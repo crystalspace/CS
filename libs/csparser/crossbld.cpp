@@ -111,11 +111,11 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
     // standard 3D coords seem to swap y and z axis compared to CS
-    newframe->SetVertex(coordindex,
+    framesource.GetVertex(newframe, coordindex) = csVector3 (
       buildsource.cor3[0][coordindex]/20.0,
       buildsource.cor3[2][coordindex]/20.0,
       buildsource.cor3[1][coordindex]/20.0);
-    newframe->SetTexel(coordindex,
+    framesource.GetTexel(newframe, coordindex) = csVector2 (
       buildsource.cor3_uv[0][coordindex],
       buildsource.cor3_uv[1][coordindex]);
   }

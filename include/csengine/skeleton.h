@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
+#include "csengine/cssprite.h"
 
 class csSkeletonLimbState;
 
@@ -90,7 +91,7 @@ public:
   /**
    * Compute the object space bounding box for this limb.
    */
-  void ComputeBoundingBox (csVector3* source);
+  void ComputeBoundingBox (csVec3Vector* source);
 };
 
 /**

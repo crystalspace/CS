@@ -90,16 +90,16 @@ void csSkeletonLimb::RemapVertices (int* mapping)
   }
 }
 
-void csSkeletonLimb::ComputeBoundingBox (csVector3* source)
+void csSkeletonLimb::ComputeBoundingBox (csVec3Vector* source)
 {
   if (num_vertices)
   {
 
-    box.StartBoundingBox (source[vertices[0]]);
+    box.StartBoundingBox (source->Get(vertices[0]));
     int i;
     for (i = 1 ; i < num_vertices ; i++)
     {
-      box.AddBoundingVertexSmart (source[vertices[i]]);
+      box.AddBoundingVertexSmart (source->Get(vertices[i]));
     }
   }
 
@@ -160,7 +160,7 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source, c
 
   int i;
   for (i = 0 ; i < num_vertices ; i++)
-    dest [vertices [i]] = tr * source [vertices [i]];
+    dest [vertices [i]] = tr * source[vertices [i]];
 }
 
 void csSkeletonConnectionState::Transform (const csTransform& tr, csVector3* source,

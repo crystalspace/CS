@@ -56,6 +56,8 @@ public:
   void AddTriangle (int a, int b, int c);
   /// Query the array of triangles.
   csTriangle* GetTriangles () { return triangles; }
+  ///
+  csTriangle& GetTriangle (int i) { return triangles[i]; }
   /// Query the number of triangles.
   int GetNumTriangles () { return num_triangles; }
 

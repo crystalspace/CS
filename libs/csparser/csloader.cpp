@@ -4439,8 +4439,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                     fr->GetName ());
                   fatal_exit (0, false);
                 }
-                fr->SetVertex (i, x, y, z);
-                fr->SetTexel (i, u, v);
+                stemp->GetVertex (fr, i) = csVector3 (x, y, z);
+                stemp->GetTexel  (fr, i) = csVector2 (u, v);
                 i++;
                 break;
             }

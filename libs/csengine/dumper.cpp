@@ -207,7 +207,7 @@ void Dumper::dump (csSpriteTemplate* s)
 {
   CsPrintf (MSG_DEBUG_0, "Dump sprite template '%s' id=%ld:\n", 
     s->GetName (), s->GetID ());
-  CsPrintf (MSG_DEBUG_0, "%d vertices.\n", s->num_vertices);
+  CsPrintf (MSG_DEBUG_0, "%d vertices.\n", s->GetNumTexels());
   CsPrintf (MSG_DEBUG_0, "%d triangles.\n", s->GetTexelMesh ()->GetNumTriangles ());
   CsPrintf (MSG_DEBUG_0, "%d frames.\n", s->GetNumFrames ());
   CsPrintf (MSG_DEBUG_0, "%d actions.\n", s->GetNumActions ());

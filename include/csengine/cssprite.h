@@ -42,15 +42,29 @@ class csSprite3D;
 class csBspContainer;
 struct iTextureHandle;
 
+class csVec3Vector : public csVector
+{
+public:
+  csVec3Vector (int ilimit = 8, int ithreshold = 8) : csVector (ilimit, ithreshold) { }
+  csVector3& Get (int index) { return (csVector3&)csVector::Get (index); }
+};
+
+class csVec2Vector : public csVector
+{
+public:
+  csVec2Vector (int ilimit = 8, int ithreshold = 8) : csVector (ilimit, ithreshold) { }
+  csVector2& Get (int index) { return (csVector2&)csVector::Get (index); }
+};
+
 /**
  * A frame for 3D sprite animation.
  */
 class csFrame : public csBase
 {
 private:
-  csVector3* vertices;
-  csVector2* texels;
-  csVector3* normals;
+  csVec3Vector* vertices;
+  csVec2Vector* texels;
+  csVec3Vector* normals;
   char* name;
 
   /// Bounding box in object space for this frame.
@@ -62,46 +76,24 @@ public:
   ///
   virtual ~csFrame ();
 
+  /// should only be used by csSpriteTemplate class
+  csVector3& GetFrameVertex (int i) { return vertices->Get(i); }
   ///
-  csVector3* GetVertices () { return vertices; }
+  void SetVertices (csVec3Vector * v) { vertices = v; }
   ///
-  csVector3& GetVertex (int i) { return vertices[i]; }
-  ///
-  void SetVertices (csVector3 * v) { vertices = v;}
-  ///
-  void SetVertex (int i, float x, float y, float z)
-  {
-    vertices[i].x = x;
-    vertices[i].y = y;
-    vertices[i].z = z;
-  }
-  ///
-  void SetVertex (int i, const csVector3& v)
-  {
-    vertices[i].x = v.x;
-    vertices[i].y = v.y;
-    vertices[i].z = v.z;
-  }
+  csVec3Vector * GetVertices () { return vertices; }
 
+  /// should only be used by csSpriteTemplate class
+  csVector2& GetFrameTexel (int i) { return texels->Get(i); }
   ///
-  csVector2* GetTexels () { return texels; }
+  void SetTexels (csVec2Vector * t) { texels = t; }
   ///
-  csVector2& GetTexel (int i) { return texels[i]; }
-  ///
-  void SetTexels (csVector2 * t) { texels = t;}
-  ///
-  void SetTexel (int i, float u, float v)
-  {
-    texels[i].x = u;
-    texels[i].y = v;
-  }
+  csVec2Vector * GetTexels () { return texels; }
 
-  /// Return true if this frame has calculated normals.
-  bool HasNormals () { return normals != NULL; }
+  /// should only be used by csSpriteTemplate class
+  csVector3& GetFrameNormal (int i) { return normals->Get(i); }
   ///
-  csVector3& GetNormal (int i) { return normals[i]; }
-  ///
-  void SetNormals (csVector3 * n) { normals = n;}
+  void SetNormals (csVec3Vector * n) { normals = n;}
 
   ///
   void SetName (char * n);
@@ -192,17 +184,14 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   csVector texels;
-  int num_texels;
 
   /// This mesh is optimized for skeletal and vertex animation.
   csTriangleMesh* vertex_mesh;
   csVector vertices;
-  int num_vertices;
 
   /// The normal mesh is used for smooth shading control.
   csTriangleMesh* normal_mesh;
   csVector normals;
-  int num_normals;
 
   /// Array that maps Texels to Normals
   int* texel_to_normal;
@@ -250,15 +239,28 @@ public:
   ///
   csTriangleMesh* GetTexelMesh () {return texel_mesh;}
 
-  /// Add some vertices
+  /// Add some vertices, normals, and texels
   void AddVertices (int num);
-  /// Add a vertex
+  /// Add a vertex, normal, and texel
   void AddVertex () { AddVertices (1); }
+
+  /// Query the number of texels.
+  int GetNumTexels   () { return ((csVec2Vector*)(texels.Get(0)))->Length (); }
   ///
-  csVector3 GetVertex (csFrame* frame, int vertex)
-    { return frame->GetVertices()[texel_to_vertex[vertex]]; }
+  csVector2& GetTexel (csFrame* frame, int vertex)
+    { return frame->GetFrameTexel(vertex); }
+
   /// Query the number of vertices.
-  int GetNumTexels () { return num_texels; }
+  int GetNumVertices () { return ((csVec3Vector*)(vertices.Get(0)))->Length (); }
+  /// 
+  csVector3& GetVertex (csFrame* frame, int vertex)
+    { return frame->GetFrameVertex(texel_to_vertex[vertex]); }
+
+  /// Query the number of normals.
+  int GetNumNormals  () { return ((csVec3Vector*)(normals.Get(0)))->Length (); }
+  ///
+  csVector3& GetNormal (csFrame* frame, int vertex)
+    { return frame->GetFrameNormal(texel_to_normal[vertex]); }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -266,14 +268,11 @@ public:
    */
   void AddTriangle (int a, int b, int c);
   /// returns the texel indices for triangle 'x'  
-  csTriangle GetTriangle (int x)
-    { return texel_mesh->GetTriangles()[x]; }
+  csTriangle GetTriangle (int x) { return texel_mesh->GetTriangle(x); }
   /// returns the triangles of the texel_mesh
-  csTriangle* GetTriangles ()
-    { return texel_mesh->GetTriangles(); }
+  csTriangle* GetTriangles ()    { return texel_mesh->GetTriangles(); }
   /// returns the number of triangles in the sprite
-  int GetNumTriangles ()
-    { return texel_mesh->GetNumTriangles(); }
+  int GetNumTriangles ()         { return texel_mesh->GetNumTriangles(); }
 
   /// Create and add a new frame to the sprite.
   csFrame* AddFrame ();

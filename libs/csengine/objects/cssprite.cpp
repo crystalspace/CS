@@ -65,10 +65,10 @@ void csFrame::SetName (char * n)
 void csFrame::ComputeBoundingBox (int num_vertices)
 {
   int i;
-  box.StartBoundingBox (vertices[0]);
+  box.StartBoundingBox (vertices->Get(0));
   for (i = 1 ; i < num_vertices ; i++)
   {
-    box.AddBoundingVertexSmart (vertices[i]);
+    box.AddBoundingVertexSmart (vertices->Get(i));
   }
 }
 
@@ -114,14 +114,11 @@ csSpriteTemplate::csSpriteTemplate ()
   emerge_from = NULL;
   skeleton = NULL;
 
-  num_normals     = 0;
   texel_to_normal = NULL;
   normal_mesh     = NULL;
 
-  num_texels   = 0;
   CHK (texel_mesh  = new csTriangleMesh ());
 
-  num_vertices    = 0;
   texel_to_vertex = NULL;
   vertex_mesh     = NULL;
 
@@ -149,45 +146,20 @@ csSpriteTemplate::~csSpriteTemplate ()
 void csSpriteTemplate::AddVertices (int num)
 {
   int frame, vertex;
-  for (frame = 0; frame < frames.Length(); frame++)
-  {
-    csFrame* fr = (csFrame*)frames[frame];
 
-    CHK (csVector3* new_normals = new csVector3 [num_normals + num]);
-    for (vertex = 0; vertex < num_normals; vertex++)
-      new_normals[vertex] = ((csVector3*)normals[frame])[vertex];
-    CHK (delete[] (csVector3*)normals[frame]);
-    normals[frame] = new_normals;
-    fr->SetNormals (new_normals);
-
-    CHK (csVector2* new_texels = new csVector2 [num_texels + num]);
-    for (vertex = 0; vertex < num_texels; vertex++)
-      new_texels[vertex] = ((csVector2*)texels[frame])[vertex];
-    CHK (delete[] (csVector2*)texels[frame]);
-    texels[frame] = new_texels;
-    fr->SetTexels (new_texels);
-
-    CHK (csVector3* new_vertices = new csVector3 [num_vertices + num]);
-    for (vertex = 0; vertex < num_vertices; vertex++)
-      new_vertices[vertex] = ((csVector3*)vertices[frame])[vertex];
-    CHK (delete[] (csVector3*)vertices[frame]);
-    vertices[frame] = new_vertices;
-    fr->SetVertices (new_vertices);
-  }
-
-  CHK (int* ttn = new int [num_texels + num]);
+  CHK (int* ttn = new int [GetNumTexels() + num]);
   if (texel_to_normal != NULL)
   {
-    for (vertex = 0; vertex < num_texels; vertex++)
+    for (vertex = 0; vertex < GetNumTexels(); vertex++)
       ttn [vertex] = texel_to_normal [vertex];
     CHK (delete[] texel_to_normal);
   }
   texel_to_normal = ttn;
 
-  CHK (int* ttv = new int [num_texels + num]);
+  CHK (int* ttv = new int [GetNumTexels() + num]);
   if (texel_to_vertex != NULL)
   {
-    for (vertex = 0; vertex < num_texels; vertex++)
+    for (vertex = 0; vertex < GetNumTexels(); vertex++)
       ttv [vertex] = texel_to_vertex [vertex];
     CHK (delete[] texel_to_vertex);
   }
@@ -195,13 +167,19 @@ void csSpriteTemplate::AddVertices (int num)
 
   for (vertex = 0; vertex < num; vertex++)
   {
-    texel_to_normal [num_texels + vertex] = num_normals + vertex;
-    texel_to_vertex [num_texels + vertex] = num_vertices + vertex;
+    texel_to_normal [GetNumTexels() + vertex] = GetNumNormals  () + vertex;
+    texel_to_vertex [GetNumTexels() + vertex] = GetNumVertices () + vertex;
   }
 
-  num_normals  += num;
-  num_texels   += num;
-  num_vertices += num;
+  for (frame = 0; frame < frames.Length(); frame++)
+  {
+    for (vertex = 0; vertex < num; vertex++)
+    {
+      ((csVec3Vector*)(normals  .Get(frame))) -> Push (new csVector3);
+      ((csVec2Vector*)(texels   .Get(frame))) -> Push (new csVector2);
+      ((csVec3Vector*)(vertices .Get(frame))) -> Push (new csVector3);
+    }
+  }
 }
 
 void csSpriteTemplate::AddTriangle (int a, int b, int c)
@@ -238,29 +216,31 @@ void csSpriteTemplate::GenerateLOD ()
   int i;
 
   //@@@ turn this into a parameter or member variable?
-  int lod_base_frame = 0;
+  csFrame* lod_base_frame = GetFrame(0);
 
-  CHK (csVector3* v = new csVector3[num_texels]);
-  for (i = 0; i < num_texels; i++)
-    v[i] = ((csVector3*)vertices[lod_base_frame])[texel_to_vertex[i]];
-  CHK (csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, num_texels));
+  CHK (csVector3* v = new csVector3[GetNumTexels()]);
+  for (i = 0; i < GetNumTexels(); i++)
+    v[i] = GetVertex (lod_base_frame, i);
+  CHK (csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels()));
   CHK (delete [] v);
 
   CHK (delete [] emerge_from);
-  CHK (emerge_from = new int [num_texels]);
-  CHK (int* translate = new int [num_texels]);
+  CHK (emerge_from = new int [GetNumTexels()]);
+  CHK (int* translate = new int [GetNumTexels()]);
   CHK (csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh));
 
   csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
   for (i = 0 ; i < frames.Length () ; i++)
   {
-    CHK (csVector2* new_texels = new csVector2 [num_texels]);
-    for (int j = 0 ; j < num_texels ; j++)
-      new_texels[translate[j]] = ((csVector2*)texels[i])[j];
-    CHK (delete [] (csVector2*)texels[i]);
-    texels[i] = new_texels;
+    CHK (csVector2* new_texels = new csVector2 [GetNumTexels()]);
+    for (int j = 0 ; j < GetNumTexels() ; j++)
+      new_texels[translate[j]] = GetTexel (GetFrame(i), j);
+    for (int j = 0 ; j < GetNumTexels() ; j++)
+      GetTexel (GetFrame(i), j) = new_texels[j];
+    CHK (delete [] new_texels);
   }
+
   if (skeleton) skeleton->RemapVertices (translate);
 
   for (i = 0 ; i < GetNumTriangles () ; i++)
@@ -272,13 +252,19 @@ void csSpriteTemplate::GenerateLOD ()
   }
   if (normal_mesh != NULL)
   {
-    for (i = 0 ; i < num_texels ; i++)
-      texel_to_normal[i] = texel_to_normal[translate[i]];
+    CHK (int* ttn = new int [GetNumTexels()]);
+    for (i = 0 ; i < GetNumTexels() ; i++)
+      ttn[i] = texel_to_normal[translate[i]];
+    CHK (delete [] texel_to_normal);
+    texel_to_normal = ttn;
   }
   if (vertex_mesh != NULL)
   {
-    for (i = 0 ; i < num_texels ; i++)
-      texel_to_vertex[i] = texel_to_vertex[translate[i]];
+    CHK (int* ttv = new int [GetNumTexels()]);
+    for (i = 0 ; i < GetNumTexels() ; i++)
+      ttv[i] = texel_to_vertex[translate[i]];
+    CHK (delete [] texel_to_vertex);
+    texel_to_vertex = ttv;
   }
 
   CHK (delete [] translate);
@@ -290,26 +276,33 @@ void csSpriteTemplate::ComputeBoundingBox ()
 {
   int i;
   for (i = 0 ; i < GetNumFrames () ; i++)
-    GetFrame (i)->ComputeBoundingBox (num_vertices);
+    GetFrame(i)->ComputeBoundingBox (GetNumVertices());
   if (skeleton)
-    skeleton->ComputeBoundingBox (GetFrame (0)->GetVertices());
+    skeleton->ComputeBoundingBox (GetFrame(0)->GetVertices());
     // @@@ should the base frame for the skeleton be a variable?
 }
 
 csFrame* csSpriteTemplate::AddFrame ()
 {
   CHK (csFrame* fr = new csFrame ());
-  CHK (csVector3* nr = new csVector3 [num_normals ? num_normals : 1]);
-  CHK (csVector2* tx = new csVector2 [num_texels ? num_texels : 1]);
-  CHK (csVector3* vr = new csVector3 [num_vertices ? num_vertices : 1]);
+  CHK (csVec3Vector* nr = new csVec3Vector ());
+  CHK (csVec2Vector* tx = new csVec2Vector ());
+  CHK (csVec3Vector* vr = new csVec3Vector ());
 
-  frames.Push (fr);
-  normals.Push (nr);
-  texels.Push (tx);
+  if (frames.Length() > 0)
+  {
+    nr -> SetLength (GetNumNormals  ());
+    tx -> SetLength (GetNumTexels   ());
+    vr -> SetLength (GetNumVertices ());
+  }
+
+  frames.Push   (fr);
+  normals.Push  (nr);
+  texels.Push   (tx);
   vertices.Push (vr);
 
-  fr -> SetNormals (nr);
-  fr -> SetTexels (tx);
+  fr -> SetNormals  (nr);
+  fr -> SetTexels   (tx);
   fr -> SetVertices (vr);
   
   return fr;
@@ -351,14 +344,8 @@ void csSpriteTemplate::SetTexture (csTextureList* textures, const char *texname)
 
 void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
 {
-  if (!frame->HasNormals())
-  {
-    CHK (csVector3* norms = new csVector3 [num_normals]);
-    frame->SetNormals (norms);
-    normals.Push(norms);
-  }
 
-  CHK (csTriangleVertices *tri_verts = new csTriangleVertices (texel_mesh, object_verts, num_texels));
+  CHK (csTriangleVertices *tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels()));
 
   int i, j;
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -378,12 +365,12 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
   }
 
   // calculate vertex normals, by averaging connected triangle normals
-  for (i = 0; i < num_texels; i++)
+  for (i = 0; i < GetNumTexels(); i++)
   {
     csTriangleVertex &vt = tri_verts->GetVertex (i);
     if (vt.num_con_triangles)
     {
-      csVector3 &n = frame->GetNormal(texel_to_normal[i]);
+      csVector3 &n = GetNormal (frame, i);
       n = csVector3 (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
         n += tri_normals[vt.con_triangles[j]];
@@ -411,10 +398,8 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
   // Minimize the number of 3D coordinates:
 
   // create an array of ints which maps old vertex indices to new ones
-  int* new_vertices = new int [num_vertices];
-  if (new_vertices == NULL) return num_vertices;
-  int* old_vertices = new int [num_vertices];
-  if (old_vertices == NULL) return num_vertices;
+  CHK (int* new_vertices = new int [GetNumVertices()]);
+  CHK (int* old_vertices = new int [GetNumVertices()]);
 
   // map the first new vertex to the first old vertex
   new_vertices[0] = 0;
@@ -423,15 +408,15 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
   int new_vertex_count = 1;
 
   // FOR each old vertex
-  for (int old_vertex=1; old_vertex<num_vertices; old_vertex++)
+  for (int old_vertex = 1; old_vertex < GetNumVertices(); old_vertex++)
   {
     bool unique = true;
 
     // FOR each new vertex
-    for (int new_vertex=0; new_vertex<new_vertex_count; new_vertex++)
+    for (int new_vertex = 0; new_vertex < new_vertex_count; new_vertex++)
     {
       // IF the vertices have the same coordinates
-      if (frame->GetVertex(old_vertex) == frame->GetVertex(new_vertices[new_vertex]))
+      if (frame->GetFrameVertex(old_vertex) == frame->GetFrameVertex(new_vertices[new_vertex]))
       {
         //  map this new vertex to this old vertex
         old_vertices[new_vertex] = new_vertex;
@@ -480,10 +465,8 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
   // Combine normals of adjacent vertices based on one special frame:
 
   // create an array of ints which maps old vertex indices to new ones
-  int* new_vertices = new int [num_vertices];
-  if (new_vertices == NULL) return num_vertices;
-  int* old_vertices = new int [num_vertices];
-  if (old_vertices == NULL) return num_vertices;
+  CHK (int* new_vertices = new int [GetNumNormals()]);
+  CHK (int* old_vertices = new int [GetNumNormals()]);
 
   // map the first new vertex to the first old vertex
   new_vertices[0] = 0;
@@ -492,15 +475,15 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
   int new_vertex_count = 1;
 
   // FOR each old vertex
-  for (int old_vertex=1; old_vertex<num_vertices; old_vertex++)
+  for (int old_vertex = 1; old_vertex < GetNumNormals(); old_vertex++)
   {
     bool unique = true;
 
     // FOR each new vertex
-    for (int new_vertex=0; new_vertex<new_vertex_count; new_vertex++)
+    for (int new_vertex = 0; new_vertex < new_vertex_count; new_vertex++)
     {
       // IF the vertices have the same coordinates
-      if (frame->GetVertex(old_vertex) == frame->GetVertex(new_vertices[new_vertex]))
+      if (frame->GetFrameNormal(old_vertex) == frame->GetFrameNormal(new_vertices[new_vertex]))
       {
         //  map this new vertex to this old vertex
         old_vertices[new_vertex] = new_vertex;
@@ -553,23 +536,23 @@ int csSpriteTemplate::MergeTexels ()
 
   // start a count and a list of unique texel maps
   int unique_texel_map_count;
-  csVector2** unique_texel_maps = new csVector2* [num_vertices];
+  CHK (csVec2Vector** unique_texel_maps = new csVec2Vector* [frames.Length()]);
 
   // add the first frame to the unique texel map list
-  unique_texel_maps [0] = ((csFrame*)frames[0])->GetTexels();
+  unique_texel_maps [0] = GetFrame(0)->GetTexels();
   unique_texel_map_count = 1;
 
   // FOR each frame
   for (int frame = 1;  frame < frames.Length(); frame ++)
   {
-    csVector2 * texels = ((csFrame*)frames[frame])->GetTexels();
+    csVec2Vector * tx = GetFrame(frame)->GetTexels();
     bool unique = true;
 
     // FOR each unique texel map
     for (int map = 0; map < unique_texel_map_count; map ++)
     {
       // IF this texel map is already in our list
-      if (texels == unique_texel_maps [map])
+      if (tx == unique_texel_maps [map])
       {
         // next frame
         unique = false;
@@ -577,9 +560,9 @@ int csSpriteTemplate::MergeTexels ()
       }
       // IF all texture vertices are are the same in both
       bool same = true;
-      for (int v = 0; v < num_vertices; v ++)
+      for (int v = 0; v < GetNumTexels(); v ++)
       {
-        if (texels[v] != unique_texel_maps[map][v])
+        if (tx->Get(v) != unique_texel_maps[map]->Get(v))
         {
           same = false;
           break;
@@ -589,11 +572,8 @@ int csSpriteTemplate::MergeTexels ()
       {
         same_count++;
 
-        // delete this redundant texel map
-        CHK (delete [] texels);
-
         // change the pointer in this frame to that texel map
-        ((csFrame*)frames[frame]) -> SetTexels(unique_texel_maps[map]);
+        GetFrame(frame)->SetTexels(unique_texel_maps[map]);
 
         // next frame
         unique = false;
@@ -603,10 +583,12 @@ int csSpriteTemplate::MergeTexels ()
     // add this frame to the unique texel map list
     if (unique)
     {
-      unique_texel_maps[unique_texel_map_count] = texels;
+      unique_texel_maps[unique_texel_map_count] = tx;
       unique_texel_map_count ++;
     }
   }
+
+  //@@@ ADD EXTRA CODE TO DELETE UNUSED TEXEL FRAMES
 
   delete[] unique_texel_maps;
 
@@ -1146,8 +1128,14 @@ void csSprite3D::Draw (csRenderView& rview)
   // Now we transform all vertices to camera space. There are two possibilities.
   // If we have a skeleton then we let the skeleton do the transformation.
   // Otherwise we just transform all vertices.
+
+  CHK ( delete [] object_vertices; )
+  CHK ( object_vertices = new csVector3 [tpl->GetNumTexels()]; )
+  for (i = 0; i < tpl->GetNumTexels(); i++)
+    object_vertices[i] = tpl->GetVertex(cframe, i);
+
   if (skeleton_state)
-    skeleton_state->Transform (tr_o2c, cframe->GetVertices(), tr_verts.GetArray ());
+    skeleton_state->Transform (tr_o2c, object_vertices, tr_verts.GetArray ());
   else
   {
     if (tween_ratio)
@@ -1160,7 +1148,7 @@ void csSprite3D::Draw (csRenderView& rview)
     else
     {
       for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        tr_verts[i] = tr_o2c * tpl->GetVertex(cframe, i);
+        tr_verts[i] = tr_o2c * tpl->GetVertex (cframe, i);
     }
   }
 
@@ -1173,7 +1161,7 @@ void csSprite3D::Draw (csRenderView& rview)
   if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
   {
     m = tpl->GetTexelMesh ();
-    num_verts = tpl->GetNumTexels();
+    num_verts = tpl->GetNumTexels ();
   }
   else
   {
@@ -1197,13 +1185,14 @@ void csSprite3D::Draw (csRenderView& rview)
     if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
     {
       v = tr_verts[i];
-      uv = cframe->GetTexel (i);
+      uv = tpl->GetTexel (cframe, i);
     }
     else
     {
       // Morph between the last vertex and the one we morphed from.
       v = (1-fnum)*tr_verts[emerge_from[i]] + fnum*tr_verts[i];
-      uv = (1-fnum)*cframe->GetTexel (emerge_from[i]) + fnum*cframe->GetTexel (i);
+      uv = (1-fnum) * tpl->GetTexel (cframe, emerge_from[i])
+        + fnum * tpl->GetTexel (cframe, i);
     }
 
     uv_verts[i] = uv;
@@ -1481,8 +1470,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
         + remainder * tpl->GetVertex (next_frame, i);
   }
 
-  if (!this_frame->HasNormals ())
-    tpl->ComputeNormals (this_frame, object_vertices);
+  tpl->ComputeNormals (this_frame, object_vertices);
 
   ResetVertexColors ();
 
@@ -1543,7 +1531,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
       if (obj_sq_dist < SMALL_EPSILON)
         cosinus = 1;
       else
-        cosinus = (obj_light_pos - obj_vertex) * this_frame->GetNormal (j);
+        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (this_frame, j);
 
       if (cosinus > 0)
       {
@@ -1592,7 +1580,7 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       if (obj_sq_dist < SMALL_EPSILON)
         cosinus = 1;
       else
-        cosinus = (obj_light_pos - obj_vertex) * this_frame->GetNormal (j);
+        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (this_frame, j);
 
       if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
       {
