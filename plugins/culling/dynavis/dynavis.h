@@ -81,6 +81,7 @@ public:
   bool hint_badoccluder;
   bool hint_goodoccluder;
   bool use_outline_filler;
+  bool full_transform_identity;	// Cache for IsFullTransformIdentity().
 
   uint32 last_visible_vistestnr;
 
@@ -95,6 +96,7 @@ public:
     history = new csVisibilityObjectHistory ();
     csVisibilityObjectWrapper::dynavis = dynavis;
     last_visible_vistestnr = 0;
+    full_transform_identity = false;
   }
   virtual ~csVisibilityObjectWrapper ()
   {
@@ -210,14 +212,15 @@ private:
   bool do_state_dump;
 
   // Fill the bounding box with the current object status.
-  void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
+  void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
+  	bool full_transform_identity);
 
   // Given an occluder, update it in the coverage buffer.
   void UpdateCoverageBuffer (iCamera* camera, csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
-  void UpdateCoverageBufferOutline (iCamera* camera, iVisibilityObject* visobj,
-  	csDynavisObjectModel* model);
+  void UpdateCoverageBufferOutline (iCamera* camera,
+  	csVisibilityObjectWrapper* obj);
 
   // Append an occluder to the write queue.
   void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,

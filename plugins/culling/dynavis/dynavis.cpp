@@ -273,10 +273,11 @@ void csDynaVis::Setup (const char* /*name*/)
 {
 }
 
-void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
+void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
+	bool full_transform_identity)
 {
   iMovable* movable = visobj->GetMovable ();
-  if (movable->IsFullTransformIdentity ())
+  if (full_transform_identity)
   {
     visobj->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
   }
@@ -329,7 +330,8 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   model_mgr->CheckObjectModel (visobj_wrap->model, mesh);
 
   csBox3 bbox;
-  CalculateVisObjBBox (visobj, bbox);
+  visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
+  CalculateVisObjBBox (visobj, bbox, visobj_wrap->full_transform_identity);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
   // Only add the listeners at the very last moment to prevent them to
@@ -415,7 +417,8 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
   csBox3 bbox;
-  CalculateVisObjBBox (visobj, bbox);
+  visobj_wrap->full_transform_identity = movable->IsFullTransformIdentity ();
+  CalculateVisObjBBox (visobj, bbox, visobj_wrap->full_transform_identity);
   kdtree->MoveObject (visobj_wrap->child, bbox);
   visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
@@ -692,7 +695,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 {
   if (do_cull_coverage != COVERAGE_POLYGON && obj->use_outline_filler)
   {
-    UpdateCoverageBufferOutline (camera, obj->visobj, obj->model);
+    UpdateCoverageBufferOutline (camera, obj);
     return;
   }
   iVisibilityObject* visobj = obj->visobj;
@@ -708,7 +711,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   csReversibleTransform trans = camera->GetTransform ();
   // Camera position in object space.
   csVector3 campos_object;
-  if (movable->IsFullTransformIdentity ())
+  if (obj->full_transform_identity)
   {
     campos_object = trans.GetOrigin ();
   }
@@ -864,8 +867,10 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 }
 
 void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
-	iVisibilityObject* visobj, csDynavisObjectModel* model)
+	csVisibilityObjectWrapper* obj)
 {
+  iVisibilityObject* visobj = obj->visobj;
+  csDynavisObjectModel* model = obj->model;
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
@@ -875,7 +880,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   csReversibleTransform trans = camera->GetTransform ();
   // Camera position in object space.
   csVector3 campos_object;
-  if (movable->IsFullTransformIdentity ())
+  if (obj->full_transform_identity)
   {
     campos_object = trans.GetOrigin ();
   }
@@ -1080,7 +1085,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (obj->model->HasOBB ())
   {
     csReversibleTransform trans = camtrans;
-    if (!movable->IsFullTransformIdentity ())
+    if (!obj->full_transform_identity)
     {
       csReversibleTransform movtrans = movable->GetFullTransform ();
       trans /= movtrans;
@@ -1858,8 +1863,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    // Transform our vector to object space.
 	    csVector3 obj_start;
 	    csVector3 obj_end;
-	    iMovable* movable = visobj_wrap->visobj->GetMovable ();
-	    bool identity = movable->IsFullTransformIdentity ();
+	    bool identity = visobj_wrap->full_transform_identity;
 	    csReversibleTransform movtrans;
 	    if (identity)
 	    {
@@ -1868,6 +1872,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    }
 	    else
 	    {
+	      iMovable* movable = visobj_wrap->visobj->GetMovable ();
 	      movtrans = movable->GetFullTransform ();
 	      obj_start = movtrans.Other2This (data->seg.Start ());
 	      obj_end = movtrans.Other2This (data->seg.End ());
@@ -2582,7 +2587,10 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
         iVisibilityObject* visobj = visobj_wrap->visobj;
 	csBox3 box;
-	CalculateVisObjBBox (visobj, box);
+	iMovable* movable = visobj->GetMovable ();
+	visobj_wrap->full_transform_identity =
+		movable->IsFullTransformIdentity ();
+	CalculateVisObjBBox (visobj, box, visobj_wrap->full_transform_identity);
 	bugplug->DebugSectorBox (box,
 		float (reason_colors[visobj_wrap->history->reason].r) / 256.0,
 		float (reason_colors[visobj_wrap->history->reason].g) / 256.0,
