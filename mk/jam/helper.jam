@@ -136,10 +136,9 @@ rule Filter
 
 ##  GetVar argument
 ##    Simply returns the value of the variable with name argument.
-##    This is usefull to query on target variables:
-##       bla = [ on TARGET Ident CFlags ] ;
+##    This is useful to query on target variables:
+##       bla = [ on TARGET GetVar CFlags ] ;
 rule GetVar
 {
   return $($(<)) ;
 }
-

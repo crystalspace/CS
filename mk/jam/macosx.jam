@@ -45,10 +45,10 @@ actions LinkPlugin bind NEEDLIBS
 
 ## LinkApplicationConsole exe : objects
 ##    Link a console (non-GUI) appliation from a set of object files.
-actions LinkApplicationConsole bind NEEDLIBS
+actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX.ENVIRON)
-  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 ## LinkApplication basename : objects
@@ -168,7 +168,7 @@ rule WrapFile
 }
 
 ## LinkApplication exe : objects
-actions AppExe bind NEEDLIBS
+actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX_ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)

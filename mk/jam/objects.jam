@@ -11,7 +11,7 @@
 ##    Register a rule which is used to compile a filetype into object
 ##    files. The registered rule is called with the name of the
 ##    sourcefile as argument and should return a list of objectfiles which are
-##    created. You should set the grest of the object files by using the
+##    created. You should set the grist of the object files by using the
 ##    DoObjectGrist function.
 rule RegisterFileType
 {
@@ -37,7 +37,7 @@ rule RegisterHeaderRule
 
 ##  CompileObjects sources
 ##    Compile a set of sourcefiles into objectfiles (extension: SUFOBJ,
-##	usually .o). This rule takes care of setting LOCATE and SEARCH
+##    usually .o). This rule takes care of setting LOCATE and SEARCH
 ##    variables to the $(SEARCH_SOURCE) and $(LOCATE_SOURCE) variables.
 ##    The Application, Plugin and Library rules already use this rule
 ##    internally. You should only use this rule if you have to avoid the
@@ -153,30 +153,29 @@ rule HeaderRule
   }
 }
 
-# dummy rule: .o files are used as is
+# Dummy rule: .o files are used as is.
 rule UseObjectFile
 {
   return $(<) ;
 }
 RegisterFileType UseObjectFile : .o ;
 
-# ignore header files
+# Ignore header files.
 rule UseHeaderFile
 {
   return ;
 }
 RegisterFileType UseHeaderFile : .h .hpp ;
 
-# generates a grist suitable for output objects based on
-# SUBVARIANT and SUBDIR variable
+# Generates a grist suitable for output objects based on
+# SUBVARIANT and SUBDIR variable.
 rule DoObjectGrist
 {
   return $(<:G=$(SOURCE_GRIST:E)!$(SUBVARIANT)) ;
 }
 
-# generates a grist suitable for source files based on SUBDIR variable
+# Generates a grist suitable for source files based on SUBDIR variable.
 rule DoSourceGrist
 {
   return $(<:G=$(SOURCE_GRIST:E)) ;
 }
-

@@ -24,11 +24,11 @@ actions LinkPlugin bind NEEDLIBS
   echo "	$(NAME:B)_scfFinalize">>$(TEMP)/$(NAME:B).def
   echo "	plugin_compiler">>$(TEMP)/$(NAME:B).def
 
-  dllwrap --driver-name=$(CMD.LINK) --dllname $(NAME:B) --def=$(TEMP)/$(NAME:B).def -o $(<) $(TEMP)/$(NAME:B)resource.o $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(ADDLIBS) $(LINKLIBS) -mwindows -mconsole
+  dllwrap --driver-name=$(CMD.LINK) --dllname $(NAME:B) --def=$(TEMP)/$(NAME:B).def -o $(<) $(TEMP)/$(NAME:B)resource.o $(>) $(NEEDLIBS) $(ADDLIBS) $(LINKLIBS) -mwindows -mconsole
   rm -f $(TEMP)/$(NAME:B)version.rc $(TEMP)/$(NAME:B)resource.rc $(TEMP)/$(NAME:B).def $(TEMP)/$(NAME:B)resource.o
 }
 
-actions LinkApplication bind NEEDLIBS
+actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh $(TEMP)/$(NAME:B)version.rc "$($(NAME)_help)" $(TOP)/include/csver.h
   $(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh $(TEMP)/$(NAME:B)resource.rc $(TOP) $(TOP) $(TEMP)/$(NAME:B)version.rc $($(NAME:B)_WIN32RESOURCE)
@@ -40,5 +40,5 @@ actions LinkApplication bind NEEDLIBS
 
 rule LinkApplicationConsole
 {
-  LinkApplication $(<) : $(>) $(EXTRAOBJECTS) ;
+  LinkApplication $(<) : $(>) ;
 }

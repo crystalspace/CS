@@ -39,6 +39,15 @@ The history order is reversed so that new features are at the top.
 	      indirectly via ExternalLibs) rules in module-specific Jamefiles.
 	    - Augmented macosx/opengl/Jamfile to also respect .c, .C, .mm, and
 	      .M file extensions.
+	- Eric Sunshine made the following corrections to Matze's recent
+	  Jam-related commit:
+	    - Fixed numerous typographical errors and incorrect comments.
+	    - Fixed serveral locations where new EXTRAOBJECTS variable was not
+	      being correctly bound.
+	    - Fixed problem where EXTRAOBJECTS was not being respected by
+	      LinkApplicationConsole in macosx.jam.
+	    - Removed unnecessary EXTRAOBJECTS references from unix.jam and
+	      win32.jam.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented

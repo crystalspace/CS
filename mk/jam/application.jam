@@ -54,9 +54,9 @@ rule Application
 rule LinkStaticPlugins
 {
   LinkWith $(<) : $(>)_static ;
-  local staticfile = [ DoObjectGrist _registerstatic.cpp ] ;
-  local staticobject = [ CompileObject $(staticfile) ] ;
-  Depends $(<)_target : $(staticobject) ;
+  local regsrc = [ DoObjectGrist _registerstatic.cpp ] ;
+  local regobj = [ CompileObject $(regsrc) ] ;
+  Depends $(<)_target : $(regobj) ;
 
   # construct flags
   local deplibs i ;
@@ -69,7 +69,7 @@ rule LinkStaticPlugins
   Depends $($(<)_target) : $(deplibs) ;
   NEEDLIBS on $($(<)_target) += $(deplibs) ;
 
-  # construct initialisation sourcefile
+  # construct initialization sourcefile
   local staticobject = [ BuildStaticFile $(>) ] ;
   ExtraObjects $(<) : $(staticobject) ;
 }

@@ -19,7 +19,7 @@ SUFPLUGIN ?= .so ;
 
 actions LinkPlugin bind NEEDLIBS
 {
-  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
@@ -29,5 +29,5 @@ actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 
 rule LinkApplicationConsole
 {
-  LinkApplication $(<) : $(>) $(EXTRAOBJECTS) ;
+  LinkApplication $(<) : $(>) ;
 }
