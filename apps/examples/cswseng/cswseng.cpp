@@ -30,6 +30,7 @@
 #include "ivaria/conout.h"
 #include "iutil/event.h"
 #include "iutil/strvec.h"
+#include "iutil/virtclk.h"
 #include "cswseng.h"
 #include "iengine/camera.h"
 #include "iengine/sector.h"
@@ -108,7 +109,9 @@ bool ceEngineView::HandleEvent (iEvent &Event)
       if (Event.Command.Code == cscmdPreProcess)
       {
         csTicks elapsed_time, current_time;
-        System->GetElapsedTime (elapsed_time, current_time);
+	iVirtualClock* vc = CS_QUERY_REGISTRY (app->object_reg, iVirtualClock);
+        elapsed_time = vc->GetElapsedTicks ();
+	current_time = vc->GetCurrentTicks ();
 
         // Now rotate the camera according to keyboard state
         float speed = (elapsed_time / 1000.) * (0.03 * 20);
