@@ -290,8 +290,8 @@ void TrianglesSuperLightmapList::Add(TrianglesSuperLightmapNode* t)
  * if it can't find any creates a new one
  */
 csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
-           SearchFittingSuperLightmap(iPolygonTexture* poly_texture,
-           csRect& rect,int num_vertices)
+    SearchFittingSuperLightmap(iPolygonTexture* poly_texture,
+                               csRect& rect,int /*num_vertices*/)
 {
 
   int i;
@@ -328,7 +328,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
 void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
     csTrianglesPerSuperLightmap* triSuperLM, int* verts, int num_vertices, 
     const csMatrix3& m_obj2tex, const csVector3& v_obj2tex, 
-    iPolygonTexture* poly_texture, int mat_index, const csPlane3& poly_normal)
+    iPolygonTexture* poly_texture, int mat_index, const csPlane3& /*poly_normal*/)
 {
 
   csVector3 aux;

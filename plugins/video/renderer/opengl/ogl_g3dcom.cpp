@@ -3293,7 +3293,7 @@ static void ResolveVertexLightmap (
     case CS_CLIPINFO_INSIDE:
     {
       csVector2 texel1, texel2,fog_texel1,fog_texel2;
-      csColor color1, color2;
+      //      csColor color1, color2;
       csColor fog1, fog2;
       
       ResolveVertexLightmap (ci->inside.ci1, clipped_translate, otexels,
@@ -3993,11 +3993,11 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     csTriangle *triangles = polbuf->GetTriangles (t);
     int num_triangles = polbuf->GetTriangleCount (t);
     int num_vertices = polbuf->GetVertexCount (t);
-    int mat_index = polbuf->GetMatIndex (t);
+    //int mat_index = polbuf->GetMatIndex (t);
     work_uv_verts = polbuf->GetUV (t);
-    int uvCount = polbuf->GetUVCount (t);
+    //int uvCount = polbuf->GetUVCount (t);
     iMaterialHandle* mat_handle = polbuf->GetMaterialPolygon (t);
-    G3DFogInfo* work_fog = mesh.vertex_fog;
+    //G3DFogInfo* work_fog = mesh.vertex_fog;
     work_colors = polbuf->GetColors (t);
     //iPolyTex_p* lightmaps = polbuf->GetLightMaps (t);
     //work_lightmaps = lightmaps;
@@ -4400,7 +4400,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     cl = clipper;
   else
     cl = NULL;
-  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false /*lazyclip, aspect,
+  DefaultDrawPolygonMesh (mesh, this, o2c, cl, false lazyclip, aspect,
   	asp_center_x, asp_center_y);
   */
 }
