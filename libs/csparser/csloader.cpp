@@ -236,6 +236,7 @@ TOKEN_DEF_START
   TOKEN_DEF (TRANSPARENT)
   TOKEN_DEF (TRIANGLE)
   TOKEN_DEF (TRIGGER)
+  TOKEN_DEF (TWEEN)
   TOKEN_DEF (UV)
   TOKEN_DEF (UVA)
   TOKEN_DEF (UV_SHIFT)
@@ -5035,6 +5036,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     TOKEN_TABLE (TRIANGLE)
     TOKEN_TABLE (SKELETON)
     TOKEN_TABLE (FILE)
+    TOKEN_TABLE (TWEEN)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tok_frame)
@@ -5198,6 +5200,14 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	  CsPrintf (MSG_WARNING, "MERGE_VERTICES is obsolete.\n");
         }
         break;
+
+      case TOKEN_TWEEN:
+	{
+	  bool do_tween;
+          ScanStr (params, "%b", &do_tween);
+          stemp->EnableTweening (do_tween);
+	}
+	break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -5339,6 +5349,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
     TOKEN_TABLE (TEMPLATE)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (MOVE)
+    TOKEN_TABLE (TWEEN)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tok_matvec)
@@ -5413,6 +5424,14 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         if (tpl->FindAction (str2) != NULL)
           spr->SetAction (str2);
         break;
+
+      case TOKEN_TWEEN:
+	{
+	  bool do_tween;
+          ScanStr (params, "%b", &do_tween);
+          spr->EnableTweening (do_tween);
+	}
+	break;
 
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);

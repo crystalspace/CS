@@ -146,6 +146,7 @@ csSprite3D* csSpriteTemplate::NewSprite (csObject* parent)
   csSprite3D* spr;
   spr = new csSprite3D (parent);
   spr->SetTemplate (this);
+  spr->EnableTweening (do_tweening);
   spr->SetAction ("default");
   spr->InitSprite ();
   return spr;
@@ -534,6 +535,8 @@ csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
   obj_verts.IncRef ();
   tween_verts.IncRef ();
   light_worktable.IncRef ();
+
+  do_tweening = false;
 }
 
 csSprite3D::~csSprite3D ()
@@ -611,7 +614,9 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
   tpl = tmpl;
   delete skeleton_state;
   skeleton_state = NULL;
-  if (tmpl->GetSkeleton ()) skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
+  if (tmpl->GetSkeleton ())
+    skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
+  EnableTweening (tmpl->IsTweeningEnabled ());
 }
 
 void csSprite3D::SetTexture (const char* name, csTextureList* textures)
@@ -1223,7 +1228,10 @@ bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
     }
   }
 
-  tween_ratio = (current_time - last_time) / (float)cur_action->GetFrameDelay (cur_frame);
+  if (do_tweening)
+    tween_ratio = (current_time - last_time) / (float)cur_action->GetFrameDelay (cur_frame);
+  else
+    tween_ratio = 0;
 
   return ret;
 }

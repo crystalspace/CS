@@ -165,6 +165,9 @@ private:
   /// The actions (a vector of csSpriteAction objects)
   csNamedObjVector actions;
 
+  /// Enable tweening.
+  bool do_tweening;
+
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
@@ -204,6 +207,12 @@ public:
 
   /// Get the 'emerge_from' array from which you can construct triangles.
   int* GetEmergeFrom () { return emerge_from; }
+
+  /// Enable or disable tweening frames (default false).
+  void EnableTweening (bool en) { do_tweening = en; }
+
+  /// Is tweening enabled?
+  bool IsTweeningEnabled () { return do_tweening; }
 
   /**
    * Generate the collapse order.
@@ -627,6 +636,9 @@ private:
   /// Animation tweening ratio:  next frame / this frame.
   float tween_ratio;
 
+  /// Enable tweening.
+  bool do_tweening;
+
   ///
   bool force_otherskin;
 
@@ -672,6 +684,12 @@ public:
 
   /// force a new texture skin other than default
   void SetTexture (const char* name, csTextureList* textures);
+
+  /// Enable or disable tweening frames (default false).
+  void EnableTweening (bool en) { do_tweening = en; }
+
+  /// Is tweening enabled?
+  bool IsTweeningEnabled () { return do_tweening; }
 
   /// Scale the sprite by scaling the diagonal of the transform
   virtual void ScaleBy (float factor);

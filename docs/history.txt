@@ -6,6 +6,14 @@ The history order has been reversed so that new features are at the top.
 	  works very well already. WARNING! Please do -relight or -recalc
 	  on levels that have curved surfaces! The lightmap format has
 	  changed (lightmap got bigger).
+	- I discovered that sprite tweening is enabled by default. Because
+	  this makes things slower I disabled it by default and added a
+	  function csSprite3D::EnableTweening() with which you can enable
+	  it again. I also added csSpriteTemplate::EnableTweening() and
+	  provided support for a new TWEEN keyword in the world file for
+	  both sprites and templates.
+	- csPolygonSet::GetBoundingBox() will now try to create the bounding
+	  box if it doesn't exist.
 21-Jun-2000
 	- Norman Kramer added new SetViewArea for gridviews to retsrict the
 	  area they can show.
