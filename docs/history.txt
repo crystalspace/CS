@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Oct-2004
+	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
+	  subdir.jam where it failed to set the LOCATE variable for the target
+	  of the rule invocation if the output directory was "." (the current
+	  working directory).  This was often the case when the rule was
+	  invoked with $(LOCATE.TARGETS) as an argument.  In practice, this
+	  bug caused, at least some, Copy invocations to be ignored if the
+	  target location was ".".
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would

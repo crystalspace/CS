@@ -1,5 +1,5 @@
 #============================================================================
-# Work around problems the SubDir rule of Jambase 
+# Work around problems the SubDir rule of Jambase
 #	(until jampeople accept my patches :-/ )
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
 #
@@ -34,7 +34,7 @@ rule FixSubDirPath
     LOCATE_TARGET = [ FDirName $(LOCATE.OBJECTS) $(SUBDIR_TOKENS) ] ;
 }
 
-# fix bug in Jambase where SubInclude in the middle of a jam file made it break
+# Fix bug in Jambase where SubInclude in the middle of a Jamfile made it break.
 rule SubInclude
 {
     if ! $($(<[1]))
@@ -51,28 +51,32 @@ rule SubInclude
     SubDir $(<[1]) $(save_SUBDIR_TOKENS) ;
 }
 
-# this MakeLocate rule differs from the Jambase one in that it also works with
-# files being in subdirectories
+# This MakeLocate rule differs from the Jambase one in that it also works with
+# files being in subdirectories.
 rule MakeLocate
 {
     # MakeLocate targets : directory ;
-                                                                           
+
     # Sets special variable LOCATE on targets, and arranges
     # with MkDir to create target directory.
-                                                                                    
+
     # Note we grist the directory name with 'dir',
     # so that directory path components and other
     # targets don't conflict.
-    
-    if $(>) && $(>) != "" && $(>) != "."
+
+    if $(>) && $(>) != ""
     {
         local i ;
-        for i in $(<) {
+        for i in $(<)
+	{
             LOCATE on $(i) = $(>) ;
 
             local targetfile = $(i:R=$(>)) ;
-            Depends $(i) : $(targetfile:DG=dir) ;
-            MkDir $(targetfile:DG=dir) ;
+	    local targetdir = $(targetfile:D) ;
+	    if ! $(targetdir) { targetdir = "." ; }
+	    targetdir = $(targetdir:G=dir) ;
+            Depends $(i) : $(targetdir) ;
+            MkDir $(targetdir) ;
         }
     }
 }
@@ -86,7 +90,7 @@ rule MkDir
 
     # Make a directory and all its parent directories.
 
-    # Ignore timestamps on directories: we only care if they 
+    # Ignore timestamps on directories: we only care if they
     # exist.
 
     NoUpdate $(<) ;
@@ -103,4 +107,3 @@ actions MkDir1
 {
         $(CMD.MKDIRS) "$(<)"
 }
-
