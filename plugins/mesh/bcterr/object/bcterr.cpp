@@ -664,7 +664,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
 
   AddEdgeTriangles (default_lod);
   // Setup vertex buffer / g3dTriangleMesh
-  if (default_lod->buf) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer Error");
+  //if (default_lod->buf) csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer Error");
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Vertex Buffer");
   owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Finished");
@@ -1428,8 +1428,8 @@ void csBCTerrObject::Build ()
 
 void csBCTerrObject::CorrectSeams (int tw, int th)
 {
-  if (object_reg)
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Terr","x %d, y %d", tw, th);
+  //if (object_reg)
+    //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Terr","x %d, y %d", tw, th);
   correct_tw = tw;
   correct_th = th;
   if (tw)
@@ -1535,8 +1535,10 @@ void csBCTerrObject::SetControlPointHeight (const float height,
   int size;
   if (!prebuilt) return;
   if (initialized) return; // need to rebuild, wait on implementation
+  //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Set Control Point Height: %f iter: %d",
+    //height, iter);
   size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
-  if ((size <= iter) && (iter >=0) )
+  if ((iter < size) && (iter >=0) )
     control_points[iter].y = height;
 }
 
@@ -1746,7 +1748,8 @@ void csBCTerrObject::SetupMesh ()
   csBCTerrBlock *up, *left;
   size = x_blocks * z_blocks;
   blocks = new csBCTerrBlock[size];
-  cntrl_pt = control_points;
+  cntrl_pt = control_points;  
+  FlattenSides ();
   bbox.StartBoundingBox (); // empty bounding box
   for (i = 0; i < z_blocks; i++)
   {
@@ -1849,7 +1852,7 @@ void csBCTerrObject::FlattenSides ()
     }
     if (bdown && (bright || bleft))
     {  
-      downh = max;     
+      downh = max;  
     }
     if (bleft && (btop || bdown))
     {
@@ -1953,7 +1956,6 @@ void csBCTerrObject::SetupControlPoints (iImage* im)
     last_z -= z;
   }
   prebuilt = true;
-  FlattenSides ();
 }
 /*
  * FreeSharedLOD

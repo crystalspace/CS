@@ -62,6 +62,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (BUILD)
   CS_TOKEN_DEF (FLATTEN)
   CS_TOKEN_DEF (DOFLATTEN)
+  CS_TOKEN_DEF (SYSINC)
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csBCTerrFactoryLoader)
@@ -290,6 +291,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
     CS_TOKEN_TABLE (BUILD)
     CS_TOKEN_TABLE (FLATTEN)
     CS_TOKEN_TABLE (DOFLATTEN)
+    CS_TOKEN_TABLE (SYSINC)
   CS_TOKEN_TABLE_END
   
   char *pName;
@@ -337,6 +339,15 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           iState->SetSize (x, z);
           iState->PreBuild ();
         }
+      }
+      break;
+      case CS_TOKEN_SYSINC:
+      {
+          int i;
+          csScanStr (pParams, "%d", &i);
+          if (iState)
+            iState->SetSystemInc (i);
+
       }
       break;
       case CS_TOKEN_BUILD:

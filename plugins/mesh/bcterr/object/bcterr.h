@@ -341,7 +341,7 @@ public:
           const int z) 
     {
       int size;
-      size = ((z - 1)* scfParent->hor_length) + x; 
+      size = ((z - 1)* scfParent->hor_length) + (x - 1); 
       scfParent->SetControlPoint (point, size);
     }
     virtual void SetControlPointHeight (const float height, const iter) 
@@ -352,7 +352,7 @@ public:
           const int z)
     {
       int size;
-      size = ((z - 1)* scfParent->hor_length) + x;
+      size = ((z - 1)* scfParent->hor_length) + (x - 1);
       scfParent->SetControlPointHeight (height, size);
     }
     virtual void SetFlattenHeight (const float up, const float down,
