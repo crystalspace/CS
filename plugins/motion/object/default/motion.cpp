@@ -102,6 +102,8 @@ bool csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion)
 
 void csMotionManager::UpdateTransform (csAppliedMotion *am, iSkeletonBone *bone, int link1, int link2)
 {
+  
+  csVector3 vec = bone->GetTransformation().GetO2TTranslation();
   if (am->curmotion->matrixmode==0)
   {
     csQuaternion quat;
@@ -125,12 +127,12 @@ void csMotionManager::UpdateTransform (csAppliedMotion *am, iSkeletonBone *bone,
 #ifdef MOTION_DEBUG
     printf("UpdateTransform Q(%g,%g,%g,%g)\n", quat.x, quat.y, quat.z, quat.r);
 #endif
-    bone->SetTransformation(csTransform(csMatrix3(quat), csVector3(0,0,0)));
+    bone->SetTransformation(csTransform(csMatrix3(quat), vec));
   }
   else if (am->curmotion->matrixmode==1)
   {
     csMatrix3 &mat=((csMatrix3*)am->curmotion->transforms)[link1];
-    bone->SetTransformation(csTransform(mat, csVector3(0,0,0)));
+    bone->SetTransformation(csTransform(mat, vec));
   }
 }
 

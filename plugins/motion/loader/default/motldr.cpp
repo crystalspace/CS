@@ -83,8 +83,7 @@ csMotionLoader::csMotionLoader(iBase *iParent)
 csMotionLoader::~csMotionLoader()
 {
   vfs->DecRef();
-//TODO : Fix memory leaks in Motion Manager : Brendon?
-//motman->DecRef();
+  motman->DecRef();
 }
 
 bool csMotionLoader::Initialize (iSystem* Sys)
