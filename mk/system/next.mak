@@ -103,8 +103,7 @@ CFLAGS.INCLUDE=$(NEXT.INCLUDE_DIRS) \
   $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
-  -ObjC++ -fno-common -pipe
+CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=$(NEXT.CFLAGS.OPTIMIZE)
@@ -137,8 +136,8 @@ LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
 NASMFLAGS.SYSTEM=
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
-  libs/cssys/general/printf.cpp
+SRC.SYS_CSSYS = libs/cssys/general/printf.cpp \
+  $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) support/gnu/getopt*.c)
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
@@ -147,7 +146,7 @@ OUTDLL=
 CC=cc -c
 
 # The C++ compiler.
-CXX=cc -c
+CXX=cc -ObjC++ -c
 
 # The linker.
 LINK=cc
