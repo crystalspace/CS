@@ -34,6 +34,12 @@
  * Preprocessor Includes
  * ----------------------------------------------------------------- */
 
+#include "ivideo/vbufmgr.h"
+
+struct iObjectRegistry;
+class csVector3;
+class csVector2;
+class csColor;
 
 /* -----------------------------------------------------------------
  * Preprocessor Defines and Enumeration Types
@@ -43,88 +49,73 @@
 /* -----------------------------------------------------------------
  * Public Class Declarations
  * ----------------------------------------------------------------- */
+
 class csVertexBufferEXT;
 
 /* -----------------------------------------------------------------
  * Public Class Definitions
  * ----------------------------------------------------------------- */
-class csVertexBufferEXT {
+class csVertexBufferEXT : public iVertexBuffer
+{
   // -------------------------------------------------------
   // Public Constructors and Destructors
   // -------------------------------------------------------
+
   public:
-    csVertexBufferEXT ( );
-    ~csVertexBufferEXT ( );
+    csVertexBufferEXT (iVertexBufferManager* mgr);
+    virtual ~csVertexBufferEXT ();
+
 
   // -------------------------------------------------------
   // Public Member Functions
   // -------------------------------------------------------
   public:
-    // Destroy the contained data, resetting everything to empty
-    int Reset( );
+    /// Get the priority.
+    virtual int GetPriority () const;
 
-    // Add a vertex to the vertex list
-    int AddVertex( float x, float y, float z );
-    // Add multiple vertices at once
-    int AddVertices( const float *vertices, const int count );
+    /// Set the priority.
+    void SetPriority(int priority);
 
+    /// Check if the buffer is locked.
+    virtual bool IsLocked () const;
+    /**
+    * Get the current array of vertices.
+    */
+    virtual csVector3* GetVertices () const;
+    /**
+    * Get the current array of texels.
+    */
+    virtual csVector2* GetTexels () const;
+    /**
+    * Get the current array of colors.
+    */
+    virtual csColor* GetColors () const;
+    /**
+    * Get the number of vertices.
+    */
+    virtual int GetVertexCount () const;
+
+    void SetBuffers (csVector3 *verts, 
+                     csVector2 *texcoords, 
+                     csColor *colors, 
+                     int count);
+
+    void LockBuffer();
+    void UnLockBuffer();
+
+    SCF_DECLARE_IBASE;
     // -------------------------------------------------------
-    // These functions add texture coordinates, normal vectors,
-    // colors, and other associated data to the specified
-    // vertex.  The Index parameter corresponds to the return
-    // value from the associated AddVertex() call, or the return
-    // value from the AddVertices() call plus the offset.
+    // Protected Member Functions
     // -------------------------------------------------------
-
-    // Texture Coordinates
-    int AddTexCoords( int index, float *coords, int components );
-    int AddTexCoords( int index, float u );
-    int AddTexCoords( int index, float u, float v );
-    int AddTexCoords( int index, float u, float v, float s );
-
-    // Vertex Normal Vectors
-    int AddNormalVector( int index, float *vec, int components );
-    int AddNormalVector( int index, float x, float y, float z );
-
-    // Vertex Colors
-    int AddColor( int index, float *color, int components );
-    int AddColor( int index, float r, float g, float b );
-    int AddColor( int index, float r, float g, float b, float a );
-
-    // -------------------------------------------------------
-    // The following functions are used for making triangles, as
-    // well as triangle strips.
-    // -------------------------------------------------------
-    int AddTriangle( const int v1, const int v2, const int v3 );
-    
-    int TriangleStripBegin( const int v1, const int v2, const int v3 );
-    int TriangleStripAdd  ( const int v_next );
-
-    int TriangleStripFromData( const int *v_indices, const int count );
-
-    // -------------------------------------------------------
-    // This is used to get a pointer to the internal data array,
-    // and is normally called when this vertex buffer is to be
-    // rasterized.  This performs an implicit call to "CompactArrays"
-    // if the data has not been compacted.
-    // -------------------------------------------------------
-    const float *GetCompactedArray( );
-
-    // -------------------------------------------------------
-    // Used to get information about the array
-    // -------------------------------------------------------
-    int GetArrayInfo( int &vertex_count,
-                      int &rowstride,
-                      int &c_per_vertex,
-                      int &t_per_vertex,
-                      int &color_per_vertex );
-
-  // -------------------------------------------------------
-  // Protected Member Functions
-  // -------------------------------------------------------
   protected:
-    // Compact all the data into a contiguous array
-    int CompactArrays ( );
+    int         m_priority;
+    bool        m_locked;
+    int         m_vertexcount;
+    csVector3 * m_vertices;
+    csColor   * m_colors;
+    csVector2 * m_texcoords;
+    iVertexBufferManager* mgr;
+ 
 };
 
 

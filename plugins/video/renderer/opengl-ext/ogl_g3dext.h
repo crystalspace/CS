@@ -46,6 +46,7 @@
  * Preprocessor Defines and Enumeration Types
  * ----------------------------------------------------------------- */
 
+#include "csgeom/transfrm.h"
 
 /* -----------------------------------------------------------------
  * Public Class Declarations
@@ -58,7 +59,8 @@ struct iTextureManager;
 /* -----------------------------------------------------------------
  * Public Class Definitions
  * ----------------------------------------------------------------- */
-class csGraphics3DGLext : public iGraphics3D {
+class csGraphics3DGLext : public iGraphics3D
+{
 
   // -------------------------------------------------------
   // Public Constructors and Destructors
@@ -89,6 +91,7 @@ class csGraphics3DGLext : public iGraphics3D {
     virtual void Close();
 
     virtual iGraphics2D *GetDriver2D ( );
+
     virtual void SetDimensions( int width, int height );
 
     virtual int GetWidth ();
@@ -158,9 +161,26 @@ class csGraphics3DGLext : public iGraphics3D {
   // -------------------------------------------------------
   // Protected Functions
   // -------------------------------------------------------
-  protected:
+
+    void Report (int severity, const char* msg, ...);
+protected:
+    // The Vertex Buffer ... (diffrent Implementations will be chosen
+    // depending on the Graphics card (atm there's only a standard one)
+    iVertexBufferManager *vbufmgr; 
     // The 2D Graphics renderer
     iGraphics2D *G2D;
+
+    // recalc frustum ?
+    bool frustum_valid;
+
+    // dummy nearplane
+    csPlane3 dummynearplane;
+
+    bool stencil_init;
+    bool planes_init;
+
+    // Current object 2 Camera transform
+    csReversibleTransform object2camera;
 
     // 3D Rendering capabilities
     csGraphics3DCaps g3d_capabilities;
@@ -193,7 +213,12 @@ class csGraphics3DGLext : public iGraphics3D {
     bool glcsenabled_vertex_array;
     bool glcsenabled_color_array;
     bool glcsenabled_texture_coord_array;
-    
+
+	// Clipper Stuff
+    void SetupClipper();
+    iClipper2D *curclip;
+    unsigned char curclipvalue;
+    bool curclipvalid;
 };
 
 #endif /* _OGL_G3DEXT_HPP_ */
