@@ -1369,7 +1369,7 @@ bool csPolygon3D::ClipToPlane (
   cnt_vis = 0;
   for (i = 0; i < num_vertices; i++)
   {
-    vis[i] = portal_plane->Classify (Vcam (i)) <= -SMALL_EPSILON;
+    vis[i] = portal_plane->Classify (Vcam (i)) <= EPSILON;
     if (vis[i]) cnt_vis++;
   }
 

@@ -3,6 +3,15 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+31-Mar-2003
+	- Fixed a very old clipping bug with individual polygon drawing
+	  in the thing plugin in case there is rendering through a portal
+	  that has the <clip/> (or CS_PORTAL_CLIPDEST) flag set.
+	- Fixed a significant bug in the OpenGL EffectDrawTriangleMesh()
+	  function. In some particular cases when there was an early
+	  exit out of that function (because after clipping no triangles
+	  were visible) the clipper wouldn't get restored correctly.
+	  This could cause wrong clipping for objects following later.
 30-Mar-2003
 	- Keith Fulton enhanced maya2spr in the following ways.
 	    - Attempted to fix all bugs except for the last two in

@@ -4668,7 +4668,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         num_vertices, work_verts,
 	mesh.buffers[0]->GetBoundingBox (),
         ci.frust_origin, ci.frustum_planes, ci.num_planes);
-      if (!vis) return false;
+      if (!vis)
+      {
+	if (setup) RestoreDTMClipping ();
+        return false;
+      }
     }
     if (ci.use_lazy_clipping)
     {
@@ -4699,7 +4703,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       }
     }
     triangles = clipped_triangles->GetArray ();
-    if (num_triangles <= 0) return false; // Nothing to do!
+    if (num_triangles <= 0)
+    {
+      if (setup) RestoreDTMClipping ();
+      return false; // Nothing to do!
+    }
   }
 
   //===========
