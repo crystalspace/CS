@@ -15,6 +15,10 @@ chronological order.
 	  WxWidgets event systems for getting input.  Note: currently
 	  only supports OpenGL; the software renderer cannot be used
 	  with this canvas.
+	- Jorrit changed iRegion->Prepare() so that it now also frees
+	  images at the end. iEngine->Prepare() already did that but it
+	  was forgotten in iRegion->Prepare(). This can save up a lot of
+	  memory.
 26-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - Added 'install' targets to csjava/Jamfile.
