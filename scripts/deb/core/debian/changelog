@@ -1,7 +1,7 @@
 crystalspace (0.98-20040623-1) unstable; urgency=low
 
   * New Upstream, should close FTBFS or at least change the way it fails,
-  for this reason (Closes: #254684)(Closes: #255614)
+  for this reason (Closes: bug#254684)(Closes: bug#255614)
   * Changed dependancy taking in account "res" comments
   * Added -fPIC for amd64 (Closes: bug#254680)
   * Removed (At least I tried) -I/usr/local/include (Closes: bug#216805)
