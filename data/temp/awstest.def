@@ -36,14 +36,23 @@ window "Splash"
   component "TestLabel" is "Label"
   {
     Frame: (20, 30) - (200, 45)
-    Caption: "This is a test label."
+    Caption: "This is a test label. (Centered)"
   }
 
   component "UserName" is "Text Box"
   {
     Frame: (20, 50) - (250, 70)
     Style: tbfsNormal
-    Text: "New user"
+    Text: "Newuser"
+    Disallow: "0123456789 "
+  }
+
+  component "Password" is "Text Box"
+  {
+    Frame: (20, 75) - (250, 95)
+    Style: tbfsNormal
+    Masked: Yes
+    MaskChar: "*"
   }
 }
 
