@@ -1,13 +1,14 @@
 skin "Normal Windows"
 {
   Texture: 		"/aws/texture.png"
-  HighlightColor: 	230,230,230
-  ShadowColor:    	60,60,60
-  FillColor:      	200,200,200
+  HighlightColor: 		230,230,230
+  ShadowColor:    		60,60,60
+  FillColor:      		200,200,200
   TextDisabledColor:	128,128,0
-  TextForeColor:	0,0,0
+  TextForeColor:		0,0,0
   TextBackColor:        255,255,255
-  ButtonTextColor:	0,0,192
+  ButtonTextColor:		0,0,192
+  ChartBarColor:		255,0,0
   OverlayTextureAlpha:	128
   ScrollBarHeight:	16
   ScrollBarWidth:	16
@@ -40,15 +41,6 @@ skin "Normal Windows"
   ScrollBarLt:		"/aws/sblt.png"
 }
 
-skin "Metal Windows"
-{
-  Texture: "/lib/windows/metal1.png"
-  Mouse:   "/lib/windows/mmouse.png"
-  Radiobuttons: "/lib/windows/metalrb.png"
-  Checkboxes:   "/lib/windows/metalcb.png"
-  Scrollbar:    "/lib/windows/metalsb.png"
-  Windowbuttons: "/lib/windows/metalwb.png"
-}
 
 window "Splash"
 {
@@ -119,7 +111,7 @@ window "Splash"
 
 window "Another"
 {
-  Frame: (100,100)-(500,440)
+  Frame: (100,100)-(600,440)
   Style: wfsNormal
   Title: "A window with lots of stuff"
 
@@ -228,6 +220,19 @@ window "Another"
 
   }
 
+  component "Sample" is "Bar Chart"
+  {
+   Frame: (320, 110) - (450, 200)
+   Style: lbfsSunken
+   Options: bcoVerticalChart
+
+
+   connect 
+    {
+     signalComponentCreated -> testButtonSink::FillBarChart
+    }
+  }
+
   component "Users" is "List Box"
   {
     Frame: (100, 210) - (385, 300)
@@ -256,6 +261,47 @@ window "Engine View"
   Frame: (10, 10) - (138, 138)
   Style: wfsNormal
 }
+
+window "Layout Test 2"
+{
+  Style: wfsNormal
+  Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl
+  Frame: (0,0) - (460,252)
+  Title: "Form1"
+  Layout: "GridBag"
+  component "PushButton3" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Caption: "PushButton3"
+  }
+  component "PushButton4" is "Command Button"
+  {
+    Anchor: gbcCenter
+	GridWidth: 0
+    Fill: gbcHorizontal
+    Caption: "PushButton4"
+  }
+  component "PushButton5" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcNone
+    Caption: "PushButton5"
+  }
+  component "PushButton1" is "Command Button"
+  {
+    Anchor: gbcCenter
+    Fill: gbcHorizontal
+    Caption: "PushButton1"
+  }
+  component "PushButton2" is "Command Button"
+  {
+    Anchor: gbcCenter
+    GridWidth: 0
+    Fill: gbcBoth
+    Caption: "PushButton2"
+  }
+}
+
 
 window "Layout Test"
 {
