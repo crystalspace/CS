@@ -563,3 +563,10 @@ Command: gouraud
 Type:    boolean command
 Action:  Toggle support for gouraud shading. By default this is on.
 
+Command: dumpvis
+Type:    general command
+Action:  This command takes the current view and dumps information for the
+         rendering process. You will see what sectors and polygons are
+	 rendered and how they are clipped. This is useful for debugging
+	 purposes. The output comes into 'debug.txt'.
+
