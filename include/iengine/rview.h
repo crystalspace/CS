@@ -281,7 +281,7 @@ struct iRenderView : public iBase
    * cull smaller objects.
    */
   virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
-  	csPlane3* top_planes, const csBox3& obox,
+  	const csBox3& obox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 
   /**
@@ -290,7 +290,7 @@ struct iRenderView : public iBase
    * use for the csIntersect3::BoxFrustum() function.
    */
   virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask, csPlane3* top_planes) = 0;
+  	csPlane3* planes, uint32& frustum_mask) = 0;
 
   /**
    * Get current sector.

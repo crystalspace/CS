@@ -4388,9 +4388,6 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
     // Select the right clipping mode variable depending on the
     // type of clipper.
     int ct = cliptype;
-    // If clip_portal in the mesh indicates that we might need toplevel
-    // clipping then we do as if the current clipper type is toplevel.
-    if (mesh.clip_portal == CS_CLIP_TOPLEVEL) ct = CS_CLIPPER_TOPLEVEL;
     char* clip_modes;
     switch (ct)
     {

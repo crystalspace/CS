@@ -42,7 +42,6 @@ csRenderView::csRenderView () :
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  top_ctxt = ctxt;
   context_id = 0;
 }
 
@@ -55,7 +54,6 @@ csRenderView::csRenderView (iCamera *c) :
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  top_ctxt = ctxt;
   c->IncRef ();
   ctxt->icamera = c;
   context_id = 0;
@@ -74,7 +72,6 @@ csRenderView::csRenderView (
   SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  top_ctxt = ctxt;
   c->IncRef ();
   ctxt->icamera = c;
   ctxt->iview = v;
@@ -748,7 +745,7 @@ void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
   topy = ty;
   boty = by;
 
-  csPlane3 *frustum = top_ctxt->frustum;
+  csPlane3 *frustum = ctxt->frustum;
   csVector3 v1 (leftx, topy, 1);
   csVector3 v2 (rightx, topy, 1);
   frustum[0].Set (v1 % v2, 0);
@@ -884,30 +881,6 @@ bool csRenderView::CalculateClipSettings (
   else
     clip_plane = CS_CLIP_NOT;
 
-  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
-  {
-    if (fully_inside)
-    {
-      clip_portal = CS_CLIP_TOPLEVEL;
-    }
-    else
-    {
-      CS_ASSERT (top_ctxt != 0);
-      TestSphereFrustum (
-        top_ctxt,
-        camera_origin,
-        radius,
-        inside,
-        outside);
-
-      // Because TestSphereFrustum() is not 100% accurate it is possible
-      // that the test here returns 'outside' even though we previously
-      // tested that the sphere was not outside a smaller frustum.
-      if (outside) return false;
-      if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
-    }
-  }
-
   return true;
 }
 #endif
@@ -997,39 +970,6 @@ bool csRenderView::ClipBSphere (
       clip_plane = CS_CLIP_NEEDED;
   }
 
-  //------
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  //------
-  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
-  {
-    if (fully_inside)
-    {
-      clip_portal = CS_CLIP_TOPLEVEL;
-    }
-    else
-    {
-      CS_ASSERT (top_ctxt != 0);
-      TestSphereFrustum (
-        top_ctxt,
-        camera_origin,
-        radius,
-        inside,
-        outside);
-
-      // Because TestSphereFrustum() is not 100% accurate it is possible
-      // that the test here returns 'outside' even though we previously
-      // tested that the sphere was not outside a smaller frustum.
-      if (outside) return false;
-      if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
-    }
-  }
-
   return true;
 }
 
@@ -1104,27 +1044,6 @@ bool csRenderView::ClipBBox (
     if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
   }
 
-  //------
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  //------
-  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
-  {
-    csRenderView* top_rview = engine->GetCsTopLevelClipper ();
-    csRenderContext* top_ctxt = top_rview->ctxt;
-    if (!csIntersect3::BoxFrustum (cbox, top_ctxt->frustum, 0xf, outClipMask))
-    {
-      CS_ASSERT (false);	// This is not possible!
-      return false;
-    }
-    if (outClipMask != 0) clip_portal = CS_CLIP_TOPLEVEL;
-  }
-
   return true;
 }
 
@@ -1163,8 +1082,7 @@ void csRenderView::SetupClipPlanes ()
 }
 
 void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask,
-	csPlane3* top_planes)
+  	csPlane3* planes, uint32& frustum_mask)
 {
   csPlane3* frust = ctxt->frustum;
   csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
@@ -1194,20 +1112,11 @@ void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
     planes[6] = tr_o2c.This2Other (fp);
     frustum_mask |= 0x40;
   }
-
-  csRenderView* top_rview = engine->GetCsTopLevelClipper ();
-  csRenderContext* top_ctxt = top_rview->ctxt;
-  frust = top_ctxt->frustum;
-  top_planes[0].Set (tr_o2c.GetT2O()*frust[0].norm, -frust[0].norm*o2tmult);
-  top_planes[1].Set (tr_o2c.GetT2O()*frust[1].norm, -frust[1].norm*o2tmult);
-  top_planes[2].Set (tr_o2c.GetT2O()*frust[2].norm, -frust[2].norm*o2tmult);
-  top_planes[3].Set (tr_o2c.GetT2O()*frust[3].norm, -frust[3].norm*o2tmult);
 }
 
 bool csRenderView::ClipBBox (
   csPlane3* planes,
   uint32& frustum_mask,
-  csPlane3* top_planes,
   const csBox3 &obox,
   int &clip_portal,
   int &clip_plane,
@@ -1232,25 +1141,6 @@ bool csRenderView::ClipBBox (
     clip_plane = CS_CLIP_NEEDED;
   else
     clip_plane = CS_CLIP_NOT;
-
-  //------
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  //------
-  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
-  {
-    if (!csIntersect3::BoxFrustum (obox, top_planes, 0xf, outClipMask))
-    {
-      CS_ASSERT (false);	// This is not possible!
-      return false;
-    }
-    if (outClipMask != 0) clip_portal = CS_CLIP_TOPLEVEL;
-  }
 
   return true;
 }
@@ -1325,22 +1215,6 @@ bool csRenderView::ClipBBox (
 
     if (cnt == 8) return false;       // Object not visible.
     if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
-  }
-
-  //------
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  //------
-  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
-  {
-    box_class = engine->GetCsTopLevelClipper ()->GetClipper ()
-    	->ClassifyBox (sbox);
-    if (box_class == 0) clip_portal = CS_CLIP_TOPLEVEL;
   }
 
   return true;

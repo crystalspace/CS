@@ -283,8 +283,9 @@ public:
     const csRect& rect = isorview->GetView()->GetRect();
     if( (rect.xmin >= QInt(sbox.MinX())) || (rect.xmax <= QInt(sbox.MaxX())) ||
         (rect.ymin >= QInt(sbox.MinY())) || (rect.ymax <= QInt(sbox.MaxY())) )
-      clip_portal = CS_CLIP_TOPLEVEL;
-    else clip_portal = CS_CLIP_NOT;
+      clip_portal = CS_CLIP_NEEDED;
+    else
+      clip_portal = CS_CLIP_NOT;
     /// test if z becomes negative, should never happen
     clip_z_plane = CS_CLIP_NOT;
     //printf("ClipBBox %g,%g %g,%g gives portal=%d plane=%d z=%d return true\n",

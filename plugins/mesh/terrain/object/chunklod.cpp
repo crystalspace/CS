@@ -835,7 +835,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
 	uint32 frustum_mask)
 {
   int clip_portal, clip_plane, clip_z_plane;
-  if (!rv->ClipBBox (planes, frustum_mask, top_planes,
+  if (!rv->ClipBBox (planes, frustum_mask,
   	node->BBox (), clip_portal, clip_plane, clip_z_plane))
     return false;
 
@@ -916,7 +916,7 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
   tricount = 0;
   uint32 frustum_mask;
-  rview->SetupClipPlanes (tr_o2c, planes, frustum_mask, top_planes);
+  rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
   if (!DrawTestQuad (rview, pFactory->root, kappa, frustum_mask)) 
     return false;
   if (meshes.Length () == 0)

@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.
 	- Jorrit fixed a compilation error of the engine with OR.
+	- Jorrit removed the almost unused CS_CLIP_PORTAL flag for clipping
+	  (was only used in the OR GL renderer). This greatly simplifies the
+	  clipping routines.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.

@@ -64,8 +64,6 @@ private:
 
   /// The view frustum as defined at z=1.
   float leftx, rightx, topy, boty;
-  /// The top render context corresponding with this initial view frustum.
-  csRenderContext* top_ctxt;
 
   /**
    * Update the frustum of the current context to the current clipper.
@@ -296,11 +294,10 @@ public:
   virtual bool ClipBBox (const csBox3& cbox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
-  	csPlane3* top_planes, const csBox3& obox,
+  	const csBox3& obox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask,
-	csPlane3* top_planes);
+  	csPlane3* planes, uint32& frustum_mask);
 
   /**
    * Get current sector.

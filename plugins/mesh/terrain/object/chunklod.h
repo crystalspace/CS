@@ -273,7 +273,6 @@ private:
 
   // Use for clipping during rendering.
   csPlane3 planes[10];
-  csPlane3 top_planes[10];
 
   int tricount;
   csFlags flags;

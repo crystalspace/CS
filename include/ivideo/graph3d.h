@@ -114,12 +114,6 @@ struct iShaderVariableContext;
  * not. (setting for clip_portal, clip_plane, or clip_z_plane).
  */
 #define CS_CLIP_NEEDED 1
-/**
- * Clipping is not needed for the current clipper but it might
- * be needed for the toplevel clipper. (setting for clip_portal,
- * will never be used for clip_plane or clip_z_plane).
- */
-#define CS_CLIP_TOPLEVEL 2
 /** @} */
 
 /**
