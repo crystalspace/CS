@@ -1,9 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+16-Feb-2003
+	- Christian Bayle did some other debian related changes.
+15-Feb-2003
+	- Christian Bayle did several fixes to the Debian packages.
 14-Feb-2003
 	- Eric Sunshine merged Norman Kramer's fixes for the AWS notebook
 	  control into the R0_96 branch.  This fixes a bug where there was no
 	  initial page selection in the notebook.
+13-Feb-2003
+	- Christian Bayle did some more Debian stuff.
 11-Feb-2003
 	- Eric Sunshine fixed documentation booboo (<texture> was used instead
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
@@ -16,6 +22,7 @@ The history order is reversed so that new features are at the top.
 	  reported by TeX.
 	- Eric Sunshine merged the new csArray<T> from the main branch into the
 	  R0_96 branch so that it will be available for the 0.96r003 release.
+	- Christian Bayle added the pre-version of the 0.96 package for Debian.
 10-Feb-2003
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
@@ -83,6 +90,12 @@ The history order is reversed so that new features are at the top.
 	  Prior to this patch, the PNG loader made the dangerous and fragile
 	  assumption that csRGBPixel was always four bytes.  The patch works
 	  uniformly by converting all input formats to 24-bit.
+	- Matthias Braun enabled qsqrt again as it seems to compile for me
+	  without problem and according to Jorrit it's important for
+	  performance. configure switch still is in of course.
+5-Deb-2003
+	- Matthias Braun disabled qsqrt by default as it seems to trigger
+	  compiler bugs in latest gcc although our test succeeds.
 4-Deb-2003
 	- Eric Sunshine disabled the experimental
 	  PTHREAD_MUTEX_HAS_RECURSIVE_NP feature since the configure test
@@ -192,6 +205,10 @@ The history order is reversed so that new features are at the top.
 	  plugin.
 	- Matthias Braun did various fixes to the plugin makefiles. Fixes
 	  related to configure.
+	- Matthias Braun applied patch from damage-list@freenet.de.
+	  This patch fixed some crashers in csgrid and tries to close a memory
+	  leak in palettes. (I modified the patch a bit as it contained a
+	  mismatched malloc/delete).
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.
@@ -211,7 +228,7 @@ The history order is reversed so that new features are at the top.
 	  bug was introduced yesterday and caused lightmaps to be wrong
 	  if exact clipping was needed.
 	- res fixed MSVC assertion in csString::Collapse() if the string
-	  contains characters >= 0x80
+	  contains characters >= 0x80.
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental
