@@ -96,7 +96,7 @@ void csRadPoly :: GetLumelWorldCoords(csVector3& res, int x, int y)
   float txt_D = A*v_world2tex->x + B*v_world2tex->y + C*v_world2tex->z + D;
 
   csVector3 v1, v2;
-  int lightcell_shift = csPolygon3D::lightcell_shift;
+  int lightcell_shift = csLightMap::lightcell_shift;
   int ru = x << lightcell_shift;
   int rv = y << lightcell_shift;
   int Imin_u = polytext->GetIMinU();
@@ -249,7 +249,7 @@ float* csRadPoly :: ComputeLumelCoverage()
   int rpv= polygon->GetVertices ().GetNumVertices ();
   csVector2* rp = new csVector2[rpv];
   csVector3 projector;
-  float inv_lightcell_size = 1.0 / csPolygon3D::lightcell_size;
+  float inv_lightcell_size = 1.0 / csLightMap::lightcell_size;
   for (i = 0; i < rpv; i++)
   {
     projector = (*m_world2tex) * (polygon->Vwor (i) - (*v_world2tex));
@@ -310,8 +310,8 @@ csRGBLightMap * csRadPoly :: ComputeTextureLumelSized()
   int txth = rgbimage->GetHeight();
   RGBPixel *rgb = (RGBPixel *) rgbimage->GetImageData();
 
-  int lightcell_size = csPolygon3D::lightcell_size;
-  int lightcell_shift = csPolygon3D::lightcell_shift;
+  int lightcell_size = csLightMap::lightcell_size;
+  int lightcell_shift = csLightMap::lightcell_shift;
 
   // scale down texture
   // map each lumel to the texture and scan the lightcellsize x lightcellsize

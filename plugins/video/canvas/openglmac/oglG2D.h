@@ -59,7 +59,7 @@ public:
 	virtual bool	SetMouseCursor (csMouseCursorID iShape);
 	virtual int		GetPage ();
 	virtual bool	DoubleBuffer (bool Enable);
-	virtual bool	DoubleBuffer ();
+	virtual bool	GetDoubleBufferState ();
 
 	int mGraphicsReady;
 

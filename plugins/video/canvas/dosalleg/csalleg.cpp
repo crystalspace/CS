@@ -126,7 +126,7 @@ bool csGraphics2DDOSAlleg::Open (char* Title)
   }
 
   // Tell printf() to shut up
-  DosSystem->EnablePrintf (false);
+  System->EnablePrintf (false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -159,7 +159,7 @@ void csGraphics2DDOSAlleg::Close ()
   destroy_bitmap ((BITMAP *)_cs_alleg2d);
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  DosSystem->EnablePrintf (true);
+  System->EnablePrintf (true);
 }
 
 void csGraphics2DDOSAlleg::Print (csRect *area)

@@ -62,6 +62,10 @@ static unsigned short ScanCodeToChar[128] =
 
 //================================================================== System ====
 
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iDosSystemDriver)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Sanity check
@@ -77,12 +81,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   __dpmi_int (0x33, &regs);
   MouseExists = !!(regs.x.ax);
   MouseOpened = false;
-}
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_INTERFACE_COMMON (iDosSystemDriver, (iDosSystemDriver *)this)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::Loop ()
@@ -104,16 +102,19 @@ void SysSystemDriver::Loop ()
         {
           int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
           bool Down = (ScanCode < 0x80);
+
           if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
-          { ExtKey = true; continue; }
+            ExtKey = true;
+          else
+          {
+            // handle keypad '/'
+            if (ExtKey && (ScanCode == 0x35))
+              ScanCode = 0x6f;
 
-          // handle keypad '/'
-          if (ExtKey && (ScanCode == 0x35))
-            ScanCode = 0x6f;
-
-          ScanCode = ScanCodeToChar [ScanCode & 0x7F];
-          if (ScanCode)
-            QueueKeyEvent (ScanCode, Down);
+            ScanCode = ScanCodeToChar [ScanCode & 0x7F];
+            if (ScanCode)
+              QueueKeyEvent (ScanCode, Down);
+          }
           break;
         }
         case 2:
@@ -123,26 +124,13 @@ void SysSystemDriver::Loop ()
           int x = event_queue [event_queue_tail].Mouse.x;
           int y = event_queue [event_queue_tail].Mouse.y;
 
-          QueueMouseEvent (Button, x, y);
-
-          if (Button == 0)
-            Mouse->do_motion (x, y);
-          else if (Down)
-            Mouse->do_press (Button, x, y);
-          else
-            Mouse->do_release (Button, x, y);
+          QueueMouseEvent (Button, Down, x, y);
           break;
         }
       } /* endswitch */
       event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
     } /* endwhile */
   } // while (!Shutdown && !ExitLoop)
-}
-
-void SysSystemDriver::EnablePrintf (bool Enable)
-{
-  extern void console_Enable (bool Enable);
-  console_Enable (Enable);
 }
 
 bool SysSystemDriver::Open (const char *Title)

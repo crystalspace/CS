@@ -8,9 +8,6 @@ endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
-ifeq ($(USE_HW_UVZ),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_HW_UVZ$">>volatile.tmp
-endif
 ifeq ($(USE_NASM),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif

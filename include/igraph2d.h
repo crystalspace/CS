@@ -112,11 +112,6 @@ struct csPixelFormat
    * Little helper function to complete a csPixelFormat
    * structure given that the masks are correctly filled in.
    */
-    // When working with COMPUTE(comp)
-    // Exercise caution in the for(;;) loops when computing "shift" and "bits"
-    // to prevent them from looping infinitely.  Some of the 2D drivers
-    // unnecessarily call this method at 8-bit depth with the "masks" set to
-    // zero, so take this special case into account.
   void complete ()
   {
 #define COMPUTE(comp)                                                   \
@@ -219,12 +214,11 @@ struct iGraphics2D : public iPlugIn
   * Set mouse cursor to one of predefined shape classes
   * (see csmcXXX enum above). If a specific mouse cursor shape
   * is not supported, return 'false'; otherwise return 'true'.
-  * If system supports it and iBitmap != NULL, shape should be
-  * set to the bitmap passed as second argument; otherwise cursor
-  * should be set to its nearest system equivalent depending on
-  * iShape argument.
+  * If system supports it the cursor should be set to its nearest
+  * system equivalent depending on iShape argument and the routine
+  * should return "true".
   */
-  virtual bool SetMouseCursor (csMouseCursorID Shape) = 0;
+  virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
   /// Write a text string into the back buffer

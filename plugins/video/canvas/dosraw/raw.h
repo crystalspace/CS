@@ -56,7 +56,7 @@ public:
   virtual void FinishDraw ();
   virtual void Clear (int color);
   virtual int GetPage ();
-  virtual bool DoubleBuffer ();
+  virtual bool GetDoubleBufferState ();
   virtual bool DoubleBuffer (bool Enable);
 #endif // USE_ALLEGRO
 

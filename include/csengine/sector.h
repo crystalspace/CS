@@ -223,7 +223,7 @@ public:
   csPolygonTree* GetStaticTree () { return static_tree; }
 
   /**
-   * Call this function to generate a polygon tree tree for all csThings
+   * Call this function to generate a polygon tree for all csThings
    * in this sector. This might make drawing more efficient because
    * those things can then be drawn using Z-fill instead of Z-buffer.
    * Also the c-buffer requires a tree of this kind.
@@ -362,11 +362,19 @@ public:
   void ShineLights (csThing*, csProgressPulse* = 0);
 
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csSector);
 
   //------------------------- iSector interface -------------------------------
   struct SectorInterface : public iSector
   {
     DECLARE_EMBEDDED_IBASE (csSector);
+
+    /// Used by the engine to retrieve internal sector object (ugly)
+    virtual csSector *GetPrivateObject ()
+    { return scfParent; }
+    /// Create the static BSP or octree for this sector.
+    virtual void CreateBSP ()
+    { scfParent->UseStaticTree (); }
   } scfiSector;
 };
 

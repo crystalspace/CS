@@ -160,7 +160,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
 #endif // USE_ALLEGRO
 
   // Tell printf() to shut up
-  DosSystem->EnablePrintf (false);
+  System->EnablePrintf (false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -197,7 +197,7 @@ void csGraphics2DDOSRAW::Close ()
 #endif // USE_ALLEGRO
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  DosSystem->EnablePrintf (true);
+  System->EnablePrintf (true);
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -288,9 +288,9 @@ int csGraphics2DDOSRAW::GetPage ()
   return VS.GetPage ();
 }
 
-bool csGraphics2DDOSRAW::DoubleBuffer ()
+bool csGraphics2DDOSRAW::GetDoubleBufferState ()
 {
-  return VS.DoubleBuffer ();
+  return VS.GetDoubleBufferState ();
 }
 
 bool csGraphics2DDOSRAW::DoubleBuffer (bool Enable)

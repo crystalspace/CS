@@ -17,16 +17,18 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
+#include "isystem.h"
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"
-#include "isystem.h"
 
 // Some mumbo-jumbo with CHK since MGL also defines this macros :-)
 #undef CHK
 #include "mgl2d.h"
-#include "mgl/mgl40.h"
 #undef CHK
 #define CHK(x) x
+
+extern int ScancodeToChar[];
 
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 
@@ -41,8 +43,7 @@ IMPLEMENT_IBASE (csGraphics2DMGL)
 IMPLEMENT_IBASE_END
 
 // csGraphics2DMGL functions
-csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) :
-  csGraphics2D ()
+csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) : csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
   dc = backdc = NULL;
@@ -69,7 +70,6 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   }
 
   do_hwmouse = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
-  do_hwbackbuf = System->ConfigGetYesNo ("VideoDriver", "HardwareBackBuffer", true);
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
@@ -106,8 +106,8 @@ bool csGraphics2DMGL::Open (const char *Title)
   MGL_setSuspendAppCallback (MGL_suspend_callback);
 
   numPages = MGL_availablePages (video_mode);
-  // We don't need more than 2 pages
-  if (numPages > 2) numPages = 2;
+  // We don't need more than three pages
+  if (numPages > 3) numPages = 3;
 
   if ((dc = MGL_createDisplayDC (video_mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
   {
@@ -144,13 +144,16 @@ bool csGraphics2DMGL::Open (const char *Title)
   } /* endif */
 
   // Reset member variables
-  videoPage = 0; allowDB = true;
-  joybutt = 0; paletteChanged = true;
+  videoPage = 0;
+  joybutt = 0;
+  paletteChanged = true;
+  do_doublebuff = true;
   memset (&joyposx, 0, sizeof (joyposx));
   memset (&joyposy, 0, sizeof (joyposy));
 
   // We always use one palette in all our contexts
   MGL_checkIdentityPalette (false);
+
   // Allocate the back buffer
   AllocateBackBuffer ();
 
@@ -173,39 +176,15 @@ void csGraphics2DMGL::Close ()
 
 void csGraphics2DMGL::AllocateBackBuffer ()
 {
-  if (backdc)
-    DeallocateBackBuffer ();
-
-  if (do_hwbackbuf && (numPages > 1) && allowDB)
-  {
-    backdc = dc;
-    bbtype = bbSecondVRAMPage;
-    MGL_makeCurrentDC (backdc);
-    MGL_setActivePage (dc, videoPage ^ 1);
-    MGL_setVisualPage (dc, videoPage, false);
-    return;
-  }
+  DeallocateBackBuffer ();
 
   videoPage = 0;
-  MGL_setActivePage (dc, 0);
   MGL_setVisualPage (dc, 0, false);
+  MGL_setActivePage (dc, 0);
 
-  backdc = do_hwbackbuf ? MGL_createOffscreenDC (dc, Width, Height) : NULL;
-  if (backdc)
-  {
-    // Check if this backbuffer covers our needs
-    if (MGL_surfaceAccessType (backdc) != MGL_LINEAR_ACCESS)
-      MGL_destroyDC (backdc), backdc = NULL;
-    else
-      bbtype = bbOffscreenVRAM;
-  }
-  if (!backdc)
-  {
-    pixel_format_t pf;
-    MGL_getPixelFormat (dc, &pf);
-    backdc = MGL_createMemoryDC (Width, Height, Depth, &pf);
-    bbtype = bbSystemMemory;
-  }
+  pixel_format_t pf;
+  MGL_getPixelFormat (dc, &pf);
+  backdc = MGL_createMemoryDC (Width, Height, Depth, &pf);
 
   MGL_makeCurrentDC (backdc);
 }
@@ -215,17 +194,22 @@ void csGraphics2DMGL::DeallocateBackBuffer ()
   if (!backdc)
     return;
 
-  if (backdc != dc)
-    MGL_destroyDC (backdc);
+  MGL_destroyDC (backdc);
   backdc = NULL;
 }
 
 bool csGraphics2DMGL::DoubleBuffer (bool Enable)
 {
-  DeallocateBackBuffer ();
-  allowDB = Enable;
-  AllocateBackBuffer ();
-  return Enable == (bbtype == bbSecondVRAMPage);
+  do_doublebuff = Enable;
+
+  if (!do_doublebuff)
+  {
+    videoPage = 0;
+    MGL_setVisualPage (dc, 0, false);
+    MGL_setActivePage (dc, 0);
+  }
+
+  return true;
 }
 
 bool csGraphics2DMGL::BeginDraw ()
@@ -240,7 +224,6 @@ bool csGraphics2DMGL::BeginDraw ()
     paletteChanged = false;
   }
 
-  MGL_beginDirectAccess ();
   Memory = (UByte *)backdc->surface;
 
   if (LineAddress [1] != backdc->mi.bytesPerLine)
@@ -259,7 +242,6 @@ void csGraphics2DMGL::FinishDraw ()
   if (FrameBufferLocked)
     return;
 
-  MGL_endDirectAccess ();
   Memory = NULL;
 }
 
@@ -269,16 +251,18 @@ void csGraphics2DMGL::Print (csRect *area)
   if (!area)
     area = &entire_screen;
 
-  if (bbtype == bbSecondVRAMPage)
+  MGL_bitBltCoord (dc, backdc,
+    area->xmin, area->ymin, area->xmax, area->ymax,
+    area->xmin, area->ymin, MGL_REPLACE_MODE);
+
+  if (do_doublebuff)
   {
-    videoPage ^= 1;
-    MGL_setActivePage (dc, videoPage ^ 1);
-    MGL_setVisualPage (dc, videoPage, true);
+    MGL_setVisualPage (dc, videoPage, false);
+    videoPage += 1;
+    if (videoPage >= numPages)
+      videoPage = 0;
+    MGL_setActivePage (dc, videoPage);
   }
-  else
-    MGL_bitBltCoord (dc, backdc,
-      area->xmin, area->ymax, area->xmax, area->ymin,
-      area->xmin, area->ymax, MGL_REPLACE_MODE);
 }
 
 void csGraphics2DMGL::SetRGB(int i, int r, int g, int b)
@@ -290,6 +274,7 @@ void csGraphics2DMGL::SetRGB(int i, int r, int g, int b)
 
 bool csGraphics2DMGL::SetMousePosition (int x, int y)
 {
+  EVT_setMousePos (x, y);
   return true;
 }
 
@@ -304,10 +289,7 @@ bool csGraphics2DMGL::SetMouseCursor (csMouseCursorID iShape)
 
 int csGraphics2DMGL::TranslateKey (int mglKey)
 {
-  //@@bug: ASCII keys with code 0xE0 (in particular, small cyrillic 'r')
-  //are unusable. @@todo: bug Kendall Bennett about it.
-  if (EVT_asciiCode (mglKey) == 0xe0
-   || EVT_asciiCode (mglKey) == 0)
+  if (EVT_asciiCode (mglKey) == 0)
   {
     mglKey = EVT_scanCode (mglKey);
     int key = 0;
@@ -356,13 +338,22 @@ int csGraphics2DMGL::TranslateKey (int mglKey)
       case KB_rightCtrl:  key = CSKEY_CTRL; break;
       case KB_leftAlt:
       case KB_rightAlt:   key = CSKEY_ALT; break;
+      default:            key = ScancodeToChar [mglKey]; break;
     }
     return key;
   }
   else
   {
-    if (EVT_asciiCode (mglKey) == '\r')
+    if (EVT_scanCode (mglKey) == KB_enter)
       return CSKEY_ENTER;
+    if (EVT_scanCode (mglKey) == KB_esc)
+      return CSKEY_ESC;
+    if (EVT_scanCode (mglKey) == KB_tab)
+      return CSKEY_TAB;
+    if (EVT_scanCode (mglKey) == KB_backspace)
+      return CSKEY_BACKSPACE;
+    if (EVT_asciiCode (mglKey) < ' ')
+      return EVT_asciiCode (mglKey + 96);
     return EVT_asciiCode (mglKey);
   }
 }
@@ -389,13 +380,13 @@ bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
       case EVT_MOUSEDOWN:
       case EVT_MOUSEUP:
         if (evt.message & EVT_LEFTBMASK)
-          System->QueueMouseEvent (1, !(evt.modifiers & EVT_LEFTBUT),
+          System->QueueMouseEvent (1, !!(evt.modifiers & EVT_LEFTBUT),
             evt.where_x, evt.where_y);
         if (evt.message & EVT_RIGHTBMASK)
-          System->QueueMouseEvent (2, !(evt.modifiers & EVT_RIGHTBUT),
+          System->QueueMouseEvent (2, !!(evt.modifiers & EVT_RIGHTBUT),
             evt.where_x, evt.where_y);
         if (evt.message & EVT_MIDDLEBMASK)
-          System->QueueMouseEvent (3, !(evt.modifiers & EVT_MIDDLEBUT),
+          System->QueueMouseEvent (3, !!(evt.modifiers & EVT_MIDDLEBUT),
             evt.where_x, evt.where_y);
         break;
       case EVT_MOUSEMOVE:
@@ -437,8 +428,48 @@ bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
   return false;
 }
 
+void csGraphics2DMGL::SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
+{
+  csGraphics2D::SetClipRect (nMinX, nMinY, nMaxX, nMaxY);
+  if (dc)
+  {
+    rect_t r;
+    r.left = nMinX;  r.top = nMinY;
+    r.right = nMaxX; r.bottom = nMaxY;
+    MGL_setClipRect (r);
+  }
+}
+
 void csGraphics2DMGL::Clear (int color)
 {
   MGL_setBackColor (color);
   MGL_clearDevice ();
+}
+
+/*
+WARNING:
+MGL uses integer coordinates for specifying line endpoints. Unfortunately
+CS uses floating point coords and this is really used (in MazeD it makes a
+big difference). MGL version should be faster though (MGL can use hardware
+acceleration). Thus this routine is disabled for now (unfortunately MGL 4.x
+had a routine called MGL_lineCoordFX that uses fixed-point 16.16 coordinates,
+but in MGL 5.0 the routine suddenly disappeared).
+
+void csGraphics2DMGL::DrawLine (float x1, float y1, float x2, float y2, int color)
+{
+  MGL_setColor (color);
+  MGL_lineCoord (QInt (x1), QInt (y1), QInt (x2), QInt (y2));
+}
+*/
+
+void csGraphics2DMGL::DrawBox (int x, int y, int w, int h, int color)
+{
+  MGL_setColor (color);
+  MGL_fillRectCoord (x, y, x + w, y + h);
+}
+
+void csGraphics2DMGL::DrawPixel (int x, int y, int color)
+{
+  MGL_setColor (color);
+  MGL_pixelCoord (x, y);
 }

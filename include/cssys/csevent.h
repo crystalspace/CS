@@ -109,7 +109,7 @@ enum
 /// Tab key
 #define CSKEY_TAB		'\t'
 /// Back-space key
-#define CSKEY_BACKSPACE	'\b'
+#define CSKEY_BACKSPACE		'\b'
 /// Up arrow key
 #define CSKEY_UP		1000
 /// Down arrow key

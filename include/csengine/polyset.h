@@ -256,18 +256,6 @@ public:
    */
   int AddVertexSmart (float x, float y, float z);
 
-  /**
-   * Compress the vertex table so that all nearly identical vertices
-   * are compressed. The polygons in the set are automatically adapted.
-   * This function can be called at any time in the creation of the object
-   * and it can be called multiple time but it normally only makes sense
-   * to call this function after you have finished adding all polygons
-   * and all vertices.<p>
-   * Note that calling this function will make the camera vertex array
-   * invalid.
-   */
-  void CompressVertices ();
-
   /// Return the world space vector for the vertex.
   csVector3& Vwor (int idx) { return wor_verts[idx]; }
 
@@ -487,6 +475,18 @@ public:
   virtual void SetName (const char *iName)
   { csObject::SetName (iName); }
 
+  /**
+   * Compress the vertex table so that all nearly identical vertices
+   * are compressed. The polygons in the set are automatically adapted.
+   * This function can be called at any time in the creation of the object
+   * and it can be called multiple time but it normally only makes sense
+   * to call this function after you have finished adding all polygons
+   * and all vertices.<p>
+   * Note that calling this function will make the camera vertex array
+   * invalid.
+   */
+  virtual void CompressVertices ();
+
   /// Query number of polygons in set
   virtual int GetPolygonCount ()
   { return polygons.Length (); }
@@ -510,6 +510,9 @@ public:
   /// Create a vertex given his object-space coords and return his index
   virtual int CreateVertex (csVector3 &iVertex)
   { return AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+
+  /// Create a key/value pair object
+  virtual bool CreateKey (const char *iName, const char *iValue);
 };
 
 #endif /*POLYSET_H*/

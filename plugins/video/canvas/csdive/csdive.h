@@ -80,7 +80,7 @@ public:
   virtual void Print (csRect *area = NULL);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);
-  virtual bool DoubleBuffer ();
+  virtual bool GetDoubleBufferState ();
 
   virtual void Clear (int color);
   virtual void SetRGB (int i, int r, int g, int b);

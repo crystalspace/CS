@@ -192,6 +192,46 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
   }
 
 /**
+ * The following macro is used in "expansion SCF classes". An expansion class
+ * is a class that extends the functionality of another SCF class. For example,
+ * suppose a class TheWolf that implements the iWolf interface. Separately
+ * it is a useful class per se, but if you want to implement an additional
+ * class TheDog that is a subclass of TheWolf and which implements and
+ * additional interface iDog in theory you should just override the
+ * QueryInterface method and return the corresponding pointer when asked.
+ * The following macro makes such overrides simpler to write.
+ */
+#define DECLARE_IBASE_EXT(ParentClass)					\
+  typedef ParentClass __scf_superclass;					\
+  virtual void IncRef ();						\
+  virtual void DecRef ();						\
+  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+
+/**
+ * This macro implements same functionality as IMPLEMENT_IBASE
+ * except that it should be used for expansion SCF classes.
+ */
+#define IMPLEMENT_IBASE_EXT(Class)					\
+void Class::IncRef ()							\
+{									\
+  __scf_superclass::IncRef ();						\
+}									\
+void Class::DecRef ()							\
+{									\
+  __scf_superclass::DecRef ();						\
+}									\
+void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
+{
+
+/**
+ * This macro implements same functionality as IMPLEMENT_IBASE_END
+ * except that it is used for expansion SCF classes.
+ */
+#define IMPLEMENT_IBASE_EXT_END						\
+  return __scf_superclass::QueryInterface (iInterfaceID, iVersion);	\
+}
+
+/**
  * The IMPLEMENT_FACTORY macro is used to define a factory for one of
  * exported classes. You can define the function manually, of course,
  * if the constructor for your class has some specific constructor

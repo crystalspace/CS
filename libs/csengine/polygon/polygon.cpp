@@ -38,11 +38,6 @@
 #include "itexture.h"
 #include "itxtmgr.h"
 
-bool csPolygon3D::do_force_recalc = false;
-bool csPolygon3D::do_not_force_recalc = false;
-int csPolygon3D::lightcell_size = 16;
-int csPolygon3D::lightcell_shift = 4;
-bool csPolygon3D::do_lightmap_highqual = true;
 bool csPolygon3D::do_cache_lightmaps = true;
 
 // This is a static vector array which is adapted to the
@@ -322,12 +317,6 @@ void csPolygon3D::SetTextureType (int type)
   }
 }
 
-void csPolygon3D::SetLightCellSize (int size)
-{
-  lightcell_size = size;
-  lightcell_shift = csLog2 (size);
-}
-
 void csPolygon3D::Reset ()
 {
   vertices.MakeEmpty ();
@@ -582,16 +571,6 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 #define TEXW(t)	((t)->w_orig)
 #define TEXH(t)	((t)->h)
 
-// @@@ The first two defines here are the ones we actually need.
-// For some reason this causes black borders on lightmaps. The bug
-// is probably somewhere in csPolyTexture::FillLightMap(). Until
-// we find that bug we're going to use the old way to calculate
-// lm size.
-//#define LMW(t)	(((t)->w_orig + lightcell_size - 1) >> lightcell_shift)
-//#define LMH(t)	(((t)->h + lightcell_size - 1) >> lightcell_shift)
-#define LMW(t)	(((t)->w_orig / lightcell_size)+1)
-#define LMH(t)	(((t)->h / lightcell_size)+1)
-
 void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
@@ -618,7 +597,7 @@ void csPolygon3D::Finish ()
     lmi->tex->SetLightMap (lm);
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lmi->tex->lm->Alloc (LMW (lmi->tex), LMH (lmi->tex), r, g, b);
+    lmi->tex->lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
     lm->DecRef ();
   }
 #ifdef DO_HW_UVZ
@@ -1374,12 +1353,12 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
   if (!do_cache) { lmi->lightmap_up_to_date = false; return; }
-  if (do_force_recalc || !csWorld::current_world->IsLightingCacheEnabled ())
+  if (csWorld::do_force_recalc || !csWorld::current_world->IsLightingCacheEnabled ())
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = false;
   }
-  else if (!lmi->tex->lm->ReadFromCache (LMW (lmi->tex), LMH (lmi->tex),
+  else if (!lmi->tex->lm->ReadFromCache (lmi->tex->w_orig, lmi->tex->h,
     owner, this, index, csWorld::current_world))
   {
     lmi->tex->InitLightMaps ();
@@ -1678,7 +1657,7 @@ void csPolygon3D::UpdateLightMapSize ()
     lm->DecRef ();
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lmi->tex->lm->Alloc (LMW (lmi->tex), LMH (lmi->tex), r, g, b);
+    lmi->tex->lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
   }
 }
 
@@ -1687,5 +1666,5 @@ void csPolygon3D::ScaleLightMaps2X ()
   if (orig_poly) return;
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
-  lmi->tex->lm->Scale2X (LMW (lmi->tex), LMH (lmi->tex));
+  lmi->tex->lm->Scale2X (lmi->tex->w_orig, lmi->tex->h);
 }

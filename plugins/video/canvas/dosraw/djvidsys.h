@@ -166,7 +166,7 @@ public:
   /// Enable or disable double buffering
   bool DoubleBuffer (bool Enable);
   /// Return double buffering state
-  bool DoubleBuffer ();
+  bool GetDoubleBufferState ();
   /// Return active video page
   inline int GetPage ()
   { return VideoPage; }

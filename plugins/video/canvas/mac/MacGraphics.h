@@ -50,7 +50,7 @@ public:
 	virtual bool		SetMouseCursor( csMouseCursorID iShape );
 	virtual int			GetPage();
 	virtual bool		DoubleBuffer( bool Enable );
-	virtual bool		DoubleBuffer() { return mDoubleBuffering; }
+	virtual bool		GetDoubleBufferState() { return mDoubleBuffering; }
 	virtual void		Clear( int color );
 
 	virtual void		ActivateWindow( WindowPtr theWindow, bool active );

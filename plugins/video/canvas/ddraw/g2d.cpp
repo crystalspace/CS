@@ -542,7 +542,7 @@ bool csGraphics2DDDraw3::DoubleBuffer (bool Enable)
   return true;
 }
 
-bool csGraphics2DDDraw3::DoubleBuffer ()
+bool csGraphics2DDDraw3::GetDoubleBufferState ()
 {
   return true;
 }

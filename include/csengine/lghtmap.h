@@ -148,8 +148,6 @@ private:
    */
   csShadowMap* first_smap;
 
-  /// Size of the lighted texture.
-  long size;
   /// Size of the lightmap.
   long lm_size;
 
@@ -187,6 +185,13 @@ private:
   void SetSize (int w, int h);
 
 public:
+  /// Option variable: shadow cell size
+  static int lightcell_size;
+  /// Log base 2 of lightcell_size
+  static int lightcell_shift;
+  /// Align lightmap size to be a divider of this number
+  static int lightsize_align;
+
   ///
   csLightMap ();
   ///
@@ -263,6 +268,14 @@ public:
    * Convert the lightmaps to a 3D driver dependent size.
    */
   void ConvertFor3dDriver (bool requirePO2, int maxAspect = 32767);
+
+  /**
+   * Set the size of one lightmap cell (default = 16).
+   * Do not directly assign to the lightcell_size variable, as
+   * lightmap_shift also has to be updated. The "align" parameter
+   * tells how the lightmap size should be aligned (usually = 1 or 2)
+   */
+  static void SetLightCellSize (int size, int align);
 
   //------------------------ iLightMap implementation ------------------------
   DECLARE_IBASE;

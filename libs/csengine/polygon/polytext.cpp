@@ -40,8 +40,8 @@ bool csPolyTexture::do_accurate_things = true;
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
-#define lightcell_size	csPolygon3D::lightcell_size
-#define lightcell_shift	csPolygon3D::lightcell_shift
+#define lightcell_size	csLightMap::lightcell_size
+#define lightcell_shift	csLightMap::lightcell_shift
 
 IMPLEMENT_IBASE (csPolyTexture)
   IMPLEMENTS_INTERFACE (iPolygonTexture)

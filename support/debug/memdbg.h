@@ -27,18 +27,11 @@ typedef void *address;
  * First we resolve a few platform dependent issues.
  * We should know the following things that depend on platform we're running on:
  *
- * - The command used to issue a debug break (not strictly required)
  * - You also may define the GET_CALL_ADDRESS macro if the version provided
  *   below (that is supposed to work on most platforms) won't work.
  * - You also may want to define the uint32 macro that stands for an unsigned
  *   32-bits integer.
  */
-
-#if defined (PROC_INTEL)
-#  if defined (COMP_GCC)
-#    define DEBUG_BREAK	asm ("int $3")
-#  endif
-#endif
 
 #if !defined (MAX_ADDRESS)
 #  define MAX_ADDRESS address (-1)

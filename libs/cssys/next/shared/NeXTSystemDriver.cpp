@@ -55,7 +55,7 @@ NeXTSystemDriver::~NeXTSystemDriver()
 //-----------------------------------------------------------------------------
 void* NeXTSystemDriver::QueryInterface( char const*iInterfaceID, int iVersion )
     {
-    IMPLEMENTS_INTERFACE_COMMON(iNeXTSystemDriver, &scfiNeXTSystemDriver)
+    IMPLEMENTS_EMBEDDED_INTERFACE(iNeXTSystemDriver)
     return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
     }
 

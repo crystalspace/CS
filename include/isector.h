@@ -22,6 +22,8 @@
 
 #include "csutil/scf.h"
 
+class csSector;
+
 SCF_VERSION (iSector, 0, 1, 0);
 
 /**
@@ -34,6 +36,10 @@ SCF_VERSION (iSector, 0, 1, 0);
  */
 struct iSector : public iBase
 {
+  /// Used by the engine to retrieve internal sector object (ugly)
+  virtual csSector *GetPrivateObject () = 0;
+  /// Create the static BSP or octree for this sector.
+  virtual void CreateBSP () = 0;
 };
 
 #endif // __ISECTOR_H__

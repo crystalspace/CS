@@ -264,16 +264,23 @@ public:
   csTransformationManager tr_manager;
   /// The 3D driver
   iGraphics3D* G3D;
-  // The fog mode this G3D implements
+  /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
-  // Does the 3D driver require power-of-two lightmaps?
+  /// Does the 3D driver require power-of-two lightmaps?
   bool NeedPO2Maps;
-  // Maximum texture aspect ratio
+  /// Maximum texture aspect ratio
   int MaxAspectRatio;
-  // A pointer to current object library
+  /// A pointer to current object library
   csObject *Library;
-  // The list of all object libraries currently loaded
+  /// The list of all object libraries currently loaded
   csNamedObjVector Libraries;
+
+  /// Option variable: high quality lightmap rendering.
+  static bool do_lightmap_highqual;
+  /// Option variable: inhibit lightmap recalculation?
+  static bool do_not_force_recalc;
+  /// Option variable: force lightmap recalculation?
+  static bool do_force_recalc;
 
 private:
   /// Texture and color information object.
@@ -283,7 +290,7 @@ private:
   /// List of halos (csHaloInformation).
   csHaloVector halos;  
   /// If true then the lighting cache is enabled.
-  bool do_lighting_cache;
+  static bool do_lighting_cache;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;
   /// Current number of processed polygons.
@@ -703,6 +710,8 @@ public:
     const csMatrix3 &iMatrix);
   /// Create a empty sector with given name
   iSector *CreateSector (const char *iName);
+  /// Create a empty thing with given name
+  virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
   //--------------------- iConfig interface implementation --------------------
 

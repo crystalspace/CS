@@ -4155,15 +4155,15 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
   CHK (csIniFile* cfg = new csIniFile ("world.cfg"));
   if (cfg)
   {
-    csPolygon3D::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
-    	csPolygon3D::lightcell_size));
-    csPolygon3D::do_lightmap_highqual = cfg->GetInt ("Lighting", "LIGHTMAP_HIGHQUAL",
-    	csPolygon3D::do_lightmap_highqual);
+    csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
+    	csLightMap::lightcell_size), 1);
+    csWorld::do_lightmap_highqual = cfg->GetInt ("Lighting", "LIGHTMAP_HIGHQUAL",
+    	csWorld::do_lightmap_highqual);
     CHK (delete cfg);
   }
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d%s.\n",
-      csPolygon3D::lightcell_size, csPolygon3D::lightcell_size,
-      csPolygon3D::do_lightmap_highqual ? " (high quality)" : " (normal quality)");
+      csLightMap::lightcell_size, csLightMap::lightcell_size,
+      csWorld::do_lightmap_highqual ? " (high quality)" : " (normal quality)");
 
   if (!LoadWorld (buf))
     return false;

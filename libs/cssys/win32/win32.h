@@ -28,13 +28,8 @@
 #endif
 
 #ifdef COMP_BC
-// The Borland C++ equivalent of strcasecmp and strncasecmp are
-// stricmp and strnicmp
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
-//The original below causes warnings
-//#define strcasecmp(s1,s2)    stricmp(s1,s2)
-//#define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
 #endif
 
 #include "csutil/scf.h"
@@ -72,10 +67,7 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
 
-  virtual void IncRef () { csSystemDriver::IncRef (); }
-  virtual void DecRef () { csSystemDriver::DecRef (); }
-  /// Override QueryInterface to allow additional interfaces
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+  DECLARE_IBASE_EXT (csSystemDriver)
 
 private:
 #ifdef DO_DINPUT_KEYBOARD

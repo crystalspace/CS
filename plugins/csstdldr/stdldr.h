@@ -30,6 +30,7 @@ struct iVFS;
 struct iSector;
 struct iPolygonSet;
 struct iPolygon3D;
+struct iThing;
 
 typedef char *csTokenList;
 
@@ -174,6 +175,12 @@ private:
   // Current recursion depth
   int recursion_depth;
 
+  // Save the state of loader and call Load() recursively
+  bool RecursiveLoad (const char *iName);
+
+  // Tokenize a string and return a newly-allocated array of tokens
+  csTokenList Tokenize (char *iData, size_t &ioSize);
+
   // Prepare the parser
   bool yyinit (csTokenList iInput, size_t iSize);
   // Finalize the parser
@@ -202,10 +209,10 @@ private:
     char *tex_prefix;
     // The name of currently loaded library/world
     char *cur_library;
-    // A unnamed union containing miscelaneous parameters for different entities
+    // A union containing miscelaneous parameters for different basic entities
     union
     {
-      // TEXTURE (...) storage
+      // TEXTURE (...) temporary storage
       struct
       {
         // texture/file name
@@ -244,15 +251,15 @@ private:
       struct
       {
         // The iSector object
-        iSector *sector;
+        iSector *object;
         // The iPolygonSet interface to same object
         iPolygonSet *polyset;
-        // The currently active polygon
-        iPolygon3D *polygon;
         // Default texture name
         char *texname;
         // Default texture length
         float texlen;
+        // Create static BSP for this sector?
+        bool statbsp;
       } sector;
     };
   } storage;
@@ -266,6 +273,8 @@ private:
     float texlen;
     // texture plane template name
     char *planetpl;
+    // The currently active polygon
+    iPolygon3D *object;
     // Transformation matrix
     csPMatrix3 matrix;
     // Texture origin
@@ -278,11 +287,18 @@ private:
     int mode;
   } polygon;
 
-  // Save the state of loader and call Load() recursively
-  bool RecursiveLoad (const char *iName);
-
-  // Tokenize a string and return a newly-allocated array of tokens
-  csTokenList Tokenize (char *iData, size_t &ioSize);
+  // Used while processing THING (...) statements
+  struct
+  {
+    // The iThing pointer to the object being filled
+    iThing *object;
+    // The iPolygonSet interface to same object
+    iPolygonSet *polyset;
+    // texture name
+    char *texname;
+    // default texture lengths
+    float texlen;
+  } thing;
 
   // Initialize texture creation process
   void InitTexture (char *name);
@@ -293,9 +309,6 @@ private:
   void InitCamera (char *name);
   // Finish camera creation
   bool CreateCamera ();
-
-  // Create a global key/value pair
-  bool CreateKey (const char *name, const char *value);
 
   // Create a polygon texture plane template
   bool CreatePlane (const char *name);

@@ -21,11 +21,27 @@
 
 #include "csutil/scf.h"
 
+class csVector3;
+class csMatrix3;
+struct iSector;
+
 SCF_VERSION (iThing, 0, 0, 1);
 
-/// temporary - subject to change
-struct iThing 
+/**
+ * This is the generalized interface to Things.<p>
+ * A thing is a 3D model, in most cases non-moveable, which is mostly used
+ * for details. That is, iSector objects outlines the basic bounds of the
+ * room (e.g. walls) and iThing's are the inside details (tables, columns,
+ * paintings and so on).
+ */
+struct iThing : public iBase
 {
+  /// Set the position of the thing
+  virtual void SetPosition (const csVector3 &iPos) = 0;
+  /// Set the sector of the thing
+  virtual void SetPosition (iSector *iSec) = 0;
+  /// Set the transformation matrix to rotate the thing in some orientation.
+  virtual void SetTransform (const csMatrix3 &iMatrix) = 0;
 };
 
 #endif

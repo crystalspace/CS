@@ -28,6 +28,7 @@ class csVector3;
 class csColor;
 
 struct iSector;
+struct iThing;
 
 SCF_VERSION (iWorld, 0, 1, 0);
 
@@ -67,6 +68,8 @@ struct iWorld : public iPlugIn
     const csMatrix3 &iMatrix) = 0;
   /// Create a empty sector with given name
   virtual iSector *CreateSector (const char *iName) = 0;
+  /// Create a empty thing with given name
+  virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
 };
 
 #endif // __IWORLD_H__

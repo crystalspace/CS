@@ -38,6 +38,18 @@ struct iPolygonSet : public iBase
   /// Set polygon set name
   virtual void SetName (const char *iName) = 0;
 
+  /**
+   * Compress the vertex table so that all nearly identical vertices
+   * are compressed. The polygons in the set are automatically adapted.
+   * This function can be called at any time in the creation of the object
+   * and it can be called multiple time but it normally only makes sense
+   * to call this function after you have finished adding all polygons
+   * and all vertices.<p>
+   * Note that calling this function will make the camera vertex array
+   * invalid.
+   */
+  virtual void CompressVertices () = 0;
+
   /// Query number of polygons in set
   virtual int GetPolygonCount () = 0;
   /// Get a polygon from set by his index
@@ -55,6 +67,9 @@ struct iPolygonSet : public iBase
   virtual csVector3 &GetVertexC (int idx) = 0;
   /// Create a vertex given his object-space coords and return his index
   virtual int CreateVertex (csVector3 &iVertex) = 0;
+
+  /// Create a key/value pair object
+  virtual bool CreateKey (const char *iName, const char *iValue) = 0;
 };
 
 #endif // __IPOLYSET_H__

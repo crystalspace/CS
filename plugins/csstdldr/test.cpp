@@ -47,6 +47,7 @@ int main (int argc, char* argv[])
 
   System->RequestPlugin ("crystalspace.kernel.vfs");
   System->RequestPlugin ("crystalspace.engine.core");
+  System->RequestPlugin ("crystalspace.graphics3d.infinite");
 
   if (!System->Initialize (argc, argv, NULL))
   {
@@ -64,7 +65,7 @@ int main (int argc, char* argv[])
   printf ("Success: %d\n", ldr->Load ("/this/plugins/csstdldr/test/world.test"));
 
   delete ldr;
-//  delete System;
+//delete System;
 
   return 0;
 }

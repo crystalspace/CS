@@ -319,7 +319,7 @@ bool csGraphics2DOpenGL::DoubleBuffer( bool Enable )
 	return true;
 }
 
-bool csGraphics2DOpenGL::DoubleBuffer()
+bool csGraphics2DOpenGL::GetDoubleBufferState()
 {
 	return mDoubleBuffering;
 }

@@ -37,6 +37,9 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
 
+# Typical object file extension
+O=.o
+
 # Typical prefix for library filenames
 LIB_PREFIX=lib
 
@@ -62,7 +65,7 @@ NEED_SOCKET_LIB=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O6 -fomit-frame-pointer

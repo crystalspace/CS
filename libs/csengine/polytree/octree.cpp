@@ -1080,10 +1080,10 @@ void csOctree::Statistics ()
 	&tot_bsp_leaves, &min_bsp_leaves, &max_bsp_leaves,
 	&tot_max_depth, &min_max_depth, &max_max_depth,
 	&tot_tot_poly, &min_tot_poly, &max_tot_poly);
-  int avg_bsp_nodes = tot_bsp_nodes / num_bsp_trees;
-  int avg_bsp_leaves = tot_bsp_leaves / num_bsp_trees;
-  int avg_max_depth = tot_max_depth / num_bsp_trees;
-  int avg_tot_poly = tot_tot_poly / num_bsp_trees;
+  int avg_bsp_nodes = num_bsp_trees ? tot_bsp_nodes / num_bsp_trees : 0;
+  int avg_bsp_leaves = num_bsp_trees ? tot_bsp_leaves / num_bsp_trees : 0;
+  int avg_max_depth = num_bsp_trees ? tot_max_depth / num_bsp_trees : 0;
+  int avg_tot_poly = num_bsp_trees ? tot_tot_poly / num_bsp_trees : 0;
   CsPrintf (MSG_INITIALIZATION, "  oct_nodes=%d max_oct_depth=%d num_bsp_trees=%d\n",
   	num_oct_nodes, max_oct_depth, num_bsp_trees);
   CsPrintf (MSG_INITIALIZATION, "  bsp nodes: tot=%d avg=%d min=%d max=%d\n",

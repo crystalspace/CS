@@ -184,6 +184,10 @@ csWorld* csWorld::current_world = NULL;
 bool csWorld::use_new_radiosity = false;
 int csWorld::max_process_polygons = 2000000000;
 int csWorld::cur_process_polygons = 0;
+bool csWorld::do_lightmap_highqual = true;
+bool csWorld::do_lighting_cache = true;
+bool csWorld::do_not_force_recalc = false;
+bool csWorld::do_force_recalc = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -204,7 +208,6 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
-  do_lighting_cache = true;
   first_dyn_lights = NULL;
   System = NULL;
   VFS = NULL;
@@ -272,10 +275,8 @@ bool csWorld::Initialize (iSystem* sys)
 
   (System = sys)->IncRef ();
 
-#if 1
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
     return false;
-#endif
 
   if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
     return false;
@@ -371,7 +372,7 @@ void csWorld::Clear ()
 void csWorld::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
-  if (!do_lighting_cache) csPolygon3D::do_force_recalc = true;
+  if (!do_lighting_cache) do_force_recalc = true;
 }
 
 void csWorld::EnableSolidBsp (bool en)
@@ -554,7 +555,7 @@ void csWorld::ShineLights ()
 
   tr_manager.NewFrame ();
 
-  if (!csPolygon3D::do_not_force_recalc)
+  if (!do_not_force_recalc)
   {
     // If recalculation is not forced then we check if the 'precalc_info'
     // file exists on the VFS. If not then we will recalculate in any case.
@@ -589,8 +590,8 @@ void csWorld::ShineLights ()
     current.radiosity = (int)csSector::do_radiosity;
     current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
-    current.lightmap_size = csPolygon3D::lightcell_size;
-    current.lightmap_highqual = (int)csPolygon3D::do_lightmap_highqual;
+    current.lightmap_size = csLightMap::lightcell_size;
+    current.lightmap_highqual = do_lightmap_highqual;
     char *reason = NULL;
 
     size_t size;
@@ -653,11 +654,11 @@ void csWorld::ShineLights ()
         current.lightmap_size, current.lightmap_highqual);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
-      csPolygon3D::do_force_recalc = true;
+      do_force_recalc = true;
     }
   }
 
-  if (csPolygon3D::do_force_recalc)
+  if (do_force_recalc)
   {
     CsPrintf (MSG_INITIALIZATION, "Recalculation of lightmaps forced.\n");
     CsPrintf (MSG_INITIALIZATION, "  Pseudo-radiosity system %s.\n", csSector::do_radiosity ? "enabled" : "disabled");
@@ -679,12 +680,12 @@ void csWorld::ShineLights ()
   // This loop also counts all polygons.
   csPolygon3D* p;
   int polygon_count = 0;
-  if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
-    csPolygon3D::SetLightCellSize (csPolygon3D::lightcell_size / 2);
+  if (do_lightmap_highqual && do_force_recalc)
+    csLightMap::SetLightCellSize (csLightMap::lightcell_size / 2, 2);
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
-    if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
+    if (do_lightmap_highqual && do_force_recalc)
       p->UpdateLightMapSize ();
     polygon_count++;
   }
@@ -725,10 +726,10 @@ void csWorld::ShineLights ()
 
   // Restore lumel size from 'High Quality Mode'
   // and remap all lightmaps.
-  if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
+  if (do_lightmap_highqual && do_force_recalc)
   {
     CsPrintf (MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
-    csPolygon3D::SetLightCellSize (csPolygon3D::lightcell_size * 2);
+    csLightMap::SetLightCellSize (csLightMap::lightcell_size * 2, 1);
     meter.SetTotal (polygon_count);
     meter.Restart ();
     pit->Restart ();
@@ -741,8 +742,7 @@ void csWorld::ShineLights ()
 
   // Render radiosity
   // -- could put his before scaling to have high quality radiosity
-  if(use_new_radiosity && !csPolygon3D::do_not_force_recalc &&
-     csPolygon3D::do_force_recalc)
+  if (use_new_radiosity && !do_not_force_recalc && do_force_recalc)
   {
     start = System->GetTime ();
     csRadiosity *rad = new csRadiosity(this);
@@ -1259,8 +1259,8 @@ void csWorld::AdvanceSpriteFrames (time_t current_time)
 void csWorld::ReadConfig ()
 {
   if (!System) return;
-  csPolygon3D::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16));
-  csPolygon3D::do_lightmap_highqual = System->ConfigGetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
+  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16), 1);
+  do_lightmap_highqual = System->ConfigGetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
   csLight::ambient_red = System->ConfigGetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_green = System->ConfigGetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_blue = System->ConfigGetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
@@ -1571,4 +1571,13 @@ iSector *csWorld::CreateSector (const char *iName)
   sector->SetName (iName);
   sectors.Push (sector);
   return QUERY_INTERFACE (sector, iSector);
+}
+
+iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
+{
+  csThing *thing = new csThing ();
+  thing->SetName (iName);
+  thing->SetSector (iParent->GetPrivateObject ());
+  thing->IncRef ();
+  return QUERY_INTERFACE (thing, iThing);
 }

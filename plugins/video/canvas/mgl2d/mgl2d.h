@@ -67,8 +67,22 @@ class csGraphics2DMGL : public csGraphics2D
   MGLDC *dc;
   /// Hardware mouse cursor or software emulation?
   bool do_hwmouse;
-  /// Use back buffer in system memory or in video memory
-  bool do_hwbackbuf;
+  /// Do double (triple) buffering?
+  bool do_doublebuff;
+  /// The video mode ID
+  int video_mode;
+  /// Number of available video pages
+  int numPages;
+  /// The handle to back buffer context (if any)
+  MGLDC *backdc;
+  /// Current active video page (if supported)
+  int videoPage;
+  /// Last known joystick button mask
+  size_t joybutt;
+  /// Last known joystick positions
+  int joyposx [2], joyposy [2];
+  /// true if palette was changed
+  bool paletteChanged;
 
 public:
   DECLARE_IBASE;
@@ -102,10 +116,23 @@ public:
   virtual bool DoubleBuffer (bool Enable);
   /// Return current double buffering state
   virtual bool GetDoubleBufferState ()
-  { return (bbtype == bbSecondVRAMPage); }
+  { return do_doublebuff; }
+
+  /// Returns 'true' if the program is being run full-screen.
+  virtual bool GetFullScreen ()
+  { return true; }
+
+  /// Set clipping rectangle
+  virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY);
 
   /// Clear backbuffer
   virtual void Clear (int color);
+  /// Draw a line
+//virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
+  /// Draw a box
+  virtual void DrawBox (int x, int y, int w, int h, int color);
+  /// Draw a pixel.
+  virtual void DrawPixel (int x, int y, int color);
 
   /// Set mouse cursor position; return success status
   virtual bool SetMousePosition (int x, int y);
@@ -125,24 +152,6 @@ public:
   virtual bool HandleEvent (csEvent &Event);
 
 private:
-  /// The video mode ID
-  int video_mode;
-  /// Number of available video pages
-  int numPages;
-  /// The handle to back buffer context (if any)
-  MGLDC *backdc;
-  /// Back buffer type
-  enum { bbSecondVRAMPage, bbOffscreenVRAM, bbSystemMemory } bbtype;
-  /// Current active video page (if supported)
-  int videoPage;
-  /// Do we allow page flipping + double buffering?
-  bool allowDB;
-  /// Last known joystick button mask
-  size_t joybutt;
-  /// Last known joystick positions
-  int joyposx [2], joyposy [2];
-  /// true if palette was changed
-  bool paletteChanged;
   /// Allocate the back buffer: either in hardware or software
   void AllocateBackBuffer ();
   /// Deallocate the back buffer

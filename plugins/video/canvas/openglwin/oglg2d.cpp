@@ -349,12 +349,14 @@ int csGraphics2DOpenGL::GetPage ()
 
 bool csGraphics2DOpenGL::DoubleBuffer (bool Enable)
 {
-  if (Enable) m_bDisableDoubleBuffer = false;
-  else m_bDisableDoubleBuffer = true;
+  if (Enable)
+    m_bDisableDoubleBuffer = false;
+  else
+    m_bDisableDoubleBuffer = true;
   return true;
 }
 
-bool csGraphics2DOpenGL::DoubleBuffer ()
+bool csGraphics2DOpenGL::GetDoubleBufferState ()
 {
   return m_bDisableDoubleBuffer;
 }

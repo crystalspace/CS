@@ -316,6 +316,18 @@
 #  include <netdb.h>
 #endif
 
+#ifdef CS_DEBUG
+#  if !defined (DEBUG_BREAK)
+#    if defined (PROC_INTEL)
+#      if defined (COMP_GCC)
+#        define DEBUG_BREAK	asm ("int $3")
+#      endif
+#    else
+#      define DEBUG_BREAK { static int x = 0; x /= x; }
+#    endif
+#  endif
+#endif
+
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
 #if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
 #  error No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!

@@ -308,16 +308,16 @@ int CrystApp::classifyAsciiKey(int c) const
   return cs_key;
 }
 
+//--------------------------------------------------// SysSystemDriver //-----//
+
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iBeLibSystemDriver)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 {
   CHK (app = new CrystApp (this));
 };
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_INTERFACE_COMMON (iBeLibSystemDriver, (iBeLibSystemDriver *)this)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
-}
 
 static int32 begin_loop(void* data)
 {

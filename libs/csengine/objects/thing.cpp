@@ -39,8 +39,17 @@
 
 IMPLEMENT_CSOBJTYPE (csThing,csPolygonSet);
 
+IMPLEMENT_IBASE_EXT (csThing)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iThing)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csThing::ThingInterface)
+  IMPLEMENTS_INTERFACE (iThing)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csThing::csThing () : csPolygonSet (), obj()
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   center_idx = -1;
   ParentTemplate = NULL;
 }
@@ -651,3 +660,13 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList,
 }
 
 //---------------------------------------------------------------------------
+
+void csThing::ThingInterface::SetPosition (const csVector3 &iPos)
+{
+  scfParent->obj.SetOrigin (iPos);
+}
+
+void csThing::ThingInterface::SetPosition (iSector *iSec)
+{
+  iSec->GetPrivateObject ()->AddThing (scfParent);
+}

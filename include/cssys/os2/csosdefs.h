@@ -65,7 +65,7 @@
      return tid;
    }
 #  endif
-#  define TEMP_FILE "zip%d.%d", getpid(), _gettid()
+#  define TEMP_FILE "cs%d.%d", getpid(), _gettid()
 #  define TEMP_DIR os2_tempdir()
    // This is the function called by TEMP_DIR macro
    static inline char *os2_tempdir()

@@ -49,8 +49,8 @@ bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
     case 2: csPolyTexture::do_accurate_things = value->v.b; break;
     case 3: csPolyTexture::cfg_cosinus_factor = value->v.f; break;
     case 4: csSector::cfg_reflections = value->v.l; break;
-    case 5: csPolygon3D::do_force_recalc = value->v.b; break;
-    case 6: csPolygon3D::do_not_force_recalc = value->v.b; break;
+    case 5: csWorld::do_force_recalc = value->v.b; break;
+    case 6: csWorld::do_not_force_recalc = value->v.b; break;
     case 7: csPolygon3D::do_cache_lightmaps = value->v.b; break;
     default: return false;
   }
@@ -67,8 +67,8 @@ bool csWorld::csWorldConfig::GetOption (int id, csVariant* value)
     case 2: value->v.b = csPolyTexture::do_accurate_things; break;
     case 3: value->v.f = csPolyTexture::cfg_cosinus_factor; break;
     case 4: value->v.l = csSector::cfg_reflections; break;
-    case 5: value->v.b = csPolygon3D::do_force_recalc; break;
-    case 6: value->v.b = csPolygon3D::do_not_force_recalc; break;
+    case 5: value->v.b = csWorld::do_force_recalc; break;
+    case 6: value->v.b = csWorld::do_not_force_recalc; break;
     case 7: value->v.b = csPolygon3D::do_cache_lightmaps; break;
     default: return false;
   }

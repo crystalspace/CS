@@ -80,16 +80,14 @@ void init_sig ()
 
 //------------------------------------------------------ The System driver ---//
 
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iUnixSystemDriver)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Initialize signal handler for clean shutdown
   init_sig ();
-}
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_INTERFACE_COMMON (iUnixSystemDriver, (iUnixSystemDriver *)this)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

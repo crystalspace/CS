@@ -31,6 +31,10 @@
 
 //== class SysSystemDriver =====================================================
 
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iOS2SystemDriver)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Lower the priority of the main thread
@@ -84,12 +88,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   ScancodeToChar [SCANCODE_F11]         = CSKEY_F11;
   ScancodeToChar [SCANCODE_F12]         = CSKEY_F12;
   ScancodeToChar [SCANCODE_CENTER]      = CSKEY_CENTER;
-}
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_INTERFACE_COMMON (iOS2SystemDriver, (iOS2SystemDriver *)this)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
 }
 
 void SysSystemDriver::SetSystemDefaults (csIniFile *config)

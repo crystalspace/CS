@@ -76,7 +76,7 @@ handler_procedure:
 		inb	$0x60, %al
 
 // If we got a strange keycode,	chain to old keyboard handler
-// This	is used	by OS/2	to detect idle DOS sessions
+// This	is used	by OS/2	to detect idle DOS sessions IMHO
 		cmpb	$0xE1, %al
 		ja	handler_chain
 

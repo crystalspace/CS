@@ -170,7 +170,7 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   lightmap->Alloc (CURVE_LM_SIZE, CURVE_LM_SIZE, r, g, b);
 
   if (!do_cache) { lightmap_up_to_date = false; return; }
-  if (csPolygon3D::do_force_recalc) lightmap_up_to_date = false;
+  if (csWorld::do_force_recalc) lightmap_up_to_date = false;
   else if (!lightmap->ReadFromCache (CURVE_LM_SIZE, CURVE_LM_SIZE, owner, NULL, index, csWorld::current_world))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;

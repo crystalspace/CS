@@ -34,18 +34,13 @@ public:
 
   virtual void Loop ();
 
-  virtual void IncRef () { csSystemDriver::IncRef (); }
-  virtual void DecRef () { csSystemDriver::DecRef (); }
-  /// Override QueryInterface to allow additional interfaces
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+  DECLARE_IBASE_EXT (csSystemDriver)
 
   virtual bool Open (const char *Title);
   virtual void Close ();
 
   /// Implementation of iDosSystemDriver
 
-  /// Enable or disable text-mode CsPrintf
-  virtual void EnablePrintf (bool Enable);
   /// Set mouse position since mouse driver is part of system driver
   virtual bool SetMousePosition (int x, int y);
 

@@ -39,10 +39,7 @@ public:
   // Constructor
   SysSystemDriver ();
 
-  virtual void IncRef () { csSystemDriver::IncRef (); }
-  virtual void DecRef () { csSystemDriver::DecRef (); }
-  /// Override QueryInterface to allow additional interfaces
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+  DECLARE_IBASE_EXT (csSystemDriver)
 
   /// Check for system-specific INI entries
   virtual void SetSystemDefaults (csIniFile *config);

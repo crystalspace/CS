@@ -407,7 +407,8 @@ void csGraphics2DOS2DIVE::Print (csRect *area)
     // Increment top & right margin by one pixel to cover calculation errors
     rect.xRight++; rect.yTop++;
     dW->Switch (switchmode, &rect);
-  } else
+  }
+  else
     dW->Switch (switchmode);
 
   // If we're in single-buffered mode, wait right now for buffer to be printed
@@ -426,7 +427,7 @@ bool csGraphics2DOS2DIVE::DoubleBuffer (bool Enable)
   return true;
 }
 
-bool csGraphics2DOS2DIVE::DoubleBuffer ()
+bool csGraphics2DOS2DIVE::GetDoubleBufferState ()
 {
   return dblbuff;
 }

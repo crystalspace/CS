@@ -218,7 +218,7 @@ bool csGraphics2DOS2GL::DoubleBuffer (bool Enable)
   return false;
 }
 
-bool csGraphics2DOS2GL::DoubleBuffer ()
+bool csGraphics2DOS2GL::GetDoubleBufferState ()
 {
   return true;
 }

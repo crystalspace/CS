@@ -39,6 +39,9 @@ include mk/dos.mak
 
 vpath %.s libs/cssys/djgpp
 
+# Typical object file extension
+O=.o
+
 # Typical extension for dynamic libraries on this system.
 DLL=
 
@@ -102,7 +105,7 @@ LFLAGS.DLL=
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
+SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/general/printf.cpp \
 	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s \
 	libs/cssys/general/timing.cpp support/gnu/getopt*.c
 
@@ -117,6 +120,9 @@ LINK=gcc
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=
+
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 

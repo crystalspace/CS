@@ -511,13 +511,6 @@ bool csSystemDriver::CheckDrivers ()
 
 void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/)
 {
-  ProcessEvents ();
-  if (Sound)
-    Sound->Update ();
-}
-
-bool csSystemDriver::ProcessEvents ()
-{
   // See if any plugin wants to be called every frame
   for (int i = 0; i < PlugIns.Length (); i++)
   {
@@ -529,6 +522,13 @@ bool csSystemDriver::ProcessEvents ()
     }
   }
 
+  ProcessEvents ();
+  if (Sound)
+    Sound->Update ();
+}
+
+bool csSystemDriver::ProcessEvents ()
+{
   csEvent *ev;
   bool did_some_work = false;
   while ((ev = EventQueue.Get ()))

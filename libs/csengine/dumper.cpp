@@ -242,8 +242,8 @@ void Dumper::dump (csPolyTexture* p, char* name)
   {
     CsPrintf (MSG_DEBUG_0, "    lm: lwidth=%d lheight=%d rwidth=%d rheight=%d lm_size=%d\n", p->lm->lwidth,
   	p->lm->lheight, p->lm->rwidth, p->lm->rheight, p->lm->lm_size);
-    CsPrintf (MSG_DEBUG_0, "    lm: size=%ld lm_size=%ld\n",
-    	p->lm->size, p->lm->lm_size);
+    CsPrintf (MSG_DEBUG_0, "    lm: lm_size=%ld\n",
+    	p->lm->lm_size);
   }
   else
     CsPrintf (MSG_DEBUG_0, "    lm: no lightmap\n");

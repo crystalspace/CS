@@ -554,7 +554,7 @@ bool csGraphics2DDDraw6::DoubleBuffer (bool Enable)
   return true;
 }
 
-bool csGraphics2DDDraw6::DoubleBuffer ()
+bool csGraphics2DDDraw6::GetDoubleBufferState ()
 {
   return false;
 }

@@ -36,6 +36,7 @@
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
 #include "csengine/bsp.h"
+#include "csengine/keyval.h"
 #include "csgeom/polypool.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
@@ -54,7 +55,6 @@ csPolygonSet::csPolygonSet () : csObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
-
   max_vertices = num_vertices = 0;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
@@ -211,9 +211,9 @@ void csPolygonSet::CompressVertices ()
   for (i = 0 ; i < num_vertices ; i++)
   {
     vt[i].orig_idx = i;
-    vt[i].x = ceil (obj_verts[i].x*1000000);
-    vt[i].y = ceil (obj_verts[i].y*1000000);
-    vt[i].z = ceil (obj_verts[i].z*1000000);
+    vt[i].x = rint (obj_verts[i].x*1000000);
+    vt[i].y = rint (obj_verts[i].y*1000000);
+    vt[i].z = rint (obj_verts[i].z*1000000);
   }
 
   // First sort so that all (nearly) equal vertices are together.
@@ -763,6 +763,12 @@ void csPolygonSet::CreateBoundingBox ()
 
 void csPolygonSet::GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox)
 {
+  if (!obj_verts)
+  {
+    min_bbox.Set (0, 0, 0);
+    max_bbox.Set (0, 0, 0);
+    return;
+  }
   min_bbox = max_bbox = Vobj (bbox->i1);
   if (Vobj (bbox->i2).x < min_bbox.x) min_bbox.x = Vobj (bbox->i2).x;
   else if (Vobj (bbox->i2).x > max_bbox.x) max_bbox.x = Vobj (bbox->i2).x;
@@ -988,4 +994,12 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
   if (num_pts) { CHK (delete data); }
 
   return final_data;
+}
+
+//---------------------------------------------------------------------------------------------------------
+
+bool csPolygonSet::CreateKey (const char *iName, const char *iValue)
+{
+  ObjAdd (new csKeyValuePair (iName, iValue));
+  return true;
 }

@@ -469,7 +469,7 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
      && ((output [prev] & TOKEN_MASK) == outtoken)
      && (TOKEN_COUNT_GET (output [prev]) < TOKEN_COUNT_MAX));
 
-    ENSURE (datasize + (equal & 1) ^ 1);
+    ENSURE (datasize + ((equal & 1) ^ 1));
 
     if (equal)
       TOKEN_COUNT_INC (output [prev]);
@@ -751,16 +751,6 @@ bool csStandardLoader::CreateCamera ()
     (csVector3 &)storage.camera.upward);
 }
 
-bool csStandardLoader::CreateKey (const char *name, const char *value)
-{
-  if (!name)
-  {
-    yyerror ("no key name defined!");
-    return false;
-  }
-  return world->CreateKey (name, value);
-}
-
 static bool CheckFlags (int mode)
 {
   // Check for incompatible combinations
@@ -859,7 +849,7 @@ bool csStandardLoader::CreateTexturePlane (iPolygon3D *iPolygon)
 
     if (polygon.mode & (pmFIRSTSECOND | pmVECTORS))
     {
-      if (!(storage.plane.mode & pmORIGIN))
+      if (!(polygon.mode & pmORIGIN))
       {
         yyerror ("no texture plane origin defined");
         return false;

@@ -434,16 +434,6 @@ public:
   csFlags flags;
 
 public:
-  /// Option variable: force lightmap recalculation?
-  static bool do_force_recalc;
-  /// Option variable: inhibit lightmap recalculation?
-  static bool do_not_force_recalc;
-  /// Option variable: shadow cell size
-  static int lightcell_size;
-  /// Log base 2 of lightcell_size
-  static int lightcell_shift;
-  /// Option variable: high quality lightmap rendering.
-  static bool do_lightmap_highqual;
   /// Option variable: cache lightmaps.
   static bool do_cache_lightmaps;
 
@@ -490,13 +480,6 @@ public:
    * already correct.
    */
   void SetTextureType (int type);
-
-  /**
-   * Set the size of one lightmap cell (default = 16).
-   * Do not directly assign to the lightcell_size variable, as
-   * lightmap_shift also has to be updated.
-   */
-  static void SetLightCellSize (int size);
 
   /**
    * Short-hand to get the texture type from the csPolygonTextureType

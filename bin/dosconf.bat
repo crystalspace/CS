@@ -59,6 +59,14 @@
 
 :nonasm
 
+  echo ### Checking whenever you have makedep already compiled and installed ...
+  makedep -h >conftest.o
+  if not exist conftest.o goto nomakedep
+
+  echo $$$ O.K., setting DEPEND_TOOL.INSTALLED to "yes"
+  echo DEPEND_TOOL.INSTALLED = yes>>config.tmp
+
+:nomakedep
   del conftest.* >nul
 
   if /%WINDIR%/ == // goto nowindoze

@@ -55,7 +55,7 @@ public:
 
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool Enable) { return true; }
-  virtual bool DoubleBuffer () { return true; }
+  virtual bool GetDoubleBufferState () { return true; }
 
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);

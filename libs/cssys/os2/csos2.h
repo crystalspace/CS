@@ -41,10 +41,7 @@ public:
   /// Initialize system-dependent data
   SysSystemDriver ();
 
-  virtual void IncRef () { csSystemDriver::IncRef (); }
-  virtual void DecRef () { csSystemDriver::DecRef (); }
-  /// Override QueryInterface to allow additional interfaces
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion);
+  DECLARE_IBASE_EXT (csSystemDriver)
 
   /// Check if configuration files requests 16 bits per pixel
   virtual void SetSystemDefaults (csIniFile *config);

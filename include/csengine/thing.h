@@ -24,6 +24,7 @@
 #include "csengine/rview.h"
 #include "csengine/texture.h"
 #include "csutil/flags.h"
+#include "ithing.h"
 
 class csSector;
 class csStatLight;
@@ -231,6 +232,22 @@ public:
   { return ParentTemplate; }
 
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csPolygonSet)
+
+  //------------------------- iSector interface --------------------------------
+  struct ThingInterface : public iThing
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+
+    /// Set the position of the thing
+    virtual void SetPosition (const csVector3 &iPos);
+    /// Set the sector of the thing
+    virtual void SetPosition (iSector *iSec);
+    /// Set the transformation matrix to rotate the thing in some orientation.
+    virtual void SetTransform (const csMatrix3 &iMatrix)
+    { scfParent->SetTransform (iMatrix); }
+  } scfiThing;
+  friend struct ThingInterface;
 };
 
 #endif /*THING_H*/

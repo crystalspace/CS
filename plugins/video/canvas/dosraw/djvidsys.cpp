@@ -1002,7 +1002,7 @@ bool VideoSystem::DoubleBuffer (bool Enable)
   return true;
 }
 
-bool VideoSystem::DoubleBuffer ()
+bool VideoSystem::GetDoubleBufferState ()
 {
   return (UseDoubleBuffering);
 }

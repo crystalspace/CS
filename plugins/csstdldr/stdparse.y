@@ -30,6 +30,7 @@
 #include "isector.h"
 #include "ipolyset.h"
 #include "ipolygon.h"
+#include "ithing.h"
 
 /* Define this to debug parser */
 //#define YYDEBUG	1
@@ -46,6 +47,7 @@
 #define CSCOLOR(x)	(*(csColor *)&x)
 #define CSVECTOR2(x)	(*(csVector2 *)&x)
 #define CSVECTOR3(x)	(*(csVector3 *)&x)
+#define CSMATRIX3(x)	(*(csMatrix3 *)&x)
 
 // More shortcuts
 #define TEX		storage.tex
@@ -307,24 +309,27 @@ world_op:
   { if (!CreatePlane ($2)) YYABORT; }
 | KW_SECTOR name '('
   {
-    SECTOR.sector = world->CreateSector ($2);
-    SECTOR.polyset = QUERY_INTERFACE (SECTOR.sector, iPolygonSet);
+    SECTOR.object = world->CreateSector ($2);
+    SECTOR.polyset = QUERY_INTERFACE (SECTOR.object, iPolygonSet);
     if (!SECTOR.polyset)
     {
-      SECTOR.sector->DecRef ();
+      SECTOR.object->DecRef ();
       yyerror ("engine created an invalid iSector object!");
       YYABORT;
     }
     SECTOR.texname = NULL;
     SECTOR.texlen = 1.0;
+    SECTOR.statbsp = false;
   }
   sector_ops ')'
   {
+    SECTOR.polyset->CompressVertices ();
+    if (SECTOR.statbsp) SECTOR.object->CreateBSP ();
     SECTOR.polyset->DecRef ();
-    SECTOR.sector->DecRef ();
+    SECTOR.object->DecRef ();
   }
-| KW_KEY name '(' STRING ')'
-  { if (!CreateKey ($2, $4)) YYABORT; }
+| KW_KEY STRING '(' STRING ')'
+  { if (!world->CreateKey ($2, $4)) ABORTMSG; }
 | KW_COLLECTION name '(' collection_ops ')'
   { printf ("COLLECTION [%s]\n", $2); }
 | KW_SCRIPT name '(' STRING ':' STRING ')'
@@ -421,13 +426,15 @@ sector_op:
   { SECTOR.polyset->CreateVertex (CSVECTOR3 ($3)); }
 | KW_POLYGON name '('
   {
-    SECTOR.polygon = SECTOR.polyset->CreatePolygon ($2);
+    polygon.object = SECTOR.polyset->CreatePolygon ($2);
+    polygon.texname = SECTOR.texname;
     polygon.texlen = SECTOR.texlen;
   }
   polygon_ops ')'
   {
-    if (!CreateTexturePlane (SECTOR.polygon)) YYABORT;
-    SECTOR.polygon->DecRef ();
+    if (!CreateTexturePlane (polygon.object))
+    { polygon.object->DecRef (); YYABORT; }
+    polygon.object->DecRef ();
   }
 | KW_TEXNR '(' STRING ')'
   { SECTOR.texname = $3; }
@@ -438,9 +445,25 @@ sector_op:
 | KW_TRIGGER '(' STRING ',' STRING ')'
   { printf ("TRIGGER (%s, %s)\n", $3, $5); }
 | KW_STATBSP noargs
-  { printf ("STATBSP ()\n"); }
-| KW_THING name '(' thing_ops ')'
-  { printf ("THING '%s' (...)\n", $2); }
+  { SECTOR.statbsp = true; }
+| KW_THING name '('
+  {
+    thing.object = world->CreateThing ($2, SECTOR.object);
+    thing.polyset = QUERY_INTERFACE (thing.object, iPolygonSet);
+    if (!thing.polyset)
+    {
+      thing.object->DecRef ();
+      yyerror ("engine created an invalid iThing object!");
+      YYABORT;
+    }
+    thing.texname = NULL;
+    thing.texlen = 1.0;
+  }
+  thing_ops ')'
+  {
+    thing.polyset->DecRef ();
+    thing.object->DecRef ();
+  }
 | KW_LIGHT name '(' light_ops ')'
   { printf ("LIGHT '%s' (...)\n", $2); }
 | KW_SPRITE name '(' sprite_ops ')'
@@ -452,8 +475,8 @@ sector_op:
   { printf ("CIRCLE (...)\n"); }
 | KW_SKYDOME '(' skydome_ops ')'
   { printf ("SKYDOME (...)\n"); }
-| KW_KEY '(' STRING ',' STRING ')'
-  { printf ("KEY ('%s', '%s')\n", $3, $5); }
+| KW_KEY STRING '(' STRING ')'
+  { if (!SECTOR.polyset->CreateKey ($2, $4)) ABORTMSG; }
 | KW_NODE '(' node_ops ')'
   { printf ("NODE (...)\n"); }
 ;
@@ -470,6 +493,12 @@ skydome_op:
   { printf ("VERTICES (...)\n"); }
 | KW_LIGHTING '(' yesno ')'
   { printf ("LIGHTING (%d)\n", $3); }
+;
+
+vertex_indices:
+  /* none */
+| vertex_indices NUMBER
+  { }
 ;
 
 node_ops:
@@ -600,16 +629,31 @@ thing_tpl_ops:
 ;
 
 thing_tpl_op:
-  KW_POLYGON name '(' polygon_ops ')'
-  { printf ("POLYGON_tpl '%s' ()\n", $2); }
+  KW_POLYGON name '('
+  {
+    polygon.object = thing.polyset->CreatePolygon ($2);
+    polygon.texname = thing.texname;
+    polygon.texlen = thing.texlen;
+  }
+  polygon_ops ')'
+  {
+    if (!CreateTexturePlane (polygon.object))
+    { polygon.object->DecRef (); YYABORT; }
+    polygon.object->DecRef ();
+  }
 | KW_VERTEX '(' vector ')'
-  { printf ("VERTEX (%g,%g,%g)\n", $3.x, $3.y, $3.z); }
+  { thing.polyset->CreateVertex (CSVECTOR3 ($3)); }
 | KW_TEXNR '(' STRING ')'
-  { printf ("TEXNR (%s)\n", $3); }
+  { thing.texname = $3; }
 | KW_TEXLEN '(' NUMBER ')'
-  { printf ("TEXLEN (%g)\n", $3); }
+  { thing.texlen = $3; }
 | KW_MOVE '(' move ')'
-  { printf ("MOVE ()\n"); }
+  {
+    if ($3->matrix_valid)
+      thing.object->SetTransform (CSMATRIX3 ($3->matrix));
+    if ($3->vector_valid)
+      thing.object->SetPosition (CSVECTOR3 ($3->vector));
+  }
 | KW_FOG '(' color NUMBER ')'
   { printf ("FOG (%g,%g,%g : %g)\n", $3.red, $3.green, $3.blue, $4); }
 | KW_CONVEX noargs
@@ -926,9 +970,8 @@ polygon_op:
     polygon.first_len = polygon.second_len = polygon.texlen;
   }
   polygon_texture_ops ')'
-  {  }
-| KW_VERTICES '(' vertex_indices ')'
-  { printf ("VERTICES (...)\n"); }
+  { if (!CreateTexturePlane (polygon.object)) YYABORT; }
+| KW_VERTICES '(' polygon_vertex_indices ')'
 | KW_GOURAUD noargs
   { printf ("GOURAUD ()\n"); }
 | KW_FLATCOL '(' color ')'
@@ -957,9 +1000,10 @@ colors:
   { }
 ;
 
-vertex_indices:
+polygon_vertex_indices:
   /* none */
-| vertex_indices NUMBER
+| polygon_vertex_indices NUMBER
+  { polygon.object->CreateVertex ($2); }
 ;
 
 tex_coordinates:
