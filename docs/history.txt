@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Apr-2004
+	- res added a small helper class to create minidumps on Win32.
+	- res augmented the Win32 assistant to allow user-defined exception
+	  handlers.
+	- res fixed spr2d & csNewParticleSystem to correctly appear in mirrors
+	  on NR.
+	- res augmented stdrep to allow retrieval of the debug log file name.
 6-Apr-2004
 	- Jorrit finished the implementation of csBSPTree.
 	- Jorrit implemented back2front for genmesh. This new feature works
@@ -22,11 +29,6 @@ chronological order.
 	- res augmented configure to check for fputws().
 	- res changed the generic csPrintf() implementation to use fputws(),
 	  if available.
-	- res added a small helper class to create minidumps on Win32.
-	- res augmented the Win32 assistant to allow user-defined exception
-	  handlers.
-	- res fixed spr2d & csNewParticleSystem to correctly appear in mirrors
-	  on NR.
 5-Apr-2004
 	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
 	  This interface allows the application to access the underlying

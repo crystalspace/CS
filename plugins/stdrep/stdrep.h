@@ -106,6 +106,7 @@ public:
 	bool do_alert, bool do_debug, bool do_popup = false);
   virtual void RemoveMessages (int severity, bool remove);
   virtual void ShowMessageID (int severity, bool showid);
+  virtual const char* GetDebugFile ();
 
   bool Report (iReporter* reporter, int severity, const char* msgId,
   	const char* description);

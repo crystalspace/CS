@@ -25,7 +25,7 @@ struct iConsoleOutput;
 struct iNativeWindowManager;
 struct iReporter;
 
-SCF_VERSION (iStandardReporterListener, 0, 0, 2);
+SCF_VERSION (iStandardReporterListener, 0, 0, 3);
 
 /**
  * Interface to control the settings of the reporter listener plugin.
@@ -68,6 +68,8 @@ struct iStandardReporterListener : public iBase
    * this is only done for fatal, bug, and debug severity levels.
    */
   virtual void ShowMessageID (int severity, bool showid) = 0;
+  /// Set the debug file that is used.
+  virtual const char* GetDebugFile () = 0;
 };
 
 #endif // __CS_IVARIA_STDREP_H__

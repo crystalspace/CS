@@ -319,6 +319,6 @@ enum MINIDUMP_TYPE
 };
 
 #define CS_API_NAME		DbgHelp
-#define CS_API_FUNCTIONS	"include/csutil/win32/DbgHelpAPI.fun"
+#define CS_API_FUNCTIONS	"csutil/win32/DbgHelpAPI.fun"
 
 #include "APIdeclare.inc"

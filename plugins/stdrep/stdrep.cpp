@@ -461,3 +461,8 @@ void csReporterListener::ShowMessageID (int severity, bool showid)
   CS_ASSERT (severity >= 0 && severity <= 4);
   show_msgid[severity] = showid;
 }
+
+const char* csReporterListener::GetDebugFile ()
+{
+  return debug_filename.GetData();
+}
