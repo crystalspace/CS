@@ -134,17 +134,17 @@ public:
 
   /**
    * Helper function to parse a string (eg. "Ctrl+A") into values describing
-   * a keyboard event.
+   * a keyboard event, returning both raw and cooked key codes.
    * \param iStr The string to parse.
-   * \param oKeyCode Will be set to the code of the parsed description.
-   * \param iUseCookedCode Whether oKeyCode is a cooked code as opposed to raw.
+   * \param oKeyCode Will be set to the raw code of the parsed description.
+   * \param oCookedCode Will be set to the cooked code of the description.
    * \param oModifiers The modifiers of the description.
    * \return Whether the string could be successfully parsed.
    * \remarks Any of the output parameters may be null, in which case they are
    *   ignored.
    */
   static bool ParseKey (const char *iStr, utf32_char *oKeyCode,
-    bool iUseCookedCode, csKeyModifiers *oModifiers);
+    utf32_char *oCookedCode, csKeyModifiers *oModifiers);
 
   /**
    * Helper function to parse a string (eg. "MouseX", "Alt+Mouse1") into

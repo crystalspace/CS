@@ -437,12 +437,19 @@ bool csInputDefinition::Compare (const csInputDefinition &other) const
     return mouseButton == other.mouseButton;
 }
 
-bool csInputDefinition::ParseKey (const char *str, utf32_char *code, bool cook,
-  csKeyModifiers *mods)
+bool csInputDefinition::ParseKey (const char *str, utf32_char *raw,
+  utf32_char *cooked, csKeyModifiers *mods)
 {
-  csInputDefinition def (str, CSMASK_ALLMODIFIERS, cook);
+  csInputDefinition def (str, CSMASK_ALLMODIFIERS, false);
   if (! def.IsValid ()) return false;
-  if (code) *code = def.keyboard.code;
+  if (raw) *raw = def.keyboard.code;
+  if (cooked)
+  {
+    if (CSKEY_IS_SPECIAL (def.keyboard.code))
+      *cooked = RawToCooked (def.keyboard.code);
+    else
+      *cooked = def.keyboard.code;
+  }
   if (mods) *mods = def.modifiers;
   return true;
 }
