@@ -218,9 +218,9 @@ iObjectRegistryIterator* csObjectRegistry::Get (scfInterfaceID id, int version)
     iBase* interf = (iBase*)(b->QueryInterface (id, version));
     if (interf)
     {
-      interf->DecRef ();
       char* t = (char*)tags[i];
       iterator->Add (interf, t);
+      interf->DecRef ();
     }
   }
   return iterator;
