@@ -20,9 +20,18 @@
 #ifndef __CS_UTIL_CALLSTACK_H__
 #define __CS_UTIL_CALLSTACK_H__
 
+/**\file
+ * Call stack creation helper
+ */
+
+/*
+ @@@ Not implemented on all platforms yet!
+ */
+ 
 #include "csextern.h"
 #include "csutil/csstring.h"
 
+// @@@ Document me
 class CS_CSUTIL_EXPORT csCallStack
 {
 protected:
@@ -51,9 +60,18 @@ public:
   }
 };
 
+// @@@ Document me
 class CS_CSUTIL_EXPORT csCallStackHelper
 {
 public:
+  /**
+   * Create a call stack.
+   * \param skip The number of calls on the top of the stack to remove from
+   *  the returned call stack. This can be used if e.g. the call stack is
+   *  created from some helper function and the helper function itself should
+   *  not appear in the stack.
+   * \return A call stack object.
+   */
   static csCallStack* CreateCallStack (int skip = 0);
 };
 

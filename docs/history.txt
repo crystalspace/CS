@@ -30,6 +30,7 @@ chronological order.
 	- res added a CS_ASSERT_MSG macro to make it possible to attach a
 	  message to an assert condition (eg explain a possible reason for the
 	  triggering of the assertion).
+	- res added some docs to csutil/callstack.h.
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
 	- res fixed texture downsampling in the NR GL renderer. It could 
