@@ -24,6 +24,9 @@ chronological order.
 	- Neil Mosafi changed csvosa3dl plugin to listen to children as well
 	  as properties and use child changes to initiate property listening.
 	  This is a more correct way of doing things
+	- Neil Mosafi changed vospolygonmesh to use iMeshObjectFactory to set
+	  the CS_THING_NOCOMPRESS flag which was previously a flag of
+	  iThingFactoryState
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
