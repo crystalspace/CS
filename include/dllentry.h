@@ -37,11 +37,6 @@ extern HINSTANCE ModuleHandle;
   return TRUE; \
 }
 
-#elif (defined(OS_UNIX)&&(!defined(CS_STATIC_LINKED)))
-#define IMPLEMENT_DLLENTRY int main (int /* argc */, char** /*argv*/) \
-{ \
-  return 0; \
-}
 #else
 #define IMPLEMENT_DLLENTRY
 #endif // OS_WIN32
