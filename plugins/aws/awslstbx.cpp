@@ -16,9 +16,10 @@
 const int awsListBox:: ctList = 0x0;
 const int awsListBox:: ctTree = 0x1;
 
-const int awsListBox:: signalSelected = 0x1;
-const int awsListBox:: signalScrolled = 0x2;
-const int awsListBox:: signalFocused  = 0x3;
+const int awsListBox:: signalSelected      = 0x1;
+const int awsListBox:: signalScrolled      = 0x2;
+const int awsListBox:: signalFocused       = 0x3;
+const int awsListBox:: signalStateChanged  = 0x4;
 
 const int alignLeft = 0;
 const int alignCenter = 1;
@@ -287,6 +288,7 @@ void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
 
   if (lb->scroll_start < 0) lb->scroll_start = 0;
 
+  lb->Broadcast(awsListBox::signalScrolled);
   lb->Invalidate ();
 }
 
@@ -1378,6 +1380,7 @@ bool awsListBox::OnMouseDown (int
             else
               itm->state = true;
 
+            Broadcast (awsListBox::signalStateChanged);
             Invalidate ();
             return true;
           }
@@ -1549,6 +1552,7 @@ awsListBoxFactory::awsListBoxFactory (iAws *wmgr) :
     awsListBox::signalSelected);
   RegisterConstant ("signalListBoxScrolled", awsListBox::signalScrolled);
   RegisterConstant ("signalListBoxFocused", awsListBox::signalFocused);
+  RegisterConstant ("signalListBoxStateChanged", awsListBox::signalStateChanged);
 }
 
 awsListBoxFactory::~awsListBoxFactory ()

@@ -330,6 +330,10 @@ public:
 
   /// Component becomes focused
   static const int signalFocused;
+
+  /// The state of a stateful column was changed
+  static const int signalStateChanged;
+
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
