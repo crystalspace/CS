@@ -21,6 +21,19 @@ Short-term cleanups that need to be done:
 	  on and off (similar to 'cbuffer', works only on levels
 	  prepared with STATBSP()). Lighting does not use the technique
 	  yet.
+	- Michael Ewert changed physics library:
+	    - Multiple simulateous collisions with one object.
+	    - Flag set to ignore object that should not be rewound
+	      (chain) during collision detection.
+	    - Link list pointer added.
+     	    - body_a removed, it is implied by the object being called
+	      with it.
+	    - Midpoint method and euler integration added as ODE solvers.
+	    - Added state data member.
+	    - When state is REWOUND, then all ctPhysicalEntities with
+	      flags set as NO_REWIND will not be integrated until no longer
+	      in REWOUND state. REWOUND state expires when time passes
+	      time when REWOUND was called.
 8-Dec-1999
 	- Wyatt Miler added plugin info on csclear and csphysics to the
 	  documentation.
@@ -33,6 +46,15 @@ Short-term cleanups that need to be done:
 	    - Increased default triangles to 2000.
 	    - Fixed z sorting and y offset bug.
 	- Further work on coverage mask trees.
+	- Robert Bate updated the instructions for building on Macintosh.
+	  Changes for CW Pro5 as well.
+	- Robert also updated the Macintosh project files.
+	- Fixes to glide from Norman Kramer: mixed up the source versions
+	  of glide last night. Here they are compiling again. Moved the
+	  iHalo implementation into separate file similar to softx.
+	- Brandon Ehle got BCB4 projects in a working state.
+	- Thomas Hieber removed ia3duitl.lib from the linker settings for
+	  VC projects.
 7-Dec-1999
 	- Continued implementation of coverage mask trees. The lookup
 	  table works and seems correct. The edge test function
