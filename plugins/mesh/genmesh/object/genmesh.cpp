@@ -483,29 +483,12 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
     initialized = true;
     object_bbox_valid = false;
     SetupVertexBuffer ();
-    delete[] mesh_normals;
-    delete[] mesh_vertices;
-    delete[] mesh_colors;
-    delete[] mesh_texels;
-    delete[] top_mesh.triangles;
-    delete[] top_mesh.vertex_fog;
-    mesh_normals = NULL;
-    mesh_vertices = NULL;
-    mesh_colors = NULL;
-    mesh_texels = NULL;
-    top_mesh.triangles = NULL;
-    top_mesh.vertex_fog = NULL;
+
     top_mesh.morph_factor = 0;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
     top_mesh.do_morph_colors = false;
     top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    mesh_normals = new csVector3 [num_mesh_vertices];
-    mesh_vertices = new csVector3 [num_mesh_vertices];
-    mesh_colors = new csColor [num_mesh_vertices];
-    mesh_texels = new csVector2 [num_mesh_vertices];
-    top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
-    top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
   }
 }
 
@@ -513,12 +496,24 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
   num_mesh_vertices = n;
   initialized = false;
+  delete[] mesh_normals;
+  delete[] mesh_vertices;
+  delete[] mesh_colors;
+  delete[] mesh_texels;
+  delete[] top_mesh.vertex_fog;
+  mesh_normals = new csVector3 [num_mesh_vertices];
+  mesh_vertices = new csVector3 [num_mesh_vertices];
+  mesh_colors = new csColor [num_mesh_vertices];
+  mesh_texels = new csVector2 [num_mesh_vertices];
+  top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
   top_mesh.num_triangles = n;
   initialized = false;
+  delete[] top_mesh.triangles;
+  top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
 }
 
 void csGenmeshMeshObjectFactory::CalculateNormals ()

@@ -52,6 +52,7 @@ PLUGINS += mesh/rain/object        mesh/rain/persist/classic
 PLUGINS += mesh/spiral/object      mesh/spiral/persist/classic
 PLUGINS += mesh/ball/object        mesh/ball/persist/classic
 PLUGINS += mesh/genmesh/object     mesh/genmesh/persist/classic
+PLUGINS +=                         mesh/genmesh/persist/tree
 PLUGINS += mesh/surf/object        mesh/surf/persist/classic
 PLUGINS += mesh/emit/object        mesh/emit/persist/classic
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/classic

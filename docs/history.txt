@@ -3,6 +3,14 @@ The history order is reversed so that new features are at the top.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.
+	- Made general mesh factory a bit safer so that you can now
+	  safely set the number of triangles after initializing the
+	  vertices. Previously setting another number of triangles
+	  would clear whatever was set in the vertex arrays before that.
+	- Added experimental tree generator. This is basically an alternative
+	  loader for the new genmesh mesh object. Instead of creating a
+	  genmesh the usual way it will generate a tree instead. At this
+	  moment this code is very experimental and not meant to be used.
 23-Jan-2002 
         - Jorge Acereda fixed LoadCamera() (crashed if the sector
 	  wasn't found). Rewrote it to be more robust and coherent
