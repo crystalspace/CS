@@ -632,6 +632,111 @@ csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
   return 0;
 }
 
+bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes)
+{
+  result = 0;
+
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
+
+  csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
+
+  if (!buf)
+  {
+    ReportError (
+	      "crystalspace.maploader.parse",
+    	      "Could not open map file '%s' on VFS!", fname);
+    return false;
+  }
+
+  csRef<iDocument> doc;
+  bool er = LoadStructuredDoc (fname, buf, doc);
+
+  if (!er) return false;
+  if (doc)
+  {
+    csRef<iDocumentNode> node = doc->GetRoot ();
+    csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
+    if (meshfactnode)
+    {
+      const char* meshfactname = meshfactnode->GetAttributeValue ("name");
+      if (ldr_context->CheckDupes ())
+      {
+	iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
+	if (t) { result = t; return true; }
+      }
+
+      csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+        meshfactname);
+      if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
+      {
+        AddToRegion (ldr_context, t->QueryObject ());
+	result = t;
+	return true;
+      }
+      else
+      {
+        // Error is already reported.
+        Engine->GetMeshFactories ()->Remove (t);
+	result = 0;
+        return false;
+      }
+    }
+
+    csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
+    if (meshobjnode)
+    {
+      const char* meshobjname = meshobjnode->GetAttributeValue ("name");
+      if (ldr_context->CheckDupes ())
+      {
+	iMeshWrapper* t = Engine->FindMeshObject (meshobjname);
+	if (t) { result = t; return true; }
+      }
+      csRef<iMeshWrapper> t = Engine->CreateMeshWrapper (meshobjname);
+      if (LoadMeshObject (ldr_context, t, 0, meshobjnode))
+      {
+        AddToRegion (ldr_context, t->QueryObject ());
+	result = t;
+	return true;
+      }
+      else
+      {
+        // Error is already reported.
+	Engine->GetMeshes ()->Remove (t);
+	result = 0;
+	return false;
+      }
+    }
+
+    csRef<iDocumentNode> worldnode = node->GetNode ("world");
+    if (worldnode)
+    {
+      result = Engine;
+      return LoadMap (ldr_context, doc->GetRoot ());
+    }
+
+    csRef<iDocumentNode> libnode = node->GetNode ("library");
+    if (libnode)
+    {
+      result = 0;
+      return LoadLibrary (ldr_context, doc->GetRoot ());
+    }
+  }
+  else
+  {
+    ReportError ("crystalspace.maploader.parse",
+      "File does not appear to be correct XML file (%s)!", fname);
+    return false;
+  }
+
+  ReportError ("crystalspace.maploader.parse",
+      "File doesn't seem to be a world, library, meshfact, or meshobj file (%s)!",
+      	fname);
+
+  return false;
+}
+
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   iRegion* region, bool curRegOnly, bool checkdupes)
 {
@@ -753,9 +858,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     else
     {
       // Error is already reported.
-      iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
-      	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
-      Engine->GetMeshFactories ()->Remove (factwrap);
+      Engine->GetMeshFactories ()->Remove (t);
       return 0;
     }
   }
@@ -809,6 +912,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     else
     {
       // Error is already reported.
+      Engine->GetMeshes ()->Remove (mesh);
       mesh = 0;
     }
   }

@@ -155,9 +155,34 @@ struct iLoader : public iBase
   	const char* fname) = 0;
   /**
    * Load a mesh object from a file.
-   * The mesh object is not automatically added to the engine and sector.
+   * The mesh object is not automatically added to any sector.
    */
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname) = 0;
+
+  /**
+   * Load a file. This is a smart function that will try to recognize
+   * what kind of file it is. It recognizes the following types of
+   * files:
+   * <ul>
+   * <li>'world' file: in that case 'result' will be set to the engine.
+   * <li>'library' file: 'result' will be 0.
+   * <li>'meshfact' file: 'result' will be the mesh factory wrapper.
+   * <li>'meshobj' file: 'result' will be the mesh wrapper.
+   * </ul>
+   * Returns false on failure.
+   * <br>
+   * Note! In case a world file is loaded this function will NOT
+   * clear the engine!
+   * <br>
+   * Note! In case a mesh factory or mesh object is loaded this function
+   * will not actually do anything checkDupes is true and the mesh or
+   * factory is already in memory (with that name). This function will
+   * still return true in that case and set 'result' to the correct object.
+   * <br>
+   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   */
+  virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
+  	bool curRegOnly = true, bool checkDupes = false) = 0;
 };
 
 /** } */

@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Sep-2004
+	- Jorrit fixed a potential bug in csLoader::LoadMeshObjectFactory()
+	  where it would destroy the wrong factory after unsuccessful
+	  loading of a new factory. This could happen in case region
+	  loading was desired OR check dupes was not enabled AND at the same
+	  time a factory with the same name already existed in memory.
+	- Jorrit fixed a bug in csLoader::LoadMeshObject() where it would fail
+	  to delete the created mesh object if the loading failed.
+	- Jorrit added a new iLoader::Load() function which is a smart
+	  function that can detect what kind of XML file it is trying to load
+	  and act accordingly. Currently it supports world files, library files,
+	  mesh factories, and objects.
 8-Sep-2004
 	- Jorrit fixed a bug in all particle systems that depend on
 	  csNewParticleSystem (rain and fountain). 'camera_origin' was
