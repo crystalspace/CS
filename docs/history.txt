@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Oct-2004
+	- res changed the Win32 GL canvas to only employ the WGL pixel format
+	  check if really needed (e.g. multisampling was requested), otherwise
+	  the GDI method is used.
 11-Oct-2004
 	- Jorrit generalized the csTriangleMeshLOD class and related
 	  so that you can now generate LOD using different cost

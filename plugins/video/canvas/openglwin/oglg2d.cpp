@@ -309,17 +309,6 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 int csGraphics2DOpenGL::FindPixelFormatGDI (HDC hDC, 
 					    csGLPixelFormatPicker& picker)
 {
-  /*GLPixelFormat someFormat;
-  csString str;
-  while (picker.GetNextFormat (someFormat))
-  {
-    str.Clear();
-    GetPixelFormatString (someFormat, str);
-    csPrintf ("%s\n", str.GetData());
-  }
-  picker.Reset();*/
-
-
   int newPixelFormat = 0;
   GLPixelFormat& format = currentFormat;
   while (picker.GetNextFormat (format))
@@ -449,38 +438,41 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       if (ext.CS_WGL_ARB_pixel_format)
       {
 	unsigned int numFormats = 0;
-	int iAttributes[24];
+	int iAttributes[26];
 	float fAttributes[] = {0.0f, 0.0f};
 
 	GLPixelFormat format;
 	memcpy (format, dwi->chosenFormat, sizeof (GLPixelFormat));
 	do
 	{
-	  iAttributes[0] = WGL_DRAW_TO_WINDOW_ARB;
-	  iAttributes[1] = GL_TRUE;
-	  iAttributes[2] = WGL_ACCELERATION_ARB;
-	  iAttributes[3] = acceleration;
-	  iAttributes[4] = WGL_DOUBLE_BUFFER_ARB;
-	  iAttributes[5] = GL_TRUE;
-	  iAttributes[6] = WGL_SAMPLE_BUFFERS_ARB;
-	  iAttributes[7] = 
+	  int index = 0;
+	  iAttributes[index++] = WGL_DRAW_TO_WINDOW_ARB;
+	  iAttributes[index++] = GL_TRUE;
+	  iAttributes[index++] = WGL_SUPPORT_OPENGL_ARB;
+	  iAttributes[index++] = GL_TRUE;
+	  iAttributes[index++] = WGL_ACCELERATION_ARB;
+	  iAttributes[index++] = acceleration;
+	  iAttributes[index++] = WGL_DOUBLE_BUFFER_ARB;
+	  iAttributes[index++] = GL_TRUE;
+	  iAttributes[index++] = WGL_SAMPLE_BUFFERS_ARB;
+	  iAttributes[index++] = 
 	    (format[glpfvMultiSamples] != 0) ? GL_TRUE : GL_FALSE;
-	  iAttributes[8] = WGL_SAMPLES_ARB;
-	  iAttributes[9] = format[glpfvMultiSamples];
-	  iAttributes[10] = WGL_COLOR_BITS_ARB;
-	  iAttributes[11] = pfd.cColorBits;
-  	  iAttributes[12] = WGL_ALPHA_BITS_ARB;
-  	  iAttributes[13] = pfd.cAlphaBits;
-  	  iAttributes[14] = WGL_DEPTH_BITS_ARB;
-	  iAttributes[15] = pfd.cDepthBits;
-	  iAttributes[16] = WGL_STENCIL_BITS_ARB;
-	  iAttributes[17] = pfd.cStencilBits;	  
-	  iAttributes[18] = WGL_ACCUM_BITS_ARB;
-	  iAttributes[19] = pfd.cAccumBits;
-	  iAttributes[20] = WGL_ACCUM_ALPHA_BITS_ARB;
-	  iAttributes[21] = pfd.cAccumAlphaBits;
-	  iAttributes[22] = 0;
-	  iAttributes[23] = 0;
+	  iAttributes[index++] = WGL_SAMPLES_ARB;
+	  iAttributes[index++] = format[glpfvMultiSamples];
+	  iAttributes[index++] = WGL_COLOR_BITS_ARB;
+	  iAttributes[index++] = pfd.cColorBits;
+  	  iAttributes[index++] = WGL_ALPHA_BITS_ARB;
+  	  iAttributes[index++] = pfd.cAlphaBits;
+  	  iAttributes[index++] = WGL_DEPTH_BITS_ARB;
+	  iAttributes[index++] = pfd.cDepthBits;
+	  iAttributes[index++] = WGL_STENCIL_BITS_ARB;
+	  iAttributes[index++] = pfd.cStencilBits;	  
+	  iAttributes[index++] = WGL_ACCUM_BITS_ARB;
+	  iAttributes[index++] = pfd.cAccumBits;
+	  iAttributes[index++] = WGL_ACCUM_ALPHA_BITS_ARB;
+	  iAttributes[index++] = pfd.cAccumAlphaBits;
+	  iAttributes[index++] = 0;
+	  iAttributes[index++] = 0;
 
 	  if ((ext.wglChoosePixelFormatARB (hDC, iAttributes, fAttributes,
 	    1, &dwi->pixelFormat, &numFormats) == GL_TRUE) && (numFormats != 0))
@@ -524,8 +516,25 @@ bool csGraphics2DOpenGL::Open ()
     SwitchDisplayMode (false);
   }
 
+  int pixelFormat = -1;
   csGLPixelFormatPicker picker (this);
-  int pixelFormat = FindPixelFormatWGL (picker);
+  /*
+    Check if the WGL pixel format check should be used at all.
+    It appears that some drivers take "odd" choices when using the WGL
+    pixel format path (e.g. returning Accum-capable formats even if none
+    was requested).
+   */
+  bool doWGLcheck = false;
+  {
+    GLPixelFormat format;
+    if (picker.GetNextFormat (format))
+    {
+      doWGLcheck = (format[glpfvMultiSamples] != 0);
+      picker.Reset ();
+    }
+  }
+  if (doWGLcheck)
+    FindPixelFormatWGL (picker);
 
   m_bActivated = true;
 
