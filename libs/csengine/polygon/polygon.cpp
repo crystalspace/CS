@@ -2379,7 +2379,8 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
 
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
-  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
+  if ((!do_smooth && dist_to_plane < SMALL_EPSILON)
+  	|| dist_to_plane >= lview->GetRadius ())
     return ;
 
   // In the following algorithm we ignore the light frustum and only
