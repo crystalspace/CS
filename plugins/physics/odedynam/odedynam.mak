@@ -45,10 +45,10 @@ SRC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.cpp)
 OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
 DEP.ODEDYNAM = CSGEOM CSUTIL CSSYS
 
-MSVC.DSP += odedynam
+MSVC.DSP += ODEDYNAM
 DSP.ODEDYNAM.NAME = odedynam
 DSP.ODEDYNAM.TYPE = plugin
-DSP.odedynam.LIBS = ode
+DSP.ODEDYNAM.LIBS = ode
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
