@@ -1178,20 +1178,6 @@ int main (int argc, char* argv[])
 }
 
 #if 0
-void* operator new (size_t s)
-{
-  printf ("Alloc with size %d\n", s);
-  if (Sys && Sys->do_edges && s > 100)
-  {
-    int a;
-    a=1;
-  }
-  return (void*)malloc (s);
-}
-
-#endif
-
-#if 0
 
 #define DETECT_SIZE 20
 #define DETECT     "ABCDabcd01234567890+"
