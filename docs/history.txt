@@ -1,11 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+19-Feb-2003
+	- Fixed a memory leak in the OpenGL renderer.
 18-Feb-2003
 	- Philipp Aumayr updated bugplug for render3d api changes and "repaired"
 	  history.txt for Philipp Wyett (wrong indent :o)
 	- Philip Wyett removed commiter related info from flex skeleton file to
-	  remove it from being generated into skinlex.cpp and creating cvs changes
-	  and conflict.
+	  remove it from being generated into skinlex.cpp and creating cvs
+	  changes and conflict.
 	- Applied a patch from Anders Reggestad <anders@pvv.ntnu.no> which
 	  does the following:
 	    - Fixed the windows implementation of csGetTicks() so it is

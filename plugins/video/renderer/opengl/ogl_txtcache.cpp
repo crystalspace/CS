@@ -261,6 +261,7 @@ void csSuperLightMap::Clear ()
   if (cacheData)
   {
     cacheData->Clear ();
+    delete cacheData;
     cacheData = NULL;
   }
 }
