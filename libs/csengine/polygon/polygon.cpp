@@ -1328,15 +1328,9 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
 	bool dynamic, bool reset)
 {
-  float rd = 0, gd = 0, bd = 0;
-  if (light)
-  {
-    rd = lcol.red / light->GetRadius ();
-    gd = lcol.green / light->GetRadius ();
-    bd = lcol.blue / light->GetRadius ();
-  }
+  csColor poly_color (0,0,0), vert_color;
+  if (light) poly_color = lcol;
 
-  csColor col;
   int i;
   float cosfact = light_info.cosinus_factor;
   if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
@@ -1361,12 +1355,10 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
       cosinus += cosfact;
       if (cosinus < 0) cosinus = 0;
       else if (cosinus > 1) cosinus = 1;
-      col.red = cosinus * rd*(light->GetRadius () - d);
-      col.green = cosinus * gd*(light->GetRadius () - d);
-      col.blue = cosinus * bd*(light->GetRadius () - d);
+      vert_color = poly_color * cosinus * light->GetBrightnessAtDistance (d);
       if (!dynamic)
-        gs->AddColor (i, col.red, col.green, col.blue);
-      gs->AddDynamicColor (i, col.red, col.green, col.blue);
+        gs->AddColor (i, vert_color.red, vert_color.green, vert_color.blue);
+      gs->AddDynamicColor (i, vert_color.red, vert_color.green, vert_color.blue);
     }
   }
 }
