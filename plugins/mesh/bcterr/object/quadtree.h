@@ -49,6 +49,10 @@ public:
   // Exact point, may clip into polys
   void HeightTestExact (csVector3  *point, 
     int &hits);
+  bool HitBeamOutline (csSegment3 seg,
+    csVector3& isect, float* pr);
+  bool HitBeamObject (csSegment3 seg,
+    csVector3& isect, float* pr);
 };
 
 class csBCCollisionQuad
@@ -68,6 +72,10 @@ public:
   int HeightTestExt (csVector3 *point);
   // uses bezier compute to get point
   int HeightTestExact (csVector3 *point);
+  bool HitBeamOutline (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr);
+  bool HitBeamObject (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr);
 };
 
 

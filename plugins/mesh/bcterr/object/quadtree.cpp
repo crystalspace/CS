@@ -61,6 +61,99 @@ static bool InsideExt (csBox3 bbox, csVector3 *point)
     return false;
 }
 
+static bool BBoxLineIntersect (csBox3 bbox,
+        csSegment3 seg, csVector3 &isect,
+        float *pr)
+{
+  return false;
+}
+       
+
+bool csColQuad::HitBeamOutline (csSegment3 seg,
+    csVector3& isect, float* pr)
+{
+  if (csIntersect3::BoxSegment (bbox, seg, isect, pr) )
+  //if (BBoxLineIntersect (bbox, seg, isect, pr) )
+  {
+    int i;
+    bool hit;
+    i = 0;
+    hit = false;
+    for (i = 0; i < num_blocks; i++)
+    {
+      //hit = BBoxLineIntersect (blocks[i]->bbox, seg, isect, pr);
+      hit = csIntersect3::BoxSegment (blocks[i]->bbox, seg, isect, pr);
+      if (hit)
+      {
+        return true;
+      }
+    }
+    if (children[0])
+    {
+      for (i = 0; i < 4; i++)
+        return children[i]->HitBeamOutline (seg, isect, pr);
+    }
+    return false;
+  } else
+  {
+    return false;
+  }  
+}
+
+bool csColQuad::HitBeamObject (csSegment3 seg,
+    csVector3& isect, float* pr)
+{
+  if (csIntersect3::BoxSegment (bbox, seg, isect, pr) )
+  //if (BBoxLineIntersect (bbox, seg, isect, pr) )
+  {
+    int i, j, k, length;
+    bool hit;
+    csVector3 *work;
+    i = 0;
+    hit = false;
+    for (i = 0; i < num_blocks; i++)
+    {
+      length = blocks[i]->owner->hor_length;
+      work = blocks[i]->controlpoint;
+      for (j = 0; j < 3; j++)
+      {
+        for (k = 0; k < 3; k++)
+        {
+          hit = csIntersect3::IntersectTriangle (work[0], work[1],
+            work[length], seg, isect);
+          if (hit)
+          {
+            return true;
+          }
+          hit = csIntersect3::IntersectTriangle (work[1], work[length],
+            work[length + 1], seg, isect);
+          if (hit)
+          {
+            return true;
+          }
+          work += 1;
+        }
+        work = blocks[i]->controlpoint + (length * j);
+      }
+      //hit = BBoxLineIntersect (blocks[i]->bbox, seg, isect, pr);
+      hit = csIntersect3::BoxSegment (blocks[i]->bbox, seg, isect, pr);
+      if (hit)
+      {
+        return true;
+      }
+    }
+    if (children[0])
+    {
+      for (i = 0; i < 4; i++)
+        return children[i]->HitBeamObject (seg, isect, pr);
+    }
+    return false;
+  } else
+  {
+    return false;
+  }  
+}
+
 
 void csColQuad::HeightTest (csVector3  *point, 
 		int &hits)
@@ -493,4 +586,17 @@ int csBCCollisionQuad::HeightTestExact (csVector3 *point)
   hits = 0;
   root_quad->HeightTestExact (point, hits);
   return hits;
+}
+
+bool csBCCollisionQuad::HitBeamOutline (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr)
+{
+  csSegment3 seg (start, end);
+  return root_quad->HitBeamOutline ( seg, isect, pr);
+}
+bool csBCCollisionQuad::HitBeamObject (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr)
+{
+  csSegment3 seg (start, end);
+  return root_quad->HitBeamObject (seg, isect, pr);
 }
