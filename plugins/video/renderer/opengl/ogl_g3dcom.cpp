@@ -50,9 +50,15 @@
 #include "ivideo/graph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
+#include "csutil/csstrvec.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
 #include "video/canvas/openglcommon/iogl.h"
+
+#ifdef WIN32
+#include "cssys/win32/win32.h"
+#endif
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -122,8 +128,6 @@ fType  csGraphics3DOGLCommon::fName = (fType) NULL;
 float sAc, sBc, sCc, sDc;
 csMatrix3 sM;
 csVector3 sV;
-
-long gleich = 0, ungleich = 0;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), object_reg (NULL)
@@ -385,8 +389,8 @@ bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
 
 bool csGraphics3DOGLCommon::NewInitialize ()
 {
-  CS_ASSERT (object_reg != NULL);
   config.AddConfig(object_reg, "/config/opengl.cfg");
+
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
@@ -404,107 +408,8 @@ bool csGraphics3DOGLCommon::NewInitialize ()
 	"Could not register the canvas!");
     return false;
   }
-
-  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
-
-  m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
-  z_buf_mode = CS_ZBUF_NONE;
+  
   width = height = -1;
-  Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
-  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.MinTexHeight", 2);
-  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.MinTexWidth", 2);
-  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.MaxTexHeight", 1024);
-  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.MaxTexWidth", 1024);
-  Caps.fog = G3DFOGMETHOD_VERTEX;
-  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
-  Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
-    32768);
-  GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
-  GLCaps.need_screen_clipping =
-  	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
-  GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
-  fps_limit = config->GetInt ("Video.OpenGL.FpsLimit", 0);
-  OpenGLLightmapCache::super_lm_num = config->GetInt (
-  	"Video.OpenGL.SuperLightMapNum", 10);
-  OpenGLLightmapCache::super_lm_size = config->GetInt (
-  	"Video.OpenGL.SuperLightMapSize", 256);
-  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
-    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"  Super lightmaps: num=%d size=%dx%d",
-  	OpenGLLightmapCache::super_lm_num,
-	OpenGLLightmapCache::super_lm_size,
-	OpenGLLightmapCache::super_lm_size);
-
-  unsigned int i, j;
-  const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
-  if (!strcmp (clip_opt, "auto"))
-    clip_optional[0] = OPENGL_CLIP_AUTO;
-  else
-  {
-    for (j = i = 0 ; i < strlen (clip_opt) ; i++)
-    {
-      char c = clip_opt[i];
-      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
-      if (c == 'z' || c == 'Z') continue;
-      clip_optional[j++] = c;
-      if (j >= 3) break;
-    }
-    while (j < 3) clip_optional[j++] = '0';
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Optional Clipping: %c%c%c",
-      clip_optional[0], clip_optional[1], clip_optional[2]);
-  }
-
-  const char* clip_req = config->GetStr ("Video.OpenGL.ClipRequired", "auto");
-  if (!strcmp (clip_req, "auto"))
-    clip_required[0] = OPENGL_CLIP_AUTO;
-  else
-  {
-    for (j = i = 0 ; i < strlen (clip_req) ; i++)
-    {
-      char c = clip_req[i];
-      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
-      if (c == 'z' || c == 'Z') continue;
-      if (c == 'n' || c == 'N') continue;
-      clip_required[j++] = c;
-      if (j >= 3) break;
-    }
-    while (j < 3) clip_required[j++] = '0';
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Required Clipping: %c%c%c",
-        clip_required[0], clip_required[1], clip_required[2]);
-  }
-
-  const char* clip_out = config->GetStr ("Video.OpenGL.ClipOuter", "zsp0");
-  if (!strcmp (clip_out, "auto"))
-    clip_outer[0] = OPENGL_CLIP_AUTO;
-  else
-  {
-    for (j = i = 0 ; i < strlen (clip_out) ; i++)
-    {
-      char c = clip_out[i];
-      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
-      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
-      if ((c == 'z' || c == 'Z' || c == 's' || c == 'S' || c == 'p' || c == 'P')
-    	  && GLCaps.need_screen_clipping) continue;
-      if (c == 'n' || c == 'N') continue;
-      clip_outer[j++] = c;
-      if (j >= 3) break;
-    }
-    while (j < 3) clip_outer[j++] = '0';
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Outer Clipping: %c%c%c",
-        clip_outer[0], clip_outer[1], clip_outer[2]);
-  }
-
-  m_renderstate.alphablend = true;
-  m_renderstate.mipmap = 0;
-  m_renderstate.gouraud = true;
-  m_renderstate.lighting = true;
-  m_renderstate.textured = true;
-
-  m_config_options.do_multitexture_level = 0;
-  m_config_options.do_extra_bright = false;
 
   return true;
 }
@@ -806,6 +711,194 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   // Initialize the default method calls
   DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
+
+#define _OGLCONFIGS_PREFIX   "Video.OpenGL.Configs"
+#define _OGLCONFIGS_CFGFILE  "config"
+
+  CS_ASSERT (object_reg != NULL);
+  config.AddConfig(object_reg, "/config/opengl/opengl.cfg");
+  
+  const char *sGL_RENDERER = (const char *)glGetString (GL_RENDERER);
+  const char *sGL_VENDOR = (const char *)glGetString (GL_VENDOR);
+  const char *sGL_VERSION = (const char *)glGetString (GL_VERSION);
+  const char *sGL_EXTENSIONS = (const char *)glGetString (GL_EXTENSIONS);
+
+  csStrVector *oglconfigs = new csStrVector ();
+  
+  iConfigIterator *it = config->Enumerate (_OGLCONFIGS_PREFIX);
+  while (it->Next ())
+  {
+    char *oglconfig = new char [strlen(it->GetKey (true))+1];
+    strcpy(oglconfig, it->GetKey (true)+1);
+    char *dot = strchr(oglconfig, '.');
+    if (dot) *dot = '\0';
+
+    if (oglconfigs->FindKey (oglconfig) == -1)
+    {
+      bool apply = true;
+      int count = 0;
+#define CHECK_STRING(str)						  \
+      if (s##str)								  \
+      {									  \
+	char *s_##str =							  \
+	  new char [strlen(_OGLCONFIGS_PREFIX) + 1 + strlen(oglconfig) + 1 + strlen(#str) + 1]; \
+	sprintf(s_##str, _OGLCONFIGS_PREFIX ".%s." #str, oglconfig);		  \
+	if (config->KeyExists(s_##str))					  \
+	{									  \
+	  count++;							  \
+	  apply &= csGlobMatches(s##str, config->GetStr(s_##str));	  \
+	}									  \
+	delete s_##str;							  \
+      } 
+
+      CHECK_STRING (GL_VENDOR);
+      CHECK_STRING (GL_VERSION);
+      CHECK_STRING (GL_RENDERER);
+      CHECK_STRING (GL_EXTENSIONS);
+
+#undef CHECK_STRING
+
+      if (apply && (count != 0)) 
+      {
+	char *cfgfkey = new char [strlen(_OGLCONFIGS_PREFIX) + 1 + strlen(oglconfig) + 
+	  1 + strlen(_OGLCONFIGS_CFGFILE) + 1];						  
+	sprintf(cfgfkey, _OGLCONFIGS_PREFIX ".%s." _OGLCONFIGS_CFGFILE, oglconfig);		  
+	const char *cfgfile = config->GetStr(cfgfkey);
+	config.AddConfig(object_reg, cfgfile);
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
+	  oglconfig, cfgfile);
+	delete cfgfkey;
+      }
+      oglconfigs->Push(oglconfig);
+    } 
+    else
+    {
+      delete oglconfig;
+    }
+  }
+#undef _OGLCONFIGS_PREFIX   
+#undef _OGLCONFIGS_CFGFILE
+
+  delete oglconfigs;
+
+  config.AddConfig(object_reg, "/config/opengl.cfg");
+
+#ifdef WIN32
+  // @@@ hack to work around an interference between the 3dfx opengl 
+  // driver on voodoo cards <= 2 and the win32 console window
+  if (G2D->GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
+  {
+    iWin32Assistant *Win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+
+    if (Win32Assistant)
+    {
+      Win32Assistant->DisableConsole();
+      Win32Assistant->DecRef();
+
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "*** disabled win32 console window");
+    }
+  }
+#endif
+  
+  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
+
+  m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
+  z_buf_mode = CS_ZBUF_NONE;
+  Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
+  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.MinTexHeight", 2);
+  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.MinTexWidth", 2);
+  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.MaxTexHeight", 1024);
+  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.MaxTexWidth", 1024);
+  Caps.fog = G3DFOGMETHOD_VERTEX;
+  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
+  Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
+    32768);
+  GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
+  GLCaps.need_screen_clipping =
+  	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
+  GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
+  fps_limit = config->GetInt ("Video.OpenGL.FpsLimit", 0);
+  OpenGLLightmapCache::super_lm_num = config->GetInt (
+  	"Video.OpenGL.SuperLightMapNum", 10);
+  OpenGLLightmapCache::super_lm_size = config->GetInt (
+  	"Video.OpenGL.SuperLightMapSize", 256);
+  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
+    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"  Super lightmaps: num=%d size=%dx%d",
+  	OpenGLLightmapCache::super_lm_num,
+	OpenGLLightmapCache::super_lm_size,
+	OpenGLLightmapCache::super_lm_size);
+
+  unsigned int i, j;
+  const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
+  if (!strcmp (clip_opt, "auto"))
+    clip_optional[0] = OPENGL_CLIP_AUTO;
+  else
+  {
+    for (j = i = 0 ; i < strlen (clip_opt) ; i++)
+    {
+      char c = clip_opt[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if (c == 'z' || c == 'Z') continue;
+      clip_optional[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_optional[j++] = '0';
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Optional Clipping: %c%c%c",
+      clip_optional[0], clip_optional[1], clip_optional[2]);
+  }
+
+  const char* clip_req = config->GetStr ("Video.OpenGL.ClipRequired", "auto");
+  if (!strcmp (clip_req, "auto"))
+    clip_required[0] = OPENGL_CLIP_AUTO;
+  else
+  {
+    for (j = i = 0 ; i < strlen (clip_req) ; i++)
+    {
+      char c = clip_req[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if (c == 'z' || c == 'Z') continue;
+      if (c == 'n' || c == 'N') continue;
+      clip_required[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_required[j++] = '0';
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Required Clipping: %c%c%c",
+        clip_required[0], clip_required[1], clip_required[2]);
+  }
+
+  const char* clip_out = config->GetStr ("Video.OpenGL.ClipOuter", "zsp0");
+  if (!strcmp (clip_out, "auto"))
+    clip_outer[0] = OPENGL_CLIP_AUTO;
+  else
+  {
+    for (j = i = 0 ; i < strlen (clip_out) ; i++)
+    {
+      char c = clip_out[i];
+      if ((c == 's' || c == 'S') && !GLCaps.use_stencil) continue;
+      if ((c == 'p' || c == 'P') && GLCaps.nr_hardware_planes <= 0) continue;
+      if ((c == 'z' || c == 'Z' || c == 's' || c == 'S' || c == 'p' || c == 'P')
+    	  && GLCaps.need_screen_clipping) continue;
+      if (c == 'n' || c == 'N') continue;
+      clip_outer[j++] = c;
+      if (j >= 3) break;
+    }
+    while (j < 3) clip_outer[j++] = '0';
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Outer Clipping: %c%c%c",
+        clip_outer[0], clip_outer[1], clip_outer[2]);
+  }
+
+  m_renderstate.alphablend = true;
+  m_renderstate.mipmap = 0;
+  m_renderstate.gouraud = true;
+  m_renderstate.lighting = true;
+  m_renderstate.textured = true;
+
+  m_config_options.do_multitexture_level = 0;
+  m_config_options.do_extra_bright = false;
 
   // See if we find any OpenGL extensions, and set the corresponding
   // flags.

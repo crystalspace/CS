@@ -75,14 +75,15 @@ bool csGraphics2DGLCommon::Open ()
     return false;
 
   const char *renderer = (const char *)glGetString (GL_RENDERER);
+  const char *vendor = (const char *)glGetString (GL_VENDOR);
   const char *version = (const char *)glGetString (GL_VERSION);
   iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (renderer || version)
+  if (renderer || version || vendor)
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.canvas.openglcommon",
-      	"OpenGL renderer: %s version %s",
-        renderer ? renderer : "unknown", version ? version : "unknown");
+      	"OpenGL renderer: %s (vendor: %s) version %s",
+        renderer ? renderer : "unknown", vendor ? vendor: "unknown", version ? version : "unknown");
 
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
