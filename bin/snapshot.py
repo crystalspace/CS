@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #==============================================================================
+#
 #    CVS Snapshot Generation Script
 #    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
@@ -16,6 +17,7 @@
 #    You should have received a copy of the GNU Library General Public
 #    License along with this library; if not, write to the Free
 #    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
 #==============================================================================
 #------------------------------------------------------------------------------
 # snapshot.py
@@ -29,11 +31,16 @@
 #    a lot of room for improvement.
 #
 #------------------------------------------------------------------------------
-import sys, os, glob, grp, tempfile, time
+import commands, glob, grp, os, string, sys, tempfile, time
 
 #------------------------------------------------------------------------------
 # Configuration Section
 #    cvsroot - CVSROOT setting for CVS.
+#    fixcvsroot - The CVSROOT setting which should appear in each CVS/Root
+#        file within the snapshot.  May be None if it is identical to the
+#        original cvsroot setting.  This setting is useful in cases where the
+#        CVSROOT value used for performing the check out differs from the one
+#        users will later need when updating the snapshot from CVS.
 #    cvsmodule - The module to checkout from the CVS repository.
 #    moduledir - The name of the directory which is created when the module
 #        is checked out from CVS (frequently identical to cvsmodule).
@@ -48,12 +55,13 @@ import sys, os, glob, grp, tempfile, time
 #------------------------------------------------------------------------------
 
 cvsroot = ":pserver:anonymous@cvs1:/cvsroot/crystal"
+fixcvsroot = ":pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal"
 cvsmodule = "crystal"
 moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
-keepsnaps = 4
+keepsnaps = 8
 
 #------------------------------------------------------------------------------
 # Snapshot Class
@@ -85,24 +93,10 @@ class Snapshot:
         return time.asctime(time.gmtime(time.time())) + " UTC"
 
     def run(self, cmd):
-        ok = None
-        try:
-            out = os.popen(cmd + " 2>&1")
-        except IOError, e:
-            self.log("Error running command: " + cmd +
-                     " (" + repr(e.args) + ")")
-        else:
-            s = out.readline()
-            while s != "":
-                self.log(s)
-                s = out.readline()
-            rc = out.close()
-            if rc == None:
-                ok = 1 # OK
-            else:
-                self.log("Command exited abnormally: " + cmd +
-                         " (" + str(rc) + ")")
-        return ok
+        rc = commands.getstatusoutput(cmd)
+        if len(rc[1]) > 0:
+            self.log(rc[1])
+        return (rc[0] == 0)
 
     def makedirectory(self, path):
         if not os.path.exists(path) :
@@ -137,6 +131,29 @@ class Snapshot:
             if rc:
                 self.run("diff -crN " + os.path.join(olddir, moduledir) +
                          " " + moduledir + " | gzip > " + self.diffname)
+
+    def patchcvsroot(self):
+        if fixcvsroot:
+            rc = commands.getstatusoutput(
+                "find " + os.path.join(self.builddir, moduledir) +
+                " -type d -name CVS -print -prune")
+            if rc[0] == 0:
+                dirs = string.split(rc[1])
+                if len(dirs) > 0:
+                    self.log("Patching CVS/Root entries")
+                    newroot = fixcvsroot + "\n"
+                    for dir in dirs:
+                        try:
+                            file = open(os.path.join(dir, "Root"), "w")
+                            file.write(newroot)
+                            file.close()
+                            file = None
+                        except IOError, e:
+                            self.log("Error patching Root in " + dir + " " +
+                                     repr(e.args))
+            else: # 'find' command returned error.
+                if len(rc[1]) > 0:
+                    self.log(rc[1])
 
     def openlog(self):
         if not self.logfile:
@@ -175,9 +192,9 @@ class Snapshot:
         # it is empty (i.e. no other snapshots are in progress).
         try:
             os.rmdir(self.workdir)
+            os.chdir(savedir)
         except Exception:
             pass
-        os.chdir(savedir)
 
     def preparetransient(self):
         tempfile.tempdir = self.workdir
@@ -195,6 +212,7 @@ class Snapshot:
     def dobulk(self):
         self.log("Retrieving module: " + cvsmodule)
         if self.run("cvs -Q -d " + cvsroot + " checkout " + cvsmodule):
+            self.patchcvsroot()
             self.gendiff()
             self.log("Creating package: " + self.packname)
             if self.run("tar cfz " + self.packname + " " + moduledir):
