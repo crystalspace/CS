@@ -11,6 +11,8 @@ class awsTestSink
   iAwsSink *sink;
   iString  *user;
   iString  *pass;
+
+  iAwsWindow *test;
   
 private:
   static void RedClicked(void *sink,   iAwsSource *source);
@@ -27,6 +29,8 @@ public:
   
   void SetSink(iAwsSink *s);
   iAwsSink *GetSink() { return sink; }
+
+  void SetTestWin(iAwsWindow *testwin);
 };
 
 #endif

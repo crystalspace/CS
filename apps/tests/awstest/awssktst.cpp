@@ -1,13 +1,14 @@
 #include "cssysdef.h"
 #include "awssktst.h"
 #include "csutil/scfstr.h"
+#include "aws/awsfparm.h"
 
 #include <stdio.h>
 
 static char *names[10] = { "Yellow", "Green", "Blue", "Orange", "Purple", "Red", "White", "Teal", "Black" };
 static int   namec = 0;
 
-awsTestSink::awsTestSink():sink(NULL), user(NULL), pass(NULL)
+awsTestSink::awsTestSink():sink(NULL), user(NULL), pass(NULL), test(NULL)
 {  
 }
 
@@ -32,6 +33,12 @@ awsTestSink::SetSink(iAwsSink *s)
    sink->RegisterTrigger("SetPassword", &SetPass);
    sink->RegisterTrigger("Login", &Login);
  }
+}
+
+void 
+awsTestSink::SetTestWin(iAwsWindow *testwin)
+{
+  test=testwin;
 }
 
 void 
@@ -86,7 +93,13 @@ awsTestSink::Login(void *sk, iAwsSource *source)
   if (sink->user==NULL || sink->pass==NULL)
     printf("awstest: You must enter a username AND password.\n");
 
-  else
+  else {
     printf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
+    iAwsComponent *comp = source->GetComponent();
+    awsParmList pl;
+
+    comp->Execute("HideWindow", pl);
+    if (sink->test) sink->test->Show();
+  }
 
 }
