@@ -19,6 +19,7 @@
 #ifndef __CS_LIGHTMAP_H__
 #define __CS_LIGHTMAP_H__
 
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
 
@@ -33,7 +34,8 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-/// Shadow map.
+typedef csDirtyAccessArray<csRGBpixel> csLightingScratchBuffer;
+
 class csShadowMap
 {
 public:
@@ -68,14 +70,6 @@ private:
    * This is used in lightmap merge optimizations.
    */
   csRGBpixel max_static_color_values;
-
-  /**
-   * The final lightmap that is going to be used for rendering.
-   * In many cases this is just a copy of static_lm. But it may
-   * contain extra lighting information obtained from all the
-   * pseudo-dynamic shadowmaps and also the true dynamic lights.
-   */
-  csRGBpixel* real_lm;
 
   /**
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
@@ -124,7 +118,8 @@ public:
   bool UpdateRealLightMap (float dyn_ambient_r,
                            float dyn_ambient_g,
                            float dyn_ambient_b, 
-                           bool dyn_dirty);
+                           bool dyn_dirty,
+			   csLightingScratchBuffer& finalLM);
 
   /**
    * Get the static lightmap data. After CalcMaxStatic() it
@@ -132,12 +127,6 @@ public:
    * the uniform lighting value in max_static_color_values.
    */
   csRGBpixel* GetStaticMap () { return static_lm; }
-  /**
-   * Get the real lightmap data. This is static lightmap +
-   * dynamic ambient + pseudo dynamic lights + dynamic
-   * lights.
-   */
-  csRGBpixel* GetRealMap () { return real_lm; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
@@ -203,8 +192,6 @@ public:
    */
   static void SetLightCellSize (int size);
 
-  ///
-  csRGBpixel *GetMapData () { return real_lm; }
   ///
   int GetWidth () const { return lwidth; }
   ///

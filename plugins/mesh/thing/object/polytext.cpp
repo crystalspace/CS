@@ -88,7 +88,8 @@ bool csPolyTexture::RecalculateDynamicLights (
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
-	const csPlane3& polygon_world_plane)
+	const csPlane3& polygon_world_plane,
+	csLightingScratchBuffer& finalLM)
 {
   if (!lm) return false;
 
@@ -96,10 +97,8 @@ bool csPolyTexture::RecalculateDynamicLights (
   csThing* thing = polygon->GetParent ();
   csColor amb = thing->GetDynamicAmbientLight();
 
-  if (!lm->UpdateRealLightMap (amb.red,
-      amb.green,
-      amb.blue,
-      thing->GetLightVersion () != light_version ))
+  if (!lm->UpdateRealLightMap (amb.red, amb.green, amb.blue,
+      thing->GetLightVersion () != light_version, finalLM))
     return false;
 
   light_version = thing->GetLightVersion ();
@@ -111,7 +110,7 @@ bool csPolyTexture::RecalculateDynamicLights (
   while (lp)
   {
     ShineDynLightMap (lp, m_world2tex, v_world2tex, polygon,
-    	polygon_world_plane);
+    	polygon_world_plane, finalLM);
     lp = lp->GetNext ();
   }
 
@@ -459,7 +458,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex,
   csPolygon3D* polygon,
-  const csPlane3& polygon_world_plane)
+  const csPlane3& polygon_world_plane,
+  csLightingScratchBuffer& finalLM)
 {
   csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()
   	->GetTextureMapping ();
@@ -490,7 +490,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   invww = 1.0f / (float)ww;
   invhh = 1.0f / (float)hh;
 
-  csRGBpixel* map = lm->GetRealMap ();
+  csRGBpixel* map = finalLM.GetArray();
   iLight *light = lp->GetLight ();
 
   int i;

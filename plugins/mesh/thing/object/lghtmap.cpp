@@ -69,7 +69,6 @@ csLightMap::csLightMap ()
   // Use slowest safest method by default.
   max_static_color_values.Set (255,255,255);
   static_lm = 0;
-  real_lm = 0;
 }
 
 csLightMap::~csLightMap ()
@@ -82,7 +81,6 @@ csLightMap::~csLightMap ()
   }
 
   delete[] static_lm;
-  delete[] real_lm;
 }
 
 void csLightMap::SetLightCellSize (int size)
@@ -156,11 +154,9 @@ void csLightMap::Alloc (int w, int h)
 {
   SetSize (w, h);
   delete[] static_lm;
-  delete[] real_lm;
 
   long lm_size = lwidth * lheight;
   static_lm = new csRGBpixel [lm_size];
-  real_lm = new csRGBpixel [lm_size];
 }
 
 struct PolySave
@@ -482,13 +478,15 @@ void csLightMap::Cache (
 bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
                                      float dyn_ambient_g,
                                      float dyn_ambient_b,
-                                     bool  dyn_dirty)
+                                     bool  dyn_dirty,
+				     csLightingScratchBuffer& finalLM)
 {
   if (!dyn_dirty) return false;
 
   csRGBpixel temp_max_color_values = max_static_color_values;
 
   long lm_size = lwidth * lheight;
+  finalLM.SetLength (lm_size);
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -516,15 +514,15 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       {
         for (int i=0; i<lm_size; i++)
         {
-          real_lm[i] = static_lm[i];
-          real_lm[i].UnsafeAdd (ambient);
+          finalLM[i] = static_lm[i];
+          finalLM[i].UnsafeAdd (ambient);
         }
       }
       else
       {
         csRGBpixel t = max_static_color_values;
 	t.UnsafeAdd (ambient);
-        for (int i=0; i<lm_size; i++) real_lm[i] = t;
+        for (int i=0; i<lm_size; i++) finalLM[i] = t;
       }
       temp_max_color_values.UnsafeAdd (ambient);
     }
@@ -535,15 +533,15 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       {
         for (int i=0; i<lm_size; i++)
         {
-          real_lm[i] = static_lm[i];
-	  real_lm[i].SafeAdd (ambient);
+          finalLM[i] = static_lm[i];
+	  finalLM[i].SafeAdd (ambient);
         }
       }
       else
       {
         csRGBpixel t = max_static_color_values;
 	t.SafeAdd (ambient);
-        for (int i=0; i<lm_size; i++) real_lm[i] = t;
+        for (int i=0; i<lm_size; i++) finalLM[i] = t;
       }
       temp_max_color_values.SafeAdd (ambient);
     }
@@ -551,10 +549,10 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   else
   {
     if (static_lm)
-      memcpy (real_lm, static_lm, 4 * lm_size);
+      memcpy (finalLM.GetArray(), static_lm, 4 * lm_size);
     else
       for (int i=0; i<lm_size; i++)
-        real_lm[i] = max_static_color_values;
+        finalLM[i] = max_static_color_values;
   }
 
   //---
@@ -573,7 +571,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     // Color mode.
     do
     {
-      map = real_lm;
+      map = finalLM.GetArray();
       light = smap->Light;
       red = light->GetColor ().red;
       green = light->GetColor ().green;

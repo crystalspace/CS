@@ -27,6 +27,10 @@ chronological order.
 	- res simplified the NR texture manager a bit.
 	- res put the normalization cube computation in the NR GL renderer 
 	  into an SV accessor (so it is only generated when really needed).
+	- res changed the Thing plugin to not store the final computed 
+	  lightmap. Instead, the final LM is computed into a buffer whose
+	  contents are then sent to the renderer. The renderer now has to keep 
+	  a copy if it needs one.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable

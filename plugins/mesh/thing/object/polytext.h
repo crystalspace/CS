@@ -26,6 +26,8 @@
 #include "ivideo/polyrender.h"
 #include "ivideo/txtmgr.h"
 
+#include "lghtmap.h"
+
 struct iFrustumView;
 struct iMaterialHandle;
 struct iPolygon3D;
@@ -323,7 +325,8 @@ public:
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
-	const csPlane3& polygon_world_plane);
+	const csPlane3& polygon_world_plane,
+	csLightingScratchBuffer& finalLM);
   // Assuming cosfact == 0 this will do one scanline of a lightmap.
   void ShineDynLightMapHoriz (
 	int du, csRGBpixel* map_uv,
@@ -368,7 +371,8 @@ public:
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
-	const csPlane3& polygon_world_plane);
+	const csPlane3& polygon_world_plane,
+	csLightingScratchBuffer& finalLM);
 
   /// Query the size of one light cell
   int GetLightCellSize ();

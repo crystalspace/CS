@@ -180,6 +180,19 @@ public:
   iMeshObjectType* thingmesh_type;
   /// Set of flags
   csFlags flags;
+  csFlags internalFlags;
+
+  /// If true then this thing has been prepared (Prepare() function).
+  bool IsPrepared() { return internalFlags.Check (1); }
+  void SetPrepared (bool b) { internalFlags.SetBool (1, b); }
+  bool IsLmPrepared() { return internalFlags.Check (2); }
+  void SetLmPrepared (bool b) { internalFlags.SetBool (2, b); }
+  /// Smooth flag
+  bool IsSmoothed() { return internalFlags.Check (4); }
+  void SetSmoothed (bool b) { internalFlags.SetBool (4, b); }
+  /// If true then the bounding box in object space is valid.
+  bool IsObjBboxValid() { return internalFlags.Check (8); }
+  void SetObjBboxValid (bool b) { internalFlags.SetBool (8, b); }
 
   /// Number of vertices
   int num_vertices;
@@ -189,9 +202,6 @@ public:
   csVector3* obj_verts;
   /// Normals in object space
   csVector3* obj_normals;
-
-  /// Smooth flag
-  bool smoothed;
 
   /// Last used range.
   csPolygonRange last_range;
@@ -208,9 +218,6 @@ public:
 
   /// Bounding box in object space.
   csBox3 obj_bbox;
-
-  /// If true then the bounding box in object space is valid.
-  bool obj_bbox_valid;
 
   /// Radius of object in object space.
   csVector3 obj_radius;
@@ -282,10 +289,6 @@ public:
   csPDelArray<csStaticLitPolyGroup> litPolys;
   csPDelArray<csStaticPolyGroup> unlitPolys;
   csArray<StaticSuperLM*> superLMs;
-
-  /// If true then this thing has been prepared (Prepare() function).
-  bool prepared;
-  bool lmprepared;
 
   /**
    * This field describes how the light hitting polygons of this thing is
@@ -432,8 +435,8 @@ public:
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
-  virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
-  virtual bool GetSmoothingFlag () { return smoothed; }
+  virtual void SetSmoothingFlag (bool smoothing) { SetSmoothed (smoothing); }
+  virtual bool GetSmoothingFlag () { return IsSmoothed(); }
   virtual csVector3* GetNormals () { return obj_normals; }
 
   virtual float GetCosinusFactor () const { return cosinus_factor; }
@@ -599,6 +602,7 @@ private:
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * @@@OR@@@
    * If we are a detail object then this will contain a reference to a
@@ -609,6 +613,7 @@ private:
    * An array of materials that are used with the polygon buffer.
    */
   csArray<iMaterialWrapper*> polybuf_materials;
+#endif
   /**
    * An array of materials that must be visited before use.
    */
@@ -634,16 +639,6 @@ private:
   /// Pointer to logical parent.
   iBase* logparent;
 
-  /// If true then this thing has been prepared (Prepare() function).
-  bool prepared;
-
-#ifdef __USE_MATERIALS_REPLACEMENT__
-  /// If true then a material has been added/removed from
-  /// the replace_materials array, and the polygon
-  /// buffer of the thing needs to be recalculated.
-  bool replaceMaterialChanged;
-#endif
-
   /**
    * This number is compared with the static_data_nr in the static data to
    * see if static data has changed and this thing needs to updated local
@@ -652,9 +647,24 @@ private:
   int32 static_data_nr;
 
   float current_lod;
-  uint32 current_features;
 
   csFlags flags;
+  csFlags internalFlags;
+
+  /// If true then this thing has been prepared (Prepare() function).
+  bool IsPrepared() { return internalFlags.Check (1); }
+  void SetPrepared (bool b) { internalFlags.SetBool (1, b); }
+#ifdef __USE_MATERIALS_REPLACEMENT__
+  /// If true then a material has been added/removed from
+  /// the replace_materials array, and the polygon
+  /// buffer of the thing needs to be recalculated.
+  bool IsReplaceMaterialChanged() { return internalFlags.Check (2); }
+  void SetReplaceMaterialChanged (bool b) { internalFlags.SetBool (2, b); }
+#endif
+  bool IsLmPrepared() { return internalFlags.Check (4); }
+  void SetLmPrepared (bool b) { internalFlags.SetBool (4, b); }
+  bool IsLmDirty() { return internalFlags.Check (8); }
+  void SetLmDirty (bool b) { internalFlags.SetBool (8, b); }
 
 #ifdef CS_USE_NEW_RENDERER
   csRenderMeshHolderMultiple rmHolder;
@@ -683,8 +693,6 @@ private:
 
   csPDelArray<csLitPolyGroup> litPolys;
   csPDelArray<csPolyGroup> unlitPolys;
-  bool lightmapsPrepared;
-  bool lightmapsDirty;
 
   void PreparePolygons ();
   void PrepareLMs ();
@@ -1181,6 +1189,8 @@ public:
   csBlockAllocator<intar6>* blk_polidx6;
   csBlockAllocator<intar20>* blk_polidx20;
   csBlockAllocator<intar60>* blk_polidx60;
+
+  csLightingScratchBuffer lightingScratch;
 
   int maxLightmapW, maxLightmapH;
   float maxSLMSpaceWaste;

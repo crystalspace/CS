@@ -215,12 +215,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   max_vertices = num_vertices = 0;
   obj_verts = 0;
   obj_normals = 0;
-  smoothed = false;
 
-  obj_bbox_valid = false;
-
-  prepared = false;
-  lmprepared = false;
   cosinus_factor = -1;
   logparent = 0;
   thingmesh_type = thing_type;
@@ -252,9 +247,9 @@ csThingStatic::~csThingStatic ()
 
 void csThingStatic::Prepare (iBase* thing_logparent)
 {
-  if (!prepared) 
+  if (!IsPrepared()) 
   {
-    prepared = true;
+    SetPrepared (true);
 
     if (!flags.Check (CS_THING_NOCOMPRESS))
     {
@@ -262,7 +257,7 @@ void csThingStatic::Prepare (iBase* thing_logparent)
       RemoveUnusedVertices ();
     }
 
-    if (smoothed)
+    if (IsSmoothed())
       CalculateNormals();
 
     size_t i;
@@ -274,12 +269,12 @@ void csThingStatic::Prepare (iBase* thing_logparent)
       // completely ready yet. In that case we set 'prepared' to false
       // again so that we force a new prepare later.
       if (!sp->Finish (thing_logparent))
-	prepared = false;
+	SetPrepared (false);
     }
     static_polygons.ShrinkBestFit ();
   }
   
-  if (prepared)
+  if (IsPrepared())
   {
     PrepareLMLayout ();
   }
@@ -309,7 +304,7 @@ static int CompareStaticPolyGroups (
 
 void csThingStatic::PrepareLMLayout ()
 {
-  if (lmprepared) return;
+  if (IsLmPrepared()) return;
 
   csHash<csStaticPolyGroup*, iMaterialWrapper*> polysSorted;
 
@@ -393,7 +388,7 @@ void csThingStatic::PrepareLMLayout ()
     slm->rects = 0;
   }
 
-  lmprepared = true;
+  SetLmPrepared (true);
 }
 
 #ifdef LIGHTMAP_DEBUG
@@ -643,6 +638,8 @@ void csThingStatic::DistributePolyLMs (
   }
   delete curOutputPolys;
 
+  //superLMs.ShrinkBestFit ();
+
   for (i = 0; i < litPolys.Length(); i++)
   {
     StaticSuperLM* slm = litPolys[i]->staticSLM;
@@ -665,7 +662,7 @@ void csThingStatic::DistributePolyLMs (
 
 void csThingStatic::UnprepareLMLayout ()
 {
-  if (!lmprepared) return;
+  if (!IsLmPrepared()) return;
   litPolys.DeleteAll ();
   unlitPolys.DeleteAll ();
 
@@ -676,7 +673,7 @@ void csThingStatic::UnprepareLMLayout ()
     delete sslm;
   }
   superLMs.DeleteAll ();
-  lmprepared = false;
+  SetLmPrepared (false);
 }
 
 int csThingStatic::AddVertex (float x, float y, float z)
@@ -838,7 +835,7 @@ void csThingStatic::RemoveUnusedVertices ()
   delete[] relocate;
   delete[] used;
 
-  obj_bbox_valid = false;
+  SetObjBboxValid (false);
   scfiObjectModel.ShapeChanged ();
 }
 
@@ -947,12 +944,12 @@ csPtr<csThingStatic> csThingStatic::CloneStatic ()
 {
   csThingStatic* clone = new csThingStatic (scfParent, thing_type);
   clone->flags.SetAll (GetFlags ().Get ());
-  clone->smoothed = smoothed;
+  clone->SetSmoothed (IsSmoothed());
   clone->obj_bbox = obj_bbox;
-  clone->obj_bbox_valid = obj_bbox_valid;
+  clone->SetObjBboxValid (IsObjBboxValid ());
   clone->obj_radius = obj_radius;
   clone->max_obj_radius = max_obj_radius;
-  clone->prepared = prepared;
+  clone->SetPrepared (IsPrepared());
   clone->scfiObjectModel.SetShapeNumber (scfiObjectModel.GetShapeNumber ());
   clone->cosinus_factor = cosinus_factor;
 
@@ -1018,13 +1015,13 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
 {
   int i;
 
-  if (obj_bbox_valid)
+  if (IsObjBboxValid())
   {
     box = obj_bbox;
     return ;
   }
 
-  obj_bbox_valid = true;
+  SetObjBboxValid (true);
 
   if (!obj_verts)
   {
@@ -1585,23 +1582,14 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   cfg_moving = CS_THING_MOVE_NEVER;
 
-#ifdef __USE_MATERIALS_REPLACEMENT__
-  replaceMaterialChanged = false;
-#endif
-
-  prepared = false;
   static_data_nr = 0xfffffffd;	// (static_nr of csThingStatic is init to -1)
-
-  current_lod = 1;
-  current_features = 0;
 
 #ifndef CS_USE_NEW_RENDERER
   polybuf = 0;
 #endif // CS_USE_NEW_RENDERER
   current_visnr = 1;
 
-  lightmapsPrepared = false;
-  lightmapsDirty = true;
+  SetLmDirty (true);
 }
 
 csThing::~csThing ()
@@ -1680,7 +1668,7 @@ void csThing::MarkLightmapsDirty ()
   if (polybuf)
     polybuf->MarkLightmapsDirty ();
 #endif // CS_USE_NEW_RENDERER
-  lightmapsDirty = true;
+  SetLmDirty (true);
   light_version++;
 }
 
@@ -1806,7 +1794,7 @@ void csThing::HardTransform (const csReversibleTransform& t)
 
 void csThing::Unprepare ()
 {
-  prepared = false;
+  SetPrepared (false);
 }
 
 void csThing::PreparePolygons ()
@@ -1834,7 +1822,7 @@ void csThing::Prepare ()
 {
   static_data->Prepare (logparent);
 
-  if (prepared)
+  if (IsPrepared())
   {
     if (static_data_nr != static_data->scfiObjectModel.GetShapeNumber ())
     {
@@ -1859,11 +1847,11 @@ void csThing::Prepare ()
 	polybuf->DecRef ();
 	polybuf = 0;
       }
+      polybuf_materials.DeleteAll ();
 #else
       rmHolder.Clear();
 #endif // CS_USE_NEW_RENDERER
 
-      polybuf_materials.DeleteAll ();
       materials_to_visit.DeleteAll ();
 
       ClearLMs ();
@@ -1876,7 +1864,7 @@ void csThing::Prepare ()
     return;
   }
 
-  prepared = true;
+  SetPrepared (true);
 
   static_data_nr = static_data->scfiObjectModel.GetShapeNumber ();
 
@@ -1899,11 +1887,11 @@ void csThing::Prepare ()
     polybuf->DecRef ();
     polybuf = 0;
   }
+  polybuf_materials.DeleteAll ();
 #else
   rmHolder.Clear();
 #endif // CS_USE_NEW_RENDERER
 
-  polybuf_materials.DeleteAll ();
   materials_to_visit.DeleteAll ();
 
   PreparePolygons ();
@@ -1930,7 +1918,7 @@ void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
 {
   //
   //Remove the binding of oldmat, if it exists.
-  int i;
+  size_t i;
   for (i = 0 ; i < replace_materials.Length () ; i++)
   {
     if (replace_materials[i].old_mat == oldmat)
@@ -1949,8 +1937,8 @@ void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
     //Create the binding of the 'oldmat' material with a new one.
     replace_materials.Push (RepMaterial (oldmat, newmat));
   }//if
-  
-  replaceMaterialChanged = true;
+
+  SetReplaceMaterialChanged (true);
 }
 
 #else
@@ -1959,7 +1947,7 @@ void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
 	iMaterialWrapper* newmat)
 {
   replace_materials.Push (RepMaterial (oldmat, newmat));
-  prepared = false;
+  SetPrepared (false);
 }
 
 #endif // __USE_MATERIALS_REPLACEMENT__
@@ -1968,7 +1956,7 @@ void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
 void csThing::ClearReplacedMaterials ()
 {
   replace_materials.DeleteAll ();
-  prepared = false;
+  SetPrepared (false);
 }
 
 csPolygon3D *csThing::GetPolygon3D (const char *name)
@@ -2014,12 +2002,12 @@ void csThing::InvalidateThing ()
     polybuf->DecRef ();
     polybuf = 0;
   }
-#endif // CS_USE_NEW_RENDERER
-
   polybuf_materials.DeleteAll ();
+#endif // CS_USE_NEW_RENDERER
   materials_to_visit.DeleteAll ();
-  prepared = false;
-  static_data->obj_bbox_valid = false;
+
+  SetPrepared (false);
+  static_data->SetObjBboxValid (false);
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
   static_data->scfiObjectModel.ShapeChanged ();
@@ -2313,6 +2301,7 @@ void csThing::PreparePolygonBuffer ()
     }//for
 
     replaceMaterialChanged = false;
+    replace_materials.ShrinkBestFit();
   }//else if
 
   //
@@ -2995,7 +2984,7 @@ tv5.tv_usec-tv4.tv_usec, tv6.tv_usec-tv5.tv_usec, tv6.tv_usec - tv1.tv_usec);
 
 void csThing::PrepareLMs ()
 {
-  if (lightmapsPrepared) return;
+  if (IsLmPrepared()) return;
 
   csThingObjectType* thing_type = static_data->thing_type;
   iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
@@ -3034,6 +3023,7 @@ void csThing::PrepareLMs ()
       {
 	pg->polys.Put (j, &polygons[slpg.polys[j]]);
       }
+      //pg->polys.ShrinkBestFit();
 
       unlitPolys.Push (pg);
     }
@@ -3046,11 +3036,12 @@ void csThing::PrepareLMs ()
 
       size_t j;
       lpg->lightmaps.SetLength (slpg.polys.Length ());
+      lpg->polys.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
 	csPolygon3D* poly = &polygons[slpg.polys[j]];
 
-	lpg->polys.Push (poly);
+	lpg->polys.Put (j, poly);
 	const csRect& r = slpg.lmRects[j];
 	csRef<iRendererLightmap> rlm = 
 	  SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
@@ -3080,6 +3071,7 @@ void csThing::PrepareLMs ()
     {
       pg->polys.Put (j, &polygons[spg.polys[j]]);
     }
+    //pg->polys.ShrinkBestFit();
 
     unlitPolys.Push (pg);
   }
@@ -3087,24 +3079,24 @@ void csThing::PrepareLMs ()
   litPolys.ShrinkBestFit ();
   unlitPolys.ShrinkBestFit ();
 
-  lightmapsPrepared = true;
-  lightmapsDirty = true;
+  SetLmDirty (true);
+  SetLmPrepared (true);
 }
 
 void csThing::ClearLMs ()
 {
-  if (!lightmapsPrepared) return;
+  if (!IsLmPrepared()) return;
 
   litPolys.DeleteAll ();
   unlitPolys.DeleteAll ();
 
-  lightmapsPrepared = false;
-  lightmapsDirty = true;
+  SetLmDirty (true);
+  SetLmPrepared (false);
 }
 
 void csThing::UpdateDirtyLMs ()
 {
-  if (!lightmapsDirty) return;
+  if (!IsLmDirty()) return;
 
   WorUpdate ();
   bool ident;
@@ -3149,17 +3141,18 @@ void csThing::UpdateDirtyLMs ()
       {
         const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
 		poly->GetPolyIdx ());
+	csLightingScratchBuffer& scratch = static_data->thing_type->lightingScratch;
         if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, poly,
-		world_plane))
+		world_plane, scratch))
         {
 	  litPolys[i]->lightmaps[j]->SetData (
-	    lmi->GetLightMap ()->GetMapData ());
+	    /*lmi->GetLightMap ()->GetMapData ()*/scratch.GetArray ());
         }
       }
     }
   }
 
-  lightmapsDirty = false;
+  SetLmDirty (false);
 }
 
 //---------------------------------------------------------------------------
