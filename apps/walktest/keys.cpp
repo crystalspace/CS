@@ -570,7 +570,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, in
   }
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));
-  CHK (new csRAPIDCollider (*spr, spr));
+  CHK ((void)new csRAPIDCollider (*spr, spr));
   CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
   spr->ObjAdd (gh_info);
   gh_info->dir = 1;

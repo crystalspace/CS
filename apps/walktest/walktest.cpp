@@ -1153,12 +1153,12 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK(new csRAPIDCollider(*sp, sp));
+    CHK((void)new csRAPIDCollider(*sp, sp));
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK(new csRAPIDCollider(*tp, tp));
+      CHK((void)new csRAPIDCollider(*tp, tp));
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -1173,7 +1173,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     spp = (csSprite3D*)sp;
 
     // TODO: Should create beings for these.
-    CHK(new csRAPIDCollider(*spp, spp));
+    CHK((void)new csRAPIDCollider(*spp, spp));
   }
 
   // Create a player object that follows the camera around.

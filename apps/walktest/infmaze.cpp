@@ -252,7 +252,7 @@ void InfPortalCS::ConnectNewSector ()
     CHK (delete lviews);
     lviews = n;
   }
-  CHK (new csRAPIDCollider (*s, s));
+  CHK ((void)new csRAPIDCollider (*s, s));
 }
 
 bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)
