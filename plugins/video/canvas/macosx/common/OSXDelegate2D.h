@@ -24,9 +24,9 @@
 #import "OSXDriver2D.h"
 
 
-@interface OSXDelegate2D : NSResponder
+@interface OSXDelegate2D : NSObject
 {
-    // Keep track of maouse tracking state
+    // Keep track of mouse tracking state
     NSTrackingRectTag trackingMouseTag;
     BOOL trackingMouse;
     BOOL hideMouse;				// YES if mouse is not visible
@@ -49,9 +49,6 @@
 
 // Deallocate object
 - (void) dealloc;
-
-// Returns YES to indicate that it will become the first responder
-- (BOOL) acceptsFirstResponder;
 
 // Open a window if none open
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
@@ -76,19 +73,8 @@
 // Change focus of window and adjust title
 - (void) focusChanged:(BOOL) focused;
 
-// Events - passed to driver
-- (void) keyDown:(NSEvent *) ev;
-- (void) keyUp:(NSEvent *) ev;
-- (void) flagsChanged:(NSEvent *) ev;
-- (void) mouseMoved:(NSEvent *) ev;
-- (void) mouseDown:(NSEvent *) ev;
-- (void) mouseUp:(NSEvent *) ev;
-- (void) mouseDragged:(NSEvent *) ev;
-- (void) rightMouseDown:(NSEvent *) ev;
-- (void) rightMouseUp:(NSEvent *) ev;
-- (void) rightMouseDragged:(NSEvent *) ev;
-
-
+// Dispatch an event to the driver
+- (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view;
 
 @end
 

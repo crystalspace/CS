@@ -18,6 +18,8 @@
 
 #include "OSXDriver2D.h"
 
+#include <sys/time.h>
+
 
 SCF_IMPLEMENT_IBASE(OSXDriver2D::EventHandler)
   SCF_IMPLEMENTS_INTERFACE(iEventHandler)
@@ -90,8 +92,9 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     // Figure out what screen we will be using
     ChooseDisplay();
 
-    // Get and save original mode - released in Close()
+    // Get and save original mode and gamma - released in Close()
     originalMode = CGDisplayCurrentMode(display);
+    SaveGamma(display, originalGamma);
 
     return true;
 };
@@ -238,6 +241,9 @@ bool OSXDriver2D::EnterFullscreenMode()
     if (mode == NULL)
         return false;
 
+    // Fade to black
+    FadeToRGB(display, 0.0, 0.0, 0.0);
+
     // Lock displays
     if (CGDisplayCapture(display) != CGDisplayNoErr)
         return false;
@@ -246,16 +252,19 @@ bool OSXDriver2D::EnterFullscreenMode()
     if (CGDisplaySwitchToMode(display, mode) == CGDisplayNoErr)
     {
         // Extract actual Width/Height/Depth
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth), kCFNumberLongType,
-                                                                                    &canvas->Width);
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight), kCFNumberLongType,
-                                                                                    &canvas->Height);
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), kCFNumberLongType,
-                                                                                    &canvas->Depth);
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth),
+                            kCFNumberLongType, &canvas->Width);
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight),
+                            kCFNumberLongType, &canvas->Height);
+        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), 
+                            kCFNumberLongType, &canvas->Depth);
+        
+        // Fade back to original gamma
+        FadeToGammaTable(display, originalGamma);
     }
     else
     {
-        CGReleaseAllDisplays();
+        CGDisplayRelease(display);
         return false;
     };
 
@@ -267,8 +276,10 @@ bool OSXDriver2D::EnterFullscreenMode()
 // Switch out of fullscreen mode, to mode stored in originalMode
 void OSXDriver2D::ExitFullscreenMode()
 {
+    FadeToRGB(display, 0.0, 0.0, 0.0);
     CGDisplaySwitchToMode(display, originalMode);
-    CGReleaseAllDisplays();
+    CGDisplayRelease(display);
+    FadeToGammaTable(display, originalGamma);
 };
 
 
@@ -301,13 +312,85 @@ bool OSXDriver2D::ToggleFullscreen()
 
     if (success == true)
         OSXDelegate2D_openWindow(delegate, canvas->win_title,
-                                    canvas->Width, canvas->Height, canvas->Depth, canvas->FullScreen, display, screen);
+                                canvas->Width, canvas->Height, canvas->Depth, 
+                                canvas->FullScreen, display, screen);
 
     return success;
 };
 
 
-// chooseDisplay
+// FadeToRGB
+// Uses CoreGraphics to fade to a given color 
+void OSXDriver2D::FadeToRGB(CGDirectDisplayID disp, float r, float g, float b)
+{
+    int i;
+    GammaTable gamma;
+    
+    for (i = 0; i < 256; i++)
+    {
+        gamma.r[i] = r;
+        gamma.g[i] = g;
+        gamma.b[i] = b;
+    };
+    
+    FadeToGammaTable(disp, gamma);
+};
+
+
+// FadeToGamma
+// Fade to a given gamma table
+void OSXDriver2D::FadeToGammaTable(CGDirectDisplayID disp, GammaTable table)
+{
+    static const float TOTAL_USEC = 1000000.0;	// 1 second total
+    
+    int i;
+    float x, start_usec, end_usec, current_usec;
+    timeval start, current;
+    GammaTable temp;
+    
+    gettimeofday(&start, NULL);
+    start_usec = (start.tv_sec * 1000000) + start.tv_usec;
+    end_usec = start_usec + TOTAL_USEC;
+    
+    do {
+        gettimeofday(&current, NULL);
+        current_usec = (current.tv_sec * 1000000) + current.tv_usec;
+        
+        // Calculate fraction of elapsed time
+        x = (current_usec - start_usec) / TOTAL_USEC;        
+        
+        for (i = 0; i < 256; i++)
+        {
+            temp.r[i] = originalGamma.r[i] + 
+                                (x * (table.r[i] - originalGamma.r[i])); 
+            temp.g[i] = originalGamma.g[i] + 
+                                (x * (table.g[i] - originalGamma.g[i])); 
+            temp.b[i] = originalGamma.b[i] + 
+                                (x * (table.b[i] - originalGamma.b[i]));
+        }
+        
+        CGSetDisplayTransferByTable(disp, 256, temp.r, temp.g, temp.b);
+    } while (current_usec < end_usec);
+
+    CGSetDisplayTransferByTable(disp, 256, table.r, table.g, table.b);
+};
+
+
+// SaveGamma
+// Save the current gamma values to the given table
+void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
+{
+    CGDisplayErr err;
+    CGTableCount sampleCount;
+    
+    err = CGGetDisplayTransferByTable(disp, 256, table.r, table.g, 
+                                        table.b, &sampleCount);
+    if (err != kCGErrorSuccess)
+        fprintf(stderr, "Error %d reading gamma values\n", err);
+};
+
+
+// ChooseDisplay
 // Choose which display to use
 // Updates the screen and display members
 void OSXDriver2D::ChooseDisplay()

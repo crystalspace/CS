@@ -28,6 +28,14 @@
 #include <ApplicationServices/ApplicationServices.h>
 
 
+// Table for storing gamma values
+struct GammaTable {
+    float r[256];
+    float g[256];
+    float b[256];
+};
+
+
 class OSXDriver2D
 {
 public:
@@ -93,11 +101,21 @@ protected:
 
     // Toggle current state of fullscreen
     virtual bool ToggleFullscreen();
+
+    // Uses CoreGraphics to fade to a given color 
+    void FadeToRGB(CGDirectDisplayID disp, float r, float g, float b);
     
+    // Fade to a given gamma table
+    void FadeToGammaTable(CGDirectDisplayID disp, GammaTable table);
+    
+    // Save the current gamma values to the given table
+    void SaveGamma(CGDirectDisplayID disp, GammaTable &table);
+
     // Choose which display to use
     void ChooseDisplay();
 
     CFDictionaryRef originalMode;		// Original display mode
+    GammaTable originalGamma;			// Original gamma values
     bool inFullscreenMode;			// Flag to indicate that we have correctly switched to fs mode
     CGDirectDisplayID display;			// Screen to display on
     uint32_t screen;				// Screen number to display on

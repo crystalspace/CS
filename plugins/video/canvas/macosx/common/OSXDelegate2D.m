@@ -8,6 +8,7 @@
 
 #import "OSXDelegate2D.h"
 
+#import "OSXView.h"
 #import "OSXWindow.h"
 
 @interface OSXDelegate2D (PrivateMethods)
@@ -76,19 +77,12 @@
 };
 
 
-// acceptsFirstResponder
-// Returns YES to indicate that it will become the first responder
-- (BOOL) acceptsFirstResponder
-{
-    return YES;
-};
-
-
 // openWindow
 // Open a window if none open
 // In fullscreen mode, opens a zero-sized window to get events
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
 {
+    NSView *view;
     NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
     NSRect rect = NSZeroRect;
 
@@ -117,6 +111,11 @@
     if (window == nil)
         return NO;
 
+    // Create and add view
+    view = [[OSXView alloc] initWithFrame:rect];
+    [window setContentView:view];
+    [view release];
+
     // Set up window stuff
     if (fs == YES)
         [window setLevel:CGShieldingWindowLevel()];
@@ -126,8 +125,8 @@
 
     [window useOptimizedDrawing:YES];
     [window setDelegate:self];
-    [window makeFirstResponder:self];
-    [[window contentView] setNextResponder:self];
+    [view setDelegate:self];
+    [window makeFirstResponder:view];
     [window makeKeyAndOrderFront:nil];
 
     // Start tracking mouse
@@ -264,58 +263,12 @@
 };
 
 
-// Events
-// All these methods just relay the event to the assistant
-- (void) keyDown:(NSEvent *) ev
+// dispatchEvent
+// Dispatch an event to the driver
+- (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view
 {
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
+    OSXDriver2D_DispatchEvent(driver, ev, view);
 };
-
-- (void) keyUp:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) flagsChanged:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) mouseMoved:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) mouseDown:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) mouseUp:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) mouseDragged:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) rightMouseDown:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) rightMouseUp:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
-- (void) rightMouseDragged:(NSEvent *) ev
-{
-    OSXDriver2D_DispatchEvent(driver, ev, [window contentView]);
-};
-
 
 @end
 
