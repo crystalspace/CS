@@ -491,16 +491,16 @@ void WinKeyTrans (csSystemDriver* pSystemDriver, WPARAM wParam, bool down)
   int key = 0;
   switch (wParam)
   {
-    case VK_END:     key = CSKEY_END;
-    case VK_UP:      key = CSKEY_UP;
-    case VK_DOWN:    key = CSKEY_DOWN;
-    case VK_LEFT:    key = CSKEY_LEFT;
-    case VK_RIGHT:   key = CSKEY_RIGHT;
-    case VK_PRIOR:   key = CSKEY_PGUP;
-    case VK_NEXT:    key = CSKEY_PGDN;
-    case VK_MENU:    key = CSKEY_ALT;
-    case VK_CONTROL: key = CSKEY_CTRL;
-    case VK_SHIFT:   key = CSKEY_SHIFT;
+    case VK_END:     key = CSKEY_END; break;
+    case VK_UP:      key = CSKEY_UP; break;
+    case VK_DOWN:    key = CSKEY_DOWN; break;
+    case VK_LEFT:    key = CSKEY_LEFT; break;
+    case VK_RIGHT:   key = CSKEY_RIGHT; break;
+    case VK_PRIOR:   key = CSKEY_PGUP; break;
+    case VK_NEXT:    key = CSKEY_PGDN; break;
+    case VK_MENU:    key = CSKEY_ALT; break;
+    case VK_CONTROL: key = CSKEY_CTRL; break;
+    case VK_SHIFT:   key = CSKEY_SHIFT; break;
   }
   if (key)
     pSystemDriver->QueueKeyEvent (key, down);
