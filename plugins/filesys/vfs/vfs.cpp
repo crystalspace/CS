@@ -1397,18 +1397,22 @@ csRef<iStrVector> csVFS::MountRoot (const char *Path)
     {
       char const* t = roots->Get(i);
       csString s(t);
+      int const slen = s.Length();
+      char c = '\0';
 
       csString vfs_dir;
       vfs_dir << Path << '/';
-      for (int j = 0, k = s.Length(); j < k; j++)
+      for (int j = 0; j < slen; j++)
       {
-        char const c = s.GetAt(j);
+        c = s.GetAt(j);
         if (c == '_' || c == '-' || isalnum(c))
 	  vfs_dir << (char)tolower(c);
       }
 
-      csString real_dir;
-      real_dir << s << "$/";
+      csString real_dir(s);
+      if (slen > 0 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
+        real_dir.Truncate(slen - 1);
+      real_dir << "$/";
 
       outv->Push(csStrNew(vfs_dir));
       Mount(vfs_dir, real_dir);

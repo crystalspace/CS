@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+1-Sep-2002
+	- Eric Sunshine changed csVFS::MountRoot() so that it normalizes each
+	  physical path it mounts so that the path ends with only a single
+	  slash.  This fixes a problem on Win9x where the mount would fail with
+	  a path such as "C:\\" since Win9x can not correctly handle the double
+	  slashes.  Note, however, that WinNT, Win2000, and (presumably) WinXP
+	  deal gracefully with the double slash, so this was not a problem on
+	  those platforms.  On Unix-like platforms, MountRoot() will now mount
+	  "/" rather than "//", though semantically there is no difference
+	  since, internally, Unix correctly treats "//" as "/" anyhow.
 31-Aug-2002
 	- Received two small fixes from Jochen Moench
 	  <jochen.moench@de.thalesgroup.com>:
