@@ -48,7 +48,10 @@ private:
   iObjectRegistry* get_registry();
   iEventQueue* get_event_queue();
   iVirtualClock* get_virtual_clock();
+  bool runWhenNotFocused;		// Does the run loop process events
+                                        // when the app is not focused?
   void init_menu(iConfigFile*);
+  void init_runmode();
 
 public:
   NeXTAssistant(iObjectRegistry*);
@@ -56,6 +59,7 @@ public:
   virtual void start_event_loop();
   virtual void request_shutdown();
   virtual void advance_state();
+  virtual bool always_runs();
   virtual bool continue_running();
   virtual void application_activated();
   virtual void application_deactivated();
@@ -96,6 +100,7 @@ typedef void* NeXTView;
 
 NSD_PROTO(void,request_shutdown)(NeXTAssistant);
 NSD_PROTO(void,advance_state)(NeXTAssistant);
+NSD_PROTO(int, always_runs)(NeXTAssistant);
 NSD_PROTO(int, continue_running)(NeXTAssistant);
 NSD_PROTO(void,application_activated)(NeXTAssistant);
 NSD_PROTO(void,application_deactivated)(NeXTAssistant);

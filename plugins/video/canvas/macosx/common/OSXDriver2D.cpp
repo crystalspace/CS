@@ -161,7 +161,8 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     {
         if (ev.Command.Code == cscmdFocusChanged)
         {
-            OSXDelegate2D_focusChanged(delegate, ev.Command.Info);
+            bool shouldPause = !assistant->always_runs();
+            OSXDelegate2D_focusChanged(delegate, ev.Command.Info, shouldPause);
             handled = true;
         };
         if (ev.Command.Code == cscmdCommandLineHelp)
@@ -236,8 +237,8 @@ void OSXDriver2D::Initialize32()
 bool OSXDriver2D::EnterFullscreenMode()
 {
     // Find mode and copy parameters
-    CFDictionaryRef mode = CGDisplayBestModeForParameters(display, canvas->Depth, 
-                                                        canvas->Width, canvas->Height, NULL);
+    CFDictionaryRef mode = CGDisplayBestModeForParameters(display, 
+                        canvas->Depth, canvas->Width, canvas->Height, NULL);
     if (mode == NULL)
         return false;
 

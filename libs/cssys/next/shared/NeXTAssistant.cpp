@@ -23,6 +23,7 @@
 #include "NeXTDelegate.h"
 #include "csutil/cfgacc.h"
 #include "cssys/sysfunc.h"
+#include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
@@ -58,6 +59,8 @@ NeXTAssistant::NeXTAssistant(iObjectRegistry* r) : registry(r),
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
   controller = NeXTDelegate_startup(this);
+
+  runWhenNotFocused = false;
 
   iEventQueue* q = get_event_queue();
   if (q != 0)
@@ -124,6 +127,31 @@ void NeXTAssistant::init_menu(iConfigFile* next_config)
 
 
 //-----------------------------------------------------------------------------
+// init_runmode
+//	Initialize the value of runWhenNotFocused based on config files
+// 	and command-line
+//-----------------------------------------------------------------------------
+void NeXTAssistant::init_runmode()
+{
+    iCommandLineParser *parser = 
+                CS_QUERY_REGISTRY(registry, iCommandLineParser);
+    const char *s = parser->GetOption("alwaysruns");
+    if (s != NULL)
+        runWhenNotFocused = 1;
+    else
+    {
+        // Query whether to pause on loss of focus
+        iConfigManager *cfg = CS_QUERY_REGISTRY(registry, iConfigManager);
+        if (cfg != NULL)
+        {
+            runWhenNotFocused = cfg->GetBool("System.RunWhenNotFocused");
+            cfg->DecRef();
+        }
+    };
+};
+
+
+//-----------------------------------------------------------------------------
 // start_event_loop
 //	This method returns only after a csevBroadcast even has been posted to
 //	the Crystal Space event queue with command code cscmdQuit.
@@ -133,6 +161,7 @@ void NeXTAssistant::start_event_loop()
   csConfigAccess next_config(registry, "/config/next.cfg", true,
     iConfigManager::PriorityMin);
   init_menu(next_config);
+  init_runmode();
   NeXTDelegate_start_event_loop(controller);
 }
 
@@ -161,21 +190,29 @@ void NeXTAssistant::advance_state()
     NeXTDelegate_stop_event_loop(controller);
 }
 
+bool NeXTAssistant::always_runs() { return runWhenNotFocused; }
+
 bool NeXTAssistant::continue_running() { return !should_shutdown; }
 
 void NeXTAssistant::application_activated()
 {
-  iVirtualClock* c = get_virtual_clock();
-  if (c != 0)
-    c->Resume();
+  if (runWhenNotFocused == false)
+  {
+    iVirtualClock* c = get_virtual_clock();
+    if (c != 0)
+      c->Resume();
+  };
   event_outlet->ImmediateBroadcast(cscmdFocusChanged,(void*)true);
 }
 
 void NeXTAssistant::application_deactivated()
 {
-  iVirtualClock* c = get_virtual_clock();
-  if (c != 0)
-    c->Suspend();
+  if (runWhenNotFocused == false)
+  {
+    iVirtualClock* c = get_virtual_clock();
+    if (c != 0)
+      c->Suspend();
+  };
   event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
 }
 
@@ -214,6 +251,8 @@ NSD_PROTO(void,request_shutdown)(NeXTAssistantHandle h)
     { NSD_ASSIST(h)->request_shutdown(); }
 NSD_PROTO(void,advance_state)(NeXTAssistantHandle h)
     { NSD_ASSIST(h)->advance_state(); }
+NSD_PROTO(int,always_runs)(NeXTAssistantHandle h)
+    { return NSD_ASSIST(h)->always_runs(); }
 NSD_PROTO(int,continue_running)(NeXTAssistantHandle h)
     { return NSD_ASSIST(h)->continue_running(); }
 NSD_PROTO(void,application_activated)(NeXTAssistantHandle h)

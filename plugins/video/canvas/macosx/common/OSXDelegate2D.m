@@ -82,7 +82,7 @@
 // In fullscreen mode, opens a zero-sized window to get events
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
 {
-    NSView *view;
+    OSXView *view;
     NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
     NSRect rect = NSZeroRect;
 
@@ -251,12 +251,15 @@
 
 // focusChanged
 // Window focus changed
-- (void) focusChanged:(BOOL) focused
+- (void) focusChanged:(BOOL) focused shouldPause:(BOOL) pause
 {
-    isPaused = !focused;
-    [self adjustTitle];
-
-    if (isPaused == YES)
+    if (isPaused != pause)
+    {
+        isPaused = pause;
+        [self adjustTitle];
+    };
+    
+    if (focused == NO)
         [self stopTrackingMouse];
     else
         [self startTrackingMouse];
@@ -402,9 +405,9 @@ DEL2D_FUNC(BOOL, setMouseCursor)(OSXDelegate2DHandle delegate, csMouseCursorID c
     return [(OSXDelegate2D *) delegate setMouseCursor:cursor];
 };
 
-DEL2D_FUNC(void, focusChanged)(OSXDelegate2DHandle delegate, BOOL focused)
+DEL2D_FUNC(void, focusChanged)(OSXDelegate2DHandle delegate, BOOL focused, BOOL shouldPause)
 {
-    [(OSXDelegate2D *) delegate focusChanged:focused];
+    [(OSXDelegate2D *) delegate focusChanged:focused shouldPause:shouldPause];
 };
 
 #undef DEL2D_FUNC

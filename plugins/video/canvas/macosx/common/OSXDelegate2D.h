@@ -71,7 +71,7 @@
 - (void) closeWindow;
 
 // Change focus of window and adjust title
-- (void) focusChanged:(BOOL) focused;
+- (void) focusChanged:(BOOL) focused shouldPause:(BOOL) pause;
 
 // Dispatch an event to the driver
 - (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view;
@@ -95,7 +95,7 @@ DEL2D_FUNC(bool, openWindow)(OSXDelegate2D delegate, char *title, int w, int h, 
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2D delegate);
 DEL2D_FUNC(void, setTitle)(OSXDelegate2D delegate, char *title);
 DEL2D_FUNC(bool, setMouseCursor)(OSXDelegate2D delegate, csMouseCursorID cursor);
-DEL2D_FUNC(void, focusChanged)(OSXDelegate2D delegate, bool focused);
+DEL2D_FUNC(void, focusChanged)(OSXDelegate2D delegate, bool focused, bool shouldPause);
 
 #undef DEL2D_FUNC
 

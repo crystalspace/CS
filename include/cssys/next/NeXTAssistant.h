@@ -53,6 +53,12 @@ struct iNeXTAssistant : public iBase
   virtual void advance_state() = 0;
 
   /**
+   * Query whether the application's event loop stops processing events
+   * when the application does not have focus
+   */
+  virtual bool always_runs() = 0;
+
+  /**
    * Query whether or not the application's event loop should continue running.
    * This will return `true' until some Crystal Space entity requests a
    * shutdown, in which case the caller of this method should proceed to

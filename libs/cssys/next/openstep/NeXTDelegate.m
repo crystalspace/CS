@@ -192,7 +192,8 @@ enum
 - (void)applicationDefined:(NSEvent*)e
 {
   NeXTAssistant_advance_state(assistant);
-  if (!paused && NeXTAssistant_continue_running(assistant))
+  if ((NeXTAssistant_always_runs(assistant) || !paused)
+        && NeXTAssistant_continue_running(assistant))
     [self scheduleEvent];
 }
 
