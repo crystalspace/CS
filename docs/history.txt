@@ -76,6 +76,11 @@ chronological order.
 	  ogl_polybuf.cpp where it failed to resolve ?: conditional operator
 	  when given a csRef and a zero.  Changed it to instead use a simple
 	  `if' expression.
+	- Eric Sunshine eliminated compilation warning in cspthrd.cpp; failed
+	  to return a value from bool function.
+	- Eric Sunshine fixed MacOS/X defaultsconfig.{mm|h} so that it can be
+	  built on pre-10.2 machines where -[NSUserDefaults
+	  objectIsForcedForKey:inDomain:] is not present.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

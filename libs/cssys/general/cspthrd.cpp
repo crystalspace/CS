@@ -132,6 +132,7 @@ bool csPosixMutexRecursive::LockWait ()
   count += 1;
 
   CS_SHOW_ERROR;
+  return lasterr == 0;
 }
 
 bool csPosixMutexRecursive::LockTry ()

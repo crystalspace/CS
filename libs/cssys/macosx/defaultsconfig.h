@@ -22,7 +22,9 @@
 #include "iutil/cfgfile.h"
 #include "csutil/scf.h"
 
-#import <Foundation/Foundation.h>
+#import <Foundation/NSDictionary.h>
+#import <Foundation/NSString.h>
+#import <Foundation/NSUserDefaults.h>
 
 /**
  * An iConfigFile which stores settings via Cocoa's NSUserDefaults facility.
@@ -35,6 +37,8 @@ private:
   NSString* domain;
   NSUserDefaults* defaults;
   NSMutableDictionary* dict;
+
+  bool Writable(const char* Key) const;
 
 public:
   SCF_DECLARE_IBASE;

@@ -20,6 +20,16 @@
 #include "csutil/util.h"
 #include "defaultsconfig.h"
 
+#import <Foundation/NSEnumerator.h>
+
+// -[NSUserDefaults objectIsForcedForKey:inDomain:] was introduced with
+// MacOS/X 10.2, but we still want the code buildable and useable with 10.1,
+// so we must perform a bit of magic by at least making the prototype known on
+// 10.1.
+@interface NSObject (csDefaultsConfig)
+- (BOOL)objectIsForcedForKey:(NSString*)key inDomain:(NSString*)domain;
+@end
+
 csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 {
   csDefaultsConfig* cfg = new csDefaultsConfig();
@@ -126,6 +136,24 @@ bool csDefaultsConfig::KeyExists (const char* Key) const
   return obj != nil;
 }
 
+// Check if we have permission to write to a key.  For MacOS/X 10.1 and earlier
+// we always have permission.  For 10.2 and later, we have permission if the
+// key does not already exist or if the administrator has not forced a key upon
+// us.
+bool csDefaultsConfig::Writable (const char* Key) const
+{
+  bool writable;
+  if (![defaults respondsToSelector:@selector(objectIsForcedForKey:inDomain:)])
+    writable = true;
+  else
+  {
+    NSString* keystr = [NSString stringWithCString:Key];
+    writable = !KeyExists(Key) ||
+      ![defaults objectIsForcedForKey:keystr inDomain:domain];
+  }
+  return writable;
+}
+
 // Check to see if we add a given subsection to our bundle ID, whether or not
 // it exists.
 bool csDefaultsConfig::SubsectionExists (const char* subsection) const
@@ -180,10 +208,7 @@ void csDefaultsConfig::SetStr (const char* Key, const char* Val)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSString* valstr = [NSString stringWithCString:Val];
-  
-  // If it's not an administrator-owned key, perform the write.
-  if (!KeyExists(Key) ||
-      ![defaults objectIsForcedForKey:keystr inDomain:domain])
+  if (Writable(Key))
     [dict setObject:valstr forKey:keystr];
 }
 
@@ -191,10 +216,7 @@ void csDefaultsConfig::SetInt (const char* Key, int Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSNumber* val = [NSNumber numberWithInt:Value];
-
-  // If it's not an administrator-owned key, perform the write.
-  if (!KeyExists(Key) ||
-      ![defaults objectIsForcedForKey:keystr inDomain:domain])
+  if (Writable(Key))
     [dict setObject:val forKey:keystr];
 }
 
@@ -202,10 +224,7 @@ void csDefaultsConfig::SetFloat (const char* Key, float Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSNumber* val = [NSNumber numberWithFloat:Value];
-  
-  // If it's not an administrator-owned key, perform the write.
-  if (!KeyExists(Key) ||
-      ![defaults objectIsForcedForKey:keystr inDomain:domain])
+  if (Writable(Key))
     [dict setObject:val forKey:keystr];
 }
 
@@ -213,10 +232,7 @@ void csDefaultsConfig::SetBool (const char* Key, bool Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSNumber* val = [NSNumber numberWithBool:Value];
-  
-  // If it's not an administrator-owned key, perform the write.
-  if (!KeyExists(Key) ||
-      ![defaults objectIsForcedForKey:keystr inDomain:domain])
+  if (Writable(Key))
     [dict setObject:val forKey:keystr];
 }
 
