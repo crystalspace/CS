@@ -866,7 +866,7 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   {
     iLight* li = lights[l];
     csRef<iStatLight> sl = SCF_QUERY_INTERFACE (li, iStatLight);
-    if (sl && sl->QueryLight()->IsDynamic ())
+    if (sl)
     {
       sl->AddAffectedLightingInfo (&scfiLightingInfo);
       affecting_lights.Add (li);
