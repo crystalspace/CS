@@ -61,6 +61,8 @@ The history order has been reversed so that new features are at the top.
 	  csFrustumContext and csLightingInfo in order to appease the NextStep
 	  compiler which had difficulty synthesizing default assignment
 	  operators for these objects.
+	- Eric Sunshine eliminated several compilation warnings in
+	  csSector::IntersectSphere().
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
