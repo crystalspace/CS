@@ -140,7 +140,7 @@ csPolygon3D* HugeRoom::create_polygon (csThing* thing,
 
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
-  csThing* thing = new csThing (sector->GetEngine ());
+  csThing* thing = new csThing ();
   thing->SetName ("t"); 
 
 #ifdef ROOM_SMALL
@@ -214,7 +214,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  csThing* thing = new csThing (sector->GetEngine ());
+  csThing* thing = new csThing ();
   thing->SetName ("t"); 
 
   float y_low = -wall_dim+1;
@@ -396,7 +396,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   }
 
 #if defined(ROOM_CITY)
-  csThing* floorthing = new csThing (engine);
+  csThing* floorthing = new csThing ();
   floorthing->SetName ("floor"); 
   create_wall (floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
@@ -406,7 +406,7 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   floorthing->GetMovable ().SetSector (room);
   floorthing->GetMovable ().UpdateMove ();
 #elif !defined(ROOM_SMALL)
-  csThing* floorthing = new csThing (engine);
+  csThing* floorthing = new csThing ();
   floorthing->SetName ("floor"); 
   create_wall (floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);

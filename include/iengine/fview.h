@@ -214,7 +214,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 0);
+SCF_VERSION (iFrustumView, 0, 1, 1);
 
 /**
  * This structure represents all information needed for the frustum
@@ -254,6 +254,11 @@ struct iFrustumView : public iBase
   virtual bool CheckShadowMask (unsigned int mask) = 0;
   /// Check if a mask corresponds with the process mask.
   virtual bool CheckProcessMask (unsigned int mask) = 0;
+
+  /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
+  virtual bool IsDynamic () = 0;
+  /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
+  virtual void SetDynamic (bool d) = 0;
 };
 
 #endif

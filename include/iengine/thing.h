@@ -27,6 +27,8 @@ class csThing;
 struct iSector;
 struct iMovable;
 struct iPolygon3D;
+struct iGraphics3D;
+struct iFrustumView;
 
 SCF_VERSION (iThing, 0, 0, 4);
 
@@ -80,6 +82,64 @@ struct iThing : public iBase
 
   /// Get the movable for this thing.
   virtual iMovable* GetMovable () = 0;
+};
+
+SCF_VERSION (iThingState, 0, 0, 1);
+
+/**
+ * This is the state interface to access the internals of a thing
+ * mesh object and factory (both).
+ */
+struct iThingState : public iBase
+{
+  /**
+   * Compress the vertex table so that all nearly identical vertices
+   * are compressed. The polygons in the set are automatically adapted.
+   * This function can be called at any time in the creation of the object
+   * and it can be called multiple time but it normally only makes sense
+   * to call this function after you have finished adding all polygons
+   * and all vertices.<p>
+   * Note that calling this function will make the camera vertex array
+   * invalid.
+   */
+  virtual void CompressVertices () = 0;
+
+  /// Query number of polygons in set
+  virtual int GetPolygonCount () = 0;
+  /// Get a polygon from set by his index
+  virtual iPolygon3D *GetPolygon (int idx) = 0;
+  /// Create a new polygon and return a pointer to it
+  virtual iPolygon3D *CreatePolygon (const char *iName = NULL) = 0;
+
+  /// Query number of vertices in set
+  virtual int GetVertexCount () = 0;
+  /// Get the given vertex coordinates in object space
+  virtual csVector3 &GetVertex (int idx) = 0;
+  /// Get the given vertex coordinates in world space
+  virtual csVector3 &GetVertexW (int idx) = 0;
+  /// Get the given vertex coordinates in camera space
+  virtual csVector3 &GetVertexC (int idx) = 0;
+  /// Create a vertex given his object-space coords and return his index
+  virtual int CreateVertex (csVector3 &iVertex) = 0;
+  /**
+   * Prepare the lightmaps for all polys so that they are suitable
+   * for the 3D rasterizer.
+   */
+  virtual void CreateLightMaps (iGraphics3D* g3d) = 0;
+  /**
+   * Init the lightmaps for all polygons in this thing.
+   */
+  virtual void InitLightMaps (bool do_cache = true) = 0;
+  /**
+   * Cache the lightmaps for all polygons in this thing.
+   */
+  virtual void CacheLightMaps () = 0;
+  /**
+   * Check frustum visibility on this thing.
+   * First initialize the 2D culler cube.
+   * @@@ Does this belong here?
+   */
+  virtual void CheckFrustum (iFrustumView* fview) = 0;
 };
 
 #endif

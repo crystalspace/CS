@@ -374,6 +374,7 @@ public:
 class csRadCurve : public csRadElement {
 private:
   csCurve* curve;
+  csSector* sector;
 
 protected:
   /// return the texture handle for this curve
@@ -391,7 +392,7 @@ protected:
   virtual void Setup();
 
 public:
-  csRadCurve (csCurve* curve);
+  csRadCurve (csCurve* curve, csSector* sector);
   ~csRadCurve();
 
   /// get normal vector for the Curve
@@ -400,7 +401,7 @@ public:
   /// Get world coordinates for a lumel
   virtual void Lumel2World(csVector3& res, int x, int y);
 
-  csSector* GetSector () const { return curve->GetSector (); }
+  csSector* GetSector () const { return sector; }
 
   /// Populates the shadow coverage Matrix for this element
   virtual void GetCoverageMatrix(csFrustumView* lview, 

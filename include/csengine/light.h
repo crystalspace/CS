@@ -28,13 +28,14 @@
 #include "iengine/statlght.h"
 #include "iengine/dynlight.h"
 
+class Dumper;
 class csSector;
 class csLightMap;
 class csDynLight;
-class Dumper;
 class csThing;
 class csLightPatchPool;
 class csHalo;
+struct iMeshWrapper;
 
 /**
  * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
@@ -329,6 +330,14 @@ public:
    * to be in the same sector as the csThing.
    */
   void CalculateLighting (csThing* th);
+
+  /**
+   * Shine this light on all polygons of the mesh.
+   * Only backface culling is used. The light is assumed
+   * to be in the same sector as the mesh.
+   * Currently only works on thing meshes.
+   */
+  void CalculateLighting (iMeshWrapper* mesh);
 
   /**
    * This function is similar to CalculateLighting. It will do all the stuff

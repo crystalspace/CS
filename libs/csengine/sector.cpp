@@ -78,7 +78,6 @@ csSector::csSector (csEngine* engine) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   csSector::engine = engine;
-  level_r = level_g = level_b = 0;
   static_thing = NULL;
   engine->AddToCurrentRegion (this);
   fog.enabled = false;
@@ -105,12 +104,12 @@ void csSector::Prepare ()
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* th = (csThing*)things[i];
-    th->Prepare (this);
+    th->Prepare ();
   }
   for (i = 0 ; i < skies.Length () ; i++)
   {
     csThing* th = (csThing*)skies[i];
-    th->Prepare (this);
+    th->Prepare ();
   }
 }
 
@@ -443,6 +442,18 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
   {
     csThing* sp = (csThing*)skies[i];
     sp->CreateLightMaps (g3d);
+  }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    // @@@ Engine should now know about things.
+    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iThingState);
+    if (thing_state)
+    {
+      thing_state->CreateLightMaps (g3d);
+      thing_state->DecRef ();
+    }
   }
 }
 
@@ -789,7 +800,7 @@ void csSector::Draw (iRenderView* rview)
   for (i = 0 ; i < skies.Length () ; i++)
   {
     csThing* th = (csThing*)skies[i];
-    th->Draw (rview, &th->GetMovable ().scfiMovable);
+    th->Draw (rview, &th->GetMovable ().scfiMovable, th->GetZBufMode ());
   }
 
   // In some cases this queue will be filled with all visible
@@ -848,7 +859,8 @@ void csSector::Draw (iRenderView* rview)
 
   // If we have a static thing we draw it here.
   if (static_thing)
-    static_thing->Draw (rview, &static_thing->GetMovable ().scfiMovable);
+    static_thing->Draw (rview, &static_thing->GetMovable ().scfiMovable,
+    	static_thing->GetZBufMode ());
 
   if (do_things)
   {
@@ -889,7 +901,8 @@ void csSector::Draw (iRenderView* rview)
       csThing* th = thing_queue[i];
       if (th != static_thing)
         if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
-        else th->Draw (rview, &th->GetMovable ().scfiMovable);
+        else th->Draw (rview, &th->GetMovable ().scfiMovable,
+		th->GetZBufMode ());
     }
 
     if (sort_idx)
@@ -901,8 +914,10 @@ void csSector::Draw (iRenderView* rview)
       for (i = 0 ; i < sort_idx ; i++)
       {
         csThing* th = sort_list[i];
-        if (th->GetFog ().enabled) th->DrawFoggy (rview, &th->GetMovable ().scfiMovable);
-        else th->Draw (rview, &th->GetMovable ().scfiMovable);
+        if (th->GetFog ().enabled)
+	  th->DrawFoggy (rview, &th->GetMovable ().scfiMovable);
+        else th->Draw (rview, &th->GetMovable ().scfiMovable,
+		th->GetZBufMode ());
       }
     }
 
@@ -1009,9 +1024,9 @@ void csSector::Draw (iRenderView* rview)
   draw_busy--;
 }
 
-csObject** csSector::GetVisibleObjects (csFrustumView& lview, int& num_objects)
+csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
 {
-  csFrustum* lf = lview.GetFrustumContext ()->GetLightFrustum ();
+  csFrustum* lf = lview->GetFrustumContext ()->GetLightFrustum ();
   bool infinite = lf->IsInfinite ();
   csVector3& c = lf->GetOrigin ();
   bool vis;
@@ -1141,7 +1156,7 @@ csObject** csSector::GetVisibleObjects (csFrustumView& lview, int& num_objects)
   return visible_objects;
 }
 
-void csSector::CheckFrustum (csFrustumView& lview)
+void csSector::CheckFrustum (iFrustumView* lview)
 {
   csCBufferCube* cb = engine->GetCBufCube ();
   csCovcube* cc = engine->GetCovcube ();
@@ -1150,7 +1165,7 @@ void csSector::CheckFrustum (csFrustumView& lview)
   RealCheckFrustum (lview);
 }
 
-void csSector::RealCheckFrustum (csFrustumView& lview)
+void csSector::RealCheckFrustum (iFrustumView* lview)
 {
   if (draw_busy > cfg_reflections) return;
   draw_busy++;
@@ -1160,10 +1175,10 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   // Translate this sector so that it is oriented around
   // the position of the light (position of the light becomes
   // the new origin).
-  csVector3& center = lview.GetFrustumContext ()->GetLightFrustum ()->
+  csVector3& center = lview->GetFrustumContext ()->GetLightFrustum ()->
   	GetOrigin ();
 
-  iShadowBlockList* shadows = lview.GetFrustumContext ()->GetShadows ();
+  iShadowBlockList* shadows = lview->GetFrustumContext ()->GetShadows ();
 
   // Remember the previous last shadow so that we can remove all
   // shadows that are added in this routine.
@@ -1171,7 +1186,7 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
 
   if (culler && culler->SupportsShadowCasting ())
   {
-    culler->CastShadows ((iFrustumView*)&lview);
+    culler->CastShadows (lview);
   }
   else
   {
@@ -1183,19 +1198,37 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     // Append the shadows for these objects to the shadow list.
     // This list is appended to the one given in 'lview'. After
     // returning, the list in 'lview' will be restored.
-    if (lview.ThingShadowsEnabled ())
+    if (lview->ThingShadowsEnabled ())
     {
       for (i = 0 ; i < num_visible_objects ; i++)
       {
         // @@@ unify with other mesh objects as soon as possible
+	// @@@ Also use shadow caster interface to append shadows!
         csObject* o = visible_objects[i];
 	if (o->GetType () >= csThing::Type)
 	{
           csThing* sp = (csThing*)o;
 	  // Only if the thing has right flags do we consider it for shadows.
-	  if (lview.CheckShadowMask (sp->flags.Get ()))
-	    sp->AppendShadows (shadows, center);
+	  if (lview->CheckShadowMask (sp->flags.Get ()))
+	    sp->AppendShadows (&(sp->GetMovable ().scfiMovable),
+	    	shadows, center);
         }
+	else
+	{
+	  csMeshWrapper* mesh = (csMeshWrapper*)o;
+	  // @@@ should not be known in engine.
+	  // @@@ UGLY
+	  iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+	  if (ithing)
+	  {
+	    csThing* sp = ithing->GetPrivateObject ();
+	    // Only if the thing has right flags do we consider it for shadows.
+	    if (lview->CheckShadowMask (mesh->flags.Get ()))
+	      sp->AppendShadows (&(mesh->GetMovable ().scfiMovable),
+	      	shadows, center);
+	    ithing->DecRef ();
+	  }
+	}
       }
     }
 
@@ -1203,12 +1236,28 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     for (i = 0 ; i < num_visible_objects ; i++)
     {
       // @@@ unify with other mesh objects as soon as possible
+      // @@@ Use shadow receiver interface!!!
       csObject* o = visible_objects[i];
       if (o->GetType () >= csThing::Type)
       {
         csThing* sp = (csThing*)o;
-        if (lview.CheckProcessMask (sp->flags.Get ()))
+        if (lview->CheckProcessMask (sp->flags.Get ()))
           sp->RealCheckFrustum (lview);
+      }
+      else
+      {
+	csMeshWrapper* mesh = (csMeshWrapper*)o;
+	// @@@ should not be known in engine.
+	// @@@ UGLY
+	iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+	if (ithing)
+	{
+	  csThing* sp = ithing->GetPrivateObject ();
+	  // Only if the thing has right flags do we consider it for shadows.
+          if (lview->CheckProcessMask (mesh->flags.Get ()))
+            sp->RealCheckFrustum (lview);
+	  ithing->DecRef ();
+	}
       }
     }
       
@@ -1241,6 +1290,18 @@ void csSector::InitLightMaps (bool do_cache)
     csThing* sp = (csThing*)skies[i];
     sp->InitLightMaps (do_cache);
   }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    // @@@ Engine should now know about things.
+    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iThingState);
+    if (thing_state)
+    {
+      thing_state->InitLightMaps (do_cache);
+      thing_state->DecRef ();
+    }
+  }
 }
 
 void csSector::CacheLightMaps ()
@@ -1255,6 +1316,18 @@ void csSector::CacheLightMaps ()
   {
     csThing* sp = (csThing*)skies[i];
     sp->CacheLightMaps ();
+  }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    // @@@ Engine should now know about things.
+    iThingState* thing_state = QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iThingState);
+    if (thing_state)
+    {
+      thing_state->CacheLightMaps ();
+      thing_state->DecRef ();
+    }
   }
 }
 
@@ -1275,6 +1348,16 @@ void csSector::ShineLights (csThing* th, csProgressPulse* pulse)
     if (pulse != 0)
       pulse->Step();
     ((csStatLight*)lights[i])->CalculateLighting (th);
+  }
+}
+
+void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
+{
+  for (int i = 0 ; i < lights.Length () ; i++)
+  {
+    if (pulse != 0)
+      pulse->Step();
+    ((csStatLight*)lights[i])->CalculateLighting (mesh);
   }
 }
 

@@ -891,7 +891,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 
 //---------------------------------------------------------------------------
 
-void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
+void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
 	csReversibleTransform& obj,
 	char* name, char* buf, int vt_offset,
 	bool isParent)
@@ -1108,12 +1108,12 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, sec, Engine->GetMaterials (),
+            thing->MergeTemplate (t, Engine->GetMaterials (),
 	    	info.mat_set_name, info.default_material, info.default_texlen);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t, sec, info.default_material,
+            thing->MergeTemplate (t, info.default_material,
 	    	info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
@@ -1135,13 +1135,13 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t->GetPrivateObject (), sec,
+            thing->MergeTemplate (t->GetPrivateObject (),
 	    	Engine->GetMaterials (), info.mat_set_name,
 		info.default_material, info.default_texlen);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t->GetPrivateObject (), sec,
+            thing->MergeTemplate (t->GetPrivateObject (),
 	    	info.default_material, info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetPrivateObject ()->GetNumPolygons ();
         }
@@ -1150,7 +1150,7 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
         load_key (params, thing);
         break;
       case CS_TOKEN_PART:
-	load_thing_part (thing, sec, info, obj, name, params,
+	load_thing_part (thing, info, obj, name, params,
 		thing->GetNumVertices (), false);
         break;
       case CS_TOKEN_SKYDOME:
@@ -1260,7 +1260,6 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
 	  csCurve* p = ct->MakeCurve ();
 	  p->SetName (ct->GetName ());
 	  p->SetParent (thing);
-	  p->SetSector (sec);
           if (!ct->GetMaterialWrapper ()) p->SetMaterialWrapper (info.default_material);
 	  int j;
           for (j = 0 ; j < ct->NumVertices () ; j++)
@@ -1320,18 +1319,17 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
   }
 }
 
-csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
+csThing* csLoader::load_thing (char* name, char* buf,
     bool is_sky, bool is_template)
 {
-  csThing* thing = new csThing (Engine, is_sky, is_template);
+  csThing* thing = new csThing (is_sky, is_template);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
   PSLoadInfo info;
-  if (sec) thing->GetMovable ().SetSector (sec);
 
   csReversibleTransform obj;
-  load_thing_part (thing, sec, info, obj, name, buf, 0, true);
+  load_thing_part (thing, info, obj, name, buf, 0, true);
 
   if (info.do_hard_trans)
     thing->HardTransform (info.hard_trans);
@@ -2250,7 +2248,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   sector->SetName (secname);
 
   csLoaderStat::sectors_loaded++;
-  sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
+  csThing* th;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -2265,13 +2263,18 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         do_stat_bsp = true;
         break;
       case CS_TOKEN_SKY:
-        Engine->skies.Push (load_thing (name, params, sector, true, false));
+        th = load_thing (name, params, true, false);
+	th->GetMovable ().SetSector (sector);
+        Engine->skies.Push (th);
         break;
       case CS_TOKEN_THING:
-        Engine->things.Push (load_thing (name, params, sector, false, false));
+        th = load_thing (name, params, false, false);
+	th->GetMovable ().SetSector (sector);
+        Engine->things.Push (th);
         break;
       case CS_TOKEN_SIXFACE:
-        CsPrintf (MSG_WARNING, "Warning! SIXFACE statement is obsolete! Use THING instead!\n");
+        CsPrintf (MSG_WARNING,
+		"Warning! SIXFACE statement is obsolete! Use THING instead!\n");
         break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -2697,10 +2700,12 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	  break;
         case CS_TOKEN_THING:
           if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
+            Engine->thing_templates.Push (
+	    	load_thing (name, params, false, true));
           break;
         case CS_TOKEN_SIXFACE:
-          CsPrintf (MSG_WARNING, "Warning! SIXFACE statement is obsolete! Use THING instead!\n");
+          CsPrintf (MSG_WARNING,
+	  	"Warning! SIXFACE statement is obsolete! Use THING instead!\n");
           break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, onlyRegion))
@@ -2995,7 +3000,8 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_THING:
           if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
+            Engine->thing_templates.Push (
+	    	load_thing (name, params, false, true));
           break;
       }
     }
@@ -3665,7 +3671,7 @@ csThing * csLoader::LoadThing (csEngine* engine, const char* fname)
       fatal_exit (0, false);
     }
 
-    csThing * thng = load_thing( name, buf, NULL, false, false );
+    csThing * thng = load_thing (name, buf, false, false);
     return thng;
   }
   databuff->DecRef ();
@@ -3701,7 +3707,7 @@ csThing * csLoader::LoadThingTemplate (csEngine* engine, const char* fname)
       fatal_exit (0, false);
     }
 
-    csThing * thng = load_thing( name, buf, NULL, false, true );
+    csThing * thng = load_thing (name, buf, false, true);
     return thng;
   }
   databuff->DecRef ();

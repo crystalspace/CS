@@ -596,7 +596,7 @@ void csPolygon3D::HardTransform (const csReversibleTransform& t)
 #define TEXW(t)	((t)->w_orig)
 #define TEXH(t)	((t)->h)
 
-void csPolygon3D::Finish (csSector* sector)
+void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
 #ifdef DO_HW_UVZ
@@ -651,7 +651,10 @@ void csPolygon3D::Finish (csSector* sector)
     csLightMap *lm = new csLightMap ();
     lmi->tex->SetLightMap (lm);
     int r, g, b;
-    sector->GetAmbientColor (r, g, b);
+    //@@@sector->GetAmbientColor (r, g, b);
+    r = csLight::ambient_red;
+    g = csLight::ambient_green;
+    b = csLight::ambient_blue;
     lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
     lm->DecRef ();
   }

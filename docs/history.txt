@@ -1,6 +1,53 @@
 The history order has been reversed so that new features are at the top.
 
 3-Apr-2001
+	- Created new iThingState interface and let csThing implement it.
+	  iThingState is almost the same as iThing but with extras.
+	  iThing will probably be removed in the future.
+	- Fixed a bug in csThing::MergeTemplate(). It would not correctly
+	  copy the new zbufMode flags.
+	- Removed 'sector' member from curves. Removed 'sector' parameter
+	  from csThing::MergeTemplate(). Removed 'sector' parameter from
+	  load_thing() and load_thing_part().
+	- Removed 'sector' from csPolygon3D::Finish() and csThing::Prepare().
+	- Removed the ability to have ambient settings per sector. This was
+	  never used and I don't think it is very useful either. Ambient
+	  settings are now global and still stored in csLight.
+	  csSector::SetAmbientColor() and GetAmbientColor() are now gone.
+	- Removed 'engine' member from csThing and also removed 'engine'
+	  parameter to csThing.
+	- Created a new csThingObjectType class which is the mesh object
+	  type class for things. For now it is not in a plugin yet but
+	  embedded inside csEngine. Added csEngine::GetThingType() to fetch
+	  the reference to this type. This is a temporary function.
+	- Added csEngine::CreateSectorWallsMesh() which is similar to
+	  CreateSectorWalls() but creates a thing as a mesh object instead
+	  of a normal thing.
+	- Avoided the use of csFrustumView in csThing. Now uses iFrustumView.
+	- Avoided the use of csFrustumView in csSector. Now uses iFrustumView.
+	- Added csLight::CalculateLighting() for iMeshWrapper. This will
+	  query if iThingState is known.
+	- Added csSector::ShineLights() for iMeshWrapper.
+	- Added iFrustumView::SetDynamic() and IsDynamic().
+	- Added iMovable parameter to csThing::AppendShadows().
+	- Extended iSector interface with GetRecLevel().
+	- It is now possible to use things through the mesh object API. When
+	  this is done the mesh wrapper takes control of some of the issues
+	  (like where the thing is positioned, what the Z-buf mode is,
+	  the entity flags, ...). The similar items in csThing are ignored
+	  (and will later be removed when csThing moves to a plugin).
+	  Note that things added through the mesh object API will not be
+	  included in the 'things' arrays that you can find in both csEngine
+	  and csSector. Instead they are added to the 'meshes' arrays like
+	  all other mesh objects. Note that in the short future the support
+	  for the 'things' array will be removed.
+	- Lighting on things which are added through the mesh object API
+	  will now also work. For now this is solved by the engine recognizing
+	  this as a special case of mesh objects (by checking if iThingState
+	  is implemented). In the future the engine should now know about
+	  iThingState so we need a more general solution. For now it will do.
+	- Converted simple to use the new iThingState and use things as
+	  if they are mesh objects. This seems to work very well.
 	- Christopher Nelson <paradox@BBHC.ORG> did the following changes
 	  to CSWS:
 	    - Fixed silly problems in csButton with textures and bitmaps

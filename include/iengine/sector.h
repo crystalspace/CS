@@ -29,7 +29,7 @@ struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 6);
+SCF_VERSION (iSector, 0, 1, 7);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -78,14 +78,19 @@ struct iSector : public iBase
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
-  	bool do_terrain) = 0;
+  virtual void CalculateSectorBBox (csBox3& bbox, bool do_things,
+  	bool do_meshes, bool do_terrain) = 0;
 
   /**
    * Get the visibility culler that is used for this sector.
    * NULL if none.
    */
   virtual iVisibilityCuller* GetVisibilityCuller () = 0;
+
+  /**
+   * Get the current draw recursion level.
+   */
+  virtual int GetRecLevel () = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__

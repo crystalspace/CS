@@ -24,6 +24,7 @@
 #include "csobject/nobjvec.h"
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
+#include "csengine/thing.h"
 #include "csobject/csobject.h"
 #include "ivideo/graph3d.h"
 #include "isys/system.h"
@@ -920,9 +921,16 @@ public:
   /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
-   * it will have CS_ENTITY_ZFILL set.
+   * it will have CS_ZBUF_FILL set.
    */
   csThing* CreateSectorWalls (csSector* sector, const char* name);
+
+  /**
+   * Conveniance function to create the thing containing the
+   * convex outline of a sector. The thing will be empty but
+   * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
+   */
+  iMeshWrapper* CreateSectorWallsMesh (csSector* sector, const char* name);
 
   /**
    * Add a dynamic light to the engine.
@@ -1130,6 +1138,13 @@ public:
   csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false);
   /// Find a loaded material by name.
   csMaterialWrapper* FindCsMaterial (const char* iName, bool regionOnly = false);
+
+  /// @@@ Temporary until things move to their own mesh plugin system.
+  csThingObjectType* thing_type;
+  iMeshObjectType* GetThingType ()
+  {
+    return (iMeshObjectType*)thing_type;
+  }
 
   CSOBJTYPE;
   DECLARE_IBASE;

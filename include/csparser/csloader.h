@@ -124,9 +124,9 @@ class csLoader
   static void skydome_process (csThing& thing, char* name, char* buf,
     csMaterialWrapper* material, int vt_offset);
   /// Parse the definition for a thing and create a thing object
-  static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky,
+  static csThing* load_thing (char* name, char* buf, bool is_sky,
       	bool is_template);
-  static void load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
+  static void load_thing_part (csThing* thing, PSLoadInfo& info,
 	csReversibleTransform& obj, char* name, char* buf, int vt_offset,
 	bool isParent);
   /// Parse a 3D polygon definition and return a new object

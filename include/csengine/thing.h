@@ -47,12 +47,12 @@ class csPolygonTree;
 class csPolygon2D;
 class csPolygon2DQueue;
 class csFrustumList;
-class csFrustumView;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
 struct iMovable;
+struct iFrustumView;
 class Dumper;
 
 /**
@@ -200,9 +200,6 @@ private:
    */
   csPolygonTree* static_tree;
 
-  /// Engine handle.
-  csEngine* engine;
-
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
@@ -211,6 +208,9 @@ private:
 
   /// If true this thing is visible.
   bool is_visible;
+
+  /// If true then this thing has been prepared (Prepare() function).
+  bool prepared;
 
   /// If true this thing is a 'sky' object. @@@ Obsolete when 'render order' is implemented
   bool is_sky;
@@ -273,13 +273,13 @@ private:
    * lightmapped polygons right now and is far from complete.
    */
   void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
-	iRenderView* rview, csZBufMode zbufMode);
+	iRenderView* rview, csZBufMode zMode);
 
   /**
    * Draw the given array of polygons in the current csPolygonSet.
    */
   static void DrawPolygonArray (csPolygonInt** polygon, int num,
-	iRenderView* rview, csZBufMode zbufMode);
+	iRenderView* rview, csZBufMode zMode);
 
   /**
    * Test a number of polygons against the c-buffer and insert them to the
@@ -294,7 +294,7 @@ private:
    * and clipped version of the 3D polygon.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	iRenderView* d, csZBufMode zbufMode);
+	iRenderView* d, csZBufMode zMode);
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -305,6 +305,7 @@ private:
 
   /**
    * Draw a number of polygons from a queue (used with C buffer processing).
+   * Polygons are drawn using ZFILL mode.
    */
   void DrawPolygonsFromQueue (csPolygon2DQueue* queue, iRenderView* rview);
 
@@ -328,7 +329,7 @@ private:
   void UpdateCurveTransform ();
 
   /// Internal draw function.
-  bool DrawInt (iRenderView* rview, iMovable* movable);
+  bool DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /// Move this thing to the specified sector. Can be called multiple times.
   void MoveToSector (csSector* s);
@@ -349,7 +350,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (csEngine*, bool is_sky = false, bool is_template = false);
+  csThing (bool is_sky = false, bool is_template = false);
 
   /// Destructor.
   virtual ~csThing ();
@@ -502,7 +503,7 @@ public:
    * to worry about this function when you add sectors or things
    * later.
    */
-  void Prepare (csSector* sector);
+  void Prepare ();
 
   /**
    * Merge the given Thing into this one. The other polygons and
@@ -516,7 +517,7 @@ public:
    * Add polygons and vertices from the specified template. Replace the
    * materials if they match one in the matList.
    */
-  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList,
+  void MergeTemplate (csThing* tpl, csMaterialList* matList,
   	const char* prefix, 
 	csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1,
@@ -525,7 +526,7 @@ public:
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
-  void MergeTemplate (csThing* tpl, csSector* sector,
+  void MergeTemplate (csThing* tpl,
   	csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
@@ -633,12 +634,12 @@ public:
   /**
    * Draw this thing given a view and transformation.
    */
-  bool Draw (iRenderView* rview, iMovable* movable);
+  bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /**
    * Draw all curves in this thing given a view and transformation.
    */
-  bool DrawCurves (iRenderView* rview, iMovable* movable);
+  bool DrawCurves (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
   /**
    * Draw this thing as a fog volume (only when fog is enabled for
@@ -706,13 +707,13 @@ public:
   /**
    * Check frustum visibility on this thing.
    */
-  void RealCheckFrustum (csFrustumView& lview);
+  void RealCheckFrustum (iFrustumView* lview);
 
   /**
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
    */
-  void CheckFrustum (csFrustumView& lview);
+  void CheckFrustum (iFrustumView* lview);
 
   /**
    * Return a list of shadow frustums which extend from
@@ -721,7 +722,8 @@ public:
    * thus assumes that this thing is transformed to the
    * origin of the light.
    */
-  void AppendShadows (iShadowBlockList* shadows, csVector3& origin);
+  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+  	csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -828,9 +830,6 @@ public:
    */
   int GetCenter () { return center_idx; }
 
-  /// Get the engine for this thing.
-  csEngine* GetEngine () { return engine; }
-
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
 
@@ -866,15 +865,43 @@ public:
     virtual iPolygon3D *GetPolygon (int idx);
     virtual iPolygon3D *CreatePolygon (const char *iName);
     virtual int GetVertexCount () { return scfParent->num_vertices; }
-    virtual csVector3 &GetVertex (int idx) { return scfParent->obj_verts [idx]; }
-    virtual csVector3 &GetVertexW (int idx) { return scfParent->wor_verts [idx]; }
-    virtual csVector3 &GetVertexC (int idx) { return scfParent->cam_verts [idx]; }
+    virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
+    virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
+    virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
     virtual int CreateVertex (csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual bool CreateKey (const char *iName, const char *iValue);
-    virtual iMovable* GetMovable () { return &scfParent->GetMovable ().scfiMovable; }
+    virtual iMovable* GetMovable ()
+    {
+      return &scfParent->GetMovable ().scfiMovable;
+    }
   } scfiThing;
   friend struct eiThing;
+ 
+  //------------------------- iThingState interface -------------------------
+  struct ThingState : public iThingState
+  {
+    DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void CompressVertices () { scfParent->CompressVertices(); }
+    virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
+    virtual iPolygon3D *GetPolygon (int idx);
+    virtual iPolygon3D *CreatePolygon (const char *iName);
+    virtual int GetVertexCount () { return scfParent->num_vertices; }
+    virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
+    virtual csVector3 &GetVertexW (int i) { return scfParent->wor_verts[i]; }
+    virtual csVector3 &GetVertexC (int i) { return scfParent->cam_verts[i]; }
+    virtual int CreateVertex (csVector3 &iVertex)
+    { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+    virtual void CreateLightMaps (iGraphics3D* g3d)
+    { scfParent->CreateLightMaps (g3d); }
+    virtual void InitLightMaps (bool do_cache = true)
+    { scfParent->InitLightMaps (do_cache); }
+    virtual void CacheLightMaps ()
+    { scfParent->CacheLightMaps (); }
+    virtual void CheckFrustum (iFrustumView* fview)
+    { scfParent->CheckFrustum (fview); }
+  } scfiThingState;
+  friend struct ThingState;
  
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public iPolygonMesh
@@ -946,13 +973,14 @@ public:
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }
     virtual bool Draw (iRenderView* rview, iMovable* movable,
-    	csZBufMode zbufMode)
+    	csZBufMode zMode)
     {
-      return scfParent->Draw (rview, movable);
+      return scfParent->Draw (rview, movable, zMode);
     }
     virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
     virtual csMeshCallback* GetVisibleCallback () { return NULL; }
-    virtual void GetObjectBoundingBox (csBox3& /*bbox*/, int /*type = CS_BBOX_NORMAL*/)
+    virtual void GetObjectBoundingBox (csBox3& /*bbox*/,
+    	int /*type = CS_BBOX_NORMAL*/)
     {
     }
     virtual csVector3 GetRadius () { return csVector3 (0); }
@@ -963,7 +991,8 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () { return true; }
-    virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
+    virtual bool HitBeamObject (const csVector3& /*start*/,
+    	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
     virtual long GetShapeNumber () { return 0; /*@@@*/ }
   } scfiMeshObject;
@@ -986,8 +1015,14 @@ public:
   struct VisObject : public iVisibilityObject
   {
     DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iMovable* GetMovable () { return &scfParent->GetMovable ().scfiMovable; }
-    virtual long GetShapeNumber () { return scfParent->scfiMeshObject.GetShapeNumber (); }
+    virtual iMovable* GetMovable ()
+    {
+      return &scfParent->GetMovable ().scfiMovable;
+    }
+    virtual long GetShapeNumber ()
+    {
+      return scfParent->scfiMeshObject.GetShapeNumber ();
+    }
     virtual void GetBoundingBox (csBox3& bbox)
     {
       scfParent->GetBoundingBox (bbox);
@@ -997,6 +1032,32 @@ public:
     virtual bool IsVisible () { return scfParent->IsVisible (); }
   } scfiVisibilityObject;
   friend struct VisObject;
+};
+
+/**
+ * Thing type. This is the plugin you have to use to create instances
+ * of csThing.
+ */
+class csThingObjectType : public iMeshObjectType
+{
+private:
+  iSystem* System;
+
+public:
+  /// Constructor.
+  csThingObjectType (iBase*);
+
+  /// Destructor.
+  virtual ~csThingObjectType ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+  //------------------------ iMeshObjectType implementation --------------
+  DECLARE_IBASE;
+
+  /// New Factory.
+  virtual iMeshObjectFactory* NewFactory ();
 };
 
 #endif // __CS_THING_H__

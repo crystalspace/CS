@@ -82,7 +82,7 @@ void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
   iPolygonMesh* mesh;
-  plbody = new csThing (engine);
+  plbody = new csThing ();
   plbody->SetName ("Player's Body");
 
   plbody->AddVertex(-DX_2, OY,    -DZ_2);
@@ -130,7 +130,7 @@ void WalkTest::CreateColliders ()
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
 
-  pllegs = new csThing (engine);
+  pllegs = new csThing ();
 
   pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
   pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);

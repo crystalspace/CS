@@ -459,9 +459,9 @@ public:
   void StartNewShadowBlock ();
 
   /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
-  bool IsDynamic () { return dynamic; }
+  virtual bool IsDynamic () { return dynamic; }
   /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
-  void SetDynamic (bool d) { dynamic = d; }
+  virtual void SetDynamic (bool d) { dynamic = d; }
 
   /// Set the function that is called for every node.
   void SetNodeFunction (csFrustumViewNodeFunc* func) { node_func = func; }

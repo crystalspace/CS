@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -685,7 +685,7 @@ public:
    * polygon (using the copy constructor) or if you change the vertices
    * in a polygon.
    */
-  void Finish (csSector* sector);
+  void Finish ();
 
   /**
    * If the polygon is a portal this will set the sector

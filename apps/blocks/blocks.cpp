@@ -445,7 +445,7 @@ csPolygon3D* add_polygon_template (csThing* tmpl,
 void Blocks::add_pillar_template ()
 {
   float dim = CUBE_DIM/2.;
-  pillar_tmpl = new csThing (engine);
+  pillar_tmpl = new csThing ();
   pillar_tmpl->SetName ("pillar");
   pillar_tmpl->AddVertex (-dim, 0, dim);
   pillar_tmpl->AddVertex (dim, 0, dim);
@@ -503,7 +503,7 @@ void Blocks::add_pillar_template ()
 void Blocks::add_vrast_template ()
 {
   float dim = RAST_DIM;
-  vrast_tmpl = new csThing (engine);
+  vrast_tmpl = new csThing ();
   vrast_tmpl->SetName ("vrast");
   vrast_tmpl->AddVertex (-dim, 0, dim);
   vrast_tmpl->AddVertex (dim, 0, dim);
@@ -535,7 +535,7 @@ void Blocks::add_vrast_template ()
 void Blocks::add_hrast_template ()
 {
   float dim = RAST_DIM;
-  hrast_tmpl = new csThing (engine);
+  hrast_tmpl = new csThing ();
   hrast_tmpl->SetName ("hrast");
 
   // zone_dim s were BIG here changed.
@@ -576,11 +576,11 @@ void Blocks::add_hrast_template ()
 void Blocks::add_pillar (int x, int y)
 {
   csThing* pillar;
-  pillar = new csThing (engine);
+  pillar = new csThing ();
   engine->things.Push (pillar);
   pillar->SetName ("pillar");
   pillar->GetMovable ().SetSector (room);
-  pillar->MergeTemplate (pillar_tmpl, room, pillar_mat, 1);
+  pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->HardTransform (csTransform (csMatrix3 (), v));
@@ -591,11 +591,11 @@ void Blocks::add_pillar (int x, int y)
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* vrast;
-  vrast = new csThing (engine);
+  vrast = new csThing ();
   engine->things.Push (vrast);
   vrast->SetName ("vrast");
   vrast->GetMovable ().SetSector (room);
-  vrast->MergeTemplate (vrast_tmpl, room, raster_mat, 1);
+  vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
   vrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -607,11 +607,11 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* hrast;
-  hrast = new csThing (engine);
+  hrast = new csThing ();
   engine->things.Push (hrast);
   hrast->SetName ("hrast");
   hrast->GetMovable ().SetSector (room);
-  hrast->MergeTemplate (hrast_tmpl, room, raster_mat, 1);
+  hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
   hrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -632,7 +632,7 @@ void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
-  cube_tmpl = new csThing (engine);
+  cube_tmpl = new csThing ();
   cube_tmpl->SetName ("cube");
   cube_tmpl->AddVertex (-dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, dim);
@@ -696,7 +696,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
 	csThing* tmpl)
 {
   csThing* cube;
-  cube = new csThing (engine);
+  cube = new csThing ();
   engine->things.Push (cube);
   cube->SetName ("cubexxx");
   cube->GetMovable ().SetSector (room);
@@ -704,7 +704,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, room, cube_mat, 1, &shift, NULL);
+  cube->MergeTemplate (tmpl, cube_mat, 1, &shift, NULL);
   cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
   csPolygon3D* p;
@@ -1840,7 +1840,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
   csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName (mat);
-  csThing* thing = new csThing (engine);
+  csThing* thing = new csThing ();
   thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   engine->things.Push (thing);
 
@@ -1873,7 +1873,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 csThing* Blocks::CreateMenuArrow (bool left)
 {
   csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName ("menu_back");
-  csThing* thing = new csThing (engine);
+  csThing* thing = new csThing ();
   thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   engine->things.Push (thing);
 

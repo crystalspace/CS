@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -637,6 +637,8 @@ csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
 
   BuildSqrtTable ();
   resize = false;
+
+  thing_type = new csThingObjectType (NULL);
 }
 
 // @@@ Hack
@@ -700,6 +702,8 @@ bool csEngine::Initialize (iSystem* sys)
   
   csConfigAccess cfg(System, "/config/engine.cfg");
   ReadConfig (cfg);
+
+  thing_type->Initialize (sys);
 
   return true;
 }
@@ -1095,7 +1099,7 @@ void csEngine::ShineLights (csRegion* region)
   csPolyIt* pit = NewPolyIterator (region);
   csLightIt* lit = NewLightIterator (region);
 
-  // Reinit all lightmaps. This loop also counts all polygons.
+  // Count all polygons.
   csPolygon3D* p;
   int polygon_count = 0;
   pit->Restart ();
@@ -1174,6 +1178,19 @@ void csEngine::ShineLights (csRegion* region)
   {
     p->CreateLightMaps (G3D);
     meter.Step();
+  }
+  int i;
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* wrap = (csMeshWrapper*)meshes[i];
+    // @@@ Temporary code!
+    iThingState* thing_state = QUERY_INTERFACE (wrap->GetMeshObject (),
+    	iThingState);
+    if (thing_state)
+    {
+      thing_state->CreateLightMaps (G3D);
+      thing_state->DecRef ();
+    }
   }
 
   csThing::current_light_frame_number++;
@@ -1965,7 +1982,6 @@ bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
 csSector* csEngine::CreateCsSector (const char *iName)
 {
   csSector* sector = new csSector (this);
-  sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sector->SetName (iName);
   sectors.Push (sector);
   return sector;
@@ -1973,13 +1989,36 @@ csSector* csEngine::CreateCsSector (const char *iName)
 
 csThing* csEngine::CreateSectorWalls (csSector* sector, const char *iName)
 {
-  csThing* thing = new csThing (this);
+  csThing* thing = new csThing ();
   thing->SetName (iName);
+  things.Push (thing);
   thing->flags.Set (CS_ENTITY_CONVEX);
   thing->SetZBufMode (CS_ZBUF_FILL);
   thing->GetMovable ().SetSector (sector);
   thing->GetMovable ().UpdateMove ();
   return thing;
+}
+
+iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
+	const char *iName)
+{
+  iMeshObjectType* thing_type = GetThingType ();
+  iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
+  iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+
+  csMeshWrapper* thing_wrap = new csMeshWrapper (this, thing_obj);
+  thing_obj->DecRef ();
+  thing_wrap->SetName (iName);
+  meshes.Push (thing_wrap);
+  thing_wrap->GetMovable ().SetSector (sector);
+  thing_wrap->GetMovable ().UpdateMove ();
+  thing_wrap->flags.Set (CS_ENTITY_CONVEX);
+  thing_wrap->SetZBufMode (CS_ZBUF_FILL);
+
+  iMeshWrapper* mesh_wrap = QUERY_INTERFACE (thing_wrap, iMeshWrapper);
+  mesh_wrap->DecRef ();
+  return mesh_wrap;
 }
 
 iSector* csEngine::CreateSector (const char *iName)
@@ -1992,7 +2031,7 @@ iSector* csEngine::CreateSector (const char *iName)
 
 iThing *csEngine::CreateThing (const char *iName, iSector *iParent)
 {
-  csThing *thing = new csThing (this);
+  csThing *thing = new csThing ();
   thing->SetName (iName);
   csSector *sector = iParent->GetPrivateObject ();
   thing->GetMovable ().SetSector (sector);

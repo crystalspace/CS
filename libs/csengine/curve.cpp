@@ -26,7 +26,6 @@
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
-#include "csengine/sector.h"
 #include "csengine/engine.h"
 #include "csengine/lppool.h"
 
@@ -279,16 +278,16 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
-void csCurve::InitLightMaps (csThing* owner, csSector* sector,
-    	bool do_cache, int index)
+void csCurve::InitLightMaps (csThing* owner, bool do_cache, int index)
 {
   if (!IsLightable ()) return;
   lightmap = new csLightMap ();
 
-  // Allocate space for the lightmap and initialize it current sector
-  // ambient color.
+  // Allocate space for the lightmap and initialize it to ambient color.
   int r, g, b;
-  sector->GetAmbientColor (r, g, b);
+  r = csLight::ambient_red;
+  g = csLight::ambient_green;
+  b = csLight::ambient_blue;
   lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
                    CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
 

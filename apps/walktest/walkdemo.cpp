@@ -1174,7 +1174,7 @@ void light_statics ()
 csThing* CreatePortalThing (const char* name, csSector* room,
     	csMaterialWrapper* tm, csPolygon3D*& portalPoly)
 {
-  csThing* thing = new csThing (Sys->engine);
+  csThing* thing = new csThing ();
   thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   Sys->engine->things.Push (thing);
   thing->SetName (name);
@@ -1351,7 +1351,7 @@ csThing* CreatePortalThing (const char* name, csSector* room,
       p->Vobj (2), csVector2 (1, 1));
   portalPoly = p;
 
-  thing->Prepare (room);
+  thing->Prepare ();
   thing->InitLightMaps (false);
   room->ShineLights (thing);
   thing->CreateLightMaps (Sys->G3D);

@@ -878,7 +878,7 @@ void CreateSolidThings (csEngine* engine, csSector* room, csOctreeNode* node, in
 	    v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
 	    csVector3 v4 = GetVector3 (plane_nr, plane_pos, v);
 	    csMaterialWrapper* white = engine->GetMaterials ()->FindByName ("white");
-	    csThing* thing = new csThing (engine);
+	    csThing* thing = new csThing ();
 	    thing->AddVertex (v1);
 	    thing->AddVertex (v2);
 	    thing->AddVertex (v3);
@@ -994,7 +994,7 @@ void ShowCheckFrustum (csView* view,
   lview.SetDynamic (false);
   ctxt->SetLightFrustum (new csFrustum (pos));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  room->CheckFrustum (lview);
+  room->CheckFrustum ((iFrustumView*)&lview);
   view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
     	draw_frust_edges);
 }

@@ -236,7 +236,7 @@ void csStatLight::CalculateLighting ()
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum (lview);
+  sector->CheckFrustum ((iFrustumView*)&lview);
 }
 
 void csStatLight::CalculateLighting (csThing* th)
@@ -258,7 +258,36 @@ void csStatLight::CalculateLighting (csThing* th)
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  th->CheckFrustum (lview);
+  th->CheckFrustum ((iFrustumView*)&lview);
+}
+
+void csStatLight::CalculateLighting (iMeshWrapper* th)
+{
+  //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
+  csFrustumView lview;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  linfo.SetColor (GetColor ());
+  lview.SetUserData ((void*)this);
+  lview.SetPolygonFunction (poly_light_func);
+  lview.SetCurveFunction (curve_light_func);
+  lview.SetRadius (GetRadius ());
+  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
+  lview.SetDynamic (false);
+  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
+
+  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
+  // @@@ Engine should not know about iThingState!!!
+  iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
+  	iThingState);
+  if (thing_state)
+  {
+    thing_state->CheckFrustum ((iFrustumView*)&lview);
+    thing_state->DecRef ();
+  }
 }
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
@@ -284,7 +313,7 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 
   ctxt->light_frustum = new csFrustum (center);
   ctxt->light_frustum->MakeInfinite ();
-  sector->CheckFrustum (lview);
+  sector->CheckFrustum ((iFrustumView*)&lview);
 #endif
 }
 
@@ -409,7 +438,7 @@ void csDynLight::Setup ()
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum (lview);
+  sector->CheckFrustum ((iFrustumView*)&lview);
 }
 
 void csDynLight::SetColor (const csColor& col)

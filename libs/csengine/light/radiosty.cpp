@@ -486,9 +486,10 @@ csColor csRadPoly::GetFlatColor() const
 
 IMPLEMENT_CSOBJTYPE(csRadCurve, csObject);
 
-csRadCurve :: csRadCurve(csCurve *original)
+csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
 : csRadElement()
 {
+  csRadCurve::sector = sector;
   curve = original;
   curve->ObjAdd(this); // attach to original
   total_unshot_light = original->GetArea();
@@ -841,7 +842,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine)
   {
     if(curve->GetLightMap()) // only for lightmapped curves
     {
-      list->InsertElement(new csRadCurve(curve));
+      list->InsertElement(new csRadCurve(curve, curve_it.GetLastSector ()));
     }
   }
   
@@ -1140,7 +1141,7 @@ void csRadiosity :: StartFrustum()
   //plane_v1 = shoot_src->GetPolygon3D()->Vwor(1) - plane_origin;
   //plane_v2 = shoot_src->GetPolygon3D()->Vwor(2) - plane_origin;
 
-  shoot_src->GetSector()->CheckFrustum (*lview);
+  shoot_src->GetSector()->CheckFrustum ((iFrustumView*)lview);
 
   delete lview;
 }

@@ -114,9 +114,6 @@ class csCurve : public csObject
   friend class Dumper;
 
 private:
-  // sector of this curve
-  csSector* sector;
-
   csMaterialWrapper* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
@@ -155,7 +152,7 @@ public:
 
 public:
   ///
-  csCurve (csCurveTemplate* parent_tmpl) : csObject (), sector(NULL), 
+  csCurve (csCurveTemplate* parent_tmpl) : csObject (),
     cstxt (NULL),	parent_template (parent_tmpl), lightpatches(NULL), 
     _o2w (NULL), _uv2World (NULL), _uv2Normal (NULL), parent  (NULL),
 	  lightmap (NULL), lightmap_up_to_date (false) {} 
@@ -172,12 +169,6 @@ public:
   /// return an approximation of the area of this curve
   float GetArea();
   
-  /// set the sector where this curve is located
-  void SetSector (csSector* s) { sector = s; }
-
-  /// return the sector where this curve is located
-  csSector* GetSector () const { return sector; }
-
   /// Set the current object to world space transformation
   void SetObject2World (csReversibleTransform* o2w);
   
@@ -249,8 +240,7 @@ public:
   ///
   virtual void Normal (csVector3& vec, double u, double v);
   ///
-  void InitLightMaps (csThing* owner, csSector* sector,
-      bool do_cache, int index);
+  void InitLightMaps (csThing* owner, bool do_cache, int index);
 
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csLightPatch* lp);

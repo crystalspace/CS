@@ -279,7 +279,7 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 void *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 {
-  csThing *newtemplate = new csThing(NULL); //@@@### BAD! NEED A PARENT
+  csThing *newtemplate = new csThing ();
   CrossBuild ((void*)newtemplate, buildsource);
   return newtemplate;
 }

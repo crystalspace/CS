@@ -38,13 +38,14 @@ class csCamera;
 class csDynLight;
 class csPolygon2DQueue;
 class csProgressPulse;
-class csFrustumView;
 class Dumper;
 struct iTerrainWrapper;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
 struct iRenderView;
+struct iMeshWrapper;
+struct iFrustumView;
 
 /**
  * A sector is a container for objects. It is one of
@@ -94,13 +95,6 @@ private:
 
   /// Fog information.
   csFog fog;
-
-  /// Ambient light level for red in this sector.
-  int level_r;
-  /// Ambient light level for green in this sector.
-  int level_g;
-  /// Ambient light level for blue in this sector.
-  int level_b;
 
   /**
    * If static_tree is not NULL then this is a pointer to the csThing
@@ -465,13 +459,13 @@ public:
    * This version doesn't init the 2D culler cube so it can be used
    * for recursing.
    */
-  void RealCheckFrustum (csFrustumView& lview);
+  void RealCheckFrustum (iFrustumView* lview);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
    * this sector and possibly traverse through portals to other sectors.
    */
-  void CheckFrustum (csFrustumView& lview);
+  void CheckFrustum (iFrustumView* lview);
 
   /**
    * Get a list of all objects which are visible in the given frustum.
@@ -479,7 +473,7 @@ public:
    * You must delete this array after you are ready using it.
    * @@@ When csThing becomes a mesh object then change rc to csMeshWrapper**
    */
-  csObject** GetVisibleObjects (csFrustumView& lview, int& num_objects);
+  csObject** GetVisibleObjects (iFrustumView* lview, int& num_objects);
 
   /**
    * Intersects world-space sphere with polygons of this set. Return
@@ -573,6 +567,8 @@ public:
 
   /// Version of shine_lights() which only affects one thing.
   void ShineLights (csThing*, csProgressPulse* = 0);
+  /// Version of shine_lights() which only affects one mesh object.
+  void ShineLights (iMeshWrapper*, csProgressPulse* = 0);
 
   //----------------------------------------------------------------------
   // Various
@@ -580,19 +576,6 @@ public:
 
   /// Get the engine for this sector.
   csEngine* GetEngine () { return engine; }
-
-  /**
-   * Get ambient color valid in this sector.
-   */
-  void GetAmbientColor (int& r, int& g, int& b)
-  { r = level_r; g = level_g; b = level_b; }
-
-  /**
-   * Set the ambient color for this sector. This is only useful
-   * before lighting is calculated.
-   */
-  void SetAmbientColor (int r, int g, int b)
-  { level_r = r; level_g = g; level_b = b; }
 
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
@@ -647,6 +630,7 @@ public:
     }
     virtual CS_ID GetID () { return scfParent->GetID (); }
     virtual bool HasFog () { return scfParent->HasFog (); }
+    virtual int GetRecLevel () { return scfParent->draw_busy; }
   } scfiSector;
   friend struct eiSector;
 };

@@ -31,6 +31,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
+#include "iengine/fview.h"
 
 IMPLEMENT_IBASE (csPortal)
   IMPLEMENTS_INTERFACE (iPortal)
@@ -315,7 +316,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     }
   }
 
-  sector->RealCheckFrustum (lview);
+  sector->RealCheckFrustum ((iFrustumView*)&lview);
 
   if (copied_frustums)
   {
