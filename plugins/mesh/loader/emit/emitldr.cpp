@@ -46,22 +46,28 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
 
-// ### Note to Wouter: the above are for MixMode, leave them.
-// below you need to add all tokens that your loader needs. The
-// tokens below are from the fire loader. Don't know if they are
-// relevant.
-  CS_TOKEN_DEF (COLORSCALE)
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (DIRECTION)
-  CS_TOKEN_DEF (DROPSIZE)
+  CS_TOKEN_DEF (AGING)
+  CS_TOKEN_DEF (ATTRACTOR)
+  CS_TOKEN_DEF (EMITBOX)
+  CS_TOKEN_DEF (EMITCONE)
+  CS_TOKEN_DEF (EMITCYLINDERTANGENT)
+  CS_TOKEN_DEF (EMITCYLINDER)
+  CS_TOKEN_DEF (EMITFIXED)
+  CS_TOKEN_DEF (EMITLINE)
+  CS_TOKEN_DEF (EMITMIXPART)
+  CS_TOKEN_DEF (EMITMIX)
+  CS_TOKEN_DEF (EMITSPHERETANGENT)
+  CS_TOKEN_DEF (EMITSPHERE)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (LIGHTING)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (ORIGIN)
-  CS_TOKEN_DEF (ORIGINBOX)
-  CS_TOKEN_DEF (SWIRL)
+  CS_TOKEN_DEF (RECTPARTICLES)
+  CS_TOKEN_DEF (REGULARPARTICLES)
+  CS_TOKEN_DEF (STARTACCEL)
+  CS_TOKEN_DEF (STARTPOS)
+  CS_TOKEN_DEF (STARTSPEED)
   CS_TOKEN_DEF (TOTALTIME)
 CS_TOKEN_DEF_END
 
@@ -244,26 +250,143 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
+
+static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate)
+{
+  CS_TOKEN_TABLE_START (emits)
+    CS_TOKEN_TABLE (EMITBOX)
+    CS_TOKEN_TABLE (EMITCONE)
+    CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
+    CS_TOKEN_TABLE (EMITCYLINDER)
+    CS_TOKEN_TABLE (EMITFIXED)
+    CS_TOKEN_TABLE (EMITLINE)
+    CS_TOKEN_TABLE (EMITMIXPART)
+    CS_TOKEN_TABLE (EMITMIX)
+    CS_TOKEN_TABLE (EMITSPHERETANGENT)
+    CS_TOKEN_TABLE (EMITSPHERE)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  iEmitGen3D* result = 0;
+  csVector3 a,b;
+  float p,q,r,s,t;
+
+  while ((cmd = csGetObject (&buf, emits, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return 0;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_EMITFIXED:
+        {
+          ScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
+	  iEmitFixed *efixed = fstate->CreateFixed();
+	  efixed->SetValue(a);
+	  result = efixed;
+	}
+	break;
+      case CS_TOKEN_EMITBOX:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+	    &b.x, &b.y, &b.z);
+	  iEmitBox *ebox = fstate->CreateBox();
+	  ebox->SetContent(a, b);
+	  result = ebox;
+	}
+	break;
+      case CS_TOKEN_EMITSPHERE:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
+	  iEmitSphere *esphere = fstate->CreateSphere();
+	  esphere->SetContent(a, p, q);
+	  result = esphere;
+	}
+	break;
+      case CS_TOKEN_EMITCONE:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+	    &p, &q, &r, &s, &t);
+	  iEmitCone *econe = fstate->CreateCone();
+	  econe->SetContent(a, p, q, r, s, t);
+	  result = econe;
+	}
+	break;
+      case CS_TOKEN_EMITMIX:
+        {
+	  iEmitMix *emix = fstate->CreateMix();
+	  float amt;
+	  iEmitGen3D *gen;
+	  
+	  // ScanStr amt
+	  //gen = ParseEmit(bla, fstate);
+	  emix->AddEmitter(amt, gen);
+          
+	  result = emix;
+	}
+	break;
+      case CS_TOKEN_EMITLINE:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+	    &b.x, &b.y, &b.z);
+	  iEmitLine *eline = fstate->CreateLine();
+	  eline->SetContent(a, b);
+	  result = eline;
+	}
+	break;
+      case CS_TOKEN_EMITCYLINDER:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+	    &b.x, &b.y, &b.z, &p, &q);
+	  iEmitCylinder *ecyl = fstate->CreateCylinder();
+	  ecyl->SetContent(a, b, p, q);
+	  result = ecyl;
+	}
+	break;
+      case CS_TOKEN_EMITCYLINDERTANGENT:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+	    &b.x, &b.y, &b.z, &p, &q);
+	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent();
+	  ecyltan->SetContent(a, b, p, q);
+	  result = ecyltan;
+	}
+	break;
+      case CS_TOKEN_EMITSPHERETANGENT:
+        {
+          ScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
+	  iEmitSphereTangent *espheretan = fstate->CreateSphereTangent();
+	  espheretan->SetContent(a, p, q);
+	  result = espheretan;
+	}
+	break;
+    }
+  }
+  return result;
+}
+
 iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
-//### Wouter: add the tokens that need to be recognized by the emit
-//loader below. Factory is required but the others are from the
-//fire loader.
-    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (AGING)
+    CS_TOKEN_TABLE (ATTRACTOR)
     CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (DIRECTION)
-    CS_TOKEN_TABLE (ORIGINBOX)
-    CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (SWIRL)
-    CS_TOKEN_TABLE (TOTALTIME)
-    CS_TOKEN_TABLE (COLORSCALE)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (DROPSIZE)
     CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (NUMBER)
+    CS_TOKEN_TABLE (RECTPARTICLES)
+    CS_TOKEN_TABLE (REGULARPARTICLES)
+    CS_TOKEN_TABLE (STARTACCEL)
+    CS_TOKEN_TABLE (STARTPOS)
+    CS_TOKEN_TABLE (STARTSPEED)
+    CS_TOKEN_TABLE (TOTALTIME)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -276,6 +399,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 
   iMeshObject* mesh = NULL;
   iParticleState* partstate = NULL;
+  iEmitFactoryState* emitfactorystate = NULL;
   iEmitState* emitstate = NULL;
 
   char* buf = (char*)string;
@@ -290,14 +414,6 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
     }
     switch (cmd)
     {
-    //### Wouter: Add cases for all the tokens and handle them here.
-      case CS_TOKEN_COLOR:
-	{
-	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-	  partstate->SetColor (color);
-	}
-	break;
       case CS_TOKEN_FACTORY:
 	{
           ScanStr (params, "%s", str);
@@ -313,6 +429,8 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	  imeshwrap->SetFactory (fact);
           partstate = QUERY_INTERFACE (mesh, iParticleState);
           emitstate = QUERY_INTERFACE (mesh, iEmitState);
+	  emitfactorystate = QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+	    iEmitFactoryState);
 	}
 	break;
       case CS_TOKEN_MATERIAL:
@@ -334,11 +452,78 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MIXMODE:
         partstate->SetMixMode (ParseMixmode (params));
 	break;
+      case CS_TOKEN_NUMBER:
+	{
+	  int num = 10;
+          ScanStr (params, "%d", &num);
+	  emitstate->SetNumberParticles (num);
+	}
+	break;
+      case CS_TOKEN_LIGHTING:
+	{
+	  bool light = false;
+          ScanStr (params, "%b", &light);
+	  emitstate->SetLighting (light);
+	}
+	break;
+      case CS_TOKEN_TOTALTIME:
+	{
+	  int totaltime = 100;
+          ScanStr (params, "%d", &totaltime);
+	  emitstate->SetParticleTime (totaltime);
+	}
+	break;
+      case CS_TOKEN_RECTPARTICLES:
+	{
+	  float w,h;
+          ScanStr (params, "%f,%f", &w, &h);
+	  emitstate->SetRectParticles (w, h);
+	}
+	break;
+      case CS_TOKEN_REGULARPARTICLES:
+	{
+	  int sides;
+	  float radius;
+          ScanStr (params, "%d,%f", &sides, &radius);
+	  emitstate->SetRegularParticles (sides, radius);
+	}
+	break;
+      case CS_TOKEN_AGING:
+        {
+	  int time;
+	  csColor col;
+	  float alpha, swirl, rotspeed, scale;
+          ScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f", &time, &col.red,
+	    &col.green, &col.blue, &alpha, &swirl, &rotspeed, &scale);
+	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
+	}
+	break;
+      case CS_TOKEN_STARTPOS:
+	{
+	  emitstate->SetStartPosEmit (ParseEmit(params, emitfactorystate));
+	}
+	break;
+      case CS_TOKEN_STARTSPEED:
+	{
+	  emitstate->SetStartSpeedEmit (ParseEmit(params, emitfactorystate));
+	}
+	break;
+      case CS_TOKEN_STARTACCEL:
+	{
+	  emitstate->SetStartAccelEmit (ParseEmit(params, emitfactorystate));
+	}
+	break;
+      case CS_TOKEN_ATTRACTOR:
+	{
+	  emitstate->SetAttractorEmit (ParseEmit(params, emitfactorystate));
+	}
+	break;
     }
   }
 
   if (partstate) partstate->DecRef ();
   if (emitstate) emitstate->DecRef ();
+  if (emitfactorystate) emitfactorystate->DecRef ();
   return mesh;
 }
 
