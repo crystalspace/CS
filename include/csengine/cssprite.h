@@ -394,6 +394,9 @@ private:
   /// The last frame time action
   int last_time;
 
+  /// animation tweening ratio:  next frame / this frame
+  float tween_ratio;
+
   ///
   bool force_otherskin;
 

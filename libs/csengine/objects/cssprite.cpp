@@ -334,6 +334,7 @@ csSprite3D::csSprite3D () : csObject ()
   draw_callback = NULL;
   is_visible = false;
   camera_cookie = 0;
+  tween_ratio = 0;
 }
 
 csSprite3D::~csSprite3D ()
@@ -780,6 +781,13 @@ void csSprite3D::Draw (csRenderView& rview)
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
+  // Get next frame for animation tweening.
+  csFrame * next_frame;
+  if (cur_frame + 1 < cur_action->GetNumFrames())
+    next_frame = cur_action->GetFrame (cur_frame + 1);
+  else
+    next_frame = cur_action->GetFrame (0);
+
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
   //   C = Mwc * (W - Vwc)
@@ -795,8 +803,18 @@ void csSprite3D::Draw (csRenderView& rview)
     skeleton_state->Transform (tr_o2c, cframe, tr_verts);
   else
   {
-    for (i = 0 ; i < tpl->num_vertices ; i++)
-      tr_verts[i] = tr_o2c * cframe->GetVertex (i);
+    if (tween_ratio)
+    {
+      float remainder = 1 - tween_ratio;
+      for (i = 0 ; i < tpl->num_vertices ; i++)
+        tr_verts[i] = tr_o2c * (tween_ratio * next_frame->GetVertex(i)
+          + remainder * cframe->GetVertex (i));
+    }
+    else
+    {
+      for (i = 0 ; i < tpl->num_vertices ; i++)
+        tr_verts[i] = tr_o2c * cframe->GetVertex (i);
+    }
   }
 
   // Calculate the right LOD level for this sprite.
@@ -1035,6 +1053,8 @@ bool csSprite3D::NextFrame (long current_time, bool onestep, bool stoptoend)
     }
   }
 
+  tween_ratio = (current_time - last_time) / (float)cur_action->GetFrameDelay (cur_frame);
+
   return ret;
 }
 
@@ -1082,10 +1102,28 @@ void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
 
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 {
+  int i;
+
   defered_num_lights = 0;
 
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
   csVector3* object_vertices = GetObjectVerts (this_frame);
+
+  if (tween_ratio)
+  {
+    CHK (object_vertices = new csVector3 [tpl->GetNumVertices()];)
+
+    csFrame * next_frame;
+    if (cur_frame + 1 < cur_action->GetNumFrames())
+      next_frame = cur_action->GetFrame (cur_frame + 1);
+    else
+      next_frame = cur_action->GetFrame (0);
+
+    float remainder = 1 - tween_ratio;
+    for (i = 0 ; i < tpl->num_vertices ; i++)
+      object_vertices [i] = tween_ratio * next_frame->GetVertex(i)
+        + remainder * this_frame->GetVertex (i);
+  }
 
   if (!this_frame->HasNormals ())
     this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
@@ -1101,7 +1139,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     int r, g, b;
     sect->GetAmbientColor (r, g, b);
     csColor ambient_color (r / 128.0, g / 128.0, b / 128.0);
-    for (int i = 0 ; i < tpl->GetNumVertices (); i++)
+    for (i = 0 ; i < tpl->GetNumVertices (); i++)
       AddVertexColor (i, ambient_color);
   }
 
@@ -1109,6 +1147,10 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     UpdateLightingHQ (lights, num_lights, object_vertices);
   else
     UpdateLightingLQ (lights, num_lights, object_vertices);
+
+  // delete tweened vertices
+  if (tween_ratio)
+    CHK (delete [] object_vertices;)
 }
 
 void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices)
