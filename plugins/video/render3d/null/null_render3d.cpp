@@ -74,6 +74,8 @@ csNullGraphics3D::csNullGraphics3D (iBase *iParent)
   Caps.maxTexWidth = 1024;
   Caps.fog = G3DFOGMETHOD_NONE;
   Caps.MaxAspectRatio = 32768;
+
+  current_drawflags = 0;
 }
 
 csNullGraphics3D::~csNullGraphics3D ()
@@ -390,7 +392,8 @@ iTextureHandle* csNullGraphics3D::GetRenderTarget () const
 
 bool csNullGraphics3D::BeginDraw (int DrawFlags)
 {
-  if (DrawFlags & (CSDRAW_3DGRAPHICS | CSDRAW_2DGRAPHICS))
+  if ((DrawFlags & (CSDRAW_3DGRAPHICS | CSDRAW_2DGRAPHICS))
+   && (!(current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
   {
     if (!G2D->BeginDraw ())
       return false;

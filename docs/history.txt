@@ -9,6 +9,8 @@ chronological order.
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.
+	- Jorrit fixed a bug in the NR null3d renderer. It would call
+	  g2d->BeginDraw() to many times.
 28-Mar-2004
 	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
 	  to avoid clashes with other external libraries which also embed
