@@ -54,7 +54,7 @@ void csfxFadeOut(iGraphics3D *g3d, float fadevalue);
 
 /**
  * Fade to given pixmap (which must be prepared for 3D usage),
- * fadevalue 0: no fading, fadevalue 1: only green is visible.
+ * fadevalue 0: no fading, fadevalue 1: only given texture is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue);
