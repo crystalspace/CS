@@ -68,24 +68,21 @@ public:
   void Reset ();
 
   /// Call this routine to add a key down/up event to queue
-  void do_key (int key, bool down);
-
-  /// Call this routine to add an extended key down/up event to queue
-  void do_key_extended (int key, int translatedkey, bool down);
+  void do_key (int iKey, int iChar, bool iDown);
 
   /**
    * Query the state of a key. All key codes in range 0..255,
    * CSKEY_FIRST..CSKEY_LAST are supported. Returns true if
    * the key is pressed, false if not.
    */
-  bool GetKeyState (int key);
+  bool GetKeyState (int iKey);
 
 private:
   /**
    * Set key state. For example SetKey (CSKEY_UP, true). Called
    * automatically by do_press and do_release.
    */
-  void SetKeyState (int key, bool state);
+  void SetKeyState (int iKey, bool iDown);
 };
 
 /**

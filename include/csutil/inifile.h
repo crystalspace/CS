@@ -27,6 +27,7 @@
 #include "ivfs.h"
 
 class csStrVector;
+struct iStrVector;
 
 class csIniFile : public csBase
 {
@@ -206,6 +207,8 @@ public:
     { bool b; return EnumData (SectionPath, b); }
   /// Enumerate data entries and put their names into a string vector
   bool EnumData (const char *SectionPath, csStrVector *oList) const;
+  /// Enumerate data entries and put their names into a string vector
+  bool EnumData (const char *SectionPath, iStrVector *oList) const;
 
   /// A comment iterator
   class CommentIterator : public Iterator

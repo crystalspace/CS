@@ -26,9 +26,10 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "cssys/csinput.h"
-#include "iconfig.h"
 #include "isystem.h"
 #include "ivfs.h"
+#include "ievent.h"
+#include "iconfig.h"
 #include "iproto.h"
 #include "iauth.h"
 
@@ -62,7 +63,9 @@ struct iConsole;
  */
 class csSystemDriver : public iSystem
 {
-  // This is a private structure used to keep the list of plugins
+  /*
+   * This is a private structure used to keep the list of plugins.
+   */
   class csPlugIn : public csBase
   {
   public:
@@ -79,7 +82,9 @@ class csSystemDriver : public iSystem
     virtual ~csPlugIn ();
   };
 
-  // This is a superset of csObjVector that can find by pointer a plugin
+  /*
+   * This is a superset of csObjVector that can find by pointer a plugin.
+   */
   class csPlugInsVector : public csObjVector
   {
   public:
@@ -99,7 +104,9 @@ class csSystemDriver : public iSystem
     { return (csPlugIn *)csObjVector::Get (idx); }
   };
 
-  /// Class to collect all options for all plug-in modules in the system.
+  /*
+   * Class to collect all options for all plug-in modules in the system.
+   */
   class csPluginOption : public csBase
   {
   public:
@@ -124,6 +131,9 @@ class csSystemDriver : public iSystem
     }
   };
 
+  /*
+   * This structure contains the data related to one command-line option.
+   */
   struct csCommandLineOption
   {
     /// Option name
@@ -138,10 +148,15 @@ class csSystemDriver : public iSystem
     { delete [] Name; delete [] Value; }
   };
 
+  /*
+   * The array of all command-line options.
+   */
   class csCommandLineOptions : public csVector
   {
   public:
     csCommandLineOptions (int iLength, int iDelta) : csVector (iLength, iDelta) {}
+    virtual ~csCommandLineOptions ()
+    { DeleteAll (); }
     virtual bool FreeItem (csSome Item)
     { delete (csCommandLineOption *)Item; return true; }
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
@@ -150,6 +165,65 @@ class csSystemDriver : public iSystem
 
   // Find Nth command-line option and return a pointer to the object (or NULL)
   csCommandLineOption *FindOptionCL (const char *iName, int iIndex);
+
+  /*
+   * A private class which implements the iEventOutlet interface.
+   */
+  class csEventOutlet : public iEventOutlet
+  {
+    // The mask of events to allow from this plug
+    unsigned EnableMask;
+    // The event plug object
+    iEventPlug *Plug;
+    // The system driver
+    csSystemDriver *System;
+  public:
+    DECLARE_IBASE;
+
+    // Initialize the outlet
+    csEventOutlet (iEventPlug *iPlug, csSystemDriver *iSys);
+    // Destroy the outlet
+    virtual ~csEventOutlet ();
+
+    // Create a event object on behalf of the system driver.
+    virtual csEvent *CreateEvent ();
+    // Put a previously created event into system event queue.
+    virtual void PutEvent (csEvent *Event);
+    // Put a keyboard event into event queue.
+    virtual void Key (int iKey, int iChar, bool iDown);
+    // Put a mouse event into event queue.
+    virtual void Mouse (int iButton, bool iDown, int x, int y);
+    // Put a joystick event into event queue.
+    virtual void Joystick (int iNumber, int iButton, bool iDown, int x, int y);
+    // Put a broadcast event into event queue.
+    virtual void Broadcast (int iCode, void *iInfo);
+    // Broadcast a event to all plugins
+    virtual void ImmediateBroadcast (int iCode, void *iInfo);
+  };
+  friend class csEventOutlet;
+
+  /*
+   * The array of all allocated event outlets.
+   */
+  class csEventOutletsVector : public csVector
+  {
+  public:
+    csEventOutletsVector () : csVector (16, 16)
+    { }
+    virtual bool FreeItem (csSome Item)
+    { delete (csEventOutlet *)Item; return true; }
+    csEventOutlet *Get (int idx)
+    { return (csEventOutlet *)csVector::Get (idx); }
+  } EventOutlets;
+
+  // Collect all options from command line
+  virtual void CollectOptions (int argc, const char* const argv[]);
+
+  // Query all options supported by given plugin and place into OptionList
+  void QueryOptions (iPlugIn *iObject);
+
+  // Elapsed time between last two frames and absolute time in milliseconds
+  time_t ElapsedTime, CurrentTime;
 
 public:
   /// -------------------------- plug-ins --------------------------
@@ -195,17 +269,11 @@ public:
   /// The Configuration File object
   csIniFile *Config;
   /// Set to non-zero to exit csSystemDriver::Loop()
-  static bool Shutdown;
+  bool Shutdown;
   /// Same as Shutdown but set manually by windowing system
   bool ExitLoop;
-  /// Enable console output (used on systems where graphics screen is shared with text console)
-  static bool EnableConsoleOutput;
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   int debug_level;
-  /// true if demo console is ready
-  bool ConsoleReady;
-  /// true if CrystalSpace visual is active (focused)
-  bool IsFocused;
   /// List of all options for all plug-in modules.
   csObjVector OptionList;
   /// The collection of all options specified on command line
@@ -223,12 +291,6 @@ public:
   /// This is usually called right after object creation.
   virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName);
 
-  /// Collect all options from command line
-  virtual void CollectOptions (int argc, const char* const argv[]);
-
-  /// Query all options supported by given plugin and place into OptionList
-  void QueryOptions (iPlugIn *iObject);
-
   /// Check if all required drivers are loaded
   virtual bool CheckDrivers ();
 
@@ -242,20 +304,23 @@ public:
 
   /**
    * System loop. This should be called last since it returns
-   * only on program exit
+   * only on program exit. There are two ways for every Crystal Space
+   * application to function: the simplest way is to call Loop() and
+   * it will take care of everything. The second way is to call NextFrame
+   * manually often enough, and use an API-dependent application loop
+   * (many GUI toolkits require your application to call their own event
+   * loop function rather than providing your own). You will have to handle
+   * the Shutdown variable yourself then.
    */
-  virtual void Loop () = 0;
+  virtual void Loop ();
 
   /**
-   * SysSystemDriver::Loop should call this method once per frame.
-   * 'elapsed_time' is the time elapsed since the previous call to
-   * NextFrame. 'current_time' is a global time counter.
-   * The time is expressed in milliseconds.
+   * SysSystemDriver::Loop calls this method once per frame.
+   * This method can be called manually as well if you don't use the
+   * Loop method. System drivers may override this method to pump events
+   * from system event queue into Crystal Space event queue.
    */
-  virtual void NextFrame (time_t elapsed_time, time_t current_time);
-
-  /// Called from NextFrame() to process all events
-  virtual bool ProcessEvents ();
+  virtual void NextFrame ();
 
   /// Pass a single event to all plugins until one eats it
   virtual bool HandleEvent (csEvent &Event);
@@ -264,29 +329,9 @@ public:
   virtual void Sleep (int /*SleepTime*/) {}
 
   /**
-   * System dependent function to set all system defaults (like
-   * the default resolution, if SHM is used or not (only for X),
-   * and so on...).<p>
-   * This routine can also make use of the config file to get
-   * the defaults from there (so instead of having to specify
-   * -mode 640x480 everytime you can set this in the config file
-   * and this routine should read that).<p>
-   * The routine can use GetOptionCL method as well to override
-   * values that can be overrided from command line.<p>
-   * System driver should implement only those options that are
-   * common for absolutely all drivers of one kind. For example,
-   * if your system does not support running in full screen, the
-   * system driver can take care of the -windowpos <x>,<y> switch.
-   * If at least for one driver this option is not applicable, you 
-   * should implement the option inside each driver (call GetOptionCL
-   * from plugin's Initialize() method).
-   */
-  virtual void SetSystemDefaults (csIniFile *config);
-
-  /**
    * This is a function that prints the commandline help text.
-   * If system has system-dependent switches, it should override
-   * this method and type its own text (possibly invoking
+   * If system driver has system-dependent switches, it should override
+   * this method and type its own text (possibly after invoking
    * csSystemDriver::Help() first).
    */
   virtual void Help ();
@@ -294,9 +339,8 @@ public:
   /**
    * Return time in milliseconds (if not supported by a system
    * just return the time in seconds multiplied by 1000).
-   * Default implementation is in 'def_sys'.
    */
-  static long Time ();
+  static time_t Time ();
 
   /// Print a string into debug.txt
   static void debug_out (bool flush, const char* str);
@@ -308,6 +352,9 @@ public:
   static void console_open ();
   static void console_close ();
   static void console_out (const char *str);
+
+  /// A shortcut for requesting to load a plugin (before Initialize())
+  void RequestPlugin (const char *iPluginName);
 
 protected:
   /**
@@ -332,17 +379,10 @@ protected:
   virtual void Warn (const char* msg);
 
   /**
-   * Write a message on the display in demo mode (used by
-   * Printf with mode MSG_INITIALIZATION).
-   * The default implementation just uses the console.
+   * Query default width/height/depth from config file
+   * and from command-line parameters.
    */
-  virtual void DemoWrite (const char* msg);
-
-  /**
-   * This is a system independent function that just initilizes
-   * FrameWidth and FrameHeight from the given mode string.
-   */
-  void SetMode (const char* mode);
+  virtual void SetSystemDefaults (csIniFile *config);
 
 public:
   DECLARE_IBASE;
@@ -351,6 +391,17 @@ public:
 
   /// returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
+  /// get the time in milliseconds.
+  virtual time_t GetTime ();
+  /// print a string to the specified device.
+  virtual void Printf (int mode, const char *format, ...);
+  /// execute a system-dependent extension command
+  virtual bool SystemExtension (const char *iCommand, ...)
+  { return false; }
+  /// Query the elapsed time between last frames and absolute time
+  virtual void GetElapsedTime (time_t &oElapsedTime, time_t &oCurrentTime)
+  { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
+
   /// Load a plugin and initialize it
   virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
     const char *iInterface, int iVersion);
@@ -360,14 +411,10 @@ public:
   virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject);
-  /// print a string to the specified device.
-  virtual void Printf (int mode, const char *format, ...);
-  /// get the time in milliseconds.
-  virtual time_t GetTime ();
-  /// quit the system.
-  virtual void StartShutdown ();
-  /// check if system is shutting down
-  virtual bool GetShutdown ();
+  /// Register a object that implements the iPlugIn interface as a plugin
+  virtual bool csSystemDriver::RegisterPlugIn (const char *iClassID,
+    const char *iFuncID, iPlugIn *iObject);
+
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
   /// Get a string configuration value
@@ -382,23 +429,13 @@ public:
   virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value);
   /// Set an float configuration value
   virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value);
+  /// Query whenever a config section exists
+  virtual bool ConfigSectionExists (const char *Section);
+  /// Enumerate all keys in a section
+  virtual bool ConfigEnumData (const char *Section, iStrVector *KeyList);
   /// Save system configuration file
   virtual bool ConfigSave ();
-  /// Put a keyboard event into event queue 
-  virtual void QueueKeyEvent (int iKeyCode, bool iDown);
-  /// Put an extended keyboard event into event queue ( keycode is not translated in any way, thus
-  /// the caller must take care to calculate the right code )
-  virtual void QueueExtendedKeyEvent (int iKeyCode, int iKeyCodeTranslated, bool iDown);
-  /// Put a mouse event into event queue 
-  virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y);
-  /// Put a joystick event into event queue
-  virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y);
-  /// Put a focus event into event queue 
-  virtual void QueueFocusEvent (bool Enable);
-  /// Put a native window resizing event into queue
-  virtual void QueueContextResizeEvent (void *info);
-  /// Put a native window closure event into queue.
-  virtual void QueueContextCloseEvent (void *info);
+
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask);
   /// Query current state for given key
@@ -407,6 +444,15 @@ public:
   virtual bool GetMouseButton (int button);
   /// Query current (last known) mouse position
   virtual void GetMousePosition (int &x, int &y);
+  /// Query current state for given joystick button (1..CS_MAX_JOYSTICK_BUTTONS)
+  virtual bool GetJoystickButton (int number, int button);
+  /// Query last known joystick position
+  virtual void GetJoystickPosition (int number, int &x, int &y);
+  /// Register an event plug and return a new outlet
+  virtual iEventOutlet *CreateEventOutlet (iEventPlug *iObject);
+  /// Get a public event outlet for posting just a single event and such.
+  virtual iEventOutlet *GetSystemEventOutlet ();
+
   /// Query a specific commandline option (you can query second etc such option)
   virtual const char *GetOptionCL (const char *iName, int iIndex = 0);
   /// Query a filename specified on the commandline (that is, without leading '-')
@@ -419,10 +465,6 @@ public:
   virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0);
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0);
-  /// Called before forced suspend / after resuming suspend
-  virtual void SuspendResume (bool iSuspend);
-  /// Toggle console text output (for consoles that share text/graphics mode)
-  virtual void EnablePrintf (bool iEnable);
 
   /****************************** iSCF interface ******************************/
 
@@ -451,9 +493,6 @@ public:
     virtual bool scfUnregisterClass (char *iClassID);
   } scfiSCF;
 };
-
-// Shortcuts for compatibility
-#define SysGetTime	csSystemDriver::Time
 
 // CrystalSpace global variables
 extern csSystemDriver *System;

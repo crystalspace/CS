@@ -21,15 +21,12 @@
 #define __CS_ICONSOLE_H__
 
 #include "iplugin.h"
-#include "csutil/scf.h"
 
 class csRect;
-class csString;
 struct iTextureManager;
-struct iCursor;
 
 /// These constants are for use with the ScrollTo() member function below
-enum ScrollConst
+enum
 {
   csConPageUp = -1,
   csConPageDown = -2,
@@ -37,118 +34,116 @@ enum ScrollConst
   csConVeryBottom = -4
 };
 
-enum CursorConst
+enum
 {
   csConNoCursor = 0,
-  csConLineCursor,
-  csConBlockCursor,
-  csConCustomCursor
+  csConNormalCursor,
+  csConInsertCursor
 };
 
-SCF_VERSION(iConsole, 0, 0, 4);
+SCF_VERSION (iConsole, 1, 0, 0);
 
 /**
- * This is the Crystal Space Console interface.  It is an output only system.
+ * This is the Crystal Space Console interface. It is an output only system.
  * It can be used in conjunction with the iConsoleInput interface in iconinp.h
- * to form an interactive console.<p>
- *
- * These some ideas for future additions, but they might be better suited for
- * a subclass of iConsole:<p>
- *
- * Alpha transparency (not directly supported by 2D driver)
- * Background texture(s) (may not be available during startup)
+ * to form an interactive console.
  */
 struct iConsole : public iPlugIn
 {
-  /// Show the console   !DEPRECATED!
-  virtual void Show() = 0;
-  /// Hide the console   !DEPRECATED!
-  virtual void Hide() = 0;
-
-  /// Print a string to the console
-  virtual void PutText(const char *text) = 0;
+  /**
+   * Put some text to the console. Console acts like a simple
+   * TTY and should interpret basical symbols like '\n' and '\b'.
+   * The '\r' character has a special meaning: it sets a flag that
+   * tells console to clear the current line before next character
+   * is output. That is, you can emmit non-persistent messages
+   * this way: PutText ("some text\r"); This message will disappear
+   * as soon as any other message will be sent to console.
+   */
+  virtual void PutText (int iMode, const char *iText) = 0;
 
   /// Return a line from the buffer (-1 = current line)
-  virtual const csString *GetText(int line = -1) const = 0;
+  virtual const char *GetLine (int iLine = -1) const = 0;
 
-  /** Delete the specified text on the current line.   Using the default 
-   *  parameters deletes all of the text in the current line.
+  /**
+   * Display the console and return the dirty rectangle.
+   * The graphics driver should be in 2D draw mode.
    */
-  virtual void DeleteText(int start = 0, int end = -1) = 0;
+  virtual void Draw2D (csRect *oRect = NULL) = 0;
 
-  /// Update the console on the window.
-  virtual void Draw(csRect *rect = NULL) = 0;
-
-  /// Update the 3D part of the console on the window.
-  virtual void Draw3D(csRect *rect = NULL) = 0;
-
-  /// Return true if console is active  !DEPRECATED!
-  virtual bool IsActive() const = 0;
-
-  /** Clear console.  If wipe = false, it just moves the top line to the current line
-   * If wipe is true, it clears the buffer completely
+  /**
+   * Update the 3D part of the console on the window.
+   * The graphics driver should be in 3D draw mode.
    */
-  virtual void Clear(bool wipe = false) = 0;
+  virtual void Draw3D (csRect *oRect = NULL) = 0;
+
+  /**
+   * Clear console. If wipe = false, it just moves the top line to the
+   * current line; if wipe is true, it clears the buffer completely.
+   */
+  virtual void Clear (bool iWipe = false) = 0;
 
   /// Set the buffer size in lines
-  virtual void SetBufferSize(int maxlines) = 0;
-
-  /// Retrieve the console colors from the current palette
-  virtual void CacheColors(iTextureManager *txtmgr) = 0;
-
-  /// Get the foreground color
-  virtual void GetForeground(int &red, int &green, int &blue) const = 0;
-  /// Set the foreground color.  CacheColor() must be called before it goes into effect!
-  virtual void SetForeground(int red, int green, int blue) = 0;
-
-  /// Get the background color
-  virtual void GetBackground(int &red, int &green, int &blue) const = 0;
-  /// Set the background color.  CacheColor() must be called before it goes into effect!
-  virtual void SetBackground(int red, int green, int blue) = 0;
-
-  /// Retrieve the current coordinates and width/height of the console rectangle
-  virtual void GetPosition(int &x, int &y, int &width, int &height) const = 0;
-  /// Set the coordinates and/or width/height of the console rectangle.  
-  /// -1 is interpreted as "use current value" for all four parameters.
-  /// Other negative values are not legal.
-  virtual void SetPosition(int x, int y, int width = -1, int height = -1) = 0;
-
-  /// Invalidates part of the console for redrawal
-  virtual void Invalidate(csRect &area) = 0;
+  virtual void SetBufferSize (int iMaxLines) = 0;
 
   /// Retrieve the transparency setting
-  virtual bool GetTransparency() const = 0;
+  virtual bool GetTransparency () const = 0;
   /// Set transparency
-  virtual void SetTransparency(bool trans) = 0;
+  virtual void SetTransparency (bool iTransp) = 0;
 
   /// Gets the ID of current font.
-  virtual int GetFontID() const = 0;
+  virtual int GetFontID () const = 0;
   /// Sets the type of the font.
-  virtual void SetFontID(int FontID) = 0;
+  virtual void SetFontID (int FontID) = 0;
 
   /// Get the current top line being displayed
-  virtual int GetTopLine() const = 0;
-  /** Set the current top line, or use of the constants above for scrolling
-   * if snap is true, the console returns to the very bottom of the display
-   * when a new line is printed
+  virtual int GetTopLine () const = 0;
+  /**
+   * Set the current top line, or use of the constants above for scrolling.
+   * If snap is true, the console returns to the very bottom of the display
+   * when a new line is printed.
    */
-  virtual void ScrollTo(int topline, bool snap = true) = 0;
+  virtual void ScrollTo (int iTopLine, bool iSnap = true) = 0;
 
-  /// Retrieve the cursor position in text coordinates
-  virtual void GetCursorPos(int &x, int &y) const = 0;
-  /// Set the cursor position in text coordinates
-  virtual void SetCursorPos(int x, int y) = 0;
+  /// Retrieve the cursor style
+  virtual int GetCursorStyle () const = 0;
+  /// Assign the cursor style
+  virtual void SetCursorStyle (int iStyle) = 0;
+
   /**
-   * Retrieve the cursor style, and if it's a custom cursor 
-   * and custom is not NULL, it will return the texture handle
-   * of the cursor.  Also returns whether the cursor flashes
+   * Show/hide the console. In 'hidden' state console should not display
+   * anything at all (when Draw() is called) or draw some minimal information
    */
-  virtual int GetCursorStyle(bool &flashing, iCursor **custom = NULL) const = 0;
+  virtual void SetVisible (bool iShow) = 0;
   /**
-   * Assign the cursor style, whether it flashes, and if custom,
-   * assign the iCursor object to use.
+   * Query whether the console is visible or hidden.
    */
-  virtual void SetCursorStyle(int style, bool flashing = true, iCursor *custom = NULL) = 0;
+  virtual bool GetVisible () = 0;
+
+  /**
+   * Enable or disable automatic console updates.
+   * When the console is in console auto-update mode, it automatically
+   * calls BeginDraw/Console->Draw methods on every PutText call.
+   * Otherwise it is your responsability to call Draw() at appropiate
+   * times. Initially this mode is enabled.
+   */
+  virtual void AutoUpdate (bool iAutoUpdate) = 0;
+
+  /// Set cursor horizontal position (-1 == follow output)
+  virtual void SetCursorPos (int iCharNo) = 0;
+
+  /// Query maximal line width in characters
+  virtual int GetMaxLineWidth () = 0;
+
+  /**
+   * Tell console that this object should be notified when console 
+   * visibility status changes.
+   */
+  virtual void RegisterPlugin (iPlugIn *iClient) = 0;
+
+  /**
+   * Implement simple extension commands.
+   */
+  virtual bool ConsoleExtension (const char *iCommand, ...) = 0;
 };
 
 #endif // ! __CS_ICONSOLE_H__

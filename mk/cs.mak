@@ -140,10 +140,9 @@ ifndef DO.DEP
       ifneq ($(MAKEDEP.INSTALLED),yes)
         dep: mkdep
       endif
-      DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) \
-        $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
-      DO.DEP1 = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) 
-      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
+      DO.DEP1 = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
+      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\) -r -c -f $@
+      DO.DEP = $(DO.DEP1) $(DO.DEP2)
     else
       DO.DEP = echo Building dependencies is not supported on this platform
     endif

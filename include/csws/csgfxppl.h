@@ -25,6 +25,7 @@
 #include "csengine/cspixmap.h"
 #include "igraph2d.h"
 
+class csMouse;
 struct iGraphics2D;
 struct iSystem;
 
@@ -69,8 +70,10 @@ private:
   /// Used to propagate changes to all pages
   /// The contents of dirty area on each page
   csImageArea *SyncArea [MAX_SYNC_PAGES];
-  /// The rectangle we should refresh for current page (incremental)
+  /// The rectangle we should refresh for current page
   csRect RefreshRect;
+  /// The rectangle that carries changes to previous pages
+  csRect PageCarry;
   /// Maximum video pages in system
   int MaxPage;
   /// Current video page
@@ -150,6 +153,10 @@ private:
   /// Get R,G,B at given screen location
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
+  /// Draw a (part) of texture (possibly scaled) in given screen rectangle
+  void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th);
+
   /// Change system mouse cursor and return success status
   bool SwitchMouseCursor (csMouseCursorID Shape);
 
@@ -171,10 +178,10 @@ private:
   { G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode); }
 
   /// Called at the start of every frame
-  void StartFrame (int iCurPage);
+  void StartFrame (csMouse *Mouse);
 
   /// Flush graphics pipeline
-  void FinishFrame ();
+  void FinishFrame (csMouse *Mouse);
 
   /// Begin painting: no-op if we're already in draw mode
   bool BeginDraw (int iMode)

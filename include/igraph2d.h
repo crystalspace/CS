@@ -295,11 +295,13 @@ struct iGraphics2D : public iPlugIn
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
 
  /**
-  * Perform a system specific exension.
-  * This is probably not the good way to do this but I see no other
-  * way currently.
+  * Perform a system specific exension.<p>
+  * The command is a string; any arguments may follow, use stdarg
+  * to extract them. There is no way to guarantee the uniquiness of
+  * commands, so please try to use descriptive command names rather
+  * than "a", "b" and so on...
   */
-  virtual bool PerformExtension (const char *args) = 0;
+  virtual bool PerformExtension (const char *iCommand, ...) = 0;
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot () = 0;

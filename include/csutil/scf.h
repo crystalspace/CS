@@ -235,7 +235,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 #define IMPLEMENT_FACTORY(Class)					\
 void *Create_##Class (iBase *iParent)					\
 {									\
-  void *ret = new Class (iParent);				\
+  void *ret = new Class (iParent);					\
   return ret;								\
 }
 

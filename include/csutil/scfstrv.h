@@ -26,17 +26,18 @@
 /// This class is a thin wrapper around csStrVector with SCF capability
 class scfStrVector : public iStrVector
 {
-  csStrVector *v;
+  csStrVector v;
 
 public:
   DECLARE_IBASE;
 
   /// Create a iStrVector from scratch
-  scfStrVector (int iLimit = 16, int iDelta = 16)
-  { CONSTRUCT_IBASE (NULL); v = new csStrVector (iLimit, iDelta); }
+  scfStrVector (int iLimit = 16, int iDelta = 16) : v (iLimit, iDelta)
+  { CONSTRUCT_IBASE (NULL); }
 
-  /// Destroy the iStrVector object
-  virtual ~scfStrVector ();
+  /// Destructor - nothing to do
+  virtual ~scfStrVector ()
+  { }
 
   /// Query array length
   virtual int Length () const;

@@ -20,66 +20,76 @@
 #ifndef __CSMOUSE_H__
 #define __CSMOUSE_H__
 
-#include "cscomp.h"
 #include "itexture.h"
-#include "csengine/cspixmap.h"
+#include "csutil/csvector.h"
+#include "csws/csgfxppl.h"
+
+class csMouse;
 
 /**
  * This class encapsulates mouse pointer
  */
-class csMousePointer : public csComponent
+class csMousePointer
 {
 private:
   friend class csMouse;
 
-  /// Cursor sprite
-  csPixmap *Cursor;
+  /// Cursor ID
+  int id;
   /// Texture X, Y, width, height, hotspot X and Y
   int tX, tY, tW, tH, hsX, hsY;
-  /// Area under mouse cursor
-  csImageArea *Under;
+  /// The application object
+  csApp *app;
+  /// The parent mouse object
+  csMouse *parent;
 
 public:
   /// Initializes mouse cursor
-  csMousePointer (csComponent *iParent, int ID, int x, int y,
-    int w, int h, int hsx, int hsy);
-
-  /// Destroy mouse cursor
-  virtual ~csMousePointer ();
+  csMousePointer (csApp *iApp, csMouse *iParent, int ID,
+    int x, int y, int w, int h, int hsx, int hsy);
 
   /// Draw mouse cursor, keeping first the background
-  void Draw (int x, int y);
-
-  /// Restore background under mouse cursor
-  void Undraw ();
-
-  /// Free buffer for saved image area covered by mouse pointer
-  void Free ();
-
-  /// Set mouse cursor texture
-  void SetTexture (iTextureHandle *tex);
+  void Draw (int x, int y, csImageArea *&Under);
 };
 
 /**
  * This class handles mouse pointer and generates mouse events.<p>
  * Usually there is only one object of this class in each csApp object.
  */
-class csMouse : public csComponent
+class csMouse
 {
 private:
-  int MouseX, MouseY;			// Mouse X and Y
-  int VirtualX, VirtualY;		// Virtual mouse position
-  int Visible;				// Visibility counter
-  bool invisible;			// "Invisible cursor" is selected
+  friend class csMousePointer;
+
+  /// Mouse X and Y
+  int MouseX, MouseY;
+  /// Virtual mouse position
+  int VirtualX, VirtualY;
+  /// Visibility counter
+  int Visible;
+  /// "Invisible cursor" is selected
+  bool invisible;
+  /// Application is focused
+  bool AppFocused;
+  /// Area under mouse cursor
+  csImageArea *Under [MAX_SYNC_PAGES];
+  /// The application object
+  csApp *app;
+  /// The array of pointers
+  DECLARE_TYPED_VECTOR (csPointerArray, csMousePointer) Pointers;
+  /// Current active mouse cursor (system cursor if NULL)
+  csMousePointer *ActiveCursor;
+  /// Cursor texture
+  iTextureHandle *Texture;
 
 public:
   ///
-  csMouse (csComponent *iParent);
+  csMouse (csApp *iApp);
   ///
-  virtual ~csMouse ();
+  ~csMouse ();
 
   /// Handle a event and return true if processed
-  virtual bool HandleEvent (csEvent &Event);
+  bool HandleEvent (csEvent &Event);
 
   /// Set mouse cursor position
   void Move (int x, int y);
@@ -110,11 +120,12 @@ public:
 
 private:
   friend class csApp;
+  friend class csGraphicsPipeline;
 
   /// Draw mouse pointer
-  virtual void Draw ();
+  void Draw (int Page);
   /// Undraw mouse pointer
-  virtual void Undraw ();
+  void Undraw (int Page);
 
   /// This function sets up mouse cursor images
   void NewPointer (char *id, char *posdef);

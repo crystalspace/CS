@@ -16,6 +16,7 @@
 # to those below into config.mak.
 PLUGINS += video/renderer video/canvas
 PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS += simpcon
 PLUGINS += cscon 
 PLUGINS += csclear 
 PLUGINS += dungeon 

@@ -17,6 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
 */
 
+#ifndef __IDUNGEON_H__
+#define __IDUNGEON_H__
+
 #include "csutil/scf.h"
 #include "iplugin.h"
 
@@ -99,3 +102,5 @@ public:
   /// get a pointer to the statistics info
   virtual dnStats *GetStatistics()=0;
 };
+
+#endif // __IDUNGEON_H__

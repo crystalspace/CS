@@ -63,8 +63,6 @@ protected:
   static bool do_addtowindowlist (csComponent *child, void *param);
 };
 
-class cswsSystemDriver;
-
 /**
  * Message box style flags (used in csMessageBox (...) as last parameter)<p>
  * These style flags can be combined using logical OR (|) operation;
@@ -155,7 +153,7 @@ extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, fl
 extern void RectUnion (csObjVector &rect, csRect &result);
 
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays
-extern void FindCFGBitmap (cswsSystemDriver *System, csStrVector &sv, char *id,
+extern void FindCFGBitmap (iSystem *System, csStrVector &sv, char *id,
   int *x, int *y, int *w, int *h);
 
 /// Convert HLS to RGB

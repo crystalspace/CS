@@ -119,19 +119,9 @@ enum
 enum
 {
   /**
-   * Broadcasted before csApp::Process () begins to process current messages
-   * in application message queue.
-   */
-  cscmdPreProcess = 0x100,
-  /**
-   * Broadcasted after csApp::Process () finished to process messages
-   * in application message queue.
-   */
-  cscmdPostProcess,
-  /**
    * This event is broadcasted to refresh invalidated components.
    */
-  cscmdRedraw,
+  cscmdRedraw = 0x100,
   /**
    * Query a control if it would like to be the default control in a dialog.<p>
    * The control is 'default' if it has a 'default' attribute (this is
@@ -152,11 +142,6 @@ enum
    * </pre>
    */
   cscmdActivate,
-  /**
-   * This broadcast message is posted after system palette has been changed.
-   * If class has looked up any colors in palette, it should redo it.
-   */
-  cscmdPaletteChanged,
   /**
    * The "hide window" command
    */

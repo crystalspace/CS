@@ -42,6 +42,14 @@ void _chdrive (char drive)
 #  include <unistd.h>
 #  undef SYSDEF_GETCWD
 #  undef SYSDEF_ACCESS
+static inline char *djgpp_getcwd (char *buf, size_t size)
+{
+  char *out = getcwd (buf, size);
+  for (int i = 0; out [i]; i++)
+    if (out [i] == '/') out [i] = '\\';
+  return out;
+}
+#  define getcwd djgpp_getcwd
 #endif
 
 #if defined (SYSDEF_DIR)

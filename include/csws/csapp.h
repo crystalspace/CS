@@ -27,8 +27,8 @@
 #include "csgfxppl.h"
 #include "cssys/cseventq.h"
 #include "csutil/csstrvec.h"
-
-class cswsSystemDriver;
+#include "iplugin.h"
+#include "ievent.h"
 
 /**
  * Application's background styles
@@ -42,16 +42,20 @@ enum csAppBackgroundStyle
 };
 
 /**
- * This class is a top-level CrystalSpace Windowing Toolkit object.<p>
+ * This class is a top-level CrystalSpace Windowing Toolkit object.
+ *<p>
  * Generally there should be only one object of this class.
  * Usually it is the root of entire window hierarchy.
  * This class also owns the application-global mouse object,
  * event queue object, graphics pipeline and some others.
+ *<p>
+ * The Crystal Space application is a regular plugin from the
+ * system driver's point of view.
  */
 class csApp : public csComponent
 {
 protected:
-  friend class cswsSystemDriver;
+  friend class csMouse;
 
   /// The graphics pipeline
   csGraphicsPipeline *GfxPpl;
@@ -71,16 +75,36 @@ protected:
   int DismissCode;
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
   int PhysColorShift;
-  /// Current time (passed by systemdriver to StartFrame())
+  /// The time at the start of current frame
   time_t CurrentTime;
+  /// The system event outlet
+  iEventOutlet *EventOutlet;
+  /// Are we inbetween StartFrame() and FinishFrame()?
+  bool InFrame;
 
-  /// Set up initial application layout (read configs, create windows, menus etc)
-  virtual bool InitialSetup (int argc, const char* const argv[],
-    const char *iConfigName, const char* iDataDir);
+  /// The iPlugIn interface
+  class csAppPlugIn : public iPlugIn
+  {
+    DECLARE_IBASE;
+    /// The parent application
+    csApp *app;
+
+    /// Initialize
+    csAppPlugIn (csApp *iParent);
+
+    /// Initialize the application plugin (called by system driver)
+    virtual bool Initialize (iSystem *System);
+
+    /// Handle a event and return true if processed; called by system driver
+    virtual bool HandleEvent (csEvent &Event);
+  } scfiPlugIn;
+  friend class csAppPlugIn;
 
 public:
   /// The system driver
-  cswsSystemDriver *System;
+  iSystem *System;
+  /// The virtual file system
+  iVFS *VFS;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse
@@ -104,9 +128,28 @@ public:
   bool insert;
 
   /// Initialize windowing system
-  csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle = csabsSolid);
+  csApp (iSystem *SysDriver);
   /// Deinitialize windowing system
   virtual ~csApp ();
+
+  /// Set up application layout (read configs, create windows, menus etc)
+  virtual bool InitialSetup ();
+
+  /// This is called once per frame by HandleEvent ()
+  virtual void StartFrame ();
+  /// This is called at the end of every frame
+  virtual void FinishFrame ();
+
+  /// Process all events in the queue and refresh the screen
+  void FlushEvents ();
+
+  /// Create a new event object: NEVER create event objects with `new'
+  csEvent *CreateEvent ()
+  { return EventOutlet->CreateEvent (); }
+
+  /// Add a previously created event to event queue
+  void PutEvent (csEvent *Event)
+  { EventOutlet->PutEvent (Event); }
 
   /// Shut down the program
   void ShutDown ();
@@ -117,16 +160,8 @@ public:
   /// Draw the application background
   virtual void Draw ();
 
-  /// This should be called once per frame by system driver
-  virtual void StartFrame (time_t ElapsedTime, time_t CurrentTime);
-  /// This is called at the end of each frame
-  virtual void FinishFrame ();
-
-  /// Process all events in event queue
-  virtual bool ProcessEvents ();
-
-  /// Process all events in the queue and refresh the screen
-  void FlushEvents ();
+  /// Set application background style
+  void SetBackgroundStyle (csAppBackgroundStyle iBackgroundStyle);
 
   /// Display a string on the console using almost usual printf() syntax
   void printf (int mode, char* str, ...);
@@ -137,9 +172,6 @@ public:
 
   /// Prepare textures for usage (register them with the graphics driver)
   virtual void PrepareTextures ();
-
-  /// Start endless event loop
-  virtual void Loop ();
 
   /// Return application's texture list
   csWSTexVector *GetTextures ()
@@ -160,15 +192,6 @@ public:
 
   /// Query mouse cursor pointer
   csMouseCursorID GetMouseCursor () { return MouseCursorID; }
-
-  /// Add a event to event queue
-  void PutEvent (csEvent *Event);
-
-  /// Handle a event and return true if processed
-  virtual bool HandleEvent (csEvent &Event);
-
-  /// Return active page number
-  int GetPage ();
 
   /// Capture all mouse events (or disable capture if NULL)
   csComponent *CaptureMouse (csComponent *who)
@@ -210,6 +233,9 @@ public:
 
   /// Handle a event before all others
   virtual bool PreHandleEvent (csEvent &Event);
+
+  /// Send event to all childs and return processed status
+  virtual bool HandleEvent (csEvent &Event);
 
   /// Handle a event if nobody eaten it.
   virtual bool PostHandleEvent (csEvent &Event);
@@ -292,6 +318,11 @@ public:
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
   { GfxPpl->GetPixel (x, y, oR, oG, oB); }
 
+  /// Draw a (part) of texture (possibly scaled) in given screen rectangle
+  void pplDrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+    int tx, int ty, int tw, int th)
+  { GfxPpl->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); }
+
   //--- 3D drawing ---//
 
   /// Draw a 3D polygon
@@ -329,6 +360,20 @@ public:
    */
   void pplDontCacheFrame ()
   { GfxPpl->DontCacheFrame = true; }
+
+  /**
+   * Get the pointer to 2D graphics driver for direct manipulations.
+   * WARNING! Don't abuse of this function!
+   */
+  iGraphics2D *GetG2D ()
+  { return GfxPpl->G2D; }
+
+  /**
+   * Get the pointer to 2D graphics driver for direct manipulations.
+   * WARNING! Don't abuse of this function!
+   */
+  iGraphics3D *GetG3D ()
+  { return GfxPpl->G3D; }
 
 protected:
   /// Initialize configuration data: load csws.cfg

@@ -24,47 +24,41 @@
 #include "csutil/scf.h"
 
 struct iConsole;
-class csString;
+typedef void (*csConsoleExecCallback) (void *, const char *);
 
-SCF_VERSION(iConsoleInput, 0, 0, 1);
+SCF_VERSION (iConsoleInput, 0, 0, 1);
 
 /**
- * @@@ Please document me using Doc++!
+ * This is a plugin that can handle keyboard input and display
+ * it on an associated console. The plugin has a command history
+ * and when user presses <Enter> can call some callback function
+ * to execute the entered command.
  */
 struct iConsoleInput : public iPlugIn
 {
-  /// Initialize the plugin, and return success status
-  virtual bool Initialize(iSystem *iSys) = 0;
+  /// Bind to a console
+  virtual void Bind (iConsole *iCon) = 0;
 
-  /// Handle a keyboard event
-  virtual bool HandleEvent(csEvent &Event) = 0;
+  /// Set the command execution callback
+  virtual void ExecuteCallback (csConsoleExecCallback iCallback, void *iCallbackData) = 0;
 
   /// Return a line from the input buffer (-1 = current line)
-  virtual const csString *GetInput(int line = -1) const = 0;
+  virtual const char *GetText (int iLine = -1) const = 0;
 
   /// Return the current input line number
-  virtual int GetCurLine() const = 0;
-
-  /// Save the current line in history and create a new input line
-  virtual void NewLine() = 0;
+  virtual int GetCurLine () const = 0;
 
   /// Retrieve the size of the history buffer
-  virtual int GetBufferSize() const = 0;
+  virtual int GetBufferSize () const = 0;
 
   /// Set the size of the history buffer;
-  virtual void SetBufferSize(int size) = 0;
+  virtual void SetBufferSize (int iSize) = 0;
 
   /// Clear the history buffer
-  virtual void Clear() = 0;
+  virtual void Clear () = 0;
 
-  /// Returns true if the input is being echoed to a console
-  virtual bool GetEcho() const = 0;
-
-  /** Set console echo and optionally, the target console
-   * The console is queried from the system if NULL.
-   */
-  virtual void SetEcho(bool echo, iConsole *console = NULL) = 0;
-
+  /// Set the prompt string
+  virtual void SetPrompt (const char *iPrompt) = 0;
 };
 
 #endif // ! __CS_ICONSOLEINPUT_H__

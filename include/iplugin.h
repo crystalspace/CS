@@ -46,11 +46,8 @@ struct iPlugIn : public iBase
    * and want the event to not be passed further for processing by
    * other plugins.
    */
-  virtual bool HandleEvent (csEvent& /*Event*/)
+  virtual bool HandleEvent (csEvent &/*Event*/)
   { return false; }
-  /// Called before forced suspend / after resuming suspend
-  virtual void SuspendResume (bool /*iSuspend*/)
-  { }
 };
 
 #endif // __IPLUGIN_H__

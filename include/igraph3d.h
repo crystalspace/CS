@@ -182,16 +182,16 @@ struct G3DPolygonDP : public G3DPolygonDFP
 typedef G3DPolygonDP G3DPolygonDPF;
 
 /**
- * Don't test/write, write, test, and write/test, respectively.
- * The values below are sometimes used as bit masks, so don't change them!
+ * Don't test/write, write, test, write/test and only write to Z-buffer
+ * respectively. The values below are sometimes used as bit masks, so don't change them!
  */
 enum csZBufMode
 {
-  CS_ZBUF_NONE = 0,
-  CS_ZBUF_FILL = 1,
-  CS_ZBUF_TEST = 2,
-  CS_ZBUF_USE  = 3,
-  CS_ZBUF_FILLONLY = 4
+  CS_ZBUF_NONE     = 0x00000000,
+  CS_ZBUF_FILL     = 0x00000001,
+  CS_ZBUF_TEST     = 0x00000002,
+  CS_ZBUF_USE      = 0x00000003,
+  CS_ZBUF_FILLONLY = 0x00000004
 };
 
 ///

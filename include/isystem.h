@@ -95,7 +95,7 @@
 #define CS_FUNCID_PROTOCOL      "Protocol"
 /// Authentation Plugin
 #define CS_FUNCID_AUTH          "Auth"
-/// Network Cmd Manager layer 
+/// Network Cmd Manager layer
 #define CS_FUNCID_CMDMGR        "CmdManager"
 /// Console
 #define CS_FUNCID_CONSOLE	"Console"
@@ -135,8 +135,11 @@
 
 struct iPlugIn;
 struct iVFS;
+struct iEventOutlet;
+struct iEventPlug;
+struct iStrVector;
 
-SCF_VERSION (iSystem, 2, 0, 0);
+SCF_VERSION (iSystem, 3, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -153,25 +156,88 @@ SCF_VERSION (iSystem, 2, 0, 0);
  */
 struct iSystem : public iBase
 {
-  /// Returns the configuration.
+  //---------------------------- Initialization ------------------------------//
+
+  /**
+   * Initialize the system. Sort all plugins with respect to their
+   * dependencies. Then load all plugins and initialize them.
+   */
+  virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName) = 0;
+
+  /**
+   * Open the graphics context (with optional title on titlebar),
+   * mouse and keyboard.
+   */
+  virtual bool Open (const char *Title) = 0;
+  /// Close the system
+  virtual void Close () = 0;
+
+  /**
+   * System loop.
+   * This function returns only when an cscmdQuit or an cscmdQuitLoop
+   * broadcast is encountered.
+   */
+  virtual void Loop () = 0;
+
+  /**
+   * The ::Loop method calls this method once per frame.
+   * This method can be called manually as well if you don't use the
+   * Loop method.
+   */
+  virtual void NextFrame () = 0;
+
+  //------------------------------ Miscelaneous ------------------------------//
+
+  /// Returns the basic configuration parameters.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
+  /// Get the time in milliseconds.
+  virtual time_t GetTime () = 0;
+  /// Print a string to the specified device.
+  virtual void Printf (int mode, const char *format, ...) = 0;
+
+  /**
+   * Execute a system-dependent extension.<p>
+   * Sometimes we need just one extra function in system-dependent system
+   * driver, which is called, say, from canvas driver (such as EnablePrintf
+   * in DJGPP port of CS). In such cases it doesn't have much sense to create
+   * a new SCF interface and so on, better just override this function and
+   * use it ...
+   */
+  virtual bool SystemExtension (const char *iCommand, ...) = 0;
+
+  /**
+   * Query the time elapsed between previous call to NextFrame and last
+   * call to NextFrame. Also returns the absolute time of the last call
+   * to NextFrame. The time is updated once at the beginning of every
+   * NextFrame, thus you may call this function as much as you wish.
+   */
+  virtual void GetElapsedTime (time_t &oElapsedTime, time_t &oCurrentTime) = 0;
+
+  /**
+   * This function will freeze your application for given number of 1/1000
+   * seconds. The function is very inaccurate, so don't use it for accurate
+   * timing. It may be useful when the application is idle, to explicitly
+   * release CPU for other tasks in multi-tasking operating systems.
+   */
+  virtual void Sleep (int iSleepTime) = 0;
+
+  //---------------------------- Plug-in manager -----------------------------//
+
   /// Load a plugin and initialize it
   virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
-    const char *iInterface, int iVersion) = 0;
+    const char *iInterface = NULL, int iVersion = 0) = 0;
   /// Get first of the loaded plugins that supports given interface ID
   virtual iBase *QueryPlugIn (const char *iInterface, int iVersion) = 0;
   /// Find a plugin given his functionality ID
   virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
-  /// Print a string to the specified device.
-  virtual void Printf (int mode, const char *format, ...) = 0;
-  /// Get the time in milliseconds.
-  virtual time_t GetTime () = 0;
-  /// Quit the system.
-  virtual void StartShutdown () = 0;
-  /// Check if system is shutting down
-  virtual bool GetShutdown () = 0;
+  /// Register a object that implements the iPlugIn interface as a plugin
+  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
+    iPlugIn *iObject) = 0;
+
+  //--------------------- System configuration file access -------------------//
+
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0) = 0;
   /// Get a string configuration value
@@ -186,30 +252,52 @@ struct iSystem : public iBase
   virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value) = 0;
   /// Set an float configuration value
   virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value) = 0;
+  /// Query whenever a config section exists
+  virtual bool ConfigSectionExists (const char *Section) = 0;
+  /// Enumerate all keys in a section
+  virtual bool ConfigEnumData (const char *Section, iStrVector *KeyList) = 0;
   /// Save system configuration file
   virtual bool ConfigSave () = 0;
-  /// Put a keyboard event into event queue 
-  virtual void QueueKeyEvent (int iKeyCode, bool iDown) = 0;
-  /// Put an extended keyboard event into event queue 
-  virtual void QueueExtendedKeyEvent (int iKeyCode, int iKeyCodeTranslated, bool iDown) = 0;
-  /// Put a mouse event into event queue 
-  virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y) = 0;
-  /// Put a joystick event into event queue
-  virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y) = 0;
-  /// Put a focus event into event queue 
-  virtual void QueueFocusEvent (bool Enable) = 0;
-  /// Put a native window resizing event into queue
-  virtual void QueueContextResizeEvent (void *info) = 0;
-  /// Put a native window closure event into queue.
-  virtual void QueueContextCloseEvent (void *info) = 0;
+
+  //------------------------------ Event manager -----------------------------//
+
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask) = 0;
   /// Query current state for given key
   virtual bool GetKeyState (int key) = 0;
-  /// Query current state for given mouse button (0..9)
+  /// Query current state for given mouse button (1..CS_MAX_MOUSE_BUTTONS)
   virtual bool GetMouseButton (int button) = 0;
   /// Query current (last known) mouse position
   virtual void GetMousePosition (int &x, int &y) = 0;
+  /// Query current state for given joystick button (1..CS_MAX_JOYSTICK_BUTTONS)
+  virtual bool GetJoystickButton (int number, int button) = 0;
+  /// Query last known joystick position
+  virtual void GetJoystickPosition (int number, int &x, int &y) = 0;
+
+  /**
+   * Register an event plug and return a new outlet.<p>
+   * Any plugin which generates events should consider using this interface
+   * for doing it. The plugin should implement the iEventPlug interface,
+   * then register that interface with the system driver. You will get an
+   * iEventOutlet object which you should use to put any events into the
+   * system event queue.
+   */
+  virtual iEventOutlet *CreateEventOutlet (iEventPlug *iObject) = 0;
+
+  /**
+   * Get a public event outlet for posting just a single event and such.
+   *<p>
+   * In general it is not advisory to post events through this public outlet;
+   * instead it is advised you to create your own private outlet (through
+   * CreateEventOutlet) and register as a normal event plug. However, there are
+   * cases when you just need to post one event from time to time; in these
+   * cases it is easier to post it without the bulk of creating your own
+   * iEventPlug interface.
+   */
+  virtual iEventOutlet *GetSystemEventOutlet () = 0;
+
+  //--------------------------- Command-line access --------------------------//
+
   /// Query a specific commandline option (you can query second etc such option)
   virtual const char *GetOptionCL (const char *iName, int iIndex = 0) = 0;
   /// Query a filename specified on the commandline (that is, without leading '-')
@@ -222,13 +310,6 @@ struct iSystem : public iBase
   virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0) = 0;
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0) = 0;
-  /// A shortcut for requesting to load a plugin (before Initialize())
-  inline void RequestPlugin (const char *iPluginName)
-  { AddOptionCL ("plugin", iPluginName); }
-  /// Called before forced suspend / after resuming suspend
-  virtual void SuspendResume (bool iSuspend) = 0;
-  /// Toggle console text output (for consoles that share text/graphics mode)
-  virtual void EnablePrintf (bool iEnable) = 0;
 };
 
 #endif // __CS_ISYSTEM_H__

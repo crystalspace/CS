@@ -727,6 +727,8 @@ void mdbFinish ()
       c = &mdbChain [i];
       if (c->free && memchk (c->mem, c->size, mdbFlags & MDF_CHECKBOUNDS))
       {
+        if (mdbFlags & MDF_DEBUGBREAK)
+          DEBUG_BREAK;
         output ("MEMDBG: Memory has been overwritten after being freed! Details:\n");
         output ("size:%8lu allocated at %s\n", c->size, mdbLocation (c->alloc_addr));
       }

@@ -78,6 +78,10 @@ class csDialog;
 class csWindow;
 class csApp;
 
+struct iVFS;
+struct iGraphics2D;
+struct iGraphics3D;
+
 // CrystalSpace headers
 #include "cswsaux.h"
 
