@@ -55,6 +55,7 @@ public:
 	const ctMatrix3 &get_I(){ return I; }
 	const ctMatrix3 &get_I_inv(){ return I_inv; }
 
+/*  
   ctMatrix3 get_I_inv_world(){ 
     const ctMatrix3 &R = RF.get_R();
     ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose()); 
@@ -66,9 +67,28 @@ public:
     ctMatrix3 I_world = R * I * (R.get_transpose()); 
     return I_world;
   }
+*/
+
+  ctMatrix3 get_I_inv_world(){ 
+    const ctMatrix3 &R = RF.get_R();
+    ctMatrix3 I_inv_world;
+    R.similarity_transform( I_inv_world, I_inv );
+    return I_inv_world;
+  }
+
+  ctMatrix3 get_I_world(){ 
+    const ctMatrix3 &R = RF.get_R();
+    ctMatrix3 I_world;
+    R.similarity_transform( I_world, I_inv );
+    return I_world;
+  }
 
   virtual ctMatrix3 get_impulse_I_inv(){ 
-    return get_I_inv_world();
+//    return get_I_inv_world();
+    const ctMatrix3 &R = RF.get_R();
+    ctMatrix3 Mret;
+    R.similarity_transform( Mret, I_inv );
+    return Mret;
   }
 
 	ctVector3 get_angular_P(){ return L; }
