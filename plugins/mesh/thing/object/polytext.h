@@ -380,17 +380,19 @@ public:
   }
 
   /// Check if dynamic lighting information should be recalculated
-  virtual bool DynamicLightsDirty ();
+  bool DynamicLightsDirty ();
   /**
    * Recalculate all pseudo and real dynamic lights if the
    * texture is dirty. The function returns true if there
    * was a recalculation (then the texture needs to be removed
    * from the texture cache).
    */
-  virtual bool RecalculateDynamicLights ();
+  bool RecalculateDynamicLights ();
 
+  /// None-virtual version of GetLightMap().
+  csLightMap *GetLightMapFast () { return lm; }
   ///
-  virtual iLightMap *GetLightMap ();
+  virtual iLightMap *GetLightMap () { return lm; }
   /// Query the size of one light cell
   virtual int GetLightCellSize ();
   /// Query log2 (cell size)

@@ -394,7 +394,7 @@ struct csPolyLightMapMapping
   int GetOriginalWidth () const { return w_orig; }
 };
 
-SCF_VERSION (iPolygonTexture, 1, 2, 0);
+SCF_VERSION (iPolygonTexture, 1, 3, 0);
 
 /**
  * This is a interface to an object responsible for containing
@@ -408,16 +408,6 @@ struct iPolygonTexture : public iBase
   virtual csPolyTextureMapping* GetTMapping () const = 0;
   /// Get the mapping to use for this lightmap.
   virtual csPolyLightMapMapping* GetLMapping () const = 0;
-
-  /// Check if dynamic lighting information should be recalculated
-  virtual bool DynamicLightsDirty () = 0;
-  /**
-   * Recalculate all pseudo and real dynamic lights if the
-   * texture is dirty. The function returns true if there
-   * was a recalculation (then the texture needs to be removed
-   * from the texture cache).
-   */
-  virtual bool RecalculateDynamicLights () = 0;
 
   /// Get light map.
   virtual iLightMap *GetLightMap () = 0;

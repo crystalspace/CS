@@ -739,6 +739,11 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   }
 }
 
+csRGBpixel *csLightMap::GetMapDataFast ()
+{
+  return GetRealMap ().GetArray ();
+}
+
 csRGBpixel *csLightMap::GetMapData ()
 {
   return GetRealMap ().GetArray ();

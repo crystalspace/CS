@@ -297,9 +297,6 @@ void csTextureCacheSoftware::fill_texture (int MipMap, /*iPolygonTexture* pt,*/
 					   float u_min, float v_min, 
 					   float u_max, float v_max)
 {
-  // Recalculate the lightmaps
-  //pt->RecalculateDynamicLights ();
-
   // Now cache the texture
   SoftwareCachedTexture *cached_texture = cache_texture (MipMap, mapping, 
     tmapping, rlm, tex_mm);

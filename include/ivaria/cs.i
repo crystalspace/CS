@@ -392,8 +392,6 @@ struct iPolygonTexture : public iBase
 //void GetTextureBox (float& fMinU, float& fMinV,
 //  float& fMaxU, float& fMaxV);
 //int GetOriginalWidth ();
-  bool DynamicLightsDirty ();
-  bool RecalculateDynamicLights ();
   iLightMap *GetLightMap ();
   int GetLightCellSize ();
   int GetLightCellShift ();

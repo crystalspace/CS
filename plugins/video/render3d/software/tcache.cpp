@@ -290,7 +290,7 @@ void csSoftwareTextureCache::fill_texture (int MipMap, iPolygonTexture* pt,
     float v_max)
 {
   // Recalculate the lightmaps
-  pt->RecalculateDynamicLights ();
+  //@@@ This is now done by csThing! pt->RecalculateDynamicLights ();
 
   // Now cache the texture
   SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);

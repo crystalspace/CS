@@ -2495,7 +2495,7 @@ void csThing::UpdateDirtyLMs ()
       if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights ())	
       {
 	litPolys[i]->lightmaps[j]->SetData (
-	  lmi->GetLightMap ()->GetMapData ());
+	  lmi->GetLightMapFast ()->GetMapDataFast ());
       }
     }
   }

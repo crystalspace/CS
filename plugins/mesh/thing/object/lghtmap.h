@@ -222,6 +222,9 @@ public:
    */
   void CalcMeanLighting ();
 
+  /// Fast none-virtual version of GetMapData().
+  csRGBpixel *GetMapDataFast ();
+
   //------------------------ iLightMap implementation ------------------------
   SCF_DECLARE_IBASE;
   ///

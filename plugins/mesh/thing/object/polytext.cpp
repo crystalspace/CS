@@ -934,11 +934,6 @@ bool csPolyTexture::DynamicLightsDirty ()
   return polygon->GetParent ()->GetLightVersion () != light_version;
 }
 
-iLightMap *csPolyTexture::GetLightMap ()
-{
-  return lm;
-}
-
 int csPolyTexture::GetLightCellSize ()
 {
   return csLightMap::lightcell_size;

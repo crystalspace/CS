@@ -51,6 +51,14 @@ chronological order.
 	      ("attribute 3" vs "color") in shaders more safe. Note that
 	      since some attribute aliasing properties are undefined in 
 	      the extension specification, shaders should preferably not mix.
+	- Jorrit removed iPolygonTexture::RecalculateDynamicLights() and
+	  DynamicLightsDirty(). They no longer need to be public as the
+	  renderers no longer call them (thing calls this). This also means
+	  the functions no longer have to be virtual and this is an
+	  optimization.
+	- Jorrit also avoided a few other virtual calls in csThing itself
+	  by adding special none-virtual versions of normally virtual calls
+	  (i.e. GetLightMapFast()).
 	- Oktal added an overloaded SetLength() to csPDelArray which copies
 	  the pointed-to object, not the pointer itsself, then converted all
 	  csArray<csShaderVariable> instances in the new renderer shader

@@ -1221,7 +1221,7 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 void csPolygon3D::StaticLightDisconnect (iStatLight* statlight)
 {
   if (!txt_info) return;
-  csLightMap* lm = (csLightMap*)(txt_info->GetLightMap ());
+  csLightMap* lm = txt_info->GetLightMapFast ();
   if (!lm) return;
   csShadowMap* sm = lm->FindShadowMap (statlight->QueryLight ());
   if (!sm) return;
