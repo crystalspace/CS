@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	  cases.
 	- Fixed flarge so that the door now uses zuse. This is now possible
 	  due to the fix above.
+	- Matze fixed csgfx which was making the wrong assumption that
+	  uint32 is always unsigned long.
 25-Mar-2003
 	- Changed API of OpenPortal() to accept a G3DPolygonDFP instead
 	  of a 2D polygon. I need z-information.
