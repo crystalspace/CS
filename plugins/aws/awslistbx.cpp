@@ -124,6 +124,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   char buf[64];
   int i;
   int sb_h, sb_w;
+  int border=3;
 
   if (!awsComponent::Setup(_wmgr, settings)) return false;
 
@@ -150,6 +151,16 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   pm->GetString(settings, "Background", tn1);
   pm->GetString(settings, "Highlight", tn2);
+
+  switch (frame_style)
+  {
+  case fsBump:
+    border=5;
+    break;
+  case fsSimple:
+    border=1;
+    break;
+  }
 
   rows.SetSortCol(sortcol);
 
@@ -194,7 +205,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   sbinfo.Initialize(new scfString("vertscroll"), new scfString("Scroll Bar"));
 
   sbinfo.AddRectKey(new scfString("Frame"), 
-                    csRect(Frame().Width()-sb_w, 0,Frame().Width(), Frame().Height()));
+                    csRect(Frame().Width()-sb_w-1, border, Frame().Width()-1, Frame().Height()-1));
 
   sbinfo.AddIntKey(new scfString("Style"), awsScrollBar::fsVertical);
 

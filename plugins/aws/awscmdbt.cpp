@@ -128,6 +128,21 @@ awsCmdButton::SetProperty(char *name, void *parm)
     
     return true;
   }
+  else if (strcmp("Image", name)==0)
+  {
+    iTextureHandle *img = (iTextureHandle *)(parm);
+    
+    if (img)
+    {
+      if (tex[1]) tex[1]->DecRef();
+      tex[1]=img;
+      img->IncRef();
+      Invalidate();
+    }
+    
+    return true;
+  }
+
   
   return false;
 }
@@ -231,7 +246,19 @@ awsCmdButton::OnDraw(csRect clip)
                        Frame().xmin-Window()->Frame().xmin, 
                        Frame().ymin-Window()->Frame().ymin, 
                        Frame().Width()+1, Frame().Height()+1, alpha_level);
-              
+
+    if (tex[1])
+    {
+      int img_w, img_h;
+
+      tex[1]->GetOriginalDimensions(img_w, img_h);
+
+      g3d->DrawPixmap(tex[1], 
+                      Frame().xmin+is_down, Frame().ymin+is_down, 
+                      Frame().Width(), Frame().Height(),
+                      0, 0, img_w, img_h, 0);
+    }
+
     // Draw the caption, if there is one and the style permits it.
     if (caption && frame_style==fsNormal)
     {     

@@ -148,6 +148,8 @@ public:
   /// Triggered when the keyboard focus is gained
   virtual bool OnGainFocus();
 
+  /// Adds in the inc and dec buttons appropriately
+  virtual void OnAdded();
 };
 
 class awsScrollBarFactory : public awsComponentFactory

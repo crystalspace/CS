@@ -12,6 +12,7 @@ public:
   static const int fsSimple;
   static const int fsRaised;
   static const int fsSunken;
+  static const int fsFlat;
 
 public:
   /// Creates a frame drawer

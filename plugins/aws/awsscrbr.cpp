@@ -84,18 +84,18 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
       // Abort if the images are not found
       if (!incimg || !decimg)
         return false;
-
+     
       int img_w, img_h;
 
       incimg->GetOriginalDimensions(img_w, img_h);
 
       decinfo.AddRectKey(new scfString("Frame"), 
-                         csRect(Frame().xmin, Frame().ymin,
-                                Frame().xmax, Frame().ymin+img_h+5));
+                         csRect(3, 0,
+                                Frame().Width()-1, img_h));
 
       incinfo.AddRectKey(new scfString("Frame"), 
-                         csRect(Frame().xmin, Frame().ymax-img_h-5,
-                                Frame().xmax, Frame().ymax));
+                         csRect(3, Frame().Height()-img_h,
+                                Frame().Width()-1, Frame().Height()));
     } break;
 
 
@@ -123,9 +123,18 @@ awsScrollBar::Setup(iAws *_wmgr, awsComponentNode *settings)
     } break;
   } // end switch framestyle
 
+  decVal->SetWindow(Window());
+  incVal->SetWindow(Window());
+
+  decVal->SetParent(this);
+  incVal->SetParent(this);
+
   decVal->Setup(_wmgr, decinfo.GetThisNode());
   incVal->Setup(_wmgr, incinfo.GetThisNode());
 
+  decVal->SetProperty("Image", decimg);
+  incVal->SetProperty("Image", incimg);
+ 
   sink = new awsSink(this);
 
   sink->RegisterTrigger("DecValue", &DecClicked);
@@ -190,33 +199,24 @@ awsScrollBar::OnDraw(csRect clip)
 {
   aws3DFrame frame3d;
 
-  frame3d.Draw(WindowManager(), Window(), Frame(), 3, tex, alpha_level);
+  frame3d.Draw(WindowManager(), Window(), Frame(), aws3DFrame::fsFlat, tex, alpha_level);
 }
 
 bool 
 awsScrollBar::OnMouseDown(int button , int x , int y)
 { 
-  if (!incVal->OnMouseDown(button,x,y))
-    return decVal->OnMouseDown(button,x,y);
-  
   return false;
 }
 
 bool 
 awsScrollBar::OnMouseUp(int button, int x, int y)
 {
-  if (!incVal->OnMouseUp(button,x,y))
-    return decVal->OnMouseUp(button,x,y);
-
   return false;
 }
 
 bool
 awsScrollBar::OnMouseMove(int button, int x, int y)
 { 
-  if (!incVal->OnMouseMove(button,x,y))
-    return decVal->OnMouseMove(button,x,y);
-
   return false;
 }
 
@@ -268,6 +268,13 @@ bool
 awsScrollBar::OnGainFocus()
 {
   return false;
+}
+
+void
+awsScrollBar::OnAdded()
+{
+  AddChild(incVal);
+  AddChild(decVal);
 }
 
 /************************************* Command Button Factory ****************/
