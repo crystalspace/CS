@@ -298,6 +298,9 @@ bool Simple::Initialize ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
+
+  ProcTexture->PrepareAnim ();
+
   return true;
 }
 

@@ -485,7 +485,7 @@ void csTextureManagerSoftware::SetGamma (float iGamma)
   for (i = 0; i < 256; i++)
     GammaTable [i] = QRound (255 * pow (i / 255.0, inv_Gamma));
   // Remap all textures according to the new colormap.
-  if (truecolor)
+  if (truecolor && !main_txtmgr)	// Not for proc textures! @@@
     for (i = 0; i < textures.Length (); i++)
       ((csTextureHandleSoftware*)textures.Get (i))->remap_texture ();
   else if (textures.Length ())

@@ -56,10 +56,16 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   // create a procedural texture
   iImage *Image = new csImageMemory (256, 256);
   TexHandle = g3d->GetTextureManager ()->RegisterTexture (Image,
-    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS |
+    CS_TEXTURE_3D |/* CS_TEXTURE_NOMIPMAPS |*/
     CS_TEXTURE_PROC /*| CS_TEXTURE_PROC_ALONE_HINT*/);
   TexHandle->Prepare ();
   Image->DecRef ();
+
+  return true;
+}
+
+void csEngineProcTex::PrepareAnim ()
+{
   ptG3D = TexHandle->GetProcTextureInterface ();
 
   // set up a view for the engine
@@ -69,8 +75,6 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   View->GetCamera ()->SetSector (room);
   View->SetRectangle (0, 0, 256, 256);
   View->GetCamera ()->SetPerspectiveCenter (128, 128);
-
-  return true;
 }
 
 void csEngineProcTex::Update (csTicks CurrentTime)

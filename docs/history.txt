@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+30-Sep-2002
+	- Reverted a downscaling fix in OpenGL renderer for 2D images.
+	- Fixed simplept so it works again. Basically there was a problem
+	  with timing of asking for the 3D interface. Still doesn't work
+	  with OpenGL for some reason.
 28-Sep-2002
 	- Fixed a new bug with iSector->HitBeam() in octree based
 	  levels.
