@@ -166,7 +166,7 @@ public:
   inline friend bool operator< (const csVector3& v, float f)
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
-  /// Test if each component of a vector is greater than a small epsilon value.
+  /// Test if each component of a vector is less than a small epsilon value.
   inline friend bool operator> (float f, const csVector3& v)
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f; }
 
