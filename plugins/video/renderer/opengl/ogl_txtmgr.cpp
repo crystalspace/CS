@@ -1129,9 +1129,8 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
   // @@@ hmm... or just return an empty image?
   if (texHandle == (GLuint)~0) return 0;
 
-  int tw, th;
-  csGraphics3DOGLCommon::statecache->SetTexture (
-    GL_TEXTURE_2D, texHandle);
+  GLint tw, th;
+  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
 
   glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
   glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
@@ -1146,4 +1145,3 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
 
   return csPtr<iImage> (lmimg);
 }
-

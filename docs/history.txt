@@ -59,6 +59,8 @@ chronological order.
 	- Eric Sunshine elminated bogus `inline' from DEL2D_FUNC() macro in
 	  common/OSXDelegate2D.h, OSXDelegate2D_CGBlit.h, and
 	  OSXDelegate2D_OpenGL.h which prompted compilation warning.
+	- Eric Sunshine eliminated compilation warnings from old OpenGL
+	  renderer regarding invalid conversion from int* to GLint*.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with
