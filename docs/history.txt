@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could
 	  get random color effects in the new renderer.
+	- Jorrit fixed waterdemo.cfg which was depending on the font
+	  multiplexer for some reason.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
