@@ -6122,7 +6122,6 @@ class iThingFactoryState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iThingFactoryState instance at %s>" % (self.this,)
-    def GetPrivateObject(*args): return _cspace.iThingFactoryState_GetPrivateObject(*args)
     def CompressVertices(*args): return _cspace.iThingFactoryState_CompressVertices(*args)
     def GetPolygonCount(*args): return _cspace.iThingFactoryState_GetPolygonCount(*args)
     def RemovePolygon(*args): return _cspace.iThingFactoryState_RemovePolygon(*args)
@@ -6188,7 +6187,6 @@ class iThingState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iThingState instance at %s>" % (self.this,)
-    def GetPrivateObject(*args): return _cspace.iThingState_GetPrivateObject(*args)
     def GetFactory(*args): return _cspace.iThingState_GetFactory(*args)
     def GetVertexW(*args): return _cspace.iThingState_GetVertexW(*args)
     def GetVerticesW(*args): return _cspace.iThingState_GetVerticesW(*args)
