@@ -521,13 +521,13 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
   csPtr<iString> __add__ (const char *other)
   {
-    iString *result = new scfString (self);
+    iString *result = new scfString (* self);
     result->Append (other);
     return csPtr<iString> (result);
   }
   csPtr<iString> __concat__ (const char *other)
   {
-    iString *result = new scfString (self);
+    iString *result = new scfString (* self);
     result->Append (other);
     return csPtr<iString> (result);
   }
@@ -538,7 +538,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
   csPtr<iString> __concat__ (iString *other)
   {
-    iString *result = new scfString (self);
+    iString *result = new scfString (* self);
     result->Append (other);
     return csPtr<iString> (result);
   }
