@@ -896,9 +896,9 @@ void csPolygon3D::Finish ()
       csColor ambient;
       thing->thing_type->engine->GetAmbientLight (ambient);
       lm->Alloc (lmi->tex->w_orig, lmi->tex->h,
-      	ambient.red * 255.0f,
-      	ambient.green * 255.0f,
-      	ambient.blue * 255.0f);
+      	int(ambient.red * 255.0f),
+      	int(ambient.green * 255.0f),
+      	int(ambient.blue * 255.0f));
 
       if (!thing->thing_type->G3D->IsLightmapOK (lmi->GetPolyTex()))
       {

@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	    include/cssys/next
 	    libs/cssys/next
 	    plugins/video/canvas/next
+	- Eric Sunshine eliminated compilation warnings from the Thing plugin.
 20-Dec-2002
 	- Clarified a few Doxygen comments in the engine.
 	- Added iLightingInfo->StaticLightChanged() to notify a mesh

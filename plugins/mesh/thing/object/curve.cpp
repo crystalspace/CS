@@ -599,9 +599,9 @@ void csCurve::InitializeDefaultLighting ()
   LightMap->Alloc (
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
-      	ambient.red * 255.0f,
-      	ambient.green * 255.0f,
-      	ambient.blue * 255.0f);
+      	int(ambient.red * 255.0f),
+      	int(ambient.green * 255.0f),
+      	int(ambient.blue * 255.0f));
   LightmapUpToDate = false;
 }
 
@@ -616,9 +616,9 @@ bool csCurve::ReadFromCache (iFile* file)
   LightMap->Alloc (
       CURVE_LM_SIZE * csLightMap::lightcell_size,
       CURVE_LM_SIZE * csLightMap::lightcell_size,
-      	ambient.red * 255.0f,
-      	ambient.green * 255.0f,
-      	ambient.blue * 255.0f);
+      	int(ambient.red * 255.0f),
+	int(ambient.green * 255.0f),
+      	int(ambient.blue * 255.0f));
 
   LightMap->ReadFromCache (
       file,
