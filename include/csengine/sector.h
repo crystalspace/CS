@@ -19,10 +19,10 @@
 #ifndef SECTOR_H
 #define SECTOR_H
 
-#include "csengine/basic/csobjvec.h"
-#include "csengine/basic/polyset.h"
-#include "csgeom/math3d.h"
+#include "csengine/csobjvec.h"
+#include "csengine/polyset.h"
 #include "csengine/rview.h"
+#include "csgeom/math3d.h"
 
 struct LightInfo;
 class csThing;

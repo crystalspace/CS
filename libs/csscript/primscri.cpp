@@ -18,10 +18,10 @@
 
 #include "sysdef.h"
 #include "csengine/sysitf.h"
-#include "csengine/basic/cscoll.h"
-#include "csengine/objects/thing.h"
+#include "csengine/cscoll.h"
+#include "csengine/thing.h"
 #include "csengine/world.h"
-#include "csengine/light/light.h"
+#include "csengine/light.h"
 #include "csscript/primscri.h"
 #include "csutil/token.h"
 

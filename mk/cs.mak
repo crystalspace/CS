@@ -172,20 +172,8 @@ doc:
 	doc++ -H -d csdoc -f $(HEADER)
 
 api:
-	doc++ -b -H -d csapi -f libs/csengine/camera.h \
-		libs/csengine/world.h libs/csengine/csview.h libs/csengine/sector.h \
-		libs/csengine/basic/polyset.h libs/csengine/light/light.h \
-		libs/csengine/polygon/polygon.h libs/csengine/polygon/pol2d.h \
-		libs/csengine/objects/thing.h libs/csengine/polygon/portal.h \
-		libs/csengine/objects/cssprite.h libs/csengine/rview.h \
-		libs/csengine/cscolor.h libs/csengine/objects/thingtpl.h \
-		libs/csengine/library.h \
-		libs/csengine/basic/csobjvec.h libs/csengine/basic/cscoll.h \
-		libs/csengine/curve.h libs/csengine/light/lghtmap.h \
-		libs/csengine/polygon/polytext.h libs/csengine/polygon/polyplan.h \
-		libs/csengine/wirefrm.h \
-		libs/csengine/colldet/being.h libs/csengine/colldet/collider.h \
-		libs/csutil/csvector.h \
+	doc++ -b -H -d csapi -f \
+		$(wildcard include/csengine/*.h) \
 		$(wildcard include/csobject/*.h) \
 		$(wildcard include/csgeom/*.h)
 

@@ -19,7 +19,7 @@
 // ILightMap interface
 
 #include "sysdef.h"
-#include "csengine/light/lghtmap.h"
+#include "csengine/lghtmap.h"
 #include "ilghtmap.h"
 
 IMPLEMENT_COMPOSITE_UNKNOWN( csLightMap, LightMap )

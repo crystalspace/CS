@@ -20,7 +20,7 @@
 #define INFMAZE_H
 
 #include "csgeom/math3d.h"
-#include "csengine/polygon/portal.h"
+#include "csengine/portal.h"
 
 class csWorld;
 class Sparse3D;

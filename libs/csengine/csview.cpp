@@ -22,7 +22,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/csview.h"
 #include "csengine/world.h"
-#include "csengine/polygon/pol2d.h"
+#include "csengine/pol2d.h"
 #include "csengine/camera.h"
 
 csView::csView (csWorld *iWorld, IGraphics3D* ig3d)

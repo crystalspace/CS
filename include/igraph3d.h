@@ -23,7 +23,7 @@
 #include "cscom/com.h"
 
 //@@@BAD!!!
-#include "csengine/basic/fog.h"
+#include "csengine/fog.h"
 
 class csVector2;
 class csMatrix3;

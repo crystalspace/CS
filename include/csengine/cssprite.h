@@ -21,7 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
-#include "csengine/basic/csobjvec.h"
+#include "csengine/csobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"

@@ -86,12 +86,12 @@ class csApp;
 #include "csgeom/csrect.h"		// Rectangle class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
-#include "csengine/basic/csobjvec.h"	// Vector of csBase heirs
+#include "csengine/csobjvec.h"		// Vector of csBase heirs
 #include "csengine/csview.h"		// CrystalSpace view
 #include "csinput/csevent.h"		// Event class
 #include "csinput/cseventq.h"		// Event Queue class
 #include "csinput/csinput.h"		// Keyboard codes
-#include "csengine/2d/csspr2d.h"	// 2D sprites
+#include "csengine/csspr2d.h"		// 2D sprites
 #include "csgfxppl.h"			// Graphics pipeline
 #include "cskeyacc.h"			// Keyboard accelerator class
 #include "cscomp.h"			// Windowing System Component

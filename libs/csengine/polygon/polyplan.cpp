@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "csengine/polygon/polyplan.h"
+#include "csengine/polyplan.h"
 #include "csengine/textrans.h"
 #include "csgeom/transfrm.h"
 

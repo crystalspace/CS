@@ -45,7 +45,7 @@
 #include <stdio.h>
 
 #include "sysdef.h"
-#include "csengine/light/dynlight.h"
+#include "csengine/dynlight.h"
 #include "csengine/world.h"
 #include "csobject/nameobj.h"
 #include "csutil/util.h"

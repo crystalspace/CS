@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "csengine/basic/triangle.h"
+#include "csengine/triangle.h"
 
 //---------------------------------------------------------------------------
 

@@ -18,8 +18,8 @@
 
 #include "sysdef.h"
 #include "csengine/library.h"
-#include "csengine/objects/thingtpl.h"
-#include "csengine/objects/cssprite.h"
+#include "csengine/thingtpl.h"
+#include "csengine/cssprite.h"
 #include "csutil/archive.h"
 
 CSOBJTYPE_IMPL(csLibrary,csObject);

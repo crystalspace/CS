@@ -23,6 +23,8 @@ Short-term cleanups that need to be done:
 	  for LIGHTMAP_SIZE in cryst.cfg. I tested 8 and 4 and this gives
 	  really accurate shadows (at the expense of memory and speed of
 	  course).
+	- Moved a lot of the include files from libs/*.h to include/*.h
+	  This includes csengine, csobject, csutil, and cscom.
 11-Jul-99:
 	- Thomas Hieber fixed/enabled mipmapping again in the Direct3D
 	  renderer. This also improves performance a little.

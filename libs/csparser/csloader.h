@@ -20,7 +20,7 @@
 #ifndef _CSLOADER_H_
 #define _CSLOADER_H_
 
-#include "csengine/basic/polyset.h"
+#include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
 
 class csPolygonTemplate;

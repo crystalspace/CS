@@ -24,7 +24,7 @@
 #include "csgeom/math2d.h"
 #include "csengine/bezier.h"
 #include "csengine/texture.h"
-#include "csengine/light/lghtmap.h"
+#include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobj.h"
 

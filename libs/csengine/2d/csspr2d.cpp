@@ -19,7 +19,7 @@
 */
 
 #include "sysdef.h"
-#include "csengine/2d/csspr2d.h"
+#include "csengine/csspr2d.h"
 
 csSprite2D::csSprite2D (csTextureHandle *hTexture, int x, int y, int w, int h)
 {

@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "cssys/common/sysdriv.h"
-#include "csengine/colldet/collider.h"
+#include "csengine/collider.h"
 
 class Polygon3D;
 class WalkTest;
@@ -33,6 +33,7 @@ class InfiniteMaze;
 class csSoundBuffer;
 class csWorld;
 class csSprite2D;
+class csWireFrameCam;
 class PhysicsLibrary;
 
 // Several map modes.

@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
-#include "csengine/colldet/collider.h"
-#include "csengine/basic/triangle.h"
+#include "csengine/collider.h"
+#include "csengine/triangle.h"
 #include "csobject/nameobj.h"
 
 int CD_num_cols_alloced = 0;

@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <ctype.h>
 #include "sysdef.h"
-#include "csengine/2d/csspr2d.h"
+#include "csengine/csspr2d.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "igraph2d.h"

@@ -19,14 +19,14 @@
 #ifndef BEING_H
 #define BEING_H
 
-#include "csengine/basic/polyset.h"
-#include "csengine/objects/cssprite.h"
-#include "csengine/objects/thing.h"
-#include "csengine/polygon/polygon.h"
+#include "csengine/polyset.h"
+#include "csengine/cssprite.h"
+#include "csengine/thing.h"
+#include "csengine/polygon.h"
 #include "csengine/world.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"
-#include "csengine/colldet/collider.h"
+#include "csengine/collider.h"
 
 /**
  * csCollider is a generic class.  All objects which participate in

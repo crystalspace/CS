@@ -23,7 +23,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/impexp/impexp.h"
+#include "csutil/impexp.h"
 #include "sysdef.h"
 
 // converter.cpp: implementation of the converter class.

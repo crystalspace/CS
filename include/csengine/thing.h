@@ -20,7 +20,7 @@
 #define THING_H
 
 #include "csgeom/transfrm.h"
-#include "csengine/basic/polyset.h"
+#include "csengine/polyset.h"
 #include "csengine/rview.h"
 
 class csSector;

@@ -22,7 +22,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/impexp/impexp.h"
+#include "csutil/impexp.h"
 
 // converter.cpp: implementation of the converter class.
 //
@@ -38,9 +38,9 @@
 
 #include "version.h"
 
-#include "csengine/objects/thing.h"
-#include "csengine/objects/cssprite.h"
-#include "csengine/objects/thingtpl.h"
+#include "csengine/thing.h"
+#include "csengine/cssprite.h"
+#include "csengine/thingtpl.h"
 #include "csutil/archive.h"
 
 

@@ -20,7 +20,7 @@
 #define BOT_H
 
 #include "csgeom/math3d.h"
-#include "csengine/objects/cssprite.h"
+#include "csengine/cssprite.h"
 
 class csSector;
 class csDynLight;

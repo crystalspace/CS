@@ -17,9 +17,9 @@
 */
 
 #include "sysdef.h"
-#include "csengine/polygon/portal.h"
-#include "csengine/polygon/polygon.h"
-#include "csengine/polygon/pol2d.h"
+#include "csengine/portal.h"
+#include "csengine/polygon.h"
+#include "csengine/pol2d.h"
 #include "csengine/sector.h"
 #include "csengine/stats.h"
 #include "itexture.h"

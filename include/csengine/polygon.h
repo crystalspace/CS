@@ -23,9 +23,9 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyint.h"
 #include "csgeom/polyclip.h"
-#include "csengine/polygon/polyplan.h"
-#include "csengine/basic/polyset.h"
-#include "csengine/polygon/portal.h"
+#include "csengine/polyplan.h"
+#include "csengine/polyset.h"
+#include "csengine/portal.h"
 #include "csengine/cscolor.h"
 
 class csSector;

@@ -21,8 +21,8 @@
 #include "csengine/config.h"
 #include "csengine/world.h"
 #include "csengine/sector.h"
-#include "csengine/polygon/polytext.h"
-#include "csengine/polygon/polygon.h"
+#include "csengine/polytext.h"
+#include "csengine/polygon.h"
 
 //---------------------------------------------------------------------------
 

@@ -21,9 +21,9 @@
 #include "csscript/trigger.h"
 #include "csobject/nameobj.h"
 #include "csengine/sysitf.h"
-#include "csengine/basic/cscoll.h"
-#include "csengine/objects/thing.h"
-#include "csengine/light/light.h"
+#include "csengine/cscoll.h"
+#include "csengine/thing.h"
+#include "csengine/light.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
 

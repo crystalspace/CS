@@ -19,8 +19,8 @@
 #include <math.h>
 
 #include "sysdef.h"
-#include "csengine/objects/thingtpl.h"
-#include "csengine/basic/polyset.h"
+#include "csengine/thingtpl.h"
+#include "csengine/polyset.h"
 
 //---------------------------------------------------------------------------
 

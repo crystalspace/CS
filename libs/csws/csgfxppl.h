@@ -24,7 +24,7 @@
 #include "cssys/common/system.h"	//@@@??? Is this needed?
 #include "csutil/csbase.h"
 #include "csgeom/csrect.h"
-#include "csengine/2d/csspr2d.h"
+#include "csengine/csspr2d.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 

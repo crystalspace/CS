@@ -16,36 +16,48 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef HALO_H
-#define HALO_H
+#ifndef LIBRARY_H
+#define LIBRARY_H
 
-#include "csgeom/math3d.h"
-#include "csengine/basic/csobjvec.h"
-#include "ihalo.h"
+#include "csobject/csobj.h"
+#include "csengine/csobjvec.h"
 
-/// This is used to keep track of halo information.
-class csHaloInformation
+class ThingTemplate;
+class csSpriteTemplate;
+class Archive;
+
+/**
+ * A library is a collection of templates and other stuff.
+ */
+class csLibrary : public csObject
 {
 public:
+  /// List of Thing templates.
+  csObjVector thing_templates;
+  /// List of sprite templates.
+  csObjVector sprite_templates;
+
+private:
+  /// The archive of this library.
+  Archive* ar;
+
+public:
   ///
-  csVector3 v;
+  csLibrary ();
   ///
-  csLight* pLight;
+  virtual ~csLibrary ();
 
   ///
-  float r, g, b;
-  ///
-  float intensity;
-  ///
-  HALOINFO haloinfo;
+  void Clear ();
 
   ///
-  csHaloInformation() : v (0, 0, 0)
-  {
-    pLight = NULL;
-    r = g = b = intensity = 0.0f;
-    haloinfo = NULL;
-  }
+  void SetArchive (Archive* ar) { csLibrary::ar = ar; }
+
+  ///
+  Archive* GetArchive () { return ar; }
+
+  CSOBJTYPE;
 };
 
-#endif /*HALO_H*/
+#endif /*LIBRARY_H*/
+

@@ -20,7 +20,7 @@
 #include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "csengine/sector.h"
-#include "csengine/light/light.h"
+#include "csengine/light.h"
 #include "csengine/world.h"
 #include "csobject/nameobj.h"
 

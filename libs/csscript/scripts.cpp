@@ -20,7 +20,7 @@
 #include "csscript/scripts.h"
 #include "csscript/intscri.h"
 #include "csscript/primscri.h"
-#include "csengine/basic/csobjvec.h"
+#include "csengine/csobjvec.h"
 #include "csengine/sysitf.h"
 #include "csobject/nameobj.h"
 

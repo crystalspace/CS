@@ -17,11 +17,11 @@
 */
 
 #include "sysdef.h"
-#include "csengine/basic/polyset.h"
-#include "csengine/polygon/polygon.h"
-#include "csengine/polygon/pol2d.h"
-#include "csengine/polygon/polytext.h"
-#include "csengine/light/dynlight.h"
+#include "csengine/polyset.h"
+#include "csengine/polygon.h"
+#include "csengine/pol2d.h"
+#include "csengine/polytext.h"
+#include "csengine/dynlight.h"
 #include "csengine/world.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"

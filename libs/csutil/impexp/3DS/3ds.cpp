@@ -23,7 +23,7 @@
 */
 
 #include "sysdef.h"
-#include "csutil/impexp/impexp.h"
+#include "csutil/impexp.h"
 
 // converter.cpp: implementation of the converter class.
 //

@@ -22,7 +22,7 @@
 #define __CSMOUSE_H__
 
 #include "cscomp.h"
-#include "csengine/2d/csspr2d.h"
+#include "csengine/csspr2d.h"
 
 class csTextureHandle;
 

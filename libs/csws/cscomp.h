@@ -23,8 +23,8 @@
 
 #include "csutil/csbase.h"
 #include "csgeom/csrect.h"
-#include "csengine/basic/csobjvec.h"
-#include "csengine/2d/csspr2d.h"
+#include "csengine/csobjvec.h"
+#include "csengine/csspr2d.h"
 #include "cswspal.h"
 
 class csApp;

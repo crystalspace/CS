@@ -18,10 +18,10 @@
 
 #include "sysdef.h"
 #include "cscom/com.h"
-#include "csengine/polygon/polygon.h"
-#include "csengine/polygon/polytext.h"
-#include "csengine/light/lghtmap.h"
-#include "csengine/basic/polyset.h"
+#include "csengine/polygon.h"
+#include "csengine/polytext.h"
+#include "csengine/lghtmap.h"
+#include "csengine/polyset.h"
 #include "csobject/nameobj.h"
 #include "ipolygon.h"
 

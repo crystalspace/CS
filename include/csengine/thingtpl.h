@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"  // texel coords
 #include "csobject/csobj.h"
-#include "csengine/basic/fog.h"
+#include "csengine/fog.h"
 #include "csengine/cscolor.h"
 
 class csPolygonTemplate;

@@ -17,8 +17,8 @@
 */
 
 #include "sysdef.h"
-#include "csengine/basic/cscoll.h"
-#include "csengine/objects/thing.h"
+#include "csengine/cscoll.h"
+#include "csengine/thing.h"
 #include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(csCollection,csObject);

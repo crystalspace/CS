@@ -19,10 +19,10 @@
 #include "sysdef.h"
 #include "csgeom/frustrum.h"
 #include "csengine/sysitf.h"
-#include "csengine/light/light.h"
+#include "csengine/light.h"
 #include "csengine/sector.h"
-#include "csengine/objects/thing.h"
-#include "csengine/polygon/polygon.h"
+#include "csengine/thing.h"
+#include "csengine/polygon.h"
 
 //---------------------------------------------------------------------------
 

@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "csgeom/math3d.h"
-#include "csengine/colldet/collider.h"
+#include "csengine/collider.h"
 
 CD_model::CD_model (int n_triangles)
 {

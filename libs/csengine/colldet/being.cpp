@@ -19,9 +19,9 @@
 
 #include "sysdef.h"
 #include "csengine/sysitf.h"
-#include "csengine/colldet/being.h"
+#include "csengine/being.h"
 #include "csobject/nameobj.h"
-#include "csengine/colldet/cdobj.h"
+#include "csengine/cdobj.h"
 
 ///
 bool csBeing::init = false;

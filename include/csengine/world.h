@@ -21,7 +21,7 @@
 
 #include "cscom/com.h"
 #include "csgeom/math3d.h"
-#include "csengine/basic/csobjvec.h"
+#include "csengine/csobjvec.h"
 #include "csengine/rview.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
@@ -34,21 +34,17 @@ class csCamera;
 class csThing;
 class csThingTemplate;
 class csCollection;
-class LanguageLayer;
 class csStatLight;
 class csDynLight;
 class Archive;
 class csSpriteTemplate;
-class csWireFrameCam;
 class csLibrary;
 class csClipper;
 class Dumper;
 class csLight;
-class csTextureHandle;
 class csHaloInformation;
 class csIniFile;
 class csEngineConfig;
-class csRenderView;
 interface IHaloRasterizer;
 interface IGraphics3D;
 interface IGraphicsInfo;

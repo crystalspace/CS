@@ -18,8 +18,8 @@
 */
 
 #include <string.h>
-#include "csengine/colldet/cdobj.h"
-#include "csengine/colldet/collider.h"
+#include "csengine/cdobj.h"
+#include "csengine/collider.h"
 
 CSOBJTYPE_IMPL(csColliderPointerObject,csObject);
 

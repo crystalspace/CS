@@ -24,7 +24,7 @@
 #include "csgeom/math2d.h" // texel coords
 #include "csgeom/polyint.h"
 #include "csobject/csobj.h"
-#include "csengine/basic/fog.h"
+#include "csengine/fog.h"
 #include "ipolygon.h"
 
 class csPolygonInt;

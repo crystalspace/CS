@@ -20,7 +20,7 @@
 
 #include "sysdef.h"
 #include "csobject/nameobj.h"
-#include "csengine/basic/csobjvec.h"
+#include "csengine/csobjvec.h"
 
 bool csObjVector::FreeItem (csSome Item)
 {
