@@ -34,6 +34,11 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.X2D+=-I$(X11_PATH)/include
 LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
  
+ifeq ($(USE_XFREE86VM),yes)
+  CFLAGS.X2D+=-DXFREE86VM
+  LIBS.X2D+=-lXxf86vm
+endif
+
 # The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)

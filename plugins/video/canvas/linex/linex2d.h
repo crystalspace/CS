@@ -36,6 +36,10 @@
 #  include <sys/shm.h>
 #endif /* DO_SHM */
 
+#ifdef XFREE86VM
+#  include <X11/extensions/xf86vmode.h>
+#endif
+
 /// XLIB version.
 class csGraphics2DLineXLib : public csGraphics2D
 {
@@ -43,6 +47,8 @@ class csGraphics2DLineXLib : public csGraphics2D
   Display* dpy;
   int screen_num;
   int display_width, display_height;
+  Window WMwindow;
+  Window FSwindow;
   Window window;
   Window leader_window;
   Window root_window;
@@ -74,6 +80,15 @@ class csGraphics2DLineXLib : public csGraphics2D
   /// Pointer to DOS-specific interface
   iUnixSystemDriver* UnixSystem;
 
+  bool currently_full_screen;
+
+#ifdef XFREE86VM
+  XF86VidModeModeInfo orig_mode;
+  XF86VidModeModeInfo fs_mode;
+  int orig_x;
+  int orig_y;
+#endif
+
 public:
   DECLARE_IBASE;
 
@@ -93,6 +108,8 @@ public:
   virtual void Clear (int color);
   virtual void Write (int x, int y, int fg, int bg, const char *text);
 
+  virtual bool PerformExtension (const char* args);
+
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);
 
@@ -106,6 +123,13 @@ public:
   bool AllocateMemory ();
   /// helper function which deallocates buffers
   void DeAllocateMemory ();
+
+  void EnterFullScreen ();
+  void LeaveFullScreen ();
+
+#ifdef XFREE86VM
+  void InitVidModes ();
+#endif
 };
 
 #endif // __LINEX2D_H__

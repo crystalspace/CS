@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
+#include "csutil/csstring.h"
 #include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"
 #include "video/canvas/linex/linex2d.h"
@@ -156,6 +157,10 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
 
+#ifdef XFREE86VM
+  InitVidModes();
+#endif
+
   return true;
 }
 
@@ -178,12 +183,26 @@ bool csGraphics2DLineXLib::Open(const char *Title)
 
   // Create window
   XSetWindowAttributes swa;
+  swa.override_redirect = True;
   swa.background_pixel = 0;
   swa.border_pixel = 0;
   swa.colormap = cmap;
   swa.bit_gravity = CenterGravity;
-  window = XCreateWindow (dpy, DefaultRootWindow(dpy), 64, 16,
-    Width, Height, 4, vinfo.depth, InputOutput, visual,
+
+#ifdef XFREE86VM
+  FSwindow = XCreateWindow (dpy, root_window, 0, 0,
+    fs_mode.hdisplay, fs_mode.vdisplay, 0,
+    vinfo.depth, InputOutput, visual,
+    CWOverrideRedirect | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+#endif
+
+  WMwindow = XCreateWindow (dpy, root_window,
+    64, 16, Width,Height, 4,
+    vinfo.depth, InputOutput, visual,
+    CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+
+  window = XCreateWindow (dpy, WMwindow, 64, 16,
+    Width, Height, 0, vinfo.depth, InputOutput, visual,
     CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
 
   XStoreName (dpy, window, Title);
@@ -230,8 +249,8 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   XmbSetWMProperties (dpy, window, Title, Title,
                       NULL, 0, NULL, NULL, NULL);
 
-  XRaiseWindow (dpy, window);
   XMapWindow (dpy, window);
+  XMapRaised (dpy, window);
 
   // Create mouse cursors
   XColor Black;
@@ -270,6 +289,11 @@ bool csGraphics2DLineXLib::Open(const char *Title)
     return false;
 
   Clear (0);
+
+  if (FullScreen) {
+    EnterFullScreen();
+  }
+
   return true;
 }
 
@@ -305,6 +329,8 @@ void csGraphics2DLineXLib::DeAllocateMemory ()
 
 void csGraphics2DLineXLib::Close ()
 {
+  LeaveFullScreen();
+
   if (EmptyMouseCursor)
   {
     XFreeCursor (dpy, EmptyMouseCursor);
@@ -391,6 +417,25 @@ bool csGraphics2DLineXLib::BeginDraw ()
   csGraphics2D::BeginDraw ();
   nr_segments = 0;
   seg_color = 0;
+  return true;
+}
+
+bool csGraphics2DLineXLib::PerformExtension (const char* args)
+{
+  csString ext(args);
+
+  if (ext.CompareNoCase ("fullscreen"))
+  {
+    if (currently_full_screen)
+    {
+      LeaveFullScreen ();
+    }
+    else
+    {
+      EnterFullScreen ();
+    }
+  }
+
   return true;
 }
 
@@ -654,4 +699,216 @@ bool csGraphics2DLineXLib::HandleEvent (csEvent &/*Event*/)
     SetClipRect (0, 0, Width, Height);
   }
   return false;
+}
+
+#ifdef XFREE86VM
+Bool GetModeInfo(Display *dpy, int scr, XF86VidModeModeInfo *info)
+{
+  XF86VidModeModeLine *l;
+    
+  l = (XF86VidModeModeLine*) ((char*) info + sizeof(info->dotclock));
+
+  return XF86VidModeGetModeLine (dpy, scr, (int *) &info->dotclock, l);
+}
+
+static int cmp_modes(const void *va, const void *vb)
+{
+  XF86VidModeModeInfo *a = *(XF86VidModeModeInfo **) va;
+  XF86VidModeModeInfo *b = *(XF86VidModeModeInfo **) vb;
+
+  if (a->hdisplay > b->hdisplay)
+  {
+    return -1;
+  }
+  else
+  {
+    return b->vdisplay - a->vdisplay;
+  }
+}
+
+static Bool wait_for_notify(Display */*display*/, XEvent *xEvent, XPointer arg)
+{
+  return (xEvent->type == MapNotify) && (xEvent->xmap.window == (Window) arg);
+}
+
+void csGraphics2DLineXLib::InitVidModes()
+{
+  XF86VidModeModeLine mode;
+  XF86VidModeModeInfo **modes;
+  int i;
+  int nModes;
+
+  currently_full_screen = false;
+
+  if (XF86VidModeGetModeLine(dpy, screen_num, &i, &mode) &&
+      XF86VidModeGetAllModeLines (dpy, screen_num, &nModes, &modes))
+  {
+    qsort (modes, nModes, sizeof(*modes), cmp_modes);
+
+    // find best full screen mode
+    for (i = nModes - 1; i >= 0; --i)
+    {
+      if (modes[i]->hdisplay >= Width && modes[i]->vdisplay >= Height)
+      {
+	fs_mode = *modes[i];
+	break;
+      }
+    }
+
+    XFree (modes);
+  }
+}
+#endif
+
+void csGraphics2DLineXLib::EnterFullScreen()
+{
+#ifdef XFREE86VM
+  XEvent xEvent;
+  int x;
+  int y;
+  int pointerX;
+  int pointerY;
+  Window rootReturn;
+  Window childReturn;
+  int childX;
+  int childY;
+  int rootX;
+  int rootY;
+  unsigned int maskReturn;
+
+  XF86VidModeLockModeSwitch (dpy, screen_num, False);
+  // only switch if needed
+  if (!currently_full_screen) {
+    XSetWindowBackground (dpy, FSwindow, 0);
+    XClearWindow (dpy, FSwindow);
+
+    XSelectInput (dpy, FSwindow, StructureNotifyMask);
+    XMapRaised (dpy, FSwindow);
+    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) FSwindow);
+    XSelectInput (dpy, FSwindow, NoEventMask);
+
+    // save current display information
+    GetModeInfo (dpy, screen_num, &orig_mode);
+    XF86VidModeGetViewPort (dpy, screen_num, &orig_x, &orig_y);
+
+    // get pointer location inside original window so it appears not to move
+    if (XQueryPointer (dpy, window, &rootReturn, &childReturn,
+		       &rootX, &rootY, &childX, &childY, &maskReturn)) {
+      pointerX = childX;
+      pointerY = childY;
+    }
+    else {
+      pointerX = fs_mode.hdisplay / 2;
+      pointerY = fs_mode.vdisplay / 2;
+    }
+
+    // grab pointer in fullscreen mode
+    if (XGrabPointer (dpy, FSwindow, True, 0, GrabModeAsync, GrabModeAsync,
+		      FSwindow, None, CurrentTime) != GrabSuccess ||
+	XGrabKeyboard (dpy, WMwindow, True, GrabModeAsync,
+		       GrabModeAsync, CurrentTime) != GrabSuccess) {
+      XUnmapWindow (dpy, FSwindow);
+      CsPrintf (MSG_FATAL_ERROR, "Unable to grab focus\n");
+    }
+
+    if (fs_mode.hdisplay != orig_mode.hdisplay ||
+	fs_mode.vdisplay != orig_mode.vdisplay)
+    {
+      // switch mode
+      XF86VidModeLockModeSwitch (dpy, screen_num, True);
+      if (!XF86VidModeSwitchToMode (dpy, screen_num, &fs_mode))
+      {
+	LeaveFullScreen ();
+	CsPrintf (MSG_FATAL_ERROR, "Unable to switch to mode %dx%d\n",
+		  fs_mode.hdisplay, fs_mode.vdisplay);
+      }
+      else
+      {
+	XF86VidModeSetViewPort (dpy, screen_num, 0, 0);
+
+	x = (fs_mode.hdisplay - Width) / 2;
+	y = (fs_mode.vdisplay - Height) / 2;
+	XReparentWindow (dpy, window, FSwindow, x, y);
+	XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
+
+	display_width  = fs_mode.hdisplay;
+	display_height = fs_mode.vdisplay;
+	currently_full_screen = true;
+      }
+    }
+
+    XSync (dpy, True);
+  }
+#endif // XFREE86VM
+}
+
+void csGraphics2DLineXLib::LeaveFullScreen()
+{
+#ifdef XFREE86VM
+  XF86VidModeModeInfo mode;
+  int pointerX;
+  int pointerY;
+  Window rootReturn;
+  Window childReturn;
+  int childX;
+  int childY;
+  int rootX;
+  int rootY;
+  unsigned int maskReturn;
+
+  if (currently_full_screen)
+  {
+    // get pointer location inside original window so it appears not to move
+    if (XQueryPointer (dpy, window, &rootReturn, &childReturn,
+		       &rootX, &rootY, &childX, &childY, &maskReturn)) {
+      pointerX = childX;
+      pointerY = childY;
+    }
+    else {
+      pointerX = fs_mode.hdisplay / 2;
+      pointerY = fs_mode.vdisplay / 2;
+    }
+
+    XUngrabPointer (dpy, CurrentTime);
+    XUngrabKeyboard (dpy, CurrentTime);
+
+    XReparentWindow (dpy, window, WMwindow, 0, 0);
+
+    if (GetModeInfo (dpy, screen_num, &mode))
+    {
+      if (orig_mode.hdisplay != mode.hdisplay ||
+	  orig_mode.vdisplay != mode.vdisplay)
+      {
+	// switch to non-fullscreen mode
+	if (!XF86VidModeSwitchToMode (dpy, screen_num, &orig_mode))
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "Unable to restore mode %dx%d\n",
+		    fs_mode.hdisplay, fs_mode.vdisplay);
+	}
+	else
+	{
+	  if (orig_x != 0 || orig_y != 0)
+	  {
+	    // restore viewport if offset inside virtual screen
+	    XF86VidModeSetViewPort(dpy, screen_num, orig_x, orig_y);
+	  }
+
+	  // restore pointer location
+	  XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
+
+	  display_width  = orig_mode.hdisplay;
+	  display_height = orig_mode.vdisplay;
+	  currently_full_screen = false;
+	}
+
+      }
+
+      XUnmapWindow (dpy, FSwindow);
+    }
+
+    XF86VidModeLockModeSwitch (dpy, screen_num, False);
+
+    XSync (dpy, True);
+  }
+#endif // XFREE86VM
 }

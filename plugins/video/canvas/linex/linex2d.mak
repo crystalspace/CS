@@ -33,6 +33,11 @@ ifeq ($(MAKESECTION),postdefines)
 # We need also the X libs
 CFLAGS.LINEX2D+=-I$(X11_PATH)/include
 LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11
+
+ifeq ($(USE_XFREE86VM),yes)
+  CFLAGS.LINEX2D+=-DXFREE86VM
+  LIBS.LINEX2D+=-lXxf86vm
+endif
  
 # The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)

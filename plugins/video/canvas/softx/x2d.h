@@ -37,6 +37,10 @@
 #  include <sys/shm.h>
 #endif /* DO_SHM */
 
+#ifdef XFREE86VM
+#  include <X11/extensions/xf86vmode.h>
+#endif
+
 /// XLIB version.
 class csGraphics2DXLib : public csGraphics2D
 {
@@ -44,6 +48,8 @@ class csGraphics2DXLib : public csGraphics2D
   Display* dpy;
   int screen_num;
   int display_width, display_height;
+  Window WMwindow;
+  Window FSwindow;
   Window window;
   Window leader_window;
   Window root_window;
@@ -86,6 +92,15 @@ class csGraphics2DXLib : public csGraphics2D
   
   /// Pointer to DOS-specific interface
   iUnixSystemDriver* UnixSystem;
+
+  bool currently_full_screen;
+
+#ifdef XFREE86VM
+  XF86VidModeModeInfo orig_mode;
+  XF86VidModeModeInfo fs_mode;
+  int orig_x;
+  int orig_y;
+#endif
 
 public:
   DECLARE_IBASE;
@@ -134,6 +149,13 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  void EnterFullScreen ();
+  void LeaveFullScreen ();
+
+#ifdef XFREE86VM
+  void InitVidModes ();
+#endif
 };
 
 #endif // __X2D_H__

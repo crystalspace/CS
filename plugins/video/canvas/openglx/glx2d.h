@@ -34,6 +34,10 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 
+#ifdef XFREE86VM
+#  include <X11/extensions/xf86vmode.h>
+#endif
+
 /// XLIB version.
 class csGraphics2DGLX : public csGraphics2DGLCommon
 {
@@ -42,6 +46,8 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   int screen_num;
   int display_width, display_height;
   Window window;
+  Window WMwindow;
+  Window FSwindow;
   Window leader_window;
   Window root_window;
   GC gc;
@@ -69,6 +75,15 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   /// Pointer to DOS-specific interface
   iUnixSystemDriver* UnixSystem;
 
+  bool currently_full_screen;
+
+#ifdef XFREE86VM
+  XF86VidModeModeInfo orig_mode;
+  XF86VidModeModeInfo fs_mode;
+  int orig_x;
+  int orig_y;
+#endif
+
 public:
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
@@ -79,6 +94,8 @@ public:
 
   virtual void Print (csRect *area = NULL);
   virtual bool BeginDraw ();
+
+  virtual bool PerformExtension (const char* args);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);
@@ -94,6 +111,13 @@ public:
    * desired attributes
    */
   bool CreateContext (int *desired_attributes);
+
+  void EnterFullScreen ();
+  void LeaveFullScreen ();
+
+#ifdef XFREE86VM
+  void InitVidModes ();
+#endif
 };
 
 #endif // __GLX2D_H__

@@ -47,6 +47,11 @@ else
   LIBS._GLX2D+=-lGL
 endif
 
+ifeq ($(USE_XFREE86VM),yes)
+  CFLAGS.GLX2D+=-DXFREE86VM
+  LIBS._GLX2D+=-lXxf86vm
+endif
+
 CFLAGS.GLX2D+=-I$(X11_PATH)/include
 
 # The 2D GLX driver
