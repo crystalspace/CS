@@ -19,8 +19,10 @@
 #ifndef COVMASK_H
 #define COVMASK_H
 
-// Set to mask4x4, mask8x4 or mask8x8 to select coverage mask size.
-#define CS_CM mask4x4
+// Define one of the three below to set the coverage mask size.
+//#define CS_CM_4x4
+//#define CS_CM_8x4
+#define CS_CM_8x8
 
 /**
  * Class representing a triage coverage mask
@@ -30,15 +32,15 @@
 class csCovMaskTriage
 {
 private:
-# if CS_CM == mask4x4
+# if defined(CS_CM_4x4)
 #   define CS_CM_HOR 4
 #   define CS_CM_VER 4
     UShort out, in;
-# elif CS_CM == mask8x4
+# elif defined(CS_CM_8x4)
 #   define CS_CM_HOR 8
 #   define CS_CM_VER 4
     ULong out, in;
-# elif CS_CM == mask8x8
+# elif defined(CS_CM_8x8)
 #   define CS_CM_HOR 8
 #   define CS_CM_VER 8
     ULong out1, out2, in1, in2;
@@ -49,9 +51,9 @@ public:
   /// Clear a coverage mask.
   void Clear ()
   {
-#   if CS_CM == mask4x4 || CS_CM == mask8x4
+#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
       out = in = 0;
-#   elif CS_CM == mask8x8
+#   elif defined(CS_CM_8x8)
       out1 = out2 = in1 = in2 = 0;
 #   endif
   }
@@ -63,10 +65,10 @@ public:
    */
   void SetState (int bit, int so, int si)
   {
-#   if CS_CM == mask4x4 || CS_CM == mask8x4
+#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
       out = (out & ~(1<<bit)) | (so<<bit);
       in = (in & ~(1<<bit)) | (si<<bit);
-#   elif CS_CM == mask8x8
+#   elif defined(CS_CM_8x8)
       if (bit < 32)
       {
 	out1 = (out1 & ~(1<<bit)) | (so<<bit);
@@ -78,6 +80,91 @@ public:
 	out2 = (out2 & ~(1<<bit)) | (so<<bit);
 	in2 = (in2 & ~(1<<bit)) | (si<<bit);
       }
+#   endif
+  }
+
+  /**
+   * Get the state of two coverage mask bits.
+   * The bits are combined in one integer with 'out'
+   * at bit position 1 and 'in' at bit position 0.
+   * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
+   * Note that this is not an efficient function.
+   * It is ment mostly for debugging.
+   */
+  int GetState (int bit) const
+  {
+#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+      return ((out & (1<<bit)) >> (bit-1)) |
+      	     ((in & (1<<bit)) >> bit);
+#   elif defined(CS_CM_8x8)
+      if (bit < 32)
+      {
+        return ((out1 & (1<<bit)) >> (bit-1)) |
+      	       ((in1 & (1<<bit)) >> bit);
+      }
+      else
+      {
+	bit -= 32;
+        return ((out2 & (1<<bit)) >> (bit-1)) |
+      	       ((in2 & (1<<bit)) >> bit);
+      }
+#   endif
+  }
+
+  /**
+   * Dump state of this mask.
+   */
+  void Dump () const
+  {
+    static char st[5] = "*#.?";
+    int i = 0;
+#   if defined(CS_CM_4x4)
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+#   elif defined(CS_CM_8x4)
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+#   elif defined(CS_CM_8x8)
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
 #   endif
   }
 };
@@ -92,11 +179,11 @@ public:
 class csCovMask
 {
 protected:
-# if CS_CM == mask4x4
+# if defined(CS_CM_4x4)
   UShort in;
-# elif CS_CM == mask8x4
+# elif defined(CS_CM_8x4)
   ULong in;
-# elif CS_CM == mask8x8
+# elif defined(CS_CM_8x8)
   ULong in1, in2;
 # endif
 
@@ -104,11 +191,11 @@ public:
   /// Clear a coverage mask.
   void Clear ()
   {
-#   if CS_CM == mask4x4
+#   if defined(CS_CM_4x4)
       in = 0;
-#   elif CS_CM == mask8x4
+#   elif defined(CS_CM_8x4)
       in = 0;
-#   elif CS_CM == mask8x8
+#   elif defined(CS_CM_8x8)
       in1 = in2 = 0;
 #   endif
   }
@@ -120,9 +207,9 @@ public:
    */
   void SetState (int bit, int s)
   {
-#   if CS_CM == mask4x4 || CS_CM == mask8x4
+#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
       in = (in & ~(1<<bit)) | (s<<bit);
-#   elif CS_CM == mask8x8
+#   elif defined(CS_CM_8x8)
       if (bit < 32)
       {
 	in1 = (in1 & ~(1<<bit)) | (s<<bit);
@@ -132,6 +219,86 @@ public:
 	bit -= 32;
 	in2 = (in2 & ~(1<<bit)) | (s<<bit);
       }
+#   endif
+  }
+
+  /**
+   * Get the state of mask bits.
+   * 'bit' is the index in the mask (between 0 and CS_CM_BITS-1).
+   * Note that this is not an efficient function.
+   * It is ment mostly for debugging.
+   */
+  int GetState (int bit) const
+  {
+#   if defined(CS_CM_4x4) || defined(CS_CM_8x4)
+      return (in & (1<<bit)) >> bit;
+#   elif defined(CS_CM_8x8)
+      if (bit < 32)
+      {
+        return (in1 & (1<<bit)) >> bit;
+      }
+      else
+      {
+	bit -= 32;
+        return (in2 & (1<<bit)) >> bit;
+      }
+#   endif
+  }
+
+  /**
+   * Dump state of this mask.
+   */
+  void Dump () const
+  {
+    static char st[3] = ".#";
+    int i = 0;
+#   if defined(CS_CM_4x4)
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)]);
+#   elif defined(CS_CM_8x4)
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+#   elif defined(CS_CM_8x8)
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
+      printf ("%c%c%c%c%c%c%c%c\n", st[GetState (i++)], st[GetState (i++)],
+      	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)],
+	st[GetState (i++)], st[GetState (i++)], st[GetState (i++)]);
 #   endif
   }
 };
@@ -170,7 +337,8 @@ private:
    * Return the index in the masks tables for the
    * intersection of the line with the box.
    */
-  int GetIndex (const csVector2& start, float dxdy, float dydx, int box) const;
+  int GetIndex (const csVector2& start, const csVector2& stop,
+  	float dxdy, float dydx, int box) const;
 
 public:
   /**
@@ -210,9 +378,10 @@ public:
    * Return the triage mask for the intersection of the line with the box.
    */
   csCovMaskTriage& GetTriageMask (const csVector2& start,
+  	const csVector2& stop,
   	float dxdy, float dydx, int box) const
   {
-    return (triage_masks[GetIndex (start, dxdy, dydx, box)]);
+    return (triage_masks[GetIndex (start, stop, dxdy, dydx, box)]);
   }
 
   /**
@@ -222,9 +391,10 @@ public:
    * Return the mask for the intersection of the line with the box.
    */
   csCovMask& GetMask (const csVector2& start,
+  	const csVector2& stop,
   	float dxdy, float dydx, int box) const
   {
-    return (masks[GetIndex (start, dxdy, dydx, box)]);
+    return (masks[GetIndex (start, stop, dxdy, dydx, box)]);
   }
 };
 

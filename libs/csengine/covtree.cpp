@@ -48,3 +48,12 @@ bool csCovTreeNode0::InsertPolygon (csVector2* poly, int num_poly)
   return false;
 }
 
+void calc_size ()
+{
+printf ("1: %d\n", sizeof(csCovTreeNode1));
+printf ("2: %d\n", sizeof(csCovTreeNode2));
+printf ("3: %d\n", sizeof(csCovTreeNode3));
+printf ("4: %d\n", sizeof(csCovTreeNode4));
+printf ("5: %d\n", sizeof(csCovTreeNode5));
+}
+
