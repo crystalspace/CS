@@ -8,7 +8,9 @@
 #include "ivaria/reporter.h"
 #include <stdio.h>
 
-awsManager::awsManager(iBase *p):prefmgr(NULL),object_reg(NULL), 
+awsManager::awsManager(iBase *p):prefmgr(NULL), 
+               dirty_lid(0), all_buckets_full(false),
+               top(NULL), ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
                UsingDefaultContext(false), DefaultContextInitialized(false)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -156,14 +158,17 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
     
     DefaultContextInitialized=true;
   }
-
-  if (txtmgr)
-    GetPrefMgr()->SetTextureManager(txtmgr);
-          
+            
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
   
   printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
+
+  if (txtmgr)
+    GetPrefMgr()->SetTextureManager(txtmgr);
+
+  if (ptG2D)
+    GetPrefMgr()->SetFontServer(ptG2D->GetFontServer());
     
   if (ptG2D && ptG3D) 
   {
@@ -180,7 +185,8 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 void
 awsManager::Mark(csRect &rect)
 {
-  int i;
+   int i;
+
    //  If we have too many rects, we simply assume that a large portion of the
    // screen will be filled, so we agglomerate them all in buffer 0.
    if (all_buckets_full)
@@ -192,7 +198,10 @@ awsManager::Mark(csRect &rect)
    for(i=0; i<dirty_lid; ++i)
    {
        if (dirty[i].Intersects(rect))
+       {
+         printf("aws-debug: combined dirty rects at (%d).\n", dirty_lid);
 	 dirty[i].AddAdjanced(rect);
+       }
    }
 
    //  If we get here it's because the rectangle didn't fit anywhere. So,
@@ -200,6 +209,7 @@ awsManager::Mark(csRect &rect)
    // set the dirty flag.
    if (dirty_lid>awsNumRectBuckets)
    {
+     printf("aws-debug: filled up all available dirty rect buckets.\n");
      for(i=1; i<awsNumRectBuckets; ++i)
      {
        dirty[0].AddAdjanced(dirty[i]);
@@ -208,7 +218,10 @@ awsManager::Mark(csRect &rect)
      dirty[0].AddAdjanced(rect);
    }
    else
+   {
+     printf("aws-debug: added new dirty rect at (%d).\n", dirty_lid);
      dirty[dirty_lid++].Set(rect);
+   }
 }
 
 bool
@@ -234,9 +247,8 @@ void
 awsManager::Print(iGraphics3D *g3d)
 {
   g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-  		  0,0,g3d->GetWidth(), g3d->GetHeight(),
-		  0,0,512,512,128);
-  		  
+  		  0,0,512,480,//g3d->GetWidth(), g3d->GetHeight(),
+		  0,0,512,480,0);
   
 }
 
@@ -245,6 +257,7 @@ awsManager::Redraw()
 {
    static unsigned redraw_tag = 0;
    static csRect bounds(0,0,512,512);
+   int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
 
    redraw_tag++;
    
@@ -256,10 +269,11 @@ awsManager::Redraw()
    else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
        
    // check to see if there is anything to redraw.
-   if (dirty[0].IsEmpty()) {
+   if (dirty[0].IsEmpty()) 
       return;
-   }		
-         
+   
+   /******* The following code is only executed if there is something to redraw *************/
+   
    awsWindow *curwin=top, *oldwin;
    
    // check to see if any part of this window needs redrawn
@@ -278,6 +292,9 @@ awsManager::Redraw()
     * only redraw each window once.
     */
 
+   if (all_buckets_full)
+     ptG2D->DrawBox(dirty[0].xmin, dirty[0].ymin, dirty[0].xmax, dirty[0].ymax, erasefill);
+
    curwin=oldwin;
    while(curwin)
    {
@@ -287,14 +304,25 @@ awsManager::Redraw()
            RedrawWindow(curwin, dirty[0]);
          else
          {
-			int i;
+	    int i;
+            
             for(i=0; i<dirty_lid; ++i)
+            {
+              // Find out if we need to erase.
+              csRect lo(dirty[i]);
+              lo.Subtract(curwin->Frame());
+
+              if (!lo.IsEmpty())
+                ptG2D->DrawBox(dirty[i].xmin, dirty[i].ymin, dirty[i].xmax, dirty[i].ymax, erasefill);
+
               RedrawWindow(curwin, dirty[i]);
+            }
          }
       }
       curwin=curwin->WindowAbove();
    }
 
+   // Reset the dirty buckets
    dirty_lid=0;
    all_buckets_full=false;
    dirty[0].MakeEmpty();
@@ -418,8 +446,16 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
   
 }
 
+bool 
+awsManager::HandleEvent(iEvent& Event)
+{
+  if (GetTopWindow())
+    return GetTopWindow()->HandleEvent(Event);
 
- //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
+  return false;
+}
+
+//// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
 
 
 awsManager::awsCanvas::awsCanvas ()

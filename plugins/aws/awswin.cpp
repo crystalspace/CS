@@ -2,6 +2,7 @@
 #include "awswin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/fontserv.h"
 
 const unsigned long awsWindow::sWindowRaised  = 0x1;
 const unsigned long awsWindow::sWindowLowered = 0x2;
@@ -21,6 +22,9 @@ const unsigned int awsWindow::foTitle   =       0x10;
 const unsigned int awsWindow::foGrip    =       0x20;
 const unsigned int awsWindow::foRoundBorder   = 0x0;
 const unsigned int awsWindow::foBeveledBorder = 0x40;
+
+const int grip_size=16;
+
 
 SCF_IMPLEMENT_IBASE(awsWindow)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
@@ -149,18 +153,56 @@ awsWindow::OnLower()
 bool 
 awsWindow::OnMouseDown(int button, int x, int y)
 {
+  
+  if (!(frame_style & fsBitmap))
+  {
+    printf("mousedown: x=%d, y=%d, fx=%d, fy=%d\n", x,y,Frame().xmax, Frame().ymax);
+
+    if (x<Frame().xmax && x>Frame().xmax-grip_size &&
+        y<Frame().ymax && y>Frame().ymax-grip_size)
+    {
+      resizing_mode=true;
+      WindowManager()->Mark(Frame());
+      return true;
+    }
+
+  }
+
   return false;
 }
     
 bool 
 awsWindow::OnMouseUp(int button, int x, int y)
 {
+  if (resizing_mode)
+  {
+    resizing_mode=false;
+    WindowManager()->Mark(Frame());
+    return true;
+  }
+
   return false;
 }
 
 bool 
 awsWindow::OnMouseMove(int button, int x, int y)
 {
+  if (resizing_mode)
+  {
+    bool marked=false;
+
+    if (x<Frame().xmax || y<Frame().ymax)
+    {
+      WindowManager()->Mark(Frame());
+      marked=true;
+    }
+
+    Frame().xmax=x;
+    Frame().ymax=y;
+    
+    if (!marked)
+      WindowManager()->Mark(Frame());
+  }
   return false;
 }
 
@@ -176,8 +218,20 @@ awsWindow::OnMouseEnter()
   return false;
 }
 
+bool
+awsWindow::OnMouseClick(int button, int x, int y)
+{
+  return false;
+}
+
+bool
+awsWindow::OnMouseDoubleClick(int button, int x, int y)
+{
+  return false;
+}
+
 bool 
-awsWindow::OnKeypress(int key)
+awsWindow::OnKeypress(int key, int modifiers)
 {
   return false;
 }
@@ -219,6 +273,17 @@ awsWindow::OnDraw(csRect clip)
       black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK),
       white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
+  int tw, th, toff;
+
+  // Get the size of the text
+  WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
+
+  // Get a good offset
+  toff=th>>1;
+
+  // Increase the textheight just a bit to have more room in the title bar
+  th+=toff;
+
   
   switch(frame_style)
   {
@@ -248,19 +313,83 @@ awsWindow::OnDraw(csRect clip)
 
       int topleft[10] =  { fill, hi, hi2, fill, fill, fill, lo2, lo, black };
       int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill };
+      int i;
+      const int step=6;
 
-      // inner fill
-      for(int i=0; i<10; ++i)
+      if (frame_options & foTitle)
       {
-        g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
-        g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
-        g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
-        g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+        // start with even border
+        for(i=0; i<step; ++i)
+        {
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+        }
+
+        // now add some more fill for the title bar
+        for(i=step; i<step+th-1; ++i)
+          g2d->DrawLine(Frame().xmin+step, Frame().ymin+i, Frame().xmax-step+1, Frame().ymin+i,  fill);
+          
+        // finish with an offset top
+        for(i=step; i<9; ++i)
+        {
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymin+i+th-1,  topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i+th-1, Frame().xmin+i, Frame().ymax-i,       topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i,      Frame().xmax-i, Frame().ymax-i,       botright[i]);
+          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i+th-1, Frame().xmax-i, Frame().ymax-i,       botright[i]);
+        } 
+
+        // now draw the title
+        g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+                   Frame().xmin+10,
+                   Frame().ymin+(step>>1)+toff,
+                   WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+                   -1,
+                   "AWS Test Window");
+
+      } // end if title bar
+      else
+      {
+        // create even border all the way around
+        for(int i=0; i<9; ++i)
+        {
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
+          g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+          g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+        }
+      }  // end else not title
+
+      if (frame_options & foGrip)
+      {
+        int   x,y;
+ 
+        g2d->DrawBox(Frame().xmax-grip_size+2,  Frame().ymax-grip_size+2, grip_size-4, grip_size-4, fill);
+        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size+1, Frame().xmax-7,           Frame().ymax-grip_size+1, hi2);
+        g2d->DrawLine(Frame().xmax-grip_size+1, Frame().ymax-grip_size,   Frame().xmax-grip_size+1, Frame().ymax-7, hi2);
+        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-6,           Frame().ymax-grip_size, hi);
+        g2d->DrawLine(Frame().xmax-grip_size,   Frame().ymax-grip_size,   Frame().xmax-grip_size,   Frame().ymax-6, hi);
+
+
+        for(x=Frame().xmax-grip_size+4; x<Frame().xmax-4; x+=2)
+          for(y=Frame().ymax-grip_size+4; y<Frame().ymax-4; y+=2)
+          {
+            if (resizing_mode)
+            {
+             g2d->DrawPixel(x+1,y+1,hi2);
+             g2d->DrawPixel(x,y,lo2);
+            }
+            else
+            {
+             g2d->DrawPixel(x+1,y+1,lo2);
+             g2d->DrawPixel(x,y,hi2);
+            }
+          }
+
       }
       
     } 
-    
-
     break;
 
   default:

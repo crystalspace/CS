@@ -60,6 +60,9 @@ private:
     /// Individual frame options
     unsigned int frame_options;
 
+    /// True if we are currently resizing
+    bool resizing_mode;
+
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;
@@ -163,6 +166,12 @@ public:
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y);
 
+    /// Triggered when the user clicks the mouse
+    virtual bool OnMouseClick(int button, int x, int y);
+
+    /// Triggered when the user double clicks the mouse
+    virtual bool OnMouseDoubleClick(int button, int x, int y);
+
     /// Triggered when this component loses mouse focus
     virtual bool OnMouseExit();
 
@@ -170,7 +179,7 @@ public:
     virtual bool OnMouseEnter();
 
     /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key);
+    virtual bool OnKeypress(int key, int modifiers);
     
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus();

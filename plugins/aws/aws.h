@@ -102,8 +102,8 @@ class awsManager : public iAws
         iGraphics3D *G3D() 
         { return ptG3D; }
 	
-		/// Set dimensions of texture
-		void SetSize(int w, int h);
+	/// Set dimensions of texture
+	void SetSize(int w, int h);
 
    };
 
@@ -200,6 +200,10 @@ public:
     /// Get the iGraphics3D interface so that components can use it.
     virtual iGraphics3D *G3D() 
     { return ptG3D; }
+
+    /// Dispatches events to the proper components
+    virtual bool HandleEvent(iEvent&);
+    
 
  
   //////////////////////////////////////

@@ -77,7 +77,7 @@ public:
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
    
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
-    virtual bool HandleEvent();
+    virtual bool HandleEvent(iEvent& Event);
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();
@@ -149,6 +149,12 @@ public:
     /// Triggered when the user moves the mouse
     virtual bool OnMouseMove(int button, int x, int y)=0;
 
+    /// Triggered when the user clicks the mouse
+    virtual bool OnMouseClick(int button, int x, int y)=0;
+
+    /// Triggered when the user double clicks the mouse
+    virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
+
     /// Triggered when this component loses mouse focus
     virtual bool OnMouseExit()=0;
 
@@ -156,7 +162,7 @@ public:
     virtual bool OnMouseEnter()=0;
 
     /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key)=0;
+    virtual bool OnKeypress(int key, int modifiers)=0;
     
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus()=0;

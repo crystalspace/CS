@@ -2,6 +2,7 @@
 #include "csutil/scfstr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "awsprefs.h"
@@ -39,7 +40,7 @@ awsKey::awsKey(iString *n)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(NULL), awstxtmgr(NULL)
+awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(NULL), awstxtmgr(NULL), fontsvr(NULL), default_font(NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
 }
@@ -100,11 +101,38 @@ awsPrefManager::GetTexture(char *name, char *filename)
  
 }
 
+iFont *
+awsPrefManager::GetDefaultFont()
+{
+  return default_font;
+}
+
+iFont *
+awsPrefManager::GetFont(char *filename)
+{
+  return NULL;
+}
+
 void 
 awsPrefManager::SetTextureManager(iTextureManager *txtmgr)
 {
   if (awstxtmgr)
    awstxtmgr->SetTextureManager(txtmgr);
+}
+
+void
+awsPrefManager::SetFontServer(iFontServer *fntsvr)
+{
+  if (fontsvr)
+    fontsvr->DecRef();
+
+  if (default_font)
+    default_font->DecRef();
+
+  fontsvr = fntsvr;
+
+  // kludge for the moment: this will eventually be more intelligent
+  default_font = fontsvr->LoadFont(CSFONT_LARGE);
 }
 
 void

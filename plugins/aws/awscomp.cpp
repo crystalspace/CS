@@ -79,8 +79,34 @@ awsComponent::Invalidate(csRect area)
 }
 
 bool 
-awsComponent::HandleEvent()
+awsComponent::HandleEvent(iEvent& Event)
 {
+ 
+  switch(Event.Type)
+  {
+  case csevMouseMove:
+    return OnMouseMove(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseUp:
+    return OnMouseUp(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseDown:
+    return OnMouseDown(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseClick:
+    return OnMouseClick(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseEnter:
+    return OnMouseEnter();
+
+  case csevMouseExit:
+    return OnMouseExit();
+
+  case csevKeyDown:
+    return OnKeypress(Event.Key.Char, Event.Key.Modifiers);
+    
+  }
+
   return false;
 }
 

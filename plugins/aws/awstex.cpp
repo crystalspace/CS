@@ -69,7 +69,15 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
       	"could not load the VFS plugin. This is a fatal error.");
+
+    if(!vfs->Mount("/aws", "./data/awsdef.zip"))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awsprefs",
+        	"could not mount the default aws skin (awsdef.zip)aws.");
+    }
   }
+
+  
 }
 
 iTextureHandle * 

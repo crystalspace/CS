@@ -265,14 +265,20 @@ class awsPrefManager : public iAwsPrefs
   /// count of skin defintions loaded
   unsigned int n_skin_defs;
 
-  /// Currently selected skin 
+  /// currently selected skin 
   awsSkinNode *def_skin;
   
-  /// Color index
+  /// color index
   int sys_colors[AC_COLOR_COUNT];
 
   /// aws texture manager
   awsTextureManager *awstxtmgr;
+
+  /// font loader
+  iFontServer *fontsvr;
+
+  /// default font
+  iFont *default_font;
 
 public:
     SCF_DECLARE_IBASE;
@@ -342,13 +348,22 @@ public:
     /// Gets the value of a color from the global AWS palette.
     virtual int  GetColor(int index);
 
+    /// Gets the current default font
+    virtual iFont *GetDefaultFont();
+
+    /// Gets a font.  If it's not loaded, it will be.  Returns NULL on error.
+    virtual iFont *GetFont(char *filename);
+    
     /// Gets a texture from the global AWS cache
     virtual iTextureHandle *GetTexture(char *name, char *filename=NULL);
 
     /** Changes the texture manager: unregisters all current textures, and then re-registers them
      *  with the new manager */
     virtual void SetTextureManager(iTextureManager *txtmgr);
-    
+
+    /** Changes the font server.  This must be set during setup in awsManager. */
+    virtual void SetFontServer(iFontServer *fntsvr);
+        
     /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
        that you do not.  Colors should always be a user preference, and 
