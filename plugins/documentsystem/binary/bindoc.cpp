@@ -323,8 +323,8 @@ static inline bool checkFloat (const char* str, float &v)
     c++;
     firstchar = false;
   }
-  sscanf (str, "%f", &v);
-  return true;
+  int ret = sscanf (str, "%g", &v);
+  return (ret > 0);
 }
 
 void csBinaryDocAttribute::SetValue (const char* val)
@@ -591,7 +591,7 @@ void csBdNode::atSetItem (csBdAttr* item, int pos)
 
 int csBdNode::atItemPos (csBdAttr* item)
 {
-  int i;
+  uint i;
   for (i = 0; i < atNum(); i++)
   {
     if (atGetItem (i) == item) 
@@ -622,7 +622,7 @@ void csBdNode::atRemove (int pos)
   }
 }
 
-int csBdNode::atNum () 
+uint csBdNode::atNum () 
 { 
   if (flags & BD_NODE_MODIFIED)
   {
@@ -660,7 +660,7 @@ void csBdNode::ctSetItem (csBdNode* item, int pos)
 
 int csBdNode::ctItemPos (csBdNode* item)
 {
-  int i;
+  uint i;
   for (i = 0; i < ctNum(); i++)
   {
     if (ctGetItem (i) == item) 
@@ -691,7 +691,7 @@ void csBdNode::ctRemove (int pos)
   }
 }
 
-int csBdNode::ctNum ()
+uint csBdNode::ctNum ()
 {
   if (flags & BD_NODE_MODIFIED)
   {
@@ -1015,7 +1015,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
     delete[] vstr; vstr = 0;
-    nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
+    nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
     nodeData->value = little_endian_long (float2long (value));
   }
@@ -1044,7 +1044,7 @@ csRef<iDocumentNode> csBinaryDocNode::GetNode (const char* value)
 {
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
-    int i;
+    uint i;
     for (i = 0; i < nodeData->ctNum(); i++)
     {
       csBdNode* nodeData = csBinaryDocNode::nodeData->ctGetItem (i);
@@ -1133,7 +1133,7 @@ const char* csBinaryDocNode::GetContentsValue ()
 {
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
-    int i;
+    uint i;
     for (i = 0; i < nodeData->ctNum(); i++)
     {
       csBdNode* nodeData = csBinaryDocNode::nodeData->ctGetItem (i);
@@ -1151,7 +1151,7 @@ int csBinaryDocNode::GetContentsValueAsInt ()
 {
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
-    int i;
+    uint i;
     for (i = 0; i < nodeData->ctNum(); i++)
     {
       csBdNode* nodeData = csBinaryDocNode::nodeData->ctGetItem (i);
@@ -1169,7 +1169,7 @@ float csBinaryDocNode::GetContentsValueAsFloat ()
 {
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
-    int i;
+    uint i;
     for (i = 0; i < nodeData->ctNum(); i++)
     {
       csBdNode* nodeData = csBinaryDocNode::nodeData->ctGetItem (i);
@@ -1370,53 +1370,56 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   size_t nodeStart = nodesFile->GetPos ();
   nodesFile->Write ((char*)&diskNode, nodeSize);
 
+  uint32 scratchSize = 0;
+  if (nodeData->flags & BD_NODE_HAS_ATTR) scratchSize = nodeData->atNum();
+  if (nodeData->flags & BD_NODE_HAS_CHILDREN)
+    scratchSize = MAX(scratchSize, nodeData->ctNum());
+    
+  CS_ALLOC_STACK_ARRAY(uint32, startsScratch, scratchSize);
+  
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
     size_t attrStart = nodesFile->GetPos();
     uint32 attrCount = nodeData->atNum();
-    uint32* attrStarts = new uint32[attrCount];
     nodesFile->Write ((char*)&attrCount, sizeof(uint32));
-    nodesFile->Write ((char*)attrStarts, sizeof(uint32) * attrCount);
+    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
 
     unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
-      attrStarts[i] = little_endian_long (nodesFile->GetPos () - attrStart);
+      startsScratch[i] = little_endian_long (nodesFile->GetPos () - attrStart);
       csBinaryDocAttribute* attr = doc->GetPoolAttr ();
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
     }
     size_t attrEnd = nodesFile->GetPos ();
     nodesFile->SetPos (attrStart + sizeof(uint32));
-    nodesFile->Write ((char*)attrStarts, sizeof(uint32) * attrCount);
+    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
     diskNode.offsets[0] = little_endian_long (attrStart - nodeStart);
     nodesFile->SetPos (attrEnd);
-    delete[] attrStarts;
   }
 
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
     size_t childStart = nodesFile->GetPos();
     uint32 childCount = nodeData->ctNum();
-    uint32* childStarts = new uint32[childCount];
     nodesFile->Write ((char*)&childCount, sizeof(uint32));
-    nodesFile->Write ((char*)childStarts, sizeof(uint32) * childCount);
+    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
 
     unsigned int i;
     for (i = 0; i < childCount; i++)
     {
-      childStarts[i] = little_endian_long (nodesFile->GetPos () - childStart);
+      startsScratch[i] = little_endian_long (nodesFile->GetPos () - childStart);
       csBinaryDocNode* node = doc->GetPoolNode();
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);
     }
     size_t childEnd = nodesFile->GetPos ();
     nodesFile->SetPos (childStart + sizeof(uint32));
-    nodesFile->Write ((char*)childStarts, sizeof(uint32) * childCount);
+    nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
     diskNode.offsets[big_endian_long (diskNode.flags & BD_NODE_HAS_ATTR)] = 
       little_endian_long (childStart - nodeStart);
     nodesFile->SetPos (childEnd);
-    delete[] childStarts;
   }    
 
   if (diskNode.flags & (BD_NODE_HAS_ATTR | BD_NODE_HAS_CHILDREN))
@@ -1640,38 +1643,38 @@ const char* csBinaryDocument::Parse (const char* buf)
   return Parse (newBuffer);
 }
 
-const char* csBinaryDocument::Write (csMemFile& out)
+const char* csBinaryDocument::Write (iFile* out)
 {
   bdHeader head;
   head.magic = BD_HEADER_MAGIC;
 
-  out.Write ((char*)&head, sizeof (head));
+  out->Write ((char*)&head, sizeof (head));
 
-  size_t docStart = out.GetPos();
+  size_t docStart = out->GetPos();
   bdDocument doc;
-  out.Write ((char*)&doc, sizeof (doc));
+  out->Write ((char*)&doc, sizeof (doc));
 
-  outStrStorage = &out;
+  outStrStorage = out;
   outStrHash = new csStringHash (431);
-  doc.ofsStr = out.GetPos();
+  doc.ofsStr = out->GetPos();
   {
     int pad = (4 - doc.ofsStr) & 3;
-    if (pad)
+    if (pad != 0)
     {
       // align to 4 byte boundary, to avoid problems
       char null[4] = {0, 0, 0, 0};
-      out.Write (null, pad);
+      out->Write (null, pad);
       doc.ofsStr += pad;
     }
     doc.ofsStr -= docStart;
   }
   doc.ofsStr = little_endian_long (doc.ofsStr);
-  outStrTabOfs = out.GetPos();
+  outStrTabOfs = out->GetPos();
 
-  csMemFile outNodes;
+  csMemFile* outNodes = new csMemFile;
   if (root)
   {
-    GetRootNode()->Store (&outNodes);
+    GetRootNode()->Store (outNodes);
   }
   else
   {
@@ -1680,43 +1683,35 @@ const char* csBinaryDocument::Write (csMemFile& out)
   delete outStrHash; 
   outStrHash = 0;
 
-  doc.ofsRoot = out.GetPos();
+  doc.ofsRoot = out->GetPos();
   {
     int pad = (4 - doc.ofsRoot) & 3;
-    if (pad)
+    if (pad != 0)
     {
       // align to 4 byte boundary, to avoid problems
       char null[4] = {0, 0, 0, 0};
-      out.Write (null, pad);
+      out->Write (null, pad);
       doc.ofsRoot += pad;
     }
     doc.ofsRoot -= docStart;
   }
   doc.ofsRoot = little_endian_long (doc.ofsRoot);
-  out.Write (outNodes.GetData(), outNodes.GetSize());
+  out->Write (outNodes->GetData(), outNodes->GetSize());
+  delete outNodes;
 
-  head.size = out.GetSize();
-  out.SetPos (0);
-  out.Write ((char*)&head, sizeof (head));
-  out.Write ((char*)&doc, sizeof (doc));
+  head.size = out->GetSize();
+  out->SetPos (0);
+  out->Write ((char*)&head, sizeof (head));
+  out->Write ((char*)&doc, sizeof (doc));
 
   return 0;
-}
-
-const char* csBinaryDocument::Write (iFile* file)
-{
-  csMemFile out;
-  const char* ret = Write(out);
-  file->Write (out.GetData(), out.GetSize());
-
-  return ret;
 }
 
 const char* csBinaryDocument::Write (iString* str)
 {
   csMemFile temp;
 
-  const char* ret = Write (temp);
+  const char* ret = Write (&temp);
   str->Clear();
   str->Append (temp.GetData(), temp.GetSize());
 
@@ -1727,7 +1722,7 @@ const char* csBinaryDocument::Write (iVFS* vfs, const char* filename)
 {
   csMemFile temp;
 
-  const char* ret = Write (temp);
+  const char* ret = Write (&temp);
   vfs->WriteFile (filename, temp.GetData(), temp.GetSize());
 
   return ret;

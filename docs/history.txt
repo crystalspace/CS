@@ -19,6 +19,10 @@ chronological order.
 	  expression in swig.jam was accidentally being expanded in swig.jam
 	  itself.  This keyword needs to appear verbatim in the sed expression;
 	  not in expanded form.
+	- res added a new tool app, docconv, to convert documents between
+	  different document systems.
+	- res tweaked the bindoc plugin a bit so it takes up a bit less memory 
+	  when writing a document.
 10-Nov-2003
 	- Jorrit removed the blend2cs script from CS. It is made obsolete
 	  by the blend2cs project http://projects.blender.org/projects/blend2cs/

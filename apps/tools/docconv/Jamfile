@@ -1,0 +1,9 @@
+SubDir TOP apps tools docconv ;
+
+Application docconv
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith docconv : cstool csutil ;
+
+Help docconv : "Crystal Space Document Converter" ;

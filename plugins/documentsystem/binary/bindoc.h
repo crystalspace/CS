@@ -219,7 +219,7 @@ private:
   /**
    * Where we are in the attribute list.
    */
-  int pos;
+  uint pos;
   /// The node whose attributes we're iterating.
   csBdNode* iteratedNode;
   /// Owning node.
@@ -305,7 +305,7 @@ private:
   /**
    * Where we are in the children list.
    */
-  int pos;
+  uint pos;
   /// Only iterate through nodes w/ this name
   char* value;
   /// Node whose childen we're iterating.
@@ -357,14 +357,14 @@ public:
   int atItemPos (csBdAttr* item);
   void atInsertBefore (csBdAttr* item, int pos);
   void atRemove (int pos);
-  int atNum ();
+  uint atNum ();
 
   csBdNode* ctGetItem (int pos);
   void ctSetItem (csBdNode* item, int pos);
   int ctItemPos (csBdNode* item);
   void ctInsertBefore (csBdNode* item, int pos);
   void ctRemove (int pos);
-  int ctNum ();
+  uint ctNum ();
 };
 
 struct csBinaryDocNode: public iDocumentNode
@@ -454,7 +454,7 @@ private:
   csBinaryDocAttribute* attrPool;
   
   csStringHash* outStrHash;
-  csMemFile* outStrStorage;
+  iFile* outStrStorage;
   uint32 outStrTabOfs;
   uint32 inStrTabOfs;
 
@@ -464,8 +464,6 @@ private:
   void RecyclePoolAttr (csBinaryDocAttribute *attr);
 
   csBinaryDocNode* GetRootNode ();
-
-  const char* Write (csMemFile& out);
 public:
   SCF_DECLARE_IBASE;
 
