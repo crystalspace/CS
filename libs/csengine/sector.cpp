@@ -24,6 +24,7 @@
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/polygon.h"
+#include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/dynlight.h"
 #include "csengine/light.h"
@@ -278,6 +279,20 @@ void* csSector::DrawPolygons (csPolygonParentInt* pi, csPolygonInt** polygon, in
   return NULL;
 }
 
+csPolygon2DQueue* poly_queue;
+
+void* csSector::TestQueuePolygons (csPolygonParentInt* pi, csPolygonInt** polygon, int num, void* data)
+{
+  csRenderView* d = (csRenderView*)data;
+  csSector* sector = (csSector*)pi;
+  sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
+  return NULL;
+}
+
+void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview)
+{
+}
+
 int compare_z_thing (const void* p1, const void* p2)
 {
   csThing* sp1 = *(csThing**)p1;
@@ -327,27 +342,30 @@ void csSector::Draw (csRenderView& rview)
     }
   }
 
-#if 0
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   if (c_buffer)
   {
     csVector3* old_tr3;
+    // @@@ We should make a pool for queues. The number of queues allocated
+    // at the same time is bounded by the recursion through portals. So a
+    // pool would be ideal.
     if (static_thing && do_things)
     {
-      //static_thing->NewTransformation (old_tr3);
-      //static_thing->TransformWorld2Cam (rview);
-      //static_bsp->Front2Back (rview.GetOrigin (), &TestPolygons, (void*)&rview);
+      CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
+      	static_thing->GetNumPolygons ()));
+      static_thing->NewTransformation (old_tr3);
+      static_thing->TransformWorld2Cam (rview);
+      static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons, (void*)&rview);
     }
-    //TestDrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
-    if (static_thing && do_things)
+    else
     {
-      //static_bsp->Back2Front (rview.GetOrigin (), &DrawVisiblePolygons, (void*)&rview);
-      //static_thing->RestoreTransformation (old_tr3);
+      CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
+    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
+    DrawPolygonsFromQueue (poly_queue, &rview);
+    CHK (delete poly_queue);
   }
-#endif
-
-  if (bsp)
+  else if (bsp)
     bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
   else
   {

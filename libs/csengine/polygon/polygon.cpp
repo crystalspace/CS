@@ -111,6 +111,7 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   lightpatches = NULL;
   uv_coords = NULL;
   colors = NULL;
+  static_colors = NULL;
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
@@ -152,6 +153,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
   lightpatches = NULL;
   uv_coords = NULL;
   colors = NULL;
+  static_colors = NULL;
 
   flat_color = poly.flat_color;
 }
@@ -160,6 +162,7 @@ csPolygon3D::~csPolygon3D ()
 {
   CHK (delete [] uv_coords);
   CHK (delete [] colors);
+  CHK (delete [] static_colors);
   CHK (delete [] vertices_idx);
   if (delete_tex_info)
   {
@@ -198,16 +201,93 @@ void csPolygon3D::ResetUV ()
   uv_coords = NULL;
   CHK (delete [] colors);
   colors = NULL;
+  CHK (delete [] static_colors);
+  static_colors = NULL;
 }
+
+void csPolygon3D::AddColor (int i, float r, float g, float b)
+{
+  if (!colors)
+  {
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+  r += static_colors[i].red; if (r > 2) r = 2;
+  g += static_colors[i].green; if (g > 2) g = 2;
+  b += static_colors[i].blue; if (b > 2) b = 2;
+  static_colors[i].Set (r, g, b);
+}
+
+void csPolygon3D::AddDynamicColor (int i, float r, float g, float b)
+{
+  if (!colors)
+  {
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+  r += colors[i].red; if (r > 2) r = 2;
+  g += colors[i].green; if (g > 2) g = 2;
+  b += colors[i].blue; if (b > 2) b = 2;
+  colors[i].Set (r, g, b);
+}
+
 
 void csPolygon3D::SetColor (int i, float r, float g, float b)
 {
   if (!colors)
   {
     CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
     int j;
     for (j = 0 ; j < num_vertices ; j++)
+    {
       colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+  static_colors[i].Set (r, g, b);
+}
+
+void csPolygon3D::ResetDynamicColor (int i)
+{
+  if (!colors)
+  {
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
+  }
+  colors[i] = static_colors[i];
+}
+
+void csPolygon3D::SetDynamicColor (int i, float r, float g, float b)
+{
+  if (!colors)
+  {
+    CHK (colors = new csColor [num_vertices]);
+    CHK (static_colors = new csColor [num_vertices]);
+    int j;
+    for (j = 0 ; j < num_vertices ; j++)
+    {
+      colors[j].Set (0, 0, 0);
+      static_colors[j].Set (0, 0, 0);
+    }
   }
   colors[i].Set (r, g, b);
 }
@@ -1154,6 +1234,51 @@ void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
+void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
+	bool dynamic, bool reset)
+{
+  float rd = 0, gd = 0, bd = 0;
+  if (light)
+  {
+    rd = lcol.red / light->GetRadius ();
+    gd = lcol.green / light->GetRadius ();
+    bd = lcol.blue / light->GetRadius ();
+  }
+
+  csColor col;
+  int i;
+  float cosfact = cosinus_factor;
+  if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (reset)
+    {
+      if (dynamic)
+        ResetDynamicColor (i);
+      else
+        SetColor (i, 0, 0, 0);
+    }
+    if (light)
+    {
+      float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
+      if (d >= light->GetSquaredRadius ()) continue;
+      d = sqrt (d);
+      float cosinus = (Vwor (i)-light->GetCenter ())*GetPolyPlane ()->Normal ();
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0) cosinus = 0;
+      else if (cosinus > 1) cosinus = 1;
+      col.red = cosinus * rd*(light->GetRadius () - d);
+      col.green = cosinus * gd*(light->GetRadius () - d);
+      col.blue = cosinus * bd*(light->GetRadius () - d);
+      if (!dynamic)
+        AddColor (i, col.red, col.green, col.blue);
+      AddDynamicColor (i, col.red, col.green, col.blue);
+    }
+  }
+}
+
 void csPolygon3D::FillLightmap (csLightView& lview)
 {
   if (orig_poly) return;
@@ -1163,54 +1288,6 @@ void csPolygon3D::FillLightmap (csLightView& lview)
     lview.callback (&lview, CALLBACK_POLYGON, (void*)this);
     return;
   }
-
-  if (uv_coords || CheckFlags (CS_POLY_FLATSHADING))
-  {
-    // We are working for a vertex lighted polygon.
-    csLight* light = (csLight*)lview.l;
-    float rd = lview.r / light->GetRadius ();
-    float gd = lview.g / light->GetRadius ();
-    float bd = lview.b / light->GetRadius ();
-
-    if (lview.dynamic)
-    {
-      // Currently not yet supported. @@@
-      // Support for this requires something similar to the static and the
-      // real lightmap so that we can store static gouraud shaded stuff seperatelly.
-      return;
-    }
-    else
-    {
-      csColor col;
-      int i;
-      float cosfact = cosinus_factor;
-      if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
-
-      for (i = 0 ; i < num_vertices ; i++)
-      {
-        if (colors && !lview.gouraud_color_reset) col = colors[i];
-	else col.Set (0, 0, 0);
-        float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
-	if (d >= light->GetSquaredRadius ()) continue;
-	d = sqrt (d);
-	float cosinus = (Vwor (i)-light->GetCenter ())*GetPolyPlane ()->Normal ();
-	cosinus /= d;
-	cosinus += cosfact;
-	if (cosinus < 0) cosinus = 0;
-	else if (cosinus > 1) cosinus = 1;
-	col.red = col.red + cosinus * rd*(light->GetRadius () - d);
-	if (col.red > 1) col.red = 1;
-	col.green = col.green + cosinus * gd*(light->GetRadius () - d);
-	if (col.green > 1) col.green = 1;
-	col.blue = col.blue + cosinus * bd*(light->GetRadius () - d);
-	if (col.blue > 1) col.blue = 1;
-        SetColor (i, col);
-      }
-    }
-    return;
-  }
-
-  if (lview.gouraud_only) return;
 
   if (lview.dynamic)
   {
@@ -1245,10 +1322,19 @@ void csPolygon3D::FillLightmap (csLightView& lview)
       //lp->vertices[i] = lview.frustrum[mi] + lview.center;
       lp->vertices[i] = lview.light_frustrum->GetVertex (mi);
     }
-
   }
   else
   {
+    if (uv_coords || CheckFlags (CS_POLY_FLATSHADING))
+    {
+      // We are working for a vertex lighted polygon.
+      csColor col (lview.r, lview.g, lview.b);
+      UpdateVertexLighting ((csLight*)lview.l, col, false, lview.gouraud_color_reset);
+      return;
+    }
+
+    if (lview.gouraud_only) return;
+
     if (lightmap_up_to_date) return;
     tex->FillLightmap (lview);
 #if 0
@@ -1467,8 +1553,9 @@ csPolygon2D::csPolygon2D (int max, bool use_uv)
 {
   max_vertices = max;
   CHK (vertices = new csVector2 [max]);
-  if (use_uv) { CHK (uv_coords = new csVector2 [max]); }
-  else uv_coords = NULL;
+  //@@@
+  // if (use_uv) { CHK (uv_coords = new csVector2 [max]); }
+  // else uv_coords = NULL;
   MakeEmpty ();
 }
 
@@ -1479,18 +1566,22 @@ csPolygon2D::csPolygon2D (csPolygon2D& copy)
   num_vertices = copy.num_vertices;
   memcpy (vertices, copy.vertices, sizeof (csVector2)*num_vertices);
   bbox = copy.bbox;
-  if (copy.uv_coords)
-  {
-    CHK (uv_coords = new csVector2 [max_vertices]);
-    memcpy (uv_coords, copy.uv_coords, sizeof (csVector2)*num_vertices);
-  }
-  else uv_coords = NULL;
+  //if (copy.uv_coords)
+  //{
+    //CHK (uv_coords = new csVector2 [max_vertices]);
+    //memcpy (uv_coords, copy.uv_coords, sizeof (csVector2)*num_vertices);
+  //}
+  //else uv_coords = NULL;
 }
 
 csPolygon2D::~csPolygon2D ()
 {
-  CHK (delete [] vertices);
-  CHK (delete [] uv_coords);
+  // Only delete the vertex array if max_vertices != 0.
+  // If max_vertices == 0 then this is a virtual 2D polygon
+  // allocated by csPolygon2DQueue.
+  if (max_vertices)
+    CHKB (delete [] vertices);
+  //CHK (delete [] uv_coords);
 }
 
 void csPolygon2D::MakeEmpty ()
@@ -1868,13 +1959,15 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       {
 	const csPlane& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-	dist1 = v.Norm () * (-pl.DD / denom);
+	//dist1 = v.Norm () * (-pl.DD / denom);
+        dist1 = v.z * (-pl.DD / denom);
       }
       else
         dist1 = 0;
       const csPlane& pl = fog_info->outgoing_plane;
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-      dist2 = v.Norm () * (-pl.DD / denom);
+      //dist2 = v.Norm () * (-pl.DD / denom);
+      dist2 = v.z * (-pl.DD / denom);
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
@@ -1941,6 +2034,35 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
 
   if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
+    // We have a gouraud shaded polygon.
+    // Add all dynamic lights if polygon is dirty.
+    csPolyTexture* tex = poly->GetPolyTex (0);
+    if (tex->dyn_dirty)
+    {
+      csLightPatch* lp = poly->GetLightpatches ();
+      if (lp)
+      {
+        // If there is at least one light patch we do the lighting reset
+	// in the first call to UpdateVertexLighting().
+        bool reset = true;
+        while (lp)
+        {
+          poly->UpdateVertexLighting (lp->GetLight (), lp->GetLight ()->GetColor (),
+      	    true, reset);
+	  reset = false;
+          lp = lp->GetNextPoly ();
+        }
+      }
+      else
+      {
+        // There are no more lightpatches. In this case we need to restore
+	// lighting to the static lighting. This can be done by calling
+	// UpdateVertexLighting() with no light and reset set to true.
+	poly->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
+      }
+      tex->dyn_dirty = false;
+    }
+
     static G3DPolygonDPFX g3dpoly;
     csVector2 orig_triangle[3];
 
@@ -2097,3 +2219,75 @@ void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPoly
 }
 
 //---------------------------------------------------------------------------
+
+csVector2Array::csVector2Array ()
+{
+  // Preallocate 100 vectors in the array.
+  max_vectors = 100;
+  CHK (array = new csVector2 [max_vectors]);
+  num_vectors = 0;
+}
+
+csVector2Array::~csVector2Array ()
+{
+  CHK (delete [] array);
+}
+
+int csVector2Array::AddArray (int n)
+{
+  int index = num_vectors;
+  num_vectors += n;
+  if (num_vectors > max_vectors)
+  {
+    max_vectors += 50;
+    CHK (csVector2* new_array = new csVector2 [max_vectors]);
+    if (num_vectors-n > 0)
+      memcpy (new_array, array, (num_vectors-n)*sizeof (csVector2));
+    CHK (delete [] array);
+    array = new_array;
+  }
+  return index;
+}
+
+//---------------------------------------------------------------------------
+
+csVector2Array csPolygon2DQueue::vector_array;
+
+csPolygon2DQueue::csPolygon2DQueue (int max_size)
+{
+  CHK (queue = new csQueueElement [max_size]);
+  max_queue = max_size;
+  num_queue = 0;
+  vector_idx = vector_array.GetNextIndex ();
+}
+
+csPolygon2DQueue::~csPolygon2DQueue ()
+{
+  CHK (delete [] queue);
+  vector_array.RemoveArray (vector_idx);
+}
+
+void csPolygon2DQueue::Push (csPolygon3D* poly3d, csPolygon2D* poly2d)
+{
+  queue[num_queue].poly3d = poly3d;
+  queue[num_queue].vector_len = poly2d->GetNumVertices ();
+  queue[num_queue].vector_idx = vector_array.AddArray (
+  	poly2d->GetNumVertices ());
+  memcpy (vector_array.GetVectors (queue[num_queue].vector_idx),
+  	poly2d->GetVertices (), sizeof (csVector2)*poly2d->GetNumVertices ());
+  num_queue++;
+}
+
+void csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D* poly2d)
+{
+  num_queue--;
+  *poly3d = queue[num_queue].poly3d;
+  poly2d->MakeEmpty ();
+  csVector2* array = vector_array.GetVectors (queue[num_queue].vector_idx);
+  int i;
+  for (i = 0 ; i < queue[num_queue].vector_len ; i++)
+    poly2d->AddVertex (array[i]);
+}
+
+//---------------------------------------------------------------------------
+
