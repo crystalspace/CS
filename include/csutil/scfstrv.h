@@ -35,9 +35,6 @@ public:
   scfStrVector (int iLimit = 16, int iDelta = 16)
   { CONSTRUCT_IBASE (NULL); v = new csStrVector (iLimit, iDelta); }
 
-  /// Create a iStrVector from given csStrVector (takes ownership)
-  scfStrVector (csStrVector*);
-
   /// Destroy the iStrVector object
   virtual ~scfStrVector ();
 
