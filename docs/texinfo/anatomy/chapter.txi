@@ -17,8 +17,6 @@ Virtual File System (@sc{vfs})
 @item
 Format of @emph{World} File
 @item
-Makefiles
-@item
 @anchor{CSWS}
 Crystal Space Windowing System (@sc{csws})
 @item
