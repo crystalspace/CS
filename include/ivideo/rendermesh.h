@@ -47,6 +47,12 @@ struct iPortalContainer;
 /// Document me! @@@
 struct csRenderMesh
 {
+#ifdef CS_DEBUG
+  // To make debugging easier we add the name of the mesh object
+  // here in debug mode.
+  const char* db_mesh_name;
+#endif
+	
   csRenderMesh () 
   {
     z_buf_mode = CS_ZBUF_NONE;
@@ -58,6 +64,9 @@ struct csRenderMesh
     indexstart = indexend = 0;
     portal = 0;
     geometryInstance = 0;
+#ifdef CS_DEBUG
+    db_mesh_name = "<unknown>";
+#endif
   }
 
   ~csRenderMesh () {}

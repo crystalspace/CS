@@ -292,6 +292,11 @@ public:
 
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num);
+#ifdef CS_DEBUG
+    int i;
+    for (i = 0 ; i < num ; i++)
+      meshes[i]->db_mesh_name = cmesh->GetName ();
+#endif
     privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	cmesh->GetZBufMode ());
   }

@@ -160,6 +160,7 @@ void csPortalContainer::Prepare ()
 
 #ifdef CS_USE_NEW_RENDERER
   rmesh.portal = this;
+  rmesh.material = 0;
 #endif
 }
 

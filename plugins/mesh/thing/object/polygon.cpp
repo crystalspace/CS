@@ -73,6 +73,7 @@ csPolygon3DStatic::csPolygon3DStatic ()
   polygon_data.tmapping = 0;
   polygon_data.num_vertices = 0;
   polygon_data.vertices = 0;
+  polygon_data.useLightmap = false;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 

@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Mar-2004
+	- Jorrit added a db_mesh_name field to csRenderMesh (but only
+	  in debug mode!). This field is updated by the engine (before
+	  calling AddRenderMeshes()) and can be used for debugging
+	  purposes. Without this field it is extremely hard to discover
+	  the source of a csRenderMesh.
+	- Jorrit again fixed a few errors throughout the Crystal Space
+	  project as reported by valgrind.
+	      - engine: portal containers didn't initialize the material
+	        field. Although this material field is strictly not needed
+		it was used by the csRenderMeshList to sort two portals
+		relative to each other.
+	      - NR OpenGL renderer: in the csVBORenderBuffer implementation
+	        there was a potentially serious lack of initialization
+		with the 'lastLock' field.
+	      - Thing mesh: the useLightmap field was not initialized.
 6-Mar-2004
 	- Anders Stenberg finally found and fixed a clipper problem in NR, 
 	  which actually turned out to be more than a clipper problem.

@@ -159,6 +159,7 @@ public:
     ext->glBufferDataARB (index?
       GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, size, 0, 
       (type==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
+    lastLock = CS_BUF_LOCK_NOLOCK;
   }
   csVBORenderBuffer (csVBORenderBuffer *copy) :
     csGLRenderBuffer (copy->size, copy->type, copy->comptype, copy->compcount)
@@ -168,6 +169,7 @@ public:
     buftype = copy->buftype;
     bufferId = copy->bufferId;
     locked = false;
+    lastLock = CS_BUF_LOCK_NOLOCK;
   }
 
   virtual ~csVBORenderBuffer ()
