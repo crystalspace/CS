@@ -30,6 +30,8 @@ The history order is reversed so that new features are at the top.
 	  MazeD in a zip file at ftp://sunsite.dk/projects/crystal.
 	- Eric Sunshine fixed CS/mk/static.mak to account for new "SCF_" prefix
 	  on SCF_REGISTER_STATIC_LIBRARY().
+	- Eric Sunshine fixed 3dsout.cpp so that it now emits `CULLER' rather
+	  than the obsolete `STATBSP' keyword.
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging
