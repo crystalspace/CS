@@ -31,6 +31,8 @@ chronological order.
 	  CS_EMIT_CHECK_PYTHON(), which emits the build properties expected by
 	  the Jam system. These macros are now suitable for use by external
 	  projects.
+	- Jorrit fixed the explo mesh object so that it works correctly
+	  again.
 13-May-2004
 	- Eric Sunshine generalized the CS_EMIT_PACKAGEINFO() macro in
 	  packageinfo.m4 so that it can work with any suitable emitter macro,

@@ -210,7 +210,6 @@ void csParticleSystem::RemoveParticles ()
   particles.DeleteAll ();
   sprite2ds.DeleteAll ();
   scfiObjectModel.ShapeChanged ();
-  initialized = false;
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height,
