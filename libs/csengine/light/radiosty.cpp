@@ -914,7 +914,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / distance;
-  if(totalfactor > 1.0f) totalfactor = 1.0f;
+  //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
 #if 0
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
