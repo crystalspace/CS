@@ -214,6 +214,7 @@ void csGraphics3DNull::Close()
   vbufmgr->DecRef (); vbufmgr = NULL;
 
   G2D->Close ();
+  G2D->DecRef(); G2D = NULL;
   width = height = -1;
 }
 
