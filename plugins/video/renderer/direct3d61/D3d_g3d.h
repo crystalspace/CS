@@ -191,6 +191,9 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   /// type of transparency blending
   D3DBLEND m_TransSrcBlend, m_TransDstBlend;
 
+protected:
+  csReversibleTransform o2c;
+
 public:
   DECLARE_IBASE;
 
@@ -305,10 +308,10 @@ public:
   {
     m_o2c = *o2c;
   }
-  /// Get world to camera transformation. 
-  virtual void GetObjectToCamera (csReversibleTransform& o2c) 
+  /// Get world to camera transformation.
+  virtual const csReversibleTransform& GetObjectToCamera ()
   {
-    o2c = m_o2c;
+    return o2c;
   }
   /// Set optional clipper. 
   virtual void SetClipper (csVector2* vertices, int num_vertices);
