@@ -127,14 +127,6 @@ These makefile targets place the generated output in subdirectories of
 @file{CS/out/docs}.  The hierarchy of subdirectories mirrors that of
 @file{CS/docs} where the master copies of these documents are kept.
 
-@subheading Texture Archive
-@cindex Texture Archive
-@cindex Archives, Texture
-
-A Crystal Space texture archive is maintained at:
-
-@uref{http://server.empathy.com/crystal/}.
-
 @node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
