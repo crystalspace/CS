@@ -48,6 +48,7 @@ csPortal::csPortal (csPortalContainer* parent)
   max_sector_visit = 5;
   csPortal::parent = parent;
   name = 0;
+  flags.Set (CS_PORTAL_VISCULL);
 
   VectorArray = GetStaticVectorArray ();
 }

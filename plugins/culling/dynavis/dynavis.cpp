@@ -355,7 +355,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
 
-  if (visobj_wrap->model->EmptyObject ())
+  if (visobj_wrap->model->IsEmptyObject ())
   {
     visobj_wrap->hint_badoccluder = true;
     visobj_wrap->hint_goodoccluder = false;
@@ -430,7 +430,7 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
 
-  if (visobj_wrap->model->EmptyObject ())
+  if (visobj_wrap->model->IsEmptyObject ())
   {
     visobj_wrap->hint_badoccluder = true;
     visobj_wrap->hint_goodoccluder = false;
@@ -453,6 +453,17 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 
 namespace
 {
+
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov * 10;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
 
 void InvPerspective (const csVector2& p, float z, csVector3& v,
 	float fov, float sx, float sy)
@@ -1050,6 +1061,178 @@ bool csDynaVis::TestWriteQueueRelevance (float min_depth,
   return use_wq;
 }
 
+void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
+  	VisTest_Front2BackData* data, iCamera* camera, bool& vis,
+	csBox2& sbox, float& min_depth, float& max_depth)
+{
+  float fov = camera->GetFOV ();
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  csVisibilityObjectHistory* hist = obj->history;
+  iVisibilityObject* visobj = obj->visobj;
+
+  iMovable* movable = visobj->GetMovable ();
+  csReversibleTransform trans = camera->GetTransform ();
+  if (!obj->full_transform_identity)
+  {
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    trans /= movtrans;
+  }
+
+  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshBase ();
+  const csVector3* verts = polymesh->GetVertices ();
+  csMeshedPolygon* poly = polymesh->GetPolygons ();
+  int num_verts = poly->num_vertices;
+  int* vi = poly->vertices;
+
+  csVector2 v2d;
+  csVector3 v = trans * verts[vi[0]];
+  min_depth = v.z;
+  max_depth = v.z;
+  if (v.z < .1)
+    PerspectiveWrong (v, v2d, fov, sx, sy);
+  else
+    Perspective (v, v2d, fov, sx, sy);
+  sbox.StartBoundingBox (v2d);
+  int i;
+  for (i = 1 ; i < num_verts ; i++)
+  {
+    v = trans * verts[vi[i]];
+    if (min_depth > v.z) min_depth = v.z;
+    else if (max_depth < v.z) max_depth = v.z;
+    if (v.z < .1)
+      PerspectiveWrong (v, v2d, fov, sx, sy);
+    else
+      Perspective (v, v2d, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (v2d);
+  }
+
+  if (max_depth < .1 || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
+        sbox.MinX () >= scr_width || sbox.MinY () >= scr_height)
+  {
+    obj->MarkInvisible (INVISIBLE_FRUSTUM);
+    vis = false;
+    return;
+  }
+
+  // If previously marked visible we stop here.
+  if (vis) return;
+
+  // Now assume that the object is visible. In the following code we
+  // will attempt to prove that it is not visible.
+  vis = true;
+
+  if (do_cull_coverage != COVERAGE_NONE)
+  {
+    bool rc = false;
+
+    if (do_cull_vpt)
+    {
+      csVector2 sbox_center = sbox.GetCenter ();
+      rc = tcovbuf->TestPoint (sbox_center, max_depth);
+      if (rc)
+      {
+	// The point is visible. If we have write queue enabled we
+	// have to test further.
+	if (do_cull_writequeue)
+	  if (write_queue->IsPointAffected (sbox_center, max_depth))
+	    rc = false;
+      }
+
+      if (rc)
+      {
+	// Point is visible. So we know the entire object is visible.
+	obj->MarkVisible (VISIBLE_VPT, dist_history (), 0, current_vistest_nr,
+	      	  history_frame_cnt);
+	data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	cnt_visible++;
+	return;
+      }
+    }
+
+    csTestRectData testrect_data;
+#   ifdef CS_DEBUG
+    if (do_state_dump)
+    {
+      csRef<iString> str = tcovbuf->Debug_Dump ();
+      printf ("Before single-poly test:\n%s\n", str->GetData ());
+    }
+#   endif
+    rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
+    if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+
+    if (rc)
+    {
+      // Object is visible. If we have a write queue we will first
+      // test if there are objects in the queue that may mark the
+      // object as non-visible.
+      if (do_cull_writequeue &&
+      	 hist->no_writequeue_vis_cnt <= history_frame_cnt)
+      {
+        bool use_wq = TestWriteQueueRelevance (min_depth, testrect_data, sbox);
+
+	// If the write queue is enabled we try to see if there
+	// are occluders that are relevant (intersect with this object
+	// to test). We will insert those object with the coverage
+	// buffer and test again.
+	if (use_wq)
+	{
+	  float out_depth;
+	  csVisibilityObjectWrapper* qobj = (csVisibilityObjectWrapper*)
+	    	write_queue->Fetch (sbox, min_depth, out_depth);
+	  if (qobj)
+	  {
+#           ifdef CS_DEBUG
+	    if (do_state_dump)
+	    {
+	      printf ("Adding objects from write queue!\n");
+	      fflush (stdout);
+	    }
+#           endif
+	    // We have found one such object. Insert them all.
+	    do
+	    {
+	      // Yes! We found such an object. Insert it now.
+	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj);
+	      // Now try again.
+              rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+              if (!rc)
+	      {
+	        // It really is invisible.
+	        obj->MarkInvisible (INVISIBLE_TESTRECT);
+	        vis = false;
+                return;
+	      }
+	      qobj = (csVisibilityObjectWrapper*)
+	    	    write_queue->Fetch (sbox, min_depth, out_depth);
+	    }
+	    while (qobj);
+	  }
+	}
+      }
+    }
+    else
+    {
+      obj->MarkInvisible (INVISIBLE_TESTRECT);
+      vis = false;
+      return;
+    }
+
+    // If we come here we are visible. VPT tracking for single poly
+    // objects is easy so we don't bother calculating a VPT point here.
+  }
+
+  //---------------------------------------------------------------
+  // Object is visible so we should write it to the coverage buffer.
+  obj->MarkVisible (VISIBLE, dist_history (), dist_nowritequeue (),
+  	current_vistest_nr, history_frame_cnt);
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+  cnt_visible++;
+
+  return;
+}
+
 bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, uint32 frustum_mask)
 {
@@ -1100,10 +1283,20 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   }
 
   // If we come here we know that either the object is already marked
-  // visible because of history culling of inside-box test or else the
+  // visible because of history culling or inside-box test or else the
   // object is at least not invisible due to frustum culling. In this case
   // we calculate the screen bounding box since we know we are going to need
   // it both for additional visibility testing and also for the write queue.
+
+  // If we have a single polygon object (which is usually a portal object)
+  // then we use a special case which is computed more accuratelly and
+  // more efficiently.
+  if (obj->model->IsSinglePolygon ())
+  {
+    TestSinglePolygonVisibility (obj, data, camera, vis,
+    	sbox, min_depth, max_depth);
+    goto end;
+  }
 
   float fov; fov = camera->GetFOV ();
   float sx; sx = camera->GetShiftX ();
@@ -1175,34 +1368,18 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       }
     }
 
-    rc = true;
-
     csTestRectData testrect_data;
-    bool cont_check = true;
-    if (rc)
+#   ifdef CS_DEBUG
+    if (do_state_dump)
     {
-#     ifdef CS_DEBUG
-      if (do_state_dump)
-      {
-        csRef<iString> str = tcovbuf->Debug_Dump ();
-        printf ("Before obj test:\n%s\n", str->GetData ());
-      }
-#     endif
-      rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
-      if (rc)
-      {
-	rc = tcovbuf->TestRectangle (testrect_data, min_depth);
-      }
-      else
-      {
-	// If PrepareTestRectangle() fails then we know that the rectangle
-	// test fails regardless of write queue contents. So we don't have
-	// to continue.
-	cont_check = false;
-      }
+      csRef<iString> str = tcovbuf->Debug_Dump ();
+      printf ("Before obj test:\n%s\n", str->GetData ());
     }
+#   endif
+    rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
+    if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
 
-    if (rc && cont_check)
+    if (rc)
     {
       // Object is visible. If we have a write queue we will first
       // test if there are objects in the queue that may mark the

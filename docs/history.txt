@@ -27,6 +27,15 @@ chronological order.
 	  this command.
 	- Jorrit extended walktest demo playback so that it shows the fps after
 	  finishing one run.
+	- Jorrit fixed a bug in portals. The default polygon mesh for
+	  visibility culling would be empty (because the VISCULL flag was
+	  not set for the portals).
+	- Jorrit extended Dynavis with a special case for single polygon
+	  objects (portals are often such objects). Since portals are
+	  expensive to render it is worth the effort to try to do a little
+	  more work on them.
+	- Jorrit changed Dynavis so that the polygon based culler is selected
+	  if there are less then 10 polygons.
 	- res fixed csutil.mak to not use all .c files, but only regexp_impl.c.
 26-Feb-2004
 	- Eric Sunshine fixed the old renderer gl3d, soft3d, null3d, and the

@@ -772,6 +772,8 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	fflush (stdout);
 	if (cfg_playloop)
 	  cfg_playrecording = 0;
+	else
+	  cfg_playrecording = -1;
 
         record_start_time = csGetTicks ();
         record_frame_count = 0;
@@ -860,15 +862,24 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
       csVector3 vel = view->GetCamera ()->GetTransform ().GetT2O ()*velocity;
 
       static bool check_once = false;
-      if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y) < SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
+      if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y)
+      	< SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
       {
         // If we don't move we don't have to do the collision detection tests.
 	// However, we need to do it once to make sure that we are standing
 	// on solid ground. So we first set 'check_once' to true to enable
 	// one more test.
-	if (check_once == false) { check_once = true; DoGravity (Engine, pos, vel); }
+	if (check_once == false)
+	{
+	  check_once = true;
+	  DoGravity (Engine, pos, vel);
+	}
       }
-      else { check_once = false; DoGravity (Engine, pos, vel); }
+      else
+      {
+        check_once = false;
+	DoGravity (Engine, pos, vel);
+      }
     }
   }
 }
@@ -882,6 +893,10 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
+    if (Sys->cfg_playrecording >= 0 && Sys->recording.Length () > 0)
+    {
+      Sys->record_frame_count++;
+    }
     Sys->DrawFrame (csGetTicks ()-t, csGetTicks ());
     Sys->FinishFrame ();
     t = csGetTicks ();

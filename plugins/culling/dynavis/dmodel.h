@@ -91,6 +91,9 @@ private:
   // If true then object is empty and we can't do coverage culling.
   bool empty_object;
 
+  // If true then object is single polygon.
+  bool single_polygon;
+
   csPolygonMeshEdge* edges;
   int num_edges;
 
@@ -121,7 +124,10 @@ public:
   bool CanUseOutlineFiller () const { return use_outline_filler; }
 
   /// Return true if model is empty.
-  bool EmptyObject () const { return empty_object; }
+  bool IsEmptyObject () const { return empty_object; }
+
+  /// Return true if model is single polygon.
+  bool IsSinglePolygon () const { return single_polygon; }
   
   /// Get the OBB for this model.
   const csOBB& GetOBB ();

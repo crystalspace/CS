@@ -42,6 +42,7 @@ csDynavisObjectModel::csDynavisObjectModel ()
   imodel = 0;
   use_outline_filler = false;
   empty_object = true;
+  single_polygon = false;
 }
 
 csDynavisObjectModel::~csDynavisObjectModel ()
@@ -204,35 +205,54 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
       csPolygonMeshTools::CheckActiveEdges (model->edges, model->num_edges,
       	model->planes);
 
+      // If we have less then some number of polygons then we don't
+      // use outline culling because it is not worth the effort (and
+      // lack of accuracy).
+      if (mesh->GetPolygonCount () < 10)
+      {
+        model->use_outline_filler = false;
+      }
+
       // Here we scan all edges and see if there are edges that have only
       // one adjacent polygon. If we find such an edge then we will not use
       // outline based culling for this object. This is not good as it will
       // slow down culling so you should try to avoid this situation in levels.
-
-      int i;
-      for (i = 0 ; i < model->num_edges ; i++)
-        if (model->edges[i].poly2 == -1)
-	{
-	  model->use_outline_filler = false;
-	  if (show_notclosed > 0)
+      if (model->use_outline_filler)
+      {
+        int i;
+        for (i = 0 ; i < model->num_edges ; i++)
+          if (model->edges[i].poly2 == -1)
 	  {
-	    printf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
-	  	mw->QueryObject ()->GetName () : "<no mesh>");
-	    fflush (stdout);
-	    show_notclosed--;
+	    model->use_outline_filler = false;
+	    if (show_notclosed > 0)
+	    {
+	      printf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
+	  	  mw->QueryObject ()->GetName () : "<no mesh>");
+	      fflush (stdout);
+	      show_notclosed--;
+	    }
+	    else if (show_notclosed == 0)
+	    {
+	      printf ("...\n");
+	      fflush (stdout);
+	      show_notclosed--;
+	    }
+	    break;
 	  }
-	  else if (show_notclosed == 0)
-	  {
-	    printf ("...\n");
-	    fflush (stdout);
-	    show_notclosed--;
-	  }
-	  break;
-	}
+      }
     }
     else
     {
       model->empty_object = true;
+    }
+    mesh = model->imodel->GetPolygonMeshBase ();
+    if (mesh)
+    {
+      model->single_polygon = mesh->GetPolygonCount () == 1;
+    }
+    else
+    {
+      model->single_polygon = false;
     }
     return true;
   }

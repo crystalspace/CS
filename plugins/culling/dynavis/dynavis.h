@@ -254,6 +254,11 @@ public:
   bool TestNodeVisibility (csKDTree* treenode, VisTest_Front2BackData* data,
   	uint32& frustum_mask);
 
+  // Test visibility for the given single-polygon object.
+  // Returns true if visible.
+  void TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
+  	VisTest_Front2BackData* data, iCamera* camera, bool& vis,
+	csBox2& sbox, float& min_depth, float& max_depth);
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, uint32 frustum_mask);
