@@ -41,6 +41,9 @@ The history order is reversed so that new features are at the top.
 	  same restrictions as simpcon.
 	- Removed the STRICT_SMART_POINTERS flag. This is now on in all cases.
 	  People should have converted to smart pointers by now.
+	- Fixed several application makefiles to also link with CSSYS
+	  at the end now. This is needed because of the new csMutex
+	  dependencies.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
