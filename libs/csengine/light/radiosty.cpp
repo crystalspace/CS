@@ -98,20 +98,11 @@ void csRadPoly :: GetLumelWorldCoords(csVector3& res, int x, int y)
 
   csPolyTexture *polytext = polygon->GetLightMapInfo()->GetPolyTex();
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  csPolyPlane* pl = polygon->GetPlane ();
   csMatrix3 *m_world2tex;
   csVector3 *v_world2tex;
   txt_pl->GetWorldToTexture(m_world2tex, v_world2tex);
   csMatrix3 m_t2w = m_world2tex->GetInverse ();
   csVector3 vv = *v_world2tex;
-  float A = pl->GetWorldPlane ().A ();
-  float B = pl->GetWorldPlane ().B ();
-  float C = pl->GetWorldPlane ().C ();
-  float D = pl->GetWorldPlane ().D ();
-  float txt_A = A*m_t2w.m11 + B*m_t2w.m21 + C*m_t2w.m31;
-  float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
-  float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
-  float txt_D = A*v_world2tex->x + B*v_world2tex->y + C*v_world2tex->z + D;
 
   csVector3 v1, v2;
   int lightcell_shift = csLightMap::lightcell_shift;
@@ -121,10 +112,6 @@ void csRadPoly :: GetLumelWorldCoords(csVector3& res, int x, int y)
   int Imin_v = polytext->GetIMinV();
   v1.x = (float)(ru + Imin_u) * invww;
   v1.y = (float)(rv + Imin_v) * invhh;
-  if (ABS (txt_C) < SMALL_EPSILON)
-    v1.z = 0;
-  else
-    v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
   v2 = vv + m_t2w * v1;
 
   res = v2;
@@ -712,6 +699,7 @@ void csRadiosity :: DoRadiosity()
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
+
     // start the frustum calcs.
     StartFrustum();
     // have shot all from shootrad.
