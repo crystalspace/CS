@@ -382,7 +382,7 @@ iMeshWrapper* csSector::HitBeamPortals (
   csVector3 &isect,
   int* polygon_idx)
 {
-  iMeshWrapper* mesh;
+  iMeshWrapper* mesh = 0;
   int p = IntersectSegment (start, end, isect, 0, false,
 		  &mesh);
   if (p != -1)
@@ -415,7 +415,7 @@ iMeshWrapper *csSector::HitBeam (
 {
   GetVisibilityCuller ();
   float r;
-  iMeshWrapper* mesh;
+  iMeshWrapper* mesh = 0;
   int poly = -1;
   bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly,
   	accurate);
