@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Oct-1999
+	- Received landscape engine code from Alex Pfaffe. It is not
+	  fully integrated yet. I prepared it so that it compiles
+	  ok but that's it.
+4-Oct-1999
+	- Continued work on quadcube/quadtree lighting. It is almost
+	  working but there are still a few problems here and there.
 3-Oct-1999
 	- Continued work on quadcube/quadtree lighting. It is almost
 	  working but there are still a few problems here and there.
@@ -25,6 +32,9 @@ Short-term cleanups that need to be done:
 	  platforms.
 	- Eric Sunshine fixed a number of compilation warnings which were
 	  recently introduced into the project.
+2-Oct-1999
+	- Thomas Hieber moved Win32 to COM emulation. (No more native
+	  COM by default).
 1-Oct-1999
 	- Finished implementation of csQuadtree. Also added csQuadcube
 	  class which represents a cube of quad-trees.
@@ -37,6 +47,9 @@ Short-term cleanups that need to be done:
 	  it was necessary to break csSystemDriver::Time() out into its own
 	  source file.
 	- Eric Sunshine fixed a shadowed-variable compiler warning in md2.cpp.
+	- Seth Galbraith changed the way sprite normals are calculated.
+	- Robert Bate brings the Macintosh port up-to-date.
+	- Gert Steenssens fixes Glide renderer.
 30-Sep-1999
 	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
 	  conforms to the CS makefile system.  He was also forced to rename
@@ -59,6 +72,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a bug in Squawk where it would crash if fewer
 	  than three views were created and the user tried navigating one of
 	  the missing views.
+	- Thomas Hieber fixed a small warning on Map2CS for Linux.
 29-Sep-1999
 	- Added initial code base from Brandon Ehle for the CS scripting
 	  layer.
