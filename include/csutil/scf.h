@@ -1076,6 +1076,6 @@ SCF_VERSION (iSCF, 0, 2, 1);
 // A bit hacky.
 #include "csutil/reftrackeraccess.h"
 
-/* @} */
+/** @} */
 
 #endif // __CSSCF_H__

@@ -368,7 +368,7 @@ public:
   STR_APPEND(float, "%g", 64)
   STR_APPEND(double, "%g", 64)
 #undef STR_APPEND
-  //@}
+  /** @} */
 
 #if !defined(CS_USE_FAKE_BOOL_TYPE)
   /// Append a boolean (as a number -- 1 or 0) to this string.
@@ -418,7 +418,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_REPLACE(bool)
 #endif
 #undef STR_REPLACE
-  //@}
+  /** @} */
   
   /**
    * Check if another string is equal to this one.
@@ -608,7 +608,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_FORMAT_FLOAT(float)
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
-  //@}
+  /** @} */
 
   /**
    * Pad to a specified size with leading characters.
@@ -645,7 +645,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADLEFT(bool)
 #endif
 #undef STR_PADLEFT
-  //@}
+  /** @} */
 
   /**
    * Pad to a specified size with trailing characters.
@@ -682,7 +682,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADRIGHT(bool)
 #endif
 #undef STR_PADRIGHT
-  //@}
+  /** @} */
 
   /**
    * Pad to a specified size with leading and trailing characters so as to
@@ -722,7 +722,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_PADCENTER(bool)
 #endif
 #undef STR_PADCENTER
-  //@}
+  /** @} */
 
 #define STR_ASSIGN(TYPE) \
 const csString& operator = (TYPE s) { return Replace (s); }
@@ -746,7 +746,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(bool)
 #endif
 #undef STR_ASSIGN
-  //@}
+  /** @} */
 
 #define STR_OP_APPEND(TYPE) \
   csString &operator += (TYPE s) { return Append (s); }
@@ -770,7 +770,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
   STR_OP_APPEND(bool)
 #endif
 #undef STR_OP_APPEND
-  //@}
+  /** @} */
 
   /// Add another string to this one and return the result as a new string.
   csString operator + (const csString &iStr) const
@@ -882,6 +882,6 @@ STR_SHIFT(double)
 STR_SHIFT(bool)
 #endif
 #undef STR_SHIFT
-//@}
+/** @} */
 
 #endif // __CS_CSSTRING_H__
