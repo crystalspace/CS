@@ -1,0 +1,1456 @@
+/*
+    Copyright (C) 1998 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <stdarg.h>
+
+#include "sysdef.h"
+#include "qint.h"
+#include "cscom/com.h"
+#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
+#include "cs3d/opengl/ogl_g3d.h"
+#include "cs3d/opengl/ogl_txtcache.h"
+#include "csutil/inifile.h"
+#include "isystem.h"
+#include "igraph3d.h"
+#include "itxtmgr.h"
+#include "itexture.h"
+#include "ipolygon.h"
+#include "icamera.h"
+#include "ilghtmap.h"
+#include "igraph2d.h"
+
+#include <GL/gl.h>
+
+// uncomment the 'USE_MULTITEXTURE 1' define to enable compile-time tests for
+// multitexture support
+#define USE_MULTITEXTURE 0
+#ifdef GL_ARB_multitexture
+//#define USE_MULTITEXTURE 1
+#endif
+
+// Option variable: do texture lighting?
+bool csGraphics3DOpenGL::do_lighting = true;
+// Option variable: render transparent textures?
+bool csGraphics3DOpenGL::do_transp = true;
+// Option variable: render textures?
+bool csGraphics3DOpenGL::do_textured = true;
+// Option variable: do perfect texture mapping?
+bool csGraphics3DOpenGL::do_perfect = false;
+// Option variable: do multitexturing?  How many textures can we do at once?
+int csGraphics3DOpenGL::do_multitexture_level = 0;
+// Interlacing.
+int csGraphics3DOpenGL::do_interlaced = -1;
+bool csGraphics3DOpenGL::ilace_fastmove = false;
+// Texel filtering.
+bool csGraphics3DOpenGL::do_texel_filt = false;
+
+#if USE_MULTITEXTURE
+// function to check for a certain extension - stolen from 
+// an example by Mark Kilgard
+static int isExtensionSupported(const char * extension);
+#endif
+//---------------------------------------------------------------------------
+
+IMPLEMENT_UNKNOWN (csGraphics3DOpenGL)
+
+BEGIN_INTERFACE_TABLE (csGraphics3DOpenGL)
+    IMPLEMENTS_INTERFACE (IGraphics3D)
+END_INTERFACE_TABLE ()
+
+csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem) : m_piG2D (NULL)
+{
+  HRESULT hRes;
+  CLSID clsid2dDriver;
+  char *sz2DDriver = OPENGL_2D_DRIVER;
+  IGraphics2DFactory* piFactory = NULL;
+  texture_cache = NULL;
+  lightmap_cache = NULL;
+  txtmgr = NULL;
+
+  m_piSystem = piSystem;
+
+  hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
+  if (FAILED(hRes))
+  {	
+      SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
+      exit(0);
+  }
+
+  hRes = csCoGetClassObject( clsid2dDriver, CLSCTX_INPROC_SERVER, NULL, (REFIID)IID_IGraphics2DFactory, (void**)&piFactory );
+  if (FAILED(hRes))
+  {
+      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
+      exit(0);
+  }
+
+  hRes = piFactory->CreateInstance( (REFIID)IID_IGraphics2D, m_piSystem, (void**)&m_piG2D );
+  if (FAILED(hRes))
+  {
+      SysPrintf(MSG_FATAL_ERROR, "Error! Couldn't create 2D graphics driver instance.");
+      exit(0);
+  }
+
+  FINAL_RELEASE( piFactory );
+
+  CHK (txtmgr = new csTextureManagerOpenGL (m_piSystem, m_piG2D));
+
+  dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
+}
+
+STDMETHODIMP csGraphics3DOpenGL::Initialize ()
+{
+  txtmgr->SetConfig (config = new csIniFile ("opengl.cfg"));
+
+  m_piG2D->Initialize ();
+  txtmgr->InitSystem ();
+
+  rstate_dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
+
+  z_buf_mode = CS_ZBUF_NONE;
+
+  width = height = -1;
+
+  rstate_alphablend = true;
+  rstate_mipmap = 0;
+  rstate_gouraud = true;
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
+{
+  DrawMode = 0;
+
+  IGraphicsInfo* piGI = NULL;
+
+  VERIFY_SUCCESS( m_piG2D->QueryInterface((IID&)IID_IGraphicsInfo, (void**)&piGI) );
+
+  if (FAILED(m_piG2D->Open (Title)))
+  {
+      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
+      FINAL_RELEASE( piGI );
+      // set "not opened" flag
+      width = height = -1;
+
+      return E_UNEXPECTED;
+  }
+
+  int nWidth, nHeight;
+  bool bFullScreen;
+
+  piGI->GetWidth(nWidth);
+  piGI->GetHeight(nHeight);
+  piGI->GetIsFullScreen(bFullScreen);
+
+  width = nWidth;
+  height = nHeight;
+  width2 = nWidth/2;
+  height2 = nHeight/2;
+  SetDimensions (width, height);
+
+  SysPrintf(MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
+            bFullScreen ? "full screen" : "windowed", nWidth, nHeight);
+
+  csPixelFormat pfmt;
+  piGI->GetPixelFormat (&pfmt);
+/*
+  if (gi_pixelbytes > 1)
+  {
+    csPixelFormat pfmt;
+    piGI->GetPixelFormat( &pfmt );
+
+    SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+          gi_pixelbytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
+
+    CHK (tcache = new TextureCache16 ());
+  }
+  else
+  {
+    SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
+    CHK (tcache = new TextureCache ());
+  }
+*/
+  if (rstate_dither)
+    glEnable (GL_DITHER);
+  else
+    glDisable (GL_DITHER);
+
+  if (config->GetYesNo ("OpenGL", "HINT_PERSPECTIVE_FAST", false))
+    glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+  else
+    glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+  do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
+
+  // determine what blend mode to use when combining lightmaps with their
+  // under lying textures.  This mode is set in the Opengl configuration file
+  char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
+  if (strcmp(lightmapstyle,"multiplydouble") == 0)
+  {
+     // final color = lightmap * texture * 2
+     m_lightmap_src_blend = GL_DST_COLOR;
+     m_lightmap_dst_blend = GL_SRC_COLOR;
+  }
+  else if (strcmp(lightmapstyle,"multiply") == 0)
+  {
+    // final color = lightmap * texture
+    m_lightmap_src_blend = GL_DST_COLOR;
+    m_lightmap_dst_blend = GL_ZERO;
+  }
+  else if (strcmp(lightmapstyle,"add") == 0)
+  {
+    // final color = lightmap + texture
+    m_lightmap_src_blend = GL_ONE;
+    m_lightmap_dst_blend = GL_ONE;
+  }
+  else if (strcmp(lightmapstyle,"coloradd") == 0)
+  {
+    // final color = lightmap + lightmap * texture
+    m_lightmap_src_blend = GL_ONE;
+    m_lightmap_dst_blend = GL_SRC_COLOR;
+  }
+  else // default is multiply, which is reasonably supported
+  {
+    SysPrintf (MSG_INITIALIZATION, "Unknown lightmap mode '%s', using default\n",
+      lightmapstyle);
+    m_lightmap_src_blend = GL_DST_COLOR;
+    m_lightmap_dst_blend = GL_ZERO;
+  }
+
+#if USE_MULTITEXTURE
+  // check with the GL driver and see if it supports the multitexure
+  // extension
+  if (isExtensionSupported("GL_ARB_multitexture"))
+  {
+    // if you support multitexture, you should allow more than one
+    // texture, right?  Let's see how many we can get...
+    GLint maxtextures;
+    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
+    
+    if (maxtextures > 1)
+    {
+      do_multitexture_level = maxtextures;
+      SysPrintf (MSG_INITIALIZATION, "Using multitexture extension; up to %d textures allowed.",maxtextures);
+    }
+    else
+    {
+      SysPrintf (MSG_INITIALIZATION, "WARNING: driver supports multitexture extension but only allows one texture!\n");
+    }
+  }
+#endif
+
+  // need some good way of determining a good texture map size and
+  // bit depth for the texture 'cache', since GL hides most of the details
+  // from us.  Maybe we should just not worry about it... GJH
+  CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
+  CHK (lightmap_cache = new OpenGLLightmapCache(1<<24,24));
+  texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
+
+  glClearColor (0.,0.,0.,0.);
+  glClearDepth (-1.0);
+
+  // if the user tries to draw lines, text, etc. before calling
+  // BeginDraw() they will not see anything since the transforms are
+  // not set up correctly until you call BeginDraw().  However,
+  // the engine initializer likes to print out console messages
+  // on the screen before any 'normal' drawing has been done, so
+  // here we set up the transforms so that initialization text will appear on
+  // the screen.
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+
+  glOrtho(0.,(GLdouble)width,0.,(GLdouble)height,-1.0,1.0);
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity();
+
+  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+
+  FINAL_RELEASE (piGI);
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::Close()
+{
+  HRESULT rc = S_OK;
+  if ((width == height) && height == -1)
+    return rc;
+  rc = m_piG2D->Close();
+  width = height = -1;
+  return rc;
+}
+
+csGraphics3DOpenGL::~csGraphics3DOpenGL ()
+{
+  CHK (delete config);
+  Close ();
+  FINAL_RELEASE (m_piG2D);
+
+  CHK (delete texture_cache);
+  CHK (delete lightmap_cache);
+  CHK (delete txtmgr);
+}
+
+STDMETHODIMP csGraphics3DOpenGL::SetDimensions (int width, int height)
+{
+  csGraphics3DOpenGL::width = width;
+  csGraphics3DOpenGL::height = height;
+  csGraphics3DOpenGL::width2 = width/2;
+  csGraphics3DOpenGL::height2 = height/2;
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::SetPerspectiveCenter (int x, int y)
+{
+  width2 = x;
+  height2 = y;
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::BeginDraw (int DrawFlags)
+{
+  //ASSERT( m_piG2D );
+
+  // if 2D graphics is not locked, lock it
+  if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+   && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+  {
+    if (FAILED (m_piG2D->BeginDraw()))
+      return E_UNEXPECTED;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.,(GLdouble)width,0.,(GLdouble)height,-1.0,10.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glColor3f(1.,0.,0.);
+//  glClearColor(0.,1.,0.,0.);
+    glClearColor(0.,0.,0.,0.);
+    dbg_current_polygon = 0;
+  }
+
+  if (DrawFlags & CSDRAW_CLEARZBUFFER)
+  {
+    if (DrawFlags & CSDRAW_CLEARSCREEN)
+      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    else
+      glClear(GL_DEPTH_BUFFER_BIT);
+  }
+  else if (DrawFlags & CSDRAW_CLEARSCREEN)
+    m_piG2D->Clear(0);
+
+  DrawMode = DrawFlags;
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::FinishDraw ()
+{
+  //ASSERT( m_piG2D );
+
+  if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+  {
+    m_piG2D->FinishDraw ();
+  }
+  DrawMode = 0;
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::Print (csRect *area)
+{
+  m_piG2D->Print (area);
+  //glClear(GL_COLOR_BUFFER_BIT);
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::SetZBufMode (G3DZBufMode mode)
+{
+  z_buf_mode = mode;
+  return S_OK;
+}
+
+#define SMALL_D 0.01
+
+/**
+ * The engine often generates "empty" polygons, for example
+ * (2, 2) - (317,2) - (317,2) - (2, 2)
+ * To avoid too much computations, DrawPolygon detects such polygons by
+ * counting the number of "real" vertices (i.e. the number of vertices,
+ * distance between which is bigger that some amount). The "right" formula
+ * for distance is sqrt(dX^2 + dY^2) but to avoid root and multiply
+ * DrawPolygon checks abs(dX) + abs(dY). This is enough.
+ */
+#define VERTEX_NEAR_THRESHOLD   0.001
+
+STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
+{
+  int i;
+  float P1, P2, P3, P4;
+  float Q1, Q2, Q3, Q4;
+  int max_i, min_i;
+  float max_y, min_y;
+  float min_z, max_z;
+
+  IGraphicsInfo* piGI = NULL;
+  int gi_pixelbytes;
+  float inv_aspect = poly.inv_aspect;
+
+  if (poly.num < 3) return S_FALSE;
+
+  // For debugging: is we reach the maximum number of polygons to draw we simply stop.
+  dbg_current_polygon++;
+  if (dbg_current_polygon == dbg_max_polygons_to_draw-1) return E_FAIL;
+  if (dbg_current_polygon >= dbg_max_polygons_to_draw-1) return S_OK;
+
+  VERIFY_SUCCESS (m_piG2D->QueryInterface( (REFIID)IID_IGraphicsInfo, (void**)&piGI));
+  piGI->GetPixelBytes( gi_pixelbytes);
+  FINAL_RELEASE (piGI);
+
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+  float Ac, Bc, Cc, Dc, inv_Dc;
+  Ac = poly.normal.A;
+  Bc = poly.normal.B;
+  Cc = poly.normal.C;
+  Dc = poly.normal.D;
+
+  float M, N, O;
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane normal is too small. This means that
+    // the plane of the polygon is almost perpendicular to the eye of the
+    // viewer. In this case, nothing much can be seen of the plane anyway
+    // so we just take one value for the entire polygon.
+    M = 0;
+    N = 0;
+    // For O choose the transformed z value of one vertex.
+    // That way Z buffering should at least work.
+    O = 1/poly.z_value;
+  }
+  else
+  {
+    inv_Dc = 1/Dc;
+    M = -Ac*inv_Dc*inv_aspect;
+    N = -Bc*inv_Dc*inv_aspect;
+    O = -Cc*inv_Dc;
+  }
+  // Compute the min_y and max_y for this polygon in screen space coordinates.
+  // We are going to use these to scan the polygon from top to bottom.
+  // Also compute the min_z/max_z in camera space coordinates. This is going to be
+  // used for mipmapping.
+  min_i = max_i = 0;
+  min_y = max_y = poly.vertices[0].sy;
+  max_z = min_z = M * (poly.vertices[0].sx - width2)
+                + N * (poly.vertices[0].sy - height2) + O;
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1 ; i < poly.num ; i++)
+  {
+    if (poly.vertices[i].sy > max_y)
+    {
+      max_y = poly.vertices[i].sy;
+      max_i = i;
+    }
+    else if (poly.vertices[i].sy < min_y)
+    {
+      min_y = poly.vertices[i].sy;
+      min_i = i;
+    }
+    float inv_z = M * (poly.vertices[i].sx - width2)
+                + N * (poly.vertices[i].sy - height2) + O;
+    if (inv_z > min_z) min_z = inv_z;
+    if (inv_z < max_z) max_z = inv_z;
+    // theoretically we should do here sqrt(dx^2+dy^2), but
+    // we can approximate it just by abs(dx)+abs(dy)
+    if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
+       + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3) return S_FALSE;
+
+  // Mipmapping.
+  int mipmap;
+  if (!poly.uses_mipmaps ||  rstate_mipmap == 1)
+    mipmap = 0;
+  else if (rstate_mipmap == 0)
+  {
+    //@@@ The ZDIST_... config values should move to the 3D rasterizer
+    if (min_z < 8) mipmap =  0;
+    else if (min_z < 16) mipmap = 1;
+    else if (min_z < 28) mipmap = 2;
+    else mipmap = 3;
+  }
+  else
+    mipmap = rstate_mipmap - 1;
+
+  IPolygonTexture*   tex     = poly.poly_texture[mipmap];
+  csTextureMMOpenGL* txt_mm  = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+
+  // Initialize our static drawing information and cache
+  // the texture in the texture cache (if this is not already the case).
+  CacheTexture (tex);
+
+  // @@@ The texture transform matrix is currently written as T = M*(C-V)
+  // (with V being the transform vector, M the transform matrix, and C
+  // the position in camera space coordinates. It would be better (more
+  // suitable for the following calculations) if it would be written
+  // as T = M*C - V.
+  P1 = poly.plane.m_cam2tex->m11;
+  P2 = poly.plane.m_cam2tex->m12;
+  P3 = poly.plane.m_cam2tex->m13;
+  P4 = - (P1 * poly.plane.v_cam2tex->x
+        + P2 * poly.plane.v_cam2tex->y
+        + P3 * poly.plane.v_cam2tex->z);
+  Q1 = poly.plane.m_cam2tex->m21;
+  Q2 = poly.plane.m_cam2tex->m22;
+  Q3 = poly.plane.m_cam2tex->m23;
+  Q4 = - (Q1 * poly.plane.v_cam2tex->x
+        + Q2 * poly.plane.v_cam2tex->y
+        + Q3 * poly.plane.v_cam2tex->z);
+
+  // Precompute everything so that we can calculate (u,v) (texture space
+  // coordinates) for every (sx,sy) (screen space coordinates). We make
+  // use of the fact that 1/z, u/z and v/z are linear in screen space.
+  float J1, J2, J3, K1, K2, K3;
+  if (ABS (Dc) < SMALL_D)
+  {
+    // The Dc component of the plane of the polygon is too small.
+    J1 = J2 = J3 = 0;
+    K1 = K2 = K3 = 0;
+  } else
+  {
+    J1 = P1 * inv_aspect + P4 * M;
+    J2 = P2 * inv_aspect + P4 * N;
+    J3 = P3              + P4 * O;
+    K1 = Q1 * inv_aspect + Q4 * M;
+    K2 = Q2 * inv_aspect + Q4 * N;
+    K3 = Q3              + Q4 * O;
+  }
+
+  bool tex_transp;
+  int poly_alpha = poly.alpha;
+
+  HighColorCache_Data *texturecache_data;
+  texturecache_data = txt_mm->get_hicolorcache ();
+  tex_transp = txt_mm->get_transparent ();
+  GLuint texturehandle = *( (GLuint *) (texturecache_data->pData) );
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+
+  glShadeModel (GL_FLAT);
+  if (do_textured)
+    glEnable (GL_TEXTURE_2D);
+  else
+  {
+    glDisable (GL_TEXTURE_2D);
+    poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+  }
+
+  SetGLZBufferFlags ();
+
+  if ((poly_alpha > 0) || tex_transp)
+  {
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable (GL_BLEND);
+    if (poly_alpha > 0)
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float)poly_alpha / 100.0);
+    else
+      glColor4f (flat_r, flat_g, flat_b, 1.0);
+  }
+  else
+  {
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+  }
+
+  // find lightmap information, if any
+  ILightMap *thelightmap = NULL;
+  tex->GetLightMap(&thelightmap);
+
+  float sx,sy,sz, one_over_sz, u_over_sz, v_over_sz;
+#if USE_MULTITEXTURE
+  // if we support multiple textures, then it may be possible to combine
+  // the following two passes into a single pass with multitexuring.
+  if (thelightmap && (do_multitexture_level > 1) )
+  {
+    HighColorCache_Data *lightmapcache_data;
+    thelightmap->GetHighColorCache(&lightmapcache_data);
+    GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
+
+    // Jorrit: this code was added to scale the lightmap.
+    // @@@ Note that many calculations in this routine are not very optimal
+    // to do here and should in fact be precalculated.
+    int lmwidth, lmrealwidth, lmheight, lmrealheight;
+    thelightmap->GetWidth (lmwidth);
+    thelightmap->GetRealWidth (lmrealwidth);
+    thelightmap->GetHeight (lmheight);
+    thelightmap->GetRealHeight (lmrealheight);
+    //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+    //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+    float scale_u = (float)(lmrealwidth) / (float)lmwidth;
+    float scale_v = (float)(lmrealheight) / (float)lmheight;
+
+    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
+                       lightmap_high_u,lightmap_high_v);
+
+    float lightmap_scale_u, lightmap_scale_v;
+
+    if (lightmap_high_u == lightmap_low_u)
+      lightmap_scale_u = scale_u;	// @@@ Is this right?
+    else
+      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
+
+    if (lightmap_high_v == lightmap_low_v)
+      lightmap_scale_v = scale_v;	// @@@ Is this right?
+    else
+      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
+    float light_u, light_v;
+
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glBindTexture (GL_TEXTURE_2D, texturehandle);
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    glEnable (GL_TEXTURE_2D);
+    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    glBegin(GL_TRIANGLE_FAN);
+    for (i=0; i<poly.num; i++)
+    {
+      sx = poly.vertices[i].sx - width2;
+      sy = poly.vertices[i].sy - height2;
+      one_over_sz = M*sx + N*sy + O;
+      sz = 1.0/one_over_sz;
+      u_over_sz = (J1 * sx + J2 * sy + J3);
+      v_over_sz = (K1 * sx + K2 * sy + K3);
+      light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
+      light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
+      // we must communicate the perspective correction (1/z) for textures
+      // by using homogenous coordinates in either texture space
+      // or in object (vertex) space.  We do it in texture space.
+
+      // modified to use homogenous object space coordinates instead
+      // of homogenous texture space coordinates
+      glMultiTexCoord2fARB (GL_TEXTURE0_ARB,u_over_sz*sz, v_over_sz*sz);
+      glMultiTexCoord2fARB (GL_TEXTURE1_ARB,light_u, light_v);
+      glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
+    }
+    glEnd();
+
+    // we must disable the 2nd texture unit, so that other parts of the
+    // code won't accidently have a second texture applied if they
+    // don't want it.
+    // at this point our active texture is still TEXTURE1_ARB
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    glDisable (GL_TEXTURE_2D);
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+
+    FINAL_RELEASE (thelightmap);
+  }
+  else
+  {
+#endif
+
+  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  glBegin(GL_TRIANGLE_FAN);
+  for (i=0; i<poly.num; i++)
+  {
+    sx = poly.vertices[i].sx - width2;
+    sy = poly.vertices[i].sy - height2;
+    one_over_sz = M*sx + N*sy + O;
+    sz = 1.0/one_over_sz;
+    u_over_sz = (J1 * sx + J2 * sy + J3);
+    v_over_sz = (K1 * sx + K2 * sy + K3);
+    // we must communicate the perspective correction (1/z) for textures
+    // by using homogenous coordinates in either texture space
+    // or in object (vertex) space.  We do it in texture space.
+    //glTexCoord4f(u_over_sz,v_over_sz,one_over_sz,one_over_sz);
+    //glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy, -one_over_sz);
+
+    // modified to use homogenous object space coordinates instead
+    // of homogenous texture space coordinates
+    glTexCoord2f (u_over_sz*sz, v_over_sz*sz);
+    glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
+  }
+  glEnd();
+
+  // next draw the lightmap over the texture.  The two are blended
+  // together.
+  // if a lightmap exists, extract the proper data (GL handle, plus
+  // texture coordinate bounds)
+  if (thelightmap && do_lighting)
+  {
+    HighColorCache_Data *lightmapcache_data;
+    thelightmap->GetHighColorCache(&lightmapcache_data);
+    GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
+
+    // Jorrit: this code was added to scale the lightmap.
+    // @@@ Note that many calculations in this routine are not very optimal
+    // to do here and should in fact be precalculated.
+    int lmwidth, lmrealwidth, lmheight, lmrealheight;
+    thelightmap->GetWidth (lmwidth);
+    thelightmap->GetRealWidth (lmrealwidth);
+    thelightmap->GetHeight (lmheight);
+    thelightmap->GetRealHeight (lmrealheight);
+    float scale_u = (float)(lmrealwidth) / (float)(lmwidth);
+    float scale_v = (float)(lmrealheight) / (float)(lmheight);
+    //float scale_u = (float)(lmrealwidth) / (float)lmwidth;
+    //float scale_v = (float)(lmrealheight) / (float)lmheight;
+
+    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
+                       lightmap_high_u,lightmap_high_v);
+    lightmap_low_u-=0.125;
+    lightmap_low_v-=0.125;
+    lightmap_high_u+=0.125;
+    lightmap_high_v+=0.125;
+
+    float lightmap_scale_u, lightmap_scale_v;
+
+    if (lightmap_high_u <= lightmap_low_u)
+    {
+      lightmap_scale_u = scale_u;	// @@@ Is this right?
+      lightmap_high_u = lightmap_low_u;
+    }
+    else
+      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
+
+    if (lightmap_high_v <= lightmap_low_v)
+    {
+      lightmap_scale_v = scale_v;	// @@@ Is this right?
+      lightmap_high_v = lightmap_low_v;
+    }
+    else
+      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
+    float light_u, light_v;
+
+    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+    glEnable (GL_TEXTURE_2D);
+
+    // Here we set the Z buffer depth function to GL_EQUAL to make sure
+    // that the lightmap only overwrites those areas where the Z buffer
+    // was updated in the previous pass. This makes sure that intersecting
+    // polygons are properly lighted.
+    if (z_buf_mode == CS_ZBUF_FILL)
+      glDisable(GL_DEPTH_TEST);
+    else
+      glDepthFunc (GL_EQUAL);
+
+    glEnable(GL_BLEND);
+    // The following blend function is configurable.
+    glBlendFunc (m_lightmap_src_blend, m_lightmap_dst_blend);
+
+    glBegin(GL_TRIANGLE_FAN);
+    for (i=0; i<poly.num; i++)
+    {
+      sx = poly.vertices[i].sx - width2;
+      sy = poly.vertices[i].sy - height2;
+      one_over_sz = M*sx + N*sy + O;
+      sz = 1.0/one_over_sz;
+      u_over_sz = (J1 * sx + J2 * sy + J3);
+      v_over_sz = (K1 * sx + K2 * sy + K3);
+      light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
+      light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
+      // we must communicate the perspective correction (1/z) for textures
+      // by using homogenous coordinates in either texture space
+      // or in object (vertex) space.  We do it in texture space.
+      //glTexCoord4f(light_u/sz,light_v/sz,one_over_sz,one_over_sz);
+      //glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy, -one_over_sz);
+
+      // modified to use homogenous object space coordinates instead
+      // of homogenous texture space coordinates
+      glTexCoord2f (light_u, light_v);
+      glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
+    }
+    glEnd();
+
+    FINAL_RELEASE (thelightmap);
+  }
+
+#if USE_MULTITEXTURE
+  }
+  // end of 'if (thelightmap...)' in #ifdef section above
+#endif
+
+  // An extra pass which improves the lighting on SRC*DST so that
+  // it looks more like 2*SRC*DST.
+  if (do_extra_bright)
+  {
+    glDisable (GL_TEXTURE_2D);
+    if (z_buf_mode == CS_ZBUF_FILL)
+      glDisable(GL_DEPTH_TEST);
+    else
+      glDepthFunc (GL_EQUAL);
+    glShadeModel (GL_SMOOTH);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+    //glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+
+    glBegin (GL_TRIANGLE_FAN);
+    for (i = 0; i < poly.num; i++)
+    {
+      sx = poly.vertices [i].sx - width2;
+      sy = poly.vertices [i].sy - height2;
+      one_over_sz = M * sx + N * sy + O;
+      sz = 1.0 / one_over_sz;
+      glColor4f (2, 2, 2, 0);
+      glVertex4f (poly.vertices [i].sx * sz, poly.vertices [i].sy * sz, -1.0, sz);
+    }
+    glEnd ();
+  }
+
+
+  // If there is vertex fog then we apply that last.
+  if (poly.use_fog)
+  {
+    glDisable (GL_TEXTURE_2D);
+    if (z_buf_mode == CS_ZBUF_FILL)
+      glDisable(GL_DEPTH_TEST);
+    else
+      glDepthFunc (GL_EQUAL);
+    glShadeModel (GL_SMOOTH);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBegin (GL_TRIANGLE_FAN);
+    for (i = 0; i < poly.num; i++)
+    {
+      sx = poly.vertices [i].sx - width2;
+      sy = poly.vertices [i].sy - height2;
+      one_over_sz = M * sx + N * sy + O;
+      sz = 1.0 / one_over_sz;
+
+      // Formula for fog is:
+      //    C = I * F + (1-I) * P
+      //	I = intensity = density * thickness
+      //	F = fog color
+      //	P = texture color
+      //	C = destination color
+
+      glColor4f (poly.fog_info [i].r, poly.fog_info [i].g, poly.fog_info [i].b,
+        poly.fog_info[i].intensity);
+
+      glVertex4f (poly.vertices [i].sx * sz, poly.vertices [i].sy * sz, -1.0, sz);
+    }
+    glEnd ();
+  }
+
+  FINAL_RELEASE (tex);
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::DrawPolygonDebug (G3DPolygonDP& /*poly*/)
+{
+  return S_OK;
+}
+
+// Calculate round (f) of a 16:16 fixed pointer number
+// and return a long integer.
+inline long round16 (long f)
+{
+  return (f + 0x8000) >> 16;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mode)
+{
+  m_gouraud = do_lighting && rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
+  m_mixmode = mode;
+  m_alpha = 1.0f - float (mode & CS_FX_MASK_ALPHA) / 255.;
+
+  GLuint texturehandle = 0;
+  if (handle && do_textured)
+  {
+    csTextureMMOpenGL* txt_mm = (csTextureMMOpenGL*)GetcsTextureMMFromITextureHandle (handle);
+    texture_cache->Add (handle);
+
+    HighColorCache_Data *cachedata;
+    cachedata = txt_mm->get_hicolorcache ();
+    texturehandle = *( (GLuint *) (cachedata->pData) );
+  }
+
+  if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+    m_gouraud = true;
+
+  // set proper shading: flat is typically faster, but we need smoothing
+  // enabled when doing gouraud shading -GJH
+  if (m_gouraud)
+    glShadeModel (GL_SMOOTH);
+  else
+    glShadeModel (GL_FLAT);
+
+  // Note: In all explanations of Mixing:
+  // Color: resulting color
+  // SRC:   Color of the texel (content of the texture to be drawn)
+  // DEST:  Color of the pixel on screen
+  // Alpha: Alpha value of the polygon
+  bool enable_blending = true;
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+    case CS_FX_MULTIPLY:
+      // Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      break;
+    case CS_FX_MULTIPLY2:
+      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc(GL_DST_COLOR,GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ADD:
+      // Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_alpha = 1.0f;
+      glBlendFunc(GL_ONE,GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ALPHA:
+      // Color = Alpha * DEST + (1-Alpha) * SRC
+      glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_TRANSPARENT:
+      // Color = 1 * DEST + 0 * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ZERO,GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_COPY:
+    default:
+      enable_blending = false;
+      // Color = 0 * DEST + 1 * SRC = SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ONE, GL_ZERO);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+  }
+
+  m_textured = (texturehandle != 0);
+  if (m_textured)
+  {
+    glBindTexture (GL_TEXTURE_2D, texturehandle);
+    glEnable (GL_TEXTURE_2D);
+  }
+  else
+    glDisable (GL_TEXTURE_2D);
+
+  if (enable_blending)
+    glEnable (GL_BLEND);
+  else
+    glDisable (GL_BLEND);
+
+  SetGLZBufferFlags ();
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::FinishPolygonFX()
+{
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
+{
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+  if (!m_textured)
+  {
+    flat_r = poly.flat_color_r;
+    flat_g = poly.flat_color_g;
+    flat_b = poly.flat_color_b;
+  }
+
+  glBegin (GL_TRIANGLE_FAN);
+  float sx,sy;
+  int i;
+  for (i = 0; i < poly.num; i++)
+  {
+    sx = poly.vertices[i].sx - width2;
+    sy = poly.vertices[i].sy - height2;
+    glTexCoord2f (poly.vertices[i].u,poly.vertices[i].v);
+    if (m_gouraud)
+      glColor4f (flat_r * poly.vertices[i].r, flat_g * poly.vertices[i].g,
+        flat_b * poly.vertices[i].b, m_alpha);
+    else
+      glColor4f (flat_r, flat_g, flat_b, m_alpha);
+    glVertex3f (poly.vertices[i].sx,poly.vertices[i].sy,-poly.vertices[i].z);
+  }
+  glEnd ();
+
+  // If there is vertex fog then we apply that last.
+  if (poly.use_fog)
+  {
+    // Remember old values.
+/*    GLenum oldBlendDst, oldBlendSrc, oldDepthFunc;
+    glGetIntegerv (GL_BLEND_DST, (GLint *)&oldBlendDst);
+    glGetIntegerv (GL_BLEND_SRC, (GLint *)&oldBlendSrc);
+    glGetIntegerv (GL_DEPTH_FUNC, (GLint *)&oldDepthFunc);*/
+    // let OpenGL save old values for us instead, to prevent stalls in the
+    // graphics pipeline -GJH
+    // -GL_COLOR_BUFFER_BIT saves blend types among other things,
+    // -GL_DEPTH_BUFFER_BIT saves depth function
+    glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDisable (GL_TEXTURE_2D);
+    glEnable (GL_BLEND);
+    glDepthFunc (GL_EQUAL);
+    glShadeModel (GL_SMOOTH);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBegin (GL_TRIANGLE_FAN);
+    for (i = 0; i < poly.num; i++)
+    {
+      sx = poly.vertices[i].sx - width2;
+      sy = poly.vertices[i].sy - height2;
+
+      // Formula for fog is:
+      //    C = I * F + (1-I) * P
+      //	I = intensity = density * thickness
+      //	F = fog color
+      //	P = texture color
+      //	C = destination color
+      float I = poly.fog_info[i].intensity;
+      glColor4f (poly.fog_info[i].r, poly.fog_info[i].g, poly.fog_info[i].b, I);
+      glVertex3f (poly.vertices[i].sx,poly.vertices[i].sy,-poly.vertices[i].z);
+    }
+    glEnd ();
+
+    // Restore for next triangle
+    glPopAttrib();
+    if (m_textured)
+      glEnable (GL_TEXTURE_2D);
+    if (!m_gouraud)
+      glShadeModel (GL_FLAT);
+/*    glBlendFunc(oldBlendSrc,oldBlendDst);
+    glDepthFunc(oldDepthFunc);*/
+  }
+
+  return S_OK;
+}
+
+/**
+ * Initiate a volumetric fog object. This function will be called
+ * before front-facing and back-facing fog polygons are added to
+ * the object. The fog object will be convex but not necesarily
+ *         closed.
+ * The given CS_ID can be used to identify multiple fog
+ * objects when
+ * multiple objects are started.
+ */
+STDMETHODIMP csGraphics3DOpenGL::OpenFogObject(CS_ID /*id*/, csFog* /*fog*/)
+{
+  return S_OK;
+}
+
+/**
+ *   * Add a front or back-facing fog polygon in the current fog object.
+ * Note that it is guaranteed that all back-facing fog polygons
+ * will have been added before the first front-facing polygon.
+ * fogtype can be:
+ *    CS_FOG_FRONT:   a front-facing polygon
+ *    CS_FOG_BACK:    a back-facing polygon
+ *    CS_FOG_VIEW:    the view-plane
+ */
+STDMETHODIMP csGraphics3DOpenGL::AddFogPolygon(CS_ID /*id*/, G3DPolygonAFP &/*poly*/, int /*fogtype*/)
+{
+  return S_OK;
+}
+
+/**
+ * Close a volumetric fog object. After the volumetric object is
+ * closed it should be rendered on screen (whether you do it here
+ * or in DrawFrontFog/DrawBackFog is not important).
+ */
+STDMETHODIMP csGraphics3DOpenGL::CloseFogObject(CS_ID /*id*/)
+{
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::CacheTexture (IPolygonTexture* texture)
+{
+  ITextureHandle* txt_handle;
+  texture->GetTextureHandle (&txt_handle);
+  texture_cache->Add (txt_handle);
+  lightmap_cache->Add (texture);
+
+  FINAL_RELEASE(txt_handle);
+
+  return S_OK;
+}
+
+void csGraphics3DOpenGL::CacheLightedTexture(IPolygonTexture* /*texture*/)
+{
+}
+
+void csGraphics3DOpenGL::CacheInitTexture (IPolygonTexture* /*texture*/)
+{
+#if 0
+  ITextureContainer* piTC;
+  world->GetTextures (&piTC);
+  tcache->init_texture (texture, piTC);
+  piTC->Release ();
+#endif
+}
+
+void csGraphics3DOpenGL::CacheSubTexture (IPolygonTexture* /*texture*/, int /*u*/, int /*v*/)
+{
+#if 0
+  ITextureContainer* piTC;
+  world->GetTextures (&piTC);
+  tcache->use_sub_texture (texture, piTC, u, v);
+  piTC->Release ();
+#endif
+}
+
+void csGraphics3DOpenGL::CacheRectTexture (IPolygonTexture* /*tex*/,
+  int /*minu*/, int /*minv*/, int /*maxu*/, int /*maxv*/)
+{
+#if 0
+  ITextureContainer* piTC;
+  world->GetTextures (&piTC);
+  int subtex_size;
+  tex->GetSubtexSize (subtex_size);
+
+  int iu, iv;
+  for (iu = minu ; iu < maxu ; iu += subtex_size)
+  {
+    for (iv = minv ; iv < maxv ; iv += subtex_size)
+        tcache->use_sub_texture (tex, piTC, iu, iv);
+    tcache->use_sub_texture (tex, piTC, iu, maxv);
+  }
+  for (iv = minv ; iv < maxv ; iv += subtex_size)
+      tcache->use_sub_texture (tex, piTC, maxu, iv);
+  tcache->use_sub_texture (tex, piTC, maxu, maxv);
+
+  piTC->Release();
+#endif
+}
+
+STDMETHODIMP csGraphics3DOpenGL::UncacheTexture (IPolygonTexture* texture)
+{
+  (void)texture;
+  return E_NOTIMPL;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::SetRenderState(G3D_RENDERSTATEOPTION op, long value)
+{
+  switch(op)
+  {
+    case G3DRENDERSTATE_NOTHING:
+      return S_OK;
+
+    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
+      if (value)
+      {
+         if (z_buf_mode == CS_ZBUF_TEST)
+           return S_OK;
+         if (z_buf_mode == CS_ZBUF_NONE)
+           z_buf_mode = CS_ZBUF_TEST;
+         else if (z_buf_mode == CS_ZBUF_FILL)
+           z_buf_mode = CS_ZBUF_USE;
+      }
+      else
+      {
+         if (z_buf_mode == CS_ZBUF_FILL)
+           return S_OK;
+         if (z_buf_mode == CS_ZBUF_USE)
+           z_buf_mode = CS_ZBUF_FILL;
+         else if (z_buf_mode == CS_ZBUF_TEST)
+           z_buf_mode = CS_ZBUF_NONE;
+      }
+      break;
+    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
+      if (value)
+      {
+        if (z_buf_mode == CS_ZBUF_FILL)
+          return S_OK;
+        if (z_buf_mode == CS_ZBUF_NONE)
+          z_buf_mode = CS_ZBUF_FILL;
+        else if (z_buf_mode == CS_ZBUF_TEST)
+          z_buf_mode = CS_ZBUF_USE;
+      }
+      else
+      {
+        if (z_buf_mode == CS_ZBUF_TEST)
+          return S_OK;
+        if (z_buf_mode == CS_ZBUF_USE)
+          z_buf_mode = CS_ZBUF_TEST;
+        else if (z_buf_mode == CS_ZBUF_FILL)
+          z_buf_mode = CS_ZBUF_NONE;
+      }
+      break;
+    case G3DRENDERSTATE_DITHERENABLE:
+      rstate_dither = value;
+      break;
+    case G3DRENDERSTATE_SPECULARENABLE:
+      rstate_specular = value;
+      break;
+    case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+      texture_cache->SetBilinearMapping (value);
+      break;
+    case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+      rstate_trilinearmap = value;
+      break;
+    case G3DRENDERSTATE_TRANSPARENCYENABLE:
+      rstate_alphablend = value;
+      break;
+    case G3DRENDERSTATE_MIPMAPENABLE:
+      rstate_mipmap = value;
+      break;
+    case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+      do_textured = value;
+      break;
+	// XAVIER: unhandled cases in enumerated switch (just to keep gcc happy)
+    case G3DRENDERSTATE_MMXENABLE:
+      break;
+    case G3DRENDERSTATE_INTERLACINGENABLE:
+      if (m_piG2D->DoubleBuffer (!value) != S_OK)
+        return E_FAIL;
+      do_interlaced = value ? 0 : -1;
+      break;
+    case G3DRENDERSTATE_FILTERINGENABLE:
+      do_texel_filt = value;
+      break;
+    case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
+      do_perfect = value;
+      break;
+    case G3DRENDERSTATE_LIGHTINGENABLE:
+      do_lighting = value;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      rstate_gouraud = value;
+      break;
+    case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
+      dbg_max_polygons_to_draw = value;
+      if (dbg_max_polygons_to_draw < 0) dbg_max_polygons_to_draw = 0;
+      break;
+    default:
+      return E_INVALIDARG;
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::GetRenderState(G3D_RENDERSTATEOPTION op, long& retval)
+{
+  switch(op)
+  {
+    case G3DRENDERSTATE_NOTHING:
+      retval = 0;
+      break;
+    case G3DRENDERSTATE_ZBUFFERTESTENABLE:
+      retval = (bool)(z_buf_mode & CS_ZBUF_TEST);
+      break;
+    case G3DRENDERSTATE_ZBUFFERFILLENABLE:
+      retval = (bool)(z_buf_mode & CS_ZBUF_FILL);
+      break;
+    case G3DRENDERSTATE_DITHERENABLE:
+      retval = rstate_dither;
+      break;
+    case G3DRENDERSTATE_SPECULARENABLE:
+      retval = rstate_specular;
+      break;
+    case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+      retval = texture_cache->GetBilinearMapping ();
+      break;
+    case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+      retval = rstate_trilinearmap;
+      break;
+    case G3DRENDERSTATE_TRANSPARENCYENABLE:
+      retval = rstate_alphablend;
+      break;
+    case G3DRENDERSTATE_MIPMAPENABLE:
+      retval = rstate_mipmap;
+      break;
+    case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+      retval = do_textured;
+      break;
+    case G3DRENDERSTATE_MMXENABLE:
+      break;
+    case G3DRENDERSTATE_INTERLACINGENABLE:
+      retval = do_interlaced == -1 ? false : true;
+      break;
+    case G3DRENDERSTATE_FILTERINGENABLE:
+      retval = do_texel_filt;
+      break;
+    case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
+      retval = do_perfect;
+      break;
+    case G3DRENDERSTATE_LIGHTINGENABLE:
+      retval = do_lighting;
+      break;
+    case G3DRENDERSTATE_GOURAUDENABLE:
+      retval = rstate_gouraud;
+      break;
+    case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
+      retval = dbg_max_polygons_to_draw;
+      break;
+    default:
+      retval = 0;
+      return E_INVALIDARG;
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::GetCaps(G3D_CAPS *caps)
+{
+  if (!caps)
+    return E_INVALIDARG;
+
+  caps->ColorModel = G3DCOLORMODEL_RGB;
+  caps->CanClip = false;
+  caps->SupportsArbitraryMipMapping = true;
+  caps->BitDepth = 24;
+  caps->ZBufBitDepth = 16;
+  caps->minTexHeight = 2;
+  caps->minTexWidth = 2;
+  caps->maxTexHeight = 1024;
+  caps->maxTexWidth = 1024;
+  caps->PrimaryCaps.RasterCaps = G3DRASTERCAPS_SUBPIXEL;
+  caps->PrimaryCaps.canBlend = true;
+  caps->PrimaryCaps.ShadeCaps = G3DRASTERCAPS_LIGHTMAP;
+  caps->PrimaryCaps.PerspectiveCorrects = true;
+  caps->PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
+  caps->fog = G3DFOGMETHOD_VERTEX;
+
+  return 1;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::ClearCache()
+{
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::DumpCache()
+{
+  return S_OK;
+}
+
+STDMETHODIMP csGraphics3DOpenGL::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+{
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return S_FALSE;
+
+  float x1 = v1.x, y1 = v1.y, z1 = v1.z;
+  float x2 = v2.x, y2 = v2.y, z2 = v2.z;
+
+  if (z1 < SMALL_Z)
+  {
+    // x = t*(x2-x1)+x1;
+    // y = t*(y2-y1)+y1;
+    // z = t*(z2-z1)+z1;
+    float t = (SMALL_Z-z1) / (z2-z1);
+    x1 = t*(x2-x1)+x1;
+    y1 = t*(y2-y1)+y1;
+    z1 = SMALL_Z;
+  }
+  else if (z2 < SMALL_Z)
+  {
+    // x = t*(x2-x1)+x1;
+    // y = t*(y2-y1)+y1;
+    // z = t*(z2-z1)+z1;
+    float t = (SMALL_Z-z1) / (z2-z1);
+    x2 = t*(x2-x1)+x1;
+    y2 = t*(y2-y1)+y1;
+    z2 = SMALL_Z;
+  }
+
+  float iz1 = fov/z1;
+  int px1 = QInt (x1 * iz1 + (width/2));
+  int py1 = height - 1 - QInt (y1 * iz1 + (height/2));
+  float iz2 = fov/z2;
+  int px2 = QInt (x2 * iz2 + (width/2));
+  int py2 = height - 1 - QInt (y2 * iz2 + (height/2));
+
+  m_piG2D->DrawLine (px1, py1, px2, py2, color);
+
+  return S_OK;
+}
+
+void csGraphics3DOpenGL::SetGLZBufferFlags()
+{
+  switch (z_buf_mode)
+  {
+    case CS_ZBUF_NONE:
+      glDisable (GL_DEPTH_TEST);
+      break;
+    case CS_ZBUF_FILL:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_ALWAYS);
+      glDepthMask (GL_TRUE);
+      break;
+    case CS_ZBUF_TEST:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_GREATER);
+      glDepthMask (GL_FALSE);
+      break;
+    case CS_ZBUF_USE:
+      glEnable (GL_DEPTH_TEST);
+      glDepthFunc (GL_GREATER);
+      glDepthMask (GL_TRUE);
+      break;
+  }
+}
+
+void csGraphics3DOpenGL::SysPrintf (int mode, char* szMsg, ...)
+{
+  char buf[1024];
+  va_list arg;
+
+  va_start (arg, szMsg);
+  vsprintf (buf, szMsg, arg);
+  va_end (arg);
+
+  m_piSystem->Print(mode, buf);
+}
+
+// extension detection code blatantly lifted from Mark J. Kilgard's
+// "All about OpenGL extensions" paper.
+int isExtensionSupported(const char *extension)
+{
+  const GLubyte *extensions = NULL;
+  const GLubyte *start;
+  GLubyte *where, *terminator;
+
+  /* Extension names should not have spaces. */
+  where = (GLubyte *) strchr(extension, ' ');
+  if (where || *extension == '\0')
+    return 0;
+
+  extensions = glGetString(GL_EXTENSIONS);
+  /* It takes a bit of care to be fool-proof about parsing the
+     OpenGL extensions string. Don't be fooled by sub-strings, etc. */
+  start = extensions;
+  for (;;) {
+    where = (GLubyte *) strstr((const char *) start, extension);
+    if (!where)
+      break;  
+    terminator = where + strlen(extension);
+    if (where == start || *(where - 1) == ' ')
+      if (*terminator == ' ' || *terminator == '\0')
+        return 1;
+    start = terminator;
+  }
+  return 0;
+}
+
