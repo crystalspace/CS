@@ -58,8 +58,7 @@ ctReferenceFrame *rf = new ctReferenceFrame();
 // so need to calc L to set w
 void ctRigidBody::set_angular_v( const ctVector3 &pw )
 {
-	const ctMatrix3 &R = RF.get_R();
-	ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose());
+	ctMatrix3 I_inv_world = get_I_inv_world();
 
 	// angular speed = 
 	// inverse of inertia tensor in world coords * angular momentum
@@ -137,8 +136,7 @@ int len;
 
 	// calculate inverse of inertia tensor in world coords 
 	// this result is used to calculate angular speed w
-	const ctMatrix3 &R = RF.get_R();
-	ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose());
+	ctMatrix3 I_inv_world = get_I_inv_world();
 
 	// angular speed = 
 	// inverse of inertia tensor in world coords * angular momentum
@@ -280,8 +278,7 @@ real mass = get_impulse_m();
 
   L += jx % jv;
 
-  const ctMatrix3 &R = RF.get_R();
-	ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose());
+	ctMatrix3 I_inv_world = get_I_inv_world();
   w = I_inv_world * L;
 
 }
