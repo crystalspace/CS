@@ -39,6 +39,10 @@ chronological order.
 	  about ambiguous assignment of SwigValueWrapper<csRef<T>> to csRef<T>
 	  (or SwigValueWrapper<csPtr<T>> to csRef<T>).  GCC, on the other hand
 	  did not have a problem such assignments.
+	- res removed code from the plugin finalization code that set iSCF::SCF
+	  to 0. As the documentation states, iSCF::SCF can be, dependent on the 
+	  platform, either module global or "truly" global. In the latter case,
+	  setting it to 0 can be dangerous.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

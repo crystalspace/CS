@@ -596,7 +596,6 @@ CS_EXPORTED_FUNCTION							\
 void CS_EXPORTED_NAME(Class,_scfFinalize)()				\
 {									\
 SCF_STATIC_VAR_CLEANUP							\
-iSCF::SCF = 0;								\
 }
 
 /**
