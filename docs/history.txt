@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+5-Feb-2001
+	- Added GetFOVAngle() to iCamera.
 4-Feb-2001
 	- Wouter Wijngaards changed includes, so that make depend works
 	  nicer for csfedit.

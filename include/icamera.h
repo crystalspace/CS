@@ -38,7 +38,7 @@
 
 class csCamera;
 
-SCF_VERSION (iCamera, 0, 0, 4);
+SCF_VERSION (iCamera, 0, 0, 5);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -49,6 +49,8 @@ struct iCamera : public iBase
   virtual float GetFOV () = 0;
   ///
   virtual float GetInvFOV () = 0;
+  ///
+  virtual float GetFOVAngle () = 0;
   ///
   virtual float GetShiftX () = 0;
   ///

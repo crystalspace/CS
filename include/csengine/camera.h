@@ -312,6 +312,7 @@ public:
     }
     virtual float GetFOV () { return scfParent->GetFOV (); }
     virtual float GetInvFOV () { return scfParent->GetInvFOV (); }
+    virtual float GetFOVAngle () { return scfParent->GetFOVAngle (); }
     virtual float GetShiftX () { return scfParent->GetShiftX (); }
     virtual float GetShiftY () { return scfParent->GetShiftY (); }
     virtual csOrthoTransform& GetTransform () { return *(csOrthoTransform*)scfParent; }
