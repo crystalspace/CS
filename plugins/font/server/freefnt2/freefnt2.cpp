@@ -417,7 +417,8 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
   glyphset = new GlyphSet;
   glyphset->size = size;
   int baseline;
-  int maxrows = (-face->size->metrics.descender + face->size->metrics.ascender + 63)>>6;
+//  int maxrows = (-face->size->metrics.descender + face->size->metrics.ascender + 63)>>6;
+  int maxrows = (face->size->metrics.height + 63)>>6;
   glyphset->maxW = (face->size->metrics.max_advance + 63) >> 6;
   glyphset->maxH = maxrows;
   int bitmapsize, stride;
@@ -441,9 +442,9 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     g.bitmap = new unsigned char [bitmapsize=maxrows*stride];
     memset (g.bitmap, 0, bitmapsize);
     int startrow = maxrows-(baseline + ((FT_BitmapGlyph)glyph)->top);
-    if (startrow < 0) startrow = 0;
     int endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
-    if (endrow >= maxrows) endrow = maxrows-1;
+    if (startrow < 0) startrow = 0;
+    if (endrow > maxrows) endrow = maxrows;
     for (int n=0,i=startrow; i < endrow; i++,n++)
       memcpy (g.bitmap + stride*i, 
               ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
