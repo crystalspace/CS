@@ -812,6 +812,17 @@ bool csLoader::LoadMap (char* buf)
   for (i=0; i<Engine->GetSectorCount(); i++)
   {
     iSector *Sector = Engine->GetSector (i);
+    if (ResolveOnlyRegion)
+    {
+      // This test avoids redoing sectors that are not in this region.
+      // @@@ But it would be better if we could even limit this loop
+      // to the sectors that were loaded here.
+      iRegion* region = Engine->GetCurrentRegion ();
+      if (!region->IsInRegion (Sector->QueryObject ()))
+      {
+        continue;
+      }
+    }
     for (j=0; j<Sector->GetMeshCount(); j++)
     {
       iMeshWrapper *Mesh    = Sector->GetMesh(j);
@@ -831,7 +842,8 @@ bool csLoader::LoadMap (char* buf)
   return true;
 }
 
-bool csLoader::LoadMapFile (const char* file, bool iClearEngine, bool iOnlyRegion)
+bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
+  bool iOnlyRegion)
 {
   Stats->Init ();
   if (iClearEngine) Engine->DeleteAll ();

@@ -428,7 +428,10 @@ void csPolygon3D::SetCSPortal (csSector* sector, bool null)
   portal = new csPortal;
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
-  portal->SetSector (&sector->scfiSector);
+  if (sector)
+    portal->SetSector (&sector->scfiSector);
+  else
+    portal->SetSector (NULL);
   flags.Reset (CS_POLY_COLLDET); // Disable CD by default for portals.
   //portal->SetTexture (texh->get_texture_handle ());
 }

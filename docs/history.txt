@@ -13,6 +13,188 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a problem with the rlecodec makefile where the
 	  SCF.STATIC was given an incorrect value.  This caused linking to fail
 	  when USE_PLUGINS was set to `no'.
+	- Christopher Nelson made a small algorithmic change to the dirty
+	  rect update scheme.  It's a little less silly about what to do
+	  when all the buckets fill up:  it sets a flag \, merges all
+	  previous rects into bucket zero, and then uses bucket zero for all
+	  subsequent updates.  This eliminates overdraw in the sinplest way,
+	  without making the algorithm overly complex.
+	- Michael Voasse added a new metagen mesh object plugin.
+	- Martin Geisse applied some major changes to the initial model
+	  converter interface:
+	    - All model data components now implement iObject
+	    - Removed lists of sub-objects from all objects (e.g. the list
+	      of polygons from mesh objects). Sub-objects should be added
+	      as iObject children.
+	    - Vertex positions are no longer stored per-vertex. Instead, all
+	      vertices in a solid object are kept in one big list and
+	      polygons use indices in this list.
+	- Philip Wyett fixed a warning in metagen (struct vs class).
+	- Philip also fixed the tutorial makefiles with regards to csfx
+	  vs cstool. Jorrit forgot to fix those. Philip also fixed a bad
+	  include in cstool itself.
+	- Norman Kramer added call to PrepareAnim() to bumptest.cpp.
+	- Norman Kramer renamed the following methods throughout the entire
+	  project:
+	    GetMiniBspNumVerts  -->  GetMiniBspVertexCount
+	    GetNumActions  -->  GetActionCount
+	    GetNumChars  -->  GetCharCount
+	    GetNumCameraPositions  -->  GetCameraPositionCount
+	    GetNumPolyTxtPlanes  -->  GetPolyTxtPlaneCount
+	    GetNumCollections  -->  GetCollectionCount
+	    GetNumCollisionPairs  -->  GetCollisionPairCount
+	    GetNumCurveVertices  -->  GetCurveVertexCount
+	    GetNumCurves  -->  GetCurveCount
+	    GetNumDimensions  -->  GetDimensionCount
+	    GetNumEdges  -->  GetEdgeCount
+	    GetNumElements  -->  GetElementCount
+	    GetNumFonts  -->  GetFontCount
+	    GetNumFormats  -->  GetFormatCount
+	    GetNumFrames  -->  GetFrameCount
+	    GetNumMaterials  -->  GetMaterialCount
+	    GetNumMeshFactories  -->  GetMeshFactoryCount
+	    GetNumMeshObjects  -->  GetMeshObjectCount
+	    GetNumNormals  -->  GetNormalCount
+	    GetNumObjects  -->  GetObjectCount
+	    GetNumPalEntries  -->  GetPalEntryCount
+	    GetNumPlanes  -->  GetPlaneCount
+	    GetNumPlugIns  -->  GetPlugInCount
+	    GetNumPoints  -->  GetPointCount
+	    GetNumPolygons  -->  GetPolygonCount
+	    GetNumRepeats  -->  GetRepeatCount
+	    GetNumShadows  -->  GetShadowCount
+	    GetNumSpokes  -->  GetSpokeCount
+	    GetNumTexels  -->  GetTexelCount
+	    GetNumTextureLayers  -->  GetTextureLayerCount
+	    GetNumTextures  -->  GetTextureCount
+	    GetNumTriangles  -->  GetTriangleCount
+	    GetNumVertices  -->  GetVertexCount
+	    GetNumberMetaBalls  -->  GetMetaBallCount
+	    GetNumberParticles  -->  GetParticleCount
+	    NumVertices  -->  GetVertexCount
+	    ReportNumberTriangles  -->  ReportTriangleCount
+	    SetNumEdges  -->  SetEdgeCount
+	    SetNumPolygons  -->  SetPolygonCount
+	    SetNumSpokes  -->  SetSpokeCount
+	    SetNumVertices  -->  SetVertexCount
+	    SetNumberMetaBalls  -->  SetMetaBallCount
+	    GetNumberEmitters  -->  GetEmitterCount
+	    GetNumberAging  -->  GetAgingCount
+	    SetNumberParticles  -->  SetParticleCount
+	    GetNumVertsToLight  -->  GetVertexToLightCount
+	    GetStaticNumSamples  -->  GetStaticSampleCount
+	    Update_Num  -->  UpdateCount
+	    SetNumber  -->  SetCount
+	    ======= global functions ========
+	    RndNum  -->  csRndNum
+	    strnew  -->  csStrNew
+	    Combinations  -->  csCombinations
+	    expandname  -->  csExpandName
+	    splitpath  -->  csSplitPath
+	    fnamematches  -->  csFilenameMatches
+	    ScanStr  -->  csScanStr
+	    iSwap  -->  csSwapInt
+	    fSwap  -->  csSwapFloat
+	    fSquare  -->  csSquareFloat
+	    ByteSwap32bit  -->  csByteSwap32bit
+	    ByteSwap16bit  -->  csByteSwap16bit
+	    ByteSwap32bitBuffer  -->  csByteSwap32bitBuffer
+	    ByteSwap16bitBuffer  -->  csByteSwap16bitBuffer
+	    FindNearestPowerOf2  -->  csFindNearestPowerOf2
+	    IsPowerOf2  -->  csIsPowerOf2
+	    GenerateHalo  -->  csGenerateHalo
+	    GenerateNova  -->  csGenerateNova
+	    get_token  -->  csGetToken
+	    get_token_float  -->  csGetTokenFloat
+	    get_token_int  -->  csGetTokenInt
+	    skip_token  -->  csSkipToken
+16-Jun-2001
+	- Fixed a bad bug in iPolygon3D::CreateNullPortal(). This function
+	  should be used to create portals that point nowhere yet. A
+	  callback associated with that portal will be called whenever
+	  the engine needs to go through the portal. This function did not
+	  work correctly though. It would set garbage to the sector pointer
+	  instead of a valid NULL pointer.
+	- Fixed a bug in the map loader when used in combination with
+	  regions. It would actually start resolving sector portals again,
+	  even from sectors not loaded in this region.
+	- Martin Geisse made the following changes:
+	    - Added first, incomplete version of the converter system.
+	    - Added csDataStream, a utility class that takes a buffer of
+	      data and lets it use as a stream.
+	    - Added a macro that lets you define a 'pool' class. This pool
+	      can be used to store unused objects instead of deleting them.
+	      When you need an object of the same class again, the pool gives
+	      the object back.
+	- Philip Wyett added VFS paths for Red Eye Entertainments current
+	  4 CS technical demo levels. As the levels are worked on and tested
+	  daily, it is much easier for these to be in CVS, I hope nobody
+	  minds? I will remove if someone complains or there is general
+	  objection...
+	- Christopher Nelson did the following (to AWS):
+	    - Updated AWS interface to allow Mark().
+	    - Created the Mark routine in the window manager using simple
+	      scatter/gather techniques to make more efficient use of bandwidth
+	      for updates which have many small regions.
+	    - Created Invalidate, which calls Mark with the frame of the
+	      compent's area to be marked.
+	    - Created signal and slot architecture.  Slots are signal
+	      conduits that end at a sink.  Slots are currently component to
+	      component conduits.  A signal is emitted by calling Emit
+	      with a reference to the emitting component and an unsigned long
+	      that represents the signal. A sink is always a component member
+	      function.  I realize that that is a silly restriction, so I
+	      will modify that to allow any class that sub-classes a new
+	      class called awsSink to be a signal sink.  Components will then
+	      inherit from this class.
+	    - Cleaned up some code involving drawing contexts. The drawing
+	      contexts are now stored in the window manager, and referenced
+	      by components from there.  Two new functions SetContext and
+	      SetDefaultContext can be called to setup these contexts.  One
+	      or the other MUST be called.  SetDefaultContext sets the
+	      contexts to an internal procedural texture.  The user
+	      can get the iTextureHandle of this (though I don't currently
+	      have it exposed.)
+	    - I would caution anyone who modifies sllex.cpp to be aware that
+	      this file, and it's associate slparse.cpp are both automatically
+	      generated.  Any changes you make will disappear if there are any
+	      modifications to skinlang.flx or skinlang.bsn.  If possible, it
+	      would be better to fix problems in the soure parser and lex
+	      language files rather than their generated results.
+	    - Modified the slot/signal system to support a special type called
+	      iAwsSigSrc as signal sources.  Signal sources have some
+	      special helper functions for registering and unregistering
+	      slots, as well as broadcasting to the lot of them.
+	    - Slot sinks can now be any member function of a class derived
+	      from iBase. This should make the system much more general and
+	      useful.
+	    - For now signal is an unsigned long, but I have run into the
+	      question of how to figure out who a signal source really is,
+	      and how to get the changed value from them.  Originally I
+	      wanted to have all signal sources simply be components, but
+	      that limits the system somewhat. For example, what if i want
+	      the WindowManger to be a signal source? Or the preferences
+	      manager?  I may move the ID functionality from components to
+	      iAwsSigSrc classes so that you can ask the window manager just
+	      exactly who and what the signal source is.  I thought about
+	      using the SCF system, but that's a little too heavyweight for
+	      what I want to do.
+	      I think that mostly the signal should identify the type of
+	      source, for example, push buttons and radio buttons would have
+	      different signals for a mouse click.  However, this introduces
+	      the problem of namespace collision.  Perhaps signals should be
+	      registered in a signal source and mapped to an unsigned long
+	      like ID's.  Then signals themselves can be referenced by index,
+	      much like the colors for csws components.
+		e.g. 
+		#define PB_MOUSEDOWN 1
+		signals[PB_MOUSEDOWN] = NameToID("pushbutton_mousedown");
+	      The signal itself would still have to be sent using the real
+	      value.  This would mess up switch statements, though, because
+	      you'd never know ahead of time what the values would be.
+	      They wouldn't be.  Hm... const.  
+	    - Fixed small compile bug introduced by my incorrect handling
+	      of the RCS merge of different versions.
 15-Jun-2001
 	- Added the ability to the parser to load proc textures (fire,
 	  water, dots, and plasma). Instead of saying 'TEXTURE' in the
@@ -49,6 +231,14 @@ The history order is reversed so that new features are at the top.
 	  engine plugin :-)
 	- Added a new simple tutorial to the documentation.  Now there are
 	  three chapters.
+	- Philip Wyett fixed other sub makefiles in an attempt
+	  to find why MSVCGEN process cannot parse the apps/tutor dir.
+	- Philip Wyett changed to remove sub of apps to a wildcard "*"
+	  for msvcxgen process rather than "tests" which was before. Now can
+	  generate any "app/../../" projects with msvcgen process.
+	- Philip Wyett extended previous commit by changing "TESTS_SUBMAKEFILES"
+	  to "SUBAPPLICATION_SUBMAKEFILES" as now it is searching both
+	  "apps/tutor/*" as well as the old "apps/tests/*".
 	- Eric Sunshine eliminated the new SUBAPPLICATION_SUBMAKEFILES variable
 	  from subs.mak and replaced it with TESTS_SUBMAKEFILES and
 	  TUTORIAL_SUBMAKEFILES.
@@ -66,6 +256,30 @@ The history order is reversed so that new features are at the top.
 	  the awsmgr.cpp file.
 	- Eric Sunshine added the missing `aws' entry to the PLUGINS.DYNAMIC
 	  list in user.mak.  (Currently commented-out, though).
+	- Christopher Nelson did lots of changes to AWS:
+	    - Implemented most of awsWindow's basic functionality. Windows
+	      are arranged in a doubly-linked list hierarchy. The top window
+	      is pointed to by the window manager, and the hierachy follows
+	      downwards from there. awsWindow implements Raise() and Lower(),
+	      and implements two new triggers, OnRaise() and OnLower().  
+	    - Expanded awsComponent. Implemented default Setup() function to
+	      automatically pull the frame and id of a component out of the
+	      component's setup information gleaned from the defintion file.
+	      Also setup the default triggers like OnMouse*() and OnKeypress().
+	    - Fixed makefile to include CSGFX and CSFX.
+	    - Expanded awsManager to include tracking of a top window. Also
+	      embedded a subclass of csProcTexture in it to allow components
+	      to draw to this canvas.  The manager actually uses the
+	      user-provided iGraphics3D to draw the window manager's canvas
+	      to the screen.  I may also allow the user to specify a virtual
+	      screen size and a texture size, and then perform drawing over
+	      NxN textures based on the virtual screen and rect tests.
+	- Philip Wyett fixed sllex.cpp so will compile on MSVC.
+	  This fix has been tested on MSVC, MingW (GCC)
+	  and the GCC 2.96 from Linux Mandrake 8 and
+	  works fine. This all could be altered at a later date
+	  when the plugin becomes active, but for testing
+	  purposes on MSVC it is adequate.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and
