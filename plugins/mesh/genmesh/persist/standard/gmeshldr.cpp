@@ -38,6 +38,8 @@
 #include "iutil/comp.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
+#include "csgeom/vector2.h"
+#include "csgeom/vector4.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -55,6 +57,9 @@ enum
   XMLTOKEN_V,
   XMLTOKEN_T,
   XMLTOKEN_N,
+#ifdef CS_USE_NEW_RENDERER
+  XMLTOKEN_STREAM,
+#endif
   XMLTOKEN_COLORS,
   XMLTOKEN_AUTONORMALS,
   XMLTOKEN_NOSHADOWS,
@@ -140,8 +145,152 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
   xmltokens.Register ("n", XMLTOKEN_N);
+#ifdef CS_USE_NEW_RENDERER
+  xmltokens.Register ("stream", XMLTOKEN_STREAM);
+#endif
   return true;
 }
+
+#ifdef CS_USE_NEW_RENDERER
+
+bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactoryState* state)
+{
+  if(!node) return false;
+  if(!state) return false;
+
+  csRef<iDocumentNode> child;
+  csRef<iDocumentNodeIterator> children = node->GetNodes();
+
+  if(!children.IsValid()) return false; // empty stream..
+  
+  const char *comptype = node->GetAttributeValue("type");
+  const char *name = node->GetAttributeValue("name");
+  int compcount = node->GetAttributeValueAsInt("compcount");
+  int length = state->GetVertexCount();
+  
+  if(strcmp(comptype, "float") == 0)
+  {
+    float *floatarray = new float[length * compcount];
+    int vertexindex = 0;
+    while(children->HasNext())
+    {
+      child = children->Next();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      
+      if(strcmp("va", child->GetValue ()) == 0)
+      {
+        for(int i = 0; i < compcount; i++)
+        {
+          char attribname[12];
+          attribname[0] = 'f';
+          attribname[1] = '\0';
+          itoa(i, &attribname[1], 10);
+
+          floatarray[vertexindex * compcount + i] = child->GetAttributeValueAsFloat(attribname);
+        }
+        vertexindex++;
+      }
+    };
+
+    state->AddStream(name, compcount);
+    state->SetStream(name, floatarray);
+    delete[] floatarray;
+  }
+  if(strcmp(comptype, "int") == 0)
+  {
+    int *intarray = new int[length * compcount];
+    int vertexindex = 0;
+    while(children->HasNext())
+    {
+      child = children->Next();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      
+      if(strcmp("va", child->GetValue()) == 0)
+      {
+        for(int i = 0; i < compcount; i++)
+        {
+          char attribname[12];
+          attribname[0] = 'i';
+          attribname[1] = '\0';
+          itoa(i, &attribname[1], 10);
+
+          intarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+        }
+        vertexindex++;
+      }
+    };
+
+    state->AddStream(name, compcount);
+    state->SetStream(name, intarray);
+    delete[] intarray;
+  }
+  else
+  if(strcmp(comptype, "short") == 0)
+  {
+    compcount += (compcount % 2);
+    short *shortarray = new short[length * compcount];
+    int vertexindex = 0;
+    while(children->HasNext())
+    {
+      child = children->Next();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      
+      if(strcmp("va", child->GetValue()) == 0)
+      {
+        for(int i = 0; i < compcount; i++)
+        {
+          char attribname[12];
+          attribname[0] = 's';
+          attribname[1] = '\0';
+          itoa(i, &attribname[1], 10);
+
+          shortarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+        }
+        vertexindex++;
+      }
+    };
+
+    state->AddStream(name, compcount >> 1);
+    state->SetStream(name, (int*)shortarray);
+    delete[] shortarray;
+  }
+  else
+  if(strcmp(comptype, "byte") == 0)
+  {
+    compcount += (compcount % 4);
+    unsigned char *bytearray = new unsigned char[length * compcount];
+    int vertexindex = 0;
+    while(children->HasNext())
+    {
+      child = children->Next();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      
+      if(strcmp("va", child->GetValue()) == 0)
+      {
+        for(int i = 0; i < compcount; i++)
+        {
+          char attribname[12];
+          attribname[0] = 'b';
+          attribname[1] = '\0';
+          itoa(i, &attribname[1], 10);
+
+          bytearray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
+        }
+        vertexindex++;
+      }
+    };
+
+    state->AddStream(name, compcount >> 2);
+    state->SetStream(name, (int*)bytearray);
+  
+    delete[] bytearray;
+  }
+  else
+    return false;
+  
+  return true;
+}
+#endif // CS_USE_NEW_RENDERER
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
@@ -215,6 +364,11 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_NUMVT:
         state->SetVertexCount (child->GetContentsValueAsInt ());
 	break;
+#ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_STREAM:
+        ParseStream(child, state);
+        break;
+#endif
       case XMLTOKEN_T:
 	{
 	  csTriangle* tr = state->GetTriangles ();

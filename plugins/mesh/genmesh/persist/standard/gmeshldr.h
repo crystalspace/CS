@@ -30,6 +30,7 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
+struct iGeneralFactoryState;
 
 /**
  * General Mesh factory loader.
@@ -57,6 +58,10 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
+
+#ifdef CS_USE_NEW_RENDERER
+  bool ParseStream(iDocumentNode *node, iGeneralFactoryState* state);
+#endif // CS_USE_NEW_RENDERER
 
   struct eiComponent : public iComponent
   {

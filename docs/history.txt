@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+16-Feb-2003
+	- Philipp Aumayr extended gmeshldr to support general streams
+	  for new Renderer.
 15-Feb-2003
 	- res checked if the image IO plugins work properly and fixed them
 	  if necessary:
