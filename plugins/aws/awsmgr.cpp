@@ -108,7 +108,6 @@ awsManager::~awsManager ()
   {
     awsComponentFactoryMap* map = (awsComponentFactoryMap*) p;
     map->factory->DecRef ();
-    delete map;
     component_factories.RemoveItem ();
   }
 }
