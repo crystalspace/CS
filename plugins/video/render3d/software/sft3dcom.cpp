@@ -4006,7 +4006,7 @@ static void DoAddPerspective (csPoly2D& dest, const csVector3& v,
   p.y = v.y * iz + shift_y;
   //dest.Push (p);
   dest.AddVertex (p);
-  dest.GetBoundingBox ().AddBoundingVertex (p);
+  //dest.GetBoundingBox ().AddBoundingVertex (p);
 }
 
 static bool DoPolyPerspective (csVector3* verts, int num_verts, 
