@@ -665,8 +665,8 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
       UPathV.Push (csStrNew (src));
 
       // Now parse and expand this path
-      char rpath [MAXPATHLEN + 1];
-      Expand (Parent, rpath, src, MAXPATHLEN);
+      char rpath [CS_MAXPATHLEN + 1];
+      Expand (Parent, rpath, src, CS_MAXPATHLEN);
       RPathV.Push (csStrNew (rpath));
       src = cur + 1;
     } /* endif */
@@ -829,7 +829,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
       DIR *dh;
       struct dirent *de;
 
-      char tpath [MAXPATHLEN + 1];
+      char tpath [CS_MAXPATHLEN + 1];
       memcpy (tpath, rpath, rpl);
       strcpy (tpath + rpl, Suffix);
       rpl = strlen (tpath);
@@ -1022,7 +1022,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
 
 bool VfsNode::Delete (const char *Suffix)
 {
-  char fname [MAXPATHLEN + 1];
+  char fname [CS_MAXPATHLEN + 1];
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1035,14 +1035,14 @@ bool VfsNode::Delete (const char *Suffix)
 
 bool VfsNode::Exists (const char *Suffix)
 {
-  char fname [MAXPATHLEN + 1];
+  char fname [CS_MAXPATHLEN + 1];
   csArchive *a;
   return FindFile (Suffix, fname, a);
 }
 
 bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
 {
-  char fname [MAXPATHLEN + 1];
+  char fname [CS_MAXPATHLEN + 1];
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1068,7 +1068,7 @@ bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
 
 bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 {
-  char fname [MAXPATHLEN + 1];
+  char fname [CS_MAXPATHLEN + 1];
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1090,7 +1090,7 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 
 bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
 {
-  char fname [MAXPATHLEN + 1];
+  char fname [CS_MAXPATHLEN + 1];
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1186,7 +1186,7 @@ csVFS::~csVFS ()
 bool csVFS::Initialize (iObjectRegistry *object_reg)
 {
   csVFS::object_reg = object_reg;
-  char vfsconfigpath [MAXPATHLEN + 1];
+  char vfsconfigpath [CS_MAXPATHLEN + 1];
   csGetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = csStrNew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
@@ -1688,7 +1688,7 @@ iDataBuffer *csVFS::GetRealPath (const char *FileName)
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
   if (!node) return NULL;
 
-  char path [MAXPATHLEN + 1];
+  char path [CS_MAXPATHLEN + 1];
   int i;
   for (i = 0; i < node->RPathV.Length (); i++)
   {

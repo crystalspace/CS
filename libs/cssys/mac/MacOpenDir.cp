@@ -4,7 +4,7 @@
 #include "cssysdef.h"
 
 struct directory_scan {
-	char d_name[ MAXPATHLEN ];
+	char d_name[ CS_MAXPATHLEN ];
 	short index;
 	short vRefNum;
 	long dirID;

@@ -126,11 +126,11 @@
 #    endif
 #  endif
 // Maximal path length
-#  ifndef MAXPATHLEN
+#  ifndef CS_MAXPATHLEN
 #    ifdef _MAX_FNAME
-#      define MAXPATHLEN _MAX_FNAME
+#      define CS_MAXPATHLEN _MAX_FNAME
 #    else
-#      define MAXPATHLEN 256
+#      define CS_MAXPATHLEN 256
 #    endif
 #  endif
 #  define APPEND_SLASH(str,len)			\
@@ -192,7 +192,7 @@
 #    if defined(OS_MACOS) || defined(OS_PS2)
        typedef char DIR;
        typedef struct dirent {
-	  char d_name[ MAXPATHLEN ];
+	  char d_name[ CS_MAXPATHLEN ];
        } dirent;
 #    else
        struct DIR;
@@ -225,7 +225,7 @@
 #    endif
      static inline bool isdir (const char *path, struct dirent *de)
      {
-       char fullname [MAXPATHLEN];
+       char fullname [CS_MAXPATHLEN];
        int pathlen = strlen (path);
        memcpy (fullname, path, pathlen + 1);
        APPEND_SLASH (fullname, pathlen);

@@ -1464,7 +1464,7 @@ bool CsfEdit::HandleEvent (iEvent &Event)
       	      case SAVE_FONT_MODAL_DATA:
 	      {
 	        SaveFontModalData* sfdata = (SaveFontModalData*)data;
-		char fname [MAXPATHLEN + 1];
+		char fname [CS_MAXPATHLEN + 1];
 		csQueryFileDialog (w, fname, sizeof (fname));
 		csEditFont* edit_font = sfdata->edit_font;
 		edit_font->SetFileName (csStrNew(fname));
@@ -1474,7 +1474,7 @@ bool CsfEdit::HandleEvent (iEvent &Event)
 	      }
 	      case LOAD_FONT_MODAL_DATA:
 	      {
-		char filename [MAXPATHLEN + 1];
+		char filename [CS_MAXPATHLEN + 1];
 		csQueryFileDialog (w, filename, sizeof (filename));
 		SetEditFont(new csEditFont(this, filename));
 		(void)new csEditFontView(this, editfont);

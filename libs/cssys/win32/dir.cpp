@@ -32,7 +32,7 @@ DIR *opendir (const char *name)
   if (!dh)
     return NULL;
 
-  char tname [MAXPATHLEN + 1];
+  char tname [CS_MAXPATHLEN + 1];
   strcpy (tname, name);
   strcat (tname, "\\*");
 

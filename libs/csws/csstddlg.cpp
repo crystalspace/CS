@@ -383,7 +383,7 @@ bool cspFileDialog::BuildAndSetPath ()
 {
   csListBox *dp = (csListBox *)GetChild (CSWID_DIRLIST);
   csComponent *cur = dp->ForEachItem (is_checked, NULL, true);
-  char buff [MAXPATHLEN + 1];
+  char buff [CS_MAXPATHLEN + 1];
 
   if (cur->id != CSFDI_PATHCOMPONENT)
   {
@@ -395,7 +395,7 @@ bool cspFileDialog::BuildAndSetPath ()
     buff [0] = 0;
 
   char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
-  int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
+  int maxlen = usevfs ? VFS_MAX_PATH_LEN : CS_MAXPATHLEN;
 
   while (cur->id == CSFDI_PATHCOMPONENT)
   {
@@ -446,7 +446,7 @@ void cspFileDialog::SetName (const char *iName)
 
 void cspFileDialog::SetFileName (const char *iName)
 {
-  char path [MAXPATHLEN + 1], name [MAXPATHLEN + 1];
+  char path [CS_MAXPATHLEN + 1], name [CS_MAXPATHLEN + 1];
   csSplitPath (iName, path, sizeof (path), name, sizeof (name));
   SetPath (path);
   if (name && *name)
@@ -469,7 +469,7 @@ void cspFileDialog::Reread ()
   SetName ("");
 
   char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
-  int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
+  int maxlen = usevfs ? VFS_MAX_PATH_LEN : CS_MAXPATHLEN;
 
   // Now decompose path into components
   char *curp = path;
@@ -621,14 +621,14 @@ csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
   
   d->UseVFS(vfspaths);
     
-  csComponent *c = new csInputLine (d, MAXPATHLEN);
+  csComponent *c = new csInputLine (d, CS_MAXPATHLEN);
   c->id = CSWID_FILENAME;
   c->SetRect (5, 15, 5+310, 31);
   
   c = new csStatic (d, c, "File ~name");
   c->SetPos (5, 5);
   
-  c = new csInputLine (d, MAXPATHLEN);
+  c = new csInputLine (d, CS_MAXPATHLEN);
   c->id = CSWID_PATHNAME;
   c->SetRect (5, 45, 5+310, 61);
 

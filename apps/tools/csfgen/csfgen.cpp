@@ -160,8 +160,8 @@ static bool Convert (const char *fontfile)
   if (opt.display)
     return Display (fs, font);
 
-  char fontname [MAXPATHLEN + 1];
-  char outfile [MAXPATHLEN + 1];
+  char fontname [CS_MAXPATHLEN + 1];
+  char outfile [CS_MAXPATHLEN + 1];
   csSplitPath (fontfile, NULL, 0, fontname, sizeof (fontname));
   if (fontname [0] == '*')
     strcpy (fontname, fontname + 1);

@@ -138,8 +138,8 @@ SysSystemDriver::~SysSystemDriver()
 //-----------------------------------------------------------------------------
 bool SysSystemDriver::Initialize ()
 {
-  char path[MAXPATHLEN];		// *1*
-  char name[MAXPATHLEN];
+  char path[CS_MAXPATHLEN];		// *1*
+  char name[CS_MAXPATHLEN];
   csSplitPath(argv[0], path, sizeof(path), name, sizeof(name));
   if (strlen(path) > 0)
     chdir(path);

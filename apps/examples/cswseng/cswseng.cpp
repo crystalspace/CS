@@ -482,7 +482,7 @@ bool ceCswsEngineApp::HandleEvent (iEvent &Event)
 	// We had a file open dialog since that's the only thing that
 	// can cause modality in our app (except for a message box
 	// which is handled above).
-        char filename[MAXPATHLEN+1];
+        char filename[CS_MAXPATHLEN+1];
         csQueryFileDialog ((csWindow*)d, filename, sizeof (filename));
         delete d;
 	LoadNewMap (filename);
@@ -500,7 +500,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
 
   // If the selected file is already a 'world' file then
   // we use that.
-  char copy_filename[MAXPATHLEN+1];
+  char copy_filename[CS_MAXPATHLEN+1];
   strcpy (copy_filename, filename);
   int len = strlen (copy_filename);
   if (!strcmp (copy_filename+len-5, "world"))

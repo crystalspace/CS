@@ -853,7 +853,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
 	    {
 	      case 66600:
 	      {
-                char filename [MAXPATHLEN + 1];
+                char filename [CS_MAXPATHLEN + 1];
                 csQueryFileDialog ((csWindow*)d, filename, sizeof (filename));
                 csMessageBox (app, "Result", filename, NULL);
 	      }

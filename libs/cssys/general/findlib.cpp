@@ -38,7 +38,7 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   int i, j;
   for (i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
   {
-    char lib [MAXPATHLEN + 1];
+    char lib [CS_MAXPATHLEN + 1];
 
     // For i == -1 try without any prefix at all
     if (i >= 0)

@@ -442,7 +442,7 @@ bool csArchive::Flush ()
 // Write pending operations into ZIP archive
 bool csArchive::WriteZipArchive ()
 {
-  char temp_file[MAXPATHLEN];
+  char temp_file[CS_MAXPATHLEN];
   FILE *temp;
   char buff [16 * 1024];
   bool success = false;
@@ -457,7 +457,7 @@ bool csArchive::WriteZipArchive ()
   int tmplen = strlen (temp_file);
 
   APPEND_SLASH (temp_file, tmplen);
-  cs_snprintf (&temp_file[tmplen], MAXPATHLEN - tmplen, TEMP_FILE);
+  cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, TEMP_FILE);
   //sprintf (&temp_file[tmplen], TEMP_FILE);
   if ((temp = fopen (temp_file, "w+b")) == NULL)
     return false;               /* Cannot create temporary file */

@@ -152,7 +152,7 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
 
 static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
 {
-  char outname [MAXPATHLEN + 1];
+  char outname [CS_MAXPATHLEN + 1];
   strcpy (outname, fname);
   char *eol = strchr (outname, 0);
   while (eol > outname && *eol != '.') eol--;
@@ -197,7 +197,7 @@ static bool display_picture (iImage *ifile)
 
 static bool output_heightmap (const char *fname, iImage *ifile)
 {
-  char outname [MAXPATHLEN + 1];
+  char outname [CS_MAXPATHLEN + 1];
   strcpy (outname, fname);
   char *eol = strchr (outname, 0);
   while (eol > outname && *eol != '.') eol--;

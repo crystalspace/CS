@@ -116,11 +116,11 @@
 
 // Maximal path length
 #ifdef CS_SYSDEF_PROVIDE_PATH
-#  ifndef MAXPATHLEN
+#  ifndef CS_MAXPATHLEN
 #    ifdef _MAX_FNAME
-#      define MAXPATHLEN _MAX_FNAME
+#      define CS_MAXPATHLEN _MAX_FNAME
 #    else
-#      define MAXPATHLEN 260 /* not 256 */
+#      define CS_MAXPATHLEN 260 /* not 256 */
 #    endif
 #  endif
 #endif
@@ -159,7 +159,7 @@ char* __WindowsDirectory()
     // Directory entry
     struct dirent
     {
-      char d_name [MAXPATHLEN + 1]; // File name, 0 terminated
+      char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
       long d_size; // File size (bytes)
       unsigned d_attr; // File attributes (Windows-specific)
     };

@@ -98,8 +98,8 @@ iObjectRegistry* csInitializer::CreateEnvironment (
 bool csInitializer::InitializeSCF ()
 {
   // Initialize Shared Class Facility|
-  char scfconfigpath [MAXPATHLEN + 1];
-  char scffilepath [MAXPATHLEN + 1];
+  char scfconfigpath [CS_MAXPATHLEN + 1];
+  char scffilepath [CS_MAXPATHLEN + 1];
   struct dirent* de;
   DIR* dh;
 

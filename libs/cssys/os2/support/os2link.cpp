@@ -181,7 +181,7 @@ int main (int argc, char *argv[])
 
   new_argv [0] = opt.linker;
 
-  char defname [MAXPATHLEN + 1];
+  char defname [CS_MAXPATHLEN + 1];
   sprintf (defname, "%s%s.def", opt.outdir, opt.modname);
 
   // Create the .def file

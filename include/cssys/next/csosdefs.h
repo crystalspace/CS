@@ -136,7 +136,7 @@ static inline char* strdup(char const* s)
 
 static inline char* getcwd(char* p, size_t size)
 {
-  char s[ MAXPATHLEN ];
+  char s[ CS_MAXPATHLEN ];
   char* r = getwd(s);
   if (r != 0)
   {

@@ -123,12 +123,12 @@ static int __getcwd (char drive, char *buffer, int buffersize)
 
 char *csExpandName (const char *iName)
 {
-  char outname [MAXPATHLEN + 1];
+  char outname [CS_MAXPATHLEN + 1];
   int inp = 0, outp = 0, namelen = strlen (iName);
-  while ((outp < MAXPATHLEN)
+  while ((outp < CS_MAXPATHLEN)
       && (inp < namelen))
   {
-    char tmp [MAXPATHLEN + 1];
+    char tmp [CS_MAXPATHLEN + 1];
     int ptmp = 0;
     while ((inp < namelen)
         && (iName [inp] != '/')
