@@ -10,11 +10,10 @@ for d in $DIRS; do
     echo "Preparing $d for annotation capability."
     $EFED -d \
       -r "html=php" \
-      -e "s/\.html/\.php/g" \
       -e "s/href *= *\"(?!http\:\/\/)([^\"]*)\.html([^\"]*)\"/href=\"\$1.php\$2\"/gi" \
       -e "s:<title>(.*)</title>:<title>\$1</title><?php \\\$theme=\"\$1\"; ?>:i" \
       -e "s:</body>:<?php require(\"annotate.php\"); ?></body>:i" \
-      $i
-    cp docs/support/annotate/*.php $i
+      $d
+    cp docs/support/annotate/*.php $d
   fi
 done
