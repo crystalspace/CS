@@ -137,6 +137,8 @@ bool Loader::ReadHeader ()
   if (sourcelen < sizeof(Header))
     return false;
 
+  int i;
+
   readpos = source;
 
   delete[] header;
@@ -150,7 +152,7 @@ bool Loader::ReadHeader ()
   header->depth = GetUInt32 ();
   header->mipmapcount = GetUInt32 ();
   header->alphabitdepth = GetUInt32 ();
-  for (int i=0;i<10;i++)
+  for (i=0;i<10;i++)
     header->reserved[i] = GetUInt32 ();
   
   header->pixelformat.size = GetUInt32 ();
@@ -200,7 +202,7 @@ bool Loader::ReadHeader ()
   positions = new uint8* [GetMipmapCount() + 1];
   positions[0] = readpos;
   uint32 add = header->linearsize;
-  for (int i=1;i<GetMipmapCount()+1;i++)
+  for (i=1;i<GetMipmapCount()+1;i++)
   {
     positions[i] = positions[i-1]+add;
     if (format == FORMAT_RGBA || format == FORMAT_RGB)

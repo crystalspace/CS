@@ -4,7 +4,8 @@ The history order is reversed so that new features are at the top.
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
 	  Still it isn't failsaife though, but works in most cases.
-
+  - Philip Wyett fixed redefintion of i in 'for' loops under MSVC 6
+    in the DDS image plugin.
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
   	  libs as shared
