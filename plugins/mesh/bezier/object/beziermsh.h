@@ -769,7 +769,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->object_flags; }
-    virtual iMeshObject* Clone () { return 0; }
+    virtual csPtr<iMeshObject> Clone () { return 0; }
     virtual bool DrawTest (iRenderView* rview, iMovable* movable,
     	uint32 frustum_mask)
     {
@@ -827,6 +827,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual csFlags& GetFlags () { return scfParent->factory_flags; }
     virtual csPtr<iMeshObject> NewInstance ();
+    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);

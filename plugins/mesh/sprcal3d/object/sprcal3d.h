@@ -235,6 +235,7 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -685,7 +686,7 @@ public:
     return ifact;	// DecRef is ok here.
   }
   virtual csFlags& GetFlags () { return flags; }
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview,

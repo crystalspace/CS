@@ -35,6 +35,7 @@
     name (iEngine *e, iObjectRegistry* reg) : csMeshFactory (e, reg) {}     \
     virtual csPtr<iMeshObject> NewInstance ()                               \
     { return new meshclass (Engine, this); }                                \
+    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }                \
   };
 
 /// Declare a simple mesh type plugin
@@ -96,7 +97,7 @@ public:
    * See imesh/object.h for specification. The default implementation
    * does nothing and returns 0.
    */
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
   
   /**
    * See imesh/object.h for specification.

@@ -27,6 +27,9 @@ chronological order.
 	- Jorrit started work on updating the isometric engine to NR. The
 	  tiles display but there is a problem with scrolling. Also mesh
 	  objects don't display yet.
+	- aarobber fixed the iMeshObject's Clone function to return a csPtr.
+	- aarobber added a Clone function to iMeshObjectFactory.  None of them
+	  are currently implemented and will return 0.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where

@@ -933,7 +933,7 @@ int csThingStatic::IntersectSegmentIndex (
   return best_p;
 }
 
-csPtr<csThingStatic> csThingStatic::Clone ()
+csPtr<csThingStatic> csThingStatic::CloneStatic ()
 {
   csThingStatic* clone = new csThingStatic (scfParent, thing_type);
   clone->flags.SetAll (GetFlags ().Get ());
@@ -1772,7 +1772,7 @@ void csThing::WorUpdate ()
 
 void csThing::HardTransform (const csReversibleTransform& t)
 {
-  csRef<csThingStatic> new_static_data = static_data->Clone ();
+  csRef<csThingStatic> new_static_data = static_data->CloneStatic ();
   static_data = new_static_data;
   static_data->HardTransform (t);
   scfiPolygonMesh.SetThing (static_data);

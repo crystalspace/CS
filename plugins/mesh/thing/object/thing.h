@@ -339,7 +339,7 @@ public:
   { return static_polygons.Get (idx); }
 
   /// Clone this static data in a separate instance.
-  csPtr<csThingStatic> Clone ();
+  csPtr<csThingStatic> CloneStatic ();
 
   /**
    * Get the bounding box in object space for this polygon set.
@@ -494,6 +494,7 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -1082,7 +1083,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual iMeshObject* Clone () { return 0; }
+    virtual csPtr<iMeshObject> Clone () { return 0; }
     virtual bool DrawTest (iRenderView* rview, iMovable* movable,
     	uint32 frustum_mask)
     {

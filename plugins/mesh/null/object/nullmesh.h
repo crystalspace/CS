@@ -74,7 +74,7 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual csFlags& GetFlags () { return object_flags; }
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable, uint32);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -184,6 +184,7 @@ public:
 
     virtual csFlags& GetFlags () { return scfParent->factory_flags; }
     virtual csPtr<iMeshObject> NewInstance ();
+    virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
     virtual void HardTransform (const csReversibleTransform&) {}
     virtual bool SupportsHardTransform () const { return false; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }

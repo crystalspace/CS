@@ -348,7 +348,7 @@ public:
     { return false; }
 
   virtual csFlags& GetFlags () { return flags; }
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
 
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
@@ -522,7 +522,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csPtr<iMeshObject> NewInstance ();
-
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }

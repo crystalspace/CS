@@ -120,8 +120,8 @@ struct iMeshObject : public iBase
   /**
    * Creates a copy of this object and returns the clone.
    */
-  virtual iMeshObject* Clone () = 0;
-  
+  virtual csPtr<iMeshObject> Clone () = 0;
+
   /**
    * First part of Draw. The engine will call this DrawTest() before
    * calling Draw() so DrawTest() can (if needed) remember computationally
@@ -313,6 +313,11 @@ struct iMeshObjectFactory : public iBase
 
   /// Create an instance of iMeshObject.
   virtual csPtr<iMeshObject> NewInstance () = 0;
+
+  /**
+   * Creates a copy of this factory and returns the clone.
+   */
+  virtual csPtr<iMeshObjectFactory> Clone () = 0;
 
   /**
    * Do a hard transform of this factory.

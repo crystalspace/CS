@@ -505,7 +505,7 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
   virtual csFlags& GetFlags () { return flags; }
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*,
@@ -747,7 +747,7 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
-
+  virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }

@@ -219,7 +219,7 @@ public:
   //--------------------- For iMeshObject ------------------------------//
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual csFlags& GetFlags () { return flags; }
-  virtual iMeshObject* Clone () { return 0; }
+  virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual bool Draw (iRenderView* rview, iMovable* movable,
