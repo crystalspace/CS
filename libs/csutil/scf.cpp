@@ -104,16 +104,15 @@ public:
 
 class scfSharedLibrary;
 
-class csStringSet* libraryNames = 0; 
+static class csStringSet* libraryNames = 0; 
 
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
 public:
-  static int CompareName (scfSharedLibrary* const& x, /*char const**/csStringID const& n);
-  size_t FindLibrary(/*char const**/ csStringID name) const
+  static int CompareName (scfSharedLibrary* const& x, csStringID const& n);
+  size_t FindLibrary(csStringID name) const
   {
-    return FindKey(
-      csArrayCmp<scfSharedLibrary*,/*char const**/csStringID>(name, CompareName));
+    return FindKey(csArrayCmp<scfSharedLibrary*,csStringID>(name,CompareName));
   }
 };
 
@@ -134,11 +133,9 @@ class scfSharedLibrary
   csLibraryHandle LibraryHandle;
   // Number of references to this shared library
   int RefCount;
-  // Base name used for composition of library intialize and shutdown
-  // functions.  All exported factory classes will implement initialize and
-  // shutdown functions, but we choose only a single pair to perform this work
-  // on behalf of the library.
-  //char *FuncCoreName;
+  // Intialize and shutdown functions.  All exported factory classes will
+  // implement initialize and shutdown functions, but we choose only a single
+  // pair to perform this work on behalf of the library.
   scfInitFunc initFunc;
   scfFinisFunc finisFunc;
 
@@ -226,7 +223,7 @@ scfSharedLibrary::~scfSharedLibrary ()
 int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
   csStringID const& Key)
 {
-  return Item->LibraryName - Key;
+  return Item->LibraryName < Key ? -1 : (Item->LibraryName > Key ? 1 : 0);
 }
 
 #endif // CS_STATIC_LINKED
@@ -315,7 +312,8 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   CreateFunc = iCreate;
   classContext = context;
 #ifndef CS_STATIC_LINKED
-  LibraryName = iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
+  LibraryName =
+    iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
   Library = 0;
 #else
   (void)iLibraryName;
@@ -951,7 +949,7 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
   if (idx != (size_t)-1)
   {
     scfFactory *cf = ClassRegistry->Get (idx);
-    if (cf->LibraryName != 0)
+    if (cf->LibraryName != csInvalidStringID)
       csGetPluginMetadata (libraryNames->Request (cf->LibraryName), metadata);
   }
 

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Nov-2004
+	- Eric Sunshine fixed bug in csSCF::GetPluginMetadata() in which it had
+	  not been properly (fully) updated to deal with csStringID following
+	  the 13-Nov-2004 change to SCF to make the data structures share
+	  library and factory names via csStrSet.  This resulted in
+	  GetPluginMetadata() sometimes failing to return a valid meta-data
+	  document.
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.
