@@ -26,7 +26,7 @@
 csTerrainQuadDiv::csTerrainQuadDiv(int depth)
 {
   parent = NULL;
-  parentplace = 0;
+  parentplace = -1;
   int i;
   for(i=0; i<4; i++)
   {
@@ -320,14 +320,34 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
 
   /// if we arrive at this point then the quad will be visible, so
   /// (re)compute lighting for it
-  light_func(lightdata, corner_color[CS_QUAD_TOPLEFT], minx, miny,
+  if(parent && parentplace == CS_QUAD_TOPLEFT)
+    corner_color[CS_QUAD_TOPLEFT] = parent->corner_color[CS_QUAD_TOPLEFT];
+  else if(parent && parentplace == CS_QUAD_BOTRIGHT)
+    corner_color[CS_QUAD_TOPLEFT] = parent->middle_color;
+  else light_func(lightdata, corner_color[CS_QUAD_TOPLEFT], minx, miny,
     corner_normal[CS_QUAD_TOPLEFT]);
-  light_func(lightdata, corner_color[CS_QUAD_BOTLEFT], minx, maxy,
+
+  if(parent && parentplace == CS_QUAD_BOTLEFT)
+    corner_color[CS_QUAD_BOTLEFT] = parent->corner_color[CS_QUAD_BOTLEFT];
+  else if(parent && parentplace == CS_QUAD_TOPRIGHT)
+    corner_color[CS_QUAD_BOTLEFT] = parent->middle_color;
+  else light_func(lightdata, corner_color[CS_QUAD_BOTLEFT], minx, maxy,
     corner_normal[CS_QUAD_BOTLEFT]);
-  light_func(lightdata, corner_color[CS_QUAD_BOTRIGHT], maxx, maxy,
+
+  if(parent && parentplace == CS_QUAD_BOTRIGHT)
+    corner_color[CS_QUAD_BOTRIGHT] = parent->corner_color[CS_QUAD_BOTRIGHT];
+  else if(parent && parentplace == CS_QUAD_TOPLEFT)
+    corner_color[CS_QUAD_BOTRIGHT] = parent->middle_color;
+  else light_func(lightdata, corner_color[CS_QUAD_BOTRIGHT], maxx, maxy,
     corner_normal[CS_QUAD_BOTRIGHT]);
+
+  if(parent && parentplace == CS_QUAD_TOPRIGHT)
+    corner_color[CS_QUAD_TOPRIGHT] = parent->corner_color[CS_QUAD_TOPRIGHT];
+  else if(parent && parentplace == CS_QUAD_BOTLEFT)
+    corner_color[CS_QUAD_TOPRIGHT] = parent->middle_color;
   light_func(lightdata, corner_color[CS_QUAD_TOPRIGHT], maxx, miny,
     corner_normal[CS_QUAD_TOPRIGHT]);
+
   light_func(lightdata, middle_color, midx, midy, middle_normal);
 
   /// compute visible error  (lower = more quality)
