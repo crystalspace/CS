@@ -1,43 +1,43 @@
-// To define a static draw_scanline function in the 'Scan' class just
-// define the following variables:
-//	SCANFUNC	: name of the draw_scanline function (required)
-//	SCANEND		: optional additional code after the function (mostly for Z fill)
-//	SCANLOOP	: code to draw one segment of 16 (or less) pixels
-//	SCANMAP		: define if the function uses the lighted textures
-// Also define one of these macros to specify the data size:
-//	SCAN8		: 8 bit data
-//	SCAN16		: 16 bit data
-//	SCAN32		: 32 bit data
-// The SCANLOOP code can expect the following variables to be set:
-//	uu, vv, izz	: u, v, and 1/z components for start of segment (izz = 8:24)
-//	duu, dvv, dzz	: deltas per pixel for above values (dzz = 8:24)
-//	_dest		: pointer to screen for start of segment
-//	_destend	: pointer to screen for end of segment
-//	z_buffer	: pointer to z_buffer for start of segment
-//	lastZbuf	: pointer to z_buffer for end of complete line
-//	srcTex		: pointer to texture map
-//	shifter		: shift value for vv (only if SCANMAP is defined)
-//	shifter_h	: shift value for vv (only if SCANMAP is NOT defined)
-//	ander_w		: and value for uu (only if SCANMAP is NOT defined)
-//	ander_h		: and value for vv (only if SCANMAP is NOT defined)
-// The SCANLOOP code needs to update these variables as follows:
-//	uu, vv, izz	: u, v, and 1/z components just after this segment (izz = 8:24)
-//	_dest		: _destend+1
-//	z_buffer	: pointer to z_buffer after end of segment
-// izz and z_buffer need only be updated if the loop code is interested
-// in using the Z buffer. If the code does only a Z fill, 'izz' need only
-// be updated in the Z fill loop.
+/*
+    To define a static draw_scanline function in the 'Scan' class just
+    define the following variables:
+	SCANFUNC	: name of the draw_scanline function (required)
+	SCANEND		: optional additional code after the function (mostly for Z fill)
+	SCANLOOP	: code to draw one segment of 16 (or less) pixels
+	SCANMAP		: define if the function uses the lighted textures
+	SCAN8		: define if function uses 8-bit pixels
+	SCAN16		: define if function uses 16-bit pixels
+	SCAN32		: define if function uses 32-bit pixels
 
-#if !defined(SCAN_DTYPE)
-#  if defined(SCAN8)
-#    define SCAN_DTYPE unsigned char
-#  elif defined(SCAN16)
-#    define SCAN_DTYPE UShort
-#  elif defined(SCAN32)
-#    define SCAN_DTYPE ULong
-#  else
-#    error Must define a data type size; one of SCAN8, SCAN16, SCAN32
-#  endif
+    The SCANLOOP code can expect the following variables to be set:
+	uu, vv, izz	: u, v, and 1/z components for start of segment (izz = 8:24)
+	duu, dvv, dzz	: deltas per pixel for above values (dzz = 8:24)
+	_dest		: pointer to screen for start of segment
+	_destend	: pointer to screen for end of segment
+	z_buffer	: pointer to z_buffer for start of segment
+	lastZbuf	: pointer to z_buffer for end of complete line
+	srcTex		: pointer to texture map
+	shifter		: shift value for vv (only if SCANMAP is defined)
+	shifter_h	: shift value for vv (only if SCANMAP is NOT defined)
+	ander_w		: and value for uu (only if SCANMAP is NOT defined)
+	ander_h		: and value for vv (only if SCANMAP is NOT defined)
+    The SCANLOOP code needs to update these variables as follows:
+	uu, vv, izz	: u, v, and 1/z components just after this segment (izz = 8:24)
+	_dest		: _destend+1
+	z_buffer	: pointer to z_buffer after end of segment
+    izz and z_buffer need only be updated if the loop code is interested
+    in using the Z buffer. If the code does only a Z fill, 'izz' need only
+    be updated in the Z fill loop.
+*/
+
+#if defined (SCAN8)
+#  define PIXTYPE UByte
+#elif defined (SCAN16)
+#  define PIXTYPE UShort
+#elif defined (SCAN32)
+#  define PIXTYPE ULong
+#else
+#  error "WARNING: no pixel size defined before including scanln.inc!"
 #endif
 
 void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
@@ -61,17 +61,17 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
   // Get global variables into registers.
 # ifdef SCANMAP
   unsigned long shifter = Scan.shf_u;
-  SCAN_DTYPE* srcTex = (SCAN_DTYPE*)Scan.tmap2;
+  PIXTYPE *srcTex = (PIXTYPE *)Scan.tmap2;
 # else
   unsigned long shifter_h = Scan.shf_h;
   unsigned long ander_w = Scan.and_w;
   unsigned long ander_h = Scan.and_h;
-  SCAN_DTYPE* srcTex = (SCAN_DTYPE*)Scan.tmap;
+  PIXTYPE *srcTex = (PIXTYPE *)Scan.tmap;
 # endif /*SCANMAP*/
   unsigned long *z_buffer = z_buf; (void)z_buffer;
   unsigned long *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
-  SCAN_DTYPE* _destend;
-  SCAN_DTYPE* _dest = (SCAN_DTYPE*)d;
+  PIXTYPE *_destend;
+  PIXTYPE *_dest = (PIXTYPE *)d;
 
   if (xx >= Scan.InterpolStep)
     inv_z += Scan.dM;
@@ -168,3 +168,4 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
+#undef PIXTYPE
