@@ -98,6 +98,9 @@ endif
 ifeq ($(CS_QINT_WORKAROUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_QINT_WORKAROUND$">>volatile.tmp
 endif
+ifeq ($(CSGL_EXT_STATIC_ASSERTION),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CSGL_EXT_STATIC_ASSERTION$">>volatile.tmp
+endif
 ifdef CS_LITTLE_ENDIAN
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_LITTLE_ENDIAN$">>volatile.tmp
 endif
