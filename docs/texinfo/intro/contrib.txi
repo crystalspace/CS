@@ -740,7 +740,7 @@ Thomas fixed the OpenGL renderer so that 3Dfx/Mesa combination doesn't crash
 anymore.
 
 @item
-Simon Boily (@email{simonb@@telisphere.com})
+Simon Boily (@email{personcountzero@@hotmail.com})
 
 Simon made several changes to the Direct3D renderer.  He added multitexture
 support and render state caching.
