@@ -503,7 +503,11 @@ void csGLTextureHandle::CreateMipMaps()
     int lcurdepth;
     for(lcurdepth = 0; lcurdepth < ldepth; lcurdepth++)
     {
-      csRef<iImage> tmpimg = (*images)[lcurdepth]->MipMap(lcurmip, 0);
+      csRef<iImage> tmpimg;
+      if (lcurmip == 0)
+        tmpimg = (*images)[lcurdepth];
+      else
+        tmpimg = (*images)[lcurdepth]->MipMap(lcurmip, 0);
       int curdepthsize = tmpimg->GetWidth() * tmpimg->GetHeight() * csGLTextureManager::glformats[i].components;
 
       memcpy(newtex->image_data + curdepthsize*lcurdepth, 
