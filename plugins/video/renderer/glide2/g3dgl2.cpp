@@ -53,9 +53,9 @@
 #else //Is there another platform Glide runs on?
 #endif
 
-#include "glidelib.h"
-#include "g3dglide.h"
-#include "alphamap.h"
+#include "gllib2.h"
+#include "g3dgl2.h"
+#include "glalpha2.h"
 
 //
 // Interface table definition

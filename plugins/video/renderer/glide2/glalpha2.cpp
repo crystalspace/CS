@@ -17,7 +17,7 @@
 */
 
 #include "sysdef.h"
-#include "alphamap.h"
+#include "glalpha2.h"
 
 IMPLEMENT_IBASE (csGlideAlphaMap)
   IMPLEMENTS_INTERFACE (iTextureHandle)

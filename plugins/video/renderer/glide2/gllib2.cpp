@@ -21,7 +21,7 @@
 // Written by xtrochu and Nathaniel
 
 #include "sysdef.h"
-#include "cs3d/glide2/glidelib.h"
+#include "gllib2.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"
 

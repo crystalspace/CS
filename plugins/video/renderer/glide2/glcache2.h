@@ -28,7 +28,7 @@
 #include "ipolygon.h"
 #include "itexture.h"
 #include "ilghtmap.h"
-#include "alphamap.h"
+#include "glalpha2.h"
 #include "cs3d/common/texmem.h"
 #include <glide.h>
 

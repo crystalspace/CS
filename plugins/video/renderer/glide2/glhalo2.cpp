@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
-#include "gl_halo.h"
-#include "glidelib.h"
+#include "glhalo2.h"
+#include "gllib2.h"
 #include <glide.h>
 #include <unistd.h>
 

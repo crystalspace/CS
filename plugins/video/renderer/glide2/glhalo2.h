@@ -22,9 +22,9 @@
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
-#include "g3dglide.h"
-#include "glcache.h"
-#include "alphamap.h"
+#include "g3dgl2.h"
+#include "glcache2.h"
+#include "glalpha2.h"
 
 class csGraphics3DGlide2x;
 

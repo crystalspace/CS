@@ -22,7 +22,7 @@
 #include "sysdef.h"
 #include "isystem.h"
 
-#include "cs3d/glide2/gl_txtmgr.h"
+#include "gltex2.h"
 #include "iimage.h"
 #include "csutil/scanstr.h"
 #include "lightdef.h"

@@ -22,9 +22,9 @@
 // Written by Dan Ogles
 #include "sysdef.h"
 #include "cssys/system.h"
-#include "gl_txtmgr.h"
-#include "glcache.h"
-#include "glidelib.h"
+#include "gltex2.h"
+#include "glcache2.h"
+#include "gllib2.h"
 #include "itexture.h"
 #include "ipolygon.h"
 #include "ilghtmap.h"
