@@ -313,11 +313,11 @@ protected:
     STDMETHODIMP GetTime (time_t& time);
     STDMETHODIMP Shutdown ();
     STDMETHODIMP GetShutdown (bool &Shutdown);
-    STDMETHODIMP (ConfigGetInt) (char *Section, char *Key, int &Value, int Default = 0);
-    STDMETHODIMP (ConfigGetStr) (char *Section, char *Key, char *&Value, char *Default = NULL);
-    STDMETHODIMP (ConfigGetYesNo) (char *Section, char *Key, bool &Value, bool Default = false);
-    STDMETHODIMP (QueueKeyEvent) (int KeyCode, bool Down);
-    STDMETHODIMP (QueueMouseEvent) (int Button, int Down, int x, int y, int ShiftFlags);
+    STDMETHODIMP ConfigGetInt (char *Section, char *Key, int &Value, int Default = 0);
+    STDMETHODIMP ConfigGetStr (char *Section, char *Key, char *&Value, char *Default = NULL);
+    STDMETHODIMP ConfigGetYesNo (char *Section, char *Key, bool &Value, bool Default = false);
+    STDMETHODIMP QueueKeyEvent (int KeyCode, bool Down);
+    STDMETHODIMP QueueMouseEvent (int Button, int Down, int x, int y, int ShiftFlags);
   };
   
   DECLARE_IUNKNOWN()
