@@ -994,13 +994,6 @@ void csWorld::ShineLights ()
 
         if (false) {}
         CHECK ("LMVERSION", xi != current.lm_version, "lightmap format")
-        CHECK ("NORMALLIGHTLEVEL", xi != current.normal_light_level, "normal light level")
-        CHECK ("AMBIENT_RED", xi != current.ambient_red, "ambient red level")
-        CHECK ("AMBIENT_GREEN", xi != current.ambient_green, "ambient green level")
-        CHECK ("AMBIENT_BLUE", xi != current.ambient_blue, "ambient blue level")
-        CHECK ("REFLECT", xi != current.reflect, "reflection value")
-        CHECK ("RADIOSITY", xi != current.radiosity, "radiosity value")
-        CHECK ("COSINUS_FACTOR", ABS (xf - current.cosinus_factor) > SMALL_EPSILON, "cosinus factor")
         CHECK ("LIGHTMAP_SIZE", xi != current.lightmap_size, "lightmap size")
 
 #undef CHECK

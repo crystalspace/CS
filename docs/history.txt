@@ -1,11 +1,24 @@
 The history order has been reversed so that new features are at the top.
 
+23-Aug-2000
+	- Gary Haussmann enabled GL-level backface culling. This makes
+	  the OpenGL renderer more consistent with the software renderer.
+	  When used together with the engine this should make little
+	  difference as the engine does backface culling. But it may make
+	  a difference if you use G3D on your own.
+	- Forced recalculation of lightmaps now only happens if you
+	  change the lightmap size (i.e. from 16x16 lumels to 8x8) or
+	  a global format change happens. In the past it also happens
+	  if you changed parameters like ambient and so on. For changes
+	  of ambient to have effect you now have to do '-relight' or
+	  '-recalc' explicitelly.
 22-Aug-2000
 	- Got a small patch from Rene Dudfield with new console command
 	  (for WalkTest) 'listactions', and a new sprite name argument
 	  for 'addsprite'.
 	- Added apimod17.txi documentation which explains how to go
 	  from 0.16 to 0.17. It is not complete though.
+	- Martin Geisse added the sound information to apimod17.txi.
 	- Fixed loadlib.cpp so that it again prints the error message
 	  from dlerror. This is ugly but it is the only way to get the
 	  useful error messages back.
@@ -16,6 +29,8 @@ The history order has been reversed so that new features are at the top.
 	  Hurray. FPS for some reason stays at zero, but I'm not sure this
 	  is DJGPP-specific.  Also for static linking mode
 	  csAddLibraryPath() is not called since it is not even present.
+	- Norman Kramer made the csBitSet members protected (were private
+	  before).
 21-Aug-2000
 	- Andrew Zabolotny did the following:
 	    - Changed perfstat plugin to compute fps once per 1/2 second
