@@ -18,6 +18,8 @@ chronological order.
 	  hack to shorten the pathnames mentioned by the the link statement.
 	  This hack did not fix the problem, and is not necessary now that the
 	  real problem has been corrected.
+	- Jorrit fixed a bug in thing which would sometimes reset the
+	  cached movable to 0 at the wrong place.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.

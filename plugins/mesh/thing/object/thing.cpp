@@ -1800,7 +1800,8 @@ void csThing::SetMovingOption (int opt)
 		static_data->max_vertices * sizeof (csVector3));
       }
 
-      cached_movable = 0;
+      //cached_movable = 0;
+      movablenr--;
       break;
   }
 
