@@ -41,15 +41,17 @@ protected:
   iTextureHandle *tex[3];
 
   /// Icon position
- int icon_align;
+  int icon_align;
 
+  ///
+  bool stretched;
+  
   /// Caption text for this component
   iString *caption;
 
-  ///
-  bool stretched; 
 protected:
   void ClearGroup ();
+
 public:
   awsCmdButton ();
   virtual ~awsCmdButton ();
@@ -115,4 +117,3 @@ public:
 };
 
 #endif // __CS_AWS_COMMAND_BUTTON_H__
-
