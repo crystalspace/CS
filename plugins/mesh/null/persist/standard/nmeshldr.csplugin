@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- nullmeshldr.csplugin -->
+<plugin>
+  <name>nullmeshldr</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.null</name>
+        <implementation>csNullFactoryLoader</implementation>
+        <description>Crystal Space Null Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.null</name>
+        <implementation>csNullMeshLoader</implementation>
+        <description>Crystal Space Null Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.null</name>
+        <implementation>csNullFactorySaver</implementation>
+        <description>Crystal Space Null Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.null</name>
+        <implementation>csNullMeshSaver</implementation>
+        <description>Crystal Space Null Mesh Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
