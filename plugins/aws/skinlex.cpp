@@ -430,14 +430,12 @@ goto find_rule; \
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "plugins/aws/skinlex.ll"
 #define INITIAL 0
 /*******
   Flex definition for the .skn file parser.
 
   to compile do:  flex -L skinlang.flx
  *********/
-#line 9 "plugins/aws/skinlex.ll"
 
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
@@ -610,7 +608,6 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 38 "plugins/aws/skinlex.ll"
 
 
 	if ( yy_init )
@@ -704,67 +701,54 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 39 "plugins/aws/skinlex.ll"
 return TOKEN_COMPONENT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 40 "plugins/aws/skinlex.ll"
 return TOKEN_CONNECT;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 41 "plugins/aws/skinlex.ll"
 return TOKEN_IS;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "plugins/aws/skinlex.ll"
 /* printf("skin-");   */ return TOKEN_SKIN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "plugins/aws/skinlex.ll"
 /* printf("window-"); */ return TOKEN_WINDOW;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 44 "plugins/aws/skinlex.ll"
 /* printf("for-");    */ return TOKEN_FOR;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "plugins/aws/skinlex.ll"
 /* printf("from-");   */ return TOKEN_FROM;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "plugins/aws/skinlex.ll"
 /* printf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "plugins/aws/skinlex.ll"
 /* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "plugins/aws/skinlex.ll"
 /* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "plugins/aws/skinlex.ll"
 /* eat all spaces and stuff */
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 50 "plugins/aws/skinlex.ll"
 /* printf("%c-", awstext[0]); */ return awstext[0];
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 51 "plugins/aws/skinlex.ll"
 ECHO;
 	YY_BREAK
 			case YY_STATE_EOF(INITIAL):
@@ -1650,5 +1634,4 @@ int main()
 	return 0;
 	}
 #endif
-#line 51 "plugins/aws/skinlex.ll"
 
