@@ -40,6 +40,13 @@ The history order is reversed so that new features are at the top.
 	  renderer when USE_PLUGINS=no.
 	- Eric Sunshine eliminated compilation warning from radiosity.h
 	  regarding undefined csCoverageMatrix.
+	- Michael Voasse did the following:
+	    - polytext.cpp: hid the overloaded *PutPixel and *DrawBox
+	      by prepending underbars to the overloaded methods. Adapts
+	      polytext to egcs 2.91.66 brain death.
+	    - flarge: added metaball to the basement. Added a couple of
+	      lights so its not so dark down there
+	    - stdtex.zip: added blobby.jpg.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the
