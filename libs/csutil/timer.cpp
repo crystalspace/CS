@@ -50,7 +50,7 @@ public:
     SCF_CONSTRUCT_IBASE (0);
     csTimerEventHandler::timer = timer;
   }
-  virutal ~csTimerEventHandler()
+  virtual ~csTimerEventHandler()
   {
     SCF_DESTRUCT_IBASE ();
   }

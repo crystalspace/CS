@@ -117,7 +117,7 @@ protected:
     /// Constructor.
     csAppPlugin (csApp *iParent);
     /// Destructor.
-    vitual ~csAppPlugin();
+    virtual ~csAppPlugin();
 
     /// Initialize the application plugin
     virtual bool Initialize (iObjectRegistry *object_reg);
