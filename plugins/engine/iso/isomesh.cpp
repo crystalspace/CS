@@ -128,14 +128,15 @@ class csIsoFakeRenderView : public iRenderView {
    * A callback function. If this is set then no drawing is done.
    * Instead the callback function is called.
    */
-  csDrawFunc* callback;
-  /// Userdata belonging to the callback.
-  void* callback_data;
+  iDrawFuncCallback* callback;
   
 public:
   DECLARE_IBASE;
   csIsoFakeRenderView() {}
-  virtual ~csIsoFakeRenderView() {}
+  virtual ~csIsoFakeRenderView() 
+  {
+    DEC_REF (callback);
+  }
 
   /// set data to render an isometric mesh
   void SetIsoData(iIsoRenderView *r, iCamera *cam)
@@ -209,22 +210,21 @@ public:
   {
     (void)key;
   }
-  virtual void SetCallback (csDrawFunc* cb, void* cbdata)
+  virtual void SetCallback (iDrawFuncCallback* cb)
   {
+    if (callback)
+      callback->DecRef ();
     callback = cb;
-    callback_data = cbdata;
+    if (callback)
+      callback->IncRef ();
   }
-  virtual csDrawFunc* GetCallback ()
+  virtual iDrawFuncCallback* GetCallback ()
   {
     return callback;
   }
-  virtual void* GetCallbackData ()
-  {
-    return callback_data;
-  }
   virtual void CallCallback (int type, void* data)
   {
-    callback (this, type, data);
+    callback->DrawFunc (this, type, data);
   }
 };
 
