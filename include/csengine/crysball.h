@@ -47,8 +47,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
-#include "ipolygon.h"
-#include "ipolyset.h"
+#include "ipolmesh.h"
 
 class csCrystalBall
 {
@@ -115,10 +114,10 @@ class csCrystalBall
   ~csCrystalBall ();
 
   // add all polygons in <polyset> to the crystal ball
-  void Build (iPolygonSet *polyset);
+  void Build (iPolygonMesh *polyset);
 
   // add a single polygon to the crystal ball
-  void InsertPolygon (iPolygonSet *polyset, int idx);
+  void InsertPolygon (iPolygonMesh *polyset, int idx);
 
   // rotate the unitsphere by <t>. Add all polygon indices to <indexVector>
   // which normlals point to the <useSign> side
