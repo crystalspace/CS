@@ -77,6 +77,11 @@ csVertexBufferManager::~csVertexBufferManager()
   // because they should already be gone by the time we come here.
   // @@@ Maybe an assert here to check if that's the case?
   // CS_ASSERT (buffers.Length () == 0);
+
+  /// go through list of registered client and tell 'em we are no longer 
+  /// available
+  for (int i=0; i < vClients.Length (); i++)
+    ((iVertexBufferManagerClient*)vClients.Get (i))->ManagerClosing ();
 }
 
 void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)
@@ -118,3 +123,14 @@ void csVertexBufferManager::UnlockBuffer (iVertexBuffer* buf)
   vbuf->SetLock (false);
 }
 
+void csVertexBufferManager::AddClient (iVertexBufferManagerClient *client)
+{
+  vClients.Push ((csSome)client);
+}
+
+void csVertexBufferManager::RemoveClient (iVertexBufferManagerClient *client)
+{
+  int idx = vClients.Find ((csSome)client);
+  if (idx != -1)
+    vClients.Delete (idx);
+}
