@@ -38,7 +38,7 @@ endif
 INC.SNOW = $(wildcard plugins/mesh/object/snow/*.h plugins/mesh/object/partgen/*.h)
 SRC.SNOW = $(wildcard plugins/mesh/object/snow/*.cpp plugins/mesh/object/partgen/*.cpp)
 OBJ.SNOW = $(addprefix $(OUT),$(notdir $(SRC.SNOW:.cpp=$O)))
-DEP.SNOW = CSGEOM CSUTIL CSSYS
+DEP.SNOW = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNOW
 DSP.SNOW.NAME = snow

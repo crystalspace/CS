@@ -38,7 +38,7 @@ endif
 INC.EXPLOLDR = $(wildcard plugins/mesh/loader/explo/*.h)
 SRC.EXPLOLDR = $(wildcard plugins/mesh/loader/explo/*.cpp)
 OBJ.EXPLOLDR = $(addprefix $(OUT),$(notdir $(SRC.EXPLOLDR:.cpp=$O)))
-DEP.EXPLOLDR = CSGEOM CSUTIL CSSYS
+DEP.EXPLOLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EXPLOLDR
 DSP.EXPLOLDR.NAME = exploldr

@@ -38,7 +38,7 @@ endif
 INC.SPR2D = $(wildcard plugins/mesh/object/spr2d/*.h)
 SRC.SPR2D = $(wildcard plugins/mesh/object/spr2d/*.cpp)
 OBJ.SPR2D = $(addprefix $(OUT),$(notdir $(SRC.SPR2D:.cpp=$O)))
-DEP.SPR2D = CSGEOM CSUTIL CSSYS
+DEP.SPR2D = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPR2D
 DSP.SPR2D.NAME = spr2d

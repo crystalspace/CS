@@ -37,7 +37,7 @@ endif
 INC.CSFONT = $(wildcard plugins/font/server/csfont/*.h)
 SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
 OBJ.CSFONT = $(addprefix $(OUT),$(notdir $(SRC.CSFONT:.cpp=$O)))
-DEP.CSFONT = CSUTIL CSSYS
+DEP.CSFONT = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSFONT
 DSP.CSFONT.NAME = csfont

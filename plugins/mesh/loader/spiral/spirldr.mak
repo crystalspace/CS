@@ -38,7 +38,7 @@ endif
 INC.SPIRLDR = $(wildcard plugins/mesh/loader/spiral/*.h)
 SRC.SPIRLDR = $(wildcard plugins/mesh/loader/spiral/*.cpp)
 OBJ.SPIRLDR = $(addprefix $(OUT),$(notdir $(SRC.SPIRLDR:.cpp=$O)))
-DEP.SPIRLDR = CSGEOM CSUTIL CSSYS
+DEP.SPIRLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPIRLDR
 DSP.SPIRLDR.NAME = spirldr

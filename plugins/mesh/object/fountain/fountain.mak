@@ -38,7 +38,7 @@ endif
 INC.FOUNT = $(wildcard plugins/mesh/object/fountain/*.h plugins/mesh/object/partgen/*.h)
 SRC.FOUNT = $(wildcard plugins/mesh/object/fountain/*.cpp plugins/mesh/object/partgen/*.cpp)
 OBJ.FOUNT = $(addprefix $(OUT),$(notdir $(SRC.FOUNT:.cpp=$O)))
-DEP.FOUNT = CSGEOM CSUTIL CSSYS
+DEP.FOUNT = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FOUNT
 DSP.FOUNT.NAME = fountain

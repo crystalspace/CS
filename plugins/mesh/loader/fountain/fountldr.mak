@@ -38,7 +38,7 @@ endif
 INC.FOUNTLDR = $(wildcard plugins/mesh/loader/fountain/*.h)
 SRC.FOUNTLDR = $(wildcard plugins/mesh/loader/fountain/*.cpp)
 OBJ.FOUNTLDR = $(addprefix $(OUT),$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
-DEP.FOUNTLDR = CSGEOM CSUTIL CSSYS
+DEP.FOUNTLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FOUNTLDR
 DSP.FOUNTLDR.NAME = fountldr

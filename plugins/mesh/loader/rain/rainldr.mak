@@ -38,7 +38,7 @@ endif
 INC.RAINLDR = $(wildcard plugins/mesh/loader/rain/*.h)
 SRC.RAINLDR = $(wildcard plugins/mesh/loader/rain/*.cpp)
 OBJ.RAINLDR = $(addprefix $(OUT),$(notdir $(SRC.RAINLDR:.cpp=$O)))
-DEP.RAINLDR = CSGEOM CSUTIL CSSYS
+DEP.RAINLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAINLDR
 DSP.RAINLDR.NAME = rainldr

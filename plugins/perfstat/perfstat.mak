@@ -45,7 +45,7 @@ endif
 INC.PERFSTAT = $(wildcard plugins/perfstat/*.h)
 SRC.PERFSTAT = $(wildcard plugins/perfstat/*.cpp)
 OBJ.PERFSTAT = $(addprefix $(OUT),$(notdir $(SRC.PERFSTAT:.cpp=$O)))
-DEP.PERFSTAT = CSGEOM CSSYS CSUTIL
+DEP.PERFSTAT = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += PERFSTAT
 DSP.PERFSTAT.NAME = perfstat

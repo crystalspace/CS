@@ -38,7 +38,7 @@ endif
 INC.SURFLDR = $(wildcard plugins/mesh/loader/surf/*.h)
 SRC.SURFLDR = $(wildcard plugins/mesh/loader/surf/*.cpp)
 OBJ.SURFLDR = $(addprefix $(OUT),$(notdir $(SRC.SURFLDR:.cpp=$O)))
-DEP.SURFLDR = CSGEOM CSUTIL CSSYS
+DEP.SURFLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SURFLDR
 DSP.SURFLDR.NAME = surfldr

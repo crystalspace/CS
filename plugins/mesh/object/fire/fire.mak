@@ -38,7 +38,7 @@ endif
 INC.FIRE = $(wildcard plugins/mesh/object/fire/*.h plugins/mesh/object/partgen/*.h)
 SRC.FIRE = $(wildcard plugins/mesh/object/fire/*.cpp plugins/mesh/object/partgen/*.cpp)
 OBJ.FIRE = $(addprefix $(OUT),$(notdir $(SRC.FIRE:.cpp=$O)))
-DEP.FIRE = CSGEOM CSUTIL CSSYS
+DEP.FIRE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FIRE
 DSP.FIRE.NAME = fire

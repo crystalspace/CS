@@ -38,7 +38,7 @@ endif
 INC.CUBE = $(wildcard plugins/mesh/object/cube/*.h)
 SRC.CUBE = $(wildcard plugins/mesh/object/cube/*.cpp)
 OBJ.CUBE = $(addprefix $(OUT),$(notdir $(SRC.CUBE:.cpp=$O)))
-DEP.CUBE = CSGEOM CSUTIL CSSYS
+DEP.CUBE = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CUBE
 DSP.CUBE.NAME = cube

@@ -38,7 +38,7 @@ endif
 INC.EMIT = $(wildcard plugins/mesh/object/emit/*.h plugins/mesh/object/partgen/*.h)
 SRC.EMIT = $(wildcard plugins/mesh/object/emit/*.cpp plugins/mesh/object/partgen/*.cpp)
 OBJ.EMIT = $(addprefix $(OUT),$(notdir $(SRC.EMIT:.cpp=$O)))
-DEP.EMIT = CSGEOM CSUTIL CSSYS
+DEP.EMIT = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EMIT
 DSP.EMIT.NAME = emit

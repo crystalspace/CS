@@ -38,7 +38,7 @@ endif
 INC.RAPID = $(wildcard plugins/colldet/rapid/*.h)
 SRC.RAPID = $(wildcard plugins/colldet/rapid/*.cpp)
 OBJ.RAPID = $(addprefix $(OUT),$(notdir $(SRC.RAPID:.cpp=$O)))
-DEP.RAPID = CSGEOM CSUTIL CSSYS
+DEP.RAPID = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAPID
 DSP.RAPID.NAME = rapid

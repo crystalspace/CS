@@ -38,7 +38,7 @@ endif
 INC.EMITLDR = $(wildcard plugins/mesh/loader/emit/*.h)
 SRC.EMITLDR = $(wildcard plugins/mesh/loader/emit/*.cpp)
 OBJ.EMITLDR = $(addprefix $(OUT),$(notdir $(SRC.EMITLDR:.cpp=$O)))
-DEP.EMITLDR = CSGEOM CSUTIL CSSYS
+DEP.EMITLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += EMITLDR
 DSP.EMITLDR.NAME = emitldr

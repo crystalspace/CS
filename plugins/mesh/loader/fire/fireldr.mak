@@ -38,7 +38,7 @@ endif
 INC.FIRELDR = $(wildcard plugins/mesh/loader/fire/*.h)
 SRC.FIRELDR = $(wildcard plugins/mesh/loader/fire/*.cpp)
 OBJ.FIRELDR = $(addprefix $(OUT),$(notdir $(SRC.FIRELDR:.cpp=$O)))
-DEP.FIRELDR = CSGEOM CSUTIL CSSYS
+DEP.FIRELDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += FIRELDR
 DSP.FIRELDR.NAME = fireldr

@@ -38,7 +38,7 @@ endif
 INC.SNOWLDR = $(wildcard plugins/mesh/loader/snow/*.h)
 SRC.SNOWLDR = $(wildcard plugins/mesh/loader/snow/*.cpp)
 OBJ.SNOWLDR = $(addprefix $(OUT),$(notdir $(SRC.SNOWLDR:.cpp=$O)))
-DEP.SNOWLDR = CSGEOM CSUTIL CSSYS
+DEP.SNOWLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNOWLDR
 DSP.SNOWLDR.NAME = snowldr

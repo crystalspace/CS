@@ -38,7 +38,7 @@ endif
 INC.CUBELDR = $(wildcard plugins/mesh/loader/cube/*.h)
 SRC.CUBELDR = $(wildcard plugins/mesh/loader/cube/*.cpp)
 OBJ.CUBELDR = $(addprefix $(OUT),$(notdir $(SRC.CUBELDR:.cpp=$O)))
-DEP.CUBELDR = CSGEOM CSUTIL CSSYS
+DEP.CUBELDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CUBELDR
 DSP.CUBELDR.NAME = cubeldr

@@ -45,7 +45,7 @@ endif
 INC.CSCONIN = $(wildcard plugins/console/input/standard/*.h)
 SRC.CSCONIN = $(wildcard plugins/console/input/standard/*.cpp)
 OBJ.CSCONIN = $(addprefix $(OUT),$(notdir $(SRC.CSCONIN:.cpp=$O)))
-DEP.CSCONIN = CSSYS CSUTIL
+DEP.CSCONIN = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSCONIN
 DSP.CSCONIN.NAME = csconin

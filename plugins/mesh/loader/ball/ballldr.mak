@@ -38,7 +38,7 @@ endif
 INC.BALLLDR = $(wildcard plugins/mesh/loader/ball/*.h)
 SRC.BALLLDR = $(wildcard plugins/mesh/loader/ball/*.cpp)
 OBJ.BALLLDR = $(addprefix $(OUT),$(notdir $(SRC.BALLLDR:.cpp=$O)))
-DEP.BALLLDR = CSGEOM CSUTIL CSSYS
+DEP.BALLLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += BALLLDR
 DSP.BALLLDR.NAME = ballldr

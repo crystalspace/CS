@@ -38,7 +38,7 @@ endif
 INC.SURF = $(wildcard plugins/mesh/object/surf/*.h)
 SRC.SURF = $(wildcard plugins/mesh/object/surf/*.cpp)
 OBJ.SURF = $(addprefix $(OUT),$(notdir $(SRC.SURF:.cpp=$O)))
-DEP.SURF = CSGEOM CSUTIL CSSYS
+DEP.SURF = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SURF
 DSP.SURF.NAME = surf

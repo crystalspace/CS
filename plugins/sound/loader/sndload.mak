@@ -42,7 +42,7 @@ endif
 INC.SNDLOAD = $(wildcard plugins/sound/loader/*.h)
 SRC.SNDLOAD = $(wildcard plugins/sound/loader/*.cpp)
 OBJ.SNDLOAD = $(addprefix $(OUT),$(notdir $(SRC.SNDLOAD:.cpp=$O)))
-DEP.SNDLOAD = CSUTIL CSSYS
+DEP.SNDLOAD = CSUTIL CSSYS CSUTIL
 CFG.SNDLOAD = data/config/sound.cfg
 
 TO_INSTALL.CONFIG += $(CFG.SNDLOAD)

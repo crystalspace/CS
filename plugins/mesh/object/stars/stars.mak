@@ -38,7 +38,7 @@ endif
 INC.STARS = $(wildcard plugins/mesh/object/stars/*.h)
 SRC.STARS = $(wildcard plugins/mesh/object/stars/*.cpp)
 OBJ.STARS = $(addprefix $(OUT),$(notdir $(SRC.STARS:.cpp=$O)))
-DEP.STARS = CSGEOM CSUTIL CSSYS
+DEP.STARS = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += STARS
 DSP.STARS.NAME = stars

@@ -38,7 +38,7 @@ endif
 INC.SPIRAL = $(wildcard plugins/mesh/object/spiral/*.h plugins/mesh/object/partgen/*.h)
 SRC.SPIRAL = $(wildcard plugins/mesh/object/spiral/*.cpp plugins/mesh/object/partgen/*.cpp)
 OBJ.SPIRAL = $(addprefix $(OUT),$(notdir $(SRC.SPIRAL:.cpp=$O)))
-DEP.SPIRAL = CSGEOM CSUTIL CSSYS
+DEP.SPIRAL = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SPIRAL
 DSP.SPIRAL.NAME = spiral

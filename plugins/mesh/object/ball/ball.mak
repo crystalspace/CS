@@ -38,7 +38,7 @@ endif
 INC.BALL = $(wildcard plugins/mesh/object/ball/*.h)
 SRC.BALL = $(wildcard plugins/mesh/object/ball/*.cpp)
 OBJ.BALL = $(addprefix $(OUT),$(notdir $(SRC.BALL:.cpp=$O)))
-DEP.BALL = CSGEOM CSUTIL CSSYS
+DEP.BALL = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += BALL
 DSP.BALL.NAME = ball

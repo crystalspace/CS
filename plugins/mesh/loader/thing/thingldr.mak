@@ -38,7 +38,7 @@ endif
 INC.THINGLDR = $(wildcard plugins/mesh/loader/thing/*.h)
 SRC.THINGLDR = $(wildcard plugins/mesh/loader/thing/*.cpp)
 OBJ.THINGLDR = $(addprefix $(OUT),$(notdir $(SRC.THINGLDR:.cpp=$O)))
-DEP.THINGLDR = CSGEOM CSUTIL CSSYS
+DEP.THINGLDR = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += THINGLDR
 DSP.THINGLDR.NAME = thingldr
