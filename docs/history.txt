@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	  	this->super::~super().
 	  This causes problems on some compilers and I don't see the
 	  need for this either.
+	- Added a 3dsMax script for converting 3dsMax levels to Crystal
+	  Space. This script is written for 3dsMax version 4 but it may
+	  also work with lower versions. This convertor is specifically
+	  designed with Dynavis in mind so it will export seperate objects
+	  in 3dsMax as seperate objects in CS. Thanks to Luca Pancallo for
+	  creating this very useful script!
 3-Jul-2002
 	- Added non-functional iEngine->GetVisibleObjects(). The purpose
 	  of this routine will be to return all potentially visible objects
