@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Win32, Problems, External Libraries, Building
-@section Win32
+@node Windows, Problems, External Libraries, Building
+@section Windows (Win32)
 
 TODO
 

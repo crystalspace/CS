@@ -18,7 +18,7 @@ will find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
-* Win32::
+* Windows::
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 * MacOS/9::
 * OS2:: @sc{os}/2
