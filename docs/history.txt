@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 23-Feb-2003
+	- Christian Bayle fixed menu in debian package
 	- Eric Sunshine made the following changes:
 	    - Fixed mk/autoconf/pkg.m4 so that it no longer aborts
 	      configuration and abuses the user just because an optional
