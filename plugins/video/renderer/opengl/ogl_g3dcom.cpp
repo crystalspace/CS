@@ -698,14 +698,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
 {
   CommonOpen ();
 
-  if (!G2D->Open ())
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
-    // set "not opened" flag
-    width = height = -1;
-    return false;
-  }
-
 #define OGLCONFIGS_PREFIX "Video.OpenGL.Config."
 #define OGLCONFIGS_SUFFIX ".config"
 
@@ -770,6 +762,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
 #undef OGLCONFIGS_PREFIX   
 #undef OGLCONFIGS_SUFFIX
+
+  if (!G2D->Open ())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
+    // set "not opened" flag
+    width = height = -1;
+    return false;
+  }
 
   // Initialize the default method calls
   DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
