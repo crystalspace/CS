@@ -126,17 +126,6 @@ if [ -n "${MAKEDEP}" ]; then
   fi
 fi
 
-# Find out the system include paths for building makedep
-echo "#include <stdio.h>
-#include <stddef.h>
-#include <float.h>" >conftest.cpp
-
-${CXX} -c -H conftest.cpp >conftest._ 2>&1
-gawk -f bin/includes.awk conftest._
-
-# Remove dummy remains
-rm -f conftest.cpp conftest.o conftest._
-
 # Find the X11 directory
 if [ -d /usr/X11 ]; then
   X11_PATH="/usr/X11"
