@@ -24,6 +24,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a few things again.
 	- Michael Dale Long fixed project files for new files from Gary
 	  Haussmann.
+	- Added version of win32.cpp from Xavier Trochu which uses
+	  DirectInput for keyboard handling.
+	- Xavier Trochu also fixed the Windows OpenGL 2D driver so that the
+	  console and FPS display works correctly.
 24-Jul-1999
 	- Changes from Thomas Hieber to fix Win32 again.
 23-Jul-1999
