@@ -18,10 +18,10 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "iutil/plugin.h"
 #include "iutil/cfgfile.h"

@@ -16,9 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <math.h>
-#include <stdarg.h>
-
 #include "cssysdef.h"
 #include "soft_txt.h"
 #include "csgfx/inv_cmap.h"

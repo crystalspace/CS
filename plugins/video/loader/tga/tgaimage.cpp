@@ -28,10 +28,10 @@
 ** implied warranty.
 */
 
+#include "cssysdef.h"
 #include <math.h>
 #include <stdio.h>
 
-#include "cssysdef.h"
 #include "tgaimage.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"

@@ -16,9 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <string.h>
 
-#include "cssysdef.h"
 #include "awsfparm.h"
 #include "awsadler.h"
 

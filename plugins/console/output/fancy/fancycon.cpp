@@ -17,10 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "fancycon.h"
 #include "ivaria/reporter.h"

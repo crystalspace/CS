@@ -213,7 +213,7 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
   int resolution = (int)(region.MaxX () - region.MinX ());
   // Make the resolution conform to n^2+1
   resolution = csLog2(resolution);
-  resolution = ((int) pow(2, resolution)) + 1;
+  resolution = (int)((float) pow(2.0f, resolution)) + 1;
 
   hm_x = hm_y = resolution;
   fullsample = terraform->GetSampler (region, resolution);

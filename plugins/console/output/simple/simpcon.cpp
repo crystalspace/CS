@@ -17,11 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/csuctransform.h"
 #include "simpcon.h"

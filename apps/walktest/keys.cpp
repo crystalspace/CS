@@ -53,12 +53,14 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh, iCamera *camera, csVe
 // Everything for key mapping and binding.
 //===========================================================================
 
-void map_key (const char* keyname, csKeyMap* map)
+void map_key (const char* _keyname, csKeyMap* map)
 {
   map->shift = 0;
   map->alt = 0;
   map->ctrl = 0;
   map->need_status = 0;
+  CS_ALLOC_STACK_ARRAY(char, keyname, strlen(_keyname) + 1);
+  strcpy (keyname, _keyname);
   char* dash = strchr (keyname, '-');
   while (dash)
   {
@@ -71,7 +73,7 @@ void map_key (const char* keyname, csKeyMap* map)
     	"Bad modifier '%s'!", keyname);
 
     *dash = '-';
-    keyname = dash+1;
+    strcpy (keyname, dash+1);
     dash = strchr (dash+1, '-');
   }
 
@@ -176,9 +178,9 @@ csKeyMap* find_mapping (const char* keyname)
   return 0;
 }
 
-void bind_key (const char* arg)
+void bind_key (const char* _arg)
 {
-  if (!arg)
+  if (!_arg)
   {
     csKeyMap* map = mapping;
     while (map)
@@ -189,6 +191,8 @@ void bind_key (const char* arg)
     }
     return;
   }
+  CS_ALLOC_STACK_ARRAY (char, arg, strlen(_arg) + 1);
+  strcpy (arg, _arg);
   char* space = strchr (arg, ' ');
   if (space)
   {

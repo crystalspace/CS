@@ -1851,7 +1851,7 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   {
     // Make the resolution conform to n^2
     block_res = csLog2 ((int) value);
-    block_res = (int) pow (2, block_res);
+    block_res = (int) ((float)pow (2.0f, block_res));
     return true;
   }
   else if (strcmp (parameter, "cd resolution") == 0)
@@ -2222,7 +2222,7 @@ void csTerrainFactory::SetSamplerRegion (const csBox2& region)
   int resolution = (int)(region.MaxX () - region.MinX ());
   // Make the resolution conform to n^2+1
   resolution = csLog2 (resolution);
-  resolution = ((int) pow(2, resolution)) + 1;
+  resolution = (int)(pow(2.0f, resolution)) + 1;
 
   hm_x = hm_y = resolution;
 }

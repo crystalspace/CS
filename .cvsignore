@@ -1,10 +1,12 @@
 *.dll
 *.exe
+*.ilk
 *.log
 *.zip
 *.txt
 *.pyd
 *.csplugin
+*.manifest
 config.*
 autom4te.cache
 Jamconfig

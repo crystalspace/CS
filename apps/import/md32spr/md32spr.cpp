@@ -20,10 +20,10 @@
     It only accepts models within zip files (for now).
 */
 
+#include "cssysdef.h"
 #include <stdarg.h>
 #include <ctype.h>
 
-#include "cssysdef.h"
 #include "md32spr.h"
 #include "bufio.h"
 #include "ivaria/reporter.h"

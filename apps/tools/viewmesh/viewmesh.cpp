@@ -1528,14 +1528,14 @@ void ViewMesh::ClearButton (void* awst, iAwsSource *s)
 
 bool ViewMesh::ParseDir(const char* filename)
 {
-  char* colon = strchr (filename, ':');
+  const char* colon = strchr (filename, ':');
   char* path;
-  char* fn;
+  CS_ALLOC_STACK_ARRAY(char, fn, strlen(filename) + 1);
   if (colon)
   {
     int pathlen = colon-filename;
     path = new char[pathlen+1];
-    fn = colon+1;
+    strcpy (fn, colon+1);
     strncpy (path, filename, pathlen);
     path[pathlen] = 0;
     if (!vfs->ChDirAuto (path, 0, 0, colon+1))
@@ -1554,7 +1554,7 @@ bool ViewMesh::ParseDir(const char* filename)
       if (!vfs->ChDir (fn))
         return false;
       *slash = rs;
-      fn = slash+1;
+      strcpy (fn, slash+1);
       slash = strpbrk (fn, "/\\");
     }
     return true;
@@ -1564,12 +1564,12 @@ bool ViewMesh::ParseDir(const char* filename)
     // grab the directory.
     path = new char[strlen(filename)+1];
     strcpy (path, filename);
-    fn = path;
+    strcpy (fn, path);
     char* slash = strrchr (path, '/');
     char* dir;
     if (slash)
     {
-      fn = slash + 1;
+      strcpy (fn, slash + 1);
       *slash = 0;
       dir = path;
     }

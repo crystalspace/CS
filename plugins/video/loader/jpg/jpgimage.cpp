@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <math.h>
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 
-#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "jpgimage.h"
 #include "csgfx/rgbpixel.h"

@@ -840,7 +840,7 @@ bool GetObjectNameSetting(const char * objectname, char setting)
     // if missing either delimiter, return false
     if (objectname[0] != '|') return false;
 
-    char * fardelim = strchr(&objectname[1], '|');
+    const char * fardelim = strchr(&objectname[1], '|');
     if (fardelim == objectname) return false;
 
     for (int pos = 1; pos < (fardelim - objectname); pos++)

@@ -24,8 +24,8 @@
  * command to this class.
  */
 
-#include <string.h>
 #include "cssysdef.h"
+#include <string.h>
 #include "csver.h"
 #include "command.h"
 #include "csutil/scanstr.h"

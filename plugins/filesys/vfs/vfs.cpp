@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <ctype.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "cssysdef.h"
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/cmdline.h"

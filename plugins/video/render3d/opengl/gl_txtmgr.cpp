@@ -19,8 +19,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-#include <math.h>
 #include "cssysdef.h"
 #include "csutil/array.h"
 #include "csutil/databuf.h"

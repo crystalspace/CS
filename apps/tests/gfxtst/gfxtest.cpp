@@ -19,8 +19,8 @@
 
 */
 
-#include <string.h>
 #include "cssysdef.h"
+#include <string.h>
 
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagetools.h"

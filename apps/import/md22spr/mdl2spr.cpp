@@ -18,11 +18,11 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "cssysdef.h"
 #include "m2s_mdl.h"
 #include "m2s_md2.h"
 #include "igraphic/imageio.h"

@@ -6,6 +6,5 @@ Description ddraw2d : "DirectDraw 2D driver" ;
 Plugin ddraw2d : [ Wildcard *.cpp *.h ] ;
 LinkWith ddraw2d : win32canvascommon directxcommon canvascommon csutil ;
 ExternalLibs ddraw2d : DIRECTX ;
-MsvcExternalLibrary ddraw2d : "user32.lib gdi32.lib advapi32.lib" ;
 CompileGroups ddraw2d : canvases softcanvas ;
 }

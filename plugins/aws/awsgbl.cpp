@@ -16,10 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdlib.h>
 #include <math.h>
 
-#include "cssysdef.h"
 #include "awslayot.h"
 #include "awsgbl.h"
 #include "awsgbc.h"

@@ -16,9 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdio.h>
 
-#include "cssysdef.h"
 #include "awsimgvw.h"
 #include "aws3dfrm.h"
 #include "ivideo/graph2d.h"

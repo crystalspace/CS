@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "cssysdef.h"
 #include "gifimage.h"
 
 CS_IMPLEMENT_PLUGIN

@@ -138,7 +138,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 	for (int vv = min_lv; vv < max_lv; vv++)
 	{
 		int tx_idx = ((pt_min_v + vv) & tx_andh) << tx_shfw;
-		PI_PIXTYPE *__out = out;
+		PI_PIXTYPE *__out_ptr = out;
 
 		if (src >= src_end) return;
 		
@@ -184,7 +184,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 
 		src += src_dlu;
 				
-		out = __out + pt_w;
+		out = __out_ptr + pt_w;
 	}
   }
   else
@@ -314,7 +314,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 		for (int vv = 0; vv < lc_h; vv++)
 		{
 			int tx_idx = ((v + vv + pt_min_v) & tx_andh) << tx_shfw;
-			PI_PIXTYPE *__out = out;
+			PI_PIXTYPE *__out_ptr = out;
 
 			int r = r0;
 			
@@ -369,7 +369,7 @@ void LM_NAME (csPolyTextureMapping* tmapping,
 			  r += rd; g += gd; b += bd;
 			}
 
-			out = __out + pt_w;
+			out = __out_ptr + pt_w;
 
 			r0 += r0d; r1 += r1d;
 			g0 += g0d; g1 += g1d;
