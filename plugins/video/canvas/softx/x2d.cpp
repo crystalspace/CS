@@ -311,7 +311,7 @@ bool csGraphics2DXLib::Open(const char *Title)
 			  CWBackPixel | CWBorderPixel | CWBitGravity | 
 			  (cmap ? CWColormap : 0), &swa);
 
-  XStoreName (dpy, window, Title);
+  XStoreName (dpy, WMwindow, Title);
 
   XGCValues values;
   gc = XCreateGC (dpy, window, 0, &values);
