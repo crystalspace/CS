@@ -63,10 +63,10 @@ enum csRenderBufferComponentType
 };
 
 /**
-  * Type of lock
-  * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
-  * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
-  */
+ * Type of lock
+ * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
+ * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
+ */
 enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
@@ -102,11 +102,11 @@ struct iRenderBuffer : public iBase
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() const = 0;
-
 };
 
 SCF_VERSION (iRenderBufferSource, 0, 0, 1);
 
+/// Document me!@@@
 struct iRenderBufferSource : public iBase
 {
   /// Get a named buffer

@@ -50,12 +50,10 @@ enum csRenderMeshType
   CS_MESHTYPE_LINESTRIP
 };
 
+/// Document me! @@@
 class csRenderMesh
 {
 public:
-
-public:
-
   csRenderMesh () 
   {
     z_buf_mode = CS_ZBUF_NONE;

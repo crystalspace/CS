@@ -31,7 +31,7 @@ struct iGraphics2D;
 
 SCF_VERSION (iXExtSHM, 1, 0, 0);
 
-///
+/// Document me!@@@
 struct iXExtSHM : public iBase
 {
   virtual void SetDisplayScreen (Display *dpy, int screen_num) = 0;

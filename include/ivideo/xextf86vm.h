@@ -30,7 +30,7 @@
 
 SCF_VERSION (iXExtF86VM, 1, 0, 0);
 
-///
+/// Document me!@@@
 struct iXExtF86VM : public iBase
 {
   /// Open Video Mode plugin

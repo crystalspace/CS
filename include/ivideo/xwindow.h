@@ -33,7 +33,7 @@ struct iGraphics2D;
 
 SCF_VERSION (iXWindow, 1, 0, 0);
 
-///
+/// Document me! @@@
 struct iXWindow : public iBase
 {
   // These should be inherited from csNativeWindow

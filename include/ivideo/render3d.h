@@ -319,7 +319,8 @@ struct iRender3D : public iBase
     int componentCount, bool index) = 0;
 
   /// Activate a vertex buffer
-  virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;
+  virtual bool ActivateBuffer (csVertexAttrib attrib,
+	iRenderBuffer* buffer) = 0;
 
   /// Deactivate a vertex buffer
   virtual void DeactivateBuffer (csVertexAttrib attrib) = 0;
@@ -328,7 +329,8 @@ struct iRender3D : public iBase
   virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
 
   /// Activate a texture (Should probably handled some better way)
-  virtual bool ActivateTexture (iMaterialHandle *matwrapper, int layer, int unit = 0) = 0;
+  virtual bool ActivateTexture (iMaterialHandle *matwrapper,
+	int layer, int unit = 0) = 0;
 
   /// Deactivate a texture
   virtual void DeactivateTexture (int unit = 0) = 0;
@@ -391,19 +393,19 @@ struct iRender3D : public iBase
   virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
   /**
-  * Draw a pixmap using a rectangle from given texture.
-  * The sx,sy(sw,sh) rectangle defines the screen rectangle within
-  * which the drawing is performed (clipping rectangle is also taken
-  * into account). The tx,ty(tw,th) rectangle defines a subrectangle
-  * from texture which should be painted. If the subrectangle exceeds
-  * the actual texture size, texture coordinates are wrapped around
-  * (e.g. the texture is tiled). The Alpha parameter defines the
-  * transparency of the drawing operation, 0 means opaque, 255 means
-  * fully transparent.<p>
-  * <b>WARNING: Tiling works only with textures that have power-of-two
-  * sizes!</b> That is, both width and height should be a power-of-two,
-  * although not neccessarily equal.
-  */
+   * Draw a pixmap using a rectangle from given texture.
+   * The sx,sy(sw,sh) rectangle defines the screen rectangle within
+   * which the drawing is performed (clipping rectangle is also taken
+   * into account). The tx,ty(tw,th) rectangle defines a subrectangle
+   * from texture which should be painted. If the subrectangle exceeds
+   * the actual texture size, texture coordinates are wrapped around
+   * (e.g. the texture is tiled). The Alpha parameter defines the
+   * transparency of the drawing operation, 0 means opaque, 255 means
+   * fully transparent.<p>
+   * <b>WARNING: Tiling works only with textures that have power-of-two
+   * sizes!</b> That is, both width and height should be a power-of-two,
+   * although not neccessarily equal.
+   */
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
 
@@ -412,7 +414,8 @@ struct iRender3D : public iBase
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
 
   /// Get the masking of color and/or alpha values to framebuffer
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) const = 0;
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue,
+	bool &alpha) const = 0;
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode) = 0;

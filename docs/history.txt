@@ -17,6 +17,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	  proper indentation, added missing doxygen comments, fixed several
 	  wrong doxygen comments, added missing LGPL notice, added missing
 	  include protector, replaced normal pointer with csRef.
+	- Jorrit did some Doxygen comment cleanups in include/ivideo.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor
