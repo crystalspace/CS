@@ -75,6 +75,8 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_CAMMODE1 77711
 #define VIEWMESH_COMMAND_CAMMODE2 77712
 #define VIEWMESH_COMMAND_CAMMODE3 77713
+#define VIEWMESH_COMMAND_MOVEANIMFASTER 77714
+#define VIEWMESH_COMMAND_MOVEANIMSLOWER 77715
 
 //-----------------------------------------------------------------------------
 
@@ -86,6 +88,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   dialog = NULL;
   cammode = movenormal;
   spritepos = csVector3(0,10,0);
+  move_sprite_speed = 0;
 }
 
 ViewMesh::~ViewMesh ()
@@ -189,6 +192,15 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 
 	  return true;
 	}
+	case VIEWMESH_COMMAND_MOVEANIMFASTER:
+	  move_sprite_speed += .5;
+	  menu->Hide();
+	  return true;
+
+	case VIEWMESH_COMMAND_MOVEANIMSLOWER:
+	  move_sprite_speed -= .5;
+	  menu->Hide();
+	  return true;
 
 	case VIEWMESH_COMMAND_CAMMODE1:
 	  cammode = movenormal;
@@ -306,7 +318,7 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
     spstate->SetAction("default");
 
   // Update Sprite States menu
-	stateslist.Push (csStrNew("default"));
+  stateslist.Push (csStrNew("default"));
   imeshfact = imeshfactwrap->GetMeshObjectFactory();
   csRef<iSprite3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
       iSprite3DFactoryState));
@@ -354,6 +366,8 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
   (void)new csMenuItem(menu,"Save Mesh (Binary)", VIEWMESH_COMMAND_SAVEMESH);
   (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
+  (void)new csMenuItem(menu,"Move Sprite Faster", VIEWMESH_COMMAND_MOVEANIMFASTER);
+  (void)new csMenuItem(menu,"Move Sprite Slower", VIEWMESH_COMMAND_MOVEANIMSLOWER);
 
   // StateMenu
   csMenu *statesmenu = new csMenu(NULL);
@@ -375,6 +389,27 @@ void ViewMesh::ConstructMenu()
   menu->Hide();
 }
 
+void ViewMesh::UpdateSpritePosition(csTicks elapsed)
+{
+    if (!sprite)
+	return;
+    if (!move_sprite_speed)
+	return;
+
+    csRef<iMovable> mov = sprite->GetMovable();
+    
+    csVector3 v(0,0,-move_sprite_speed*elapsed/1000);
+    mov->MovePosition(v);
+
+    v = mov->GetFullPosition();
+    if (abs(v.z) > 4.5)  // this should make the sprite loop.
+    {
+	v.z = -v.z;
+	mov->SetPosition(v);
+    }
+    mov->UpdateMove();
+}
+
 void ViewMesh::Draw()
 {
   // First get elapsed time from the system driver.
@@ -384,6 +419,9 @@ void ViewMesh::Draw()
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+
+  if (sprite)
+    UpdateSpritePosition(elapsed_time);
 
   if (!dialog && !menu->GetState(CSS_VISIBLE))
   {

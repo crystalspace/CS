@@ -47,11 +47,15 @@ private:
   csRef<iMeshWrapper> sprite;
   csVector3 spritepos;
   csRef<iMeshObjectFactory> imeshfact;
+  float move_sprite_speed;
 
   csMenu *menu;
   csWindow *dialog;
   csStrVector stateslist;
   enum { movenormal, moveorigin, rotateorigin } cammode;
+
+  void UpdateSpritePosition(csTicks elapsed);
+
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
