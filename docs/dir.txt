@@ -48,6 +48,11 @@ Here go all applications developed, using Crystal Space.
     [CS/apps/support]
     Some files that are potentially needed by all applications.
 
+    [CS/apps/shooter]
+    Crystal Shooter. An application that is intended to grow into a classic
+    First Person Shooter. Right now it is more some sort of feasability study.
+    It is also a demo application of the csgame gameing library.
+
     [CS/apps/walktest]
     Walktest. _The_ reference application for Crystal Space. If this application
     wont work, probably no other application will.
@@ -130,7 +135,8 @@ subdirectories.
         [CS/libs/cs3d/software]   Software based rasterizer 
 
     [CS/libs/cscom]
-
+    The Crystal Space COM layer. Especially imporant, because the only OS with
+    native COM support right now is Win32.
 
     [CS/libs/csengine]
     3D Engine 
@@ -147,6 +153,11 @@ subdirectories.
         [CS/libs/csengine/objects] Sprites and things
         [CS/libs/csengine/polygon] ???
         [CS/libs/csengine/scripts] Scripting
+
+    [CS/libs/csgame]
+    Crystal Space game library. A set of utility classes that focus on 
+    creating a real game. You can think of it, as an easier way to use
+    Crystal Space in your own games, at the cost of some flexibility.
 
     [CS/libs/csgeom]
     Geometry library 
