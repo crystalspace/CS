@@ -11,7 +11,7 @@ chronological order.
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.
 	- Eric Sunshine fixed libs/Jamfile so that it doesn't use `module' as a
 	  variable name since `module' is a reserved keyword in BoostJam.
-	- Eric Sunshine remove the abominable non-const csString::GetData()
+	- Eric Sunshine removed the abominable non-const csString::GetData()
 	  which returned a mutable reference to the internal buffer. This is no
 	  longer allowed. csString's internal state is private. External
 	  clients are required to manipulate the string representation strictly
