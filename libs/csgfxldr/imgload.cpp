@@ -56,6 +56,11 @@ static csImageLoader *loaderlist = NULL;
 
 bool csImageLoader::Register (csImageLoader* loader)
 {
+  // check if already present
+  for (csImageLoader *l = loaderlist; l; l = l->Next)
+    if(l == loader)
+      return true;
+  // add it
   loader->Next = loaderlist;
   loaderlist = loader;
   return true;
