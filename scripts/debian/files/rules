@@ -52,7 +52,6 @@ clean:
 	-cd $(CURDIR)/CS; $(MAKE) distclean
 	rm -f $(CURDIR)/CS/cache.mak
 	rm -f $(CURDIR)/CS/config.mak
-	rm -f $(CURDIR)/debian/crystalspace-data.menu
 
 	dh_clean
 
@@ -70,6 +69,7 @@ install: build ###xpms
 	# Add here commands to install the package into debian/crystalspace.
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
 	cd CS; $(MAKE) install INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace
+	# Let's fix some things
 	$(CURDIR)/debian/addmissing $(CURDIR)
 
 	find $(CURDIR)/debian/tmp/usr/lib/crystalspace/include -type f \
@@ -78,7 +78,7 @@ install: build ###xpms
 	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/cssh.py
 	chmod +x \
 	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/pysimp.py
-
+	
 	# Move to respect Debian Policy
 
 	# dev binaries in /usr/bin
@@ -86,6 +86,10 @@ install: build ###xpms
 	mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
 		 $(DEVBIN))\
 		$(CURDIR)/debian/tmp/usr/bin
+	# From Loic Dachary (fix for cs-config)
+	perl -pi -e 's:^prefix=.*:prefix=/usr:' $(CURDIR)/debian/tmp/usr/bin/cs-config
+	perl -pi -e 's:^includedir=.*:includedir=/usr/include/crystalspace:' $(CURDIR)/debian/tmp/usr/bin/cs-config
+	perl -pi -e 's:libdir=.*:libdir=/usr/lib/crystalspace/lib:' $(CURDIR)/debian/tmp/usr/bin/cs-config
 
 	# demos binaries in /usr/games
 	mkdir -p $(CURDIR)/debian/tmp/usr/games
@@ -103,15 +107,6 @@ install: build ###xpms
 	cp $(CURDIR)/debian/xpm/*.xpm \
 		$(CURDIR)/debian/crystalspace-demos/usr/share/pixmaps
 
-	# These are levels for walktest + data for csdemo
-	###cp $(CURDIR)/data.extra/*.zip \
-	###	$(CURDIR)/debian/crystalspace-data/usr/lib/crystalspace/data
-	# This one needed by csdemo is more logically in demos package
-	###mv $(CURDIR)/debian/crystalspace-data/usr/lib/crystalspace/data/demodata.zip	\
-	###$(CURDIR)/debian/crystalspace-demos/usr/lib/crystalspace/data
-	###cp $(CURDIR)/data.extra/*.xpm \
-	###	$(CURDIR)/debian/crystalspace-data/usr/share/pixmaps
-
 	# Autogenerate man
 	$(CURDIR)/debian/automan $(CURDIR)
 	$(CURDIR)/debian/rules man
@@ -122,8 +117,6 @@ install: build ###xpms
 %.xpm: %.jpg
 	convert -size 32x32 $< $@
 	mogrify -format xpm -geometry 32x32 -map /usr/X11R6/include/X11/pixmaps/cmap.xpm $@
-
-###xpms: $(patsubst %.jpg,%.xpm,$(wildcard $(CURDIR)/data.extra/*.jpg))
 
 man: $(subst .sgml,, $(wildcard $(CURDIR)/debian/man/*.sgml*))
 %.1: %.sgml.1
