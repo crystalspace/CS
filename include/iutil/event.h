@@ -30,10 +30,11 @@
  * \addtogroup event_handling
  * @{ */
 
-
-#define CS_MUSCLE_PROTOCOL          1347235888L // 'PM00'
-#define CS_CRYSTAL_PROTOCOL         1129525296L // 'CS00'
-#define CS_XML_PROTOCOL             1481460784L // 'XML0'
+enum {
+  CS_MUSCLE_PROTOCOL = 1347235888L, // 'PM00'
+  CS_CRYSTAL_PROTOCOL = 1129525296L, // 'CS00'
+  CS_XML_PROTOCOL = 1481460784L // 'XML0'
+};
 
 struct iEventHandler;
 
