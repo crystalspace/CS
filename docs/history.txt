@@ -21,6 +21,15 @@ chronological order.
 	- Anders fixed an error in nullmesh factory saver. It forgot a 
 	  <box>...</box> tag wrapping the actual contents of the bounding box, 
 	  resulting in a file that couldn't be loaded.
+	- res changed the csInputDefinition code to remove the internal
+	  'CookedToName()' function. Obtaining a name from a cooked code is
+	  only of limited use, as a cooked code is somewhat ambigious as more
+	  than one key can produce the same raw code. Instead, 'RawToName()'
+	  is now used when the name for a key code is to be obtained.
+	  (As a side effect, this also fixed csInputDefinition::GetKeyString()
+	  for numpad keys.)
+	- res beautified the Numpad key names in csInputDefinition and added
+	  a few missing pad keys.
 30-Oct-2004
 	- res improved the Win32 custom cursor cleanup a bit.
 	- res fixed a crash in the software sound renderer source, where a 

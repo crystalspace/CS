@@ -96,21 +96,23 @@ static struct csKeyCodeDef
   { "Print",	CSKEY_PRINTSCREEN, CSKEY_PRINTSCREEN },
   { "PrntScrn", CSKEY_PRINTSCREEN, CSKEY_PRINTSCREEN },
   { "Pause",    CSKEY_PAUSE,	   CSKEY_PAUSE },
-  { "PADPLUS",	CSKEY_PADPLUS,	   '+' },
-  { "PADMINUS",	CSKEY_PADMINUS,	   '-' },
-  { "PADMULT",	CSKEY_PADMULT,	   '*' },
-  { "PADDIV",	CSKEY_PADDIV,	   '/' },
-  { "PAD0",	CSKEY_PAD0,	   '0' },
-  { "PAD1",	CSKEY_PAD1,	   '1' },
-  { "PAD2",	CSKEY_PAD2,	   '2' },
-  { "PAD3",	CSKEY_PAD3,	   '3' },
-  { "PAD4",	CSKEY_PAD4,	   '4' },
+  { "PadPlus",	CSKEY_PADPLUS,	   '+' },
+  { "PadMinus",	CSKEY_PADMINUS,	   '-' },
+  { "PadMult",	CSKEY_PADMULT,	   '*' },
+  { "PadDiv",	CSKEY_PADDIV,	   '/' },
+  { "Pad0",	CSKEY_PAD0,	   '0' },
+  { "Pad1",	CSKEY_PAD1,	   '1' },
+  { "Pad2",	CSKEY_PAD2,	   '2' },
+  { "Pad3",	CSKEY_PAD3,	   '3' },
+  { "Pad4",	CSKEY_PAD4,	   '4' },
+  { "Pad5",	CSKEY_PAD5,	   '5' },
   { "Center",	CSKEY_CENTER,	   '5' },
-  { "PAD6",	CSKEY_PAD6,	   '6' },
-  { "PAD7",	CSKEY_PAD7,	   '7' },
-  { "PAD8",	CSKEY_PAD8,	   '8' },
-  { "PAD9",	CSKEY_PAD9,	   '9' },
-  { "PADDECIMAL",CSKEY_PADDECIMAL, '.' }, // @@@ Not always '.' on all layouts.
+  { "Pad6",	CSKEY_PAD6,	   '6' },
+  { "Pad7",	CSKEY_PAD7,	   '7' },
+  { "Pad8",	CSKEY_PAD8,	   '8' },
+  { "Pad9",	CSKEY_PAD9,	   '9' },
+  { "PadDecimal",CSKEY_PADDECIMAL, '.' }, // @@@ Not always '.' on all layouts.
+  { "PadEnter",	CSKEY_PADENTER,	   CSKEY_ENTER },
   { "Shift",	CSKEY_SHIFT,	   CSKEY_SHIFT },
   { "LShift",	CSKEY_SHIFT_LEFT,  CSKEY_SHIFT_LEFT },
   { "RShift",	CSKEY_SHIFT_RIGHT, CSKEY_SHIFT_RIGHT },
@@ -154,13 +156,6 @@ static const char* RawToName (utf32_char raw)
 {
   for (csKeyCodeDef *c = KeyDefs; c->key; c++)
     if (c->codeRaw == raw) return c->key;
-  return 0;
-}
-
-static const char* CookedToName (utf32_char cooked)
-{
-  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
-    if (c->codeCooked == cooked) return c->key;
   return 0;
 }
 
@@ -372,37 +367,36 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   switch (containedType)
   {
     case csevKeyboard:
-    if (CSKEY_IS_SPECIAL (keyboard.code) || keyboard.code <= 0x20)
-      str.Append (keyboard.isCooked ? CookedToName (keyboard.code)
-				    : RawToName (keyboard.code));
-    else
-    {
-      char buf[CS_UC_MAX_UTF8_ENCODED];
-      size_t size = csUnicodeTransform::EncodeUTF8
-        (keyboard.code, (utf8_char *) buf, sizeof (buf));
-      str.Append (buf, size);
-    }
-    break;
+      if (CSKEY_IS_SPECIAL (keyboard.code) || (keyboard.code <= 0x20))
+	str.Append (RawToName (keyboard.code));
+      else
+      {
+	char buf[CS_UC_MAX_UTF8_ENCODED];
+	size_t size = csUnicodeTransform::EncodeUTF8
+	  (keyboard.code, (utf8_char *) buf, sizeof (buf));
+	str.Append (buf, size);
+      }
+      break;
 
     case csevMouseDown:
-    str.Append ("Mouse");
-    str.Append (mouseButton);
-    break;
+      str.Append ("Mouse");
+      str.Append (mouseButton);
+      break;
 
     case csevMouseMove:
-    str.Append ("Mouse");
-    str.Append (mouseAxis ? "Y" : "X");
-    break;
+      str.Append ("Mouse");
+      str.Append (mouseAxis ? "Y" : "X");
+      break;
 
     case csevJoystickDown:
-    str.Append ("Joystick");
-    str.Append (joystickButton);
-    break;
+      str.Append ("Joystick");
+      str.Append (joystickButton);
+      break;
 
     case csevJoystickMove:
-    str.Append ("Joystick");
-    str.Append (joystickAxis ? "Y" : "X");
-    break;
+      str.Append ("Joystick");
+      str.Append (joystickAxis ? "Y" : "X");
+      break;
   }
 
   return str;
@@ -472,7 +466,7 @@ bool csInputDefinition::ParseKey (const char *str, utf32_char *raw,
 bool csInputDefinition::ParseOther (const char *str, int *type, int *num,
   csKeyModifiers *mods)
 {
-  csInputDefinition def (str, CSMASK_ALLMODIFIERS, true);
+  csInputDefinition def (str, CSMASK_ALLMODIFIERS);
   if (! def.IsValid ()) return false;
   if (type) *type = def.containedType;
   if (num) *num = def.mouseButton;
@@ -483,7 +477,7 @@ bool csInputDefinition::ParseOther (const char *str, int *type, int *num,
 csString csInputDefinition::GetKeyString (utf32_char code,
   const csKeyModifiers *mods, bool distinguishModifiers)
 {
-  csInputDefinition def (CSMASK_ALLMODIFIERS, true);
+  csInputDefinition def (CSMASK_ALLMODIFIERS);
   def.containedType = csevKeyboard;
   def.keyboard.code = code;
   if (mods) def.modifiers = *mods;
@@ -493,7 +487,7 @@ csString csInputDefinition::GetKeyString (utf32_char code,
 csString csInputDefinition::GetOtherString (int type, int num,
   const csKeyModifiers *mods, bool distinguishModifiers)
 {
-  csInputDefinition def (CSMASK_ALLMODIFIERS, true);
+  csInputDefinition def (CSMASK_ALLMODIFIERS);
   def.containedType = type;
   def.mouseButton = num;
   if (mods) def.modifiers = *mods;
