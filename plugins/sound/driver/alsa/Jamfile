@@ -7,7 +7,7 @@ Help alsadrv : "Crystal Space ALSA sound driver" ;
 Plugin alsadrv
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ossdrv : csutil ;
+LinkWith alsadrv : csutil ;
 ExternalLibs alsadrv :  ALSA ;
 
 CompileGroups alsadrv :  sounddrivers ;
