@@ -330,8 +330,29 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 		if(fabs(Nodes[i].mAABB.mExtents.y)>EMax.y)	EMax.y = fabs(Nodes[i].mAABB.mExtents.y);	\
 		if(fabs(Nodes[i].mAABB.mExtents.z)>EMax.z)	EMax.z = fabs(Nodes[i].mAABB.mExtents.z);	\
 	}
+#define INIT_QUANTIZATION             \
+ udword nbc=15; /* Keep one bit for sign */        \
+ udword nbe=15; /* Keep one bit for fix */        \
+ if(!gFixQuantized) nbe++;            \
+                   \
+ /* Compute quantization coeffs */          \
+ Point CQuantCoeff, EQuantCoeff;           \
+ CQuantCoeff.x = CMax.x!=0.0f ? float((1<<nbc)-1)/CMax.x : 0.0f;   \
+ CQuantCoeff.y = CMax.y!=0.0f ? float((1<<nbc)-1)/CMax.y : 0.0f;   \
+ CQuantCoeff.z = CMax.z!=0.0f ? float((1<<nbc)-1)/CMax.z : 0.0f;   \
+ EQuantCoeff.x = EMax.x!=0.0f ? float((1<<nbe)-1)/EMax.x : 0.0f;   \
+ EQuantCoeff.y = EMax.y!=0.0f ? float((1<<nbe)-1)/EMax.y : 0.0f;   \
+ EQuantCoeff.z = EMax.z!=0.0f ? float((1<<nbe)-1)/EMax.z : 0.0f;   \
+ /* Compute and save dequantization coeffs */       \
+ mCenterCoeff.x = CQuantCoeff.x!=0.0f ? 1.0f / CQuantCoeff.x : 0.0f;  \
+ mCenterCoeff.y = CQuantCoeff.y!=0.0f ? 1.0f / CQuantCoeff.y : 0.0f;  \
+ mCenterCoeff.z = CQuantCoeff.z!=0.0f ? 1.0f / CQuantCoeff.z : 0.0f;  \
+ mExtentsCoeff.x = EQuantCoeff.x!=0.0f ? 1.0f / EQuantCoeff.x : 0.0f; \
+ mExtentsCoeff.y = EQuantCoeff.y!=0.0f ? 1.0f / EQuantCoeff.y : 0.0f; \
+ mExtentsCoeff.z = EQuantCoeff.z!=0.0f ? 1.0f / EQuantCoeff.z : 0.0f; \
 
-#define INIT_QUANTIZATION							\
+//  Old version of the macro
+//#define INIT_QUANTIZATION							\
 	udword nbc=15;	/* Keep one bit for sign */		\
 	udword nbe=15;	/* Keep one bit for fix */		\
 	if(!gFixQuantized) nbe++;						\
@@ -351,7 +372,8 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 	mExtentsCoeff.x = 1.0f / EQuantCoeff.x;			\
 	mExtentsCoeff.y = 1.0f / EQuantCoeff.y;			\
 	mExtentsCoeff.z = 1.0f / EQuantCoeff.z;
-
+    
+	
 #define PERFORM_QUANTIZATION														\
 	/* Quantize */																	\
 	mNodes[i].mAABB.mCenter[0] = sword(Nodes[i].mAABB.mCenter.x * CQuantCoeff.x);	\
