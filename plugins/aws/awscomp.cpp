@@ -33,15 +33,3 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 
 }
 
-bool 
-awsComponent::RegisterSlot(iAwsSlot *slot, unsigned long signal)
-{
-  return true;
-}
-
-bool 
-awsComponent::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
-{
-  return true;
-}
-

@@ -20,6 +20,43 @@
 *****************************************************************************/
 
 #include "ivaria/aws.h"
+#include "csutil/csdllist.h"
+
+/*********************************************************************************************************************
+*                                                                                                                    *
+*      This implements the signal source architecture.  A signal source is an object which knows how to register and *
+*    unregister slots.  A signal source always defines and emits signals.  A signal source does not care if someone  *
+*    is listening or not.                                                                                            *
+*                                                                                                                    *
+*********************************************************************************************************************/
+class awsSigSrc : public iAwsSigSrc
+{
+   /// contains a list of all slots that we have registered
+   csDLinkList slots;
+
+   struct SlotSignalMap
+   {
+      /// The slot that's registered
+      iAwsSlot *slot;
+
+      /// The signal it's registered for
+      unsigned long signal;
+   };
+
+public:  
+    awsSigSrc();
+
+    virtual ~awsSigSrc();
+
+    /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
+    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Unregisters a slot for a signal.
+    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Broadcasts a signal to all slots that are interested.
+    virtual void Broadcast(unsigned long signal);
+};
 
 /**********************************************************************************************************************
 *                                                                                                                     *
@@ -30,9 +67,9 @@
 **********************************************************************************************************************/
 class awsSlot : public iAwsSlot
 {
-   awsComponent *sink;
+   iBase *sink;
 
-   void (awsComponent::*Slot)(awsComponent &source, unsigned long signal);
+   void (iBase::*Slot)(iBase &source, unsigned long signal);
 
 public:
   /// Does nothing
@@ -42,16 +79,16 @@ public:
   virtual ~awsSlot();
 
   /// Sets up the slot's sink
-  virtual void Initialize(awsComponent *sink, void (awsComponent::*_Slot)(awsComponent &source, unsigned long signal));
+  virtual void Initialize(iBase *sink, void (iBase::*_Slot)(iBase &source, unsigned long signal));
   
   /// Connects the slot to a signal source
-  virtual void Connect(awsComponent &source, unsigned long signal);
+  virtual void Connect(iAwsSigSrc &source, unsigned long signal);
                                           
   /// Disconnects the slot from a signal source
-  virtual void Disconnect(awsComponent &source, unsigned long signal);
+  virtual void Disconnect(iAwsSigSrc &source, unsigned long signal);
 
   /// Emit a signal
-  virtual void Emit(awsComponent &source, unsigned long signal);
+  virtual void Emit(iBase &source, unsigned long signal);
 };
 
 

@@ -64,13 +64,7 @@ public:
      *  You should also call awsComponent::Setup() so that it can perform some default initialization work.
      */
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
-
-    /// Registers a slot for any one of the signals defined by a component.  Each component's signals exist in it's own namespace
-    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
-
-    /// Unregisters a slot for a signal.
-    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal);
-
+   
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent();
 

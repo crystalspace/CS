@@ -1,35 +1,100 @@
 #include "cssysdef.h"
 #include "awsslot.h"
-#include "awscomp.h"
+
+///////////////////////////////////// Signal Sources ////////////////////////////////////////////////////////
+awsSigSrc::awsSigSrc() 
+{
+}
+
+awsSigSrc::~awsSigSrc() 
+{
+}
+
+
+bool 
+awsSigSrc::RegisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+  SlotSignalMap *ssm = new SlotSignalMap;
+
+  ssm->slot = slot;
+  ssm->signal = signal;
+
+  slots.AddItem(ssm);
+    
+  return true;
+}
+
+bool 
+awsSigSrc::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
+{
+    void *entry = slots.GetFirstItem();
+
+    while(entry)
+    {
+       SlotSignalMap *ssm = static_cast<SlotSignalMap *>(entry);
+
+       if (ssm->signal == signal && ssm->slot == slot)
+       {
+          slots.RemoveItem();
+          delete ssm;
+
+          return true;
+       }
+
+       entry = slots.GetNextItem();
+    }
+
+
+  return false;
+}
+
+void 
+awsSigSrc::Broadcast(unsigned long signal)
+{
+ void *entry = slots.GetFirstItem();
+
+ while(entry)
+ {
+    SlotSignalMap *ssm = static_cast<SlotSignalMap *>(entry);
+
+    if (ssm->signal == signal)
+        ssm->slot->Emit(*this, signal);
+    
+
+    entry = slots.GetNextItem();
+ }
+}
+                                                                                                  
+
+///////////////////////////////////// Slots ////////////////////////////////////////////////////////
 
 awsSlot::awsSlot():sink(NULL), Slot(NULL) {}
 
 awsSlot::~awsSlot() {}
 
 void 
-awsSlot::Initialize(awsComponent *_sink, void (awsComponent::*_Slot)(awsComponent &source, unsigned long signal))
+awsSlot::Initialize(iBase *_sink, void (iBase::*_Slot)(iBase &source, unsigned long signal))
 {
  sink = _sink;
  Slot = _Slot;
 }
 
 void 
-awsSlot::Connect(awsComponent &source, unsigned long signal)
+awsSlot::Connect(iAwsSigSrc &source, unsigned long signal)
 {
   source.RegisterSlot(this, signal);
 }
 
 void 
-awsSlot::Disconnect(awsComponent &source, unsigned long signal)
+awsSlot::Disconnect(iAwsSigSrc &source, unsigned long signal)
 {
   source.UnregisterSlot(this, signal);
 }
 
 void 
-awsSlot::Emit(awsComponent &source, unsigned long signal)
+awsSlot::Emit(iBase &source, unsigned long signal)
 {
     if (sink && Slot) 
       (sink->*Slot)(source, signal);
 }
-
 
