@@ -72,11 +72,11 @@ iFont *csFontServerMultiplexor::LoadFont (const char *filename)
   return NULL;
 }
 
-int csFontServerMultiplexor::GetNumFonts ()
+int csFontServerMultiplexor::GetFontCount ()
 {
   int count = 0;
   for (int i = 0; i < fontservers.Length (); i++)
-    count += fontservers.Get (i)->GetNumFonts ();
+    count += fontservers.Get (i)->GetFontCount ();
   return count;
 }
 
@@ -84,7 +84,7 @@ iFont *csFontServerMultiplexor::GetFont (int iIndex)
 {
   for (int i = 0; i < fontservers.Length (); i++)
   {
-    int count = fontservers.Get (i)->GetNumFonts ();
+    int count = fontservers.Get (i)->GetFontCount ();
     if (iIndex < count)
       return fontservers.Get (iIndex)->GetFont (iIndex);
     iIndex -= count;

@@ -24,7 +24,7 @@
 
 #define CS_WHITE " \t\n\r\f"
 
-int ScanStr (const char* in, const char* format, ...)
+int csScanStr (const char* in, const char* format, ...)
 {
   va_list arg;
   va_start (arg, format);

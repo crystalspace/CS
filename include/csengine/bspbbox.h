@@ -112,7 +112,7 @@ public:
   csPolyIndexed& GetPolygon () { return polygon; }
 
   /// Get number of vertices.
-  virtual int GetNumVertices () { return polygon.GetNumVertices (); }
+  virtual int GetVertexCount () { return polygon.GetVertexCount (); }
 
   /// Get vertex index table (required for csPolygonInt).
   virtual int* GetVertexIndices () { return polygon.GetVertexIndices (); }
@@ -291,7 +291,7 @@ public:
   }
 
   /// Get the number of polygons in this polygonset.
-  int GetNumPolygons () { return base_stub->GetNumPolygons (); }
+  int GetPolygonCount () { return base_stub->GetPolygonCount (); }
 
   /// Get the specified polygon from this set.
   csPolygonInt* GetPolygon (int idx)

@@ -68,7 +68,7 @@ bool csColorWheel::HandleEvent (iEvent &Event)
         }
         float xc = bound.Width () / 2.0;
         float yc = bound.Height () / 2.0;
-        float ns = sqrt (fSquare (Event.Mouse.x - xc) + fSquare (Event.Mouse.y - yc)) / xc;
+        float ns = sqrt (csSquareFloat (Event.Mouse.x - xc) + csSquareFloat (Event.Mouse.y - yc)) / xc;
         if (ns > 1) ns = 1;
         float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / (2 * M_PI);
         if (nh < 0) nh += 1;

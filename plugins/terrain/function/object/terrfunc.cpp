@@ -306,7 +306,7 @@ public:
   // (with the same number as at init).
   void UpdateVertices (csVector3* verts);
 
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
   csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
 
   void CalculateCost (csTerrFuncObject* terrfunc);

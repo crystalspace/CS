@@ -58,7 +58,7 @@ public:
   virtual ~csIsoSprite();
 
   //-------- iIsoSprite ---------------------------------------------
-  virtual int GetNumVertices() const;
+  virtual int GetVertexCount() const;
   virtual void AddVertex(const csVector3& coord, float u, float v);
   virtual const csVector3& GetPosition() const {return position;}
   virtual void SetPosition(const csVector3& pos);
@@ -73,7 +73,7 @@ public:
   virtual void SetAllColors(const csColor& color);
   virtual const csVector3& GetVertexPosition(int i)
   {
-    CS_ASSERT (i >= 0 && i < poly.GetNumVertices ());
+    CS_ASSERT (i >= 0 && i < poly.GetVertexCount ());
     return poly[i];
   }
   virtual void AddToVertexColor(int i, const csColor& color);

@@ -308,7 +308,7 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
         {
 	  csGenerateImageValueFuncConst* vt =
 	  	new csGenerateImageValueFuncConst ();
-	  ScanStr (params, "%f", &(vt->constant));
+	  csScanStr (params, "%f", &(vt->constant));
 	  v = vt;
 	}
 	break;
@@ -317,7 +317,7 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
 	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
 	  char heightmap[255];
 	  float hscale, hshift;
-          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
   	  data->im = img;
@@ -338,7 +338,7 @@ csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
 	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
 	  char heightmap[255];
 	  float hscale, hshift;
-          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
   	  data->im = img;
@@ -401,7 +401,7 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
         {
 	  csGenerateImageTextureSolid* ts = new csGenerateImageTextureSolid ();
 	  csColor col;
-	  ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
 	  ts->color = col;
 	  t = ts;
 	}
@@ -410,7 +410,7 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
         {
 	  char imagename[255];
 	  csVector2 scale, offset;
-          ScanStr (params, "%s,%f,%f,%f,%f",
+          csScanStr (params, "%s,%f,%f,%f,%f",
 		imagename, &scale.x, &scale.y,
 		&offset.x, &offset.y);
 	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
@@ -462,7 +462,7 @@ csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
 			}
 	        	break;
 	      	      case CS_TOKEN_HEIGHT:
-		        ScanStr (params3, "%f", &height);
+		        csScanStr (params3, "%f", &height);
 	        	break;
 	    	    }
 		  }
@@ -508,13 +508,13 @@ void csLoader::heightgen_process (char* buf)
     switch (cmd)
     {
       case CS_TOKEN_SIZE:
-	ScanStr (params, "%d,%d", &totalw, &totalh);
+	csScanStr (params, "%d,%d", &totalw, &totalh);
 	break;
       case CS_TOKEN_MULTIPLY:
-	ScanStr (params, "%d,%d", &mw, &mh);
+	csScanStr (params, "%d,%d", &mw, &mh);
 	break;
       case CS_TOKEN_PARTSIZE:
-	ScanStr (params, "%d,%d", &partw, &parth);
+	csScanStr (params, "%d,%d", &partw, &parth);
 	break;
       case CS_TOKEN_TEXTURE:
         {
@@ -527,7 +527,7 @@ void csLoader::heightgen_process (char* buf)
         {
 	  char heightmap[255];
 	  float hscale, hshift;
-          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+          csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  data = new HeightMapData ();	// @@@ Memory leak!!!
   	  data->im = img;
@@ -550,7 +550,7 @@ void csLoader::heightgen_process (char* buf)
 	  float height;
 	  char imagename[255];
 	  csVector2 scale, offset;
-          ScanStr (params, "%f,%s,%f,%f,%f,%f",
+          csScanStr (params, "%f,%s,%f,%f,%f,%f",
 		&height, imagename, &scale.x, &scale.y,
 		&offset.x, &offset.y);
 	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
@@ -567,7 +567,7 @@ void csLoader::heightgen_process (char* buf)
       case CS_TOKEN_GENERATE:
         {
 	  int startx, starty;
-	  ScanStr (params, "%d,%d", &startx, &starty);
+	  csScanStr (params, "%d,%d", &startx, &starty);
 	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
 	  	partw, parth);
 	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
@@ -632,7 +632,7 @@ UInt csLoader::ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA (alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -750,7 +750,7 @@ bool csLoader::LoadMap (char* buf)
         case CS_TOKEN_REGION:
 	  {
 	    char str[255];
-	    ScanStr (params, "%s", str);
+	    csScanStr (params, "%s", str);
 	    if (*str)
 	      Engine->SelectRegion (str);
 	    else
@@ -791,7 +791,7 @@ bool csLoader::LoadMap (char* buf)
         {
           char start_sector [100];
           csVector3 pos (0, 0, 0);
-          ScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
+          csScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
           Engine->CreateCameraPosition("Start", start_sector, pos,
 	    csVector3 (0, 0, 1), csVector3 (0, 1, 0));
           break;
@@ -899,7 +899,7 @@ bool csLoader::LoadPlugins (char* buf)
     switch (cmd)
     {
       case CS_TOKEN_PLUGIN:
-	ScanStr (params, "%s", str);
+	csScanStr (params, "%s", str);
 	loaded_plugins.NewPlugIn (name, str);
         break;
     }
@@ -1148,9 +1148,9 @@ struct csLoaderPluginRec
   csLoaderPluginRec (const char* iShortName,
 	const char *iClassID, iLoaderPlugIn *iPlugin)
   { 
-    if (iShortName) ShortName = strnew (iShortName);
+    if (iShortName) ShortName = csStrNew (iShortName);
     else ShortName = NULL;
-    ClassID = strnew (iClassID);
+    ClassID = csStrNew (iClassID);
     Plugin = iPlugin; 
   }
 
@@ -1325,7 +1325,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 
       case CS_TOKEN_MATERIAL:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper *mat = FindMaterial (str);
           if (mat)
 	  {
@@ -1345,7 +1345,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 
       case CS_TOKEN_FILE:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  converter* filedata = new converter;
 	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
 	  {
@@ -1373,7 +1373,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 
       case CS_TOKEN_PLUGIN:
 	{
-	  ScanStr (params, "%s", str);
+	  csScanStr (params, "%s", str);
 	  plug = loaded_plugins.FindPlugIn (str, "MeshLdr");
 	}
         break;
@@ -1437,7 +1437,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     switch (cmd)
     {
       case CS_TOKEN_PRIORITY:
-	ScanStr (params, "%s", priority);
+	csScanStr (params, "%s", priority);
 	break;
       case CS_TOKEN_ADDON:
 	LoadAddOn (params, mesh);
@@ -1583,7 +1583,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 
       case CS_TOKEN_PLUGIN:
 	{
-	  ScanStr (params, "%s", str);
+	  csScanStr (params, "%s", str);
 	  plug = loaded_plugins.FindPlugIn (str, "MeshLdr");
 	}
         break;
@@ -1664,7 +1664,7 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
         break;
       case CS_TOKEN_PLUGIN:
 	{
-	  ScanStr (params, "%s", pStr);
+	  csScanStr (params, "%s", pStr);
 	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
 	}
         break;
@@ -1747,7 +1747,7 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
         break;
       case CS_TOKEN_PLUGIN:
 	{
-	  ScanStr (params, "%s", pStr);
+	  csScanStr (params, "%s", pStr);
 	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
 	}
         break;
@@ -1805,7 +1805,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 
       case CS_TOKEN_PLUGIN:
 	{
-	  ScanStr (params, "%s", str);
+	  csScanStr (params, "%s", str);
 	  plug = loaded_plugins.FindPlugIn (str, "Loader");
 	}
         break;
@@ -1845,7 +1845,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
       {
         long pri;
 	char sorting[100];
-	ScanStr (params, "%d,%s", &pri, sorting);
+	csScanStr (params, "%d,%s", &pri, sorting);
 	if (!strcmp (sorting, "BACK2FRONT"))
 	{
 	}
@@ -2177,19 +2177,19 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
         m = identity;
         break;
       case CS_TOKEN_ROT_X:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csXRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Y:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csYRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Z:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csZRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 3)
         {
           m *= csXRotMatrix3 (list[0]);
@@ -2200,19 +2200,19 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
 	  System->Printf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
         break;
       case CS_TOKEN_SCALE_X:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csXScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Y:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csYScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Z:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csZScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	  m *= list[0];
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
@@ -2226,7 +2226,7 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
   {
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
-    ScanStr (buf, "%F", list, &num);
+    csScanStr (buf, "%F", list, &num);
     if (num == 1)
       m = csMatrix3 () * list[0];
     else if (num == 9)
@@ -2242,20 +2242,20 @@ bool csLoader::ParseMatrix (char* buf, csMatrix3 &m)
 
 bool csLoader::ParseVector (char* buf, csVector3 &v)
 {
-  ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
   return true;
 }
 
 bool csLoader::ParseQuaternion (char* buf, csQuaternion &q)
 {
-  ScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
+  csScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
   return true;
 }
 
 bool csLoader::ParseColor (char *buf, csRGBcolor &c)
 {
   float r, g, b;
-  ScanStr (buf, "%f,%f,%f", &r, &g, &b);
+  csScanStr (buf, "%f,%f,%f", &r, &g, &b);
   c.red   = QInt (r * 255.99);
   c.green = QInt (g * 255.99);
   c.blue  = QInt (b * 255.99);
@@ -2373,7 +2373,7 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
         break;
       case CS_TOKEN_TRANSPARENT:
         do_transp = true;
-        ScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
+        csScanStr (params, "%f,%f,%f", &transp.red, &transp.green, &transp.blue);
         break;
       case CS_TOKEN_FILTER:
         System->Printf (MSG_WARNING,
@@ -2460,7 +2460,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
     {
       case CS_TOKEN_TEXTURE:
       {
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
         texh = Engine->FindTexture (str, ResolveOnlyRegion);
         if (!texh)
         {
@@ -2475,13 +2475,13 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
         ParseColor (params, col);
         break;
       case CS_TOKEN_DIFFUSE:
-        ScanStr (params, "%f", &diffuse);
+        csScanStr (params, "%f", &diffuse);
         break;
       case CS_TOKEN_AMBIENT:
-        ScanStr (params, "%f", &ambient);
+        csScanStr (params, "%f", &ambient);
         break;
       case CS_TOKEN_REFLECTION:
-        ScanStr (params, "%f", &reflection);
+        csScanStr (params, "%f", &reflection);
         break;
       case CS_TOKEN_LAYER:
 	{
@@ -2506,7 +2506,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	    {
 	      case CS_TOKEN_TEXTURE:
 		{
-                  ScanStr (params2, "%s", str);
+                  csScanStr (params2, "%s", str);
                   iTextureWrapper *texh = Engine->FindTexture (str,
 		  	ResolveOnlyRegion);
                   if (texh)
@@ -2521,12 +2521,12 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 		}
 		break;
 	      case CS_TOKEN_SCALE:
-	        ScanStr (params2, "%d,%d",
+	        csScanStr (params2, "%d,%d",
 			&layers[num_txt_layer].uscale,
 			&layers[num_txt_layer].vscale);
 	        break;
 	      case CS_TOKEN_SHIFT:
-	        ScanStr (params2, "%d,%d",
+	        csScanStr (params2, "%d,%d",
 			&layers[num_txt_layer].ushift,
 			&layers[num_txt_layer].vshift);
 	        break;
@@ -2604,7 +2604,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
         {
 # if 0
 //@@@@@@
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshWrapper* spr = Engine->FindMeshObject (str, ResolveOnlyRegion);
           if (!spr)
             System->Printf (MSG_WARNING, "Mesh object '%s' not found!\n", str);
@@ -2615,7 +2615,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
         break;
       case CS_TOKEN_LIGHT:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iStatLight* l = Engine->FindLight (str, ResolveOnlyRegion);
           if (!l)
             System->Printf (MSG_WARNING, "Light '%s' not found!\n", str);
@@ -2625,7 +2625,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
         break;
       case CS_TOKEN_SECTOR:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
           if (!s)
             System->Printf (MSG_WARNING, "Sector '%s' not found!\n", str);
@@ -2635,7 +2635,7 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
         break;
       case CS_TOKEN_COLLECTION:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  //@@@$$$ TODO: Collection in regions.
           iCollection* th = Engine->FindCollection(str, ResolveOnlyRegion);
           if (!th)
@@ -2710,7 +2710,7 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
   {
     // Still support old format for backwards compatibility.
     int d;
-    ScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
+    csScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
           &x, &y, &z, &dist, &r, &g, &b, &d);
     dyn = bool (d);
   }
@@ -2726,13 +2726,13 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
       switch (cmd)
       {
         case CS_TOKEN_RADIUS:
-          ScanStr (params, "%f", &dist);
+          csScanStr (params, "%f", &dist);
           break;
         case CS_TOKEN_CENTER:
-          ScanStr (params, "%f,%f,%f", &x, &y, &z);
+          csScanStr (params, "%f,%f,%f", &x, &y, &z);
           break;
         case CS_TOKEN_COLOR:
-          ScanStr (params, "%f,%f,%f", &r, &g, &b);
+          csScanStr (params, "%f,%f,%f", &r, &g, &b);
           break;
         case CS_TOKEN_DYNAMIC:
           dyn = true;
@@ -2742,7 +2742,7 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
           break;
         case CS_TOKEN_HALO:
 	  str[0] = 0;
-          cnt = ScanStr (params, "%s", str);
+          cnt = csScanStr (params, "%s", str);
           if (cnt == 0 || !strcmp (str, "CROSS"))
           {
             params = strchr (params, ',');
@@ -2751,7 +2751,7 @@ defaulthalo:
             halo.type = 1;
             halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
             if (params)
-              ScanStr (params, "%f,%f", &halo.cross.Intensity,
+              csScanStr (params, "%f,%f", &halo.cross.Intensity,
 	      	&halo.cross.Cross);
           }
           else if (!strcmp (str, "NOVA"))
@@ -2762,7 +2762,7 @@ defaulthalo:
             halo.nova.Seed = 0; halo.nova.NumSpokes = 100;
 	    halo.nova.Roundness = 0.5;
             if (params)
-              ScanStr (params, "%d,%d,%f", &halo.nova.Seed,
+              csScanStr (params, "%d,%d,%f", &halo.nova.Seed,
 	      	&halo.nova.NumSpokes, &halo.nova.Roundness);
           }
           else if (!strcmp (str, "FLARE"))
@@ -2794,7 +2794,7 @@ defaulthalo:
             goto defaulthalo;
           break;
         case CS_TOKEN_ATTENUATION:
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
           if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
           if (strcmp (str, "inverse")   == 0) attenuation = CS_ATTN_INVERSE;
@@ -2875,7 +2875,7 @@ iKeyValuePair* csLoader::ParseKey (char* buf, iObject* pParent)
 {
   char Key  [256];
   char Value[10000]; //Value can potentially grow _very_ large.
-  if (ScanStr(buf, "%S,%S", Key, Value) == 2)
+  if (csScanStr(buf, "%S,%S", Key, Value) == 2)
   {
     iKeyValuePair* kvp = Engine->CreateKeyValuePair (Key, Value);
     if (pParent)
@@ -2925,7 +2925,7 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
         ParseKey (params, pNode->QueryObject ());
         break;
       case CS_TOKEN_POSITION:
-        ScanStr (params, "%f,%f,%f", &x, &y, &z);
+        csScanStr (params, "%f,%f,%f", &x, &y, &z);
         break;
       default:
         abort ();
@@ -2976,7 +2976,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	LoadAddOn (params, sector);
       	break;
       case CS_TOKEN_CULLER:
-	if (!ScanStr (params, "%s", bspname))
+	if (!csScanStr (params, "%s", bspname))
 	{
           System->Printf (MSG_WARNING,
 	  	"CULLER expects the name of a mesh object!\n");
@@ -3014,7 +3014,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         {
           csFog *f = sector->GetFog ();
           f->enabled = true;
-          ScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
+          csScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
         }
         break;
       case CS_TOKEN_KEY:

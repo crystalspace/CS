@@ -169,7 +169,7 @@ csSector* csSectorIt::Fetch ()
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // @@@ This function should try to use the octree if available to
   // quickly discard lots of polygons that cannot be close enough.
-  while (cur_poly < sector->GetNumPolygons ())
+  while (cur_poly < sector->GetPolygonCount ())
   {
     csPolygon3D* p = sector->GetPolygon3D (cur_poly);
     cur_poly++;
@@ -625,7 +625,7 @@ void csEngine::RegisterRenderPriority (const char* name, long priority)
 
   char* n = (char*)render_priorities[priority];
   delete[] n;
-  n = strnew (name);
+  n = csStrNew (name);
   render_priorities[priority] = n;
   if (!strcmp (name, "sky")) render_priority_sky = priority;
   else if (!strcmp (name, "wall")) render_priority_wall = priority;
@@ -1016,20 +1016,20 @@ bool csEngine::CheckConsistency ()
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
   {
-    if (p->GetNumVertices () < 3)
+    if (p->GetVertexCount () < 3)
     {
-      CsPrintf (MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetNumVertices (), p->GetID ());
-      CsPrintf (MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetNumVertices (), p->GetID ());
+      CsPrintf (MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetVertexCount (), p->GetID ());
+      CsPrintf (MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetVertexCount (), p->GetID ());
       //Dumper::dump (p);
       error = true;
     }
-    else if (p->GetNumVertices () > 3)
+    else if (p->GetVertexCount () > 3)
     {
       csVector3 poly[3];
       int i, j;
       poly[0] = p->Vobj (0);
       j = 1;
-      for (i = 1 ; i < p->GetNumVertices () ; i++)
+      for (i = 1 ; i < p->GetVertexCount () ; i++)
         if (!((poly[j-1] - p->Vobj (i)) < SMALL_EPSILON))
 	{
 	  poly[j] = p->Vobj (i);
@@ -1042,7 +1042,7 @@ bool csEngine::CheckConsistency ()
         float D;
         csMath3::CalcPlane (poly[0], poly[1], poly[2], normal, D);
         csPlane3 pl (normal, D);
-        for (i = 3 ; i < p->GetNumVertices () ; i++)
+        for (i = 3 ; i < p->GetVertexCount () ; i++)
         {
           if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
 	  {
@@ -1107,7 +1107,7 @@ void csEngine::StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview)
     if (c_buffer)
     {
       c_buffer->Initialize ();
-      c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (),
+      c_buffer->InsertPolygon (view->GetClipPoly (), view->GetVertexCount (),
       	true);
     }
   }
@@ -2191,7 +2191,7 @@ iMeshWrapper* csEngine::CreateMeshObject (const char* name)
   return &meshwrap->scfiMeshWrapper;
 }
 
-int csEngine::GetNumMeshObjects () const
+int csEngine::GetMeshObjectCount () const
 {
   return meshes.Length ();
 }
@@ -2201,7 +2201,7 @@ iMeshWrapper *csEngine::GetMeshObject (int n) const
   return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
 }
 
-int csEngine::GetNumMeshFactories () const
+int csEngine::GetMeshFactoryCount () const
 {
   return mesh_factories.Length ();
 }
@@ -2491,7 +2491,7 @@ iKeyValuePair* csEngine::CreateKeyValuePair (const char* key,
   return ikey;
 }
 
-int csEngine::GetNumCollections () const
+int csEngine::GetCollectionCount () const
 {
   return collections.Length ();
 }
@@ -2501,7 +2501,7 @@ iCollection* csEngine::GetCollection (int idx) const
   return &((csCollection*)collections.Get(idx))->scfiCollection;
 }
 
-int csEngine::GetNumCameraPositions () const
+int csEngine::GetCameraPositionCount () const
 {
   return camera_positions.Length ();
 }

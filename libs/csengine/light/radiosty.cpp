@@ -958,7 +958,7 @@ void csRadiosity :: DoRadiosity()
   csRadElement *shoot;
 
   CsPrintf (MSG_INITIALIZATION, "Calculating radiosity (%d lightmaps):\n",
-    list->GetNumElements());
+    list->GetElementCount());
   CsPrintf(MSG_INITIALIZATION, "  ");
   meter->Restart();
   shoot = list->PopHighest();
@@ -1055,7 +1055,7 @@ csRadElement* csRadiosity :: FetchNext()
     stop_now = true;
     sprintf(reason, "%d iterations reached", iterations);
   }
-  else if(element->GetNumRepeats() > max_repeats)
+  else if(element->GetRepeatCount() > max_repeats)
   {
     stop_now = true;
     sprintf(reason, "loop detected");
@@ -1186,7 +1186,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csVector3 poly[40];
   const csVector3& center = light_frustum->GetOrigin ();
   int num_vert = 4;
-  int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
+  int num_vertices = destpoly3d->GetVertices ().GetVertexCount ();
   int j;
   if(dest)
   {
@@ -1573,7 +1573,7 @@ static volatile float total_area = 0.0;
 
 static void calc_ambient_func(csRadElement *p)
 {
-  if(p->GetNumRepeats() > 5) // skip repeat-disabled polygons
+  if(p->GetRepeatCount() > 5) // skip repeat-disabled polygons
     return; // they will be too bright anyway, don't spread the problem
 
   float this_area = p->GetOneLumelArea() * p->GetSize();

@@ -2018,7 +2018,7 @@ void csComponent::SetText (const char *iText)
   if (!iText)
     iText = "";
   delete [] text;
-  text = strnew (iText);
+  text = csStrNew (iText);
   Invalidate ();
 }
 

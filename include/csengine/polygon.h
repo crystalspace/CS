@@ -747,7 +747,7 @@ public:
   /**
    * Get number of vertices (required for csPolygonInt).
    */
-  virtual int GetNumVertices () { return vertices.GetNumVertices (); }
+  virtual int GetVertexCount () { return vertices.GetVertexCount (); }
 
   /**
    * Get vertex index table (required for csPolygonInt).
@@ -1261,7 +1261,7 @@ public:
     }
 
     virtual int GetVertexCount ()
-    { return scfParent->vertices.GetNumVertices (); }
+    { return scfParent->vertices.GetVertexCount (); }
     virtual int* GetVertexIndices ()
     { return scfParent->vertices.GetVertexIndices (); }
     virtual csVector3 &GetVertex (int idx)

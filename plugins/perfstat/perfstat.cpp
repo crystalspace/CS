@@ -277,7 +277,7 @@ void csPerfStats::FinishSection ()
 
 void csPerfStats::SetOutputFile (const char *Name, bool summary)
 { 
-  file_name = strnew (Name); 
+  file_name = csStrNew (Name); 
   statlog_section = this; 
   statvec = new StatVector (30, 100);
   if (!summary)

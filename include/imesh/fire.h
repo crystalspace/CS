@@ -32,9 +32,9 @@ SCF_VERSION (iFireState, 0, 0, 1);
 struct iFireState : public iBase
 {
   /// Set the number of particles to use.
-  virtual void SetNumberParticles (int num) = 0;
+  virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles.
-  virtual int GetNumberParticles () const = 0;
+  virtual int GetParticleCount () const = 0;
   /// Set the size of the fire drops.
   virtual void SetDropSize (float dropwidth, float dropheight) = 0;
   /// Get the size of the fire drops.

@@ -41,7 +41,7 @@ void csSprite2DUVAnimationFrame::SetName (const char *name)
   if (name)
   {
     if (this->name) delete [] this->name;
-    this->name = strnew (name);
+    this->name = csStrNew (name);
   }
 }
 
@@ -119,7 +119,7 @@ void csSprite2DUVAnimation::SetName (const char *name)
   if (name)
   {
     if (this->name) delete [] this->name;
-    this->name = strnew (name);
+    this->name = csStrNew (name);
   }
 }
 

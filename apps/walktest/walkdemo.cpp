@@ -122,7 +122,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   partstate->DecRef ();
 
   iRainState* rainstate = QUERY_INTERFACE (mesh, iRainState);
-  rainstate->SetNumberParticles (num);
+  rainstate->SetParticleCount (num);
   rainstate->SetDropSize (.3/50., .3);
   rainstate->SetLighting (false);
   rainstate->SetBox (bbox.Min (), bbox.Max ());
@@ -168,7 +168,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   partstate->DecRef ();
 
   iSnowState* snowstate = QUERY_INTERFACE (mesh, iSnowState);
-  snowstate->SetNumberParticles (num);
+  snowstate->SetParticleCount (num);
   snowstate->SetDropSize (.07, .07);
   snowstate->SetLighting (false);
   snowstate->SetBox (bbox.Min (), bbox.Max ());
@@ -212,7 +212,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   partstate->DecRef ();
 
   iFireState* firestate = QUERY_INTERFACE (mesh, iFireState);
-  firestate->SetNumberParticles (num);
+  firestate->SetParticleCount (num);
   //firestate->SetDropSize (.02, .04);
   firestate->SetDropSize (.04, .08);
   firestate->SetLighting (false);
@@ -261,7 +261,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   partstate->DecRef ();
 
   iFountainState* fountstate = QUERY_INTERFACE (mesh, iFountainState);
-  fountstate->SetNumberParticles (num);
+  fountstate->SetParticleCount (num);
   fountstate->SetDropSize (.1, .1);
   fountstate->SetOrigin (csVector3 (0, 0, 0));
   fountstate->SetAcceleration (csVector3 (0, -1., 0));
@@ -311,7 +311,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   partstate->DecRef ();
 
   iExplosionState* expstate = QUERY_INTERFACE (mesh, iExplosionState);
-  expstate->SetNumberParticles (100);
+  expstate->SetParticleCount (100);
   expstate->SetCenter (csVector3 (0, 0, 0));
   expstate->SetPush (csVector3 (0, 0, 0));
   expstate->SetNrSides (6);
@@ -361,7 +361,7 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
   partstate->DecRef ();
 
   iSpiralState* spirstate = QUERY_INTERFACE (mesh, iSpiralState);
-  spirstate->SetNumberParticles (500);
+  spirstate->SetParticleCount (500);
   spirstate->SetSource (csVector3 (0, 0, 0));
   spirstate->DecRef ();
 }
@@ -1160,7 +1160,7 @@ void AttachRandomLight (csDynLight* light)
 void light_statics ()
 {
   iEngine* e = Sys->view->GetEngine ();
-  for (int i = 0 ; i < e->GetNumMeshObjects () ; i++)
+  for (int i = 0 ; i < e->GetMeshObjectCount () ; i++)
   {
     iMeshWrapper* sp = e->GetMeshObject (i);
     iSprite3DState* state = QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);

@@ -131,7 +131,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
-  if (engine->GetNumCameraPositions () > 0)
+  if (engine->GetCameraPositionCount () > 0)
   {
     // There is a valid starting position defined in the level file.
     iCameraPosition* campos = engine->GetCameraPosition (0);

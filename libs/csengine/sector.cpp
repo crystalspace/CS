@@ -916,7 +916,7 @@ void csSector::Draw (iRenderView* rview)
       G3DPolygonDFP g3dpoly;
       if (fogmethod == G3DFOGMETHOD_ZBUFFER)
       {
-        g3dpoly.num = rview->GetClipper ()->GetNumVertices ();
+        g3dpoly.num = rview->GetClipper ()->GetVertexCount ();
         csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
         memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
         if (icam->GetSector () == &scfiSector && draw_busy == 0)
@@ -982,8 +982,8 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
       // ALL of them are on the outside of the same plane from the
       // frustum then the object is certainly not visible.
       vis = true;
-      i1 = lf->GetNumVertices ()-1;
-      for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
+      i1 = lf->GetVertexCount ()-1;
+      for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
       {
         csVector3& v1 = lf->GetVertex (i);
         csVector3& v2 = lf->GetVertex (i1);

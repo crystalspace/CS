@@ -150,20 +150,20 @@ bool csFireFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csFireFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -223,7 +223,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -285,21 +285,21 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
       case CS_TOKEN_DROPSIZE:
 	{
 	  float dw, dh;
-	  ScanStr (params, "%f,%f", &dw, &dh);
+	  csScanStr (params, "%f,%f", &dw, &dh);
 	  firestate->SetDropSize (dw, dh);
 	}
 	break;
       case CS_TOKEN_ORIGINBOX:
 	{
 	  csVector3 o1, o2;
-	  ScanStr (params, "%f,%f,%f,%f,%f,%f",
+	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
 	  	&o1.x, &o1.y, &o1.z,
 		&o2.x, &o2.y, &o2.z);
 	  firestate->SetOrigin (csBox3 (o1, o2));
@@ -308,41 +308,41 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_ORIGIN:
 	{
 	  csVector3 origin;
-	  ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
+	  csScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
 	  firestate->SetOrigin (origin);
 	}
 	break;
       case CS_TOKEN_DIRECTION:
 	{
 	  csVector3 dir;
-	  ScanStr (params, "%f,%f,%f", &dir.x, &dir.y, &dir.z);
+	  csScanStr (params, "%f,%f,%f", &dir.x, &dir.y, &dir.z);
 	  firestate->SetDirection (dir);
 	}
 	break;
       case CS_TOKEN_SWIRL:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  firestate->SetSwirl (f);
 	}
 	break;
       case CS_TOKEN_COLORSCALE:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  firestate->SetColorScale (f);
 	}
 	break;
       case CS_TOKEN_TOTALTIME:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  firestate->SetTotalTime (f);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -359,7 +359,7 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -379,15 +379,15 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           firestate->SetLighting (do_lighting);
         }
         break;
       case CS_TOKEN_NUMBER:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
-          firestate->SetNumberParticles (nr);
+          csScanStr (params, "%d", &nr);
+          firestate->SetParticleCount (nr);
         }
         break;
     }
@@ -427,7 +427,7 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -435,15 +435,15 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
-  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
-  str->Push(strnew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "ORIGINBOX (%g,%g,%g, %g,%g,%g)\n",
     state->GetOrigin ().MinX (),
     state->GetOrigin ().MinY (),
@@ -451,22 +451,22 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
     state->GetOrigin ().MaxX (),
     state->GetOrigin ().MaxY (),
     state->GetOrigin ().MaxZ ());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "DIRECTION (%g,%g,%g)\n",
     state->GetDirection ().x,
     state->GetDirection ().y,
     state->GetDirection ().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SWIRL (%g)\n", state->GetSwirl());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "TOTALTIME (%g)\n", state->GetTotalTime());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLORSCALE (%g)\n", state->GetColorScale());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   float sx = 0.0, sy = 0.0;
   state->GetDropSize(sx, sy);
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   partstate->DecRef();

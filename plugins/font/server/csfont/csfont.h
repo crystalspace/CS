@@ -143,7 +143,7 @@ public:
   /**
    * Get number of loaded fonts.
    */
-  virtual int GetNumFonts ()
+  virtual int GetFontCount ()
   { return fonts.Length (); }
 
   /**

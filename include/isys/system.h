@@ -291,7 +291,7 @@ struct iSystem : public iBase
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
     iPlugIn *iObject) = 0;
   /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetNumPlugIns () = 0;
+  virtual int GetPlugInCount () = 0;
   /// Get the specified plugin from the plugin manager.
   virtual iBase* GetPlugIn (int idx) = 0;
 

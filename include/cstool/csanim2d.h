@@ -45,11 +45,11 @@ public:
   ~csAnimationTemplate();
 
   /// get number of frames
-  inline int GetNumFrames() const
+  inline int GetFrameCount() const
     {return Frames.Length();}
   /// get total length of animation (all delays added together)
   inline cs_time GetLength() const
-    {return (GetNumFrames()==0)?0:(cs_time)FinishTimes.Get(GetNumFrames()-1);}
+    {return (GetFrameCount()==0)?0:(cs_time)FinishTimes.Get(GetFrameCount()-1);}
   /// add a frame. (giving the length of this frame)
   inline void AddFrame(cs_time Delay, csPixmap *s)
     {FinishTimes.Push((csSome)(GetLength() + Delay)); Frames.Push(s);}

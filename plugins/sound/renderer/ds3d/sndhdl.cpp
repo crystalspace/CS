@@ -29,7 +29,7 @@ csSoundHandleDS3D::csSoundHandleDS3D(csSoundRenderDS3D *srdr, iSoundData *snd)
   SoundRender = srdr;
   SoundRender->IncRef();
   Registered = true;
-  NumSamples = Data->IsStatic() ? Data->GetStaticNumSamples() :
+  NumSamples = Data->IsStatic() ? Data->GetStaticSampleCount() :
     (Data->GetFormat()->Freq/REFRESH_RATE);
 }
 

@@ -129,7 +129,7 @@ void csMouse::NewPointer (const char *id, const char *posdef)
       break;
 
   int cX, cY, cW, cH, chX, chY;
-  ScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
+  csScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
   Pointers.Push (new csMousePointer (this, cID, cX, cY, cW, cH, chX, chY));
 }
 

@@ -42,7 +42,7 @@ public:
   ~csModelConverterMultiplexer ();
 
   bool Initialize (iSystem *System);
-  virtual int GetNumFormats ();
+  virtual int GetFormatCount ();
   virtual const char *GetFormat (int idx);
   virtual bool SupportsFormat (const char *Format);
   virtual iModelData *Load (UByte* Buffer, ULong Size);
@@ -91,14 +91,14 @@ bool csModelConverterMultiplexer::Initialize (iSystem *sys)
   for (int i=0; i<Converters.Length (); i++)
   {
     iModelConverter *mconv = Converters.Get(i);
-    for (int j=0; j<mconv->GetNumFormats (); j++)
+    for (int j=0; j<mconv->GetFormatCount (); j++)
       Formats.Push (new csString (mconv->GetFormat (j)));
   }
 
   return true;
 }
 
-int csModelConverterMultiplexer::GetNumFormats ()
+int csModelConverterMultiplexer::GetFormatCount ()
 {
   return Formats.Length ();
 }

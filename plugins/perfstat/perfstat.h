@@ -159,7 +159,7 @@ protected:
   virtual void SetResolution (int iMilSecs);
 
   virtual void SetName (const char *Name)
-  { name = strnew (Name); }
+  { name = csStrNew (Name); }
   /// Output stats to named file. If summary is true, you'll get a summary.
   virtual void SetOutputFile (const char *Name, bool summary);
 

@@ -91,7 +91,7 @@ struct iEmitMix : public iEmitGen3D
   /// get the total weight in this mix
   virtual float GetTotalWeight() = 0;
   /// get the number of emitters in this mix
-  virtual int GetNumberEmitters() = 0;
+  virtual int GetEmitterCount() = 0;
   /// get content, returns emitters and their weight by a number (0..number-1)
   virtual void GetContent(int num, float& weight, iEmitGen3D*& emit) = 0;
 };
@@ -174,9 +174,9 @@ SCF_VERSION (iEmitState, 0, 0, 1);
 struct iEmitState : public iBase
 {
   /// Set the number of particles to use.
-  virtual void SetNumberParticles (int num) = 0;
+  virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles used.
-  virtual int GetNumberParticles () const = 0;
+  virtual int GetParticleCount () const = 0;
   /// Enable or disable lighting.
   virtual void SetLighting (bool l) = 0;
   /// See if lighting is enabled.
@@ -219,7 +219,7 @@ struct iEmitState : public iBase
   virtual void AddAge(int time, const csColor& color, float alpha,
     float swirl, float rotspeed, float scale) = 0;
   /// Get the number of aging moments
-  virtual int GetNumberAging() const = 0;
+  virtual int GetAgingCount() const = 0;
   /// get the settings of aging moment i (0..number-1)
   virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
     float& swirl, float& rotspeed, float& scale) = 0;

@@ -37,7 +37,7 @@ csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
   SetName (iName);
-  Sector = strnew (iSector);
+  Sector = csStrNew (iSector);
   Position = iPosition;
   Forward = iForward;
   Upward = iUpward;

@@ -143,20 +143,20 @@ bool csSpiralFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -214,7 +214,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -269,20 +269,20 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
       case CS_TOKEN_SOURCE:
 	{
 	  csVector3 s;
-	  ScanStr (params, "%f,%f,%f", &s.x, &s.y, &s.z);
+	  csScanStr (params, "%f,%f,%f", &s.x, &s.y, &s.z);
 	  spiralstate->SetSource (s);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -299,7 +299,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -318,8 +318,8 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_NUMBER:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
-          spiralstate->SetNumberParticles (nr);
+          csScanStr (params, "%d", &nr);
+          spiralstate->SetParticleCount (nr);
         }
         break;
     }
@@ -358,7 +358,7 @@ void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -367,15 +367,15 @@ void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
 
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(strnew(buf));
-  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
+  str->Push(csStrNew(buf));
   printf(buf, "SOURCE (%g, %g, %g)\n", state->GetSource().x,
     state->GetSource().y, state->GetSource().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   partstate->DecRef();

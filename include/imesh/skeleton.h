@@ -36,7 +36,7 @@ struct iSkeletonLimb : public iBase
   /// Get the array of vertex indices.
   virtual int* GetVertices () const = 0;
   /// Get the number of vertices in the array returned by GetVertices.
-  virtual int GetNumVertices () const = 0;
+  virtual int GetVertexCount () const = 0;
   /// Create a new connection and add it as a child.
   virtual iSkeletonConnection* CreateConnection () = 0;
   /// Set the name for this limb.

@@ -70,9 +70,9 @@ public:
   ~csCurveTesselated ();
 
   ///
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
   ///
-  int GetNumTriangles () { return num_triangles; }
+  int GetTriangleCount () { return num_triangles; }
   ///
   csVector3* GetVertices () { return object_coords; }
   ///
@@ -315,7 +315,7 @@ public:
   ///
   virtual int GetVertex (int index)  = 0;
   ///
-  virtual int NumVertices () = 0;
+  virtual int GetVertexCount () = 0;
   ///
   csMaterialWrapper* GetMaterialWrapper () { return cstxt; }
   ///
@@ -334,7 +334,7 @@ public:
     virtual void SetMaterial (iMaterialWrapper* mat);
     virtual iMaterialWrapper* GetMaterial ();
     virtual iCurve* MakeCurve ();
-    virtual int GetNumVertices () const { return scfParent->NumVertices (); }
+    virtual int GetVertexCount () const { return scfParent->GetVertexCount (); }
     virtual int GetVertex (int idx) const
     {
       return scfParent->GetVertex (idx);
@@ -364,7 +364,7 @@ public:
   virtual void SetVertex (int index, int ver_ind);
   ///
   virtual int GetVertex (int index);
-  virtual int NumVertices ();
+  virtual int GetVertexCount ();
 
   // Should not be necessary, but without this buggy NextStep compiler
   // incorrectly calls csObject::QueryInterface() rather than correctly

@@ -138,7 +138,7 @@ struct iFontServer : public iPlugIn
   /**
    * Get number of loaded fonts.
    */
-  virtual int GetNumFonts () = 0;
+  virtual int GetFontCount () = 0;
 
   /**
    * Get Nth loaded font or NULL.

@@ -32,9 +32,9 @@ SCF_VERSION (iSpiralState, 0, 0, 1);
 struct iSpiralState : public iBase
 {
   /// Set the number of particles to use.
-  virtual void SetNumberParticles (int num) = 0;
+  virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles.
-  virtual int GetNumberParticles () const = 0;
+  virtual int GetParticleCount () const = 0;
   /// Set the source for the particles.
   virtual void SetSource (const csVector3& source) = 0;
   /// Get the source for the particles.

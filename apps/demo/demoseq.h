@@ -47,7 +47,7 @@ private:
 public:
   csNamedPath (int p, const char* name) : csPath (p)
   {
-    csNamedPath::name = strnew (name);
+    csNamedPath::name = csStrNew (name);
   }
   virtual ~csNamedPath () { delete[] name; }
   char* GetName () const { return name; }

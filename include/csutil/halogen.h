@@ -26,14 +26,14 @@
  * The iCross argument is an 0..1 float that defines how much the
  * hallo ressembles a cross (0) or a circle (1).
  */
-extern uint8 *GenerateHalo (int iSize, float iFactor, float iCross);
+extern uint8 *csGenerateHalo (int iSize, float iFactor, float iCross);
 
 /**
  * Generate an "super-nova" kind of halo alphamap given halo size,
  * initial random seed, number of spokes and a "roundness" coefficient
  * 0..1, with iRoundness == 1 you will get just a circle.
  */
-extern uint8 *GenerateNova (int iSize, int iSeed, int iNumSpokes,
+extern uint8 *csGenerateNova (int iSize, int iSeed, int iNumSpokes,
   float iRoundness);
 
 #endif // __HALOGEN_H__

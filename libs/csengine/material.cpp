@@ -90,7 +90,7 @@ iTextureHandle *csMaterial::GetTexture ()
   return texture ? texture->GetTextureHandle () : NULL;
 }
 
-int csMaterial::GetNumTextureLayers ()
+int csMaterial::GetTextureLayerCount ()
 {
   return num_texture_layers;
 }

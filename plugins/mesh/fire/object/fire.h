@@ -106,9 +106,9 @@ public:
   void AddLight (iEngine*, iSector*);
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num) { initialized = false; number = num; }
   /// Get the number of particles.
-  int GetNumberParticles () const { return number; }
+  int GetParticleCount () const { return number; }
   /// Set the size of the fire drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
@@ -189,13 +189,13 @@ public:
   class FireState : public iFireState
   {
     DECLARE_EMBEDDED_IBASE (csFireMeshObject);
-    virtual void SetNumberParticles (int num)
+    virtual void SetParticleCount (int num)
     {
-      scfParent->SetNumberParticles (num);
+      scfParent->SetParticleCount (num);
     }
-    virtual int GetNumberParticles () const 
+    virtual int GetParticleCount () const 
     { 
-      return scfParent->GetNumberParticles (); 
+      return scfParent->GetParticleCount (); 
     }
     virtual void SetDropSize (float dropwidth, float dropheight)
     {

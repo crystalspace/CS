@@ -336,7 +336,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
 
 //------ further iIsoSprite compliance implementation ---------
 
-int csIsoMeshSprite::GetNumVertices() const
+int csIsoMeshSprite::GetVertexCount() const
 {
   return 0;
 }

@@ -57,7 +57,7 @@ struct iTerrainObject : public iBase
   /// Set a material for this surface.
   virtual void SetMaterial (int i, iMaterialWrapper *material) = 0;
   /// Get the number of materials required/supported.
-  virtual int GetNumMaterials () = 0;
+  virtual int GetMaterialCount () = 0;
   /// Set the amount of triangles
   virtual void SetLOD (unsigned int detail) = 0;
 

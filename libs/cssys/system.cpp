@@ -65,8 +65,8 @@ csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID,
   const char *iFuncID)
 {
   PlugIn = iObject;
-  ClassID = strnew (iClassID);
-  FuncID = strnew (iFuncID);
+  ClassID = csStrNew (iClassID);
+  FuncID = csStrNew (iFuncID);
   EventMask = 0;
 }
 
@@ -85,7 +85,7 @@ struct csPluginLoadRec
   char *ClassID;
 
   csPluginLoadRec (const char *iFuncID, const char *iClassID)
-  { FuncID = strnew (iFuncID); ClassID = strnew (iClassID); }
+  { FuncID = csStrNew (iFuncID); ClassID = csStrNew (iClassID); }
   ~csPluginLoadRec ()
   { delete [] ClassID; delete [] FuncID; }
 };
@@ -676,14 +676,14 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
         char *newopt = new char [n + 1];
         memcpy (newopt, opt, n);
         (opt = newopt) [n] = 0;
-        arg = strnew (arg + 1);
+        arg = csStrNew (arg + 1);
       }
       else
-        opt = strnew (opt);
+        opt = csStrNew (opt);
       CommandLine.Push (new csCommandLineOption (opt, arg));
     }
     else
-      CommandLineNames.Push (strnew (opt));
+      CommandLineNames.Push (csStrNew (opt));
   }
 }
 
@@ -1052,7 +1052,7 @@ bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   }
 }
 
-int csSystemDriver::GetNumPlugIns ()
+int csSystemDriver::GetPlugInCount ()
 {
   return PlugIns.Length ();
 }
@@ -1257,7 +1257,7 @@ bool csSystemDriver::ReplaceOptionCL (const char *iName, const char *iValue, int
   if (clo)
   {
     delete [] clo->Value;
-    clo->Value = strnew (iValue);
+    clo->Value = csStrNew (iValue);
     return true;
   }
   else
@@ -1268,7 +1268,7 @@ bool csSystemDriver::ReplaceNameCL (const char *iValue, int iIndex)
 {
   if ((iIndex >= 0) && (iIndex < CommandLineNames.Length ()))
   {
-    CommandLineNames.Replace (iIndex, strnew (iValue));
+    CommandLineNames.Replace (iIndex, csStrNew (iValue));
     return true;
   }
   else
@@ -1290,10 +1290,10 @@ const char *csSystemDriver::GetNameCL (int iIndex)
 
 void csSystemDriver::AddOptionCL (const char *iName, const char *iValue)
 {
-  CommandLine.Push (new csCommandLineOption (strnew (iName), strnew (iValue)));
+  CommandLine.Push (new csCommandLineOption (csStrNew (iName), csStrNew (iValue)));
 }
 
 void csSystemDriver::AddNameCL (const char *iName)
 {
-  CommandLineNames.Push (strnew (iName));
+  CommandLineNames.Push (csStrNew (iName));
 }

@@ -67,12 +67,12 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
 
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () const { return num_vertices; }
+  int GetVertexCount () const { return num_vertices; }
 
   /**
    * Get the array with all vertices.
@@ -136,7 +136,7 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetNumVertices (int n)
+  void SetGetVertexCount (int n)
   {
     MakeRoom (n);
     num_vertices = n;

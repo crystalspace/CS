@@ -299,7 +299,7 @@ csShadowIterator::csShadowIterator (csShadowBlock* cur, bool onlycur,
 void csShadowIterator::Reset ()
 {
   cur = first_cur;
-  if (cur) cur_num = cur->GetNumShadows ();
+  if (cur) cur_num = cur->GetShadowCount ();
   if (dir == 1) i = 0;
   else i = cur_num-1;
 }
@@ -318,7 +318,7 @@ csFrustum* csShadowIterator::Next ()
     if (onlycur) cur = NULL;
     else if (dir == 1) cur = cur->next;
     else cur = cur->prev;
-    if (cur) cur_num = cur->GetNumShadows ();
+    if (cur) cur_num = cur->GetShadowCount ();
     if (dir == 1) i = 0;
     else i = cur_num-1;
   }
@@ -382,7 +382,7 @@ void csShadowIterator::DeleteCurrent ()
     {
       // We are the first element of this list so we delete the last
       // element of the previous list.
-      cur->prev->UnlinkShadow (cur->prev->GetNumShadows ()-1);
+      cur->prev->UnlinkShadow (cur->prev->GetShadowCount ()-1);
     }
   }
 }

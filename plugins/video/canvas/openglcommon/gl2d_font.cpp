@@ -148,7 +148,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
     }
   }
 
-  int basetextureheight = FindNearestPowerOf2 (MIN (maxheight * rows, 256));
+  int basetextureheight = csFindNearestPowerOf2 (MIN (maxheight * rows, 256));
   gs->texheight = float (maxheight) / basetextureheight;
 
   int nTextures = (rows * maxheight + 255) / 256;

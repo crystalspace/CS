@@ -78,7 +78,7 @@ struct iMetaGen : iBase
 
   virtual void SetEnvironmentMappingFactor(float f) = 0;
   /// For statistics only
-  virtual int ReportNumberTriangles () = 0;
+  virtual int ReportTriangleCount () = 0;
 
   virtual bool IsLighting () = 0;
   
@@ -89,15 +89,15 @@ struct iMetaGen : iBase
 
   virtual csVector3* GetVertices() = 0;
 
-  virtual int GetNumVertices() = 0;
+  virtual int GetVertexCount() = 0;
   
   virtual csVector2* GetTexels() = 0;
   
-  virtual int GetNumTexels() = 0;
+  virtual int GetTexelCount() = 0;
   
   virtual csTriangle* GetTriangles() = 0;
 
-  virtual int GetNumTriangles() = 0;
+  virtual int GetTriangleCount() = 0;
   
   virtual void SetSplinterSize(float size) = 0;
   

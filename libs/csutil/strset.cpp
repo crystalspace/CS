@@ -50,7 +50,7 @@ csStringID csStringSet::Request (const char *Name)
   }
 
   itf = new csRegisteredString ();
-  itf->String = strnew (Name);
+  itf->String = csStrNew (Name);
   itf->ID = IDCounter;
   IDCounter++;
 

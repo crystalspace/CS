@@ -50,7 +50,7 @@ public:
   ///
   csTriangle& GetTriangle (int i) { return triangles[i]; }
   /// Query the number of triangles.
-  int GetNumTriangles () { return num_triangles; }
+  int GetTriangleCount () { return num_triangles; }
 
   /// Clear the mesh of triangles.
   void Clear ();
@@ -134,7 +134,7 @@ public:
   void UpdateVertices (csVector3* verts);
 
   ///
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
   ///
   csTriangleVertex2& GetVertex (int idx) { return vertices[idx]; }
 

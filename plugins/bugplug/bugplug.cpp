@@ -652,16 +652,16 @@ void csBugPlug::ExitEditMode ()
   switch (edit_command)
   {
     case DEBUGCMD_GAMMA:
-      ScanStr (edit_string, "%f", &f);
+      csScanStr (edit_string, "%f", &f);
       G3D->SetRenderState (G3DRENDERSTATE_GAMMACORRECTION,
       	QRound (f * 65536));
       break;
     case DEBUGCMD_FOV:
-      ScanStr (edit_string, "%d", &i);
+      csScanStr (edit_string, "%d", &i);
       spider->GetCamera ()->SetFOV (i, G3D->GetWidth ());
       break;
     case DEBUGCMD_FOVANGLE:
-      ScanStr (edit_string, "%f", &f);
+      csScanStr (edit_string, "%f", &f);
       spider->GetCamera ()->SetFOVAngle (f, G3D->GetWidth ());
       break;
   }
@@ -859,20 +859,20 @@ void csBugPlug::Dump (iEngine* engine)
   System->Printf (MSG_DEBUG_0,
     "%d sectors, %d mesh factories, %d mesh objects\n",
     engine->GetSectorCount (),
-    engine->GetNumMeshFactories (),
-    engine->GetNumMeshObjects ());
+    engine->GetMeshFactoryCount (),
+    engine->GetMeshObjectCount ());
   int i;
   for (i = 0 ; i < engine->GetSectorCount () ; i++)
   {
     iSector* sector = engine->GetSector (i);
     Dump (sector);
   }
-  for (i = 0 ; i < engine->GetNumMeshFactories () ; i++)
+  for (i = 0 ; i < engine->GetMeshFactoryCount () ; i++)
   {
     iMeshFactoryWrapper* meshfact = engine->GetMeshFactory (i);
     Dump (meshfact);
   }
-  for (i = 0 ; i < engine->GetNumMeshObjects () ; i++)
+  for (i = 0 ; i < engine->GetMeshObjectCount () ; i++)
   {
     iMeshWrapper* mesh = engine->GetMeshObject (i);
     Dump (mesh);

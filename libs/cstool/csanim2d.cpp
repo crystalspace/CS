@@ -33,12 +33,12 @@ csAnimationTemplate::~csAnimationTemplate() {
 
 csPixmap *csAnimationTemplate::GetFrameByTime(cs_time Time) {
   // test for empty animation
-  if (GetNumFrames() == 0) return NULL;
+  if (GetFrameCount() == 0) return NULL;
   // wrap time
   Time %= GetLength();
   // search for frame (@@@ optimize this!)
   long i;
-  for (i=0; i<GetNumFrames(); i++) {
+  for (i=0; i<GetFrameCount(); i++) {
     if (Time < (cs_time)FinishTimes.Get(i))
       return GetFrame(i);
   }
@@ -57,7 +57,7 @@ csAnimatedPixmap::csAnimatedPixmap(csAnimationTemplate *tpl)
 {
   Template = tpl;
   CurrentTime = 0;
-  CurrentFrame = (tpl->GetNumFrames()>0) ? tpl->GetFrame(0) : NULL;
+  CurrentFrame = (tpl->GetFrameCount()>0) ? tpl->GetFrame(0) : NULL;
 }
 
 csAnimatedPixmap::~csAnimatedPixmap()

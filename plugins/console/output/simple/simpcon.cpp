@@ -406,7 +406,7 @@ void csSimpleConsole::Draw2D (csRect* area)
         cursor [0] = ' ';
       cursor [1] = 0;
 
-      char *tmp = strnew (Line [LineNumber]);
+      char *tmp = csStrNew (Line [LineNumber]);
       int curx = strlen (tmp);
       if ((CursorPos >= 0) && (CursorPos < curx))
         tmp [CursorPos] = 0;

@@ -143,7 +143,7 @@ private:
   ULONG MouseCursorID;			// Mouse cursor shape ID (SPTR_ARROW ...)
   bool fMinimized;                      // This is TRUE when window is minimized
   bool fActive;                         // Window is active
-  bool fSwapBuffers;			// Do we have to swap buffers on WM_PAINT?
+  bool csSwapFloatBuffers;			// Do we have to swap buffers on WM_PAINT?
   bool fRedrawDisabled;			// Set between VRN_DISABLED and VRN_ENABLED
   long MouseButtonMask;			// Current mouse button states
   bool MouseCaptured;			// Mouse captured flag
@@ -241,7 +241,7 @@ public:
   {
     ULONG Count;
     DosResetEventSem (sRedrawComplete, &Count);
-    fSwapBuffers = true;
+    csSwapFloatBuffers = true;
     WinInvalidateRect (hwndCL, rect, FALSE);
   }
 

@@ -347,10 +347,10 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     tmp [sl] = 0;
 
     if (!filename)
-      filename = strnew (tmp);
+      filename = csStrNew (tmp);
     else if (!strncmp (tmp, "Key:", 4))
     {
-      ScanStr (tmp + 4, "%f,%f,%f", &tr, &tg, &tb);
+      csScanStr (tmp + 4, "%f,%f,%f", &tr, &tg, &tb);
     }
     else if (!strncmp (tmp, "Dither:", 7))
     {

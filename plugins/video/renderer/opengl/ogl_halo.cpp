@@ -77,8 +77,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   // Initialization
   R = iR; G = iG; B = iB;
   // OpenGL can only use 2^n sized textures
-  Width = FindNearestPowerOf2 (iWidth);
-  Height = FindNearestPowerOf2 (iHeight);
+  Width = csFindNearestPowerOf2 (iWidth);
+  Height = csFindNearestPowerOf2 (iHeight);
 
   uint8 *Alpha = iAlpha;
   if ((Width != iWidth) || (Height != iHeight))

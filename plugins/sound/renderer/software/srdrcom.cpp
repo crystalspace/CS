@@ -246,7 +246,7 @@ void csSoundRenderSoftware::MixingFunction()
   long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);
   for (i=0;i<SoundHandles.Length();i++) {
     csSoundHandleSoftware *hdl = (csSoundHandleSoftware*)SoundHandles.Get(i);
-    hdl->Update_Num(NumSamples);
+    hdl->UpdateCount(NumSamples);
   }
 
   SoundDriver->UnlockMemory();

@@ -46,9 +46,9 @@ public:
   virtual ~csSpiralMeshObject ();
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num) { initialized = false; max = num; }
+  void SetParticleCount (int num) { initialized = false; max = num; }
   /// Get the number of particles.
-  int GetNumberParticles () const { return max; }
+  int GetParticleCount () const { return max; }
 
   /// Set the source.
   void SetSource (const csVector3& source)
@@ -72,17 +72,17 @@ public:
   class SpiralState : public iSpiralState
   {
     DECLARE_EMBEDDED_IBASE (csSpiralMeshObject);
-    virtual void SetNumberParticles (int num)
+    virtual void SetParticleCount (int num)
     {
-      scfParent->SetNumberParticles (num);
+      scfParent->SetParticleCount (num);
     }
     virtual void SetSource (const csVector3& source)
     {
       scfParent->SetSource (source);
     }
-    virtual int GetNumberParticles () const
+    virtual int GetParticleCount () const
     {
-      return scfParent->GetNumberParticles();
+      return scfParent->GetParticleCount();
     }
     virtual const csVector3& GetSource () const
     {

@@ -154,7 +154,7 @@ public:
   virtual iMaterialWrapper *FindMaterial(int index);
   virtual void RemoveMaterial(const char *name);
   virtual void RemoveMaterial(int index);
-  virtual int GetNumMaterials() const ;
+  virtual int GetMaterialCount() const ;
   virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
       const char *name);
   virtual void AddMeshFactory(iMeshObjectFactory *fact, const char *name);

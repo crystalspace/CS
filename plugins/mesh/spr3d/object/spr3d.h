@@ -116,7 +116,7 @@ public:
   virtual char const* GetName () const
   { return name; }
   /// Get total number of frames in this action
-  virtual int GetNumFrames () { return frames.Length (); }
+  virtual int GetFrameCount () { return frames.Length (); }
   /// Query the frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
   csSpriteFrame* GetCsFrame (int f)
   { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
@@ -343,7 +343,7 @@ public:
   void AddVertex () { AddVertices (1); }
 
   /// Query the number of texels.
-  int GetNumTexels () const { return texels.Get(0)->GetNumVertices (); }
+  int GetTexelCount () const { return texels.Get(0)->GetVertexCount (); }
   /// Get a texel.
   csVector2& GetTexel (int frame, int vertex) const
     { return (*texels.Get(frame)) [vertex]; }
@@ -352,7 +352,7 @@ public:
     { return (*texels.Get(frame)).GetVertices (); }
 
   /// Query the number of vertices.
-  int GetNumVertices () const { return vertices.Get (0)->GetNumVertices (); }
+  int GetVertexCount () const { return vertices.Get (0)->GetVertexCount (); }
   /// Get a vertex.
   csVector3& GetVertex (int frame, int vertex) const
     { return (*vertices.Get(frame)) [vertex]; }
@@ -361,7 +361,7 @@ public:
     { return (*vertices.Get(frame)).GetVertices (); }
 
   /// Query the number of normals.
-  int GetNumNormals () const { return normals.Get (0)->GetNumVertices (); }
+  int GetNormalCount () const { return normals.Get (0)->GetVertexCount (); }
   /// Get a normal.
   csVector3& GetNormal (int frame, int vertex) const
     { return (*normals.Get(frame)) [vertex]; }
@@ -379,14 +379,14 @@ public:
   /// returns the triangles of the texel_mesh
   csTriangle* GetTriangles () const { return texel_mesh->GetTriangles(); }
   /// returns the number of triangles in the sprite
-  int GetNumTriangles () const { return texel_mesh->GetNumTriangles(); }
+  int GetTriangleCount () const { return texel_mesh->GetTriangleCount(); }
 
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
   /// find a named frame into the sprite.
   csSpriteFrame* FindFrame (const char * name);
   /// Query the number of frames
-  int GetNumFrames () const { return frames.Length (); }
+  int GetFrameCount () const { return frames.Length (); }
   /// Query the frame number f
   csSpriteFrame* GetFrame (int f) const
   { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
@@ -399,7 +399,7 @@ public:
   csSpriteAction2* GetFirstAction () const
   { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
-  int GetNumActions () const
+  int GetActionCount () const
   { return actions.Length (); }
   /// Get action number No
   csSpriteAction2* GetAction (int No) const
@@ -463,9 +463,9 @@ public:
     {
       scfParent->AddVertices (num);
     }
-    virtual int GetNumTexels () const
+    virtual int GetTexelCount () const
     {
-      return scfParent->GetNumTexels ();
+      return scfParent->GetTexelCount ();
     }
     virtual csVector2& GetTexel (int frame, int vertex) const
     {
@@ -475,9 +475,9 @@ public:
     {
       return scfParent->GetTexels (frame);
     }
-    virtual int GetNumVertices () const
+    virtual int GetVertexCount () const
     {
-      return scfParent->GetNumVertices ();
+      return scfParent->GetVertexCount ();
     }
     virtual csVector3& GetVertex (int frame, int vertex) const
     {
@@ -487,9 +487,9 @@ public:
     {
       return scfParent->GetVertices (frame);
     }
-    virtual int GetNumNormals () const
+    virtual int GetNormalCount () const
     {
-      return scfParent->GetNumNormals ();
+      return scfParent->GetNormalCount ();
     }
     virtual csVector3& GetNormal (int frame, int vertex) const
     {
@@ -511,9 +511,9 @@ public:
     {
       return scfParent->GetTriangles ();
     }
-    virtual int GetNumTriangles () const
+    virtual int GetTriangleCount () const
     {
-      return scfParent->GetNumTriangles ();
+      return scfParent->GetTriangleCount ();
     }
     virtual iSpriteFrame* AddFrame ()
     {
@@ -527,9 +527,9 @@ public:
       if (ifr) ifr->DecRef ();
       return ifr;
     }
-    virtual int GetNumFrames () const
+    virtual int GetFrameCount () const
     {
-      return scfParent->GetNumFrames ();
+      return scfParent->GetFrameCount ();
     }
     virtual iSpriteFrame* GetFrame (int f) const
     {
@@ -555,9 +555,9 @@ public:
       if (ia) ia->DecRef ();
       return ia;
     }
-    virtual int GetNumActions () const
+    virtual int GetActionCount () const
     {
-      return scfParent->GetNumActions ();
+      return scfParent->GetActionCount ();
     }
     virtual iSpriteAction* GetAction (int No) const
     {
@@ -798,9 +798,9 @@ public:
   { return lod_level_config; }
 
   /**
-   * GetNumVertsToLight returns the number of vertices to light based on LOD.
+   * GetVertexToLightCount returns the number of vertices to light based on LOD.
    */
-  int GetNumVertsToLight ();
+  int GetVertexToLightCount ();
  
 private:
 
@@ -1018,7 +1018,7 @@ public:
    */
   void SetFrame (int f)
   {
-    if (cur_action && f < cur_action->GetNumFrames ()) cur_frame = f;
+    if (cur_action && f < cur_action->GetFrameCount ()) cur_frame = f;
     //@@@!!! WHAT DO WE DO HERE!!! UpdateInPolygonTrees ();
   }
 
@@ -1035,7 +1035,7 @@ public:
   /**
    * Get the number of frames.
    */
-  int GetNumFrames () const { return cur_action->GetNumFrames (); }
+  int GetFrameCount () const { return cur_action->GetFrameCount (); }
 
   /**
    * Select an action.
@@ -1138,10 +1138,10 @@ public:
     DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
 
     /// Get the number of vertices for this mesh.
-    virtual int GetNumVertices ()
+    virtual int GetVertexCount ()
     {
       csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetNumVertices ();
+      return fact->GetVertexCount ();
     }
     /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
@@ -1150,10 +1150,10 @@ public:
       return fact->GetVertices (0);
     }
     /// Get the number of polygons for this mesh.
-    virtual int GetNumPolygons ()
+    virtual int GetPolygonCount ()
     {
       csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetNumTriangles ();
+      return fact->GetTriangleCount ();
     }
     
     /// Get the pointer to the array of polygons.
@@ -1210,9 +1210,9 @@ public:
     {
       return scfParent->GetCurFrame ();
     }
-    virtual int GetNumFrames () const
+    virtual int GetFrameCount () const
     {
-      return scfParent->GetNumFrames ();
+      return scfParent->GetFrameCount ();
     }
     virtual bool SetAction (const char * name)
     {

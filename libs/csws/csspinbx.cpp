@@ -314,7 +314,7 @@ void csSpinBox::SetLimits (int iMin, int iMax, char *iFormat)
   NumLimits.MaxValue = iMax;
   if (NumLimits.ValueFormat)
     delete [] NumLimits.ValueFormat;
-  NumLimits.ValueFormat = strnew (iFormat);
+  NumLimits.ValueFormat = csStrNew (iFormat);
   SetValue (iMin);
 }
 
@@ -322,7 +322,7 @@ int csSpinBox::InsertItem (char *iValue, int iPosition)
 {
   if (iPosition == CSSB_ITEM_AFTERALL)
     iPosition = Values.Length ();
-  Values.Insert (iPosition, strnew (iValue));
+  Values.Insert (iPosition, csStrNew (iValue));
   return iPosition;
 }
 

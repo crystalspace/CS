@@ -93,7 +93,7 @@ public:
   /**
    * Get the number of objects in this collection.
    */
-  int GetNumObjects () const { return objects.Length(); }
+  int GetObjectCount () const { return objects.Length(); }
 
   /// Add an object to the collection.
   void AddObject (iObject* obj) { objects.Push((csSome)obj); }
@@ -114,8 +114,8 @@ public:
       { return &(scfParent->GetMovable().scfiMovable); }
     virtual iObject* FindObject (char* name) const
       { return scfParent->FindObject(name); }
-    virtual int GetNumObjects () const
-      { return scfParent->GetNumObjects(); }
+    virtual int GetObjectCount () const
+      { return scfParent->GetObjectCount(); }
     virtual void AddObject (iObject* obj)
       { scfParent->AddObject(obj); }
     virtual iObject* operator[] (int i) const

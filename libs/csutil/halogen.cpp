@@ -28,7 +28,7 @@
  * The iCross argument is an 0..1 float that defines how much the
  * hallo ressembles a cross (0) or a circle (1).
  */
-unsigned char *GenerateHalo (int iSize, float iFactor, float iCross)
+unsigned char *csGenerateHalo (int iSize, float iFactor, float iCross)
 {
   unsigned char *image = new unsigned char [iSize * iSize];
   memset (image, 0, iSize * iSize);

@@ -164,7 +164,7 @@ csTriangleVertices2::csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* vert
   {
     vertices[i].pos = verts[i];
     vertices[i].idx = i;
-    for (j = 0 ; j < mesh->GetNumTriangles () ; j++)
+    for (j = 0 ; j < mesh->GetTriangleCount () ; j++)
       if (triangles[j].a == i || triangles[j].b == i || triangles[j].c == i)
       {
         vertices[i].AddTriangle (j);
@@ -240,7 +240,7 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
   verts->CalculateCost ();
 
   // Collapse vertices, one by one until only one remains.
-  int num = verts->GetNumVertices ();
+  int num = verts->GetVertexCount ();
   int from, to, col_idx;
   int *from_vertices, *to_vertices;
   from_vertices = new int [num];
@@ -305,7 +305,7 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
   to_vertices[col_idx] = -1;
 
   // Fill the output arrays.
-  for (i = 0 ; i < verts->GetNumVertices () ; i++)
+  for (i = 0 ; i < verts->GetVertexCount () ; i++)
   {
     translate[from_vertices[col_idx]] = i;
     emerge_from[i] = translate[to_vertices[col_idx]];

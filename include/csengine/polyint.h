@@ -153,7 +153,7 @@ public:
   /**
    * Get number of vertices for this polygon.
    */
-  virtual int GetNumVertices () = 0;
+  virtual int GetVertexCount () = 0;
 
   /**
    * Get pointer to array of vertex indices.
@@ -215,14 +215,14 @@ public:
   csPolygonInt** GetPolygons () { return polygons; }
 
   /// Get number of polygons.
-  int GetNumPolygons () { return num; }
+  int GetPolygonCount () { return num; }
 
   /**
    * Set number of polygons (i.e. truncate list).
    * The new number of polygons cannot be greater than the
    * current number of polygons.
    */
-  void SetNumPolygons (int n) { num = n; }
+  void SetPolygonCount (int n) { num = n; }
 };
 
 /**

@@ -64,7 +64,7 @@ struct iMaterial : public iBase
    * Get the number of texture layers. The base
    * texture is not counted in this.
    */
-  virtual int GetNumTextureLayers () = 0;
+  virtual int GetTextureLayerCount () = 0;
 
   /**
    * Get a texture layer.

@@ -124,7 +124,7 @@ void csMenuItem::SetText (const char *iText)
       cc++;
   text = new char [cc + 1];
   if (i < sl)
-    info = strnew (iText + i + 1);
+    info = csStrNew (iText + i + 1);
 
   cc = 0;
   for (i = 0; i < sl; i++)

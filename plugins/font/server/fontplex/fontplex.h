@@ -75,7 +75,7 @@ public:
   /**
    * Get number of loaded fonts.
    */
-  virtual int GetNumFonts ();
+  virtual int GetFontCount ();
 
   /**
    * Get Nth loaded font or NULL.

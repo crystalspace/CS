@@ -20,12 +20,12 @@
 #define __TOKEN_H__
 
 /// Get a token
-extern char* get_token (char** buf);
+extern char* csGetToken (char** buf);
 /// Get a floating-point number
-extern float get_token_float (char** buf);
+extern float csGetToken_float (char** buf);
 /// Get a integer number
-extern int get_token_int (char** buf);
+extern int csGetToken_int (char** buf);
 /// Skip a token
-extern void skip_token (char** buf, char* tok, char* msg = NULL);
+extern void csSkipToken (char** buf, char* tok, char* msg = NULL);
 
 #endif // __TOKEN_H__

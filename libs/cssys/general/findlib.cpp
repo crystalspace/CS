@@ -29,7 +29,7 @@ bool findlib_search_nodir = true;
 
 void csAddLibraryPath (const char *iPath)
 {
-  LibPath.Push (strnew (iPath));
+  LibPath.Push (csStrNew (iPath));
 }
 
 csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,

@@ -110,7 +110,7 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
     if (fontdef)
     {
       delete [] fontdef->Name;
-      fontdef->Name = strnew (filename);
+      fontdef->Name = csStrNew (filename);
       return fontdef;
     }
   }
@@ -261,7 +261,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   Parent = parent;
   Parent->NotifyCreate (this);
   if (name [0] != '*')
-    Name = strnew (name);
+    Name = csStrNew (name);
   else
     Name = CONST_CAST(char*, name);
   First = first;

@@ -100,7 +100,7 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
 csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
   	: csClipper ()
 {
-  int Count = Clipper->GetNumVertices ();
+  int Count = Clipper->GetVertexCount ();
   ClipPolyVertices = Count;
 
   if (mirror || copy)

@@ -155,11 +155,11 @@ void csTextureHandle::AdjustSizePo2 ()
   int newwidth  = image->GetWidth();
   int newheight = image->GetHeight();
 
-  if (!IsPowerOf2(newwidth))
-    newwidth = FindNearestPowerOf2 (image->GetWidth ()) / 2;
+  if (!csIsPowerOf2(newwidth))
+    newwidth = csFindNearestPowerOf2 (image->GetWidth ()) / 2;
 
-  if (!IsPowerOf2 (newheight))
-    newheight = FindNearestPowerOf2 (image->GetHeight ()) / 2;
+  if (!csIsPowerOf2 (newheight))
+    newheight = csFindNearestPowerOf2 (image->GetHeight ()) / 2;
 
   if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
     image->Rescale (newwidth, newheight);
@@ -182,7 +182,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     if (texture) texture->IncRef ();
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
-    num_texture_layers = material->GetNumTextureLayers ();
+    num_texture_layers = material->GetTextureLayerCount ();
     if (num_texture_layers > 4) num_texture_layers = 4;
     int i;
     for (i = 0 ; i < num_texture_layers ; i++)

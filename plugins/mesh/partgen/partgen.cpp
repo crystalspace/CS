@@ -285,7 +285,7 @@ csNewtonianParticleSystem::csNewtonianParticleSystem (iSystem* system,
   part_accel = NULL;
 }
 
-void csNewtonianParticleSystem::SetNumber (int max)
+void csNewtonianParticleSystem::SetCount (int max)
 {
   delete[] part_speed;
   delete[] part_accel;

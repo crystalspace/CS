@@ -320,7 +320,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   pastate->SetMaterialWrapper(halo);
   pastate->SetMixMode(CS_FX_ADD);
   pastate->SetColor( csColor(0.125, 0.5, 1.0) );
-  fostate->SetNumberParticles(100);
+  fostate->SetParticleCount(100);
   fostate->SetDropSize(0.1, 0.1);
   fostate->SetOrigin( csVector3(0,0,0) );
   fostate->SetLighting(false);

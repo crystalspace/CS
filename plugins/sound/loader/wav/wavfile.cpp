@@ -198,7 +198,7 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 
     // correct length of chunk on big endian system
     #ifdef CS_BIG_ENDIAN     // @@@ correct fmtchk.len on big-endian systems?
-      fmtchk.len = ByteSwap32bit (fmtchk.len);
+      fmtchk.len = csByteSwap32bit (fmtchk.len);
     #endif
   }
 
@@ -208,12 +208,12 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 
   // correct the chunk, if under big-endian system
   #ifdef CS_BIG_ENDIAN // @@@ is this correct?
-    fmtchk.fmt_tag = ByteSwap16bit (fmtchk.fmt_tag);
-    fmtchk.channel = ByteSwap16bit (fmtchk.channel);
-    fmtchk.samples_per_sec = ByteSwap32bit (fmtchk.samples_per_sec);
-    fmtchk.avg_bytes_per_sec = ByteSwap32bit (fmtchk.avg_bytes_per_sec);
-    fmtchk.blk_align = ByteSwap16bit (fmtchk.blk_align);
-    fmtchk.bits_per_sample = ByteSwap16bit (fmtchk.bits_per_sample);
+    fmtchk.fmt_tag = csByteSwap16bit (fmtchk.fmt_tag);
+    fmtchk.channel = csByteSwap16bit (fmtchk.channel);
+    fmtchk.samples_per_sec = csByteSwap32bit (fmtchk.samples_per_sec);
+    fmtchk.avg_bytes_per_sec = csByteSwap32bit (fmtchk.avg_bytes_per_sec);
+    fmtchk.blk_align = csByteSwap16bit (fmtchk.blk_align);
+    fmtchk.bits_per_sample = csByteSwap16bit (fmtchk.bits_per_sample);
   #endif // CS_BIG_ENDIAN
 
   // check format of file
@@ -241,7 +241,7 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 
     // correct length of chunk on big endian systems
     #ifdef CS_BIG_ENDIAN     // @@@ correct wavchk.len on big-endian systems?
-      wavchk.len = ByteSwap32bit (wavchk.len);
+      wavchk.len = csByteSwap32bit (wavchk.len);
     #endif
   }
 
@@ -264,7 +264,7 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
   
   #ifdef CS_BIG_ENDIAN // @@@ correct?
   if (fmtchk.bits_per_sample == 16)
-    ByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
+    cscsByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
   #endif // CS_BIG_ENDIAN
 
   // set up format for csSoundDataRaw

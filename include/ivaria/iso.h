@@ -118,7 +118,7 @@ struct iIsoEngine : public iPlugIn
   /// delete a material by index
   virtual void RemoveMaterial(int index) = 0;
   /// get the possible number of materials (indices 0..n-1), some are NULL.
-  virtual int GetNumMaterials() const = 0;
+  virtual int GetMaterialCount() const = 0;
 
   /// load and add a mesh factory, given classID under given name.
   virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
@@ -392,7 +392,7 @@ struct iIsoSprite : public iBase
   typedef void (*GridChangeCallbackType)(iIsoSprite *, void *);
 
   /// get the number of vertices
-  virtual int GetNumVertices() const = 0;
+  virtual int GetVertexCount() const = 0;
   /// add a new vertex to the polygon
   virtual void AddVertex(const csVector3& coord, float u, float v) = 0;
   /// get a vertex position

@@ -46,7 +46,7 @@ bool csSoundDataRaw::IsStatic() {
   return true;
 }
 
-long csSoundDataRaw::GetStaticNumSamples() {
+long csSoundDataRaw::GetStaticSampleCount() {
   return NumSamples;
 }
 

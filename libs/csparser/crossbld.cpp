@@ -134,7 +134,7 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   int anm_idx = newframe->GetAnmIndex();
   int tex_idx = newframe->GetTexIndex();
 
-  if (framesource->GetNumFrames() == 1)
+  if (framesource->GetFrameCount() == 1)
     framesource->AddVertices(buildsource.num_cor3);
 
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
@@ -518,7 +518,7 @@ iSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
   newaction->SetName(prefixstring);
 
   // check all the frame names, do any match?
-  for (int frameindex=0; frameindex < frameholder->GetNumFrames(); frameindex++)
+  for (int frameindex=0; frameindex < frameholder->GetFrameCount(); frameindex++)
   {
     iSpriteFrame *curframe = frameholder->GetFrame(frameindex);
     const char *framename = curframe->GetName();

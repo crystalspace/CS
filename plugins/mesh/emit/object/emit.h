@@ -95,7 +95,7 @@ public:
   virtual void GetValue(csVector3& value, csVector3 &given);
   virtual void AddEmitter(float weight, iEmitGen3D* emit);
   virtual float GetTotalWeight() {return totalweight;}
-  virtual int GetNumberEmitters() {return nr;}
+  virtual int GetEmitterCount() {return nr;}
   virtual void GetContent(int num, float& weight, iEmitGen3D*& emit);
 };
 
@@ -244,9 +244,9 @@ public:
   virtual ~csEmitMeshObject ();
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num) { initialized = false; number = num; }
   /// Get the number of particles
-  int GetNumberParticles () const { return number; }
+  int GetParticleCount () const { return number; }
   /// Enable or disable lighting.
   void SetLighting (bool l)
   {
@@ -286,7 +286,7 @@ public:
   float GetAttractorForce() const {return attractor_force;}
 
   /// get the number of ageing moments
-  int GetNumberAging() const {return nr_aging_els;}
+  int GetAgingCount() const {return nr_aging_els;}
   /// add an age
   void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale);
@@ -322,12 +322,12 @@ public:
   class EmitState : public iEmitState
   {
     DECLARE_EMBEDDED_IBASE (csEmitMeshObject);
-    virtual void SetNumberParticles (int num)
-    { scfParent->SetNumberParticles (num); }
+    virtual void SetParticleCount (int num)
+    { scfParent->SetParticleCount (num); }
     virtual void SetLighting (bool l)
     { scfParent->SetLighting (l); }
-    virtual int GetNumberParticles () const 
-    { return scfParent->GetNumberParticles(); }
+    virtual int GetParticleCount () const 
+    { return scfParent->GetParticleCount(); }
     virtual bool GetLighting () const
     { return scfParent->GetLighting(); }
     virtual void SetParticleTime (int l)
@@ -353,7 +353,7 @@ public:
     virtual void SetAttractorForce(float f) {scfParent->SetAttractorForce(f);}
     virtual float GetAttractorForce() const 
     {return scfParent->GetAttractorForce();}
-    virtual int GetNumberAging() const { return scfParent->GetNumberAging();}
+    virtual int GetAgingCount() const { return scfParent->GetAgingCount();}
     virtual void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
     { scfParent->AddAge(time, color, alpha, swirl, rotspeed, scale);}

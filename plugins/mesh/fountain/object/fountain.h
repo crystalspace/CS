@@ -77,9 +77,9 @@ public:
   virtual ~csFountainMeshObject ();
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num) { initialized = false; number = num; }
   /// Get the number of particles used.
-  int GetNumberParticles () const { return number; }
+  int GetParticleCount () const { return number; }
   /// Set the size of the fountain drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
@@ -171,9 +171,9 @@ public:
   class FountainState : public iFountainState
   {
     DECLARE_EMBEDDED_IBASE (csFountainMeshObject);
-    virtual void SetNumberParticles (int num)
+    virtual void SetParticleCount (int num)
     {
-      scfParent->SetNumberParticles (num);
+      scfParent->SetParticleCount (num);
     }
     virtual void SetDropSize (float dropwidth, float dropheight)
     {
@@ -211,9 +211,9 @@ public:
     {
       scfParent->SetFallTime (ftime);
     }
-    virtual int GetNumberParticles () const
+    virtual int GetParticleCount () const
     {
-      return scfParent->GetNumberParticles ();
+      return scfParent->GetParticleCount ();
     }
     virtual void GetDropSize (float& dropwidth, float& dropheight) const
     {

@@ -185,7 +185,7 @@ public:
   virtual float GetEnvironmentMappingFactor ()
   { return env_map_mult; }
 
-  virtual int ReportNumberTriangles ()
+  virtual int ReportTriangleCount ()
   { return vertices_tesselated; }
 
   virtual void SetArcSineTableRes( int res )
@@ -210,11 +210,11 @@ public:
   virtual csVector3* GetVertices();
   virtual csVector2* GetTexels();
   virtual csTriangle* GetTriangles();
-  virtual int GetNumVertices()
+  virtual int GetVertexCount()
 	{ return current_vertices; }
-  virtual int GetNumTexels()
+  virtual int GetTexelCount()
 	{ return current_texels; }
-  virtual int GetNumTriangles()
+  virtual int GetTriangleCount()
 	{ return current_triangles; }
   virtual void SetSplinterSize( float sz )
 	{ splinter_size = sz; }
@@ -304,8 +304,8 @@ public:
 	  { return scfParent->GetEnvironmentMappingFactor(); }
 	virtual void SetEnvironmentMappingFactor(float env )
 	  { scfParent->SetEnvironmentMappingFactor( env ); }
-	virtual int ReportNumberTriangles()
-	  { return scfParent->ReportNumberTriangles(); }
+	virtual int ReportTriangleCount()
+	  { return scfParent->ReportTriangleCount(); }
 	virtual bool IsLighting() 
 	  { return scfParent->IsLighting(); }
 	virtual void SetLighting(bool set) 
@@ -326,12 +326,12 @@ public:
 	  { return scfParent->GetTexels(); }
 	virtual csTriangle* GetTriangles()
 	  { return scfParent->GetTriangles(); }
-	virtual int GetNumVertices()
-	  { return scfParent->GetNumVertices(); }
-	virtual int GetNumTexels()
-	  { return scfParent->GetNumTexels(); }
-	virtual int GetNumTriangles()
-	  { return scfParent->GetNumTriangles(); }
+	virtual int GetVertexCount()
+	  { return scfParent->GetVertexCount(); }
+	virtual int GetTexelCount()
+	  { return scfParent->GetTexelCount(); }
+	virtual int GetTriangleCount()
+	  { return scfParent->GetTriangleCount(); }
 	virtual void SetSplinterSize(float size)
 	  { scfParent->SetSplinterSize(size); }
 	virtual float GetSplinterSize()

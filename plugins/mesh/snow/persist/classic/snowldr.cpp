@@ -147,20 +147,20 @@ bool csSnowFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csSnowFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -219,7 +219,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -278,21 +278,21 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
       case CS_TOKEN_DROPSIZE:
 	{
 	  float dw, dh;
-	  ScanStr (params, "%f,%f", &dw, &dh);
+	  csScanStr (params, "%f,%f", &dw, &dh);
 	  snowstate->SetDropSize (dw, dh);
 	}
 	break;
       case CS_TOKEN_BOX:
 	{
 	  csVector3 minbox, maxbox;
-	  ScanStr (params, "%f,%f,%f,%f,%f,%f",
+	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
 	      	&minbox.x, &minbox.y, &minbox.z,
 	      	&maxbox.x, &maxbox.y, &maxbox.z);
 	  snowstate->SetBox (minbox, maxbox);
@@ -301,20 +301,20 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_FALLSPEED:
 	{
 	  csVector3 s;
-	  ScanStr (params, "%f,%f,%f", &s.x, &s.y, &s.z);
+	  csScanStr (params, "%f,%f,%f", &s.x, &s.y, &s.z);
 	  snowstate->SetFallSpeed (s);
 	}
 	break;
       case CS_TOKEN_SWIRL:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  snowstate->SetSwirl (f);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -331,7 +331,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -350,15 +350,15 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           snowstate->SetLighting (do_lighting);
         }
         break;
       case CS_TOKEN_NUMBER:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
-          snowstate->SetNumberParticles (nr);
+          csScanStr (params, "%d", &nr);
+          snowstate->SetParticleCount (nr);
         }
         break;
     }
@@ -396,7 +396,7 @@ void csSnowSaver::WriteDown (iBase* obj, iStrVector *str,
   char name[MAXLINE];
  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -405,27 +405,27 @@ void csSnowSaver::WriteDown (iBase* obj, iStrVector *str,
 
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(strnew(buf));
-  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   float sx = 0.0, sy = 0.0;
   state->GetDropSize(sx, sy);
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   printf(buf, "FALLSPEED (%g, %g, %g)\n", state->GetFallSpeed().x,
     state->GetFallSpeed().y, state->GetFallSpeed().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   csVector3 minbox, maxbox;
   state->GetBox(minbox, maxbox);
   printf(buf, "BOX (%g,%g,%g, %g,%g,%g)\n", minbox.x, minbox.y, minbox.z,
     maxbox.x, maxbox.y, maxbox.z);
   printf(buf, "SWIRL (%d)\n", state->GetSwirl());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   partstate->DecRef();

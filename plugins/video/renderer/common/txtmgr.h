@@ -251,7 +251,7 @@ public:
   void FreeMaterial ();
 
   /// Get the number of texture layers.
-  int GetNumTextureLayers () { return num_texture_layers; }
+  int GetTextureLayerCount () { return num_texture_layers; }
   /// Get a texture layer.
   csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
   /// Returns true if texture layer needs translation.

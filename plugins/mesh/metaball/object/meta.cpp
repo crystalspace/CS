@@ -141,7 +141,7 @@ bool csMetaBall::Initialize ()
   return true;
 }
 
-void csMetaBall::SetNumberMetaBalls (int number)
+void csMetaBall::SetMetaBallCount (int number)
 {
   if (number < 1 || number  == num_meta_balls)
     return;

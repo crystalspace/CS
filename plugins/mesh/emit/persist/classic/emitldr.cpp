@@ -161,20 +161,20 @@ bool csEmitFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -234,7 +234,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -292,11 +292,11 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	  printf ("WEIGHT cannot be given in this context!\n");
 	  return 0;
 	}
-        ScanStr (params, "%f", weight);
+        csScanStr (params, "%f", weight);
 	break;
       case CS_TOKEN_EMITFIXED:
         {
-          ScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
+          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
 	  iEmitFixed *efixed = fstate->CreateFixed();
 	  efixed->SetValue(a);
 	  result = efixed;
@@ -304,7 +304,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITBOX:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
 	    &b.x, &b.y, &b.z);
 	  iEmitBox *ebox = fstate->CreateBox();
 	  ebox->SetContent(a, b);
@@ -313,7 +313,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITSPHERE:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
 	  iEmitSphere *esphere = fstate->CreateSphere();
 	  esphere->SetContent(a, p, q);
 	  result = esphere;
@@ -321,7 +321,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCONE:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
 	    &p, &q, &r, &s, &t);
 	  iEmitCone *econe = fstate->CreateCone();
 	  econe->SetContent(a, p, q, r, s, t);
@@ -340,7 +340,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITLINE:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
 	    &b.x, &b.y, &b.z);
 	  iEmitLine *eline = fstate->CreateLine();
 	  eline->SetContent(a, b);
@@ -349,7 +349,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCYLINDER:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
 	    &b.x, &b.y, &b.z, &p, &q);
 	  iEmitCylinder *ecyl = fstate->CreateCylinder();
 	  ecyl->SetContent(a, b, p, q);
@@ -358,7 +358,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCYLINDERTANGENT:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
 	    &b.x, &b.y, &b.z, &p, &q);
 	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent();
 	  ecyltan->SetContent(a, b, p, q);
@@ -367,7 +367,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITSPHERETANGENT:
         {
-          ScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
+          csScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
 	  iEmitSphereTangent *espheretan = fstate->CreateSphereTangent();
 	  espheretan->SetContent(a, p, q);
 	  result = espheretan;
@@ -425,7 +425,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -444,7 +444,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -464,28 +464,28 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_NUMBER:
 	{
 	  int num = 10;
-          ScanStr (params, "%d", &num);
-	  emitstate->SetNumberParticles (num);
+          csScanStr (params, "%d", &num);
+	  emitstate->SetParticleCount (num);
 	}
 	break;
       case CS_TOKEN_LIGHTING:
 	{
 	  bool light = false;
-          ScanStr (params, "%b", &light);
+          csScanStr (params, "%b", &light);
 	  emitstate->SetLighting (light);
 	}
 	break;
       case CS_TOKEN_TOTALTIME:
 	{
 	  int totaltime = 100;
-          ScanStr (params, "%d", &totaltime);
+          csScanStr (params, "%d", &totaltime);
 	  emitstate->SetParticleTime (totaltime);
 	}
 	break;
       case CS_TOKEN_RECTPARTICLES:
 	{
 	  float w,h;
-          ScanStr (params, "%f,%f", &w, &h);
+          csScanStr (params, "%f,%f", &w, &h);
 	  emitstate->SetRectParticles (w, h);
 	}
 	break;
@@ -493,7 +493,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	{
 	  int sides;
 	  float radius;
-          ScanStr (params, "%d,%f", &sides, &radius);
+          csScanStr (params, "%d,%f", &sides, &radius);
 	  emitstate->SetRegularParticles (sides, radius);
 	}
 	break;
@@ -502,7 +502,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	  int time;
 	  csColor col;
 	  float alpha, swirl, rotspeed, scale;
-          ScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f", &time, &col.red,
+          csScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f", &time, &col.red,
 	    &col.green, &col.blue, &alpha, &swirl, &rotspeed, &scale);
 	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
 	}
@@ -528,7 +528,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_ATTRACTORFORCE:
 	{
 	  float force;
-          ScanStr (params, "%f", &force);
+          csScanStr (params, "%f", &force);
 	  emitstate->SetAttractorForce (force);
 	}
 	break;
@@ -578,7 +578,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     /// b is ignored
     efixed->GetValue(a, b);
     sprintf(buf, "  EMITFIXED(%g, %g, %g)\n", a.x, a.y, a.z);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     efixed->DecRef();
     return;
   }
@@ -587,7 +587,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     esphere->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERE(%g,%g,%g, %g, %g)\n", a.x, a.y, a.z, p, q);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     esphere->DecRef();
     return;
   }
@@ -596,7 +596,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     ebox->GetContent(a, b);
     sprintf(buf, "  EMITBOX(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     ebox->DecRef();
     return;
   }
@@ -606,22 +606,22 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     econe->GetContent(a, p, q, r, s, t);
     sprintf(buf, "  EMITCONE(%g,%g,%g, %g, %g, %g, %g, %g)\n", a.x,a.y,a.z, 
       p, q, r, s, t);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     econe->DecRef();
     return;
   }
   iEmitMix *emix = QUERY_INTERFACE(emit, iEmitMix);
   if(emix)
   {
-    for(int i=0; i<emix->GetNumberEmitters(); i++)
+    for(int i=0; i<emix->GetEmitterCount(); i++)
     {
       float w;
       iEmitGen3D *gen;
       emix->GetContent(i, w, gen);
       sprintf(buf, "  EMITMIX( WEIGHT(%g)\n", w);
-      str->Push(strnew(buf));
+      str->Push(csStrNew(buf));
       WriteEmit(str, gen);
-      str->Push(strnew("  )\n"));
+      str->Push(csStrNew("  )\n"));
     }
     emix->DecRef();
     return;
@@ -631,7 +631,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     eline->GetContent(a, b);
     sprintf(buf, "  EMITLINE(%g,%g,%g, %g,%g,%g)\n", a.x,a.y,a.z, b.x,b.y,b.z);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     eline->DecRef();
     return;
   }
@@ -641,7 +641,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyl->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDER(%g,%g,%g, %g,%g,%g, %g, %g)\n", a.x,a.y,a.z, 
       b.x,b.y,b.z, p, q);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     ecyl->DecRef();
     return;
   }
@@ -651,7 +651,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
     ecyltan->GetContent(a, b, p, q);
     sprintf(buf, "  EMITCYLINDERTANGENT(%g,%g,%g, %g,%g,%g, %g, %g)\n", 
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     ecyltan->DecRef();
     return;
   }
@@ -660,7 +660,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   {
     espheretan->GetContent(a, p, q);
     sprintf(buf, "  EMITSPHERETANGENT(%g,%g,%g, %g, %g)\n", a.x,a.y,a.z, p, q);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     espheretan->DecRef();
     return;
   }
@@ -678,7 +678,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -686,13 +686,13 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject()->GetName());
-  str->Push(strnew(buf));
-  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "TOTALTIME (%d)\n", state->GetParticleTime());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->UsingRectParticles())
   {
     float w,h; state->GetRectParticles(w,h);
@@ -703,30 +703,30 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     int n; float r; state->GetRegularParticles(n, r);
     sprintf(buf, "REGULARPARTICLES (%d, %g)\n", n, r);
   }
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
-  str->Push(strnew("STARTPOS(\n"));
+  str->Push(csStrNew("STARTPOS(\n"));
   WriteEmit(str, state->GetStartPosEmit());
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
   
-  str->Push(strnew("STARTSPEED(\n"));
+  str->Push(csStrNew("STARTSPEED(\n"));
   WriteEmit(str, state->GetStartSpeedEmit());
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
-  str->Push(strnew("STARTACCEL(\n"));
+  str->Push(csStrNew("STARTACCEL(\n"));
   WriteEmit(str, state->GetStartAccelEmit());
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
   if(state->GetAttractorEmit())
   {
-    str->Push(strnew("ATTRACTOR(\n"));
+    str->Push(csStrNew("ATTRACTOR(\n"));
     WriteEmit(str, state->GetAttractorEmit());
-    str->Push(strnew(")\n"));
+    str->Push(csStrNew(")\n"));
     sprintf(buf, "ATTRACTORFORCE (%g)\n", state->GetAttractorForce());
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
 
-  for(int i=0; i<state->GetNumberAging(); i++)
+  for(int i=0; i<state->GetAgingCount(); i++)
   {
     int time;
     csColor col;
@@ -734,7 +734,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     state->GetAgingMoment(i, time, col, alpha, swirl, rotspeed, scale);
     sprintf(buf, "AGING (%d, %g,%g,%g, %g, %g, %g, %g)\n", time, col.red,
       col.green, col.blue, alpha, swirl, rotspeed, scale);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
 
   fact->DecRef();

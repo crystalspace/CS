@@ -53,7 +53,7 @@ struct iModelDataPolygon : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// return the number of vertices
-  virtual int GetNumVertices () const = 0;
+  virtual int GetVertexCount () const = 0;
   /// Add a vertex
   virtual void AddVertex (int PositionIndex, const csVector3 &Normal,
     const csColor &Color, const csVector2 &TextureCoords) = 0;
@@ -102,7 +102,7 @@ struct iModelDataObject : public iBase
   virtual iObject* QueryObject () = 0;
 
   /// Return the number of vertices in the object
-  virtual int GetNumVertices () const = 0;
+  virtual int GetVertexCount () const = 0;
   /// Return the coordinates of a vertex
   virtual const csVector3 &GetVertex (int n) const = 0;
   /// Set the coordinates of a vertex

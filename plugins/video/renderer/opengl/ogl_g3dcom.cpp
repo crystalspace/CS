@@ -838,8 +838,8 @@ void csGraphics3DOGLCommon::SetupClipPlanes (bool add_near_clip,
     csPlane3 pl;
     GLdouble plane_eq[4];
     int i, i1;
-    i1 = frustum.GetNumVertices ()-1;
-    for (i = 0 ; i < frustum.GetNumVertices () ; i++)
+    i1 = frustum.GetVertexCount ()-1;
+    for (i = 0 ; i < frustum.GetVertexCount () ; i++)
     {
       pl.Set (csVector3 (0), frustum[i], frustum[i1]);
       plane_eq[0] = pl.A ();
@@ -876,7 +876,7 @@ void csGraphics3DOGLCommon::CalculateFrustum ()
   if (clipper)
   {
     frustum.MakeEmpty ();
-    int nv = clipper->GetNumVertices ();
+    int nv = clipper->GetVertexCount ();
     csVector3 v3;
     v3.z = 1;
     csVector2* v = clipper->GetClipPoly ();
@@ -911,7 +911,7 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
     // @@@ SideNote! This toplevel_init could cause problems for multiple
     // views. Have to think about this.
     toplevel_init = true;
-    int nv = clipper->GetNumVertices ();
+    int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
     int i, i1;
     i1 = nv-1;
@@ -1244,7 +1244,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
     glClear (GL_STENCIL_BUFFER_BIT);
     glStencilFunc (GL_ALWAYS, 1, 1);
     glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
-    int nv = clipper->GetNumVertices ();
+    int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (0, 0, 0, 0);
     glShadeModel (GL_FLAT);
@@ -1296,7 +1296,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   if (mat_handle)
   {
-    multimat = mat_handle->GetNumTextureLayers () > 0;
+    multimat = mat_handle->GetTextureLayerCount () > 0;
     txt_handle = mat_handle->GetTexture ();
     txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
     tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
@@ -1378,7 +1378,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   //=================
   if (multimat)
   {
-    for (j = 0 ; j < mat_handle->GetNumTextureLayers () ; j++)
+    for (j = 0 ; j < mat_handle->GetTextureLayerCount () ; j++)
     {
       csTextureLayer* layer = mat_handle->GetTextureLayer (j);
       iTextureHandle* txt_handle = layer->txt_handle;
@@ -2103,7 +2103,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     // mesh.
     csPoly3D obj_frustum;
     int mir_i;
-    num_frust = frustum.GetNumVertices ();
+    num_frust = frustum.GetVertexCount ();
     for (i = 0 ; i < num_frust ; i++)
     {
       if (mirror) mir_i = num_frust-i-1;
@@ -2447,7 +2447,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
-      		clipper->GetNumVertices ()
+      		clipper->GetVertexCount ()
 		>= GLCaps.nr_hardware_planes-reserved_planes)
         continue;
       how_clip = c;
@@ -2615,7 +2615,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
     	mesh.clip_z_plane != CS_CLIP_NOT);
     clip_planes_enabled = true;
-    for (i = 0 ; i < frustum.GetNumVertices ()+reserved_planes ; i++)
+    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
@@ -2724,7 +2724,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
       txt_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
     }
-    if (((csMaterialHandle*)mesh.mat_handle)->GetNumTextureLayers () > 0)
+    if (((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount () > 0)
       m_multimat = (csMaterialHandle*)mesh.mat_handle;
   }
   m_alpha = SetupBlend (m_mixmode, m_alpha, txt_alpha);
@@ -2822,7 +2822,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       uv_mul_verts.SetLimit (num_vertices);
 
     int j;
-    for (j = 0 ; j < mat->GetNumTextureLayers () ; j++)
+    for (j = 0 ; j < mat->GetTextureLayerCount () ; j++)
     {
       csTextureLayer* layer = mat->GetTextureLayer (j);
       iTextureHandle* txt_handle = layer->txt_handle;
@@ -2941,7 +2941,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (stencil_enabled)
     glDisable (GL_STENCIL_TEST);
   if (clip_planes_enabled)
-    for (i = 0 ; i < frustum.GetNumVertices ()+reserved_planes ; i++)
+    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 
   SetMirrorMode (false);
@@ -2972,7 +2972,7 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
     texture_cache->Cache (txt_handle);
   // Also cache all textures used in the texture layers.
   int i;
-  for (i = 0 ; i < mat_handle->GetNumTextureLayers () ; i++)
+  for (i = 0 ; i < mat_handle->GetTextureLayerCount () ; i++)
   {
     iTextureHandle* txt_layer_handle = mat_handle->GetTextureLayer (i)->
     	txt_handle;
@@ -3236,7 +3236,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // the shortcut works only if there is a lightmap and no fog and
   // no multitexturing
   csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
-  if (!thelightmap || poly.use_fog || mat_handle->GetNumTextureLayers () > 0)
+  if (!thelightmap || poly.use_fog || mat_handle->GetTextureLayerCount () > 0)
   {
     DrawPolygonSingleTexture (poly);
     return true;

@@ -56,7 +56,7 @@ public:
   /**
    * Get the number of edges.
    */
-  int GetNumEdges () { return num_edges; }
+  int GetEdgeCount () { return num_edges; }
 
   /**
    * Get the array with all edges.
@@ -111,7 +111,7 @@ public:
   /**
    * Set the number of edges.
    */
-  void SetNumEdges (int n) { MakeRoom (n); num_edges = n; }
+  void SetEdgeCount (int n) { MakeRoom (n); num_edges = n; }
 
   /**
    * Add a edge (2D) to the polygon.

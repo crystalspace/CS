@@ -160,19 +160,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         m = identity;
         break;
       case CS_TOKEN_ROT_X:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csXRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Y:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csYRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Z:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csZRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 3)
         {
           m *= csXRotMatrix3 (list[0]);
@@ -183,19 +183,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 	  //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
         break;
       case CS_TOKEN_SCALE_X:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csXScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Y:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csYScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Z:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csZScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	  m *= list[0];
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
@@ -209,7 +209,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
   {
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
-    ScanStr (buf, "%F", list, &num);
+    csScanStr (buf, "%F", list, &num);
     if (num == 1)
       m = csMatrix3 () * list[0];
     else if (num == 9)
@@ -225,7 +225,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 
 static bool load_vector (char* buf, csVector3 &v)
 {
-  ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
   return true;
 }
 
@@ -263,7 +263,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -365,7 +365,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
       case CS_TOKEN_VERTICES:
         {
           int list[1000], num;	//@@@ HARDCODED!!!
-          ScanStr (params, "%D", list, &num);
+          csScanStr (params, "%D", list, &num);
           for (int i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
         }
         break;
@@ -453,7 +453,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -503,7 +503,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             switch (cmd)
             {
               case CS_TOKEN_F:
-                ScanStr (params2, "%s,%d", fn, &d);
+                csScanStr (params2, "%s,%d", fn, &d);
                 iSpriteFrame* ff = spr3dLook->FindFrame (fn);
                 if (!ff)
                 {
@@ -544,13 +544,13 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
             switch (cmd)
             {
               case CS_TOKEN_V:
-                ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+                csScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
                 // check if it's the first frame
-                if (spr3dLook->GetNumFrames () == 1)
+                if (spr3dLook->GetFrameCount () == 1)
                 {
                   spr3dLook->AddVertices (1);
                 }
-                else if (i >= spr3dLook->GetNumTexels ())
+                else if (i >= spr3dLook->GetTexelCount ())
                 {
 		  //@@@ Error handling!
                   //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
@@ -576,11 +576,11 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 	    fact->DecRef ();
 	    return NULL;
           }
-          if (i < spr3dLook->GetNumTexels ())
+          if (i < spr3dLook->GetTexelCount ())
           {
 	    //@@@ Error handling!
             //CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
-                //fr->GetName (), i, state->GetNumTexels ());
+                //fr->GetName (), i, state->GetTexelCount ());
 	    printf ("Too few vertices!\n");
 	    spr3dLook->DecRef ();
 	    fact->DecRef ();
@@ -592,7 +592,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_TRIANGLE:
         {
           int a, b, c;
-          ScanStr (params, "%d,%d,%d", &a, &b, &c);
+          csScanStr (params, "%d,%d,%d", &a, &b, &c);
           spr3dLook->AddTriangle (a, b, c);
         }
         break;
@@ -600,7 +600,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_SMOOTH:
         {
           int num, list[30];
-          ScanStr (params, "%D", list, &num);
+          csScanStr (params, "%D", list, &num);
           switch (num)
           {
             case 0  :  spr3dLook->MergeNormals ();                  break;
@@ -615,7 +615,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_TWEEN:
 	{
 	  bool do_tween;
-          ScanStr (params, "%b", &do_tween);
+          csScanStr (params, "%b", &do_tween);
           spr3dLook->EnableTweening (do_tween);
 	}
 	break;
@@ -646,19 +646,19 @@ bool csSprite3DFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA) {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 
@@ -668,7 +668,7 @@ static void WriteMatrix(const csMatrix3& m, iStrVector* str)
   char buf[MAXLINE];
   sprintf(buf, "MATRIX (%g,%g,%g,%g,%g,%g,%g,%g,%g)", m.m11, m.m12, m.m13,
     m.m21, m.m22, m.m23, m.m31, m.m32, m.m33);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 }
 
 
@@ -678,29 +678,29 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
   iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
   int i;
   char buf[MAXLINE];
-  str->Push(strnew("VERTICES ("));
-  for(i=0; i<limb->GetNumVertices(); i++)
+  str->Push(csStrNew("VERTICES ("));
+  for(i=0; i<limb->GetVertexCount(); i++)
   {
     sprintf(buf, "%d%s", limb->GetVertices()[i], 
-      (i==limb->GetNumVertices()-1)?"":",");
-    str->Push(strnew(buf));
+      (i==limb->GetVertexCount()-1)?"":",");
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
-  str->Push(strnew("TRANSFORM ("));
+  str->Push(csStrNew("TRANSFORM ("));
   WriteMatrix(con->GetTransformation().GetO2T(), str);
   sprintf(buf, " V(%g,%g,%g))", con->GetTransformation().GetO2TTranslation().x,
     con->GetTransformation().GetO2TTranslation().y, 
     con->GetTransformation().GetO2TTranslation().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   iSkeletonLimb *ch = limb->GetChildren();
   while(ch)
   {
     sprintf(buf, "LIMB '%s' (", ch->GetName());
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     SaveSkeleton(ch, str);
-    str->Push(strnew(")\n"));
+    str->Push(csStrNew(")\n"));
     ch = ch->GetNextSibling();
   }
 
@@ -715,45 +715,45 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   int i,j;
-  for(i=0; i<state->GetNumFrames(); i++)
+  for(i=0; i<state->GetFrameCount(); i++)
   {
     iSpriteFrame* frame = state->GetFrame(i);
     sprintf(buf, "FRAME '%s' (\n", frame->GetName());
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
     int anm_idx = frame->GetAnmIndex ();
     int tex_idx = frame->GetTexIndex ();
-    for(j=0; j<state->GetNumTexels(); j++)
+    for(j=0; j<state->GetTexelCount(); j++)
     {
       sprintf(buf, "  V(%g,%g,%g:%g,%g)\n", state->GetVertex(anm_idx, j).x,
         state->GetVertex(anm_idx, j).y, state->GetVertex(anm_idx, j).z,
 	state->GetTexel(tex_idx, j).x, state->GetTexel(tex_idx, j).y);
-      str->Push(strnew(buf));
+      str->Push(csStrNew(buf));
     }
-    str->Push(strnew(")\n"));
+    str->Push(csStrNew(")\n"));
   }
 
-  for(i=0; i<state->GetNumActions(); i++)
+  for(i=0; i<state->GetActionCount(); i++)
   {
     iSpriteAction* action = state->GetAction(i);
     sprintf(buf, "ACTION '%s' (", action->GetName());
-    str->Push(strnew(buf));
-    for(j=0; j<action->GetNumFrames(); j++)
+    str->Push(csStrNew(buf));
+    for(j=0; j<action->GetFrameCount(); j++)
     {
       sprintf(buf, " F(%s,%d)", action->GetFrame(j)->GetName(),
         action->GetFrameDelay(j));
-      str->Push(strnew(buf));
+      str->Push(csStrNew(buf));
     }
-    str->Push(strnew(")\n"));
+    str->Push(csStrNew(")\n"));
   }
 
-  for(i=0; i<state->GetNumTriangles(); i++)
+  for(i=0; i<state->GetTriangleCount(); i++)
   {
     sprintf(buf, "TRIANGLE (%d,%d,%d)\n", state->GetTriangle(i).a,
       state->GetTriangle(i).b, state->GetTriangle(i).c);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
 
   iSkeleton *skeleton = state->GetSkeleton();
@@ -764,9 +764,9 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
     while(skelp) 
     {
       sprintf(buf, "SKELETON '%s' (\n", skelp->GetName());
-      str->Push(strnew(buf));
+      str->Push(csStrNew(buf));
       SaveSkeleton(skelp, str);
-      str->Push(strnew(")\n"));
+      str->Push(csStrNew(")\n"));
       skelp = skelp->GetNextSibling();
     }
     skellimb->DecRef();
@@ -778,7 +778,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   /// or a list of SMOOTH(basenr, framenr);
 
   sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   state->DecRef();
 }
@@ -837,7 +837,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -852,26 +852,26 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_ACTION:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
 	spr3dLook->SetAction (str);
         break;
       case CS_TOKEN_BASECOLOR:
 	{
 	  csColor col;
-          ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+          csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
 	  spr3dLook->SetBaseColor (col);
 	}
         break;
       case CS_TOKEN_LIGHTING:
 	{
 	  bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
 	  spr3dLook->SetLighting (do_lighting);
 	}
         break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -889,7 +889,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	break;
 	  case CS_TOKEN_APPLY_MOTION:
 	{
-	  ScanStr( params, "%s", str);
+	  csScanStr( params, "%s", str);
 	  iMotionManager *motman = QUERY_PLUGIN_CLASS( sys, 
 		"crystalspace.motion.manager.default","MotionManager",iMotionManager);
 	  if (!motman) 
@@ -924,7 +924,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_TWEEN:
 	{
 	  bool do_tween;
-          ScanStr (params, "%b", &do_tween);
+          csScanStr (params, "%b", &do_tween);
           spr3dLook->EnableTweening (do_tween);
 	}
 	break;
@@ -968,7 +968,7 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(state->GetMixMode() != CS_FX_COPY)
   {
@@ -978,16 +978,16 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
   {
     sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
       QueryObject ()->GetName());
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
   sprintf(buf, "LIGHTING (%s)\n", state->IsLighting ()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "TWEEN (%s)\n", state->IsTweeningEnabled()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->GetCurAction())
   {
     sprintf(buf, "ACTION (%s)\n", state->GetCurAction()->GetName());
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
   fact->DecRef();
   factstate->DecRef();

@@ -200,8 +200,8 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual bool GetFullScreen ()
   { return false; }
 
-  virtual int GetNumPalEntries ()
-  { return g2d->GetNumPalEntries (); }
+  virtual int GetPalEntryCount ()
+  { return g2d->GetPalEntryCount (); }
 
   virtual csRGBpixel *GetPalette ()
   { return g2d->GetPalette (); }

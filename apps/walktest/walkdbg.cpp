@@ -108,7 +108,7 @@ void select_object (iRenderView* rview, int type, void* entity)
   {
     int i;
     csPolygon2D* polygon = (csPolygon2D*)entity;
-    int num = polygon->GetNumVertices ();
+    int num = polygon->GetVertexCount ();
     csPolygon2D* pp = new csPolygon2D ();
     if (rview->IsMirrored ())
       for (i = 0 ; i < num ; i++)
@@ -117,7 +117,7 @@ void select_object (iRenderView* rview, int type, void* entity)
       for (i = 0 ; i < num ; i++)
         pp->AddVertex  (polygon->GetVertices ()[i]);
     if (csMath2::InPoly2D (coord_check_vector, pp->GetVertices (),
-        pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
+        pp->GetVertexCount (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
       //Dumper::dump (polygon, "csPolygon2D");
 
     delete pp;
@@ -172,8 +172,8 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
     int j;
     csWfPolygon* po = wf->AddPolygon ();
     po->SetVisColor (wf->GetYellow ());
-    po->SetNumVertices (poly->GetVertices ().GetNumVertices ());
-    for (j = 0 ; j < poly->GetVertices ().GetNumVertices () ; j++)
+    po->SetGetVertexCount (poly->GetVertices ().GetVertexCount ());
+    for (j = 0 ; j < poly->GetVertices ().GetVertexCount () ; j++)
       po->SetVertex (j, poly->Vwor (j));
     po->Prepare ();
   }

@@ -71,7 +71,7 @@ private:
 csConfigNode::csConfigNode(const char *Keyname)
 {
   Prev = Next = NULL;
-  Name = strnew(Keyname);
+  Name = csStrNew(Keyname);
   Data = Comment = NULL;
 }
 
@@ -123,7 +123,7 @@ void csConfigNode::Remove()
 void csConfigNode::SetStr(const char *s)
 {
   if (Data) delete[] Data;
-  Data = strnew(s);
+  Data = csStrNew(s);
 }
 
 void csConfigNode::SetInt(int n)
@@ -148,7 +148,7 @@ void csConfigNode::SetBool(bool b)
 void csConfigNode::SetComment(const char *s)
 {
   if (Comment) delete[] Comment;
-  Comment = strnew(s);
+  Comment = csStrNew(s);
 }
 
 const char *csConfigNode::GetStr() const
@@ -245,7 +245,7 @@ csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
   CONSTRUCT_IBASE(NULL);
   Config = c;
   Node = Config->FirstNode;
-  Subsection = strnew(sub);
+  Subsection = csStrNew(sub);
   SubsectionLength = (Subsection ? strlen(Subsection) : 0);
   Config->IncRef();
 }
@@ -403,7 +403,7 @@ void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
   if (Filename) delete[] Filename;
   if (VFS) VFS->DecRef();
 
-  Filename = strnew(fName);
+  Filename = csStrNew(fName);
   VFS = vfs;
   if (VFS) VFS->IncRef();
   Dirty = true;
@@ -808,7 +808,7 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 void csConfigFile::SetEOFComment(const char *text)
 {
   if (EOFComment) delete[] EOFComment;
-  EOFComment = (text ? strnew(text) : NULL);
+  EOFComment = (text ? csStrNew(text) : NULL);
   Dirty = true;
 }
 

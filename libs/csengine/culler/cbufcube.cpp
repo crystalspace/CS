@@ -96,7 +96,7 @@ bool csCBufferPersp::InsertPolygon (csVector3* verts, int num_verts,
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::InsertPolygon (persp.GetVertices (),
-  	persp.GetNumVertices ());
+  	persp.GetVertexCount ());
 }
 
 bool csCBufferPersp::TestPolygon (csVector3* verts, int num_verts,
@@ -106,7 +106,7 @@ bool csCBufferPersp::TestPolygon (csVector3* verts, int num_verts,
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::TestPolygon (persp.GetVertices (),
-  	persp.GetNumVertices ());
+  	persp.GetVertexCount ());
 }
 
 //-----------------------------------------------------------------

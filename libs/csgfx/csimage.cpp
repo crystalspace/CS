@@ -182,7 +182,7 @@ void *csImageFile::GetImageData ()
 void csImageFile::SetName (const char *iName)
 {
   delete [] fName;
-  fName = strnew (iName);
+  fName = csStrNew (iName);
 }
 
 const char *csImageFile::GetName ()

@@ -202,7 +202,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -258,62 +258,62 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_REVERSED:
 	{
 	  bool r;
-	  ScanStr (params, "%b", &r);
+	  csScanStr (params, "%b", &r);
 	  ballstate->SetReversed (r);
 	}
 	break;
       case CS_TOKEN_TOPONLY:
 	{
 	  bool r;
-	  ScanStr (params, "%b", &r);
+	  csScanStr (params, "%b", &r);
 	  ballstate->SetTopOnly (r);
 	}
 	break;
       case CS_TOKEN_CYLINDRICAL:
 	{
 	  bool r;
-	  ScanStr (params, "%b", &r);
+	  csScanStr (params, "%b", &r);
 	  ballstate->SetCylindricalMapping (r);
 	}
 	break;
       case CS_TOKEN_LIGHTING:
 	{
 	  bool r;
-	  ScanStr (params, "%b", &r);
+	  csScanStr (params, "%b", &r);
 	  ballstate->SetLighting (r);
 	}
 	break;
       case CS_TOKEN_COLOR:
 	{
 	  csColor col;
-	  ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
 	  ballstate->SetColor (col);
 	}
 	break;
       case CS_TOKEN_RADIUS:
 	{
 	  float x, y, z;
-	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
+	  csScanStr (params, "%f,%f,%f", &x, &y, &z);
 	  ballstate->SetRadius (x, y, z);
 	}
 	break;
       case CS_TOKEN_SHIFT:
 	{
 	  float x, y, z;
-	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
+	  csScanStr (params, "%f,%f,%f", &x, &y, &z);
 	  ballstate->SetShift (x, y, z);
 	}
 	break;
       case CS_TOKEN_NUMRIM:
 	{
 	  int f;
-	  ScanStr (params, "%d", &f);
+	  csScanStr (params, "%d", &f);
 	  ballstate->SetRimVertices (f);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -327,7 +327,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -368,19 +368,19 @@ bool csBallSaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA) {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -409,7 +409,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
@@ -419,26 +419,26 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   float x=0, y=0, z=0;
   state->GetRadius(x, y, z);
   sprintf(buf, "RADIUS (%g, %g, %g)\n", x, y, z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SHIFT (%g, %g, %g)\n", state->GetShift ().x, 
     state->GetShift ().y, state->GetShift ().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if (!state->IsLighting ())
-    str->Push (strnew ("LIGHTING (no)\n"));
+    str->Push (csStrNew ("LIGHTING (no)\n"));
   if (state->IsReversed ())
-    str->Push (strnew ("REVERSED (yes)\n"));
+    str->Push (csStrNew ("REVERSED (yes)\n"));
   if (state->IsTopOnly ())
-    str->Push (strnew ("TOPONLY (yes)\n"));
+    str->Push (csStrNew ("TOPONLY (yes)\n"));
   if (state->IsCylindricalMapping ())
-    str->Push (strnew ("CYLINDRICAL (yes)\n"));
+    str->Push (csStrNew ("CYLINDRICAL (yes)\n"));
   csColor col = state->GetColor ();
   sprintf(buf, "COLOR (%g,%g,%g)\n", col.red, col.green, col.blue);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   mesh->DecRef();

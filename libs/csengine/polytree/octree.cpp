@@ -263,7 +263,7 @@ static void GetVertexComponents (csPolygonInt** polygons, int num, const csBox3&
   for (i = 0 ; i < num ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
     {
       const csVector3& v = p->Vwor (j);
       if (v.x >= box.MinX () && v.x <= box.MaxX ())
@@ -742,7 +742,7 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
 void csOctree::Cache (csOctreeNode* node, iFile* cf)
 {
   if (!node) return;
-  long const num = node->unsplit_polygons.GetNumPolygons ();
+  long const num = node->unsplit_polygons.GetPolygonCount ();
   // Consistency check
   WriteLong (cf, num);
   WriteVector3 (cf, node->GetCenter ());

@@ -115,7 +115,7 @@ class csSystemDriver : public iSystem
 
     csPluginOption (const char *iName, csVariantType iType, int iID, bool iValue, iConfig* iConfig)
     {
-      Name = strnew (iName);
+      Name = csStrNew (iName);
       Type = iType;
       ID = iID;
       Value = iValue;
@@ -438,7 +438,7 @@ public:
   /// Register a object that implements the iPlugIn interface as a plugin
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugIn *iObject);
   /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetNumPlugIns ();
+  virtual int GetPlugInCount ();
   /// Get the specified plugin from the plugin manager.
   virtual iBase* GetPlugIn (int idx);
 

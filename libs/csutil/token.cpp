@@ -21,9 +21,9 @@
 #include "cssysdef.h"
 #include "csutil/token.h"
 
-float get_token_float (char** buf)
+float csGetToken_float (char** buf)
 {
-  char* t = get_token (buf);
+  char* t = csGetToken (buf);
   if (!((*t >= '0' && *t <= '9') || *t == '-' || *t == '.'))
   {
     // Error situation. We handle this by return 0.
@@ -33,9 +33,9 @@ float get_token_float (char** buf)
   return rc;
 }
 
-int get_token_int (char** buf)
+int csGetToken_int (char** buf)
 {
-  char* t = get_token (buf);
+  char* t = csGetToken (buf);
   if (!((*t >= '0' && *t <= '9') || *t == '-'))
   {
     // Error situation. We handle this by return 0.
@@ -45,7 +45,7 @@ int get_token_int (char** buf)
   return rc;
 }
 
-char* get_token (char** buf)
+char* csGetToken (char** buf)
 {
   static char token[100];
   char* b = *buf, * t = token;
@@ -100,8 +100,8 @@ char* get_token (char** buf)
   return token;
 }
 
-void skip_token (char** buf, char* tok, char* /*msg*/)
+void csSkipToken (char** buf, char* tok, char* /*msg*/)
 {
-  char* t = get_token (buf);
+  char* t = csGetToken (buf);
   if (strcmp (t, tok)) return; // Error
 }

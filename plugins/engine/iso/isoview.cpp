@@ -97,8 +97,8 @@ void csIsoView::Draw()
   rview->SetClipper(clipper);
   rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
   rview->GetG3D()->ResetNearPlane ();
-  if(rview->GetNumBuckets() < engine->GetNumMaterials())
-    rview->CreateBuckets(engine->GetNumMaterials());
+  if(rview->GetNumBuckets() < engine->GetMaterialCount())
+    rview->CreateBuckets(engine->GetMaterialCount());
   PreCalc();
   
   for(int pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)

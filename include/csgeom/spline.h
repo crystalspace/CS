@@ -41,10 +41,10 @@ public:
   virtual ~csSpline ();
 
   /// Get the number of dimensions.
-  int GetNumDimensions () { return dimensions; }
+  int GetDimensionCount () { return dimensions; }
 
   /// Get the number of points.
-  int GetNumPoints () { return num_points; }
+  int GetPointCount () { return num_points; }
 
   /**
    * Insert a point after some index. If index == -1 add a point before all

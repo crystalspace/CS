@@ -245,19 +245,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         m = identity;
         break;
       case CS_TOKEN_ROT_X:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csXRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Y:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csYRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Z:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csZRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 3)
         {
           m *= csXRotMatrix3 (list[0]);
@@ -268,19 +268,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 	  printf ("Badly formed rotation: '%s'\n", params);
         break;
       case CS_TOKEN_SCALE_X:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csXScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Y:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csYScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Z:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csZScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	  m *= list[0];
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
@@ -294,7 +294,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
   {
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
-    ScanStr (buf, "%F", list, &num);
+    csScanStr (buf, "%F", list, &num);
     if (num == 1)
       m = csMatrix3 () * list[0];
     else if (num == 9)
@@ -310,7 +310,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 
 static bool load_vector (char* buf, csVector3 &v)
 {
-  ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
   return true;
 }
 
@@ -366,7 +366,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -482,7 +482,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     switch (cmd)
     {
       case CS_TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
         mat = engine->FindMaterial (str/*@@@, onlyRegion*/); //@@@ REGION SUPPORT?
         if (mat == NULL)
         {
@@ -494,7 +494,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
         }
@@ -502,28 +502,28 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_COSFACT:
         {
           float cosfact;
-          ScanStr (params, "%f", &cosfact);
+          csScanStr (params, "%f", &cosfact);
           poly3d->SetCosinusFactor (cosfact);
         }
         break;
       case CS_TOKEN_ALPHA:
         {
           int alpha;
-          ScanStr (params, "%d", &alpha);
+          csScanStr (params, "%d", &alpha);
           poly3d->SetAlpha (alpha * 655 / 256);
         }
         break;
       case CS_TOKEN_COLLDET:
         {
           bool do_colldet;
-          ScanStr (params, "%b", &do_colldet);
+          csScanStr (params, "%b", &do_colldet);
 	  if (do_colldet) set_colldet = 1;
 	  else set_colldet = -1;
         }
         break;
       case CS_TOKEN_PORTAL:
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iSector* s = engine->CreateSector (str, false);
           poly3d->CreatePortal (s);
         }
@@ -591,37 +591,37 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
               tx1_given = true;
               int num;
               float flist[100];
-              ScanStr (params2, "%F", flist, &num);
+              csScanStr (params2, "%F", flist, &num);
               if (num == 1) tx_orig = thing_state->GetVertex ((int)flist[0]);
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_FIRST:
 	      tx_uv_given = false;
               tx1_given = true;
-              ScanStr (params2, "%F", flist, &num);
+              csScanStr (params2, "%F", flist, &num);
               if (num == 1) tx1 = thing_state->GetVertex ((int)flist[0]);
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_FIRST_LEN:
 	      tx_uv_given = false;
-              ScanStr (params2, "%f", &tx1_len);
+              csScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
             case CS_TOKEN_SECOND:
 	      tx_uv_given = false;
               tx2_given = true;
-              ScanStr (params2, "%F", flist, &num);
+              csScanStr (params2, "%F", flist, &num);
               if (num == 1) tx2 = thing_state->GetVertex ((int)flist[0]);
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_SECOND_LEN:
 	      tx_uv_given = false;
-              ScanStr (params2, "%f", &tx2_len);
+              csScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
             case CS_TOKEN_LEN:
 	      tx_uv_given = false;
-              ScanStr (params2, "%f", &tx_len);
+              csScanStr (params2, "%f", &tx_len);
               break;
             case CS_TOKEN_MATRIX:
 	      tx_uv_given = false;
@@ -635,13 +635,13 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
               break;
             case CS_TOKEN_PLANE:
 	      tx_uv_given = false;
-              ScanStr (params2, "%s", str);
+              csScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
               break;
             case CS_TOKEN_UV_SHIFT:
               uv_shift_given = true;
-              ScanStr (params2, "%f,%f", &u_shift, &v_shift);
+              csScanStr (params2, "%f,%f", &u_shift, &v_shift);
               break;
             case CS_TOKEN_UVEC:
               tx1_given = true;
@@ -661,7 +661,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 	      {
 		float u1, v1, u2, v2, u3, v3;
 		tx_uv_given = true;
-                ScanStr (params2, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
+                csScanStr (params2, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
 			&tx_uv_i1, &u1, &v1,
 			&tx_uv_i2, &u2, &v2,
 			&tx_uv_i3, &u3, &v3);
@@ -676,7 +676,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       case CS_TOKEN_VERTICES:
         {
           int list[100], num;
-          ScanStr (params, "%D", list, &num);
+          csScanStr (params, "%D", list, &num);
           for (i = 0 ; i < num ; i++)
 	  {
 	    if (list[i] == list[(i-1+num)%num])
@@ -722,7 +722,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [2 * 100];
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
 	  int j;
           for (j = 0; j < num; j++)
@@ -738,7 +738,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
           int num, nv = poly3d->GetVertexCount ();
 	  gs->Setup (poly3d);
           float list [3 * 100];
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
 	  int j;
           for (j = 0; j < num; j++)
@@ -755,7 +755,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [3 * 100];
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
 	  int j;
           for (j = 0; j < num; j++)
@@ -929,7 +929,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	}
 	else
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
           if (!fact)
           {
@@ -963,7 +963,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	}
 	else
         {
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshWrapper* wrap = engine->FindMeshObject (str);
           if (!wrap)
           {
@@ -996,7 +996,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
       case CS_TOKEN_VERTEX:
         {
 	  csVector3 v;
-          ScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
+          csScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
           thing_state->CreateVertex (v);
         }
         break;
@@ -1004,7 +1004,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         {
           float x, y, z, rx, ry, rz;
           int num, dir;
-          ScanStr (params, "%f,%f,%f:%f,%f,%f,%d",
+          csScanStr (params, "%f,%f,%f:%f,%f,%f,%d",
 	  	&x, &y, &z, &rx, &ry, &rz, &num);
           if (num < 0) { num = -num; dir = -1; }
           else dir = 1;
@@ -1041,7 +1041,7 @@ Nag to Jorrit about this feature if you want it.\n");
         {
           csFog& f = thing->GetFog ();
           f.enabled = true;
-          ScanStr (params, "%f,%f,%f,%f",
+          csScanStr (params, "%f,%f,%f,%f",
 	  	&f.red, &f.green, &f.blue, &f.density);
         }
 #endif
@@ -1058,7 +1058,7 @@ Nag to Jorrit about this feature if you want it.\n");
       case CS_TOKEN_CURVE:
         {
 	  char cname[100];
-	  ScanStr (params, "%s", cname);
+	  csScanStr (params, "%s", cname);
 	  iCurveTemplate* ct = engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (name);
@@ -1070,14 +1070,14 @@ Nag to Jorrit about this feature if you want it.\n");
       case CS_TOKEN_CURVECENTER:
         {
           csVector3 c;
-          ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
+          csScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
           thing_state->SetCurvesCenter (c);
         }
         break;
       case CS_TOKEN_CURVESCALE:
         {
 	  float f;
-          ScanStr (params, "%f", &f);
+          csScanStr (params, "%f", &f);
 	  thing_state->SetCurvesScale (f);
           break;
         }
@@ -1085,13 +1085,13 @@ Nag to Jorrit about this feature if you want it.\n");
         {
           csVector3 v;
           csVector2 t;
-          ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
+          csScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
           thing_state->AddCurveVertex (v, t);
         }
         break;
 
       case CS_TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
         info.default_material = engine->FindMaterial (str
 		/*@@@ REGIONS?, onlyRegion*/);
         if (info.default_material == NULL)
@@ -1101,10 +1101,10 @@ Nag to Jorrit about this feature if you want it.\n");
         }
         break;
       case CS_TOKEN_TEXLEN:
-        ScanStr (params, "%f", &info.default_texlen);
+        csScanStr (params, "%f", &info.default_texlen);
         break;
       case CS_TOKEN_MAT_SET_SELECT:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
         info.SetTextureSet (str);
         info.use_mat_set = true;
         break;
@@ -1176,7 +1176,7 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   char name[MAXLINE];
   csFindReplace (name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf (buf, "FACTORY ('%s')\n", name);
-  str->Push (strnew (buf));
+  str->Push (csStrNew (buf));
   fact->DecRef ();
 }
 
@@ -1236,7 +1236,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
     switch (cmd)
     {
       case CS_TOKEN_NAME:
-        ScanStr (params, "%s", name);
+        csScanStr (params, "%s", name);
 	ppl->QueryObject()->SetName (name);
         break;
       case CS_TOKEN_ORIG:
@@ -1248,7 +1248,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
         load_vector (params, tx1);
         break;
       case CS_TOKEN_FIRST_LEN:
-        ScanStr (params, "%f", &tx1_len);
+        csScanStr (params, "%f", &tx1_len);
         tx1_given = true;
         break;
       case CS_TOKEN_SECOND:
@@ -1256,7 +1256,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
         load_vector (params, tx2);
         break;
       case CS_TOKEN_SECOND_LEN:
-        ScanStr (params, "%f", &tx2_len);
+        csScanStr (params, "%f", &tx2_len);
         tx2_given = true;
         break;
       case CS_TOKEN_MATRIX:
@@ -1386,11 +1386,11 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
     switch (cmd)
     {
       case CS_TOKEN_NAME:
-        ScanStr (params, "%s", name);
+        csScanStr (params, "%s", name);
 	tmpl->QueryObject()->SetName (name);
         break;
       case CS_TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
         mat = engine->FindMaterial (str/*@@@, onlyRegion*/); //@@@ REGION SUPPORT?
         if (mat == NULL)
         {
@@ -1402,7 +1402,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_VERTICES:
         {
           int list[100], num;
-          ScanStr (params, "%D", list, &num);
+          csScanStr (params, "%D", list, &num);
           if (num != 9)
           {
             printf ("Wrong number of vertices to bezier!\n");

@@ -93,7 +93,7 @@ public:
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /// Number of texture layers.
-  virtual int GetNumTextureLayers () { return 0; }
+  virtual int GetTextureLayerCount () { return 0; }
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int) { return NULL; }
   /// Set the flat shading color
@@ -265,7 +265,7 @@ public:
       if (mw) return &(mw->scfiMaterialWrapper);
       else return NULL;
     }
-    virtual int GetNumMaterials ()
+    virtual int GetMaterialCount ()
     {
       return scfParent->Length ();
     }

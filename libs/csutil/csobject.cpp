@@ -135,7 +135,7 @@ csObject::~csObject ()
 void csObject::SetName (const char *iName)
 {
   delete [] Name;
-  Name = strnew (iName);
+  Name = csStrNew (iName);
 }
 
 const char *csObject::GetName () const

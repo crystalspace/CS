@@ -143,7 +143,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   // Then append "_scfInitialize" to the file name to get the name of
   // the exported function.
   char name [200];
-  splitpath (iLibraryName, NULL, 0, name, 200);
+  csSplitPath (iLibraryName, NULL, 0, name, 200);
   strcat (name, "_scfInitialize");
 
   scfInitializeFunc func =
@@ -233,11 +233,11 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 {
   // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
   scfRefCount = 0; scfParent = NULL;
-  ClassID = strnew (iClassID);
+  ClassID = csStrNew (iClassID);
   ClassInfo = NULL;
-  Dependencies = strnew (iDepend);
+  Dependencies = csStrNew (iDepend);
 #ifndef CS_STATIC_LINKED
-  LibraryName = strnew (iLibraryName);
+  LibraryName = csStrNew (iLibraryName);
   Library = NULL;
 #else
   (void)iLibraryName;
@@ -250,9 +250,9 @@ scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 {
   // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
   scfRefCount = 0; scfParent = NULL;
-  ClassID = strnew (iClassInfo->ClassID);
+  ClassID = csStrNew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
-  Dependencies = strnew (iClassInfo->Dependencies);
+  Dependencies = csStrNew (iClassInfo->Dependencies);
 #ifndef CS_STATIC_LINKED
   LibraryName = NULL;
   Library = NULL;
@@ -570,7 +570,7 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
-        v->Push(strnew(s));
+        v->Push(csStrNew(s));
     }
   }
   return QUERY_INTERFACE(v, iStrVector);

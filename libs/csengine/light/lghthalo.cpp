@@ -72,7 +72,7 @@ csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
 
 uint8 *csCrossHalo::Generate (int Size)
 {
-  return GenerateHalo (Size, IntensityFactor, CrossFactor);
+  return csGenerateHalo (Size, IntensityFactor, CrossFactor);
 }
 
 //----------------------------------------------------------+ csNovaHalo +---//
@@ -96,7 +96,7 @@ csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
 
 uint8 *csNovaHalo::Generate (int Size)
 {
-  return GenerateNova (Size, Seed, NumSpokes, Roundness);
+  return csGenerateNova (Size, Seed, NumSpokes, Roundness);
 }
 
 //---------------------------------------------------------+ csFlareHalo +---//

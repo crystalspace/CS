@@ -50,8 +50,8 @@ public:
     pCacheData = NULL;
     alpha = NULL;
     realwidth = width; realheight = height;
-    this->width = FindNearestPowerOf2( width );
-    this->height = FindNearestPowerOf2( height );
+    this->width = csFindNearestPowerOf2( width );
+    this->height = csFindNearestPowerOf2( height );
 //    printf("nearest: %d %d\n", this->width, this->height);
 //    if ( realwidth < this->width ) this->width >>= 1;
 //    if ( realheight < this->height ) this->height >>= 1;

@@ -142,7 +142,7 @@ real csRigidSpaceTimeObj::collision_check()
       CD_contact = cdsys->GetCollisionPairs ();
     }
 
-    space_time_continuum[i]->num_collisions = cdsys->GetNumCollisionPairs ();
+    space_time_continuum[i]->num_collisions = cdsys->GetCollisionPairCount ();
     space_time_continuum[i]->contact = NULL;
     contact_heap_index = 0;
     // determine type of collision and penetration depth
@@ -157,7 +157,7 @@ real csRigidSpaceTimeObj::collision_check()
       this_contact = &(contact_heap [contact_heap_index]);
       this_contact->next = NULL;
       
-      for ( int acol = 0; acol < cdsys->GetNumCollisionPairs (); acol++ )
+      for ( int acol = 0; acol < cdsys->GetCollisionPairCount (); acol++ )
       {
         space_time_continuum[i]->cd_contact[acol] = CD_contact[acol];
 

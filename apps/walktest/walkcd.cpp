@@ -223,7 +223,7 @@ int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt)
   if (c->Collide (sp->QueryObject (), cdt)) hit++;
   csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
 
-  for (i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
+  for (i=0 ; i<Sys->collide_system->GetCollisionPairCount () ; i++)
     our_cd_contact[num_our_cd++] = CD_contact[i];
 
   if (Sys->collide_system->GetOneHitOnly () && hit)
@@ -237,7 +237,7 @@ int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt)
     if (c->Collide (tp->QueryObject (), cdt, &tp->GetMovable ()->GetTransform ())) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
-    for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)
+    for (int j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
       our_cd_contact[num_our_cd++] = CD_contact[j];
 
     if (Sys->collide_system->GetOneHitOnly () && hit)

@@ -202,7 +202,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -259,7 +259,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!mp) { printf("Please set FACTORY before ISO_LEVEL\n"); return NULL; }
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  mp->iso_level = f;
 	}
 	break;
@@ -267,7 +267,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!mp) { printf("Please set FACTORY before CHARGE\n"); return NULL; }
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  mp->charge = f;
 	}
 	break;
@@ -275,15 +275,15 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!ballstate) { printf("Please set FACTORY before NUMBER\n"); return NULL; }
 	  int r;
-	  ScanStr (params, "%d", &r);
-	  ballstate->SetNumberMetaBalls (r);
+	  csScanStr (params, "%d", &r);
+	  ballstate->SetMetaBallCount (r);
 	}
 	break;
       case CS_TOKEN_RATE:
 	{
 	  if (!mp) { printf("Please set FACTORY before RATE\n"); return NULL; }
 	  float r;
-	  ScanStr (params, "%f", &r);
+	  csScanStr (params, "%f", &r);
 	  mp->rate = r;
 	}
 	break;
@@ -291,7 +291,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!ballstate) { printf("Please set FACTORY before TRUE_MAP\n"); return NULL; }
 	  bool m;
-	  ScanStr (params, "%b", &m);
+	  csScanStr (params, "%b", &m);
 	  ballstate->SetQualityEnvironmentMapping (m);
 	}
 	break;
@@ -299,13 +299,13 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	{
 	  if (!ballstate) { printf("Please set FACTORY before TEX_SCALE\n"); return NULL; }
 	  float s;
-	  ScanStr (params, "%f", &s);
+	  csScanStr (params, "%f", &s);
 	  ballstate->SetEnvironmentMappingFactor(s);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-      ScanStr (params, "%s", str);
+      csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -321,7 +321,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MATERIAL:
 	{
 	  if (!ballstate) { printf("Please set FACTORY before MATERIAL\n"); return NULL; }
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -339,7 +339,7 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 	  case CS_TOKEN_LIGHTING:
 		if (!ballstate) { printf("Please set FACTORY before MIXMODE\n"); return NULL; }
 		bool l;
-		ScanStr(params, "%b", &l);
+		csScanStr(params, "%b", &l);
 		ballstate->SetLighting(l);
 	break;
     }
@@ -369,19 +369,19 @@ bool csMetaBallSaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA) {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -410,7 +410,7 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
@@ -418,25 +418,25 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
 
   // Mesh information
   MetaParameters *mp = state->GetParameters();
-  sprintf(buf, "NUMBER (%d)\n", state->GetNumberMetaBalls());
-  str->Push(strnew(buf));
+  sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "ISO_LEVEL (%f)\n",mp->iso_level );
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "CHARGE (%f)\n", mp->charge);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterial()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING(%s)\n",(state->IsLighting())? "true" : "false");
-  str->Push (strnew (buf));
-  sprintf(buf, "NUMBER (%d)\n", state->GetNumberMetaBalls());
-  str->Push(strnew(buf));
+  str->Push (csStrNew (buf));
+  sprintf(buf, "NUMBER (%d)\n", state->GetMetaBallCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "RATE (%f)\n",mp->rate);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "TRUE_MAP (%s)\n",(state->GetQualityEnvironmentMapping())?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "TEX_SCALE (%f)\n",state->GetEnvironmentMappingFactor());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   mesh->DecRef();

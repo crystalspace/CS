@@ -1133,12 +1133,12 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   /// return the number of mesh objects
-  virtual int GetNumMeshObjects () const;
+  virtual int GetMeshObjectCount () const;
   /// return a mesh object by index
   virtual iMeshWrapper *GetMeshObject (int n) const;
 
   /// return the number of mesh factories
-  virtual int GetNumMeshFactories () const;
+  virtual int GetMeshFactoryCount () const;
   /// return a mesh factory by index
   virtual iMeshFactoryWrapper *GetMeshFactory (int n) const;
 
@@ -1177,12 +1177,12 @@ public:
   	const char* value);
 
   /// Get the number of collections in the engine
-  virtual int GetNumCollections () const;
+  virtual int GetCollectionCount () const;
   /// Get a collection by its index
   virtual iCollection* GetCollection (int idx) const;
 
   /// Get the number of camera positions in the engine
-  virtual int GetNumCameraPositions () const;
+  virtual int GetCameraPositionCount () const;
   /// Get a camera position by its index
   virtual iCameraPosition* GetCameraPosition (int idx) const;
 

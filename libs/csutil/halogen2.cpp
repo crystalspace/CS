@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 unsigned char*
-GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
+csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
 {
   csRandomGen rnd (iSeed);
   unsigned char *image = new unsigned char [iSize * iSize];

@@ -251,7 +251,7 @@ public:
   inline void SetLastShootingPriority(float val) {last_shoot_priority=val;}
 
   /// Get number of repeats shooting at the same priority for this poly.
-  inline int GetNumRepeats() { return num_repeats; }
+  inline int GetRepeatCount() { return num_repeats; }
   
   /// Increment the number of repeats of shooting at same priority by one.
   inline void IncNumRepeats() {num_repeats++;}
@@ -497,7 +497,7 @@ public:
   { if(tree) tree->TraverseInOrder(func); }
 
   /// get the number of elements in the list
-  inline int GetNumElements() { return num; }
+  inline int GetElementCount() { return num; }
 };
 
 /**

@@ -377,7 +377,7 @@ public:
   csVector3& Vcam (int idx) { return cam_verts[idx]; }
 
   /// Return the number of vertices.
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
 
   //----------------------------------------------------------------------
   // Polygon handling functions
@@ -390,7 +390,7 @@ public:
   csPolygon3D* NewPolygon (csMaterialWrapper* material);
 
   /// Get the number of polygons in this thing.
-  int GetNumPolygons ()
+  int GetPolygonCount ()
   { return polygons.Length (); }
 
   /// Get a csPolygonInt with the index.
@@ -414,7 +414,7 @@ public:
   void AddCurve (csCurve* curve);
 
   /// Get the number of curves in this thing.
-  int GetNumCurves ()
+  int GetCurveCount ()
   { return curves.Length (); }
 
   /// Get the specified curve from this set.
@@ -428,7 +428,7 @@ public:
   csCurve* GetCurve (char* name);
 
   /// Get the number of curve vertices.
-  int GetNumCurveVertices () { return num_curve_vertices; }
+  int GetCurveVertexCount () { return num_curve_vertices; }
 
   /// Get the specified curve vertex.
   csVector3& CurveVertex (int i) { return curve_vertices[i]; }
@@ -784,10 +784,10 @@ public:
     { return scfParent->curves_scale; }
     virtual void SetCurvesScale (float scale)
     { scfParent->curves_scale = scale; }
-    virtual int GetNumCurves ()
-    { return scfParent->GetNumCurves (); }
-    virtual int GetNumCurveVertices ()
-    { return scfParent->GetNumCurveVertices (); }
+    virtual int GetCurveCount ()
+    { return scfParent->GetCurveCount (); }
+    virtual int GetCurveVertexCount ()
+    { return scfParent->GetCurveVertexCount (); }
     virtual csVector3& CurveVertex (int i)
     { return scfParent->CurveVertex (i); }
     virtual csVector3* GetCurveVertices ()
@@ -822,9 +822,9 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csThing);
 
-    virtual int GetNumVertices () { return scfParent->GetNumVertices (); }
+    virtual int GetVertexCount () { return scfParent->GetVertexCount (); }
     virtual csVector3* GetVertices () { return scfParent->wor_verts; }
-    virtual int GetNumPolygons ()
+    virtual int GetPolygonCount ()
     {
       GetPolygons ();	// To make sure our count is ok.
       return num;

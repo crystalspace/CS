@@ -137,7 +137,7 @@ IMPLEMENT_IBASE_END
 csFreeTypeFont::csFreeTypeFont (const char *filename) : DeleteCallbacks (4, 4)
 {
   CONSTRUCT_IBASE (NULL);
-  name = strnew (filename);
+  name = csStrNew (filename);
   face.z = NULL;
   current = NULL;
 }

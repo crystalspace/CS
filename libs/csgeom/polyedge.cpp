@@ -106,8 +106,8 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
 
   onplane = false;
 
-  left.SetNumEdges (0);
-  right.SetNumEdges (0);
+  left.SetEdgeCount (0);
+  right.SetEdgeCount (0);
 
   for (i = 0 ; i < num_edges ; i++)
   {

@@ -143,7 +143,7 @@ void csView::UpdateView ()
   {
     int i;
     csVector2 *pverts = PolyView->GetVertices ();
-    int InCount = PolyView->GetNumVertices ();
+    int InCount = PolyView->GetVertexCount ();
     // scale poly
     for (i = 0; i < InCount; i++)
     {
@@ -196,7 +196,7 @@ void csView::RestrictClipperToScreen ()
   // so we only have to update polygon-based views
   if (PolyView)
   {
-    int InCount = PolyView->GetNumVertices (), OutCount;
+    int InCount = PolyView->GetVertexCount (), OutCount;
     csBoxClipper bc (0., 0., (float)G3D->GetWidth (), (float)G3D->GetHeight());
     csVector2 *TempPoly = new csVector2[InCount + 5];
     UByte rc = bc.Clip (PolyView->GetVertices (), InCount , TempPoly, OutCount);

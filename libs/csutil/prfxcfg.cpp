@@ -30,7 +30,7 @@ csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf,
   Prefix[len + 1] = 0;
   PrefixLength = len + 1;
 
-  if (AliasName) Alias = strnew (AliasName);
+  if (AliasName) Alias = csStrNew (AliasName);
   else Alias = NULL;
 
   Load(fName, vfs);

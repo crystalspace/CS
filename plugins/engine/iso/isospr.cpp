@@ -52,9 +52,9 @@ csIsoSprite::~csIsoSprite ()
 {
 }
 
-int csIsoSprite::GetNumVertices() const
+int csIsoSprite::GetVertexCount() const
 {
-  return poly.GetNumVertices();
+  return poly.GetVertexCount();
 }
 
 void csIsoSprite::AddVertex(const csVector3& coord, float u, float v)
@@ -212,7 +212,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
 
   //material->Visit ();
 
-  g3dpolyfx.num = poly.GetNumVertices ();
+  g3dpolyfx.num = poly.GetVertexCount ();
   g3dpolyfx.mat_handle = material->GetMaterialHandle();
   /// guesstimate of fov (angle) of view. 1/fov.
   g3d->SetPerspectiveAspect (180.);
@@ -259,7 +259,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
 
   if (clip_result != CS_CLIP_INSIDE)
     PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
-        clipped_vtstats, poly.GetNumVertices(), true);
+        clipped_vtstats, poly.GetVertexCount(), true);
 
   iIsoMaterialWrapperIndex *wrapindex = QUERY_INTERFACE(
     material, iIsoMaterialWrapperIndex);
@@ -290,9 +290,9 @@ void csIsoSprite::SetGrid(iIsoGrid *grid)
 
 void csIsoSprite::SetAllColors(const csColor& color)
 {
-  CS_ASSERT (poly.GetNumVertices () == colors.GetNumVertices ());
-  CS_ASSERT (poly.GetNumVertices () == static_colors.GetNumVertices ());
-  for(int i=0; i<poly.GetNumVertices(); i++)
+  CS_ASSERT (poly.GetVertexCount () == colors.GetVertexCount ());
+  CS_ASSERT (poly.GetVertexCount () == static_colors.GetVertexCount ());
+  for(int i=0; i<poly.GetVertexCount(); i++)
   {
     colors[i].Set(color.red, color.green, color.blue);
   }
@@ -300,8 +300,8 @@ void csIsoSprite::SetAllColors(const csColor& color)
 
 void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 {
-  CS_ASSERT (poly.GetNumVertices () == colors.GetNumVertices ());
-  CS_ASSERT (i >= 0 && i < colors.GetNumVertices ());
+  CS_ASSERT (poly.GetVertexCount () == colors.GetVertexCount ());
+  CS_ASSERT (i >= 0 && i < colors.GetVertexCount ());
   colors[i].x += color.red; 
   if(colors[i].x>1.0f) colors[i].x=1.0f;
   else if(colors[i].x < 0.0f) colors[i].x = 0.0f;
@@ -315,7 +315,7 @@ void csIsoSprite::AddToVertexColor(int i, const csColor& color)
 
 void csIsoSprite::ResetAllColors()
 {
-  for(int i=0; i<poly.GetNumVertices(); i++)
+  for(int i=0; i<poly.GetVertexCount(); i++)
   {
     colors[i] = static_colors[i];
   }
@@ -323,7 +323,7 @@ void csIsoSprite::ResetAllColors()
 
 void csIsoSprite::SetAllStaticColors(const csColor& color)
 {
-  for(int i=0; i<poly.GetNumVertices(); i++)
+  for(int i=0; i<poly.GetVertexCount(); i++)
   {
     static_colors[i].Set(color.red, color.green, color.blue);
   }
@@ -331,8 +331,8 @@ void csIsoSprite::SetAllStaticColors(const csColor& color)
 
 void csIsoSprite::AddToVertexStaticColor(int i, const csColor& color)
 {
-  CS_ASSERT (poly.GetNumVertices () == static_colors.GetNumVertices ());
-  CS_ASSERT (i >= 0 && i < static_colors.GetNumVertices ());
+  CS_ASSERT (poly.GetVertexCount () == static_colors.GetVertexCount ());
+  CS_ASSERT (i >= 0 && i < static_colors.GetVertexCount ());
   static_colors[i].x += color.red; 
   if(static_colors[i].x>1.0f) static_colors[i].x=1.0f;
   else if(static_colors[i].x < 0.0f) static_colors[i].x = 0.0f;

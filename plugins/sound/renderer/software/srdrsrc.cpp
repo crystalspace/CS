@@ -290,8 +290,8 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
   while (1) {
     long Num = NumSamples;
 
-    if (SoundPos + Num > snd->GetStaticNumSamples())
-      Num = snd->GetStaticNumSamples() - SoundPos;
+    if (SoundPos + Num > snd->GetStaticSampleCount())
+      Num = snd->GetStaticSampleCount() - SoundPos;
     unsigned char *Input = (unsigned char*)snd->GetStaticData();
 
     WriteBuffer(Input + SoundPos * InBPS, mem, Num);

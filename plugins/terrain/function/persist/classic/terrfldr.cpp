@@ -161,7 +161,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     {
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (pParams, "%s", pStr);
+          csScanStr (pParams, "%s", pStr);
 	  iTerrainFactoryWrapper* iFactory = iEngine->FindTerrainFactory (pStr);
 	  if (!iFactory)
 	  {
@@ -175,7 +175,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_MATERIAL:
 	{
 	  int i;
-          ScanStr (pParams, "%d,%s", &i, pStr);
+          csScanStr (pParams, "%d,%s", &i, pStr);
           iMaterialWrapper* mat = iEngine->FindMaterial (pStr);
 	  if (!mat)
 	  {
@@ -188,7 +188,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_GROUPMATERIAL:
 	{
 	  int rangeStart, rangeEnd;
-	  ScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
+	  csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
 	  iTerrainState->LoadMaterialGroup (iEngine, pStr,
 	  	rangeStart, rangeEnd);
 	}
@@ -196,42 +196,42 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_CORRECTSEAMS:
 	{
 	  int tw, th;
-	  ScanStr (pParams, "%d,%d", &tw, &th);
+	  csScanStr (pParams, "%d,%d", &tw, &th);
           iTerrainState->CorrectSeams (tw, th);
         }
         break;
       case CS_TOKEN_BLOCKS:
 	{
 	  int bx, by;
-	  ScanStr (pParams, "%d,%d", &bx, &by);
+	  csScanStr (pParams, "%d,%d", &bx, &by);
           iTerrainState->SetResolution (bx, by);
         }
         break;
       case CS_TOKEN_GRID:
 	{
 	  int bx, by;
-	  ScanStr (pParams, "%d,%d", &bx, &by);
+	  csScanStr (pParams, "%d,%d", &bx, &by);
           iTerrainState->SetGridResolution (bx, by);
         }
         break;
       case CS_TOKEN_TOPLEFT:
 	{
 	  csVector3 tl;
-	  ScanStr (pParams, "%f,%f,%f", &tl.x, &tl.y, &tl.z);
+	  csScanStr (pParams, "%f,%f,%f", &tl.x, &tl.y, &tl.z);
           iTerrainState->SetTopLeftCorner (tl);
         }
         break;
       case CS_TOKEN_SCALE:
 	{
 	  csVector3 s;
-	  ScanStr (pParams, "%f,%f,%f", &s.x, &s.y, &s.z);
+	  csScanStr (pParams, "%f,%f,%f", &s.x, &s.y, &s.z);
           iTerrainState->SetScale (s);
         }
         break;
       case CS_TOKEN_COLOR:
         {
 	  csColor col;
-	  ScanStr (pParams, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  csScanStr (pParams, "%f,%f,%f", &col.red, &col.green, &col.blue);
 	  iTerrainState->SetColor (col);
 	}
 	break;
@@ -239,7 +239,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  csVector3 pos;
 	  csColor col;
-	  ScanStr (pParams, "%f,%f,%f:%f,%f,%f", &pos.x, &pos.y, &pos.z,
+	  csScanStr (pParams, "%f,%f,%f:%f,%f,%f", &pos.x, &pos.y, &pos.z,
 	  	&col.red, &col.green, &col.blue);
 	  iTerrObj->SetDirLight (pos, col);
 	}
@@ -248,7 +248,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  int lod;
 	  float dist;
-	  ScanStr (pParams, "%d,%f", &lod, &dist);
+	  csScanStr (pParams, "%d,%f", &lod, &dist);
 	  iTerrainState->SetLODDistance (lod, dist);
 	}
 	break;
@@ -256,28 +256,28 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         {
 	  int lod;
 	  float cost;
-	  ScanStr (pParams, "%d,%f", &lod, &cost);
+	  csScanStr (pParams, "%d,%f", &lod, &cost);
 	  iTerrainState->SetMaximumLODCost (lod, cost);
 	}
 	break;
       case CS_TOKEN_QUADDEPTH:
         {
 	  int qd;
-	  ScanStr (pParams, "%d", &qd);
+	  csScanStr (pParams, "%d", &qd);
 	  iTerrainState->SetQuadDepth (qd);
 	}
         break;
       case CS_TOKEN_VISTEST:
         {
 	  bool vt;
-	  ScanStr (pParams, "%b", &vt);
+	  csScanStr (pParams, "%b", &vt);
 	  iTerrainState->SetVisTesting (vt);
 	}
         break;
       case CS_TOKEN_HEIGHTMAP:
         {
 	  float hscale, hshift;
-	  ScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
+	  csScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
 	  iVFS* vfs = QUERY_PLUGIN (pSystem, iVFS);
 	  if (!vfs)
 	  {

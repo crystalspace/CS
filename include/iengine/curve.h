@@ -63,7 +63,7 @@ struct iCurveTemplate : public iBase
   /// Make a curve from this template.
   virtual iCurve* MakeCurve () = 0;
   /// Get the number of vertices.
-  virtual int GetNumVertices () const = 0;
+  virtual int GetVertexCount () const = 0;
   /// Get a vertex.
   virtual int GetVertex (int idx) const = 0;
   /// Set a vertex.

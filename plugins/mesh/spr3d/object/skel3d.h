@@ -74,7 +74,7 @@ public:
   virtual int* GetVertices () const { return vertices; }
 
   /// Get the number of vertices.
-  virtual int GetNumVertices () const { return num_vertices; }
+  virtual int GetVertexCount () const { return num_vertices; }
 
   /// Get the bounding box.
   void GetBoundingBox (csBox3& b) const { b = box; }

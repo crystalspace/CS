@@ -117,7 +117,7 @@ bool csSkin::ReadGradient (const char *iText, csRGBcolor *color, int iNum)
     temp [end - iText] = 0;
     iText = end + 1;
     int r, g, b;
-    if (ScanStr (temp, "%d,%d,%d", &r, &g, &b) != 3)
+    if (csScanStr (temp, "%d,%d,%d", &r, &g, &b) != 3)
       return false;
     color [idx++].Set (r, g, b);
   }

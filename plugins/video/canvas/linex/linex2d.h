@@ -164,7 +164,7 @@ public:
   virtual bool Initialize (iSystem *)
   { return true; }
   virtual iFont *LoadFont (const char *filename);
-  virtual int GetNumFonts ()
+  virtual int GetFontCount ()
   { return font.xfont ? 1 : 0; }
   virtual iFont *GetFont (int iIndex)
   { (void)iIndex; return font.xfont ? &font : (iFont*)NULL; }

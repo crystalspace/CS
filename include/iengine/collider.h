@@ -82,7 +82,7 @@ struct iCollideSystem : public iPlugIn
   /**
    * Get number of collision pairs in array.
    */
-  virtual int GetNumCollisionPairs () = 0;
+  virtual int GetCollisionPairCount () = 0;
 
   /**
    * Reset the array with collision pairs.

@@ -51,11 +51,11 @@ int csBspNode::CountVertices ()
   if (front) num_verts += front->CountVertices ();
   if (back) num_verts += back->CountVertices ();
   int i;
-  for (i = 0 ; i < polygons.GetNumPolygons () ; i++)
+  for (i = 0 ; i < polygons.GetPolygonCount () ; i++)
   {
-    num_verts += polygons.GetPolygon (i)->GetNumVertices ();
+    num_verts += polygons.GetPolygon (i)->GetVertexCount ();
     if (polygons.GetPolygon (i)->GetUnsplitPolygon ())
-      num_verts += polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetNumVertices ();
+      num_verts += polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetVertexCount ();
   }
   return num_verts;
 }
@@ -65,16 +65,16 @@ void csBspNode::FetchVertices (int* array, int& cur_idx)
   if (front) front->FetchVertices (array, cur_idx);
   if (back) back->FetchVertices (array, cur_idx);
   int i;
-  for (i = 0 ; i < polygons.GetNumPolygons () ; i++)
+  for (i = 0 ; i < polygons.GetPolygonCount () ; i++)
   {
     int* idx = polygons.GetPolygon (i)->GetVertexIndices ();
-    int n = polygons.GetPolygon (i)->GetNumVertices ();
+    int n = polygons.GetPolygon (i)->GetVertexCount ();
     memcpy (array+cur_idx, idx, sizeof (int)*n);
     cur_idx += n;
     if (polygons.GetPolygon (i)->GetUnsplitPolygon ())
     {
       int* idx = polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetVertexIndices ();
-      int n = polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetNumVertices ();
+      int n = polygons.GetPolygon (i)->GetUnsplitPolygon ()->GetVertexCount ();
       memcpy (array+cur_idx, idx, sizeof (int)*n);
       cur_idx += n;
     }
@@ -83,7 +83,7 @@ void csBspNode::FetchVertices (int* array, int& cur_idx)
 
 int csBspNode::CountPolygons ()
 {
-  int count = polygons.GetNumPolygons ();
+  int count = polygons.GetPolygonCount ();
   if (front) count += ((csBspNode*)front)->CountPolygons ();
   if (back) count += ((csBspNode*)back)->CountPolygons ();
   return count;
@@ -374,7 +374,7 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
-    	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
+    	node->polygons.GetPolygonCount (), node->polygons_on_splitter, data);
     if (rc) return rc;
     // IMPORTANT: First the real polygons have to be traversed and
     // then the bounding box polygons!!!
@@ -389,7 +389,7 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
-    	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
+    	node->polygons.GetPolygonCount (), node->polygons_on_splitter, data);
     if (rc) return rc;
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
@@ -420,7 +420,7 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
-    	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
+    	node->polygons.GetPolygonCount (), node->polygons_on_splitter, data);
     if (rc) return rc;
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -433,7 +433,7 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
-    	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
+    	node->polygons.GetPolygonCount (), node->polygons_on_splitter, data);
     if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -448,7 +448,7 @@ void csBspTree::Statistics (csBspNode* node, int depth, int* num_nodes,
   depth++;
   if (depth > *max_depth) *max_depth = depth;
 
-  int num = node->polygons.GetNumPolygons ();
+  int num = node->polygons.GetPolygonCount ();
   *tot_polygons += num;
   if (num > *max_poly_in_node) *max_poly_in_node = num;
   if (num < *min_poly_in_node) *min_poly_in_node = num;
@@ -533,7 +533,7 @@ int* csBspTree::GetVertices (int& count)
 void csBspTree::Cache (csBspNode* node, iFile* cf)
 {
   if (!node) return;
-  WriteLong (cf, node->polygons.GetNumPolygons ());	// Consistency check
+  WriteLong (cf, node->polygons.GetPolygonCount ());	// Consistency check
   WriteBool (cf, node->polygons_on_splitter);
   if (!node->polygons_on_splitter) return;
   WritePlane3 (cf, node->splitter);
@@ -600,7 +600,7 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
     }
   }
 
-  if (check_num_polygons != node->polygons.GetNumPolygons ())
+  if (check_num_polygons != node->polygons.GetPolygonCount ())
   {
     CsPrintf (MSG_WARNING, "Bsp does not match with loaded level (2)!\n");
     return false;

@@ -55,9 +55,9 @@ bool csArtsHandle::UseData (iSoundData *sd)
 
     sd->Initialize (&format);
 
-    std::vector<float> vData (sd->GetStaticNumSamples ()*2);
+    std::vector<float> vData (sd->GetStaticSampleCount ()*2);
     short *data = (short*)sd->GetStaticData ();
-    for (long i=0; i < sd->GetStaticNumSamples ()*2; i++)
+    for (long i=0; i < sd->GetStaticSampleCount ()*2; i++)
       vData[i] = (float)data[i];
     
     //    am.SetData (vData);

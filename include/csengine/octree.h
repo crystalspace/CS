@@ -162,7 +162,7 @@ public:
   int* GetMiniBspVerts () const { return minibsp_verts; }
 
   /// Get number of vertices.
-  int GetMiniBspNumVerts () const { return minibsp_numverts; }
+  int GetMiniBspVertexCount () const { return minibsp_numverts; }
 
   /// Return type (NODE_???).
   int Type () { return NODE_OCTREE; }

@@ -307,7 +307,7 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 void csCrystalBall::Build (iPolygonMesh *polyset)
 {
   // just cycle through all polygons and add them
-  for (int i=0; i<polyset->GetNumPolygons (); i++)
+  for (int i=0; i<polyset->GetPolygonCount (); i++)
     InsertPolygon (polyset, i);
 }
 

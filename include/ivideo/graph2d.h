@@ -147,7 +147,7 @@ struct iGraphics2D : public iPlugIn
    * get from GetPixelFormat. It is just a little bit easier to obtain
    * this way.
    */
-  virtual int GetNumPalEntries () = 0;
+  virtual int GetPalEntryCount () = 0;
 
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette () = 0;

@@ -399,7 +399,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     }
     char sect[100];
     float x, y, z;
-    if (ScanStr (arg, "%s,%f,%f,%f", sect, &x, &y, &z) != 4)
+    if (csScanStr (arg, "%s,%f,%f,%f", sect, &x, &y, &z) != 4)
     {
       CsPrintf (MSG_CONSOLE, "Expected sector,x,y,z. Got something else!\n");
       return false;

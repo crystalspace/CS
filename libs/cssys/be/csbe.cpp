@@ -122,7 +122,7 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
 {
   char path[MAXPATHLEN];		// *1*
   char name[MAXPATHLEN];
-  splitpath(argv[0], path, sizeof(path), name, sizeof(name));
+  csSplitPath(argv[0], path, sizeof(path), name, sizeof(name));
   if (strlen(path) > 0)
     chdir(path);
 

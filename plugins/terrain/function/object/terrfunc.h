@@ -355,7 +355,7 @@ public:
     }
     blocks[i].material = mat;
   }
-  virtual int GetNumMaterials () { return blockxy*blockxy; }
+  virtual int GetMaterialCount () { return blockxy*blockxy; }
   virtual void SetLOD (unsigned int) { }
 
   virtual int CollisionDetect (csTransform *p);

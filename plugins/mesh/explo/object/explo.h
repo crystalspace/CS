@@ -81,14 +81,14 @@ public:
   virtual ~csExploMeshObject ();
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num)
+  void SetParticleCount (int num)
   {
     initialized = false;
     number = num;
-    SetNumber (number);
+    SetCount (number);
   }
   /// Get the number of particles
-  int GetNumberParticles () const {return number;}
+  int GetParticleCount () const {return number;}
   /// Set the explosion center.
   void SetCenter (const csVector3& center)
   {
@@ -189,13 +189,13 @@ public:
   class ExplosionState : public iExplosionState
   {
     DECLARE_EMBEDDED_IBASE (csExploMeshObject);
-    virtual void SetNumberParticles (int num)
+    virtual void SetParticleCount (int num)
     {
-      scfParent->SetNumberParticles (num);
+      scfParent->SetParticleCount (num);
     }
-    virtual int GetNumberParticles () const 
+    virtual int GetParticleCount () const 
     {
-      return scfParent->GetNumberParticles();
+      return scfParent->GetParticleCount();
     }
     virtual void SetCenter (const csVector3& center)
     {

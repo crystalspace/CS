@@ -97,7 +97,7 @@ public:
   }
   void AddIterated(const char *Key) {
     csHashKey HashKey = csHashCompute(Key);
-    Iterated.Put(HashKey, strnew(Key));
+    Iterated.Put(HashKey, csStrNew(Key));
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub) {
@@ -106,7 +106,7 @@ public:
     Config->IncRef();
     CurrentDomain = Config->LastDomain;
     CurrentIterator = NULL;
-    Subsection = strnew(sub);
+    Subsection = csStrNew(sub);
   }
   virtual ~csConfigManagerIterator() {
     Config->RemoveIterator(this);

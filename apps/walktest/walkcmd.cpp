@@ -250,7 +250,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   int imirror = false;
   char* sector_name = new char [data->GetSize ()];
 
-  ScanStr (**data,
+  csScanStr (**data,
     "%f %f %f\n"
     "%f %f %f\n"
     "%f %f %f\n"
@@ -352,7 +352,7 @@ void list_meshes (void)
   const char* mesh_name;
   iMeshWrapper* mesh;
 
-  num_meshes = Sys->Engine->GetNumMeshObjects ();
+  num_meshes = Sys->Engine->GetMeshObjectCount ();
 
   for(int i = 0; i < num_meshes; i++)
   {
@@ -365,7 +365,7 @@ void list_meshes (void)
       Sys->Printf (MSG_CONSOLE, "A mesh with no name.\n");
   }
   Sys->Printf (MSG_CONSOLE, "There are:%d meshes\n",
-	       Sys->Engine->GetNumMeshObjects ());
+	       Sys->Engine->GetMeshObjectCount ());
 }
 
 //===========================================================================
@@ -389,8 +389,8 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 	switch (odesc.type)
 	{
 	  case CSVAR_LONG: sscanf (optValue, "%ld", &var.v.l); break;
-	  case CSVAR_BOOL: ScanStr (optValue, "%b", &var.v.b); break;
-	  case CSVAR_FLOAT: ScanStr (optValue, "%f", &var.v.f); break;
+	  case CSVAR_BOOL: csScanStr (optValue, "%b", &var.v.b); break;
+	  case CSVAR_FLOAT: csScanStr (optValue, "%f", &var.v.f); break;
 	  default: break;
 	}
 	config->SetOption (i, &var);
@@ -465,7 +465,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
       if (Sector)
       {
         char name[100], rot[100];
-        ScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
+        csScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
@@ -497,7 +497,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
       if (wrap)
       {
         csVector3 hinge;
-        ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
+        csScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
 	csDoor* door = new csDoor (wrap);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
@@ -509,7 +509,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     {
       csVector3 angle;
       bool always;
-      ScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
+      csScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
 		&always);
       csRotatingObject* rotobj = new csRotatingObject (src);
       rotobj->SetAngles (angle);
@@ -527,7 +527,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	float act_time;
 	char sector_name[100];
 	char light_name[100];
-        ScanStr (kp->GetValue (), "%s,%s,%f,%f,%f,%f,%f,%f,%f",
+        csScanStr (kp->GetValue (), "%s,%s,%f,%f,%f,%f,%f,%f,%f",
 	  sector_name, light_name,
 	  &start_col.red, &start_col.green, &start_col.blue,
 	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
@@ -707,7 +707,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
-    int num = Sys->GetNumPlugIns ();
+    int num = Sys->GetPlugInCount ();
     int i;
     for (i = 0 ; i < num ; i++)
     {
@@ -723,7 +723,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       int idx;
       sscanf (arg, "%d", &idx);
-      if (idx < 0 || idx >= Sys->GetNumPlugIns ())
+      if (idx < 0 || idx >= Sys->GetPlugInCount ())
 	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
@@ -773,8 +773,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       char name[50];
       char val[256];
       int idx;
-      ScanStr (arg, "%d,%s,%s", &idx, name, val);
-      if (idx < 0 || idx >= Sys->GetNumPlugIns ())
+      csScanStr (arg, "%d,%s,%s", &idx, name, val);
+      if (idx < 0 || idx >= Sys->GetPlugInCount ())
 	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
@@ -821,7 +821,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       char buf[255];
       sprintf (buf, "/this/%s.rec", arg);
       LoadRecording (Sys->myVFS, buf);
-      Sys->recorded_perf_stats_name = strnew (arg);
+      Sys->recorded_perf_stats_name = csStrNew (arg);
     }
     else
       LoadRecording (Sys->myVFS, "/this/record");
@@ -863,7 +863,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	bool summary = true;
 	char name[50], option[50];
 	int resolution = 0;
-	ScanStr (arg, "%s,%d,%s", option, &resolution, name);
+	csScanStr (arg, "%s,%d,%s", option, &resolution, name);
 	if (Sys->perf_stats)
 	  Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (name);
 	if (!strcasecmp (option, "res") && (resolution >= 1))
@@ -1223,7 +1223,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       float r, g, b, dens;
-      if (ScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &dens) != 4)
+      if (csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &dens) != 4)
       {
         Sys->Printf (MSG_CONSOLE, "Expected r,g,b,density. Got something else!\n");
         return false;
@@ -1242,7 +1242,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       char level[100];
-      ScanStr (arg, "%s", level);
+      csScanStr (arg, "%s", level);
       void OpenPortal (iLoader*, csView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
@@ -1258,7 +1258,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_inter_length = 30;
       Sys->fs_inter_anim = 0;
       if (arg)
-        ScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
+        csScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
     }
   }
   else if (!strcasecmp (cmd, "fs_fadeout"))
@@ -1278,7 +1278,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_fadecol_fade = 0;
       Sys->fs_fadecol_dir = true;
       float r = 1, g = 0, b = 0;
-      if (arg) ScanStr (arg, "%f,%f,%f", &r, &g, &b);
+      if (arg) csScanStr (arg, "%f,%f,%f", &r, &g, &b);
       Sys->fs_fadecol_color.Set (r, g, b);
     }
   }
@@ -1291,7 +1291,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->fs_fadetxt_dir = true;
       char buf[255];
       *buf = 0;
-      if (arg) ScanStr (arg, "%s", buf);
+      if (arg) csScanStr (arg, "%s", buf);
       iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (buf);
       if (mat)
       {
@@ -1346,7 +1346,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->do_fs_shadevert)
     {
       float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
-      if (arg) ScanStr (arg, "%f,%f,%f,%f,%f,%f", &tr, &tg, &tb, &br, &bg, &bb);
+      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f", &tr, &tg, &tb, &br, &bg, &bb);
       Sys->fs_shadevert_topcol.Set (tr, tg, tb);
       Sys->fs_shadevert_botcol.Set (br, bg, bb);
     }
@@ -1354,7 +1354,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "perftest"))
   {
     int num = 100;
-    if (arg) ScanStr (arg, "%d", &num);
+    if (arg) csScanStr (arg, "%d", &num);
     perf_test (num);
   }
   else if (!strcasecmp (cmd, "debug0"))
@@ -1451,72 +1451,72 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "i_forward"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_forward (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_backward"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_backward (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_left"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_left (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_right"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_right (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_up"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_up (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_down"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_down (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftc"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_camera (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftw"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_world (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightc"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_camera (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightw"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_world (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftx"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_xaxis (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftz"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_left_zaxis (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightx"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_xaxis (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightz"))
   {
-    int slow = 0, fast = 0; if (arg) ScanStr (arg, "%d,%d", &slow, &fast);
+    int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
     Sys->imm_rot_right_zaxis (.1, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "fire"))
@@ -1533,7 +1533,7 @@ bool CommandHandler (const char *cmd, const char *arg)
      * on some systems. */
     int num = 0;
     float speed = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
+    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_rain (iSector* sector, char* txtname,
     	int num, float speed);
     if (cnt <= 2) speed = 2;
@@ -1550,7 +1550,7 @@ bool CommandHandler (const char *cmd, const char *arg)
      * on some systems. */
     int num = 0;
     float speed = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
+    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_snow (iSector* sector, char* txtname,
     	int num, float speed);
     if (cnt <= 2) speed = .3;
@@ -1565,7 +1565,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char txtname[100];
     int cnt = 0;
     int num = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
+    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
     extern void add_particles_fire (iSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 200;
@@ -1580,7 +1580,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char txtname[100];
     int cnt = 0;
     int num = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
+    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
     extern void add_particles_fountain (iSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 400;
@@ -1593,7 +1593,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s", txtname);
+    if (arg) cnt = csScanStr (arg, "%s", txtname);
     extern void add_particles_explosion (iSector* sector, const csVector3& center,
     	char* txtname);
     if (cnt != 1)
@@ -1608,7 +1608,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s", txtname);
+    if (arg) cnt = csScanStr (arg, "%s", txtname);
     extern void add_particles_spiral (iSector* sector, const csVector3& bottom,
     	char* txtname);
     if (cnt != 1)
@@ -1623,7 +1623,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char filename[100], tempname[100], txtname[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%s,%s", filename, tempname, txtname);
+    if (arg) cnt = csScanStr (arg, "%s,%s,%s", filename, tempname, txtname);
     if (cnt != 3)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
@@ -1636,7 +1636,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char sname[100];
     float size = 9;
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%s,%f", tname, sname, &size);
+    if (arg) cnt = csScanStr (arg, "%s,%s,%f", tname, sname, &size);
     if(cnt != 3)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'templatename',");
@@ -1653,7 +1653,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[100];
     if (arg)
     {
-      ScanStr (arg, "%s", name);
+      csScanStr (arg, "%s", name);
       csObject* obj = Sys->view->GetEngine ()->GetCsEngine ()->meshes.FindByName (name);
       if (obj)
         Sys->view->GetEngine ()->GetCsEngine ()->RemoveMesh ((csMeshWrapper*)obj);
@@ -1672,7 +1672,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[100];
     char action[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
+    if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 1)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname'!\n");
@@ -1690,7 +1690,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	iSpriteAction* aspr_act;
 	int i;
 
-	for (i = 0; i < (fstate->GetNumActions ()); i ++)
+	for (i = 0; i < (fstate->GetActionCount ()); i ++)
 	{
 	  aspr_act = fstate->GetAction (i);
 	  Sys->Printf (MSG_CONSOLE, "%s\n", aspr_act->GetName ());
@@ -1709,7 +1709,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[100];
     char action[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
+    if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 2)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,action'!\n");
@@ -1747,7 +1747,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[100];
     char motion[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s,%s", name, motion);
+    if (arg) cnt = csScanStr (arg, "%s,%s", name, motion);
     if(cnt != 2)
     {
       Sys->Printf (MSG_CONSOLE, "Expected parameters 'meshname,motion'!\n");
@@ -1794,7 +1794,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     int depth = 0, width = 0;
-    if (arg) ScanStr (arg, "%d,%d", &depth, &width);
+    if (arg) csScanStr (arg, "%d,%d", &depth, &width);
     if (depth < 1) depth = 3; 
     if (width < 1) width = 3;
     extern void add_skeleton_tree (iSector* where, csVector3 const& pos,
@@ -1806,7 +1806,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     int depth, width;
-    if (arg) ScanStr (arg, "%d,%d", &depth, &width);
+    if (arg) csScanStr (arg, "%d,%d", &depth, &width);
     else { depth = 5; width = 8; }
     extern void add_skeleton_ghost (iSector* where, csVector3 const& pos,
     	int maxdepth, int width);
@@ -1817,7 +1817,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     float radius = 0;
-    if (arg) ScanStr (arg, "%f", &radius);
+    if (arg) csScanStr (arg, "%f", &radius);
     extern void add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius);
     add_bot (2, Sys->view->GetCamera ()->GetSector (),
@@ -1844,7 +1844,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->selected_light)
     {
       float r, g, b;
-      if (arg && ScanStr (arg, "%f,%f,%f", &r, &g, &b) == 3)
+      if (arg && csScanStr (arg, "%f,%f,%f", &r, &g, &b) == 3)
         Sys->selected_light->SetColor (csColor (r, g, b));
       else
         CsPrintf (MSG_CONSOLE, "Arguments missing or invalid!\n");
@@ -1861,7 +1861,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     bool rnd;
     float r, g, b, radius, thing_shadows;
-    if (arg && ScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
+    if (arg && csScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
     	&thing_shadows) == 5)
     {
       dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b);

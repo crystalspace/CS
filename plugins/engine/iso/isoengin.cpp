@@ -320,7 +320,7 @@ void csIsoEngine::RemoveMaterial(int index)
   delete wrap;
 }
 
-int csIsoEngine::GetNumMaterials() const
+int csIsoEngine::GetMaterialCount() const
 {
   return materials.Length();
 }

@@ -60,7 +60,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () const { return num_vertices; }
+  int GetVertexCount () const { return num_vertices; }
 
   /**
    * Get the array with all vertex indices.

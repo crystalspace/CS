@@ -52,7 +52,7 @@ struct iSoundData : public iBase
   virtual bool IsStatic() = 0;
 
   /// Get size of this sound in samples (static sounds only).
-  virtual long GetStaticNumSamples() = 0;
+  virtual long GetStaticSampleCount() = 0;
   /// Get a pointer to the data buffer (static sounds only).
   virtual void *GetStaticData() = 0;
 

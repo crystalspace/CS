@@ -44,7 +44,7 @@ void csSpiralMeshObject::SetupObject ()
     RemoveParticles ();
     initialized = true;
 
-    SetNumber(max);
+    SetCount(max);
     time_before_new_particle = 0;
     last_reuse = 0;
     float radius = 10.0; // guessed radius of the spiral;

@@ -86,7 +86,7 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
   int lm_height = lightmap->GetWidth ();
 
   int j;
-  for (j = 0 ; j < GetNumTriangles () ; j++)
+  for (j = 0 ; j < GetTriangleCount () ; j++)
   {
     csTriangle& ct = triangles[j];
     int lm_idx;
@@ -662,7 +662,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
 void csCurve::HardTransform (const csReversibleTransform& trans)
 {
-  for (int i = 0 ; i < GetParentTemplate ()->NumVertices () ; i++)
+  for (int i = 0 ; i < GetParentTemplate ()->GetVertexCount () ; i++)
     SetControlPoint (i, GetParentTemplate ()->GetVertex (i));
   if (_uv2World) CalcUVBuffers();
   return;
@@ -733,7 +733,7 @@ float csCurve::GetArea()
   csTriangle t;
 
   // loop through all of our triangles and sum thier areas
-  for(int i=0; i<ct->GetNumTriangles(); i++)
+  for(int i=0; i<ct->GetTriangleCount(); i++)
   {
     t = ct->GetTriangle(i);
     area += ABS(csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]) );
@@ -914,7 +914,7 @@ int csBezierTemplate::GetVertex (int index)
   return ver_id[index];
 }
 
-int csBezierTemplate::NumVertices ()
+int csBezierTemplate::GetVertexCount ()
 {
   return 9;
 }

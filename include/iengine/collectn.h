@@ -51,7 +51,7 @@ struct iCollection : public iBase
   virtual iObject* FindObject (char* name) const = 0;
 
   /// Get the number of objects in this collection.
-  virtual int GetNumObjects () const = 0;
+  virtual int GetObjectCount () const = 0;
 
   /// Add an object to the collection.
   virtual void AddObject (iObject* obj) = 0;

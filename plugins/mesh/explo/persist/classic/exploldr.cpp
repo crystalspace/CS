@@ -153,20 +153,20 @@ bool csExplosionFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csExplosionFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
@@ -227,7 +227,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -290,27 +290,27 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
       case CS_TOKEN_CENTER:
 	{
 	  csVector3 center;
-	  ScanStr (params, "%f,%f,%f", &center.x, &center.y, &center.z);
+	  csScanStr (params, "%f,%f,%f", &center.x, &center.y, &center.z);
 	  explostate->SetCenter (center);
 	}
 	break;
       case CS_TOKEN_PUSH:
 	{
 	  csVector3 push;
-	  ScanStr (params, "%f,%f,%f", &push.x, &push.y, &push.z);
+	  csScanStr (params, "%f,%f,%f", &push.x, &push.y, &push.z);
 	  explostate->SetPush (push);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -327,7 +327,7 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -346,56 +346,56 @@ iBase* csExplosionLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           explostate->SetLighting (do_lighting);
         }
         break;
       case CS_TOKEN_NUMBER:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
-          explostate->SetNumberParticles (nr);
+          csScanStr (params, "%d", &nr);
+          explostate->SetParticleCount (nr);
         }
         break;
       case CS_TOKEN_NRSIDES:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
+          csScanStr (params, "%d", &nr);
           explostate->SetNrSides (nr);
         }
         break;
       case CS_TOKEN_FADE:
         {
           int f;
-          ScanStr (params, "%d", &f);
+          csScanStr (params, "%d", &f);
           explostate->SetFadeSprites (f);
         }
         break;
       case CS_TOKEN_PARTRADIUS:
         {
           float f;
-          ScanStr (params, "%f", &f);
+          csScanStr (params, "%f", &f);
           explostate->SetPartRadius (f);
         }
         break;
       case CS_TOKEN_SPREADPOS:
         {
           float f;
-          ScanStr (params, "%f", &f);
+          csScanStr (params, "%f", &f);
           explostate->SetSpreadPos (f);
         }
         break;
       case CS_TOKEN_SPREADSPEED:
         {
           float f;
-          ScanStr (params, "%f", &f);
+          csScanStr (params, "%f", &f);
           explostate->SetSpreadSpeed (f);
         }
         break;
       case CS_TOKEN_SPREADACCEL:
         {
           float f;
-          ScanStr (params, "%f", &f);
+          csScanStr (params, "%f", &f);
           explostate->SetSpreadAcceleration (f);
         }
         break;
@@ -436,7 +436,7 @@ void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -444,36 +444,36 @@ void csExplosionSaver::WriteDown (iBase* obj, iStrVector *str,
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   sprintf(buf, "CENTER (%g, %g, %g)\n", explostate->GetCenter().x,
     explostate->GetCenter().y, explostate->GetCenter().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "PUSH (%g, %g, %g)\n", explostate->GetPush().x,
     explostate->GetPush().y, explostate->GetPush().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SPREADPOS (%g)\n", explostate->GetSpreadPos());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SPREADSPEED (%g)\n", explostate->GetSpreadSpeed());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SPREADACCEL (%g)\n", explostate->GetSpreadAcceleration());
-  str->Push(strnew(buf));
-  sprintf(buf, "NUMBER (%d)\n", explostate->GetNumberParticles());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
+  sprintf(buf, "NUMBER (%d)\n", explostate->GetParticleCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "NRSIDES (%d)\n", explostate->GetNrSides());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "PARTRADIUS (%g)\n", explostate->GetPartRadius());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", explostate->GetLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   cs_time fade_time = 0;
   if(explostate->GetFadeSprites(fade_time))
   {
     sprintf(buf, "FADE (%d)\n", (int)fade_time);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
 
   fact->DecRef();

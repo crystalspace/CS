@@ -155,7 +155,7 @@ void csPolyTexFlat::ClearUV ()
 void csPolyTexFlat::Setup (csPolygon3D *iParent)
 {
   uv_coords = (csVector2 *)realloc (uv_coords,
-    iParent->GetVertices ().GetNumVertices () * sizeof (csVector2));
+    iParent->GetVertices ().GetVertexCount () * sizeof (csVector2));
 }
 
 void csPolyTexFlat::Setup (iPolygon3D *iParent)
@@ -195,7 +195,7 @@ void csPolyTexGouraud::ClearColors ()
 void csPolyTexGouraud::Setup (csPolygon3D *iParent)
 {
   csPolyTexFlat::Setup (iParent);
-  int nv = iParent->GetVertices ().GetNumVertices ();
+  int nv = iParent->GetVertices ().GetVertexCount ();
   bool init = !colors;
   colors = (csColor *)realloc (colors, nv * sizeof (csColor));
   if (init) memset (colors, 0, nv * sizeof (csColor));
@@ -386,7 +386,7 @@ void csPolygon3D::CopyTextureType (iPolygon3D* ipt)
     txtflat_dst->Setup (this);
     csVector2 *uv_coords = txtflat_src->GetUVCoords ();
     if (uv_coords)
-      for (j = 0; j < pt->GetNumVertices (); j++)
+      for (j = 0; j < pt->GetVertexCount (); j++)
         txtflat_dst->SetUV (j, uv_coords[j].x, uv_coords[j].y);
   }
 
@@ -397,7 +397,7 @@ void csPolygon3D::CopyTextureType (iPolygon3D* ipt)
     txtgour_dst->Setup (this);
     csColor* col = txtgour_src->GetColors ();
     if (col)
-      for (j = 0; j < pt->GetNumVertices (); j++)
+      for (j = 0; j < pt->GetVertexCount (); j++)
         txtgour_dst->SetColor (j, col[j]);
   }
 
@@ -456,11 +456,11 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = Vobj (GetVertices ().GetNumVertices () - 1);
+  csVector3 ptA = Vobj (GetVertices ().GetVertexCount () - 1);
   sideA = plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < GetVertices ().GetNumVertices () ; )
+  for (int i = -1 ; ++i < GetVertices ().GetVertexCount () ; )
   {
     ptB = Vobj (i);
     sideB = plane.Classify (ptB);
@@ -526,12 +526,12 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   csPlane3& this_plane = plane->GetObjectPlane ();
   csPlane3& test_plane = totest->plane->GetObjectPlane ();
   int i;
-  for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
+  for (i = 0 ; i < totest->vertices.GetVertexCount () ; i++)
   {
     if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
     {
       int j;
-      for (j = 0 ; j < vertices.GetNumVertices () ; j++)
+      for (j = 0 ; j < vertices.GetVertexCount () ; j++)
       {
         if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
 	{
@@ -607,7 +607,7 @@ int csPolygon3D::Classify (const csPlane3& pl)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     float dot = pl.Classify (Vobj (i));
     if (ABS (dot) < EPSILON) dot = 0;
@@ -624,7 +624,7 @@ int csPolygon3D::ClassifyX (float x)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     float xx = Vobj (i).x-x;
     if (xx < -EPSILON) front++;
@@ -641,7 +641,7 @@ int csPolygon3D::ClassifyY (float y)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     float yy = Vobj (i).y-y;
     if (yy < -EPSILON) front++;
@@ -658,7 +658,7 @@ int csPolygon3D::ClassifyZ (float z)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     float zz = Vobj (i).z-z;
     if (zz < -EPSILON) front++;
@@ -783,9 +783,9 @@ void csPolygon3D::SetupHWUV()
 
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   lmi->txt_plane->GetTextureSpace( m_o2t, v_o2t );
-  uvz = new csVector3[ GetNumVertices() ];
+  uvz = new csVector3[ GetVertexCount() ];
 
-  for( i=0; i < GetNumVertices(); i++ ){
+  for( i=0; i < GetVertexCount(); i++ ){
     uvz[i] = m_o2t * ( Vobj( i ) - v_o2t );
   }
 }
@@ -806,7 +806,7 @@ float csPolygon3D::GetArea()
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i = 0 ; i<vertices.GetNumVertices()-2 ; i++)
+  for (int i = 0 ; i<vertices.GetVertexCount()-2 ; i++)
     area += ABS(csMath3::Area3 (Vobj(0), Vobj(i+1), Vobj(i+2)));
   return area / 2.0;
 }
@@ -986,10 +986,10 @@ void csPolygon3D::AddLightpatch (csLightPatch* lp)
 
 int csPolygon3D::AddVertex (int v)
 {
-  if (v >= thing->GetNumVertices ())
+  if (v >= thing->GetVertexCount ())
   {
     CsPrintf (MSG_FATAL_ERROR, "Index number %d is too high for a polygon (max=%d)!\n",
-    	v, thing->GetNumVertices ());
+    	v, thing->GetVertexCount ());
     fatal_exit (0, false);
   }
   if (v < 0)
@@ -998,7 +998,7 @@ int csPolygon3D::AddVertex (int v)
     fatal_exit (0, false);
   }
   vertices.AddVertex (v);
-  return vertices.GetNumVertices ()-1;
+  return vertices.GetVertexCount ()-1;
 }
 
 int csPolygon3D::AddVertex (const csVector3& v)
@@ -1023,8 +1023,8 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = GetVertices ().GetNumVertices ()-1;
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  i1 = GetVertices ().GetVertexCount ()-1;
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     x = Vobj (i).x;
     y = Vobj (i).y;
@@ -1141,7 +1141,7 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   // vertices has been done earlier).
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
-  num_vertices = GetVertices ().GetNumVertices ();
+  num_vertices = GetVertices ().GetVertexCount ();
   for (i = 0 ; i < num_vertices ; i++)
     if (Vcam (i).z >= 0) { cnt_vis++; break; }
     //if (Vcam (i).z >= SMALL_Z) cnt_vis++;
@@ -1488,8 +1488,8 @@ bool csPolygon3D::PointOnPolygon (const csVector3& v)
   // Check if 'v' is on the same side of all edges.
   int i, i1;
   bool neg = false, pos = false;
-  i1 = GetVertices ().GetNumVertices ()-1;
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  i1 = GetVertices ().GetVertexCount ()-1;
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
     if (ar < 0) neg = true;
@@ -1523,8 +1523,8 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   relend -= start;
 
   int i, i1;
-  i1 = GetVertices ().GetNumVertices ()-1;
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  i1 = GetVertices ().GetVertexCount ()-1;
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if ( (relend * normal) > 0) return false;
@@ -1557,8 +1557,8 @@ bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector
   relend -= start;
 
   int i, i1;
-  i1 = GetVertices ().GetNumVertices ()-1;
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  i1 = GetVertices ().GetVertexCount ()-1;
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if (dot1 > 0)
@@ -1622,7 +1622,7 @@ void csPolygon3D::UpdateVertexLighting (iLight* light, const csColor& lcol,
   if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
   csPolyTexGouraud* gs = GetGouraudInfo ();
 
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  for (i = 0 ; i < GetVertices ().GetVertexCount () ; i++)
   {
     if (reset)
     {
@@ -1670,15 +1670,15 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     dl->AddLightpatch (lp);
 
     csFrustum* light_frustum = ctxt->GetLightFrustum ();
-    lp->Initialize (light_frustum->GetNumVertices ());
+    lp->Initialize (light_frustum->GetVertexCount ());
 
     // Copy shadow frustums.
     lp->GetShadowBlock ().AddRelevantShadows (ctxt->GetShadows ());
 
     int i, mi;
-    for (i = 0 ; i < lp->GetNumVertices () ; i++)
+    for (i = 0 ; i < lp->GetVertexCount () ; i++)
     {
-      mi = ctxt->IsMirrored () ? lp->GetNumVertices ()-i-1 : i;
+      mi = ctxt->IsMirrored () ? lp->GetVertexCount ()-i-1 : i;
       lp->GetVertex (i) = light_frustum->GetVertex (mi);
     }
   }
@@ -1718,8 +1718,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // Precalculate the normals for csFrustum::BatchClassify.
   csVector3* lf_verts = lf->GetVertices ();
   csVector3 lf_normals[100];	// @@@ HARDCODED!
-  i1 = lf->GetNumVertices ()-1;
-  for (i = 0 ; i < lf->GetNumVertices () ; i++)
+  i1 = lf->GetVertexCount ()-1;
+  for (i = 0 ; i < lf->GetVertexCount () ; i++)
   {
     lf_normals[i1] = lf_verts[i1] % lf_verts[i];
     i1 = i;
@@ -1738,8 +1738,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
     {
       csPolygon3D* sfp = (csPolygon3D*)(shadow_it->GetUserData ());
       switch (csFrustum::BatchClassify (
-        lf_verts, lf_normals, lf->GetNumVertices (),
-        sf->GetVertices (), sf->GetNumVertices ()))
+        lf_verts, lf_normals, lf->GetVertexCount (),
+        sf->GetVertices (), sf->GetVertexCount ()))
       {
         case CS_FRUST_PARTIAL:
         case CS_FRUST_INSIDE:
@@ -1747,12 +1747,12 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
 	  // If partial then we first test if the light and shadow
 	  // frustums are adjacent. If so then we ignore the shadow
 	  // frustum as well (not relevant).
-	  i1 = GetNumVertices ()-1;
-	  for (i = 0 ; i < GetNumVertices () ; i++)
+	  i1 = GetVertexCount ()-1;
+	  for (i = 0 ; i < GetVertexCount () ; i++)
 	  {
-	    j1 = sfp->GetNumVertices ()-1;
+	    j1 = sfp->GetVertexCount ()-1;
 	    float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
-	    for (j = 0 ; j < sfp->GetNumVertices () ; j++)
+	    for (j = 0 ; j < sfp->GetVertexCount () ; j++)
 	    {
 	      float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
 	      if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
@@ -1858,7 +1858,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   else
   {
     rectangle_frust = false;
-    num_vertices = GetVertices ().GetNumVertices ();
+    num_vertices = GetVertices ().GetVertexCount ();
     if (num_vertices > VectorArray.Limit ())
       VectorArray.SetLimit (num_vertices);
     poly = VectorArray.GetArray ();
@@ -1890,7 +1890,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   csVector3 o (0, 0, 0);
   float min_sqdist = csSquaredDist::PointPoly (o,
         new_light_frustum->GetVertices (),
-        new_light_frustum->GetNumVertices (),
+        new_light_frustum->GetVertexCount (),
         poly_plane, dist_to_plane * dist_to_plane);
 
   if (min_sqdist >= lview->GetSquaredRadius ())
@@ -1928,7 +1928,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   if (rectangle_frust
    && (po || (!lview->IsDynamic () && csSector::do_radiosity)))
   {
-    num_vertices = GetVertices ().GetNumVertices ();
+    num_vertices = GetVertices ().GetVertexCount ();
     if (num_vertices > VectorArray.Limit ())
       VectorArray.SetLimit (num_vertices);
     poly = VectorArray.GetArray ();

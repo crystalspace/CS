@@ -40,10 +40,10 @@ SCF_VERSION (iMetaBallState, 0, 0, 1);
 struct iMetaBallState : public iBase
 {
   /// Get number of balls currently being animated
-  virtual int GetNumberMetaBalls () = 0;
+  virtual int GetMetaBallCount () = 0;
 
   /// Set the number of balls being animated
-  virtual void SetNumberMetaBalls (int number) = 0;
+  virtual void SetMetaBallCount (int number) = 0;
 
   /// Set True for true environment mapping, false for fake style mapping
   virtual void SetQualityEnvironmentMapping (bool toggle) = 0;
@@ -64,7 +64,7 @@ struct iMetaBallState : public iBase
   virtual void SetMaterial (iMaterialWrapper *mat) = 0;
 
   /// For statistics only
-  virtual int ReportNumberTriangles () = 0;
+  virtual int ReportTriangleCount () = 0;
 
   /// Regular lighting and mixmode settings  
   virtual UInt GetMixMode () = 0;

@@ -433,7 +433,7 @@ void csThing::CompressVertices ()
     csPolygon3D* p = polygons.Get (i);
     csPolyIndexed& pi = p->GetVertices ();
     int* idx = pi.GetVertexIndices ();
-    for (j = 0 ; j < pi.GetNumVertices () ; j++)
+    for (j = 0 ; j < pi.GetVertexCount () ; j++)
       idx[j] = vt[idx[j]].new_idx;
   }
 
@@ -529,7 +529,7 @@ iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)
   csCurve* c = curve->GetOriginalObject ();
   c->SetParent (this);
   int i;
-  for (i = 0 ; i < tmpl->GetNumVertices () ; i++)
+  for (i = 0 ; i < tmpl->GetVertexCount () ; i++)
     curve->SetControlPoint (i, tmpl->GetVertex (i));
   AddCurve (c);
   return curve;
@@ -707,25 +707,25 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
   G3DPolygonMesh mesh;
-  mesh.num_vertices = GetNumVertices ();
-  mesh.num_polygons = GetNumPolygons ();
+  mesh.num_vertices = GetVertexCount ();
+  mesh.num_polygons = GetPolygonCount ();
   mesh.master_mat_handle = NULL;
   // @@@ It would be nice if we could avoid this allocate.
   // Even nicer would be if we didn't have to copy the data
   // to this structure every time. Maybe hold this array native
   // in every detail object?
   // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
-  mesh.polygons = new csPolygonDPM [GetNumPolygons ()];
-  mesh.mat_handle = new iMaterialHandle* [GetNumPolygons ()];
-  mesh.normal = new csPlane3 [GetNumPolygons ()];
-  mesh.plane = new G3DTexturePlane [GetNumPolygons ()];
-  mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()];
-  for (i = 0 ; i < GetNumPolygons () ; i++)
+  mesh.polygons = new csPolygonDPM [GetPolygonCount ()];
+  mesh.mat_handle = new iMaterialHandle* [GetPolygonCount ()];
+  mesh.normal = new csPlane3 [GetPolygonCount ()];
+  mesh.plane = new G3DTexturePlane [GetPolygonCount ()];
+  mesh.poly_texture = new iPolygonTexture* [GetPolygonCount ()];
+  for (i = 0 ; i < GetPolygonCount () ; i++)
   {
     csPolygon3D* p = GetPolygon3D (i);
 
     // Vertices.
-    int num_v = p->GetNumVertices ();
+    int num_v = p->GetVertexCount ();
     mesh.polygons[i].vertices = num_v;
     mesh.polygons[i].vertex = p->GetVertexIndices ();
 
@@ -850,7 +850,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	          && clip->ClipAgainst (d->GetClipper ()) )
             {
 	      if (c_buffer->TestPolygon (clip->GetVertices (),
-	  	   clip->GetNumVertices ()))
+	  	   clip->GetVertexCount ()))
 	        mark_vis = true;
             }
 	  }
@@ -905,7 +905,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
             visible = true;
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
-		    clip->GetNumVertices ());
+		    clip->GetVertexCount ());
         }
       }
 
@@ -982,9 +982,9 @@ void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
-    frust = list->AddShadow (origin, (void*)p, p->GetVertices ().GetNumVertices (),
+    frust = list->AddShadow (origin, (void*)p, p->GetVertices ().GetVertexCount (),
 	pl);
-    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
+    for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
       frust->GetVertex (j).Set (p->Vwor (j)-origin);
   }
 }
@@ -1135,7 +1135,7 @@ csMeshedPolygon* csThing::PolyMesh::GetPolygons ()
     int i;
     num = 0;
     const csPolygonArray& pol = scfParent->polygons;
-    for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
+    for (i = 0 ; i < scfParent->GetPolygonCount () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
@@ -1145,12 +1145,12 @@ csMeshedPolygon* csThing::PolyMesh::GetPolygons ()
     // Always allocate at least one polygon.
     polygons = new csMeshedPolygon [num ? num : 1];
     num = 0;
-    for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
+    for (i = 0 ; i < scfParent->GetPolygonCount () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
       {
-        polygons[num].num_vertices = p->GetNumVertices ();
+        polygons[num].num_vertices = p->GetVertexCount ();
         polygons[num].vertices = p->GetVertexIndices ();
 	num++;
       }
@@ -1185,10 +1185,10 @@ void csThing::SetConvex (bool c)
 
 void csThing::UpdateCurveTransform (const csReversibleTransform& movtrans)
 {
-  if (GetNumCurves () == 0) return;
+  if (GetCurveCount () == 0) return;
   // since obj has changed (possibly) we need to tell all of our curves
   csReversibleTransform o2w = movtrans.GetInverse();
-  for (int i = 0 ; i < GetNumCurves () ; i++)
+  for (int i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
     c->SetObject2World (&o2w);
@@ -1242,7 +1242,7 @@ static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 	csZBufMode zMode)
 {
-  if (GetNumCurves () <= 0) return false;
+  if (GetCurveCount () <= 0) return false;
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
 
@@ -1290,7 +1290,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 
   // Loop over all curves
   csCurve* c;
-  for (i = 0 ; i < GetNumCurves () ; i++)
+  for (i = 0 ; i < GetCurveCount () ; i++)
   {
     c = curves.Get (i);
 
@@ -1314,18 +1314,18 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
       tess->UpdateColors (c->lightmap);
 
     // Setup the structure for DrawTriangleMesh.
-    if (tess->GetNumVertices () > fog_verts.Limit ())
+    if (tess->GetVertexCount () > fog_verts.Limit ())
     {
-      fog_verts.SetLimit (tess->GetNumVertices ());
+      fog_verts.SetLimit (tess->GetVertexCount ());
     }
 
     c->GetMaterialWrapper ()->Visit ();
     mesh.mat_handle = c->GetMaterialHandle ();
-    mesh.num_vertices = tess->GetNumVertices ();
+    mesh.num_vertices = tess->GetVertexCount ();
     mesh.vertices[0] = tess->GetVertices ();
     mesh.texels[0] = tess->GetTxtCoords ();
     mesh.vertex_colors[0] = tess->GetColors ();
-    mesh.num_triangles = tess->GetNumTriangles ();
+    mesh.num_triangles = tess->GetTriangleCount ();
     mesh.triangles = tess->GetTriangles ();
     mesh.clip_portal = clip_portal;
     mesh.clip_plane = clip_plane;
@@ -1491,7 +1491,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
     // c-buffer test.
     bool vis = c_buffer->TestPolygon (persp.GetVertices (),
-      	persp.GetNumVertices ());
+      	persp.GetVertexCount ());
     if (!vis)
     {
       count_cull_node_notvis_cbuffer++;
@@ -1512,7 +1512,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     csThing* pset = otree->GetThing ();
     cam = pset->GetCameraVertices (camtrans, icam->GetCameraNumber ());
     indices = onode->GetMiniBspVerts ();
-    num_indices = onode->GetMiniBspNumVerts ();
+    num_indices = onode->GetMiniBspVertexCount ();
     for (i = 0 ; i < num_indices ; i++)
       cam[indices[i]] = camtrans.Other2This (pset->Vwor (indices[i]));
   }
@@ -1647,7 +1647,7 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode)
       //-----
       csOctree* otree = (csOctree*)static_tree;
       csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
-      DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
+      DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetPolygonCount (),
     	  rview, CS_ZBUF_USE);
     }
   }
@@ -1901,7 +1901,7 @@ bool csThing::VisTest (iRenderView* irview)
     // Initialize a queue on which all visible polygons will be pushed.
     // The octree is traversed front to back but we want to render
     // back to front. That's one of the reasons for this queue.
-    csPolygonVisInfo* pvi = new csPolygonVisInfo (GetNumPolygons ());
+    csPolygonVisInfo* pvi = new csPolygonVisInfo (GetPolygonCount ());
     irview->AttachRenderContextData ((void*)this, (iBase*)pvi);
 
     // Update the transformation for the static tree. This will
@@ -1970,7 +1970,7 @@ static void CompressShadowFrustums (iShadowBlockList* list)
     sf = shadow_it->Next ();
     if (shadlist->GetSector () != cur_sector || shadlist->GetRecLevel () != cur_draw_busy)
       break;
-    bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetVertexCount ());
     if (!vis)
       shadow_it->DeleteCurrent ();
   }
@@ -2011,9 +2011,9 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 	  csPolyIndexed& pi = bsppol->GetPolygon ();
 	  csPolyTreeBBox* pi_par = bsppol->GetParent ();
 	  csVector3Array& verts = pi_par->GetVertices ();
-          for (j = 0 ; j < pi.GetNumVertices () ; j++)
+          for (j = 0 ; j < pi.GetVertexCount () ; j++)
             poly[j] = verts[pi[j]]-center;
-	  bool vis = cb->TestPolygon (poly, pi.GetNumVertices ());
+	  bool vis = cb->TestPolygon (poly, pi.GetVertexCount ());
 	  if (vis)
   	  {
 	    if (fview->ThingShadowsEnabled ())
@@ -2040,7 +2040,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
     p = (csPolygon3D*)polygon[i];
 
     // Polygons that are merged with the octree have world==obj space.
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
       poly[j] = p->Vobj (j)-center;
     bool vis = false;
 
@@ -2050,11 +2050,11 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 
     if (p->GetPortal ())
     {
-      vis = cb->TestPolygon (poly, p->GetNumVertices ());
+      vis = cb->TestPolygon (poly, p->GetVertexCount ());
     }
     else
     {
-      vis = cb->InsertPolygon (poly, p->GetNumVertices ());
+      vis = cb->InsertPolygon (poly, p->GetVertexCount ());
     }
     if (vis)
     {
@@ -2069,9 +2069,9 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       pl.Invert ();
       csFrustum* frust = shadows->GetLastShadowBlock ()->
       		AddShadow (center, (void*)p,
-		p->GetVertices ().GetNumVertices (), pl);
+		p->GetVertices ().GetVertexCount (), pl);
       // Polygons that are merged with the octree have world==obj space.
-      for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
+      for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
         frust->GetVertex (j).Set (p->Vobj (j)-center);
       frust_cnt--;
       if (frust_cnt < 0)
@@ -2224,7 +2224,7 @@ void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
     lview->CallPolygonFunction ((csObject*)p);
   }
 
-  for (i = 0 ; i < GetNumCurves () ; i++)
+  for (i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
     
@@ -2246,7 +2246,7 @@ void csThing::InitLightMaps (bool do_cache)
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
     polygons.Get (i)->InitLightMaps (do_cache);
-  for (i = 0 ; i < GetNumCurves () ; i++)
+  for (i = 0 ; i < GetCurveCount () ; i++)
     curves.Get (i)->InitLightMaps (do_cache);
 }
 
@@ -2255,28 +2255,28 @@ void csThing::CacheLightMaps ()
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
     polygons.Get (i)->CacheLightMaps ();
-  for (i = 0 ; i < GetNumCurves () ; i++)
+  for (i = 0 ; i < GetCurveCount () ; i++)
     curves.Get (i)->CacheLightMaps ();
 }
 
 void csThing::Merge (csThing* other)
 {
   int i, j;
-  int* merge_vertices = new int [other->GetNumVertices ()+1];
-  for (i = 0 ; i < other->GetNumVertices () ; i++)
+  int* merge_vertices = new int [other->GetVertexCount ()+1];
+  for (i = 0 ; i < other->GetVertexCount () ; i++)
     merge_vertices[i] = AddVertex (other->Vwor (i));
 
   for (i = 0 ; i < other->polygons.Length () ; i++)
   {
     csPolygon3D* p = other->GetPolygon3D (i);
     int* idx = p->GetVertices ().GetVertexIndices ();
-    for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
+    for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
       idx[j] = merge_vertices[idx[j]];
     AddPolygon (p);
     other->polygons[i] = NULL;
   }
 
-  for (i = 0 ; i < other->GetNumCurveVertices () ; i++)
+  for (i = 0 ; i < other->GetCurveVertexCount () ; i++)
     AddCurveVertex (other->CurveVertex (i), other->CurveTexel (i));
 
   for (i = 0 ; i < other->curves.Length () ; i++)
@@ -2338,7 +2338,7 @@ void csThing::MergeTemplate (iThingState* tpl,
     p->CopyTextureType (pt);
   }
 
-  for (i = 0; i < tpl->GetNumCurveVertices (); i++)
+  for (i = 0; i < tpl->GetCurveVertexCount (); i++)
   {
     csVector3 v = tpl->CurveVertex (i);
     if (transform) v = *transform * v;
@@ -2346,7 +2346,7 @@ void csThing::MergeTemplate (iThingState* tpl,
     AddCurveVertex (v, tpl->CurveTexel (i));
   }
 
-  for (i = 0; i < tpl->GetNumCurves (); i++)
+  for (i = 0; i < tpl->GetCurveCount (); i++)
   {
     iCurve* orig_curve = tpl->GetCurve (i);
     iCurve* p = CreateCurve (orig_curve->GetParentTemplate ());
@@ -2363,7 +2363,7 @@ void csThing::MergeTemplate (iThingState* tpl,
 void csThing::ReplaceMaterials (iMaterialList* matList, const char* prefix)
 {
   int i;
-  for (i = 0; i < GetNumPolygons (); i++)
+  for (i = 0; i < GetPolygonCount (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
     const char* txtname = p->GetMaterialWrapper ()->GetName ();

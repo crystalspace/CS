@@ -50,11 +50,11 @@ SCF_VERSION (iPolygonMesh, 0, 1, 0);
 struct iPolygonMesh : public iBase
 {
   /// Get the number of vertices for this mesh.
-  virtual int GetNumVertices () = 0;
+  virtual int GetVertexCount () = 0;
   /// Get the pointer to the array of vertices.
   virtual csVector3* GetVertices () = 0;
   /// Get the number of polygons for this mesh.
-  virtual int GetNumPolygons () = 0;
+  virtual int GetPolygonCount () = 0;
   /// Get the pointer to the array of polygons.
   virtual csMeshedPolygon* GetPolygons () = 0;
 };

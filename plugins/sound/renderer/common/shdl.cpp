@@ -82,10 +82,10 @@ void csSoundHandle::ResetStream()
 void csSoundHandle::Update_Time(cs_time Time)
 {
   if (!ActiveStream) return;
-  Update_Num (Time * Data->GetFormat()->Freq / 1000);
+  UpdateCount (Time * Data->GetFormat()->Freq / 1000);
 }
 
-void csSoundHandle::Update_Num(long Num)
+void csSoundHandle::UpdateCount(long Num)
 {
   if (!ActiveStream) return;
   while (Num > 0)

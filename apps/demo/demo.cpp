@@ -1075,7 +1075,7 @@ void Demo::DrawEditInfo ()
       	tms-tms1); hh += fh;
     }
     GfxWrite (ww, hh, col_black, col_white, "Right Path Info:"); hh += fh;
-    if (map_selpoint < np->GetNumPoints ()-1)
+    if (map_selpoint < np->GetPointCount ()-1)
     {
       csVector3 v1;
       np->GetPositionVector (map_selpoint+1, v1);
@@ -1174,7 +1174,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  // with the previous and next point.
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to an average direction as specified by next and previous point.
-	  if (map_selpoint <= 0 || map_selpoint >= np->GetNumPoints ()-1)
+	  if (map_selpoint <= 0 || map_selpoint >= np->GetPointCount ()-1)
 	  {
 	    ShowMessage ("The 'y' operation can't work on this point!\n");
 	  }
@@ -1214,7 +1214,7 @@ bool Demo::HandleEvent (iEvent &Event)
         case '=':
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to an average direction as specified by next and previous point.
-	  if (map_selpoint <= 0 || map_selpoint >= np->GetNumPoints ()-1)
+	  if (map_selpoint <= 0 || map_selpoint >= np->GetPointCount ()-1)
 	  {
 	    ShowMessage ("The '=' operation can't work on this point!\n");
 	  }
@@ -1265,7 +1265,7 @@ bool Demo::HandleEvent (iEvent &Event)
         case '+':
 	  // Make the forward vector look along the path. i.e. let it look
 	  // to the next point in the path if there is one.
-	  if (map_selpoint >= np->GetNumPoints ()-1)
+	  if (map_selpoint >= np->GetPointCount ()-1)
 	  {
             csVector3 v1, v2;
 	    np->GetPositionVector (map_selpoint-1, v1);
@@ -1399,7 +1399,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	    iFile* fp = myVFS->Open (buf, VFS_FILE_WRITE);
 	    if (fp)
 	    {
-	      int i, num = np->GetNumPoints ();
+	      int i, num = np->GetPointCount ();
 	      FileWrite (fp, "    NUM (%d)\n", num);
 	      float* t = np->GetTimeValues ();
 	      FileWrite (fp, "    TIMES (%g", t[0]);
@@ -1442,7 +1442,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  {
 	    np->InsertPoint (map_selpoint);
 	    map_selpoint++;
-	    if (map_selpoint == np->GetNumPoints ()-1)
+	    if (map_selpoint == np->GetPointCount ()-1)
 	    {
 	      csVector3 v;
 	      np->GetPositionVector (map_selpoint-1, v);
@@ -1476,14 +1476,14 @@ bool Demo::HandleEvent (iEvent &Event)
 	  if (np)
 	  {
 	    np->RemovePoint (map_selpoint);
-	    if (map_selpoint >= np->GetNumPoints ())
+	    if (map_selpoint >= np->GetPointCount ())
 	      map_selpoint--;
 	  }
 	  break;
 	case ',':
 	  if (np)
 	  {
-	    if (map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
+	    if (map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
 	    {
 	      float t = np->GetTimeValue (map_selpoint);
 	      float t1 = np->GetTimeValue (map_selpoint-1);
@@ -1501,7 +1501,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	case '.':
 	  if (np)
 	  {
-	    if (map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
+	    if (map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
 	    {
 	      float t = np->GetTimeValue (map_selpoint);
 	      float t1 = np->GetTimeValue (map_selpoint-1);
@@ -1517,7 +1517,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  }
 	  break;
 	case '/':
-	  if (np && map_selpoint > 0 && map_selpoint < np->GetNumPoints ()-1)
+	  if (np && map_selpoint > 0 && map_selpoint < np->GetPointCount ()-1)
 	  {
 	    float t1 = np->GetTimeValue (map_selpoint-1);
 	    float t2 = np->GetTimeValue (map_selpoint+1);
@@ -1527,7 +1527,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	case '?':
 	  if (np)
 	  {
-	    int num = np->GetNumPoints ();
+	    int num = np->GetPointCount ();
 	    float* xv, * yv, * zv;
 	    xv = np->GetDimensionValues (0);
 	    yv = np->GetDimensionValues (1);
@@ -1565,7 +1565,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  if (np)
 	  {
             map_selpoint++;
-	    if (map_selpoint >= np->GetNumPoints ())
+	    if (map_selpoint >= np->GetPointCount ())
 	      map_selpoint = 0;
 	  }
 	  break;
@@ -1574,7 +1574,7 @@ bool Demo::HandleEvent (iEvent &Event)
 	  {
             map_selpoint--;
 	    if (map_selpoint < 0)
-	      map_selpoint = np->GetNumPoints ()-1;
+	      map_selpoint = np->GetPointCount ()-1;
 	  }
 	  break;
         case 'c':
@@ -1614,8 +1614,8 @@ bool Demo::HandleEvent (iEvent &Event)
 	  np = seqmgr->GetSelectedPath (map_selpath);
 	  if (np)
 	  {
-	    if (map_selpoint >= np->GetNumPoints ())
-	      map_selpoint = np->GetNumPoints ()-1;
+	    if (map_selpoint >= np->GetPointCount ())
+	      map_selpoint = np->GetPointCount ()-1;
 	  }
 	  break;
         case ']':
@@ -1623,8 +1623,8 @@ bool Demo::HandleEvent (iEvent &Event)
 	  np = seqmgr->GetSelectedPath (map_selpath);
 	  if (np)
 	  {
-	    if (map_selpoint >= np->GetNumPoints ())
-	      map_selpoint = np->GetNumPoints ()-1;
+	    if (map_selpoint >= np->GetPointCount ())
+	      map_selpoint = np->GetPointCount ()-1;
 	  }
 	  break;
       }

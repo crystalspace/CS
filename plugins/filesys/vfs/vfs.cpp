@@ -624,7 +624,7 @@ iDataBuffer *ArchiveFile::GetAllData ()
 VfsNode::VfsNode (char *iPath, const char *iConfigKey, iSystem *iSys)
 {
   VPath = iPath;
-  ConfigKey = strnew (iConfigKey);
+  ConfigKey = csStrNew (iConfigKey);
   System = iSys;
 }
 
@@ -640,7 +640,7 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
   // Split rpath into several, separated by commas
   int rpl = strlen (RealPath);
   char *cur, *src;
-  char *oldsrc = src = strnew (RealPath);
+  char *oldsrc = src = csStrNew (RealPath);
   for (cur = src; rpl >= 0; cur++, rpl--)
     if ((rpl == 0) || (*cur == VFS_PATH_DIVIDER))
     {
@@ -657,12 +657,12 @@ bool VfsNode::AddRPath (const char *RealPath, csVFS *Parent)
       src [cl] = 0;
 
       rc = true;
-      UPathV.Push (strnew (src));
+      UPathV.Push (csStrNew (src));
 
       // Now parse and expand this path
       char rpath [MAXPATHLEN + 1];
       Expand (Parent, rpath, src, MAXPATHLEN);
-      RPathV.Push (strnew (rpath));
+      RPathV.Push (csStrNew (rpath));
       src = cur + 1;
     } /* endif */
 
@@ -827,7 +827,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
          || (strcmp (de->d_name, "..") == 0))
           continue;
 
-        if (!fnamematches (de->d_name, Mask))
+        if (!csFilenameMatches (de->d_name, Mask))
           continue;
 
         bool append_slash = isdir (tpath, de);
@@ -875,7 +875,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
         char *fname = a->GetFileName (iterator);
 	size_t fnl = strlen (fname);
 	if ((fnl >= sl) && (memcmp (fname, Suffix, sl) == 0)
-         && fnamematches (fname, Mask))
+         && csFilenameMatches (fname, Mask))
 	{
           size_t cur = sl;
 	  while (cur < fnl)
@@ -1160,7 +1160,7 @@ bool csVFS::Initialize (iSystem *iSys)
   System = iSys;
   char vfsconfigpath [MAXPATHLEN + 1];
   iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
-  basedir = strnew (vfsconfigpath);
+  basedir = csStrNew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
   config.Load (vfsconfigpath);
   return ReadConfig ();
@@ -1325,7 +1325,7 @@ bool csVFS::ChDir (const char *Path)
 
 void csVFS::PushDir ()
 {
-  dirstack.Push (strnew (cwd));
+  dirstack.Push (csStrNew (cwd));
 }
 
 bool csVFS::PopDir ()
@@ -1669,5 +1669,5 @@ iDataBuffer *csVFS::GetRealPath (const char *FileName)
 
   strcat (strcpy (path, node->RPathV.Get (0)), suffix);
 done:
-  return new csDataBuffer (strnew (path), strlen (path) + 1);
+  return new csDataBuffer (csStrNew (path), strlen (path) + 1);
 }

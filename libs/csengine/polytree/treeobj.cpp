@@ -26,7 +26,7 @@
 void csPolygonStub::RemoveData ()
 {
   int i;
-  for (i = 0 ; i < GetNumPolygons () ; i++)
+  for (i = 0 ; i < GetPolygonCount () ; i++)
     poly_pool->Free (GetPolygons ()[i]);
 }
 

@@ -61,7 +61,7 @@ csArchive::csArchive (const char *filename)
 {
   comment = NULL;
   comment_length = 0;
-  csArchive::filename = strnew (filename);
+  csArchive::filename = csStrNew (filename);
 
   file = fopen (filename, "rb");
   if (!file)       			/* Create new archive file */
@@ -406,7 +406,7 @@ bool csArchive::DeleteFile (const char *name)
   if (!FileExists (name))
     return false;
 
-  del.InsertSorted (strnew (name));
+  del.InsertSorted (csStrNew (name));
   return true;
 }
 

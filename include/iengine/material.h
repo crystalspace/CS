@@ -87,7 +87,7 @@ struct iMaterialList : public iBase
   /**
    * Get the number of materials.
    */
-  virtual int GetNumMaterials () = 0;
+  virtual int GetMaterialCount () = 0;
 
   /// Return material by index.
   virtual iMaterialWrapper* Get (int idx) = 0;

@@ -143,7 +143,7 @@ public:
    * get from GetPixelFormat. It is just a little bit easier to obtain
    * this way.
    */
-  virtual int GetNumPalEntries ()
+  virtual int GetPalEntryCount ()
   { return pfmt.PalEntries; }
 
   /**

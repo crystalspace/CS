@@ -524,8 +524,8 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   if (!requirePO2) return; // Nothing to do.
   int oldw = lwidth, oldh = lheight;
 
-  lwidth  = FindNearestPowerOf2 (lwidth);
-  lheight = FindNearestPowerOf2 (lheight);
+  lwidth  = csFindNearestPowerOf2 (lwidth);
+  lheight = csFindNearestPowerOf2 (lheight);
 
   while (lwidth/lheight > maxAspect) lheight += lheight;
   while (lheight/lwidth > maxAspect) lwidth  += lwidth;

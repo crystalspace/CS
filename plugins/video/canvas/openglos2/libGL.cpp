@@ -162,7 +162,7 @@ glWindow::glWindow (long Width, long Height, long ContextFlags)
   hMouse = NULL;
   hFocus = NULL;
   hResize = NULL;
-  fSwapBuffers = false;
+  csSwapFloatBuffers = false;
   fRedrawDisabled = false;
   AllowResize = true;
   hpal = NULLHANDLE;
@@ -385,9 +385,9 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
     case WM_PAINT:
       FrameCount++;
       glFlush ();
-      if (fSwapBuffers)
+      if (csSwapFloatBuffers)
       {
-        fSwapBuffers = false;
+        csSwapFloatBuffers = false;
         if (viscfg->doubleBuffer)
         {
           pglSwapBuffers (glAB, hwndCL);

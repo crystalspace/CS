@@ -216,7 +216,7 @@ static bool output_heightmap (const char *fname, iImage *ifile)
 
   // And now write the 3D file
   *eol = 0;
-  splitpath (outname, NULL, 0, outname, sizeof (outname));
+  csSplitPath (outname, NULL, 0, outname, sizeof (outname));
   fprintf (f, "WORLD\n(\n  THING '%s'\n  (\n", outname);
 
   int x, y;

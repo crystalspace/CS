@@ -107,7 +107,7 @@ struct iSpriteAction : public iBase
   /// Get the name.
   virtual char const* GetName () const = 0;
   /// Get the number of frames in this action.
-  virtual int GetNumFrames () = 0;
+  virtual int GetFrameCount () = 0;
   /// Get the specified frame.
   virtual iSpriteFrame* GetFrame (int f) = 0;
   /// Get the next frame after the specified one.
@@ -138,21 +138,21 @@ struct iSprite3DFactoryState : public iBase
   virtual void AddVertices (int num) = 0;
 
   /// Query the number of texels.
-  virtual int GetNumTexels () const = 0;
+  virtual int GetTexelCount () const = 0;
   /// Get a texel.
   virtual csVector2& GetTexel (int frame, int vertex) const = 0;
   /// Get array of texels.
   virtual csVector2* GetTexels (int frame) const = 0;
 
   /// Query the number of vertices.
-  virtual int GetNumVertices () const = 0;
+  virtual int GetVertexCount () const = 0;
   /// Get a vertex.
   virtual csVector3& GetVertex (int frame, int vertex) const = 0;
   /// Get vertex array.
   virtual csVector3* GetVertices (int frame) const = 0;
 
   /// Query the number of normals.
-  virtual int GetNumNormals () const = 0;
+  virtual int GetNormalCount () const = 0;
   /// Get a normal.
   virtual csVector3& GetNormal (int frame, int vertex) const = 0;
   /// Get normal array.
@@ -168,14 +168,14 @@ struct iSprite3DFactoryState : public iBase
   /// returns the triangles of the texel_mesh
   virtual csTriangle* GetTriangles () const = 0;
   /// returns the number of triangles in the sprite
-  virtual int GetNumTriangles () const = 0;
+  virtual int GetTriangleCount () const = 0;
 
   /// Create and add a new frame to the sprite.
   virtual iSpriteFrame* AddFrame () = 0;
   /// Find a named frame.
   virtual iSpriteFrame* FindFrame (const char* name) const = 0;
   /// Query the number of frames.
-  virtual int GetNumFrames () const = 0;
+  virtual int GetFrameCount () const = 0;
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f) const = 0;
 
@@ -186,7 +186,7 @@ struct iSprite3DFactoryState : public iBase
   /// Get the first action.
   virtual iSpriteAction* GetFirstAction () const = 0;
   /// Get number of actions in sprite.
-  virtual int GetNumActions () const = 0;
+  virtual int GetActionCount () const = 0;
   /// Get action number No
   virtual iSpriteAction* GetAction (int No) const = 0;
 
@@ -300,7 +300,7 @@ struct iSprite3DState : public iBase
   virtual int GetCurFrame () const = 0;
 
   /// Get the number of frames.
-  virtual int GetNumFrames () const = 0;
+  virtual int GetFrameCount () const = 0;
 
   /// Select an action.
   virtual bool SetAction (const char * name) = 0;

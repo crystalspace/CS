@@ -90,7 +90,7 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
     }
 
     int GetShadowCount ()
-    { return shadows.GetNumShadows (); }
+    { return shadows.GetShadowCount (); }
 
     iShadowIterator* GetShadowIterator ()
     {
@@ -290,7 +290,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
   int i;
   csVector3 v1, v2;
-  for (i = 0; i < polygon->GetVertices ().GetNumVertices (); i++)
+  for (i = 0; i < polygon->GetVertices ().GetVertexCount (); i++)
   {
     v1 = polygon->Vobj (i);           // Coordinates of vertex in object space.
     v1 -= txt_pl->v_obj2tex;
@@ -582,7 +582,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   csDelayedLightingInfo *dli = lm->delayed_light_info;
 
   // Now allocate the space for the projected lighted polygon
-  int nvlf = light_frustum->GetNumVertices ();
+  int nvlf = light_frustum->GetVertexCount ();
   csVector3 *lf3d = light_frustum->GetVertices ();
   ALLOC_STACK_ARRAY (lf2d, csVector2, nvlf);
   // Project the light polygon from world space to responsability grid space
@@ -642,7 +642,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
       if (!shadow) { sfc [i] = NULL; continue; }
 
       // Translate the shadow frustum to polygon plane
-      nv = shadow->GetNumVertices ();
+      nv = shadow->GetVertexCount ();
       csVector3 *s3d = shadow->GetVertices ();
       if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
       mirror = !shadow->IsMirrored ();
@@ -659,7 +659,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
     {
       mirror = false;
       csPolygon3D *poly = dli->GetNextUnlitPolygon ();
-      nv = poly->GetNumVertices ();
+      nv = poly->GetVertexCount ();
       if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
       float w2 = cm.width / 2.0;
       float h2 = cm.height / 2.0;
@@ -893,8 +893,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   if (lp->GetVertices ())
   {
     int mi;
-    f_uv = new csVector2 [lp->GetNumVertices ()];
-    for (i = 0 ; i < lp->GetNumVertices () ; i++)
+    f_uv = new csVector2 [lp->GetVertexCount ()];
+    for (i = 0 ; i < lp->GetVertexCount () ; i++)
     {
       //if (lview.IsMirrored ()) mi = lview.num_frustum-i-1;
       //else mi = i;
@@ -938,7 +938,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
         // Check first if polygon has been finished
 a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % lp->GetNumVertices ();
+        scanR2 = (scanR2 + 1) % lp->GetVertexCount ();
 
         if (ABS (f_uv [scanR2].y - f_uv [MaxIndex].y) < EPSILON)
         {
@@ -965,7 +965,7 @@ a:      if (scanR2 == MinIndex) goto finish;
       {
 b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + lp->GetNumVertices ()) % lp->GetNumVertices ();
+        scanL2 = (scanL2 - 1 + lp->GetVertexCount ()) % lp->GetVertexCount ();
 
         if (ABS (f_uv [scanL2].y - f_uv [MaxIndex].y) < EPSILON)
         {

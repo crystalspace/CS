@@ -462,12 +462,12 @@ struct iEngine : public iPlugIn
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
   /// return the number of mesh objects
-  virtual int GetNumMeshObjects () const = 0;
+  virtual int GetMeshObjectCount () const = 0;
   /// return a mesh object by index
   virtual iMeshWrapper *GetMeshObject (int n) const = 0;
 
   /// return the number of mesh factories
-  virtual int GetNumMeshFactories () const = 0;
+  virtual int GetMeshFactoryCount () const = 0;
   /// return a mesh object by index
   virtual iMeshFactoryWrapper *GetMeshFactory (int n) const = 0;
 
@@ -533,12 +533,12 @@ struct iEngine : public iPlugIn
   virtual iMeshObjectType* GetThingType () const = 0;
 
   /// Get the number of collections in the engine
-  virtual int GetNumCollections () const = 0;
+  virtual int GetCollectionCount () const = 0;
   /// Get a collection by its index
   virtual iCollection* GetCollection (int idx) const = 0;
 
   /// Get the number of camera positions in the engine
-  virtual int GetNumCameraPositions () const = 0;
+  virtual int GetCameraPositionCount () const = 0;
   /// Get a camera position by its index
   virtual iCameraPosition* GetCameraPosition (int idx) const = 0;
 

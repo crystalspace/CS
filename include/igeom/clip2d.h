@@ -126,7 +126,7 @@ struct iClipper2D : public iBase
   virtual bool IsInside (const csVector2& v) = 0;
 
   /// Return number of vertices for this clipper polygon.
-  virtual int GetNumVertices () = 0;
+  virtual int GetVertexCount () = 0;
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly () = 0;

@@ -137,19 +137,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
         m = identity;
         break;
       case CS_TOKEN_ROT_X:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csXRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Y:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csYRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT_Z:
-        ScanStr (params, "%f", &angle);
+        csScanStr (params, "%f", &angle);
         m *= csZRotMatrix3 (angle);
         break;
       case CS_TOKEN_ROT:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 3)
         {
           m *= csXRotMatrix3 (list[0]);
@@ -160,19 +160,19 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 	  printf ("Badly formed rotation: '%s'\n", params);
         break;
       case CS_TOKEN_SCALE_X:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csXScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Y:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csYScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE_Z:
-        ScanStr (params, "%f", &scaler);
+        csScanStr (params, "%f", &scaler);
         m *= csZScaleMatrix3(scaler);
         break;
       case CS_TOKEN_SCALE:
-        ScanStr (params, "%F", list, &num);
+        csScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	  m *= list[0];
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
@@ -186,7 +186,7 @@ static bool load_matrix (char* buf, csMatrix3 &m)
   {
     // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
     // or the nine values of a 3x3 matrix.
-    ScanStr (buf, "%F", list, &num);
+    csScanStr (buf, "%F", list, &num);
     if (num == 1)
       m = csMatrix3 () * list[0];
     else if (num == 9)
@@ -202,13 +202,13 @@ static bool load_matrix (char* buf, csMatrix3 &m)
 
 static bool load_vector (char* buf, csVector3 &v)
 {
-  ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
   return true;
 }
 
 static bool load_quaternion (char* buf, csQuaternion &q)
 {
-  ScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
+  csScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
   return true;
 }
 
@@ -348,14 +348,14 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
         break;
 	  case CS_TOKEN_ACTIONSET:
 	{
-	  ScanStr( params, "%s", &buffer );
+	  csScanStr( params, "%s", &buffer );
 	  mot->AddFrameSet(buffer);	   
 	}
 	break;
       case CS_TOKEN_FRAME:
 	{
 	  int frametime,link;
-	  ScanStr(name, "%d", &frametime);
+	  csScanStr(name, "%d", &frametime);
 	  int index=mot->AddFrame(frametime);
 	  while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0)
 	  {
@@ -363,19 +363,19 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 		{
 		  case CS_TOKEN_QLINK:
 			{
-	  		  ScanStr(params2, "%d", &link);
+	  		  csScanStr(params2, "%d", &link);
 	  		  mot->AddFrameQLink(index, name, link);
 			}
 			break;
 		  case CS_TOKEN_MLINK:
 			{
-			  ScanStr( params2, "%d", &link);
+			  csScanStr( params2, "%d", &link);
 			  mot->AddFrameMLink(index, name, link);
 			}
 			break;
 		  case CS_TOKEN_VLINK:
 			{
-			  ScanStr( params2, "%d", &link);
+			  csScanStr( params2, "%d", &link);
 			  mot->AddFrameVLink(index, name, link);
 			}
 			break;

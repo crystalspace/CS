@@ -55,7 +55,7 @@ public:
   virtual ~csIsoMeshSprite();
 
   //-------- iIsoSprite ---------------------------------------------
-  virtual int GetNumVertices() const;
+  virtual int GetVertexCount() const;
   virtual void AddVertex(const csVector3& coord, float u, float v);
   virtual const csVector3& GetPosition() const {return position;}
   virtual void SetPosition(const csVector3& pos);

@@ -186,7 +186,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     {
       c_buffer->Initialize ();
       c_buffer->InsertPolygon (new_clipper->GetVertices (),
-      	new_clipper->GetNumVertices (), true);
+      	new_clipper->GetVertexCount (), true);
     }
   }
 
@@ -194,7 +194,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     return false;
 
   Stats::portals_drawn++;
-  if (!new_clipper->GetNumVertices ())
+  if (!new_clipper->GetVertexCount ())
     return false;
 
   iCamera* icam = rview->GetCamera ();

@@ -138,7 +138,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
         char meshName[100];
 	cs_time t;
 	float angle_speed;
-	ScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
+	csScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
 	t = cs_time (float (t) * SPEED_FACTOR);
         RotatePartOp* op = new RotatePartOp (meshName, t, angle_speed);
 	seq->AddOperation (cur_time, op);
@@ -150,7 +150,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
         char meshName[100];
 	char sectName[100];
 	csVector3 p;
-	ScanStr (params, "%s,%s,%f,%f,%f", meshName, sectName,
+	csScanStr (params, "%s,%s,%f,%f,%f", meshName, sectName,
 		&p.x, &p.y, &p.z);
         SetupMeshOp* op = new SetupMeshOp (meshName, sectName, p);
 	seq->AddOperation (cur_time, op);
@@ -160,7 +160,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_SHOWMESH:
       {
         char meshName[100];
-	ScanStr (params, "%s", meshName);
+	csScanStr (params, "%s", meshName);
         ShowMeshOp* op = new ShowMeshOp (meshName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -169,7 +169,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_HIDEMESH:
       {
         char meshName[100];
-	ScanStr (params, "%s", meshName);
+	csScanStr (params, "%s", meshName);
         HideMeshOp* op = new HideMeshOp (meshName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -179,7 +179,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       {
         char meshName[100];
 	char pathName[100];
-	ScanStr (params, "%s,%s", meshName, pathName);
+	csScanStr (params, "%s,%s", meshName, pathName);
 	char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
         AttachOp* op = new AttachOp (name, pathName);
@@ -192,7 +192,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
         char meshName[100];
 	char pathName[100];
 	cs_time t;
-	ScanStr (params, "%d,%s,%s", &t, meshName, pathName);
+	csScanStr (params, "%d,%s,%s", &t, meshName, pathName);
 	t = cs_time (float (t) * SPEED_FACTOR);
 	char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
@@ -212,7 +212,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       {
 	float start, end;
 	cs_time t;
-	ScanStr (params, "%d,%f,%f,%d", &t, &start, &end);
+	csScanStr (params, "%d,%f,%f,%d", &t, &start, &end);
 	t = cs_time (float (t) * SPEED_FACTOR);
         FadeOp* op = new FadeOp (start, end, t);
 	seq->AddOperation (cur_time, op);
@@ -222,7 +222,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_DELAY:
       {
 	cs_time delay;
-        ScanStr (params, "%d", &delay);
+        csScanStr (params, "%d", &delay);
 	delay = cs_time (float (delay) * SPEED_FACTOR);
 	cur_time += delay;
 	break;
@@ -235,7 +235,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_RUNSEQUENCE:
       {
 	char seqName[100];
-	ScanStr (params, "%s", seqName);
+	csScanStr (params, "%s", seqName);
         iSequence* newseq = GetSequence (seqName);
 	if (!newseq)
 	{
@@ -300,7 +300,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
 	{
 	  newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
-	  ns->name = strnew (name);
+	  ns->name = csStrNew (name);
 	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
@@ -313,7 +313,7 @@ void DemoSequenceLoader::LoadSequences (char* buf)
 	{
           newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
-	  ns->name = strnew (name);
+	  ns->name = csStrNew (name);
 	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
@@ -376,7 +376,7 @@ static bool ParseVectorList (char* buf, csVector3* list, int num)
       case CS_TOKEN_V:
       {
         csVector3 v;
-	ScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
+	csScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
 	list[n++] = v;
 	break;
       }
@@ -421,7 +421,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       case CS_TOKEN_FILE:
       {
 	char fname[255];
-	ScanStr (params, "%s", fname);
+	csScanStr (params, "%s", fname);
   	iDataBuffer* buf = demo->myVFS->ReadFile (fname);
 	if (!buf || !buf->GetSize ())
 	{
@@ -443,7 +443,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	seq++;
-	ScanStr (params, "%d", &num);
+	csScanStr (params, "%d", &num);
 	np = new csNamedPath (num, pName);
 	break;
       }
@@ -460,7 +460,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	// First get the list of relative speeds.
 	float list[10000];
 	int n;
-	ScanStr (params, "%F", list+1, &n);	// Don't read in list[0]
+	csScanStr (params, "%F", list+1, &n);	// Don't read in list[0]
 	if (n != num-1)
 	{
 	  demo->Printf (MSG_FATAL_ERROR,
@@ -550,7 +550,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	}
 	int n;
 	float list[10000];
-	ScanStr (params, "%F", list, &n);
+	csScanStr (params, "%F", list, &n);
 	if (n != num)
 	{
 	  demo->Printf (MSG_FATAL_ERROR,

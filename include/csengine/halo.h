@@ -117,9 +117,9 @@ public:
     { scfParent->Seed = s; }
     virtual int GetRandomSeed ()
     { return scfParent->Seed; }
-    virtual void SetNumSpokes (int s)
+    virtual void SetSpokeCount (int s)
     { scfParent->NumSpokes = s; }
-    virtual int GetNumSpokes ()
+    virtual int GetSpokeCount ()
     { return scfParent->NumSpokes; }
     virtual void SetRoundnessFactor (float r)
     { scfParent->Roundness = r; }

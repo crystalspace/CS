@@ -52,7 +52,7 @@ void csBspPolygon::Dump ()
   int i, j;
   csVector3Array& verts = parent->GetVertices ();
   csVector3Array& cverts = parent->GetCameraVertices ();
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
   {
     j=polygon[i];
     printf("  vt %d:(%f,%f,%f) cam:(%f,%f,%f)\n", i, verts[j].x,
@@ -70,7 +70,7 @@ int csBspPolygon::Classify (const csPlane3& pl)
   int front = 0, back = 0;
   csVector3* verts = parent->GetVertices ().GetVertices ();
 
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
   {
     float dot = pl.Classify (verts[polygon[i]]);
     if (ABS (dot) < EPSILON) dot = 0;
@@ -88,7 +88,7 @@ int csBspPolygon::ClassifyX (float x)
   int front = 0, back = 0;
   csVector3* verts = parent->GetVertices ().GetVertices ();
 
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
   {
     float xx = verts[polygon[i]].x-x;
     if (xx < -EPSILON) front++;
@@ -105,7 +105,7 @@ int csBspPolygon::ClassifyY (float y)
   int front = 0, back = 0;
   csVector3* verts = parent->GetVertices ().GetVertices ();
 
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
   {
     float yy = verts[polygon[i]].y-y;
     if (yy < -EPSILON) front++;
@@ -122,7 +122,7 @@ int csBspPolygon::ClassifyZ (float z)
   int front = 0, back = 0;
   csVector3* verts = parent->GetVertices ().GetVertices ();
 
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
   {
     float zz = verts[polygon[i]].z-z;
     if (zz < -EPSILON) front++;
@@ -155,12 +155,12 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
-  	[polygon[polygon.GetNumVertices () - 1]];
+  	[polygon[polygon.GetVertexCount () - 1]];
   sideA = split_plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = split_plane.Classify (ptB);
@@ -228,12 +228,12 @@ void csBspPolygon::SplitWithPlaneX (csPolygonInt** poly1, csPolygonInt** poly2,
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
-  	[polygon[polygon.GetNumVertices () - 1]];
+  	[polygon[polygon.GetVertexCount () - 1]];
   sideA = ptA.x - x;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.x - x;
@@ -301,12 +301,12 @@ void csBspPolygon::SplitWithPlaneY (csPolygonInt** poly1, csPolygonInt** poly2,
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
-  	[polygon[polygon.GetNumVertices () - 1]];
+  	[polygon[polygon.GetVertexCount () - 1]];
   sideA = ptA.y - y;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.y - y;
@@ -374,12 +374,12 @@ void csBspPolygon::SplitWithPlaneZ (csPolygonInt** poly1, csPolygonInt** poly2,
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
-  	[polygon[polygon.GetNumVertices () - 1]];
+  	[polygon[polygon.GetVertexCount () - 1]];
   sideA = ptA.z - z;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
   int idx;
 
-  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  for (int i = -1 ; ++i < polygon.GetVertexCount () ; )
   {
     ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
     sideB = ptB.z - z;
@@ -452,7 +452,7 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   // If there are no visible vertices this polygon need not be drawn.
   csVector3* vertices = GetParent ()->GetCameraVertices ().GetVertices ();
   cnt_vis = 0;
-  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
     if (vertices[polygon[i]].z >= 0) cnt_vis++;
   if (cnt_vis == 0) return false;
 
@@ -468,7 +468,7 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   }
 
   // Copy the vertices to verts.
-  int num_vertices = polygon.GetNumVertices ();
+  int num_vertices = polygon.GetVertexCount ();
   for (i = 0 ; i < num_vertices ; i++) verts[i] = vertices[polygon[i]];
   pverts = verts;
 
@@ -807,8 +807,8 @@ void csPolyTreeBBox::LinkStub (csPolygonStub* ps)
 void csPolyTreeBBox::World2Camera (const csTransform& trans)
 {
   int i;
-  cam_vertices.SetNumVertices (vertices.GetNumVertices ());
-  for (i = 0 ; i < vertices.GetNumVertices () ; i++)
+  cam_vertices.SetGetVertexCount (vertices.GetVertexCount ());
+  for (i = 0 ; i < vertices.GetVertexCount () ; i++)
     cam_vertices[i] = trans.Other2This (vertices[i]);
   is_cam_transf = true;
 }
@@ -1025,7 +1025,7 @@ void csPolyTreeBBox::SplitWithPlane (csPolygonStub* stub,
   // Fill the stubs with the needed polygons.
   int i;
   csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
-  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetPolygonCount () ; i++)
   {
     int c = polygons[i]->Classify (plane);
     switch (c)
@@ -1054,17 +1054,17 @@ void csPolyTreeBBox::SplitWithPlane (csPolygonStub* stub,
   }
 
   // If the stubs are empty (no polygons) then free them again.
-  if (p_stub_on && stub_on->GetNumPolygons () == 0)
+  if (p_stub_on && stub_on->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_on);
     stub_on = NULL;
   }
-  if (stub_front->GetNumPolygons () == 0)
+  if (stub_front->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_front);
     stub_front = NULL;
   }
-  if (stub_back->GetNumPolygons () == 0)
+  if (stub_back->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_back);
     stub_back = NULL;
@@ -1093,7 +1093,7 @@ void csPolyTreeBBox::SplitWithPlaneX (csPolygonStub* stub,
   // Fill the stubs with the needed polygons.
   int i;
   csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
-  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetPolygonCount () ; i++)
   {
     int c = polygons[i]->ClassifyX (x);
     switch (c)
@@ -1119,12 +1119,12 @@ void csPolyTreeBBox::SplitWithPlaneX (csPolygonStub* stub,
   }
 
   // If the stubs are empty (no polygons) then free them again.
-  if (stub_front->GetNumPolygons () == 0)
+  if (stub_front->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_front);
     stub_front = NULL;
   }
-  if (stub_back->GetNumPolygons () == 0)
+  if (stub_back->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_back);
     stub_back = NULL;
@@ -1152,7 +1152,7 @@ void csPolyTreeBBox::SplitWithPlaneY (csPolygonStub* stub,
   // Fill the stubs with the needed polygons.
   int i;
   csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
-  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetPolygonCount () ; i++)
   {
     int c = polygons[i]->ClassifyY (y);
     switch (c)
@@ -1178,12 +1178,12 @@ void csPolyTreeBBox::SplitWithPlaneY (csPolygonStub* stub,
   }
 
   // If the stubs are empty (no polygons) then free them again.
-  if (stub_front->GetNumPolygons () == 0)
+  if (stub_front->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_front);
     stub_front = NULL;
   }
-  if (stub_back->GetNumPolygons () == 0)
+  if (stub_back->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_back);
     stub_back = NULL;
@@ -1211,7 +1211,7 @@ void csPolyTreeBBox::SplitWithPlaneZ (csPolygonStub* stub,
   // Fill the stubs with the needed polygons.
   int i;
   csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
-  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetPolygonCount () ; i++)
   {
     int c = polygons[i]->ClassifyZ (z);
     switch (c)
@@ -1237,12 +1237,12 @@ void csPolyTreeBBox::SplitWithPlaneZ (csPolygonStub* stub,
   }
 
   // If the stubs are empty (no polygons) then free them again.
-  if (stub_front->GetNumPolygons () == 0)
+  if (stub_front->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_front);
     stub_front = NULL;
   }
-  if (stub_back->GetNumPolygons () == 0)
+  if (stub_back->GetPolygonCount () == 0)
   {
     stub_pool.Free (stub_back);
     stub_back = NULL;

@@ -347,7 +347,7 @@ Then add the following somewhere before the creation of the view:
 @example
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
-  if (engine->GetNumCameraPositions () > 0)
+  if (engine->GetCameraPositionCount () > 0)
   @{
     // There is a valid starting position defined in the level file.
     iCameraPosition* campos = engine->GetCameraPosition (0);
@@ -369,7 +369,7 @@ Then add the following somewhere before the creation of the view:
 @end example
 
 First we see how many camera positions there were defined in the
-map by using @code{iEngine::GetNumCameraPositions()}. If this is 0
+map by using @code{iEngine::GetCameraPositionCount()}. If this is 0
 then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
 at (0,0,0) in that sector. But otherwise we will use the first

@@ -73,9 +73,9 @@ struct iNovaHalo : public iBase
   /// Get random seed.
   virtual int GetRandomSeed () = 0;
   /// Set the number of halo spokes.
-  virtual void SetNumSpokes (int s) = 0;
+  virtual void SetSpokeCount (int s) = 0;
   /// Get the number of halo spokes.
-  virtual int GetNumSpokes () = 0;
+  virtual int GetSpokeCount () = 0;
   /// Set the roundness factor.
   virtual void SetRoundnessFactor (float r) = 0;
   /// Get the roundness factor.

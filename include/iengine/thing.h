@@ -175,11 +175,11 @@ struct iThingState : public iBase
   /// Add a curve vertex.
   virtual void AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
   /// Get the number of curves.
-  virtual int GetNumCurves () = 0;
+  virtual int GetCurveCount () = 0;
   /// Get the curve.
   virtual iCurve* GetCurve (int idx) = 0;
   /// Get the number of curve vertices.
-  virtual int GetNumCurveVertices () = 0;
+  virtual int GetCurveVertexCount () = 0;
   /// Get the specified curve vertex.
   virtual csVector3& CurveVertex (int i) = 0;
   /// Get the curve vertices.

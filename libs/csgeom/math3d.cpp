@@ -382,11 +382,11 @@ bool csIntersect3::IntersectPolygon (const csPlane3& plane,
   float c, c1;
   csVector3 isect;
   float dist;
-  i1 = poly->GetNumVertices ()-1;
+  i1 = poly->GetVertexCount ()-1;
   c1 = plane.Classify ((*poly)[i1]);
   bool found_v1 = false;
   bool found_v2 = false;
-  for (i = 0 ; i < poly->GetNumVertices () ; i++)
+  for (i = 0 ; i < poly->GetVertexCount () ; i++)
   {
     c = plane.Classify ((*poly)[i]);
     if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))

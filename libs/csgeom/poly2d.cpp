@@ -129,7 +129,7 @@ void csPoly2D::UpdateBoundingBox ()
 
 bool csPoly2D::ClipAgainst (iClipper2D *view)
 {
-  MakeRoom (num_vertices + view->GetNumVertices () + 1);
+  MakeRoom (num_vertices + view->GetVertexCount () + 1);
   return view->ClipInPlace (vertices, num_vertices, bbox);
 }
 
@@ -167,11 +167,11 @@ void csPoly2D::Intersect (const csPlane2& plane,
       // case we remember it for later (skip_xxx var) so
       // that we can later add them if the polygon ever
       // gets vertices.
-      if (left.GetNumVertices ())
+      if (left.GetVertexCount ())
         left.AddVertex (vertices[i]);
       else
         skip_left++;
-      if (right.GetNumVertices ())
+      if (right.GetVertexCount ())
         right.AddVertex (vertices[i]);
       else
         skip_right++;
@@ -181,7 +181,7 @@ void csPoly2D::Intersect (const csPlane2& plane,
       // This vertex is on the left and the previous
       // vertex is not right (i.e. on the left or on the edge).
       left.AddVertex (vertices[i]);
-      if (!skip_right && !right.GetNumVertices ())
+      if (!skip_right && !right.GetVertexCount ())
         ignore_right++;
     }
     else if (c >= EPSILON && c1 > -EPSILON)
@@ -189,7 +189,7 @@ void csPoly2D::Intersect (const csPlane2& plane,
       // This vertex is on the right and the previous
       // vertex is not left.
       right.AddVertex (vertices[i]);
-      if (!skip_left && !left.GetNumVertices ())
+      if (!skip_left && !left.GetVertexCount ())
         ignore_left++;
     }
     else
@@ -214,7 +214,7 @@ void csPoly2D::Intersect (const csPlane2& plane,
   // 'plane'. We will add them to the corresponding polygon if
   // that polygon is not empty.
   i = ignore_left;
-  if (left.GetNumVertices ())
+  if (left.GetVertexCount ())
     while (skip_left > 0)
     {
       left.AddVertex (vertices[i]);
@@ -222,7 +222,7 @@ void csPoly2D::Intersect (const csPlane2& plane,
       skip_left--;
     }
   i = ignore_right;
-  if (right.GetNumVertices ())
+  if (right.GetVertexCount ())
     while (skip_right > 0)
     {
       right.AddVertex (vertices[i]);
@@ -265,7 +265,7 @@ printf ("    b1\n");
       // case we remember it for later (skip_xxx var) so
       // that we can later add them if the polygon ever
       // gets vertices.
-      if (right.GetNumVertices ())
+      if (right.GetVertexCount ())
 {
 printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
         right.AddVertex (vertices[i]);
@@ -281,7 +281,7 @@ printf ("    skip_right++ = %d\n", skip_right);
 printf ("    b2\n");
       // This vertex is on the left and the previous
       // vertex is not right (i.e. on the left or on the edge).
-      if (!skip_right && !right.GetNumVertices ())
+      if (!skip_right && !right.GetVertexCount ())
 {
         ignore_right++;
 printf ("    ignore_right++ =%d\n", ignore_right);
@@ -321,7 +321,7 @@ printf ("    AddVertex (%f,%f)\n", vertices[i].x, vertices[i].y);
   // 'plane'. We will add them to the corresponding polygon if
   // that polygon is not empty.
   i = ignore_right;
-  if (right.GetNumVertices ())
+  if (right.GetVertexCount ())
     while (skip_right > 0)
     {
 printf ("    AddVertex while:(%f,%f)\n", vertices[i].x, vertices[i].y);
@@ -344,7 +344,7 @@ void csPoly2D::ExtendConvex (const csPoly2D& other, int i1)
 
   // First find j1 and j2.
   j2 = -1;
-  for (j = 0 ; j < other.GetNumVertices () ; j++)
+  for (j = 0 ; j < other.GetVertexCount () ; j++)
   {
     if ((vertices[i1]-other[j]) < EPSILON)
     {
@@ -357,15 +357,15 @@ void csPoly2D::ExtendConvex (const csPoly2D& other, int i1)
     printf ("INTERNAL ERROR: matching vertex not found!\n");
     exit (0);
   }
-  j1 = (j2-1+other.GetNumVertices ()) % other.GetNumVertices ();
+  j1 = (j2-1+other.GetVertexCount ()) % other.GetVertexCount ();
 
   // Double check if i2 and j1 really match.
   if (!((vertices[i2]-other[j1]) < EPSILON))
   {
     printf ("INTERNAL ERROR: i2 doesn't match j1!\n");
-    for (i = 0 ; i < GetNumVertices () ; i++)
+    for (i = 0 ; i < GetVertexCount () ; i++)
       printf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
-    for (i = 0 ; i < other.GetNumVertices () ; i++)
+    for (i = 0 ; i < other.GetVertexCount () ; i++)
       printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
     printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
     exit (0);
@@ -373,8 +373,8 @@ void csPoly2D::ExtendConvex (const csPoly2D& other, int i1)
 
   // Copy this polygon to 'orig' and clear this one.
   csPoly2D orig (*this);
-  int orig_num = orig.GetNumVertices ();
-  int other_num = other.GetNumVertices ();
+  int orig_num = orig.GetVertexCount ();
+  int other_num = other.GetVertexCount ();
   MakeEmpty ();
 
   // Add the vertex just before i1. We will start our new
@@ -406,9 +406,9 @@ void csPoly2D::ExtendConvex (const csPoly2D& other, int i1)
     if (cnt < 0)
     {
       printf ("INTERNAL ERROR! Looping forever!\n");
-      for (i = 0 ; i < orig.GetNumVertices () ; i++)
+      for (i = 0 ; i < orig.GetVertexCount () ; i++)
 	printf ("  orig %d: %f,%f\n", i, orig[i].x, orig[i].y);
-      for (i = 0 ; i < other.GetNumVertices () ; i++)
+      for (i = 0 ; i < other.GetVertexCount () ; i++)
 	printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
       printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
       exit (0);
@@ -495,7 +495,7 @@ float csPoly2D::GetSignedArea ()
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i=0 ; i < GetNumVertices()-2 ; i++)
+  for (int i=0 ; i < GetVertexCount()-2 ; i++)
     area += csMath2::Area2 ( vertices[0], vertices[i+1], vertices[i+2] );
   return area / 2.0;
 }

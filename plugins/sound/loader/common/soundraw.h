@@ -33,7 +33,7 @@ public:
   virtual bool Initialize(const csSoundFormat *fmt);
   virtual const csSoundFormat *GetFormat();
   virtual bool IsStatic();
-  virtual long GetStaticNumSamples();
+  virtual long GetStaticSampleCount();
   virtual void *GetStaticData();
   virtual void ResetStreamed();
   virtual void *ReadStreamed(long &NumSamples);

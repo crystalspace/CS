@@ -90,12 +90,12 @@ public:
   /// Get list of polygons.
   csPolygonInt** GetPolygons () { return polygons.GetPolygons (); }
   /// Get number of polygons.
-  int GetNumPolygons () { return polygons.GetNumPolygons (); }
+  int GetPolygonCount () { return polygons.GetPolygonCount (); }
 
   /// Visit this stub while traversing the tree (octree or BSP tree).
   void* Visit (csThing* thing, csTreeVisitFunc* func, void* data)
   {
-    return func (thing, polygons.GetPolygons (), polygons.GetNumPolygons (),
+    return func (thing, polygons.GetPolygons (), polygons.GetPolygonCount (),
     	false, data);
   }
 

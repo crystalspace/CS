@@ -86,7 +86,7 @@ csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
   return csRAPIDCollider::GetCollisions ();
 }
 
-int csRapidCollideSystem::GetNumCollisionPairs ()
+int csRapidCollideSystem::GetCollisionPairCount ()
 {
   return csRAPIDCollider::numHits;
 }

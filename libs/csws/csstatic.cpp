@@ -142,7 +142,7 @@ void csStatic::Draw ()
       // remember where the lines start
       char **starts = new char * [strlen (text)];
       // count the lines
-      char s[2], *t, *p = strnew(text);
+      char s[2], *t, *p = csStrNew(text);
       int i;
       int rowstart = 0, rowend = 0; // area within bound we gonna write in
       int line = 0; // runs through the lines we write

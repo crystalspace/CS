@@ -118,7 +118,7 @@ struct iShadowBlock : public iBase
   virtual void UnlinkShadow (int idx) = 0;
 
   /// Get the number of shadows in this list.
-  virtual int GetNumShadows () = 0;
+  virtual int GetShadowCount () = 0;
 
   /// Get the specified shadow.
   virtual csFrustum* GetShadow (int idx) = 0;

@@ -66,9 +66,9 @@ public:
   virtual ~csSnowMeshObject ();
 
   /// Set the number of particles to use.
-  void SetNumberParticles (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num) { initialized = false; number = num; }
   /// Get the number of particles used.
-  int GetNumberParticles () const
+  int GetParticleCount () const
   { return number; }
   /// Set the size of the drops.
   void SetDropSize (float dropwidth, float dropheight)
@@ -130,9 +130,9 @@ public:
   class SnowState : public iSnowState
   {
     DECLARE_EMBEDDED_IBASE (csSnowMeshObject);
-    virtual void SetNumberParticles (int num)
+    virtual void SetParticleCount (int num)
     {
-      scfParent->SetNumberParticles (num);
+      scfParent->SetParticleCount (num);
     }
     virtual void SetDropSize (float dropwidth, float dropheight)
     {
@@ -154,8 +154,8 @@ public:
     {
       scfParent->SetSwirl (sw);
     }
-    virtual int GetNumberParticles () const
-    { return scfParent->GetNumberParticles (); }
+    virtual int GetParticleCount () const
+    { return scfParent->GetParticleCount (); }
     virtual void GetDropSize (float& dropwidth, float& dropheight) const
     { scfParent->GetDropSize (dropwidth, dropheight); }
     virtual void GetBox (csVector3& minbox, csVector3& maxbox) const

@@ -379,7 +379,7 @@ bool cspFileDialog::SetPath (const char *iPath)
       return false;
     delete [] path;
   }
-  path = expandname (iPath);
+  path = csExpandName (iPath);
   Reread ();
   csInputLine *il = (csInputLine *)GetChild (CSWID_PATHNAME);
   if (il && path)
@@ -397,7 +397,7 @@ void cspFileDialog::SetName (const char *iName)
 void cspFileDialog::SetFileName (const char *iName)
 {
   char path [MAXPATHLEN + 1], name [MAXPATHLEN + 1];
-  splitpath (iName, path, sizeof (path), name, sizeof (name));
+  csSplitPath (iName, path, sizeof (path), name, sizeof (name));
   SetPath (path);
   if (name && *name)
     SetName (name);
@@ -466,9 +466,9 @@ void cspFileDialog::Reread ()
       const char* const name = de->d_name;
       if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
         if (isdir (path, de))
-	  dirs.Push (strnew(name));
+	  dirs.Push (csStrNew(name));
 	else
-	  files.Push(strnew(name));
+	  files.Push(csStrNew(name));
     }
     closedir (dh);
 

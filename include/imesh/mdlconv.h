@@ -29,7 +29,7 @@ SCF_VERSION (iModelConverter, 0, 0, 1);
 struct iModelConverter
 {
   /// Return the number of supported formats
-  virtual int GetNumFormats () = 0;
+  virtual int GetFormatCount () = 0;
   /// Return the description of a supported format
   virtual const char *GetFormat (int idx) = 0;
   /// Check whether the given format is supported

@@ -144,7 +144,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -187,7 +187,7 @@ static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, c
       case CS_TOKEN_FRAME:
 	{
 	  int num;
-          ScanStr (params, "%d, %F", &duration, &verts, &num);
+          csScanStr (params, "%d, %F", &duration, &verts, &num);
 	  iSprite2DUVAnimationFrame *frame = ani->CreateFrame (-1);
 	  frame->SetFrameData (name, duration, num/2, verts);
 	}
@@ -245,7 +245,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -260,7 +260,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           spr2dLook->SetLighting (do_lighting);
         }
 	break;
@@ -299,20 +299,20 @@ bool csSprite2DFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
@@ -323,13 +323,13 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
   }
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   state->DecRef();
 }
@@ -389,7 +389,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -405,7 +405,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -424,7 +424,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
         {
           float list[100];
 	  int num;
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
 	  num /= 2;
 	  verts->SetLength (num);
           for (int i = 0 ; i < num ; i++)
@@ -440,7 +440,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
         {
           float list[100];
 	  int num;
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
 	  num /= 2;
 	  verts->SetLength (num);
           for (int i = 0 ; i < num ; i++)
@@ -453,7 +453,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           spr2dLook->SetLighting (do_lighting);
         }
         break;
@@ -461,7 +461,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
         {
           float list[100];
 	  int num;
-          ScanStr (params, "%F", list, &num);
+          csScanStr (params, "%F", list, &num);
 	  num /= 3;
 	  verts->SetLength (num);
           for (int i = 0 ; i < num ; i++)
@@ -476,7 +476,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
         {
           bool loop;
 	  int type;
-          ScanStr (params, "%s, %d, %b", str, &type, &loop);
+          csScanStr (params, "%s, %d, %b", str, &type, &loop);
 	  iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (str);
 	  if (ani)
 	    spr2dLook->SetUVAnimation (str, type, loop);
@@ -518,13 +518,13 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, state->GetMixMode());
@@ -532,31 +532,31 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csColoredVertices& vs = state->GetVertices();
   int i;
-  str->Push(strnew("VERTICES("));
+  str->Push(csStrNew("VERTICES("));
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g%s", vs[i].pos.x, vs[i].pos.y,
       (i==vs.Length()-1)?"":", ");
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
-  str->Push(strnew("UV("));
+  str->Push(csStrNew("UV("));
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length()-1)?"":", ");
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
-  str->Push(strnew("COLORS("));
+  str->Push(csStrNew("COLORS("));
   for(i=0; vs.Length(); i++)
   {
     sprintf(buf, "%g,%g,%g%s", vs[i].color_init.red, vs[i].color_init.green,
       vs[i].color_init.blue, (i==vs.Length()-1)?"":", ");
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")\n"));
+  str->Push(csStrNew(")\n"));
 
   fact->DecRef();
   state->DecRef();

@@ -246,7 +246,7 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
   int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx); 
   int spry = QInt(sprite->GetPosition().x * multy) - mingridy*QInt(multy);
   bool dynamic = flags.Check(CSISO_LIGHT_DYNAMIC);
-  for(int i=0; i<sprite->GetNumVertices(); i++)
+  for(int i=0; i<sprite->GetVertexCount(); i++)
   {
     csVector3 vpos = sprite->GetVertexPosition(i);
     int x = QInt(vpos.z * multx) + sprx;

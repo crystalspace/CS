@@ -81,7 +81,7 @@ public:
   virtual ~csModelDataPolygon ();
   
   /// return the number of vertices
-  int GetNumVertices () const;
+  int GetVertexCount () const;
   /// Add a vertex
   void AddVertex (int PositionIndex, const csVector3 &Normal,
     const csColor &Color, const csVector2 &TextureCoords);

@@ -50,10 +50,10 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
   Console = NULL;
   Prompt = NULL;
   CursorPos = 0;
-  Prompt = strnew ("# ");
+  Prompt = csStrNew ("# ");
   PromptLen = strlen(Prompt);
   HistoryPos = 0;
-  History.Push (strnew (""));
+  History.Push (csStrNew (""));
   line = new char [linemax = 80];
   InsertMode = true;
   MaxLines = 50;
@@ -129,7 +129,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
             Callback (CallbackData, line);
           if (line [0])
           {
-            HistoryPos = History.Push (strnew (line)) + 1;
+            HistoryPos = History.Push (csStrNew (line)) + 1;
             while (History.Length () > MaxLines)
               History.Delete (0);
           }
@@ -233,7 +233,7 @@ void csConsoleInput::Clear ()
 void csConsoleInput::SetPrompt (const char *iPrompt)
 {
   delete [] Prompt;
-  Prompt = strnew (iPrompt);
+  Prompt = csStrNew (iPrompt);
   PromptLen = strlen (Prompt);
   Refresh ();
 }

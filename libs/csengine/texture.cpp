@@ -126,7 +126,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     int Width  = image->GetWidth ();
     int Height = image->GetHeight ();
 
-    if (!IsPowerOf2 (Width) || !IsPowerOf2 (Height))
+    if (!csIsPowerOf2 (Width) || !csIsPowerOf2 (Height))
       CsPrintf (MSG_WARNING,
         "Inefficient texture image '%s' dimensions!\n"
         "The width (%d) and height (%d) should be a power of two.\n",
@@ -212,7 +212,7 @@ iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
   return &scfParent->NewTexture(ith)->scfiTextureWrapper;
 }
 
-long csTextureList::TextureList::GetNumTextures () const
+long csTextureList::TextureList::GetTextureCount () const
 {
   return scfParent->Length();
 }

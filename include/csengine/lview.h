@@ -236,7 +236,7 @@ public:
   virtual void UnlinkShadow (int idx);
 
   /// Get the number of shadows in this list.
-  virtual int GetNumShadows ()
+  virtual int GetShadowCount ()
   {
     return shadows.Length ();
   }

@@ -267,7 +267,7 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   if ((val = GetOptionCL ("exec")))
   {
     delete [] auto_script;
-    auto_script = strnew (val);
+    auto_script = csStrNew (val);
   }
 }
 
@@ -729,7 +729,7 @@ void WalkTest::DrawFrameMap ()
     {
       if (p->GetPortal ()) continue;
       in = false;
-      for (i = 0 ; i < p->GetNumVertices () ; i++)
+      for (i = 0 ; i < p->GetVertexCount () ; i++)
       {
 	const csVector3& v = p->Vwor (i);
 	if (ABS (v.x - c.x) < maxdist.x &&
@@ -744,7 +744,7 @@ void WalkTest::DrawFrameMap ()
       {
         csPolygon2D* clip = (csPolygon2D*)(render_pool->Alloc ());
 	clip->MakeEmpty ();
-	for (i = 0 ; i < p->GetNumVertices () ; i++)
+	for (i = 0 ; i < p->GetVertexCount () ; i++)
 	{
 	  const csVector3& v = p->Vwor (i);
 	  csVector2 v2;
@@ -764,7 +764,7 @@ void WalkTest::DrawFrameMap ()
 	  else
 	  {
     	    static G3DPolygonDP g3dpoly;
-	    g3dpoly.num = clip->GetNumVertices ();
+	    g3dpoly.num = clip->GetVertexCount ();
     	    g3dpoly.mat_handle = p->GetMaterialHandle ();
     	    g3dpoly.inv_aspect = view->GetCamera ()->GetInvFOV ();
 	    for (i = 0 ; i <g3dpoly.num ; i++)
@@ -1118,7 +1118,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   }
   // Initialize all mesh objects for collision detection.
   int i;
-  for (i = 0 ; i < engine->GetNumMeshObjects () ; i++)
+  for (i = 0 ; i < engine->GetMeshObjectCount () ; i++)
   {
     iMeshWrapper* sp = engine->GetMeshObject (i);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;

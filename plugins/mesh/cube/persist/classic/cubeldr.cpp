@@ -137,7 +137,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -194,7 +194,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -212,14 +212,14 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_SHIFT:
 	{
 	  float shiftx, shifty, shiftz;
-	  ScanStr (params, "%f,%f,%f", &shiftx, &shifty, &shiftz);
+	  csScanStr (params, "%f,%f,%f", &shiftx, &shifty, &shiftz);
 	  cubeLook->SetShift (shiftx, shifty, shiftz);
 	}
 	break;
       case CS_TOKEN_SIZE:
 	{
 	  float sizex, sizey, sizez;
-	  ScanStr (params, "%f,%f,%f", &sizex, &sizey, &sizez);
+	  csScanStr (params, "%f,%f,%f", &sizex, &sizey, &sizez);
 	  cubeLook->SetSize (sizex, sizey, sizez);
 	}
 	break;
@@ -251,20 +251,20 @@ bool csCubeFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if (mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if (mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if (mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if (mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if (mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if (mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if (mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if (mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if (mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if (mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if (mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if (mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if (mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf (buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push (strnew(")"));
+  str->Push (csStrNew(")"));
 }
 
 void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
@@ -288,13 +288,13 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   char buf[MAXLINE];
   sprintf(buf, "MATERIAL (%s)\n", cubelook->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SIZE (%g, %g, %g)\n", cubelook->GetSizeX (),
     cubelook->GetSizeY (), cubelook->GetSizeZ ());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SHIFT (%g, %g, %g)\n", cubelook->GetShiftX (),
     cubelook->GetShiftY (), cubelook->GetShiftZ ());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   
   cubelook->DecRef();
   fact->DecRef();
@@ -345,7 +345,7 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
     switch (cmd)
     {
       case CS_TOKEN_FACTORY:
-        ScanStr (params, "%s", str);
+        csScanStr (params, "%s", str);
 	iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	if (!fact)
 	{
@@ -386,7 +386,7 @@ void csCubeSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   char name[MAXLINE];
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   fact->DecRef();
 }
 

@@ -91,8 +91,8 @@ public:
   virtual void SetMaterial (iMaterialWrapper *tex)
   { th = tex; }
 
-  virtual void SetNumberMetaBalls (int number);
-  virtual int GetNumberMetaBalls ()
+  virtual void SetMetaBallCount (int number);
+  virtual int GetMetaBallCount ()
   { return num_meta_balls; }
 
   virtual void SetQualityEnvironmentMapping (bool toggle);
@@ -106,7 +106,7 @@ public:
   virtual MetaParameters *GetParameters ()
   { return &mp; }
 
-  virtual int ReportNumberTriangles ()
+  virtual int ReportTriangleCount ()
   { return mesh.num_triangles; }
 
 // Where the real work gets done....
@@ -168,10 +168,10 @@ public:
   {
 	DECLARE_EMBEDDED_IBASE(csMetaBall);
 
-	virtual int GetNumberMetaBalls() 
-	  { return scfParent->GetNumberMetaBalls(); }
-	virtual void SetNumberMetaBalls( int num )
-	  { scfParent->SetNumberMetaBalls( num ); }
+	virtual int GetMetaBallCount() 
+	  { return scfParent->GetMetaBallCount(); }
+	virtual void SetMetaBallCount( int num )
+	  { scfParent->SetMetaBallCount( num ); }
 	virtual void SetQualityEnvironmentMapping ( bool tog )
 	  { scfParent->SetQualityEnvironmentMapping( tog ); }
 	virtual bool GetQualityEnvironmentMapping()
@@ -184,8 +184,8 @@ public:
 	  { return scfParent->GetParameters(); }
 	virtual void SetMaterial ( iMaterialWrapper *mat )
 	  { scfParent->SetMaterial(mat); }
-	virtual int ReportNumberTriangles()
-	  { return scfParent->ReportNumberTriangles(); }
+	virtual int ReportTriangleCount()
+	  { return scfParent->ReportTriangleCount(); }
 	virtual UInt GetMixMode ()
 	  { return scfParent->GetMixMode(); }
 	virtual void SetMixMode( UInt mode )

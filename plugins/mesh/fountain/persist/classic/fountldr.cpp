@@ -153,20 +153,20 @@ bool csFountainFactorySaver::Initialize (iSystem* system)
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
 {
-  str->Push(strnew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  str->Push(csStrNew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
   if(mixmode&CS_FX_ALPHA)
   {
     char buf[MAXLINE];
     sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(strnew(buf));
+    str->Push(csStrNew(buf));
   }
-  str->Push(strnew(")"));
+  str->Push(csStrNew(")"));
 }
 
 
@@ -227,7 +227,7 @@ static UInt ParseMixmode (char* buf)
       case CS_TOKEN_ALPHA:
 	Mixmode &= ~CS_FX_MASK_ALPHA;
 	float alpha;
-        ScanStr (params, "%f", &alpha);
+        csScanStr (params, "%f", &alpha);
 	Mixmode |= CS_FX_SETALPHA(alpha);
 	break;
       case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -290,69 +290,69 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
       case CS_TOKEN_DROPSIZE:
 	{
 	  float dw, dh;
-	  ScanStr (params, "%f,%f", &dw, &dh);
+	  csScanStr (params, "%f,%f", &dw, &dh);
 	  fountstate->SetDropSize (dw, dh);
 	}
 	break;
       case CS_TOKEN_ORIGIN:
 	{
 	  csVector3 origin;
-	  ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
+	  csScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
 	  fountstate->SetOrigin (origin);
 	}
 	break;
       case CS_TOKEN_ACCEL:
 	{
 	  csVector3 accel;
-	  ScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
+	  csScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
 	  fountstate->SetAcceleration (accel);
 	}
 	break;
       case CS_TOKEN_SPEED:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  fountstate->SetSpeed (f);
 	}
 	break;
       case CS_TOKEN_OPENING:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  fountstate->SetOpening (f);
 	}
 	break;
       case CS_TOKEN_AZIMUTH:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  fountstate->SetAzimuth (f);
 	}
 	break;
       case CS_TOKEN_ELEVATION:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  fountstate->SetElevation (f);
 	}
 	break;
       case CS_TOKEN_FALLTIME:
 	{
 	  float f;
-	  ScanStr (params, "%f", &f);
+	  csScanStr (params, "%f", &f);
 	  fountstate->SetFallTime (f);
 	}
 	break;
       case CS_TOKEN_FACTORY:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = engine->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -369,7 +369,7 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_MATERIAL:
 	{
-          ScanStr (params, "%s", str);
+          csScanStr (params, "%s", str);
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
@@ -388,15 +388,15 @@ iBase* csFountainLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_LIGHTING:
         {
           bool do_lighting;
-          ScanStr (params, "%b", &do_lighting);
+          csScanStr (params, "%b", &do_lighting);
           fountstate->SetLighting (do_lighting);
         }
         break;
       case CS_TOKEN_NUMBER:
         {
           int nr;
-          ScanStr (params, "%d", &nr);
-          fountstate->SetNumberParticles (nr);
+          csScanStr (params, "%d", &nr);
+          fountstate->SetParticleCount (nr);
         }
         break;
     }
@@ -436,7 +436,7 @@ void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,
 
   csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
   sprintf(buf, "FACTORY ('%s')\n", name);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   if(partstate->GetMixMode() != CS_FX_COPY)
   {
@@ -444,34 +444,34 @@ void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
     QueryObject ()->GetName());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
-  str->Push(strnew(buf));
-  printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
+  printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
+  str->Push(csStrNew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().x,
     state->GetOrigin().y, state->GetOrigin().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   float sx = 0.0, sy = 0.0;
   state->GetDropSize(sx, sy);
   sprintf(buf, "DROPSIZE (%g, %g)\n", sx, sy);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "ACCEL (%g, %g, %g)\n", state->GetAcceleration().x,
     state->GetAcceleration().y, state->GetAcceleration().z);
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "SPEED (%g)\n", state->GetSpeed());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "OPENING (%g)\n", state->GetOpening());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "AZIMUTH (%g)\n", state->GetAzimuth());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "ELEVATION (%g)\n", state->GetElevation());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
   sprintf(buf, "FALLTIME (%g)\n", state->GetFallTime());
-  str->Push(strnew(buf));
+  str->Push(csStrNew(buf));
 
   fact->DecRef();
   partstate->DecRef();

@@ -31,8 +31,8 @@ csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
   (Image = inImage)->IncRef ();
   Flags = iFlags;
   HasKey = false;
-  Name = strnew (iName);
-  FileName = strnew (Image->GetName ());
+  Name = csStrNew (iName);
+  FileName = csStrNew (Image->GetName ());
   Handle = NULL;
   KeyChanged = false;
   tr = tg = tb = 255;
@@ -138,13 +138,13 @@ void csWSTexture::Refresh ()
 void csWSTexture::SetName (const char *iName)
 {
   delete [] Name;
-  Name = strnew (iName);
+  Name = csStrNew (iName);
 }
 
 void csWSTexture::SetFileName (const char *iFileName)
 {
   delete [] FileName;
-  FileName = strnew (iFileName);
+  FileName = csStrNew (iFileName);
 }
 
 int csWSTexture::GetWidth ()

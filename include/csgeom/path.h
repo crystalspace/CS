@@ -34,10 +34,10 @@ private:
   {
     int i;
     float* x, * y, * z;
-    x = new float [GetNumPoints ()];
-    y = new float [GetNumPoints ()];
-    z = new float [GetNumPoints ()];
-    for (i = 0 ; i < GetNumPoints () ; i++)
+    x = new float [GetPointCount ()];
+    y = new float [GetPointCount ()];
+    z = new float [GetPointCount ()];
+    for (i = 0 ; i < GetPointCount () ; i++)
     {
       x[i] = v[i].x;
       y[i] = v[i].y;

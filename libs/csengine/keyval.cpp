@@ -36,7 +36,7 @@ csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiKeyValuePair);
   SetName (Key);
-  m_Value = strnew (Value);
+  m_Value = csStrNew (Value);
 }
 
 csKeyValuePair::~csKeyValuePair ()
@@ -62,7 +62,7 @@ const char *csKeyValuePair::GetValue () const
 void csKeyValuePair::SetValue (const char* value)
 {
   delete[] m_Value;
-  m_Value = strnew (value);
+  m_Value = csStrNew (value);
 }
 
 //---------------------------------------------------------------------------

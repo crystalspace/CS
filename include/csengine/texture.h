@@ -189,7 +189,7 @@ public:
 
     virtual iTextureWrapper *NewTexture (iImage *image);
     virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-    virtual long GetNumTextures () const;
+    virtual long GetTextureCount () const;
     virtual iTextureWrapper *Get (int idx) const;
     virtual iTextureWrapper *FindByName (const char* iName) const;
   } scfiTextureList;

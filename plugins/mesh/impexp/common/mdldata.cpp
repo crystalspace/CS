@@ -70,7 +70,7 @@ csModelDataPolygon::~csModelDataPolygon ()
   if (Material) Material->DecRef ();
 }
 
-int csModelDataPolygon::GetNumVertices () const
+int csModelDataPolygon::GetVertexCount () const
 {
   return Vertices.Length ();
 }

@@ -243,7 +243,7 @@ void RectUnion (csObjVector &rect, csRect &result)
   if (n > 8)
     n = 8;
   if (rect.Length ())
-    Combinations (n, n, doRectUnion, &ru);
+    csCombinations (n, n, doRectUnion, &ru);
 }
 
 void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
@@ -270,7 +270,7 @@ void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
     fatal_exit (0, false);
   }
 
-  if (ScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
+  if (csScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
   {
     app->printf (MSG_FATAL_ERROR, "%s.%s): parse error in string: %s\n",
       section, id, butdef);

@@ -470,7 +470,7 @@ public:
   csShadowBlock& GetShadowBlock () { return shadows; }
 
   /// Get the number of vertices in this light patch.
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
   /// Get all the vertices.
   csVector3* GetVertices () { return vertices; }
 

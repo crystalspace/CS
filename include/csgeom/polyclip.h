@@ -104,7 +104,7 @@ public:
   { return region.In (v.x, v.y); }
 
   /// Return number of vertices for this clipper polygon.
-  virtual int GetNumVertices ()
+  virtual int GetVertexCount ()
   { return 4; }
 
   /// Return a pointer to the array of csVector2's
@@ -169,7 +169,7 @@ public:
   virtual bool IsInside (const csVector2& v);
 
   /// Return number of vertices for this clipper polygon.
-  virtual int GetNumVertices () { return ClipPolyVertices; }
+  virtual int GetVertexCount () { return ClipPolyVertices; }
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly ()

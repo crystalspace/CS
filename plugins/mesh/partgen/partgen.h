@@ -370,7 +370,7 @@ public:
   csNewtonianParticleSystem (iSystem* system, iMeshObjectFactory* factory);
   virtual ~csNewtonianParticleSystem ();
 
-  void SetNumber (int max);
+  void SetCount (int max);
 
   /// Moves the particles depending on their acceleration and speed.
   virtual void Update (cs_time elapsed_time);

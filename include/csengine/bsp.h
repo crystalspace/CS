@@ -104,7 +104,7 @@ public:
   /// Return true if node is empty.
   bool IsEmpty ()
   {
-    return polygons.GetNumPolygons () == 0 &&
+    return polygons.GetPolygonCount () == 0 &&
     	(!front || front->IsEmpty ()) &&
 	(!back || back->IsEmpty ());
   }

@@ -268,7 +268,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () { return num_vertices; }
+  int GetVertexCount () { return num_vertices; }
 
   /**
    * Get a vertex.

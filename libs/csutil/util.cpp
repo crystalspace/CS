@@ -26,7 +26,7 @@
 #include "cssysdef.h"
 
 // return a random number from minRange to maxRange inclusive
-long RndNum(long minRange, long maxRange)
+long csRndNum(long minRange, long maxRange)
 {
   if (minRange > maxRange)
   {
@@ -38,7 +38,7 @@ long RndNum(long minRange, long maxRange)
   return minRange + (long (rand ()) % range);
 }
 
-char *strnew (const char *s)
+char *csStrNew (const char *s)
 {
   if (s)
   {
@@ -51,7 +51,7 @@ char *strnew (const char *s)
     return NULL;
 }
 
-static bool RecursiveCombinations (int *vector, int top, int mask, int m, int n,
+static bool RecursivecsCombinations (int *vector, int top, int mask, int m, int n,
   bool (*callback) (int *vector, int count, void *arg), void *arg)
 {
   for (int i = 0; i < m; i++)
@@ -64,18 +64,18 @@ static bool RecursiveCombinations (int *vector, int top, int mask, int m, int n,
         return true;
       else
         ;
-    else if (RecursiveCombinations (vector, top + 1, mask | (1 << i),
+    else if (RecursivecsCombinations (vector, top + 1, mask | (1 << i),
                                     m, n, callback, arg))
       return true;
   } /* endfor */
   return false;
 }
 
-void Combinations (int m, int n, bool (*callback) (int *vector, int count,
+void csCombinations (int m, int n, bool (*callback) (int *vector, int count,
   void *arg), void *arg)
 {
   int *vector = new int [m];
-  RecursiveCombinations (vector, 0, 0, m, n, callback, arg);
+  RecursivecsCombinations (vector, 0, 0, m, n, callback, arg);
   delete [] vector;
 }
 
@@ -115,7 +115,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
 
 #endif // defined (OS_DOS)
 
-char *expandname (const char *iName)
+char *csExpandName (const char *iName)
 {
   char outname [MAXPATHLEN + 1];
   int inp = 0, outp = 0, namelen = strlen (iName);
@@ -226,7 +226,7 @@ char *expandname (const char *iName)
   return ret;
 }
 
-void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
+void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
   char *oName, size_t iNameSize)
 {
   size_t sl = strlen (iPathName);
@@ -262,7 +262,7 @@ void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
       memcpy (oName, &iPathName [sl], maxl - sl + 1);
 }
 
-bool fnamematches (const char *fName, const char *fMask)
+bool csFilenameMatches (const char *fName, const char *fMask)
 {
   while (*fName || *fMask)
   {
@@ -294,7 +294,7 @@ bool fnamematches (const char *fName, const char *fMask)
 /*------------------------------------------------------------------------------
   Byte swap 32 bit data buffer
 ------------------------------------------------------------------------------*/
-void ByteSwap32bitBuffer( register unsigned long* place, register unsigned long count )
+void cscsByteSwap32bitBuffer( register unsigned long* place, register unsigned long count )
 {
   register unsigned long value;
 
@@ -307,7 +307,7 @@ void ByteSwap32bitBuffer( register unsigned long* place, register unsigned long 
 /*------------------------------------------------------------------------------
 	Byte swap 16 bit data in place.
 ------------------------------------------------------------------------------*/
-void ByteSwap16bitBuffer( register unsigned short* place, register unsigned long count )
+void cscsByteSwap16bitBuffer( register unsigned short* place, register unsigned long count )
 {
   register unsigned short value;
 
@@ -318,7 +318,7 @@ void ByteSwap16bitBuffer( register unsigned short* place, register unsigned long
 }
 
 // finds the smallest number that is a power of two and is larger or equal to n
-int FindNearestPowerOf2 (int n)
+int csFindNearestPowerOf2 (int n)
 {
   int w=1;
 
@@ -328,7 +328,7 @@ int FindNearestPowerOf2 (int n)
 }
 
 // returns true if n is a power of two
-bool IsPowerOf2 (int n)
+bool csIsPowerOf2 (int n)
 {
   if (n <= 0)
     return false; 
