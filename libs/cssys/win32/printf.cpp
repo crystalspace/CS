@@ -57,7 +57,6 @@ void pprintf_close(void)
 #ifdef WIN32_USECONSOLE
   FreeConsole();
 #endif
-
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)

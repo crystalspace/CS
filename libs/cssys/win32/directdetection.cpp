@@ -392,5 +392,3 @@ bool DirectDetection::Have3DDevice()
   
   return false;
 }
-
-

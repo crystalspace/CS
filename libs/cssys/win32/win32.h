@@ -21,12 +21,6 @@
 
 #include <windows.h>
 
-#if defined(COMP_WCC) || defined(COMP_BC)
-// The WATCOM C++ compiler does not accept a 'main' routine
-// in a program which already contains WinMain. This is a 'fix'.
-#define main csMain
-#endif
-
 #ifdef COMP_BC
 // The Borland C++ equivalent of strcasecmp and strncasecmp are
 // stricmp and strnicmp
@@ -91,6 +85,15 @@ static inline bool isdir (char *path, dirent *de)
 /// Windows version.
 class SysSystemDriver : public csSystemDriver
 {
+  // the mouse cursor handle
+  HCURSOR MouseCursor;
+  // Use hardware mouse cursor?
+  bool HardwareCursor;
+
+  // The window callback
+  static LONG CALLBACK csWindowProc (HWND Window, UINT Msg,
+    WPARAM wParam, LPARAM lParam);
+
 public:
   SysSystemDriver ();
   
@@ -102,14 +105,18 @@ public:
   /// Implementation of IWin32SystemDriver interface.
   class XWin32SystemDriver : public IWin32SystemDriver
   {
-	/// Returns the HINSTANCE of the program
-	STDMETHODIMP GetInstance(HINSTANCE* retval);
-	/// Returns S_OK if the program is 'active', S_FALSE otherwise.
-	STDMETHODIMP GetIsActive();
-	/// Gets the nCmdShow of the WinMain().
-	STDMETHODIMP GetCmdShow(int* retval);
+    /// Returns the HINSTANCE of the program
+    STDMETHODIMP GetInstance (HINSTANCE* retval);
+    /// Returns S_OK if the program is 'active', S_FALSE otherwise.
+    STDMETHODIMP GetIsActive ();
+    /// Gets the nCmdShow of the WinMain ().
+    STDMETHODIMP GetCmdShow (int* retval);
+    /// Query whenever driver should use hardware mouse cursor
+    STDMETHODIMP GetHardwareCursor (bool *enabled);
+    /// Set the mouse cursor
+    STDMETHODIMP SetMouseCursor (LPCTSTR cursorid);
 
-	DECLARE_IUNKNOWN()
+    DECLARE_IUNKNOWN ()
   };
 
   // COM stuff

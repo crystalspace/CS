@@ -16,8 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef OS_WIN32
-
 #include "sysdef.h"
 #include "csgeom/math3d.h"
 #include "cssys/common/system.h"
@@ -38,45 +36,64 @@
 #include <sys\timeb.h>
 #endif
 
-#if defined(COMP_BC)
-#include <dos.h> // For _argc & _argv
-#endif
-
-#define NAME "Crystal"
-
-extern HINSTANCE DllHandle; //provided by the COM package
-HINSTANCE gb_hInstance;
-BOOL gb_bActive;
-int gb_nCmdShow;
-
-STDAPI DllInitialize ()
-{
-  //a Dummy function. required by the CS COM lib. This function would be
-  //called, if the cspace lib woul be loaded as a COM module.
-  return TRUE;
-}
-
-extern void cleanup();
-
-void sys_fatalerror(char *s)
-{
-  SysSystemDriver::Printf (MSG_FATAL_ERROR, "%s", s);
-  cleanup();
-  exit(1);
-}
+extern HINSTANCE ModuleHandle;
+extern int ApplicationShow;
+extern bool ApplicationActive;
 
 extern csSystemDriver* System; // Global pointer to system that can be used by event handler
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam );
+// The scan code -> character translation table
+static unsigned short ScanCodeToChar[128] =
+{
+  CSKEY_ESC,27,       '1',      '2',      '3',      '4',      '5',      '6',    // 00..07
+  '7',      '8',      '9',      '0',      '-',      '=',      '\b',     '\t',   // 08..0F
+  'q',      'w',      'e',      'r',      't',      'y',      'u',      'i',    // 10..17
+  'o',      'p',      '[',      ']',      '\n',     CSKEY_CTRL,'a',     's',    // 18..1F
+  'd',      'f',      'g',      'h',      'j',      'k',      'l',      ';',    // 20..27
+  39,       '`',      CSKEY_SHIFT,'\\',   'z',      'x',      'c',      'v',    // 28..2F
+  'b',      'n',      'm',      ',',      '.',      '/',      CSKEY_SHIFT,'*',  // 30..37
+  CSKEY_ALT,' ',      0,        CSKEY_F1, CSKEY_F2, CSKEY_F3, CSKEY_F4, CSKEY_F5,// 38..3F
+  CSKEY_F6,  CSKEY_F7, CSKEY_F8, CSKEY_F9, CSKEY_F10,0,       0,        CSKEY_HOME,// 40..47
+  CSKEY_UP,  CSKEY_PGUP,'-',    CSKEY_LEFT,CSKEY_CENTER,CSKEY_RIGHT,'+',CSKEY_END,// 48..4F
+  CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL,0,      0,        0,        CSKEY_F11,// 50..57
+  CSKEY_F12,0,        0,        0,        0,        0,        0,        0,      // 58..5F
+  0,        0,        0,        0,        0,        0,        0,        0,      // 60..67
+  0,        0,        0,        0,        0,        0,        0,        0,      // 68..6F
+  0,        0,        0,        0,        0,        0,        0,        0,      // 70..77
+  0,        0,        0,        0,        0,        0,        0,        0       // 78..7F
+};
 
+//--------------------------------------------------// The System Driver //---//
 
-////The System Driver////////////
+SysSystemDriver::SysSystemDriver() : csSystemDriver()
+{
+  WNDCLASS wc;
+
+  wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+  wc.lpfnWndProc = csWindowProc;
+  wc.cbClsExtra = 0;
+  wc.cbWndExtra = 0;
+  wc.hInstance = ModuleHandle;
+  wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
+  wc.hCursor = NULL;
+  wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+  wc.lpszClassName = WINDOWCLASSNAME;
+
+  RegisterClass (&wc);
+  MouseCursor = NULL;
+}
 
 void SysSystemDriver::SetSystemDefaults ()
 {
   csSystemDriver::SetSystemDefaults ();
   
-  System->FullScreen = 1; if (config) System->FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", System->FullScreen);
+  FullScreen = 1;
+  HardwareCursor = true;
+  if (config)
+  {
+    FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", System->FullScreen);
+    HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+  }
 }
 
 void SysSystemDriver::Alert (char* s)
@@ -89,54 +106,6 @@ void SysSystemDriver::Warn (char* s)
   MessageBox(NULL, s, "Warning", MB_OK | MB_ICONEXCLAMATION);
 }
 
-////The Keyboard Driver////////////////
-
-SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
-{
-  // Create your keyboard interface
-}
-
-SysKeyboardDriver::~SysKeyboardDriver(void)
-{
-  // Destroy your keyboard interface
-  Close();
-}
-
-bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
-{
-  csKeyboardDriver::Open (EvQueue);
-  return true;
-}
-
-void SysKeyboardDriver::Close(void)
-{
-  // Close your keyboard interface
-}
-
-////The Mouse Driver///////////////////
-
-SysMouseDriver::SysMouseDriver() : csMouseDriver ()
-{
-}
-
-SysMouseDriver::~SysMouseDriver(void)
-{
-  Close();
-}
-
-bool SysMouseDriver::Open(csEventQueue *EvQueue)
-{
-  csMouseDriver::Open (GetISystemFromSystem(System), EvQueue);
-  // Open mouse system
-  return true;
-}
-
-void SysMouseDriver::Close()
-{
-  // Close mouse system
-}
-
-
 // The System driver ////////////////
 
 BEGIN_INTERFACE_TABLE(SysSystemDriver)
@@ -145,30 +114,6 @@ BEGIN_INTERFACE_TABLE(SysSystemDriver)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
-
-SysSystemDriver::SysSystemDriver() : csSystemDriver()
-{
-  WNDCLASS wc;
-
-  wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-  wc.lpfnWndProc = WindowProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = 0;
-  wc.hInstance = gb_hInstance;
-  wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-  wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-  wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-  wc.lpszClassName = NAME;
-
-  RegisterClass( &wc );
-// Serguei 'Snaar' Narojnyi
-// Following doesnt want to work on my system,
-// it just thinks it's true anyway and i dont know what to do
-// It may be VC++ 6.0 SP2 bug, but since someone else could use it
-// I decided to make it in thins way.
-//  if(!RegisterClass( &wc ))
-//    sys_fatalerror("Cannot register CrystalSpace window class");
-}
 
 //// System loop ! 
 
@@ -207,246 +152,174 @@ void SysSystemDriver::Loop(void)
   }
 }
 
+//---------------------------------------------------// Window procedure //---//
 
-/// COM Implementation
+LONG CALLBACK SysSystemDriver::csWindowProc (HWND Window, UINT Msg,
+  WPARAM wParam, LPARAM lParam)
+{
+  int button;
+  unsigned long time = SysGetTime ();
+  
+  switch (Msg)
+  {
+    case WM_ACTIVATEAPP:
+      ApplicationActive = wParam;
+      break;
 
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, Win32SystemDriver )
+    case WM_ACTIVATE:
+      if (System)
+        System->Keyboard->Reset ();
+      break;
+
+    case WM_SETCURSOR:
+      SetCursor (((SysSystemDriver *)System)->MouseCursor);
+      return TRUE;
+
+    case WM_CREATE:
+      break;
+
+    case WM_DESTROY:
+      PostQuitMessage (0);
+      break;
+
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+      if (System)
+      {
+        bool Down = (Msg == WM_KEYDOWN) || (Msg == WM_SYSKEYDOWN);
+        int Key = ScanCodeToChar [(lParam >> 16) & 0x7f];
+
+        if (Key)
+          if (Down)
+            System->Keyboard->do_keypress (time, Key);
+          else
+            System->Keyboard->do_keyrelease (time, Key);
+      }
+      return TRUE;
+    
+    case WM_LBUTTONDOWN:
+      button = 1;
+      goto button_down;
+    case WM_RBUTTONDOWN:
+      button = 2;
+      goto button_down;
+    case WM_MBUTTONDOWN:
+      button = 3;
+button_down:
+      if (System)
+        System->Mouse->do_buttonpress (SysGetTime (), button,
+          LOWORD (lParam), HIWORD(lParam), wParam & MK_SHIFT,
+          GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
+      break;
+    
+    case WM_LBUTTONUP:
+      button = 1;
+      goto button_up;
+    case WM_RBUTTONUP:
+      button = 2;
+      goto button_up;
+    case WM_MBUTTONUP:
+      button = 3;
+button_up:
+      if (System)
+        System->Mouse->do_buttonrelease (SysGetTime (), button,
+          LOWORD (lParam), HIWORD (lParam));
+      break;
+    
+    case WM_MOUSEMOVE:
+      if (System)
+        System->Mouse->do_mousemotion (SysGetTime (),
+          LOWORD (lParam), HIWORD (lParam));
+      break;
+  }
+
+  return DefWindowProc (Window, Msg, wParam, lParam);
+}
+
+//-------------------------------------------------// COM Implementation //---//
+
+IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED (SysSystemDriver, Win32SystemDriver)
 
 STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetInstance(HINSTANCE* retval)
 {
-	*retval = gb_hInstance;
-	return S_OK;
+  *retval = ModuleHandle;
+  return S_OK;
 }
 
-STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetIsActive()
+STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetIsActive ()
 {
-	return gb_bActive ? S_OK : S_FALSE;
+  return ApplicationActive ? S_OK : S_FALSE;
 }
 
-STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetCmdShow(int* retval)
+STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetCmdShow (int* retval)
 {
-	*retval = gb_nCmdShow;
-	return S_OK;
+  *retval = ApplicationShow;
+  return S_OK;
 }
 
-// Windows input translator ////////////
-
-inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, bool shift, bool alt, bool ctrl, bool down)
+STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetHardwareCursor (bool *enabled)
 {
-  if(!pSystemDriver) return;
-  
-  // handle standard alphabetical.
-/*		if((wParam >= 'A') && (wParam <= 'z'))
-    {
-      if(down)
-        pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam + ('a' - 'A')) ;
-      else
-        pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), wParam + ('a' - 'A')) ;
-      
-    }
-    else if((wParam >= '0') && (wParam <= '9'))
-    {
-      if(down)
-        pSystemDriver->Keyboard->do_keypress(SysGetTime (), wParam);
-      else 
-        pSystemDriver->Keyboard->do_keyrelease(SysGetTime (), wParam);
-    }
-    else */
-    {
-      switch(wParam)
-      {
-      case VK_END:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_END) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_END) ;
-        break;
-      case VK_ESCAPE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ESC) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ESC) ;
-        break;
-/*      case VK_SPACE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), ' ') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), ' ') ;
-        break;
-      case VK_TAB:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\t') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\t');
-        break; */
-      case VK_RETURN:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\n') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\n') ;
-        break;
-/*      case VK_BACK:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\b') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\b') ;
-        break;
-      case VK_DELETE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\b') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\b') ;
-        break; */
-      case VK_UP:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_UP) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_UP) ;
-        break;
-      case VK_DOWN:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_DOWN) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_DOWN) ;
-        break;
-        
-      case VK_LEFT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_LEFT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_LEFT) ;
-        break;
-        
-      case VK_RIGHT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_RIGHT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_RIGHT) ;
-        break;
-        
-      case VK_PRIOR:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGUP) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGUP) ;
-        break;
-        
-      case VK_NEXT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGDN) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGDN) ;
-        break;
-        
-      case VK_MENU:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ALT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ALT) ;
-        break;
-        
-      case VK_CONTROL:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_CTRL) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_CTRL) ;
-        break;
-
-      case VK_SHIFT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_SHIFT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_SHIFT);
-        break;
-
-//      default:
-//        pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam) ;
-      }
-    }
+  METHOD_PROLOGUE (SysSystemDriver, Win32SystemDriver);
+  *enabled = pThis->HardwareCursor;
+  return S_OK;
 }
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+STDMETHODIMP SysSystemDriver::XWin32SystemDriver::SetMouseCursor (LPCTSTR cursorid)
 {
-  bool shift=false, ctrl=false;
-  
-  if(GetAsyncKeyState(VK_CONTROL)) ctrl=true;
-  if(GetAsyncKeyState(VK_SHIFT)) shift=true;
-  
-  switch( message )
-  {
-  case WM_ACTIVATEAPP:
-    gb_bActive = wParam;
-    break;
-
-  case WM_ACTIVATE:
-    if (System) System->Keyboard->Reset ();
-    break;
-
-  case WM_SETCURSOR:
-    SetCursor(NULL);
-    return TRUE;
-    
-  case WM_CREATE:
-    break;
-    
-  case WM_DESTROY:
-    PostQuitMessage( 0 );
-    break;
-
-  case WM_CHAR:
-    if(System)
-    {
-	System->Keyboard->do_keypress (SysGetTime (), wParam) ;
-	System->Keyboard->do_keyrelease (SysGetTime (), wParam) ;
-    }
-    break;
-    
-  case WM_KEYDOWN:
-    WinKeyTrans(System, wParam, shift, false, ctrl, true);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_SYSKEYDOWN:
-    WinKeyTrans(System, wParam, shift, true, ctrl, true);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_KEYUP:
-    WinKeyTrans(System, wParam, shift, false, ctrl, false);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_SYSKEYUP:
-    WinKeyTrans(System, wParam, shift, true, ctrl, false);
-    if(wParam==VK_MENU) return 0;
-    break;
-    
-  case WM_LBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 1, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_LBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 1, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_MBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_MBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_RBUTTONDOWN:
-    if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
-    break;
-    
-  case WM_RBUTTONUP:
-    if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam));
-    break;
-    
-  case WM_MOUSEMOVE:
-    // Not yet ready for this!
-    if (System)
-      System->Mouse->do_mousemotion(SysGetTime (), LOWORD(lParam), HIWORD(lParam));
-    break;
-  }
-  return DefWindowProc(hWnd, message, wParam, lParam);
+  METHOD_PROLOGUE (SysSystemDriver, Win32SystemDriver);
+  if (cursorid)
+    pThis->MouseCursor = LoadCursor (NULL, cursorid);
+  else
+    pThis->MouseCursor = NULL;
+  SetCursor (pThis->MouseCursor);
+  return S_OK;
 }
 
-extern int main (int argc, char* argv[]);
+//------------------------------------------------// The Keyboard Driver //---//
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
-                   LPSTR lpCmdLine, int nCmdShow )
+SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
 {
-  gb_hInstance = hInstance;
-  DllHandle = gb_hInstance;
-
-  gb_nCmdShow = nCmdShow;
-  gb_bActive = true;
-  
-#ifdef COMP_BC
-  main( _argc,  _argv);
-#else
-  main(__argc, __argv);
-#endif
-
-  return TRUE;
+  // Create your keyboard interface
 }
 
-#endif //OS_WIN32
+SysKeyboardDriver::~SysKeyboardDriver(void)
+{
+  // Destroy your keyboard interface
+  Close();
+}
 
+bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
+{
+  csKeyboardDriver::Open (EvQueue);
+  return true;
+}
+
+void SysKeyboardDriver::Close(void)
+{
+  // Close your keyboard interface
+}
+
+//---------------------------------------------------// The Mouse Driver //---//
+
+SysMouseDriver::SysMouseDriver() : csMouseDriver ()
+{
+}
+
+SysMouseDriver::~SysMouseDriver(void)
+{
+  Close();
+}
+
+bool SysMouseDriver::Open(csEventQueue *EvQueue)
+{
+  csMouseDriver::Open (GetISystemFromSystem(System), EvQueue);
+  // Open mouse system
+  return true;
+}
+
+void SysMouseDriver::Close()
+{
+  // Close mouse system
+}
