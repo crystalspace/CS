@@ -615,6 +615,14 @@ PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
 			 "CS_STRUCT_ALIGN_4BYTE_BEGIN=" \
 			 "CS_STRUCT_ALIGN_4BYTE_END=" \
 			 CS_USE_FAKE_WCHAR_TYPE \
+			 "CS_EXPORT_SYM=" \
+			 "CS_IMPORT_SYM=" \
+			 "CS_CSAPPFRAME_EXPORT=" \
+			 "CS_CSGEOM_EXPORT=" \
+			 "CS_CSGFX_EXPORT=" \
+			 "CS_CSTOOL_EXPORT=" \
+			 "CS_CSUTIL_EXPORT=" \
+			 "CS_CSWS_EXPORT=" \
 			 "SCF_VERSION(a,b,c,d)=" \
 			 "UCTF_CONVERTER(a,b,c,d,e)=inline static size_t a \
 			   (d* dest, size_t destSize, \

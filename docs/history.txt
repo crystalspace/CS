@@ -73,6 +73,9 @@ chronological order.
 	- Eric Sunshine augmented cspace.i to take into account the new
 	  CS_CSUTIL_EXPORT, CS_CSTOOL_EXPORT, etc. export macros in order to
 	  keep Swig from barfing on them.
+	- Eric Sunshine augmented pubapi.dox and devapi.dox to take into
+	  account the new CS_CSUTIL_EXPORT, CS_CSTOOL_EXPORT, etc.  export
+	  macros in order to keep Doxygen from barfing on them.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
