@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+12-Jun-2001
+	- Fixed a compile error and warning in SCF.
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following

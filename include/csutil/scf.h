@@ -559,10 +559,10 @@ struct iStrVector;
  * required if you want to use QUERY_INTERFACE_FAST ().
  */
 #define DECLARE_FAST_INTERFACE(Interface)				\
-inline scfGetID_##Interface ()						\
+inline uint32 scfGetID_##Interface ()					\
 {									\
   static scfInterfaceID ID = (scfInterfaceID)-1;			\
-  if (ID == -1)								\
+  if (ID == (uint32)(-1))						\
     ID = iSCF::SCF->GetInterfaceID (#Interface);			\
   return ID;								\
 }
