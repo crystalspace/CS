@@ -81,7 +81,7 @@ DO_MMX=yes
 
 # If "yes", then in UNIX create core dumps on crash.
 # Be warned, they are large (> 20MB)!
-DO_COREDUMP=no
+DO_COREDUMP=yes
 
 # Uncomment the following line(s) if you want to enable the memory debugger
 # that is built in.  This is only recommended for debugging purposes as it
