@@ -44,7 +44,6 @@ Description-fr: Kit de développement 3D Multi-Plateformes (Documentations)
  doute interéssés pour l'utiliser comme base d'un jeu 3D, pour lequel il
  convient bien.
 
-
 Package: crystalspace-demos
 Architecture: any
 Depends: crystalspace (= ${Source-Version})
