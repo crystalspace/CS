@@ -368,6 +368,7 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   if(node_state == CS_QUAD3D_UNKNOWN)
   {
     CsPrintf(MSG_INTERNAL_ERROR, "QuadTree3D: insertpoly quad_unknown.\n");
+    Print();
     return CS_QUAD3D_NOCHANGE;
   }
   if(node_state == CS_QUAD3D_FULL) // full already, skip it.
@@ -417,11 +418,13 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   if( covered == CS_FRUST_COVERED )
   {
     if(!info.test_only)
+    {
       pObj->SetNodeState(node_pos, CS_QUAD3D_FULL);
-    /// mark children (if any) as unknown, since they should not be reached.
-    if(node_pos->depth < pObj->max_depth)
-      pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
-        node_pos, (void*)CS_QUAD3D_UNKNOWN);
+      /// mark children (if any) as unknown, since they should not be reached.
+      if(node_pos->depth < pObj->max_depth)
+        pObj->CallChildren(&csQuadTree3D::mark_node_func, pObj,
+          node_pos, (void*)CS_QUAD3D_UNKNOWN);
+    }
     return CS_QUAD3D_CERTAINCHANGE;
   }
 
