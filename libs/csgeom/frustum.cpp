@@ -406,7 +406,9 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
 	// rect (0,1,1), (1,1,1), (1,0,1), (0,0,1)
 	// with frust (0,0,2), (8,8,2), (8,0,2)
 	// is classified as 0 (outside) but should be partial.
-	if (!((poly[pvp]%v1)*poly[pv] > 0 || (v2%poly[pvp])*poly[pv] > 0))
+	float f1;
+	float f2; 
+	if (!((f1=(poly[pvp]%v1)*poly[pv]) > 0 || (f2=(v2%poly[pvp]) * poly[pv]) > 0) || f1 == 0 || f2 == 0)
           return CS_FRUST_PARTIAL;
 #else
         // If the segment intersects with the frustum plane somewhere
