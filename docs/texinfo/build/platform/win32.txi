@@ -25,23 +25,23 @@ The Windows port of Crystal Space is currently maintained by Philip Wyett
 @node Win32 General, Win32 MSVC5, Win32, Win32
 @subsubsection General Information
 
-To compile Crystal Space for Windows, you'll need the
-@emph{Microsoft Developer Studio} or @emph{Microsoft Visual C++} version 6, with
-Service pack 4 installed and optionally the Microsoft Processor Pack.
+To compile Crystal Space for Windows, you'll need the @emph{Microsoft Developer
+Studio} or @emph{Microsoft Visual C++} version 6, with Service pack 4 installed
+and optionally the Microsoft Processor Pack.
 
-You may try to compile Crystal Space with version 5 of @emph{Visual C++}, however it is unsupported and not
-recommended. @xref{Win32 MSVC5}.
+You may try to compile Crystal Space with version 5 of @emph{Visual C++},
+however it is unsupported and not recommended.  @xref{Win32 MSVC5}.
 
 In addition to @file{zlib}, @file{libjpeg} and @file{libpng}, the following
-external libraries are used. Note that to use these libraries, you need
-both the @sc{sdk} and the runtime installation. For the runtime libraries this
+external libraries are used.  Note that to use these libraries, you need both
+the @sc{sdk} and the runtime installation.  For the runtime libraries this
 should not be a problem as they can usually be found in any game distribution
 that uses them.
 
 @itemize @bullet
 @item
-DirectX 5.0 or higher is required. With this, you get sound output and
-non-accelerated graphics. The @sc{sdk} is usually included in the @sc{msvc}
+DirectX 5.0 or higher is required.  With this, you get sound output and
+non-accelerated graphics.  The @sc{sdk} is usually included in the @sc{msvc}
 package.
 
 @item
@@ -53,40 +53,54 @@ OpenGL also allows hardware acceleration, but DirectX 5.0 is still required.
 The OpenGL @sc{sdk} is usually included in the @sc{msvc} package.
 @end itemize
 
-If you don't have these ready, they can be found at one of the following
+If you do not have these ready, they can be found at one of the following
 locations:
-@table @emph
-@item NooTe's homepage
-This site should contain everything you need in the @samp{Sources} section: @*
+
+@itemize @bullet
+@item
+@emph{NooTe's homepage}
+
+This site should contain everything you need in the @samp{Sources} section:
+
+@noindent
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
-@item SGI OpenGL for Windows Software Development Kit (@sc{sdk})
+@item
+@emph{@sc{sgi} OpenGL for Windows Software Development Kit (@sc{sdk})}
+
+@noindent
 @uref{http://www.meer.net/~gold/OpenGL/sgi-opengl.html}
 
-@item Microsoft OpenGL @sc{sdk}
-The Microsoft OpenGL @sc{sdk} ships with the platform @sc{sdk}. In Microsoft's
-own words:
-@quotation
-The complete Platform @sc{sdk} is available as part of Visual C++ (R), an
-@sc{msdn} Professional subscription, an @sc{msdn} Universal subscription, or
-from the following download site,
-@uref{http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm}. A
-low-cost @sc{sdk cd} will also be available from
-@uref{http://developerstore.com}, starting in December 2000.
-@end quotation
-So, if you have VC++ you, probalby already have it too, even if you haven't
-installed it.
+@item
+@emph{Microsoft OpenGL @sc{sdk}}
 
-The download is free, but a typical installation will take 22 MB. The
-complete MS Platform @sc{sdk} installation is a 1212 MB download (yes, your
-read it). You can also do a custom install and get only what you want.
-@end table
+The Microsoft OpenGL @sc{sdk} ships with the platform @sc{sdk}.  The complete
+Platform @sc{sdk} is available as part of Visual-C++, an @sc{msdn} Professional
+subscription, an @sc{msdn} Universal subscription, or from the following
+download site:
+
+@noindent
+@uref{http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm}
+
+A low-cost @sc{sdk cd} is also available from:
+
+@noindent
+@uref{http://developerstore.com/}
+
+Therefore, if you have Visual-C++ you, probably already have the OpenGL
+@sc{sdk} as well, even if you have not manually installed it.
+
+The download is free, but a typical installation will require 22 megabytes.
+The complete Microsoft Platform @sc{sdk} installation is a 1212 megabytes
+download.  You can also perform a custom install and retrieve only what you
+want or need.
+@end itemize
 
 After installing a new DirectX @sc{sdk}, you must also make sure that it is
-used. Select @emph{Tools/Options/Directories}. For both libraries and
-headers the new DirectX directory must appear before the older version's
-directory. So if they are not in the list, add them. If they appear after the
-older directories, move them on top of the list.
+actually used by Visual-C++.  Select @emph{Tools/Options/Directories}.  For
+both libraries and headers the new DirectX directory must appear before the
+older version's directory.  So if they are not in the list, add them.  If they
+appear after the older directories, move them on top of the list.
 
 You need not compile all parts of Crystal Space. For example, if you don't
 want to use DirectX 6.1 for graphics, then you don't have to compile it. See

@@ -67,12 +67,12 @@ filenames, so if you're sure that you will never have to place some file on a
 @item
 Different platforms use different filename comparison criteria.  On Unix
 filenames are case-sensitive, while on @sc{dos}, @sc{os/2}, Windows, and
-Macintosh they are case-insensitive.  To avoid problems always refer to files
-by their exact names.  For example, if you have a file on @sc{vfs} called
+Macintosh (HFS) they are case-insensitive.  To avoid problems always refer to
+files by their exact names.  For example, if you have a file on @sc{vfs} called
 @file{GaMe.DaT} you should open it exactly as @file{GaMe.DaT} and not as
 @file{game.dat} or @file{GAME.DAT}.  On @sc{dos}, the file will appear to be
-entirely upper-case @file{GAME.DAT}, but you should still use the correct
-name, @file{GaMe.DaT}, when opening it.
+entirely upper-case @file{GAME.DAT}, but you should still use the correct name,
+@file{GaMe.DaT}, when opening it.
 
 @item
 Keep in mind that Unix @emph{can} delete currently opened files while
@@ -171,9 +171,12 @@ here. This example is only intended to understand the concept:
 ; directory.
 
 VFS.Mount.~ = $(HOME)$/
-VFS.Mount.level1 = $.$/patches$/level1$/, $.$/cache$/level1.zip, $(CD)$/data$/level1.zip
-VFS.Mount.level2 = $.$/patches$/level2$/, $.$/cache$/level2.zip, $(CD)$/data$/level2.zip
-VFS.Mount.level3 = $.$/patches$/level3$/, $.$/cache$/level3.zip, $(CD)$/data$/level3.zip
+VFS.Mount.map1 =
+  $.$/patches$/map1$/, $.$/cache$/map1.zip, $(CD)$/data$/map1.zip
+VFS.Mount.map2 =
+  $.$/patches$/map2$/, $.$/cache$/map2.zip, $(CD)$/data$/map2.zip
+VFS.Mount.map3 =
+  $.$/patches$/map3$/, $.$/cache$/map3.zip, $(CD)$/data$/map3.zip
 
 ; Platform aliases.  Aliases are always read first; VFS
 ; entries specific to each platform override those defined

@@ -1,10 +1,11 @@
 @node Internals, Contributing, Plug-In Drivers, Top
-@chapter The Internal Structure of the Project
+@chapter Internal Project Structure
 @cindex Internal Structure
 
-This chapter describes how Crystal Space works internally. This information
-should not be nessecary to use CS in your project. It is intended for
-developers.
+This chapter describes how Crystal Space works internally.  This information is
+not nessecary to utilize Crystal Space in your own project.  Instead, it is
+intended for developers of Crystal Space itself, as well as for those who are
+merely curious about the internal workings of the project.
 
 @menu
 * Platform Details:: Platform-Specific Details

@@ -84,9 +84,9 @@ information about the @samp{Video.Software.Interlacing} option in the config
 file for the software renderer, @file{CS/data/config/soft3d.cfg}.
 
 @item mmx
-Toggle @sc{mmx} support on/off.  This command corresponds with the
-@samp{Video.Software.MMX} option in the software graphics config file
-(@file{CS/data/config/soft3d.cfg}).  @xref{Config Graphics}.  Note that this
+Toggle @sc{mmx} support on/off.  This command corresponds to the software
+renderer's @samp{Video.Software.MMX} option in
+@file{CS/data/config/soft3d.cfg}.  @xref{Config Graphics}.  Note that this
 command is only useful if you have a @sc{mmx} capable processor.
 
 @item zbuf

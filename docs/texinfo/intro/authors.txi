@@ -57,8 +57,8 @@ alphabetically by surname.
 @item
 Robert Bate (@email{rbate@@ma.ultranet.com})
 
-Robert wrote the documentation detailing the Macintosh port of Crystal Space
-which he also maintains.
+Robert wrote the documentation detailing the pre-Carbon Macintosh port of
+Crystal Space which he also maintains.
 
 @item
 Brandon Ehle (@email{azverkan@@yahoo.com})

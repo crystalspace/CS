@@ -1,8 +1,8 @@
 @c -*-texinfo-*-
 @noindent
-Copyright @copyright{} 1998, 1999, 2000 by Jorrit Tyberghein@*
+Copyright @copyright{} 1998, 1999, 2000, 2001 by Jorrit Tyberghein@*
 Copyright @copyright{} 1998, 1999, 2000 by Andrew Zabolotny@*
-Copyright @copyright{} 1999, 2000 by Eric Sunshine@*
+Copyright @copyright{} 1999, 2000, 2001 by Eric Sunshine@*
 Copyright @copyright{} 1999, 2000 by Thomas Hieber@*
 Copyright @copyright{} 1999, 2000 by Seth Galbraith@*
 Copyright @copyright{} 1999, 2000 by Michael Dale Long@*

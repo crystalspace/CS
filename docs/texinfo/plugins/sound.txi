@@ -10,7 +10,7 @@ The sound system consists of three components.
 System dependent sound drivers.  This driver is used to pass one audio stream
 to the sound hardware (it does not mix several streams), and is only used by
 the software sound renderer.  The other renderers do not need this driver.
-There are currently drivers for Macintosh, @sc{oss} (Linux) and WaveOut
+There are currently drivers for MacOS/9, @sc{oss} (Linux) and WaveOut
 (Windows).
 
 @emph{Note}: You need not load the sound driver yourself.  It is loaded
@@ -33,7 +33,7 @@ Microsoft @file{.wav}, 8- and 16-bit @sc{pcm}.
 @item
 Amiga @file{.8svx} and @file{.iff}, 8-bit @sc{pcm}.
 @item
-Macintosh @file{.aiff}, 8- and 16-bit @sc{pcm}.
+MacOS/9 @file{.aiff}, 8- and 16-bit @sc{pcm}.
 @end itemize
 @end table
 

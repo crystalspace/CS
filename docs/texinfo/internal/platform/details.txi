@@ -10,7 +10,7 @@ platform or merely wish to know how it works, this is the information which
 you should read.
 
 @menu
-* NeXT Details:: MacOS/X Server, OpenStep, NextStep
+* NeXT Details:: MacOS/X, MacOS/X Server, OpenStep, NextStep
 * OS2 Details:: OS/2
 @end menu
 

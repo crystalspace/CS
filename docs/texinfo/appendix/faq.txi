@@ -105,9 +105,8 @@ Where @samp{flarge} is the name of the map file you wish to use.  In this case,
 Also note that @file{flarge.zip} itself requires the file @file{stdtex.zip}
 which contains all the textures.
 
-Alternately, for the @file{walktest} program, you can edit its configuration
-file @file{data/config/cryst.cfg} and change the @samp{WorldFile=@dots{}}
-setting.  For example:
+Alternately, for WalkTest, you can change the @samp{WorldFile} setting in its
+configuration file @file{CS/data/config/cryst.cfg}.  For example:
 
 @example
 Walktest.Settings.WorldFile = flarge

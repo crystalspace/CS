@@ -127,7 +127,7 @@ bin/memdbg.sh ./walktest sL
 
 After you created the map file, just run your program as usual.  If your
 program doesn't have a separate @samp{stdout} stream (such as on @sc{dos},
-@sc{os/2}, Windows, Macintosh) it is recommended that you always use log file;
+@sc{os/2}, Windows, MacOS/9) it is recommended that you always use log file;
 if you didn't you can still redirect the @samp{stdout} to a file using the
 @samp{stdout} redirection, if it is possible (for intance, @samp{./walktest >
 logfile}).
