@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Aug-2003
+	- Paul G. implemented a very nasty (and hopefully very temporary) hack
+	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for Win32/COMP_GCC
+	  platform (Mingw).
 	- Jorrit removed iAwsParmList->AddBasicVector() and GetBasicVector().
 	  These functions were not used in CS and I thikn they are not safe
 	  (i.e. should use SCF parameter and not csBasicVector). And

@@ -25,6 +25,12 @@
  
 /**\addtogroup util
  * @{ */
+ 
+// A very nasty, last chance hack to define/declare CS_WCHAR_T_SIZE
+#if defined(OS_WIN32) && defined(COMP_GCC)
+#include "win32/volatile.h"
+#endif
+// end hack
 
 #if defined(CS_HAS_WCHAR_H)
 #include <wchar.h>
@@ -38,7 +44,7 @@ typedef uint16 wchar_t;
 #if !defined(CS_WCHAR_T_SIZE)
 #  error Unknown wchar_t size.
 #elif (CS_WCHAR_T_SIZE != 1) && (CS_WCHAR_T_SIZE != 2) && (CS_WCHAR_T_SIZE != 4)
-#  error Unsupported whcar_t size.
+#  error Unsupported wchar_t size.
 #endif
 
 /// A single char in a UTF8 encoded string.
