@@ -1782,6 +1782,22 @@ CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
 
 
 #------------------------------------------------------------------------------
+# Check if backtrace() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for backtrace() support], [cs_cv_backtrace],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <execinfo.h>]],
+	[void* foo; int x; x = backtrace (&foo, 0); 
+	backtrace_symbols (&foo, x);])],
+    [], [],
+    [CS_EMIT_BUILD_PROPERTY([BACKTRACE.AVAILABLE], [yes])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if TemplateToolkit2 is installed (needed for MSVC project generation).
 #------------------------------------------------------------------------------
 AS_IF([test -n "$PERL"],

@@ -21,7 +21,6 @@ case MACOS_X :					# MacOS/X
 		[ ConcatDirs generic csprocessorcap.cpp ]
 		[ ConcatDirs generic cspthrd.cpp ] 
 		[ ConcatDirs generic cspthrd.h ]
-		[ ConcatDirs generic dummycallstack.cpp ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
 		[ ConcatDirs generic mmap.cpp ]
@@ -38,7 +37,6 @@ case * :					# Posix, Unix, Linux, etc.
 		[ ConcatDirs generic csprocessorcap.cpp ]
 		[ ConcatDirs generic cspthrd.cpp ]
 		[ ConcatDirs generic cspthrd.h ]
-		[ ConcatDirs generic dummycallstack.cpp ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
 		[ ConcatDirs generic mmap.cpp ]
@@ -56,6 +54,18 @@ case * :					# Posix, Unix, Linux, etc.
   else
   {
     CSSYS_SRC += [ ConcatDirs generic scanplugins.cpp ] ;
+  }
+}
+
+if $(TARGET.OS) != "WIN32"
+{
+  if $(BACKTRACE.AVAILABLE) = "yes"
+  {
+    CSSYS_SRC += [ ConcatDirs generic callstack-backtrace.cpp ] ;
+  }
+  else
+  {
+    CSSYS_SRC += [ ConcatDirs generic callstack-dummy.cpp ] ;
   }
 }
 
