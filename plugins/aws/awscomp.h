@@ -89,7 +89,7 @@ protected:
   /// Embedded awsSource
   awsSource signalsrc;
 
-  /// If true then the preferred set is manually set.
+  /// If true then the preferred size is manually set.
   bool set_preferred_size;
   /// Preferred size if set_preferred_size is true.
   csRect preferred_size;
