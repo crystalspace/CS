@@ -53,7 +53,7 @@ public:
     return chUsed;
   
 #define GET_NEXT(next)	\
-  if (chUsed == strlen)				\
+  if ((size_t)chUsed == strlen)			\
   {						\
     FAIL(chUsed);				\
   }						\
@@ -731,7 +731,7 @@ public:
     
     // Skip backward to the first byte of the sequence.
     int skip = 1;
-    while (((*pos & 0xc0) == 0x80) && (skip < maxRew))
+    while (((*pos & 0xc0) == 0x80) && ((size_t)skip < maxRew))
     {
       skip++;
       pos--;

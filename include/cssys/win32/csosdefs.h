@@ -22,7 +22,6 @@
 
 #if defined(COMP_VC)
 
-  #pragma warning(disable:4018)   // Signed unsigned warnings
   #pragma warning(disable:4097)   // use of xxx as synonym for a classname
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4102)   // 'label' : unreferenced label

@@ -19,6 +19,9 @@ chronological order.
 	  simple1 to crash at exit due to an assert in csBlockAllocator.
 	- Jorrit forgot to remove some instances of FASTMESH.
 	- Jorrit removed an unused field from csPolygon3DStatic.
+	- res fixed a few 'signed/unsigned mismatch' compiler warnings in
+	  cssys/csuctransform.h.
+	- res re-enabled 'signed/unsigned mismatch' compiler warnings for MSVC.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.
