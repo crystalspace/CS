@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+8-Jan-2002
+	- Reverted a change to the png loader plugin (in the saving part)
+	  that 'res' made some time ago. It caused quality degradation when
+	  writing a big bunch of thumbnails using gfxtest.
 7-Jan-2002
 	- Corrected the includes in the collision detection howto.
 	- Extended iLoader::LoadTexture() with a 'register' parameter which

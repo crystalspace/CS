@@ -199,7 +199,7 @@ error2:
     } /* endfor */
     png_set_PLTE (png, info, palette, 256);
     // pnglib makes its own copy of the palette
-    free (palette);
+    //free (palette);
   }/* endif */
 
   /* otherwise, if we are dealing with a color image then */
@@ -238,6 +238,9 @@ error2:
 
   /* It is REQUIRED to call this to finish writing the rest of the file */
   png_write_end (png, info);
+
+  if (info->palette)
+    free (info->palette);
 
   /* clean up after the write, and free any memory allocated */
   png_destroy_write_struct (&png, (png_infopp)NULL);
