@@ -87,27 +87,38 @@ bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
   // Open the visual, initialize keyboard and mouse
   Open (application->GetText ());
 
-  // create a uniform palette: r(3)g(3)b(2)
+  // Setup application palette etc
+  application->SetWorld (world);
+
+  // Can only set up the palette after SetWorld() has been called (above),
+  // since it calls csWorld::Prepare() which blasts any existing palette.
+  // Unfortunately, Prepare() leaves the palette in such a state that we can
+  // not add any additional palette entries, but must instead re-initialize
+  // it.  Fortunately re-initializing it is harmless at this point in time
+  // during application start-up since there was no useful information in the
+  // palette anyhow.
+
+  // Create a uniform palette: r(3)g(3)b(2)
   ITextureManager* txtmgr;
   piG3D->GetTextureManager (&txtmgr);
+  txtmgr->Initialize ();
 
   int r,g,b;
   for (r = 0; r < 8; r++)
     for (g = 0; g < 8; g++)
       for (b = 0; b < 4; b++)
         txtmgr->ReserveColor (r * 32, g * 32, b * 64);
-
-  // Setup application palette etc
-  application->SetWorld (world);
   
+  txtmgr->Prepare ();
+  txtmgr->AllocPalette ();
+  application->SetupPalette ();
+
   atexit (cleanup);
   return true;
 };
 
 void appSystemDriver::CloseConsole ()
 {
-  Sleep (2000);
-  piG2D->ClearAll (0);
   // Compute and set the work palette (instead of console palette)
   application->SetWorld (world);
 }
@@ -143,7 +154,7 @@ void appSystemDriver::DemoWrite (const char* buf)
   strcpy (textline [curline], buf);
   linecolor [curline] = textcolor;
 
-  if (Console && piG2D)
+  if (piG2D)
   {
     if (SUCCEEDED (piG2D->BeginDraw ()))
     {

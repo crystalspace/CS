@@ -135,11 +135,7 @@ void csApp::SetWorld (csWorld *AppWorld)
   world->Prepare (System->piG3D);
   ITextureManager* txtmgr;
   System->piG3D->GetTextureManager (&txtmgr);
-  if (txtmgr)
-  {
-    //txtmgr->Prepare (); //fill cause a crash, but looks unnecessary anyway.
-    txtmgr->AllocPalette ();
-  }
+  txtmgr->AllocPalette ();
   SetupPalette ();
 }
 
