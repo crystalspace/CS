@@ -27,6 +27,8 @@
 #define CS_LINUX_JOYSTICK_CFG "/config/joystick.cfg"
 #define CS_LINUX_JOYSTICK_KEY "Device.Joystick.Linux."
 
+#define CS_LINUX_JOYSTICK_OLD_EVENTS // the values of the first two axis are sent only
+
 CS_IMPLEMENT_PLUGIN;
 
 SCF_IMPLEMENT_IBASE (csLinuxJoystick)
@@ -83,7 +85,12 @@ bool csLinuxJoystick::HandleEvent (iEvent &)
         break;
       case JS_EVENT_AXIS:
         joystick[i].axis[js.number] = js.value;
+#ifdef CS_LINUX_JOYSTICK_OLD_EVENTS
+        if (js.number < 2)
+          EventOutlet->Joystick (i, 0, 0, joystick[i].axis[0], (joystick[i].nAxes > 1 ? joystick[i].axis[1] : 0));
+#else
         EventOutlet->Joystick (i, 0, 0, js.number, js.value);
+#endif
         break;
       }
     }
