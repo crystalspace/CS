@@ -216,26 +216,26 @@ public:
   void WindowToClient (int &ClientW, int &ClientH);
 
   /// Set background color of the window
-  void SetBackgroundColor(int Color);
+  void SetBackgroundColor (int Color);
   /// Set background Pixmap of the window
-  void SetBackgroundPixmap(csPixmap *pixmap);
+  void SetBackgroundPixmap (csPixmap *pixmap);
   /// Get background color of the window
-  int GetBackgroundColor();
+  int GetBackgroundColor ();
   /// Get background Pixmap of the window
-  csPixmap * GetBackgroundPixmap();
+  csPixmap *GetBackgroundPixmap ();
 
   /// Set BorderDarkColor
-  void SetBorderDarkColor(int Color);
+  void SetBorderDarkColor (int Color);
   /// Set BorderLightColor
-  void SetBorderLightColor(int Color);
+  void SetBorderLightColor (int Color);
   /// Set BorderPixmap
-  void SetBorderPixmap(csPixmap * pixmap);
+  void SetBorderPixmap (csPixmap * pixmap);
   /// Get BorderDarkColor
-  int GetBorderDarkColor();
+  int GetBorderDarkColor ();
   /// Get BorderLightColor
-  int GetBorderLightColor();
+  int GetBorderLightColor ();
   /// Get BorderPixmap
-  csPixmap * GetBorderPixmap();
+  csPixmap *GetBorderPixmap ();
 
 protected:
   /// Set button bitmaps to one of those read from csws.cfg

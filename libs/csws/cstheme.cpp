@@ -40,30 +40,32 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csTheme class --//--//
 
-csTheme::csTheme(csApp * napp)
+csTheme::csTheme (csApp * napp)
 {
   g_app = napp;
-  themeComponents = new csVectorThemeComponent();
+  themeComponents = new csVectorThemeComponent ();
 
-  AddThemeComponent(new csThemeComponent(this));
-  AddThemeComponent(new csThemeWindow(this));
-  AddThemeComponent(new csThemeButton(this));
+  AddThemeComponent (new csThemeComponent (this));
+  AddThemeComponent (new csThemeWindow (this));
+  AddThemeComponent (new csThemeButton (this));
 };
 
-void csTheme::AddThemeComponent(csThemeComponent * comp)
+void csTheme::AddThemeComponent (csThemeComponent * comp)
 {
-  themeComponents->InsertSorted(comp);
+  themeComponents->InsertSorted (comp);
 }
 
-csThemeComponent * csTheme::GetThemeComponent(char * name)
+csThemeComponent * csTheme::GetThemeComponent (char * name)
 {
-  return (csThemeComponent *) themeComponents->Get(themeComponents->FindKey(name));
+  return (csThemeComponent *)themeComponents->Get (
+    themeComponents->FindSortedKey (name));
 }
 
-void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int li, int di, csPixmap * pixmap)
+void csTheme::DrawBorder (csComponent &comp, int FrameStyle, int &bw, int &bh,
+  int li, int di, csPixmap *pixmap)
 {
   int bwi,bhi;
-  GetBorderSize(comp,FrameStyle,bw,bh);
+  GetBorderSize (comp, FrameStyle, bw, bh);
   switch (FrameStyle)
   {
     case csthfsOblique:
@@ -101,132 +103,137 @@ void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int 
     case csthfsTexture:
       // Top Piece
       CS_ASSERT(pixmap != NULL);
-      bwi=comp.bound.Width()-bw;
-      bhi=comp.bound.Height()-bh;
-      comp.Sprite2DTiledShifted(pixmap,0,0,comp.bound.Width(),bh,0,0);
+      bwi = comp.bound.Width () - bw;
+      bhi = comp.bound.Height () - bh;
+      comp.Sprite2DTiledShifted (pixmap, 0, 0, comp.bound.Width (), bh, 0, 0);
       // Bottom Piece
-      comp.Sprite2DTiledShifted(pixmap,0,bhi,comp.bound.Width(),comp.bound.Height(),0,bhi);
+      comp.Sprite2DTiledShifted (pixmap, 0, bhi, comp.bound.Width (),
+        comp.bound.Height (), 0, bhi);
       // Left Side Piece
-      comp.Sprite2DTiledShifted(pixmap,0,bh,bw,bhi,0,bh);
+      comp.Sprite2DTiledShifted (pixmap, 0, bh, bw, bhi, 0, bh);
       // Right Side Piece
-      comp.Sprite2DTiledShifted(pixmap,bwi,bh,comp.bound.Width(),bhi,bwi,bh);
+      comp.Sprite2DTiledShifted (pixmap, bwi, bh, comp.bound.Width (),
+        bhi, bwi, bh);
       break;
   } /* endswitch */
 }
 
-void csTheme::BroadcastThemeChange(csThemeComponent *tcomp)
+void csTheme::BroadcastThemeChange (csThemeComponent *tcomp)
 {
-  csEvent * bmsg = NULL;
-  if (tcomp == NULL)
-    bmsg = new csEvent(0,csevBroadcast,cscmdThemeChange,this);
-  else
-    bmsg = new csEvent(0,csevBroadcast,cscmdThemeComponentChange,tcomp);
-  g_app->PutEvent(bmsg);
+  csEvent *bmsg = (tcomp == NULL) ?
+    new csEvent (0, csevBroadcast, cscmdThemeChange, this) :
+    new csEvent (0, csevBroadcast, cscmdThemeComponentChange, tcomp);
+  g_app->PutEvent (bmsg);
 }
 
-csButton * csThemeWindow::GetCloseButton(csComponent * parent)
+csButton *csThemeWindow::GetCloseButton(csComponent * parent)
 {
-  int tx,ty,tw,th;
+  int tx, ty, tw, th;
 
   if (bmpClosen == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "CLOSEN", &tx, &ty, &tw, &th);
+    FindCFGBitmap (theme->GetApp ()->System, *(theme->GetApp ()->titlebardefs),
+      "CLOSEN", &tx, &ty, &tw, &th);
     bmpClosen = new csPixmap (theme->GetApp()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
   if (bmpClosep == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "CLOSEP", &tx, &ty, &tw, &th);
-    bmpClosep = new csPixmap (theme->GetApp()->GetTexture (
+    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs),
+      "CLOSEP", &tx, &ty, &tw, &th);
+    bmpClosep = new csPixmap (theme->GetApp ()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
   csButton *bt = (csButton *)parent->GetChild (CSWID_BUTCLOSE);
   if (bt == NULL) bt = new csButton (parent, cscmdClose, 0, csbfsNone);
 
-  bt->SetBitmap(new csPixmap(*bmpClosen),new csPixmap(*bmpClosep));
+  bt->SetBitmap (new csPixmap (*bmpClosen), new csPixmap (*bmpClosep));
   bt->id = CSWID_BUTCLOSE;
   return bt;
 }
 
-csButton * csThemeWindow::GetHideButton(csComponent * parent)
+csButton *csThemeWindow::GetHideButton(csComponent * parent)
 {
-  int tx,ty,tw,th;
+  int tx, ty, tw, th;
 
   if (bmpHiden == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "HIDEN", &tx, &ty, &tw, &th);
+    FindCFGBitmap (theme->GetApp ()->System, *(theme->GetApp ()->titlebardefs),
+      "HIDEN", &tx, &ty, &tw, &th);
     bmpHiden = new csPixmap (theme->GetApp()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
   if (bmpHidep == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "HIDEP", &tx, &ty, &tw, &th);
-    bmpHidep = new csPixmap (theme->GetApp()->GetTexture (
+    FindCFGBitmap (theme->GetApp ()->System, *(theme->GetApp ()->titlebardefs),
+      "HIDEP", &tx, &ty, &tw, &th);
+    bmpHidep = new csPixmap (theme->GetApp ()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
 
   csButton *bt = (csButton *)parent->GetChild (CSWID_BUTHIDE);
   if (bt == NULL) bt = new csButton (parent, cscmdHide, 0, csbfsNone);
 
-  bt->SetBitmap(new csPixmap(*bmpHiden),new csPixmap(*bmpHidep));
+  bt->SetBitmap (new csPixmap (*bmpHiden), new csPixmap (*bmpHidep));
   bt->id = CSWID_BUTHIDE;
   return bt;
 }
 
-csButton * csThemeWindow::GetMaximizeButton(csComponent * parent)
+csButton *csThemeWindow::GetMaximizeButton (csComponent * parent)
 {
-  int tx,ty,tw,th;
+  int tx, ty, tw, th;
 
   if (bmpMaximizen == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "MAXN", &tx, &ty, &tw, &th);
-    bmpMaximizen = new csPixmap (theme->GetApp()->GetTexture (
+    FindCFGBitmap (theme->GetApp ()->System, *(theme->GetApp ()->titlebardefs),
+      "MAXN", &tx, &ty, &tw, &th);
+    bmpMaximizen = new csPixmap (theme->GetApp ()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
   if (bmpMaximizep == NULL)
   {
-    FindCFGBitmap (theme->GetApp()->System, *(theme->GetApp()->titlebardefs), "MAXP", &tx, &ty, &tw, &th);
-    bmpMaximizep = new csPixmap (theme->GetApp()->GetTexture (
+    FindCFGBitmap (theme->GetApp ()->System, *(theme->GetApp ()->titlebardefs),
+      "MAXP", &tx, &ty, &tw, &th);
+    bmpMaximizep = new csPixmap (theme->GetApp ()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
 
   csButton *bt = (csButton *)parent->GetChild (CSWID_BUTMAXIMIZE);
   if (bt == NULL) bt = new csButton (parent, cscmdMaximize, 0, csbfsNone);
 
-  bt->SetBitmap(new csPixmap(*bmpMaximizen),new csPixmap(*bmpMaximizep));
+  bt->SetBitmap (new csPixmap (*bmpMaximizen), new csPixmap (*bmpMaximizep));
   bt->id = CSWID_BUTMAXIMIZE;
   return bt;
 }
 
-csTitleBar * csThemeWindow::GetTitleBar(csComponent *parent, const char *iTitle)
+csTitleBar *csThemeWindow::GetTitleBar (csComponent *parent, const char *iTitle)
 {
   csTitleBar *tb = (csTitleBar *) parent->GetChild (CSWID_TITLEBAR);
   if (tb == NULL) tb = new csTitleBar (parent, (char *)iTitle);
-
   tb->id = CSWID_TITLEBAR;
   return tb;
 }
 
-void csTheme::GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh)
+void csTheme::GetBorderSize (csComponent &comp, int FrameStyle, int &bw, int &bh)
 {
   switch (FrameStyle)
   {
     case csthfsOblique:
       if (comp.bound.Height () >= 6)
       {
-        bh=bw=3;
+        bh = bw = 3;
         break;
       } // otherwise fallback to a smaller frame.
     case csthfsThickRect:
       if (comp.bound.Height () >= 6)
       {
-        bh=bw=3;
+        bh = bw = 3;
         break;
       } // otherwise fallback to a smaller frame
     case csthfsThinRect:
       if (comp.bound.Height () >= 4)
       {
-        bh=bw=2;
+        bh = bw = 2;
         break;
       } // otherwise fallback to a smaller frame
     case csthfsThin:
@@ -243,82 +250,80 @@ void csTheme::GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh)
   } /* endswitch */
 }
 
-
-csThemeComponent::csThemeComponent(csTheme * ntheme)
+csThemeComponent::csThemeComponent (csTheme * ntheme)
 {
   theme = ntheme;
   name = "csComponent";
-  BorderWidth=16;
-  BorderHeight=16;
+  BorderWidth = 16;
+  BorderHeight = 16;
 }
 
-void csThemeComponent::BroadcastThemeChange()
+void csThemeComponent::BroadcastThemeChange ()
 {
-  theme->BroadcastThemeChange(this);
+  theme->BroadcastThemeChange (this);
 }
 
-
-csThemeWindow::csThemeWindow(csTheme * ntheme) : csThemeComponent(ntheme)
+csThemeWindow::csThemeWindow (csTheme *ntheme) : csThemeComponent (ntheme)
 {
   name = "csWindow";
-  BorderLightColor=CSPAL_WINDOW_2LIGHT3D;
-  BorderDarkColor=CSPAL_WINDOW_2DARK3D;
-  BackgroundColor=CSPAL_WINDOW_BORDER;
-  BorderPixmap=NULL;
-  BackgroundPixmap=NULL;
+  BorderLightColor = CSPAL_WINDOW_2LIGHT3D;
+  BorderDarkColor = CSPAL_WINDOW_2DARK3D;
+  BackgroundColor = CSPAL_WINDOW_BORDER;
+  BorderPixmap = NULL;
+  BackgroundPixmap = NULL;
   bmpClosep = NULL;
   bmpClosen = NULL;
   bmpHidep = NULL;
   bmpHiden = NULL;
   bmpMaximizep = NULL;
   bmpMaximizen = NULL;
-  TitleBarHeight=16;
-  MenuHeight=16;
+  TitleBarHeight = 16;
+  MenuHeight = 16;
   FrameStyle = cswfs3D;
 }
 
-void csThemeWindow::SetDefaultPallet(csComponent *window)
+void csThemeWindow::SetDefaultPallet (csComponent *window)
 {
   window->SetPalette (CSPAL_WINDOW);
 }
 
-csThemeButton::csThemeButton(csTheme * ntheme) : csThemeComponent(ntheme)
+csThemeButton::csThemeButton (csTheme * ntheme) : csThemeComponent (ntheme)
 {
   name = "csButton";
-  BorderLightColor=CSPAL_BUTTON_LIGHT3D;
-  BorderDarkColor=CSPAL_BUTTON_DARK3D;
-  BackgroundColor=CSPAL_BUTTON_BACKGROUND;
-  BorderTexture=NULL;
+  BorderLightColor = CSPAL_BUTTON_LIGHT3D;
+  BorderDarkColor = CSPAL_BUTTON_DARK3D;
+  BackgroundColor = CSPAL_BUTTON_BACKGROUND;
+  BorderTexture = NULL;
 }
 
-csPixmap * csThemeWindow::GetBackgroundPixmap()
+csPixmap *csThemeWindow::GetBackgroundPixmap ()
 {
   if (BackgroundPixmap != NULL)
-    return new csPixmap(*BackgroundPixmap);
+    return new csPixmap (*BackgroundPixmap);
   else
     return NULL;
 }
 
-csPixmap * csThemeWindow::GetBorderPixmap()
+csPixmap *csThemeWindow::GetBorderPixmap ()
 {
   if (BorderPixmap != NULL)
-    return new csPixmap(*BorderPixmap);
+    return new csPixmap (*BorderPixmap);
   else
     return NULL;
 }
 
-csPixmap * csThemeWindow::GetCloseButtonP()
+csPixmap *csThemeWindow::GetCloseButtonP ()
 {
   if (bmpClosep != NULL)
-    return new csPixmap(*bmpClosep);
+    return new csPixmap (*bmpClosep);
   else
     return NULL;
 }
 
-csPixmap * csThemeWindow::GetCloseButtonN()
+csPixmap *csThemeWindow::GetCloseButtonN ()
 {
   if (bmpClosen != NULL)
-    return new csPixmap(*bmpClosen);
+    return new csPixmap (*bmpClosen);
   else
     return NULL;
 }

@@ -269,7 +269,7 @@ protected:
   /// Original bound when window is maximized
   csRect OrgBound;
   /// Theme Component Name
-  char * name;
+  char *ThemeID;
 
 public:
   /// The focused child window
@@ -650,15 +650,15 @@ public:
   void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
 
   /// Retrieve the Component Theme
-  csThemeComponent * GetTheme();
+  csThemeComponent *GetTheme ();
   /// Set the Component Theme (setting it to NULL makes it look at the parent or app Theme)
-  void SetTheme(csThemeComponent * nTheme);
+  void SetTheme (csThemeComponent *nTheme);
   /// Get the name of the component in the Theme.
-  char * GetName(){return name;};
+  char *GetName () { return ThemeID; }
   /// Handle a theme change event
   virtual void ThemeChanged ();
   /// Reset the window to use all theme values.
-  virtual void ResetTheme();
+  virtual void ResetTheme ();
 
 protected:
   /**

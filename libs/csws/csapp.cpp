@@ -620,19 +620,17 @@ void csApp::Dismiss (int iCode)
   } /* endif */
 }
 
-void csApp::SetTheme(csTheme * nTheme)
+void csApp::SetTheme (csTheme *nTheme)
 {
-  if (theme != NULL) delete theme;
-  if (nTheme == NULL)
-  {
-    theme = new csTheme(this);
-    return;
-  }
+  delete theme;
+  if (!nTheme)
+    nTheme = new csTheme (this);
   theme = nTheme;
 }
 
-csTheme * csApp::GetTheme()
+csTheme *csApp::GetTheme ()
 {
-  if (theme == NULL) theme = new csTheme(this);
+  if (!theme)
+    theme = new csTheme (this);
   return theme;
 }

@@ -38,7 +38,8 @@ enum csThemeFrameStyle
   csthfsThinRect,
   csthfsThin,
   csthfsTexture,
-  /// This style is what a person should base CUSTOM styles off of.  i.e. csmyfsWacky = csthfsCustom+1, etc
+  // This style is what a person should base CUSTOM styles off of.
+  // i.e. csmyfsWacky = csthfsCustom+1, etc
   csthfsCustom
 };
 
@@ -57,9 +58,9 @@ enum
   cscmdThemeComponentChange
 };
 
-
 /**
- * This class is the standard theme.  It is intended to be subclassed for custom themes.
+ * This class is the standard theme. It is intended to be subclassed
+ * for custom themes.
  *<p>
  * Generally there should be only one object of this class.
  * However, you can specify a theme per component if you wish.
@@ -67,46 +68,48 @@ enum
 class csTheme
 {
 protected:
-  csApp * g_app;
-  csVectorThemeComponent * themeComponents;
+  csApp *g_app;
+  csVectorThemeComponent *themeComponents;
 
 public:
-  csTheme(csApp * napp);
+  csTheme (csApp * napp);
 
-  void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di, csPixmap * pixmap = NULL);
-  void GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh);
+  void DrawBorder (csComponent &comp, int FrameStyle, int &bw, int &bh,
+    int li, int di, csPixmap *pixmap = NULL);
+  void GetBorderSize (csComponent &comp,int FrameStyle,int &bw, int &bh);
 
-  void BroadcastThemeChange(csThemeComponent *tcomp);
+  void BroadcastThemeChange (csThemeComponent *tcomp);
 
-  void AddThemeComponent(csThemeComponent * comp);
-  csThemeComponent * GetThemeComponent(char * name);
-  inline csApp * GetApp(){return g_app;};
+  void AddThemeComponent (csThemeComponent * comp);
+  csThemeComponent *GetThemeComponent (char * name);
+  inline csApp *GetApp () { return g_app; }
 };
 
 class csThemeComponent
 {
 protected:
-  char * name;
-  csTheme * theme;
+  char *name;
+  csTheme *theme;
   int BorderWidth;
   int BorderHeight;
 
 public:
-  csThemeComponent(csTheme * ntheme);
-  csTheme * GetTheme(void){return theme;};
+  csThemeComponent (csTheme *ntheme);
+  csTheme *GetTheme () { return theme; };
 
-  inline int GetBorderWidth(){return BorderWidth;};
-  inline void SetBorderWidth(int width){BorderWidth=width;};
-  inline int GetBorderHeight(){return BorderHeight;};
-  inline void SetBorderHeight(int height){BorderHeight=height;};
+  inline int GetBorderWidth () { return BorderWidth; }
+  inline void SetBorderWidth (int width) { BorderWidth = width; }
+  inline int GetBorderHeight () { return BorderHeight; }
+  inline void SetBorderHeight (int height) { BorderHeight = height; }
 
-  inline char *GetName() {return name;};
-  inline void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di, csPixmap * pixmap = NULL) \
-    {theme->DrawBorder(comp,FrameStyle,bw,bh,li,di,pixmap);};
-  inline void GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh) \
-    {theme->GetBorderSize(comp,FrameStyle,bw,bh);};
+  inline char *GetName () { return name; }
+  inline void DrawBorder (csComponent &comp, int FrameStyle, int &bw, int &bh,
+    int li, int di, csPixmap *pixmap = NULL)
+  { theme->DrawBorder (comp, FrameStyle, bw, bh, li, di, pixmap); }
+  inline void GetBorderSize (csComponent &comp, int FrameStyle, int &bw, int &bh)
+  { theme->GetBorderSize (comp, FrameStyle, bw, bh); }
 
-  void BroadcastThemeChange();
+  void BroadcastThemeChange ();
 };
 
 class csThemeButton : public csThemeComponent
@@ -118,7 +121,7 @@ protected:
   csPixmap * BorderTexture;
 
 public:
-  csThemeButton(csTheme * ntheme);
+  csThemeButton (csTheme * ntheme);
 };
 
 class csThemeWindow : public csThemeComponent
@@ -140,47 +143,47 @@ protected:
   csPixmap *bmpMaximizep;
 
 public:
-  csThemeWindow(csTheme * ntheme);
+  csThemeWindow (csTheme *ntheme);
 
-  int GetFrameStyle(){return FrameStyle;};
-  void SetFrameStyle(int fs){FrameStyle=fs;};
+  int GetFrameStyle () { return FrameStyle; }
+  void SetFrameStyle (int fs) { FrameStyle = fs; }
 
-  int GetTitleBarHeight(){return TitleBarHeight;};
-  void SetTitleBarHeight(int Height){TitleBarHeight=Height;};
+  int GetTitleBarHeight () { return TitleBarHeight; }
+  void SetTitleBarHeight (int Height) { TitleBarHeight = Height; }
 
-  int GetMenuHeight(){return MenuHeight;};
-  void SetMenuHeight(int Height){MenuHeight=Height;};
+  int GetMenuHeight () {return MenuHeight; }
+  void SetMenuHeight (int Height) { MenuHeight = Height; }
 
-  int GetBorderLightColor(){return BorderLightColor;};
-  void SetBorderLightColor(int Color){BorderLightColor = Color;};
+  int GetBorderLightColor () { return BorderLightColor; }
+  void SetBorderLightColor (int Color) { BorderLightColor = Color; }
 
-  int GetBorderDarkColor(){return BorderDarkColor;};
-  void SetBorderDarkColor(int Color){BorderDarkColor = Color;};
+  int GetBorderDarkColor () { return BorderDarkColor; }
+  void SetBorderDarkColor (int Color) { BorderDarkColor = Color; }
 
-  int GetBackgroundColor(){return BackgroundColor;};
-  void SetBackgroundColor(int Color){BackgroundColor = Color;};
+  int GetBackgroundColor () { return BackgroundColor; }
+  void SetBackgroundColor (int Color) { BackgroundColor = Color; }
 
-  csPixmap * GetBackgroundPixmap();
-  void SetBackgroundPixmap(csPixmap * pixmap)
-    {if (BackgroundPixmap != NULL) delete BackgroundPixmap; BackgroundPixmap = pixmap;};
+  csPixmap *GetBackgroundPixmap ();
+  void SetBackgroundPixmap (csPixmap *pixmap)
+  { delete BackgroundPixmap; BackgroundPixmap = pixmap; }
 
-  csPixmap * GetBorderPixmap();
-  void SetBorderPixmap(csPixmap * pixmap)
-    {if (BorderPixmap != NULL) delete BorderPixmap; BorderPixmap = pixmap;};
+  csPixmap *GetBorderPixmap ();
+  void SetBorderPixmap (csPixmap *pixmap)
+  { delete BorderPixmap; BorderPixmap = pixmap; }
 
-  csButton * GetCloseButton(csComponent *window);
-  csPixmap * GetCloseButtonP();
-  csPixmap * GetCloseButtonN();
+  csButton *GetCloseButton (csComponent *window);
+  csPixmap *GetCloseButtonP ();
+  csPixmap *GetCloseButtonN ();
 
-  csButton * GetHideButton(csComponent *window);
-  csButton * GetMaximizeButton(csComponent *window);
-  csTitleBar * GetTitleBar(csComponent *window, const char *iTitle);
+  csButton *GetHideButton (csComponent *window);
+  csButton *GetMaximizeButton (csComponent *window);
+  csTitleBar *GetTitleBar (csComponent *window, const char *iTitle);
 
-  void SetDefaultPallet(csComponent *window);
+  void SetDefaultPallet (csComponent *window);
 
-  void GetSysMenu();
-  void GetToolbar();
-  void GetMenuBar();
+  void GetSysMenu ();
+  void GetToolbar ();
+  void GetMenuBar ();
 };
 
 /// This class holds a number of csThemeComponent classes
