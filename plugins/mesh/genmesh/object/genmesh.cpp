@@ -879,6 +879,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   logparent = NULL;
   initialized = false;
   object_bbox_valid = false;
+  mesh_tri_normals = NULL;
 #ifndef CS_USE_NEW_RENDERER
   top_mesh.num_triangles = 0;
   top_mesh.triangles = NULL;
@@ -886,7 +887,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #else
   num_mesh_triangles = 0;
   mesh_triangles = NULL;
-  mesh_tri_normals = NULL;
 #endif
   num_mesh_vertices = 0;
   mesh_vertices = NULL;

@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.
+	- Fixed an initialization error with the new mesh_tri_normals
+	  in genmesh.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
