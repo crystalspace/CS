@@ -407,7 +407,7 @@ public:
    * thus assumes that this polygon set is transformed to the
    * origin of the light.
    */
-  csFrustrumList* GetShadows (csVector3& origin);
+  csFrustrumList* GetShadows (csSector* sector, csVector3& origin);
 
   /**
    * Create an oriented bounding box (currently not oriented yet@@@)

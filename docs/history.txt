@@ -27,6 +27,16 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the WAV loader so that it works correctly for
 	  Jorrit on big-endian Sparc machines.  He also replaced non-standard
 	  PORT_BYTESEX_BIG_ENDIAN usage with CS_BIG_ENDIAN.
+	- Andrew Zabolotny did the following changes:
+	    - Fixed unlighted polygon saving in MazeD.
+	    - Temporarily replaced QInt(x) with just int(x) so that we
+	      can find out whenever the -recalc problems reported by Jorrito
+	      are related to QInt.
+	    - Resolved some memory leaks in cssprite.cpp.
+	- Fixed a bug which prevented lighting to work properly when
+	  using multiple STATBSP levels connected through portals.
+	  This bug was documented actually in the source code :-)
+	  (CompressShadowFrustrums).
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.

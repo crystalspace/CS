@@ -198,8 +198,24 @@ public:
   /// Linked list.
   csShadowFrustrum* next, * prev;
 
-  /// Polygon which generated this shadow.
+  /**
+   * Polygon which generated this shadow.
+   */
   csPolygon3D* polygon;
+
+  /**
+   * Current sector when adding this frustrum. This is useful to find
+   * all shadow frustrums added in the same recursion level for one sector
+   * (together with draw_busy below).
+   */
+  csSector* sector;
+
+  /**
+   * draw_busy value of the sector when adding this
+   * frustrum. This is useful to find all shadow frustrums added
+   * in the same recursion level for one sector.
+   */
+  int draw_busy;
 
   /**
    * If true then this frustrum is relevant. This is

@@ -963,7 +963,6 @@ void* csSector::CalculateLightingPolygons (csSector*,
 }
 
 //@@@ Needs to be part of sector?
-//@@@ ONLY DELETE FRUSTRUMS ADDED THIS SECTOR???
 void CompressShadowFrustrums (csFrustrumList* list)
 {
   csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
@@ -972,7 +971,13 @@ void CompressShadowFrustrums (csFrustrumList* list)
   else cc->MakeEmpty ();
 
   csShadowFrustrum* sf = list->GetLast ();
-int cnt=0,del=0;
+  csSector* cur_sector;
+  int cur_draw_busy;
+  if (sf)
+  {
+    cur_sector = sf->sector;
+    cur_draw_busy = sf->draw_busy;
+  }
   while (sf)
   {
     bool vis;
@@ -986,13 +991,12 @@ int cnt=0,del=0;
       sf = sf->prev;
       list->Unlink (sfdel);
       CHK (delete sfdel);
-del++;
     }
     else
       sf = sf->prev;
-cnt++;
+    if (sf->sector != cur_sector || sf->draw_busy != cur_draw_busy)
+      break;
   }
-//printf ("Tested %d frustrums, deleted %d.\n", cnt, del);
 }
 
 //@@@ Needs to be part of sector?
@@ -1268,7 +1272,7 @@ void csSector::CalculateLighting (csLightView& lview)
       sp = visible_things[i];
       if (sp != static_thing)
       {
-        shadows = sp->GetShadows (center);
+        shadows = sp->GetShadows (this, center);
         lview.shadows.AppendList (shadows);
         CHK (delete shadows);
       }

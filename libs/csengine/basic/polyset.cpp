@@ -611,7 +611,7 @@ void csPolygonSet::GetCameraMinMaxZ (float& minz, float& maxz)
 // and also more correct in that a convex 3D object has no internal
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
-csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
+csFrustrumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
 {
   CHK (csFrustrumList* list = new csFrustrumList ());
   csShadowFrustrum* frust;
@@ -627,6 +627,8 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
     if ((clas <= 0) != cw) continue;
 
     CHK (frust = new csShadowFrustrum (origin));
+    frust->sector = sector;
+    frust->draw_busy = sector->draw_busy;
     list->AddFirst (frust);
     csPlane pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
