@@ -1028,6 +1028,7 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 csVFS::~csVFS ()
 {
   CHK (delete config);
+  CHK (delete cwd);
 }
 
 bool csVFS::Initialize (iSystem *iSys)
