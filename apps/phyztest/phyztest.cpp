@@ -126,6 +126,8 @@ Phyztest::Phyztest ()
   cdsys = NULL;
   courierFont = NULL;
   LevelLoader = NULL;
+  myG2D = NULL;
+  myG3D = NULL;
 }
 
 Phyztest::~Phyztest ()
@@ -136,6 +138,8 @@ Phyztest::~Phyztest ()
     courierFont->DecRef ();
   if (LevelLoader)
     LevelLoader->DecRef ();
+  DEC_REF (myG2D);
+  DEC_REF (myG3D);
 }
 
 void cleanup ()
@@ -150,6 +154,20 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
 
   // Find the pointer to engine plugin
+  myG3D = QUERY_PLUGIN (this, iGraphics3D);
+  if (!myG3D)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    abort ();
+  }
+
+  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  if (!myG2D)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    abort ();
+  }
+
   iEngine *Engine = QUERY_PLUGIN (this, iEngine);
   if (!Engine)
   {
@@ -174,7 +192,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     exit (1);
   }
 
-  iFontServer *fs = G3D->GetDriver2D()->GetFontServer ();
+  iFontServer *fs = myG3D->GetDriver2D()->GetFontServer ();
   if (fs)
     courierFont = fs->LoadFont (CSFONT_COURIER);
   else
@@ -188,7 +206,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // First disable the lighting cache. Our app is simple enough
@@ -302,7 +320,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, G3D);
+  view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (&room->scfiSector);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
@@ -520,11 +538,11 @@ void Phyztest::NextFrame ()
   }
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
 
   view->Draw ();
 
-  if (rb_bot && G3D->BeginDraw (CSDRAW_2DGRAPHICS))
+  if (rb_bot && myG3D->BeginDraw (CSDRAW_2DGRAPHICS))
   {
     ctVector3 p = rb_bot->get_pos ();
     ctVector3 F = rb_bot->get_F ();
@@ -558,9 +576,9 @@ void Phyztest::NextFrame ()
   WriteShadow( ALIGN_LEFT,10, 150, write_colour,"an impulse to the spring object");
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool Phyztest::HandleEvent (iEvent &Event)
@@ -575,7 +593,7 @@ bool Phyztest::HandleEvent (iEvent &Event)
   }
   if ((Event.Type == csevBroadcast) && 
       (Event.Command.Code == cscmdContextResize))
-    view->GetCamera()->SetPerspectiveCenter (G3D->GetWidth()/2, G3D->GetHeight()/2);
+    view->GetCamera()->SetPerspectiveCenter (myG3D->GetWidth()/2, myG3D->GetHeight()/2);
   return false;
 }
 void Phyztest::Write(int align,int x,int y,int fg,int bg,char *str,...)
@@ -609,7 +627,7 @@ void Phyztest::Write(int align,int x,int y,int fg,int bg,char *str,...)
     }
   }
 
-  G2D->Write (courierFont, x, y, fg, bg, buf);
+  myG2D->Write (courierFont, x, y, fg, bg, buf);
 }
 
 void Phyztest::WriteShadow (int align,int x,int y,int fg,char *str,...)

@@ -48,6 +48,9 @@ public:
   int motion_flags;
   iCollideSystem* cdsys;
   iLoader *LevelLoader;
+  iGraphics2D *myG2D;
+  iGraphics3D *myG3D;
+
   void WriteShadow (int align, int x, int y, int fg, char *str,...);
   void Write (int align, int x, int y, int fg, int bg, char *str,...);
 public:
