@@ -17,13 +17,14 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CS_SMARTPOINTER_H__
-#define CS_SMARTPOINTER_H__
+#ifndef __CSREF_H__
+#define __CSREF_H__
 
 /**
- * Smart pointer like class. Keeps a reference to something that
- * implements IncRef() and DecRef() (either iBase or csRefCount at this
- * moment).
+ * A smart pointer.  Maintains and correctly manages a reference to a
+ * reference-counted object.  This template requires only that the object type
+ * T implement the methods IncRef() and DecRef().  No other requirements are
+ * placed upon T.
  */
 template <class T>
 class csRef
@@ -33,81 +34,100 @@ private:
 
 public:
   /**
-   * Default constructor for a smart pointer. This will initialize
-   * the object to NULL.
+   * Construct an invalid smart pointer (that is, one pointing at nothing).
+   * Dereferencing or attempting to use the invalid pointer will result in a
+   * run-time error, however it is safe to invoke IsValid() and Assign().
    */
-  csRef () : obj (NULL) { }
+  csRef () : obj (0) {}
 
   /**
-   * Construct a new smart pointer from a previously IncRef'ed pointer.
-   * This should ONLY be used to contain return values from older functions
-   * that are not yet aware of smart pointers.
+   * Construct a smart pointer from a raw object reference.  Takes ownership of
+   * the referenced object by assuming that its IncRef() method has already
+   * been called, and invokes its DecRef() method upon destruction.
    */
   csRef (T* newobj) : obj (newobj) { }
   
   /**
-   * Copy constructor for a smart pointer. This will increase the
-   * ref count of the object from the other smart pointer.
+   * Smart pointer copy constructor.
    */
-  csRef (const csRef& other) : obj (other.obj)
+  csRef (csRef const& other) : obj (other.obj)
   {
-    if (obj) obj->IncRef ();
+    if (obj)
+      obj->IncRef ();
   }
 
   /**
-   * Clean up the reference.
+   * Smart pointer destructor.  Invokes DecRef() upon the underlying object.
    */
   ~csRef ()
   {
-    if (obj) obj->DecRef ();
+    if (obj)
+      obj->DecRef ();
   }
 
   /**
-   * Replace the object pointed to in this smart pointer with another one.
-   * This will increase the ref count of the new object and decrease the
-   * ref count of the old one.
+   * Assign another object to this smart pointer.
    */
-  void Set (T* newobj)
+  void Assign (csRef const& other)
   {
-    T* oldobj = obj;
-    obj = newobj;
-    if (obj) obj->IncRef ();
-    if (oldobj) oldobj->DecRef ();
+    if (obj != other.obj)
+    {
+      obj->DecRef();
+      obj = other.obj;
+      obj->IncRef();
+    }
   }
 
   /**
-   * Replace the object pointed to in this smart pointer with another one.
-   * This function assume the new object has already be increffed before.
+   * Assign a raw object reference to this smart pointer.  If
+   * transfer_ownership is true, then it assumes that object's IncRef() method
+   * has already been called on behalf of the smart pointer.  Otherwise a new
+   * reference is created via IncRef().
    */
-  void Assign (T* newobj)
+  void Assign (T* newobj, bool transfer_ownership = false)
   {
     T* oldobj = obj;
     obj = newobj;
-    if (oldobj) oldobj->DecRef ();
+    if (!transfer_ownership)
+      obj->IncRef();
+    if (oldobj)
+      oldobj->DecRef();
   }
 
+  /**
+   * Assign another object to this smart pointer via the assignment operator.
+   */
+  csRef& operator = (csRef const& other)
+  {
+    Assign (other);
+    return *this;
+  }
+
+  /// Dereference underlying object.
   T* operator -> () const
   { return obj; }
   
+  /// Cast smart pointer to a pointer to the underlying object.
   operator T* () const
   { return obj; }
   
+  /// Dereference underlying object.
   T& operator* () const
   { return *obj; }
 
+  /**
+   * Boolean cast.  Returns true if smart pointer is pointing at an actual
+   * object, otherwise returns false.
+   */
   operator bool () const
-  { return obj; }
+  { return (obj != 0); }
 
   /**
-   * Assign another smart pointer to this one.
-   * Keeps correct track of references.
+   * Smart pointer validity check.  Returns true if smart pointer is pointing
+   * at an actual object, otherwise returns false.
    */
-  csRef& operator = (const csRef& other)
-  {
-    Set (other.obj);
-    return *this;
-  }
+  bool IsValid() const
+  { return (obj != 0); }
 };
 
-#endif
-
+#endif // __CSREF_H__
