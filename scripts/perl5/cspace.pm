@@ -12672,6 +12672,13 @@ sub VFS_STATUS_NOSPACE () { $cspacec::VFS_STATUS_NOSPACE }
 sub VFS_STATUS_RESOURCES () { $cspacec::VFS_STATUS_RESOURCES }
 sub VFS_STATUS_ACCESSDENIED () { $cspacec::VFS_STATUS_ACCESSDENIED }
 sub VFS_STATUS_IOERROR () { $cspacec::VFS_STATUS_IOERROR }
+sub csmbLeft () { $cspacec::csmbLeft }
+sub csmbRight () { $cspacec::csmbRight }
+sub csmbMiddle () { $cspacec::csmbMiddle }
+sub csmbWheelUp () { $cspacec::csmbWheelUp }
+sub csmbWheelDown () { $cspacec::csmbWheelDown }
+sub csmbExtra1 () { $cspacec::csmbExtra1 }
+sub csmbExtra2 () { $cspacec::csmbExtra2 }
 sub csEventErrNone () { $cspacec::csEventErrNone }
 sub csEventErrLossy () { $cspacec::csEventErrLossy }
 sub csEventErrNotFound () { $cspacec::csEventErrNotFound }
