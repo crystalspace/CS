@@ -35,6 +35,8 @@ chronological order.
 	  http://bbx.hp.infoseek.co.jp/dikeyboard.html
 	  http://bbx.hp.infoseek.co.jp/archive/GetDIDF.zip
 	  References provided by Randall Foreman <eidpers@comcast.net>.
+	- John Harger added point sprite support to the NR for use in the
+	  upcoming particle system plugin
 6-Jan-2004
 	- Eric Sunshine changed the libbfd check in configure.ac so that it is
 	  not performed on Windows.  Newer versions of Mingw supply libbfd and

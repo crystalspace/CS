@@ -119,6 +119,8 @@ private:
   csStringID string_normals;
   csStringID string_colors;
   csStringID string_indices;
+  csStringID string_point_radius;
+  csStringID string_point_scale;
 
   csConfigAccess config;
 

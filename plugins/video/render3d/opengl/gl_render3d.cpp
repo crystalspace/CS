@@ -726,6 +726,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_EXT_texture_lod_bias ();
   ext->InitGL_EXT_stencil_wrap ();
   ext->InitGL_EXT_stencil_two_side ();
+  ext->InitGL_ARB_point_parameters ();
+  ext->InitGL_ARB_point_sprite ();
   /*
     Check whether to init NVidia-only exts.
     Note: NV extensions supported by multiple vendors
@@ -744,6 +746,8 @@ bool csGLGraphics3D::Open ()
   {
     ext->InitGL_ATI_separate_stencil ();
   }
+
+  rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters;
 
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
@@ -791,6 +795,8 @@ bool csGLGraphics3D::Open ()
   string_normals = strings->Request ("normals");
   string_colors = strings->Request ("colors");
   string_indices = strings->Request ("indices");
+  string_point_radius = strings->Request ("point radius");
+  string_point_scale = strings->Request ("point scale");
 
 
   // @@@ These shouldn't be here, I guess.
@@ -1541,6 +1547,25 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
       break;
+    case CS_MESHTYPE_POINT_SPRITES:
+    {
+      float radius, scale;
+      mymesh->dynDomain->GetVariable(string_point_radius)->GetValue (radius);
+      mymesh->dynDomain->GetVariable(string_point_scale)->GetValue (scale);
+      glPointSize (1.0f);
+      GLfloat atten[3] = {0.0f, 0.0f, scale * scale};
+      ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
+      ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
+      ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
+      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 0.1f);
+
+      glEnable (GL_POINT_SPRITE_ARB);
+      primitivetype = GL_POINTS;
+      statecache->Enable_GL_TEXTURE_2D ();
+      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+
+      break;
+    }
     case CS_MESHTYPE_LINES:
       primitivetype = GL_LINES;
       break;
@@ -1640,6 +1665,12 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 	(indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
 
     indexbuf->Release();
+  }
+
+  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) {
+      //statecache->Enable_GL_TEXTURE_2D ();
+      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
+      glDisable(GL_POINT_SPRITE_ARB);
   }
 
   //if (clip_planes_enabled)
