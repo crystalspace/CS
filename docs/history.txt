@@ -39,6 +39,7 @@ chronological order.
 	  lightmaps it would still allocate the lightmap memory. For some
 	  huge oversized objects this could cause a blowup of memory usage.
 	  Now lighting is disabled for such polygons.
+	- PK worked on the saver.
 26-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - Added 'install' targets to csjava/Jamfile.

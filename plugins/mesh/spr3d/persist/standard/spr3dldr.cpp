@@ -608,6 +608,7 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DSaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 //TBD
@@ -617,10 +618,70 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for Sprite3D mesh");
-  paramsNode=0;
-  
+
+  if (obj)
+  {
+    csRef<iSprite3DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite3DState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!sprite) return false;
+    if (!mesh) return false;
+
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", sprite->IsLighting(), true);
+
+    //Writedown Tween tag
+    synldr->WriteBool(paramsNode, "tween", sprite->IsTweeningEnabled(), true);
+
+    //Writedown Basecolor tag
+    csColor col;
+    sprite->GetBaseColor(col);
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("basecolor");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown Action tag
+    const char* actionname = sprite->GetCurAction()->GetName();
+    if (actionname && *actionname)
+    {
+      csRef<iDocumentNode> actionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      actionNode->SetValue("action");
+      actionNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(actionname);
+    }    
+
+    //Writedown Factory tag
+    csRef<iMeshFactoryWrapper> fact = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+    
+    //Writedown Material tag
+    iMaterialWrapper* mat = sprite->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown Mixmode tag
+    int mixmode = sprite->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
   return true;
 }
 

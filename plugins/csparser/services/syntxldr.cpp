@@ -401,9 +401,25 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 					bool allowFxMesh)
 {
+  switch ( mixmode & CS_FX_MASK_MIXMODE )
+  {
+    case CS_FX_COPY: 
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("copy");
+      break;
+    case CS_FX_MULTIPLY: 
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("multiply");
+      break;
+    case CS_FX_MULTIPLY2: 
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("multipy2");
+      break;
+    case CS_FX_ADD: 
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("add");
+      break;
+  }        
+
   //TBD
   node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("SyntaxService: WriteMixmode not yet supported!");
+    ("SyntaxService: WriteMixmode not yet fully supported!");
 
   return true;
 }
