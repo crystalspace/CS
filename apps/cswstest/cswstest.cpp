@@ -26,6 +26,7 @@ REGISTER_STATIC_LIBRARY (vfs)
 
 class csWsTest : public csApp
 {
+  void ThemeDialog ();
   void NotebookDialog ();
   void GridDialog ();
   void TreeDialog ();
@@ -40,7 +41,7 @@ public:
   virtual bool InitialSetup ();
 };
 
-csWsTest *app;                        // The main Windowing System object
+//csWsTest *cswstest_app;                        // The main Windowing System object
 
 //-----------------------------------------------------------------------------
 class csGridHeaderCell : public csGridCell
@@ -285,6 +286,18 @@ bool csWsTest::InitialSetup ()
 
     but = new csButton (this, 9995);
     but->SetText ("Tree"); but->SetRect (520, 45, 620, 65);
+
+    but = new csButton (this, 9994);
+    but->SetText ("Theme"); but->SetRect (400, 75, 500, 95);
+
+    but = new csButton (this, 9993);
+    but->SetText ("~Black background"); but->SetRect (20, 120, 190, 140);
+
+    but = new csButton (this, 9992);
+    but->SetText ("~White background"); but->SetRect (20, 180, 190, 200);
+
+    but = new csButton (this, 9991);
+    but->SetText ("~Red background"); but->SetRect (20, 240, 190, 260);
   }
 
   return true;
@@ -412,6 +425,16 @@ void csWsTest::GridDialog ()
 
   Execute (window);
   delete window;
+}
+
+void csWsTest::ThemeDialog ()
+{
+  // create a window
+  csComponent *window = new csWindow (this, "Theme test",
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
+    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  window->SetSize (400, 300);
+  window->Center ();
 }
 
 void csWsTest::NotebookDialog ()
@@ -581,6 +604,35 @@ bool csWsTest::HandleEvent (iEvent &Event)
           TreeDialog ();
           return true;
         }
+        case 9994:
+        {
+          ThemeDialog ();
+          return true;
+        }
+        case 9993:
+        {
+          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
+          int Color = FindColor(0,0,0);
+          thwin->SetBackgroundColor(Color);
+          thwin->BroadcastThemeChange();
+          return true;
+        }
+        case 9992:
+        {
+          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
+          int Color = FindColor(255,255,255);
+          thwin->SetBackgroundColor(Color);
+          thwin->BroadcastThemeChange();
+          return true;
+        }
+        case 9991:
+        {
+          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
+          int Color = FindColor(255,0,0);
+          thwin->SetBackgroundColor(Color);
+          thwin->BroadcastThemeChange();
+          return true;
+        }
       }
       break;
 
@@ -659,9 +711,9 @@ int main (int argc, char* argv[])
     return -1;
 
   // Create our application object
-  csWsTest app (&System);
+  csWsTest cswstest_app (&System);
 
-  if (app.InitialSetup ())
+  if (cswstest_app.InitialSetup ())
     System.Loop ();
 
   return 0;

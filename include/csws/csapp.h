@@ -29,6 +29,7 @@
 #include "csutil/csstrvec.h"
 #include "iplugin.h"
 #include "ievent.h"
+#include "cstheme.h"
 
 /**
  * Application's background styles
@@ -57,6 +58,8 @@ class csApp : public csComponent
 protected:
   friend class csMouse;
 
+  /// The Application Theme
+  csTheme * theme;
   /// The graphics pipeline
   csGraphicsPipeline *GfxPpl;
   /// The mouse pointer
@@ -218,6 +221,11 @@ public:
   /// Set window list size
   void SetWindowListSize (int iWidth, int iHeight)
   { WindowListWidth = iWidth; WindowListHeight = iHeight; }
+
+  /// Retrieve the Application Theme
+  csTheme * GetTheme();
+  /// Set the Application Theme (setting it to NULL creates a new default theme)
+  void SetTheme(csTheme * nTheme);
 
   /// Insert a child component
   virtual void Insert (csComponent *comp);

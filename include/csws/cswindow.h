@@ -23,6 +23,7 @@
 #include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
+#include "cstheme.h"
 
 /// Window system menu button ID
 #define CSWID_BUTSYSMENU	0xC500

@@ -123,6 +123,7 @@ csApp::csApp (iSystem *SysDriver) : csComponent (NULL), scfiPlugIn (this)
   state |= CSS_VISIBLE | CSS_SELECTABLE | CSS_FOCUSED;
 
   Mouse = new csMouse (this);
+  theme = NULL;
 }
 
 csApp::~csApp ()
@@ -617,4 +618,21 @@ void csApp::Dismiss (int iCode)
     DismissCode = iCode;
     EventOutlet->Broadcast (cscmdQuitLoop);
   } /* endif */
+}
+
+void csApp::SetTheme(csTheme * nTheme)
+{
+  if (theme != NULL) delete theme;
+  if (nTheme == NULL)
+  {
+    theme = new csTheme(this);
+    return;
+  }
+  theme = nTheme;
+}
+
+csTheme * csApp::GetTheme()
+{
+  if (theme == NULL) theme = new csTheme(this);
+  return theme;
 }

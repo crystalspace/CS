@@ -36,8 +36,9 @@
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
   originalpalette (true), DragStyle (CS_DRAG_MOVEABLE), clipparent (NULL),
   text (NULL), Font (csFontParent), FontSize (-1), Maximized (false), focused (NULL),
-  top (NULL), next (NULL), prev (NULL), parent (NULL), app (NULL), id (0)
+  top (NULL), next (NULL), prev (NULL), parent (NULL), app (NULL), theme (NULL), id (0)
 {
+  name="csComponent";
   SetPalette (NULL, 0);
   if (iParent)
     iParent->Insert (this);
@@ -396,6 +397,14 @@ bool csComponent::HandleEvent (iEvent &Event)
         Redraw ();                              // redraw invalidated rectangle
         ForEach (do_handle_event, &Event);
         return false;
+      }
+      if (Event.Command.Code == cscmdThemeChange)
+      {
+        if ( ((csTheme *)Event.Command.Info) == GetTheme()->GetTheme()) ThemeChanged();
+      }
+      if (Event.Command.Code == cscmdThemeComponentChange)
+      {
+        if ( ((csThemeComponent *)Event.Command.Info) == GetTheme()) ThemeChanged();
       }
       break;
     case csevCommand:
@@ -1687,4 +1696,26 @@ bool csComponent::CheckHotKey (iEvent &iEvent, char iHotKey)
   else
     Key = UPPERCASE (iEvent.Key.Char);
   return Key == iHotKey;
+}
+
+csThemeComponent * csComponent::GetTheme()
+{
+  if (theme != NULL) return theme;
+  if (parent != NULL)
+  {
+   csThemeComponent *tmp = parent->GetTheme();
+   if (tmp != NULL) return tmp->GetTheme()->GetThemeComponent(GetName());
+  }
+  return app->GetTheme()->GetThemeComponent(GetName());
+}
+
+void csComponent::SetTheme(csThemeComponent * nTheme)
+{
+  theme = nTheme;
+}
+
+void csComponent::ThemeChanged(void)
+{
+  Invalidate();
+  fprintf(stderr,"ThemeChanged called form Component %s : %p!\n",name,this);
 }

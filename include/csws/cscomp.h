@@ -26,6 +26,7 @@
 #include "csengine/cspixmap.h"
 #include "cswspal.h"
 #include "igraph2d.h"
+#include "cstheme.h"
 
 class csApp;
 class csStrVector;
@@ -267,6 +268,8 @@ protected:
   bool Maximized;
   /// Original bound when window is maximized
   csRect OrgBound;
+  /// Theme Component Name
+  char * name;
 
 public:
   /// The focused child window
@@ -281,6 +284,8 @@ public:
   csVector clipchildren;
   /// Top-level application object
   csApp *app;
+  /// Component Theme
+  csThemeComponent *theme;
   /// Component ID, unique within its parrent's child ring
   unsigned int id;
   /// Component size/position rectangle
@@ -372,7 +377,8 @@ public:
 
   /// Get a color from logical palette
   int GetColor (int Index)
-  { if (Index >= palettesize) return cs_Color_Red_L; else return palette[Index]; }
+   { if (Index & 0x80000000) return Index;
+    if (Index >= palettesize) return cs_Color_Red_L; else return palette[Index]; }
 
   /**
    * Most components have a text string field. For example, titlebars,
@@ -640,6 +646,15 @@ public:
 
   /// Draw a 3D polygon
   void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
+
+  /// Retrieve the Component Theme
+  csThemeComponent * GetTheme();
+  /// Set the Component Theme (setting it to NULL makes it look at the parent or app Theme)
+  void SetTheme(csThemeComponent * nTheme);
+  /// Get the name of the component in the Theme.
+  char * GetName(){return name;};
+  /// Handle a theme change event
+  virtual void ThemeChanged ();
 
 protected:
   /**

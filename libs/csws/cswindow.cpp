@@ -64,14 +64,16 @@ void csSysMenu::Hide ()
 csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
   csWindowFrameStyle iFrameStyle) : csComponent (iParent)
 {
+  name="csWindow";
   state |= CSS_SELECTABLE | CSS_TOPSELECT;
   DragStyle |= CS_DRAG_SIZEABLE;
   FrameStyle = iFrameStyle;
   WindowStyle = iWindowStyle;
-  BorderWidth = BorderHeight = (FrameStyle == cswfsNone ? 0 :
-    FrameStyle == cswfsThin ? 3 : 4);
-  TitlebarHeight = 16;
-  MenuHeight = 16;
+  csThemeWindow * thwin = (csThemeWindow *)GetTheme();
+  CS_ASSERT(thwin != NULL)
+  thwin->GetBorderSize(*this,FrameStyle,BorderWidth,BorderHeight);
+  TitlebarHeight = thwin->GetTitleBarHeight();
+  MenuHeight = thwin->GetMenuHeight();
   SetPalette (CSPAL_WINDOW);
 
   // Attach required handles & gadgets to window
@@ -89,25 +91,22 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
   } /* endif */
   if (iWindowStyle & CSWS_BUTCLOSE)
   {
-    csButton *bt = new csButton (this, cscmdClose, 0, csbfsNone);
-    SetButtBitmap (bt, "CLOSEN", "CLOSEP");
+    csComponent *bt = thwin->GetCloseButton(this);
     bt->id = CSWID_BUTCLOSE;
   } /* endif */
   if (iWindowStyle & CSWS_BUTHIDE)
   {
-    csButton *bt = new csButton (this, cscmdHide, 0, csbfsNone);
-    SetButtBitmap (bt, "HIDEN", "HIDEP");
+    csComponent *bt = thwin->GetHideButton(this);
     bt->id = CSWID_BUTHIDE;
   } /* endif */
   if (iWindowStyle & CSWS_BUTMAXIMIZE)
   {
-    csButton *bt = new csButton (this, cscmdMaximize, 0, csbfsNone);
-    SetButtBitmap (bt, "MAXN", "MAXP");
+    csComponent *bt = thwin->GetMaximizeButton(this);
     bt->id = CSWID_BUTMAXIMIZE;
   } /* endif */
   if (iWindowStyle & CSWS_TITLEBAR)
   {
-    csComponent *tb = new csTitleBar (this, iTitle);
+    csComponent *tb = thwin->GetTitleBar(this,iTitle);
     tb->id = CSWID_TITLEBAR;
   }
   else
@@ -268,39 +267,45 @@ bool csWindow::SetRect (int xmin, int ymin, int xmax, int ymax)
 void csWindow::Draw ()
 {
   int bw = 0, bh = 0;
+  int li,di,back;
+
+  csThemeWindow * thwin = (csThemeWindow *) GetTheme();
+
+  li = thwin->GetBorderLightColor();
+  di = thwin->GetBorderDarkColor();
+  back = thwin->GetBackgroundColor();
   switch (FrameStyle)
   {
     case cswfsNone:
       break;
     case cswfsThin:
-      Rect3D (0, 0, bound.Width (), bound.Height (), CSPAL_WINDOW_2DARK3D,
-        CSPAL_WINDOW_2DARK3D);
-      bw = bh = 1;
+      thwin->GetBorderSize(*this,csthfsThin,bw,bh);
+      thwin->DrawBorder(*this,csthfsThin,bw,bh,di,di);
       break;
     case cswfs3D:
     {
       if ((BorderWidth > 0) && (BorderHeight > 0))
       {
-        Rect3D (0, 0, bound.Width (), bound.Height (), CSPAL_WINDOW_2DARK3D,
-          CSPAL_WINDOW_2LIGHT3D);
-        bw++; bh++;
+        thwin->GetBorderSize(*this,csthfsThin,bw,bh);
+        thwin->DrawBorder(*this,csthfsThin,bw,bh,li,di);
       } /* endif */
       if ((BorderWidth > 1) && (BorderHeight > 1))
       {
-        Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1,
-          CSPAL_WINDOW_DARK3D, CSPAL_WINDOW_LIGHT3D);
-        bw++; bh++;
+        thwin->GetBorderSize(*this,csthfsThinRect,bw,bh);
+        thwin->DrawBorder(*this,csthfsThinRect,bw,bh,li,di);
       } /* endif */
       break;
     }
   } /* endswitch */
-  Box (bw, bw, bound.Width () - bw, bound.Height () - bh, CSPAL_WINDOW_BORDER);
+
+  Box (bw, bw, bound.Width () - bw, bound.Height () - bh,back);
+
   if (WindowStyle & CSWS_CLIENTBORDER)
   {
     csComponent *c = GetChild (CSWID_CLIENT);
     if (c)
       Rect3D (c->bound.xmin - 1, c->bound.ymin - 1, c->bound.xmax + 1,
-        c->bound.ymax + 1, CSPAL_WINDOW_LIGHT3D, CSPAL_WINDOW_DARK3D);
+        c->bound.ymax + 1, li, di);
   } /* endif */
   csComponent::Draw ();
 }
