@@ -4,6 +4,11 @@
 
 # BUGS & TODO 
 #------------
+# - Add support to create multiple, customizable workspaces rather than always
+#   creating only wksall.  Obvious examples of workspaces are the ones
+#   presently created by the GNU make system: wksall, wkstypical, wkswalkall,
+#   wksnewrenderer.
+#
 # - Create a secondary target (such as "msvcinst") which copies the generated
 #   project files from the build/"out" directory back into the source
 #   directory.  This is useful for maintainers who, after having created and
@@ -29,6 +34,10 @@
 #
 # - When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't know how to
 #   locate or create <grist>csperlxs.c.
+#
+# - Eliminate the ugly mk/msvcgen/msvcgen.sh and mk/msvcgen/Jamconfig.
+#   Instead, it should be possible to run the entire process using the normal
+#   Jamconfig created by the configuration process.
 
 if "$(MSVCGEN_CONFIG)"
 {
@@ -199,7 +208,7 @@ rule MsvcProject
   NotFile $(rcpath) ;
   Always $(target) ;
 
-  MSVCWorkspace csall : $(fragments) : $(fragroot) ;
+  MSVCWorkspace wksall : $(fragments) : $(fragroot) ;
 
   Clean msvcclean : $(target) ;
 }

@@ -37,8 +37,8 @@
 ifeq ($(ZLIB.AVAILABLE),yes)
 PLUGINS += filesys/vfs
 endif
-PLUGINS += video/renderer/software
 ifneq ($(USE_NEW_RENDERER),yes)
+PLUGINS += video/renderer/software
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/renderer/opengl
 endif
@@ -54,7 +54,6 @@ endif
 PLUGINS += video/loader/dds
 PLUGINS += video/loader/bmp
 PLUGINS += video/loader/tga
-PLUGINS += video/effects
 PLUGINS += video/cursor
 PLUGINS += sound/loader/mplex
 PLUGINS += sound/loader/au
@@ -88,9 +87,10 @@ PLUGINS += mesh/emit/object        mesh/emit/persist/standard
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/standard
 ifeq ($(USE_NEW_RENDERER),yes)
 PLUGINS += mesh/terrain/object     mesh/terrain/persist/standard
-endif
+else
 PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/standard
 PLUGINS += mesh/terrbig
+endif
 PLUGINS += mesh/lghtng/object
 PLUGINS += mesh/null/object        mesh/null/persist/standard
 PLUGINS += mesh/bcterr/object      mesh/bcterr/persist/standard
@@ -115,7 +115,10 @@ PLUGINS += engseq
 PLUGINS += documentsystem/xmlread
 
 ifeq ($(USE_NEW_RENDERER),yes)
+ifeq ($(GL.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/render3d/opengl
+endif
+PLUGINS.DYNAMIC += video/render3d/software
 endif
 PLUGINS.DYNAMIC += video/render3d/shader/shadermgr
 PLUGINS.DYNAMIC += video/render3d/shader/shadercompiler/xmlshader

@@ -3,7 +3,8 @@
 
 include $(SRCDIR)/$(TARGET_MAKEFILE)
 
-PLUGINS += video/renderer video/canvas # Special defines.
+PLUGINS += $(PLUGINS.SEED)
+PLUGINS += video/renderer video/canvas # Special defines; not optional.
 ifeq ($(USE_PLUGINS),yes)
   PLUGINS += $(PLUGINS.DYNAMIC)
 endif

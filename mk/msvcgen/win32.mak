@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic MSVC-compliant workspace and project generation component
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -25,16 +25,6 @@
 #	targets which are specific to Windows or which are not otherwise
 #	represented by stand-alone makefiles within the project hierarchy.
 #
-# *NOTE* AUGMENTED
-#	The macro MSVC.DSP.AUGMENTED generates a type-augmented project list.
-#	For example, (CSGEOM CSFONT VFS) becomes (library.CSGEOM plugin.CSFONT
-#	plugin.VFS).  Later, the DSP.PROJECT.DEPEND variables filter the list
-#	by type and strip off the type-prefix in order to arrive at a
-#	bare-word dependency list.  For instance, for the pseudo-project
-#	"grpplugins", the list is filtered to (plugin.CSFONT plugin.VFS), and
-#	then transformed into (CSFONT VFS), which is exactly the list of
-#	bare-word project names upon which "grpplugins" should depend.
-#
 # *NOTE* SYS_CSUTIL
 #	We override the SRC.SYS_CSUTIL and INC.SYS_CSUTIL variables from the
 #	platform-specific makefile since, for project file generation, the
@@ -43,10 +33,8 @@
 #	CS/libs/csutil/csutil.mak) since they may reference inappropriate
 #	resources if the project is configured for a non-Windows platform.  For
 #	example, it is possible to generate the project files from Unix.
+#
 #------------------------------------------------------------------------------
-
-# Macro to generate a type-augmented project list. (*NOTE* AUGMENTED)
-MSVC.DSP.AUGMENTED = $(foreach d,$(MSVC.DSP),$(DSP.$d.TYPE).$d)
 
 # Platform-specific implementation for Windows. (*NOTE* SYS_CSUTIL)
 ifeq ($(DO_MSVCGEN),yes)
@@ -63,31 +51,3 @@ SRC.SYS_CSUTIL = \
   $(SRCDIR)/libs/csutil/generic/resdir.cpp \
   $(SRCDIR)/libs/csutil/generic/runloop.cpp
 endif
-
-# grpall -- represents all other projects indirectly through grpapps,
-# grpplugins, and grplibs.
-MSVC.DSP += ALL
-DSP.ALL.NAME = all
-DSP.ALL.TYPE = group
-DSP.ALL.DEPEND = APPS PLUGINS LIBS
-
-# grpapps -- represents all GUI and console application projects.
-MSVC.DSP += APPS
-DSP.APPS.NAME = apps
-DSP.APPS.TYPE = group
-DSP.APPS.DEPEND = $(patsubst appgui.%,%,$(patsubst appcon.%,%,\
-  $(filter appgui.% appcon.%,$(MSVC.DSP.AUGMENTED))))
-
-# grpplugins -- represents all plug-in projects.
-MSVC.DSP += PLUGINS
-DSP.PLUGINS.NAME = plugins
-DSP.PLUGINS.TYPE = group
-DSP.PLUGINS.DEPEND = \
-  $(patsubst plugin.%,%,$(filter plugin.%,$(MSVC.DSP.AUGMENTED)))
-
-# grplibs -- represents all static library projects.
-MSVC.DSP += LIBS
-DSP.LIBS.NAME = libs
-DSP.LIBS.TYPE = group
-DSP.LIBS.DEPEND = \
-  $(patsubst library.%,%,$(filter library.%,$(MSVC.DSP.AUGMENTED))))

@@ -1,7 +1,7 @@
 #==============================================================================
 #
-#    Automatic MSVC-compliant DSW and DSP generation component
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Automatic MSVC-compliant workspace and project generation component
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -41,33 +41,34 @@
 #	normally process Windows-specific modules.
 #
 #------------------------------------------------------------------------------
-MSVC.MAKE.FLAGS = \
-  3DS.AVAILABLE=yes \
-  ODE.AVAILABLE=yes
+MSVC.MAKE.FLAGS =		\
+  3DS.AVAILABLE=yes		\
+  DIRECTX.AVAILABLE=yes		\
+  FT2.AVAILABLE=yes		\
+  GL.AVAILABLE=yes		\
+  GLU.AVAILABLE=yes		\
+  HAS_CAL3D=yes			\
+  JPEG.AVAILABLE=yes		\
+  MNG.AVAILABLE=yes		\
+  ODE.AVAILABLE=yes		\
+  OPENAL.AVAILABLE=yes		\
+  PNG.AVAILABLE=yes		\
+  PYTHON.AVAILABLE=yes		\
+  SOCKET.AVAILABLE=yes		\
+  USE_NEW_RENDERER=yes		\
+  VORBISFILE.AVAILABLE=yes	\
+  ZLIB.AVAILABLE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
-  cscript/cspython              \
-  device/joystick/windows	\
-  documentsystem/xml            \
-  filesys/vfs			\
-  font/server/freefnt2          \
-  mesh/impexp/3ds               \
-  mesh/sprcal3d/object		\
-  mesh/sprcal3d/persist		\
-  net/driver/socket		\
-  net/driver/ensocket		\
-  physics/odedynam              \
-  physics/loader                \
+  mesh/terrbig			\
+  mesh/terrfunc/object		\
+  mesh/terrfunc/persist/standard\
   sound/driver/waveoutsd        \
-  sound/loader/ogg              \
   sound/renderer/ds3d           \
-  sound/renderer/openal         \
   sound/renderer/software       \
   video/canvas/ddraw            \
   video/canvas/openglwin        \
   video/format/avi              \
   video/format/codecs/rle       \
-  video/loader/png		\
-  video/loader/jpg		\
-  video/loader/jng              \
-  video/renderer/opengl
+  video/renderer/opengl		\
+  video/renderer/software

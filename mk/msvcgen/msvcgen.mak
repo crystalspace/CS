@@ -21,16 +21,16 @@
 #------------------------------------------------------------------------------
 # msvcgen.mak
 #
-#	A makefile for synthesizing a complete set of MSVC-compliant workspace
+#	A makefile for synthesizing a complete set of MSVC-compliant workspaces
 # 	and project files based upon information gleaned from GNU makefiles
 #	project-wide.
 #
 #	This process strives to enforce the fundamental invariant that if the
 #	GNU makefile builds a working target (application, plug-in, library,
-#	etc.), then the synthesized workspace (DSW/SLN) and project files
-#	(DSP/VCPROJ) will also build a working target.  Thus, the headache
-#	associated with manual maintenance of the MSVC project files becomes a
-#	problem of the past.
+#	etc.), then the synthesized workspaces (SLN/DSW) and project files
+#	(VCPROJ/DSP) will also build a working target.  As a result, the
+#	headache associated with manual maintenance of the MSVC project files
+#	becomes a problem of the past.
 #
 # IMPORTS
 #	In the discussion which follows, assume that "PROJECT" is the core name
@@ -60,9 +60,9 @@
 #
 #	o CFG.PROJECT -- List of configuration files related to this module.
 #
-#	Furthermore, the following variables specifically control DSW and
-#	DSP project file creation.  These variables should only appear in
-#	makefiles for which a corresponding DSP file should be generated.
+#	Furthermore, the following variables specifically control project file
+#	creation.  These variables should only appear in makefiles for which a
+#	corresponding project file should be generated.
 #
 #	o MSVC.DSP -- Master list of modules for which project files should be
 #	  generated.  Entries must be *appended* to this list with the "+="
@@ -71,11 +71,11 @@
 #	  expression "MSVC.DSP += SOFT3D".
 #
 #	o DSP.PROJECT.NAME -- Base name (such as "soft3d") for the generated
-#	  project and target.  This name is used to compose the DSP file name,
-#	  the end target name (such as "soft3d.dll"), and the displayed project
-#	  name in the Visual-C++ IDE.  In general, it should be identical to
-#	  the base name of the target which is generated for non-Windows
-#	  platforms.
+#	  project and target.  This name is used to compose the project file
+#	  name, the end target name (such as "soft3d.dll"), and the displayed
+#	  project name in the Visual-C++ IDE.  In general, it should be
+#	  identical to the base name of the target which is generated for
+#	  non-Windows platforms.
 #
 #	o DSP.PROJECT.TYPE -- Module's type.  It should be one of "appgui",
 #	  "appcon", "library", "plugin", or "group", which stand for GUI
@@ -86,12 +86,12 @@
 #	  related to this module which are not covered by CFG.PROJECT.  These
 #	  resources are made available for browsing in the Visual-C++ IDE as a
 #	  convenience to the user.  Some good candidates, among others, for
-#	  this variable are files having the suffixes .inc, .y (yacc), .l
-#	  (lex), and .txt.
+#	  this variable are files having the suffixes .inc, .y (Yacc), .l
+#	  (Lex), and .txt.
 #
 #	o $(PROJECT.EXE).WINRSRC -- List of .rc files related to this project.
 #	  These files are combined and fed to MSVC's resource compiler.  Note
-#	  that this is expanded with $($(PROJECT.EXE).WINRSRC).
+#	  that this is expanded via $($(PROJECT.EXE).WINRSRC).
 #
 #	o DSP.PROJECT.DEPEND -- List of extra dependencies for this module.
 #	  Entries in this list have the same format as those in the DEP.PROJECT
@@ -110,7 +110,7 @@
 #
 #	o DSP.PROJECT.DELAYLIBS -- List of DLLs (sans suffix) which should be
 #	  delay-loaded (that is, they are not loaded when the
-#	  application/plugin itself is loaded, but rather the first time a
+#	  application/plugin is itself loaded, but rather the first time a
 #	  contained function is invoked.)
 #
 #	o DSP.PROJECT.LFLAGS -- Specifies extra Windows-specific linker options
@@ -135,44 +135,48 @@
 #	  specific to Windows or which are not otherwise represented by
 #	  stand-alone makefiles within the project hierarchy.
 #
-#	o required.mak -- Sets the value of the MSVC.PLUGINS.REQUIRED and
+#	o required.mak -- Populates MSVC.PLUGINS.REQUIRED and
 #	  MSVC.MAKE.FLAGS variables.  MSVC.PLUGINS.REQUIRED supplements the
 #	  list of plug-in modules defined by the PLUGINS variable (see
-#	  CS/mk/user.mak) and ensures that the correct set of DSP files are
+#	  CS/mk/user.mak) and ensures that the correct set of project files are
 #	  generated even when invoking the project file generation process from
-#	  a non-Windows platform such as Unix.  MSVC.MAKE.FLAGS allows
+#	  a non-Windows platform, such as Unix.  MSVC.MAKE.FLAGS allows
 #	  additional flags to be sent to the child "make" invocation.  This is
 #	  useful when one needs to define additional make variables which
 #	  affect the synthesis process.
 #
+#	o workspaces.mak -- Populates MSVC.WORKSPACES, which is a list of
+#	  workspaces (SLN/DSW) to create.
+#
 # EXPORTS
 #	The following files are exported by this makefile:
 #
-#	o A DSP/VCPROJ project file is generated for each project mentioned by
+#	o A VCPROJ/DSP project file is generated for each project mentioned by
 #	  the MSVC.DSP variable.
 #
-#	o A single DSW/SLN workspace file, named csall.dsw/csall.sln, is
-#	  generated.  It contains dependency information for all generated
-#	  DSP/VCPROJ projects.
+#	o A SLN/DSW workspace file is generated for each workspace defined by
+#	  the MSVC.WORKSPACES variable populated by workspaces.mak.  Each
+#	  workspace contains dependency information for all generated
+#	  VCPROJ/DSP projects.
 #
 #	The following makefile targets are exported:
 #
-#	o msvc6gen -- Generates the MSVC6 DSW workspace csall.dsw, as well as
-#	  one DSP project files for each module mentioned by the MSVC.DSP
-#	  variable.
+#	o msvc6gen -- Generates the MSVC6 DSW workspaces mentioned by
+#	  MSVC.WORKSPACES, as well as one DSP project file for each module
+#	  mentioned by the MSVC.DSP variable.
 #
-#	o msvc7gen -- Generates the MSVC7 SLN workspace csall.sln, as well as
-#	  one VCPROJ project files for each module mentioned by the MSVC.DSP
-#	  variable.
+#	o msvc7gen -- Generates the MSVC7 SLN workspaces mentioned by
+#	  MSVC.WORKSPACES, as well as one VCPROJ project file for each module
+#	  mentioned by the MSVC.DSP variable.
 #
 #	o msvc6inst -- Copies the newly generated DSW and DSP files over top of
-#	  the existing files from the CVS repository and informs the user as to
+#	  the existing files from the CVS repository and informs the user
 #	  exactly which CVS commands must be invoked in order to permanently
 #	  commit the new files to the repository.
 #
 #	o msvc7inst -- Copies the newly generated SLN and VCPROJ files over top
-#	  of the existing files from the CVS repository and informs the user as
-#	  to exactly which CVS commands must be invoked in order to permanently
+#	  of the existing files from the CVS repository and informs the user
+#	  exactly which CVS commands must be invoked in order to permanently
 #	  commit the new files to the repository.
 #
 #	The following makefile variables are exported by this makefile:
@@ -181,11 +185,12 @@
 #	  makefile target is running.  In general, this variable can be
 #	  ignored, but in special cases a makefile may check this variable to
 #	  alter its behavior.  For instance, in rare circumstances, a makefile
-#	  may need to use a different $(wildcard) expression during the
-#	  generation process.
+#	  might need to use a different $(wildcard) expression or might need to
+#	  $(filter-out) some files during the generation process.
 #
 #	o MSVCGEN_VERSION is either '6' or '7' and is used internally to
-#	  determine the right behaviour for either MSVC 6 or 7 projects.
+#	  determine the proper behaviour for synthesizing either MSVC 6 or 7
+#	  projects.
 #
 #------------------------------------------------------------------------------
 
@@ -224,7 +229,7 @@ define MSVCGEN_BUILD
   @echo $(SEPARATOR)
   @$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak msvcgen \
   DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no $(MSVC.MAKE.FLAGS) \
-  PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
+  PLUGINS.SEED='$(MSVC.PLUGINS.REQUIRED)'
 endef
 
 define MSVCGEN_INSTALL
@@ -295,7 +300,7 @@ MSVC.EXT.WORKSPACE = sln
 endif
 MSVC.EXT.FRAGMENT = frag
 MSVC.EXT.RESOURCES = rc
-MSVC.WORKSPACE = csall.$(MSVC.EXT.WORKSPACE)
+MSVC.PFX.WORKSPACE = wks
 
 OUTDIRS += $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
 
@@ -348,6 +353,13 @@ MSVC.VERSIONRC.OUT.group   =
 # Define extra Windows-specific targets which do not have associated makefiles.
 include $(SRCDIR)/mk/msvcgen/win32.mak
 
+# Define workspaces.
+include $(SRCDIR)/mk/msvcgen/workspaces.mak
+
+# Macro to compose workspace name. (ex: "TYPICAL" becomes "wkstypical.sln")
+MSVC.WORKSPACE = \
+  $(MSVC.PFX.WORKSPACE)$(MSVC.WORKSPACE.$*.NAME).$(MSVC.EXT.WORKSPACE)
+
 # Macro to compose project name. (ex: "CSGEOM" becomes "libcsgeom")
 MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
 
@@ -398,7 +410,7 @@ MSVC.CONTENTS = $(subst $(SRCDIR)/,, \
 
 # Macro to compose the optional --meta-file option from INF.PROJECT.
 MSVC.METAFILE.DIRECTIVE = \
-  $(subst $(SRCDIR)/,,$(foreach m,$(INF.$*),--meta-file=$m))
+  $(subst $(SRCDIR)/,,$(addprefix --meta-file=,$(INF.$*)))
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -412,13 +424,20 @@ MSVC.DEPEND.LIST = $(foreach d,$(sort \
   $(MSVC.PREFIX.$(DSP.$d.TYPE))$(DSP.$d.NAME))
 
 # Macro to compose list of --depend directives from MSVC.DEPEND.LIST.
-MSVC.DEPEND.DIRECTIVES = $(foreach d,$(MSVC.DEPEND.LIST),--depend=$d)
+MSVC.DEPEND.DIRECTIVES = $(addprefix --depend=,$(MSVC.DEPEND.LIST))
 
 # Macro to compose list of --library and --delaylibs directives from
 # DSP.PROJECT.LIBS.
 MSVC.LIBRARY.DIRECTIVES = \
-  $(foreach l,$(DSP.$*.LIBS),--library=$l) \
-  $(foreach l,$(DSP.$*.DELAYLIBS),--delaylib=$l)
+  $(addprefix --library=,$(DSP.$*.LIBS)) \
+  $(addprefix --delaylib=,$(DSP.$*.DELAYLIBS))
+
+# Macros to compose list of --accept and --reject directives from
+# MSVC.WORKSPACE definitions.
+MSVC.ACCEPT.DIRECTIVES = \
+  $(foreach d,$(MSVC.WORKSPACE.$*.ACCEPT),--accept='$d')
+MSVC.REJECT.DIRECTIVES = \
+  $(foreach d,$(MSVC.WORKSPACE.$*.REJECT),--reject='$d')
 
 # Macros to compose --lflags and --cflags directives from DSP.PROJECT.LFLAGS
 # and DSP.PROJECT.CFLAGS.  These are slightly complicated because it is valid
@@ -438,7 +457,7 @@ MSVC.FRAG.FILES = $(sort \
   $(patsubst %.dpf,%, \
   $(wildcard $(MSVC.OUT.FRAGMENT)/*.$(MSVC.EXT.FRAGMENT).*)))))
 
-# Macros to compose lists of existing and newly created DSW/SLN and DSP/VCPROJ
+# Macros to compose lists of existing and newly created SLN/DSW and VCPROJ/DSP
 # files.
 MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,\
   $(wildcard $(addprefix $(MSVC.CVS.DIR)/*,\
@@ -479,7 +498,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: msvcgen msvcinst msvcgenclean dswgen
 
-# Build a project project file and an associated DSW/SLN fragment file.
+# Build a project project file and an associated SLN/DSW fragment file.
 %.MAKEPROJECT:
 	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
 	$(MSVC.SILENT)$(MSVC.MAKEMETARC)
@@ -502,25 +521,27 @@ ifeq ($(MAKESECTION),targets)
 	$(MSVCGEN.EXTRA) \
 	$(MSVC.CONTENTS)
 
-# Build the project-wide workspace file (csall.dsw/.sln).
-workspacegen:
+# Build the a workspace file (.sln/.dsw).
+%.MAKEWORKSPACE:
 	$(MSVC.SILENT)$(MSVCGEN) \
 	--quiet \
 	--workspace \
 	--workspace-extension=$(MSVC.EXT.WORKSPACE) \
 	--output=$(MSVC.OUT.DIR)/$(MSVC.WORKSPACE) \
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
+	$(MSVC.ACCEPT.DIRECTIVES) \
+	$(MSVC.REJECT.DIRECTIVES) \
 	$(MSVCGEN.EXTRA) \
 	$(MSVC.FRAG.FILES)
 
-# Build all Visual C++ DSW/SLN workspace and DSP/VCPROJ project files.  The
-# DSW/SLN workspace is built last since it is composed of the fragment files
-# generated as part of the DSP/VCPROJ file synthesis process.
+# Build all Visual C++ SLN/DSW workspace and VCPROJ/DSP project files.  The
+# SLN/DSW workspaces are built last since they are composed of the fragment
+# files generated as part of the VCPROJ/DSP file synthesis process.
 msvcgen: \
   msvcgenclean \
   $(OUTDIRS) \
   $(addsuffix .MAKEPROJECT,$(MSVC.DSP)) \
-  workspacegen
+  $(addsuffix .MAKEWORKSPACE,$(MSVC.WORKSPACES))
 
 # Install the generated project files in place of the files from the CVS
 # repository and inform the user as to which CVS commands must be manually
