@@ -40,7 +40,7 @@
 #include "ivideo/rndbuf.h"
 #include "csutil/csvector.h"
 #include "ivideo/rendermesh.h"
-#include "csutil/anonrndbuf.h"
+#include "cstool/anonrndbuf.h"
 #endif
 
 struct iMaterialWrapper;
