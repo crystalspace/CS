@@ -19,6 +19,9 @@ chronological order.
 	  would hang when truncating the command history. It was using
 	  Delete (0) instead of DeleteIndex (0). Additionally, the history
 	  position could be invalid after truncation.
+	- Wouter fixed glcommon2d to glClear after resizing. Apparently some
+ 	  drivers (like ati radeon 7500 on win XP) corrupt the video
+ 	  memory if you don't. Fix from Robin Stanton.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate
