@@ -23,6 +23,8 @@
 #define CS_SYSDEF_PROVIDE_TEMP
 #define CS_SYSDEF_PROVIDE_UNLINK
 #define CS_SYSDEF_PROVIDE_ACCESS
+
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/csendian.h"
 #include "csutil/archive.h"

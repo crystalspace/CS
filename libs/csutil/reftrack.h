@@ -20,6 +20,7 @@
 #ifndef __CS_UTIL_REFTRACK_H__
 #define __CS_UTIL_REFTRACK_H__
 
+#include "csextern.h"
 #include "iutil/reftrack.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
@@ -27,13 +28,13 @@
 #include "csutil/hash.h"
 #include "csutil/thread.h"
 
-class csRefTracker : public iRefTracker
+class CS_CSUTIL_EXPORT csRefTracker : public iRefTracker
 {
   enum RefActionType
   {
     Increased, Decreased, Destructed
   };
-  struct RefAction
+  struct CS_CSUTIL_EXPORT RefAction
   {
     RefActionType type;
     int refCount;
@@ -49,7 +50,7 @@ class csRefTracker : public iRefTracker
       if (stack) stack->Free();
     }
   };
-  struct RefInfo
+  struct CS_CSUTIL_EXPORT RefInfo
   {
     csArray<RefAction> actions;
     int refCount;
@@ -61,7 +62,7 @@ class csRefTracker : public iRefTracker
   csBlockAllocator<RefInfo> riAlloc;
   csHash<void*, void*> aliases;
   csHash<RefInfo*, void*> trackedRefs;
-  struct OldRefInfo
+  struct CS_CSUTIL_EXPORT OldRefInfo
   {
     void* obj;
     RefInfo* ri;

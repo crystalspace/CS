@@ -17,6 +17,7 @@
 */
 
 #define CS_SYSDEF_PROVIDE_DIR
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 
 #ifdef __NEED_OPENDIR_PROTOTYPE

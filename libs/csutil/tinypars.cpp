@@ -22,6 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "tinyxml.h"
 #include <ctype.h>

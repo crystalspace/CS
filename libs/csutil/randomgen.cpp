@@ -27,6 +27,7 @@
     of Florida State University.
 */
 
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/randomgen.h"
 #include <stdio.h>

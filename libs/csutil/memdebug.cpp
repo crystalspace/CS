@@ -18,6 +18,8 @@
 
 #include <stdarg.h>
 
+#define CS_CSUTIL_LIB
+
 // Include platform.h here. Otherwise we don't get the CS_EXTENSIVE_MEMDEBUG
 // or CS_MEMORY_TRACKER definitions.
 #include "platform.h"

@@ -17,14 +17,16 @@
 */
 
 // Support for platform-specific VFS variables.
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
+#include "csextern.h"
 #include <windows.h>
 
 #include "shellstuff.h"
 
 // Windows has built-in var "SystemRoot"
 // (env var on NT, but not 9x; so we provide it this way)
-const char* 
+CS_CSUTIL_EXPORT const char* 
 csCheckPlatformVFSVar(const char* VarName)
 {
   if (!strcasecmp(VarName, "systemroot"))

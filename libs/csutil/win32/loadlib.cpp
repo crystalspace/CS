@@ -17,6 +17,7 @@
 */	
 
 #define CS_SYSDEF_PROVIDE_HARDWARE_MMIO
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"

@@ -20,6 +20,8 @@
 #ifndef __CS_UTIL_WIN32_CACHEDLL_H__
 #define __CS_UTIL_WIN32_CACHEDLL_H__
 
+#include "csextern.h"
+
 /**\file
  * Helper to avoid repeated loading/unloading of DLLs
  */
@@ -36,7 +38,7 @@
  * }
  * \endcode
  */
-class cswinCacheDLL
+class CS_CSUTIL_EXPORT cswinCacheDLL
 {
   const char* dllName;
   HMODULE dllHandle;

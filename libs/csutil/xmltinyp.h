@@ -19,6 +19,7 @@
 #ifndef __CSUTIL_XMLTINYPRIV_H__
 #define __CSUTIL_XMLTINYPRIV_H__
 
+#include "csextern.h"
 #include "iutil/document.h"
 #include "tinyxml.h"
 
@@ -27,7 +28,8 @@ class csTinyXmlDocument;
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
-struct csTinyXmlAttributeIterator : public iDocumentAttributeIterator
+struct CS_CSUTIL_EXPORT csTinyXmlAttributeIterator :
+  public iDocumentAttributeIterator
 {
 private:
   int current;
@@ -47,7 +49,7 @@ public:
 /**
  * This is an SCF compatible wrapper for an attribute in TinyXml.
  */
-struct csTinyXmlAttribute : public iDocumentAttribute
+struct CS_CSUTIL_EXPORT csTinyXmlAttribute : public iDocumentAttribute
 {
 private:
   TiDocumentAttribute* attr;
@@ -134,7 +136,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a node iterator.
  */
-struct csTinyXmlNodeIterator : public iDocumentNodeIterator
+struct CS_CSUTIL_EXPORT csTinyXmlNodeIterator : public iDocumentNodeIterator
 {
 private:
   csTinyXmlDocument* doc;
@@ -156,7 +158,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a node in TinyXml.
  */
-struct csTinyXmlNode : public iDocumentNode
+struct CS_CSUTIL_EXPORT csTinyXmlNode : public iDocumentNode
 {
 private:
   friend class csTinyXmlDocument;
@@ -220,7 +222,7 @@ public:
 /**
  * This is an SCF compatible wrapper for a document in TinyXml.
  */
-class csTinyXmlDocument : public iDocument
+class CS_CSUTIL_EXPORT csTinyXmlDocument : public iDocument
 {
 private:
   TiDocument* root;

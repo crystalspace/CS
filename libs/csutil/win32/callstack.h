@@ -20,6 +20,7 @@
 #ifndef __CS_UTIL_WIN32_CALLSTACK_H__
 #define __CS_UTIL_WIN32_CALLSTACK_H__
 
+#include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
 #include "csutil/callstack.h"
@@ -27,12 +28,12 @@
 
 #include "csutil/win32/DbgHelpAPI.h"
 
-class cswinCallStack : public csCallStack
+class CS_CSUTIL_EXPORT cswinCallStack : public csCallStack
 {
 public:
   static csStringSet strings;
 
-  struct StackEntry
+  struct CS_CSUTIL_EXPORT StackEntry
   {
     uint64 instrPtr;
 

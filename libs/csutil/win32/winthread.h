@@ -18,9 +18,10 @@
 #ifndef __CS_WINTHREAD_H__
 #define __CS_WINTHREAD_H__
 
+#include "csextern.h"
 #include "csutil/thread.h"
 
-class csWinThread : public csThread
+class CS_CSUTIL_EXPORT csWinThread : public csThread
 {
  public:
   /**
@@ -71,7 +72,7 @@ class csWinThread : public csThread
   bool created;
 };
 
-class csWinMutex : public csMutex
+class CS_CSUTIL_EXPORT csWinMutex : public csMutex
 {
 public:
   csWinMutex ();
@@ -90,7 +91,7 @@ public:
   friend class csWinCondition;
 };
 
-class csWinSemaphore : public csSemaphore
+class CS_CSUTIL_EXPORT csWinSemaphore : public csSemaphore
 {
 public:
   csWinSemaphore (uint32 value);
@@ -110,7 +111,7 @@ public:
   bool Destroy ();
 };
 
-class csWinCondition : public csCondition
+class CS_CSUTIL_EXPORT csWinCondition : public csCondition
 {
  public:
   csWinCondition (uint32 conditionAttributes);

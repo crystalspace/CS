@@ -20,6 +20,7 @@
 #ifndef __CS_SYS_WIN32_WIN32KBD_H__
 #define __CS_SYS_WIN32_WIN32KBD_H__
 
+#include "csextern.h"
 #include "iutil/csinput.h"
 #include "csutil/csinput.h"
 
@@ -34,7 +35,7 @@
 
 struct iEventOutlet;
 
-class csWin32KeyComposer : public iKeyComposer
+class CS_CSUTIL_EXPORT csWin32KeyComposer : public iKeyComposer
 {
 protected:
   utf32_char lastDead;

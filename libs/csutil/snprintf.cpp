@@ -62,7 +62,9 @@
  * <panos@alumni.cs.colorado.edu> for xinetd.
  */
 
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
+#include "csutil/snprintf.h"
 // This MUST go before the ctype includes!
 #ifdef WIN32
 #define _CTYPE_DISABLE_MACROS

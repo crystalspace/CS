@@ -17,6 +17,7 @@
 */
 
 
+#define CS_CSUTIL_LIB
 #include <cssysdef.h>
 #include <csutil/csbaseeventh.h>
 

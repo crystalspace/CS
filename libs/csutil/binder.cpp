@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
 #include "csutil/csunicode.h"
 #include "csutil/binder.h"
@@ -240,3 +241,13 @@ bool csInputBinder::UnbindAll ()
   Hash.DeleteAll ();
   return true;
 }
+
+SCF_IMPLEMENT_IBASE (csInputBinderPosition)
+  SCF_IMPLEMENTS_INTERFACE (iInputBinderPosition)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csInputBinderBoolean)
+  SCF_IMPLEMENTS_INTERFACE (iInputBinderBoolean)
+SCF_IMPLEMENT_IBASE_END
+
+CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP

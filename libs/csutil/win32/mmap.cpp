@@ -17,7 +17,9 @@
 */
 
 #define CS_SYSDEF_PROVIDE_HARDWARE_MMIO
+#define CS_CSUTIL_LIB
 #include "cssysdef.h"
+#include "csutil/csmmap.h"
 
 static bool map_window (mmioInfo* info, unsigned int offset, 
   unsigned int len, bool writable) 
