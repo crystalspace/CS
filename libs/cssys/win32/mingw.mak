@@ -163,7 +163,7 @@ ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
 endif
 
 SYSHELP += \
-  $(NEWLINE)echo $"  make mingw        Prepare for building under and for $(DESCRIPTION.mingwnt4)$"
+  $(NEWLINE)echo $"  make mingw        Prepare for building under and for $(DESCRIPTION.mingw)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
