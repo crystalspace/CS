@@ -41,7 +41,7 @@ OBJ.FOUNT = $(addprefix $(OUT),$(notdir $(SRC.FOUNT:.cpp=$O)))
 DEP.FOUNT = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += FOUNT
-DSP.FOUNT.NAME = fount
+DSP.FOUNT.NAME = fountain
 DSP.FOUNT.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
