@@ -861,8 +861,8 @@ public:
   bool SetAnimCycle(int idx, float weight);
   bool AddAnimCycle(const char *name, float weight, float delay);
   bool AddAnimCycle(int idx, float weight, float delay);
-  void ClearAnimCycle(int idx, float delay);
-  bool ClearAnimCycle(const char *name, float delay);
+  bool ClearAnimCycle (int idx, float delay);
+  bool ClearAnimCycle (const char *name, float delay);
   int  GetActiveAnimCount();
   int  GetActiveAnims(char *buffer,int max_length);
   void SetActiveAnims(const char *buffer,int anim_count);
@@ -943,23 +943,23 @@ public:
     }
     virtual bool SetAnimCycle(int idx, float weight)
     {
-	return scfParent->SetAnimCycle(idx,weight);
+      return scfParent->SetAnimCycle(idx,weight);
     }
     virtual bool AddAnimCycle(const char *name, float weight, float delay)
     {
-	return scfParent->AddAnimCycle(name,weight,delay);
+      return scfParent->AddAnimCycle(name,weight,delay);
     }
-    bool AddAnimCycle(int idx, float weight, float delay)
+    bool AddAnimCycle (int idx, float weight, float delay)
     {
-      return scfParent->AddAnimCycle(idx,weight,delay);
+      return scfParent->AddAnimCycle (idx, weight, delay);
     }
-    virtual void ClearAnimCycle(int idx, float delay)
+    virtual bool ClearAnimCycle (int idx, float delay)
     {
-      return scfParent->ClearAnimCycle(idx,delay);
+      return scfParent->ClearAnimCycle (idx, delay);
     }
     virtual bool ClearAnimCycle(const char *name, float delay)
     {
-	return scfParent->ClearAnimCycle(name,delay);
+      return scfParent->ClearAnimCycle(name,delay);
     }
     virtual int  GetActiveAnimCount()
     {

@@ -16,6 +16,8 @@ chronological order.
 	  iSpriteCal3DState which complements the existing ClearAnimCycle(char
 	  const*,float). Also added the missing FindAnim(char const*) to the
 	  interface.
+	- Luca replaced the void return type with the bool one for the 
+	  SpriteCal3DState::ClearAnimCycle(int idx, float delay) method.
 18-Nov-2004
 	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.h so that it
 	  also augments pkg-config's search path to reference directories which

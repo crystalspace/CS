@@ -2063,19 +2063,21 @@ void csSpriteCal3DMeshObject::ClearAnimCyclePos(int pos, float delay)
   active_anims.DeleteIndex(pos);
 }
 
-void csSpriteCal3DMeshObject::ClearAnimCycle(int idx, float delay)
+bool csSpriteCal3DMeshObject::ClearAnimCycle (int idx, float delay)
 {
-  int const pos = FindAnimCyclePos(idx);
-  if (pos != -1)
-    ClearAnimCyclePos(pos,delay);
-}
-
-bool csSpriteCal3DMeshObject::ClearAnimCycle(const char *name, float delay)
-{
-  int const pos = FindAnimCycleNamePos(name);
+  int const pos = FindAnimCyclePos (idx);
   bool const ok = (pos != -1);
   if (ok)
-    ClearAnimCyclePos(pos,delay);
+    ClearAnimCyclePos (pos, delay);
+  return ok;
+}
+
+bool csSpriteCal3DMeshObject::ClearAnimCycle (const char *name, float delay)
+{
+  int const pos = FindAnimCycleNamePos (name);
+  bool const ok = (pos != -1);
+  if (ok)
+    ClearAnimCyclePos (pos, delay);
   return ok;
 }
 

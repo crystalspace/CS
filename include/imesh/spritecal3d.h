@@ -385,14 +385,14 @@ struct iSpriteCal3DState : public iBase
    * This removes the animation at index `idx' from the current blend set over
    * the period of time specifed by "delay" parm in seconds.
    */
-  virtual void ClearAnimCycle(int idx, float delay) = 0;
+  virtual bool ClearAnimCycle (int idx, float delay) = 0;
 
   /**
    * This removes the named animation from the current blend set over the
    * period of time specifed by "delay" parm in seconds. Returns true if the
    * named animation was found; else false.
    */
-  virtual bool ClearAnimCycle(const char *name, float delay) = 0;
+  virtual bool ClearAnimCycle (const char *name, float delay) = 0;
 
   /**
    * Returns the count of currently playing animation cycles.  This should
