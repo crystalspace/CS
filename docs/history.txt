@@ -25,6 +25,53 @@ The history order has been reversed so that new features are at the top.
 	  the crasher in OpenGL AddFont().
 	- Norman Kramer removed the explicit IncRef of VFS that caused the
 	  warning about unreleased instance of kernel.vfs.
+	- Eric Sunshine overhauled the approach used for dynamic (plug-in)
+	  linking on MacOS/X Server, OpenStep, and NextStep ports.
+	    - These ports now do a fairly good job of emulating dynamic
+	      linking as it is done on most other platforms in which symbols
+	      within a plug-in are private unless explicitly exported.
+	      Historically, with the NeXT ports, all symbols were
+	      automatically public.  This naturally leads to severe symbolic
+	      conflicts since many plug-ins link with the same static
+	      libraries.  As a consequence, in the past I had to devise
+	      elaborate mechanisms to work around these conflicts.
+	    - The NextStep port emulates private plug-in symbols by actually
+	      stripping all public (resolved) symbols, except for the SCF
+	      GetClassTable() hook, from the plug-in module at build time.
+	      This technique provides fairly decent insurance against symbolic
+	      conflicts at plug-in load time even when multiple plug-ins have
+	      linked against the same static libraries.  The only big drawback
+	      to this approach is that it makes symbolic debugging impossible.
+	      I had tried the alternate approach of parsing the error stream
+	      from RLD and calling rld_forget_symbol() for symbolic conflicts,
+	      and then attempting a reload, but the RLD run-time is
+	      sufficiently buggy that it would actually crash within
+	      rld_forget_symbol().
+	    - The MacOS/X Server and OpenStep ports emulate private plug-in
+	      symbols by taking advantage of DYLD's NSLinkEditErrorHandlers
+	      which allows the loader to ignore duplicate symbols at load
+	      time, thus there is no need to strip them away at build time.
+	      This approach has the advantage that symbolic debugging
+	      capability is retained.  I had attempted to use the same
+	      approach as I used for the NextStep port (that of stripping
+	      aways symbols at build time), but discovered that the
+	      Objective-C run-time is more picky in OpenStep than NextStep.
+	      In particular, it couldn't deal with the fact that symbolic
+	      references to Objective-C classes defined locally in the plug-in
+	      had been stripped away.  It would be possible to manually
+	      instruct the 'strip' utility to retain certain symbols, but
+	      doing so would have introduced a potential maintanence headache
+	      as future changes are made to the code.
+	    - Eliminated all the special-case hacks which had been placed in
+	      various applications to force symbolic references in the
+	      executable itself so that the symbols would be available for
+	      dynamically loaded plug-in modules.  Since plug-in modules now
+	      link with all the libraries which they, themselves, require, the
+	      application no longer needs to do so.
+	    - Eliminated special-case makefile hacks which forced applications
+	      to link with extra libraries required by plug-in modules which
+	      they might end up loading.  In particular, scfreg makefile was
+	      considerably simplified.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
