@@ -74,11 +74,14 @@ int main( int argc, char *argv[ ])
     const char* crystal = getenv("CRYSTAL");
     if (!crystal)
     {
-      printf ("Couldn't find Crystal Space directory! Set CRYSTAL var!\n");
-      exit(1);
+      printf ("Couldn't find Crystal Space directory (CRYSTAL var)! Using current dir!\n");
+      strcpy (filename, "data/config/map2cs.cfg");
     }
-    strcpy (filename, crystal);
-    strcat (filename, "/data/config/map2cs.cfg");
+    else
+    {
+      strcpy (filename, crystal);
+      strcat (filename, "/data/config/map2cs.cfg");
+    }
     configfile=filename;
   }
   const char* mapfile   = argv[1];
