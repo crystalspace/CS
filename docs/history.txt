@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+8-Jan-2001
+	- Wouter Wijngaards fixed procedural sky for OpenGL.
+	- Wouter also optimized it a little to use the new qsqrt().
+	- Made some initial documentation on the MeshObject system.
+	  Not finished but already useful. Check it out in
+	  docs/texinfo/plugins/meshobj.
 7-Jan-2001
 	- Made usage of qisqrt() more sensible. First test if square
 	  is less than some amount then you don't have to do the entire

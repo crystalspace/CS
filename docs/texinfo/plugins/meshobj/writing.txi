@@ -1,0 +1,15 @@
+@c -*-texinfo-*-
+@node Writing MeshObjects, , Using MeshObject, MeshObject
+@subsection Writing Mesh Objects
+@cindex MeshObject
+@cindex iMeshObject
+@cindex iMeshObjectFactory
+@cindex iMeshObjectType
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+
+This section explains how you can write your own Mesh Object plugins.
+
+NOT WRITTEN YET.
+

@@ -1,0 +1,31 @@
+@c -*-texinfo-*-
+@node MeshObject, CrystalClear, csEngine, Plug-In Drivers
+@section Mesh Object PlugIn System
+@cindex MeshObject Plug-In
+@cindex Plug-In, MeshObject
+
+This section covers the Crystal Space Mesh Object plugin system.
+This is a very general system for defining various kinds of 3D objects
+and using them in the CS 3D engine. There are already a number of
+mesh objects predefined in CS: particle systems like snow and fountain,
+2D sprites, a cube and a ball, ...
+
+In the first section a general overview is given on some of the concepts
+in the mesh object system.
+
+In the second section you will see how you can use mesh objects in your own
+applications and how you can work with them.
+
+The third section covers everything needed to write your own mesh object
+plugins.
+
+@menu
+* MeshObject Concepts::
+* Using MeshObject:: Using Mesh Objects
+* Writing MeshObjects:: Writing Mesh Objects
+@end menu
+
+@importss{plugins,meshobj,concepts.txi}
+@importss{plugins,meshobj,using.txi}
+@importss{plugins,meshobj,writing.txi}
+
