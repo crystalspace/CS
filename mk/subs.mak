@@ -25,3 +25,10 @@ endif
 ifneq ($(APPLICATION_SUBMAKEFILES),)
   include $(APPLICATION_SUBMAKEFILES)
 endif
+
+ifeq ($(TESTS_SUBMAKEFILES),)
+  TESTS_SUBMAKEFILES=$(wildcard apps/tests/*/*.mak)
+endif
+ifneq ($(TESTS_SUBMAKEFILES),)
+  include $(TESTS_SUBMAKEFILES)
+endif
