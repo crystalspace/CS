@@ -21,12 +21,11 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "dmath3d.h"
-#include "qsqrt.h"
 
 //---------------------------------------------------------------------------
 
 double CdVector3::Norm () const
-{ return qsqrt (x*x + y*y + z*z); }
+{ return sqrt (x*x + y*y + z*z); }
 
 //---------------------------------------------------------------------------
 
@@ -215,7 +214,7 @@ void CdMath3::Between (const CdVector3& v1, const CdVector3& v2,
     pct /= 100.;
   else
   {
-    double dist = (double) qsqrt((v1-v2)*(v1-v2));
+    double dist = (double) sqrt((v1-v2)*(v1-v2));
     if (dist == 0) return;
     pct = wid / dist;
   }
