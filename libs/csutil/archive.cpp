@@ -53,9 +53,7 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 #define BUFF_GET_LONG(ofs)      get_le_long  ((UByte *)&buff[ofs])
 #define BUFF_SET_SHORT(ofs,val) set_le_short ((UByte *)&buff[ofs], val)
 #define BUFF_SET_LONG(ofs,val)  set_le_long  ((UByte *)&buff[ofs], val)
-#if defined (OS_WIN32)
-#define _getpid getpid
-#endif
+
 //-- Archive class implementation -------------------------------------------
 
 csArchive::csArchive (const char *filename)

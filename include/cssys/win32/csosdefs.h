@@ -168,7 +168,7 @@
 
 #ifdef SYSDEF_TEMP
 #  include <process.h>
-#  define TEMP_FILE "%x.cs", _getpid()
+#  define TEMP_FILE "%x.cs", getpid()
 #  define TEMP_DIR win32_tempdir()
    // This is the function called by TEMP_DIR macro
    static inline char *win32_tempdir()
@@ -187,11 +187,11 @@
 // supposed to fix the problem.
 #ifdef COMP_VC
 #  define memcpy better_memcpy
-static inline void *better_memcpy (void *dst, const void *src, size_t bsize)
+static inline void *better_memcpy (void *dst, const void *src, size_t len)
 {
   _asm		mov	esi,src
   _asm		mov	edi,dst
-  _asm		mov	ecx,bsize
+  _asm		mov	ecx,len
   _asm		mov	al,cl
   _asm		shr	ecx,2
   _asm		cld
