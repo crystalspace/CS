@@ -127,10 +127,10 @@ struct iAwsPrefManager : public iBase
 {
 public:
   /// Performs whatever initialization is needed
-  virtual void Setup(iObjectRegistry *object_reg)=0;   
+  virtual bool Setup(iObjectRegistry *object_reg)=0;   
 
   /// Invokes the definition parser to load definition files
-  virtual void Load(const char *def_file)=0;
+  virtual bool Load(const char *def_file)=0;
 
   /// Maps a name to an id
   virtual unsigned long NameToId(char *name)=0;
