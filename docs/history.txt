@@ -1,6 +1,7 @@
 he history order is reversed so that new features are at the top.
 
 16-Jan-2002
+	- Matt Reda fixed a memory leak in csIsoEngine::CreateMeshFactory()
 	- Fixed a bug in iRenderView::ClipBSphere() in combination
 	  with mirroring and a portal that clips geometry.
 	- I discovered that there is a bug when a CAMERA object
