@@ -145,5 +145,9 @@ ifeq ($(ROOTCONFIG),config)
 override USE_DLL = no
 
 SYSCONFIG=bin/dosconf.bat
+# Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)
+ifeq ($(shell echo ""),"")
+SYSCONFIG += $(NEWLINE)type bin\dosconf.var>>config.tmp
+endif
 
 endif # ifeq ($(ROOTCONFIG),config)
