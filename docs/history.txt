@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	  rather than the unportable stricmp().
 	- Eric Sunshine eliminated a compilation warning in demoop.cpp caused
 	  by mismatch of printf() format directive and incoming argument.
+	- Eric Sunshine eliminated a compilation warning from cthing.cpp
+	  regarding unused variable.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
