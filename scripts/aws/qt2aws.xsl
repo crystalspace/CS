@@ -25,7 +25,7 @@
   <xsl:variable name="tabwidth" select="'  '"/>
 
   <!-- the top level widget types allowed -->
-  <xsl:template match="widget[class[text()='QDialog' or text()='QWidget']]">
+  <xsl:template match="widget[class[text()='QDialog' or text()='QWidget'] and not(../class='QTabWidget')]">
     <xsl:call-template name="spacer"/><xsl:text>window "</xsl:text>
     <xsl:choose>
       <xsl:when test="/UI/class"><xsl:value-of select="/UI/class"/></xsl:when>
@@ -41,7 +41,7 @@
   </xsl:template>
 
   <!-- list of widgets we convert -->
-  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
+  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel' or text()='QTabWidget'] or (class='QWidget' and ../class='QTabWidget')]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:call-template name="layout"/>
@@ -232,24 +232,33 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="attribute[name='title']">
+    <xsl:if test="string-length(string) > 0">
+      <xsl:call-template name="spacer"/>
+      <xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template name="layout">
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
-    <xsl:text>Anchor: gbcCenter</xsl:text>
-    <xsl:if test="@column">
+    <xsl:if test="name(..)='grid'">
       <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
-      <xsl:text>GridX: </xsl:text><xsl:value-of select="number(@column)"/>
-    </xsl:if>
-    <xsl:if test="@row">
-      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
-      <xsl:text>GridY: </xsl:text><xsl:value-of select="number(@row)"/>
-    </xsl:if>
-    <xsl:if test="@colspan">
-      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
-      <xsl:text>GridWidth: </xsl:text><xsl:value-of select="number(@colspan)"/>
-    </xsl:if>
-    <xsl:if test="@rowspan">
-      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
-      <xsl:text>GridHeight: </xsl:text><xsl:value-of select="number(@rowspan)"/>
+      <xsl:text>Anchor: gbcCenter</xsl:text>
+      <xsl:if test="@column">
+        <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+        <xsl:text>GridX: </xsl:text><xsl:value-of select="number(@column)"/>
+      </xsl:if>
+      <xsl:if test="@row">
+        <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+        <xsl:text>GridY: </xsl:text><xsl:value-of select="number(@row)"/>
+      </xsl:if>
+      <xsl:if test="@colspan">
+        <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+        <xsl:text>GridWidth: </xsl:text><xsl:value-of select="number(@colspan)"/>
+      </xsl:if>
+      <xsl:if test="@rowspan">
+        <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+        <xsl:text>GridHeight: </xsl:text><xsl:value-of select="number(@rowspan)"/>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
@@ -278,6 +287,8 @@
 
   <xsl:template name="get_classname">
     <xsl:choose>
+      <xsl:when test="class='QTabWidget'">"Notebook"</xsl:when>
+      <xsl:when test="class='QWidget' and ../class='QTabWidget'">"Notebook Page"</xsl:when>
       <xsl:when test="class='QPushButton'">"Command Button"</xsl:when>
       <xsl:when test="class='QRadioButton'">"Radio Button"</xsl:when>
       <xsl:when test="class='QButtonGroup'">"Group Frame"</xsl:when>
@@ -296,6 +307,7 @@
 
   <xsl:template name="prefix">
     <xsl:choose>
+      <xsl:when test="../class='QWidget' and ../../class='QTabWidget'"><xsl:text>nb</xsl:text></xsl:when>
       <xsl:when test="class='QWidget' or class='QDialog'"><xsl:text>w</xsl:text></xsl:when>
       <xsl:when test="../class='QPushButton' or class='QPushButton'"><xsl:text>b</xsl:text></xsl:when>
       <xsl:when test="../class='QButtonGroup'"><xsl:text>g</xsl:text></xsl:when>
