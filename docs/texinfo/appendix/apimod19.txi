@@ -647,6 +647,93 @@ The @sc{ddg} landscape engine which used to be featured in Crystal Space has
 been removed and was replaced with a simpler landscape engine, but one which is
 better integrated with the project.
 
+@subheading @sc{csws} Modal Changes
+@cindex @sc{csws}
+@cindex @code{csMessageBox}
+@cindex @code{csApp::Execute()}
+@cindex @code{csApp::StartModal()}
+@cindex @code{csApp::StopModal()}
+@cindex @code{csApp::GetTopModalUserdata()}
+@cindex @code{csApp::GetTopModalComponent()}
+@cindex @code{iMessageBoxData}
+
+@code{csApp::Execute()} has been removed. This code enabled a modal way
+of using dialogs. @code{Execute()} would only return when the dialog was
+finished. Instead of @code{Execute()} there is now @code{csApp::StartModal()}
+and @code{csApp::StopModal()}. @code{StartModal()} will set up modality
+for the given component but it will return immediatelly. From the perspective
+of the GUI user the component behaves modal but from the perspective of
+the application programmer it is not. Instead the application will have
+to wait for the command (event type @code{csevCommand}) @code{cscmdStopModal}
+which will be called (to @code{csApp::HandleEvent()}) when the component
+finishes modality (i.e. ok or cancel is pressed in many cases).
+
+With @code{StartModal()} you can give userdata (which is an @sc{scf} interface
+that you can implement on your own). That userdata will be available
+to the event handler (while processing @code{cscmdStopModal}) through
+the function @code{csApp::GetTopModalUserdata()}. The modal component can
+be retrieved with @code{csApp::GetTopModalComponent()}. The
+@code{Event.Command.Info} field will be an integer containing the ID of
+the pressed button (i.e. @code{cscmdOK}, @code{cscmdCancel}, ...).
+
+A related change has happened with @code{csMessageBox()}. It also returns
+immediatelly now. It will send a simmilar message to the application when
+it is closed (ok or cancel). The userdata will implement @code{iMessageBoxData}
+so you can use @code{SCF_QUERY_INTERFACE} to check if it does.
+
+Here is an example on how to define your own data to do the processing.
+
+@example
+struct ModalData : public iBase
+@{
+  @dots{}  // Some data...
+  SCF_DECLARE_IBASE;
+  ModalData ()
+  @{
+    SCF_CONSTRUCT_IBASE (NULL);
+  @}
+@};
+
+SCF_IMPLEMENT_IBASE (ModalData)
+SCF_IMPLEMENT_IBASE_END
+
+bool MyApp::HandleEvent (iEvent &Event)
+@{
+  switch (Event.Type)
+  @{
+    case csevCommand:
+      switch (Event.Command.Code)
+      @{
+        case cscmdStopModal:
+	@{
+	  csComponent* d = GetTopModalComponent ();
+	  int rc = (int)Event.Command.Info;
+	  if (rc == 0 || rc == cscmdCancel) { delete d; return true; }
+	  iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+	  	iMessageBoxData);
+	  if (mbd)
+	  @{
+	    mbd->DecRef ();
+	    delete d;
+	    return true;
+	  @}
+	  ModalData* md = (ModalData*)GetTopModalUserdata ();
+	  @dots{}
+	  return true;
+	@}
+	case CODE:
+	@{
+          csWindow* d = csFileDialog (this, "test file dialog");
+	  ModalData* data = new ModalData ();
+	  @dots{}
+	  StartModal (d, data);
+	  data->DecRef ();
+          return true;
+	@}
+	@dots{}
+@}
+@end example
+
 @subheading Miscellaneous Changes
 @cindex @code{iPortal}
 @cindex @code{csMeshWrapper}
