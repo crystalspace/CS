@@ -43,11 +43,11 @@ public:
   int point_to;
 
   efvariable( csStringID argid )
-    { type = CS_EFVARIABLETYPE_UNDEFINED; id = argid; point_to = 0;}
+    { type = CS_EFVARIABLETYPE_UNDEFINED; id = argid; point_to = -1;}
   efvariable( csStringID argid, float value)
-    { type = CS_EFVARIABLETYPE_FLOAT; id = argid; float_value = value; point_to = 0;}
+    { type = CS_EFVARIABLETYPE_FLOAT; id = argid; float_value = value; point_to = -1;}
   efvariable( csStringID argid, csEffectVector4 value)
-    { type = CS_EFVARIABLETYPE_VECTOR4; id = argid; vector_value = value;  point_to = 0;}
+    { type = CS_EFVARIABLETYPE_VECTOR4; id = argid; vector_value = value;  point_to = -1;}
 };
 
 class csEffectDefinition : public iEffectDefinition
