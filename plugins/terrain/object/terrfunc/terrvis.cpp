@@ -63,8 +63,8 @@ void csTerrainQuad::Build (int depth)
 }
 
 /// smallest value for horizon
-#define MININF -99999999.0
-#define MAXINF -MININF
+#define MININF (-99999999.0)
+#define MAXINF (-MININF)
 
 void csTerrainQuad::InitHorizon(float *horizon, int horsize)
 {
