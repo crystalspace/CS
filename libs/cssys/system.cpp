@@ -1087,22 +1087,21 @@ iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
     iSCF::SCF->GetInterfaceID (iInterface), iVersion);
 }
 
-iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface,
-  int iVersion)
+iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, 
+				    const char *iInterface, int iVersion)
 {
   int i;
+  scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   for (i = 0 ; i < PlugIns.Length () ; i++)
   {
     csPlugIn* pl = PlugIns.Get (i);
-    if (pl->ClassID)
+    if (pl->ClassID && pl->FuncID)
       if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
       {
-	if (pl->FuncID)
-	  if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
-	  {
-	    return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (
-	      iSCF::SCF->GetInterfaceID (iInterface), iVersion);
-	  }
+	if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
+	{
+	  return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (ifID, iVersion);
+	}
       }
   }
   return NULL;
