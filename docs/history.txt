@@ -20,9 +20,9 @@ Short-term cleanups that need to be done:
 	  SPRITE 'mySpriteTmpl' (TEXNR ('test.gif') FILE ('test.3ds'))
 	- Fixed bug in reading of 3DS texture coordinates. They had to be
 	  reversed. i.e. u in a 3DS files corresponds to 1-u in a CS sprite.
-	- Fixed another bug in reading of 3DS texture coordinates for different
-	  chunks of vertices. Only the first series of vertices was correctly
-	  textured.
+	- Fixed another bug in reading of 3DS texture coordinates for 
+	  different chunks of vertices.  Only the first series of vertices was 
+	  correctly textured.  
 	- Changed the Cross Builder Factory (for importing models from other
 	  formats) so that there is now also a version which accepts a
 	  previously created object.
@@ -32,48 +32,47 @@ Short-term cleanups that need to be done:
 	- Added 'FILE' keyword in THING template loader as well.
 	- Michael Dale Long added Initialize() code to GGI 2D driver
 	  so that the GGI port works again.
-	- Added update to MazeD from Or Siu-Hang with the following
-	  changes:
-	  	- All things in the world all displayed. Previously
-		  only one thing was displayed.
-		- The save path was incorrect. The map was saved into
-		  cryst directory no matter the path that the user
-		  selected.
-		- Some hand-edited map features (like 'start' and
-		  'thing') were lost when MazeD loaded and then saved
-		  the level. This is now fixed. There are still a
-		  few features not supported though.
-		- Portal Expression Generation: select it in edit/select
-		  menu, drag accross the portal position and MazeD
-		  will gnerate a portal expression for the two sectors
-		  involved.
-		- Polygon Mirror Expression. You can now change the
-		  attributes of a selected polygon by changing the
-		  texture, name, and even the mirror effect of a
-		  particular polygon (edit/select/polygon).
+	- Added update to MazeD from Or Siu-Hang with the following changes: 
+	    - All things in the world all displayed.  Previously only one 
+	      thing was displayed.  
+	    - The save path was incorrect.  The map was saved into cryst 
+	      directory no matter the path that the user selected.  
+	    - Some hand-edited map features (like 'start' and 'thing') were 
+	      lost when MazeD loaded and then saved the level.  This is now 
+	      fixed.  There are still a few features not supported though.  
+	    - Portal Expression Generation: select it in edit/select menu, 
+	      drag accross the portal position and MazeD will gnerate a portal 
+	      expression for the two sectors involved.  
+	    - Polygon Mirror Expression.  You can now change the attributes of 
+	      a selected polygon by changing the texture, name, and even the 
+	      mirror effect of a particular polygon (edit/select/polygon).  
+	- Eric Sunshine fixed a problem in 3ds.cpp where the compiler 
+	  correctly warned that "num_cor3_prev" might have been used 
+	  uninitialized.  
 2-Aug-1999
-	- Added 'maxpol' debugging functionality to OpenGL renderer (just
-	  like software renderer).
+	- Added 'maxpol' debugging functionality to OpenGL renderer (just like 
+	  software renderer).  
 	- Experimenting with OpenGL renderer. Fixed a bug already (lightmap
 	  scaling).
 	- Implemented a c-buffer class (csCBuffer). Project file maintainers
 	  need to add libs/csengine/cbuffer.cpp and include/csengine/cbuffer.h.
 	- Andrew Zabolotny fixed a bug in the makefile system which caused
 	  some changes in user.mak not to be reflected in volatile.h.
-	- Andrew did many small changes required to build Win32 version from
-	  command line using GNU Make and VC++. He removed DllMain() from several
-	  3D and 2D drivers and moved it to a seperate file
-	  libs/cssys/win32/dllentry.cpp. Moved ModuleHandle to csCOM library.
-	  Fixed complete_pixel_format() to work around a bug in VC 5.
+	- Andrew did many small changes required to build Win32 version from 
+	  command line using GNU Make and VC++.  He removed DllMain() from 
+	  several 3D and 2D drivers and moved it to a seperate file 
+	  libs/cssys/win32/dllentry.cpp.  Moved ModuleHandle to csCOM library.  
+	  Fixed complete_pixel_format() to work around a bug in VC 5.  
 1-Aug-1999
-	- I managed to get hardware accelerated OpenGL in Linux (for my RIVA 128)!
-	- Changed glOrtho() settings in OpenGL renderer so that it works better
-	  on my RIVA 128 card (problems with Z buffering otherwise).
-	- For OpenGL/DrawPolygon() the Z buffer test is disabled when blending a lightmap
-	  if Zbuf mode is equal to fill. This gives a noticable performance increase
-	  (about 5%).
-	- Use Z instead of sqrt for vertex fog distance calculation. This is not
-	  as accurate but a lot faster.
+	- Jorrit managed to get hardware accelerated OpenGL in Linux (for my 
+	  RIVA 128)! 
+	- Changed glOrtho() settings in OpenGL renderer so that it works 
+	  better on my RIVA 128 card (problems with Z buffering otherwise).  
+	- For OpenGL/DrawPolygon() the Z buffer test is disabled when blending 
+	  a lightmap if Zbuf mode is equal to fill.  This gives a noticable 
+	  performance increase (about 5%).  
+	- Use Z instead of sqrt for vertex fog distance calculation.  This is 
+	  not as accurate but a lot faster.  
 31-Jul-1999
 	- Michael Dale Long made a small fix in unixconf.sh for IRIX.
 	- Michael also fixed a divide by zero bug in OpenGL renderer

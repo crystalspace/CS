@@ -1216,7 +1216,7 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
   unsigned char       end_found = FALSE;
   int                 i;
   int                 j;
-  int                 num_cor3_prev;
+  int                 num_cor3_prev = 0;
   int                 num_cor3_base;
   int                 num_cor3_inc;
   int                 num_face_inc;
