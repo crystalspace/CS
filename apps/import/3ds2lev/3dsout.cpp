@@ -345,12 +345,13 @@ bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
   // this holds the numbers of the 2 shared vertices
   facenum sharedfaces[2];
   // this is the number of the vertice that is left on the triangle
-  facenum nonshared;
+  facenum nonshared = 0;
   
   bool found=false;
-  for (int i=0;i<3;i++)
+  int i, i2;
+  for (i=0;i<3;i++)
   {
-    for (int i2=0; i2<plen; i2++)
+    for (i2=0; i2<plen; i2++)
     {
       // a point found that is the same on both polys
       // then the next point must correspond to the next (or last) point

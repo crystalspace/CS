@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+14-Apr-2002
+	- Philip Wyett eliminated some minor MSVC compiler warnings
+	  in 3ds2lev. Phil Also improved the memcpy replacement for MSVC
+	  and it's handling of the 'short' type.
+13-Apr-2002
+	- Philip Wyett fixed a Window style problem in the win32 GL canvas.
 8-Apr-2002
 	- Release of CS 0.94.
 7-Apr-2002
