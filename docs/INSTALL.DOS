@@ -1,5 +1,75 @@
-On:
-  http://www.planetquake.com/simitar/engine/csinstall.html
+Crystal Space installation with DJGPP
 
-You can find a very good guide for installing Crystal Space on DOS.
-Please read it if you have any problems.
+Written by Seth Galbraith <sgalbrai@krl.org>
+
+If you want to compile and use Crystal Space for DOS using the DJGPP
+compiler (http://www.delorie.com/djgpp/), you're reading the right document.
+
+
+FILES YOU WILL NEED
+
+You should use the Crystal Space makefile system to compile Crystal Space.
+This will require some utilities and libraries which are common in Unix-like
+environments but not in DOS.  Here is a list of all of the files you should
+need to compile Crystal Space with DJGPP:
+
+DJGPP development kit
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/djdev201.zip
+DJGPP frequently asked questions
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq210b.zip
+DJGPP DPMI provider
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/csdpmi3b.zip
+
+DJGPP GNU C++ libraries
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp271b.zip
+DJGPP GNU help system
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi390b.zip
+DJGPP GNU linker and assembler
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip
+DJGPP GNU C compiler
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc281b.zip
+DJGPP GNU C++ compiler
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp281b.zip
+DJGPP GNU make utility
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak375b.zip
+
+DJGPP GNU sed utility
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed302b.zip
+DJGPP GNU file utilities
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil316b.zip
+DJGPP GNU text utilities
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt122b.zip
+DJGPP GNU shell utilities
+    ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl112b.zip
+
+Compiled zip, jpeg and png libraries (See Bugs.)
+    ftp://ftp.linuxgames.com/crystal/support/doslibs.zip
+
+
+INSTALLATION
+
+Unzip the compiled libraries into the same folder where you unzipped Crystal
+Space.  (See Bugs.)
+
+If you don't already have a directory for DJGPP, create one.  Unzip all of the
+DJGPP stuff into that directory.  To use DJGPP you need to set two environment
+variables.  Use this example but change the DJGPP directory if you have DJGPP
+installed somewhere other than c:\djgpp\:
+
+SET PATH=c:\djgpp\bin;%PATH%
+SET DJGPP=c:\djgpp\djgpp.env
+
+Now just CD to your Crystal Space directory, run make and follow the
+instructions.
+
+
+BUGS
+
+The compiled libraries didn't work for me, so I made my own.  You can download
+them from here:
+
+http://asp.planetquake.com/dl/dl.asp?simitar/doslibsb.zip
+
+DON'T unzip the other compiled libraries into your Crystal Space directory.
+(Delete them if you already unzipped them.)  Unzip my version of the compiled
+libraries into your DJGPP directory.
