@@ -110,4 +110,35 @@ inline csSome csVector::Pop ()
   return (ret);
 }
 
+/* This macro will create a typesafe wrapper for csVector
+ * This class will only manage pointers to Types, but this is still better than
+ * nothing.
+ *
+ * For example, if you want to use a csVector, that contains pointers to integers,
+ * you could just add the following line to your header:
+ * DECLARE_TYPED_VECTOR(int)
+ * this wil declare a new class called csVector_int for you, which can be used just
+ * like csVector, just without that nasty casting.
+ */
+#define DECLARE_TYPED_VECTOR(TYPE) \
+class csVector_##TYPE : protected csVector \
+{ \
+public: \
+  csVector_##TYPE(int ilimit = 8, int ithreshold = 16) : csVector(ilimit, ithreshold) {} \
+  inline TYPE*& operator [] (int n) {return (TYPE*&) csVector::operator[](n);} \
+  inline TYPE*& Get (int n) const   {return (TYPE*&) csVector::Get(n);} \
+  inline TYPE*& operator [] (int n) const { return Get(n); } \
+  void SetLength (int n) {csVector::SetLength(n);} \
+  inline int Length () const {return csVector::Length();} \
+  int Find (TYPE* which) const {return csVector::Find(which);} \
+  int FindKey (const TYPE* value) const {return csVector::FindKey(value);}\
+  inline void Push (TYPE* what) {csVector::Push(what);}\
+  inline TYPE* Pop () {return (TYPE*)csVector::Pop();}\
+  bool Delete (int n) {return csVector::Delete(n);}\
+  void DeleteAll () {csVector::DeleteAll();}\
+  bool Insert (int n, TYPE* Item) {return Insert(n, Item);}\
+  virtual bool FreeItem (TYPE* Item) {return FreeItem(Item);}\
+  virtual bool Equal (TYPE* Item, const TYPE* Key) const {return Equal(Item, Key);}\
+};
+
 #endif // __CSVECTOR_H__
