@@ -13,6 +13,9 @@
 #include <iutil/event.h>
 #include <iutil/eventq.h>
 #include <iutil/vfs.h>
+#ifdef USE_CEL
+#include <celtool/initapp.h>
+#endif
 
 App#PROJECTNAMECAP#::App#PROJECTNAMECAP#() : csApplicationFramework()
 {
@@ -62,27 +65,15 @@ bool App#PROJECTNAMECAP#::OnKeyboard(iEvent& ev)
 
 bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
 {
+  iObjectRegistry* r = GetObjectRegistry();
+
   // Load application-specific configuration file.
-  if (!csInitializer::SetupConfigManager(GetObjectRegistry(),
+  if (!csInitializer::SetupConfigManager(r,
       "/my/vfs/path/App#PROJECTNAMECAP#.cfg", GetApplicationName()))
     return ReportError("Failed to initialize configuration manager!");
 
 #ifdef USE_CEL
-  // Instruct SCF to also scan for CEL plugins.
-  csPluginPaths cel_paths;
-  csString cel_path = getenv("CEL");
-  if (!cel_path.IsEmpty())
-  {
-    cel_paths.AddOnce(cel_path, false, "cel");
-    cel_path << CS_PATH_SEPARATOR << "lib";
-    cel_paths.AddOnce(cel_path, false, "cel");
-    cel_path << CS_PATH_SEPARATOR << "cel";
-    cel_paths.AddOnce(cel_path, false, "cel");
-  }
-#ifdef CEL_PLUGIN_DIR
-  cel_paths.AddOnce(CEL_PLUGIN_DIR, false, "cel");
-#endif
-  scfInitialize(&cel_paths);
+  celInitializer::SetupCelPluginDirs(r);
 #endif
 
   // RequestPlugins() will load all plugins we specify.  In addition it will
@@ -90,7 +81,7 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
   // configuration system (both the application configuration and CS or global
   // configurations).  It also supports specifying plugins on the command line
   // via the --plugin= option.
-  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+  if (!csInitializer::RequestPlugins(r,
 	CS_REQUEST_VFS,
 	CS_REQUEST_OPENGL3D,
 	CS_REQUEST_ENGINE,
@@ -105,7 +96,7 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
   // Set up an event handler for the application.  Crystal Space is fully
   // event-driven.  Everything (except for this initialization) happens in
   // response to an event.
-  if (!RegisterQueue(GetObjectRegistry()))
+  if (!RegisterQueue(r))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -117,20 +108,22 @@ void App#PROJECTNAMECAP#::OnExit()
 
 bool App#PROJECTNAMECAP#::Application()
 {
+  iObjectRegistry* r = GetObjectRegistry();
+
   // Open the main system. This will open all the previously loaded plugins
   // (i.e. all windows will be opened).
-  if (!OpenApplication(GetObjectRegistry()))
+  if (!OpenApplication(r))
     return ReportError("Error opening system!");
 
   // Now get the pointer to various modules we need.  We fetch them from the
   // object registry.  The RequestPlugins() call we did earlier registered all
   // loaded plugins with the object registry.  It is also possible to load
   // plugins manually on-demand.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = CS_QUERY_REGISTRY(r, iGraphics3D);
   if (!g3d)
     return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = CS_QUERY_REGISTRY(r, iEngine);
   if (!engine)
     return ReportError("Failed to locate 3D engine!");
 

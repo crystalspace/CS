@@ -38,6 +38,10 @@ chronological order.
 	- Eric Sunshine added csInitializer::RequestPluginsV(). This is just
 	  like the variable-argument RequestPlugins(...), except that the
 	  arguments are specified as a `va_list'.
+	- Eric Sunshine augmented `jamtemplate' so that the synthesized program
+	  invokes the new celInitializer::SetupCelPluginDirs() rather than
+	  manually attempting to figure out where the CEL plugins are located
+	  and telling SCF where to scan.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.
