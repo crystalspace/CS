@@ -317,7 +317,7 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   sin_size = sizeof(struct sockaddr_in);
   SOCKET socket_fd = accept(socketfd,(struct sockaddr *)&remote_addr,&sin_size);
 
-  if (socket_fd == -1)
+  if (socket_fd == (SOCKET)-1)
   {
     last_error = CS_NET_SOCKET_CANNOT_ACCEPT;
     return 0;
