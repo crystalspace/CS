@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom.h"
 #include "csgfx.h"
+#include "csplugincommon.h"
 #include "csqint.h"
 #include "csqsqrt.h"
 #include "cstool.h"
