@@ -23,6 +23,8 @@ chronological order.
 	  prevented flarge from loading since there was a conflict with
 	  the 'float' keyword being used for shader variables and for
 	  portals.
+	- Eric Sunshine removed 8-bit characters from rendermeshlist.h and
+	  rendermeshlist.cpp.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6
