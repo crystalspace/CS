@@ -140,7 +140,7 @@ Crystal Space can optionally utilize the @code{libmng} library for reading
 @sc{mng}/@sc{jng} graphic files.  You can download @code{libmng} from:
 
 @noindent
-@uref{http://www.libmng.com/downloadpublic.html}
+@uref{http://www.libmng.com/}
 
 After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
