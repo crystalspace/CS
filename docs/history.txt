@@ -19,6 +19,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine set MSVC.MAKE.FLAGS in required.mak to define HAS_CAL3D
 	  to "yes".  This will allow the synthesis process to build the
 	  `caltocs' application.
+	- Eric Sunshine updated configure.ac so that it normalizes the value of
+	  CS_PLATFORM_NAME which is emitted to volatile.h.  This is necesary
+	  because that value is used to make selections from vfs.cfg and
+	  joystick.cfg.
+	- Eric Sunshine updated vfs.cfg and joystick.cfg to agree with the new
+	  normalized CS_PLATFORM_NAME.
 6-Jan-2002
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()
