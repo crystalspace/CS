@@ -39,7 +39,7 @@
 #include "qint.h"
 #include "qsqrt.h"
 
-#define TERR_DEBUG
+//#define TERR_DEBUG
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1409,60 +1409,71 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
   inc.Normalize(); 
   inc *= EPSILON; // Tiny little increment ammount to nudge the ray over a box boundary
   float max_y = global_bbox.MaxY();
+  float min_y = global_bbox.MinY();
   csBox3 tbox;
   float dist = 1.0, dist2 = 1.0;
+  int max_index = blockxy*blockxy - 1;
 
 #ifdef TERR_DEBUG
-  printf("Entering box crawl face: %d\n",ret);
+  printf("Entering box crawl, face: %d\n",ret);
   printf("Start :(%f,%f,%f)\n",st.x,st.y,st.z);
   printf("Inc :(%f,%f,%f)\n",inc.x,inc.y,inc.z);
 #endif
 
   st += inc;
   csSegment3 rev ( end, st );
-  int x, y, index, i, max;
+  int x, y, index = -1, i, max, _index;
   while (1)
   {
-    Object2Block( st, x, y );
+    _index = index;
+    Object2Block( st+inc, x, y );
     Block2Index( x, y, index);
-#ifdef TERR_DEBUG
-	printf("Index :%d x,y :(%d,%d)\n",index, x, y);
-	printf("New Start :(%f,%f,%f)\n",st.x,st.y,st.z);
-#endif
+    if ((index == _index) || (index > max_index) || (index < 0)) break;
 	max = blocks[index].mesh[0].num_triangles;
 	csVector3 *vrt = blocks[index].mesh[0].vertices[0];
 	csTriangle *tr = blocks[index].mesh[0].triangles;
-	for (i = 0 ; i < max ; i++)
-	{
-  	  if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	vrt[tr[i].c], seg, st))
-      {
-          dist2 = qsqrt (csSquaredDist::PointPoint (start, st) /
-		  csSquaredDist::PointPoint (start, end));
-	  if ( dist2 < dist )
-	  {
-	    isect = st;
-	    dist = dist2;
-            if (pr) *pr = dist;
-	  }
 #ifdef TERR_DEBUG
-  printf("Terrain:Hit Beam Object: HIT! intersect : at (%f,%f,%f)\n",
-    st.x, st.y, st.z);
+	printf("Index :%d x,y :(%d,%d)\n",index, x, y);
+	printf("New Start :(%f,%f,%f)\n",st.x,st.y,st.z);
+	printf("Number of triangles: %d\n",max);
+#endif
+	for (i = 0 ; i < max ; i++)
+	{ // Check each triangle in both orientations
+  	  if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	     vrt[tr[i].c], seg, st) ||
+	     csIntersect3::IntersectTriangle (vrt[tr[i].c], vrt[tr[i].b],
+    	     vrt[tr[i].a], seg, st))
+	  {
+            dist2 = qsqrt (csSquaredDist::PointPoint (start, st) /
+		    csSquaredDist::PointPoint (start, end));
+	    if ( dist2 < dist )
+	    {
+	      isect = st;
+	      dist = dist2;
+              if (pr) *pr = dist;
+	    }
+#ifdef TERR_DEBUG
+  printf("Terrain:Hit Beam Object: HIT! intersect : at (%f,%f,%f), triangle %d\n",
+    st.x, st.y, st.z, i);
+    blocks[index].mesh[0].vertex_colors[0][tr[i].a].Set(0,0,0);
+    blocks[index].mesh[0].vertex_colors[0][tr[i].b].Set(0,0,0);
+    blocks[index].mesh[0].vertex_colors[0][tr[i].c].Set(0,0,0);
+    
 #endif
 	  }
 	}
 	tbox = blocks[index].bbox; v = tbox.Max();
 	tbox.AddBoundingVertex(v.x, max_y, v.z);
+	tbox.AddBoundingVertex(v.x, min_y, v.z);
 	ret = csIntersect3::BoxSegment (tbox, rev, st, NULL); 
 
 // Note: The BOX_INSIDE check here terminates the search since the endpoint
 // of the beam is inside the bounding box. This shouldnt occur as the beam
 // should not end inside an object.
-	if ((ret == -1) || (ret == BOX_INSIDE) || (ret == BOX_SIDE_y) 
-	    || (ret == BOX_SIDE_Y)) break;	
-	st += inc;
-	rev.SetEnd(st);
 
+	if ((ret == -1) || (ret == BOX_INSIDE) || (ret == BOX_SIDE_y) || (ret == BOX_SIDE_Y)) 
+	break;	
+	rev.SetEnd(st);
   }
   if (dist == 1.0)
       return false;
