@@ -2298,6 +2298,19 @@ AS_IF([test $enable_new_renderer = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine if the "make" emulation layer should be synthesized.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to emulate makefiles])
+AC_ARG_ENABLE([make-emulation],
+    [AC_HELP_STRING([--enable-make-emulation],
+	[enable emulation layer allowing project to be built with `make', in
+	addition to `jam' (default YES)])],
+    [], [enable_make_emulation=yes])
+AC_MSG_RESULT([$enable_make_emulation])
+
+
+
+#------------------------------------------------------------------------------
 # Boilerplate: volatile.h
 #------------------------------------------------------------------------------
 CS_HEADER_PREPEND(
@@ -2374,7 +2387,7 @@ AC_DEFUN([CS_JAM_CFLAGS],
     esac
     $1=CS_TRIM([$$1])])
 
-AS_IF([test "$CS_NEED_LOCAL_JAM" = yes],
+AS_IF([test "$CS_NEED_LOCAL_JAM" = yes && test $enable_make_emulation = yes],
     [CS_JAM_CFLAGS([JAM_CFLAGS])
     AC_CONFIG_COMMANDS([cs_jam_local_exe],
 	[CS_BUILD_LOCAL_JAM([$srcdir/apps/tools/jam], [jambuild],
@@ -2418,8 +2431,9 @@ EOF
 	[AC_MSG_WARN([failed to create makefile emulation layer])])
     rm -f $tmp/jcache])
 
-AC_CONFIG_COMMANDS([Makefile], [CS_SYNTHESIZE_MAKEFILE([Makefile])],
-    [JAM=$JAM])
+AS_IF([test $enable_make_emulation = yes],
+    [AC_CONFIG_COMMANDS([Makefile], [CS_SYNTHESIZE_MAKEFILE([Makefile])],
+	[JAM=$JAM])])
 
 
 

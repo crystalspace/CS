@@ -904,6 +904,8 @@ Optional Features:
                           per source file (default NO)
   --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
                           (default NO)
+  --enable-make-emulation enable emulation layer allowing project to be built
+                          with `make', in addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -35962,6 +35964,23 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Determine if the "make" emulation layer should be synthesized.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether to emulate makefiles" >&5
+echo $ECHO_N "checking whether to emulate makefiles... $ECHO_C" >&6
+# Check whether --enable-make-emulation or --disable-make-emulation was given.
+if test "${enable_make_emulation+set}" = set; then
+  enableval="$enable_make_emulation"
+
+else
+  enable_make_emulation=yes
+fi;
+echo "$as_me:$LINENO: result: $enable_make_emulation" >&5
+echo "${ECHO_T}$enable_make_emulation" >&6
+
+
+
+#------------------------------------------------------------------------------
 # Boilerplate: volatile.h
 #------------------------------------------------------------------------------
 cs_header_text="// File generated automatically.
@@ -36095,7 +36114,7 @@ cs_jamconfig_text="${cs_jamconfig_text}mandir ?= \"`echo "$mandir" | sed -e 's/\
 
 
 
-if test "$CS_NEED_LOCAL_JAM" = yes; then
+if test "$CS_NEED_LOCAL_JAM" = yes && test $enable_make_emulation = yes; then
 
     case $host_os in
 	mingw*) JAM_CFLAGS="$JAM_CFLAGS -DMSYS" ;;
@@ -36110,7 +36129,10 @@ fi
 # (2)
 
 
-          ac_config_commands="$ac_config_commands Makefile"
+if test $enable_make_emulation = yes; then
+            ac_config_commands="$ac_config_commands Makefile"
+
+fi
 
 
 
