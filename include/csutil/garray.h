@@ -51,10 +51,6 @@
     int RefCount;							\
     int length;								\
   public:								\
-    Name ()								\
-    { limit = length = RefCount = 0; root = NULL; }			\
-    ~Name ()								\
-    { SetLimit (0); }							\
     int Limit () const							\
     { return limit; }							\
     void SetLimit (int iLimit)						\
@@ -65,6 +61,10 @@
       else								\
       { if (root) { free (root); root = NULL; } }			\
     }									\
+    Name ()								\
+    { limit = length = RefCount = 0; root = NULL; }			\
+    ~Name ()								\
+    { SetLimit (0); }							\
     int Length () const							\
     { return length; }							\
     void SetLength (int iLength, int iGrowStep = 8)			\
