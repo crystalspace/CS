@@ -741,41 +741,41 @@ public:
      void SetSuspensionERP3 (float value) { SetParam (dParamSuspensionERP3, value); }
      void SetSuspensionCFM3 (float value) { SetParam (dParamSuspensionCFM3, value); }
  
-     float GetLoStop (float value) { return GetParam (dParamLoStop); }
-     float GetHiStop (float value) { return GetParam (dParamHiStop); }
-     float GetVel (float value) { return GetParam (dParamVel); }
-     float GetFMax (float value) { return GetParam (dParamFMax); }
-     float GetFudgeFactor (float value) { return GetParam (dParamFudgeFactor); }
-     float GetBounce (float value) { return GetParam (dParamBounce); }
-     float GetCFM (float value) { return GetParam (dParamCFM); }
-     float GetStopERP (float value) { return GetParam (dParamStopERP); }
-     float GetStopCFM (float value) { return GetParam (dParamStopCFM); }
-     float GetSuspensionERP (float value) { return GetParam (dParamSuspensionERP); }
-     float GetSuspensionCFM (float value) { return GetParam (dParamSuspensionCFM); }
+     float GetLoStop () { return GetParam (dParamLoStop); }
+     float GetHiStop () { return GetParam (dParamHiStop); }
+     float GetVel () { return GetParam (dParamVel); }
+     float GetFMax () { return GetParam (dParamFMax); }
+     float GetFudgeFactor () { return GetParam (dParamFudgeFactor); }
+     float GetBounce () { return GetParam (dParamBounce); }
+     float GetCFM () { return GetParam (dParamCFM); }
+     float GetStopERP () { return GetParam (dParamStopERP); }
+     float GetStopCFM () { return GetParam (dParamStopCFM); }
+     float GetSuspensionERP () { return GetParam (dParamSuspensionERP); }
+     float GetSuspensionCFM () { return GetParam (dParamSuspensionCFM); }
  
-     float GetLoStop2 (float value) { return GetParam (dParamLoStop2); }
-     float GetHiStop2 (float value) { return GetParam (dParamHiStop2); }
-     float GetVel2 (float value) { return GetParam (dParamVel2); }
-     float GetFMax2 (float value) { return GetParam (dParamFMax2); }
-     float GetFudgeFactor2 (float value) { return GetParam (dParamFudgeFactor2); }
-     float GetBounce2 (float value) { return GetParam (dParamBounce2); }
-     float GetCFM2 (float value) { return GetParam (dParamCFM2); }
-     float GetStopERP2 (float value) { return GetParam (dParamStopERP2); }
-     float GetStopCFM2 (float value) { return GetParam (dParamStopCFM2); }
-     float GetSuspensionERP2 (float value) { return GetParam (dParamSuspensionERP2); }
-     float GetSuspensionCFM2 (float value) { return GetParam (dParamSuspensionCFM2); }
+     float GetLoStop2 () { return GetParam (dParamLoStop2); }
+     float GetHiStop2 () { return GetParam (dParamHiStop2); }
+     float GetVel2 () { return GetParam (dParamVel2); }
+     float GetFMax2 () { return GetParam (dParamFMax2); }
+     float GetFudgeFactor2 () { return GetParam (dParamFudgeFactor2); }
+     float GetBounce2 () { return GetParam (dParamBounce2); }
+     float GetCFM2 () { return GetParam (dParamCFM2); }
+     float GetStopERP2 () { return GetParam (dParamStopERP2); }
+     float GetStopCFM2 () { return GetParam (dParamStopCFM2); }
+     float GetSuspensionERP2 () { return GetParam (dParamSuspensionERP2); }
+     float GetSuspensionCFM2 () { return GetParam (dParamSuspensionCFM2); }
  
-     float GetLoStop3 (float value) { return GetParam (dParamLoStop3); }
-     float GetHiStop3 (float value) { return GetParam (dParamHiStop3); }
-     float GetVel3 (float value) { return GetParam (dParamVel3); }
-     float GetFMax3 (float value) { return GetParam (dParamFMax3); }
-     float GetFudgeFactor3 (float value) { return GetParam (dParamFudgeFactor3); }
-     float GetBounce3 (float value) { return GetParam (dParamBounce3); }
-     float GetCFM3 (float value) { return GetParam (dParamCFM3); }
-     float GetStopERP3 (float value) { return GetParam (dParamStopERP3); }
-     float GetStopCFM3 (float value) { return GetParam (dParamStopCFM3); }
-     float GetSuspensionERP3 (float value) { return GetParam (dParamSuspensionERP3); }
-     float GetSuspensionCFM3 (float value) { return GetParam (dParamSuspensionCFM3); }
+     float GetLoStop3 () { return GetParam (dParamLoStop3); }
+     float GetHiStop3 () { return GetParam (dParamHiStop3); }
+     float GetVel3 () { return GetParam (dParamVel3); }
+     float GetFMax3 () { return GetParam (dParamFMax3); }
+     float GetFudgeFactor3 () { return GetParam (dParamFudgeFactor3); }
+     float GetBounce3 () { return GetParam (dParamBounce3); }
+     float GetCFM3 () { return GetParam (dParamCFM3); }
+     float GetStopERP3 () { return GetParam (dParamStopERP3); }
+     float GetStopCFM3 () { return GetParam (dParamStopCFM3); }
+     float GetSuspensionERP3 () { return GetParam (dParamSuspensionERP3); }
+     float GetSuspensionCFM3 () { return GetParam (dParamSuspensionCFM3); }
  
      void SetHinge2Axis1 (const csVector3& axis);
      void SetHinge2Axis2 (const csVector3& axis);
@@ -815,4 +815,3 @@ public:
 };
 
 #endif // __CS_ODEDYNAMICS_H__
-

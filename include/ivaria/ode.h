@@ -198,8 +198,6 @@ struct iODEDynamicSystemState : public iBase
 
 };
 
-SCF_VERSION (iODEJointState, 0, 0, 1);
-
 /**
  * TODO: Doc...
  * @@@ Document me
@@ -216,6 +214,8 @@ enum ODEJointType
   CS_ODE_JOINT_TYPE_AMOTOR = dJointTypeAMotor
 };
 
+
+SCF_VERSION (iODEJointState, 0, 0, 2);
 
 /// @@@ Document me.
 struct iODEJointState : public iBase
@@ -260,47 +260,46 @@ struct iODEJointState : public iBase
   virtual void SetSuspensionERP3 (float value) = 0;
   virtual void SetSuspensionCFM3 (float value) = 0;
 
-  virtual float GetLoStop (float value) = 0;
-  virtual float GetHiStop (float value) = 0;
-  virtual float GetVel (float value) = 0;
-  virtual float GetFMax (float value) = 0;
-  virtual float GetFudgeFactor (float value) = 0;
-  virtual float GetBounce (float value) = 0;
-  virtual float GetCFM (float value) = 0;
-  virtual float GetStopERP (float value) = 0;
-  virtual float GetStopCFM (float value) = 0;
-  virtual float GetSuspensionERP (float value) = 0;
-  virtual float GetSuspensionCFM (float value) = 0;
+  virtual float GetLoStop () = 0;
+  virtual float GetHiStop () = 0;
+  virtual float GetVel () = 0;
+  virtual float GetFMax () = 0;
+  virtual float GetFudgeFactor () = 0;
+  virtual float GetBounce () = 0;
+  virtual float GetCFM () = 0;
+  virtual float GetStopERP () = 0;
+  virtual float GetStopCFM () = 0;
+  virtual float GetSuspensionERP () = 0;
+  virtual float GetSuspensionCFM () = 0;
 
-  virtual float GetLoStop2 (float value) = 0;
-  virtual float GetHiStop2 (float value) = 0;
-  virtual float GetVel2 (float value) = 0;
-  virtual float GetFMax2 (float value) = 0;
-  virtual float GetFudgeFactor2 (float value) = 0;
-  virtual float GetBounce2 (float value) = 0;
-  virtual float GetCFM2 (float value) = 0;
-  virtual float GetStopERP2 (float value) = 0;
-  virtual float GetStopCFM2 (float value) = 0;
-  virtual float GetSuspensionERP2 (float value) = 0;
-  virtual float GetSuspensionCFM2 (float value) = 0;
+  virtual float GetLoStop2 () = 0;
+  virtual float GetHiStop2 () = 0;
+  virtual float GetVel2 () = 0;
+  virtual float GetFMax2 () = 0;
+  virtual float GetFudgeFactor2 () = 0;
+  virtual float GetBounce2 () = 0;
+  virtual float GetCFM2 () = 0;
+  virtual float GetStopERP2 () = 0;
+  virtual float GetStopCFM2 () = 0;
+  virtual float GetSuspensionERP2 () = 0;
+  virtual float GetSuspensionCFM2 () = 0;
 
-  virtual float GetLoStop3 (float value) = 0;
-  virtual float GetHiStop3 (float value) = 0;
-  virtual float GetVel3 (float value) = 0;
-  virtual float GetFMax3 (float value) = 0;
-  virtual float GetFudgeFactor3 (float value) = 0;
-  virtual float GetBounce3 (float value) = 0;
-  virtual float GetCFM3 (float value) = 0;
-  virtual float GetStopERP3 (float value) = 0;
-  virtual float GetStopCFM3 (float value) = 0;
-  virtual float GetSuspensionERP3 (float value) = 0;
-  virtual float GetSuspensionCFM3 (float value) = 0;
+  virtual float GetLoStop3 () = 0;
+  virtual float GetHiStop3 () = 0;
+  virtual float GetVel3 () = 0;
+  virtual float GetFMax3 () = 0;
+  virtual float GetFudgeFactor3 () = 0;
+  virtual float GetBounce3 () = 0;
+  virtual float GetCFM3 () = 0;
+  virtual float GetStopERP3 () = 0;
+  virtual float GetStopCFM3 () = 0;
+  virtual float GetSuspensionERP3 () = 0;
+  virtual float GetSuspensionCFM3 () = 0;
 
   // This is a very ugly hack quite specific to NmS
   virtual void SetHinge2Axis1 (const csVector3& axis) = 0;
   virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
   virtual void SetHinge2Anchor (const csVector3& point) = 0;
 };
-
 
 #endif // __CS_IVARIA_ODE_H__
