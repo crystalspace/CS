@@ -49,7 +49,7 @@ public:
   csPtr (T* p) : obj (p) { }
 
   template <class T2>
-  explicit csPtr (csRef<T2> const& r) : obj((T2*)r) { r->IncRef(); }
+  explicit csPtr (csRef<T2> const& r) : obj((T2*)r) { if (obj) obj->IncRef(); }
 
 #ifdef CS_TEST_VOIDPTRUSAGE
   ~csPtr ()

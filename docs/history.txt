@@ -42,6 +42,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the "internal implementation detail"
 	  documentation for the Apple/NeXT ports to reflect present day
 	  conditions.
+	- Eric Sunshine fixed a bad crasher in the new csPtr(csRef&)
+	  constructor where it failed to check against NULL before applying
+	  IncRef().
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for
