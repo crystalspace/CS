@@ -56,7 +56,7 @@ extern char**	_argv;
 
 extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
-extern int ApplicationShow;
+int nCmdShow;
 extern bool need_console;
 
 void sys_fatalerror(char *s)
@@ -537,7 +537,7 @@ bool SysSystemDriver::GetIsActive () const
 
 int SysSystemDriver::GetCmdShow () const
 {
-  return ApplicationShow;
+  return nCmdShow;
 }
 
 #ifndef DO_DINPUT_KEYBOARD
