@@ -210,20 +210,61 @@ _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
 	%typemap(javaout) csWrapPtr { Object _obj = $jnicall; iBase ibase = (iBase) _obj; ibase.IncRef(); return _obj; }
 %enddef
 
-#undef INTERFACE_APPLY
-%define INTERFACE_APPLY(T)
-	%typemap(javacode) T %{
-	    public boolean equals (Object obj)
-	    {
-	        boolean equal = false;
-	        if (obj instanceof $javaclassname)
-	            equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
-	        return equal;
-	    }
-	%}
-%enddef
-APPLY_FOR_EACH_INTERFACE
 #undef INTERFACE_EQUALS
+%define INTERFACE_EQUALS
+	public boolean equals (Object obj)
+	{
+	    boolean equal = false;
+	    if (obj instanceof $javaclassname)
+	        equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
+	    return equal;
+	}
+%enddef
+#undef INTERFACE_APPLY
+#define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
+APPLY_FOR_EACH_INTERFACE
+
+// ivaria/event.h
+#undef IEVENTOUTLET_JAVACODE
+%define IEVENTOUTLET_JAVACODE
+%typemap(javacode) iEventOutlet
+%{
+    INTERFACE_EQUALS
+    public void Broadcast (int iCode) { Broadcast(iCode, null); }
+%}
+%enddef
+IEVENTOUTLET_JAVACODE
+
+// iutil/cfgmgr.h
+// Swig 1.3.21 (and possibly earlier) have a bug where enums are emitted as
+// illegal Java code:
+//   public final static int ConfigPriorityFoo = iConfigManager::PriorityFoo;
+// rather than the legal code:
+//   public final static int ConfigPriorityFoo = iConfigManager.PriorityFoo;
+// We work around this by %ignoring those constants and defining them maually.
+%ignore iConfigManager::ConfigPriorityPlugin;
+%ignore iConfigManager::ConfigPriorityApplication;
+%ignore iConfigManager::ConfigPriorityUserGlobal;
+%ignore iConfigManager::ConfigPriorityUserApp;
+%ignore iConfigManager::ConfigPriorityCmdLine;
+#undef ICONFIGMANAGER_JAVACODE
+%define ICONFIGMANAGER_JAVACODE
+%typemap(javacode) iConfigManager
+%{
+  INTERFACE_EQUALS
+  public final static int ConfigPriorityPlugin =
+    iConfigManager.PriorityVeryLow;
+  public final static int ConfigPriorityApplication =
+    iConfigManager.PriorityLow;
+  public final static int ConfigPriorityUserGlobal =
+    iConfigManager.PriorityMedium;
+  public final static int ConfigPriorityUserApp =
+    iConfigManager.PriorityHigh;
+  public final static int ConfigPriorityCmdLine =
+    iConfigManager.PriorityVeryHigh;
+%}
+%enddef
+ICONFIGMANAGER_JAVACODE
 
 // argc-argv handling
 %typemap(in) (int argc, char const * const argv[])
@@ -254,11 +295,5 @@ APPLY_FOR_EACH_INTERFACE
 %typemap(jtype) (int argc, char const * const argv []) "String[]"
 %typemap(jstype) (int argc, char const * const argv []) "String[]"
 %typemap(javain) (int argc, char const * const argv []) "$javainput"
-
-// ivaria/event.h
-%typemap(javacode) iEventOutlet
-%{
-    public void Broadcast (int iCode) { Broadcast(iCode, null); }
-%}
 
 #endif // SWIGJAVA

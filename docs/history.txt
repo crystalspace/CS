@@ -32,6 +32,15 @@ chronological order.
 	  Also applied Brendon's patch to SimpleRoom.java. In addition to
 	  addressing the remaining Java compilation errors, we still also need
 	  to fix the RequestPlugins() bug (tracker #858626).
+	- Eric Sunshine worked around Swig 1.3.21 bug where it generates
+	  invalid Java code for the iConfigManager enumeration. The illegal
+	  emitted code has the form:
+	    public final static int ConfigFoo = iConfigManager::PriorityFoo;
+	  rather than the legal:
+	    public final static int ConfigFoo = iConfigManager.PriorityFoo;
+	- Eric Sunshine fixed bug in the iEventOutlet %typemap(javacode)
+	  override which prevented the iEventOutlet::equals() method from
+	  being synthesized.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space
