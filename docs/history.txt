@@ -12,6 +12,9 @@ chronological order.
 	    for <float> portals, fogs and a few other bits.
 	  - Fixed clipping with the new renderer.
 	  - Added portal sorting to the csRenderMesh sorting routines.
+	- Jorrit changed iPortalContainer->Draw() so it no longer does
+	  SCF_QUERY_INTERFACE to get the mesh wrapper (and movable) but
+	  uses the movable parameter instead.
 30-Dec-2003
 	- Eric Sunshine applied patch from Bjorn Hansen
 	  <holomorph@users.sourceforge.net> which adds csParseMouseDef() to

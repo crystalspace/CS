@@ -198,10 +198,11 @@ public:
   virtual void Draw (iRenderView* rview, iMovable* movable)
   {
     //get the movable from parent
-    iBase *parent = GetLogicalParent();
-    csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE(parent, iMeshWrapper);
-    if (wrap)
-      Draw (rview, wrap->GetMovable (), CS_ZBUF_NONE);
+    //iBase *parent = GetLogicalParent();
+    //csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE(parent, iMeshWrapper);
+    //if (wrap)
+      //Draw (rview, wrap->GetMovable (), CS_ZBUF_NONE);
+    Draw (rview, movable, CS_ZBUF_NONE);
   }
 
   //--------------------- For iMeshObject ------------------------------//
