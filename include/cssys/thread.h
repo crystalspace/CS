@@ -117,7 +117,14 @@ public:
 class csMutex : public csRefCount
 {
 public:
-  static csRef<csMutex> Create ();
+  /** This will create a Thread. Note that the mutexes on windows are always
+   * recursive (ie. the same thread is able to Lock the mutex multiple times)
+   * while on other platforms non recursive threads may be faster to implement.
+   * If you need recursive behaviour set needrecursive to treu.
+   * Note: It seems Conditionals on linux only work with non-recursive
+   * mutexes.
+   */
+  static csRef<csMutex> Create (bool needrecursive = false);
   virtual bool LockWait() = 0;
   virtual bool LockTry () = 0;
   virtual bool Release () = 0;

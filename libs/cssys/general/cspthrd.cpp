@@ -31,17 +31,33 @@
 #define CS_SHOW_ERROR
 #endif
 
-csRef<csMutex> csMutex::Create ()
+csRef<csMutex> csMutex::Create (bool needrecursive)
 {
-  return csPtr<csMutex>(new csPosixMutex);
+  return csPtr<csMutex>(new csPosixMutex (needrecursive));
 }
 
-csPosixMutex::csPosixMutex ()
+csPosixMutex::csPosixMutex (bool needrecursive)
 {
   lasterr = NULL;
-  // Create an 'fast' mutex, that is a deadlock occurs if a thread 
-  // tries to LockWait a mutex it already owns.
+
+#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+  if (needrecursive)
+  {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init (&attr);
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutex_init (&mutex, &attr);
+  }
+  else
+  {
+    pthread_mutex_init (&mutex, NULL);
+  }
+#else
+  (void) needrecursive;
+  count = 0;
+  owner = 0;
   pthread_mutex_init (&mutex, NULL);
+#endif
 }
 
 csPosixMutex::~csPosixMutex ()
@@ -70,7 +86,21 @@ bool csPosixMutex::Destroy ()
 
 bool csPosixMutex::LockWait()
 {
-  int rc = pthread_mutex_lock (&mutex);
+  int rc;
+#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+  rc = pthread_mutex_lock (&mutex);
+#else
+  pthread_t self = pthread_self();
+  if (owner != self)
+  {
+    rc = pthread_mutex_lock(&mutex);
+    owner = self;
+  }
+  else
+    rc = 0;
+  count += 1;
+#endif
+
   switch (rc)
   {
   case EINVAL:
@@ -92,7 +122,23 @@ bool csPosixMutex::LockWait()
 
 bool csPosixMutex::LockTry ()
 {
-  int rc = pthread_mutex_trylock (&mutex);
+  int rc;
+#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+  rc = pthread_mutex_trylock (&mutex);
+#else
+  pthread_t self = pthread_self();
+  if (owner != self)
+  {
+    rc = pthread_mutex_trylock(&mutex);
+    if (rc!=0)
+      return false;
+    owner = self;                     
+  }
+  else
+    rc = 0;
+  count += 1;
+#endif
+
   switch (rc)
   {
   case EINVAL:
@@ -118,7 +164,21 @@ bool csPosixMutex::LockTry ()
 
 bool csPosixMutex::Release ()
 {
-  int rc = pthread_mutex_unlock (&mutex);
+  int rc;
+  
+#ifdef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+  rc = pthread_mutex_unlock (&mutex);
+#else
+  CS_ASSERT (pthread_self() == owner);
+  if (--count == 0)
+  {
+    owner = 0;
+    rc = pthread_mutex_unlock(&mutex);
+  }
+  else
+    rc = 0;
+#endif
+ 
   switch (rc)
   {
   case EINVAL:
