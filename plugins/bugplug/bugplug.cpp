@@ -498,9 +498,8 @@ void csBugPlug::MouseButton3 (iCamera* camera)
     	iThingState);
     if (ts)
     {
-      iPolygon3D* poly = ts->GetPolygon (polyidx);
-      poly_name = poly->GetStaticData ()->GetName ();
-      Dump (poly);
+      poly_name = ts->GetFactory ()->GetPolygonName (polyidx);
+      Dump (ts->GetFactory (), polyidx);
     }
   }
   else
@@ -1949,16 +1948,15 @@ void csBugPlug::Dump (iCamera* c)
   Dump (4, trans.GetO2T (), "Camera matrix");
 }
 
-void csBugPlug::Dump (iPolygon3D* poly)
+void csBugPlug::Dump (iThingFactoryState* fact, int polyidx)
 {
-  iPolygon3DStatic* ps = poly->GetStaticData ();
-  const char* poly_name = ps->GetName ();
+  const char* poly_name = fact->GetPolygonName (polyidx);
   if (!poly_name) poly_name = "<noname>";
   Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s'",
   	poly_name);
-  int nv = ps->GetVertexCount ();
+  int nv = fact->GetPolygonVertexCount (polyidx);
   int i;
-  int* idx = ps->GetVertexIndices ();
+  int* idx = fact->GetPolygonVertexIndices (polyidx);
   char buf[256];
   sprintf (buf, "  Vertices: ");
   for (i = 0 ; i < nv ; i++)

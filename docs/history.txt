@@ -76,6 +76,7 @@ chronological order.
 	  apimod98.txi.
 	- Eric Sunshine eliminated TeX `underfull hbox' warnings from
 	  apimod98.txi and simple.txi.
+	- Jorrit removed usage of iPolygon3D from a few plugins.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).

@@ -116,53 +116,12 @@ class SimpleRoom extends CS
 	    iMaterialWrapper material = engine.GetMaterialList().FindByName(matname);
 	
         System.out.println("creating walls");
-	    iPolygon3DStatic poly = thingstate.GetFactory().CreatePolygon("floor");
-	    poly.CreateVertex(new csVector3(-5,0,5));
-	    poly.CreateVertex(new csVector3(5,0,5));
-	    poly.CreateVertex(new csVector3(5,0,-5));
-	    poly.CreateVertex(new csVector3(-5,0,-5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
-	
-	    poly = thingstate.GetFactory().CreatePolygon("ceiling");
-	    poly.CreateVertex(new csVector3(-5,20,-5));
-	    poly.CreateVertex(new csVector3(5,20,-5));
-	    poly.CreateVertex(new csVector3(5,20,5));
-	    poly.CreateVertex(new csVector3(-5,20,5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
-	
-	    poly = thingstate.GetFactory().CreatePolygon("w1");
-	    poly.CreateVertex(new csVector3(-5,20,5));
-	    poly.CreateVertex(new csVector3(5,20,5));
-	    poly.CreateVertex(new csVector3(5,0,5));
-	    poly.CreateVertex(new csVector3(-5,0,5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
-	
-	    poly = thingstate.GetFactory().CreatePolygon("w2");
-	    poly.CreateVertex(new csVector3(5,20,5));
-	    poly.CreateVertex(new csVector3(5,20,-5));
-	    poly.CreateVertex(new csVector3(5,0,-5));
-	    poly.CreateVertex(new csVector3(5,0,5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
-	
-	    poly = thingstate.GetFactory().CreatePolygon("w3");
-	    poly.CreateVertex(new csVector3(-5,20,-5));
-	    poly.CreateVertex(new csVector3(-5,20,5));
-	    poly.CreateVertex(new csVector3(-5,0,5));
-	    poly.CreateVertex(new csVector3(-5,0,-5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
-	
-	    poly = thingstate.GetFactory().CreatePolygon("w4");
-	    poly.CreateVertex(new csVector3(5,20,-5));
-	    poly.CreateVertex(new csVector3(-5,20,-5));
-	    poly.CreateVertex(new csVector3(-5,0,-5));
-	    poly.CreateVertex(new csVector3(5,0,-5));
-	    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3);
-	    poly.SetMaterial(material);
+	    iThingFactoryState fact = thingstate.GetFactory()
+	    fact.AddInsideBox (
+	      new csVector3(-5,0,-5),
+	      new csVector3(5,20,5));
+	    fact.SetPolygonTextureMapping(CS_POLYRANGE_LAST, 3);
+	    fact.SetPolygonMaterial(CS_POLYRANGE_LAST, material);
 	    //thingstate.DecRef();
 
         iStatLight light = engine.CreateLight("", new csVector3(0, 5, 0), 10f, new csColor(1, 0, 0), false);

@@ -108,21 +108,21 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object,
     {
       continue;
     }
-    iPolygon3DStatic *ThingPoly = tgt->CreatePolygon ();
+    tgt->AddEmptyPolygon ();
 
     // copy vertices
     for (i=0; i<Polygon->GetVertexCount (); i++)
-      ThingPoly->CreateVertex (Polygon->GetVertex (i));
+      tgt->AddPolygonVertex (CS_POLYRANGE_LAST, Polygon->GetVertex (i));
 
     // copy material
     iModelDataMaterial *mat = Polygon->GetMaterial ();
     if (mat && mat->GetMaterialWrapper ())
-      ThingPoly->SetMaterial (mat->GetMaterialWrapper ());
+      tgt->SetPolygonMaterial (CS_POLYRANGE_LAST, mat->GetMaterialWrapper ());
     else
-      ThingPoly->SetMaterial (DefaultMaterial);
+      tgt->SetPolygonMaterial (CS_POLYRANGE_LAST, DefaultMaterial);
 
     // copy texture transformation
-    ThingPoly->SetTextureSpace (
+    tgt->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
       Vertices->GetVertex (Polygon->GetVertex (0)),
       Vertices->GetTexel (Polygon->GetTexel(0)),
       Vertices->GetVertex (Polygon->GetVertex (1)),
