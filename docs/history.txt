@@ -36,6 +36,10 @@ chronological order.
 	  clipping. By default this is set to 500. With this optimization
 	  I managed to improve performance in walktest flarge from 87
 	  to 209 fps! (for new renderer).
+	- Eric Sunshine fixed bug in msvcgen.jam where the overriden
+	  Application rule was employgin an incorrect mechanism for detecting
+	  console applications.  Also eliminated hard-coded use of Unix-style
+	  pathnames.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

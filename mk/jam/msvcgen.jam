@@ -4,16 +4,17 @@
 
 if "$(MSVCGEN_CONFIG)"
 {
-MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
-MKVERRES = "$(SHELL) $(TOP)/libs/csutil/win32/mkverres.sh" ;
-MKMETADATARES = "$(SHELL) $(TOP)/libs/csutil/win32/mkmetadatares.sh" ;
-MERGERES = "$(SHELL) $(TOP)/libs/csutil/win32/mergeres.sh" ;
+MSVCGEN = $(PERL) [ ConcatDirs $(TOP) mk msvcgen msvcgen.pl ] ;
+MERGERES = $(SHELL) [ ConcatDirs $(TOP) libs csutil win32 mergeres.sh ] ;
 
 MSVC_VERSION ?= 7 ;
-MSVCGEN_BUILD_ROOT = $(BUILDTOP)/out ;
-MSVCGEN_LOCATE_TARGET ?= $(MSVCGEN_BUILD_ROOT)/mk/visualc$(MSVC_VERSION) ;
-MSVCGEN_LOCATE_FRAGMENT ?= $(MSVCGEN_BUILD_ROOT)/mk/fragment$(MSVC_VERSION) ;
-MSVCGEN_TEMPLATEDIR ?= $(TOP)/mk/msvcgen/template$(MSVC_VERSION) ;
+MSVCGEN_BUILD_ROOT = [ ConcatDirs $(BUILDTOP) out ] ;
+MSVCGEN_LOCATE_TARGET ?=
+  [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk visualc$(MSVC_VERSION) ] ;
+MSVCGEN_LOCATE_FRAGMENT ?=
+  [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk fragment$(MSVC_VERSION) ] ;
+MSVCGEN_TEMPLATEDIR ?=
+  [ ConcatDirs $(TOP) mk msvcgen template$(MSVC_VERSION) ] ;
 
 if $(MSVC_VERSION) = 6
 {
@@ -61,7 +62,7 @@ rule MsvcProject
   }
   $(<)_MSVCNAME = $(msvcname) ;
       
-  fragroot = $(MSVCGEN_LOCATE_FRAGMENT)/$(msvcname).frag ;
+  fragroot = [ ConcatDirs $(MSVCGEN_LOCATE_FRAGMENT) $(msvcname).frag ] ;
   NotFile $(fragroot) ;
 
   fragments = [ FAppendSuffix $(msvcname) : .frag.cff ]
@@ -171,7 +172,7 @@ rule Application
   # _Options $(<) : $(3) ;
 
   local projtype ;
-  if $(CONSOLEAPP_$(<)) = "yes"
+  if [ IsElem console : $(3) ]
   {
     projtype = appcon ;
   }
