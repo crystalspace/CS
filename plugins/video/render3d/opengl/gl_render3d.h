@@ -89,7 +89,7 @@ private:
   csRef<iLightingManager> lightmgr;
   csRef<iShaderManager> shadermgr;
 
-  static csRef<iGLStateCache> statecache;
+  static iGLStateCache* statecache;
 
   csGLExtensionManager ext;
   csGLTextureCache *txtcache;

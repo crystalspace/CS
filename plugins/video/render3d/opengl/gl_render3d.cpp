@@ -55,7 +55,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
 
-csRef<iGLStateCache> csGLRender3D::statecache;
+iGLStateCache* csGLRender3D::statecache;
 
 
 CS_IMPLEMENT_PLUGIN
@@ -145,8 +145,6 @@ csGLRender3D::~csGLRender3D()
 ////////////////////////////////////////////////////////////////////
 // Private helpers
 ////////////////////////////////////////////////////////////////////
-
-
 
 
 void csGLRender3D::Report (int severity, const char* msg, ...)
@@ -709,6 +707,7 @@ bool csGLRender3D::Open ()
 
 void csGLRender3D::Close ()
 {
+  
   if (G2D)
     G2D->Close ();
 }
