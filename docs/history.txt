@@ -10,6 +10,7 @@ The history order is reversed so that new features are at the top.
 	  again.
 	- Fixed a bug in the TinyXml loader by making sure that
 	  nodes also have a real reference to the system (for the pool).
+	- Fixed a few compile problems in effects system.
 4-Sep-2002
 	- Converted exploldr to XML.
 	- Converted bcterrldr to XML.

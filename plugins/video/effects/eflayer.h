@@ -25,17 +25,17 @@
 class csEffectLayer : public csStateHandler
 {
 private:
-	csRef<iBase> rendererData;
+  csRef<iBase> rendererData;
 
-	csRef<iBase> GetRendererData()
-	{
-		return rendererData;
-	}
+  csRef<iBase> GetRendererData()
+  {
+    return rendererData;
+  }
 
-	void SetRendererData(csRef<iBase> data)
-	{
-		rendererData = data;
-	}
+  void SetRendererData(csRef<iBase> data)
+  {
+    rendererData = data;
+  }
 
 public:
 
@@ -46,11 +46,11 @@ public:
     SCF_CONSTRUCT_EMBEDDED_IBASE( scfiEffectLayer );
   }
 
-	
+  
 
   struct EffectLayer : public iEffectLayer
   {
-	  SCF_DECLARE_EMBEDDED_IBASE( csEffectLayer );
+    SCF_DECLARE_EMBEDDED_IBASE( csEffectLayer );
 
     void SetStateFloat( csStringID state, float value )
     {
@@ -64,10 +64,10 @@ public:
     {
       scfParent->SetStateOpaque( state, value );
     }
-		void SetStateVector4( csStringID state, csEffectVector4 value)
-		{
-			scfParent->SetStateVector4( state, value);
-		}
+    void SetStateVector4( csStringID state, csEffectVector4 value)
+    {
+      scfParent->SetStateVector4( state, value);
+    }
     
     float GetStateFloat( csStringID state )
     {
@@ -81,10 +81,10 @@ public:
     {
       return scfParent->GetStateOpaque( state );
     }
-		csEffectVector4 GetStateVector4( csStringID state)
-		{
-			return scfParent->GetStateVector4( state );
-		}
+    csEffectVector4 GetStateVector4( csStringID state)
+    {
+      return scfParent->GetStateVector4( state );
+    }
     
     csStringID GetFirstState()
     {
@@ -95,17 +95,18 @@ public:
       return scfParent->GetNextState();
     }
 
-		csRef<iBase> GetRendererData()
-		{
-			return scfParent->GetRendererData();
-		}
+    csRef<iBase> GetRendererData()
+    {
+      return scfParent->GetRendererData();
+    }
 
-		void SetRendererData(csRef<iBase> data)
-		{
-			scfParent->SetRendererData(data);
-		}
+    void SetRendererData(csRef<iBase> data)
+    {
+      scfParent->SetRendererData(data);
+    }
 
   } scfiEffectLayer;
+  friend struct EffectLayer;
 };
 
 #endif // __EFFECTLAYER_H__
