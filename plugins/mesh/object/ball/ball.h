@@ -37,6 +37,7 @@ class csBallMeshObject : public iMeshObject
 {
 private:
   float radiusx, radiusy, radiusz;
+  float max_radius;
   csVector3 shift;
   iMaterialWrapper* material;
   UInt MixMode;
@@ -93,13 +94,7 @@ public:
   iMaterialWrapper* GetMaterialWrapper () { return material; }
   /// Get mixmode.
   UInt GetMixMode () { return MixMode; }
-  void SetRadius (float radiusx, float radiusy, float radiusz)
-  {
-    initialized = false;
-    csBallMeshObject::radiusx = radiusx;
-    csBallMeshObject::radiusy = radiusy;
-    csBallMeshObject::radiusz = radiusz;
-  }
+  void SetRadius (float radiusx, float radiusy, float radiusz);
   void SetShift (float shiftx, float shifty, float shiftz)
   {
     initialized = false;
@@ -130,6 +125,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
+  virtual float GetRadius () { return max_radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);

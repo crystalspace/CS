@@ -48,6 +48,7 @@ csBallMeshObject::csBallMeshObject ()
   initialized = false;
   camera_cookie = 0;
   radiusx = radiusy = radiusz = 1;
+  max_radius = 1;
   shift.Set (0, 0, 0);
   verts_circle = 6;
   material = NULL;
@@ -100,6 +101,17 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
   float iz = fov / v.z;
   p.x = v.x * iz + sx;
   p.y = v.y * iz + sy;
+}
+
+void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
+{
+  initialized = false;
+  csBallMeshObject::radiusx = radiusx;
+  csBallMeshObject::radiusy = radiusy;
+  csBallMeshObject::radiusz = radiusz;
+  max_radius = radiusx;
+  if (radiusy > max_radius) max_radius = radiusy;
+  if (radiusz > max_radius) max_radius = radiusz;
 }
 
 float csBallMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,

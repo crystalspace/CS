@@ -134,6 +134,9 @@ public:
   /// Get the children of this mesh object.
   csNamedObjVector& GetChildren () { return children; }
 
+  /// Get the radius of this mesh (ignoring children).
+  float GetRadius () { return mesh->GetRadius (); }
+
   /**
    * Do a hard transform of this object.
    * This transformation and the original coordinates are not

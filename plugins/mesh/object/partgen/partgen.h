@@ -42,6 +42,8 @@ struct iRenderView;
 class csParticleSystem : public iMeshObject
 {
 protected:
+  /// Object space radius.
+  float radius;
   /// iParticle ptrs to the particles.
   csVector particles;
   /// Self destruct and when.
@@ -224,6 +226,7 @@ public:
     (void)accurate;
     bbox = csParticleSystem::bbox;
   }
+  virtual float GetRadius () { return radius; }
   virtual void NextFrame (cs_time current_time)
   {
     cs_time elaps = 0;

@@ -507,11 +507,6 @@ protected:
   /// Mixmode for the triangles/polygons of the sprite.
   UInt MixMode;
 
-  /**
-   * List of light-hits-sprites for this sprite.
-   */
-  csLightHitsSprite* dynamiclights;
-
   /// Defered lighting. If > 0 then we have defered lighting.
   int defered_num_lights;
 
@@ -641,23 +636,6 @@ public:
    * use this function to chain.
    */
   csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
-
-  /**
-   * Unlink a light-hits-sprite from the list.
-   * Warning! This function does not test if it
-   * is really on the list!
-   */
-  void UnlinkDynamicLight (csLightHitsSprite* lp);
-
-  /**
-   * Add a light-hits-sprite to the list.
-   */
-  void AddDynamicLight (csLightHitsSprite *lp);
-
-  /**
-   * Get the list of dynamic lights that hit this sprite.
-   */
-  csLightHitsSprite* GetDynamicLights () { return dynamiclights; }
 
   /**
    * Light sprite according to the given array of lights (i.e.

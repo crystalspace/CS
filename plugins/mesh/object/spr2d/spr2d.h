@@ -45,6 +45,7 @@ private:
   bool initialized;
   csMeshCallback* vis_cb;
   void* vis_cbData;
+  float radius;
 
   /**
    * Array of 3D vertices.
@@ -103,6 +104,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
+  virtual float GetRadius () { return radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);

@@ -547,7 +547,6 @@ csSprite::csSprite (csObject* theParent) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite);
   movable.scfParent = this;
-  dynamiclights = NULL;
   MixMode = CS_FX_COPY;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
@@ -569,7 +568,6 @@ csSprite::csSprite (csObject* theParent) : csPObject ()
 
 csSprite::~csSprite ()
 {
-  while (dynamiclights) delete dynamiclights;
   if (parent->GetType () == csEngine::Type)
   {
     csEngine* engine = (csEngine*)parent;
@@ -631,24 +629,6 @@ void csSprite::DeferUpdateLighting (int flags, int num_lights)
 {
   defered_num_lights = num_lights;
   defered_lighting_flags = flags;
-}
-
-void csSprite::UnlinkDynamicLight (csLightHitsSprite* lp)
-{
-  if (lp->next_sprite) lp->next_sprite->prev_sprite = lp->prev_sprite;
-  if (lp->prev_sprite) lp->prev_sprite->next_sprite = lp->next_sprite;
-  else dynamiclights = lp->next_sprite;
-  lp->prev_sprite = lp->next_sprite = NULL;
-  lp->sprite = NULL;
-}
-
-void csSprite::AddDynamicLight (csLightHitsSprite* lp)
-{
-  lp->next_sprite = dynamiclights;
-  lp->prev_sprite = NULL;
-  if (dynamiclights) dynamiclights->prev_sprite = lp;
-  dynamiclights = lp;
-  lp->sprite = this;
 }
 
 bool csSprite::HitBeam (const csVector3& start, const csVector3& end,

@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "spiral.h"
 #include "imater.h"
+#include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -46,6 +47,15 @@ void csSpiralMeshObject::SetupObject ()
     float height = 10.0; // guessed height
     bbox.Set(source - csVector3(-radius,0,-radius), 
       source + csVector3(+radius, +height, +radius) );
+
+    // Calculate the maximum radius.
+    csVector3 size = bbox.Max () - bbox.Min ();
+    float max_size = size.x;
+    if (size.y > max_size) max_size = size.y;
+    if (size.z > max_size) max_size = size.z;
+    float a = max_size/2.;
+    radius = qsqrt (a*a + a*a);
+
     SetupColor ();
     SetupMixMode ();
   }

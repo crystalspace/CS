@@ -22,6 +22,7 @@
 #include "csgeom/matrix3.h"
 #include "fountain.h"
 #include "imater.h"
+#include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -48,10 +49,18 @@ void csFountainMeshObject::SetupObject ()
     part_age = new float[number];
     amt = number;
 
-    float radius = 10.0; // guessed radius of the fountain
+    float fradius = 10.0; // guessed radius of the fountain
     float height = 10.0; // guessed height
-    bbox.Set(origin - csVector3(-radius,0,-radius), 
-      origin + csVector3(+radius, +height, +radius) );
+    bbox.Set(origin - csVector3(-fradius,0,-fradius), 
+      origin + csVector3(+fradius, +height, +fradius) );
+
+    // Calculate the maximum radius.
+    csVector3 size = bbox.Max () - bbox.Min ();
+    float max_size = size.x;
+    if (size.y > max_size) max_size = size.y;
+    if (size.z > max_size) max_size = size.z;
+    float a = max_size/2.;
+    radius = qsqrt (a*a + a*a);
 
     // create particles
     for (int i=0 ; i<number ; i++)

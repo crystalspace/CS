@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+22-Jan-2001
+	- Removed support from sprites and lights for an old and never-used
+	  dynamic lighting registration system. If we still need this later
+	  we'll have to redo it another way.
+	- Extended iSprite3DState a bit.
+	- Extended iMeshObject with GetRadius() function which will return
+	  the radius of the object in object space. Also added GetRadius()
+	  to csMeshWrapper.
+	- Extended all mesh object plugins to support this function.
 21-Jan-2001
 	- Martin Geisse moved the following modules to the new config system:
 	    - Glide renderer/canvas.

@@ -53,10 +53,18 @@ void csFireMeshObject::SetupObject ()
     part_age = new float[number];
     amt = number;
 
-    float radius = drop_width * swirl; // guessed radius of the fire
+    float fradius = drop_width * swirl; // guessed radius of the fire
     csVector3 height = total_time * direction; // guessed height
-    bbox.Set (origin - csVector3 (-radius,0,-radius), 
-      origin + csVector3 (+radius, 0, +radius) + height );
+    bbox.Set (origin - csVector3 (-fradius,0,-fradius), 
+      origin + csVector3 (+fradius, 0, +fradius) + height );
+
+    // Calculate the maximum radius.
+    csVector3 size = bbox.Max () - bbox.Min ();
+    float max_size = size.x;
+    if (size.y > max_size) max_size = size.y;
+    if (size.z > max_size) max_size = size.z;
+    float a = max_size/2.;
+    radius = qsqrt (a*a + a*a);
 
     // create particles
     for (int i=0 ; i < number ; i++)

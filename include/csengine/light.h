@@ -30,8 +30,6 @@
 #include "idlight.h"
 
 class csSector;
-class csSprite;
-//class csPolygon3D;
 class csLightMap;
 class csDynLight;
 class Dumper;
@@ -359,66 +357,6 @@ public:
 };
 
 /**
- * A light-hits-sprite structure. This is basicly a structure which indicates
- * that some sprite is hit by a dynamic light.
- * There is a list of these structures in every sprite (all dynamic lights
- * hitting a sprite will give rise to a seperate lights-hits-sprite) and there
- * is a list of these structures in every dynamic light (representing all
- * sprites that are hit by that particular light).
- */
-class csLightHitsSprite
-{
-  friend class csSprite;
-  friend class csDynLight;
-  friend class Dumper;
-
-private:
-  csLightHitsSprite* next_sprite;
-  csLightHitsSprite* prev_sprite;
-  csLightHitsSprite* next_light;
-  csLightHitsSprite* prev_light;
-
-  /// Sprite that this is for.
-  csSprite* sprite;
-  /// Light that this originates from.
-  csDynLight* light;
-
-public:
-  /**
-   * Create a new csLightHitsSprite.
-   */
-  csLightHitsSprite ();
-
-  /**
-   * Unlink this structure from the sprite and the light
-   * and then destroy.
-   */
-  ~csLightHitsSprite ();
-
-  /**
-   * Get the sprite that this belongs too.
-   */
-  csSprite* GetSprite () { return sprite; }
-
-  /**
-   * Get the light that this belongs too.
-   */
-  csDynLight* GetLight () { return light; }
-
-  /**
-   * Get next as seen from the standpoint
-   * of the sprite.
-   */
-  csLightHitsSprite* GetNextSprite () { return next_sprite; }
-
-  /**
-   * Get next as seen from the standpoint
-   * of the light.
-   */
-  csLightHitsSprite* GetNextLight () { return next_light; }
-};
-
-/**
  * A light patch. This is a 3D polygon which fits on a world level 3D
  * polygon and defines where the light hits the polygon.
  * There is a list of light patches in every polygon (all dynamic lights
@@ -527,8 +465,6 @@ private:
 
   /// List of light patches for this dynamic light.
   csLightPatch* lightpatches;
-  /// List of light-hits-sprite structures for this dynamic light.
-  csLightHitsSprite* lightedsprites;
 
 public:
   /**
@@ -590,18 +526,6 @@ public:
    * Add a light patch to the light patch list.
    */
   void AddLightpatch (csLightPatch* lp);
-
-  /**
-   * Unlink a light-hits-sprite from the list.
-   * Warning! This function does not test if the structure
-   * is really on the list!
-   */
-  void UnlinkLightedSprite (csLightHitsSprite* lp);
-
-  /**
-   * Add a light-hits-sprite to the list.
-   */
-  void AddLightedSprite (csLightHitsSprite* lp);
 
   ///
   void SetNext (csDynLight* n) { next = n; }

@@ -33,7 +33,7 @@ class csReversibleTransform;
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 7);
+SCF_VERSION (iMeshObject, 0, 0, 8);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -85,6 +85,11 @@ struct iMeshObject : public iBase
    * to be a bounding box.
    */
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false) = 0;
+
+  /**
+   * Get the radius of this object in object space.
+   */
+  virtual float GetRadius () = 0;
 
   /**
    * Control animation of this object.

@@ -252,12 +252,9 @@ struct iSprite3DState : public iBase
   /// Get mix mode.
   virtual UInt GetMixMode () = 0;
 
-  // @@@ TODO: dynamic light support? Probably obsolete.
   // @@@ TODO: global LOD level.
   // @@@ TODO: static int global_lighting_quality;
-  // @@@ TODO: query actions.
   // @@@ TODO: what about conveniance functions to set colors for verts?
-  // @@@ TODO: what about GetRadius()? Add to csMeshWrapper?
 
   /**
    * Get the reference to the factory for this sprite.
@@ -282,6 +279,9 @@ struct iSprite3DState : public iBase
 
   /// Select an action.
   virtual bool SetAction (const char * name) = 0;
+
+  /// Get the current action.
+  virtual iSpriteAction* GetCurAction () = 0;
 
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;

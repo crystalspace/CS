@@ -51,6 +51,7 @@ void csExploMeshObject::SetupObject ()
     float sqmaxspeed = 0.0;
     csVector3 bbox_radius (part_radius, part_radius, part_radius);
     bbox_radius *= 10.;
+    radius = bbox_radius.x; // @@@ This is only an approximation.
 
     // The bounding box for the explosion particle system is not accurate.
     // For efficiency reasons we overestimate this bounding box and never

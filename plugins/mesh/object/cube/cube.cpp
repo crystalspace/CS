@@ -47,6 +47,12 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   sizey = factory->GetSizeY ();
   sizez = factory->GetSizeZ ();
   shift = factory->GetShift ();
+  // Calculate the maximum radius.
+  float max_size = sizex;
+  if (sizey > max_size) max_size = sizey;
+  if (sizez > max_size) max_size = sizez;
+  float a = max_size/2.;
+  radius = qsqrt (a*a + a*a);
 }
 
 csCubeMeshObject::~csCubeMeshObject ()

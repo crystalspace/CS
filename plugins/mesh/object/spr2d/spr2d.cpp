@@ -78,6 +78,8 @@ void csSprite2DMeshObject::SetupObject ()
         vertices[i].color = vertices[i].color_init;
         vertices[i].color.Clamp (2, 2, 2);
       }
+      // @@@ TODO: compute radius
+      radius = 1;
     }
   }
 }

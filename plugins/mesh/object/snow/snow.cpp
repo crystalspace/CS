@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "snow.h"
 #include "imater.h"
+#include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -47,6 +48,14 @@ void csSnowMeshObject::SetupObject ()
     bbox = rainbox;
     /// spread particles evenly through box
     csVector3 size = rainbox.Max () - rainbox.Min ();
+
+    // Calculate the maximum radius.
+    float max_size = size.x;
+    if (size.y > max_size) max_size = size.y;
+    if (size.z > max_size) max_size = size.z;
+    float a = max_size/2.;
+    radius = qsqrt (a*a + a*a);
+
     csVector3 pos;
     for (int i=0 ; i < number ; i++)
     {

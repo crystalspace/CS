@@ -314,22 +314,6 @@ void csStatLight::SetColor (const csColor& col)
 
 //---------------------------------------------------------------------------
 
-csLightHitsSprite::csLightHitsSprite ()
-{
-  next_sprite = prev_sprite = NULL;
-  next_light = prev_light = NULL;
-  sprite = NULL;
-  light = NULL;
-}
-
-csLightHitsSprite::~csLightHitsSprite ()
-{
-  if (sprite) sprite->UnlinkDynamicLight (this);
-  if (light) light->UnlinkLightedSprite (this);
-}
-
-//---------------------------------------------------------------------------
-
 csLightPatch::csLightPatch ()
 {
   next_poly = prev_poly = NULL;
@@ -471,20 +455,3 @@ void csDynLight::AddLightpatch (csLightPatch* lp)
   lp->light = this;
 }
 
-void csDynLight::UnlinkLightedSprite (csLightHitsSprite* lp)
-{
-  if (lp->next_light) lp->next_light->prev_light = lp->prev_light;
-  if (lp->prev_light) lp->prev_light->next_light = lp->next_light;
-  else lightedsprites = lp->next_light;
-  lp->prev_light = lp->next_light = NULL;
-  lp->light = NULL;
-}
-
-void csDynLight::AddLightedSprite (csLightHitsSprite* lp)
-{
-  lp->next_light = lightedsprites;
-  lp->prev_light = NULL;
-  if (lightedsprites) lightedsprites->prev_light = lp;
-  lightedsprites = lp;
-  lp->light = this;
-}
