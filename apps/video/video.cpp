@@ -132,7 +132,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
  
   room = engine->CreateCsSector ("room");
-  iThing* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThing);
+  iThingState* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThingState);
   csVector3 
 	   f1 (-5, 20, 5),
 	   f2 ( 5, 20, 5), 
