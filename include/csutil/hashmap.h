@@ -20,7 +20,7 @@
 #define __CS_HASHMAP_H__
 
 #if 0 // let's not deprecate just yet :)
-#ifndef COMP_VC
+#ifndef CS_COMPILER_MSVC
 # warning Use of csHashMap is deprecated. Please csHash instead.
 #endif
 #endif
@@ -36,7 +36,7 @@ class csHashIteratorReversible;
 
 class csHashMap;
 
-#if (CS_PROCSIZE == 32)
+#if (CS_PROCESSOR_SIZE == 32)
 # if (_MSC_VER >= 1300)
   /*
    * Silence VC7 64bit warning.

@@ -6,10 +6,6 @@ BUILDTOP = . ;
 # Include configuration.
 JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
-if ! $(JAMCONFIG_READ)
-{
-    EXIT "Could not locate configuration. Please run 'configure' first." ;
-}
 
 # Set up compiler flags.
 # Unfortunately, we can not use FDefines here since Boost Jam does not have it,

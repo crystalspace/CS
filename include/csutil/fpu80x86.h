@@ -19,7 +19,7 @@
 #ifndef __CS_FPU80X86_H__
 #define __CS_FPU80X86_H__
 
-#if defined(PROC_X86) && defined(COMP_GCC)
+#if defined(CS_PROCESSOR_X86) && defined(CS_COMPILER_GCC)
 
 /*
      ---- ---- --XX XXXX = MCW_EM - exception masks (1=handle exception internally, 0=fault)
@@ -66,7 +66,7 @@ static inline unsigned int csControl87(unsigned int newcw, unsigned int mask)
 
 #else
 
-#if defined(COMP_VC)
+#if defined(CS_COMPILER_MSVC)
 #define csControl87	_control87
 #else
 static inline unsigned int csControl87(unsigned int, unsigned int) { return 0; }

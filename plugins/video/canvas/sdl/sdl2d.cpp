@@ -219,7 +219,7 @@ void csGraphics2DSDL::fixlibrary()
     dlopen(dlip.dli_fname,RTLD_NOW);
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Library %s locked.",dlip.dli_fname);
-#elif defined(OS_WIN32)
+#elif defined(CS_PLATFORM_WIN32)
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "SDL generic Win32 support by Crystal Space Development Team.");
 #else

@@ -387,7 +387,7 @@ protected:
   static cswsRectVector *visregion;
 
 public:
-#if (CS_PROCSIZE == 32)
+#if (CS_PROCESSOR_SIZE == 32)
 # if (_MSC_VER >= 1300)
   /*
    * Silence VC7 64bit warning.

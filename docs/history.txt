@@ -35,6 +35,28 @@ chronological order.
 	- Eric Sunshine renamed the following macros in order to avoid global
 	  namespace pollution:
 	    WIN32_VOLATILE --> CS_WIN32_CSCONFIG
+	    COMP_GCC       --> CS_COMPILER_GCC
+	    COMP_VC	   --> CS_COMPILER_MSVC
+	    COMP_BC        --> CS_COMPILER_BCC
+	    OS_DOS         --> CS_PLATFORM_DOS
+	    OS_WIN32       --> CS_PLATFORM_WIN32
+	    OS_UNIX        --> CS_PLATFORM_UNIX
+	    OS_MACOSX      --> CS_PLATFORM_MACOSX
+	    PROC_FOO       --> CS_PROCESSOR_FOO
+	    CS_PROCSIZE    --> CS_PROCESSOR_SIZE
+	    DO_NASM        --> CS_USE_NASM
+	    DO_MMX	   --> CS_USE_MXX
+	- Eric Sunshine removed the obsolete USE_PLUGINS configuration
+	  property. The Jam build system now instead provides "variants", such
+	  as `static'.
+	- Eric Sunshine removed the obsolete JAMCONFIG_READ configuration
+	  property. Both CS and 'jamtemplate' now use the more standardized
+	  `Jamfile.in --> Jamfile' configuration mechanism for determining if
+	  the project has been configured.
+	- Eric Sunshine changed configure.ac so that it emits the header
+	  property CS_USE_FAKE_SOCKLEN_TYPE to csconfig.h rather than emitting
+	  the explicit 'typedef int socklen_t'. csdef.h now fakes up socklent_t
+	  in an appropriate manner if CS_USE_FAKE_SOCKLEN_TYPE is defined.
 30-Jul-2004
 	- Eric Sunshine fixed bugs in csInitializer::OpenApplication() and
 	  CloseApplication() where they created broadcast events on the stack.

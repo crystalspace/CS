@@ -28,7 +28,7 @@
   #define CS_IMPORT_SYM
 #endif // CS_BUILD_SHARED_LIBS
 
-#if defined(COMP_VC)
+#if defined(CS_COMPILER_MSVC)
   #pragma warning(disable:4097)   // use of xxx as synonym for a classname
   #pragma warning(disable:4099)   // type seen as both 'struct' and `class'
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
@@ -86,14 +86,14 @@
 // Worse, the bugs manifest in "random" locations throughout the project, often
 // in completely unrelated code.  Consequently, instruct csArray<> to avoid
 // such usage for MSVC6.
-#if defined(COMP_VC) && (_MSC_VER < 1300)
+#if defined(CS_COMPILER_MSVC) && (_MSC_VER < 1300)
 #define CSARRAY_INHIBIT_TYPED_KEYS
 #endif
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
 
-#if defined(COMP_GCC)
+#if defined(CS_COMPILER_GCC)
 
 // From the w32api header files:
 
@@ -216,7 +216,7 @@
   #undef  DEBUG_BREAK
   #define DEBUG_BREAK ::DebugBreak()
   
-  #if defined(COMP_VC) 
+  #if defined(CS_COMPILER_MSVC) 
     #include <crtdbg.h>
 
     #if defined(CS_EXTENSIVE_MEMDEBUG)
@@ -289,12 +289,12 @@ struct mmioInfo
 #endif
 #endif
 
-#if defined (COMP_BC)
+#if defined (CS_COMPILER_BCC)
 #  define strcasecmp stricmp
 #  define strncasecmp strnicmp
 #endif
 
-#if defined (COMP_VC)
+#if defined (CS_COMPILER_MSVC)
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
 #endif
@@ -333,7 +333,7 @@ struct mmioInfo
 
 #endif
 
-// Although COMP_GCC has opendir, readdir, CS' versions are preferred.
+// Although CS_COMPILER_GCC has opendir, readdir, CS' versions are preferred.
 #if defined(CS_SYSDEF_PROVIDE_DIR)
 // Directory read functions
   #define __NEED_OPENDIR_PROTOTYPE
@@ -384,7 +384,7 @@ struct mmioInfo
 #  include <io.h>
 #endif
 
-#if defined (COMP_BC) || defined (__CYGWIN32__)
+#if defined (CS_COMPILER_BCC) || defined (__CYGWIN32__)
 #  define GETPID() getpid()
 #else
 #  define GETPID() _getpid()
@@ -415,7 +415,7 @@ struct mmioInfo
 // Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
 // This also replaces the older 'better_memcpy', which was also not as
 // efficient as it could be ergo... heres a better solution.
-#if defined(COMP_VC) && (_MSC_VER < 1300)
+#if defined(CS_COMPILER_MSVC) && (_MSC_VER < 1300)
 #include <memory.h>
 #define memcpy fast_mem_copy
 static inline void* fast_mem_copy (void *dest, const void *src, int count)
@@ -457,7 +457,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 }
 #endif
 
-#ifdef COMP_BC
+#ifdef CS_COMPILER_BCC
 // Major hack due to pow failures in CS for Borland, removing this
 // causes millions of strings to print out -- Brandon Ehle
 #define pow(arga, argb) ( (!arga && !argb)?0:pow(arga, argb) )
@@ -465,13 +465,13 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 #define DEBUG_BREAK
 #endif
 
-#if defined (PROC_X86)
+#if defined (CS_PROCESSOR_X86)
 #  define CS_LITTLE_ENDIAN
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in win32/csosdefs.h!"
 #endif
 
-#if defined(COMP_BC)
+#if defined(CS_COMPILER_BCC)
   // The Borland C++ compiler does not accept a 'main' routine
   // in a program which already contains WinMain. This is a work-around.
   #undef main
@@ -492,7 +492,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
-#if defined(COMP_BC)
+#if defined(CS_COMPILER_BCC)
   #define CS_WIN32_ARGC _argc
   #define CS_WIN32_ARGV _argv
 #else

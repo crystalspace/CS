@@ -20,7 +20,7 @@
 #ifndef __CS_ZIP_H__
 #define __CS_ZIP_H__
 
-#if defined(__cplusplus) && !defined(COMP_BC)
+#if defined(__cplusplus) && !defined(CS_COMPILER_BCC)
 extern "C" {
 #endif
 
@@ -28,7 +28,7 @@ extern "C" {
 #include <zlib.h>
 #undef Byte
 
-#if defined(__cplusplus) && !defined(COMP_BC)
+#if defined(__cplusplus) && !defined(CS_COMPILER_BCC)
 }
 #endif
 

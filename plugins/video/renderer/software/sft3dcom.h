@@ -135,7 +135,7 @@ protected:
   int height2;
   /// The pixel format of display
   csPixelFormat pfmt;
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
   /// True if CPU has MMX instructions.
   bool cpu_mmx;
   /// True if 3D rendering should use MMX if available.

@@ -321,7 +321,6 @@ my $CONFIGURE =
     "CMD.SWIG ?= \"swig\" ;\n" .
     "CMD.TEXI2DVI ?= \"texi2dvi\" ;\n" .
     "JAM ?= \"jam\" ;\n" .
-    "JAMCONFIG_READ ?= \"yes\" ;\n" .
     "MODE ?= \"optimize\" ;\n" .
     "MSVCGEN_SILENT ?= \"yes\" ;\n" .
     "PACKAGE_COPYRIGHT ?= \"\$cscopy\" ;\n" .
@@ -336,7 +335,6 @@ my $CONFIGURE =
     "PYTHON ?= \"python\" ;\n" .
     "PYTHON.AVAILABLE ?= \"yes\" ;\n" .
     "TARGET.OS ?= \"UNIX\" ;\n" .
-    "USE_PLUGINS ?= \"yes\" ;\n" .
     "EOF\n" .
     "sed 's/\@top_srcdir\@/./;s/\@top_builddir\@//' < Jamfile.in > Jamfile\n";
 

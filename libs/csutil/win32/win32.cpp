@@ -39,11 +39,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#if defined(COMP_VC)
+#if defined(CS_COMPILER_MSVC)
 #include <sys/timeb.h>
 #endif
 
-#if defined(COMP_BC)
+#if defined(CS_COMPILER_BCC)
 #include <dos.h> // For _argc & _argv
 #endif
 

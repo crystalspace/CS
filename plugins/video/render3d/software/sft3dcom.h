@@ -20,12 +20,12 @@
 #ifndef __CS_SFTR3DCOM_H__
 #define __CS_SFTR3DCOM_H__
 
-#if defined(DO_MMX) && (CS_PROCSIZE != 32)
+#if defined(CS_USE_MMX) && (CS_PROCESSOR_SIZE != 32)
   /*
    * Disable MMX stuff on non-32bit machines for the time being.
    * The asm code needs to be checked/updated for 64bit.
    */
-  #undef DO_MMX
+  #undef CS_USE_MMX
 #endif
 
 #include "csutil/scf.h"
@@ -154,7 +154,7 @@ protected:
   int height2;
   /// The pixel format of display
   csPixelFormat pfmt;
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
   /// True if CPU has MMX instructions.
   bool cpu_mmx;
   /// True if 3D rendering should use MMX if available.

@@ -44,7 +44,7 @@ SCF_VERSION (iWin32Assistant, 0, 1, 0);
  *  registered with the tag `iWin32Assistant'. To ensure that code using this 
  *  functionality compiles properly on all other platforms, the use of the
  *  interface and inclusion of the header file should be surrounded by
- *  appropriate `#if defined(OS_WIN32) ... #endif' statements.
+ *  appropriate `#if defined(CS_PLATFORM_WIN32) ... #endif' statements.
  */
 struct iWin32Assistant : public iBase
 {

@@ -877,8 +877,6 @@ Optional Features:
                           processor will not work with earlier processors (for
                           example, Intel 686-specific code will not work with
                           a 586)
-  --enable-plugins        create plugin modules instead of linkable libraries
-                          (default YES)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
                           modules if supported by platform; if disabled,
@@ -2828,7 +2826,7 @@ fi
 
 
 if test $ac_compiler_gnu = yes; then
-  cs_compiler_name=GCC cs_header_text="${cs_header_text}#define COMP_GCC
+  cs_compiler_name=GCC cs_header_text="${cs_header_text}#define CS_COMPILER_GCC
 "
 else
   cs_compiler_name="`echo "$CXX" | $as_tr_cpp`"
@@ -4764,7 +4762,7 @@ fi
 "
 fi
 
-	cs_header_text="${cs_header_text}#define DO_NASM
+	cs_header_text="${cs_header_text}#define CS_USE_NASM
 "
 fi
 
@@ -6710,7 +6708,7 @@ fi
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
 #	code can use these variables to emit appropriate Jam variables and
-#	OS_FOO header define.
+#	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 
 
@@ -6818,7 +6816,7 @@ fi
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 
-	cs_header_text="${cs_header_text}#define OS_MACOSX
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
 "
 	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
 "
@@ -6886,7 +6884,7 @@ fi
 
 case $cs_host_family in
     windows)
-	cs_header_text="${cs_header_text}#define OS_WIN32
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
 "
 	if test -z "$cs_host_os_normalized"; then
   cs_host_os_normalized='Win32'
@@ -6894,7 +6892,7 @@ fi
 
 	;;
     unix)
-	cs_header_text="${cs_header_text}#define OS_UNIX
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
 "
 	if test -z "$cs_host_os_normalized"; then
   cs_host_os_normalized='Unix'
@@ -32010,7 +32008,7 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
+# Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking for long" >&5
 echo $ECHO_N "checking for long... $ECHO_C" >&6
@@ -32427,26 +32425,20 @@ _ACEOF
 
 
 if test $ac_cv_sizeof_long = 8; then
-  cs_header_text="${cs_header_text}#define CS_PROCSIZE 64
-"
-      cs_build_prop_val="64"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSORSIZE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
+  cs_long_bits=64
 else
-  cs_header_text="${cs_header_text}#define CS_PROCSIZE 32
+  cs_long_bits=32
+fi
+
+cs_header_text="${cs_header_text}#define CS_PROCESSOR_SIZE $cs_long_bits
 "
-      cs_build_prop_val="32"
+cs_build_prop_val="$cs_long_bits"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSORSIZE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-fi
 
 
 
@@ -32456,11 +32448,11 @@ fi
 # CS_CHECK_HOST_CPU
 #	Set the shell variable cs_host_cpu to a normalized form of the CPU name
 #	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "PROC_" to form a name suitable
-#	for the C preprocessor.  Assigns this value to the shell variable
-#	cs_host_cpu_cpp_define.  Typically, Crystal Space's conception of CPU
-#	name is the same as that returned by config.guess/config.sub, but there
-#	may be exceptions as seen in the `case' statement.
+#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
+#	suitable for the C preprocessor.  Assigns this value to the shell
+#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
+#	of CPU name is the same as that returned by config.guess/config.sub,
+#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
 
 
@@ -32477,13 +32469,13 @@ cs_build_prop_val="$cs_host_cpu_normalized"
 "
 fi
 
-cs_header_text="${cs_header_text}#define PROC_$cs_host_cpu_normalized
+cs_header_text="${cs_header_text}#define CS_PROCESSOR_$cs_host_cpu_normalized
 "
 cs_header_text="${cs_header_text}#define CS_PROCESSOR_NAME \"$cs_host_cpu\"
 "
 
 if test $cs_host_cpu = x86; then
-  cs_header_text="${cs_header_text}#define DO_MMX
+  cs_header_text="${cs_header_text}#define CS_USE_MMX
 "
 fi
 
@@ -34737,7 +34729,7 @@ echo "${ECHO_T}$ac_cv_type_socklen_t" >&6
 if test $ac_cv_type_socklen_t = yes; then
   :
 else
-  cs_header_text="${cs_header_text}#define socklen_t int
+  cs_header_text="${cs_header_text}#define CS_USE_FAKE_SOCKLEN_TYPE
 "
 fi
 
@@ -35661,8 +35653,8 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#define PROC_$cs_host_cpu_normalized
-		    #define COMP_GCC
+#define CS_PROCESSOR_$cs_host_cpu_normalized
+		    #define CS_COMPILER_GCC
 		    #include <csqsqrt.h>
 
 int
@@ -35827,39 +35819,6 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Determine if modules should be built as plugins or static link libraries.
-# The macro CS_CHECK_ENABLE_PLUGINS sets the shell variable enable_plugins to
-# yes or no.
-#------------------------------------------------------------------------------
-
-
-echo "$as_me:$LINENO: checking whether to build plugins" >&5
-echo $ECHO_N "checking whether to build plugins... $ECHO_C" >&6
-    # Check whether --enable-plugins or --disable-plugins was given.
-if test "${enable_plugins+set}" = set; then
-  enableval="$enable_plugins"
-
-else
-  enable_plugins=yes
-fi;
-    echo "$as_me:$LINENO: result: $enable_plugins" >&5
-echo "${ECHO_T}$enable_plugins" >&6
-cs_build_prop_val="$enable_plugins"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-if test $enable_plugins != yes; then
-  cs_header_text="${cs_header_text}#define CS_STATIC_LINKED
-"
-fi
-
-
-
-
-#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into the
 # plugin module or if it should exist in a stand-alone .csplugin file.  The
 # macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable
@@ -35868,27 +35827,21 @@ fi
 
 
 
-
-    if test $enable_plugins = yes; then
-  echo "$as_me:$LINENO: checking whether to embed plugin meta-information" >&5
+    echo "$as_me:$LINENO: checking whether to embed plugin meta-information" >&5
 echo $ECHO_N "checking whether to embed plugin meta-information... $ECHO_C" >&6
-	case $cs_host_target in
-	    unix) cs_embed_meta_info_default=no ;;
-	    *) cs_embed_meta_info_default=yes ;;
-	esac
-	# Check whether --enable-meta-info-embedding or --disable-meta-info-embedding was given.
+    case $cs_host_target in
+	unix) cs_embed_meta_info_default=no ;;
+	*) cs_embed_meta_info_default=yes ;;
+    esac
+    # Check whether --enable-meta-info-embedding or --disable-meta-info-embedding was given.
 if test "${enable_meta_info_embedding+set}" = set; then
   enableval="$enable_meta_info_embedding"
 
 else
   enable_meta_info_embedding=$cs_embed_meta_info_default
 fi;
-	echo "$as_me:$LINENO: result: $enable_meta_info_embedding" >&5
+    echo "$as_me:$LINENO: result: $enable_meta_info_embedding" >&5
 echo "${ECHO_T}$enable_meta_info_embedding" >&6
-else
-  enable_meta_info_embedding=no
-fi
-
 cs_build_prop_val="$enable_meta_info_embedding"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -37032,13 +36985,6 @@ cs_build_prop_val="\$(COMPILER.C++FLAGS.MANDATORY)"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}JAMCONFIG_READ ?= \"$cs_build_prop_val\" ;
 "
 fi
 

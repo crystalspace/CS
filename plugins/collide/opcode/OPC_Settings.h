@@ -21,7 +21,7 @@
 #define __OPC_SETTINGS_H__
 
 	//! Use CPU comparisons (comment that line to use standard FPU compares)
-#if defined(PROC_X86)
+#if defined(CS_PROCESSOR_X86)
 	// Defining this causes aliasing bugs. It is not legal C++ to do so.
 	// i.e. the AIR() and IR() defines are very buggy and actually cause wrong
 	// code in optimize.

@@ -134,6 +134,12 @@
   #define CS_SPECIALIZE_TEMPLATE template<>
 #endif
 
+// Platforms which do not supply a socklen_t type should define
+// CS_USE_FAKE_SOCKLEN_TYPE
+#if defined(CS_USE_FAKE_SOCKLEN_TYPE)
+  typedef int socklen_t;
+#endif
+
 // The smallest Z at which 3D clipping occurs
 #define SMALL_Z 0.01f
 

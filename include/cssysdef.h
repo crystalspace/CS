@@ -85,7 +85,7 @@
  * \param var Name of the array to be allocated.
  * \param size Number of elements to be allocated.
  */
-#ifdef COMP_GCC
+#ifdef CS_COMPILER_GCC
 // In GCC we are able to declare stack vars of dynamic size directly
 #  define CS_ALLOC_STACK_ARRAY(type, var, size) \
       type var [size]
@@ -100,14 +100,14 @@
  */
 #ifdef CS_SYSDEF_PROVIDE_TEMP
 #  ifndef TEMP_DIR
-#    if defined(OS_UNIX)
+#    if defined(CS_PLATFORM_UNIX)
 #      define TEMP_DIR "/tmp/"
 #    else
 #      define TEMP_DIR ""
 #    endif
 #  endif
 #  ifndef TEMP_FILE
-#    if defined(OS_UNIX)
+#    if defined(CS_PLATFORM_UNIX)
 #      include <unistd.h>
 /// Name for temporary file
 #      define TEMP_FILE "cs%lud.tmp", (unsigned long)getpid()
@@ -123,7 +123,7 @@
  */
 #ifdef CS_SYSDEF_PROVIDE_MKDIR
 #  ifndef MKDIR
-#    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
+#    if defined(CS_PLATFORM_WIN32) || (defined(CS_PLATFORM_DOS) && !defined(CS_COMPILER_GCC))
 #      define MKDIR(path) _mkdir (path)
 #    else
 #      define MKDIR(path) mkdir (path, 0755)
@@ -132,14 +132,14 @@
 #endif // CS_SYSDEF_PROVIDE_MKDIR
 
 #ifdef CS_SYSDEF_PROVIDE_GETCWD
-#  if !defined(COMP_VC) && !defined(COMP_BC)
+#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
 #    include <unistd.h>
 #  endif
 #endif // CS_SYSDEF_PROVIDE_GETCWD
 
 #ifdef CS_SYSDEF_PROVIDE_DIR
 // For systems without opendir()
-// Although COMP_GCC has opendir, readdir, CS' versions are preferred.
+// Although CS_COMPILER_GCC has opendir, readdir, CS' versions are preferred.
 # if defined(__NEED_OPENDIR_PROTOTYPE)
      struct DIR;
      struct dirent;
@@ -152,11 +152,11 @@
 # endif
 // Generic ISDIR where needed
 #  ifdef __NEED_GENERIC_ISDIR
-#    if defined (OS_WIN32) || defined (OS_DOS)
+#    if defined (CS_PLATFORM_WIN32) || defined (CS_PLATFORM_DOS)
 #      include <io.h>
 #    endif
 #    include <sys/types.h>
-#    if !defined(OS_WIN32)
+#    if !defined(CS_PLATFORM_WIN32)
 #      include <dirent.h>
 #    endif
 #    include <sys/stat.h>
@@ -181,13 +181,13 @@
 #endif // CS_SYSDEF_PROVIDE_DIR
 
 #ifdef CS_SYSDEF_PROVIDE_UNLINK
-#  if !defined(COMP_VC) && !defined(COMP_BC)
+#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
 #    include <unistd.h>
 #  endif
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_ACCESS
-#  if !defined(COMP_VC) && !defined(COMP_BC)
+#  if !defined(CS_COMPILER_MSVC) && !defined(CS_COMPILER_BCC)
 #    include <unistd.h>
 #  endif
 #  ifndef F_OK
@@ -605,8 +605,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
 
 #ifdef CS_DEBUG
 #  if !defined (DEBUG_BREAK)
-#    if defined (PROC_X86)
-#      if defined (COMP_GCC)
+#    if defined (CS_PROCESSOR_X86)
+#      if defined (CS_COMPILER_GCC)
 #        define DEBUG_BREAK asm ("int $3")
 #      else
 #        define DEBUG_BREAK _asm int 3
@@ -616,7 +616,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #    endif
 #  endif
 #  if !defined (CS_ASSERT)
-#    if defined (COMP_VC)
+#    if defined (CS_COMPILER_MSVC)
 #      define  CS_ASSERT(x) assert(x)
 #    else
 #      include <stdio.h>
@@ -654,25 +654,25 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * @@@ In the future, this should be moved to csconfig.h and determined as
  * part of the configuration process.
  */
-#if !defined (PROC_X86)
+#if !defined (CS_PROCESSOR_X86)
 #  define CS_STRICT_ALIGNMENT
 #endif
 
 // Adjust some definitions contained in csconfig.h
-#if defined (PROC_X86) && !defined (DO_NASM)
+#if defined (CS_PROCESSOR_X86) && !defined (CS_USE_NASM)
 #  undef NO_ASSEMBLER
 #  define NO_ASSEMBLER
 #endif
 
-#if !defined (PROC_X86) || defined (NO_ASSEMBLER)
-#  undef DO_MMX
-#  undef DO_NASM
+#if !defined (CS_PROCESSOR_X86) || defined (NO_ASSEMBLER)
+#  undef CS_USE_MMX
+#  undef CS_USE_NASM
 #endif
 
 // Use fast csQint and csQround on CPUs that are known to support it
 #if !defined (CS_NO_IEEE_OPTIMIZATIONS)
 #  if !defined (CS_IEEE_DOUBLE_FORMAT)
-#    if defined (PROC_X86) || defined (PROC_M68K)
+#    if defined (CS_PROCESSOR_X86) || defined (CS_PROCESSOR_M68K)
 #      define CS_IEEE_DOUBLE_FORMAT
 #    endif
 #  endif

@@ -29,7 +29,7 @@
 #define DIRECTINPUT_VERSION 0x0500
 // @@@ Should be able build on older SDKs as well
 #include <dinput.h>
-#ifdef COMP_BC
+#ifdef CS_COMPILER_BCC
 #include "dinputdefs.h"
 #endif
 

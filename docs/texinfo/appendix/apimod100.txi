@@ -192,5 +192,28 @@ global namespace.
 @item
 @code{QRound} @result{} @code{csQround()}
 @item
+@code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
+@item
+@code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
+@item
+@code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
+@item
+@code{DO_MMX} @result{} @code{CS_USE_MMX}
+@item
+@code{DO_NASM} @result{} @code{CS_USE_NASM}
+@item
+@code{OS_DOS} @result{} @code{CS_PLATFORM_DOS}
+@item
+@code{OS_MACOSX} @result{} @code{CS_PLATFORM_MACOSX}
+@item
+@code{OS_UNIX} @result{} @code{CS_PLATFORM_UNIX}
+@item
+@code{OS_WIN32} @result{} @code{CS_PLATFORM_WIN32}
+@item
+@code{PROC_FOO} @result{} @code{CS_PROCESSOR_FOO} (where @samp{FOO} is
+@samp{X86}, @samp{M68K}, etc.)
+@item
+@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
+@item
 @code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
 @end itemize

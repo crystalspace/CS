@@ -141,7 +141,7 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
   return ptr;
 }
 
-#if (defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)) || \
+#if (defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_COMPILER_MSVC)) || \
   defined(CS_MEMORY_TRACKER) || defined(CS_REF_TRACKER)
 /*
   Lazily unload libs - Because if unloading happens immediately,

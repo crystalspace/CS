@@ -487,7 +487,7 @@ void cspFileDialog::Reread ()
       sep++;
     char *name = new char [maxlen + 1];
     if ((sep == curp)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
      || ((level == 0) && (sep [-1] == ':'))
 #endif
        )

@@ -8,10 +8,6 @@ BUILDTOP = . ;
 # instance, this is done with the 'msvcgen' target (see CS/mk/msvcgen/Jamfile).
 JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
-if ! $(JAMCONFIG_READ)
-{
-  EXIT "Failed to find configuration information. Please configure project." ;
-}
 
 # CFLAGS.  Don't use FDefines here since Boost Jam doesn't have it, and we have
 # not yet included mk/jam/build.jam which provides an emulation layer for

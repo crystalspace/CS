@@ -46,7 +46,7 @@
 #include "renderbuffer.h"
 #include "soft_polyrender.h"
 
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
 #  include "plugins/video/renderer/software/i386/cpuid.h"
 #endif
 
@@ -252,7 +252,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
   cliptype = CS_CLIPPER_NONE;
   do_near_plane = false;
 
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
   do_mmx = true;
 #endif
   do_lighting = true;
@@ -364,7 +364,7 @@ void csSoftwareGraphics3DCommon::NewInitialize ()
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3f);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
   do_mmx = config->GetBool ("Video.Software.MMX", true);
 #endif
 }
@@ -427,7 +427,7 @@ bool csSoftwareGraphics3DCommon::Open ()
 
 bool csSoftwareGraphics3DCommon::NewOpen ()
 {
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
   int family, features;
   char vendor [13];
   csDetectCPU (&family, vendor, &features);
@@ -500,7 +500,7 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
   //fog_buffers = partner->fog_buffers;
   alpha_mask = partner->alpha_mask;
   z_buf_mode = partner->z_buf_mode;
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
   cpu_mmx = partner->cpu_mmx;
 #endif
   texman = partner->texman;
@@ -519,7 +519,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
   memset (&ScanProcPIG, 0, sizeof (ScanProcPIG));
   ScanProc_Alpha = 0;
 
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
   bool UseMMX = (cpu_mmx && do_mmx);
 #endif
 
@@ -538,7 +538,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_TEX_ZNONE] = csScan_16_scan_tex_znone;
       ScanProc [SCANPROC_TEX_ZFIL] =
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
         UseMMX ? csScan_16_mmx_scan_tex_zfil :
 #endif
         csScan_16_scan_tex_zfil;
@@ -558,7 +558,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
           csScan_16_555_scan_map_filt2_zfil :
           csScan_16_565_scan_map_filt2_zfil) :
         bilinear_filter == 1 ? csScan_16_scan_map_filt_zfil :
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
         UseMMX ? csScan_16_mmx_scan_map_zfil :
 #endif
         csScan_16_scan_map_zfil;
@@ -648,7 +648,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_16_scan_pi_tex_znone;
       ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_16_scan_pi_tex_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ZUSE] =
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
         UseMMX ? csScan_16_mmx_scan_pi_tex_zuse :
 #endif
         csScan_16_scan_pi_tex_zuse;
@@ -871,7 +871,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_TEX_ZNONE] = csScan_32_scan_tex_znone;
       ScanProc [SCANPROC_TEX_ZFIL] =
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
         UseMMX ? csScan_32_mmx_scan_tex_zfil :
 #endif
         csScan_32_scan_tex_zfil;
@@ -882,7 +882,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
         csScan_32_scan_map_znone;
       ScanProc [SCANPROC_MAP_ZFIL] =
         bilinear_filter == 2 ? csScan_32_scan_map_filt2_zfil :
-#if defined (DO_MMX)
+#if defined (CS_USE_MMX)
         UseMMX ? csScan_32_mmx_scan_map_zfil :
 #endif
         csScan_32_scan_map_zfil;
@@ -3506,7 +3506,7 @@ bool csSoftwareGraphics3DCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
       ScanSetup ();
       break;
     case G3DRENDERSTATE_MMXENABLE:
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
       do_mmx = value;
       ScanSetup ();
       break;
@@ -3566,7 +3566,7 @@ long csSoftwareGraphics3DCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
       return do_textured;
     case G3DRENDERSTATE_MMXENABLE:
-#ifdef DO_MMX
+#ifdef CS_USE_MMX
       return do_mmx;
 #else
       return 0;

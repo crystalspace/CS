@@ -53,7 +53,7 @@ typedef short int16;
 typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef int int32;
-#ifdef COMP_GCC
+#ifdef CS_COMPILER_GCC
 /// unsigned 64-bit integer
 typedef unsigned long long uint64;
 /// signed 64-bit integer
@@ -71,7 +71,7 @@ typedef long long int64;
  */
 #define CONST_UINT64(x) x ## ULL
 #else
-# if defined(COMP_VC) || defined(COMP_BC) || defined(__BORLANDC__)
+# if defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC) || defined(__BORLANDC__)
 /// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
 /// signed 64 bit integer
@@ -83,7 +83,7 @@ typedef __int64 int64;
 # else
 #  warning NO definition for 64 bit integers defined for your compiler
 # endif
-#endif // end of #ifdef COMP_GCC
+#endif // end of #ifdef CS_COMPILER_GCC
 
 #else
 // We're happy and can simply use stdint.h.

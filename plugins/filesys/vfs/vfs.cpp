@@ -1160,7 +1160,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
       strcpy (tpath + rpl, Suffix);
       rpl = strlen (tpath);
       if ((rpl > 1)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
        && ((rpl > 2) || (tpath [1] != ':'))
        && (!((rpl == 3) && (tpath [1] == ':') && (tpath [2] == '\\')))
        // keep trailing backslash for drive letters

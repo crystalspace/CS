@@ -34,7 +34,7 @@
 
 #include <sys/types.h>
 
-#if defined(OS_WIN32) && !defined(__CYGWIN__)
+#if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
 #  include <winsock.h>
 #  ifndef socklen_t
      typedef int socklen_t;
@@ -48,7 +48,7 @@
 #  define EWOULDBLOCK WSAEWOULDBLOCK
 #  define CS_GETSOCKETERROR ::WSAGetLastError()
 #  undef CS_SYSDEF_PROVIDE_SOCKETS
-#elif defined(OS_UNIX) || defined(__CYGWIN__)
+#elif defined(CS_PLATFORM_UNIX) || defined(__CYGWIN__)
 #  include <sys/socket.h>
 #  include <unistd.h>
 #  define BSD_COMP 1

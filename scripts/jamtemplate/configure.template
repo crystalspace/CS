@@ -119,7 +119,6 @@ CS_EMIT_PACKAGEINFO
 # Output generated files.  Also create a Jamfile when compiling outside
 # source directory.
 #----------------------------------------------------------------------------
-CS_EMIT_BUILD_PROPERTY([JAMCONFIG_READ], [yes])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
 AC_CONFIG_FILES([Jamfile])
 AC_OUTPUT

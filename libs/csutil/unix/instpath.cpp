@@ -33,13 +33,13 @@
 
 // These defines should be set by the configure script
 #ifndef CS_CONFIGDIR
-#ifdef COMP_GCC
+#ifdef CS_COMPILER_GCC
 #warning CS_CONFIGDIR not set
 #endif
 #define CS_CONFIGDIR "/usr/local/" CS_PACKAGE_NAME
 #endif
 #ifndef CS_PLUGINDIR
-#ifdef COMP_GCC
+#ifdef CS_COMPILER_GCC
 #warning CS_PLUGINDIR not set
 #endif
 #define CS_PLUGINDIR "/usr/local/" CS_PACKAGE_NAME "/lib"

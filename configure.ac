@@ -65,7 +65,7 @@ CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])
 
 AS_IF([test $ac_compiler_gnu = yes],
-    [cs_compiler_name=GCC CS_HEADER_PROPERTY([COMP_GCC])],
+    [cs_compiler_name=GCC CS_HEADER_PROPERTY([CS_COMPILER_GCC])],
     [cs_compiler_name="AS_TR_CPP([$CXX])"])
 CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
@@ -206,7 +206,7 @@ AS_IF([test -n "$NASM"],
     AS_IF([test $cs_cv_prog_nasm_ok = yes],
 	[CS_EMIT_BUILD_PROPERTY([NASM.AVAILABLE], [yes])
 	CS_EMIT_BUILD_PROPERTY([CMD.NASM], [$NASM])
-	CS_HEADER_PROPERTY([DO_NASM])])])
+	CS_HEADER_PROPERTY([CS_USE_NASM])])])
 
 
 
@@ -276,7 +276,7 @@ CS_CHECK_RTLD
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
 #	code can use these variables to emit appropriate Jam variables and
-#	OS_FOO header define.
+#	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -330,7 +330,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 
-	CS_HEADER_PROPERTY([OS_MACOSX])
+	CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
 	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
 
 	# We assume that we always have CoreAudio available on MacOS/X.
@@ -351,12 +351,12 @@ CS_CHECK_HOST
 
 case $cs_host_family in
     windows)
-	CS_HEADER_PROPERTY([OS_WIN32])
+	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
 	AS_IF([test -z "$cs_host_os_normalized"],
 	    [cs_host_os_normalized='Win32'])
 	;;
     unix)
-	CS_HEADER_PROPERTY([OS_UNIX])
+	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
 	AS_IF([test -z "$cs_host_os_normalized"],
 	    [cs_host_os_normalized='Unix'])
 	;;
@@ -1687,14 +1687,13 @@ CS_SYS_PLUGIN_MAIN
 
 
 #------------------------------------------------------------------------------
-# Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
+# Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
 #------------------------------------------------------------------------------
 AC_CHECK_SIZEOF([long])
-AS_IF([test $ac_cv_sizeof_long = 8],
-     [CS_HEADER_PROPERTY([CS_PROCSIZE], [64])
-      CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [64])],
-     [CS_HEADER_PROPERTY([CS_PROCSIZE], [32])
-      CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [32])])
+AS_IF([test $ac_cv_sizeof_long = 8], [cs_long_bits=64], [cs_long_bits=32])
+CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_long_bits])
+CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_long_bits])
+
 
 
 #------------------------------------------------------------------------------
@@ -1703,11 +1702,11 @@ AS_IF([test $ac_cv_sizeof_long = 8],
 # CS_CHECK_HOST_CPU
 #	Set the shell variable cs_host_cpu to a normalized form of the CPU name
 #	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "PROC_" to form a name suitable
-#	for the C preprocessor.  Assigns this value to the shell variable
-#	cs_host_cpu_cpp_define.  Typically, Crystal Space's conception of CPU
-#	name is the same as that returned by config.guess/config.sub, but there
-#	may be exceptions as seen in the `case' statement.
+#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
+#	suitable for the C preprocessor.  Assigns this value to the shell
+#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
+#	of CPU name is the same as that returned by config.guess/config.sub,
+#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -1719,12 +1718,12 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
 
 CS_CHECK_HOST_CPU
 CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized])
-CS_HEADER_PROPERTY([PROC_$cs_host_cpu_normalized])
+CS_HEADER_PROPERTY([CS_PROCESSOR_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
 
 AS_IF([test $cs_host_cpu = x86], 
-  [CS_HEADER_PROPERTY([DO_MMX])])
+  [CS_HEADER_PROPERTY([CS_USE_MMX])])
 
 
 
@@ -1835,7 +1834,9 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	[CS_EMIT_BUILD_RESULT([cs_cv_sys_socket], [SOCKET])])
 
 AS_IF([test $cs_cv_sys_socket = yes],
-    [AC_CHECK_TYPE([socklen_t], [], [CS_HEADER_PROPERTY([socklen_t],[int])],
+    [AC_CHECK_TYPE([socklen_t],
+	[],
+	[CS_HEADER_PROPERTY([CS_USE_FAKE_SOCKLEN_TYPE])],
 	[[#if HAVE_UNISTD_H
 	#include <unistd.h>
 	#endif
@@ -1951,8 +1952,8 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		[cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"])
 	    CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
-		    [[#define PROC_$cs_host_cpu_normalized
-		    #define COMP_GCC
+		    [[#define CS_PROCESSOR_$cs_host_cpu_normalized
+		    #define CS_COMPILER_GCC
 		    #include <csqsqrt.h>
 		    ]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
@@ -1997,51 +1998,29 @@ AS_IF([test $cs_cv_cxx_qint_ok = no],
 
 
 #------------------------------------------------------------------------------
-# Determine if modules should be built as plugins or static link libraries.
-# The macro CS_CHECK_ENABLE_PLUGINS sets the shell variable enable_plugins to
-# yes or no.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_ENABLE_PLUGINS],
-    [AC_MSG_CHECKING([whether to build plugins])
-    AC_ARG_ENABLE([plugins], [AC_HELP_STRING([--enable-plugins],
-	[create plugin modules instead of linkable libraries (default YES)])],
-	[], [enable_plugins=yes])
-    AC_MSG_RESULT([$enable_plugins])])
-
-CS_CHECK_ENABLE_PLUGINS
-CS_EMIT_BUILD_PROPERTY([USE_PLUGINS], [$enable_plugins])
-AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
-
-
-
-#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into the
 # plugin module or if it should exist in a stand-alone .csplugin file.  The
 # macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable
 # enable_meta_info_embedding to yes or no.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_ENABLE_META_EMBEDDING],
-    [AC_REQUIRE([CS_CHECK_ENABLE_PLUGINS])
-    AC_REQUIRE([CS_CHECK_HOST])
-    AS_IF([test $enable_plugins = yes],
-	[AC_MSG_CHECKING([whether to embed plugin meta-information])
-	case $cs_host_target in
-	    unix) cs_embed_meta_info_default=no ;;
-	    *) cs_embed_meta_info_default=yes ;;
-	esac
-	AC_ARG_ENABLE([meta-info-embedding],
-	    [AC_HELP_STRING([--enable-meta-info-embedding],
-		[store plugin meta-information directly inside plugin modules
-		if supported by platform; if disabled, meta-information is
-		stored in stand-alone .csplugin files; this is enabled by
-		default for non-Unix platforms, and disabled by default for
-		Unix platforms since the Unix implementation requires the
-		GPL-licensed libbfd library; enable this option on Unix only if
-		you are certain you want a GPL-licensed library infecting your
-		project])],
-	    [], [enable_meta_info_embedding=$cs_embed_meta_info_default])
-	AC_MSG_RESULT([$enable_meta_info_embedding])],
-	[enable_meta_info_embedding=no])])
+    [AC_REQUIRE([CS_CHECK_HOST])
+    AC_MSG_CHECKING([whether to embed plugin meta-information])
+    case $cs_host_target in
+	unix) cs_embed_meta_info_default=no ;;
+	*) cs_embed_meta_info_default=yes ;;
+    esac
+    AC_ARG_ENABLE([meta-info-embedding],
+	[AC_HELP_STRING([--enable-meta-info-embedding],
+	    [store plugin meta-information directly inside plugin modules if
+	    supported by platform; if disabled, meta-information is stored in
+	    stand-alone .csplugin files; this is enabled by default for
+	    non-Unix platforms, and disabled by default for Unix platforms
+	    since the Unix implementation requires the GPL-licensed libbfd
+	    library; enable this option on Unix only if you are certain you
+	    want a GPL-licensed library infecting your project])],
+	[], [enable_meta_info_embedding=$cs_embed_meta_info_default])
+    AC_MSG_RESULT([$enable_meta_info_embedding])])
 
 CS_CHECK_ENABLE_META_EMBEDDING
 CS_EMIT_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding])
@@ -2243,7 +2222,6 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
     [AS_ESCAPE([$(COMPILER.CFLAGS.MANDATORY)])], [+])
 CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
     [AS_ESCAPE([$(COMPILER.C++FLAGS.MANDATORY)])], [+])
-CS_EMIT_BUILD_PROPERTY([JAMCONFIG_READ], [yes])
 CS_EMIT_PACKAGEINFO
 CS_OUTPUT_INSTALLDIRS
 

@@ -45,7 +45,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
 # CS_CHECK_HOST
 #       Sets the shell variables cs_host_target cs_host_family,
 #       cs_host_os_normalized, and cs_host_os_normalized_uc.  Emits appropriate
-#       OS_UNIX, OS_WIN32, OS_MACOSX via AC_DEFINE(), and TARGET.OS and
+#       CS_PLATFORM_UNIX, CS_PLATFORM_WIN32, CS_PLATFORM_MACOSX via AC_DEFINE(), and TARGET.OS and
 #       TARGET.OS.NORMALIZED to Jamconfig.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST],
@@ -69,12 +69,12 @@ AC_DEFUN([CS_CHECK_HOST],
 
     case $cs_host_family in
 	windows)
-            AC_DEFINE([OS_WIN32], [], [define when compiling for Win32])
+            AC_DEFINE([CS_PLATFORM_WIN32], [], [define when compiling for Win32])
 	    AS_IF([test -z "$cs_host_os_normalized"],
 		[cs_host_os_normalized='Win32'])
 	    ;;
 	unix)
-            AC_DEFINE([OS_UNIX], [],
+            AC_DEFINE([CS_PLATFORM_UNIX], [],
 		[define when compiling for Unix and Unix-like (i.e. MacOS/X)])
 	    AS_IF([test -z "$cs_host_os_normalized"],
 		[cs_host_os_normalized='Unix'])
@@ -119,7 +119,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	[cs_host_target=macosx
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
-        AC_DEFINE([OS_MACOSX], [], [define when compiling for MacOS/X])
+        AC_DEFINE([CS_PLATFORM_MACOSX], [], [define when compiling for MacOS/X])
 
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC"])

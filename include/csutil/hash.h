@@ -47,7 +47,7 @@ class csIntegralHashKeyHandler
 public:
   static unsigned int ComputeHash (const T& key)
   {
-#if (CS_PROCSIZE == 32)
+#if (CS_PROCESSOR_SIZE == 32)
 #if (_MSC_VER >= 1300)
     /*
       VC7 with 64bit warnings complains about a pointer truncation when T is

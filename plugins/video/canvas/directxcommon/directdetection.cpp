@@ -33,7 +33,7 @@
 //without any DirectX SDK installed, this #include below
 //is required (and it does not hurt if there is an SDK
 //installed anyway). groton
-#ifdef COMP_VC
+#ifdef CS_COMPILER_MSVC
 #include <multimon.h>
 #endif
 
@@ -44,7 +44,7 @@
 
 #include "directdetection.h"
 
-#ifdef COMP_BC
+#ifdef CS_COMPILER_BCC
 # define _strdup _fstrdup
 #endif
 #ifdef __CYGWIN__

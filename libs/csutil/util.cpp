@@ -111,7 +111,7 @@ wchar_t* csStrNewW (const char *s)
   }
 }
 
-#if defined (OS_DOS)
+#if defined (CS_PLATFORM_DOS)
   #define IS_PATH_SEPARATOR(c)	\
     (((c) == PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))
 #else
@@ -122,14 +122,14 @@ wchar_t* csStrNewW (const char *s)
 #ifndef CS_PROVIDES_EXPAND_PATH
 // generic csExpandName for all platforms
 
-#ifdef COMP_BC
+#ifdef CS_COMPILER_BCC
 static int __getcwd (char drive, char *buffer, int buffersize) {
   _getdcwd(drive, buffer, buffersize);
   return strlen(buffer);
 }
 #endif
 
-#if defined (OS_DOS)
+#if defined (CS_PLATFORM_DOS)
 // We need a function to retrieve current working directory on specific drive
 
 static int __getcwd (char drive, char *buffer, int buffersize)
@@ -142,7 +142,7 @@ static int __getcwd (char drive, char *buffer, int buffersize)
   return strlen (buffer);
 }
 
-#endif // defined (OS_DOS)
+#endif // defined (CS_PLATFORM_DOS)
 
 char *csExpandName (const char *iName)
 {
@@ -159,7 +159,7 @@ char *csExpandName (const char *iName)
 
     if ((ptmp > 0)
      && (outp == 0)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
      && ((inp >= namelen)
       || (iName [inp] != ':'))
 #endif
@@ -171,7 +171,7 @@ char *csExpandName (const char *iName)
         outname [outp++] = PATH_SEPARATOR;
     } /* endif */
 
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
     // If path starts with '/' (root), get current drive
     if ((ptmp == 0)
      && (outp == 0))
@@ -187,7 +187,7 @@ char *csExpandName (const char *iName)
       while ((outp > 0)
           && ((outname [outp - 1] == '/')
            || (outname [outp - 1] == PATH_SEPARATOR)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
            || (outname [outp - 1] == ':')
 #endif
              )
@@ -196,7 +196,7 @@ char *csExpandName (const char *iName)
       while ((outp > 0)
           && (outname [outp - 1] != '/')
           && (outname [outp - 1] != PATH_SEPARATOR)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
           && (outname [outp - 1] != ':')
 #endif
             )
@@ -218,7 +218,7 @@ char *csExpandName (const char *iName)
       outp += ptmp;
       if (inp < namelen)
       {
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
         if ((inp == 1)
          && (iName [inp] == ':'))
           if ((iName [inp + 1] == '/')
@@ -236,7 +236,7 @@ char *csExpandName (const char *iName)
     while ((inp < namelen)
         && ((iName [inp] == '/')
          || (iName [inp] == PATH_SEPARATOR)
-#if defined (OS_DOS) || defined (OS_WIN32)
+#if defined (CS_PLATFORM_DOS) || defined (CS_PLATFORM_WIN32)
          || (iName [inp] == ':')
 #endif
            )
@@ -323,7 +323,7 @@ bool csGlobMatches (const char *fName, const char *fMask)
 
 // don't forget to revert the changes above
 #if defined(__CYGWIN__)
-#define OS_WIN32
+#define CS_PLATFORM_WIN32
 #endif
 
 // finds the smallest number that is a power of two and is larger or equal to n

@@ -110,6 +110,5 @@ actions MsvcJamconfig1 bind BOILERPLATE
   cat $(>) $(REJECTS) >> $(<)
 }
 
-MsvcGenConfig USE_PLUGINS : yes ;
 MsvcJamconfig Jamconfig.msvcgen : $(JAMCONFIG:BS) : $(JAMCONFIG:D) :
     config.jam : $(SUBDIR) : AVAILABLE CFLAGS C++FLAGS LFLAGS ;

@@ -34,7 +34,7 @@
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 static inline wchar_t* cswinAnsiToWide (const char* ansi, 
@@ -58,7 +58,7 @@ static inline wchar_t* cswinAnsiToWide (const char* ansi,
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 static inline char* cswinWideToAnsi (const wchar_t* wide, 
@@ -86,7 +86,7 @@ static inline char* cswinWideToAnsi (const wchar_t* wide,
  * \remarks This class provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the class and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 struct CS_CSUTIL_EXPORT cswinWtoA
@@ -111,7 +111,7 @@ public:
  * \remarks This class provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the class and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 struct CS_CSUTIL_EXPORT cswinCtoA
@@ -140,7 +140,7 @@ public:
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
@@ -151,7 +151,7 @@ extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
@@ -161,7 +161,7 @@ extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
- *  header file should be surrounded by appropriate `#if defined(OS_WIN32) ... 
+ *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
 extern CS_CSUTIL_EXPORT bool cswinIsWinNT ();

@@ -28,11 +28,6 @@ if $(VARIANT) != "debug" && $(VARIANT) != "optimize" && $(VARIANT) != "profile"
   exit "Invalid modus set, please set VARIANT to debug, profile or optimize" ;
 }
 
-if $(USE_PLUGINS) = no
-{
-  exit "USE_PLUGINS is deprecated in jam. Just invoke the static targets direct (walktest_static)" ;
-}
-
 # Set modus related flags
 CCFLAGS += $(COMPILER.CFLAGS) $(COMPILER.CFLAGS.$(VARIANT)) ;
 C++FLAGS += $(COMPILER.CFLAGS) $(COMPILER.C++FLAGS)

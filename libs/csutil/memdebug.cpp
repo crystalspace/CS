@@ -51,7 +51,7 @@
 #  define MEMDEBUG_MEMORY_TRACKER
 #endif
 
-#if defined(COMP_VC)
+#if defined(CS_COMPILER_MSVC)
 //========================================================================
 // Branch: For VC
 //========================================================================
@@ -84,7 +84,7 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif defined(MEMDEBUG_EXTENSIVE) // COMP_VC
+#elif defined(MEMDEBUG_EXTENSIVE) // CS_COMPILER_MSVC
 //========================================================================
 // Extensive memory debugger.
 //========================================================================
@@ -539,7 +539,7 @@ void operator delete[] (void* p)
 #endif
 }
 
-#elif defined(MEMDEBUG_CHECKALLOC)	// COMP_VC
+#elif defined(MEMDEBUG_CHECKALLOC)	// CS_COMPILER_MSVC
 //========================================================================
 // This alternative branch allows for checking allocated memory amounts.
 //========================================================================
@@ -596,7 +596,7 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif defined(MEMDEBUG_DUMPALLOC)	// COMP_VC
+#elif defined(MEMDEBUG_DUMPALLOC)	// CS_COMPILER_MSVC
 //========================================================================
 // This alternative branch allows for dumping all memory allocations.
 //========================================================================
@@ -916,7 +916,7 @@ void operator delete[] (void* p)
 
 #endif // CS_MEMORY_TRACKER_IMPLEMENT
 
-#else	// COMP_VC
+#else	// CS_COMPILER_MSVC
 //========================================================================
 // If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
 // the correct overloaded operators even if we don't do debugging.
@@ -942,5 +942,5 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#endif	// COMP_VC
+#endif	// CS_COMPILER_MSVC
 

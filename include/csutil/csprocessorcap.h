@@ -51,7 +51,7 @@ public:
     if (isInitialized)
       return;
 
-#ifdef PROC_X86
+#ifdef CS_PROCESSOR_X86
     CheckX86Processor ();
 #else
     mmxSupported = false;
@@ -91,7 +91,7 @@ private:
   /// The name of the processor
   static char processorName[16];
 
-  #ifdef PROC_X86
+  #ifdef CS_PROCESSOR_X86
   /**
   * Check for x86 features. This function is written twice due to different
   * syntax for inline assembly on MSVC and GCC
@@ -105,7 +105,7 @@ private:
 
     bool have_cpuid;
 
-    #if defined(COMP_VC)
+    #if defined(CS_COMPILER_MSVC)
     __asm
     {
       // save vars
@@ -170,7 +170,7 @@ end_detect:
         pop ebx
         pop eax
     }
-    #elif defined(COMP_GCC)
+    #elif defined(CS_COMPILER_GCC)
     __asm__(
     //detect 386/486
     "  pushfl                           \n"
@@ -221,14 +221,14 @@ end_detect:
     : "g" (procName), "2" (maxEax)
     : "eax", "ebx", "ecx", "edx", "esi");
 
-    #endif //COMP_
+    #endif //CS_COMPILER_
     mmxSupported = capFlags & (1<<23);
     sseSupported = capFlags & (1<<25);
     //AMD3dnowSupported = capFlags & (1<<31);
   }
-  #else //PROC_X86
+  #else //CS_PROCESSOR_X86
   void csProcessorCapability::CheckX86Processor () {}
-  #endif //PROC_X86
+  #endif //CS_PROCESSOR_X86
 
 };
 

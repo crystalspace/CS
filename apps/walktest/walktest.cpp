@@ -77,13 +77,13 @@
 #include "iengine/campos.h"
 #include "iutil/plugin.h"
 
-#if defined(OS_WIN32)
+#if defined(CS_PLATFORM_WIN32)
 #include "csutil/win32/minidump.h"
 #endif
 
-#if defined(OS_DOS) || defined(OS_WIN32)
+#if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
-#elif defined(OS_UNIX)
+#elif defined(CS_PLATFORM_UNIX)
 #  include <unistd.h>
 #endif
 
@@ -1098,7 +1098,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
 
-#if defined(OS_WIN32)
+#if defined(CS_PLATFORM_WIN32)
   cswinMinidumpWriter::SetCrashMinidumpObjectReg (Sys->object_reg);
 #endif
 
@@ -1109,9 +1109,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-#if defined(OS_WIN32)
+#if defined(CS_PLATFORM_WIN32)
   const bool mdumpDefault =
-#if defined(COMP_VC)
+#if defined(CS_COMPILER_MSVC)
     true;
 #else
     false;
@@ -1630,7 +1630,7 @@ static void CreateSystem(void)
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#if defined(OS_WIN32) && defined(COMP_VC)
+#if defined(CS_PLATFORM_WIN32) && defined(CS_COMPILER_MSVC)
   cswinMinidumpWriter::EnableCrashMinidumps ();
 #endif
   // Initialize the random number generator

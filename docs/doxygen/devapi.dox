@@ -608,7 +608,7 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed. 
 
-PREDEFINED             = COMP_GCC \
+PREDEFINED             = CS_COMPILER_GCC \
 			 "CS_GNUC_PRINTF(a,b)=" \
 			 "CS_GNUC_SCANF(a,b)=" \
 			 CS_SYSDEF_PROVIDE_CASE \

@@ -49,7 +49,7 @@ static inline float csQisqrt (float x);
 
 /** @} */
 
-#if (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_GCC)
+#if (!defined (CS_NO_QSQRT)) && defined (CS_PROCESSOR_X86) && defined (CS_COMPILER_GCC)
 
 /** \page SingleFloatFormat: Single-precision floating-point format (32 bits)
     \internal 	
@@ -157,7 +157,7 @@ static inline float csQisqrt (float x)
   return ret;
 }
 
-#elif (!defined (CS_NO_QSQRT)) && defined (PROC_POWERPC) && defined (COMP_GCC)
+#elif (!defined (CS_NO_QSQRT)) && defined (CS_PROCESSOR_POWERPC) && defined (CS_COMPILER_GCC)
 
 /**
  * Use the PowerPC fsqrte to get an estimate of 1/sqrt(x) Then apply two
@@ -199,7 +199,7 @@ static inline float csQisqrt(float x)
   return y0;
 };
 
-#elif (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_VC)
+#elif (!defined (CS_NO_QSQRT)) && defined (CS_PROCESSOR_X86) && defined (CS_COMPILER_MSVC)
 
 #include <math.h>
 static inline float csQsqrt (float x) { return sqrtf(x); }

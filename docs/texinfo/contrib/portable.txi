@@ -92,7 +92,7 @@ and the format specification dictates a certain word size) use the sized types
 from @file{cstypes.h} (e.g. @samp{int32}, @samp{uint8}). Consequently, also 
 avoid constructs such as casting pointers to @samp{int}s. If there's a rare 
 case that no other way than casting a pointer to/from an integral type, use the 
-value of the @samp{CS_PROCSIZE} macro (usually 32 or 64) to determine an 
+value of the @samp{CS_PROCESSOR_SIZE} macro (usually 32 or 64) to determine an 
 appropriate sized type.
 
 @item

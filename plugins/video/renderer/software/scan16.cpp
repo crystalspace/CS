@@ -28,9 +28,9 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if defined (PROC_X86) && defined (DO_NASM)
+#if defined (CS_PROCESSOR_X86) && defined (CS_USE_NASM)
 #  include "i386/scan16a.h"
-#endif // PROC_X86
+#endif // CS_PROCESSOR_X86
 
 #if defined (CS_LITTLE_ENDIAN)
 #  define LEFT(x)	(x & 0xffff)
