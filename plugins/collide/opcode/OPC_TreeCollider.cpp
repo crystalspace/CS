@@ -43,22 +43,22 @@ using namespace Opcode;
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AABBTreeCollider::AABBTreeCollider() :
-	mNbBVBVTests		(0),
-	mNbBVPrimTests		(0),
-	mNbPrimPrimTests	(0),
-	mFullBoxBoxTest		(true),
-	mFullPrimBoxTest	(true),
 #ifdef OPC_USE_CALLBACKS
 	mUserData0			(0),
 	mUserData1			(0),
 	mObjCallback0		(null),
-	mObjCallback1		(null)
+	mObjCallback1		(null),
 #else
 	mFaces0				(null),
 	mFaces1				(null),
 	mVerts0				(null),
 	mVerts1				(null)
 #endif
+	mNbBVBVTests		  (0),
+	mNbPrimPrimTests	(0),
+  mNbBVPrimTests		(0),
+	mFullBoxBoxTest		(true),
+	mFullPrimBoxTest	(true)
 {
 }
 
