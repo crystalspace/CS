@@ -4,7 +4,7 @@
 #    numbers and propagate them to the generated make and Jam property files.
 #
 # Copyright (C)2003 by Matthias Braun <matze@braunis.de>
-# Copyright (C)2003 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -37,11 +37,15 @@ AC_DEFUN([CS_PACKAGEINFO],
 
 
 #------------------------------------------------------------------------------
-# CS_EMIT_PACKAGEINFO(TARGET)
-#	Emit extended package information to a designated target.  If TARGET is
-#	"jam", then information is emitted via CS_JAMCONFIG_PROPERTY macros.
-#	If TARGET is "make", then information is emitted via
-#	CS_MAKEFILE_PROPERTY macros.
+# CS_EMIT_PACKAGEINFO([EMITTER])
+#	Emit extended package information using the provided EMITTER.  EMITTER
+#	is a macro name, such as CS_JAMCONFIG_PROPERTY or CS_MAKEFILE_PROPERTY,
+#	which performs the actual task of emitting the KEY/VALUE tuple.  If
+#	EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.  For backward
+#	compatibility, if EMITTER is the literal value "jam", then
+#	CS_JAMCONFIG_PROPERTY is used; if it is "make", then
+#	CS_MAKEFILE_PROPERTY is used; however use of these literal names is
+#	highly discouraged.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_PACKAGEINFO],
     [_CS_EMIT_PACKAGEINFO([$1], [PACKAGE_NAME], [$PACKAGE_NAME])
@@ -51,18 +55,14 @@ AC_DEFUN([CS_EMIT_PACKAGEINFO],
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_LONGNAME], [$PACKAGE_LONGNAME])
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_HOMEPAGE], [$PACKAGE_HOMEPAGE])
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_COPYRIGHT], [$PACKAGE_COPYRIGHT])
-    m4_define([cs_ver_components], m4_translit(AC_PACKAGE_VERSION, [.], [ ]))
-    m4_case([$1],
-    [make], [CS_MAKEFILE_PROPERTY([PACKAGE_VERSION_LIST], cs_ver_components)],
-    [jam], [CS_JAMCONFIG_APPEND([PACKAGE_VERSION_LIST ?= cs_ver_components ;
-])],
-    [_CS_EMIT_PACKAGEINFO_FATAL([$1])])])
+    for cs_veritem in m4_translit(AC_PACKAGE_VERSION, [.], [ ]); do
+	_CS_EMIT_PACKAGEINFO([$1], [PACKAGE_VERSION_LIST], [$cs_veritem], [+])
+    done
+    ])
 
 AC_DEFUN([_CS_EMIT_PACKAGEINFO],
     [m4_case([$1],
 	[make], [CS_MAKEFILE_PROPERTY([$2], [$3], [$4])],
 	[jam], [CS_JAMCONFIG_PROPERTY([$2], [$3], [$4])],
-	[_CS_EMIT_PACKAGEINFO_FATAL([$1])])])
-
-AC_DEFUN([_CS_EMIT_PACKAGEINFO_FATAL],
-    [AC_FATAL([CS_EMIT_PACKAGEINFO: unrecognized emitter ([$1])])])
+	[], [CS_JAMCONFIG_PROPERTY([$2], [$3], [$4])],
+	[$1([$2], [$3], [$4])])])

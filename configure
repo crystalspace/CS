@@ -35569,9 +35569,11 @@ cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_NAME ?= \"$PACKAGE_NAME\" ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_COPYRIGHT ?= \"$PACKAGE_COPYRIGHT\" ;
 "
-
-    cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION_LIST ?= 0 97 ;
+    for cs_veritem in 0 97; do
+	cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_VERSION_LIST += \"$cs_veritem\" ;
 "
+    done
+
 
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
