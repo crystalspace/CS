@@ -32,7 +32,7 @@ awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) : awsSourc
   this->object_reg = object_reg;
   ehSetup = false;
   bSetup = false;
-  stopped = false;
+  stopped = true;
   vc = NULL;
 }
 
