@@ -28,6 +28,9 @@ BIN_DIR=bin
 # test for endianess
 . ${BIN_DIR}/endtest.sh
 
+# Check for python
+. ${BIN_DIR}/haspythn.sh
+
 # test for phyton
 # Phyton doesn't work yet
 #. ${BIN_DIR}/haspythn.sh

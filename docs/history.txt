@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+10-Dec-2001
+	- Matze enabled python in cygwin port. (I didn't touch anything, but as
+	  I tried it again today, it suddenly worked :)
 9-Dec-2001
 	- Optimized the matrix multiply routine considerably (the
 	  *= operator) by avoiding the copy of 'this'. Instead
