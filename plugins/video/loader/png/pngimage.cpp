@@ -305,12 +305,12 @@ error2:
     }
     png_set_PLTE (png, info, palette, max_color+1);
 
-    if (Image->HasKeycolor())
+    if (Image->HasKeyColor())
     {
       // Get the keycolor palette index and write the appropriate
       // tRNS chunk.
       int key_r, key_g, key_b;
-      Image->GetKeycolor (key_r, key_g, key_b);
+      Image->GetKeyColor (key_r, key_g, key_b);
       csRGBpixel key (key_r, key_g, key_b);
       int key_index = closest_index (Image, &key);
       png_bytep trans = new png_byte[key_index + 1];
@@ -323,10 +323,10 @@ error2:
   else
   {
     //Write tRNS chunk with keycolor.
-    if (Image->HasKeycolor())
+    if (Image->HasKeyColor())
     {
       int key_r, key_g, key_b;
-      Image->GetKeycolor (key_r, key_g, key_b);
+      Image->GetKeyColor (key_r, key_g, key_b);
       png_color_16 trans;
       memset (&trans, 0, sizeof(trans));
       trans.red = big_endian_short (key_r << 8);

@@ -211,7 +211,7 @@ void csTextureWrapper::TextureWrapper::SetKeyColor (
 void csTextureWrapper::TextureWrapper::GetKeyColor (
   int &red,
   int &green,
-  int &blue)
+  int &blue) const
 {
   scfParent->GetKeyColor (red, green, blue);
 }
@@ -221,7 +221,7 @@ void csTextureWrapper::TextureWrapper::SetFlags (int flags)
   scfParent->SetFlags (flags);
 }
 
-int csTextureWrapper::TextureWrapper::GetFlags ()
+int csTextureWrapper::TextureWrapper::GetFlags () const
 {
   return scfParent->GetFlags ();
 }
@@ -237,7 +237,7 @@ void csTextureWrapper::TextureWrapper::SetUseCallback (
   scfParent->SetUseCallback (callback);
 }
 
-iTextureCallback *csTextureWrapper::TextureWrapper::GetUseCallback ()
+iTextureCallback *csTextureWrapper::TextureWrapper::GetUseCallback () const
 {
   return scfParent->GetUseCallback ();
 }

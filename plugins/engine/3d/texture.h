@@ -78,8 +78,8 @@ private:
   // update our key color with that from the image
   void UpdateKeyColorFromImage ()
   {
-    if(image->HasKeycolor ())
-      image->GetKeycolor( key_col_r, key_col_g, key_col_b );
+    if(image->HasKeyColor ())
+      image->GetKeyColor( key_col_r, key_col_g, key_col_b );
     else
       key_col_r = -1;
   }
@@ -118,13 +118,13 @@ public:
   /// Set the transparent color.
   void SetKeyColor (int red, int green, int blue);
   /// Query the transparent color.
-  void GetKeyColor (int &red, int &green, int &blue)
+  void GetKeyColor (int &red, int &green, int &blue) const
   { red = key_col_r; green = key_col_g; blue = key_col_b; }
 
   /// Set the flags which are used to register the texture
   void SetFlags (int flags) { csTextureWrapper::flags = flags; }
   /// Return the flags which are used to register the texture
-  int GetFlags () { return flags; }
+  int GetFlags () const { return flags; }
 
   /// Register the texture with the texture manager
   void Register (iTextureManager *txtmng);
@@ -143,7 +143,7 @@ public:
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  iTextureCallback* GetUseCallback ()
+  iTextureCallback* GetUseCallback () const
   {
     return use_callback;
   }
@@ -183,12 +183,12 @@ public:
       return scfParent->GetTextureHandle ();
     }
     virtual void SetKeyColor (int red, int green, int blue);
-    virtual void GetKeyColor (int &red, int &green, int &blue);
+    virtual void GetKeyColor (int &red, int &green, int &blue) const;
     virtual void SetFlags (int flags);
-    virtual int GetFlags ();
+    virtual int GetFlags () const;
     virtual void Register (iTextureManager *txtmng);
     virtual void SetUseCallback (iTextureCallback* callback);
-    virtual iTextureCallback* GetUseCallback ();
+    virtual iTextureCallback* GetUseCallback () const;
     virtual void Visit ()
     {
       scfParent->Visit ();

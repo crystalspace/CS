@@ -612,7 +612,7 @@ bool csThingLoader::ParsePoly3d (
         iImage* im = tw->GetImageFile ();
         if (im)
         {
-          is_texture_transparent = im->HasKeycolor () ||
+          is_texture_transparent = im->HasKeyColor () ||
 	    (im->GetFormat () & CS_IMGFMT_ALPHA);
         }
       }

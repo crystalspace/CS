@@ -155,9 +155,9 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       texWrap->GetKeyColor(r, g, b);
       if (r != -1)
       {
-        if (img->HasKeycolor())
+        if (img->HasKeyColor())
         {
-          img->GetKeycolor(r2, g2, b2);
+          img->GetKeyColor(r2, g2, b2);
         }
         if (r != r2 || g != g2 || b != b2)
           CreateValueNodeAsColor(child, "transparent",
