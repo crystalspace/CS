@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Dec-2003
+	- Marten removed String shadervariabletype.
+	- Marten added accessors to shadervariable system. Currently they
+	  are only implemented for genmesh buffers, but they should be
+	  implemented in all meshtypes.
 12-Dec-2003
 	- res updated the terrain-related shaders.
 	- res fixed the distorted 2D with the GL NR.

@@ -41,6 +41,8 @@ struct iShaderCompiler;
 
 struct csRenderMesh;
 
+
+
 SCF_VERSION (iShaderVariableContext, 0, 0, 1);
 
 /**
@@ -172,8 +174,6 @@ struct iShaderCompiler : iBase
 
   /// Check if template is parsable by this compiler
   virtual bool IsTemplateToCompiler (iDocumentNode *templ) = 0;
-
 };
-
 
 #endif // __CS_IVIDEO_SHADER_H__

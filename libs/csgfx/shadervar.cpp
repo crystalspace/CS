@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2002 by Mårten Svanfeldt
-                          Anders Stenberg
+    Copyright (C) 2002-2003 by Mårten Svanfeldt
+                  2002      by Anders Stenberg
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,37 +30,41 @@ static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
 
 
 csShaderVariable::csShaderVariable (csStringID name) : csRefCount (), 
-  String(0), TextureHandValue(0), TextureWrapValue(0), VectorValue(0), 
-  Name (name) 
+  TextureHandValue(0), TextureWrapValue(0), VectorValue(0), 
+  Name (name) , accessor(0)
 {
 }
 
 csShaderVariable& csShaderVariable::operator= (
-  const csShaderVariable& copyFrom)
+  csShaderVariable& copyFrom)
 {
   switch (copyFrom.Type)
   {
     case INT:
       {
-	SetValue (copyFrom.Int);
-      }
-      break;
-    case STRING:
-      {
-	SetValue (copyFrom.String);
+        int val;
+        copyFrom.GetValue (val); 
+        SetValue (val);
       }
       break;
     case TEXTURE:
       {
 	if (copyFrom.TextureWrapValue != 0)
-	  SetValue (copyFrom.TextureWrapValue);
+        {
+          iTextureWrapper *val;
+          copyFrom.GetValue (val);  SetValue (val);
+        }
 	else
-	  SetValue (copyFrom.TextureHandValue);
+        {
+          iTextureHandle* val;
+	  copyFrom.GetValue (val);  SetValue (val);
+        }
       }
       break;
     case RENDERBUFFER:
       {
-	SetValue (copyFrom.RenderBuffer);
+        iRenderBuffer* val;
+	copyFrom.GetValue (val);  SetValue (val);
       }
       break;
     case FLOAT:

@@ -204,7 +204,6 @@ void csShaderGLAVP::BuildTokenHash()
   // the XMLTOKENs start with 100
   xmltokens.Register ("integer", csShaderVariable::INT);
   xmltokens.Register ("float", csShaderVariable::FLOAT);
-  xmltokens.Register ("string", csShaderVariable::STRING);
   xmltokens.Register ("vector3", csShaderVariable::VECTOR3);
 }
 
@@ -257,10 +256,6 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
                 break;
               case csShaderVariable::FLOAT:
                 var->SetValue (child->GetAttributeValueAsFloat ("default"));
-                break;
-              case csShaderVariable::STRING:
-                var->SetValue(new scfString (child->GetAttributeValue (
-			"default")));
                 break;
               case csShaderVariable::VECTOR3:
                 const char* def = child->GetAttributeValue("default");

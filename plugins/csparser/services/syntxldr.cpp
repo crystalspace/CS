@@ -650,10 +650,6 @@ bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
       var->SetType (csShaderVariable::FLOAT);
       var->SetValue (node->GetContentsValueAsFloat ());
       break;
-    case XMLTOKEN_STRING:
-      var->SetType (csShaderVariable::STRING);
-      var->SetValue (new scfString(node->GetContentsValue ()));
-      break;
     case XMLTOKEN_VECTOR2:
       var->SetType (csShaderVariable::VECTOR2);
       {

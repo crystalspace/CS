@@ -72,7 +72,7 @@ void csGLShaderFVP::Deactivate()
 void csGLShaderFVP::SetupState (csRenderMesh *mesh,
                                 csArray<iShaderVariableContext*> &dynamicDomains)
 {
-  int i,j;
+  int i;
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.renderer.stringset", iStringSet);
@@ -248,7 +248,6 @@ void csGLShaderFVP::BuildTokenHash()
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+csShaderVariable::STRING);
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 

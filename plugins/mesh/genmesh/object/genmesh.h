@@ -41,6 +41,7 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
+#include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
 struct iMaterialWrapper;
@@ -410,11 +411,9 @@ private:
 #ifndef CS_USE_NEW_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
-#endif
-  iMaterialWrapper* material;
-#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh top_mesh;
 #endif
+  iMaterialWrapper* material;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csVector3* mesh_normals;
@@ -442,9 +441,6 @@ private:
   csRef<iRenderBuffer> index_buffer;
   
   csAnonRenderBufferManager anon_buffers;
-  /*csRefArray<iRenderBuffer> anon_buffers;
-  csDirtyAccessArray<csStringID> anon_names;
-  csDirtyAccessArray<int> anon_size;*/
 #endif
 
   csVector3 radius;
@@ -497,11 +493,6 @@ public:
   csGenmeshMeshObjectType* genmesh_type;
 
   iEngine* engine;
-
-  //@@@ Crashes istest and isomap - NEW RENDERER ???
-#ifdef CS_USE_NEW_RENDERER
-  csRef<iMaterialWrapper> shadowmat;
-#endif
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -571,17 +562,6 @@ public:
     SetupFactory ();
     return top_mesh;
   }
-#else
-  iRenderBuffer *GetRenderBuffer (csStringID name);
-  bool UpdateRenderBuffers ();
-  //------------------------- iRenderBufferSource implementation ----------------
-  /*class BufferSource : public iRenderBufferSource 
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    iRenderBuffer *GetRenderBuffer (csStringID name)
-	{ return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-  friend class BufferSource;*/
 #endif
 
   //------------------------ iMeshObjectFactory implementation --------------
@@ -730,6 +710,23 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+
+  //------------------ iShaderVariableAccessor implementation ------------
+  class ShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    csGenmeshMeshObjectFactory* parent;
+    ShaderVariableAccessor (csGenmeshMeshObjectFactory* p) : parent(p)
+    {}
+
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      parent->PreGetShaderVariableValue (variable);
+    }
+  } shaderVarAccessor;
+  friend class ShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
 };
 
 /**

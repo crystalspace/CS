@@ -498,9 +498,6 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
       case XMLTOKEN_FLOAT:
 	svVar->SetValue (var->GetAttributeValueAsFloat("default"));
 	break;
-      case XMLTOKEN_STRING:
-	svVar->SetValue (new scfString( var->GetAttributeValue("default")) );
-	break;
       case XMLTOKEN_VECTOR3:
 	const char* def = var->GetAttributeValue("default");
 	csVector3 v;
