@@ -2,57 +2,59 @@ The history order has been reversed so that new features are at the top.
 
 19-Jun-2000
 	- Wouter Wijngaards added a new snow particle system.
-	- Added 'snow' console command that works almost the same as
-	  the 'rain' console command.
-	- Fixed a bug in 'rain' and 'snow' commands with speeds other
-	  than the default. Also made raindrop.png and snow.jpg default
-	  so you can type just 'rain' or 'snow'. Default number of particles
-	  is now 500.
-	- Tried an experimental change to OpenGL to minimize the amount
-	  of processing between glBegin/glEnd. There is an OpenGL
-	  performance FAQ which says you should do almost nothing except
-	  glVertex,glNormal, glTexCoords, ... calls between glBegin/glEnd.
-	  So I changed DrawPolygon so that it first calculates and copies
-	  the results in a few arrays.
+	- Added 'snow' console command that works almost the same as the
+	  'rain' console command.
+	- Fixed a bug in 'rain' and 'snow' commands with speeds other than the
+	  default.  Also made raindrop.png and snow.jpg default so you can
+	  type just 'rain' or 'snow'.  Default number of particles is now 500.
+	- Tried an experimental change to OpenGL to minimize the amount of
+	  processing between glBegin/glEnd.  There is an OpenGL performance
+	  FAQ which says you should do almost nothing except
+	  glVertex,glNormal, glTexCoords, ...  calls between glBegin/glEnd.
+	  So I changed DrawPolygon so that it first calculates and copies the
+	  results in a few arrays.
 	- Fixed a bug in csString as reported by George Yohng
 	  <yohng@drivex.dosware.8m.com>.
-	- Got a new patch from Travis McIntosh. This patch finished
-	  pseudo-dynamic lighting for curved surfaces. Works nicely now.
+	- Got a new patch from Travis McIntosh.  This patch finished
+	  pseudo-dynamic lighting for curved surfaces.  Works nicely now.
 	- Update from Andrew Zabolotny:
 	    - Fixed the titlebar title that someone had broken for software
 	      renderer (the window heading used to be empty last week).
 	    - (Finally! :-) fixed the polygon clipper routines so that 2D
 	      sprites (and 3D sprites as well) are clipped in 2D correctly.
-	      The problem was not with the CS_VERTEX_INSIDE case, but with
-	      the fact that sometimes for some CS_VERTEX_ONEDGE vertices
-	      it used to generate incorrectly the 't' parametric value.
-	      More specifically, it happened when an edge was clipped more
-	      than once (against several clipper edges).
-	    - Fixed a bug in software renderer - all polygons were drawn
-	      one pixel up. E.g. with the default renderer view with a 2
-	      pixel border on each side it worked like 3 pixels border at
-	      bottom and 1 pixel border at top.
-	    - Implemented polygon drawing (clipped against other windows!)
-	      in CSWS. This is the first step towards implementing the
-	      solid view window.
-	    - Implemented a little bit of solid view window in MazeD. It
-	      is very limited and buggy for now, but thats a start. Texture
-	      mapping doesn't work (all vertices get u/v == 0) thus you
-	      will see strange colors for textured polygons. Flat-shaded
-	      polygons work.
+	      The problem was not with the CS_VERTEX_INSIDE case, but with the
+	      fact that sometimes for some CS_VERTEX_ONEDGE vertices it used
+	      to generate incorrectly the 't' parametric value.  More
+	      specifically, it happened when an edge was clipped more than
+	      once (against several clipper edges).
+	    - Fixed a bug in software renderer - all polygons were drawn one
+	      pixel up.  E.g.  with the default renderer view with a 2 pixel
+	      border on each side it worked like 3 pixels border at bottom and
+	      1 pixel border at top.
+	    - Implemented polygon drawing (clipped against other windows!) in
+	      CSWS.  This is the first step towards implementing the solid
+	      view window.
+	    - Implemented a little bit of solid view window in MazeD.  It is
+	      very limited and buggy for now, but thats a start.  Texture
+	      mapping doesn't work (all vertices get u/v == 0) thus you will
+	      see strange colors for textured polygons.  Flat-shaded polygons
+	      work.
 	    - Added a new random number generator class to csutil library.
 	      Currently it is unused but I'm going to use it in future,
 	      besides we can switch existing code from rand() to it.
+	- Eric Sunshine worked around OpenStep problem where run-time
+	  construction of global BSP-polygon pool was being botched.
+	- Eric Sunshine eliminated several compilation warnings throughout the
+	  project which were flagged by the OpenStep compiler.
 18-Jun-2000
-	- Norman Kramer fixed Squawk and csgame following the recent modifications
-	  in sprite creation.
+	- Norman Kramer fixed Squawk and csgame following the recent
+	  modifications in sprite creation.
 	- Martin Geisse removed another compiler warning in dungeon plugin.
-	- Added two new tests to 'perftest' to test how grouping of
-	  textures in the 3D rasterizer might benefit performance.
-	  It seems that this would give a great benefit indeed.
-	- Got a new patch from Travis McIntosh to start work for
-	  supporting pseudo-dynamic lights and curved surfaces.
-	  Not finished yet.
+	- Added two new tests to 'perftest' to test how grouping of textures
+	  in the 3D rasterizer might benefit performance.  It seems that this
+	  would give a great benefit indeed.
+	- Got a new patch from Travis McIntosh to start work for supporting
+	  pseudo-dynamic lights and curved surfaces.  Not finished yet.
 	- Eric Sunshine made the following changes to the Crystal Space
 	  documentation:
 	    - Repaired all of the errors and warnings reported by 'makeinfo'
