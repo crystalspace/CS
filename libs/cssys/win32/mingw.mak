@@ -10,10 +10,13 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 # video/renderer/opengl
 #
 PLUGINS += video/renderer/software video/canvas/ddraw
-# sound/renderer/software
+
+ifeq ($(DO_SOUND),yes)
+PLUGINS += sound/renderer/software
+endif
+
 # video/renderer/direct3d5
 # video/renderer/direct3d6
-#video/renderer/opengl
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -32,6 +35,9 @@ COMP=GCC
 # Command to update a target
 #UPD=bin\dosupd.bat $@ DEST
 
+# Win32 console equivalent of Unix rmdir
+RMDIR=deltree /Y
+
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #------------------------------------------------------------------ defines ---#
@@ -47,7 +53,7 @@ ifeq ($(MAKESECTION),defines)
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz -mwindows
+Z_LIBS=-Llibs/zlib -lz
 
 # Where can the PNG library be found on this system?
 PNG_LIBS=-Llibs/libpng -lpng
@@ -83,7 +89,7 @@ CFLAGS.optimize=-s -O3
 CFLAGS.debug=-g
 
 # Flags for the compiler which are used when profiling.
-CFLAGS.profile=-pg -O -g
+CFLAGS.profile=-p -O -g
 
 # Flags for the compiler which are used when building a shared library.
 CFLAGS.DLL=
@@ -98,7 +104,7 @@ LFLAGS.optimize=
 LFLAGS.debug=-g
 
 # Flags for the linker which are used when profiling.
-LFLAGS.profile=-pg
+LFLAGS.profile=-p
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
 # Flags for the linker which are used when building a shared library.
@@ -162,8 +168,11 @@ SYS_SED_DEPEND=
 #Use CC to build Dependencies
 DEPEND_TOOL=cc
 
-# Flags for linking a GUI and a console executable
-LFLAGS.EXE=
+# Flags for linking a GUI [Windows Executable -- WinMain()]
+LFLAGS.EXE= -mwindows
+
+# Flags for linking a console executable [Mingw Console Executable -- Main()]
+LFLAGS.CONSOLE.EXE= -mconsole
 
 endif # ifeq ($(MAKESECTION),defines)
 
