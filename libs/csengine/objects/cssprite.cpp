@@ -739,20 +739,18 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   if (skeleton_state)
   {
     UpdateWorkTables (tpl->num_vertices);
-    skeleton_state->Transform (csTransform (m_obj2world, m_world2obj * v_obj2world), this_frame, tr_verts);
+    skeleton_state->Transform (csTransform (), this_frame, tr_verts);
     object_vertices = tr_verts;
-    // @@@ Computing normals every time is not efficient. We need to do it
-    // only when something changes.
-    this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
   }
   else
-  {
     object_vertices = this_frame->GetVertices ();
-    if (!this_frame->HasNormals ())
-      this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
-  }
+
+  if (!this_frame->HasNormals ())
+    this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
 
   ResetVertexColors ();
+  AddVertexColor (0, csColor (0, 0, 0));
+
   for (i = 0 ; i < num_lights ; i++)
   {
     csColor &light_color = lights [i]->GetColor ();
