@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
 #include "cssys/csendian.h"
 #include <math.h>
@@ -264,7 +265,7 @@ error2:
       break;
     case CS_IMGFMT_TRUECOLOR:
       colortype = (format & CS_IMGFMT_ALPHA) ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB;
-      rowlen = Image->GetWidth () * sizeof (csRGBpixel);
+      rowlen = Image->GetWidth () * 4;
       break;
     default:
       // unknown format
@@ -354,11 +355,24 @@ error2:
 
   /* Writing the image. Interlacing is handled automagically. */
   png_bytep *row_pointers = new png_bytep [height];
-  uint8 *ImageData = (uint8 *)Image->GetImageData ();
+  png_bytep packedData;
+  if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+  {
+    packedData = (png_bytep)csPackRGBpixelToRGBA 
+      ((csRGBpixel *)Image->GetImageData (), width * height);
+  }
+  else
+  {
+    packedData = (png_bytep)Image->GetImageData ();
+  }
   int i;
   for (i = 0; i < height; i++)
-    row_pointers [i] = ImageData + i * rowlen;
+    row_pointers [i] = packedData + i * rowlen;
   png_write_image (png, row_pointers);
+  if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+  {
+    csDiscardPackedRGBA (packedData);
+  }
 
   /* It is REQUIRED to call this to finish writing the rest of the file */
   png_write_end (png, info);
@@ -453,30 +467,101 @@ nomem2:
   png_get_IHDR (png, info, &Width, &Height, &bit_depth, &color_type,
     NULL, NULL, NULL);
 
-  // Strip double-byte color information to 8bpp.
   if (bit_depth > 8)
   {
-      // tell libpng to strip 16 bit/color files down to 8 bits/color
-      png_set_strip_16 (png);
-      bit_depth = 8;
+    // tell libpng to strip 16 bit/color files down to 8 bits/color
+    png_set_strip_16 (png);
+    bit_depth = 8;
   }
+  else if (bit_depth < 8)
+    // Expand pictures with less than 8bpp to 8bpp
+    png_set_packing (png);
 
-  // When alpha channel is missing, always add filler.
-  png_set_filler(png, 0xff, PNG_FILLER_AFTER);
-  
-  // Un-palette images into full rgb components.
-  if (color_type== PNG_COLOR_TYPE_PALETTE){
-      png_set_palette_to_rgb(png);
+  volatile enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
+  int keycolor_index = -1;
 
-      // Transform paletted transparency into alpha channel.
-      if (png_get_valid(png, info, PNG_INFO_tRNS)) {
-          png_set_tRNS_to_alpha(png);
+  switch (color_type)
+  {
+    case PNG_COLOR_TYPE_GRAY:
+    case PNG_COLOR_TYPE_GRAY_ALPHA:
+      if ((Format & CS_IMGFMT_ALPHA) && (color_type & PNG_COLOR_MASK_ALPHA))
+      {
+	ImageType = imgGrayAlpha;
       }
-  }
-  
-  // Convert <8-bit grayscale images to full 8-bit grayscale + alpha.
-  if (color_type == PNG_COLOR_TYPE_GRAY || PNG_COLOR_TYPE_GRAY_ALPHA) {
-      png_set_gray_to_rgb(png);
+      else
+      {
+        // Check if we have keycolor transparency.
+	ImageType = imgPAL;
+	png_set_strip_alpha (png);
+	if (png_get_valid (png, info, PNG_INFO_tRNS))
+	{
+	  png_color_16p trans_values;
+	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  has_keycolour = true;
+	  keycolour_r = convert_endian (trans_values->gray) & 0xff;
+	  keycolour_g = convert_endian (trans_values->gray) & 0xff;
+	  keycolour_b = convert_endian (trans_values->gray) & 0xff;
+	}
+      }
+      break;
+    case PNG_COLOR_TYPE_PALETTE:
+      ImageType = imgPAL;
+      // If we need alpha, take it. If we don't, strip it.
+      if (Format & CS_IMGFMT_ALPHA)
+      {
+	if (png_get_valid (png, info, PNG_INFO_tRNS))
+	{
+	  // tRNS chunk. Every palette entry gets its own alpha value.
+	  png_bytep trans;
+	  int num_trans;
+	  png_get_tRNS (png, info, &trans, &num_trans, NULL);
+	  
+	  // see if there is a single entry w/ alpha==0 and all other 255.
+	  // if yes use keycolor transparency.
+	  bool only_binary_trans = true;
+	  for (int i = 0; (i < num_trans)&& only_binary_trans; i++)
+	  {
+	    if (trans[i] != 0xff)
+	    {
+	      only_binary_trans = only_binary_trans && (trans[i] == 0) 
+		&& (keycolor_index == -1);
+	      keycolor_index = i;
+	    }
+	  }
+	  if (!only_binary_trans)
+	  {
+	    keycolor_index = -1;
+	    png_set_palette_to_rgb (png);
+	    png_set_tRNS_to_alpha (png);
+	    ImageType = imgRGB;
+	  }
+	  else
+	    Format &= ~CS_IMGFMT_ALPHA;
+	}
+      }
+      break;
+    case PNG_COLOR_TYPE_RGB:
+    case PNG_COLOR_TYPE_RGB_ALPHA:
+      ImageType = imgRGB;
+      // If there is no alpha information, fill with 0xff
+      if (!(color_type & PNG_COLOR_MASK_ALPHA))
+      {
+        Format &= ~CS_IMGFMT_ALPHA;
+        // Check if we have keycolor transparency.
+        if (png_get_valid (png, info, PNG_INFO_tRNS))
+	{
+	  png_color_16p trans_values;
+	  png_get_tRNS (png, info, NULL, NULL, &trans_values);
+	  has_keycolour = true;
+	  keycolour_r = convert_endian (trans_values->red) & 0xff;
+	  keycolour_g = convert_endian (trans_values->green) & 0xff;
+	  keycolour_b = convert_endian (trans_values->blue) & 0xff;
+	}
+        png_set_filler (png, 0xff, PNG_FILLER_AFTER);
+      }
+      break;
+    default:
+      goto nomem2;
   }
 
   // Update structure with the above settings
@@ -484,7 +569,12 @@ nomem2:
 
   // Allocate the memory to hold the image
   set_dimensions (Width, Height);
-  exp_rowbytes = Width * sizeof (csRGBpixel);
+  if (ImageType == imgRGB)
+    exp_rowbytes = Width * 4;	  // RGBA
+  else if (ImageType == imgGrayAlpha)
+    exp_rowbytes = Width * 2;	  // GrayA
+  else
+    exp_rowbytes = Width;	  // Index
 
   rowbytes = png_get_rowbytes (png, info);
   if (rowbytes != exp_rowbytes)
@@ -498,8 +588,13 @@ nomem2:
     goto nomem2;
   }
 
-  void *NewImage = new csRGBpixel [Width * Height];
-
+  uint8 *NewImage = NULL;
+  if (ImageType == imgRGB)
+    NewImage = new uint8 [Width * Height * 4];
+  else if (ImageType == imgGrayAlpha)
+    NewImage = new uint8 [Width * Height * 2];
+  else
+    NewImage = new uint8 [Width * Height];
   if (!NewImage)
     goto nomem2;
 
@@ -512,8 +607,68 @@ nomem2:
   // read rest of file, and get additional chunks in info_ptr
   png_read_end (png, (png_infop)NULL);
 
-  // Convert our image over.
-  convert_rgba ((csRGBpixel *)NewImage);
+  if (ImageType == imgRGB)
+  {
+    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel
+      (NewImage, Width * Height);
+    convert_rgba (rgbImage);
+    delete[] NewImage;
+  }
+  else if (ImageType == imgPAL)
+  {
+    png_color graypal [256];
+    png_color *png_palette = NULL;
+    csRGBcolor *palette;
+    int colors, i;
+    if (!png_get_PLTE (png, info, &png_palette, &colors))
+    {
+      // This is a grayscale image, build a grayscale palette
+      png_palette = graypal;
+      int entries = (1 << bit_depth) - 1;
+      colors = entries + 1;
+      for (i = 0; i <= entries; i++)
+        png_palette [i].red = png_palette [i].green = png_palette [i].blue =
+          (i * 255) / entries;
+    }
+    // copy PNG palette.
+    palette = new csRGBcolor[colors];
+    for (i = 0; i < colors; i++)
+    {
+      palette[i].red = png_palette[i].red;
+      palette[i].green = png_palette[i].green;
+      palette[i].blue = png_palette[i].blue;
+    }
+    if (keycolor_index != -1)
+    {
+      has_keycolour = true;
+      keycolour_r = palette[keycolor_index].red;
+      keycolour_g = palette[keycolor_index].green;
+      keycolour_b = palette[keycolor_index].blue;
+    }
+    convert_pal8 ((uint8 *)NewImage, palette, colors);
+    delete[] palette;
+  }
+  else // grayscale + alpha
+  {
+    // This is a grayscale image, build a grayscale palette
+    csRGBpixel *palette = new csRGBpixel [256];
+    int i, entries = (1 << bit_depth) - 1;
+    for (i = 0; i <= entries; i++)
+      palette [i].red = palette [i].green = palette [i].blue =
+        (i * 255) / entries;
+
+    int pixels = Width * Height;
+    uint8 *image = new uint8 [pixels];
+    Alpha = new uint8 [pixels];
+    uint8 *src = (uint8 *)NewImage;
+    for (i = 0; i < pixels; i++)
+    {
+      image [i] = *src++;
+      Alpha [i] = *src++;
+    }
+    delete [] (uint8 *)NewImage;
+    convert_pal8 (image, palette);
+  }
 
   // clean up after the read, and free any memory allocated
   png_destroy_read_struct (&png, &info, (png_infopp) NULL);

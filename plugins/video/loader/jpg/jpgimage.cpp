@@ -25,20 +25,13 @@
 #include "csutil/scf.h"
 #include "jpgimage.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
 #include "ivaria/reporter.h"
 
 extern "C"
 {
 #define jpeg_boolean boolean
-/*#if defined (OS_WIN32)
-#if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
-#  define HAVE_BOOLEAN	// we need int booleans, not Windows unsigned char bools
-#  define boolean int
-#  undef jpeg_boolean 
-#  define jpeg_boolean int
-#endif
-#endif*/
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
 #define INT32 JPEG_INT32
 #include <jpeglib.h>
@@ -280,7 +273,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   if (quality < 0) quality = 0;
   if (quality > 100) quality = 100;
 
-  csRGBcolor* volatile row = NULL;
+  JSAMPLE* volatile row = NULL;
   struct jpg_datastore ds;
   struct jpeg_compress_struct cinfo;
   struct my_error_mgr jerr;
@@ -306,26 +299,28 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   cinfo.input_components = 3;
   cinfo.in_color_space = JCS_RGB;
 
-  row = new csRGBcolor[cinfo.image_width];
   jpeg_set_defaults (&cinfo);
   jpeg_set_quality (&cinfo, quality, true);
   if (progressive) jpeg_simple_progression (&cinfo);
   jpeg_start_compress (&cinfo, true);
 
   JSAMPROW row_pointer[1];
-  csRGBpixel *image = (csRGBpixel*)Image->GetImageData ();
+  JSAMPLE *image = (JSAMPLE*)csPackRGBpixelToRGB
+    ((csRGBpixel*)Image->GetImageData (),
+     Image->GetWidth () * Image->GetHeight ());
   row_pointer[0] = (JSAMPLE*)&row[0];
 
   while (cinfo.next_scanline < cinfo.image_height)
   {
-    for (size_t i=0; i < cinfo.image_width; i++)
-      row[i] = image[cinfo.next_scanline * cinfo.image_width + i];
+    row_pointer[0] = 
+      (JSAMPLE*)&image[cinfo.next_scanline * cinfo.image_width * 3];
     jpeg_write_scanlines (&cinfo, row_pointer, 1);
   }
 
   jpeg_finish_compress (&cinfo);
   jpeg_destroy_compress (&cinfo);
 
+  delete[] image;
   delete [] row;
 
   /* make the iDataBuffer to return */
