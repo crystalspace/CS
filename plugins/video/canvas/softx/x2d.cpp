@@ -100,7 +100,7 @@ void csGraphics2DXLib::Initialize ()
   pfmt.PalEntries = vinfo.colormap_size;
   if (vclass == TrueColor)
     pfmt.PalEntries = 0;
-  if (vinfo.depth == 24)
+  if (vinfo.depth == 24 || vinfo.depth == 32)
     pfmt.PixelBytes = 4;
   else if (pfmt.PalEntries)
     pfmt.PixelBytes = 1;		// Palette mode
