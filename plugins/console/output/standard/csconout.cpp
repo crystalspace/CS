@@ -29,7 +29,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "cssys/csevent.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 
 IMPLEMENT_IBASE(csConsoleOutput)

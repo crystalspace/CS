@@ -47,7 +47,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/terrobj.h"
 #include "csparser/impexp.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/scanstr.h"
 #include "csobject/dataobj.h"
 #include "csobject/csobject.h"

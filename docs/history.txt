@@ -1,5 +1,45 @@
 The history order is reversed so that new features are at the top.
 
+@@@ ADD: libs/csgeom/subrec.cpp libs/csgeom/csrect.cpp
+@@@ ADD: include/csgeom/subrec.h include/csgeom/csrect.h
+@@@ REM: libs/csutil/csrect.cpp include/csutil/csrect.h
+
+21-May-2001
+	- Added non-functional emit loader/saver which Wouter can complete.
+20-May-2001
+	- Philip Wyett started a big overhaul of CS/Visual C++ docs.
+	- Wouter Wijngaards added an emittor particle system. This is a very
+	  configurable particle system. It has the following options:
+	    - You can set the particle start position, start speed, start
+	      accel from a host of generation functions.
+	    - During the lifetime of the particle, the color, alpha,
+	      swirlyness of movement, rotationspeed and scale are animated.
+	      These values are interpolated from given values.
+	    - You can specify an attractor for the particles. Particles tend
+	      to go towards the attractor point. The attractor point is
+	      gotten per particle. You can also use a NULL attractor - none
+	      will be used.
+	    - The bounding box of the system is now pretty smart - each time
+	      a particle is started or moves, the bbox is updated.
+	    - You can use either rectangular sprite2ds or you can use regular
+	      shaped (n-sided) sprite2ds with this particle system.
+	  This particle system should be able to also do the behaviour of
+	  the fountain, rain, snow, fire and explosion particle systems.
+	  (But those are probably a little more efficient at what they do).
+	- Norman Kramer added a sound renderer using the artsd soundserver
+	  that comes with the aRts system (see www.arts-project.org). This
+	  is not operational yet (well at one point the tt testprogram worked,
+	  but after an evening full of moving code back and forth im sure it
+	  wont now).
+19-May-2001
+	- Moved csRect from csutil to csgeom. First I believe it belongs
+	  there, and secondly I need csRect for another new class that
+	  I'm going to put in csgeom.
+	- Started new csSubRectangles class. This class represents a region
+	  from which you can allocate smaller rectangles until the region is
+	  empty. This class is going to be used for combining lightmaps
+	  efficiently into a bigger texture (OpenGL). It is currently not
+	  operational yet.
 18-May-2001
 	- Since the new lightmap format seems to work well I removed the
 	  optional support for the old format.
@@ -13,6 +53,11 @@ The history order is reversed so that new features are at the top.
 	- Wouter also fixed the slopefunction so it now is much more robust
 	  in several respects. The values it returns can be pretty large,
 	  say in 0.. 4xterrainheight or so.
+	- Wouter fixed procedural water, so that it will look nice in
+	  software mode. No more pixelized look. By removing the
+	  proc.texture.only flag.
+	- Thomas Hieber made the output format of map2cs even better.
+	  (but Walktest still decides to crash when loading).
 17-May-2001
 	- Fixed Blocks so it compiles again.
 	- Did an experimental optimization. CS will now keep the lightmap

@@ -40,7 +40,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/terrobj.h"
 #include "csparser/impexp.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csobject/dataobj.h"
 #include "csfx/cspixmap.h"
 #include "iengine/collider.h"

@@ -27,7 +27,7 @@
 #include "ivideo/material.h"
 #include "isys/event.h"
 #include "isys/vfs.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"

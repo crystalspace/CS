@@ -100,8 +100,8 @@ struct iEvent;
 #ifndef CSWS_INTERNAL
 
 // Include all Windowing System components
+#include "csgeom/csrect.h"		// Rectangle class
 #include "csutil/csbase.h"		// Base class
-#include "csutil/csrect.h"		// Rectangle class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
 #include "csutil/csobjvec.h"		// Vector of csBase heirs

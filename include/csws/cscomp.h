@@ -20,8 +20,8 @@
 #ifndef __CSCOMP_H__
 #define __CSCOMP_H__
 
+#include "csgeom/csrect.h"
 #include "csutil/csbase.h"
-#include "csutil/csrect.h"
 #include "csutil/csobjvec.h"
 #include "csfx/cspixmap.h"
 #include "cswspal.h"

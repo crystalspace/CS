@@ -21,9 +21,9 @@
 
 #include "csutil/scf.h"
 #include "isys/plugin.h"
-#include "csutil/csrect.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
+#include "csgeom/csrect.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 

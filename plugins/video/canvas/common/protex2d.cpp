@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "protex2d.h"
 #include "csutil/scf.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "isys/event.h"
 

@@ -20,8 +20,8 @@
 #ifndef __CSGFXPPL_H__
 #define __CSGFXPPL_H__
 
+#include "csgeom/csrect.h"
 #include "csutil/csbase.h"
-#include "csutil/csrect.h"
 #include "csfx/cspixmap.h"
 #include "ivideo/graph2d.h"
 

@@ -20,7 +20,7 @@
 #ifndef __POLYAA_H__
 #define __POLYAA_H__
 
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 
 class csVector2;
 

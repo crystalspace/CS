@@ -24,7 +24,7 @@
 #include "cssysdef.h"
 #include "simpcon.h"
 #include "csutil/util.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "cssys/csevent.h"
 #include "ivideo/graph2d.h"

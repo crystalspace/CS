@@ -1,5 +1,6 @@
 /*
-    Crystal Space Windowing System: rectangle class
+    Crystal Space Engine: rectangle class interface
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -18,7 +19,7 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 
 csRect::csRect () : csBase()
 {

@@ -37,7 +37,7 @@
 #include "csengine/meshobj.h"
 #include "csengine/csview.h"
 #include "csengine/octree.h"
-#include "csutil/csrect.h"
+#include "csgeom/csrect.h"
 #include "csobject/dataobj.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"

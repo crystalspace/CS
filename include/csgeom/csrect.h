@@ -1,5 +1,6 @@
 /*
-    Crystal Space Windowing System: rectangle class interface
+    Crystal Space Engine: rectangle class interface
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -20,13 +21,11 @@
 #ifndef __CSRECT_H__
 #define __CSRECT_H__
 
-#include "cstypes.h"
 #include "csutil/csbase.h"
 
 /**
  * Rectangle class: simple class for manipulating 2D rectangles.
- * This class is somewhat similar to Box, but uses integer coordinates
- * and is mostly used for CrystalSpace Windowing System.<p>
+ * This class is somewhat similar to Box, but uses integer coordinates.<p>
  * Example of a rectangle (xmin = 0, ymin = 0, xmax = 3, ymax = 2):
  * <pre>
  *     0  1  2  3  4 ...
