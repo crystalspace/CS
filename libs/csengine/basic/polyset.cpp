@@ -27,7 +27,6 @@
 #include "csengine/sector.h"
 #include "csengine/curve.h"
 #include "csengine/rview.h"
-#include "csengine/wirefrm.h"
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csobject/nameobj.h"
@@ -436,9 +435,6 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
   int num_verts;
   int i;
   
-  csWireFrame* wf = NULL;
-  if (csWorld::current_world->map_mode != MAP_OFF) wf = csWorld::current_world->wf->GetWireframe ();
-  
   for (i = 0 ; i < num ; i++)
   {
     csVector2 orig_triangle[3];
@@ -468,14 +464,10 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
          p->DoPerspective (*d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d->IsMirrored ())  &&
          csPolygon2D::clipped.ClipAgainst (d->view) )
     {
-      if (wf)
+      if (d->callback)
       {
-        int j;
-        csWfPolygon* po = wf->AddPolygon ();
-        po->SetVisColor (wf->GetYellow ());
-        po->SetNumVertices (p->GetNumVertices ());
-        for (j = 0 ; j < p->GetNumVertices () ; j++) po->SetVertex (j, p->Vwor (j));
-        po->Prepare ();
+        d->callback (d, CALLBACK_POLYGON, (void*)p);
+        d->callback (d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
       }
 
       Stats::polygons_drawn++;
@@ -516,13 +508,16 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
 	// true for Things and false for sectors so this works now.
         if (po->Draw (&csPolygon2D::clipped, &p->GetPlane ()->GetCameraPlane (), use_z_buf, *d))
         {
-	  if (filtered)
-	    keep_clipped->DrawFilled (d->g3d, p, keep_plane, d->IsMirrored (),
-		use_z_buf, orig_triangle);
-	  if (is_this_fog) keep_clipped->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
-		sector->GetID (), CS_FOG_BACK);
+	  if (!d->callback)
+	  {
+	    if (filtered)
+	      keep_clipped->DrawFilled (d->g3d, p, keep_plane, d->IsMirrored (),
+		  use_z_buf, orig_triangle);
+	    if (is_this_fog) keep_clipped->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
+		  sector->GetID (), CS_FOG_BACK);
+	  }
         }
-        else
+        else if (!d->callback)
 	  csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
 		use_z_buf, orig_triangle);
               
@@ -533,20 +528,9 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
           CHK (delete keep_plane);
         }
       }
-      else
+      else if (!d->callback)
         csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
       	  use_z_buf, orig_triangle);
-          
-      long do_edges;
-      d->g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
-      if (do_edges)
-      {
-        ITextureManager* txtmgr;
-        d->g3d->GetTextureManager (&txtmgr);
-        int white;
-        txtmgr->FindRGB (255, 255, 255, white);
-        csPolygon2D::clipped.Draw (d->g2d, white);
-      }
     }
   }
 }
