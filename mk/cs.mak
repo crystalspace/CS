@@ -77,6 +77,9 @@ endif
 ifeq ($(DO_ASM),no)
   CFLAGS+=$(CFLAGS.D)NO_ASSEMBLER
 endif
+ifeq ($(MODE),debug)
+  CFLAGS+=$(CFLAGS.D)DEBUG
+endif
 
 # Memory debugger
 ifdef MEMDBG
