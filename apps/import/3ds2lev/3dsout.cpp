@@ -424,6 +424,9 @@ pointfound:
     return false;
 
 #if 1
+// Note to Matze: the test below is much better than the RelaxedPlanesEqual
+// test. It is more robust. However the value of 0.01 requires tweaking...
+// This value depends on the scale used. So it probably has to be a parameter.
   double dist = plane->Distance (vectors[nonshared]);
 printf ("\npl:%g,%g,%g,%g\n", plane->norm.x, plane->norm.y, plane->norm.z,
 	plane->DD);
