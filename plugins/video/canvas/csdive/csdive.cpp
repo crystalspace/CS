@@ -232,7 +232,6 @@ void csGraphics2DOS2DIVE::Initialize ()
   {
     case 32:
       for (int i = 0; i < (int)vmCount; i++)
-      {
         if (vmList[i].PixelFormat == FOURCC_RGB4
          || vmList[i].PixelFormat == FOURCC_BGR4)
         {
@@ -245,12 +244,13 @@ void csGraphics2DOS2DIVE::Initialize ()
           if (PixelFormat == FOURCC_LUT8)
             PixelFormat = vmList[i].PixelFormat;
         } /* endif */
-      } /* endfor */
       if (PixelFormat != FOURCC_LUT8)
         break;
+#if 0
+    // When Crystal Space (hopefully) oneday will support
+    // 24 bpp modes, enable this branch
     case 24:
       for (int i = 0; i < (int)vmCount; i++)
-      {
         if (vmList[i].PixelFormat == FOURCC_RGB3
          || vmList[i].PixelFormat == FOURCC_BGR3)
         {
@@ -263,9 +263,9 @@ void csGraphics2DOS2DIVE::Initialize ()
           if (PixelFormat == FOURCC_LUT8)
             PixelFormat = vmList[i].PixelFormat;
         } /* endif */
-      } /* endfor */
       if (PixelFormat != FOURCC_LUT8)
         break;
+#endif
     case 16:
       for (int i = 0; i < (int)vmCount; i++)
       {
