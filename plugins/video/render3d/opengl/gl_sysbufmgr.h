@@ -52,7 +52,7 @@ public:
     csSysRenderBuffer::type = type;
     locked = false;
   }
-  ~csSysRenderBuffer ()
+  virtual ~csSysRenderBuffer ()
   {
     if (buffer != NULL)
       delete[] buffer;

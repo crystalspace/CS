@@ -64,9 +64,9 @@ class csGLRender3D : public iRender3D
   friend class csSysRenderBufferManager;
   friend class csVARRenderBuffer;
 private:
-friend csGLTextureHandle;
-friend csGLTextureCache;
-friend csGLTextureManager;
+friend class csGLTextureHandle;
+friend class csGLTextureCache;
+friend class csGLTextureManager;
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
