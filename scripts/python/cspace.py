@@ -354,6 +354,7 @@ class csStringSet(_object):
             if self.thisown: destroy(self)
         except: pass
     def Request(*args): return _cspace.csStringSet_Request(*args)
+    def Contains(*args): return _cspace.csStringSet_Contains(*args)
     def Clear(*args): return _cspace.csStringSet_Clear(*args)
 
 class csStringSetPtr(csStringSet):
