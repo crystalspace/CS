@@ -1019,8 +1019,6 @@ csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
   thing = 0;
-  static_poly_idx = -1;
-
   lightpatches = 0;
 }
 
@@ -1053,14 +1051,10 @@ void csPolygon3D::RemovePolyTexture ()
   }
 }
 
-void csPolygon3D::SetStaticPolyIdx (int idx)
-{
-  static_poly_idx = idx;
-}
-
 csPolygon3DStatic* csPolygon3D::GetStaticPoly () const
 {
-  return thing->GetStaticData ()->GetPolygon3DStatic (static_poly_idx);
+  return thing->GetStaticData ()->GetPolygon3DStatic (
+  	GetPolyIdx ());
 }
 
 void csPolygon3D::SetParent (csThing *thing)
@@ -1335,7 +1329,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    csVector3 isect;
 	    float dist;
 	    const csPlane3& wor_plane = sfp->GetParent ()
-	    	->GetPolygonWorldPlaneNoCheck (sfp->GetStaticPolyIdx ());
+	    	->GetPolygonWorldPlaneNoCheck (sfp->GetPolyIdx ());
 	    if (!csIntersect3::Plane (center, thing->Vwor (vt_idx[0]), wor_plane,
 	      isect, dist))
 	    {

@@ -1579,8 +1579,11 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     }
 
     lit->Reset ();
+    int lit_cnt = 0;
     while (lit->HasNext ())
     {
+      printf ("Doing light %d\n", lit_cnt); fflush (stdout);
+      lit_cnt++;
       l = lit->Next ();
       l->GetPrivateObject ()->CalculateLighting ();
       if (meter) meter->Step ();

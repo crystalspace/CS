@@ -155,11 +155,11 @@ static bool FindSeparatingPlane (
 
   csThing* p_thing = p->GetParent ();
   int* p_vt_idx = p_thing->GetStaticData ()
-  	->GetPolygon3DStatic (p->GetStaticPolyIdx ())
+  	->GetPolygon3DStatic (p->GetPolyIdx ())
 	->GetVertexIndices ();
   csThing* poly1_thing = poly1->GetParent ();
   int* poly1_vt_idx = poly1_thing->GetStaticData ()
-  	->GetPolygon3DStatic (poly1->GetStaticPolyIdx ())
+  	->GetPolygon3DStatic (poly1->GetPolyIdx ())
 	->GetVertexIndices ();
 
   int i1 = num_vertices2-1;
@@ -414,7 +414,7 @@ void csPolyTexture::FillLightMap (
       if (shad_poly)
       {
         shad_pl = shad_poly->GetParent ()->GetPolygonWorldPlaneNoCheck (
-		shad_poly->GetStaticPolyIdx ());
+		shad_poly->GetPolyIdx ());
       }
       else
       {
@@ -1597,7 +1597,7 @@ void csLightingPolyTexQueue::UpdateMaps (
 	m_world2tex, v_world2tex);
     }
     const csPlane3& pol_plane = pol->GetParent ()->GetPolygonWorldPlaneNoCheck (
-    	pol->GetStaticPolyIdx ());
+    	pol->GetPolyIdx ());
     pt->UpdateFromShadowBitmap (light, lightpos, lightcolor,
     	m_world2tex, v_world2tex, pol, pol_plane);
   }

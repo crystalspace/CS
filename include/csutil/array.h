@@ -571,7 +571,7 @@ public:
    * index is actually valid. The caller of this function is responsible
    * for testing if the returned index is within the bounds of the array.
    */
-  int GetIndex (T* which) const
+  int GetIndex (const T* which) const
   {
     return which-root;
   }

@@ -22,27 +22,6 @@
 #include "polygon.h"
 #include "thing.h"
 
-//------------------------------------------------------+ csPolygonArray +----//
-csPolygonArray::~csPolygonArray ()
-{
-  FreeAll ();
-}
-
-void csPolygonArray::FreeAll ()
-{
-  int i;
-  for (i = 0 ; i < Length () ; i++)
-  {
-    FreeItem (Get (i));
-  }
-  DeleteAll ();
-}
-
-void csPolygonArray::FreeItem (csPolygon3D* Item)
-{
-  thing_type->blk_polygon3d.Free (Item);
-}
-
 //-----------------------------------------------+ csPolygonStaticArray +----//
 csPolygonStaticArray::~csPolygonStaticArray ()
 {

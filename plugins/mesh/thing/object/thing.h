@@ -548,6 +548,7 @@ public:
 class csThing : public iBase
 {
   friend class PolyMeshHelper;
+  friend class csPolygon3D;
 
 private:
   /// Static data for this thing.
@@ -755,7 +756,7 @@ public:
 
   /// Get the specified polygon from this set.
   csPolygon3D *GetPolygon3D (int idx)
-  { return polygons.Get (idx); }
+  { return &polygons.Get (idx); }
 
   /// Get the named polygon from this set.
   csPolygon3D *GetPolygon3D (const char* name);
@@ -787,14 +788,6 @@ public:
    * recalculated.
    */
   void Unprepare ();
-
-  /**
-   * Merge the given Thing into this one. The other polygons and
-   * curves are removed from the other thing so that it is ready to
-   * be removed. Warning! All Things are merged in world space
-   * coordinates and not in object space as one could expect!
-   */
-  void Merge (csThing* other);
 
   /// Set parent template.
   void SetTemplate (csThing *t)
@@ -1168,7 +1161,6 @@ public:
   /**
    * Block allocators for various types of objects in thing.
    */
-  csBlockAllocator<csPolygon3D> blk_polygon3d;
   csBlockAllocator<csPolygon3DStatic> blk_polygon3dstatic;
   csBlockAllocator<csPolyTextureMapping> blk_texturemapping;
   csBlockAllocator<csLightMap> blk_lightmap;

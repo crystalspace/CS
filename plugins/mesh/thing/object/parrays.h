@@ -69,7 +69,7 @@ public:
  * This class is used in polygon set class and thing template class
  * for storing the polygons that the model consists of.
  */
-class csPolygonArray : public csArray<csPolygon3D*>
+class csPolygonArray : public csArray<csPolygon3D>
 {
 private:
   csThingObjectType* thing_type;
@@ -77,25 +77,16 @@ private:
 public:
   /// Create the polygon array object
   csPolygonArray (int iLimit, int iDelta)
-  	: csArray<csPolygon3D*> (iLimit, iDelta)
+  	: csArray<csPolygon3D> (iLimit, iDelta)
   {
     thing_type = 0;
   }
-
-  /// Destroy the polygon array and all inserted polygons
-  ~csPolygonArray ();
 
   /// Set the thing type used to destroy polygons.
   void SetThingType (csThingObjectType* thing_type)
   {
     csPolygonArray::thing_type = thing_type;
   }
-
-  /// Free all polygons.
-  void FreeAll ();
-
-  /// Delete a particular array element
-  void FreeItem (csPolygon3D* Item);
 };
 
 #endif // __CS_PARRAYS_H__

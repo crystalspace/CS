@@ -508,9 +508,6 @@ class csPolygon3D
   friend class csPolyTexture;
 
 private:
-  /// Pointer to static data.
-  int static_poly_idx;
-
   /**
    * @@@@@@@@@@@@@ DO WE NEED THIS HERE?
    * The physical parent of this polygon.
@@ -551,14 +548,9 @@ public:
   csPolyTexture* GetPolyTexture () { return &txt_info; }
 
   /**
-   * Set the static data.
+   * Get index of this polygon.
    */
-  void SetStaticPolyIdx (int idx);
-
-  /**
-   * Get static data.
-   */
-  int GetStaticPolyIdx () const { return static_poly_idx; }
+  int GetPolyIdx () const { return thing->polygons.GetIndex (this); }
 
   /**
    * Get static polygon.

@@ -11,6 +11,10 @@ chronological order.
 	  index of an element in the array (as input you give a pointer to
 	  the element in the array).
 	- Fritz Elfert fixed several msvc6 compiler warnings.
+	- Jorrit removed the index from every polygon. The polygons are
+	  now stored in a csArray<csPolygon3D> instead of a
+	  csArray<csPolygon3D*>. This saves memory and also makes polygon
+	  handling a bit faster.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.

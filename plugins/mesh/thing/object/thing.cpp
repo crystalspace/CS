@@ -1589,7 +1589,7 @@ csThing::~csThing ()
     delete[] wor_verts;
   }
 
-  polygons.FreeAll ();
+  polygons.DeleteAll ();
   delete[] polygon_world_planes;
 
 #ifdef CS_USE_NEW_RENDERER
@@ -1787,19 +1787,18 @@ void csThing::PreparePolygons ()
 {
   csPolygon3DStatic *ps;
   csPolygon3D *p;
-  polygons.FreeAll ();
+  polygons.DeleteAll ();
   delete[] polygon_world_planes;
   polygon_world_planes = 0;
   polygon_world_planes_num = -1;	// Not checked!
 
   int i;
+  polygons.SetLength (static_data->static_polygons.Length ());
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
-    p = static_data->thing_type->blk_polygon3d.Alloc ();
+    p = &polygons.Get (i);
     ps = static_data->static_polygons.Get (i);
-    p->SetStaticPolyIdx (i);
     p->SetParent (this);
-    polygons.Push (p);
     p->Finish (ps);
   }
   polygons.ShrinkBestFit ();
@@ -1910,7 +1909,7 @@ void csThing::ClearReplacedMaterials ()
 csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
   int idx = static_data->FindPolygonByName (name);
-  return idx >= 0 ? polygons.Get (idx) : 0;
+  return idx >= 0 ? &polygons.Get (idx) : 0;
 }
 
 csPtr<iPolygonHandle> csThing::CreatePolygonHandle (int polygon_idx)
@@ -2195,7 +2194,7 @@ void csThing::AppendShadows (
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     sp = static_data->static_polygons.Get (i);
-    p = polygons.Get (i);
+    p = &polygons.Get (i);
 
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
     const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (i);
@@ -2545,7 +2544,7 @@ void csThing::InitializeDefault (bool clear)
 
   int i;
   for (i = 0; i < polygons.Length (); i++)
-    polygons.Get (i)->InitializeDefault (clear);
+    polygons.Get (i).InitializeDefault (clear);
 }
 
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
@@ -2571,9 +2570,9 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
     int i;
     for (i = 0; i < polygons.Length (); i++)
     {
-      csPolygon3D* p = polygons.Get (i);
+      csPolygon3D& p = polygons.Get (i);
       csPolygon3DStatic* sp = static_data->GetPolygon3DStatic (i);
-      const char* error = p->ReadFromCache (&mf, sp);
+      const char* error = p.ReadFromCache (&mf, sp);
       if (error != 0)
       {
         rc = false;
@@ -2612,9 +2611,9 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   csMemFile mf;
   for (i = 0; i < polygons.Length (); i++)
   {
-    csPolygon3D* p = polygons.Get (i);
+    csPolygon3D& p = polygons.Get (i);
     csPolygon3DStatic* sp = static_data->GetPolygon3DStatic (i);
-    if (!p->WriteToCache (&mf, sp)) goto stop;
+    if (!p.WriteToCache (&mf, sp)) goto stop;
   }
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
     	"thing_lm", 0, (uint32) ~0))
@@ -2634,8 +2633,8 @@ void csThing::PrepareLighting ()
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = polygons.Get (i);
-    csLightMap* lm = p->GetPolyTexture ()->GetLightMap ();
+    csPolygon3D& p = polygons.Get (i);
+    csLightMap* lm = p.GetPolyTexture ()->GetLightMap ();
     if (lm)
     {
       lm->CalcMaxStatic (
@@ -2646,27 +2645,6 @@ void csThing::PrepareLighting ()
   }
   ClearLMs ();
   PrepareLMs ();
-}
-
-void csThing::Merge (csThing *other)
-{
-  int i, j;
-  int *merge_vertices = new int[other->static_data->GetVertexCount () + 1];
-  for (i = 0; i < other->static_data->GetVertexCount (); i++)
-    merge_vertices[i] = static_data->AddVertex (other->Vwor (i));
-
-  for (i = 0; i < other->polygons.Length (); i++)
-  {
-    //csPolygon3D *p = other->GetPolygon3D (i);
-    csPolygon3DStatic *sp = other->static_data->GetPolygon3DStatic (i);
-    int *idx = sp->GetVertexIndices ();
-    for (j = 0; j < sp->GetVertexCount (); j++)
-      idx[j] = merge_vertices[idx[j]];
-    static_data->AddPolygon (sp);
-    other->polygons[i] = 0;
-  }
-
-  delete[] merge_vertices;
 }
 
 #ifdef CS_USE_NEW_RENDERER
@@ -2773,7 +2751,7 @@ void csThing::PrepareLMs ()
       pg->polys.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-	pg->polys.Put (j, polygons[slpg.polys[j]]);
+	pg->polys.Put (j, &polygons[slpg.polys[j]]);
       }
 
       unlitPolys.Push (pg);
@@ -2789,7 +2767,7 @@ void csThing::PrepareLMs ()
       lpg->lightmaps.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-	csPolygon3D* poly = polygons[slpg.polys[j]];
+	csPolygon3D* poly = &polygons[slpg.polys[j]];
 
 	lpg->polys.Push (poly);
 	const csRect& r = slpg.lmRects[j];
@@ -2819,7 +2797,7 @@ void csThing::PrepareLMs ()
     pg->polys.SetLength (spg.polys.Length ());
     for (j = 0; j < spg.polys.Length(); j++)
     {
-      pg->polys.Put (j, polygons[spg.polys[j]]);
+      pg->polys.Put (j, &polygons[spg.polys[j]]);
     }
 
     unlitPolys.Push (pg);
@@ -2889,7 +2867,7 @@ void csThing::UpdateDirtyLMs ()
       if (lmi->GetLightVersion () != GetLightVersion ())
       {
         const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
-		poly->GetStaticPolyIdx ());
+		poly->GetPolyIdx ());
         if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, poly,
 		world_plane))
         {
@@ -2941,7 +2919,6 @@ SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
 
 csThingObjectType::csThingObjectType (iBase *pParent) :
-	blk_polygon3d (2000),
 	blk_polygon3dstatic (2000),
 	blk_texturemapping (2000),
 	blk_lightmap (2000),
