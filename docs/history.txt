@@ -32,6 +32,7 @@ chronological order.
 	    - csConfigDocumentIterator now properly handles a 0 subsection.
 	- aarobber added an anonymous union to csVector3 to allow for easier
 	  accessing/storing of float* data to a csVector3
+	- aarobber reverted a wrongly committed r3dopengl.cfg
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals
