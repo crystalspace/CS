@@ -28,6 +28,8 @@ chronological order.
 	  file. The problem is that it is impossible to detect at load time
 	  and we have no facility to report these kind of errors at
 	  render time yet... So a CS_ASSERT will have to do for now.
+	- Steven Geens fixed sockets in sprcal3d. The alignement of the
+	  object in the socket was incorrect.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

@@ -1354,14 +1354,19 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
     csVector3 vert3(vector[2].x,vector[2].y,vector[2].z);
 
     csVector3 center= (vert1+vert2+vert3)/3;
+    
 
-    csVector3 ab = vert2 - vert1;
     csVector3 bc = vert3 - vert2;
-    csVector3 normal = ab % bc;
+        
+    csVector3 up = vert1-center;
+    up.Normalize();
+    
+    csVector3 normal = bc % up;
+    normal.Normalize();
 
     csReversibleTransform trans = movable->GetFullTransform();
     trans.SetOrigin(center);
-    trans.LookAt(normal, csVector3(0,1,0));
+    trans.LookAt(normal, up);
     movable->SetTransform(trans);
     movable->UpdateMove();
 
