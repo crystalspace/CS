@@ -527,7 +527,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
-  if (image->GetWidth () != ((1 << (ilogb (image->GetWidth()))) + 1)) {
+  if (image->GetWidth () != ((1 << (ilogb ((unsigned int)image->GetWidth()))) + 1)) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.mesh.object.terrbig",
 		"Unable to process image, must square and width 2^n+1");

@@ -162,17 +162,6 @@ class nTerrain
   // Map mode, whether we are looking up stuff in rgb_colors or pal_colors.
   int map_mode;
   
-  /// Calculates the binary logarithm of n
-  int ilogb (unsigned n) 
-  {
-    int i = -1;
-    while (n != 0) {
-        ++ i;
-        n >>= 1;
-    }
-    return i;
-  }
-
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
   void VerifyTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
   void WriteTreeNode(FILE *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, nBlock *);
@@ -506,5 +495,16 @@ public:
     { return scfParent->Initialize (object_reg); }
   } scfiComponent;
 };
+
+/// Calculates the binary logarithm of n
+int ilogb (unsigned n) 
+{
+  int i = -1;
+  while (n != 0) {
+      ++ i;
+      n >>= 1;
+  }
+  return i;
+}
 
 #endif // __CS_N_TERRAIN_RENDERER__
