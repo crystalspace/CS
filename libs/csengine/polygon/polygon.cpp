@@ -1988,7 +1988,11 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView* lview, bool vis)
   // that are adjacent.
 
   csPolyTexLightMap *lmi = GetLightMapInfo ();
-  bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
+  bool calc_lmap;
+  if (lmi)
+    calc_lmap = lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
+  else
+    calc_lmap = true;
 
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap) FillLightMapStatic (lview, vis);
