@@ -33,8 +33,8 @@ protected:
     csRef<iDataBuffer> glyphAlphaDataBuf;
     uint8* glyphData;
     uint8* glyphAlphaData;
-    iFont::BitmapMetrics bitmapMetrics;
-    iFont::BitmapMetrics alphaMetrics;
+    csBitmapMetrics bitmapMetrics;
+    csBitmapMetrics alphaMetrics;
   };
 
   size_t cacheRemaining;

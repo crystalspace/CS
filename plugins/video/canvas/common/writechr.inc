@@ -124,7 +124,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
     if ((!CharImage) && (!CharImageAlpha))
       continue;
 
-    iFont::BitmapMetrics* bmetrics;
+    csBitmapMetrics* bmetrics;
     if (CharImageAlpha)
     {
       bmetrics = &cacheData->alphaMetrics;

@@ -87,7 +87,7 @@ public:
    * Return character size in pixels.
    * Returns false if values could not be determined.
    */
-  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
+  virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
@@ -95,10 +95,10 @@ public:
    * filled with bitmap width and height.
    */
   virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c, 
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
 
   virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
 
   /**
    * Return the width and height of text written with this font.

@@ -54,7 +54,7 @@ public:
     /// Glyph
     utf32_char glyph;
     /// Glyph metrics
-    iFont::GlyphMetrics glyphMetrics;
+    csGlyphMetrics glyphMetrics;
     /// Does this font have this glyph?
     bool hasGlyph;
   };

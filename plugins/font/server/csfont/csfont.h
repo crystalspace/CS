@@ -94,9 +94,9 @@ public:
     size_t bitmapSize;
     size_t alphaOffs;
     size_t alphaSize;
-    GlyphMetrics gMetrics;
-    BitmapMetrics bMetrics;
-    BitmapMetrics aMetrics;
+    csGlyphMetrics gMetrics;
+    csBitmapMetrics bMetrics;
+    csBitmapMetrics aMetrics;
 
     Glyph () { bitmapSize = alphaSize = (size_t)~0; }  
   };
@@ -153,9 +153,9 @@ public:
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 
     CharRange* glyphs, int height, int ascent, int descent,
-    GlyphMetrics* gMetrics,
-    iDataBuffer* bitmap, BitmapMetrics* bMetrics,
-    iDataBuffer* alpha = 0, BitmapMetrics* aMetrics = 0);
+    csGlyphMetrics* gMetrics,
+    iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
+    iDataBuffer* alpha = 0, csBitmapMetrics* aMetrics = 0);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();
@@ -183,19 +183,19 @@ public:
   /**
    * Return the metrics of a glyph.
    */
-  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
+  virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics);
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
    */
   virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c,
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
 
   /**
    * Return a pointer to the alpha bitmap for rendered character.
    */
   virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
 
   /**
    * Return the width and height of text written with this font.

@@ -155,8 +155,8 @@ void csPolygonTree::IntersectBox (csArray<int>& polyidx, const csBox3& box)
   }
 }
 
-void csPolygonTree::IntersectSphere (csArray<int>& polyidx, const csVector3& center,
-  	float sqradius)
+void csPolygonTree::IntersectSphere (csArray<int>& polyidx,
+	const csVector3& center, float sqradius)
 {
   if (csIntersect3::BoxSphere (bbox, center, sqradius))
   {

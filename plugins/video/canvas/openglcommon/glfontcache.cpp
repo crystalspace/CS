@@ -75,7 +75,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
   csRect texRect;
   csSubRect2* sr = 0;
 
-  iFont::BitmapMetrics bmetrics;
+  csBitmapMetrics bmetrics;
   csRef<iDataBuffer> alphaData = 
     font->font->GetGlyphAlphaBitmap (glyph, bmetrics);
   csRef<iDataBuffer> bitmapData;

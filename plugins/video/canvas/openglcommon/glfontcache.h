@@ -48,7 +48,7 @@ class csGLFontCache : public csFontCache
     csSubRect2* subrect;
     float tx1, ty1, tx2, ty2;
     int texNum;
-    iFont::BitmapMetrics bmetrics;
+    csBitmapMetrics bmetrics;
   };
 
   csGraphics2DGLCommon* G2D;

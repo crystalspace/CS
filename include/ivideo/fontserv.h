@@ -76,6 +76,32 @@ struct iFontDeleteNotify : public iBase
   virtual void BeforeDelete (iFont* font) = 0;
 };
 
+/**
+ * Metrics for a glyph that are dependent from whether a simple
+ * or antialiased image is used.
+ */
+struct csBitmapMetrics
+{
+  /// Width of the glyph image
+  int width;
+  /// Height of the glyph image
+  int height;
+  /// X offset of the image to the pen position
+  int left;
+  /// Y offset of the image to the pen position
+  int top;
+};
+
+/**
+ * Metrics for a glyph that are independent from whether a simple
+ * or antialiased image is used.
+ */
+struct csGlyphMetrics
+{
+  /// Amount of pixels the pen needs to advance after the glyph
+  int advance;
+};
+
 SCF_VERSION (iFont, 4, 0, 0);
 
 /**
@@ -84,31 +110,6 @@ SCF_VERSION (iFont, 4, 0, 0);
  */
 struct iFont : public iBase
 {
-  /**
-   * Metrics for a glyph that are dependent from whether a simple
-   * or antialiased image is used.
-   */
-  struct BitmapMetrics
-  {
-    /// Width of the glyph image
-    int width;
-    /// Height of the glyph image
-    int height;
-    /// X offset of the image to the pen position
-    int left;
-    /// Y offset of the image to the pen position
-    int top;
-  };
-  /**
-   * Metrics for a glyph that are independent from whether a simple
-   * or antialiased image is used.
-   */
-  struct GlyphMetrics
-  {
-    /// Amount of pixels the pen needs to advance after the glyph
-    int advance;
-  };
-
   /**
    * Add a font delete notification callback routine.
    * This routine will be called from font destructor,
@@ -145,14 +146,14 @@ struct iFont : public iBase
   /**
    * Return the metrics of a glyph.
    */
-  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics) = 0;
+  virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics) = 0;
 
   /**
    * Return a pointer to a bitmap containing a rendered character.
    * Returns 0 if the glyph can't be retrieved.
    */
   virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c,
-    BitmapMetrics& metrics) = 0;
+    csBitmapMetrics& metrics) = 0;
 
   /**
    * Return a pointer to a bitmap containing the alpha bitmap for the
@@ -160,7 +161,7 @@ struct iFont : public iBase
    * Returns 0 if the glyph can't be retrieved.
    */
   virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
-    BitmapMetrics& metrics) = 0;
+    csBitmapMetrics& metrics) = 0;
 
   /**
    * Return the width and height of text written with this font.

@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Aug-2003
+	- Jorrit moved GlyphMetrics and BitmapMetrics out of iFont and
+	  added 'cs' in front of them. The reason is that SWIG seems to have
+	  problems with the embedded structures.
 	- Eric Sunshine fixed bug in bfdplugins.cpp.  csGetPluginMetaData()
 	  was leaking `buf' if errors occurred.
 24-Aug-2003

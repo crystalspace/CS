@@ -265,7 +265,7 @@ void csFreeType2Font::GetMaxSize (int &oW, int &oH)
   oH = maxrows;
 }
 
-bool csFreeType2Font::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
+bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
    FT_Get_Char_Index (face, (FT_ULong)c);
@@ -283,7 +283,7 @@ bool csFreeType2Font::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
 }
 
 csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
-						    BitmapMetrics& metrics)
+						    csBitmapMetrics& metrics)
 {
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
     FT_Get_Char_Index (face, (FT_ULong)c);
@@ -327,7 +327,7 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
 }
 
 csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c, 
-							 BitmapMetrics& metrics)
+						 csBitmapMetrics& metrics)
 {
   FT_UInt ci = (c == CS_FONT_DEFAULT_GLYPH) ? 0 : 
     FT_Get_Char_Index (face, (FT_ULong)c);

@@ -420,7 +420,7 @@ void csFontPlexer::GetMaxSize (int &oW, int &oH)
   primaryFont->GetMaxSize (oW, oH);
 }
 
-bool csFontPlexer::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
+bool csFontPlexer::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   iFont* font;
   int i;
@@ -436,7 +436,7 @@ bool csFontPlexer::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
 }
 
 csPtr<iDataBuffer> csFontPlexer::GetGlyphBitmap (utf32_char c, 
-  BitmapMetrics& metrics)
+  csBitmapMetrics& metrics)
 {
   iFont* font;
   int i;
@@ -456,7 +456,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphBitmap (utf32_char c,
 }
 
 csPtr<iDataBuffer> csFontPlexer::GetGlyphAlphaBitmap (utf32_char c,
-  BitmapMetrics& metrics)
+  csBitmapMetrics& metrics)
 {
   iFont* font;
   int i;
@@ -475,7 +475,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphAlphaBitmap (utf32_char c,
 
 void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH, int &desc)
 {
-  GlyphMetrics defMetrics;
+  csGlyphMetrics defMetrics;
 
   oW = oH = desc = 0;
   if (!GetGlyphMetrics (CS_FONT_DEFAULT_GLYPH, defMetrics))
@@ -497,7 +497,7 @@ void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH, int &desc)
     text += skip;
     textLen -= skip;
 
-    GlyphMetrics gMetrics = defMetrics;
+    csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
     int i;
     for (i = 0; i < order->Length (); i++)
@@ -530,7 +530,7 @@ void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH)
 
 int csFontPlexer::GetLength (const char *text, int maxwidth)
 {
-  GlyphMetrics defMetrics;
+  csGlyphMetrics defMetrics;
 
   if (!GetGlyphMetrics (CS_FONT_DEFAULT_GLYPH, defMetrics))
   {
@@ -548,7 +548,7 @@ int csFontPlexer::GetLength (const char *text, int maxwidth)
     text += skip;
     textLen -= skip;
 
-    GlyphMetrics gMetrics = defMetrics;
+    csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
     int i;
     for (i = 0; i < order->Length (); i++)

@@ -76,12 +76,12 @@ public:
   virtual void SetSize (int iSize);
   virtual int GetSize ();
   virtual void GetMaxSize (int &oW, int &oH);
-  virtual bool GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics);
+  virtual bool GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics);
 
   virtual csPtr<iDataBuffer> GetGlyphBitmap (utf32_char c, 
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
   virtual csPtr<iDataBuffer> GetGlyphAlphaBitmap (utf32_char c,
-    BitmapMetrics& metrics);
+    csBitmapMetrics& metrics);
 
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
   virtual void GetDimensions (const char *text, int &oW, int &oH);

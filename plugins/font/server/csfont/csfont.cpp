@@ -122,9 +122,9 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
 	  numGlyphs += FontList [i].ranges[numRanges].charCount;
 	  numRanges++;
 	}
-	csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
+	csDirtyAccessArray<csBitmapMetrics> bMetrics;
 	bMetrics.SetLength (numGlyphs);
-	csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+	csDirtyAccessArray<csGlyphMetrics> gMetrics;
 	gMetrics.SetLength (numGlyphs);
 	int j;
 	for (j = 0; j < numGlyphs; j++)
@@ -308,9 +308,9 @@ error:
       "Reading new style Font %s.",
       fontdef.Name);
   #endif
-    csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
-    csDirtyAccessArray<iFont::BitmapMetrics> aMetrics;
-    csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+    csDirtyAccessArray<csBitmapMetrics> bMetrics;
+    csDirtyAccessArray<csBitmapMetrics> aMetrics;
+    csDirtyAccessArray<csGlyphMetrics> gMetrics;
     csDirtyAccessArray<csDefaultFont::CharRange> ranges;
 
     int numGlyphs = 0;
@@ -355,7 +355,7 @@ error:
       int j;
       for (j = 0; j < numGlyphs; j++)
       {
-	memset (&(bMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	memset (&(bMetrics[j]), 0, sizeof (csBitmapMetrics));
 	bMetrics[j].width = get_le_long (binary);
 	binary += 4;
 	bMetrics[j].height = get_le_long (binary);
@@ -370,7 +370,7 @@ error:
       {
 	for (j = 0; j < numGlyphs; j++)
 	{
-	  memset (&(aMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	  memset (&(aMetrics[j]), 0, sizeof (csBitmapMetrics));
 	  aMetrics[j].width = get_le_long (binary);
 	  binary += 4;
 	  aMetrics[j].height = get_le_long (binary);
@@ -389,7 +389,7 @@ error:
       int j;
       for (j = 0; j < numGlyphs; j++)
       {
-	memset (&(bMetrics[j]), 0, sizeof (iFont::BitmapMetrics));
+	memset (&(bMetrics[j]), 0, sizeof (csBitmapMetrics));
 	bMetrics[j].width = individualWidths[j];
 	bMetrics[j].height = fontdef.Height;
 	bMetrics[j].left = 0;
@@ -397,8 +397,7 @@ error:
 
 	if (fontdefAlpha)
 	{
-	  memcpy (&(aMetrics[j]), &(bMetrics[j]), 
-	    sizeof (iFont::BitmapMetrics));
+	  memcpy (&(aMetrics[j]), &(bMetrics[j]), sizeof (csBitmapMetrics));
 	}
 	bitmapSize += ((individualWidths[j] + 7) / 8) * fontdef.Height;
 	alphaSize += individualWidths[j] * fontdef.Height;
@@ -412,7 +411,7 @@ error:
       int j;
       for (j = 0; j < numGlyphs; j++)
       {
-	memset (&(gMetrics[j]), 0, sizeof (iFont::GlyphMetrics));
+	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
 	gMetrics[j].advance = get_le_long (binary);
 	binary += 4;
       }
@@ -422,7 +421,7 @@ error:
       int j;
       for (j = 0; j < numGlyphs; j++)
       {
-	memset (&(gMetrics[j]), 0, sizeof (iFont::GlyphMetrics));
+	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
 	gMetrics[j].advance = bMetrics[j].width;
       }
     }
@@ -454,9 +453,9 @@ error:
   #endif
 
     uint8* individualWidths = (uint8*)binary;
-    csDirtyAccessArray<iFont::BitmapMetrics> bMetrics;
+    csDirtyAccessArray<csBitmapMetrics> bMetrics;
     bMetrics.SetLength (fontdefGlyphs);
-    csDirtyAccessArray<iFont::GlyphMetrics> gMetrics;
+    csDirtyAccessArray<csGlyphMetrics> gMetrics;
     gMetrics.SetLength (fontdefGlyphs);
     int j;
     for (j = 0; j < fontdefGlyphs; j++)
@@ -511,9 +510,9 @@ SCF_IMPLEMENT_IBASE_END
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
 			      CharRange* glyphs, int height, 
 			      int ascent, int descent,
-			      GlyphMetrics* gMetrics,
-			      iDataBuffer* bitmap, BitmapMetrics* bMetrics,
-			      iDataBuffer* alpha, BitmapMetrics* aMetrics) 
+			      csGlyphMetrics* gMetrics,
+			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
+			      iDataBuffer* alpha, csBitmapMetrics* aMetrics) 
 			      : DeleteCallbacks (4, 4)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -567,16 +566,16 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
       glyphData.bitmapOffs = bOffs;
       glyphData.bitmapSize = bSize;
       bOffs += bSize;
-      memcpy (&glyphData.bMetrics, &(bMetrics[i]), sizeof (BitmapMetrics));
+      memcpy (&glyphData.bMetrics, &(bMetrics[i]), sizeof (csBitmapMetrics));
       if (alpha)
       {
 	glyphData.alphaOffs = aOffs;
 	glyphData.alphaSize = aSize;
 	aOffs += aSize;
-	memcpy (&glyphData.aMetrics, &(aMetrics[i]), sizeof (BitmapMetrics));
+	memcpy (&glyphData.aMetrics, &(aMetrics[i]), sizeof (csBitmapMetrics));
       }
 
-      memcpy (&glyphData.gMetrics, &(gMetrics[i]), sizeof (GlyphMetrics));
+      memcpy (&glyphData.gMetrics, &(gMetrics[i]), sizeof (csGlyphMetrics));
 
       glyph++;
       numGlyphs--;
@@ -622,7 +621,7 @@ void csDefaultFont::GetMaxSize (int &oW, int &oH)
   oH = Height;
 }
 
-bool csDefaultFont::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
+bool csDefaultFont::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   int gidx1 = c >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = c & GLYPH_INDEX_LOWER_MASK;
@@ -650,7 +649,7 @@ bool csDefaultFont::GetGlyphMetrics (utf32_char c, GlyphMetrics& metrics)
 }
 
 csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
-    BitmapMetrics& metrics)
+    csBitmapMetrics& metrics)
 {
   if (bitData == 0) return 0;
 
@@ -680,7 +679,7 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
 }
 
 csPtr<iDataBuffer> csDefaultFont::GetGlyphAlphaBitmap (utf32_char c,
-    BitmapMetrics& metrics)
+    csBitmapMetrics& metrics)
 {
   if (alphaData == 0) return 0;
 
