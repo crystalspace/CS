@@ -28,7 +28,9 @@
     SKIN_SLICE (DefaultButton);		\
     SKIN_SLICE (DefaultWindow);		\
     SKIN_SLICE (DefaultDialog);		\
-    SKIN_SLICE (DefaultTitlebar);	\
+    SKIN_SLICE (DefaultTitlebar);		\
+    SKIN_SLICE (DefaultListBox);		\
+    SKIN_SLICE (DefaultListBoxItem);		\
   SKIN_DECLARE_END var
 
 class csButton;
@@ -132,5 +134,26 @@ public:
   /// Draw the component we are responsible for
   virtual void Draw (csComponent &iComp);
 };
+
+/**
+ * This is the default skin for listboxes
+ */
+class csDefaultListBoxSkin : public csListBoxSkin
+{
+public:
+  /// Draw the component we are responsible for
+  virtual void Draw (csComponent &iComp);
+};
+
+/**
+ * This is the default skin for listboxe items
+ */
+class csDefaultListBoxItemSkin : public csListBoxItemSkin
+{
+public:
+  /// Draw the component we are responsible for
+  virtual void Draw (csComponent &iComp);
+};
+
 
 #endif // __SDEFAULT_H__

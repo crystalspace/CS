@@ -200,9 +200,6 @@ public:
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
 
-  /// Draw the menu item
-  virtual void Draw ();
-
   /// Handle additional state flags
   virtual void SetState (int mask, bool enable);
 
@@ -215,7 +212,30 @@ public:
   /// Set content offset
   void SetOffset (int ihOffset)
   { hOffset = ihOffset; Invalidate (); }
-};
+  
+  /**
+   * Accessor functions for public variables.
+   */
+   
+   /// Get list box item style
+   csListBoxItemStyle GetItemStyle() 
+   { return ItemStyle; }
+   
+  /// Get horizontal item offset in pixels
+  int GetDeltaX() 
+  { return deltax; }
+  
+  /// Get listbox item image
+  csPixmap *GetItemBitmap() 
+  { return ItemBitmap; }
+    
+  /// Get horizontal contents offset
+  int GetHOffset()
+  { return hOffset; }
+  
+  char *GetText() 
+  { return text; }
+ };
 
 /**
  * List box styles. These are bit masks that can be ORed together
@@ -239,7 +259,11 @@ enum csListBoxFrameStyle
   /// List box has a thin 3D rectangular frame
   cslfsThinRect,
   /// List box has a thick 3D rectangular frame
-  cslfsThickRect
+  cslfsThickRect,
+  /// List box has a thin 3D rectangular frame, and it's background is textured.
+  cslfsTextured,
+  /// List box has a bitmap frame
+  cslfsBitmap
 };
 
 /**
@@ -272,18 +296,22 @@ class csListBox : public csComponent
   int deltax, maxdeltax;
   /// Flag: place items before redraw?
   bool fPlaceItems;
-
+  /// Bitmap images, used as both the texture and frame bitmap, depending on frame style
+  csPixmap *FrameBitmap;
+  /// Flag: delete frame bitmap on destruction?
+  bool fDelFrameBitmap;
+  
 public:
   /// Create input line object
   csListBox (csComponent *iParent, int iStyle = CSLBS_DEFAULTVALUE,
     csListBoxFrameStyle iFrameStyle = cslfsThickRect);
 
+ /// Destructor - cleans up the frame bitmap
+ ~csListBox();
+
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);
-
-  /// Draw the list box
-  virtual void Draw ();
-
+ 
   /// Find a place for each menu item
   void PlaceItems (bool setscrollbars = true);
 
@@ -311,6 +339,56 @@ public:
 
   /// Set fPlaceItems since a item has been removed
   virtual void Delete (csComponent *comp);
+
+ /// Set the frame bitmap (only useful when FrameStyle is cslfsBitmap)
+ void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap=false);
+ 
+ /// Set the background texture (only useful when FrameStyle is cslfsTextured)
+ void SetTexture(csPixmap *iTexture, bool iDelFrameBitmap=false);
+    
+ /**
+  * Accessors for private member variables
+  *
+  */
+  
+  /// Get List box style
+  int GetListBoxStyle() 
+  { return ListBoxStyle; }
+  
+  /// Get  List box frame style
+  csListBoxFrameStyle GetFrameStyle() 
+  { return FrameStyle; }
+  
+  /// Get List box frame width and height
+  void GetBorderSize(int *iBorderWidth,  int *iBorderHeight);
+  
+  ///  Get number of items that fits vertically
+  int VerticalCount() 
+  { return vertcount; }
+  
+  /// Get the horizontal scroll bar
+  csScrollBar *GetHScroll()
+  { return hscroll; }
+  
+  /// Get the vertical scroll bar
+  csScrollBar *GetVScroll() 
+  { return vscroll; }
+  
+  /// Get horizontal scrolling position
+  int GetDeltaX()
+  { return deltax; }
+  
+  /// Get horizontal scrolling maximum
+  int GetMaxDeltaX()
+  { return maxdeltax; }
+  
+  /// Get  place items before redraw flag
+  bool GetPlaceItemsFlag() 
+  { return fPlaceItems; }
+  
+ /// Get frame bitmap or texture bitmap (same item, meaning just depends on FrameStyle)
+ csPixmap *GetFrameBitmap()
+ { return FrameBitmap; }
 
 protected:
   /// Make a listbox item visible (same as cscmdListBoxMakeVisible)

@@ -253,6 +253,32 @@ public:
 };
 
 /**
+ * This class defines the interface for a listbox skin slice.
+ * Every skin slice that is meant for listboxes should inherit
+ * from this interface.
+ */
+class csListBoxSkin : public csSkinSlice
+{
+public:
+  /// Get the identifier of the component this skin slice is for
+  virtual const char *GetName ()
+  { return "Listbox"; }
+};
+
+/**
+ * This class defines the interface for a listbox item skin slice.
+ * Every skin slice that is meant for listboxe items should inherit
+ * from this interface.
+ */
+class csListBoxItemSkin : public csSkinSlice
+{
+public:
+  /// Get the identifier of the component this skin slice is for
+  virtual const char *GetName ()
+  { return "ListboxItem"; }
+};
+
+/**
  * Use the following macros to declare a skin.
  * You should declare all the skins that your program will use
  * preferably inside the main module of your program. The following
