@@ -530,15 +530,6 @@ csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
   return csPtr<iModelData> (Scene);
 }
 
-// A simple triangle, consisting of three vertex indices
-struct csTriangle
-{
-  int a, b, c;
-
-  csTriangle (int v1, int v2, int v3)
-  { a=v1; b=v2; c=v3; }
-};
-
 /*
  * Extended triangle structure, consisting of three vertex, normal, color
  * and texel indices.
