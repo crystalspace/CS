@@ -17,6 +17,7 @@
 */
 
 #include <stdlib.h>
+#include <sys/param.h>
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cs2d/be/belibg2d.h"

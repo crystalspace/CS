@@ -17,6 +17,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <sys/param.h>
 #include "sysdef.h"
 
 #ifdef NO_COM_SUPPORT
