@@ -193,7 +193,9 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   iIsoView* view = rview->GetView ();
 
   // Prepare for rendering.
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+  if((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
+    g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+  else g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_TEST);
   //g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
   //material->Visit ();
