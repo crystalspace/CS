@@ -47,6 +47,9 @@ chronological order.
 	- Eric Sunshine changed SCF_QUERY_INTERFACE(context, iMeshWrapper) in
 	  csThingLoader::Parse() to use SCF_QUERY_INTERFACE_SAFE() since
 	  `context' might be null.  Reported by Atis Elsts <atisel@inbox.lv>.
+	- Eric Sunshine augmented the OpenDivX check in configure.ac so that it
+	  tests for presence of DEC_PARAM since at least one user's
+	  installation seems to be lacking this necessary typedef.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

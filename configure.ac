@@ -1762,9 +1762,9 @@ CS_CHECK_LIB_WITH([asound],
 
 
 #------------------------------------------------------------------------------
-# Check for OpenDivX version 4+ or earlier.
+# Check for DivX4 or OpenDivX.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for OpenDivX4], [cs_cv_libdivxdecore4],
+CS_CHECK_BUILD([for DivX4], [cs_cv_libdivxdecore4],
     [AC_LANG_PROGRAM(
 	[[#include <divx4/decore.h>]],
 	[DEC_MEM_REQS r; decore(0, DEC_OPT_MEMORY_REQS, 0, &r);])],
@@ -1776,8 +1776,18 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <decore.h>]],
 	    [decore(0, DEC_OPT_RELEASE, 0, 0);])],
-	[CS_CREATE_TUPLE([],[],[-ldivxdecore])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore], [OPENDIVX])])])
+	[CS_CREATE_TUPLE([],[],[-ldivxdecore])])
+    AS_IF([test $cs_cv_libdivxdecore = yes],
+	[CS_CHECK_BUILD([is OpenDivX is sufficiently recent],
+	    [cs_cv_libdivxdecore_recent],
+	    [AC_LANG_PROGRAM(
+		[[#include <decore.h>]],
+		[DEC_PARAM d; d.x_dim = 0;])],
+	    [], [],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore], [OPENDIVX])], [], [],
+	    [$cs_cv_libdivxdecore_cflags],
+	    [$cs_cv_libdivxdecore_lflags],
+	    [$cs_cv_libdivxdecore_libs])])])
 
 
 
