@@ -20,6 +20,8 @@
 #include "csgeom/polyclip.h"
 #include "csengine/quadcube.h"
 #include "csengine/world.h"
+#include "csengine/dumper.h"
+#include "csengine/sysitf.h"
 
 bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 	csPolygon2D& persp)
@@ -34,7 +36,7 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
   num_z_0 = 0;
   for (i = 0 ; i < num_verts ; i++)
   {
-    if (verts[i].z < SMALL_EPSILON) num_z_0++;
+    if (verts[i].z < EPSILON) num_z_0++;
   }
   if (num_z_0 == num_verts)
   {
@@ -57,25 +59,25 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
     int i1 = num_verts-1;
     for (i = 0 ; i < num_verts ; i++)
     {
-      if (verts[i].z < SMALL_EPSILON)
+      if (verts[i].z < EPSILON)
       {
-	if (verts[i1].z < SMALL_EPSILON)
+	if (verts[i1].z < EPSILON)
 	{
 	  // Just skip vertex.
 	}
 	else
 	{
 	  // We need to intersect and add intersection point.
-	  csIntersect3::ZPlane (SMALL_EPSILON, verts[i], verts[i1], isect);
+	  csIntersect3::ZPlane (EPSILON, verts[i], verts[i1], isect);
 	  persp.AddPerspectiveUnit (isect);
 	}
       }
       else
       {
-	if (verts[i1].z < SMALL_EPSILON)
+	if (verts[i1].z < EPSILON)
 	{
 	  // We need to intersect and add both intersection point and this point.
-	  csIntersect3::ZPlane (SMALL_EPSILON, verts[i], verts[i1], isect);
+	  csIntersect3::ZPlane (EPSILON, verts[i], verts[i1], isect);
 	  persp.AddPerspectiveUnit (isect);
 	}
 	// Just perspective correct and add to the 2D polygon.
@@ -90,7 +92,6 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
 	csClipper* clipper)
 {
-  (void)clipper;
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
   //if (clipper && !persp.ClipAgainst (clipper)) return false;
@@ -101,7 +102,6 @@ bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
 bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
 	csClipper* clipper)
 {
-  (void)clipper;
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
   //if (clipper && !persp.ClipAgainst (clipper)) return false;
@@ -213,7 +213,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
   int i;
 
   // -> Z
-  if (trees[0]->InsertPolygon (verts, num_verts)) return true;
+  if (trees[0]->TestPolygon (verts, num_verts)) return true;
 
   // -> -Z
   for (i = 0 ; i < num_verts ; i++)
@@ -222,7 +222,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
     cam[i].y = verts[i].y;
     cam[i].z = -verts[i].z;
   }
-  if (trees[1]->InsertPolygon (cam, num_verts)) return true;
+  if (trees[1]->TestPolygon (cam, num_verts)) return true;
 
   // -> X
   for (i = 0 ; i < num_verts ; i++)
@@ -231,7 +231,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
     cam[i].y = verts[i].y;
     cam[i].z = -verts[i].x;
   }
-  if (trees[2]->InsertPolygon (cam, num_verts)) return true;
+  if (trees[2]->TestPolygon (cam, num_verts)) return true;
 
   // -> -X
   for (i = 0 ; i < num_verts ; i++)
@@ -240,7 +240,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
     cam[i].y = verts[i].y;
     cam[i].z = verts[i].x;
   }
-  if (trees[3]->InsertPolygon (cam, num_verts)) return true;
+  if (trees[3]->TestPolygon (cam, num_verts)) return true;
 
   // -> Y
   for (i = 0 ; i < num_verts ; i++)
@@ -249,7 +249,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
     cam[i].y = verts[i].z;
     cam[i].z = -verts[i].y;
   }
-  if (trees[4]->InsertPolygon (cam, num_verts)) return true;
+  if (trees[4]->TestPolygon (cam, num_verts)) return true;
 
   // -> -Y
   for (i = 0 ; i < num_verts ; i++)
@@ -258,7 +258,7 @@ bool csQuadcube::TestPolygon (csVector3* verts, int num_verts)
     cam[i].y = -verts[i].z;
     cam[i].z = verts[i].y;
   }
-  if (trees[5]->InsertPolygon (cam, num_verts)) return true;
+  if (trees[5]->TestPolygon (cam, num_verts)) return true;
 
   return false;
 }

@@ -72,6 +72,7 @@ void csPolygon2D::AddPerspectiveUnit (float x, float y, float z)
 
   px = x * iz;
   py = y * iz;
+
   vertices[num_vertices].x = px;
   vertices[num_vertices].y = py;
 

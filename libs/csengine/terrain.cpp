@@ -68,6 +68,7 @@ bool csTerrain::Initialize (char* heightmap)
 {
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap)) return false;
+  //height->generateHeights (257, 257, 0);
   CHK (mesh = new ddgTBinMesh (height));
   CHK (clipbox = new ddgBBox (ddgVector3(0,0,1),ddgVector3(640, 480, 15000)));
   wtoc[0] = 1;

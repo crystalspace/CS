@@ -321,6 +321,14 @@ public:
   bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csVFS *vfs);
 
   /**
+   * Check consistancy of the loaded world. Currently this function only
+   * checks if polygons have three or more vertices and if the vertices
+   * are coplanar (if more than three). This function prints out warnings
+   * for all found errors.  * Returns true if everything is in order.
+   */
+  bool CheckConsistancy ();
+
+  /**
    * Prepare the textures. It will initialise all loaded textures
    * for the texture manager. (Normally you shouldn't call this function
    * directly, because it will be called by Prepare() for you.

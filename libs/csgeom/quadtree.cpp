@@ -305,6 +305,12 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
 
 bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
+//printf ("InsertPolygon(%08lx): ", (long)this);
+//int i;
+//for (i = 0 ; i < num_verts ; i++)
+//printf ("(%.3f,%.3f) ", verts[i].x, verts[i].y);
+//printf ("\n");
+
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;
 
@@ -489,6 +495,13 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
 
 bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
+//printf ("TestPolygon(%08lx): ", (long)this);
+//int i;
+//for (i = 0 ; i < num_verts ; i++)
+//printf ("(%.3f,%.3f) ", verts[i].x, verts[i].y);
+//printf ("\n");
+
+
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;
 

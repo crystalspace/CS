@@ -58,7 +58,7 @@ public:
    * This version computes unit perspective correction for which aspect ratio
    * is one and shift_x and shift_y are zero.
    */
-  void AddPerspectiveUnit (csVector3& v) { AddPerspective (v.x, v.y, v.z); }
+  void AddPerspectiveUnit (csVector3& v) { AddPerspectiveUnit (v.x, v.y, v.z); }
 
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.

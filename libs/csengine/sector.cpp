@@ -917,7 +917,7 @@ del++;
       sf = sf->prev;
 cnt++;
   }
-printf ("Tested %d frustrums, deleted %d.\n", cnt, del);
+//printf ("Tested %d frustrums, deleted %d.\n", cnt, del);
 }
 
 //@@@ Needs to be part of sector?
@@ -946,8 +946,11 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
     if (vis)
     {
       p->CalculateLighting (lview);
+      //if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
+      float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
+      if (ABS (clas) < EPSILON) continue;
+      if ((clas <= 0) != cw) continue;
 
-      if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
       csShadowFrustrum* frust;
       CHK (frust = new csShadowFrustrum (center));
       csPlane pl = p->GetPlane ()->GetWorldPlane ();
@@ -961,7 +964,7 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
       frust_cnt--;
       if (frust_cnt < 0) 
       {
-        frust_cnt = 50;
+        frust_cnt = 200;
 	CompressShadowFrustrums (&(lview->shadows));
       }
     }
@@ -971,7 +974,6 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
 
 static int count_cull_dist;
 static int count_cull_quad;
-static int count_cull_frust;
 static int count_cull_not;
 
 // @@@ This routine need to be cleaned up!!! It needs to
@@ -1006,7 +1008,6 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
     return false;
   }
 
-#if 0
   // Test node against quad-tree.
   csVector3 outline[6];
   int num_outline;
@@ -1021,30 +1022,6 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
       count_cull_quad++;
       return false;
     }
-  }
-#endif
-
-  csShadowFrustrum* sf = lview->shadows.GetFirst ();
-  for ( ; sf ; sf = sf->next)
-  {
-    if (!sf->Contains (bmin)) continue;
-    if (!sf->Contains (bmax)) continue;
-    csVector3 v;
-    v.x = bmin.x; v.y = bmin.y; v.z = bmax.z;
-    if (!sf->Contains (v)) continue;
-    v.x = bmin.x; v.y = bmax.y; v.z = bmin.z;
-    if (!sf->Contains (v)) continue;
-    v.x = bmin.x; v.y = bmax.y; v.z = bmax.z;
-    if (!sf->Contains (v)) continue;
-    v.x = bmax.x; v.y = bmin.y; v.z = bmin.z;
-    if (!sf->Contains (v)) continue;
-    v.x = bmax.x; v.y = bmin.y; v.z = bmax.z;
-    if (!sf->Contains (v)) continue;
-    v.x = bmax.x; v.y = bmax.y; v.z = bmin.z;
-    if (!sf->Contains (v)) continue;
-    // Node is completely shadowed by frustrum.
-    count_cull_frust++;
-    return false;
   }
   count_cull_not++;
   return true;
@@ -1203,14 +1180,13 @@ void csSector::CalculateLighting (csLightView& lview)
   {
     count_cull_dist = 0;
     count_cull_quad = 0;
-    count_cull_frust = 0;
     count_cull_not = 0;
     static_thing->UpdateTransformation (center);
     static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
     CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
-    printf ("Cull: dist=%d quad=%d frust=%d not=%d\n",
-    	count_cull_dist, count_cull_quad, count_cull_frust, count_cull_not);
+    //printf ("Cull: dist=%d quad=%d not=%d\n",
+    	//count_cull_dist, count_cull_quad, count_cull_not);
   }
   else
   {

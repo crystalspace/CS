@@ -495,6 +495,8 @@ bool csWorld::Prepare (IGraphics3D* g3d)
   if (!SUCCEEDED (g3d->QueryInterface(IID_IHaloRasterizer, (void**)&piHR)))
     piHR = NULL;
 
+  CheckConsistancy ();
+
   return true;
 }
 
@@ -701,6 +703,49 @@ void csWorld::ShineLights (IGraphics3D* g3d)
 
   CHK (delete pit);
   CHK (delete lit);
+}
+
+bool csWorld::CheckConsistancy ()
+{
+  csPolyIt* pit = NewPolyIterator ();
+  bool error = false;
+
+  csPolygon3D* p;
+
+  CsPrintf (MSG_INITIALIZATION, "Checking world consistancy:\n");
+  pit->Restart ();
+  while ((p = pit->Fetch ()) != NULL)
+  {
+    if (p->GetNumVertices () < 3)
+    {
+      CsPrintf (MSG_WARNING, "  Polygon with only %d vertices (id=%d)!\n", p->GetNumVertices (), p->GetID ());
+      CsPrintf (MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetNumVertices (), p->GetID ());
+      Dumper::dump (p);
+      error = true;
+    }
+    else if (p->GetNumVertices () > 3)
+    {
+      csVector3 normal;
+      float D;
+      csMath3::CalcPlane (p->Vobj (0), p->Vobj (1), p->Vobj (2), normal, D);
+      csPlane pl (normal, D);
+      int i;
+      for (i = 3 ; i < p->GetNumVertices () ; i++)
+      {
+        if (ABS (pl.Classify (p->Vobj (i))) > EPSILON)
+	{
+          CsPrintf (MSG_WARNING, "  Non-coplanar polygon (id=%d)!\n", p->GetID ());
+          CsPrintf (MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
+          Dumper::dump (p);
+          error = true;
+	  break;
+	}
+      }
+    }
+  }
+
+  CHK (delete pit);
+  return error;
 }
 
 void csWorld::StartWorld ()

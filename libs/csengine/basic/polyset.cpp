@@ -670,7 +670,11 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
   for (i = 0 ; i < num_polygon ; i++)
   {
     p = (csPolygon3D*)polygons[i];
-    if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
+    //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
+    float clas = p->GetPlane ()->GetWorldPlane ().Classify (origin);
+    if (ABS (clas) < EPSILON) continue;
+    if ((clas <= 0) != cw) continue;
+
     CHK (frust = new csShadowFrustrum (origin));
     list->AddFirst (frust);
     csPlane pl = p->GetPlane ()->GetWorldPlane ();
