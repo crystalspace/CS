@@ -30,6 +30,8 @@ Short-term cleanups that need to be done:
 	  Now 45 degree polygons will work in all cases.
 	- Eric Sunshine fixed a signed-versus-unsigned comparison warning in
 	  vfs.cpp which afflicted the DOS port.
+	- Eric Sunshine fixed compilation errors in csLoader which showed up
+	  after recent changes to csPolygon3D and TextureTrans.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
