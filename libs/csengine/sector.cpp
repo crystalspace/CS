@@ -1159,7 +1159,7 @@ bool csSectorList::FreeItem (csSome Item)
 {
   if (CleanupReferences)
     ((iSector*)Item)->GetPrivateObject ()->CleanupReferences ();
-  return true;
+  return csSectorListHelper::FreeItem (Item);
 }
 
 int csSectorList::SectorList::GetSectorCount () const
