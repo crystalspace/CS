@@ -14,7 +14,7 @@ Crystal Space - This sounds obvious, but you require a release disrtibution
 of the Crystal Space game engine. Preferably version 0.18 or above. You can
 obtain this from:
 
-@uref{http://crystal.linuxgames.com/}
+@uref{http://crystal.sourceforge.net/}
 
 @item
 WorldCraft 3.3 - The Half-Life editor.  You might be technically or legally

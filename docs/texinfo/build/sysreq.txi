@@ -33,7 +33,7 @@ homepage.  They are @sc{zip} archives.  Do not unzip them.  Crystal Space reads
 @sc{zip} archives directly.
 
 @noindent
-@uref{http://crystal.linuxgames.com/}
+@uref{http://crystal.sourceforge.net/}
 
 @item
 The external libraries @code{zlib}, @code{libjpeg} and @code{libpng}.

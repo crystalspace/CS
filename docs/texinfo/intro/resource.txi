@@ -18,7 +18,7 @@ know.
 @noindent
 The Crystal Space home page is located at:
 
-@uref{http://crystal.linuxgames.com/}
+@uref{http://crystal.sourceforge.net/}
 
 @noindent
 The Crystal Space @emph{Jump Start} page, from which you can jump to many
