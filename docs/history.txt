@@ -33,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	  away for 2.1.)
 	- Eric Sunshine eliminated a slew of compilation warnings from the
 	  cloth plugin.
+	- Eric Sunshine fixed an infinite loop bug in
+	  csEffectDefinition::GetTopmostVariableID().
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.

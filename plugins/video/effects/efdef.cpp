@@ -120,7 +120,7 @@ int csEffectDefinition::GetTopmostVariableID(int id)
   while (parent >= 0)
   {
     curid = parent;
-    int parent = ((efvariable*)variables[curid])->point_to;
+    parent = ((efvariable*)variables[curid])->point_to;
   }
   return curid;
 }
