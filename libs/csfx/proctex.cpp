@@ -94,14 +94,13 @@ bool csProcTexture::PrepareAnim ()
   return true;
 }
 
-void csProcTexture::Initialize1 (iSystem * system,
+csMaterialWrapper* csProcTexture::Initialize (iSystem * system,
     	csEngine* engine, iTextureManager* txtmgr, const char* name)
 {
   SetName (name);
   Initialize (system);
   tex->Register (txtmgr);
   tex->GetTextureHandle ()->Prepare ();
-#if 0
   PrepareAnim ();
   csMaterial* material = new csMaterial ();
   csMaterialWrapper* mat = engine->GetMaterials ()->NewMaterial (material);
@@ -109,14 +108,14 @@ void csProcTexture::Initialize1 (iSystem * system,
   material->SetTextureWrapper (tex);
   material->DecRef ();
   mat->Register (txtmgr);
-  //mat->GetMaterialHandle ()->Prepare ();
+  mat->GetMaterialHandle ()->Prepare ();
   return mat;
-#endif
 }
 
+#if 0
 csMaterialWrapper* csProcTexture::Initialize2 (csEngine* engine, iTextureManager* txtmgr)
 {
-  PrepareAnim ();
+  //PrepareAnim ();
 
   csMaterial* material = new csMaterial ();
   csMaterialWrapper* mat = engine->GetMaterials ()->NewMaterial (material);
@@ -127,5 +126,6 @@ csMaterialWrapper* csProcTexture::Initialize2 (csEngine* engine, iTextureManager
   mat->GetMaterialHandle ()->Prepare ();
   return mat;
 }
+#endif
 
 //--------------------------------------------------------------------------------

@@ -104,10 +104,8 @@ public:
    * less flexibility but is sufficient for most cases. The texture and
    * material will get the name that is given by this routine.
    */
-  void Initialize1 (iSystem* system, csEngine* engine,
+  csMaterialWrapper* Initialize (iSystem* system, csEngine* engine,
       	iTextureManager* txtmgr, const char* name);
-
-  csMaterialWrapper* Initialize2 (csEngine* engine, iTextureManager* txtmgr);
 
   /**
    * Prepare the animation for use. This needs to be done after

@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+22-Dec-2000
+	- Eliminated a bug in the procedural texture manager for the
+	  software renderer. The problem was that only the first 8-bit
+	  proc texture was correctly initialized.
+	- Fixed csfx so that there is only one Initialize() method now
+	  as was originally intended.
+21-Dec-2000
+	- Philip Wyett fixed a small bug in texture.h.
+	- Philip also found a bug in ~SoftwareCachedTexture () which
+	  causes an on exit error in "appptlab" in Windows. Because of
+	  possible side effects I have merely commented above the offending
+	  line for resolution at a later date/more convenient time..
+	  Hope that is OK.
+	- Wouter Wijngaards fixed the macintosh pow() command for radiosity.
 20-Dec-2000
 	- Continued work on csfx library. Implemented support for a random
 	  dot proc texture, plasma, fire and water (the last three are

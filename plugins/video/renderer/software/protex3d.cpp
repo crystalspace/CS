@@ -169,6 +169,11 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
         SharedInitialize (parent_texman->GetFirst8bitProcTexture ());
         if (!Open (NULL) || !SharedOpen ())
           return false;
+	// @@@ Jorrit: I put in this call to PrepareTextures() here
+	// because otherwise the needed call to Reprepare8BitProcs()
+	// will not happen except for the first 8-bit proc texture.
+	// Of course this is still not very optimal.
+        texman->PrepareTextures ();
       }
 
       if (buffer)
