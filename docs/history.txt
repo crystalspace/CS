@@ -19,6 +19,10 @@ chronological order.
 	  softness from .316 to .01
 	- Duhprey fixed the default to stepfast and coding style in
 	  odedynam.
+	- Duhprey added the following to stencil shadows
+	  - Improved memory management with csHash<> and csArray<>
+	  - Fixed robustness on animated (deforming) meshes
+	  - Fixed robustness on moving meshes
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap 
