@@ -50,7 +50,10 @@ struct iPolygon3D;
 struct iRenderView;
 struct iFrustumView;
 struct iSector;
+
+#ifdef CS_USE_NEW_RENDERER
 class csRenderMesh;
+#endif // CS_USE_NEW_RENDERER
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 
@@ -328,4 +331,3 @@ struct iSectorIterator : public iBase
 /** @} */
 
 #endif // __CS_IENGINE_SECTOR_H__
-
