@@ -631,12 +631,45 @@ void operator delete[] (void* p)
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 
-#elif defined(MEMDEBUG_MEMORY_TRACKER)
+#else	// CS_COMPILER_MSVC
+//========================================================================
+// If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
+// the correct overloaded operators even if we don't do debugging.
+//========================================================================
+
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#undef new
+void* operator new (size_t s, void*, int)
+{
+  return (void*)malloc (s);
+}
+void* operator new[] (size_t s, void*, int)
+{
+  return (void*)malloc (s);
+}
+void operator delete (void* p)
+{
+  if (p) free (p);
+}
+void operator delete[] (void* p)
+{
+  if (p) free (p);
+}
+#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+
+#endif	// CS_COMPILER_MSVC
+
+//#elif defined(MEMDEBUG_MEMORY_TRACKER)
+//#endif  // CS_COMPILER_MSVC
+
+#if defined(MEMDEBUG_MEMORY_TRACKER)
 
 #ifdef CS_MEMORY_TRACKER_IMPLEMENT
 
+#define CS_MEMORY_TRACKER // to get iSCF::object_reg
 #include "csutil/scf.h"
-#include "csutil/ref.h"
+#undef CS_MEMORY_TRACKER
+
 #include "iutil/objreg.h"
 #include "csutil/memdebug.h"
 #include "iutil/memdebug.h"
@@ -869,7 +902,7 @@ void mtiUpdateAmount (MemTrackerInfo* mti, int dcount, int dsize)
 
 void* operator new (size_t s, void* filename, int /*line*/)
 {
-  CS_ASSERT (s > 0);
+  //CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
   memset (rc, 0xfe, s+16);
   *rc++ = s;
@@ -880,7 +913,7 @@ void* operator new (size_t s, void* filename, int /*line*/)
 }
 void* operator new[] (size_t s, void* filename, int /*line*/)
 {
-  CS_ASSERT (s > 0);
+  //CS_ASSERT (s > 0);
   uint32* rc = (uint32*)malloc (s+16);
   memset (rc, 0xfe, s+16);
   *rc++ = s;
@@ -916,31 +949,4 @@ void operator delete[] (void* p)
 
 #endif // CS_MEMORY_TRACKER_IMPLEMENT
 
-#else	// CS_COMPILER_MSVC
-//========================================================================
-// If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
-// the correct overloaded operators even if we don't do debugging.
-//========================================================================
-
-#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
-#undef new
-void* operator new (size_t s, void*, int)
-{
-  return (void*)malloc (s);
-}
-void* operator new[] (size_t s, void*, int)
-{
-  return (void*)malloc (s);
-}
-void operator delete (void* p)
-{
-  if (p) free (p);
-}
-void operator delete[] (void* p)
-{
-  if (p) free (p);
-}
-#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
-
-#endif	// CS_COMPILER_MSVC
-
+#endif // defined(MEMDEBUG_MEMORY_TRACKER)

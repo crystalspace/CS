@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Nov-2004
+	- res made the memtracker also work in optimize builds.
+	- res fixed memtracker compilation with MSVC.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable

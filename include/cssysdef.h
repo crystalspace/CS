@@ -511,7 +511,6 @@ Type &Class::getterFunc ()                                                      
 // Same for CS_REF_TRACKER.
 #ifndef CS_DEBUG
 #  undef CS_EXTENSIVE_MEMDEBUG
-#  undef CS_MEMORY_TRACKER
 #  undef CS_REF_TRACKER
 #else
 #  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)

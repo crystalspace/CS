@@ -43,6 +43,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "imap/ldrctxt.h"
 #include "sprcal3dldr.h"
 
+// Hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <cal3d/loader.h>
 
 CS_IMPLEMENT_PLUGIN
