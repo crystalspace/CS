@@ -69,30 +69,30 @@ public:
   {
   public:
     /// Constructor
-    Iterator() : ptr(0)
+    Iterator() : ptr(0), visited(false), reversed(false)
     { }
     /// Copy constructor
-    Iterator(const Iterator& other)
-    { ptr = other.ptr; }
+    Iterator(const Iterator& r)
+    { ptr = r.ptr; visited = r.visited; reversed = r.reversed; }
     /// Constructor.
-    Iterator(const csList<T> &list, bool reverse = false)
+    Iterator(const csList<T> &list, bool reverse = false) :
+      visited(false), reversed(reverse)
     {
-      reversed = reverse;
       if (reverse) ptr = list.tail;
       else ptr = list.head;
     }
     /// Assignment operator
-    const Iterator& operator= (const Iterator& other)
-    { ptr = other.ptr; reversed = other.reversed; return *this; }
+    const Iterator& operator= (const Iterator& r)
+    { ptr = r.ptr; visited = r.visited; reversed = r.reversed; return *this; }
     /// Test if the Iterator is set to a valid element.
     bool HasCurrent() const
-    { return ptr != 0; }
+    { return visited && ptr != 0; }
     /// Test if there is a next element.
     bool HasNext() const
-    { return ptr && ptr->next; }
+    { return ptr && (ptr->next || !visited); }
     /// Test if there is a previous element.
     bool HasPrevious() const
-    { return ptr && ptr->prev; }
+    { return ptr && (ptr->prev || !visited); }
     /// Test if the Iterator is set to the first element.
     bool IsFirst() const
     { return ptr && ptr->prev == 0; }
@@ -105,64 +105,83 @@ public:
 
     /// Cast operator.
     operator T*() const
-    { return &ptr->data; }
+    { return visited && ptr ? &ptr->data : 0; }
     /// Dereference operator (*).
     T &operator *() const
-    { return ptr->data; }
+    { CS_ASSERT(ptr != 0); return ptr->data; }
     /// Dereference operator (->).
     T *operator->() const
-    { return &ptr->data; }
+    { return visited && ptr ? &ptr->data : 0; }
 
     /// Set iterator to non-existent element. HasCurrent() will return false.
     void Clear ()
     {
       ptr = 0;
+      visited = true;
     }
     /// Advance to next element and return it.
     T* Next ()
     {
-      if (ptr != 0)
+      if (visited && ptr != 0)
         ptr = ptr->next;
+      visited = true;
       return *this;
     }
     /// Backup to previous element and return it.
-    T* Prev()
+    T* Previous()
     {
-      if (ptr != 0)
+      if (visited && ptr != 0)
         ptr = ptr->prev;
+      visited = true;
       return *this;
     }
+    T* Prev() { return Previous(); } // Backward compatibility.
+
     /// Advance to next element and return it.
     Iterator& operator++()
     {
-      if (ptr != 0)
+      if (visited && ptr != 0)
         ptr = ptr->next;
+      visited = true;
       return *this;
     }
     /// Backup to previous element and return it.
     Iterator& operator--()
     {
-      if (ptr != 0)
+      if (visited && ptr != 0)
         ptr = ptr->prev;
+      visited = true;
       return *this;
     }
 
+    /**
+     * Return current element.
+     * Warning! Assumes there is a current element!
+     */
+    const T& FetchCurrent () const
+    {
+      CS_ASSERT(visited && ptr != 0);
+      return ptr->data;
+    }
     /**
      * Return next element but don't modify iterator.
      * Warning! Assumes there is a next element!
      */
     const T& FetchNext () const
     {
+      CS_ASSERT(ptr != 0);
       return ptr->next->data;
     }
     /**
      * Return previous element but don't modify iterator.
      * Warning! Assumes there is a previous element!
      */
-    const T& FetchPrev () const
+    const T& FetchPrevious () const
     {
+      CS_ASSERT(ptr != 0);
       return ptr->prev->data;
     }
+    const T& FetchPrev () const { return FetchPrevious(); } // Backward compat.
 
   protected:
     friend class csList<T>;
@@ -171,6 +190,7 @@ public:
 
   private:
     csListElement* ptr;
+    bool visited;
     bool reversed;
   };
 
