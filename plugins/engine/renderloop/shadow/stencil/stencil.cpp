@@ -241,7 +241,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   if (csStencilShadowCacheEntry::model != model)
   {
 #   ifdef SHADOW_CACHE_DEBUG
-    printf ("New model %8.8x, old model %8.8x\n", model,
+    csPrintf ("New model %p, old model %p\n", model,
       csStencilShadowCacheEntry::model);
 #   endif
     csStencilShadowCacheEntry::model = model;	

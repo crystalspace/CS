@@ -40,7 +40,7 @@ public:
     struct Param
     {
       csStringID name;
-      uint32 value;
+      uintptr_t value;
     };
     Param* params;
 

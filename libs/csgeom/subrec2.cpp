@@ -672,7 +672,7 @@ void csSubRectangles2::Dump ()
   {
     csRef<iDataBuffer> buf = imgsaver->Save (img, "image/png");
     csString outfn;
-    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_r.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%p_r.png", this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -687,7 +687,7 @@ void csSubRectangles2::Dump ()
     }
 
     buf = imgsaver->Save (img2, "image/png");
-    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_ar.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%p_ar.png", this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -702,7 +702,7 @@ void csSubRectangles2::Dump ()
     }
 
     buf = imgsaver->Save (img3, "image/png");
-    outfn.Format ("/tmp/csSubRectangles2_dump_%.8x_ov.png", (uint)this);
+    outfn.Format ("/tmp/csSubRectangles2_dump_%p_ov.png", this);
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,

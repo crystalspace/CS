@@ -65,7 +65,7 @@ csThreadJobQueue::~csThreadJobQueue()
 
   delete sharedData.jobFifo;
 #ifdef THREADJOBQUEUE_PRINT_STATS
-  csPrintf ("csThreadJobQueue %pp: %u added, %u pulled, %u waited, %u unqueued\n",
+  csPrintf ("csThreadJobQueue %p: %u added, %u pulled, %u waited, %u unqueued\n",
     this, jobsAdded, jobsPulled, jobsWaited, jobsUnqueued);
 #endif
   SCF_DESTRUCT_IBASE();

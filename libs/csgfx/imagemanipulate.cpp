@@ -684,7 +684,7 @@ csRef<iImage> csImageManipulate::RenderKeycolorToAlpha (iImage* source,
     result->SetFormat ((source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
 
 #ifdef KEYCOLOR_DEBUG
-  csDebugImageWriter::DebugImageWrite (result, "renderkeycolor_%pp.png", source);
+  csDebugImageWriter::DebugImageWrite (result, "renderkeycolor_%p.png", source);
 #endif
   return result;
 }

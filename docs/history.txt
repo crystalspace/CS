@@ -14,6 +14,12 @@ chronological order.
 	  the function is used only by other compilation units in the same
 	  DLL. Swig 1.3.24 issue reported by Michael D. Adams
 	  <mdmkolbe@gmail.com>.
+	- res augmented the MAXPATHLEN condifugure check to use the -ansi 
+	  -pedantic flags, as apparently on some setups MAXPATHLEN is detected 
+	  by configure, but later not available when compiling sources with 
+	  -ansi -pedantic.
+	- res changed some places to use the newly supported cs_snprintf()
+	  formats (mostly correct formatting of pointers).
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 
@@ -40,6 +46,8 @@ chronological order.
 	  set the float heightmap data on an iSimpleFormerState.
 	- res fixed some issues with cs_snprintf() long double support. Needs
 	  more work, though.
+	- res added ability to walktest to optionally enable saver flag. Edit
+	  walktest.cfg or run with "-saveable". (Really, this time.)
 4-Mar-2005
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for

@@ -427,7 +427,7 @@ void csGLTextureHandle::CreateMipMaps()
   for (i=0; i < subImageCount; i++)
   {
     csDebugImageWriter::DebugImageWrite (image->GetSubImage (i),
-      "/tmp/mipdebug/%.8x_%d_0.png", this, i);
+      "/tmp/mipdebug/%p_%d_0.png", this, i);
   }
 #endif
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
@@ -493,7 +493,7 @@ void csGLTextureHandle::CreateMipMaps()
 	}
   #ifdef MIPMAP_DEBUG
 	csDebugImageWriter::DebugImageWrite (cimg,
-	  "/tmp/mipdebug/%.8x_%d_%d.png", this, i, nMip);
+	  "/tmp/mipdebug/%p_%d_%d.png", this, i, nMip);
   #endif
 	thisImage = cimg;
 	if (mipskip != 0) mipskip--;

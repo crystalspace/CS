@@ -227,8 +227,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       statecache->SetMatrixMode (GL_TEXTURE);
       glLoadMatrixf (mAutoTextureMatrix);
     }
-	else
-    if (layers[i].texgen == TEXGEN_REFLECT_SPHERE)
+    else if (layers[i].texgen == TEXGEN_REFLECT_SPHERE)
     {
       //setup for environmental spheremapping
       glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
@@ -268,8 +267,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       glLoadMatrixf (mAutoTextureMatrix);
 	  */
     }
-      else
-    if (layers[i].texgen == TEXGEN_FOG)
+    else if (layers[i].texgen == TEXGEN_FOG)
     {
       csRef<csShaderVariable> planeVar;
       csRef<csShaderVariable> densityVar;

@@ -2028,7 +2028,8 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 	#include <sys/param.h>
 	#endif]],
 	[char s[[[MAXPATHLEN]]]; (void)s;])],
-    [], [], [CS_HEADER_PROPERTY([CS_MAXPATHLEN], [MAXPATHLEN])])
+    [], [], [CS_HEADER_PROPERTY([CS_MAXPATHLEN], [MAXPATHLEN])], [], [],
+    [$cs_cv_prog_cxx_enable_pedantic])
 
 
 

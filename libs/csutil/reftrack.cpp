@@ -255,17 +255,16 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
     (info->destructed && (info->refCount <= 1));
   if (!okay)
   {
-    // strictly speaking %pp is wrong, but out own snprintf uses that
-    csPrintf ("object %pp (%s), refcount %d, %s\n",
+    csPrintf ("object %p (%s), refcount %d, %s\n",
       obj,
       info->descr ? info->descr : "<unknown>",
       info->refCount,
       info->destructed ? "destructed" : "not destructed");
     for (size_t i = 0; i < info->actions.Length(); i++)
     {
-      csPrintf ("%s by %pp from %d\n",
+      csPrintf ("%s by %p from %d\n",
 	(info->actions[i].type == Increased) ? "Increase" : "Decrease",
-	(void*)info->actions[i].tag, // @@@ Fix for pointer
+	(void*)info->actions[i].tag, 
 	info->actions[i].refCount);
       if (info->actions[i].stack != 0)
 	info->actions[i].stack->Print ();

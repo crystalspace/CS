@@ -134,7 +134,7 @@ BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
   {
     SymCallbackInfo* info = (SymCallbackInfo*)UserContext;
 
-    uint32 data = *((uint32*)(info->paramOffset + pSymInfo->Address));
+    uintptr_t data = *((uintptr_t*)(info->paramOffset + pSymInfo->Address));
     StackEntry::Param& param =
       info->params->GetExtend(info->params->Length ());
     param.name = strings.Request (pSymInfo->Name);
@@ -243,13 +243,13 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%.8x] (%s)%s+0x%x", (unsigned int)entries[num].instrPtr,
+    str.Format ("[%p] (%s)%s+0x%llx", (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
-      symbolInfo->Name, (unsigned int)displace);
+      symbolInfo->Name, (ulonglong)displace);
   }
   else
   {
-    str.Format ("[%.8x] (%s)<unknown>", (uint32)entries[num].instrPtr,
+    str.Format ("[%p] (%s)<unknown>", (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>");
   }
 
@@ -286,8 +286,8 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
     str << strings.Request (param->name);
     str << " = ";
     char tmp[23];
-    uint32 data = param->value;
-    sprintf (tmp, "%d(0x%.8x)", data, data);
+    longlong data = param->value;
+    sprintf (tmp, "%lld(0x%llx)", data, data);
     str << tmp;
     param++;
   }
