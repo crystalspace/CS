@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -17,7 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SYSDEFS_H__
+#ifdef __SYSDEFS_H__
+#error "Don't include sysdef.h from header files please!"
+#else
 #define __SYSDEFS_H__
 
 #define OK_TO_INCLUDE_DEFS_IM_A_FRIEND
@@ -77,21 +79,13 @@
 #  define SYSDEF_PATH
 #endif
 
-/*
-
-	The next #ifdef is only necessary for VC/C++ based builds
-	or those platforms that can use Dx 5 (Win9x or Win2k) or
-	later.
-
-*/
-#ifdef OS_WIN32
+// For VC/C++ based builds or platforms which use DX5 (Win9x/Win2k) or later.
+#if defined(OS_WIN32)
 #  include "cssys/win32/csosdefs.h"
 #endif
 
-/*
-	Next #ifdef is for Mingw build under NT4 OS
-*/
-#ifdef OS_NT4
+// For Mingw build under NT4 OS.
+#if defined(OS_NT4)
 #  include "cssys/mingw/csosdefs.h"
 #endif
 
@@ -127,7 +121,7 @@
 #  include "cssys/next/csosdefs.h"
 #endif
 
-//--//--//--//--//--/ Allow system-dependent header files to override these --//
+// Allow system-dependent header files to override these ----------------------
 
 #ifdef SYSDEF_CASE
 // Convert a character to upper case
@@ -195,7 +189,7 @@
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
 #      define MKDIR(path) _mkdir (path)
 #    else
-#      define MKDIR(path) mkdir (path, 0644)
+#      define MKDIR(path) mkdir (path, 0755)
 #    endif
 #  endif
 #endif // SYSDEF_MKDIR
