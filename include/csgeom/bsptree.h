@@ -20,12 +20,14 @@
 #define __CS_BSPTREE_H__
 
 #include "csextern.h"
+#include "plane3.h"
 #include "csutil/array.h"
 #include "csutil/garray.h"
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 
 struct iGraphics3D;
+struct csTriangle;
 class csBSPTree;
 
 /**

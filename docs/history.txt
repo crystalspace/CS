@@ -72,6 +72,11 @@ chronological order.
 	  "jam freezemasterheaders".
 	- Eric Sunshine augmented jobber.pl so that it keeps the new master
 	  header files up-to-date.
+	- Eric Sunshine began the task of making the CS headers self-contained
+	  and responsible for their own needs so that they will actually work
+	  correctly in conjunction with <crystalspace.h>. (Some headers expect
+	  that the .cpp file has #included other headers upon which they
+	  depend, but this is incorrect behavior.)
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
