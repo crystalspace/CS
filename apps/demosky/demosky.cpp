@@ -87,12 +87,12 @@ void Simple::SetTexSpace(csPolygon3D *poly, int size, const csVector3& orig,
   csVector3 uvector = upt - orig;
   csVector3 vvector = vpt - orig;
   /// to have 1 pixel going over the edges.
-  texorig -= uvector * 1 / float(size);
-  texorig -= vvector * 1 / float(size);
-  texu += uvector * 1 / float(size);
-  texv += vvector * 1 / float(size);
-  texulen += 2 / float(size);
-  texvlen += 2 / float(size);
+  texorig -= uvector * 1. / float(size);
+  texorig -= vvector * 1. / float(size);
+  texu += uvector * 1. / float(size);
+  texv += vvector * 1. / float(size);
+  texulen += 2. / float(size);
+  texvlen += 2. / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
 }
 
@@ -151,6 +151,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   //csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
   sky = new csProcSky();
+  sky->SetAnimated(false);
   sky_f = new csProcSkyTexture(sky);
   csMaterialWrapper* matf = sky_f->Initialize(this, engine, txtmgr, "sky_f");
   sky_b = new csProcSkyTexture(sky);

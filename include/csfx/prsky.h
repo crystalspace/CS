@@ -106,6 +106,9 @@ class csProcSky {
   /// the octaves
   uint8 *octaves;
 
+  /// is it animation (if not - no recalculation is performed)
+  bool animated;
+
   /// init the texture
   void Initialize();
   /// init an octave with new random/smoothed content
@@ -134,6 +137,11 @@ public:
 
   /// Make intersection point cache in a texture
   void MakeIntersectCache(csProcSkyTexture *skytex);
+
+  /// Enable or disable sky animation. Sky animation is very slow.
+  void SetAnimated(bool anim=true) {animated=anim;}
+  /// See if the prsky is animated
+  bool GetAnimated() const {return animated;}
 };
 
 #endif // __PROCSKYTEX_H__

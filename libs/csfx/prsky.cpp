@@ -96,6 +96,8 @@ csProcSky::csProcSky()
   octsize = 32; // octave is octsize x octsize
   octaves = new uint8 [octsize*octsize*nr_octaves];
 
+  animated= true;
+
   Initialize();
 }
 
@@ -304,6 +306,9 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
   iGraphics2D *g2d = skytex->GetG2D();
   iTextureManager *txtmgr = skytex->GetTextureManager();
 
+  /// if it already has a texture cache (it has been drawn to in the past)
+  /// an we do not animate - skip, nothing to be done.
+  if(skytex->GetIntersect() && !animated) return;
   // if the texture has no cache, make one
   if(!skytex->GetIntersect()) MakeIntersectCache(skytex);
 
