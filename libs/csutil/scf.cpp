@@ -45,7 +45,7 @@ public:
   /// constructor
   csSCF ();
   /// destructor
-  ~csSCF ();
+  virtual ~csSCF ();
 
   /// Read config file
   virtual void RegisterConfigClassList (iConfigFile *cfg);
