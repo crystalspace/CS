@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Nov-2004
+	- Eric Sunshine added blurb about newly supported Java bindings to
+	  apimod100.txi.
 21-Nov-2004
 	- res fixed a problem in the NR software renderer were wrong renderer
 	  lightmaps were selected for polygons, causing problems from visual 

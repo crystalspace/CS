@@ -650,3 +650,9 @@ the @samp{iImage} objects associated with textures with the purpose of freeing
 up memory.  This happens automatically now; the images associated with a
 texture are released by the renderer as soon as the image data is converted
 into the internal texture format (that is, uploaded to the graphics hardware).
+
+@subheading Java Bindings
+
+The Java bindings for Crystal Space have been fully integrated into the project
+and are now well-supported. It is now possible to write Crystal Space program
+entirely in Java. @xref{Java Bindings}.
