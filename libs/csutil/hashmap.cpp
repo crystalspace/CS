@@ -101,13 +101,13 @@ csHashObject csHashMap::Get (csHashKey key)
 csHashIterator* csHashMap::GetIterator (csHashKey key)
 {
   csHashIterator* iterator = new csHashIterator ();
+  iterator->hash = this;
 
   int idx = key % max_size;
 
   iterator->bucket = (csHashBucket*)buckets[idx]; // Will be NULL if bucket is empty.
   iterator->element_index = 0;
   iterator->next_bucket_index = -1;
-  iterator->hash = this;
 
   return iterator;
 }
@@ -115,11 +115,31 @@ csHashIterator* csHashMap::GetIterator (csHashKey key)
 csHashIterator* csHashMap::GetIterator ()
 {
   csHashIterator* iterator = new csHashIterator ();
-
-  iterator->bucket = (csHashBucket*)buckets[0];
-  iterator->element_index = 0;
-  iterator->next_bucket_index = 1;
   iterator->hash = this;
+
+  int i = 0;
+  while (i < buckets.Length ())
+  {
+    if (buckets[i]) break;
+    i++;
+  }
+  if (i >= buckets.Length ())
+  {
+    iterator->bucket = NULL;
+    return iterator;
+  }
+  iterator->bucket = (csHashBucket*)buckets[i];
+  iterator->element_index = 0;
+  i++;
+  while (i < buckets.Length ())
+  {
+    if (buckets[i]) break;
+    i++;
+  }
+  if (i >= buckets.Length ())
+    iterator->next_bucket_index = -1;
+  else
+    iterator->next_bucket_index = i;
 
   return iterator;
 }

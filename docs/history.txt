@@ -42,6 +42,7 @@ The history order has been reversed so that new features are at the top.
 	- Added new csHashMap class to csutil. This is the first version of
 	  a new hashtable class that can be used for several things.
 	  This is untested code right now.
+	- Fixed a bug in the iterator code of the new csHashMap class.
 	- Norman Kramer changed config for Glide to access Glide section
 	  instead of Glide2x.
 1-Jun-2000
