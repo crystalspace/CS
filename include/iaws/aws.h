@@ -155,6 +155,12 @@ public:
   /// Creates a new parameter list
   virtual iAwsParmList *CreateParmList()=0;
 
+  /// Creates and enables a transition for a window
+  virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1)=0;
+
+  /// Creates and enables a transition for a window, using a user specified start or finish (transition type defines which)
+  virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)=0;
+
   /// Sets one or more flags for different operating modes
   virtual void SetFlag(unsigned int flags)=0;
 
@@ -545,6 +551,9 @@ struct iAwsWindow : public iAwsComponent
 
   /// Sets the engine view for this window
   virtual void SetEngineView(iView *_view)=0;
+
+  /// Moves the window and all associated items (including children)
+  virtual void Move(int delta_x, int delta_y)=0;
 
   /// Gets the engine view for this window
   virtual iView *GetEngineView()=0;

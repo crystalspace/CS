@@ -24,4 +24,14 @@ const unsigned int AWSF_CMP_HIDDEN      = 8;  // set if component is hidden
 const unsigned int AWSF_CMP_TRANSPARENT = 2;  // set if component is transparent
 const unsigned int AWSF_CMP_ALWAYSERASE = 4;  // set if component always needs erased by parent first
 
+const unsigned int AWS_TRANSITION_SLIDE_IN_LEFT  = 0;  // window slides left (start out to curframe)
+const unsigned int AWS_TRANSITION_SLIDE_IN_RIGHT = 1;  // window slides right
+const unsigned int AWS_TRANSITION_SLIDE_IN_UP    = 2;  // window slides up
+const unsigned int AWS_TRANSITION_SLIDE_IN_DOWN  = 3;  // window slides down
+
+const unsigned int AWS_TRANSITION_SLIDE_OUT_LEFT  = 4;  // window slides left (start curframe to out)
+const unsigned int AWS_TRANSITION_SLIDE_OUT_RIGHT = 5;  // window slides right
+const unsigned int AWS_TRANSITION_SLIDE_OUT_UP    = 6;  // window slides up
+const unsigned int AWS_TRANSITION_SLIDE_OUT_DOWN  = 7;  // window slides down
+
 #endif
