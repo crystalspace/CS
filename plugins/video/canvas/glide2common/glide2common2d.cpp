@@ -146,7 +146,7 @@ void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, 
 }
 
 //#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
-#define GR_DRAWBUFFER GR_BUFFER_BACKBUFFER
+//#define GR_DRAWBUFFER GR_BUFFER_BACKBUFFER
 
 bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 {
@@ -162,7 +162,7 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
   if(locked) FinishDraw();
 
   bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
-                          GR_DRAWBUFFER,
+                          m_drawbuffer,
                           GR_LFBWRITEMODE_565,
                           GR_ORIGIN_UPPER_LEFT,
                           FXFALSE,
@@ -191,6 +191,10 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 
 void csGraphics2DGlideCommon::FinishDraw ()
 {
+  DrawPixel (mx,my,~0);
+  DrawPixel (mx+1,my,~0);
+  DrawPixel (mx+1,my+1,~0);
+  DrawPixel (mx,my+1,~0);
   csGraphics2D::FinishDraw ();
   if (FrameBufferLocked)
     return;
@@ -198,7 +202,7 @@ void csGraphics2DGlideCommon::FinishDraw ()
   Memory=NULL;
   for (int i = 0; i < Height; i++) LineAddress [i] = 0;
   if (locked) 
-    GlideLib_grLfbUnlock (glDrawMode,GR_DRAWBUFFER);
+    GlideLib_grLfbUnlock (glDrawMode,m_drawbuffer);
   
   locked = false;
 }
@@ -238,7 +242,7 @@ unsigned char* csGraphics2DGlideCommon::GetPixelAt ( int x, int y)
 void csGraphics2DGlideCommon::Print( csRect* area ){
   (void)area;
   // swap the buffers only to show the new frame
-  GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
+  if (GetDoubleBufferState()) GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
 }
 
 csImageArea *csGraphics2DGlideCommon::SaveArea (int x, int y, int w, int h)
@@ -291,11 +295,11 @@ void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
   {
     if ( !locked ){
 #ifdef GLIDE3
-      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, 
+      GlideLib_grLfbWriteRegion( m_drawbuffer, Area->x, Area->y, 
                                  GR_LFB_SRC_FMT_565, Area->w, Area->h, 
 				 FXFALSE, Area->w*pfmt.PixelBytes, Area->data );
 #else
-      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, 
+      GlideLib_grLfbWriteRegion( m_drawbuffer, Area->x, Area->y, 
                                  GR_LFB_SRC_FMT_565, Area->w, Area->h, 
 				 Area->w*pfmt.PixelBytes, Area->data );
 #endif
@@ -360,4 +364,11 @@ float csGraphics2DGlideCommon::GetZBuffValue (int x, int y)
   printf( "could not lock depthbuffer\n");
   }
   return val;
+}
+
+bool csGraphics2DGlideCommon::DoubleBuffer (bool Enable)
+{
+    m_drawbuffer = (Enable ? GR_BUFFER_BACKBUFFER : GR_BUFFER_FRONTBUFFER);
+    GlideLib_grRenderBuffer ( m_drawbuffer );
+    return true;
 }

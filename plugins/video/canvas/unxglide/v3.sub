@@ -1,0 +1,103 @@
+# This is a subinclude file used to define the rules needed
+# to build the GlideX 2D V3 driver -- glidx2d3
+
+# Driver description
+DESCRIPTION.glidx2d3 = Crystal Space Glide V3/X 2D driver 
+
+#-------------------------------------------------------------- rootdefines ---#
+ifeq ($(MAKESECTION),rootdefines)
+
+# Driver-specific help commands
+DRIVERHELP += $(NEWLINE)echo $"  make glidx2d3     Make the $(DESCRIPTION.glidx2d3)$"
+
+endif # ifeq ($(MAKESECTION),rootdefines)
+
+#-------------------------------------------------------------- roottargets ---#
+ifeq ($(MAKESECTION),roottargets)
+
+.PHONY: glidx2d3
+
+all plugins drivers drivers23: glidx2d3
+
+glidx2d3:
+	$(MAKE_TARGET) MAKE_DLL=yes
+glidx2d3clean:
+	$(MAKE_CLEAN)
+
+endif # ifeq ($(MAKESECTION),roottargets)
+
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+# local CFLAGS
+CFLAGS.GLIDX2D3=-I$(X11_PATH)/include $(GLIDE3_PATH) -DGLIDE3
+
+LIBS._GLIDX2D3+=-L$(X11_PATH)/lib -lXext -lX11 -lglide3x  
+
+# The 2D GlideX driver
+ifeq ($(USE_SHARED_PLUGINS),yes)
+  GLIDX2D3=glidx2d3$(DLL)
+  LIBS.GLIDX2D3=$(LIBS._GLIDX2D3)
+else
+  GLIDX2D3=$(OUT)$(LIB_PREFIX)glidx2d3$(LIB)
+  DEP.EXE+=$(GLIDX2D3)
+  LIBS.EXE+=$(LIBS._GLIDX2D3)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDX2D3
+endif
+DESCRIPTION.$(GLIDX2D3) = $(DESCRIPTION.glidx2d3)
+SRC.GLIDX2D3 = libs/cs2d/unxglide/glidex2d.cpp libs/cs2d/glide2common/glide2common2d.cpp \
+               $(SRC.COMMON.DRV2D)
+OBJ.GLIDX2D3 = $(OUT)glidx2d3$O $(OUT)glide3common2d$O \
+               $(addprefix $(OUT), $(notdir $(SRC.COMMON.DRV2D:.cpp=$O)))
+
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
+#------------------------------------------------------------------ targets ---#
+ifeq ($(MAKESECTION),targets)
+
+.PHONY: glidx2d3 glidx2d3clean
+
+# Chain rules
+clean: glidx2d3clean
+
+glidx2d3: $(OUTDIRS) $(GLIDX2D3)
+
+$(OUT)glidx2d3$O: libs/cs2d/unxglide/glidex2d.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
+
+$(OUT)glide3common2d$O: libs/cs2d/glide2common/glide2common2d.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
+
+$(OUT)%$O: libs/cs2d/common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D3)
+ 
+$(GLIDX2D3): $(OBJ.GLIDX2D3) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+	$(DO.PLUGIN) $(LIBS.GLIDX2D3)
+
+glidx2d3clean:
+	$(RM) $(GLIDX2D3) $(OBJ.GLIDX2D3)
+
+ifdef DO_DEPEND
+dep: $(OUTOS)glidx2d3.dep
+$(OUTOS)glidx2d3.dep: $(SRC.GLIDX2D3)
+	$(DO.DEP1) $(CFLAGS.GLIDX2D3) $(DO.DEP2)
+else
+-include $(OUTOS)glidx2d3.dep
+endif
+
+endif # ifeq ($(MAKESECTION),targets)
+
+#------------------------------------------------------------------- config ---#
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+
+# Default value for DO_SHM
+ifndef DO_SHM
+  DO_SHM = yes
+endif
+
+ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
+endif
+
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

@@ -39,7 +39,13 @@ protected:
   /// flag to indicate whether to draw fullscreen or not.
   bool m_DoGlideInWindow;
   bool m_bVRetrace;
+
+  /// last mouse position
+  int mx, my;
   
+  /// do we render into backbuffer ?
+  FxI32 m_drawbuffer;
+    
   /// palette has been changed
   bool bPaletteChanged;
   bool bPalettized;
@@ -114,6 +120,8 @@ public:
   /// Restore a subarea of screen saved with SaveArea()
   virtual void RestoreArea (csImageArea *Area, bool Free);
 
+  virtual bool DoubleBuffer (bool Enable);
+  virtual bool GetDoubleBufferState () { return m_drawbuffer == GR_BUFFER_BACKBUFFER; }
   /// Figure out GL RGB color from a packed color format
 //  virtual void setGlideColorfromint(int color); //dh: not implemented yet
 

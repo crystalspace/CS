@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cs2d/common
 
-SRC.COMMON.DRV2D=libs/cs2d/common/igraph2d.cpp libs/cs2d/common/graph2d.cpp \
+SRC.COMMON.DRV2D=libs/cs2d/common/graph2d.cpp \
   libs/cs2d/common/fonts.cpp libs/cs2d/common/scrshot.cpp
 
 SRC.COMMON.DRV2D.OPENGL=libs/cs2d/openglcommon/*.cpp

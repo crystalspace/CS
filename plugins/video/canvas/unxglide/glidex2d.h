@@ -51,7 +51,7 @@ private:
   XImage* xim;
   GC gc;
   XVisualInfo *active_GLVisual;
-
+  
   // Window colormap
   Colormap cmap;
 
@@ -86,7 +86,8 @@ public:
   virtual void Print (csRect *area = NULL);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
+  virtual bool SetMousePosition (int x, int y);
 
   Display *GetDisplay ()
   { return dpy; }

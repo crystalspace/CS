@@ -25,15 +25,29 @@
 #include "cssys/unix/iunix.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
-#include "cs3d/glide2/gllib2.h"
 #include "isystem.h"
+
+#ifdef GLIDE3
+#include "cs3d/glide3/gllib3.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
-EXPORT_CLASS_TABLE (glidex2d)
-  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glidex",
-    "Glide/X 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE (glidx2d3)
+  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
+    "Glide V3/X 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
+
+#else
+#include "cs3d/glide2/gllib2.h"
+
+IMPLEMENT_FACTORY (csGraphics2DGlideX)
+
+EXPORT_CLASS_TABLE (glidx2d2)
+  EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
+    "Glide V2/X 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
+
+#endif
 
 csGraphics2DGlideX* thisPtr=NULL;
 
@@ -116,7 +130,7 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);
 
-  GraphicsReady = 1;
+  GraphicsReady = 1;  
 
   return true;
 }
@@ -166,12 +180,13 @@ bool csGraphics2DGlideX::Open(const char *Title)
 
   if (m_DoGlideInWindow)
   {
+    memset( MouseCursor, 0, sizeof(MouseCursor) );
     // Create mouse cursors
-    memset( MouseCursor, 0, sizeof( MouseCursor ) );
     XColor Black;
     memset (&Black, 0, sizeof (Black));
     EmptyPixmap = XCreatePixmap (dpy, window, 1, 1, 1);
-    EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap, &Black, &Black, 0, 0);
+    EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
+      &Black, &Black, 0, 0);
     MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
     //MouseCursor [csmcLens] = XCreateFontCursor (dpy, 
     MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
@@ -189,7 +204,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
     //MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
     /// Wait (longplay operation) cursor
     MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
-    
     // Create backing store
     if (!xim)
     {
@@ -227,13 +241,14 @@ bool csGraphics2DGlideX::Open(const char *Title)
     }
   }
 
+  SetMousePosition( Width/2, Height/2 );
+
   return true;
 }
 
 void csGraphics2DGlideX::Close(void)
 {
   if (m_DoGlideInWindow){
-
     if (EmptyMouseCursor)
     {
       XFreeCursor (dpy, EmptyMouseCursor);
@@ -253,6 +268,7 @@ void csGraphics2DGlideX::Close(void)
     XDestroyWindow (dpy, window);
     window = 0;
   }
+  
   
   if (m_DoGlideInWindow)
   {
@@ -274,7 +290,7 @@ void csGraphics2DGlideX::Close(void)
 }
 
 void csGraphics2DGlideX::Print (csRect *area)
-{
+{  
   if (m_DoGlideInWindow)  
   {
     FXgetImage();
@@ -290,7 +306,7 @@ void csGraphics2DGlideX::FXgetImage()
   // we only handle 16bit 
    if (Depth==16) 
    {    
-          grLfbReadRegion( GR_BUFFER_FRONTBUFFER,       
+          grLfbReadRegion( m_drawbuffer,       
                       0, 0,
                       Width, Height,
                       Width * 2,
@@ -302,8 +318,9 @@ void csGraphics2DGlideX::FXgetImage()
 
 }
 
-bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* /*iBitmap*/)
+bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
 {
+  return true;
   if (do_hwmouse
    && (iShape >= 0)
    && (iShape <= csmcWait)
@@ -316,7 +333,14 @@ bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle*
   {
     XDefineCursor (dpy, window, EmptyMouseCursor);
     return (iShape == csmcNone);
-  } /* endif */
+  }
+}
+
+bool csGraphics2DGlideX::SetMousePosition (int x, int y)
+{
+  mx=y; my=y;
+  XWarpPointer (dpy, None, window, 0, 0, 0, 0, x, y);
+  return true;    
 }
 
 static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
@@ -352,6 +376,7 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
       case MotionNotify:
         System->QueueMouseEvent (0, false,
 	  event.xbutton.x, event.xbutton.y);
+	mx = event.xbutton.x; my = event.xbutton.y;
         break;
       case KeyPress:
       case KeyRelease:

@@ -1,0 +1,1 @@
+-include $(addprefix libs/cs2d/unxglide/v, $(addsuffix .sub, $(GLIDE_VERSIONS) ))
