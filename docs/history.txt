@@ -41,6 +41,12 @@ chronological order.
 	  camera transform local. Avoids a few virtual calls and also avoids
 	  having to pass the camera along as a parameter.
 	- Jorrit fixed a MSVC6 compatibility error with sprcal3d.
+	- Vincent Knecht added building switches to cs.spec file.
+	  These can be used when (re)building (S)RPM files:
+	    - --with debug
+	    - --with newrenderer
+	    - --with perl
+	  Relighting levels is disabled for now when building NR.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

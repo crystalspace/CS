@@ -1,7 +1,20 @@
 %define name    crystalspace
-%define version 20040531
-%define release 2
+%define version 20040628
+%define release 1
 %define prefix	/usr
+
+%define with_DEBUG 0
+%{?_without_debug: %{expand: %%global with_DEBUG 0}}
+%{?_with_debug: %{expand: %%global with_DEBUG 1}}
+                                                                                                         
+%define with_NR 0
+%{?_without_newrenderer: %{expand: %%global with_NR 0}}
+%{?_with_newrenderer: %{expand: %%global with_NR 1}}
+                                                                                                         
+%define with_PERL 0
+%{?_without_perl: %{expand: %%global with_PERL 0}}
+%{?_with_perl: %{expand: %%global with_PERL 1}}
+
 Group: Applications/Development
 Source: http://crystal.sourceforge.net/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -39,14 +52,34 @@ Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
 %setup -n CS
 
 %build
-sh configure --enable-debug --prefix=%{prefix} 
+sh configure \
+%if %{with_DEBUG}
+ --enable-debug \
+%endif
+%if %{with_NR}
+ --enable-new-renderer \
+%endif
+%if %{with_PERL}
+ --with-perl \
+%endif
+--prefix=%{prefix}
+
 make all
 
 %install
 DESTDIR=%{buildroot} make install
 
-CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
-CRYSTAL=%{buildroot}%{prefix} CS_DATADIR=%{buildroot}%{prefix}/share/crystal CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
+%if ! %{with_NR}
+ CRYSTAL=%{buildroot}%{prefix} \
+ CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
+ CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
+ %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
+
+ CRYSTAL=%{buildroot}%{prefix} \
+ CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
+ CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
+ %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
+%endif
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -114,6 +147,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Mon Jun 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040628-1
+- Added conditional build flags to enable debug, NR and perl plugin.
+- Disabled relighting of levels when building NR. Crashes for me.
+
 * Mon May 31 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040531-2
 - Added %files entries for .inc and .fun files in include/csutil/
 
