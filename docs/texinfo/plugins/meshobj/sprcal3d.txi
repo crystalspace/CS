@@ -15,6 +15,97 @@ Cal3D library.
 
 @@@@@@ WRITE ME: Please cover more topics.
 
+@subsubheading Example
+
+This is an example of how to load and view a cal3d file with viewmesh.
+
+We are going to load the cally model. The data files of this 
+model are part of the standard CAL3D cvs and can be found in 
+cal3d/data/cally. You must copy the files in this directory
+to CS/cally.
+
+Make a new file called test.cal3d in the CS directory and enter the following contents:
+@example
+<!-- the meshfact name is the CS name used to instantiate instances of this object -->
+<meshfact name="test">
+
+<!-- the plugin line specifies the plugin to use to parse the succeeding 'params' tag -->
+<plugin>crystalspace.mesh.loader.factory.sprite.cal3d</plugin>
+
+<params>
+
+	<options rotate_x_axis="yes" flip_textures="no" />
+
+	<!-- path specifies the OS-dependent directory path to where all the other files are located. optional.-->
+	<path dir="cally/" />
+	
+	<!-- The cally model is much to large. -->
+	<scale value="0.01" />
+
+	<!-- specify cal3d skeleton file used by model -->
+	<skeleton file="cally.csf" />
+
+	<!-- animations specify the filename to load, and the CS-accessible name of this anim.
+	The type attribute is used to distinguish various types of animations.  Type 1 is
+	a regular animation cycle with movement and type 4 is a one-time action. It is a
+	TODO to use words instead of numbers here
+	base_vel specifies the speed of translation which should be used when the animation
+	is playing alone.
+	min_vel and max_vel are used by the blender to achieve a specified desired velocity.
+	min_random and max are interval to be used in idle override actions, in seconds.
+	idle_pct is a number between 0 and 100, which is the % probability of that action being the override action.-->
+	<animation file="cally_idle.caf"   name="stand"  type="idle" base_vel="0" min_vel="0" max_vel="0" min_random="10" max_random="30" />
+	<animation file="cally_walk.caf"   name="walk"   type="travel" base_vel="2" min_vel="0" max_vel="3" />
+	<animation file="cally_strut.caf"   name="strut"   type="travel" base_vel="2" min_vel="0" max_vel="3" />
+	<animation file="cally_jog.caf"    name="run"    type="travel" base_vel="5" min_vel="2" max_vel="5" />
+	<animation file="cally_wave.caf"  name="greet"  type="action" idle_pct="33" />
+	<animation file="cally_tornado_kick.caf"   name="hurt"   type="action" idle_pct="33" />
+	<animation file="cally_shoot_arrow.caf"  name="shoot"  type="action" idle_pct="34" />
+
+	<!-- materials are VFS filenames because they are CS materials and not cal3d materials. optional.-->
+	<!-- We cannot use the real .xrf files because CS can't load that format. -->
+	<material file="/lib/std/green.gif"  name="green"  />
+
+	<!-- meshes specify each attachable part of the model.  
+	The name is the CS-accessible name which will be used to select/deselect it for the model.  
+	The material specified is the default CS material used by this mesh.  
+	-->
+	<mesh file="cally_calf_left.cmf" name="cally_calf_left" material="green"   />
+	<mesh file="cally_calf_right.cmf" name="cally_calf_right" material="green"   />
+	<mesh file="cally_chest.cmf" name="cally_chest" material="green"   />
+	<mesh file="cally_foot_left.cmf" name="cally_foot_left" material="green"   />
+	<mesh file="cally_foot_right.cmf" name="cally_foot_right" material="green"   />
+	<mesh file="cally_hand_left.cmf" name="cally_hand_left" material="green"   />
+	<mesh file="cally_hand_right.cmf" name="cally_hand_right" material="green"   />
+	<mesh file="cally_head.cmf" name="cally_head" material="green"   />
+	<mesh file="cally_lowerarm_left.cmf" name="cally_lowerarm_left"  material="green"  />
+	<mesh file="cally_lowerarm_right.cmf" name="cally_lowerarm_right" material="green"   />
+	<mesh file="cally_neck.cmf" name="cally_neck" material="green"   />
+	<mesh file="cally_pelvis.cmf" name="cally_pelvis" material="green"   />
+	<mesh file="cally_ponytail.cmf" name="cally_ponytail" material="green"   />
+	<mesh file="cally_thigh_left.cmf" name="cally_thigh_left" material="green"   />
+	<mesh file="cally_thigh_right.cmf" name="cally_thigh_right" material="green"   />
+	<mesh file="cally_upperarm_left.cmf" name="cally_upperarm_left" material="green"   />
+	<mesh file="cally_upperarm_right.cmf" name="cally_upperarm_right" material="green"   />
+
+
+	<!--The following rotates the model and all anims around the Y axis by 180 degrees.  
+	Any axis and angle maybe specified, and translation may also be specified. -->
+
+	<hardtransform rot_axis_x="0" rot_axis_y="1" rot_axis_z="0" rot_angle="180" />
+
+</params>
+</meshfact>
+@end example
+
+Next, you must run viewmesh from the CS directory. 
+Right click on the screen and then select "Load Mesh".
+Select test.cal3d from the list of files.
+
+You should be able to see the Cally model, completely green.
+
+
+
 @subsubheading Morph Animations
 
 You can add morph target meshes to each mesh.  Remember that morph target
@@ -87,7 +178,7 @@ is maintained, so you can deduce which mesh you are using.
 You can test a socket if you load the Cal3D file in the @file{viewmesh} example
 program.
 
-You can use sockets programmatically as follows.
+You can use sockets in code as follows.
 
 @noindent
 In this example, @samp{cal3dstate} is the Cal3D state object.  Here we find a
