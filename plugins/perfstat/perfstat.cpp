@@ -361,7 +361,7 @@ void csPerfStats::WriteMainHeader ()
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (!g3d) abort ();
   iGraphics2D *g2d = g3d->GetDriver2D ();
-  csGraphics3DCaps *caps = g3d->GetCaps ();
+  const csGraphics3DCaps *caps = g3d->GetCaps ();
   csPixelFormat *pfmt = g2d->GetPixelFormat ();
 
 #if defined CS_DEBUG
