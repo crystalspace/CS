@@ -21,6 +21,7 @@
 #include "cssys/sysfunc.h"
 #include "qint.h"
 #include "qsqrt.h"
+#include "csutil/xmltiny.h"
 #include "csutil/cfgfile.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
@@ -247,74 +248,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ZTEST)
 CS_TOKEN_DEF_END
 
-enum
-{
-  XMLTOKEN_AMBIENT = 1,
-  XMLTOKEN_ADDON,
-  XMLTOKEN_ATTENUATION,
-  XMLTOKEN_CAMERA,
-  XMLTOKEN_CENTER,
-  XMLTOKEN_CLEARZBUF,
-  XMLTOKEN_CLEARSCREEN,
-  XMLTOKEN_COLLECTION,
-  XMLTOKEN_COLOR,
-  XMLTOKEN_CONVEX,
-  XMLTOKEN_CULLER,
-  XMLTOKEN_CULLERP,
-  XMLTOKEN_DETAIL,
-  XMLTOKEN_DYNAMIC,
-  XMLTOKEN_FACTORY,
-  XMLTOKEN_FARPLANE,
-  XMLTOKEN_FILE,
-  XMLTOKEN_FOG,
-  XMLTOKEN_FORWARD,
-  XMLTOKEN_HALO,
-  XMLTOKEN_HARDMOVE,
-  XMLTOKEN_INVISIBLE,
-  XMLTOKEN_KEY,
-  XMLTOKEN_LEVEL,
-  XMLTOKEN_LIBRARY,
-  XMLTOKEN_LIGHT,
-  XMLTOKEN_LIGHTMAPCELLSIZE,
-  XMLTOKEN_LMCACHE,
-  XMLTOKEN_LOD,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_MATERIALS,
-  XMLTOKEN_MATRIX,
-  XMLTOKEN_MAXLIGHTMAPSIZE,
-  XMLTOKEN_MESHFACT,
-  XMLTOKEN_MESHLIB,
-  XMLTOKEN_MESHOBJ,
-  XMLTOKEN_MESHREF,
-  XMLTOKEN_MOVE,
-  XMLTOKEN_NODE,
-  XMLTOKEN_NOLIGHTING,
-  XMLTOKEN_NOSHADOWS,
-  XMLTOKEN_PARAMS,
-  XMLTOKEN_PARAMSFILE,
-  XMLTOKEN_PLUGIN,
-  XMLTOKEN_PLUGINS,
-  XMLTOKEN_POSITION,
-  XMLTOKEN_PRIORITY,
-  XMLTOKEN_RADIUS,
-  XMLTOKEN_REGION,
-  XMLTOKEN_RENDERPRIORITIES,
-  XMLTOKEN_SECTOR,
-  XMLTOKEN_SETTINGS,
-  XMLTOKEN_SOUND,
-  XMLTOKEN_SOUNDS,
-  XMLTOKEN_START,
-  XMLTOKEN_TEXTURES,
-  XMLTOKEN_MATSET,
-  XMLTOKEN_UP,
-  XMLTOKEN_V,
-  XMLTOKEN_WORLD,
-  XMLTOKEN_ZFILL,
-  XMLTOKEN_ZNONE,
-  XMLTOKEN_ZUSE,
-  XMLTOKEN_ZTEST
-};
-
 //---------------------------------------------------------------------------
 
 void csLoader::ReportError (const char* id, const char* description, ...)
@@ -516,11 +449,11 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   ResolveOnlyRegion = iOnlyRegion;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  iDataBuffer *buf = VFS->ReadFile (file);
+  csRef<iDataBuffer> buf;
+  buf.Take (VFS->ReadFile (file));
 
   if (!buf || !buf->GetSize ())
   {
-    if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.map",
     	      "Could not open map file '%s' on VFS!", file);
@@ -529,10 +462,45 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
 
   Engine->ResetWorldSpecificSettings();
 
-  if (!LoadMap (**buf))
+  // XML: temporary code to detect if we have an XML file. If that's
+  // the case then we will use the XML parsers.
+  // @@@
+  char* b = **buf;
+  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+  if (*b == '<')
   {
-    buf->DecRef ();
-    return false;
+    // XML.
+    // First try to find out if there is an iXmlSystem registered in the
+    // object registry. If that's the case we will use that. Otherwise
+    // we'll use tinyxml.
+    csRef<iXmlSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iXmlSystem));
+    if (!xml)
+    {
+      xml.Take (new csTinyXmlSystem ());
+    }
+    csRef<iXmlDocument> doc = xml->CreateDocument ();
+    const char* error = doc->ParseXML (buf);
+    if (error == NULL)
+    {
+      if (!LoadMap (doc->GetRoot ()))
+	return false;
+    }
+    else
+    {
+      ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "XML error '%s' for file '%s'!", error, file);
+      return false;
+    }
+  }
+  else
+  {
+    // Old format.
+    if (!LoadMap (**buf))
+    {
+      return false;
+    }
   }
 
   if (Stats->polygons_loaded)
@@ -545,8 +513,6 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     ReportNotify ("  %d curves, %d lights, %d sounds.", Stats->curves_loaded,
       Stats->lights_loaded, Stats->sounds_loaded);
   } /* endif */
-
-  buf->DecRef ();
 
   return true;
 }
@@ -2444,15 +2410,21 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
   xmltokens.Register ("detail", XMLTOKEN_DETAIL);
   xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
+  xmltokens.Register ("dither", XMLTOKEN_DITHER);
+  xmltokens.Register ("diffuse", XMLTOKEN_DIFFUSE);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
   xmltokens.Register ("file", XMLTOKEN_FILE);
   xmltokens.Register ("fog", XMLTOKEN_FOG);
   xmltokens.Register ("forward", XMLTOKEN_FORWARD);
+  xmltokens.Register ("for2d", XMLTOKEN_FOR2D);
+  xmltokens.Register ("for3d", XMLTOKEN_FOR3D);
   xmltokens.Register ("halo", XMLTOKEN_HALO);
   xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
+  xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);
   xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
   xmltokens.Register ("key", XMLTOKEN_KEY);
+  xmltokens.Register ("layer", XMLTOKEN_LAYER);
   xmltokens.Register ("level", XMLTOKEN_LEVEL);
   xmltokens.Register ("library", XMLTOKEN_LIBRARY);
   xmltokens.Register ("light", XMLTOKEN_LIGHT);
@@ -2468,6 +2440,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
   xmltokens.Register ("meshref", XMLTOKEN_MESHREF);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
+  xmltokens.Register ("mipmap", XMLTOKEN_MIPMAP);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("node", XMLTOKEN_NODE);
   xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
@@ -2477,15 +2451,23 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
+  xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
+  xmltokens.Register ("procedural", XMLTOKEN_PROCEDURAL);
+  xmltokens.Register ("persistent", XMLTOKEN_PERSISTENT);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("region", XMLTOKEN_REGION);
   xmltokens.Register ("renderpriorities", XMLTOKEN_RENDERPRIORITIES);
+  xmltokens.Register ("reflection", XMLTOKEN_REFLECTION);
+  xmltokens.Register ("scale", XMLTOKEN_SCALE);
   xmltokens.Register ("sector", XMLTOKEN_SECTOR);
   xmltokens.Register ("settings", XMLTOKEN_SETTINGS);
+  xmltokens.Register ("shift", XMLTOKEN_SHIFT);
   xmltokens.Register ("sound", XMLTOKEN_SOUND);
   xmltokens.Register ("sounds", XMLTOKEN_SOUNDS);
   xmltokens.Register ("start", XMLTOKEN_START);
+  xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
   xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
+  xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
   xmltokens.Register ("matset", XMLTOKEN_MATSET);
   xmltokens.Register ("up", XMLTOKEN_UP);
   xmltokens.Register ("v", XMLTOKEN_V);
@@ -3393,6 +3375,25 @@ bool csLoader::LoadMap (iXmlNode* node)
 
 bool csLoader::LoadPlugins (iXmlNode* node)
 {
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_PLUGIN:
+	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
+			child->GetContentsValue ());
+        break;
+      default:
+	TokenError ("plugin descriptors", value);
+	return false;
+    }
+  }
+
   return true;
 }
 
@@ -3424,6 +3425,340 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iXmlNode* node)
 
 bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
 {
+  if (!Engine) return false;
+
+  const char* priority;
+
+  Stats->meshes_loaded++;
+  iLoaderPlugin* plug = NULL;
+
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LOD:
+        {
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+	      "Only use 'lod' after 'params'!");
+	    return false;
+	  }
+	  csRef<iLODControl> lodctrl;
+	  lodctrl.Take (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+		iLODControl));
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh doesn't implement LOD control!");
+	    return false;
+	  }
+	  if (!LoadLodControl (lodctrl, child))
+	  {
+	    return false;
+	  }
+	}
+        break;
+      case XMLTOKEN_PRIORITY:
+	priority = child->GetContentsValue ();
+	break;
+      case XMLTOKEN_ADDON:
+	if (!LoadAddOn (child, mesh))
+	  return false;
+      	break;
+      case XMLTOKEN_NOLIGHTING:
+        mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
+        break;
+      case XMLTOKEN_NOSHADOWS:
+        mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+        break;
+      case XMLTOKEN_INVISIBLE:
+        mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
+        break;
+      case XMLTOKEN_DETAIL:
+        mesh->GetFlags().Set (CS_ENTITY_DETAIL);
+        break;
+      case XMLTOKEN_ZFILL:
+        if (!priority) priority = "wall";
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case XMLTOKEN_ZUSE:
+        if (!priority) priority = "object";
+        mesh->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case XMLTOKEN_ZNONE:
+        if (!priority) priority = "sky";
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case XMLTOKEN_ZTEST:
+        if (!priority) priority = "alpha";
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+        break;
+      case XMLTOKEN_CAMERA:
+        if (!priority) priority = "sky";
+        mesh->GetFlags().Set (CS_ENTITY_CAMERA);
+        break;
+      case XMLTOKEN_CONVEX:
+        mesh->GetFlags().Set (CS_ENTITY_CONVEX);
+        break;
+      case XMLTOKEN_KEY:
+        {
+          iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return false;
+	}
+        break;
+      case XMLTOKEN_MESHREF:
+        {
+          iMeshWrapper* sp = LoadMeshObjectFromFactory (child);
+          if (!sp)
+	  {
+	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s'!",
+		child->GetAttributeValue ("name"));
+	    return false;
+	  }
+	  sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetChildren ()->Add (sp);
+	  sp->DecRef ();
+        }
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+	  iMeshWrapper* sp = Engine->CreateMeshWrapper (
+			  child->GetAttributeValue ("name"));
+          if (!LoadMeshObject (sp, child))
+	  {
+	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s'!",
+		child->GetAttributeValue ("name"));
+	    return false;
+	  }
+	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetChildren ()->Add (sp);
+	  sp->DecRef ();
+        }
+        break;
+      case XMLTOKEN_HARDMOVE:
+        {
+	  if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh object doesn't support 'hardmove'!");
+	    return false;
+	  }
+	  csReversibleTransform tr;
+	  csRef<iXmlNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+	    tr.SetT2O (m);
+	  }
+	  csRef<iXmlNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+	    tr.SetOrigin (v);
+	  }
+	  mesh->HardTransform (tr);
+        }
+        break;
+      case XMLTOKEN_MOVE:
+        {
+          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+          mesh->GetMovable ()->SetPosition (csVector3 (0));
+	  csRef<iXmlNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            mesh->GetMovable ()->SetTransform (m);
+	  }
+	  csRef<iXmlNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+            mesh->GetMovable ()->SetPosition (v);
+	  }
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+
+      case XMLTOKEN_PARAMS:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+	{
+	  iBase* mo = plug->Parse (child, GetLoaderContext (), NULL);
+          if (mo)
+          {
+	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    if (!mo2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.mesh",
+		"Returned object does not implement iMeshObject!");
+	      return false;
+	    }
+	    mesh->SetMeshObject (mo2);
+	    mo2->SetLogicalParent (mesh);
+	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+	    {
+	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
+	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper);
+	      if (mfw)
+	      {
+	        mesh->SetFactory (mfw);
+		mfw->DecRef ();
+	      }
+	    }
+	    mo2->DecRef ();
+            mo->DecRef ();
+          }
+          else
+          {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Error parsing 'params' in mesh '%s'!",
+	      mesh->QueryObject ()->GetName ());
+	    return false;
+          }
+	}
+        break;
+      case XMLTOKEN_PARAMSFILE:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin for mesh '%s'!",
+	      mesh->QueryObject ()->GetName ());
+	  return false;
+	}
+	else
+        {
+	  const char* fname = child->GetContentsValue ();
+	  if (!fname)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      "Specify a VFS filename with 'paramsfile'!");
+	    return false;
+	  }
+          iDataBuffer *buf = VFS->ReadFile (fname);
+	  if (!buf)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      "Error opening file '%s'!", fname);
+	    return false;
+	  }
+	  // @@@ SWITCH TO XML HERE!
+	  iBase* mo = plug->Parse ((char*)(buf->GetUint8 ()),
+	  	GetLoaderContext (), NULL);
+          if (mo)
+          {
+	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    if (!mo2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.mesh",
+		"Returned object does not implement iMeshObject!");
+	      return false;
+	    }
+	    mesh->SetMeshObject (mo2);
+	    mo2->SetLogicalParent (mesh);
+	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+	    {
+	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
+	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper);
+	      if (mfw)
+	      {
+	        mesh->SetFactory (mfw);
+		mfw->DecRef ();
+	      }
+	    }
+	    mo2->DecRef ();
+            mo->DecRef ();
+          }
+          else
+          {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Error parsing 'paramsfile' '%s'!", fname);
+	    return false;
+          }
+
+        }
+        break;
+
+      case XMLTOKEN_PLUGIN:
+	{
+	  const char* plugname = child->GetContentsValue ();
+	  if (!plugname)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+	      "Specify a plugin name with 'plugin'!");
+	    return false;
+	  }
+	  plug = loaded_plugins.FindPlugin (plugname);
+	}
+        break;
+
+      case XMLTOKEN_LMCACHE:
+        {
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+	      "Only use 'lmcache' after 'params'!");
+	    return false;
+	  }
+	  iLightingInfo* li = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	  	iLightingInfo);
+	  if (li)
+	  {
+	    li->SetCacheName (child->GetContentsValue ());
+	    li->DecRef ();
+	  }
+	}
+        break;
+      default:
+	TokenError ("a mesh object", value);
+	return false;
+    }
+  }
+
+  if (!priority) priority = "object";
+  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+
   return true;
 }
 

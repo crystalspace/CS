@@ -601,7 +601,15 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	  if (IsString (params))
 	  {
 	    WriteToken (indent, tokname, name, false, false);
+	    char* p = NULL;
+	    if (*params == '\'')
+	    {
+	      params++;
+	      p = strchr (params, '\'');
+	      if (p) *p = 0;
+	    }
 	    PrintIndent (0, "%s", params);
+	    if (p) *p = '\'';
             PrintIndent (0, "</%s>\n", tokname);
 	  }
 	  else if (IsBoolean (params))
@@ -643,11 +651,11 @@ void Cs2Xml::Main ()
     return;
   }
 
-  iDataBuffer* buf = NULL;
+  csRef<iDataBuffer> buf;
   if (strstr (val, ".zip"))
   {
     vfs->Mount ("/tmp/cs2xml_data", val);
-    buf = vfs->ReadFile ("/tmp/cs2xml_data/world");
+    buf.Take (vfs->ReadFile ("/tmp/cs2xml_data/world"));
     if (!buf || !buf->GetSize ())
     {
       ReportError ("Archive '%s' does not seem to contain a 'world' file!",
@@ -657,7 +665,7 @@ void Cs2Xml::Main ()
   }
   else
   {
-    buf = vfs->ReadFile (val);
+    buf.Take (vfs->ReadFile (val));
     if (!buf || !buf->GetSize ())
     {
       ReportError ("Could not load file '%s'!", val);
@@ -665,13 +673,13 @@ void Cs2Xml::Main ()
     }
   }
 
-  iFile* fout = vfs->Open ("/this/world", VFS_FILE_WRITE);
-  if (!fout)
-  {
-    buf->DecRef ();
-    ReportError ("Could not open file '/this/world'!");
-    return;
-  }
+  csRef<iFile> fout;
+  //fout.Take (vfs->Open ("/this/world", VFS_FILE_WRITE));
+  //if (!fout)
+  //{
+    //ReportError ("Could not open file '/this/world'!");
+    //return;
+  //}
 
   csParser* parser = new csParser (true);
   parser->ResetParserLine ();
@@ -688,9 +696,9 @@ void Cs2Xml::Main ()
   {
     if (params)
     {
-      Write (fout, "%s (\n", parser->GetUnknownToken ());
+      WriteToken (0, "world", NULL, false, true);
       ParseGeneral ("", 2, parser, fout, params);
-      WriteStr (fout, ")\n");
+      PrintIndent (0, "</world>\n");
     }
   }
   else
@@ -699,9 +707,6 @@ void Cs2Xml::Main ()
   }
 
   delete parser;
-
-  fout->DecRef ();
-  buf->DecRef ();
 }
 
 /*---------------------------------------------------------------------*

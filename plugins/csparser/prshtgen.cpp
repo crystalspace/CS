@@ -21,6 +21,7 @@
 #include "csloader.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
+#include "iutil/xml.h"
 #include "csgfx/rgbpixel.h"
 #include "cstool/gentrtex.h"
 #include "ivideo/graph3d.h"
@@ -409,4 +410,10 @@ bool csLoader::ParseHeightgen (char* buf)
   return true;
 }
 
+// XML versions -------------------------------------------------------------------
+
+bool csLoader::ParseHeightgen (iXmlNode* node)
+{
+  return true;
+}
 

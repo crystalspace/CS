@@ -5,6 +5,25 @@ The history order is reversed so that new features are at the top.
 	  main loader.
 	- Added XML version of ParseColor() to syntax services.
 	- Added XML version of ParseStatLight() to the loader.
+	- Implemented XML parsing of textures and materials in loader (things
+	  like procedural textures and heightmap texture generation tools are
+	  not yet converted).
+	- Implemented XML parsing of 'plugins' block.
+	- Implemented XML parsing of 'meshobj'.
+	- Modified LoadMap() in the main parser so that it will automatically
+	  switch to XML loading if the first non-blank character in the
+	  read buffer is equal to '<'.
+	- LoadMap() will also see if it can find an iXmlSystem in the object
+	  registry. If not it will use the tinyxml parser. Using that it is
+	  possible to make your own implementations of iXmlSystem using another
+	  XML parser.
+	- Fixed cs2xml so that it makes an XML world file that can almost be read
+	  by the current loader (still need to fix a few things manually but
+	  I will not continue writing cs2xml like this anyway. The plan is to
+	  let cs2xml generate a node tree and output that using the XML system).
+	  By doing this I could confirm that XML map loading works for very simple
+	  levels now (sectors, textures, materials, lights, and thing mesh objects).
+	  This is a very nice step indeed.
 12-Aug-2002
 	- Renamed the XML version of ParseTexture() to ParseTextureMapping()
 	  as that more accuratelly reflects what happens (in syntax
