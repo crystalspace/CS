@@ -17,6 +17,13 @@ Short-term cleanups that need to be done:
 	- Michael Ewert <mewert99@yahoo.com> supplied a new version of
 	  phyztest.cpp, the Phyziks test program.  This version is stable at
 	  4-7 FPS (and briefly at 3, but looks wrong).
+	- Eric Sunshine fixed a transmogrification bug :-) in the Phyziks
+	  library.  The problem was that ctWorld was incorrectly calling the
+	  constructor for ctPhysicalEntity (its superclass) explicitly within
+	  its own constructor.  For older or non-conforming compilers (such as
+	  NextStep) this had the side-effect of transmogrifying the ctWorld
+	  into a ctPhysicalEntity, such that all virtual method dispatches
+	  went to ctPhysicalEntity rather than ctWorld as expected.
 24-Nov-1999
 	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
 	  leaking memory.
