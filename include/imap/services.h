@@ -32,6 +32,7 @@ class csVector2;
 class csVector;
 class csColor;
 class csBox3;
+class csGradient;
 struct iPolygon3DStatic;
 struct iEngine;
 struct iSector;
@@ -52,7 +53,7 @@ struct iDocumentNode;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 2, 0);
+SCF_VERSION (iSyntaxService, 1, 3, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -156,6 +157,12 @@ struct iSyntaxService : public iBase
 			    iThingFactoryState* thing_fact_state,
 			    int vt_offset) = 0;
 
+  /**
+   * Parse a color gradient.
+   */
+  virtual bool ParseGradient (iDocumentNode* node,
+			      csGradient& gradient) = 0;
+			    
   /**
    * Report an error and also gives a path in the XML tree.
    */

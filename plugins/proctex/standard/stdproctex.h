@@ -24,8 +24,22 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
+#include "itexture/itexfact.h"
 
 class csProcTexture;
+
+class csBaseProctexType : public iComponent, iTextureType
+{
+protected:
+  csRef<iObjectRegistry> object_reg;
+public:
+  SCF_DECLARE_IBASE;
+
+  csBaseProctexType (iBase *p);
+  virtual ~csBaseProctexType ();
+
+  virtual bool Initialize(iObjectRegistry *object_reg);
+};  
 
 class csBaseProctexLoader : public iLoaderPlugin
 {
@@ -57,15 +71,6 @@ class csPtDotsLoader : public csBaseProctexLoader
 {
 public:
   csPtDotsLoader(iBase *p);
-
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
-};
-
-class csPtFireLoader : public csBaseProctexLoader
-{
-public:
-  csPtFireLoader(iBase *p);
 
   csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context);

@@ -47,8 +47,22 @@
             <type>plasma</type>
         </texture>
 	<texture name="flamelet">
-	    <!--<type>fireTexLoader</type>-->
-	    <file>/lib/std/raindrop.png</file>
+	    <type>fireTexLoader</type>
+	    <size width="16" height="32" />
+	    <params>
+		<smoothing>0</smoothing>
+		<halfbase>2</halfbase>
+		<palette>
+		    <shade>
+			<color red="0" green="0" blue="0" />
+			<pos>0</pos>
+		    </shade>
+		    <shade>
+			<color red="1" green="1" blue="1" />
+			<pos>1</pos>
+		    </shade>
+		</palette>
+	    </params>
 	</texture>
     </textures>
     <materials>
@@ -1146,10 +1160,10 @@
                 <number>200</number>
                 <material>flamelet</material>
                 <originbox>
-                    <min x="-2" y="0" z="-2" />
-                    <max x="2" y="0" z="2" />
+                    <min x="-1" y="0" z="-1" />
+                    <max x="1" y="0" z="1" />
                 </originbox>
-                <dropsize w="0.1" h="0.2" />
+                <dropsize w="0.4" h="0.6" />
                 <direction x="0" y="2" z="0" />
                 <lighting>no</lighting>
                 <swirl>1.6</swirl>

@@ -30,10 +30,13 @@
  
 #include "csutil/scf.h"
 
+class csGradient;
+
 SCF_VERSION (iFireTexture, 0, 0, 1);
 
 /**
  * Interface to the 'fire' procedural texture.
+ * \todo 'GetPalette()' maybe.
  */
 struct iFireTexture : public iBase
 {
@@ -99,6 +102,13 @@ struct iFireTexture : public iBase
   virtual void SetPostSmoothing (int amount) = 0;
   /// Get post smoothing value.
   virtual int GetPostSmoothing () = 0;
+  
+  /**
+   * Set the colors used by the flame.
+   * Position 0 = darkest areas (background, actually), 
+   * position 1 = brightest areas.
+   */
+  virtual void SetPalette (const csGradient gradient) = 0;
 };
 
 /** @} */

@@ -32,6 +32,7 @@
 #include "cstool/prplasma.h"
 
 #include "stdproctex.h"
+#include "fire.h"
 
 // Plugin stuff
 
@@ -44,20 +45,29 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csBaseProctexLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE(csBaseProctexType);
+  SCF_IMPLEMENTS_INTERFACE(iTextureType);
+  SCF_IMPLEMENTS_INTERFACE(iComponent);
+SCF_IMPLEMENT_IBASE_END;
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csPtDotsLoader);
-SCF_IMPLEMENT_FACTORY(csPtFireLoader);
 SCF_IMPLEMENT_FACTORY(csPtPlasmaLoader);
 SCF_IMPLEMENT_FACTORY(csPtWaterLoader);
 
 SCF_EXPORT_CLASS_TABLE (stdpt)
+  SCF_EXPORT_CLASS_DEP (csPtFireType, 
+    CLASSID_FIRETYPE,
+    "'Fire' procedural texture factory", 
+    "crystalspace.graphics3d., ")
+
   SCF_EXPORT_CLASS_DEP (csPtDotsLoader, 
     "crystalspace.texture.loader.dots",
     "'Dots' procedural texture loader", 
     "crystalspace.graphics3d., ")
   SCF_EXPORT_CLASS_DEP (csPtFireLoader, 
-    "crystalspace.texture.loader.fire",
+    CLASSID_FIRELOADER,
     "'Fire' procedural texture loader", 
     "crystalspace.graphics3d., ")
   SCF_EXPORT_CLASS_DEP (csPtWaterLoader, 
@@ -70,6 +80,26 @@ SCF_EXPORT_CLASS_TABLE (stdpt)
     "crystalspace.graphics3d., ")
 SCF_EXPORT_CLASS_TABLE_END
 
+//---------------------------------------------------------------------------
+// Base for all PT types
+
+csBaseProctexType::csBaseProctexType (iBase *p)
+{
+  SCF_CONSTRUCT_IBASE (p);
+}
+
+csBaseProctexType::~csBaseProctexType ()
+{
+}
+
+bool csBaseProctexType::Initialize(iObjectRegistry *object_reg)
+{
+  csBaseProctexType::object_reg = object_reg;
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
 // Base for all PT loaders
 
 csBaseProctexLoader::csBaseProctexLoader(iBase *p)
@@ -102,6 +132,7 @@ csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt)
   }
 }
 
+//---------------------------------------------------------------------------
 // 'Dots' loader.
 
 csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
@@ -116,20 +147,7 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* node,
   return PrepareProcTex (pt);
 }
 
-// 'Fire' loader.
-
-csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
-{
-}
-
-csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
-  				    iBase* context)
-{
-  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcFire ());
-  return PrepareProcTex (pt);
-}
-
+//---------------------------------------------------------------------------
 // 'Water' loader.
 
 csPtWaterLoader::csPtWaterLoader(iBase *p) : csBaseProctexLoader(p)
@@ -144,6 +162,7 @@ csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* node,
   return PrepareProcTex (pt);
 }
 
+//---------------------------------------------------------------------------
 // 'Plasma' loader.
 
 csPtPlasmaLoader::csPtPlasmaLoader(iBase *p) : csBaseProctexLoader(p)

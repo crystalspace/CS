@@ -35,6 +35,7 @@ struct iMaterialWrapper;
 struct iReporter;
 struct iLoader;
 struct iMeshObjectType;
+struct csGradientShade;
 
 /**
  * This component provides services for other loaders to easily parse
@@ -53,6 +54,7 @@ protected:
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
+  bool ParseGradientShade (iDocumentNode* node, csGradientShade& shade);
 public:
 
   SCF_DECLARE_IBASE;
@@ -89,6 +91,8 @@ public:
 			    float default_texlen,
 			    iThingFactoryState* thing_fact_state,
 			    int vt_offset);
+  virtual bool ParseGradient (iDocumentNode* node,
+			      csGradient& gradient);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

@@ -18,6 +18,8 @@
 */
 
 #include "cssysdef.h"
+
+#include "csgfx/gradient.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -74,7 +76,7 @@ bool csProcFire::PrepareAnim ()
 {
   if (anim_prepared) return true;
   if (!csProcTexture::PrepareAnim ()) return false;
-  MakePalette (256);
+  if (!palette) MakePalette (256);
   fireline = new uint8[mat_w];
   image[0] = new uint8[mat_w*mat_h];
   image[1] = new uint8[mat_w*mat_h];
@@ -118,7 +120,7 @@ void csProcFire::MakePalette (int max)
   delete[] palette;
   delete[] palette_idx;
   palsize = max;
-  palette = new unsigned char [palsize*4];
+  palette = new csRGBcolor [palsize];
   palette_idx = new int [palsize];
   memset (palette, 0, 4*palsize);
   memset (palette_idx, 0, palsize*sizeof (int));
@@ -142,9 +144,9 @@ void csProcFire::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i*4+0] = r;
-    palette[i*4+1] = g;
-    palette[i*4+2] = b;
+    palette[i].red = r;
+    palette[i].green = g;
+    palette[i].blue = b;
 #if NEW_PROC
     if (palette_mode)
     {
@@ -168,9 +170,9 @@ void csProcFire::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i*4+0] = r;
-    palette[i*4+1] = g;
-    palette[i*4+2] = b;
+    palette[i].red = r;
+    palette[i].green = g;
+    palette[i].blue = b;
 #if NEW_PROC
     if (palette_mode)
     {
@@ -329,10 +331,9 @@ void csProcFire::Animate (csTicks /*current_time*/)
       {
 	int col = *im++;
 	col = col * palsize / 256;
-	col *= 4;
-	*d++ = palette[col+0];
-	*d++ = palette[col+1];
-	*d++ = palette[col+2];
+	*d++ = palette[col].red;
+	*d++ = palette[col].green;
+	*d++ = palette[col].blue;
 	*d++ = 0;
       }
     g2d->Blit (0, 0, mat_w, mat_h, blitbuf);
@@ -423,3 +424,9 @@ int csProcFire::GetPostSmoothing ()
   return postsmooth;
 }
 
+void csProcFire::SetPalette (const csGradient gradient)
+{
+  palsize = 256;
+  if (!palette) palette = new csRGBcolor[palsize];
+  gradient.Render (palette, palsize, -0.5f, 1.5f);
+}

@@ -1,0 +1,175 @@
+/*
+    Copyright (C) 2003 by Jorrit Tyberghein
+	      (C) 2003 by Frank Richter
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+
+#include "iutil/document.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "itexture/itexloaderctx.h"
+#include "imap/services.h"
+#include "cstool/prfire.h"
+#include "csgfx/gradient.h"
+
+#include "stdproctex.h"
+#include "fire.h"
+
+SCF_IMPLEMENT_FACTORY(csPtFireType);
+SCF_IMPLEMENT_FACTORY(csPtFireLoader);
+
+csPtFireType::csPtFireType (iBase* p) : csBaseProctexType(p)
+{
+}
+
+csPtr<iTextureFactory> csPtFireType::NewFactory()
+{
+  return csPtr<iTextureFactory> (new csPtFireFactory (
+    (iComponent*)this, 
+    object_reg));
+}
+
+//---------------------------------------------------------------------------
+// 'Fire' PT factory
+
+csPtFireFactory::csPtFireFactory (iBase* p, iObjectRegistry* object_reg) : 
+    csBaseTextureFactory (p, object_reg)
+{
+}
+
+csPtr<iTextureWrapper> csPtFireFactory::Generate ()
+{
+  csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcFire (width, height));
+  if (pt->Initialize (object_reg))
+  {
+    csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
+    return csPtr<iTextureWrapper> (tw);
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+//---------------------------------------------------------------------------
+// 'Fire' loader.
+
+csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
+{
+}
+
+csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 
+				    iLoaderContext* ldr_context,
+  				    iBase* context)
+{
+  /*
+    Going through the plugin manager to retrieve the texture type
+    isn't really necessary here, as we could just instantiate csPtFireType
+    with new. It's just an 'exercise'.
+   */
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iTextureType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	CLASSID_FIRETYPE, iTextureType));
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, CLASSID_FIRETYPE,
+    	iTextureType);
+  }
+  csRef<iSyntaxService> synldr = 
+    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+
+  csRef<iTextureFactory> fireFact = type->NewFactory();
+
+  csRef<iTextureLoaderContext> ctx;
+  if (context)
+  {
+    ctx = csPtr<iTextureLoaderContext>
+      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+
+    if (ctx)
+    {
+      if (ctx->HasSize())
+      {
+	int w, h;
+	ctx->GetSize (w, h);
+	fireFact->SetSize (w, h);
+      }
+    }
+  }
+  csRef<iTextureWrapper> tex = fireFact->Generate();
+  csRef<iFireTexture> fire = csPtr<iFireTexture>
+    (SCF_QUERY_INTERFACE (tex, iFireTexture));
+
+  if (node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      csStringID id = tokens.Lookup (child->GetValue ());
+      switch (id)
+      {
+	case tokens.POSSBURN:
+	  fire->SetPossibleBurn (child->GetContentsValueAsInt());
+	  break;
+	case tokens.ADDBURN:
+	  fire->SetAdditionalBurn (child->GetContentsValueAsInt());
+	  break;
+	case tokens.CONTBURN:
+	  fire->SetContinuedBurn (child->GetContentsValueAsInt());
+	  break;
+	case tokens.SMOOTHING:
+	  fire->SetSmoothing (child->GetContentsValueAsInt());
+	  break;
+	case tokens.EXTINGUISH:
+	  fire->SetExtinguish (child->GetContentsValueAsInt());
+	  break;
+	case tokens.SINGLEFLAME:
+	  bool res;
+	  if (synldr && synldr->ParseBool (child, res, true))
+	    fire->SetSingleFlameMode (res);
+	  break;
+	case tokens.HALFBASE:
+	  fire->SetHalfBase (child->GetContentsValueAsInt());
+	  break;
+	case tokens.POSTSMOOTH:
+	  fire->SetPostSmoothing (child->GetContentsValueAsInt());
+	  break;
+	case tokens.PALETTE:
+	  {
+	    if (!synldr) return NULL;
+
+	    csGradient grad;
+	    if (!synldr->ParseGradient (child, grad))
+	    {
+	      return NULL;
+	    }
+	    fire->SetPalette (grad);
+	  }
+	  break;
+	default:
+	  if (synldr) synldr->ReportBadToken (child);
+	  return NULL;
+      };
+    }
+  }
+
+  return csPtr<iBase> (tex);
+}

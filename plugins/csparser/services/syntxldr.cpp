@@ -31,6 +31,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
 #include "csgeom/transfrm.h"
+#include "csgfx/gradient.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
@@ -137,7 +138,13 @@ enum
   XMLTOKEN_ZFILL,
   XMLTOKEN_FLOAT,
   XMLTOKEN_CLIP,
-  XMLTOKEN_SECTOR
+  XMLTOKEN_SECTOR,
+  // gradients
+  XMLTOKEN_SHADE,
+  XMLTOKEN_LEFT,
+  XMLTOKEN_RIGHT,
+  //XMLTOKEN_COLOR,
+  XMLTOKEN_POS
 };
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
@@ -216,6 +223,11 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("float", XMLTOKEN_FLOAT);
   xmltokens.Register ("clip", XMLTOKEN_CLIP);
   xmltokens.Register ("sector", XMLTOKEN_SECTOR);
+  
+  xmltokens.Register ("shade", XMLTOKEN_SHADE);
+  xmltokens.Register ("left", XMLTOKEN_LEFT);
+  xmltokens.Register ("right", XMLTOKEN_RIGHT);
+  xmltokens.Register ("pos", XMLTOKEN_POS);
   return true;
 }
 
@@ -385,7 +397,7 @@ bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
 }
 
 bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
-{
+{				      
   c.red = node->GetAttributeValueAsFloat ("red");
   c.green = node->GetAttributeValueAsFloat ("green");
   c.blue = node->GetAttributeValueAsFloat ("blue");
@@ -923,6 +935,24 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (texspec & CSTEX_UV)
   {
+    if (tx_uv_i1 > poly3d->GetVertexCount())
+    {
+        ReportError ("crystalspace.syntax.polygon", node,
+	  "Bad texture specification: vertex index 1 doesn't exist!");
+	return false;
+    }
+    if (tx_uv_i2 > poly3d->GetVertexCount())
+    {
+        ReportError ("crystalspace.syntax.polygon", node,
+	  "Bad texture specification: vertex index 2 doesn't exist!");
+	return false;
+    }
+    if (tx_uv_i3 > poly3d->GetVertexCount())
+    {
+        ReportError ("crystalspace.syntax.polygon", node,
+	  "Bad texture specification: vertex index 3 doesn't exist!");
+	return false;
+    }
     poly3d->SetTextureSpace (
 			     poly3d->GetVertex (tx_uv_i1), tx_uv1,
 			     poly3d->GetVertex (tx_uv_i2), tx_uv2,
@@ -1015,6 +1045,173 @@ bool csTextSyntaxService::ParsePoly3d (
 
   OptimizePolygon (poly3d);
 
+  return true;
+}
+
+bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node, 
+					      csGradientShade& shade)
+{
+  bool has_left = false;
+  bool has_right = false;
+  bool has_color = false;
+  bool has_position = false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+	{
+	  if (has_left)
+	  {
+	    Report (
+	      "crystalspace.syntax.gradient.shade",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "'color' overrides previously specified 'left'.");
+	  }
+	  else if (has_right)
+	  {
+	    Report (
+	      "crystalspace.syntax.gradient.shade",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "'color' overrides previously specified 'right'.");
+	  }
+	  else if (has_color)
+	  {
+	    Report (
+	      "crystalspace.syntax.gradient.shade",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "'color' overrides previously specified 'color'.");
+	  }
+	  csColor c;
+	  if (!ParseColor (child, c))
+	  {
+	    return false;
+	  }
+	  else
+	  {
+	    shade.left = c;
+	    shade.right = c;
+	    has_color = true;
+	  }
+	}
+	break;
+      case XMLTOKEN_LEFT:
+	{
+	  if (has_color)
+	  {
+	    Report (
+	      "crystalspace.syntax.gradient.shade",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "'left' overrides previously specified 'color'.");
+	  }
+	  if (!ParseColor (child, shade.left))
+	  {
+	    return false;
+	  }
+	  else
+	  {
+	    has_left = true;
+	  }
+	}
+	break;
+      case XMLTOKEN_RIGHT:
+	{
+	  if (has_color)
+	  {
+	    Report (
+	      "crystalspace.syntax.gradient.shade",
+	      CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "'right' overrides previously specified 'color'.");
+	  }
+	  if (!ParseColor (child, shade.right))
+	  {
+	    return false;
+	  }
+	  else
+	  {
+	    has_right = true;
+	  }
+	}
+	break;
+      case XMLTOKEN_POS:
+	shade.position = child->GetContentsValueAsFloat ();
+	has_position = true;
+	break;
+      default:
+        ReportBadToken (child);
+        return false;
+    }
+  }
+
+  if (!has_color && ((!has_left && has_right) || (has_left && !has_right)))
+  {
+    Report (
+      "crystalspace.syntax.gradient.shade",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Only one of 'left' or 'right' specified.");
+  }
+  if (!has_color && !has_left && !has_right)
+  {
+    Report (
+      "crystalspace.syntax.gradient.shade",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "No color at all specified.");
+  }
+  if (!has_position)
+  {
+    Report (
+      "crystalspace.syntax.gradient.shade",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "No position specified.");
+  }
+
+  return true;
+}
+
+bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
+					 csGradient& gradient)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SHADE:
+	{
+	  csGradientShade shade;
+	  if (!ParseGradientShade (child, shade))
+	  {
+	    return false;
+	  }
+	  else
+	  {
+	    gradient.AddShade (shade);
+	  }
+	}
+	break;
+      default:
+        ReportBadToken (child);
+        return false;
+    }
+  }
   return true;
 }
 

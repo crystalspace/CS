@@ -25,6 +25,9 @@
 #include "cstool/proctex.h"
 #include "itexture/ifire.h"
 
+class csGradient;
+struct csRGBcolor;
+
 /**
  * Fire.
  */
@@ -32,7 +35,7 @@ class csProcFire : public csProcTexture, iFireTexture
 {
 private:
   /// Palette.
-  unsigned char* palette;
+  csRGBcolor* palette;
   int* palette_idx;
   /// number of colours in palette
   int palsize;
@@ -112,6 +115,8 @@ public:
 
   virtual void SetPostSmoothing (int amount);
   virtual int GetPostSmoothing ();
+
+  virtual void SetPalette (const csGradient gradient);
 };
 
 #endif // __CS_PROCFIRETEX_H__
