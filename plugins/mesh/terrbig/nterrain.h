@@ -178,10 +178,10 @@ class nTerrain
   csColor CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
-  void BufferTreeNode(iMovable *m, int p, nBlock *b);
+  void BufferTreeNode(int p, nBlock *b);
 
   /// Processes a node for buffering, checks for visibility and detail levels.
-  void ProcessTreeNode(iRenderView *rv, float kappa, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, unsigned int branch);
+  void ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level, unsigned int parent_index, unsigned int child_num, unsigned int branch);
     
 public:
   /// Sets the heightmap file
@@ -209,10 +209,10 @@ public:
   void BuildTree(FILE *f, nBlock *heightmap, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
-  void AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo);
+  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
 
   /// Sets the object to camera transform
-  void SetObjectToCamera(csOrthoTransform &o2c)
+  void SetObjectToCamera(csReversibleTransform &o2c)
   { obj2cam = o2c; }
 
   /// Sets the camera origin

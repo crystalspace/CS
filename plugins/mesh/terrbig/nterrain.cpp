@@ -287,9 +287,9 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v,
   return color;
 }
 
-void nTerrain::BufferTreeNode(iMovable *m, int p, nBlock *b)
+void nTerrain::BufferTreeNode(int p, nBlock *b)
 {
-  csVector3 v = b->pos / m->GetTransform();
+  csVector3 v = b->pos;
   float mid = terrain_w / 2.0;
   csVector2 t = csVector2 ((b->pos.x + mid) / (float)terrain_w, 1.0 - (b->pos.z + mid) / (float)terrain_w);
   csColor c = csColor (1.0, 1.0, 1.0);
@@ -297,33 +297,60 @@ void nTerrain::BufferTreeNode(iMovable *m, int p, nBlock *b)
     c = csColor (0.0, 0.0, 0.0);
     for (int i = 0; i < info->num_lights; i ++) {
       iLight *li = info->light_list[i];
-      c += CalculateLightIntensity (li, m, b->pos, b->norm);
+      // c += CalculateLightIntensity (li, m, b->pos, b->norm);
     }
     c.Clamp (2., 2., 2.);
   }
   info->AddVertex (v, t, c, p);
 }
 
-void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, iMovable *m, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
+/*
+void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
 {
   nBlock b = (nBlock *)hm->GetPointer(child + parent);
-  csSphere bs(b.pos / m->GetTransform(), b.radius);
-  float distance = (rv->GetCamera()->GetTransform().GetOrigin() - (b.pos / m->GetTransform())).SquaredNorm();
+  csSphere bs(b.pos, b.radius);
+  float distance = (obj2cam * b.pos).SquaredNorm();
   float error_projection = (b.error / kappa + b.radius);
   // Squared
   error_projection *= error_projection;
   if (rv->TestBSphere (obj2cam, bs) && error_projection > distance) {
     if (level < 2 * max_levels - 1) {
-      ProcessTreeNode (rv, kappa, m, level + 1, parent, branch, branch * 2 + 0);
+      ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 0);
 	}
-    BufferTreeNode (m, level & 1, &b);
+    BufferTreeNode (level & 1, &b);
     if (level < 2 * max_levels - 1) {
-      ProcessTreeNode (rv, kappa, m, level + 1, parent, branch, branch * 2 + 1);
+      ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 1);
 	}
   } 
 }
+*/
 
-void nTerrain::AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo)
+void nTerrain::ProcessTreeNode(iRenderView *rv, float kappa, unsigned int level, unsigned int parent, unsigned int child, unsigned int branch)
+{
+  nBlock b = (nBlock *)hm->GetPointer(child + parent);
+  if (level < 2 * max_levels - 1) {
+    csSphere bs(b.pos, b.radius);
+    if (rv->TestBSphere (obj2cam, bs)) {
+      float distance = (obj2cam * b.pos).SquaredNorm();
+      float error_projection = (b.error / kappa + b.radius);
+      error_projection *= error_projection;
+	  if (error_projection > distance) {
+        ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 0);
+        BufferTreeNode (level & 1, &b);
+        ProcessTreeNode (rv, kappa, level + 1, parent, branch, branch * 2 + 1);
+      } 
+    }
+  } else {
+    float distance = (obj2cam * b.pos).SquaredNorm();
+    float error_projection = (b.error / kappa + b.radius);
+    error_projection *= error_projection;
+	if (error_projection > distance) {
+      BufferTreeNode (level & 1, &b);
+    } 
+  }
+}
+
+void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
 {
   info = terrinfo;   
 
@@ -341,33 +368,33 @@ void nTerrain::AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terri
     size += inc;
   }
   float kappa = error_metric_tolerance * 
-    // rv->GetCamera()->GetInvFOV() * 2 * tan (rv->GetCamera()->GetFOVAngle() / 180.0 * PI / 2);
-    rv->GetCamera()->GetInvFOV() * rv->GetCamera()->GetFOVAngle() / 180.0 * PI;
+    rv->GetCamera()->GetInvFOV() * 2 * tan (rv->GetCamera()->GetFOVAngle() / 180.0 * PI / 2);
+    // rv->GetCamera()->GetInvFOV() * rv->GetCamera()->GetFOVAngle() / 180.0 * PI;
 
   float mid = terrain_w/2.0;
-  info->InitBuffer (sw.pos / m->GetTransform(), 
+  info->InitBuffer (sw.pos, 
     csVector2 ((sw.pos.x + mid)/(float)terrain_w, 1.0 - (sw.pos.z + mid)/(float)terrain_w),
     csColor (1.0, 1.0, 1.0), 0);
-  ProcessTreeNode (rv, kappa, m, 1, 0 * size + 4, 1, 2);
-  BufferTreeNode (m, 0, &c);
-  ProcessTreeNode (rv, kappa, m, 1, 0 * size + 4, 1, 3);
+  ProcessTreeNode (rv, kappa, 1, 0 * size + 4, 1, 2);
+  BufferTreeNode (0, &c);
+  ProcessTreeNode (rv, kappa, 1, 0 * size + 4, 1, 3);
 
-  BufferTreeNode (m, 1, &se);
-  ProcessTreeNode (rv, kappa, m, 1, 1 * size + 4, 1, 2);
-  BufferTreeNode (m, 0, &c);
-  ProcessTreeNode (rv, kappa, m, 1, 1 * size + 4, 1, 3);
+  BufferTreeNode (1, &se);
+  ProcessTreeNode (rv, kappa, 1, 1 * size + 4, 1, 2);
+  BufferTreeNode (0, &c);
+  ProcessTreeNode (rv, kappa, 1, 1 * size + 4, 1, 3);
 
-  BufferTreeNode (m, 1, &ne);
-  ProcessTreeNode (rv, kappa, m, 1, 2 * size + 4, 1, 2);
-  BufferTreeNode (m, 0, &c);
-  ProcessTreeNode (rv, kappa, m, 1, 2 * size + 4, 1, 3);
+  BufferTreeNode (1, &ne);
+  ProcessTreeNode (rv, kappa, 1, 2 * size + 4, 1, 2);
+  BufferTreeNode (0, &c);
+  ProcessTreeNode (rv, kappa, 1, 2 * size + 4, 1, 3);
 
-  BufferTreeNode (m, 1, &nw);
-  ProcessTreeNode (rv, kappa, m, 1, 3 * size + 4, 1, 2);
-  BufferTreeNode (m, 0, &c);
-  ProcessTreeNode (rv, kappa, m, 1, 3 * size + 4, 1, 3);
+  BufferTreeNode (1, &nw);
+  ProcessTreeNode (rv, kappa, 1, 3 * size + 4, 1, 2);
+  BufferTreeNode (0, &c);
+  ProcessTreeNode (rv, kappa, 1, 3 * size + 4, 1, 3);
 
-  info->EndBuffer (sw.pos / m->GetTransform(), 
+  info->EndBuffer (sw.pos, 
     csVector2 ((sw.pos.x + mid)/(float)terrain_w, 1.0 - (sw.pos.z + mid)/(float)terrain_w),
     csColor (1.0, 1.0, 1.0), rv);
 }
@@ -646,9 +673,10 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     iCamera* cam = rview->GetCamera ();
 
-    terrain->SetObjectToCamera(cam->GetTransform());
-    terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
-    terrain->AssembleTerrain(rview, movable, info);
+	csReversibleTransform tr_o2c = cam->GetTransform ();
+	tr_o2c /= movable->GetFullTransform ();
+    terrain->SetObjectToCamera(tr_o2c);
+    terrain->AssembleTerrain(rview, info);
 
     info->GetMesh()->do_mirror = rview->GetCamera()->IsMirrored();
     if (info->num_lights > 0) {
@@ -677,15 +705,14 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
 }
 
 bool 
-csBigTerrainObject::Draw (iRenderView* rview, iMovable*, csZBufMode zbufMode)
+csBigTerrainObject::Draw (iRenderView* rview, iMovable* m, csZBufMode zbufMode)
 {
   iGraphics3D* pG3D = rview->GetGraphics3D ();
   iCamera* pCamera = rview->GetCamera ();
 
-  csReversibleTransform& camtrans = pCamera->GetTransform ();
-  // const csVector3& origin = camtrans.GetOrigin ();
-
-  pG3D->SetObjectToCamera (&camtrans);
+  csReversibleTransform tr_o2c = pCamera->GetTransform ();
+  tr_o2c /= m->GetFullTransform ();
+  pG3D->SetObjectToCamera (&tr_o2c);
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
   info->GetMesh()->mat_handle = terrain->GetMaterialsList()[0]->GetMaterialHandle();
   terrain->GetMaterialsList()[0]->Visit ();
