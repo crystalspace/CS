@@ -973,7 +973,6 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     //support for special rendering flags. Ideally, these properties would be
     //assigned to surfaces instead of entities, but the Quake/ Half-Life map
     //format doesn't have a really portable way to do so.
-    double Alpha  = pEntity->GetNumValueOfKey ("alpha",  100);
     bool   Solid  = pEntity->GetBoolValueOfKey("solid",  true);
     bool   Mirror = pEntity->GetBoolValueOfKey("mirror", false);
     if (!pEntity->GetBoolValueOfKey("lighting", true))
@@ -983,7 +982,8 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     }
     
     //Not supported anymore
-    /*if (Alpha < 100)
+    /*double Alpha  = pEntity->GetNumValueOfKey ("alpha",  100);
+    if (Alpha < 100)
     {
       CreateNode (poly, "alpha", (float)Alpha);
     }
