@@ -42,7 +42,7 @@ rule ObjC
 
 actions ObjC
 {
-  $(CMD.OBJC) -c -o $(<) $(CCFLAGS) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC) -c -o $(<) $(CCHDRS) $(CCFLAGS) $(OBJCFLAGS) $(CCDEFS) $(>)
 }
 }
 
@@ -69,6 +69,6 @@ rule ObjC++
 
 actions ObjC++
 {
-  $(CMD.OBJC++) -c -o $(<) $(C++FLAGS) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC++) -c -o $(<) $(CCHDRS) $(C++FLAGS) $(OBJC++FLAGS) $(CCDEFS) $(>)
 }
 }

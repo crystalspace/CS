@@ -41,7 +41,7 @@ rule Cc
 
 actions Cc
 {
-    $(CMD.CC) -c -o $(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+    $(CMD.CC) -c -o $(<) $(CCHDRS) $(CCFLAGS) $(CCDEFS) $(>)
 }
 } # end if $(CMD.CC)
 
@@ -68,7 +68,7 @@ rule C++
 
 actions C++
 {
-    $(CMD.C++) -c -o $(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+    $(CMD.C++) -c -o $(<) $(CCHDRS) $(C++FLAGS) $(CCDEFS) $(>)
 }
 } # end if $(CMD:C++)
 
