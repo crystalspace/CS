@@ -14,6 +14,9 @@ chronological order.
 	  captures, if necessary), rather than opening a new console window and
 	  dumping the output there. This matches the subsystem setting for GUI
 	  executables in the old msvcgen templates.
+	- Eric Sunshine repaired some outdated references to
+	  /usr/local/crystal, the old GNU-make-based installation location, in
+	  the CS manual. Also eliminated TeX 'hbox' warnings.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon

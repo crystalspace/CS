@@ -222,7 +222,7 @@ email=some.body@@some.where
 execute_args=-video=opengl
 kdevprj_version=1.3
 lfv_open_groups=
-make_options=-j1 -I/usr/local/crystal/include
+make_options=-j1 -I/usr/local/include/crystalspace
 makefiles=Makefile.am,kdevelopcs/Makefile.am, \
 kdevelopcs/docs/Makefile.am,kdevelopcs/docs/en/Makefile.am
 modifyMakefiles=true
