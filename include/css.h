@@ -61,8 +61,7 @@
 #endif
 
 //CS Object
-#ifndef NO_CSUTIL
-#include "csobject/nameobj.h"
+#ifndef NO_CSOBJECT
 #endif
 
 //CS Util
