@@ -23,6 +23,8 @@ chronological order.
 	    - Made Jam SubVariants nesteable.
 	    - Changed DoSourceGrist to not replace already existing grist.
 	    - Fixed shared libs to also have install rules.
+	- res tweaked the VC7 project files release configuration. Notably,
+	  debug info generation is now enabled.
 18-Feb-2005
 	- Jorrit worked further on PVSCalc:
 	    - Some small fixes on kdtree building.

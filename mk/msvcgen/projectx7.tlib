@@ -76,6 +76,8 @@
 				StringPooling="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeLibrary="2"
+				DebugInformationFormat="3"
+				BufferSecurityCheck="FALSE"
 [% END %]
 [% MACRO compiler_debug BLOCK -%]
 				Optimization="0"
@@ -88,7 +90,9 @@
 
 [% MACRO linker_release BLOCK -%]
 				LinkIncremental="1"
-				OptimizeReferences="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				GenerateDebugInformation="TRUE"
 [% END %]
 [% MACRO linker_debug BLOCK -%]
 				LinkIncremental="2"
