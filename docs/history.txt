@@ -12,6 +12,11 @@ chronological order.
 3-Dec-2003
 	- res changed the csKeyEventHelper to accept 'const iEvent*' arguments.
 	  Also changed the iEvent->Find() methods to be 'const'.
+	- jamest Modifed swig wrapper to support iSector::HitBeamPortals(),  
+	  also added csBox* to the swig wrapper.  
+	- jamest commented out the setScale() function in sprcal3d 
+	  so plugin would build until setScale() makes it into cal3d
+	  cvs
 2-Dec-2003
 	- res enabled VC the warning "class has virtual functions, but
 	  destructor is not virtual". It was enabled in the past, but somehow

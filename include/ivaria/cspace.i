@@ -293,6 +293,7 @@
 %apply int * OUTPUT { int & newWidth };
 %apply int * OUTPUT { int & oColor };
 %apply int * OUTPUT { int & val };
+%apply int * OUTPUT { int * polygon_idx };
 %apply float * OUTPUT { float & oDiffuse };
 %apply float * OUTPUT { float & oAmbient };
 %apply float * OUTPUT { float & oReflection };
@@ -704,6 +705,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csgeom/spline.h"
 %include "csgeom/cspoint.h"
+%include "csgeom/box.h"
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"

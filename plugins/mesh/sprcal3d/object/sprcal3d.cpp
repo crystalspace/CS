@@ -485,7 +485,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   for (unsigned int i=0; i < bones.size(); i++)
   {
     bone = bones[i];
-    bone->setScale (factory->GetRenderScale() );
+    //bone->setScale (factory->GetRenderScale() );
     bone->calculateState ();
   }
   skeleton->calculateState ();
