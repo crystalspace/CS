@@ -1724,7 +1724,7 @@ bool csVFS::CheckIfMounted(char const* virtual_path) const
 {
   bool ok = false;
   csScopedMutexLock lock(mutex);
-  char const* const s = _ExpandPath(virtual_path, true);
+  char* const s = _ExpandPath(virtual_path, true);
   if (s != 0)
   {
     ok = GetNode(s, 0, 0) != 0;
