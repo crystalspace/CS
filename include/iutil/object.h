@@ -43,7 +43,7 @@ struct iObjectIterator;
  */
 #define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
   csPtr<Interface> ((Interface*)(object)->GetChild			\
-  (Interface_scfGetID (), Interface##_VERSION, name))
+  (Interface##_scfGetID (), Interface##_VERSION, name))
 
 /**
  * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object
