@@ -125,8 +125,7 @@ public:
   {
     int(*cf)(char const* const&, char const* const&) =
       case_sensitive ? CaseSensitiveCompare : CaseInsensitiveCompare;
-    return superclass::InsertSorted (item,
-    	cf, equal_index);
+    return superclass::InsertSorted (item, cf, equal_index);
   }
 
 
