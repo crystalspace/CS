@@ -23,6 +23,8 @@
 #ifndef __RNG_H__
 #define __RNG_H__
 
+#include "cstypes.h"
+
 /**
  * Portable random number generator class.<p>
  * The reason for using this class if that you may want a

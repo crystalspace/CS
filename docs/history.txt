@@ -66,6 +66,8 @@ The history order has been reversed so that new features are at the top.
 	    - Was applying delete[] to the middle rather than the beginning of
 	      a character array in yywrap().
 	    - Was leaking the 'filename' string of an included dungeon file.
+	- Eric Sunshine csRandomGen so that it works with compilers which do
+	  not provide a native 'bool' type.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent
 	  modifications in sprite creation.
@@ -93,7 +95,7 @@ The history order has been reversed so that new features are at the top.
 	      also renamed it to memdebug.txi.  Fixed several Texinfo mark-up
 	      problems as well.
 	    - Created a new section (portable.txi) which discusses portability
-	      issues when writing code and creating resources for Crytal
+	      issues when writing code and creating resources for Crystal
 	      Space.  Most of the content of this section actually comes from
 	      the older coding.txi file which now contains only Coding Style
 	      guidelines instead of a mixture of both.  Also expanded the

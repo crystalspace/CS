@@ -27,6 +27,7 @@
     of Florida State University.
 */
 
+#include "cssysdef.h"
 #include "csutil/rng.h"
 #include <stdio.h>
 #include <time.h>
