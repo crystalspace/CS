@@ -31,7 +31,7 @@
 
 #include "imesh/object.h"
 #include "imesh/particles.h"
-
+#include "iutil/object.h"
 #include "ivaria/reporter.h"
 
 #include "particlesldr.h"
@@ -677,19 +677,252 @@ csParticlesFactorySaver::~csParticlesFactorySaver ()
 bool csParticlesFactorySaver::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
+
 bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
   if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
+
+  csRef<iMeshObjectFactory> fact = 
+    SCF_QUERY_INTERFACE(obj, iMeshObjectFactory);
+  csRef<iParticlesFactoryState> state =
+    SCF_QUERY_INTERFACE(obj, iParticlesFactoryState);
+
+  if (fact && state)
+  {
+    csRef<iDocumentNode> paramsNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+
+    //TBD
+    //Writedown Material tag
+    iMaterialWrapper* mat = 0; //state->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown emitter tag
+    WriteEmitter(state, paramsNode);
+
+    //Writedown dampener tag:
+    float damp = state->GetDampener ();
+    csRef<iDocumentNode> dampNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    dampNode->SetValue("dampener");
+    dampNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(damp);
+
+    //Writedown mass tag
+    float mass = state->GetMass ();
+    csRef<iDocumentNode> massNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    massNode->SetValue("mass");
+    massNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(mass);
+
+    //Writedown massvar tag
+    float massvar = state->GetMassVariation ();
+    csRef<iDocumentNode> massvarNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    massvarNode->SetValue("massvariation");
+    massvarNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(massvar);
+
+    //Writedown partpersec tag
+    int pps = state->GetParticlesPerSecond ();
+    csRef<iDocumentNode> ppsNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    ppsNode->SetValue("pps");
+    ppsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(pps);
+
+    //Writedown initial tag
+    int initial = state->GetInitialParticleCount ();
+    csRef<iDocumentNode> initialNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    initialNode->SetValue("initial");
+    initialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(initial);
+
+    //Writedown gravity tag
+    csVector3 gravity;
+    state->GetGravity(gravity);
+    csRef<iDocumentNode> gravityNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    gravityNode->SetValue("gravity");
+    synldr->WriteVector(gravityNode, &gravity);
+
+    //Writedown diffusion tag
+    float diffuse = state->GetDiffusion ();
+    csRef<iDocumentNode> diffuseNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    diffuseNode->SetValue("diffusion");
+    diffuseNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(diffuse);
+
+    //Writedown radius tag
+    float radius = state->GetParticleRadius ();
+    csRef<iDocumentNode> radiusNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
+
+    //Writedown timetolive tag (ttl)
+    float ttl = state->GetTimeToLive ();
+    csRef<iDocumentNode> ttlNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    ttlNode->SetValue("ttl");
+    ttlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(ttl);
+
+    //Writedown timevariation tag
+    float tv = state->GetTimeVariation ();
+    csRef<iDocumentNode> tvNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    tvNode->SetValue("timevariation");
+    tvNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(tv);
+
+    //TBD
+    //case XMLTOKEN_AUTOSTART:
+    //state->GetAutoStart ();
+
+    //case XMLTOKEN_TRANSFORM_MODE:
+    synldr->WriteBool(paramsNode, "transformnode", 
+                      state->GetTransformMode(), false);
+
+    //TBD
+    //case XMLTOKEN_PHYSICS_PLUGIN:
+    //const char* pysplug = state->GetPhysicsPlugin ();
+
+    //Write colormethod tags
+    WriteColorMethode(state, paramsNode);
+  }
+  return true;
+}
+
+//TBD
+bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
+                                            iDocumentNode* parent)
+{
+  csRef<iDocumentNode> emitterNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  emitterNode->SetValue("emitter");
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for particles mesh");
-  paramsNode=0;
-  
+  //Write time tags
+  float emittime = state->GetEmitTime();
+  csRef<iDocumentNode> emittimeNode =
+    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  emittimeNode->SetValue("time");
+  emittimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(emittime);
+
+  switch (state->GetEmitType())
+  {
+    case CS_PART_EMIT_BOX:
+    {
+      float x = state->GetEmitXSize();
+      float y = state->GetEmitYSize();
+      float z = state->GetEmitZSize();
+      break;
+    }
+
+    case CS_PART_EMIT_CYLINDER:
+    {
+      break;
+    }
+
+    case CS_PART_EMIT_PLANE:
+    {
+      break;
+    }
+
+    case CS_PART_EMIT_SPHERE:
+    {
+      emitterNode->SetAttribute("type", "sphere");
+
+      float innerradius = state->GetEmitXSize();
+      csRef<iDocumentNode> innerradiusNode =
+        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      innerradiusNode->SetValue("innerradius");
+      innerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(innerradius);
+      
+      float outerradius = state->GetEmitYSize();
+      csRef<iDocumentNode> outerradiusNode =
+        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      outerradiusNode->SetValue("outerradius");
+      outerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(outerradius);
+
+      break;
+    }
+  }
+
+  //paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
+
+  //Write force tags
+  csRef<iDocumentNode> forceNode =
+    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  forceNode->SetValue("force");
+
+  switch (state->GetForceType())
+  {
+    case CS_PART_FORCE_RADIAL:
+    {
+      break;
+    }
+
+    case CS_PART_FORCE_LINEAR:
+    {
+      forceNode->SetAttribute("type", "linear");
+
+      csVector3 direction;
+      state->GetForceDirection(direction);
+      csRef<iDocumentNode> directionNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      directionNode->SetValue("direction");
+      synldr->WriteVector(directionNode, &direction);
+
+      float amount = state->GetForce();
+      csRef<iDocumentNode> amountNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      amountNode->SetValue("amount");
+      amountNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(amount);
+
+      float range = state->GetForceRange();
+      csRef<iDocumentNode> rangeNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      rangeNode->SetValue("range");
+      rangeNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(range);
+
+      break;
+    }
+
+    case CS_PART_FORCE_CONE:
+    {
+      float radius = state->GetForceConeRadius();
+      csRef<iDocumentNode> radiusNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      radiusNode->SetValue("radius");
+      radiusNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(radius);
+
+      break;
+    }
+  }
+
+
+  return true;
+}
+
+//TBD
+bool csParticlesFactorySaver::WriteColorMethode (iParticlesFactoryState* state,
+                                                 iDocumentNode* parent)
+{
+  //state->GetConstantColor();
+
   return true;
 }
 
@@ -781,8 +1014,8 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	if (!state)
 	{
       	  synldr->ReportError (
-		"crystalspace.particles.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a particles factory!",
+		"crystalspace.particles.parse.badfactory", child,
+                "Factory '%s' doesn't appear to be a particles factory!",
 		factname);
 	  return 0;
 	}
@@ -801,7 +1034,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
         if (!mat)
         {
-          synldr->ReportError ("crystalspace.ballloader.parse.unknownmaterial",
+          synldr->ReportError("crystalspace.ballloader.parse.unknownmaterial",
 	    child, "Couldn't find material '%s'!", matname);
           return 0;
         }
@@ -1078,7 +1311,8 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
   }
   else if (!strcmp(type, "cone"))
   {
-    state->SetConeForceType(direction, range, falloff, radius, radius_falloff);
+    state->SetConeForceType(direction, range, falloff, radius,
+      radius_falloff);
   }
   else
   {
@@ -1281,19 +1515,266 @@ csParticlesObjectSaver::~csParticlesObjectSaver ()
 bool csParticlesObjectSaver::Initialize (iObjectRegistry *objreg)
 {
   object_reg = objreg;
-  return true;
-}
-//TBD
-bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
-{
-  if (!parent) return false; //you never know...
-  
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for particles mesh");
-  paramsNode=0;
-  
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
 
+
+bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+{
+  if (!parent) return false; //you never know...
+  if (!obj)    return false; //you never know...
+
+  csRef<iMeshObject> mesh = 
+    SCF_QUERY_INTERFACE(obj, iMeshObject);
+  csRef<iParticlesObjectState> object =
+    SCF_QUERY_INTERFACE(obj, iParticlesObjectState);
+
+  if (mesh && object)
+  {
+    csRef<iDocumentNode> paramsNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+
+    //Writedown factory tag
+    csRef<iMeshWrapper> meshwrap = SCF_QUERY_INTERFACE(mesh->GetLogicalParent(), iMeshWrapper);
+    iMeshFactoryWrapper* factwrap = meshwrap->GetFactory();
+    if (factwrap)
+    {
+      const char* factname = factwrap->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //TBD
+    //Writedown Material tag
+    iMaterialWrapper* mat = 0; //object->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
+
+    //Writedown emitter tag
+    WriteEmitter(object, paramsNode);
+
+    //Writedown dampener tag:
+    float damp = object->GetDampener ();
+    csRef<iDocumentNode> dampNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    dampNode->SetValue("dampener");
+    dampNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(damp);
+
+    //Writedown mass tag
+    float mass = object->GetMass ();
+    csRef<iDocumentNode> massNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    massNode->SetValue("mass");
+    massNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(mass);
+
+    //Writedown massvar tag
+    float massvar = object->GetMassVariation ();
+    csRef<iDocumentNode> massvarNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    massvarNode->SetValue("massvariation");
+    massvarNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(massvar);
+
+    //Writedown partpersec tag
+    //int pps = object->GetParticlesPerSecond ();
+    //csRef<iDocumentNode> ppsNode = 
+    //  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    //ppsNode->SetValue("pps");
+    //ppsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(pps);
+
+    //Writedown initial tag
+    //int initial = object->GetInitialParticleCount ();
+    //csRef<iDocumentNode> initialNode = 
+    //  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    //initialNode->SetValue("initial");
+    //initialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(initial);
+
+    //Writedown gravity tag
+    csVector3 gravity;
+    object->GetGravity(gravity);
+    csRef<iDocumentNode> gravityNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    gravityNode->SetValue("gravity");
+    synldr->WriteVector(gravityNode, &gravity);
+
+    //Writedown diffusion tag
+    float diffuse = object->GetDiffusion ();
+    csRef<iDocumentNode> diffuseNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    diffuseNode->SetValue("diffusion");
+    diffuseNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(diffuse);
+
+    //Writedown radius tag
+    float radius = object->GetParticleRadius ();
+    csRef<iDocumentNode> radiusNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(radius);
+
+    //Writedown timetolive tag (ttl)
+    float ttl = object->GetTimeToLive ();
+    csRef<iDocumentNode> ttlNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    ttlNode->SetValue("ttl");
+    ttlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(ttl);
+
+    //Writedown timevariation tag
+    float tv = object->GetTimeVariation ();
+    csRef<iDocumentNode> tvNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    tvNode->SetValue("timevariation");
+    tvNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(tv);
+
+    //TBD
+    //case XMLTOKEN_AUTOSTART:
+    //object->GetAutoStart ();
+
+    //case XMLTOKEN_TRANSFORM_MODE:
+    synldr->WriteBool(paramsNode, "transformnode", 
+                      object->GetTransformMode(), false);
+
+    //TBD
+    //case XMLTOKEN_PHYSICS_PLUGIN:
+    //const char* pysplug = object->GetPhysicsPlugin ();
+
+    //Write colormethod tags
+    WriteColorMethode(object, paramsNode);
+  }
+  return true;
+}
+
+//TBD
+bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
+                                            iDocumentNode* parent)
+{
+  csRef<iDocumentNode> emitterNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  emitterNode->SetValue("emitter");
+  
+  //Write time tags
+  float emittime = object->GetEmitTime();
+  csRef<iDocumentNode> emittimeNode =
+    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  emittimeNode->SetValue("time");
+  emittimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(emittime);
+
+  switch (object->GetEmitType())
+  {
+    case CS_PART_EMIT_BOX:
+    {
+      float x = object->GetEmitXSize();
+      float y = object->GetEmitYSize();
+      float z = object->GetEmitZSize();
+      break;
+    }
+
+    case CS_PART_EMIT_CYLINDER:
+    {
+      break;
+    }
+
+    case CS_PART_EMIT_PLANE:
+    {
+      break;
+    }
+
+    case CS_PART_EMIT_SPHERE:
+    {
+      emitterNode->SetAttribute("type", "sphere");
+
+      float innerradius = object->GetEmitXSize();
+      csRef<iDocumentNode> innerradiusNode =
+        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      innerradiusNode->SetValue("innerradius");
+      innerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(innerradius);
+      
+      float outerradius = object->GetEmitYSize();
+      csRef<iDocumentNode> outerradiusNode =
+        emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      outerradiusNode->SetValue("outerradius");
+      outerradiusNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(outerradius);
+
+      break;
+    }
+  }
+
+  //paramsNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
+
+  //Write force tags
+  csRef<iDocumentNode> forceNode =
+    emitterNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  forceNode->SetValue("force");
+
+  switch (object->GetForceType())
+  {
+    case CS_PART_FORCE_RADIAL:
+    {
+      break;
+    }
+
+    case CS_PART_FORCE_LINEAR:
+    {
+      forceNode->SetAttribute("type", "linear");
+
+      csVector3 direction;
+      object->GetForceDirection(direction);
+      csRef<iDocumentNode> directionNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      directionNode->SetValue("direction");
+      synldr->WriteVector(directionNode, &direction);
+
+      float amount = object->GetForce();
+      csRef<iDocumentNode> amountNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      amountNode->SetValue("amount");
+      amountNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(amount);
+
+      float range = object->GetForceRange();
+      csRef<iDocumentNode> rangeNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      rangeNode->SetValue("range");
+      rangeNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(range);
+
+      break;
+    }
+
+    case CS_PART_FORCE_CONE:
+    {
+      float radius = object->GetForceConeRadius();
+      csRef<iDocumentNode> radiusNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      radiusNode->SetValue("radius");
+      radiusNode->CreateNodeBefore(CS_NODE_TEXT,0)->SetValueAsFloat(radius);
+
+      break;
+    }
+  }
+
+
+  return true;
+}
+
+//TBD
+bool csParticlesObjectSaver::WriteColorMethode (iParticlesObjectState* object,
+                                                 iDocumentNode* parent)
+{
+  //state->GetConstantColor();
+
+  return true;
+}

@@ -91,6 +91,7 @@ class csParticlesFactorySaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -106,6 +107,12 @@ public:
 
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+
+  /// Write down the emitter block.
+  virtual bool WriteEmitter (iParticlesFactoryState *obj, iDocumentNode* parent);
+
+  /// Write down colormethode block.
+  virtual bool WriteColorMethode (iParticlesFactoryState *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {
@@ -178,6 +185,7 @@ class csParticlesObjectSaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -192,7 +200,13 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  bool WriteDown (iBase *obj, iDocumentNode* parent);
+
+  /// Write the emitter block
+  bool WriteEmitter (iParticlesObjectState *state, iDocumentNode *node);
+
+  /// Write constant color block
+  bool WriteColorMethode (iParticlesObjectState *state, iDocumentNode *node);
 
   struct eiComponent : public iComponent
   {
