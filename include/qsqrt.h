@@ -166,6 +166,13 @@ static inline float qisqrt(float x)
   return y0;
 };
 
+#elif (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_VC)
+
+#include <math.h>
+
+#define qsqrt(x) sqrtf(x)
+#define qisqrt(x) (1.0f / sqrtf(x))
+
 #else
 
 #include <math.h>
