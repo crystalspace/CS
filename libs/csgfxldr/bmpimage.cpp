@@ -133,6 +133,9 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
 
   UByte *iPtr = iBuffer + BFOFFBITS(iBuffer);
 
+  // No alpha for BMP.
+  Format &= ~CS_IMGFMT_ALPHA;
+
   // The last scanline in BMP corresponds to the top line in the image
   int  buffer_y = Width * (Height - 1);
   bool blip     = false;
@@ -242,8 +245,6 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     convert_rgba (buffer);
     return true;
   }
-
-  Format &= ~CS_IMGFMT_ALPHA;
 
   return false;
 }

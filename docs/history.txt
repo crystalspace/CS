@@ -3,6 +3,7 @@ The history order has been reversed so that new features are at the top.
 18-Aug-2000
 	- Accidently left on PVS building. I wonder why nobody complained
 	  about dmburg needing several hours to start up :-)
+	- Fixed BMP loader so that it doesn't enable ALPHA anymore.
 17-Aug-2000
 	- Martin Geisse fixed a bug in csloader related to sound.
 	- Martin also added the cssysdef.h include to getopt.cpp.
