@@ -35,6 +35,7 @@ struct iSector;
 struct iShaderManager;
 struct iDocumentSystem;
 struct iGeneralMeshState;
+struct iStringSet;
 
 class CsBench
 {
@@ -53,6 +54,7 @@ private:
   csRef<iCommandLineParser> cmdline;
   csRef<iView> view;
   csRef<iGeneralMeshState> genmesh;
+  csRef<iStringSet> strings;
   iSector* room1;
   iSector* room2;
   iMaterialWrapper* material;

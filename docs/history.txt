@@ -15,6 +15,8 @@ chronological order.
 	- Jorrit attempted to extend csbench to also test the light_bumpmap.xml
 	  shader. For this I had to create a new renderloop in code. The
 	  visual effects seems weird so I'm not sure it is actually working.
+	- res changed csbench to attach a normal map to the material used for
+	  testing.
 20-Jun-2004
 	- Christian Bayle adapted debian scripts to the new configuration
 	  options

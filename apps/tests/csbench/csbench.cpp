@@ -130,7 +130,18 @@ bool CsBench::CreateGeometry ()
         "Error loading 'stone4' texture!");
     return false;
   }
+  if (!loader->LoadTexture ("stone_normal", "/lib/std/stone2DOT3.png", CS_TEXTURE_3D,
+    0, false, false))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.simple1",
+        "Error loading 'stone2DOT3' texture!");
+    return false;
+  }
   material = engine->GetMaterialList ()->FindByName ("stone");
+  csShaderVariable* normalSV = 
+    material->GetMaterial()->GetVariableAdd (strings->Request ("tex normal"));
+  normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
 
   room2 = engine->CreateSector ("room2");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room2, "walls"));
@@ -255,6 +266,9 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   if (!imageio) return ReportError ("No image loader plugin!");
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs) return ReportError ("No iVFS plugin!");
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+  if (!strings) return ReportError ("No string set!");
 
   iGraphics2D* g2d = g3d->GetDriver2D ();
   iNativeWindow* nw = g2d->GetNativeWindow ();
@@ -364,8 +378,6 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
   csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
   shaderDoc->Parse (shaderFile);
   csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
   csStringID shadertype = strings->Request (shtype);
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   int i;

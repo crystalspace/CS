@@ -22,7 +22,7 @@
       <file>/lib/std/stone4.gif</file>
     </texture>
     <texture name="stone2DOT3.png">
-      <file>/lev/terrain/stone2DOT3.png</file>
+      <file>/lib/std/stone2DOT3.png</file>
     </texture>
     <texture name="grass.png">
       <file>/lev/terrain/grass.png</file>
@@ -104,7 +104,6 @@
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>terrain splat</shadertype>
           <zoffset>no</zoffset>
-          <!--zuse /-->
 	  <zequal />
         </step>
         <!-- draws geometry -->
