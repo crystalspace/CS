@@ -183,6 +183,7 @@ class csTrianglesPerSuperLightmap
 
     ///Pointer to the cache data
     csSLMCacheData* cacheData;
+    bool isUnlit;
 
 };
 
@@ -248,11 +249,14 @@ protected:
 
   csTrianglesPerSuperLightmap* SearchFittingSuperLightmap(
     iPolygonTexture* poly_texture, csRect& rect, int num_vertices);
+
+  csTrianglesPerSuperLightmap* unlitPolysSL;
   
 
 public:
   
 
+  bool HaveUnlitPolys() {return unlitPolysSL != NULL;};
   /// Gets the triangles for a given node (by material)
   csTriangle* GetTriangles(TrianglesNode* t);
 
@@ -341,6 +345,9 @@ public:
   ///Gets the fog indices
 
   int *GetFogIndices(TrianglesSuperLightmapNode* tSL);
+
+  ///Gets the unlit polygons
+  csTrianglesPerSuperLightmap* GetUnlitPolys(){ return unlitPolysSL;};
 
   /// Sets a material
   virtual void SetMaterial (int idx, iMaterialHandle* mat_handle);

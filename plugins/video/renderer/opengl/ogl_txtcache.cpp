@@ -93,6 +93,7 @@ void* csSLMCacheData::Alloc(int /*w*/, int /*h*/, SourceData s, csSubRectangles*
 {
    source = s.superLMDataSource;
    source->cacheData = this;
+   isUnlit = source->isUnlit;
    return s.superLMDataSource;
 }
 
@@ -304,7 +305,7 @@ int csLightMapQueue::AddVertices (int num)
     delete[] gltxtFog; gltxtFog = new_ar;
 
     new_ar = new GLfloat [max_vertices*4];
-    if (gltxt) memcpy (new_ar, glcolorsFog, sizeof (GLfloat)*4*old_num);
+    if (gltxt) memcpy (new_ar, glcolorsFog, sizeof (GLfloat)*3*old_num);
     delete[] glcolorsFog; glcolorsFog = new_ar;
 
 
@@ -446,6 +447,8 @@ void csLightMapQueue::Reset()
     gltxt = NULL;
     glverts = NULL;
     tris = NULL;
+    gltxtFog = NULL;
+    glcolorsFog = NULL;
     max_triangles = 0;
     max_vertices = 0;
   }
@@ -908,6 +911,8 @@ void OpenGLLightmapCache::Flush ()
   csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
   for (i = 0 ; i < super_lm_num ; i++)
   {
+    if(suplm[i].cacheData)
+      if(suplm[i].cacheData->IsUnlit()) continue;
     suplm[i].queue.Flush (suplm[i].Handle);
   }
   csGraphics3DOGLCommon::SetupBlend (CS_FX_ALPHA, 0, false);
@@ -917,13 +922,13 @@ void OpenGLLightmapCache::Flush ()
   {
     if(!suplm[i].cacheData)
     {
-      suplm[i].queue.Reset();
-      continue;
+     suplm[i].queue.Reset();
+     continue;
     }
     if(suplm[i].cacheData->HasFog())
     { 
       csSLMCacheData* cacheData = (csSLMCacheData*) suplm[i].cacheData;
-      suplm[i].queue.FlushFog( cacheData->FogHandle);
+      suplm[i].queue.FlushFog(cacheData->FogHandle);
     }
     else suplm[i].queue.Reset();
   }

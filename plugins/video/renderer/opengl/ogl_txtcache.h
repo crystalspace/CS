@@ -119,6 +119,7 @@ struct iLMCache
   virtual void Clear() = 0;
   virtual bool IsPrecalcSuperlightmap() = 0;
   virtual bool HasFog() = 0;
+  virtual bool IsUnlit() = 0;
 };
 
 /**
@@ -165,7 +166,9 @@ class csLMCacheDataQueue: public iLMCache
     {
       return false;
     };
-    virtual bool HasFog() {return false;};
+    virtual bool HasFog() { return false; };
+    virtual bool IsUnlit() { return false; };
+
 
 };
 
@@ -180,13 +183,15 @@ class csSLMCacheData: public iLMCache
     GLuint Handle;
     GLuint FogHandle;
     bool hasFog;
+    bool isUnlit;
     virtual void* Alloc(int w, int h, SourceData s, csSubRectangles* r, GLuint Handle);
     virtual void Clear();
     virtual bool IsPrecalcSuperlightmap()
     {
       return true;
     };
-    virtual bool HasFog() {return hasFog;};
+    virtual bool HasFog() { return hasFog; };
+    virtual bool IsUnlit(){return isUnlit;};
 
 };
 
@@ -244,12 +249,8 @@ public:
   GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
   GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
 
-  /*DeleteArrays()
-  {
-    //delete[] tris;
-    //delete[] glverts;
-    //delete[] gltxt;
-  }*/
+
+  
 
   /// Adds a whole triangle array
   void AddTrianglesArray(csTriangle* indices, int numTriangles);
@@ -281,10 +282,10 @@ public:
   /// Flush this queue: i.e. render the lightmaps.
   void Flush (GLuint Handle);
 
-  /// Flush the queue (renders the lightmaps and the fog)
+  /// Flush the queue (renders the fog)
 
   void FlushFog (GLuint HandleFog);
-
+  
   ///Sets the state of ownsData attribute;
   //void SetOwnsData(bool value) {ownsData = value;};
 

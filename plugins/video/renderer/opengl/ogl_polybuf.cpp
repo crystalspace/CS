@@ -110,6 +110,7 @@ csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (iVertexBufferManager
 
   vertices = NULL;
   matCount = 0;
+  unlitPolysSL = NULL;
 }
 
 
@@ -200,6 +201,7 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
   numVertices = 0;
   numLightmaps = 0;
   cacheData = NULL;
+  isUnlit = false;
 }
 
 csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
@@ -219,6 +221,7 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
   int i;
 
   for(i = 0; i < numVertex; i++) vertexIndices[i] = NULL;
+  isUnlit = false;
 }
 
 csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap()
@@ -287,7 +290,11 @@ void TrianglesSuperLightmapList::Add(TrianglesSuperLightmapNode* t)
 
 
 /** Search a superlightmap to fit the lighmap in the superLM list
- * if it can't find any creates a new one
+ * if it can't find any creates a new one.
+ * The case that the polygon has no superlightmap is supported too.
+ * If the polygontexture has no lightmap it means its not lighted, 
+ * then a special superlightmap has to be created, just to store 
+ * the triangles and vertices that will be used in fog
  */
 csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
     SearchFittingSuperLightmap(iPolygonTexture* poly_texture,
@@ -296,6 +303,16 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
 
   int i;
   iLightMap* piLM = poly_texture->GetLightMap();
+  if (piLM == NULL)
+  {
+    //OK This polygon has no lightmap.
+    //Let's check if we have to create a unlitPolygonsSL or is already
+    //created
+    if (unlitPolysSL) return unlitPolysSL;
+    unlitPolysSL = new csTrianglesPerSuperLightmap(verticesCount);
+    unlitPolysSL->isUnlit = true;
+    return unlitPolysSL;
+  }
   int lm_width = piLM->GetWidth();
   int lm_height = piLM->GetHeight();
 
@@ -566,9 +583,111 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
   csRect rect;
   triSuperLM = SearchFittingSuperLightmap(poly_texture, rect,verticesCount);
   CS_ASSERT(triSuperLM != NULL);
-    /* We have the superlightmap where the poly_texture fits
+  
+   /* We have the superlightmap where the poly_texture fits
    * Now we can add the triangles
    */
+
+  /* Let's check if it's the unlitPolySL
+   */
+  if(triSuperLM == unlitPolysSL)
+  {
+    // It is, we can avoid most of this stuff, no 
+    //lightmap is needed, only the triangles, vertex
+    // and vertex indices are needed
+
+    /*It's easier than the lightmap case.
+     * Considerations:
+     * 1) This logic superlightmap will store:
+     *    a) The mesh's triangles that are unlit
+     *    b) The mesh's vertices
+     * 2) We don't need to duplicate vertex
+     * 3) We don't need to comapare with uv's
+     *
+     */
+
+
+    if(triSuperLM->vertexIndices[verts[0]] != NULL)
+      //The vertex already exists
+      triangle.a = triSuperLM->vertexIndices[verts[0]]->indices[0].vertex;   
+    else
+    {
+      //There is no vertices in the index. We have to create it.
+      csVector4 point;
+      Indexes ind;
+    
+      point.x = vertices[verts[0]].x;
+      point.y = vertices[verts[0]].y;
+      point.z = vertices[verts[0]].z;
+      point.w = 1.0;
+
+    
+      triSuperLM->vertexIndices[verts[0]] = new csVertexIndexArrayNode;
+      triSuperLM->vertices.Push(point);
+      ind.vertex = triSuperLM->vertices.Length() - 1;      
+      triSuperLM->vertexIndices[verts[0]]->indices.Push(ind);    
+    
+      triSuperLM->fogInfo.Push(verts[0]);
+      triSuperLM->numVertices++;
+      triangle.a = ind.vertex;
+    }
+
+   for(i = 1; i < num_vertices - 1; i++)
+   {
+      
+      if(triSuperLM->vertexIndices[verts[i]] != NULL)
+        triangle.b = triSuperLM->vertexIndices[verts[i]]->indices[0].vertex;
+      
+      else
+      {
+        /* It's is null, we have to create
+        * the vertices[verts[i]] array and we can push it directly in
+        * the verticesPoints array and the uv's can be pushed directly too
+        */
+        Indexes ind;
+        csVector4 point;
+
+        point.x = vertices[verts[i]].x;
+        point.y = vertices[verts[i]].y;
+        point.z = vertices[verts[i]].z;
+        point.w = 1.0;
+
+        triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
+        triSuperLM->vertices.Push(point);
+        ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!                         
+        triSuperLM->vertexIndices[verts[i]]->indices.Push(ind);
+        triSuperLM->fogInfo.Push(verts[i]);
+        triSuperLM->numVertices++;        
+        triangle.b = ind.vertex;
+      }
+
+      if(triSuperLM->vertexIndices[verts[i+1]] != NULL)
+        triangle.c = triSuperLM->vertexIndices[verts[i+1]]->indices[0].vertex;      
+      else
+      {
+        Indexes ind;
+        csVector4 point;
+        point.x = vertices[verts[i+1]].x;
+        point.y = vertices[verts[i+1]].y;
+        point.z = vertices[verts[i+1]].z;
+        point.w = 1.0;
+    
+        triSuperLM->vertexIndices[verts[i+1]] = new csVertexIndexArrayNode;
+        triSuperLM->vertices.Push(point);
+        ind.vertex = triSuperLM->vertices.Length() - 1;        
+        triSuperLM->vertexIndices[verts[i+1]]->indices.Push(ind);
+        triSuperLM->fogInfo.Push(verts[i+1]);
+        triSuperLM->numVertices++;
+        triangle.c = ind.vertex;
+      }  
+      triSuperLM->triangles.Push(triangle);   
+      poly_texture->IncRef();
+      triSuperLM->numTriangles++;    
+    }
+    return;
+
+  }
+
   float lm_low_u,lm_low_v,lm_high_u,lm_high_v;
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
   
@@ -991,6 +1110,7 @@ void csTriangleArrayPolygonBuffer::Clear ()
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Falta el Clear
   delete[] vertices; vertices = NULL;
   materials.SetLimit(0);
+  delete unlitPolysSL;
 
 }
 
