@@ -1030,7 +1030,7 @@ csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
   thing = 0;
-  static_poly = 0;
+  static_poly_idx = -1;
 
   lightpatches = 0;
 }
@@ -1064,9 +1064,14 @@ void csPolygon3D::RemovePolyTexture ()
   }
 }
 
-void csPolygon3D::SetStaticPoly (csPolygon3DStatic* static_poly)
+void csPolygon3D::SetStaticPolyIdx (int idx)
 {
-  csPolygon3D::static_poly = static_poly;
+  static_poly_idx = idx;
+}
+
+csPolygon3DStatic* csPolygon3D::GetStaticPoly () const
+{
+  return thing->GetStaticData ()->GetPolygon3DStatic (static_poly_idx);
 }
 
 void csPolygon3D::SetParent (csThing *thing)
@@ -1077,39 +1082,33 @@ void csPolygon3D::SetParent (csThing *thing)
 void csPolygon3D::RefreshFromStaticData ()
 {
   RemovePolyTexture ();
-  plane_wor = static_poly->GetObjectPlane ();
 }
 
-void csPolygon3D::ObjectToWorld (
-  const csReversibleTransform &t,
-  const csVector3 &vwor)
+const csVector3& csPolygon3D::Vwor (int idx) const
 {
-  t.This2Other (static_poly->polygon_data.plane_obj, vwor, plane_wor);
-  // This is not efficient and only needed in those cases where the
-  // thing is really scaled. We have to see if this is a problem. Normally
-  // it is a good thing to avoid calling csThing::Transform() to often.
-  // So normally it should not be a problem.
-  plane_wor.Normalize ();
+  return thing->Vwor (thing->GetStaticData ()
+  	->GetPolygon3DStatic (static_poly_idx)
+	->polygon_data.vertices[idx]);
 }
 
 #define TEXW(t) ((t)->w_orig)
 #define TEXH(t) ((t)->h)
 
-void csPolygon3D::Finish ()
+void csPolygon3D::Finish (csPolygon3DStatic* spoly)
 {
   RefreshFromStaticData ();
 
-  if (static_poly->IsTextureMappingEnabled ())
+  if (spoly->IsTextureMappingEnabled ())
   {
     txt_info.SetLightMap (0);
-    if (static_poly->flags.Check (CS_POLY_LIGHTING))
+    if (spoly->flags.Check (CS_POLY_LIGHTING))
     {
-      csLightMap *lm = static_poly->thing_static->thing_type
+      csLightMap *lm = spoly->thing_static->thing_type
         ->blk_lightmap.Alloc ();
       txt_info.SetLightMap (lm);
 
-      lm->Alloc (static_poly->polygon_data.tmapping->w_orig,
-      	static_poly->polygon_data.tmapping->h);
+      lm->Alloc (spoly->polygon_data.tmapping->w_orig,
+      	spoly->polygon_data.tmapping->h);
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
@@ -1117,8 +1116,8 @@ void csPolygon3D::Finish ()
 	lm->lightcell_size))
       {
         thing_type->Notify ("Renderer can't handle lightmap "
-         "for polygon '%s'", static_poly->GetName());
-        static_poly->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
+         "for polygon '%s'", spoly->GetName());
+        spoly->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
 #endif // CS_USE_NEW_RENDERER
     }
@@ -1173,27 +1172,28 @@ void csPolygon3D::InitializeDefault (bool clear)
   }
 }
 
-const char* csPolygon3D::ReadFromCache (iFile* file)
+const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
 {
   if (txt_info.lm == 0) return 0;
   const char* error = txt_info.lm->ReadFromCache (
           file,
-          static_poly->polygon_data.tmapping->w_orig,
-          static_poly->polygon_data.tmapping->h,
-          this,
-  thing->GetStaticData ()->thing_type->engine);
+          spoly->polygon_data.tmapping->w_orig,
+          spoly->polygon_data.tmapping->h,
+          this, spoly,
+	  thing->GetStaticData ()->thing_type->engine);
   if (error != 0)
     txt_info.InitLightMaps ();
   return error;
 }
 
-bool csPolygon3D::WriteToCache (iFile* file)
+bool csPolygon3D::WriteToCache (iFile* file, csPolygon3DStatic* spoly)
 {
   if (txt_info.lm == 0) return true;
   if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
       & CS_ENGINE_CACHE_WRITE)
-      txt_info.lm->Cache (file, this,
-  thing->GetStaticData ()->thing_type->engine);
+    txt_info.lm->Cache (file, this,
+	spoly,
+    	thing->GetStaticData ()->thing_type->engine);
   return true;
 }
 
@@ -1231,7 +1231,8 @@ void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
 
 bool csPolygon3D::MarkRelevantShadowFrustums (
   iFrustumView* lview,
-  csPlane3 &plane)
+  csPlane3 &plane,
+  csPolygon3DStatic* spoly)
 {
   // @@@ Currently this function only checks if a shadow frustum is inside
   // the light frustum. There is no checking done if shadow frustums obscure
@@ -1286,13 +1287,14 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           // If partial then we first test if the light and shadow
           // frustums are adjacent. If so then we ignore the shadow
           // frustum as well (not relevant).
-          i1 = static_poly->GetVertexCount () - 1;
-          for (i = 0; i < static_poly->GetVertexCount (); i++)
+          i1 = spoly->GetVertexCount () - 1;
+          for (i = 0; i < spoly->GetVertexCount (); i++)
           {
-            j1 = sfp->static_poly->GetVertexCount () - 1;
+	    csPolygon3DStatic* sfp_static = sfp->GetStaticPoly ();
+            j1 = sfp_static->GetVertexCount () - 1;
 
             float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
-            for (j = 0; j < sfp->static_poly->GetVertexCount (); j++)
+            for (j = 0; j < sfp_static->GetVertexCount (); j++)
             {
               float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
@@ -1338,7 +1340,9 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    // if it intersects.
 	    csVector3 isect;
 	    float dist;
-	    if (!csIntersect3::Plane (center, Vwor (0), sfp->GetPolyPlane (),
+	    const csPlane3& wor_plane = sfp->GetParent ()
+	    	->GetPolygonWorldPlaneNoCheck (sfp->GetStaticPolyIdx ());
+	    if (!csIntersect3::Plane (center, Vwor (0), wor_plane,
 	      isect, dist))
 	    {
 	      shadow_it->MarkRelevant (false);
@@ -1355,29 +1359,19 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   return true;
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustums (iFrustumView* lview)
-{
-  csPlane3 poly_plane = GetPolyPlane ();
-
-  // First translate plane to center of frustum.
-  poly_plane.DD += poly_plane.norm * lview->GetFrustumContext ()
-    ->GetLightFrustum ()->GetOrigin ();
-  poly_plane.Invert ();
-  return MarkRelevantShadowFrustums (lview, poly_plane);
-}
-
 void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
-    iMovable* movable)
+    iMovable* movable, const csPlane3& world_plane,
+    csPolygon3DStatic* spoly)
 {
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane_wor)) return ;
+  if (!csMath3::Visible (center, world_plane)) return ;
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
-  float dist_to_plane = GetPolyPlane ().Distance (center);
+  float dist_to_plane = world_plane.Distance (center);
 
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
@@ -1391,7 +1385,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
 
   bool fill_lightmap = true;
 
-  num_vertices = static_poly->polygon_data.num_vertices;
+  num_vertices = spoly->polygon_data.num_vertices;
   if (num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
   poly = VectorArray->GetArray ();
@@ -1446,7 +1440,13 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   // all shadow frustums which start at the same plane are discarded as
   // well.
   // FillLightMap() will use this information and
-  if (!MarkRelevantShadowFrustums (lview)) goto stop;
+
+  csPlane3 inv_world_plane = world_plane;
+  // First translate plane to center of frustum.
+  inv_world_plane.DD += inv_world_plane.norm * lview->GetFrustumContext ()
+    ->GetLightFrustum ()->GetOrigin ();
+  inv_world_plane.Invert ();
+  if (!MarkRelevantShadowFrustums (lview, inv_world_plane, spoly)) goto stop;
 
   // Update the lightmap given light and shadow frustums in new_lview.
   if (fill_lightmap) FillLightMapDynamic (lview);
@@ -1459,7 +1459,9 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   iMovable* movable,
   csLightingPolyTexQueue* lptq, bool vis,
   const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex)
+  const csVector3& v_world2tex,
+  const csPlane3& world_plane,
+  csPolygon3DStatic* spoly)
 {
   bool do_smooth = GetParent ()->GetStaticData ()->GetSmoothingFlag ();
 
@@ -1468,7 +1470,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane_wor))
+  if (!csMath3::Visible (center, world_plane))
     if (do_smooth)
       maybeItsVisible = true;
     else
@@ -1476,7 +1478,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
-  float dist_to_plane = GetPolyPlane ().Distance (center);
+  float dist_to_plane = world_plane.Distance (center);
 
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
@@ -1503,18 +1505,11 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   // Update the lightmap given light and shadow frustums in lview.
   if (txt_info.lm)
-    FillLightMapStatic (lview, lptq, vis, m_world2tex, v_world2tex);
+    txt_info.FillLightMap (lview, lptq, vis, this,
+    	m_world2tex, v_world2tex, world_plane, spoly);
 
   if (maybeItsVisible)
     return;
 }
 
-void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
-  csLightingPolyTexQueue* lptq, bool vis,
-  const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex)
-{
-  txt_info.FillLightMap (lview, lptq, vis, this,
-    	m_world2tex, v_world2tex);
-}
 

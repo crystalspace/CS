@@ -35,9 +35,14 @@ chronological order.
 	  properly DecRef()ed.
 	- Jorrit fixed a bug in Dynavis with empty occlusion objects. It would
 	  try to put those on the coverage buffer with bad initialized arrays.
-	  The current solution is very optimal in that objects with no occlusion
-	  objects will now be completely ignored for occlusion writing as the
-	  old code always attempted to process them (and failed later).
+	  The current solution is very optimal in that objects with no
+	  occlusion objects will now be completely ignored for occlusion
+	  writing as the old code always attempted to process them (and
+	  failed later).
+	- Jorrit removed another 16 bytes per polygon by removing the world
+	  space plane from every polygon and putting that in a seperate array
+	  in csThing. The array in csThing is only created if the object has
+	  moved so for most static geometry this optimization will be useful.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

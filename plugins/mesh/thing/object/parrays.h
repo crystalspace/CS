@@ -96,9 +96,6 @@ public:
 
   /// Delete a particular array element
   void FreeItem (csPolygon3D* Item);
-
-  /// Find a polygon by name
-  static int CompareKey (csPolygon3D* const& Item, void* Key);
 };
 
 #endif // __CS_PARRAYS_H__

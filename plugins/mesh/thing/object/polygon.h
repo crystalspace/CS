@@ -76,6 +76,7 @@ class csPolygon3DStatic
   friend class csPolyTexture;
   friend class csPolygon3D;
   friend class csThingStatic;
+  friend class csThing;
 
 private:
   /// Name of this polygon.
@@ -409,9 +410,8 @@ public:
 
   /**
    * Hard transform the plane of this polygon and also the
-   * lightmap info. This is similar to ObjectToWorld
-   * but it does a hard transform of the object space planes
-   * instead of keeping a transformation.
+   * lightmap info. This does a hard transform of the object space
+   * planes.
    */
   void HardTransform (const csReversibleTransform& t);
 
@@ -504,7 +504,7 @@ class csPolygon3D
 
 private:
   /// Pointer to static data.
-  csPolygon3DStatic* static_poly;
+  int static_poly_idx;
 
   /**
    * @@@@@@@@@@@@@ DO WE NEED THIS HERE?
@@ -513,9 +513,6 @@ private:
   csThing* thing;
 
   iMaterialWrapper* material;
-
-  /// The world space plane equation.
-  csPlane3 plane_wor;
 
   /**
    * List of light patches for this polygon.
@@ -553,7 +550,7 @@ public:
   /**
    * Set the static data.
    */
-  void SetStaticPoly (csPolygon3DStatic* static_poly);
+  void SetStaticPolyIdx (int idx);
 
   /**
    * After the plane normal and the texture matrices have been set
@@ -565,7 +562,7 @@ public:
    * polygon (using the copy constructor) or if you change the vertices
    * in a polygon.
    */
-  void Finish ();
+  void Finish (csPolygon3DStatic* spoly);
 
   /**
    * Refresh texture mapping and other info from static polygon.
@@ -574,15 +571,6 @@ public:
 
   void SetMaterial (iMaterialWrapper* mat) { material = mat; }
   iMaterialWrapper* GetMaterial () { return material; }
-  /**
-   * Get the real material to use for rendering this polygon.
-   * This will first check the local material and if that is 0
-   * return the one from the factory.
-   */
-  iMaterialWrapper* GetRealMaterial ()
-  {
-    return material ? material : static_poly->GetMaterialWrapper ();
-  }
 
   /**
    * @@@@@ NEEDED?
@@ -599,28 +587,19 @@ public:
   /**
    * Get static data.
    */
-  csPolygon3DStatic* GetStaticPoly () const { return static_poly; }
+  int GetStaticPolyIdx () const { return static_poly_idx; }
 
   /**
-   * Return the world-space plane of this polygon.
+   * Get static polygon.
    */
-  const csPlane3& GetPolyPlane () const { return plane_wor; }
-
-  /**
-   * Return the world-space plane of this polygon.
-   */
-  csPlane3& GetWorldPlane () { return plane_wor; }
+  csPolygon3DStatic* GetStaticPoly () const;
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
    * This index is translated to the index in the parent container and
    * a reference to the vertex in world-space is returned.
    */
-  const csVector3& Vwor (int idx) const
-  {
-    return thing->Vwor (
-    	static_poly->polygon_data.vertices[idx]);
-  }
+  const csVector3& Vwor (int idx) const;
 
   /**
    * Before calling a series of Vwor() you should call
@@ -668,13 +647,13 @@ public:
    * This function will try to read the lightmap from the given file.
    * Return 0 on success or else an error message.
    */
-  const char* ReadFromCache (iFile* file);
+  const char* ReadFromCache (iFile* file, csPolygon3DStatic* spoly);
 
   /**
    * Call after calling InitializeDefault() and CalculateLighting to cache
    * the calculated lightmap to the file.
    */
-  bool WriteToCache (iFile* file);
+  bool WriteToCache (iFile* file, csPolygon3DStatic* spoly);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -690,26 +669,6 @@ public:
   void FillLightMapDynamic (iFrustumView* lview);
 
   /**
-   * Fill the lightmap of this polygon according to the given light and
-   * the frustum. The light is given in world space coordinates. The
-   * view frustum is given in camera space (with (0,0,0) the origin
-   * of the frustum). The camera space used is just world space translated
-   * so that the center of the light is at (0,0,0).
-   * If the lightmaps were cached in the level archive this function will
-   * do nothing.<p>
-   *
-   * The "frustum" parameter defines the original light frustum (not the
-   * one bounded by this polygon as given by "lview").<p>
-   *
-   * If 'vis' == false this means that the lighting system already discovered
-   * that the polygon is totally shadowed.
-   */
-  void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
-  	bool vis,
-	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
-
-  /**
    * Check all shadow frustums and mark all relevant ones. A shadow
    * frustum is relevant if it is (partially) inside the light frustum
    * and if it is not obscured by other shadow frustums.
@@ -720,19 +679,16 @@ public:
    * This function will also discard all shadow frustums which start at
    * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustums (iFrustumView* lview, csPlane3& plane);
-
-  /**
-   * Same as above but takes polygon plane as 'plane' argument.
-   */
-  bool MarkRelevantShadowFrustums (iFrustumView* lview);
+  bool MarkRelevantShadowFrustums (iFrustumView* lview, csPlane3& plane,
+  	csPolygon3DStatic* spoly);
 
   /**
    * Check visibility of this polygon with the given csFrustumView
    * and update the light patches if needed.
    * This version is for dynamic lighting.
    */
-  void CalculateLightingDynamic (iFrustumView* lview, iMovable* movable);
+  void CalculateLightingDynamic (iFrustumView* lview, iMovable* movable,
+  	const csPlane3& world_plane, csPolygon3DStatic* spoly);
 
   /**
    * Check visibility of this polygon with the given csFrustumView
@@ -744,13 +700,9 @@ public:
   void CalculateLightingStatic (iFrustumView* lview, iMovable* movable,
   	csLightingPolyTexQueue* lptq, bool vis,
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
-
-  /**
-   * Transform the plane of this polygon from object space to world space.
-   * 'vt' is a vertex of this polygon in world space.
-   */
-  void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
+	const csVector3& v_world2tex,
+	const csPlane3& world_plane,
+	csPolygon3DStatic* spoly);
 };
 
 #endif // __CS_POLYGON_H__

@@ -586,6 +586,9 @@ private:
 
   /// The array of dynamic polygon data (csPolygon3D).
   csPolygonArray polygons;
+  /// World space planes (if movable is not identity).
+  csPlane3* polygon_world_planes;
+  int polygon_world_planes_num;
 
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;
@@ -722,12 +725,22 @@ public:
   // Vertex handling functions
   //----------------------------------------------------------------------
 
+  /// Make sure the world vertices are up-to-date.
+  void WorUpdate ();
+
   /**
    * Return the world space vector for the vertex.
    * Make sure you recently called WorUpdate(). Otherwise it is
    * possible that this coordinate will not be valid.
    */
   const csVector3& Vwor (int idx) const { return wor_verts[idx]; }
+
+  /**
+   * Get the world plane for a polygon. This function does NOT
+   * check if the world plane is valid. Call WorUpdate() to make sure
+   * it is valid.
+   */
+  const csPlane3& GetPolygonWorldPlaneNoCheck (int polygon_idx) const;
 
   //----------------------------------------------------------------------
   // Polygon handling functions
@@ -884,13 +897,6 @@ public:
    */
   bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-
-  //----------------------------------------------------------------------
-  // Transformation
-  //----------------------------------------------------------------------
-
-  /// Make sure the world vertices are up-to-date.
-  void WorUpdate ();
 
   //----------------------------------------------------------------------
   // Various

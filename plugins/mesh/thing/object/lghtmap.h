@@ -25,6 +25,7 @@
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
+class csPolygon3DStatic;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
@@ -172,12 +173,13 @@ public:
    * otherwise a description of the error.
    */
   const char* ReadFromCache (iFile* file, int w, int h,
-    csPolygon3D* poly, iEngine*);
+    csPolygon3D* poly, csPolygon3DStatic* spoly, iEngine*);
 
   /**
    * Write lightmap to a file.
    */
-  void Cache (iFile* file, csPolygon3D* poly, iEngine*);
+  void Cache (iFile* file, csPolygon3D* poly,
+  	csPolygon3DStatic* spoly, iEngine*);
 
   /**
    * Set the size of one lightmap cell (default = 16).

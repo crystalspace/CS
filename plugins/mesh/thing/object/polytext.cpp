@@ -92,7 +92,8 @@ void csPolyTexture::SetLightMap (csLightMap *lightmap)
 bool csPolyTexture::RecalculateDynamicLights (
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
-	csPolygon3D* polygon)
+	csPolygon3D* polygon,
+	const csPlane3& polygon_world_plane)
 {
   if (!lm) return false;
 
@@ -114,7 +115,8 @@ bool csPolyTexture::RecalculateDynamicLights (
   csLightPatch *lp = polygon->GetLightpatches ();
   while (lp)
   {
-    ShineDynLightMap (lp, m_world2tex, v_world2tex, polygon);
+    ShineDynLightMap (lp, m_world2tex, v_world2tex, polygon,
+    	polygon_world_plane);
     lp = lp->GetNext ();
   }
 
@@ -236,7 +238,9 @@ void csPolyTexture::FillLightMap (
   bool vis,
   csPolygon3D* subpoly,
   const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex)
+  const csVector3& v_world2tex,
+  const csPlane3& subpoly_plane,
+  csPolygon3DStatic* spoly)
 {
   if (!lm) return ;
 
@@ -246,7 +250,7 @@ void csPolyTexture::FillLightMap (
   csVector3 &lightpos = light_frustum->GetOrigin ();
   float inv_lightcell_size = 1.0f / csLightMap::lightcell_size;
   int ww, hh;
-  iMaterialHandle* mat_handle = subpoly->static_poly->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = spoly->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -288,7 +292,6 @@ void csPolyTexture::FillLightMap (
     csPolyTextureMapping* tmapping = subpoly->GetStaticPoly ()->GetTextureMapping ();
 
     csVector3 poly[4];
-    csPolygon3D *base_poly = subpoly;
     int num_vertices = 4;
     csMatrix3 m_t2w = m_world2tex.GetInverse ();
     const csVector3 &v_t2w = v_world2tex;
@@ -393,15 +396,16 @@ void csPolyTexture::FillLightMap (
       csPolygon3D *shad_poly = (csPolygon3D *) (shadow_it->GetUserData ());
       // It is possible that shad_poly is 0. This can happen if we
       // are casting shadows from something that is not a thing.
-      if (shad_poly == base_poly) continue;
+      if (shad_poly == subpoly) continue;
 
       // Check if planes of two polygons are equal
       // (@@@ should be precalculated).
-      const csPlane3& base_pl = base_poly->GetPolyPlane ();
+      const csPlane3& base_pl = subpoly_plane;
       csPlane3 shad_pl;
       if (shad_poly)
       {
-        shad_pl = shad_poly->GetPolyPlane ();
+        shad_pl = shad_poly->GetParent ()->GetPolygonWorldPlaneNoCheck (
+		shad_poly->GetStaticPolyIdx ());
       }
       else
       {
@@ -421,7 +425,7 @@ void csPolyTexture::FillLightMap (
         // Test if two polygons can cast shadows on each other.
 	// Note: we use the base polygons here because that is a stronger
 	// test which is more likely to give a better result.
-        if (shad_poly && !CanCastShadow (shad_poly, base_poly, lightpos))
+        if (shad_poly && !CanCastShadow (shad_poly, subpoly, lightpos))
         {
           continue;
         }
@@ -449,7 +453,8 @@ void csPolyTexture::FillLightMap (
 void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex,
-  csPolygon3D* polygon)
+  csPolygon3D* polygon,
+  const csPlane3& polygon_world_plane)
 {
   csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()->GetTextureMapping ();
   int lw = 1 +
@@ -691,8 +696,7 @@ b:
           if (d >= light->GetInfluenceRadiusSq ()) continue;
           d = qsqrt (d);
 
-          float cosinus = (v2 - lightpos) *
-            polygon->GetPolyPlane ().Normal ();
+          float cosinus = (v2 - lightpos) * polygon_world_plane.Normal ();
           cosinus /= d;
           cosinus += cosfact;
           if (cosinus < 0)
@@ -758,7 +762,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
   const csColor &lightcolor,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex,
-  csPolygon3D* polygon)
+  csPolygon3D* polygon,
+  const csPlane3& polygon_world_plane)
 {
   CS_ASSERT (shadow_bitmap != 0);
 
@@ -811,6 +816,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         light,
         lightpos,
         polygon,
+	polygon_world_plane,
         cosfact);
 
       if (!relevant && created)
@@ -842,6 +848,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         lightpos,
         lightcolor,
         polygon,
+	polygon_world_plane,
         cosfact);
 
     lm->CalcMaxStatic();
@@ -1181,6 +1188,7 @@ void csShadowBitmap::UpdateLightMap (
   const csVector3 &lightpos,
   const csColor &lightcolor,
   csPolygon3D* poly,
+  const csPlane3& poly_world_plane,
   float cosfact)
 {
   if (IsFullyShadowed () || IsFullyUnlit ()) return ;
@@ -1232,7 +1240,7 @@ void csShadowBitmap::UpdateLightMap (
       d = qsqrt (d);
 
       // Initialize normal with the flat one
-      csVector3 normal = poly->GetPolyPlane().Normal ();
+      csVector3 normal = poly_world_plane.Normal ();
       if (poly->GetParent ()->GetStaticData ()->GetSmoothingFlag())
       {
 	int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
@@ -1352,6 +1360,7 @@ bool csShadowBitmap::UpdateShadowMap (
   iLight *light,
   const csVector3 &lightpos,
   csPolygon3D* poly,
+  const csPlane3& poly_world_plane,
   float cosfact)
 {
   if (IsFullyShadowed () || IsFullyUnlit ()) return false;
@@ -1403,7 +1412,7 @@ bool csShadowBitmap::UpdateShadowMap (
 
       d = qsqrt (d);
 
-      csVector3 normal = poly->GetPolyPlane().Normal ();
+      csVector3 normal = poly_world_plane.Normal ();
       if ( static_data->GetSmoothingFlag() )
       {
   int* vertexs = poly->GetStaticPoly ()->GetVertexIndices ();
@@ -1580,8 +1589,10 @@ void csLightingPolyTexQueue::UpdateMaps (
 	mov->GetFullTransform (),
 	m_world2tex, v_world2tex);
     }
+    const csPlane3& pol_plane = pol->GetParent ()->GetPolygonWorldPlaneNoCheck (
+    	pol->GetStaticPolyIdx ());
     pt->UpdateFromShadowBitmap (light, lightpos, lightcolor,
-    	m_world2tex, v_world2tex, pol);
+    	m_world2tex, v_world2tex, pol, pol_plane);
   }
 
   polytxts.DeleteAll ();

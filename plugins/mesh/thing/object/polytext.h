@@ -179,6 +179,7 @@ public:
 	iLight* light, const csVector3& lightpos,
 	const csColor& lightcolor,
 	csPolygon3D* poly,
+	const csPlane3& poly_world_plane,
 	float cosfact);
   /**
    * Take a light and update the shadowmap using the information in
@@ -203,6 +204,7 @@ public:
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
 	iLight* light, const csVector3& lightpos,
 	csPolygon3D* poly,
+	const csPlane3& poly_world_plane,
 	float cosfact);
   /**
    * Return true if this bitmap is fully shadowed.
@@ -296,7 +298,9 @@ public:
   void FillLightMap (iFrustumView* lview, csLightingPolyTexQueue* lptq,
   	bool vis, csPolygon3D* subpoly,
 	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex);
+	const csVector3& v_world2tex,
+	const csPlane3& subpoly_plane,
+	csPolygon3DStatic* spoly);
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap
@@ -306,7 +310,8 @@ public:
   	const csColor& lightcolor,
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
-	csPolygon3D* polygon);
+	csPolygon3D* polygon,
+	const csPlane3& polygon_world_plane);
 
   /**
    * Update the real lightmap for a given csLightPatch
@@ -315,7 +320,8 @@ public:
   void ShineDynLightMap (csLightPatch* lp,
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
-	csPolygon3D* polygon);
+	csPolygon3D* polygon,
+	const csPlane3& polygon_world_plane);
 
   /**
    * Transform this plane from object space to world space using
@@ -344,7 +350,8 @@ public:
   bool RecalculateDynamicLights (
 	const csMatrix3& m_world2tex,
 	const csVector3& v_world2tex,
-	csPolygon3D* polygon);
+	csPolygon3D* polygon,
+	const csPlane3& polygon_world_plane);
 
   /// Query the size of one light cell
   int GetLightCellSize ();

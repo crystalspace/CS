@@ -43,12 +43,6 @@ void csPolygonArray::FreeItem (csPolygon3D* Item)
   thing_type->blk_polygon3d.Free (Item);
 }
 
-int csPolygonArray::CompareKey (csPolygon3D* const& Item, void* Key)
-{
-  const char *name = Item->GetStaticPoly ()->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
 //-----------------------------------------------+ csPolygonStaticArray +----//
 csPolygonStaticArray::~csPolygonStaticArray ()
 {

@@ -1521,6 +1521,8 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   csThing::static_data = static_data;
   polygons.SetThingType (static_data->thing_type);
+  polygon_world_planes = 0;
+  polygon_world_planes_num = -1;	// -1 means not checked yet, 0 means no planes.
 
   scfiPolygonMesh.SetThing (static_data);
   scfiPolygonMeshCD.SetThing (static_data);
@@ -1574,6 +1576,7 @@ csThing::~csThing ()
   }
 
   polygons.FreeAll ();
+  delete[] polygon_world_planes;
 
 #ifdef CS_USE_NEW_RENDERER
   ClearRenderMeshes ();
@@ -1707,6 +1710,9 @@ void csThing::WorUpdate ()
 	  break;
 	}
         movablenr = cached_movable->GetUpdateNumber ();
+	delete[] polygon_world_planes;
+	polygon_world_planes = 0;
+	polygon_world_planes_num = 0;
       }
       return ;
 
@@ -1719,25 +1725,28 @@ void csThing::WorUpdate ()
 	{
 	  memcpy (wor_verts, static_data->obj_verts,
 	  	static_data->num_vertices * (sizeof (csVector3)));
-	  csReversibleTransform movtrans;	// Identity.
-	  // @@@ It is possible to optimize the below too. Don't know
-	  // if it is worth it though.
-	  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          for (i = 0; i < polygons.Length (); i++)
-          {
-            csPolygon3D *p = GetPolygon3D (i);
-            p->ObjectToWorld (movtrans, p->Vwor (0));
-          }
+	  delete[] polygon_world_planes;
+	  polygon_world_planes = 0;
+	  polygon_world_planes_num = 0;
 	}
 	else
 	{
           csReversibleTransform movtrans = cached_movable->GetFullTransform ();
           for (i = 0; i < static_data->num_vertices; i++)
             wor_verts[i] = movtrans.This2Other (static_data->obj_verts[i]);
+	  if (!polygon_world_planes || polygon_world_planes_num < polygons.Length ())
+	  {
+	    delete[] polygon_world_planes;
+	    polygon_world_planes_num = polygons.Length ();
+	    polygon_world_planes = new csPlane3[polygon_world_planes_num];
+	  }
           for (i = 0; i < polygons.Length (); i++)
           {
+            //csPolygon3DStatic *p = static_data->GetPolygon3DStatic (i);
             csPolygon3D *p = GetPolygon3D (i);
-            p->ObjectToWorld (movtrans, p->Vwor (0));
+	    movtrans.This2Other (p->GetStaticPoly ()->polygon_data.plane_obj, p->Vwor (0),
+	    	polygon_world_planes[i]);
+	    polygon_world_planes[i].Normalize ();
           }
 	}
       }
@@ -1765,17 +1774,20 @@ void csThing::PreparePolygons ()
   csPolygon3DStatic *ps;
   csPolygon3D *p;
   polygons.FreeAll ();
+  delete[] polygon_world_planes;
+  polygon_world_planes = 0;
+  polygon_world_planes_num = -1;	// Not checked!
 
   int i;
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     p = static_data->thing_type->blk_polygon3d.Alloc ();
     ps = static_data->static_polygons.Get (i);
-    p->SetStaticPoly (ps);
+    p->SetStaticPolyIdx (i);
     p->SetParent (this);
     polygons.Push (p);
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-    p->Finish ();
+    p->Finish (ps);
   }
 }
 
@@ -1883,7 +1895,7 @@ void csThing::ClearReplacedMaterials ()
 
 csPolygon3D *csThing::GetPolygon3D (const char *name)
 {
-  int idx = polygons.FindKey ((void*)name, polygons.CompareKey);
+  int idx = static_data->FindPolygonByName (name);
   return idx >= 0 ? polygons.Get (idx) : 0;
 }
 
@@ -1901,7 +1913,19 @@ csPtr<iPolygonHandle> csThing::CreatePolygonHandle (int polygon_idx)
 const csPlane3& csThing::GetPolygonWorldPlane (int polygon_idx)
 {
   CS_ASSERT (polygon_idx >= 0);
-  return polygons[polygon_idx]->GetWorldPlane ();
+  if (polygon_world_planes_num == -1)
+  {
+    WorUpdate ();
+  }
+  return GetPolygonWorldPlaneNoCheck (polygon_idx);
+}
+
+const csPlane3& csThing::GetPolygonWorldPlaneNoCheck (int polygon_idx) const
+{
+  if (polygon_world_planes)
+    return polygon_world_planes[polygon_idx];
+  else
+    return static_data->static_polygons[polygon_idx]->GetObjectPlane ();
 }
 
 iMaterialWrapper* csThing::GetPolygonMaterial (int polygon_idx)
@@ -2183,11 +2207,12 @@ void csThing::AppendShadows (
     p = polygons.Get (i);
 
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
-    float clas = p->GetWorldPlane ().Classify (origin);
+    const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (i);
+    float clas = world_plane.Classify (origin);
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    csPlane3 pl = p->GetWorldPlane ();
+    csPlane3 pl = world_plane;
     pl.DD += origin * pl.norm;
     pl.Invert ();
     frust = list->AddShadow (
@@ -2494,8 +2519,10 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   for (i = 0; i < polygons.Length (); i++)
   {
     csPolygon3D* poly = GetPolygon3D (i);
+    csPolygon3DStatic* spoly = static_data->GetPolygon3DStatic (i);
+    const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (i);
     if (dyn)
-      poly->CalculateLightingDynamic (lview, movable);
+      poly->CalculateLightingDynamic (lview, movable, world_plane, spoly);
     else
     {
       if (ident)
@@ -2514,7 +2541,7 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 		o2c, m_world2tex, v_world2tex);
       }
       poly->CalculateLightingStatic (lview, movable, lptq, true,
-      	m_world2tex, v_world2tex);
+      	m_world2tex, v_world2tex, world_plane, spoly);
     }
   }
 }
@@ -2552,15 +2579,16 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
     int i;
     for (i = 0; i < polygons.Length (); i++)
     {
-      const char* error = polygons.Get (i)->ReadFromCache (&mf);
+      csPolygon3D* p = polygons.Get (i);
+      csPolygon3DStatic* sp = static_data->GetPolygon3DStatic (i);
+      const char* error = p->ReadFromCache (&mf, sp);
       if (error != 0)
       {
         rc = false;
         if (static_data->thing_type->do_verbose)
 	{
 	  printf ("  Thing '%s' Poly '%s': %s\n",
-	  	thing_name, static_data->static_polygons.Get (i)->GetName (),
-		error);
+	  	thing_name, sp->GetName (), error);
 	  fflush (stdout);
         }
       }
@@ -2591,7 +2619,11 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   bool rc = false;
   csMemFile mf;
   for (i = 0; i < polygons.Length (); i++)
-    if (!polygons.Get (i)->WriteToCache (&mf)) goto stop;
+  {
+    csPolygon3D* p = polygons.Get (i);
+    csPolygon3DStatic* sp = static_data->GetPolygon3DStatic (i);
+    if (!p->WriteToCache (&mf, sp)) goto stop;
+  }
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
     	"thing_lm", 0, (uint32) ~0))
     goto stop;
@@ -2841,11 +2873,16 @@ void csThing::UpdateDirtyLMs ()
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
 		o2c, m_world2tex, v_world2tex);
       }
-      if (lmi->GetLightVersion () != GetLightVersion () && lmi->RecalculateDynamicLights (
-      	m_world2tex, v_world2tex, poly))	
+      if (lmi->GetLightVersion () != GetLightVersion ())
       {
-	litPolys[i]->lightmaps[j]->SetData (
-	  lmi->GetLightMap ()->GetMapData ());
+        const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
+		poly->GetStaticPolyIdx ());
+        if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, poly,
+		world_plane))
+        {
+	  litPolys[i]->lightmaps[j]->SetData (
+	    lmi->GetLightMap ()->GetMapData ());
+        }
       }
     }
   }
