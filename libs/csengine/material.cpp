@@ -46,7 +46,7 @@ csMaterial::csMaterial (csTextureHandle *txt)
 
 csMaterial::~csMaterial () 
 {
-  delete texture;
+//  delete texture;
 }
 
 iTextureHandle* csMaterial::GetTexture ()
