@@ -111,7 +111,7 @@ objects. Polygons on things can also be portals to other areas.
 @cindex Visibility of Curved Surfaces
 @cindex Curved Surfaces, Visibility
 
-Curved surfaces are part of things at this moment. They are usually
+Curved surfaces are implemented in a seperate mesh object. They are usually
 considered as detail objects.
 
 @subsubheading Terrain Surfaces

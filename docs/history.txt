@@ -47,6 +47,7 @@ The history order is reversed so that new features are at the top.
 	    - Updated the portal section in the documentation.
 	    - Added a reference to the procedural texture documentation from
 	      within the section describing animation techniques for textures.
+	    - Another small documentation update.
 	- Eric Sunshine fixed ddraw8/Jamfile so that it only enables the ddraw8
 	  target if DirectDraw8 is present (DDRAW8.AVAILABLE=yes).  This
 	  prevents Jam from trying to build this plugin when a lesser version
