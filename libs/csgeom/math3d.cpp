@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -341,27 +341,35 @@ int csIntersect3::IntersectSegment (csPlane3* planes, int num_planes,
   csVector3 isect;
   float dist;
   bool mod = false;
+  bool out1 = false, out2 = false;	// If v1 or v2 is out the frustum.
   int i;
   for (i = 0 ; i < num_planes ; i++)
   {
     csPlane3& pl = planes[i];
     float c1 = pl.Classify (v1);
     float c2 = pl.Classify (v2);
+    if (c1 < 0) out1 = true;
+    if (c2 < 0) out2 = true;
     if (c1 < 0 && c2 > 0)
     {
-      mod = true;
-      Plane (v1, v2, pl, isect, dist);
-      v1 = isect;
-      if ((v2 - v1) < (float).0001) return -1;
+      if (Plane (v1, v2, pl, isect, dist))
+      {
+        mod = true;
+        v1 = isect;
+        if ((v2 - v1) < (float).0001) return -1;
+      }
     }
     else if (c1 > 0 && c2 < 0)
     {
-      mod = true;
-      Plane (v1, v2, pl, isect, dist);
-      v2 = isect;
-      if ((v2 - v1) < (float).0001) return -1;
+      if (Plane (v1, v2, pl, isect, dist))
+      {
+        mod = true;
+        v2 = isect;
+        if ((v2 - v1) < (float).0001) return -1;
+      }
     }
   }
+  if (out1 && out2 && !mod) return -1;
   return mod ? 1 : 0;
 }
 
@@ -422,6 +430,17 @@ void csIntersect3::Plane(const csVector3& u, const csVector3& v,
   if (divider == 0) { isect = v; return; }
   dist = counter / divider;
   isect = u + dist*(u - v);
+}
+
+void csIntersect3::Plane(const csVector3& u, const csVector3& v,
+                         const csVector3& normal, const csVector3& a,
+                         csVector3& isect, float& dist)
+{
+  float counter = normal * (u - a);
+  float divider = normal * (v - u);
+  if (divider == 0) { isect = v; return; }
+  dist = -counter / divider;
+  isect = u + dist*(v - u);
 }
 
 bool csIntersect3::Plane(const csVector3& u, const csVector3& v,

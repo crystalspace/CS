@@ -1478,103 +1478,303 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   }
 }
 
-static int AddVertex (
-	int i1, int i2, float r,
-	int& num_verts,
-	csVector3* overts, csVector2* otexels,
-	csColor* ocolors, G3DFogInfo* ofog,
-	csVector3* verts, csVector2* texels,
-	csColor* colors, G3DFogInfo* fog)
+struct csClipInfo
 {
-  verts[num_verts] = overts[i1] * (1-r) + overts[i2] * r;
-  texels[num_verts] = otexels[i1] * (1-r) + otexels[i2] * r;
-  if (ocolors)
+# define CLIPINFO_ORIGINAL 0
+# define CLIPINFO_ONEDGE 1
+# define CLIPINFO_INSIDE 2
+  int type;	// One of VTINFO_???
+  union
   {
-    colors[num_verts].red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
-    colors[num_verts].green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
-    colors[num_verts].blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
-  }
-  if (ofog)
-  {
-    fog[num_verts].intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
-    fog[num_verts].r = ofog[i1].r * (1-r) + ofog[i2].r * r;
-    fog[num_verts].g = ofog[i1].g * (1-r) + ofog[i2].g * r;
-    fog[num_verts].b = ofog[i1].b * (1-r) + ofog[i2].b * r;
-  }
-  num_verts++;
-  return num_verts-1;
-}
-
-static void ClipSegment (
-	int tri1, int tri2,
-	int* vert_idx, int& num_verts,
-	int& num_clipped_vertices,
-	int* clipped_translate,
-	csPlane3* frustum_planes, int num_planes,
-	const csVector3& frust_origin,
-	csVector3* vertices, csVector2* texels,
-	csColor* vertex_colors, G3DFogInfo* vertex_fog,
-	csVector3* clipped_vertices, csVector2* clipped_texels,
-	csColor* clipped_colors, G3DFogInfo* clipped_fog)
-{
-  csSegment3 seg (vertices[tri1]-frust_origin, vertices[tri2]-frust_origin);
-  csSegment3 orig_seg = seg;
-  if (clipped_translate[tri1] == -1 && clipped_translate[tri2] == -1)
-  {
-    if (csIntersect3::IntersectSegment (frustum_planes, num_planes, seg) != -1)
+    struct
     {
-      float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-	  	orig_seg.End ()));
-      float l1 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-	  	seg.Start ()));
-      float r1 = l1 / len;
-      float l2 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-	  	seg.End ()));
-      float r2 = l2 / len;
-      vert_idx[num_verts++] = AddVertex (
-	  	tri1, tri2, r1, num_clipped_vertices,
-		vertices, texels, vertex_colors, vertex_fog,
-		clipped_vertices, clipped_texels,
-		clipped_colors, clipped_fog);
-      vert_idx[num_verts++] = AddVertex (
-	  	tri1, tri2, r2, num_clipped_vertices,
-		vertices, texels, vertex_colors, vertex_fog,
-		clipped_vertices, clipped_texels,
-		clipped_colors, clipped_fog);
+      int idx;
+    } original;
+    struct
+    {
+      int i1, i2;
+      float r;
+    } onedge;
+    struct
+    {
+      csClipInfo* ci1, * ci2;
+      float r;
+    } inside;
+  };
+
+  csClipInfo ()
+  {
+    type = CLIPINFO_ORIGINAL;
+  }
+  csClipInfo (const csClipInfo& other)
+  {
+    type = other.type;
+    if (type == CLIPINFO_INSIDE)
+    {
+      inside.ci1 = new csClipInfo (*other.inside.ci1);
+      inside.ci2 = new csClipInfo (*other.inside.ci2);
+      inside.r = other.inside.r;
+    }
+    else if (type == CLIPINFO_ORIGINAL)
+    {
+      original.idx = other.original.idx;
+    }
+    else
+    {
+      onedge.i1 = other.onedge.i1;
+      onedge.i2 = other.onedge.i2;
+      onedge.r = other.onedge.r;
     }
   }
-  else if (clipped_translate[tri1] == -1)
+  ~csClipInfo ()
   {
-    csIntersect3::IntersectSegment (frustum_planes, num_planes, seg);
-    float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-		orig_seg.End ()));
-    float l1 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-		seg.Start ()));
-    float r1 = l1 / len;
-    vert_idx[num_verts++] = AddVertex (
-		tri1, tri2, r1, num_clipped_vertices,
-		vertices, texels, vertex_colors, vertex_fog,
-		clipped_vertices, clipped_texels,
-		clipped_colors, clipped_fog);
-    vert_idx[num_verts++] = clipped_translate[tri2];
+    if (type == CLIPINFO_INSIDE)
+    {
+      delete inside.ci1;
+      delete inside.ci2;
+    }
   }
-  else if (clipped_translate[tri2] == -1)
+
+  csClipInfo& operator= (const csClipInfo& other)
   {
-    csIntersect3::IntersectSegment (frustum_planes, num_planes, seg);
-    float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-		orig_seg.End ()));
-    float l2 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
-		seg.End ()));
-    float r2 = l2 / len;
-    vert_idx[num_verts++] = AddVertex (
-		tri1, tri2, r2, num_clipped_vertices,
-		vertices, texels, vertex_colors, vertex_fog,
-		clipped_vertices, clipped_texels,
-		clipped_colors, clipped_fog);
+    if (type == CLIPINFO_INSIDE)
+    {
+      delete inside.ci1;
+      delete inside.ci2;
+    }
+    type = other.type;
+    if (type == CLIPINFO_INSIDE)
+    {
+      inside.ci1 = new csClipInfo (*other.inside.ci1);
+      inside.ci2 = new csClipInfo (*other.inside.ci2);
+      inside.r = other.inside.r;
+    }
+    else if (type == CLIPINFO_ORIGINAL)
+    {
+      original.idx = other.original.idx;
+    }
+    else
+    {
+      onedge.i1 = other.onedge.i1;
+      onedge.i2 = other.onedge.i2;
+      onedge.r = other.onedge.r;
+    }
+    return *this;
+  }
+
+  // Move the information from another clipinfo instance to this one.
+  void Move (csClipInfo& other)
+  {
+    if (type == CLIPINFO_INSIDE)
+    {
+      delete inside.ci1;
+      delete inside.ci2;
+    }
+    type = other.type;
+    if (type == CLIPINFO_INSIDE)
+    {
+      inside.ci1 = other.inside.ci1;
+      inside.ci2 = other.inside.ci2;
+      inside.r = other.inside.r;
+      other.type = CLIPINFO_ORIGINAL;
+    }
+    else if (type == CLIPINFO_ORIGINAL)
+    {
+      original.idx = other.original.idx;
+    }
+    else
+    {
+      onedge.i1 = other.onedge.i1;
+      onedge.i2 = other.onedge.i2;
+      onedge.r = other.onedge.r;
+      other.type = CLIPINFO_ORIGINAL;
+    }
+  }
+
+  // Find out the location of a vertex by recursing through the
+  // clipinfo tree.
+  void ResolveVertex (
+	int* clipped_translate,
+	csVector3* overts, csVector2* otexels,
+	csColor* ocolors, G3DFogInfo* ofog,
+	csVector2& texel, csColor& color, G3DFogInfo& fog)
+  {
+    switch (type)
+    {
+      case CLIPINFO_ORIGINAL:
+        texel = otexels[original.idx];
+        if (ocolors) color = ocolors[original.idx];
+        if (ofog) fog = ofog[original.idx];
+        break;
+      case CLIPINFO_ONEDGE:
+      {
+        int i1 = onedge.i1;
+	int i2 = onedge.i2;
+	float r = onedge.r;
+	texel = otexels[i1] * (1-r) + otexels[i2] * r;
+	if (ocolors)
+	{
+	  color.red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
+	  color.green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
+	  color.blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
+	}
+	if (ofog)
+	{
+	  fog.intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
+	  fog.r = ofog[i1].r * (1-r) + ofog[i2].r * r;
+	  fog.g = ofog[i1].g * (1-r) + ofog[i2].g * r;
+	  fog.b = ofog[i1].b * (1-r) + ofog[i2].b * r;
+	}
+        break;
+      }
+      case CLIPINFO_INSIDE:
+      {
+        csVector2 texel1, texel2;
+	csColor color1, color2;
+	G3DFogInfo fog1, fog2;
+	inside.ci1->ResolveVertex (clipped_translate, overts, otexels,
+		ocolors, ofog, texel1, color1, fog1);
+	inside.ci2->ResolveVertex (clipped_translate, overts, otexels,
+		ocolors, ofog, texel2, color2, fog2);
+	delete inside.ci1;
+	delete inside.ci2;
+	type = CLIPINFO_ORIGINAL;
+	float r = inside.r;
+	texel = texel1 * (1-r) + texel2 * r;
+	if (ocolors)
+	{
+	  color.red = color1.red * (1-r) + color2.red * r;
+	  color.green = color1.green * (1-r) + color2.green * r;
+	  color.blue = color1.blue * (1-r) + color2.blue * r;
+	}
+	if (ofog)
+	{
+	  fog.intensity = fog1.intensity*(1-r)+fog2.intensity*r;
+	  fog.r = fog1.r * (1-r) + fog2.r * r;
+	  fog.g = fog1.g * (1-r) + fog2.g * r;
+	  fog.b = fog1.b * (1-r) + fog2.b * r;
+	}
+        break;
+      }
+    }
+  }
+};
+
+static void ClipToPlane (csVector3* vertices, int& num_vertices,
+	csClipInfo* clipinfo, csVector3& v1, csVector3& v2)
+{
+  int cw_offset = -1;
+  int ccw_offset;
+  bool first_vertex_side;
+  csVector3 isect_cw, isect_ccw;
+  csVector3 Plane_Normal;
+  int i;
+
+  // Do the check only once at the beginning.
+  Plane_Normal = v1%v2;
+
+  // On which side is the first vertex?
+  first_vertex_side = (Plane_Normal*vertices[num_vertices -1] > 0);
+
+  for (i = 0; i < num_vertices - 1; i++)
+  {
+    if ( (Plane_Normal*vertices[i] > 0) != first_vertex_side)
+    {
+      cw_offset = i;
+      break;
+    }
+  }
+
+  if (cw_offset == -1)
+  {
+    // Return, if there is no intersection.
+    if (first_vertex_side)
+      num_vertices = 0;  // The whole polygon is behind the plane
+      			 // because the first is.
+    return;
+  }
+
+  for (ccw_offset = num_vertices -2; ccw_offset >= 0; ccw_offset--)
+  {
+    if ((Plane_Normal*vertices[ccw_offset] > 0) != first_vertex_side)
+      break;
+  }
+
+  // Calculate the intersection points.
+  i = cw_offset - 1;
+  if (i < 0) i = num_vertices-1;
+  float dist_cw, dist_ccw;
+  csIntersect3::Plane (vertices[cw_offset], vertices[i],
+  	Plane_Normal, v1, isect_cw, dist_cw);
+  csClipInfo clip_cw;
+  if (clipinfo[cw_offset].type != CLIPINFO_ORIGINAL ||
+  	clipinfo[i].type != CLIPINFO_ORIGINAL)
+  {
+    clip_cw.type = CLIPINFO_INSIDE;
+    clip_cw.inside.r = dist_cw;
+    clip_cw.inside.ci1 = new csClipInfo (clipinfo[cw_offset]);
+    clip_cw.inside.ci2 = new csClipInfo (clipinfo[i]);
   }
   else
   {
-    vert_idx[num_verts++] = clipped_translate[tri2];
+    clip_cw.type = CLIPINFO_ONEDGE;
+    clip_cw.onedge.r = dist_cw;
+    clip_cw.onedge.i1 = clipinfo[cw_offset].original.idx;
+    clip_cw.onedge.i2 = clipinfo[i].original.idx;
+  }
+  csIntersect3::Plane (vertices[ccw_offset], vertices[ccw_offset + 1],
+  	Plane_Normal, v1, isect_ccw, dist_ccw);
+  csClipInfo clip_ccw;
+  if (clipinfo[ccw_offset].type != CLIPINFO_ORIGINAL ||
+  	clipinfo[ccw_offset + 1].type != CLIPINFO_ORIGINAL)
+  {
+    clip_ccw.type = CLIPINFO_INSIDE;
+    clip_ccw.inside.r = dist_ccw;
+    clip_ccw.inside.ci1 = new csClipInfo (clipinfo[ccw_offset]);
+    clip_ccw.inside.ci2 = new csClipInfo (clipinfo[ccw_offset + 1]);
+  }
+  else
+  {
+    clip_ccw.type = CLIPINFO_ONEDGE;
+    clip_ccw.onedge.r = dist_ccw;
+    clip_ccw.onedge.i1 = clipinfo[ccw_offset].original.idx;
+    clip_ccw.onedge.i2 = clipinfo[ccw_offset + 1].original.idx;
+  }
+
+  // Remove the obsolete point and insert the intersection points.
+  if (first_vertex_side)
+  {
+    for (i = 0; i < ccw_offset - cw_offset + 1; i++)
+    {
+      vertices[i] = vertices[i + cw_offset];
+      clipinfo[i] = clipinfo[i + cw_offset];
+    }
+    vertices[i] = isect_ccw;
+    clipinfo[i].Move (clip_ccw);
+    vertices[i+1] = isect_cw;
+    clipinfo[i+1].Move (clip_cw);
+    num_vertices = 3 + ccw_offset - cw_offset;
+  }
+  else
+  {
+    if (cw_offset + 1 < ccw_offset)
+      for (i = 0; i < num_vertices - ccw_offset - 1; i++)
+      {
+        vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+      }
+    else if (cw_offset + 1 > ccw_offset)
+      for (i = num_vertices - 2 - ccw_offset;i >= 0; i--)
+      {
+        vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+      }
+
+    vertices[cw_offset] = isect_cw;
+    clipinfo[cw_offset].Move (clip_cw);
+    vertices[cw_offset+1] = isect_ccw;
+    clipinfo[cw_offset+1].Move (clip_ccw);
+    num_vertices = 2 + cw_offset + num_vertices - ccw_offset - 1;
   }
 }
 
@@ -1672,7 +1872,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     int cnt = int (clipped_translate[tri.a] != -1)
       	+ int (clipped_translate[tri.b] != -1)
 	+ int (clipped_translate[tri.c] != -1);
-    if (cnt == 0)
+    if (false && cnt == 0)
     {
       //=====
       // Easiest case: triangle is not visible.
@@ -1701,41 +1901,63 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Difficult case: clipping will result in several triangles.
       //=====
-      // @@@ NOT OPTIMAL!!!
-      int vert_idx[100];	// @@@ Arbitrary limit
-      int num_verts = 0;
-      //if (clipped_translate[tri.a] != -1)
-        //vert_idx[num_verts++] = clipped_translate[tri.a];
-      ClipSegment (tri.a, tri.b, vert_idx, num_verts,
-        num_clipped_vertices, clipped_translate.GetArray (),
-	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
-	vertices, texels, vertex_colors, vertex_fog,
-	clipped_vertices.GetArray (),
-	clipped_texels.GetArray (),
-	clipped_colors.GetArray (),
-	clipped_fog.GetArray ());
-      ClipSegment (tri.b, tri.c, vert_idx, num_verts,
-        num_clipped_vertices, clipped_translate.GetArray (),
-	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
-	vertices, texels, vertex_colors, vertex_fog,
-	clipped_vertices.GetArray (),
-	clipped_texels.GetArray (),
-	clipped_colors.GetArray (),
-	clipped_fog.GetArray ());
-      ClipSegment (tri.c, tri.a, vert_idx, num_verts,
-        num_clipped_vertices, clipped_translate.GetArray (),
-	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
-	vertices, texels, vertex_colors, vertex_fog,
-	clipped_vertices.GetArray (),
-	clipped_texels.GetArray (),
-	clipped_colors.GetArray (),
-	clipped_fog.GetArray ());
-      // Triangulate the resulting polygon.
-      for (j = 2 ; j < num_verts ; j++)
+      csVector3 poly[100];	// @@@ Arbitrary limit
+      static csClipInfo clipinfo[100];
+      poly[0] = vertices[tri.a] - frust_origin;
+      poly[1] = vertices[tri.b] - frust_origin;
+      poly[2] = vertices[tri.c] - frust_origin;
+      clipinfo[0].type = CLIPINFO_ORIGINAL; clipinfo[0].original.idx = tri.a;
+      clipinfo[1].type = CLIPINFO_ORIGINAL; clipinfo[1].original.idx = tri.b;
+      clipinfo[2].type = CLIPINFO_ORIGINAL; clipinfo[2].original.idx = tri.c;
+      int num_poly = 3;
+
+      //-----
+      // First we clip the triangle to the planes of the frustum.
+      // This will result in a polygon. The clipper keeps information
+      // (in clipinfo) about what happens to all the vertices.
+      //-----
+      j1 = obj_frustum.GetNumVertices ()-1;
+      for (j = 0 ; j < obj_frustum.GetNumVertices () ; j++)
       {
-        clipped_triangles[num_clipped_triangles].a = vert_idx[0];
-        clipped_triangles[num_clipped_triangles].b = vert_idx[j-1];
-        clipped_triangles[num_clipped_triangles].c = vert_idx[j];
+        csVector3& v1 = obj_frustum[j1];
+        csVector3& v2 = obj_frustum[j];
+        ClipToPlane (poly, num_poly, clipinfo, v1, v2);
+	if (num_poly <= 0) break;
+	j1 = j;
+      }
+
+      //-----
+      // First add all new vertices and resolve coordinates of texture
+      // mapping and so on using the clipinfo.
+      //-----
+      for (j = 0 ; j < num_poly ; j++)
+      {
+	if (clipinfo[j].type == CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	  	clipped_translate[clipinfo[j].original.idx];
+	}
+        else
+	{
+	  clipinfo[j].ResolveVertex (clipped_translate.GetArray (),
+	  	vertices, texels, vertex_colors, vertex_fog,
+		clipped_texels.GetArray ()[num_clipped_vertices],
+		clipped_colors.GetArray ()[num_clipped_vertices],
+		clipped_fog.GetArray ()[num_clipped_vertices]);
+	  clipped_vertices[num_clipped_vertices] = poly[j]+frust_origin;
+	  clipinfo[j].original.idx = num_clipped_vertices;
+	  num_clipped_vertices++;
+	}
+      }
+
+      //-----
+      // Triangulate the resulting polygon.
+      //-----
+      for (j = 2 ; j < num_poly ; j++)
+      {
+        clipped_triangles[num_clipped_triangles].a = clipinfo[0].original.idx;
+        clipped_triangles[num_clipped_triangles].b = clipinfo[j-1].original.idx;
+        clipped_triangles[num_clipped_triangles].c = clipinfo[j].original.idx;
         num_clipped_triangles++;
       }
     }
@@ -1750,7 +1972,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   // fallback to "default" implementation if something comes up that we can't
   // handle.  This includes software clipping.
-  // @@@ We can do this smarter: keep track of toplevel portal for example.
+  bool stencil_enabled = false;
   bool want_clipping = false;
   if (mesh.clip_portal != CS_CLIP_NOT &&
       (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
@@ -1773,18 +1995,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     if (GLCaps.use_stencil)
     {
+      stencil_enabled = true;
+      want_clipping = false;
       // Use the stencil area.
       glEnable (GL_STENCIL_TEST);
       glStencilFunc (GL_EQUAL, 1, 1);
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-    }
-    else
-    {
-    // @@@@ NEW_CLIP
-      // If we have no stencil buffer then we just use the default version.
-      DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
-    	  width2, height2);
-      return;
     }
   }
 
@@ -1853,8 +2069,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csTriangle *triangles = mesh.triangles;
   G3DFogInfo* work_fog = mesh.vertex_fog;
 
-#if 0
-//@@@ NEW_CLIP
   // If we need clipping then we do this here.
   if (want_clipping)
   {
@@ -1874,7 +2088,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     work_fog = clipped_fog.GetArray ();
     triangles = clipped_triangles.GetArray ();
   }
-#endif
   
   // set up coordinate transform
   GLfloat matrixholder[16];
@@ -2141,7 +2354,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
-  if (GLCaps.use_stencil && want_clipping)
+  if (stencil_enabled)
   {
     glDisable (GL_STENCIL_TEST);
   }

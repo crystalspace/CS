@@ -1,6 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+8-May-2001
+	- Martin Geisse did some changes in the RTTI macros:
+	    - Extended object interfaces now use DECLARE_OBJECT_INTERFACE,
+  	      just like normal object interfaces. The parent class is now
+	      given in IMPLEMENT_OBJECT_INTERFACE_EXT.
+	    - Added wrapper macros for csObject::GetChild().
+	- Made some small enhancements to csIntersect3::IntersectSegment().
+	- Added new version of csIntersect3::Plane().
+	- Finally managed to implement a new software triangle clipper
+	  for OpenGL. This triangle clipper will be used when all other
+	  options are not possible. It is funny to see that this software
+	  clipper is FASTER than letting OpenGL clip the triangles to the
+	  screen boundaries on my card (ATI Rage PRO Mobility).
 7-May-2001
+	- Martin Geisse started to change the engine to use the new RTTI
+	  system. Also changed IMPLEMENT_OBJECT_INTERFACE and
+	  IMPLEMENT_OBJECT_INTERFACE_EXT. They now take the class they are
+	  applied to and add it implicitly to the list of support cast types
+	  (so you don't have to do that explicitly for every class).
 	- Added 'strserv' to walkall target.
 	- Fixed OpenGL multiply mode. It was using GL_DECAL when it should
 	  use GL_MODULATE.

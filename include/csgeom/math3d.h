@@ -263,6 +263,8 @@ public:
    * visible in the frustum). Returns -1 if the segment is entirely
    * outside the frustum. Returns 0 if the segment is not modified and
    * returns 1 otherwise. The input segment will be modified.
+   * @@@ WARNING! This function may not work completely ok. It has only
+   * barely been tested and is now unused.
    */
   static int IntersectSegment (csPlane3* planes, int num_planes,
   	csSegment3& seg);
@@ -284,6 +286,15 @@ public:
     const csVector3& u, const csVector3& v,
     const csVector3& normal, const csVector3& a, // plane
     csVector3& isect);                    // intersection point
+
+  /**
+   * Intersect a 3D segment with a plane.  Returns true if there is an
+   * intersection, with the intersection point returned in isect.
+   */
+  static void Plane (
+    const csVector3& u, const csVector3& v,
+    const csVector3& normal, const csVector3& a, // plane
+    csVector3& isect, float& dist);              // intersection point
 
   /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
