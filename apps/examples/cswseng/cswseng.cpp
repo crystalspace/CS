@@ -361,8 +361,6 @@ bool ceCswsEngineApp::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)

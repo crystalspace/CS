@@ -93,6 +93,8 @@ The history order is reversed so that new features are at the top.
 	- Added a new version of 3ds2lev from Luca Pancallo. Read README.1st
 	  for more information. Keep in mind that this version now requires
 	  the lib3ds library!
+	- Eric Sunshine eliminated an "unused variable" compilation warning
+	  from cswseng.cpp.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded
