@@ -24,6 +24,13 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine added missing Texinfo mark-up to win32.txi.
 	- Eric Sunshine eliminated an "underfull hbox" warning from TeX in
 	  config.txi.
+	- Eric Sunshine changed the makefile system so that __CRYSTAL_SPACE__
+	  is defined when building all files in the project.  (Previously, this
+	  was only defined when building the DDG library.) This change had
+	  already been applied to the Visual-C++ project files several months
+	  ago.
+	- Eric Sunshine resolved a problem with the new ddg.mak makefile were
+	  CFLAGS.DDG was not being employed in all cases.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:

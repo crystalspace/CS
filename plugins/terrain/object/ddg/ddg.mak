@@ -22,7 +22,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/terrain/object/ddg plugins/terrain/object/ddg/math plugins/terrain/object/ddg/struct plugins/terrain/object/ddg/util
+vpath %.cpp plugins/terrain/object/ddg plugins/terrain/object/ddg/math \
+  plugins/terrain/object/ddg/struct plugins/terrain/object/ddg/util
 
 ifeq ($(USE_PLUGINS),yes)
   DDG = $(OUTDLL)ddg$(DLL)
@@ -35,14 +36,13 @@ else
   TO_INSTALL.STATIC_LIBS += $(DDG)
 endif
 
-INC.DDG = $(wildcard plugins/terrain/object/ddg/*.h plugins/terrain/object/ddg/*/*.h)
-SRC.DDG = $(wildcard plugins/terrain/object/ddg/*.cpp plugins/terrain/object/ddg/*/*.cpp)
+INC.DDG = $(wildcard plugins/terrain/object/ddg/*.h \
+  plugins/terrain/object/ddg/*/*.h)
+SRC.DDG = $(wildcard plugins/terrain/object/ddg/*.cpp \
+  plugins/terrain/object/ddg/*/*.cpp)
 OBJ.DDG = $(addprefix $(OUT),$(notdir $(SRC.DDG:.cpp=$O)))
-CFLAGS.DDG = $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
-# @@@@@ The following line is temporary until this makefile is fixed
-CFLAGS += $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
-
 DEP.DDG = CSGEOM CSUTIL CSSYS
+CFLAGS.DDG = $(CFLAGS.I)plugins/terrain/object/ddg
 
 MSVC.DSP += DDG
 DSP.DDG.NAME = ddg
@@ -58,6 +58,9 @@ ddg: $(OUTDIRS) $(DDG)
 clean: ddgclean
 ddgclean:
 	-$(RM) $(DDG) $(OBJ.DDG)
+
+$(OUT)%$O: plugins/terrain/object/ddg/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.DDG)
 
 $(OUT)%$O: plugins/terrain/object/ddg/math/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.DDG)
@@ -81,7 +84,7 @@ $(DDG): $(OBJ.DDG) $(LIB.DDG)
 ifdef DO_DEPEND
 dep: $(OUTOS)ddg.dep
 $(OUTOS)ddg.dep: $(SRC.DDG)
-	$(DO.DEP)
+	$(DO.DEP1) $(CFLAGS.DDG) $(DO.DEP2)
 else
 -include $(OUTOS)ddg.dep
 endif
