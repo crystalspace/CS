@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+21-Jun-2000
+	- Added 'colors' to the tesselated version of a curve so that
+	  drawing curves will be much more optimal. This means that we'll
+	  have to update this whenever the lightmap or tesselation changes
+	  of course.
+	- Use DrawTriangleMesh now for drawing curved surfaces. Still not
+	  complete though. I need to implement correct clipping (currently
+	  the curve will always be clipped which means you'll get the
+	  non hardware accelerated version of DrawTriangleMesh) and vertex
+	  fog is also not implemented. Note it should already be somewhat
+	  faster since lighting is now cached with the tesselated curve
+	  and is only recalculated when either lighting or the tesselation
+	  changes.
 20-Jun-2000
 	- Changed csDynLight::SetColor() so that it will work without
 	  having to call Setup() later. This is MUCH more efficient if you
@@ -65,6 +78,12 @@ The history order has been reversed so that new features are at the top.
 	  plug-in which were reported by George Yohng <cspace@mmts.nsys.by>,
 	  though the bulk of them had already been fixed by Eric even before
 	  receiving the problem report.
+	- Changed curve system so that tesselated vertices are kept in a more
+	  DrawTriangleMesh friendly format.
+	- Did first attempt to use DrawTriangleMesh for curved surfaces. Not
+	  enabled now because it doesn't work very optimal due to the way
+	  lightmaps and lighting for curves work. We need to find a solution for
+	  this. Maybe putting lighting in the tesselated curve might help.
 	- Eric Sunshine made a pass through the makefiles for all plug-in
 	  modules to ensure that every plug-in defines an SCL_* flag and
 	  defines the correct parameters for use with static linking.
@@ -78,6 +97,15 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed the 'clean' target in all application and
 	  plug-in makefiles.  He also fixed several other errors and problems
 	  found throughout the makefile system.
+	- Thomas Hieber removed a problem for Map2CS on a map created by
+	  Nicolas Blumire using q3radiant. Also some other minor fixes.
+	- Thomas also did a small adjustment to the VC project files.
+	- Andrew Zabolotny added pplBeginDraw() to CSWS for apps that need
+	  low-level access to the CS plugins.
+	- Martin Geisse fixed more compiler warnings.
+	- Frank O'Connor fixed ext_w32.cpp so that it compiles on VC.
+	  It was including cssysdef.h which is not legal for a file that
+	  is being included (although technically it is a cpp file).
 19-Jun-2000
 	- Martin Geisse fixed a number of compiler warnings all over
 	  the place.

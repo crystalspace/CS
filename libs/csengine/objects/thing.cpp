@@ -157,6 +157,91 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
   return min_p;
 }
 
+#if 1
+/// The list of fog vertices
+static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+
+void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
+{
+  int i;
+  int res=1;
+
+  // Calculate tesselation resolution
+  csVector3 wv = curves_center;
+  csVector3 world_coord = obj.This2Other (wv);
+  csVector3 camera_coord = rview.Other2This (world_coord);
+
+  if (camera_coord.z >= SMALL_Z)
+  {
+    res=(int)(curves_scale/camera_coord.z);
+  }
+  else
+    res=1000; // some big tesselation value...
+
+  // Create the combined transform of object to camera by
+  // combining object to world and world to camera.
+  csReversibleTransform obj_cam = rview;
+  obj_cam /= obj;
+  rview.g3d->SetObjectToCamera (&obj_cam);
+  rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
+  rview.g3d->SetPerspectiveAspect (rview.GetFOV ());
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+      use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+
+  // Base of the mesh.
+  G3DTriangleMesh mesh;
+  mesh.morph_factor = 0;
+  mesh.num_vertices_pool = 1;
+  mesh.num_textures = 1;
+  mesh.do_mirror = rview.IsMirrored ();
+  mesh.do_morph_texels = false;
+  mesh.do_morph_colors = false;
+  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+
+  // Loop over all curves
+  csCurve* c;
+  for (i = 0 ; i < GetNumCurves () ; i++)
+  {
+    c = curves.Get (i);
+
+    // If we have a dirty lightmap recombine the curves and the shadow maps.
+    bool updated_lm = c->lightmap->UpdateRealLightMap();
+
+    // Create a new tesselation reuse an old one.
+    csCurveTesselated* tess = c->Tesselate (res);
+
+    // If the lightmap was updated or the new tesselation doesn't yet
+    // have a valid colors table we need to update colors here.
+    if (updated_lm || !tess->AreColorsValid ())
+      tess->UpdateColors (c->lightmap);
+
+    // Setup the structure for DrawTriangleMesh.
+    if (tess->GetNumVertices () > fog_verts.Limit ())
+    {
+      fog_verts.SetLimit (tess->GetNumVertices ());
+    }
+    mesh.txt_handle[0] = c->GetTextureHandle ();
+    mesh.num_vertices = tess->GetNumVertices ();
+    mesh.vertices[0] = tess->GetVertices ();
+    mesh.texels[0][0] = tess->GetTxtCoords ();
+    mesh.vertex_colors[0] = tess->GetColors ();
+    mesh.num_triangles = tess->GetNumTriangles ();
+    mesh.triangles = tess->GetTriangles ();
+    mesh.do_clip = true;	// @@@
+    mesh.vertex_fog = fog_verts.GetArray ();
+    bool gouraud = !!c->lightmap;
+    mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
+    mesh.use_vertex_color = gouraud;
+    if (mesh.txt_handle[0] == NULL)
+    {
+      CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
+      continue;
+    }
+    if (!rview.callback)
+      rview.g3d->DrawTriangleMesh (mesh);
+  }
+}
+#else
 void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 {
   int i;
@@ -213,10 +298,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     // world space and then from world to camera space.
     persp = new csVector2 [tess->GetNumVertices ()];
     z_array = new float [tess->GetNumVertices ()];
+    csVector3* vertices = tess->GetVertices ();
     for (j = 0 ;  j < tess->GetNumVertices () ; j++)
     {
-      csCurveVertex& cv = tess->GetVertex (j);
-      coord = obj_cam.Other2This (cv.object_coord);
+      coord = obj_cam.Other2This (vertices[j]);
       if (coord.z >= SMALL_Z)
       {
     	float iz = rview.GetFOV ()/coord.z;
@@ -255,13 +340,15 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     if (!rview.callback)
       rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0));
 
+    csVector2* txt_coords = tess->GetTxtCoords ();
+    csVector2* controls = tess->GetControlPoints ();
     for (j = 0 ; j < tess->GetNumTriangles () ; j++)
     {
-      csCurveTriangle& ct = tess->GetTriangle (j);
+      csTriangle& ct = tess->GetTriangle (j);
 
-      bool visible = z_array [ct.i1] >= SMALL_Z &&
-      		     z_array [ct.i2] >= SMALL_Z &&
-      		     z_array [ct.i3] >= SMALL_Z;
+      bool visible = z_array [ct.a] >= SMALL_Z &&
+      		     z_array [ct.b] >= SMALL_Z &&
+      		     z_array [ct.c] >= SMALL_Z;
 
       if (visible)
       {
@@ -269,9 +356,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   	// Do backface culling. Note that this depends on mirroring
 	// of the current view.
   	//-----
-  	float area = csMath2::Area2 (persp [ct.i1],
-          		 	     persp [ct.i2],
-          		 	     persp [ct.i3]);
+  	float area = csMath2::Area2 (persp [ct.a],
+          		 	     persp [ct.b],
+          		 	     persp [ct.c]);
 
 	if (mirror)
 	{
@@ -280,9 +367,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	else
           if (area >= SMALL_EPSILON) continue;
 
-        triangle [mirror ? 2 : 0] = persp [ct.i1];
-        triangle [1] = persp [ct.i2];
-        triangle [mirror ? 0 : 2] = persp [ct.i3];
+        triangle [mirror ? 2 : 0] = persp [ct.a];
+        triangle [1] = persp [ct.b];
+        triangle [mirror ? 0 : 2] = persp [ct.c];
 
   	// Clip triangle
   	int rescount;
@@ -290,22 +377,22 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 		rescount, clipped_vtstats);
         if (clip_result == CS_CLIP_OUTSIDE) continue;
 
-        texes[0] = &tess->GetVertex (ct.i1).txt_coord;
-        texes[1] = &tess->GetVertex (ct.i2).txt_coord;
-        texes[2] = &tess->GetVertex (ct.i3).txt_coord;
+        texes[0] = txt_coords+ct.a;
+        texes[1] = txt_coords+ct.b;
+        texes[2] = txt_coords+ct.c;
 
         if (gouraud)
         {
-          control_x[0] = QInt (tess->GetVertex (ct.i1).control.x * lm_width);
-          control_y[0] = QInt (tess->GetVertex (ct.i1).control.y * lm_height);
-          control_x[1] = QInt (tess->GetVertex (ct.i2).control.x * lm_width);
-          control_y[1] = QInt (tess->GetVertex (ct.i2).control.y * lm_height);
-          control_x[2] = QInt (tess->GetVertex (ct.i3).control.x * lm_width);
-          control_y[2] = QInt (tess->GetVertex (ct.i3).control.y * lm_height);
+          control_x[0] = QInt (controls[ct.a].x * lm_width);
+          control_y[0] = QInt (controls[ct.a].y * lm_height);
+          control_x[1] = QInt (controls[ct.b].x * lm_width);
+          control_y[1] = QInt (controls[ct.b].y * lm_height);
+          control_x[2] = QInt (controls[ct.c].x * lm_width);
+          control_y[2] = QInt (controls[ct.c].y * lm_height);
         }
 
   	poly.num = rescount;
-        int trivert [3] = { ct.i1, ct.i2, ct.i3 };
+        int trivert [3] = { ct.a, ct.b, ct.c };
         int j, idx, dir;
         // If mirroring we store the vertices in the other direction.
         if (mirror) { idx = 2; dir = -1; }
@@ -350,6 +437,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     delete [] z_array;
   }
 }
+#endif
 
 void csThing::Draw (csRenderView& rview, bool use_z_buf)
 {

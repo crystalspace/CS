@@ -39,16 +39,62 @@ IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
   num_vertices = num_v;
-  vertices = new csCurveVertex[num_v];
+  object_coords = new csVector3[num_v];
+  txt_coords = new csVector2[num_v];
+  controls = new csVector2[num_v];
+  colors = new csColor[num_v];
   num_triangles = num_t;
-  triangles = new csCurveTriangle[num_t];
+  triangles = new csTriangle[num_t];
+  colors_valid = false;
 }
 
 csCurveTesselated::~csCurveTesselated ()
 {
-  delete[] vertices;
+  delete[] object_coords;
+  delete[] txt_coords;
+  delete[] controls;
+  delete[] colors;
   delete[] triangles;
 }
+
+void csCurveTesselated::UpdateColors (csLightMap* lightmap)
+{
+  csRGBLightMap& map = lightmap->GetRealMap ();
+  UByte* mapR = map.GetRed ();
+  UByte* mapG = map.GetGreen ();
+  UByte* mapB = map.GetBlue ();
+  int lm_width = lightmap->GetWidth ()-2;
+  int lm_height = lightmap->GetWidth ()-2;
+
+  int j;
+  for (j = 0 ; j < GetNumTriangles () ; j++)
+  {
+    csTriangle& ct = triangles[j];
+    int lm_idx;
+    int cx, cy;
+    cx = QInt (controls[ct.a].x * lm_width);
+    cy = QInt (controls[ct.a].y * lm_height);
+    lm_idx = cy*(lm_width+2) + cx;
+    colors[ct.a].red = ((float)mapR[lm_idx])/256.;
+    colors[ct.a].green = ((float)mapG[lm_idx])/256.;
+    colors[ct.a].blue = ((float)mapB[lm_idx])/256.;
+    cx = QInt (controls[ct.b].x * lm_width);
+    cy = QInt (controls[ct.b].y * lm_height);
+    lm_idx = cy*(lm_width+2) + cx;
+    colors[ct.b].red = ((float)mapR[lm_idx])/256.;
+    colors[ct.b].green = ((float)mapG[lm_idx])/256.;
+    colors[ct.b].blue = ((float)mapB[lm_idx])/256.;
+    cx = QInt (controls[ct.c].x * lm_width);
+    cy = QInt (controls[ct.c].y * lm_height);
+    lm_idx = cy*(lm_width+2) + cx;
+    colors[ct.c].red = ((float)mapR[lm_idx])/256.;
+    colors[ct.c].green = ((float)mapG[lm_idx])/256.;
+    colors[ct.c].blue = ((float)mapB[lm_idx])/256.;
+  }
+
+  colors_valid = true;
+}
+
 
 csCurveTesselated* csBezier::Tesselate (int res)
 {
@@ -74,62 +120,52 @@ csCurveTesselated* csBezier::Tesselate (int res)
 
   int i,j;
 
-// Remove this code. Handled by set_control_point
-/*
-  for (i=0;i<3;i++)
-    for (j=0;j<3;j++)
-      {
-	      controls[i*3+j][0] = points[i][j].x;
-	      controls[i*3+j][1] = points[i][j].y;
-	      controls[i*3+j][2] = points[i][j].z;
-
-	      controls[i*3+j][3] = texture_coords[i][j].x; 
-	      controls[i*3+j][4] = texture_coords[i][j].y; 
-      }
-*/
-
   for (i=0;i<=res;i++)
   for (j=0;j<=res;j++)
   {
     TDtDouble point[5];
     BezierPoint(point, controls, i, j,res,BinomiumMap());
-    csCurveVertex& vtx = previous_tesselation->GetVertex(i+(res+1)*j);
-    vtx.object_coord.x = point[0];
-    vtx.object_coord.y = point[1];
-    vtx.object_coord.z = point[2];
+    int idx = i+(res+1)*j;
+    csVector3* vtx_coord = previous_tesselation->GetVertices ()+idx;
+    csVector2* vtx_txtcoord = previous_tesselation->GetTxtCoords ()+idx;
+    csVector2* vtx_control = previous_tesselation->GetControlPoints ()+idx;
+    vtx_coord->x = point[0];
+    vtx_coord->y = point[1];
+    vtx_coord->z = point[2];
     //
-    vtx.txt_coord.x    = point[3];
-    vtx.txt_coord.y    = point[4];
+    vtx_txtcoord->x    = point[3];
+    vtx_txtcoord->y    = point[4];
     //
-    vtx.control.x      = ((float)i)/(float)res;
-    vtx.control.y      = ((float)j)/(float)res;
+    vtx_control->x      = ((float)i)/(float)res;
+    vtx_control->y      = ((float)j)/(float)res;
   }
 
   for (i=0;i<res;i++)
   {
     for (j=0;j<res;j++)
     {
-      csCurveTriangle& up = 
+      csTriangle& up = 
 	previous_tesselation->GetTriangle (2*(i+j*res));
-      csCurveTriangle& down = 
+      csTriangle& down = 
 	previous_tesselation->GetTriangle (2*(i+j*res)+1);
       int tl = i+(res+1)*j;
       int tr = i+(res+1)*j+1;
 
       int bl = i+(res+1)*(j+1);
       int br = i+(res+1)*(j+1)+1;
-      up.i1 = tl;
-      up.i2 = br;
-      up.i3 = tr;
+      up.a = tl;
+      up.b = br;
+      up.c = tr;
 
-      down.i1 = br;
-      down.i2 = tl;
-      down.i3 = bl;
+      down.a = br;
+      down.b = tl;
+      down.c = bl;
     }
   }
 
   return previous_tesselation;
 }
+
 
 csCurve::~csCurve ()
 {

@@ -28,33 +28,10 @@
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
+#include "igraph3d.h"
 
 struct iTextureHandle;
 class csBspContainer;
-
-/**
- * Vertex resulting from a tesselated curve.
- */
-class csCurveVertex
-{
-public:
-  /// Object space coordinates.
-  csVector3 object_coord;
-  /// Texture coordinates.
-  csVector2 txt_coord;
-  /// Original control points.
-  csVector2 control;
-};
-
-/**
- * Triangle resulting from a tesselated curve.
- */
-class csCurveTriangle
-{
-public:
-  /// Indices in triangle list.
-  int i1, i2, i3;
-};
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -62,10 +39,22 @@ public:
 class csCurveTesselated
 {
 private:
-  csCurveVertex* vertices;
+  // Object space coordinates.
+  csVector3* object_coords;
+  // Texture coordinates.
+  csVector2* txt_coords;
+  // Original control points.
+  csVector2* controls;
+  // Colors for the vertices.
+  csColor* colors;
+  // Triangles.
+  csTriangle* triangles;
+
   int num_vertices;
-  csCurveTriangle* triangles;
   int num_triangles;
+
+  // A flag which indicates if the color table is filled in.
+  bool colors_valid;
 
 public:
   /**
@@ -81,9 +70,27 @@ public:
   ///
   int GetNumTriangles () { return num_triangles; }
   ///
-  csCurveVertex& GetVertex (int i) { return vertices[i]; }
+  csVector3* GetVertices () { return object_coords; }
   ///
-  csCurveTriangle& GetTriangle (int i) { return triangles[i]; }
+  csVector2* GetTxtCoords () { return txt_coords; }
+  ///
+  csVector2* GetControlPoints () { return controls; }
+  ///
+  csColor* GetColors () { return colors; }
+  ///
+  csTriangle* GetTriangles () { return triangles; }
+  ///
+  csTriangle& GetTriangle (int i) { return triangles[i]; }
+
+  /**
+   * Update the 'colors' array in this tesselation given
+   * a lightmap. This should be called whenever the lightmap
+   * changes and the curve needs to be rendered.
+   */
+  void UpdateColors (csLightMap* lightmap);
+
+  /// Return true if the colors table is valid.
+  bool AreColorsValid () { return colors_valid; }
 };
 
 class csPolygonSet;
