@@ -27,6 +27,17 @@ The history order has been reversed so that new features are at the top.
 	  used in MazeD.
 	- Removed all CHK and CHKB from the code. That memory debugger
 	  is now obsolete.
+	- Eric Sunshine eliminated a compilation warning in csnotebk.cpp.
+	- Eric Sunshine moved declaration and definition of cspExtDialog
+	  outside of the function within which it was defined since the BeOS
+	  compiler was generating unlinkable code.
+	- Eric Sunshine added dynamic-texture support to BeOS software and
+	  OpenGL 2D drivers.
+	- Eric Sunshine modified the BeOS system driver so that it now
+	  automatically changes the current working directory to path the
+	  which contains the executable.  This allows CS applications to find
+	  their resources even when launched via double-click from the Tracker
+	  application.
 11-May-2000
 	- Changes from Michael Dale Long:
 	    - Added a CHK_DECREF() macro to cctest.h that checks if an
