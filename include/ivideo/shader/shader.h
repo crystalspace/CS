@@ -36,8 +36,8 @@ struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
 
-SCF_VERSION (iShaderManager, 0,0,1);
 
+SCF_VERSION (iShaderManager, 0,0,1);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
@@ -112,12 +112,26 @@ struct iShader : iBase
 SCF_VERSION (iShaderVariable, 0,0,1);
 struct iShaderVariable : iBase
 {
+  enum VariableType
+  {
+    INT = 1,
+    STRING,
+    VECTOR1,
+    VECTOR3,
+    VECTOR4
+  };
+
+  virtual VariableType GetType() = 0;
+  virtual void SetType(VariableType) = 0;
+
   virtual const char* GetName() = 0;
   virtual bool GetValue(int& value) = 0;
+  virtual bool GetValue(float& value) = 0;
   virtual bool GetValue(iString* value) = 0;
   virtual bool GetValue(csVector3& value) = 0;
 //  virtual bool GetValue(csVector4* value) = 0;
   virtual bool SetValue(int value) = 0;
+  virtual bool SetValue(float value) = 0;
   virtual bool SetValue(iString* value) = 0;
   virtual bool SetValue(csVector3 value) = 0;
 //  virtual bool SetValue(csVector4* value) = 0;
@@ -177,6 +191,13 @@ struct iShaderPass : iBase
 
   /// Deactivate the whole pass
   virtual void Deactivate() = 0;
+
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  /// Get all variable stringnames added to this context (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames() = 0; 
 };
 
 SCF_VERSION (iShaderProgram, 0,0,1);
@@ -188,10 +209,10 @@ struct iShaderProgram : iBase
 {
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate() = 0;
+  virtual void Activate(iShaderPass* current) = 0;
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate() = 0;
+  virtual void Deactivate(iShaderPass* current) = 0;
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific
@@ -208,6 +229,13 @@ struct iShaderProgram : iBase
   virtual bool SetProperty(const char* name, int* string) = 0;
   virtual bool SetProperty(const char* name, csVector3* string) = 0;
 //  virtual bool SetProperty(const char* name, csVector4* string) = 0;
+
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(const char* string) = 0;
+  /// Get all variable stringnames added to this context (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames() = 0; 
 };
 
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);

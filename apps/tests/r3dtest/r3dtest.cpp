@@ -217,7 +217,7 @@ void R3DTest::SetupFrame ()
 
   csReversibleTransform trans;
   static float a = 0;
-
+/*
   csVector2 clipshape[10];
   clipshape[0] = csVector2 (sin(a*5.0)*100.0+200, 100);
   clipshape[1] = csVector2 (sin(a*5.0+0.5)*100.0+150, 200);
@@ -227,7 +227,7 @@ void R3DTest::SetupFrame ()
   csPolygonClipper polyclip (clipshape, 5);
   csRef<iClipper2D> clipper = SCF_QUERY_INTERFACE (&polyclip, iClipper2D);
   r3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-
+*/
   a += speed;
   trans.RotateOther (csVector3 (1,0,0), a*2.0);
   trans.RotateOther (csVector3 (0,1,0), a*1.5);
