@@ -550,17 +550,38 @@ class csPrintfFormatter
 	  }
 	  parseState = scanFormat;
 	  break;
-       }
-     }
-   }
+      }
+    }
+  }
 
-   void FetchParams (va_list args)
-   {
+  /// Fetch all arguments from the stack, store in params array
+  void FetchArgs (va_list args)
+  {
+    size_t i;
     // Determine order of params
-    for (size_t i = 0; i < formatSpecs.Length(); i++)
+    csArray<FormatSpec*> paramOrder;
+    paramOrder.SetCapacity (formatSpecs.Length());
+    for (i = 0; i < formatSpecs.Length(); i++)
     {
       FormatSpec& currentFormat = formatSpecs[i];
-      FmtParam& param = params.GetExtend (currentFormat.paramIdx);
+      if (currentFormat.conversion == convNone) continue;
+      if (paramOrder.Length() <= (size_t)currentFormat.paramIdx)
+	paramOrder.SetLength (currentFormat.paramIdx + 1, 0);
+      paramOrder[currentFormat.paramIdx] = &currentFormat;
+    }
+    // Fetch params from stack in order, store at correct place in params array
+    for (i = 0; i < paramOrder.Length(); i++)
+    {
+      FmtParam& param = params.GetExtend (i);
+      FormatSpec* fmtPtr = paramOrder[i];
+      if (fmtPtr == 0) 
+      {
+	// Can just guess here...
+	param.vInt = va_arg (args, int);
+	continue;
+      }
+      FormatSpec& currentFormat = *fmtPtr;
+
       if (currentFormat.width == -2)
       {
 	currentFormat.width = va_arg (args, int);
@@ -573,7 +594,10 @@ class csPrintfFormatter
       if (currentFormat.precision == -2)
       {
 	int v = va_arg (args, int);
-	if (v >= 0) currentFormat.precision = v;
+	if (v >= 0) 
+	  currentFormat.precision = v;
+	else
+	  currentFormat.precision = -1;
       }
       switch (currentFormat.conversion)
       {
@@ -652,7 +676,7 @@ class csPrintfFormatter
   void Init (va_list args)
   {
     ParseSpec ();
-    FetchParams (args);
+    FetchArgs (args);
   }
 
   /// Write out a string

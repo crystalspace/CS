@@ -132,6 +132,7 @@ int main (int argc, char* argv[])
   csPrintf ("%0.*f ", 4, 123.456);
   csPrintf ("%0*.*f ", 12, 4, 123.456);
   csPrintf ("\n");
+  csPrintf ("%5$d %3$s %2$d %1$d\n", 1, 2, "3", 4, 5);
   return 0;
 }
 

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Mar-2005
+	- res fixed csPrintfFormatter to actually properly handle argument
+	  number specification (like in %3$d to take the 3rd argument).
 11-Mar-2005
 	- Jorrit fixed the simple2 tutorial in the documentation so that it
 	  explicitly states that you shouldn't use the scale.
