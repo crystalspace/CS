@@ -57,6 +57,63 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csSectorMeshList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSectorMeshList::MeshList)
+  SCF_IMPLEMENTS_INTERFACE (iMeshList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSectorMeshList::csSectorMeshList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
+  sector = NULL;
+}
+
+iMeshWrapper *csSectorMeshList::FindByName (const char *name) const
+{
+  if (!name) return NULL;
+
+  int i;
+  for (i=0 ; i<Length () ; i++)
+  {
+    iMeshWrapper *mesh = Get (i);
+    if (mesh->QueryObject ()->GetName ())
+      if (!strcmp (mesh->QueryObject ()->GetName (), name))
+        return mesh;
+  }
+  return NULL;
+}
+
+void csSectorMeshList::AddMesh (iMeshWrapper* mesh)
+{
+  CS_ASSERT (sector != NULL);
+  sector->AddMesh (mesh->GetPrivateObject ());
+}
+
+void csSectorMeshList::RemoveMesh (iMeshWrapper* mesh)
+{
+  CS_ASSERT (sector != NULL);
+  sector->UnlinkMesh (mesh->GetPrivateObject ());
+}
+
+int csSectorMeshList::MeshList::GetMeshCount () const
+{ return scfParent->Length (); }
+iMeshWrapper *csSectorMeshList::MeshList::GetMesh (int idx) const
+{ return scfParent->Get (idx); }
+void csSectorMeshList::MeshList::AddMesh (iMeshWrapper* sect)
+{ scfParent->AddMesh (sect); }
+void csSectorMeshList::MeshList::RemoveMesh (iMeshWrapper* sect)
+{ scfParent->RemoveMesh (sect); }
+iMeshWrapper *csSectorMeshList::MeshList::FindByName (const char *name) const
+{ return scfParent->FindByName (name); }
+int csSectorMeshList::MeshList::Find (iMeshWrapper *mesh) const
+{ return scfParent->Find (mesh); }
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT (csSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReferencedObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
@@ -81,6 +138,7 @@ csSector::csSector (csEngine* engine) : csObject ()
   engine->AddToCurrentRegion (this);
   fog.enabled = false;
   draw_busy = 0;
+  meshes.SetSector (this);
 }
 
 csSector::~csSector ()
@@ -123,7 +181,7 @@ void csSector::CleanupReferences ()
 
 void csSector::AddMesh (csMeshWrapper* mesh)
 {
-  meshes.Push ((csSome)mesh);
+  meshes.Push (&(mesh->scfiMeshWrapper));
 
   //-----
   // Place the mesh in the right priority queue.
@@ -166,13 +224,14 @@ void csSector::UnlinkMesh (csMeshWrapper* mesh)
     queue->Delete (idx);
   }
 
-  idx = meshes.Find ((csSome)mesh);
+  idx = meshes.Find (&(mesh->scfiMeshWrapper));
   if (idx != -1)
   {
     meshes.Delete (idx);
     if (culler)
     {
-      iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh, iVisibilityObject);
+      iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh,
+      	iVisibilityObject);
       vo->DecRef ();
       culler->UnregisterVisObject (vo);
     }
@@ -213,18 +272,6 @@ void csSector::RelinkMesh (csMeshWrapper* mesh)
     mesh_priority_queues[pri] = queue;
   }
   queue->Push ((csSome)mesh);
-}
-
-csMeshWrapper* csSector::GetMesh (const char* name) const
-{
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* s = (csMeshWrapper*)meshes[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
 }
 
 //----------------------------------------------------------------------
@@ -272,9 +319,11 @@ csStatLight* csSector::FindLight (unsigned long id) const
 void csSector::UseCuller (const char* meshname)
 {
   if (culler_mesh) return;
-  culler_mesh = GetMesh (meshname);
-  if (!culler_mesh) return;
-  culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (), iVisibilityCuller);
+  iMeshWrapper* cul_mesh = meshes.FindByName (meshname);
+  if (!cul_mesh) return;
+  culler_mesh = cul_mesh->GetPrivateObject ();
+  culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (),
+  	iVisibilityCuller);
   if (!culler) return;
   char cachename[256];
   sprintf (cachename, "%s_%s", GetName (), meshname);
@@ -285,8 +334,8 @@ void csSector::UseCuller (const char* meshname)
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csMeshWrapper* th = (csMeshWrapper*)meshes[i];
-    th->GetMovable ().UpdateMove ();
+    iMeshWrapper* th = meshes.Get (i);
+    th->GetMovable ()->UpdateMove ();
 
     iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
     vo->DecRef ();
@@ -325,7 +374,7 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+    csMeshWrapper* mesh = meshes.Get (i)->GetPrivateObject ();
     if (mesh->HitBeam (start, end, isect, &r))
     {
       if (r < best_mesh_r)
@@ -387,7 +436,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     int i;
     for (i = 0 ; i < meshes.Length () ; i++)
     {
-      csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+      iMeshWrapper* mesh = meshes.Get (i);
       // @@@ UGLY!!!
       iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
       	iThingState);
@@ -403,7 +452,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
         }
         else
         {
-          movtrans = mesh->GetMovable ().GetFullTransform ();
+          movtrans = mesh->GetMovable ()->GetFullTransform ();
           obj_start = movtrans.Other2This (start);
 	  obj_end = movtrans.Other2This (end);
         }
@@ -761,7 +810,7 @@ void csSector::Draw (iRenderView* rview)
   {
     csMeshWrapper* sp;
     if (mesh_queue) sp = mesh_queue[i];
-    else sp = (csMeshWrapper*)meshes[i];
+    else sp = meshes.Get (i)->GetPrivateObject ();
 
     if (!previous_sector || sp->GetMovable ().GetSectors ()->
     	Find (previous_sector) == -1)
@@ -849,7 +898,7 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
   // @@@ Unify both loops below once csThing becomes a mesh object.
   for (j = 0 ; j < meshes.Length () ; j++)
   {
-    csMeshWrapper* sp = (csMeshWrapper*)meshes[j];
+    csMeshWrapper* sp = meshes.Get (j)->GetPrivateObject ();
     // If the light frustum is infinite then every thing
     // in this sector is of course visible.
     if (infinite) vis = true;
@@ -1039,29 +1088,13 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
   if (do_meshes)
     for (i = 0 ; i < meshes.Length () ; i++)
     {
-      csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
+      csMeshWrapper* mesh = meshes.Get (i)->GetPrivateObject ();
       mesh->GetTransformedBoundingBox (mesh->GetMovable ().GetTransform (), b);
       bbox += b;
     }
 }
 
 //---------------------------------------------------------------------------
-
-iMeshWrapper *csSector::eiSector::GetMesh (int n) const
-{
-  return &scfParent->GetMesh (n)->scfiMeshWrapper;
-}
-
-void csSector::eiSector::AddMesh (iMeshWrapper *pMesh)
-{
-  scfParent->AddMesh (pMesh->GetPrivateObject ());
-}
-
-iMeshWrapper *csSector::eiSector::GetMesh (const char *name) const
-{
-  csMeshWrapper *mw = scfParent->GetMesh (name);
-  return mw ? &mw->scfiMeshWrapper : NULL;
-}
 
 void csSector::eiSector::AddLight (iStatLight *light)
 {

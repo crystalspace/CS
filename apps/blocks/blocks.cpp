@@ -2085,9 +2085,10 @@ void Blocks::ChangePlaySize (int new_size)
   WriteConfig ();
   InitGameRoom ();
   int i;
-  for (i = 0 ; i < room->GetMeshCount () ; i++)
+  iMeshList* ml = room->GetMeshes ();
+  for (i = 0 ; i < ml->GetMeshCount () ; i++)
   {
-    iMeshWrapper* mesh = room->GetMesh (i);
+    iMeshWrapper* mesh = ml->GetMesh (i);
     iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
@@ -2097,9 +2098,9 @@ void Blocks::ChangePlaySize (int new_size)
     }
   }
   room->ShineLights ();
-  for (i = 0 ; i < room->GetMeshCount () ; i++)
+  for (i = 0 ; i < ml->GetMeshCount () ; i++)
   {
-    iMeshWrapper* mesh = room->GetMesh (i);
+    iMeshWrapper* mesh = ml->GetMesh (i);
     iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
@@ -2353,9 +2354,10 @@ void Blocks::StartNewGame ()
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
-  while (i < room->GetMeshCount ())
+  iMeshList* ml = room->GetMeshes ();
+  while (i < ml->GetMeshCount ())
   {
-    iMeshWrapper* cube = room->GetMesh (i);
+    iMeshWrapper* cube = ml->GetMesh (i);
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
       room->UnlinkMesh (cube);

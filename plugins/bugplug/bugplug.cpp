@@ -597,9 +597,10 @@ bool csBugPlug::EatKey (iEvent& event)
 	  for (i = 0 ; i < Engine->GetSectors ()->GetSectorCount () ; i++)
 	  {
 	    iSector* sector = Engine->GetSectors ()->GetSector (i);
-	    for (j = 0 ; j < sector->GetMeshCount () ; j++)
+	    iMeshList* ml = sector->GetMeshes ();
+	    for (j = 0 ; j < ml->GetMeshCount () ; j++)
 	    {
-	      iMeshWrapper* terr = sector->GetMesh (j);
+	      iMeshWrapper* terr = ml->GetMesh (j);
 	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetMeshObject (),
 	      	iTerrFuncState);
 	      if (st)
@@ -1022,11 +1023,11 @@ void csBugPlug::Dump (iSector* sector)
   Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08lx)",
   	sn ? sn : "?", sector);
   Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
-  	sector->GetMeshCount (), sector->GetLightCount ());
+  	sector->GetMeshes ()->GetMeshCount (), sector->GetLightCount ());
   int i;
-  for (i = 0 ; i < sector->GetMeshCount () ; i++)
+  for (i = 0 ; i < sector->GetMeshes ()->GetMeshCount () ; i++)
   {
-    iMeshWrapper* mesh = sector->GetMesh (i);
+    iMeshWrapper* mesh = sector->GetMeshes ()->GetMesh (i);
     const char* n = mesh->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08lx)",
     	n ? n : "?", mesh);

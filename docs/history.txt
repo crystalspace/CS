@@ -42,6 +42,9 @@ The history order is reversed so that new features are at the top.
 	      by keeping an efficient portal representation structure on the
 	      csSector level.
 	  Otherwise it should work just fine but it is untested.
+	- Removed iSector::AddMesh, UnlinkMesh, GetMeshCount, and GetMesh (two
+	  versions). Instead there is now iSector::GetMeshes() which returns
+	  an implementation of iMeshList.
 19-Aug-2001
 	- Added iThingState::GetPortalCount() and GetPortal(int) so you
 	  can query all portals from a thing.

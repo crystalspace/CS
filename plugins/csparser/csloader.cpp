@@ -215,7 +215,7 @@ bool csLoader::ResolvePortalSectors (iThingState *th)
       // First we check if this sector already has some meshes.
       // If so then this is not a sector we have to resolve.
       // This test is here to make this code a little more robust.
-      if (stmp->GetMeshCount () > 0) continue;
+      if (stmp->GetMeshes ()->GetMeshCount () > 0) continue;
       iSector *snew = Engine->FindSector (stmp->QueryObject ()->GetName (),
         ResolveOnlyRegion);
       if (!snew)
@@ -393,9 +393,10 @@ bool csLoader::LoadMap (char* buf)
         continue;
       }
     }
-    for (j=0; j<Sector->GetMeshCount(); j++)
+    iMeshList* ml = Sector->GetMeshes ();
+    for (j=0 ; j < ml->GetMeshCount () ; j++)
     {
-      iMeshWrapper *Mesh    = Sector->GetMesh(j);
+      iMeshWrapper *Mesh = ml->GetMesh (j);
       if (Mesh)
       {
         iThingState* Thing = SCF_QUERY_INTERFACE_SAFE (

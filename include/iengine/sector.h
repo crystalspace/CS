@@ -29,6 +29,7 @@ class csColor;
 class csBox3;
 class csReversibleTransform;
 struct iMeshWrapper;
+struct iMeshList;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -38,7 +39,7 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 2, 13);
+SCF_VERSION (iSector, 0, 3, 13);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -64,16 +65,8 @@ struct iSector : public iBase
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
 
-  /// Return the number of mesh objects in this sector.
-  virtual int GetMeshCount () const = 0;
-  /// Return a mesh wrapper by index.
-  virtual iMeshWrapper *GetMesh (int n) const = 0;
-  /// Add a mesh object to this sector.
-  virtual void AddMesh (iMeshWrapper *pMesh) = 0;
-  /// Find a mesh object by name.
-  virtual iMeshWrapper *GetMesh (const char *name) const = 0;
-  /// Unlink a mesh object.
-  virtual void UnlinkMesh (iMeshWrapper *pMesh) = 0;
+  /// Get the list of meshes in this sector.
+  virtual iMeshList* GetMeshes () = 0;
 
   /// Return the number of lights in this sector.
   virtual int GetLightCount () const = 0;

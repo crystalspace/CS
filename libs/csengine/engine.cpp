@@ -374,11 +374,12 @@ iObject* csObjectIt::Fetch ()
   // Handle csMeshWrapper.
   if (CurrentList == ITERATE_MESHES)
   {
-    if (cur_idx >= cur_sector->GetMeshCount ())
+    if (cur_idx >= cur_sector->GetMeshes ()->GetMeshCount ())
       CurrentList = ITERATE_SECTORS;
     else
     {
-      iObject* rc = cur_sector->GetMesh (cur_idx)->scfiMeshWrapper.QueryObject ();
+      iObject* rc = cur_sector->GetMeshes ()->GetMesh (cur_idx)
+      	->QueryObject ();
       cur_idx++;
       return rc;
     }

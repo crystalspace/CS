@@ -182,7 +182,7 @@ void csMeshWrapper::RemoveFromSectors ()
   {
     iSector* ss = sectors->GetSector (i);
     if (ss)
-      ss->UnlinkMesh (&scfiMeshWrapper);
+      ss->GetMeshes ()->RemoveMesh (&scfiMeshWrapper);
   }
   e->DecRef ();
 }
@@ -321,9 +321,10 @@ void csMeshWrapper::PlaceMesh ()
   // @@@ It would be nice if we could find a more optimal portal representation
   // for large sectors.
   int i, j;
-  for (i = 0 ; i < sector->GetMeshCount () ; i++)
+  iMeshList* ml = sector->GetMeshes ();
+  for (i = 0 ; i < ml->GetMeshCount () ; i++)
   {
-    iMeshWrapper* mesh = sector->GetMesh (i);
+    iMeshWrapper* mesh = ml->GetMesh (i);
     iThingState* thing = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
 	iThingState);
     if (thing)

@@ -220,11 +220,13 @@ int CollisionDetect (csColliderWrapper *c, iSector* sp, csTransform *cdt)
     return 1;
 
   // Check collision with the meshes in this sector.
-  for (i = 0 ; i < sp->GetMeshCount () ; i++)
+  iMeshList* ml = sp->GetMeshes ();
+  for (i = 0 ; i < ml->GetMeshCount () ; i++)
   {
-    iMeshWrapper* tp = sp->GetMesh (i);
+    iMeshWrapper* tp = ml->GetMesh (i);
     Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (tp->QueryObject (), cdt, &tp->GetMovable ()->GetTransform ())) hit++;
+    if (c->Collide (tp->QueryObject (), cdt,
+    	&tp->GetMovable ()->GetTransform ())) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
     for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
@@ -260,12 +262,13 @@ void DoGravity (csVector3& pos, csVector3& vel)
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
-    if (n[k]->GetMeshCount () > 0)
+    iMeshList* ml = n[k]->GetMeshes ();
+    if (ml->GetMeshCount () > 0)
     {
       int i;
-      for (i = 0 ; i < n[k]->GetMeshCount () ; i++)
+      for (i = 0 ; i < ml->GetMeshCount () ; i++)
       {
-	iMeshWrapper* terrain = n[k]->GetMesh (i);
+	iMeshWrapper* terrain = ml->GetMesh (i);
 	iTerrFuncState* state = SCF_QUERY_INTERFACE (terrain
 		->GetMeshObject (), iTerrFuncState);
 	if (state)

@@ -270,11 +270,11 @@ struct iEngine : public iBase
       const char* name) = 0;
 
   /// Get the list of sectors
-  virtual iSectorList *GetSectors () = 0;
+  virtual iSectorList* GetSectors () = 0;
   /// Get the list of mesh factories
-  virtual iMeshFactoryList *GetMeshFactories () = 0;
+  virtual iMeshFactoryList* GetMeshFactories () = 0;
   /// Get the list of meshes
-  virtual iMeshList *GetMeshes () = 0;
+  virtual iMeshList* GetMeshes () = 0;
 
   /**
    * Find a sector by name. If regionOnly is true then the returned

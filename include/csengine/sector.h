@@ -21,13 +21,14 @@
 
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csengine/bsp.h"
 #include "csgeom/math3d.h"
+#include "csengine/bsp.h"
 #include "csutil/cscolor.h"
-#include "iengine/sector.h"
-#include "ivideo/graph3d.h"
-#include "iengine/mesh.h"
 #include "iutil/objref.h"
+#include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "iengine/mesh.h"
+#include "ivideo/graph3d.h"
 
 class csEngine;
 class csStatLight;
@@ -37,6 +38,7 @@ class csCamera;
 class csDynLight;
 class csPolygon2DQueue;
 class csProgressPulse;
+class csSector;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -44,8 +46,36 @@ struct iRenderView;
 struct iMeshWrapper;
 struct iFrustumView;
 
+CS_DECLARE_TYPED_VECTOR_NODELETE (csMeshVector, iMeshWrapper);
 
-SCF_VERSION (csSector, 0, 0, 1);
+/// A list of meshes for a sector.
+class csSectorMeshList : public csMeshVector
+{
+private:
+  csSector* sector;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csSectorMeshList ();
+  void SetSector (csSector* sec) { sector = sec; }
+  iMeshWrapper *FindByName (const char *name) const;
+  void AddMesh (iMeshWrapper* mesh);
+  void RemoveMesh (iMeshWrapper* mesh);
+  class MeshList : public iMeshList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSectorMeshList);
+    virtual int GetMeshCount () const;
+    virtual iMeshWrapper *GetMesh (int idx) const;
+    virtual void AddMesh (iMeshWrapper *mesh);
+    virtual void RemoveMesh (iMeshWrapper *mesh);
+    virtual iMeshWrapper *FindByName (const char *name) const;
+    virtual int Find (iMeshWrapper *mesh) const;
+  } scfiMeshList;
+};
+
+
+SCF_VERSION (csSector, 0, 0, 2);
 
 /**
  * A sector is a container for objects. It is one of
@@ -57,9 +87,9 @@ private:
   /**
    * List of meshes in this sector. Note that meshes also
    * need to be in the engine list. This vector contains objects
-   * of type csMeshWrapper*.
+   * of type iMeshWrapper*.
    */
-  csVector meshes;
+  csSectorMeshList meshes;
 
   /**
    * The same meshes above but each mesh in their own render priority
@@ -152,6 +182,11 @@ public:
   // Mesh manipulation functions
   //----------------------------------------------------------------------
 
+  iMeshList* GetMeshes ()
+  {
+    return &(meshes.scfiMeshList);
+  }
+
   /**
    * Add a mesh to this sector and register it to the culler.
    */
@@ -168,27 +203,6 @@ public:
    * that the sector needs to know this.
    */
   void RelinkMesh (csMeshWrapper* mesh);
-
-  /**
-   * Get the number of meshes in this sector.
-   */
-  int GetMeshCount () const
-  {
-    return meshes.Length ();
-  }
-
-  /**
-   * Get the specified mesh.
-   */
-  csMeshWrapper* GetMesh (int idx) const
-  {
-    return (csMeshWrapper*)meshes[idx];
-  }
-
-  /**
-   * Find the given mesh by name.
-   */
-  csMeshWrapper* GetMesh (const char* name) const;
 
   //----------------------------------------------------------------------
   // Light manipulation functions
@@ -289,8 +303,8 @@ public:
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  csObject* HitBeam (const csVector3& start, const csVector3& end, csVector3& intersect,
-  	csPolygon3D** polygonPtr);
+  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& intersect, csPolygon3D** polygonPtr);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
@@ -448,12 +462,10 @@ public:
       return scfParent->GetVisibilityCuller ();
     }
 
-    virtual int GetMeshCount () const { return scfParent->GetMeshCount (); }
-    virtual iMeshWrapper *GetMesh (int n) const;
-    virtual void AddMesh (iMeshWrapper *pMesh);
-    virtual iMeshWrapper *GetMesh (const char *name) const;
-    virtual void UnlinkMesh (iMeshWrapper *pMesh)
-    { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
+    virtual iMeshList* GetMeshes ()
+    {
+      return &(scfParent->meshes.scfiMeshList);
+    }
 
     virtual void AddLight (iStatLight *light);
     virtual int GetLightCount () const { return scfParent->GetLightCount (); }

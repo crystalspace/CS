@@ -518,7 +518,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
-        anim_sky = Sector->GetMesh (name);
+        anim_sky = Sector->GetMeshes ()->FindByName (name);
 	Sector->DecRef ();
       }
     }
@@ -642,9 +642,10 @@ void WalkTest::ParseKeyCmds ()
     ParseKeyCmds (sector->QueryObject ());
 
     int j;
-    for (j = 0 ; j < sector->GetMeshCount () ; j++)
+    iMeshList* ml = sector->GetMeshes ();
+    for (j = 0 ; j < ml->GetMeshCount () ; j++)
     {
-      iMeshWrapper* sprite = sector->GetMesh (j);
+      iMeshWrapper* sprite = ml->GetMesh (j);
       ParseKeyCmds (sprite->QueryObject ());
     }
     for (j = 0 ; j < sector->GetLightCount () ; j++)

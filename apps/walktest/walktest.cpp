@@ -1138,9 +1138,10 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     // Initialize the things in this sector.
     int i;
-    for (i = 0 ; i < sp->GetMeshCount () ; i++)
+    iMeshList* ml = sp->GetMeshes ();
+    for (i = 0 ; i < ml->GetMeshCount () ; i++)
     {
-      iMeshWrapper* tp = sp->GetMesh (i);
+      iMeshWrapper* tp = ml->GetMesh (i);
       mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
       if (mesh)
       {
