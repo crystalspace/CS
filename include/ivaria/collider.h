@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csgeom/vector3.h"
+#include "imesh/object.h"
 
 struct iPolygonMesh;
 class csReversibleTransform;
@@ -35,18 +36,24 @@ struct csCollisionPair
   csVector3 a1, b1, c1;	// First triangle
   csVector3 a2, b2, c2;	// Second triangle
 };
-
+//////////////////////////////////////////////////////
 SCF_VERSION (iCollider, 0, 2, 0);
 
 /**
- * A collider.
+ * A mesh collider.
  */
 struct iCollider : public iBase
 {
 };
-
-SCF_VERSION (iCollideSystem, 0, 0, 2);
-
+//////////////////////////////////////////////////////
+SCF_VERSION (iCollideSystem, 0, 0, 3);
+//   
+//  THIS IS A REMINDER; CAN BE REMOVED AFTER COMMIT: 
+//   methods added:
+//
+//   iPrimSphereCollider* CreateSphereCollider (iPolygonMesh* mesh);
+//   iPrimBoxCollider*    CreateBoxCollider    (iPolygonMesh* mesh);
+//
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -55,9 +62,22 @@ SCF_VERSION (iCollideSystem, 0, 0, 2);
  */
 struct iCollideSystem : public iBase
 {
+<<<<<<< collider.h
+  /// Create an iCollider for the given mesh geometry.
+  virtual iCollider* CreateCollider (iPolygonMesh* mesh) = 0;
+  
+  /// Create an iPrimSphereCollider for the given sphere geometry
+  virtual iCollider* CreateSphereCollider (iMeshObject* sphere) = 0;
+
+  /// Create an iPrimBoxCollider for the given box geometry
+  virtual iCollider*    CreateBoxCollider    (iMeshObject* box) = 0;
+  
+ 
+=======
   /// Create an iCollider for the given geometry.
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
 
+>>>>>>> 1.8
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by
@@ -70,7 +90,6 @@ struct iCollideSystem : public iBase
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
   	iCollider* collider2, const csReversibleTransform* trans2) = 0;
-
   /**
    * Get pointer to current array of collision pairs.
    * This array will grow with every call to Collide until you clear
