@@ -25,6 +25,28 @@
 
 #define VEC_X_NORM_THRESHOLD 0.01
 
+//!me from graphic gems.  faster, but may have discontinuity...
+/*void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
+{
+    double  angleRad = theta,
+	    c = cos(angleRad),
+	    s = sin(angleRad),
+	    t = 1.0 - c;
+
+    pvec = pvec/pvec.Norm();
+    pR.set(t * pvec[0] * pvec[0] + c,
+		     t * pvec[0] * pvec[1] - s * pvec[2],
+		     t * pvec[0] * pvec[2] + s * pvec[1],
+		t * pvec[0] * pvec[1] + s * pvec[2],
+		     t * pvec[1] * pvec[1] + c,
+		     t * pvec[1] * pvec[2] - s * pvec[0],
+		t * pvec[0] * pvec[1] - s * pvec[1],
+		     t * pvec[1] * pvec[2] + s * pvec[0],
+		     t * pvec[2] * pvec[2] + c);
+ // pR = pR.get_transpose();
+}
+*/
+// not convinced this is bug free...
 void R_from_vector_and_angle( ctVector3 pvec, real theta, ctMatrix3 &pR )
 {
 ctVector3 Tx = pvec/pvec.Norm();
@@ -60,6 +82,7 @@ ctMatrix3 TRot;
 	pR = T.get_transpose() * TRot * T; 
 
 }
+
 
 // use dot product to find the angle between two vectors
 real angle_diff( ctVector3 v1, ctVector3 v2 )
