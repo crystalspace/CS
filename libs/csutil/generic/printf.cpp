@@ -34,16 +34,16 @@ int csPrintf (char const* str, ...)
   return rc;
 }
 
-static int csFPutStr (FILE* file, const char* str)
+static int cs_fputsn (FILE* file, const char* str, size_t len)
 {
 //#ifdef CS_HAVE_FPUTWS
 #if 0
   // Jorrit: Disabled for now since on some linuxes it appears
   // that fputws is buggy.
-  size_t wstrSize = strlen (str) + 1;
+  size_t wstrSize = len + 1;
   CS_ALLOC_STACK_ARRAY(wchar_t, wstr, wstrSize);
   
-  csUnicodeTransform::UTF8toWC (wstr, wstrSize, (utf8_char*)str, (size_t)-1);
+  csUnicodeTransform::UTF8toWC (wstr, wstrSize, (utf8_char*)str, len);
     
   return fputws (wstr, file);
 #else
@@ -51,20 +51,60 @@ static int csFPutStr (FILE* file, const char* str)
   const utf8_char* ch = (utf8_char*)str;
   
   int n = 0;
-  while (*ch != 0)
+  while (len-- > 0)
   {
     utf8_char type = *ch & 0xc0;
     
     if (type <= 0x40)
-      fputc ((char)*ch, file);
-    else if (type == 0x80)
-      fputc ('?', file);
+    {
+      if (fputc ((char)*ch, file) == EOF) return EOF;
+      n++;
+    }
+    else if (type == 0xc0)
+    {
+      if (fputc ('?', file) == EOF) return EOF;
+      n++;
+    }
       
-    ch++; n++;
+    ch++; 
   }
   
   return n;
 #endif
+}
+
+static int csFPutStr (FILE* file, const char* str)
+{
+  bool isTTY = isatty (fileno (file));
+  
+  int ret = 0;
+  size_t ansiCommandLen;
+  csAnsiParser::CommandClass cmdClass;
+  size_t textLen;
+  // Check for ANSI codes
+  while (csAnsiParser::ParseAnsi (string, ansiCommandLen, cmdClass, textLen))
+  {
+    int rc;
+    if (isTTY && (cmdClass == csAnsiParser::classFormat))
+    {
+      // Only let formatting codes through
+      rc = cs_fputsn (file, str, ansiCommandLen);
+      if (rc == EOF)
+	return EOF;
+      ret += rc;
+    }
+
+    if (textLen > 0)
+    {
+      rc = cs_fputsn (file, str + ansiCommandLen, textLen);
+      if (rc == EOF)
+	return EOF;
+      ret += rc;
+    }
+
+    str += ansiCommandLen + textLen;
+  }
+  return ret;
 }
 
 // Replacement for vprintf()

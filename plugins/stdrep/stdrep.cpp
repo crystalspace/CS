@@ -200,6 +200,24 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   return true;
 }
 
+static const char* consolePrefix[5] = 
+{
+  CS_ANSI_BK CS_ANSI_FM CS_ANSI_FI,
+  CS_ANSI_BK CS_ANSI_FR CS_ANSI_FI,
+  CS_ANSI_BK CS_ANSI_FY CS_ANSI_FI,
+  "",
+  ""
+};
+
+static const char* consoleSuffix[5] = 
+{
+  CS_ANSI_RST,
+  CS_ANSI_RST,
+  CS_ANSI_RST,
+  "",
+  ""
+};
+
 bool csReporterListener::Report (iReporter*, int severity,
 	const char* msgID, const char* description)
 {
@@ -219,8 +237,9 @@ bool csReporterListener::Report (iReporter*, int severity,
   {
     if (!repeatedID)
     {
-      csPrintf ("\n%s:\n", msgID);
+      stdoutTmp << '\n' << msgID << ":\n";
     }
+    stdoutTmp << consolePrefix[severity];
     int offset = 0;
     while (strlen(description+offset)>77)
     {
@@ -230,20 +249,25 @@ bool csReporterListener::Report (iReporter*, int severity,
       if (linebreak>0)
       {
         str.Truncate (linebreak);
-        csPrintf ("  %s\n", str.GetData ());
+	stdoutTmp << "  " << str << '\n';
         offset += linebreak+1;
       }
       else
       {
         //csPrintf ("  %0.77s\n", str.GetData ());
-        csPrintf ("  %.77s\n", str.GetData ());
+	stdoutTmp << "  " << str << '\n';
         offset += 77;
       }
     }
-    csPrintf ("  %s\n", description+offset);
+    //csPrintf ("  %s\n", description+offset);
+    stdoutTmp << "  " << description+offset << '\n';
+    stdoutTmp << consoleSuffix[severity];
+    csPrintf ("%s", stdoutTmp.GetData());
+    stdoutTmp.Truncate (0);
   }
   if (dest_stderr[severity])
-    csFPutErr (msg.GetData());
+    csPrintfErr ("%s%s%s", consolePrefix[severity], msg.GetData(), 
+      consoleSuffix[severity]);
   if (dest_console[severity] && console)
     console->PutText ("%s", msg.GetData());
   if (dest_alert[severity] && nativewm)

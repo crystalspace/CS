@@ -20,10 +20,12 @@
 #include "cssysdef.h"
 #include <ctype.h>
 #include "cstool/initapp.h"
+#include "csutil/ansicolor.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/ref.h"
 #include "csutil/util.h"
+#include "csutil/sysfunc.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -122,7 +124,7 @@ static bool get2args (char *command, char *args, char *&arg1, char *&arg2,
 {
   if (!args)
   {
-    fprintf (stderr, "%s: arguments required\n", command);
+    csPrintfErr ("%s: arguments required\n", command);
     return false;
   }
 
@@ -132,7 +134,7 @@ static bool get2args (char *command, char *args, char *&arg1, char *&arg2,
   if (!*args && req2nd)
   {
 nodest:
-    fprintf (stderr, "%s: no second argument\n", command);
+    csPrintfErr ("%s: no second argument\n", command);
     return false;
   }
   arg2 = args;
@@ -160,7 +162,7 @@ static void get_option (char *&args, bool &opt)
 
 static void cmd_help (char *)
 {
-  printf(
+  csPrintf (
 "----========************* Virtual Shell commands: *************========----\n"
 "cat {-} file           Display file contents to console; with '-' in one pass\n"
 "cd {path}              Change directory to path; or to root if path not given\n"
@@ -191,7 +193,7 @@ static void cmd_help (char *)
 
 static void cmd_pwd (char *)
 {
-  printf ("%s\n", VFS->GetCwd ());
+  csPrintf ("%s\n", VFS->GetCwd ());
 }
 
 static void cmd_chdir (char *args)
@@ -209,7 +211,7 @@ static void cmd_cat (char *args)
     csRef<iDataBuffer> data (VFS->ReadFile (args));
     if (!data)
     {
-      fprintf (stderr, "cat: cannot read file \"%s\"\n", args);
+      csPrintfErr ("cat: cannot read file \"%s\"\n", args);
       return;
     }
 
@@ -220,7 +222,7 @@ static void cmd_cat (char *args)
     csRef<iFile> F (VFS->Open (args, VFS_FILE_READ));
     if (!F)
     {
-      fprintf (stderr, "cat: cannot open file \"%s\" for reading\n", args);
+      csPrintfErr ("cat: cannot open file \"%s\" for reading\n", args);
       return;
     }
 
@@ -229,7 +231,7 @@ static void cmd_cat (char *args)
       char buff [16];
       size_t len = F->Read (buff, sizeof (buff) - 1);
       buff [len] = 0;
-      printf ("%s", buff);
+      csPrintf ("%s", buff);
     }
   }
 }
@@ -239,12 +241,12 @@ static void cmd_create (char *args)
   csRef<iFile> F (VFS->Open (args, VFS_FILE_WRITE));
   if (!F)
   {
-    fprintf (stderr, "create: cannot create or open for writing file \"%s\"\n",
+    csPrintfErr ("create: cannot create or open for writing file \"%s\"\n",
       args);
     return;
   }
 
-  printf ("Copying from stdin to file \"%s\", enter EOF to finish\n", args);
+  csPrintf ("Copying from stdin to file \"%s\", enter EOF to finish\n", args);
   for (;;)
   {
     char buff [160];
@@ -253,11 +255,11 @@ static void cmd_create (char *args)
     size_t len = F->Write (buff, strlen (buff));
     if (len < strlen (buff))
     {
-      fprintf (stderr, "create: error writing to file \"%s\"\n", args);
+      csPrintfErr ("create: error writing to file \"%s\"\n", args);
       break;
     }
   }
-  printf ("done, closing file\n");
+  csPrintf ("done, closing file\n");
 }
 
 static void cmd_ls (char *args)
@@ -292,7 +294,7 @@ static void cmd_ls (char *args)
         size_t fs;
         if (!VFS->GetFileSize (fname, fs))
           fs = 0;
-        printf ("[%02d:%02d:%02d %02d-%02d-%04d]%9lu %s\n",
+        csPrintf ("[%02d:%02d:%02d %02d-%02d-%04d]%9lu %s\n",
 	  ft.hour, ft.min, ft.sec,
           ft.day, ft.mon + 1, ft.year, (unsigned long)fs, fname);
       }
@@ -303,20 +305,20 @@ static void cmd_ls (char *args)
           dirlen--;
         while (dirlen && fname [dirlen - 1] != VFS_PATH_SEPARATOR)
           dirlen--;
-        printf ("%-19s", fname + dirlen);
+        csPrintf ("%-19s", fname + dirlen);
         nl = true;
         if ((i & 3) == 3)
         {
-          printf ("\n");
+          csPrintf ("\n");
           nl = false;
         }
       }
     }
     if (nl)
-      printf ("\n");
+      csPrintf ("\n");
   }
   else
-    printf ("ls: no files to display\n");
+    csPrintf ("ls: no files to display\n");
 }
 
 static void cmd_cp (char *args)
@@ -347,7 +349,7 @@ static void cmd_cp (char *args)
         if (destname [strlen (destname) - 1] != VFS_PATH_SEPARATOR)
           strcat (destname, "/");
       strcat (destname, src + dirlen);
-      printf ("%s -> %s\n", src, destname);
+      csPrintf ("%s -> %s\n", src, destname);
       dst = destname;
     }
 
@@ -356,25 +358,25 @@ static void cmd_cp (char *args)
       csRef<iDataBuffer> data (VFS->ReadFile (src));
       if (!data)
       {
-        fprintf (stderr, "cp: cannot read file \"%s\"\n", src);
+        csPrintfErr ("cp: cannot read file \"%s\"\n", src);
         return;
       }
 
       if (!VFS->WriteFile (dst, **data, data->GetSize ()))
-        fprintf (stderr, "cp: error writing to file \"%s\"\n", dst);
+        csPrintfErr ("cp: error writing to file \"%s\"\n", dst);
     }
     else
     {
       csRef<iFile> dF (VFS->Open (dst, VFS_FILE_WRITE));
       if (!dF)
       {
-        fprintf (stderr, "cp: cannot open destination file \"%s\"\n", dst);
+        csPrintfErr ("cp: cannot open destination file \"%s\"\n", dst);
         return;
       }
       csRef<iFile> sF (VFS->Open (src, VFS_FILE_READ));
       if (!sF)
       {
-        fprintf (stderr, "cp: cannot open source file \"%s\"\n", src);
+        csPrintfErr ("cp: cannot open source file \"%s\"\n", src);
         return;
       }
       while (!sF->AtEOF ())
@@ -383,7 +385,7 @@ static void cmd_cp (char *args)
         size_t len = sF->Read (buff, sizeof (buff));
         if (dF->Write (buff, len) != len)
         {
-          fprintf (stderr, "cp: error writing to file \"%s\"\n", dst);
+          csPrintfErr ("cp: error writing to file \"%s\"\n", dst);
           break;
         }
       }
@@ -394,15 +396,15 @@ static void cmd_cp (char *args)
 static void cmd_rm (char *args)
 {
   if (!args)
-    fprintf (stderr, "rm: empty argument\n");
+    csPrintfErr ("rm: empty argument\n");
   else if (!VFS->DeleteFile (args))
-    fprintf (stderr, "rm: cannot remove file \"%s\"\n", args);
+    csPrintfErr ("rm: cannot remove file \"%s\"\n", args);
 }
 
 static void cmd_save (char *)
 {
   if (!VFS->SaveMounts (VFS_CONFIG_FILE))
-    fprintf (stderr, "save: cannot save VFS configuration file\n");
+    csPrintfErr ("save: cannot save VFS configuration file\n");
 }
 
 static void cmd_mount (char *args)
@@ -412,7 +414,7 @@ static void cmd_mount (char *args)
     return;
 
   if (!VFS->Mount (vpath, rpath))
-    fprintf (stderr, "mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
+    csPrintfErr ("mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
 }
 
 static void cmd_unmount (char *args)
@@ -425,7 +427,7 @@ static void cmd_unmount (char *args)
     rpath = 0;
 
   if (!VFS->Unmount (vpath, rpath))
-    fprintf (stderr, "unmount: cannot unmount \"%s\" from \"%s\"\n",
+    csPrintfErr ("unmount: cannot unmount \"%s\" from \"%s\"\n",
       rpath, vpath);
 }
 
@@ -440,13 +442,13 @@ static void cmd_config (char *args)
 
   if (!config)
   {
-    fprintf (stderr, "config: cannot load config file \"%s\" in %s\n",
+    csPrintfErr ("config: cannot load config file \"%s\" in %s\n",
       args, real_fs ? "real filesystem" : "VFS");
     return;
   }
 
   if (!VFS->LoadMountsFromFile (config))
-    fprintf (stderr,
+    csPrintfErr (
       "config: mount: cannot mount all directories found in config file.\n");
 }
 
@@ -464,12 +466,12 @@ static void cmd_exists (char *args)
 {
   if (!args)
   {
-    fprintf (stderr, "exists: empty argument\n");
+    csPrintfErr ("exists: empty argument\n");
     return;
   }
 
   bool IsDir = args [strlen (args) - 1] == '/';
-  printf ("%s \"%s\" %s\n", IsDir ? "Directory" : "File", args,
+  csPrintf ("%s \"%s\" %s\n", IsDir ? "Directory" : "File", args,
     VFS->Exists (args) ? "exists" : "does not exist");
 }
 
@@ -477,14 +479,14 @@ static void cmd_time (char *args)
 {
   if (!args)
   {
-    fprintf (stderr, "time: expected filename\n");
+    csPrintfErr ("time: expected filename\n");
     return;
   }
 
   csFileTime flmt;
   if (!VFS->GetFileTime (args, flmt))
   {
-    fprintf (stderr, "time: can not query file time (no such file maybe)\n");
+    csPrintfErr ("time: can not query file time (no such file maybe)\n");
     return;
   }
 
@@ -498,21 +500,21 @@ static void cmd_time (char *args)
   time.tm_year = flmt.year - 1900;
 
   // No newline needed; asctime() adds it for us.
-  printf ("Last file modification time: %s", asctime (&time));
+  csPrintf ("Last file modification time: %s", asctime (&time));
 }
 
 static void cmd_rpath (char *args)
 {
   if (!args)
   {
-    fprintf (stderr, "rpath: expected filename\n");
+    csPrintfErr ("rpath: expected filename\n");
     return;
   }
 
   csRef<iDataBuffer> db (VFS->GetRealPath (args));
   if (!db)
   {
-    fprintf(stderr, "rpath: no real-world path corresponding to `%s'\n", args);
+    csPrintfErr ("rpath: no real-world path corresponding to `%s'\n", args);
     return;
   }
 
@@ -527,26 +529,26 @@ static void cmd_mounts (char *args)
     bool nl = false;
     for (size_t i=0; i<mounts->Length (); i++)
     {
-      printf ("%-19s", mounts->Get (i));
+      csPrintf ("%-19s", mounts->Get (i));
       nl = true;
       if ((i & 3) == 3)
       {
-        printf ("\n");
+        csPrintf ("\n");
         nl = false;
       }
     }
     if (nl)
-      printf ("\n");
+      csPrintf ("\n");
   }
   else
-    printf ("mounts: no current mounts to display!\n");
+    csPrintf ("mounts: no current mounts to display!\n");
 }
 
 static void cmd_rmounts (char *args)
 {
   if (!args)
   {
-    fprintf (stderr, "rmounts: expected virtual mount path\n");
+    csPrintfErr ("rmounts: expected virtual mount path\n");
     return;
   }
 
@@ -555,11 +557,11 @@ static void cmd_rmounts (char *args)
   {
     for (size_t i=0; i<rpaths->Length (); i++)
     {
-      printf ("%s\n", rpaths->Get (i));
+      csPrintf ("%s\n", rpaths->Get (i));
     }
   }
   else
-    printf ("rmounts: no virtual mount at path `%s'\n", args);
+    csPrintf ("rmounts: no virtual mount at path `%s'\n", args);
 }
 
 static bool execute (char *command)
@@ -590,7 +592,7 @@ int main (int argc, char *argv [])
 
   if (!csInitializer::SetupConfigManager (object_reg, 0))
   {
-     fprintf (stderr, "couldn't setup config!\n");
+     csPrintfErr ("couldn't setup config!\n");
      return 1;
   }
 
@@ -602,27 +604,28 @@ int main (int argc, char *argv [])
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    fprintf (stderr, "Cannot load iVFS plugin\n");
+    csPrintfErr ("Cannot load iVFS plugin\n");
     return -1;
   }
 
   Cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   if (!Cfg)
   {
-    fprintf (stderr, "Cannot load iConfigManager plugin\n");
+    csPrintfErr ("Cannot load iConfigManager plugin\n");
     return -1;
   }
 
   VFS->MountRoot ("native");
 
-  printf ("Welcome to Virtual Shell\n"
+  csPrintf ("Welcome to Virtual Shell\n"
           "Type \"help\" to get a short description of commands\n"
           "\n");
 
   while (!ShutDown)
   {
     char command [999];
-    printf ("%s# ", VFS->GetCwd ());
+    csPrintf (CS_ANSI_FI CS_ANSI_FY "%s " CS_ANSI_FI_OFF 
+      CS_ANSI_FG "#" CS_ANSI_RST " ", VFS->GetCwd ());
     fflush (stdout);
     if (!fgets (command, sizeof(command), stdin))
     {
@@ -634,7 +637,7 @@ int main (int argc, char *argv [])
       char* s = command;
       trimwhite(s);
       if (s != 0 && !execute (s))
-        fprintf (stderr, "vsh: unknown command: [%s]\n", s);
+        csPrintfErr ("vsh: unknown command: [%s]\n", s);
     }
   }
 

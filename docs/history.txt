@@ -12,6 +12,13 @@ chronological order.
 	  The part in the light iterator needs more careful rewrite later.
 	- Marten reduced the density of the fog in flarge slightly so you 
 	  see anything in it.
+	- res added support for color output to the Win32 csPrintf(); it can
+	  now parse ansi sequences and set the console colors accordingly.
+	- res fixed a bug in the generic csPrintf(), it was incorrectly 
+	  writing non-ASCII chars in the cheap UTF8-to-ASCII mode.
+	- res augmented the generic csPrintf() to parse for ANSI code sequences
+	  to only output formatting sequences to a TTY.
+	- res made csparser and cssynldr use csReport().
 28-Feb-2005
 	- Jorrit changed the generation of the light ID so that it is
 	  compatible again for pseudo dynamic lights. Otherwise too many

@@ -1394,16 +1394,7 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
       (const char*)errmsg,
       (const char*)nodepath);
 
-  if (reporter)
-  {
-    reporter->Report (severity, msgid, "%s",
-    	(const char*)errmsg);
-  }
-  else
-  {
-    csPrintf ("Error ID: %s\n", msgid);
-    csPrintf ("Description: %s\n", (const char*)errmsg);
-  }
+  csReport (object_reg, severity, msgid, "%s",	(const char*)errmsg);
 }
 
 void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)

@@ -504,18 +504,7 @@ void csLoader::ReportError (const char* id, const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Error ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
+  csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
   va_end (arg);
 }
 
@@ -530,17 +519,7 @@ void csLoader::ReportNotify (const char* description, ...)
 void csLoader::ReportNotifyV (const char* id, const char* description,
 	va_list arg)
 {
-  if (Reporter)
-  {
-    Reporter->ReportV (CS_REPORTER_SEVERITY_NOTIFY, id,
-    	description, arg);
-  }
-  else
-  {
-    csPrintf ("%s: ", id);
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, CS_REPORTER_SEVERITY_NOTIFY, id, description, arg);
 }
 
 void csLoader::ReportNotify2 (const char* id, const char* description, ...)
@@ -555,18 +534,7 @@ void csLoader::ReportWarning (const char* id, const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (CS_REPORTER_SEVERITY_WARNING, id, description, arg);
-  }
-  else
-  {
-    char buf[1024];
-    vsprintf (buf, description, arg);
-    csPrintf ("Warning ID: %s\n", id);
-    csPrintf ("Description: %s\n", buf);
-  }
+  csReportV (object_reg, CS_REPORTER_SEVERITY_WARNING, id, description, arg);
   va_end (arg);
 }
 

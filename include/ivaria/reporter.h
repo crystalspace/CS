@@ -20,6 +20,7 @@
 #define __CS_IVARIA_REPORTER_H__
 
 #include <stdarg.h>
+#include "csutil/ansicolor.h"
 #include "csutil/scf.h"
 #include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
@@ -340,21 +341,21 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
     switch (severity)
     {
       case CS_REPORTER_SEVERITY_BUG:
-	csPrintf("BUG: ");
+	csPrintf(CS_ANSI_BK CS_ANSI_FM CS_ANSI_FI "BUG: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_ERROR:
         if (strncasecmp (description, "error", 5) != 0)
-	  csPrintf("ERROR: ");
+	  csPrintf(CS_ANSI_BK CS_ANSI_FR CS_ANSI_FI "ERROR: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_WARNING:
         if (strncasecmp (description, "warning", 7) != 0)
-	  csPrintf("WARNING: ");
+	  csPrintf(CS_ANSI_BK CS_ANSI_FY CS_ANSI_FI "WARNING: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_NOTIFY:
-        csPrintf("NOTIFY: ");
+	csPrintf ("NOTIFY: ");
 	break;
       case CS_REPORTER_SEVERITY_DEBUG:
-        csPrintf("DEBUG: ");
+	csPrintf(CS_ANSI_BK CS_ANSI_FW CS_ANSI_FI "DEBUG: " CS_ANSI_RST);
 	break;
     }
     csPrintfV(description, args);

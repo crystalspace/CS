@@ -88,6 +88,7 @@ private:
   bool silent;	// Don't show the yellow warnings if true.
   bool append;  // If data should be appended to debug file instead of new    
   static csString DefaultDebugFilename();
+  csString stdoutTmp;
 
 public:
   SCF_DECLARE_IBASE;
