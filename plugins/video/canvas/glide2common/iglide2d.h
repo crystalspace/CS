@@ -19,6 +19,7 @@
 #ifndef __IGLIDE2D_H__
 #define __IGLIDE2D_H__
 
+#include <glide.h>
 #include "csutil/scf.h"
 
 #ifdef GLIDE3
@@ -35,6 +36,8 @@ typedef struct {
   float r,g,b;
   MyGrTmuVertex tmuvtx[3];
 } MyGrVertex;
+#else
+typedef GrVertex MyGrVertex;
 #endif
 
 #if defined (OS_LINUX)

@@ -110,8 +110,11 @@ void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
     pal = Palette[i];
     p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
   }
-  
-  GlideLib_grTexDownloadTable( GR_TEXTABLE_PALETTE, &p);		
+#ifdef GLIDE3
+  GlideLib_grTexDownloadTable( GR_TEXTABLE_PALETTE, &p);
+#else
+  GlideLib_grTexDownloadTable( tmu, GR_TEXTABLE_PALETTE, &p);
+#endif
 }
 
 void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, int color)
@@ -285,9 +288,15 @@ void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
   if (Area)
   {
     if ( !locked ){
+#ifdef GLIDE3
       GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, 
                                  GR_LFB_SRC_FMT_565, Area->w, Area->h, 
 				 FXFALSE, Area->w*pfmt.PixelBytes, Area->data );
+#else
+      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, 
+                                 GR_LFB_SRC_FMT_565, Area->w, Area->h, 
+				 Area->w*pfmt.PixelBytes, Area->data );
+#endif
     }else{
       int x, y, n;
       unsigned char *data = (unsigned char*)Area->data;
