@@ -16,6 +16,7 @@ The history order is reversed so that new features are at the top.
 	  lghtmap.cpp.
 	- Eric Sunshine fixed bug: imgplex was not in the imgplexall pseudo-
 	  target.
+	- Daniel Duhprey fixed mesh collisions again and fixed the physics loader
 10-Mar-2003
 	- Added a few timing printfs in region code to debug long load times.
 	- A few optimizations in the spr2d plugin to make particle systems use
