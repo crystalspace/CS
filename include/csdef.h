@@ -63,10 +63,10 @@
  #define PI 3.1415926535897932385f
 #endif
 #ifndef HALF_PI
-  #define HALF_PI PI / 2.0f
+  #define HALF_PI (PI / 2.0f)
 #endif
 #ifndef TWO_PI
-  #define TWO_PI PI * 2.0f
+  #define TWO_PI (PI * 2.0f)
 #endif
 
 #undef EPSILON
