@@ -20,8 +20,6 @@
 #ifndef __CS_IVARIA_ODE_H__
 #define __CS_IVARIA_ODE_H__
 
-#ifdef CS_HAS_ODE
-
 #define int8 ode_int8
 #define uint8 ode_uint8
 #define int32 ode_int32
@@ -331,7 +329,5 @@ struct iODEJointState : public iBase
   virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
   virtual void SetHinge2Anchor (const csVector3& point) = 0;
 };
-
-#endif // CS_HAS_ODE
 
 #endif // __CS_IVARIA_ODE_H__

@@ -1321,9 +1321,7 @@ AS_IF([test $cs_cv_libode_recent = yes],
 	    [[#include <ode/ode.h>]],
 	    [dGeomTriMeshDataCreate();])],
 	[], [C++],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])
-	CS_HEADER_PROPERTY([CS_HAS_ODE])],
-	[], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
 	[cs_cv_libode_opcode=no])
 
@@ -1504,8 +1502,7 @@ AS_IF([test "$with_vos" != no],
 		[cs_cv_libvos=no])],
 	    [cs_cv_libvos=no])])
     AS_IF([test $cs_cv_libvos = yes],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])
-	CS_HEADER_PROPERTY([CS_HAS_VOS])])])
+	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])])
 
 
 
@@ -1573,8 +1570,7 @@ AS_IF([test $cs_cv_wxwidgets_ok = yes],
 	[C++])])
 
 AS_IF([test $cs_cv_wxwidgets_opengl = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])
-    CS_HEADER_PROPERTY([CS_HAS_WXWIDGETS])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])])
 
 
 

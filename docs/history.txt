@@ -14,6 +14,27 @@ chronological order.
 	- Eric Sunshine fixed logic flaw in the re-written (18-Sep-2004)
 	  csGetConfigPath() for MacOS/X in which it would sometimes return the
 	  incorrect path.
+	- Eric Sunshine made the following changes:
+	    - Augmented the 'masterheaders' Jam target so that it now omits
+	      several headers from the synthesized master headers because those
+	      headers reference external resources which may not be known or
+	      available to all clients of the master headers. Prior to this
+	      change, clients of the master headers had to utilize the `cflags'
+	      of each of these external resources if <crystalspace.h> was ever
+	      included. The list of headers now omitted from the master headers
+	      follows.
+	        csutil/archive.h  -- needs zlib (indirectly via csutil/zip.h)
+		csutil/zip.h	  -- needs zlib
+		inetwork/vosapi.h -- needs VOS
+		ivaria/ode.h	  -- needs ODE
+		ivideo/wxwin.h	  -- needs wxWidgets
+	      Clients requiring these headers will have to #include them
+	      manually; and will need to arrange with the build system that the
+	      appropriate `cflags' are used (typically by invoking the
+	      ExternalLibs Jam rule).
+	    - Agumented configure.ac so that it no longer emits CS_HAS_VOS,
+	      CS_HAS_ODE, and CS_HAS_WXWIDGETS to csconfig.h. These control
+	      macros have been obsoleted by the above change.
 20-Sep-2004
         - Andrew Craig fixed memory leak in csparser.
 	- PK did the following:

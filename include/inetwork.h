@@ -19,6 +19,5 @@
 
 #include "cssysdef.h"
 #include "inetwork/vosa3dl.h"
-#include "inetwork/vosapi.h"
 #endif /* __INETWORK_H__ */
 

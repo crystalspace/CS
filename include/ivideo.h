@@ -36,6 +36,5 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
-#include "ivideo/wxwin.h"
 #endif /* __IVIDEO_H__ */
 

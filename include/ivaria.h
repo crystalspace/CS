@@ -27,7 +27,6 @@
 #include "ivaria/keyval.h"
 #include "ivaria/mapnode.h"
 #include "ivaria/movierecorder.h"
-#include "ivaria/ode.h"
 #include "ivaria/pmeter.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"

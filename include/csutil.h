@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/archive.h"
 #include "csutil/array.h"
 #include "csutil/binder.h"
 #include "csutil/bintree.h"
@@ -113,7 +112,6 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/xmltiny.h"
-#include "csutil/zip.h"
 #if defined(CS_PLATFORM_MACOSX)
 #include "csutil/macosx/OSXAssistant.h"
 #elif defined(CS_PLATFORM_WIN32)

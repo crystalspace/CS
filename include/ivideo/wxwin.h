@@ -19,16 +19,14 @@
 #ifndef _CS_IVIDEO_WXWIN_H_
 #define _CS_IVIDEO_WXWIN_H_
 
-#ifdef CS_HAS_WXWIDGETS
-
 // wxWidgets boilerplate.
 #ifndef _WX_WXH__
-#include "wx/wxprec.h"
+#include <wx/wxprec.h>
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 #ifndef WX_PRECOMP
-#include "wx/wx.h"
+#include <wx/wx.h>
 #endif
 #endif
 
@@ -39,7 +37,5 @@ struct iWxWindow : public iBase
   virtual void SetParent(wxWindow* parent) = 0;
   virtual wxWindow* GetWindow() = 0;
 };
-
-#endif // CS_HAS_WXWIDGETS
 
 #endif
