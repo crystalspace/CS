@@ -167,38 +167,34 @@ ctRigidBody *pe_g;  // this handle
 		return;
 	}
 
-	//!me add error log
-	// ack something is wrong so try to limit the damage
-	if( jnt == NULL || jnt->inboard == NULL ){
-		ctVector3 vzero( 0.0,0.0,0.0 );
-		pe_g->set_angular_v( vzero );
-		pe_g->set_v( vzero );
-	}
+  // if we are not at root
+  if( jnt != NULL && jnt->inboard != NULL ){
 
-	pe_f = jnt->inboard->handle;
-	if( !pe_f ){
-		return;
-	}
+	  pe_f = jnt->inboard->handle;
+	  if( !pe_f ){
+		  return;
+	  }
 
-	// R_fg = R_world_g * R_f_world
-	// R is coord transfrom matrix, not rotation
-	R_fg = pe_g->get_world_to_this()*pe_f->get_this_to_world();
+	  // R_fg = R_world_g * R_f_world
+	  // R is coord transfrom matrix, not rotation
+	  R_fg = pe_g->get_world_to_this()*pe_f->get_this_to_world();
 
-	// vector from C.O.M. of F to G in G's ref frame.
-	r_fg = pe_g->get_T()*( pe_g->get_org_world() - pe_f->get_org_world() );
+	  // vector from C.O.M. of F to G in G's ref frame.
+	  r_fg = pe_g->get_T()*( pe_g->get_org_world() - pe_f->get_org_world() );
 
-	// calc contribution to v and w from parent link.
-//!me 1Dec99	pe_g->w = R_fg*pe_f->get_angular_v();
-//!me	1Dec99  pe_g->v = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
+	  // calc contribution to v and w from parent link.
+  //!me 1Dec99	pe_g->w = R_fg*pe_f->get_angular_v();
+  //!me	1Dec99  pe_g->v = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
   
-  ctVector3 w_prime = R_fg*pe_f->get_angular_v();
-  ctVector3 v_prime = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
+    ctVector3 w_prime = R_fg*pe_f->get_angular_v();
+    ctVector3 v_prime = R_fg*pe_f->get_v() + w_prime % r_fg;
 
-	// get joint to calculate final result for v and angular v ( w )
-	jnt->calc_vw( v_prime, w_prime );
-	
-  pe_g->set_angular_v( w_prime );
-  pe_g->set_v( v_prime );
+	  // get joint to calculate final result for v and angular v ( w )
+	  jnt->calc_vw( v_prime, w_prime );
+	  
+    pe_g->set_angular_v( w_prime );
+    pe_g->set_v( v_prime );
+  }
   
 	// iterate to next links
 	out_link = outboard_links.get_first();
@@ -236,7 +232,7 @@ ctArticulatedBody *out_link;
 	pe = handle;
 
 	if( pe ){
-		pe->solve( t );
+		pe->solve( t ); 
 		out_link = outboard_links.get_first();
 		while( out_link ){
 			out_link->apply_forces( t );
