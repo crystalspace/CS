@@ -33,6 +33,7 @@ The history order is reversed so that new features are at the top.
 	- Added some additional asserts in dynavis and frustvis for
 	  debugging purposes.
 	- Matze Braun added copy constructors and = operator to csArray.
+	- Daniel Duhprey updated genmesh with the UpdateLighting cache
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
