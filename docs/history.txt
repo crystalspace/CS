@@ -1,6 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+31-Jan-2001
+	- Norman Kramer did further work on the video plugins:
+	    - Extended PLUGIN var to build AVI and optionally opendivx.
 30-Jan-2001
+	- Norman Kramer did further work on the video plugins:
+	    - Removed some debug code and a stupid comment.
+	    - Divx codec works (AVI).
+	    - For opengl the pic is flipped vertically , eek (this is
+	      because I abused the csImageArea and filled it myself
+	      while it was actually meant to be filled by the renderer.
+	      Jorrit talked about introducing a FillPixelArray, which
+	      should solve this problem - or the csImageArea can be
+	      extended to do that ).
 	- Eric Sunshine changed the behavior of the -simdepth option in the
 	  AppKit-based Apple/NeXT 2D driver.  If the user specifies an illegal
 	  depth, then a suitable warning message is issued and the request is
@@ -10,8 +22,10 @@ The history order has been reversed so that new features are at the top.
 	  portably across different versions of GNU make.  In particular, the
 	  old definition failed to work correctly on MacOS/X Server 1.0
 	  (Rhapsody).
-	- Martin Geisse eliminated a few compiler warnings in csgfxldr and
-	  glcommon2d.cpp.
+	- Martin Geisse eliminated a few compiler warnings in csgfxldr,
+	  glcommon2d.cpp and MazeD.
+	- Martin also eliminated a few cases where options have different
+	  names in walktest sources and in config file.
 	- Eric Sunshine fixed potential a memory leak which Martin introduced
 	  in glcommon2d.cpp.
 	- Eric Sunshine fixed CS/include/cssys/next/csosdefs.h so that it
