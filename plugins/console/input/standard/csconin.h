@@ -109,20 +109,6 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  // Implement iEventHandler interface.
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csConsoleInput* parent;
-  public:
-    EventHandler (csConsoleInput* parent)
-    {
-      SCF_CONSTRUCT_IBASE (NULL);
-      EventHandler::parent = parent;
-    }
-    SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-  } * scfiEventHandler;
 
   // Implement iConsoleWatcher interface.
   struct eiConsoleWatcher : public iConsoleWatcher
