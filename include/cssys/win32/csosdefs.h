@@ -447,6 +447,17 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
   #define main csMain
 #endif
 
+// cygwin has no _beginthread and _endthread functions
+#ifdef __CYGWIN32__
+#ifndef _beginthread
+#define _beginthread(func, stack, ptr)	CreateThread (NULL, 0, \
+	  LPTHREAD_START_ROUTINE(func), ptr, CREATE_SUSPEND, 0)
+#endif
+#ifndef _endthread
+#define _endthread
+#endif
+#endif
+
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
