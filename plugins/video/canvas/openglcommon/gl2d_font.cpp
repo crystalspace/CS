@@ -211,7 +211,11 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
         }
         // set up the texture info
         memset (fontbitmapdata, 0, fontbitmapsize);
+#ifdef CS_USE_NEW_RENDERER'
+        glBindTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
+#else
         statecache->SetTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
+#endif   
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -349,6 +353,9 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
   statecache->Enable_GL_BLEND ();
   statecache->SetBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#ifdef CS_USE_NEW_RENDERER
+  glColorMask (true, true, true, true);
+#endif
 //  statecache->EnableState (GL_ALPHA_TEST);
 //  statecache->SetAlphaFunc (GL_EQUAL, 1.0);
 
@@ -382,7 +389,11 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
     if (hTexture != hLastTexture)
     {
       hLastTexture = hTexture;
+#ifdef CS_USE_NEW_RENDERER
+      glBindTexture (GL_TEXTURE_2D, hTexture);
+#else
       statecache->SetTexture (GL_TEXTURE_2D, hTexture);
+#endif
 
       if(verts2d.Length() > 0)
       {
