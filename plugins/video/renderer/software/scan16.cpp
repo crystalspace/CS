@@ -942,6 +942,82 @@ void Scan16::draw_pi_scanline_gouraud_565 (void *dest, int len, long *zbuff, lon
 
 //------------------------------------------------------------------
 
+#ifndef NO_draw_pi_scanline_transp_gouraud_555
+
+void Scan16::draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  UShort tex;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      tex = pal_table[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
+      if (tex)
+      {
+        r1 = tex >> 10;
+        g1 = (tex >> 5) & 0x1f;
+        b1 = tex & 0x1f;
+        r1 = (r1*r) >> (16+5);
+        g1 = (g1*g) >> (16+5);
+        b1 = (b1*b) >> (16+5);
+        *_dest = (r1<<10) | (g1<<5) | b1;
+        *zbuff = z;
+      }
+    }
+    _dest++;
+    zbuff++;
+    u += du; v += dv; z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_transp_gouraud_555
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_transp_gouraud_565
+
+void Scan16::draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *zbuff, long u, long du,
+  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+  long r, long g, long b, long dr, long dg, long db)
+{
+  UShort *_dest = (UShort *)dest;
+  UShort *_destend = _dest + len;
+  UShort tex;
+  int r1, g1, b1;
+  while (_dest < _destend)
+  {
+    if (z >= *zbuff)
+    {
+      tex = pal_table[*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
+      if (tex)
+      {
+        r1 = tex >> 11;
+        g1 = (tex >> 5) & 0x3f;
+        b1 = tex & 0x1f;
+        r1 = (r1*r) >> (16+5);
+        g1 = (g1*g) >> (16+6);
+        b1 = (b1*b) >> (16+5);
+        *_dest = (r1<<11) | (g1<<5) | b1;
+        *zbuff = z;
+      }
+    }
+    _dest++;
+    zbuff++;
+    u += du; v += dv; z += dz;
+    r += dr; g += dg; b += db;
+  } /* endwhile */
+}
+
+#endif // NO_draw_pi_scanline_transp_gouraud_565
+
+//------------------------------------------------------------------
+
 #ifndef NO_draw_pi_scanline_flat
 
 void Scan16::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, long du,

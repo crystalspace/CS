@@ -141,6 +141,16 @@ public:
                                 long u, long du, long v, long dv, long z, long dz,
                                 unsigned char *bitmap, int bitmap_log2w,
 				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a perspective-incorrect transparent texture mapped polygon scanline with gouraud shading.
+  static void draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
+  /// Draw a perspective-incorrect transparent texture mapped polygon scanline with gouraud shading.
+  static void draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *zbuff,
+                                long u, long du, long v, long dv, long z, long dz,
+                                unsigned char *bitmap, int bitmap_log2w,
+				long r, long g, long b, long dr, long dg, long db);
   /// Draw a flat shaded polygon scanline
   static void draw_pi_scanline_flat (void *dest, int len, long *zbuff,
                                 long u, long du, long v, long dv, long z, long dz,
