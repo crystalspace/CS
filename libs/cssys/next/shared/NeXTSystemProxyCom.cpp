@@ -99,7 +99,7 @@ void NeXTSystemProxy::mouse_down( int btn, int x, int y,
 //-----------------------------------------------------------------------------
 void NeXTSystemProxy::focus_changed( bool active ) const
     {
-    driver->do_focus( active );
+    driver->QueueFocusEvent( active );
     }
 
 

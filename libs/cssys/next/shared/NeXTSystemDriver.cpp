@@ -21,15 +21,12 @@
 #include "csutil/inifile.h"
 
 //-----------------------------------------------------------------------------
-// COM interface to NeXT-specific csSystemDriver.
+// SCF interface to NeXT-specific csSystemDriver.
 //-----------------------------------------------------------------------------
-BEGIN_INTERFACE_TABLE(SysSystemDriver)
-    IMPLEMENTS_COMPOSITE_INTERFACE(System)
-    IMPLEMENTS_COMPOSITE_INTERFACE(NeXTSystemDriver)
-END_INTERFACE_TABLE()
-
-IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(SysSystemDriver, NeXTSystemDriver)
+IMPLEMENT_IBASE(SysSystemDriver)
+    IMPLEMENTS_INTERFACE(iSystem)
+    IMPLEMENTS_INTERFACE(iNeXTSystemDriver)
+IMPLEMENT_IBASE_END
 
 
 //-----------------------------------------------------------------------------
@@ -38,6 +35,7 @@ IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(SysSystemDriver, NeXTSystemDriver)
 SysSystemDriver::SysSystemDriver() :
     csSystemDriver(), proxy(0), simulated_depth(0)
     {
+    CONSTRUCT_IBASE(0);
     printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
 	OS_NEXT_DESCRIPTION " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
     }
@@ -54,14 +52,12 @@ SysSystemDriver::~SysSystemDriver()
 
 
 //-----------------------------------------------------------------------------
-// Initialize -- Create the COM --> Objective-C proxy.
+// Initialize -- Create the SCF --> Objective-C proxy.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::Initialize( int argc, char* argv[],
-    char const* iConfigName, char const* iVfsConfigName, iConfig* iConfig )
+bool SysSystemDriver::Initialize( int argc, char* argv[], char const* cfgfile )
     {
     proxy = new NeXTSystemProxy( this );
-    return superclass::Initialize( argc, argv, iConfigName, iVfsConfigName,
-	iConfig );
+    return superclass::Initialize( argc, argv, cfgfile );
     }
 
 
@@ -71,11 +67,9 @@ bool SysSystemDriver::Initialize( int argc, char* argv[],
 void SysSystemDriver::SetSystemDefaults( csIniFile* config )
     {
     superclass::SetSystemDefaults(config);
-    simulated_depth = config->GetInt( "VideoDriver", "SIMULATE_DEPTH", 0 );
-
-    const char *val;
-    if ((val = GetOptionCL ( "simdepth" )))
-        simulated_depth = atoi( val );
+    char const* const s = GetOptionCL( "simdepth" );
+    simulated_depth = (s != 0 ?
+	atoi(s) : config->GetInt( "VideoDriver", "SimulateDepth", 0 ));
     }
 
 
@@ -102,9 +96,7 @@ void SysSystemDriver::Loop()
 //-----------------------------------------------------------------------------
 // GetSimulatedDepth
 //-----------------------------------------------------------------------------
-STDMETHODIMP SysSystemDriver::XNeXTSystemDriver::GetSimulatedDepth( int& d )
+int SysSystemDriver::GetSimulatedDepth() const
     {
-    METHOD_PROLOGUE( SysSystemDriver, NeXTSystemDriver )
-    d = pThis->simulated_depth;
-    return S_OK;
+    return simulated_depth;
     }

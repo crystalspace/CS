@@ -31,10 +31,9 @@ class SysMouseDriver    : public csMouseDriver    {};
 
 
 //-----------------------------------------------------------------------------
-// NeXT-specific subclass of csSystemDriver.  Conforms to iNeXTSystemDriver
-// COM-interface via composition.
+// NeXT-specific subclass of csSystemDriver.
 //-----------------------------------------------------------------------------
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iNeXTSystemDriver
     {
     typedef csSystemDriver superclass;
     friend NeXTSystemProxy;
@@ -46,14 +45,14 @@ private:
 public:
     SysSystemDriver();
     virtual ~SysSystemDriver();
-    virtual bool Initialize( int argc, char *argv[], char const* iConfigName,
-	char const* iVfsConfigName, iConfig* iOptions );
+    virtual bool Initialize( int argc, char *argv[], char const* iConfigName );
     virtual void SetSystemDefaults( csIniFile* );
     virtual void Help();
     virtual void Loop ();
 
-    // Implement iNeXTSystemDriver interface
-    virtual int GetSimulatedDepth ();
+    // Implement iNeXTSystemDriver interface.
+    virtual int GetSimulatedDepth() const;
+    DECLARE_IBASE;
     };
 
 #endif // __NeXT_NeXTSystemDriver_h

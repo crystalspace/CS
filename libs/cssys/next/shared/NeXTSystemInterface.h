@@ -14,14 +14,14 @@
 //-----------------------------------------------------------------------------
 // NeXTSystemInterface.h
 //
-//	A pure COM-compatible interface to the NeXT-specific csSystemDriver.
+//	A pure SCF interface to the NeXT-specific csSystemDriver.
 //
 //-----------------------------------------------------------------------------
 #include "csutil/scf.h"
 
 SCF_INTERFACE (iNeXTSystemDriver, 0, 0, 1) : public iBase
     {
-    virtual int GetSimulatedDepth () = 0;
+    virtual int GetSimulatedDepth() const = 0;
     };
 
 #endif // __NeXT_NeXTSystemInterface_h

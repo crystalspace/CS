@@ -28,10 +28,10 @@ SRC=./CS
 DST=${1-"outgoing"}
 PACK=${DST}/CS
 PROGS="walktest mazed blocks metademo"
-DATA="flarge.zip maze.zip room.zip MazeD.zip blocks.zip"
+DATA="standard.zip flarge.zip maze.zip room.zip MazeD.zip blocks.zip"
 DOCS="blocks.txt config.txt console.txt keys.txt README.NeXT"
 SRCFILES="autoexec.cfg blocks.cfg cryst.cfg softrndr.cfg coord MazeD.cfg \
-	metademo.cfg standard.zip"
+	metademo.cfg scf.cfg VFS.cfg"
 READMEFILES="README INSTALL.NeXT-Binary"
 
 AMBIENT=40

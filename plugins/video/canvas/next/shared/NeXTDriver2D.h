@@ -35,8 +35,6 @@ private:
     void setup_rgb_32();
 
 public:
-    DECLARE_IBASE;
-
     NeXTDriver2D::NeXTDriver2D( iBase* );
     virtual ~NeXTDriver2D();
     virtual bool Initialize( iSystem* );
@@ -44,6 +42,7 @@ public:
     virtual void Close();
     virtual void Print( csRect* = 0 );
     virtual bool SetMouseCursor( csMouseCursorID shape, iTextureHandle* );
+    DECLARE_IBASE;
     };
 
 #endif //__NeXT_NeXTDriver2D_h

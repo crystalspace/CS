@@ -16,30 +16,32 @@
 //	functionality via the AppKit.
 //
 //-----------------------------------------------------------------------------
+#include "sysdef.h"
 #include "NeXTDriver2D.h"
 #include "NeXTFrameBuffer.h"
 #include "NeXTProxy2D.h"
 #include "isystem.h"
 
-IMPLEMENT_FACTORY (NeXTDriver2D)
+IMPLEMENT_FACTORY(NeXTDriver2D)
 
-EXPORT_CLASS_TABLE (next2d)
-  EXPORT_CLASS (NeXTDriver2D, "crystalspace.graphics2d.next",
-    "MacOS/X Server, OpenStep, and NextStep 2D graphics driver for Crystal Space")
+EXPORT_CLASS_TABLE(next2d)
+    EXPORT_CLASS(NeXTDriver2D, "crystalspace.graphics2d.next",
+	"MacOS/X Server, OpenStep, and NextStep 2D graphics driver for "
+	"Crystal Space")
 EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_IBASE (NeXTDriver2D)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE(NeXTDriver2D)
+    IMPLEMENTS_INTERFACE(iPlugIn)
+    IMPLEMENTS_INTERFACE(iGraphics2D)
 IMPLEMENT_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTDriver2D::NeXTDriver2D( iBase* iParent ) :
+NeXTDriver2D::NeXTDriver2D( iBase* p ) :
     csGraphics2D(), next_system(0), proxy(0)
     {
-    CONSTRUCT_IBASE (iParent);
+    CONSTRUCT_IBASE(p);
     }
 
 
@@ -51,6 +53,8 @@ NeXTDriver2D::~NeXTDriver2D()
     Close();
     if (proxy != 0)
 	delete proxy;
+    if (next_system != 0)
+	next_system->DecRef();
     Memory = 0;
     }
 
@@ -59,39 +63,42 @@ NeXTDriver2D::~NeXTDriver2D()
 // Initialize
 //	We only support depth of 15 or 32.  See README.NeXT for an explanation.
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::Initialize(iSystem *pSystem)
+bool NeXTDriver2D::Initialize(iSystem* s)
     {
-    if (!superclass::Initialize(pSystem))
-        return false;
-
-    next_system = QUERY_INTERFACE (System, iNeXTSystemDriver);
-    if (!next_system)
+    bool ok = superclass::Initialize(s);
+    if (ok)
 	{
-	CsPrintf( MSG_FATAL_ERROR, "FATAL: The system driver does not "
-		"support the iNeXTSystemDriver interface\n" );
-	return false;
-	}
-
-    int simulated_depth = next_system->GetSimulatedDepth();
-    proxy = new NeXTProxy2D( Width, Height, simulated_depth );
-    NeXTFrameBuffer const* const frame_buffer = proxy->get_frame_buffer();
-    if (frame_buffer != 0)
-	{
-	Depth  = frame_buffer->depth();
-	Memory = frame_buffer->get_raw_buffer();
-	pfmt.RedMask    = frame_buffer->red_mask();
-	pfmt.GreenMask  = frame_buffer->green_mask();
-	pfmt.BlueMask   = frame_buffer->blue_mask();
-	pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
-	pfmt.PalEntries = frame_buffer->palette_entries();
-	complete_pixel_format();
-	switch (Depth)
+	next_system = QUERY_INTERFACE (System, iNeXTSystemDriver);
+	if (next_system != 0)
 	    {
-	    case 15: setup_rgb_15(); break;
-	    case 32: setup_rgb_32(); break;
+	    int simulated_depth = next_system->GetSimulatedDepth();
+	    proxy = new NeXTProxy2D( Width, Height, simulated_depth );
+	    NeXTFrameBuffer const* frame_buffer = proxy->get_frame_buffer();
+	    if (frame_buffer != 0)
+		{
+		Depth  = frame_buffer->depth();
+		Memory = frame_buffer->get_raw_buffer();
+		pfmt.RedMask    = frame_buffer->red_mask();
+		pfmt.GreenMask  = frame_buffer->green_mask();
+		pfmt.BlueMask   = frame_buffer->blue_mask();
+		pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
+		pfmt.PalEntries = frame_buffer->palette_entries();
+		complete_pixel_format();
+		switch (Depth)
+		    {
+		    case 15: setup_rgb_15(); break;
+		    case 32: setup_rgb_32(); break;
+		    }
+		}
+	    }
+	else
+	    {
+	    ok = false;
+	    System->Print( MSG_FATAL_ERROR, "FATAL: The system driver does "
+		"not support the iNeXTSystemDriver interface\n" );
 	    }
 	}
-    return true;
+    return ok;
     }
 
 
@@ -100,10 +107,10 @@ bool NeXTDriver2D::Initialize(iSystem *pSystem)
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::setup_rgb_15()
     {
-    DrawPixel  = DrawPixel16;
-    WriteChar  = WriteChar16;
-    GetPixelAt = GetPixelAt16;
-    DrawSprite = DrawSprite16;
+    _DrawPixel  = DrawPixel16;
+    _WriteChar  = WriteChar16;
+    _GetPixelAt = GetPixelAt16;
+    _DrawSprite = DrawSprite16;
     }
 
 
@@ -112,10 +119,10 @@ void NeXTDriver2D::setup_rgb_15()
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::setup_rgb_32()
     {
-    DrawPixel  = DrawPixel32;
-    WriteChar  = WriteChar32;
-    GetPixelAt = GetPixelAt32;
-    DrawSprite = DrawSprite32;
+    _DrawPixel  = DrawPixel32;
+    _WriteChar  = WriteChar32;
+    _GetPixelAt = GetPixelAt32;
+    _DrawSprite = DrawSprite32;
     }
 
 
@@ -155,7 +162,7 @@ void NeXTDriver2D::Print( csRect* )
 //-----------------------------------------------------------------------------
 // SetMouseCursor
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape, iTextureHandle* bitmap )
+bool NeXTDriver2D::SetMouseCursor( csMouseCursorID c, iTextureHandle* bitmap )
     {
-    return proxy->set_mouse_cursor( shape, bitmap );
+    return proxy->set_mouse_cursor( c, bitmap );
     }

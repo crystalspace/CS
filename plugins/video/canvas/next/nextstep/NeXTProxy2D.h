@@ -21,6 +21,7 @@
 // *WARNING* Do NOT include any COM or Objective-C headers in this file.
 //-----------------------------------------------------------------------------
 #include "types.h"	// For bool.
+#include "igraph2d.h"
 @class NeXTView, Window;
 class NeXTFrameBuffer;
 class iTextureHandle;
@@ -41,7 +42,7 @@ public:
     bool open( char const* title );
     void close();
     void flush();
-    bool set_mouse_cursor( int shape, iTextureHandle* );
+    bool set_mouse_cursor( csMouseCursorID shape, iTextureHandle* );
     };
 
 #endif //__NeXT_NeXTProxy2D_h
