@@ -8,6 +8,19 @@ The history order is reversed so that new features are at the top.
 18-Sep-2001
 	- Changed orientation for default XPLANE so it matches better
 	  with ZPLANE.
+	- Philip Wyett Removed VC on exit crasher workaround. Under dev team
+	  agreement a crasher is preferred to a possibly forgotten
+	  workaround until the errors true source is located.
+	- Wouter Wijngaards added a new idea for doing skydomes that should
+	  be performant. This uses the ball mesh and gouraud shading. Added
+	  demosky2 app with a small demo of current options:
+	    - A vertical gradient can be displayed easily.
+	    - A lightspot can be created - for the sun for example.
+	- Norman Kramer removed a debugging message in thing.cpp.
+	- Norman Kramer did the following for OpenGL renderer:
+	    - Refcounting is fine now for normal textures.
+	    - Refcounting is screwed for procedural textures but at least the
+	      openglrender does not crash :)
 17-Sep-2001
 	- Added the following short-hands to the thing loader:
 	    - V for VERTEX in a thing or thing-part.
