@@ -93,7 +93,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Allocate a buffer of the specified type and return it
-  csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
+  csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
 
 };
 

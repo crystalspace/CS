@@ -101,8 +101,7 @@ SCF_VERSION (iRenderBufferManager, 0, 0, 2);
 struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-
-  virtual csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE type) = 0;
+  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE type) = 0;
 
 };
 

@@ -416,6 +416,8 @@ private:
   bool mesh_colors_dirty_flag;
   bool mesh_triangle_dirty_flag;
 
+  bool autonormals;
+
   csRef<iRender3D> r3d;
 
   csRef<iRenderBuffer> vertex_buffer;
@@ -498,7 +500,8 @@ public:
   csVector3* GetNormals () { SetupFactory (); return mesh_normals; }
   csColor* GetColors () { SetupFactory (); return mesh_colors; }
 #else
-  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; return mesh_vertices; }
+  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; 
+    mesh_tri_normals_dirty_flag = true; return mesh_vertices; }
   csVector2* GetTexels () { mesh_texels_dirty_flag = true; return mesh_texels; }
   csVector3* GetNormals () { mesh_normals_dirty_flag = true; return mesh_normals; }
   csColor* GetColors () { mesh_colors_dirty_flag = true; return mesh_colors; }
