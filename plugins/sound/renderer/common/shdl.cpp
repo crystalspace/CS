@@ -57,14 +57,17 @@ bool csSoundHandle::IsStatic()
 
 csPtr<iSoundSource> csSoundHandle::Play(bool Loop)
 {
+  // Looping the source on streaming sound handles makes no sense
+  if (!IsStatic())
+    Loop=false;
+
   csRef<iSoundSource> src (CreateSource(SOUND3D_DISABLE));
   if (src)
   {
     src->Play(Loop ? SOUND_LOOP : 0);
-  }
-  if (Loop)
     return csPtr<iSoundSource> (src);
-  else return 0;
+  }
+  return 0;
 }
 
 void csSoundHandle::StartStream(bool Loop)
