@@ -14,6 +14,10 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 21-Dec-1999
+	- Changes from Michael Dale Long to CrystalClear. Added initial
+	  iPhysicsConfig interface and implementation.  More code to come.
+	  It looks like we'll be able to use csPhyziks but I'll have to
+	  look more closely at it. Also some updates to the documentation.
 	- Change to build.pl and cssh.py from Brandon Ehle.
 	- Changes to MazeD from Andrew Zabolotny.
 	- Finally found the remaining bugs in the coverage mask tree
