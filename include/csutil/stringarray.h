@@ -139,7 +139,7 @@ public:
   int Find (const char* what) const
   {
     for (int i = 0; i < Length (); i++)
-      if (strcmp (Get (i), what))
+      if (! strcmp (Get (i), what))
         return i;
     return -1;
   }
@@ -151,7 +151,7 @@ public:
   int FindCaseInsensitive (const char* what) const
   {
     for (int i = 0; i < Length (); i++)
-      if (strcasecmp (Get (i), what))
+      if (!strcasecmp (Get (i), what))
         return i;
     return -1;
   }
