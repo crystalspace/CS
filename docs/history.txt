@@ -19,6 +19,8 @@ chronological order.
 		csMath3::Direction3(): which will return something <0 or
 		>0 depending on the direction of the triangle.
 	- Jorrit renamed csPoly3D::GetSignedArea() to GetArea().
+	- Neil Mosafi changed odedynam's default move callback to not call
+	  UpdateMove unless something has actually changed
 7-Jun-2004
 	- Jorrit added an assignement operator to csHashMapReversible.
 	  This actually fixes the crash at exit bug for some of the CSWS
