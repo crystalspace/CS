@@ -7790,7 +7790,7 @@ WORLD (
     )
     )
     )
-    LIGHT (6,-15,38:20,.1,.2,.9,0)
+    LIGHT (6,-15,38:20,.7,.7,.9,0)
   )
   SECTOR 'kamer2d' (
     MESHOBJ 'walls' (
