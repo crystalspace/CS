@@ -18,7 +18,7 @@ Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-Microsoft Visual C++ 5 and 6 and @sc{dos} users can download a single package
+Microsoft Visual C++ 6 and @sc{dos} users can download a single package
 which contains all headers, pre-built library files, and dynamic link libraries
 in pre-compiled form from the following location on the Crystal Space server:
 
