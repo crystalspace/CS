@@ -99,7 +99,7 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
 {
   csSprite3D *tsprt;
   
-  tsprt = new csSprite3D();
+  tsprt = new csSprite3D(view->GetWorld ());
   tsprt->SetTemplate( tmpl );
   view->GetWorld ()->sprites.Push (tsprt);
   tsprt->MoveToSector (aroom);
@@ -338,7 +338,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
       Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
       return;
     }
-    bot = new csSprite3D();
+    bot = new csSprite3D(view->GetWorld ());
     bot->SetTemplate( tmpl );
     view->GetWorld ()->sprites.Push (bot);
     bot->MoveToSector (room);

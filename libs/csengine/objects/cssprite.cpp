@@ -28,6 +28,7 @@
 #include "csengine/sector.h"
 #include "csengine/bspbbox.h"
 #include "csengine/dumper.h"
+#include "csengine/particle.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/fastsqrt.h"
 #include "csutil/garray.h"
@@ -140,10 +141,10 @@ void csSpriteTemplate::SetSkeleton (csSkeleton* sk)
   skeleton = sk;
 }
 
-csSprite3D* csSpriteTemplate::NewSprite ()
+csSprite3D* csSpriteTemplate::NewSprite (csObject* parent)
 {
   csSprite3D* spr;
-  spr = new csSprite3D ();
+  spr = new csSprite3D (parent);
   spr->SetTemplate (this);
   spr->SetAction ("default");
   spr->InitSprite ();
@@ -152,9 +153,6 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
-// @@@ TEMPORARILY DISABLED LOD BECAUSE IT IS BROKEN RIGHT NOW.
-// WE NEED TO SEE WHAT IS WRONG IN THIS ROUTINE.
-//return;
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -361,7 +359,7 @@ IMPLEMENT_IBASE (csSprite)
   IMPLEMENTS_INTERFACE(iParticle)
 IMPLEMENT_IBASE_END
 
-csSprite::csSprite () : csObject ()
+csSprite::csSprite (csObject* theParent) : csObject ()
 {
   CONSTRUCT_IBASE (NULL);
   dynamiclights = NULL;
@@ -373,20 +371,28 @@ csSprite::csSprite () : csObject ()
   is_visible = false;
   camera_cookie = 0;
   ptree_obj = NULL;
+  myOwner = NULL;
+  parent = theParent;
 }
 
 csSprite::~csSprite ()
 {
   while (dynamiclights) delete dynamiclights;
-  csWorld::current_world->UnlinkSprite (this);
-  //RemoveFromSectors ();
+  if (parent->GetType () == csWorld::Type)
+  {
+    csWorld* world = (csWorld*)parent;
+    world->UnlinkSprite (this);
+  }
 }
 
 void csSprite::MoveToSector (csSector* s)
 {
   RemoveFromSectors ();
-  sectors.Push (s);
-  s->sprites.Push (this);
+  if (parent->GetType () == csWorld::Type)
+  {
+    sectors.Push (s);
+    s->sprites.Push (this);
+  }
   UpdateInPolygonTrees ();
 }
 
@@ -394,6 +400,7 @@ void csSprite::RemoveFromSectors ()
 {
   if (GetPolyTreeObject ())
     GetPolyTreeObject ()->RemoveFromTree ();
+  if (parent->GetType () != csWorld::Type) return;
   while (sectors.Length () > 0)
   {
     csSector* ss = (csSector*)sectors.Pop ();
@@ -409,6 +416,17 @@ void csSprite::RemoveFromSectors ()
   }
 }
 
+csNamedObjVector& csSprite::GetSectors ()
+{
+  if (parent->GetType () == csWorld::Type) return sectors;
+  else if (parent->GetType () >= csSprite::Type)
+  {
+    csSprite* sppar = (csSprite*)parent;
+    return sppar->GetSectors ();
+  }
+  else return sectors;	// @@@ Not valid!
+}
+
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
 
@@ -419,7 +437,7 @@ void csSprite::UpdateDeferedLighting (const csVector3& pos)
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    csSector* sect = (csSector*)sectors[0];
+    csSector* sect = GetSector (0);
     int num_lights = csWorld::current_world->GetNearbyLights (sect,
       pos, defered_lighting_flags,
       light_worktable.GetArray (), defered_num_lights);
@@ -467,7 +485,7 @@ static DECLARE_GROWING_ARRAY (obj_verts, csVector3);
 /// The list of tween vertices.
 static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
 
-csSprite3D::csSprite3D () : csSprite (), bbox (NULL)
+csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
 {
   bbox.SetOwner (this);
   ptree_obj = &bbox;
@@ -531,7 +549,7 @@ bool csSprite3D::SetPositionSector (const csVector3 &move_to)
   csSector* pNewSector;//  = currentSector;
 
   bool mirror = false;
-  pNewSector = ((csSector*)sectors[0])->FollowSegment (OldPos, new_pos, mirror);
+  pNewSector = GetSector (0)->FollowSegment (OldPos, new_pos, mirror);
 
   if (pNewSector &&
       ABS (new_pos.x-move_to.x) < SMALL_EPSILON &&
@@ -712,9 +730,10 @@ void csSprite3D::UpdateInPolygonTrees ()
   // moving in normal convex sectors.
   int i;
   csPolygonTree* tree = NULL;
-  for (i = 0 ; i < sectors.Length () ; i++)
+  csNamedObjVector& sects = GetSectors ();
+  for (i = 0 ; i < sects.Length () ; i++)
   {
-    tree = ((csSector*)sectors[i])->GetStaticTree ();
+    tree = ((csSector*)sects[i])->GetStaticTree ();
     if (tree) break;
   }
   if (!tree) return;
@@ -802,9 +821,9 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->Transform (trans);
 
   // Here we need to insert in trees where this sprite lives.
-  for (i = 0 ; i < sectors.Length () ; i++)
+  for (i = 0 ; i < sects.Length () ; i++)
   {
-    tree = ((csSector*)sectors[i])->GetStaticTree ();
+    tree = ((csSector*)sects[i])->GetStaticTree ();
     if (tree)
     {
       // Temporarily increase reference to prevent free.
@@ -1238,7 +1257,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   // this is so that sprite gets blackened if no light strikes it
   AddVertexColor (0, csColor (0, 0, 0));
 
-  csSector * sect = (csSector*)sectors[0];
+  csSector * sect = GetSector (0);
   if (sect)
   {
     int r, g, b;

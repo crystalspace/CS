@@ -194,7 +194,7 @@ public:
    * no default action the first action will be made default.
    * The sprite will also be initialized (csSprite3D::InitSprite()).
    */
-  csSprite3D* NewSprite ();
+  csSprite3D* NewSprite (csObject* parent);
 
   /// Set the skeleton for this sprite template.
   void SetSkeleton (csSkeleton* sk);
@@ -322,6 +322,12 @@ protected:
   csObject* myOwner;
 
   /**
+   * Points to the parent container object of this sprite.
+   * This is usually csWorld or csParticleSystem.
+   */
+  csObject* parent;
+
+  /**
    * Camera space bounding box is cached here.
    * GetCameraBoundingBox() will check the current cookie from the
    * transformation manager to see if it needs to recalculate this.
@@ -372,20 +378,43 @@ protected:
   /// Update defered lighting.
   void UpdateDeferedLighting (const csVector3& pos);
 
-public:
-  /// List of sectors where this sprite is.
+private:
+  /**
+   * List of sectors where this sprite is.
+   * This list is only valid if the sprite is connected directly
+   * to the world (i.e. parent is a csWorld object).
+   */
   csNamedObjVector sectors;
 
 public:
   /// Constructor.
-  csSprite ();
+  csSprite (csObject* theParent);
   /// Destructor.
   virtual ~csSprite ();
 
   /// Set owner (actor) for this sprite.
-  void SetMyOwner (csObject *newOwner) { myOwner = newOwner; }
+  void SetMyOwner (csObject* newOwner) { myOwner = newOwner; }
   /// Get owner (actor) for this sprite.
   csObject* GetMyOwner () { return myOwner; }
+
+  /// Set parent container for this sprite.
+  void SetParentContainer (csObject* newParent) { parent = newParent; }
+  /// Get parent container for this sprite.
+  csObject* GetParentContainer () { return parent; }
+
+  /**
+   * Get list of sectors for this sprite. This is either the
+   * list of sectors for this sprite itself if the sprite is linked
+   * directly to the world or else the list of sectors for the parent
+   * object that contains this sprite.
+   */
+  csNamedObjVector& GetSectors ();
+
+  /**
+   * Get the specified sector where this sprite lives.
+   * (conveniance function).
+   */
+  csSector* GetSector (int idx) { return (csSector*)GetSectors ()[idx]; }
 
   /// Get the pointer to the object to place in the polygon tree.
   csPolyTreeObject* GetPolyTreeObject ()
@@ -413,7 +442,7 @@ public:
    * This will call world->GetNearestLights with the supplied
    * parameters.
    */
-  void DeferUpdateLighting (int flags, int num_lights);
+  virtual void DeferUpdateLighting (int flags, int num_lights);
 
   /// Sets the mode that is used, when drawing that sprite.
   void SetMixmode (UInt m) { MixMode = m; }
@@ -606,7 +635,7 @@ protected:
 
 public:
   ///
-  csSprite3D ();
+  csSprite3D (csObject* theParent);
   ///
   virtual ~csSprite3D ();
 

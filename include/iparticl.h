@@ -22,8 +22,9 @@
 #include "csutil/scf.h"
 class csColor;
 class csVector3;
+class csRenderView;
 
-SCF_VERSION (iParticle, 0, 0, 0);
+SCF_VERSION (iParticle, 0, 0, 1);
 
 /**
  *  An iParticle can be used in particle Systems.
@@ -51,6 +52,12 @@ struct iParticle : public iBase
   virtual void SetMixmode(UInt mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
   virtual void Rotate(float angle) = 0;
+  /// Draw this particle.
+  virtual void Draw (csRenderView& rview) = 0;
+  /// Light this particle.
+  virtual void UpdateLighting (csLight** lights, int num_lights) = 0;
+  /// Light this particle as soon as it is visible.
+  virtual void DeferUpdateLighting (int flags, int num_lights) = 0;
 };
 
 #endif // __IPARTCL_H__

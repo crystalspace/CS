@@ -76,7 +76,7 @@ protected:
 
 public:
   ///
-  csSprite2D ();
+  csSprite2D (csObject* theParent);
   ///
   virtual ~csSprite2D ();
 

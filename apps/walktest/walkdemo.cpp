@@ -127,12 +127,13 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
-    csRainParticleSystem* exp = new csRainParticleSystem (num,
+    csRainParticleSystem* exp = new csRainParticleSystem (
+    	  Sys->view->GetWorld (), num,
   	  txt, CS_FX_ADD, false, .3/50., .3,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
     exp->MoveToSector (sector);
-    exp->SetColor (csColor (.35,.35,.35));
+    exp->SetColor (csColor (.25,.25,.25));
   }
 }
 
@@ -150,7 +151,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* t
     return;
   }
 
-  csParSysExplosion* exp = new csParSysExplosion (100,
+  csParSysExplosion* exp = new csParSysExplosion (
+  	Sys->view->GetWorld (), 100,
   	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.);
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
@@ -177,7 +179,8 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtn
     return;
   }
 
-  csSpiralParticleSystem* exp = new csSpiralParticleSystem (500,
+  csSpiralParticleSystem* exp = new csSpiralParticleSystem (
+  	Sys->view->GetWorld (), 500,
   	bottom, txt);
   exp->MoveToSector (sector);
   //exp->SetSelfDestruct (3000);
@@ -589,7 +592,7 @@ extern int num_our_cd;
 void move_ghost (csSprite3D* spr)
 {
   csRAPIDCollider* col = csRAPIDCollider::GetRAPIDCollider (*spr);
-  csSector* first_sector = (csSector*)(spr->sectors[0]);
+  csSector* first_sector = spr->GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
@@ -900,7 +903,7 @@ void fire_missile ()
     Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite template!\n", misname);
   else
   {
-    csSprite3D* sp = tmpl->NewSprite ();
+    csSprite3D* sp = tmpl->NewSprite (Sys->view->GetWorld ());
     sp->SetName ("missile");
     Sys->view->GetWorld ()->sprites.Push (sp);
     sp->MoveToSector (Sys->view->GetCamera ()->GetSector ());

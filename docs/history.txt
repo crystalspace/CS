@@ -1,5 +1,23 @@
 The history order has been reversed so that new features are at the top.
 
+17-Jun-2000
+	- Fundamental change in how the particle systems work.
+	  A particle system now also inherits from csSprite and
+	  is controlled like other sprites. So for the engine as
+	  such a particle system behaves just like any other sprite.
+	  In addition a particle system will now control its own
+	  children. So sprites inside a particle system will not be
+	  added to the entire world anymore but will be local to
+	  the particle system. This will make optimizations (i.e.
+	  DrawTriangleMesh) and visibility for the entire particle
+	  system easier to manage. A particle system of 1000
+	  particles would cause 1000 visibility checks in the engine.
+	  Now the entire particle system can be handled with one check.
+	- csSprite now expects a new 'parent' csObject which can currently
+	  be either csWorld or csParticleSystem. This is an important
+	  change which will require changes in potentially all applications
+	  using CS. csSpriteTemplate::NewSprite() also has the new
+	  parent parameter.
 16-Jun-2000
 	- Improved the 'rain' console command in WalkTest so that it
 	  adds rain to the entire current sector. There are now three

@@ -181,7 +181,7 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
     Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
     return NULL;
   }
-  csSprite3D* spr = tmpl->NewSprite ();
+  csSprite3D* spr = tmpl->NewSprite (Sys->view->GetWorld ());
   spr->SetName (sname);
   Sys->view->GetWorld ()->sprites.Push (spr);
   spr->MoveToSector (where);

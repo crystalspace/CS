@@ -35,6 +35,7 @@
 #include "csengine/thingtpl.h"
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
+#include "csengine/csspr2d.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
 #include "csengine/solidbsp.h"
@@ -361,7 +362,6 @@ void csWorld::Clear ()
 {
   halos.DeleteAll ();
   collections.DeleteAll ();
-  particle_systems.DeleteAll ();
   while (sprites.Length () > 0)
     delete (csSprite*)sprites[0];
   sprite_templates.DeleteAll ();
@@ -1231,22 +1231,28 @@ void csWorld::RemoveDynLight (csDynLight* dyn)
 void csWorld::UpdateParticleSystems (time_t elapsed_time)
 {
   int i;
-  for (i = 0 ; i < particle_systems.Length () ; i++)
+  for (i = 0 ; i < sprites.Length () ; i++)
   {
-    csParticleSystem* ps = (csParticleSystem*)particle_systems[i];
-    ps->Update (elapsed_time);
-  }
-  // delete particle systems that self-destructed now.
-  for (i = 0 ; i < particle_systems.Length () ; i++)
-  {
-    csParticleSystem* ps = (csParticleSystem*)particle_systems[i];
-    while(i< particle_systems.Length () && ps->GetDelete())
+    csSprite* sp = (csSprite*)sprites[i];
+    if (sp->GetType () >= csParticleSystem::Type)
     {
-      particle_systems.Delete(i);
-      // process the new element at i .
-      if(i < particle_systems.Length ())
-        ps = (csParticleSystem*)particle_systems[i];
+      csParticleSystem* partsys = (csParticleSystem*)sp;
+      partsys->Update (elapsed_time);
     }
+  }
+
+  // Delete particle systems that self-destructed now.
+  i = sprites.Length ()-1;
+  while (i >= 0)
+  {
+    csSprite* sp = (csSprite*)sprites[i];
+    if (sp->GetType () >= csParticleSystem::Type)
+    {
+      csParticleSystem* partsys = (csParticleSystem*)sp;
+      if (partsys->GetDelete ())
+        delete partsys;
+    }
+    i--;
   }
 
 }

@@ -28,7 +28,7 @@
 
 IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 
-csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
+csSprite2D::csSprite2D (csObject* theParent) : csSprite (theParent), position (0, 0, 0)
 {
   cstxt = NULL;
   lighting = true;
@@ -125,7 +125,7 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
   if (!lighting) return;
   csColor color (0, 0, 0);
 
-  csSector* sect = (csSector*)sectors[0];
+  csSector* sect = GetSector (0);
   if (sect)
   {
     int r, g, b;
@@ -164,11 +164,11 @@ void csSprite2D::Draw (csRenderView& rview)
     fatal_exit (0, false);
   }
 
-  UpdateDeferedLighting (position);
-
   // Camera transformation for the single 'position' vector.
   csVector3 cam = rview.Other2This (position);
   if (cam.z < SMALL_Z) return;
+
+  UpdateDeferedLighting (position);
 
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
 

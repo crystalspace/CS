@@ -104,7 +104,7 @@ collision_pair *CD_contact = NULL;
 
   for( int i = 0; i < continuum_end; i++ ){
 
-    first_sector = (csSector*)(space_time_continuum[i]->sprt->sectors[0]);
+    first_sector = space_time_continuum[i]->sprt->GetSector (0);
     
     // Start collision detection.
     csRAPIDCollider::CollideReset ();

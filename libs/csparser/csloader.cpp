@@ -3270,7 +3270,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_SPRITE:
         {
-          csSprite3D* sp = new csSprite3D ();
+          csSprite3D* sp = new csSprite3D (World);
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3279,7 +3279,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_SPRITE2D:
         {
-          csSprite2D* sp = new csSprite2D ();
+          csSprite2D* sp = new csSprite2D (World);
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3669,7 +3669,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_SPRITE:
         {
-          csSprite3D* sp = new csSprite3D ();
+          csSprite3D* sp = new csSprite3D (World);
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3678,7 +3678,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_SPRITE2D:
         {
-          csSprite2D* sp = new csSprite2D ();
+          csSprite2D* sp = new csSprite2D (World);
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);

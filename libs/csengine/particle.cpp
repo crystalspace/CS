@@ -22,22 +22,20 @@
 #include "csengine/light.h"
 #include "csengine/world.h"
 #include "csengine/particle.h"
+#include "csengine/rview.h"
 #include <math.h>
 #include <stdlib.h>
 
 
-IMPLEMENT_CSOBJTYPE (csParticleSystem, csObject)
+IMPLEMENT_CSOBJTYPE (csParticleSystem, csSprite)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csSpiralParticleSystem, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csRainParticleSystem, csParticleSystem)
-IMPLEMENT_IBASE (csParticleSystem)
-  IMPLEMENTS_INTERFACE(iParticle)
-IMPLEMENT_IBASE_END
 
 
-csParticleSystem :: csParticleSystem()
-  : csObject()
+csParticleSystem :: csParticleSystem(csObject* theParent)
+  : csSprite (theParent)
 {
   CONSTRUCT_IBASE (NULL);
   particles.SetLength(0);
@@ -45,7 +43,7 @@ csParticleSystem :: csParticleSystem()
   time_to_live = 0;
   to_delete = false;
   // add me to the world
-  csWorld::current_world->particle_systems.Push(this);
+  csWorld::current_world->sprites.Push (this);
   // defaults
   change_size = false;
   change_color = false;
@@ -66,8 +64,8 @@ csParticleSystem :: ~csParticleSystem()
 void csParticleSystem :: AppendRectSprite(float width, float height, 
   csTextureHandle *txt, bool lighted)
 {
-  csSprite2D *part = new csSprite2D();
-  csWorld::current_world->sprites.Push(part);
+  csSprite2D *part = new csSprite2D(this);
+  //csWorld::current_world->sprites.Push(part);
   csColoredVertices& vs = part->GetVertices();
   vs.SetLimit(4);
   vs.SetLength(4);
@@ -86,8 +84,8 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
 void csParticleSystem :: AppendRegularSprite(int n, float radius, 
   csTextureHandle* txt, bool lighted)
 {
-  csSprite2D *part = new csSprite2D();
-  csWorld::current_world->sprites.Push(part);
+  csSprite2D *part = new csSprite2D(this);
+  //csWorld::current_world->sprites.Push(part);
   part->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
   part->SetTexture(txt);
@@ -121,8 +119,9 @@ void csParticleSystem :: AddColor(const csColor& col)
 
 void csParticleSystem :: MoveToSector(csSector *sector)
 {
-  for(int i = 0; i<particles.Length(); i++)
-    GetParticle(i)->MoveToSector(sector);
+  //for(int i = 0; i<particles.Length(); i++)
+    //GetParticle(i)->MoveToSector(sector);
+  csSprite::MoveToSector (sector);
 }
 
 
@@ -183,6 +182,37 @@ void csParticleSystem :: Update(time_t elapsed_time)
     Rotate(anglepersecond * elapsed_seconds);
 }
 
+void csParticleSystem::Draw (csRenderView& rview)
+{
+  for (int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->Draw (rview);
+}
+
+void csParticleSystem::UpdateInPolygonTrees ()
+{
+}
+
+void csParticleSystem::UpdateLighting (csLight** lights, int num_lights)
+{
+  defered_num_lights = 0;
+  for (int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->UpdateLighting (lights, num_lights);
+}
+
+void csParticleSystem::DeferUpdateLighting (int flags, int num_lights)
+{
+  csSprite::DeferUpdateLighting (flags, num_lights);
+  for (int i = 0; i<particles.Length(); i++)
+    GetParticle(i)->DeferUpdateLighting (flags, num_lights);
+}
+
+const csVector3& csParticleSystem::GetPosition () const
+{
+  // @@@ Can we return anything useful here?
+  static csVector3 v (0);
+  return v;
+}
+
 //---------------------------------------------------------------------
 
 /// helping func. Returns vector of with -1..+1 members. Varying length!
@@ -209,8 +239,8 @@ static csVector3& GetRandomDirection (const csVector3& magnitude,
 
 //-- csSpiralParticleSystem ------------------------------------------
 
-csSpiralParticleSystem::csSpiralParticleSystem (int max,
-	const csVector3& source, csTextureHandle* txt) : csNewtonianParticleSystem (max)
+csSpiralParticleSystem::csSpiralParticleSystem (csObject* theParent, int max,
+	const csVector3& source, csTextureHandle* txt) : csNewtonianParticleSystem (theParent, max)
 {
   csSpiralParticleSystem::max = max;
   csSpiralParticleSystem::source = source;
@@ -262,7 +292,7 @@ void csSpiralParticleSystem::Update (time_t elapsed_time)
     {
       AppendRegularSprite (3, .02, txt, false);	// @@@ PARAMETER
       part_idx = GetNumParticles ()-1;
-      GetParticle (part_idx)->MoveToSector (this_sector);
+      //GetParticle (part_idx)->MoveToSector (this_sector);
     }
     iParticle* part = GetParticle (part_idx);
     part->SetPosition (source);
@@ -277,8 +307,8 @@ void csSpiralParticleSystem::Update (time_t elapsed_time)
 
 //-- csNewtonianParticleSystem ------------------------------------------
 
-csNewtonianParticleSystem :: csNewtonianParticleSystem(int max)
-  : csParticleSystem()
+csNewtonianParticleSystem :: csNewtonianParticleSystem(csObject* theParent, int max)
+  : csParticleSystem(theParent)
 {
   // create csVector3's
   part_speed = new csVector3 [max];
@@ -313,12 +343,12 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
 //-- csParSysExplosion --------------------------------------------------
 
 
-csParSysExplosion :: csParSysExplosion(int number_p, 
+csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p, 
     const csVector3& explode_center, const csVector3& push, 
     csTextureHandle *txt, int nr_sides, float part_radius,
     bool lighted_particles,
     float spread_pos, float spread_speed, float spread_accel)
-    : csNewtonianParticleSystem(number_p)
+    : csNewtonianParticleSystem(theParent, number_p)
 {
   int i;
   csVector3 pos;
@@ -406,11 +436,11 @@ void csParSysExplosion :: RemoveLight()
 
 //-- csRainParticleSystem --------------------------------------------------
 
-csRainParticleSystem :: csRainParticleSystem(int number, csTextureHandle* txt, 
+csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, csTextureHandle* txt, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
   const csVector3& fall_speed)
-  : csParticleSystem()
+  : csParticleSystem(theParent)
 {
   part_pos = new csVector3[number];
   rain_dir = fall_speed;

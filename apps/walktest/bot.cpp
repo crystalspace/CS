@@ -24,7 +24,7 @@
 
 IMPLEMENT_CSOBJTYPE (Bot,csSprite3D);
 
-Bot::Bot (csSpriteTemplate* tmpl, csWorld *World) : csSprite3D ()
+Bot::Bot (csSpriteTemplate* tmpl, csWorld *World) : csSprite3D (World)
 {
   world = World;
   SetTemplate (tmpl);
@@ -84,7 +84,7 @@ void Bot::move (time_t elapsed_time)
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
   SetPosition (new_p);
 
-  s = (csSector*)sectors[0];
+  s = GetSector (0);
   mirror = false;
   csOrthoTransform old_pos2 (GetW2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);

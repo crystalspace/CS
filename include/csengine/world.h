@@ -237,13 +237,6 @@ public:
   csNamedObjVector sprites;
 
   /**
-   * List of all particle systems in the world. This vector contains
-   * objects of type csParticleSystem*. Note that the sprites of a
-   * particle system are in the sprites list. 
-   */
-  csNamedObjVector particle_systems;
-
-  /**
    * The list of all camera position objects.
    */
   csNamedObjVector camera_positions;

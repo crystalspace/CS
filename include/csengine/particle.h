@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
+#include "csengine/cssprite.h"
 #include "iparticl.h"
 
 class csSprite2D;
@@ -31,13 +32,14 @@ class csTextureHandle;
 class csWorld;
 class csSector;
 class csDynLight;
+class csRenderView;
 
 /**
  * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class csParticleSystem : public csObject, public iParticle
+class csParticleSystem : public csSprite
 {
 protected:
   /// iParticle ptrs to the particles.
@@ -56,12 +58,16 @@ protected:
   /// Rotate particles, angle in radians.
   bool change_rotation; float anglepersecond;
 
+protected:
+  /// Update this sprite in the polygon trees.
+  virtual void UpdateInPolygonTrees ();
+
 public:
   /**
    * Make a new system. 
    * Also adds the particle system to the list of the current world.
    */
-  csParticleSystem ();
+  csParticleSystem (csObject* theParent);
 
   /**
    * Destroy particle system, and all particles.
@@ -170,9 +176,28 @@ public:
    * this member function will set to_delete if self_destruct is
    * enabled and time is up.
    */
-  virtual void Update(time_t elapsed_time);
+  virtual void Update (time_t elapsed_time);
 
-  DECLARE_IBASE;
+  /**
+   * Draw the particle system.
+   */
+  virtual void Draw (csRenderView& rview);
+
+  /**
+   * Light part sys according to the given array of lights.
+   */
+  virtual void UpdateLighting (csLight** lights, int num_lights);
+
+  /**
+   * Get the location of the part sys.
+   */
+  virtual const csVector3& GetPosition () const;
+
+  /**
+   * Update lighting as soon as the part sys becomes visible.
+   */
+  virtual void DeferUpdateLighting (int flags, int num_lights);
+
   CSOBJTYPE;
 };
 
@@ -190,7 +215,7 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csNewtonianParticleSystem (int max);
+  csNewtonianParticleSystem (csObject* theParent, int max);
   virtual ~csNewtonianParticleSystem ();
 
   /// Moves the particles depending on their acceleration and speed.
@@ -227,7 +252,7 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csSpiralParticleSystem (int max, const csVector3& source,
+  csSpiralParticleSystem (csObject* theParent, int max, const csVector3& source,
   	csTextureHandle* txt);
   virtual ~csSpiralParticleSystem ();
 
@@ -269,7 +294,8 @@ public:
    * part_radius is the radius of every particle,
    * spreading multipliers: a random number (1.0..+1.0) * spread is added.
    */
-  csParSysExplosion (int number_p, const csVector3& explode_center,
+  csParSysExplosion (csObject* theParent, int number_p,
+  	const csVector3& explode_center,
   	const csVector3& push, csTextureHandle *txt, int nr_sides = 6,
 	float part_radius = 0.25, bool lighted_particles = false,
 	float spread_pos = 0.6, 
@@ -334,7 +360,8 @@ public:
     *   You can make slanted rain this way. Although you would also want to
     *   slant the particles in that case...
     */
-  csRainParticleSystem(int number, csTextureHandle* txt, UInt mixmode,
+  csRainParticleSystem(csObject* theParent, int number, csTextureHandle* txt,
+    UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
     const csVector3& fall_speed
