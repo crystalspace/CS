@@ -41,7 +41,8 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
 {
 #ifdef DEBUG
   if (iPos > Size)
-    STR_FATAL (("Inserting `%s' into `%s' at position %u\n", iStr.GetData (), Data, iPos))
+    STR_FATAL (("Inserting `%s' into `%s' at position %lu\n",
+      iStr.GetData (), Data, (unsigned long)iPos))
 #endif
 
   if (Data == NULL)
@@ -65,7 +66,8 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
 {
 #ifdef DEBUG
   if (iPos > Size)
-    STR_FATAL (("Overwriting `%s' into `%s' at position %u\n", iStr.GetData (), Data, iPos))
+    STR_FATAL (("Overwriting `%s' into `%s' at position %lu\n",
+      iStr.GetData (), Data, (unsigned long)iPos))
 #endif
 
   if (Data == NULL)

@@ -80,7 +80,8 @@ public:
   {
 #ifdef DEBUG
     if (iPos > Size)
-      STR_FATAL(("Trying to access string `%s' at position %u\n", Data, iPos))
+      STR_FATAL(("Trying to access string `%s' at position %lu\n",
+        Data, (unsigned long)iPos))
 #endif
     return Data [iPos];
   }
@@ -90,7 +91,8 @@ public:
   {
 #ifdef DEBUG
     if (iPos > Size)
-      STR_FATAL (("Trying to do `%s'.SetAt (%u)\n", Data, iPos))
+      STR_FATAL (("Trying to do `%s'.SetAt (%lu)\n",
+        Data, (unsigned long)iPos))
 #endif
     Data [iPos] = iChar;
   }
@@ -100,7 +102,8 @@ public:
   {
 #ifdef DEBUG
     if (iPos > Size)
-      STR_FATAL (("Trying to do `%s'.GetAt (%u)\n", Data, iPos));
+      STR_FATAL (("Trying to do `%s'.GetAt (%lu)\n",
+        Data, (unsigned long)iPos));
 #endif
     return Data [iPos];
   }
