@@ -26,8 +26,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-#include <windowsx.h>
-#include <ddraw.h>
+#include <windows.h>
 
 #ifdef DO_DINPUT_KEYBOARD
 #include <dinput.h>
@@ -430,7 +429,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.lpszClassName  = WINDOWCLASSNAME;
   wc.hbrBackground  = 0;
   wc.hInstance      = ModuleHandle;
-  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;;
+  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   wc.lpfnWndProc    = WindowProc;
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
