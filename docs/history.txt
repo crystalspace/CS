@@ -8,6 +8,8 @@ The history order has been reversed so that new features are at the top.
             - Resizing still crashed after patch with x2d. I have partly fixed 
               this, dtsimple doesnt crash out but gets weird zbuffery like 
               artifacts, but walktest does...investigating :) 
+            - Walkest now responds to resizing events, so doesnt crash out anymore
+              on resizing.
 	- Fixed bug in embedded iPolygonMesh in csSprite3D.
 	- Fixed a bug in the rapid CD plugin.
 	- Fixed bug in WalkTest so that walking through CD enabled portals

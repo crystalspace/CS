@@ -665,6 +665,20 @@ bool WalkTest::HandleEvent (csEvent &Event)
 
   switch (Event.Type)
   {
+    case csevBroadcast:
+    {
+      if (Event.Command.Code == cscmdContextResize)
+      {
+	int w = G2D->GetWidth();
+	int h = G2D->GetHeight();
+	view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
+	if (wf)
+	  wf->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
+	Sys->FrameWidth = w;
+	Sys->FrameHeight = h;
+	break;
+      }
+    }
     case csevKeyDown:
       eatkeypress (1,Event.Key.Code,
         (Event.Key.Modifiers & CSMASK_SHIFT) != 0,
