@@ -91,7 +91,7 @@ public:
   /**
    * Set the FOV to use for this camera.
    */
-  static void SetFOV (int fov) { aspect = fov; inv_aspect = 1. / aspect; }
+  static void SetFOV (int fov) { aspect = fov; inv_aspect = 1.0f / aspect; }
 
   /**
    * Get the FOV for this camera.
