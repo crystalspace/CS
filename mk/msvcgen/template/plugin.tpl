@@ -86,6 +86,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib gdi32.lib advapi32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 user32.lib gdi32.lib advapi32.lib ddraw.lib zlib.lib %libs% /nologo /version:1.0 /subsystem:windows /dll /profile /debug /machine:I386 /nodefaultlib:"LIBC" /nodefaultlib:"LIBCD" /nodefaultlib:"LIBCMTD" /out:"csdebug\temp\%project%\%target%" /libpath:"..\..\libs\cssys\win32\libs" %lflags%
+# SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 TargetPath=.\csdebug\temp\%project%\%target%
 SOURCE="$(InputPath)"
