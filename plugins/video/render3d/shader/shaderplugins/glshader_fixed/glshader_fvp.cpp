@@ -256,8 +256,8 @@ void csGLShaderFVP::SetupState (
 
   var = primcolVarRef;
   if (!var && primcolvar != csInvalidStringID &&
-    primcolvar < (csStringID)stacks.Length () && 
-    stacks[primcolvar].Length () > 0)
+      primcolvar < (csStringID)stacks.Length () && 
+      stacks[primcolvar].Length () > 0)
     var = stacks[primcolvar].Top ();
 
   if (var)
@@ -474,8 +474,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
     for (j=0; j<staticContexts.Length(); j++)
     {
       if (!layers[i].constcolorVarRef)
-        layers[i].constcolorVarRef = 
-        staticContexts[j]->GetVariable (layers[i].constcolorvar);
+        layers[i].constcolorVarRef = staticContexts[j]->GetVariable (
+		layers[i].constcolorvar);
     }
   }
 

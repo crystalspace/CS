@@ -47,7 +47,8 @@ inline int srcModBits (uint srcMod)
   const uint repMask = repMaskRGB | CS_PS_RMOD_REP_ALPHA;
   if ((srcMod & (repMaskRGB | CS_PS_RMOD_XYZ)) || ((srcMod & repMask) == 0))
     result |= BIT_RGB;
-  if ((srcMod & (CS_PS_RMOD_REP_ALPHA | CS_PS_RMOD_XYW)) || ((srcMod & repMask) == 0))
+  if ((srcMod & (CS_PS_RMOD_REP_ALPHA | CS_PS_RMOD_XYW))
+  	|| ((srcMod & repMask) == 0))
     result |= BIT_ALPHA;
   return result;
 }

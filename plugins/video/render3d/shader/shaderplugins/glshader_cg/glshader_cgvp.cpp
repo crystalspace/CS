@@ -115,7 +115,7 @@ void csShaderGLCGVP::SetupState (csRenderMesh* mesh,
           }
           break;
         default:
-	        break;
+	  break;
       }
     }
   }
@@ -232,9 +232,8 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
           {
             //create a new variable
             csRef<csShaderVariable> var = 
-	            csPtr<csShaderVariable>(new csShaderVariable ( strings->
-							     Request (child->
-								      GetAttributeValue ("name"))));
+	            csPtr<csShaderVariable>(new csShaderVariable (
+		    	strings->Request (child->GetAttributeValue ("name"))));
             // @@@ Will leak! Should do proper refcounting.
             var->IncRef ();
 

@@ -86,7 +86,7 @@ void csShaderGLCGFP::SetupState (csRenderMesh* mesh,
     csRef<csShaderVariable> lvar = variablemap[i].statlink;
     // If not, we check the stack
     if (!lvar && variablemap[i].name < (csStringID)stacks.Length ()
-      && stacks[variablemap[i].name].Length () > 0)
+        && stacks[variablemap[i].name].Length () > 0)
       lvar = stacks[variablemap[i].name].Top ();
 
     if(lvar)
@@ -123,7 +123,7 @@ void csShaderGLCGFP::SetupState (csRenderMesh* mesh,
           }
           break;
         default:
-	        break;
+	  break;
       }
     }
   }
@@ -188,10 +188,14 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       mappings))
     {
       return pswrap->Compile (staticContexts);
-    } else {
+    }
+    else
+    {
       return false;
     }
-  } else {
+  }
+  else
+  {
     CGprofile profile = CG_PROFILE_UNKNOWN;
 
     if(cg_profile.Length ())
@@ -289,9 +293,8 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
           {
             //create a new variable
             csRef<csShaderVariable> var = 
-	            csPtr<csShaderVariable>(new csShaderVariable ( strings->
-							     Request (child->
-								      GetAttributeValue ("name"))));
+	            csPtr<csShaderVariable>(new csShaderVariable (
+		    	strings->Request (child->GetAttributeValue ("name"))));
 
             // @@@ Will leak! Should do proper refcounting.
             var->IncRef ();

@@ -143,105 +143,105 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
 
     switch(shader.instruction)
     {
-    default:
-      break;
-    case CS_PS_INS_TEX:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GetTexTarget ());
-      break;
-    case CS_PS_INS_TEXBEM:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_OFFSET_TEXTURE_2D_NV);
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXBEML:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_OFFSET_TEXTURE_SCALE_NV);
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXCOORD:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_PASS_THROUGH_NV);
-      break;
-    case CS_PS_INS_TEXKILL:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_CULL_FRAGMENT_NV);
-      break;
-    // 3x2 and 3x3 pad instructions are equivalent here
-    case CS_PS_INS_TEXM3X3PAD:
-    case CS_PS_INS_TEXM3X2PAD:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DOT_PRODUCT_NV);
-      if(shader.signed_scale)
+      default:
+        break;
+      case CS_PS_INS_TEX:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GetTexTarget ());
+        break;
+      case CS_PS_INS_TEXBEM:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_OFFSET_TEXTURE_2D_NV);
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXBEML:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_OFFSET_TEXTURE_SCALE_NV);
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXCOORD:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_PASS_THROUGH_NV);
+        break;
+      case CS_PS_INS_TEXKILL:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_CULL_FRAGMENT_NV);
+        break;
+      // 3x2 and 3x3 pad instructions are equivalent here
+      case CS_PS_INS_TEXM3X3PAD:
+      case CS_PS_INS_TEXM3X2PAD:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DOT_PRODUCT_NV);
+        if(shader.signed_scale)
+        {
+          glTexEnvi(GL_TEXTURE_SHADER_NV,
+            GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        }
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXM3X2TEX:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DOT_PRODUCT_TEXTURE_2D_NV);
+        if(shader.signed_scale)
+        {
+          glTexEnvi(GL_TEXTURE_SHADER_NV,
+            GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        }
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXM3X3TEX:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV);
+        if(shader.signed_scale)
+        {
+          glTexEnvi(GL_TEXTURE_SHADER_NV,
+            GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        }
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXM3X3SPEC:
       {
-        glTexEnvi(GL_TEXTURE_SHADER_NV,
-          GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        csVector4 eye = GetConstantRegisterValue(shader.param);
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV);
+        glTexEnvfv(GL_TEXTURE_SHADER_NV, GL_CONST_EYE_NV, &eye.x);
+        if(shader.signed_scale)
+        {
+          glTexEnvi(GL_TEXTURE_SHADER_NV,
+            GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        }
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
       }
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXM3X2TEX:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DOT_PRODUCT_TEXTURE_2D_NV);
-      if(shader.signed_scale)
-      {
-        glTexEnvi(GL_TEXTURE_SHADER_NV,
-          GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
-      }
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXM3X3TEX:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV);
-      if(shader.signed_scale)
-      {
-        glTexEnvi(GL_TEXTURE_SHADER_NV,
-          GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
-      }
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXM3X3SPEC:
-    {
-      csVector4 eye = GetConstantRegisterValue(shader.param);
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV);
-      glTexEnvfv(GL_TEXTURE_SHADER_NV, GL_CONST_EYE_NV, &eye.x);
-      if(shader.signed_scale)
-      {
-        glTexEnvi(GL_TEXTURE_SHADER_NV,
-          GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
-      }
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    }
-    case CS_PS_INS_TEXM3X3VSPEC:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV);
-      if(shader.signed_scale)
-      {
-        glTexEnvi(GL_TEXTURE_SHADER_NV,
-          GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
-      }
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXREG2AR:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DEPENDENT_AR_TEXTURE_2D_NV);
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
-    case CS_PS_INS_TEXREG2GB:
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_DEPENDENT_GB_TEXTURE_2D_NV);
-      glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
-        GL_TEXTURE0_ARB + shader.previous);
-      break;
+      case CS_PS_INS_TEXM3X3VSPEC:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV);
+        if(shader.signed_scale)
+        {
+          glTexEnvi(GL_TEXTURE_SHADER_NV,
+            GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV, GL_EXPAND_NORMAL_NV);
+        }
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXREG2AR:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DEPENDENT_AR_TEXTURE_2D_NV);
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
+      case CS_PS_INS_TEXREG2GB:
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
+          GL_DEPENDENT_GB_TEXTURE_2D_NV);
+        glTexEnvi(GL_TEXTURE_SHADER_NV, GL_PREVIOUS_TEXTURE_INPUT_NV,
+          GL_TEXTURE0_ARB + shader.previous);
+        break;
     }
   }
 
@@ -251,15 +251,15 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
 GLenum csShaderGLPS1_NV::GetTexTarget()
 {
   if(glIsEnabled(GL_TEXTURE_CUBE_MAP_ARB))
-		return GL_TEXTURE_CUBE_MAP_ARB;
-	if(glIsEnabled(GL_TEXTURE_3D))
-		return GL_TEXTURE_3D;
-	if(glIsEnabled(GL_TEXTURE_RECTANGLE_NV))
-		return GL_TEXTURE_RECTANGLE_NV;
-	if(glIsEnabled(GL_TEXTURE_2D))
-		return GL_TEXTURE_2D;
-	if(glIsEnabled(GL_TEXTURE_1D))
-		return GL_TEXTURE_1D;
+    return GL_TEXTURE_CUBE_MAP_ARB;
+  if(glIsEnabled(GL_TEXTURE_3D))
+    return GL_TEXTURE_3D;
+  if(glIsEnabled(GL_TEXTURE_RECTANGLE_NV))
+    return GL_TEXTURE_RECTANGLE_NV;
+  if(glIsEnabled(GL_TEXTURE_2D))
+    return GL_TEXTURE_2D;
+  if(glIsEnabled(GL_TEXTURE_1D))
+    return GL_TEXTURE_1D;
 
   return GL_NONE;
 }
@@ -289,7 +289,7 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
     nv_texture_shader_stage texshader;
     texshader.instruction = inst.instruction;
     if(inst.src_reg_mods[0] & CS_PS_RMOD_BIAS && 
-      inst.src_reg_mods[0] & CS_PS_RMOD_SCALE)
+        inst.src_reg_mods[0] & CS_PS_RMOD_SCALE)
       texshader.signed_scale = true;
     texshader.stage = stage;
     texshader.previous = previous;
@@ -318,7 +318,8 @@ csVector4 csShaderGLPS1_NV::GetConstantRegisterValue (int reg)
 bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
   const csArray<csPSProgramInstruction> &instrs)
 {
-  for(int i=0;i<instrs.Length ();i++) {
+  for(int i=0;i<instrs.Length ();i++)
+  {
     const csPSProgramInstruction &inst = instrs.Get(i);
 
     /* Skip over any tex instructions, they are used in the texture
@@ -371,47 +372,47 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
       GLenum *out = 0;
       switch(j)
       {
-      case 0:
-        in_reg = inst.dest_reg;
-        in_num = inst.dest_reg_num;
-        out = &dest;
-        break;
-      case 1:
-      case 2:
-      case 3:
-        in_reg = inst.src_reg[j-1];
-        in_num = inst.src_reg_num[j-1];
-        out = &src[j-1];
-        break;
+        case 0:
+          in_reg = inst.dest_reg;
+          in_num = inst.dest_reg_num;
+          out = &dest;
+          break;
+        case 1:
+        case 2:
+        case 3:
+          in_reg = inst.src_reg[j-1];
+          in_num = inst.src_reg_num[j-1];
+          out = &src[j-1];
+          break;
       }
       if(in_reg == CS_PS_REG_NONE) break;
       switch(in_reg)
       {
-      case CS_PS_REG_TEX:
-        *out = GL_TEXTURE0_ARB + in_num;
-        break;
-      case CS_PS_REG_CONSTANT:
-        if(con_first < 0)
-        {
-          *out = GL_CONSTANT_COLOR0_NV;
-          con_first = in_num;
-        }
-        else
-        {
-          *out = GL_CONSTANT_COLOR1_NV;
-          con_second = in_num;
-        }
-        break;
-      case CS_PS_REG_TEMP:
-        if(in_num == 0) *out = GL_SPARE0_NV;
-        else *out = GL_SPARE1_NV;
-        break;
-      case CS_PS_REG_COLOR:
-        if(in_num == 0) *out = GL_PRIMARY_COLOR_NV;
-        else *out = GL_SECONDARY_COLOR_NV;
-        break;
-      default:
-	break;
+        case CS_PS_REG_TEX:
+          *out = GL_TEXTURE0_ARB + in_num;
+          break;
+        case CS_PS_REG_CONSTANT:
+          if(con_first < 0)
+          {
+            *out = GL_CONSTANT_COLOR0_NV;
+            con_first = in_num;
+          }
+          else
+          {
+            *out = GL_CONSTANT_COLOR1_NV;
+            con_second = in_num;
+          }
+          break;
+        case CS_PS_REG_TEMP:
+          if(in_num == 0) *out = GL_SPARE0_NV;
+          else *out = GL_SPARE1_NV;
+          break;
+        case CS_PS_REG_COLOR:
+          if(in_num == 0) *out = GL_PRIMARY_COLOR_NV;
+          else *out = GL_SECONDARY_COLOR_NV;
+          break;
+        default:
+	  break;
       }
 
       // Get the src register modifiers
@@ -419,34 +420,34 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
       {
         switch(inst.src_reg_mods[j-1])
         {
-        case (CS_PS_RMOD_NEGATE | CS_PS_RMOD_BIAS):
-          mapping[j-1] = GL_HALF_BIAS_NEGATE_NV;
-          break;
-        case (CS_PS_RMOD_NEGATE | CS_PS_RMOD_SCALE):
-          mapping[j-1] = GL_HALF_BIAS_NEGATE_NV;
-          break;
-        case (CS_PS_RMOD_BIAS | CS_PS_RMOD_SCALE):
-          mapping[j-1] = GL_EXPAND_NORMAL_NV;
-          break;
-        case (CS_PS_RMOD_BIAS | CS_PS_RMOD_SCALE | CS_PS_RMOD_NEGATE):
-          mapping[j-1] = GL_EXPAND_NEGATE_NV;
-          break;
-        case CS_PS_RMOD_SCALE:
-          Report(CS_REPORTER_SEVERITY_ERROR,
-            "Register Combiners doesn't support the _x2 register modifier.");
-          return false;
-        case CS_PS_RMOD_NEGATE:
-          mapping[j-1] = GL_SIGNED_NEGATE_NV;
-          break;
-        case CS_PS_RMOD_BIAS:
-          mapping[j-1] = GL_HALF_BIAS_NORMAL_NV;
-          break;
-        case CS_PS_RMOD_INVERT:
-          mapping[j-1] = GL_UNSIGNED_INVERT_NV;
-          break;
-        default:
-          mapping[j-1] = GL_SIGNED_IDENTITY_NV;
-          break;
+          case (CS_PS_RMOD_NEGATE | CS_PS_RMOD_BIAS):
+            mapping[j-1] = GL_HALF_BIAS_NEGATE_NV;
+            break;
+          case (CS_PS_RMOD_NEGATE | CS_PS_RMOD_SCALE):
+            mapping[j-1] = GL_HALF_BIAS_NEGATE_NV;
+            break;
+          case (CS_PS_RMOD_BIAS | CS_PS_RMOD_SCALE):
+            mapping[j-1] = GL_EXPAND_NORMAL_NV;
+            break;
+          case (CS_PS_RMOD_BIAS | CS_PS_RMOD_SCALE | CS_PS_RMOD_NEGATE):
+            mapping[j-1] = GL_EXPAND_NEGATE_NV;
+            break;
+          case CS_PS_RMOD_SCALE:
+            Report(CS_REPORTER_SEVERITY_ERROR,
+              "Register Combiners doesn't support the _x2 register modifier.");
+            return false;
+          case CS_PS_RMOD_NEGATE:
+            mapping[j-1] = GL_SIGNED_NEGATE_NV;
+            break;
+          case CS_PS_RMOD_BIAS:
+            mapping[j-1] = GL_HALF_BIAS_NORMAL_NV;
+            break;
+          case CS_PS_RMOD_INVERT:
+            mapping[j-1] = GL_UNSIGNED_INVERT_NV;
+            break;
+          default:
+            mapping[j-1] = GL_SIGNED_IDENTITY_NV;
+            break;
         }
       }
     }
@@ -478,103 +479,103 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
 
       switch(inst.instruction)
       {
-      case CS_PS_INS_ADD:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          src[1], mapping[1], component[1]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
-        combiner.output.sumOutput = dest;
-        break;
-      case CS_PS_INS_BEM:
-        Report(CS_REPORTER_SEVERITY_WARNING,
-          "NV_register_combiners does not support the 'bem' instruction");
-        break;
-      case CS_PS_INS_CMP:
-        Report(CS_REPORTER_SEVERITY_WARNING,
-          "NV_register_combiners does not support the 'cmp' instruction");
-        break;
-      case CS_PS_INS_CND:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          src[1], mapping[1], component[1]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
-        combiner.output.sumOutput = dest;
-        combiner.output.muxSum = GL_TRUE;
-        break;
-      case CS_PS_INS_DP3:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          src[1], mapping[1], component[1]));
-        combiner.output.abOutput = dest;
-        combiner.output.abDotProduct = GL_TRUE;
-        break;
-      case CS_PS_INS_DP4:
-        Report(CS_REPORTER_SEVERITY_WARNING,
-          "NV_register_combiners does not support four component dot \
-          products. Skipping PS1 style shader.");
-        return false;
-      case CS_PS_INS_LRP:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], GL_UNSIGNED_IDENTITY_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          src[1], mapping[1], component[1]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          src[0], GL_UNSIGNED_INVERT_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          src[2], mapping[2], component[2]));
-        combiner.output.sumOutput = dest;
-        break;
-      case CS_PS_INS_MAD:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          src[1], mapping[1], component[1]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          src[2], mapping[2], component[2]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[2]));
-        combiner.output.sumOutput = dest;
-        break;
-      case CS_PS_INS_MOV:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
-        combiner.output.sumOutput = dest;
-        break;
-      case CS_PS_INS_MUL:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          src[1], mapping[1], component[1]));
-        combiner.output.abOutput = dest;
-        break;
-      case CS_PS_INS_SUB:
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
-          src[0], mapping[0], component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
-          src[1], GL_SIGNED_NEGATE_NV, component[1]));
-        combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
-          GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
-        combiner.output.sumOutput = dest;
-        break;
-      default:
-        break;
+        case CS_PS_INS_ADD:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], mapping[1], component[1]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.output.sumOutput = dest;
+          break;
+        case CS_PS_INS_BEM:
+          Report(CS_REPORTER_SEVERITY_WARNING,
+            "NV_register_combiners does not support the 'bem' instruction");
+          break;
+        case CS_PS_INS_CMP:
+          Report(CS_REPORTER_SEVERITY_WARNING,
+            "NV_register_combiners does not support the 'cmp' instruction");
+          break;
+        case CS_PS_INS_CND:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], mapping[1], component[1]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.output.sumOutput = dest;
+          combiner.output.muxSum = GL_TRUE;
+          break;
+        case CS_PS_INS_DP3:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]));
+          combiner.output.abOutput = dest;
+          combiner.output.abDotProduct = GL_TRUE;
+          break;
+        case CS_PS_INS_DP4:
+          Report(CS_REPORTER_SEVERITY_WARNING,
+            "NV_register_combiners does not support four component dot \
+            products. Skipping PS1 style shader.");
+          return false;
+        case CS_PS_INS_LRP:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], GL_UNSIGNED_IDENTITY_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            src[0], GL_UNSIGNED_INVERT_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            src[2], mapping[2], component[2]));
+          combiner.output.sumOutput = dest;
+          break;
+        case CS_PS_INS_MAD:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            src[2], mapping[2], component[2]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[2]));
+          combiner.output.sumOutput = dest;
+          break;
+        case CS_PS_INS_MOV:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_IDENTITY_NV, component[0]));
+          combiner.output.sumOutput = dest;
+          break;
+        case CS_PS_INS_MUL:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            src[1], mapping[1], component[1]));
+          combiner.output.abOutput = dest;
+          break;
+        case CS_PS_INS_SUB:
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_A_NV,
+            src[0], mapping[0], component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_B_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[0]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_C_NV,
+            src[1], GL_SIGNED_NEGATE_NV, component[1]));
+          combiner.inputs.Push(nv_input(portion, GL_VARIABLE_D_NV,
+            GL_ZERO, GL_UNSIGNED_INVERT_NV, component[1]));
+          combiner.output.sumOutput = dest;
+          break;
+        default:
+          break;
       }
       stages.Push (combiner);
     }

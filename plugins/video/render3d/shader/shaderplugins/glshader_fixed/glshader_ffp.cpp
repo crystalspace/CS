@@ -284,12 +284,12 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   {
     mtexlayer* layer = &texlayers[i];
     if (((layer->colorp == GL_DOT3_RGB_ARB) || 
-      (layer->colorp == GL_DOT3_RGBA_ARB)) && 
-      !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+        (layer->colorp == GL_DOT3_RGBA_ARB)) && 
+        !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
       return false;
     if (((layer->alphap == GL_DOT3_RGB_ARB) || 
-      (layer->alphap == GL_DOT3_RGBA_ARB)) && 
-      !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+        (layer->alphap == GL_DOT3_RGBA_ARB)) && 
+        !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
       return false;
 
     /*

@@ -145,7 +145,9 @@ void csGLShader_CG::Open()
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.graphics3d.shader.glcg",
       "Routing Cg fragment programs to Pixel Shader plugin OFF (forced).", 0);
-  } else {
+  }
+  else
+  {
     ext->InitGL_ARB_fragment_program ();
     ext->InitGL_ATI_fragment_shader ();
 

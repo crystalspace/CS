@@ -193,7 +193,8 @@ csVector3 csChunkLodTerrainFactory::GetScale ()
   return scale;
 }
 
-void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj, int n, int w)
+void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj,
+	int n, int w)
 {
   Data *b = &datamap[i + j * w];
   Data *l = &datamap[i - di + (j - dj) * w];
@@ -218,7 +219,8 @@ void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj, int n
   }
 }
 
-bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data, int w, int h)
+bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
+	int w, int h)
 {
   CS_ASSERT (w == h);
   CS_ASSERT (w >= MIN_TERRAIN);
@@ -238,7 +240,8 @@ bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data, int w, 
       float lt = (i-1 < 0) ? data[pos] : data[pos-1];
       float rt = (i+1 >= h) ? data[pos] : data[pos+1];
 
-      datamap[pos].norm = csVector3 (lt - rt, 2.0/(float)w + 2.0/(float)h, dn - up);
+      datamap[pos].norm = csVector3 (lt - rt,
+      	2.0/(float)w + 2.0/(float)h, dn - up);
       datamap[pos].norm.Normalize ();
       datamap[pos].tan = csVector3 (0,0,1) % datamap[pos].norm;
       datamap[pos].tan.Normalize ();
@@ -467,15 +470,19 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
   AddEdgeVertex (p->datamap[sw], southwest);
   AddSkirtVertex (p->datamap[sw], southwest);
 
-  if (error >= 1) {
+  if (error >= 1)
+  {
     float new_error = error / 2.0;
     int new_w = mid_w + 1;
     int new_h = mid_h + 1;
     children[0] = new MeshTreeNode (p, x, y, new_w, new_h, new_error);
     children[1] = new MeshTreeNode (p, x+new_w-1, y, new_w, new_h, new_error);
     children[2] = new MeshTreeNode (p, x, y+new_h-1, new_w, new_h, new_error);
-    children[3] = new MeshTreeNode (p, x+new_w-1, y+new_h-1, new_w, new_h, new_error);
-  } else {
+    children[3] = new MeshTreeNode (p, x+new_w-1, y+new_h-1, new_w, new_h,
+    	new_error);
+  }
+  else
+  {
     children[0] = 0;
     children[1] = 0;
     children[2] = 0;
@@ -485,7 +492,8 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
 csChunkLodTerrainFactory::MeshTreeNode::~MeshTreeNode ()
 {
-  if (error > 0) {
+  if (error > 0)
+  {
     delete children[0];
     delete children[1];
     delete children[2];
@@ -538,7 +546,8 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       compressed_normal_buffer = pFactory->r3d->CreateRenderBuffer (
         sizeof (csVector2) * len, CS_BUF_STATIC,
 	CS_BUFCOMP_FLOAT, 2, false);
-      csVector2 *cnbuf = (csVector2*)compressed_normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+      csVector2 *cnbuf = (csVector2*)compressed_normal_buffer->Lock (
+      	CS_BUF_LOCK_NORMAL);
       for (unsigned int i = 0; i < len; i ++) {
         cnbuf[i].x = normals[i].x;
         cnbuf[i].y = normals[i].z;
@@ -663,10 +672,10 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
         index_buffer = pFactory->r3d->CreateRenderBuffer (
 	  sizeof (unsigned char) * len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_BYTE, 1, true);
-        unsigned char *ibuf = (unsigned char *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        for (unsigned char i = 0; i < len; i ++) {
+        unsigned char *ibuf = (unsigned char *)index_buffer->Lock (
+		CS_BUF_LOCK_NORMAL);
+        for (unsigned char i = 0; i < len; i ++)
           ibuf[i] = i;
-        }
         index_buffer->Release ();
       } 
       else if (len < USHRT_MAX)  
@@ -674,10 +683,10 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
         index_buffer = pFactory->r3d->CreateRenderBuffer (
 	  sizeof (unsigned short) * len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_SHORT, 1, true);
-        unsigned short *ibuf = (unsigned short *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        for (unsigned short i = 0; i < len; i ++) {
+        unsigned short *ibuf = (unsigned short *)index_buffer->Lock (
+		CS_BUF_LOCK_NORMAL);
+        for (unsigned short i = 0; i < len; i ++)
           ibuf[i] = i;
-        }
         index_buffer->Release ();
       } 
       else
@@ -685,10 +694,10 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
         index_buffer = pFactory->r3d->CreateRenderBuffer (
 	  sizeof (unsigned int) * len, CS_BUF_STATIC, 
 	  CS_BUFCOMP_UNSIGNED_INT, 1, true);
-        unsigned int *ibuf = (unsigned int *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        for (unsigned int i = 0; i < len; i ++) {
+        unsigned int *ibuf = (unsigned int *)index_buffer->Lock (
+		CS_BUF_LOCK_NORMAL);
+        for (unsigned int i = 0; i < len; i ++)
           ibuf[i] = i;
-        }
         index_buffer->Release ();
       }
     }
@@ -756,7 +765,8 @@ void csChunkLodTerrainFactory::MeshTreeNode::AddVertex (const Data& d, int p)
   parity = p;
 }
 
-void csChunkLodTerrainFactory::MeshTreeNode::AddEdgeVertex (const Data& d, const Data& m)
+void csChunkLodTerrainFactory::MeshTreeNode::AddEdgeVertex (const Data& d,
+	const Data& m)
 {
   vertices.Push(d.pos+csVector3 (m.pos.x, 0.0, m.pos.z));
   normals.Push(d.norm);
@@ -766,7 +776,8 @@ void csChunkLodTerrainFactory::MeshTreeNode::AddEdgeVertex (const Data& d, const
   colors.Push(d.col);
 }
 
-void csChunkLodTerrainFactory::MeshTreeNode::AddSkirtVertex (const Data& d, const Data& m)
+void csChunkLodTerrainFactory::MeshTreeNode::AddSkirtVertex (const Data& d,
+	const Data& m)
 {
   vertices.Push(d.pos+m.pos);
   normals.Push(d.norm);
@@ -1062,7 +1073,8 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
   csRef<csShaderVariable> splat_var = 
     new csShaderVariable (strings->Request ("splat map scale"));
   splat_var->SetType (csShaderVariable::VECTOR2);
-  splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
+  splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x,
+  	1.0 / (float)pFactory->hm_y));
   matwrap->GetMaterial()->AddVariable (splat_var);
 
   csRef<csShaderVariable> lod_var = 
@@ -1098,7 +1110,8 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
     csRef<csShaderVariable> splat_var = 
       new csShaderVariable (strings->Request ("splat map scale"));
     splat_var->SetType (csShaderVariable::VECTOR2);
-    splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
+    splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x,
+    	1.0 / (float)pFactory->hm_y));
     matwrap->GetMaterial()->AddVariable (splat_var);
     palette[i]->GetMaterial()->AddVariable (splat_var);
 

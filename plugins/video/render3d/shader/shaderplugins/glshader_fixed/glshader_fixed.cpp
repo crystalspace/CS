@@ -179,7 +179,7 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-    f->QueryClassID ()) == 0)
+      f->QueryClassID ()) == 0)
     enable = true;
   else
     return false;

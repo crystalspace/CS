@@ -103,12 +103,12 @@ int csPixelShaderParser::GetArguments (const csString &str, csString &dest,
 
     switch(argument)
     {
-    default: break;
-    case 0: dest = reg; break;
-    case 1: src1 = reg; break;
-    case 2: src2 = reg; break;
-    case 3: src3 = reg; break;
-    case 4: src4 = reg; break;
+      default: break;
+      case 0: dest = reg; break;
+      case 1: src1 = reg; break;
+      case 2: src2 = reg; break;
+      case 3: src3 = reg; break;
+      case 4: src4 = reg; break;
     }
     argument ++;
     start = end + 1;
@@ -336,7 +336,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
       if(reg==NULL) break;
 
       const char *p = reg;
-      while(p[0] != 'c' && p[0] != 'v' && p[0] != 't' && p[0] != 'r' && p[0]!='\0') p++;
+      while(p[0] != 'c' && p[0] != 'v' && p[0] != 't' && p[0] != 'r'
+      	&& p[0]!='\0') p++;
       if(p[0]=='\0') return false;
       switch(p[0])
       {
@@ -508,8 +509,9 @@ static void GetSrcRegname (csPSRegisterType type, int num, uint mods,
   if (mods & CS_PS_RMOD_XYW) str << ".xyw";
 }
 
-void csPixelShaderParser::WriteProgram (const csArray<csPSProgramInstruction>& instrs, 
-					csString& str)
+void csPixelShaderParser::WriteProgram (
+	const csArray<csPSProgramInstruction>& instrs, 
+	csString& str)
 {
   for(int i = 0; i < instrs.Length (); i++)
   {

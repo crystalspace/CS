@@ -207,25 +207,25 @@ public:
   virtual const float *SampleFloat (csStringID type);
 
   /**
-  * Sample 2d vector data.
-  * Allowed types:
-  * texture coordinates
-  */ 
+   * Sample 2d vector data.
+   * Allowed types:
+   * texture coordinates
+   */ 
   virtual const csVector2 *SampleVector2 (csStringID type);
 
   /**
-  * Sample 3d vector data.
-  * Allowed types:
-  * positions
-  * normals
-  */ 
+   * Sample 3d vector data.
+   * Allowed types:
+   * positions
+   * normals
+   */ 
   virtual const csVector3 *SampleVector3 (csStringID type);
 
   /**
-  * Sample integer data.
-  * Allowed types:
-  * material indices
-  */ 
+   * Sample integer data.
+   * Allowed types:
+   * material indices
+   */ 
   virtual const int *SampleInteger (csStringID type);
 
   /// Returns the material palette

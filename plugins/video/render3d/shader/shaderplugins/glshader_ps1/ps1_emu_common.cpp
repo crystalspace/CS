@@ -98,7 +98,8 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
           {
             //create a new variable
             csRef<csShaderVariable> var = csPtr<csShaderVariable>(
-              new csShaderVariable (strings->Request(child->GetAttributeValue ("name"))));
+              new csShaderVariable (strings->Request(
+	      	child->GetAttributeValue ("name"))));
 
             // @@@ Will leak! Should do proper refcounting.
             var->IncRef ();
@@ -174,7 +175,8 @@ bool csShaderGLPS1_Common::Load (const char* program,
 }
 
 
-bool csShaderGLPS1_Common::Compile(csArray<iShaderVariableContext*> &staticContexts)
+bool csShaderGLPS1_Common::Compile(
+	csArray<iShaderVariableContext*> &staticContexts)
 {
   csShaderVariable *var;
   int i,j;

@@ -289,14 +289,18 @@ void csSimpleSampler::CachePositions ()
                         terraFormer->heightData[ix+iz*terraFormer->width]*
                           terraFormer->scale.y + terraFormer->offset.y,
                          zr);
-          } else {
+          }
+	  else
+	  {
             edgePositions[edgeIdx++] = 
               csVector3 (xr,
                         terraFormer->heightData[ix+iz*terraFormer->width]*
                           terraFormer->scale.y + terraFormer->offset.y,
                          zr);
           }
-        } else {
+        }
+	else
+	{
           // If we're not on the extra edge, store the position (with height
           // 0 since we're outside the heightmap) in our output buffer, and 
           // if we are, store it in the edge buffer
@@ -304,7 +308,9 @@ void csSimpleSampler::CachePositions ()
           {
             positions[posIdx++] = 
               csVector3 (xr, terraFormer->offset.y, zr);
-          } else {
+          }
+	  else
+	  {
             edgePositions[edgeIdx++] = 
               csVector3 (xr, terraFormer->offset.y, zr);
           }
@@ -437,7 +443,9 @@ const float *csSimpleSampler::SampleFloat (csStringID type)
     CacheHeights ();
 
     return heights;
-  } else {
+  }
+  else
+  {
     // Something we can't return was requested
     return 0;
   }
@@ -452,7 +460,9 @@ const csVector2 *csSimpleSampler::SampleVector2 (csStringID type)
     CacheTexCoords ();
 
     return texCoords;
-  } else {
+  }
+  else
+  {
     // Something we can't return was requested
     return 0;
   }
@@ -467,13 +477,16 @@ const csVector3 *csSimpleSampler::SampleVector3 (csStringID type)
     CachePositions ();
 
     return positions;
-  } else if (type == terraFormer->stringNormals)
+  }
+  else if (type == terraFormer->stringNormals)
   {
     // Make sure we've got data
     CacheNormals ();
 
     return normals;
-  } else {
+  }
+  else
+  {
     // Something we can't return was requested
     return 0;
   }
@@ -486,7 +499,9 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
   {
     // This isn't implemented yet. We just return 0
     return 0;
-  } else {
+  }
+  else
+  {
     // Something we can't return was requested
     return false;
   }

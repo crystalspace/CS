@@ -156,19 +156,19 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
     if(instr.src_reg[i] == CS_PS_REG_NONE) break;
     switch(instr.src_reg[i])
     {
-    default:
-    case CS_PS_REG_TEMP:
-      arg[i] = GL_REG_0_ATI + instr.src_reg_num[i];
-      break;
-    case CS_PS_REG_CONSTANT:
-      arg[i] = GL_CON_0_ATI + instr.src_reg_num[i];
-      break;
-    case CS_PS_REG_COLOR:
-      if(instr.src_reg_num[i] == 0) arg[i] = GL_PRIMARY_COLOR_ARB;
-      else arg[i] = GL_SECONDARY_INTERPOLATOR_ATI;
-      break;
-    case CS_PS_REG_TEX:
-      return false; // Not allowed in 1.4
+      default:
+      case CS_PS_REG_TEMP:
+        arg[i] = GL_REG_0_ATI + instr.src_reg_num[i];
+        break;
+      case CS_PS_REG_CONSTANT:
+        arg[i] = GL_CON_0_ATI + instr.src_reg_num[i];
+        break;
+      case CS_PS_REG_COLOR:
+        if(instr.src_reg_num[i] == 0) arg[i] = GL_PRIMARY_COLOR_ARB;
+        else arg[i] = GL_SECONDARY_INTERPOLATOR_ATI;
+        break;
+      case CS_PS_REG_TEX:
+        return false; // Not allowed in 1.4
     }
     if(instr.src_reg_mods[i] & CS_PS_RMOD_BIAS)
       argmod[i] |= GL_BIAS_BIT_ATI;

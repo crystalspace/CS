@@ -124,19 +124,23 @@ void csGLShader_PS1::Open()
   
   if(ext->CS_GL_ATI_fragment_shader)
   {
-    Report(CS_REPORTER_SEVERITY_NOTIFY, "ATI Fragment Shader Extension Supported");
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	"ATI Fragment Shader Extension Supported");
   }
   if(ext->CS_GL_NV_texture_shader)
   {
-    Report(CS_REPORTER_SEVERITY_NOTIFY, "nVidia Texture Shader Extension Supported");
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	"nVidia Texture Shader Extension Supported");
   }
   if(ext->CS_GL_NV_register_combiners)
   {
-    Report(CS_REPORTER_SEVERITY_NOTIFY, "nVidia Register Combiners Extension Supported");
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	"nVidia Register Combiners Extension Supported");
 
     GLint num_combiners;
     glGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &num_combiners);
-    Report(CS_REPORTER_SEVERITY_NOTIFY, "Max General Combiners: %d", num_combiners);
+    Report(CS_REPORTER_SEVERITY_NOTIFY,
+    	"Max General Combiners: %d", num_combiners);
   }
 
   isOpen = true;
