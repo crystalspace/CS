@@ -365,8 +365,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   // a VFS volume.
   Config = new csIniFile;
   VFS = (iVFS*)LoadPlugIn("crystalspace.kernel.vfs", CS_FUNCID_VFS, "iVFS", 0);
-  if (VFS)
-    VFS->IncRef();
 
   // Initialize configuration file
   if (iConfigName)
