@@ -19,12 +19,12 @@ PLUGINS += simpcon
 PLUGINS += font/server/csfont 
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
-ifeq ($(USE_SHARED_PLUGINS),yes)
+#ifeq ($(USE_SHARED_PLUGINS),yes)
 PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS += sound/loader sound/driver/nulldrv
 PLUGINS += cscon
 PLUGINS += csclear
-#PLUGINS += dungeon
+PLUGINS += dungeon
 PLUGINS += engine
 PLUGINS += net/driver/socket net/netman
 #PLUGINS += font/server/freefont
@@ -32,7 +32,7 @@ PLUGINS += csstdldr
 PLUGINS += netspace/nstp netspace/nsmgr
 PLUGINS += csauth/simple
 PLUGINS += metaball
-endif
+#endif
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
