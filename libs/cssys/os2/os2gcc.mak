@@ -194,10 +194,10 @@ SYSHELP += \
 # System-dependent help commands
 #  
 SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  USE_OMF=yes$|no (OS/2)$" \
-  $(NEWLINE)echo $"      Use OMF object module format (yes) vs a.out format (no)$" \
-  $(NEWLINE)echo $"  USE_CRTDLL=yes$|no (OS/2)$" \
-  $(NEWLINE)echo $"      Use EMX C runtime DLLs (yes: default) or do not (no)$"
+  $(NEWLINE)echo $"  USE_OMF=yes$|no (default: yes)$" \
+  $(NEWLINE)echo $"      OS/2-Only: Use OMF object module format (yes) vs a.out format (no)$" \
+  $(NEWLINE)echo $"  USE_CRTDLL=yes$|no (default: yes)$" \
+  $(NEWLINE)echo $"      OS/2-Only: Use EMX C runtime DLLs (yes) or do not (no)$"
 
 endif # ifeq ($(MAKESECTION),confighelp)
 

@@ -180,9 +180,9 @@ endif # ifneq (,$(findstring targets,$(MAKESECTION)))
 ifeq ($(MAKESECTION),confighelp)
 
 SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  USE_MAKEFILE_CACHE=yes$|no$" \
+  $(NEWLINE)echo $"  USE_MAKEFILE_CACHE=yes$|no (default: yes)$" \
   $(NEWLINE)echo $"      Cache makefile information for speedier builds.$" \
-  $(NEWLINE)echo $"  MONITOR_MAKEFILE_CACHE=yes$|no$" \
+  $(NEWLINE)echo $"  MONITOR_MAKEFILE_CACHE=yes$|no (default: yes)$" \
   $(NEWLINE)echo $"      Automatically refresh makefile cache when outdated.$" \
   $(NEWLINE)echo $"      Caution: Monitoring cache slows build process slightly.$"
 

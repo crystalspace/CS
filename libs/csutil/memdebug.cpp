@@ -208,7 +208,7 @@ static void ShowBlockInfo (MemEntry& me)
 {
   printf ("BLOCK: start=%08lx size=%d freed=%d\n", (long)me.start,
   	me.size, me.freed);
-# if CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG
   printf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
 # endif
 }
@@ -320,7 +320,7 @@ static void DumpError (const char* msg, int info, char* rc)
   }
 }
 
-#if CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG
 #undef new
 void* operator new (size_t s, void* filename, int line)
 #else
@@ -344,7 +344,7 @@ void* operator new (size_t s)
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
-# if CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG
   me.alloc_file = (char*)filename;
   me.alloc_line = line;
 # endif
@@ -352,7 +352,7 @@ void* operator new (size_t s)
   return (void*)(rc+4+DETECT_WALL);
 }
 
-#if CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG
 void* operator new[] (size_t s, void* filename, int line)
 #else
 void* operator new[] (size_t s)
@@ -375,7 +375,7 @@ void* operator new[] (size_t s)
   me.start = rc+4+DETECT_WALL;
   me.size = s;
   me.freed = false;
-# if CS_EXTENSIVE_MEMDEBUG
+# ifdef CS_EXTENSIVE_MEMDEBUG
   me.alloc_file = (char*)filename;
   me.alloc_line = line;
 # endif
@@ -477,7 +477,7 @@ void operator delete[] (void* p)
 // If CS_EXTENSIVE_MEMDEBUG is defined we still have to provide
 // the correct overloaded operators even if we don't do debugging.
 
-#if CS_EXTENSIVE_MEMDEBUG
+#ifdef CS_EXTENSIVE_MEMDEBUG
 #undef new
 void* operator new (size_t s, void*, int)
 {

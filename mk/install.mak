@@ -257,7 +257,7 @@ endif # ifeq ($(MAKESECTION),targets)
 ifeq ($(MAKESECTION),confighelp)
 
 SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  INSTALL_DIR=path$" \
+  $(NEWLINE)echo $"  INSTALL_DIR=path (default: /usr/local/crystal)$" \
   $(NEWLINE)echo $"      Overrides the default installation destination.$" \
   $(NEWLINE)echo $"      Specify an absolute path (excluding the trailing /).$"
 

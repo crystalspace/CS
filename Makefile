@@ -61,10 +61,12 @@ define SYSMODIFIERSHELP
   echo $(SEPARATOR)
   echo $"The following optional configuration modifiers may be specified:$"
   echo $"$"
-  echo $"  USE_PLUGINS=yes$|no$"
+  echo $"  USE_PLUGINS=yes$|no (default: yes)$"
   echo $"      Build drivers/plugins as dynamic/static modules.$"
-  echo $"  MODE=optimize$|debug$|profile$"
+  echo $"  MODE=optimize$|debug$|profile (default: optimize)$"
   echo $"      Select one of three available compilation modes.$"
+  echo $"  EXTENSIVE_MEMDEBUG=yes$|no (default:no)$"
+  echo $"      In debug mode, enable extensive heap validation.$"
 endef
 
 # If there is no target defined (makefile system was not configured),
@@ -105,6 +107,7 @@ showconfig:
 	@echo $"Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_PLUGINS=$(USE_PLUGINS)$"
 	@echo $"  MODE=$(MODE)$"
+	@echo $"  EXTENSIVE_MEMDEBUG=$(EXTENSIVE_MEMDEBUG)$"
 	@$(SYSMODIFIERS)
 	@echo $(SEPARATOR)
 
@@ -171,8 +174,9 @@ configbanner:
 	@echo $(SEPARATOR)
 
 config.tmp:
-	@echo MODE = $(MODE)>>config.tmp
 	@echo USE_PLUGINS = $(USE_PLUGINS)>>config.tmp
+	@echo MODE = $(MODE)>>config.tmp
+	@echo EXTENSIVE_MEMDEBUG = $(EXTENSIVE_MEMDEBUG)>>config.tmp
 	@echo FORCEBUCK = $(FORCEBUCK)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))

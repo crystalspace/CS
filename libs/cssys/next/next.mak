@@ -62,6 +62,10 @@ NEXT.PLUGIN_EXT = .csplugin
 # None of the NeXT platforms can grok the assembly used by CS
 override DO_ASM = no
 
+# The extensive memory debugger facility in cssysdef.h is incompatible with
+# some of the Apple/NeXT compilers.
+override EXTENSIVE_MEMDEBUG = no
+
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #----------------------------------------------------------------- defines ---#
@@ -268,8 +272,8 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 SYSCONFIG += $(NEXT.SYSCONFIG) \
-  $(NEWLINE)sh bin/comptest.sh>>config.tmp \
-  $(NEWLINE)sh bin/haspythn.sh>> config.tmp \
+  $(NEWLINE)CC=cc CXX=cc sh bin/comptest.sh>>config.tmp \
+  $(NEWLINE)CC=cc CXX=cc sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)

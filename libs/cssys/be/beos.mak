@@ -11,6 +11,10 @@ PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 # Be compiler does not currently grok CS assembly
 override DO_ASM=no
 
+# The extensive memory debugger facility in cssysdef.h interferes with the
+# 'operator new' overloads in the Be system headers.
+override EXTENSIVE_MEMDEBUG=no
+
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -127,7 +131,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
-SYSCONFIG += $(NEWLINE)sh bin/haspythn.sh >>config.tmp
+SYSCONFIG += $(NEWLINE)CC=gcc CXX=gcc sh bin/haspythn.sh >>config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 SYSCONFIG += $(NEWLINE)echo CS_BUILTIN_SIZED_TYPES = yes>>config.tmp
 

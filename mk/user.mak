@@ -93,8 +93,8 @@ PLUGINS.DYNAMIC += font/server/fontplex
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
 # After changing the settings in this section, you must re-run the makefile
-# configuration step (for example, "make linux") in order for your changes
-# to become effective.
+# configuration step (for example, "make unknown" followed by "make linux")
+# in order for your changes to become effective.
 #-----------------------------------------------------------------------------
 
 # Should we build drivers/plugins as loadable modules?
@@ -108,9 +108,16 @@ ifndef USE_SHARED_LIBS
   USE_SHARED_LIBS=no
 endif
 
-# Default build mode
+# Default build mode (either "optimize", "debug", or "profile").
 ifndef MODE
   MODE=optimize
+endif
+
+# If MODE is "debug", should we use the extensive heap validating machinery?
+# Do not enable this if you platform or your own code uses an overloaded `new'
+# operator.
+ifndef EXTENSIVE_MEMDEBUG
+  EXTENSIVE_MEMDEBUG=no
 endif
 
 # Should we cache makefile information?  Caching information speeds up the

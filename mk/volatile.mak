@@ -65,6 +65,9 @@ endif
 ifeq ($(USE_PLUGINS),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
+ifeq ($(EXTENSIVE_MEMDEBUG),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_EXTENSIVE_MEMDEBUG$">>volatile.tmp
+endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
