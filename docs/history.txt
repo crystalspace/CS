@@ -38,6 +38,15 @@ The history order has been reversed so that new features are at the top.
 	  of the problem rather than the problem itself.  Additionally, his
 	  change added unnecessary pollution to the global name space.
 	  Instead, I (Eric) solved the problem in a more correct fashion.
+	- Eric Sunshine repaired the following makefile-related problems which
+	  were recently introduced into the project:
+	    - Removed the video/loader reference from mk/msvcgen/required.mak.
+	      This was not the appropriate place to list this module.
+	    - Removed the video/loader reference from mk/subs.mak.  This was
+	      not the appropriate place to list this module.
+	    - Added a video/loader reference to mk/user.mak.  This _is_ the
+	      appropriate place to list such modules.
+	    - Removed the obsolete csstdldr reference from mk/user.mak.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works

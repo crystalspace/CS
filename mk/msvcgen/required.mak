@@ -54,6 +54,5 @@ MSVC.PLUGINS.REQUIRED =         \
   video/format/avi              \
   video/format/codecs/opendivx  \
   video/format/codecs/rle       \
-  video/loader                  \
   video/renderer/direct3d61     \
   video/renderer/opengl

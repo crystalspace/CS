@@ -13,7 +13,6 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(PLUGINS_SUBMAKEFILES),)
-  PLUGINS += video/renderer video/canvas video/loader  # These are not optional.
   ifeq ($(USE_PLUGINS),yes)
     PLUGINS += $(PLUGINS.DYNAMIC)
   endif
@@ -21,7 +20,9 @@ ifeq ($(PLUGINS_SUBMAKEFILES),)
     $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
 endif
 ifneq ($(PLUGINS_SUBMAKEFILES),)
-  include $(PLUGINS_SUBMAKEFILES)
+  PLUGINS.AUGMENTATION += video/renderer video/canvas # Special defines.
+  include $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,\
+    $(sort $(PLUGINS.AUGMENTATION))))) $(PLUGINS_SUBMAKEFILES)
 endif
 
 ifeq ($(APPLICATION_SUBMAKEFILES),)

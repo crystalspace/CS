@@ -18,41 +18,42 @@
 # as shared libraries. Please think twice before adding anything to PLUGINS;
 # in most cases you will want to add to PLUGINS.DYNAMIC.
 
-PLUGINS += video/renderer/software
 PLUGINS += filesys/vfs
+PLUGINS += video/renderer/software
+PLUGINS += video/loader
+PLUGINS += font/server/csfont 
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
-PLUGINS += font/server/csfont 
-PLUGINS += mesh/object/cube     mesh/loader/cube
-PLUGINS += mesh/object/spr2d    mesh/loader/spr2d
-PLUGINS += mesh/object/spr3d    mesh/loader/spr3d
-PLUGINS += mesh/object/fountain mesh/loader/fountain
-PLUGINS += mesh/object/explo    mesh/loader/explo
-PLUGINS += mesh/object/fire     mesh/loader/fire
-PLUGINS += mesh/object/snow     mesh/loader/snow
-PLUGINS += mesh/object/rain     mesh/loader/rain
-PLUGINS += mesh/object/spiral   mesh/loader/spiral
-PLUGINS += mesh/object/ball     mesh/loader/ball
-PLUGINS +=                      mesh/loader/thing
-PLUGINS += terrain/object/ddg   terrain/loader/ddg
+PLUGINS += mesh/object/cube        mesh/loader/cube
+PLUGINS += mesh/object/spr2d       mesh/loader/spr2d
+PLUGINS += mesh/object/spr3d       mesh/loader/spr3d
+PLUGINS += mesh/object/fountain    mesh/loader/fountain
+PLUGINS += mesh/object/explo       mesh/loader/explo
+PLUGINS += mesh/object/fire        mesh/loader/fire
+PLUGINS += mesh/object/snow        mesh/loader/snow
+PLUGINS += mesh/object/rain        mesh/loader/rain
+PLUGINS += mesh/object/spiral      mesh/loader/spiral
+PLUGINS += mesh/object/ball        mesh/loader/ball
+PLUGINS +=                         mesh/loader/thing
+PLUGINS += terrain/object/ddg      terrain/loader/ddg
 PLUGINS += terrain/object/terrfunc terrain/loader/terrfunc
+
+PLUGINS.DYNAMIC += engine
+PLUGINS.DYNAMIC += iso
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += csclear
 PLUGINS.DYNAMIC += dungeon
-PLUGINS.DYNAMIC += engine
-PLUGINS.DYNAMIC += net/driver/socket
 #PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
-#PLUGINS.DYNAMIC += csstdldr
 #PLUGINS.DYNAMIC += csgame/gamecore
-PLUGINS.DYNAMIC += iso
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
