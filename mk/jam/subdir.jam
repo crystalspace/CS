@@ -14,4 +14,21 @@ rule FixSubDirPath
     LOCATE_SOURCE = [ FDirName $(LOCATE.OBJECTS) $(SUBDIR_TOKENS) ] ;
     LOCATE_TARGET = [ FDirName $(LOCATE.OBJECTS) $(SUBDIR_TOKENS) ] ;
 }
-       
+
+# fix bug in Jambase where SubInclude in the middle of a jam file made it break
+rule SubInclude
+{
+    if ! $($(<[1]))
+    {
+        Exit SubInclude $(<[1]) without prior SubDir $(<[1]) ;
+    }
+
+    local save_SUBDIR_TOKENS = $(SUBDIR_TOKENS) ;
+
+    SubDir $(<) ;
+
+    include $(JAMFILE:D=$(SUBDIR)) ;
+
+    SubDir $(<[1]) $(save_SUBDIR_TOKENS) ;
+}
+    
