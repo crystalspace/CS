@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  causing it to be ignored by some versions of GCC. The fix reqires
 	  these functions to be declared inline to avoid syntax errors and
 	  linking errors.
+	- Philip Wyett moved the existing MSVC external application creation
+          HOWTO, to a new directory indicating MSVC 6. He also created 
+          a new one for the upcoming MSVC 7 external application HOWTO.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 
