@@ -33,7 +33,7 @@
 // 3D rasterizer if you can't do it better :-)
 //------------------------------------------------------------------------
 
-void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
+static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 	int num_vertices, csVector2* orig_triangle, bool use_fog, bool gouraud)
 {
   // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
@@ -233,7 +233,7 @@ static DECLARE_GROWING_ARRAY (visible, bool);
 /// Array with colors.
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
-void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
+void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
 	csClipper* clipper, float aspect,
 	int width2, int height2)
 {

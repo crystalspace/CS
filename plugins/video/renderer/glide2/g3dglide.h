@@ -33,6 +33,7 @@
 #include "icamera.h"
 #include "cs3d/glide2/glcache.h"
 #include "cs3d/glide2/gl_txtmgr.h"
+#include "cs3d/common/dtmesh.h"
 #include "glidhalo.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
@@ -226,10 +227,7 @@ public:
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
   { 
-    // i'm lazy thats why i'm calling the generic funtion :)
-    void DrawTriangleMesh( G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
-         csClipper* clipper, float aspect, int width2, int height2 );
-    DrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
+    DefaultDrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
   }
 
   ///

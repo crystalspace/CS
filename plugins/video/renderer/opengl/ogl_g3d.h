@@ -30,6 +30,7 @@
 
 #include "csutil/scf.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
+#include "cs3d/common/dtmesh.h"
 #include "csgeom/transfrm.h"
 #include "igraph3d.h"
 #include "iplugin.h"
@@ -327,11 +328,7 @@ public:
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
-    // Call generic version.
-    void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
-	csClipper* clipper, float aspect,
-	int width2, int height2);
-    DrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
   }
 
   /// Get the iGraphics2D driver.

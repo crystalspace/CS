@@ -33,6 +33,7 @@
 
 #include "cs3d/direct3d5/d3d_txtcache.h"
 #include "cs3d/direct3d5/d3d_txtmgr.h"
+#include "cs3d/common/dtmesh.h"
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "cssys/win32/IDDetect.h"
@@ -272,11 +273,7 @@ public:
   /// Draw a triangle mesh. 
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) 
   {
-    // Call generic version.
-    void DrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
-	csClipper* clipper, float aspect,
-	int width2, int height2);
-    DrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
+    DefaultDrawTriangleMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_nHalfWidth, m_nHalfHeight);
   }
 
   ///
