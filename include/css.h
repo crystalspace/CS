@@ -138,7 +138,6 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/portal.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/thing.h"
 #include "inetwork/driver.h"
 #include "inetwork/socket.h"
