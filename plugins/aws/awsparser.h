@@ -15,7 +15,7 @@ extern awsParser* static_awsparser;
 class awsParser
 {
 public:
-  awsParser (iObjectRegistry* objreg, iAws* prefmgr, awsPrefManager* prefmgr);
+  awsParser (iObjectRegistry* objreg, iAws* aws, awsPrefManager* prefmgr);
   ~awsParser ();
   bool Initialize (const char* filename);
 
