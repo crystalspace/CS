@@ -197,7 +197,7 @@ public:
   void Compact ()
   {
     int i = blocks.Length ()-1;
-    while (i >= 0)
+    while (i > firstfreeblock)
     {
       if (blocks[i].firstfree == (csFreeList*)blocks[i].memory &&
       	  blocks[i].firstfree->next == 0)

@@ -377,6 +377,13 @@ void csThingStatic::PrepareLMLayout ()
   litPolys.ShrinkBestFit ();
   unlitPolys.ShrinkBestFit ();
 
+  for (i = 0 ; i < litPolys.Length () ; i++)
+  {
+    StaticSuperLM* slm = litPolys[i]->staticSLM;
+    delete slm->rects;
+    slm->rects = 0;
+  }
+
   lmprepared = true;
 }
 
@@ -546,7 +553,6 @@ void csThingStatic::DistributePolyLMs (
 	{
 	  curOutputPolys->polys.Push (polyIdx);
 	  curOutputPolys->lmRects.Push (r);
-	  curOutputPolys->slmSubrects.Push (slmSR);
 	}
 	else
 	{
@@ -570,7 +576,6 @@ void csThingStatic::DistributePolyLMs (
 
       if (curOutputPolys->polys.Length () > 0)
       {
-	curOutputPolys->slmSubrects.ShrinkBestFit ();
 	curOutputPolys->lmRects.ShrinkBestFit ();
 	curOutputPolys->polys.ShrinkBestFit ();
 	outputPolys.Push (curOutputPolys);

@@ -501,6 +501,7 @@ csSubRectangles2::csSubRectangles2 (const csRect &region)
 csSubRectangles2::~csSubRectangles2 ()
 {
   GetSubRecAlloc ()->Free (root);
+  GetSubRecAlloc ()->Compact ();
 }
 
 csSubRect2* csSubRectangles2::AllocSubrect ()

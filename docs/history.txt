@@ -54,6 +54,10 @@ chronological order.
 	- Jorrit removed 16 bytes from every lightmapped polygon by removing
 	  unneeded fields from csGLRendererLightmap (in the GL renderer).
 	  Also for software renderer.
+	- Jorrit fixed a bug in csBlockAllocator::Compact() so that it actually
+	  works.
+	- Jorrit optimized thing a bit more by deleting the csSubRectangles2
+	  structure after calculating the optimal lightmap distribution.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

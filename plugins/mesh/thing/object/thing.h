@@ -231,7 +231,6 @@ public:
    */
   struct csStaticLitPolyGroup : public csStaticPolyGroup
   {
-    csArray<csSubRect2*> slmSubrects;
     csArray<csRect> lmRects;
     StaticSuperLM* staticSLM;
   };
