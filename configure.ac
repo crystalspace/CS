@@ -141,8 +141,7 @@ AS_IF([test -n "$SWIG"],
 #------------------------------------------------------------------------------
 m4_define([cs_jam_local_exe], [jam$EXEEXT])
 
-AC_CHECK_PROGS([JAM], [jam])
-#AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
+AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
 AS_IF([test -n "$JAM"],
     [CS_CHECK_PROG_VERSION([jam], [$JAM -v 2>&1], [2.4], [9.9|.9],
 	[cs_prog_jam_okay=yes], [cs_prog_jam_okay=no])],

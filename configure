@@ -3906,29 +3906,33 @@ do
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAM+set}" = set; then
+if test "${ac_cv_path_JAM+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$JAM"; then
-  ac_cv_prog_JAM="$JAM" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
+  case $JAM in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAM="$JAM" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR.
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_JAM="$ac_prog"
+    ac_cv_path_JAM="$as_dir/$ac_word$ac_exec_ext"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
 done
 done
 
+  ;;
+esac
 fi
-fi
-JAM=$ac_cv_prog_JAM
+JAM=$ac_cv_path_JAM
+
 if test -n "$JAM"; then
   echo "$as_me:$LINENO: result: $JAM" >&5
 echo "${ECHO_T}$JAM" >&6
@@ -3940,7 +3944,6 @@ fi
   test -n "$JAM" && break
 done
 
-#AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
 if test -n "$JAM"; then
   echo "$as_me:$LINENO: checking if jam version >= 2.4" >&5
 echo $ECHO_N "checking if jam version >= 2.4... $ECHO_C" >&6
