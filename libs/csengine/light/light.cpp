@@ -251,24 +251,26 @@ void csLight::CalculateInfluenceRadius ()
 {
   if (attenuationvec.y == 0 && attenuationvec.z == 0) {
     SetInfluenceRadius (GetRadius()); //if we only have constant falloff, use current radius
+    return;
   }
 
   /*calculate radius where the light have the intensity of 1/256 using the
-  standard lightmodel    1/(kc + kl*d + kl*d^2)
+  standard lightmodel    y*1/(kc + kl*d + kq*d^2)
   solution formula:
-       / -kl +- sqrt( kl^2 - 4*kc*kq + 1024*kq )\
-  0.5* |---------------------------------------|
-       \                kq                     /
+       / -kl +- sqrt( kl^2 - 4*kc*kq + 1024*kq *y )\
+  0.5* |------------------------------------------|
+       \                  kq                      /
   */
   float radius1, radius2;
   float kc = attenuationvec.x;
   float kl = attenuationvec.y;
   float kq = attenuationvec.z;
   float det;
+  float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   
-  det = -kl + sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq);
+  det = -kl + sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq*y);
   radius1 = 0.5*(det/kq);
-  det = -kl - sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq);
+  det = -kl - sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq*y);
   radius2 = 0.5*(det/kq);
 
   SetInfluenceRadius(MAX(radius1,radius2));
