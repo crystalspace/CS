@@ -22,7 +22,6 @@
 #include <ddraw.h>
 
 #include "csutil/scf.h"
-#include "cssys/win32/iddetect.h"
 
 SCF_VERSION (iGraphics2DDDraw8, 0, 0, 1);
 

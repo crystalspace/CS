@@ -29,7 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common
+vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common \
+  plugins/video/canvas/directxcommon
 
 ifeq ($(USE_PLUGINS),yes)
   DDRAW = $(OUTDLL)csddraw$(DLL)
@@ -44,17 +45,16 @@ else
   TO_INSTALL.STATIC_LIBS += $(DDRAW)
 endif
 
-INC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.h $(INC.COMMON.DRV2D)) \
-  libs/cssys/win32/directdetection.h
-SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
-  libs/cssys/win32/directdetection.cpp
+INC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.h \
+  $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D)))
+SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp \
+  $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 DEP.DDRAW = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDRAW
 DSP.DDRAW.NAME = csddraw
 DSP.DDRAW.TYPE = plugin
-DSP.DDRAW.LIBS = ddraw
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

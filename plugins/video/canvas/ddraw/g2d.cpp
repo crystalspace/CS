@@ -20,7 +20,7 @@
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "video/canvas/ddraw/g2d.h"
-#include "cssys/win32/directdetection.h"
+#include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
 #include "isys/system.h"

@@ -28,7 +28,7 @@
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "cssys/win32/DirectDetection.h"
+#include "directdetection.h"
 
 #ifdef COMP_BC
 # define _strdup _fstrdup

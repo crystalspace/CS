@@ -29,7 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/canvas/ddraw8 plugins/video/canvas/common
+vpath %.cpp plugins/video/canvas/ddraw8 plugins/video/canvas/common \
+  plugins/video/canvas/directxcommon
 
 ifeq ($(USE_PLUGINS),yes)
   DDRAW8 = $(OUTDLL)ddraw8$(DLL)
@@ -45,16 +46,15 @@ else
 endif
 
 INC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.h \
-  $(INC.COMMON.DRV2D)) libs/cssys/win32/directdetection.h
+  $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D)))
 SRC.DDRAW8 = $(wildcard plugins/video/canvas/ddraw8/*.cpp \
-  $(SRC.COMMON.DRV2D)) libs/cssys/win32/directdetection.cpp
+  $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.DDRAW8 = $(addprefix $(OUT),$(notdir $(SRC.DDRAW8:.cpp=$O)))
 DEP.DDRAW8 = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDRAW8
 DSP.DDRAW8.NAME = ddraw8
 DSP.DDRAW8.TYPE = plugin
-DSP.DDRAW8.LIBS = ddraw
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

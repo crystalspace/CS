@@ -26,8 +26,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-#include "cssys/win32/directdetection.h"
-
 #include <windowsx.h>
 #include <ddraw.h>
 
