@@ -325,16 +325,16 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const& engine)
 
 
 #define INTERPOLATE1(component) \
-  g3dpoly->vertices [i].##component## = inpoly [vt].##component## + \
-    t * (inpoly [vt2].##component## - inpoly [vt].##component##);
+  g3dpoly->vertices [i].component = inpoly [vt].component + \
+    t * (inpoly [vt2].component - inpoly [vt].component);
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = inpoly [edge_from [0]].##component## + \
-    t1 * (inpoly [edge_to [0]].##component## - inpoly [edge_from [0]].##component##); \
-  float v2 = inpoly [edge_from [1]].##component## + \
-    t2 * (inpoly [edge_to [1]].##component## - inpoly [edge_from [1]].##component##); \
-  g3dpoly->vertices [i].##component## = v1 + t * (v2 - v1); \
+  float v1 = inpoly [edge_from [0]].component + \
+    t1 * (inpoly [edge_to [0]].component - inpoly [edge_from [0]].component); \
+  float v2 = inpoly [edge_from [1]].component + \
+    t2 * (inpoly [edge_to [1]].component - inpoly [edge_from [1]].component); \
+  g3dpoly->vertices [i].component = v1 + t * (v2 - v1); \
 }
 
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,

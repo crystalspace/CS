@@ -38,32 +38,32 @@
 //------------------------------------------------------------------------
 
 #define INTERPOLATE1(component) \
-  g3dpoly->vertices [i].##component## = tritexcoords [vt].##component## + \
-    t * (tritexcoords [vt2].##component## - tritexcoords [vt].##component##);
+  g3dpoly->vertices [i].component = tritexcoords [vt].component + \
+    t * (tritexcoords [vt2].component - tritexcoords [vt].component);
 
 #define INTERPOLATE1_FOG(component) \
-  g3dpoly->fog_info [i].##component## = trifoginfo [vt].##component## + \
-    t * (trifoginfo [vt2].##component## - trifoginfo [vt].##component##);
+  g3dpoly->fog_info [i].component = trifoginfo [vt].component + \
+    t * (trifoginfo [vt2].component - trifoginfo [vt].component);
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = tritexcoords [edge1 [0]].##component## + \
-    t1 * (tritexcoords [edge1 [1]].##component## - \
-          tritexcoords [edge1 [0]].##component##); \
-  float v2 = tritexcoords [edge2 [0]].##component## + \
-    t2 * (tritexcoords [edge2 [1]].##component## - \
-          tritexcoords [edge2 [0]].##component##); \
-  g3dpoly->vertices [i].##component## = v1 + t * (v2 - v1); \
+  float v1 = tritexcoords [edge1 [0]].component + \
+    t1 * (tritexcoords [edge1 [1]].component - \
+          tritexcoords [edge1 [0]].component); \
+  float v2 = tritexcoords [edge2 [0]].component + \
+    t2 * (tritexcoords [edge2 [1]].component - \
+          tritexcoords [edge2 [0]].component); \
+  g3dpoly->vertices [i].component = v1 + t * (v2 - v1); \
 }
 #define INTERPOLATE_FOG(component) \
 { \
-  float v1 = trifoginfo [edge1 [0]].##component## + \
-    t1 * (trifoginfo [edge1 [1]].##component## - \
-          trifoginfo [edge1 [0]].##component##); \
-  float v2 = trifoginfo [edge2 [0]].##component## + \
-    t2 * (trifoginfo [edge2 [1]].##component## - \
-          trifoginfo [edge2 [0]].##component##); \
-  g3dpoly->fog_info [i].##component## = v1 + t * (v2 - v1); \
+  float v1 = trifoginfo [edge1 [0]].component + \
+    t1 * (trifoginfo [edge1 [1]].component - \
+          trifoginfo [edge1 [0]].component); \
+  float v2 = trifoginfo [edge2 [0]].component + \
+    t2 * (trifoginfo [edge2 [1]].component - \
+          trifoginfo [edge2 [0]].component); \
+  g3dpoly->fog_info [i].component = v1 + t * (v2 - v1); \
 }
 
 static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
@@ -465,14 +465,14 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       G3DFogInfo fog[3];
 #undef COPYVT
 #define COPYVT(id,idl,i) \
-	p##idl## = persp[i]; zv[id] = z_verts[i]; uv[id] = work_uv_verts[i]; \
+	p##idl = persp[i]; zv[id] = z_verts[i]; uv[id] = work_uv_verts[i]; \
 	if (work_col) col[id] = work_col[i]; \
 	if (poly.use_fog) fog[id] = mesh.vertex_fog[i];
 #undef INTERPOL
 #define INTERPOL(id,idl,i1,i2) \
 	uv[id] = work_uv_verts[i1] + r*(work_uv_verts[i2]-work_uv_verts[i1]); \
         zv[id] = com_zv; \
-	p##idl##.x = v.x * com_iz + width2; p##idl##.y = v.y * com_iz + width2; \
+	p##idl.x = v.x * com_iz + width2; p##idl.y = v.y * com_iz + width2; \
 	if (work_col) \
 	{ \
 	  col[id].red = work_col[i1].red+r*(work_col[i2].red-work_col[i1].red); \

@@ -35,16 +35,16 @@
  */
 
 #define INTERPOLATE1(component) \
-  poly.vertices [j].##component## = orig_poly [vt].##component## + \
-    t * (orig_poly [vt2].##component## - orig_poly [vt].##component##);
+  poly.vertices [j].component = orig_poly [vt].component + \
+    t * (orig_poly [vt2].component - orig_poly [vt].component);
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = orig_poly [edge_from [0]].##component## + \
-    t1 * (orig_poly [edge_to [0]].##component## - orig_poly [edge_from [0]].##component##); \
-  float v2 = orig_poly [edge_from [1]].##component## + \
-    t2 * (orig_poly [edge_to [1]].##component## - orig_poly [edge_from [1]].##component##); \
-  poly.vertices [j].##component## = v1 + t * (v2 - v1); \
+  float v1 = orig_poly [edge_from [0]].component + \
+    t1 * (orig_poly [edge_to [0]].component - orig_poly [edge_from [0]].component); \
+  float v2 = orig_poly [edge_from [1]].component + \
+    t2 * (orig_poly [edge_to [1]].component - orig_poly [edge_from [1]].component); \
+  poly.vertices [j].component = v1 + t * (v2 - v1); \
 }
 
 void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
