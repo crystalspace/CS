@@ -92,9 +92,13 @@ typedef __int64 int64;
 #endif // end of #ifdef COMP_GCC
 
 #else
-// we're happy and can simply use stdint.h
+// We're happy and can simply use stdint.h.
+#ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#endif
+#ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
+#endif
 #include <stdint.h>
 typedef uint8_t uint8;
 typedef int8_t int8;
