@@ -4193,7 +4193,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
               case TOKEN_MATRIX:
                 spr->SetTransform (load_matrix (params2));
                 break;
-              case TOKEN_MOVE:
+              case TOKEN_V:
                 spr->SetMove (load_vector (params2));
                 break;
             }
