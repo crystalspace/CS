@@ -30,6 +30,7 @@ Crystal Space supports.
 * MeshObject Spr3D:: Sprite3D Mesh Object
 * MeshObject Ball:: Ball Mesh Object
 * MeshObject Cube:: Cube Mesh Object
+* MeshObject Emit:: Emitter Mesh Object
 * MeshObject PartSys:: Particle Systems in General
 * MeshObject Fountain:: Fountain Mesh Object
 * MeshObject Fire:: Fire Mesh Object
@@ -46,6 +47,7 @@ Crystal Space supports.
 @importss{plugins,meshobj,spr3d.txi}
 @importss{plugins,meshobj,ball.txi}
 @importss{plugins,meshobj,cube.txi}
+@importss{plugins,meshobj,emit.txi}
 @importss{plugins,meshobj,partsys.txi}
 @importss{plugins,meshobj,fountain.txi}
 @importss{plugins,meshobj,fire.txi}

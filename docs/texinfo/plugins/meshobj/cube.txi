@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Cube, MeshObject PartSys, MeshObject Ball, MeshObject
+@node MeshObject Cube, MeshObject Emit, MeshObject Ball, MeshObject
 @subsection Cube Mesh Object
 @cindex MeshObject
 @cindex Cube

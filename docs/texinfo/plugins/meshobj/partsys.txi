@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject PartSys, MeshObject Fountain, MeshObject Cube, MeshObject
+@node MeshObject PartSys, MeshObject Fountain, MeshObject Emit, MeshObject
 @subsection Particle Systems in General
 @cindex MeshObject
 @cindex Particle Systems
