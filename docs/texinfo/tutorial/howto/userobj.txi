@@ -6,7 +6,10 @@
 @cindex @code{csObject}
 
 This section explains how you can assign your own game specific data
-to Crystal Space objects (i.e. like meshes and sectors).
+to Crystal Space objects (i.e. like meshes and sectors). In this section
+we explain how to do it from within code. In the next howto
+(@pxref{HOWTO User Objects in Maps}) we explain how you can do this from
+a map file.
 
 @subsubheading The Crystal Space Object System
 
