@@ -28,6 +28,7 @@ class csWsTest : public csApp
   void NotebookDialog ();
   void GridDialog ();
   void TreeDialog ();
+  void LayoutDialog ();
 
 public:
   /// Initialize maze editor
@@ -360,6 +361,9 @@ bool csWsTest::Initialize (const char *iConfigName)
 
     but = new csButton (this, 9990);
     but->SetText ("~Green scheme"); but->SetRect (20, 280, 190, 300);
+
+    but = new csButton (this, 9989);
+    but->SetText ("Layout"); but->SetRect (20, 340, 190, 360);
   }
 
   return true;
@@ -485,6 +489,84 @@ void csWsTest::GridDialog ()
   but->SetText ("blah");
   grid->CreateRegion (rc, gc);
 
+  Execute (window);
+  delete window;
+}
+
+void CreateButton (csComponent *parent, int id, const char *text, int xpos, int ypos)
+{
+  csButton *b= new csButton (parent, id);
+  b->SetPos (xpos, ypos);
+  b->SetSuggestedSize (0, 0);
+  b->SetText (text);
+}
+
+void csWsTest::LayoutDialog ()
+{
+  csComponent *window = new csWindow (this, "Layout test",
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
+    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  window->SetSize (400, 300);
+  window->Center ();
+  
+  csGridBagLayout *gb = new csGridBagLayout (window);
+
+  window->SendCommand (cscmdWindowSetClient, (void*)gb);
+
+  csBorderConstraint *blc[5] = {csBorderLayout::CENTER, 
+				csBorderLayout::EAST, 
+				csBorderLayout::NORTH,
+				csBorderLayout::WEST,
+				csBorderLayout::SOUTH};
+
+  gb->c.fill = csGridBagConstraint::BOTH;
+  gb->c.weightx = 1.0;
+  CreateButton (gb, 7000, "test 1", 0, 20);
+  CreateButton (gb, 7001, "test 2", 0, 20);
+  CreateButton (gb, 7002, "test 3", 0, 20);
+  gb->c.gridwidth = csGridBagConstraint::REMAINDER; //end row
+  CreateButton (gb, 7003, "test 4", 0, 20);
+  gb->c.weightx = 0.0;                  //reset to the default
+  CreateButton (gb, 7004, "test 5", 0, 20);
+  gb->c.gridwidth = csGridBagConstraint::RELATIVE; //next-to-last in row
+  CreateButton (gb, 7005, "test 6", 0, 20);
+  gb->c.gridwidth = csGridBagConstraint::REMAINDER; //end row
+  gb->c.gridx = 2;                //reset to the default
+  CreateButton (gb, 7006, "test 7", 0, 20);
+  gb->c.gridx = csGridBagConstraint::RELATIVE;                //reset to the default
+  gb->c.gridwidth = 1;                //reset to the default
+  gb->c.gridheight = 2;
+  gb->c.weighty = 1.0;
+  CreateButton (gb, 7007, "test 8", 0, 20);
+  gb->c.weighty = 0.0;                  //reset to the default
+  gb->c.gridwidth = csGridBagConstraint::REMAINDER; //end row
+  gb->c.gridheight = 1;               //reset to the default
+  CreateButton (gb, 7008, "test 9", 0, 20);
+
+  csBorderLayout *border = new csBorderLayout (gb);
+  border->SetRect (0, 0, 50, 50);
+  
+  // a flow layout in the center of the borderlayout
+  border->c = *blc[0];
+  csFlowLayout *flow = new csFlowLayout (border);
+  for (int k=0; k<10; k++)
+  {
+    char tt[20];
+    sprintf (tt, "t %d", k);
+    CreateButton (flow, 7200+k, tt, k*20, 20);
+  }
+
+  for (int j=1; j < 5; j++)
+  {
+    border->c = *blc[j];
+    csButton *b= new csButton (border, 7100+j);
+    b->SetPos ((9+j)*10, 20);
+    b->SetSuggestedSize (0, 0);
+    char text[20];
+    sprintf (text, "Test %d", j);
+    b->SetText (text);
+  }
+  
   Execute (window);
   delete window;
 }
@@ -700,6 +782,11 @@ bool csWsTest::HandleEvent (iEvent &Event)
           csSetColorScheme (this, Scheme);
           return true;
 	}
+        case 9989:
+        {
+          LayoutDialog ();
+          return true;
+        }
       }
       break;
 
