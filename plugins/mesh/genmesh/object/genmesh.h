@@ -91,8 +91,10 @@ private:
   float current_lod;
   uint32 current_features;
 
-  // Optional hard transform.
+  // Optional hard transform and bbox in case of hard transform.
   csReversibleTransform* hard_transform;
+  csBox3* hard_bbox;
+  csVector3 hard_radius;
 
   bool do_shadows;
   bool do_shadow_rec;
@@ -150,6 +152,9 @@ private:
    * Update lighting using the iLightingInfo system.
    */
   void UpdateLighting2 (iMovable* movable);
+
+  /// Used in case of a hard transformed mesh object.
+  void CalculateBBoxRadiusHard ();
 
 public:
   /// Constructor.

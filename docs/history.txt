@@ -36,6 +36,8 @@ The history order is reversed so that new features are at the top.
 	  makefiles to fail when USE_PLUGINS=no.  Problem was that win32gcc.mak
 	  was setting DO.PLUGIN.POSTAMBLE rather than
 	  DO.SHARED.PLUGIN.POSTAMBLE.
+	- Fixed genmesh so that when you transform a mesh object the bounding
+	  box and sphere will be correct.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from

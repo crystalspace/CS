@@ -129,6 +129,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   lighting_dirty = true;
   shadow_caps = false;
   hard_transform = NULL;
+  hard_bbox = NULL;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -145,6 +146,7 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
   delete hard_transform;
+  delete hard_bbox;
 }
 
 void csGenmeshMeshObject::CheckLitColors ()
@@ -929,9 +931,59 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
 }
 #endif // CS_USE_NEW_RENDERER
 
+void csGenmeshMeshObject::CalculateBBoxRadiusHard ()
+{
+  if (hard_bbox) return;
+  hard_bbox = new csBox3 ();
+  if (factory->GetVertexCount () == 0)
+  {
+    hard_bbox->StartBoundingBox ();
+    hard_radius.Set (0, 0, 0);
+    return;
+  }
+
+  csVector3* vt = factory->GetVertices ();
+  hard_bbox->StartBoundingBox (hard_transform->This2Other (vt[0]));
+  csVector3 max_sq_radius (0);
+  int i;
+  for (i = 1 ; i < factory->GetVertexCount () ; i++)
+  {
+    csVector3 v = hard_transform->This2Other (vt[i]);
+    hard_bbox->AddBoundingVertexSmart (v);
+    csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+    if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+    if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+    if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+  }
+  hard_radius.Set (qsqrt (max_sq_radius.x),
+  	qsqrt (max_sq_radius.y), qsqrt (max_sq_radius.z));
+}
+
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
-  bbox = factory->GetObjectBoundingBox ();
+  if (hard_transform)
+  {
+    CalculateBBoxRadiusHard ();
+    bbox = *hard_bbox;
+  }
+  else
+  {
+    bbox = factory->GetObjectBoundingBox ();
+  }
+}
+
+void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
+{
+  if (hard_transform)
+  {
+    CalculateBBoxRadiusHard ();
+    rad = hard_radius;
+  }
+  else
+  {
+    rad = factory->GetRadius ();
+  }
+  cent.Set (0);
 }
 
 bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
@@ -993,12 +1045,6 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   return true;
 }
 
-void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
-{
-  rad = factory->GetRadius ();
-  cent.Set (0);
-}
-
 int csGenmeshMeshObject::PolyMesh::GetVertexCount ()
 {
   return scfParent->factory->GetVertexCount ();
@@ -1030,6 +1076,11 @@ void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
   {
     *hard_transform = t * *hard_transform;
   }
+  // Force recomputation of bbox.
+  delete hard_bbox;
+  hard_bbox = NULL;
+  shapenr++;
+  FireListeners ();
 }
 
 //----------------------------------------------------------------------
