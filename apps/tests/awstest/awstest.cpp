@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
+#include "csutil/csevent.h"
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
