@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <wchar.h>
 
 #define CS_SYSDEF_PROVIDE_GETCWD
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH

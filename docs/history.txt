@@ -48,6 +48,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	  csInitializer::SetupConfigManager to use that function.
 	- res committed some forgotten files and fixed some cut'n'paste and 
 	  similar stupid errors.
+        - acraig added missing #include<wchar.h> in csutil/utill.cpp 
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.
