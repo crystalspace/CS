@@ -218,7 +218,25 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 iSector* csLoader::FindSector (const char* name)
 {
   if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-    return Engine->GetCurrentRegion ()->FindSector (name);
+  {
+    // We can't use iRegion::FindSector() here because that routine
+    // also returns sectors that are added to the region but not linked
+    // to the engine. Here we need to find sectors that are linked to the
+    // engine AND are in a region. Otherwise we risk finding the dummy
+    // sectors that are created during the loading process.
+    iRegion* reg = Engine->GetCurrentRegion ();
+    iSectorList* sl = Engine->GetSectors ();
+    for (int i = 0 ; i < sl->GetCount () ; i++)
+    {
+      iSector* s = sl->Get (i);
+      if (!strcmp (s->QueryObject ()->GetName (), name))
+      {
+        if (reg->IsInRegion (s->QueryObject ()))
+          return s;
+      }
+    }
+    return NULL;
+  }
   else
     return Engine->GetSectors ()->FindByName (name);
 }

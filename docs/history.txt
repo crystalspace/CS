@@ -18,6 +18,16 @@ The history order is reversed so that new features are at the top.
 	  loader cannot be found in the registry the syntax services will
 	  simply use the engine to find the material (ignoring
 	  region information).
+	- Fixed a bug in csparser with regards to loading a world in
+	  a region. The sector resolver (for finding out to which sector
+	  a portal goes) was finding any sector in the region with the
+	  given name. The problem is that this also finds the dummy
+	  sectors that are created in the loading process and which are not
+	  linked to the engine (but they are in the region). Solved this
+	  bug by manually looping over all sectors in the engine and
+	  seeing if they have the right name and are in the right sector.
+	  That will make sure we only find sectors that are linked to the
+	  engine AND are in the region.
 	- Eric Sunshine fixed a small error in winconf.bat where it was not
 	  properly making use of the result of its Bash quote-test.  (Was
 	  invoking the wrong filename.)
