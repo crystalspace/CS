@@ -1843,7 +1843,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   if (badoccluder_thresshold >= 0)
   {
-    int i;
+    size_t i;
     for (i = 0 ; i < occluder_info.Length () ; i++)
     {
       csOccluderInfo& occinfo = occluder_info[i];
