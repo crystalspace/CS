@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Dec-2004
+	- Eric Sunshine removed obsolete warning from Doxygen documentation for
+	  iEventOutlet::Post() which said to post only events returned by
+	  CreateEvent().  This requirement was eliminated on 9-Feb-2004 when
+	  Eric re-wrote all of the highly nasty code in csEvent which made the
+	  dangerous assumption that the incoming iEvent was actually a csEvent.
 7-Dec-2004
 	- Eric Sunshine added new Autoconf macros CS_CHECK_PROG(),
 	  CS_CHECK_PROGS(), CS_CHECK_TOOL(), CS_CHECK_TOOLS(), CS_PATH_PROG(),

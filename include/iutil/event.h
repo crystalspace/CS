@@ -425,9 +425,14 @@ struct iEventOutlet : public iBase
 
   /**
    * Put a previously created event into system event queue.<p>
-   * <b>NOTE:</b> YOU SHOULD PASS HERE ONLY OBJECTS THAT WERE CREATED
-   * VIA CreateEvent() FUNCTION! IF YOU PASS ARBITRARY EVENTS CREATED
-   * BY YOUR PROGRAM/PLUGIN IN SOME ENVIRONMENTS IT WILL CRASH!
+   * \remarks The event you pass to this method should be heap-allocated rather
+   * than stack-allocated since the event will be queued for later dispatch and
+   * because receivers of the event may claim their own references to it.  The
+   * typical way to create a heap-allocated event is with
+   * iEventQueue::CreateEvent(), iEventOutlet::CreateEvent(), or via the C++
+   * 'new' operator. The CreateEvent() methods have the benefit that they pool
+   * "dead" events and re-issue them to you when needed, thus they are quite
+   * efficient.
    */
   virtual void Post (iEvent*) = 0;
 
@@ -440,7 +445,7 @@ struct iEventOutlet : public iBase
    * translated key, after applying all modeshift keys. Never assume
    * that any of these two codes is always less 127, not being 255
    * or 224 -- these are common mistakes for English-speaking programmers.
-   *<p>
+   * <p>
    * if you pass -1 as character code, the iChar argument is computed
    * using an simple internal translation table that takes care of
    * Control/Shift/Alt for English characters. But in general it is
