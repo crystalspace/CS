@@ -136,7 +136,6 @@ bool BumpTest::InitProcDemo ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
   csVector3 overdist(0,0,-0.01); // to move slightly in front
   /// the bumpoverlay
-  /*
   // this does not work - the texture is flat shaded too.
   p = thing_state->CreatePolygon ();
   p->SetTextureType(POLYTXT_FLAT);
@@ -156,7 +155,6 @@ bool BumpTest::InitProcDemo ()
   if(!ipn) printf("No PolyTexNone info!\n");
   else ipn->SetMixMode(CS_FX_MULTIPLY2);
   if(ipn) ipn->SetMixMode(CS_FX_COPY);
-  */
 
   ////// copy of bumps for debug
   p = thing_state->CreatePolygon ();
@@ -225,6 +223,7 @@ bool BumpTest::InitProcDemo ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
   */
 
+  iSector* iroom = QUERY_INTERFACE (room, iSector);
   csMeshWrapper* thing_wrap = new csMeshWrapper (engine, thing_obj);
   thing_obj->DecRef ();
   thing_wrap->SetName ("Bumpy");
@@ -239,7 +238,7 @@ bool BumpTest::InitProcDemo ()
   ithing_wrap->DecRef ();
   thing_state->CreateLightMaps (G3D);
 
-  iSector* iroom = QUERY_INTERFACE (room, iSector);
+#if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (
     "crystalspace.mesh.object.sprite.3d", "sprite3d");
   iSprite3DFactoryState* sprfactstate = QUERY_INTERFACE(
@@ -275,6 +274,7 @@ bool BumpTest::InitProcDemo ()
   //spstate->SetMixMode(CS_FX_COPY);
   spstate->SetMixMode(CS_FX_MULTIPLY2 | CS_FX_TILING);
   spstate->DecRef ();
+#endif
 
 
   iroom->DecRef();
@@ -485,12 +485,12 @@ void BumpTest::NextFrame ()
   //angle += elapsed_time * 0.4 / 1000.;
   if(going_right)
   {
-    animli += speed * 0.5;
+    animli += speed * 2.5;
     if(animli > 7.0) going_right = false;
   }
   else 
   {
-    animli -= speed * 0.3;
+    animli -= speed * 2.5;
     if(animli < 0.0) going_right = true;
   }
   dynlight->Move(room, -3 + animli, 5, -2);
