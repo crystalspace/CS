@@ -1,0 +1,4 @@
+Some notes:
+	- copy iPhysique.gup to your max_dir/plugins and restart max. 
+	- After biped creation use physique modifier.
+	- All vertices should be "rigid" type when rigging model.
