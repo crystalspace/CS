@@ -424,7 +424,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 
     if(layer->tcoordsource == CS_COLORSOURCE_MESH)
     {
-      csRef<iRenderBuffer> tbuf = ss->GetBuffer(strset->Request(mesh->GetDefaultTexCoordBuffer()));
+      csRef<iRenderBuffer> tbuf = ss->GetBuffer(strset->Request("texture coordinates"));
       if(tbuf)
       {
         glTexCoordPointer(2,GL_FLOAT,0,tbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
@@ -510,7 +510,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
   }
 }
 
-void csShaderGLMTEX::Deactivate(iShaderPass* current)
+void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
 {
   if(!validProgram) return;
 

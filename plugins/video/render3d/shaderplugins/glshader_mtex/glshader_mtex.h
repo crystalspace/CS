@@ -194,7 +194,7 @@ public:
 
   virtual ~csShaderGLMTEX ()
   {
-    Deactivate(NULL);
+    Deactivate(NULL, NULL);
     if(programstring) delete programstring;
   }
 
@@ -208,7 +208,7 @@ public:
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current);
+  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh);
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific
