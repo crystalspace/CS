@@ -50,7 +50,6 @@
 	</addon>
 	
 	<settings>
-		<fastmesh>100</fastmesh>
 		<renderloop>myLoop</renderloop>
 		<clearzbuf>yes</clearzbuf>
 	</settings>
