@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Dec-2004
+	- Mike Handverger added support for enabling/disabling bodies
+          in odedynam. This is especially helpful when used with
+          EnableAutoDisable()
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.
 	- PK added *polygon_idx = i; to csSprite3DMeshObject::HitBeamObject

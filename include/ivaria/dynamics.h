@@ -114,10 +114,10 @@ struct iDynamicSystem : public iBase
   virtual bool AutoDisableEnabled () =0;
   /**
     Set the parameters for AutoDisable.
-    /param linear Maximum linear movement to disable a body
-    /param angular Maximum angular movement to disable a body
-    /param steps Minimum number of steps the body meets linear and angular requirements before it is disabled.
-    /param time Minimum time the body needs to meet linear and angular movement requirements before it is disabled.
+    \param linear Maximum linear movement to disable a body
+    \param angular Maximum angular movement to disable a body
+    \param steps Minimum number of steps the body meets linear and angular requirements before it is disabled.
+    \param time Minimum time the body needs to meet linear and angular movement requirements before it is disabled.
   */
   virtual void SetAutoDisableParams (float linear, float angular, int steps, float time)=0;
 
@@ -341,6 +341,14 @@ struct iRigidBody : public iBase
   virtual bool MakeDynamic (void) = 0;
   /// Tells whether a body has been made static or not
   virtual bool IsStatic (void) = 0;
+  /**
+    * Temporarily ignores the body until something collides with it.
+  */
+  virtual bool Disable (void) = 0;
+  /// Re-enables a body after calling Disable, or by being auto disabled
+  virtual bool Enable (void) = 0;
+  /// Returns true if a body is enabled.
+  virtual bool IsEnabled (void) = 0;  
 
   /// Returns which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;

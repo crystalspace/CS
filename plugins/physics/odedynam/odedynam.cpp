@@ -600,8 +600,12 @@ void csODEDynamicSystem::Step (float elapsed_time)
     for (size_t i = 0; i < bodies.Length(); i ++) 
     {
         iRigidBody *b = bodies.Get(i);
-        b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
-        b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+        // only do this if the body is enabled
+        if (b->IsEnabled())
+        {
+          b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
+          b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+        }
     }
     for (size_t j = 0; j < updates.Length(); j ++) 
     {
@@ -876,6 +880,23 @@ bool csODERigidBody::MakeDynamic ()
   return true;
 }
 
+bool csODERigidBody::Disable ()
+{
+  dBodyDisable (bodyID);
+  return true;
+}
+
+bool csODERigidBody::Enable ()
+{
+  dBodyEnable (bodyID);
+  return true;
+}
+
+bool csODERigidBody::IsEnabled ()
+{
+  return dBodyIsEnabled (bodyID);
+}
+
 void csODERigidBody::SetGroup(iBodyGroup *group)
 {
   if (collision_group)
@@ -1124,8 +1145,8 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
-    dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
-    if (statjoint != 0) dJointSetFixed(statjoint);
+  dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
+  if (statjoint != 0) dJointSetFixed(statjoint);
 }
 
 const csVector3 csODERigidBody::GetPosition () const

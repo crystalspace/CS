@@ -534,6 +534,12 @@ public:
     { return scfParent->MakeDynamic (); }
     bool IsStatic (void) 
     { return scfParent->IsStatic (); }
+    bool Disable (void) 
+    { return scfParent->Disable (); }
+    bool Enable (void)
+    { return scfParent->Enable (); }
+    bool IsEnabled (void) 
+    { return scfParent->IsEnabled (); }
     csRef<iBodyGroup> GetGroup (void) 
     { return scfParent->GetGroup (); }
     bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans, 
@@ -623,6 +629,10 @@ public:
   bool MakeStatic (void);
   bool IsStatic (void) { return statjoint != 0; }
   bool MakeDynamic (void);
+  
+  bool Disable (void);
+  bool Enable (void);
+  bool IsEnabled (void);
 
   void SetGroup (iBodyGroup *group);
   void UnsetGroup () { collision_group = 0; }
