@@ -23,6 +23,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+// added for Crystal Space to avoid a lot of compiler warnings
+#include "cssysdef.h"
+
 #if defined (WIN32) && !defined (__CYGWIN32__)
 /* It's not Unix, really.  See?  Capital letters.  */
 #include <windows.h>
