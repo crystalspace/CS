@@ -1830,7 +1830,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
 	[AC_CACHE_CHECK([if qsqrt() is usable], [cs_cv_cxx_qsqrt_ok],
 	    [AC_LANG_PUSH([C++])
 	    cs_cflags_save="$CXXFLAGS"
-	    CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
+	    CXXFLAGS="$CXXFLAGS -fPIC $cs_optimize_flags"
 	    AC_RUN_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [#define PROC_$cs_host_cpu_normalized
