@@ -1798,7 +1798,7 @@ CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
 	[[#include <regex.h>]],
 	[regex_t re; regcomp (&re, 0, 0); regexec (&re, 0, 0, 0, 0);])],
     [], [],
-    [CS_HEADER_PROPERTY([CS_UNIX_PLUGIN_REQUIRES_MAIN])])
+    [CS_HEADER_PROPERTY([CS_HAS_REGEX])])
 
 
 #------------------------------------------------------------------------------

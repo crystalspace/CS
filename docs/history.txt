@@ -60,6 +60,7 @@ chronological order.
 	    - Added a "GL driver database". The depending on a set of rules 
 	      the GL canvases now load certain config settings. See 
 	      data/config/gldrivers.xml.
+	- res fixed a cut'n'paste error in the regexp configure check.	
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
