@@ -131,14 +131,21 @@ private:
   // World space data. movable_nr is used to detect if it needs to be
   // recalculated.
   long movable_nr;
+  bool movable_identity;
   csDirtyAccessArray<csVector3> world_vertices;
   csArray<csPlane3> world_planes;
+
+  // Camera space data.
+  csDirtyAccessArray<csVector3> camera_vertices;
+  csArray<csPlane3> camera_planes;
 
   // Probably only for old renderer: clip data between DrawTest->Draw. @@@OR@@@
   int clip_portal, clip_plane, clip_z_plane;
 
   /// Transform from object to world space.
   void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
+  /// Transform from world to camera space.
+  void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
 
 protected:
   /**

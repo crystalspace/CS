@@ -113,6 +113,7 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   movable_nr = -1;
+  movable_identity = false;
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -124,6 +125,7 @@ void csPortalContainer::Prepare ()
   if (prepared) return;
   prepared = true;
   movable_nr = -1; // Make sure move stuff gets updated.
+  movable_identity = false;
   data_nr++;
   csCompressVertex* vt = csVector3Array::CompressVertices (vertices);
   if (vt == 0) return;
@@ -182,9 +184,10 @@ void csPortalContainer::ObjectToWorld (iMovable* movable,
 {
   if (movable_nr == movable->GetUpdateNumber ()) return;
   movable_nr = movable->GetUpdateNumber ();
+  movable_identity = movable->IsFullTransformIdentity ();
   int i;
   world_vertices.SetLength (vertices.Length ());
-  if (movable->IsFullTransformIdentity ())
+  if (movable_identity)
   {
     world_vertices = vertices;
     world_planes = planes;
@@ -205,38 +208,69 @@ void csPortalContainer::ObjectToWorld (iMovable* movable,
   }
 }
 
+void csPortalContainer::WorldToCamera (iCamera*,
+	const csReversibleTransform& camtrans)
+{
+  camera_vertices.SetLength (world_vertices.Length ());
+  int i;
+  for (i = 0 ; i < world_vertices.Length () ; i++)
+    camera_vertices[i] = camtrans.Other2This (world_vertices[i]);
+  camera_planes.DeleteAll ();
+  for (i = 0 ; i < world_planes.Length () ; i++)
+  {
+    csPlane3 p;
+    csVector3& cam_vec = camera_vertices[portals[i]->GetVertexIndices ()[0]];
+    camtrans.Other2This (world_planes[i], cam_vec, p);
+    p.Normalize ();
+    camera_planes.Push (p);
+  }
+}
+
 //--------------------- For iMeshObject ------------------------------//
 
 bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
 {
   Prepare ();
 
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform& camtrans = icam->GetTransform ();
+  iCamera* camera = rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
   const csReversibleTransform& movtrans = movable->GetFullTransform ();
+
+  ObjectToWorld (movable, movtrans);
 
   csSphere sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
   sphere.SetRadius (max_object_radius);
-  csReversibleTransform tr_o2c = camtrans;
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movtrans;
-  if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
+  if (movable_identity)
+  {
+    if (!rview->ClipBSphere (camtrans, sphere, clip_portal,
   	clip_plane, clip_z_plane))
-    return false;
+      return false;
+  }
+  else
+  {
+    csReversibleTransform tr_o2c = camtrans;
+    tr_o2c /= movtrans;
+    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
+  	clip_plane, clip_z_plane))
+      return false;
+  }
 
-  ObjectToWorld (movable, movtrans);
-
-  return false;
+  return true;
 }
 
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode)
+  	csZBufMode /*zbufMode*/)
 {
   Prepare ();
-  (void)rview;
+
+  // We assume here that ObjectToWorld has already been called.
+  iCamera* camera = rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+
+  WorldToCamera (camera, camtrans);
+
   (void)movable;
-  (void)zbufMode;
   return false;
 }
 

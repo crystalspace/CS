@@ -13,6 +13,7 @@ chronological order.
 	  default.
 	- Jorrit implemented csPortalContainer::DrawTest(). This still leaves
 	  Draw() unimplemented.
+	- Jorrit started implementation of csPortalContainer::Draw().
 22-Sep-2003
 	- Eric Sunshine converted csengine.mak and thingmsh.mak over to the new
 	  style where built objects and resources are placed in their own
