@@ -38,6 +38,7 @@ class csCurveTemplate;
 class csSoundDataObject;
 class csSpriteTemplate;
 class csSprite3D;
+class csSprite2D;
 class csKeyValuePair;
 class csMapNode;
 class csFrame;
@@ -121,6 +122,11 @@ class csLoader
    * Load the sprite from the world file.
    */
   static bool LoadSprite (csSprite3D* spr, char* buf);
+
+  /**
+   * Load the 2D sprite from the world file.
+   */
+  static bool LoadSprite (csSprite2D* spr, char* buf);
 
   /**
    * Load sounds from a SOUNDS(...) argument.

@@ -23,17 +23,23 @@
 
 //=============================================================================
 
-IMPLEMENT_CSOBJTYPE (csSprite2D, csObject)
+IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 
-csSprite2D::csSprite2D () : csObject (), position (0, 0, 0)
+csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
 {
-  MixMode = CS_FX_COPY;
   cstxt = NULL;
 }
 
 csSprite2D::~csSprite2D ()
 {
-  RemoveFromSectors ();
+}
+
+void csSprite2D::UpdatePolyTreeBBox ()
+{
+}
+
+void csSprite2D::UpdateLighting (csLight** /*lights*/, int /*num_lights*/)
+{
 }
 
 void csSprite2D::Draw (csRenderView& rview)
@@ -45,30 +51,11 @@ void csSprite2D::Draw (csRenderView& rview)
   }
 
   rview.g3d->SetZBufMode (CS_ZBUF_USE);
-}
 
-void csSprite2D::MoveToSector (csSector* s)
-{
-  RemoveFromSectors ();
-  sectors.Push (s);
-  s->sprites.Push (this);
-}
-
-void csSprite2D::RemoveFromSectors ()
-{
-  while (sectors.Length () > 0)
-  {
-    csSector* ss = (csSector*)sectors.Pop ();
-    if (ss)
-    {
-      int idx = ss->sprites.Find (this);
-      if (idx >= 0)
-      {
-        ss->sprites[idx] = NULL;
-        ss->sprites.Delete (idx);
-      }
-    }
-  }
+  static G3DPolygonDPFX g3dpolyfx;
+  g3dpolyfx.num = vertices.GetLimit ();
+  g3dpolyfx.txt_handle = cstxt->GetTextureHandle ();
+  g3dpolyfx.inv_aspect = rview.inv_aspect;
 }
 
 

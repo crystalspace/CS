@@ -27,6 +27,7 @@
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
 #include "csengine/cssprite.h"
+#include "csengine/csspr2d.h"
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
@@ -180,6 +181,7 @@ TOKEN_DEF_START
   TOKEN_DEF (SOUNDS)
   TOKEN_DEF (SPLIT)
   TOKEN_DEF (SPRITE)
+  TOKEN_DEF (SPRITE2D)
   TOKEN_DEF (START)
   TOKEN_DEF (STATBSP)
   TOKEN_DEF (STATELESS)
@@ -2903,6 +2905,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     TOKEN_TABLE (ACTIVATE)
     TOKEN_TABLE (BSP)
     TOKEN_TABLE (STATBSP)
+    TOKEN_TABLE (SPRITE2D)
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (FOG)
   TOKEN_TABLE_END
@@ -3115,6 +3118,15 @@ csSector* csLoader::load_room (char* secname, char* buf)
       case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
+          sp->SetName (name);
+          LoadSprite (sp, params);
+          World->sprites.Push (sp);
+          sp->MoveToSector (sector);
+        }
+        break;
+      case TOKEN_SPRITE2D:
+        {
+          CHK (csSprite2D* sp = new csSprite2D ());
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3458,6 +3470,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (THING)
     TOKEN_TABLE (SIXFACE)
     TOKEN_TABLE (LIGHT)
+    TOKEN_TABLE (SPRITE2D)
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (SKYDOME)
     TOKEN_TABLE (TERRAIN)
@@ -3502,6 +3515,15 @@ csSector* csLoader::load_sector (char* secname, char* buf)
       case TOKEN_SPRITE:
         {
           CHK (csSprite3D* sp = new csSprite3D ());
+          sp->SetName (name);
+          LoadSprite (sp, params);
+          World->sprites.Push (sp);
+          sp->MoveToSector (sector);
+        }
+        break;
+      case TOKEN_SPRITE2D:
+        {
+          CHK (csSprite2D* sp = new csSprite2D ());
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -4525,6 +4547,92 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
 //---------------------------------------------------------------------------
 
+bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (VERTICES)
+    TOKEN_TABLE (UV)
+    TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MOVE)
+  TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  int i;
+
+  csLoaderStat::sprites_loaded++;
+
+  csColoredVertices& verts = spr->GetVertices ();
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case TOKEN_VERTICES:
+        {
+          float list[100];
+	  int num;
+          ScanStr (params, "%F", list, &num);
+	  num /= 3;
+	  verts.SetLimit (num);
+          for (i = 0 ; i < num ; i++)
+	  {
+	    verts[i].pos.x = list[i*3+0];
+	    verts[i].pos.y = list[i*3+1];
+	    verts[i].pos.z = list[i*3+2];
+	  }
+        }
+        break;
+      case TOKEN_UV:
+        {
+          float list[100];
+	  int num;
+          ScanStr (params, "%F", list, &num);
+	  num /= 2;
+	  verts.SetLimit (num);
+          for (i = 0 ; i < num ; i++)
+	  {
+	    verts[i].u = list[i*2+0];
+	    verts[i].v = list[i*2+1];
+	  }
+        }
+        break;
+      case TOKEN_MOVE:
+        {
+	  float x, y, z;
+	  ScanStr (params, "%f,%f,%f", &x, &y, &z);
+          spr->SetMove (x, y, z);
+	}
+        break;
+
+      case TOKEN_TEXNR:
+        {
+          csTextureHandle* tex = World->GetTextures ()->FindByName (params);
+          if (tex == NULL)
+          {
+            CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", params);
+            fatal_exit (0, true);
+          }
+          spr->SetTexture (tex);
+	}
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
 bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 {
   TOKEN_TABLE_START (commands)
@@ -4604,16 +4712,14 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         break;
 
       case TOKEN_TEXNR:
-        memset (str, 0, 255);
-        ScanStr (params, "%s", str);
-        spr->SetTexture (str, World->GetTextures ());
+        spr->SetTexture (params, World->GetTextures ());
         // unset_texture ();
         break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite!\n", csGetLastOffender ());
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
 

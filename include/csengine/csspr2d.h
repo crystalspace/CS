@@ -26,27 +26,28 @@
 #include "csgeom/poly3d.h"
 #include "csengine/rview.h"
 #include "csengine/texture.h"
+#include "csengine/cssprite.h"
 #include "igraph3d.h"
 
-struct iTextureHandle;
+class csTextureHandle;
 
-TYPEDEF_GROWING_ARRAY (csColoredVertices, G3DTexturedVertex);
+struct csSprite2DVertex
+{
+  csVector3 pos;
+  csColor color;
+  float u, v;
+};
+
+TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
 
 /**
  * A 2D sprite handled by the engine. It is actually a general
  * 2D polygon which has a 3D position and dimension but always
  * faces the camera.
  */
-class csSprite2D : public csObject
+class csSprite2D : public csSprite
 {
-public:
-  /// List of sectors where this sprite is.
-  csNamedObjVector sectors;
-
 private:
-  /// Mixmode.
-  UInt MixMode;
-
   /// Position for sprite.
   csVector3 position;
 
@@ -57,6 +58,12 @@ private:
 
   /// The texture handle as returned by iTextureManager.
   csTextureHandle* cstxt;
+
+  /**
+   * Update the bounding box for the polygon tree
+   * algorithm.
+   */
+  virtual void UpdatePolyTreeBBox ();
 
 public:
   ///
@@ -69,9 +76,6 @@ public:
 
   /// Get the vertex array.
   csColoredVertices& GetVertices () { return vertices; }
-
-  /// Sets the mode that is used, when drawing that sprite.
-  void SetMixmode (UInt m) { MixMode = m; }
 
   /**
    * Set the transformation vector to move sprite to some position.
@@ -103,21 +107,21 @@ public:
    */
   void Move (csVector3& v) { position += v; }
 
+  /// Get position of this sprite.
+  inline csVector3 GetOrigin () const { return position; }
+
+  /**
+   * Light sprite according to the given array of lights (i.e.
+   * fill the vertex color array).
+   */
+  virtual void UpdateLighting (csLight** lights, int num_lights);
+
   /**
    * Draw this sprite given a camera transformation.
    * If needed the skeleton state will first be updated.
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
-  void Draw (csRenderView& rview);
-
-  /// Get position of this sprite.
-  inline csVector3 GetOrigin () const { return position; }
-
-  /// Move this sprite to one sector (conveniance function).
-  void MoveToSector (csSector* s);
-
-  /// Remove this sprite from all sectors it is in (but not from the world).
-  void RemoveFromSectors ();
+  virtual void Draw (csRenderView& rview);
 
   CSOBJTYPE;
 };
