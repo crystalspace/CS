@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  In fact, cached runs would produce incorrect results.  Second, poor
 	  quoting and parentheses placement borked up the logic of much of the
 	  Perl5 check.
+	- Eric Sunshine fixed bugs in csperl5.mak where swigperl5gen was not
+	  declared .PHONY.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.

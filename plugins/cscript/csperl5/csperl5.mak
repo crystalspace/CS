@@ -13,19 +13,18 @@ endif
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION), roottargets)
 
-.PHONY: csperl5 csperl5clean csperl5distclean
+.PHONY: csperl5 swigperl5gen csperl5clean csperl5distclean
 
 all plugins: csperl5
 
 csperl5:
 	$(MAKE_TARGET) MAKE_DLL=yes
+swigperl5gen:
+	$(MAKE_TARGET)
 csperl5clean:
 	$(MAKE_CLEAN)
 csperl5distclean:
 	$(MAKE_CLEAN)
-swigperl5gen:
-	$(MAKE_TARGET)
-	
 
 endif
 
@@ -43,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPERL5)
 endif
 
+SCF.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/csperl5.scf
 INC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.h))
 SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
@@ -94,7 +94,7 @@ endif
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION), targets)
 
-.PHONY: csperl5 csperl5clean csperl5distclean
+.PHONY: csperl5 swigperl5gen csperl5clean csperl5distclean
 
 csperl5: $(OUTDIRS) $(CSPERL5) $(CSPERL5.PM) $(CEX.CSPERL5)
 
@@ -155,7 +155,7 @@ clean: csperl5clean
 distclean: csperl5distclean
 
 csperl5clean:
-	$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) $(PERLXSI.C) \
+	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) $(PERLXSI.O) $(PERLXSI.C) \
 	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 swigperl5clean:
