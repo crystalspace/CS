@@ -37,25 +37,25 @@ struct iTextureHandle;
  * the texture will be dynamically modified.
  */
 /// You're going to yse the texture for 2D drawing
-#define CS_TEXTURE_2D		0x00000001
+#define CS_TEXTURE_2D			0x00000001
 /// You're going to yse the texture for 3D drawing
-#define CS_TEXTURE_3D		0x00000002
+#define CS_TEXTURE_3D			0x00000002
 /**
  * The texture manager should be able to hand you a pointer to some buffer
  * containing texture image and a format description. You can change the
  * contents of that buffer and then hand it back to the texture manager.
  * Then texture manager recompute that texture from the image buffer.
  */
-#define CS_TEXTURE_DYNAMIC	0x00000004
+#define CS_TEXTURE_DYNAMIC		0x00000004
 /**
  * The number of mipmaps computed for this texture
  * 0     .. default number ( implementation dependend )
  * n > 0 .. not more than n
  */
-#define CS_TEXTURE_MMLEVEL_MASK	0x000000F0
+#define CS_TEXTURE_MMLEVEL_MASK		0x000000F0
 
-#define CS_SET_TEXTURE_MMLEVEL(level) ((UInt)level<<4)
-#define CS_GET_TEXTURE_MMLEVEL(flag) ((flag&CS_TEXTURE_MMLEVEL_MASK)>>4)
+#define CS_SET_TEXTURE_MMLEVEL(level)	((UInt)level << 4)
+#define CS_GET_TEXTURE_MMLEVEL(flag)	((flag & CS_TEXTURE_MMLEVEL_MASK) >> 4)
 
 SCF_VERSION (iTextureManager, 1, 0, 0);
 
