@@ -20,3 +20,9 @@ font server anyway.  The 3rd touches a few other routines currently in the 2d
 driver and most heavily csws.
 
 Norman
+
+additional note:
+Please be aware that the freetype1 library uses patented techniques. So using this in your commercial
+product will violate patents held by Apple. Use the freefont2 plugins along with FreeType2 instead.
+
+read more about this issue at www.freetype.org/patents.html
