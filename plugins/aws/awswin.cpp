@@ -712,8 +712,13 @@ awsWindow::OnDraw(csRect clip)
     }
   }
 
+  iGraphics3D *og3d = NULL;
+    
   if (view)
   {  
+     og3d = view->GetContext();
+     view->SetContext(g3d);
+
      view->SetRectangle(Frame().xmin, g3d->GetHeight()-Frame().Height()-Frame().ymin, Frame().Width(), Frame().Height());
      view->GetCamera()->SetPerspectiveCenter(Frame().xmin+(Frame().Width()>>1), (g3d->GetHeight()-Frame().Height()-Frame().ymin)+(Frame().Height()>>1));
      view->GetCamera()->SetFOV(view->GetCamera()->GetFOV(), Frame().Width());
@@ -742,13 +747,13 @@ awsWindow::OnDraw(csRect clip)
     {
       if (view)
       {
-        iGraphics3D *og3d = view->GetContext();
+//        iGraphics3D *og3d = view->GetContext();
 
-        view->SetContext(g3d);
+//        view->SetContext(g3d);
         g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
         g3d->BeginDraw(CSDRAW_2DGRAPHICS);
-        view->SetContext(og3d);
+//        view->SetContext(og3d);
 
       } //  end if view
       else
@@ -790,13 +795,13 @@ awsWindow::OnDraw(csRect clip)
 
       if (view)
       {
-        iGraphics3D *og3d = view->GetContext();
+//        iGraphics3D *og3d = view->GetContext();
 
-        view->SetContext(g3d);
+//        view->SetContext(g3d);
         g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
         view->Draw();
         g3d->BeginDraw(CSDRAW_2DGRAPHICS);
-        view->SetContext(og3d);
+//        view->SetContext(og3d);
         
       } //  end if view
       else
@@ -972,6 +977,10 @@ awsWindow::OnDraw(csRect clip)
     break;
   }
 
+  if (view)
+  {  
+     view->SetContext(og3d);
+  }
 }
 
 void 
