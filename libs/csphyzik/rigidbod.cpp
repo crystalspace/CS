@@ -21,6 +21,7 @@
 #include "csphyzik/math3d.h"
 #include "csphyzik/refframe.h"
 #include "csphyzik/rigidbod.h"
+#include "csphyzik/debug.h"
 
 ctRigidBody::ctRigidBody()
 {
@@ -63,6 +64,13 @@ void ctRigidBody::set_angular_v( const ctVector3 &pw )
 	// inverse of inertia tensor in world coords * angular momentum
 	w = pw;
 	L = I_inv_world.get_transpose() * w;
+}
+
+// v is a secondary value that is calculated from momentum
+void ctRigidBody::set_v( const ctVector3 &pv )
+{ 
+  v = pv; 
+  P = v*m;
 }
 
 int ctRigidBody::set_state( real *state_array )
