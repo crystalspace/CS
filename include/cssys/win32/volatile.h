@@ -35,7 +35,6 @@
 #endif
 
 #if !defined (COMP_GCC)
-  #define DO_SOUND
   #define DO_MMX
   #define ZLIB_DLL
 #endif

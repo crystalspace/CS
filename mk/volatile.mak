@@ -71,9 +71,6 @@ endif
 ifeq ($(STRICT_SMART_POINTERS),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STRICT_SMART_POINTERS$">>volatile.tmp
 endif
-ifeq ($(DO_SOUND),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
-endif
 ifeq ($(NASM.AVAILABLE),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
