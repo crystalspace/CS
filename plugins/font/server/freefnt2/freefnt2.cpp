@@ -56,14 +56,12 @@ csFreeType2Server::csFreeType2Server (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  VFS = NULL;
   library = NULL;
   freetype_inited = false;
 }
 
 csFreeType2Server::~csFreeType2Server ()
 {
-  if (VFS) VFS->DecRef ();
   if (freetype_inited) 
   {
     FT_Done_FreeType (library);
