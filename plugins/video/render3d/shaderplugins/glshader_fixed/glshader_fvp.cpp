@@ -48,72 +48,106 @@ SCF_IMPLEMENT_IBASE_END
 
 void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
-  //enable it
+  int i;
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
+
+  if (do_lighting)
+  {
+    csShaderVariable* var;
+
+    glMatrixMode (GL_MODELVIEW_MATRIX);
+    glPushMatrix ();
+    glLoadIdentity ();
+
+    for(i = 0; i < lights.Length(); ++i)
+    {
+      int l = lights[i].lightnum;
+      glEnable (GL_LIGHT0+l);
+
+      var = GetVariable(lights[i].positionvar);
+      if (var)
+      {
+        csVector4 v;
+        var->GetValue (v);
+        glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
+      } else {
+        csVector4 v (0);
+        glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
+      }
+
+      var = GetVariable(lights[i].diffusevar);
+      if (var)
+      {
+        csVector4 v;
+        var->GetValue (v);
+        glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
+      } else {
+        csVector4 v (0);
+        glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
+      }
+
+      var = GetVariable(lights[i].specularvar);
+      if (var)
+      {
+        csVector4 v;
+        var->GetValue (v);
+        glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
+      } else {
+        csVector4 v (0);
+        glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
+      }
+
+      var = GetVariable(lights[i].attenuationvar);
+      if (var)
+      {
+        csVector4 v;
+        var->GetValue (v);
+        glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
+        glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
+        glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
+      } else {
+        csVector4 v (1, 0, 0, 0);
+        glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
+        glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
+        glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
+      }
+    }
+
+    glPopMatrix ();
+
+    csVector4 v (1);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
+
+    if (ambientvar != csInvalidStringID && 
+        (var = GetVariable(ambientvar)))
+      var->GetValue (v);
+    else
+      v = csVector4 (0, 0, 0, 1);
+    glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
+    
+    glEnable (GL_LIGHTING);
+    glDisable (GL_COLOR_MATERIAL);
+  }
 }
 
 void csGLShaderFVP::Deactivate(iShaderPass* current)
 {
+  int i;
+
+  if (do_lighting)
+  {
+    for (i = 0; i < lights.Length(); ++i)
+      glDisable (GL_LIGHT0+lights[i].lightnum);
+
+    glDisable (GL_LIGHTING);
+  }
 }
 
 void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
-  int i;
-
-  // set variables
-  /*for(i = 0; i < variablemap.Length(); ++i)
-  {
-    csShaderVariable* lvar = GetVariable(variablemap[i].name);
-
-    if(lvar)
-    {
-      switch(lvar->GetType())
-      {
-      case csShaderVariable::INT:
-        {
-          int intval;
-          if(lvar->GetValue(intval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            (float)intval, (float)intval, (float)intval, (float)intval);
-        }
-        break;
-      case csShaderVariable::FLOAT:
-        {
-          float fval;
-          if(lvar->GetValue(fval))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            fval, fval, fval, fval);
-        }
-        break;
-      case csShaderVariable::VECTOR3:
-        {
-          csVector3 v3;
-          if(lvar->GetValue(v3))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            v3.x, v3.y, v3.z, 1);
-        }
-        break;
-      case csShaderVariable::VECTOR4:
-        {
-          csVector4 v4;
-          if(lvar->GetValue(v4))
-            ext->glProgramLocalParameter4fARB(GL_VERTEX_PROGRAM_ARB, 
-            variablemap[i].registernum,
-            v4.x, v4.y, v4.z, v4.w);
-        }
-        break;
-      default:
-	break;
-      }
-    }
-  }*/
-  /*csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
-  csShaderVariable* lvar = GetVariable(strings->Request (
-    "STANDARD_TIME"));*/
-  
 }
 
 void csGLShaderFVP::ResetState ()
@@ -124,8 +158,8 @@ void csGLShaderFVP::BuildTokenHash()
 {
   xmltokens.Register("fixedvp",XMLTOKEN_FIXEDVP);
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
-  xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register("program", XMLTOKEN_PROGRAM);
+  xmltokens.Register("light", XMLTOKEN_LIGHT);
+  xmltokens.Register("ambient", XMLTOKEN_AMBIENT);
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
@@ -152,6 +186,9 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 {
   if(!program)
     return false;
+
+  do_lighting = false;
+  ambientvar = csInvalidStringID;
 
   BuildTokenHash();
 
@@ -224,6 +261,64 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
             child->GetAttributeValueAsInt("register");
         }
         break;*/
+      case XMLTOKEN_LIGHT:
+        {
+          do_lighting = true;
+          lights.Push (lightingentry ());
+          int i = lights.Length ()-1;
+
+          const char* str;
+
+          lights[i].lightnum = child->GetAttributeValueAsInt("num");
+
+          if (str = child->GetAttributeValue("position"))
+            lights[i].positionvar = strings->Request (str);
+          else
+          {
+            char buf[40];
+            sprintf (buf, "STANDARD_LIGHT_%d_POSITION", lights[i].lightnum);
+            lights[i].positionvar = strings->Request (buf);
+          }
+
+          if (str = child->GetAttributeValue("diffuse"))
+            lights[i].diffusevar = strings->Request (str);
+          else
+          {
+            char buf[40];
+            sprintf (buf, "STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
+            lights[i].diffusevar = strings->Request (buf);
+          }
+
+          if (str = child->GetAttributeValue("specular"))
+            lights[i].specularvar = strings->Request (str);
+          else
+          {
+            char buf[40];
+            sprintf (buf, "STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
+            lights[i].specularvar = strings->Request (buf);
+          }
+
+          if (str = child->GetAttributeValue("attenuation"))
+            lights[i].attenuationvar = strings->Request (str);
+          else
+          {
+            char buf[40];
+            sprintf (buf, "STANDARD_LIGHT_%d_ATTENUATION", lights[i].lightnum);
+            lights[i].attenuationvar = strings->Request (buf);
+          }
+        }
+        break;
+      case XMLTOKEN_AMBIENT:
+        {
+          const char* str;
+          if (str = child->GetAttributeValue("color"))
+            ambientvar = strings->Request (str);
+          else
+            ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
+          
+          do_lighting = true;
+        }
+        break;
       default:
         break;
         //return false;

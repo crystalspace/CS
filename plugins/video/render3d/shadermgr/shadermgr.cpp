@@ -556,12 +556,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
     {
       csShaderVariable* var = GetVariable (texmapping[i]);
       if (var)
-      {
-        iTextureWrapper* tex;
-        var->GetValue (tex);
-        if (tex && tex->GetTextureHandle ())
-	  textures[i] = tex->GetTextureHandle ();
-      }
+        var->GetValue (textures[i]);
     }
   }
   g3d->SetTextureState (units, textures, TEXMAX);

@@ -1,10 +1,22 @@
 <shader name="ambient">
+  <!-- This should be defined by renderloop somehow and track sector ambient -->
+  <declare name="STANDARD_LIGHT_AMBIENT" type="vector3" default="0.2, 0.2, 0.4" />
 	<technique priority="100">
 		<pass>
-		  <mixmode><copy/></mixmode>
+      <mixmode><copy/></mixmode>
 			<streammapping stream="vertices" destination="attribute 0" />
 			<streammapping stream="texture coordinates" destination="attribute 1" />
 			<vp type="gl_arb_vp" file="/shader/ambient.avp"/>
+			<texturemapping unit="0" name="tex diffuse" />
+			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
+		</pass>
+	</technique>
+	<technique priority="50">
+		<pass>
+		  <mixmode><copy/></mixmode>
+			<streammapping stream="vertices" destination="position" />
+			<streammapping stream="texture coordinates" destination="texture coordinate" />
+			<vp type="gl_fixed_vp" file="/shader/ambient.fvp"/>
 			<texturemapping unit="0" name="tex diffuse" />
 			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
 		</pass>

@@ -1,4 +1,18 @@
 <shader name="light">
+	<technique priority="200">
+		<pass>
+		  <mixmode><add/></mixmode>
+  		<streammapping stream="vertices" destination="attribute 0" />
+      <streammapping stream="colors" destination="attribute 1" />
+      <streammapping stream="normals" destination="attribute 2" />
+      <streammapping stream="texture coordinates" destination="attribute 3" />
+			<vp type="gl_arb_vp" file="/shader/flat_ppl_diffuse.avp"/>
+      <texturemapping unit="0" name="standardtex normalization map" />
+      <texturemapping unit="1" name="standardtex normalization map" />
+      <texturemapping unit="2" name="tex diffuse" />
+			<fp type="gl_fixed_fp" file="/shader/dot3_modulate.ffp"/>
+		</pass>
+	</technique>
 	<technique priority="100">
 		<pass>
 		  <mixmode><add/></mixmode>
@@ -7,6 +21,18 @@
       <streammapping stream="normals" destination="attribute 2" />
       <streammapping stream="texture coordinates" destination="attribute 3" />
 			<vp type="gl_arb_vp" file="/shader/vertexlight.avp"/>
+      <texturemapping unit="0" name="tex diffuse" />
+			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
+		</pass>
+	</technique>
+	<technique priority="50">
+		<pass>
+		  <mixmode><add/></mixmode>
+  		<streammapping stream="vertices" destination="position" />
+      <streammapping stream="colors" destination="color" />
+      <streammapping stream="normals" destination="normal" />
+      <streammapping stream="texture coordinates" destination="texture coordinate" />
+			<vp type="gl_fixed_vp" file="/shader/vertexlight.fvp"/>
       <texturemapping unit="0" name="tex diffuse" />
 			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
 		</pass>

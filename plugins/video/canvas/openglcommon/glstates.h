@@ -169,12 +169,7 @@ public:
 #endif // CS_USE_NEW_RENDERER
     }
 
-    memset( texture2d, 0, 32*sizeof(GLuint) );
-#ifdef CS_USE_NEW_RENDERER
-    memset( texture1d, 0, 32*sizeof(GLuint) );
-    memset( texture3d, 0, 32*sizeof(GLuint) );
-    memset( texturecube, 0, 32*sizeof(GLuint) );
-#endif // CS_USE_NEW_RENDERER
+    memset( boundtexture, 0, 32*sizeof(GLuint) );
   }
 
   // Standardized caches
@@ -204,64 +199,18 @@ public:
   IMPLEMENT_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
 
   // Special caches
-  GLuint texture2d[32]; // 32 max texture layers
-#ifdef CS_USE_NEW_RENDERER
-  GLuint texture1d[32]; // 32 max texture layers
-  GLuint texture3d[32]; // 32 max texture layers
-  GLuint texturecube[32]; // 32 max texture layers
-#endif // CS_USE_NEW_RENDERER
+  GLuint boundtexture[32]; // 32 max texture layers
   void SetTexture( GLenum target, GLuint texture, int layer = 0 )
   {
-    switch (target)
+    if (texture != boundtexture[layer])
     {
-    case GL_TEXTURE_2D:
-      if (texture != texture2d[layer])
-      {
-        texture2d[layer] = texture;
-        glBindTexture (target, texture);
-      }
-      break;
-#ifdef CS_USE_NEW_RENDERER
-    case GL_TEXTURE_1D:
-      if (texture != texture1d[layer])
-      {
-        texture1d[layer] = texture;
-        glBindTexture (target, texture);
-      }
-      break;
-    case GL_TEXTURE_3D:
-      if (texture != texture3d[layer])
-      {
-        texture3d[layer] = texture;
-        glBindTexture (target, texture);
-      }
-      break;
-    case GL_TEXTURE_CUBE_MAP:
-      if (texture != texturecube[layer])
-      {
-        texturecube[layer] = texture;
-        glBindTexture (target, texture);
-      }
-      break;
-#endif // CS_USE_NEW_RENDERER
+      boundtexture[layer] = texture;
+      glBindTexture (target, texture);
     }
   }
   GLuint GetTexture( GLenum target, GLuint texture, int layer = 0 )
   {
-    switch (target)
-    {
-    case GL_TEXTURE_2D:
-      return texture2d[layer];
-#ifdef CS_USE_NEW_RENDERER
-    case GL_TEXTURE_1D:
-      return texture1d[layer];
-    case GL_TEXTURE_3D:
-      return texture3d[layer];
-    case GL_TEXTURE_CUBE_MAP:
-      return texturecube[layer];
-#endif // CS_USE_NEW_RENDERER
-    }
-    return 0;
+    return boundtexture[layer];
   }
 };
 

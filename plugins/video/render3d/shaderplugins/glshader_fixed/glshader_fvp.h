@@ -32,12 +32,31 @@ private:
   {
     XMLTOKEN_FIXEDVP = 1,
     XMLTOKEN_DECLARE,
-    XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_PROGRAM
+    XMLTOKEN_LIGHT,
+    XMLTOKEN_AMBIENT
   };
 
   csPDelArray<csSymbolTable> symtabs;
   csSymbolTable *symtab;
+
+  struct lightingentry
+  {
+    lightingentry() { 
+      positionvar = csInvalidStringID; 
+      diffusevar = csInvalidStringID; 
+      specularvar = csInvalidStringID; 
+      attenuationvar = csInvalidStringID;
+    }
+    csStringID positionvar;
+    csStringID diffusevar;
+    csStringID specularvar;
+    csStringID attenuationvar;
+    int lightnum;
+  };
+
+  csStringID ambientvar;
+  csArray<lightingentry> lights;
+  bool do_lighting;
 
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;

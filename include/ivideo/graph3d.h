@@ -783,24 +783,6 @@ struct iGraphics3D : public iBase
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state) = 0;
-
-  /// Get maximum number of simultaneous HW lights supported.
-  virtual int GetMaxLights () const = 0;
-
-  /// Sets a parameter for light i.
-  virtual void SetLightParameter (int i, int param, csVector3 value) = 0;
-
-  /// Enables light i.
-  virtual void EnableLight (int i) = 0;
-
-  /// Disables light i.
-  virtual void DisableLight (int i) = 0;
-
-  /// Enable vertex lighting.
-  virtual void EnablePVL () = 0;
-
-  /// Disable vertex lighting.
-  virtual void DisablePVL () = 0;
 #else
   /// Debugging only: get a pointer to Z-buffer at some location
   virtual uint32 *GetZBuffAt (int x, int y) = 0;

@@ -75,12 +75,20 @@ class csLightIterRenderStep : public iRenderStep,
 {
 private:
   csRefArray<iLightRenderStep> steps;
+
+  csRef<iObjectRegistry> object_reg;
+  csRef<csShaderVariable> shvar_light_0_position;
+  csRef<csShaderVariable> shvar_light_0_diffuse;
+  csRef<csShaderVariable> shvar_light_0_specular;
+  csRef<csShaderVariable> shvar_light_0_attenuation;
+  bool initialized;
 public:
   SCF_DECLARE_IBASE;
 
   csLightIterRenderStep (iObjectRegistry* object_reg);
   virtual ~csLightIterRenderStep ();
 
+  void InitVariables ();
   virtual void Perform (iRenderView* rview, iSector* sector);
 
   virtual int AddStep (iRenderStep* step);

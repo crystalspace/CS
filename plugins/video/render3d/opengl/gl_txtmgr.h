@@ -98,6 +98,7 @@ private:
 
   bool has_alpha;
   bool texupdate_needed;
+  bool prepared;
 
   void *cachedata;
 

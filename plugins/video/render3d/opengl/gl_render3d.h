@@ -124,13 +124,6 @@ private:
 
   float textureLodBias;
 
-  /// Light standard variables
-  csRef<csShaderVariable> shvar_light_0_pos;
-  csRef<csShaderVariable> shvar_light_0_diffuse;
-  csRef<csShaderVariable> shvar_light_0_specular;
-  csRef<csShaderVariable> shvar_light_0_attenuation;
-
-
   bool do_near_plane;
   csPlane3 near_plane;
 
@@ -390,29 +383,6 @@ public:
   /// Return true if we have near plane.
   virtual bool HasNearPlane () const
     { return do_near_plane; }
-
-  /// Get maximum number of simultaneous vertex lights supported
-  virtual int GetMaxLights () const
-    { return GL_MAX_LIGHTS; }
-
-  /// Sets a parameter for light i
-  virtual void SetLightParameter (int i, int param, csVector3 value);
-
-  /// Enables light i
-  virtual void EnableLight (int i)
-    { glEnable (GL_LIGHT0+i); }
-
-  /// Disables light i
-  virtual void DisableLight (int i)
-    { glDisable (GL_LIGHT0+i); }
-
-  /// Enable vertex lighting
-  virtual void EnablePVL ()
-    { statecache->Enable_GL_LIGHTING (); }
-    
-  /// Disable vertex lighting
-  virtual void DisablePVL ()
-    { statecache->Disable_GL_LIGHTING (); }
 
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;

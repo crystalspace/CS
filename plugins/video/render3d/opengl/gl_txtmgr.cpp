@@ -33,6 +33,7 @@
 #include "csgfx/csimgvec.h"
 #include "csutil/array.h"
 #include "cstool/shaderbranch.h"
+#include "igraphic/image.h"
 #include "../common/txtmgr.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
@@ -114,6 +115,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
+  has_alpha = image->GetFormat () & CS_IMGFMT_ALPHA;
 
   mean_color.red = mean_color.green = mean_color.blue = 0;
   if (image->HasKeycolor ())
@@ -123,6 +125,8 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
+
+  prepared = false;
 }
 
 csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
@@ -146,6 +150,7 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
+  has_alpha = images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA;
 
   if (images->GetImage (0)->HasKeycolor ())
   {
@@ -154,6 +159,8 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
+
+  prepared = false;
 }
 
 csGLTextureHandle::~csGLTextureHandle()
@@ -490,6 +497,11 @@ bool csGLTextureHandle::GetAlphaMap ()
 
 void csGLTextureHandle::Prepare ()
 {
+  //@@@ Images may be lost if preparing twice. Some better way of solving it?
+  if (prepared)
+    return;
+  prepared = true;
+
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
   AdjustSizePo2 ();

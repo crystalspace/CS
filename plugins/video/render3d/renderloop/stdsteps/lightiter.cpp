@@ -134,18 +134,79 @@ csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  csLightIterRenderStep::object_reg = object_reg;
+
+  initialized = false;
 }
 
 csLightIterRenderStep::~csLightIterRenderStep ()
 {
 }
 
+void csLightIterRenderStep::InitVariables ()
+{
+  if (!initialized)
+  {
+    initialized = true;
+
+    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      object_reg, "crystalspace.renderer.stringset", iStringSet);
+
+    csStringID posname =
+      strings->Request ("STANDARD_LIGHT_0_POSITION");
+    csStringID difname =
+      strings->Request ("STANDARD_LIGHT_0_DIFFUSE");
+    csStringID spcname =
+      strings->Request ("STANDARD_LIGHT_0_SPECULAR");
+    csStringID attname =
+      strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
+
+    csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+
+    shvar_light_0_position = 
+      shadermgr->GetVariable (posname);
+    if (!shvar_light_0_position)
+    {
+      shvar_light_0_position = shadermgr->CreateVariable(posname);
+      shvar_light_0_position->SetType(csShaderVariable::VECTOR4);
+      shadermgr->AddVariable(shvar_light_0_position);
+    }
+
+    shvar_light_0_diffuse = 
+      shadermgr->GetVariable (difname);
+    if (!shvar_light_0_diffuse)
+    {
+      shvar_light_0_diffuse = shadermgr->CreateVariable(difname);
+      shvar_light_0_diffuse->SetType(csShaderVariable::VECTOR4);
+      shadermgr->AddVariable(shvar_light_0_diffuse);
+    }
+
+    shvar_light_0_specular = 
+      shadermgr->GetVariable (spcname);
+    if (!shvar_light_0_specular)
+    {
+      shvar_light_0_specular = shadermgr->CreateVariable(spcname);
+      shvar_light_0_specular->SetType(csShaderVariable::VECTOR4);
+      shadermgr->AddVariable(shvar_light_0_specular);
+    }
+
+    shvar_light_0_attenuation = 
+      shadermgr->GetVariable (attname);
+    if (!shvar_light_0_attenuation)
+    {
+      shvar_light_0_attenuation = shadermgr->CreateVariable(attname);
+      shvar_light_0_attenuation->SetType(csShaderVariable::VECTOR4);
+      shadermgr->AddVariable(shvar_light_0_attenuation);
+    }
+  }
+}
+
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iGraphics3D* g3d = rview->GetGraphics3D();
+  InitVariables ();
 
-  g3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
-    csVector3 (0, 0, 0));
+  iGraphics3D* g3d = rview->GetGraphics3D();
 
   iLightList* lights = sector->GetLights();
 
@@ -164,16 +225,17 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
     */
     csReversibleTransform camTransR = 
       rview->GetCamera()->GetTransform();
-    g3d->SetObjectToCamera (&camTransR);
 
     const csColor& color = light->GetColor ();
-    g3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-    csVector3 (color.red, color.green, color.blue));
+    shvar_light_0_diffuse->SetValue (
+      csVector3 (color.red, color.green, color.blue));
 
-    g3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+    shvar_light_0_specular->SetValue (csVector3 (1));
+
+    shvar_light_0_attenuation->SetValue (
       light->GetAttenuationVector ());
-    g3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-      lightPos);
+
+    shvar_light_0_position->SetValue (lightPos * camTransR);
 
     csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
     if (rview->TestBSphere (camTransR, lightSphere))

@@ -2,7 +2,7 @@
 <shader name="shadowextrude">
 	<technique priority="100">
 		<pass>
-			<mixmode><add /></mixmode>
+			<mixmode><copy/></mixmode>
 			<streammapping stream="shadow vertices" destination="attribute 0" />
 			<streammapping stream="shadow normals" destination="attribute 1" />
 			<writemask r="false" g="false" b="false" a="false"/>

@@ -628,6 +628,30 @@ void csGLGraphics3D::ApplyObjectToCamera ()
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
 
+
+void FillNormalizationMapSide (unsigned char *normdata, int size, 
+                          int xx, int xy, int xo,
+                          int yx, int yy, int yo,
+                          int zx, int zy, int zo)
+{
+  for (int y=0; y<size; y++)
+  {
+    float yv = (y-size/2+0.5)/(float)(size/2);
+    for (int x=0; x<size; x++)
+    {
+      float xv = (x-size/2+0.5)/(float)(size/2);
+      csVector3 norm = csVector3 (
+        xo+xv*xx+yv*xy, yo+xv*yx+yv*yy, zo+xv*zx+yv*zy);
+      norm.Normalize ();
+      *normdata++ = 127.5+norm.x*127.5;
+      *normdata++ = 127.5+norm.y*127.5;
+      *normdata++ = 127.5+norm.z*127.5;
+      *normdata++ = 0;
+    }
+  }
+}
+
+
 bool csGLGraphics3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr (
@@ -666,7 +690,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_env_combine ();
   ext->InitGL_EXT_texture_env_combine ();
-  ext->InitGL_ARB_texture_compression ();
+  ext->InitGL_ARB_texture_env_dot3 ();
+  ext->InitGL_EXT_texture_env_dot3 ();
   ext->InitGL_EXT_texture_compression_s3tc ();
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_ARB_vertex_program ();
@@ -694,36 +719,13 @@ bool csGLGraphics3D::Open ()
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
-  shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
-  if( !shadermgr )
+  shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  if (!shadermgr)
   {
     shadermgr = csPtr<iShaderManager>
-      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
-    object_reg->Register( shadermgr, "iShaderManager");
+      (CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
+    object_reg->Register (shadermgr, "iShaderManager");
   }
-
-  // setup or standard-variables for lighting
-  //position
-  shvar_light_0_pos = shadermgr->CreateVariable(
-    strings->Request ("STANDARD_LIGHT_0_POSITION"));
-  shvar_light_0_pos->SetType(csShaderVariable::VECTOR4);
-  shadermgr->AddVariable(shvar_light_0_pos);
-  
-  shvar_light_0_diffuse = shadermgr->CreateVariable(
-    strings->Request ("STANDARD_LIGHT_0_DIFFUSE"));
-  shvar_light_0_diffuse->SetType(csShaderVariable::VECTOR4);
-  shadermgr->AddVariable(shvar_light_0_diffuse);
-  
-  shvar_light_0_specular = shadermgr->CreateVariable(
-    strings->Request ("STANDARD_LIGHT_0_SPECULAR"));
-  shvar_light_0_specular->SetType(csShaderVariable::VECTOR4);
-  shadermgr->AddVariable(shvar_light_0_specular);
-
-  shvar_light_0_attenuation = shadermgr->CreateVariable(
-    strings->Request ("STANDARD_LIGHT_0_ATTENUATION"));
-  shvar_light_0_attenuation->SetType(csShaderVariable::VECTOR4);
-  shadermgr->AddVariable(shvar_light_0_attenuation);
-
 
   txtcache 
       = csPtr<csGLTextureCache> (new csGLTextureCache (1024*1024*32, this));
@@ -775,8 +777,83 @@ bool csGLGraphics3D::Open ()
 
   csRef<csShaderVariable> fogvar = shadermgr->CreateVariable(
     strings->Request ("standardtex fog"));
+  fogvar->SetType (csShaderVariable::TEXTURE);
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
+
+  #define CS_NORMTABLE_SIZE 128
+
+  imgvec = csPtr<iImageVector> (new csImageVector ());
+
+  // Positive X
+  unsigned char *normdata = 
+    new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0,  1,
+                                                          0, -1,  0,
+                                                         -1,  0,  0);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true,
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  // Negative X
+  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0, -1,
+                                                          0, -1,  0,
+                                                          1,  0,  0);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  // Positive Y
+  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+                                                          0,  0,  1,
+                                                          0,  1,  0);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  // Negative Y
+  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+                                                          0,  0, -1,
+                                                          0, -1,  0);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  // Positive Z
+  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+                                                          0, -1,  0,
+                                                          0,  0,  1);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  // Negative Z
+  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
+  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE, -1,  0,  0,
+                                                          0, -1,  0,
+                                                          0,  0, -1);
+  img = csPtr<iImage> (new csImageMemory (
+    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    CS_IMGFMT_TRUECOLOR));
+  imgvec->AddImage (img);
+
+  csRef<iTextureHandle> normtex = txtmgr->RegisterTexture (
+    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
+    iTextureHandle::CS_TEX_IMG_CUBEMAP);
+
+  csRef<csShaderVariable> normvar = shadermgr->CreateVariable(
+    strings->Request ("standardtex normalization map"));
+  normvar->SetValue (normtex);
+  shadermgr->AddVariable(normvar);
 
   return true;
 }
@@ -1252,14 +1329,14 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   case iTextureHandle::CS_TEX_IMG_1D:
     statecache->Enable_GL_TEXTURE_1D (unit);
     if (bind)
-      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
-      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
     if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
@@ -1271,14 +1348,14 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Enable_GL_TEXTURE_3D (unit);
     if (bind)
-      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
+      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
     if (bind)
-      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle, unit);
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
     break;
@@ -1414,6 +1491,8 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures, int
     else
       DeactivateTexture (unit);
   }
+  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
+  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
 void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
@@ -1544,14 +1623,16 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // we correct the input coordinates here.
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
-  csGLTextureHandle *txt_mm = (csGLTextureHandle*)
+  csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     hTex->GetPrivateObject ();
   int owidth = txt_mm->orig_width;
   int oheight = txt_mm->orig_height;
   if (owidth != bitmapwidth || oheight != bitmapheight)
   {
-    sw = sw * owidth / bitmapwidth;
-    sh = sh * oheight / bitmapheight;
+    tx = tx * (float)bitmapwidth / (float)owidth;
+    ty = ty * (float)bitmapheight / (float)oheight;
+    tw = tw * (float)bitmapwidth / (float)owidth;
+    th = th * (float)bitmapheight / (float)oheight;
   }
 
   int ClipX1, ClipY1, ClipX2, ClipY2;
@@ -1562,7 +1643,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 
   // Clipping
   if ((sx >= ClipX2) || (sy >= ClipY2) ||
-    (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
     return;                             // Sprite is totally invisible
   if (sx < ClipX1)                      // Left margin crossed?
   {
@@ -1590,6 +1671,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
     _th = (_th * nh) / sh;              // Adjust height on texture
     sh = nh;
   }
+
 
   // cache the texture if we haven't already.
   txtcache->Cache (hTex);
@@ -1697,35 +1779,6 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   clipplane_initialized = false;
   stencil_initialized = false;
   frustum_valid = false;
-}
-
-void csGLGraphics3D::SetLightParameter (int i, int param, csVector3 value)
-{
-  if(i != 0) return; //not implemented any other light than first yet
-  csVector4 v4 (value);
-
-  switch (param)
-  {
-  case CS_LIGHTPARAM_POSITION:
-    glLightfv (GL_LIGHT0, GL_POSITION, (float*)&v4);
-    value *= object2camera;
-    shvar_light_0_pos->SetValue (csVector4 (value));
-    break;
-  case CS_LIGHTPARAM_DIFFUSE:
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
-    shvar_light_0_diffuse->SetValue (v4);
-    break;
-  case CS_LIGHTPARAM_SPECULAR:
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
-    shvar_light_0_specular->SetValue (v4);
-    break;
-  case CS_LIGHTPARAM_ATTENUATION:
-    glLightf (GL_LIGHT0, GL_CONSTANT_ATTENUATION, v4.x);
-    glLightf (GL_LIGHT0, GL_LINEAR_ATTENUATION, v4.y);
-    glLightf (GL_LIGHT0, GL_QUADRATIC_ATTENUATION, v4.z);
-    shvar_light_0_attenuation->SetValue (v4);
-    break;
-  }
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.
