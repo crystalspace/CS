@@ -19,6 +19,10 @@ Short-term cleanups that need to be done:
 	  a texture name argument, it implicitly assumed that the first
 	  argument was always the texture name, even in cases where it was
 	  some other perfectly valid string such as -driver or -simdepth.
+	- Eric Sunshine eliminated the obnoxious spinning text cursor which
+	  was continuously printed to "stdout" by Blocks during game play.
+	- Eric Sunshine fixed WalkTest's broken "-infinite" option.  It caused
+	  the application to crash during initialization.
 	- Eric Sunshine patched 'makedep' (which Andrew added) so that it
 	  compiles on NextStep.
 8-Aug-1999
