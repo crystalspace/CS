@@ -177,7 +177,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   iPlugin *fs = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iPlugin);
   if (fs)
   {
-    System->UnloadPlugIn (fs);
+    System->UnloadPlugin (fs);
     fs->DecRef ();
   }
   // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
