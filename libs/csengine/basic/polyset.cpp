@@ -344,6 +344,7 @@ void csPolygonSet::TranslateVector (csVector3& trans)
     cam_verts[i] = wor_verts[i]-trans;
 }
 
+#if 0
 bool csPolygonSet::TransformWorld2Cam (csCamera& c)
 {
   int i;
@@ -352,6 +353,54 @@ bool csPolygonSet::TransformWorld2Cam (csCamera& c)
 
   return true;
 }
+#else
+bool csPolygonSet::TransformWorld2Cam (csCamera& c)
+{
+  // This loop has been made explicit because this makes better
+  // usage of the cache.
+  int i;
+ 
+  float dx, dy, dz;
+  float cx, cy, cz;
+ 
+  csMatrix3& m_o2t = c.GetO2T ();
+  csVector3& v_o2t = c.GetO2TTranslation ();
+
+  float m11 = m_o2t.m11;
+  float m21 = m_o2t.m21;
+  float m31 = m_o2t.m31;
+ 
+  float m12 = m_o2t.m12;
+  float m22 = m_o2t.m22;
+  float m32 = m_o2t.m32;
+  
+  float m13 = m_o2t.m13;
+  float m23 = m_o2t.m23;
+  float m33 = m_o2t.m33;
+ 
+  cx = v_o2t.x;
+  cy = v_o2t.y;
+  cz = v_o2t.z;
+ 
+  csVector3* world_verts = wor_verts;
+  csVector3* camra_verts = cam_verts;
+  for (i = 0 ; i < num_vertices ; i++)
+  {        
+    dx = world_verts->x - cx;
+    dy = world_verts->y - cy;
+    dz = world_verts->z - cz; 
+ 
+    camra_verts->x  = m11 * dx + m12 * dy + m13 *dz;
+    camra_verts->y  = m21 * dx + m22 * dy + m23 *dz;
+    camra_verts->z  = m31 * dx + m32 * dy + m33 *dz;
+
+    world_verts++;
+    camra_verts++;
+  }
+ 
+  return true;
+}
+#endif
 
 void csPolygonSet::NewTransformation (csVector3*& old_tr3)
 {
