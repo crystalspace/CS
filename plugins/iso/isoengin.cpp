@@ -21,6 +21,7 @@
 #include "isoworld.h"
 #include "isoview.h"
 #include "isospr.h"
+#include "isolight.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -119,3 +120,8 @@ iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
   return spr;
 }
 
+
+iIsoLight* csIsoEngine::CreateLight()
+{
+  return new csIsoLight(this);
+}

@@ -61,6 +61,8 @@ public:
   virtual void AddSprite(iIsoSprite *sprite, const csVector3& pos);
   virtual void RemoveSprite(iIsoSprite *sprite, const csVector3& pos);
   virtual void Draw(iIsoRenderView *rview);
+  virtual void Traverse(void (*func)(iIsoSprite*, void *), void *userdata);
+
 
 };
 

@@ -35,6 +35,7 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
     grid[i] = NULL;
   mingridx = 0; mingridy = 0;
   box.Set(0,-9999,0, height,+9999,width);
+  groundmap = new csIsoGroundMap(this, 1, 1);
 }
 
 csIsoGrid::~csIsoGrid ()
@@ -42,6 +43,7 @@ csIsoGrid::~csIsoGrid ()
   for(int i=0; i<width*height; i++) 
     if(grid[i]) grid[i]->DecRef();
   delete[] grid;
+  delete groundmap;
 }
 
 bool csIsoGrid::Contains(const csVector3& pos)
@@ -87,11 +89,9 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
   iIsoGrid *newgrid = world->FindGrid(newpos);
   if(!newgrid) 
   {
-    // uh oh sprite not any longer in *any* grid
-    sprite->SetGrid(NULL); // so the sprite will not call me back
-    sprite->SetPosition(oldpos);
-    sprite->SetGrid(this);
+    // uh oh sprite moved out of *all* grids
     // disallow the movement
+    sprite->ForcePosition(oldpos);
     return;
   }
   printf("Grid: Sprite moved to new grid\n");
@@ -207,7 +207,13 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
 #endif
   }
   // other render passes?
-  // do nothing
+  if(rview->GetRenderPass() == CSISO_RENDERPASS_PRE)
+  {
+    // calculate dyn lighting
+    SetAllLight(csColor(0.,0.,0.));
+    for(int l=0; l<lights.Length(); l++)
+      ((iIsoLight*)(lights[l]))->ShineGrid();
+  }
 }
 
 void csIsoGrid::SetSpace(int minx, int minz, float miny = -1.0,
@@ -216,6 +222,76 @@ void csIsoGrid::SetSpace(int minx, int minz, float miny = -1.0,
   mingridx = minz; 
   mingridy = minx;
   box.Set(minx,miny,minz, minx+height,maxy,minz+width);
+}
+
+void csIsoGrid::SetGroundMult(int multx, int multy)
+{
+  delete groundmap;
+  groundmap = new csIsoGroundMap(this, multx, multy);
+}
+
+void csIsoGrid::SetGroundValue(int x, int y, int gr_x, int gr_y, float val)
+{
+  groundmap->SetGround(x*groundmap->GetMultX()+gr_x, 
+    y*groundmap->GetMultY()+gr_y, val);
+}
+
+float csIsoGrid::GetGroundValue(int x, int y, int gr_x, int gr_y)
+{
+  return groundmap->GetGround(x*groundmap->GetMultX()+gr_x, 
+    y*groundmap->GetMultY()+gr_y);
+}
+
+float csIsoGrid::GetGroundValue(int x, int y)
+{
+  return groundmap->GetGround(x, y);
+}
+
+bool csIsoGrid::GroundHitBeam(const csVector3& src, const csVector3& dest)
+{
+  return groundmap->HitBeam(src, dest);
+}
+
+int csIsoGrid::GetGroundMultX() const
+{
+  return groundmap->GetMultX();
+}
+
+int csIsoGrid::GetGroundMultY() const
+{
+  return groundmap->GetMultY();
+}
+
+
+static void setspritecolor(iIsoSprite* spr, void *dat)
+{
+  const csColor *col = (const csColor*)dat;
+  spr->SetAllColors(*col);
+}
+
+void csIsoGrid::SetAllLight(const csColor& color)
+{
+  // make copy of color, since (weird usermade) iIsoSprites could violate 
+  // the const that is promised in my heading.
+  csColor col = color;
+  for(int i=0; i<width*height; i++) 
+    if(grid[i]) 
+    {
+      grid[i]->Traverse(setspritecolor, &col);
+    }
+}
+
+void csIsoGrid::RegisterLight(iIsoLight *light)
+{
+  if(lights.Find(light)==-1)
+    lights.Push(light);
+}
+
+void csIsoGrid::UnRegisterLight(iIsoLight *light)
+{
+  int idx = lights.Find(light);
+  if(idx!=-1)
+    lights.Delete(idx);
 }
 
 
@@ -260,6 +336,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
     dheight = dheight / float(dx);
     baseheight = src.y - dheight * x0;
     dx = (dx < 0) ? -1 : 1;
+    x1-=dx; // do not check last pos
     while (x0 != x1) {
       x0 += dx;
       //check (x0, round(m*x0 + b))
@@ -272,6 +349,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
     dheight = dheight / float(dy);
     baseheight = src.y - dheight * y0;
     dy = (dy < 0) ? -1 : 1;
+    y1-=dy; // do not check last pos
     while (y0 != y1) {
       y0 += dy;
       //check (round(m*y0 + b), y0)
@@ -281,3 +359,5 @@ bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
   }
   return true;
 }
+
+

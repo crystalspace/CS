@@ -61,6 +61,7 @@ public:
   virtual void SetCurrentWorld(iIsoWorld *world) {csIsoEngine::world=world;}
   virtual iIsoWorld *GetCurrentWorld() const {return world;}
   virtual iIsoView* CreateView(iIsoWorld *world);
+  virtual iIsoLight* CreateLight();
   virtual iIsoSprite* CreateSprite();
   virtual int GetBeginDrawFlags () const;
   virtual iIsoSprite* CreateFloorSprite(const csVector3& pos, float w, 

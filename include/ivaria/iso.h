@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "isys/plugin.h"
 #include "csutil/csrect.h"
+#include "csutil/cscolor.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -38,6 +39,7 @@ struct iIsoRenderView;
 struct iIsoSprite;
 struct iIsoGrid;
 struct iIsoCell;
+struct iIsoLight;
 
 SCF_VERSION (iIsoEngine, 0, 0, 1);
 
@@ -62,6 +64,8 @@ struct iIsoEngine : public iPlugIn
   virtual iIsoWorld* CreateWorld() = 0;
   /// Create new view on the given world
   virtual iIsoView* CreateView(iIsoWorld *world) = 0;
+  /// create a new light
+  virtual iIsoLight* CreateLight() = 0;
   /// Create new sprite
   virtual iIsoSprite* CreateSprite() = 0;
   /// (convenience) create new floor/ceiling tile.
@@ -126,6 +130,36 @@ struct iIsoGrid : public iBase
   virtual int GetHeight() const = 0;
   /// get the grid offset
   virtual void GetGridOffset(int& minx, int& miny) const = 0;
+  /// get a cell by index
+  virtual iIsoCell* GetGridCell(int x, int y) = 0;
+
+  /** Set the ground level precision, default is 1,1
+   *  you give a multiplier, each cell in the grid then has
+   *  multx x multy ground values. This resets the groundmap.
+   */
+  virtual void SetGroundMult(int multx, int multy) = 0;
+  /// get the x mult
+  virtual int GetGroundMultX() const = 0;
+  /// get the y mult
+  virtual int GetGroundMultY() const = 0;
+  /** Set a ground value for cell, and subground index grx, gry.
+   *  0 < grx < multx, 0 < gry < multy. x,y are cell indices.
+   *  the value is the height of the floor. Walls have a high value.
+   */
+  virtual void SetGroundValue(int x, int y, int gr_x, int gr_y, float val) = 0;
+  /// get a ground value, same syntax as SetGroundValue.
+  virtual float GetGroundValue(int x, int y, int gr_x, int gr_y) = 0;
+  /// same, but pass ground indices (cellx*multx+gr_x, celly*multy+gr_y).
+  virtual float GetGroundValue(int x, int y) = 0;
+  /// test if src can reach dest without intersecting the ground.
+  virtual bool GroundHitBeam(const csVector3& src, const csVector3& dest) = 0;
+
+  /// Set all the lighting in the grid to given color.
+  virtual void SetAllLight(const csColor& color) = 0;
+  /// register a light with this grid
+  virtual void RegisterLight(iIsoLight *light) = 0;
+  /// unregister a light with this grid
+  virtual void UnRegisterLight(iIsoLight *light) = 0;
 
   /// Add a sprite to this grid
   virtual void AddSprite(iIsoSprite *sprite) = 0;
@@ -157,6 +191,8 @@ struct iIsoCell : public iBase
   virtual void RemoveSprite(iIsoSprite *sprite, const csVector3& pos) = 0;
   /// Draw using given renderview
   virtual void Draw(iIsoRenderView *rview) = 0;
+  /// Traverse in any order, all sprites, calling func(sprite, userdata).
+  virtual void Traverse(void (*func)(iIsoSprite*, void *), void *userdata)=0;
 };
 
 SCF_VERSION (iIsoView, 0, 0, 1);
@@ -269,6 +305,12 @@ struct iIsoSprite : public iBase
   virtual int GetNumVertices() const = 0;
   /// add a new vertex to the polygon
   virtual void AddVertex(const csVector3& coord, float u, float v) = 0;
+  /// get a vertex position
+  virtual const csVector3& GetVertexPosition(int i) = 0;
+  /// set all vertex colors to given
+  virtual void SetAllColors(const csColor& color) = 0;
+  /// add color to color of vertex
+  virtual void AddToVertexColor(int i, const csColor& color) = 0;
 
   /// Get the world position of the sprite
   virtual const csVector3& GetPosition() const = 0;
@@ -276,6 +318,12 @@ struct iIsoSprite : public iBase
   virtual void SetPosition(const csVector3& pos) = 0;
   /// Move the position by delta.
   virtual void MovePosition(const csVector3& delta) = 0;
+  /** 
+   * force position to a value - without updating other internal
+   * data structures. Used by those internal data structures, to
+   * invalidate impossible movement
+   */
+  virtual void ForcePosition(const csVector3& pos) = 0;
 
   /// Set the materialhandle to use
   virtual void SetMaterialHandle(iMaterialHandle *material) = 0;
@@ -291,7 +339,65 @@ struct iIsoSprite : public iBase
 
   /// Set the grid this sprite is part of (used as notification by grid/world)
   virtual void SetGrid(iIsoGrid *grid) = 0;
+  /// get the grid this sprite is part of
+  virtual iIsoGrid *GetGrid() const = 0;
+  /// set a callback for when the sprite moves to another grid
+  virtual void SetGridChangeCallback(void (*func)(iIsoSprite *, void *),
+    void *data) = 0;
+  /// get the callback for when the sprite moves to another grid
+  virtual void GetGridChangeCallback(void (*&func)(iIsoSprite *, void *),
+    void *&data) const = 0;
 };
 
+
+/**
+ * Attenuation controls how the brightness of a light fades with distance.
+ * There are four attenuation formulas:
+ * <ul>
+ *   <li> no attenuation = light * 1
+ *   <li> linear attenuation = light * (radius - distance) / radius
+ *   <li> inverse attenuation = light * (radius / distance)
+ *   <li> realistic attenuation = light * (radius^2 / distance^2)
+ * </ul>
+ */
+#define CSISO_ATTN_NONE      0
+#define CSISO_ATTN_LINEAR    1
+#define CSISO_ATTN_INVERSE   2
+#define CSISO_ATTN_REALISTIC 3
+
+SCF_VERSION (iIsoLight, 0, 0, 1);
+
+/**
+ * A light for the isometric engine.
+*/
+struct iIsoLight : public iBase
+{
+  /// set the grid for this light
+  virtual void SetGrid(iIsoGrid *grid) = 0;
+  /// get the grid for this light
+  virtual iIsoGrid* GetGrid() const = 0;
+  /// set attentuation type of light (CSISO_ATTN_... see above)
+  virtual void SetAttenuation(int attn) = 0;
+  /// get attentuation type of light 
+  virtual int GetAttenuation() const = 0;
+  /// set the position of the light
+  virtual void SetPosition(const csVector3& pos) = 0;
+  /// get the position of the light
+  virtual const csVector3& GetPosition() const = 0;
+  /// set the color of the light
+  virtual void SetColor(const csColor& col) = 0;
+  /// get the color of the light
+  virtual const csColor& GetColor() const = 0;
+  /// set the radius of the light
+  virtual void SetRadius(float radius) = 0;
+  /// get the radius of the light
+  virtual float GetRadius() const = 0;
+
+  /// shine the light, add light to all visible areas of the grid
+  virtual void ShineGrid() = 0;
+  /// shine the light on a sprite, adding to all the vertex colors
+  virtual void ShineSprite(iIsoSprite *sprite) = 0;
+
+};
 
 #endif

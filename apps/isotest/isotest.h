@@ -29,6 +29,7 @@ struct iIsoEngine;
 struct iIsoView;
 struct iIsoWorld;
 struct iIsoSprite;
+struct iIsoLight;
 struct iLoaderNew;
 struct iFont;
 
@@ -47,6 +48,8 @@ private:
   iFont *font;
   /// the player sprite
   iIsoSprite *player;
+  /// the light
+  iIsoLight *light;
 
 public:
   IsoTest ();
@@ -56,6 +59,7 @@ public:
     const char *iConfigName);
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
+  iIsoLight *GetLight () const {return light;}
 };
 
 #endif // ISOTEST_H

@@ -37,6 +37,8 @@ csIsoSprite::csIsoSprite (iBase *iParent)
   material = NULL;
   mixmode = CS_FX_COPY;
   grid = NULL;
+  gridcall = NULL;
+  gridcalldata = NULL;
 }
 
 csIsoSprite::~csIsoSprite ()
@@ -252,5 +254,25 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
 
 void csIsoSprite::SetGrid(iIsoGrid *grid)
 {
-  csIsoSprite::grid = grid;
+  if(csIsoSprite::grid != grid)
+  {
+    csIsoSprite::grid = grid;
+    if(gridcall) gridcall(this, gridcalldata);
+  }
 }
+
+void csIsoSprite::SetAllColors(const csColor& color)
+{
+  for(int i=0; i<poly.GetNumVertices(); i++)
+  {
+    colors[i].Set(color.red, color.green, color.blue);
+  }
+}
+
+void csIsoSprite::AddToVertexColor(int i, const csColor& color)
+{
+  colors[i].x += color.red; if(colors[i].x>1.0) colors[i].x=1.0;
+  colors[i].y += color.green; if(colors[i].y>1.0) colors[i].y=1.0;
+  colors[i].z += color.blue; if(colors[i].z>1.0) colors[i].z=1.0;
+}
+

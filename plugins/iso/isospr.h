@@ -44,6 +44,10 @@ private:
   csPoly3D colors;
   /// drawing prealloc
   G3DPolygonDPFX g3dpolyfx;
+  /// the grid change callback
+  void (*gridcall)(iIsoSprite *, void *);
+  /// grid change callback userdata
+  void *gridcalldata;
 
 public:
   DECLARE_IBASE;
@@ -66,6 +70,16 @@ public:
   virtual UInt GetMixmode() const {return mixmode;}
   virtual void Draw(iIsoRenderView *rview);
   virtual void SetGrid(iIsoGrid *grid);
+  virtual void SetAllColors(const csColor& color);
+  virtual const csVector3& GetVertexPosition(int i) { return poly[i];}
+  virtual void AddToVertexColor(int i, const csColor& color);
+  virtual iIsoGrid *GetGrid() const {return grid;}
+  virtual void SetGridChangeCallback(void (*func)(iIsoSprite *, void *),
+    void *data) {gridcall = func; gridcalldata = data;}
+  virtual void GetGridChangeCallback(void (*&func)(iIsoSprite *, void *),
+    void *&data) const {func = gridcall; data = gridcalldata;}
+  virtual void ForcePosition(const csVector3& pos) {position = pos;}
+
 };
 
 #endif

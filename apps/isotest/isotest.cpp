@@ -36,6 +36,7 @@ IsoTest::IsoTest ()
   view = NULL;
   world = NULL;
   font = NULL;
+  light = NULL;
 }
 
 IsoTest::~IsoTest ()
@@ -44,6 +45,7 @@ IsoTest::~IsoTest ()
   if(world) world->DecRef();
   if(engine) engine->DecRef();
   if(font) font->DecRef();
+  if(light) light->DecRef();
 }
 
 void cleanup ()
@@ -72,6 +74,15 @@ static iMaterialHandle* LoadTexture(iSystem *sys, iTextureManager *txtmgr,
   buf->DecRef();
   imgloader->DecRef();
   return math;
+}
+
+
+/// helper grid change callback for the player sprite - to move the light
+static void PlayerGridChange(iIsoSprite *sprite, void *mydata)
+{
+  IsoTest* app = (IsoTest*)mydata;
+  if(app->GetLight())
+    app->GetLight()->SetGrid(sprite->GetGrid());
 }
 
 
@@ -142,8 +153,10 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   // the grid is 20 units tall (from 0..20 in the +x direction)
   iIsoGrid *grid = world->CreateGrid(10, 20);
   grid->SetSpace(0, 0, -1.0, +10.0);
+  int multx = 2, multy = 2;
+  grid->SetGroundMult(multx, multy);
   iIsoSprite *sprite = NULL;
-  int x,y;
+  int x,y, mx,my;
   for(y=0; y<20; y++)
     for(x=0; x<10; x++)
     {
@@ -153,6 +166,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
         sprite->SetMaterialHandle(math1);
       else sprite->SetMaterialHandle(math2);
       world->AddSprite(sprite);
+      for(my=0; my<multy; my++)
+        for(mx=0; mx<multx; mx++)
+          grid->SetGroundValue(x, y, mx, my, 0.0);
     }
 
   // add the player sprite to the world
@@ -160,6 +176,29 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   player = engine->CreateFrontSprite(startpos, 1.0, 4.0);
   player->SetMaterialHandle(snow);
   world->AddSprite(player);
+  player->SetGridChangeCallback(PlayerGridChange, (void*)this);
+
+  // add a light to the scene.
+  iIsoLight *scenelight = engine->CreateLight();
+  scenelight->SetPosition(csVector3(3,3,3));
+  scenelight->SetGrid(grid);
+  scenelight->SetRadius(4.0);
+  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+
+  // add a light for the player
+  light = engine->CreateLight();
+  light->SetPosition(startpos+csVector3(0,1,0));
+  light->SetGrid(grid);
+  light->SetRadius(5.0);
+  light->SetColor(csColor(1.0, 0.4, 0.2));
+  for(my=0; my<multy; my++)
+    for(mx=0; mx<multx; mx++)
+      grid->SetGroundValue(5, 15, mx, my, 0.8);
+
+  bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,0,8));
+  printf("Hitbeam gave %d\n", (int)res);
+  res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
+  printf("Hitbeam gave %d\n", (int)res);
 
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();
@@ -206,6 +245,7 @@ void IsoTest::NextFrame ()
   if (GetKeyState (CSKEY_DOWN)) playermotion += csVector3(-speed,0,0);
   player->MovePosition(playermotion);
   view->MoveScroll(playermotion); 
+  light->SetPosition(player->GetPosition()+csVector3(0,1,0));
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
@@ -218,7 +258,7 @@ void IsoTest::NextFrame ()
   if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   char buf[255];
-  sprintf(buf, "FPS: %g    (%g,%g,%g)", fps, player->GetPosition().x,
+  sprintf(buf, "FPS: %g    loc(%g,%g,%g)", fps, player->GetPosition().x,
     player->GetPosition().y, player->GetPosition().z);
   G2D->Write(font, 10, G2D->GetHeight() - 20, txtmgr->FindRGB(255,255,255),
     -1, buf);

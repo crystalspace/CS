@@ -148,3 +148,20 @@ void csIsoCell::TraverseInOrder(csIsoCellNode *tree,
   func(tree, data);
   if(tree->right) TraversePost(tree->right, func, data);
 }
+
+
+struct calldata { void (*func)(iIsoSprite*, void *); void *userdata; };
+static void callfunc(csIsoCellNode *node, void *data)
+{
+  struct calldata* dat = (struct calldata*)data;
+  dat->func(node->drawpart, dat->userdata);
+}
+void csIsoCell::Traverse(void (*func)(iIsoSprite*, void *), void *userdata)
+{
+  struct calldata dat;
+  dat.func = func;
+  dat.userdata = userdata;
+  if(root)
+    TraverseInOrder(root, callfunc, &dat);
+}
+

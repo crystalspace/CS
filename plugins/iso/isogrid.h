@@ -21,6 +21,7 @@
 
 #include "ivaria/iso.h"
 #include "csgeom/box.h"
+#include "csutil/csvector.h"
 #include "qint.h"
 
 class csIsoGroundMap;
@@ -45,7 +46,9 @@ private:
    */
   int mingridx, mingridy;
   /// the ground map of this grid
-  csIsoGroundMap *groudmap;
+  csIsoGroundMap *groundmap;
+  /// the lights in this grid, type iIsoLight
+  csBasicVector lights;
 
 public:
   DECLARE_IBASE;
@@ -88,7 +91,17 @@ public:
   virtual int GetHeight() const {return height;}
   virtual void GetGridOffset(int& minx, int& miny) const 
   {minx = mingridx; miny = mingridy;}
-
+  virtual void SetGroundMult(int multx, int multy);
+  virtual void SetGroundValue(int x, int y, int gr_x, int gr_y, float val);
+  virtual float GetGroundValue(int x, int y, int gr_x, int gr_y);
+  virtual float GetGroundValue(int x, int y);
+  virtual bool GroundHitBeam(const csVector3& src, const csVector3& dest);
+  virtual int GetGroundMultX() const;
+  virtual int GetGroundMultY() const;
+  virtual void SetAllLight(const csColor& color);
+  virtual void RegisterLight(iIsoLight *light);
+  virtual void UnRegisterLight(iIsoLight *light);
+  virtual iIsoCell* GetGridCell(int x, int y) { return GetCell(x,y); }
 };
 
 
@@ -111,6 +124,10 @@ public:
   ///
   ~csIsoGroundMap();
 
+  /// get mult x
+  int GetMultX() const {return multx;}
+  /// get mult y
+  int GetMultY() const {return multy;}
   /// set a value
   void SetGround(int x, int y, float val) {map[y*width+x]=val;}
   /// get a value
