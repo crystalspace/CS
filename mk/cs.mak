@@ -11,7 +11,7 @@ include mk/user.mak
 -include config.mak
 include mk/common.mak
 
-.PHONY: doc api depend clean cleanlib cleandep distclean html pdf classpdf pdfbook cleandoc detex zips
+.PHONY: depend clean cleanlib cleandep distclean
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -63,8 +63,6 @@ OUTOS=$(OUTBASE)$(OS)/
 OUTPROC=$(OUTOS)$(PROC)/
 OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
-
-HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./plugins $(CFLAGS.I)./apps $(CFLAGS.I)./support
@@ -162,90 +160,17 @@ depend: $(OUTBASE) $(OUTOS)
 distclean: clean
 	-$(RM) config.mak include/volatile.h
 
-clean: cleandoc
+clean:
 	-$(RMDIR) $(subst /,,$(OUTBASE))
 ifneq ($(strip $(OUTDLL)),)
 	-$(RMDIR) $(subst /,,$(OUTDLL))
 endif
-	-$(RM) debug.txt ivcon.log precalc.zip
+	-$(RM) debug.txt precalc.zip
 
 cleanlib:
 
 cleandep:
 	-$(RM) $(OUTOS)*.dep
-
-CSAPI=$(wildcard include/csengine/*.h include/csobject/*.h include/csgeom/*.h)
-CSDOC=$(HEADER)
-
-pics: 
-	mkdir pics
-	cp newdoc/pics/* ./pics/
-
-csapi/index.html: $(CSAPI) newdoc/html/docxxbanner.html
-	doc++ -F -B newdoc/html/docxxbanner.html -j -H -d csapi -f $(CSAPI)		
-
-api: csapi/index.html pics
-
-csdoc/index.html: $(CSDOC) newdoc/html/docxxbanner.html
-	doc++ -F -T newdoc/html/docxxbanner.html -j -H -d csdoc -f $(CSDOC)
-	$(RM) csdoc/HIERjava.html
-	
-doc: csdoc/index.html pics
-
-PDFLATEX=pdflatex -interaction=nonstopmode
-CLASS_PDF_FILES=csgeom.pdf csengine.pdf csobject.pdf
-PDF_FILES=cs-tut.pdf cs-inst.pdf cs-thry.pdf cs-def.pdf cs-debu.pdf
-TEXT_FILES=cs-tut.txt cs-inst.txt cs-thry.txt cs-def.txt cs-debu.txt
-
-VPATH=newdoc
-
-html/index.html: $(wildcard newdoc/*.tex)
-	latex2html newdoc/html
-	python bin/mshelp.py crystal
-
-html: doc html/index.html pics
-
-%.pdf: %.tex
-	$(PDFLATEX) $<
-
-%.ttx: $(wildcard include/$(*F)/*.h)
-	doc++ -t -o $(*F).ttx $(wildcard include/$(*F)/*.h)
-
-%.pdf: %.ttx
-	$(PDFLATEX) $<
-
-classpdf: $(CLASS_PDF_FILES)
-
-pdf: $(PDF_FILES) classpdf
-
-pdfbook: crystal.pdf classpdf
-
-%.txt: %.pdf
-	pdftotext $<
-
-text: $(TEXT_FILES)
-
-cs-help-html.zip: html
-	zip -9 -rp cs-help-html.zip csdoc html pics crystal.hh*
-
-cs-help-pdf.zip: pdf
-	zip -9 cs-help-pdf.zip $(PDF_FILES) $(CLASS_PDF_FILES)
-
-cs-help-book.zip: pdfbook
-	zip -9 cs-help-book.zip crystal.pdf $(CLASS_PDF_FILES)
-
-cs-help-txt.zip: text
-	zip -9 cs-help-text.zip $(TEXT_FILES)
-
-doczips: cs-help-html.zip cs-help-pdf.zip cs-help-book.zip cs-help-txt.zip
-
-#lacheck: $(PDF_FILES) $(CLASS_PDF_FILES) crystal.pdf
-#	lacheck 
-
-cleandoc:
-	$(RM) *.aux *.log *.pdf *.idx *.toc *.ttx *.txt
-	$(RM) crystal.hhc crystal.hhk crystal.hhp
-	$(RMDIR) csdoc csapi html
 
 $(OUT)static$O: static.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_SCF)

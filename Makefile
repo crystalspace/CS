@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-.PHONY: help banner showplatforms showconfig platforms all doc api depend \
-  configure clean cleanlib cleandep distclean libs plugins drivers drivers2d \
-  drivers3d snddrivers netdrivers html doczips text lacheck
+.PHONY: help banner showplatforms showconfig platforms all depend configure \
+  configbanner clean cleanlib cleandep distclean libs plugins drivers \
+  drivers2d drivers3d snddrivers netdrivers
 
 # The following two symbols are intended to be used in "echo" commands
 # config.mak can override them depending on configured system requirements
@@ -21,6 +21,8 @@ include mk/common.mak
 SYSTARGETS=$(patsubst mk/system/%.mak,%,$(wildcard mk/system/*.mak))
 
 # The initial driver and application targets help text
+SYSHELP = \
+  echo $"The makefile system can be configured for the following platforms:$"
 DRIVERHELP = \
   echo $"The following Crystal Space drivers can be built:$"
 PLUGINHELP = \
@@ -29,8 +31,23 @@ APPHELP = \
   echo $"The following Crystal Space applications can be built:$"
 LIBHELP = \
   echo $"The following Crystal Space libraries can be built:$"
-SYSHELP = \
-  echo $"The makefile system can be configured for the following platforms:$"
+define PSEUDOHELP
+  echo $"The following pseudo targets can be built:$"
+  echo $"  make apps         Make all applications$"
+  echo $"  make libs         Make all static libraries$"
+  echo $"  make plugins      Make all plug-in modules including drivers$"
+  echo $"  make drivers      Make all drivers$"
+  echo $"  make drivers2d    Make all supported 2D graphics drivers$"
+  echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"
+  echo $"  make snddrivers   Make all supported sound drivers$"
+  echo $"  make netdrivers   Make all supported sound drivers$"
+  echo $"  make depend       Make dependencies (recommended!)$"
+  echo $"  make clean        Clean all files generated during build$"
+  echo $"  make cleanlib     Clean all dynamic libraries$"
+  echo $"  make cleandep     Clean all dependency rule files$"
+  echo $"  make distclean    Clean everything$"
+  echo $"  make platforms    List the available target platforms$"
+endef
 define SYSMODIFIERSHELP
   echo $"+++ Modifiers +++$"
   echo $"  USE_SHARED_PLUGINS=yes$|no$"
@@ -65,7 +82,7 @@ help: banner showconfig driverhelp pluginhelp libhelp apphelp pseudohelp
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
 
-doc api pdf cleandoc html text doczips lacheck clean cleanlib cleandep distclean:
+clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 unknown:
@@ -74,7 +91,7 @@ unknown:
 
 platforms:
 	@echo $(SEPARATOR)
-	@$(MAKE) --no-print-directory TARGET= showplatforms
+	@$(MAKE) --no-print-directory showplatforms TARGET=
 
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
@@ -98,22 +115,7 @@ apphelp:
 	@echo $(SEPARATOR)
 
 pseudohelp:
-	@echo $"  make apps         Make all applications$"
-	@echo $"  make libs         Make all static libraries$"
-	@echo $"  make plugins      Make all plug-in modules including drivers$"
-	@echo $"  make drivers      Make all drivers$"
-	@echo $"  make drivers2d    Make all supported 2D graphics drivers$"
-	@echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"
-	@echo $"  make snddrivers   Make all supported sound drivers$"
-	@echo $"  make netdrivers   Make all supported sound drivers$"
-	@echo $"  make depend       Make dependencies (recommended!)$"
-	@echo $"  make doc          Make documentation using Doc++$"
-	@echo $"  make api          Make API documentation using Doc++$"
-	@echo $"  make clean        Clean all files generated during build$"
-	@echo $"  make cleanlib     Clean all dynamic libraries$"
-	@echo $"  make cleandep     Clean all dependency rule files$"
-	@echo $"  make distclean    Clean everything$"
-	@echo $"  make platforms    List the available target platforms$"
+	@$(PSEUDOHELP)
 	@echo $(SEPARATOR)
 
 endif
@@ -144,10 +146,12 @@ ifeq ($(ROOTCONFIG),config)
 # Force config.tmp to be always rebuilt
 .PHONY: config.tmp
 
-configure: config.tmp
+configure: configbanner config.tmp
 	@$(MAKE) --no-print-directory ROOTCONFIG=volatile configure
+
+configbanner:
 	@echo $(SEPARATOR)
-	@echo $"  Makefiles are now configured for $(DESCRIPTION.$(TARGET)).$"
+	@echo $"  Configuring makefiles for $(DESCRIPTION.$(TARGET)) [$(MODE)]$"
 	@echo $(SEPARATOR)
 
 config.tmp:

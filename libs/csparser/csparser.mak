@@ -46,7 +46,7 @@ $(CSPARSER.LIB): $(OBJ.CSPARSER)
 	$(DO.LIBRARY)
 
 csparserclean:
-	-$(RM) $(CSPARSER.LIB) $(OBJ.CSPARSER)
+	-$(RM) $(CSPARSER.LIB) $(OBJ.CSPARSER) ivcon.log
 
 ifdef DO_DEPEND
 depend: $(OUTOS)csparser.dep

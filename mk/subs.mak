@@ -39,3 +39,10 @@ endif
 ifneq ($(TESTS_SUBMAKEFILES),)
   include $(TESTS_SUBMAKEFILES)
 endif
+
+ifeq ($(COMPOSITE_SUBMAKEFILES),)
+  COMPOSITE_SUBMAKEFILES=$(wildcard docs/*.mak newdocs/*.mak)
+endif
+ifneq ($(COMPOSITE_SUBMAKEFILES),)
+  include $(COMPOSITE_SUBMAKEFILES)
+endif
