@@ -34,13 +34,13 @@ struct iMotion : public iBase
 	///
 	virtual void SetName (const char* name) = 0;
 	///
-	virtual bool AddAnim (const csQuaternion &quat);
+	virtual bool AddAnim (const csQuaternion &quat) = 0;
 	///
-	virtual bool AddAnim (const csMatrix3 &mat);
+	virtual bool AddAnim (const csMatrix3 &mat) = 0;
 	///
-	virtual void AddFrame (int framenumber);
+	virtual int AddFrame (int framenumber) = 0;
 	///
-	virtual void AddFrameLink (int framenumber, const char* affector, int link);
+	virtual void AddFrameLink (int frameindex, const char* affector, int link) = 0;
 };
 
 SCF_VERSION (iMotionManager, 0, 0, 1);

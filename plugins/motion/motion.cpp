@@ -140,7 +140,7 @@ bool csMotion::AddAnim (const csMatrix3 &mat) {
 	return true;
 }
 
-void csMotion::AddFrame (int framenumber) {
+int csMotion::AddFrame (int framenumber) {
 	if(!frames) {
 		frames=(csMotionFrame*)malloc(sizeof(csMotionFrame));
 	} else {
@@ -149,13 +149,14 @@ void csMotion::AddFrame (int framenumber) {
 	frames[numframes].keyframe=framenumber;
 	frames[numframes].size=0;
 	numframes++;
+	return numframes-1;
 }
 
-void csMotion::AddFrameLink (int framenumber, const char* affector, int link) {
-	CS_ASSERT(framenumber>0);
-	CS_ASSERT(framenumber<numframes);
+void csMotion::AddFrameLink (int frameindex, const char* affector, int link) {
+	CS_ASSERT(frameindex>=0);
+	CS_ASSERT(frameindex<numframes);
 
-	csMotionFrame *mf=&frames[framenumber];
+	csMotionFrame *mf=&frames[frameindex];
 	if(!mf->size) {
 		mf->links=(int*)malloc(sizeof(int));
 		mf->affectors=(unsigned int*)malloc(sizeof(unsigned int));
