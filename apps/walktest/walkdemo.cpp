@@ -298,7 +298,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtn
   //exp->SetChangeSize (1.25);
   //exp->SetFadeSprites (500);
   exp->SetColor( csColor(1,1,0) );
-  //exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
+  exp->SetChangeColor( csColor(+0.01,0.,-0.012) );
   //exp->AddLight (Sys->world, sector, 1000);
 }
 
