@@ -110,7 +110,7 @@ csProcSky::csProcSky()
   endoctaves = new uint8 [octsize*octsize*nr_octaves];
   periods = new int [nr_octaves];
   curposition = new int [nr_octaves];
-  int aperiod = 60*1000;
+  int aperiod = 10*1000;
   for(i=0 ; i<nr_octaves; i++)
   {
     periods[i] = aperiod;
