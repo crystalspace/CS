@@ -224,13 +224,11 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b)
 {
 #ifndef CS_USE_NEW_RENDERER
-  float width = g3d->GetWidth();
-  float height = g3d->GetHeight();
-  float sx = (float(x)-width*0.5)/(width*0.5);
-  float sy = (float(height - y - 1)-height*0.5)/(height*0.5);
-  float smx = sx + float(w)/(width*0.5);
+  float sx = float(x);
+  float sy = float(g3d->GetHeight() - y - 1);
+  float smx = sx + float(w);
   float smy = sy;
-  sy -= float(h)/(height*0.5);
+  sy -= float(h);
   G3DPolygonDPFX dpfx;
   dpfx.num = 4;
   dpfx.use_fog = false;
