@@ -256,7 +256,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		seqname);
 	    return NULL;
 	  }
-	  trigger->SetEnabled (true);
+	  sequence->AddOperationTriggerState (cur_time,
+	  	trigger, true);
 	}
         break;
       case XMLTOKEN_DISABLETRIGGER:
@@ -272,7 +273,8 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		seqname);
 	    return NULL;
 	  }
-	  trigger->SetEnabled (false);
+	  sequence->AddOperationTriggerState (cur_time,
+	  	trigger, false);
 	}
         break;
       default:

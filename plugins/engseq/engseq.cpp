@@ -260,6 +260,30 @@ public:
 
 //---------------------------------------------------------------------------
 
+/**
+ * Set trigger state.
+ */
+class OpTriggerState : public OpStandard
+{
+private:
+  csRef<iSequenceTrigger> trigger;
+  bool en;
+
+public:
+  OpTriggerState (iSequenceTrigger* trigger, bool en)
+  {
+    OpTriggerState::trigger = trigger;
+    OpTriggerState::en = en;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    trigger->SetEnabled (en);
+  }
+};
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT(csSequenceWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSequenceWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -337,6 +361,9 @@ void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
 void csSequenceWrapper::AddOperationTriggerState (csTicks time,
 	iSequenceTrigger* trigger, bool en)
 {
+  OpTriggerState* op = new OpTriggerState (trigger, en);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 //---------------------------------------------------------------------------
