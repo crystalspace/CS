@@ -1205,7 +1205,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   char *params;
   char str [255];
 
-  iTextureWrapper* texh;
+  iTextureWrapper* texh = 0;
   bool col_set = false;
   csRGBcolor col;
   float diffuse = CS_DEFMAT_DIFFUSE;

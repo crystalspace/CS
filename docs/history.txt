@@ -43,6 +43,8 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated several unnecessary makefile statements which could
 	      also have confused a future maintainer.  Also simplified the
 	      existing makefile statements.
+	- Eric Sunshine eliminated a compilation warning in csloader.h
+	  regarding `texh' possibly being used uninitialized.
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.
