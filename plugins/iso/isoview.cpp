@@ -39,7 +39,8 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
   x_axis.Set(1.0,-1.0);
   y_axis.Set(0.0,1.0);
   z_axis.Set(1.0,1.0);
-  const float startscale = 30.0; // default scale.
+  // default scale.
+  float startscale = float(engine->GetG3D()->GetHeight())/16.0; 
   x_axis *= startscale;
   y_axis *= startscale;
   z_axis *= startscale;
