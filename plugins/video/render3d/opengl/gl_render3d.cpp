@@ -1263,7 +1263,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
       SetZMode (CS_ZBUF_NONE);
       
-      SetMixMode (CS_FX_COPY);
+      SetMixMode (CS_FX_ALPHA); 
+      // So alpha blending works w/ 2D drawing
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     }
     return true;//G2D->BeginDraw ();

@@ -43,7 +43,7 @@ csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) :
   csGLFontCache::G2D = G2D;
   statecache = G2D->statecache;
 
-  GLint maxtex = 257;
+  GLint maxtex = 256;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
 
   texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
@@ -57,18 +57,7 @@ csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) :
   maxFloats = MAX (maxFloats, 4);
   usedTexs = 0;
 
-  compressPages = false;
-  /*
-    Optionally enable compression of the font texture pages.
-   */
-  if (G2D->config->GetBool ("Video.OpenGL.FontCache.CompressTextures", false))
-  {
-    G2D->ext.InitGL_ARB_texture_compression ();
-    G2D->ext.InitGL_EXT_texture_compression_s3tc ();
-    compressPages = G2D->ext.CS_GL_ARB_texture_compression &&
-      G2D->ext.CS_GL_EXT_texture_compression_s3tc;
-  }
-  glyphAlign = compressPages ? 4 : 1;
+  glyphAlign = 1;
 
   glGenTextures (1, &texWhite);
   statecache->SetTexture (GL_TEXTURE_2D, texWhite);
@@ -158,32 +147,24 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    csRGBpixel* texImage = new csRGBpixel[texSize * texSize * 4];
+    uint8* texImage = new uint8[texSize * texSize];
 #ifdef CS_DEBUG
-    csRGBpixel* p = texImage;
+    uint8* p = texImage;
     for (int y = 0; y < texSize; y++)
     {
       for (int x = 0; x < texSize; x++)
       {
 	const uint8 val = 0x7f + (((x ^ y) & 1) << 7);
-	(p++)->Set (val, val, val, 255 - val);
+	*p++ = val;
       }
     }
 #endif
     // Alloc a pixel on that texture for background drawing.
-    texImage->Set (255, 255, 255, 0);
+    *texImage = 255;
     textures[tex].glyphRects->Alloc (1, 1, texRect);
 
-    if (compressPages)
-    {
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-	texSize, texSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImage);
-    }
-    else
-    {
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, texSize, texSize, 0, 
-	GL_RGBA, GL_UNSIGNED_BYTE, texImage);
-    }
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_INTENSITY, texSize, texSize, 0, 
+      GL_LUMINANCE, GL_UNSIGNED_BYTE, texImage);
     delete[] texImage;
 
     statecache->SetTexture (GL_TEXTURE_2D, 0);
@@ -239,13 +220,13 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 
     glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
-    csRGBpixel* rgbaData = new csRGBpixel[texRect.Width () * texRect.Height ()];
+    uint8* intData = new uint8[texRect.Width () * texRect.Height ()];
 
     const int padX = texRect.Width() - bmetrics.width;
     if (alphaDataBuf)
     {
       uint8* alphaData = alphaDataBuf->GetUint8 ();
-      csRGBpixel* dest = rgbaData;
+      uint8* dest = intData;
       uint8* src = alphaData;
       int x, y;
       for (y = 0; y < bmetrics.height; y++)
@@ -253,7 +234,7 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 	for (x = 0; x < bmetrics.width; x++)
 	{
 	  const uint8 val = *src++;
-	  (dest++)->Set (255 - val, 255 - val, 255 - val, val);
+	  *dest++ = 255 - val;
 	}
 	dest += padX;
       }
@@ -264,7 +245,7 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
       {
 	uint8* bitData = bitmapDataBuf->GetUint8 ();
 
-	csRGBpixel* dest = rgbaData;
+	uint8* dest = intData;
 	uint8* src = bitData;
 	uint8 byte = *src++;
 	int x, y;
@@ -273,7 +254,7 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 	  for (x = 0; x < bmetrics.width; x++)
 	  {
 	    const uint8 val = (byte & 0x80) ? 0xff : 0;
-	    (dest++)->Set (255 - val, 255 - val, 255 - val, val);
+	    *dest++ = 255 - val;
 	    if ((x & 7) == 7)
 	    {
 	      byte = *src++;
@@ -291,8 +272,8 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, texRect.xmin, texRect.ymin, 
       texRect.Width (), texRect.Height (), 
-      GL_RGBA, GL_UNSIGNED_BYTE, rgbaData);
-    delete[] rgbaData;
+      GL_LUMINANCE, GL_UNSIGNED_BYTE, intData);
+    delete[] intData;
   }
 }
 
@@ -310,23 +291,26 @@ void csGLFontCache::FlushArrays ()
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_CONSTANT_ARB);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_TEXTURE);
-      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_ONE_MINUS_SRC_ALPHA);
       glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB);
       glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
 
-      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PRIMARY_COLOR);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_CONSTANT_ARB);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
-      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_INTERPOLATE_ARB);
       glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
     }
     else
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
     statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    statecache->SetAlphaFunc (GL_GREATER, 0.0f);
 
-    envColor = ~0;
+    static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+    glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, envTransparent);
+    envColor = -1;
     needStates = false;
   }
   glTexCoordPointer(2, GL_FLOAT, sizeof (float) * 2, texcoords.GetArray ());
@@ -339,36 +323,17 @@ void csGLFontCache::FlushArrays ()
     if (doFG || doBG)
     {
       statecache->SetTexture (GL_TEXTURE_2D, job.texture);
-      if (job.bg != -1)
+      if (envColor != job.bg)
       {
-	if (envColor != job.bg)
-	{
-	  float bgRGB[4];
-	  G2D->DecomposeColor (job.bg, bgRGB[0], bgRGB[1], bgRGB[2], bgRGB[3]);
-	  glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
-	  envColor = job.bg;
-	}
-	/*statecache->Disable_GL_ALPHA_TEST ();
-	statecache->Disable_GL_BLEND ();*/
-
-	if (doBG)
-	{
-	  glDrawArrays(GL_QUADS, (GLsizei)job.bgVertOffset, (GLsizei)job.bgVertCount);
-	}
+	float bgRGB[4];
+	G2D->DecomposeColor (job.bg, bgRGB[0], bgRGB[1], bgRGB[2], bgRGB[3]);
+	glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
+	envColor = job.bg;
       }
-      else
+      if (doBG)
       {
-	if (doFG)
-	{
-	  statecache->Enable_GL_ALPHA_TEST ();
-	  statecache->Enable_GL_BLEND ();
-	  if (envColor != 0)
-	  {
-	    static float fgRGB[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-	    glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, fgRGB);
-	    envColor = 0;
-	  }
-	}
+	glDrawArrays(GL_QUADS, (GLsizei)job.bgVertOffset, 
+	  (GLsizei)job.bgVertCount);
       }
 
       if (doFG)
@@ -402,6 +367,15 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 {
   if (!text || !*text) return;
 
+  int bgTrans;
+  {
+    GLubyte oR, oG, oB, oA;
+    G2D->DecomposeColor (fg, oR, oG, oB, oA);
+    bgTrans = G2D->FindRGB (oR, oG, oB, 0);
+    G2D->DecomposeColor (bg, oR, oG, oB, oA);
+    if (oA == 0)
+      bg = bgTrans;
+  }
   BeginText();
 
   if (!(flags & CS_WRITE_BASELINE)) pen_y += font->GetAscent ();
@@ -556,7 +530,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 	bgVertOffset += 8;
 
 	// The glyph needs to be drawn transparently, so fetch another job
-	job = &GetJob (fg, -1, job->texture, bgVertOffset);
+	job = &GetJob (fg, bgTrans, job->texture, bgVertOffset);
 	// Later, fetch a BG job again
 	needBgJob = true;
       }
@@ -670,8 +644,6 @@ void csGLFontCache::FlushText ()
   if (!tcaEnabled) statecache->Disable_GL_TEXTURE_COORD_ARRAY();
   if (caEnabled) statecache->Enable_GL_COLOR_ARRAY();
 
-  statecache->Disable_GL_BLEND ();
-  statecache->Disable_GL_ALPHA_TEST ();
   if (G2D->useCombineTE)
   {
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
@@ -691,6 +663,8 @@ void csGLFontCache::FlushText ()
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+  statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   PurgeEmptyPlanes ();
 
   textWriting = false;
@@ -702,10 +676,15 @@ void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
   {
     csRef<iImage> page;
     page.AttachNew (new csImageMemory (texSize, texSize, 
-      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+      CS_IMGFMT_PALETTED8));
+    csRGBpixel* pal = page->GetPalette ();
+    for (int i = 0; i < 256; i++)
+    {
+      pal[i].Set (i, i, i);
+    }
 
     statecache->SetTexture (GL_TEXTURE_2D, textures[t].handle);
-    glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+    glGetTexImage (GL_TEXTURE_2D, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 
       page->GetImageData ());
     pages.Push (page);
   }

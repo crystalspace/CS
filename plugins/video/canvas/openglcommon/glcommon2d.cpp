@@ -302,6 +302,9 @@ bool csGraphics2DGLCommon::BeginDraw ()
 #ifdef CS_USE_NEW_RENDERER
   statecache->SetColorMask (true, true, true, true);
 #endif
+    
+  statecache->Enable_GL_BLEND ();		      
+  statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   return true;
 }
@@ -317,7 +320,7 @@ void csGraphics2DGLCommon::FinishDraw ()
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
   GLubyte &oR, GLubyte &oG, GLubyte &oB, GLubyte &oA)
 {
-  oA = (iColor >> 24) & 0xff;
+  oA = 255 - ((iColor >> 24) & 0xff);
   oR = (iColor >> 16) & 0xff;
   oG = (iColor >> 8) & 0xff;
   oB = iColor & 0xff;
@@ -336,15 +339,9 @@ void csGraphics2DGLCommon::DecomposeColor (int iColor,
 
 void csGraphics2DGLCommon::setGLColorfromint (int color)
 {
-  if (pfmt.AlphaMask)
-  {
-    statecache->Enable_GL_BLEND ();		      
-    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
-      color & 0xff, (color >> 24) & 0xff);
-  }
-  else
-    glColor3ub ((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+  GLubyte oR, oG, oB, oA;
+  DecomposeColor (color, oR, oG, oB, oA);
+  glColor4ub (oR, oG, oB, oA);
 }
 
 csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()

@@ -46,7 +46,6 @@ class csGLFontCache : public csFontCache
   int texSize;
   size_t maxTxts;
   size_t usedTexs;
-  bool compressPages;
   int glyphAlign;
   GLuint texWhite;
 

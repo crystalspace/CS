@@ -317,15 +317,18 @@ struct iGraphics2D : public iBase
   virtual void FreeArea (csImageArea *Area) = 0;
 
   /**
-   * Write a text string into the back buffer. A negative value for bg
+   * Write a text string into the back buffer. A value of -1 for \p bg
    * color will not draw the background.
    * \remarks \p str is expected to be UTF-8 encoded.
+   * \remarks For transparent backgrounds, it is recommended to obtain a color
+   *  value from FindRGB() that has the same R, G, B components as the 
+   *  foreground color, but an alpha component of 0.
    */
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str, uint flags = 0) = 0;
 
   /**
-   * Write a text string into the back buffer. A negative value for bg
+   * Write a text string into the back buffer. A value of -1 for \p bg
    * color will not draw the background. x and y are the pen position on
    * a baseline. The actual font baseline is shifted up by the font's descent.
    * \deprecated

@@ -196,7 +196,11 @@ public:
     if (g < 0) g = 0; else if (g > 255) g = 255;
     if (b < 0) b = 0; else if (b > 255) b = 255;
     if (a < 0) a = 0; else if (a > 255) a = 255;
-    return (a << 24) | (r << 16) | (g << 8) | b;
+    return ((255 - a) << 24) | (r << 16) | (g << 8) | b;
+    /* Alpha is "inverted" so '-1' can be decomposed to a 
+       transparent color. (But alpha not be inverted, '-1'
+       would be "opaque white". However, -1 is the color
+       index for "transparent text background". */
   }
 
   /// Draw a line

@@ -6,7 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-17-Oct-2005
+18-Oct-2004
+	- res enhanced the OpenGL canvases so blending is always functioning
+	  (lack of an alpha channel in the frame buffer isn't really a reason
+	  to disable alpha blending) and made the text output properly support
+	  transparency in both foreground and background color.
+	- res added some more transparent text to the g2d alpha test.
+17-Oct-2004
 	- Eric Sunshine eliminated a few more warnings in the public CS headers
 	  reported by Doxygen.
 	- Eric Sunshine augmented the Doxygen configuration files devapi.dox

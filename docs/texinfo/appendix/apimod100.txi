@@ -503,4 +503,9 @@ are also 1-based.
 @samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
 accepts an optional alpha value (0 being completely transparent, and
 255 being fully opaque) which defaults to 255. All canvases that support 32-bit
-mode will then blend the pixels appropriately.
+mode will then blend the pixels appropriately. Furthermore, as
+@code{iGraphics2D::Write()} also handles alpha in both foreground and 
+background colors, it is recommended for transparent backgrounds, instead 
+of using @samp{-1} as the color value, to obtain a color value from 
+@code{FindRGB()} that has the same R, G, B components as the foreground color, 
+but an alpha component of 0.

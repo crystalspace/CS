@@ -601,16 +601,16 @@ bool csGraphics2DOpenGL::Open ()
     pixelFormat = FindPixelFormatGDI (hDC, picker);
   }
 
-  if (SetPixelFormat (hDC, pixelFormat, 0) != TRUE)
-  {
-    HRESULT spfErr = (HRESULT)GetLastError();
-    SystemFatalError (L"SetPixelFormat failed.", spfErr);
-  }
-
   PIXELFORMATDESCRIPTOR pfd;
   if (DescribePixelFormat (hDC, pixelFormat, 
     sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     SystemFatalError (L"DescribePixelFormat failed.", GetLastError());
+
+  if (SetPixelFormat (hDC, pixelFormat, &pfd) != TRUE)
+  {
+    HRESULT spfErr = (HRESULT)GetLastError();
+    SystemFatalError (L"SetPixelFormat failed.", spfErr);
+  }
 
   currentFormat[glpfvColorBits] = pfd.cColorBits;
   currentFormat[glpfvAlphaBits] = pfd.cAlphaBits;

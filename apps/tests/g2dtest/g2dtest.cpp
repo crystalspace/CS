@@ -590,14 +590,15 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
 
 int G2DTestSystemDriver::MakeColor (int r, int g, int b, int a)
 {
-  if (!pfmt.PalEntries)
+  /*if (!pfmt.PalEntries)
     return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift)
          | ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift)
          | ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift)
          | ((a >> (8 - pfmt.AlphaBits)) << pfmt.AlphaShift);
 
   // In paletted mode this is easy since we have a uniform 3-3-2 palette
-  return ((r >> 5) << 5) | ((g >> 5) << 2) | (b >> 6);
+  return ((r >> 5) << 5) | ((g >> 5) << 2) | (b >> 6);*/
+  return myG2D->FindRGB (r, g, b, a);
 }
 
 csPtr<iFont> G2DTestSystemDriver::GetFont (const char *fontID, int size)
@@ -918,6 +919,19 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
     "Here is some partially transparent text");
   myG2D->Write (font, 50, 150, myG2D->FindRGB (0, 0, 255, 150), -1,
     "overlaying partially transparent boxes.");
+
+  csString str;
+  int i;
+  for (i = 0; i < 6; i++)
+  {
+    const uint8 alpha = (i * 51);
+    str.Format ("FG has alpha %d", alpha);
+    myG2D->Write (font, 320, 140 + i * 20, MakeColor (255, 255, 255, alpha), 
+      black, str);
+    str.Format ("BG has alpha %d", alpha);
+    myG2D->Write (font, 320, 150 + i * 20, white, MakeColor (0, 0, 0, alpha), 
+      str);
+  }
 }
 
 void G2DTestSystemDriver::DrawUnicodeTest1 ()
@@ -1022,6 +1036,10 @@ void G2DTestSystemDriver::DrawFreetypeTest ()
   WriteCentered (0, tpos + 16*4, black,  -1, 
     "in various faces and sizes below.");
 
+  csRefArray<iFont> fonts;
+  // The used fonts are all kept until the end of this function, to provide
+  // some more "stress" on the font cache.
+
   int y = tpos + 16*7;
   int i = 0;
   while (fontFaces[i] != 0)
@@ -1034,6 +1052,7 @@ void G2DTestSystemDriver::DrawFreetypeTest ()
       csRef<iFont> font = GetFont (fontFaces[i], fontSizes[j]);
       if (font)
       {
+	fonts.Push (font);
 	SetFont (font);
 	str.Clear ();
         str << fontFaces[i] << ", Size " << fontSizes[j];
