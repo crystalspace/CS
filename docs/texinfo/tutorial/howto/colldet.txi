@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Collision Detection, , HOWTO, HOWTO
+@node HOWTO Collision Detection, HOWTO Mesh LightAnim, HOWTO, HOWTO
 @subsection Doing Collision Detection
 @cindex @code{iCollideSystem}
 @cindex @code{iCollider}
