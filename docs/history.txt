@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+7-May-2003
+	- Eric Sunshine removed MSVC project-related variables from
+	  csjoylin.mak.  This module is Linux-specific, therefore there is no
+	  need to ever create an MSVC project file for it.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and

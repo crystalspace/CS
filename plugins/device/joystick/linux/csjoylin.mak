@@ -43,11 +43,6 @@ CFG.JOYLIN = $(SRCDIR)/data/config/joystick.cfg
 
 TO_INSTALL.CONFIG += $(CFG.JOYLIN)
 
-MSVC.DSP += JOYLIN
-DSP.JOYLIN.NAME = joylin
-DSP.JOYLIN.TYPE = plugin
-DSP.JOYLIN.LFLAGS = /nodefaultlib:"MSVCRT"
-
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
