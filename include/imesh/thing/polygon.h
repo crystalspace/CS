@@ -307,7 +307,7 @@ struct iPolygonTexture : public iBase
   virtual int GetWidth () = 0;
   /// Get height of lighted texture.
   virtual int GetHeight () = 0;
-  ///Get the degree of the lowest power of 2 that is not smaller than the texture bounding box' width
+  /// Get the power of the lowest power of 2 that is not smaller than the texture bounding box' width
   /// that is: 2^shift_u >= texbbox-width > 2^(shift_u-1)
   virtual int GetShiftU () = 0;
 
