@@ -79,7 +79,7 @@ csPython::~csPython()
 extern "C"
 {
   PyObject* csWrapTypedObject(void *objptr, const char *tagtype, int own);
-  void SWIG_init();
+  void SWIG_init_cspace();
 }
 
 static csString const& path_append(csString& path, char const* component)

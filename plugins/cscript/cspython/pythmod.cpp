@@ -23,9 +23,9 @@
 
 CS_IMPLEMENT_FOREIGN_DLL
 
-extern "C" void SWIG_init();
+extern "C" void SWIG_init_cspace();
 
 extern "C" CS_EXPORT_SYM_DLL void init_cspace ()
 {
-  SWIG_init();
+  SWIG_init_cspace();
 }

@@ -81,13 +81,36 @@ do
   makeout="$(LOCATE.OBJECTS)"
   version="$(PACKAGE_VERSION)"
   longversion="$(PACKAGE_STRING)"
+  newincdir=""
   # try to determine if we're in a source or installed CS version
-  if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
-    includedir="\${prefix}/include/$(PACKAGE_NAME)"
-    break
-  elif [ -r \${prefix}/include/cssysdef.h ] ; then
-    includedir="\${prefix}/include"
-    break
+  if test "x\$includedir_main" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+      includedir_main=\$newincdir
+    elif [ -r \${prefix}/include/cssysdef.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_main=\$newincdir
+    fi
+  fi
+  if test "x\$includedir_config" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)/csconfig.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+      includedir_config=\$newincdir
+    elif [ -r \${prefix}/include/csconfig.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_config=\$newincdir
+    fi
+  fi
+  if test -n "\$newincdir"
+  then
+    if test "x\$includedir" = "x"
+    then
+      includedir="\$newincdir"
+    else
+      includedir="\$includedir\$PATH_SEPARATOR\$newincdir"
+    fi
   fi
 done
 IFS=\$my_IFS

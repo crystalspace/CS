@@ -784,9 +784,6 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #define CS_IMPLICIT_PTR_CAST(classname, ptr) \
   (classname::_CS_IMPLICITPTRCAST_NAME(ptr))
 
-/// Fatal exit routine (which can be replaced if neccessary)
-extern void (*fatal_exit) (int errorcode, bool canreturn);
-
 /**\def CS_VA_COPY(dest, src)
  * Copies the state of a va_list value.
  */

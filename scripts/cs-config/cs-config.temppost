@@ -4,9 +4,9 @@ libdir=""
 lflags=""
 
 if test -r "$prefix/Jamfile" && \
-    test -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
+    test -r "$prefix/$makeout/libs/libcsutil.a"; then
     libdir="$prefix/$makeout/libs"
-    lflags="-L$libdir/csutil -L$libdir/cstool -L$libdir/csgfx -L$libdir/csgeom -L$libdir/csws"
+    lflags="-L$libdir"
 elif test -z "$libdir" && test -r "${exec_prefix}/lib/libcsutil.a"; then
     libdir="${exec_prefix}/lib"
     lflags="-L${exec_prefix}/lib"
@@ -189,7 +189,7 @@ while test $# -gt 0; do
 	exit 0
 	;;
     --includedir)
-	echo $includedir
+	echo $includedir_main
 	exit 0
 	;;
     --cflags)
@@ -224,14 +224,23 @@ EOF
   exit 1
 fi
 
+inc_dir_shown=""
+my_IFS=$IFS; IFS=$PATH_SEPARATOR
+for p in $includedir
+do
+  inc_dir_shown="$inc_dir_shown -I$p"
+done
+IFS=$my_IFS
+
+
 if test -n "$show_cflags"; then
-	echo "-I$includedir $common_cflags $add_cflags"
+	echo "$inc_dir_shown $common_cflags $add_cflags"
 else
     if test -n "$show_cxxflags"; then
-	echo "-I$includedir $common_cxxflags $add_cxxflags"
+	echo "$inc_dir_shown $common_cxxflags $add_cxxflags"
     else
 	if test -n "$show_includes"; then
-	    echo "-I$includedir"
+	    echo "$inc_dir_shown"
 	fi
     fi
 fi    

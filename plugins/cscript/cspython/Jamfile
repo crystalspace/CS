@@ -45,7 +45,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
   InstallCSPythonPY $(cspacepy) : bindings python ;
 
-  Library cspycommon : $(common) : noinstall shared independent ;
+  Library cspycommon : $(common) : shared independent ;
   LibDepends cspycommon : cstool csgfx csgeom csutil ;
   ExternalLibs cspycommon : PYTHON ;
   CFlags cspycommon :

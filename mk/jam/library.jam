@@ -136,7 +136,7 @@ rule LibraryStatic
   # already have a path.
   if ! $(target:D)
   {
-    MakeLocate $(target) $(target)($(objects:BS)) : $(LOCATE_TARGET) ;
+    MakeLocate $(target) $(target)($(objects:BS)) : $(LOCATE.OBJECTS)/libs ;
   }
 
   if $(NOARSCAN)
@@ -214,7 +214,7 @@ rule LibraryShared
   
   if ! $(target:D)
   {
-    MakeLocate $(target) : $(LOCATE.TARGETS) ;
+    MakeLocate $(target) : $(LOCATE.OBJECTS)/libs ;
   }
 
   # Generate install rules

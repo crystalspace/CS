@@ -62,7 +62,7 @@ if $(CMD.SWIG)
     \\1/g
     /\$Header:/d
     s/new[ 	][ 	]*(\\([^)][^)]*\\))[ 	]*\\[/new \\1 [/g
-    /[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*.*/d'" ;
+    s/[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*init_\\(.*\\)/#define SWIG_init SWIG_init_\\1/g'" ;
 
   ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]

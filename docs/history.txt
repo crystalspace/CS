@@ -51,6 +51,14 @@ chronological order.
 	  (possibly with different arguments). As a result, CS_COMPILER_PIC()
 	  was unable to predict the name of the shell variable in which
 	  CS_COMPILER_ERRORS() stored its result.
+	- res made the followig changes:
+	    - Removed ancient fatal_exit from cssysdef.h.
+	    - Made all lib*.a files go to out/<platform>/<mode>/libs to make
+	      the life easier for cs-config.
+	    - Changed cs-config to scan the dirs in the CRYSTAL var for
+	      cssysdef.h and csconfig.h (both may lie in different directory
+	      trees).
+	    - Changed the SWIG stuff to rename SWIG_init to SWIG_init_<module>.
 7-Mar-2005
 	- Jorrit fixed walktest to use csStrCaseCmp instead of strcasecmp.
 	  That fixes compilation on mingw.

@@ -57,10 +57,10 @@ PyMethodDef PytocsMethods[] =
   { 0, 0, 0, "" }
 };
 
-extern "C" void SWIG_init();
+extern "C" void SWIG_init_cspace();
 
 void InitPytocs()
 {
   Py_InitModule("pytocs", PytocsMethods);
-  SWIG_init();
+  SWIG_init_cspace();
 }
