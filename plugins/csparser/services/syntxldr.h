@@ -27,6 +27,7 @@
 
 #include "imap/services.h"
 #include "iutil/comp.h"
+#include "csutil/csstring.h"
 
 struct iObjectRegistry;
 
@@ -37,6 +38,7 @@ class csTextSyntaxService : public iSyntaxService
   int num;
   bool success;
   char *last_error;
+  csString text;
 
   void SetError (const char *msg, ...);
 
@@ -53,6 +55,22 @@ class csTextSyntaxService : public iSyntaxService
   virtual bool ParseVector (char *buffer, csVector3 &v);
   virtual bool ParseMixmode (char *buffer, UInt &mixmode);
   virtual bool ParseShading (char *buf, int &shading);
+
+
+  virtual const char* MatrixToText (const csMatrix3 &m, int indent, bool newline=true);
+  virtual const char* VectorToText (const char *vname, const csVector3 &v, int indent, 
+				    bool newline=true);
+  virtual const char* VectorToText (const char *vname, float x, float y, float z, int indent,
+				    bool newline=true);
+  virtual const char* VectorToText (const char *vname, const csVector2 &v, int indent,
+				    bool newline=true);
+  virtual const char* VectorToText (const char *vname, float x, float y, int indent,
+				    bool newline=true);
+
+  virtual const char* BoolToText (const char *vname, bool b, int indent, bool newline=true);
+
+  virtual const char* MixmodeToText (UInt mixmode, int indent, bool newline = true);
+
 
  private:
   /// make it plugable

@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
+#include "csgeom/vector2.h"
 #include "ivideo/graph3d.h"
 #include "imesh/thing/ptextype.h"
 
@@ -294,3 +295,139 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
   return success;
 }
 
+
+const char* csTextSyntaxService::MatrixToText (const csMatrix3 &m, int indent, bool newline)
+{
+  char line[100];
+  csString ind = csString::PadLeft (' ', indent);
+  
+  text = ind;
+  text.Append ("MATRIX (\n");
+
+  sprintf (line, "%g, %g, %g\n", m.m11, m.m12, m.m13); 
+  text.Append (ind);
+  text.Append (line);
+
+  sprintf (line, "%g, %g, %g\n", m.m21, m.m22, m.m23); 
+  text.Append (ind);
+  text.Append (line);
+
+  sprintf (line, "%g, %g, %g\n", m.m31, m.m32, m.m33); 
+  text.Append (ind);
+  text.Append (line);
+
+  text.Append (ind);
+  if (newline)
+    text.Append (")\n");
+  else
+    text.Append (")");
+
+  return text;
+}
+
+const char* csTextSyntaxService::VectorToText (const char *vname, float x, float y, float z,
+					       int indent, bool newline)
+{
+  char line[100];
+  csString ind = csString::PadLeft (' ', indent);
+  
+  sprintf (line, "%s (%g, %g, %g)%c", vname, x, y, z, newline ? '\n' : ' '); 
+  text.Append (ind);
+  text.Append (line);
+
+  return text;
+}
+
+const char* csTextSyntaxService::VectorToText (const char *vname, const csVector3 &v, int indent,
+					       bool newline)
+{
+  return VectorToText (vname, v.x, v.y, v.z, indent, newline);
+}
+
+const char* csTextSyntaxService::VectorToText (const char *vname, float x, float y, int indent,
+					       bool newline)
+{
+  char line[100];
+  csString ind = csString::PadLeft (' ', indent);
+  
+  sprintf (line, "%s (%g, %g)%c", vname, x, y, newline ? '\n' : ' '); 
+  text.Append (ind);
+  text.Append (line);
+
+  return text;
+}
+
+const char* csTextSyntaxService::VectorToText (const char *vname, const csVector2 &v, int indent,
+					       bool newline)
+{
+  return VectorToText (vname, v.x, v.y, indent, newline, newline);
+}
+
+const char* csTextSyntaxService::BoolToText (const char *vname, bool b, int indent, bool newline)
+{
+  char line[100];
+  csString ind = csString::PadLeft (' ', indent);
+  
+  sprintf (line, "%s (%s)%c", vname, b ? "yes" : "no", newline ? '\n' : ' '); 
+  text.Append (ind);
+  text.Append (line);
+
+  return text;
+}
+
+const char* csTextSyntaxService::MixmodeToText (UInt mixmode, int indent, bool newline)
+{
+  csString ind = csString::PadLeft (' ', indent);
+  
+  text = ind;
+  text.Append ("MIXMODE (\n");
+  if (mixmode & CS_FX_COPY)
+  {
+    text.Append (ind);
+    text.Append (" COPY ()\n");
+  }
+  if (mixmode & CS_FX_ADD)
+  {
+    text.Append (ind);
+    text.Append (" ADD ()\n");
+  }
+  if(mixmode & CS_FX_MULTIPLY)
+  {
+    text.Append (ind);
+    text.Append (" MULTIPLY ()\n");
+  }
+  if(mixmode & CS_FX_MULTIPLY2)
+  {
+    text.Append (ind);
+    text.Append (" MULTIPLY2 ()\n");
+  }
+  if(mixmode & CS_FX_KEYCOLOR)
+  {
+    text.Append (ind);
+    text.Append (" KEYCOLOR ()\n");
+  }
+  if(mixmode & CS_FX_TILING)
+  {
+    text.Append (ind);
+    text.Append (" TILING ()\n");
+  }
+  if(mixmode & CS_FX_TRANSPARENT)
+  {
+    text.Append (ind);
+    text.Append (" TRANSPARENT ()\n");
+  }
+  if(mixmode & CS_FX_ALPHA) 
+  {
+    char buf[30];
+    sprintf(buf, "  ALPHA (%.5g)\n", float(mixmode&CS_FX_MASK_ALPHA)/255.);;
+    text.Append (ind);
+    text.Append (buf);
+  }
+  text.Append (ind);
+  if (newline)
+    text.Append (")\n");
+  else
+    text.Append (")");
+
+  return text;
+}
