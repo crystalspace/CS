@@ -1067,8 +1067,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     source_patch_area * visibility / distance;
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
-#if 0
-  // if(totalfactor > 10.0f)
+#if 1
+  if(totalfactor > 10.0f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
@@ -1079,7 +1079,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #endif
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
-  shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
+  if(totalfactor > 0.0001) 
+    shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
 
   // specular gloss
   // direction of the 'light' on dest is -path
