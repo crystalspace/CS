@@ -12,9 +12,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csconfig csconfigclean
+.PHONY: cs-config cs-configclean
 
-all: csconfig
+all: cs-config
 cs-config:
 	$(MAKE_TARGET) DO_CREATE_CSCONFIG=yes
 cs-configclean:
