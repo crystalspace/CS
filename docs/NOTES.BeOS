@@ -1,18 +1,18 @@
 Description of BeOS port internals
 ==================================
-Beta 0.13r010 (8/5/99)
-written by David Huen(smh1008@cus.cam.ac.uk)
+Written by David Huen(smh1008@cus.cam.ac.uk)
+Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/08
 
 Contents
 ========
-0. Introduction
-
+0.0 Introduction
 1.0 Description of the BeOS SysSystemDriver
 1.1 Operation of SysSystemDriver
-
 2.0 Description of BeOS 2D Graphics Driver
+2.1 Operation of BeOS 2D Graphics Driver
+3.0 Bug List
 
-0. Introduction
+0.0 Introduction
 ===============
 I have expended many hours on working out how CrystalSpace works in BeOS with a view to improving its existing performance and eventually extending its functionality.  My main interest in CS is as a testbed to explore the extent to which SMP can impact 3D graphics engines.  Unfortunately, I'll have to understand the current implementation thoroughly before I can begin to explore SMP possibilities.
 
@@ -28,7 +28,7 @@ For example, in the demo application, walktest.cpp, the main block begins with a
 CHK(Sys = new Walktest());  [see apps/walktest/walktest.cpp]
 
 Walktest itself is derived from SysSystemDriver (which is derived from csSystemDriver) so SysSystemDriver::SysSystemDriver is invoked.  This in turn creates an instance of CrystApp:-
-CHK (app = new CrystApp(this)); [see cryst/libs/cssys/be/csbe]
+CHK (app = new CrystApp(this)); [see CS/libs/cssys/be/csbe]
 
 app is a global pointer that points to CrystApp (and therefore the BApplication).
 
@@ -90,6 +90,37 @@ unsigned char *csGraphics2D::Memory = NULL;
 This Print method  displays the bitmap by locking the window, blitting the BBitmap to the CrystView, then unlocking the window.
 
 
+3.0 Bug List
+========================================
+This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
+- should auto-detect buggy egcs compiler
+- application does not exit when CS requests termination
+- window is not closed when alt-q is used to terminat application
+- it is possible to close the window while the application is starting, yet the application does not terminate.
+- application bombs when window is closed when using OpenGL driver.
+- blocks prints out some twirling text cursor as game progresses (every frame, presumably)
+- modified key strokes not translated properly (can not use shift modifier in walktest)
+- something in the make process is executing "rm -f" during 'clean'
+- maze does not respond to the mouse at all (which makes it entirely useless); presumably mouse related functionality has not yet been implemented.
+- cswstest experiences some very bizarre display anomalies when the right mouse button is clicked; it appears to be a double-buffer problem.
+- metademo and squawk crash upon initialization when using OpenGL driver.
+- glide does not compile
+- usage of simulated depth appears to crash most applications, and is ignored by others
 
+This is the list of bugs which have recently been fixed.
 
+- compilation warnings abound
+- does not support png
+- does not support jpeg
+- shooter does not work (needs png)
+- cswstest does not work (needs png)
+- mazed does not work (needs png)
+- squawk does not work (needs jpeg)
+- version/description string says "Unix-Intel-GCC" but should say "BeOS-Intel-GCC"
+- network socket library does not compile (BeOS does not support sockets)
+- ndriverdemo does not work (needs socket library)
+- opengl compiles with warnings
+- squawk is displaying detritus console text in the gaps between 3D views every other frame;
+this appears to be a double-buffer problem.
+- glrender.mak tries linking with libraries which do not exist on BeOS
