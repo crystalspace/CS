@@ -34,6 +34,7 @@
   SKIN_DECLARE_END var
 
 class csButton;
+class csListBox;
 struct iTextureHandle;
 
 /**
@@ -143,6 +144,9 @@ class csDefaultListBoxSkin : public csListBoxSkin
 public:
   /// Draw the component we are responsible for
   virtual void Draw (csComponent &iComp);
+  
+ /// Suggest the optimal size of the ListBox
+ virtual void SuggestSize (csListBox &This, int &w, int &h);
 };
 
 /**

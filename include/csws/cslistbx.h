@@ -315,9 +315,6 @@ public:
   /// Find a place for each menu item
   void PlaceItems (bool setscrollbars = true);
 
-  /// Report the minimal size of listbox
-  virtual void SuggestSize (int &w, int &h);
-
   /// Resize child items on parent window resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
 
