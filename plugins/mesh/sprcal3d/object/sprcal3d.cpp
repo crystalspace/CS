@@ -1169,7 +1169,6 @@ void csSpriteCal3DMeshObject::SetupObject()
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
-
   csSegment3 seg (start, end);
   float dist, temp, max;
   temp = dist = max = csSquaredDist::PointPoint (start, end);
@@ -1200,6 +1199,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 		pVertexBuffer[(*iteratorFace).vertexId[1]],
 		pVertexBuffer[(*iteratorFace).vertexId[2]], seg, tsect))
 	{
+	  isect = tsect;
 	  if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 	      csSquaredDist::PointPoint (start, end));
 	  return true;

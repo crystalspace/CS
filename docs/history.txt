@@ -8,20 +8,24 @@ chronological order.
 
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
-	  * Added the possibility to route Cg programs through
-	    the Pixel Shader plugin, to make Cg available on lower end ATI 
-	    cards. This means the Cg plugin should now be able to cover all 
-	    cards with some kind of pixel shading ability. (I.e. GF3+ and 
-	    ATI 8500+). Routing will be enabled by default on cards where 
-	    ATI_fragment_shader is supported, but ARB_fragment_program isn't. 
-	    It can also be manually forced on or off by setting 
-	    "Video.OpenGL.Shader.Cg.PSRouting" in a config file. 
-	  * Fixed variable mapping in the Cg plugin, which apparantly was 
-	    broken.
-	  * Added an overloaded Load function to shader plugins, which
-	    allows for loading shaders from raw text buffers instead of
-	    via iDocumentNode. (Useful for programmatic loading of shaders.)
-	    Currently only the Pixel Shader plugin actually implements this.
+	    - Added the possibility to route Cg programs through
+	      the Pixel Shader plugin, to make Cg available on lower end ATI 
+	      cards. This means the Cg plugin should now be able to cover all 
+	      cards with some kind of pixel shading ability. (I.e. GF3+ and 
+	      ATI 8500+). Routing will be enabled by default on cards where 
+	      ATI_fragment_shader is supported, but ARB_fragment_program isn't.
+	      It can also be manually forced on or off by setting 
+	      "Video.OpenGL.Shader.Cg.PSRouting" in a config file. 
+	    - Fixed variable mapping in the Cg plugin, which apparantly was 
+	      broken.
+	    - Added an overloaded Load function to shader plugins, which
+	      allows for loading shaders from raw text buffers instead of
+	      via iDocumentNode. (Useful for programmatic loading of shaders.)
+	      Currently only the Pixel Shader plugin actually implements this.
+	- Jorrit fixed a bug in sprcal3d->HitBeamOutline() routine.
+	  The routine forgot to set the 'isect' return value AND in
+	  addition to that it even used that value. Hitting cal3d
+	  sprites with HitBeam() should now work.
 26-Mar-2004
 	- Marten added csMatrix as a type a csShaderVariable can store.
 	- Marten made the shadermanager responsible for handling the shader-
