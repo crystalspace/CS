@@ -248,7 +248,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   poly.colors[3].green = c4.green;
   poly.colors[3].blue = c4.blue;
   poly.mat_handle = 0;
-  poly.mixmode = CS_FX_ADD|CS_FX_GOURAUD;
+  poly.mixmode = CS_FX_ADD;
   if (do3d)
   {
     Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);

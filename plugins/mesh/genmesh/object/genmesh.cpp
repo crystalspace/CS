@@ -942,7 +942,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   iVertexBufferManager* vbufmgr = factory->GetVertexBufferManager ();
   m.mat_handle = mat;
   m.use_vertex_color = true;
-  m.mixmode = MixMode | CS_FX_GOURAUD;
+  m.mixmode = MixMode;
   CS_ASSERT (!vbuf->IsLocked ());
   const csBox3& b = factory->GetObjectBoundingBox ();
   vbufmgr->LockBuffer (vbuf,

@@ -1541,7 +1541,7 @@ bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,
 
   meshes[mesh][submesh].mat_handle = (material)?material->GetMaterialHandle():0;
   meshes[mesh][submesh].use_vertex_color = true;
-  meshes[mesh][submesh].mixmode = /* MixMode  | */ CS_FX_GOURAUD;
+  meshes[mesh][submesh].mixmode = /* MixMode  | */ CS_FX_COPY;
   meshes[mesh][submesh].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
   CS_ASSERT (!vbuf->IsLocked ());

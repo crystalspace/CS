@@ -1559,7 +1559,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
   g3dmesh.vertex_fog = fog_verts->GetArray ();
 
   g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  g3dmesh.mixmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
+  g3dmesh.mixmode = MixMode | (vertex_colors ? 0 : CS_FX_FLAT);
 
 
 #endif // CS_USE_NEW_RENDERER

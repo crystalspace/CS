@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you
 	  have to do -relight on this level to get lighting.
+	- res fixed some left occasions of CS_FX_GOURAUD in OR code.
 30-Apr-2004
 	- Eric Sunshine changed the Install* rules in install.jam so that they
 	  grist the source files with $(SUBDIR). This fixes a bug where

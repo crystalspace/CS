@@ -2683,7 +2683,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
   else return;
 
   if (!do_gouraud || !do_lighting)
-    mode &= ~CS_FX_GOURAUD;
+    mode |= CS_FX_FLAT;
 
   pqinfo.mat_handle = handle;
 
@@ -2754,7 +2754,7 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
     }
     case CS_FX_TRANSPARENT:
 zfill_only:
-      mode &= ~CS_FX_GOURAUD;
+      mode |= CS_FX_FLAT;
       pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
       	? 0
 	: csScan_scan_pi_zfil;
@@ -2778,7 +2778,7 @@ zfill_only:
     scan_index += 8;
   if (!pqinfo.drawline)
     pqinfo.drawline = ScanProcPI [scan_index];
-  if (mode & CS_FX_GOURAUD)
+  if (!(mode & CS_FX_FLAT))
     pqinfo.drawline_gouraud = ScanProcPIG [scan_index];
 
   pqinfo.mixmode = mode;
@@ -2898,7 +2898,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != 0)
-    && (pqinfo.mixmode & CS_FX_GOURAUD);
+    && (!(pqinfo.mixmode & CS_FX_FLAT));
 
   //-----
   // Main scanline loop.
@@ -2939,7 +2939,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             R.dudy = QInt16 ((uu [R.fv] - uu [R.sv]) * inv_dyR);
             R.dvdy = QInt16 ((vv [R.fv] - vv [R.sv]) * inv_dyR);
           }
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             R.drdy = QRound ((rr [R.fv] - rr [R.sv]) * inv_dyR);
             R.dgdy = QRound ((gg [R.fv] - gg [R.sv]) * inv_dyR);
@@ -2963,7 +2963,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             R.v = QInt16 (vv [R.sv] + (vv [R.fv] - vv [R.sv]) * Factor);
           }
           R.z = QInt24 (iz [R.sv] + (iz [R.fv] - iz [R.sv]) * Factor);
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             R.r = QRound (rr [R.sv] + (rr [R.fv] - rr [R.sv]) * Factor);
             R.g = QRound (gg [R.sv] + (gg [R.fv] - gg [R.sv]) * Factor);
@@ -2999,7 +2999,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             L.dudy = QInt16 ((uu [L.fv] - uu [L.sv]) * inv_dyL);
             L.dvdy = QInt16 ((vv [L.fv] - vv [L.sv]) * inv_dyL);
           }
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             L.drdy = QRound ((rr [L.fv] - rr [L.sv]) * inv_dyL);
             L.dgdy = QRound ((gg [L.fv] - gg [L.sv]) * inv_dyL);
@@ -3023,7 +3023,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             L.v = QInt16 (vv [L.sv] + (vv [L.fv] - vv [L.sv]) * Factor);
           }
           L.z = QInt24 (iz [L.sv] + (iz [L.fv] - iz [L.sv]) * Factor);
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             L.r = QRound (rr [L.sv] + (rr [L.fv] - rr [L.sv]) * Factor);
             L.g = QRound (gg [L.sv] + (gg [L.fv] - gg [L.sv]) * Factor);
@@ -3095,7 +3095,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           // will be neutralized by our "clamp to 1.0" circuit.
           int rr = 0, drr = 0, gg = 0, dgg = 0, bb = 0, dbb = 0;
           bool clamp = false;
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             int span_r = R.r - L.r;
             int span_g = R.g - L.g;
@@ -3137,7 +3137,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       if (pqinfo.textured)
         L.u += L.dudy, L.v += L.dvdy,
         R.u += R.dudy, R.v += R.dvdy;
-      if (pqinfo.mixmode & CS_FX_GOURAUD)
+      if (!(pqinfo.mixmode & CS_FX_FLAT))
         L.r += L.drdy, L.g += L.dgdy, L.b += L.dbdy,
         R.r += R.drdy, R.g += R.dgdy, R.b += R.dbdy;
 

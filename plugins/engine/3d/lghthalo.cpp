@@ -534,10 +534,11 @@ void csLightFlareHalo::ProcessFlareComponent (
   // draw the halo
   float intensity = flare->GetIntensity ();
   uint mode = comp->mixmode;
-  if ((mode&CS_FX_ADD) && (intensity < 1.0f))
-    mode |= CS_FX_GOURAUD;
-  else
+  if (!(mode & CS_FX_ADD) || (intensity >= 1.0f))
+  {
+    mode |= CS_FX_FLAT;
     intensity = 1.0f;
+  }
 
   //if(flare->GetIntensity() < 1.0)
   //return; // many drivers do not support combinations of weird modes

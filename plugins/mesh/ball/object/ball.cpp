@@ -915,7 +915,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   material->Visit ();
   top_mesh.mat_handle = mat;
   top_mesh.use_vertex_color = true;
-  top_mesh.mixmode = MixMode | CS_FX_GOURAUD;
+  top_mesh.mixmode = MixMode;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf,
     ball_vertices, ball_texels, ball_colors, num_ball_vertices,

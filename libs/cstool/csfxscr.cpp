@@ -145,7 +145,7 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   dpfx.colors[3].green = bottomcolor.green;
   dpfx.colors[3].blue = bottomcolor.blue;
   dpfx.mat_handle = 0;
-  dpfx.mixmode = mixmode | CS_FX_GOURAUD;
+  dpfx.mixmode = mixmode;
   dpfx.flat_color_r = 255;
   dpfx.flat_color_g = 255;
   dpfx.flat_color_b = 255;

@@ -265,8 +265,8 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           }
           try
           {
-            if(mt->getShaded())
-              cmt->coords[i].mode |= CS_FX_GOURAUD;
+            if(!mt->getShaded())
+              cmt->coords[i].mode |= CS_FX_FLAT;
           }
           catch(...) { }
           cmt->coords[i].mode |= CS_FX_TILING;   // for software renderer :P

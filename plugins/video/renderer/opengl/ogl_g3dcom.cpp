@@ -544,7 +544,7 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  mesh.mixmode = CS_FX_GOURAUD;
+  mesh.mixmode = CS_FX_COPY;
   mesh.morph_factor = 0;
   mesh.mat_handle = 0;
   mesh.vertex_fog = 0;
@@ -1898,7 +1898,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   GLuint texturehandle = 0;
   bool multimat = false;
   bool tex_transp = false;
-  bool gouraud = (queue.mixmode & CS_FX_GOURAUD) != 0;
+  bool gouraud = (queue.mixmode & CS_FX_FLAT) == 0;
 
   if (mat_handle)
   {
@@ -3096,7 +3096,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     flat_b = BYTE_TO_FLOAT (poly.flat_color_b);
   }
 
-  bool gouraud = (poly.mixmode & CS_FX_GOURAUD) != 0;
+  bool gouraud = (poly.mixmode & CS_FX_FLAT) == 0;
   float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   bool txt_alpha = false;
   if (poly.mat_handle)
@@ -5135,7 +5135,7 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   uint m_mixmode = mesh.mixmode;
   float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
   bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
-    ((m_mixmode & CS_FX_GOURAUD) != 0);
+    ((m_mixmode & CS_FX_FLAT) == 0);
 
   // This is added here because otherwise objects disappear
   // when a previous object has an alpha channel.
