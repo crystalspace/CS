@@ -15,6 +15,7 @@ chronological order.
 	  Crystal Space headers would be found before (possibly more recent)
 	  local development headers.
 	- res updated Opcode to version 1.3.
+	- res fixed the Opcode plugin to compile on non-Win32 platforms.
 27-May-2004
 	- Jorrit fixed a bug in the engine so that engine->RemoveObject()
 	  will correctly link a mesh from its parent if it is a hierarchical
