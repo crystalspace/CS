@@ -76,6 +76,7 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   TreeCollider.SetFullPrimBoxTest(false);
  // TreeCollider.SetFullPrimPrimTest(true);
   TreeCollider.SetTemporalCoherence(false);
+  N_pairs=0;
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -185,12 +186,19 @@ bool csOPCODECollideSystem::Collide (
 	udword* indexholder1 = col2->indexholder;
 	
 	Point* current;
-        if ( pairs ) delete[](pairs);
-	int i;
+        	int i;
 	int j;     
 	int size=(int)(udword(TreeCollider.GetNbPairs() ));
-         pairs = new csCollisionPair[ size ];
-	 for (i=0;i< size ;i++) {
+	 if ( pairs ) {
+	csCollisionPair* temporal;
+          temporal=new csCollisionPair[N_pairs + size ]	;
+           memcpy (temporal , pairs , sizeof(csCollisionPair)*N_pairs );	   
+	    delete[](pairs); 
+	      };
+         pairs = temporal;               //new csCollisionPair[ size ];
+	 int oldN=N_pairs;
+	 N_pairs+=size;
+	 for (i= oldN ;i< N_pairs ;i++) {
 		 j =  3*colPairs[i].id0;
 		 current = &vertholder0[ indexholder0 [ j ] ];		 
           pairs[i].a1=csVector3 ( current->x , current->y , current->z ); 
@@ -206,11 +214,10 @@ bool csOPCODECollideSystem::Collide (
 	           current =  &vertholder1[ indexholder1 [ j + 2 ] ];		 
           pairs[i].c2=csVector3 ( current->x , current->y , current->z ); 
 	
-	 };
-	
+	 };	
        
        return true;
-      } else { pairs=NULL;
+      } else { //pairs=NULL;  very bad, this must be done on ResetCollisionPairs
 	       return false; };  
   } else {
 	    
@@ -239,7 +246,7 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 
 int csOPCODECollideSystem::GetCollisionPairCount ()
 {
-	return TreeCollider.GetNbPairs();
+	return N_pairs;
 
 //  return csRapidCollider::numHits;
 }
@@ -248,6 +255,8 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
 {
 //  csRapidCollider::CollideReset ();
 //  csRapidCollider::numHits = 0;
+	delete[](pairs);
+	N_pairs=0;
 }
 
 
