@@ -22,6 +22,7 @@
 
 #include <stdarg.h>
 #include "csutil/csobject.h"
+#include "qint.h"
 
 struct iTextureWrapper;
 struct iMaterialWrapper;
@@ -141,7 +142,7 @@ public:
 
   static int GetRandom (int max)
   {
-    return (int)(float(max)*rand()/(RAND_MAX+1.0));
+    return QInt ((float(max)*rand()/(RAND_MAX+1.0)));
   }
 };
 

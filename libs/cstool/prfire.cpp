@@ -75,15 +75,6 @@ bool csProcFire::PrepareAnim ()
   return true;
 }
 
-uint8& csProcFire::GetImage(int x, int y)
-{
-  if (x < 0) x += mat_w;
-  if (y < 0) y += mat_h;
-  x %= mat_w;
-  y %= mat_h;
-  return image[ y*mat_w + x ];
-}
-
 uint8& csProcFire::GetFireLine(int x)
 {
   if (x < 0) 
@@ -153,17 +144,25 @@ void csProcFire::Animate (csTicks /*current_time*/)
   /// do nextframe of firetexture
   int x, y;
   /// put fireline at bottom
-  for (i = 0; i < mat_w; i++)
-    GetImage (i, mat_h-1) = fireline[i];
+  uint8* im = image+(mat_h-1)*mat_w;	// Point to last line.
+  uint8* fl = fireline;
+  memcpy (im, fl, mat_w);
 
   /// move all pixels
-  for (x = 0; x < mat_w; x++)
-    for (y = 1; y < mat_h; y++)
+  im = image + mat_w;	// Point after first row (y=1)
+  for (y = 1; y < mat_h; y++)
+  {
+    for (x = 0; x < mat_w; x++)
     {
-      int part = GetImage (x, y) - GetRandom (extinguish);
-      if (part<extinguish)part=0;
-      GetImage (x+GetRandom(3)-1 , y-1) = part;
+      int part = *im - GetRandom (extinguish);
+      if (part<extinguish) part=0;
+      int nx = x+GetRandom (3)-1;
+      if (nx < 0) nx = mat_w-1;
+      else if (nx >= mat_w) nx = 0;
+      *(im-mat_w+nx-x) = part;
+      im++;
     }
+  }
 
   if (GetRandom (100) == 0)
   {
@@ -212,13 +211,15 @@ void csProcFire::Animate (csTicks /*current_time*/)
 
   if (ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
   {  
-   /// draw firetexture
-    for (y = 0; y < mat_h; y++)
-      for(x = 0; x < mat_w; x++)
-      {
-	int col = image [y*mat_w + x];
-	ptG2D->DrawPixel (x, y, palette[col*palsize/256]);
-      }
+    /// draw firetexture
+    im = image;
+    int tot = mat_w * mat_h;
+    while (tot > 0)
+    {
+      int col = *im++;
+      ptG2D->DrawPixel (x, y, palette[col*palsize/256]);
+      tot--;
+    }
     ptG3D->FinishDraw ();
     ptG3D->Print (NULL);
   }

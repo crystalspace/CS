@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	  third place).
 	- Did an additional optimization to plasma procedural texture
 	  by avoiding array access and using normal variables.
+	- Did several optimizations to the fire procedural texture. With
+	  no big effect on framerate however.
 8-Dec-2001
 	- Fixed a closing brace in mapfmt.txi.
 7-Dec-2001

@@ -43,8 +43,6 @@ private:
   void MakePalette (int max);
   /// HSI to RGB csColor 
   void SetHSI (csColor& col, float H, float S, float I);
-  /// get image val of x,y (wraps)
-  uint8& GetImage (int x, int y);
   /// get fireline (wraps)
   uint8& GetFireLine (int x);
 
