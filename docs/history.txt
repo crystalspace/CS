@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  to not having a map file.
 	- Possibly fixed the bug in cs2xml with converting of LEN keyword
 	  in a polygon. Didn't test this yet.
+	- Eric Sunshine cleaned up the pthread and qsqrt() tests in
+	  configure.ac.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the

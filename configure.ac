@@ -1091,25 +1091,22 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 	[cs_cv_sys_pthread_recursive],
 	[CS_BUILD_IFELSE(
 	    [AC_LANG_PROGRAM(
-		[#ifndef _GNU_SOURCE
-		 #define _GNU_SOURCE
-		 #endif
-		 #include <pthread.h>
-		 ],
+		[#include <pthread.h>],
 		[pthread_mutexattr_t attr;
 		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-	    [CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-	    CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
+	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
 	    [C++],
 	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
 		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
 	    [cs_cv_sys_pthread_recursive=no],
-	    [$cs_cv_sys_pthread_cflags],
+	    [$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
 	    [$cs_cv_sys_pthread_lflags],
 	    [$cs_cv_sys_pthread_libs])])
     AS_IF([test $cs_cv_sys_pthread_recursive != no],
 	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	    [$cs_cv_sys_pthread_recursive])])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1799,17 +1796,14 @@ AC_DEFUN([CS_CHECK_QSQRT],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
 AC_ARG_ENABLE([qsqrt],
-    [AC_HELP_STRING([--disable-qsqrt],
-      [disable qsqrt optimisation (sometimes triggers compiler bugs) (default
-	NO)])],
-    [enable_qsqrt=$enableval], [enable_qsqrt="yes"])
+    [AC_HELP_STRING([--enable-qsqrt],
+      [enable qsqrt() optimization (may not work with some compilers)
+	  (default YES)])], [], [enable_qsqrt=yes])
+
+AS_IF([test $enable_qsqrt = yes], [CS_CHECK_QSQRT], [cs_cv_cxx_qsqrt_ok=no])
+AS_IF([test $cs_cv_cxx_qsqrt_ok = no], [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
 
 
-AS_IF([test "$enable_qsqrt" = "yes" ],
-    [CS_CHECK_QSQRT],
-    [cs_cv_cxx_qsqrt_ok="no"])
-
-AS_IF([test "$cs_cv_cxx_qsqrt_ok" = "no"], [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
 
 #------------------------------------------------------------------------------
 # Check if a compiler bug discovered in gcc 2.96 (RedHat and other unstable
