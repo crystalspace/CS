@@ -88,11 +88,12 @@ public:
  * \param modifiers Pointer where the key modifiers are written to.
  * \returns Whether the string could be successfully parsed. Error can be
  *  unrecognized keys etc.
- * \remark If you don't want an information to be returned, pass in 0.
+ * \remark For any piece of information in which you are not interested, pass 0
+ *  for the address.
  * \remark The cooked code returned *may* be 0. This is the case if
  *  the non-modifier part is a single letter.
  */
-extern bool csParseKeyDef (const char* str, utf32_char* rawCode,
+bool csParseKeyDef (const char* str, utf32_char* rawCode,
   utf32_char* cookedCode, csKeyModifiers* modifiers);
 
 /**
@@ -106,13 +107,31 @@ extern bool csParseKeyDef (const char* str, utf32_char* rawCode,
  *  (e.g. "LAlt" vs just "Alt".)
  * \returns The key string.
  */
-extern csString csGetKeyDesc (utf32_char code, 
+csString csGetKeyDesc (utf32_char code, 
 			      const csKeyModifiers* modifiers,
 			      bool distinguishModifiers = true);
 
+/**
+ * Convert a free-format string into a set of values that can be compared 
+ * against the data of a mouse event.
+ * \param str Strings are in the form "mouseX", "mouse2" etc.
+ * \param x pointer to where the X value is written;
+ *        this will be 1 for mouseX events, 0 otherwise.
+ * \param y pointer to where the Y value is written;
+ *        this will be 1 for mouseY events, 0 otherwise.
+ * \param button pointer to where the button number is written to.
+ *        for example, the string "mouse1" results in button = 1;
+ *        this will be -1 if not a mouse button event.
+ * \param modifiers pointer to where the modifiers are written to.
+ * \return Whether the string could be successfully parsed.
+ * \remark For any piece of information in which you are not interested, pass 0
+ *  for the address.
+ */
+bool csParseMouseDef(const char* str, int* x, int* y, 
+                            int* button, csKeyModifiers* modifiers);
+
 /*
   @@@ TODO:
-    csParseMouseDef
     csParseJoystickDef
     csGetKeyDesc
     csGetMouseDesc
@@ -120,4 +139,3 @@ extern csString csGetKeyDesc (utf32_char code,
  */
 
 #endif // __CS_UTIL_CSINPUTS_H__
-

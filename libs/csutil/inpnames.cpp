@@ -63,6 +63,7 @@ static struct csKeyCodeDef
   { "Tab",	CSKEY_TAB,	   CSKEY_TAB},
   { "Back",	CSKEY_BACKSPACE,   CSKEY_BACKSPACE},
   { "BackSpace",CSKEY_BACKSPACE,   CSKEY_BACKSPACE},
+  { "Space", CSKEY_SPACE, CSKEY_SPACE},
   { "Up",	CSKEY_UP,	   CSKEY_UP},
   { "Down",	CSKEY_DOWN,	   CSKEY_DOWN},
   { "Left",	CSKEY_LEFT,	   CSKEY_LEFT},
@@ -106,8 +107,8 @@ static struct csKeyCodeDef
   { "PAD7",	CSKEY_PAD7,	   '7'},
   { "PAD8",	CSKEY_PAD8,	   '8'},
   { "PAD9",	CSKEY_PAD9,	   '9'},
-  { "PADDECIMAL",CSKEY_PADDECIMAL, '.'}, // @@@ Not always '.' on all kbd layouts
-  { 0,	0		}
+  { "PADDECIMAL",CSKEY_PADDECIMAL, '.'}, // @@@ Not always '.' on all layouts.
+  { 0,	0 }
 };
 
 //---------------------------------------------------------------------------
@@ -213,6 +214,9 @@ static bool ParseKey (const char* key, utf32_char* rawCode,
     if (cookedCode) *cookedCode = CSKEY_MODIFIER (t, csKeyModifierNumAny);;
     return true;
   }
+
+  if (csUnicodeTransform::UTF8Skip((utf8_char*)key, strlen(key)) < strlen(key))
+    return false; // It's more than 1 character, so must be misspelled keyname.
 
   utf32_char ch;
   bool valid;
@@ -330,6 +334,25 @@ csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
   ret << (char*)keyStr;
 
   return ret;
+}
+
+bool csParseMouseDef(const char* str, int* x, int* y, 
+    int* button, csKeyModifiers* modifiers)
+{
+  if (x) *x = 0;
+  if (y) *y = 0;
+  if (button) *button = -1;
+  if (modifiers) modifiers->modifiers = 0;
+  csKeyModifiers m;
+  const char* name = ParseModifiers (str, m);
+  if (strncasecmp("mouse", name, 5)) return false;
+  name += 5;
+  if (modifiers) *modifiers = m;
+  if (!strcasecmp ("x", name)) { if (x) *x = 1; return true; }
+  if (!strcasecmp ("y", name)) { if (y) *y = 1; return true; }
+  if (!isdigit(name[0] & 0x7f)) return false;
+  if (button) *button = atoi(name);
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -467,8 +490,10 @@ int csInputDefinition::Compare (const csInputDefinition& def)
     d = modifiersHonored - def.modifiersHonored;
     if (d == 0)
     {
-      d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) & modifiersHonored)) -
-	((int)(csKeyEventHelper::GetModifiersBits (def.modifiers) & modifiersHonored));
+      d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) &
+            modifiersHonored)) -
+	  ((int)(csKeyEventHelper::GetModifiersBits (def.modifiers) &
+	    modifiersHonored));
       if (d == 0)
       {
 	switch (containedType)
@@ -483,8 +508,8 @@ int csInputDefinition::Compare (const csInputDefinition& def)
 	      {
 		utf32_char cooked1 = 
 		  k.codeIsCooked ? k.keyCode : RawToCooked (k.keyCode);
-		utf32_char cooked2 = 
-		  def.k.codeIsCooked ? def.k.keyCode : RawToCooked (def.k.keyCode);
+		utf32_char cooked2 = def.k.codeIsCooked ?
+		  def.k.keyCode : RawToCooked (def.k.keyCode);
 		d = (int)cooked1 - (int)cooked2;
 	      }
 	      if (d == 0)
@@ -496,11 +521,15 @@ int csInputDefinition::Compare (const csInputDefinition& def)
 		  {
 		    /*
 		      Modifier compare logic:
-		      - If the parsed modifier was generic, allow any modifier of a type.
-		      - If the parsed modifier(s) were specific, only allow those.
+		      - If the parsed modifier was generic, allow any modifier
+		        of a type.
+		      - If the parsed modifier(s) were specific, only allow
+		        those.
 		    */
-		    if (!(((modifiers.modifiers[n] == 0xffffffff) && (mod.modifiers[n] != 0)) || 
-		      (((mod.modifiers[n] & modifiers.modifiers[n]) == modifiers.modifiers[n]) && 
+		    if (!(((modifiers.modifiers[n] == 0xffffffff) &&
+		         (mod.modifiers[n] != 0)) || 
+		      (((mod.modifiers[n] & modifiers.modifiers[n]) ==
+		        modifiers.modifiers[n]) && 
 		      ((mod.modifiers[n] & ~modifiers.modifiers[n]) == 0))))
 		    {
 		      d = n;
@@ -553,8 +582,9 @@ int csInputDefinition::Compare (iEvent* event)
   
   if (d == 0)
   {
-    d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) & modifiersHonored)) -
-      ((int)(csKeyEventHelper::GetModifiersBits (event) & modifiersHonored));
+    d = ((int)(csKeyEventHelper::GetModifiersBits (modifiers) &
+          modifiersHonored)) -
+        ((int)(csKeyEventHelper::GetModifiersBits (event) & modifiersHonored));
     if (d == 0)
     {
       switch (event->Type)
@@ -581,11 +611,15 @@ int csInputDefinition::Compare (iEvent* event)
 		{
 		  /*
 		    Modifier compare logic:
-		    - If the parsed modifier was generic, allow any modifier of a type.
-		    - If the parsed modifier(s) were specific, only allow those.
+		    - If the parsed modifier was generic, allow any modifier of
+		        a type.
+		    - If the parsed modifier(s) were specific, only allow
+		        those.
 		   */
-		  if (!(((modifiers.modifiers[n] == 0xffffffff) && (mod.modifiers[n] != 0)) || 
-		    (((mod.modifiers[n] & modifiers.modifiers[n]) == modifiers.modifiers[n]) && 
+		  if (!(((modifiers.modifiers[n] == 0xffffffff) &&
+		       (mod.modifiers[n] != 0)) || 
+		    (((mod.modifiers[n] & modifiers.modifiers[n]) ==
+		      modifiers.modifiers[n]) && 
 		    ((mod.modifiers[n] & ~modifiers.modifiers[n]) == 0))))
 		  {
 		    d = n;
@@ -626,4 +660,3 @@ int csInputDefinition::Compare (iEvent* event)
 
   return d;
 }
-
