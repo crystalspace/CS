@@ -23,6 +23,10 @@ The history order has been reversed so that new features are at the top.
 	  plugins are now responsible for setting the factory itself. They
 	  can do this now because they receive the wrapper pointer as a
 	  context.
+	- Managed to re-fix the problem with actions being usable in
+	  combination with models loaded as 3DS or MDL. This is a temporary
+	  fix until these loaders have moved to a plugin but for now it
+	  will do.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real

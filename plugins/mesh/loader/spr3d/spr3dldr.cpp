@@ -383,7 +383,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 }
 
 iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
-	iBase* /*context*/)
+	iBase* context)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -410,6 +410,10 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
   char* params2;
   char str[255];
 
+  iMeshFactoryWrapper* imeshfactwrap = QUERY_INTERFACE (context,
+  	iMeshFactoryWrapper);
+  imeshfactwrap->DecRef ();
+
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys,
   	"crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
   if (!type)
@@ -418,7 +422,15 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
     	"MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
+  iMeshObjectFactory* fact;
+  // @@@ Temporary fix to allow to set actions for objects loaded
+  // with impexp. Once those loaders move to another plugin this code
+  // below should be removed.
+  if (imeshfactwrap->GetMeshObjectFactory ())
+    fact = imeshfactwrap->GetMeshObjectFactory ();
+  else
+    fact = type->NewFactory ();
+
   type->DecRef ();
   iSprite3DFactoryState* spr3dLook = QUERY_INTERFACE (fact,
   	iSprite3DFactoryState);
