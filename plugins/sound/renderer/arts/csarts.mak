@@ -13,10 +13,11 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csarts csartsclean csartsinstall
+.PHONY: csarts csartsclean csartsinstall csartslib
 
-all apps: csarts csartsinstall
-csartsinstall csarts:
+all apps: csarts 
+#csartsinstall
+csartsinstall csarts csartslib:
 	$(MAKE_TARGET)
 csartsclean:
 	$(MAKE_CLEAN)
@@ -31,7 +32,7 @@ vpath %.cpp %.cc plugins/sound/renderer/arts
 ARTSTEST.EXE = artstest$(EXE)
 LIB.CSARTS = plugins/sound/renderer/arts/libcsarts.la
 INC.ARTS = -I$(KDEDIR)/include/arts
-LIB.ARTS=-L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lmcop -lsoundserver_idl -ldl -lstdc++
+LIB.ARTS=-L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lartsmodules -lmcop -lsoundserver_idl -ldl -lstdc++
 IDL.ARTSTEST = $(wildcard plugins/sound/renderer/arts/*.idl)
 IDLSRC.ARTSTEST = $(IDL.ARTSTEST:.idl=.cc)
 SRC.ARTSTEST = $(wildcard plugins/sound/renderer/arts/*.cpp) 
@@ -43,7 +44,7 @@ LIB.ARTSTEST = $(foreach d,$(DEP.ARTSTEST),$($d.LIB))
 ARTS.CXX = libtool --mode=compile g++
 ARTS.LD=libtool --mode=link g++
 ARTS.CP=libtool --mode=install cp
-ARTS.LDFLAGS=-module -rpath $(KDEDIR)/lib -L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lmcop -ldl
+ARTS.LDFLAGS=-module -rpath $(KDEDIR)/lib -L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lartsmodules -lmcop -ldl
 
 CSARTS.LA.SRC = $(IDLSRC.ARTSTEST) $(IMPLSRC.ARTSTEST)
 
@@ -61,9 +62,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csarts csartsclean csartsinstall
+.PHONY: csarts csartsclean csartsinstall csartslib
 
 csarts: $(OUTDIRS) $(ARTSTEST.EXE) $(LIB.CSARTS)
+csartslib: $(LIB.CSARTS)
 clean: csartsclean
 
 $(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.ARTSTEST)

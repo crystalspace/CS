@@ -60,7 +60,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
   bool bInit;
 
   iSoundSource *CreateSource (csArtsHandle *pHandle, int Mode3D);
-  Arts::csSoundModule *CreateArtsModule ();
+  //  Arts::csSoundModule *CreateArtsModule ();
 
 public:
   DECLARE_IBASE;

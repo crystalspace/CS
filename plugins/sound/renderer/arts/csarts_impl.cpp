@@ -174,7 +174,7 @@ csSoundModule_impl::csSoundModule_impl ()
 {
   bOK = true;
   bPlaying = false;
-
+  
   // create the object we'll need
   server = Arts::Reference ("global:Arts_SimpleSoundServer");
   if (server.isNull ())
@@ -211,6 +211,13 @@ csSoundModule_impl::csSoundModule_impl ()
 	  bOK = !volControl.isNull();
 	  if (!bOK)
 	    fprintf (stderr, "volume control null\n");
+	  else
+	  {
+	    reverb = Arts::DynamicCast (server.createObject ("Arts::Synth_FREEVERB"));
+	    bOK = !reverb.isNull();
+	    if (!bOK)
+		 fprintf (stderr, "freeverb control null\n");
+	  }
 	}
       }
     }
@@ -312,6 +319,7 @@ void csSoundModule_impl::streamStart ()
     bPlaying = true;
     ss.start ();
     effect.start ();
+    reverb.start ();
     volControl.start ();
     play.start();
   }
@@ -322,7 +330,8 @@ void csSoundModule_impl::streamInit ()
   if (bOK)
   {
     connect (ss, effect);
-    connect (effect, volControl);
+    connect (effect, reverb);
+    connect (reverb, volControl);
     connect (volControl, play);
   }
 }
@@ -334,12 +343,13 @@ void csSoundModule_impl::streamEnd ()
     bPlaying = false;
     play.stop ();
     volControl.stop ();
+    reverb.stop ();
     effect.stop ();
     ss.stop ();
   }
 }
+REGISTER_IMPLEMENTATION (csSoundModule_impl);
 
 
 REGISTER_IMPLEMENTATION (csSoundSource_impl);
 REGISTER_IMPLEMENTATION (cs3DEffect_impl);
-REGISTER_IMPLEMENTATION (csSoundModule_impl);

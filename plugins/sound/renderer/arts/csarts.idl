@@ -25,6 +25,7 @@ module Arts {
 
   };
 
+  
   /// this is the main module through which CS communicates, it is responsible for connecting
   /// submodules, starting, stoping, etc.
   interface csSoundModule : SynthModule {
@@ -43,4 +44,5 @@ module Arts {
     void Play (long playType);
     void Stop ();
   };
+  
 };

@@ -3,6 +3,7 @@
 
 #include "csarts.h"
 #include <stdsynthmodule.h>
+#include <artsmodules.h>
 
 namespace Arts{
 class csSoundSource_impl : public csSoundSource_skel, public StdSynthModule
@@ -97,6 +98,7 @@ class csSoundModule_impl : public csSoundModule_skel, public StdSynthModule
   csSoundSource ss;
   cs3DEffect effect;
   Synth_AMAN_PLAY play;
+  Synth_FREEVERB reverb;
   StereoVolumeControl volControl;
   SimpleSoundServer server;
   bool bOK, bPlaying;

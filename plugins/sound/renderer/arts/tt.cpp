@@ -74,7 +74,6 @@ void init ()
 
 int main(int argc, const char* const args[])
 {
-  init ();
   SysSystemDriver sys;
   sys.RequestPlugin ("crystalspace.kernel.vfs:VFS");
   sys.RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
@@ -130,12 +129,13 @@ int main(int argc, const char* const args[])
   for (long i=0; i < sd->GetStaticNumSamples ()*2; i++)
     vData[i] = (float)data[i];
   sm.SetData (vData);
-
+  
   sm.Set3DType (Arts::SOUND3D_RELATIVE);
   sm.start ();
 
   csVector3 pos (0, 0, 1);
 
+  init ();
   while (1)
   {
     if (kbhit())
@@ -165,12 +165,12 @@ int main(int argc, const char* const args[])
 	sm.SetSoundPosition (pos.x, pos.y, pos.z);
     }
   }
-
+  tcsetattr(0,TCSANOW,&save);
+  
   sd->DecRef ();
   db->DecRef ();
   pVFS->DecRef ();
   pLoader->DecRef ();
 
-  tcsetattr(0,TCSANOW,&save);
   return 1;
 }

@@ -44,8 +44,8 @@ bool csArtsHandle::IsStatic()
 bool csArtsHandle::UseData (iSoundData *sd)
 {
   this->sd = sd;
-  am = *pRend->CreateArtsModule ();
-  if (!am.isNull())
+  //  am = *pRend->CreateArtsModule ();
+  //  if (!am.isNull())
   {
     // force a format we like
     csSoundFormat format;
@@ -60,7 +60,7 @@ bool csArtsHandle::UseData (iSoundData *sd)
     for (long i=0; i < sd->GetStaticNumSamples ()*2; i++)
       vData[i] = (float)data[i];
     
-    am.SetData (vData);
+    //    am.SetData (vData);
     return true;
   }
   return false;
@@ -97,17 +97,17 @@ void csArtsHandle::ResetStream()
 
 void csArtsHandle::Play (unsigned long playMethod)
 {
-  am.Play (playMethod);
+  //  am.Play (playMethod);
 }
 
 void csArtsHandle::Stop ()
 {
-  am.Stop ();
+  //  am.Stop ();
 }
 
 void csArtsHandle::SetVolume (float volume)
 {
-  am.SetVolume (volume);
+  //  am.SetVolume (volume);
   this->volume = volume;
 }
 
@@ -118,7 +118,7 @@ float csArtsHandle::GetVolume ()
 
 void csArtsHandle::SetFrequencyFactor (float factor)
 {
-  am.SetFrequencyFactor (factor);
+  //  am.SetFrequencyFactor (factor);
   this->frequencyfactor = factor;
 }
 
@@ -129,7 +129,7 @@ float csArtsHandle::GetFrequencyFactor ()
 
 void csArtsHandle::SetMode3D(int m)
 {
-  am.Set3DType ((Arts::Sound3DType)m);
+  //  am.Set3DType ((Arts::Sound3DType)m);
   Mode3D = m;
 }
 
@@ -140,7 +140,7 @@ int csArtsHandle::GetMode3D()
 
 void csArtsHandle::SetPosition(csVector3 thePos)
 {
-  am.SetSoundPosition (thePos.x, thePos.y, thePos.z);
+  //  am.SetSoundPosition (thePos.x, thePos.y, thePos.z);
   pos = thePos;
 }
 
@@ -151,7 +151,7 @@ csVector3 csArtsHandle::GetPosition()
 
 void csArtsHandle::SetVelocity(csVector3 spd)
 {
-  am.SetVelocity (spd.x, spd.y, spd.z);
+  //  am.SetVelocity (spd.x, spd.y, spd.z);
   speed = spd;
 }
 
@@ -163,27 +163,27 @@ csVector3 csArtsHandle::GetVelocity()
 
 void csArtsHandle::SetDirection (const csVector3 &Front, const csVector3 &Top)
 {
-  am.SetOrientation (Front.x, Front.y, Front.z, Top.x, Top.y, Top.z);
+  //  am.SetOrientation (Front.x, Front.y, Front.z, Top.x, Top.y, Top.z);
 }
 
 void csArtsHandle::SetDistanceFactor (float factor)
 {
-  am.SetDistanceFactor (factor);
+  //  am.SetDistanceFactor (factor);
 }
 
 void csArtsHandle::SetRollOffFactor (float factor)
 {
-  am.SetRollOffFactor (factor);
+  //  am.SetRollOffFactor (factor);
 }
 
 void csArtsHandle::SetDopplerFactor (float factor)
 {
-  am.SetDopplerFactor (factor);
+  //  am.SetDopplerFactor (factor);
 }
 
 void csArtsHandle::SetHeadSize (float size)
 {
-  am.SetHeadSize (size);
+  //  am.SetHeadSize (size);
 }
 
 

@@ -32,7 +32,7 @@ class csArtsHandle : public iSoundHandle, public iSoundSource
   friend class csArtsRenderer;
   csArtsRenderer *pRend;
   iSoundData *sd;
-  Arts::csSoundModule am;
+  //  Arts::csSoundModule am;
 
   csArtsHandle (csArtsRenderer *pRend);
 

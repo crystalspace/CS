@@ -69,7 +69,7 @@ bool csArtsRenderer::Initialize (iSystem *iSys)
   }
   return bInit;
 }
-
+/*
 Arts::csSoundModule *csArtsRenderer::CreateArtsModule ()
 {
   Arts::csSoundModule *sm = new Arts::csSoundModule;
@@ -81,7 +81,7 @@ Arts::csSoundModule *csArtsRenderer::CreateArtsModule ()
   }
   return sm;
 }
-
+*/
 void csArtsRenderer::SetVolume (float vol)
 {
   if (bInit)
