@@ -27,7 +27,6 @@
 #include "glproc.h"
 #include "iimage.h"
 #include "csutil/scanstr.h"
-#include "lightdef.h"
 
 #define SysPrintf System->Printf
 

@@ -24,7 +24,6 @@
 #include "csutil/scanstr.h"
 #include "iimage.h"
 #include "isystem.h"
-#include "lightdef.h"
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 

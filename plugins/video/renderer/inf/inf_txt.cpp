@@ -26,7 +26,6 @@
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "iimage.h"
-#include "lightdef.h"
 
 #define SysPrintf System->Printf
 

@@ -26,7 +26,6 @@
 #include "qint.h"
 #include "iimage.h"
 #include "isystem.h"
-#include "lightdef.h"
 #include "igraph2d.h"
 //---------------------------------------------------------- csTextureMM -----//
 
