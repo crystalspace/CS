@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Aug-2004
+	- Jorrit fixed iCameraPosition->Load() so that it will first
+	  attempt to find a sector in the current region and if that
+	  fails try to find a more global sector.
 29-Aug-2004
 	- Jorrit added a new -enable-leakguards configure option. Instead
 	  of disabling or enabling leakguards with debug versus optimize

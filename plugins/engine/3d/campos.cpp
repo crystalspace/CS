@@ -68,7 +68,16 @@ void csCameraPosition::Set (
 
 bool csCameraPosition::Load (iCamera *camera, iEngine *e)
 {
-  iSector *room = e->GetSectors ()->FindByName (sector);
+  // First get the region for this camera position.
+  csRef<iRegion> this_region;
+  if (GetObjectParent () != 0)
+  {
+    this_region = SCF_QUERY_INTERFACE (GetObjectParent (), iRegion);
+  }
+
+  iSector *room = e->FindSector (sector, this_region);
+  if (!room)
+    room = e->FindSector (sector);	// Try globally.
   if (!room) return false;
   camera->SetSector (room);
   camera->GetTransform ().SetOrigin (position);

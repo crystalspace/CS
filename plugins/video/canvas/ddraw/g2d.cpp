@@ -512,10 +512,13 @@ void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
 bool rc;
-  if (!m_bHardwareCursor) {
+  if (!m_bHardwareCursor)
+  {
     m_piWin32Assistant->SetCursor (csmcNone);
     rc = false;
-  } else {
+  }
+  else
+  {
     rc = m_piWin32Assistant->SetCursor (iShape);
   }
   return rc;

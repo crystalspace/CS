@@ -39,6 +39,10 @@
 
 CS_LEAKGUARD_IMPLEMENT(csGLTexture)
 CS_LEAKGUARD_IMPLEMENT(csGLTextureHandle)
+CS_LEAKGUARD_IMPLEMENT(csGLMaterialHandle)
+CS_LEAKGUARD_IMPLEMENT(csGLRendererLightmap)
+CS_LEAKGUARD_IMPLEMENT(csGLSuperLightmap)
+CS_LEAKGUARD_IMPLEMENT(csGLTextureManager)
 
 //---------------------------------------------------------------------------
 

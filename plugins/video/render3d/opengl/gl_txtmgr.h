@@ -293,6 +293,8 @@ protected:
   csGLTextureManager* texman;
 
 public:
+  CS_LEAKGUARD_DECLARE(csGLMaterialHandle);
+
   ///
   csGLMaterialHandle (iMaterial* material, csGLTextureManager *parent);
   ///
@@ -339,6 +341,8 @@ class csGLSuperLightmap;
  */
 class csGLRendererLightmap : public iRendererLightmap
 {
+private:
+
   friend class csGLSuperLightmap;
   friend class csGLGraphics3D;
 
@@ -354,6 +358,8 @@ class csGLRendererLightmap : public iRendererLightmap
   /// Mean light of this LM
   float mean_r, mean_g, mean_b;
 public:
+  CS_LEAKGUARD_DECLARE (csGLRendererLightmap);
+
   SCF_DECLARE_IBASE;
 
   csGLRendererLightmap ();
@@ -378,6 +384,7 @@ public:
  */
 class csGLSuperLightmap : public iSuperLightmap
 {
+private:
   friend class csGLRendererLightmap;
 
   /// Number of lightmaps on this SLM.
@@ -393,6 +400,8 @@ class csGLSuperLightmap : public iSuperLightmap
    */
   void FreeRLM (csGLRendererLightmap* rlm);
 public:
+  CS_LEAKGUARD_DECLARE (csGLSuperLightmap);
+
   /// GL texture handle
   GLuint texHandle;
   /// Dimensions of this SLM
@@ -425,6 +434,7 @@ public:
 */
 class csGLTextureManager : public iTextureManager
 {
+private:
   struct formatDescription
   {
     GLenum targetFormat;
@@ -450,6 +460,8 @@ class csGLTextureManager : public iTextureManager
 
   iObjectRegistry *object_reg;
 public:
+  CS_LEAKGUARD_DECLARE (csGLTextureManager);
+
   csGLTextureCache* txtcache;
   csWeakRef<csGLGraphics3D> G3D;
 
