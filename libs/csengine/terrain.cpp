@@ -171,7 +171,7 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 #endif
 }
 
-void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
+void csTerrain::Draw (csRenderView& /*rview*/, bool /*use_z_buf*/)
 {
 #if 0
 //////////////////// OLD FUNCTION INITIALIZATION.
@@ -209,7 +209,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 		ddgCacheIndex ci = 0;
 		while (i < mesh->getBinTreeNo())
 		{
-			if (bt = mesh->getBinTree(i))
+			if ((bt = mesh->getBinTree(i)))
 			{
 				unsigned int v = 0;
 				// Render each triangle.
