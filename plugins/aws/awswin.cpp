@@ -55,7 +55,9 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   // Link into the current window hierarchy, at the top.
   if (WindowManager()->GetTopWindow()==NULL)
+  {
     WindowManager()->SetTopWindow(this);
+  }
   else
   {
     LinkAbove(WindowManager()->GetTopWindow());
@@ -85,7 +87,7 @@ awsWindow::Unlink()
         /*  This means that we're the top level window, and we're going away.  We need to tell the window manager to
          * set the new top window. */
 
-        WindowManager()->SetTopWindow(below);
+        if (below) WindowManager()->SetTopWindow(below);
     }
 
 }
@@ -117,13 +119,20 @@ awsWindow::Raise()
 {
    // Only raise if we're not already the top
    if (above != NULL)
-   {  
+   {        
       // Get us out of the window hierarchy
       Unlink();
 
       // Put us back into the window hierachy at the top.
-      if (WindowManager()->GetTopWindow()) LinkAbove(WindowManager()->GetTopWindow());
-      else WindowManager()->SetTopWindow(this);
+      if (WindowManager()->GetTopWindow())        
+      {
+        WindowManager()->Mark(WindowManager()->GetTopWindow()->Frame());
+        LinkAbove(WindowManager()->GetTopWindow());
+      }
+      
+      
+      WindowManager()->SetTopWindow(this);
+      WindowManager()->Mark(Frame());
    }
 }
 
@@ -402,7 +411,7 @@ awsWindow::OnDraw(csRect clip)
 
       int topleft[10] =  { fill, hi, hi2, fill, fill, fill, lo2, lo, black };
       int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill };
-      int i;
+      int i, titleback;
       const int step=6;
 
       if (frame_options & foTitle)
@@ -417,8 +426,12 @@ awsWindow::OnDraw(csRect clip)
         }
 
         // now add some more fill for the title bar
+        if (WindowManager()->GetTopWindow()==this)  titleback=hi;
+        else                                        titleback=fill;
+        
         for(i=step; i<step+th-1; ++i)
-          g2d->DrawLine(Frame().xmin+step, Frame().ymin+i, Frame().xmax-step+1, Frame().ymin+i,  fill);
+          g2d->DrawLine(Frame().xmin+step, Frame().ymin+i, Frame().xmax-step+1, Frame().ymin+i,  titleback);
+        
           
         // finish with an offset top
         for(i=step; i<9; ++i)

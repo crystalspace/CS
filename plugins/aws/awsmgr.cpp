@@ -528,24 +528,29 @@ awsManager::HandleEvent(iEvent& Event)
     if (GetTopWindow())
     {
       // If the mouse is locked into the top window, keep it there
-      if (mouse_captured)
+      if (mouse_captured) 
         return GetTopWindow()->HandleEvent(Event);
+      
 
       // If the top window still contains the mouse, it stays on top
       if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
         return GetTopWindow()->HandleEvent(Event);
+      
       else
       {
         // Find the window that DOES contain the mouse.
-
+      
         awsWindow *win=GetTopWindow();
+      
+        // Skip the top 'cause we already checked it.
+        if (win) win=win->WindowBelow();
 
         while(win)
         {
           // If the window contains the mouse, it becomes new top.
           if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
           {
-            //win->Raise();
+            win->Raise();
             return win->HandleEvent(Event);
           }
           else
