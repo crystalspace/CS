@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    CVS Snapshot Generation Script
-#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,11 +59,11 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "13"
+prog_version = "14"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 author_info = author_name + " <" + author_email + ">"
-copyright = "Copyright (C) 2000-2003 by " + author_info
+copyright = "Copyright (C) 2000-2004 by " + author_info
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -121,7 +121,7 @@ warnlevel = 0
 archivers = (
     {"name": "bzip2",
      "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
-     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}})
+     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},)
 
 #archivers = (
 #    {"name": "gzip",
