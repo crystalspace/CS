@@ -23,6 +23,16 @@ The history order is reversed so that new features are at the top.
 	  can be cached per model instead of per object). At this moment
 	  no objects in the engine actually support sharing models yet but
 	  this is planned.
+	- Added new csPolygonMeshTools class in csgeom. This class will
+	  contain functions to work with iPolygonMesh instances. Currently
+	  it only contains the CalculateNormals() function which will calculate
+	  the normals of all polygons in the mesh.
+	- Optimized csPoly3D::ComputeNormal() a bit.
+	- csPolyPlane contained a virtual destructor for no particular reason.
+	- Polygon perspective projection was doing an additional transform
+	  of the camera plane for no particular reason.
+	- Implemented backface culling for writing out objects to the
+	  coverage buffer in Dynavis.
 20-May-2002
 	- csThing now implements GetWriteObject(). Currently it will
 	  just return the full detail version of the thing. A lower

@@ -22,8 +22,23 @@
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/math3d.h"
+#include "csgeom/pmtools.h"
 #include "igeom/objmodel.h"
+#include "igeom/polymesh.h"
 #include "dmodel.h"
+
+//---------------------------------------------------------------------------
+
+csObjectModel::csObjectModel ()
+{
+  normals = NULL;
+  num_normals = -1;
+}
+
+csObjectModel::~csObjectModel ()
+{
+  delete[] normals;
+}
 
 //---------------------------------------------------------------------------
 
@@ -78,6 +93,23 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
   if (model->imodel->GetShapeNumber () != model->shape_number)
   {
     model->shape_number = model->imodel->GetShapeNumber ();
+    iPolygonMesh* mesh = model->imodel->GetSmallerPolygonMesh ();
+    if (!mesh)
+    {
+      delete[] model->normals;
+      model->normals = NULL;
+      model->num_normals = -1;
+    }
+    else
+    {
+      if (model->num_normals != mesh->GetPolygonCount ())
+      {
+        delete[] model->normals;
+        model->num_normals = mesh->GetPolygonCount ();
+        model->normals = new csVector3 [model->num_normals];
+      }
+      csPolygonMeshTools::CalculateNormals (mesh, model->normals);
+    }
     return true;
   }
   return false;

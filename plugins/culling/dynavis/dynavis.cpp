@@ -331,7 +331,7 @@ end:
 }
 
 void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
-	iVisibilityObject* visobj)
+	iVisibilityObject* visobj, csObjectModel* model)
 {
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
@@ -340,11 +340,15 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   int vertex_count = polymesh->GetVertexCount ();
   int poly_count = polymesh->GetPolygonCount ();
 
-  csReversibleTransform trans = camera->GetTransform ()
-  	/ movable->GetFullTransform ();
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  csReversibleTransform trans = camtrans / movtrans;
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
   float sy = camera->GetShiftY ();
+
+  // Calculate camera position in object space.
+  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
 
   int i;
   // First transform all vertices.
@@ -372,9 +376,13 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   // Then insert all polygons.
   csMeshedPolygon* poly = polymesh->GetPolygons ();
+  const csVector3* normals = model->GetNormals ();
   csVector2 verts2d[64];
   for (i = 0 ; i < poly_count ; i++, poly++)
   {
+    if (normals[i] * campos_object <= 0.0)
+      continue;
+
     int num_verts = poly->num_vertices;
     int* vi = poly->vertices;
     float max_depth = -1.0;
@@ -392,7 +400,6 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       if (tz > max_depth) max_depth = tz;
       verts2d[j] = tr_verts[vertex_idx];
     }
-    // @@@ Back face culling?
     if (max_depth > 0.0)
     {
       bool rc = covbuf->InsertPolygon (verts2d, num_verts, max_depth);
@@ -461,7 +468,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     if (do_cull_coverage && obj->visobj->GetObjectModel ()->
     	GetSmallerPolygonMesh ())
     {
-      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj);
+      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+      	obj->model);
     }
 
     obj->visobj->MarkVisible ();

@@ -45,7 +45,7 @@ private:
   int ref_count;
 
   /// Destructor is private.
-  virtual ~csPolyPlane ();
+  ~csPolyPlane ();
 
 public:
   /// Constructor. Reference count is initialized to 1.

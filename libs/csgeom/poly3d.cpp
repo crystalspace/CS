@@ -614,18 +614,20 @@ csVector3 csPoly3D::ComputeNormal (csVector3 *vertices, int num)
   float x1, y1, z1, x, y, z;
 
   i1 = num - 1;
+  x1 = vertices[i1].x;
+  y1 = vertices[i1].y;
+  z1 = vertices[i1].z;
   for (i = 0; i < num; i++)
   {
     x = vertices[i].x;
     y = vertices[i].y;
     z = vertices[i].z;
-    x1 = vertices[i1].x;
-    y1 = vertices[i1].y;
-    z1 = vertices[i1].z;
     ayz += (z1 + z) * (y - y1);
     azx += (x1 + x) * (z - z1);
     axy += (y1 + y) * (x - x1);
-    i1 = i;
+    x1 = x;
+    y1 = y;
+    z1 = z;
   }
 
   float sqd = ayz * ayz + azx * azx + axy * axy;

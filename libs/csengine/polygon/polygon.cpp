@@ -1242,13 +1242,13 @@ void csPolygon3D::ClipPolyPlane (
   csVector3 Plane_Normal;
   int i;
 
-  //  do the check only once at the beginning instead of twice during the routine.
+  // Do the check only once at beginning instead of twice during the routine.
   if (mirror)
     Plane_Normal = v2 % v1;
   else
     Plane_Normal = v1 % v2;
 
-  //  On which side is the first vertex?
+  // On which side is the first vertex?
   first_vertex_side = (Plane_Normal * (verts[(*num) - 1] - v1) > 0);
 
   for (i = 0; i < (*num) - 1; i++)
@@ -1262,7 +1262,7 @@ void csPolygon3D::ClipPolyPlane (
 
   if (cw_offset == -1)
   {
-    //  Return , if there is no intersection.
+    // Return , if there is no intersection.
     if (first_vertex_side)
     {
       *num = 0;
@@ -1278,7 +1278,7 @@ void csPolygon3D::ClipPolyPlane (
     }
   }
 
-  // calculate the intersection points.
+  // Calculate the intersection points.
   i = cw_offset - 1;
   if (i < 0)
   {
@@ -1301,7 +1301,7 @@ void csPolygon3D::ClipPolyPlane (
       isect_ccw,
       dummy);
 
-  // remove the obsolete point and insert the intersection points.
+  // Remove the obsolete point and insert the intersection points.
   if (first_vertex_side)
   {
     for (i = 0; i < ccw_offset - cw_offset + 1; i++)
@@ -1342,11 +1342,8 @@ bool csPolygon3D::ClipToPlane (
   static bool vis[100];
 
   // Count the number of visible vertices for this polygon (note
-
   // that the transformation from world to camera space for all the
-
   // vertices has been done earlier).
-
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
   num_vertices = GetVertices ().GetVertexCount ();
@@ -1361,9 +1358,7 @@ bool csPolygon3D::ClipToPlane (
   if (cnt_vis == 0) return false;
 
   // Perform backface culling.
-
   // Note! The plane normal needs to be correctly calculated for this
-
   // to work!
   const csPlane3 &wplane = plane->GetWorldPlane ();
   float cl = wplane.Classify (v_w2c);
@@ -1387,13 +1382,9 @@ bool csPolygon3D::ClipToPlane (
   }
 
   // Otherwise we will have to clip this polygon in 3D against the
-
   // portal polygon. This is to make sure that objects behind the
-
   // portal polygon are not accidently rendered.
-
   // First count how many vertices are before the portal polygon
-
   // (so are visible as seen from the portal).
   cnt_vis = 0;
   for (i = 0; i < num_vertices; i++)
@@ -1601,7 +1592,7 @@ bool csPolygon3D::DoPerspective (
     if (ABS (ex) < SMALL_EPSILON && ABS (ey) < SMALL_EPSILON)
     {
       // Uncommon special case:  polygon passes through origin.
-      plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed???
+      //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed???
       ex = plane->GetCameraPlane ().A ();
       ey = plane->GetCameraPlane ().B ();
       if (ABS (ex) < SMALL_EPSILON && ABS (ey) < SMALL_EPSILON)
@@ -1654,7 +1645,7 @@ bool csPolygon3D::DoPerspective (
     if (ABS (rx) < SMALL_EPSILON && ABS (ry) < SMALL_EPSILON)
     {
       // Uncommon special case:  polygon passes through origin.
-      plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed?
+      //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed?
       rx = plane->GetCameraPlane ().A ();
       ry = plane->GetCameraPlane ().B ();
       if (ABS (rx) < SMALL_EPSILON && ABS (ry) < SMALL_EPSILON)

@@ -144,7 +144,10 @@ public:
    * Set all polygon vertices at once.  Copies the array.
    */
   void SetVertices (csVector3 const* v, int num)
-  { MakeRoom (num); memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3)); }
+  {
+    MakeRoom (num);
+    memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3));
+  }
 
   /**
    * Project this polygon onto a X plane as seen from some

@@ -109,7 +109,8 @@ private:
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
   // Given an occluder, update it in the coverage buffer.
-  void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj);
+  void UpdateCoverageBuffer (iCamera* camera, iVisibilityObject* visobj,
+  	csObjectModel* model);
 
 public:
   SCF_DECLARE_IBASE;
