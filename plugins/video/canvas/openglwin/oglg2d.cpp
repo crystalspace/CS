@@ -328,7 +328,7 @@ bool csGraphics2DOpenGL::Open()
   LONG ti;
 
   // create the window.
-  DWORD exStyle = WS_EX_TOPMOST;
+  DWORD exStyle = 0;
   DWORD style = WINDOW_STYLE;
   if (FullScreen)
   {
@@ -382,9 +382,9 @@ bool csGraphics2DOpenGL::Open()
 
   if (FullScreen)
   {
-    m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
-		WS_POPUP, 0, 0, Width, Height,
-		NULL, NULL, m_hInstance, NULL);
+    m_hWnd = CreateWindowEx(exStyle | WS_EX_TOPMOST, CS_WIN32_WINDOW_CLASS_NAME, 
+      win_title, WS_POPUP, 0, 0, Width, Height,
+      NULL, NULL, m_hInstance, NULL);
   }
   else
   {
