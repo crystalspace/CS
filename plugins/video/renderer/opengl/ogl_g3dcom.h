@@ -582,9 +582,6 @@ public:
   /// Give a material to csGraphics3DOGLCommon to cache it.
   void CacheTexture (iMaterialHandle *mat_handle);
 
-  /// Give a texture to csGraphics3DOGLCommon to cache it.
-  void CacheTexture (iPolygonTexture *texture);
-
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 

@@ -147,7 +147,6 @@ public:
   int numTriangles;
   int numTexels;
   int numVertices;
-  int numLightmaps;
 
   csTrianglesPerSuperLightmap();
   csTrianglesPerSuperLightmap(int numVertex);

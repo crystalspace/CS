@@ -178,7 +178,6 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
   numTriangles = 0;
   numTexels = 0;
   numVertices = 0;
-  numLightmaps = 0;
   cacheData = NULL;
   isUnlit = false;
   initialized = false;
@@ -193,7 +192,6 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap(int numVertex)
   numTriangles = 0;
   numTexels = 0;
   numVertices = 0;
-  numLightmaps = 0;
   cacheData = NULL;
   initialized = false;
 
@@ -573,7 +571,6 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
   }
 
   triSuperLM->rectangles.Push (rect);
-  triSuperLM->numLightmaps++;
   triSuperLM->lightmaps.Push (poly_texture);
 }
 
@@ -652,10 +649,10 @@ csSLMCacheData* csTriangleArrayPolygonBuffer::GetCacheData(
   return t->info->cacheData;
 }
 
-int csTriangleArrayPolygonBuffer::GetLightmapCount(
+int csTriangleArrayPolygonBuffer::GetLightmapCount (
   TrianglesSuperLightmapNode* t)
 {
-  return t->info->numLightmaps;
+  return t->info->lightmaps.Length ();
 }
 
 TrianglesSuperLightmapNode* csTriangleArrayPolygonBuffer::GetFirstTrianglesSLM()

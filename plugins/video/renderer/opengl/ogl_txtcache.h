@@ -404,9 +404,6 @@ public:
   ///
   ~OpenGLLightmapCache ();
 
-  /// Cache a lightmap.
-  void Cache (iPolygonTexture *polytex);
-
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   GLuint GetTempHandle () { return TempHandle; }
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
