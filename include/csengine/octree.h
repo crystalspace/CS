@@ -455,6 +455,11 @@ public:
   }
 
   /**
+   * Given a position return the leaf that this position is in.
+   */
+  csOctreeNode* GetLeaf (const csVector3& pos);
+
+  /**
    * Build vertex tables for minibsp leaves. These tables are
    * used to optimize the world to camera transformation so that only
    * the needed vertices are transformed.

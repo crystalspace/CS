@@ -665,6 +665,24 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
   return rc;
 }
 
+csOctreeNode* csOctree::GetLeaf (const csVector3& pos)
+{
+  // First locate the leaf this position is in.
+  csOctreeNode* node = (csOctreeNode*)root;
+  while (node)
+  {
+    if (node->IsLeaf ()) break;
+    const csVector3& center = node->GetCenter ();
+    int cur_idx;
+    if (pos.x <= center.x) cur_idx = 0;
+    else cur_idx = 4;
+    if (pos.y > center.y) cur_idx |= 2;
+    if (pos.z > center.z) cur_idx |= 1;
+    node = (csOctreeNode*)node->children[cur_idx];
+  }
+  return node;
+}
+
 
 static csOctreeNode* best_pvs_node;
 void csOctree::Statistics ()

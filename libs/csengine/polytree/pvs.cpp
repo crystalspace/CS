@@ -36,10 +36,10 @@
 #include "isystem.h"
 #include "ivfs.h"
 
-#define DO_PVS_PASS1 1
-#define DO_PVS_SOLID_NODE_OPT 1
-#define DO_PVS_SOLID_SPACE_OPT 1
-#define DO_PVS_ADJACENT_NODES 1
+#define DO_PVS_PASS1 0
+#define DO_PVS_SOLID_NODE_OPT 0
+#define DO_PVS_SOLID_SPACE_OPT 0
+#define DO_PVS_ADJACENT_NODES 0
 #define DO_PVS_POLYGONS 1
 #define DO_PVS_MERGE_ADJACENT_POLYGONS 0
 #define DO_PVS_QAD 0
@@ -357,18 +357,7 @@ void csOctreeNode::CleanupSolidPolygonIterator (void* vspit)
 void csOctree::MarkVisibleFromPVS (const csVector3& pos)
 {
   // First locate the leaf this position is in.
-  csOctreeNode* node = (csOctreeNode*)root;
-  while (node)
-  {
-    if (node->IsLeaf ()) break;
-    const csVector3& center = node->GetCenter ();
-    int cur_idx;
-    if (pos.x <= center.x) cur_idx = 0;
-    else cur_idx = 4;
-    if (pos.y > center.y) cur_idx |= 2;
-    if (pos.z > center.z) cur_idx |= 1;
-    node = (csOctreeNode*)node->children[cur_idx];
-  }
+  csOctreeNode* node = GetLeaf (pos);
 
   // Mark all objects in the world as invisible.
   csOctreeNode::pvs_cur_vis_nr++;
@@ -1012,6 +1001,7 @@ void CalculateContainingPlane (const csVector3& v1, const csVector3& v2,
 }
 #endif
 
+bool debug_me = false;
 bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
 {
   // This routine works as follows: first we find a suitable plane
@@ -1073,6 +1063,14 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   csVector2 shift = plane_area.Min ();
   cbuffer->Initialize ();
 
+  if (debug_me)
+  {
+    printf ("  plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
+    printf ("  plane_area=%f,%f %f,%f\n", plane_area.MinX (), plane_area.MinY (),
+    	plane_area.MaxX (), plane_area.MaxY ());
+    printf ("  scale=%f,%f shift=%f,%f\n", scale.x, scale.y, shift.x, shift.y);
+  }
+
   // For every corner of the occludee initialize a frustum to which all
   // occluder polygons will be clipped.
   // The bottom plane is taken a bit larger to make sure we don't clip too much
@@ -1127,6 +1125,10 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
 
   // If the c-buffer is full then the occludee will not be visible.
   bool full = cbuffer->IsFull ();
+  if (debug_me)
+  {
+    printf ("  cbuffer full is %d\n", full);
+  }
   delete cbuffer;
   return !full;
 }
@@ -1184,6 +1186,37 @@ bool csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
 	csOctreeNode* leaf)
 {
   if (!occludee) return true;
+  {
+  //@@@###
+  const csBox3& box = leaf->GetBox ();
+  const csBox3& occludee_box = occludee->GetBox ();
+  csVector3 center_debug ((-1.2-2.4)/2, (0-5.8)/2, (-3.8-0.8)/2);
+  debug_me =
+     (ABS (box.MinX ()-5) < EPSILON &&
+      ABS (box.MinY ()-0) < EPSILON &&
+      ABS (box.MinZ ()+6.4) < EPSILON &&
+      ABS (box.MaxX ()-21.6) < EPSILON &&
+      ABS (box.MaxY ()-33.6) < EPSILON &&
+      ABS (box.MaxZ ()-21.6) < EPSILON &&
+      occludee_box.In (center_debug));
+      //ABS (occludee_box.MinX ()+1.2) < EPSILON &&
+      //ABS (occludee_box.MinY ()-0) < EPSILON &&
+      //ABS (occludee_box.MinZ ()+3.8) < EPSILON &&
+      //ABS (occludee_box.MaxX ()-2.4) < EPSILON &&
+      //ABS (occludee_box.MaxY ()-5.8) < EPSILON &&
+      //ABS (occludee_box.MaxZ ()-0.8) < EPSILON);
+  if (debug_me)
+  {
+    printf ("\n\nStart debug session between:\n");
+    printf ("  box=%f,%f,%f %f,%f,%f\n",
+    	box.MinX (), box.MinY (), box.MinZ (),
+	box.MaxX (), box.MaxY (), box.MaxZ ());
+    printf ("  occludee_box=%f,%f,%f %f,%f,%f\n",
+    	occludee_box.MinX (), occludee_box.MinY (), occludee_box.MinZ (),
+	occludee_box.MaxX (), occludee_box.MaxY (), occludee_box.MaxZ ());
+  }
+  }
+
   int i;
   bool visible = false;
   int adjacent_side;
@@ -1191,6 +1224,7 @@ bool csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   csOctreeVisible* ovis = pvs.FindNode (occludee);
   if (!ovis)
   {
+if (debug_me) printf ("###1###\n");
     // Node is not in PVS so it isn't visible.
     return false;
   }
@@ -1204,6 +1238,7 @@ bool csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     visible = true;
   else if ((adjacent_side = leaf->GetBox ().Adjacent (occludee->GetBox ())) != -1)
   {
+if (debug_me) printf ("###2###\n");
 #   if DO_PVS_ADJACENT_NODES
     // Two sides are adjacent.
     csBox2 leaf_side = leaf->GetBox ().GetSide (adjacent_side);

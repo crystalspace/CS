@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+29-Jun-2000
+	- Added csOctree::GetLeaf() function that calculates the leaf where
+	  the given position is in.
+	- Added db_curleaf console command to WalkTest. This command
+	  shows the dimensions of the current octree leaf you are in. This
+	  command only works if the current sector has an octree.
+	- Fixed a severe bug with the octree. The vertices were not correctly
+	  transformed to camera space anymore!
+	- Continued further debugging work on the PVS.
 28-Jun-2000
 	- Rene Dudfield <illumen@yahoo.com> contributed a set of Python
 	  scripts for Blender to convert Blender entities to CS objects.

@@ -283,4 +283,9 @@ Set the color for the selected pseudo-dynamic light to r,g,b.
 @item db_osolid
 Debug command to create things from all solid space node boundaries for
 the octree.
+
+@item db_curleaf
+Debug command to find the octree leaf where the camera is located and
+then show the dimensions of this leaf on standard output.
+
 @end table

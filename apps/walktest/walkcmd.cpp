@@ -213,6 +213,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Visibility:\n");
     CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
+    CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
     CONPRI("  addlight dellight dellights picklight droplight\n");
     CONPRI("  clrlights setlight\n");
@@ -280,6 +281,21 @@ bool CommandHandler (const char *cmd, const char *arg)
     Command::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
   else if (!strcasecmp (cmd, "db_octree"))
     Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
+  else if (!strcasecmp (cmd, "db_curleaf"))
+  {
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
+      const csBox3& b = l->GetBox ();
+      printf ("Leaf (%d): %f,%f,%f %f,%f,%f\n", l->IsLeaf (),
+      	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+  }
   else if (!strcasecmp (cmd, "db_dumpstubs"))
   {
     csSector* room = Sys->view->GetCamera ()->GetSector ();

@@ -151,7 +151,7 @@ void csSector::AddLight (csStatLight* light)
   light->SetSector (this);
 }
 
-void csSector::UseStaticTree (int mode, bool octree)
+void csSector::UseStaticTree (int mode, bool /*octree*/)
 {
   //mode = BSP_BALANCE_AND_SPLITS;
 
@@ -213,7 +213,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
-  if (octree) { ((csOctree*)static_tree)->BuildVertexTables (); }
+  ((csOctree*)static_tree)->BuildVertexTables ();
 
   // Everything for PVS.
   str = "vis/pvs_";
@@ -231,17 +231,11 @@ void csSector::UseStaticTree (int mode, bool octree)
   if (recalc_pvs)
   {
 #   if 0
-    if (octree)
-    {
-      CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
-      ((csOctree*)static_tree)->BuildPVS (static_thing);
-    }
+    CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");
+    ((csOctree*)static_tree)->BuildPVS (static_thing);
 #   else
-    if (octree)
-    {
-      CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
-      ((csOctree*)static_tree)->SetupDummyPVS ();
-    }
+    CsPrintf (MSG_INITIALIZATION, "Build Dummy PVS...\n");
+    ((csOctree*)static_tree)->SetupDummyPVS ();
 #   endif
     CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
     ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
