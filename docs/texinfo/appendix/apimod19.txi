@@ -929,6 +929,29 @@ bool MyApp::HandleEvent (iEvent &Event)
 @}
 @end example
 
+@subheading 3d Sprite Factories
+@cindex @code{iSprite3DFactory}
+
+The interface has been modified to show the restrictions of 3d sprites and
+to clean it up:
+@itemize @bullet
+@item
+@code{GetNormalCount()} and @code{GetTexelCount()} have been removed. Sprites
+do not allow to have different numbers of vertices, normals and texels. So
+@code{GetVertexCount()} should be used instead.
+
+@item
+The @samp{count} parameter has been removed from @code{SetVertices()},
+@code{SetNormals()} and @code{SetTexels()}. These functions only worked
+properly if the current number of vertices was passed for @samp{count}, so
+passing the parameter at all makes no sense.
+
+@item
+@code{GetVertex()}, @code{GetNormal()} and @code{GetTexel()} now return
+@samp{const} objects. To modify these objects, @code{SetVertex()},
+@code{SetNormal()} and @code{SetTexel()} have been added.
+@end itemize
+
 @subheading Miscellaneous Changes
 @cindex @code{iPortal}
 @cindex @code{csMeshWrapper}
