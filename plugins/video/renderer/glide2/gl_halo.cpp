@@ -90,7 +90,6 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
     float u_scale = rwidth;
     u_scale /= Width;
     float v_scale = rheight;
-    FILE *k;
     v_scale /= Height;
     v_scale=u_scale=1.;
     // Build the vertex structure

@@ -96,24 +96,32 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
       Unload(cached_texture);          // unload it.
     }
     
-    // now load the unit.
-    num++;
-    total_size += size;
-
     CHK (cached_texture = new csGlideCacheData);
 
-    cached_texture->next = head;
-    cached_texture->prev = NULL;
-    if(head) head->prev = cached_texture;
-    else tail = cached_texture;
-    head = cached_texture;
     cached_texture->pSource = texture;
     cached_texture->lSize = size;
     cached_texture->texhnd.type = alpha ? CS_GLIDE_ALPHACACHE : CS_GLIDE_TEXCACHE;
 
-    texture->SetCacheData (cached_texture);
-
     Load(cached_texture);       // load it.
+    if ( cached_texture->texhnd.loaded )
+    {
+      // now load the unit.
+      num++;
+      total_size += size;
+      cached_texture->next = head;
+      cached_texture->prev = NULL;
+      if (head) 
+        head->prev = cached_texture;
+      else 
+        tail = cached_texture;
+      head = cached_texture;
+      texture->SetCacheData (cached_texture);
+    }
+    else
+    {
+      delete cached_texture;
+      texture->SetCacheData (NULL);
+    }
   }
 }
 
@@ -174,24 +182,31 @@ void csGlideTextureCache::Add(iPolygonTexture *polytex)
             
     }
     
-    // now load the unit.
-    num++;
-    total_size += size;
-
     CHK (cached_texture = new csGlideCacheData);
 
-    cached_texture->next = head;
-    cached_texture->prev = NULL;
-    if(head) head->prev = cached_texture;
-    else tail = cached_texture;
-    head = cached_texture;
     cached_texture->pSource = piLM;
     cached_texture->lSize = size;
     cached_texture->texhnd.type = CS_GLIDE_LITCACHE;
     
-    piLM->SetCacheData(cached_texture);
-    
     Load(cached_texture);       // load it.
+    if ( cached_texture->texhnd.loaded )
+    {
+      num++;
+      total_size += size;
+      cached_texture->next = head;
+      cached_texture->prev = NULL;
+      if (head) 
+        head->prev = cached_texture;
+      else 
+        tail = cached_texture;
+      head = cached_texture;
+      piLM->SetCacheData(cached_texture);
+    }
+    else
+    {
+      delete cached_texture;
+      piLM->SetCacheData (NULL);
+    }
   }
 }
 

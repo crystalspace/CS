@@ -48,7 +48,6 @@ public:
     CONSTRUCT_IBASE( NULL );
     pCacheData = NULL;
     alpha = NULL;
-    printf("dim %d %d\n", width, height );
     realwidth = width; realheight = height;
     this->width = FindNearestPowerOf2( width );
     this->height = FindNearestPowerOf2( height );

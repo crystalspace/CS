@@ -988,7 +988,6 @@ void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 
 void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
-//return;
   if (poly.num < 3 || poly.normal.D == 0.0) return;
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
@@ -1038,7 +1037,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     a = 255 - (int)(( poly.alpha / 100.f ) * 255.f);
     GlideLib_grDepthMask( FXFALSE );
   }
-  
+ 
   // if we draw a flat shaded polygon we gonna use the mean color
   if ( !m_renderstate.textured )
     poly.txt_handle->GetMeanColor ( r, g, b );
