@@ -31,7 +31,7 @@ class csOpenGLEmptyDisp : public iOpenGLDisp
       
       virtual bool open();
       virtual bool close();
-      virtual bool Initialize( iSystem *pSystem ){ return true; }
+      virtual bool Initialize( iSystem * /*pSystem*/ ){ return true; }
 };
 
 #endif // __OPENGLEmptyDISP_H__
