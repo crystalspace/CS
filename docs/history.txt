@@ -7,6 +7,32 @@ The history order has been reversed so that new features are at the top.
 	- As suggested by Chris Bruner, Jorrit did a small fix to Blocks
 	  so that it doesn't confuse the Borland compiler and is also more
 	  robust (i.e. don't compare floats with 0).
+	- Andrew Zabolotny did a batch of changes:
+	    - Fixed the DOS/DJGPP that was slightly broken after my
+	      last changes to csinput system.
+	    - Fixed MGL 2D driver. Now it always uses the backbuffer
+	      in system memory, now it run at least as fast as RAWDOS VBE
+	      2.0 driver. Hmm... strange I see absolutely no gain by
+	      using hardware accelerated BitBlt over memcpy().
+	    - Added a simple new tool called "textconv" which can be used
+	      to convert text back and forth between Unix and DOS line
+	      ending formats.
+	    - Improved the new loader of course. Now it loads sectors and
+	      things, I already see light at the end of tunnel.
+	    - Fixed a lot of 2D drivers. The iGraph2D interface defines
+	      a function called GetDoubleBufferState () while some drivers
+	      still define the old fashioned DoubleBuffer() function which
+	      effectively made the application unable to query the real
+	      double-buffering state.  This can fix some problems with
+	      double-buffering on Windows, for example.
+	    - Started to fix a part of the infamous Black Borders (BB)
+	      problem.  The work is not finished so the lightmaps will be
+	      for now even worse than they were before, but it will be
+	      changed in near future. Please do not spend time fixing it.
+	    - Added a new macro DEBUG_BREAK in sysdef.h that is handy
+	      for setting debugger breakpoints (e.g. the debugger will
+	      break when that macro will be invoked). It is defined
+	      only in CS_DEBUG mode.
 19-Apr-2000
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few
