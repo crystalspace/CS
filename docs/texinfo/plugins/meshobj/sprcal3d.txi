@@ -225,7 +225,8 @@ After the code previously inserted into  @file{simple1.cpp}, add this code:
 @example
 // Make it do something.
 csRef<iSpriteCal3DFactoryState> factstate(
-  SCF_QUERY_INTERFACE(imeshfact->GetMeshObjectFactory(), iSpriteCal3DFactoryState));
+  SCF_QUERY_INTERFACE(imeshfact->GetMeshObjectFactory(),
+  iSpriteCal3DFactoryState));
 csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
   sprite->GetMeshObject(), iSpriteCal3DState));
 cal3dstate->SetAnimCycle("strut", 1.0f);
