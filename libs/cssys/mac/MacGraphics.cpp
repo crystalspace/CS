@@ -57,24 +57,28 @@
 
 /////The 2D Graphics Driver//////////////
 
-#define NAME  "Crystal"
+IMPLEMENT_FACTORY (csGraphics2DMac)
 
-BEGIN_INTERFACE_TABLE(csGraphics2DMac)
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iGraphics2D, XGraphics2D )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iGraphicsInfo, XGraphicsInfo )
-    IMPLEMENTS_COMPOSITE_INTERFACE_EX( iMacGraphicsInfo, XMacGraphicsInfo )
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (Driver2D)
+	EXPORT_CLASS (csGraphics2DMac, SOFTWARE_2D_DRIVER,
+		"Crystal Space 2D driver for Macintosh")
+EXPORT_CLASS_TABLE_END
 
-IMPLEMENT_UNKNOWN(csGraphics2DMac)
+IMPLEMENT_IBASE(csGraphics2DMac)
+	IMPLEMENTS_INTERFACE (iPlugIn)
+    IMPLEMENTS_INTERFACE(iGraphics2D)
+    IMPLEMENTS_INTERFACE(iMacGraphicsInfo)
+IMPLEMENT_IBASE_END
 
 
 /*----------------------------------------------------------------
 	Construct a graphics object.  This object provides a place on
 	screen to draw, and a place offscreen to render into.
 ----------------------------------------------------------------*/
-csGraphics2DMac::csGraphics2DMac(iSystem* piSystem)
-				: csGraphics2D (piSystem)
+csGraphics2DMac::csGraphics2DMac(iBase *iParent)
 {
+	CONSTRUCT_IBASE(iParent);
+
 	mMainWindow = NULL;
 	mColorTable = NULL;
 	mOffscreen = NULL;
@@ -102,13 +106,14 @@ csGraphics2DMac::~csGraphics2DMac()
 	Construct the screen objects.  This object provides a place on
 	screen to draw, and a place offscreen to render into.
 ----------------------------------------------------------------*/
-void csGraphics2DMac::Initialize()
+bool csGraphics2DMac::Initialize( iSystem* piSystem )
 {
 	long					pixel_format;
 	OSErr					err;
 	Boolean					showDialogFlag;
 
-	csGraphics2D::Initialize();
+	if ( ! csGraphics2D::Initialize( piSystem ))
+		return false;
 
 	/*
 	 *	Check to see if the depth requested is 15 bits,
@@ -288,10 +293,10 @@ void csGraphics2DMac::Initialize()
   		pfmt.BlueMask = 0xFF;
   		complete_pixel_format();
 
-		DrawPixel = DrawPixel32;
-		WriteChar = WriteChar32;
-		GetPixelAt = GetPixelAt32;
-		DrawSprite = DrawSprite32;
+		_DrawPixel = DrawPixel32;
+		_WriteChar = WriteChar32;
+		_GetPixelAt = GetPixelAt32;
+		_DrawSprite = DrawSprite32;
 	} else if ( Depth == 16 ) {
 		mColorTable = NULL;			// No color table needed
 		pfmt.PalEntries = 0;
@@ -301,10 +306,10 @@ void csGraphics2DMac::Initialize()
   		pfmt.BlueMask = 0x1F;
   		complete_pixel_format();
 
-		DrawPixel = DrawPixel16;
-		WriteChar = WriteChar16;
-		GetPixelAt = GetPixelAt16;
-		DrawSprite = DrawSprite16;
+		_DrawPixel = DrawPixel16;
+		_WriteChar = WriteChar16;
+		_GetPixelAt = GetPixelAt16;
+		_DrawSprite = DrawSprite16;
 	} else {
 		/*
 		 *	The 8 bit pixel data was filled in by csGraphics2D
@@ -320,6 +325,8 @@ void csGraphics2DMac::Initialize()
 			DisplayErrorDialog( kUnableToReserveDSContext );
 		}
 	}
+
+	return true;
 }
 
 
@@ -730,7 +737,7 @@ int csGraphics2DMac::GetPage()
 /*----------------------------------------------------------------
 	Set the mouse cursor.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::SetMouseCursor( int iShape, iTextureHandle* iBitmap )
+bool csGraphics2DMac::SetMouseCursor( csMouseCursorID iShape, iTextureHandle* iBitmap )
 {
 #pragma unused( iBitmap )
 	bool		cursorSet = true;

@@ -1,5 +1,5 @@
 Crystal Space Macintosh Development Readme
-This is up to date as of August 11th, 1999
+This is up to date as of November 19th, 1999
 Written by K. Robert Bate
 If you have any questions or problems, contact me at rbate@ma.ultranet.com.
 
@@ -27,30 +27,34 @@ out "includes Folder".
 
 [3] WORKING WITH THE CRYSTAL SPACE PROJECTS
 
-There are 22 Crystal Space projects in the mwcw folder: 
+There are 23 Crystal Space projects in the mwcw folder: 
 
-2 projects that build static libraries:
+3 projects that build static libraries:
 CSpace.mcp		- generates the static linked library, which includes the
 				  majority of the code for Crystal Space
 CSWS.mcp		- generates the static linked library, which includes the
 				  code for the Crystal Space Windowing System
+impexp.mcp		- generates the static linked library, which includes the
+				  code for the import and export code.
 
 10 projects that build shared libraries:
 Driver2D.mcp			- generates the 2D Graphics shared library.
-NetworkDriverNull.mcp	- generates the null network driver shared library.
-NetworkMgrNull.mcp  	- generates the null network manager shared library.
 SftRndr.mcp				- generates the SoftwareRender shared library, which includes the 3D graphics
 						  driver for software rasterization.
+OpenGLRndr.mcp			- generates the OpenGL Render shared library.
+
+These next 7 projects are not up to date:
 SoundDriver.mcp 		- generates the mac sound driver shared library.
 SoundDriverNull.mcp  	- generates the null sound driver shared library.
 SoundRender.mcp			- generates the software sound render shared library.
 SoundRenderNull.mcp		- generates the null sound render manager shared library.
 GlideRender.mcp			- generates the Glide Render shared library.
-OpenGLRndr.mcp			- generates the OpenGL Render shared library.
+NetworkDriverNull.mcp	- generates the null network driver shared library.
+NetworkMgrNull.mcp  	- generates the null network manager shared library.
 
 10 projects that generate applications
 Blocks.mcp		- A Tetris type game
-CSRegSvr.mcp	- The application which registers the shared libraries.
+scfreg.mcp		- The application which registers the shared libraries.
 CSWSTest.mcp	- The application which tests the Crystal Space Windowing System.
 MazeD.mcp		- The Crystal Space Editor.
 MetaDemo.mcp	- A demo application
@@ -69,7 +73,7 @@ All of the resulting libraries and applications will be placed in the src direct
 1. Open MakeShared.mcp in CodeWarrior and make it.
 
 2. Switch back to the finder select all of the files that end in .shlb
-in the src folder and drop them on the csregsvr application.
+in the src folder and drop them on the scfreg application.
 
 3. Choose an application to build.  I generally start with walktest.  Make it.
 

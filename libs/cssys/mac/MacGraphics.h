@@ -24,33 +24,19 @@
 #include <DrawSprocket.h>
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "xsysg2d.h"
-
-// the CLSID to create csGraphics2DWin32 instances.
-extern const CLSID CLSID_MacGraphics2D;
-
-///
-class csGraphics2DMacFactory : public IGraphics2DFactory
-{
-public:
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csGraphics2DMacFactory)
-
-    STDMETHOD(CreateInstance)(REFIID riid, iSystem* piSystem, void** ppv);
-    STDMETHOD(LockServer)(COMBOOL bLock);
-};
+#include "isysg2d.h"
 
 /// Macintosh version.
-class csGraphics2DMac : public csGraphics2D
+class csGraphics2DMac : public csGraphics2D, public iMacGraphicsInfo
 {
   friend class csGraphics3DSoftware;
 
 public:
-	 					 csGraphics2DMac( iSystem* piSystem );
+	 					 csGraphics2DMac(iBase *iParent);
 	virtual 			~csGraphics2DMac();
 
 					// this is handled in the constuctor
-  	virtual void 		Initialize();
+  	virtual bool 		Initialize(iSystem *theSystem);
   	virtual bool 		Open( const char *Title );
   	virtual void 		Close();
 
@@ -61,19 +47,21 @@ public:
 	virtual bool 		BeginDraw();
 	virtual void		FinishDraw ();
 
-	virtual bool		SetMouseCursor( int iShape, iTextureHandle *hBitmap );
+	virtual bool		SetMouseCursor( csMouseCursorID iShape, iTextureHandle *hBitmap );
 	virtual int			GetPage();
 	virtual bool		DoubleBuffer( bool Enable );
 	virtual bool		DoubleBuffer() { return mDoubleBuffering; }
 	virtual void		Clear( int color );
 
-	void		 		ActivateWindow( WindowPtr theWindow, bool active );
-	void		 		UpdateWindow( WindowPtr theWindow, bool *updated );
-	void				PointInWindow( Point *thePoint, bool *inWindow );
- 	void				DoesDriverNeedEvent( bool *isEnabled );
- 	void				SetColorPalette( void );
- 	void				WindowChanged( void );
-	void				HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
+	virtual void		ActivateWindow( WindowPtr theWindow, bool active );
+	virtual void		UpdateWindow( WindowPtr theWindow, bool *updated );
+	virtual void		PointInWindow( Point *thePoint, bool *inWindow );
+ 	virtual void		DoesDriverNeedEvent( bool *isEnabled );
+ 	virtual void		SetColorPalette( void );
+ 	virtual void		WindowChanged( void );
+	virtual void		HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
+
+	DECLARE_IBASE;
 
 protected:
 	CWindowPtr			mMainWindow;
@@ -95,11 +83,6 @@ protected:
 
 	void				DisplayErrorDialog( short errorIndex );
 	void				GetColorfromInt( int color, RGBColor *outColor );
-
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(csGraphics2DMac)
-
-  DECLARE_COMPOSITE_INTERFACE(XMacGraphicsInfo)
 };
 
 #endif

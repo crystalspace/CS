@@ -24,7 +24,7 @@ int access (const char *path, int mode);
 #endif
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.mac"
+#define SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.macintosh"
 #define OPENGL_2D_DRIVER	"crystalspace.graphics2d.glmac"
 #define GLIDE_2D_DRIVER		"crystalspace.graphics3d.glide.2x"
 #define RAVE_2D_DRIVER		"crystalspace.graphics3d.rave"

@@ -39,6 +39,13 @@
 
 #include "Files.h"
 
+#include <console.h>
+
+
+void clrscr(void)
+{
+}
+
 /*
  *	FixupFilePath
  *

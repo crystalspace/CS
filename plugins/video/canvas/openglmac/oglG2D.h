@@ -24,7 +24,7 @@
 #include <gl/gl.h>
 #include <agl.h>
 #include "csutil/scf.h"
-#include "cs2d/mac/xsysg2d.h"
+#include "cs2d/mac/isysg2d.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 
 /// Windows version.
@@ -33,7 +33,7 @@ class csGraphics2DOpenGL : public csGraphics2DGLCommon
 	friend class csGraphics3DOpenGL;
 
 public:
-	csGraphics2DOpenGL(iBase* iParent, bool bUses3D);
+	csGraphics2DOpenGL(iBase* iParent);
 	virtual ~csGraphics2DOpenGL(void);
   
 	virtual bool	Open (const char *Title);

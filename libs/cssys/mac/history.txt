@@ -7,6 +7,10 @@ Add Network support.
 Optimize everything.
 
 History:
+19-Nov-99
+	- Bringing documentation up to date.
+	- Converting mac port over to SCF.
+	- Adding scfreg application and removing csregsvr.
 11-Aug-99
 	- Bringing documentation up to date.
 	- Added four more application projects: Blocks.mcp, MetaCemo.mcp, Shooter.mcp and Squawk.mcp.

@@ -37,7 +37,7 @@ EXPORT_CLASS_TABLE (glmac)
     "Mac OpenGL 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent, bool bUses3D) : 
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) : 
                    csGraphics2DGLCommon (iParent)
 {
 	mMainWindow = NULL;

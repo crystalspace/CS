@@ -40,13 +40,15 @@ public:
 
 	virtual void Close();
 
-	virtual bool Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, iConfig* cfg_engine);
+	virtual bool Initialize ( int argc, char *argv[], const char *iConfigName );
 	virtual void Loop();
 
-	virtual void Alert(const char* s);
-	virtual void Warn(const char* s);
+	virtual void Alert( const char* s );
+	virtual void Warn( const char* s );
 
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
+
+	DECLARE_IBASE;
 
 private:
 	void		DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D );

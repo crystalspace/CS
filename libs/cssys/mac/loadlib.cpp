@@ -20,47 +20,44 @@
 #include <string.h>
 #include <CodeFragments.h>
 #include "sysdef.h"
-#include "comdefs.h"
+#include "cssys/csshlib.h"
 
-extern CS_HLIBRARY SysLoadLibrary (const char *szLibName);
-extern PROC SysGetProcAddress (CS_HLIBRARY Handle, const char *szProcName);
-extern bool SysFreeLibrary (CS_HLIBRARY Handle);
 
-CS_HLIBRARY SysLoadLibrary( const char* szLibName )
+csLibraryHandle csLoadLibrary( const char* iName )
 {
 	CFragConnectionID libID;
 	OSErr	theError;
 	Str63	theLibName;
 	Str255	errorString;
-    HRESULT (*pfnDllInitialize)(void) = NULL;
+    void (*pfnDllInitialize)(void) = NULL;
 
-	strcpy( (char *)&theLibName[1], szLibName );
-	theLibName[0] = strlen( szLibName );
+	strcpy( (char *)&theLibName[1], iName );
+	strcat( (char *)&theLibName[1], ".shlb" );
+	theLibName[0] = strlen( (char *)&theLibName[1] );
 
     theError = GetSharedLibrary( theLibName, kPowerPCCFragArch, kReferenceCFrag, &libID, (Ptr*)&pfnDllInitialize, errorString );
 
     if ( theError == noErr )
     {
-		if (!pfnDllInitialize) {
-			return 0;
+		if (pfnDllInitialize) {
+			(*pfnDllInitialize)();
 		}
 
-		(*pfnDllInitialize)();
 	}
 
-	return (CS_HLIBRARY)libID;
+	return (csLibraryHandle)libID;
 }
 
-PROC SysGetProcAddress( CS_HLIBRARY hLib, const char* szProcName )
+void *csGetLibrarySymbol( csLibraryHandle Handle, const char* iName )
 {
 	Str63				theSymbolName;
 	CFragSymbolClass	theSymbolClass;
-	PROC				theSymbolAddress;
+	void *				theSymbolAddress;
 	OSErr				theError;
 
-	strcpy( (char *)&theSymbolName[1], szProcName );
-	theSymbolName[0] = strlen( szProcName );
-    theError = FindSymbol( (CFragConnectionID)hLib, theSymbolName, (Ptr*)&theSymbolAddress, &theSymbolClass );
+	strcpy( (char *)&theSymbolName[1], iName );
+	theSymbolName[0] = strlen( iName );
+    theError = FindSymbol( (CFragConnectionID)Handle, theSymbolName, (Ptr*)&theSymbolAddress, &theSymbolClass );
 
 	if ( theError != noErr ) {
 		theSymbolAddress = NULL;
@@ -69,11 +66,11 @@ PROC SysGetProcAddress( CS_HLIBRARY hLib, const char* szProcName )
     return theSymbolAddress;
 }
 
-bool SysFreeLibrary(CS_HLIBRARY hLib)
+bool csUnloadLibrary(csLibraryHandle Handle)
 {
 	OSErr	theError;
 
-	theError = CloseConnection( (CFragConnectionID *)&hLib );
+	theError = CloseConnection( (CFragConnectionID *)&Handle );
 
 	return ( theError == noErr );
 }

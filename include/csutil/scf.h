@@ -347,6 +347,8 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
 /// A macro to declare a symbol that should be exported from shared libraries
 #if defined (OS_WIN32) || defined (OS_BE)
 #  define EXPORTED_FUNCTION(f) extern "C" __declspec(dllexport) f
+#elif defined (OS_MACOS)
+#  define EXPORTED_FUNCTION(f) extern "C" __declspec(export) f
 #else
 #  define EXPORTED_FUNCTION(f) extern "C" f
 #endif
@@ -360,7 +362,7 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
  * (such as exported functions table). Because of this, on these platforms
  * we drop the module-dependent prefix in the case we use dynamic linking.
  */
-#if !defined (CS_STATIC_LINKING) && (defined (OS_AMIGA) || defined (OS_MACOS))
+#if !defined (CS_STATIC_LINKING) && defined (OS_AMIGA)
 #  define EXPORTED_NAME(Prefix, Suffix) Suffix
 #else
 #  define EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix

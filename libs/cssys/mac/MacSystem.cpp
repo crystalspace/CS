@@ -62,11 +62,19 @@ static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCo
 static AEEventHandlerUPP AppleEventHandlerUPP = NULL;
 static SysSystemDriver * gSysSystemDriver = NULL;
 
+
+IMPLEMENT_IBASE(SysSystemDriver)
+    IMPLEMENTS_INTERFACE(iSystem)
+IMPLEMENT_IBASE_END
+
 SysSystemDriver::SysSystemDriver()
+				 : csSystemDriver ()
 {
 	unsigned int		i;
 	ProcessSerialNumber	theCurrentProcess;
 	ProcessInfoRec		theInfo;
+
+	CONSTRUCT_IBASE(NULL);
 
 	gSysSystemDriver = this;
 
@@ -171,14 +179,14 @@ void SysSystemDriver::Warn(const char* s)
 }
 
 
-bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, iConfig* cfg_engine)
+bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName )
 {
 	Handle			theMenuBar;
 	MenuHandle		theMenu;
 	Str255			theText;
 
 	argc = GetCommandLine( &argv );
-	if ( ! csSystemDriver::Initialize ( argc, argv, iConfigName, iVfsConfigName, cfg_engine ))
+	if ( ! csSystemDriver::Initialize ( argc, argv, iConfigName ))
 		return false;
 
 	/*
@@ -229,12 +237,11 @@ void SysSystemDriver::Loop(void)
 	EventRecord anEvent;
 	iMacGraphicsInfo* piG2D = NULL;
 	bool outEventWasProcessed;
-	HRESULT	hRes;
 	bool	driverNeedsEvent = false;
 
-	hRes = piG2D->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
+	piG2D = QUERY_INTERFACE(System, iMacGraphicsInfo);
 
-	if (SUCCEEDED(hRes)) {
+	if (piG2D) {
 		piG2D->DoesDriverNeedEvent( &driverNeedsEvent );
       	piG2D->SetColorPalette();
 	}
