@@ -268,6 +268,9 @@ public:
   /// Constructor
   csMeshFactory (iEngine *engine, iObjectRegistry* object_reg);
 
+  /// Get the object registry.
+  iObjectRegistry* GetObjectRegistry () { return object_reg; }
+
   /// destructor
   virtual ~csMeshFactory ();
 

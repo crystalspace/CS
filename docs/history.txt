@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed the .csplugin file in the ODE based physics plugin
 	  for particles. It was using the same plugin ID as the simple
 	  physics plugin.
+	- Jorrit attempted to convert the rain mesh to the NR. It doesn't
+	  yet work though.
 14-Jan-2004
 	- Peter Amstutz rewrote the GenerateBox() method in the genmesh
 	  plugin to create a box with better texel settings 

@@ -604,13 +604,10 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 2, false);
       ball_texels_dirty_flag = false;
-      texel_buffer->CopyToBuffer(ball_texels, sizeof (csVector2) * num_ball_vertices);
+      texel_buffer->CopyToBuffer (ball_texels,
+      	sizeof (csVector2) * num_ball_vertices);
     }
-    if (texel_buffer)
-    {
-      return texel_buffer;
-    }
-    return 0;
+    return texel_buffer;
   }
   if (name == normal_name)
   {
@@ -620,13 +617,10 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       ball_normals_dirty_flag = false;
-      normal_buffer->CopyToBuffer(top_normals, sizeof (csVector3)*num_ball_vertices);
+      normal_buffer->CopyToBuffer (top_normals,
+      	sizeof (csVector3)*num_ball_vertices);
     }
-    if(normal_buffer)
-    {
-      return normal_buffer;
-    }
-    return 0;
+    return normal_buffer;
   }
   if (name == color_name)
   {
@@ -636,13 +630,10 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
         sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       ball_colors_dirty_flag = false;
-      color_buffer->CopyToBuffer(ball_colors, sizeof (csColor) * num_ball_vertices);
+      color_buffer->CopyToBuffer (ball_colors,
+      	sizeof (csColor) * num_ball_vertices);
     }
-    if (color_buffer)
-    {
-      return color_buffer;
-    }
-    return 0;
+    return color_buffer;
   }
   if (name == index_name)
   {
@@ -652,13 +643,10 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
         sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
       ball_triangle_dirty_flag = false;
-      index_buffer->CopyToBuffer(ball_indices, sizeof (unsigned int) * ball_triangles *3);
+      index_buffer->CopyToBuffer (ball_indices,
+      	sizeof (unsigned int) * ball_triangles *3);
     }
-    if (index_buffer)
-    {
-      return index_buffer;
-    }
-    return 0;
+    return index_buffer;
   }
   return 0;
 }

@@ -22,6 +22,8 @@
 #include "cstool/meshobjtmpl.h"
 #include "imesh/partsys.h"
 #include "ivideo/vbufmgr.h"
+#include "ivideo/rendermesh.h"
+#include "csgfx/shadervarcontext.h"
 
 /**
  * flag value to indicate that the system should be deleted when all
@@ -71,8 +73,31 @@ protected:
   /// the mesh factory (should be an empty frame)
   iMeshObjectFactory *Factory;
 
+#ifdef CS_USE_NEW_RENDERER
+  bool initialized;
+  csRenderMesh mesh;
+  csRenderMesh* meshPtr;
+
+  int VertexCount;
+  int TriangleCount;
+  csVector3* vertices;
+  csColor* colors;
+  csVector2* texels;
+  csTriangle* triangles;
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csRef<iGraphics3D> g3d;
+
+  csRef<csShaderVariableContext> dynDomain;
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+#else
   /// The vertex buffer.
   csRef<iVertexBuffer> vbuf;
+#endif
 
   /// currently allocated amount of storage for particles
   int StorageCount;
@@ -141,6 +166,8 @@ protected:
    */
   virtual void Allocate (int newsize, int copysize);
 
+  void SetupObject ();
+
 public:
   /// constructor
   csNewParticleSystem (iEngine *, iMeshObjectFactory *, int ParticleFlags);
@@ -167,7 +194,7 @@ public:
 
   /// quick visibility test
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
+  virtual csRenderMesh** GetRenderMeshes (int& n);
 
   /// update lighting info
   void UpdateLighting (iLight**, int, iMovable*);
