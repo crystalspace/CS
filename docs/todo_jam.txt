@@ -12,6 +12,9 @@ W - Wishlist (the build also works without this feature)
     shared.  We should provide rules to copy the generated files back to the
     source tree upon explicit request so that they can be committed to the CVS
     respository if desired.
+[H] When Bison and Flex are installed, the generated MSVC project file for AWS
+    incorrectly mentions skinlex.ll and skinpars.yy, rather than skinlex.cpp
+    and skinpars.cpp from the source directory.
 [H] msvcgen.jam: Auto-generated MSVC project files should be generated into the
     build directory rather than the source tree, since the source tree might be
     read-only or shared.  We should provide rules to copy the generated files
