@@ -31,14 +31,14 @@
 extern "C"
 {
 #define jpeg_boolean boolean
-#if defined (OS_WIN32)
+/*#if defined (OS_WIN32)
 #if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
 #  define HAVE_BOOLEAN	// we need int booleans, not Windows unsigned char bools
 #  define boolean int
 #  undef jpeg_boolean 
 #  define jpeg_boolean int
 #endif
-#endif
+#endif*/
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
 #include <jpeglib.h>
 #include <jerror.h>
