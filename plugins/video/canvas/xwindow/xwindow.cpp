@@ -390,7 +390,7 @@ void csXWindow::Close ()
 void csXWindow::SetTitle (const char* title)
 { 
   delete [] win_title;
-  win_title = new char [strlen (title + 1)]; 
+  win_title = new char [strlen (title) + 1]; 
   strcpy (win_title, title); 
 }
 

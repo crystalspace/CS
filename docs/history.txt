@@ -14,6 +14,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with the software renderer where flat rendering
 	  (without texture) would not correctly check which z-buffer
 	  mode (NONE, FILL, TEST, or USE) to use.
+	- Fixed a potential memory overwrite bug in xwindow.cpp. It
+	  was doing:
+	    new char [strlen (title+1)];
+	  instead of:
+	    new char [strlen (title)+1];
 	- Michael H. Voase did the following:
 	  HitBeam updates:
 	    Fleshed out HitBeam interface. HitBeamBBox
