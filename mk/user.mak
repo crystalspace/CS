@@ -197,7 +197,6 @@ ifeq ($(PYTHON.AVAILABLE),yes)
 PLUGINS.DYNAMIC += cscript/cspython
 endif
 
-# csperl5 still fails to build properly on many platforms, so disable for now.
 ifeq ($(PERL5.AVAILABLE),yes)
-#PLUGINS.DYNAMIC += cscript/csperl5
+PLUGINS.DYNAMIC += cscript/csperl5
 endif

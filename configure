@@ -912,7 +912,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-perl             use Perl5 scripting interface (default YES)
+  --with-perl             use Perl5 scripting interface (default NO)
   --with-python           use Python scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
@@ -5384,6 +5384,7 @@ cs_build_prop_val=`echo x$PERL | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 
+# csperl5 fails to build on many platforms, so default is NO for now.
 
 # Check whether --with-perl or --without-perl was given.
 if test "${with_perl+set}" = set; then
@@ -5391,7 +5392,7 @@ if test "${with_perl+set}" = set; then
 
 fi;
 if test -z "$with_perl"; then
-  with_perl=yes
+  with_perl=no
 fi
 
 

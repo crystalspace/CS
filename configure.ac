@@ -422,9 +422,10 @@ CS_BUILD_PROPERTY([PERL5], [$PERL])
 CS_BUILD_PROPERTY([PERL], [$PERL])
 CS_BUILD_PROPERTY([CMD.PERL5], [$PERL])
 
+# csperl5 fails to build on many platforms, so default is NO for now.
 AC_ARG_WITH([perl], [AC_HELP_STRING([--with-perl],
-    [use Perl5 scripting interface (default YES)])])
-AS_IF([test -z "$with_perl"], [with_perl=yes])
+    [use Perl5 scripting interface (default NO)])])
+AS_IF([test -z "$with_perl"], [with_perl=no])
 
 AS_IF([test -n "$PERL" && test "$with_perl" != no],
     [AC_CACHE_CHECK([for perl ExtUtils::Embed module], [cs_cv_perl_mod_embed],

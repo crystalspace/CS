@@ -1,8 +1,5 @@
 SubDir TOP plugins cscript csperl5 ;
 
-# csperl5 still fails to build properly on many platforms, so disable for now.
-if $(PERL5.REALLY_BUILD_IT) = "yes"
-{
 if $(PERL5.AVAILABLE) = "yes"
 {
   if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
@@ -67,4 +64,3 @@ if $(PERL5.AVAILABLE) = "yes"
   Clean clean : $(perlxs) ;
   Clean csperl5clean : $(perlxs) ;
 }
-} # PERL5.REALLY_BUILD_IT
