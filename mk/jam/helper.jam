@@ -7,7 +7,13 @@ DEEPCOPY ?= "cp -R" ;
 DELTREE ?= "rm -rf" ;
 
 # The -f option to `cp' is not supported on older platforms.
-if "$(CP)" = "cp -f" { CP = "cp" ; }
+# The convolution of the conditional arises because CP is defined in Jambase as
+# two tokens rather than a single string, so we must check the tokens
+# individually; yet we also check it as a simple string for future robustness.
+if $(CP) = "cp -f" || $(CP[1]) = "cp" && $(CP[2]) = "-f"
+{
+  CP = cp ;
+}
 
 ##  IncludeDir [ target : ] directories
 ##    Description: Is used to specify the location of header files for a
