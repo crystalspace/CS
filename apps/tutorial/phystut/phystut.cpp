@@ -62,8 +62,9 @@ CS_IMPLEMENT_APPLICATION
 // The global pointer to simple
 Simple *simple;
 
-Simple::Simple ()
+Simple::Simple (iObjectRegistry* obj)
 {
+  object_reg = obj;
   engine = NULL;
   loader = NULL;
   g3d = NULL;
@@ -82,7 +83,9 @@ Simple::~Simple ()
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
   if (view) view->DecRef ();
-  csInitializer::DestroyApplication (object_reg);
+  if (dyn) dyn->DecRef ();
+  if (dynSys) dynSys->DecRef ();
+  dyn->RemoveSystem (dynSys);
 }
 
 void Simple::SetupFrame ()
@@ -193,10 +196,8 @@ bool Simple::SimpleEventHandler (iEvent& ev)
   return simple->HandleEvent (ev);
 }
 
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
@@ -286,7 +287,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"No iDynamics plugin!");
     return false;
   }
-
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
@@ -391,8 +391,9 @@ bool Simple::Initialize (int argc, const char* const argv[])
   engine->Prepare ();
 
   view = new csView (engine, g3d);
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
+  iCamera *c = view->GetCamera ();
+  c->SetSector (room);
+  c->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -418,7 +419,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"Error loading mesh object factory!");
     return false;
   }
-
   // Double the size.
   csMatrix3 m; m *= .5;
   csReversibleTransform t = csReversibleTransform (m, csVector3 (0));
@@ -608,11 +608,16 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  simple = new Simple ();
+  iObjectRegistry *object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return 0;
 
-  if (simple->Initialize (argc, argv))
+  simple = new Simple (object_reg);
+
+  if (simple->Initialize ())
     simple->Start ();
 
   delete simple;
+  csInitializer::DestroyApplication (object_reg);
+
   return 0;
 }

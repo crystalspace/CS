@@ -50,8 +50,12 @@ private:
   iSector* room;
   iView* view;
 
+  /*
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
+  */
+  iDynamics *dyn;
+  iDynamicSystem *dynSys;
   iMeshFactoryWrapper* boxFact;
   iMeshFactoryWrapper* ballFact;
 
@@ -66,10 +70,10 @@ private:
   iRigidBody* CreateRoomSolids (const csVector3& center, const csVector3& radius, float thickness);
 
 public:
-  Simple ();
+  Simple (iObjectRegistry *obj);
   ~Simple ();
 
-  bool Initialize (int argc, const char* const argv[]);
+  bool Initialize ();
   void Start ();
 };
 
