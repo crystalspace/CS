@@ -15,6 +15,12 @@ chronological order.
 	  longer necessary to make this exlusion.  Furthermore, these
 	  directories may contain useful classes which the user might wish to
 	  use (such as csWin32RegistryConfig).
+	- Eric Sunshine augmented crystal.m4 so that it applies
+	  CS_PATH_NORMALIZE() to the results of several cs-config invocations.
+	  This should resolve a problem for some Windows users in which the
+	  paths returned by cs-config were in DOS format (containing
+	  backslashes), which were interpreted incorrectly by the Bourne shell
+	  invoked by Jam to compile and link programs.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you
