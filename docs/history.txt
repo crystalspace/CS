@@ -38,12 +38,12 @@ The history order has been reversed so that new features are at the top.
 	- Fixed an initialization bug in the new terrain engine. It should
 	  now work.
 	- Also started working a little on LOD support. Not finished yet.
-	- Fixed a VERY weird bug in ScanStr. If you used ScanStr
-	  with %b it would actually crash in very rare cases (like with
-	  the ball loader plugin). I fixed it by replacing the va_arg
-	  type for %b by 'bool'. It used to be 'int'. I have no idea
-	  what is going on here and I also don't know why this problem
-	  suddenly pops up now.
+	- Norman Kramer fixed a VERY weird bug in ScanStr. If you used
+	  ScanStr with %b it would actually crash in very rare cases
+	  (like with the ball loader plugin). Fixed it by replacing
+	  the va_arg type for %b by 'bool'. It used to be 'int'. I have
+	  no idea what is going on here and I also don't know why this
+	  problem suddenly pops up now.
 11-Apr-2001
 	- Norman Kramer fixed ptlab.
 	- Norman Kramer fixed the video app so that it works completely
