@@ -12,6 +12,7 @@ chronological order.
 	  map (for that block).
 	- res added a sanity check to the opcode glue.
 	- res changed csBitArray to support resizing after init.
+	- res fixed a VC6 compile error in libcanvascommon.
 28-May-2004
 	- Eric Sunshine fixed bug in CS/include/Jamfile where it failed to
 	  install APIdeclare.inc and DbgHelpAPI.fun from csutil/win32.

@@ -454,6 +454,7 @@ protected:
     virtual bool DebugCommand (const char* cmd)
     { return scfParent->DebugCommand (cmd); }
   } scfiDebugHelper;
+  friend struct eiDebugHelper;
 };
 
 #endif // __CS_GRAPH2D_H__
