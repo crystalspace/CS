@@ -1035,14 +1035,16 @@ bool csChunkLodTerrainObject::SetMaterialPalette (
 	const csArray<iMaterialWrapper*>& pal)
 {
   palette.SetLength (pal.Length());
-  for (int i = 0; i < pal.Length(); i++) {
+  for (int i = 0; i < pal.Length(); i++)
+  {
     palette[i] = pal[i];
   }
   palette_meshes.SetLength (pal.Length());
   return true;
 }
 
-bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
+bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
+	int w, int h)
 {
   csRef<iStringSet> strings = 
 	CS_QUERY_REGISTRY_TAG_INTERFACE (pFactory->object_reg,

@@ -31,6 +31,8 @@ chronological order.
 	  indeterministic cases if the string was empty.  Projects should
 	  #define CSSTRING_BUGGY_NULL_RETURN before #including
 	  <csutil/csstring.h> to enable this temporary transitional hack.
+	- Jorrit changed iTerrainFactoryState->SetMaterialMap() so that
+	  it uses a const csArray<>& instead of a csArray<> as a parameter.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only

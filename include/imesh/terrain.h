@@ -54,7 +54,7 @@ struct iTerrainObjectState : public iBase
    * high level quad in the final terrain.
    * Note x and y must be 2^n and usually they must be equal
    */
-  virtual bool SetMaterialMap (csArray<char> data, int x, int y) = 0;
+  virtual bool SetMaterialMap (const csArray<char>& data, int x, int y) = 0;
   virtual bool SetMaterialMap (iImage* map) = 0;
 
   /**

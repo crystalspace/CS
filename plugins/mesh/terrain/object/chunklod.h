@@ -341,7 +341,7 @@ public:
   {
     return palette;
   }
-  bool SetMaterialMap (csArray<char> data, int x, int y);
+  bool SetMaterialMap (const csArray<char>& data, int x, int y);
   bool SetMaterialMap (iImage* map);
   void SetLODDistance (float distance) { lod_distance = distance; }
   float GetLODDistance () const { return lod_distance; }
@@ -359,7 +359,7 @@ public:
     { return scfParent->SetMaterialPalette (pal); }
     virtual const csArray<iMaterialWrapper*>& GetMaterialPalette () const
     { return scfParent->GetMaterialPalette (); }
-    virtual bool SetMaterialMap (csArray<char> data, int x, int y)
+    virtual bool SetMaterialMap (const csArray<char>& data, int x, int y)
     { return scfParent->SetMaterialMap (data, x, y); }
     virtual bool SetMaterialMap (iImage* map)
     { return scfParent->SetMaterialMap (map); }
