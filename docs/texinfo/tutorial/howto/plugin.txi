@@ -19,7 +19,7 @@ class in C++ means that all methods are pure virtual.  This means that no
 implementation is given; only method declarations.  The implementation will
 come later in the code of the plugin.
 
-This concept completely analogous to the Java interface mechanism.  The
+This concept is completely analogous to the Java interface mechanism.  The
 advantage of using this paradigm is that you have a clear separation between
 the @sc{api} and the implementation.  This allows one to easily replace an
 implementation of some @sc{api} or even provide multiple implementations (for
