@@ -711,7 +711,7 @@ csRadPoly* csRadiosity :: FetchNext()
   float nextpriority = p?p->GetPriority():0.0;
   float val = (start_priority - nextpriority ) / start_priority;
   if(val<0.0f) val=0.0f;
-  val = pow(val, 20.0) * 0.98f;
+  val = pow(val, 2.0) * 0.98f;
   int ticks_now = QRound( val * meter->GetTotal());
   //CsPrintf(MSG_STDOUT, "New value %g, ticks at %d / %d\n",
   //  val, ticks_now, meter->GetTotal());
@@ -1046,7 +1046,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 {
   // check visibility
   float visibility = shadow_matrix->coverage[ruv];
-  if(visibility <= 0.0) return;
+  if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info
   shoot_dest->QuickLumel2World(dest_lumel, rx, ry);
@@ -1054,26 +1054,28 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
   float distance = path.Norm();
-  if(distance < 1.0f) distance=1.0f; // too close together
+  if(distance < 1.0f ) distance=1.0f; // too close together
   path /= distance ; //otherwise dot product will not return cos(angle).
   distance *= distance;
   float cossrcangle = src_normal * path;
-  if(cossrcangle < 0.0f) return;
+  if(cossrcangle < SMALL_EPSILON) return;
   float cosdestangle = - (dest_normal * path);
-  if(cosdestangle < 0.0f) return; // facing away, negative light is not good.
+  if(cosdestangle < SMALL_EPSILON) return; 
+  // facing away, negative light is not good.
 
   float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / distance;
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
-#if 1
-   if(totalfactor > 10.0f)
+#if 0
+  // if(totalfactor > 10.0f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
-	"srclumelcolor (%g, %g, %g)\n", 
+	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
   	totalfactor, cossrcangle, cosdestangle,
  	source_patch_area, visibility, distance,
-	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue);
+	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue,
+	delta_color.red, delta_color.green, delta_color.blue);
 #endif
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
@@ -1092,7 +1094,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - -path) * 
     dest_normal;
   double val = ( reflectdir * viewdir );
-  if(val<0.0f) return;
+  if(val<SMALL_EPSILON) return;
   if(val>1.0) val=1.0;
   //alternative specular computation
   //csVector3 halfdir = (-path + viewdir);
