@@ -1,6 +1,6 @@
 SubDir TOP plugins aws ;
 
-FILES = [ Glob *.cpp *.h ] ;
+FILES = [ Wildcard *.cpp *.h ] ;
 
 if $(CMD.BISON) && $(CMD.FLEX)
 {
