@@ -116,13 +116,6 @@ public:
   { return *obj; }
 
   /**
-   * Boolean cast.  Returns true if smart pointer is pointing at an actual
-   * object, otherwise returns false.
-   */
-  operator bool () const
-  { return (obj != 0); }
-
-  /**
    * Smart pointer validity check.  Returns true if smart pointer is pointing
    * at an actual object, otherwise returns false.
    */

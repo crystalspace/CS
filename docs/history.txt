@@ -40,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	  it in scripts/blender/sectorexport.
 	- Added 'explicit' keyword to csRef constructor which takes a normal
 	  pointer so that you cannot misuse the assign anymore.
+	- Removed the 'bool' cast for csRef because this was
+	  ambigious.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.
