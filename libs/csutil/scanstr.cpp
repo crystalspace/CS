@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,17 +22,21 @@
 #include "sysdef.h"
 #include "csutil/scanstr.h"
 
+#define CS_WHITE " \t\n\r\f"
+
 int ScanStr (const char* in, const char* format, ...)
 {
   va_list arg;
   va_start (arg, format);
 
   int num = 0;
-  in += strspn (in, " \t\n\f");
+  in += strspn (in, CS_WHITE);
 
+  char c[2] = { '\0', '\0' };
   while (*format && *in)
   {
-    if (*format == '%')
+    c[0] = *format;
+    if (c[0] == '%')
     {
       format++;
       switch (*format)
@@ -40,9 +44,10 @@ int ScanStr (const char* in, const char* format, ...)
         case 'd':
 	{
 	  int* a = va_arg (arg, int*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  *a = atoi (in);
-	  in += strspn (in, "0123456789+- \t\n\f");
+	  in += strspn (in, "0123456789+-");
+	  in += strspn (in, CS_WHITE);
 	  num++;
 	  break;
 	}
@@ -51,16 +56,16 @@ int ScanStr (const char* in, const char* format, ...)
 	  int i;
 	  int* list = va_arg (arg, int*);
 	  int* nr = va_arg (arg, int*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  i = 0;
 	  while ((*in >= '0' && *in <= '9') || *in == '+' || *in == '-')
 	  {
 	    list[i++] = atoi (in);
 	    in += strspn (in, "0123456789+-");
-	    in += strspn (in, " \t\n\f");
+	    in += strspn (in, CS_WHITE);
 	    if (*in != ',') break;
 	    in++;
-	    in += strspn (in, " \t\n\f");
+	    in += strspn (in, CS_WHITE);
 	  }
 	  *nr = i;
 	  num++;
@@ -69,21 +74,23 @@ int ScanStr (const char* in, const char* format, ...)
         case 'b':
 	{
 	  int* a = va_arg (arg, int*);
-	  in += strspn (in, " \t\n\f");
-	  const char* in2 = in + strspn (in, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	  in += strspn (in, CS_WHITE);
+	  const char* in2 = in + strspn (in,
+	    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	  int l = (int)(in2-in);
-	  *a = !strncasecmp (in, "yes", l) || !strncasecmp (in, "true", l) || !strncasecmp (in, "on", l) ||
-	  	!strncasecmp (in, "1", l);
-	  in = in2 + strspn (in2, " \t\n\f");
+	  *a = !strncasecmp (in, "yes", l) || !strncasecmp (in, "true", l) ||
+	       !strncasecmp (in, "on", l)  || !strncasecmp (in, "1", l);
+	  in = in2 + strspn (in2, CS_WHITE);
 	  num++;
 	  break;
 	}
 	case 'f':
 	{
 	  float* a = va_arg (arg, float*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  *a = atof (in);
-	  in += strspn (in, "0123456789.eE+- \t\n\f");
+	  in += strspn (in, "0123456789.eE+-");
+	  in += strspn (in, CS_WHITE);
 	  num++;
 	  break;
 	}
@@ -92,16 +99,17 @@ int ScanStr (const char* in, const char* format, ...)
 	  int i;
 	  float* list = va_arg (arg, float*);
 	  int* nr = va_arg (arg, int*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  i = 0;
-	  while ((*in >= '0' && *in <= '9') || *in == '.' || *in == '+' || *in == '-' || *in == 'e' || *in == 'E')
+	  while ((*in >= '0' && *in <= '9') || *in == '.' || *in == '+' ||
+	    *in == '-' || *in == 'e' || *in == 'E')
 	  {
 	    list[i++] = atof (in);
 	    in += strspn (in, "0123456789.eE+-");
-	    in += strspn (in, " \t\n\f");
+	    in += strspn (in, CS_WHITE);
 	    if (*in != ',') break;
 	    in++;
-	    in += strspn (in, " \t\n\f");
+	    in += strspn (in, CS_WHITE);
 	  }
 	  *nr = i;
 	  num++;
@@ -110,7 +118,7 @@ int ScanStr (const char* in, const char* format, ...)
 	case 's':
 	{
 	  char* a = va_arg (arg, char*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  if (*in == '\'')
 	  {
 	    in++;
@@ -129,19 +137,20 @@ int ScanStr (const char* in, const char* format, ...)
 	  }
 	  else
 	  {
-	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789.");
+	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyz"
+	      "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789.");
 	    strncpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;
 	  }
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  num++;
 	  break;
 	}
 	case 'S':
 	{
 	  char* a = va_arg (arg, char*);
-	  in += strspn (in, " \t\n\f");
+	  in += strspn (in, CS_WHITE);
 	  if (*in == '\"')
 	  {
 	    in++;
@@ -190,12 +199,15 @@ int ScanStr (const char* in, const char* format, ...)
       }
       if (*format) format++;
     }
-    else if (*format == ' ') { format++; in += strspn (in, " \t\n\f"); }
-    else if (*in == *format) { in++; format++; }
+    else if (strpbrk(c, CS_WHITE))
+    {
+      format += strspn (format, CS_WHITE);
+      in += strspn (in, CS_WHITE);
+    }
+    else if (*in == *format) { format++; in++; }
     else { num = -1; break; }
   }
 
   va_end (arg);
-
   return num;
 }

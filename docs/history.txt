@@ -25,6 +25,14 @@ The history order has been reversed so that new features are at the top.
 	  project.  Most of these involved changing (char*) to (const char*).
 	- Eric Sunshine added 'bool' variations of the Append() method, and
 	  operator+= and operator<< to csString.
+	- Eric Sunshine made the following changes to ScanStr():
+	    - Fixed bug: Wasn't able to parse strings which used only
+	      whitespace as delimiters, such as "%f %f %f".  In this case, it
+	      would only scan the first "%f" and skip the remainder of the
+	      string.  (It has always been able to parse strings which use
+	      non-whitespace delimiters, such as "%f,%f,%f".)
+	    - Is now much more tolerant of Macintosh and Windows/DOS line
+	      terminators (CR and CRLF).
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
