@@ -1539,7 +1539,9 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
             g3dpoly.pi_tritexcoords [vtr].b, g3dpoly.pi_tritexcoords [vbr].b);
       }
     }
+    g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
     g3d->DrawPolygonQuick (g3dpoly, po_colors != NULL);
+    g3d->FinishPolygonQuick ();
     CHK (delete [] g3dpoly.pi_texcoords);
   }
   else
