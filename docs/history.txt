@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  within the physical filesystem.  It is essentially the complement of
 	  virtual iFile implementations for VFS, and the antithesis of
 	  csMemFile.
+	- Eric Sunshine eliminated several compilation warnings from
+	  win32/registrycfg.cpp.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

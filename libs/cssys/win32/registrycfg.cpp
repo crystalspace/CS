@@ -58,7 +58,7 @@ csRegistryConfig::~csRegistryConfig()
 
 void csRegistryConfig::ReplaceSeparators (char* key) const
 {
-  int len = strlen (key);
+  size_t len = (size_t)strlen (key);
   size_t p;
   while ((p = strcspn (key, "./")) < len)
   {
@@ -254,7 +254,7 @@ const char* csRegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
     return status->strings.Register (buf, 0);
     break;
   case REG_BINARY:
-    sprintf (buf, "%d", *((float*)data.data));
+    sprintf (buf, "%g", *((float*)data.data));
     return status->strings.Register (buf, 0);
     break;
   default:
@@ -265,7 +265,6 @@ const char* csRegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
 bool csRegistryConfig::RegToBool (DWORD type, Block_O_Mem& data,
 				  bool Def) const
 {
-  int n, v;
   switch (type)
   {
   case REG_SZ:
