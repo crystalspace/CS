@@ -1,8 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+26-Apr-2000
+    - Desmond Fletcher added new classnames and keys to map2cs to extend
+      map editing capabilities.  Updated documentation for map2cs.
 24-Apr-2000
-        - Martin Geisse added the first working version of the DUNGEON
-          plugin (random level generator).
+    - Martin Geisse added the first working version of the DUNGEON
+      plugin (random level generator).
 21-Apr-2000
 	- Andrew Zabolotny changed 'int' back to 'ceil' in CompressVertices()
 	  (i.e. change from Frank O'Connor).
