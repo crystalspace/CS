@@ -24,6 +24,7 @@
 #include <crtdbg.h>
 
 #ifdef CS_EXTENSIVE_MEMDEBUG
+// use the CRT's built-in memory debugging aids
 void* operator new (size_t s, void* filename, int line)
 {
   return (void*)_malloc_dbg (s, _NORMAL_BLOCK, filename, line);
