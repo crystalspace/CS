@@ -18,9 +18,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
-const unsigned int AWSF_CMP_HIDDEN      = 8; // set if component is hidden
-const unsigned int AWSF_CMP_TRANSPARENT = 2; // set if component is transparent
-const unsigned int AWSF_CMP_ALWAYSERASE = 4; // set if component always needs erased by parent first
-const unsigned int AWSF_CMP_INVISIBLE   = 16; // set if component is so small it gets invisible
+
+const unsigned int AWSF_CMP_INVISIBLE   = 16; // set by window manager when a component gets too small during resize
+const unsigned int AWSF_CMP_HIDDEN      = 8;  // set if component is hidden
+const unsigned int AWSF_CMP_TRANSPARENT = 2;  // set if component is transparent
+const unsigned int AWSF_CMP_ALWAYSERASE = 4;  // set if component always needs erased by parent first
 
 #endif

@@ -72,6 +72,7 @@ const int AWSF_AlwaysRedrawWindows=2;
 
 SCF_VERSION (iAws, 0, 1, 0);
 
+/// Interface for the window manager.
 struct iAws : public iBase
 {
 public:
@@ -174,6 +175,7 @@ public:
 
 SCF_VERSION (iAwsPrefManager, 0, 0, 1);
 
+/// Interface for the preferences manager (window manager needs one.)
 struct iAwsPrefManager : public iBase
 {
 public:
@@ -237,6 +239,9 @@ public:
   /// Gets the value of a color from the global AWS palette.
   virtual int  GetColor(int index)=0;
 
+  /// Finds the closest matching color
+  virtual int FindColor(unsigned char r, unsigned char g, unsigned char b)=0;
+
   /// Gets the current default font
   virtual iFont *GetDefaultFont()=0;
 
@@ -278,6 +283,7 @@ public:
 
 SCF_VERSION (iAwsSinkManager, 0, 0, 1);
 
+/// Interface for the sink manager
 struct iAwsSinkManager : public iBase
 {
   /// Registers a sink by name for lookup.
@@ -293,6 +299,7 @@ struct iAwsSinkManager : public iBase
 
 SCF_VERSION (iAwsSink, 0, 0, 1);
 
+/// Interface for sinks
 struct iAwsSink : public iBase
 {
   /// Maps a trigger name to a trigger id
@@ -308,6 +315,7 @@ struct iAwsSink : public iBase
 
 SCF_VERSION (iAwsSource, 0, 0, 1);
 
+/// Interface for signal sources
 struct iAwsSource : public iBase
 {
   /// Gets the component owner for this (sources are embedded)
@@ -326,6 +334,7 @@ struct iAwsSource : public iBase
 
 SCF_VERSION (iAwsSlot, 0, 0, 1);
 
+/// Interface for signal slots (conduits)
 struct iAwsSlot : public iBase
 {
   /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources
@@ -346,6 +355,7 @@ struct iAwsSlot : public iBase
 
 SCF_VERSION (iAwsComponent, 0, 0, 1);
 
+/// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
 {
   /// Sets up a component.
@@ -493,6 +503,7 @@ struct iAwsComponent : public iAwsSource
 
 SCF_VERSION (iAwsWindow, 0, 0, 1);
 
+/// Interface for windows.
 struct iAwsWindow : public iAwsComponent
 {
 
@@ -551,6 +562,7 @@ struct iAwsWindow : public iAwsComponent
 
 SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
+/// Interface for component factories
 struct iAwsComponentFactory : public iBase
 {
   /// Returns a newly created component of the type this factory handles.
@@ -566,6 +578,7 @@ struct iAwsComponentFactory : public iBase
 
 SCF_VERSION (iAwsKeyFactory, 0, 0, 1);
 
+/// Interface for key factories.
 struct iAwsKeyFactory : public iBase
 {
    /// Initializes the factory , name is the name of this component, component type is it's type.
