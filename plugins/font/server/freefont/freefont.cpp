@@ -17,7 +17,6 @@
 */
 
 #include <freetype.h>
-#include <ftxsbit.h>
 
 #include "sysdef.h"
 #include "csutil/inifile.h"
@@ -50,11 +49,8 @@ bool csFreeTypeRender::Initialize (iSystem *pSystem)
   if (!succ)
     pSystem->Printf (MSG_FATAL_ERROR, "Could not create a TrueType engine instance !\n");
   else{
-    int error = TT_Init_SBit_Extension (engine);
-    if (error)
-      pSystem->Printf(MSG_WARNING, "SBit extension not initialized: error %d\n", error);
-    //    iVFS *v= pSystem->GetVFS ();
-    csIniFile *ftini = new csIniFile ( "data/config/freetype.cfg");
+    iVFS *v= pSystem->GetVFS ();
+    csIniFile *ftini = new csIniFile ( v, "config/freetype.cfg");
     defaultSize = ftini->GetInt ("Default", "size", 10);
     platformID = ftini->GetInt ("Default", "platformid", 3);
     encodingID = ftini->GetInt ("Default", "encodingid", 1);
@@ -69,7 +65,7 @@ bool csFreeTypeRender::Initialize (iSystem *pSystem)
       LoadFont ((const char*)vFonts[i], ftini->GetStr (p, (const char*)vFonts[i]));
     }
     succ = (vFonts.Length() == 0 || fonts.Length() > 0 );
-    //    v->DecRef ();
+    v->DecRef ();
     delete ftini;
   }
 
