@@ -52,7 +52,7 @@ cal3dtocs: $(OUTDIRS) $(CALTOCS.EXE)
 clean: cal3dtocsclean
 
 $(CALTOCS.EXE): $(OBJ.CALTOCS)
-	$(DO.LINK.CONSOLE.EXE) -lcal3d
+	$(DO.LINK.CONSOLE.EXE) -lcal3d -lstdc++
 
 cal3dtocsclean:
 	-$(RM) $(CALTOCS.EXE) $(OBJ.CALTOCS)

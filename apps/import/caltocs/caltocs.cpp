@@ -310,9 +310,8 @@ int ConvertModel(const char *filename) {
 
     *(param++)=0;
     for(;*param==32; param++) {} //skip whitespace
-    char *tmp=strchr(param, '\n');
-    if(tmp)
-      *tmp=0;
+    size_t s=strcspn(param, "\r\n");
+    param[s]=0;
 
     if(strcmp(cmd, "geomscale")==0) {
       scale=atof(param);
