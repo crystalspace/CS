@@ -27,9 +27,18 @@
 #define ST_NUM_FLOATS 2
 #define ST_NUM_INTS 6
 #define ST_NUM_BITS (ZONE_HEIGHT * ZONE_DIM * ZONE_DIM)
+
 #define ST_SIZE_INT sizeof(int)
 #define ST_ENCODED_LENGTH \
   ((ST_NUM_BITS / 8) + 1 + (ST_NUM_INTS * ST_SIZE_INT) + 21)
+
+// Have to include the '\0' character as well.
+#define ST_CLIENT_EXTRA (19 + ST_SIZE_INT)
+#define ST_SERVER_EXTRA (19 + ST_SIZE_INT)
+
+// moving game_cube, set_cube, get_cube into states.
+
+
 
 /**
  * Player state object.
@@ -81,7 +90,8 @@ public:
   int gone_z;
 
   /// The encoded data.
-  unsigned char encodedData[ST_ENCODED_LENGTH];
+  unsigned char* encodedData;
+  // unsigned char encodedData[ST_ENCODED_LENGTH];
 
 public:
   /// Constructor.
@@ -130,6 +140,76 @@ public:
 
   /// Print the encoded data to 'stdout'.
   bool PrintData(const char* fileName) const;
+
+
+  
+  int lenOfGameCube;
+
+  // position in encodedData that these sections finish.
+  int endOfFloats;
+  int endOfInts;
+  
+  
+ private:
+  
+  // Data for encoding decoding.
+  int tints[ST_NUM_INTS];
+  unsigned char* tbools;
+  csBitSet* tempBitSet;
+  
+  
 };
+
+
+// -----------------------------------------------------------------------
+//  This is a description of the protocol.
+// 
+// client
+// When receive: "SEND <State stateNumber>"
+// Send: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
+// 
+// Server
+// When receive: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
+// Send: "SEND <State stateNumber+1>"
+//
+// "BYE" other blocks disconnects.
+//
+
+
+class NetworkStates
+{
+
+ public:
+  
+  
+  NetworkStates ();
+  ~NetworkStates ();
+  
+  
+  // Returns false if it can't encode the data for what ever reason.
+  //  Increments the StateNumber everytime it is called.
+  //  Sets the PreviousStateNumber to the current StateNumber.
+  // EncodedData is a pointer to a state which has been encoded.
+  bool EncodeForNetwork(unsigned char * EncodedData, 
+			unsigned char * NetworkData, 
+			int sizeOfEncoded, int sizeOfNetwork);
+
+  // Returns false if it can't decode the data for what ever reason.
+  //  Sets the StateNumber to the data it recieves from the net.
+  //  Sets the PreviousStateNumber to the current StateNumber.
+  bool DecodeFromNetwork(unsigned char * NetworkData, int sizeOfBuffer, 
+			 States * aState);
+
+  // Returns the number of the state.
+  int GetStateNumber();
+
+  // Returns the state number what was around before StateNumber.
+ private:
+  int StateNumber;
+  int PreviousStateNumber;
+
+};
+
+
 
 #endif // __BLOCKS_STATES_H__

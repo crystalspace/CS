@@ -1,12 +1,31 @@
 Random notes, and todos about blocks, networking.
 
 
-* possible bug in the network code... maybe.
+Fix endianness.  "man htonl" are these function portable?
+
+
+
+Make the Shapes as they fall down be the same on both machines.  I think this
+has to do with the random number generation.
+
+Movement backwards and forwards needs to be put in a state.  I think it is
+done in another way at the moment.
+
+
+
+
+
+
+* For 320x200 make the menus bigger, it is nearly impossible to read the text.
 
 * need to look at the rotation stuff a bit more.  See what needs to go into States.
 
-
 * should change the size of the encoded data when zone_dim is less than 6.  For a 3x3 field this would mean ~ half as much data sent.
+Better than this would to send only the rows that have changed.
+
+
+* Might want to have a look at using elapsed time, instead of using the number of frames to decide when to check the network connection.
+
 
 
 
@@ -17,7 +36,39 @@ Random notes, and todos about blocks, networking.
 Get blocks working so that it can be displayed on another copy of blocks.
 
 
-Figure out how we are going to decide who is server, or client.  Some sort of negotiation would be the best.  But having people decide by themselves would be easier.
+
+Blocks can be two different things.  Either server, or client.
+
+Server blocks will wait for a client connection and display the clients data.
+
+
+
+The protocol should be something like this.
+
+
+client 
+When receive: "SEND <State stateNumber>"
+Send: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
+
+Server
+When receive: "STARTSTATE<int stateNumber><States currentState>ENDSTATE"
+Send: "SEND <State stateNumber+1>"
+
+"BYE"  other blocks quits. 
+
+
+Server: is the one that is the MASTER!!!  it controls everything.
+Client: Is subserviant to the master.  Displays the servers game on its 
+        display.
+
+
+
+
+
+
+Figure out how we are going to decide who is server, or client.  Some sort of 
+negotiation would be the best.  But having people decide by themselves would 
+be easier.
 
 
 
@@ -28,7 +79,7 @@ Needed so that when the state falls behind a bit we can catch up without the mot
 
 Possibly just the block which is falling could be queued.
 
-
+Should use csvector... see csutils/csvector.h
 
 
 

@@ -59,7 +59,7 @@
 
 #define BLOCKS_SERVER 1
 
-bool do_network = false;
+bool do_network = true;
 // Maybe move these into Blocks class.
 static iNetworkListener* Listener = NULL;
 static iNetworkConnection* Connection = NULL;
@@ -70,6 +70,7 @@ static long LastConnectTime = 0;
 // ------------------------------------------------------
 
 Blocks* Sys = NULL;
+
 csView* view = NULL;
 
 #define Gfx3D System->G3D
@@ -325,6 +326,9 @@ Blocks::Blocks ()
 
   // State changes.
   player1 = new States();
+  
+  player1_net = new NetworkStates();
+
 
   //menu
   cur_menu = 0;
@@ -346,6 +350,11 @@ Blocks::~Blocks ()
   delete keyconf_menu;
   TerminateConnection();
 }
+
+
+
+
+
 
 void Blocks::InitGame ()
 {
@@ -2290,41 +2299,86 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 
   // -----------------------------------------------------------------
   // Start network stuff.
+  
+  //printf("since_last_check:%d\n",since_last_check);
 
-  if (do_network && NUM_FRAMES_CHK_NET >= since_last_check)
+  if (do_network && NUM_FRAMES_CHK_NET <= since_last_check)
   {
+//    printf("h");
     since_last_check = 0;
 
-    player1->EncodeStates ();
-    if (!player1->DecodeStates ())
-      printf ("failed to decode\n");
+///    player1->EncodeStates ();
+    //    printf("Printing to before.txt\n");
+    //    player1->PrintData("before.txt");
+    //    printf("********decoding data*********\n");
+///    if (!player1->DecodeStates ())
+///      printf ("failed to decode\n");
+      //    printf("Printing to after.txt\n");
+      //    player1->PrintData("after.txt");
 
-    if (BLOCKS_SERVER)
+///    unsigned char * abuffer = (unsigned char *) malloc(
+///				     (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA) 
+///				     * sizeof(unsigned char));
+///        
+///    if(!player1_net->EncodeForNetwork(player1->encodedData, abuffer, 
+///				      ST_ENCODED_LENGTH, 
+///                                      (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA)))
+///      printf("Network don't work\n");
+
+///    if(!player1_net->DecodeFromNetwork(abuffer,
+///				       (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA),
+///				       player1))
+///      printf("Network don't work, decoding\n");
+///    else
+///      printf("eh!! it did work\n");
+
+
+    if (IsServer)
     {
-      if (Connection != NULL)
-        CheckConnection();
+//      printf("I am server hear me roar!!!\n");
+
       if (Connection != NULL)
       {
+        CheckConnection();
+//        Connection->Send("You suck", sizeof("You suck"));
+      }
+      else
+      {
+//	printf("oi!");
         if ((System->Time() - LastConnectTime) > 1000)
         {
           LastConnectTime = System->Time();
+	  
           Connection = Listener->Accept();
+	  // These slow down blocks too much.
+	  if (Connection != NULL)
+	    System->Printf(MSG_INITIALIZATION, "Connection accepted\n");
+	  else
+	    System->Printf(MSG_INITIALIZATION,
+			   "Awaiting connect (response %d)\n",
+			   Listener->GetLastError());
         }
+      
       }
     }
-    else
+    
+    else  // We are not a blocks server.
     {
+      
       if (Connection != NULL)
         CheckConnection();
-      if (Connection)
+      else
       {
-        if ((System->Time() - LastConnectTime) > 1000)
+        if ((Sys->Time() - LastConnectTime) > 1000)
         {
-          LastConnectTime = System->Time ();
+          LastConnectTime = Sys->Time ();
           Connect();
         }
       }
+      
     }
+    
+    
   }
   else  // aren't up to the number of frames yet.
   {
@@ -2614,6 +2668,8 @@ void Blocks::ReadConfig ()
 	  keys.GetStr ("HighScores", key, NULL));
       }
     }
+  // Network stuff.
+  IsServer = Config->GetYesNo ("Network", "Server", false);
 }
 
 void Blocks::WriteConfig ()
@@ -2665,24 +2721,41 @@ void Blocks::CheckConnection()
 {
   if (!do_network) return;
 
-  const int BUFF_SIZE = 64;
-  char buff[BUFF_SIZE];
+  if(IsServer)
+    ServerCheckConnection();
+  else
+    ClientCheckConnection();
+}
+
+void Blocks::ClientCheckConnection()
+{
+  // The buffer is the length of the encoded state plus the STARTSTATE, 
+  //  and ENDSTATE parts.
+  const int BUFF_SIZE = ST_ENCODED_LENGTH + ST_CLIENT_EXTRA;
+  unsigned char buff[BUFF_SIZE];
   const int received = Connection->Receive(buff, BUFF_SIZE);
   if (received > 0)
   {
-    if (strcmp(buff, "BYE") == 0)
+    if (strcmp((char *)buff, "BYE") == 0)
     {
-      Sys->Printf(MSG_INITIALIZATION, "Other blocks disconnected.\n");
+      Sys->Printf(MSG_INITIALIZATION, "Server disconnected.\n");
       TerminateConnection();
-    }
-    else if (strcmp(buff, "OK") == 0)
-    {
-      Sys->Printf(MSG_INITIALIZATION, "Received data: %s\n", buff);
-      Connection->Send("OK", sizeof("OK"));
     }
     else
     {
-      Sys->Printf(MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
+      //Sys->Printf(MSG_INITIALIZATION, "Server responds: %s\n", buff);
+      
+      
+      if(!player1_net->DecodeFromNetwork(buff,
+				       (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA),
+				       player1))
+      {
+        printf("CLIENT: Network don't work, decoding\n");
+      }
+      else
+      {
+        printf("CLIENT: eh!! it did work\n");
+      }
     }
   }
   else
@@ -2695,13 +2768,74 @@ void Blocks::CheckConnection()
       Connection = NULL;
     }
   }
+
+
+
+}
+
+void Blocks::ServerCheckConnection()
+{
+
+  const int BUFF_SIZE = ST_ENCODED_LENGTH + ST_SERVER_EXTRA;
+  unsigned char buff[BUFF_SIZE];
+  const int received = Connection->Receive(buff, BUFF_SIZE);
+  if (received > 0)
+  {
+    if (strcmp((char *)buff, "BYE") == 0)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Other blocks disconnected.\n");
+      TerminateConnection();
+      InitNet();
+    }
+    else if (strcmp((char *)buff, "OK") == 0)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Received data: %s\n", buff);
+      Connection->Send("OK", sizeof("OK"));
+    }
+    
+    else
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
+      Connection->Send("You", sizeof("You"));
+    }
+  }
+  else
+  {
+    const csNetworkDriverError err = Connection->GetLastError();
+    if (err != CS_NET_ERR_NO_ERROR)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Receive error %d\n", err);
+      Connection->DecRef();
+      Connection = NULL;
+    }
+    
+//    Connection->Send("You are a poo poo", sizeof("You are a poo poo"));
+
+    // Encode the state.
+    player1->EncodeStates();
+    
+    if(!player1_net->EncodeForNetwork(player1->encodedData, buff,
+				      ST_ENCODED_LENGTH, 
+                                      (ST_ENCODED_LENGTH + ST_CLIENT_EXTRA)))
+    {
+      printf("SERVER:Network don't work\n");
+    }
+    else  // send the data.
+    {
+      Connection->Send(buff, (ST_ENCODED_LENGTH +ST_CLIENT_EXTRA));
+
+    }
+    
+    
+    
+  }
 }
 
 bool Blocks::InitNet()
 {
   LastConnectTime = Sys->Time ();
-
-  if (BLOCKS_SERVER)
+  
+  if (IsServer)
   {
     const char source[] = "2222";
 
@@ -2714,6 +2848,11 @@ bool Blocks::InitNet()
         Sys->NetDrv->GetLastError ());
 
     return (Listener != NULL);
+  }
+  else  // We are the client.
+  {
+    //LastConnectTime = Sys->Time ();
+    return true;
   }
   return true;
 }
