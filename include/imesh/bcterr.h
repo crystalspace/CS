@@ -69,7 +69,7 @@ struct iBCTerrState : public iBase
   virtual void SetControlPoint (const csVector3 point, const int x,
         const int z) = 0;
   /// Set control point height
-  virtual void SetControlPointHeight (const float height, const iter) = 0;
+  virtual void SetControlPointHeight (const float height, const int iter) = 0;
   /// Set control point height
   virtual void SetControlPointHeight (const float height, const int x,
         const int z) = 0;
