@@ -351,7 +351,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
     CHKB (Config = new csIniFile ());
 
   Mouse.SetDoubleClickTime (
-    ConfigGetInt ("MouseDriver", "DoubleClockTime", 300),
+    ConfigGetInt ("MouseDriver", "DoubleClickTime", 300),
     ConfigGetInt ("MouseDriver", "DoubleClickDist", 2));
 
   // Initialize Shared Class Facility
