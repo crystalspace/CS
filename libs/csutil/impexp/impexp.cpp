@@ -1,7 +1,5 @@
-
 /*
     Crystal Space 3d format converter 
-
 
     Based on IVCON - converts various 3D graphics file
 	Author: John Burkardt - used with permission
@@ -47,11 +45,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-converter::converter() : frame_builder(NULL)
+converter::converter() : frame_builder(NULL), revnorm(FALSE)
 {
-// for now to remove warnings
-	revnorm = false;
-
 }
 
 converter::~converter()
@@ -73,58 +68,34 @@ int converter::set_animation_frame(int frame_number)
   return frame_builder->SetFrame(frame_number);
 }
 
-void converter::set_infile_name(char* /*sysinfile*/)
+void converter::set_reverse_normals (int flag)
 {
-
+  revnorm = flag;
 }
-
-void converter::set_outfile_name(char* /*outfile*/)
-{
-
-}
-
-void converter::set_reverse_normals ( int /*yesno*/ )
-{
-
-}
-
-
-
-void converter::ProcessConfig (csIniFile* config )
-{
-
-
-
-	if ( config->SectionExists ("converter"))
-		{
-		
-
-		}
-
-}
-
-
-
-
 
 
 /******************************************************************************/
 
-int converter::ivcon ( char *command ) {
+int converter::ivcon( const char* input_filename, bool keep_log,
+  bool create_output_file, const char* output_filename ) {
 
 /******************************************************************************/
 
-   int result;
+  int result;
 
-	logfile = fopen("ivcon.log","w");
+  if (keep_log)
+    logfile = fopen("ivcon.log","a");
+  else
+    logfile = stdout;
 
-   init_program_data ( );
+  init_program_data ();
    
-   result = comline ( command );
+  result = comline ( input_filename, create_output_file, output_filename );
   
-   fclose(logfile);
+  if (keep_log)
+    fclose(logfile);
 
-    return result;
+  return result;
 }
 
 
@@ -305,7 +276,8 @@ int converter::char_pad ( int *char_index, int *null_index, char *string,
 }
 /******************************************************************************/
 
-int converter::comline ( char *command) {
+int converter::comline ( const char* input_filename, bool create_output_file,
+  const char* output_filename ) {
 
 /******************************************************************************/
 
@@ -332,9 +304,14 @@ int converter::comline ( char *command) {
 
   data_init ( );
 
-  strcpy ( filein_name, command);
+  strcpy (filein_name, input_filename);
 
-  strcpy(fileout_name,"iconv.txt");
+  if (!create_output_file)
+    strcpy(fileout_name,"{none}");
+  else if (output_filename)
+    strcpy(fileout_name,output_filename);
+  else
+    strcpy(fileout_name,"iconv.txt");
 
 
 
@@ -352,7 +329,7 @@ int converter::comline ( char *command) {
 /*
   Reverse the normal vectors if requested.
 */
-  if ( revnorm == TRUE ) {
+  if ( revnorm ) {
 
     for ( icor3 = 0; icor3 < num_cor3; icor3++ ) {
       for ( i = 0; i < 3; i++ ) {
@@ -382,14 +359,15 @@ int converter::comline ( char *command) {
   Write the output. 
 */
 
+  if (create_output_file) {
+    ierror = data_write ( );
 
-  ierror = data_write ( );
-
-  if ( ierror == ERROR ) {
-    fprintf ( logfile,  "\n" );
-    fprintf ( logfile,  "COMLINE - Error!\n" );
-    fprintf ( logfile,  "  Failure while writing output data.\n" );
-    return ERROR;
+    if ( ierror == ERROR ) {
+      fprintf ( logfile,  "\n" );
+      fprintf ( logfile,  "COMLINE - Error!\n" );
+      fprintf ( logfile,  "  Failure while writing output data.\n" );
+      return ERROR;
+    }
   }
   return SUCCESS;
 }

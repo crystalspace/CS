@@ -1,6 +1,4 @@
 /*
-
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -21,14 +19,10 @@
 
   C++ Class and CS interface: Bruce Williams
 
- 
-
 */
 // converter.h: interface for the converter class.
 //
 //////////////////////////////////////////////////////////////////////
-
-
 
 #if !defined(AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_)
 #define AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_
@@ -76,10 +70,6 @@
 //#define MAX(a,b) ( (a)>(b) ? (a) : (b) ) 
 //#define MIN(a,b) ( (a)>(b) ? (b) : (a) )
 
-
-
-#include "csutil/inifile.h"
-
 /*
   COR3(3,MAX_COR3), the coordinates of nodes.
 
@@ -120,25 +110,20 @@
   VERTEX_RGB(3,MAX_ORDER,MAX_FACE), colors associated with vertices. 
 */
 
-
 // format readers subclass this in order to provide functionality
 // for changing frames
 class csConverter_FrameManipulator;
-
-
 
 class converter  
 {
 public:
 	converter();
 	virtual ~converter();
-	int      comline ( char *command );
-	int ivcon( char* filename );  // reads in filename
+	int      comline ( const char* input_filename,
+	  bool create_output_file, const char* output_filename );
+	int ivcon( const char* input_filename, bool keep_log = true,
+	  bool create_output_file = true, const char* output_filename = NULL );
 
-	void ProcessConfig ( csIniFile* config );
-
-	void set_outfile_name( char* outfile);
-	void set_infile_name(char* infile );
 	void set_reverse_normals( int yesno );
 
 	// set the current 'frame' of animation; the converter
@@ -148,8 +133,6 @@ public:
 	// There must always exist at least one frame, frame 0
 	int set_animation_frame(int framenumber);
 
-bool convert(char* infile);
-	
 public:
 
 FILE* logfile;
@@ -157,7 +140,6 @@ FILE* logfile;
 int    debug;
 char   filein_name[81];
 char   fileout_name[81];
-
 
 float  cor3[3][MAX_COR3];
 float  cor3_normal[3][MAX_COR3];
@@ -200,13 +182,13 @@ char   object_name[81];
 
 private:
 
-  int   i;
-  int   iarg;
-  int   icor3;
-  int   ierror;
-  int   iface;
-  int   ivert;
-  int   revnorm;
+int    i;
+int    iarg;
+int    icor3;
+int    ierror;
+int    iface;
+int    ivert;
+int    revnorm;
 
 int    byte_swap;
 float  origin[3];
@@ -317,4 +299,3 @@ class csConverter_FrameManipulator
 };
 
 #endif  // !defined(AFX_CONVERTER_H__1B690D4B_0CC0_11D3_8D99_444553540000__INCLUDED_)
-
