@@ -23,9 +23,9 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csgeom/vector3.h"
-#include "imesh/object.h"
 
 struct iPolygonMesh;
+struct iMeshObject;
 class csReversibleTransform;
 
 /**
