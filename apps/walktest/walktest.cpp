@@ -44,6 +44,7 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/covtree.h"
+#include "csengine/solidbsp.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
 #include "csengine/collider.h"
@@ -548,17 +549,46 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     if (do_covtree_dump)
     {
       csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
-      if (covtree)
+      csSolidBsp* solidbsp = Sys->world->GetSolidBsp ();
+      if (solidbsp)
+      {
+        Gfx2D->Clear (0);
+#	if 1
+	solidbsp->MakeEmpty ();
+	csCamera* c = view->GetCamera ();
+	csPolygon2D poly1, poly2, poly3;
+	poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
+	solidbsp->InsertPolygon (poly1.GetVertices (),
+		poly1.GetNumVertices ());
+	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
+	//printf ("T2:%d ", solidbsp->TestPolygon (poly2.GetVertices (),
+		//poly2.GetNumVertices ()));
+	printf ("P2:%d ", solidbsp->InsertPolygon (poly2.GetVertices (),
+		poly2.GetNumVertices ()));
+	poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
+	poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+	poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+	//printf ("T3:%d ", solidbsp->TestPolygon (poly3.GetVertices (),
+		//poly3.GetNumVertices ()));
+	printf ("P3:%d\n", solidbsp->InsertPolygon (poly3.GetVertices (),
+		poly3.GetNumVertices ()));
+	poly1.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (0, 100, 100));
+	poly2.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 0, 100));
+	poly3.Draw (Gfx2D, Gfx3D->GetTextureManager ()->FindRGB (100, 100, 0));
+	solidbsp->GfxDump (Gfx2D, Gfx3D->GetTextureManager (), covtree_level);
+#	endif
+      }
+      else if (covtree)
       {
         Gfx2D->Clear (0);
 #	if 0
-	extern csPolygon2D debug_poly2d;
 	covtree->GfxDump (Gfx2D, covtree_level);
-	debug_poly2d.Draw (Gfx2D, 0xf800);
-	int i;
-	printf ("-----\n");
-	for (i = 0 ; i < debug_poly2d.GetNumVertices () ; i++)
-	  printf ("%d %f,%f\n", i, debug_poly2d[i].x, debug_poly2d[i].y);
 #	else
 	//covtree->MakeInvalid ();
 	covtree->MakeEmpty ();

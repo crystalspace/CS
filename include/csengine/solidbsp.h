@@ -22,10 +22,13 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/polyedge.h"
+#include "csgeom/poly2d.h"
 
 class csPoly2DEdges;
 class csSolidBsp;
 class csSolidBspNodePool;
+struct iGraphics2D;
+struct iTextureManager;
 
 /**
  * A solid BSP node.
@@ -127,6 +130,10 @@ private:
   /// Test a polygon in the node.
   bool TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly);
 
+  /// Graphical dump.
+  void GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
+  	csPoly2D& poly);
+
 public:
   /**
    * Create an empty tree.
@@ -160,6 +167,11 @@ public:
    * Return true if polygon is visible.
    */
   bool TestPolygon (csVector2* verts, int num_verts);
+
+  /**
+   * Do a graphical dump of the solid BSP tree.
+   */
+  void GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr, int depth);
 };
 
 #endif /*SOLIDBSP_H*/

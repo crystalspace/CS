@@ -21,6 +21,7 @@
 #include "sysdef.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
+#include "csgeom/poly2d.h"
 
 //---------------------------------------------------------------------------
 
@@ -199,20 +200,39 @@ bool csIntersect2::Plane(const csVector2& u, const csVector2& v,
 
 csPlane2::csPlane2 (const csVector2& v1, const csVector2& v2)
 {
-  if (ABS (v1.x-v2.x) > ABS (v1.y-v2.y))
+  norm.x = -(v2.y-v1.y);
+  norm.y = v2.x-v1.x;
+  CC = - (v2 * norm);
+  Invert ();
+}
+
+bool csPlane2::IntersectPolygon (csPoly2D* poly, csVector2& v1, csVector2& v2)
+{
+  int i, i1;
+  float c, c1;
+  csVector2 isect;
+  float dist;
+  i1 = poly->GetNumVertices ()-1;
+  c1 = Classify ((*poly)[i1]);
+  bool found_v1 = false;
+  bool found_v2 = false;
+  for (i = 0 ; i < poly->GetNumVertices () ; i++)
   {
-    float fact = (v2.y-v1.y) / (v2.x-v1.x);
-    norm.x = fact;
-    norm.y = -1;
-    CC = v1.y - v1.x * fact;
+    c = Classify ((*poly)[i]);
+    if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))
+    {
+      csIntersect2::Plane ((*poly)[i1], (*poly)[i],
+      	  *this, isect, dist);
+      if (!found_v1) { v1 = isect; found_v1 = true; }
+      else { v2 = isect; found_v2 = true; break; }
+    }
+
+    i1 = i;
+    c1 = c;
   }
-  else
-  {
-    float fact = (v2.x-v1.x) / (v2.y-v1.y);
-    norm.x = -1;
-    norm.y = fact;
-    CC = v1.x - v1.y * fact;
-  }
+  if (!found_v1) return false;
+  if (!found_v2) v2 = v1;
+  return true;
 }
 
 //---------------------------------------------------------------------------

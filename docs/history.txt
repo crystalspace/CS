@@ -19,6 +19,17 @@ Short-term cleanups that need to be done:
 	  itself with the plugin and supply data needed by the plugin,
 	  without the plugin having to maintain the list itself and provide
 	  it's own interfaces for maintaining the lists.
+	- Added csPlane2::IntersectPolygon() to calculate the segment
+	  that corresponds with the intersection of the plane and the
+	  polygon.
+	- Added csSolidBsp::GfxDump() to debug the solid bsp.
+	- More debugging on the solid BSP. It is starting to work much
+	  better now but still not finished. Also added a graphical
+	  debugger to help debugging it.
+	- Andrew Zabolotny did further improvement of texture mapping
+	  dialog. Actually it's almost done, it just does not update the
+	  proper mapping parameters of the polys when user presses Ok
+	  button :-)
 13-Mar-2000
 	- Further implemented csSolidBsp.
 	- Added the new csSolidBsp as a new 2D culler next to the quadtree,

@@ -19,6 +19,8 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csengine/solidbsp.h"
+#include "igraph2d.h"
+#include "itxtmgr.h"
 
 //---------------------------------------------------------------------------
 
@@ -292,6 +294,72 @@ bool csSolidBsp::TestPolygon (csVector2* verts, int num_verts)
   return rc;
 }
 
+int white, red, blue, green, yellow, black;
+
+void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
+	csPoly2D& poly)
+{
+  if (!node) return;
+  if (!node->left) return;
+  if (depth <= 0) return;
+
+  int width = ig2d->GetWidth ();
+  int height = ig2d->GetHeight ();
+
+  csPlane2& sp = node->splitter;
+  const csVector2& spc = node->split_center;
+  csVector2 v1, v2;
+
+  if (sp.IntersectPolygon (&poly, v1, v2))
+  {
+    ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y, depth == 1 ? yellow : white);
+
+    ig2d->DrawPixel (spc.x, height-spc.y, blue);
+    ig2d->DrawPixel (spc.x-1, height-spc.y-1, blue);
+    ig2d->DrawPixel (spc.x-2, height-spc.y-2, blue);
+    ig2d->DrawPixel (spc.x+1, height-spc.y-1, blue);
+    ig2d->DrawPixel (spc.x+2, height-spc.y-2, blue);
+    ig2d->DrawPixel (spc.x-1, height-spc.y+1, blue);
+    ig2d->DrawPixel (spc.x-2, height-spc.y+2, blue);
+    ig2d->DrawPixel (spc.x+1, height-spc.y+1, blue);
+    ig2d->DrawPixel (spc.x+2, height-spc.y+2, blue);
+printf ("==============\n");
+printf ("(%f,%f)-(%f,%f) - ", v1.x, v1.y, v2.x, v2.y);
+printf ("(%f,%f,%f)\n", sp.A (), sp.B (), sp.C ());
+  }
+
+  csPoly2D poly_left, poly_right;
+  poly.Intersect (sp, &poly_left, &poly_right);
+int i;
+for (i = 0 ; i < poly.GetNumVertices () ; i++)
+printf ("  poly%d  (%f,%f)\n", i, poly[i].x, poly[i].y);
+for (i = 0 ; i < poly_left.GetNumVertices () ; i++)
+printf ("  left%d  (%f,%f)\n", i, poly_left[i].x, poly_left[i].y);
+for (i = 0 ; i < poly_right.GetNumVertices () ; i++)
+printf ("  right%d  (%f,%f)\n", i, poly_right[i].x, poly_right[i].y);
+
+  GfxDump (node->left, ig2d, depth-1, poly_left);
+  GfxDump (node->right, ig2d, depth-1, poly_right);
+}
+
+void csSolidBsp::GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr, int depth)
+{
+  if (root && root->solid) return;
+  white = itxtmgr->FindRGB (255, 255, 255);
+  red = itxtmgr->FindRGB (255, 0, 0);
+  green = itxtmgr->FindRGB (0, 255, 0);
+  blue = itxtmgr->FindRGB (0, 0, 255);
+  yellow = itxtmgr->FindRGB (255, 255, 0);
+  black = itxtmgr->FindRGB (0, 0, 0);
+  int width = ig2d->GetWidth ();
+  int height = ig2d->GetHeight ();
+  csPoly2D poly;
+  poly.AddVertex (0, height);
+  poly.AddVertex (width, height);
+  poly.AddVertex (width, 0);
+  poly.AddVertex (0, 0);
+  GfxDump (root, ig2d, depth, poly);
+}
 
 //---------------------------------------------------------------------------
 

@@ -1216,13 +1216,13 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     extern int covtree_level;
     covtree_level++;
-    if (covtree_level > 5) covtree_level = 1;
+    if (covtree_level > 10) covtree_level = 1;
     printf ("covtree_level=%d\n", covtree_level);
     //Sys->Printf (MSG_CONSOLE, "No debug1 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-#   if 1
+#   if 0
     if (Sys->world->IsPVS ())
     {
       Sys->world->DisablePVS ();
@@ -1236,7 +1236,7 @@ static bool CommandHandler (char *cmd, char *arg)
 #   else
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
-#endif
+#   endif
     //Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "strafe_left"))

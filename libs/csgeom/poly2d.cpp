@@ -120,11 +120,12 @@ void csPoly2D::Intersect (const csPlane2& plane,
   csVector2 isect;
   float dist;
 
-  // If 0 then don't know, else if 1 then prefer right,
-  // else prefer left. This is used for trying to put edges
+  // If NULL then don't know, else points to the preferred
+  // polygon to add the edges too.
+  // This is used for trying to put edges
   // that coincide with the splitter plane on the prefered
   // side (i.e. a side that contains other edges).
-  int preferred_dir = 0;
+  csPoly2D* preferred_edge = NULL;
 
   // If skip is > 0 then we skipped the 'skip' edges because
   // we didn't have enough information for putting them
@@ -136,8 +137,8 @@ void csPoly2D::Intersect (const csPlane2& plane,
 
   i1 = num_vertices-1;
   c1 = plane.Classify (vertices[i1]);
-  if (c1 <= -EPSILON) preferred_dir = -1;
-  else if (c1 >= EPSILON) preferred_dir = 1;
+  if (c1 <= -EPSILON) preferred_edge = left;
+  else if (c1 >= EPSILON) preferred_edge = right;
 
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -145,32 +146,30 @@ void csPoly2D::Intersect (const csPlane2& plane,
     if (c > -EPSILON && c < EPSILON)
     {
       // This vertex is on the edge. Add it to the
-      // left or right polygon depending on preferred_dir.
-      if (preferred_dir == 0)
+      // left or right polygon depending on preferred_edge.
+      if (preferred_edge == NULL)
       {
         // The previous vertex was also on the edge and we
 	// don't have enough information about the preferred
 	// side to use. Skip this edge for later.
 	skip++;
       }
-      else if (preferred_dir == -1)
-	left->AddVertex (vertices[i]);
       else
-	right->AddVertex (vertices[i]);
+	preferred_edge->AddVertex (vertices[i]);
     }
     else if (c <= -EPSILON && c1 < EPSILON)
     {
       // This vertex is on the left and the previous
       // vertex is not right (i.e. on the left or on the edge).
       left->AddVertex (vertices[i]);
-      preferred_dir = -1;
+      preferred_edge = left;
     }
     else if (c >= EPSILON && c1 > -EPSILON)
     {
       // This vertex is on the right and the previous
       // vertex is not left.
       right->AddVertex (vertices[i]);
-      preferred_dir = 1;
+      preferred_edge = right;
     }
     else
     {
@@ -182,12 +181,12 @@ void csPoly2D::Intersect (const csPlane2& plane,
       if (c <= 0)
       {
 	left->AddVertex (vertices[i]);
-	preferred_dir = -1;
+	preferred_edge = left;
       }
       else
       {
 	right->AddVertex (vertices[i]);
-	preferred_dir = 1;
+	preferred_edge = right;
       }
     }
 
@@ -195,16 +194,15 @@ void csPoly2D::Intersect (const csPlane2& plane,
     c1 = c;
   }
 
+  if (!preferred_edge) return; //@@@ INVESTIGATE THIS CASE!!!
+
   // If skip > 0 then there are a number of edges in
   // the beginning that we ignored. These edges are all coplanar
   // with 'plane'. We will add them to the preferred side.
   i = 0;
   while (skip > 0)
   {
-    if (preferred_dir == -1)
-      left->AddVertex (vertices[i]);
-    else
-      right->AddVertex (vertices[i]);
+    preferred_edge->AddVertex (vertices[i]);
     i++;
     skip--;
   }

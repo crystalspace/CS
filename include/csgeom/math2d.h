@@ -27,6 +27,7 @@
 #include "types.h"	// for bool
 
 class csBox;
+class csPoly2D;
 
 /**
  * A 2D vector.
@@ -179,6 +180,14 @@ public:
     float f = norm.Norm ();
     if (f) { norm /= f;  CC /= f; }
   }
+
+  /**
+   * Intersect this plane with a 2D polygon and return 
+   * the line segment corresponding with this intersection.
+   * Returns true if there is an intersection. If false
+   * then 'v1' and 'v2' will not be valid.
+   */
+  bool IntersectPolygon (csPoly2D* poly, csVector2& v1, csVector2& v2);
 };
 
 /** 
