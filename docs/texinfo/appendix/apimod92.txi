@@ -6,6 +6,13 @@
 This section documents the major changes between versions 0.90 and 0.92 of of
 Crystal Space.
 
+@subheading csInitializer changes
+@cindex @code{csInitializer}
+
+@code{csInitializer::CreateEnvironment()} now accepts two additional
+parameters: @code{argc} and @code{argv}.
+Consequently @code{csInitializer::SetupKeyboardHandler()} has been removed.
+
 @subheading Texture Manager Changes
 @cindex @code{iTextureManager::UnregisterTexture()}
 @cindex @code{iTextureManager::UnregisterMaterial()}
