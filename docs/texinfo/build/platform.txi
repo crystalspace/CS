@@ -2,11 +2,11 @@
 @node Platform Instructions, Problems, External Libraries, Building
 @section Platform Specific Instructions
 
-When working with Crystal Space, always keep in mind, that this is a
-multiplatform project. So sometimes not all features will work correct
+When working with Crystal Space, always keep in mind that this is a
+multiplatform project. So sometimes not all features will work correctly
 on all platforms. Sometimes a specific port may even be broken due to
-changes in other ports. Since the introduction of CVS this is usually
-only for a short time, so if you got your version out of CVS, it usually
+changes in other ports. Since the introduction of CVS, this is usually
+only for a short time so if you got your version out of CVS, it usually
 pays off to post a message describing the problems to the Crystal
 Space Mailing List describing you problem and include the exact error
 messages. If you wait a while, this will probably be fixed, or at least be

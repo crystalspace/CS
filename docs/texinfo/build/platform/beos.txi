@@ -26,7 +26,7 @@ instructions.  A list of @BeOS{}-specific bugs and future plans is also
 presented.  @xref{BeOS Notes}.
 
 It is assumed that you will have obtained a full set of sources at this stage.
-Full sources includes the Crystal Space sources as well as those for the
+Full sources include the Crystal Space sources as well as those for the
 supporting library, @samp{libjpeg}.  After downloading and unpacking the
 @sc{jpeg} library into @file{CS/libs/libjpeg}, you can build it by following
 these simple instructions:
@@ -84,7 +84,7 @@ make csfont
 @end example
 
 The convenience makefile target @samp{walkall} builds the WalkTest application
-and the plug-in modules which it mostly often requires.  So, for instance,
+and the plug-in modules which it most often requires.  So, for instance,
 to build only WalkTest and the plug-in modules it requires, along with
 the 2D graphics driver utilized by the software renderer, you could invoke
 this comand:
@@ -187,7 +187,7 @@ Walktest.Settings.WorldFile=flarge
 @end example
 
 The rest of the settings are mostly self evident and can often be overridden
-at the command line.
+on the command line.
 
 You may have to adjust the @samp{Engine.Lighting.Ambient.White} level in
 @file{engine.cfg} if the maps appear too dark.  After adjusting the ambient

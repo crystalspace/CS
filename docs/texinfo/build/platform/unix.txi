@@ -3,7 +3,7 @@
 @subsection Unix
 @cindex Unix
 
-This section covers all Unix and Unix-like platforms which run X-windows.
+This section covers all the Unix and Unix-like platforms which run X-windows.
 Some platforms which use the SVGA library for display on the console
 (sans X-windows) may also be covered.
 
@@ -30,7 +30,7 @@ safely leave it enabled.
 @subsubsection Editing the Makefile
 
 The file @file{user.mak} (which you can find in @file{CS/mk}) is normally
-the only makefile that you should worry about. Edit it and see if all
+the only makefile that you should worry about. View it and see if all the 
 options are suitable for you.
 
 Some important options in @file{user.mak} are:
@@ -38,11 +38,24 @@ Some important options in @file{user.mak} are:
 @table @code
 @item DO_ASM=... (possible values: 'yes' or 'no')
 With this option you can disable all assembler optimizations
-present in CS. Note that there is currently only assembler currently
-for Intel so this option has no effect otherwise.
+present in CS. Note that there is currently only assembly for the Intel 
+x86 processor(s) so this option has no effect otherwise.
 The default for this option is @samp{yes} if you are compiling for
 optimization (see above option). Otherwise it is @samp{no} (because
 debugging interferes with the assembler).
+
+@item USE_PLUGINS=... (possible values: 'yes' or 'no')
+This option allows you to select whether or not to build drivers and 
+plugins as loadable modules. The default is @samp{yes}.
+
+@item USE_SHARED_LIBS=... (possible values: 'yes' or 'no')
+This option is currently only supported on Unix, and determines 
+whether libraries are built as shared or dynamic. The default 
+is @samp{no}.
+
+@item MODE=... (possible values: 'optimize' or 'debug')
+Selects whether Crystal Space is built with debugging information 
+or not. The default is @samp{optimize}.
 @end table
 
 @node Unix Compiling, Unix Other2d3d, Unix Editing the Makefile, Unix

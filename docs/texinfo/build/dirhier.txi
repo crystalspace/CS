@@ -141,7 +141,7 @@ Win32
 
 @item CS/libs/csutil
 This library contains various utilities.  There is an Archive class which can
-read/write @sc{zip} archives.  There is a vector class, a sparse matrix class
+read and/or write @sc{zip} archives.  There is a vector class, a sparse matrix class
 and some other useful goodies.  This library requires the use of the external
 @file{zlib} library which is used to read/write @sc{zip} archives.
 
@@ -193,7 +193,7 @@ Win32 using Direct Draw
 Win32 using Direct Draw (DirectX 6.1)
 @item CS/plugins/video/canvas/dosraw
 @sc{dos}
-@item C~S/plugins/video/canvas/ggi
+@item CS/plugins/video/canvas/ggi
 Unix, using @sc{ggi}
 @item CS/plugins/video/canvas/softx
 Unix, using X
@@ -219,11 +219,12 @@ OpenGL 2D driver for Unix/X Windows
 
 @item CS/plugins/video/renderer
 The 3D rasterizer component is required by the 3D engine but may also be
-useful standalone.  It needs a 2D Driver.  There are currently several classes
-of this component which correspond to particular @sc{api}s: software, OpenGL,
-and Direct3D.  Some rasterizers are operating system independent, such
-as OpenGL and software.  Some rasterizer techonolgy is only available on
-certain operating systems, such as DirectX.
+used in a standalone environment.  It requires a 2D Driver to function.  
+There are currently several classes of this component which correspond 
+to particular @sc{api}s: software, OpenGL, and Direct3D.  Some rasterizers 
+are operating system independent, such as OpenGL and software.  Some 
+rasterizer technology is only available on certain operating systems, 
+such as DirectX.
 
 @table @code
 @item CS/plugins/video/renderer/common
@@ -239,7 +240,7 @@ A vector based rasterizer (draws only lines)
 @item CS/plugins/video/renderer/inf
 The @emph{infinite} rasterizer (draws nothing at all)
 @item CS/plugins/video/renderer/null
-The @emph{null} rasterizer (needed to work with 2D graphics alone)
+The @emph{null} rasterizer (required to work with 2D graphics only)
 @end table
 
 @item CS/plugins/video/format
@@ -254,7 +255,7 @@ Network drivers.  The only existing driver is a @sc{bsd} socket-based
 
 @item CS/plugins/sequence
 This is the sequence manager which is useful for managing timed sequences
-of events (useful for demos for example).
+of events such as for demos.
 
 @item CS/plugins/bugplug
 @sc{BugPlug} is a small plugin that gives debugging facilities to any
@@ -267,13 +268,12 @@ directory.
 
 @item CS/plugins/engine/3d
 If you want to use the engine as a plugin then this directory contains
-the needed support for that. In the future using the engine as a plugin
-will be the prefered way.
+the needed support. Using the engine as a plugin is the perferred method. 
 
 @item CS/plugins/engine/iso
 This is an alternative engine used in Crystal Space. It gives an isometric view
 instead of a real 3D view. Mesh objects can also work with this engine
-(with a few limitations, mostly regarding size).
+with a few limitations (mostly regarding size).
 
 @table @code
 @item CS/plugins/sound/driver
@@ -282,11 +282,11 @@ System dependent sound drivers.  There are currently drivers for MacOS/9,
 
 @table @code
 @item CS/plugins/sound/driver/macsnd
-Sounddriver for MacOS/9
+Sound driver for MacOS/9
 @item CS/plugins/sound/driver/oss
-Sounddriver for Unix
+Sound driver for Unix
 @item CS/plugins/sound/driver/waveoutsd
-Sounddriver for Win32
+Sound driver for Win32
 @end table
 
 @item CS/plugins/sound/loader
