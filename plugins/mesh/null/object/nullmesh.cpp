@@ -40,7 +40,7 @@ SCF_IMPLEMENT_IBASE (csNullmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iNullMeshState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iNullFactoryState)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::MeshObjectFactory)
@@ -51,22 +51,32 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::NullMeshState)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csNullmeshMeshObject::NullFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iNullMeshState)
+  SCF_IMPLEMENTS_INTERFACE (iNullFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
-csNullmeshMeshObject::csNullmeshMeshObject (iMeshObjectFactory* factory)
+csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshObject* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNullMeshState);
-  csNullmeshMeshObject::factory = factory;
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNullFactoryState);
+  if (factory)
+  {
+    csNullmeshMeshObject::factory = &(factory->scfiMeshObjectFactory);
+    radius = factory->radius;
+    box = factory->box;
+  }
+  else
+  {
+    csNullmeshMeshObject::factory = 0;
+    radius = 0.0001f;
+    box.Set (-radius, -radius, -radius, radius, radius, radius);
+  }
   logparent = 0;
   vis_cb = 0;
-  radius = 0.0001f;
-  box.Set (-radius, -radius, -radius, radius, radius, radius);
 }
 
 csNullmeshMeshObject::~csNullmeshMeshObject ()
@@ -75,7 +85,7 @@ csNullmeshMeshObject::~csNullmeshMeshObject ()
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNullMeshState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNullFactoryState);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -152,8 +162,7 @@ void csNullmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 
 csPtr<iMeshObject> csNullmeshMeshObject::MeshObjectFactory::NewInstance ()
 {
-  csNullmeshMeshObject* cm = new csNullmeshMeshObject (
-  	(iMeshObjectFactory*)this);
+  csNullmeshMeshObject* cm = new csNullmeshMeshObject (scfParent);
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
   cm->DecRef ();
   return csPtr<iMeshObject> (im);

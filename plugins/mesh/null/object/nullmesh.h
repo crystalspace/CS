@@ -50,7 +50,7 @@ private:
 
 public:
   /// Constructor.
-  csNullmeshMeshObject (iMeshObjectFactory* factory);
+  csNullmeshMeshObject (csNullmeshMeshObject* factory);
 
   /// Destructor.
   virtual ~csNullmeshMeshObject ();
@@ -131,7 +131,8 @@ public:
   virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   //------------------------- iGeneralMeshState implementation ----------------
-  class NullMeshState : public iNullMeshState
+  //---------------------- iGeneralMeshFactoryState implementation ------------
+  class NullFactoryState : public iNullFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
     virtual void SetRadius (float radius)
@@ -150,8 +151,8 @@ public:
     {
       scfParent->GetBoundingBox (box);
     }
-  } scfiNullMeshState;
-  friend class NullMeshState;
+  } scfiNullFactoryState;
+  friend class NullFactoryState;
 
   //---------------- iMeshObjectFactory interface implementation --------------
   struct MeshObjectFactory : public iMeshObjectFactory

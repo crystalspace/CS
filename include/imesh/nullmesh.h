@@ -54,24 +54,8 @@ SCF_VERSION (iNullFactoryState, 0, 0, 1);
 /**
  * This interface describes the API for the null mesh object factory.
  */
-struct iNullFactoryState : public iBase
+struct iNullFactoryState : public iNullMeshState
 {
-  /**
-   * Set the radius of the sphere represented by this object.
-   * If you call this function then the box will be calculated from the
-   * radius.
-   */
-  virtual void SetRadius (float radius) = 0;
-  /// Get the radius of the sphere represented by this object.
-  virtual float GetRadius () const = 0;
-  /**
-   * Set the bounding box represented by this object.
-   * If you call this function then the radius will be calculated based
-   * on this box.
-   */
-  virtual void SetBoundingBox (const csBox3& box) = 0;
-  /// Get the bounding box represented by this object.
-  virtual void GetBoundingBox (csBox3& box) = 0;
 };
 
 #endif // __CS_IMESH_NULLMESH_H__

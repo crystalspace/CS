@@ -24,6 +24,12 @@ chronological order.
 	- Eric Sunshine added a 'repairdoc' target to texinfo/Jamfile which
 	  invokes CS/docs/support/nodefix.pl to repair broken Texinfo @node and
 	  @menu directives.
+	- Jorrit fixed a bug in the nullmesh factories. They didn't
+	  implement iNullFactoryState.
+	- Jorrit made iNullFactoryState a subclass of iNullMeshState since
+	  they were exactly the same.
+	- Jorrit fixed the null mesh NewInstance() so that the parameters
+	  of the factory are copied to the null mesh.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
