@@ -613,11 +613,11 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
     return NULL;
   }
 
-  csRef<iDocumentNode> paramsnode = node->GetNode ("params");
-  if (paramsnode)
+  csRef<iDocumentNode> argsnode = node->GetNode ("args");
+  if (argsnode)
   {
     iEngineSequenceParameters* params = sequence->CreateBaseParameterBlock ();
-    csRef<iDocumentNodeIterator> it = paramsnode->GetNodes ();
+    csRef<iDocumentNodeIterator> it = argsnode->GetNodes ();
     while (it->HasNext ())
     {
       csRef<iDocumentNode> child = it->Next ();
@@ -626,7 +626,7 @@ iSequenceWrapper* csLoader::CreateSequence (iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
-        case XMLTOKEN_PAR:
+        case XMLTOKEN_ARG:
 	  {
 	    const char* parname = child->GetAttributeValue ("name");
 	    params->AddParameter (parname, NULL);
@@ -665,7 +665,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_PARAMS:
+      case XMLTOKEN_ARGS:
 	// Already handled in CreateSequence().
 	break;
       case XMLTOKEN_RUN:

@@ -22,10 +22,13 @@ The history order is reversed so that new features are at the top.
 	        More importantly the fade, move, and rotate type of operations
 	        (the ones that cause a timed operation will not work properly).
 	- Eric Sunshine eliminated comilation warnings.
-	- Changed the way that timed operations are created in the engine
-	  sequence manager.  They are now much more optimal (only query for the
-	  object on which they operate once instead of every frame) and they
-	  also work properly with parameters now.
+	- Changed the way that timed operations are created in the
+	  engine sequence manager. They are now much more optimal (only
+	  query for the object on which they operate once instead of
+	  every frame) and they also work properly with parameters now.
+	- Changes <params> to <args> and <par> to <arg> for engine
+	  sequence manager parsing.
+	- Improved Doxygen documentation of engine sequence manager.
 	- Eric Sunshine upgraded the build process so that the Apple/NeXT ports
 	  now create application wrappers for generated GUI programs.  The new
 	  script CS/libs/cssys/next/appwrap.sh knows how to wrap applications

@@ -696,7 +696,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("node", XMLTOKEN_NODE);
   xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
-  xmltokens.Register ("par", XMLTOKEN_PAR);
   xmltokens.Register ("params", XMLTOKEN_PARAMS);
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
@@ -796,6 +795,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
   xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
   xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
+  xmltokens.Register ("arg", XMLTOKEN_ARG);
+  xmltokens.Register ("args", XMLTOKEN_ARGS);
   return true;
 }
 

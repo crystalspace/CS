@@ -44,13 +44,24 @@ SCF_VERSION (iParameterESM, 0, 0, 1);
  * This interface is a parameter resolver. The operations
  * in the engine sequence manager use instances of this class
  * to get the required object (mesh, light, material, ...).
+ * The engine sequence manager itself currently provides two ready-made
+ * implementations of this resolver:
+ * <ul>
+ * <li>iEngineSequenceParameters->CreateParameterESM() which will create
+ *     a resolver that gets the requested parameter from the given
+ *     iEngineSequenceParameters instance. This is useful for sequences
+ *     where you don't know in advance on what objects you will use it.
+ * <li>iEngineSequenceManager->CreateParameterESM() which will give
+ *     a resolver that returns a constant value. This is useful for
+ *     operations where the object to operate on is known in advance.
+ * </ul>
  */
 struct iParameterESM : public iBase
 {
   /**
    * Get the value based on userdata which is given to the
    * operations. If IsConstant() returns true then the params
-   * parameter may not be used!
+   * parameter will not be used!
    */
   virtual iBase* GetValue (iBase* params = NULL) const = 0;
 
@@ -59,7 +70,7 @@ struct iParameterESM : public iBase
    * upon request. In that case operations can store that value so
    * then don't have to ask for it every time. If this function returns
    * false then the operation MUST call GetValue() every time it
-   * wants to do something.
+   * wants to do something with the object.
    */
   virtual bool IsConstant () const = 0;
 };
@@ -68,7 +79,15 @@ SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
 
 /**
  * An interface for passing on parameters to the engine sequence
- * manager. Some of the operations expect this.
+ * manager. You can create a ready-made instance of this interface
+ * by calling iSequenceWrapper->CreateBaseParameterBlock(). This will
+ * create an empty parameter block that specifies the supported parameters
+ * (and optional default values) that are relevant for that sequence.
+ * When running a sequence later you can call
+ * iSequenceWrapper->CreateParameterBlock() to make a clone of the
+ * base parameter block and then fill in the values.<br>
+ * To use a value from this parameter block you can call CreateParameterESM()
+ * which will return a parameter that you can give to an operation.
  */
 struct iEngineSequenceParameters : public iBase
 {
@@ -98,7 +117,9 @@ struct iEngineSequenceParameters : public iBase
   virtual const char* GetParameterName (int idx) const = 0;
 
   /**
-   * Add a parameter.
+   * Add a parameter. Warning! ONLY call this for setting up the
+   * base parameter block. Don't use this to set the values for
+   * parameters later on blocks created with CreateParameterBlock()!
    */
   virtual void AddParameter (const char* name, iBase* def_value = NULL) = 0;
 
@@ -115,7 +136,8 @@ struct iEngineSequenceParameters : public iBase
   /**
    * Create a parameter ESM which keeps a reference to this parameter
    * block and knows how to resolve the specified parameter. Returns
-   * NULL if the parameter 'name' is not known in this block.
+   * NULL if the parameter 'name' is not known in this block. You can use
+   * the return of this function to give as an argument for operations.
    */
   virtual csPtr<iParameterESM> CreateParameterESM (const char* name) = 0;
 };
@@ -125,6 +147,13 @@ SCF_VERSION (iSequenceWrapper, 0, 2, 0);
 /**
  * A sequence wrapper. This objects holds the reference
  * to the original sequence and also implements iObject.
+ * Basically a sequence corresponds to a series of operations
+ * that are time based and can be scheduled on the sequence manager.
+ * This class enhances iSequence with support for custom operations
+ * and parameter blocks.
+ * <p>
+ * Note that many parameters given to the AddOperation functions
+ * are of type iParameterESM.
  */
 struct iSequenceWrapper : public iBase
 {
