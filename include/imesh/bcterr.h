@@ -58,13 +58,8 @@ struct iBCTerrState : public iBase
   virtual void SetBlockMaterialNum (int num, iMaterialWrapper* mat) = 0;
   /// CameraHeightTest should return a point that a camera can use
   virtual int CameraHeightTest (csVector3 *point) = 0;
-  /// Test a Bounding Box's path against the terrain
-  virtual void CollideBBox (const csBox3 bbox, const csVector3 start,
-      csVector3 &end) = 0;
-  /// Test a ray against the mesh
-  virtual void CollideRay (const csVector3 start, csVector3 &end) = 0;
   /// Set control point by array position
-  virtual void SetControlPoint (const csVector3 point, int iter) = 0;
+  virtual void SetControlPoint (const csVector3 point, const int iter) = 0;
   /// Set control point by x / z position
   virtual void SetControlPoint (const csVector3 point, const int x,
         const int z) = 0;
