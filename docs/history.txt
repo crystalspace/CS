@@ -17,6 +17,13 @@ The history order has been reversed so that new features are at the top.
 	  if relevant to map world space to object space.
 	- Eric Sunshine repaired the csgamtst.mak makefile.  Apparently it
 	  was just a verbatim copy of the pysimple makefile.
+	- Eric Sunshine eliminated a compilation warning in gamecore.h about
+	  destructor not declared virtual.
+	- Eric Sunshine fixed the gamecore makefile so that the plugin no
+	  longer links with csEngine or any of its supporting libraries.
+	- Eric Sunshine eliminated several compilation warnings in gattrib.h.
+	  There is still one additional warning from use of
+	  DECLARE_SCF_STRINGMAP(), but I have not yet looked closely at it.
 5-Mar-2001
 	- Thomas Hieber did the following to the gamecore plugin:
 	    - Added to scf.cfg.
