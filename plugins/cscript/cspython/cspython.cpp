@@ -82,7 +82,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   InitPytocs();
 
   char path[256];
-  csGetInstallPath (path, 255);
+  csGetConfigPath (path, 255);
   if (path[0] == 0) strcpy (path, "./");
 
   if (!LoadModule ("sys")) return false;
