@@ -767,8 +767,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   // Compute the light coverage for every cell of the lightmap
   GetCoverageMatrix (lview, lc);
 
-  unsigned char *ShadowMap;
-  csRGBpixel *LightMap;
+  unsigned char *ShadowMap = 0;
+  csRGBpixel *LightMap = 0;
   csShadowMap *smap = NULL;
 
   int ww, hh;
