@@ -45,5 +45,54 @@ Append the output to a file containing skin definitions.
 @item QListView @tab ==> @tab List Box
 @item QDialog @tab ==> @tab Window
 @item QWidget @tab ==> @tab Window
+@item QTabWidget @tab ==> @tab Notebook
 @end multitable
 
+@subsubheading Special Notes
+
+You can place special information in the controls @strong{whatsThis} property. The content will be broken into tokens
+separated by the pipe (@sc{"|"}). A token consist of a token identifier, the colon @sc{:} and token text.
+The following tokens are recognized:
+
+@itemize
+@item connect token
+@itemize
+@item token identifier: c
+@item token text: a list of comma separated items
+@item example:
+@example
+c:signalClicked,mySink::OnClick,signalBreak,mySink::ByeBye
+@end example
+
+This will be translated into
+
+@example
+connect 
+{
+  signalClicked -> mySink::OnClick  
+  signalBreak -> mySink::ByeBye
+}
+@end example
+@end itemize
+
+@item literal token
+@itemize
+@item token identifier: l
+@item token text: some text
+@item example:
+@example
+l:LeftEye: "Blue"
+@end example
+
+This will be translated into
+
+@example
+LeftEye: "Blue"
+@end example
+@end itemize
+@end itemize
+
+Both examples from above would be concatenated and placed in the @strong{whatsThis} property and would look like this:
+@example
+c:signalClicked,mySink::OnClick,signalBreak,mySink::ByeBye|l:LeftEye: "Blue"
+@end example
