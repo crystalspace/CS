@@ -166,7 +166,7 @@ float csProcSky::GetSundist(const csVector3& spot)
 
 
 csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
-  float sundist)
+  float sundist, bool& below)
 {
   csRGBcolor res;
   int r,g,b;
@@ -175,6 +175,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   if(spot.y < cam.y) 
   {
     haze = 1.0;   /// ground
+    below = true;
     float d = (cam.y-spot.y)/(radius - (cam.y-center.y));
     float mirrorplace = 0.0;
     if(d>mirrorplace){
@@ -313,14 +314,22 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
       }
 
       float sundist = GetSundist(isect);
+      bool below = false;
+      float haze=0.0;
+      csRGBcolor blue = GetSkyBlue(isect, haze, sundist, below);
       /// 
-      float cloudx = 1024.+(isect.x - center.x)/radius*255.*20.;
-      float cloudy = 1024.+(isect.z - center.z)/radius*255.*20.;
-      if(cloudx<0.0)cloudx = -cloudx;
-      if(cloudy<0.0)cloudy = -cloudy;
-      int cloud = GetCloudVal((int)cloudx, (int)cloudy );
-      //cloud = int(cloudx)%256 + int(cloudy)%256; /// nice patterns :)
-      //cloud = GetCloudVal(x,y); // debug
+      int cloud;
+      if(!below)
+      {
+        float cloudx = 1024.+(isect.x - center.x)/radius*255.*20.;
+        float cloudy = 1024.+(isect.z - center.z)/radius*255.*20.;
+        if(cloudx<0.0)cloudx = -cloudx;
+        if(cloudy<0.0)cloudy = -cloudy;
+        cloud = GetCloudVal((int)cloudx, (int)cloudy );
+        //cloud = int(cloudx)%256 + int(cloudy)%256; /// nice patterns :)
+        //cloud = GetCloudVal(x,y); // debug
+      }
+      else cloud = 0;
       csRGBcolor clcol(cloud, cloud, cloud);
       if(sundist>3.)
       {
@@ -328,8 +337,6 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
 	if(sunshadow<0)sunshadow=0;
 	clcol.Set(sunshadow,sunshadow,sunshadow);
       }
-      float haze=0.0;
-      csRGBcolor blue = GetSkyBlue(isect, haze, sundist);
       int hazefact = int(haze*255.);
       if(cloud<64) hazefact=255;
       if(hazefact<255-cloud) hazefact = 255-cloud;

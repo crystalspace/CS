@@ -111,8 +111,9 @@ class csProcSky {
   { octaves[ oct*octsize*octsize + y*octsize + x ] = val; }
   /// get the intersection with sphere (false = no intersection)
   bool SphereIntersect(const csVector3& point, csVector3& isect);
-  /// get sky bluishness at a point on the sphere.
-  csRGBcolor GetSkyBlue(const csVector3& spot, float& haze, float sundist);
+  /// get sky bluishness at a point on the sphere. below==the ground
+  csRGBcolor GetSkyBlue(const csVector3& spot, float& haze, float sundist,
+    bool& below);
   /// get combined octave value, cloudval.
   uint8 GetCloudVal(int x, int y);
   /// get sundistance value
