@@ -788,7 +788,7 @@ void csSprite3D::UpdateInPolygonTrees ()
 
   csBspPolygon* poly;
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYz);
@@ -798,7 +798,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
   poly->Transform (trans);
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_XYz);
@@ -808,7 +808,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
   poly->Transform (trans);
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_XYZ);
@@ -818,7 +818,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
   poly->Transform (trans);
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYZ);
@@ -828,7 +828,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
   poly->Transform (trans);
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYZ);
@@ -838,7 +838,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
   poly->Transform (trans);
 
-  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
   bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xyz);

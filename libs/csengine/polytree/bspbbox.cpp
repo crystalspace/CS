@@ -24,9 +24,6 @@
 
 //---------------------------------------------------------------------------
 
-csBspPolygonFactory csBspPolygon::poly_fact;
-csPolygonIntPool csBspPolygon::poly_pool (&poly_fact);
-
 csPolygonInt* csBspPolygonFactory::Create ()
 {
   csBspPolygon* pol = new csBspPolygon ();
@@ -42,6 +39,13 @@ void csBspPolygonFactory::Init (csPolygonInt* pi)
 }
 
 //---------------------------------------------------------------------------
+
+csPolygonIntPool& csBspPolygon::GetPolygonPool()
+{
+  static csBspPolygonFactory poly_fact;
+  static csPolygonIntPool poly_pool (&poly_fact);
+  return poly_pool;
+}
 
 void csBspPolygon::Dump ()
 {
@@ -133,8 +137,8 @@ int csBspPolygon::ClassifyZ (float z)
 void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 				  const csPlane3& split_plane)
 {
-  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
-  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np1 = (csBspPolygon*)GetPolygonPool().Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)GetPolygonPool().Alloc ();
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   csPolyIndexed& polygon1 = np1->GetPolygon ();
@@ -206,8 +210,8 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 void csBspPolygon::SplitWithPlaneX (csPolygonInt** poly1, csPolygonInt** poly2,
 				  float x)
 {
-  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
-  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np1 = (csBspPolygon*)GetPolygonPool().Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)GetPolygonPool().Alloc ();
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   csPolyIndexed& polygon1 = np1->GetPolygon ();
@@ -279,8 +283,8 @@ void csBspPolygon::SplitWithPlaneX (csPolygonInt** poly1, csPolygonInt** poly2,
 void csBspPolygon::SplitWithPlaneY (csPolygonInt** poly1, csPolygonInt** poly2,
 				  float y)
 {
-  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
-  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np1 = (csBspPolygon*)GetPolygonPool().Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)GetPolygonPool().Alloc ();
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   csPolyIndexed& polygon1 = np1->GetPolygon ();
@@ -352,8 +356,8 @@ void csBspPolygon::SplitWithPlaneY (csPolygonInt** poly1, csPolygonInt** poly2,
 void csBspPolygon::SplitWithPlaneZ (csPolygonInt** poly1, csPolygonInt** poly2,
 				  float z)
 {
-  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
-  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np1 = (csBspPolygon*)GetPolygonPool().Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)GetPolygonPool().Alloc ();
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   csPolyIndexed& polygon1 = np1->GetPolygon ();
@@ -758,7 +762,7 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
-csPolygonStubFactory csPolyTreeBBox::stub_fact (&csBspPolygon::poly_pool);
+csPolygonStubFactory csPolyTreeBBox::stub_fact (&csBspPolygon::GetPolygonPool());
 
 csPolyTreeBBox::csPolyTreeBBox (csObject* owner) :
 	csDetailedPolyTreeObject (owner, &stub_fact)

@@ -62,10 +62,8 @@ private:
   csObject* originator;
 
 public:
-  /// A factory for csBspPolygon.
-  static csBspPolygonFactory poly_fact;
   /// A pool of csBspPolygon.
-  static csPolygonIntPool poly_pool;
+  static csPolygonIntPool& GetPolygonPool();
 
   /// Debug.
   void Dump();
