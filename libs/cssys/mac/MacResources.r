@@ -374,9 +374,11 @@ resource 'MENU' (128) {
 resource 'MENU' (129) {
 	129,
 	0,
-	0x7FFFFFFF,
+	0x7FFFFFFD,
 	enabled,
 	"File", {
+		"Configure Input", noIcon, "I", noMark, plain;
+		"-", noIcon, noKey, noMark, plain;
 		"Quit", noIcon, "Q", noMark, plain
 	}
 };
@@ -544,4 +546,3 @@ resource 'STR#' (1025, purgeable) {
 	/* [9] */ "Fatal Error in Driver2D.shlb"
 	}
 };
-
