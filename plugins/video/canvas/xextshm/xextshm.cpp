@@ -114,7 +114,7 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
     Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
     return 0;
   }
-  shmi.readOnly = FALSE;
+  shmi.readOnly = false;
   XShmAttach (dpy, &shmi);
 
   // Delete memory segment. The memory stays available until
