@@ -27,6 +27,10 @@ The history order is reversed so that new features are at the top.
 	- At this moment my changes cause big leaks in SCF at exit. I have
 	  not yet been able to find out why.
 	- Matze Braun fixed static build with linux
+	- Added first experimental version of the cs-config script for systems
+          with unix shell. compile simple1 with 2 (short) lines:
+		g++ `cs-config --cxxflags csengine` -c simple1.cpp -o simple1.o
+		g++ -o simple1 simple1.o `cs-config --libs csengine` 
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).

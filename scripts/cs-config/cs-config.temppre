@@ -1,0 +1,5 @@
+#!/bin/sh
+# Config Script for Crystal Space, outputs compiler flags for compiling 
+# Crystal Space applications
+#
+# ...code stolen from gnome-config...

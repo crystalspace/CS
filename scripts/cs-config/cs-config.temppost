@@ -1,0 +1,186 @@
+# tweak if CRYSTAL var is set
+if test -n "$CRYSTAL"; then 
+	prefix="$CRYSTAL"
+#	is it a source distribution?
+	if test -e "$prefix"; then
+#		look for the lib files...
+#		a more or less dirty hack...
+#		FIXME: what if there are multiple libcssys.a???
+		libdir=`find "$CRYSTAL" -name "libcssys.a" -printf "%h"`
+		if test -z "$libdir"; then
+			echo "Couldn't detect dir with lib files, aborting!"
+			echo "  Did you already compile CS?"
+			exit 1
+		fi
+	fi
+fi
+
+usage()
+{
+	cat <<EOF
+Usage: cs-config [OPTIONS] [LIBRARIES]
+Options:
+	[--prefix[=DIR]]
+	[--exec-prefix[=DIR]]
+	[--version]
+	[--libs]
+	[--cflags]
+	[--cxxflags]
+	[--help]
+Libraries:
+	csengine
+	csgeom
+	csgfx
+	csphyzik
+	cssys
+	cstool
+	csutil
+	csws
+EOF
+	exit $1
+}
+
+if test $# -eq 0; then
+	usage 1 1>&2
+fi
+
+cflags=false
+libs_L=false
+libs_l=false
+
+incs="-I${includedir} -I${exec_prefix}/include"
+libs="-L${libdir} ${syslibs}"
+
+while test $# -gt 0; do
+  case "$1" in
+  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+  *) optarg= ;;
+  esac
+
+  case $1 in
+    --prefix=*)
+      prefix=$optarg
+      if test $exec_prefix_set = no ; then
+        exec_prefix=$optarg
+      fi
+      ;;
+    --prefix)
+	echo $prefix
+	exit 0
+	;;
+    --exec-prefix=*)
+	exec_prefix=$optarg
+	exec_prefix_set=yes
+	;;
+    --exec-prefix)
+	echo $exec_prefix
+	exit 0
+	;;
+    --version)
+      echo $version
+      exit 0
+      ;;
+    --cflags)
+      show_cflags=true
+      ;;
+    --cxxflags)
+	show_cxxflags=true
+	;;
+    --libs)
+	libs_l=true
+	libs_L=true
+	;;
+    --libs-only-L)
+	libs_L=true
+	;;
+    --libs-only-l)
+	libs_l=true
+	;;
+    cssys)
+	the_libs="$the_libs ${libs} -lcssys"
+	the_flags="$the_flags ${incs}"
+	;;
+    csengine)
+	the_libs="$the_libs ${libs} -lcsengine -lcstool -lcsgeom -lcsutil -lcssys"
+	the_flags="$the_flags ${incs}"
+	;;
+    csgeom)
+	the_libs="$the_libs ${libs} -lcsgeom -lcsutil -lcssys"
+	the_flags="$the_flags ${incs}"
+	;;
+    csgfx)
+	the_libs="$the_libs ${libs} -lcsgfx -lcssys -lcsutil"
+	the_flags="$the_flags ${incs}"
+	;;
+    cstool)
+	the_libs="$the_libs ${libs} -lcstool -lcsutil -lcssys"
+	the_flags="$the_flags ${incs}"
+	;;
+    csutil)
+	the_libs="$the_libs ${libs} -lcsutil -lcssys"
+	the_flags="$the_flags ${incs}"
+	;; 
+    csws)
+	the_libs="$the_libs -L${libdir} -lcsws -lcsgfx -lcsgeom -lcsutil -lcssys"
+	the_flags="$the_flags ${incs}"
+	;;
+    *)
+      usage 1 1>&2
+      ;;
+  esac
+  shift
+done
+
+
+if test -n "$show_cflags"; then
+	all_flags="$the_flags $common_cflags"
+fi
+if test -n "$show_cxxflags"; then
+	all_flags="$the_flags $common_cxxflags"
+fi
+if $libs_L || $libs_l; then
+	all_flags="$all_flags $the_libs"
+fi
+
+if test -z "$all_flags" || test "x$all_flags" = "x "; then
+	exit 1
+fi
+
+# Straight out any possible duplicates, but be careful to
+# get '-lfoo -lbar -lbaz' for '-lfoo -lbaz -lbar -lbaz'
+other_flags=
+lib_L_flags=
+rev_libs=
+for i in $all_flags; do
+    case "$i" in
+    # a library, save it for later, in reverse order
+    -l*) rev_libs="$i $rev_libs" ;;
+    -L*|-R*)
+        if $libs_L; then
+            case " $lib_L_flags " in
+            *\ $i\ *) ;;                        # already there
+            *) lib_L_flags="$lib_L_flags $i" ;; # add it to output
+            esac
+        fi;;
+    *)
+        case " $other_flags " in
+        *\ $i\ *) ;;                            # already there
+        *) other_flags="$other_flags $i" ;;     # add it to output
+        esac ;;
+    esac
+done
+
+ord_libs=
+if $libs_l; then
+    for i in $rev_libs; do
+        case " $ord_libs " in
+        *\ $i\ *) ;;                    # already there
+        *) ord_libs="$i $ord_libs" ;;   # add it to output in reverse order
+        esac
+    done
+fi
+
+echo $other_flags $lib_L_flags $ord_libs
+
+exit 0
+
