@@ -7702,7 +7702,6 @@ CS_CLIPPER_TOPLEVEL = _cspace.CS_CLIPPER_TOPLEVEL
 CS_CLIPPER_REQUIRED = _cspace.CS_CLIPPER_REQUIRED
 CS_CLIP_NOT = _cspace.CS_CLIP_NOT
 CS_CLIP_NEEDED = _cspace.CS_CLIP_NEEDED
-CS_CLIP_TOPLEVEL = _cspace.CS_CLIP_TOPLEVEL
 class csFog(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
