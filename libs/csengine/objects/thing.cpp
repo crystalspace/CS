@@ -690,6 +690,8 @@ void csThing::AddPolygon (csPolygonInt* poly)
   polygons.Push ((csPolygon3D *)poly);
   thing_edges_valid = false;
   prepared = false;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
 }
 
 csCurve* csThing::GetCurve (char* name)
@@ -703,6 +705,8 @@ void csThing::AddCurve (csCurve* curve)
   curve->SetParentThing (this);
   curves.Push (curve);
   curves_transf_ok = false;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
 }
 
 iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)

@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	  geometrical data of the mesh object.
 	- partsys level in CVS now uses LMCACHE. This means you'll have to
 	  recalculate lighting for this.
+	- Fixed a bug in the engine. When adding polygons or curves the bounding
+	  box of the thing would be invalid. Added code to invalidate the bouding
+	  box so that it will be recalculated later.
 19-Nov-2001
 	- Added iEngine::RemoveObject() which is a conveniance function to
 	  'remove' a CS object from the engine. This will not clear the
