@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "csws/cswssys.h"
 #include "csws/csapp.h"
@@ -102,14 +103,17 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
  */
 void cswsSystemDriver::DemoWrite (const char* buf)
 {
-  char *crpos;
+  const char *crpos;
   while ((crpos = strchr (buf, '\n')))
   {
-    *crpos = 0;
-    int len = maxwidth - strlen (textline [curline]);
-    if (len > 0)
+    size_t sl = crpos - buf;
+    size_t rl = maxwidth - strlen (textline [curline]);
+    if (sl > rl) sl = rl;
+    if (sl > 0)
     {
-      strncat (textline [curline], buf, len);
+      rl = strlen (textline [curline]);
+      memcpy (textline [curline] + rl, buf, sl);
+      textline [curline][rl + sl] = 0;
       linecolor [curline] = textcolor;
     }
     buf = crpos + 1;
