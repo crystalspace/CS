@@ -34,8 +34,10 @@ extern "C"
 #endif
 #endif
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
+#define INT32 JPEG_INT32
 #include <jpeglib.h>
 #include <jerror.h>
+#undef INT32
 }
 
 CS_IMPLEMENT_PLUGIN
