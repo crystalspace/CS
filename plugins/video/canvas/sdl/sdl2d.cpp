@@ -493,7 +493,7 @@ bool csGraphics2DSDL::HandleEvent (iEvent&)
           int down = (ev.type == SDL_KEYDOWN);
 
           if (key >= 0)
-            EventOutlet->Key (key, -1, down);
+            EventOutlet->Key (key, 0, down);
 
           break;
       }
