@@ -51,7 +51,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
-	iMeshObjectFactory* factory)
+				    iMeshObjectFactory* factory) : 
+  rmHolder(false)
 {
   SCF_CONSTRUCT_IBASE (factory);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);

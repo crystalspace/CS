@@ -65,7 +65,17 @@ class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple
   csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
   int rmHolderListIndex;
 public:
-  csRenderMeshHolderMultiple ();
+  /**
+   * Whether to delete the rendermeshes contained in the managed
+   * arrays.
+   */
+  bool deleteMeshes;
+
+  /**
+   * Construct a new render mesh array holder.
+   * \param deleteMeshes Whether to delete the contained rendermeshes.
+   */
+  csRenderMeshHolderMultiple (bool deleteMeshes = true);
   ~csRenderMeshHolderMultiple ();
 
   /**

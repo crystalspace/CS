@@ -66,10 +66,11 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
 
 //---------------------------------------------------------------------------
 
-csRenderMeshHolderMultiple::csRenderMeshHolderMultiple ()
+csRenderMeshHolderMultiple::csRenderMeshHolderMultiple (bool deleteMeshes)
 {
   rmHolderListIndex = rmHolderList.Push (
     new csDirtyAccessArray<csRenderMesh*>);
+  csRenderMeshHolderMultiple::deleteMeshes = deleteMeshes;
 }
 
 csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
@@ -77,11 +78,14 @@ csRenderMeshHolderMultiple::~csRenderMeshHolderMultiple ()
   while (rmHolderList.Length() > 0)
   {
     csDirtyAccessArray<csRenderMesh*>* holder = rmHolderList.Pop();
-    for (int j = 0; j < holder->Length(); j++)
+    if (deleteMeshes)
     {
-      csRenderMesh* rm = (*holder)[j];
-      CS_ASSERT (rm->inUse == false);
-      delete rm;
+      for (int j = 0; j < holder->Length(); j++)
+      {
+	csRenderMesh* rm = (*holder)[j];
+	CS_ASSERT (rm->inUse == false);
+	delete rm;
+      }
     }
     delete holder;
   }

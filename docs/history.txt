@@ -22,6 +22,10 @@ chronological order.
 	  built-in GL state matrices for the ModelView etc. matrices resp.
 	  use glTrackMatrixNV() for nVidia VPs.
 	- res added the ability to load ARB VPs from raw text.
+	- res augmented csRenderMeshHolderMultiple to allow optional 
+	  non-deletion of the contained csRenderMesh*es.
+	- res fixed csParticleSystem to disable render mesh deletion in the 
+	  holder.
 2-Apr-2004
 	- res made the following changes:
 	    - Replaced the CS_SHADERVAR_STACK #define with a csShaderVarStack
