@@ -235,6 +235,11 @@ void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
   basePath = path;
 }
 
+void csSpriteCal3DMeshObjectFactory::RescaleFactory(float factor)
+{
+  calCoreModel.scale(factor);
+}
+
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(iVFS *vfs,const char *filename)
 {
   csString path(basePath);
@@ -701,9 +706,6 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
 
-  // update the scale being used by the skeleton for this particular model
-  // This looks like it sets per model scaling, but it does not.  The skeleton
-  // is shared by all model instances of the factory despite the naming.
   CalSkeleton *skeleton;
   CalBone *bone;
   skeleton = calModel.getSkeleton();
@@ -712,7 +714,6 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   for (i=0; i < (int)bones.size(); i++)
   {
     bone = bones[i];
-    //bone->setScale (factory->GetRenderScale() );
     bone->calculateState ();
   }
   skeleton->calculateState ();

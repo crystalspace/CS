@@ -155,7 +155,6 @@ private:
   csArray<csString>          morph_animation_names;
 
   csString     basePath;
-  float	       renderScale;
 
   /// The sockets.
   csPDelArray<csSpriteCal3DSocket> sockets;
@@ -188,8 +187,7 @@ public:
   void ReportLastError ();
   void SetLoadFlags(int flags);
   void SetBasePath(const char *path);
-  void SetRenderScale(float scale) { renderScale=scale; }
-  float GetRenderScale() { return renderScale; }
+  void RescaleFactory(float factor);
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,
                          float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct, bool lock);
@@ -345,10 +343,8 @@ public:
     virtual void SetBasePath(const char *path)
     { scfParent->SetBasePath(path); }
 
-    virtual void SetRenderScale(float scale)
-    { scfParent->SetRenderScale(scale); }
-    virtual float GetRenderScale()
-    { return scfParent->GetRenderScale(); }
+    virtual void RescaleFactory(float factor)
+    { scfParent->RescaleFactory(factor); }
 
     virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename)
     { return scfParent->LoadCoreSkeleton(vfs,filename); }
