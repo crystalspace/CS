@@ -666,9 +666,9 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   is_initialized = 0;
 #ifdef CS_USE_NEW_RENDERER
   rmeshesSetup = false;
+#endif
   meshVersion = 0;
   bboxVersion = (uint)-1;
-#endif
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -1453,9 +1453,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
       idle_override_interval = 20;
     }
   }
-#ifdef CS_USE_NEW_RENDERER
   meshVersion++;
-#endif
   lighting_dirty = true;
   return true;
 }

@@ -58,6 +58,7 @@ chronological order.
 	- Jorrit clarified some Doxygen comments for iMovable.
 	- Jorrit changed the shader compiler to give more verbose diagnostics
 	  when -verbose commandline option is given.
+	- res fixed sprcal3d to compile with OR again after his latest changes.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

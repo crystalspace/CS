@@ -535,13 +535,13 @@ private:
   };
 
   bool rmeshesSetup;
-  uint meshVersion;
   csRef<iStringSet> strings;
   csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
   csArray<csArray<csRenderMesh> > renderMeshes;
   csRef<iGraphics3D> G3D;
   iMovable* currentMovable;
 #endif
+  uint meshVersion;
   bool arrays_initialized;
   csBox3 object_bbox;
   uint bboxVersion;
