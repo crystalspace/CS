@@ -238,6 +238,8 @@ MyPlugin::MyPlugin (iBase* parent)
 
 MyPlugin::~MyPlugin ()
 @{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 @}
 
 bool MyPlugin::Initialize (iObjectRegistry* iobject_reg)
@@ -297,7 +299,9 @@ In the constructor of @samp{MyPlugin} you must call
 @code{SCF_CONSTRUCT_IBASE()} for the main interface and
 @code{SCF_CONSTRUCT_EMBEDDED_IBASE()} for each embedded interface.  These
 macros will ensure that the object is initialized correctly (i.e. reference
-count set to 1 and so on).
+count set to 1 and so on).  Likewise, in the destructor, you must call the
+corresponding @code{SCF_DESTRUCT_IBASE()} and
+@code{SCF_DESTRUCT_EMBEDDED_IBASE()} macros.
 
 The rest of the plugin is very straightforward. It is important
 to realize that you should do most initialization of the plugin
