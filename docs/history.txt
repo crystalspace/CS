@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	      compilers.
 	    - Added several new useful methods.
 	    - Generally cleaned up and unified the code.
+	- Updated documentation about the new csArray class.
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards

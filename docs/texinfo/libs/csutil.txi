@@ -9,9 +9,9 @@ live as a separate library. The biggest part of it is the @sc{scf} library.
 @xref{SCF}.
 
 Then there are a series of classes implementing arrays of some sort.
-There are currently five types of arrays in CS. All are templated and
+There are currently six types of arrays in CS. All are templated and
 type-safe: @code{csRefArray<T>}, @code{csRefArrayObject<T>},
-@code{csPArray<T>}, @code{csPDelArray<T>},
+@code{csPArray<T>}, @code{csPDelArray<T>}, @code{csArray<T>},
 and @code{csGrowingArray<T>}. See later sections for more information.
 
 Also in csutil are the @file{.cfg} file reader and the random
@@ -73,7 +73,7 @@ object by 1.
 @subsection @code{Typed Vectors}
 @cindex @code{Typed Vectors}
 
-Crystal Space currently has five types of typed vectors. These four types
+Crystal Space currently has six types of typed vectors. These six types
 all provide automatical growing when the array size is too small.
 
 @itemize
@@ -106,11 +106,23 @@ takes care of initializating everything correctly (so that no double deletes
 can occur).
 Include file is @file{include/csutil/ptrarr.h}.
 @item
-@code{csGrowingArray<T>}: this is the only array class that can handle
+@code{csArray<T>}: this array class can handle objects that are not pointers.
+It is best to avoid using this class for pointers as the four other array
+types above already provide support for that. This class takes proper care
+of constructing/destructing objects and can be used to contain any kind of
+object.
+Include file is @file{include/csutil/array.h}.
+@item
+@code{csGrowingArray<T>}: just like csArray<T> this array class can handle
 objects that are not pointers. It is best to avoid using this class for pointers
-as the three other array types above already provide support for that.
+as the four other array types above already provide support for that.
 Also note that you should not use this class for objects that require a
-constructor as this class doesn't do any initialization at all.
+constructor as this class doesn't do any initialization at all. This class
+is mainly useful in cases where you have simple objects (structures) and
+efficiency is of utmost importance. Also this array provides read access
+to the actual memory array which is useful if you want to communicate with
+external API's (for example, the OpenGL renderer uses this to store arrays
+of vectors and then it can pass the real array pointer to the OpenGL API).
 Include file is @file{include/csutil/garray.h}.
 @end itemize
 
