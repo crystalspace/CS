@@ -35,11 +35,14 @@ csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) :
   CONSTRUCT_IBASE (NULL);
   System = isys;
   image_buffer = NULL;
+  destroy_memory = false;
 }
 
 csProcTextureSoft2D::~csProcTextureSoft2D ()
 {
   //  Close ();
+  if (destroy_memory)
+    delete [] Memory;
 }
 
 iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 
@@ -114,6 +117,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 	// We therefor render to a 16bit frame buffer and then unpack into an 
 	// RGBPixel format from which the texture manager recalculates the 
 	// texture
+	destroy_memory = true;
 	Memory = new unsigned char[width*height*2];
 	image_buffer = (RGBPixel*) buffer;
       }
@@ -157,9 +161,9 @@ void csProcTextureSoft2D::Close ()
 {
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
-  Memory = NULL;
   // the font server is DecRefed in csGraphics2D
   csGraphics2D::Close ();
+  System->QueueContextCloseEvent ((void*)this);
 }
 
 void csProcTextureSoft2D::Print (csRect*)

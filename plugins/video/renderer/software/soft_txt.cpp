@@ -122,10 +122,12 @@ int csColorMap::FreeEntries ()
   return colors;
 }
 
+//---------------------------------------------------- csTextureSoftProc -----//
+
 csTextureSoftwareProc::~csTextureSoftwareProc ()
 { 
   if (texG3D) texG3D->DecRef ();
-
+  if (image) image->DecRef ();
 }
 
 //---------------------------------------------------- csTextureMMSoftware ---//
@@ -144,7 +146,10 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 {
   delete [] (UByte *)pal2glob;
   delete [] orig_palette;
-
+  if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) && 
+      (texman->pfmt.PixelBytes == 1))
+    texman->UnRegister8BitCanvas 
+                      (((csTextureSoftwareProc *)tex[0])->texG3D->GetDriver2D ());
 }
 
 csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
@@ -178,10 +183,8 @@ void csTextureMMSoftware::ComputeMeanColor ()
   // If the procedural textures do not have their own texture manager
   // the procedural textures update the iImage, so we avoid destroying them 
   // here in the usual manner.
-  bool destroy_image = true;
-  if ((flags & (CS_TEXTURE_PROC_ALONE_HINT | CS_TEXTURE_PROC))
-       != CS_TEXTURE_PROC_ALONE_HINT)
-    destroy_image = false;
+  bool destroy_image = ((flags & (CS_TEXTURE_PROC_ALONE_HINT | CS_TEXTURE_PROC))
+			== CS_TEXTURE_PROC_ALONE_HINT);
 
   // Compute a common palette for all three mipmaps
   csQuantizeBegin ();
@@ -317,12 +320,9 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
     if ((texman->pfmt.PixelBytes == 1) && !alone_hint)
     {
       success = stex->Prepare (this, texman->G3D, 
-			       alone_hint ? texman->alone_proc_tex : 0, 
-			       alone_hint,
+			       NULL, alone_hint,
                                (void*) ((csTextureSoftware*) tex[0])->bitmap, 
 			       &texman->pfmt, palette, 256);
-      if (alone_hint && !texman->alone_proc_tex)
-	texman->alone_proc_tex = stex;
     }
     else if (alone_hint)
     {
@@ -331,7 +331,10 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
                                &texman->pfmt, palette, 256);
       // temporary...need to resolve lone destruction of texture issues
       if (!texman->alone_proc_tex)
+      {
 	texman->alone_proc_tex = stex;
+	stex->IncRef ();
+      }
     }
     else
       success = stex->Prepare  (this, texman->G3D, NULL, alone_hint, 
@@ -341,7 +344,11 @@ iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
     if (!success)
       delete stex;
     else
+    {
       ((csTextureSoftwareProc*)tex[0])->texG3D = stex;
+      if (texman->pfmt.PixelBytes == 1)
+	texman->Register8BitCanvas (stex->GetDriver2D ());
+    }
   }
   return ((csTextureSoftwareProc*)tex[0])->texG3D;
 }
@@ -442,14 +449,8 @@ void csTextureManagerSoftware::read_config (csIniFile *config)
 
 csTextureManagerSoftware::~csTextureManagerSoftware ()
 {
-  delete [] lightmap_tables [0];
-  if (lightmap_tables [1] != lightmap_tables [0])
-    delete [] lightmap_tables [1];
-  if (lightmap_tables [2] != lightmap_tables [1]
-   && lightmap_tables [2] != lightmap_tables [0])
-    delete [] lightmap_tables [2];
-  Clear ();
-
+  if (alone_proc_tex) 
+    alone_proc_tex->DecRef ();
   if (mG2D)
   {
     canvas8bit *c = mG2D->next;
@@ -461,6 +462,15 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
     }
     delete mG2D;
   }
+  delete [] inv_cmap;
+
+  delete [] lightmap_tables [0];
+  if (lightmap_tables [1] != lightmap_tables [0])
+    delete [] lightmap_tables [1];
+  if (lightmap_tables [2] != lightmap_tables [1]
+   && lightmap_tables [2] != lightmap_tables [0])
+    delete [] lightmap_tables [2];
+  Clear ();
 }
 
 void csTextureManagerSoftware::Clear ()
@@ -507,7 +517,7 @@ void csTextureManagerSoftware::create_inv_cmap ()
     SysPrintf (MSG_INITIALIZATION, "  Computing inverse colormap...\n");
 
   // Greg Ewing, 12 Oct 1998
-  delete inv_cmap;
+  delete [] inv_cmap;
   inv_cmap = NULL; // let the routine allocate the array itself
   csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
     RGB2PAL_BITS_B, inv_cmap);
@@ -738,31 +748,31 @@ void csTextureManagerSoftware::Register8BitCanvas (iGraphics2D *g2d8bit)
     mG2D = new canvas8bit (g2d8bit, mG2D);
 }
 
-void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D* /*g2d8bit*/)
+void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D* g2d8bit)
 {
-//    if (mG2D)
-//    {
-//      canvas8bit *last = mG2D;
-//      if (mG2D->g2d == g2d8bit)
-//      {
-//        last = last->next;
-//        delete mG2D;
-//        mG2D = last;
-//      }
-//      else
-//      {
-//        canvas8bit *dead;
-//        while (last->next)
-//        {
-//  	if (last->next->g2d == g2d8bit)
-//  	{
-//  	  dead = last->next;
-//  	  last->next = last->next->next;
-//  	  delete dead;
-//  	  break;
-//  	}
-//  	last = last->next;
-//        }     
-//      }
-//    }
+  if (mG2D)
+  {
+    canvas8bit *last = mG2D;
+    if (mG2D->g2d == g2d8bit)
+    {
+      last = last->next;
+      delete mG2D;
+      mG2D = last;
+    }
+    else
+    {
+      canvas8bit *dead;
+      while (last->next)
+      {
+  	if (last->next->g2d == g2d8bit)
+	{
+  	  dead = last->next;
+  	  last->next = last->next->next;
+  	  delete dead;
+  	  break;
+  	}
+  	last = last->next;
+      }     
+    }
+  }
 }

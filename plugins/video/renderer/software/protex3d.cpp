@@ -44,9 +44,6 @@ csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
 
 csSoftProcTexture3D::~csSoftProcTexture3D ()
 { 
-  if (pfmt.PixelBytes == 1)
-    texman->UnRegister8BitCanvas (G2D);
-
   if (partner_g3d || tex_mm)
   {
     // We are sharing the cache and texture manager
@@ -110,7 +107,6 @@ bool csSoftProcTexture3D::Prepare
     SharedInitialize ((csGraphics3DSoftwareCommon*)partner_g3d);
     if (!Open (NULL) || !SharedOpen ())
       return false;
-    texman->Register8BitCanvas (G2D);
   }
   else if (!alone_hint)
   {
@@ -118,8 +114,6 @@ bool csSoftProcTexture3D::Prepare
     SharedInitialize ((csGraphics3DSoftwareCommon*)parent_g3d);
     if (!Open (NULL) || !SharedOpen ())
       return false;
-    if (ipfmt->PixelBytes == 1)
-      texman->Register8BitCanvas (G2D);
   }
   else
   {
@@ -132,7 +126,7 @@ bool csSoftProcTexture3D::Prepare
   return true;
 }
 
-  // The entry point for other than software drivers..
+  // The entry point for other than software graphics drivers..
 iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer 
     (iGraphics3D *parent_g3d, iGraphics3D* partner, int width, int height, 
      void *buffer, csOffScreenBuffer hint, csPixelFormat *ipfmt)
@@ -184,7 +178,7 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
 
   // Register our own buffer as a procedural texture. 
   // The texture handles GetProcTextureInterface () is never called so
-  // no additional interfaces are called.
+  // no additional interfaces are created.
   int flags = CS_TEXTURE_PROC | CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
   iTextureHandle *soft_tex_handle = texman->RegisterTexture (tex_image, flags);
   texman->PrepareTexture (soft_tex_handle);
@@ -194,6 +188,7 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   else
     tex_mm_alone = (csTextureMMSoftware*) soft_tex_handle;
 
+  // Return the software texture managers handle for this procedural texture.
   return soft_tex_handle;
 }
 

@@ -398,6 +398,13 @@ void csWorld::Clear ()
   // Clear all object libraries
   Library = NULL;
   Libraries.DeleteAll ();
+
+  if (world_states)
+  {
+    world_states->DeleteAll ();
+    delete world_states;
+    world_states = NULL;
+  }
 }
 
 void csWorld::EnableLightingCache (bool en)
@@ -1685,10 +1692,11 @@ void csWorld::csWorldState::Activate ()
 
 void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 {
-  // Hack-- with the back buffer implementations of dynamic textures
+  // Hack-- with the glide back buffer implementations of procedural textures
   // circumstances are that many G3D can be associated with one G2D.
-  // However at the moment back buffer dynamic textures when destroyed
-  // do not send any close context messages so we kill them all.
+  // It is impossible to tell which is which so destroy them both, and allow
+  // regeneration next time context is set to the surviving G3D associated
+  // with this G2D
   for (int i = 0; i < Length (); i++)
     if (((csWorldState*)root [i])->G2D == g2d)
       Delete (i);
@@ -1696,8 +1704,9 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 
 void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
 { 
-  // Hack-- with the back buffer implementations of dynamic textures
-  // circumstances are that many G3D can be associated with one G2D
+  // With the glide back buffer implementations of procedural textures
+  // circumstances are that many G3D can be associated with one G2D, so
+  // we test for width and height also.
   for (int i = 0; i < Length (); i++)
   {
     csWorldState *state = (csWorldState*)root [i];

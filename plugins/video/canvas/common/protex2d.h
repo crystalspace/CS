@@ -32,6 +32,10 @@ public:
   // For 16bit procedural textures sharing texture manager
   RGBPixel *image_buffer;
 
+  // Under certain circumstances, this class allocates its own memory, this flag
+  // indicates whether or not this is the case and hence our responsibility.
+  bool destroy_memory;
+
   csProcTextureSoft2D (iSystem *isys);
   virtual ~csProcTextureSoft2D ();
 

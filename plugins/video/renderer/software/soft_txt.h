@@ -115,6 +115,7 @@ public:
   /// Destroy the texture
   virtual ~csTextureSoftware ()
   { delete [] bitmap; if (image) image->DecRef (); }
+
   /// Return a pointer to texture data
   UByte *get_bitmap ()
   { return bitmap; }
@@ -132,7 +133,6 @@ class csTextureSoftwareProc : public csTextureSoftware
 {
 public:
   csSoftProcTexture3D *texG3D;
-
 
   csTextureSoftwareProc (csTextureMM *Parent, iImage *Image)
     : csTextureSoftware (Parent, Image), texG3D(NULL)
@@ -230,7 +230,7 @@ public:
 class csTextureManagerSoftware : public csTextureManager
 {
 private:
-  /// Texture manager is responsible for the palettes of multiple 8bit canvases
+  /// Structure to help manage multiple 8bit canvases
   struct canvas8bit
   {
     canvas8bit (iGraphics2D *new_canvas)
