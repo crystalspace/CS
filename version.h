@@ -1,10 +1,12 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+#ifndef __SYSDEFS_H__
 #include "sysdef.h"
+#endif
 
-#define CS_VERSION	"0.14"
-#define CS_SUBVERSION	"001"
+#define CS_VERSION	"0.15"
+#define CS_SUBVERSION	"000"
 #define RELEASE_DATE	"Tue, 24-Aug-1999"
 
 #if defined(OS_SOLARIS)
@@ -71,7 +73,7 @@
 #  error "Unspecified compiler!"
 #endif
 
-#define VERSION CS_VERSION" "CS_SUBVERSION" ["OS_VERSION"-"PR_VERSION"-"CC_VERSION"]"
+#define VERSION CS_VERSION " r" CS_SUBVERSION " [" OS_VERSION "-" PR_VERSION "-" CC_VERSION "]"
 
 #endif
 
