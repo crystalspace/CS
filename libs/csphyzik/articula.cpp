@@ -185,12 +185,18 @@ ctRigidBody *pe_g;  // this handle
 	r_fg = pe_g->get_T()*( pe_g->get_org_world() - pe_f->get_org_world() );
 
 	// calc contribution to v and w from parent link.
-	pe_g->w = R_fg*pe_f->get_angular_v();
-	pe_g->v = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
-	
+//!me 1Dec99	pe_g->w = R_fg*pe_f->get_angular_v();
+//!me	1Dec99  pe_g->v = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
+  
+  ctVector3 w_prime = R_fg*pe_f->get_angular_v();
+  ctVector3 v_prime = R_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
+
 	// get joint to calculate final result for v and angular v ( w )
-	jnt->calc_vw( pe_g->v, pe_g->w );
+	jnt->calc_vw( v_prime, w_prime );
 	
+  pe_g->set_angular_v( w_prime );
+  pe_g->set_v( v_prime );
+  
 	// iterate to next links
 	out_link = outboard_links.get_first();
 	while( out_link ){
