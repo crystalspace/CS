@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Extended iXmlNode with functions to create and move nodes
 	  and attributes. Added iXmlDocument as a representation of a document.
 	  Added iXmlSystem which represents the XML system in general.
+	- Removed JNG image target from walkall. It is not an essential
+	  target to have.
 5-Aug-2002
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow
