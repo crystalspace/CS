@@ -326,7 +326,7 @@ void csGraphics2DMac::Initialize()
 /*----------------------------------------------------------------
 	Open a window.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::Open(char* Title)
+bool csGraphics2DMac::Open(const char* Title)
 {
 	Str255			theTitle;
 	Rect			theBounds;

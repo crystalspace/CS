@@ -51,7 +51,7 @@ public:
 
 					// this is handled in the constuctor
   	virtual void 		Initialize();
-  	virtual bool 		Open( char *Title );
+  	virtual bool 		Open( const char *Title );
   	virtual void 		Close();
 
 	virtual void 		Print( csRect *area = NULL );

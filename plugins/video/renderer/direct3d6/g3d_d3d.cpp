@@ -216,7 +216,7 @@ m_piSystem(piSystem)
   rstate_gouraud = true;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::Open(char* Title)
+STDMETHODIMP csGraphics3DDirect3DDx6::Open(const char* Title)
 {
   LPD3DDEVICEDESC lpD3dDeviceDesc;
   DWORD dwDeviceMemType;

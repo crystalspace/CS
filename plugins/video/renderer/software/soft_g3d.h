@@ -242,7 +242,7 @@ public:
   ///
   STDMETHODIMP Initialize ();
   ///
-  STDMETHODIMP Open (char *Title);
+  STDMETHODIMP Open (const char *Title);
   ///
   STDMETHODIMP Close ();
 

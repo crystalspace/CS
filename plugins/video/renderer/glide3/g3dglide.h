@@ -110,7 +110,7 @@ public:
   ~csGraphics3DGlide3x ();
   
   /// opens Glide.
-  STDMETHODIMP Open(char* Title);
+  STDMETHODIMP Open(const char* Title);
   /// closes Glide.
   STDMETHODIMP Close();
   

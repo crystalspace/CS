@@ -383,7 +383,7 @@ static int getResolutionIndex(int width, int height)
   return -1;
 }
 
-STDMETHODIMP csGraphics3DGlide3x::Open(char* Title)
+STDMETHODIMP csGraphics3DGlide3x::Open(const char* Title)
 {
   FxU32 hwnd=NULL;
   GrScreenResolution_t iRes;

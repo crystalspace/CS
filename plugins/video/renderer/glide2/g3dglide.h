@@ -117,7 +117,7 @@ public:
   
   STDMETHODIMP Initialize();
   /// opens Glide.
-  STDMETHODIMP Open(char* Title);
+  STDMETHODIMP Open(const char* Title);
   /// closes Glide.
   STDMETHODIMP Close();
   

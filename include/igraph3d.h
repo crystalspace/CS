@@ -349,7 +349,7 @@ public:
   STDMETHOD (Initialize) () PURE;
 
   /// Open the 3D graphics display.
-  STDMETHOD (Open) (char *Title) PURE;
+  STDMETHOD (Open) (const char *Title) PURE;
   /// Close the 3D graphics display.
   STDMETHOD (Close) () PURE;
 

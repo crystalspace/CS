@@ -116,7 +116,7 @@ SysGraphics2D::~SysGraphics2D(void)
   Close();
 }
 
-bool SysGraphics2D::Open(char *Title)
+bool SysGraphics2D::Open(const char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;

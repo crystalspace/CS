@@ -169,7 +169,7 @@ public:
   STDMETHODIMP Initialize ();
 
   /// opens Direct3D.
-  STDMETHODIMP Open(char* Title);
+  STDMETHODIMP Open(const char* Title);
   /// closes Direct3D.
   STDMETHODIMP Close();
   

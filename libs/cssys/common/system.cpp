@@ -204,7 +204,7 @@ bool csSystemDriver::Initialize (int argc, char *argv[],
   return true;
 }
 
-bool csSystemDriver::Open (char *Title)
+bool csSystemDriver::Open (const char *Title)
 {
   // the initialization order is crucial! do not reorder!
   if (FAILED (piG3D->Open (Title)))

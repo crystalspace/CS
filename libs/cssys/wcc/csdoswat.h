@@ -51,7 +51,7 @@ public:
   SysGraphics2D(int argc, char *argv[]);
   virtual ~SysGraphics2D(void);
 
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   virtual void Close ();
 
   virtual void Print(csRect *area = NULL);

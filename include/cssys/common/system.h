@@ -158,7 +158,7 @@ public:
    * Open the graphics context (with optional title on titlebar),
    * mouse and keyboard.
    */
-  virtual bool Open (char *Title);
+  virtual bool Open (const char *Title);
   /// Close the system
   virtual void Close ();
 

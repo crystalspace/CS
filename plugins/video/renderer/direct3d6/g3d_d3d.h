@@ -160,7 +160,7 @@ public:
   ~csGraphics3DDirect3DDx6 ();
   
   /// opens Direct3D.
-  STDMETHODIMP Open(char* Title);
+  STDMETHODIMP Open(const char* Title);
   /// closes Direct3D.
   STDMETHODIMP Close();
   

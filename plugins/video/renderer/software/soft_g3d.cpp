@@ -575,7 +575,7 @@ STDMETHODIMP csGraphics3DSoftware::Initialize ()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::Open (char *Title)
+STDMETHODIMP csGraphics3DSoftware::Open (const char *Title)
 {
   DrawMode = 0;
 
