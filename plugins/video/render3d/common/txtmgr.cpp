@@ -176,16 +176,13 @@ void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const
   b = mean_color.blue;
 }
 
-bool csTextureHandle::GetMipMapDimensions (int mipmap, int& w, int& h)
+bool csTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
-  csTexture *txt = get_texture (mipmap);
-  if (txt)
-  {
-    w = txt->get_width ();
-    h = txt->get_height ();
-    return true;
-  }
-  return false;
+  PrepareInt ();
+  if (!tex[0]) return false;
+  mw = tex[0]->get_width();
+  mh = tex[0]->get_height();
+  return true;
 }
 
 void csTextureHandle::AdjustSizePo2 ()

@@ -123,7 +123,7 @@ void csCsLightProgressMeter::Step()
     System->g3d->BeginDraw (CSDRAW_2DGRAPHICS);
     System->g2d->Clear (System->color_bg);
     int lw, lh;
-    System->logo->GetMipMapDimensions (0, lw, lh);
+    System->logo->GetRendererDimensions (lw, lh);
     int w = lw * fw / 300;
     int h = lh * fh / 200;
     System->g3d->DrawPixmap (System->logo, (fw - w)/2, 20, w, h,

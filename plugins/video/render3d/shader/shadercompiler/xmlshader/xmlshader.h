@@ -89,7 +89,7 @@ private:
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
     csRef<csShaderVariable> autoAlphaTexRef;
-    unsigned int textureCount;
+    int textureCount;
 
     //programs
     csRef<iShaderProgram> vp;

@@ -324,59 +324,6 @@ void csSoftwareTextureHandle::Blit (int x, int y, int width, int height, unsigne
   UpdateTexture ();  
 }
 
-class csOFSCbSoftware : public iOffscreenCanvasCallback
-{
-private:
-  csSoftwareTextureHandle* txt;
-
-public:
-  SCF_DECLARE_IBASE;
-  csOFSCbSoftware (csSoftwareTextureHandle* txt)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    csOFSCbSoftware::txt = txt;
-  }
-  virtual ~csOFSCbSoftware ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-  virtual void FinishDraw (iGraphics2D*)
-  {
-    txt->UpdateTexture ();
-  }
-  virtual void SetRGB (iGraphics2D*, int idx, int r, int g, int b)
-  {
-    txt->ChangePaletteEntry (idx, r, g, b);
-  }
-};
-
-
-SCF_IMPLEMENT_IBASE(csOFSCbSoftware)
-  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
-SCF_IMPLEMENT_IBASE_END
-
-iGraphics2D* csSoftwareTextureHandle::GetCanvas ()
-{
-  if (!canvas)
-  {
-    csOFSCbSoftware* ofscb = new csOFSCbSoftware (this);
-    csSoftwareTexture *t = (csSoftwareTexture *)tex [0];
-    canvas = texman->G3D->GetDriver2D ()->CreateOffscreenCanvas (
-  	t->bitmap, t->get_width (), t->get_height (), 8,
-	ofscb);
-    ofscb->DecRef ();
-    int i;
-    is_palette_init = true;
-    for (i = 0 ; i < palette_size ; i++)
-    {
-      canvas->SetRGB (i, palette[i].red, palette[i].green,
-      	palette[i].blue);
-    }
-    is_palette_init = false;
-  }
-  return canvas;
-}
-
 void csSoftwareTextureHandle::ChangePaletteEntry (int idx, int r, int g, int b)
 {
   if (is_palette_init) return;

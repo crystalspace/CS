@@ -142,10 +142,10 @@ public:
    * This function is only valid if the texture has been registered
    * for 3D usage.
    */
-  virtual bool GetMipMapDimensions (int mm, int& w, int& h);
+  virtual bool GetRendererDimensions (int &mw, int &mh);
   virtual void GetOriginalDimensions (int& w, int& h)
   {
-    GetMipMapDimensions (0, w, h);
+    GetRendererDimensions (w, h);
   }
 
   /// Get the mean color.
@@ -170,8 +170,6 @@ public:
   virtual bool GetAlphaMap () const
   { return false; }
 
-  virtual iGraphics2D* GetCanvas () { return 0; }
-
   /**
    * Given a texture width and height, it tries to 'guesstimate' the po2 size
    * that causes the least quality reduction: it calculates how many 
@@ -185,6 +183,9 @@ public:
   { return csAlphaMode::alphaNone; }
 
   virtual void Precache () {}
+
+  virtual void SetTextureClass (const char* className) {}
+  virtual const char* GetTextureClass () { return "default"; }
 };
 
 /**

@@ -288,6 +288,11 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
             context.SetFlags (context.GetFlags() | CS_TEXTURE_NOFILTER);
         }
         break;
+      case XMLTOKEN_CLASS:
+	{
+	  context.SetClass (child->GetContentsValue ());
+	}
+	break;
       default:
         SyntaxService->ReportBadToken (child);
 	goto error;
@@ -426,6 +431,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (do_transp)
       tex->SetKeyColor (csQint (transp.red * 255.99),
         csQint (transp.green * 255.99), csQint (transp.blue * 255.99));
+    tex->SetTextureClass (context.GetClass ());
 
     csRef<iProcTexture> ipt = csPtr<iProcTexture>
       (SCF_QUERY_INTERFACE (tex, iProcTexture));
@@ -667,6 +673,7 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   csRef<iImage> north, south, east, west, top, bottom;
   const char* texname = node->GetAttributeValue ("name");
   const char *fname;
+  csString className;
 
   csRefArray<iDocumentNode> key_nodes;
 
@@ -758,6 +765,11 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
       
         bottom = LoadImage (fname, Format);
         break;
+      case XMLTOKEN_CLASS:
+	{
+	  className.Replace (child->GetContentsValue ());
+	}
+	break;
     }
   }
 
@@ -773,6 +785,8 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
 
   itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);
+  if (!className.IsEmpty())
+    itexwrap->SetTextureClass (className);
 
   // Set keys
   for (size_t i=0; i<key_nodes.Length (); i++)
@@ -802,6 +816,7 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
   csRef<iImage> image;
 
   const char* texname = node->GetAttributeValue ("name");
+  csString className;
 
   csRefArray<iDocumentNode> key_nodes;
 
@@ -832,6 +847,11 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
         imagecount++;
         break;
       }
+      case XMLTOKEN_CLASS:
+      {
+	className.Replace (child->GetContentsValue ());
+      }
+      break;
     }
   }
   
@@ -840,6 +860,8 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   csRef<iTextureWrapper> itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);
+  if (!className.IsEmpty())
+    itexwrap->SetTextureClass (className);
 
   // Set keys
   for (size_t i=0; i<key_nodes.Length (); i++)

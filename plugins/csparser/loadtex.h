@@ -38,6 +38,7 @@ class TextureLoaderContext : public iTextureLoaderContext
   bool has_size;
   int width, height;
   const char* texname;
+  char* texClass;
 public:
   SCF_DECLARE_IBASE;
 
@@ -55,6 +56,9 @@ public:
   void SetSize (int w, int h);
   virtual bool HasSize ();
   virtual void GetSize (int& w, int& h);
+
+  virtual void SetClass (const char* className);
+  virtual const char* GetClass ();
 
   virtual const char* GetName ();
 };

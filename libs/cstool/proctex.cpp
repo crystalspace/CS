@@ -361,6 +361,16 @@ bool csProcTexture::eiTextureWrapper::KeepImage () const
   return scfParent->tex->KeepImage();
 }
 
+void csProcTexture::eiTextureWrapper::SetTextureClass (const char* className)
+{
+  scfParent->tex->SetTextureClass (className);
+}
+
+const char* csProcTexture::eiTextureWrapper::GetTextureClass ()
+{
+  return scfParent->tex->GetTextureClass();
+}
+
 //-----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiProcTexture)

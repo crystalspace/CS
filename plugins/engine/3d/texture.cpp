@@ -44,6 +44,7 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
   DG_TYPE (this, "csTextureWrapper");
   image = Image;
   keep_image = false;
+  texClass = 0;
   DG_LINK (this, image);
   UpdateKeyColorFromImage ();
 }
@@ -54,6 +55,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject()
   DG_TYPE (this, "csTextureWrapper");
 
   keep_image = false;
+  texClass = 0;
 
   handle = ith;
   if (handle)
@@ -80,6 +82,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   image = t.image;
   DG_LINK (this, image);
   keep_image = t.keep_image;
+  texClass = csStrNew (t.texClass);
 
   UpdateKeyColorFromImage ();
 }
@@ -90,6 +93,7 @@ csTextureWrapper::~csTextureWrapper ()
     DG_UNLINK (this, handle);
   if (image)
     DG_UNLINK (this, image);
+  delete[] texClass;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
 
@@ -174,10 +178,24 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   {
     DG_LINK (this, handle);
     SetKeyColor (key_col_r, key_col_g, key_col_b);
+    if (texClass) handle->SetTextureClass (texClass);
   }
+  //delete[] texClass; texClass = 0; 
+    // @@@SAVE: Maybe needed for saving. But really, clean if not needed!
 
   if (!keep_image)
     SetImageFile (0);
+}
+
+void csTextureWrapper::SetTextureClass (const char* className)
+{
+  delete[] texClass;
+  texClass = csStrNew (className);
+}
+
+const char* csTextureWrapper::GetTextureClass ()
+{
+  return texClass;
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject ()

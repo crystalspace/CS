@@ -126,9 +126,6 @@ protected:
   /// the texture manager
   csRef<csSoftwareTextureManager> texman;
 
-  /// Reference to internal canvas.
-  csRef<iGraphics2D> canvas;
-
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -188,13 +185,7 @@ public:
    */
   uint32 GetUpdateNumber () const { return update_number; }
 
-  /**
-   * Get canvas for texture.
-   */
-  virtual iGraphics2D* GetCanvas ();
-
-
-  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
+  virtual bool GetRendererDimensions (int &mw, int &mh, int& md)
   {
     return false;
   }

@@ -118,6 +118,8 @@ protected:
     virtual bool IsVisitRequired () const;
     virtual void SetKeepImage (bool k);
     virtual bool KeepImage () const;
+    virtual void SetTextureClass (const char* className);
+    virtual const char* GetTextureClass ();
   } scfiTextureWrapper;
   friend struct eiTextureWrapper;
 

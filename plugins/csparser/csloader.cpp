@@ -1058,6 +1058,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
+  xmltokens.Register ("class", XMLTOKEN_CLASS);
   // 3d Texture
   xmltokens.Register ("texture3d", XMLTOKEN_TEXTURE3D);
   // Cubemaps

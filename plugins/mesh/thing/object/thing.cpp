@@ -2372,8 +2372,8 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
         rc = false;
         if (csThingObjectType::do_verbose)
 	{
-	  printf ("  Thing '%s' Poly '%s': %s\n",
-	  	thing_name, sp->GetName (), error);
+	  csPrintf ("  Thing '%s' Poly '%s': %s\n",
+	    thing_name, sp->GetName (), error);
 	  fflush (stdout);
         }
       }
@@ -2383,7 +2383,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   {
     if (csThingObjectType::do_verbose)
     {
-      printf ("  Thing '%s': Could not find cached lightmap file for thing!\n",
+      csPrintf ("  Thing '%s': Could not find cached lightmap file for thing!\n",
       	thing_name);
       fflush (stdout);
     }

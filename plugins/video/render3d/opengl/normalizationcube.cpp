@@ -140,6 +140,7 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
       texture = txtmgr->RegisterTexture (
 	imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
 	iTextureHandle::CS_TEX_IMG_CUBEMAP);
+      texture->SetTextureClass ("lookup");
       texture->Precache ();
     }
   }

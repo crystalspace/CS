@@ -23,6 +23,7 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csutil/array.h"
+#include "csutil/databuf.h"
 #include "csutil/debug.h"
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
@@ -37,7 +38,6 @@
 
 #include "gl_txtmgr.h"
 
-CS_LEAKGUARD_IMPLEMENT(csGLTexture);
 CS_LEAKGUARD_IMPLEMENT(csGLTextureHandle);
 CS_LEAKGUARD_IMPLEMENT(csGLMaterialHandle);
 CS_LEAKGUARD_IMPLEMENT(csGLRendererLightmap);
@@ -56,89 +56,22 @@ CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ());
 
 //---------------------------------------------------------------------------
 
-class csOFSCbOpenGL : public iOffscreenCanvasCallback
-{
-private:
-  csGLTextureHandle* txt;
-
-public:
-  SCF_DECLARE_IBASE;
-  csOFSCbOpenGL (csGLTextureHandle* txt)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    csOFSCbOpenGL::txt = txt;
-  }
-  virtual ~csOFSCbOpenGL ()
-  {
-    SCF_DESTRUCT_IBASE()
-  }
-  virtual void FinishDraw (iGraphics2D*)
-  {
-    txt->UpdateTexture ();
-  }
-  virtual void SetRGB (iGraphics2D*, int, int, int, int)
-  {
-  }
-};
-
-SCF_IMPLEMENT_IBASE(csOFSCbOpenGL)
-  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
-SCF_IMPLEMENT_IBASE_END
-
-
-// csGLTexture stuff
-
-csGLTexture::UploadData::UploadData ()
-{
-  image_data = 0;
-  size = 0;
-  compressed = GL_FALSE;
-}
-
-csGLTexture::UploadData::~UploadData ()
-{
-  if (!imgRef.IsValid())
-    delete[] image_data;
-}
-
-csGLTexture::csGLTexture (csGLTextureHandle *p, iImage *Image)
-{
-  d = 1;
-  w = Image->GetWidth ();
-  h = Image->GetHeight ();
-  Parent = p;
-  uploadData = 0;
-}
-
-csGLTexture::~csGLTexture()
-{
-  CleanupImageData ();
-}
-
-void csGLTexture::CleanupImageData ()
-{
-  delete uploadData;
-  uploadData = 0;
-}
-
 SCF_IMPLEMENT_IBASE(csGLTextureHandle)
   SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
-				      csGLGraphics3D *iG3D)
+				      csGLGraphics3D *iG3D) : uploadData(0)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
   //has_alpha = false;
-  this->sourceFormat = GL_RGBA;
-  size = 0;
   Handle = 0;
+  textureClass = txtmgr->GetTextureClassID ("default");
 
   images = csPtr<iImageVector> (new csImageVector());
-  //image->IncRef();
   images->AddImage(image);
 
   texFlags.Set (flagsPublicMask, flags);
@@ -162,16 +95,15 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
 
 csGLTextureHandle::csGLTextureHandle (iImageVector* image,
 				      int flags, int target,
-				      csGLGraphics3D *iG3D)
+				      csGLGraphics3D *iG3D) : uploadData(0)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
   //has_alpha = false;
-  this->sourceFormat = GL_RGBA;
-  size = 0;
   Handle = 0;
+  textureClass = txtmgr->GetTextureClassID ("default");
 
   images = image;
 
@@ -194,7 +126,7 @@ csGLTextureHandle::csGLTextureHandle (iImageVector* image,
 }
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
-				      csGLGraphics3D *iG3D)
+				      csGLGraphics3D *iG3D) : uploadData(0)
 {
   SCF_CONSTRUCT_IBASE(0);
   G3D = iG3D;
@@ -214,9 +146,11 @@ csGLTextureHandle::~csGLTextureHandle()
 
 void csGLTextureHandle::Clear()
 {
-  for (size_t i=0; i<vTex.Length(); i++)
-    delete vTex[i];
-  vTex.DeleteAll();
+  if (uploadData != 0)
+  {
+    delete uploadData;
+    uploadData = 0;
+  }
   Unload ();
 }
 
@@ -255,56 +189,6 @@ bool csGLTextureHandle::GetKeyColor () const
   return IsTransp();
 }
 
-bool csGLTextureHandle::FindFormatType ()
-{
-  int i;
-
-  GLenum sourceFormat = csGLTextureHandle::sourceFormat;
-  if (sourceFormat == GL_RGBA)
-  {
-    if (!IsTransp())
-    {
-      if (!(images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA))
-      {
-	sourceFormat = GL_RGB;
-      }
-    }
-  }
-
-  for (i=0; csGLTextureManager::glformats[i].sourceFormat != sourceFormat
-   && csGLTextureManager::glformats[i].components; i++);
-
-  if (csGLTextureManager::glformats[i].sourceFormat != sourceFormat)
-  {
-    G3D->Report (CS_REPORTER_SEVERITY_BUG, "unknown source format: %d", 
-      sourceFormat);
-    return false;
-  }
-
-  formatidx = i;
-
-  sourceType = GL_UNSIGNED_BYTE;
-  targetFormat = csGLTextureManager::glformats[formatidx].targetFormat;
-
-  // do we force it to some specific targetFormat ?
-  if (csGLTextureManager::glformats[i].forcedFormat != 0)
-  {
-    targetFormat = csGLTextureManager::glformats[i].forcedFormat;
-    for (i=0; csGLTextureManager::glformats[i].targetFormat != targetFormat
-     && csGLTextureManager::glformats[i].components; i++);
-
-    if (csGLTextureManager::glformats[i].targetFormat == targetFormat)
-      formatidx = i;
-  }
-  if (Compressable () 
-    && (csGLTextureManager::glformats[i].compressedFormat != 0))
-  {
-    targetFormat = csGLTextureManager::glformats[i].compressedFormat;
-  }
-
-  return true;
-}
-
 void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const
 {
   red = transp_color.red;
@@ -312,16 +196,11 @@ void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) cons
   blue = transp_color.blue;
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
+bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
   PrepareInt ();
-  if ((size_t)mipmap < vTex.Length ())
-  {
-    w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
-    h = vTex[mipmap]->get_height () << txtmgr->texture_downsample;
-    return true;
-  }
-  return false;
+  mw = actual_width; mh = actual_height;
+  return true;
 }
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
@@ -332,40 +211,21 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 }
 
 // Check the two below for correctness
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh,
-	int &md)
+bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
 {
   PrepareInt ();
-  if(cachedata)
-  {
-    csGLTexture *real_tex = (csGLTexture*) cachedata;
-
-    // real_tex size has to be multiple of 2
-    mw = real_tex->get_width() >> mipmap;
-    mh = real_tex->get_height() >> mipmap;
-    md = real_tex->get_depth() >> mipmap;
-  }
-  else if(images.IsValid() && images->GetImage (0).IsValid())
-  {
-    mw = images->GetImage (0)->GetWidth ();
-    mh = images->GetImage (0)->GetHeight ();
-    md = images->Length ();
-  }
-  else
-    return false;
-
-  return true; 
+  mw = actual_width;
+  mh = actual_height;
+  md = actual_d;
+  return true;
 }
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
   PrepareInt ();
-  if (images.IsValid() && images->GetImage (0).IsValid())
-  {
-    mw = images->GetImage (0)->GetWidth();
-    mh = images->GetImage (0)->GetHeight();
-    md = images->Length();
-  }
+  mw = orig_width;
+  mh = orig_height;
+  md = orig_d;
 }
 
 void csGLTextureHandle::SetTextureTarget (int target)
@@ -442,7 +302,7 @@ void csGLTextureHandle::PrepareInt ()
     if (newAlphaType > alphaType) alphaType = newAlphaType;
   }
   // Determine the format and type of the source we gonna tranform the data to.
-  FindFormatType ();
+  //FindFormatType ();
   CreateMipMaps ();
   FreeImage ();
 }
@@ -450,6 +310,7 @@ void csGLTextureHandle::PrepareInt ()
 void csGLTextureHandle::AdjustSizePo2 ()
 {
   size_t i;
+  actual_d = orig_d = images->Length();
   for(i = 0; i < images->Length(); i++)
   {
     orig_width  = images->GetImage (i)->GetWidth();
@@ -485,41 +346,26 @@ void csGLTextureHandle::AdjustSizePo2 ()
     {
       images->GetImage (i)->Rescale (newwidth, newheight);
     }
+    actual_width = newwidth;
+    actual_height = newheight;
   }
-}
-
-csGLTexture* csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
-{
-  ismipmap = false;
-  return new csGLTexture (this, Image);
 }
 
 void csGLTextureHandle::CreateMipMaps()
 {
-  //int thissize;
   csRGBpixel *tc = IsTransp() ? &transp_color : (csRGBpixel *)0;
 
-  //  printf ("delete old\n");
   // Delete existing mipmaps, if any
   size_t i;
-  for(i=0; i<vTex.Length(); i++)
-    delete vTex[i];
-  vTex.DeleteAll ();
+  if (uploadData != 0)
+    uploadData->DeleteAll();
+  else
+    uploadData = new csArray<csGLUploadData>;
 
-  size = 0;
-  //  printf ("push 0\n");
-  csGLTexture* ntex = NewTexture (images->GetImage (0), false);
-  ntex->d = images->Length();
-  //ntex->components = csGLTextureManager::glformats[formatidx].components;
-  vTex.Push (ntex);
-  DG_LINK (this, ntex);
-
-  //  printf ("transform 0\n");
-  transform (images, vTex[0]);
+  transform (images, 0);
   // Create each new level by creating a level 2 mipmap from previous level
   // we do this down to 1x1 as opengl defines it
 
-  //iImageVector* prevImages = images;
   csRef<iImageVector> thisImages =
       csPtr<iImageVector> (new csImageVector()); 
   for (i=0; i < images->Length(); i++)
@@ -559,77 +405,96 @@ void csGLTextureHandle::CreateMipMaps()
       thisImages->SetImage (i, cimg);
     }
 
-    csGLTexture* ntex = NewTexture (thisImages->GetImage (0), true);
-    ntex->d = thisImages->Length();
-    vTex.Push (ntex);
-    DG_LINK (this, ntex);
-
-    transform (thisImages, ntex);
+    transform (thisImages, nTex);
     w = thisImages->GetImage (0)->GetWidth ();
     h = thisImages->GetImage (0)->GetHeight ();
   }
 }
 
 
-bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
+bool csGLTextureHandle::transform (iImageVector *ImageVector/*, csGLTexture *tex*/, int mipNum)
 {
   uint8 *h;
-
-  csGLTexture::UploadData* uploadData = tex->uploadData =
-    new csGLTexture::UploadData;
-
-  uploadData->internalFormat = targetFormat;
 
   csRef<iImage> Image = ImageVector->GetImage (0);
   int n = Image->GetWidth ()*Image->GetHeight ();
   int d = ImageVector->Length();
   if (d > 1)
   {
-    void* data = 0;
-    int j;
-
-    h = uploadData->image_data = new uint8 [n * d * 4];
-    for (j=0; j<d; j++)
+    if (target == CS_TEX_IMG_CUBEMAP)
     {
-      Image = ImageVector->GetImage (j);
-      if (n == (Image->GetWidth() * Image->GetHeight()))
+      for (int j=0; j<d; j++)
       {
-	data = Image->GetImageData();
-	memcpy (h, data, n * 4);
+	csGLUploadData& uploadData = this->uploadData->GetExtend (
+	  this->uploadData->Length());
+
+	csRef<iImage> Image = ImageVector->GetImage (j);
+	uploadData.dataRef = Image;
+	uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
+	uploadData.imageNum = j;
+	uploadData.w = Image->GetWidth();
+	uploadData.h = Image->GetHeight();
+	uploadData.d = 1;
+	uploadData.sourceFormat = GL_RGBA;
+	uploadData.sourceType = GL_UNSIGNED_BYTE;
+	uploadData.mip = mipNum;
       }
-      else
-      {
-	memset (h, 0, n * 4);
-	/* or well, something else? */
-      }
-      h += (n * 4);
     }
-    uploadData->size = n * 4;
+    else
+    {
+      csGLUploadData& uploadData = this->uploadData->GetExtend (
+	this->uploadData->Length());
+      uploadData.w = Image->GetWidth();
+      uploadData.h = Image->GetHeight();
+      uploadData.d = d;
+      uploadData.sourceFormat = GL_RGBA;
+      uploadData.sourceType = GL_UNSIGNED_BYTE;
+      uploadData.mip = mipNum;
+
+      void* data = 0;
+      int j;
+
+      csRef<csDataBuffer> volumeData;
+      volumeData.AttachNew (new csDataBuffer (n * d * 4));
+      uploadData.dataRef = volumeData;
+      uploadData.image_data = h = volumeData->GetUint8();
+      for (j=0; j<d; j++)
+      {
+	Image = ImageVector->GetImage (j);
+	if (n == (Image->GetWidth() * Image->GetHeight()))
+	{
+	  data = Image->GetImageData();
+	  memcpy (h, data, n * 4);
+	}
+	else
+	{
+	  memset (h, 0, n * 4);
+	  /* or well, something else? */
+	}
+	h += (n * 4);
+      }
+    }
+    //uploadData->size = n * 4;
   }
   else
   {
+    csGLUploadData& uploadData = this->uploadData->GetExtend (
+      this->uploadData->Length());
+
     csRef<iImage> Image = ImageVector->GetImage (0);
-    uploadData->imgRef = Image;
-    uploadData->image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
-    uploadData->size = n * 4;
+    uploadData.dataRef = Image;
+    uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
+    //uploadData->size = n * 4;
+    uploadData.w = Image->GetWidth();
+    uploadData.h = Image->GetHeight();
+    uploadData.d = 1;
+    uploadData.sourceFormat = GL_RGBA;
+    uploadData.sourceType = GL_UNSIGNED_BYTE;
+    uploadData.mip = mipNum;
   }
   
-  size += uploadData->size * d;
+  //size += uploadData->size * d;
   return true;
-}
-
-iGraphics2D* csGLTextureHandle::GetCanvas ()
-{
-  if (!canvas)
-  {
-    csOFSCbOpenGL* ofscb = new csOFSCbOpenGL (this);
-    csGLTexture *t = vTex[0];
-    canvas = G3D->GetDriver2D ()->CreateOffscreenCanvas (
-      t->get_image_data (), t->get_width (), t->get_height (), 32,
-      ofscb);
-    ofscb->DecRef ();
-  }
-  return canvas;
 }
 
 void csGLTextureHandle::Blit (int x, int y, int width,
@@ -651,6 +516,11 @@ void csGLTextureHandle::Blit (int x, int y, int width,
 void csGLTextureHandle::Load ()
 {
   if (Handle != 0) return;
+
+  const csGLTextureClassSettings* textureSettings = 
+    txtmgr->GetTextureClassSettings (textureClass);
+  const GLenum targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
+    textureSettings->formatRGBA : textureSettings->formatRGB;
 
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
@@ -698,15 +568,15 @@ void csGLTextureHandle::Load ()
     }
 
     size_t i;
-    for (i = 0; i < vTex.Length(); i++)
+    for (i = 0; i < uploadData->Length(); i++)
     {
-      csGLTexture* togl = vTex[i];
+      const csGLUploadData& uploadData = this->uploadData->Get (i);
       //if (togl->compressed == GL_FALSE)
       {
-	glTexImage2D (GL_TEXTURE_2D, i, togl->uploadData->internalFormat, 
-	  togl->get_width(), 
-	  togl->get_height(), 0, sourceFormat, sourceType, 
-	  togl->uploadData->image_data);
+	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
+	  targetFormat, 
+	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat, 
+	  uploadData.sourceType, uploadData.image_data);
       }
       /*else
       {
@@ -714,7 +584,6 @@ void csGLTextureHandle::Load ()
 	  (GLenum)togl->internalFormat, togl->get_width(),  togl->get_height(), 
 	  0, togl->size, togl->image_data);
       }*/
-      togl->CleanupImageData ();
     }
   }
   else if (target == CS_TEX_IMG_3D)
@@ -736,15 +605,14 @@ void csGLTextureHandle::Load ()
         txtmgr->texture_filter_anisotropy);
     }
 
-    for (size_t i = 0; i < vTex.Length (); i++)
+    size_t i;
+    for (i = 0; i < uploadData->Length(); i++)
     {
-      csGLTexture* togl = vTex[i];
-      G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, i, 
-	togl->uploadData->internalFormat,
-	togl->get_width (), togl->get_height (),  togl->get_depth (),
-	0, sourceFormat, sourceType, 
-	togl->uploadData->image_data);
-      togl->CleanupImageData ();
+      const csGLUploadData& uploadData = this->uploadData->Get (i);
+      G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
+	targetFormat, uploadData.w, uploadData.h, uploadData.d,
+	0, uploadData.sourceFormat, uploadData.sourceType, 
+	uploadData.image_data);
     }
   }
   else if (target == CS_TEX_IMG_CUBEMAP)
@@ -770,25 +638,19 @@ void csGLTextureHandle::Load ()
         txtmgr->texture_filter_anisotropy);
     }
 
-    for (size_t i=0; i < vTex.Length (); i++)
+    size_t i;
+    for (i = 0; i < uploadData->Length(); i++)
     {
-      csGLTexture* togl = vTex[i];
+      const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      int cursize = togl->uploadData->size;
-
-      uint8* data = togl->uploadData->image_data;
-      int j;
-      for(j = 0; j < 6; j++)
-      {
-        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, 
-	  /*togl->uploadData->internalFormat*/GL_RGBA8, 
-	  togl->get_width (), togl->get_height(),
-          0, sourceFormat, sourceType,	data);
-        data += cursize;
-      }
-      togl->CleanupImageData ();
+      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
+	uploadData.mip, GL_RGBA8/*@@@ targetFormat*/, 
+	uploadData.w, uploadData.h,
+        0, uploadData.sourceFormat, uploadData.sourceType,	
+	uploadData.image_data);
     }
   }
+  delete uploadData; uploadData = 0;
 }
 
 void csGLTextureHandle::Unload ()
@@ -810,6 +672,16 @@ void csGLTextureHandle::Precache ()
 {
   PrepareInt ();
   Load ();
+}
+
+void csGLTextureHandle::SetTextureClass (const char* className)
+{
+  textureClass = txtmgr->GetTextureClassID (className);
+}
+
+const char* csGLTextureHandle::GetTextureClass ()
+{
+  return txtmgr->GetTextureClassName (textureClass);
 }
 
 void csGLTextureHandle::UpdateTexture ()
@@ -1062,28 +934,12 @@ void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
   }
 }
 
-// make sure the lenient versions are listed ahead of specific ones
-CS_GL_FORMAT_TABLE (csGLTextureManager::glformats)
-  CS_GL_FORMAT (GL_RGBA,      GL_RGBA,	4, 0)
-  CS_GL_FORMAT (GL_RGBA16,    GL_RGBA,	4, 8)
-  CS_GL_FORMAT (GL_RGBA8,     GL_RGBA,  4, 4)
-  CS_GL_FORMAT (GL_RGB10_A2,  GL_RGBA,	4, 4)
-  CS_GL_FORMAT (GL_RGB5_A1,   GL_RGBA,	4, 2)
-  CS_GL_FORMAT (GL_RGBA4,     GL_RGBA,	4, 2)
-  CS_GL_FORMAT (GL_RGBA2,     GL_RGBA,	4, 1)
-  CS_GL_FORMAT (GL_RGB,	      GL_RGB,	3, 0)
-  CS_GL_FORMAT (GL_RGB16,     GL_RGB,	3, 6)
-  CS_GL_FORMAT (GL_RGB10,     GL_RGB,	3, 4)
-  CS_GL_FORMAT (GL_RGB8,      GL_RGB,	3, 3)
-  CS_GL_FORMAT (GL_RGB5,      GL_RGB,	3, 2)
-  CS_GL_FORMAT (GL_RGB4,      GL_RGB,	3, 2)
-  CS_GL_FORMAT (GL_R3_G3_B2,  GL_RGB,	3, 1)
-CS_GL_FORMAT_TABLE_END
-
-
 SCF_IMPLEMENT_IBASE(csGLTextureManager)
   SCF_IMPLEMENTS_INTERFACE(iTextureManager)
 SCF_IMPLEMENT_IBASE_END
+
+static const csGLTextureClassSettings defaultSettings = 
+  {GL_RGB, GL_RGBA, false, false};
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -1101,6 +957,46 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
+
+#define CS_GL_TEXTURE_FORMAT(fmt)					    \
+  textureFormats.Put (#fmt, TextureFormat (fmt, true));		
+#define CS_GL_TEXTURE_FORMAT_EXT(fmt, Ext)				    \
+  textureFormats.Put (#fmt, TextureFormat (fmt, G3D->ext->CS_##Ext));		
+
+  CS_GL_TEXTURE_FORMAT(GL_RGB);
+  CS_GL_TEXTURE_FORMAT(GL_R3_G3_B2);
+  CS_GL_TEXTURE_FORMAT(GL_RGB4);
+  CS_GL_TEXTURE_FORMAT(GL_RGB5);
+  CS_GL_TEXTURE_FORMAT(GL_RGB8);
+  CS_GL_TEXTURE_FORMAT(GL_RGB10);
+  CS_GL_TEXTURE_FORMAT(GL_RGB12);
+  CS_GL_TEXTURE_FORMAT(GL_RGB16);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA2);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA4);
+  CS_GL_TEXTURE_FORMAT(GL_RGB5_A1);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA8);
+  CS_GL_TEXTURE_FORMAT(GL_RGB10_A2);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA12);
+  CS_GL_TEXTURE_FORMAT(GL_RGBA16);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGB_ARB, 
+    GL_ARB_texture_compression);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGBA_ARB, 
+    GL_ARB_texture_compression);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+    GL_EXT_texture_compression_s3tc);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 
+    GL_EXT_texture_compression_s3tc);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 
+    GL_EXT_texture_compression_s3tc);
+  CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 
+    GL_EXT_texture_compression_s3tc);
+#undef CS_GL_TEXTURE_FORMAT_SUPP
+#undef CS_GL_TEXTURE_FORMAT_EXT
+#undef CS_GL_TEXTURE_FORMAT
+
+  textureClasses.Put (textureClassIDs.Request ("default"), defaultSettings);
+
   read_config (config);
   Clear ();
 
@@ -1141,100 +1037,108 @@ void csGLTextureManager::read_config (iConfigFile *config)
       "Invalid texture filter mode '%s'.", filterModeStr);
   }
 
-  int rgbBits = (texture_bits >= 48) ? 48 :
-    ((texture_bits > 24) ? 24 : texture_bits);
-  int rgbaBits = texture_bits <= 8 ? 8 :
-    ((texture_bits + 15) / 16) * 16;
-
-  AlterTargetFormatForBits (GL_RGB, rgbBits);
-  AlterTargetFormatForBits (GL_RGBA, rgbaBits);
-
-  csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
-  while (it->Next ())
-    AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
+  ReadTextureClasses (config);
 }
 
-void csGLTextureManager::AlterTargetFormatForBits (GLenum target, int bits)
+const csGLTextureClassSettings* 
+csGLTextureManager::GetTextureClassSettings (csStringID texclass)
 {
-  int targetIdx;
-  for (targetIdx = 0; (glformats[targetIdx].sourceFormat != target)
-    && (glformats[targetIdx].components != 0); targetIdx++);
-  if (glformats[targetIdx].components == 0) return;
-
-  int newIdx;
-  for (newIdx = targetIdx + 1; (glformats[newIdx].sourceFormat == target)
-    && (glformats[newIdx].texelbytes > (bits / 8))
-    && (glformats[newIdx].components != 0); newIdx++);
-
-  if ((glformats[newIdx].sourceFormat != target) 
-    || (glformats[newIdx].components == 0)) return;
-
-  glformats[targetIdx].forcedFormat = glformats[newIdx].targetFormat;
+  const csGLTextureClassSettings* ret = 
+    textureClasses.GetElementPointer (texclass);
+  return ret ? ret : &defaultSettings;
 }
 
-void csGLTextureManager::AlterTargetFormat (const char *oldTarget, 
-					    const char *newTarget)
+GLenum csGLTextureManager::ParseTextureFormat (const char* formatName, 
+					       GLenum defaultFormat)
 {
-    // first find the old target
-  int theOld=0;
-  while (glformats[theOld].name && strcmp (glformats[theOld].name, oldTarget))
-    theOld++;
+  csString extractedFormat;
 
-  if (glformats[theOld].name)
+  while ((formatName != 0) && (*formatName != 0))
   {
-    if (strcmp (newTarget, "compressed") == 0)
+    const char* comma = strchr (formatName, ',');
+    if (comma != 0)
     {
-      if (G3D->ext->CS_GL_ARB_texture_compression)
+      extractedFormat.Replace (formatName, comma - formatName);
+      formatName = comma + 1;
+    }
+    else
+    {
+      extractedFormat.Replace (formatName);
+      formatName = 0;
+    }
+    const TextureFormat* textureFmt = textureFormats.GetElementPointer (
+      extractedFormat.GetData());
+    if (textureFmt == 0)
+    {
+      G3D->Report (CS_REPORTER_SEVERITY_ERROR,
+	"Unknown texture format name '%s'", extractedFormat.GetData());
+    }
+    else
+    {
+      if (textureFmt->supported)
+	return textureFmt->format;
+      else
       {
-	GLint compressedFormat;
-	// is the format compressable at all ?
-	switch (glformats[theOld].sourceFormat)
-	{
-	  case GL_RGB:
-	    compressedFormat = GL_COMPRESSED_RGB_ARB;
-	    break;
-	  case GL_RGBA:
-	    compressedFormat = GL_COMPRESSED_RGBA_ARB;
-	    break;
-	  default:
-	    G3D->Report (CS_REPORTER_SEVERITY_ERROR, 
-	      "%s is not compressable !", oldTarget);
-	    return;
-	}
-	glformats[theOld].compressedFormat = compressedFormat;
+	// @@@ Report if verbose?
+      }
+    }
+  }
+
+  return defaultFormat;
+}
+
+void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
+{
+  csString extractedClass;
+  csRef<iConfigIterator> it = config->Enumerate (
+    "Video.OpenGL.TextureClass.");
+  while (it->Next())
+  {
+    const char* keyName = it->GetKey (true);
+    const char* dot = strchr (keyName, '.');
+    if (dot != 0)
+    {
+      extractedClass.Replace (keyName, dot - keyName);
+
+      csStringID classID = textureClassIDs.Request (extractedClass);
+      csGLTextureClassSettings* settings = textureClasses.GetElementPointer (
+	classID);
+      if (settings == 0)
+      {
+	textureClasses.Put (classID, defaultSettings);
+	settings = textureClasses.GetElementPointer (classID);
+      }
+
+      const char* optionName = dot + 1;
+      if (strcasecmp (optionName, "FormatRGB") == 0)
+      {
+	settings->formatRGB = ParseTextureFormat (it->GetStr(),
+	  GL_RGB);
+      } 
+      else if (strcasecmp (optionName, "FormatRGBA") == 0)
+      {
+	settings->formatRGBA = ParseTextureFormat (it->GetStr(),
+	  GL_RGBA);
+      } 
+      else if (strcasecmp (optionName, "SharpenPrecomputedMipmaps") == 0)
+      {
+	settings->sharpenPrecomputedMipmaps = it->GetBool ();
+      } 
+      else if (strcasecmp (optionName, "ForceDecompress") == 0)
+      {
+	settings->forceDecompress = it->GetBool ();
+      } 
+      else
+      {
+	G3D->Report (CS_REPORTER_SEVERITY_ERROR,
+	  "Unknown texture class option '%s' for '%s'", 
+	  optionName, extractedClass.GetData());
       }
     }
     else
     {
-      // does the new format exist ?
-      int theNew=0;
-      while (glformats[theNew].name
-      		&& strcmp (glformats[theNew].name, newTarget))
-	theNew++;
-
-      if (glformats[theNew].name)
-      {
-	if (glformats[theNew].sourceFormat == glformats[theOld].sourceFormat)
-	  glformats[theOld].forcedFormat = glformats[theNew].targetFormat;
-	else
-	{
-	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
-            "You can only force a new targetFormat if both, old and new targetFormat"
-	    "(%s resp. %s) have the same sourceFormat",
-	    glformats[theOld].name, glformats[theNew]);
-	}
-      }
-      else
-      {
-	G3D->Report (CS_REPORTER_SEVERITY_ERROR,
-	  "Unknown target format: %s", newTarget);
-      }
+      // @@@ Report?
     }
-  }
-  else
-  {
-    G3D->Report (CS_REPORTER_SEVERITY_ERROR,
-      "Unknown source format: %s", newTarget);
   }
 }
 

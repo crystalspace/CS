@@ -183,10 +183,12 @@ TextureLoaderContext::TextureLoaderContext (const char* texname)
   width = height = 128;
 
   TextureLoaderContext::texname = texname;
+  texClass = 0;
 }
 
 TextureLoaderContext::~TextureLoaderContext ()
 {
+  delete[] texClass;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -241,6 +243,16 @@ void TextureLoaderContext::GetSize (int& w, int& h)
 const char* TextureLoaderContext::GetName ()
 {
   return texname;
+}
+
+void TextureLoaderContext::SetClass (const char* className)
+{
+  texClass = csStrNew (className);
+}
+
+const char* TextureLoaderContext::GetClass ()
+{
+  return texClass;
 }
 
 //----------------------------------------------------------------------------

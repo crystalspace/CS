@@ -58,6 +58,7 @@ private:
   int key_col_r, key_col_g, key_col_b;
   /// Texture registration flags
   int flags;
+  char* texClass;
 
   // The callback which is called just before texture is used.
   csRef<iTextureCallback> use_callback;
@@ -164,6 +165,8 @@ public:
     return use_callback != 0;
   }
 
+  void SetTextureClass (const char* className);
+  const char* GetTextureClass ();
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -199,6 +202,10 @@ public:
     }
     virtual void SetKeepImage (bool k) { scfParent->keep_image = k; }
     virtual bool KeepImage () const { return scfParent->keep_image; }
+    virtual void SetTextureClass (const char* className)
+    { scfParent->SetTextureClass (className); }
+    virtual const char* GetTextureClass () 
+    { return scfParent->GetTextureClass(); }
   } scfiTextureWrapper;
   friend struct TextureWrapper;
 };

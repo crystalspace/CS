@@ -255,7 +255,7 @@ void csPolyTexture::FillLightMap (
   int ww, hh;
   iMaterialHandle* mat_handle = spoly->GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
-    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+    mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
   else
     ww = hh = 64;
 
@@ -472,7 +472,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
 
   int ww, hh;
   iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
-  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
 
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
@@ -1030,7 +1030,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   int ww, hh;
   iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
   if (mat_handle && mat_handle->GetTexture ())
-    mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+    mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
   else
     ww = hh = 64;
 

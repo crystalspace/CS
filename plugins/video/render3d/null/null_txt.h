@@ -136,10 +136,10 @@ public:
 
   csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
 
-  bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
-  { md = 0; return csTextureHandle::GetMipMapDimensions (mipmap, mw, mh); }
+  bool GetRendererDimensions (int &mw, int &mh, int &md)
+  { md = 0; return csTextureHandle::GetRendererDimensions (mw, mh); }
   void GetOriginalDimensions (int& mw, int& mh, int& md)
-  { GetMipMapDimensions (0, mw, mh, md); }
+  { GetRendererDimensions (mw, mh, md); }
   void SetTextureTarget (int target) { }
   int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
   const char* GetImageName (int depth = 0) const { return image->GetName (); }

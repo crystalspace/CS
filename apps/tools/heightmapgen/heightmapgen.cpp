@@ -210,7 +210,7 @@ void HeightMapGen::CreateHeightmap (int heightmap_res, iCollideSystem* cdsys,
       	false, closest_tri, isect);
       float y = (isect.y - box.MinY ()) / (box.MaxY () - box.MinY ());
       if (y < 0) y = 0;
-      else if (y > 0.9999) y = 0.9999f;
+      else if (y > 0.9999f) y = 0.9999f;
       *height_dst++ = y;
       y *= 256.0;
       hmap_dst->Set (int (y), int (y), int (y));

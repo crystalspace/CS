@@ -50,51 +50,18 @@ class csGLTextureHandle;
 class csGLTextureManager;
 class csGLTextureCache;
 
-class csGLTexture
+struct csGLUploadData
 {
-public:
-  CS_LEAKGUARD_DECLARE(csGLTexture);
-
-  csGLTexture (csGLTextureHandle *p, iImage* Image);
-  virtual ~csGLTexture();
-
-  csGLTextureHandle *Parent;
-
-  struct UploadData
-  {
-    uint8* image_data;
-    /** 
-     * Ref to image that owns image_data.
-     * Note: only if imgRef == 0 image_data will be delete[]d.
-     */
-    csRef<iImage> imgRef;
-    GLint compressed;
-    GLint internalFormat;
-    GLint size;
-
-    UploadData ();
-    ~UploadData ();
-  };
-  UploadData* uploadData;
-  int w, h, d/*, components*/;
-
-  void CleanupImageData ();
-   ///
-  int get_width () const { return w; }
-  ///
-  int get_height () const { return h; }
-
-  int get_depth () const { return d; }
-
-  //int get_components () const { return components; } 
-
-  uint8 *&get_image_data ()
-  { 
-    CS_ASSERT (uploadData);
-    return uploadData->image_data; 
-  }
-
-  csGLTextureHandle *get_parent () { return Parent; }
+  //GLint compressed;
+  //GLint internalFormat;
+  //GLint size;
+  void* image_data;
+  int w, h, d;
+  csRef<iBase> dataRef;
+  GLenum sourceFormat;
+  GLenum sourceType;
+  int mip;
+  int imageNum;
 };
 
 class csGLTextureHandle : public iTextureHandle
@@ -105,9 +72,8 @@ private:
   /// texturemanager handle
   csRef<csGLTextureManager> txtmgr;
 
-  
-  GLenum sourceFormat, targetFormat;
-  GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
+  //GLenum targetFormat;
+  csStringID textureClass;
 
   /// 2D Canvas
   csRef<iGraphics2D> canvas;
@@ -151,20 +117,19 @@ private:
   void *cachedata;
 
   bool Compressable () { return !texFlags.Check (CS_TEXTURE_2D); }
-  bool transform (iImageVector *ImageVec, csGLTexture *tex);
-
-  csGLTexture* NewTexture (iImage *Image, bool ismipmap);
+  bool transform (iImageVector *ImageVec, int mipNum);
 
   GLuint Handle;
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
 public:
-  int formatidx;
-  int orig_width, orig_height;
-  csArray<csGLTexture*> vTex;
+  //int formatidx;
+  int orig_width, orig_height, orig_d;
+  int actual_width, actual_height, actual_d;
+  csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
-  long size;
+  //long size;
   int target;
   bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
   void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
@@ -179,15 +144,11 @@ public:
 
   virtual ~csGLTextureHandle ();
 
-  GLenum SourceType () const { return sourceType; }
-  GLenum SourceFormat () const { return sourceFormat; }
-  GLenum TargetFormat () const { return targetFormat; }
-
   void Clear();
 
   void AdjustSizePo2 ();
   void CreateMipMaps();
-  bool FindFormatType();
+  //bool FindFormatType();
   void PrepareKeycolor (iImage* image, const csRGBpixel& transp_color,
     csAlphaMode::AlphaType& alphaType);
   void ComputeMeanColor (int w, int h, csRGBpixel *src, 
@@ -228,7 +189,7 @@ public:
    * and in that case the size returned here will be the corrected size.
    * You can get the original image size with GetOriginalDimensions().
    */
-  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh);
+  virtual bool GetRendererDimensions (int &mw, int &mh);
 
   /**
    * Return the original dimensions of the image used to create this texture.
@@ -258,7 +219,7 @@ public:
    * and in that case the size returned here will be the corrected size.
    * You can get the original image size with GetOriginalDimensions().
    */
-  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md);
+  virtual bool GetRendererDimensions (int &mw, int &mh, int &md);
 
   /**
    * Return the original dimensions of the image used to create this texture.
@@ -310,17 +271,13 @@ public:
    */
   virtual bool GetAlphaMap () const;
 
-  /**
-   * Get a canvas instance which is suitable for rendering on this
-   * texture. Note that it is not allowed to change the palette of
-   * the returned canvas.
-   */
-  virtual iGraphics2D* GetCanvas ();
-
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return alphaType; }
 
   virtual void Precache ();
+
+  virtual void SetTextureClass (const char* className);
+  virtual const char* GetTextureClass ();
 
   void UpdateTexture ();
 
@@ -468,6 +425,14 @@ public:
   virtual iTextureHandle* GetTexture ();
 };
 
+struct csGLTextureClassSettings
+{
+  GLenum formatRGB;
+  GLenum formatRGBA;
+  bool sharpenPrecomputedMipmaps;
+  bool forceDecompress;
+};
+
 /*
 *
 * New Texture Manager... done by Phil Aumayr (phil@rarebyte.com)
@@ -476,17 +441,6 @@ public:
 class csGLTextureManager : public iTextureManager
 {
 private:
-  struct formatDescription
-  {
-    GLenum targetFormat;
-    char *name;
-    GLenum sourceFormat;
-    int components; // number of components in texture
-    GLint compressedFormat;
-    GLenum forcedFormat;
-    int texelbytes;
-  };
-
   typedef csWeakRefArray<csGLTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
@@ -497,8 +451,20 @@ private:
 
   csPixelFormat pfmt;
 
-  void AlterTargetFormatForBits (GLenum target, int bits);
-  void AlterTargetFormat (const char *oldTarget, const char *newTarget);
+  csStringSet textureClassIDs;
+  csHash<csGLTextureClassSettings, csStringID> textureClasses;
+  struct TextureFormat
+  {
+    GLenum format;
+    bool supported;
+
+    TextureFormat (GLenum fmt, bool supp) : format (fmt), supported (supp) {}
+  };
+  csHash<TextureFormat, csStrKey, csConstCharHashKeyHandler>
+    textureFormats;
+
+  GLenum ParseTextureFormat (const char* formatName, GLenum defaultFormat);
+  void ReadTextureClasses (iConfigFile* config);
 
   iObjectRegistry *object_reg;
 public:
@@ -520,8 +486,6 @@ public:
 
   csStringID nameDiffuseTexture;
 
-  static formatDescription glformats [];
-
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *G3D);
@@ -532,6 +496,15 @@ public:
   void read_config (iConfigFile *config);
   void Clear ();
 
+  const csGLTextureClassSettings* GetTextureClassSettings (csStringID texclass);
+  csStringID GetTextureClassID (const char* className)
+  {
+    return textureClassIDs.Request (className);
+  }
+  const char* GetTextureClassName (csStringID classID)
+  {
+    return textureClassIDs.Request (classID);
+  }
 
   /**
    * Called from csMaterialHandle destructor to notify parent texture
@@ -619,16 +592,6 @@ public:
     int lm_x1, int lm_y1, int lm_x2, int lm_y2,
     float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
-
-#define CS_GL_FORMAT_TABLE(var) \
-csGLTextureManager::formatDescription var[] = {
-
-#define CS_GL_FORMAT(dsttype, srctype, size, texelsize) \
-{dsttype, #dsttype, srctype, size, 0, (GLenum)0, texelsize},
-
-#define CS_GL_FORMAT_TABLE_END \
-{(GLenum)0, 0, (GLenum)0, 0, 0, (GLenum)0, 0}};
-
 
 #endif // __CS_GL_TXTMGR_H__
 

@@ -35,7 +35,7 @@
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 2, 4);
+SCF_VERSION (iTextureHandle, 2, 3, 0);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -71,16 +71,15 @@ struct iTextureHandle : public iBase
   virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const = 0;
 
   /**
-   * Get the dimensions for a given mipmap level (0 to 3).
-   * If the texture was registered just for 2D usage, mipmap levels above
-   * 0 will return false. Note that the result of this function will
-   * be the size that the renderer uses for this texture. In most cases
-   * this corresponds to the size that was used to create this texture
-   * but some renderers have texture size limitations (like power of two)
-   * and in that case the size returned here will be the corrected size.
+   * Get the dimensions the renderer uses for this texture.
+   * In most cases this corresponds to the size that was used to create this 
+   * texture, but some renderers have texture size limitations (like power 
+   * of two) and in that case the size returned here will be the corrected 
+   * size.
    * You can get the original image size with GetOriginalDimensions().
+   * \return Whether the renderer-used dimensions could be determined.
    */
-  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh) = 0;
+  virtual bool GetRendererDimensions (int &mw, int &mh) = 0;
 
   /**
    * Return the original dimensions of the image used to create this texture.
@@ -103,16 +102,15 @@ struct iTextureHandle : public iBase
 
 
   /**
-   * Get the dimensions for a given mipmap level (0 to 3).
-   * If the texture was registered just for 2D usage, mipmap levels above
-   * 0 will return false. Note that the result of this function will
-   * be the size that the renderer uses for this texture. In most cases
-   * this corresponds to the size that was used to create this texture
-   * but some renderers have texture size limitations (like power of two)
-   * and in that case the size returned here will be the corrected size.
+   * Get the dimensions the renderer uses for this texture.
+   * In most cases this corresponds to the size that was used to create this 
+   * texture, but some renderers have texture size limitations (like power 
+   * of two) and in that case the size returned here will be the corrected 
+   * size.
    * You can get the original image size with GetOriginalDimensions().
+   * \return Whether the renderer-used dimensions could be determined.
    */
-  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md) = 0;
+  virtual bool GetRendererDimensions (int &mw, int &mh, int &md) = 0;
 
   /**
    * Return the original dimensions of the image used to create this texture.
@@ -171,13 +169,6 @@ struct iTextureHandle : public iBase
    */
   virtual bool GetAlphaMap () const = 0;
 
-  /**
-   * Get a canvas instance which is suitable for rendering on this
-   * texture. Note that it is not allowed to change the palette of
-   * the returned canvas.
-   */
-  virtual iGraphics2D* GetCanvas () = 0;
-
   /// Get the type of alpha associated with the texture.
   virtual csAlphaMode::AlphaType GetAlphaType () const = 0;
 
@@ -186,6 +177,23 @@ struct iTextureHandle : public iBase
    * makes later usage of the texture faster.
    */
   virtual void Precache () = 0;
+
+  /**
+   * Set the "class" of this texture.
+   * A texture class is used to set some characteristics on how a texture is
+   * handled at runtime. For example, graphics hardware usually offers texture
+   * compression, but it can cause a loss of quality and precision and thus
+   * may not be desireable for all data. In this case, a class can be set on
+   * the texture that instructs the renderer to not apply texture compression.
+   * \remarks Not all renderers may support texture classes. 
+   * \sa GetTextureClass
+   */
+  virtual void SetTextureClass (const char* className) = 0;
+  /**
+   * Get the "class" of a texture.
+   * \sa SetTextureClass
+   */
+  virtual const char* GetTextureClass () = 0;
 };
 
 /** @} */

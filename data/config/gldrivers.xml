@@ -71,18 +71,6 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="texturecompression">
-      <Video>
-	<OpenGL>
-	  <TargetFormat>
-	    <GL_RGB>compressed</GL_RGB>
-	    <GL_RGBA>compressed</GL_RGBA>
-	    <GL_RGB5_A1>compressed</GL_RGB5_A1>
-	    <GL_RGBA8>compressed</GL_RGBA8>
-	  </TargetFormat>
-	</OpenGL>
-      </Video>
-    </config>
     <config name="softgl">
       <Video>
 	<OpenGL>
@@ -224,22 +212,6 @@
       </conditions>
       <applicable>
 	<usecfg>3dfxhacks</usecfg>
-      </applicable>
-    </rule>
-    <rule description="GeForce setting: Texture Compression">
-      <conditions>
-	<regexp string="renderer" pattern="^GeForce" />
-      </conditions>
-      <applicable>
-	<usecfg>texturecompression</usecfg>
-      </applicable>
-    </rule>
-    <rule description="ATI r300+ setting: Texture Compression">
-      <conditions>
-	<regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\)00" />
-      </conditions>
-      <applicable>
-	<usecfg>texturecompression</usecfg>
       </applicable>
     </rule>
     <rule description="GeForce FX 5xxx: Slow VBO">

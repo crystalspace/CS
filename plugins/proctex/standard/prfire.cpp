@@ -29,8 +29,6 @@
 
 #include "prfire.h"
 
-#define NEW_PROC 0
-
 SCF_IMPLEMENT_IBASE_EXT(csProcFire)
   SCF_IMPLEMENTS_INTERFACE(iFireTexture)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -128,10 +126,6 @@ void csProcFire::MakePalette (int max)
   int maxcolours = palsize/2;
   csColor col;
   int r,g,b;
-#if NEW_PROC
-  g2d = tex->GetTextureHandle ()->GetCanvas ();
-  bool palette_mode = g2d->GetPixelBytes () == 1;
-#endif
   for (i = 0; i < maxcolours; i++)
   {
     float H = 4.6f - 1.5f * float(i) / float(maxcolours);
@@ -147,17 +141,6 @@ void csProcFire::MakePalette (int max)
     palette[i].red = r;
     palette[i].green = g;
     palette[i].blue = b;
-#if NEW_PROC
-    if (palette_mode)
-    {
-      palette_idx[i] = i;
-      g2d->SetRGB (i, r, g, b);
-    }
-    else
-    {
-      palette_idx[i] = g2d->FindRGB (r, g, b);
-    }
-#endif
   }
   //// guess rest of colours
   float inc = 512.0f / float (palsize - maxcolours);
@@ -173,17 +156,6 @@ void csProcFire::MakePalette (int max)
     palette[i].red = r;
     palette[i].green = g;
     palette[i].blue = b;
-#if NEW_PROC
-    if (palette_mode)
-    {
-      palette_idx[i] = i;
-      g2d->SetRGB (i, r, g, b);
-    }
-    else
-    {
-      palette_idx[i] = g2d->FindRGB (r, g, b);
-    }
-#endif
   }
 }
 
@@ -304,20 +276,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
     fireline[x] = tot / (2*sm+1);
   }
 
-#if NEW_PROC
-  g2d = tex->GetTextureHandle ()->GetCanvas ();
-  if (!g2d->BeginDraw ()) return;
-  /// draw firetexture
-  im = image;
-  for (y = 0 ; y < mat_h ; y++)
-    for (x = 0 ; x < mat_w ; x++)
-    {
-      int col = *im++;
-      col = col * palsize / 256;
-      g2d->DrawPixel (x, y, palette_idx[col]);
-    }
-  g2d->FinishDraw ();
-#else
   if (visible)
   {
     /// draw firetexture
@@ -336,7 +294,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
     tex->GetTextureHandle ()->Blit (0, 0, mat_w,mat_h, blitbuf);
   }
   curimg = newimg;
-#endif
 }
 
 void csProcFire::SetPossibleBurn (int possburn)

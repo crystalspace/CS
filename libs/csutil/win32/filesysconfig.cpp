@@ -51,7 +51,7 @@ static void MakeDir (const char* name)
   upPath[len] = 0;
 
   MakeDir (upPath);
-  CreateDirectoryEx (upPath, name, 0);
+  CreateDirectoryA (name, 0);
 }
 
 csPtr<iConfigFile> csGetPlatformConfig (const char* Key)

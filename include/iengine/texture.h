@@ -46,7 +46,7 @@ struct iTextureCallback : public iBase
   virtual void UseTexture (iTextureWrapper* wrap) = 0;
 };
 
-SCF_VERSION (iTextureWrapper, 0, 1, 0);
+SCF_VERSION (iTextureWrapper, 0, 1, 1);
 
 /**
  * A texture wrapper is an engine-level object that wraps around an actual
@@ -149,6 +149,17 @@ struct iTextureWrapper : public iBase
    * remove the image pointer from this texture wrapper. False by default.
    */
   virtual bool KeepImage () const = 0;
+
+  /**
+   * Set the "class" of this texture.
+   * For more information, see iTextureHandle::SetTextureClass.
+   */
+  virtual void SetTextureClass (const char* className) = 0;
+  /**
+   * Get the "class" of this texture.
+   * For more information, see iTextureHandle::GetTextureClass.
+   */
+  virtual const char* GetTextureClass () = 0;
 };
 
 

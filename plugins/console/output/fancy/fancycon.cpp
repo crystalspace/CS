@@ -195,11 +195,11 @@ void csFancyConsole::Draw3D (csRect *oArea)
     // determine what space left to draw the actual console
     memset (&bordersize, 0, sizeof (bordersize));
     if (deco.border [0].mat)
-      deco.border [0].mat->GetTexture ()->GetMipMapDimensions(
-        0, bordersize.xmin, bordersize.ymin);
+      deco.border [0].mat->GetTexture ()->GetRendererDimensions (
+        bordersize.xmin, bordersize.ymin);
     if (deco.border[4].mat)
-      deco.border [4].mat->GetTexture ()->GetMipMapDimensions(
-        0, bordersize.xmax, bordersize.ymax);
+      deco.border [4].mat->GetTexture ()->GetRendererDimensions (
+        bordersize.xmax, bordersize.ymax);
 
     SetTransparency (true); // Otherwise 2D-part will overdraw what we paint.
     border_computed = true;
@@ -339,7 +339,7 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
     float u_stretch = 1.0, v_stretch = 1.0;
     int w, h;
 
-    border.mat->GetTexture ()->GetMipMapDimensions (0, w, h);
+    border.mat->GetTexture ()->GetRendererDimensions (w, h);
     switch (align)
     {
       case 1:

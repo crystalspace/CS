@@ -699,7 +699,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   shaderPass *thispass = &passes[currentPass];
 
   //now map our buffers. all refs should be set
-  unsigned int i;
+  size_t i;
   for (i = 0; i < thispass->custommaping_attrib.Length (); i++)
   {
     if (thispass->custommapping_variables.Length () >= i && thispass->custommapping_variables[i] != 0)
@@ -723,25 +723,26 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   lastBufferCount = thispass->custommaping_attrib.Length ();
   
   //and the textures
-  for (i = 0; i < thispass->textureCount; i++)
+  int j;
+  for (j = 0; j < thispass->textureCount; j++)
   {
-    if (thispass->textureRef[i] != 0)
+    if (thispass->textureRef[j] != 0)
     {
       iTextureWrapper* wrap;
-      thispass->textureRef[i]->GetValue(wrap);
+      thispass->textureRef[j]->GetValue(wrap);
       if (wrap)
       {
         wrap->Visit ();
-        last_textures[i] = wrap->GetTextureHandle ();
+        last_textures[j] = wrap->GetTextureHandle ();
       }
       else
-        last_textures[i] = 0;
+        last_textures[j] = 0;
     }
-    else if (thispass->textureID[i] < (csStringID)stacks.Length ())
+    else if (thispass->textureID[j] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
-      if (stacks[thispass->textureID[i]].Length () > 0)
-        var = stacks[thispass->textureID[i]].Top ();
+      if (stacks[thispass->textureID[j]].Length () > 0)
+        var = stacks[thispass->textureID[j]].Top ();
       if (var)
       {
         iTextureWrapper* wrap;
@@ -749,14 +750,14 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
         if (wrap) 
         {
           wrap->Visit ();
-          last_textures[i] = wrap->GetTextureHandle ();
+          last_textures[j] = wrap->GetTextureHandle ();
         } else 
-          var->GetValue(last_textures[i]);
+          var->GetValue(last_textures[j]);
       } else
-        last_textures[i] = 0;
+        last_textures[j] = 0;
     }
     else
-      last_textures[i] = 0;
+      last_textures[j] = 0;
   }
   g3d->SetTextureState (textureUnits, last_textures, 
     thispass->textureCount);

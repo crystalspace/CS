@@ -526,7 +526,7 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   iMaterialHandle* mat_handle = GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
   {
-    rc = mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+    rc = mat_handle->GetTexture ()->GetRendererDimensions (ww, hh);
     if (!rc) ww = hh = 64;
   }
   else

@@ -170,6 +170,10 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     if (texTarget == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
       child->SetValue ("cubemap"); // cubemap node
+      const char* texClass = texWrap->GetTextureClass();
+      if ((texClass != 0) && (strcmp (texClass, "default") != 0))
+	CreateValueNode (child, "class", texClass);
+
       CreateValueNode (child, "north",
         texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_X));
       CreateValueNode (child, "south",
@@ -186,8 +190,12 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
     {
       child->SetValue ("texture3d"); // texture3d node
+      const char* texClass = texWrap->GetTextureClass();
+      if ((texClass != 0) && (strcmp (texClass, "default") != 0))
+	CreateValueNode (child, "class", texClass);
+
       int w,h,d;
-      if (texHand->GetMipMapDimensions (0, w, h, d) && d)
+      if (texHand->GetRendererDimensions (w, h, d) && (d != 0))
       {
         for (int i=0; i<d; i++)
           CreateValueNode (child, "layer", texHand->GetImageName (i));
@@ -201,6 +209,9 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (filename && *filename)
       {
         CreateValueNode(child, "file", filename);
+	const char* texClass = texWrap->GetTextureClass();
+	if ((texClass != 0) && (strcmp (texClass, "default") != 0))
+	  CreateValueNode (child, "class", texClass);
 
         int r,g,b, r2,g2,b2;
         texWrap->GetKeyColor(r, g, b);

@@ -1197,7 +1197,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
   if (render_target)
   {
     int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    render_target->GetRendererDimensions (txt_w, txt_h);
     if (!rt_cliprectset)
     {
       G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
@@ -1208,7 +1208,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
     if (!rt_onscreen)
     {
       int txt_w, txt_h;
-      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
 	    render_target->GetPrivateObject ();
       csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
@@ -1348,7 +1348,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
     {
       rt_onscreen = false;
       int txt_w, txt_h;
-      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
 	    render_target->GetPrivateObject ();
       //tex_mm->DeleteMipmaps ();

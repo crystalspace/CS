@@ -3604,7 +3604,7 @@ void csEngine::SetContext (iTextureHandle *txthandle)
     render_context = txthandle;
     if (render_context)
     {
-      render_context->GetMipMapDimensions (0, frame_width, frame_height);
+      render_context->GetRendererDimensions (frame_width, frame_height);
     }
     else
     {
