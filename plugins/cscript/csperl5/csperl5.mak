@@ -160,8 +160,10 @@ csperl5clean:
 	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) \
 $(PERLXSI.O) $(PERLXSI.C) $(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
-csperl5maintainerclean: csperl5clean
+swigperl5clean:
 	$(RM) $(SWIG.PERL5.DOC) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+
+csperl5maintainerclean: csperl5clean swigperl5clean
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
