@@ -15,7 +15,6 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: 3dslev 3dslevclean
 
-all apps: 3dslev
 3dslev:
 	$(MAKE_TARGET)
 3dslevclean:
@@ -49,7 +48,6 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: 3dslev 3dslevclean
 
-all: $(3DS2LEV.EXE)
 3dslev: $(OUTDIRS) $(3DS2LEV.EXE)
 clean: 3dslevclean
 

@@ -95,6 +95,11 @@ The history order is reversed so that new features are at the top.
 	  the lib3ds library!
 	- Eric Sunshine eliminated an "unused variable" compilation warning
 	  from cswseng.cpp.
+	- Eric Sunshine modified the makefile for the new 3ds2lev application
+	  so that the `3dslev' makefile target no longer appears in the `all'
+	  or `apps' targets since most people do _not_ have the lib3ds package
+	  installed.  If you want to build this program, then you must
+	  explicitly mention the `3dslev' target.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded
