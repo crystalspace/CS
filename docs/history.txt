@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Nov-1999
+	- Brandon Ehle fixes cspython so that it works with SCF.
+	- Michael Dale Long did a major update of Crystal Clear to SCF.
+	- Fixes to Win port from Siu-Hang Or.
+	- Some fixes to OpenGL. At least it compiles with SCF now
+	  but it doesn't run yet.
 11-Nov-1999
 	- Eric Sunshine fixed a "pure virtual method called" crasher at
 	  application termination time.  This bug appeared with the
@@ -20,6 +26,45 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine renamed csTextureManager class in MazeD to
 	  mzTextureManager in order to avoid symbolic conflict with
 	  csTextureManager in the 3D software renderer.
+	- Brandon Ehle almost got WalkTest running with BCB4.
+	- Brandon also added 'tests' application.
+	- Alex Pfaffe did a cleanup of the terrain engine. He removed
+	  a lot of unneeded stuff. He also added support for PGM loading.
+	- Andrew Zabolotny completed redesigned commandline parsing in
+	  CS. Here is how it works:
+	    - You pass to System::Initialize() the argc and argv (as before)
+      	    - Initialize() collects all command-line options into an array.
+              Since it doesn't apriory know which options takes arguments,
+	      arguments are specified using the '=' character. Example:
+	      --mode=320x200.  Note that you can use any number of dashes...
+	      I prefer two.
+      	    - From now on you can query command-line options using
+              iSystem::GetOptionCL(char*, int) method. The method will
+	      return NULL only and only if the option is not present on the
+	      command line. You also can query the non-dashed command-line
+	      entries using the GetNameCL (int) method. The (int) arg in
+	      both prototypes is the ordinal number. For example, if you do
+	      GetOptionCL("plugin", 0) you will get the first "--plugin=xxx"
+	      switch. If you do GetOptionCL("plugin", 1) you'll get the
+	      second and so on. Same about GetNameCL(): 0 for the first arg,
+	      1 for the second and so on.
+      	    - If a plugin implements the iConfig interface, all config
+	      options are automatically handled by system driver. Right after
+	      loading the plugin the iConfig interface is queried, and all
+	      options from that plugin are added to the OptionList array in
+	      csSystemDriver object. After this all driver's options are
+	      queried using GetOptionCL() and if they are present on command
+	      line, are automatically presented to the plugin (via iConfig).
+              Note that this automatical handling is done BEFORE Open(). If
+	      you need post-Open() command-line handling, do it through
+	      messaging system (catch the cscmdSystemOpen broadcast and
+	      query via iSystem::GetOptionCL())
+	    - The help is displayed ONLY for the options that are exposed
+	      through iConfig interface and for options implemented by the
+	      SysSystemDriver. So using iConfig is highly recommended in
+	      plugins.
+	- Andrew also fixed a bug in system.cpp that could crash WalkTest
+	  at exit. He played a bit with thread priorities on OS/2.
 10-Nov-1999
 	- Eric Sunshine performed the SCF conversion on the Win32 system-
 	  driver.  Both Thomas Hieber and Brandon Ehle made attempts to get
