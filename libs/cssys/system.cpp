@@ -633,7 +633,7 @@ void csSystemDriver::Loop ()
   ExitLoop = false;
 }
 
-bool csSystemDriver::HandleEvent (iEvent &Event)
+bool csSystemDriver::HandleEvent (iEvent&Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
@@ -1150,6 +1150,18 @@ iEventOutlet *csSystemDriver::CreateEventOutlet (iEventPlug *iObject)
   csEventOutlet *outlet = new csEventOutlet (iObject, this);
   EventOutlets.Push (outlet);
   return outlet;
+}
+
+iEventCord *csSystemDriver::GetEventCord (int Category, int Subcategory)
+{
+  int idx = EventCords.Find(Category, Subcategory);
+  if(idx != -1) 
+    return EventCords.Get(idx);
+  else {
+    csEventCord *cord = new csEventCord(Category, Subcategory);
+    EventCords.Push(cord);
+    return cord;
+  }
 }
 
 iEventOutlet *csSystemDriver::GetSystemEventOutlet ()

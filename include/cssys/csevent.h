@@ -32,7 +32,7 @@ class csEvent : public iEvent
 {
 public:
   /// Empty initializer
-  csEvent () {}
+  csEvent ();
 
   /// Create a keyboard event object
   csEvent (cs_time eTime, int eType, int kCode, int kChar, int kModifiers);

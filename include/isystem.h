@@ -141,6 +141,7 @@ struct iPlugIn;
 struct iVFS;
 struct iEventOutlet;
 struct iEventPlug;
+struct iEventCord;
 struct iStrVector;
 
 SCF_VERSION (iSystem, 4, 0, 0);
@@ -282,6 +283,14 @@ struct iSystem : public iBase
    * system event queue.
    */
   virtual iEventOutlet *CreateEventOutlet (iEventPlug *iObject) = 0;
+
+  /**
+   * Get the event cord for a given category and subcategory.<p>
+   * This allows events to be delivered immediately to a chain
+   * of plugins that register with the implementation of iEventCord
+   * returned by this function.
+   */
+  virtual iEventCord *GetEventCord(int Category, int Subcategory) = 0;
 
   /**
    * Get a public event outlet for posting just a single event and such.

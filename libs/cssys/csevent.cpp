@@ -25,6 +25,11 @@ IMPLEMENT_IBASE (csEvent)
   IMPLEMENTS_INTERFACE (iEvent)
 IMPLEMENT_IBASE_END
 
+csEvent::csEvent ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
 csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers)
 {
   CONSTRUCT_IBASE (NULL);

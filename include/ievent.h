@@ -22,6 +22,8 @@
 
 #include "csutil/scf.h"
 
+struct iPlugIn;
+
 /// System Events: take care not to define more than 32 event types
 enum
 {
@@ -418,11 +420,11 @@ struct iEvent : public iBase
  * | .                       +<-|event +-<<--+event|
  * | .   +---------------+   |  |outlet| .   |plug |
  * +-----+  event queue  +<--+  +------+ .   +-----+
+ * | .   +---------------+   |  +------+ .   +-----+
+ * | .                       +<-|event +-<<--+event|
+ * | .   +---------------+   |  |outlet| .   |plug |
+ * +-----+ event cord    +<--|  +------+ .   +-----+
  *   .   +---------------+   |  +------+ .   +-----+
- *   .                       +<-|event +-<<--+event|
- *   .                       |  |outlet| .   |plug |
- *   .                       |  +------+ .   +-----+
- *   .                       |  +------+ .   +-----+
  *   .                       +<-|event +-<<--+event|
  *   .                          |outlet| .   |plug |
  *   .                          +------+ .   +-----+
@@ -436,6 +438,9 @@ struct iEvent : public iBase
  * and generate duplicate keydown events).<p>
  * Events are put into the system event queue, from where they are sent to
  * applications and plugins.
+ * Event cords bypass the system queue for specific command event categories
+ * and deliver events immediately in a prioritizied chain to specific plugins
+ * which request the categories.
  */
 
 /**
@@ -596,6 +601,48 @@ struct iEventOutlet : public iBase
    * is kind of too late to process this kind of events).
    */
   virtual void ImmediateBroadcast (int iCode, void *iInfo) = 0;
+};
+
+SCF_VERSION(iEventCord, 0, 0, 1);
+
+/**
+ * The iEventCord is an interface provided by the system driver to
+ * any plugins wanting to receive a given csevCommand events ASAP
+ * in a specified priority.  It can optionally pass events onto 
+ * the system queue, as well.
+ */
+struct iEventCord {
+
+  /**
+   * Insert a plugin into the queue.  The priority defines
+   * when it will receive the event with respect to other
+   * registered plugins.  Plugins with the same priority are
+   * handled in a first-come first-served fashion.  This is 
+   * significant since returning false from HandleEvent will
+   * stop further event processing.
+   */
+  virtual int Insert(iPlugIn *plugin, int priority) = 0;
+
+  /**
+   * Remove a plugin from the queue.
+   */
+  virtual void Remove(iPlugIn *plugin) = 0;
+
+  /**
+   * Returns true if events are passed on to the
+   * system queue after all plugins in the local
+   * queue have processed (and returned false).
+   */
+  virtual bool GetPass() const = 0;
+
+  /**
+   * Sets whether events are passed to the system
+   * queue after the local queue have been processed
+   * and all returned false.  This could cause the 
+   * event to be processed twice under some circumstances.
+   */
+  virtual void SetPass(bool pass) = 0;
+  
 };
 
 #endif // __IEVENT_H__

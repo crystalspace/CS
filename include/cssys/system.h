@@ -26,6 +26,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "cssys/csinput.h"
+#include "cssys/csevcord.h"
 #include "isystem.h"
 #include "ivfs.h"
 #include "ievent.h"
@@ -215,6 +216,21 @@ class csSystemDriver : public iSystem
     csEventOutlet *Get (int idx)
     { return (csEventOutlet *)csVector::Get (idx); }
   } EventOutlets;
+
+  /*
+   * The array of all allocated event cords.
+   */
+  class csEventCordsVector : public csVector
+  {
+  public:
+    csEventCordsVector () : csVector (16, 16)
+    { }
+    virtual bool FreeItem (csSome Item)
+    { delete (csEventCord *)Item; return true; }
+    csEventCord *Get (int idx)
+    { return (csEventCord *)csVector::Get (idx); }
+    int Find (int Category, int SubCategory);
+  } EventCords;
 
   // Collect all options from command line
   virtual void CollectOptions (int argc, const char* const argv[]);
@@ -435,6 +451,8 @@ public:
   virtual void GetJoystickPosition (int number, int &x, int &y);
   /// Register an event plug and return a new outlet
   virtual iEventOutlet *CreateEventOutlet (iEventPlug *iObject);
+  /// Get an event cord for the given category/subcategory.
+  virtual iEventCord *GetEventCord(int Category, int Subcategory);
   /// Get a public event outlet for posting just a single event and such.
   virtual iEventOutlet *GetSystemEventOutlet ();
 
