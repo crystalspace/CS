@@ -20201,6 +20201,10 @@ cs_header_text="${cs_header_text}#endif // __CS_VOLATILE_H__
 #------------------------------------------------------------------------------
 # Output generated files.  Also create makefile cache if caching enabled.
 #------------------------------------------------------------------------------
+if test ! -d include; then
+  mkdir include
+fi
+
           ac_config_commands="$ac_config_commands include/volatile.h"
 
 cs_jamconfig_text="${cs_jamconfig_text}PACKAGE.NAME = \"$PACKAGE_NAME\" ;
