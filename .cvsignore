@@ -1,9 +1,0 @@
-.cvsignore
-out
-*.cfg
-debug.txt
-config.*
-coord*
-*.zip
-*.exe
-*.dll
