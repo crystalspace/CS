@@ -319,9 +319,41 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 			int tx_idx = ((v + vv + pt_min_v) & tx_andh) << tx_shfw;
 			PI_PIXTYPE *__out = out;
 
-			int r = r0, rd = (r1 - r0) >> pt_cell_shift;
-			int g = g0, gd = (g1 - g0) >> pt_cell_shift;
-			int b = b0, bd = (b1 - b0) >> pt_cell_shift;
+			int r = r0;
+			
+			int g = g0;
+			int b = b0;
+			int rd, gd, bd;
+			if (r0 > r1)
+			{
+			  // if r1-r0 is very small and negative
+			  // rd is slightly wrong, but enough to
+			  // cause visible artifacts due to an 
+			  // underflow
+			  // we work around this by distinguishing
+			  // between r0>r1 and r1>r0.
+			  rd = -((r0 - r1) >> pt_cell_shift);
+			}
+			else
+			{
+			  rd = (r1 - r0) >> pt_cell_shift;
+			}
+			if (g0 > g1)
+			{
+			  gd = -((g0 - g1) >> pt_cell_shift);
+			}
+			else
+			{
+			  gd = (g1 - g0) >> pt_cell_shift;
+			}
+			if (b0 > b1)
+			{
+			  bd = -((b0 - b1) >> pt_cell_shift);
+			}
+			else
+			{
+			  bd = (b1 - b0) >> pt_cell_shift;
+			}
 
 			int uu = u + pt_min_u;
 			int end_uu = uu + lc_w;
