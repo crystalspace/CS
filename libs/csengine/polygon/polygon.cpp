@@ -1414,6 +1414,14 @@ bool csPolygon3D::IntersectSegment (const csVector3& start, const csVector3& end
   return plane->IntersectSegment (start, end, isect, pr);
 }
 
+bool csPolygon3D::IntersectRayPlane (const csVector3& start, const csVector3& end,
+                                   csVector3& isect)
+{
+  float r;
+  plane->IntersectSegment (start, end, isect, &r);
+  return r >= 0;
+}
+
 void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (orig_poly) return;

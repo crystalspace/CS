@@ -45,7 +45,7 @@ void csPoly3D::MakeEmpty ()
   num_vertices = 0;
 }
 
-bool csPoly3D::In (const csVector3& v)
+bool csPoly3D::In (const csVector3& v) const
 {
   int i, i1;
   i1 = num_vertices-1;
@@ -91,7 +91,7 @@ int csPoly3D::AddVertex (float x, float y, float z)
 }
 
 bool csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
-	csPoly2D* poly2d)
+	csPoly2D* poly2d) const
 {
   poly2d->MakeEmpty ();
   csVector2 p;
@@ -110,7 +110,7 @@ bool csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
 }
 
 bool csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
-	csPoly2D* poly2d)
+	csPoly2D* poly2d) const
 {
   poly2d->MakeEmpty ();
   csVector2 p;
@@ -129,7 +129,7 @@ bool csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
 }
 
 bool csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
-	csPoly2D* poly2d)
+	csPoly2D* poly2d) const
 {
   poly2d->MakeEmpty ();
   csVector2 p;

@@ -1058,6 +1058,16 @@ public:
   bool IntersectRayNoBackFace (const csVector3& start, const csVector3& end);
 
   /**
+   * Intersect ray with the plane of this polygon and returns the intersection
+   * point. This function does not test if the intersection is inside the
+   * polygon. It just returns the intersection with the plane (in or out).
+   * This function returns false if the ray is parallel with the plane
+   * (i.e. there is no intersection).
+   */
+  bool IntersectRayPlane (const csVector3& start, const csVector3& end,
+  	csVector3& isect);
+
+  /**
    * This is a given point is on (or very nearly on) this polygon.
    */
   bool PointOnPolygon (const csVector3& v);

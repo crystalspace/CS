@@ -41,9 +41,11 @@ struct iFile;
 /**
  * Visit a node in a polygon tree. If this function returns non-NULL
  * the scanning will stop and the pointer will be returned.
+ * The 'same_plane' bool will be true if all polygons are on the same
+ * plane.
  */
 typedef void* (csTreeVisitFunc)(csSector*, csPolygonInt**,
-	int num, void*);
+	int num, bool same_plane, void*);
 
 /**
  * Potentially cull a node from the tree just before it would otherwise

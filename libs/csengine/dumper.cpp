@@ -300,10 +300,24 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
   spaces[indent] = 0;
   CsPrintf (MSG_DEBUG_0, "%sThere are %d polygons in this node (pol split=%d).\n",
   	spaces, node->polygons.GetNumPolygons (), node->polygons_on_splitter);
-  CsPrintf (MSG_DEBUG_0, "%s Front:\n", spaces);
-  dump (tree, node->front, indent+2);
-  CsPrintf (MSG_DEBUG_0, "%s Back:\n", spaces);
-  dump (tree, node->back, indent+2);
+  for (i = 0 ; i < node->polygons.GetNumPolygons () ; i++)
+  {
+    if (node->polygons.GetPolygon (i)->GetType () == 1)
+    {
+      csPolygon3D* p = (csPolygon3D*)node->polygons.GetPolygon (i);
+      CsPrintf (MSG_DEBUG_0, "%s  %d='%s'\n", spaces, i, p->GetName ());
+    }
+  }
+  if (node->front || node->back)
+  {
+    CsPrintf (MSG_DEBUG_0, "%s Splitter: %f,%f,%f,%f\n", spaces,
+    	node->splitter.A (), node->splitter.B (),
+    	node->splitter.C (), node->splitter.D ());
+    CsPrintf (MSG_DEBUG_0, "%s Front:\n", spaces);
+    dump (tree, node->front, indent+2);
+    CsPrintf (MSG_DEBUG_0, "%s Back:\n", spaces);
+    dump (tree, node->back, indent+2);
+  }
 }
 
 void Dumper::dump (csBspTree2D* tree, csBspNode2D* node, int indent)

@@ -65,17 +65,17 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () { return num_vertices; }
+  int GetNumVertices () const { return num_vertices; }
 
   /**
    * Get the array with all vertices.
    */
-  csVector3* GetVertices () { return vertices; }
+  csVector3* GetVertices () const { return vertices; }
 
   /**
    * Get the specified vertex.
    */
-  csVector3* GetVertex (int i) 
+  csVector3* GetVertex (int i) const
   {
     if (i<0 || i>=num_vertices) return NULL;
     return &vertices[i];
@@ -100,19 +100,19 @@ public:
   /**
    * Get the first vertex.
    */
-  csVector3* GetFirst ()
+  csVector3* GetFirst () const
   { if (num_vertices<=0) return NULL;  else return vertices; }
 
   /**
    * Get the last vertex.
    */
-  csVector3* GetLast ()
+  csVector3* GetLast () const
   { if (num_vertices<=0) return NULL;  else return &vertices[num_vertices-1]; }
 
   /**
    * Test if this vector is inside the polygon.
    */
-  bool In (const csVector3& v);
+  bool In (const csVector3& v) const;
 
   /**
    * Test if a vector is inside the given polygon.
@@ -155,7 +155,7 @@ public:
    * as 'point' then it will return false (no valid projection).
    */
   bool ProjectXPlane (const csVector3& point, float plane_x,
-  	csPoly2D* poly2d);
+  	csPoly2D* poly2d) const;
 
   /**
    * Project this polygon onto a Y plane as seen from some
@@ -165,7 +165,7 @@ public:
    * as 'point' then it will return false (no valid projection).
    */
   bool ProjectYPlane (const csVector3& point, float plane_y,
-  	csPoly2D* poly2d);
+  	csPoly2D* poly2d) const;
 
   /**
    * Project this polygon onto a Z plane as seen from some
@@ -175,7 +175,7 @@ public:
    * as 'point' then it will return false (no valid projection).
    */
   bool ProjectZPlane (const csVector3& point, float plane_z,
-  	csPoly2D* poly2d);
+  	csPoly2D* poly2d) const;
 
   /**
    * Project this polygon onto an axis-aligned plane as seen from some
@@ -184,7 +184,7 @@ public:
    * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
    */
   bool ProjectAxisPlane (const csVector3& point, int plane_nr, float plane_pos,
-  	csPoly2D* poly2d)
+  	csPoly2D* poly2d) const
   {
     switch (plane_nr)
     {

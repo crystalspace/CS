@@ -111,6 +111,9 @@ bool csPolyPlane::IntersectSegment (const csVector3& start,
   //
   // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
 
+  // Set *pr to -1 to indicate error if we return false now.
+  if (pr) *pr = -1;
+
   denom = plane_wor.A ()*(x2-x1) + plane_wor.B ()*(y2-y1)
   	+ plane_wor.C ()*(z2-z1);
   if (ABS (denom) < SMALL_EPSILON) return false;	// Lines are parallel

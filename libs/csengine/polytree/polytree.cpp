@@ -20,8 +20,10 @@
 #include "csengine/polytree.h"
 #include "csengine/polygon.h"
 #include "csengine/treeobj.h"
+#include "csengine/world.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
+#include "isystem.h"
 
 csPolygonTreeNode::~csPolygonTreeNode ()
 {
@@ -76,7 +78,8 @@ void* csPolygonTreeNode::TraverseObjects (csSector* sector,
   stub = first_stub;
   while (stub)
   {
-    rc = func (sector, stub->GetPolygons (), stub->GetNumPolygons (), data);
+    rc = func (sector, stub->GetPolygons (), stub->GetNumPolygons (),
+    	false, data);
     if (rc) return rc;
     stub = stub->next_tree;
   }
@@ -235,14 +238,26 @@ struct CPTraverseData
   int num_polygon_was_hit;
 };
 
-static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
-	int num, void* vdata)
+struct CPSortPolDist
 {
+  csPolygon3D* pol;
+  float sqdist;
+};
+
+static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
+	int num, bool same_plane, void* vdata)
+{
+  int i, j;
+
   // Only for csPolygon3D.
   if (polygons[0]->GetType () != 1) return NULL;
 
   CPTraverseData* data = (CPTraverseData*)vdata;
-  int i, j;
+
+  // First put all polygons in a list which will be sorted
+  // by distance (closest polygon first). If 'same_plane'
+  // is true then this sorting is not needed.
+  CPSortPolDist* sorted_polygons = new CPSortPolDist[num];
   for (i = 0 ; i < num ; i++)
   {
     csPolygon3D* p = (csPolygon3D*)polygons[i];
@@ -251,14 +266,37 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
       data->is_solid = true;
       return (void*)1;
     }
-    for (j = 0 ; j < 6 ; j++)
-      if (!data->polygon_was_hit[j])
+    sorted_polygons[i].pol = p;
+  }
+
+  // Now try all six directions that haven't been tried earlier.
+  for (j = 0 ; j < 6 ; j++)
+    if (!data->polygon_was_hit[j])
+    {
+      if (!same_plane)
       {
+	csVector3 isect;
+        for (i = 0 ; i < num ; i++)
+	{
+          csPolygon3D* p = sorted_polygons[i].pol;
+	  bool is = p->IntersectRayPlane (data->pos, data->test_points[j],
+	  	isect);
+	  if (is) sorted_polygons[i].sqdist =
+	    	csSquaredDist::PointPoint (data->pos, isect);
+	  else sorted_polygons[i].sqdist = 1000000000.;
+	}
+	// @@@ DO qsort here!!!
+      }
+
+      for (i = 0 ; i < num ; i++)
+      {
+        csPolygon3D* p = sorted_polygons[i].pol;
         bool is = p->IntersectRayNoBackFace (data->pos, data->test_points[j]);
         if (is)
         {
           data->polygon_was_hit[j] = true;
 	  data->num_polygon_was_hit++;
+	  // @@@ This is not efficient. We should only do BF culling here.
           if (!p->IntersectRay (data->pos, data->test_points[j]))
 	  {
 	    // We can not see the polygon from 'pos'. So we are in solid
@@ -268,9 +306,11 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 	  }
 	  // We tested all points.
 	  if (data->num_polygon_was_hit >= 6) return (void*)1;
+	  // Otherwise don't test any other polygons from this node.
+	  break;
         }
       }
-  }
+    }
   return NULL;
 }
 

@@ -100,14 +100,14 @@ private:
    * to draw a number of polygons.
    */
   static void* DrawPolygons (csSector*, csPolygonInt** polygon,
-  	int num, void* data);
+  	int num, bool same_plane, void* data);
 
   /**
    * This function is called by the BSP tree traversal routine
    * to test polygons against the C buffer and add them to a queue if needed.
    */
   static void* TestQueuePolygons (csSector*, csPolygonInt** polygon,
-  	int num, void* data);
+  	int num, bool same_plane, void* data);
 
   /**
    * This function is called by the BSP tree traversal routine

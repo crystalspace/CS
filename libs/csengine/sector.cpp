@@ -322,7 +322,7 @@ bool IntersectSegmentCull (csPolygonTree* /*tree*/,
 }
 
 void* IntersectSegmentTestPol (csSector*,
-	csPolygonInt** polygon, int num, void* data)
+	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   ISectData* idata = (ISectData*)data;
   int i;
@@ -468,7 +468,7 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
 }
 
 void* csSector::DrawPolygons (csSector* sector,
-  csPolygonInt** polygon, int num, void* data)
+  csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   sector->DrawPolygonArray (polygon, num, d, false);
@@ -478,7 +478,7 @@ void* csSector::DrawPolygons (csSector* sector,
 csPolygon2DQueue* poly_queue;
 
 void* csSector::TestQueuePolygons (csSector* sector,
-  csPolygonInt** polygon, int num, void* data)
+  csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
@@ -878,7 +878,7 @@ void csSector::Draw (csRenderView& rview)
   }
   else
   {
-    DrawPolygons (this, polygons.GetArray (), polygons.Length (), &rview);
+    DrawPolygons (this, polygons.GetArray (), polygons.Length (), false, &rview);
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
@@ -1139,7 +1139,7 @@ void CompressShadowFrustums (csFrustumList* list)
 
 //@@@ Needs to be part of sector?
 void* CheckFrustumPolygonsFB (csSector*,
-	csPolygonInt** polygon, int num, void* data)
+	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   csPolygon3D* p;
   csFrustumView* lview = (csFrustumView*)data;
@@ -1456,7 +1456,7 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     static_tree->Front2Back (center, CheckFrustumPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
     CheckFrustumPolygonsFB (this, polygons.GetArray (),
-      polygons.Length (), (void*)&lview);
+      polygons.Length (), false, (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",
     	//count_cull_dist, count_cull_quad, count_cull_not);
   }

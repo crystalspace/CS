@@ -1,9 +1,33 @@
 The history order has been reversed so that new features are at the top.
 
+30-May-2000
+	- Alex Pfaffe did some minor fixes and cleanup in the terrain
+	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
+	- Fixed an inline problem in DDG terrain engine and a small other
+	  fix.
+	- Added a number of 'const' declarations to members in csPoly3D.
+	- Fixed a number of warnings in the WalkTest changes from David
+	  Durant.
+	- Still show the warning when RAPID plugin cannot be loaded by
+	  WalkTest but doesn't fail anymore.
+	- Extended BSP tree traversal with an extra flag 'same_plane' so
+	  that the BSP traversal routines know if all given polygons are
+	  on the same plane or not. This could be used for optimizations.
+	- Changed BSP building so that it better detects the case where
+	  all polygons are coplanar and indicates that in the node.
+	- Added csPolygon3D::IntersectRayPlane() to intersect a ray
+	  with the plane of a polygon.
+	- Wyatt Miler did a few fixes to terrain engine as well.
+	- Debugging version of radiosity from Wouter Wijngaards.
 29-May-2000
 	- Alex Pfaffe did some fixes on terrain engine. He also resynced
 	  with DDG. Various bug fixes and optimizations.
 	- Small fix to terrain engine (removal of bogus 'inline').
+	- Found a serious bug in PVS (more exactly the calculation of solid
+	  space between nodes). Note that I didn't fix the bug yet :-)
+	- Added more debugging information when dumping the octree/bsp tree.
+	- David Durant started reworking myapp functionality in WalkTest
+	  using proper subclassing.
 	- Eric Sunshine eliminated a compilation warning about multi-line '//'
 	  comment in ddgbtree.cpp.
 	- Eric Sunshine fixed several warnings throughout the project reported
