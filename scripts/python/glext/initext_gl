@@ -4,6 +4,7 @@
     if (!extstrGL) return;
     tested_CS_%Name% = true;
     const char* ext = "%Name%";
+%Depcheck%
     char cfgkey[%Cfglen% + %Namelen% + 1];
     sprintf (cfgkey, "%Cfgprefix%%%s", ext);
     

@@ -15,6 +15,14 @@ chronological order.
 	- Jorrit added csEngineTools::FindShortestDistance(). This function
 	  tries to find the shortest distance between two points. Possibly
 	  it will traverse portals to do so.
+	- res added some new extensions to the GL extension manager.
+	- res changed the GL "texture downsampling" code to not do actual 
+	  downsampling, but rather skip the first N mipmaps.
+	- res changed the GL texture manager to not resize textures larger 
+	  than the maximum size but to rather pick the first mipmap fitting
+	  into the texture size limit.
+	- res added some more per-texture-class options for downsampling and
+	  mip sharpening.
 14-Jan-2004
 	- Eric Sunshine added a new automated and highly dynamic unit testing
 	  framework which employs CppUnit (http://cppunit.sourceforge.net/).

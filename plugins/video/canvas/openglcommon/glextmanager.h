@@ -8149,6 +8149,44 @@ typedef GLvoid (csAPIENTRY* csGLBINDATTRIBLOCATIONARB) (GLhandleARB programObj, 
 typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIBARB) (GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLcharARB* name);
 typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, const GLcharARB* name);
 
+// GL_ARB_pixel_buffer_object
+#ifndef GL_PIXEL_PACK_BUFFER_ARB
+#define GL_PIXEL_PACK_BUFFER_ARB                                     0x88EB
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_ARB
+#define GL_PIXEL_UNPACK_BUFFER_ARB                                   0x88EC
+#endif
+
+#ifndef GL_PIXEL_PACK_BUFFER_BINDING_ARB
+#define GL_PIXEL_PACK_BUFFER_BINDING_ARB                             0x88ED
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_BINDING_ARB
+#define GL_PIXEL_UNPACK_BUFFER_BINDING_ARB                           0x88EF
+#endif
+
+
+
+// GL_ARB_texture_rectangle
+#ifndef GL_TEXTURE_RECTANGLE_ARB
+#define GL_TEXTURE_RECTANGLE_ARB                                     0x84F5
+#endif
+
+#ifndef GL_TEXTURE_BINDING_RECTANGLE_ARB
+#define GL_TEXTURE_BINDING_RECTANGLE_ARB                             0x84F6
+#endif
+
+#ifndef GL_PROXY_TEXTURE_RECTANGLE_ARB
+#define GL_PROXY_TEXTURE_RECTANGLE_ARB                               0x84F7
+#endif
+
+#ifndef GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB
+#define GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB                            0x84F8
+#endif
+
+
+
 
 
 // end of definitions
@@ -12432,6 +12470,10 @@ public:
   #endif
 
 
+  // GL_ARB_pixel_buffer_object
+
+  // GL_ARB_texture_rectangle
+
 
 // end of functions
 };
@@ -12595,6 +12637,8 @@ public:
   bool CS_GL_ARB_shader_objects;
   bool CS_GL_ARB_fragment_shader;
   bool CS_GL_ARB_vertex_shader;
+  bool CS_GL_ARB_pixel_buffer_object;
+  bool CS_GL_ARB_texture_rectangle;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -12753,6 +12797,8 @@ protected:
   bool tested_CS_GL_ARB_shader_objects;
   bool tested_CS_GL_ARB_fragment_shader;
   bool tested_CS_GL_ARB_vertex_shader;
+  bool tested_CS_GL_ARB_pixel_buffer_object;
+  bool tested_CS_GL_ARB_texture_rectangle;
 
 };
 
@@ -12770,6 +12816,7 @@ private:
   const char* msgExtFoundAndNotUsed;
   const char* msgExtInitFail;
   const char* msgExtNotFound;
+  const char* msgDependencyNotFound;
 #ifdef __WIN32__
   const char* extstrWGL;
   
@@ -12848,6 +12895,8 @@ public:
     msgExtFoundAndNotUsed = "%s Extension '%s' found, but not used.";
     msgExtInitFail = "%s Extension '%s' failed to initialize.";
     msgExtNotFound = "%s Extension '%s' not found.";
+    msgDependencyNotFound = "%s Extension '%s' depends on '%s' which did "
+      "not initialize.";
     
     Reset ();
   }
@@ -12858,6 +12907,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_version_1_2 = true;
     const char* ext = "GL_version_1_2";
+
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -12888,6 +12938,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_version_1_3 = true;
     const char* ext = "GL_version_1_3";
+
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -12960,6 +13011,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_imaging = true;
     const char* ext = "GL_ARB_imaging";
+
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13020,6 +13072,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_multitexture = true;
     const char* ext = "GL_ARB_multitexture";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13080,6 +13133,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_transpose_matrix = true;
     const char* ext = "GL_ARB_transpose_matrix";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13110,6 +13164,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_multisample = true;
     const char* ext = "GL_ARB_multisample";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13137,6 +13192,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_add = true;
     const char* ext = "GL_ARB_texture_env_add";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13227,6 +13283,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_cube_map = true;
     const char* ext = "GL_ARB_texture_cube_map";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13253,6 +13310,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_depth_texture = true;
     const char* ext = "GL_ARB_depth_texture";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13279,6 +13337,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_point_parameters = true;
     const char* ext = "GL_ARB_point_parameters";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13307,6 +13366,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_shadow = true;
     const char* ext = "GL_ARB_shadow";
+
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13333,6 +13393,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_shadow_ambient = true;
     const char* ext = "GL_ARB_shadow_ambient";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13359,6 +13420,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_border_clamp = true;
     const char* ext = "GL_ARB_texture_border_clamp";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13385,6 +13447,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_compression = true;
     const char* ext = "GL_ARB_texture_compression";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13418,6 +13481,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_combine = true;
     const char* ext = "GL_ARB_texture_env_combine";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13444,6 +13508,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_crossbar = true;
     const char* ext = "GL_ARB_texture_env_crossbar";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13470,6 +13535,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_env_dot3 = true;
     const char* ext = "GL_ARB_texture_env_dot3";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13496,6 +13562,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_mirrored_repeat = true;
     const char* ext = "GL_ARB_texture_mirrored_repeat";
+
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13522,6 +13589,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_blend = true;
     const char* ext = "GL_ARB_vertex_blend";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13559,6 +13627,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_program = true;
     const char* ext = "GL_ARB_vertex_program";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13647,6 +13716,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_window_pos = true;
     const char* ext = "GL_ARB_window_pos";
+
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13689,6 +13759,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_422_pixels = true;
     const char* ext = "GL_EXT_422_pixels";
+
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13715,6 +13786,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_abgr = true;
     const char* ext = "GL_EXT_abgr";
+
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13741,6 +13813,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_bgra = true;
     const char* ext = "GL_EXT_bgra";
+
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13767,6 +13840,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_blend_color = true;
     const char* ext = "GL_EXT_blend_color";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13794,6 +13868,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_blend_func_separate = true;
     const char* ext = "GL_EXT_blend_func_separate";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13821,6 +13896,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_blend_logic_op = true;
     const char* ext = "GL_EXT_blend_logic_op";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13847,6 +13923,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_blend_minmax = true;
     const char* ext = "GL_EXT_blend_minmax";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13874,6 +13951,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_blend_subtract = true;
     const char* ext = "GL_EXT_blend_subtract";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13900,6 +13978,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_clip_volume_hint = true;
     const char* ext = "GL_EXT_clip_volume_hint";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13926,6 +14005,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_color_subtable = true;
     const char* ext = "GL_EXT_color_subtable";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13954,6 +14034,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_compiled_vertex_array = true;
     const char* ext = "GL_EXT_compiled_vertex_array";
+
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -13982,6 +14063,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_convolution = true;
     const char* ext = "GL_EXT_convolution";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14021,6 +14103,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_fog_coord = true;
     const char* ext = "GL_EXT_fog_coord";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14052,6 +14135,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_histogram = true;
     const char* ext = "GL_EXT_histogram";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14088,6 +14172,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_multi_draw_arrays = true;
     const char* ext = "GL_EXT_multi_draw_arrays";
+
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14116,6 +14201,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_packed_pixels = true;
     const char* ext = "GL_EXT_packed_pixels";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14142,6 +14228,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_paletted_texture = true;
     const char* ext = "GL_EXT_paletted_texture";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14173,6 +14260,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_point_parameters = true;
     const char* ext = "GL_EXT_point_parameters";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14201,6 +14289,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_polygon_offset = true;
     const char* ext = "GL_EXT_polygon_offset";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14228,6 +14317,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_secondary_color = true;
     const char* ext = "GL_EXT_secondary_color";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14271,6 +14361,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_separate_specular_color = true;
     const char* ext = "GL_EXT_separate_specular_color";
+
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14297,6 +14388,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_shadow_funcs = true;
     const char* ext = "GL_EXT_shadow_funcs";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14323,6 +14415,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_shared_texture_palette = true;
     const char* ext = "GL_EXT_shared_texture_palette";
+
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14349,6 +14442,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_stencil_two_side = true;
     const char* ext = "GL_EXT_stencil_two_side";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14376,6 +14470,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_stencil_wrap = true;
     const char* ext = "GL_EXT_stencil_wrap";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14402,6 +14497,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_subtexture = true;
     const char* ext = "GL_EXT_subtexture";
+
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14431,6 +14527,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture3D = true;
     const char* ext = "GL_EXT_texture3D";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14458,6 +14555,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_compression_s3tc = true;
     const char* ext = "GL_EXT_texture_compression_s3tc";
+
     char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14484,6 +14582,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_add = true;
     const char* ext = "GL_EXT_texture_env_add";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14510,6 +14609,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_combine = true;
     const char* ext = "GL_EXT_texture_env_combine";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14536,6 +14636,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_env_dot3 = true;
     const char* ext = "GL_EXT_texture_env_dot3";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14562,6 +14663,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_filter_anisotropic = true;
     const char* ext = "GL_EXT_texture_filter_anisotropic";
+
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14588,6 +14690,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_lod_bias = true;
     const char* ext = "GL_EXT_texture_lod_bias";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14614,6 +14717,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_texture_object = true;
     const char* ext = "GL_EXT_texture_object";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14646,6 +14750,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_array = true;
     const char* ext = "GL_EXT_vertex_array";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14681,6 +14786,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_shader = true;
     const char* ext = "GL_EXT_vertex_shader";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14749,6 +14855,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_vertex_weighting = true;
     const char* ext = "GL_EXT_vertex_weighting";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14778,6 +14885,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_HP_occlusion_test = true;
     const char* ext = "GL_HP_occlusion_test";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14804,6 +14912,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_blend_square = true;
     const char* ext = "GL_NV_blend_square";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14830,6 +14939,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_copy_depth_to_color = true;
     const char* ext = "GL_NV_copy_depth_to_color";
+
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14856,6 +14966,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_depth_clamp = true;
     const char* ext = "GL_NV_depth_clamp";
+
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14882,6 +14993,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_evaluators = true;
     const char* ext = "GL_NV_evaluators";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14917,6 +15029,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_fence = true;
     const char* ext = "GL_NV_fence";
+
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14950,6 +15063,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_fog_distance = true;
     const char* ext = "GL_NV_fog_distance";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -14976,6 +15090,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_light_max_exponent = true;
     const char* ext = "GL_NV_light_max_exponent";
+
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15002,6 +15117,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_multisample_filter_hint = true;
     const char* ext = "GL_NV_multisample_filter_hint";
+
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15028,6 +15144,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_occlusion_query = true;
     const char* ext = "GL_NV_occlusion_query";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15061,6 +15178,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_packed_depth_stencil = true;
     const char* ext = "GL_NV_packed_depth_stencil";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15087,6 +15205,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_point_sprite = true;
     const char* ext = "GL_NV_point_sprite";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15115,6 +15234,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_register_combiners = true;
     const char* ext = "GL_NV_register_combiners";
+
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15154,6 +15274,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_register_combiners2 = true;
     const char* ext = "GL_NV_register_combiners2";
+
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15182,6 +15303,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texgen_emboss = true;
     const char* ext = "GL_NV_texgen_emboss";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15208,6 +15330,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texgen_reflection = true;
     const char* ext = "GL_NV_texgen_reflection";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15234,6 +15357,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_compression_vtc = true;
     const char* ext = "GL_NV_texture_compression_vtc";
+
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15260,6 +15384,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_env_combine4 = true;
     const char* ext = "GL_NV_texture_env_combine4";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15286,6 +15411,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_rectangle = true;
     const char* ext = "GL_NV_texture_rectangle";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15312,6 +15438,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader = true;
     const char* ext = "GL_NV_texture_shader";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15338,6 +15465,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader2 = true;
     const char* ext = "GL_NV_texture_shader2";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15364,6 +15492,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_texture_shader3 = true;
     const char* ext = "GL_NV_texture_shader3";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15390,6 +15519,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_vertex_array_range = true;
     const char* ext = "GL_NV_vertex_array_range";
+
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15420,6 +15550,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_vertex_array_range2 = true;
     const char* ext = "GL_NV_vertex_array_range2";
+
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15446,6 +15577,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program = true;
     const char* ext = "GL_NV_vertex_program";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15534,6 +15666,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program1_1 = true;
     const char* ext = "GL_NV_vertex_program1_1";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15560,6 +15693,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_element_array = true;
     const char* ext = "GL_ATI_element_array";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15589,6 +15723,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_envmap_bumpmap = true;
     const char* ext = "GL_ATI_envmap_bumpmap";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15619,6 +15754,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_fragment_shader = true;
     const char* ext = "GL_ATI_fragment_shader";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15659,6 +15795,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_pn_triangles = true;
     const char* ext = "GL_ATI_pn_triangles";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15687,6 +15824,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_texture_mirror_once = true;
     const char* ext = "GL_ATI_texture_mirror_once";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15713,6 +15851,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_array_object = true;
     const char* ext = "GL_ATI_vertex_array_object";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15751,6 +15890,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_attrib_array_object = true;
     const char* ext = "GL_ATI_vertex_attrib_array_object";
+
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15780,6 +15920,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_vertex_streams = true;
     const char* ext = "GL_ATI_vertex_streams";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15953,6 +16094,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_3DFX_texture_compression_FXT1 = true;
     const char* ext = "GL_3DFX_texture_compression_FXT1";
+
     char cfgkey[26 + 32 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -15979,6 +16121,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_IBM_cull_vertex = true;
     const char* ext = "GL_IBM_cull_vertex";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16005,6 +16148,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_IBM_multimode_draw_arrays = true;
     const char* ext = "GL_IBM_multimode_draw_arrays";
+
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16033,6 +16177,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_IBM_raster_pos_clip = true;
     const char* ext = "GL_IBM_raster_pos_clip";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16059,6 +16204,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_IBM_texture_mirrored_repeat = true;
     const char* ext = "GL_IBM_texture_mirrored_repeat";
+
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16085,6 +16231,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_IBM_vertex_array_lists = true;
     const char* ext = "GL_IBM_vertex_array_lists";
+
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16118,6 +16265,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_MESA_resize_buffers = true;
     const char* ext = "GL_MESA_resize_buffers";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16145,6 +16293,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_MESA_window_pos = true;
     const char* ext = "GL_MESA_window_pos";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16195,6 +16344,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_OML_interlace = true;
     const char* ext = "GL_OML_interlace";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16221,6 +16371,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_OML_resample = true;
     const char* ext = "GL_OML_resample";
+
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16247,6 +16398,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_OML_subsample = true;
     const char* ext = "GL_OML_subsample";
+
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16273,6 +16425,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_generate_mipmap = true;
     const char* ext = "GL_SGIS_generate_mipmap";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16299,6 +16452,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_multisample = true;
     const char* ext = "GL_SGIS_multisample";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16327,6 +16481,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_pixel_texture = true;
     const char* ext = "GL_SGIS_pixel_texture";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16357,6 +16512,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_border_clamp = true;
     const char* ext = "GL_SGIS_texture_border_clamp";
+
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16383,6 +16539,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_color_mask = true;
     const char* ext = "GL_SGIS_texture_color_mask";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16410,6 +16567,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_edge_clamp = true;
     const char* ext = "GL_SGIS_texture_edge_clamp";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16436,6 +16594,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_texture_lod = true;
     const char* ext = "GL_SGIS_texture_lod";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16462,6 +16621,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIS_depth_texture = true;
     const char* ext = "GL_SGIS_depth_texture";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16488,6 +16648,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIX_fog_offset = true;
     const char* ext = "GL_SGIX_fog_offset";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16514,6 +16675,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIX_interlace = true;
     const char* ext = "GL_SGIX_interlace";
+
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16540,6 +16702,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGIX_shadow_ambient = true;
     const char* ext = "GL_SGIX_shadow_ambient";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16566,6 +16729,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGI_color_matrix = true;
     const char* ext = "GL_SGI_color_matrix";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16592,6 +16756,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGI_color_table = true;
     const char* ext = "GL_SGI_color_table";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16625,6 +16790,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SGI_texture_color_table = true;
     const char* ext = "GL_SGI_texture_color_table";
+
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16651,6 +16817,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_SUN_vertex = true;
     const char* ext = "GL_SUN_vertex";
+
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16717,6 +16884,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_fragment_program = true;
     const char* ext = "GL_ARB_fragment_program";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16762,6 +16930,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_text_fragment_shader = true;
     const char* ext = "GL_ATI_text_fragment_shader";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16788,6 +16957,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_APPLE_client_storage = true;
     const char* ext = "GL_APPLE_client_storage";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16814,6 +16984,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_APPLE_element_array = true;
     const char* ext = "GL_APPLE_element_array";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16845,6 +17016,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_APPLE_fence = true;
     const char* ext = "GL_APPLE_fence";
+
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16879,6 +17051,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_APPLE_vertex_array_object = true;
     const char* ext = "GL_APPLE_vertex_array_object";
+
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -16909,6 +17082,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_APPLE_vertex_array_range = true;
     const char* ext = "GL_APPLE_vertex_array_range";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17342,6 +17516,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_matrix_palette = true;
     const char* ext = "GL_ARB_matrix_palette";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17373,6 +17548,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_element_array = true;
     const char* ext = "GL_NV_element_array";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17404,6 +17580,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_float_buffer = true;
     const char* ext = "GL_NV_float_buffer";
+
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17430,6 +17607,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_fragment_program = true;
     const char* ext = "GL_NV_fragment_program";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17466,6 +17644,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_primitive_restart = true;
     const char* ext = "GL_NV_primitive_restart";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17494,6 +17673,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_NV_vertex_program2 = true;
     const char* ext = "GL_NV_vertex_program2";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17520,6 +17700,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_buffer_object = true;
     const char* ext = "GL_ARB_vertex_buffer_object";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17557,6 +17738,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ATI_separate_stencil = true;
     const char* ext = "GL_ATI_separate_stencil";
+
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17585,6 +17767,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_texture_non_power_of_two = true;
     const char* ext = "GL_ARB_texture_non_power_of_two";
+
     char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17611,6 +17794,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_point_sprite = true;
     const char* ext = "GL_ARB_point_sprite";
+
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17637,6 +17821,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_shading_language_100 = true;
     const char* ext = "GL_ARB_shading_language_100";
+
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17663,6 +17848,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_shader_objects = true;
     const char* ext = "GL_ARB_shader_objects";
+
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17728,6 +17914,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_fragment_shader = true;
     const char* ext = "GL_ARB_fragment_shader";
+
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17754,6 +17941,7 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_vertex_shader = true;
     const char* ext = "GL_ARB_vertex_shader";
+
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -17810,6 +17998,65 @@ public:
       EXTMGR_FUNC_INIT(glGetVertexAttribPointervARB, GLGETVERTEXATTRIBPOINTERVARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_vertex_shader)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_pixel_buffer_object ()
+  {
+    if (tested_CS_GL_ARB_pixel_buffer_object) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_pixel_buffer_object = true;
+    const char* ext = "GL_ARB_pixel_buffer_object";
+    InitGL_ARB_vertex_buffer_object();
+    if (!CS_GL_ARB_vertex_buffer_object)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_ARB_vertex_buffer_object");
+      return;
+    }
+    char cfgkey[26 + 26 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_pixel_buffer_object = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_pixel_buffer_object;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_pixel_buffer_object)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ARB_texture_rectangle ()
+  {
+    if (tested_CS_GL_ARB_texture_rectangle) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_rectangle = true;
+    const char* ext = "GL_ARB_texture_rectangle";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_rectangle = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_rectangle;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_rectangle)
     }
     else
     {

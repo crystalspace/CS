@@ -52,9 +52,6 @@ class csGLTextureCache;
 
 struct csGLUploadData
 {
-  //GLint compressed;
-  //GLint internalFormat;
-  //GLint size;
   void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
@@ -431,6 +428,8 @@ struct csGLTextureClassSettings
   GLenum formatRGBA;
   bool sharpenPrecomputedMipmaps;
   bool forceDecompress;
+  bool allowDownsample;
+  bool allowMipSharpen;
 };
 
 /*

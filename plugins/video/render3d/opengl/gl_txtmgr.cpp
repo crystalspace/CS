@@ -29,6 +29,7 @@
 #include "csgfx/csimgvec.h"
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
+#include "cstool/debugimagewriter.h"
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
@@ -301,8 +302,6 @@ void csGLTextureHandle::PrepareInt ()
 
     if (newAlphaType > alphaType) alphaType = newAlphaType;
   }
-  // Determine the format and type of the source we gonna tranform the data to.
-  //FindFormatType ();
   CreateMipMaps ();
   FreeImage ();
 }
@@ -321,39 +320,40 @@ void csGLTextureHandle::AdjustSizePo2 ()
     csTextureHandle::CalculateNextBestPo2Size (
       orig_width, orig_height, newwidth, newheight);
 
-    // downsample textures, if requested, but not 2D textures
-    if (!texFlags.Check (CS_TEXTURE_2D))
-    {
-      /*
-        @@@ FIXME: for some special 3d textures (eg normalization cube)
-	  downsampling may not be desired, either.
-       */
-      newwidth >>= txtmgr->texture_downsample;
-      if (newwidth <= 0) newwidth = 1;
-      newheight >>= txtmgr->texture_downsample;
-      if (newheight <= 0) newheight = 1;
-    }
+    actual_width = newwidth;
+    actual_height = newheight;
 
-    // If necessary rescale if bigger than maximum texture size
-    if (newwidth > txtmgr->max_tex_size) newwidth = txtmgr->max_tex_size;
-    if (newheight > txtmgr->max_tex_size) newheight = txtmgr->max_tex_size;
+    // If necessary rescale if bigger than maximum texture size,
+    // but only if a dimension has changed. For textures that are
+    // already PO2, a lower mipmap will be selected in CreateMipMaps()
+    if ((newwidth != orig_width) && (newwidth > txtmgr->max_tex_size)) 
+      newwidth = txtmgr->max_tex_size;
+    if ((newheight != orig_width) && (newheight > txtmgr->max_tex_size)) 
+      newheight = txtmgr->max_tex_size;
 
-    /*
-      @@@ FIXME: It would be better if lower mipmaps provided by the 
-      image were used.
-     */
     if (newwidth != orig_width || newheight != orig_height)
     {
       images->GetImage (i)->Rescale (newwidth, newheight);
     }
-    actual_width = newwidth;
-    actual_height = newheight;
   }
 }
+
+//#define MIPMAP_DEBUG
 
 void csGLTextureHandle::CreateMipMaps()
 {
   csRGBpixel *tc = IsTransp() ? &transp_color : (csRGBpixel *)0;
+
+  const csGLTextureClassSettings* textureSettings = 
+    txtmgr->GetTextureClassSettings (textureClass);
+
+  // Determine if and how many mipmaps we skip.
+  const bool doReduce = !texFlags.Check (CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS)
+    && textureSettings->allowDownsample;
+  int mipskip = doReduce ? txtmgr->texture_downsample : 0;
+  while (((actual_width >> mipskip) > txtmgr->max_tex_size)
+    || ((actual_height >> mipskip) > txtmgr->max_tex_size))
+    mipskip++;
 
   // Delete existing mipmaps, if any
   size_t i;
@@ -362,52 +362,76 @@ void csGLTextureHandle::CreateMipMaps()
   else
     uploadData = new csArray<csGLUploadData>;
 
-  transform (images, 0);
-  // Create each new level by creating a level 2 mipmap from previous level
-  // we do this down to 1x1 as opengl defines it
-
   csRef<iImageVector> thisImages =
       csPtr<iImageVector> (new csImageVector()); 
   for (i=0; i < images->Length(); i++)
   {
     thisImages->AddImage (images->GetImage (i));
+#ifdef MIPMAP_DEBUG
+    csDebugImageWriter::DebugImageWrite (images->GetImage (i),
+      "/tmp/mipdebug/%.8x_%d_0.png", this, i);
+#endif
   }
-  csArray<int> nMipmaps;
-
-  int w = thisImages->GetImage (0)->GetWidth ();
-  int h = thisImages->GetImage (0)->GetHeight ();
-  int nTex = 0;
-
-  for (i=0; i < thisImages->Length(); i++)
+  if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
   {
-    nMipmaps.Push (thisImages->GetImage (i)->HasMipmaps());
+    transform (thisImages, 0);
   }
-  
-  while (w != 1 || h != 1)
+  else
   {
-    nTex++;
-    for (i=0; i<thisImages->Length();i++)
+    // Create each new level by creating a level 2 mipmap from previous level
+    // we do this down to 1x1 as opengl defines it
+    csArray<int> nMipmaps;
+
+    int w, h;
+    int nTex = 0;
+    int nMip = 0;
+
+    for (i=0; i < thisImages->Length(); i++)
     {
-      csRef<iImage> cimg;
-      if (nMipmaps[i] != 0)
-      {
-	cimg = images->GetImage (i)->MipMap (nTex, tc);
-	nMipmaps[i]--;
-      }
-      else
-      {
-        cimg = thisImages->GetImage (i)->MipMap (1, tc);
-      }
-      if (txtmgr->sharpen_mipmaps)
-      {
-	cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
-      }
-      thisImages->SetImage (i, cimg);
+      nMipmaps.Push (thisImages->GetImage (i)->HasMipmaps());
     }
+    
+    do
+    {
+      w = thisImages->GetImage (0)->GetWidth ();
+      h = thisImages->GetImage (0)->GetHeight ();
 
-    transform (thisImages, nTex);
-    w = thisImages->GetImage (0)->GetWidth ();
-    h = thisImages->GetImage (0)->GetHeight ();
+      if ((mipskip == 0) || ((w == 1) && (h == 1)))
+	transform (thisImages, nTex++);
+
+      if ((w == 1) && (h == 1)) break;
+
+      nMip++;
+      for (i=0; i<thisImages->Length();i++)
+      {
+	csRef<iImage> cimg;
+	bool precompMip = false;
+	if (nMipmaps[i] != 0)
+	{
+	  cimg = images->GetImage (i)->MipMap (nMip, tc);
+	  nMipmaps[i]--;
+	  precompMip = true;
+	}
+	else
+	{
+	  cimg = thisImages->GetImage (i)->MipMap (1, tc);
+	}
+	if (txtmgr->sharpen_mipmaps 
+	  && (mipskip == 0) // don't sharpen when doing skip...
+	  && textureSettings->allowMipSharpen
+	  && (!precompMip || textureSettings->sharpenPrecomputedMipmaps))
+	{
+	  cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
+	}
+  #ifdef MIPMAP_DEBUG
+	csDebugImageWriter::DebugImageWrite (cimg,
+	  "/tmp/mipdebug/%.8x_%d_%d.png", this, i, nMip);
+  #endif
+	thisImages->SetImage (i, cimg);
+      }
+      if (mipskip != 0) mipskip--;
+    }
+    while (true);
   }
 }
 
@@ -644,7 +668,7 @@ void csGLTextureHandle::Load ()
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
       glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	uploadData.mip, GL_RGBA8/*@@@ targetFormat*/, 
+	uploadData.mip, targetFormat, 
 	uploadData.w, uploadData.h,
         0, uploadData.sourceFormat, uploadData.sourceType,	
 	uploadData.image_data);
@@ -939,7 +963,7 @@ SCF_IMPLEMENT_IBASE(csGLTextureManager)
 SCF_IMPLEMENT_IBASE_END
 
 static const csGLTextureClassSettings defaultSettings = 
-  {GL_RGB, GL_RGBA, false, false};
+  {GL_RGB, GL_RGBA, false, false, true, true};
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -1127,6 +1151,14 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
       else if (strcasecmp (optionName, "ForceDecompress") == 0)
       {
 	settings->forceDecompress = it->GetBool ();
+      } 
+      else if (strcasecmp (optionName, "AllowDownsample") == 0)
+      {
+	settings->allowDownsample = it->GetBool ();
+      } 
+      else if (strcasecmp (optionName, "AllowMipSharpen") == 0)
+      {
+	settings->allowMipSharpen = it->GetBool ();
       } 
       else
       {

@@ -164,7 +164,8 @@ def getInitExtensions (ext):
       "namelen" : str (len (name)),
       "cfgprefix" : cfgprefix, 
       "cfglen" : str (len (cfgprefix)),
-      "functionsinit" : "" };
+      "functionsinit" : "",
+      "depcheck" : "" };
     type = ((name.split ("_"))[0]).lower();
     ettype = type;
     specials = ( 
@@ -178,6 +179,8 @@ def getInitExtensions (ext):
       ettype), values), "");
     for func in ext.getElementsByTagName ("function"):
       values["functionsinit"] += join (getFunctionInit (func), "");
+    for dep in ext.getElementsByTagName ("depends"):
+      values["depcheck"] += join (getDependency (dep), "");
     return interpolate (getTemplateK ("initext", 
       type), values);
 
@@ -186,6 +189,12 @@ def getFunctionInit (func):
     values = { 
       "name" : name};
     return interpolate (getTemplate ("funcinit"), values);
+
+def getDependency (dep):
+    ext = dep.getAttribute ("ext")
+    values = { 
+      "ext" : ext};
+    return interpolate (getTemplate ("depends"), values);
 
 stuff = join (getExtensions (xmldoc.getElementsByTagName ("extension")),
   "");

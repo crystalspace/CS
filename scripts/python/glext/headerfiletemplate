@@ -188,6 +188,7 @@ private:
   const char* msgExtFoundAndNotUsed;
   const char* msgExtInitFail;
   const char* msgExtNotFound;
+  const char* msgDependencyNotFound;
 #ifdef __WIN32__
   const char* extstrWGL;
   
@@ -266,6 +267,8 @@ public:
     msgExtFoundAndNotUsed = "%%s Extension '%%s' found, but not used.";
     msgExtInitFail = "%%s Extension '%%s' failed to initialize.";
     msgExtNotFound = "%%s Extension '%%s' not found.";
+    msgDependencyNotFound = "%%s Extension '%%s' depends on '%%s' which did "
+      "not initialize.";
     
     Reset ();
   }

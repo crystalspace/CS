@@ -334,6 +334,7 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
     attTex = g3d->GetTextureManager()->RegisterTexture (
 	imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
 	iTextureHandle::CS_TEX_IMG_2D);
+    attTex->SetTextureClass ("lookup");
   }
   return csPtr<iTextureHandle> (attTex);
 }
