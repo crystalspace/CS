@@ -40,7 +40,7 @@ awsSimpleCanvas::awsSimpleCanvas ()
 
   // this doesn't work:
 
-  //texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
+  //texFlags = CS_TEXTURE_2D;
 
   // but this is ok either:
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;

@@ -100,12 +100,7 @@ bool csSaver::SaveTextures(csRef<iDocumentNode>& parent) {
     int flags=texWrap->GetFlags();
     iImage *img=texWrap->GetImageFile();
 
-    if(flags & CS_TEXTURE_PROC) {
-
-      child->SetValue("proctex");
-      CreateValueNode(child, "type", name); //TODO hack for now
-
-    } else if(img) {
+    if(img) {
 
       child->SetValue("texture");
       const char *filename=img->GetName();
@@ -138,10 +133,6 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent) {
     CS_ASSERT(matEngine);
 
     iTextureWrapper *texWrap=matEngine->GetTextureWrapper();
-    //Don't add fake materials that wrap a procedural texture
-    if(texWrap && (texWrap->GetFlags() & CS_TEXTURE_PROC) )
-      continue;
-
     csRef<iDocumentNode> child = CreateNode(current, "material");
 
     const char *name=matWrap->QueryObject()->GetName();
