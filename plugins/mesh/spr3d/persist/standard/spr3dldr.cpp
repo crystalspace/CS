@@ -334,7 +334,7 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 	    {
               case XMLTOKEN_F:
 	        {
-		  const char* fn = childchild->GetAttributeValue ("name");
+		  char* fn = csStrNew (childchild->GetAttributeValue ("name"));
 		  int d = childchild->GetAttributeValueAsInt ("delay");
 		  float disp = childchild->GetAttributeValueAsFloat ("displacement");
                   iSpriteFrame* ff = spr3dLook->FindFrame (fn);
@@ -345,8 +345,10 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 		      childchild,
 		      "Trying to add unknown frame '%s' to action '%s'!",
 		      fn, act->GetName ());
+		    delete[] fn;
                     return NULL;
 	          }
+		  delete[] fn;
                   act->AddFrame (ff, d, disp);
                 }
                 break;
