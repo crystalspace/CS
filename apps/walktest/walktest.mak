@@ -17,8 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walk walkclean
 
-walkall: walk vfs soft softcanvas csfont csconin simpcon perfstat rapid \
-  sndload meshes imgplex gifimg jpgimg pngimg bmpimg
+walkall: walk strserv vfs soft softcanvas csfont csconin simpcon perfstat \
+  rapid sndload meshes imgplex gifimg jpgimg pngimg bmpimg
 all apps: walk
 walk:
 	$(MAKE_TARGET)
