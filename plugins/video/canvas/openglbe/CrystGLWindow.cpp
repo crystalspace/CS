@@ -24,6 +24,8 @@
 #include "ivideo/graph2d.h"
 #include "isys/system.h"
 #include "CrystGLWindow.h"
+#include "cssys/be/behelp.h"
+#include "iutil/objreg.h"
 
 CrystGLView::CrystGLView(BRect frame, iObjectRegistry* objreg) :
   BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
@@ -37,8 +39,9 @@ CrystGLView::~CrystGLView()
 
 void CrystGLView::UserAction() const
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension("UserAction", Looper()->CurrentMessage());
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  behelper->UserAction (Looper()->CurrentMessage());
 }
 
 void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
@@ -106,9 +109,10 @@ void CrystGLWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGLWindow::QuitRequested()
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension("ContextClose", g2d);
-  sys->PerformExtension("Quit");
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  behelper->ContextClose(g2d);
+  behelper->Quit ();
   return false; // Allow Crystal Space to close window itself.
 }
 

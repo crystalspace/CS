@@ -84,6 +84,10 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   MouseExists = !!(regs.x.ax);
   MouseOpened = false;
   EnablePrintf = true;
+
+  DosHelper* doshelper = new DosHelper (this);
+  scfiObjectRegistry.Register (doshelper, "SystemHelper");
+
   EventOutlet = CreateEventOutlet (this);
 }
 
@@ -232,26 +236,47 @@ void SysSystemDriver::Close ()
   }
 }
 
-bool SysSystemDriver::PerformExtensionV (char const* command, va_list args)
+void SysSystemDriver::SetMousePosition (int x, int y)
 {
-  bool rc = true;
-  if (!strcmp (command, "SetMousePosition"))
+  if (MouseOpened)
   {
-    int x = va_arg (args, int);
-    int y = va_arg (args, int);
-
-    if (MouseOpened)
-    {
-      __dpmi_regs regs;
-      regs.x.cx = x;
-      regs.x.dx = y;
-      regs.x.ax = 0x04;
-      __dpmi_int (0x33, &regs);
+    __dpmi_regs regs;
+    regs.x.cx = x;
+    regs.x.dx = y;
+    regs.x.ax = 0x04;
+    __dpmi_int (0x33, &regs);
     }
   }
-  else if (!strcmp (command, "EnablePrintf"))
-    EnablePrintf = va_arg (args, bool);
-  else
-    rc = false;
-  return rc;
 }
+
+void SysSystemDriver::DoEnablePrintf (bool en)
+{
+  EnablePrintf = en;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (DosHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDosHelper)
+SCF_IMPLEMENT_IBASE_END
+
+DosHelper::DosHelper (SysSystemDriver* sys)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  DosHelper::sys = sys;
+}
+
+DosHelper::~DosHelper ()
+{
+}
+
+void DosHelper::SetMousePosition (int x, int y)
+{
+  sys->SetMousePosition (x, y);
+}
+
+void DosHelper::DoEnablePrintf (bool en)
+{
+  sys->DoEnablePrintf (en);
+}
+

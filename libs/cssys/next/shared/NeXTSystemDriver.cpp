@@ -182,6 +182,7 @@ void NeXTSystemDriver::advance_state()
 // the Crystal Space coordinate system where `x' increases from left to right,
 // and `y' increases from top to bottom.
 //-----------------------------------------------------------------------------
+// @@@ OBSOLETE! FIX ME!!!!
 bool NeXTSystemDriver::PerformExtensionV(char const* cmd, va_list args)
 {
   bool ok = true;

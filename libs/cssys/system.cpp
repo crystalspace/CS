@@ -791,20 +791,6 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 
 //--------------------------------- iSystem interface for csSystemDriver -----//
 
-bool csSystemDriver::PerformExtensionV (char const*, va_list)
-{
-  return false;
-}
-
-bool csSystemDriver::PerformExtension (char const* command, ...)
-{
-  va_list args;
-  va_start (args, command);
-  bool rc = PerformExtensionV(command, args);
-  va_end (args);
-  return rc;
-}
-
 iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {

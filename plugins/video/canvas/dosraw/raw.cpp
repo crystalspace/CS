@@ -26,6 +26,7 @@
 #include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "cssys/djgpp/doshelp.h"
 
 #include "djvidsys.h"
 
@@ -163,8 +164,9 @@ bool csGraphics2DDOSRAW::Open ()
 #endif // USE_ALLEGRO
 
   // Tell printf() to shut up
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("EnablePrintf", false);
+  iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
+  CS_ASSERT (doshelper != NULL);
+  doshelper->DoEnablePrintf (false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -202,8 +204,9 @@ void csGraphics2DDOSRAW::Close ()
 #endif // USE_ALLEGRO
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("EnablePrintf", true);
+  iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
+  CS_ASSERT (doshelper != NULL);
+  doshelper->DoEnablePrintf (true);
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -244,8 +247,9 @@ void csGraphics2DDOSRAW::Print (csRect *area)
 
 bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  return sys->PerformExtension ("SetMousePosition", x, y);
+  iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
+  CS_ASSERT (doshelper != NULL);
+  doshelper->SetMousePosition (x, y);
 }
 
 bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)

@@ -27,6 +27,7 @@
 #include "isys/event.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "cssys/win32/winhelp.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file
@@ -442,12 +443,9 @@ void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
-  bool success;
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  if (!sys->PerformExtension ("SetCursor", iShape, &success))
-    return false;
-
-  return success;
+  iWin32Helper* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Helper);
+  CS_ASSERT (winhelper != NULL);
+  return winhelper->SetCursor (iShape);
 }
 
 bool csGraphics2DDDraw3::SetMousePosition (int x, int y)

@@ -22,6 +22,25 @@
 
 #include "cssys/csinput.h"
 #include "cssys/system.h"
+#include "cssys/os2/os2help.h"
+
+class SysSystemDriver;
+
+/**
+ * Implementation class for iOs2Helper.
+ */
+class Os2Helper : public iOs2Helper
+{
+private:
+  SysSystemDriver* sys;
+
+public:
+  Os2Helper (SysSystemDriver* sys);
+  virtual ~Os2Helper ();
+
+  SCF_DECLARE_IBASE;
+  virtual void StartGUI ();
+};
 
 /**
  * This is the System driver for OS/2. It implements all required
@@ -43,8 +62,8 @@ public:
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
 
-  /// Perform extension function
-  bool PerformExtensionV (char const* command, va_list);
+  /// Perform extension function from Os2Helper.
+  void StartGUI ();
 };
 
 #endif // __CSOS2_H__

@@ -56,6 +56,8 @@ SysSystemDriver::SysSystemDriver() :
 {
   for (int i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
+  BeHelper* behelper = new BeHelper (this);
+  scfiObjectRegistry.Register (behelper, "SystemHelper");
 }
 
 
@@ -144,7 +146,7 @@ int32 SysSystemDriver::ThreadEntry(void* p)
   SysSystemDriver* sys = (SysSystemDriver*)p;
   be_app->Lock();		 // Thread invoking Run() must hold lock.
   be_app->Run();
-  sys->PerformExtension("Quit"); // BApplication terminated, so ask CS to quit.
+  sys->QueueMessage (CS_BE_QUIT);// BApplication terminated, so ask CS to quit.
   return 0;
 }
 
@@ -191,58 +193,6 @@ void SysSystemDriver::NextFrame()
   }
   CheckMouseMoved();
   superclass::NextFrame();
-}
-
-
-//-----------------------------------------------------------------------------
-// Perform a system-specific extension.  Most requests are received from
-// BeOS-specific plugin modules, such as 2D drivers, though a few may also
-// originate from the system driver which is acting as the BApplication's
-// preferred message handler in the subthread.
-//
-// The following commands are understood.
-//
-//	UserAction <BMessage*>
-//	    A user action (probably sent from the subthread), such as keypress
-//	    or mouse action, in the form of a BMessage.  The BMessage is
-//	    placed in a thread-safe message queue and later processed by the
-//	    Crystal Space event-loop running in the main thread.
-//	SetCursor <csMouseCursorID>
-//	    Set the mouse pointer to one of the pre-defined Crystal Space
-//	    mouse shapes.
-//	BeginUI
-//	    Spawn a thread in which to run the BApplication and invokes its
-//	    Run() method.  If the application is already running in the
-//	    subthread, then this method does nothing.  This extension is
-//	    requested by 2D driver modules when they are about to place a
-//	    window on-screen, at which point the BeOS event-loop should be
-//	    running (independently of whether or not the Crystal Space
-//	    event-loop is running) so that they can respond to user actions.
-//	Quit
-//	    Ask the Crystal Space event-loop to terminate.
-//	ContextClose <iGraphics2D*>
-//	    Notify Crystal Space that a 2D graphics context is closing.
-//-----------------------------------------------------------------------------
-bool SysSystemDriver::PerformExtensionV(char const* cmd, va_list args)
-{
-  bool ok = false;
-
-  if (strcmp(cmd, "UserAction") == 0)
-    ok = QueueMessage(va_arg(args, BMessage*));
-
-  else if (strcmp(cmd, "SetCursor") == 0)
-    ok = SetMouse(va_arg(args, csMouseCursorID));
-
-  else if (strcmp(cmd, "BeginUI") == 0)
-    ok = RunBeApp();
-
-  else if (strcmp(cmd, "Quit") == 0)
-    ok = QueueMessage(CS_BE_QUIT);
-
-  else if (strcmp(cmd, "ContextClose") == 0)
-    ok = QueueMessage(CS_BE_CONTEXT_CLOSE, va_arg(args, iGraphics2D*));
-
-  return ok;
 }
 
 
@@ -655,3 +605,45 @@ int SysSystemDriver::ClassifyUnicodeKey(BMessage* m) const
   }
   return cs_char;
 }
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (BeHelper)
+  SCF_IMPLEMENTS_INTERFACE (iBeHelper)
+SCF_IMPLEMENT_IBASE_END
+
+BeHelper::BeHelper (SysSystemDriver* sys)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  BeHelper::sys = sys;
+}
+
+BeHelper::~BeHelper ()
+{
+}
+
+bool BeHelper::UserAction (BMessage* msg)
+{
+  return sys->QueueMessage (msg);
+}
+
+bool BeHelper::SetCursor (csMouseCursorID id)
+{
+  return sys->SetMouse (id);
+}
+
+bool BeHelper::BeginUI ()
+{
+  return sys->RunBeApp ();
+}
+
+bool BeHelper::Quit ()
+{
+  return sys->QueueMessage (CS_BE_QUIT);
+}
+
+bool BeHelper::ContextClose (iGraphics2D* g2d)
+{
+  return sys->QueueMessage (CS_BE_CONTEXT_CLOSE, g2d);
+}
+

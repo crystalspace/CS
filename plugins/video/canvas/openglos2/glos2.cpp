@@ -30,6 +30,7 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "cssys/os2/os2help.h"
 
 // shit ...
 #undef SEVERITY_ERROR
@@ -90,8 +91,9 @@ bool csGraphics2DOS2GL::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("StartGUI");
+  iOs2Helper* os2helper = CS_QUERY_REGISTRY (object_reg, iOs2Helper);
+  CS_ASSERT (os2helper != NULL);
+  os2helper->StartGUI ();
 
   // Initialize OpenGL
   if (!gdGLInitialize ())

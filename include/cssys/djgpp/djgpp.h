@@ -24,6 +24,26 @@
 
 #include "cssys/csinput.h"
 #include "cssys/system.h"
+#include "cssys/djgpp/doshelp.h"
+
+class SysSystemDriver;
+
+/**
+ * Implementation class for iDosHelper.
+ */
+class DosHelper : public DosHelper
+{
+private:
+  SysSystemDriver* sys;
+
+public:
+  DosHelper (SysSystemDriver* sys);
+  virtual ~DosHelper ();
+
+  SCF_DECLARE_IBASE;
+  virtual void SetMousePosition (int x, int y);
+  virtual void EnablePrintf (bool en);
+};
 
 /// DJGPP version.
 class SysSystemDriver : public csSystemDriver, public iEventPlug
@@ -39,8 +59,10 @@ public:
   /// Close the system
   virtual void Close ();
 
-  /// Execute a system-dependent extension
-  virtual bool PerformExtensionV (char const* command, va_list);
+  /// Set the mouse position (function for DosHelper).
+  void SetMousePosition (int x, int y);
+  /// Enable/disable printf (function for DosHelper).
+  void DoEnablePrintf (bool en);
 
   SCF_DECLARE_IBASE_EXT (csSystemDriver);
 

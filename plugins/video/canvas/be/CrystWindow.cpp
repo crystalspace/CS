@@ -24,6 +24,8 @@
 #include "ivideo/graph2d.h"
 #include "isys/system.h"
 #include "CrystWindow.h"
+#include "cssys/be/behelp.h"
+#include "iutil/objreg.h"
 
 CrystView::CrystView(BRect frame, iObjectRegistry* objreg, BBitmap* ibmap) :
   BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), object_reg(objreg), bitmap(ibmap)
@@ -36,8 +38,9 @@ CrystView::~CrystView()
 
 void CrystView::UserAction() const
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension("UserAction", Looper()->CurrentMessage());
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  behelper->UserAction (Looper()->CurrentMessage());
 }
 
 void CrystView::KeyDown(char const *bytes, int32 numBytes)
@@ -92,8 +95,9 @@ CrystWindow::~CrystWindow()
 
 bool CrystWindow::QuitRequested()
 {
-  iSystem* sys = CS_GET_SYSTEM (objreg);	//@@@
-  sys->PerformExtension("ContextClose", g2d);
-  sys->PerformExtension("Quit");
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  behelper->ContextClose(g2d);
+  behelper->Quit ();
   return false; // Allow Crystal Space to close window itself.
 }

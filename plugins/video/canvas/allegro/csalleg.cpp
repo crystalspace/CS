@@ -26,6 +26,8 @@
 #include "csutil/csstring.h"
 #include "isys/system.h"
 #include "allegro.h"
+#include "cssys/djgpp/doshelp.h"
+#include "iutil/objreg.h"
 
 static unsigned short ScanCodeToChar [128] =
 {
@@ -163,8 +165,9 @@ bool csGraphics2DAlleg::Open ()
   Memory = (unsigned char *) bitmap->dat;
 
   // Tell printf() to shut up
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("EnablePrintf", false);
+  iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
+  CS_ASSERT (doshelper != NULL);
+  doshelper->DoEnablePrintf (false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -227,8 +230,11 @@ void csGraphics2DAlleg::Close (void)
   bitmap = NULL;
   Memory = NULL;
   csGraphics2D::Close ();
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("EnablePrintf", true);
+
+  iDosHelper* doshelper = CS_QUERY_REGISTRY (object_reg, iDosHelper);
+  CS_ASSERT (doshelper != NULL);
+  doshelper->DoEnablePrintf (true);
+
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
 }
 

@@ -27,10 +27,29 @@
 
 #include "csutil/scf.h"
 #include "cssys/win32/win32itf.h"
+#include "cssys/win32/winhelp.h"
 #include <objbase.h>
 
 #include "cssys/system.h"
 #include "cssys/csinput.h"
+
+class SysSystemDriver;
+
+/**
+ * Implementation class for iWin32Helper.
+ */
+class Win32Helper : public iWin32Helper
+{
+private:
+  SysSystemDriver* sys;
+
+public:
+  Win32Helper (SysSystemDriver* sys);
+  virtual ~Win32Helper ();
+
+  SCF_DECLARE_IBASE;
+  virtual bool SetCursor (int cursor);
+};
 
 /// Windows system driver
 class SysSystemDriver :
@@ -54,9 +73,6 @@ public:
   virtual bool Open ();
   virtual void Close ();
 
-  /// Perform extension function
-  bool PerformExtensionV (char const* command, va_list);
-
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
 
@@ -65,6 +81,13 @@ public:
 
   ///
   virtual void Help ();
+
+  /// Function for Win32Helper to set the cursor.
+  void SetWinCursor (HCURSOR cur)
+  {
+    m_hCursor = cur;
+    SetCursor (cur);
+  }
 
   //------------------------ iEventPlug interface ---------------------------//
   SCF_DECLARE_IBASE_EXT (csSystemDriver);

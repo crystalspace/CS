@@ -33,6 +33,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Lower the priority of the main thread
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
+
+  Os2Helper* os2helper = new Os2Helper (this);
+  scfiObjectRegistry.Register (os2helper, "SystemHelper");
 }
 
 void SysSystemDriver::Sleep (int SleepTime)
@@ -40,25 +43,43 @@ void SysSystemDriver::Sleep (int SleepTime)
   DosSleep (SleepTime);
 }
 
-bool SysSystemDriver::PerformExtensionV (char const* command, va_list)
+void SysSystemDriver::StartGUI ()
 {
-  if (!strcmp (command, "StartGUI"))
-  {
-    /*
-      !!! This is a very nasty but VERY nice hack, it fools OS/2 and let the
-      program act as a PM program, while keeping its stdin/stdout/stderr
-      connected to the console (given that program is compiled as WINDOWCOMPAT
-      AKA VIO). This means we'll compile all the Crystal Space programs as
-      VIO and switch to "GUI mode" when required.
+  /*
+    !!! This is a very nasty but VERY nice hack, it fools OS/2 and let the
+    program act as a PM program, while keeping its stdin/stdout/stderr
+    connected to the console (given that program is compiled as WINDOWCOMPAT
+    AKA VIO). This means we'll compile all the Crystal Space programs as
+    VIO and switch to "GUI mode" when required.
 
-      Credits and a great THANKS go to Michal Necasek (mike@mendelu.cz)
-      (one of FreeType library authors) for finding this!
-    */
-    PTIB tib;
-    PPIB pib;
-    DosGetInfoBlocks (&tib, &pib);
-    pib->pib_ultype = 3;
-    return true;
-  }
-  return false;
+    Credits and a great THANKS go to Michal Necasek (mike@mendelu.cz)
+    (one of FreeType library authors) for finding this!
+  */
+  PTIB tib;
+  PPIB pib;
+  DosGetInfoBlocks (&tib, &pib);
+  pib->pib_ultype = 3;
 }
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (Os2Helper)
+  SCF_IMPLEMENTS_INTERFACE (iOs2Helper)
+SCF_IMPLEMENT_IBASE_END
+
+Os2Helper::Os2Helper (SysSystemDriver* sys)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  Os2Helper::sys = sys;
+}
+
+Os2Helper::~Os2Helper ()
+{
+}
+
+void Os2Helper::StartGUI ()
+{
+  sys->StartGUI ();
+}
+
+

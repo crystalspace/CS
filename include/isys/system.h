@@ -41,7 +41,7 @@ struct iConfigManager;
 #define CS_GET_SYSTEM(object_reg) CS_QUERY_REGISTRY(object_reg, iSystem)
 
 
-SCF_VERSION (iSystem, 10, 0, 0);
+SCF_VERSION (iSystem, 11, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -68,23 +68,6 @@ struct iSystem : public iBase
   virtual void NextFrame () = 0;
 
   //------------------------------ Miscellaneous -----------------------------//
-
-  /**
-   * Execute a system-dependent extension.<p>
-   * Sometimes we need just one extra function in system-dependent system
-   * driver, which is called, say, from canvas driver (such as "EnablePrintf"
-   * in DJGPP port of CS).  In such cases it doesn't make much sense to create
-   * a new SCF interface; it is simpler to just override this function and
-   * respond to the special request.
-   */
-  virtual bool PerformExtension (char const* command, ...) = 0;
-
-  /**
-   * Execute a system-dependent extension.<p>
-   * This is just like PerformExtension() except that it accepts a `va_list'
-   * instead of a variable argument list.
-   */
-  virtual bool PerformExtensionV (char const* command, va_list) = 0;
 
   /**
    * Suspend the engine's virtual-time clock.<p>

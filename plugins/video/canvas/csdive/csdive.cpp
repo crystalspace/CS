@@ -32,6 +32,7 @@
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
+#include "cssys/os2/os2help.h"
 
 #if defined (PROC_X86)
 inline void memsetd (void *dest, unsigned int value, size_t count)
@@ -109,8 +110,9 @@ bool csGraphics2DOS2DIVE::Initialize (iObjectRegistry* object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension ("StartGUI");
+  iOs2Helper* os2helper = CS_QUERY_REGISTRY (object_reg, iOs2Helper);
+  CS_ASSERT (os2helper != NULL);
+  os2helper->StartGUI ();
 
   // Initialize DIVE
   if (!gdDiveInitialize ())

@@ -26,11 +26,41 @@
 #include "ivideo/graph2d.h" // csMouseCursorID
 #include <Handler.h>
 #include <MessageQueue.h>
+#include "cssys/be/behelp.h"
+
+class SysSystemDriver;
+
+/**
+ * Implementation class for iBeHelper.
+ */
+class BeHelper : public iBeHelper
+{
+private:
+  SysSystemDriver* sys;
+
+public:
+  BeHelper (SysSystemDriver* sys);
+  virtual ~BeHelper ();
+
+  SCF_DECLARE_IBASE;
+  virtual bool UserAction (BMessage* msg);
+  virtual bool SetCursor (csMouseCursorID id);
+  virtual bool BeginUI ();
+  virtual bool Quit ();
+  virtual bool ContextClose (iGraphics2D* g2d);
+};
 
 class SysSystemDriver :
   public csSystemDriver, public iEventPlug, public BHandler
 {
   typedef csSystemDriver superclass;
+
+public:
+  // Public functions for BeHelper.
+  bool SetMouse(csMouseCursorID shape);
+  bool RunBeApp();
+  bool QueueMessage(BMessage*);
+  bool QueueMessage(uint32, void const* = 0);
 
 protected:
   enum { CSBE_MOUSE_BUTTON_COUNT = 3 };
@@ -47,12 +77,8 @@ protected:
   BPoint mouse_point;
 
   static int32 ThreadEntry(void*);
-  bool RunBeApp();
   void HideMouse();
   void ShowMouse();
-  bool SetMouse(csMouseCursorID shape);
-  bool QueueMessage(BMessage*);
-  bool QueueMessage(uint32, void const* = 0);
   void DispatchMessage(BMessage*);
   void CheckMouseMoved();
   void DoContextClose(BMessage*);
@@ -77,7 +103,6 @@ public:
 
   // Implementation of iSystem.
   virtual bool Initialize(int argc, char const* const argv[], char const* cfg);
-  virtual bool PerformExtensionV(char const* cmd, va_list);
   virtual void NextFrame();
 
   // Implementation of iEventPlug.

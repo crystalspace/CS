@@ -90,8 +90,9 @@ bool csGraphics2DGLBe::Open()
     window->Unlock();
   }
   window->Flush();
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->PerformExtension("BeginUI");
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  behelper->BeginUI ();
 
   return superclass::Open();
 }
@@ -133,8 +134,9 @@ void csGraphics2DGLBe::Print(csRect*)
 
 bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  return sys->PerformExtension("SetCursor", shape);
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  return behelper->SetCursor (shape);
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)

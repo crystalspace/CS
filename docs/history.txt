@@ -1,6 +1,49 @@
 The history order is reversed so that new features are at the top.
 
 7-Aug-2001
+	- Removed PerformExtension() in the Windows system driver. Instead
+	  the Windows system driver now creates an object Win32Helper which
+	  implements iWin32Helper. That object contains the function
+	  SetCursor(). The Win32Helper object is registered with the object
+	  registry. The ddraw and ddraw8 canvases now use CS_QUERY_REGISTRY
+	  to query the iWin32Helper and then use SetCursor on that.
+	- Removed PerformExtension() in the DOS system driver. Instead
+	  the DOS system driver now creates an object DosHelper which
+	  implements iDosHelper. That object contains the functions
+	  SetMousePosition() and DoEnablePrintf(). I also modified the raw
+	  and allegro canvases for these modifications. Note that I made all
+	  the modifications but am not able to compile the DOS port. So it may
+	  not work correctly.
+	- Removed PerformExtension() in the BeOS system driver. Instead
+	  the BeOS system driver now creates an object BeHelper which
+	  implements iBeHelper. That object contains the functions
+	  UserAction(), SetCursor(), BeginUI(), Quit(), and ContextClose().
+	  I also modified the BeOS and OpenGL BeOS canvases for this.
+	  Note that I made all the modifications but am not able to compile
+	  the BeOS port. So it may not work correctly.
+	- Removed PerformExtension() in the OS/2 system driver. Instead
+	  the OS/2 system driver now creates an object Os2Helper which
+	  implements iOs2Helper. That object contains the function
+	  StartGUI(). I also modified the csdive and OpenGL/OS/2 canvases
+	  for these modifications. Note that I made all the modifications but
+	  am not able to compile the OS/2 port. So it may not work correctly.
+	- Did NOT remove PerformExtension() for the NeXT system driver.
+	  The problem is that the code seems slightly complicated and I will
+	  most likely mess it up completely without being able to test it.
+	  So the NeXT port will be broken now.
+	- Removed support for PerformExtension() and PerformExtensionV() in
+	  the system driver (csSystemDriver) and iSystem. All ports (except
+	  NeXTStep) have been fixed for this (I could only test the Windows
+	  port). If your system needs to provide an extension for other system
+	  dependent modules (usually canvases) then you must create an
+	  SCF interface (something like iMyOsHelper) and implemented the
+	  needed additional functionality there. Then the OS specific system
+	  driver can register an instance of this object with the object
+	  registry. To use such an extension from a system dependent canvas
+	  you can then do:
+	  	iMyOsHelper* help = CS_QUERY_REGISTRY (object_reg, iMyOsHelper);
+		CS_ASSERT (help != NULL);
+		help->MySpecialFunction (myspecialargs, ...);
 	- Michael Voase did the following:
 	  Texture Manager: All drivers
 	  - Continued fortification of texture manager.. It

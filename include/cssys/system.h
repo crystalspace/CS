@@ -340,18 +340,6 @@ public:
   /// Get the object registry.
   virtual iObjectRegistry* GetObjectRegistry () { return &scfiObjectRegistry; }
 
-  /**
-   * Execute a system-dependent extension command.  This is implemented as a
-   * thin wrapper over PerformExtensionV().
-   */
-  virtual bool PerformExtension (char const* command, ...);
-  /**
-   * Execute a system-dependent extension command.  Since PerformExtension() is
-   * just a thin wrapper over this method, most subclasses which need to
-   * provide special extensions should override PerformExtensionV() rather than
-   * PerformExtension().
-   */
-  virtual bool PerformExtensionV (char const* command, va_list);
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}
   /// Resume the engine's virtual-time clock.

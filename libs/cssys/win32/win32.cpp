@@ -443,6 +443,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   ASSERT (bResult);
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
+  Win32Helper* winhelper = new Win32Helper (this);
+  scfiObjectRegistry.Register (winhelper, "SystemHelper");
+
   EventOutlet = CreateEventOutlet (this);
 }
 
@@ -707,44 +710,6 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-bool SysSystemDriver::PerformExtensionV (char const* command, va_list args)
-{
-  bool rc = true;
-  if (!strcmp (command, "SetCursor"))
-  {
-    char *CursorID;
-    switch (va_arg (args, int))
-    {
-      case csmcNone:     CursorID = (char *)-1;   break;
-      case csmcArrow:    CursorID = IDC_ARROW;    break;
-      case csmcMove:     CursorID = IDC_SIZEALL;  break;
-      case csmcSizeNWSE: CursorID = IDC_SIZENWSE; break;
-      case csmcSizeNESW: CursorID = IDC_SIZENESW; break;
-      case csmcSizeNS:   CursorID = IDC_SIZENS;   break;
-      case csmcSizeEW:   CursorID = IDC_SIZEWE;   break;
-      case csmcStop:     CursorID = IDC_NO;       break;
-      case csmcWait:     CursorID = IDC_WAIT;     break;
-      default:           CursorID = 0;            break;
-    }
-
-    bool *success = va_arg (args, bool *);
-    if (CursorID)
-    {
-      m_hCursor = (CursorID != (char *)-1) ? LoadCursor (NULL, CursorID) : NULL;
-      *success = true;
-    }
-    else
-    {
-      m_hCursor = NULL;
-      *success = false;
-    }
-    SetCursor (m_hCursor);
-  }
-  else
-    rc = false;
-  return rc;
-}
-
 void SysSystemDriver::Sleep (int SleepTime)
 {
   ::Sleep (SleepTime);
@@ -772,5 +737,56 @@ void SysSystemDriver::Help ()
   //@@@???
   printf ("  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (Win32Helper)
+  SCF_IMPLEMENTS_INTERFACE (iWin32Helper)
+SCF_IMPLEMENT_IBASE_END
+
+Win32Helper::Win32Helper (SysSystemDriver* sys)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  Win32Helper::sys = sys;
+}
+
+Win32Helper::~Win32Helper ()
+{
+}
+
+bool Win32Helper::SetCursor (int cursor)
+{
+  char *CursorID;
+  switch (cursor)
+  {
+    case csmcNone:     CursorID = (char *)-1;   break;
+    case csmcArrow:    CursorID = IDC_ARROW;    break;
+    case csmcMove:     CursorID = IDC_SIZEALL;  break;
+    case csmcSizeNWSE: CursorID = IDC_SIZENWSE; break;
+    case csmcSizeNESW: CursorID = IDC_SIZENESW; break;
+    case csmcSizeNS:   CursorID = IDC_SIZENS;   break;
+    case csmcSizeEW:   CursorID = IDC_SIZEWE;   break;
+    case csmcStop:     CursorID = IDC_NO;       break;
+    case csmcWait:     CursorID = IDC_WAIT;     break;
+    default:           CursorID = 0;            break;
+  }
+
+  bool success;
+  HCURSOR cur;
+  if (CursorID)
+  {
+    cur = ((CursorID != (char *)-1)
+    	? LoadCursor (NULL, CursorID)
+	: NULL);
+    success = true;
+  }
+  else
+  {
+    cur = NULL;
+    success = false;
+  }
+  sys->SetWinCursor (cur);
+  return success;
 }
 

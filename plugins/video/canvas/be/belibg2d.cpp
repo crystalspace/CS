@@ -25,6 +25,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <Screen.h>
+#include "cssys/be/behelp.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -99,8 +100,9 @@ bool csGraphics2DBeLib::Open()
     window->Flush();
 	
     Memory = (unsigned char*)bitmap->Bits();
-    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-    sys->PerformExtension("BeginUI");
+    iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+    CS_ASSERT (behelper != NULL);
+    behelper->BeginUI ();
   }
   return ok;
 }
@@ -133,8 +135,9 @@ void csGraphics2DBeLib::Print(csRect* cr)
 
 bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  return sys->PerformExtension("SetCursor", shape);
+  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
+  CS_ASSERT (behelper != NULL);
+  return behelper->SetCursor (shape);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
