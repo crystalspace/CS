@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+29-Jul-1999
+	- Removed support for planed fog. It is obsolete now that we have
+	  vertex fog.
 28-Jul-1999
 	- Fixed fog in OpenGL. One-layered fog works now.
 	- Clipping portals are no longer automatic. There is now a CLIP()
@@ -26,6 +29,11 @@ Short-term cleanups that need to be done:
 	  well. This fixes sprites and curves. It works but there seem
 	  to be a little problems yet. I'm not sure but it seems as if the
 	  sprites drawn using fog stand out a little.
+	- Xavier Trochu mentioned a bug in the ScanStr routine. It crashed
+	  with unmatched quotes.
+	- Andrew Zabolotny added correct flat shading for Gouraud-shaded
+	  sprites (and non-Gouraud as well). Fixed the bug in walktest
+	  that all sprites are unlighted during the very first frame.
 27-Jul-1999
 	- Added csWorld::EnableLightingCache() with which you can disable
 	  the lighting cache (and thus saving of lightmaps to precalc.zip).
