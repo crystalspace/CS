@@ -105,7 +105,7 @@ private:
    * csThing::RemovePortalPolygon()) so that it can update its list
    * of portal polygons.
    */
-  csPortal* portal;
+  csPortalObsolete* portal;
 
   /// The object space plane equation (this is fixed).
   csPlane3 plane_obj;
@@ -292,7 +292,7 @@ public:
   /**
    * Get the portal structure (if there is one).
    */
-  csPortal* GetPortal () { return portal; }
+  csPortalObsolete* GetPortal () { return portal; }
 
   /**
    * Set the thing that this polygon belongs to.
@@ -644,7 +644,7 @@ public:
     }
     virtual iPortal* GetPortal ()
     {
-      csPortal* prt = scfParent->GetPortal ();
+      csPortalObsolete* prt = scfParent->GetPortal ();
       if (prt)
         return &(prt->scfiPortal);
       else

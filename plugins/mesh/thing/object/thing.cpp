@@ -137,8 +137,10 @@ csStringID csThingStatic::tangent_name = csInvalidStringID;
 csStringID csThingStatic::binormal_name = csInvalidStringID;
 #endif
 
-csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
-	: static_polygons (32, 64), scfiPolygonMesh (CS_POLY_COLLDET),
+csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
+	static_polygons (32, 64),
+	scfiPolygonMesh (0),
+	scfiPolygonMeshCD (CS_POLY_COLLDET),
 	scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -147,9 +149,10 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
   static_polygons.SetThingType (thing_type);
 
   scfiPolygonMesh.SetThing (this);
+  scfiPolygonMeshCD.SetThing (this);
   scfiPolygonMeshLOD.SetThing (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMeshCD);
   scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
@@ -652,114 +655,13 @@ void csThingStatic::DeleteVertices (int from, int to)
   scfiObjectModel.ShapeChanged ();
 }
 
-struct CompressVertex
-{
-  int orig_idx;
-  float x, y, z;
-  int new_idx;
-  bool used;
-};
-
-static int compare_vt (const void *p1, const void *p2)
-{
-  CompressVertex *sp1 = (CompressVertex *)p1;
-  CompressVertex *sp2 = (CompressVertex *)p2;
-  if (sp1->x < sp2->x)
-    return -1;
-  else if (sp1->x > sp2->x)
-    return 1;
-  if (sp1->y < sp2->y)
-    return -1;
-  else if (sp1->y > sp2->y)
-    return 1;
-  if (sp1->z < sp2->z)
-    return -1;
-  else if (sp1->z > sp2->z)
-    return 1;
-  return 0;
-}
-
-static int compare_vt_orig (const void *p1, const void *p2)
-{
-  CompressVertex *sp1 = (CompressVertex *)p1;
-  CompressVertex *sp2 = (CompressVertex *)p2;
-  if (sp1->orig_idx < sp2->orig_idx)
-    return -1;
-  else if (sp1->orig_idx > sp2->orig_idx)
-    return 1;
-  return 0;
-}
-
 void csThingStatic::CompressVertices ()
 {
-  if (num_vertices <= 0) return ;
-
-  // Copy all the vertices.
-  CompressVertex *vt = new CompressVertex[num_vertices];
-  int i, j;
-  for (i = 0; i < num_vertices; i++)
-  {
-    vt[i].orig_idx = i;
-    vt[i].x = (float)ceil (obj_verts[i].x * 1000000);
-    vt[i].y = (float)ceil (obj_verts[i].y * 1000000);
-    vt[i].z = (float)ceil (obj_verts[i].z * 1000000);
-  }
-
-  // First sort so that all (nearly) equal vertices are together.
-  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt);
-
-  // Count unique values and tag all doubles with the index of the unique one.
-  // new_idx in the vt table will be the index inside vt to the unique vector.
-  int count_unique = 1;
-  int last_unique = 0;
-  vt[0].new_idx = last_unique;
-  for (i = 1; i < num_vertices; i++)
-  {
-    if (
-      vt[i].x != vt[last_unique].x ||
-      vt[i].y != vt[last_unique].y ||
-      vt[i].z != vt[last_unique].z)
-    {
-      last_unique = i;
-      count_unique++;
-    }
-
-    vt[i].new_idx = last_unique;
-  }
-
-  // If count_unique == num_vertices then there is nothing to do.
-  if (count_unique == num_vertices)
-  {
-    delete[] vt;
-    return ;
-  }
-
-  // Now allocate and fill new vertex tables.
-  // After this new_idx in the vt table will be the new index
-  // of the vector.
-  csVector3 *new_obj = new csVector3[count_unique];
-  new_obj[0] = obj_verts[vt[0].orig_idx];
-
-  vt[0].new_idx = 0;
-  j = 1;
-  for (i = 1; i < num_vertices; i++)
-  {
-    if (vt[i].new_idx == i)
-    {
-      new_obj[j] = obj_verts[vt[i].orig_idx];
-      vt[i].new_idx = j;
-      j++;
-    }
-    else
-    {
-      vt[i].new_idx = j - 1;
-    }
-  }
-
-  // Now we sort the table back on orig_idx so that we have
-  // a mapping from the original indices to the new one (new_idx).
-  qsort (vt, num_vertices, sizeof (CompressVertex),
-  	compare_vt_orig);
+  csVector3* new_obj;
+  int count_unique;
+  csCompressVertex* vt = csVector3Array::CompressVertices (
+  	obj_verts, num_vertices, new_obj, count_unique);
+  if (vt == 0) return;
 
   // Replace the old vertex tables.
   delete[] obj_verts;
@@ -767,6 +669,7 @@ void csThingStatic::CompressVertices ()
   num_vertices = max_vertices = count_unique;
 
   // Now we can remap the vertices in all polygons.
+  int i, j;
   for (i = 0; i < static_polygons.Length (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
@@ -1360,8 +1263,11 @@ void csThingStatic::FillRenderMeshes (
 
 //----------------------------------------------------------------------------
 
-csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64),
-	scfiPolygonMesh (CS_POLY_COLLDET), scfiPolygonMeshLOD (CS_POLY_VISCULL)
+csThing::csThing (iBase *parent, csThingStatic* static_data) :
+	polygons(32, 64),
+	scfiPolygonMesh (0),
+	scfiPolygonMeshCD (CS_POLY_COLLDET),
+	scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
@@ -1376,6 +1282,7 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64),
   polygons.SetThingType (static_data->thing_type);
 
   scfiPolygonMesh.SetThing (static_data);
+  scfiPolygonMeshCD.SetThing (static_data);
   scfiPolygonMeshLOD.SetThing (static_data);
 
   last_thing_id++;
@@ -1642,6 +1549,7 @@ void csThing::HardTransform (const csReversibleTransform& t)
   static_data = new_static_data;
   static_data->HardTransform (t);
   scfiPolygonMesh.SetThing (static_data);
+  scfiPolygonMeshCD.SetThing (static_data);
   scfiPolygonMeshLOD.SetThing (static_data);
 }
 
@@ -1701,7 +1609,7 @@ void csThing::PreparePolygons ()
     polygons.Push (p);
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->Finish ();
-    csPortal* portal = ps->GetPortal ();
+    csPortalObsolete* portal = ps->GetPortal ();
     if (portal) has_portals = true;
   }
 
@@ -1895,7 +1803,7 @@ void csThing::DrawOnePolygon (
   }
 
   csPolygon3DStatic* sp = p->GetStaticData ();
-  csPortal *po = sp->GetPortal ();
+  csPortalObsolete *po = sp->GetPortal ();
   //@@@if (csSector::do_portals && po)
   if (po)
   {
@@ -2357,7 +2265,7 @@ void PolyMeshHelper::Setup ()
   for (i = 0 ; i < pol.Length () ; i++)
   {
     csPolygon3DStatic *p = pol.Get (i);
-    if (p->flags.Check (poly_flag)) num_poly++;
+    if (p->flags.CheckAll (poly_flag)) num_poly++;
   }
 
   // Allocate the arrays and the copy the data.
@@ -2373,7 +2281,7 @@ void PolyMeshHelper::Setup ()
     for (i = 0 ; i < pol.Length () ; i++)
     {
       csPolygon3DStatic *p = pol.Get (i);
-      if (p->flags.Check (poly_flag))
+      if (p->flags.CheckAll (poly_flag))
       {
         polygons[num_poly].num_vertices = p->GetVertexCount ();
         polygons[num_poly].vertices = p->GetVertexIndices ();

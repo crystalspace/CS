@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_ENGINE_PORTAL_H__
-#define __CS_ENGINE_PORTAL_H__
+#ifndef __CS_IENGINE_PORTAL_H__
+#define __CS_IENGINE_PORTAL_H__
 
 /**\file
  */
@@ -80,6 +80,16 @@ class csPlane3;
  * of a sector.
  */
 #define CS_PORTAL_FLOAT 0x00000020
+
+/**
+ * If this flag is set then this portal is used for collision detection.
+ */
+#define CS_PORTAL_COLLDET 0x00000040
+
+/**
+ * If this flag is set then this portal is used for visibility culling.
+ */
+#define CS_PORTAL_VISCULL 0x00000080
 
 class csTransform;
 class csMatrix3;
@@ -297,5 +307,5 @@ struct iPortal : public iBase
 
 /** @} */
 
-#endif // __CS_ENGINE_PORTAL_H__
+#endif // __CS_IENGINE_PORTAL_H__
 

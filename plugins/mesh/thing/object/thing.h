@@ -474,6 +474,8 @@ public:
 
   //-------------------- iPolygonMesh interface implementation ---------------
   PolyMeshHelper scfiPolygonMesh;
+  //-------------------  CD iPolygonMesh implementation ---------------
+  PolyMeshHelper scfiPolygonMeshCD;
   //------------------- Lower detail iPolygonMesh implementation ---------------
   PolyMeshHelper scfiPolygonMeshLOD;
 
@@ -1059,6 +1061,8 @@ public:
 
   //-------------------- iPolygonMesh interface implementation ---------------
   PolyMeshHelper scfiPolygonMesh;
+  //------------------- CD iPolygonMesh implementation ---------------
+  PolyMeshHelper scfiPolygonMeshCD;
   //------------------- Lower detail iPolygonMesh implementation ---------------
   PolyMeshHelper scfiPolygonMeshLOD;
 

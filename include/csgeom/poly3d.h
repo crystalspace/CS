@@ -279,6 +279,15 @@ public:
   csVector3 GetCenter () const;
 };
 
+/// This structure is used by csVector3Array::CompressVertices().
+struct csCompressVertex
+{
+  int orig_idx;
+  float x, y, z;
+  int new_idx;
+  bool used;
+};
+
 /**
  * This is actually the same class as csPoly3D. But it has been
  * renamed to make it clear that it is for other uses. It also
@@ -302,6 +311,30 @@ public:
    * in the array. Return the index that the vertex was added too.
    */
   int AddVertexSmart (float x, float y, float z);
+
+  /**
+   * Compress an array of vertices (i.e. remove all duplicated
+   * vertices). Returns an array of csCompressVertex which can be
+   * used to map from the old index to the new one. 'new_count'
+   * will be set to the new number of unique vertices (and 'new_vertices'
+   * will be the new vertex table with that size). The size
+   * of the returned array is 'num_vertices' though since it has
+   * to be indexed with the original vertex array.
+   * If this function returns 0 there is nothing to do (i.e. no duplicate
+   * vertices). Otherwise you have to 'delete[]' the returned array.
+   */
+  static csCompressVertex* CompressVertices (csVector3* vertices,
+	int num_vertices, csVector3*& new_vertices, int& new_count);
+
+  /**
+   * Compress an array of vertices (i.e. remove all duplicated
+   * vertices). Returns an array of csCompressVertex which can be
+   * used to map from the old index to the new one. The 'vertices'
+   * table will be modified with the new compressed vertices.
+   * If this function returns 0 there is nothing to do (i.e. no duplicate
+   * vertices). Otherwise you have to 'delete[]' the returned array.
+   */
+  static csCompressVertex* CompressVertices (csArray<csVector3>& vertices);
 };
 
 /** @} */

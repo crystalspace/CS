@@ -668,4 +668,136 @@ csVector3 csPoly3D::GetCenter () const
   return bbox.GetCenter ();
 }
 
+static int compare_vt (const void *p1, const void *p2)
+{
+  csCompressVertex *sp1 = (csCompressVertex *)p1;
+  csCompressVertex *sp2 = (csCompressVertex *)p2;
+  if (sp1->x < sp2->x)
+    return -1;
+  else if (sp1->x > sp2->x)
+    return 1;
+  if (sp1->y < sp2->y)
+    return -1;
+  else if (sp1->y > sp2->y)
+    return 1;
+  if (sp1->z < sp2->z)
+    return -1;
+  else if (sp1->z > sp2->z)
+    return 1;
+  return 0;
+}
+
+static int compare_vt_orig (const void *p1, const void *p2)
+{
+  csCompressVertex *sp1 = (csCompressVertex *)p1;
+  csCompressVertex *sp2 = (csCompressVertex *)p2;
+  if (sp1->orig_idx < sp2->orig_idx)
+    return -1;
+  else if (sp1->orig_idx > sp2->orig_idx)
+    return 1;
+  return 0;
+}
+
+template <class T>
+static csCompressVertex* TemplatedCompressVertices (T& vertices,
+	int num_vertices, csVector3*& new_vertices, int& new_count)
+{
+  new_vertices = 0;
+  new_count = 0;
+  if (num_vertices <= 0) return 0;
+
+  // Copy all the vertices.
+  csCompressVertex *vt = new csCompressVertex[num_vertices];
+  int i, j;
+  for (i = 0; i < num_vertices; i++)
+  {
+    vt[i].orig_idx = i;
+    vt[i].x = (float)ceil (vertices[i].x * 1000000);
+    vt[i].y = (float)ceil (vertices[i].y * 1000000);
+    vt[i].z = (float)ceil (vertices[i].z * 1000000);
+  }
+
+  // First sort so that all (nearly) equal vertices are together.
+  qsort (vt, num_vertices, sizeof (csCompressVertex), compare_vt);
+
+  // Count unique values and tag all doubles with the index of the unique one.
+  // new_idx in the vt table will be the index inside vt to the unique vector.
+  new_count = 1;
+  int last_unique = 0;
+  vt[0].new_idx = last_unique;
+  for (i = 1; i < num_vertices; i++)
+  {
+    if (
+      vt[i].x != vt[last_unique].x ||
+      vt[i].y != vt[last_unique].y ||
+      vt[i].z != vt[last_unique].z)
+    {
+      last_unique = i;
+      new_count++;
+    }
+
+    vt[i].new_idx = last_unique;
+  }
+
+  // If new_count == num_vertices then there is nothing to do.
+  if (new_count == num_vertices)
+  {
+    delete[] vt;
+    return 0;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // After this new_idx in the vt table will be the new index
+  // of the vector.
+  new_vertices = new csVector3[new_count];
+  new_vertices[0] = vertices[vt[0].orig_idx];
+
+  vt[0].new_idx = 0;
+  j = 1;
+  for (i = 1; i < num_vertices; i++)
+  {
+    if (vt[i].new_idx == i)
+    {
+      new_vertices[j] = vertices[vt[i].orig_idx];
+      vt[i].new_idx = j;
+      j++;
+    }
+    else
+    {
+      vt[i].new_idx = j - 1;
+    }
+  }
+
+  // Now we sort the table back on orig_idx so that we have
+  // a mapping from the original indices to the new one (new_idx).
+  qsort (vt, num_vertices, sizeof (csCompressVertex),
+  	compare_vt_orig);
+
+  return vt;
+}
+
+csCompressVertex* csVector3Array::CompressVertices (csVector3* vertices,
+	int num_vertices, csVector3*& new_vertices, int& new_count)
+{
+  return TemplatedCompressVertices (vertices, num_vertices,
+  	new_vertices, new_count);
+}
+
+csCompressVertex* csVector3Array::CompressVertices (
+	csArray<csVector3>& vertices)
+{
+  csVector3* new_vertices;
+  int new_count;
+  csCompressVertex* vt = TemplatedCompressVertices (vertices,
+  	vertices.Length (), new_vertices, new_count);
+  if (vt == 0) return 0;
+
+  int i;
+  vertices.DeleteAll ();
+  for (i = 0 ; i < new_count ; i++)
+    vertices.Push (new_vertices[i]);
+  delete[] new_vertices;
+  return vt;
+}
+
 //---------------------------------------------------------------------------

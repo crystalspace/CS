@@ -39,7 +39,7 @@ struct iPolygon3D;
  * This class represents a portal. It belongs to some polygon
  * which is then considered a portal to another sector.
  */
-class csPortal : public csObject
+class csPortalObsolete : public csObject
 {
 private:
   /**
@@ -78,18 +78,18 @@ protected:
 
 public:
   /// Create a portal.
-  csPortal (csPolygon3DStatic* parent);
+  csPortalObsolete (csPolygon3DStatic* parent);
 
   /// Destructor.
-  virtual ~csPortal ();
+  virtual ~csPortalObsolete ();
 
   /// Create a clone of this portal.
-  csPortal* Clone ();
+  csPortalObsolete* Clone ();
 
   /// Set the parent polygon.
   void SetParentPolygon (csPolygon3DStatic* parent)
   {
-    csPortal::parent = parent;
+    csPortalObsolete::parent = parent;
   }
 
   //---- misc. manipulation functions ---------------------------------------
@@ -272,7 +272,7 @@ public:
   //------------------- iPortal implementation -----------------------
   struct Portal : public iPortal
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csPortal);
+    SCF_DECLARE_EMBEDDED_IBASE (csPortalObsolete);
     virtual iObject *QueryObject () { return scfParent; }
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }

@@ -331,7 +331,7 @@ void csPolygon3DStatic::SetPortal (iSector *sector, bool null)
   }
 
   if (!null && !sector) return ;
-  portal = new csPortal (this);
+  portal = new csPortalObsolete (this);
   portal->flags.Reset (CS_PORTAL_WARP);
   portal->SetSector (sector);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
@@ -1988,7 +1988,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
     return ;
 
-  csPortal *po;
+  csPortalObsolete *po;
   csRef<csFrustum> new_light_frustum;
 
   csVector3 *poly;
@@ -2050,7 +2050,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   // all shadow frustums which start at the same plane are discarded as
   // well.
   // FillLightMap() will use this information and
-  // csPortal::CalculateLighting() will also use it!!
+  // csPortalObsolete::CalculateLighting() will also use it!!
   po = static_data->GetPortal ();
   if (!MarkRelevantShadowFrustums (lview)) goto stop;
 
@@ -2124,7 +2124,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   if (maybeItsVisible)
     return;
 
-  csPortal *po = static_data->GetPortal ();
+  csPortalObsolete *po = static_data->GetPortal ();
 
   // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
   // Needs to be fixed soon!!!

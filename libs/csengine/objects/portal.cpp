@@ -16,94 +16,56 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "portal.h"
-#include "polygon.h"
-#include "pol2d.h"
-#include "csutil/debug.h"
 #include "csgeom/frustum.h"
 #include "ivideo/texture.h"
+#include "csengine/portal.h"
+#include "csengine/portalcontainer.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
 #include "iengine/fview.h"
 #include "iengine/camera.h"
 #include "iengine/shadows.h"
+#include "iengine/light.h"
 
-SCF_IMPLEMENT_IBASE_EXT(csPortalObsolete)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPortal)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPortalObsolete::Portal)
+SCF_IMPLEMENT_IBASE(csPortal)
   SCF_IMPLEMENTS_INTERFACE(iPortal)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
-csPortalObsolete::csPortalObsolete (csPolygon3DStatic* parent)
+csPortal::csPortal (csPortalContainer* parent)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPortal);
-  DG_TYPE (this, "csPortalObsolete");
-  filter_texture = 0;
+  SCF_CONSTRUCT_IBASE (0);
   filter_r = 1;
   filter_g = 1;
   filter_b = 1;
-  sector = 0;
   max_sector_visit = 5;
-  csPortalObsolete::parent = parent;
+  csPortal::parent = parent;
 }
 
-csPortalObsolete::~csPortalObsolete ()
+csPortal::~csPortal ()
 {
-  if (filter_texture) filter_texture->DecRef ();
 }
 
-csPortalObsolete* csPortalObsolete::Clone ()
-{
-  csPortalObsolete* clone = new csPortalObsolete (0);
-  clone->SetSector (sector);
-  clone->flags.SetAll (flags.Get ());
-  clone->warp_obj = warp_obj;
-  clone->max_sector_visit = max_sector_visit;
-  clone->filter_texture = filter_texture;
-  clone->filter_r = filter_r;
-  clone->filter_g = filter_g;
-  clone->filter_b = filter_b;
-  int i;
-  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
-    clone->SetMissingSectorCallback (GetMissingSectorCallback (i));
-  for (i = 0 ; i < portal_cb_vector.Length () ; i++)
-    clone->SetPortalCallback (GetPortalCallback (i));
-  return clone;
-}
-
-iSector *csPortalObsolete::GetSector () const
-{
-  return sector;
-}
-
-void csPortalObsolete::SetSector (iSector *s)
+void csPortal::SetSector (iSector *s)
 {
   sector = s;
 }
 
-csFlags &csPortalObsolete::GetFlags ()
+const csVector3* csPortal::GetVertices () const
 {
-  return flags;
+  return parent->GetVertices ()->GetArray ();
 }
 
-const csVector3* csPortalObsolete::GetVertices () const
+int* csPortal::GetVertexIndices () const
 {
-  return parent->GetParent ()->GetVertices ();
+  return (int*)vertex_indices.GetArray ();
 }
 
-int* csPortalObsolete::GetVertexIndices () const
+int csPortal::GetVertexIndicesCount () const
 {
-  return parent->GetVertexIndices ();
+  return vertex_indices.Length ();
 }
 
-int csPortalObsolete::GetVertexIndicesCount () const
-{
-  return parent->GetVertexCount ();
-}
-
-bool csPortalObsolete::CompleteSector (iBase *context)
+bool csPortal::CompleteSector (iBase *context)
 {
   if (sector)
   {
@@ -115,7 +77,7 @@ bool csPortalObsolete::CompleteSector (iBase *context)
     while (i >= 0)
     {
       iPortalCallback* cb = portal_cb_vector[i];
-      rc = cb->Traverse (&(this->scfiPortal), context);
+      rc = cb->Traverse (this, context);
       if (!rc) break;
       i--;
     }
@@ -130,7 +92,7 @@ bool csPortalObsolete::CompleteSector (iBase *context)
     while (i >= 0)
     {
       iPortalCallback* cb = sector_cb_vector[i];
-      rc = cb->Traverse (&(this->scfiPortal), context);
+      rc = cb->Traverse (this, context);
       if (rc == true) break;
       i--;
     }
@@ -140,7 +102,7 @@ bool csPortalObsolete::CompleteSector (iBase *context)
   return false;
 }
 
-void csPortalObsolete::ObjectToWorld (const csReversibleTransform &t,
+void csPortal::ObjectToWorld (const csReversibleTransform &t,
   csReversibleTransform& warp_wor) const
 {
   if (flags.Check (CS_PORTAL_STATICDEST))
@@ -149,13 +111,13 @@ void csPortalObsolete::ObjectToWorld (const csReversibleTransform &t,
     warp_wor = t.GetInverse () * warp_obj * t;
 }
 
-void csPortalObsolete::HardTransform (const csReversibleTransform &t)
+void csPortal::HardTransform (const csReversibleTransform &t)
 {
   if (flags.Check (CS_PORTAL_WARP))
     ObjectToWorld (t, warp_obj);
 }
 
-void csPortalObsolete::SetWarp (const csTransform &t)
+void csPortal::SetWarp (const csTransform &t)
 {
   flags.Set (CS_PORTAL_WARP);
   warp_obj = t;
@@ -166,7 +128,7 @@ void csPortalObsolete::SetWarp (const csTransform &t)
       (((m.Col1 () % m.Col2 ()) * m.Col3 ()) < 0));
 }
 
-void csPortalObsolete::SetWarp (
+void csPortal::SetWarp (
   const csMatrix3 &m_w,
   const csVector3 &v_w_before,
   const csVector3 &v_w_after)
@@ -187,43 +149,37 @@ void csPortalObsolete::SetWarp (
       (((m.Col1 () % m.Col2 ()) * m.Col3 ()) < 0));
 }
 
-const csReversibleTransform &csPortalObsolete::GetWarp () const
+const csReversibleTransform &csPortal::GetWarp () const
 {
   return warp_obj;
 }
 
-void csPortalObsolete::SetFilter (iTextureHandle *ft)
+void csPortal::SetFilter (iTextureHandle *ft)
 {
-  if (ft) ft->IncRef ();
-  if (filter_texture) filter_texture->DecRef ();
   filter_texture = ft;
 }
 
-iTextureHandle *csPortalObsolete::GetTextureFilter () const
+iTextureHandle *csPortal::GetTextureFilter () const
 {
   return filter_texture;
 }
 
-void csPortalObsolete::SetFilter (float r, float g, float b)
+void csPortal::SetFilter (float r, float g, float b)
 {
   filter_r = r;
   filter_g = g;
   filter_b = b;
-  if (filter_texture)
-  {
-    filter_texture->DecRef ();
-    filter_texture = 0;
-  }
+  filter_texture = 0;
 }
 
-void csPortalObsolete::GetColorFilter (float &r, float &g, float &b) const
+void csPortal::GetColorFilter (float &r, float &g, float &b) const
 {
   r = filter_r;
   g = filter_g;
   b = filter_b;
 }
 
-csVector3 csPortalObsolete::Warp (const csReversibleTransform& t,
+csVector3 csPortal::Warp (const csReversibleTransform& t,
     const csVector3 &pos) const
 {
   if (flags.Check (CS_PORTAL_WARP))
@@ -240,7 +196,7 @@ csVector3 csPortalObsolete::Warp (const csReversibleTransform& t,
   }
 }
 
-void csPortalObsolete::WarpSpace (const csReversibleTransform& warp_wor,
+void csPortal::WarpSpace (const csReversibleTransform& warp_wor,
     csReversibleTransform &t, bool &mirror) const
 {
   // warp_wor is a world -> warp space transformation.
@@ -251,7 +207,8 @@ void csPortalObsolete::WarpSpace (const csReversibleTransform& warp_wor,
   if (flags.Check (CS_PORTAL_MIRROR)) mirror = !mirror;
 }
 
-bool csPortalObsolete::Draw (
+#if 0
+bool csPortal::Draw (
   csPolygon2D *new_clipper,
   iPolygon3D *portal_polygon,
   const csReversibleTransform& t,
@@ -327,8 +284,9 @@ bool csPortalObsolete::Draw (
 
   return true;
 }
+#endif
 
-iPolygon3D *csPortalObsolete::HitBeam (
+iPolygon3D *csPortal::HitBeam (
   const csReversibleTransform& t,
   const csVector3 &start,
   const csVector3 &end,
@@ -358,35 +316,7 @@ iPolygon3D *csPortalObsolete::HitBeam (
   }
 }
 
-#if 0
-iMeshWrapper *csPortalObsolete::HitBeam (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  iPolygon3D **polygonPtr)
-{
-  if (!CompleteSector (0)) return 0;
-  if (sector->GetRecLevel () >= max_sector_visit)
-    return 0;
-  if (flags.Check (CS_PORTAL_WARP))
-  {
-    csVector3 new_start = warp_wor.Other2This (start);
-    csVector3 new_end = warp_wor.Other2This (end);
-    iMeshWrapper *o = sector->HitBeam (
-        new_start, new_end, isect,
-        polygonPtr);
-    return o;
-  }
-  else
-  {
-    return sector->HitBeam (
-        start, end, isect,
-        polygonPtr);
-  }
-}
-#endif
-
-void csPortalObsolete::CheckFrustum (iFrustumView *lview,
+void csPortal::CheckFrustum (iFrustumView *lview,
     const csReversibleTransform& t, int alpha)
 {
   if (!CompleteSector (lview)) return ;
@@ -516,27 +446,27 @@ stop:
   }
 }
 
-void csPortalObsolete::SetMirror (const csPlane3& plane)
+void csPortal::SetMirror (const csPlane3& plane)
 {
   SetWarp (csTransform::GetReflect (plane));
 }
 
-void csPortalObsolete::SetPortalCallback (iPortalCallback *cb)
+void csPortal::SetPortalCallback (iPortalCallback *cb)
 {
   portal_cb_vector.Push (cb);
 }
 
-iPortalCallback *csPortalObsolete::GetPortalCallback (int idx) const
+iPortalCallback *csPortal::GetPortalCallback (int idx) const
 {
   return portal_cb_vector[idx];
 }
 
-void csPortalObsolete::SetMissingSectorCallback (iPortalCallback *cb)
+void csPortal::SetMissingSectorCallback (iPortalCallback *cb)
 {
   sector_cb_vector.Push (cb);
 }
 
-iPortalCallback *csPortalObsolete::GetMissingSectorCallback (int idx) const
+iPortalCallback *csPortal::GetMissingSectorCallback (int idx) const
 {
   return sector_cb_vector[idx];
 }

@@ -27,6 +27,8 @@
 
 #include "csutil/scf.h"
 
+struct iPortal;
+
 SCF_VERSION (iPortalContainer, 0, 0, 1);
 
 /**
@@ -34,6 +36,17 @@ SCF_VERSION (iPortalContainer, 0, 0, 1);
  */
 struct iPortalContainer : public iBase
 {
+  /// Get the number of portals in this contain.
+  virtual int GetPortalCount () const = 0;
+
+  /// Get a specific portal.
+  virtual iPortal* GetPortal (int idx) const = 0;
+
+  /// Create a new portal.
+  virtual iPortal* CreatePortal (csVector3* vertices, int num) = 0;
+
+  /// Remove a portal.
+  virtual void RemovePortal (iPortal* portal) = 0;
 };
 
 /** @} */
