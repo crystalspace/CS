@@ -1608,7 +1608,7 @@ void csBCTerrObject::SetControlPointHeight (const float height,
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Set Control Point Height: %f iter: %d",
     //height, iter);
   size = ((3 * x_blocks) + 1) * ((3 * z_blocks) + 1);
-  if ((iter < size) && (iter >=0) )
+  if ((iter < size) && (iter >= 0) )
   {
     control_points[iter].y = height;    
     if (initialized)
@@ -1910,10 +1910,10 @@ void csBCTerrObject::FlattenSides ()
   z_size = (3 * z_blocks) + 1;
   end = x_size * z_size;
   
-  control_points[0].y = topleft.y;
+  /*control_points[0].y = topleft.y;
   control_points[x_size - 1].y = topleft.y; 
   control_points[(z_size -1) * x_size].y = topleft.y; 
-  control_points[end - 1].y = topleft.y; 
+  control_points[end - 1].y = topleft.y;*/ 
   if (!initheight)
   {
     toph = topleft.y;
