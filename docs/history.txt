@@ -14,6 +14,13 @@ chronological order.
 	- Eric Sunshine changed cs.mak so that "mkdir -p" for $(OUTDIRS) is now
 	  performed silently since it provided very little useful information
 	  to the viewer yet was extremely verbose.
+	- Eric Sunshine re-enabled the assignment-compatible (<class T2>)
+	  copy-constructor and assignment operator in csRef<>.  It turns out
+	  that if T and T2 are the same class, then the compiler will not
+	  invoke the T2 copy-constructor or assignment operator, but will
+	  instead just perform memberwise copy/assignment.  For this reason, we
+	  need to have copy-constructors and assignment operators for both T
+	  and T2.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
@@ -39,9 +46,9 @@ chronological order.
 	    csRef<iFoo> f = ...;
 	    csRef<iBase> b(f);
 	    b = f;
-	- res disabled Eric's new copy constructor, as it caused problems on 
-	  VC7. Specifically, MSVC7 doesn't seem to call that constructor,
-	  messing up reference counting.
+	- res disabled Eric's new csRef<> copy-constructor and assignment
+	  operator, as it caused problems on VC7. Specifically, MSVC7 doesn't
+	  seem to call that constructor, messing up reference counting.
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.

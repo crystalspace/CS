@@ -160,15 +160,13 @@ public:
   }
 
   /**
-   * Smart pointer copy constructor.
+   * Smart pointer copy constructor from assignment-compatible csRef<T2>.
    */
-  /*
   template <class T2>
-  csRef (csRef<T2> const& other) : obj (other)
+  csRef (csRef<T2> const& other) : obj ((T2*)other)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
-  */
 
   /**
    * Smart pointer destructor.  Invokes DecRef() upon the underlying object.
@@ -261,23 +259,21 @@ public:
     *this = newObj;
   }
 
-  /**
-   * Assign another object to this smart pointer.
-   */
+  /// Assign another csRef<> of the same type to this one.
   csRef& operator = (csRef const& other)
   {
     this->operator=(other.obj);
     return *this;
   }
-  /*
+
+  /// Assign another assignment-compatible csRef<T2> to this one.
   template <class T2>
   csRef& operator = (csRef<T2> const& other)
   {
-    T* p = other; // No cast; allow compiler to check type compatibility.
+    T* p = (T2*)other;
     this->operator=(p);
     return *this;
   }
-  */
 
   /// Test if the two references point to same object.
   inline friend bool operator == (const csRef& r1, const csRef& r2)
