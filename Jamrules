@@ -85,8 +85,6 @@ if $(USE_NEW_RENDERER) = "yes"
     hazeldr
     ieplex
     imgplex
-    motion
-    motldr
     nullmesh
     rain
     rainldr
@@ -158,8 +156,6 @@ else
     hazeldr
     ieplex
     imgplex
-    motion
-    motldr
     nullmesh
     rain
     rainldr
