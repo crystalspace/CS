@@ -747,7 +747,7 @@ iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
   if (!image)
   {
     G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csTextureManagerOpenGL::RegisterTexture with NULL image!");
+      "BAAAD!!! csTextureManagerSoftware::RegisterTexture with NULL image!");
 
     image = csCreateXORPatternImage(32, 32, 5);
   }
