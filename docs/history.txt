@@ -1462,15 +1462,9 @@ The history order is reversed so that new features are at the top.
 	- Seperated geometry and rule in the tree generator. This will make
 	  it easier to setup better rules.
 	- Matze changed annotation to include a link to the page in the e-mail
-<<<<<<< history.txt
-	  and mangles e-mail adress
-	- Matze finally fixed all issues with sky in map2cs (well it works
-		although it could be improved a bit)
-=======
 	  and mangles e-mail adress.
-<<<<<<< history.txt
->>>>>>> 1.2329
-=======
+	- Matze finally fixed all issues with sky in map2cs (well it works
+	  although it could be improved a bit).
 	- Matze fixed a sky issue in map2cs.
 	- Christopher Nelson did the following:
 	    - Added new function: AllWindowsHidden(), which returns true if
@@ -1494,7 +1488,6 @@ The history order is reversed so that new features are at the top.
 	- Norman also added a timer class to AWS to give pulses for cases no
 	  new event is generated but actions should happen (think: keeping the
 	  mouse pressed on a scrollbar button).
->>>>>>> 1.2378
 26-Jan-2002
 	- Matze fixed skybox generation in map2cs
 	- Added missing initialization of do_manual_colors to genmesh
