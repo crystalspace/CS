@@ -93,12 +93,12 @@ void csOctreeNode::BuildVertexTables ()
 
 //---------------------------------------------------------------------------
 
-csOctree::csOctree (csPolygonParentInt* pset, const csVector3& min_bbox,
-	const csVector3& max_bbox, int bsp_num, int mode) : csPolygonTree (pset)
+csOctree::csOctree (csPolygonParentInt* pset, const csVector3& imin_bbox,
+	const csVector3& imax_bbox, int ibsp_num, int imode) : csPolygonTree (pset)
 {
-  csOctree::bbox.Set (min_bbox, max_bbox);
-  csOctree::bsp_num = bsp_num;
-  csOctree::mode = mode;
+  bbox.Set (imin_bbox, imax_bbox);
+  bsp_num = ibsp_num;
+  mode = imode;
 }
 
 csOctree::~csOctree ()
