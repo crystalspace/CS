@@ -311,7 +311,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "cosfact"))
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
-    change_float (arg, &csSprite3D::global_lod_detail, "LOD detail", 
+    change_float (arg, &csSprite3D::global_lod_level, "LOD detail", 
       -1, 1000000);
   else if (!strcasecmp (cmd, "sprlight"))
     change_int (arg, &csSprite3D::global_lighting_quality, "sprite lighting quality", 0, 3);
