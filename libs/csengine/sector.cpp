@@ -860,6 +860,10 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
     iMeshWrapper *sp = objects[i];
     if (sp) 
     {
+      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+      //set the light-parameters
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+      	light->GetCenter ());
       sp->DrawShadow (rview, light);
     }
   }
