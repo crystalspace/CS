@@ -132,6 +132,7 @@ The history order has been reversed so that new features are at the top.
 	      driver without the 3D driver.
 	    - Added a note about C_INCLUDE_PATH needed to be set up correctly
 	      before you do "make depend" to the win32gcc.txi file.
+	- Release of 0.17r001.
 4-Sep-2000
 	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.
