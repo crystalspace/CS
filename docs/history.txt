@@ -45,6 +45,8 @@ The history order is reversed so that new features are at the top.
 	  is now fully XML. Note that saving of paths is not yet in XML
 	  format!
 	- Implemented XML version of the starldr.
+	- Fixed a crash bug in 3ds2lev with sprites if the 3ds file doesn't
+	  have texture mapping information.
 22-Aug-2002
 	- Fixed Cs2Xml for DURATION and FRAME commands in motion loader.
 	- Cs2Xml now supports the normal notation for vertices in 3D

@@ -297,7 +297,8 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
     for (unsigned int vn = 0; vn < mesh->points; vn++)
     {
       float *xyz = mesh->pointL[vn].pos;
-      Lib3dsTexel* texel = &mesh->texelL[vn];
+      Lib3dsTexel* texel = NULL;
+      if (mesh->texelL) texel = &mesh->texelL[vn];
       float u = 0, v = 0;
 
       if (texel)
