@@ -82,6 +82,8 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   TreeCollider.SetFullPrimBoxTest (false);
   // TreeCollider.SetFullPrimPrimTest (true);
   TreeCollider.SetTemporalCoherence (true);
+
+  RayCol.SetCulling (false);
 }
 
 csOPCODECollideSystem::~csOPCODECollideSystem ()
@@ -158,13 +160,90 @@ bool csOPCODECollideSystem::Collide (
   col2->transform.m[3][1] = u.y;
   col2->transform.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache, &col1->transform, &col2->transform);
+  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
+  	&col2->transform);
   if (isOk)
   {
     bool status = TreeCollider.GetContactStatus ();
     if (status)
     {
       CopyCollisionPairs (col1, col2);
+    }
+    return status;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+static void ray_cb (const CollisionFace& hit, void* user_data)
+{
+  csArray<int>* collision_faces = (csArray<int>*)user_data;
+  collision_faces->Push (hit.mFaceID);
+}
+
+bool csOPCODECollideSystem::CollideRay (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end)
+{
+  csOPCODECollider* col = (csOPCODECollider*) collider;
+  ColCache.Model0 = col->m_pCollisionModel;
+
+  csMatrix3 m;
+  if (trans) m = trans->GetT2O ();
+  csVector3 u;
+
+  u = m.Row1 ();
+  col->transform.m[0][0] = u.x;
+  col->transform.m[1][0] = u.y;
+  col->transform.m[2][0] = u.z;
+  u = m.Row2 ();
+  col->transform.m[0][1] = u.x;
+  col->transform.m[1][1] = u.y;
+  col->transform.m[2][1] = u.z;
+  u = m.Row3 ();
+  col->transform.m[0][2] = u.x;
+  col->transform.m[1][2] = u.y;
+  col->transform.m[2][2] = u.z;
+
+  if (trans) u = trans->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  col->transform.m[3][0] = u.x;
+  col->transform.m[3][1] = u.y;
+  col->transform.m[3][2] = u.z;
+
+  Ray ray (Point (start.x, start.y, start.z),
+  	   Point (end.x-start.x, end.y-start.y, end.z-start.z));
+
+  RayCol.SetHitCallback (ray_cb);
+  RayCol.SetUserData ((void*)&collision_faces);
+  intersecting_triangles.SetLength (0);
+  collision_faces.SetLength (0);
+  bool isOk = RayCol.Collide (ray, *ColCache.Model0, &col->transform);
+  if (isOk)
+  {
+    bool status = RayCol.GetContactStatus ();
+    if (status)
+    {
+      // Now calculate the real intersection points for all hit faces.
+      Point* vertholder = col->vertholder;
+      if (!vertholder) return true;
+      udword* indexholder = col->indexholder;
+      if (!indexholder) return true;
+      Point* c;
+      size_t i;
+      for (i = 0 ; i < collision_faces.Length () ; i++)
+      {
+        int idx = collision_faces[i] * 3;
+	int it_idx = intersecting_triangles.Push (csIntersectingTriangle ());
+	c = &vertholder[indexholder[idx+0]];
+	intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
+	c = &vertholder[indexholder[idx+1]];
+	intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
+	c = &vertholder[indexholder[idx+2]];
+	intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+      }
     }
     return status;
   }

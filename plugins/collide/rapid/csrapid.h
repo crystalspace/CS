@@ -30,6 +30,9 @@
  */
 class csRapidCollideSystem : public iCollideSystem
 {
+private:
+  csArray<csIntersectingTriangle> intersecting_triangles;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -44,6 +47,19 @@ public:
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
   	iCollider* collider2, const csReversibleTransform* trans2);
+
+  virtual bool CollideRay (
+  	iCollider*, const csReversibleTransform*,
+	const csVector3&, const csVector3&)
+  {
+    CS_ASSERT (false);
+    return false;
+  }
+  virtual const csArray<csIntersectingTriangle>& GetIntersectingTriangles ()
+  	const
+  {
+    return intersecting_triangles;
+  }
 
   virtual csCollisionPair* GetCollisionPairs ();
   virtual int GetCollisionPairCount ();

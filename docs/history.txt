@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Sep-2004
+	- Jorrit added a new iCollideSystem->CollideRay() and
+	  GetIntersectingTriangles(). With this function it is possible
+	  to test if a collider intersects with a ray. Only the OPCODE
+	  plugin implements this (not RAPID). Note that this function
+	  is currently untested.
 31-Aug-2004
 	- Jorrit did a huge optimization and cleanup on dynamic lights (old
 	  style dynamic lights which do NOT use stencil hardware). Pressing

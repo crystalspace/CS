@@ -47,9 +47,12 @@ class csOPCODECollideSystem : public iCollideSystem
 {
 public:
   Opcode::AABBTreeCollider TreeCollider;
+  Opcode::RayCollider RayCol;
   Opcode::BVTCache ColCache;
 
   csDirtyAccessArray<csCollisionPair> pairs;
+  csArray<int> collision_faces;
+  csArray<csIntersectingTriangle> intersecting_triangles;
   iObjectRegistry *object_reg;
  
   SCF_DECLARE_IBASE;
@@ -66,21 +69,22 @@ public:
 
   /**
    * Test collision between two colliders.
-   * This is only supported for iCollider objects created by
-   * this plugin. Returns false if no collision or else true.
-   * The collisions will be added to the collision pair array
-   * that you can query with GetCollisionPairs and reset/clear
-   * with ResetCollisionPairs. Every call to Collide will
-   * add to that array.
    */
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
   	iCollider* collider2, const csReversibleTransform* trans2);
 
+  virtual bool CollideRay (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end);
+  virtual const csArray<csIntersectingTriangle>& GetIntersectingTriangles ()
+  	const
+  {
+    return intersecting_triangles;
+  }
+
   /**
    * Get pointer to current array of collision pairs.
-   * This array will grow with every call to Collide until you clear
-   * it using 'ResetCollisionPairs'.
    */
   virtual csCollisionPair* GetCollisionPairs ();
 
