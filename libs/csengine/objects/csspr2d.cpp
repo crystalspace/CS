@@ -85,6 +85,20 @@ void csSprite2D::Shift (float dx, float dy)
 }
 
 
+void csSprite2D::SetColor (const csColor& col)
+{
+  for (int i=0; i<vertices.Length(); i++)
+    vertices[i].color_init = col;
+}
+
+
+void csSprite2D::AddColor (const csColor& col)
+{
+  for (int i=0; i<vertices.Length(); i++)
+    vertices[i].color_init = col;
+}
+
+
 void csSprite2D::UpdatePolyTreeBBox ()
 {
 }

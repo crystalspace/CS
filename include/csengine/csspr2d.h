@@ -130,7 +130,7 @@ public:
   /**
    * Relative move
    */
-  void Move (csVector3& v) { position += v; }
+  void Move (const csVector3& v) { position += v; }
 
   /// Get position of this sprite.
   inline csVector3 GetOrigin () const { return position; }
@@ -155,7 +155,17 @@ public:
    * Shift the vertices of the sprite by vector delta.
    * The sprite will be drawn displaced from the center position.
    */
-  void Shift (csVector2& delta) { Shift (delta.x, delta.y); }
+  void Shift (const csVector2& delta) { Shift (delta.x, delta.y); }
+
+  /**
+   * Set the color of the sprite for all vertices
+   */
+  void SetColor(const csColor& col);
+
+  /** 
+   * Add a color to all vertices init_color.
+   */
+  void AddColor(const csColor&col);
 
   /**
    * Light sprite according to the given array of lights (i.e.
