@@ -39,6 +39,12 @@ chronological order.
 	- Eric Sunshine applied fix to opengl/gl_renderbuffer.h for Borland to
 	  make csGLVBOBufferManager::VBO_NUMBER_OF_SLOTS accessible to
 	  csGLVBOBufferManager::slotList.
+	- Marten updated the VBO-routines to split/merge VBO-slots when needed.
+	  These routines should somewhen in the future be moved so it does not
+	  get into a "split-merge" loop over a few frames.
+	- Marten fixed a typo in glshader_fixed.
+	- Marten fixed a bug in glstates.h. It didn't reset the vertex/color/
+	  normal pointers when switching VBO-buffer (which is needed).
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this

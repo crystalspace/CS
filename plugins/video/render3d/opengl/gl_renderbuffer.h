@@ -241,13 +241,14 @@ struct csGLVBOBufferSlot
 public:
   csGLVBOBufferSlot()
     : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0), offset (0),
-    listIdx (0), next (0), prev (0), inUse (false), locked (false), indexBuffer (false)
+    listIdx (0), next (0), prev (0), inUse (false), locked (false), indexBuffer (false),
+    separateVBO (false)
   {
   }
 
   void AttachBuffer (csGLRenderBuffer* buffer)
   {
-    if (inUse) DeattachBuffer ();
+    if (inUse && buffer!=renderBuffer) DeattachBuffer ();
 
     renderBuffer = buffer;
     buffer->vboSlot = this;
@@ -280,6 +281,7 @@ public:
   bool inUse;         //Currently allocated to some buffer
   bool locked;        //Locked due to active renderering
   bool indexBuffer;   //if this slot contains indexbuffer
+  bool separateVBO;   //this slot have a separate VBO buffer
 };
 
 /**
@@ -307,6 +309,11 @@ public:
   bool DeactivateBuffer (csGLRenderBuffer *buffer);
 
   /**
+   * Buffer removed
+   */
+  void BufferRemoved (csGLRenderBuffer *buffer);
+
+  /**
    * Make sure no VBO-buffer is activated
    */
   void DeactivateVBO ();
@@ -321,14 +328,14 @@ public:
 protected:
   csGLExtensionManager *ext; //extension manager
   csGLStateCache *statecache;
-  csRef<iBugPlug> bugplug;
   csConfigAccess config;
   iObjectRegistry *object_reg;
   bool verbose, superVerbose;
 
   enum
   {
-    VBO_NUMBER_OF_SLOTS = 12
+    VBO_NUMBER_OF_SLOTS = 12,
+    VBO_BIGGEST_SLOT_SIZE = 512*1024
   };
 
   // Precache buffer to specific slot
@@ -345,21 +352,27 @@ protected:
   // render buffer (false)
   csGLVBOBufferSlot* FindEmptySlot (size_t size, bool ib);
 
+  // allocate a vbo-buffer of given size
+  GLuint AllocateVBOBuffer (size_t size, bool ib);
+
   // Touch slot as used
   void TouchSlot (csGLVBOBufferSlot *slot)
   {
+    if (slot->separateVBO) return;
     if (slot->indexBuffer) indexBuffer.TouchSlot (slot);
     else vertexBuffer.TouchSlot (slot);
   }
 
   struct csGLVBOBuffer
   {
+    ~csGLVBOBuffer();
+
     GLuint vboID;
     GLenum vboTarget; //opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
     size_t size; //total size (in bytes);
 
     // Find an empty slot
-    csGLVBOBufferSlot* FindEmptySlot (size_t size);
+    csGLVBOBufferSlot* FindEmptySlot (size_t size, bool splitStarted = false);
 
     // Setup, create VBO buffers and initial slots
     void Setup (GLenum usage, size_t totalSize, csGLExtensionManager *ext);

@@ -1323,12 +1323,10 @@ void csGLGraphics3D::Print (csRect const* area)
   if (bugplug)
     bugplug->ResetCounter ("Triangle Count");
 
-#ifdef CS_DEBUG
   if (vboManager.IsValid ())
   {
     vboManager->ResetFrameStats ();
   }
-#endif
 
   G2D->Print (area);
 }

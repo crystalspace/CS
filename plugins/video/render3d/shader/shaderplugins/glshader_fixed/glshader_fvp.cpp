@@ -76,7 +76,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
   if (do_lighting)
   {
-    statecache->SetMatrixMode (GL_MODELVIEW_MATRIX);
+    statecache->SetMatrixMode (GL_MODELVIEW);
     glPushMatrix ();
     glLoadIdentity ();
 

@@ -406,10 +406,10 @@ public:
     glGetIntegerv (GL_NORMAL_ARRAY_TYPE, (GLint*)&parameter_ntype);
     glGetPointerv (GL_NORMAL_ARRAY_POINTER, &parameter_npointer);
 
-    glGetIntegerv (GL_COLOR_ARRAY_SIZE, (GLint*)&parameter_vsize);
-    glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_vstride);
-    glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_vtype);
-    glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_vpointer);
+    glGetIntegerv (GL_COLOR_ARRAY_SIZE, (GLint*)&parameter_csize);
+    glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_cstride);
+    glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_ctype);
+    glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_cpointer);
   }
 
   // Standardized caches
@@ -518,6 +518,10 @@ public:
       {
         extmgr->glBindBufferARB (target, id);
         currentBufferID = id;
+        parameter_vpointer = (GLvoid*)~0; //invalidate vertexpointer
+        parameter_npointer = (GLvoid*)~0; //invalidate vertexpointer
+        parameter_cpointer = (GLvoid*)~0; //invalidate vertexpointer
+        memset(&parameter_tpointer, ~0, sizeof(GLvoid*)*CS_GL_MAX_LAYER);
       }
     }
   }
