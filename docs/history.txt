@@ -23,6 +23,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug in csFont where it incorrectly computed
 	  FontCount (as one too large).  This could have been responsible for
 	  the crasher in OpenGL AddFont().
+	- Norman Kramer removed the explicit IncRef of VFS that caused the
+	  warning about unreleased instance of kernel.vfs.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
