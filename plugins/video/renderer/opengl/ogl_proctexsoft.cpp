@@ -365,6 +365,8 @@ void csOpenGLProcSoftware::Print (csRect *area)
   csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   glDisable (GL_ALPHA_TEST);
 
+  g3d->Print (area);
+  
   csTxtCacheData *tex_data = (csTxtCacheData*) tex->GetCacheData();
   if (tex_data)
   {
@@ -379,7 +381,6 @@ void csOpenGLProcSoftware::Print (csRect *area)
   {
     // Not in cache. Sharing buffer with texture so do nothing
   }
-  g3d->Print (area);
 }
 
 iGraphics2D *csOpenGLProcSoftware::GetDriver2D ()
