@@ -110,6 +110,21 @@ public:
       }
     }
   }
+
+  /// copy to bytemap
+  void CopyTo (csRGBLightMap& other, int size)
+  {
+    other.Clear ();
+    if (GetMap()) { 
+      other.Alloc (size); 
+      for(int i=0; i<size; i++)
+      {
+        other.GetRed()[i] = (unsigned char)GetRed()[i];
+        other.GetGreen()[i] = (unsigned char)GetGreen()[i];
+        other.GetBlue()[i] = (unsigned char)GetBlue()[i];
+      }
+    }
+  }
 };
 
 /**
@@ -121,17 +136,26 @@ protected:
   float area;
   
   float total_unshot_light; // diffuse * area * avg_delta_level
-  
+
+public://@@@
   csLightMap *csmap;
   
+protected:
   int width, height, size;
   
   /// ptr to static lightmap of polygon
   csRGBLightMap *lightmap;
-  
+ 
   /// the change to this lightmap, unshot light.
   csRGBFloatLightMap *deltamap;
-  
+
+  /**
+   * if we are debugging radiosity then this is a copy of the
+   * lightmap that we store in order to restore the static lightmap
+   * values later.
+   */
+  csRGBLightMap* copy_lightmap;
+ 
   /// the area of one lumel of the polygon
   float one_lumel_area;
 
@@ -203,6 +227,18 @@ public:
   
   /// get the delta map
   inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
+
+  /**
+   * For debugging: keep a pointer of the static lightmap
+   * and temporarily copy the deltamap to the static lightmap again.
+   */
+  void ShowDeltaMap ();
+
+  /**
+   * For debugging: restore the state of the static lightmaps
+   * and free the copy of the static lightmap.
+   */
+  void RestoreStaticMap ();
 
   /// Get last shooting priority of this radpoly
   inline float GetLastShootingPriority() { return last_shoot_priority;}
@@ -503,6 +539,12 @@ private:
   /// list of all radiosity polygon info
   csRadList *list;
 
+  /**
+   * For debugging: if true we are showing the delta maps in the
+   * static map.
+   */
+  bool showing_deltamaps;
+
   /// progress meter of the work
   csProgressMeter *meter;
   /// pulse to see polygon shootings
@@ -550,6 +592,24 @@ public:
   ~csRadiosity();
   /// Does the whole radiosity thing. This is the one to call.
   void DoRadiosity();
+
+  /**
+   * Do the radiosity a few steps at a time. This is useful for debugging.
+   * Returns false on stop criterium.
+   */
+  bool DoRadiosityStep (int steps);
+  /// For step-by-step radiosity: return next polygon to process.
+  csPolygon3D* GetNextPolygon ();
+  /**
+   * For debugging: temporarily show all delta maps.
+   * Calling this again will restore the situation.
+   */
+  void ToggleShowDeltaMaps ();
+  /**
+   * Restore the static maps after doing ToggleShowDeltaMaps().
+   * Calling DoRadiosityStep() will also do this.
+   */
+  void RestoreStaticMaps ();
 
   /// get next best poly to shoot, or NULL if we should stop.
   csRadElement* FetchNext();

@@ -41,6 +41,7 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/cspixmap.h"
+#include "csengine/radiosty.h"
 #include "csengine/collider.h"
 #include "csengine/particle.h"
 #include "csutil/scanstr.h"
@@ -555,7 +556,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
-    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis\n");
+    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
     CONPRI("Sprites:\n");
     CONPRI("  loadsprite addsprite delsprite listsprites\n");
     CONPRI("  listactions setaction\n");
@@ -865,6 +866,36 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       CreateSolidThings (Sys->world, room, otree->GetRoot (), 0);
     }
+  }
+  else if (!strcasecmp (cmd, "db_radstep"))
+  {
+    csRadiosity* rad;
+    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+    {
+      int steps;
+      if (arg)
+        sscanf (arg, "%d", &steps);
+      else
+        steps = 1;
+      if (steps < 1) steps = 1;
+      rad->DoRadiosityStep (steps);
+      Sys->world->InvalidateLightmaps ();
+    }
+  }
+  else if (!strcasecmp (cmd, "db_radtodo"))
+  {
+    csRadiosity* rad;
+    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+    {
+      rad->ToggleShowDeltaMaps ();
+      Sys->world->InvalidateLightmaps ();
+    }
+  }
+  else if (!strcasecmp (cmd, "db_radhi"))
+  {
+    csRadiosity* rad;
+    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+      Sys->selected_polygon = rad->GetNextPolygon ();
   }
   else if (!strcasecmp (cmd, "palette"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");

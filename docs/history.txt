@@ -1,5 +1,35 @@
 The history order has been reversed so that new features are at the top.
 
+28-Sep-2000
+	- Philip Wyett updated a few VC project files.
+	- Thomas Hieber did a very small update to icsgame.h.
+	- Added a single stepper for radiosity. This is mainly useful
+	  for debugging. To use it you first need to enable radiosity
+	  in cryst.cfg. Then at startup you use the -radstep option.
+	  This will initialize the radiosity process but not start it yet.
+	  Using the console command db_radstep you can single step radiosity
+	  one iteration at a time (or more if you give an argument). This
+	  key is assigned to 'shift-r'. Before doing this you can also
+	  hilight the polygon that is going to be used next for radiosity.
+	  This is with the db_radhi command (assigned to 'alt-r').
+	  There is also the db_radtodo command which toggles between showing
+	  the current static lightmaps and the delta maps. This is useful
+	  for showing what radiosity is going to use next. Note that
+	  this toggle will be safely restored if you continue radiosity
+	  with 'db_radstep'. This command is assigned to 'ctrl-r'.
+	  Some notes. If you start walktest using this setup all lightmaps
+	  will initially be black. This is because the radiosity algorithm
+	  starts by removing all lighting info from the lightmaps and
+	  putting it in 'todo' lightmaps. If you continue the iterations
+	  the lighting info will gradually reappear.
+	  WARNING! This feature only works correctly with the software
+	  renderer. The problem is that the radiosity algorithm assumed
+	  the lightmaps are in original format but for OpenGL/D3D the
+	  lightmaps are converted to power-of-two format later.
+	- Added csWorld::InvalidateLightmaps() which can be used after
+	  changing the static lightmaps so that the changes will take
+	  effect. This is a slow function though! It is used by the
+	  radiosity debugger.
 27-Sep-2000
 	- Fixed bug in csparser which would cause things defined with
 	  the SIXFACE command to be added twice to the sector. This was

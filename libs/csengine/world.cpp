@@ -536,6 +536,7 @@ bool csWorld::do_not_force_relight = false;
 bool csWorld::do_force_relight = false;
 bool csWorld::do_not_force_revis = false;
 bool csWorld::do_force_revis = false;
+bool csWorld::do_rad_debug = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -577,6 +578,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   freeze_pvs = false;
   Library = NULL;
   world_states = NULL;
+  rad_debug = NULL;
 
   if (!covtree_lut)
   {
@@ -613,6 +615,7 @@ csWorld::~csWorld ()
   delete covcube;
   delete cbufcube;
   delete covtree_lut;
+  delete rad_debug;
 
   // @@@ temp hack
   delete camera_hack;
@@ -1080,8 +1083,15 @@ void csWorld::ShineLights ()
   {
     start = System->GetTime ();
     csRadiosity *rad = new csRadiosity(this);
-    rad->DoRadiosity();
-    delete rad;
+    if (do_rad_debug)
+    {
+      rad_debug = rad;
+    }
+    else
+    {
+      rad->DoRadiosity();
+      delete rad;
+    }
     stop = System->GetTime ();
     CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)", (float)(stop-start)/1000.);
   }
@@ -1115,6 +1125,19 @@ void csWorld::ShineLights ()
 
   delete pit;
   delete lit;
+}
+
+void csWorld::InvalidateLightmaps ()
+{
+  csPolyIt* pit = NewPolyIterator ();
+  csPolygon3D* p;
+  while ((p = pit->Fetch ()) != NULL)
+  {
+    csPolyTexLightMap* lmi = p->GetLightMapInfo ();
+    if (lmi && lmi->GetLightMap ())
+      ((csLightMap*)lmi->GetLightMap ())->MakeDirtyDynamicLights ();
+  }
+  delete pit;
 }
 
 bool csWorld::CheckConsistency ()

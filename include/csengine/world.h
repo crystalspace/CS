@@ -31,6 +31,7 @@
 #include "iworld.h"
 #include "iconfig.h"
 
+class csRadiosity;
 class csSector;
 class csSprite;
 class csTextureList;
@@ -482,6 +483,8 @@ public:
   static bool do_not_force_revis;
   /// Option variable: force visibility recalculation?
   static bool do_force_revis;
+  /// Option variable: radiosity debugging (step by step)?
+  static bool do_rad_debug;
 
 private:
   /// Texture and color information objects.
@@ -501,6 +504,9 @@ private:
 
   /// Current engine mode (one of CS_ENGINE_... flags).
   int engine_mode;
+
+  /// Pointer to radiosity system if we are in step-by-step radiosity mode.
+  csRadiosity* rad_debug;
 
   /// Optional 3D quadtree used for culling.
   csQuadTree3D* quad3d;
@@ -644,6 +650,19 @@ public:
   {
     return cur_process_polygons >= max_process_polygons;
   }
+
+  /**
+   * Get the pointer to the radiosity object (used with step-by-step
+   * debugging).
+   */
+  csRadiosity* GetRadiosity () { return rad_debug; }
+
+  /**
+   * Invalidate all lightmaps. This can be called after doing
+   * a significant change on the static lightmaps (i.e. after doing
+   * a radiosity debug function).
+   */
+  void InvalidateLightmaps ();
 
   /**
    * Set the desired engine mode.

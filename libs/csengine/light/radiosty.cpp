@@ -58,11 +58,13 @@ csRadElement::csRadElement()
   last_shoot_priority = 0.0f;
   num_repeats = 0;
   deltamap = new csRGBFloatLightMap();
+  copy_lightmap = NULL;
 }
 
 csRadElement::~csRadElement()
 {
   delete deltamap;
+  delete copy_lightmap;
 }
 
 void csRadElement::ComputePriority()
@@ -358,6 +360,26 @@ csRadElement* csRadElement::GetRadElement(csCurve &object)
   }
 
   return NULL;
+}
+
+void csRadElement::ShowDeltaMap ()
+{
+  if (copy_lightmap) return;
+
+  copy_lightmap = new csRGBLightMap ();
+  copy_lightmap->Copy (*lightmap, lightmap->GetMaxSize ());
+
+  deltamap->CopyTo (*lightmap, lightmap->GetMaxSize ());
+}
+
+void csRadElement::RestoreStaticMap ()
+{
+  if (!copy_lightmap) return;
+
+  lightmap->Copy (*copy_lightmap, copy_lightmap->GetMaxSize ());
+
+  delete copy_lightmap;
+  copy_lightmap = NULL;
 }
 
 //--------------- csRadPoly --------------------------------------
@@ -822,6 +844,8 @@ csRadiosity :: csRadiosity(csWorld *current_world)
   RemoveAmbient();
   texturemap = 0;
   shadow_matrix = 0;
+
+  showing_deltamaps = false;
 }
 
 csRadiosity :: ~csRadiosity()
@@ -832,6 +856,91 @@ csRadiosity :: ~csRadiosity()
   delete meter;
   // remove data needed.
   delete list;
+}
+
+static void show_deltamap (csRadElement *p)
+{
+  p->ShowDeltaMap ();
+}
+
+static void restore_staticmap (csRadElement *p)
+{
+  p->RestoreStaticMap ();
+}
+
+void csRadiosity :: ToggleShowDeltaMaps ()
+{
+  if (showing_deltamaps)
+  {
+    RestoreStaticMaps ();
+    return;
+  }
+  showing_deltamaps = true;
+  list->Traverse (show_deltamap);
+}
+
+void csRadiosity :: RestoreStaticMaps ()
+{
+  if (!showing_deltamaps) return;
+  showing_deltamaps = false;
+  list->Traverse (restore_staticmap);
+}
+
+csPolygon3D* csRadiosity :: GetNextPolygon ()
+{
+  csRadElement *shoot;
+
+  shoot = list->PopHighest();
+  if(shoot)
+  {
+    start_priority = shoot->GetPriority();
+    list->InsertElement(shoot);
+    // @@@ Only for polygons for now!!!
+    csRadPoly* radpoly = (csRadPoly*)shoot;
+    return radpoly->GetPolygon3D ();
+  }
+  return NULL;
+}
+
+bool csRadiosity :: DoRadiosityStep (int steps)
+{
+  RestoreStaticMaps ();
+  csRadElement *shoot;
+
+  shoot = list->PopHighest();
+  if(shoot) {
+    start_priority = shoot->GetPriority();
+    list->InsertElement(shoot);
+  }
+
+  // do the work
+  // Take RadPoly with highest unshot light amount, and distribute
+  // the light to other polys (incrementing their unshot amount).
+  // until stability, in theory, in practice some stop-condition.
+
+  while (steps > 0 && (shoot = FetchNext()) != NULL)
+  {
+    steps--;
+    iterations++;
+    // shoot the light off of RadPoly.
+    CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
+    // prepare to shoot from source (visibility, precompute, etc)
+    PrepareShootSource(shoot);
+
+    // start the frustum calcs.
+    StartFrustum();
+    // have shot all from shootrad.
+    shoot->CopyAndClearDelta();
+    list->InsertElement(shoot); 
+  }
+
+  if (steps <= 0)
+    return true;
+  else
+  {
+    ApplyDeltaAndAmbient();
+    return false;
+  }
 }
 
 void csRadiosity :: DoRadiosity()
@@ -858,11 +967,9 @@ void csRadiosity :: DoRadiosity()
     iterations++;
     // shoot the light off of RadPoly.
     CsPrintf(MSG_STDOUT, "(priority at %f).\n", shoot->GetPriority() );
-//@@@
-//memset (shoot->csmap->GetStaticMap ().GetRed (), 255, shoot->csmap->GetStaticMap ().GetMaxSize ());
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
-   PrepareShootSource(shoot);
+    PrepareShootSource(shoot);
 
     // start the frustum calcs.
     StartFrustum();
@@ -1268,9 +1375,9 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
   //shoot_src->CapDelta(suv, srcp_width, srcp_height, cap);
   // get delta in colour
   shoot_src->GetSummedDelta(suv, srcp_width, srcp_height, delta_color);
-  delta_color.red *= src_lumel_color.red ;
-  delta_color.green *= src_lumel_color.green ;
-  delta_color.blue *= src_lumel_color.blue ;
+  delta_color.red *= src_lumel_color.red;
+  delta_color.green *= src_lumel_color.green;
+  delta_color.blue *= src_lumel_color.blue;
 }
 
 
@@ -1364,7 +1471,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
   if(totalfactor > 0.000001) 
-    shoot_dest->AddToDelta(ruv, delta_color * totalfactor);
+    shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 1.);
 
   // specular gloss
   // direction of the 'light' on dest is -path

@@ -35,7 +35,8 @@ static const csOptionDescription config_options [] =
   {  4, "recalc",   "Force/inhibit recalculation of all cached information", CSVAR_BOOL },
   {  5, "relight",  "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
   {  6, "revis",    "Force/inhibit recalculation of visibility data", CSVAR_BOOL },
-  {  7, "cache",    "Enable caching of generated lightmaps", CSVAR_BOOL }
+  {  7, "cache",    "Enable caching of generated lightmaps", CSVAR_BOOL },
+  {  8, "radstep",  "Enable radiosity step-by-step", CSVAR_BOOL }
 };
 const int NUM_OPTIONS = (sizeof (config_options) / sizeof (config_options [0]));
 
@@ -72,6 +73,7 @@ bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
     case 5:  config_relight (value->v.b); break;
     case 6:  config_revis   (value->v.b); break;
     case 7:  csPolygon3D::do_cache_lightmaps = value->v.b; break;
+    case 8:  csWorld::do_rad_debug = value->v.b; break;
     default: return false;
   }
   return true;
@@ -90,6 +92,7 @@ bool csWorld::csWorldConfig::GetOption (int id, csVariant* value)
     case 5:  value->v.b = config_relight(); break;
     case 6:  value->v.b = config_revis  (); break;
     case 7:  value->v.b = csPolygon3D::do_cache_lightmaps; break;
+    case 8:  value->v.b = csWorld::do_rad_debug; break;
     default: return false;
   }
   return true;
