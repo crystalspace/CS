@@ -3538,7 +3538,11 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     ddgTriIndex tvc = mesh->qs()->index(mesh->qsi());
     ddgTBinTree *bt = mesh->qs()->tree(mesh->qsi());
 
-//  drawTriangle(bt, tvc);
+#if 0
+    drawTriangle(bt, tvc);
+#else
+    (void)tvc; (void)bt;
+#endif
     mesh->qsi()->next();
   }
 
