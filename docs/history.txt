@@ -3,6 +3,11 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+29-Mar-2003
+	- Oktal added double2longlong and longlong2double functions to
+	  csendian.h, for converting doubles to a portable format, like
+	  float2long and long2float. Commented out for now because it doesn't
+	  work on all compilers.
 28-Mar-2003
 	- Removed internal csPolyTxtPlane class from thing and merged
 	  functionality with csPolyTexLightMap.

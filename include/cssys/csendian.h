@@ -102,6 +102,8 @@ static inline float little_endian_float (float f)
     only have 32 bits, we'll ommit the most significant bit of mantissa
     since it is always 1 (we use normalized numbers). This increases the
     precision twice.
+
+    For double, we use one bit sign, 15 bits exponent, 49 bits mantissa.
 */
 
 /// Convert a float to a cross-platform 32-bit format (no endianess adjustments!)
@@ -124,6 +126,29 @@ static inline float long2float (int32 l)
   if (l & 0x80000000) mant = -mant;
   return (float) ldexp (mant, exp);
 }
+
+#if 0 // comment out this because it doesn't work on all compilers
+/// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
+static inline int64 double2longlong (double d)
+{
+  int exp;
+  int64 mant = (int64) (frexp (d, &exp) * 0x1000000000000LL);
+  int64 sign = mant & 0x800000000000000LL;
+  if (mant < 0) mant = -mant;
+  if (exp > 32767) exp = 32767; else if (exp < -32768) exp = -32768;
+  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & 0xffffffffffffLL);
+}
+
+/// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
+static inline double longlong2double (int64 i)
+{
+  int64 exp = (i >> 48) & 0x7fff;
+  if (exp & 0x4000) exp = exp | ~0x7fff;
+  double mant = double (i & 0xffffffffffffLL) / 0x1000000000000LL;
+  if (i & 0x8000000000000000LL) mant = -mant;
+  return ldexp (mant, exp);
+}
+#endif // 0
 
 /**
  * The following routines are used for converting floating-point numbers
