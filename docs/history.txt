@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Aug-1999
+	- Eric Sunshine fixed a new compilation warning about an uninitialized
+	  variable in WalkTest.
 19-Aug-1999
 	- Added 'statistics' to engine for c-buffer rejection/acception.
 	  WalkTest also shows this with the 'stats' command.
