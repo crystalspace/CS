@@ -573,6 +573,17 @@ void csPolygon3D::AddLightpatch (csLightPatch* lp)
 
 int csPolygon3D::AddVertex (int v)
 {
+  if (v >= poly_set->GetNumVertices ())
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Index number %d is too high for a polygon (max=%d)!\n",
+    	v, poly_set->GetNumVertices ());
+    fatal_exit (0, false);
+  }
+  if (v < 0)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Bad negative vertex index %d!\n", v);
+    fatal_exit (0, false);
+  }
   if (!vertices_idx)
   {
     max_vertices = 4;
@@ -807,7 +818,8 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   cnt_vis = 0;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    vis[i] = csMath3::Visible (Vcam (i), *portal_plane);
+    //vis[i] = csMath3::Visible (Vcam (i), *portal_plane);
+    vis[i] = portal_plane->Classify (Vcam (i)) <= SMALL_EPSILON;
     if (vis[i]) cnt_vis++;
   }
 
