@@ -345,6 +345,9 @@ void csBugPlug::HideSpider (iCamera* camera)
 	  EnterEditMode (spider_command, "Enter new fov angle:", buf);
 	}
 	break;
+      case DEBUGCMD_SCRSHOT:
+        CaptureScreen ();
+	break;
       case DEBUGCMD_DEBUGSECTOR:
 	SwitchDebugSector (camera->GetTransform ());
         break;
@@ -911,6 +914,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
       case DEBUGCMD_DEBUGSECTOR:
+      case DEBUGCMD_SCRSHOT:
         // Set spider on a hunt.
 	UnleashSpider (cmd);
         break;
@@ -1013,9 +1017,6 @@ bool csBugPlug::EatKey (iEvent& event)
 	fps_tottime = 0;
 	fps_cur = -1;
         break;
-      case DEBUGCMD_SCRSHOT:
-        CaptureScreen ();
-	break;
     }
     process_next_key = false;
   }
