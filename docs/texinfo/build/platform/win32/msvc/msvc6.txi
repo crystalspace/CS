@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC6, , MSVC5, MSVC
+@node MSVC6, MSVC7, MSVC5, MSVC
 @subsubsection Microsoft Visual C++ 6
 @cindex Windows, Building
 
