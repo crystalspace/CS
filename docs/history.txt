@@ -94,7 +94,7 @@ chronological order.
 	  off at least things will work but slower.
 	- Eric Sunshine documented the semantic and syntactic changes to
 	  csList<>::Iterator in apimod100.txi.
-	- Eric Sunshine worked around problem where Doxygen became hightly
+	- Eric Sunshine worked around problem where Doxygen became highly
 	  confused early in csutil/array.h, with the result that the majority
 	  of methods were not reflected in the generated documentation.
 	- Eric Sunshine added extra quoting around usage of several commands in
@@ -166,7 +166,7 @@ chronological order.
 	  they deposit generated .jar, .py, .pm, and .dll (.so) files at the
 	  root of the build tree rather than somewhere deep inside the build
 	  tree. This should make it simpler for developers to test these
-	  modules since CLASSPATH, PYTHONPATH, PERL5LIB, and LD_LIBRARY_PATH
+	  modules since CLASSPATH, PYTHONLIB, PERL5LIB, and LD_LIBRARY_PATH
 	  can now be pointed at the top of the build tree rather than having to
 	  point them at specific deeply nested subdirectories within the tree.
 	- Jorrit reverted an earlier memory leak fix in the DDS loader
