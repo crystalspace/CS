@@ -1,5 +1,66 @@
 The history order is reversed so that new features are at the top.
 
+16-Jul-2001
+	- Cleaned up new lighting system and CheckFrustum() a little more.
+	- Added iLightingProcessInfo interface. A callback for a null-portal
+	  can query this interface from the userdata in iFrustumView to
+	  get information about the light that is being processed.
+	- Fixed a small bug in the first simple tutorial (documentation
+	  only).
+	- Fixed curve static and dynamic lighting so it is correct with
+	  space warping portals.
+	- Fixed a memory leak in curve code.
+	- Added -lightqual commandline option to influence the quality of
+	  lightmap generation. By default this is equal to 3 which is rather
+	  good. Higher values give better quality but then calculation takes
+	  a LOT longer. I would not go beyond 4 or 5 really. Lower quality
+	  values are a lot faster to calculate but don't look as nice. 2
+	  is still good but below that it starts getting ugly (but fast) very
+	  soon.
+	- Also added equivalent Engine.Lighting.LightmapQuality config option
+	  (in data/config/engine.cfg) which holds the default for this setting.
+15-Jul-2001
+	- New lighting system starts to work good enough so that I
+	  now removed the old system. There are still a few small problems
+	  with lighting but it does look a lot better than the old system.
+	  Also the new system doesn't support warping portals yet.
+	- Significantly cleaned up the iFrustumView code by removing all
+	  lighting specific stuff.
+	- Philip Wyett removed following piece of old glide stuff.
+	  #define CS_GLIDE_2D_DRIVER "crystalspace.graphics2d.glidewin"
+	- Michael Voasse did the following:
+	      - simplept: Changed this tutorial to use the inbuilt water
+	        procedural texture.
+	      - walktest: Very slight change to walktest to clip the 2d
+	        window closer to the 3d window.  Also added CS_DEBUG check
+		to disable before- the-edge testing when in optimize mode.
+		It should make walktest a little more presentable
+	        during demonstrations.
+	      - sprite3d: Modified HitBeamObject() to do a full scan of a
+	        mesh. This now returns the first intersecting triangle in a
+		mesh. This is slower, but at least it is closer to correct.
+	- Later Michael Voasse reverted his changes to simplept.
+14-Jul-2001
+	- Fixed pseudo-dynamic lighting again (broke it yesterday).
+	- Continued work on new lighting system.
+	- Philip Wyett Added:
+		#pragma inline_depth (255)
+		#pragma inline_recursion (on)
+		#pragma auto_inline (on)
+	  to win32/csosdefs.h. This works round MS's default implementation
+	  of the "inline" keyword in MSVC and makes the compiler do a true
+	  "inline" when we ask for "inline".
+	- Michael Voasse did the following:
+	    - Graph2D: Fixed procedural texture clip problem (introduced by
+	      my last patch). DrawPixeln() now checks upto and including the
+	      bouding box values.
+	    - 2D drivers (Mac, linux, OS/2, opengl): Corrected SetClipRect()
+	      to set the correct parameters for the clipper.
+	    - awsmdg.cpp: Changed SetClipRect() call to fix out of bounds
+	      setting ( 639, 479 ) instead of ( 640 x 480 ).
+	    - graph2d: Did a general audit of all drawing routines, some
+	      context problems found with csRect and DrawBox(), however, the
+	      new clip settings seem to prevent invalid pixels being drawn.
 13-Jul-2001
 	- Removed a hard-coded limit to the number of lightmaps that
 	  can be affected by a pseudo-dynamic light. This used to be
@@ -16,7 +77,33 @@ The history order is reversed so that new features are at the top.
 	      This was allowing bugplug to use an unassigned Polygon3D
 	      pointer.
 	    - Terrfunc: Removed unecessary increment from hit beam.
+	    - linex2d, x2d, common/graph2d.cpp: Decreased width and height
+	      of clipping rectangles by 1. Since the screen is represented
+	      by an array that starts at (0,0), trying to access pixel
+	      (*, height), was out of bounds causing a segfault in the
+	      2d driver. All widths and heights of clipping rectangles
+	      should be height - 1 and width - 1. This is due to the
+	      clipper protecting a pixel array.
+	    - Sprite3D: Improved GetRadius() a little to provide
+	      the center of the bounding box as a radius center.
+	    - BugPlug: Quick and dirty Hack on HitBeam() debug
+	      command to work on mouse button 1 as well as mouse
+	      button 3. Not all platforms have multiple mouse
+	      buttons ( ie Mac ). This is to aid the debugging
+	      of the graph2d driver on all platforms.
 	- Wouter Wijngaards made isogrid more resistant against overflows.
+	- Christopher Nelson did the following:
+	    - Changed csDLLinkList in awsKeyContainer to csBasicVector.
+	    - Fixed circular list bugs in FindWindowDef and SelectDefaultSkin.
+	    - Fixed Consume bug, where consume was deleting the items at the
+	      wrong time, and keys weren't getting consumed properly.
+	      Consume and lookup now works 100%.
+	    - Fixed a couple of other functions to work properly with the
+	      circular nature of csDLinkList.
+	    - Added aws_debug const bool for turning on and off printf
+	      output in key areas.
+	    - Fixed small potential bug in PeekFirstItem (csDLinkList),
+	      in case the first item does not exist.
 12-Jul-2001
 	- Added iPolygon3D::GetPolygonID ().
 	- Extended BugPlug to show the name and ID of the selected polygon.

@@ -1703,10 +1703,9 @@ void csPolygon3D::UpdateVertexLighting (iLight* light, const csColor& lcol,
   }
 }
 
-void csPolygon3D::FillLightMap (csFrustumView& lview)
+void csPolygon3D::FillLightMapDynamic (csFrustumView& lview)
 {
   csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
   //@@@if (orig_poly) return; BE CAREFUL
   //@@@ DISABLED if (lview.callback)
   //{
@@ -1714,46 +1713,26 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     //return;
   //}
 
-  if (lview.IsDynamic ())
+  // We are working for a dynamic light. In this case we create
+  // a light patch for this polygon.
+  csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
+  GetBasePolygon ()->AddLightpatch (lp);
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
+  	(lview.GetUserdata ());
+  csDynLight* dl = (csDynLight*)(lptq->GetCsLight ());
+  dl->AddLightpatch (lp);
+
+  csFrustum* light_frustum = ctxt->GetLightFrustum ();
+  lp->Initialize (light_frustum->GetVertexCount ());
+
+  // Copy shadow frustums.
+  lp->GetShadowBlock ().AddRelevantShadows (ctxt->GetShadows ());
+
+  int i, mi;
+  for (i = 0 ; i < lp->GetVertexCount () ; i++)
   {
-    // We are working for a dynamic light. In this case we create
-    // a light patch for this polygon.
-    csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
-    GetBasePolygon ()->AddLightpatch (lp);
-    csDynLight* dl = (csDynLight*)lview.GetUserData ();
-    dl->AddLightpatch (lp);
-
-    csFrustum* light_frustum = ctxt->GetLightFrustum ();
-    lp->Initialize (light_frustum->GetVertexCount ());
-
-    // Copy shadow frustums.
-    lp->GetShadowBlock ().AddRelevantShadows (ctxt->GetShadows ());
-
-    int i, mi;
-    for (i = 0 ; i < lp->GetVertexCount () ; i++)
-    {
-      mi = ctxt->IsMirrored () ? lp->GetVertexCount ()-i-1 : i;
-      lp->GetVertex (i) = light_frustum->GetVertex (mi);
-    }
-  }
-  else
-  {
-    if (GetTextureType () != POLYTXT_LIGHTMAP)
-    {
-      // We are working for a vertex lighted polygon.
-      csColor& col = linfo.GetColor ();
-      csLight* l = (csLight*)lview.GetUserData ();
-      iLight* il = SCF_QUERY_INTERFACE_FAST (l, iLight);
-      UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
-      il->DecRef ();
-      return;
-    }
-
-    if (linfo.GetGouraudOnly ()) return;
-
-    csPolyTexLightMap* lmi = GetLightMapInfo ();
-    if (lmi->lightmap_up_to_date) return;
-    lmi->tex->FillLightMap (lview);
+    mi = ctxt->IsMirrored () ? lp->GetVertexCount ()-i-1 : i;
+    lp->GetVertex (i) = light_frustum->GetVertex (mi);
   }
 }
 
@@ -1860,7 +1839,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview)
   return MarkRelevantShadowFrustums (lview, poly_plane);
 }
 
-void csPolygon3D::CalculateLighting (csFrustumView *lview)
+void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
 {
   csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3& center = light_frustum->GetOrigin ();
@@ -1883,48 +1862,21 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   csVector3 *poly;
   int num_vertices;
 
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  bool rectangle_frust;
   bool fill_lightmap = true;
-  bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
 
-  // Calculate the new frustum for this polygon.
-  if ((GetTextureType () == POLYTXT_LIGHTMAP)
-    && !lview->IsDynamic () && calc_lmap)
-  {
-    // For lightmapped polygons we will compute the lighting of the
-    // entire lightmap as a whole. This removes any problems that existed
-    // before with black/white borders.
+  num_vertices = GetVertices ().GetVertexCount ();
+  if (num_vertices > VectorArray.Limit ())
+    VectorArray.SetLimit (num_vertices);
+  poly = VectorArray.GetArray ();
 
-    // We will use the "responsability grid" rectangle instead of polygon
-    // since we need to calculate the lighing for the whole lightmap.
-    rectangle_frust = true;
-    // Bounding rectangle always has 4 vertices
-    num_vertices = 4;
-    if (4 > VectorArray.Limit ())
-      VectorArray.SetLimit (4);
-    poly = VectorArray.GetArray ();
-
-    fill_lightmap = lmi->tex->GetLightmapBounds (center, lview->
-    	GetFrustumContext ()->IsMirrored (),
-    	poly);
-  }
+  int j;
+  if (lview->GetFrustumContext ()->IsMirrored ())
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = Vwor (num_vertices - j - 1) - center;
   else
-  {
-    rectangle_frust = false;
-    num_vertices = GetVertices ().GetVertexCount ();
-    if (num_vertices > VectorArray.Limit ())
-      VectorArray.SetLimit (num_vertices);
-    poly = VectorArray.GetArray ();
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = Vwor (j) - center;
 
-    int j;
-    if (lview->GetFrustumContext ()->IsMirrored ())
-      for (j = 0 ; j < num_vertices ; j++)
-        poly[j] = Vwor (num_vertices - j - 1) - center;
-    else
-      for (j = 0 ; j < num_vertices ; j++)
-        poly[j] = Vwor (j) - center;
-  }
   new_light_frustum = light_frustum->Intersect (poly, num_vertices);
 
   // Check if light frustum intersects with the polygon
@@ -1968,101 +1920,24 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   // FillLightMap() will use this information and
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
-  if (po || lview->IsDynamic () || calc_lmap)
-    if (!MarkRelevantShadowFrustums (*lview))
-      goto stop;
+  if (!MarkRelevantShadowFrustums (*lview))
+    goto stop;
 
   // Update the lightmap given light and shadow frustums in new_lview.
-  if (fill_lightmap
-   || GetLightMapInfo ()->tex->CollectShadows (lview, old_ctxt, this))
-    FillLightMap (*lview);
-
-  // If we aren't finished with the new_lview,
-  // we should clip it to the actual polygon now
-  if (rectangle_frust
-   && (po || (!lview->IsDynamic () && csSector::do_radiosity)))
-  {
-    num_vertices = GetVertices ().GetVertexCount ();
-    if (num_vertices > VectorArray.Limit ())
-      VectorArray.SetLimit (num_vertices);
-    poly = VectorArray.GetArray ();
-
-    int j;
-    if (old_ctxt->IsMirrored ())
-      for (j = 0 ; j < num_vertices ; j++)
-        poly[j] = Vwor (num_vertices - j - 1) - center;
-    else
-      for (j = 0 ; j < num_vertices ; j++)
-        poly[j] = Vwor (j) - center;
-
-    delete new_light_frustum;
-    new_light_frustum = light_frustum->Intersect (poly, num_vertices);
-    new_ctxt->SetLightFrustum (new_light_frustum);
-    if (!new_light_frustum) goto stop;
-
-    // Mark the shadow frustums that hit THE polygon (and not the lightmap)
-    if (po || lview->IsDynamic () || calc_lmap)
-      if (!MarkRelevantShadowFrustums (*lview))
-        goto stop;
-  }
+  if (fill_lightmap)
+    FillLightMapDynamic (*lview);
 
   if (po)
   {
-    if (!lview->IsDynamic () || !po->flags.Check (CS_PORTAL_MIRROR))
+    if (!po->flags.Check (CS_PORTAL_MIRROR))
       po->CheckFrustum ((iFrustumView*)lview, GetAlpha ());
   }
-  else if (!lview->IsDynamic () && csSector::do_radiosity)
-  {
-    // If there is no portal we simulate radiosity by creating
-    // a dummy portal for this polygon which reflects light.
-#if 0
-    //@@@ DISABLED FOR NOW. WAS BROKEN ANYWAY.
-    csPortal mirror;
-    mirror.SetSector (GetSector ());
-    UByte r, g, b;
-    material->GetMaterialHandle ()->GetTexture ()->GetMeanColor (r, g, b);
-    mirror.SetFilter (r/1000., g/1000., b/1000.);
-    mirror.SetWarp (csTransform::GetReflect (*GetPolyPlane ()));
-    mirror.CheckFrustum (new_lview, 10);
-#endif
-  }
+
 stop:
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview,
-	csFrustumContext* ctxt)
-{
-  csFrustumContext* old_ctxt = lview->GetFrustumContext ();
-  csFrustum* light_frustum = ctxt->GetLightFrustum ();
-  csFrustum* new_light_frustum;
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-
-  // Bounding rectangle always has 4 vertices
-  int num_vertices = 4;
-  if (4 > VectorArray.Limit ())
-    VectorArray.SetLimit (4);
-  csVector3 *poly = VectorArray.GetArray ();
-
-  lmi->tex->GetLightmapBounds (light_frustum->GetOrigin (),
-  	ctxt->IsMirrored (), poly);
-
-  new_light_frustum = light_frustum->Intersect (poly, num_vertices);
-
-  // Check if light frustum intersects with the polygon
-  if (!new_light_frustum)
-    return;
-
-  lview->CreateFrustumContext ();
-  csFrustumContext* new_ctxt = lview->GetFrustumContext ();
-  new_ctxt->SetLightFrustum (new_light_frustum);
-
-  // Update the lightmap given light and shadow frustums in new_lview.
-  FillLightMap (*lview);
-  lview->RestoreFrustumContext (old_ctxt);
-}
-
-void csPolygon3D::CalculateLightingNew (csFrustumView* lview, bool vis)
+void csPolygon3D::CalculateLightingStatic (csFrustumView* lview, bool vis)
 {
   csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3& center = light_frustum->GetOrigin ();
@@ -2104,7 +1979,7 @@ void csPolygon3D::CalculateLightingNew (csFrustumView* lview, bool vis)
   bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
 
   // Update the lightmap given light and shadow frustums in lview.
-  if (calc_lmap) FillLightMapNew (lview, vis);
+  if (calc_lmap) FillLightMapStatic (lview, vis);
 
   csPortal* po = GetPortal ();
   // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
@@ -2141,26 +2016,24 @@ void csPolygon3D::CalculateLightingNew (csFrustumView* lview, bool vis)
   }
 }
 
-void csPolygon3D::FillLightMapNew (csFrustumView* lview, bool vis)
+void csPolygon3D::FillLightMapStatic (csFrustumView* lview, bool vis)
 {
   csFrustumContext* ctxt = lview->GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)lview->GetUserdata ();
 
   if (GetTextureType () != POLYTXT_LIGHTMAP)
   {
     // We are working for a vertex lighted polygon.
-    csColor& col = linfo.GetColor ();
-    csLight* l = (csLight*)lview->GetUserData ();
-    iLight* il = SCF_QUERY_INTERFACE_FAST (l, iLight);
+    const csColor& col = lptq->GetColor ();
+    iLight* il = lptq->GetLight ();
     UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
-    il->DecRef ();
     return;
   }
 
-  if (linfo.GetGouraudOnly ()) return;
+  if (lptq->GetGouraudOnly ()) return;
 
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   if (lmi->lightmap_up_to_date) return;
-  lmi->tex->FillLightMapNew (lview, vis, this);
+  lmi->tex->FillLightMap (lview, vis, this);
 }
 

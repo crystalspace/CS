@@ -397,6 +397,7 @@ bool csEngine::use_new_radiosity = false;
 int csEngine::max_process_polygons = 2000000000;
 int csEngine::cur_process_polygons = 0;
 int csEngine::lightcache_mode = CS_ENGINE_CACHE_READ;
+int csEngine::lightmap_quality = 3;
 bool csEngine::do_force_revis = false;
 bool csEngine::do_rad_debug = false;
 
@@ -1366,12 +1367,19 @@ void csEngine::ControlMeshes ()
 
 void csEngine::ReadConfig (iConfigFile* Config)
 {
-  csLightMap::SetLightCellSize (Config->GetInt ("Engine.Lighting.LightmapSize", 16));
+  csLightMap::SetLightCellSize (Config->GetInt (
+  	"Engine.Lighting.LightmapSize", 16));
+  csEngine::lightmap_quality = Config->GetInt (
+  	"Engine.Lighting.LightmapQuality", 3);
 
-  csLight::ambient_red = Config->GetInt ("Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = Config->GetInt ("Engine.Lighting.Ambient.Green", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = Config->GetInt ("Engine.Lighting.Ambient.Blue", DEFAULT_LIGHT_LEVEL);
-  int ambient_white = Config->GetInt ("Engine.Lighting.Ambient.White", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_red = Config->GetInt (
+  	"Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = Config->GetInt (
+  	"Engine.Lighting.Ambient.Green", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = Config->GetInt (
+  	"Engine.Lighting.Ambient.Blue", DEFAULT_LIGHT_LEVEL);
+  int ambient_white = Config->GetInt (
+  	"Engine.Lighting.Ambient.White", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;

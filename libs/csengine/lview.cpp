@@ -37,7 +37,6 @@ csFrustumView::csFrustumView () :
 	curve_func (NULL),
 	userdata (NULL),
 	things_shadow (false),
-	dynamic (false),
 	callback (NULL),
 	callback_data (NULL),
 	ctxt (NULL)
@@ -50,7 +49,6 @@ csFrustumView::csFrustumView () :
 
 csFrustumView::~csFrustumView ()
 {
-  ctxt->CallCleanups ((iFrustumView*)this);
   if (ctxt->GetLightFrustum ()) ctxt->GetLightFrustum ()->DecRef ();
   if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
   delete ctxt;
@@ -69,10 +67,8 @@ void csFrustumView::CreateFrustumContext ()
   // @@@ Use a pool for frustum contexts?
   // A pool would work very well here since we have limited recusion depth.
 
-  // Leave cleanup actions alone to original copy.
   ctxt = new csFrustumContext ();
   *ctxt = *old_ctxt;
-  ctxt->SetCleanup (NULL);
   ctxt->SetShadows (old_ctxt->GetShadows (), true);
 }
 
@@ -83,10 +79,8 @@ void csFrustumView::SetFrustumContext (csFrustumContext* new_ctxt)
 
 csFrustumContext* csFrustumView::CopyFrustumContext ()
 {
-  // Leave cleanup actions alone to original copy.
   csFrustumContext* new_ctxt = new csFrustumContext ();
   *new_ctxt = *ctxt;
-  new_ctxt->SetCleanup (NULL);
   new_ctxt->SetShadows (ctxt->GetShadows (), true);
   return new_ctxt;
 }
@@ -95,7 +89,6 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext* original)
 {
   csFrustumContext* old_ctxt = ctxt;
   ctxt = original;
-  old_ctxt->CallCleanups ((iFrustumView*)this);
   //@@@ HANDLING OF LightFrustum
   if (old_ctxt->GetLightFrustum ()) old_ctxt->GetLightFrustum ()->DecRef ();
   if (!old_ctxt->IsShared ()) old_ctxt->GetShadows ()->DecRef ();

@@ -859,7 +859,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine, iProgressMeter* meter)
 csRadiosity :: ~csRadiosity()
 {
   delete texturemap;
-  delete shadow_matrix;
+  //@@@ REWRITE delete shadow_matrix;
   delete pulse;
   // remove data needed.
   delete list;
@@ -1106,16 +1106,13 @@ void csRadiosity :: StartFrustum()
 {
   csFrustumView *lview = new csFrustumView();
   csFrustumContext* ctxt = lview->GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
   // the resulting color can be used as a filter
-  linfo.SetColor (csColor (1, 1, 1));
-  lview->SetUserData ((void*) this);
+  //linfo.SetColor (csColor (1, 1, 1));
+  //@@@lview->SetUserData ((void*) this);
   lview->SetCurveFunction (frustum_curve_report_func);
   lview->SetPolygonFunction (frustum_polygon_report_func);
   lview->SetRadius (10000000.0); // should be enough
   lview->EnableThingShadows (true);
-  lview->SetDynamic (false);
   lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
@@ -1158,8 +1155,8 @@ static void frustum_curve_report_func (csObject *obj, csFrustumView* lview,
   if(dest)
   {
     /// radiosity to this curve.
-    csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
-    rad->ProcessDest (dest, lview);
+    //@@@ FIXME! csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
+    //@@@ rad->ProcessDest (dest, lview);
   }
 }
 
@@ -1191,10 +1188,13 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview,
   int j;
   if(dest)
   {
+#if 0
+//@@@ REWRITE!
     if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
         GetLightmapBounds(center, old_ctxt->IsMirrored (), poly) )
       /// empty intersection or lightmap has already been seen by frustum.
       goto stop;
+#endif
   }
   else
   {
@@ -1226,8 +1226,8 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview,
   if(dest)
   {
     /// radiosity to this polygon.
-    csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
-    rad->ProcessDest(dest, lview);
+    //@@@ FIXME csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
+    //@@@rad->ProcessDest(dest, lview);
   }
   
   /// portal?
@@ -1260,13 +1260,13 @@ void csRadiosity :: ProcessDest(csRadElement *dest, csFrustumView *lview)
   // prepare to send/receive light.
   if(!PrepareShootDest(dest, lview))
   {
-    delete shadow_matrix; 
+    //@@@ REWRITEdelete shadow_matrix; 
     shadow_matrix = 0;
     return;
   }
 
   ShootRadiosityToElement(dest);
-  delete shadow_matrix; 
+  //@@@ REWRITE delete shadow_matrix; 
   shadow_matrix = 0;
   list->DeleteElement(dest); // get out of tree
   dest->ComputePriority(); // recompute dest's unshot light
@@ -1300,14 +1300,16 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
   // dest_normal = - shoot_dest->GetNormal();
 
   // use filter colour from lview
-  csLightingInfo& linfo = lview->GetFrustumContext ()->GetLightingInfo ();
-  trajectory_color = linfo.GetColor ();
+  //@@@ REWRITE trajectory_color = linfo.GetColor ();
 
   // use shadows and light from lview
   // gets coverage matrix from polytext.cpp, so the code is shared
   // between regular lighting and radiosity lighting, prevents bugs.
+#if 0
+//@@@@@@@@@@@@@@@@ NEEDS to be rewritten!
   shadow_matrix = new csCoverageMatrix(dest->GetWidth(), dest->GetHeight());
   dest->GetCoverageMatrix(lview, shadow_matrix);
+#endif
 
   return true;
 }
@@ -1413,7 +1415,8 @@ void csRadiosity :: PrepareShootSourceLumel(int sx, int sy, int suv)
 void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 {
   // check visibility
-  float visibility = shadow_matrix->coverage[ruv];
+  float visibility;
+  //@@@ REWRITE visibility = shadow_matrix->coverage[ruv];
   //if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info

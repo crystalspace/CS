@@ -29,6 +29,25 @@
 #include "csengine/engine.h"
 #include "csengine/lppool.h"
 
+struct csCoverageMatrix
+{
+  // Each float corresponds to a lightmap grid cell and contains
+  // the area of light cell that is covered by light.
+  float* coverage;
+  int width, height;
+  csCoverageMatrix (int w, int h)
+  {
+    width = w;
+    height = h;
+    coverage = new float [w * h];
+    memset (coverage, 0, w*h*sizeof (float));
+  }
+  ~csCoverageMatrix ()
+  {
+    delete[] coverage;
+  }
+};
+
 // @@@ What value should this macro have, and why?
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
@@ -196,6 +215,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
 
   csRGBpixel *map = LightMap->GetRealMap().GetArray ();
+  csVector3& center = lp->GetLightFrustum ()->GetOrigin ();
 
   int lval;
   float cosfact = csPolyTexture::cfg_cosinus_factor;
@@ -215,7 +235,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
       pos = uv2World[uv];
 
       // is the point contained within the light frustrum? 
-      if (!lp->GetLightFrustum ()->Contains(pos - lp->GetLightFrustum ()->GetOrigin()))
+      if (!lp->GetLightFrustum ()->Contains (pos - center))
         // No, skip it
         continue;
 
@@ -240,11 +260,11 @@ void csCurve::ShineDynLight (csLightPatch* lp)
           continue;
       }
 
-      d = csSquaredDist::PointPoint (light->GetCenter (), pos);
+      d = csSquaredDist::PointPoint (center, pos);
       if (d >= light->GetSquaredRadius ()) continue;
       d = qsqrt (d);
       normal = uv2Normal[uv];
-      float cosinus = (pos-light->GetCenter ())*normal;
+      float cosinus = (pos-center)*normal;
       cosinus /= d;
       cosinus += cosfact;
       if (cosinus < 0) cosinus = 0;
@@ -298,11 +318,10 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
         uv2World[uv] = O2W->This2Other(uv2World[uv]);
       }
     }
-    
-    delete O2W; 
   }
   
   // intialize the new transform
+  delete O2W; 
   O2W = new csReversibleTransform(*o2w);
 
   if (uv2World)
@@ -319,153 +338,161 @@ void csCurve::SetObject2World (const csReversibleTransform *o2w)
   }
 }
 
-void csCurve::CalculateLighting (csFrustumView& lview)
+void csCurve::CalculateLightingStatic (csFrustumView* lview, bool vis)
 {
-  csLightingInfo& linfo = lview.GetFrustumContext ()->GetLightingInfo ();
-  if (lview.IsDynamic ())
+  if (!vis) return;
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
+    lview->GetUserdata ();
+  const csColor& col = lptq->GetColor ();
+
+  // If our UV buffers have not been intialized, create them.
+  if (!uv2World)
   {
-    // We are working for a dynamic light. In this case we create
-    // a light patch for this polygon.
-    csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
+    CalcUVBuffers ();
+  }
 
-    AddLightPatch (lp);
-  
-    csDynLight* dl = (csDynLight*)lview.GetUserData ();
-    dl->AddLightpatch (lp);
+  if (!LightMap || LightmapUpToDate) 
+    return;
 
-    // This light patch has exactly 4 vertices because it fits around our
-    // LightMap
-    lp->Initialize (4);
+  int lm_width = LightMap->GetWidth ();
+  int lm_height = LightMap->GetHeight ();
 
-    // Copy shadow frustums.
-    lp->GetShadowBlock ().DeleteShadows ();
-    // @@@: It would be nice if we could optimize earlier 
-    // to determine relevant shadow frustums in curves and use
-    // AddRelevantShadows instead.
-    lp->GetShadowBlock ().AddAllShadows (lview.GetFrustumContext ()->GetShadows ());
+  csStatLight *light = (csStatLight *)(lptq->GetCsLight ());
 
-    lp->SetLightFrustum (new csFrustum(*lview.GetFrustumContext ()->
-    	GetLightFrustum ()));
+  bool dyn = light->IsDynamic ();
 
-    MakeDirtyDynamicLights ();
+  csShadowMap* smap;
+  UByte *ShadowMap = 0;
+  csRGBpixel *Lightmap = 0;
+
+  /* initialize color to something to avoid compiler warnings */
+  csColor color (0,0,0);
+
+  if (dyn)
+  {
+    smap = LightMap->FindShadowMap (light);
+    if (!smap)
+    {
+      smap = LightMap->NewShadowMap (light, CURVE_LM_SIZE, CURVE_LM_SIZE );
+    }
+    ShadowMap = smap->GetArray ();
   }
   else
   {
-    // if our UV buffers have not been intialized, create them
-    if (!uv2World)
-    {
-      CalcUVBuffers();
-    }
-
-    if (!LightMap || LightmapUpToDate) 
-      return;
-
-    int lm_width = LightMap->GetWidth ();
-    int lm_height = LightMap->GetHeight ();
-
-    csStatLight *light = (csStatLight *)lview.GetUserData ();
-
-    bool dyn = light->IsDynamic();
-
-    csShadowMap* smap;
-    UByte *ShadowMap = 0;
-    csRGBpixel *Lightmap = 0;
-
-    /* initialize color to something to avoid compiler warnings */
-    csColor color(0,0,0);
-
-    if (dyn)
-    {
-      smap = LightMap->FindShadowMap( light );
-      if (!smap)
-      {
-        smap = LightMap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
-      }
-      ShadowMap = smap->GetArray ();
-    }
-    else
-    {
-      Lightmap = LightMap->GetStaticMap ().GetArray ();
-      color = linfo.GetColor () * NORMAL_LIGHT_LEVEL;
-    }
-
-    int lval;
-
-    float cosfact = csPolyTexture::cfg_cosinus_factor;
-
-    // get our coverage matrix
-    csCoverageMatrix *shadow_matrix = new csCoverageMatrix(lm_width,lm_height);
-    GetCoverageMatrix(lview, *shadow_matrix);
-
-    // calculate the static LightMap
-    csVector3 pos;
-    csVector3 normal;
-    float d;
-    int ui, vi;
-    int uv;
-    for (ui = 0 ; ui < lm_width; ui++)
-    {
-      for (vi = 0 ; vi < lm_height; vi++)
-      {
-        uv = vi*lm_width + ui;
-
-        // is the point lit by our current light
-        if (shadow_matrix->coverage[uv] <= SMALL_EPSILON)
-          // No, go to next point then
-          continue;
-
-        // what are the world coordinates of this texel
-        pos = uv2World[uv];
-
-        d = csSquaredDist::PointPoint (light->GetCenter (), pos);
-        if (d >= light->GetSquaredRadius ()) continue;
-        d = qsqrt (d);
-
-        normal = uv2Normal[uv];
-        float cosinus = (pos-light->GetCenter ())*normal;
-        cosinus /= d;
-        cosinus += cosfact;
-
-        if (cosinus < 0) 
-          cosinus = 0;
-        else if (cosinus > 1) 
-          cosinus = 1;
-
-        float brightness = cosinus * light->GetBrightnessAtDistance (d);
-
-        if (dyn)
-        {
-          lval = ShadowMap[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
-          if (lval > 255) lval = 255;
-          ShadowMap[uv] = lval;
-        }
-        else
-        {
-	  csColor& col = linfo.GetColor ();
-          if (col.red > 0)
-          {
-            lval = Lightmap[uv].red + QRound (color.red * brightness);
-            if (lval > 255) lval = 255;
-            Lightmap[uv].red = lval;
-          }
-          if (col.green > 0)
-          {
-            lval = Lightmap[uv].green + QRound (color.green * brightness);
-            if (lval > 255) lval = 255;
-            Lightmap[uv].green = lval;
-          }
-          if (col.blue > 0)
-          {
-            lval = Lightmap[uv].blue + QRound (color.blue * brightness);
-            if (lval > 255) lval = 255;
-            Lightmap[uv].blue = lval;
-          }
-        }
-      }
-    }
-
-    delete shadow_matrix;
+    Lightmap = LightMap->GetStaticMap ().GetArray ();
+    color = col * NORMAL_LIGHT_LEVEL;
   }
+
+  int lval;
+
+  float cosfact = csPolyTexture::cfg_cosinus_factor;
+
+  // get our coverage matrix
+  csCoverageMatrix *shadow_matrix = new csCoverageMatrix (lm_width, lm_height);
+  GetCoverageMatrix (*lview, *shadow_matrix);
+
+  csFrustumContext* ctxt = lview->GetFrustumContext ();
+  csVector3& center = ctxt->GetLightFrustum ()->GetOrigin ();
+
+  // calculate the static LightMap
+  csVector3 pos;
+  csVector3 normal;
+  float d;
+  int ui, vi;
+  int uv;
+  for (ui = 0 ; ui < lm_width; ui++)
+  {
+    for (vi = 0 ; vi < lm_height; vi++)
+    {
+      uv = vi*lm_width + ui;
+
+      // is the point lit by our current light
+      if (shadow_matrix->coverage[uv] <= SMALL_EPSILON)
+        // No, go to next point then
+        continue;
+
+      // What are the world coordinates of this texel?
+      pos = uv2World[uv];
+
+      d = csSquaredDist::PointPoint (center, pos);
+      if (d >= light->GetSquaredRadius ()) continue;
+      d = qsqrt (d);
+
+      normal = uv2Normal[uv];
+      float cosinus = (pos-center)*normal;
+      cosinus /= d;
+      cosinus += cosfact;
+
+      if (cosinus < 0) 
+        cosinus = 0;
+      else if (cosinus > 1) 
+        cosinus = 1;
+
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+      if (dyn)
+      {
+        lval = ShadowMap[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
+        if (lval > 255) lval = 255;
+        ShadowMap[uv] = lval;
+      }
+      else
+      {
+        if (col.red > 0)
+        {
+          lval = Lightmap[uv].red + QRound (color.red * brightness);
+          if (lval > 255) lval = 255;
+          Lightmap[uv].red = lval;
+        }
+        if (col.green > 0)
+        {
+          lval = Lightmap[uv].green + QRound (color.green * brightness);
+          if (lval > 255) lval = 255;
+          Lightmap[uv].green = lval;
+        }
+        if (col.blue > 0)
+        {
+          lval = Lightmap[uv].blue + QRound (color.blue * brightness);
+          if (lval > 255) lval = 255;
+          Lightmap[uv].blue = lval;
+        }
+      }
+    }
+  }
+
+  delete shadow_matrix;
+}
+
+void csCurve::CalculateLightingDynamic (csFrustumView* lview)
+{
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
+    lview->GetUserdata ();
+
+  // We are working for a dynamic light. In this case we create
+  // a light patch for this polygon.
+  csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
+
+  AddLightPatch (lp);
+  
+  csDynLight* dl = (csDynLight*)(lptq->GetCsLight ());
+  dl->AddLightpatch (lp);
+
+  // This light patch has exactly 4 vertices because it fits around our
+  // LightMap
+  lp->Initialize (4);
+
+  // Copy shadow frustums.
+  lp->GetShadowBlock ().DeleteShadows ();
+  // @@@: It would be nice if we could optimize earlier 
+  // to determine relevant shadow frustums in curves and use
+  // AddRelevantShadows instead.
+  lp->GetShadowBlock ().AddAllShadows (lview->GetFrustumContext ()
+  	->GetShadows ());
+
+  lp->SetLightFrustum (new csFrustum (*lview->GetFrustumContext ()->
+  	GetLightFrustum ()));
+
+  MakeDirtyDynamicLights ();
 }
 
 void csCurve::InitializeDefaultLighting ()
@@ -529,9 +556,10 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   csVector3 pos;
   int uv;
 
-  iShadowIterator* shadow_it = lview.GetFrustumContext ()->
-  	GetShadows ()->GetShadowIterator ();
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
+  csVector3& center = ctxt->GetLightFrustum ()->GetOrigin ();
   
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
@@ -546,10 +574,8 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       uv = vi*lm_width + ui;
       pos = uv2World[uv];
 
-      csFrustumContext* ctxt = lview.GetFrustumContext ();
       // is the point contained within the light frustrum? 
-      if (!ctxt->GetLightFrustum ()->Contains (pos-
-      		ctxt->GetLightFrustum ()->GetOrigin ()))
+      if (!ctxt->GetLightFrustum ()->Contains (pos-center))
         // No, skip it
         continue;
 
@@ -721,7 +747,7 @@ void csCurve::HardTransform (const csReversibleTransform& /*trans*/)
   /// @@@ where must the transformation be used???
   for (int i = 0 ; i < GetParentTemplate ()->GetVertexCount () ; i++)
     SetControlPoint (i, GetParentTemplate ()->GetVertex (i));
-  if (uv2World) CalcUVBuffers();
+  if (uv2World) CalcUVBuffers ();
 }
 
 iCurveTemplate* csCurve::Curve::GetParentTemplate ()

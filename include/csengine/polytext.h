@@ -21,13 +21,14 @@
 
 #include "csgeom/math3d.h"
 #include "csutil/csvector.h"
+#include "csutil/cscolor.h"
 #include "imesh/thing/polygon.h"
-#include "iengine/fview.h"
+#include "iengine/light.h"
 
 struct iFrustumView;
-struct csFrustumViewCleanup;
 struct iMaterialHandle;
 struct iPolygon3D;
+struct iLight;
 struct csRGBpixel;
 class csPolygon3D;
 class csPolyTexture;
@@ -41,21 +42,57 @@ class csVector3;
 class csVector2;
 class csColor;
 
+SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
+
 /**
  * This is user-data for iFrustumView for the lighting process.
  * It represents a queue holding references to csPolyTexture
  * for all polygons that were hit by a light during the lighting
  * process.
  */
-struct csLightingPolyTexQueue : public iFrustumViewUserdata
+struct csLightingPolyTexQueue : public iLightingProcessInfo
 {
 private:
   // Vector containing csPolygonTexture pointers.
   csVector polytxts;
+  // Light.
+  csLight* light;
+  // Gouraud shading alone.
+  bool gouraud_only;
+  // For dynamic lighting.
+  bool dynamic;
+  // Current lighting color.
+  csColor color;
 
 public:
-  csLightingPolyTexQueue ();
+  csLightingPolyTexQueue (csLight* light, bool dynamic, bool gouraud_only);
   virtual ~csLightingPolyTexQueue ();
+
+  /**
+   * Get the light.
+   */
+  csLight* GetCsLight () const { return light; }
+  virtual iLight* GetLight () const;
+
+  /**
+   * Get gouraud only state.
+   */
+  virtual bool GetGouraudOnly () const { return gouraud_only; }
+
+  /**
+   * Return true if dynamic.
+   */
+  virtual bool IsDynamic () const { return dynamic; }
+
+  /**
+   * Set the current color.
+   */
+  virtual void SetColor (const csColor& col) { color = col; }
+
+  /**
+   * Get the current color.
+   */
+  virtual const csColor& GetColor () const { return color; }
 
   /**
    * Add a csPolyTexture to the queue. Only call this when the
@@ -86,7 +123,9 @@ private:
   int lm_w, lm_h;	// Original lightmap size.
   int sb_w, sb_h;	// Shadow bitmap size.
   int quality;		// Quality factor.
-  bool full_shadow;	// Optimization: we are fully shadowed.
+  int cnt_unshadowed;	// Number of bits still unshadowed in 'shadow' array.
+  int cnt_unlit;	// Number of bits still unlit in 'light' array.
+  int default_light;	// Default value to use initially for light map.
 
 private:
   /**
@@ -103,6 +142,10 @@ private:
   static void LightDrawBox (int x, int y, int w, int h, void *arg);
   static void ShadowPutPixel (int x, int y, float area, void *arg);
   static void ShadowDrawBox (int x, int y, int w, int h, void *arg);
+  void LightPutPixel (int x, int y, float area);
+  void LightDrawBox (int x, int y, int w, int h);
+  void ShadowPutPixel (int x, int y, float area);
+  void ShadowDrawBox (int x, int y, int w, int h);
 
 public:
   /**
@@ -114,7 +157,7 @@ public:
    * lumels there will be one shadow-point. A quality of 1 means that
    * one lumel corresponds with 2x2 shadow-points.
    */
-  csShadowBitmap (int lm_w, int lm_h, int quality);
+  csShadowBitmap (int lm_w, int lm_h, int quality, int default_light);
 
   /**
    * Destroy the shadow bitmap.
@@ -129,6 +172,12 @@ public:
    * a shadow you would use 1 and for light you would use 0.
    */
   void RenderPolygon (csVector2* poly, int num_vertices, int val);
+
+  /**
+   * Set the entire area of this bitmap to either completely shadowed
+   * (val==1) or fully lit (val==0).
+   */
+  void RenderTotal (int val);
 
   /**
    * Take a light and update the lightmap using the information in
@@ -183,36 +232,29 @@ public:
 
   /**
    * Return true if this bitmap is fully shadowed.
-   * @@@ Will always return false at the moment (not implemented yet).
    */
-  bool IsFullyShadowed () const { return full_shadow; }
+  bool IsFullyShadowed () const
+  {
+    return cnt_unshadowed == 0;
+  }
+
+  /**
+   * Return true if this bitmap is fully unlit.
+   */
+  bool IsFullyUnlit () const
+  {
+    return cnt_unlit == sb_w * sb_h;
+  }
 
   /**
    * Return true if this bitmap is fully lit.
-   * @@@ Will always return false at the moment (not implemented yet).
    */
-  bool IsFullyLit () const { return false; }
-};
-
-
-// a structure used to build the light coverage data
-struct csCoverageMatrix
-{
-  // The coverage array. Each float corresponds to a lightmap grid cell
-  // and contains the area of light cell that is covered by light.
-  float *coverage;
-  // The width and height of the coverage array
-  int width, height;
-
-  csCoverageMatrix (int w, int h)
-  { 
-    coverage = new float [ (width = w) * (height = h)]; 
-    memset (coverage, 0, w*h*sizeof(float)); 
+  bool IsFullyLit () const
+  {
+    return cnt_unlit == 0 && (cnt_unshadowed == sb_w * sb_h);
   }
-
-  ~csCoverageMatrix ()
-  { delete[]coverage; }
 };
+
 
 /**
  * This class represents a lighted texture for a polygon.
@@ -330,16 +372,11 @@ public:
 
   /**
    * Update the lightmap for the given light.
-   */
-  void FillLightMap (csFrustumView& lview);
-
-  /**
-   * Update the lightmap for the given light.
    * 'vis' will be false if the polygon is totally shadowed. In this
    * case we should use 'subpoly' to see where the shadow must go and
    * not the base polygon which this csPolyTexture points too.
    */
-  void FillLightMapNew (csFrustumView* lview, bool vis, csPolygon3D* subpoly);
+  void FillLightMap (csFrustumView* lview, bool vis, csPolygon3D* subpoly);
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap
@@ -356,21 +393,6 @@ public:
    * (used for a dynamic light).
    */
   void ShineDynLightMap (csLightPatch* lp);
-
-  /// Get the bounding rectangle of the whole lightmap in world space
-  bool GetLightmapBounds (const csVector3& lightpos, bool mirror,
-  	csVector3 *bounds);
-
-  /// Get the coverage matrix for the associated lightmap
-  void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);
-
-  /// Process lighting for all delayed polygon lightmaps
-  static void ProcessDelayedLightmaps (iFrustumView *lview,
-  	csFrustumContext* ctxt, csFrustumViewCleanup *lighting_info);
-
-  /// Collect all relevant shadows from this frustum that covers this lightmap
-  bool CollectShadows (csFrustumView *lview,
-  	csFrustumContext* ctxt, csPolygon3D *poly);
 
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;

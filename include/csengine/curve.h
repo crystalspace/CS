@@ -190,7 +190,7 @@ public:
   /// update the real lightmap with info from the lightpatch
   void ShineDynLight (csLightPatch* lp);
 
-  /// Set the current object to world space transformation
+  /// Set the current object to world space transformation.
   void SetObject2World (const csReversibleTransform *o2w);
   /// Return the current object to world space transformation
   inline const csReversibleTransform *GetObject2World () const;
@@ -202,8 +202,10 @@ public:
 
   /// Get the lightmap.
   inline csLightMap* GetLightMap () const;
-  /// calculate the lighting for this curve
-  void CalculateLighting (csFrustumView& lview);
+  /// Calculate the lighting for this curve (static).
+  void CalculateLightingStatic (csFrustumView* lview, bool vis);
+  /// Calculate the lighting for this curve (dynamic).
+  void CalculateLightingDynamic (csFrustumView* lview);
   /// Initialize default lighting.
   void InitializeDefaultLighting ();
   /// Read lighting from cache.

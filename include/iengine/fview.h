@@ -20,7 +20,6 @@
 #define __IENGINE_FVIEW_H__
 
 #include "csutil/scf.h"
-#include "csutil/cscolor.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/box.h"
@@ -29,8 +28,8 @@ struct iFrustumView;
 struct iShadowBlockList;
 class csFrustum;
 class csFrustumContext;
-class csObject; //@@@@@@
-class csOctreeNode; //@@@@@
+class csObject;
+class csOctreeNode;
 
 
 SCF_VERSION (iFrustumViewUserdata, 0, 0, 1);
@@ -42,72 +41,6 @@ struct iFrustumViewUserdata : public iBase
 {
 };
 
-
-/**
- * The structure for registering cleanup actions.  You can register with any
- * frustumlist object any number of cleanup routines.  For this you create
- * such a structure and pass it to RegisterCleanup () method of csFrustumList.
- * You can derive a subclass from csFrustumViewCleanup and keep all
- * additional data there.
- */
-struct csFrustumViewCleanup
-{
-  // Pointer to next cleanup action in chain
-  csFrustumViewCleanup *next;
-  // The routine that is called for cleanup
-  void (*action) (iFrustumView *, csFrustumContext*, csFrustumViewCleanup *);
-};
-
-/**
- * This class is used by the lighting routines used in CheckFrustum to
- * keep the light specific information.
- */
-class csLightingInfo
-{
-private:
-  /**
-   * The current color of the light. Initially this is the same as the
-   * light in csStatLight but portals may change this.
-   */
-  csColor color;
-
-  /**
-   * If only gouraud shading should be updated then this flag is true.
-   */
-  bool gouraud_only;
-
-  /**
-   * If 'true' then the gouraud vertices need to be initialized (set to
-   * black) first. Only the parent PolygonSet of a polygon can know this
-   * because it is calculated using the current_light_frame_number.
-   */
-  bool gouraud_color_reset;
-
-public:
-  /// Constructor.
-  csLightingInfo ()
-  {
-    color.Set (0, 0, 0);
-    gouraud_only = false;
-  }
-
-  /// Assignment operator.
-  csLightingInfo& operator= (csLightingInfo const& i)
-  {
-    color = i.color;
-    gouraud_only = i.gouraud_only;
-    gouraud_color_reset = i.gouraud_color_reset;
-    return *this;
-  }
-  /// Set gouraud only.
-  void SetGouraudOnly (bool go) { gouraud_only = go; }
-  /// Get gouraud_only.
-  bool GetGouraudOnly () { return gouraud_only; }
-  /// Color to start with.
-  void SetColor (const csColor& col) { color = col; }
-  /// Get the color.
-  csColor& GetColor () { return color; }
-};
 
 /**
  * This structure keeps track of the current frustum context.
@@ -130,9 +63,6 @@ private:
    */
   bool shared;
 
-  /// The head of cleanup actions
-  csFrustumViewCleanup *cleanup;
-
   /// True if this is the first time we visit a thing in this frustum call.
   bool first_time;
 
@@ -145,18 +75,11 @@ private:
    */
   csFrustum* light_frustum;
 
-  /**
-   * Extra information for the frustum checking process when
-   * used for lighting.
-   */
-  csLightingInfo lighting_info;
-
 public:
   /// Constructor.
   csFrustumContext () :
   	shadows (NULL),
 	shared (false),
-	cleanup (NULL),
   	first_time (false),
 	mirror (false)
   { }
@@ -165,11 +88,9 @@ public:
   {
     shadows = c.shadows;
     shared = c.shared;
-    cleanup = c.cleanup;
     mirror = c.mirror;
     first_time = c.first_time;
     light_frustum = c.light_frustum;
-    lighting_info = c.lighting_info;
     return *this;
   }
 
@@ -184,44 +105,6 @@ public:
   /// Get shared.
   bool IsShared () { return shared; }
 
-  /// Get the cleanup list.
-  csFrustumViewCleanup* GetCleanup () { return cleanup; }
-  /// Set the cleanup list.
-  void SetCleanup (csFrustumViewCleanup* cl) { cleanup = cl; }
-  /// Register a cleanup routine.
-  void RegisterCleanup (csFrustumViewCleanup *action)
-  {
-    action->next = cleanup;
-    cleanup = action;
-  }
-  /// Deregister a cleanup routine.
-  bool DeregisterCleanup (csFrustumViewCleanup *action)
-  {
-    csFrustumViewCleanup **pcur = &cleanup;
-    csFrustumViewCleanup *cur = cleanup;
-    while (cur)
-    {
-      if (cur == action)
-      {
-        *pcur = cur->next;
-        return true;
-      }
-      pcur = &cur->next;
-      cur = cur->next;
-    }
-    return false;
-  }
-  /// Call all cleanup routines.
-  void CallCleanups (iFrustumView* view)
-  {
-    while (cleanup)
-    {
-      csFrustumViewCleanup *next = cleanup->next;
-      cleanup->action (view, this, cleanup);
-      cleanup = next;
-    }
-  }
-
   /// Set the light frustum.
   void SetLightFrustum (csFrustum* lf) { light_frustum = lf; }
   /// Get the light frustum.
@@ -235,17 +118,13 @@ public:
   /// Is mirrored.
   bool IsMirrored () { return mirror; }
 
-  /**
-   * Get lighting information.
-   */
-  csLightingInfo& GetLightingInfo () { return lighting_info; }
   /// Set first time.
   void SetFirstTime (bool ft) { first_time = ft; }
   /// Is first time.
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 5);
+SCF_VERSION (iFrustumView, 0, 1, 6);
 
 /**
  * This structure represents all information needed for the frustum
@@ -280,11 +159,11 @@ struct iFrustumView : public iBase
    */
   virtual void RestoreFrustumContext (csFrustumContext* original) = 0;
 
-  /// Call the node function. @@@ csOctreeNode!!!!!!!
+  /// Call the node function.
   virtual void CallNodeFunction (csOctreeNode* onode, bool vis) = 0;
-  /// Call the polygon function. @@@ csObject!!!!!
+  /// Call the polygon function.
   virtual void CallPolygonFunction (csObject* poly, bool vis) = 0;
-  /// Call the curve function. @@@ csObject!!!!!
+  /// Call the curve function.
   virtual void CallCurveFunction (csObject* curve, bool vis) = 0;
 
   /// Get the radius.
@@ -295,11 +174,6 @@ struct iFrustumView : public iBase
   virtual bool CheckShadowMask (unsigned int mask) = 0;
   /// Check if a mask corresponds with the process mask.
   virtual bool CheckProcessMask (unsigned int mask) = 0;
-
-  /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
-  virtual bool IsDynamic () = 0;
-  /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
-  virtual void SetDynamic (bool d) = 0;
 
   /// Start new shadow list for this frustum.
   virtual void StartNewShadowBlock () = 0;

@@ -418,8 +418,6 @@ typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview,
 class csFrustumView : public iFrustumView
 {
 private:
-  /// Data for the functions below.
-  void* func_userdata;
   /// A function that is called for every node that is visited.
   csFrustumViewNodeFunc* node_func;
   /// A function that is called for every polygon that is hit.
@@ -437,12 +435,6 @@ private:
 
   /// If true the we process shadows for things.
   bool things_shadow;
-
-  /**
-   * If this structure is used for dynamic light frustum calculation
-   * then this flag is true.
-   */
-  bool dynamic;
 
   /**
    * A callback function. If this is set then no actual
@@ -491,11 +483,6 @@ public:
   /// Start new shadow list for this frustum.
   virtual void StartNewShadowBlock ();
 
-  /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
-  virtual bool IsDynamic () { return dynamic; }
-  /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
-  virtual void SetDynamic (bool d) { dynamic = d; }
-
   /// Set the function that is called for every node.
   void SetNodeFunction (csFrustumViewNodeFunc* func) { node_func = func; }
   /// Set the function that is called for every polygon to visit.
@@ -517,10 +504,6 @@ public:
   {
     curve_func (curve, this, vis);
   }
-  /// Set the userdata.
-  void SetUserData (void* ud) { func_userdata = ud; }
-  /// Get the userdata.
-  void* GetUserData () { return func_userdata; }
   /// Set the maximum radius to use for visiting objects.
   void SetRadius (float rad)
   {

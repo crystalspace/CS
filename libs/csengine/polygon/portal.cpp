@@ -65,7 +65,8 @@ csPortal::~csPortal ()
 iReferencedObject* csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
-  iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
+  iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector,
+  	iReferencedObject);
   refobj->DecRef ();
   return refobj;
 }
@@ -97,7 +98,8 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // First unlink from the previous sector.
-      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector,
+      	iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->RemoveReference (&scfiPortal);
       refobj->DecRef ();
@@ -106,7 +108,8 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // Link to the new sector.
-      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector,
+      	iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->AddReference (&scfiPortal);
       refobj->DecRef ();
@@ -369,6 +372,11 @@ void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
   // delete them later.
   bool copied_frustums = false;
 
+  // If true then we have to restore color.
+  iLightingProcessInfo* linfo = NULL;
+  bool restore_color = false;
+  csColor old_color;
+
   if (flags.Check (CS_PORTAL_WARP))
   {
     new_ctxt->GetLightFrustum ()->Transform (&warp_wor);
@@ -393,33 +401,40 @@ void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
 
     copied_frustums = true;
 
-    csLightingInfo& linfo = new_ctxt->GetLightingInfo ();
-    if (alpha)
+    iFrustumViewUserdata* ud = lview->GetUserdata ();
+    if (ud) linfo = SCF_QUERY_INTERFACE (ud, iLightingProcessInfo);
+    if (linfo)
     {
-      float fr, fg, fb;
-      if (filter_texture)
+      linfo->DecRef ();
+      if (alpha)
       {
-        UByte mr, mg, mb;
-        filter_texture->GetMeanColor (mr, mg, mb);
-        fr = mr / 255.; fg = mg / 255.; fb = mb / 255.;
+        float fr, fg, fb;
+        if (filter_texture)
+        {
+          UByte mr, mg, mb;
+          filter_texture->GetMeanColor (mr, mg, mb);
+          fr = mr / 255.; fg = mg / 255.; fb = mb / 255.;
+        }
+        else
+        {
+          fr = filter_r;
+          fg = filter_g;
+          fb = filter_b;
+        }
+	restore_color = true;
+	old_color = linfo->GetColor ();
+        linfo->SetColor (csColor (
+      	  linfo->GetColor ().red * fr,
+      	  linfo->GetColor ().green * fg,
+      	  linfo->GetColor ().blue * fb));
       }
-      else
-      {
-        fr = filter_r;
-        fg = filter_g;
-        fb = filter_b;
-      }
-      linfo.SetColor (csColor (
-      	linfo.GetColor ().red * fr,
-      	linfo.GetColor ().green * fg,
-      	linfo.GetColor ().blue * fb));
-    }
 
-    // Don't go further if the light intensity is almost zero.
-    if (linfo.GetColor ().red < SMALL_EPSILON &&
-    	linfo.GetColor ().green < SMALL_EPSILON &&
-	linfo.GetColor ().blue < SMALL_EPSILON)
-      goto stop;
+      // Don't go further if the light intensity is almost zero.
+      if (linfo->GetColor ().red < SMALL_EPSILON &&
+    	  linfo->GetColor ().green < SMALL_EPSILON &&
+	  linfo->GetColor ().blue < SMALL_EPSILON)
+        goto stop;
+    }
   }
   else
   {
@@ -450,6 +465,10 @@ void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
 
 stop:
   lview->RestoreFrustumContext (old_ctxt);
+  if (restore_color)
+  {
+    linfo->SetColor (old_color);
+  }
 }
 
 void csPortal::SetMirror (iPolygon3D *iPoly)

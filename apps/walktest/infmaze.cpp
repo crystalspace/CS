@@ -26,6 +26,7 @@
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/polygon.h"
+#include "iengine/light.h"
 
 InfiniteMaze::InfiniteMaze ()
 {
@@ -199,19 +200,25 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
   else fv = NULL;
   if (fv)
   {
-    if (!fv->IsDynamic ())
+    iFrustumViewUserdata* ud = fv->GetUserdata ();
+    iLightingProcessInfo* linfo = SCF_QUERY_INTERFACE (ud,
+    	iLightingProcessInfo);
+    if (linfo)
     {
-      // If we want to shine light through this portal but it doesn't
-      // really exist yet then we remember the csFrustumView for later.
-      LV* lv = new LV ();
-      lv->next = lviews;
-      lviews = lv;
-      lv->lv = fv;
-      // Make a copy of the current context and remember it.
-      lv->ctxt = fv->CopyFrustumContext ();
+      linfo->DecRef ();
+      if (!linfo->IsDynamic ())
+      {
+        // If we want to shine light through this portal but it doesn't
+        // really exist yet then we remember the csFrustumView for later.
+        LV* lv = new LV ();
+        lv->next = lviews;
+          lviews = lv;
+        lv->lv = fv;
+        // Make a copy of the current context and remember it.
+        lv->ctxt = fv->CopyFrustumContext ();
+      }
     }
-    else
-      fv->DecRef ();
+    fv->DecRef ();
     return false;
   }
   else

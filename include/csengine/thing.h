@@ -172,6 +172,11 @@ private:
 
   /// The array of curves forming the outside of the set
   csCurvesArray curves;
+  /**
+   * If true the transforms of the curves are set up (in case
+   * CS_THING_MOVE_NEVER is used).
+   */
+  bool curves_transf_ok;
 
   /// Optional oriented bounding box.
   csThingBBox* bbox;
@@ -329,6 +334,13 @@ private:
    * object to world transforms in all the curves have to be updated.
    */
   void UpdateCurveTransform (const csReversibleTransform& movtrans);
+
+  /**
+   * Utility function to call when the thing never moves but the
+   * curve transform has to be updated. The identity transformation
+   * is used.
+   */
+  void UpdateCurveTransform ();
 
   /// Internal draw function.
   bool DrawInt (iRenderView* rview, iMovable* movable, csZBufMode zMode);

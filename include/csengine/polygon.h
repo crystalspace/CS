@@ -1032,7 +1032,7 @@ public:
    * The "frustum" parameter defines the original light frustum (not the
    * one bounded by this polygon as given by "lview").
    */
-  void FillLightMap (csFrustumView& lview);
+  void FillLightMapDynamic (csFrustumView& lview);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -1049,7 +1049,7 @@ public:
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
    */
-  void FillLightMapNew (csFrustumView* lview, bool vis);
+  void FillLightMapStatic (csFrustumView* lview, bool vis);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -1086,10 +1086,11 @@ public:
 
   /**
    * Check visibility of this polygon with the given csFrustumView
-   * and fill the lightmap if needed (this function calls FillLightMap ()).
+   * and update the light patches if needed.
    * This function will also traverse through a portal if so needed.
+   * This version is for dynamic lighting.
    */
-  void CalculateLighting (csFrustumView* lview);
+  void CalculateLightingDynamic (csFrustumView* lview);
 
   /**
    * Check visibility of this polygon with the given csFrustumView
@@ -1097,8 +1098,9 @@ public:
    * This function will also traverse through a portal if so needed.
    * If 'vis' == false this means that the lighting system already discovered
    * that the polygon is totally shadowed.
+   * This version is for static lighting.
    */
-  void CalculateLightingNew (csFrustumView* lview, bool vis);
+  void CalculateLightingStatic (csFrustumView* lview, bool vis);
 
   /**
    * Transform the plane of this polygon from object space to world space.

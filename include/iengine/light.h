@@ -21,6 +21,7 @@
 #define __IENGINE_LIGHT_H__
 
 #include "csutil/scf.h"
+#include "iengine/fview.h"
 
 class csLight;
 class csColor;
@@ -104,4 +105,31 @@ struct iLight : public iBase
   virtual float GetBrightnessAtDistance (float d) = 0;
 };
 
+SCF_VERSION (iLightingProcessInfo, 0, 0, 1);
+
+/**
+ * The iLightingProcessInfo interface holds information for the lighting
+ * system. You can query the userdata from iFrustumView for this interface
+ * while in a 'portal' callback. This way you can get specific information
+ * from the lighting system for your null-portal.
+ */
+struct iLightingProcessInfo : public iFrustumViewUserdata
+{
+  /// Get the light.
+  virtual iLight* GetLight () const = 0;
+
+  /// Get gouraud only state.
+  virtual bool GetGouraudOnly () const = 0;
+
+  /// Return true if dynamic.
+  virtual bool IsDynamic () const = 0;
+
+  /// Set the current color.
+  virtual void SetColor (const csColor& col) = 0;
+
+  /// Get the current color.
+  virtual const csColor& GetColor () const = 0;
+};
+
 #endif // __IENGINE_LIGHT_H__
+

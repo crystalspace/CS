@@ -96,7 +96,7 @@ public:
   Simple ();
   virtual ~Simple ();
 
-  virtual bool Initialize (int argc, const char const* const argv[],
+  virtual bool Initialize (int argc, const char* const argv[],
     char const *iConfigName);
 @};
 
@@ -118,10 +118,9 @@ In the source file @file{simple.cpp} we place the following:
 #include "iengine/texture.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "iengine/thing.h"
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/mesh.h"
+#include "imesh/thing/thing.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
@@ -153,7 +152,7 @@ void Cleanup ()
   delete System;
 @}
 
-bool Simple::Initialize (int argc, const char const* const argv[],
+bool Simple::Initialize (int argc, const char* const argv[],
   char const* iConfigName)
 @{
   if (!superclass::Initialize (argc, argv, iConfigName))
@@ -374,7 +373,7 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-bool Simple::Initialize (int argc, const char const* const argv[],
+bool Simple::Initialize (int argc, const char* const argv[],
   char const* iConfigName)
 @{
   @dots{}
@@ -604,7 +603,7 @@ Simple::~Simple ()
 At the end of our @code{Initialize()} function we add the following:
 
 @example
-bool Simple::Initialize (int argc, const char const* const argv[],
+bool Simple::Initialize (int argc, const char* const argv[],
   char const* iConfigName)
 @{
   @dots{}

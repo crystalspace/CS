@@ -365,8 +365,13 @@ public:
   /// Populates the shadow coverage Matrix for this element
   virtual void GetCoverageMatrix(csFrustumView* lview, 
                                  csCoverageMatrix* shadow_matrix)
-  { GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
-                    GetCoverageMatrix(*lview, *shadow_matrix); }
+  {
+#if 0
+// @@@@@@@@@@@ REWRITE
+    GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
+                    GetCoverageMatrix(*lview, *shadow_matrix);
+#endif
+  }
   SCF_DECLARE_IBASE_EXT (csRadElement);
 };
 

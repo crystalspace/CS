@@ -57,7 +57,7 @@ dynamically later when the application is already running.  So first we edit
 (between @code{txtmgr->SetPalette()} and @samp{return true}):
 
 @example
-bool Simple::Initialize(int argc, char const* const argv[],
+bool Simple::Initialize(int argc, const char* const argv[],
   char const* iConfigName)
 @{
   @dots{}

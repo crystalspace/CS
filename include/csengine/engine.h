@@ -385,6 +385,8 @@ public:
 
   /// Option variable: force lightmap recalculation?
   static int lightcache_mode;
+  /// Option variable: quality for lightmap calculation.
+  static int lightmap_quality;
   /// Option variable: force visibility recalculation?
   static bool do_force_revis;
   /// Option variable: radiosity debugging (step by step)?

@@ -132,6 +132,8 @@ csThing::csThing (iBase* parent) : csObject (parent),
   current_lod = 1;
   current_features = ALL_FEATURES;
   thing_edges_valid = false;
+  
+  curves_transf_ok = false;
 }
 
 csThing::~csThing ()
@@ -179,6 +181,7 @@ void csThing::ComputeThingEdgeTable ()
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;
+  curves_transf_ok = false;
   switch (cfg_moving)
   {
     case CS_THING_MOVE_NEVER:
@@ -212,6 +215,7 @@ void csThing::WorUpdate ()
   switch (cfg_moving)
   {
     case CS_THING_MOVE_NEVER:
+      UpdateCurveTransform ();
       return;
 
     case CS_THING_MOVE_OCCASIONAL:
@@ -555,6 +559,7 @@ void csThing::AddCurve (csCurve* curve)
 {
   curve->SetParentThing (this);
   curves.Push (curve);
+  curves_transf_ok = false;
 }
 
 iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)
@@ -589,6 +594,7 @@ void csThing::HardTransform (const csReversibleTransform& t)
     csPolygon3D* p = GetPolygon3D (i);
     p->HardTransform (t);
   }
+  curves_transf_ok = false;
   for (i = 0 ; i < curves.Length () ; i++)
   {
     csCurve* c = GetCurve (i);
@@ -1177,6 +1183,7 @@ void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = polygons.Get (i);
+    if (p->GetPortal ()) return;	// No portals
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
     float clas = p->GetPlane ()->GetWorldPlane ().Classify (origin);
     if (ABS (clas) < EPSILON) continue;
@@ -1185,8 +1192,8 @@ void csThing::AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
-    frust = list->AddShadow (origin, (void*)p, p->GetVertices ().GetVertexCount (),
-	pl);
+    frust = list->AddShadow (origin, (void*)p,
+    	p->GetVertices ().GetVertexCount (), pl);
     for (j = 0 ; j < p->GetVertices ().GetVertexCount () ; j++)
       frust->GetVertex (j).Set (p->Vwor (j)-origin);
   }
@@ -1392,6 +1399,19 @@ void csThing::UpdateCurveTransform (const csReversibleTransform& movtrans)
   if (GetCurveCount () == 0) return;
   // since obj has changed (possibly) we need to tell all of our curves
   csReversibleTransform o2w = movtrans.GetInverse();
+  for (int i = 0 ; i < GetCurveCount () ; i++)
+  {
+    csCurve* c = curves.Get (i);
+    c->SetObject2World (&o2w);
+  }
+}
+
+void csThing::UpdateCurveTransform ()
+{
+  if (curves_transf_ok) return;
+  curves_transf_ok = true;
+  if (GetCurveCount () == 0) return;
+  csReversibleTransform o2w;	// Identity transform.
   for (int i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
@@ -2146,6 +2166,10 @@ struct CheckFrustData
 static int frust_cnt = 50;
 
 //@@@ Needs to be part of sector?
+//@@@ TODO Optimization!: sort shadow frustums with relative size
+//as seen from light position. i.e. bigger shadow frustums come first.
+//After that do the compression step. This should reduce a lot more
+//of the shadow frustums.
 static void CompressShadowFrustums (iShadowBlockList* list)
 {
   iShadowIterator* shadow_it = list->GetShadowIterator (true);
@@ -2161,7 +2185,8 @@ static void CompressShadowFrustums (iShadowBlockList* list)
   {
     iShadowBlock* shadlist = shadow_it->GetNextShadowBlock ();
     sf = shadow_it->Next ();
-    if (shadlist->GetSector () != cur_sector || shadlist->GetRecLevel () != cur_draw_busy)
+    if (shadlist->GetSector () != cur_sector ||
+    	shadlist->GetRecLevel () != cur_draw_busy)
       break;
     bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetVertexCount ());
     if (!vis)
@@ -2444,13 +2469,6 @@ void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
   for (i = 0 ; i < GetCurveCount () ; i++)
   {
     csCurve* c = curves.Get (i);
-    
-    if (!lview->IsDynamic ())
-    {
-      csReversibleTransform o2w = movable->GetFullTransform ().GetInverse();
-      c->SetObject2World (&o2w);
-    }
-    
     lview->CallCurveFunction ((csObject*)c, true);
   }
 

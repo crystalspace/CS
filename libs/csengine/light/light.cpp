@@ -163,7 +163,7 @@ static void node_light_func (csOctreeNode* node, csFrustumView* lview, bool vis)
 	{
 	  // Otherwise we have to calculate lighting (but with vis set
 	  // to false).
-	  p->CalculateLightingNew (lview, false);
+	  p->CalculateLightingStatic (lview, false);
 	}
       }
     }
@@ -173,40 +173,45 @@ static void node_light_func (csOctreeNode* node, csFrustumView* lview, bool vis)
 static void poly_light_func (csObject* obj, csFrustumView* lview, bool vis)
 {
   csPolygon3D* poly = (csPolygon3D*)obj;
-  //if (lview->IsDynamic ())
-  //{
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
+  	(lview->GetUserdata ());
+  if (lptq->IsDynamic ())
+  {
     if (!vis) return;
-    poly->CalculateLighting (lview);
-  //}
-  //else
-    //poly->CalculateLightingNew (lview, vis);
+    poly->CalculateLightingDynamic (lview);
+  }
+  else
+    poly->CalculateLightingStatic (lview, vis);
 }
 
 static void curve_light_func (csObject* obj, csFrustumView* lview, bool vis)
 {
   csCurve* curve = (csCurve*)obj;
-  if (vis)
-    curve->CalculateLighting (*lview);
+  csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)
+  	(lview->GetUserdata ());
+  if (lptq->IsDynamic ())
+  {
+    if (!vis) return;
+    curve->CalculateLightingDynamic (lview);
+  }
+  else
+    curve->CalculateLightingStatic (lview, vis);
 }
 
 void csStatLight::CalculateLighting ()
 {
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
-  linfo.SetColor (GetColor ());
-  lview.SetUserData ((void*)this);
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetDynamic (false);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
-  //@@@ TWO KINDS OF USERDATA!!!
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
+  	this, false, false);
+  lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
@@ -221,21 +226,17 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
 {
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
-  linfo.SetColor (GetColor ());
-  lview.SetUserData ((void*)this);
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetDynamic (false);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
-  //@@@ TWO KINDS OF USERDATA!!!
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
+    this, false, false);
+  lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
 
   ctxt->SetLightFrustum (new csFrustum (center));
@@ -261,16 +262,11 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 #if 0
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
-  linfo.SetColor (GetColor ());
-  lview.SetUserData ((void*)this);
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetDynamic (false);
   lview.callback = callback;
   lview.callback_data = callback_data;
   lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
@@ -288,7 +284,6 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 void csStatLight::RegisterLightMap (csLightMap* lmap)
 {
   if (!dynamic) return;
-  lightmaps.SetLength (0);
 
   int i;
   for (i = 0 ; i < lightmaps.Length () ; i++)
@@ -383,32 +378,24 @@ void csDynLight::Setup ()
     csEngine::current_engine->lightpatch_pool->Free (lightpatches);
   csFrustumView lview;
   csFrustumContext* ctxt = lview.GetFrustumContext ();
-  csLightingInfo& linfo = ctxt->GetLightingInfo ();
-  linfo.SetGouraudOnly (false);
-  linfo.SetColor (GetColor ());
-  lview.SetUserData ((void*)this);
   lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
   lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
-  lview.SetDynamic (true);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-#if 0
-  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue ();
-  //@@@ TWO KINDS OF USERDATA!!!
+  csLightingPolyTexQueue* lptq = new csLightingPolyTexQueue (
+  	this, true, false);
+  lptq->SetColor (GetColor ());
   lview.SetUserdata (lptq);
-#endif
 
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum ((iFrustumView*)&lview);
 
-#if 0
   lptq->DecRef ();
-#endif
 }
 
 void csDynLight::SetColor (const csColor& col)
