@@ -215,7 +215,7 @@ public:
 
   // The 'relevantcount' parameter should be the number of items
   // in the old array that are initialized.
-  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount, 
+  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
     size_t newcount)
   {
     (void)relevantcount; (void)oldcount;
@@ -251,7 +251,7 @@ public:
     free (mem);
   }
 
-  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount, 
+  static T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
     size_t newcount)
   {
     if (newcount <= oldcount)
@@ -456,7 +456,7 @@ public:
     count = 0;
     CopyFrom (source);
   }
-  
+
   /// Assignment operator.
   csArray<T,ElementHandler>& operator= (const csArray& other)
   {
@@ -598,11 +598,11 @@ public:
   /// Push an element onto the tail end of the array. Returns index of element.
   size_t Push (T const& what)
   {
-    if (((&what >= root) && (&what < root + Length())) && 
+    if (((&what >= root) && (&what < root + Length())) &&
       (capacity < count + 1))
     {
       /*
-        Special case: An element from this very array is pushed, and a 
+        Special case: An element from this very array is pushed, and a
 	reallocation is needed. This could cause the passed ref to the
 	element to be pushed to be read from deleted memory. Work
 	around this.
@@ -682,11 +682,12 @@ public:
 
   /**
    * Find an element based on some key, using a comparison function.
-   * The array must be sorted. Returns csArrayItemNotFound if element does 
+   * The array must be sorted. Returns csArrayItemNotFound if element does
    * not exist.
    */
   csArrayTemplate(K)
-  size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey, size_t* candidate = 0) const
+  size_t FindSortedKey (csArrayCmpDecl(T,K) comparekey,
+                        size_t* candidate = 0) const
   {
     size_t m = 0, l = 0, r = Length ();
     while (l < r)
@@ -742,7 +743,7 @@ public:
   }
 
   /**
-   * Find a element in array and return its index (or csArrayItemNotFound 
+   * Find a element in array and return its index (or csArrayItemNotFound
    * if not found).
    */
   size_t Find (T const& which) const
@@ -965,7 +966,7 @@ public:
 	: currentelem(0), array(newarray)
     { }
     friend class csArray<T, ElementHandler>;
-    
+
   private:
     size_t currentelem;
     const csArray<T, ElementHandler>& array;
