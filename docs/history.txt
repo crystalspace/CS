@@ -42,9 +42,11 @@ The history order has been reversed so that new features are at the top.
 	  contains another one.
 	- Fixed PVS test with adjacent nodes.  It was not correctly testing if
 	  one box contained the other.
-	- Eric Sunshine fixed a compilation error on some platforms in
+	- Eric Sunshine fixed compilation errors on some platforms in
 	  soft_txt.cpp where it was trying to implicitly cast void* to
 	  RGBPixel*.
+	- Eric Sunshine eliminated a compilatioin warning in polytext.cpp and
+	  also made it work with the buggy OpenStep compiler.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.

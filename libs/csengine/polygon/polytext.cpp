@@ -84,14 +84,14 @@ class csDelayedLightingInfo : public csFrustumView::CleanupAction
       }
     }
 
+    csShadowFrustum *GetShadow (int idx)
+    { return (csShadowFrustum *)shadows.Get (idx); }
+
     ~LightViewInfo ()
     {
       for (int i = 0; i < shadows.Length (); i++)
         GetShadow (i)->DecRef ();
     }
-
-    csShadowFrustum *GetShadow (int idx)
-    { return (csShadowFrustum *)shadows.Get (idx); }
 
     void CheckShadow (csShadowFrustum *frust, int count)
     {
@@ -645,7 +645,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   csVector2 *lf2d = (csVector2 *)alloca (nvlf * sizeof (csVector2));
   // Project the light polygon from world space to responsability grid space
   float inv_lightcell_size = 1.0 / lightcell_size;
-  int i, j, k;
+  int i, j;
   for (i = 0; i < nvlf; i++)
   {
     // T = Mwt * (W - Vwt)
