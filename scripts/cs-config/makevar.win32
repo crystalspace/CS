@@ -8,11 +8,8 @@ COMMAND_DELIM= ;
 LINK.PLUGIN=dllwrap
 PLUGIN.POSTFLAGS=-mwindows -mconsole -lstdc++
 DO.SHARED.PLUGIN.PREAMBLE += \
- echo $"EXPORTS$">$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
- echo $"       $(TARGET.RAW)_scfInitialize$">>$(OUT)/$(TARGET.RAW).def \
- $(COMMAND_DELIM) \
- echo $"       $(TARGET.RAW)_scfFinalize$">>$(OUT)/$(TARGET.RAW).def \
- $(COMMAND_DELIM) \
- echo $"       plugin_compiler$">>$(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
+  echo $"EXPORTS$" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
+  echo $"  plugin_compiler$" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
 DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
 

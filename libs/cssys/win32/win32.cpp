@@ -944,8 +944,16 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
         int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
         if (key || (wParam >= ' '))
         {
+	  // Don't emit a char for keypad special keys (/*-+),
+	  // as this is already done upon WM_KEYDOWN.
+	  // @@@ Maybe there's a more 'elegant' solution?
+	  UINT vkey = MapVirtualKey (scancode, 1);
+	  bool kpkey = ((vkey == VK_ADD) || (vkey == VK_SUBTRACT) || 
+	    (vkey == VK_DIVIDE) || (vkey == VK_MULTIPLY) ||
+	    ((lParam & (1 << 24)) && (wParam == '/')));
+
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-          outlet->Key (key, wParam, true);
+          if (!kpkey) outlet->Key (key, wParam, true);
           LastCharCode [scancode] = (unsigned char) wParam;
         }
       }

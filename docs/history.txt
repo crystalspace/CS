@@ -13,6 +13,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine reverted the reversion of glrender.mak and applied a
 	  small patch so that it can build files from the renderer/common
 	  directory.  Also patched gl_render3d.mak.
+	- res worked around the 'double keypad key event' problem on Win32. 
+	  Upon reception of a 'keydown' message for such keys, CS enqueues a 
+	  key event; however, Windows generates another message containing the 
+	  keycode translated to a character. 
+	- res attempted to update & fix cs-config on win32.
 7-Jul-2003
 	- Peter Amstutz changed iDataBuffer so that it can be instructed 
 	  not to delete the underlying buffer when iDataBuffer is freed.

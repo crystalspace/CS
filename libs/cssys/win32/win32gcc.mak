@@ -62,7 +62,7 @@ CFLAGS.DLL =
 
 # General flags for the linker which are used in any case.
 # <cs-config>
-LFLAGS.GENERAL = $(CSTHREAD.LFLAGS)
+LFLAGS.GENERAL = 
 # </cs-config>
 
 # Flags for the linker which are used when optimizing.
@@ -142,12 +142,12 @@ MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
 
-# For metadata generation, insert the following lines between 
-# the $(MAKEVERSIONINFO) and $(MERGERES) commands:
-#  $(MAKEMETADATA) $(OUT)/$(@:$(DLL)=-meta.rc) $(INF.$(TARGET.RAW.UPCASE)) \
-#    $(COMMAND_DELIM) \
-# Also add $(OUT)/$(@:$(DLL)=-meta.rc) add the end of the $(MERGERES) command.
-
+# <cs-config>
+DO.SHARED.PLUGIN.PREAMBLE += \
+  echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
+  echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
+# </cs-config>
 DO.SHARED.PLUGIN.PREAMBLE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" \
