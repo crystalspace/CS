@@ -9,6 +9,9 @@ chronological order.
 19-May-2004
 	- res fixed the VBO render buffer to bind a 0 buffer after buffer
 	  creation and releasing.
+	- res augmented the glwin32 canvas to support an extension 
+	  "setglcontext" which allows it to set it's GL context as the current
+	  (useful if CS is used alongside other GL stuff).
 18-May-2004
 	- Eric Sunshine made the following change to msvcgen.jam:
 	    - Fixed bug in LinkWith where, though Frank changed it to properly

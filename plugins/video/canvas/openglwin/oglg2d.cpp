@@ -761,6 +761,11 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
       SWP_NOZORDER | SWP_NOACTIVATE);
     return true;
   }
+  if (!strcasecmp (command, "setglcontext"))
+  {
+    wglMakeCurrent (hDC, hGLRC);
+    return true;
+  }
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 
