@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW61=ddraw61$(DLL)
   DEP.DDRAW61=$(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.LOCAL.DDRAW61=$(LFLAGS.l)ddraw
+  LIBS.LOCAL.DDRAW61=$(LFLAGS.l)ddraw $(LFLAGS.l)dxguid
 else
   DDRAW61=$(OUT)$(LIB_PREFIX)ddraw61$(LIB)
   DEP.EXE+=$(DDRAW61)
