@@ -3434,7 +3434,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
   draw_busy--;
   return true;                                  // @@@@ RETURN correct vis info
 }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 void csThing::RegisterVisObject (iVisibilityObject *visobj)
 {

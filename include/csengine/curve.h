@@ -98,7 +98,7 @@ public:
   inline csTriangle* GetTriangles ();
   /// Return a single triangle @@@ why?
   inline csTriangle& GetTriangle (int i);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
   /// Return true if the colors table is valid.
   inline bool AreColorsValid () const;
 

@@ -139,7 +139,7 @@ SCF_IMPLEMENT_IBASE_EXT(csCurve)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCurve)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVertexBufferManagerClient)
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
@@ -150,7 +150,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE(iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 unsigned long csCurve:: LastCurveID = 0;
 
@@ -168,13 +168,13 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
 #ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   CurveID = LastCurveID++;
 #ifndef CS_USE_NEW_RENDERER
   vbufmgr = NULL;
   SetupVertexBuffer ();
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   // Call to make sure csBezier2 is properly initialized.
   csBezier2::Initialize ();
@@ -190,7 +190,7 @@ csCurve::~csCurve ()
   delete[] uv2Normal;
 #ifndef CS_USE_NEW_RENDERER
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 }
 
 #ifndef CS_USE_NEW_RENDERER
@@ -205,7 +205,7 @@ void csCurve::SetupVertexBuffer ()
     vbufmgr->AddClient (&scfiVertexBufferManagerClient);
   }
 }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 void csCurve::SetMaterial (iMaterialWrapper *m)
 {
@@ -853,7 +853,7 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbufmgr = NULL;
   }
 }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 // --- csCurveTemplate -------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csCurveTemplate)
@@ -966,7 +966,7 @@ csCurveTesselated *csBezierCurve::Tesselate (
       down.c = bl;
     }
   }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   return previous_tesselation;
 }

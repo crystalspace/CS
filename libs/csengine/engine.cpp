@@ -2373,7 +2373,7 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   	"crystalspace.mesh.object.thing", name, sector));
 #ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_USE);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }
@@ -2387,7 +2387,7 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   thing_wrap->GetFlags ().Set (CS_ENTITY_CONVEX);
 #ifndef CS_USE_NEW_RENDERER
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
   return csPtr<iMeshWrapper> (thing_wrap);
 }

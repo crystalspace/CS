@@ -461,7 +461,7 @@ static void PreparePolygonFX2 (
     }
   }
 }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 #undef INTERPOLATE
 #undef INTERPOLATE1

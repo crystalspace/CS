@@ -87,7 +87,7 @@ public:
    */
   void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
   	bool mirror, CS_ID id, int fog_type);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**

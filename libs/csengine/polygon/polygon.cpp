@@ -928,7 +928,7 @@ void csPolygon3D::Finish ()
 #ifdef DO_HW_UVZ
   SetupHWUV ();
 #endif
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 }
 
 #ifdef DO_HW_UVZ
