@@ -21,7 +21,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
-#include "csgeom/cspoint.h"
 #include "awscomp.h"
 
 /***************************************************************************************************************************
@@ -78,7 +77,13 @@ private:
     bool moving_mode;
 
     /// Points for placement of controls, offset from top, right of window.
-    csPoint minp, maxp, closep;
+    csRect minp, maxp, closep;
+
+    /// These are true if the control buttons that we're using are down, else false
+    bool min_down, max_down, close_down;
+
+private:
+    void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
 
 public:
    static const unsigned long sWindowRaised;

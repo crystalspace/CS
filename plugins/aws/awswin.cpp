@@ -39,7 +39,9 @@ awsWindow::awsWindow():above(NULL), below(NULL),
   min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
   frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
-  resizing_mode(false), moving_mode(false), minp(50,5), maxp(34,5), closep(18,5)
+  resizing_mode(false), moving_mode(false), 
+  minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
+  min_down(false), max_down(false), close_down(false)
 {
 
 }
@@ -81,10 +83,26 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Options", frame_options);
 
-  pm->LookupPointKey("WindowMinAt", minp);
-  pm->LookupPointKey("WindowZoomAt", maxp);
-  pm->LookupPointKey("WindowCloseAt", closep);
-  
+  pm->LookupRectKey("WindowMinAt", minp);
+  pm->LookupRectKey("WindowZoomAt", maxp);
+  pm->LookupRectKey("WindowCloseAt", closep);
+
+  // Arrange control rects
+  minp.xmin=Frame().xmax-minp.xmin;
+  minp.xmax=Frame().xmax-minp.xmax;
+  minp.ymin=Frame().ymin+minp.ymin;
+  minp.ymax=Frame().ymin+minp.ymax;
+
+  maxp.xmin=Frame().xmax-maxp.xmin;
+  maxp.xmax=Frame().xmax-maxp.xmax;
+  maxp.ymin=Frame().ymin+maxp.ymin;
+  maxp.ymax=Frame().ymin+maxp.ymax;
+
+  closep.xmin=Frame().xmax-closep.xmin;
+  closep.xmax=Frame().xmax-closep.xmax;
+  closep.ymin=Frame().ymin+closep.ymin;
+  closep.ymax=Frame().ymin+closep.ymax;
+   
   return true;
 }
 
@@ -200,6 +218,31 @@ awsWindow::OnMouseDown(int button, int x, int y)
     if (DEBUG_WINDOW_EVENTS) 
       printf("mousedown: x=%d, y=%d, fx=%d, fy=%d\n", x,y,Frame().xmax, Frame().ymax);
 
+    // check controls first
+    if (minp.Contains(x, y))
+    {
+      min_down=true;
+      Invalidate();
+      return true;
+    }
+
+    if (maxp.Contains(x, y))
+    {
+      max_down=true;
+      Invalidate();
+      return true;
+    }
+
+    if (closep.Contains(x, y))
+    {
+      close_down=true;
+      Invalidate();
+      return true;
+    }
+
+
+
+
     if (x<Frame().xmax && x>Frame().xmax-grip_size &&
         y<Frame().ymax && y>Frame().ymax-grip_size)
     {
@@ -232,6 +275,15 @@ awsWindow::OnMouseDown(int button, int x, int y)
 bool 
 awsWindow::OnMouseUp(int button, int x, int y)
 {
+  if (min_down || max_down || close_down)
+  {
+    min_down=false;
+    max_down=false;
+    close_down=false;
+    Invalidate();
+    return true;
+  }
+
   if (resizing_mode)
   {
     resizing_mode=false;
@@ -313,6 +365,10 @@ awsWindow::OnMouseMove(int button, int x, int y)
     Frame().ymin+=delta_y;
     Frame().xmax+=delta_x;
     Frame().ymax+=delta_y;
+
+    minp.Move(delta_x, delta_y);
+    maxp.Move(delta_x, delta_y);
+    closep.Move(delta_x, delta_y);
 
     // Move children
     int i;
@@ -551,12 +607,18 @@ awsWindow::OnDraw(csRect clip)
       close_button->GetOriginalDimensions(ctw, cth);
 
       // Draw min/max/close buttons
-      g3d->DrawPixmap(min_button, Frame().xmax-minp.x, Frame().ymin+minp.y, mtw, mth, 0,0, mtw, mth, 0);
-      g3d->DrawPixmap(max_button, Frame().xmax-maxp.x, Frame().ymin+maxp.y, mxtw, mth, 0,0, mxtw, mxth, 0);
-      g3d->DrawPixmap(close_button, Frame().xmax-closep.x, Frame().ymin+closep.y, ctw, cth, 0,0, ctw, cth, 0);
-           
-      //Todo:  add in button locations for the window def.  That way we know right where to put them.
+      g3d->DrawPixmap(min_button, minp.xmin+min_down, minp.ymin+min_down, mtw, mth, 0,0, mtw, mth, 0);
+      if (min_down) Draw3DRect(g2d, minp, lo2, hi2);
+      else          Draw3DRect(g2d, minp, hi2, lo2);
 
+      g3d->DrawPixmap(max_button, maxp.xmin+max_down, maxp.ymin+max_down, mxtw, mth, 0,0, mxtw, mxth, 0);
+      if (max_down) Draw3DRect(g2d, maxp, lo2, hi2);
+      else          Draw3DRect(g2d, maxp, hi2, lo2);
+
+      g3d->DrawPixmap(close_button, closep.xmin+close_down, closep.ymin+close_down, ctw, cth, 0,0, ctw, cth, 0);
+      if (close_down) Draw3DRect(g2d, closep, lo2, hi2);
+      else            Draw3DRect(g2d, closep, hi2, lo2);
+      
     } 
     break;
 
@@ -564,4 +626,13 @@ awsWindow::OnDraw(csRect clip)
     break;
   }
 
+}
+
+void 
+awsWindow::Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo)
+{
+  g2d->DrawLine(f.xmin, f.ymin, f.xmax, f.ymin, hi);
+  g2d->DrawLine(f.xmin, f.ymin, f.xmin, f.ymax, hi);
+  g2d->DrawLine(f.xmin, f.ymax, f.xmax, f.ymax, lo);
+  g2d->DrawLine(f.xmax, f.ymin, f.xmax, f.ymax, lo);
 }

@@ -134,6 +134,7 @@ skin_item:       TOKEN_ATTR ':' TOKEN_STR             { $$ = new awsStringKey(ne
 	       | TOKEN_ATTR ':' exp ',' exp ',' exp       { $$ = new awsRGBKey(new scfString($1), $3, $5, $7);           }
 		   | TOKEN_ATTR ':' exp						  { $$ = new awsIntKey(new scfString($1), $3);					 }
 		   | TOKEN_ATTR ':' '(' exp ',' exp ')'		  { $$ = new awsPointKey(new scfString($1), csPoint($4, $6));    }
+		   | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')' { $$ = new awsRectKey(new scfString($1), csRect($4, $6, $10, $12));     }
 ;
 
 skin_item_list:  skin_item                            { skcont.Add($1); }
