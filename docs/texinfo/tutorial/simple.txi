@@ -29,12 +29,35 @@ available online.  The @sc{api} documentation can be generated locally or
 viewed online.  @xref{Where to Get}.
 
 @menu
+* Simple MinApp:: Minimum Application
 * Simple System Driver:: Creating the Simple System Driver
 * Simple Event Handling:: Event Handling
 * Simple World:: Creating a ``World''
 * Simple Camera:: The Camera
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
+
+@node Simple MinApp
+@subsection Minimum Application
+@cindex Tutorial Minimum Application
+@cindex Minimum Application, Tutorial
+
+There are some requirements to fulfil until an application can be considered
+a ``Crystal Space Application''. These are:
+@itemize @bullet
+@item
+You have to include @file{cssysdef.h} as the very first include in
+@emph{every} source file.
+
+@item
+Your @code{main} function must be built using the following prototype:
+@example
+int main(int argc, char *argv[]);
+@end example
+@end itemize
+
+If you don't obey these rules, your program will not compile, or not compile
+on all supported systems.
 
 @node Simple System Driver, Simple Event Handling, Tutorial Simple, Tutorial Simple
 @subsection Creating the Simple System Driver
