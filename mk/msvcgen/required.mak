@@ -48,6 +48,7 @@ MSVC.MAKE.FLAGS = \
 MSVC.PLUGINS.REQUIRED =         \
   apps/import/caltocs		\
   cscript/cspython              \
+  documentsystem/xml            \
   filesys/vfs			\
   font/server/freefnt2          \
   mesh/impexp/3ds               \
