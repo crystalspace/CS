@@ -509,7 +509,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
   	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
-  return visit;
+  return csPtr<iVisibilityObjectIterator> (visit);
 }
 
 //======== VisTest sphere ==================================================
@@ -579,7 +579,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
   	(iVisibilityObjectIterator*)(new csFrustVisObjIt (&vistest_objects)));
-  return visit;
+  return csPtr<iVisibilityObjectIterator> (visit);
 }
 
 //======== IntersectSegment ================================================

@@ -3731,7 +3731,7 @@ csPtr<iVisibilityObjectIterator> csThing::VisTest (const csBox3& box)
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
   	(iVisibilityObjectIterator*)(new csThingVisObjIt (&vistest_objects)));
-  return visit;
+  return csPtr<iVisibilityObjectIterator> (visit);
 }
 
 csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
@@ -3761,7 +3761,7 @@ csPtr<iVisibilityObjectIterator> csThing::VisTest (const csSphere& sphere)
 
   csRef<iVisibilityObjectIterator> visit = csPtr<iVisibilityObjectIterator> (
   	(iVisibilityObjectIterator*)(new csThingVisObjIt (&vistest_objects)));
-  return visit;
+  return csPtr<iVisibilityObjectIterator> (visit);
 }
 
 struct CheckFrustData
