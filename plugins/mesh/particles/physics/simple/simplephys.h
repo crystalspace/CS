@@ -38,6 +38,9 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
   struct particles_object {
     iParticlesObjectState *particles;
     csArray<csParticlesData> *data;
+    float new_particles;
+    int dead_particles;
+    float total_elapsed_time;
   };
   csArray<particles_object*> partobjects;
 
@@ -46,8 +49,9 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
 
   csRandomGen rng;
 
-  void StepPhysics (float elapsed_time, iParticlesObjectState *particles,
-    csArray<csParticlesData> *data);
+  void StepPhysics (float elapsed_time, particles_object *part);
+  particles_object *FindParticles(iParticlesObjectState *p);
+  static int ZSort(void const *item1, void const *item2);
 
 public:
   SCF_DECLARE_IBASE;
@@ -73,6 +77,12 @@ public:
    * Remove a particles object from the physics plugin
    */
   virtual void RemoveParticles (iParticlesObjectState *particles);
+
+  /// (Re)Start a particle simulation
+  virtual void Start (iParticlesObjectState *particles);
+
+  /// Stop a particle simulation
+  virtual void Stop (iParticlesObjectState *particles);
 
   /**
    * Event Handler

@@ -382,7 +382,6 @@ private:
   csVector3 gravity;
 
   float emit_time;
-  float total_elapsed_time;
   float time_to_live;
   float time_variation;
 
@@ -414,8 +413,7 @@ private:
 
   int buffer_length;
 
-  float new_particles;
-  int dead_particles;
+  //int dead_particles;
 
   bool point_sprites;
 
@@ -429,7 +427,6 @@ private:
   csRandomGen rng;
   csVector3 emitter;
   float radius;
-  static int ZSort(void const *item1, void const *item2);
 
 public:
   SCF_DECLARE_IBASE;
@@ -600,6 +597,12 @@ public:
   { position = emitter; }
   csParticleEmitType GetEmitType ()
   { return emit_type; }
+  float GetEmitSize1 ()
+  { return emit_size_1; }
+  float GetEmitSize2 ()
+  { return emit_size_2; }
+  float GetEmitSize3 ()
+  { return emit_size_3; }
   csParticleForceType GetForceType ()
   { return force_type; }
   void GetFalloffType(csParticleFalloffType &force,
@@ -640,23 +643,25 @@ public:
   { return mass_variation; }
   float GetMass ()
   { return particle_mass; }
-  virtual csParticleColorMethod GetParticleColorMethod ()
+  csParticleColorMethod GetParticleColorMethod ()
   { return color_method; }
-  virtual csColor GetConstantColor ()
+  csColor GetConstantColor ()
   { return constant_color; }
-  virtual float GetColorLoopTime ()
+  float GetColorLoopTime ()
   { return loop_time; }
-  virtual float GetBaseHeat ()
+  float GetBaseHeat ()
   { return base_heat; }
+  csArray<csColor> &GetGradient ()
+  { return gradient_colors; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
+  csReversibleTransform GetCameraTranform ()
+  { return tr_o2c; }
 
   void Start ();
   void Stop ();
   bool IsRunning ()
   { return running; }
-
-  bool Update (float elapsed_time);
 
   virtual void PositionChild (iMeshObject* child,csTicks current_time) {}
 
@@ -719,6 +724,8 @@ public:
     { return scfParent->GetConstantColor (); }
     virtual float GetColorLoopTime ()
     { return scfParent->GetColorLoopTime (); }
+    virtual csArray<csColor> &GetGradient ()
+    { return scfParent->GetGradient (); }
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }
     virtual void SetParticleRadius (float radius)
@@ -731,6 +738,16 @@ public:
     { scfParent->GetEmitPosition (position); }
     virtual csParticleEmitType GetEmitType ()
     { return scfParent->GetEmitType (); }
+    virtual float GetSphereEmitInnerRadius ()
+    { return scfParent->GetEmitSize2 (); }
+    virtual float GetSphereEmitOuterRadius ()
+    { return scfParent->GetEmitSize1 (); }
+    virtual float GetEmitXSize ()
+    { return scfParent->GetEmitSize1 (); }
+    virtual float GetEmitYSize ()
+    { return scfParent->GetEmitSize2 (); }
+    virtual float GetEmitZSize ()
+    { return scfParent->GetEmitSize3 (); }
     virtual csParticleForceType GetForceType ()
     { return scfParent->GetForceType (); }
     virtual void GetFalloffType(csParticleFalloffType &force,
@@ -770,6 +787,8 @@ public:
     { return scfParent->GetMassVariation (); }
     virtual void SetTransformMode (bool transform)
     { scfParent->SetTransformMode (transform); }
+    virtual csReversibleTransform GetObjectToCamera ()
+    { return scfParent->GetCameraTranform (); }
     virtual void ChangePhysicsPlugin (const char *plugin)
     { scfParent->LoadPhysicsPlugin (plugin); }
     virtual void Start ()
@@ -778,8 +797,6 @@ public:
     { scfParent->Stop (); }
     virtual bool IsRunning ()
     { return scfParent->IsRunning (); }
-    virtual void Update (float elapsed_time)
-    { scfParent->Update (elapsed_time); }
   } scfiParticlesObjectState;
   friend struct eiParticlesObjectState;
 

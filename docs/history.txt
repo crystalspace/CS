@@ -22,7 +22,7 @@ chronological order.
 	  from include/csengine.
 	- Luca added a very informative message in the bottom of the screen
 	  for the waterdemo application.
-        - Matze removed csengine from cs-config.
+    - Matze removed csengine from cs-config.
 	- res made the following changes to data/config/opengl.cfg:
 	    - Improved comment for Video.OpenGL.TextureDownsample.
 	    - Added GL font cache settings.
@@ -39,6 +39,10 @@ chronological order.
 	- Eric Sunshine fixed bug in bugplug.mak where it failed to install
 	  bugplug.key.
 	- Added a missing CS_IMPLEMENT_PLUGIN to the new engine plugin
+	- John Harger moved everything from iParticlesObjectState::Update into
+	  the physics plugin. This will allow better control over the particles
+	  and especially make the ODE particle physics plugin a lot easier and
+	  cleaner.
 25-Jan-2004
         - Matze did some updates to the jam rules:
             - I decided not to fight autoconf while using custom variable
@@ -118,6 +122,8 @@ chronological order.
 	- Jorrit added csWeakRefArray<T> which is an array of weak references.
 	  This is needed because csArray<csWeakRef<T> > does not work because
 	  you cannot reallocate an array of weak references.
+	- John Harger cleaned up the particles plugin interface a bit, and 
+	  changed the loader syntax a little.
 	- Eric Sunshine added new interface iParticlesColorCallback.  This
 	  replaces the ugly functional-style color callback used by
 	  iParticlesObjectState and iParticlesFactoryState with a more

@@ -36,6 +36,8 @@
 
 #include "iengine/material.h"
 
+#include "iengine/movable.h"
+
 class csColor;
 
 /// Particle force falloff type
@@ -131,6 +133,21 @@ struct iParticlesObjectState : public iBase
   /// Set the emitter type to a box (which can be rotated)
   virtual void SetBoxEmitType (float x_size, float y_size, float z_size) = 0;
 
+  /// Get the inner radius for a sphere emitter
+  virtual float GetSphereEmitInnerRadius () = 0;
+
+  /// Get the outer radius for a sphere emitter
+  virtual float GetSphereEmitOuterRadius () = 0;
+
+  /// Get the X size for a plane or box emitter
+  virtual float GetEmitXSize () = 0;
+
+  /// Get the Y size for a plane or box emitter
+  virtual float GetEmitYSize () = 0;
+
+  /// Get the Z size for a plane or box emitter
+  virtual float GetEmitZSize () = 0;
+
   /// Get the emitter type
   virtual csParticleEmitType GetEmitType () = 0;
 
@@ -207,6 +224,8 @@ struct iParticlesObjectState : public iBase
   /// Clear the color gradient
   virtual void ClearColors () = 0;
 
+  virtual csArray<csColor> &GetGradient () = 0;
+
   /// Set the color method to a constant color
   virtual void SetConstantColorMethod (csColor color) = 0;
 
@@ -274,6 +293,9 @@ struct iParticlesObjectState : public iBase
   /// Set whether to apply the mesh's transform to the individual particles
   virtual void SetTransformMode (bool transform) = 0;
 
+  /// Get the camera transform
+  virtual csReversibleTransform GetObjectToCamera () = 0;
+
   /**
    * Change the particle physics plugin
    * (Defaults to loading 'crystalspace.particles.physics.simple')
@@ -292,12 +314,6 @@ struct iParticlesObjectState : public iBase
 
   /// Returns true if this particle simulation is running
   virtual bool IsRunning () = 0;
-
-  /**
-   * Update the particle system (should only be called by an 
-   * iParticlesPhysics plugin
-   */
-  virtual void Update (float elapsed_time) = 0;
 };
 
 SCF_VERSION (iParticlesFactoryState, 0, 2, 0);
@@ -444,6 +460,12 @@ struct iParticlesPhysics : public iBase
    * Remove a particles object from the physics plugin
    */
   virtual void RemoveParticles (iParticlesObjectState *particles) = 0;
+
+  /// (Re)Start a particle simulation
+  virtual void Start (iParticlesObjectState *particles) = 0;
+
+  /// Stop a particle simulation
+  virtual void Stop (iParticlesObjectState *particles) = 0;
 };
 
 /** @} */

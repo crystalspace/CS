@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/ref.h"
+#include "csutil/cscolor.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -97,6 +98,42 @@ void csParticlesPhysicsSimple::RemoveParticles (
   }
 }
 
+void csParticlesPhysicsSimple::Start (iParticlesObjectState *particles)
+{
+  particles_object *part = FindParticles (particles);
+  if(!part) return;
+  
+  int initial_particles = part->particles->GetInitialParticleCount();
+
+  if(part->data->Length () < 1)
+  {
+    int start_size = 1000;
+    if (initial_particles > start_size) start_size = initial_particles;
+
+    part->data->SetLength (start_size);
+    for (int i = 0; i < start_size; i++)
+    {
+      csParticlesData &p = part->data->Get (i);
+      p.sort = -FLT_MAX;
+      p.color.w = 0.0f;
+      p.time_to_live = -1.0f;
+    }
+    part->dead_particles = start_size;
+  }
+
+  part->new_particles = (float)initial_particles;
+  part->total_elapsed_time = 0.0f;
+}
+
+void csParticlesPhysicsSimple::Stop (iParticlesObjectState *particles)
+{
+  particles_object *part = FindParticles (particles);
+  if(!part) return;
+
+  part->total_elapsed_time = part->particles->GetEmitTime () + 50.0f;
+  part->new_particles = 0.0f;
+}
+
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
@@ -108,41 +145,136 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
     float elapsedSecs = (float)elapsed * 0.001f;
     for (int i=0; i < partobjects.Length (); i++)
     {
-      StepPhysics (elapsedSecs, partobjects[i]->particles,
-        partobjects[i]->data);
-      partobjects[i]->particles->Update (elapsedSecs);
+      StepPhysics (elapsedSecs, partobjects[i]);
     }
   }
   return false;
 }
 
-void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
-  iParticlesObjectState *particles, csArray<csParticlesData> *data)
+void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
+  particles_object *part)
 {
-  float force_range = particles->GetForceRange ();
-  for (int i=0;i<data->Length ();i++)
+  float emit_time = part->particles->GetEmitTime ();
+  if (part->total_elapsed_time < emit_time)
   {
-    // Setup for this particle
-    csParticlesData &part = data->Get (i);
+    part->total_elapsed_time += true_elapsed_time;
+    part->new_particles += true_elapsed_time * 
+      (float)part->particles->GetParticlesPerSecond ();
+  }
 
-    if (part.time_to_live < 0.0f) break;
+  if ((part->dead_particles-part->new_particles) <
+    part->data->Length () * 0.30f)
+  {
+    int oldlen = part->data->Length ();
+    int newlen = (oldlen > (int)part->new_particles) ?
+      oldlen << 1 : (int)part->new_particles << 1;
+    part->data->SetLength (newlen);
+    part->dead_particles += part->data->Length() - oldlen;
+    for(int i=oldlen;i<part->data->Length ();i++) {
+      csParticlesData &p = part->data->Get (i);
+      p.sort = -FLT_MAX;
+      p.color.w = 0.0f;
+      p.time_to_live = -1.0f;
+    }
+  }
+  else if (part->dead_particles - part->new_particles >
+    part->data->Length () * 0.70f && part->data->Length() > 1)
+  {
+    int oldlen = part->data->Length();
+    part->data->Truncate ((part->data->Length () >> 1));
+    part->dead_particles -= oldlen - part->data->Length();
+  }
+
+  int i;
+  int dead_offset = part->data->Length() - part->dead_particles;
+
+  csVector3 emitter;
+  part->particles->GetEmitPosition (emitter);
+
+  for (i = 0; i < (int)part->new_particles; i++)
+  {
+    csParticlesData &point = part->data->Get(i + dead_offset);
+    // Emission
+    csVector3 start;
+
+    switch (part->particles->GetEmitType ())
+    {
+    case CS_PART_EMIT_SPHERE:
+    {
+      start = csVector3((rng.Get() - 0.5) * 2,
+                        (rng.Get() - 0.5) * 2,
+			(rng.Get() - 0.5) * 2);
+      start.Normalize ();
+      float inner_radius = part->particles->GetSphereEmitInnerRadius ();
+      float outer_radius = part->particles->GetSphereEmitOuterRadius ();
+      start = emitter +
+        (start * ((rng.Get() * (outer_radius - inner_radius ))
+        + inner_radius ));
+      break;
+    }
+    case CS_PART_EMIT_PLANE:
+      break;
+    case CS_PART_EMIT_BOX:
+      break;
+    }
+
+    point.position = start;
+    point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
+    point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
+    point.time_to_live = part->particles->GetTimeToLive() +
+      (part->particles->GetTimeVariation () * rng.Get());
+    point.mass = part->particles->GetMass() +
+      (rng.Get() * part->particles->GetMassVariation ());
+  }
+
+  float time_increment = true_elapsed_time / part->new_particles;
+
+  dead_offset += (int)part->new_particles;
+  part->dead_particles -= (int)part->new_particles;
+  part->new_particles -= (int)part->new_particles;
+
+  float elapsed_time = 0.0f;
+
+  float force_range = part->particles->GetForceRange ();
+  for (int i=0;i<dead_offset;i++)
+  {
+    if(elapsed_time < true_elapsed_time - time_increment)
+    {
+      elapsed_time += time_increment;
+    }
+    else
+    {
+      elapsed_time = true_elapsed_time;
+    }
+
+    // Setup for this particle
+    csParticlesData &point = part->data->Get (i);
+
+    // Time until death
+    point.time_to_live -= elapsed_time;
+    if (point.time_to_live < 0.0f)
+    {
+      // Deletion :(
+      point.color.w = 0.0f;
+      point.sort = -FLT_MAX;
+      part->dead_particles ++;
+      continue;
+    }
 
     // Diffusion
     csVector3 diff((rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f,
       (rng.Get() * 2.0f) - 1.0f);
-    diff *= particles->GetDiffusion ();
-    part.position += (diff * elapsed_time);
+    diff *= part->particles->GetDiffusion ();
+    point.position += (diff * elapsed_time);
 
     // Force related stuff
-    csVector3 emitter;
-    particles->GetEmitPosition (emitter);
     float force_range_squared = (force_range * force_range);
-    csVector3 dir = part.position - emitter;
+    csVector3 dir = point.position - emitter;
     float dist_squared = dir.SquaredNorm();
     float falloff = 1.0f;
 
     csParticleForceType force_type;
-    force_type = particles->GetForceType ();
+    force_type = part->particles->GetForceType ();
 
     switch (force_type)
     {
@@ -150,16 +282,16 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
       dir.Normalize ();
       break;
     case CS_PART_FORCE_LINEAR:
-      particles->GetForceDirection (dir);
+      part->particles->GetForceDirection (dir);
       break;
     case CS_PART_FORCE_CONE:
-      particles->GetForceDirection (dir);
+      part->particles->GetForceDirection (dir);
       break;
     }
 
     csParticleFalloffType force_falloff, cone_falloff;
 
-    particles->GetFalloffType (force_falloff, cone_falloff);
+    part->particles->GetFalloffType (force_falloff, cone_falloff);
 
     switch (force_falloff) {
     case CS_PART_FALLOFF_CONSTANT:
@@ -176,11 +308,108 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
     }
 
     csVector3 gravity;
-    particles->GetGravity (gravity);
+    part->particles->GetGravity (gravity);
 
-    part.velocity += dir * (((particles->GetForce() * falloff -
-      fabs(part.velocity.Norm()) * particles->GetDampener ()) /
-      part.mass) * elapsed_time) + gravity * elapsed_time;
-    part.position += part.velocity * elapsed_time;
+    point.velocity += dir * (((part->particles->GetForce() * falloff -
+      fabs(point.velocity.Norm()) * part->particles->GetDampener ()) /
+      point.mass) * elapsed_time) + gravity * elapsed_time;
+    point.position += point.velocity * elapsed_time;
+
+    // The color functions
+    switch (part->particles->GetParticleColorMethod ())
+    {
+    case CS_PART_COLOR_CONSTANT:
+    {
+      csColor constant_color = part->particles->GetConstantColor ();
+      point.color.x = constant_color.red;
+      point.color.y = constant_color.blue;
+      point.color.z = constant_color.green;
+      point.color.w = 1.0f;
+      break;
+    }
+    case CS_PART_COLOR_LINEAR:
+    {
+      float colortime = point.time_to_live
+        / (part->particles->GetTimeToLive ()
+        + part->particles->GetTimeVariation ());
+      csArray<csColor> &gradient_colors =
+        part->particles->GetGradient ();
+      int color_len=gradient_colors.Length();
+      if (color_len)
+      {
+        // With a gradient
+        float cref = (1.0f - colortime) * (float)(color_len-1);
+        int index = (int)floor(cref);
+        csColor color1 = gradient_colors.Get(index);
+        csColor color2 = color1;
+        if (index != color_len - 1)
+        {
+          color2 = gradient_colors.Get(index + 1);
+        }
+
+        float pos = cref - floor(cref);
+
+        point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
+        point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
+        point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
+      }
+      else
+      {
+        // With no gradient set, use magic pink instead (fade to black)
+        // Note, that this case is technically an error
+        point.color.x = 1.0f * colortime;
+        point.color.y = 0.0f * colortime;
+        point.color.z = 1.0f * colortime;
+      }
+      point.color.w = colortime;
+      break;
+    }
+    case CS_PART_COLOR_HEAT:
+      // @@@ TODO: Do this
+      break;
+    case CS_PART_COLOR_CALLBACK:
+    {
+      csRef<iParticlesColorCallback> color_callback =
+        part->particles->GetColorCallback ();
+      if (color_callback.IsValid())
+      {
+        float colortime = point.time_to_live
+          / (part->particles->GetTimeToLive ()
+          + part->particles->GetTimeVariation ());
+        csColor color = color_callback->GetColor(colortime);
+        // @@@ FIXME: Do something with the retrieved color.
+	      (void)color;
+      }
+      break;
+    }
+    case CS_PART_COLOR_LOOPING:
+      // @@@ TODO: Do this
+      break;
+    }
+
+    csVector3 transformed =
+      part->particles->GetObjectToCamera ().Other2This(point.position);
+    point.sort = transformed.z;
   }
+  part->data->Sort (ZSort);
 }
+
+csParticlesPhysicsSimple::particles_object*
+  csParticlesPhysicsSimple::FindParticles(iParticlesObjectState *p)
+{
+  for (int i=0;i<partobjects.Length ();i++) {
+    if (partobjects[i]->particles == p) {
+      return partobjects[i];
+    }
+  }
+  return NULL;
+}
+
+int csParticlesPhysicsSimple::ZSort (void const *item1, void const *item2)
+{
+  csParticlesData* i1 = (csParticlesData*)item1;
+  csParticlesData* i2 = (csParticlesData*)item2;
+  if (i1->sort < i2->sort) return 1;
+  return -1;
+}
+

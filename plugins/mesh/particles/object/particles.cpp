@@ -207,7 +207,6 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   gravity = p->gravity;
 
   emit_time = p->emit_time;
-  total_elapsed_time = 0.0f;
   time_to_live = p->time_to_live;
   time_variation = p->time_variation;
 
@@ -227,7 +226,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
-  dead_particles = 0;
+  //dead_particles = 0;
   point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
 
   running = false;
@@ -316,7 +315,38 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
 
   int vertnum = 0;
-  if ((vertnum = point_data.Length () - dead_particles) < 1) return false;
+  float new_radius = 0.0f;
+
+  for(int i=0;i<point_data.Length ();i++)
+  {
+    if(point_data[i].time_to_live < 0.0f) break;
+
+    vertnum ++;
+
+    // For calculating radius
+    csVector3 dist_vect = point_data[i].position - emitter;
+    if (dist_vect.SquaredNorm() > new_radius)
+    {
+      new_radius = dist_vect.SquaredNorm();
+    }
+  }
+  //dead_particles = point_data.Length () - vertnum;
+
+  if(vertnum>0) 
+  {
+    radius = qsqrt(new_radius);
+    running = true;
+  }
+  else
+  {
+    radius = 0.0f;
+    running = false;
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  csSphere s(csVector3(0,0,0), radius);
+  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
+    return false;
 
   if (!point_sprites)
   {
@@ -341,11 +371,6 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
     }
   }
 
-  int clip_portal, clip_plane, clip_z_plane;
-  csSphere s(csVector3(0,0,0), radius);
-  if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
-    return false;
-
   if (!mesh)
     mesh = new csRenderMesh;
 
@@ -367,14 +392,6 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
 
   return true;
-}
-
-int csParticlesObject::ZSort (void const *item1, void const *item2)
-{
-  csParticlesData* i1 = (csParticlesData*)item1;
-  csParticlesData* i2 = (csParticlesData*)item2;
-  if (i1->sort < i2->sort) return 1;
-  return -1;
 }
 
 void csParticlesObject::UpdateLighting (iLight**, int, iMovable*)
@@ -587,194 +604,16 @@ void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
 
 void csParticlesObject::Start ()
 {
-  if(point_data.Length () < 1)
-  {
-    int start_size = 1000;
-    if (initial_particles > start_size) start_size = initial_particles;
-
+  if(point_data.Length () < 1) {
     buffer_length = 0;
-
-    point_data.SetLength (start_size);
-    for (int i = 0; i < start_size; i++)
-    {
-      csParticlesData &p = point_data.Get (i);
-      p.sort = -FLT_MAX;
-      p.color.w = 0.0f;
-      p.time_to_live = -1.0f;
-    }
-    dead_particles = start_size;
   }
-
-  new_particles = (float)initial_particles;
-  total_elapsed_time = 0.0f;
+  physics->Start (&scfiParticlesObjectState);
   running = true;
 }
 
 void csParticlesObject::Stop ()
 {
-  total_elapsed_time = emit_time + 50.0f;
-  new_particles = 0.0f;
-}
-
-bool csParticlesObject::Update (float elapsed_time)
-{
-  if (elapsed_time <= 0.0) return true;
-
-  if (total_elapsed_time < emit_time)
-  {
-    total_elapsed_time += elapsed_time;
-    new_particles += elapsed_time * (float)particles_per_second;
-  }
-
-  if(dead_particles-new_particles >= point_data.Length())
-  {
-    running = false;
-    return true;
-  }
-  running = true;
-
-  float new_radius = 0.0f;
-
-  if ((dead_particles-new_particles) < point_data.Length () * 0.30f)
-  {
-    int oldlen = point_data.Length ();
-    int newlen = (oldlen > (int)new_particles) ?
-      oldlen << 1 : (int)new_particles << 1;
-    point_data.SetLength (newlen);
-    dead_particles += point_data.Length() - oldlen;
-    for(int i=oldlen;i<point_data.Length ();i++) {
-      csParticlesData &p = point_data.Get (i);
-      p.sort = -FLT_MAX;
-      p.color.w = 0.0f;
-      p.time_to_live = -1.0f;
-    }
-  }
-  else if (dead_particles - new_particles > point_data.Length () * 0.70f && 
-           point_data.Length() > 1)
-    {
-    int oldlen = point_data.Length();
-    point_data.Truncate ((point_data.Length () >> 1));
-    dead_particles -= oldlen - point_data.Length();
-  }
-
-  int i;
-  int dead_offset = point_data.Length() - dead_particles;
-
-  for (i = 0; i < (int)new_particles; i++)
-  {
-    csParticlesData &point = point_data[i + dead_offset];
-    // Emission
-    csVector3 start;
-
-    switch (emit_type)
-    {
-    case CS_PART_EMIT_SPHERE:
-      start = csVector3((rng.Get() - 0.5) * 2,
-                        (rng.Get() - 0.5) * 2,
-			(rng.Get() - 0.5) * 2);
-      start.Normalize ();
-      start = emitter +
-        (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
-      break;
-    case CS_PART_EMIT_PLANE:
-      break;
-    case CS_PART_EMIT_BOX:
-      break;
-    }
-
-    point.position = start;
-    point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
-    point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
-    point.time_to_live = time_to_live + (time_variation * rng.Get());
-    point.mass = particle_mass + (rng.Get() * mass_variation);
-  }
-  dead_offset += (int)new_particles;
-  dead_particles -= (int)new_particles;
-  new_particles -= (int)new_particles;
-  for (i = 0; i < dead_offset; i++)
-  {
-    csParticlesData &point = point_data[i];
-    
-    // Time until death
-    point.time_to_live -= elapsed_time;
-    if (point.time_to_live < 0.0f)
-    {
-      // Deletion :(
-      point.color.w = 0.0f;
-      point.sort = -FLT_MAX;
-      dead_particles ++;
-      continue;
-    }
-
-    // The color functions
-    switch (color_method)
-    {
-    case CS_PART_COLOR_CONSTANT:
-      point.color.x = constant_color.red;
-      point.color.y = constant_color.blue;
-      point.color.z = constant_color.green;
-      point.color.w = 1.0f;
-      break;
-    case CS_PART_COLOR_LINEAR:
-    {
-      float colortime = point.time_to_live / (time_to_live + time_variation);
-      int color_len=gradient_colors.Length();
-      if (color_len)
-      {
-        // With a gradient
-        float cref = (1.0f - colortime) * (float)(color_len-1);
-        int index = (int)floor(cref);
-        csColor color1 = gradient_colors.Get(index);
-        csColor color2 = color1;
-        if (index != color_len - 1)
-        {
-          color2 = gradient_colors.Get(index + 1);
-        }
-
-        float pos = cref - floor(cref);
-
-        point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
-        point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
-        point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
-      }
-      else
-      {
-        // With no gradient set, use mesh's base color instead (fade to black)
-        point.color.x = basecolor.red * colortime;
-        point.color.y = basecolor.green * colortime;
-        point.color.z = basecolor.blue * colortime;
-      }
-      point.color.w = colortime;
-      break;
-    }
-    case CS_PART_COLOR_HEAT:
-      // @@@ TODO: Do this
-      break;
-    case CS_PART_COLOR_CALLBACK:
-      if (color_callback.IsValid())
-      {
-        float colortime = point.time_to_live / (time_to_live + time_variation);
-        csColor color = color_callback->GetColor(colortime);
-        // @@@ FIXME: Do something with the retrieved color.
-	(void)color;
-      }
-      break;
-    case CS_PART_COLOR_LOOPING:
-      // @@@ TODO: Do this
-      break;
-    }
-
-    csVector3 transformed = tr_o2c.Other2This(point.position);
-    point.sort = transformed.z;
-
-    // For calculating radius
-    csVector3 dist_vect = point.position - emitter;
-    if (dist_vect.SquaredNorm() > new_radius)
-      new_radius = dist_vect.SquaredNorm();
-  }
-  point_data.Sort (ZSort);
-  radius = qsqrt(new_radius);
-  return true;
+  physics->Stop (&scfiParticlesObjectState);
 }
 
 void csParticlesObject::NextFrame (csTicks, const csVector3 &)
