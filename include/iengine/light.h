@@ -112,18 +112,29 @@ SCF_VERSION (iLightList, 0, 0, 1);
 
 struct iLightList : public iBase
 {
-  /// Return the number of lights in this list.
-  virtual int GetLightCount () const = 0;
-  /// Return a single light.
-  virtual iLight *GetLight (int idx) const = 0;
-  /// Add a light.
-  virtual void AddLight (iLight *light) = 0;
+  /// Return the number of lights in this list
+  virtual int GetCount () const = 0;
+
+  /// Return a light by index
+  virtual iLight *Get (int n) const = 0;
+
+  /// Add a light
+  virtual int Add (iLight *obj) = 0;
+
   /// Remove a light
-  virtual void RemoveLight (iLight *light) = 0;
-  /// Find a light by name
-  virtual iLight *FindByName (const char *name) const = 0;
+  virtual bool Remove (iLight *obj) = 0;
+
+  /// Remove the nth light
+  virtual bool Remove (int n) = 0;
+
+  /// Remove all lights
+  virtual void RemoveAll () = 0;
+
   /// Find a light and return its index
-  virtual int Find (iLight *light) const = 0;
+  virtual int Find (iLight *obj) const = 0;
+
+  /// Find a light by name
+  virtual iLight *FindByName (const char *Name) const = 0;
 };
 
 SCF_VERSION (iLightingProcessInfo, 0, 0, 1);

@@ -135,18 +135,6 @@ csCameraPositionList::csCameraPositionList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPositionList);
 }
 
-csCameraPositionList::~csCameraPositionList ()
-{
-  DeleteAll ();
-}
-
-bool csCameraPositionList::FreeItem (csSome Item)
-{
-  iCameraPosition* campos = (iCameraPosition*)Item;
-  campos->DecRef ();
-  return true;
-}
-
 iCameraPosition* csCameraPositionList::NewCameraPosition (const char* name)
 {
   csVector3 v (0);
@@ -156,23 +144,24 @@ iCameraPosition* csCameraPositionList::NewCameraPosition (const char* name)
   return cp;
 }
 
-void csCameraPositionList::RemoveCameraPosition (iCameraPosition *campos)
-{
-  int n = Find (campos);
-  if (n >= 0) Delete (n); 
-}
-
-int csCameraPositionList::CameraPositionList::GetCameraPositionCount () const
-{ return scfParent->Length (); }
-iCameraPosition *csCameraPositionList::CameraPositionList::
-	GetCameraPosition (int idx) const
-{ return scfParent->Get (idx); }
-iCameraPosition *csCameraPositionList::CameraPositionList::FindByName
-	(const char *name) const
-{ return scfParent->FindByName (name); }
-int csCameraPositionList::CameraPositionList::Find
-	(iCameraPosition *campos) const
-{ return scfParent->Find (campos); }
+iCameraPosition* csCameraPositionList::CameraPositionList::NewCameraPosition (const char* name)
+  { return scfParent->NewCameraPosition (name); }
+int csCameraPositionList::CameraPositionList::GetCount () const
+  { return scfParent->Length (); }
+iCameraPosition *csCameraPositionList::CameraPositionList::Get (int n) const
+  { return scfParent->Get (n); }
+int csCameraPositionList::CameraPositionList::Add (iCameraPosition *obj)
+  { return scfParent->Push (obj); }
+bool csCameraPositionList::CameraPositionList::Remove (iCameraPosition *obj)
+  { return scfParent->Delete (obj); }
+bool csCameraPositionList::CameraPositionList::Remove (int n)
+  { return scfParent->Delete (n); }
+void csCameraPositionList::CameraPositionList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csCameraPositionList::CameraPositionList::Find (iCameraPosition *obj) const
+  { return scfParent->Find (obj); }
+iCameraPosition *csCameraPositionList::CameraPositionList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //---------------------------------------------------------------------------
 
@@ -190,18 +179,6 @@ csCollectionList::csCollectionList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollectionList);
 }
 
-csCollectionList::~csCollectionList ()
-{
-  DeleteAll ();
-}
-
-bool csCollectionList::FreeItem (csSome Item)
-{
-  iCollection* collection = (iCollection*)Item;
-  collection->DecRef ();
-  return true;
-}
-
 iCollection* csCollectionList::NewCollection (const char* name)
 {
   csCollection* c = new csCollection (csEngine::current_engine);
@@ -211,21 +188,24 @@ iCollection* csCollectionList::NewCollection (const char* name)
   return &(c->scfiCollection);
 }
 
-void csCollectionList::RemoveCollection (iCollection *collection)
-{
-  int n = Find (collection);
-  if (n >= 0) Delete (n); 
-}
-
-int csCollectionList::CollectionList::GetCollectionCount () const
-{ return scfParent->Length (); }
-iCollection *csCollectionList::CollectionList::GetCollection (int idx) const
-{ return scfParent->Get (idx); }
-iCollection *csCollectionList::CollectionList::FindByName
-	(const char *name) const
-{ return scfParent->FindByName (name); }
-int csCollectionList::CollectionList::Find (iCollection *collection) const
-{ return scfParent->Find (collection); }
+iCollection* csCollectionList::CollectionList::NewCollection (const char* name)
+{ return scfParent->NewCollection (name); }
+int csCollectionList::CollectionList::GetCount () const
+  { return scfParent->Length (); }
+iCollection *csCollectionList::CollectionList::Get (int n) const
+  { return scfParent->Get (n); }
+int csCollectionList::CollectionList::Add (iCollection *obj)
+  { return scfParent->Push (obj); }
+bool csCollectionList::CollectionList::Remove (iCollection *obj)
+  { return scfParent->Delete (obj); }
+bool csCollectionList::CollectionList::Remove (int n)
+  { return scfParent->Delete (n); }
+void csCollectionList::CollectionList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csCollectionList::CollectionList::Find (iCollection *obj) const
+  { return scfParent->Find (obj); }
+iCollection *csCollectionList::CollectionList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //---------------------------------------------------------------------------
 
@@ -244,6 +224,7 @@ bool csEngineMeshList::FreeItem (csSome Item)
 
 void csEngineMeshList::RemoveMesh (iMeshWrapper* mesh)
 {
+  // @@@ why that ???
   mesh->IncRef ();
   csMeshList::RemoveMesh (mesh);
   mesh->DecRef ();
@@ -288,7 +269,7 @@ csLight* csLightIt::Fetch ()
   // Try next light.
   light_idx++;
 
-  if (light_idx >= sector->scfiSector.GetLights ()->GetLightCount ())
+  if (light_idx >= sector->scfiSector.GetLights ()->GetCount ())
   {
     // Go to next sector.
     light_idx = -1;
@@ -297,7 +278,7 @@ csLight* csLightIt::Fetch ()
     return Fetch ();
   }
 
-  return sector->scfiSector.GetLights ()->GetLight (light_idx)
+  return sector->scfiSector.GetLights ()->Get (light_idx)
   	->GetPrivateObject ();
 }
 
@@ -479,14 +460,14 @@ iObject* csObjectIt::Fetch ()
   // Handle csLight.
   if (CurrentList == ITERATE_STATLIGHTS)
   {
-    if (cur_idx >= cur_sector->scfiSector.GetLights ()->GetLightCount ())
+    if (cur_idx >= cur_sector->scfiSector.GetLights ()->GetCount ())
       StartMeshes ();
     else
     {
       iLightList* ll = cur_sector->scfiSector.GetLights ();
       do
       {
-        iObject* rc = ll->GetLight (cur_idx)->QueryObject ();
+        iObject* rc = ll->Get (cur_idx)->QueryObject ();
         cur_idx++;
 	iStatLight* sl = SCF_QUERY_INTERFACE_FAST (rc, iStatLight);
 	if (sl)
@@ -497,8 +478,8 @@ iObject* csObjectIt::Fetch ()
               return rc;
 	}
       }
-      while (cur_idx < ll->GetLightCount ());
-      if (cur_idx >= ll->GetLightCount ())
+      while (cur_idx < ll->GetCount ());
+      if (cur_idx >= ll->GetCount ())
         StartMeshes ();
     }
   }
@@ -506,11 +487,11 @@ iObject* csObjectIt::Fetch ()
   // Handle csMeshWrapper.
   if (CurrentList == ITERATE_MESHES)
   {
-    if (cur_idx >= cur_sector->GetMeshes ()->GetMeshCount ())
+    if (cur_idx >= cur_sector->GetMeshes ()->GetCount ())
       CurrentList = ITERATE_SECTORS;
     else
     {
-      iObject* rc = cur_sector->GetMeshes ()->GetMesh (cur_idx)
+      iObject* rc = cur_sector->GetMeshes ()->Get (cur_idx)
       	->QueryObject ();
       cur_idx++;
       return rc;
@@ -778,10 +759,10 @@ void csEngine::DeleteAll ()
   // from the meshlist vector after the DecRef/Destruction happens.
   // With the loop below we simply make sure that the mesh is not destructed
   // while removing from the meshlist. ... norman
-  for (i=GetMeshes ()->GetMeshCount ()-1; i >= 0; i--)
+  for (i=GetMeshes ()->GetCount ()-1; i >= 0; i--)
   {
-    iMeshWrapper *imw = GetMeshes ()->GetMesh (i);
-    GetMeshes ()->RemoveMesh (imw); // this will IncRef before removal and DecRef afterward
+    iMeshWrapper *imw = GetMeshes ()->Get (i);
+    GetMeshes ()->Remove (imw); // this will IncRef before removal and DecRef afterward
   }
   mesh_factories.DeleteAll ();
 
@@ -1504,7 +1485,7 @@ void csEngine::ControlMeshes ()
   {
     iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
     if (sp->WantToDie ())
-      GetMeshes ()->RemoveMesh (sp);
+      GetMeshes ()->Remove (sp);
     i--;
   }
 }
@@ -1660,9 +1641,9 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
   if (flags & CS_NLIGHT_STATIC)
   {
     iLightList* ll = sector->scfiSector.GetLights ();
-    for (i = 0 ; i < ll->GetLightCount () ; i++)
+    for (i = 0 ; i < ll->GetCount () ; i++)
     {
-      iLight* l = ll->GetLight (i);
+      iLight* l = ll->Get (i);
       sqdist = csSquaredDist::PointPoint (pos, l->GetCenter ());
       if (sqdist < l->GetSquaredRadius ())
       {
@@ -1823,7 +1804,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
-  GetMeshes ()->AddMesh (&(thing_wrap->scfiMeshWrapper));
+  GetMeshes ()->Add (&(thing_wrap->scfiMeshWrapper));
   thing_wrap->GetMovable ().SetSector (&sector->scfiSector);
   thing_wrap->GetMovable ().UpdateMove ();
   thing_wrap->flags.Set (CS_ENTITY_CONVEX);
@@ -1965,7 +1946,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
+  GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
 
@@ -1985,7 +1966,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
+  GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
 
@@ -2009,7 +1990,7 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   plug->DecRef ();
   if (!mof) 
   { 
-    GetMeshFactories ()->RemoveMeshFactory (fact); 
+    GetMeshFactories ()->Remove (fact); 
     return NULL; 
   }
   fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
@@ -2034,7 +2015,7 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   csMeshWrapper* meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   iMeshWrapper* imw = &(meshwrap->scfiMeshWrapper);
-  GetMeshes ()->AddMesh (imw);
+  GetMeshes ()->Add (imw);
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2045,7 +2026,7 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, imw);
   plug->DecRef ();
-  if (!mof) {GetMeshes ()->RemoveMesh (imw); meshwrap->DecRef(); return NULL; }
+  if (!mof) {GetMeshes ()->Remove (imw); meshwrap->DecRef(); return NULL; }
   meshwrap->SetMeshObject ((iMeshObject*)mof);
   mof->DecRef ();
   return imw;
@@ -2056,7 +2037,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshFactoryWrapper* factory,
 {
   iMeshWrapper* mesh = factory->CreateMeshWrapper ();
   if (name) mesh->QueryObject ()->SetName (name);
-  GetMeshes ()->AddMesh (mesh);
+  GetMeshes ()->Add (mesh);
   if (sector)
   {
     mesh->GetMovable ()->SetSector (sector);
@@ -2071,7 +2052,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (NULL, mesh);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
+  GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   if (sector)
   {
     meshwrap->GetMovable ().SetSector (sector);
@@ -2085,7 +2066,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
+  GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;
 }
 

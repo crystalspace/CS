@@ -244,31 +244,22 @@ public:
 
   /// constructor
   csCollectionList ();
-  /// destructor
-  ~csCollectionList ();
-
-  /// Override FreeItem
-  virtual bool FreeItem (csSome Item);
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name);
-  /// Remove a collection.
-  virtual void RemoveCollection (iCollection* collection);
 
   class CollectionList : public iCollectionList
   {
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csCollectionList);
-    virtual int GetCollectionCount () const;
-    virtual iCollection *GetCollection (int idx) const;
-    virtual iCollection* NewCollection (const char* name)
-    {
-      return scfParent->NewCollection (name);
-    }
-    virtual void RemoveCollection (iCollection *collection)
-    {
-      scfParent->RemoveCollection (collection);
-    }
-    virtual iCollection *FindByName (const char *name) const;
-    virtual int Find (iCollection *collection) const;
+    virtual iCollection* NewCollection (const char* name);
+    virtual int GetCount () const;
+    virtual iCollection *Get (int n) const;
+    virtual int Add (iCollection *obj);
+    virtual bool Remove (iCollection *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iCollection *obj) const;
+    virtual iCollection *FindByName (const char *Name) const;
   } scfiCollectionList;
 };
 
@@ -276,7 +267,7 @@ CS_DECLARE_OBJECT_VECTOR (csCameraPositionListHelper, iCameraPosition);
 
 /**
  * List of camera positions for the engine. This class implements
- * iCameraPosition.
+ * iCameraPositionList.
  */
 class csCameraPositionList : public csCameraPositionListHelper
 {
@@ -285,31 +276,21 @@ public:
 
   /// constructor
   csCameraPositionList ();
-  /// destructor
-  ~csCameraPositionList ();
-
-  /// Override FreeItem
-  virtual bool FreeItem (csSome Item);
   /// New camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name);
-  /// Remove a camera position.
-  virtual void RemoveCameraPosition (iCameraPosition* campos);
 
   class CameraPositionList : public iCameraPositionList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCameraPositionList);
-    virtual int GetCameraPositionCount () const;
-    virtual iCameraPosition *GetCameraPosition (int idx) const;
-    virtual iCameraPosition* NewCameraPosition (const char* name)
-    {
-      return scfParent->NewCameraPosition (name);
-    }
-    virtual void RemoveCameraPosition (iCameraPosition *campos)
-    {
-      scfParent->RemoveCameraPosition (campos);
-    }
-    virtual iCameraPosition *FindByName (const char *name) const;
-    virtual int Find (iCameraPosition *campos) const;
+    virtual iCameraPosition* NewCameraPosition (const char* name);
+    virtual int GetCount () const;
+    virtual iCameraPosition *Get (int n) const;
+    virtual int Add (iCameraPosition *obj);
+    virtual bool Remove (iCameraPosition *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iCameraPosition *obj) const;
+    virtual iCameraPosition *FindByName (const char *Name) const;
   } scfiCameraPositionList;
 };
 
@@ -319,7 +300,7 @@ public:
 class csEngineMeshList : public csMeshList
 {
 public:
-  ~csEngineMeshList ();
+  virtual ~csEngineMeshList ();
   virtual bool FreeItem (csSome Item);
   virtual void RemoveMesh (iMeshWrapper* mesh);
 };

@@ -70,26 +70,20 @@ public:
 
   /// Override FreeItem
   virtual bool FreeItem (csSome Item);
-  /// Add a light.
-  virtual void AddLight (iLight* light);
-  /// Remove a light.
-  virtual void RemoveLight (iLight* light);
+  /// Override PrepareItem
+  virtual bool PrepareItem (csSome Item);
 
   class LightList : public iLightList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLightList);
-    virtual int GetLightCount () const;
-    virtual iLight *GetLight (int idx) const;
-    virtual void AddLight (iLight *light)
-    {
-      scfParent->AddLight (light);
-    }
-    virtual void RemoveLight (iLight *light)
-    {
-      scfParent->RemoveLight (light);
-    }
-    virtual iLight *FindByName (const char *name) const;
-    virtual int Find (iLight *light) const;
+    virtual int GetCount () const;
+    virtual iLight *Get (int n) const;
+    virtual int Add (iLight *obj);
+    virtual bool Remove (iLight *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iLight *obj) const;
+    virtual iLight *FindByName (const char *Name) const;
   } scfiLightList;
 };
 

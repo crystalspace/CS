@@ -49,18 +49,21 @@ csMovableSectorList::~csMovableSectorList ()
   DeleteAll ();
 }
 
-int csMovableSectorList::AddSector (iSector* sector)
+bool csMovableSectorList::PrepareItem (csSome item)
 {
-  int n = -1;
-  if (sector == NULL) return -1;
+  // check for a valid item and IncRef it
+  iSector* sector = (iSector*)item;
+  if (sector == NULL) return false;
+  sector->IncRef ();
+
+  // if the movable has a parent, no sectors can be added.
   CS_ASSERT (movable != NULL);
-  if (movable->GetParent () == NULL)
-  {
-    n = Push (sector);
-    movable->GetMeshWrapper ()->
-      MoveToSector (sector->GetPrivateObject ());
-  }
-  return n;
+  if (movable->GetParent ())
+    return false;
+
+  movable->GetMeshWrapper ()->
+    MoveToSector (sector->GetPrivateObject ());
+  return true;
 }
 
 bool csMovableSectorList::FreeItem (void *item)
@@ -79,7 +82,7 @@ int csMovableSectorList::SectorList::GetCount () const
 iSector *csMovableSectorList::SectorList::Get (int n) const
   { return scfParent->Get (n); }
 int csMovableSectorList::SectorList::Add (iSector *obj)
-  { return scfParent->AddSector (obj); }
+  { return scfParent->Push (obj); }
 bool csMovableSectorList::SectorList::Remove (iSector *obj)
   { return scfParent->Delete (obj); }
 bool csMovableSectorList::SectorList::Remove (int n)
@@ -149,7 +152,7 @@ void csMovable::SetSector (iSector* sector)
   if (sectors.Length () == 1 && sector == sectors[0])
     return;
   ClearSectors ();
-  sectors.AddSector (sector);
+  sectors.Push (sector);
 }
 
 void csMovable::ClearSectors ()

@@ -152,16 +152,16 @@ public:
  * FreeItem() and PopItem() functions. The vector still leaves the RefCount
  * of the contained objects untouched.
  */
-#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
-  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
+#define CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)		\
+  CS_PRIVATE_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR (NAME, TYPE)
 
 /**
  * Declare an object vector class which handles the reference count of the
  * contained object correctly and also contains overridable PrepareItem(),
  * FreeItem() and PopItem() functions.
  */
-#define CS_DECLARE_RESTRICED_ACCESS_OBJECT_VECTOR(NAME,TYPE)		\
-  CS_PRIVATE_DECLARE_RESTRICED_ACCESS_OBJECT_VECTOR (NAME, TYPE)
+#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
+  CS_PRIVATE_DECLARE_OBJECT_VECTOR (NAME, TYPE)
 
 //----------------------------------------------------------------------------
 //--- implementation of the above macros follows -----------------------------

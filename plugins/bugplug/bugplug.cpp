@@ -598,9 +598,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	  {
 	    iSector* sector = Engine->GetSectors ()->Get (i);
 	    iMeshList* ml = sector->GetMeshes ();
-	    for (j = 0 ; j < ml->GetMeshCount () ; j++)
+	    for (j = 0 ; j < ml->GetCount () ; j++)
 	    {
-	      iMeshWrapper* terr = ml->GetMesh (j);
+	      iMeshWrapper* terr = ml->Get (j);
 	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetMeshObject (),
 	      	iTerrFuncState);
 	      if (st)
@@ -994,22 +994,22 @@ void csBugPlug::Dump (iEngine* engine)
   Report (CS_REPORTER_SEVERITY_DEBUG,
     "%d sectors, %d mesh factories, %d mesh objects",
     sectors->GetCount (),
-    factories->GetMeshFactoryCount (),
-    meshes->GetMeshCount ());
+    factories->GetCount (),
+    meshes->GetCount ());
   int i;
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* sector = sectors->Get (i);
     Dump (sector);
   }
-  for (i = 0 ; i < factories->GetMeshFactoryCount () ; i++)
+  for (i = 0 ; i < factories->GetCount () ; i++)
   {
-    iMeshFactoryWrapper* meshfact = factories->GetMeshFactory (i);
+    iMeshFactoryWrapper* meshfact = factories->Get (i);
     Dump (meshfact);
   }
-  for (i = 0 ; i < meshes->GetMeshCount () ; i++)
+  for (i = 0 ; i < meshes->GetCount () ; i++)
   {
-    iMeshWrapper* mesh = meshes->GetMesh (i);
+    iMeshWrapper* mesh = meshes->Get (i);
     Dump (mesh);
   }
   Report (CS_REPORTER_SEVERITY_DEBUG, "===========================================");
@@ -1021,12 +1021,12 @@ void csBugPlug::Dump (iSector* sector)
   Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08lx)",
   	sn ? sn : "?", sector);
   Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
-  	sector->GetMeshes ()->GetMeshCount (),
-	sector->GetLights ()->GetLightCount ());
+  	sector->GetMeshes ()->GetCount (),
+	sector->GetLights ()->GetCount ());
   int i;
-  for (i = 0 ; i < sector->GetMeshes ()->GetMeshCount () ; i++)
+  for (i = 0 ; i < sector->GetMeshes ()->GetCount () ; i++)
   {
-    iMeshWrapper* mesh = sector->GetMeshes ()->GetMesh (i);
+    iMeshWrapper* mesh = sector->GetMeshes ()->Get (i);
     const char* n = mesh->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08lx)",
     	n ? n : "?", mesh);

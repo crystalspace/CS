@@ -55,18 +55,32 @@ SCF_VERSION (iCameraPositionList, 0, 0, 1);
 
 struct iCameraPositionList : public iBase
 {
-  /// Return the number of camera positions in this list.
-  virtual int GetCameraPositionCount () const = 0;
-  /// Return a single camera position.
-  virtual iCameraPosition *GetCameraPosition (int idx) const = 0;
   /// Create a new empty camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name) = 0;
+
+  /// Return the number of camera positions in this list
+  virtual int GetCount () const = 0;
+
+  /// Return a camera position by index
+  virtual iCameraPosition *Get (int n) const = 0;
+
+  /// Add a camera position
+  virtual int Add (iCameraPosition *obj) = 0;
+
   /// Remove a camera position
-  virtual void RemoveCameraPosition (iCameraPosition *campos) = 0;
-  /// Find a camera position by name
-  virtual iCameraPosition *FindByName (const char *name) const = 0;
+  virtual bool Remove (iCameraPosition *obj) = 0;
+
+  /// Remove the nth camera position
+  virtual bool Remove (int n) = 0;
+
+  /// Remove all camera positions
+  virtual void RemoveAll () = 0;
+
   /// Find a camera position and return its index
-  virtual int Find (iCameraPosition *campos) const = 0;
+  virtual int Find (iCameraPosition *obj) const = 0;
+
+  /// Find a camera position by name
+  virtual iCameraPosition *FindByName (const char *Name) const = 0;
 };
 
 #endif

@@ -361,12 +361,12 @@ void list_meshes (void)
   iMeshWrapper* mesh;
 
   iMeshList* meshes = Sys->Engine->GetMeshes ();
-  num_meshes = meshes->GetMeshCount ();
+  num_meshes = meshes->GetCount ();
 
   int i;
   for(i = 0; i < num_meshes; i++)
   {
-    mesh = meshes->GetMesh (i);
+    mesh = meshes->Get (i);
     mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
@@ -375,7 +375,7 @@ void list_meshes (void)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "A mesh with no name.");
   }
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "There are:%d meshes",
-	       Sys->Engine->GetMeshes ()->GetMeshCount ());
+	       Sys->Engine->GetMeshes ()->GetCount ());
 }
 
 //===========================================================================
@@ -603,9 +603,9 @@ void WalkTest::ParseKeyCmds (iObject* src)
   {
     int k;
     iMeshList* ml = mesh->GetChildren ();
-    for (k = 0 ; k < ml->GetMeshCount () ; k++)
+    for (k = 0 ; k < ml->GetCount () ; k++)
     {
-      iMeshWrapper* spr = ml->GetMesh (k);
+      iMeshWrapper* spr = ml->Get (k);
       ParseKeyCmds (spr->QueryObject ());
     }
     mesh->DecRef ();
@@ -623,14 +623,14 @@ void WalkTest::ParseKeyCmds ()
 
     int j;
     iMeshList* ml = sector->GetMeshes ();
-    for (j = 0 ; j < ml->GetMeshCount () ; j++)
+    for (j = 0 ; j < ml->GetCount () ; j++)
     {
-      iMeshWrapper* sprite = ml->GetMesh (j);
+      iMeshWrapper* sprite = ml->Get (j);
       ParseKeyCmds (sprite->QueryObject ());
     }
-    for (j = 0 ; j < sector->GetLights ()->GetLightCount () ; j++)
+    for (j = 0 ; j < sector->GetLights ()->GetCount () ; j++)
     {
-      iLight* l = sector->GetLights ()->GetLight (j);
+      iLight* l = sector->GetLights ()->Get (j);
       ParseKeyCmds (l->QueryObject ());
     }
   }
@@ -1726,7 +1726,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshList* meshes = Sys->Engine->GetMeshes ();
       iMeshWrapper* mesh = meshes->FindByName (name);
       if (mesh)
-        meshes->RemoveMesh (mesh);
+        meshes->Remove (mesh);
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Can't find mesh with that name!");

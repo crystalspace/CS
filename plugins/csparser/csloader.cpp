@@ -233,7 +233,7 @@ bool csLoader::ResolvePortalSectors (iThingState *th)
       // First we check if this sector already has some meshes.
       // If so then this is not a sector we have to resolve.
       // This test is here to make this code a little more robust.
-      if (stmp->GetMeshes ()->GetMeshCount () > 0) continue;
+      if (stmp->GetMeshes ()->GetCount () > 0) continue;
       iSector* snew = FindSector (stmp->QueryObject ()->GetName ());
       if (!snew)
       {
@@ -415,9 +415,9 @@ bool csLoader::LoadMap (char* buf)
       }
     }
     iMeshList* ml = Sector->GetMeshes ();
-    for (j=0 ; j < ml->GetMeshCount () ; j++)
+    for (j=0 ; j < ml->GetCount () ; j++)
     {
-      iMeshWrapper *Mesh = ml->GetMesh (j);
+      iMeshWrapper *Mesh = ml->Get (j);
       if (Mesh)
       {
         iThingState* Thing = SCF_QUERY_INTERFACE_SAFE (
@@ -738,7 +738,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 		name, fname);
       iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
       	->FindByName (name);
-      Engine->GetMeshFactories ()->RemoveMeshFactory (factwrap);
+      Engine->GetMeshFactories ()->Remove (factwrap);
       databuff->DecRef ();
       return NULL;
     }
@@ -871,8 +871,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  int i;
 	  iMeshFactoryList* mfl2 = stemp2->GetChildren ();
 	  iMeshFactoryList* mfl = stemp->GetChildren ();
-	  for (i=0; i<mfl2->GetMeshFactoryCount (); i++)
-	    mfl->AddMeshFactory (mfl2->GetMeshFactory (i));
+	  for (i=0; i<mfl2->GetCount (); i++)
+	    mfl->Add (mfl2->Get (i));
         }
         break;
 
@@ -896,7 +896,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    if (t) t->DecRef ();
 	    return false;
 	  }
-	  stemp->GetChildren ()->AddMeshFactory (t);
+	  stemp->GetChildren ()->Add (t);
 	  t->SetTransform (child_transf);
 	  t->DecRef ();
         }
@@ -1394,7 +1394,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
 	  sp->QueryObject ()->SetName (name);
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-          mesh->GetChildren ()->AddMesh (sp);
+          mesh->GetChildren ()->Add (sp);
 	  sp->DecRef ();
         }
         break;
@@ -1410,7 +1410,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	    return false;
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-          mesh->GetChildren ()->AddMesh (sp);
+          mesh->GetChildren ()->Add (sp);
 	  sp->DecRef ();
         }
         break;
@@ -2304,7 +2304,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
-	  Engine->GetMeshes ()->AddMesh (mesh);
+	  Engine->GetMeshes ()->Add (mesh);
 	  mesh->DecRef ();
         }
         break;
@@ -2333,7 +2333,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  {
 	    return NULL; // @@@ Leak
 	  }
-          sector->GetLights ()->AddLight (sl->QueryLight ());
+          sector->GetLights ()->Add (sl->QueryLight ());
 	  sl->DecRef ();
 	}
         break;

@@ -174,7 +174,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     {
       // impossible to query the correct interface, maybe because
       // of a version conflict
-      Engine->GetMeshFactories ()->RemoveMeshFactory (SubWrapper);
+      Engine->GetMeshFactories ()->Remove (SubWrapper);
       return NULL;
     }
     
@@ -184,7 +184,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
 
     if (MainWrapper)
     {
-      MainWrapper->GetChildren ()->AddMeshFactory (SubWrapper);
+      MainWrapper->GetChildren ()->Add (SubWrapper);
       /* @@@ remove the sub-wrapper from the iEngine again? */
     }
     else

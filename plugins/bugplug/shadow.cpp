@@ -138,7 +138,7 @@ void csShadow::SetShadowMesh (iMeshWrapper* sh)
 
 bool csShadow::AddToEngine (iEngine* engine)
 {
-  if (wrap) { engine->GetMeshes ()->RemoveMesh (wrap); wrap = NULL; }
+  if (wrap) { engine->GetMeshes ()->Remove (wrap); wrap = NULL; }
   if (engine->GetSectors ()->GetCount () <= 0) return false;
   wrap = engine->CreateMeshWrapper (this, "_@Shadow@_");
   wrap->SetRenderPriority (engine->GetAlphaRenderPriority ());
@@ -157,7 +157,7 @@ void csShadow::RemoveFromEngine (iEngine* engine)
 {
   if (wrap)
   {
-    engine->GetMeshes ()->RemoveMesh (wrap);
+    engine->GetMeshes ()->Remove (wrap);
     wrap = NULL;
   }
 }

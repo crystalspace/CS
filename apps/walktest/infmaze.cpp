@@ -155,7 +155,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 	1+rand1 (3),
   	csColor (rand1 (1), rand1 (1), rand1 (1)),
 	false);
-  room->GetLights ()->AddLight (light->QueryLight ());
+  room->GetLights ()->Add (light->QueryLight ());
   light->DecRef ();
 
   InfRoomData* ird = new InfRoomData ();
@@ -249,9 +249,9 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 
     int i;
     iMeshList* ml = is->GetMeshes ();
-    for (i = 0 ; i < ml->GetMeshCount () ; i++)
+    for (i = 0 ; i < ml->GetCount () ; i++)
     {
-      iMeshWrapper* mesh = ml->GetMesh (i);
+      iMeshWrapper* mesh = ml->Get (i);
       iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
@@ -261,9 +261,9 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       }
     }
     s->ShineLights ();
-    for (i = 0 ; i < ml->GetMeshCount () ; i++)
+    for (i = 0 ; i < ml->GetCount () ; i++)
     {
-      iMeshWrapper* mesh = ml->GetMesh (i);
+      iMeshWrapper* mesh = ml->Get (i);
       iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
       	iLightingInfo);
       if (linfo)

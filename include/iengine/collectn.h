@@ -57,18 +57,32 @@ SCF_VERSION (iCollectionList, 0, 0, 1);
 
 struct iCollectionList : public iBase
 {
-  /// Return the number of collections in this list.
-  virtual int GetCollectionCount () const = 0;
-  /// Return a single collection.
-  virtual iCollection *GetCollection (int idx) const = 0;
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name) = 0;
+
+  /// Return the number of collections in this list
+  virtual int GetCount () const = 0;
+
+  /// Return a collection by index
+  virtual iCollection *Get (int n) const = 0;
+
+  /// Add a collection
+  virtual int Add (iCollection *obj) = 0;
+
   /// Remove a collection
-  virtual void RemoveCollection (iCollection *collection) = 0;
-  /// Find a collection by name
-  virtual iCollection *FindByName (const char *name) const = 0;
+  virtual bool Remove (iCollection *obj) = 0;
+
+  /// Remove the nth collection
+  virtual bool Remove (int n) = 0;
+
+  /// Remove all collections
+  virtual void RemoveAll () = 0;
+
   /// Find a collection and return its index
-  virtual int Find (iCollection *collection) const = 0;
+  virtual int Find (iCollection *obj) const = 0;
+
+  /// Find a collection by name
+  virtual iCollection *FindByName (const char *Name) const = 0;
 };
 
 #endif // __IENGINE_COLLECTN_H__

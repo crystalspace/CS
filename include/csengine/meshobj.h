@@ -65,18 +65,14 @@ public:
   class MeshList : public iMeshList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
-    virtual int GetMeshCount () const;
-    virtual iMeshWrapper *GetMesh (int idx) const;
-    virtual void AddMesh (iMeshWrapper *mesh)
-    {
-      scfParent->AddMesh (mesh);
-    }
-    virtual void RemoveMesh (iMeshWrapper *mesh)
-    {
-      scfParent->RemoveMesh (mesh);
-    }
-    virtual iMeshWrapper *FindByName (const char *name) const;
-    virtual int Find (iMeshWrapper *mesh) const;
+    virtual int GetCount () const;
+    virtual iMeshWrapper *Get (int n) const;
+    virtual int Add (iMeshWrapper *obj);
+    virtual bool Remove (iMeshWrapper *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iMeshWrapper *obj) const;
+    virtual iMeshWrapper *FindByName (const char *Name) const;
   } scfiMeshList;
 };
 
@@ -110,8 +106,6 @@ public:
   /// destructor
   ~csMeshFactoryList ();
 
-  /// override FreeItem
-  virtual bool FreeItem (csSome Item);
   /// Add a mesh factory.
   virtual void AddMeshFactory (iMeshFactoryWrapper* mesh);
   /// Remove a mesh factory.
@@ -120,18 +114,14 @@ public:
   class MeshFactoryList : public iMeshFactoryList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
-    virtual int GetMeshFactoryCount () const;
-    virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const;
-    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh)
-    {
-      scfParent->AddMeshFactory (mesh);
-    }
-    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh)
-    {
-      scfParent->RemoveMeshFactory (mesh);
-    }
-    virtual iMeshFactoryWrapper *FindByName (const char *name) const;
-    virtual int Find (iMeshFactoryWrapper *mesh) const;
+    virtual int GetCount () const;
+    virtual iMeshFactoryWrapper *Get (int n) const;
+    virtual int Add (iMeshFactoryWrapper *obj);
+    virtual bool Remove (iMeshFactoryWrapper *obj);
+    virtual bool Remove (int n);
+    virtual void RemoveAll ();
+    virtual int Find (iMeshFactoryWrapper *obj) const;
+    virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
   } scfiMeshFactoryList;
 };
 

@@ -419,7 +419,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
     		rand1 (sector_light_max_blue-sector_light_min_blue)
 			+sector_light_min_blue),
 	false);
-    room->GetLights ()->AddLight (light->QueryLight ());
+    room->GetLights ()->Add (light->QueryLight ());
     light->DecRef ();
   }
 

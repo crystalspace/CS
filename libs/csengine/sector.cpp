@@ -78,34 +78,38 @@ csLightList::~csLightList ()
   DeleteAll ();
 }
 
+bool csLightList::PrepareItem (csSome Item)
+{
+  iLight* light = (iLight*)Item;
+  light->IncRef ();
+  light->SetSector (&(sector->scfiSector));
+  return true;
+}
+
 bool csLightList::FreeItem (csSome Item)
 {
   iLight* light = (iLight*)Item;
+  light->SetSector (NULL);
   light->DecRef ();
   return true;
 }
 
-void csLightList::AddLight (iLight *light)
-{
-  CS_ASSERT (sector != NULL);
-  Push (light);
-  light->SetSector (&(sector->scfiSector));
-}
-
-void csLightList::RemoveLight (iLight *light)
-{
-  int n = Find (light);
-  if (n >= 0) Delete (n); 
-}
-
-int csLightList::LightList::GetLightCount () const
-{ return scfParent->Length (); }
-iLight *csLightList::LightList::GetLight (int idx) const
-{ return scfParent->Get (idx); }
-iLight *csLightList::LightList::FindByName (const char *name) const
-{ return scfParent->FindByName (name); }
-int csLightList::LightList::Find (iLight *light) const
-{ return scfParent->Find (light); }
+int csLightList::LightList::GetCount () const
+  { return scfParent->Length (); }
+iLight *csLightList::LightList::Get (int n) const
+  { return scfParent->Get (n); }
+int csLightList::LightList::Add (iLight *obj)
+  { return scfParent->Push (obj); }
+bool csLightList::LightList::Remove (iLight *obj)
+  { return scfParent->Delete (obj); }
+bool csLightList::LightList::Remove (int n)
+  { return scfParent->Delete (n); }
+void csLightList::LightList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csLightList::LightList::Find (iLight *obj) const
+  { return scfParent->Find (obj); }
+iLight *csLightList::LightList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //---------------------------------------------------------------------------
 

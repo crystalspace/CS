@@ -30,7 +30,7 @@ class csMovable;
 class csMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
-CS_DECLARE_OBJECT_VECTOR_NOREF (csSectorVector, iSector);
+CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR (csSectorVector, iSector);
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public csSectorVector
@@ -45,7 +45,7 @@ public:
   ~csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
 
-  int AddSector (iSector* sec);
+  virtual bool PrepareItem (csSome item);
   virtual bool FreeItem (csSome item);
 
   class SectorList : public iSectorList

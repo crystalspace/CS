@@ -181,9 +181,9 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
     csSector* sector = (csSector*)entity;
     iSector* isector = &(sector->scfiSector);
     int i;
-    for (i = 0 ; i < isector->GetLights ()->GetLightCount () ; i++)
+    for (i = 0 ; i < isector->GetLights ()->GetCount () ; i++)
     {
-      csWfVertex* vt = wf->AddVertex (isector->GetLights ()->GetLight (i)->
+      csWfVertex* vt = wf->AddVertex (isector->GetLights ()->Get (i)->
         GetCenter ());
       vt->SetColor (wf->GetRed ());
     }

@@ -90,7 +90,7 @@ void csRegion::Region::DeleteAll ()
       iCollection* o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
 
-      scfParent->engine->GetCollections ()->RemoveCollection (o);
+      scfParent->engine->GetCollections ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
@@ -103,7 +103,7 @@ void csRegion::Region::DeleteAll ()
       iMeshWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMeshes ()->RemoveMesh (o);
+      scfParent->engine->GetMeshes ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
@@ -116,7 +116,7 @@ void csRegion::Region::DeleteAll ()
       iMeshFactoryWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
 
-      scfParent->engine->GetMeshFactories ()->RemoveMeshFactory (o);
+      scfParent->engine->GetMeshFactories ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
@@ -169,7 +169,7 @@ void csRegion::Region::DeleteAll ()
       iCameraPosition* o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
 
-      scfParent->engine->GetCameraPositions ()->RemoveCameraPosition (o);
+      scfParent->engine->GetCameraPositions ()->Remove (o);
       scfParent->ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();

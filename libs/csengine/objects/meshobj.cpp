@@ -168,7 +168,7 @@ void csMeshWrapper::RemoveFromSectors ()
   {
     iSector* ss = sectors->Get (i);
     if (ss)
-      ss->GetMeshes ()->RemoveMesh (&scfiMeshWrapper);
+      ss->GetMeshes ()->Remove (&scfiMeshWrapper);
   }
 }
 
@@ -306,9 +306,9 @@ void csMeshWrapper::PlaceMesh ()
   // for large sectors.
   int i, j;
   iMeshList* ml = sector->GetMeshes ();
-  for (i = 0 ; i < ml->GetMeshCount () ; i++)
+  for (i = 0 ; i < ml->GetCount () ; i++)
   {
-    iMeshWrapper* mesh = ml->GetMesh (i);
+    iMeshWrapper* mesh = ml->Get (i);
     iThingState* thing = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
 	iThingState);
     if (thing)
@@ -494,9 +494,9 @@ void csMeshWrapper::AddChild (iMeshWrapper* child)
   // First unlink the mesh from the engine or another parent.
   iMeshWrapper *oldParent = child->GetParentContainer ();
   if (oldParent)
-    oldParent->GetChildren ()->RemoveMesh (child);
+    oldParent->GetChildren ()->Remove (child);
   else
-    csEngine::current_engine->GetMeshes ()->RemoveMesh (child);
+    csEngine::current_engine->GetMeshes ()->Remove (child);
 
   child->SetParentContainer (&scfiMeshWrapper);
   children.Push (child);
@@ -596,7 +596,7 @@ csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
   {
     csMeshFactoryWrapper* childfact = children.Get (i)->GetPrivateObject ();
     csMeshWrapper* relchild = childfact->NewMeshObject ();
-    meshObj->scfiMeshWrapper.GetChildren ()->AddMesh (
+    meshObj->scfiMeshWrapper.GetChildren ()->Add (
     	&(relchild->scfiMeshWrapper));
     relchild->GetMovable ().SetTransform (childfact->GetTransform ());
     relchild->GetMovable ().UpdateMove ();
@@ -698,14 +698,22 @@ void csMeshList::RemoveMesh (iMeshWrapper *mesh)
   if (n >= 0) Delete (n); 
 }
 
-int csMeshList::MeshList::GetMeshCount () const
-{ return scfParent->Length (); }
-iMeshWrapper *csMeshList::MeshList::GetMesh (int idx) const
-{ return scfParent->Get (idx); }
-iMeshWrapper *csMeshList::MeshList::FindByName (const char *name) const
-{ return scfParent->FindByName (name); }
-int csMeshList::MeshList::Find (iMeshWrapper *mesh) const
-{ return scfParent->Find (mesh); }
+int csMeshList::MeshList::GetCount () const
+  { return scfParent->Length (); }
+iMeshWrapper *csMeshList::MeshList::Get (int n) const
+  { return scfParent->Get (n); }
+int csMeshList::MeshList::Add (iMeshWrapper *obj)
+  { scfParent->AddMesh (obj); return true; }
+bool csMeshList::MeshList::Remove (iMeshWrapper *obj)
+  { scfParent->RemoveMesh (obj); return true; }
+bool csMeshList::MeshList::Remove (int n)
+  { scfParent->RemoveMesh (scfParent->Get (n)); return true; }
+void csMeshList::MeshList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csMeshList::MeshList::Find (iMeshWrapper *obj) const
+  { return scfParent->Find (obj); }
+iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //--------------------------------------------------------------------------
 
@@ -742,14 +750,6 @@ csMeshFactoryList::~csMeshFactoryList ()
   DeleteAll ();
 }
 
-bool csMeshFactoryList::FreeItem (csSome Item)
-{
-  iMeshFactoryWrapper* mesh = (iMeshFactoryWrapper*)Item;
-  mesh->DecRef ();
-  Item = NULL;
-  return true;
-}
-
 void csMeshFactoryList::AddMeshFactory (iMeshFactoryWrapper *mesh)
 {
   Push (mesh);
@@ -761,16 +761,22 @@ void csMeshFactoryList::RemoveMeshFactory (iMeshFactoryWrapper *mesh)
   if (n >= 0) Delete (n); 
 }
 
-int csMeshFactoryList::MeshFactoryList::GetMeshFactoryCount () const
-{ return scfParent->Length (); }
-iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::GetMeshFactory (
-	int idx) const
-{ return scfParent->Get (idx); }
-iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (
-	const char *name) const
-{ return scfParent->FindByName (name); }
-int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *mesh) const
-{ return scfParent->Find (mesh); }
+int csMeshFactoryList::MeshFactoryList::GetCount () const
+  { return scfParent->Length (); }
+iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::Get (int n) const
+  { return scfParent->Get (n); }
+int csMeshFactoryList::MeshFactoryList::Add (iMeshFactoryWrapper *obj)
+  { scfParent->AddMeshFactory (obj); return true; }
+bool csMeshFactoryList::MeshFactoryList::Remove (iMeshFactoryWrapper *obj)
+  { scfParent->RemoveMeshFactory (obj); return true; }
+bool csMeshFactoryList::MeshFactoryList::Remove (int n)
+  { scfParent->RemoveMeshFactory (scfParent->Get (n)); return true; }
+void csMeshFactoryList::MeshFactoryList::RemoveAll ()
+  { scfParent->DeleteAll (); }
+int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
+  { return scfParent->Find (obj); }
+iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (const char *Name) const
+  { return scfParent->FindByName (Name); }
 
 //--------------------------------------------------------------------------
 

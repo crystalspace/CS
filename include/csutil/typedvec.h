@@ -412,15 +412,15 @@ public:
  * details.
  */
 #define CS_PRIVATE_DECLARE_TYPED_RESTR_ACC_VECTOR(NAME,TYPE,sclass)	\
-  class NAME : sclass							\
+  class NAME : private sclass						\
   {									\
   protected:								\
     typedef sclass superclass;						\
-    inline bool PrepareItem (csSome item)				\
+    virtual bool PrepareItem (csSome item)				\
     { return superclass::PrepareItem (item); }				\
-    inline bool PopItem (csSome item)					\
+    virtual bool PopItem (csSome item)					\
     { return superclass::PopItem (item); }				\
-    inline bool FreeItem (csSome item)					\
+    virtual bool FreeItem (csSome item)					\
     { return superclass::FreeItem (item); }				\
   public:								\
     inline bool Delete (int n)						\
