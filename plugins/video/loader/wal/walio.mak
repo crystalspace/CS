@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make walimg      Make the $(DESCRIPTION.walimg)$"
+  $(NEWLINE)echo $"  make walimg       Make the $(DESCRIPTION.walimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walimg walimgclean
-all plugins drivers: walimg
+all plugins: walimg
 
 walimg:
 	$(MAKE_TARGET) MAKE_DLL=yes

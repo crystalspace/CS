@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make bmpimg      Make the $(DESCRIPTION.bmpimg)$"
+  $(NEWLINE)echo $"  make bmpimg       Make the $(DESCRIPTION.bmpimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: bmpimg bmpimgclean
-all plugins drivers: bmpimg
+all plugins: bmpimg
 
 bmpimg:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make pngimg      Make the $(DESCRIPTION.pngimg)$"
+  $(NEWLINE)echo $"  make pngimg       Make the $(DESCRIPTION.pngimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: pngimg pngimgclean
-all plugins drivers: pngimg
+all plugins: pngimg
 
 pngimg:
 	$(MAKE_TARGET) MAKE_DLL=yes

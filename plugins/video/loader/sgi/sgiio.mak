@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make sgiimg      Make the $(DESCRIPTION.sgiimg)$"
+  $(NEWLINE)echo $"  make sgiimg       Make the $(DESCRIPTION.sgiimg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: sgiimg sgiimgclean
-all plugins drivers: sgiimg
+all plugins: sgiimg
 
 sgiimg:
 	$(MAKE_TARGET) MAKE_DLL=yes

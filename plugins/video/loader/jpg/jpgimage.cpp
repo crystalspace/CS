@@ -46,7 +46,9 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_FACTORY (csJPGImageIO);
 
 EXPORT_CLASS_TABLE (csjpgimg)
-  EXPORT_CLASS (csJPGImageIO, "crystalspace.graphic.image.io.jpg", "CrystalSpace JPG image format I/O plugin")
+  EXPORT_CLASS (csJPGImageIO,
+    "crystalspace.graphic.image.io.jpg",
+    "CrystalSpace JPG image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
 #define JPG_MIME "image/jpg"
@@ -119,8 +121,7 @@ static void init_destination (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
   dest->buffer = (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, 
-						     JPOOL_IMAGE,
-						     sizeof(JOCTET) * my_dst_mgr::buf_len);
+    JPOOL_IMAGE, sizeof(JOCTET) * my_dst_mgr::buf_len);
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = my_dst_mgr::buf_len;
 }
@@ -130,10 +131,11 @@ static boolean empty_output_buffer (j_compress_ptr cinfo)
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 
   dest->ds->data = (unsigned char*)realloc (dest->ds->data, 
-					    dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
+    dest->ds->len + sizeof(JOCTET) * my_dst_mgr::buf_len);
   if (!dest->ds->data)
     ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
-  memcpy (dest->ds->data + dest->ds->len, dest->buffer, sizeof(JOCTET) * my_dst_mgr::buf_len);
+  memcpy (dest->ds->data + dest->ds->len, dest->buffer,
+    sizeof(JOCTET) * my_dst_mgr::buf_len);
   dest->pub.next_output_byte = dest->buffer;
   dest->pub.free_in_buffer = my_dst_mgr::buf_len;
   dest->ds->len += sizeof(JOCTET) * my_dst_mgr::buf_len;
@@ -148,10 +150,11 @@ static void term_destination (j_compress_ptr cinfo)
   
   if (len > 0)
   {
-    dest->ds->data = (unsigned char*)realloc (dest->ds->data, dest->ds->len + sizeof(JOCTET) * len);
+    dest->ds->data = (unsigned char*)realloc (dest->ds->data,
+      dest->ds->len + sizeof(JOCTET) * len);
     if (!dest->ds->data)
       ERREXITS(cinfo,JERR_OUT_OF_MEMORY, "Could not reallocate enough memory");
-    memcpy (dest->ds->data + dest->ds->len, dest->buffer, sizeof(JOCTET) * len);
+    memcpy(dest->ds->data + dest->ds->len, dest->buffer, sizeof(JOCTET) * len);
     dest->ds->len += sizeof(JOCTET) * len;
   }
 }
@@ -161,11 +164,8 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
   my_dst_mgr *dest;
 
   if (cinfo->dest == NULL)
-  {
-    cinfo->dest = (struct jpeg_destination_mgr*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
-							  JPOOL_PERMANENT,
-							  sizeof(my_dst_mgr));
-  }
+    cinfo->dest = (struct jpeg_destination_mgr*)(*cinfo->mem->alloc_small)
+      ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(my_dst_mgr));
 
   dest = (my_dst_mgr*)cinfo->dest;
   dest->pub.init_destination = init_destination;
@@ -189,11 +189,9 @@ void csJPGImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csJPGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*)
 {
-
   int format = Image->GetFormat ();
-
   switch (format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:
@@ -203,8 +201,7 @@ iDataBuffer *csJPGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
       return NULL;
   } /* endswitch */
 
-
-  csRGBcolor *row=NULL;
+  csRGBcolor* volatile row = NULL;
   struct jpg_datastore ds;
   struct jpeg_compress_struct cinfo;
   struct my_error_mgr jerr;
