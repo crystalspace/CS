@@ -40,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	  longer assumes unconditionally that libm.a is present.  Not all
 	  platforms have libm.a
 	- Eric Sunshine removed scftutor for lack of obvious usefulness.
+	- Eric Sunshine hacked the cslight run in install.mak to work with
+	  MacOS/X.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find

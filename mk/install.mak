@@ -274,12 +274,19 @@ install_all: \
   install_root \
   install_logfile
 	@echo $"$"
-	@echo $"Calculating Lightmaps...$"
+	@echo $"Creating Lightmaps...$"
 	@echo $"------------------------$"
-	@echo $"It is possible that the following lighting run fails. $"
-	@echo $"(esp. on MacOS/X) start walktest with -relight then.$"
-	-CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null flarge
-	-CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null partsys
+	@echo $"If this fails, use the -relight option when viewing maps$"
+	@echo $"for the first time with Walktest.$"
+	-CRYSTAL=$"$(INSTALL_DIR)$" \
+	if test -f $(INSTALL_DIR)/bin/cslight.app/Contents/MacOS/cslight ; \
+	then \
+	$(INSTALL_DIR)/bin/cslight.app/Contents/MacOS/cslight -video=null flarge ; \
+	$(INSTALL_DIR)/bin/cslight.app/Contents/MacOS/cslight -video=null partsys ; \
+	else \
+	$(INSTALL_DIR)/bin/cslight -video=null flarge ; \
+	$(INSTALL_DIR)/bin/cslight -video=null partsys ; \
+	fi
 	@echo $"$"
 	@echo $"Installation complete$"
 	@echo $"---------------------$"
