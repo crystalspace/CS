@@ -80,7 +80,7 @@ bool csPython::Initialize(iSystem* iSys) {
   if(!LoadModule("cspace"))
     return 0;
 
-  Mode=MSG_CONSOLE;
+  Mode=MSG_STDOUT;
 
   return 1;
 }
@@ -116,7 +116,7 @@ bool csPython::LoadModule(const char* name) {
 
 void csPython::Print(bool Error, const char *msg) {
   if(Error) {
-    Sys->Printf(MSG_WARNING, csString("CrystalScript Error: ")+msg);
+    Sys->Printf(MSG_FATAL_ERROR, csString("CrystalScript Error: ")+msg);
   } else {
     Sys->Printf(Mode, msg);
   }

@@ -10,7 +10,7 @@
 
 #include "isystem.h"
 #include "csparser/csloader.h"
-#include "cspython.h"
+#include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem() {
 	return thisclass->Sys;
 }
@@ -235,6 +235,7 @@ struct iWorld:public iPlugIn {
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName) = 0;
   virtual iSector *FindSector (const char *iName) = 0;
+  virtual iSector *GetSector (int idx) = 0;
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
 };

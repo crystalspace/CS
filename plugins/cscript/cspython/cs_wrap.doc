@@ -488,6 +488,8 @@ CreateSector(iName)
 
 FindSector(iName)
 
+GetSector(idx)
+
 CreateThing(iName,iParent)
 
 FindMaterial(iName)

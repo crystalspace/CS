@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+27-Oct-2000
+	- Added GetSector(idx) to the swig interface file (cs.i) so that
+	  Python scripts can use it.
+26-Oct-2000
+	- Norman Kramer added suggestsize to inputline and listbox in CSWS.
+	- Norman also fixed disappearing elements in gridbaglayout.
+	- Norman uses the original size of the component and not the one
+	  after last resize.
+25-Oct-2000
+	- Brandon Ehle turned off console printing for the python
+	  script plugin.
 24-Oct-2000
 	- Philip Wyett eliminated a compiler warning in
 	  csFlowLayout::SuggestSize().
