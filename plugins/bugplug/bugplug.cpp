@@ -1220,7 +1220,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "BugPlug %s shadow debugging.",
-	    do_shadow_debug ? "disabled" : "enabled");
+	    do_shadow_debug ? "enabled" : "disabled");
         break;
 #endif
     }

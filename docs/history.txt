@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 
 13-Apr-2003
 	- Matze cleaned some jamrules.
+	- res fixed the swapped "enabled"/"disabled" in shadow debug
+	  toggle notification.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in
