@@ -16,7 +16,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all: csconfig
 csconfig:
-	$(MAKE_TARGET)
+	$(MAKE_TARGET) DO_CREATE_CSCONFIG=yes
 csconfigclean:
 	$(MAKE_CLEAN)
 
@@ -31,16 +31,11 @@ CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 
-endif
+# This section is specially protected by DO_INSTALL in order to prevent
+# execution of sed commands for _all_ other build targets.  DO_CREATE_CSCONFIG
+# is only defined when the top-level 'csconfig' target is invoked.
 
-#----------------------------------------------------------------- targets ---#
-ifeq ($(MAKESECTION),targets)
-
-.PHONY: csconfig csconfigclean
-
-all: $(CSCONFIG.EXE)
-csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
-clean: csconfigclean
+ifeq ($(DO_CREATE_CSCONFIG),yes)
 
 CSCONFIG.VERFILE := include/csver.h
 CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
@@ -66,6 +61,22 @@ CSCONFIG.DO.SHARED.PLUGIN.POSTAMBLE = \
   $(subst $@,$$@,$(DO.SHARED.PLUGIN.POSTAMBLE))
 CSCONFIG.PLUGIN.POSTFLAGS = \
   $(subst $@,$$@,$(PLUGIN.POSTFLAGS))
+
+endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
+
+.PHONY: csconfig csconfigclean
+
+all: $(CSCONFIG.EXE)
+clean: csconfigclean
+
+ifeq ($(DO_CREATE_CSCONFIG),yes)
+
+csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
 
 # Create csconfig.tmp for the make variables that need to be transferred.
 $(CSCONFIG.EXE): $(CSCONFIG.DEP)
@@ -115,6 +126,8 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 
 	@chmod +x cs-config
 	
+endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
+
 csconfigclean:
 	-$(RM) $(CSCONFIG.EXE) 
 

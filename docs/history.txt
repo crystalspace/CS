@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  change will eliminate the annoying MacOS/X (Apple/NeXT) linker
 	  warnings about non-existent directories.
 	- Eric Sunshine eliminated a number of compilation warnings in csutil.
+	- Eric Sunshine fixed csconf.mak so that it only executes the sed
+	  commands when the top-level `csconfig' target is invoked, rather than
+	  when _any_ target is invoked.
 14-Aug-2002
 	- Removed CreateElement(), CreateText(), and CreateComment() again.
 	  Will do this differently.
