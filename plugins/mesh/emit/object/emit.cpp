@@ -79,7 +79,7 @@ struct csEmitCompPart {
 
 /// growing drawing sort array
 CS_TYPEDEF_GROWING_ARRAY (csCompPartArray, struct csEmitCompPart);
-static csCompPartArray cpa;
+CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,)
 
 /// utility function
 static float GetRandomFloat(float min, float max)
@@ -586,6 +586,8 @@ static int compareparticle(const void* p1, const void* p2)
 bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
         csZBufMode mode)
 {
+  static csCompPartArray *cpa = GetStaticCompPartArray ();
+
   // detect if back to front is needed.
   if(MixMode & CS_FX_ADD)
     return csParticleSystem::Draw(rview, movable, mode);
@@ -598,17 +600,17 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   int i;
   csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform()
     * trans.GetInverse(); // object to camera space
-  cpa.SetLength(number);
+  cpa->SetLength(number);
   for (i = 0 ; i < number ; i++)
   {
-    cpa[i].z = (tr_o2c * part_pos[i]).z;
-    cpa[i].part = GetParticle(i);
+    (*cpa)[i].z = (tr_o2c * part_pos[i]).z;
+    (*cpa)[i].part = GetParticle(i);
   }
-  qsort(cpa.GetArray(), number, sizeof( struct csEmitCompPart ),
+  qsort(cpa->GetArray(), number, sizeof( struct csEmitCompPart ),
     compareparticle);
-
+  
   for (i = 0 ; i < number ; i++)
-    cpa[i].part->Draw (rview, trans, mode);
+    (*cpa)[i].part->Draw (rview, trans, mode);
 
   return true;
 }
