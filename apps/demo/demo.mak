@@ -31,7 +31,7 @@ OUT.CSDEMO = $(OUT)/$(DIR.CSDEMO)
 INC.CSDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSDEMO)/*.h))
 SRC.CSDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSDEMO)/*.cpp))
 OBJ.CSDEMO = $(addprefix $(OUT.CSDEMO)/,$(notdir $(SRC.CSDEMO:.cpp=$O)))
-DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
+DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS CSUTIL
 LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
 CFG.CSDEMO = $(SRCDIR)/data/config/csdemo.cfg
 
