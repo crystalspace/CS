@@ -1,5 +1,7 @@
 SubDir TOP plugins mesh particles physics ode ;
 
+if $(ODE.AVAILABLE) = "yes" 
+{
 Help partphys_ode : "Particle ODE-based Physics plug-in" ;
 
 Plugin partphys_ode
@@ -8,4 +10,4 @@ Plugin partphys_ode
 LinkWith partphys_ode : csutil csgeom ;
 
 CompileGroups partphys_ode :  meshes ;
-
+}

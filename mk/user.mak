@@ -184,6 +184,7 @@ endif
 ifeq ($(ODE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += physics/odedynam
 PLUGINS.DYNAMIC += physics/loader
+PLUGINS.DYNAMIC += mesh/particles/physics/ode
 endif
 ifeq ($(LINUXJOYSTICK.AVAILABLE),yes)
 PLUGINS.DYNAMIC += device/joystick/linux
