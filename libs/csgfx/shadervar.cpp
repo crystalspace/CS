@@ -129,7 +129,7 @@ bool csShaderVariable::SetValue(iString* value)
   floats[0] = floats[1] = floats[2] = 0.0f;
   floats[3] = 1.0f;
   sscanf (value->GetData (), "%f %f %f %f", 
-    floats[0], floats[1], floats[2], floats[3]);
+    &floats[0], &floats[1], &floats[2], &floats[3]);
   VectorValue.Set (floats[0], floats[1], floats[2], floats[3]);
   Int = (int)VectorValue.x;
   return true; 
