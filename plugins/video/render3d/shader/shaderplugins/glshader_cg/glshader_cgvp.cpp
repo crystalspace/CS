@@ -44,7 +44,7 @@ SCF_IMPLEMENT_IBASE(csShaderGLCGVP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csShaderGLCGVP::Activate(csRenderMesh* mesh)
+void csShaderGLCGVP::Activate()
 {
   int i;
 
@@ -187,6 +187,12 @@ void csShaderGLCGVP::ResetState()
 {
 }
 
+bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticDomains)
+{
+  // i guess here should be the code from Prepare()
+  return false;
+}
+
 bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
 {
   if(!programstring)
@@ -213,7 +219,7 @@ void csShaderGLCGVP::BuildTokenHash()
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  //xmltokens.Register("string", 100+csShaderVariable::STRING);
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
@@ -266,9 +272,10 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
         case XMLTOKEN_DECLARE:
           {
             //create a new variable
-            csRef<csShaderVariable> var = shadermgr->CreateVariable (
-              strings->Request(child->GetAttributeValue ("name")));
-
+            csRef<csShaderVariable> var = 
+	      csPtr<csShaderVariable>(new csShaderVariable ( strings->
+							     Request (child->
+								      GetAttributeValue ("name"))));
             // @@@ Will leak! Should do proper refcounting.
             var->IncRef ();
 
@@ -284,10 +291,10 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
               case csShaderVariable::FLOAT:
                 var->SetValue (child->GetAttributeValueAsFloat("default"));
                 break;
-              case csShaderVariable::STRING:
-                var->SetValue (new scfString (child->GetAttributeValue (
-			"default")));
-                break;
+		//case csShaderVariable::STRING:
+                //var->SetValue (new scfString (child->GetAttributeValue (
+		//	"default")));
+                //break;
               case csShaderVariable::VECTOR3:
                 const char* def = child->GetAttributeValue("default");
                 csVector3 v;
@@ -322,7 +329,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
   return true;
 }
 
-  
+/*  
 bool csShaderGLCGVP::Prepare(iShaderPass *pass)
 {
   if (!LoadProgramStringToGL(programstring))
@@ -450,3 +457,4 @@ bool csShaderGLCGVP::Prepare(iShaderPass *pass)
   }
   return true;
 }
+*/

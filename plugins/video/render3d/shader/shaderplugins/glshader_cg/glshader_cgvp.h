@@ -20,7 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CGVP_H__
 #define __GLSHADER_CGVP_H__
 
-#include "ivideo/shader/shader.h"
+#include "../../common/shaderplugin.h"
 #include "csutil/strhash.h"
 
 #include <Cg/cg.h>
@@ -71,7 +71,7 @@ private:
   bool validProgram;
 
   csShaderVariableContextHelper svContextHelper;
-  csShaderVariableList dynamicVars;
+  csShaderVariableProxyList dynamicVars;
 public:
   SCF_DECLARE_IBASE;
 
@@ -101,7 +101,7 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(csRenderMesh* mesh);
+  virtual void Activate();
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate();
@@ -122,11 +122,14 @@ public:
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
+  /// Compile a program
+  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
+
   /**
    * Prepares the shaderprogram for usage. Must be called before the shader
    * is assigned to a material.
    */
-  virtual bool Prepare(iShaderPass *pass);
+  //virtual bool Prepare(iShaderPass *pass);
 
   //=================== iShaderVariableContext ================//
   /// Add a variable to this context
@@ -138,8 +141,8 @@ public:
   { return svContextHelper.GetVariable (name); }
 
   /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-  { svContextHelper.FillVariableList (list); }
+  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
+  { return svContextHelper.FillVariableList (list); }
 
   /// Get a named variable from this context, and any context above/outer
   virtual csShaderVariable* GetVariableRecursive (csStringID name) const
