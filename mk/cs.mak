@@ -72,7 +72,7 @@ endif
 ############################################
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
-  $(CFLAGS.I)./plugins $(CFLAGS.I)./apps $(CFLAGS.I)./support
+  $(CFLAGS.I)./plugins $(CFLAGS.I)./apps
   
 CFLAGS=$(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.GENERAL) $(CFLAGS.$(MODE))
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
