@@ -135,13 +135,12 @@ void InternalScanPluginDir (iStringArray*& messages,
           csp.Insert (0, PATH_SEPARATOR);
           csp.Insert (0, dir);
 
-printf("* %s\n", csp.GetData());
-          if (plugins->FindContent (csp) == -1)
+          if (plugins->Find (csp) == -1)
           {
 	    csString scffilepath;
 	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
 	  
-	    plugins->Push (csStrNew (scffilepath));
+	    plugins->Push (scffilepath);
           }
         }
         else if (n >= 3 && strcasecmp(de->d_name + n - 3, ".so") == 0)
@@ -173,7 +172,7 @@ printf("* %s\n", csp.GetData());
                 csString message;
                 message.Format ("Warning: both %s and %s found, using %s.",
                   de->d_name, csp.GetData (), de->d_name);
-                messages->Push (csStrNew (message));
+                messages->Push (message);
                 int index = plugins->Find (csp);
                 if (index != -1) plugins->DeleteIndex (index);
               }
@@ -181,7 +180,7 @@ printf("* %s\n", csp.GetData());
 	      csString scffilepath;
 	      scffilepath << dir << PATH_SEPARATOR << de->d_name;
 	  
-	      plugins->Push (csStrNew (scffilepath));
+	      plugins->Push (scffilepath);
             }
 
             bfd_close (abfd);
@@ -225,10 +224,8 @@ csRef<iStringArray> csScanPluginDir (const char* dir,
   if (!plugins)
     plugins.AttachNew (new scfStringArray ());
 
-  InternalScanPluginDir (messages, dir, plugins, 
-    recursive);
+  InternalScanPluginDir (messages, dir, plugins, recursive);
  
-for (int i = 0; i < plugins->Length (); i++) printf("%s\n", plugins->Get(i));
   return csPtr<iStringArray> (messages);
 }
 
@@ -263,6 +260,5 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
     }
   }
  
-for (int i = 0; i < plugins->Length (); i++) printf("%s\n", plugins->Get(i));
   return csPtr<iStringArray> (messages);
 }

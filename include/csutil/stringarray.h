@@ -133,31 +133,26 @@ public:
   }
 
   /**
-   * Call csArray::Find(what).
+   * Find a string, case-sensitive. Returns -1 if not found, else item index.
+   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  int Find (const char *what) const
-  {
-    return superclass::Find (what);
-  }
-
-  /**
-   * This version of Find compares the contents of the string instead of just
-   * the char pointers.
-   */
-  int FindContent (const char *what) const
+  int Find (const char* what) const
   {
     for (int i = 0; i < Length (); i++)
-      if (strcmp (Get (i), what)) return i;
+      if (strcmp (Get (i), what))
+        return i;
     return -1;
   }
 
   /**
-   * Case insensitive version of FindContent().
+   * Find a string, case-insensitive. Returns -1 if not found, else item index.
+   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
    */
-  int FindCaseContent (const char *what) const
+  int FindCaseInsensitive (const char* what) const
   {
     for (int i = 0; i < Length (); i++)
-      if (strcasecmp (Get (i), what)) return i;
+      if (strcasecmp (Get (i), what))
+        return i;
     return -1;
   }
 };

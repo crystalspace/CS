@@ -40,6 +40,19 @@ chronological order.
 	  .csplugin files at the same time (but not for the same plugin).
 	- Oktal fixed an off-by-one bug in csHash::Iterator.
 	- Oktal changed csHash::DeleteAll() from void to bool.
+	- Eric Sunshine made the following changes:
+	    - Removed the pointless csStringArray::Find() method which did
+	      pointer comparisions.  This would never succeed under normal
+	      circumstances.  Ditto for iStringArray and scfStringArray.
+	    - Renamed csStringArray::FindContent() and FindCaseContent() to
+	      Find() and FindCaseInsensitive().  Ditto for iStringArray and
+	      scfStringArray.
+	    - Fixed several memory leaks in bfdplugins.cpp where it was leaking
+	      strings added to various string arrays.  (The string array Push()
+	      method makes its own copy of the incoming string, so calling code
+	      should not duplicate the string on the array's behalf.)
+	    - Simplified some csStringArray::Push() invocations in
+	      win32/loadlib.cpp.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate

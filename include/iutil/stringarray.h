@@ -44,14 +44,17 @@ struct iStringArray : public iBase
   /// Get Nth string in vector.
   virtual char const *Get (int n) const = 0;
 
-  /// Find index of given string pointer.
+  /**
+   * Find a string, case-sensitive. Returns -1 if not found, else item index.
+   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
+   */
   virtual int Find (const char *value) const = 0;
 
-  /// Find index of given string contents.
-  virtual int FindContent (const char *value) const = 0;
-
-  /// Case insensitive version of FindContent.
-  virtual int FindCaseContent (const char *value) const = 0;
+  /**
+   * Find a string, case-insensitive. Returns -1 if not found, else item index.
+   * Works with unsorted arrays.  For sorted arrays, FindSortedKey() is faster.
+   */
+  virtual int FindCaseInsensitive (const char *value) const = 0;
 
   /// Find index of a string in a pre-sorted string array.
   virtual int FindSortedKey (const char *value) const = 0;
