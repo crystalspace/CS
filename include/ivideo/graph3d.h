@@ -47,6 +47,7 @@ class csReversibleTransform;
 
 struct iGraphics2D;
 struct iPolygonBuffer;
+struct iPolygonRenderer;
 struct iVertexBuffer;
 struct iVertexBufferManager;
 struct iTextureManager;
@@ -62,7 +63,6 @@ struct csPolyTextureMapping;
 struct iRenderBuffer;
 struct iRenderBufferManager;
 struct iLightingManager;
-struct iPolygonRenderer;
 struct iShader;
 struct iShaderVariableContext;
 
@@ -158,7 +158,7 @@ enum csZBufMode
   /// use the z mode of the mesh (NOTE: NOT VALID AS MESH ZMODE)
   CS_ZBUF_MESH     = 0x00000007,
   /**
-   * Use a z mode depending of the mesh zmode.
+   * Use a z mode depending on the mesh zmode.
    * The mesh zmode is used a to choose a zmode that makes sure only pixels
    * that are changed by the mesh zmode can be touched, e.g. if the mesh has a
    * zmode of "zuse", zmesh2 will resolve to "ztest". This is useful for multi-
@@ -249,7 +249,12 @@ enum G3D_FOGMETHOD
 /// =(dstalpha)*SRC + DST
 #define CS_FX_DESTALPHAADD 0x60000000 
 /// =(srcalpha)*SRC + DST
-#define CS_FX_SRCALPHAADD  0x70000000 
+#define CS_FX_SRCALPHAADD  0x70000000
+/**
+  * Use the mix mode of the mesh zmode.
+  * (NOTE: NOT VALID AS MESH ZMODE - only for shader pass mixmodes)
+  */
+#define CS_FX_MESH	   0xf0000000
 /// color 0 is transparent
 #define CS_FX_KEYCOLOR     0x08000000 
 /// Gouraud shading
