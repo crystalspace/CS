@@ -1,13 +1,46 @@
+crystalspace (0.94-1) unstable; urgency=low
+
+  * Added suggested changes proposed by Gerhard Tonn <GerhardTonn@swol.de>
+  to support s390 (Closes: bug#142404)
+  * Renaming picview in cspicview because of name conflict with picview 
+  package (Closes: bug#141198)
+  * New upstream
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-8) unstable; urgency=low
+
+  * Changed svgalibg1-dev dependancy to try to get autobuilders happy
+  * I won't upload package daily when everything will compile on 
+  all platforms (Closes: bug#140851)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-7) unstable; urgency=low
+
+  * Changed version dependency on lib3ds-dev
+  * Repeating Automan correction/improvment (Closes: bug#140793)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-6) unstable; urgency=low
+
+  * Section changes in control file
+  * Added dependancy on zlib1g (Closes: bug#140649)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
 crystalspace (0.93-5) unstable; urgency=low
 
   * Repeating First upload (CLoses: bug#120691)
+  * Removed csdemo from demos menus (Closes: bug#140508)
+  * Added dependancy on on svgalib1 (Closes: bug#140510)
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
 crystalspace (0.93-4) unstable; urgency=low
 
-  * automan correction/improvment
-  * French translation of control file
+  * Automan correction/improvment
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 

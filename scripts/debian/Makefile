@@ -1,10 +1,9 @@
 BUILDDIR=$(HOME)/debian/crystal
 #DATE=$(shell date '+%Y%m%d')
-VERSION=0.93
-#VERSION=0.92
-TAG=R0_92_001
-DATE=20020318
-MINOR=4
+VERSION=0.94
+TAG=R0_94_001
+DATE=20020412
+MINOR=2
 
 default:
 	@echo "=============================================================="
