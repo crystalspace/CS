@@ -146,8 +146,8 @@ SCF_DECLARE_IBASE;
     SCF_DECLARE_EMBEDDED_IBASE (csStuffObject);
     virtual long GetShapeNumber () const { return 0; }
     virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
-    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
-    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float) { return NULL; }
+    virtual iPolygonMesh* etSmallerPolygonMesh () { return NULL; }
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float) { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -209,7 +209,8 @@ SCF_DECLARE_IBASE;
  StuffFactory(iBase* parent);
  virtual ~StuffFactory();
   virtual bool Initialize(iObjectRegistry* iO_R);
-  virtual iMeshObject* NewInstance();
+  virtual csPtr<iMeshObject> NewInstance();
+
 
   virtual void HardTransform (const csReversibleTransform &);
   virtual bool SupportsHardTransform() const;
@@ -238,7 +239,7 @@ public:
   /// Destructor.
   virtual ~StuffMeshObjectType ();
   /// Draw.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg)
   {
