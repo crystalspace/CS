@@ -12,14 +12,15 @@ case MACOS_X :
   SearchSubdir general ;
   SYSFILES = [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
 		findlib.cpp getopt.cpp printf.cpp sysroot.cpp cspthrd.cpp 
-		cspthrd.h ;
+		cspthrd.h scanplugins.cpp ;
   InstallConfig macosx.cfg ;
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
   SearchSubdir general ;
   SYSFILES = [ Wildcard unix : *.cpp *.h ]
 		sysroot.cpp findlib.cpp getopt.cpp printf.cpp runloop.cpp 
-		sysinit.cpp cspthrd.cpp cspthrd.h platformconfig.cpp ;
+		sysinit.cpp cspthrd.cpp cspthrd.h platformconfig.cpp 
+		scanplugins.cpp ;
 }
 
 Library cssys :
