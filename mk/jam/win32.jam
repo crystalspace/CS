@@ -224,6 +224,12 @@ rule SystemInstallApplication
   Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ; 
 }
 
+rule SystemInstallPlugin
+{
+  Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
+      $(INSTALL_PROGRAM) ] ;
+}
+
 # SystemLinkPlugin target : objects : options
 rule SystemLinkPlugin
 {
