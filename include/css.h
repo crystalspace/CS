@@ -174,7 +174,6 @@
 #include "ivaria/conout.h"
 #include "ivaria/iso.h"
 #include "ivaria/keyval.h"
-#include "ivaria/lexan.h"
 #include "ivaria/mapnode.h"
 #include "ivaria/perfstat.h"
 #include "ivaria/pmeter.h"
