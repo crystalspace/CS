@@ -120,6 +120,14 @@ enum
   XMLTOKEN_FASTMESH,
   XMLTOKEN_FILE,
 #ifdef CS_USE_NEW_RENDERER
+  XMLTOKEN_TEXTURE3D,
+  XMLTOKEN_CUBEMAP,
+  XMLTOKEN_NORTH,
+  XMLTOKEN_SOUTH,
+  XMLTOKEN_EAST,
+  XMLTOKEN_WEST,
+  XMLTOKEN_TOP,
+  XMLTOKEN_BOTTOM,
   XMLTOKEN_FILTER,
 #endif // CS_USE_NEW_RENDERER
   XMLTOKEN_FOG,
@@ -468,6 +476,17 @@ private:
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
   	iDocumentNode* node);
+
+#ifdef CS_USE_NEW_RENDERER
+  /// Parse a Cubemap texture definition and add the texture to the engine
+  iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
+    iDocumentNode* node);
+
+  /// Parse a 3D Texture definition and add the texture to the engine
+  iTextureWrapper* ParseTexture3D (iLoaderContext* ldr_context,
+    iDocumentNode* node);
+
+#endif // CS_USE_NEW_RENDERER
   /// Parse a proc texture definition and add the texture to the engine
   //iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine

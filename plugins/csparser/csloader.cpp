@@ -805,6 +805,17 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
 #ifdef CS_USE_NEW_RENDERER
+  // 3d Texture
+  xmltokens.Register ("texture3d", XMLTOKEN_TEXTURE3D);
+  // Cubemaps
+  xmltokens.Register ("cubemap", XMLTOKEN_CUBEMAP);
+  xmltokens.Register ("north", XMLTOKEN_NORTH);
+  xmltokens.Register ("south", XMLTOKEN_SOUTH);
+  xmltokens.Register ("east", XMLTOKEN_EAST);
+  xmltokens.Register ("west", XMLTOKEN_WEST);
+  xmltokens.Register ("top", XMLTOKEN_TOP);
+  xmltokens.Register ("bottom", XMLTOKEN_BOTTOM);
+
   xmltokens.Register ("filter", XMLTOKEN_FILTER);
 #endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("fog", XMLTOKEN_FOG);
