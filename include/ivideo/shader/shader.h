@@ -25,6 +25,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
+#include "csutil/csvector.h"
 #include "ivideo/render3d.h"
 
 struct iString;
@@ -50,6 +51,8 @@ struct iShaderManager : iBase
   virtual csPtr<iShader> CreateShader() = 0;
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) = 0;
+  /// Returns all shaders that have been created
+  virtual const csBasicVector &GetShaders () = 0;
 
   /// Create variable
   virtual csPtr<iShaderVariable> CreateVariable(const char* name) = 0;

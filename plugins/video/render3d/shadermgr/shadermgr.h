@@ -67,6 +67,8 @@ public:
   virtual csPtr<iShader> CreateShader() ;
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) ;
+  /// Returns all shaders that have been created
+  virtual const csBasicVector &GetShaders () { return *shaders; }
 
   /// Create variable
   virtual csPtr<iShaderVariable> CreateVariable(const char* name) ;

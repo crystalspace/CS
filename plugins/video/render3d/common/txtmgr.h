@@ -272,6 +272,11 @@ public:
   SCF_DECLARE_IBASE;
 
   /**
+   * Get the associated shader
+   */
+  virtual iShader *GetShader () { return material->GetShader(); }
+
+  /**
    * Get a texture from the material.
    */
   virtual iTextureHandle *GetTexture () { return texture; }

@@ -137,6 +137,13 @@ SCF_VERSION (iMaterialHandle, 0, 0, 2);
  */
 struct iMaterialHandle : public iBase
 {
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Get accosiated shader
+   */
+  virtual iShader* GetShader () = 0;
+#endif
+
   /**
    * Get a texture from the material.
    */

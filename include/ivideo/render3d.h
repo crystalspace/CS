@@ -118,7 +118,7 @@ enum csZBufMode
   /// test if equal
   CS_ZBUF_EQUAL    = 0x00000005,
   /// inverted test
-  CS_ZBUF_INVERT   = 0x00000006,
+  CS_ZBUF_INVERT   = 0x00000006
 };
 
 /// Vertex attributes

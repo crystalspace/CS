@@ -134,26 +134,21 @@ struct iStreamSource : public iBase
   virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
 };
 
+/// Type of mesh
+enum csRenderMeshType
+{
+  CS_MESHTYPE_TRIANGLES,
+  CS_MESHTYPE_QUADS,
+  CS_MESHTYPE_TRIANGLESTRIP,
+  CS_MESHTYPE_TRIANGLEFAN,
+  CS_MESHTYPE_POINTS,
+  CS_MESHTYPE_LINES,
+  CS_MESHTYPE_LINESTRIP
+};
+
 class csRenderMesh
 {
 public:
-  /// Type of mesh
-  typedef enum
-  {
-    MESHTYPE_TRIANGLES,
-    MESHTYPE_QUADS,
-    MESHTYPE_TRIANGLESTRIP,
-    MESHTYPE_TRIANGLEFAN,
-    MESHTYPE_POINTS,
-    MESHTYPE_LINES,
-    MESHTYPE_LINESTRIP
-  } meshtype;
-
-private: 
-  meshtype type;
-  unsigned int indexstart, indexend;
-  csRef<iStreamSource> streamsource;
-  csRef<iMaterialHandle> mathandle;
 
 public:
 
@@ -164,13 +159,13 @@ public:
 
   virtual ~csRenderMesh () {}
 
-  /// Special attributes. Please don't change, it's used as flags
+  /*/// Special attributes. Please don't change, it's used as flags
   typedef enum
   {
     SPECIAL_NONE = 0,
     SPECIAL_BILLBOARD = 1,
     SPECIAL_ZFILL = 2
-  } specialattributes;
+  } specialattributes;*/
 
   /// Z mode to use
   csZBufMode z_buf_mode;
@@ -190,47 +185,23 @@ public:
   /// Mirror mode
   bool do_mirror;
 
+  /// Mesh type
+  csRenderMeshType meshtype;
 
-  /// Set buffer source
-  virtual void SetStreamSource (iStreamSource* streamsource)
-    { csRenderMesh::streamsource = streamsource; }
-  /// Get buffer source
-  virtual iStreamSource* GetStreamSource ()
-    { return streamsource; }
+  /// Start of the range of indices to use
+  unsigned int indexstart;
 
-  /// Set range of indices to use
-  virtual void SetIndexRange (unsigned int start, unsigned int end)
-    { indexstart = start; indexend = end; }
-  /// Get start of index range
-  virtual unsigned int GetIndexStart ()
-    { return indexstart; }
-  /// Get end of index range
-  virtual unsigned int GetIndexEnd ()
-    { return indexend; }
+  /// End of the range of indices to use
+  unsigned int indexend;
 
-  /// Set mesh type
-  virtual void SetType (meshtype type) 
-    { csRenderMesh::type = type; }
-  /// Get mesh type
-  virtual meshtype GetType () 
-    { return type; }
+  /// Streamsource to get buffers from
+  iStreamSource* streamsource;
 
-  /// Set material handle
-  virtual void SetMaterialHandle (iMaterialHandle* mathandle)
-    { csRenderMesh::mathandle = mathandle; }
-  /// Get material handle
-  virtual iMaterialHandle* GetMaterialHandle ()
-    { return mathandle; }
+  /// Material used for this mesh
+  iMaterialHandle* mathandle;
 
-  /// Get lighting information
-  virtual iLightingInfo* GetLightingInfo () { return NULL; }
-
-  /**
-   * Special case for lightmap. To get lightmaps into renderers
-   * not able to do multitexture, here is a handle to the lightmap
-   * texture
-   */
-  virtual iTextureHandle* GetLightmapHandle () { return NULL; }
+  /// Transform to use for this mesh
+  csReversibleTransform *transform;
 };
 
 /** @} */

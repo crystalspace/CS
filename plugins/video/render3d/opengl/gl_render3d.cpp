@@ -1017,6 +1017,15 @@ csReversibleTransform* csGLRender3D::GetWVMatrix()
 
 void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
 {
+  const csMatrix3 &orientation1 = object2camera.GetO2T();
+  const csVector3 &translation1 = object2camera.GetO2TTranslation();
+  const csMatrix3 &orientation2 = wvmatrix->GetO2T();
+  const csVector3 &translation2 = wvmatrix->GetO2TTranslation();
+  if (translation1 == translation2 &&
+      orientation1.Col1 () == orientation2.Col1 () &&
+      orientation1.Col2 () == orientation2.Col2 () &&
+      orientation1.Col3 () == orientation2.Col3 ())
+      return;
   object2camera = *wvmatrix;
   ApplyObjectToCamera ();
 }
@@ -1290,28 +1299,30 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_z_plane);*/
 
   SetZMode (mymesh->z_buf_mode);
+  SetObjectToCamera (mymesh->transform);
+
   GLenum primitivetype;
-  switch (mymesh->GetType ())
+  switch (mymesh->meshtype)
   {
-  case csRenderMesh::MESHTYPE_QUADS:
+  case CS_MESHTYPE_QUADS:
     primitivetype = GL_QUADS;
     break;
-  case csRenderMesh::MESHTYPE_TRIANGLESTRIP:
+  case CS_MESHTYPE_TRIANGLESTRIP:
     primitivetype = GL_TRIANGLE_STRIP;
     break;
-  case csRenderMesh::MESHTYPE_TRIANGLEFAN:
+  case CS_MESHTYPE_TRIANGLEFAN:
     primitivetype = GL_TRIANGLE_FAN;
     break;
-  case csRenderMesh::MESHTYPE_POINTS:
+  case CS_MESHTYPE_POINTS:
     primitivetype = GL_POINTS;
     break;
-  case csRenderMesh::MESHTYPE_LINES:
+  case CS_MESHTYPE_LINES:
     primitivetype = GL_LINES;
     break;
-  case csRenderMesh::MESHTYPE_LINESTRIP:
+  case CS_MESHTYPE_LINESTRIP:
     primitivetype = GL_LINE_STRIP;
     break;
-  case csRenderMesh::MESHTYPE_TRIANGLES:
+  case CS_MESHTYPE_TRIANGLES:
   default:
     primitivetype = GL_TRIANGLES;
     break;
@@ -1351,11 +1362,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     SetMirrorMode (mymesh->do_mirror);
 
   csMaterialHandle* mathandle = 
-    (csMaterialHandle*)(mymesh->GetMaterialHandle ());
+    (csMaterialHandle*)(mymesh->mathandle);
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  csRef<iTextureHandle> txthandle;
+  /*csRef<iTextureHandle> txthandle;
   if (mathandle)
     txthandle = mathandle->GetTexture ();
 
@@ -1380,7 +1391,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     alpha = SetMixMode (mymesh->mixmode, 1, false);
   }
 
-  glColor4f (red, green, blue, alpha);
+  glColor4f (red, green, blue, alpha);*/
 
   csRef<iShader> shader;
   if (mathandle)
@@ -1391,15 +1402,17 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   if(shader && shader->IsValid())
   {
     useshader = true;
-    iShaderTechnique* tech = shader->GetBestTechnique();
+    //iShaderTechnique* tech = shader->GetBestTechnique();
 
-    iStreamSource* source = mymesh->GetStreamSource ();
+    iStreamSource* source = mymesh->streamsource;
     iRenderBuffer* indexbuf =
       source->GetBuffer (string_indices);
     if (!indexbuf)
       return;
 
-    int currp;
+    SetMixMode (mymesh->mixmode, 0, true);
+
+    /*int currp;
     for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
       iShaderPass *pass = tech->GetPass (currp);
@@ -1416,32 +1429,32 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
         pass->Activate (mymesh);
       }
-      pass->SetupState (mymesh);
+      pass->SetupState (mymesh);*/
 
       if (bugplug)
-        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+        bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
       glDrawElements (
         primitivetype,
-        mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+        mymesh->indexend-mymesh->indexstart,
         GL_UNSIGNED_INT,
         ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-        +mymesh->GetIndexStart ());
+        +mymesh->indexstart);
 
       //pass->Deactivate(mymesh);
-      pass->ResetState ();
-      lastUsedShaderpass = pass;
+      /*pass->ResetState ();
+      lastUsedShaderpass = pass;*/
       indexbuf->Release ();
-    }
+    //}
   } else {
-    if (lastUsedShaderpass)
+    /*if (lastUsedShaderpass)
     {
       lastUsedShaderpass->ResetState ();
       lastUsedShaderpass->Deactivate ();
       lastUsedShaderpass = NULL;
-    }
+    }*/
 
-    iStreamSource* source = mymesh->GetStreamSource ();
+    iStreamSource* source = mymesh->streamsource;
     iRenderBuffer* vertexbuf =
       source->GetBuffer (string_vertices);
     iRenderBuffer* texcoordbuf = NULL;
@@ -1462,7 +1475,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       (float*)vertexbuf->Lock(CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_VERTEX_ARRAY);
 
-    if (texcoordbuf && !texcoordbuf->IsDiscarded())
+    /*if (texcoordbuf && !texcoordbuf->IsDiscarded())
     {
       varr.TexCoordPointer (2, GL_FLOAT, 0, (float*)
         texcoordbuf->Lock(CS_BUF_LOCK_RENDER));
@@ -1479,19 +1492,19 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       varr.ColorPointer (4, GL_FLOAT, 0, (float*)
         colorbuf->Lock(CS_BUF_LOCK_RENDER));
       glEnableClientState (GL_COLOR_ARRAY);
-    }
+    }*/
 
     if (bugplug)
-        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+        bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
     glDrawElements (
       primitivetype,
-      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+      mymesh->indexend-mymesh->indexstart,
       GL_UNSIGNED_INT,
       ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-      +mymesh->GetIndexStart ());
+      +mymesh->indexstart);
 
-    if (mathandle)
+    /*if (mathandle)
     {
       for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
       {
@@ -1533,23 +1546,23 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         glLoadMatrixf (scalematrix);
 
         if (bugplug)
-          bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);
+          bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
         glDrawElements (
           primitivetype,
-          mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+          mymesh->indexend-mymesh->indexstart,
           GL_UNSIGNED_INT,
           ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-          +mymesh->GetIndexStart ());
+          +mymesh->indexstart);
 
         glPopMatrix ();
       }
-    }
+    }*/
 
     vertexbuf->Release();
     glDisableClientState (GL_VERTEX_ARRAY);
     indexbuf->Release();
-    if (texcoordbuf)
+    /*if (texcoordbuf)
     {
       glDisableClientState (GL_TEXTURE_COORD_ARRAY);
       texcoordbuf->Release();
@@ -1563,11 +1576,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     {
       glDisableClientState (GL_NORMAL_ARRAY);
       normalbuf->Release();
-    }
+    }*/
   }
   glDisableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
-  if (clip_planes_enabled)
+  /*if (clip_planes_enabled)
   {
     clip_planes_enabled = false;
     for (int i = 0; i < 6; i++)
@@ -1577,7 +1590,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   {
     //stencil_enabled = false;
     //statecache->Disable_GL_STENCIL_TEST ();
-  }
+  }*/
 }
 
 void csGLRender3D::SetShadowState (int state)

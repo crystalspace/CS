@@ -49,7 +49,6 @@
 #include "ivideo/rndbuf.h"
 #include "shadermgr.h"
 
-
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
 
@@ -587,11 +586,12 @@ void csShaderPass::Deactivate()
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
+
   for (i=0; i<STREAMMAX; i++)
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      iRenderBuffer* buf  = mesh->GetStreamSource ()->GetBuffer (streammapping[i]);
+      iRenderBuffer* buf  = mesh->streamsource->GetBuffer (streammapping[i]);
       if (buf)
         r3d->ActivateBuffer ((csVertexAttrib)i, buf);
     }
@@ -602,7 +602,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
     if (texmappinglayer[i] != -1)
     {
       if (texmappinglayer[i] >= 0)
-        if (r3d->ActivateTexture (mesh->GetMaterialHandle (), texmappinglayer[i], i))
+        if (r3d->ActivateTexture (mesh->mathandle, texmappinglayer[i], i))
           continue;
     }
     if (texmappingdirect[i])
@@ -630,7 +630,8 @@ void csShaderPass::ResetState ()
       r3d->DeactivateBuffer ((csVertexAttrib)i);
     }
   }
-  /*for (i=TEXMAX-1; i>=0; i--)
+  /*
+  for (i=TEXMAX-1; i>=0; i--)
   {
     if (texmappingdirect[i] || texmappinglayer[i] != -1)
     {
