@@ -142,7 +142,7 @@ bool States::DecodeStates ()
 {
   int i, numSections;
   // Find the floats.
-  for(i = 0, numSections = 0; i < ST_ENCODED_LENGTH; i++)
+  for(i = 0, numSections = 0; i < (int)ST_ENCODED_LENGTH; i++)
   {
     if (encodedData[i] == ',')
     {
