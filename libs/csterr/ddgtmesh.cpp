@@ -405,6 +405,9 @@ unsigned int _ppmax = 0;
 
 void ddgTBinMesh::calculate( void )
 {
+#ifndef DDG
+	_dirty = true; // Assume always dirty for CS
+#endif
 	if (_dirty)
 	{
 		ddgVector3 ev0,ev1;
