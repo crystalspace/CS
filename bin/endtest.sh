@@ -10,14 +10,14 @@
 
 CXX=$1
 
-echo "int main() { int x = 0x1234; return *(unsigned char *)&x == 0x12; }" > endtest.cpp
+echo "int main() { long x = 0x12; return *(unsigned char *)&x == 0x12; }" > endtest.cpp
 
 ${CXX} -o endtest endtest.cpp 2>/dev/null || echo "endtest.sh: cannot compile testcase" >&2
 if test -f ./endtest; then
     if ./endtest; then
-	echo "CS_LITTLE_ENDIAN = 1"
-    else
 	echo "CS_BIG_ENDIAN = 1"
+    else
+	echo "CS_LITTLE_ENDIAN = 1"
     fi
 fi
 
