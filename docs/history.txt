@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	 the image contains precalculated mipmaps.
 	- res added csImageFile::HasMipmaps() which Matze seems to have 
 	  forgotten. 
+	- res fixed a division by zero in the DDS loader.
+	- res changed the mipmap creation code in the OpenGL texture 
+	  renderer to take better advantage of precalculated mipmaps.
 24-Feb-2003
 	- Mårten Svanfeldt made these changes:
 	    - Modified the light/shadow culling algoritm.

@@ -459,35 +459,42 @@ void csTextureHandleOpenGL::CreateMipmaps ()
   {
     // Create each new level by creating a level 2 mipmap from previous level
     // we do this down to 1x1 as opengl defines it
-
-    csRef<iImage> prevImage = image;
-    csRef<iImage> thisImage;
-
-    int w = prevImage->GetWidth ();
-    int h = prevImage->GetHeight ();
+    int w = image->GetWidth ();
+    int h = image->GetHeight ();
     int nTex = 0;
 
     ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
-          (csRGBpixel *)prevImage->GetImageData ());
+          (csRGBpixel *)image->GetImageData ());
 
+    csRef<iImage> prevImage = image;
+    csRef<iImage> mipmapImage;
+    int nMipmaps = image->HasMipmaps();
     while (w != 1 || h != 1)
     {
       nTex++;
-      //  printf ("make mipmap %d\n", nTex);
-      thisImage = prevImage->MipMap (1, tc);
+      // don't calculate a mipmap if the image provides precalculated ones
+      if (nMipmaps != 0)
+      {
+	mipmapImage = image->MipMap (nTex, tc);
+	nMipmaps--;
+      }
+      else
+      {
+        mipmapImage = prevImage->MipMap (1, tc);
+      }
       if (txtmgr->sharpen_mipmaps)
       {
-	thisImage = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
+	mipmapImage = mipmapImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
       }
       //  printf ("push %d\n", nTex);
-      csTexture* ntex = NewTexture (thisImage, true);
+      csTexture* ntex = NewTexture (mipmapImage, true);
       vTex.Push (ntex);
       DG_LINK (this, ntex);
       //  printf ("transform %d\n", nTex);
-      transform (thisImage, vTex[nTex]);
-      w = thisImage->GetWidth ();
-      h = thisImage->GetHeight ();
-      prevImage = thisImage;
+      transform (mipmapImage, vTex[nTex]);
+      w = mipmapImage->GetWidth ();
+      h = mipmapImage->GetHeight ();
+      prevImage = mipmapImage;
     }
   }
   else

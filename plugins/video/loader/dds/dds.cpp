@@ -62,9 +62,9 @@ bool Loader::IsDDS ()
     return false;
 
   // minimum flags we need
-  int minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
+  uint32 minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
 		     FLAG_PIXELFORMAT;
-  if (header->flags & minimumflags != minimumflags)
+  if ((header->flags & minimumflags) != minimumflags)
     return false;
 
   return true;
@@ -92,7 +92,7 @@ int Loader::GetDepth ()
 
 int Loader::GetMipmapCount ()
 {
-  if (!header->flags & FLAG_MIPMAPCOUNT)
+  if (!(header->flags & FLAG_MIPMAPCOUNT))
     return 0;
 
   return header->mipmapcount;
@@ -172,9 +172,9 @@ bool Loader::ReadHeader ()
     return false;
 
   // minimum flags we need                                   
-  int minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
+  uint32 minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
 		     FLAG_PIXELFORMAT;
-  if (header->flags & minimumflags != minimumflags)
+  if ((header->flags & minimumflags) != minimumflags)
     return false;
 
   CheckFormat ();
@@ -659,6 +659,7 @@ void Loader::CorrectPremult (uint8* buffer, uint32 planesize)
   uint32 size = planesize * GetDepth();
   for (uint32 i=0;i<size;i+=4)
   {
+    if (!buffer[i+3]) continue;
     buffer[i] = (uint8) (((uint32) buffer[i] << 8) / buffer[i+3]);
     buffer[i+1] = (uint8) (((uint32) buffer[i+1] << 8) / buffer[i+3]);
     buffer[i+2] = (uint8) (((uint32) buffer[i+2] << 8) / buffer[i+3]);
