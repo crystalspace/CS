@@ -1,4 +1,4 @@
-@node Config Graphics
+@node Config Graphics, Config Engine, Config System, Configuration File
 @subsection Graphics Configuration
 @cindex Configuration, Graphics
 

@@ -1,4 +1,4 @@
-@node Config Sound
+@node Config Sound, Config Console, Config Engine, Configuration File
 @subsection Sound Configuration
 @cindex Configuration, Sound
 

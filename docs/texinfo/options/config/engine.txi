@@ -1,4 +1,4 @@
-@node Config Engine
+@node Config Engine, Config Sound, Config Graphics, Configuration File
 @subsection Engine Configuration
 @cindex Configuration, Engine
 
