@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+16-Jun-2003
+	- Oktal separated a multiple-argument %ignore directive into several
+	  single-argument ones, in perlpre.i, in order to support older
+	  versions of Swig.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image 
 	  View".

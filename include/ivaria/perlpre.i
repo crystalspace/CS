@@ -23,7 +23,9 @@
  * We ignore operator [] and () and unary *
  * since these will have to be wrapped manually.
  ****************************************************************************/
-%ignore			*::operator[], *::operator(), *::operator* ();
+%ignore			*::operator[];
+%ignore			*::operator();
+%ignore			*::operator* ();
 
 %rename(__add__)	*::operator+;
 %rename(__subtr__)	*::operator-;
