@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "igeom/polymesh.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
@@ -424,6 +425,14 @@ public:
     {
       scfParent->GetRadius (radius, center);
     }
+    virtual void AddListener (iObjectModelListener*)
+    {
+      // @@@ TODO
+    }
+    virtual void RemoveListener (iObjectModelListener*)
+    {
+      // @@@ TODO
+    }
   } scfiObjectModel;
   
   ///--------------------- iMeshObject implementation ---------------------
@@ -687,7 +696,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  //------------------------- iBCTerrFactoryState implementation ----------------
+  //---------------------- iBCTerrFactoryState implementation ----------------
   class BCTerrFactoryState : public iBCTerrFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObjectFactory);

@@ -22,6 +22,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
@@ -82,6 +83,7 @@ protected:
   /// Previous time.
   csTicks prev_time;
   long shapenr;
+  csRefArray<iObjectModelListener> listeners;
   float current_lod;
   uint32 current_features;
 
@@ -228,8 +230,10 @@ public:
     rad = radius;
     cent = bbox.GetCenter();
   }
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
-  //------------------------ iMeshObject implementation ------------------------
+  //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
@@ -282,6 +286,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

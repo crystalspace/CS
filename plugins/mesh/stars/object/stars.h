@@ -22,6 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/stars.h"
 #include "ivideo/graph3d.h"
@@ -53,6 +54,7 @@ private:
   bool initialized;
   csVector3 max_radius;
   long shapenr;
+  csRefArray<iObjectModelListener> listeners;
   float current_lod;
   uint32 current_features;
 
@@ -120,6 +122,8 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
   { rad = max_radius; cent = box.GetCenter(); }
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
   ///---------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -167,6 +171,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
@@ -70,6 +71,7 @@ private:
   iMeshObjectDrawCallback* vis_cb;
   csVector3 radius;
   long shapenr;
+  csRefArray<iObjectModelListener> listeners;
   float current_lod;
   uint32 current_features;
   csBox2 bbox_2d;
@@ -123,8 +125,10 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
   { rad =  radius; cent.Set(0,0,0); }
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
-  ///----------------------- iMeshObject implementation ------------------------
+  ///---------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -171,6 +175,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

@@ -1153,7 +1153,18 @@ void csSprite3DMeshObject::SetupObject ()
   }
 }
 
+void csSprite3DMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
 
+void csSprite3DMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
 
 bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {

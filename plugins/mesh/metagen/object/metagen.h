@@ -27,6 +27,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
+#include "csutil/refarr.h"
 #include "igeom/objmodel.h"
 #include "imesh/object.h"
 #include "imesh/metagen.h"

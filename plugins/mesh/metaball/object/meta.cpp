@@ -214,6 +214,19 @@ static void LitVertex( const csVector3 &n, csColor &c )
 }
 #endif
 
+void csMetaBall::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csMetaBall::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 {
 // This is basically a ripped of version of drawtest from the

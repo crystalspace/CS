@@ -469,6 +469,19 @@ void csBallMeshObject::SetupVertexBuffer ()
  }
 }
 
+void csBallMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csBallMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();

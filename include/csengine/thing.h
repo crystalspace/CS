@@ -28,6 +28,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/garray.h"
+#include "csutil/refarr.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "iengine/viscull.h"
@@ -208,6 +209,8 @@ private:
 
   /// Shape number.
   long shapenr;
+  /// Object model listeners.
+  csRefArray<iObjectModelListener> listeners;
 
   /**
    * This number indicates the last value of the movable number.
@@ -369,10 +372,8 @@ public:
   int draw_busy;
 
 private:
-
   
   /// Calculates the interpolated normals of all vertices
-
   void CalculateNormals();
 
   /**
@@ -727,6 +728,9 @@ public:
   /// Query parent template.
   csThing *GetTemplate () const
   { return ParentTemplate; }
+
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------------------------------------------------------
   // Bounding information
@@ -1352,6 +1356,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

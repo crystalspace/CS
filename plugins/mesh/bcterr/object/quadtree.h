@@ -4,6 +4,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"

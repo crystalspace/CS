@@ -232,6 +232,19 @@ void csParticleSystem::Update (csTicks elapsed_time)
     Rotate (anglepersecond * elapsed_seconds);
 }
 
+void csParticleSystem::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csParticleSystem::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();

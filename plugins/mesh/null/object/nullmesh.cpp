@@ -74,6 +74,19 @@ csNullmeshMeshObject::~csNullmeshMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
 }
 
+void csNullmeshMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csNullmeshMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   iCamera* camera = rview->GetCamera ();

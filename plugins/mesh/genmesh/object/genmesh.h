@@ -22,6 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "iutil/eventh.h"
@@ -58,6 +59,7 @@ private:
 
   bool initialized;
   long shapenr;
+  csRefArray<iObjectModelListener> listeners;
 
   /**
    * Camera space bounding box is cached here.
@@ -106,6 +108,8 @@ public:
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent);
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -155,6 +159,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

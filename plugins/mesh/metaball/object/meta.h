@@ -25,6 +25,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
+#include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
 #include "iutil/eventh.h"
@@ -78,6 +79,7 @@ class csMetaBall : public iMeshObject
   bool do_lighting;
   bool initialize;
   long shape_num;
+  csRefArray<iObjectModelListener> listeners;
   long cur_camera_num;
   long cur_movable_num;
   uint MixMode;
@@ -136,6 +138,9 @@ public:
   void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
   void GetRadius (csVector3& radius, csVector3& cent)
   { radius =  rad; cent = object_bbox.GetCenter(); }
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
+
   ///-------------------- iMeshObject implementation --------------
 
   virtual iMeshObjectFactory * GetFactory() const { return factory; }
@@ -191,6 +196,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

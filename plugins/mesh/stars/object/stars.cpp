@@ -85,6 +85,19 @@ void csStarsMeshObject::SetupObject ()
   }
 }
 
+void csStarsMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csStarsMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*)
 {
   SetupObject ();

@@ -80,8 +80,6 @@ private:
   csMovableSectorList sectors;
   /// List of listeners to this movable.
   csMovableListenerVector listeners;
-  /// List of user-data for the listeners.
-  csVector listener_userdata;
 
   /**
    * Parent (for hierachical transformations).
@@ -234,7 +232,7 @@ public:
    * Add a listener to this movable. This listener will be called whenever
    * the movable changes or right before the movable is destroyed.
    */
-  void AddListener (iMovableListener* listener, void* userdata);
+  void AddListener (iMovableListener* listener);
 
   /**
    * Remove a listener from this movable.
@@ -273,7 +271,7 @@ public:
     virtual csReversibleTransform GetFullTransform () const;
     virtual void MovePosition (const csVector3& v);
     virtual void Transform (const csMatrix3& matrix);
-    virtual void AddListener (iMovableListener* listener, void* userdata);
+    virtual void AddListener (iMovableListener* listener);
     virtual void RemoveListener (iMovableListener* listener);
     virtual void UpdateMove ();
     virtual long GetUpdateNumber () const;

@@ -106,6 +106,19 @@ void csSprite2DMeshObject::SetupObject ()
   }
 }
 
+void csSprite2DMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csSprite2DMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();

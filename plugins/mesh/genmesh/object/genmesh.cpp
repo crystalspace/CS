@@ -178,6 +178,19 @@ void csGenmeshMeshObject::SetupObject ()
   }
 }
 
+void csGenmeshMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csGenmeshMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();

@@ -409,6 +409,14 @@ public:
 		{
 			scfParent->GetRadius( rad, cent );
 		}
+		virtual void AddListener (iObjectModelListener*)
+		{
+			// @@@ TODO
+		}
+		virtual void RemoveListener (iObjectModelListener*)
+		{
+			// @@@ TODO
+		}
 	}	scfiObjectModel;
   friend struct eiObjectModel;
 

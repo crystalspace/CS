@@ -24,6 +24,7 @@
 #include "csgeom/tesselat.h"
 #include "csutil/csvector.h"
 #include "csutil/bitarray.h"
+#include "csutil/refarr.h"
 
 struct csTriangle;
 struct iClothFactoryState;

@@ -23,6 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
+#include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/clothmesh.h"
 #include "iutil/eventh.h"
@@ -168,6 +169,15 @@ class           ObjectModel:public iObjectModel
     rad = scfParent->max_radius;
     cent.Set(scfParent->shift);
   }
+  virtual void AddListener (iObjectModelListener*)
+  {
+    // @@@ TODO
+  }
+  virtual void RemoveListener (iObjectModelListener*)
+  {
+    // @@@ TODO
+  }
+
 } scfiObjectModel;
 friend class    ObjectModel;
 

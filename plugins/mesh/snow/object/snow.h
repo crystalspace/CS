@@ -22,6 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/snow.h"
 #include "iutil/eventh.h"

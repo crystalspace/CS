@@ -30,6 +30,7 @@
 #include "csutil/scf.h"
 
 struct iPolygonMesh;
+struct iObjectModel;
 class csBox3;
 
 /**
@@ -58,7 +59,21 @@ class csBox3;
 
 /** @} */
 
-SCF_VERSION (iObjectModel, 0, 0, 1);
+SCF_VERSION (iObjectModelListener, 0, 0, 1);
+
+/**
+ * Implement this class if you're interested in hearing about
+ * when the object model changes.
+ */
+struct iObjectModelListener : public iBase
+{
+  /// The object model has changed.
+  virtual void ObjectModelChanged (iObjectModel* model) = 0;
+  /// The object model is about to be destroyed.
+  virtual void ObjectModelDestroyed (iObjectModel* model) = 0;
+};
+
+SCF_VERSION (iObjectModel, 0, 0, 2);
 
 /**
  * This interface represents data related to some geometry in object
@@ -125,6 +140,17 @@ struct iObjectModel : public iBase
    * Get the radius and center of this object in object space.
    */
   virtual void GetRadius (csVector3& radius, csVector3& center) = 0;
+
+  /**
+   * Add a listener to this object model. This listener will be called whenever
+   * the object model changes or right before it is destroyed.
+   */
+  virtual void AddListener (iObjectModelListener* listener) = 0;
+
+  /**
+   * Remove a listener from this object model.
+   */
+  virtual void RemoveListener (iObjectModelListener* listener) = 0;
 };
 
 /** @} */

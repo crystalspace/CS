@@ -137,8 +137,7 @@ csMovable::~csMovable ()
   for (i = 0; i < listeners.Length (); i++)
   {
     iMovableListener *ml = listeners[i];
-    void *ml_data = listener_userdata[i];
-    ml->MovableDestroyed (&scfiMovable, ml_data);
+    ml->MovableDestroyed (&scfiMovable);
   }
 }
 
@@ -180,11 +179,10 @@ void csMovable::ClearSectors ()
   }
 }
 
-void csMovable::AddListener (iMovableListener *listener, void *userdata)
+void csMovable::AddListener (iMovableListener *listener)
 {
   RemoveListener (listener);
   listeners.Push (listener);
-  listener_userdata.Push (userdata);
 }
 
 void csMovable::RemoveListener (iMovableListener *listener)
@@ -192,7 +190,6 @@ void csMovable::RemoveListener (iMovableListener *listener)
   int idx = listeners.Find (listener);
   if (idx == -1) return ;
   listeners.Delete (idx);
-  listener_userdata.Delete (idx);
 }
 
 void csMovable::UpdateMove ()
@@ -204,8 +201,7 @@ void csMovable::UpdateMove ()
   for (i = 0; i < listeners.Length (); i++)
   {
     iMovableListener *ml = listeners[i];
-    void *ml_data = listener_userdata[i];
-    ml->MovableChanged (&scfiMovable, ml_data);
+    ml->MovableChanged (&scfiMovable);
   }
 }
 
@@ -294,10 +290,9 @@ void csMovable::eiMovable::Transform (const csMatrix3 &matrix)
 }
 
 void csMovable::eiMovable::AddListener (
-  iMovableListener *listener,
-  void *userdata)
+  iMovableListener *listener)
 {
-  scfParent->AddListener (listener, userdata);
+  scfParent->AddListener (listener);
 }
 
 void csMovable::eiMovable::RemoveListener (iMovableListener *listener)

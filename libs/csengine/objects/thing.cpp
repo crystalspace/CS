@@ -2884,6 +2884,19 @@ bool csThing::DrawCurves (
 }
 #endif // CS_USE_NEW_RENDERER
 
+void csThing::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csThing::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 {
   Prepare ();

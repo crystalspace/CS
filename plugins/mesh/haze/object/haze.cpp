@@ -552,6 +552,19 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
 }
 
 
+void csHazeMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csHazeMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
 bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();

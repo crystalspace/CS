@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
+#include "csutil/refarr.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
@@ -533,6 +534,14 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener*)
+    {
+      // @@@ TODO
+    }
+    virtual void RemoveListener (iObjectModelListener*)
+    {
+      // @@@ TODO
     }
   } scfiObjectModel;
   friend class ObjectModel;

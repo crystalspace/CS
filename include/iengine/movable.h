@@ -44,9 +44,9 @@ SCF_VERSION (iMovableListener, 0, 0, 1);
 struct iMovableListener : public iBase
 {
   /// The movable has changed.
-  virtual void MovableChanged (iMovable* movable, void* userdata) = 0;
+  virtual void MovableChanged (iMovable* movable) = 0;
   /// The movable is about to be destroyed.
-  virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
+  virtual void MovableDestroyed (iMovable* movable) = 0;
 };
 
 SCF_VERSION (iMovable, 0, 1, 1);
@@ -154,7 +154,7 @@ struct iMovable : public iBase
    * Add a listener to this movable. This listener will be called whenever
    * the movable changes or right before the movable is destroyed.
    */
-  virtual void AddListener (iMovableListener* listener, void* userdata) = 0;
+  virtual void AddListener (iMovableListener* listener) = 0;
 
   /**
    * Remove a listener from this movable.

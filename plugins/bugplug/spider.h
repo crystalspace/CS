@@ -122,6 +122,12 @@ public:
     {
       scfParent->GetRadius (rad, cent);
     }
+    virtual void AddListener (iObjectModelListener*)
+    {
+    }
+    virtual void RemoveListener (iObjectModelListener*)
+    {
+    }
   } scfiObjectModel;
   friend class ObjectModel;
 
