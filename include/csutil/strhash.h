@@ -51,11 +51,12 @@ private:
 public:
 
   /**
-   * Constructor for an iterator to iterate over all elements in a hashmap.
-   * Note that you should not do changes on the hashmap when you have
-   * open iterators.
+   * Construct an iterator to iterate over all elements in the string hash.
+   * \remarks You should not make changes to the hashmap when you have open
+   *   iterators.
    */
-  csStringHashIterator (csStringHash* hash);
+  csStringHashIterator (csStringHash*);
+  /// Destructor.
   virtual ~csStringHashIterator ();
 
   /// Is there a next element in this iterator?
@@ -65,8 +66,11 @@ public:
 };
 
 /**
- * The string hash is a hash of strings, all with different content. Each
- * string has an ID number.
+ * A string-to-ID hash table.  Useful when you need to work with strings but
+ * want the performance characteristics of simple numeric comparisons.
+ * Register a string with a unique numeric ID and then compare ID's rather than
+ * comparing strings.  You can fetch a string's ID via Request().
+ * \sa csStringSet
  */
 class CS_CSUTIL_EXPORT csStringHash
 {
@@ -82,20 +86,31 @@ public:
   ~csStringHash ();
 
   /**
-   * Register a string with an id. Returns the pointer to the copy
-   * of the string in this hash.
+   * Register a string with an ID.
+   * \param s The string with which to associate the ID.
+   * \param id A numeric value with which to identify this string.
+   * \return A pointer to the copy of the string in this hash.
+   * \remarks If the string is already registered with a different ID, the old
+   *   ID will be replaced with the one specified here. If you would like the
+   *   convenience of having the ID assigned automatically, then consider using
+   *   csStringSet, instead.
    */
-  const char* Register (const char *s, csStringID id);
+  const char* Register (const char* s, csStringID id);
 
   /**
-   * Request the ID for the given string. Return csInvalidStringID
-   * if the string was never requested before.
+   * Request the ID for the given string.
+   * \return The string's ID or csInvalidStringID if the string has not yet
+   *   been registered.
    */
-  csStringID Request (const char *s);
+  csStringID Request (const char* s);
 
   /**
-   * Request the string for a given ID. Return 0 if the string
-   * has not been requested (yet).
+   * Request the string for a given ID.
+   * \return The string associated with the given ID, or the null pointer if
+   *   the string has not yet been registered.
+   * \remarks This operation is relatively slow.  If you find that you must
+   *   perform this reverse lookup frequently, then consider using csStringSet,
+   *   instead.
    */
   const char* Request (csStringID id);
 

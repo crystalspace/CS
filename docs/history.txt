@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Apr-2004
+	- Eric Sunshine fixed bugs in csString where GetData() and the (char
+	  const*) operator would incorrectly return a null pointer at times.
+	  (These methods should always return a zero-length C-string when the
+	  csString is empty; they should never return null.)
+	- Eric Sunshine updated Doxygen comments for csStringHash.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
@@ -31,10 +37,6 @@ chronological order.
 	  and Frustvis by replacing csHashSet with csSet<T>.
 	- res augmented the GL fixed shader program plugin to allow 
 	  manipulation of the texture matrix.
-	- Eric Sunshine fixed bugs in csString where GetData() and the (char
-	  const*) operator would incorrectly return a null pointer at times.
-	  (These methods should always return a zero-length C-string when the
-	  csString is empty; they should never return null.)
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.
