@@ -67,10 +67,10 @@ obsolete.
 @item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})
 
-Steve made the Macintosh port of Crystal Space.  He also did some
-optimizations on the assembler @samp{draw_scanline()} routines.  Steve made
-the first preliminary physics system and also implemented an easy uniform kind
-of dynamic lighting useful for fluorescent lights and such.  Steve greatly
+Steve made the pre-Carbon Macintosh port of Crystal Space.  He also did some
+optimizations on the assembler @samp{draw_scanline()} routines.  Steve made the
+first preliminary physics system and also implemented an easy uniform kind of
+dynamic lighting useful for fluorescent lights and such.  Steve greatly
 enhanced the routines to parse the map format.
 
 @item
@@ -438,7 +438,7 @@ parts.
 @item
 Robert Bate (@email{rbate@@ma.ultranet.com})
 
-Robert is the current Macintosh port maintainer.
+Robert is the current pre-Carbon Macintosh port maintainer.
 
 @item
 Norman Kramer (@email{normank@@lycosmail.com})
@@ -457,22 +457,22 @@ Nicholas made a few contributions to MazeD.
 @item
 Eric Sunshine (@email{sunshine@@sunshineco.com})
 
-Eric ported Crystal Space to MacOS/X Server, OpenStep 4.2, and NextStep 3.3!
-He has also fixed numerous bugs throughout the system and has provided a
-number of updates to the makefile system.  Additionally, he fixed the long
-standing problem with the console blanking out all but the most recently
-printed line of text which occurs on ports such as Windows, MacOS/X Server,
-OpenStep, and NextStep.  As part of this patch he replaced the ill-conceived
-progress meter code in the lighting routines with very localized and simple
-classes.  He repaired the broken console in MazeD, so that it is once again
-functional.  He has pored through the documentation and updated many out of
-date references.  Eric rewrote and re-engineered the BeOS port of Crystal
-Space almost entirely from scratch with the result that it is now about 98%
-functional as compared to being only about 15% functional before his effort.
-Eric re-engineered Crystal Space's network driver architecture and completely
-rewrote the network drivers from scratch.  The new architecture is far more
-robust, generalized, and usable than the old.  On the documentation front,
-Eric took on the task of acting as master editor of the Crystal Space
+Eric ported Crystal Space to MacOS/X, MacOS/X Server, OpenStep 4.2, and
+NextStep 3.3!  He has also fixed numerous bugs throughout the system and has
+provided a number of updates to the makefile system.  Additionally, he fixed
+the long standing problem with the console blanking out all but the most
+recently printed line of text which occurs on ports such as Windows, MacOS/X
+Server, OpenStep, and NextStep.  As part of this patch he replaced the
+ill-conceived progress meter code in the lighting routines with very localized
+and simple classes.  He repaired the broken console in MazeD, so that it is
+once again functional.  He has pored through the documentation and updated many
+out of date references.  Eric rewrote and re-engineered the BeOS port of
+Crystal Space almost entirely from scratch with the result that it is now about
+98% functional as compared to being only about 15% functional before his
+effort.  Eric re-engineered Crystal Space's network driver architecture and
+completely rewrote the network drivers from scratch.  The new architecture is
+far more robust, generalized, and usable than the old.  On the documentation
+front, Eric took on the task of acting as master editor of the Crystal Space
 documentation.  As part of this job, he has written much of the content which
 ties together various portions of the manual, fleshed out much of the bare
 skeleton and written many otherwise absent sections.  He is also responsible

@@ -6,48 +6,55 @@
 @end macro
 
 @node NeXT Details, OS2 Details, Platform Details, Platform Details
-@subsection MacOS/X Server, OpenStep, NextStep
+@subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 @cindex @sc{n}e@sc{xt} Details
+@cindex MacOS/X Details
 @cindex MacOS/X Server Details
 @cindex OpenStep Details
 @cindex NextStep Details
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 22 December 2000.}
-
-This section contains comprehensive and detailed implementation information
-about the MacOS/X Server, OpenStep 4.2, and NextStep 3.3 ports of Crystal
-Space.  Configuration, compilation, installation, and usage instructions are
-also available, @ref{NeXT}.
+@copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
+19 Februrary 2001.}
 
 Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
-Sunshine in February of 1999.  If you have questions or comments about this
-port, please contact Eric Sunshine at @email{sunshine@@sunshineco.com}.
+Sunshine in February of 1999 and has been continuously maintained and updated
+ever since.  If you have questions or comments about this port, please contact
+Eric Sunshine at @email{sunshine@@sunshineco.com}.
+
+This section contains comprehensive and detailed implementation information
+about the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep 4.2, and NextStep
+3.3 ports of Crystal Space.  Configuration, compilation, installation, and
+usage instructions are also available, @ref{NeXT}.
 
 This project may be built for any of the architectures which are supported by
 the standard developer tools, as summarized below.
 
 @quotation
-@multitable @columnfractions .20 .30 .30
+@multitable @columnfractions .25 .30 .30
 @item @emph{Platform} @tab @emph{Architectures} @tab @emph{Tested}
-@item MacOS/X Server @tab @code{i386 ppc} @tab @code{i386 ppc}
+@item MacOS/X @tab @code{ppc} @tab @code{}
+@item MacOS/X Server 1.0 @tab @code{i386 ppc} @tab @code{i386 ppc}
 @item OpenStep @tab @code{i386 m68k sparc} @tab @code{i386 m68k}
 @item NextStep @tab @code{i386 m68k sparc hppa} @tab @code{i386 m68k sparc}
 @end multitable
 @end quotation
 
-It is possible to build multi-architecture binaries (@sc{mab}) by using the
-standard Apple/@NeXT{} makefile variable @samp{TARGET_ARCHS} on the
-command-line.  For a full discussion of this facility see the compilation
-instructions.  @xref{NeXT Architectures}.
+It is possible to build multi-architecture binaries (@sc{mab}) by utilizing the
+standard Apple/@NeXT{} makefile variable @samp{TARGET_ARCHS}.  For a full
+discussion of this facility see the compilation instructions,
+@ref{NeXT Architectures}.
 
-This implementation makes use of public AppKit @sc{api} to interface with the
-Window Server for all animation and event handling.  It does not make use of
-the private, undocumented, and unsupported Interceptor library.
+This implementation makes use of public AppKit @sc{api} (also known as
+@dfn{Cocoa} in Apple parlance) to interface with the display server for all
+animation and event handling.  It does not make use of any private
+undocumented, or unsupported @sc{api}.
 
-A future version of the MacOS/X Server port may make use of the new public
-@sc{api} for direct frame-buffer access provided by the @samp{NSDirectBitmap},
-@samp{NSDirectPalette}, and @samp{NSDirectScreen} classes.
+As a consequence of the high-level nature of this @sc{api} and certain
+restrictions upon pixel format, the AppKit-based 2D driver for Crystal Space
+may not be as fast as a driver written atop a lower-level facility.  For better
+video performance, both an OpenGL driver and a CoreGraphics driver are planned
+for MacOS/X some time in the future.
 
 @menu
 * NeXT Directories:: Directories
@@ -56,6 +63,7 @@ A future version of the MacOS/X Server port may make use of the new public
 * NeXT Video Optimization:: Video Optimization
 * NeXT Frame Buffer:: Frame Buffer
 * NeXT Dynamic Linking:: Dynamic Linking
+* NeXT Keymapping:: Key Mapping
 * NeXT Notes:: Final Notes
 @end menu
 
@@ -73,43 +81,46 @@ directory hierarchies:
 
 @noindent
 Relative to each directory, in platform-specific subdirectories, are the the
-files comprising the associated MacOS/X Server, OpenStep, and NextStep
-components.  The contents of the subdirectories of @file{CS/libs/cssys/next}
-and @file{CS/plugins/video/canvas/next} are summarized below.
+files comprising the associated MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+OpenStep, and NextStep components.  The directories @file{CS/libs/cssys/next}
+and @file{CS/plugins/video/canvas/next} may contain the following
+subdirectories.
 
 @quotation
 @multitable @columnfractions .12 .88
 @item @emph{Directory}
 @tab @emph{Contents}
 @item @code{shared}
-@tab Resources common to MacOS/X Server, OpenStep & NextStep
+@tab Resources shared by all Apple/@NeXT{} platforms
+@item @code{macosx}
+@tab Resources specific to MacOS/X
 @item @code{macosxs}
-@tab Resources specific to MacOS/X Server
+@tab Resources specific to MacOS/X Server 1.0
 @item @code{openstep}
-@tab Resources specific to OpenStep & MacOS/X Server
+@tab Resources specific to MacOS/X, MacOS/X Server, OpenStep
 @item @code{nextstep}
 @tab Resources specific to NextStep
 @end multitable
 @end quotation
 
-Functionally, this port is comprised of two distinct system-dependent modules:
+Functionally, this port is comprised of two distinct platform-specific modules:
 
 @itemize @bullet
 @item
 The core components which provide low-level platform-specific functionality to
 the Crystal Space engine.  These files and resources are located in
 platform-specific subdirectories of @file{CS/libs/cssys/next}.  For instance,
-files specific to the OpenStep port reside in
-@file{CS/libs/cssys/next/openstep}, whereas files common to all three
-platforms reside in @file{CS/libs/cssys/next/shared}.
+files specific to the NextStep port reside in
+@file{CS/libs/cssys/next/nextstep}, whereas files common to all three platforms
+reside in @file{CS/libs/cssys/next/shared}.
 
 @item
-The library which provides 2D graphics capability into which Crystal Space
-renders its images.  These files and resources are located in
-platform-specific subdirectories of @file{CS/plugins/video/canvas/next}.  For
-instance, files specific to the NextStep port reside in
+The AppKit-based plug-in module which provides 2D graphics capability into
+which Crystal Space renders its images.  These files and resources are located
+in platform-specific subdirectories of @file{CS/plugins/video/canvas/next}.
+For instance, files specific to the NextStep port reside in
 @file{CS/plugins/video/canvas/next/nextstep}, whereas files common to all
-three platforms reside in @file{CS/plugins/video/canvas/next/shared}.
+platforms reside in @file{CS/plugins/video/canvas/next/shared}.
 @end itemize
 
 @node NeXT Files, NeXT Run-Loop, NeXT Directories, NeXT Details
@@ -122,26 +133,28 @@ for each target platform.
 
 @quotation
 @multitable @columnfractions .17 .83
+@item @code{macosx.mak}
+@tab Defines MacOS/X-specific build attributes.
 @item @code{macosxs.mak}
-@tab Defines MacOS/X Server-specific build attributes.
+@tab Defines MacOS/X Server 1.0-specific build attributes.
 @item @code{openstep.mak}
 @tab Defines OpenStep-specific build attributes.
 @item @code{nextstep.mak}
 @tab Defines NextStep-specific build attributes.
 @item @code{next.mak}
-@tab Common to all three platforms; controls the build.
+@tab Controls the build process for all Apple/@NeXT{} ports.
 @end multitable
 @end quotation
 
-An additional makefile, @file{CS/plugins/video/canvas/next/next2d.mak}, is
-common to all three platforms and controls the build process for the 2D
-display driver.
+An additional makefile, @file{CS/plugins/video/canvas/next/next2d.mak}, is also
+common to all Apple/@NeXT{} platforms and controls the build process for the
+AppKit-based 2D display driver.
 
-The core components provide low-level platform-specific functionality which
+The core components provide low-level, platform-specific functionality which
 Crystal Space requires.  This includes interfaces to the underlying operating
 system as well as higher-level event-loop processing as provided by the
-AppKit's @samp{Application} and @samp{NSApplication} classes.  The files
-comprising this module are:
+AppKit's @samp{NSApplication} (Cocoa and OpenStep) and @samp{Application}
+(NextStep) classes.  The files comprising this module are:
 
 @table @code
 @item NeXTSystemDriver.h
@@ -150,87 +163,97 @@ all ports of Crystal Space must supply.  This is the sole interface through
 which Crystal Space accesses platform-specific functionality.
 
 @item NeXTSystemDriver.cpp
-Implements methods of @samp{NeXTSystemDriver} which are common to MacOS/X
-Server, OpenStep, and NextStep.
+Implements the C++ portion of the system driver, @samp{NeXTSystemDriver}, which
+is common to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 
-@item NeXTSystemLocal.cpp
-Implements methods of @samp{NeXTSystemDriver} which are particular to a
-specific platform; either MacOS/X Server, OpenStep, or NextStep.
-
-@item NeXTSystemInterface.h
-Declares a pure @sc{scf} interface named @samp{iNeXTSystemDriver} for
-accessing @samp{NeXTSystemDriver} from other modules via the @sc{scf}
-facility.  @xref{SCF}.
-
-@item NeXTDelegate.cpp
+@item NeXTDelegate.m
 @itemx NeXTDelegate.h
-An Objective-C class which acts as the delegate to both the @samp{Application}
-(or @samp{NSApplication}) object and the animation window.  This object is
-responsible for handling AppKit events and forwarding them to Crystal Space
-via @samp{NeXTSystemProxy}.  Termination requests by the user on the AppKit
-side are also forwarded.
+Implements the Objective-C portion of the system driver functionality.  This
+Objective-C class, @samp{NeXTDelegate}, acts as the delegate to the application
+object.  It is responsible for handling application-wide AppKit events and
+provides convenience facilities for event interpretation on behalf of plug-in
+modules such as 2D drivers which are the focus of keyboard and mouse events.
+Interfacing between the C++ and Objective-C portions of the system driver
+implementation is accomplished via a pure-C bridge.
 
-@item NeXTLoadLibrary.cpp
-Functions which provide dynamic linking facilities for MacOS/X Server,
-OpenStep, and NextStep.
+@item NeXTLoadLibrary.m
+@itemx NeXTLoadLibrary.h
+Functions which provide dynamic linking facilities of plug-in modules for
+MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 
-@item NeXTMenu.cpp
+@item NeXTDynamicLibrary.cpp
+A thin C++ wrapper over the Objective-C plug-in loading facilities.  The
+interface between the C++ and Objective-C facilities is implemented via a
+pure-C bridge, thus allowing Crystal Space's C++ Shared Class Facility
+(@pxref{SCF}) to successfully load plug-in modules via the Objective-C dynamic
+linking facility.
+
+@item NeXTKeymap.m
+@itemx NeXTKeymap.h
+A utility class which parses the raw @NeXT{} key-mapping resource which drives
+keystroke interpretation by the WindowServer and the AppKit.  This class is
+specific to the NextStep port.  @xref{NeXT Keymapping}.
+
+@item NeXTMenu.m
 @itemx NeXTMenu.h
-A utility which generates the application's main Menu from @sc{ini}-style
-configuration information.
+A utility which generates the application's main menu from information
+contained in a configuration file (@file{CS/data/next.cfg}).
 
-@item NeXTMenu.cfg
-An @sc{ini}-style configuration file which defines a menu layout appropriate
-to the platform.  This file is actually located in the virtual directory
-@file{/config/}, which is typically mounted at the physical location
-@file{CS/data/config}.
+@item next.cfg
+A configuration file which defines platform-specific settings such as the menu
+layout appopriate to a particular platform.  This file is actually located in
+the @file{CS/data/config} directory which is typically mounted at the virtual
+location @file{/config/} (@pxref{VFS}).
+
+@item NeXTConfigFile.cpp
+@itemx NeXTConfigFile.h
+A thin pure-C wrapper over Crystal Space's C++ configuration file class.  This
+wrapper allows the Objective-C @file{NeXTMenu} implementation to utilize the
+C++ configuration class.
 
 @item NeXTTime.cpp
-Platform-specific implementation of @code{csSystemDriver::Time()} which works
-on MacOS/X Server, OpenStep, and NextStep.
-
-@item malloc.h
-A header which works around Crystal Space's misuse of the deprecated
-@file{<malloc.h>} header.
+Platform-specific implementation of @code{iSystemDriver::Time()} which works
+with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 
 @item csosdefs.h
-Implementation of platform-specific operating system functionality.  Allows
-Crystal Space to treat the operating system services abstractly.  Located in
-@file{CS/include/cssys/next} and included by @file{CS/include/cssysdef.h}.
+Platform-specific definition of operating system services which allows Crystal
+Space to access such services in a uniform manner from platform to platform.
+Located in @file{CS/include/cssys/next}.
 @end table
 
-The @NeXT{} 2D graphics library in @file{CS/plugins/video/canvas/next}
-provides 2D graphics capability to the Crystal Space engine.  This library is
-responsible for providing a hardware-specific frame-buffer into which Crystal
-Space can draw.  It is also responsible for actually displaying the
-frame-buffer in a manner which is appropriate for the given platform.  The
-files comprising the 2D graphics library are:
+The AppKit-based 2D graphics plug-in module in
+@file{CS/plugins/video/canvas/next} provides 2D graphics capability to the
+Crystal Space engine.  This module is responsible for providing a
+hardware-specific frame-buffer into which Crystal Space can draw.  It is also
+responsible for actually displaying the frame-buffer in a manner which is
+appropriate for the given platform.  The files comprising the 2D graphics
+library are:
 
 @table @code
-@item NeXTDriver2D.h
-Defines the class @samp{NeXTDriver2D} which provides 2D drawing surface to
-Crystal Space.  This is the sole interface through which Crystal Space
-communicates with the 2D graphics services.
-
 @item NeXTDriver2D.cpp
-Implements methods of @samp{NeXTDriver2D} which are common to MacOS/X Server,
-OpenStep, and NextStep.
+@itemx NeXTDriver2D.h
+Defines the class @samp{NeXTDriver2D} which provides an AppKit-based 2D drawing
+surface to Crystal Space.  This is the sole interface through which Crystal
+Space communicates with the 2D graphics services.
 
-@item NeXTLocal2D.cpp
-Implements methods of @samp{NeXTDriver2D} which are particular to a specific
-platform; either MacOS/X Server, OpenStep, or NextStep.
+@item NeXTDelegate2D.m
+@itemx NeXTDelegate2D.h
+Implements the Objective-C portion of the AppKit-based 2D driver.  This class
+is responsible for managing the window and view into which Crystal Space draws.
+It is also the window's delegate object.
 
-@item NeXTView.cpp
+@item NeXTView.m
 @itemx NeXTView.h
-An Objective-C subclass of the AppKit's @samp{View} (or @samp{NSView} class.
-This is the view where the animation is actually displayed.  Forwards events
-to @samp{NeXTDelegate} which propagates them up to Crystal Space.
+An Objective-C subclass of the AppKit's @samp{NSView} (Cocoa and OpenStep) or
+@samp{View} (NextStep) class.  This is the view where the rendered scene from
+Crystal Space is actually displayed.  This class also forwards received
+keyboard and mouse events to the system driver for interpretation and handling
+via the @code{iSystem::SystemExtension("dispatchevent")} interface.
 
-@item NeXTFrameBuffer.cpp
-@itemx NeXTFrameBuffer.h
-A mostly abstract 2D frame buffer class which defines the interface of objects
-which are capable of converting a raw Crystal Space frame buffer into a
-@NeXT{}-format frame buffer.
+@item NeXTFrameBuffer.h
+An abstract 2D frame buffer class which defines the interface of objects which
+are capable of converting a raw Crystal Space frame buffer into an
+AppKit-format frame buffer.
 
 @item NeXTFrameBuffer15.cpp
 @item NeXTFrameBuffer15.h
@@ -241,6 +264,11 @@ A concrete subclass of @samp{NeXTFrameBuffer} which can convert Crystal Space
 @item NeXTFrameBuffer32.h
 A concrete subclass of @samp{NeXTFrameBuffer} which can convert Crystal Space
 @sc{rgb}:888 to @NeXT{} @sc{rgba}:8888.
+
+@item NeXTMemory.m
+@itemx NeXTMemory.h
+Utility functions for manipulation of page-aligned memory blocks for the
+@samp{NeXTFrameBuffer} subclasses.
 @end table
 
 @node NeXT Run-Loop, NeXT Video Optimization, NeXT Files, NeXT Details
@@ -257,12 +285,9 @@ With most ports of Crystal Space, this is not a problem since the main
 run-loop is generally implemented in this fashion:
 
 @example
-SysSystemDriver::Loop() @{
-    while (!done) @{
-        ProcessEvents(); // @r{For platform-specific event handling.}
-        CheckKeyboard();
-        CheckMouse();
-        NextFrame();     // @r{Tell engine to render the next frame.}
+csSystemDriver::Loop() @{
+    while (!Shutdown && !ExitLoop) @{
+        NextFrame(); // @r{Process events and render next frame.}
     @}
 @}
 @end example
@@ -279,8 +304,8 @@ other words, the naive implementation of @code{Loop()} as shown below does not
 work properly when called recursively.
 
 @example
-SysSystemDriver::Loop() @{
-    [NXApp run];
+NeXTSystemDriver::Loop() @{
+    [NSApp run];
 @}
 @end example
 
@@ -292,7 +317,7 @@ To do so, a category was introduced which extends the AppKit's application
 class with the introduction of a method named @samp{-runRecursively:}.  This
 method, as the name implies, provides the capability of recursive run-loop
 invocation by patching and overriding the default run-loop behavior.  The
-implementation of this method is contained in @file{NeXTSystemProxy.cpp}.
+implementation of this method is contained in @file{NeXTDelegate.m}.
 
 In the long run, it may be desirable to re-engineer Crystal Space so that it
 runs as a client in a surrounding application framework, rather than forcing
@@ -307,30 +332,41 @@ control of the entire environment without regard to other outside factors.
 @subsubsection Video Optimization
 @cindex @sc{n}e@sc{xt} Video Optimization
 
-Unlike programs on some other platforms, OpenStep and NextStep applications do
-not have direct access to the display hardware, thus video performance
-suffers.  As MacOS/X Server and MacOS/X evolve, they may include facilities
-for accessing display hardware directly, but at this time these facilities
-have not been finalized.
+This section describes video optionization techniques which have been
+implemented for the high-level AppKit-based 2D driver, which is the only
+Apple/@NeXT{} graphics driver currently available for Crystal Space.
+Lower-level CoreGraphics and OpenGL drivers are planned for MacOS/X at some
+time in the future.
 
-Under MacOS/X Server, OpenStep, and NextStep, all drawing to the display is
-performed by a separate program called the WindowServer.  Whenever an
-applications needs to draw to the screen, it actually sends drawing commands
-across an @sc{ipc} connection to the WindowServer and the WindowServer
+Unlike programs on some other platforms, OpenStep and NextStep applications do
+not have direct access to the display hardware (except via the highly private
+``Interceptor'' @sc{api}), thus video performance suffers.  MacOS/X Server 1.0
+(Rhapsody) saw the introduction of the @samp{NSDirectBitmap},
+@samp{NSDirectPalette}, and @samp{NSDirectScreen} classes which were presumably
+intended to allow lower-level access to the display hardware, however their
+interfaces were never fully developed.  With the advent of MacOS/X, Apple has
+introduced the CoreGraphics and OpenGL @sc{api}s which will hopefully provide
+much better video performance than that which was available in previous
+incarnations of the Apple/@NeXT{} platforms.
+
+Under MacOS/X Server 1.0 (Rhapsody) OpenStep, and NextStep, all drawing to the
+display is performed by a separate program called the @dfn{WindowServer}.
+Whenever an applications needs to draw to the screen, it actually sends drawing
+commands across an @sc{ipc} connection to the WindowServer and the WindowServer
 performs the drawing on the application's behalf.  This negatively impacts
 video performance in essentially three ways.
 
 @itemize @bullet
 @item
 Inter-process communication (@sc{ipc}) between the application and the
-WindowServer is performed serially and tends to be a bottle-neck.
-Furthermore, @sc{ipc} is generally slower than direct access.
+WindowServer is performed serially and tends to be a bottle-neck.  Furthermore,
+@sc{ipc} is generally slower than direct memory access.
 
 @item
 Image data resides in different address spaces since the application and
-WindowServer are separate processes.  This means that the image data must be
-copied from one address space to the other.  Copying large amounts of data is
-typically very time-consuming.
+WindowServer are separate processes.  This means that the image data must
+somehow be copied from one address space to the other.  Copying large amounts
+of data is typically very time-consuming.
 
 @item
 Since the application does not own the frame-buffer, it also does not have
@@ -340,21 +376,24 @@ the format of the frame-buffer.  This can be a particularly time-consuming
 operation since it may require quite a lot of bit-fiddling over quite a lot of
 bytes.  For instance, the application may supply image data in the format
 @sc{rrrrggggbbbbaaaa}, which may be converted to @sc{rrrrrggggggbbbbb} by the
-WindowServer.
+WindowServer.  A further constraint is that the high-level AppKit image classes
+only understand a very limited number of pixel formats, so even if the
+frame-buffer's precise format is known, there is no guarantee that the AppKit
+will support it.
 @end itemize
 
 This port of Crystal Space implements video optimizations discussed in the
 @cite{NextStep 3.0 WindowServer Release Notes} in order to work around these
-problems as much as possible.  The optimizations are:
+problems as much as possible.  The implemented optimizations are:
 
 @itemize @bullet
 @item
-Image data is aligned on a page boundary, allowing it to be sent to the window
-server as out-of-band data in a Mach message.  This is very fast since the
-data need only be mapped into the WindowServer's address space rather than
-actually copied.  Such alignment is guaranteed by using
-@code{NSAllocateMemoryPages()} on MacOS/X & OpenStep, and @code{vm_allocate()}
-on NextStep.
+Image data is aligned on a page boundary, allowing it to be sent to the
+WindowServer as out-of-band data in a Mach message.  This is very fast since
+the data need only be mapped into the WindowServer's address space rather than
+actually being copied.  Page-alignment is guaranteed by using
+@code{NSAllocateMemoryPages()} on Cocoa and OpenStep, and and
+@code{vm_allocate()} on NextStep.
 
 @item
 Image samples are organized in a meshed format.
@@ -372,29 +411,28 @@ The image's ``@code{rowbytes} modulo 16'' equals the destination buffer's
 ``@code{rowbytes} modulo 16'' and the source data pointer is cacheline-aligned
 (16 byte aligned) with the destination data pointer.  This is accomplished by
 using a Retained-mode window and aligning the left edge of the destination
-View on an x-coordinate which is a multiple of 8 for 12-bit color depth, and a
+view on an x-coordinate which is a multiple of 8 for 12-bit color depth, and a
 multiple of 4 for 24-bit color depth.
 
 @item
-The view displaying the image uses the identity transform.  That is, it is not
-flipped, scaled, rotated, etc.
+The AppKit view which displays the image uses the identity transform.  That is,
+it is not flipped, scaled, rotated, etc.
 
 @item
-On MacOS/X Server and OpenStep, @code{-[NSBitmapImageRep draw]} is used to
-draw the image in the destination view.  On NextStep, @code{-[NXBitmapImageRep
-draw]} (which is a cover for @code{NXDrawBitmap()}) is used.  This ensures
-that the image data is passed to to the WindowServer as out-of-band data in a
-Mach message via the proprietary @samp{nextimage} PostScript operator.
+In Cocoa and OpenStep, @code{-[NSBitmapImageRep draw]} is used to draw the
+image in the destination view.  On NextStep, @code{-[NXBitmapImageRep draw]}
+(which is a cover for @code{NXDrawBitmap()}) is used.  This ensures that the
+image data is passed to to the WindowServer as out-of-band data in a Mach
+message via the proprietary @samp{nextimage} PostScript operator.
 @end itemize
 
 Many of these optimizations are actually geared toward traditional @NeXT{}
 (@code{m68k}) hardware and may not be as effective on other platforms such as
 Intel.  In some cases using these optimizations on original @NeXT{} hardware,
 can result in a very dramatic improvement in video performance.  In all cases,
-it is presumed that the WindowServer has been hand-optimized to perform well
-on each platform when presented with data meeting these prerequisites.
-Therefore following these guidelines seem sensible even for non-@NeXT{}
-hardware.
+it is presumed that the WindowServer has been optimized to perform well on each
+platform when presented with data meeting these prerequisites.  Therefore
+following these guidelines seems sensible even for non-@NeXT{} hardware.
 
 Some further optimizations are employed which are not discussed in the
 WindowServer release notes.  These include:
@@ -402,20 +440,21 @@ WindowServer release notes.  These include:
 @itemize @bullet
 @item
 Disabling PostScript @dfn{clipping} in the view in which the image is
-displayed.  (Not applicable to MacOS/X Server or OpenStep, since clipping can
-not be disabled via the AppKit @sc{api} on these platforms.)
+displayed.  (This item is applicable only to NextStep.  In Cocoa and OpenStep,
+clipping can not be disabled via the AppKit.)
 
 @item
-Allocating a PostScript @dfn{gstate} for the view.  This saves valuable time
-whenever focusing on the view, though at the expense of memory.  Without the
-gstate the view has to perform certain time-consuming actions each time it is
-focused upon.
+Allocating a @dfn{graphics state} (PostScript's `gstate') for the view.  This
+saves valuable time whenever focusing on the view, though at the expense of
+memory.  Without the allocated graphics state cache, the view would otherwise
+have to perform certain time-consuming preparation tasks each time before
+drawing.
 
 @item
-The Window which displays the view is Retained rather than Buffered.  This
-means that drawing occurs directly on-screen rather than going to a
-backing-store which would then need be flushed to the screen with an expensive
-memory copy.
+The window which displays the view is `Retained' rather than `Buffered'.  This
+means that drawing occurs directly on-screen rather than going into a
+backing-store which would then have to be flushed to the screen with an
+expensive memory copy as an extra step.
 @end itemize
 
 It is worth noting that none of the aforementioned video optimizations deal
@@ -433,10 +472,11 @@ impact of this limitation may not be particularly severe.
 @subsubsection Frame Buffer
 @cindex @sc{n}e@sc{xt} Frame Buffer
 
-With few exceptions, most MacOS/X Server, OpenStep, and NextStep are
-configured for @dfn{true-color} rather than palettized color.  However,
-true-color is rather relative in this case since the AppKit supports only a
-limited number of configurations for image data.  In particular, these are:
+With few exceptions, most MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
+NextStep installations are configured for @dfn{true-color} rather than
+palettized color.  However, true-color is rather relative in the case of the
+AppKit-based 2D graphics driver since the AppKit supports only a limited number
+of configurations for image data.  In particular, these are:
 
 @quotation
 @multitable @columnfractions .15 .85
@@ -452,13 +492,13 @@ MacOS/X Server and OpenStep take a stab at providing more comprehensive color
 depth support, but in their current state, these facilities provide little
 additional assistance and, consequently, are not discussed further.
 
-At the lowest level, the WindowServer itself supports additional
-configurations and adjusts appropriately to the underlying hardware.  The
-high-level application, however does not have access to this information
-(without resorting to private and unsupported @sc{api}), and consequently can
-not make use of it.  Furthermore, even in 8-bit color mode the application has
-neither access to, nor knowledge of the palette.  In this case the 8-bit
-number is simply an opaque color value allowing no further interpretation.
+At the lowest level, the WindowServer itself supports additional configurations
+and adjusts appropriately to the underlying hardware.  The high-level AppKit
+@sc{api}, however does not have access to this information (without resorting
+to private and unsupported @sc{api}), and consequently can not make use of it.
+Furthermore, even in 8-bit color mode the application has neither access to,
+nor knowledge of the palette.  In this case the 8-bit number is simply an
+opaque color value from which no furthre interpretation can be made.
 
 To further complicate matters, in order to achieve decent video performance,
 image data sent to the WindowServer needs to be specially formatted, as
@@ -468,82 +508,122 @@ alpha channel and all alpha bits must be set to one.
 
 Unfortunately Crystal Space is unable to produce image data in a format usable
 by the WindowServer when video performance is a concern.  This is unfortunate
-since it means that this port must itself massage the data into a format
-suitable to the WindowServer, which can be a time consuming operation.
-Crystal Space is unable to produce the proper image format for two reasons.
+since it means that the AppKit-based 2D driver must, itself, massage the data
+into a format suitable to the AppKit and the WindowServer.  This can be a time
+consuming operation.
+
+Crystal Space is unable to produce the proper image format for several reasons.
 
 @itemize @bullet
 @item
 The rendering engine has no facilities for forcing certain unused bits to
-conform to a certain value.  In this case the alpha bits need to be set to
-one.  It does have facilities for masking off the appropriate unused bits, but
-this is insufficient since the alpha bits would be uninitialized.
+conform to a certain value.  In this case the alpha bits need to be set to one.
 
 @item
-The rendering engine does not support all of the common AppKit display modes.
-For instance, the engine can generate 8-bit, 15-bit, and 16-bit, but not the
-12-bit @sc{rgb} data which is quite common on MacOS/X Server, OpenStep, and
-NextStep platforms.
+The rendering engine does not support the common AppKit display modes.  For
+instance, the software rendere has modes for only 8-bit, 15-bit, and 16-bit,
+but not the 12-bit @sc{rgb} data which is expected by the AppKit image classes.
+
+@item
+For performance reasons of its own, the software renderer is hard-coded to
+produce pixel data in the format @sc{nbgr} for big-endian and @sc{nrgb} for
+little-endian (as seen from a @sc{cpu} register perspective), where `@sc{n}'
+represents unused and potentially uninitialized bits.  Neither of these pixel
+formats is suitable for the AppKit image classes.
 @end itemize
 
-The upshot is that even though MacOS/X Server, OpenStep, and NextStep support
-true-color data and Crystal Space is capable of generating true-color data,
-the formats are incompatible.
+The upshot is that even though MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+OpenStep, and NextStep support true-color data and Crystal Space is capable of
+generating true-color data, the formats are incompatible from the perspective
+of an AppKit-based 2D driver.
 
-One solution to the problem is to allow Crystal Space to generate 15-bit or
-16-bit true-color data and then have port-specific code massage it into an
-appropriate format immediately before passing it to the WindowServer for each
-animation frame.  However in the interest of video performance, this is
-probably a sub-optimal solution since it tends to be quite time-consuming.
-Rather than performing the time-consuming massaging of image data prior to
-flusing it to the display, this port attempts to perform most of the
-time-consuming work during a one-time initialization phase which simplifies
-conversion from Crystal Space format image data to WindowServer format data,
-as well as enhancing the speed of the operation.
+There are at least a couple of solutions to the problem of pixel-format
+mismatch between Crystal Space's software renderer and the AppKit:
 
-Crystal Space is automatically configured to generate 32-bit @sc{rgb} image
-data when running on MacOS/X Server, OpenStep, and NextStep machines
-configured for 24-bit @sc{rgba} display.  Conversion of Crystal Space 32-bit
-@sc{rgb}:888 data to @sc{rgba}:8888 needed by the WindowServer is encapsulated
-in the class @samp{NeXTFrameBuffer32}.  This class instructs the Crystal Space
-renderer to generate @sc{rgb} data in the first three bytes of a four-byte
-pixel entity.  Just prior to flushing the image data to the display,
-@samp{NeXTFrameBuffer32} places @code{0xff} in every fourth byte to satisfy
-the requirement that the alpha byte be set to @code{0xff}, as explained in the
-video optimizations section, @ref{NeXT Video Optimization}.  This technique is
-both simple and efficient and achieves the objective admirably.
+@itemize @bullet
+@item
+Parameterize the software renderer's currently hard-coded constants such that
+those constants can be modified at compile-time, and then build several
+versions of the renderer, each geared for a particular pixel format.  To some
+extent, this approach has already been implemented for a few fixed 8-, 15-,
+16-, and 32-bit pixel formats, however extending it to handle the many existing
+(and potential future) Apple/@NeXT{} formats could become quickly nightmarish,
+as well as leading to bloat.
 
-Crystal Space is automatically configured to generate 15-bit @sc{rgb} image
-data when running on machines configured for 12-bit @sc{rgba} display.
-Conversion of Crsytal Space 15-bit @sc{rgb}:555 data to @sc{rgba}:4444 needed
-by the WindowServer is encapsulated in the class @samp{NeXTFrameBuffer15}.  In
-order to avoid time-consuming bit manipulation of image data, this class
-generates a translation table which equates each possible @sc{rgb}:555 color
-value with the corresponding @sc{rgba}:4444 color.  The alpha nybble of the
-translated color contains @code{0x0f} as explained in the video optimizations
-section, @ref{NeXT Video Optimization}.  To translate incoming @sc{rgb}:555
-data to @sc{rgba}:4444, @samp{NeXTFrameBuffer15} enumerates over each color
-value in the incoming image data, looks up its corresponding @sc{rgba}:4444
-value in the translation table and outputs that color.  This technique is both
-simple and reasonably efficient.
+One other obstacle to this approach is that on 32-bit @sc{rgb} big-endian
+hardware, the AppKit expects the pixel data to occupy the high-byte of the
+longword which represents each pixel.  Historically, the software renderer has
+had trouble dealing with pixel data which occupies the high-byte since most
+programmers working on the renderer only test it with pixel formats which do
+not occupy that byte.  As a consequence, it is common for breakage to occur as
+changes are made to the renderer.  Although the maintainer of the Apple/@NeXT{}
+ports has painstakingly eradicated all known bugs of this nature in the
+software renderer, the framework is still quite fragile and breaks easily.
 
-@node NeXT Dynamic Linking, NeXT Notes, NeXT Frame Buffer, NeXT Details
+@item
+Allow the renderer to generate pixel data in one of its hard-coded formats and
+then massage the data into a format suitable for the AppKit and WindowServer in
+a post-processing step just before sending it off to the WindowServer.  The
+downside to this approach is that post-processing can be time-consuming as well
+as memory intensive since such processing involves copying the pixel data from
+one frame-buffer to another.  (The double frame-buffer requirement is a
+limitation of the way in which many Crystal Space applications deal with the
+frame-buffer.  These applications expect that the frame-buffer data will remain
+valid and unmodified from frame to frame, thus massaging the data in-place is
+not a workable approach.) The benefit of the post-processing approach, on the
+other hand, is that it is much less fragile than parameterizing the renderer.
+@end itemize
+
+In the interest of video performance, whenever possible, the AppKit-base 2D
+driver attempts to perform as much of the time-consuming post-processing work
+in a one-time initialization step.  The additional benefit of performing some
+of the time-consuming work in an initialization step is that the actual
+post-processing step is simplified to some extent.
+
+The AppKit-based 2D driver is automatically configured to generate 32-bit
+@sc{rgb} image data when running on MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+OpenStep, and NextStep machines configured for 24- or 32-bit @sc{rgba} display.
+Conversion of Crystal Space 32-bit @sc{rgb}:888 data to @sc{rgba}:8888 needed
+by the AppKit and WindowServer is encapsulated in the class
+@samp{NeXTFrameBuffer32}.  Just prior to flushing the image data to the
+display, @samp{NeXTFrameBuffer32} transmutes the pixel data into a format
+suitable for the AppKit.  It also ensures that the alpha byte is set to
+@code{0xff}, as explained in the video optimizations section, @ref{NeXT Video
+Optimization}.
+
+The 2D driver is automatically configured to generate 15-bit @sc{rgb} image
+data when running on machines configured for 12-, 15-, or 16-bit @sc{rgba}
+display.  Conversion of Crsytal Space 15-bit @sc{rgb}:555 data to
+@sc{rgba}:4444 needed by the AppKit and WindowServer is encapsulated in the
+class @samp{NeXTFrameBuffer15}.  In order to avoid time-consuming bit
+manipulation of image data, this class generates a translation table which
+equates each possible @sc{rgb}:555 color value with the corresponding
+@sc{rgba}:4444 color.  The alpha nybble of the translated color contains
+@code{0x0f} as explained in the video optimizations section, @ref{NeXT Video
+Optimization}.  To translate incoming @sc{rgb}:555 data to @sc{rgba}:4444,
+@samp{NeXTFrameBuffer15} enumerates over each color value in the incoming image
+data, looks up its corresponding @sc{rgba}:4444 value in the translation table
+and outputs that color.  This technique is both simple and reasonably
+efficient.
+
+@node NeXT Dynamic Linking, NeXT Keymapping, NeXT Frame Buffer, NeXT Details
 @subsubsection Dynamic Linking
 @cindex @sc{n}e@sc{xt} Dynamic Linking
 
-On MacOS/X Server, OpenStep, and NextStep, symbol management within plug-in
-modules (also known as @dfn{dynamically loaded libraries}) is handled
-differently than on most other platforms and operating systems.  On most
-platforms, symbols are private to a plug-in module unless explicitly exported.
-On MacOS/X Server, OpenStep, and NextStep, all symbols are public by default.
-This difference of symbolic semantics can have detrimental side-effects.
+On MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep, symbol
+management within plug-in modules (also known as @dfn{dynamically loaded
+libraries}) is handled differently than on most other platforms and operating
+systems.  On most platforms, symbols are private to a plug-in module unless
+explicitly exported.  On the Apple/@NeXT{} platforms all symbols are public by
+default.  This difference of symbolic semantics can have detrimental
+side-effects.
 
 On other platforms, plug-in modules are themselves linked against any required
-static libraries in order to satisfy external symbolic references.  On MacOS/X
-Server, OpenStep, and NextStep, on the other hand, the application is
-typically linked against any libraries which may be required by plug-in
-modules rather than linking the plug-in modules against the required
-libraries.  There are a couple problems with this approach.
+static libraries in order to satisfy external symbolic references.  On MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep, on the other hand, the
+application is typically linked against any libraries which may be required by
+plug-in modules rather than linking the plug-in modules, themselves, against
+the libraries.  There are a couple problems with this approach.
 
 @itemize @bullet
 @item
@@ -552,8 +632,8 @@ required by a set of plug-in modules since those modules may come from
 independent sources.  Thus, it is neither practical nor always possible to
 link the application against the correct set of static libraries.  As a
 corollary, this often means having to add special cases to otherwise general
-makefiles in order to specify an extended set of static libraries when
-invoking the static linker.
+makefiles in order to specify an extended set of static libraries when invoking
+the static linker to build the application's executable image.
 
 @item
 Even though an application may be linked against a static library for the
@@ -571,21 +651,21 @@ external symbolic references of a plug-in module may require that the
 application be relinked against a different set of static libraries.
 @end itemize
 
-The approach used by other platforms where plug-in modules are linked directly
-against any static libraries which they require has several advantages.
+The approach used by other platforms, where plug-in modules are linked directly
+against any static libraries which they require, has several advantages.
 
 @itemize @bullet
 @item
 Plug-in modules are self-contained since external symbolic references have
-already been satisfied, thus there is no need for the application to attempt
-to satisfy those references.
+already been satisfied, thus there is no need for the application, itself, to
+attempt to satisfy those references.
 
 @item
-An application needs to be linked only against the set of static libraries
-which it requires.  There is no need to try to fathom the set of libraries
-which @emph{might} one day be required by plug-in modules.  As a corollary
-there is no need to invent artificial mechanisms for forcing libraries to be
-linked into the application which are not required by the application itself.
+An application needs to be linked only against the set of libraries which it
+requires.  There is no need to try to fathom the set of libraries which
+@emph{might} one day be required by plug-in modules.  As a corollary there is
+no need to invent artificial mechanisms for forcing libraries to be linked into
+the application which are not required by the application itself.
 
 @item
 It is much more robust since a change in the symbolic requirements of any
@@ -593,26 +673,27 @@ given plug-in module will not require re-linking of the application against
 a new set of libraries.
 @end itemize
 
-In order to avoid the fragility of the standard MacOS/X Server, OpenStep, and
-NextStep dynamic linking model, and in order to avoid having to invent special
-case solutions to work around these problems, this port of Crystal Space
-attempts to emulate the model of dynamic linking used on other platforms.
-This is accomplished by linking plug-in modules against the static libraries
-which they require, rather than linking those libraries into the application.
+In order to avoid the fragility of the standard MacOS/X, MacOS/X Server 1.0
+(Rhapsody), OpenStep, and NextStep dynamic linking model, and in order to avoid
+having to invent special case solutions to work around these problems, this
+port of Crystal Space attempts to emulate the model of dynamic linking used on
+other platforms.  This is accomplished by linking plug-in modules against the
+static libraries which they require, rather than linking those libraries into
+the application.
 
 The one major pitfall which makes employment of this approach difficult, is
 that of symbolic conflicts where the same symbol is defined in more than one
 place.  This problem can occur when more than one plug-in module links with
 the same static library, and when both a plug-in module and the application
-link against the same static library.  This port uses a couple different
-solutions to work around this problem depending upon the exact platform in
-question, as summarized below.
+link against the same static library.  This port employs a couple different
+solutions to work around these problem depending upon the exact platform in
+question.  These solutions are summarized below.
 
 @itemize @bullet
 @item
 The NextStep port emulates private plug-in symbols by actually stripping away
-all public (resolved) symbols, except for the @sc{scf} @code{GetClassTable()}
-hook (@pxref{SCF}), from the plug-in module at build time.  This technique
+all public (resolved) symbols from the plug-in module at build time except for
+the @sc{scf} @code{GetClassTable()} hook (@pxref{SCF}).  This technique
 provides fairly decent insurance against symbolic conflicts at plug-in load
 time even when multiple plug-ins have been linked against the same static
 libraries.  The only big drawback to this approach is that it makes symbolic
@@ -627,21 +708,62 @@ run-time (being sufficiently buggy) would actually crash within
 @code{rld_forget_symbol()} when this approach was employed.
 
 @item
-The MacOS/X Server and OpenStep ports emulate private plug-in symbols by
-taking advantage of @sc{dyld}'s @samp{NSLinkEditErrorHandlers} which allows
-the loader to ignore duplicate symbols at load time, thus there is no need to
-strip them away at build time as is done with the NextStep port.  This
-approach has the advantage that symbolic debugging capability of plug-in
-modules is retained.
+The MacOS/X, MacOS/X Server 1.0 (Rhapsody), and OpenStep ports emulate private
+plug-in symbols by taking advantage of @sc{dyld}'s
+@samp{NSLinkEditErrorHandlers} which allows the loader to ignore duplicate
+symbols at load time, thus there is no need to strip the symbols away at build
+time as is done with the NextStep port.  This approach has the advantage that
+symbolic debugging capability of plug-in modules is retained.
 @end itemize
 
-@node NeXT Notes, , NeXT Dynamic Linking, NeXT Details
+@node NeXT Keymapping, NeXT Notes, NeXT Dynamic Linking, NeXT Details
+@subsubsection Key Mapping
+@cindex @sc{n}e@sc{xt} Key Mapping
+
+For keyboard events, Crystal Space's event system expects the platform-specific
+driver to provide both the raw key code and the cooked character code.  For
+instance, for @kbd{@key{Alt}-p}, the raw key code is @kbd{p} and the cooked
+character code would be whatever that keytroke is mapped to in the current
+key-mapping (for instance, Greek
+@ifnottex
+`pi').
+@end ifnottex
+@iftex
+@tex
+$\pi$).
+@end tex
+@end iftex
+
+Unfortunately, the AppKit event mechanism in NextStep cooks the raw key code
+completely out of existence and only makes available the final character code
+along with the hardware scan code of the depressed key.  The @samp{NSEvent}
+class in Cocoa and OpenStep, on the other hand, make both the raw key code and
+the cooked character code available.
+
+In order to provide Crystal Space with the raw key code on NextStep, it was
+necessary to reverse-engineer the format of the raw key-mapping resource
+(@file{.keymapping} files).  Once accomplished, a special class,
+@samp{NeXTKeymap}, was created to interpret the key-mapping.  This class parses
+the private key-mapping data structure used by the WindowServer and the AppKit
+and provides a mechanism for translating hardware scan codes to the raw key
+codes which Crystal Space expects.
+
+@samp{NeXTKeymap} is implemented in
+@file{CS/libs/cssys/next/nextstep/NeXTKeymap.m}.  It is based upon extracts
+from the program @file{dumpkeymap} which is a diagnostic utility for
+interpreting @file{.keymapping} files.  The source code and full documentation
+for @samp{dumpkeymap} are available at
+@file{CS/libs/cssys/next/support/dumpkeymap}.  @samp{dumpkeymap} was written by
+Eric Sunshine, @email{sunshine@@sunshineco.com}.
+
+@node NeXT Notes, , NeXT Keymapping, NeXT Details
 @subsubsection Final Notes
 @cindex @sc{n}e@sc{xt} Notes
 
 This section details future plans as well as problems or potential problems
-with the MacOS/X Server, OpenStep, and NextStep ports of Crystal Space.
-Consult this section if you want to know what direction this port is taking.
+with the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep ports
+of Crystal Space.  Consult this section if you want to know what direction this
+port is taking.
 
 @cindex @sc{n}e@sc{xt} Future Plans
 @subsubheading Future Plans
@@ -650,38 +772,62 @@ This is a list of items which are planned for future releases of this project:
 
 @itemize @bullet
 @item
-I have discovered that OpenStep does not reliably return images with the same
-bits-per-sample when @code{-[NSBitmapImageRep initWithFocusedViewRect:]} is
-used.  Thus, I see no reason to rely on the Window Server's suggestion for
-preferred depth any longer.  May as well simplify the code by once again using
-@code{+[NSWindow defaultDepthLimit]}.
+Rewrite canvas image sizing computation so that the image's row-bytes value is
+always multiple of 16.  This is necessary for best video performance according
+to the @cite{NextStep 3.0 WindowServer Release Notes}.  Currently, this
+condition is not enforced, and it is possible for the user to specify window
+sizes (via the @samp{--mode} switch) which break this requirement.
+Furthermore, when dynamic canvas resizing is implemented, this will be an
+absolute requirement.
 
 @item
-Consider flushing only part of the frame buffer to the display upon invocation
-of @code{csGraphics2D::Print()} rather than the entire frame buffer.  Be
-careful, though.  The current technique of flushing the entire frame buffer
-takes advantage of out-of-line data in Mach messages, so it is very fast.
+Consider respecting the @samp{area} argument to @code{iGraphics2D::Print()} and
+flushing only part of the frame buffer to the display rather than the entire
+frame buffer.  However, this must be done carefully in order to preserve all of
+the speed advantages of the current technique of flushing the entire frame
+buffer via a single Mach message.  The way to do this is to create a second
+@samp{NSBitmapImageRep} (or @samp{NXBitmapImageRep}) using the same
+frame-buffer as the full-sized one, but which has a smaller specified area and
+a much larger row-bytes value.  This second image representation will actually
+overlay the full-sized one but will specify smaller dimensions.  The row-bytes
+value must be computed in such a way as to compensate for all of the image data
+outside of the secondary image's bounds.
 
 @item
-Re-write event handling so that it no longer relies on a timer to drive
-animation.  The problem with using the timer are:
-
-@itemize @minus
-@item
-It places an upper limit on the frame rate.
-@item
-On slow machines it can fire frequently enough to put a strangle hold on the
-user event queue, since the run loop checks for timer events before checking
-for user events.
-@end itemize
-
-A good way to re-engineer this may be to place an @dfn{application defined}
-event in the event queue at the end of each animation frame, then have the
-application event trigger the next animation frame.  Since the event will be
-placed at the tail of the event queue, it will not smother out user events.
+Support user-initiated canvas resizing.
 
 @item
-Possibly implement sound support.
+Ditch the recursive run-loop mechanism and go with a threaded model instead.
+Since the AppKit and Crystal Space will then each be running in a distinct
+thread, a timer will no longer be required for pulsing the engine.  One benefit
+of this is that the engine can then run full-speed without being capped by the
+timer's pulse interval.  The other major benefit of this approach is that it
+will facilitate elimination of the recursive run-loop hack (@pxref{NeXT
+Run-Loop}), which is the only place in the entire Apple/@NeXT{} port where
+private (and potentially volatile) AppKit @sc{api} was employed.
+
+@item
+As a possible alternative to going with the threaded model (see above item),
+consider re-writing event handling so that it no longer relies on timer to
+drive animation.  The problem with using the timer is that it places an upper
+limit on the frame rate.  Furthermore, on slow machines it can fire frequently
+enough to place a strangle-hold on the user event queue, since the run loop
+checks for timer events before checking for user events.  Instead of using a
+timer, place an @dfn{application defined} event in the event queue at the end
+of each animation frame, then have the application event trigger the next
+animation frame.  Since the event will be placed at the tail of the event
+queue, it will not smother out user events.
+
+@item
+Create native AppKit cursors for @sc{csws} cursors.
+
+@item
+Write an Apple/@NeXT{} @samp{line} canvas which utilizes @samp{NSBezierPath} on
+MacOS/X and MacOS/X Server 1.0 (Rhapsody), and which utilizes PostScript
+primitives on OpenStep and NextStep.
+
+@item
+Implement sound support.
 @end itemize
 
 @cindex @sc{n}e@sc{xt} Bugs
@@ -697,11 +843,27 @@ Server, or from the the Workspace Manager's File Viewer on OpenStep and
 NextStep.  This problem is a result of a limitation of Viewer and Workspace
 Manager applications.  When the Crystal Space demonstration applications are
 launched, they expect to find the configuration files @file{scf.cfg} and
-@file{vfs.cfg} in the @dfn{current directory}--which is generally the same
+@file{vfs.cfg} in the @dfn{current directory}---which is generally the same
 directory in which the Crystal Space applications reside.  Unfortunately,
 neither Viewer nor Workspace Manager provide the necessary information for
 Crystal Space to locate these administrative files.  Therefore, at this time,
 all Crystal Space applications @emph{must} be launched from the command-line.
+The proper solution to this problem is to place each Crystal Space application
+within its own application wrapper (@file{.app}) at build time.  Doing so,
+however, will require a certain amount of re-work of the makefile system.  It
+is also not clear as to precisely which resources should be relocated into the
+application wrapper.
+
+@item
+One attempt to solve the problem of not being able to launch an application via
+double-click (distinct from creating an application wrapper) was the
+introduction of a default, @samp{CrystalSpaceRoot}, which tells the application
+where the root of the Crystal Space resource hierarchy resides.  This setting
+does allow applications to be launched via a double-click in NextStep, however
+it fails on OpenStep.  It is suspected that the problem has to do with the fact
+that the Workspace provides no path information whatsoever (not even in
+@code{argv[0]}).  Although the application wrapper is ultimately a better
+solution, it is still worthwhile to resolve this issue.
 @end itemize
 
 @unmacro NeXT

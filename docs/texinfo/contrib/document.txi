@@ -112,7 +112,7 @@ perl ../../bin/texi2html -init_file \
 
 The @samp{-subdir} option controls where the output files are placed.  Replace
 @file{cs-unix.txi} by @file{cs-dos.txi} or @file{cs-mac.txi} for
-Windows/@sc{dos} or Macintosh systems, respectively.
+Windows/@sc{dos} or Macintosh (HFS) systems, respectively.
 
 @subsubheading Directory Structure
 

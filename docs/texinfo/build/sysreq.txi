@@ -20,16 +20,18 @@ C++ Development Environment: Crystal Space must be built with a C++
 compiler and other standard development tools.
 
 @item
-The main Crystal Space package:
-In fact you need the compiled library, an example application, and several
-drivers (@file{.DLL} or @file{.so} files). The CS package contains the
-sources for all of them, which means you must compile everything. This
-is explained later.
+The main Crystal Space package.  In fact you need the compiled library, an
+example application, and several drivers (@file{.DLL} or @file{.so} files).
+The Crystal Space package contains the sources for all of them, which means you
+must compile everything.  This is explained later.
 
 @item
-One or more map files. These can be downloaded from the CS homepage
-(@uref{http://crystal.linuxgames.com}). They are ZIP files. Do not unzip
-them!  Crystal Space reads ZIP files directly.
+One or more map files.  These can be downloaded from the Crystal Space
+homepage.  They are @sc{zip} archives.  Do not unzip them.  Crystal Space reads
+@sc{zip} archives directly.
+
+@noindent
+@uref{http://crystal.linuxgames.com/}
 
 @item
 The external libraries @code{zlib}, @code{libjpeg} and @code{libpng}.

@@ -226,7 +226,7 @@ Some operating systems have case sensitive filenames, whereas others do not.
 Undesirable things happen if you capitalize a file one way in an
 @code{#include} directive and a different way for the actual filename.  This
 problem may not even be apparent on your platform if you are using a
-case-insensitive file system such as @sc{dos}, Windows, or Macintosh.  In
+case-insensitive file system such as @sc{dos}, Windows, or Macintosh (HFS).  In
 general, it is preferable to use entirely lower-case filenames for files which
 are shared between ports.
 

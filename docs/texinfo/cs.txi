@@ -9,11 +9,11 @@
 
 @dircategory Crystal Space
 @direntry
-* CrystalSpace: (cs). Crystal Space 3D Engine.
+* CrystalSpace: (cs). Crystal Space 3D Game Toolkit.
 @end direntry
 
 @ifinfo
-This file documents Crystal Space, an open-source 3D engine.  It provides
+This file documents Crystal Space, an open-source 3D game toolkit.  It provides
 both usage instructions and informative technical discussions.
 
 This manual, edition @value{EDITION}, is for Crystal Space version
@@ -45,7 +45,7 @@ by the copyright holders.
 
 @titlepage
 @title Crystal Space
-@subtitle Open-Source 3D Engine Documentation
+@subtitle Open-Source 3D Game Toolkit Documentation
 @subtitle Edition @value{EDITION} for Crystal Space @value{VERSION}
 @subtitle Last updated @value{UPDATED}
 @author Jorrit Tyberghein
@@ -85,8 +85,8 @@ by the copyright holders.
 @node Top, CS Introduction, , (dir)
 @top Crystal Space
 
-Crystal Space is an open-source 3D engine.  It can be used for a variety of
-3D visualization tasks.  Many people will probably be interested in using
+Crystal Space is an open-source 3D game toolkit.  It can be used for a variety
+of 3D visualization tasks.  Many people will probably be interested in using
 Crystal Space as the basis of a 3D game, for which it is well suited.
 
 This document includes usage instructions, conceptual material, and detailed
@@ -104,7 +104,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Tutorials::
 * Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
-* Internals:: The Internal Structure of the Project
+* Internals:: Internal Project Structure
 * Contributing:: Contributing to Crystal Space
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * API Modifications:: Significant @sc{api} Changes

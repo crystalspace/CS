@@ -6,46 +6,60 @@
 @end macro
 
 @node NeXT, MacOS/9, Mingw, Platform Instructions
-@subsection MacOS/X Server, OpenStep, NextStep
+@subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 @cindex @sc{n}e@sc{xt}
+@cindex MacOS/X
 @cindex MacOS/X Server
 @cindex OpenStep
 @cindex NextStep
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 8 September 2000.}
-
-This section contains configuration, compilation, installation, and usage
-instructions for the MacOS/X Server, OpenStep 4.2 and NextStep 3.3 ports of
-Crystal Space.  Comprehensive and detailed implementation information is also
-available, @ref{NeXT Details}, as well as a list of known bugs and future
-plans, @ref{NeXT Notes}.
+@copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
+19 February 2001.}
 
 Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
-Sunshine in February of 1999.  If you have questions or comments about this
-port, please contact Eric Sunshine at @email{sunshine@@sunshineco.com}.
+Sunshine in February of 1999 and has been continuously maintained and updated
+ever since.  If you have questions or comments about this port, please contact
+Eric Sunshine at @email{sunshine@@sunshineco.com}.
 
-If you have downloaded a binary-only package of Crystal Space for MacOS/X
-Server, OpenStep, or NextStep, you may want to skip over the following
-sections explaining how to build Crystal Space, and jump directly to the
-section explaining how to run the applications, @ref{NeXT Running Programs}.
+This section contains configuration, compilation, installation, and usage
+instructions for the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep 4.2 and
+NextStep 3.3 ports of Crystal Space.  These ports are collectively known as the
+Apple/@NeXT{} ports and are implemented using the @dfn{Cocoa} technology which
+Apple inherited from @NeXT{} and then enhanced.
+
+Comprehensive and detailed implementation information about the Apple/@NeXT{}
+ports is also available (@pxref{NeXT Details}), as well as a list of known bugs
+and future plans (@pxref{NeXT Notes}).
+
+For Macintosh users, the information detailed in this section applies to
+MacOS/X and later.  A port of Crystal Space using the classic Macintosh Toolbox
+(pre-Carbon) API is also available for MacOS/9 and earlier.  @xref{MacOS/9}.
+
+If you have downloaded a binary-only package of Crystal Space for MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, or NextStep, you may want to skip over
+the following sections explaining how to build Crystal Space, and jump directly
+to the section explaining how to run the applications, @ref{NeXT Running
+Programs}.
 
 If you are building Crystal Space from source code, you may want to briefly
 scan the section for compiling on generic Unix systems (@pxref{Unix}), though
-it is not strictly necessary, as only a small fraction of that information is
-applicable to the MacOS/X Server, OpenStep, and NextStep ports.
+it is not strictly necessary to do so since only a small fraction of that
+information is applicable to the MacOS/X, MacOS/X Server 1.0 (Rhapsody)
+OpenStep, and NextStep ports.
 
 In addition to obtaining the project source code (@pxref{Where to Get}), you
 will also need to download and compile several support libraries used for
 compression and image manipulation (@pxref{External Libraries}).  These
 libraries, @samp{zlib}, @samp{libpng}, and @samp{libjpeg}, are present on most
-current Unix platforms, but are absent from MacOS/X Server, OpenStep, and
-NextStep.
+current Unix installations, but are absent from MacOS/X, MacOS/X Server 1.0
+(Rhapsody), OpenStep, and NextStep.
 
+@anchor{NeXT Resources}
 The most convenient site from which to download these library packages is the
-LinuxGames @sc{ftp} site.  These packages are known to work with MacOS/X
-Server, OpenStep, and NextStep and have already been organized to fit
-correctly into the Crystal Space project hierarchy.
+LinuxGames @sc{ftp} site.  These packages are known to work with MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep and have already been
+organized to fit correctly into the Crystal Space project hierarchy.
 
 @noindent
 @uref{ftp://ftp.linuxgames.com/crystal/support/general/zlib_1.1.1.tgz}@*
@@ -60,7 +74,7 @@ makes heavy use of its rich feature set.  @xref{NeXT GNU make}.
 * NeXT GNU make:: @sc{gnu} make
 * NeXT Packages:: Packages
 * NeXT Architectures:: Architectures
-* NeXT Libraries:: Supporting Libraries
+* NeXT Libraries:: Library Prerequisites
 * NeXT Building:: Building
 * NeXT Running Programs:: Using Crystal Space
 @end menu
@@ -70,10 +84,10 @@ makes heavy use of its rich feature set.  @xref{NeXT GNU make}.
 
 Building Crystal Space requires @sc{gnu}'s @samp{make} utility.  NextStep does
 not ship with @sc{gnu} @samp{make}, so it must be downloaded and installed
-before this project can be built.  MacOS/X Server and OpenStep both ship with
-@sc{gnu} @samp{make} already installed.  On these platforms, it is named
-@samp{gnumake}.  MacOS/X Server and OpenStep users may ignore this section and
-safely skip to the next one.
+before this project can be built.  MacOS/X, MacOS/X Server 1.0 (Rhapsody), and
+OpenStep all ship with @sc{gnu} @samp{make} already installed.  On these
+platforms, it is named @samp{gnumake}.  MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+and OpenStep users may ignore this section and safely skip to the next one.
 
 NextStep users can find pre-built binaries of @sc{gnu} @samp{make} at these
 locations:
@@ -100,15 +114,15 @@ easily corrected.  Build the program by following these instructions:
 Unpack the source:
 
 @example
-% gnutar xfz make-3.79.1.tar.gz
+gnutar xfz make-3.79.1.tar.gz
 @end example
 
 @item
 Run the configuration script:
 
 @example
-% cd make-3.79.1
-% ./configure
+cd make-3.79.1
+./configure
 @end example
 
 @item
@@ -129,26 +143,28 @@ Replace this line with:
 Build the project:
 
 @example
-% make install
+make install
 @end example
 @end enumerate
 
-In order to be consistent with the MacOS/X Server and OpenStep installations,
-it would probably be best to rename the installed executable to @samp{gnumake}
-rather than the default name, @samp{make}.  The remaining instructions in this
-document assume that the utility is installed with the name @samp{gnumake}.
+In order to be consistent with the MacOS/X, MacOS/X Server 1.0 (Rhapsody), and
+OpenStep installations, it is probably best to rename the installed executable
+to @samp{gnumake} rather than the default name, @samp{make}.  The remaining
+instructions in this document assume that the utility is installed under the
+name @samp{gnumake}.
 
 @node NeXT Packages, NeXT Architectures, NeXT GNU make, NeXT
 @subsubsection Packages
 
 Once you have obtained the latest Crystal Space source code package
-(@pxref{Where to Get}) and its supporting libraries (@pxref{External
-Libraries}), unpack them into a convenient directory as shown below.  A
-description of the directory hierarchy which is created when you unpack the
-source code archive is available, @ref{Directory Hierarchy}.
+(@pxref{Where to Get}) and its supporting libraries (@pxref{NeXT Resources}),
+unpack them into a convenient directory as shown below.  A description of the
+directory hierarchy which is created when you unpack the source code archive is
+available, @ref{Directory Hierarchy}.  A description of the files specific to
+the Apple/@NeXT{} port is also available, @ref{NeXT Details}.
 
 @example
-% gnutar xfz @var{CS-package-name}.tgz
+gnutar xfz @var{CS-package-name}.tgz
 @end example
 
 The @sc{jpeg}, @sc{png}, and @sc{zlib} libraries must be installed within the
@@ -156,30 +172,47 @@ The @sc{jpeg}, @sc{png}, and @sc{zlib} libraries must be installed within the
 these libraries at the same site from which you obtained the Crystal Space
 source code package then they will automatically unpack into the correct
 directory.  If you obtained the packages elsewhere, then you must manually
-ensure that they are placed end up within @file{CS/libs/libjpeg},
+ensure that they are placed within @file{CS/libs/libjpeg},
 @file{CS/libs/libpng}, and @file{CS/libs/zlib}, respectively.
 
 @example
-% gnutar xfz libjpeg*.tgz
-% gnutar xfz libpng*.tgz
-% gnutar xfz zlib*.tgz
+gnutar xfz libjpeg*.tgz
+gnutar xfz libpng*.tgz
+gnutar xfz zlib*.tgz
 @end example
 
-Typically, the standard library archive @file{standard.zip} is included with
+The standard library archive, @file{standard.zip}, is included with
 the Crystal Space package within the @file{CS/data} directory.  If it is
 missing, however, you may downloaded it from the Crystal Space site
 (@pxref{Where to Get}) and place it in @file{CS/data} manually.  This file
 contains resources which are used by several Crystal Space demonstration
 programs.  Do not unpack this file; Crystal Space uses it as is.
 
-You must have at least one @dfn{map} file in order to use the Crystal Space
-demonstration program, WalkTest.  Typically map files should be placed within
-the @file{CS/data} directory.  For example, if you downloaded
-@file{large.zip}:
+The standard texture archive, @file{stdtex.zip}, contains textures which are
+required by many of the example Crystal Space map files.  You should download
+this file and place it in the @file{CS/data} directory.  As with
+@file{standard.zip}, do not unpack this file.  @file{stdtex.zip} can be
+downloaded from the following location:
 
-@example
-% mv large.zip CS/data/large.zip
-@end example
+@noindent
+@uref{ftp://ftp.linuxgames.com/crystal/levels/stdtex.zip}
+
+You will also need to have at least one @dfn{map} file in order to use the
+Crystal Space demonstration program, WalkTest.  Typically map files should be
+placed within the @file{CS/data} directory.  As with other Crystal Space
+resources, map files are actually compressed archives which are used directly
+by the engine, thus you should not unpack these archives.
+
+The most commonly used map file is @file{flarge.zip} since it demonstrates many
+of the special features of the engine rather than focusing on merely one or two
+areas.  You can download @file{flarge.zip}, as well as several other example
+map files from the following location:
+
+@noindent
+@uref{ftp://ftp.linuxgames.com/crystal/levels/}
+
+@noindent
+Be sure to place the map files into the @file{CS/data} directory.
 
 @node NeXT Architectures, NeXT Libraries, NeXT Packages, NeXT
 @subsubsection Architectures
@@ -188,9 +221,10 @@ This project may be built for any of the architectures which are supported by
 the standard developer tools, as summarized below.
 
 @quotation
-@multitable @columnfractions .20 .30 .30
+@multitable @columnfractions .25 .30 .30
 @item @emph{Platform} @tab @emph{Architectures} @tab @emph{Tested}
-@item MacOS/X Server @tab @code{i386 ppc} @tab @code{i386 ppc}
+@item MacOS/X @tab @code{ppc} @tab @code{}
+@item MacOS/X Server 1.0 @tab @code{i386 ppc} @tab @code{i386 ppc}
 @item OpenStep @tab @code{i386 m68k sparc} @tab @code{i386 m68k}
 @item NextStep @tab @code{i386 m68k sparc hppa} @tab @code{i386 m68k sparc}
 @end multitable
@@ -211,8 +245,8 @@ unless manually overridden.  If you do not specify @samp{TARGET_ARCHS} at
 configuration time, then the project will be compiled for the hardware on
 which it is being built.
 
-You can manually override the configured choice of architectures by specifying
-@samp{TARGET_ARCHS} on the command line at build time.  For instance, to build
+You can also override the configured choice of architectures by specifying
+@samp{TARGET_ARCHS} for a particular makefile target.  For instance, to build
 the @file{walktest} demonstration program as a @sc{mab} executable for Intel,
 Motorola, and Sparc, one would type:
 
@@ -230,11 +264,11 @@ Motorola, and Sparc one would type:
 make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc"
 @end example
 
-If @sc{cc} is not specified then the library is compiled for the hardware on
+If @samp{CC} is not specified then the library is compiled for the hardware on
 which it is being built.
 
 @node NeXT Libraries, NeXT Building, NeXT Architectures, NeXT
-@subsubsection Supporting Libraries
+@subsubsection Library Prerequisites
 
 Before building Crystal Space, it is necessary to build the supporting
 libraries, @samp{zlib}, @samp{libpng}, and @samp{libjpeg}.  Crystal Space
@@ -245,21 +279,22 @@ These instructions assume that you wish to build multi-architecture libraries.
 Adjust the @code{CC="..."} directive to reflect the architectures you wish to
 include in the generated libraries.  If you do not wish to generate
 multi-architecture libraries, then omit the @code{CC="..."} directive
-altogether.  The list of supported architectures varies between MacOS/X
-Server, OpenStep, and NextStep.  @ref{NeXT Architectures}.
+altogether.  The list of supported architectures varies between MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
+@xref{NeXT Architectures}.
 
 @example
-% cd CS/libs/zlib
-% sh ./configure
-% make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+cd CS/libs/zlib
+sh ./configure
+make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 
-% cd ../libpng
-% make -f makefile.std libpng.a \
+cd ../libpng
+make -f makefile.std libpng.a \
   CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 
-% cd ../libjpeg
-% sh ./configure
-% make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+cd ../libjpeg
+sh ./configure
+make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 @end example
 
 @node NeXT Building, NeXT Running Programs, NeXT Libraries, NeXT
@@ -273,9 +308,10 @@ To begin building Crystal Space, first configure the makefiles for the
 appropriate platform by typing the correct build command as indicated below.
 
 @quotation
-@multitable @columnfractions .20 .80
+@multitable @columnfractions .25 .80
 @item @emph{Platform} @tab @emph{Build Command}
-@item MacOS/X Server @tab @code{gnumake macosxs}
+@item MacOS/X @tab @code{gnumake macosx}
+@item MacOS/X Server 1.0 @tab @code{gnumake macosxs}
 @item OpenStep @tab @code{gnumake openstep}
 @item NextStep @tab @code{gnumake nextstep}
 @end multitable
@@ -284,14 +320,16 @@ appropriate platform by typing the correct build command as indicated below.
 If you want to build multi-architecture binaries of Crystal Space then you can
 specify @samp{TARGET_ARCHS} on the configuration command line.  Your choice of
 architectures will be remembered and automatically applied to subsequent build
-operations.  The list of supported architectures varies between MacOS/X
-Server, OpenStep, and NextStep.  @ref{NeXT Architectures}.
+operations.  The list of supported architectures varies between MacOS/X,
+MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
+@xref{NeXT Architectures}.
 
 For instance, if you want to build Crystal Space executables for Intel,
-Motorola, and Sparc on an OpenStep 4.2 system, you would type:
+Motorola, and Sparc on an OpenStep 4.2 system, you would configure the makefile
+system by invoking the following command:
 
 @example
-% gnumake openstep TARGET_ARCHS="i386 m68k sparc"
+gnumake openstep TARGET_ARCHS="i386 m68k sparc"
 @end example
 
 Once the makefiles have been configured for the appropriate platform, you can
@@ -302,137 +340,166 @@ drivers or libraries, then can do that instead.
 To see a list of all targets which can be built, type:
 
 @example
-% gnumake help
+gnumake help
 @end example
 
 The simplest way to build the entire package, including all applications,
 drivers, and plug-in modules is to invoke the makefile target @samp{all}:
 
 @example
-% gnumake -k all
+gnumake -k all
 @end example
 
 This can be a fairly time consuming operation.  If you would like to be more
 selective and only build the necessary drivers and a subset of the available
 applications, you can invoke their targets individually.
 
-For example, to build all plug-in drivers, you could invoke this command:
+For example, to build all plug-in modules, you could invoke this command:
 
 @example
-% gnumake -k drivers  # @r{Builds all plug-in drivers}
+gnumake -k plugins # @r{Builds all plug-in modules.}
 @end example
 
-Or, for even finer control, you could build only the most commonly needed
-plug-in modules:
+Or, for example, for even finer control, you could build only the WalkTest
+application and the plug-in modules which it most commonly requires.
 
 @example
-% gnumake next2d    # @r{Builds the 2D graphics driver}
-% gnumake soft      # @r{Builds the software-based 3D renderer}
-% gnumake csfont    # @r{Builds default font server}
-% gnumake rapid     # @r{Builds collision detection plug-in}
-% gnumake perfstat  # @r{Builds the performance statistics plug-in}
-% gnumake simpcons  # @r{Builds the simple console plug-in}
+gnumake next2d    # @r{Builds the 2D graphics driver}
+gnumake walkall   # @r{Builds WalkTest and required plug-ins}
 @end example
 
 For finer control over which applications are built, you can invoke their
 targets directly.  For instance:
 
 @example
-% gnumake walk  # @r{Builds @code{walktest}, the level exploration program}
-% gnumake blks  # @r{Builds @code{blocks}, the 3D-Tetris style game}
-% gnumake meta  # @r{Builds @code{metademo}, the MetaBalls demonstration}
-% gnumake mzed  # @r{Builds @code{mazed}, the Crystal Space level editor}
+gnumake walk  # @r{Builds @code{walktest}, the level exploration program}
+gnumake blks  # @r{Builds @code{blocks}, the 3D-Tetris style game}
+gnumake meta  # @r{Builds @code{metademo}, the MetaBalls demonstration}
+gnumake mzed  # @r{Builds @code{mazed}, the Crystal Space level editor}
 @end example
 
 These commands individually build some of the more prominent Crystal Space
-demonstration programs; the ones which perform the most interesting
-operations.  @xref{Applications}.
+demonstration programs; the ones which perform the most interesting operations.
+@xref{Applications}.  All of these programs require the plug-in modules, so be
+sure to build those as well by invoking the @samp{plugins} makefile target as
+illustrated above if you have not already invoked the @samp{all} target.
 
 @node NeXT Running Programs, , NeXT Building, NeXT
 @subsubsection Using Crystal Space
 
 Before attempting to run any of the Crystal Space sample applications, ensure
-that the file @file{standard.zip} resides in @file{CS/data}.  This file
-contains standard resources which are used by several of the example programs.
+that the files @file{standard.zip} and @file{stdtex.zip} reside in
+@file{CS/data}.  These file contain resources and textures which are used by
+several of the example programs and map files.
 
 You need to have one or more @dfn{map} files in order to run WalkTest.  These
 are the files which contain the maps and rooms which you can explore with
-WalkTest and edit with MazeD, the Crystal Space map (or ``maze'') editor.
+WalkTest and edit with MazeD, the Crystal Space map (or ``maze'') editor.  The
+most commonly used example map file is @file{flarge.zip}.
 
 @strong{Note}: It is not currently possible to launch the Crystal Space
-demonstration applications by double-clicking on them in the Viewer
-application in MacOS/X Server, or from the the Workspace Manager's File Viewer
-on OpenStep and NextStep.  This problem is a result of a limitation of Viewer
-and Workspace Manager applications.  When the Crystal Space demonstration
-applications are launched, they expect to find the configuration files
-@file{scf.cfg} and @file{vfs.cfg} in the @dfn{current directory}--which is
-generally the same directory in which the Crystal Space applications reside.
-Unfortunately, neither Viewer nor Workspace Manager provide the necessary
-information for Crystal Space to locate these administrative files.  This
-problem will be corrected in the future once a suitable work-around has been
-devised.  @emph{Therefore, at this time, all Crystal Space applications
-@strong{must} be launched from the command-line.}
+demonstration applications by double-clicking on them via the Finder on
+MacOS/X, the Viewer in MacOS/X Server 1.0, or from the the Workspace Manager's
+File Viewer on OpenStep and NextStep.  This problem is a result of a limitation
+of the Finder, Viewer, and Workspace Manager applications.  When the Crystal
+Space demonstration applications are launched, they expect to find the
+configuration files @file{scf.cfg} and @file{vfs.cfg} in the @dfn{current
+directory}---which is generally the same directory in which the Crystal Space
+applications reside.  Unfortunately, neither Finder, Viewer, nor Workspace
+Manager provide the necessary information for Crystal Space to locate these
+administrative files.  This problem will be corrected in the future once a
+suitable work-around has been devised.  @emph{Therefore, at this time, all
+Crystal Space applications @strong{must} be launched from the command-line.}
 
 Before running the demonstration programs for the first time, you should
 locate the file @file{cryst.cfg} in the @file{CS/data/config} directory.  This
 file contains parameters which control Crystal Space's environment.
 
 By default, the overall ambient light level specified in @file{cryst.cfg} is
-often too dark for many MacOS/X Server, OpenStep, and NextStep displays.  To
-correct this problem, edit @file{cryst.cfg} and change the
-@samp{AMBIENT_WHITE} setting to a more appropriate value.  Some potentially
-good choices for @samp{AMBIENT_WHITE} are summarized below.  If these values
-don't work well for you, experiment with others until you find one which is
-suitable.
+often too dark for many MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
+NextStep displays.  To correct this problem, edit @file{cryst.cfg} and change
+the @samp{Engine.Lighting.Ambient.White} setting to a more appropriate value.
+Some potentially good choices for this setting are summarized below.  If these
+values do not work well for you, experiment with others until you find one
+which is suitable.
 
 @quotation
-@multitable @columnfractions .20 .80
+@multitable @columnfractions .25 .80
 @item @emph{Platform} @tab @emph{Setting}
-@item MacOS/X Server @tab @code{AMBIENT_WHITE=60}
-@item OpenStep @tab @code{AMBIENT_WHITE=40}
-@item NextStep @tab @code{AMBIENT_WHITE=40}
+@item MacOS/X @tab @code{Engine.Lighting.Ambient.White=70}
+@item MacOS/X Server 1.0 @tab @code{Engine.Lighting.Ambient.White=70}
+@item OpenStep @tab @code{Engine.Lighting.Ambient.White=50}
+@item NextStep @tab @code{Engine.Lighting.Ambient.White=50}
 @end multitable
 @end quotation
 
-The first time you explore a map after changing the @samp{AMBIENT_WHITE}
-value, you should run WalkTest with the @samp{-relight} option.  This causes
-Crystal Space to recalculate the lighting information in the map in order to
-take advantage of the new ambient light value.
+@strong{Important}: The first time you explore a map after changing the ambient
+white value, you should run WalkTest with the @samp{--relight} option.  This
+causes Crystal Space to recalculate the lighting information in the map in
+order to take advantage of the new ambient light value.
 
 Note, however, that this process may be time consuming, particularly for
-sizable levels such as @file{large.zip}, so be patient.  In other cases,
-Crystal Space may determine, on its own, that lighting needs to be
-recalculated.  This is a normal occurrence and should not cause alarm.
+certain sizable maps, so be patient.  In other cases, Crystal Space may
+determine, on its own, that lighting needs to be recalculated.  This is a
+normal occurrence and should not cause alarm.
 
-You may find it useful to specify the @samp{-relight} option with newly
-downloaded maps, or at any time the lighting in a map seems incorrect in some
-fashion.
+As a general rule, you may find it useful to specify the @samp{--relight}
+option with newly downloaded maps, or at any other time that the lighting in a
+map seems to be somehow incorrect.
 
-To run WalkTest with a particular map (for instance, @file{large.zip}) for the
+To run WalkTest with a particular map (for instance, @file{flarge.zip}) for the
 very first time, type:
 
 @example
-% ./walktest -relight large
+walktest --relight flarge
 @end example
 
 Subsequent uses of the map file do not require @samp{-relight}, in which case
 you can type:
 
 @example
-% ./walktest large
+walktest flarge
 @end example
 
-Once invoked, you will be able to explore the map file @file{large.zip} by
+Once invoked, you will be able to explore the map file (@file{flarge.zip}) by
 using the navigation controls (@pxref{Walktest Keyboard}).  To explore a
-different map, substitute its name in place of @samp{large}.
+different map, substitute its name in place of @samp{flarge}.
 
-Other interesting applications, such as MetaBalls, MazeD, and Blocks can be
+Other interesting applications, such as Blocks, MetaBalls, and MazeD can be
 run with the following commands:
 
 @example
-% ./blocks
-% ./metademo
-% ./mazed
+blocks
+metademo
+mazed
+@end example
+
+Finally, it is possible to use the Apple/@NeXT{} defaults system to inform
+Crystal Space applications about the location of the Crystal Space resources.
+The @samp{CrystalSpaceRoot} setting can be configured with an absolute path
+which points at the root of the Crystal Space resource hierarchy within the
+filesystem.  It is most useful to configure this setting in the @emph{global}
+defaults domain.  For example, on MacOS/X, MacOS/X Server 1.0 (Rhapsody), or
+OpenStep, you could invoke this command from the command-line:
+
+@example
+defaults write NSGlobalDomain CrystalSpaceRoot "/usr/local/CS"
+@end example
+
+On NextStep, you would invoke this command:
+
+@example
+dwrite Global CrystalSpaceRoot "/usr/local/CS"
+@end example
+
+It is also possible to instruct Crystal Space applications to ignore the value
+of @samp{CrystalSpaceRoot} by assigning the @samp{CrystalSpaceRootIgnore}
+option a value of @samp{Yes}.  This is most useful when you would like to have
+a particular application ignore the value of @samp{CrystalSpaceRoot} set in the
+global domain.  For example:
+
+@example
+defaults write walktest CrystalSpaceRootIgnore "Yes"
 @end example
 
 @unmacro NeXT

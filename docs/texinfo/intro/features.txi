@@ -35,7 +35,7 @@ write your own engine. The libraries include:
 Direct3D for Windows port.
 
 @item
-OpenGL support for GNU/Linux, BeOS, Macintosh, OS/2, and Windows.
+OpenGL support for GNU/Linux, BeOS, MacOS/9, OS/2, and Windows.
 
 @item
 Glide support for GNU/Linux and BeOS.
@@ -186,7 +186,7 @@ Dynamically-sized arrays (@code{csVector}).
 Virtual file system.  @xref{VFS}.
 
 @item Sound Driver / Sound Renderer
-General sound system.  Currently drivers exist for GNU/Linux, Macintosh, and
+General sound system.  Currently drivers exist for GNU/Linux, MacOS/9, and
 Windows.
 
 @item Network Driver

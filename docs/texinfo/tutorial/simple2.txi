@@ -120,8 +120,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @{
   @dots{}
   // Load a sprite template from disk.
-  csMeshFactoryWrapper* spritetmpl = csLoader::LoadMeshObjectFactory (engine,
-  	"/lib/std/sprite1");
+  csMeshFactoryWrapper* spritetmpl =
+    csLoader::LoadMeshObjectFactory (engine, "/lib/std/sprite1");
   if (spritetmpl == NULL)
   @{
     Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");

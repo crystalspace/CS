@@ -57,6 +57,29 @@ The history order has been reversed so that new features are at the top.
 	- Cleaned up the csThing.h header a lot. Made a lot private
 	  and added GetCurvesScale/SetCurvesScale and GetCurvesCenter/
 	  SetCurvesCenter.
+	- Eric Sunshine performed a major update to the Apple/NeXT
+	  documentation in the user's manual.
+	    - Overhauled to reflect all the recent major work done to the
+	      Apple/NeXT ports.
+	    - Now mentions new (untested) MacOS/X port.
+	    - Added and updated resource URLs.
+	    - Reworked port-specific file-description section.  Now takes into
+	      account recent distillation of Objective-C++ into pure C++ and
+	      pure Objective-C.
+	    - Discusses new CrystalSpaceRoot and CrystalSpaceRootIgnore
+	      defaults.
+	    - Added key-mapping discussion for NextStep.
+	    - Added several new To-Do and Bugs items to the `NeXT Notes'
+	      section.
+	    - Many other clarifications and enhancements.
+	- Eric Sunshine updated the BeOS-specific documentation in the user's
+	  manual.
+	- Eric Sunshine repaired a significant number of TeX formatting
+	  problems which were recently introduced into the Texinfo source
+	  files.
+	- Eric Sunshine converted several of the map2cs tutorial EPS images
+	  back to gray scale so that they will look nicer in typical printed
+	  output.  They also display correctly once again on NeXT.
 18-Feb-2001
 	- Martin Geisse added some missing 'volatile' keywords to the
 	  waveout driver.

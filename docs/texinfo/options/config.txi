@@ -36,12 +36,12 @@ The file itself looks like this:
 Section.Keyname = Value
 ; Comments may be
 ; several lines long
-; The option 'Section.TestOption' has no comment attached to it
+; The option 'Section.TestOption' has no comment attached to it.
 Video.OpenGL.EnableDither = true
 Section.TestOption = false
-; Comments at the end of the file do not belong to any config key. When a
-; config file is loaded and saved again later this end-of-file comment is put
-; back at the end of the config file.
+; Comments at the end of the file do not belong to any configuration
+; key. When a config file is loaded and saved again later this
+; end-of-file comment is put back at the end of the config file.
 @end example
 
 @menu

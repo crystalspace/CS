@@ -10,9 +10,9 @@ updated 8 December 1999.}
 The MacOS/9 port of Crystal Space is maintained by K.  Robert Bate.  If you
 have any questions or problems, contact him at @email{rbate@@ma.ultranet.com}.
 
-This port of Crystal Space is based upon the pre-Carbon Macintosh ToolBox API.
-Because it utilizes the classic Macintosh it is suitable for MacOS/9 as well
-as possibly earlier releases.  This port of Crystal Space will not work on
+This port of Crystal Space is based upon the pre-Carbon Macintosh Toolbox API.
+Because it utilizes the classic Macintosh API it is suitable for MacOS/9 as
+well as possibly earlier releases.  This port of Crystal Space will not work on
 MacOS/X since it is not Carbon-compatible
 
 You will need the following to compile Crystal Space:

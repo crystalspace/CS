@@ -20,7 +20,7 @@ will find a reference to it from within the instructions in this section.
 * Unix::
 * Win32:: Windows - Using @sc{msvc}++ Compiler
 * Mingw:: Windows - Using Mingw Compiler
-* NeXT:: MacOS/X Server, OpenStep, NextStep
+* NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 * MacOS/9::
 * OS2:: @sc{os}/2
 * BeOS:: @sc{b}e@sc{os}
