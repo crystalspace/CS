@@ -226,6 +226,13 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       {
 	const char *file = child->GetAttributeValue("file");
 	const char *name = child->GetAttributeValue("name");
+	if (!name)
+	{
+	  synldr->ReportError (
+		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
+		  child,"name is a required attribute of <animation> token in cal3d files.");
+	  return 0;
+	}
 	int type = child->GetAttributeValueAsInt("type");
 	float base_vel = child->GetAttributeValueAsInt("base_vel");
 	float min_vel = child->GetAttributeValueAsFloat("min_vel");
