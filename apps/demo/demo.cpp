@@ -118,7 +118,7 @@ void Demo::SetupFactories ()
     Printf (MSG_FATAL_ERROR, "Could not open sprite 3d factory loader!\n");
     exit (0);
   }
-  //LoadFactory ("stars", "/demo/skymesh", "crystalspace.mesh.object.sprite.3d",
+  //LoadFactory ("stars", "/lib/demo/skymesh", "crystalspace.mesh.object.sprite.3d",
 	//plug);
   plug->DecRef ();
 }
@@ -136,17 +136,17 @@ void Demo::SetupMaterials ()
   LoadMaterial ("flare_spark", "/lib/std/spark.png");
   LoadMaterial ("stone", "/lib/std/stone4.gif");
   LoadMaterial ("sun", "/lib/std/white.gif");
-  LoadMaterial ("jupiter", "/demo/jup0vtt2.jpg");
-  LoadMaterial ("saturn", "/demo/Saturn.jpg");
-  LoadMaterial ("earth", "/demo/Earth.jpg");
-  LoadMaterial ("earthclouds", "/demo/earthclouds.jpg");
-  LoadMaterial ("nebula_b", "/demo/nebula_b.png");
-  LoadMaterial ("nebula_d", "/demo/nebula_d.png");
-  LoadMaterial ("nebula_f", "/demo/nebula_f.png");
-  LoadMaterial ("nebula_l", "/demo/nebula_l.png");
-  LoadMaterial ("nebula_r", "/demo/nebula_r.png");
-  LoadMaterial ("nebula_u", "/demo/nebula_u.png");
-  LoadMaterial ("stars", "/demo/stars.png");
+  LoadMaterial ("jupiter", "/lib/demo/jup0vtt2.jpg");
+  LoadMaterial ("saturn", "/lib/demo/Saturn.jpg");
+  LoadMaterial ("earth", "/lib/demo/Earth.jpg");
+  LoadMaterial ("earthclouds", "/lib/demo/earthclouds.jpg");
+  LoadMaterial ("nebula_b", "/lib/demo/nebula_b.png");
+  LoadMaterial ("nebula_d", "/lib/demo/nebula_d.png");
+  LoadMaterial ("nebula_f", "/lib/demo/nebula_f.png");
+  LoadMaterial ("nebula_l", "/lib/demo/nebula_l.png");
+  LoadMaterial ("nebula_r", "/lib/demo/nebula_r.png");
+  LoadMaterial ("nebula_u", "/lib/demo/nebula_u.png");
+  LoadMaterial ("stars", "/lib/demo/stars.png");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -493,7 +493,12 @@ bool Demo::Initialize (int argc, const char* const argv[],
     "The Crystal Space Demo.\n");
 
   // Mount our demo file.
-  VFS->Mount ("/demo", ".$/csdemo$/");
+  //if (!VFS->Mount ("/lib/demo", "data/csdemo.zip"))
+  //{
+    //Printf (MSG_FATAL_ERROR, "Can't load csdemo data!...\n");
+    //exit (0);
+  //}
+  VFS->Mount ("/lib/demo", ".$/csdemo$/");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
@@ -511,7 +516,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   SetupSector ();
   seqmgr = new DemoSequenceManager (this);
   SetupObjects ();
-  seqmgr->Setup ("/demo/sequences");
+  seqmgr->Setup ("/lib/demo/sequences");
 
   engine->Prepare ();
 
