@@ -62,6 +62,7 @@
 #    define GLAPIENTRY __stdcall
 #  else
 /* non-Windows compilation */
+//#    define GLAPI extern
 #    define GLAPI
 #    define GLAPIENTRY
 #  endif /* WIN32 / CYGWIN bracket */
@@ -12810,7 +12811,7 @@ public:
     // Low priority so canvas/renderer cfgs may override the settings
     config.AddConfig (object_reg, "/config/glext.cfg", true,
       iConfigManager::ConfigPriorityPlugin - 1);
-}
+  }
   
   void Open () 
   { 

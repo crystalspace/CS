@@ -307,10 +307,10 @@ void csExactCuller::AddObject (void* obj,
       int num_clipped = spoly->GetVertexCount ();
       csBox2 out_box;
       out_box.StartBoundingBox ();
-      for (j = 0 ; j < spoly->GetVertexCount () ; j++)
+      for (size_t k = 0 ; k < spoly->GetVertexCount () ; k++)
       {
-        Perspective ((*spoly)[j], clipped[j], fov, sx, sy);
-	out_box.AddBoundingVertex (clipped[j]);
+        Perspective ((*spoly)[k], clipped[k], fov, sx, sy);
+	out_box.AddBoundingVertex (clipped[k]);
       }
       if (boxclip->ClipInPlace (clipped, num_clipped, out_box)
       	!= CS_CLIP_OUTSIDE)

@@ -1689,7 +1689,10 @@ bool csVFS::ChDir (const char *Path)
   // Find the current directory node and directory suffix
   VfsNode* newcnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
   if (!newcnode)
+  {
+    delete[] newwd;
     return false;
+  }
   cnode = newcnode;
 
   delete [] cwd;

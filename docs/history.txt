@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Sep-2004
+	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
+	  of 'extern') over to the GL extension manager templates.
+	- res fixed a leak in VFS.
+	- res fixed a signed vs unsigned warning in dynavis.
 24-Sep-2004
 	- Jorrit moved csProcAnimated to cstool so that it is easier to
 	  use animated textures from code.
