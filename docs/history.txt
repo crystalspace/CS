@@ -24,6 +24,10 @@ Short-term cleanups that need to be done:
 	  simpcons.h and cssprite.cpp which afflicted MSVC++.
 	- Made the colors for Blocks a little nicer.
 	- Fixed bug with camera position. Uninitialized variable.
+	- Eric Sunshine fixed a couple problems with handling of key input
+	  in the Win32 driver in the absence of DirectInput.  The ESC key
+	  was generating multiple key-down events, and the Return key was
+	  generating two key-down events with distinct key codes.
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
