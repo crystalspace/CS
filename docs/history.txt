@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	    - Fixed bug: SetCurLine() had bogus logic.
 	    - Fixed bugs: A significant number of boundary (one-off) errors
 	      were present.
+	- Eric Sunshine eliminated compilation warnings from tinystr.cpp.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.

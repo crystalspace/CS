@@ -130,7 +130,6 @@ void TiXmlString ::operator = (const TiXmlString & copy)
 // append a const char * to an existing TiXmlString
 void TiXmlString::append( const char* str, int len )
 {
-    char * new_string;
     unsigned new_alloc, new_size;
 
     new_size = length () + len + 1;
@@ -166,7 +165,6 @@ void TiXmlString::append( const char* str, int len )
 // append a single char
 void TiXmlString::append( char single )
 {
-    char * new_string;
     unsigned new_alloc, new_size;
 
     new_size = length () + 1 + 1;
