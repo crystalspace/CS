@@ -256,7 +256,11 @@ enum
    * OUT: NULL
    * </pre>
    */
-  cscmdTreeRemoveChild
+  cscmdTreeRemoveChild,
+  /**
+   * Remove all tree items 
+   */
+  cscmdTreeRemoveAll
 };
 
 #define CS_TREEITEMCHECK_SELECTED	0xdeadface
@@ -383,6 +387,9 @@ protected:
 
   /// Removes an item from the tree ( and all its children )
   void RemoveChild (csComponent *item);
+
+  /// Removes all tree items
+  void RemoveAll ();
 
   /// Get the last in the set of opened branches
   csComponent *GetLast ();

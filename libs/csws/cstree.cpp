@@ -903,6 +903,9 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       RemoveChild ((csComponent*)Event.Command.Info);
       Event.Command.Info = NULL;
       return true;
+    case cscmdTreeRemoveAll:
+      RemoveAll ();
+      return true;
     } /* endswitch */
     break;
   } /* endswitch */
@@ -1176,6 +1179,14 @@ void csTreeCtrl::RemoveChild (csComponent *item)
   TreeCtrlNode *node = treeroot->FindItem (item);
   if (node)
     delete node;
+}
+
+void csTreeCtrl::RemoveAll ()
+{
+  delete treeroot;
+  treeroot = new TreeCtrlNode (NULL, NULL, true);
+  PlaceItems ();
+  Invalidate ();
 }
 
 bool csTreeCtrl::ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess)
