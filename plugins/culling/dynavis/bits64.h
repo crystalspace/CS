@@ -26,7 +26,7 @@
  */
 class csBits64
 {
-private:
+public:
   uint32 b1, b2;
 
 public:

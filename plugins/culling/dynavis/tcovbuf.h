@@ -29,6 +29,7 @@ struct iGraphics2D;
 struct iGraphics3D;
 class csString;
 class csBox2;
+class csTiledCoverageBuffer;
 
 // Line operations in a tile.
 #define OP_LINE 1	// General line.
@@ -55,6 +56,8 @@ struct csLineOperation
  */
 class csCoverageTile
 {
+  friend class csTiledCoverageBuffer;
+
 private:
   // If true entire tile is full.
   bool tile_full;

@@ -337,7 +337,7 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
   }
 
   const csBits64& c = coverage[x];
-  return c.TestBit (y);
+  return !c.TestBit (y);
 }
 
 //---------------------------------------------------------------------------
@@ -1102,21 +1102,37 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
   }
 }
 
-static int count_bits (uint32 bits)
-{
-  int cnt = 0;
-  while (bits)
-  {
-    if (bits & 1) cnt++;
-    bits >>= 1;
-  }
-  return cnt;
-}
-
 iString* csTiledCoverageBuffer::Debug_Dump ()
 {
   scfString* rc = new scfString ();
-  //csString& str = rc->GetCsString ();
+  csString& str = rc->GetCsString ();
+
+  int x, y, tx, ty, i, j;
+  for (ty = 0 ; ty < num_tile_rows ; ty++)
+  {
+    for (y = 0 ; y < 8 ; y++)
+    {
+      for (tx = 0 ; tx < (width_po2 >> 5) ; tx++)
+      {
+        int cnt = 0;
+        csCoverageTile* tile = GetTile (tx, ty);
+	for (x = 0 ; x < 4 ; x++)
+	{
+	  for (i = 0 ; i < 8 ; i++)
+	    for (j = 0 ; j < 8 ; j++)
+	      cnt += tile->coverage[x*8+i].TestBit (y*8+j);
+	}
+	char c;
+	if (cnt == 64) c = '#';
+	else if (cnt > 54) c = '*';
+	else if (cnt == 0) c = ' ';
+	else if (cnt < 10) c = '.';
+	else c = 'x';
+	str.Append (c);
+      }
+      str.Append ('\n');
+    }
+  }
 
   return rc;
 }
@@ -1153,6 +1169,9 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
   poly[2].Set (300, 300);
   poly[3].Set (50, 300);
   InsertPolygon (poly, 4, 10.0);
+iString* sss = Debug_Dump ();
+printf ("%s\n", sss->GetData ());
+sss->DecRef ();
   COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
   COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
 

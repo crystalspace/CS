@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	- In addition to the boxes the view frustum is also shown with
 	  transparent colored triangles that fade in the distance.
 	- Assigned 'setup_debugsector' to shift-3 key in BugPlug.
+	- Some more debugging in Dynavis.
 13-Jun-2002
 	- Fixed ode plugin so that it now calls DeferUpdateLighting()
 	  when the object moves so that lighting is calculated. This is
