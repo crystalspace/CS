@@ -7,12 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Apr-2004
-	- Aren Blondahl updated map2cs to have newly optimized render priority 
-	  on entities ('priority' tag in the .map) and fixed map2cs to support 
-	  new alpha flag under <mixmode> instead of under each polygon. ('alpha'
-	  tag in the .map)
-	- Aren Blondahl patched map2cs's light format to comply with <radius> tag,
-	  and added in brightness / influence radius support.
+	- Aren Blondahl updated map2cs to have newly optimized render priority
+	  on entities ('priority' tag in the .map) and fixed map2cs to support
+	  new alpha flag under <mixmode> instead of under each polygon.
+	  ('alpha' tag in the .map)
+	- Aren Blondahl patched map2cs's light format to comply with <radius>
+	  tag, and added in brightness / influence radius support.
 	- res fixed a crash bug in the Win32 GL canvas when the WGL "extension
 	  string" extension was not present.
 16-Apr-2004
@@ -200,7 +200,7 @@ chronological order.
 	- Remi Bonnet made csSet::Delete returns whether an object was deleted
 	  or not.
 	- res added a facility to the common shader plugins to simplify the use
-	  of program parameters that can either be constants or shader 
+	  of program parameters that can either be constants or shader
 	  variables. (Functionality overlaps with variable mappings; would be
 	  nice colllapse var mappings and shader params at some point.)
 	- res augmented the light iter step to also provide the light position
@@ -267,7 +267,7 @@ chronological order.
 	- Eric Sunshine fixed bug in the deprecated csutil/hashmap.h where it
 	  was re-declaring the csHashCompute() functions with signatures
 	  different from the ones in csutil/hash.h.
-	- res removed a commented-out debug printf() in 
+	- res removed a commented-out debug printf() in
 	  csHashMap::ChangeBuckets(). The comment was errorneously line-broken,
 	  causing compile errors.
 	- Eric Sunshine fixed CS_TEXT_CACHE_OUTPUT() in textcache.m4 to do a
@@ -275,9 +275,9 @@ chronological order.
 	- Jorrit disabled the use of fputws for now until we find out a way
 	  to discover buggy implementations of fputws.
 	- res augmented the fixed function FP tp support GL fog.
-	- res fixed a bug where binding a vertex buffer to multiple 
+	- res fixed a bug where binding a vertex buffer to multiple
 	  destinations didn't work (was only bound to the first destination).
-	- res augmented the chunklod plugin to also provide normalized tex 
+	- res augmented the chunklod plugin to also provide normalized tex
 	  coords (ie go from 0 to 1 over the area of the terrain).
 	- Eric Sunshine fixed a stupid oversight in install.mak where the
 	  'install' target failed to be recognized by the sub-make invocation,
@@ -303,11 +303,11 @@ chronological order.
 	- Jorrit found out that walktest was actually using iDataObject.
 	  Instead of reviving iDataObject, fixed Walktest so that it no
 	  longer requires it.
-	- res fixed a bug in the AVI handler where a loop counter was 
+	- res fixed a bug in the AVI handler where a loop counter was
 	  incremented twice.
 	- Jorrit implemented a considerable optimization in Dynavis
 	  and Frustvis by replacing csHashSet with csSet<T>.
-	- res augmented the GL fixed shader program plugin to allow 
+	- res augmented the GL fixed shader program plugin to allow
 	  manipulation of the texture matrix.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
@@ -377,9 +377,9 @@ chronological order.
 	  iCollideSystem->CreateSphereCollider() and CreateBoxCollider().
 	  Fixed RAPID and OPCODE plugins for this change.
 	- Jorrit augmented the API documentation of iCollideSystem.
-	- Luca has fixed a tiny error in the engine plugin. The error was 
-	  returning a value in a function whose return value is void. He 
-	  also updated the doxygen's comment for the iMeshWrapper::GetFlags() 
+	- Luca has fixed a tiny error in the engine plugin. The error was
+	  returning a value in a function whose return value is void. He
+	  also updated the doxygen's comment for the iMeshWrapper::GetFlags()
 	  method.
 	- Aren Blondahl revised <settings> block in map2cs and added ambient
 	  lighting, clearscreen, and maxlightmapsize support to map2cs.
@@ -514,7 +514,7 @@ chronological order.
 	      difficult or dirty work.
 	- res augmented the win32 minidump facility to optionally include the
 	  heap in the dump.
-	- res slightly changed the way lightiter creates the attenuation 
+	- res slightly changed the way lightiter creates the attenuation
 	  texture.
 	- res made some VC6 compile fixes.
 	- Eric Sunshine performed a major overhaul of intro/contrib.txi:
@@ -626,11 +626,11 @@ chronological order.
 	  now output XML instead of the old map format.
 	- Jorrit also fixed the MDL part of mdl2spr (not only MD2).
 	- res made the following changes to the standard render steps:
-	    - Add the ability to create the texture and use a persistent 
+	    - Add the ability to create the texture and use a persistent
 	      render target in the 'target' step.
 	    - Changed the 'fullscreen' step to accept a shader instead of a
-	      material/shadertype combo, textures, mixmode, alpha mode and 
-	      shader vars, as well as optionally different behaviour when it's 
+	      material/shadertype combo, textures, mixmode, alpha mode and
+	      shader vars, as well as optionally different behaviour when it's
 	      drawn the first time. Also changed it to use DrawSimpleMesh().
 	- res augmented the Win32 keyboard handling to support input from an
 	  IME, based on some code from 'fusilli'.
@@ -639,11 +639,11 @@ chronological order.
 	  and where it was incorrectly terminating tags with ">" when "/>" was
 	  called for.
 4-Apr-2004
-	- res moved the attenuation texture generation to the light iter 
+	- res moved the attenuation texture generation to the light iter
 	  plugin. Still the same texture for all lights, though. Plan is to
 	  have individual attenuation textures, reflecting the light's
 	  actual attenuation settings.
-	- res added non-const versions for csHash<>::Get() and 
+	- res added non-const versions for csHash<>::Get() and
 	  GetElementPointer().
 	- res made spr2d's SV accessor a non-embedded interface. Fixes a leak.
 	- Eric Sunshine re-added 'ranlib' step to Library build rule in Jam.
@@ -653,7 +653,7 @@ chronological order.
 	  the make system creates the library with Apple's 'libtool', whereas
 	  Jam creates it with 'ar'.)  Consequently, Jam build now runs ranlib
 	  at both build and install times.
-	- res fixed leaking of render meshes and the SV context in the new 
+	- res fixed leaking of render meshes and the SV context in the new
 	  particle system.
 	- res fixed the haze plugin to use the _EXT versions of SCF macros for
 	  descendants of csHazeHull.
@@ -671,13 +671,13 @@ chronological order.
 	- Jorrit also added iGeneralFactoryState->SetBack2Front() and
 	  IsBack2Front() for this functionality. Still doesn't do anything
 	  yet.
-	- res augmented Cg VPs to modify the compiled ARB VP to use the 
+	- res augmented Cg VPs to modify the compiled ARB VP to use the
 	  built-in GL state matrices for the ModelView etc. matrices resp.
 	  use glTrackMatrixNV() for nVidia VPs.
 	- res added the ability to load ARB VPs from raw text.
-	- res augmented csRenderMeshHolderMultiple to allow optional 
+	- res augmented csRenderMeshHolderMultiple to allow optional
 	  non-deletion of the contained csRenderMesh*es.
-	- res fixed csParticleSystem to disable render mesh deletion in the 
+	- res fixed csParticleSystem to disable render mesh deletion in the
 	  holder.
 	- res added a facility to allow shader programs to resolve a texture
 	  binding destination in shaders. This way you can have 'custom' names
@@ -691,7 +691,7 @@ chronological order.
 	      typedef.
 	    - Added a new base class for shader plugins, containing some
 	      common stuff.
-	    - Updated the glshader_arb program classes to use that new base 
+	    - Updated the glshader_arb program classes to use that new base
 	      class.
 	- res augmented the Cg configure check to use pthread, required by
 	  Cg for Linux.
@@ -758,7 +758,7 @@ chronological order.
 	  python23_d.lib is used on MSVC.
 	- res fixed some VC6 compile errors in some shader plugin and updated
 	  some shader plugin makefiles to utilize the common shaderplugin code.
-	- res changed char arrays on the stack to csStrings in stdrep and 
+	- res changed char arrays on the stack to csStrings in stdrep and
 	  simpcon to avoid buffer overflows.
 	- Eric Sunshine applied a Swig-related patch from Andrew Sutherland
 	  <sombrero@alum.mit.edu> (patch #925053).  Andrew writes:
@@ -791,7 +791,7 @@ chronological order.
 	  %ignore directives for non-Python platforms to ignore the methods
 	  which are incorrectly exported by Swig, and which the new
 	  GetFooByIndex() methods are meant to replace.
-	- res changed the Cg shader plugins to use the new shader plugin base 
+	- res changed the Cg shader plugins to use the new shader plugin base
 	  class.
 	- res added two simple example Cg programs.
 1-Apr-2004
@@ -864,7 +864,7 @@ chronological order.
 	      unregister itself instead of registering.
 	    - Second the portal container registration was broken in case
 	      the portal mesh is a child mesh (which is a very common case).
-	- res fixed spr3d on NR (actually, just the obj2cam transform wasn't 
+	- res fixed spr3d on NR (actually, just the obj2cam transform wasn't
 	  set). Also slightly changed the way it's drawn, now uses shader var
 	  accessors (instead of setting all the data in GetRenderMeshes()).
 	- res fixed a GCC warning in the PS1 plugin.
@@ -874,7 +874,7 @@ chronological order.
 	  updates this matrix when the perspective center or aspect changes
 	  (which can happen if multiple views are drawn subsequently).
 	- res changed csList<>::csListElement to not be dllimported any more.
-	  That caused linking problems (as the actual instantiation of 
+	  That caused linking problems (as the actual instantiation of
 	  csListElement would eb required in csutil).
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
@@ -886,7 +886,7 @@ chronological order.
 	- Jorrit added 'chunklod' to the list of static plugins for Jam.
 	- res worked further on the PS1.x->1.4 converter. Improved register
 	  aliasing.
-	- res made the NR normalizer cubemap size changeable via a config 
+	- res made the NR normalizer cubemap size changeable via a config
 	  setting. Also increased the default size to 256.
 28-Mar-2004
 	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
@@ -912,8 +912,8 @@ chronological order.
 	    - Allow more control where a library is referenced in the map file;
 	      "end:lib" puts lib at the end (useful for e.g. sequences).
 	    - The player start angle is correctly evaluated.
-	    - Added possibility to exclude certain textures from being 
-	      generated and written to the .zip (so they are supplied by the 
+	    - Added possibility to exclude certain textures from being
+	      generated and written to the .zip (so they are supplied by the
 	      user).
 	    - Added possibility to specify the renderloop to use.
 	- res augmented the rotation sequence action loaded to automatically
@@ -924,7 +924,7 @@ chronological order.
 	- res fixed the simple console to draw text in PutTextV() only if the
 	  method hadn't been called recursively (on rare occasions, something
 	  was reported from inside the 2D functions, causing the 2D stuff to
-	  be called again, where again something was reported and so on, 
+	  be called again, where again something was reported and so on,
 	  leading to an infinite recursion resp. stack overflow).
 	- res changed csShaderVariable::SetValue(csVector2) to set the 3rd
 	  component of the internally stored Vector4 to 0 instead of 1.
@@ -935,17 +935,17 @@ chronological order.
 	- res virtualized some methods in the standard proctex plugin.
 	- res augmented csRenderMeshList with a method to remove all meshes
 	  outside a sphere.
-	- res changed the generic renderstep to not draw meshes that are 
+	- res changed the generic renderstep to not draw meshes that are
 	  outside the influence of the light passed in.
 	- res added a method to iTextureLoaderContext to retrieve the name of
 	  the texture to be loaded.
 	- res un-inverted the <mipmap> texture flag parse logic.
-	- res added a texture loader to generate a (static) texture from a 
+	- res added a texture loader to generate a (static) texture from a
 	  shader expression.
 	- res added a sanity check to csShaderVariableContext::PopVariables().
 	- res fixed the shader expressions so atomic expressions are accepted
 	  and added pow, min and max functions.
-	- res did various changed and fixes to the glshader_ps1 plugin: 
+	- res did various changed and fixes to the glshader_ps1 plugin:
 	  changed the way instruction are declared, the version is parsed,
 	  fixed replication for ps1.4 programs, fixed dealing with phase in
 	  ps1.4 programs, fixed parsing of the destination write mask for 1.4
@@ -953,14 +953,14 @@ chronological order.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through
-	      the Pixel Shader plugin, to make Cg available on lower end ATI 
-	      cards. This means the Cg plugin should now be able to cover all 
-	      cards with some kind of pixel shading ability. (I.e. GF3+ and 
-	      ATI 8500+). Routing will be enabled by default on cards where 
+	      the Pixel Shader plugin, to make Cg available on lower end ATI
+	      cards. This means the Cg plugin should now be able to cover all
+	      cards with some kind of pixel shading ability. (I.e. GF3+ and
+	      ATI 8500+). Routing will be enabled by default on cards where
 	      ATI_fragment_shader is supported, but ARB_fragment_program isn't.
-	      It can also be manually forced on or off by setting 
-	      "Video.OpenGL.Shader.Cg.PSRouting" in a config file. 
-	    - Fixed variable mapping in the Cg plugin, which apparantly was 
+	      It can also be manually forced on or off by setting
+	      "Video.OpenGL.Shader.Cg.PSRouting" in a config file.
+	    - Fixed variable mapping in the Cg plugin, which apparantly was
 	      broken.
 	    - Added an overloaded Load function to shader plugins, which
 	      allows for loading shaders from raw text buffers instead of
@@ -971,7 +971,7 @@ chronological order.
 	  addition to that it even used that value. Hitting cal3d
 	  sprites with HitBeam() should now work.
 	- Anders Stenberg added scissor clipping to NR. This means a GL
-	  scissor clipping box is applied to the bounding box of the clipper, 
+	  scissor clipping box is applied to the bounding box of the clipper,
 	  which in practice means some fillrate is saved.
 	- Anders reverted the latest addition (or at least commented it out)
 	  since it'll probably conflict with scissor settings in the canvas.
@@ -979,7 +979,7 @@ chronological order.
 26-Mar-2004
 	- Marten added csMatrix as a type a csShaderVariable can store.
 	- Marten made the shadermanager responsible for handling the shader-
-	  variablestack used during rendering. This to allow other plugins to 
+	  variablestack used during rendering. This to allow other plugins to
 	  access it without having to pass it around everywhere.
 	- Marten comitted first steps toward making NR use fog. It does not yet
 	  work though, but its progressing.
@@ -1015,8 +1015,8 @@ chronological order.
 	  values: now, a handle is requested from a wrapper when it's needed
 	  the first time. Some wrappers don't have a handle yet when the value
 	  is set, but get one later.
-	- Matt Reda changed the MacOS X OpenGL canvas to use a 32 bit depth 
-	  buffer (it was 16) and added 8 bit stencil and alpha buffers when 
+	- Matt Reda changed the MacOS X OpenGL canvas to use a 32 bit depth
+	  buffer (it was 16) and added 8 bit stencil and alpha buffers when
 	  compiling for the new renderer
 	- Jorrit added a new csStringReader class to csutil. This class takes
 	  a const char* input buffer as input and will split that buffer
@@ -1066,9 +1066,9 @@ chronological order.
 	  Possible todo: Not assume 8-bit stencil, but allow different
 	  bitcounts. Also somehow avoid glClear of the stencil buffer.
 	- Anders Stenberg updated shader plugins to actually not load
-	  if the wrong renderer (software) is used. Todo is to give a 
+	  if the wrong renderer (software) is used. Todo is to give a
 	  better error message.
-	  Also changed the "environment" syntax of FixedVP a bit to 
+	  Also changed the "environment" syntax of FixedVP a bit to
 	  allow for future texgen modes. Look at water shader for reference.
 	- Anders Stenberg fixed a bug in windows threading, where a
 	  semaphore "LockWait" would return instantly due to wrong
@@ -1120,7 +1120,7 @@ chronological order.
 	  the bcsgeom library (whatever that is :-).
 	- Jorrit fixed the NR glrender3d target. You can't declare variables
 	  without a type like this:
-	    static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+	    static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST,
 	      GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
 	- Jorrit fixed a harmless initialization error in Frustvis and
 	  Dynavis.
@@ -1155,9 +1155,9 @@ chronological order.
 	  iString::FormatV() wrapper.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
-	  of the regex.c file in the CSUtil library. The problem was 
+	  of the regex.c file in the CSUtil library. The problem was
 	  related to the VisualC++ compiler environments only.
-	- Marten made a new, hopefully permanent, fix for the csRenderMesh 
+	- Marten made a new, hopefully permanent, fix for the csRenderMesh
 	  problem. This fix replace removed res workaround from the 15th March.
 	  This change also means that DrawTest no longer is used in the NR
 	  way of doing things. Instead GetRenderMeshes now does the job of both
@@ -1184,8 +1184,8 @@ chronological order.
 	  'fixed' it.
 	- Duhprey added a IBASE constructor/destructor for csSimpleSampler
 	- res changed csMaterial::SetShader() to override any already set
-	  shader for a type. 
-	- res fixed bugplug's spider camera catching in NR after Marten's 
+	  shader for a type.
+	- res fixed bugplug's spider camera catching in NR after Marten's
 	  recent changes to GetRenderMeshes() and DrawTest().
 	- res augmented map2cs with the ability to specify libraries included
 	  in a map and exclude certain materials from being generated (so they
@@ -1197,7 +1197,7 @@ chronological order.
 	  before beginning/finishing 3d graphics.
 	- res moved the NV/ATI fragment shader setup to the ps1 plugin.
 	- res updated sprcal3d after Marten's recent changes.
-	- res tried some more to get NR softrender3d to work. Not there yet, 
+	- res tried some more to get NR softrender3d to work. Not there yet,
 	  though.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
@@ -1211,7 +1211,7 @@ chronological order.
 	- res applied some changes needed by the cs-win32libs package.
 	- res changed the manual to state cs-win32libs instead of msvc_libs
 	  resp. csmingw-libs as the Win32 support package.
-	- res generally updated some of the information in the Win32 build 
+	- res generally updated some of the information in the Win32 build
 	  docs.
 	- res extended the "External Libraries" list somewhat.
 	- res fixed a small formatting error in the VC build docs.
@@ -1279,7 +1279,7 @@ chronological order.
 	  CS_CSUTIL_EXPORT, causing missing symbols when csTree was used
 	  elsewhere.
 	- res hacked around the fact that cs_static_var_cleanup was defined in
-	  the app/plugins but used in the libs by using only one 
+	  the app/plugins but used in the libs by using only one
 	  cs_static_var_cleanup (contained in csutil) when building shared
 	  libraries.
 	- res changed the nada reftracker to being not exported via
@@ -1368,7 +1368,7 @@ chronological order.
 	  operators for types T and T2.  It turns out that MSVC6 will accept
 	  these as long as the templated versions (T2) appear before the
 	  non-templated versions (T).
-	- res renamed T& csHash<>::Fetch(key, fallback) to Get() and 
+	- res renamed T& csHash<>::Fetch(key, fallback) to Get() and
 	  T* csHash<>::Fetch(key) to GetElementPointer(). This way, familiar
 	  name(s) are kept, but code utilizing the old-style Get() syntax will
 	  fail to compile, thus forcing examination of the code as well.
@@ -1426,14 +1426,14 @@ chronological order.
 	  published in .tar.bz2 format (rather than .tar.bz2, .tgz, and .zip).
 	- John Harger fixed the warnings in glshader_ps1.
 	- res fixed a problem in csPortalContainer::Draw() where a ref to an
-	  object on the stack was stored (and thus the data was subsequently 
+	  object on the stack was stored (and thus the data was subsequently
 	  corrupted).
 	- res added a workaround to the generic render step for the issue that
-	  the transforms in the rendermeshes will be changed to reflect the 
-	  portal transform. However, as meshes usually keep just 1 copy RM, 
+	  the transforms in the rendermeshes will be changed to reflect the
+	  portal transform. However, as meshes usually keep just 1 copy RM,
 	  it'll affect the original mesh as well. Now the RMs are copied before
 	  drawing behind the portal and restored afterwards. Makes the shape
-	  room mirror in flarge work, but a better solution should be 
+	  room mirror in flarge work, but a better solution should be
 	  researched.
 	- John Harger added the beginnings of the macros for the DLL
 	  compilation on Windows. Added include/csextern.h, modified
@@ -1441,7 +1441,7 @@ chronological order.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
-	  Most of the enhancements are to minimize calls to 
+	  Most of the enhancements are to minimize calls to
 	  CalRenderer::getNormals due to a lot of unnecessary lighting updates.
 	- Jorrit added back the Get() to csHash that res removed a while ago.
 	  Having that Get() there does NOT restrict the csHash to be used on
@@ -1486,7 +1486,7 @@ chronological order.
 	  3D graphics. This makes more sense as BeginDraw() isn't called when
 	  beginning 3D gfx and fixes CSWS (it used to come up with black
 	  components).
-	- res changed the OR compatibility shader to respect the primary 
+	- res changed the OR compatibility shader to respect the primary
 	  color's alpha value.
 12-Mar-2004
 	- res augmented configure.ac to look for the OpenAL, Cg, and CgGL
@@ -1527,14 +1527,14 @@ chronological order.
 10-Mar-2004
 	- res made the following changes related to fonts:
 	    - Removed iFontServer::GetFont() and GetFontCount().
-	    - Removed iFont::SetSize(). The size is now a parameter to 
+	    - Removed iFont::SetSize(). The size is now a parameter to
 	      LoadFont().
 	    - Changed the behaviour of LoadFont() accordingly; now, only for
 	      same font name/font size pairs instances of the same font will
 	      be returned.
-	- res added a note to the movie recorder HOWTO that the plugin can 
+	- res added a note to the movie recorder HOWTO that the plugin can
 	  also be loaded via the command line.
-	- res partially rewrote the Custom Font HOWTO. It stated that the 
+	- res partially rewrote the Custom Font HOWTO. It stated that the
 	  best approach for custom fonts would be bitmap fonts converted from
 	  truetypes. However, using fontplex offers better I18N support.
 	- Eric Sunshine fixed `--plugin=' example in the movie recorder HOWTO
@@ -1547,9 +1547,9 @@ chronological order.
 	  to the resp. API mod paragraph.
 	- res changed csHash<> interface to contain two variants of Get(); one
 	  that returns a pointer to the contained data or 0, the other returns
-	  a reference to the data or a user-specified fallback value. This 
+	  a reference to the data or a user-specified fallback value. This
 	  change removes the need for contained types to have a constructor
-	  accepting a single parameter, which would be used to construct a 
+	  accepting a single parameter, which would be used to construct a
 	  'zero' return value in case a key wasn't found in the hash.
 	- res changed the csRefDocumentation slightly; at one place, 'csRef'
 	  was used, tho 'csRefCount' would make more sense there.
@@ -1564,8 +1564,8 @@ chronological order.
 	- Wouter removed old comment from iSector::GetLights() that
 	  instructed the user not to add dynamic lights to the list,
 	  but to use SetSector() instead. This method has been removed.
-	- John Harger finally implemented the cylinder emitter type in 
-	  particles. 
+	- John Harger finally implemented the cylinder emitter type in
+	  particles.
 	- res fixed the movie recorder to emit a proper warning when the movie
 	  couldn't be created.
 7-Mar-2004
@@ -1585,7 +1585,7 @@ chronological order.
 	      'lastLock' field.
 	    - Thing mesh: the useLightmap field was not initialized.
 6-Mar-2004
-	- Anders Stenberg finally found and fixed a clipper problem in NR, 
+	- Anders Stenberg finally found and fixed a clipper problem in NR,
 	  which actually turned out to be more than a clipper problem.
 	- Jorrit fixed a few errors throughout the Crystal Space project
 	  as reported by valgrind. Please people! Remember to initialize
@@ -1673,8 +1673,8 @@ chronological order.
 	- Eric Sunshine updated user.mak and shaderplugins/Jamfile so that the
 	  new glshader_ps1 plugin actually gets built.  Also augmented
 	  msvcgen/workspaces.mak to take this new plugin into account.
-	- res removed regex.c from msvcgen/win32.mak again. Seems it appears 
-	  in some other place, and thus occurs twice in the generated VC 
+	- res removed regex.c from msvcgen/win32.mak again. Seems it appears
+	  in some other place, and thus occurs twice in the generated VC
 	  libcsutil project.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
@@ -1705,15 +1705,15 @@ chronological order.
 	  about CS_CONFIGDIR and CS_PLUGINDIR being undefined when building
 	  with GNU make.
 	- res fixed a problem with the link library order when doing static
-	  builds: the LinkStaticPlugins Jam rule didn't respect that the last 
+	  builds: the LinkStaticPlugins Jam rule didn't respect that the last
 	  occurance of a lib has to remain when filtering out duplicates from
-	  the list of libs later passed to the linker; instead, it preserved 
+	  the list of libs later passed to the linker; instead, it preserved
 	  the first.
 	- Eric Sunshine converted csutil.mak, macosx.mak, unix.mak, and
 	  win32gcc.mak to the new style where built resources are placed in a
 	  target-specific subdirectory of $(OUT) rather than directly polluting
 	  $(OUT).
-	- res changed the data/config/Jamfile to also install .xml files. 
+	- res changed the data/config/Jamfile to also install .xml files.
 	  Needed for the GL driver db.
 	- res fixed mk/msvcgen/win32.mak to include generic/regex.c into the VC
 	  projects of csutil.
@@ -1775,7 +1775,7 @@ chronological order.
 	  lightmaps.
 	- res simplified the GL color (de)composition in the canvases. No need
 	  to juggle with pixel formats here.
-	- res changed the GL canvases to use scissor instead of manual 
+	- res changed the GL canvases to use scissor instead of manual
 	  clipping.
 	- res fixed a few memory leaks in VFS.
 27-Feb-2004
