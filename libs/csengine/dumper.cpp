@@ -447,6 +447,8 @@ void Dumper::dump (csLightPatchPool* pool, char* name)
   CsPrintf (MSG_DEBUG_0, "%d freed.\n", cnt);
 }
 
+
+#if 0
 void Dumper::dump (csQuadtreeNode* node, char* buf, int bufdim, int depth,
   	int x1, int y1, int x2, int y2)
 {
@@ -522,6 +524,7 @@ void Dumper::dump (csQuadtree* tree)
 
   delete [] buf;
 }
+#endif // quad removal
 
 char* spaces (int nr)
 {

@@ -22,6 +22,8 @@
 #include "csengine/world.h"
 #include "csengine/dumper.h"
 
+#if 0
+
 bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 	csPolygon2D& persp)
 {
@@ -115,6 +117,7 @@ int csQuadtreePersp::TestPoint (const csVector3& point)
   csVector2 persp (point.x * iz, point.y * iz);
   return csQuadtree::TestPoint (persp);
 }
+
 
 //-----------------------------------------------------------------
 
@@ -315,3 +318,4 @@ int csQuadcube::TestPoint (const csVector3& point)
   return trees[5]->TestPoint (cam);
 }
 
+#endif // if 0

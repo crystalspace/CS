@@ -64,8 +64,8 @@ private:
   static void dump (csBspTree* tree, csBspNode* node, int indent);
   static void dump (csOctree* tree, csOctreeNode* node, int indent);
   static void dump (csBspTree2D* tree, csBspNode2D* node, int indent);
-  static void dump (csQuadtreeNode* node, char* buf, int bufdim,
-  	int depth, int x1, int y1, int x2, int y2);
+  //static void dump (csQuadtreeNode* node, char* buf, int bufdim,
+  //	int depth, int x1, int y1, int x2, int y2);
   static void dump_stubs_node (csPolygonStub* stub, char* name, int level);
   static void dump_stubs_obj (csPolygonStub* stub, char* name, int level);
   static void dump_stubs (csBspNode* bnode, char* name, int level);
@@ -96,7 +96,7 @@ public:
   static void dump (csFrustum* frustum, char* name);
   static void dump (csPoly2DPool* pool, char* name);
   static void dump (csLightPatchPool* pool, char* name);
-  static void dump (csQuadcube* cube);
+  //static void dump (csQuadcube* cube);
   static void dump (csQuadtree* tree);
   static void dump_stubs (csOctree* octree);
   static void dump_stubs (csPolyTreeObject* ptobj);

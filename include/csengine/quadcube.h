@@ -25,6 +25,7 @@ class csClipper;
 #include "csengine/quadtree.h"
 #include "csengine/pol2d.h"
 
+#if 0
 /**
  * Subclass of csQuadtree which adds perspective correction
  * of 3d polygons.
@@ -112,6 +113,7 @@ public:
    */
   int TestPoint (const csVector3& point);
 };
+#endif // if 0
 
 #endif /*QUADCUBE_H*/
 
