@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __WALKTEST_H
-#define __WALKTEST_H
+#ifndef __WALKTEST_H__
+#define __WALKTEST_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -523,18 +523,6 @@ public:
   void RotateCam(float x, float y);
   
   ///
-  void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);
-  ///
-  void handle_key_backwards (float speed, bool shift, bool alt, bool ctrl);
-  ///
-  void handle_key_left (float speed, bool shift, bool alt, bool ctrl);
-  ///
-  void handle_key_right (float speed, bool shift, bool alt, bool ctrl);
-  ///
-  void handle_key_pgup (float, bool shift, bool alt, bool ctrl);
-  ///
-  void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
-  ///
   void eatkeypress (iEvent &Event);
 
   /// Handle mouse click events
@@ -566,4 +554,4 @@ void BoundingBoxForView(iView *view, csBox2 *box);
 // The global system driver
 extern WalkTest *Sys;
 
-#endif // __WALKTEST_H
+#endif // __WALKTEST_H__

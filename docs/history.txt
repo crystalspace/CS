@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+13-Dec-2002
+        - Andreas Busch cleaned up some old/unused prototypes and outdated
+          comments in walktest/handle_keys.
 12-Dec-2002
 	- Keith Fulton changed format of sequence delay tag from
 	  <delay>1000</delay> to <delay time="1000" />.

@@ -230,14 +230,6 @@ void free_keymap ()
   mapping = NULL;
 }
 
-/*------------------------------------------------------------------
- * The following handle_key_... routines are general movement
- * routines that are called by do_update() for the new movement
- * system and by do_keypress() for the old movement system (see
- * system.h for an explanation of the difference between the two
- * systems).
- *------------------------------------------------------------------*/
-
 extern iCamera* c;
 extern WalkTest* Sys;
 
