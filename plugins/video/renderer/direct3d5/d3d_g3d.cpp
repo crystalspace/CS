@@ -56,7 +56,7 @@ csIniFile *configd3d5;
 
 static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
 static bool use32BitTexture=false, use16BitTexture=false;
-static const float SCALE_FACTOR = 1.0f/2500.0f;
+static const float SCALE_FACTOR = 1.0f/10100.0f;
 
 /* ************************************************************** 
 csGraphics3DDirect3DDx5 Class Definition
