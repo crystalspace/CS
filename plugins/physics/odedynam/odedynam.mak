@@ -50,6 +50,7 @@ DEP.odedynam = CSGEOM CSUTIL CSSYS
 MSVC.DSP += odedynam
 DSP.odedynam.NAME = odedynam
 DSP.odedynam.TYPE = plugin
+DSP.odedynam.LIBS = ode
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
