@@ -77,6 +77,9 @@ public:
   ///
   virtual void Help ();
 
+  /// Get the installation path.
+  virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
+
   //------------------------- iEventPlug interface ---------------------------//
   DECLARE_IBASE_EXT (csSystemDriver);
 

@@ -772,3 +772,58 @@ void SysSystemDriver::Help ()
   Printf (MSG_STDOUT, "  -[np]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
 }
+
+
+bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
+{
+  // override the default to get install path from
+  // 1. registry
+  // 2. CRYSTAL environment variable
+  // 3. default.
+
+  /// Try the registry .. tentative code I cannot compile this...
+  HKEY m_pKey = _T("SOFTWARE\\CrystalSpace"));
+  char * pValueName = "installpath";
+  DWORD dwType;
+  DWORD bufSize = iBufferSize;
+
+  LONG result = RegQueryValueEx(
+      m_pKey, 
+      pValueName, 
+      0,
+      &dwType,
+      oInstallPath,
+      &bufSize);
+ 
+  if (ERROR_SUCCESS == result
+  {
+    goto got_value;
+  }
+
+  // registry didn't work.
+  // try env variable.
+  char *path = getenv ("CRYSTAL");
+  if (path && *path)
+  {
+    strncpy(oInstallPath, path, iBufferSize);
+    goto got_value;
+  }
+  // no env. variable. take the default
+  // which is C:\Program Files\Crystal\
+  strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
+
+got_value:
+  // got the value in oInstallPath, check for ending '/' or '\'.
+  int len = strlen(oInstallPath);
+  if(len == 0) return;
+  if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\' )
+    return;
+  if(len+1 >= iBufferSize)
+  {
+    strncpy(oInstallPath, "", iBufferSize); //make empty if possible
+    return;
+  }
+  oInstallPath[len] = '\';
+  oInstallPath[len+1] = 0;
+}
+
