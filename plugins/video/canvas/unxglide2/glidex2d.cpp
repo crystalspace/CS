@@ -84,13 +84,13 @@ void csGraphics2DGlideX::Initialize()
   display_height = DisplayHeight (dpy, screen_num);
 
   // Determine visual information.
-  Visual* visual = DefaultVisual (dpy, screen_num);
+  //Visual* visual = DefaultVisual (dpy, screen_num);
 
-
+  
   Depth=16;
 	  
-  DrawPixel = DrawPixelGlide;   WriteChar = WriteChar16;
-  GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
+  DrawPixel = DrawPixelGlide;   WriteChar = WriteCharGlide;
+  GetPixelAt = GetPixelAtGlide; DrawSprite = DrawSpriteGlide;
     
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
