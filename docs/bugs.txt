@@ -9,11 +9,6 @@ SOLUTION: A more general solution (alpha mapped texture?) may solve all
 problems at once. Or else implement it ad hoc again.
 DIFFICULTY: moderate to hard
 
-PROBLEM: No fog in hardware accelerated renderers.
-SOLUTION: Currently Jorrit is working on vertex based fog. It is not
-ready yet but it is probably the best way.
-DIFFICULTY: moderate to hard
-
 PROBLEM: When standing VERY close to the portal engine sometimes draw it
 (shouldn't -- for example I found one position near the exit from the
 startup room in large.zip. But it's pretty hard to find)
@@ -29,7 +24,8 @@ CS will crash while trying to draw a polygon.
 SOLUTION: No idea?
 DIFFICULTY: moderate?
 
-PROBLEM: Bots are unstable. Cause crashes often because of faulty collision detection.
+PROBLEM: Bots are unstable. Cause crashes often because of faulty
+collision detection.
 SOLUTION: probably rewrite them using CD system. However bug may be indicative
 of something internal which is wrong in CS since in principle the ad hoc
 CD method should work.
@@ -42,11 +38,6 @@ DIFFICULTY: moderate
 
 PROBLEM: Lightmapping of curves is still a bit wrong.
 SOLUTION: further investigation is needed.
-DIFFICULTY: moderate
-
-PROBLEM: As far as I know the previously mentioned semi-transparent texture
-feature is also not supported by the 3D hardware accelerated drivers.
-SOLUTION: Look for a suitable solution.
 DIFFICULTY: moderate
 
 PROBLEM: Glide doesn't support 2D text yet.
@@ -68,10 +59,6 @@ PROBLEM: Lightmapping in Glide is still broken.
 SOLUTION: Don't know (someone who manages Glide port just have to look,
 since OpenGL and DirectX have correct mapping)
 DIFFICULTY: Moderate?
-
-PROBLEM: Gouraud shaded tris not always correctly split by BSP tree.
-SOLUTION: Don't know yet.
-DIFFICULTY: moderate
 
 PROBLEM: No halos in 8-bit and 32-bit display mode.
 SOLUTION: 32-bit display mode is easy. It just
