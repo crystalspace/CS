@@ -178,13 +178,19 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
       {
         //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Material");
         csScanStr (pParams, "%s", pStr);
-        iMaterialWrapper* mat = ldr_context->FindMaterial (pStr);
+        iMaterialWrapper* mat = NULL;
+        mat = ldr_context->FindMaterial (pStr);
         if (!mat)
         {
           // @@@ Error handling!
-          printf("Terrain func loader: Can't find requested material '%s'\n",pStr);
+          csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Load Material");
           return NULL;
         }
+        /*if ( !mat->GetMaterialHandle () )
+        {
+          csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Get Material Handle");
+          return NULL;
+        }*/
         iState->SetDefaultMaterial (mat);
       }
       break;

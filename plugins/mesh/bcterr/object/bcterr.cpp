@@ -625,7 +625,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   // lock mesh?
   if (owner->vbufmgr)
     owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
-        default_lod->verts, default_lod->texels, NULL,
+        default_lod->verts, default_lod->texels, default_lod->color,
         (end + z2_end), 0);
   default_lod->mesh->mat_handle = material->GetMaterialHandle ();
 
@@ -1054,8 +1054,8 @@ void csBCTerrBlock::CreateNewMesh (int level)
   // lock buffer?
   end = current_lod->x_verts * current_lod->z_verts;
   if (owner->vbufmgr)
-    owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
-        default_lod->verts, default_lod->texels, NULL,
+    owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
+        current_lod->verts, current_lod->texels, current_lod->color,
         (end + z2_end), 0);
   current_lod->mesh->mat_handle = material->GetMaterialHandle ();
 }
@@ -1197,7 +1197,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       {
         end = current_lod->x_verts * current_lod->z_verts;
         owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
-          current_lod->verts, current_lod->texels, NULL,
+          current_lod->verts, current_lod->texels, current_lod->color,
           (end + z2_end), 0);
       }
       current_lod->mesh->clip_portal = clip_portal;
@@ -1218,7 +1218,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       {
         end = default_lod->x_verts * default_lod->z_verts;
         owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
-          default_lod->verts, default_lod->texels, NULL,
+          default_lod->verts, default_lod->texels, default_lod->color,
           (end + z2_end), 0);
       }
       default_lod->mesh->clip_portal = clip_portal;
@@ -1240,7 +1240,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!buf->IsLocked ())
       {
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
-          verts, texels, NULL,
+          verts, texels, color,
           16, 0);
       }
       draw_mesh.clip_portal = clip_portal;
@@ -1261,7 +1261,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
       if (!buf->IsLocked ())
       {
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
-          verts, texels, NULL,
+          verts, texels, color,
           16, 0);
       }
       draw_mesh.clip_portal = clip_portal;
@@ -1316,6 +1316,18 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
   topleft.Set (0,0,0);
   x_blocks = z_blocks = 0;
   vis_cb = NULL;
+  collision = NULL;
+}
+
+int csBCTerrObject::HeightTest (csVector3 *point)
+{
+	//csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Height Test");
+  if (initialized)
+  {
+    if (collision)
+      return collision->HeightTestExact (point);
+  }
+  return 0;
 }
 
 csBCTerrObject::~csBCTerrObject ()
@@ -1534,6 +1546,28 @@ void csBCTerrObject::SetupMesh ()
     (v.z - center.z)*(v.z - center.z);
   t = qsqrt (t);
   radius = csVector3 (t,t,t);
+  SetupCollisionQuads ();
+}
+
+void csBCTerrObject::SetupCollisionQuads ()
+{
+  float shortest;
+  csVector2* size;
+  int end, i;
+  size = factory_state->GetSize ();
+  shortest = 0.0f;
+  if (x_blocks > z_blocks)
+    shortest = size->y;
+  else
+    shortest = size->x;
+  collision = new csBCCollisionQuad (control_points, x_blocks, 
+      z_blocks, shortest, object_reg );
+  end = x_blocks * z_blocks;
+  for (i = 0; i < end; i++)
+  {
+    collision->AddBlock (&blocks[i]);
+  }
+  //collision->RebuildBoundingBoxes ();
 }
 
 int csBCTerrObject::GetHeightFromImage (iImage* im, float x, float z)

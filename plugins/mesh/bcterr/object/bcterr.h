@@ -31,6 +31,7 @@
 #include "ivideo/vbufmgr.h"
 #include "igeom/objmodel.h"
 #include "qsqrt.h"
+#include "quadtree.h"
 
 struct iEngine;
 struct iMaterialWrapper;
@@ -135,6 +136,7 @@ public:
   csVector3 radius;
 
   csVector3* control_points;
+  csBCCollisionQuad *collision;
   csBCTerrBlock* blocks;
 
   csVector3 topleft;
@@ -146,9 +148,11 @@ public:
 
   void SetHeightMap (iImage* im);
   void SetupMesh ();
+  void SetupCollisionQuads ();
   bool ComputeSharedMesh (csSharedLODMesh* mesh, csVector3* cntrl_pts);
   void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2);
   void GetRadius (csVector3& rad, csVector3& cent);
+  int HeightTest (csVector3 *point);
 
   ///--------------------- iMeshObject implementation ---------------------
   SCF_DECLARE_IBASE;
@@ -231,6 +235,11 @@ public:
       {
         scfParent->SetHeightMap (im);
       }
+    }
+    virtual int HeightTest (csVector3 *point)
+    {
+      if (!scfParent->initialized) return 0;
+      return scfParent->HeightTest (point);
     }
   } scfiBCTerrState;
   //------------------------- iObjectModel implementation ----------------
@@ -473,6 +482,8 @@ public:
   friend struct eiComponent;
 };
 
+extern csVector3 BezierCompute ( float u, csVector3* temp);
+extern csVector3 BezierControlCompute (float u, csVector3* cntrl, int width);
 
 #endif
 
