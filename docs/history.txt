@@ -276,8 +276,8 @@ chronological order.
 	  "-ansi" and "-pedantic" options.
 	- Eric Sunshine removed <csutil/getopt.h> from the <csutil.h>
 	  master-header since the symbols which it provides tend to conflict
-	  with platform-supplied symbols in getopt.h. (In the near future, we
-	  should prefix our getopt.h symbols with `cs' to avoid such
+	  with symboles in the platform-supplied <getopt.h>. (In the near
+	  future, we should prefix our getopt.h symbols with `cs' to avoid such
 	  conflicts.)
 	- Eric Sunshine added CS_SUBST_EMITTER() and CS_DEFINE_EMITTER() macros
 	  to emit.m4. These are wrappers around the standard AC_SUBST() and
