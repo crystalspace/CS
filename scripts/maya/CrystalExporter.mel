@@ -1,0 +1,848 @@
+/*
+	Filename         : CrystalExporter.mel
+	Last modified by : Mark Sanders
+	Creator          : Mark Sanders <mark@ttzn.nl>, Hristo Hristov <hhristov@delin.org>, Boyan Hristov <bhristov@delin.com>
+	Created          : 21 August 2004 17:11:47
+	Last Updated     : Sunday, November 21, 2004 16:26:28
+	Version          : 1.0.81
+	Comments         : 
+	Copyright: 
+		LGPL ?
+		
+		Original copyright unknown but I suggest making this LGPL.
+	
+Original header:
+    Maya exporter for Crystal Space model
+    Version 1.0
+    Authors: Hristo Hristov <hhristov@delin.org>, Boyan Hristov <bhristov@delin.com>
+<? This is for my(Mark) editor to do color coding ... (I use PHP color coding)
+*/
+proc Export()
+{
+	int $MeshType_spr3d = `radioButton -query -select MeshType_spr3d`;
+	int $MeshType_gen = `radioButton -query -select MeshType_gen`;
+	int $MeshType_thing = `radioButton -query -select MeshType_thing`;
+	
+	CheckObjectSelected(); //Check if an object is selected.
+	
+	if ($MeshType_spr3d == 1){ // Exporting as Sprite 3D.
+		ExportSprite3D();
+	}else if ($MeshType_gen == 1){ // Exporting as GenMesh.
+		ExportGenMesh();
+	}else if ($MeshType_thing == 1){ // Esporting as ThingMesh.
+		ErrorMsg ("Not yet supported.");
+	}else{
+		ErrorMsg ("Unknown mesh type.");
+	}
+}
+
+proc string SaveDummy( string $filename, string $fileType ){
+	global string $CSExporterFilename;
+	$CSExporterFilename = $filename;
+	return $filename;
+}
+
+proc ExportSprite3D()
+{
+	global string $CSExporterFilename;
+	flushUndo;
+	string $outfile = `fileBrowserDialog -ds 2 -m 1 -fc "SaveDummy" -an "Export ..." -om "SaveAs"`;
+	
+	$outfile = $CSExporterFilename;
+	
+	if ($outfile == ""){
+		ErrorMsg ("No filename selected or canceled.");
+	}
+	if ($outfile == "1"){
+		ErrorMsg ("I don't want this.");
+	}
+	string $message = "Output file selected as: ";
+	$message += $outfile;
+	print($message);
+
+	/*
+	TODO: Add more initialization of used variables here.
+	This so that the variable used in the loops are not being redefined.
+	I'm not sure about how MEL works but this could slow 
+	the exporter script down a lot as how it is now.
+	*/
+	
+	string $action_name = `textField -q -tx faction`;
+	float $scale = `floatField -q -v ScaleMesh`;
+	int $counter=0;
+
+	//TODO: add needed variables.
+	
+	string $face[];
+	string $sname;
+	string $vert[];
+	float $vtx[];
+	float $uv[];
+	string $message;
+	
+	int $verTtinfo[];
+	int $faceindeces[3];
+	int $tfaceindeces[3];
+	int $i;
+	
+	int $ExpType_MeshFact = `radioButton -query -select ExpType_MeshFact`;
+	int $ExpType_MeshObj = `radioButton -query -select ExpType_MeshObj`;
+	int $ExpType_ParamFile = `radioButton -query -select ExpType_ParamFile`;
+	
+	int $FrameOnly = `radioButton -query -select FrameOnly`;
+	int $FrameRange = `radioButton -query -select FrameRange`;
+	int $AllFrames = `radioButton -query -select AllFrames`;
+	
+	
+	//get selected object
+	string $object[] = `ls -tr -sl`;
+	
+	int $numverts[] = `polyEvaluate -v`;
+	int $numtris[] = `polyEvaluate -t`;
+	int $numuvs[] = `polyEvaluate -uv`;
+	int $numframes = `intSlider -q -value FrameRangeMax`;
+	int $frame_time = (int)(1000 / `intSlider -q -value FPS`);
+
+	int $current_frame;
+
+	int $maxprogress;
+	if ($AllFrames == 1 || $FrameRange == 1){
+		$current_frame = `intSlider -q -value FrameRangeMin`;
+		$maxprogress = ($numframes + $numframes * ($numtris[0] + $numuvs[0]) + $numtris[0]);
+	}else{
+		$current_frame = `currentTime -q`;
+		$numframes = $current_frame + 1;
+		$maxprogress =($numtris[0] + $numuvs[0] + $numtris[0]);
+	}
+	
+	int $progress=0;
+	progressWindow -t "exporting..." -pr $progress -st "0%" -ii false -min 0 -max $maxprogress;
+
+	currentTime $current_frame;
+
+	float $step=1;
+	
+	//----------------------------- write to $tempfile
+
+	string $tempfile="";
+
+	if ($ExpType_MeshFact == 1){
+		$tempfile+="<meshfact name=\"" + $object[0] +"\">\n";
+		$tempfile+="\t<plugin>crystalspace.mesh.loader.factory.sprite.3d</plugin>\n";
+		$tempfile+="\t<params>\n";
+	}else if ($ExpType_ParamFile == 1){
+		$tempfile+="\t<params>\n";
+	}else if ($ExpType_MeshObj == 1){
+		ErrorMsg ("Not yet supported.");
+	}else{
+		ErrorMsg ("Unknown exporting type.");
+	}
+
+	string $obj_texture[] = `uvLink -query -uvSet ($object[0] + ".uvSet[0].uvSetName")`;
+	string $texture_path = `getAttr ($obj_texture[0] + ".fileTextureName")`;
+	string $texture_filename = basename($texture_path, "" );
+	
+	//TODO: Add texture copying code after the mesh has been saved. But I put this here becouse here the actual path is know.
+	
+	$tempfile+="\t\t<material>" + $texture_filename + "</material>\n";
+
+	//----------------------------- write animation frames
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+	string $action = "\t\t\t<action name=\"";
+	$action += $action_name;
+	$action += "\">\n";
+	while($current_frame < $numframes)
+	{
+		$sname = $action_name;
+		$sname += $current_frame;
+		$action += "\t\t\t\t<f name=\"" + $sname + "\" delay=\"" + $frame_time + "\" />\n";
+		$tempfile += "\t\t\t<frame name=\"" + $sname+"\">\n";
+
+		$counter=0;
+		while($counter<$numtris[0])
+		{
+			$face = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+
+			$face = `filterExpand -sm 70 -expand true $face`;
+			if(size($face) > 3)
+			{
+				ErrorMsg ("Model is not triangulated!");
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				$vert = `polyListComponentConversion -fromVertexFace -toVertex $vf`;
+				$faceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				$vert = `polyListComponentConversion -fromVertexFace -toUV $vf`;
+				$tfaceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$verTtinfo[$tfaceindeces[0]] = $faceindeces[0];
+			$verTtinfo[$tfaceindeces[1]] = $faceindeces[1];
+			$verTtinfo[$tfaceindeces[2]] = $faceindeces[2];
+
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"writing frame "+$sname+"...");
+		}
+		
+		$step=$numuvs[0]/10;
+		if($step < 1)$step = 1;
+		$counter = 0;
+		while($counter<$numuvs[0])
+		{
+			
+			$vtx = `pointPosition ($object[0]+".vtx["+$verTtinfo[$counter]+"]")`;
+			$uv = `polyEditUV -q -u -v ($object[0]+".map["+$counter+"]")`;
+			$tempfile+=("\t\t\t\t<v x=\"" + $vtx[2]*$scale
+					+   "\" y=\"" + $vtx[1]*$scale
+					+   "\" z=\"" + $vtx[0]*$scale
+					+   "\" u=\"" + $uv[0] 
+					+   "\" v=\"" + (1 - $uv[1]) 
+					+   "\"/>\n");
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"writing frame "+$sname+"...");
+		}
+
+		$tempfile+="\t\t\t</frame>\n\n";
+
+		if ($FrameOnly == 1)
+			break;
+
+		$current_frame++;
+		currentTime $current_frame;
+	}
+	$action += "\t\t\t</action>\n\n";
+	$tempfile+=$action;
+
+	//----------------------------------------write triangles indeces
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+	$counter = 0;
+	while($counter<$numtris[0])
+	{
+		$face = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+
+		$face=`filterExpand -sm 70 -expand true $face`;
+		if(size($face)>3)
+		{
+			ErrorMsg ("Model is not triangulated!");
+		}
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[0]`;
+		$tempfile+= "\t\t\t<t v1=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[2]`;
+		$tempfile+= "v2=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[1]`;
+		$tempfile += "v3=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" />\n";
+		$counter++;
+		if($counter%$step==0)
+			UpdateProgress($progress+=$step,$maxprogress,"writing triangles...");
+	}
+
+	if ($ExpType_MeshFact == 1){
+		$tempfile+="\t\t<smooth>yes</smooth>\n";
+		$tempfile+="\t</params>\n";
+		$tempfile+="</meshfact>";
+	}else if ($ExpType_ParamFile == 1){
+		$tempfile+="\t\t<smooth>yes</smooth>\n";
+		$tempfile+="\t</params>\n";
+	}else if ($ExpType_MeshObj == 1){
+		ErrorMsg ("Not yet supported.");
+	}else{
+		ErrorMsg ("Unknown exporting type.");
+	}
+	//----------------------------------------write data into physical file
+
+	$fileId = `fopen $outfile "w"`;
+	fprint $fileId $tempfile;
+	fclose $fileId;
+
+	Clean();
+	
+	//TODO: add mestype info (maybe other info too).
+	confirmDialog -title "Done!" -message "Done!" -button "ok" -defaultButton "ok" -dismissString "ok";
+}
+
+proc ExportGenMesh()
+{
+	global string $CSExporterFilename;
+	flushUndo;
+	string $outfile = `fileBrowserDialog -ds 2 -m 1 -fc "SaveDummy" -an "Export ..." -om "SaveAs"`;
+	
+	$outfile = $CSExporterFilename;
+	
+	if ($outfile == ""){
+		ErrorMsg ("No filename selected or canceled.");
+	}
+	if ($outfile == "1"){
+		ErrorMsg ("I don't want this.");
+	}
+	string $message = "Output file selected as: ";
+	$message += $outfile;
+	print($message);
+
+	float $scale = `floatField -q -v ScaleMesh`;
+	int $counter=0;
+
+	string $face[];
+	string $sname;
+	string $vert[];
+	float $vtx[];
+	float $uv[];
+	
+	int $verTtinfo[];
+	int $faceindeces[3];
+	int $tfaceindeces[3];
+	int $i;
+	
+	int $ExpType_MeshFact = `radioButton -query -select ExpType_MeshFact`;
+	int $ExpType_MeshObj = `radioButton -query -select ExpType_MeshObj`;
+	int $ExpType_ParamFile = `radioButton -query -select ExpType_ParamFile`;
+	
+	//get selected object
+	string $object[] = `ls -tr -sl`;
+	
+	int $numverts[] = `polyEvaluate -v`;
+	int $numtris[] = `polyEvaluate -t`;
+	int $numuvs[] = `polyEvaluate -uv`;
+	int $maxprogress = ($numtris[0] + $numuvs[0] + $numtris[0]);
+	
+	int $progress=0;
+	progressWindow -t "exporting..." -pr $progress -st "0%" -ii false -min 0 -max $maxprogress;
+
+	float $step=1;
+	
+	//----------------------------- write to $tempfile
+
+	string $tempfile="";
+
+	if ($ExpType_MeshFact == 1){
+		$tempfile+="<meshfact name=\"" + $object[0] +"\">\n";
+		$tempfile+="\t<plugin>crystalspace.mesh.loader.factory.genmesh</plugin>\n";
+		$tempfile+="\t<params>\n";
+	}else if ($ExpType_ParamFile == 1){
+		$tempfile+="\t<params>\n";
+	}else if ($ExpType_MeshObj == 1){
+		ErrorMsg ("Not yet supported.");
+	}else{
+		ErrorMsg ("Unknown exporting type.");
+	}
+
+	string $obj_texture[] = `uvLink -query -uvSet ($object[0] + ".uvSet[0].uvSetName")`;
+	string $texture_path = `getAttr ($obj_texture[0] + ".fileTextureName")`;
+	string $texture_filename = basename($texture_path, "" );
+	
+	//TODO: Add texture copying code after the mesh has been saved. But I put this here becouse here the actual path is know.
+	
+	$tempfile+="\t\t<material>" + $texture_filename + "</material>\n";
+	$tempfile+="\t\t<numtri>"+$numtris[0]+"</numtri>\n";
+	$tempfile+="\t\t<numvt>"+$numuvs[0]+"</numvt>\n";
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+
+		$counter=0;
+		while($counter<$numtris[0])
+		{
+			$face = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+
+			$face = `filterExpand -sm 70 -expand true $face`;
+			if(size($face) > 3)
+			{
+				ErrorMsg ("Model is not triangulated!");
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				$vert = `polyListComponentConversion -fromVertexFace -toVertex $vf`;
+				$faceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$i = 0;
+			for ($vf in $face)
+			{
+				$vert = `polyListComponentConversion -fromVertexFace -toUV $vf`;
+				$tfaceindeces[$i] = match("[0-9]+",match("[0-9]+\]",$vert[0]))+" ";
+				$i++;
+			}
+
+			$verTtinfo[$tfaceindeces[0]] = $faceindeces[0];
+			$verTtinfo[$tfaceindeces[1]] = $faceindeces[1];
+			$verTtinfo[$tfaceindeces[2]] = $faceindeces[2];
+
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"Getting vertice info "+$counter+"...");
+		}
+		
+		$step=$numuvs[0]/10;
+		if($step < 1)$step = 1;
+		$counter = 0;
+		while($counter<$numuvs[0])
+		{
+			
+			$vtx = `pointPosition ($object[0]+".vtx["+$verTtinfo[$counter]+"]")`;
+			$uv = `polyEditUV -q -u -v ($object[0]+".map["+$counter+"]")`;
+			$tempfile+=("\t\t\t<v x=\"" + $vtx[2]*$scale
+					+   "\" y=\"" + $vtx[1]*$scale
+					+   "\" z=\"" + $vtx[0]*$scale
+					+   "\" u=\"" + $uv[0] 
+					+   "\" v=\"" + (1 - $uv[1]) 
+					+   "\"/>\n");
+			$counter++;
+			if($counter%$step==0)
+				UpdateProgress($progress+=$step,$maxprogress,"Writing vertice "+$counter+"...");
+		}
+
+	//----------------------------------------write triangles indeces
+
+	$step=$numtris[0]/10;
+	if($step < 1)$step = 1;
+	$counter = 0;
+	while($counter<$numtris[0])
+	{
+		$face = `polyListComponentConversion -ff -tvf ($object[0]+".f["+$counter+"]")`;
+
+		$face=`filterExpand -sm 70 -expand true $face`;
+		if(size($face)>3)
+		{
+			ErrorMsg ("Model is not triangulated!");
+		}
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[0]`;
+		$tempfile+= "\t\t\t<t v1=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[2]`;
+		$tempfile+= "v2=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" ";
+
+		$vert = `polyListComponentConversion -fromVertexFace -toUV $face[1]`;
+		$tempfile += "v3=\"" + match("[0-9]+",match("[0-9]+\]",$vert[0]))+"\" />\n";
+		$counter++;
+		if($counter%$step==0)
+			UpdateProgress($progress+=$step,$maxprogress,"Writing triangle "+$counter+"...");
+	}
+
+	if ($ExpType_MeshFact == 1){
+		$tempfile+="\t\t<autonormals />\n";
+		$tempfile+="\t</params>\n";
+		$tempfile+="</meshfact>";
+	}else if ($ExpType_ParamFile == 1){
+		$tempfile+="\t\t<autonormals />\n";
+		$tempfile+="\t</params>\n";
+	}else if ($ExpType_MeshObj == 1){
+		ErrorMsg ("Not yet supported.");
+	}else{
+		ErrorMsg ("Unknown exporting type.");
+	}
+
+	//----------------------------------------write data into physical file
+
+	$fileId = `fopen $outfile "w"`;
+	fprint $fileId $tempfile;
+	fclose $fileId;
+
+	Clean();
+	
+	//TODO: add mestype info (maybe other info too).
+	confirmDialog -title "Done!" -message "Done!" -button "ok" -defaultButton "ok" -dismissString "ok";
+
+}
+
+proc CheckObjectSelected(){
+	string $testobject[] = `ls -tr -sl`;
+	if ($testobject[0] == "")
+	{
+		ErrorMsg ("No object selected!");
+	}
+}
+proc ErrorMsg(string $msg){
+	Clean();
+	confirmDialog -t "warning" -m $msg -b "ok"; 
+	error $msg;
+}
+proc Clean()
+{
+	if(`window -exists CSEportWindow`)
+		deleteUI CSEportWindow;
+	progressWindow -ep;
+}
+proc int UpdateProgress(int $value, int $maxvalue, string $status)
+{
+	float $div=(float)$maxvalue/(float)100;
+	float $percent=(float)$value/$div;
+	progressWindow -e -pr $value -st ($percent + "% " + $status);
+	return 1;
+}
+
+proc SelectionChanged(int $how)
+{
+	int $numFrames = `playbackOptions -q -max`;
+	int $FrameMinVal = `intSlider -q -value FrameRangeMin`;
+	int $FrameMaxVal = `intSlider -q -value FrameRangeMax`;
+	int $FrameMinValA = `intField -q -value FrameRangeMinA`;
+	int $FrameMaxValA = `intField -q -value FrameRangeMaxA`;
+	int $FPSVal = `intSlider -q -value FPS`;
+	int $FPSValA = `intField -q -value FPSA`;
+	float $ScaleVal = `floatField -q -value ScaleMesh`;
+	float $ScaleValA = `floatSlider -q -value ScaleMeshA`;
+	int $MeshType_spr3d = `radioButton -query -select MeshType_spr3d`;
+	int $MeshType_gen = `radioButton -query -select MeshType_gen`;
+	int $MeshType_thing = `radioButton -query -select MeshType_thing`;
+	int $FrameOnly = `radioButton -query -select FrameOnly`;
+	int $FrameRange = `radioButton -query -select FrameRange`;
+	int $AllFrames = `radioButton -query -select AllFrames`;
+	
+	int $doFrameCheck = 0;
+	int $doFrameCheckA = 0;
+	int $doFrameSelectAll = 0;
+	int $doFPSCheck = 0;
+	int $doFPSCheckA = 0;
+	int $doScaleCheck = 0;
+	int $doScaleCheckA = 0;
+	switch ($how)
+	{
+		case 1:
+			// Sprite 3D Mesh Selected.
+			//TODO: Add check for export type.
+			if ($FrameOnly == 1){
+				ChangeEnabled(2 + 16 + 64 + 128 + 256);
+			}else if ($FrameRange == 1){
+				ChangeEnabled(1 + 2 + 4 + 16 + 64 + 128 + 256);
+			}else{
+				ChangeEnabled(1 + 2048 + 2 + 4 + 16 + 64 + 128 + 256);
+			}
+			$doFrameCheck = 1;
+			$doFPSCheck = 1;
+			$doScaleCheck = 1;
+			break;
+		case 2:
+			// GenMesh Selected.
+			//TODO: Add check for export type.
+			ChangeEnabled(16 + 64 + 128 + 4096);
+			$doScaleCheck = 1;
+			break;
+		case 3:
+			// ThingMesh Selected.
+			print("\nNot yet supported!!!\n");
+			break;
+		case 4:
+			// "No animation" selected.
+			//TODO: Add check for export type.
+			if ($MeshType_spr3d == 1){ // Exporting as Sprite 3D.
+				ChangeEnabled(2 + 16 + 64 + 128 + 256);
+			}else if ($MeshType_gen == 1){ // Exporting as GenMesh.
+				ChangeEnabled(16 + 64 + 128);
+			}else if ($MeshType_thing == 1){ // Esporting as ThingMesh.
+				print ("\nNot yet supported!!!\n");
+			}else{
+				print ("Unknown mesh type.");
+			}
+			$doFrameCheck = 1;
+			$doFPSCheck = 1;
+			$doScaleCheck = 1;
+			break;
+		case 5:
+			// "Selected frames" selected.
+			//TODO: Add check for export type.
+			if ($MeshType_spr3d == 1){ // Exporting as Sprite 3D.
+				ChangeEnabled(1 + 2048 + 2 + 4 + 16 + 64 + 128 + 256);
+			}else if ($MeshType_gen == 1){ // Exporting as GenMesh.
+				ChangeEnabled(16 + 64 + 128);
+			}else if ($MeshType_thing == 1){ // Esporting as ThingMesh.
+				print ("\nNot yet supported!!!\n");
+			}else{
+				print ("Unknown mesh type.");
+			}
+			$doFrameCheck = 1;
+			$doFPSCheck = 1;
+			$doScaleCheck = 1;
+			break;
+		case 6:
+			// "All frames" selected.
+			//TODO: Add check for export type.
+			if ($MeshType_spr3d == 1){ // Exporting as Sprite 3D.
+				ChangeEnabled(1 + 2 + 4 + 16 + 64 + 128 + 256);
+			}else if ($MeshType_gen == 1){ // Exporting as GenMesh.
+				ChangeEnabled(16 + 64 + 128);
+			}else if ($MeshType_thing == 1){ // Esporting as ThingMesh.
+				print ("\nNot yet supported!!!\n");
+			}else{
+				print ("Unknown mesh type.");
+			}
+			$doFrameSelectAll = 1;
+			$doFPSCheck = 1;
+			$doScaleCheck = 1;
+			break;
+		case 7:
+			$doFrameCheckA = 1;
+			break;
+		case 8:
+			$doFrameCheck = 1;
+			break;
+		case 9:
+			$doFPSCheckA = 1;
+			break;
+		case 10:
+			$doFPSCheck = 1;
+			break;
+		case 11:
+			$doScaleCheckA = 1;
+			break;
+		case 12:
+			$doScaleCheck = 1;
+			break;
+		default:
+			print("\nA rather strange error!!!\n");
+			break;
+	}
+	
+	if ($doFrameCheck == 1)
+	{
+		if ($FrameMinVal < 1){$FrameMinVal = 1;};
+		if ($FrameMinVal > $numFrames){$FrameMinVal = 1;};
+		if ($FrameMaxVal < 1){$FrameMaxVal = 1;};
+		if ($FrameMaxVal > $numFrames){$FrameMaxVal = 1;};
+		if ($FrameMaxVal < $FrameMinVal){$FrameMaxVal = $FrameMinVal;};
+		intSlider -edit -min 1 -max $numFrames -value $FrameMinVal FrameRangeMin;
+		intSlider -edit -min 1 -max $numFrames -value $FrameMaxVal FrameRangeMax;
+		intField -edit -min 1 -max $numFrames -value $FrameMinVal FrameRangeMinA;
+		intField -edit -min 1 -max $numFrames -value $FrameMaxVal FrameRangeMaxA;
+	}
+	if ($doFrameCheckA == 1)
+	{
+		if ($FrameMinValA < 1){$FrameMinValA = 1;};
+		if ($FrameMinValA > $numFrames){$FrameMinValA = 1;};
+		if ($FrameMaxValA < 1){$FrameMaxValA = 1;};
+		if ($FrameMaxValA > $numFrames){$FrameMaxValA = 1;};
+		if ($FrameMaxValA < $FrameMinValA){$FrameMaxValA = $FrameMinValA;};
+		intSlider -edit -min 1 -max $numFrames -value $FrameMinValA FrameRangeMin;
+		intSlider -edit -min 1 -max $numFrames -value $FrameMaxValA FrameRangeMax;
+		intField -edit -min 1 -max $numFrames -value $FrameMinValA FrameRangeMinA;
+		intField -edit -min 1 -max $numFrames -value $FrameMaxValA FrameRangeMaxA;
+	}
+	if ($doFrameSelectAll == 1)
+	{
+		intSlider -edit -min 1 -max $numFrames -value 1 -enable false FrameRangeMin;
+		intSlider -edit -min 1 -max $numFrames -value $numFrames -enable false FrameRangeMax;
+		intField -edit -min 1 -max $numFrames -value 1 -enable false FrameRangeMinA;
+		intField -edit -min 1 -max $numFrames -value $numFrames -enable false FrameRangeMaxA;
+	}
+	if ($doFPSCheck == 1)
+	{
+		intSlider -edit -value $FPSVal FPS;
+		intField -edit -value $FPSVal FPSA;
+	}
+	if ($doFPSCheckA == 1)
+	{
+		intSlider -edit -value $FPSValA FPS;
+		intField -edit -value $FPSValA FPSA;
+	}
+	if ($doScaleCheck == 1)
+	{
+		floatSlider -edit -value $ScaleVal ScaleMeshA;
+	}
+	if ($doScaleCheckA == 1)
+	{
+		floatField -edit -value $ScaleValA ScaleMesh;
+	}
+}
+
+
+proc ChangeEnabled(int $what)
+{
+	// Animations.
+	int $hasAnimation = 0; // 1
+	int $EnableAniSelect = 1; // 2048
+	int $hasFrameSelect = 0; // 2048
+	int $hasActionName = 0; // 2
+	int $hasFPS = 0; // 4
+	int $hasTween = 0; // 8
+	
+	// Export type
+	int $hasMeshFactory = 0; // 16
+	int $hasMeshObject = 0; // 32
+	int $hasParamFile = 0;  // 64
+	
+	// Display
+	int $hasScale = 0; // 128
+	int $hasSmooth = 0; // 256
+	int $hasLighting = 0; // 512
+	int $hasBaseColor = 0; // 1024
+	
+	if ($what >= 4096){$what -= 4096; $EnableAniSelect = 0;}
+	if ($what >= 2048){$what -= 2048; $hasFrameSelect = 1;}
+	if ($what >= 1024){$what -= 1024; $hasBaseColor = 1;}
+	if ($what >= 512){$what -= 512; $hasLighting = 1;}
+	if ($what >= 256){$what -= 256; $hasSmooth = 1;}
+	if ($what >= 128){$what -= 128; $hasScale = 1;}
+	if ($what >= 64){$what -= 64; $hasParamFile = 1;}
+	if ($what >= 32){$what -= 32; $hasMeshObject = 1;}
+	if ($what >= 16){$what -= 16; $hasMeshFactory = 1;}
+	if ($what >= 8){$what -= 8; $hasTween = 1;}
+	if ($what >= 4){$what -= 4; $hasFPS = 1;}
+	if ($what >= 2){$what -= 2; $hasActionName = 1;}
+	if ($what >= 1){$what -= 1; $hasAnimation = 1;}
+	
+	if($hasAnimation == 1 || $EnableAniSelect == 1){
+		radioButton -edit -enable true FrameRange;
+		radioButton -edit -enable true AllFrames;
+	}else{
+		radioButton -edit -select  FrameOnly;
+		radioButton -edit -enable false  FrameRange;
+		radioButton -edit -enable false  AllFrames;
+		$hasFPS = 0;
+		$hasFrameSelect = 0;
+	}
+	if($hasFrameSelect == 1){
+		intSlider -edit -enable true FrameRangeMin;
+		intSlider -edit -enable true FrameRangeMax;
+		intField -edit -enable true FrameRangeMinA;
+		intField -edit -enable true FrameRangeMaxA;
+	}else{
+		intSlider -edit -enable false FrameRangeMin;
+		intSlider -edit -enable false FrameRangeMax;
+		intField -edit -enable false FrameRangeMinA;
+		intField -edit -enable false FrameRangeMaxA;
+	}
+	if($hasActionName == 1){
+		textField -edit -enable true faction;
+	}else{
+		textField -edit -enable false faction;
+	}
+	if($hasFPS == 1){
+		intField -edit -enable true FPSA;
+		intSlider -edit -enable true FPS;
+	}else{
+		intField -edit -enable false FPSA;
+		intSlider -edit -enable false FPS;
+	}
+	if($hasTween == 1){
+		// Not implemented
+	}else{
+		// Not implemented
+	}
+	if($hasMeshFactory == 1){
+		radioButton -edit -enable true ExpType_MeshFact;
+	}else{
+		radioButton -edit -enable false ExpType_MeshFact;
+	}
+	if($hasMeshObject == 1){
+		radioButton -edit -enable true ExpType_MeshObj;
+	}else{
+		radioButton -edit -enable false ExpType_MeshObj;
+	}
+	if($hasParamFile == 1){
+		radioButton -edit -enable true ExpType_ParamFile;
+	}else{
+		radioButton -edit -enable false ExpType_ParamFile;
+	}
+	if($hasScale == 1){
+		floatField -edit -enable true ScaleMesh;
+		floatSlider -edit -enable true ScaleMeshA;
+	}else{
+		floatField -edit -enable false ScaleMesh;
+		floatSlider -edit -enable false ScaleMeshA;
+	}
+	if($hasSmooth == 1){
+		// Not implemented
+	}else{
+		// Not implemented
+	}
+	if($hasLighting == 1){
+		// Not implemented
+	}else{
+		// Not implemented
+	}
+	if($hasBaseColor == 1){
+		// Not implemented
+	}else{
+		// Not implemented
+	}
+}
+
+
+proc int CreateGUI()
+{
+	if(`window -exists CSEportWindow`)
+		deleteUI CSEportWindow;
+	window -width 400 -height 290 -sizeable false -maximizeButton false -t "Maya Crystal Space model exporter" CSEportWindow;
+	rowColumnLayout -nr 11 -rh 1 10 -rh 2 25 -rh 3 25 -rh 4 25 -rh 5 25 -rh 6 25 -rh 7 25 -rh 8 25 -rh 9 25 -rh 10 25 -rh 11 25 rcl1;
+		rowLayout -numberOfColumns 1 -columnWidth2 80 270 -parent rcl1 rlTop;
+			text -l "";
+		rowLayout -numberOfColumns 5 -columnWidth2 80 270 -parent rcl1 rlMeshType;
+			text -l "   Mesh type:";
+			radioCollection;
+			radioButton -label "Sprite 3D Mesh" -onCommand "SelectionChanged(1)" MeshType_spr3d;
+			radioButton -select -label "Gen Mesh" -onCommand "SelectionChanged(2)" MeshType_gen;
+			radioButton -label "Thing Mesh" -enable false -onCommand "SelectionChanged(3)" MeshType_thing;
+		rowLayout -numberOfColumns 5 -columnWidth2 80 270 -parent rcl1 rlExportType;
+			text -l "   Export type:";
+			radioCollection;
+			radioButton -label "Mesh Factory" ExpType_MeshFact;
+			radioButton -label "Mesh Object" -enable false ExpType_MeshObj;
+			radioButton -select -label "Param File" ExpType_ParamFile;
+		rowLayout -numberOfColumns 5 -columnWidth2 80 270 -parent rcl1 rlAnimate;
+			text -l "   Animation:";
+			radioCollection;
+			radioButton -select -label "No animation" -onCommand "SelectionChanged(4)" FrameOnly;
+			radioButton -label "Selected frames" -onCommand "SelectionChanged(5)" FrameRange;
+			radioButton -label "All frames" -onCommand "SelectionChanged(6)" AllFrames;
+		rowLayout -numberOfColumns 4 -columnWidth4 80 60 60 150 -parent rcl1 rlFrangeMin;
+			text -l "   Frame range:";
+			text -l "First frame";
+			intField -min 1 -max 100 -value 1 -step 1 -changeCommand "SelectionChanged(7)" FrameRangeMinA;
+			intSlider -min 1 -max 100 -value 1 -step 1 -changeCommand "SelectionChanged(8)" FrameRangeMin;
+		rowLayout -numberOfColumns 4 -columnWidth4 80 60 60 150 -parent rcl1 rlFrangeMax;
+			text -l "";
+			text -l "Last frame";
+			intField -min 1 -max 100 -value 100 -step 1 -changeCommand "SelectionChanged(7)" FrameRangeMaxA;
+			intSlider -min 1 -max 100 -value 1 -step 1 -changeCommand "SelectionChanged(8)" FrameRangeMax;
+		rowLayout -numberOfColumns 4 -columnWidth4 80 60 60 150 -parent rcl1 rlFPS;
+			text -l "";
+			text -l "FPS";
+			intField -min 1 -max 100 -value 24 -step 1 -changeCommand "SelectionChanged(9)" FPSA;
+			intSlider -min 1 -max 100 -value 24 -step 1 -changeCommand "SelectionChanged(10)" FPS;
+		rowLayout -numberOfColumns 2 -columnWidth2 80 270 -parent rcl1 rlActionName;
+			text -l "   Action name:";
+			textField -width 180 -tx "default" faction;
+		rowLayout -numberOfColumns 3 -columnWidth2 80 270 -parent rcl1 rlScale;
+			text -l "   Scale:";
+			floatField -precision 2 -min 0.01 -max 100 -value 1 -step 0.01 -changeCommand "SelectionChanged(12)" ScaleMesh;
+			floatSlider -min 0.01 -max 100 -value 1 -step 0.01 -changeCommand "SelectionChanged(11)" ScaleMeshA;
+		rowLayout -numberOfColumns 2 -columnWidth2 80 270 -parent rcl1 rlSaveOpt;
+			text -l "   Save options:";
+			checkBox -enable false -label "Save constantly (slower)" SaveOpt;
+		rowLayout -numberOfColumns 3 -columnWidth2 80 270 -parent rcl1 rlButtons;
+			text -l " ";
+			button -l "Export" -al "center" -w 100 -c "Export()";
+			button -l "Cancel" -al "center" -w 100 -c "Clean()";
+	showWindow CSEportWindow;
+	
+	window -edit -width 400 -height 290 CSEportWindow;
+	radioButton -edit -select MeshType_spr3d;
+	radioButton -edit -select FrameOnly;
+	SelectionChanged(1);
+	SelectionChanged(4);
+	return 1;
+}
+
+CreateGUI();
+
+/*?>*/
