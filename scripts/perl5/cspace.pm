@@ -10446,6 +10446,7 @@ package cspace::iTextureHandle;
 *Precache = *cspacec::iTextureHandle_Precache;
 *SetTextureClass = *cspacec::iTextureHandle_SetTextureClass;
 *GetTextureClass = *cspacec::iTextureHandle_GetTextureClass;
+*SetAlphaType = *cspacec::iTextureHandle_SetAlphaType;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
