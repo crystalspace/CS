@@ -1135,6 +1135,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
 {
   // Look through all RPathV's for file or directory
   int i;
+  csString vpath;
   for (i = 0; i < RPathV.Length (); i++)
   {
     char *rpath = (char *)RPathV [i];
@@ -1168,16 +1169,11 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         bool append_slash = isdir (tpath, de);
-        char *vpath = new char [strlen (VPath) + strlen (Suffix) +
-	  strlen (de->d_name) + (append_slash ? 2 : 1)];
-	strcpy (vpath, VPath);
-	strcat (vpath, Suffix);
-	strcat (vpath, de->d_name);
+	vpath.Clear();
+	vpath << VPath << Suffix << de->d_name;
 	if (append_slash)
 	{
-	  size_t sl = strlen (vpath);
-	  vpath [sl++] = VFS_PATH_SEPARATOR;
-	  vpath [sl] = 0;
+	  vpath << VFS_PATH_SEPARATOR;
 	}
 
 	FileList->Push (vpath);
@@ -1229,14 +1225,12 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
 	  if (cur < fnl)
 	    cur++;
           size_t vpl = strlen (VPath);
-          char *vpath = new char [vpl + cur + 1];
-          memcpy (vpath, VPath, vpl);
-          memcpy (vpath + vpl, fname, cur);
-	  vpath [vpl + cur] = 0;
+	  vpath.Clear();
+	  vpath << VPath;
+	  vpath << fname;
+	  vpath.Truncate (vpl + cur);
 	  if (FileList->Find (vpath) == -1)
             FileList->Push (vpath);
-	  else
-	    delete [] vpath;
         }
       }
     }
@@ -1774,6 +1768,7 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
   csScopedMutexLock lock (mutex);
   scfStringArray *fl = new scfStringArray;		// the output list
 
+  csString news;
   if (Path != 0)
   {
     VfsNode *node;				// the node we are searching
@@ -1820,13 +1815,11 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path) const
           pp++;
         while (*pp && *pp == VFS_PATH_SEPARATOR)
           pp++;
-        char *news = new char [pp - node->VPath + 1];
-        memcpy (news, node->VPath, pp - node->VPath);
-        news [pp - node->VPath] = 0;
+	news.Clear();
+	news.Append (node->VPath);
+	news.Truncate (pp - node->VPath);
         if (fl->Find (news) == -1)
           fl->Push (news);
-        else
-          delete [] news;
       }
     }
 

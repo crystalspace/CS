@@ -15,6 +15,7 @@ chronological order.
 	  to juggle with pixel formats here.
 	- res changed the GL canvases to use scissor instead of manual 
 	  clipping.
+	- res fixed a few memory leaks in VFS.
 27-Feb-2004
 	- Jorrit enabled the Dynavis write queue again since it appears to
 	  be giving better fps in most cases. Perhaps we need to come up with
