@@ -22,6 +22,29 @@ chronological order.
 	  refactored the csplugincommon Jamfile for ease of maintenance.
 	- Eric Sunshine documented new csplugincommon convenience libraries in
 	  apimod100.txi.
+	- Eric Sunshine re-engineered the way configure.ac filters out the
+	  optimization (-O2) and debugging (-g) flags which Autoconf insists
+	  upon adding to CFLAGS and CXXFLAGS. (We want to avoid these by
+	  default because together they interfere with Crystal Space's
+	  "optimize" and "debug" build modes.)  There were several serious
+	  problems with the old approach:
+	    - It mutated valid compiler options into bogus arguments. For
+	      instance, `-ggdb3' became `db3'. This bug report from the Gentoo
+	      bug tracker illustrates the problem:
+	      http://bugs.gentoo.org/show_bug.cgi?id=77413
+	    - It removed -O and -g options unconditionally even if the user had
+	      requested them explicitly, thus making it extremely difficult for
+	      the user to supply certain desired options at configuration time.
+	      (Typically, the user ended up having to edit Jamconfig
+	      after-the-fact.)
+	    - The options were fed through `echo' in such a way that it was
+	      possible for `echo' to mistakenly think that the options were
+	      intended for it (rather than for the compiler), which could
+	      causeresult in `echo' eating some options, and issuing error
+	      messages for others.
+	    - The `sed' expression was broken and failed to filter out a
+	      literal "-g" despite the fact that "-g" is one of the problematic
+	      flags.
 22-Feb-2005
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such

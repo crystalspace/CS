@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -31,11 +31,24 @@ AC_CANONICAL_HOST
 
 
 #------------------------------------------------------------------------------
-# Check for compilers and common tools.
+# Check for compilers and linker.
+#
+# IMPLEMENTATION NOTES
+#
+# Note that AC_PROG_CC and AC_PROC_CXX insist upon adding both optimization
+# (-O2) and debug (-g) flags to CFLAGS and CXXFLAGS if these variables have not
+# been set explicitly. Unfortunately, this is not suitable for Crystal Space's
+# build system which makes a distinction between `optimize' and `debug' builds.
+# To work around this problem, we ensure that both of these variables are set
+# (either with empty values or with a user-supplied values) in order to
+# override Autoconf's undesirable behavior.
 #------------------------------------------------------------------------------
+
+CFLAGS="$CFLAGS" # See above note.
 AC_PROG_CC
 CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 
+CXXFLAGS="$CXXFLAGS" # See above note.
 AC_PROG_CXX
 CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 
@@ -48,6 +61,12 @@ AS_IF([test $ac_compiler_gnu = yes],
 CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for common tools.
+#------------------------------------------------------------------------------
 
 # The default RANLIB in Jambase is wrong on some platforms, and is also
 # unsuitable during cross-compilation, so we set the value unconditionally
@@ -170,6 +189,16 @@ AS_IF([test $cs_cv_cslibs = yes],
     CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
     LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
     PATH="$cs_cv_cslibs_binpath$PATH_SEPARATOR$PATH"])
+
+
+
+#------------------------------------------------------------------------------
+# Use the CPPFLAGS, CXXFLAGS, CFLAGS, and LDFLAGS passed to configure, as well
+# as any additional flags provided by cs-win32libs.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
+CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
+CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 
@@ -505,22 +534,6 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
 
 CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
-
-
-
-#------------------------------------------------------------------------------
-# Use the CPPFLAGS, CXXFLAGS, CFLAGS, and LDFLAGS passed to configure.
-# Further, Autoconf insists upon issuing optimization flags (-O) and debug
-# flags (-g) at one and the same time, but this is not suitable for Crystal
-# Space's build system, which makes a distinction between `optimize' and
-# `debug' builds, so we must filter out these flags.
-#------------------------------------------------------------------------------
-CFLAGS=`echo "$CFLAGS" | sed 's/-O.//g;s/-g.//g'`
-CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-O.//g;s/-g.//g'`
-
-CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
-CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
-CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 
