@@ -1,6 +1,7 @@
 freetype.h
 fterrid.h
 ftnameid.h
+iconv.h
 ioapi.h
 jconfig.h
 jerror.h
@@ -29,9 +30,6 @@ libmng_trace.h
 libmng_types.h
 libmng_write.h
 libmng_zlib.h
-lua.h
-luadebug.h
-lualib.h
 mikmod.h
 png.h
 pngconf.h
@@ -39,12 +37,11 @@ unzip.h
 zconf.h
 zlib.h
 zip.h
+AL
 cal3d
-divx
-divx4
-freetype
 freetype2
 lib3ds
+libxml
 ogg
 perl5
 vorbis
