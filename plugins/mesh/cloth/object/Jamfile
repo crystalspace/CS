@@ -1,9 +1,0 @@
-SubDir TOP plugins mesh cloth object ;
-
-Description cloth : "Cloth mesh object plugin" ;
-
-Plugin cloth
-	: [ Wildcard *.cpp *.h ]
-	: noinstall
-;
-LinkWith cloth : csgeom csutil ;

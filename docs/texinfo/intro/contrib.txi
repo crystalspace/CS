@@ -265,7 +265,7 @@ Burton added an Allegro canvas.
 @item
 Charles Al' Quarra (@email{charsquarra@@hotmail.com})
 
-Charles contributed the @sc{opcode} and cloth plugins.
+Charles contributed the @sc{opcode} and (the now obsolete) cloth plugins.
 
 @item
 Charles Vidal (@email{vidalc@@club-internet.fr})

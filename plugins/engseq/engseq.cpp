@@ -43,16 +43,9 @@
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/material.h"
-#include "imesh/object.h"
-#include "imesh/ball.h"
-#include "imesh/genmesh.h"
-#include "imesh/sprite3d.h"
-#include "imesh/clothmesh.h"
-#include "imesh/partsys.h"
-#include "imesh/stars.h"
-#include "imesh/terrfunc.h"
-#include "imesh/thing.h"
 #include "iengine/sharevar.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
 #include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN

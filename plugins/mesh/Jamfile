@@ -3,7 +3,6 @@ SubDir TOP plugins mesh ;
 SubInclude TOP plugins mesh partgen ;
 SubInclude TOP plugins mesh ball ;
 SubInclude TOP plugins mesh bezier ;
-SubInclude TOP plugins mesh cloth ;
 SubInclude TOP plugins mesh crossbld ;
 SubInclude TOP plugins mesh emit ;
 SubInclude TOP plugins mesh explo ;

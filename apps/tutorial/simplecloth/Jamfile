@@ -1,5 +1,0 @@
-SubDir TOP apps tutorial simplecloth ;
-
-Description simplecloth : "Cloth demonstration" ;
-Application simplecloth	: [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simplecloth : csgeom csgfx cstool csutil ;

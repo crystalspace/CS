@@ -72,7 +72,7 @@ HIGH:
 	     (optimize mode)
 	     Note by Jorrit: this will most likely not be fixed soon as it is
 	     a rather fundamental problem.
-	[S2] simplecloth crashes consistently at startup dereferencing address
+	[**] simplecloth crashes consistently at startup dereferencing address
 	     0x0884 when run with the software renderer.  The program seems to
 	     run correctly with the OpenGL renderer.  (optimize mode) Matze
 	     Braun <matze@braunis.de> further reports that the bounding box of
@@ -81,16 +81,14 @@ HIGH:
 	     further reports that MatzeB fixed the simplecloth crash at exit,
 	     but the fix is not yet in CVS.  Dan Mahoney
 	     <domahoneyii@users.sourceforget.net> reports that the crash is on
-	     line 95 of scanp2.inc.
-	     [Bug 747983]
-	[S2] Cloth plugin has a culling problem.  If any corner of the cloth's
+	     line 95 of scanp2.inc. [Bug 747983] Module dropped.
+	[**] Cloth plugin has a culling problem.  If any corner of the cloth's
 	     bbox is above the top border of the screen, then the entire cloth
 	     is culled.  Charles James Leonardo Quarra Cappiello
 	     <charsquarra@hotmail.com> wonders if this problem arose when the
 	     old culler was removed. Matze: This is probably a duplicate
 	     because this is probably caused because of the wrong bounding
-	     box.
-	     [Bug 725406]
+	     box. [Bug 725406] Module dropped.
 	[V2] Investigate various visible artifacts in the mazedex level.  It
 	     appears that most of these have to do with the halos and only
 	     appear with OpenGL.  One artifact appears to be Z-fighting (with
