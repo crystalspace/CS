@@ -59,6 +59,10 @@ The history order is reversed so that new features are at the top.
 	  it by removing the 'extern "C"' around the declarations
 	  of cs_snprintf. Reenabled the use of cs_snprintf in three
 	  of the csutil files.
+	- Renamed snprintf.c to snprintf.cpp to avoid all problems
+	  above related to extern "C" and not extern "C" for declarations.
+	  That way the functions are at least normal C++ functions like
+	  we're used to in CS.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
