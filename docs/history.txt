@@ -12,6 +12,38 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Mar-2000
+	- Thomas Hieber did some general reworking of polygon handling in
+	  Map2CS. Allows a much cleaner way to add specific effects like
+	  no lighting or mirrors.
+	- Thomas also changed DX by doing a dropback to generic DrawPixmap
+	  for DirectX 5. This definitely breaks the DX5 Hardware accelerated
+	  driver, but he will probably stop supporting that beast anyway.
+	  Thomas thus removed the dx5 hardware accelerated renderer from
+	  the project files.
+	- Thomas reenabled Startup console text. (Was a wrong
+	  implementation for FindRGB in the texture manager base class).
+	- Eric Sunshine: The Microsoft sorcerers cast a spell to prevent
+	  VC++ from compiling valid C++, so I derived a counter-spell to
+	  undermine their Black Magic.
+	- Norman Kramer added a Crop() method to iImage.
+	- Eric Sunshine made ColliderType public so that it is possible
+	  to call GetType() (which is also public).
+	- Seth Galbraith did some changes to sprites again: mergetexels
+	  and mergenormals now measure the number of redundant vertices
+	  which can be merged. Also commited some disabled code which
+	  should actually merge the vertices but seems to have bugs.
+4-Mar-2000
+	- Thomas Hieber added support for semi transparent and reflecting
+	  things in Map2CS, as well as for fog. These changes are based
+	  on code which desmond.fletcher@usm.edu, has committed to me.
+	- Norman Kramer added an implementation for GetZbuffValue for
+	  Glide.
+	- Norman also fixed handling of texture cache entries that could
+	  not be downloaded to TMU. that caused crashes in sqk1 and blocks
+	  program.
+	- Thomas Hieber added another bunch of patches by Xavier Trochu
+	  for the windows port.
 3-Mar-2000
 	- Jason Platt removed broken and unused SIMD detection
 	  routine from terrain engine.
