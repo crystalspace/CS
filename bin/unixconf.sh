@@ -116,5 +116,6 @@ fi
 
 sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
 sh ${SCRIPT_DIR}/booltest.sh ${CXX}
+sh ${SCRIPT_DIR}/endtest.sh ${CXX}
 
 exit 0

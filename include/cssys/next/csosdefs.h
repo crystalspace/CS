@@ -114,4 +114,12 @@ static inline char* getcwd( char* p, size_t size )
 #  include <libc.h>
 #endif // SYSDEF_GETOPT
 
+#if defined (__LITTLE_ENDIAN__)
+#  define CS_LITTLE_ENDIAN
+#elif defined (__BIG_ENDIAN__)
+#  define CS_BIG_ENDIAN
+#else
+#  error "Please define a suitable CS_XXX_ENDIAN macro in next/csosdefs.h!"
+#endif
+
 #endif // __NeXT_osdefs_h

@@ -36,4 +36,10 @@ int access (const char *path, int mode);
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (PROC_M68K) || defined (PROC_POWERPC)
+#  define CS_BIG_ENDIAN
+#else
+#  error "Please define a suitable CS_XXX_ENDIAN macro in mac/csosdefs.h!"
+#define
+
 #endif // OSDEFS_H

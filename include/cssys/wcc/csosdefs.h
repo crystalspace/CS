@@ -31,4 +31,6 @@
 #  include <io.h>
 #endif
 
+#define CS_LITTLE_ENDIAN
+
 #endif // __CSOSDEFS_H__

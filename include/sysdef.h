@@ -301,6 +301,11 @@
 #  include <netdb.h>
 #endif
 
+// Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
+#if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
+#  error "No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!"
+#endif
+
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 

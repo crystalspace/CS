@@ -27,4 +27,10 @@
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (PROC_M68K)
+#  define CS_BIG_ENDIAN
+#else
+#  error "Please define a suitable CS_XXX_ENDIAN macro in amiga/csosdefs.h!"
+#endif
+
 #endif // __CSOSDEFS_H__

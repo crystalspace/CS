@@ -11,9 +11,6 @@ endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
-ifneq ($(DO_ASM),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define NO_ASSEMBLER$">>volatile.tmp
-endif
 ifeq ($(USE_NASM),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
@@ -25,4 +22,10 @@ ifeq ($(NEED_FAKE_BOOL),yes)
 endif
 ifeq ($(DO_COREDUMP),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_COREDUMP$">>volatile.tmp
+endif
+ifdef CS_LITTLE_ENDIAN
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_LITTLE_ENDIAN$">>volatile.tmp
+endif
+ifdef CS_BIG_ENDIAN
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_BIG_ENDIAN$">>volatile.tmp
 endif

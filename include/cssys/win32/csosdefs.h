@@ -151,4 +151,10 @@
   #include <io.h>
 #endif
 
+#if defined (PROC_INTEL)
+#  define CS_LITTLE_ENDIAN
+#else
+#  error "Please define a suitable CS_XXX_ENDIAN macro in win32/csosdefs.h!"
+#endif
+
 #endif // __CSOSDEFS_H__

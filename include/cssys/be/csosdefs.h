@@ -39,4 +39,12 @@
 typedef int socklen_t;
 #endif
 
+#if defined (PROC_INTEL)
+#  define CS_LITTLE_ENDIAN
+#elif defined (PROC_PPC)
+#  define CS_BIG_ENDIAN
+#else
+#  error "Please define a suitable CS_XXX_ENDIAN macro in be/csosdefs.h!"
+#endif
+
 #endif // __CSOSDEFS_H__

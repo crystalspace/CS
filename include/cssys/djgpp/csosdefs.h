@@ -48,4 +48,6 @@ void _chdrive (char drive)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#define CS_LITTLE_ENDIAN
+
 #endif // __CSOSDEFS_H__
