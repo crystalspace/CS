@@ -128,15 +128,15 @@ public:
 
   virtual csConstructionObject* GetConstructionObject (int depth)
   {
-    if (depth < 4)
+    if (depth < 6)
       return object1;
-    else if (depth < 7)
+    else if (depth < 9)
     {
       float f = float ((rand () >> 3) & 0xff) / 255.;
       if (f <= .05) return object2;
       return object1;
     }
-    else if (depth == 7)
+    else if (depth == 9)
     {
       float f = float ((rand () >> 3) & 0xff) / 255.;
       if (f <= .1) return object3;
@@ -188,6 +188,21 @@ csGeneralTreeFactoryLoader::csGeneralTreeFactoryLoader (iBase* pParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   reporter = NULL;
   plugin_mgr = NULL;
+
+  co_tree = NULL;
+  co_branch1 = NULL;
+  co_branch2 = NULL;
+  co_top = NULL;
+  co_sidebranch = NULL;
+  co_twig = NULL;
+  co_twigside1 = NULL;
+  co_twigside2 = NULL;
+
+  cg_straighttrunk = NULL;
+  cg_shrinktrunk = NULL;
+  cg_tip = NULL;
+  cg_branch = NULL;
+  cg_smallbranch = NULL;
 }
 
 csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
@@ -195,11 +210,20 @@ csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
   if (reporter) reporter->DecRef ();
   if (plugin_mgr) plugin_mgr->DecRef ();
 
-  delete co_straighttrunk;
-  delete co_shrinktrunk;
-  delete co_tip;
-  delete co_branch;
-  delete co_smallbranch;
+  delete co_tree;
+  delete co_branch1;
+  delete co_branch2;
+  delete co_top;
+  delete co_sidebranch;
+  delete co_twig;
+  delete co_twigside1;
+  delete co_twigside2;
+
+  delete cg_straighttrunk;
+  delete cg_shrinktrunk;
+  delete cg_tip;
+  delete cg_branch;
+  delete cg_smallbranch;
 }
 
 void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,
@@ -282,20 +306,20 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   vertices[j++].Set (-.03*top_radius, height, -.07*top_radius);
 
   // Vertices for the connection to the side branch.
-  vertices[j++].Set (-.1, height*.4, 0);
-  vertices[j++].Set (-.065, height*.48, .035);
-  vertices[j++].Set (-.065, height*.52, .035);
-  vertices[j++].Set (-.1, height*.6, 0);
-  vertices[j++].Set (-.065, height*.52, -.035);
-  vertices[j++].Set (-.065, height*.48, -.035);
+  vertices[j++].Set (-.1, height*.28, 0);
+  vertices[j++].Set (-.065, height*.42, .035);
+  vertices[j++].Set (-.065, height*.58, .035);
+  vertices[j++].Set (-.1, height*.72, 0);
+  vertices[j++].Set (-.065, height*.58, -.035);
+  vertices[j++].Set (-.065, height*.42, -.035);
 
   // Vertices for the top of the side branch.
-  vertices[j++].Set (-.21, height*.5, 0);
-  vertices[j++].Set (-.18, height*.53, .035);
-  vertices[j++].Set (-.15, height*.56, .035);
-  vertices[j++].Set (-.12, height*.59, 0);
-  vertices[j++].Set (-.15, height*.56, -.035);
-  vertices[j++].Set (-.18, height*.53, -.035);
+  vertices[j++].Set (-.21, height*.8, 0);
+  vertices[j++].Set (-.18, height*.83, .035);
+  vertices[j++].Set (-.15, height*.86, .035);
+  vertices[j++].Set (-.12, height*.89, 0);
+  vertices[j++].Set (-.15, height*.86, -.035);
+  vertices[j++].Set (-.18, height*.83, -.035);
 
   co->SetVertices (j, 6, vertices);
   j = 0;
@@ -354,9 +378,9 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 
-  m.Set (.5, 0, 0, 0, .5, 0, 0, 0, .5);
+  m.Set (.4, 0, 0, 0, .4, 0, 0, 0, .4);
   m *= csZRotMatrix3 (.7);
-  v = m.GetInverse () * csVector3 (.165, -.545*height, 0);
+  v = m.GetInverse () * csVector3 (.165, -.845*height, 0);
   transform.SetO2TTranslation (v);
   transform.SetO2T (m);
 
@@ -503,23 +527,15 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   cg_branch = new csConstructionGeometry ();
   cg_smallbranch = new csConstructionGeometry ();
 
-  co_straighttrunk = new csConstructionObject (cg_straighttrunk);
-  co_shrinktrunk = new csConstructionObject (cg_shrinktrunk);
-  co_tip = new csConstructionObject (cg_tip);
-  co_branch = new csConstructionObject (cg_branch);
-  co_smallbranch = new csConstructionObject (cg_smallbranch);
-
   //---------
   // A straight trunk.
   //---------
   GenerateTrunk (cg_straighttrunk, 1, 1, .5);
-  co_straighttrunk->AddRule (new csStraightRule (co_branch));
 
   //---------
   // A trunk that shrinks at the top.
   //---------
   GenerateTrunk (cg_shrinktrunk, 1, .8, .5);
-  co_shrinktrunk->AddRule (new csStraightRule (co_branch));
 
   //---------
   // A tip with no output connectors.
@@ -545,14 +561,33 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   //---------
   // A branch.
   //---------
-  GenerateBranch (cg_branch, 1, 1, .5);
-  co_branch->AddRule (new csRandomRule (co_branch, co_shrinktrunk, co_tip));
-  co_branch->AddRule (new csRandomRule (co_branch, co_shrinktrunk, co_tip));
-  GenerateSmallBranch (cg_smallbranch, 1, 1, .3);
-  co_smallbranch->AddRule (new csRandomRule (co_branch,
-  	co_shrinktrunk, co_tip));
-  co_smallbranch->AddRule (new csRandomRule (co_branch,
-  	co_shrinktrunk, co_tip));
+  GenerateBranch (cg_branch, 1, 1, .15);
+  GenerateSmallBranch (cg_smallbranch, 1, 1, .2);
+
+  //---------
+  // Rules.
+  //---------
+
+  co_tree = new csConstructionObject (cg_straighttrunk);
+  co_branch1 = new csConstructionObject (cg_branch);
+  co_branch2 = new csConstructionObject (cg_branch);
+  co_top = new csConstructionObject (cg_tip);
+  co_sidebranch = new csConstructionObject (cg_branch);
+  co_twig = new csConstructionObject (cg_smallbranch);
+  co_twigside1 = new csConstructionObject (cg_straighttrunk);
+  co_twigside2 = new csConstructionObject (cg_straighttrunk);
+
+  co_tree->AddRule (new csStraightRule (co_branch1));
+  co_branch1->AddRule (new csStraightRule (co_branch2));
+  co_branch1->AddRule (new csStraightRule (co_sidebranch));
+  co_branch2->AddRule (new csStraightRule (co_top));
+  co_branch2->AddRule (new csStraightRule (co_sidebranch));
+  co_sidebranch->AddRule (new csDepthRule (co_sidebranch, co_top, 7));
+  co_sidebranch->AddRule (new csStraightRule (co_twig));
+  co_twig->AddRule (new csDepthRule (co_twig, co_top, 7));
+  co_twig->AddRule (new csStraightRule (co_twigside1));
+  co_twigside1->AddRule (new csStraightRule (co_twigside2));
+  co_twigside2->AddRule (new csStraightRule (co_top));
 
   return true;
 }
@@ -626,7 +661,9 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
   vtidx[j++] = 4;
   vtidx[j++] = 5;
   construction->AddConstructionObject (0, csReversibleTransform (),
-  	6, vtidx, 0, co_straighttrunk);
+  	6, vtidx, 0, co_tree);
+printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
+		construction->GetVertexCount ());
 
   state->SetVertexCount (construction->GetVertexCount ());
   memcpy (state->GetVertices (), construction->GetVertices (),

@@ -53,11 +53,14 @@ private:
   csConstructionGeometry* cg_branch;
   csConstructionGeometry* cg_smallbranch;
 
-  csConstructionObject* co_straighttrunk;
-  csConstructionObject* co_shrinktrunk;
-  csConstructionObject* co_tip;
-  csConstructionObject* co_branch;
-  csConstructionObject* co_smallbranch;
+  csConstructionObject* co_tree;
+  csConstructionObject* co_branch1;
+  csConstructionObject* co_branch2;
+  csConstructionObject* co_top;
+  csConstructionObject* co_sidebranch;
+  csConstructionObject* co_twig;
+  csConstructionObject* co_twigside1;
+  csConstructionObject* co_twigside2;
 
   void GenerateTrunk (csConstructionGeometry* co,
 	float bot_radius, float top_radius, float height);
