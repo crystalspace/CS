@@ -47,6 +47,9 @@ protected:
   /// Alpha level for this component
   int alpha_level;
 
+  /// Icon position
+ int icon_align;
+
   /// Caption text for this component
   iString *caption;
 protected:
@@ -65,6 +68,12 @@ public:
 
   /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
   static const int fsBitmap;
+
+  /******* Icon Positions *******************/
+  static const int iconLeft;
+  static const int iconRight;
+  static const int iconTop;
+  static const int iconBottom;
 
   /******* Signals **********************/
 

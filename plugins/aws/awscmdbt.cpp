@@ -16,6 +16,10 @@ SCF_IMPLEMENT_IBASE_END
 const int awsCmdButton:: fsNormal = 0x0;
 const int awsCmdButton:: fsToolbar = 0x1;
 const int awsCmdButton:: fsBitmap = 0x2;
+const int awsCmdButton:: iconLeft = 0x0;
+const int awsCmdButton:: iconRight = 0x1;
+const int awsCmdButton:: iconTop = 0x2;
+const int awsCmdButton:: iconBottom = 0x3;
 
 const int awsCmdButton:: signalClicked = 0x1;
 
@@ -26,6 +30,7 @@ awsCmdButton::awsCmdButton () :
   was_down(false),
   frame_style(0),
   alpha_level(92),
+  icon_align(0),
   caption(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -53,6 +58,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
   pm->GetInt (settings, "Toggle", switch_style);
+  pm->GetInt (settings, "IconAlign", icon_align);
   pm->GetString (settings, "Caption", caption);
 
   is_switch = switch_style;
@@ -68,6 +74,10 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
         pm->GetString (settings, "Image", tn);
 
         if (tn) tex[1] = pm->GetTexture (tn->GetData (), tn->GetData ());
+
+        iString *in = NULL;
+        pm->GetString (settings, "Icon", in);
+        if (in) tex[2] = pm->GetTexture (in->GetData (), in->GetData ());
       }
       break;
 
@@ -193,6 +203,8 @@ bool awsCmdButton::HandleEvent (iEvent &Event)
 
 void awsCmdButton::OnDraw (csRect clip)
 {
+  int tw=0, th=0, tx, ty, itx=0, ity=0;
+
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();
 
@@ -385,20 +397,77 @@ void awsCmdButton::OnDraw (csRect clip)
             0);
       }
 
-      // Draw the caption, if there is one and the style permits it.
+      tx = Frame ().Width () >> 1;
+      ty = Frame ().Height () >> 1;
+
       if (caption && frame_style == fsNormal)
       {
-        int tw, th, tx, ty;
-
         // Get the size of the text
         WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
             caption->GetData (),
             tw,
             th);
+      }
 
-        // Calculate the center
-        tx = (Frame ().Width () >> 1) - (tw >> 1);
-        ty = (Frame ().Height () >> 1) - (th >> 1);
+      if (tex[2])
+      {
+        int img_w, img_h;
+        itx = tx, ity = ty;
+
+        tex[2]->GetOriginalDimensions (img_w, img_h);
+
+        itx -= (img_w>>1);
+        ity -= (img_h>>1);
+
+        switch (icon_align)
+        {
+        case iconLeft:
+          itx = tx - ((tw+img_w)>>1) - 1;
+          ity = ty - (img_h>>1);
+          tx = itx + img_w + 2;
+          ty = ty - (th>>1);
+          break;
+        case iconRight:
+          itx = tx + ((tw-img_w)>>1) + 1;
+          ity = ty - (img_h>>1);
+          tx = tx - ((tw+img_w)>>1) - 1;
+          ty = ty - (th>>1);
+          break;
+        case iconTop:
+          itx = tx - (img_w>>1);
+          ity = ty - ((th+img_h)>>1) - 1;
+          tx = tx - (tw>>1);
+          ty = ity + img_h + 2;
+          break;
+        case iconBottom:
+          itx = tx - (img_w>>1);
+          ity = ty + ((th-img_h)>>1) + 1;
+          tx = tx - (tw>>1);
+          ty = ty - ((th+img_h)>>1) - 1;
+          break;
+        }
+        
+        g3d->DrawPixmap (
+            tex[2],
+            Frame ().xmin + is_down + itx,
+            Frame ().ymin + is_down + ity,
+            img_w,
+            img_h,
+            0,
+            0,
+            img_w,
+            img_h,
+            0);
+      }
+      else
+      {
+        tx -= (tw>>1);
+        ty -= (th>>1);
+      }
+
+      // Draw the caption, if there is one and the style permits it.
+      if (caption && frame_style == fsNormal)
+      {
 
         // Draw the text
         g2d->Write (
@@ -486,6 +555,24 @@ csRect awsCmdButton::getMinimumSize ()
         tw,
         th);
   }
+
+  if (frame_style == fsNormal && tex[2])
+  {
+    int img_w = 0, img_h = 0;
+    tex[2]->GetOriginalDimensions (img_w, img_h);
+    
+    if (icon_align == iconLeft || icon_align == iconRight)
+    {
+      tw += img_w + 2;
+      th = MAX(th, img_h);
+    }
+    else
+    {
+      th += img_h + 2;
+      tw = MAX(tw, img_w);
+    }
+  }
+
 
   return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
 }
@@ -583,6 +670,10 @@ awsCmdButtonFactory::awsCmdButtonFactory (
   RegisterConstant ("bfsNormal", awsCmdButton::fsNormal);
   RegisterConstant ("bfsToolbar", awsCmdButton::fsToolbar);
   RegisterConstant ("bfsBitmap", awsCmdButton::fsBitmap);
+  RegisterConstant ("biaLeft", awsCmdButton::iconLeft);
+  RegisterConstant ("biaRight", awsCmdButton::iconRight);
+  RegisterConstant ("biaTop", awsCmdButton::iconTop);
+  RegisterConstant ("biaBottom", awsCmdButton::iconBottom);
 
   RegisterConstant ("signalCmdButtonClicked", awsCmdButton::signalClicked);
 }
