@@ -330,6 +330,12 @@ void csScan_32_draw_scanline_fog_plane (int xx, unsigned char* d,
 
 #ifndef NO_draw_pi_scanline_tex_zfil
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_zfil
+#define ZFILL
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_tex_zfil (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
@@ -344,8 +350,9 @@ void csScan_32_draw_pi_scanline_tex_zfil (void *dest, int len,
     *_dest++ = tex;
     *zbuff++ = z;
     u += du; v += dv; z += dz;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_tex_zfil
 
@@ -353,6 +360,12 @@ void csScan_32_draw_pi_scanline_tex_zfil (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_tex_zuse
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_zuse
+#define ZUSE
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_tex_zuse (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
@@ -372,8 +385,9 @@ void csScan_32_draw_pi_scanline_tex_zuse (void *dest, int len,
     _dest++;
     zbuff++;
     u += du; v += dv; z += dz;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_tex_zuse
 
@@ -381,6 +395,13 @@ void csScan_32_draw_pi_scanline_tex_zuse (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_tex_gouraud_zfil
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_gouraud_zfil
+#define ZFILL
+#define GOURAUD
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_tex_gouraud_zfil (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -404,8 +425,9 @@ void csScan_32_draw_pi_scanline_tex_gouraud_zfil (void *dest, int len,
     *zbuff++ = z;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zfil
 
@@ -413,6 +435,13 @@ void csScan_32_draw_pi_scanline_tex_gouraud_zfil (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_tex_gouraud_zuse
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_tex_gouraud_zuse
+#define ZUSE
+#define GOURAUD
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_tex_gouraud_zuse (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -441,8 +470,9 @@ void csScan_32_draw_pi_scanline_tex_gouraud_zuse (void *dest, int len,
     zbuff++;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_tex_gouraud_zuse
 
@@ -450,6 +480,14 @@ void csScan_32_draw_pi_scanline_tex_gouraud_zuse (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_gouraud_zfil
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_gouraud_zfil
+#define FLAT
+#define ZFILL
+#define GOURAUD
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_flat_gouraud_zfil (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -468,8 +506,9 @@ void csScan_32_draw_pi_scanline_flat_gouraud_zfil (void *dest, int len,
     *zbuff++ = z;
     z += dz;
     r += dr; g += dg; b += db;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_flat_gouraud_zfil
 
@@ -477,6 +516,14 @@ void csScan_32_draw_pi_scanline_flat_gouraud_zfil (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_gouraud_zuse
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_gouraud_zuse
+#define FLAT
+#define ZUSE
+#define GOURAUD
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_flat_gouraud_zuse (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
@@ -500,8 +547,9 @@ void csScan_32_draw_pi_scanline_flat_gouraud_zuse (void *dest, int len,
     zbuff++;
     z += dz;
     r += dr; g += dg; b += db;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_flat_gouraud_zuse
 
@@ -509,6 +557,13 @@ void csScan_32_draw_pi_scanline_flat_gouraud_zuse (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_zfil
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_zfil
+#define FLAT
+#define ZFILL
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_flat_zfil (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
@@ -521,8 +576,9 @@ void csScan_32_draw_pi_scanline_flat_zfil (void *dest, int len,
     *_dest++ = 0xffffff;
     *zbuff++ = z;
     z += dz;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_flat_zfil
 
@@ -530,6 +586,13 @@ void csScan_32_draw_pi_scanline_flat_zfil (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_zuse
 
+#define PI_SCANFUNC csScan_32_draw_pi_scanline_flat_zuse
+#define FLAT
+#define ZUSE
+#define BPP32
+#include "scanpi.inc"
+
+/*
 void csScan_32_draw_pi_scanline_flat_zuse (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
@@ -547,8 +610,9 @@ void csScan_32_draw_pi_scanline_flat_zuse (void *dest, int len,
     _dest++;
     zbuff++;
     z += dz;
-  } /* endwhile */
+  } 
 }
+*/
 
 #endif // NO_draw_pi_scanline_flat_zuse
 
