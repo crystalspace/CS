@@ -33,7 +33,8 @@ CS_DECLARE_OBJECT_POOL (csLightPatchPoolHelper, csLightPatch);
  */
 class csLightPatchPool : public csLightPatchPoolHelper {
 public:
-  void Free (void* o) {
+  void Free (void* o)
+  {
     ((csLightPatch *)o)->RemovePatch ();
     csObjectPool::Free (o);
   }

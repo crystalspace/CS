@@ -630,7 +630,8 @@ void csSector::Draw (iRenderView* rview)
   // draw it clipped (in 3D) to the portal polygon. This is currently not
   // done.
 
-  if (meshes.Length () > 0) {
+  if (meshes.Length () > 0)
+  {
     // if we use a culler, visible objects are marked now
     bool UseCuller = (culler && culler->VisTest (rview));
 
@@ -655,7 +656,7 @@ void csSector::Draw (iRenderView* rview)
       for (j = 0 ; j < v->Length () ; j++)
       {
         iMeshWrapper* sp = v->Get (j);
-        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ())
+        if (!UseCuller || sp->IsVisible ())
 	{
           if (!PreviousSector || sp->GetMovable ()->GetSectors ()->
     	      Find (PreviousSector) == -1)

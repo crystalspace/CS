@@ -223,14 +223,6 @@ bool csEngineMeshList::FreeItem (csSome Item)
   return true;
 }
 
-void csEngineMeshList::RemoveMesh (iMeshWrapper* mesh)
-{
-  // @@@ why that ???
-  mesh->IncRef ();
-  csMeshList::RemoveMesh (mesh);
-  mesh->DecRef ();
-}
-
 //---------------------------------------------------------------------------
 
 /**
@@ -1550,9 +1542,11 @@ iStatLight* csEngine::FindLight (unsigned long light_id) const
   for (int i=0; i<sectors.Length (); i++)
   {
     iLight *l = sectors [i]->GetLights ()->FindByID (light_id);
-    if (l) {
+    if (l)
+    {
       iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
-      if (sl) {
+      if (sl)
+      {
         // @@@ this might destroy the object!
         sl->DecRef ();
 	return sl;
@@ -1568,9 +1562,11 @@ iStatLight* csEngine::FindLight (const char* name, bool regionOnly) const
   for (int i=0; i<sectors.Length (); i++)
   {
     iLight *l = sectors [i]->GetLights ()->FindByName (name);
-    if (l) {
+    if (l)
+    {
       iStatLight *sl = SCF_QUERY_INTERFACE (l, iStatLight);
-      if (sl) {
+      if (sl)
+      {
         // @@@ this might destroy the object!
         sl->DecRef ();
 	return sl;

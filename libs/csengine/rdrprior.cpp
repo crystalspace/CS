@@ -51,7 +51,8 @@ void csRenderQueueSet::Remove (iMeshWrapper *mesh)
   long pri = mesh->GetRenderPriority ();
 
   // look if the queue of the mesh exists
-  if (pri < Queues.Length () && Queues [pri] != NULL) {
+  if (pri < Queues.Length () && Queues [pri] != NULL)
+  {
     // delete the object from the queue
     Queues [pri]->Delete (mesh);
   }
@@ -61,9 +62,11 @@ void csRenderQueueSet::RemoveUnknownPriority (iMeshWrapper *mesh)
 {
   for (int i = 0 ; i < Queues.Length () ; i++)
   {
-    if (Queues [i]) {
+    if (Queues [i])
+    {
       int n = Queues [i]->Find (mesh);
-      if (n != -1) {
+      if (n != -1)
+      {
         Queues [i]->Delete (n);
 	return;
       }

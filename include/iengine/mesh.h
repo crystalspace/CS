@@ -131,12 +131,18 @@ struct iMeshWrapper : public iBase
 {
   /// UGLY!!!@@@
   virtual csMeshWrapper* GetPrivateObject () = 0;
+  /// Get the iObject for this mesh object.
+  virtual iObject *QueryObject () = 0;
+
   /// Get the iMeshObject.
   virtual iMeshObject* GetMeshObject () const = 0;
   /// Set the iMeshObject.
   virtual void SetMeshObject (iMeshObject*) = 0;
-  /// Get the iObject for this mesh object.
-  virtual iObject *QueryObject () = 0;
+
+  /// Get the parent factory.
+  virtual iMeshFactoryWrapper *GetFactory () const = 0;
+  /// Set the parent factory (this only sets a pointer).
+  virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
 
   /**
    * Update lighting as soon as the object becomes visible.
@@ -223,9 +229,6 @@ struct iMeshWrapper : public iBase
 
   /// Get the draw callback.
   virtual iMeshDrawCallback* GetDrawCallback () const = 0;
-
-  /// Set the parent factory.
-  virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
 
   /**
    * The renderer will render all objects in a sector based on this
@@ -327,6 +330,13 @@ struct iMeshWrapper : public iBase
    * Returns true if the object wants to die.
    */
   virtual bool WantToDie () = 0;
+
+  /// Mark this object as visible
+  virtual void MarkVisible () = 0;
+  /// Mark this object as invisible.
+  virtual void MarkInvisible () = 0;
+  /// Return if this object is marked as visible or invisible.
+  virtual bool IsVisible () const = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);
@@ -344,8 +354,6 @@ SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);
  */
 struct iMeshFactoryWrapper : public iBase
 {
-  /// UGLY!!!@@@
-  virtual csMeshFactoryWrapper* GetPrivateObject () = 0;
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
@@ -373,6 +381,11 @@ struct iMeshFactoryWrapper : public iBase
    * has no parent.
    */
   virtual iMeshFactoryWrapper* GetParentContainer () const = 0;
+  /**
+   * Set the parent of this factory. This will only change the 'parent'
+   * pointer but not add the factory as a child! Internal use only.
+   */
+  virtual void SetParentContainer (iMeshFactoryWrapper *p) const = 0;
 
   /**
    * Get all the children of this mesh factory.

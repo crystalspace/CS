@@ -201,7 +201,6 @@ class csEngineMeshList : public csMeshList
 public:
   virtual ~csEngineMeshList ();
   virtual bool FreeItem (csSome Item);
-  virtual void RemoveMesh (iMeshWrapper* mesh);
 };
 
 /**

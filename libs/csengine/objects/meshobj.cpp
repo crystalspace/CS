@@ -28,45 +28,15 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 
-SCF_IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
+// ---------------------------------------------------------------------------
+// csMeshWrapper
+// ---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE_EXT (csMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
   SCF_IMPLEMENTS_INTERFACE (csMeshWrapper)
-SCF_IMPLEMENT_IBASE_EXT_QUERY_END
-
-SCF_IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
-SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(csMeshWrapper)
-
-// We implement a custom DecRef() in order to work around a shortcoming of the
-// NextStep compiler.  The UnlinkMesh(this) invocation which appears here used
-// to appear in the destructor of this class.  During the processing of
-// UnlinkMesh(), QueryInterface(iMeshWrapper) is invoked on this object.
-// Unfortunately, the NextStep compiler modifies the `vptr' of this object to
-// point at its superclass' `vtbl' as soon as the destructor is entered, rather
-// than modifying it after the destructor has completed, which is how all other
-// compilers behave.  This early vptr modification, thus transmogrifies this
-// object into its superclass (csObject) too early; before
-// QueryInterface(iMeshWrapper) is invoked.  As a result, by the time
-// UnlinkMesh(this) was being called, the object already appeared to be a
-// csObject and failed to respond positively to QueryInterface(iMeshWrapper).
-// To work around this problem, the UnlinkMesh() invocation was moved out of
-// the destructor and into DecRef(), thus it is now called prior to the
-// undesirable transmogrification.  Note that the csMeshWrapper destructor is
-// now private, thus it is ensured that terrain wrappers can only be destroyed
-// via DecRef(), which is public.
-
-void csMeshWrapper::DecRef()
-{
-  CS_ASSERT (scfRefCount > 0);
-#ifdef CS_DEBUG
-  if (scfRefCount == 1)
-  {
-    int idx = csEngine::current_engine->GetMeshes ()->Find (&scfiMeshWrapper);
-    CS_ASSERT (idx == -1);
-  }
-#endif
-  __scf_superclass::DecRef();
-}
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
   SCF_IMPLEMENTS_INTERFACE (iMeshWrapper)
@@ -183,7 +153,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* ss = sectors->Get (i);
-    if (ss) ss->GetPrivateObject ()->RelinkMesh (&scfiMeshWrapper);
+    if (ss) ss->RelinkMesh (&scfiMeshWrapper);
   }
 }
 
@@ -380,26 +350,6 @@ bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
   return rc;
 }
 
-void csMeshWrapper::ScaleBy (float factor)
-{
-  csMatrix3 trans = movable.GetTransform ().GetT2O ();
-  trans.m11 *= factor;
-  trans.m22 *= factor;
-  trans.m33 *= factor;
-  movable.SetTransform (trans);
-  UpdateMove ();
-}
-
-
-void csMeshWrapper::Rotate (float angle)
-{
-  csZRotMatrix3 rotz(angle);
-  movable.Transform (rotz);
-  csXRotMatrix3 rotx(angle);
-  movable.Transform (rotx);
-  UpdateMove ();
-}
-
 void csMeshWrapper::HardTransform (const csReversibleTransform& t)
 {
   mesh->HardTransform (t);
@@ -484,64 +434,15 @@ float csMeshWrapper::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
-void csMeshWrapper::AddChild (iMeshWrapper* child)
-{
-  // First we increase reference on the mesh to make sure it will
-  // not get deleted by unlinking it from it's previous parent.
-  child->IncRef ();
-
-  // First unlink the mesh from the engine or another parent.
-  iMeshWrapper *oldParent = child->GetParentContainer ();
-  if (oldParent)
-    oldParent->GetChildren ()->Remove (child);
-  else
-    csEngine::current_engine->GetMeshes ()->Remove (child);
-
-  child->SetParentContainer (&scfiMeshWrapper);
-  children.Push (child);
-  child->GetMovable ()->SetParent (&movable.scfiMovable);
-  child->DecRef ();
-}
-
-void csMeshWrapper::RemoveChild (iMeshWrapper* child)
-{
-  // @@@ is this test really required?
-  if (child->GetParentContainer () != &scfiMeshWrapper) return;
-
-  csMeshMeshList& ch = children;
-  int idx = ch.Find (child);
-  CS_ASSERT (idx != -1);
-  ch.Delete (idx);		// Remove object
-  child->SetParentContainer (NULL);
-  child->GetMovable ()->SetParent (NULL);
-}
-
-void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
-{
-  scfParent->SetFactory (factory->GetPrivateObject ());
-}
-
 float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
 	csBox2& sbox, csBox3& cbox)
 {
   return scfParent->GetScreenBoundingBox (camera, sbox, cbox);
 }
 
-//--------------------------------------------------------------------------
-
-void csMeshMeshList::AddMesh (iMeshWrapper* child)
-{
-  CS_ASSERT (mesh != NULL);
-  mesh->AddChild (child);
-}
-
-void csMeshMeshList::RemoveMesh (iMeshWrapper* child)
-{
-  CS_ASSERT (mesh != NULL);
-  mesh->RemoveChild (child);
-}
-
-//--------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// csMeshFactoryWrapper
+// ---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE_EXT (csMeshFactoryWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
@@ -584,25 +485,26 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 
-csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
+iMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
 {
-  iMeshObject* mesh = meshFact->NewInstance ();
-  csMeshWrapper* meshObj = new csMeshWrapper (NULL, mesh);
-  mesh->DecRef ();
-  if (GetName ()) meshObj->SetName (GetName ());
-  meshObj->SetFactory (this);
+  iMeshObject* basemesh = meshFact->NewInstance ();
+  iMeshWrapper* mesh = &(new csMeshWrapper (NULL, basemesh))->scfiMeshWrapper;
+  basemesh->DecRef ();
+
+  if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
+  mesh->SetFactory (&scfiMeshFactoryWrapper);
+
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshFactoryWrapper* childfact = children.Get (i)->GetPrivateObject ();
-    csMeshWrapper* relchild = childfact->NewMeshObject ();
-    meshObj->scfiMeshWrapper.GetChildren ()->Add (
-    	&(relchild->scfiMeshWrapper));
-    relchild->GetMovable ().SetTransform (childfact->GetTransform ());
-    relchild->GetMovable ().UpdateMove ();
-    relchild->DecRef ();
+    iMeshFactoryWrapper *childfact = children.Get (i);
+    iMeshWrapper *child = childfact->CreateMeshWrapper ();
+    mesh->GetChildren ()->Add (child);
+    child->GetMovable ()->SetTransform (childfact->GetTransform ());
+    child->GetMovable ()->UpdateMove ();
+    child->DecRef ();
   }
-  return meshObj;
+  return mesh;
 }
 
 void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
@@ -610,55 +512,8 @@ void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
   meshFact->HardTransform (t);
 }
 
-void csMeshFactoryWrapper::AddChild (iMeshFactoryWrapper* child)
-{
-  // First unlink the factory from another possible parent.
-  csMeshFactoryWrapper* c = child->GetPrivateObject ();
-  // First we increase reference on the mesh to make sure it will
-  // not get deleted by unlinking it from it's previous parent.
-  c->IncRef ();
-  if (c->parent)
-  {
-    csMeshFactoryFactoryList& ch = c->parent->children;
-    int idx = ch.Find (child);
-    CS_ASSERT (idx != -1);	// Impossible!
-    ch.Delete (idx);		// Remove object
-  }
-
-  c->parent = this;
-  children.Push (child); // here child will be IncRef'ed again, so we now do a:
-  c->DecRef ();
-}
-
-void csMeshFactoryWrapper::RemoveChild (iMeshFactoryWrapper* child)
-{
-  // First unlink the mesh from the parent.
-  csMeshFactoryWrapper* c = child->GetPrivateObject ();
-  if (c->parent != this) return;	// Wrong parent, nothing to do.
-  csMeshFactoryFactoryList& ch = children;
-  int idx = ch.Find (child);
-  CS_ASSERT (idx != -1);
-  ch.Delete (idx);			// Remove object
-  c->parent = NULL;
-}
-
-iMeshWrapper* csMeshFactoryWrapper::MeshFactoryWrapper::CreateMeshWrapper ()
-{
-  csMeshWrapper* wrapper = scfParent->NewMeshObject ();
-  if (wrapper)
-    return &(wrapper->scfiMeshWrapper);
-  else
-    return NULL;
-}
-
-iMeshFactoryWrapper* csMeshFactoryWrapper::MeshFactoryWrapper::
-	GetParentContainer () const
-{
-  csMeshFactoryWrapper* par = scfParent->parent;
-  if (!par) return NULL;
-  return &(par->scfiMeshFactoryWrapper);
-}
-
+//--------------------------------------------------------------------------
+// csMeshList
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csMeshList)
@@ -675,39 +530,16 @@ csMeshList::csMeshList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
 }
 
-csMeshList::~csMeshList ()
-{
-  DeleteAll ();
-}
-
-bool csMeshList::FreeItem (csSome Item)
-{
-  iMeshWrapper* mesh = (iMeshWrapper*)Item;
-  mesh->DecRef ();
-  return true;
-}
-
-void csMeshList::AddMesh (iMeshWrapper *mesh)
-{
-  Push (mesh);
-}
-
-void csMeshList::RemoveMesh (iMeshWrapper *mesh)
-{
-  int n = Find (mesh);
-  if (n >= 0) Delete (n); 
-}
-
 int csMeshList::MeshList::GetCount () const
   { return scfParent->Length (); }
 iMeshWrapper *csMeshList::MeshList::Get (int n) const
   { return scfParent->Get (n); }
 int csMeshList::MeshList::Add (iMeshWrapper *obj)
-  { scfParent->AddMesh (obj); return true; }
+  { scfParent->Push (obj); return true; }
 bool csMeshList::MeshList::Remove (iMeshWrapper *obj)
-  { scfParent->RemoveMesh (obj); return true; }
+  { scfParent->Delete (obj); return true; }
 bool csMeshList::MeshList::Remove (int n)
-  { scfParent->RemoveMesh (scfParent->Get (n)); return true; }
+  { scfParent->Delete (n); return true; }
 void csMeshList::MeshList::RemoveAll ()
   { scfParent->DeleteAll (); }
 int csMeshList::MeshList::Find (iMeshWrapper *obj) const
@@ -716,19 +548,39 @@ iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
   { return scfParent->FindByName (Name); }
 
 //--------------------------------------------------------------------------
+// csMeshMeshList
+//--------------------------------------------------------------------------
 
-void csMeshFactoryFactoryList::AddMeshFactory (iMeshFactoryWrapper* child)
+bool csMeshMeshList::PrepareItem (csSome item)
 {
-  CS_ASSERT (meshfact != NULL);
-  meshfact->AddChild (child);
+  CS_ASSERT (mesh != NULL);
+  csMeshList::PrepareItem (item);
+  iMeshWrapper *child = (iMeshWrapper*)item;
+
+  // unlink the mesh from the engine or another parent.
+  iMeshWrapper *oldParent = child->GetParentContainer ();
+  if (oldParent)
+    oldParent->GetChildren ()->Remove (child);
+  else
+    csEngine::current_engine->GetMeshes ()->Remove (child);
+
+  child->SetParentContainer (&mesh->scfiMeshWrapper);
+  child->GetMovable ()->SetParent (&mesh->GetMovable ().scfiMovable);
+
+  return true;
 }
 
-void csMeshFactoryFactoryList::RemoveMeshFactory (iMeshFactoryWrapper* child)
+bool csMeshMeshList::FreeItem (csSome item)
 {
-  CS_ASSERT (meshfact != NULL);
-  meshfact->RemoveChild (child);
+  CS_ASSERT (mesh != NULL);
+  ((iMeshWrapper*)item)->SetParentContainer (NULL);
+  ((iMeshWrapper*)item)->GetMovable ()->SetParent (NULL);
+  csMeshList::FreeItem (item);
+  return true;
 }
 
+//--------------------------------------------------------------------------
+// csMeshFactoryList
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csMeshFactoryList)
@@ -745,32 +597,16 @@ csMeshFactoryList::csMeshFactoryList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
 }
 
-csMeshFactoryList::~csMeshFactoryList ()
-{
-  DeleteAll ();
-}
-
-void csMeshFactoryList::AddMeshFactory (iMeshFactoryWrapper *mesh)
-{
-  Push (mesh);
-}
-
-void csMeshFactoryList::RemoveMeshFactory (iMeshFactoryWrapper *mesh)
-{
-  int n = Find (mesh);
-  if (n >= 0) Delete (n); 
-}
-
 int csMeshFactoryList::MeshFactoryList::GetCount () const
   { return scfParent->Length (); }
 iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::Get (int n) const
   { return scfParent->Get (n); }
 int csMeshFactoryList::MeshFactoryList::Add (iMeshFactoryWrapper *obj)
-  { scfParent->AddMeshFactory (obj); return true; }
+  { scfParent->Push (obj); return true; }
 bool csMeshFactoryList::MeshFactoryList::Remove (iMeshFactoryWrapper *obj)
-  { scfParent->RemoveMeshFactory (obj); return true; }
+  { scfParent->Delete (obj); return true; }
 bool csMeshFactoryList::MeshFactoryList::Remove (int n)
-  { scfParent->RemoveMeshFactory (scfParent->Get (n)); return true; }
+  { scfParent->Delete (scfParent->Get (n)); return true; }
 void csMeshFactoryList::MeshFactoryList::RemoveAll ()
   { scfParent->DeleteAll (); }
 int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
@@ -779,4 +615,27 @@ iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (const char 
   { return scfParent->FindByName (Name); }
 
 //--------------------------------------------------------------------------
+// csMeshFactoryFactoryList
+//--------------------------------------------------------------------------
 
+bool csMeshFactoryFactoryList::PrepareItem (csSome item)
+{
+  CS_ASSERT (meshfact != NULL);
+  csMeshFactoryList::PrepareItem (item);
+  iMeshFactoryWrapper *child = (iMeshFactoryWrapper*)item;
+
+  // unlink the factory from another possible parent.
+  if (child->GetParentContainer ())
+    child->GetParentContainer ()->GetChildren ()->Remove (child);
+
+  child->SetParentContainer (&meshfact->scfiMeshFactoryWrapper);
+  return true;
+}
+
+bool csMeshFactoryFactoryList::FreeItem (csSome item)
+{
+  CS_ASSERT (meshfact != NULL);
+  ((iMeshFactoryWrapper*)item)->SetParentContainer (NULL);
+  csMeshFactoryList::FreeItem (item);
+  return true;
+}
