@@ -63,8 +63,7 @@ class awsComponent : public awsSigSrc
 
    /// True if the component is hidden, else false.
    bool hidden;
-
-
+  
 public:
     awsComponent();
     virtual ~awsComponent();
@@ -180,20 +179,27 @@ public:
 
 };
 
-class awsComponentFactory : public iBase
+class awsComponentFactory : public iAwsComponentFactory
 {
+  iAws *wmgr;
 public:
     /// Calls register to register the component that it builds with the window manager
-    awsComponentFactory(iAws *wmgr);
+    awsComponentFactory(iAws *_wmgr);
 
     /// Does nothing
     virtual ~awsComponentFactory();
+
+    /// Returns the current window manager
+    iAws *WindowManager() { return wmgr; }
 
     /// Returns a newly created component of the type this factory handles. 
     virtual awsComponent *Create()=0;
 
     /// Registers this factory with the window manager
-    void Register(iAws *wmgr, char *type);
+    void Register(char *type);
+
+    /// Registers constants for the parser so that we can construct right.
+    void RegisterConstant(char *name, int value);
 };
 
 #endif

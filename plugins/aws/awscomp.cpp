@@ -204,10 +204,12 @@ awsComponent::Show()
   * don't.  In any case, a factory is remarkably simple to build.  All you need to do is to inherit from 
   * awsComponentFactory and call register with the window manager and the named type of the component.  That's it.
   */
-awsComponentFactory::awsComponentFactory(iAws *wmgr)
+awsComponentFactory::awsComponentFactory(iAws *_wmgr)
 {
    // This is where you call register, only you must do it in the derived factory.  Like this:
    // Register(wmgr, "Radio Button");
+
+   wmgr=_wmgr;
 }
 
 awsComponentFactory::~awsComponentFactory()
@@ -216,10 +218,15 @@ awsComponentFactory::~awsComponentFactory()
 }
 
 void
-awsComponentFactory::Register(iAws *wmgr, char *name)
+awsComponentFactory::Register(char *name)
 {
-    wmgr->RegisterComponentFactory(this, name);
+  wmgr->RegisterComponentFactory(this, name);
 }
 
+void 
+awsComponentFactory::RegisterConstant(char *name, int value)
+{
+  wmgr->GetPrefMgr()->RegisterConstant(name, value);
+}
 
 
