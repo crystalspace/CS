@@ -65,7 +65,7 @@ graphics.
 Visual C++ 6 comes with the minimum DirectX @sc{sdk} 5 files in-order to build
 Crystal Space.
 
-To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
+To enable you to build Crystal Space to it's optimum @sc{d3d} support, you must
 download the latest DirectX Software Development Kit (@sc{sdk}), which can be
 obtained from:
 
