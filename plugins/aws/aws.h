@@ -111,7 +111,7 @@ class awsManager :
   struct awsComponentFactoryMap
   {
     ~awsComponentFactoryMap();
-    awsComponentFactory *factory;
+    iAwsComponentFactory *factory;
     unsigned long id;
   };
 
@@ -166,11 +166,11 @@ public:
 
   /// Register a component factory
   virtual void RegisterComponentFactory (
-                awsComponentFactory *factory,
+                iAwsComponentFactory *factory,
                 char *name);
 
   /// Find a component factory
-  virtual awsComponentFactory *FindComponentFactory (char *name);
+  virtual iAwsComponentFactory *FindComponentFactory (char *name);
 
   /// Get the top window
   virtual iAwsWindow *GetTopWindow ();

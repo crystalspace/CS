@@ -189,7 +189,7 @@ iAwsComponent *awsManager::CreateEmbeddableComponent ()
 }
 
 void awsManager::RegisterComponentFactory (
-  awsComponentFactory *factory,
+  iAwsComponentFactory *factory,
   char *name)
 {
   awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
@@ -202,7 +202,7 @@ void awsManager::RegisterComponentFactory (
   component_factories.AddItem (cfm);
 }
 
-awsComponentFactory *awsManager::FindComponentFactory (char *name)
+iAwsComponentFactory *awsManager::FindComponentFactory (char *name)
 {
   void *p = component_factories.GetFirstItem ();
   unsigned long id = prefmgr->NameToId (name);
@@ -897,7 +897,7 @@ void awsManager::CreateChildrenFromDef (
     if (key->Type () == KEY_COMPONENT)
     {
       awsComponentNode *comp_node = (awsComponentNode *)key;
-      awsComponentFactory *factory = FindComponentFactory (
+      iAwsComponentFactory *factory = FindComponentFactory (
           comp_node->ComponentTypeName ()->GetData ());
 
       // If we have a factory for this component, then create it and set it up.
