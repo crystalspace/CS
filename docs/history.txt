@@ -12,11 +12,38 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Jul-99:
+	- I decreased SMALL_Z from 0.1 to 0.01. This should reduce the chances
+	  of the variaus stages of the clipper going wrong and thus remove a
+	  lot of the ugly polygon drawings.
+	- Received and integrated makefiles for IRIX/SGI from Dmitry Derevyanko
+	  <dmitryd@robotics.EECS.Berkeley.EDU>.
+	- Or Siu-Hang fixed the Archive class (small bugfix).
+15-Jul-99:
+	- Added support for multi-sector sprites. Also simplified the
+	  rendering process through portals a bit.
+	- Removed csPortalCS class and put all functionality in csPortal.
+	  There is no need for the current double class situation since
+	  the landscape engine is going to be integrated and overriding
+	  portal behaviour is still possible this way (like InfMaze does).
 14-Jul-99:
 	- Added a lot of config file variables for collision detection and
 	  speed of the new movement system. Almost everything can be configured
 	  now (movement speed, acceleration, jump speed, dimensions of body
 	  and legs, ...). See docs/config.txt (or cryst.cfg) for a list.
+	- Fix from Andrew Zabolotny to 'client' in ndrvdemo.
+	- Andrew also fixed the X 2D drivers so that they can be included
+	  in the same executable (CheckKeyPress() problem).
+	- Added missing scan32a.h file for compiling with NASM.
+	- Small changes to the makefiles from Andrew Zabolotny.
+	- Andrew fixed the 'Black Screen' problem in MetaDemo and
+	  Shooter (at least for OS/2).
+	- Andrew changed BOOL to bool, TRUE to true, and FALSE to false
+	  in libs/csgame and apps/shooter. Also another small fix
+	  to the csgame library.
+	- Eric Sunshine fixed a macro name (for multiple inclusion) in
+	  ndrvscon.h.
+	- Thomas Hieber cleaned up the project files for VC a bit.
 13-Jul-99:
 	- Fixed bug in ClipToPlane() which is only used for portals on
 	  things. This bug could cause flickering polygons.

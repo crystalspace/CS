@@ -128,7 +128,8 @@ In any case all foggy things are collected and then Z sorted. This is
 also not correct but currently the only way. Here we need a better way
 to do Z sorting.
 
-Now we can proceed to drawing all sprites. Currently this algorithm is
+Now we can proceed to drawing all sprites. @@@ UPDATE @@@ NO LONGER
+TRUE! --> Currently this algorithm is
 somewhat simple. It assumes that a sprite always lives in one sector.
 This is of course not always right and the sprite structure (csSprite3D
 in libs/csengine/objects/cssprite.h) already has provisions for the
