@@ -62,7 +62,7 @@ public:
     else if (abs (fx2 - fx1) > abs (fy2 - fy1))
     {
       // Transform floating-point format to 16.16 fixed-point
-      fy1 = csQint16 (y1); fy2 = csQint16 (y2);
+      fy1 = csQfixed16 (y1); fy2 = csQfixed16 (y2);
   
       if (fx1 > fx2)
       {
@@ -86,7 +86,7 @@ public:
     else
     {
       // Transform floating-point format to 16.16 fixed-point
-      fx1 = csQint16 (x1); fx2 = csQint16 (x2);
+      fx1 = csQfixed16 (x1); fx2 = csQfixed16 (x2);
   
       if (fy1 > fy2)
       {
