@@ -1,24 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
 16-May-2000
-	- Alex Pfaffe did some minor changes/cleanup to the terrain
-	  engine.
+	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.
-	- Added csOctree::ClassifyRectangle() that will be used for
-	  PVS calculation. This function calculates a 4x4 bitmap representing
-	  the solid space in some rectangle.
-	- At octree calculation time the solid masks are precalculated
-	  for every node. The octree cache format version has been bumped
-	  up so that recalculation of the octree is automatic.
+	- Added csOctree::ClassifyRectangle() that will be used for PVS
+	  calculation.  This function calculates a 4x4 bitmap representing the
+	  solid space in some rectangle.
+	- At octree calculation time the solid masks are precalculated for
+	  every node.  The octree cache format version has been bumped up so
+	  that recalculation of the octree is automatic.
 	- Modified db_octree command so that it will show all leaves
 	  (disregarding depth) if -1 is given as an argument.
-	- Added csPolygon3D::IntersectRayNoBackFace() which does the
-	  same as csPolygon3D::IntersectRay() but without back-face
-	  culling.
+	- Added csPolygon3D::IntersectRayNoBackFace() which does the same as
+	  csPolygon3D::IntersectRay() but without back-face culling.
 	- Wouter Wijngaards made a small quality increase in radiosity.
 	- Fixed csPolygonTree::ClassifyPoint().
-	- Disabled the new routine to calculate the solid mask because
-	  it is too slow. I need to make this faster.
+	- Disabled the new routine to calculate the solid mask because it is
+	  too slow.  I need to make this faster.
+	- Eric Sunshine and Jorrit performed repair work on the new terrain
+	  library merge, bringing the makefile and source code into shape.
+	  Eliminated compilation warnings and errors.
 15-May-2000
 	- Added const version of csPoly3D::operator[].
 	- Added csPoly3D::SplitWithPlaneXYZ().
