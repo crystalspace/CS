@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,10 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include <stdarg.h>
 #include <math.h>
 
-#include "sysdef.h"
 #include "cs3d/direct3d5/d3d_txtmgr.h"
 #include "csutil/scanstr.h"
 #include "iimage.h"

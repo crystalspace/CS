@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/timeb.h>
 #include <windows.h>
-#include "sysdef.h"
 #include "cssys/system.h"
 
 // This function should return milliseconds since some specific

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
+    Copyright (C) 1998-2000 by Jorrit Tyberghein and Dan Ogles.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,13 +24,13 @@
 // Ported to COM by Dan Ogles on 8.26.98
 #define INITGUID
 
+#include "sysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include <ddraw.h>
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "sysdef.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

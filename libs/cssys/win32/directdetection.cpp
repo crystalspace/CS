@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    DirectDetection.cpp: implementation of the DirectDetection class.
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,12 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// DirectDetection.cpp: implementation of the DirectDetection class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #define INITGUID
 
+#include "sysdef.h"
 #include <stdlib.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -30,7 +28,6 @@
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "sysdef.h"
 #include "cssys/win32/DirectDetection.h"
 
 #ifdef COMP_BC

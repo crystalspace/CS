@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
+    Copyright (C) 1998-2000 by Jorrit Tyberghein and Dan Ogles.
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,15 +21,14 @@
 // Written by Dan Ogles
 // some modifications by Nathaniel
 
+#include "sysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include <ddraw.h>
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "sysdef.h"
 #include "cs3d/direct3d5/d3d_txtcache.h"
-
 #include "cs3d/direct3d5/d3d_g3d.h"
 #include "itexture.h"
 #include "ilghtmap.h"
