@@ -13,6 +13,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Sep-1999
+	- Eric Sunshine fixed some "const versus non-const" warnings in
+	  csPolyPlane and TextureTrans which were pointed out by
+	  Petr Kocmid <pkocmid@atlas.cz>.
+	- Eric Sunshine modified the DECLARE_TYPED_VECTOR() macro based upon
+	  a suggestion by Brandon Ehle <azverkan@yahoo.com>.  It is now
+	  possible to specify the class name of the new vector type, the
+	  superclass type, as well as the element type.
 23-Sep-1999
 	- Big optimization in sprite drawing. I eliminated 3*num_triangles
 	  divides for every sprite!
