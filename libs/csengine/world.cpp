@@ -255,11 +255,11 @@ csLight* csLightIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-csSectorIt::csSectorIt (csSector* sector, const csVector3& pos, float sqradius)
+csSectorIt::csSectorIt (csSector* sector, const csVector3& pos, float radius)
 {
   csSectorIt::sector = sector;
   csSectorIt::pos = pos;
-  csSectorIt::sqradius = sqradius;
+  csSectorIt::radius = radius;
   recursive_it = NULL;
 
   Restart ();
@@ -285,7 +285,11 @@ csSector* csSectorIt::Fetch ()
   if (recursive_it)
   {
     csSector* rc = recursive_it->Fetch ();
-    if (rc) return rc;
+    if (rc)
+    {
+      last_pos = recursive_it->GetLastPosition ();
+      return rc;
+    }
     delete recursive_it;
     recursive_it = NULL;
   }
@@ -293,6 +297,7 @@ csSector* csSectorIt::Fetch ()
   if (cur_poly == -1)
   {
     cur_poly = 0;
+    last_pos = pos;
     return sector;
   }
 
@@ -307,7 +312,7 @@ csSector* csSectorIt::Fetch ()
     {
       const csPlane3& wpl = p->GetPlane ()->GetWorldPlane ();
       float d = wpl.Distance (pos);
-      if (d*d < sqradius && csMath3::Visible (pos, wpl))
+      if (d < radius && csMath3::Visible (pos, wpl))
       {
         if (!po->GetSector ()) po->CompleteSector ();
 	csVector3 new_pos;
@@ -315,7 +320,7 @@ csSector* csSectorIt::Fetch ()
 	  new_pos = po->Warp (pos);
 	else
 	  new_pos = pos;
-	recursive_it = new csSectorIt (po->GetSector (), new_pos, sqradius);
+	recursive_it = new csSectorIt (po->GetSector (), new_pos, radius);
 	return Fetch ();
       }
     }
@@ -328,7 +333,6 @@ csSector* csSectorIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-#if 0
 csObjectIt::csObjectIt (csWorld* w, const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius)
 {
@@ -338,8 +342,14 @@ csObjectIt::csObjectIt (csWorld* w, const csIdType& type, bool derived,
   csObjectIt::start_sector = sector;
   csObjectIt::start_pos = pos;
   csObjectIt::radius = radius;
+  sectors_it = new csSectorIt (sector, pos, radius);
 
   Restart ();
+}
+
+csObjectIt::~csObjectIt ()
+{
+  delete sectors_it;
 }
 
 bool csObjectIt::CheckType (csObject* obj)
@@ -348,7 +358,7 @@ bool csObjectIt::CheckType (csObject* obj)
   else return &obj->GetType () == type;
 }
 
-bool csObjectIt::CheckType (csIdType* ctype)
+bool csObjectIt::CheckType (const csIdType* ctype)
 {
   if (derived) return *ctype >= *type;
   else return ctype == type;
@@ -356,35 +366,75 @@ bool csObjectIt::CheckType (csIdType* ctype)
 
 void csObjectIt::Restart ()
 {
-  cur_sector = start_sector;
-  cur_pos = start_pos;
   cur_type = &csDynLight::Type;
   cur_object = world->GetFirstDynLight ();
-  do_this_sector = true;
+  sectors_it->Restart ();
+}
+
+void csObjectIt::StartThings ()
+{
+  cur_type = &csThing::Type;
+  cur_object = cur_sector->GetFirstThing ();
+}
+
+void csObjectIt::StartStatLights ()
+{
+  cur_type = &csStatLight::Type;
+  cur_idx = 0;
+}
+
+void csObjectIt::StartSprites ()
+{
+  cur_type = &csSprite::Type;
+  cur_idx = 0;
+}
+
+void csObjectIt::EndSearch ()
+{
+  cur_type = NULL;
 }
 
 csObject* csObjectIt::Fetch ()
 {
+  if (!cur_type) return NULL;
+
   // Handle csDynLight.
   if (cur_type == &csDynLight::Type)
   {
     if (CheckType (cur_type))
     {
       if (cur_object == NULL)
-        StartStatLights ();
+        cur_type = &csSector::Type;
       else
       {
-        csObject* rc = cur_object;
-        cur_object = ((csDynLight*)cur_object)->GetNext ();
-        return rc;
+        do
+	{
+          csObject* rc = cur_object;
+          cur_object = ((csDynLight*)cur_object)->GetNext ();
+	  float r = ((csLight*)rc)->GetRadius () + radius;
+	  if (csSquaredDist::PointPoint (((csLight*)rc)->GetCenter (),
+		  cur_pos) <= r*r)
+            return rc;
+	}
+	while (cur_object);
+	if (cur_object == NULL)
+          cur_type = &csSector::Type;
       }
     }
     else
-      StartStatLights ();
+      cur_type = &csSector::Type;
   }
   // Handle this sector first.
   if (cur_type == &csSector::Type)
   {
+    cur_sector = sectors_it->Fetch ();
+    if (!cur_sector)
+    {
+      EndSearch ();
+      return NULL;
+    }
+    cur_pos = sectors_it->GetLastPosition ();
+
     if (CheckType (cur_type))
     {
       StartThings ();
@@ -419,9 +469,18 @@ csObject* csObjectIt::Fetch ()
         StartSprites ();
       else
       {
-        csObject* rc = cur_sector->lights[cur_idx];
-	cur_idx++;
-        return rc;
+        do
+	{
+          csObject* rc = (csObject*)cur_sector->lights[cur_idx];
+	  cur_idx++;
+	  float r = ((csLight*)rc)->GetRadius () + radius;
+	  if (csSquaredDist::PointPoint (((csLight*)rc)->GetCenter (),
+		  cur_pos) <= r*r)
+            return rc;
+	}
+	while (cur_idx < cur_sector->lights.Length ());
+        if (cur_idx >= cur_sector->lights.Length ())
+          StartSprites ();
       }
     }
     else
@@ -433,34 +492,19 @@ csObject* csObjectIt::Fetch ()
     if (CheckType (cur_type))
     {
       if (cur_idx >= cur_sector->sprites.Length ())
-        StartSectors ();
+        cur_type = &csSector::Type;
       else
       {
-        csObject* rc = cur_sector->sprites[cur_idx];
+        csObject* rc = (csObject*)cur_sector->sprites[cur_idx];
 	cur_idx++;
         return rc;
       }
     }
     else
-      StartSectors ();
+      cur_type = &csSector::Type;
   }
-  // Handle csSector.
-  if (cur_type == &csSector::Type)
-  {
-    if (CheckType (cur_type))
-    {
-      if (cur_idx >= cur_sector->GetNumPolygons ())
-        EndSearch ();
-      else
-      {
-        return NULL;
-      }
-    }
-    else
-      EndSearch ();
-  }
+  return NULL;
 }
-#endif
 
 //---------------------------------------------------------------------------
 
@@ -1658,14 +1702,12 @@ csSectorIt* csWorld::GetNearbySectors (csSector* sector,
   return it;
 }
 
-#if 0
 csObjectIt* csWorld::GetNearbyObjects (const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius)
 {
   csObjectIt* it = new csObjectIt (this, type, derived, sector, pos, radius);
   return it;
 }
-#endif
 
 int csWorld::GetTextureFormat ()
 {

@@ -192,8 +192,9 @@ int num_our_cd;
 int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
 {
   int c = 0;
-  float sqsize = d.x * d.x + d.y * d.y + d.z * d.z;
-  csSectorIt* it = Sys->world->GetNearbySectors (s, v, sqsize);
+  // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
+  float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
+  csSectorIt* it = Sys->world->GetNearbySectors (s, v, size);
   csSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {

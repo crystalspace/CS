@@ -8,9 +8,13 @@ The history order has been reversed so that new features are at the top.
 	  not needed as particles are in the 'sprites' list.
 	- Added new csWorld::GetNearbySectors() which returns an iterator
 	  to iterate over all sectors near some position and a radius. This
-	  function takes space warping portals into account. A GetNearbyObjects
-	  function is also planned which will be able to get all nearby
-	  objects (lights, sectors, things, sprites, ...).
+	  function takes space warping portals into account.
+	- Added csWorld::GetNearbyObjects() which returns an iterator
+	  to iterate over all nearby objects. You can specify the type
+	  of object to iterate over. It supports sectors, sprites, things,
+	  lights, ... Currently this function does returns all things
+	  and sprites that are in reachable sectors. It needs to do
+	  distance calculation there too.
 	- Changed WalkTest collision detection to use the new iterator
 	  to find nearby sectors. This is better because:
 	    - Easier to read like this.
