@@ -25,8 +25,6 @@ Dynavis.
 * VIS visibility culling:: Visibility Culling
 * VIS view frustum culling:: View Frustum Culling
 * VIS portal/Sector visibility:: Portal/Sector Visibility
-* VIS in Sector Visibility:: In-Sector Visibility
-* VIS PVS:: Potentially Visible Set (@sc{pvs})
 @end menu
 
 @node VIS sectors and portals, VIS entities, Visibility Culling, Visibility Culling
@@ -166,7 +164,7 @@ objects automatically from detail objects.
 View frustum culling is the most obvious type of culling.  Crystal Space does
 this for all objects.
 
-@node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustum culling, Visibility Culling
+@node VIS portal/Sector visibility, , VIS view frustum culling, Visibility Culling
 @subsubsection Portal/Sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
