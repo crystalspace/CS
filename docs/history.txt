@@ -20,7 +20,7 @@ The history order is reversed so that new features are at the top.
 	      point to an element which had been delete()ed previously,
 	      and now simply points to a valid element (i.e. it used to
 	      crash if you used it again, now it wont).
-	    - csList::Delete(csListElement *) has been added to allow deletion
+	    - csList::Delete(csListElement*) has been added to allow deletion
 	      of an element without passing through an implicit Iterator
 	      construction.
 	    - renderer3d/opengl/gl_varbufmrg.cpp has been changed to call
@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	    - Added workarounds to make the system working with boostjam.
 	    - Completely reworked the documentation rules.
 	    - Fixed configure to only output Makefiles when run from top
+	      source directory.  This is necessary because the CS GNU make
+	      system is not yet capable of building the project outside of the
 	      source directory.
 	- Fixed the makefiles of all particle systems. They need to link
 	  with cstool now. Also fixed the Jamfiles.
@@ -65,6 +67,8 @@ The history order is reversed so that new features are at the top.
 	  objects to the engine as they are loaded in the loading thread.
 	  Work on the interfaces alone at this moment.
 	- res added a new "Application Framework" module to the API docs.
+	- Eric Sunshine performed minor clean up of recent changes to
+	  configure.ac.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

@@ -224,6 +224,8 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_CHECK_PROGS([JAM], [jam])
 AC_PROG_MAKE_SET
 
+
+
 #------------------------------------------------------------------------------
 # Determine how to make a directory tree.  We need to know the exact commands,
 # so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
@@ -1785,16 +1787,17 @@ CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
 #------------------------------------------------------------------------------
 CS_HEADER_OUTPUT([include/volatile.h])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
-AC_CONFIG_FILES([Jamfile Makefile]) #XXX: seems we can't put AC_CONFIG_FILES
-				    # in a conditional
+AC_CONFIG_FILES([Jamfile])
 
-# only output makefile stuff when building inside source directory
-AS_IF([test -e "$ac_top_builddir""configure"],[
-      CS_MAKEFILE_OUTPUT([config.mak])
-      # Queue makefile cache creation if caching enabled.
-      AS_IF([test $enable_makefile_cache = yes],
+# Hack: Presently, the makefile system is incapable of building the project
+# outside of the source directory, therefore only emit makefile support files
+# if configuring within the source directory.
+AS_IF([test -r Makefile.in],
+    [AC_CONFIG_FILES([Makefile])
+    CS_MAKEFILE_OUTPUT([config.mak])
+    # Queue makefile cache creation if caching enabled.
+    AS_IF([test $enable_makefile_cache = yes],
 	[AC_CONFIG_COMMANDS([cache.mak],
-	    [rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])
-    ])
+	    [rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])])
 
 AC_OUTPUT
