@@ -3,6 +3,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
+#include "csgeom/cspoint.h"
 #include "iutil/string.h"
 
 struct iAws;
@@ -132,6 +133,12 @@ public:
   /// Lookup the value of an RGB key by name (from the skin def)
   virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
 
+  /// Lookup the value of a point key by name (from the skin def)
+  virtual bool LookupPointKey(char *name, csPoint &point)=0; 
+
+  /// Lookup the value of a point key by id (from the skin def)
+  virtual bool LookupPointKey(unsigned long id, csPoint &point)=0; 
+  
   /// Get the an integer from a given component node
   virtual bool GetInt(awsComponentNode *node, char *name, int &val)=0;
 
