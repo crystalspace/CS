@@ -460,6 +460,7 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
       pos = GetRandomDirection( rainbox.Min(), csVector3 (
         rainbox.MaxX() - rainbox.MinX(), 0,0f,
         rainbox.MaxZ() - rainbox.MinZ()) );
+      pos.y = rainbox.MaxY();
       GetParticle(i)->SetPosition(pos);
       part_pos[i] = pos;
     }
