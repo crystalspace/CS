@@ -96,7 +96,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     csString s;
     s << "LoadLibraryEx(" << dllPath << ") error " << (int)errorCode << ": "
       << buf;
-    ErrorMessages.Push (s);
+    ErrorMessages.Push ((char*)(const char*)s);
     delete[] buf;
     return 0;
   }
@@ -108,7 +108,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
   {
     csString s;
     s << dllPath << ": DLL does not export \"plugin_compiler\".";
-    ErrorMessages.Push (s);
+    ErrorMessages.Push ((char*)(const char*)s);
     FreeLibrary ((HMODULE)handle);
     return 0;
   }
@@ -118,7 +118,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     csString s;
     s << dllPath << ": plugin compiler does not match application compiler: "
       << plugin_compiler << " != " CS_COMPILER_NAME;
-    ErrorMessages.Push (s);
+    ErrorMessages.Push ((char*)(const char*)s);
     FreeLibrary ((HMODULE)handle);
     return 0;
   }

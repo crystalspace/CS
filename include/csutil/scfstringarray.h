@@ -48,7 +48,7 @@ public:
   /// Push a string onto the stack.
   virtual void Push (char const *value)
   {
-    v.Push (value);
+    v.Push ((char*)value);
   }
 
   /// Pop a string from the top of stack.
@@ -66,13 +66,13 @@ public:
   /// Find index of given string.
   virtual int Find (const char *value) const
   {
-    return v.Find (value);
+    return v.Find ((char*)value);
   }
 
   /// Find index of a string in a pre-sorted string array.
-  virtual int FindSorted (const char *value) const
+  virtual int FindSortedKey (const char *value) const
   {
-    return v.FindSorted (value);
+    return v.FindSortedKey ((char*)value);
   }
 
   /// Sort the string array.
@@ -90,7 +90,7 @@ public:
   /// Insert a string before Nth string in the array.
   virtual bool Insert (int n, char const *value)
   {
-    return v.Insert (n, value);
+    return v.Insert (n, (char*)value);
   }
 
   /// Delete all strings in array.

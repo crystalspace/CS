@@ -97,7 +97,7 @@ iBase* csObjectRegistryIterator::Next ()
 void csObjectRegistryIterator::Add (iBase* obj, char const* tag)
 {
   objects.Push (obj);
-  tags.Push (tag);
+  tags.Push ((char*)tag);
 }
 
 //-------------------------------------------------------------------------
@@ -161,7 +161,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
 
     obj->IncRef ();
     registry.Push (obj);
-    tags.Push (tag);
+    tags.Push ((char*)tag);
     return true;
   }
   return false;

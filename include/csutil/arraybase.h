@@ -19,6 +19,10 @@
 #ifndef __CSUTIL_BASEARRAY_H__
 #define __CSUTIL_BASEARRAY_H__
 
+/// This function prototype is used for Sort()
+typedef int ArraySortCompareFunction (void const* item1,
+	void const* item2);
+
 /**
  * The base for all templated array classes in CS. Note that
  * there are no virtual functions here for performance reasons.
@@ -101,10 +105,6 @@ protected:
   }
 
 public:
-  /// This function prototype is used for Sort()
-  typedef int ArraySortCompareFunction (void const* item1,
-	void const* item2);
-
   ~csArrayBase ()
   {
     DeleteAll ();

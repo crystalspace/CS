@@ -22,289 +22,41 @@
 
 #include <stdarg.h>
 #include "csutil/util.h"
-#include "csutil/arraybase.h"
+#include "csutil/array.h"
 
-template <class T>
 class csStringArrayElementHandler
 {
 public:
-  static void Construct (T* address, T const& src)
+  static void Construct (char** address, char* const& src)
   {
     *address = csStrNew (src);
   }
 
-  static void Destroy (T* address)
+  static void Destroy (char** address)
   {
     delete[] *address;
   }
 
-  static void InitRegion (T* address, int count)
+  static void InitRegion (char** address, int count)
   {
-    memset (address, 0, count*sizeof (T));
+    memset (address, 0, count*sizeof (char*));
   }
 };
-
-#undef ElementHandler
-#undef ArraySuper
-#define ElementHandler csStringArrayElementHandler<char*>
-#define ArraySuper csArrayBase<char*, ElementHandler >
-
-typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
 
 /**
  * An array of strings. This array will properly make copies of the strings
  * and delete those copies using delete[] later.
  */
-class csStringArray : private ArraySuper  // Note! Private.
+class csStringArray : public csArray<char*, csStringArrayElementHandler>
 {
 public:
-  // We take the following public functions from csArrayBase<T> and
-  // make them public here.
-  using ArraySuper::Length;
-  using ArraySuper::Capacity;
-  // using ArraySuper::Find; We have our own version
-  using ArraySuper::Sort;
-  using ArraySuper::Get;
-  using ArraySuper::operator[];
-  using ArraySuper::DeleteAll;
-  using ArraySuper::Truncate;
-  using ArraySuper::Empty;
-  using ArraySuper::SetLength;
-  using ArraySuper::AdjustCapacity;
-  using ArraySuper::ShrinkBestFit;
-  using ArraySuper::DeleteIndex;
-  using ArraySuper::DeleteRange;
-  using ArraySuper::Delete;
-
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csStringArray (int ilimit = 0, int ithreshold = 0)
-  	: ArraySuper (ilimit, ithreshold)
+  	: csArray<char*, csStringArrayElementHandler> (ilimit, ithreshold)
   {
-  }
-
-  /// Copy constructor.
-  csStringArray (const csStringArray& source)
-  {
-    ArraySuper::CopyFrom ((ArraySuper&)source);
-  }
-
-  /// Assignment operator.
-  csStringArray& operator= (const csStringArray& other)
-  {
-    ArraySuper::CopyFrom ((ArraySuper&)other);
-    return *this;
-  }
-
-  /**
-   * Transfer the entire contents of one array to the other. The end
-   * result will be that this array will be completely empty and the
-   * other array will have all items that originally were in this array.
-   * This operation is very efficient.
-   */
-  void TransferTo (csStringArray& destination)
-  {
-    ArraySuper::TransferTo ((ArraySuper&)destination);
-  }
-
-  /// Make a copy of a string and remember it.
-  void Put (int n, char const* ptr)
-  {
-    CS_ASSERT (n >= 0);
-    if (n >= count)
-      SetLength (n + 1);
-    delete root[n];
-    root[n] = csStrNew (ptr);
-  }
-
-  /**
-   * Find a element in array and return its index (or -1 if not found).
-   * This version will compare pointers and does NOT do an actual string
-   * compare. Use Find() for that.
-   */
-  int FindPointer (char const* which) const
-  {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
-      if (root[i] == which)
-        return i;
-    return -1;
-  }
-
-  /**
-   * Find a element in array and return its index (or -1 if not found).
-   * This version will compare strings in a case-sensitive manner.
-   */
-  int Find (char const* which) const
-  {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
-    {
-      if (root[i] == which)
-        return i;
-      if (root[i] != 0 && which != 0 && !strcmp (root[i], which))
-        return i;
-    }
-    return -1;
-  }
-
-  /// Push a element on 'top' of vector (makes a copy of the string).
-  int Push (char const* what)
-  {
-    SetLength (count + 1);
-    root [count - 1] = csStrNew (what);
-    return (count - 1);
-  }
-  /**
-   * Push a printf-style string onto the list (makes copy of string after
-   * formatting).
-   */
-  int FormatPush (char const * fmt, ...)
-  {
-    char str[1000];
-    va_list args;
-    va_start(args, fmt);
-    vsprintf(str, fmt, args);
-    va_end(args);
-    return Push(str);
-  }
-
-  /**
-   * Push a element on 'top' of vector if it is not already there
-   * (makes a copy of the string).
-   * This function does a case-sensitive string compare.
-   */
-  int PushSmart (char const* what)
-  {
-    int n = Find (what);
-    return (n == -1) ? Push (what) : n;
-  }
-
-  /**
-   * Pop an element from vector 'top'. Caller is responsible for
-   * deleting the object later (via delete[]).
-   */
-  char* Pop ()
-  {
-    char* ret = root [count - 1];
-    root [count - 1] = 0;
-    SetLength (count - 1);
-    return ret;
-  }
-
-  /// Return the top element but don't remove it.
-  char const* Top () const
-  {
-    return root [count - 1];
-  }
-
-  /**
-   * Get and clear the element 'n' from vector. This spot in the array
-   * will be set to 0. Caller is responsible for deleting the returned
-   * pointer later (via delete[]).
-   */
-  char* GetAndClear (int n)
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    char* ret = root[n];
-    root[n] = 0;
-    return ret;
-  }
-
-  /**
-   * Extract element number 'n' from vector. The element is deleted
-   * from the array and returned. Caller is responsible for deleting the
-   * pointer later (using delete[]).
-   */
-  char* Extract (int n)
-  {
-    char* rc = 0;
-    if (n >= 0 && n < count)
-    {
-      rc = root[n];
-      const int ncount = count - 1;
-      const int nmove = ncount - n;
-      if (nmove > 0)
-      {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (char*));
-      }
-      root[ncount] = 0;	// Clear last element to prevent deletion.
-      SetLength (ncount);
-    }
-    return rc;
-  }
-
-  /**
-   * Insert element 'Item' before element 'n'. This function makes a
-   * copy.
-   */
-  bool Insert (int n, char const* item)
-  {
-    if (n <= count)
-    {
-      SetLength (count + 1); // Increments 'count' as a side-effect.
-      const int nmove = (count - n - 1);
-      if (nmove > 0)
-      {
-        memmove (&root [n + 1], &root [n], nmove * sizeof (char*));
-      }
-      root [n] = csStrNew (item);
-      return true;
-    }
-    else
-     return false;
-  }
-
-  /**
-   * Find an element based on some key.
-   */
-  int FindSorted (const char* key,
-  	csStringArrayCompareFunction* compare) const
-  {
-    int l = 0, r = Length () - 1;
-    while (l <= r)
-    {
-      int m = (l + r) / 2;
-      int cmp = compare (root [m], key);
-
-      if (cmp == 0)
-        return m;
-      else if (cmp < 0)
-        l = m + 1;
-      else
-        r = m - 1;
-    }
-    return -1;
-  }
-
-  /**
-   * Insert an element at a sorted position.
-   * Assumes array is already sorted.
-   */
-  int InsertSorted (char const* item, csStringArrayCompareFunction* compare)
-  {
-    int m = 0, l = 0, r = Length () - 1;
-    while (l <= r)
-    {
-      m = (l + r) / 2;
-      int cmp = compare (root [m], item);
-
-      if (cmp == 0)
-      {
-        Insert (++m, item);
-        return m;
-      }
-      else if (cmp < 0)
-        l = m + 1;
-      else
-        r = m - 1;
-    }
-    if (r == m)
-      m++;
-    Insert (m, item);
-    return m;
   }
 
   static int CaseSensitiveCompare (char const* item1, char const* item2)
@@ -328,31 +80,11 @@ public:
   }
  
   /**
-   * Find an element in a case sensitive way.
+   * Sort array based on case sensitive string compare function.
    */
-  int FindSorted (const char* key) const
+  void Sort (ArraySortCompareFunction* compare)
   {
-    return FindSorted (key, CaseSensitiveCompare);
-  }
-
-  /**
-   * Insert an element at a sorted position.
-   * Assumes array is already sorted.
-   * Sorting assumes case-sensitive string compare.
-   */
-  int InsertSorted (char const* item)
-  {
-    return InsertSorted (item, CaseSensitiveCompare);
-  }
-
-  /**
-   * Insert an element at a sorted position.
-   * Assumes array is already sorted.
-   * Sorting assumes case-insensitive string compare.
-   */
-  int InsertSortedCase (char const* item)
-  {
-    return InsertSorted (item, CaseInsensitiveCompare);
+    csArray<char*, csStringArrayElementHandler>::Sort (compare);
   }
 
   /**
@@ -360,19 +92,19 @@ public:
    */
   void Sort ()
   {
-    qsort (root, Length (), sizeof (char*), CaseSensitiveCompare);
+    csArray<char*, csStringArrayElementHandler>::Sort (CaseSensitiveCompare);
   }
 
-  /**
-   * Sort array based on case insensitive string compare function.
-   */
-  void SortCase ()
+  /// Pop an element from tail end of array.
+  char* Pop ()
   {
-    qsort (root, Length (), sizeof (char*), CaseInsensitiveCompare);
+    CS_ASSERT (Length () > 0);
+    int l = Length () - 1;
+    char* ret = Get (l);
+    InitRegion (l, 1);
+    SetLength (l);
+    return ret;
   }
 };
-
-#undef ElementHandler
-#undef ArraySuper
 
 #endif // __CS_STRINGARRAY_H__

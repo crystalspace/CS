@@ -32,6 +32,17 @@ chronological order.
 	  viewmesh now divides cal3d animations by looping and non-looping
 	  types, and dynamically updates the list of animations to remove
 	  from the blend set.
+	- Jorrit also changed csStringArray to inherit from csArray by
+	  using csArray<char*, csStringArrayElementHandler> as superclass.
+	  There is one problem which I couldn't solve yet. For some reason,
+	  functions like Put and Push don't accept const char* pointers.
+	  So you have to cast to (char*) to use Put and Push. Solutions
+	  to this would be welcome. I don't understand why it doesn't work
+	  as csArray::Push() is declared as follows:
+		int Push (T const& what)
+	  with T equal to char*. Sidenote: changing the Push() to this:
+		int Push (const T& what)
+	  didn't help.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.

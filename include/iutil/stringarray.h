@@ -48,7 +48,7 @@ struct iStringArray : public iBase
   virtual int Find (const char *value) const = 0;
 
   /// Find index of a string in a pre-sorted string array.
-  virtual int FindSorted (const char *value) const = 0;
+  virtual int FindSortedKey (const char *value) const = 0;
 
   /// Sort the string array.
   virtual void Sort () = 0;

@@ -997,7 +997,7 @@ void csEngine::RegisterRenderPriority (
     render_priority_cameraflags[i] = false;
   }
 
-  render_priorities.Put (priority, name);
+  render_priorities.Put (priority, (char*)name);
   render_priority_sortflags[priority] = rendsort;
   render_priority_cameraflags[priority] = do_camera;
   if (!strcmp (name, "sky"))
