@@ -28,7 +28,6 @@ struct iXmlAttribute;
 struct iFile;
 struct iDataBuffer;
 struct iString;
-class csString;
 
 //===========================================================================
 
@@ -215,14 +214,6 @@ struct iXmlDocument : public iBase
   virtual const char* ParseXML (iString* str) = 0;
 
   /**
-   * Parse XML file from a csString.
-   * This will clear the previous root node if any.
-   * Returns NULL if all is ok. Otherwise it will return an error
-   * string.
-   */
-  virtual const char* ParseXML (const csString& str) = 0;
-
-  /**
    * Parse XML file from a char array.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
@@ -243,13 +234,6 @@ struct iXmlDocument : public iBase
    * error string.
    */
   virtual const char* WriteXML (iString& str) = 0;
-
-  /**
-   * Write out XML file to a csString.
-   * This will return NULL if all is ok. Otherwise it will return an
-   * error string.
-   */
-  virtual const char* WriteXML (csString& str) = 0;
 };
 
 //===========================================================================
