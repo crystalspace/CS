@@ -743,6 +743,24 @@ int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand,
   {
     case operandInt:
       return operand.intVal;
+    case operandFloat:
+      return (int)operand.floatVal;
+    case operandSVValueFloat:
+      {
+	if (stacks.Length() > operand.svName)
+	{
+	  if (stacks[operand.svName].Length() > 0)
+	  {
+	    csShaderVariable* sv = stacks[operand.svName].Top ();
+	    if (sv != 0)
+	    {
+	      float v;
+	      if (sv->GetValue (v))
+		return (int)v;
+	    }
+	  }
+	}
+      }
     case operandSVValueInt:
       {
 	if (stacks.Length() > operand.svName)
@@ -773,7 +791,9 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
   {
     case operandFloat:
       return operand.floatVal;
-    case operandSVValueInt:
+    case operandInt:
+      return (float)operand.intVal;
+    case operandSVValueFloat:
       {
 	if (stacks.Length() > operand.svName)
 	{
@@ -785,6 +805,22 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
 	      float v;
 	      if (sv->GetValue (v))
 		return v;
+	    }
+	  }
+	}
+      }
+    case operandSVValueInt:
+      {
+	if (stacks.Length() > operand.svName)
+	{
+	  if (stacks[operand.svName].Length() > 0)
+	  {
+	    csShaderVariable* sv = stacks[operand.svName].Top ();
+	    if (sv != 0)
+	    {
+	      int v;
+	      if (sv->GetValue (v))
+		return (float)v;
 	    }
 	  }
 	}

@@ -45,6 +45,9 @@ chronological order.
 	- res slightly augmented the iGraphics3D::DrawSimpleMesh() docs to
 	  state that use of that method in 2D mode is possible, too.
 	- res fixed the flare halos for NR SR.
+	- res fixed a problem in the shader conditionals where float-typed SV
+	  values where not correctly retrieved. Also fixed float-vs-int 
+	  comparisons (ints were not casted to floats).
 25-Nov-2004
 	- Eric Sunshine enhanced SCF so that it now recognizes the --verbose
 	  command-line option. When enabled, it emits the following additional
