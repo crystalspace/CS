@@ -96,7 +96,7 @@ doc api clean cleanlib cleandep:
 
 # Create volatile.h before anything other if it does not exist
 mk/user.mak: include/volatile.h
-include/volatile.h: $(SYSMAKEFILE) $(LIBRARY_SUBMAKEFILES) \
+include/volatile.h: config.mak $(SYSMAKEFILE) $(LIBRARY_SUBMAKEFILES) \
 	$(DRIVER_SUBMAKEFILES) $(APPLICATION_SUBMAKEFILES)
 	@echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
 	@echo $"| Rebuilding $@$"
