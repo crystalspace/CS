@@ -2433,7 +2433,7 @@ The history order is reversed so that new features are at the top.
 	      of csver.h when invoking mkverres.sh, thus it failed when
 	      generating project files from a build hierarchy which differed
 	      from the source hierarchy.
-	    - Fixed bug in msvcgen.jam where it failed to use --xmlprotect (nee
+	    - Fixed bug in msvcgen.jam where it failed to use --xmlprotect (ne
 	      --htmlent) when building MSVC7 project files.
 	    - Fixed bug in msvcgen.jam where it was incorrectly specifying
 	      external libraries via --depend.  The correct option is
@@ -4336,17 +4336,17 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine corrected a couple package names in cygwin.txi as
 	  reported by Ian Walker.
 	- res made the following changes:
-	    * added iterators for csStringHash and csStringSet.
-	    * added some sorting functions to csRefArray.
-	    * enhanced levtool so iDocumentSystem plugins can be specified for
+	    - Added iterators for csStringHash and csStringSet.
+	    - Added some sorting functions to csRefArray.
+	    - Enhanced levtool so iDocumentSystem plugins can be specified for
 	      reading or writing world files.
-	    * changed levtool to just write from input to output docsys if one
+	    - Changed levtool to just write from input to output docsys if one
 	      of those and no other operation is specified.
-	    * levtool reports times for some actions.
-	    * levtool used to make backups even on operations which did not
+	    - Levtool reports times for some actions.
+	    - Levtool used to make backups even on operations which did not
 	      modify a world.
-	    * added a simple TinyXML wrapping document system plugin.
-	    * added a binary document system plugin.
+	    - Added a simple TinyXML wrapping document system plugin.
+	    - Added a binary document system plugin.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.
@@ -4493,8 +4493,8 @@ The history order is reversed so that new features are at the top.
 	  volatile.h.  This macro is only needed when building the zlib.dll
 	  itself, thus it was superfluous for volatile.h to define it.
 	- res made the following changes to map2cs:
-	  * Fixed: output of things w/o polys
-	  * Hopefully fixed texture alignment/rotation this time.
+	  - Fixed: output of things w/o polys
+	  - Hopefully fixed texture alignment/rotation this time.
 	- res fixed the GL renderer so polys w/ keycolor textures are lit
 	  properly again
 6-Mar-2003
@@ -4543,19 +4543,19 @@ The history order is reversed so that new features are at the top.
 		</meshfact>
 	- Fixed map2cs to output the new curve format.
 	- res made the following changes to map2cs:
-	    * Fixed a bunch of bugs he introduced with the converison to
+	    - Fixed a bunch of bugs he introduced with the converison to
 	      iDocumentSystem.
-	    * Improved handling of keycolored HL textures.
-	    * A sky portal can now be created by assigning the "sky" texture
+	    - Improved handling of keycolored HL textures.
+	    - A sky portal can now be created by assigning the "sky" texture
 	      to a brush face.
-	    * Less <part>s, more <meshobj>s are written.
-	    * Can now be instructed to specify dynavis as the culler (through
+	    - Less <part>s, more <meshobj>s are written.
+	    - Can now be instructed to specify dynavis as the culler (through
 	      Hammer)
-	    * Lighmap cell size can now also be specified in the map file.
-	    * Various other small tweaks.
+	    - Lighmap cell size can now also be specified in the map file.
+	    - Various other small tweaks.
 	- res made the following changes to crystal.fgd:
-	    * Fixed some problems he introduced.
-	    * Added some new settings, like Dynavis activation.
+	    - Fixed some problems he introduced.
+	    - Added some new settings, like Dynavis activation.
 	- res fixed a possible endless loop in mesh ie multiplexer.
 	- res added csImageMemory::SetKeycolor() and ::ClearKeycolor()
 5-Mar-2003
@@ -4598,16 +4598,16 @@ The history order is reversed so that new features are at the top.
 	  is also faster to check.
 	- Fixed python plugin for latest changes. Also fixed css.h.
 	- res made the following changes to the Hammer FGD file:
-	    * some "Under Development" stuff was commented out
-	    * some things that are uncertain to work were commented out
-	    * added some convenience stuff, mostly choices for 0/1 integers
+	    - some "Under Development" stuff was commented out
+	    - some things that are uncertain to work were commented out
+	    - added some convenience stuff, mostly choices for 0/1 integers
 	- res made the following changes to map2cs:
-	    * now uses the iDocumentSystem to output the converted level
-	    * when using manual sectors map2cs also wrote out the polys of the
+	    - now uses the iDocumentSystem to output the converted level
+	    - when using manual sectors map2cs also wrote out the polys of the
 	      sector brush, which were rendered over the 'real' surfaces and
 	      causes heavy z-fighting
-	    * the size of textures in zip/pk3 files is now determined correctly
-	    * converted HalfLife textures are written out as PNG instead of BMP
+	    - the size of textures in zip/pk3 files is now determined correctly
+	    - converted HalfLife textures are written out as PNG instead of BMP
 	- res changed csImageMemory so it isn't limited to truecolor images only
 4-Mar-2003
         - Andrew Craig fixed coordshow text drawing in walktest.  If you had
@@ -4697,23 +4697,22 @@ The history order is reversed so that new features are at the top.
 	  it and the XML data is already taking way too much memory. So this
 	  is four bytes less memory for every XML node.
 	- res made the following changes to bugplug:
-	    * Now uses a config file to read certain settings.
+	    - Now uses a config file to read certain settings.
 	      Right now these are the name of the keybinding file and some
 	      screen capture options.
-	    * Slightly changed appearance of the "Press key" box
+	    - Slightly changed appearance of the "Press key" box
 	- res fixed a bug in stdrep where format qualifiers contained in
 	  messages output via console or nativewm where errorneously
 	  expanded.
 	- res changed the bugplug makefile to be in the same style as the
 	  ISO plugin after ES' recent changes.
 2-Mar-2003
-        - Rudolf Potucek updated makefiles in the apps/ directory to
-	  remove vpath and generate object files in individual
-	  subdirectories of $(OUT). This should allow identical
-	  filenames to coexist in different directories of the
-	  build tree. Also added a rule to remove the console output
-	  *.txt files generated on the windows platform. There may be an
-	  issue for the following files:
+        - Rudolf Potucek updated makefiles in the apps/ directory to remove
+	  vpath and generate object files in individual subdirectories of
+	  $(OUT).  This should allow identical filenames to coexist in
+	  different directories of the build tree.  Also added a rule to remove
+	  the console output *.txt files generated on the windows platform.
+	  There may be an issue for the following files:
 	    apps/demo/demo.mak
 	    apps/tests/netmtst/netmtst.mak
 	    apps/tests/perl5tst/perl5tst.mak
@@ -4751,10 +4750,10 @@ The history order is reversed so that new features are at the top.
 	  and instead left the old value ("no") in place.
 	- De-obfuscated a loop in csHashMap::Delete().
 	- res made the following changes to the Win32 port:
-	  * csGetInstallPath() now always returns a path without trailing
+	  - csGetInstallPath() now always returns a path without trailing
 	    delimiter.
-	  * all plugin directories are added to the PATH env var on startup.
-	  * the install path is cached between calls to csGetInstallPath().
+	  - all plugin directories are added to the PATH env var on startup.
+	  - the install path is cached between calls to csGetInstallPath().
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
@@ -5727,9 +5726,9 @@ The history order is reversed so that new features are at the top.
 	  currently handle both vertex and fragment programs, and use textures
 	  supplied by the material.  Shader variables can be bound to CG
 	  variables.  Features missing include:
-	    * Better handling of passing matrices into CG
-	    * Fetching "global" textures directly from the engine by name
-	    * Effective code (totally unoptimized now)
+	    - Better handling of passing matrices into CG
+	    - Fetching "global" textures directly from the engine by name
+	    - Effective code (totally unoptimized now)
 	- Anders Stenberg fixed stencil clipping for new renderer again.  It
 	  should now work even with shadows.
 	- Anders also fixed shader plugins to be up to date with minor
