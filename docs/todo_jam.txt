@@ -71,3 +71,6 @@ W - Wishlist (the build also works without this feature)
     CS libs incompatible with other apps. Someone should check if we really need
     -fvtable-thunks in general or if we could specify it for the ddraw plugin
     only.
+[H] There are no rules for Building the python modul yet. 
+    (only the python plugin works)
+
