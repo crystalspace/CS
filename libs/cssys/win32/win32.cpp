@@ -56,7 +56,7 @@ extern char**	_argv;
 
 extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
-int ApplicationShow;
+extern int ApplicationShow;
 extern bool need_console;
 
 void sys_fatalerror(char *s)

@@ -21,7 +21,7 @@
 #include "csutil/scf.h"
 
 extern int csMain (int argc, char* argv[]);
-extern int ApplicationShow;
+int ApplicationShow;
 HINSTANCE ModuleHandle;	
 
 #undef main
