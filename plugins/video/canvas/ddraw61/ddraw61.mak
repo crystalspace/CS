@@ -2,7 +2,7 @@
 # to build the Windows DirectDraw 2D driver
 
 # Driver description
-DESCRIPTION.ddraw61 = Crystal Space Windows DirectDraw/DirectX 6.1 2D driver
+DESCRIPTION.ddraw61 = Crystal Space Windows DirectDraw/DX 6.1 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

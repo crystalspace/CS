@@ -10,6 +10,17 @@ The history order has been reversed so that new features are at the top.
 	      executable).
 	    - Documented the -fs/-nofs switch in help (fullscreen toggle).
 	    - Fixed the 32-bit unlighted texture drawing bug (long-standing).
+	- Fixed the WaveOut sound driver makefile so that the description
+	  is correctly showed.
+	- Enabled the WaveOut sound driver in the win32gcc.mak makefile
+	  because it works fine.
+	- Fixed the win32gcc.mak file so that it works better on Windows
+	  NT (replaced '/' with '\' in two places).
+	- Fixed the d3ddx6.mak file so that it's description is aligned
+	  correctly with 'make help'.
+	- Fixed ddraw61.mak so that the description is a little shorter.
+	- Fixed Makefile so that it correctly displays help for the install
+	  target with win32gcc.mak.
 23-Aug-2000
 	- Martin Geisse fixed a bug in the console plugin.
 	- Gary Haussmann enabled GL-level backface culling. This makes

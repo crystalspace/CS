@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make wos          Make the $(DESCRIPTION.oss)$"
+  $(NEWLINE)echo $"  make wos          Make the $(DESCRIPTION.wos)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

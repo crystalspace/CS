@@ -146,7 +146,7 @@ pseudohelp:
   ifdef INSTALL_DIR
 	@echo $"  make install      Make installation to $(INSTALL_DIR)$"
   else
-	@echo $"  make install      Make installation INSTALL_DIR=<directory>$"
+	@echo $"  make install      Make installation INSTALL_DIR=directory$"
   endif
 	@echo $(SEPARATOR)
 

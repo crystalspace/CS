@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make d3ddx6         Make the $(DESCRIPTION.d3ddx6)$"
+  $(NEWLINE)echo $"  make d3ddx6       Make the $(DESCRIPTION.d3ddx6)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

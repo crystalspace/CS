@@ -14,7 +14,7 @@ PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
 # uncomment the line below to build the sound driver
-#PLUGINS+= sound/driver/waveoutsd
+PLUGINS+= sound/driver/waveoutsd
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -31,7 +31,7 @@ OS=WIN32
 COMP=GCC
 
 # Command to update a target
-UPD=bin/dosupd.bat $@ DEST
+UPD=bin\dosupd.bat $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -194,6 +194,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin/win32conf.bat
+SYSCONFIG=bin\win32conf.bat
 
 endif # ifeq ($(ROOTCONFIG),config)
