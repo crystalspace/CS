@@ -20,6 +20,8 @@
 #ifndef __CSREFARR_H__
 #define __CSREFARR_H__
 
+#include "csutil/ref.h"
+
 /**
  * An array of smart pointers.
  */
