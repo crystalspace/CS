@@ -3,6 +3,8 @@
 *.log
 *.zip
 *.txt
+*.pyd
+*.csplugin
 config.mak*
 cache.mak*
 out
