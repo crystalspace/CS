@@ -37,7 +37,7 @@
 #if defined(OS_NEXT_OPENSTEP) || defined(OS_NEXT_MACOSXS)
 #import <AppKit/NSDPSContext.h>
 #else
-#import <AppKit/NSGraphicContext.h>
+#import <AppKit/NSGraphicsContext.h>
 #endif
 
 typedef void* NeXTDelegateHandle;
