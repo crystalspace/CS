@@ -3,6 +3,10 @@
 @section Crystal Space Contributors
 @cindex Contributors
 
+@c ---------------------------------------------
+@c This document was last updated on Aug 12 2001
+@c ---------------------------------------------
+
 This is a list of people who have contributed to Crystal Space in one way or
 another.  Some of these people are no longer active with Crystal Space and may
 not be reachable.  This list is sorted chronologically based upon the first
@@ -172,23 +176,56 @@ unfortunately no longer supported.
 @item
 Andrew Zabolotny (@email{bit@@eltech.ru})
 
-Andrew ported Crystal Space to @sc{os/2}.  Andrew changed Crystal Space to
-read/write @sc{zip} files instead of the @sc{csar} archive format.  He
-enhanced Crystal Space to read @sc{png} files.  He did a @emph{major} rewrite
-of the system dependent stuff and made a lot of support classes for that.
-Andrew wrote the 2D sprites.  Andrew wrote @sc{csws}, the Crystal Space
-Windowing System and is also busy writing MazeD, a Crystal Space level editor.
+Andrew is one of the developers who does far more work than can possibly be
+detailed in this small blurb, and his contribution to Crystal Space is far
+more extensive than this tiny entry implies. Here is an excerpt of his
+contributions:
+
+@itemize @bullet
+@item
+He helped a lot with general project maintenance and bug fixing.
+@item
+He ported Crystal Space to @sc{os/2}.
+@item
+He changed Crystal Space to read/write @sc{zip} files instead of the
+@sc{csar} archive format.
+@item
+He enhanced Crystal Space to read @sc{png} files.
+@item
+He did a @emph{major} rewrite of the system dependent stuff and made a lot of
+support classes for that.
+@item
+Andrew wrote the 2D sprites.
+@item
+Andrew wrote @sc{csws}, the Crystal Space Windowing System and is also busy
+writing MazeD, a Crystal Space level editor.
+@item
 Andrew did very good work on @code{DrawPolygon()} and
-@code{DrawPolygonQuick()}.  He also rewrote the @sc{djgpp} port (non-Allegro)
-to use 16-bit and also support more video modes.  He recently ported almost
-all assembly to @sc{nasm} and wrote a few new routines.  He also improved
-speed of fog and alpha transparency a lot.  He is also responsible for the
-current makefile system.  Andrew is also the author of @sc{vfs} (Virtual File
-System).  His latest achievement is converting the @sc{com} subsystem in
-Crystal Space to a new @sc{scf} system.  Andrew is one of the developers who
-does far more work than can possibly be detailed in this small blurb, and his
-contribution to Crystal Space is far more extensive than this tiny entry
-implies.
+@code{DrawPolygonQuick()}. He also contributed to the halo code and to the
+graphics drivers in general. He introduced the first @sc{mmx} support.
+@item
+He also rewrote the @sc{djgpp} port (non-Allegro)
+to use 16-bit and also support more video modes.
+@item
+He recently ported almost all assembly to @sc{nasm} and wrote a few new
+routines.
+@item
+He also improved speed of fog and alpha transparency a lot.
+@item
+He is also responsible for the current makefile system.
+@item
+Andrew is also the author of @sc{vfs} (Virtual File System).
+@item
+His latest achievement is converting the @sc{com} subsystem in Crystal Space
+to a new @sc{scf} system.
+@item
+He also rewrote the @file{csfgen} application.
+@item
+He contributed to the engine, the level loader, the event system and various
+other parts of CS.
+@item
+He wrote a nice memory debugger.
+@end itemize
 
 @item
 John Lilley (@email{jlilley@@empathy.com})
@@ -212,7 +249,8 @@ Andrew ported Crystal Space to the @sc{ggi} library.  More information at:
 @item
 Paul Garceau (@email{pgarceau@@teleport.com})
 
-Paul contributed a makefile for Windows @sc{nt} with @sc{gcc}.
+Paul contributed a makefile for Windows @sc{nt} with @sc{gcc} and helped to
+maintain that port.
 
 @item
 Ralf Eisele (@email{eiselera@@pcpool1.informatik.uni-ulm.de})
@@ -284,7 +322,8 @@ ported the @sc{gcc} assembler functions to Visual C++ and implemented a few
 additional Visual C++ assembly functions.  He also implemented the @sc{bmp}
 loader class.  He also optimized and helped optimize several key-functions in
 the engine pipeline.  For example, he managed to nearly @emph{double}the speed
-of the assembler scanline drawers!
+of the assembler scanline drawers! Lightmap generation and math functions were
+also improved.
 
 @item
 Alex Pfaffe (@email{ddg@@oz.net})
@@ -382,7 +421,8 @@ also wrote the Squawk (@pxref{Squawk}) demo (using the skybox).  Seth also
 fixed the @code{csCamera} and @code{csView} classes so that the @sc{fov} is no
 longer static and it is also possible to recenter each view separately.  Seth
 added sprite vertex tweening and new lighting attenuation settings.  He also
-worked on vertex/texel merging in sprites.
+worked on vertex/texel merging in sprites, and on sprites in general, and he
+added several other features to the project.
 
 @item
 Gert Steenssens (@email{gsteenss@@eps.agfa.be})
@@ -394,12 +434,13 @@ OpenGL ports.
 @item
 Michael Dale Long (@email{mlong@@custom.net})
 
-Michael helped fix the Glide port and contributed some other small fixes.  He
-is also the author of the Crystal Clear project which was included in
+Michael helped fix the Glide port and contributed lots of other small fixes.
+He is also the author of the Crystal Clear project which was included in
 Crystal Space.  Crystal Clear served as a game layer on top of Crystal Space.
 Crystal Clear is now removed from Crystal Space though due to lack of
 maintenance and interest. Michael also wrote the default version of
-DrawPolygonMesh().
+DrawPolygonMesh(). He also helped a bit with the Windows port and with the
+console plugin. He wrote the @sc{cvs} guideline documentation.
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
@@ -440,16 +481,25 @@ parts.
 @item
 Robert Bate (@email{rbate@@mac.com})
 
-Robert is the current pre-Carbon Macintosh port maintainer.
+Robert is the current pre-Carbon Macintosh port maintainer. He also helps
+with maintenance in general.
 
 @item
 Norman Kramer (@email{normank@@lycosmail.com})
 
-Norman contributed a few fixes.  In particular he provided a few fixes on the
-sound code.  He also fixed the @sc{bmp} loader so that it is endian correct
-and added @sc{rle8} encoding.  Norman also added the @code{csQuaternion} class
-and has been bringing the Glide drivers up to date.  Norman contributed a
-FreeType font server plug-in.  Most recently, he added a grid-view to CSWS.
+Norman contributed several fixes and new features and helped with code
+cleanup. In particular he worked on the sound code, the engine, @sc{csws} and
+the graphics drivers. He also worked on the image loaders. For example he
+split the former monolithic image loader into several modules, added saving to
+many of the image loaders, fixed the @sc{bmp} loader so that it is endian
+correct and added @sc{rle8} encoding to the @sc{bmp} loader. Norman also added
+the @code{csQuaternion} class and has been bringing the Glide drivers up to
+date. Norman contributed a FreeType font server plug-in.  Most recently, he
+added a grid-view to CSWS. He also added a sound renderer using the artsd
+soundserver that comes with the aRts system (see www.arts-project.org). Norman
+added an export script for Blender. He added texture coordinate animation to
+2d sprites. He worked on the video file streamer. Norman also added the
+(unused) @code{csCrystalBall} culler and the fancy console plugin.
 
 @item
 Nicholas Francis (@email{nicholasfrancis@@iname.com})
@@ -459,31 +509,59 @@ Nicholas made a few contributions to MazeD.
 @item
 Eric Sunshine (@email{sunshine@@sunshineco.com})
 
+Eric is one of the developers who does far more work than can possibly be
+detailed in this small blurb, and his contribution to Crystal Space is far
+more extensive than this tiny entry implies. His contributions include:
+
+@itemize @bullet
+@item
 Eric ported Crystal Space to MacOS/X, MacOS/X Server, OpenStep 4.2, and
-NextStep 3.3!  He has also fixed numerous bugs throughout the system and has
-provided a number of updates to the makefile system.  Additionally, he fixed
-the long standing problem with the console blanking out all but the most
-recently printed line of text which occurs on ports such as Windows, MacOS/X
-Server, OpenStep, and NextStep.  As part of this patch he replaced the
-ill-conceived progress meter code in the lighting routines with very localized
-and simple classes.  He repaired the broken console in MazeD, so that it is
-once again functional.  He has pored through the documentation and updated many
-out of date references.  Eric rewrote and re-engineered the BeOS port of
-Crystal Space almost entirely from scratch with the result that it is now about
-98% functional as compared to being only about 15% functional before his
-effort.  Eric re-engineered Crystal Space's network driver architecture and
-completely rewrote the network drivers from scratch.  The new architecture is
-far more robust, generalized, and usable than the old.  On the documentation
-front, Eric took on the task of acting as master editor of the Crystal Space
-documentation.  As part of this job, he has written much of the content which
-ties together various portions of the manual, fleshed out much of the bare
-skeleton and written many otherwise absent sections.  He is also responsible
-for the documentation's current look and feel and has created an entire
-supporting infrastructure to make documentation available easily and
-automatically on all supported platforms.  Eric is one of the developers who
-does far more work than can possibly be detailed in this small blurb, and his
-contribution to Crystal Space is far more extensive than this tiny entry
-implies.
+NextStep 3.3!
+@item
+He has also fixed numerous bugs and problems throughout the system and has
+provided a number of updates to the makefile system. He did a lot of work in
+cleaning up the CS source code and the makefile structure.
+@item
+He added an automated rebuild process for the Windows/@sc{msvc} project files.
+The nessecary information is taken from the @sc{gnu} makefiles.
+@item
+He added automated generation of @sc{cvs} ``snapshots''. They are packages
+(archive files) containing the complete @sc{cvs} tree. Also, log files and
+@file{diff} files are generated. Eric also set up automatic notification of
+all changes to @email{crystal-cvs@lists.sourceforge.net}.
+@item
+Eric designed most of the current configuration system (for example the
+idea of a configuration manager) and helped a lot with the implementation.
+@item
+Additionally, he fixed the long standing problem with the console blanking
+out all but the most recently printed line of text which occurs on ports such
+as Windows, MacOS/X Server, OpenStep, and NextStep. As part of this patch he
+replaced the ill-conceived progress meter code in the lighting routines with
+very localized and simple classes. He repaired the broken console in MazeD,
+so that it is once again functional.
+@item
+On the documentation front, Eric took on the task of acting as master editor
+of the Crystal Space documentation.  As part of this job, he has written much
+of the content which ties together various portions of the manual, fleshed
+out much of the bare skeleton and written many otherwise absent sections. He
+is also responsible for the documentation's current look and feel and has
+created an entire supporting infrastructure to make documentation available
+easily and automatically on all supported platforms. He set up the automated
+@sc{api} reference generation, node repairing for the texinfo documentation
+source and conversion texinfo to various other formats. He fixed lots of bugs
+in the @sc{html} conversion script, @file{texi2html}. He has also pored
+through the documentation and updated many out of date references.
+@item
+Eric rewrote and re-engineered the BeOS port of Crystal Space almost entirely
+from scratch with the result that it is now about 98% functional as compared
+to being only about 15% functional before his effort.
+@item
+Eric re-engineered Crystal Space's network driver architecture and completely
+rewrote the network drivers from scratch.  The new architecture is far more
+robust, generalized, and usable than the old.
+@item
+Together with Jorrit he wroked on the decomposition of the system driver.
+@end itemize
 
 @item
 Wolfgang Lehrach (@email{wolfg_l@@pro-net.co.uk})
@@ -510,7 +588,9 @@ the console (during lighting) and added a new way to do bilinear filtering for
 the software renderer.  He also dramatically improved the quality of the
 precalculated lightmaps.  Denis also improved the movement system in WalkTest
 by implementing gravity and better collision detection (using the collision
-detection system from Alex Pfapf).
+detection system from Alex Pfaffe). He added the @file{metademo} application
+which has recently been reworked to the @file{metaballs} mesh object. He also
+fixed a lot of bugs.
 
 @item
 Thomas Hieber (@email{thieber@@gmx.net})
@@ -518,9 +598,13 @@ Thomas Hieber (@email{thieber@@gmx.net})
 Thomas was the primary maintainer of the Windows port of Crystal
 Space for some time and has also contributed various other things.  He wrote
 @code{DrawPolygonFX()}.  He added the csGame library and the Crystal Shooter
-application.  He also significantly enhanced the Windows Direct3D port.
-Thomas also wrote @code{map2cs}, a converter which translates Quake maps to
-Crystal Space format.
+application.  Both are now removed, but he is now working on a remake of it,
+the @file{gamecore} plugin. He also significantly enhanced and maintained the
+Windows port and especially the Direct3D port. Thomas also wrote
+@code{map2cs}, a converter which translates Quake maps to Crystal Space
+format. He provided a shuttle sprite and a space station sprite for
+@file{csdemo}. Thomas introduced the concept of map nodes and key/value pairs
+for engine objects.
 
 @item
 Bruce Williams (@email{brucewil@@pacbell.net})
@@ -544,7 +628,8 @@ textures, etc.  He also sped up the calculation of the palette at startup.
 David Durant (@email{ddurant@@novametrix.com})
 
 David added code for sprite selection to WalkTest and also did some other
-fixes to sprites.
+fixes to sprites. He also cleaned up the WalkTest code and added a double
+linked list class.
 
 @item
 Tristan McLure (@email{Tristan_CS@@gmx.de})
@@ -561,7 +646,8 @@ upside-down.
 FragDance Galore (@email{fragdance@@hotmail.com})
 
 Mr. Galore contributed a @sc{wal}/@sc{sgi} loader and also added initial
-support for alpha maps to the texture loaders.
+support for alpha maps to the texture loaders. He has also contributed to
+the halo code.
 
 @item
 Brad Davis (@email{jbdavis@@uswest.net})
@@ -575,14 +661,19 @@ However, the project now resides at SourceForge:
 Brandon Ehle (@email{azverkan@@yahoo.com})
 
 Brandon added a new plug-in system to Crystal Space.  He also contributed
-@file{csPython} for scripting.  Using @file{csPython} he wrote an Unreal map
-to Crystal Space convertor.  Brandon also added project files for Borland 4.
+@file{csPython} and @file{csLua} for scripting.  Using @file{csPython} he
+wrote an Unreal map to Crystal Space convertor.  Brandon also added project
+files for Borland 4. Brandon also worked on the Playstation2 port. He
+improved @code{csQuaternion} a lot. Brandon also added @sc{cssh} (Crystal
+Space Shell). He added the (now non-existant) @file{newdoc} directory with
+LaTeX documentation.
 
 @item
 Wyatt Miler (@email{wmiler@@milertronics.com}
 
 Wyatt has performed some editing of Crystal Space's (now defunct) LaTeX
-documentation files.
+documentation files. He has also helped to maintain the Mac port. Wyatt added
+the background music to Blocks.
 
 @item
 Scott Wood (@email{scott@@geekland.cx})
@@ -592,7 +683,7 @@ Scott sent patches to allow Crystal Space to compile on Alpha machines.
 @item
 Petr Kocmid (@email{pkocmid@@atlas.cz})
 
-Petr helped fix Windows Glide.
+Petr helped fix Windows Glide and added @sc{xml} output to @file{map2cs}.
 
 @item
 Stephan Goetter (@email{sg17@@irz301.inf.tu-dresden.de})
@@ -614,7 +705,7 @@ considerable number of bugs and other problems.
 @item
 Peter Donald (@email{donaldp@@lion.cs.latrobe.edu.au})
 
-Peter fixed the sound drivers for @sc{scf}.
+Peter fixed the sound drivers for @sc{scf} and also fixed some bugs.
 
 @item
 Noah ``angelbob'' L. Gibbs (@email{angelbob@@users.sourceforge.net})
@@ -650,12 +741,19 @@ Eric Wigforss (@email{ewigforss@@novametrix.com})
 Eric made some Windows-specific fixes to the networking code.
 
 @item
-Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de})
+Martin Geisse (@email{mgeisse@@gmx.net})
 
 Martin converted many of the Crystal Space text and LaTeX documents to Texinfo
 format and began construction of Texinfo version of the Crystal Space manual.
 He also contributed a random dungeon generation plug-in module as well as a
-sample program which demonstrates its use.
+sample program which demonstrates its use. Martin added the model data classes
+and rewrote the old model importer in a more modular way. He also cleaned up
+some of the utility classes, parts of the system driver and parts of the
+engine, added the configuration manager as suggested by Eric Subshine,
+changed many applications to use the engine as a plug-in and added the
+@file{simplept} application. He added ``fast interfaces'' to @sc{scf}. Martin
+also completely rewrote the ``Software'' and ``DirectSound'' sound renderes
+and modified the world file loader and the image loader to work as plug-ins.
 
 @item
 Daniel Fannar Gudbjartsson (@email{dfg@@decode.is})
@@ -671,7 +769,9 @@ pointed out several bugs and errors in Crystal Space.
 @item
 Rene Dudfield (@email{illumen@@yahoo.com})
 
-Rene began working on networking capability for the Blocks game.
+Rene began working on networking capability for the Blocks game and
+contributed to the 3d sprite code. He also provided a set of export scripts
+for Blender.
 
 @item
 Thomas Giesel (@email{skoe@@freenet.de})
@@ -689,14 +789,20 @@ Wouter C. A. Wijngaards (@email{wouterw@@cs.vu.nl})
 
 Wouter contributed a particle system to Crystal Space based on 2D sprites.  He
 also added a full-fledged radiosity calculator.  Wouter is the author of the
-game @emph{Tunnel Fighter} which is based on the Crystal Space engine.
+game @emph{Tunnel Fighter} which is based on the Crystal Space engine. He
+added lots of nice particle effects and a test level for them, and so-called
+@dfn{full screen visual effects}. Wouter is also the author of the iso engine!
+He also worked on visibility culling in the terrain engine and on the terrain
+texture generator. He added a test application for a new bump-mapping feature,
+and a test application for a procedural sky texture. He added the @samp{flare}
+halo and several minor patches. He also added the @samp{make install} target.
 
 @item
 Frank O'Connor (@email{frank@@oconnors.org})
 
-Frank is the current maintainer of the Windows port of Crystal Space.  One of
-the first tasks he undertook was a reorganization of the @sc{msvc} project
-files.
+Frank was the port maintainer of the Windows port of Crystal Space for some
+time. One of the first tasks he undertook was a reorganization of the
+@sc{msvc} project files. He also helped with project maintenance in general.
 
 @item
 Samuel Humphreys (@email{samuelh@@ntlworld.com})
@@ -704,7 +810,8 @@ Samuel Humphreys (@email{samuelh@@ntlworld.com})
 Samuel submitted some fixes for sprites and patched the X drivers so that
 resizing windows works.  Samuel also added a procedural texture system to
 Crystal Space.  With this system it is possible to render on textures
-procedurally and use that texture on a polygon as usual.
+procedurally and use that texture on a polygon as usual. He also helped to
+clean up the engine code. He added the @file{perfstat} plugin.
 
 @item
 Thomas Riemer (@email{triemer@@apt4g.a3nyc.com})
@@ -737,7 +844,144 @@ read much of this manual.  He also started working on a level editor for
 Crystal Space but ceased work on it:
 
 @uref{http://sourceforge.net/projects/ticle/}
+
+@item
+Bart van Langen (@email{bart.van.langen@@dyme.nl})
+
+Bart provided a few patches, a working Watcom/DOS makefile and Visual C++
+project files.
+
+@item
+@email{bob@@imperium.ru}
+
+Bob provided a project file for Windows/Watcom C++.
+
+@item
+Philip Wyett (@email{philipwyett@@dsl.pipex.com})
+
+Philip has done (and is doing) a great job maintaining the Windows ports,
+both the @sc{msvc} one and the @sc{gcc} one and also the documentation for
+the ports. He also creates installable packets for Windows from time to time
+and helps with maintenance in general.
+
+@item
+Justin Miller (@email{dyad@fuse.net})
+
+Justin added @code{csString::Format()}. He also contributed to the
+documentation and sent a few fixes.
+
+@item
+Luca Pancallo
+
+Luca extended the @sc{ase} importer in impexp and added a CS sprite exporter.
+He also sent a patch for @file{mdl2spr}.
+
+@item
+Mike Bond (@email{mbond@@cox.rr.com})
+
+Mike added fullscreen support under X.
+
+@item
+Matthew Tang
+
+Matthew added a world file exporter script for Blender.
+
+@item
+George Yohng (@email{cspace@@mmts.nsys.by})
+
+George added an @sc{sdl} canvas driver and reported some bugs.
+
+@item
+Thomas Krug (@email{thomas.krug@@assix.de})
+
+Thomas sent some patches for the OpenGL driver.
+
+@item
+Nicholas Blumire (@email{empathy@@empathy.hostingcheck.com})
+
+Nicholas sent a few bug fixes.
+
+@item
+Mark Welch
+
+Mark sent a few patches for the @sc{msvc} project files.
+
+@item
+Scott Bowden
+
+Scott added an Unreal to Crystal Space converter.
+
+@item
+Jerry A. Segler Jr
+
+Jerry added theme support to @sc{csws}.
+
+@item
+Roland Reckel (@email{luxx@yahoo.com})
+
+Roland contributed a simple terrain engine.
+
+@item
+Michael Voase (@email{mvoase@@midcoast.com.au})
+
+Michael cleaned up the texture manager and added some minor features. He also
+fixed several bugs, especially the buggy implementation of
+@code{HitBeamObject} in several mesh objects. He moved the ``metaballs'' to
+a mesh object plugin and added a blobby texture for them. He wrote the
+motion manager and contributed a shuttle model for ``csdemo''. 
+
+@item
+Sebastian Duell (@email{wastel7@gmx.de})
+
+Sebastian contributed a Blender export script.
+
+@item
+Christopher Nelson (@email{paradox@@BBHC.ORG})
+
+Christopher wrote a remake of the windowing system (@sc{csws}), called
+@sc{aws}. He also added the @file{cslexan} plugin (lexical analyzer). Before
+he started work on the @sc{aws}, he contributed to @sc{csws}.
+
+@item
+Andreas Hoefler
+
+Andreas rewrote and cleaned up the @sc{wav} loader.
+
+@item
+Richard D. Shank
+
+Richard added the @sc{3ds} model importer. He also moved the old terrain
+engine to a plug-in.
+
+@item
+Dan Bogdanov
+
+Dan became port maintainer for @sc{dos} recently.
+
+@item
+The following people have contributed to the project by minor patches or by
+their suggestions and ideas: Duane McDonnel, Ryan J. Evans,
+Jaroslav Benkovsky (@email{benkovsk@@www.pvtnet.cz}), Sebestyen Zoltan
+(@email{szoli@@valerie.inf.elte.hu}),  @email{wormzstudios@@iname.com},
+Frederick A. Niles, Branimir Karadzic, Jason McKnight, Michael Robellard
+(@email{miker@@vetechno.com}), Charles Duffy (@email{cduffy@@bigfoot.com}),
+Walt Armour (@email{walt@@armour.cx}), David Fox, Donald Ryan Willhoit
+(@email{willhoit@mail1.andrew.cmu.edu}), @email{simonb@telisphere.com},
+Artur Biesiadowski (@email{abies@pg.gda.pl}), Jason Platt, Furqan Ullah
+(@email{furqan@@writeme.com}), @email{garrett@@memesis.org}, Thomthee Besset
+(@email{Besset@sugar-land.dowell.slb.com}), Adam Bailey, Jonathan Hudson
+(@email{nathanoj@realmail.2ndmail.com}), Ed Halley, Denis Oliver Kropp
+(@email{dok@@master.fischlustig.de}), Terrence Stewart, Paul Snively
+(@email{psnively@@earthlink.net}), Jan Dvorak (@email{johnydog@go.cz}),
+Paulo Candido, Jonathon Doran (@email{jon.doran@nsc.com}), Harald Fielker
+(@email{fielker@@informatik.fh-augsburg.de}), Travis McLane
+(@email{tmclane@@swt.edu}), Matt Keith (@email{keith@@www.keithcom.com}),
+Malcolm Peacock (@email{malcolm@@mpeacock.demon.co.uk}), E.Allen Soard
+(@email{esp@@espsw.net}), Gregory Austwick (@email{g.austwick@@virgin.net}),
+Alistair Leslie (@email{AlistairL@optushome.com.au}), Michael Knorr
+(@email{damage-list@@freenet.de}), Thiago Ramon.
 @end itemize
+
 
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
 for being the first to offer web space for Crystal Space.
