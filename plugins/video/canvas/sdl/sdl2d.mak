@@ -31,7 +31,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.SDL2D += `sdl-config --cflags`
-LIB.SDL2D.SYSTEM += `sdl-config --libs` -ldl
+LIB.SDL2D.SYSTEM += `sdl-config --libs` #-ldl
 
 ifeq ($(USE_PLUGINS),yes)
   SDL2D = $(OUTDLL)sdl2d$(DLL)
