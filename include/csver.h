@@ -30,9 +30,9 @@
 /// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(0.96)
 /// Minor version (release, or "dev" for CVS version)
-#define CS_VERSION_MINOR CS_VER_QUOTE(1)
+#define CS_VERSION_MINOR CS_VER_QUOTE(2)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE(Wed 29-Jan-2003)
+#define CS_RELEASE_DATE  CS_VER_QUOTE(Tue 4-Feb-2003)
 
 #define CS_VER_QUOTE(X) #X
 
