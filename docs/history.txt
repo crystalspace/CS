@@ -4,6 +4,10 @@ The history order has been reversed so that new features are at the top.
 	- Brandon Ehle fixed some compile errors in imotion.h and
 	  also restructured the API a bit.
 	- Brandon also added CS_ASSERT to some calls in csVector.
+	- Further work on leafy BSP generator in levtool. Added a 'bsp'
+	  button to test it. Select a sector from the list below and it
+	  will take the static thing (if present, else the sector polygons)
+	  to make a bsp. Not useful yet at the moment.
 8-Oct-2000
 	- Brandon Ehle added the motion interface for sprites to the CVS tree.
 	  The SCF interfaces & the loader are 90% done, but the plugin and
