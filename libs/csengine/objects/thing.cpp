@@ -1784,20 +1784,35 @@ void csThing::PreparePolygonBuffer ()
     csPolyTexLightMap *lmi = poly->GetLightMapInfo ();
 
     // @@@ what if lmi == NULL?
-    CS_ASSERT (lmi != NULL);
-
-    csPolyTxtPlane *txt_plane = lmi->GetTxtPlane ();
-    csMatrix3 *m_obj2tex;
-    csVector3 *v_obj2tex;
-    txt_plane->GetObjectToTexture (m_obj2tex, v_obj2tex);
-    polybuf->AddPolygon (
-        poly->GetVertexIndices (),
-        poly->GetVertexCount (),
-        poly->GetPlane ()->GetObjectPlane (),
-        matpol[i].mat_index,
-        *m_obj2tex,
-        *v_obj2tex,
-        lmi->GetPolyTex ());
+    //CS_ASSERT (lmi != NULL);
+    if (lmi)
+    {
+      csPolyTxtPlane *txt_plane = lmi->GetTxtPlane ();
+      csMatrix3 *m_obj2tex;
+      csVector3 *v_obj2tex;
+      txt_plane->GetObjectToTexture (m_obj2tex, v_obj2tex);
+      polybuf->AddPolygon (
+          poly->GetVertexIndices (),
+          poly->GetVertexCount (),
+          poly->GetPlane ()->GetObjectPlane (),
+          matpol[i].mat_index,
+          *m_obj2tex,
+          *v_obj2tex,
+          lmi->GetPolyTex ());
+    }
+    else
+    {
+      csMatrix3 m_obj2tex;	// @@@
+      csVector3 v_obj2tex;
+      polybuf->AddPolygon (
+          poly->GetVertexIndices (),
+          poly->GetVertexCount (),
+          poly->GetPlane ()->GetObjectPlane (),
+          matpol[i].mat_index,
+          m_obj2tex,
+          v_obj2tex,
+          NULL);
+    }
   }
 
   delete[] matpol;

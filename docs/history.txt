@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	- Updated faq related to smart pointers and added new entry about
 	  plugin loading.
 	- Eliminated CS/data/tex/arial9.csf since it is considered unnecessary.
+	- Fixed both engine and DrawPolygonMesh implementations so they
+	  correctly work on non-lit polygons.
 	- Eric Sunshine made the following changes to the Apple/NeXT port:
 	    - Moved libs/cssys/next/openstep/instpath.cpp to
 	      libs/cssys/next/shared/NeXTInstallPath.cpp since it is

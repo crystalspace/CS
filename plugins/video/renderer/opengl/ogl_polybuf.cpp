@@ -307,8 +307,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
                                csRect& rect,int /*num_vertices*/)
 {
   int i;
-  iLightMap* piLM = poly_texture->GetLightMap();
-  if (piLM == NULL)
+  if (poly_texture == NULL || poly_texture->GetLightMap () == NULL)
   {
     //OK This polygon has no lightmap.
     //Let's check if we have to create a unlitPolygonsSL or is already
@@ -318,6 +317,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
     unlitPolysSL->isUnlit = true;
     return unlitPolysSL;
   }
+  iLightMap* piLM = poly_texture->GetLightMap();
   int lm_width = piLM->GetWidth();
   int lm_height = piLM->GetHeight();
 
@@ -567,7 +567,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
 
     pol->triangles.Push(triangle);
     pol->infoPolygons.Push(poly_texture);
-    poly_texture->IncRef();
+    if (poly_texture) poly_texture->IncRef();
 
     pol->numTriangles++;
   }
@@ -673,7 +673,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
         triangle.c = ind.vertex;
       }
       triSuperLM->triangles.Push(triangle);
-      poly_texture->IncRef();
+      if (poly_texture) poly_texture->IncRef();
       triSuperLM->numTriangles++;
     }
     return;
