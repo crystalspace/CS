@@ -14,6 +14,8 @@ chronological order.
 	  lighter.
 	- Eric Sunshine fixed a significant number of Texinfo mark-up and
 	  formatting problems in sprcal3d.txi.
+	- Vincent Knecht made corrections in csapplicationframework.h doxygen
+	  sample code.
 15-Aug-2004
 	- Jorrit extended iEngine->PrecacheDraw() so that it also causes
 	  the cullers to precache. To do that it calls a new
