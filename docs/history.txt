@@ -109,6 +109,8 @@ The history order is reversed so that new features are at the top.
 	  Need to investigate the causes and devise suitable solutions.  By
 	  disabling them temporarily, people won't have to be bothered by
 	  shutdown-time crashes.
+	- Matze fixed a bug in csObjectIterator pointed out by groton and also
+	  cleaned the code up there.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

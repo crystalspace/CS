@@ -25,58 +25,47 @@
 #include <string.h>
 
 /*** Object Iterators ***/
-
 class csObjectIterator : public iObjectIterator
 {
 public:
   SCF_DECLARE_IBASE;
-  csObject *Object;
-  int Position;
+  csRef<csObject> object;
+  int position;
 
-  csObjectIterator (csObject *obj) : Object (obj)
+  csObjectIterator (csObject *obj) 
+      : object (obj)
   {
     SCF_CONSTRUCT_IBASE (0);
-    Object->IncRef ();
     Reset ();
   }
   virtual ~csObjectIterator ()
   {
-    Object->DecRef ();
   }
+
   virtual bool HasNext() const
   {
-    if (Position < 0)
+    if (object->Children == 0 || position >= object->Children->Length())
       return false;
-    if (Position+1 >= Object->Children->Length ())
-    {
-      return false;
-    }
+
     return true;
   }
 
   virtual iObject* Next()
   {
-    if (Position < 0)
+    if (object->Children == 0 || position >= object->Children->Length())
       return 0;
 
-    Position++;
-    if (Position == Object->Children->Length ())
-    {
-      Position = -1;
-      return 0;
-    }
-    return Object->Children->Get (Position);
+    iObject* result = object->Children->Get(position);
+    position++;
+    return result;
   }
   virtual void Reset()
   {
-    if (Object->Children == 0 || Object->Children->Length () < 1)
-      Position = -1;
-    else
-      Position = 0;
+    position = 0;
   }
   virtual iObject* GetParentObj() const
   {
-    return Object;
+    return object;
   }
   virtual iObject* FindName (const char* name)
   {
