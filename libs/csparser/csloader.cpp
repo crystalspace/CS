@@ -4415,42 +4415,43 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 
 csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 {
-  /* get the needed plugin interfaces
-   * @@@ when moving the loader to a plug-in, this should be done
+  /* @@@ get the needed plugin interfaces:
+   * when moving the loader to a plug-in, this should be done
    * at initialization, and pointers shouldn't be DecRef'ed here.
    */
-  iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
-  if (!SoundLoader) {
-    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
-      "without sound loader plug-in", filename);
-  }
+
+  /* get format descriptor */
   iSoundRender *SoundRender = QUERY_PLUGIN(System, iSoundRender);
-  if (!SoundRender) {
-    /*@@@*/SoundLoader->DecRef();
-    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
-      "without sound renderer plug-in", filename);
+  csSoundFormat Format;
+  if (SoundRender) {
+    Format = *SoundRender->GetLoadFormat();
+    /*@@@*/SoundRender->DecRef();
+  } else {
+    Format.Freq = -1;
+    Format.Bits = -1;
+    Format.Channels = -1;
   }
 
   /* read the file data */
   size_t size;
   char* buf = System->VFS->ReadFile (filename, size);
   if (!buf || !size) {
-    /*@@@*/SoundLoader->DecRef();
-    /*@@@*/SoundRender->DecRef();
     CsPrintf (MSG_FATAL_ERROR,
       "Cannot read sound file \"%s\" from VFS\n", filename);
     return NULL;
   }
 
-  /* get format descriptor */
-  const csSoundFormat *Format = SoundRender->GetLoadFormat();
+  /* get sound loader plugin */
+  iSoundLoader *SoundLoader = QUERY_PLUGIN(System, iSoundLoader);
+  if (!SoundLoader) {
+    CsPrintf (MSG_FATAL_ERROR, "Cannot load sound \"%s\" "
+      "without sound loader plug-in", filename);
+    return NULL;
+  }
 
   /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, Format);
+  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, &Format);
   delete [] buf;
-
-  /* dereference interface pointers */
-  /*@@@*/SoundRender->DecRef();
   /*@@@*/SoundLoader->DecRef();
 
   /* check for valid sound data */
