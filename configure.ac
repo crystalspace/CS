@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.95])
+m4_define([cs_version_number], [0.96])
 
 
 

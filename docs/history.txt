@@ -63,6 +63,9 @@ The history order is reversed so that new features are at the top.
 	  just added to configure.ac.  The botched test only covered two of the
 	  three cases.
 	- Small optimization in the OpenGL superlightmap cache.
+	- Eric Sunshine updated the CS version number in csver.h, version.txi,
+	  and configure.ac (configure) in prepration for the 0.96 release.
+	  Also rebuilt the documentation with the new version number.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
