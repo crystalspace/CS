@@ -1017,6 +1017,7 @@ void csPolygon3D::SetTextureSpace (
   //     (1/M) * (UV - UV1) = PL
   csMatrix2 m (uv2.x - uv1.x, uv3.x - uv1.x, uv2.y - uv1.y, uv3.y - uv1.y);
   float det = m.Determinant ();
+
   if (ABS (det) < EPSILON)
   {
     csEngine::current_engine->Warn (

@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+14-Apr-2002
+	- In one version of csTextureTrans::compute_texture_space()
+	  there were two calls to qisqrt() (equivalent to 1/sqrt()).
+	  With gcc 2.96 on linux and optimize -O2 compile the second
+	  qisqrt() would fail unless the first one is replaced with
+	  1/qsqrt() (debug mode and -O are fine). I have no idea
+	  why this is. For now I just replaced the first qisqrt()
+	  with 1/qsqrt() but this needs further investigation.
+13-Apr-2002
+	- Reverted my csconfig fix again. It fails to generate a correct
+	  csconfig file.
 12-Apr-2002
 	- Added a fix to 'make csconfig' so that it also works on Win98
 	  now. The problem was that redirecting to out/csconfig.tmp works
