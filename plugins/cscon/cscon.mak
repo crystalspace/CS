@@ -32,7 +32,6 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   CSCON=$(OUTDLL)cscon$(DLL)
   DEP.CSCON=$(LIB.CSCON)
   TO_INSTALL.DYNAMIC_LIBS+=$(CSCON)
-  LDFLAGS.CSCON += $(LIBS.EXE)
 else
   CSCON=$(OUT)$(LIB_PREFIX)cscon$(LIB)
   DEP.EXE+=$(CSCON)
@@ -53,7 +52,7 @@ $(OUT)%$O: plugins/cscon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSCON)
 
 $(CSCON): $(OBJ.CSCON) $(DEP.CSCON)
-	$(DO.PLUGIN) $(LDFLAGS.CSCON)
+	$(DO.PLUGIN)
 
 clean: csconclean
 csconclean:

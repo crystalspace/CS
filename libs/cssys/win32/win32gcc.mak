@@ -116,7 +116,7 @@ LFLAGS.debug=-g
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=
+LFLAGS.DLL=-q -s --no-export-all-symbols --dllname $*
 
 # Typical extension for objects and static libraries
 LIB=.a
@@ -174,7 +174,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN = dllwrap -q -s --no-export-all-symbols --dllname $* -o $@ $(^^) $(L^) $(LFLAGS.L)$(OUT) -mwindows
+DO.SHARED.PLUGIN = dllwrap $(LFLAGS.DLL) -o $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
