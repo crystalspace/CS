@@ -1,11 +1,3 @@
-#if defined(__BORLANDC__)
-#define _NO_VCL
-#include <condefs.h>
-USEUNIT("..\..\libs\cssys\win32\exeentry.cpp");
-USEUNIT("..\..\apps\blocks\states.cpp");
-USERC(".\Blocks.rc");
-USEFILE("vctobpr.log");
-#endif // defined(__BORLANDC__)
 /*
     Copyright (C) 1998-2000 by Jorrit Tyberghein
 

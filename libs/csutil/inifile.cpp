@@ -19,10 +19,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-extern "C" {
 #include <string.h>
 #include <stdlib.h>
-}
+
 #include "sysdef.h"
 #include "types.h"
 #include "csutil/inifile.h"
@@ -352,7 +351,7 @@ plain:
       }
       else if (*cur == '[')           // Section
       {
-        char *cb;
+        const char *cb;
         int i;
 
         cur++;
@@ -376,7 +375,7 @@ plain:
       }                                 // else if Section
       else
       {                                 // Key = Value
-        char *eq;
+        const char *eq;
         int i;
 
         eq = strchr (cur, '=');
@@ -429,7 +428,7 @@ out:
     while (Comments->Length ())
       Root.Push (Comments->Pop ());
     CHK (delete Comments);
-    Comments = NULL;
+//    Comments = NULL;    // not needed but left for clarity
   }
   return true;
 }
