@@ -55,6 +55,8 @@ struct iSoundDriver : public iBase
    * writing to the sound memory?
    */
   virtual bool IsHandleVoidSound () = 0;
+  // @@@ temporary
+  virtual bool ThreadAware (){ return false; }
 };
 
 #endif // __ICS_SOUND_DRIVER_H__
