@@ -857,11 +857,38 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
     }
     else
     {
-      csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
+      //@@@ ONLY DO THIS WHEN QUADTREE IS USED!!!
+      //csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
       p->CalculateLighting (lview);
     }
   }
   return NULL;
+}
+
+//@@@ Needs to be part of sector?
+//@@@ ONLY DELETE FRUSTRUMS ADDED THIS SECTOR???
+void CompressShadowFrustrums (csFrustrumList* list)
+{
+  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  qc->MakeEmpty ();
+  csShadowFrustrum* sf = list->GetLast ();
+int cnt=0,del=0;
+  while (sf)
+  {
+    bool vis = qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    if (!vis)
+    {
+      csShadowFrustrum* sfdel = sf;
+      sf = sf->prev;
+      list->Unlink (sfdel);
+      CHK (delete sfdel);
+del++;
+    }
+    else
+      sf = sf->prev;
+cnt++;
+  }
+printf ("Tested %d frustrums, deleted %d.\n", cnt, del);
 }
 
 //@@@ Needs to be part of sector?
@@ -871,8 +898,10 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
   csPolygon3D* p;
   csLightView* lview = (csLightView*)data;
   csVector3& center = lview->light_frustrum->GetOrigin ();
+  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
+static int frust_cnt = 20;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
@@ -883,9 +912,9 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
       poly[j] = p->Vcam (j);
     bool vis = false;
     if (p->GetPortal ())
-      vis = csWorld::current_world->GetQuadcube ()->TestPolygon (poly, p->GetNumVertices ());
+      vis = qc->TestPolygon (poly, p->GetNumVertices ());
     else
-      vis = csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
+      vis = qc->InsertPolygon (poly, p->GetNumVertices ());
     if (vis)
     {
       p->CalculateLighting (lview);
@@ -901,6 +930,8 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
       for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
         frust->AddVertex (p->Vwor (j)-center);
       lview->shadows.AddLast (frust);
+frust_cnt--;
+if (frust_cnt<0){frust_cnt=50;CompressShadowFrustrums (&(lview->shadows));}
     }
   }
   return NULL;
@@ -932,7 +963,11 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   else if (bmax.z < 0) result.z = -bmax.z;
   float dist = result.Norm ();
   float radius = lview->l->GetRadius ();
-  if (radius < dist) return false;
+  if (radius < dist)
+{
+//printf("CULLDIST!\n");
+return false;
+}
 
   // Test node against quad-tree.
   csVector3 outline[6];
@@ -945,7 +980,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
       outline[i] -= center;
     if (!csWorld::current_world->GetQuadcube ()->TestPolygon (outline, num_outline))
 {
-printf("CULL!\n");
+//printf("CULLQUAD!\n");
       return false;
 }
   }
@@ -969,9 +1004,10 @@ printf("CULL!\n");
     v.x = bmax.x; v.y = bmax.y; v.z = bmin.z;
     if (!sf->Contains (v)) continue;
     // Node is completely shadowed by frustrum.
-//printf ("CULL (%f,%f,%f)\n", bmax.x-bmin.x, bmax.y-bmin.y, bmax.z-bmin.z);
+//printf("CULLFRUST!\n");
     return false;
   }
+//printf ("ENTER (%f,%f,%f)\n", bmax.x-bmin.x, bmax.y-bmin.y, bmax.z-bmin.z);
   return true;
 }
 

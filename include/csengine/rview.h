@@ -295,6 +295,15 @@ public:
     if (!first) first = fr;
   }
 
+  /// Unlink a shadow frustrum from the list.
+  void Unlink (csShadowFrustrum* sf)
+  {
+    if (sf->next) sf->next->prev = sf->prev;
+    else last = sf->prev;
+    if (sf->prev) sf->prev->next = sf->next;
+    else first = sf->next;
+  }
+
   /**
    * Apply a transformation to all frustrums in this list.
    */
