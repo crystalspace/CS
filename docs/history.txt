@@ -7,8 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Feb-2004
-	- Neil Mosafi added support for "a3dl:model" to the csvosa3dl plugin (a
-	  Sprite3D wrapper)
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
 	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'
 	  since MSVC used by Bruce Williams <midnightcoder@midnightcoder.com>
@@ -34,7 +32,7 @@ chronological order.
 	  than hard-coding 'flex' and 'bison'.
 	- Eric Sunshine relocated default definitions of SED, DEEPCOPY, and
 	  DELTREE into helper.jam from various other Jam files.
-	- Eric Sunshine mirgrated Keith Fulton's change to the Cal3D check from
+	- Eric Sunshine migrated Keith Fulton's change to the Cal3D check from
 	  configure to configure.ac where it belongs so that it won't get
 	  clobbered the next time someone re-generates configure from
 	  configure.ac.
@@ -87,6 +85,8 @@ chronological order.
 	      consistency, also renamed $(CMD.RANLIB) to $(RANLIB).
 	    - Fixed bug in Install1 in install.jam where it was applying
 	      $(INSTALLFLAGS) at the wrong position in the command invocation.
+	- Neil Mosafi added support for "a3dl:model" to the csvosa3dl plugin (a
+	  Sprite3D wrapper)
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
@@ -94,9 +94,9 @@ chronological order.
 	  close this window" is flushed to console window.
         - Philip Wyett removed cast to int causing signed / unsigned mismatch
           in csString& csString::RTrim ().
-	- Neil Mosafi added Cone and Billboard classes to the csvosa3dl plugin. This
-	  provides support for constructing CS meshwrappers corresponding to
-	  "a3dl:cone" and "a3dl:billboard" metaobjects on a VOS site
+	- Neil Mosafi added Cone and Billboard classes to the csvosa3dl plugin.
+	  This provides support for constructing CS meshwrappers corresponding
+	  to "a3dl:cone" and "a3dl:billboard" metaobjects on a VOS site
 30-Jan-2004
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.
