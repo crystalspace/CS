@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 #include "iutil/databuff.h"
+#include "iutil/objreg.h"
+#include "iutil/strvec.h"
 #include "csutil/csstring.h"
 #include "csutil/typedvec.h"
 #include "isys/system.h"
@@ -82,13 +84,37 @@ csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 {
+  while (Formats.Length () > 0)
+  {
+    csString *str = Formats.Pop ();
+    delete str;
+  }
+
+  while (Converters.Length () > 0)
+  {
+    iModelConverter *conv = Converters.Pop ();
+    conv->DecRef ();
+  }
 }
 
-bool csModelConverterMultiplexer::Initialize (iObjectRegistry *)
+bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
-  // @@@ collect converter plugins
+  int i;
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  for (int i=0; i<Converters.Length (); i++)
+  // @@@ collect converter plugins
+  iStrVector* classlist =
+      iSCF::SCF->QueryClassList ("crystalspace.modelconverter.");
+  int const nmatches = classlist->Length();
+  for (i = 0; i < nmatches; i++)
+  {
+    char const* classname = classlist->Get(i);
+    iModelConverter *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname, 0, iModelConverter);
+    if (ldr)
+      Converters.Push(ldr);
+  }
+
+  for (i=0; i<Converters.Length (); i++)
   {
     iModelConverter *mconv = Converters.Get(i);
     for (int j=0; j<mconv->GetFormatCount (); j++)

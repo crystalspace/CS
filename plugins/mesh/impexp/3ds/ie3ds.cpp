@@ -148,7 +148,7 @@ int csModelConverter3ds::GetFormatCount()
 
 const char *csModelConverter3ds::GetFormat( int idx )
 {
-  if( idx == 1 )
+  if( idx == 0 )
     return supportedFormats;
   else
     return NULL;
