@@ -226,22 +226,22 @@ bool csPolyTexture::RecalcDynamicLights ()
         green = light->GetColor ().green;
         blue = light->GetColor ().blue;
         csLight::CorrectForNocolor (&red, &green, &blue);
-  p = smap->map;
-  last_p = p+lm_size;
-  do
-  {
-    s = *p++;
+  	p = smap->map;
+  	last_p = p+lm_size;
+  	do
+  	{
+    	  s = *p++;
           l = *mapR + QRound (red * s);
-    if (l > 255) l = 255;
+    	  if (l > 255) l = 255;
           *mapR++ = l;
           l = *mapG + QRound (green * s); if (l > 255) l = 255;
-    if (l > 255) l = 255;
-    *mapG++ = l;
+    	  if (l > 255) l = 255;
+    	  *mapG++ = l;
           l = *mapB + QRound (blue * s); if (l > 255) l = 255;
-    if (l > 255) l = 255;
+    	  if (l > 255) l = 255;
           *mapB++ = l;
-  }
-  while (p < last_p);
+  	}
+        while (p < last_p);
 
         smap = smap->next;
       }
@@ -260,15 +260,15 @@ bool csPolyTexture::RecalcDynamicLights ()
         green = light->get_green ();
         blue = light->get_blue ();
         csLight::mixing_dependent_strengths (&red, &green, &blue);
-  p = smap->map;
-  last_p = p+lm_size;
-  do
-  {
+  	p = smap->map;
+  	last_p = p+lm_size;
+  	do
+  	{
           l = *mapR + QRound (red * (*p++));
-    if (l > 255) l = 255;
+    	  if (l > 255) l = 255;
           *mapR++ = l;
-  }
-  while (p < last_p);
+  	}
+  	while (p < last_p);
 
         smap = smap->next;
       }
@@ -314,35 +314,35 @@ bool csPolyTexture::RecalcDynamicLights ()
       {
         // If already dirty we don't need to check.
         if (!dirty_matrix[idx])
-  {
+  	{
           lu = (ru * csPolyTexture::subtex_size) >> mipmap_shift;
-    luv = luv_v + lu;
+    	  luv = luv_v + lu;
           if (lu+num >= lw-1) numu = lw-lu-1;
-    else numu = num;
-    // <= num here because I want to include the boundaries of the next
-    // sub-texture in the test as well.
-    for (vv = 0 ; vv <= numv ; vv++)
-    {
+    	  else numu = num;
+    	  // <= num here because I want to include the boundaries of the next
+    	  // sub-texture in the test as well.
+    	  for (vv = 0 ; vv <= numv ; vv++)
+    	  {
       
-      for (uu = 0 ; uu <= numu ; uu++)
-      {
-        // If we find a difference this sub-texture is dirty. I would like to have
-        // a multi-break statement but unfortunatelly C++ does not have this. That's
-        // why I use the goto. Yes I know! goto's are EVIL!
-        if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
-            (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
-            (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))
-        {
-          dirty_matrix[idx] = 1;
-    dirty_cnt++;
-    goto stop;
+      	    for (uu = 0 ; uu <= numu ; uu++)
+      	    {
+              // If we find a difference this sub-texture is dirty. I would like to have
+              // a multi-break statement but unfortunatelly C++ does not have this. That's
+              // why I use the goto. Yes I know! goto's are EVIL!
+              if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
+                  (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
+                  (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))
+              {
+          	dirty_matrix[idx] = 1;
+    		dirty_cnt++;
+    		goto stop;
+              }
+              luv++;
+            }
+            luv += lw-num-1;
+          }
+          stop: ;
         }
-        luv++;
-      }
-      luv += lw-num-1;
-    }
-    stop: ;
-  }
       }
     }
   }
@@ -445,7 +445,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     int x = QInt (visible.left), y = QInt (visible.top);
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
-  __draw_func (j+x, i+y, 1);
+    __draw_func (j+x, i+y, 1);
 
     depth--;
     return;
@@ -498,18 +498,17 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
       if (now_we_are==where_are_we)
       {
-  if (i)
-    p2[where_are_we][n2[where_are_we]++]=p2d[i];
+  	if (i)
+    	p2[where_are_we][n2[where_are_we]++]=p2d[i];
       }
       else
       {
-  float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
-  csVector2 p(sub_x,y);
+  	float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
+  	csVector2 p(sub_x,y);
 
-  p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+  	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
 
-  if (i)
-    p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  	if (i) p2[now_we_are][n2[now_we_are]++]=p2d[i];
       }
 
       where_are_we=now_we_are;
@@ -547,18 +546,17 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
       if (now_we_are==where_are_we)
       {
-  if (i)
-    p2[where_are_we][n2[where_are_we]++]=p2d[i];
+  	if (i)
+    	p2[where_are_we][n2[where_are_we]++]=p2d[i];
       }
       else
       {
-  float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
-  csVector2 p(x, sub_y);
+  	float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
+  	csVector2 p(x, sub_y);
 
-  p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+  	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
 
-  if (i)
-    p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  	if (i) p2[now_we_are][n2[now_we_are]++]=p2d[i];
       }
 
       where_are_we=now_we_are;
