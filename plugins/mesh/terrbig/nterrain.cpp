@@ -551,18 +551,18 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
     }
   }
 
-  for  (int i = 0; i < size; i ++) {
-    csVector3 up = (i-width < 0) ? 
-	  csVector3(0,0,0) : heightmap[i-width].pos - heightmap[i].pos;
-    csVector3 dn = (i+width >= image->GetSize ()) ?  
-	  csVector3 (0,0,0) : heightmap[i+width].pos - heightmap[i].pos;
-    csVector3 lt = (i%width - (i-1)%width != 1) ? 
-	  csVector3 (0,0,0) : heightmap[i-1].pos - heightmap[i].pos;
-    csVector3 rt = ((i+1)%width - i%width != 1) ? 
-	  csVector3 (0,0,0) : heightmap[i+1].pos - heightmap[i].pos;
+  for  (int k = 0; k < size; k ++) {
+    csVector3 up = (k-width < 0) ? 
+	  csVector3(0,0,0) : heightmap[k-width].pos - heightmap[k].pos;
+    csVector3 dn = (k+width >= image->GetSize ()) ?  
+	  csVector3 (0,0,0) : heightmap[k+width].pos - heightmap[k].pos;
+    csVector3 lt = (k%width - (k-1)%width != 1) ? 
+	  csVector3 (0,0,0) : heightmap[k-1].pos - heightmap[k].pos;
+    csVector3 rt = ((k+1)%width - k%width != 1) ? 
+	  csVector3 (0,0,0) : heightmap[k+1].pos - heightmap[k].pos;
 
-    heightmap[i].norm = (up + dn + lt + rt) / 4.0;
-    heightmap[i].norm.Normalize ();
+    heightmap[k].norm = (up + dn + lt + rt) / 4.0;
+    heightmap[k].norm.Normalize ();
   }
 
   int a, b, c, s, i, j;
