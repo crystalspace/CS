@@ -19,6 +19,82 @@
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
+#include "csutil/blockallocator.h"
+
+// --------------------------------------------------------------------------
+
+struct vecar3 { csVector3 ar[3]; };
+struct vecar4 { csVector3 ar[4]; };
+struct vecar5 { csVector3 ar[5]; };
+struct vecar6 { csVector3 ar[6]; };
+struct vecar10 { csVector3 ar[10]; };
+
+class csVertexArrayAlloc
+{
+public:
+  csBlockAllocator<vecar3> blk_vecar3;
+  csBlockAllocator<vecar4> blk_vecar4;
+  csBlockAllocator<vecar5> blk_vecar5;
+  csBlockAllocator<vecar6> blk_vecar6;
+  csBlockAllocator<vecar10>* blk_vecar10;
+  csVertexArrayAlloc () :
+  	blk_vecar3 (400),
+	blk_vecar4 (400),
+	blk_vecar5 (100),
+	blk_vecar6 (100),
+	blk_vecar10 (0)
+  {
+  }
+  ~csVertexArrayAlloc ()
+  {
+    delete blk_vecar10;
+  }
+
+  csVector3* GetVertexArray (int n)
+  {
+    if (!n) return 0;
+    switch (n)
+    {
+      case 3: return blk_vecar3.Alloc ()->ar;
+      case 4: return blk_vecar4.Alloc ()->ar;
+      case 5: return blk_vecar5.Alloc ()->ar;
+      case 6: return blk_vecar6.Alloc ()->ar;
+      default:
+        if (n <= 10)
+	{
+	  if (!blk_vecar10) blk_vecar10 = new csBlockAllocator<vecar10> (100);
+	  return blk_vecar10->Alloc ()->ar;
+	}
+        else
+	{
+	  return new csVector3[n];
+        }
+    }
+    return 0;
+  }
+
+  /// Free an array of n vertices.
+  void FreeVertexArray (csVector3* ar, int n)
+  {
+    if (!n) return;
+    switch (n)
+    {
+      case 3: blk_vecar3.Free ((vecar3*)ar); break;
+      case 4: blk_vecar4.Free ((vecar4*)ar); break;
+      case 5: blk_vecar5.Free ((vecar5*)ar); break;
+      case 6: blk_vecar6.Free ((vecar6*)ar); break;
+      default:
+        if (n <= 10)
+	  blk_vecar10->Free ((vecar10*)ar);
+        else
+	  delete[] ar;
+        break;
+    }
+  }
+};
+
+CS_IMPLEMENT_STATIC_VAR (GetVertexArrayAlloc, csVertexArrayAlloc, ());
+
 
 // OpenStep compiler generates corrupt assembly output (with unresolveable
 // symbols) when this method is defined inline in the interface, so it is
@@ -37,8 +113,7 @@ csFrustum::csFrustum (
   const csVector3 &o,
   csVector3 *verts,
   int num_verts,
-  csPlane3 *backp) :
-    pool(&csDefaultVertexArrayPool::GetDefaultPool())
+  csPlane3 *backp)
 {
   origin = o;
   num_vertices = num_verts;
@@ -49,7 +124,7 @@ csFrustum::csFrustum (
 
   if (verts)
   {
-    vertices = pool->GetVertexArray (max_vertices);
+    vertices = GetVertexArrayAlloc ()->GetVertexArray (max_vertices);
     memcpy (vertices, verts, sizeof (csVector3) * num_vertices);
   }
   else
@@ -61,9 +136,7 @@ csFrustum::csFrustum (
 csFrustum::csFrustum (
   const csVector3 &o,
   int num_verts,
-  csVertexArrayPool *pl,
-  csPlane3 *backp) :
-    pool(pl)
+  csPlane3 *backp)
 {
   origin = o;
   num_vertices = num_verts;
@@ -72,13 +145,12 @@ csFrustum::csFrustum (
   mirrored = false;
   ref_count = 1;
 
-  vertices = pool->GetVertexArray (max_vertices);
+  vertices = GetVertexArrayAlloc ()->GetVertexArray (max_vertices);
   backplane = backp ? new csPlane3 (*backp) : 0;
 }
 
 csFrustum::csFrustum (const csFrustum &copy)
 {
-  pool = copy.pool;
   origin = copy.origin;
   num_vertices = copy.num_vertices;
   max_vertices = copy.max_vertices;
@@ -88,7 +160,7 @@ csFrustum::csFrustum (const csFrustum &copy)
 
   if (copy.vertices)
   {
-    vertices = pool->GetVertexArray (max_vertices);
+    vertices = GetVertexArrayAlloc ()->GetVertexArray (max_vertices);
     memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
   }
   else
@@ -105,7 +177,7 @@ csFrustum::~csFrustum ()
 
 void csFrustum::Clear ()
 {
-  pool->FreeVertexArray (vertices, max_vertices);
+  GetVertexArrayAlloc ()->FreeVertexArray (vertices, max_vertices);
   vertices = 0;
   num_vertices = max_vertices = 0;
   delete backplane;
@@ -128,11 +200,12 @@ void csFrustum::RemoveBackPlane ()
 
 void csFrustum::ExtendVertexArray (int num)
 {
-  csVector3 *new_vertices = pool->GetVertexArray (max_vertices + num);
+  csVector3 *new_vertices = GetVertexArrayAlloc ()->GetVertexArray (
+  	max_vertices + num);
   if (vertices)
   {
     memcpy (new_vertices, vertices, sizeof (csVector3) * num_vertices);
-    pool->FreeVertexArray (vertices, max_vertices);
+    GetVertexArrayAlloc ()->FreeVertexArray (vertices, max_vertices);
   }
 
   vertices = new_vertices;

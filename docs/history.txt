@@ -24,6 +24,8 @@ chronological order.
 	  at 257 items).
 	- Jorrit fixed a weird bug in walktest (introduced by res2k) which
 	  simply disabled coordshow directly after enabling it.
+	- Jorrit rewrote the csFrustum code to avoid the old vertex pools.
+	  Instead the code now uses csBlockAllocator.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.

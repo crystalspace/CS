@@ -27,7 +27,6 @@
 
 #include "cstypes.h"
 #include "csgeom/math3d.h"
-#include "csgeom/vtpool.h"
 
 class csTransform;
 
@@ -142,9 +141,6 @@ struct csClipInfo
 class csFrustum
 {
 private:
-  /// Reference to the pool which is used to allocate new vertex arrays.
-  csVertexArrayPool* pool;
-
   /// The origin of this frustum
   csVector3 origin;
 
@@ -189,15 +185,9 @@ private:
 public:
 
   /// Create a new empty frustum.
-  csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::GetDefaultPool()),
+  csFrustum (const csVector3& o) :
     origin (o), vertices (0), num_vertices (0), max_vertices (0),
-  backplane (0), wide (false), mirrored (false), ref_count (1)
-  { }
-
-  /// Create a new empty frustum with another pool.
-  csFrustum (const csVector3& o, csVertexArrayPool* pl) : pool (pl),
-    origin (o), vertices (0), num_vertices (0), max_vertices (0),
-  backplane (0), wide (false), mirrored (false), ref_count (1)
+    backplane (0), wide (false), mirrored (false), ref_count (1)
   { }
 
   /**
@@ -214,7 +204,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    */
   csFrustum (const csVector3& o, int num_verts,
-        csVertexArrayPool* pl, csPlane3* backp = 0);
+        csPlane3* backp = 0);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);
