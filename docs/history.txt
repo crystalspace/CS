@@ -2426,7 +2426,7 @@ The history order is reversed so that new features are at the top.
 	  skeleton-meshes and animations to LIBRARY files that load sprite3ds
 	  and motions. I have some modifications to cal3d that I need to get
 	  in, and I will post those patches on the SourceForge patch page
-	  until they are in cal3d cvs.^
+	  until they are in cal3d cvs.
 16-Dec-2001
 	- Norman Kramer added CS_QUERY_REGISTRY_TAG_INTERFACE macro.
 	- Norman also added SSE detection bit to cpuid.h.
