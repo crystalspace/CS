@@ -115,6 +115,9 @@ rule Library
     {
       Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
     }
+    
+    # Add to global library list
+    INSTALLEDLIBS += $(<) ;
   }
 
   if $(CRELIB)

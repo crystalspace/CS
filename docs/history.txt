@@ -15,6 +15,17 @@ chronological order.
 	- Eric Sunshine removed obsolete crystalspace.motion.manager.*
 	  reference from csparser.csplugin.  Reported by Matthew Hawn
 	  <steamraven@yahoo.com>.
+	- res made the following changes:
+	    - Changed the cs-config generator to not have a harcoded list of
+	      libs or their dependencies, but rather extract this info from
+	      the Library Jam rules.
+	    - Added some new shaders and used them in walktest: 
+	      or_lighting_detail_alpha and or_lighting_detail_add, mimicking
+	      some layer effects used by OR; reflect.xml, a simple reflection
+	      shader, now used by the "car" in flarge; an OR lighting 
+	      compatible shader for detail textures. Those are relatively 
+	      cheap, but give the illusion of a higher res texture. Applied
+	      to the "mosaic" material(s) in flarge.
 28-Apr-2004
 	- Eric Sunshine applied a few scripting-related patches from Michael
 	  Franz Aigner <crystal-space@amfranz.com>:

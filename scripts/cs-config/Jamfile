@@ -10,6 +10,35 @@ rule csConfigGen
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
 
+  local l d e s libdep libdepstr ;
+  
+  for l in $(INSTALLEDLIBS)
+  {
+    libaddstrings += "    $(l)) 	\
+	addlib \"-l$(l)\" 	\
+	;;			\
+" ;
+    libdep = ;
+    for d in $($(l)_depends)
+    {
+      libdep += -l$(d) ;
+    }
+    for e in $($(l).EXTERNALLIBS)
+    {
+      libdep += $($(e).LFLAGS) ;
+    }
+    libdepstr = "" ;
+    for s in $(libdep)
+    {
+      libdepstr = "$(libdepstr) $(s)" ;
+    }
+    libstrings += "       -l$(l)) DEPS=\"$(libdepstr)\" ;;\
+" ;
+  }
+
+  liblist = "       $(INSTALLEDLIBS) \
+" ;
+
   # Hack to produce a makevars output similar to the 'make' build system.
   switch $(TARGET.OS)
   {
@@ -44,6 +73,7 @@ fi
 syslibs=" $(LINKLIBS) "
 common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
 common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
+lflags_csutil=" $($(csutil.EXTERNALLIBS).LFLAGS) "
 
 makevars()
 {
@@ -54,6 +84,46 @@ __END__
 
   echo "__EOF__" >> $(<) 
   echo "}" >> $(<)
+
+  cat >> $(<) << __END__
+# dependencies of CS
+depends()
+{
+    case \$1 in
+ $(libstrings)
+	*)
+	    CEXFILE=`echo "\$1.cex" | sed -e "s/\-l//"`
+	    findcexfile "\$CEXFILE"
+	    if test -r "\$CEXFILE"; then
+		DEPS=\`/bin/sh \$CEXFILE --deps\`
+	    else
+		DEPS=''
+	    fi
+	    ;;                                        	    
+    esac
+}
+
+checklibname()
+{
+    case \$1 in
+ $(libaddstrings)
+    *)
+	findcexfile "$1"
+	if test -z "$CEXFILE"; then
+	    echo "Unknown lib: $1" 1>&2
+            usage 1>&2
+	    exit 1
+	fi
+	
+	addexlib "$CEXFILE"
+        ;;
+    esac
+}
+
+liblist="\
+ $(liblist)
+"
+__END__
 
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }

@@ -1,25 +1,3 @@
-# dependencies of CS
-depends()
-{
-    case $1 in
-	-lcsappframe) DEPS="-lcstool -lcsutil" ;;
-	-lcsutil) DEPS="" ;;
-	-lcsgeom) DEPS="-lcsutil" ;;
-	-lcsgfx) DEPS="-lcsutil" ;;
-	-lcstool) DEPS="-lcsgfx -lcsgeom -lcsutil" ;;
-	-lcsws) DEPS="-lcsgfx -lcsgeom -lcstool -lcsutil" ;;
-	*)
-	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
-	    findcexfile "$CEXFILE"
-	    if test -r "$CEXFILE"; then
-		DEPS=`/bin/sh $CEXFILE --deps`
-	    else
-		DEPS=''
-	    fi
-	    ;;                                        	    
-    esac
-}
-
 # Detect type of the installation and the directories where the library files
 # reside in.
 lflags=""
@@ -57,13 +35,7 @@ Options:
 	[--makevars]
 	[--help]
 Libraries:
-	csappframe
-	csgeom
-	csgfx
-	cstool
-	csutil
-	csws
-
+${liblist}
 Note that the Crystal Space directory is detect by looking at the CRYSTAL
 environment variable. Make sure this variable is set correctly.
 EOF
@@ -226,33 +198,8 @@ while test $# -gt 0; do
     --libs)
 	show_libs=true
 	;;
-    csappframe)
-	addlib "-lcsappframe"
-	;;
-    csgeom)
-	addlib "-lcsgeom"
-	;;
-    csgfx)
-	addlib "-lcsgfx"
-	;;
-    cstool)
-	addlib "-lcstool"
-	;;
-    csutil)
-	addlib "-lcsutil"
-	;; 
-    csws)
-	addlib "-lcsws"
-	;;
     *)
-	findcexfile "$1"
-	if test -z "$CEXFILE"; then
-	    echo "Unknown lib: $1" 1>&2
-            usage 1>&2
-	    exit 1
-	fi
-	
-	addexlib "$CEXFILE"
+	checklibname $1
         ;;
   esac
   shift

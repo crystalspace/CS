@@ -4,5 +4,5 @@ Description csgfx : "graphics utility library" ;
 Library csgfx :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csgfx ] : *.h ] ;
-LibDepends csgfx : csutil ;
+LibDepends csgfx : csgeom csutil ;
 

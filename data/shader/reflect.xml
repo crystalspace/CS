@@ -1,0 +1,28 @@
+<shader type="xmlshader" name="reflect">
+  <shadervars>
+      <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.1, 0.1, 0.1</shadervar>
+  </shadervars>
+  <technique priority="50">
+    <pass>
+      <mixmode><copy/></mixmode>
+      <buffer name="vertices" destination="position" />
+      <buffer name="normals" destination="normal"/>
+      <vp plugin="glfixed">
+        <fixedvp>  
+          <texgen type="reflection" mapping="cube" />
+          <!--<ambient/>-->
+        </fixedvp>
+      </vp>
+      <texture name="cubemap" destination="unit 0" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color"/>
+            <!--<colorsource num="1" source="texture" modifier="color"/>
+            <coloroperation operation="replace"/>-->
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
