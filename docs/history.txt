@@ -22,6 +22,9 @@ chronological order.
 	- res changed genmesh to let not tris facing the light, but rather 
 	  those facing away cast shadows. This seems to give better results.
 	- res fixed DrawPixmap() alpha support in the software renderer.
+	- res fixed spr2d texture coordinate vertex buffer not getting 
+	  properly filled when NextFrame() was called, but the mesh wasn't
+	  rendered any time before.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
