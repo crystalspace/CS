@@ -10,8 +10,10 @@ The history order is reversed so that new features are at the top.
 	- Added 'xmlread' to 'make walkall'.
 	- Fixed bug in xmlread with parsing of attributes values that
 	  have no quotes around them.
-	- Micah added an alternative logo image to standard.zip
-	- Micah modivied walktest to use the alternative logo
+	- Fixed a bug in spr3d plugin. It was querying the iMeshWrapper
+	  from the movable instead of the logparent.
+	- Micah added an alternative logo image to standard.zip.
+	- Micah modivied walktest to use the alternative logo.
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h

@@ -1293,7 +1293,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
     // Drill down into the parent and compute the center of
   // the socket where this mesh should be located along with the rotation angles
-  csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (movable,	iMeshWrapper));
+  csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
   if (mw)
   {
     // Get the parent of this wrapper
