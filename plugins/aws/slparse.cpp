@@ -939,7 +939,7 @@ case 35:
 																					}
 																				   else 
 																				    {
-																					  printf("  aws window definition error: %s is not a registered constant.\n", yyvsp[0].str);
+																					  printf("\taws window definition error: %s is not a registered constant.\n", yyvsp[0].str);
 																					  yyval.val=0;
 																					}
 																				;
@@ -1195,7 +1195,7 @@ yyerrhandle:
 int 
 awserror(char *s)
 {
- printf("  aws definition parse error(%i): %s\n", awslineno, s);
+ printf("\taws definition parse error(%i): %s\n", awslineno, s);
  return 0;
 }
 
@@ -1205,7 +1205,7 @@ mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iStrin
 
   if (windowmgr==NULL)
   {
-    printf("  internal error: window manager parameter is null in mapsourcetosink!\n");
+    printf("\tinternal error: window manager parameter is null in mapsourcetosink!\n");
 	return;
   }
 
@@ -1213,7 +1213,7 @@ mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iStrin
 
   if (sink==NULL)
   {
-    printf("  could not find sink \"%s\" referred to in connection map.\n", sinkname->GetData());
+    printf("\tcould not find sink \"%s\" referred to in connection map.\n", sinkname->GetData());
 	return;
   }
 

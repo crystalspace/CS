@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 
-const bool DEBUG_GETTEX = true;
+const bool DEBUG_GETTEX = false;
 
 static unsigned long
 NameToId(char *txt)

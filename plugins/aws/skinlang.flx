@@ -1,6 +1,8 @@
 
 /*******
   Flex definition for the .skn file parser.
+
+  to compile do:  flex -L skinlang.flx
  *********/
  
 %{
@@ -27,6 +29,7 @@
  
 %%
 component                                        return TOKEN_COMPONENT;
+connect											 return TOKEN_CONNECT;
 is                                               return TOKEN_IS;
 skin                    /* printf("skin-");   */ return TOKEN_SKIN;
 window                  /* printf("window-"); */ return TOKEN_WINDOW;
