@@ -642,6 +642,14 @@ void csGraphics3DOGLCommon::PerfTest ()
     }
   }
 
+  if (compute_outer)
+  {
+    // If the first element is a '0' (software clipper) we replace
+    // it with a 'N' (lazy clipper) since '0' is certainly not good.
+    if (clip_outer[0] == '0')
+      clip_outer[0] = 'N';
+  }
+
   //========
   // Now test again for a very small clipper. This test is to see if
   // it is beneficial to even enable clipping on optional portals.
@@ -706,6 +714,10 @@ void csGraphics3DOGLCommon::PerfTest ()
       else clip_optional[i] = test_modes[j].mode;
       j++;
     }
+    // If the first element is a '0' (software clipper) we replace
+    // it with a 'N' (lazy clipper) since '0' is certainly not good.
+    if (clip_optional[0] == '0')
+      clip_optional[0] = 'N';
   }
   Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipOuter = %c%c%c",
     clip_outer[0], clip_outer[1], clip_outer[2]);

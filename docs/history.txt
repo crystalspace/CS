@@ -27,6 +27,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed the memory leak in csPolygonMeshTools for real using
 	  the proper CS_IMPLEMENT_STATIC_VAR instead of the non-portable
 	  dependency on global constructors/destructors.
+	- Made sure that for outer and optional clippers the '0' (software)
+	  clipper is never selected (OpenGL renderer). Instead it is
+	  replaced with 'N' (lazy clipping).
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
