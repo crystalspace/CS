@@ -41,6 +41,7 @@
 #include "iengine/region.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "ivaria/keyval.h"
 #include "igraphic/animimg.h"
 #include "csgfx/csimgvec.h"
 #include "loadtex.h"
@@ -163,6 +164,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   csRef<iDocumentNode> ParamsNode;
   char* type = 0;
 
+  csRefArray<iDocumentNode> key_nodes;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -172,6 +175,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_KEY:
+	key_nodes.Push (child);
+	break;
       case XMLTOKEN_FOR2D:
 	{
 	  bool for2d;
@@ -419,6 +425,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 
+  delete[] type;
+
   if (tex)
   {
     tex->QueryObject ()->SetName (txtname);
@@ -433,10 +441,19 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     {
       ipt->SetAlwaysAnimate (always_animate);
     }
-  }
-  AddToRegion (ldr_context, tex->QueryObject ());
+    AddToRegion (ldr_context, tex->QueryObject ());
 
-  delete[] type;
+    size_t i;
+    for (i = 0 ; i < key_nodes.Length () ; i++)
+    {
+      iKeyValuePair* kvp = ParseKey (key_nodes[i], tex->QueryObject());
+      if (kvp)
+	kvp->DecRef ();
+      else
+	return 0;
+    }
+  }
+
   return tex;
 
 error:
@@ -479,6 +496,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     object_reg, "crystalspace.shared.stringset", iStringSet);
 #endif // CS_USE_NEW_RENDERER
 
+  csRefArray<iDocumentNode> key_nodes;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -488,6 +507,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_KEY:
+	key_nodes.Push (child);
+	break;
       case XMLTOKEN_TEXTURE:
         {
 	  const char* txtname = child->GetContentsValue ();
@@ -716,6 +738,14 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 
+  for (i = 0 ; i < key_nodes.Length () ; i++)
+  {
+    iKeyValuePair* kvp = ParseKey (key_nodes[i], mat->QueryObject ());
+    if (kvp)
+      kvp->DecRef ();
+    else
+      return 0;
+  }
   AddToRegion (ldr_context, mat->QueryObject ());
   return mat;
 }
