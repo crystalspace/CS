@@ -441,6 +441,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   	num_txt_layer, txt_layers, layers));
   if (col_set)
     material->SetFlatColor (col);
+#ifdef CS_USE_NEW_RENDERER
+  else
+    material->SetFlatColor (csRGBcolor(255,255,255));
+#endif
   material->SetReflection (diffuse, ambient, reflection);
 
   if(efdef.IsValid())
