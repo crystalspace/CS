@@ -26,6 +26,7 @@
 #undef SEVERITY_ERROR
 #define INCL_DOS
 #include <os2.h>
+#include <sys/uflags.h>
 
 //== class SysSystemDriver =====================================================
 
@@ -33,6 +34,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   // Lower the priority of the main thread
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
+  // Allow more than 32Mb for heap
+  _uflags (_UF_SBRK_MODEL, _UF_SBRK_ARBITRARY);
 
   Os2Helper* os2helper = new Os2Helper (this);
   object_reg.Register (os2helper, "SystemHelper");
