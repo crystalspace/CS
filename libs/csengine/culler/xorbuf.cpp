@@ -52,16 +52,18 @@ csXORBuffer::~csXORBuffer ()
 
 void csXORBuffer::Initialize ()
 {
-  int i;
   memset (buffer, 0, bufsize << 2);
 }
 
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
 {
-  int dy = y2-y1+1;
+  int dy = y2-y1;
   int x = x1<<16;
   int y = y1;
   int dx = ((x2-x1)<<16) / dy;
+  int dx2 = dx>>1;
+  if (dx2 < 0) dx2 = -dx2;
+  x -= dx2;
   while (dy > 0)
   {
     uint32* buf = &buffer[(y>>5) << w_shift];
@@ -72,6 +74,112 @@ void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
   }
 }
 
+void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2)
+{
+  int dy = y2-y1;
+  int x = x1<<16;
+  int y = y1;
+  int dx = ((x2-x1)<<16) / dy;
+  int dx2 = dx>>1;
+  if (dx2 < 0) dx2 = -dx2;
+  x += dx2;
+  while (dy > 0)
+  {
+    uint32* buf = &buffer[(y>>5) << w_shift];
+    buf[x>>16] |= 1 << (y & 0x1f);
+    x += dx;
+    y++;
+    dy--;
+  }
+}
+
+void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts)
+{
+  int i, j;
+
+  //---------
+  // First we copy the vertices to xa/ya. In the mean time
+  // we convert to integer and also search for the top vertex (lowest
+  // y coordinate) and bottom vertex.
+  //@@@ TODO: pre-shift x with 16
+  //---------
+  int xa[128], ya[128];
+  int top_vt = 0;
+  int bot_vt = 0;
+  xa[0] = QInt (verts[0].x);
+  ya[0] = QInt (verts[0].y);
+  int top_y = ya[0];
+  int bot_y = ya[0];
+  for (i = 1 ; i < num_verts ; i++)
+  {
+    xa[i] = QInt (verts[i].x);
+    ya[i] = QInt (verts[i].y);
+    if (ya[i] < top_y)
+    {
+      top_y = ya[i];
+      top_vt = i;
+    }
+    else if (ya[i] > bot_y)
+    {
+      bot_y = ya[i];
+      bot_vt = i;
+    }
+  }
+
+  //---------
+  // First find out in which direction the 'right' lines go.
+  //---------
+  //@@@ TODO
+  int dir_right = 1;
+
+  //---------
+  // Draw all right lines.
+  //---------
+  int dir = dir_right;
+  i = top_vt;
+  j = (i+num_verts+dir)%num_verts;
+
+  while (i != bot_vt)
+  {
+    if (ya[i] != ya[j])
+      DrawRightLine (xa[i], ya[i], xa[j], ya[j]);
+    i = j;
+    j = (j+num_verts+dir)%num_verts;
+  }
+
+  //---------
+  // Draw all left lines.
+  //---------
+  dir = -dir_right;
+  i = top_vt;
+  j = (i+num_verts+dir)%num_verts;
+
+  while (i != bot_vt)
+  {
+    if (ya[i] != ya[j])
+      DrawLeftLine (xa[i], ya[i], xa[j], ya[j]);
+    i = j;
+    j = (j+num_verts+dir)%num_verts;
+  }
+}
+
+void csXORBuffer::XORSweep ()
+{
+  int i, x;
+  uint32* buf;
+  for (i = 0 ; i < numrows ; i++)
+  {
+    buf = &buffer[i<<w_shift];
+    uint32 first = *buf++;
+    for (x = 1 ; x < width ; x++)
+    {
+      first ^= *buf;
+      *buf++ = first;
+      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
+    }
+  }
+}
+
 void csXORBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *ig3d)
 {
   iTextureManager *txtmgr = ig3d->GetTextureManager ();
@@ -79,7 +187,7 @@ void csXORBuffer::GfxDump (iGraphics2D *ig2d, iGraphics3D *ig3d)
   int x, y, i;
   for (i = 0 ; i < numrows ; i++)
   {
-    uint32* row = &buffer[i*width];
+    uint32* row = &buffer[i<<w_shift];
     for (x = 0 ; x < width ; x++)
     {
       uint32 c = *row++;

@@ -19,6 +19,7 @@
 #ifndef __CS_XORBUF_H__
 #define __CS_XORBUF_H__
 
+#include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 
 struct iGraphics2D;
@@ -53,6 +54,21 @@ public:
    * Draw a left-side line on the XOR buffer.
    */
   void DrawLeftLine (int x1, int y1, int x2, int y2);
+
+  /**
+   * Draw a right-side line on the XOR buffer.
+   */
+  void DrawRightLine (int x1, int y1, int x2, int y2);
+
+  /**
+   * Draw a polygon on the XOR buffer.
+   */
+  void DrawPolygon (csVector2* verts, int num_verts);
+
+  /**
+   * Do a XOR sweep on the entire buffer.
+   */
+  void XORSweep ();
 
   /**
    * Do a graphical dump of the XOR buffer contents on screen.

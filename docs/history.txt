@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 17-Apr-2002
 	- Started working on new XOR buffer which *might* (if all goes
 	  well) replace the c-buffer. Nothing functional yet though.
+	- Continued the work. The basic polygon filler (based on XOR
+	  fill) appears to work now.
 15-Apr-2002
 	- Disabled the use of DrawPolygonMultiTexture() in OpenGL renderer
 	  even if multi-texture is enabled. DrawPolygonMultiTexture() is
