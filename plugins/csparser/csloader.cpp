@@ -4993,11 +4993,11 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 	if (!SyntaxService->ParseVector (child, up))
 	  return false;
 	break;
-      case CS_TOKEN_FORWARD:
+      case XMLTOKEN_FORWARD:
 	if (!SyntaxService->ParseVector (child, forward))
 	  return false;
 	break;
-      case CS_TOKEN_FARPLANE:
+      case XMLTOKEN_FARPLANE:
         {
 	  csPlane3 p;
 	  p.A () = child->GetAttributeValueAsFloat ("a");

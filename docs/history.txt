@@ -4,6 +4,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
 	- Fixed a crash at exit bug in cswstest.
+	- Fixed XML parsing of <forward> and <farplane> in
+	  <start> sectrion.
 11-Sep-2002
 	- Further csPtr/csRef cleanups by removing the cast operator.
 	- Added a new STRICT_SMART_POINTERS flag in mk/user.mak. If this
