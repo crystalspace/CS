@@ -133,6 +133,6 @@ The include files useful for this section are:
 @example
 #include "iobject/object.h"
 #include "ivaria/collider.h"
-#include "iengine/polymesh.h"
+#include "ivaria/polymesh.h"
 #include "iengine/mesh.h"
 @end example
