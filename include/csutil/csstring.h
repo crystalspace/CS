@@ -38,21 +38,21 @@
  * implicit null terminator is not included in the character count returned by
  * Length().
  *
- * Like a typical C character string pointer, csString can also represent a
+ * Like a typical C character string pointer, csStringBase can also represent a
  * null pointer.  This allows a non-string to be distinguished from an empty
- * (zero-length) string.  The csString will represent a null-pointer in the
+ * (zero-length) string.  The csStringBase will represent a null-pointer in the
  * following cases:
  * <ul>
  * <li>When constructed with no arguments (the default constructor).
  * <li>When constructed with an explicit null-pointer.
  * <li>When assigned a null-pointer via operator=((char const*)0).
  * <li>After an invocation of Replace((char const*)0).
- * <li>After invocation of csString::Free() or any method which is documented
+ * <li>After invocation of csStringBase::Free() or any method which is documented
  *     as invoking Free() as a side-effect, such as Reclaim().
- * <li>After invocation of csString::Detach().
+ * <li>After invocation of csStringBase::Detach().
  * </ul>
  */
-class CS_CSUTIL_EXPORT csString
+class CS_CSUTIL_EXPORT csStringBase
 {
 protected:
   // Default number of bytes by which allocation should grow.
@@ -73,10 +73,18 @@ protected:
   // If necessary, increase the buffer capacity enough to hold NewSize bytes.
   // Buffer capacity is increased in GrowBy increments or exponentially
   // depending upon configuration.
-  void ExpandIfNeeded(size_t NewSize);
+  void ExpandIfNeeded (size_t NewSize);
 
-  /// Move the data pointer and associated info over from \a other.
-  void Mug (csString& other);
+  /**
+   * Set the buffer to hold NewSize bytes. If \a extraSpace is true it means
+   * the buffer can be larger to reduce the number of allocations needed.
+   */
+  virtual void SetCapacityInternal (size_t NewSize, bool extraSpace);
+  /**
+   * Compute a new buffer size. Takes GrowBy and GrowExponentially into
+   * consideration.
+   */
+  size_t ComputeNewSize (size_t NewSize);
 public:
   /**
    * Advise the string that it should allocate enough space to hold up to
@@ -122,7 +130,7 @@ public:
    *   'operator char const*' will return a null pointer (until some new
    *   content is added to the string).
    */
-  void Free ();
+  virtual void Free ();
 
   /**
    * Truncate the string.
@@ -140,7 +148,7 @@ public:
    *   had already represented a null-pointer, in which case it will continue
    *   to represent a null-pointer after truncation.
    */
-  csString& Truncate (size_t Len);
+  csStringBase& Truncate (size_t Len);
 
   /**
    * Set string buffer capacity to hold exactly the current content.
@@ -151,7 +159,7 @@ public:
    *   that GetData() and 'operator char const*' will return a null pointer
    *   after reclamation.
    */
-  csString& Reclaim ();
+  csStringBase& Reclaim ();
 
   /**
    * Clear the string (so that it contains only a null terminator).
@@ -159,7 +167,7 @@ public:
    * \remarks This is rigidly equivalent to Truncate(0), but more idiomatic in
    *   terms of human language.
    */
-  csString& Clear ()
+  csStringBase& Clear ()
   { return Truncate (0); }
 
   /**
@@ -253,7 +261,7 @@ public:
    * \param Count Number of characters to delete.
    * \return Reference to itself.
    */
-  csString& DeleteAt (size_t Pos, size_t Count = 1);
+  csStringBase& DeleteAt (size_t Pos, size_t Count = 1);
 
   /**
    * Insert another string into this one.
@@ -261,7 +269,7 @@ public:
    * \param Str String to insert.
    * \return Reference to itself.
    */
-  csString& Insert (size_t Pos, const csString& Str);
+  csStringBase& Insert (size_t Pos, const csStringBase& Str);
 
   /**
    * Insert another string into this one.
@@ -269,7 +277,7 @@ public:
    * \param Str String to insert.
    * \return Reference to itself.
    */
-  csString& Insert (size_t Pos, const char* Str);
+  csStringBase& Insert (size_t Pos, const char* Str);
 
   /**
    * Insert another string into this one.
@@ -277,7 +285,7 @@ public:
    * \param C Character to insert.
    * \return Reference to itself.
    */
-  csString& Insert (size_t Pos, char C);
+  csStringBase& Insert (size_t Pos, char C);
 
   /**
    * Overlay another string onto a part of this string.
@@ -287,7 +295,7 @@ public:
    * \remarks The target string will grow as necessary to accept the new
    *   string.
    */
-  csString& Overwrite (size_t Pos, const csString& Str);
+  csStringBase& Overwrite (size_t Pos, const csStringBase& Str);
 
   /**
    * Append a null-terminated C-string to this one.
@@ -296,7 +304,7 @@ public:
    *   then all characters from Str will be appended.
    * \return Reference to itself.
    */
-  csString& Append (const char* Str, size_t Count = (size_t)-1);
+  csStringBase& Append (const char* Str, size_t Count = (size_t)-1);
 
   /**
    * Append a string to this one. 
@@ -305,20 +313,20 @@ public:
    *   then all characters from Str will be appended.
    * \return Reference to itself.
    */
-  csString& Append (const csString& Str, size_t Count = (size_t)-1);
+  csStringBase& Append (const csStringBase& Str, size_t Count = (size_t)-1);
 
   /**
    * Append a signed character to this string.
    * \return Reference to itself.
    */
-  csString& Append (char c)
+  csStringBase& Append (char c)
   { char s[2]; s[0] = c; s[1] = '\0'; return Append(s); }
 
   /**
    * Append an unsigned character to this string.
    * \return Reference to itself.
    */
-  csString& Append (unsigned char c)
+  csStringBase& Append (unsigned char c)
   { return Append(char(c)); }
 
   /**
@@ -327,7 +335,7 @@ public:
    * \param len Number of characters in slice.
    * \return The indicated string slice.
    */
-  csString Slice (size_t start, size_t len) const;
+  csStringBase Slice (size_t start, size_t len) const;
 
   /**
    * Copy a portion of this string.
@@ -339,7 +347,7 @@ public:
    *   of allocation of a new string object for each operation.  Simply re-use
    *   'sub' for each operation.
    */
-  void SubString (csString& sub, size_t start, size_t len) const;
+  void SubString (csStringBase& sub, size_t start, size_t len) const;
 
   /**
    * Find the first occurrence of a character in the string.
@@ -380,7 +388,7 @@ public:
    */
   void FindReplace (const char* str, const char* replaceWith);
 
-#define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
+#define STR_APPEND(TYPE,FMT,SZ) csStringBase& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, FMT, n); return Append(s); }
   /** @{ */
   /**
@@ -398,7 +406,7 @@ public:
   /** @} */
 
   /// Append a boolean (as a number -- 1 or 0) to this string.
-  csString& Append (bool b) { return Append (b ? "1" : "0"); }
+  csStringBase& Append (bool b) { return Append (b ? "1" : "0"); }
 
   /**
    * Replace contents of this string with the contents of another.
@@ -409,7 +417,7 @@ public:
    * \remarks This string will represent a null-pointer after replacement if
    *   and only if Str represents a null-pointer.
    */
-  csString& Replace (const csString& Str, size_t Count = (size_t)-1);
+  csStringBase& Replace (const csStringBase& Str, size_t Count = (size_t)-1);
 
   /**
    * Replace contents of this string with the contents of another.
@@ -420,10 +428,10 @@ public:
    * \remarks This string will represent a null-pointer after replacement if
    *   and only if Str is a null pointer.
    */
-  csString& Replace (const char* Str, size_t Count = (size_t)-1);
+  csStringBase& Replace (const char* Str, size_t Count = (size_t)-1);
 
 #define STR_REPLACE(TYPE) \
-csString& Replace (TYPE s) { Size = 0; return Append(s); }
+csStringBase& Replace (TYPE s) { Size = 0; return Append(s); }
   /** @{ */
   /**
    * Replace contents of this string with the value in formatted form.
@@ -449,7 +457,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \return True if they are equal; false if not.
    * \remarks The comparison is case-sensitive.
    */
-  bool Compare (const csString& iStr) const
+  bool Compare (const csStringBase& iStr) const
   {
     if (&iStr == this)
       return true;
@@ -476,7 +484,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \return True if they are equal; false if not.
    * \remarks The comparison is case-insensitive.
    */
-  bool CompareNoCase (const csString& iStr) const
+  bool CompareNoCase (const csStringBase& iStr) const
   {
     if (&iStr == this)
       return true;
@@ -503,7 +511,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \param ignore_case Causes the comparison to be case insensitive if true.
    * \return True if they are equal up to the length of iStr; false if not.
    */
-  bool StartsWith (const csString& iStr, bool ignore_case = false) const
+  bool StartsWith (const csStringBase& iStr, bool ignore_case = false) const
   {
     if (&iStr == this)
       return true;
@@ -542,18 +550,18 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   }
 
   /**
-   * Create an empty csString object.
+   * Create an empty csStringBase object.
    * \remarks The newly constructed string represents a null-pointer.
    */
-  csString () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
+  csStringBase () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
     GrowExponentially (false) {}
 
   /**
-   * Create a csString object and reserve space for at least Length characters.
+   * Create a csStringBase object and reserve space for at least Length characters.
    * \remarks The newly constructed string represents a non-null zero-length
    *   string.
    */
-  csString (size_t Length) : Data (0), Size (0), MaxSize (0),
+  csStringBase (size_t Length) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { SetCapacity (Length); }
 
@@ -562,39 +570,39 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks The newly constructed string will represent a null-pointer if and
    *   only if the template string represented a null-pointer.
    */
-  csString (const csString& copy) : Data (0), Size (0), MaxSize (0),
+  csStringBase (const csStringBase& copy) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
   /**
-   * Create a csString object from a null-terminated C string.
+   * Create a csStringBase object from a null-terminated C string.
    * \remarks The newly constructed string will represent a null-pointer if and
    *   only if the input argument is a null-pointer.
    */
-  csString (const char* src) : Data (0), Size (0), MaxSize (0),
+  csStringBase (const char* src) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (src); }
 
-  /// Create a csString object from a single signed character.
-  csString (char c) : Data (0), Size (0), MaxSize (0),
+  /// Create a csStringBase object from a single signed character.
+  csStringBase (char c) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (c); }
 
-  /// Create a csString object from a single unsigned character.
-  csString (unsigned char c) : Data(0), Size (0), MaxSize (0),
+  /// Create a csStringBase object from a single unsigned character.
+  csStringBase (unsigned char c) : Data(0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append ((char) c); }
 
-  /// Destroy the csString.
-  virtual ~csString ();
+  /// Destroy the csStringBase.
+  virtual ~csStringBase ();
 
   /**
    * Get a copy of this string.
    * \remarks The newly constructed string will represent a null-pointer if and
    *   only if this string represents a null-pointer.
    */
-  csString Clone () const
-  { return csString (*this); }
+  csStringBase Clone () const
+  { return csStringBase (*this); }
 
   /**
    * Trim leading whitespace.
@@ -603,7 +611,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    *   non-whitespace character, or zero if the string is composed entirely of
    *   whitespace.
    */
-  csString& LTrim();
+  csStringBase& LTrim();
 
   /**
    * Trim trailing whitespace.
@@ -612,21 +620,21 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    *   non-whitespace character, or Lenght() if the string is composed entirely
    *   of whitespace.
    */
-  csString& RTrim();
+  csStringBase& RTrim();
 
   /**
    * Trim leading and trailing whitespace.
    * \return Reference to itself.
    * \remarks This is equivalent to LTrim() followed by RTrim().
    */
-  csString& Trim();
+  csStringBase& Trim();
 
   /**
    * Trim leading and trailing whitespace, and collapse all internal
    * whitespace to a single space.
    * \return Reference to itself.
    */
-  csString& Collapse();
+  csStringBase& Collapse();
 
   /**
    * Format this string using sprintf()-style formatting directives.
@@ -634,7 +642,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
    */
-  csString& Format(const char* format, ...) CS_GNUC_PRINTF (2, 3);
+  csStringBase& Format(const char* format, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Format this string using sprintf() formatting directives in a va_list.
@@ -642,10 +650,10 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks Automatically allocates sufficient memory to hold result.  Newly
    *   formatted string replaces previous string value.
    */
-  csString& FormatV(const char* format, va_list args);
+  csStringBase& FormatV(const char* format, va_list args);
 
 #define STR_FORMAT(TYPE) \
-  static csString Format (TYPE v);
+  static csStringBase Format (TYPE v);
   /** @{ */
   /**
    * Format this value using a sprintf() formatting directive.
@@ -661,7 +669,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #undef STR_FORMAT
 
 #define STR_FORMAT_INT(TYPE) \
-  static csString Format (TYPE v, int width, int prec=0);
+  static csStringBase Format (TYPE v, int width, int prec=0);
   STR_FORMAT_INT(short)
   STR_FORMAT_INT(unsigned short)
   STR_FORMAT_INT(int)
@@ -671,7 +679,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #undef STR_FORMAT_INT
 
 #define STR_FORMAT_FLOAT(TYPE) \
-  static csString Format (TYPE v, int width, int prec=6);
+  static csStringBase Format (TYPE v, int width, int prec=6);
   STR_FORMAT_FLOAT(float)
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
@@ -685,18 +693,18 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks Never shortens the string.  If NewSize is less than or equal to
    *   Length(), nothing happens.
    */
-  csString& PadLeft (size_t NewSize, char PadChar = ' ');
+  csStringBase& PadLeft (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadLeft().
-  csString AsPadLeft (size_t NewSize, char PadChar = ' ') const;
+  csStringBase AsPadLeft (size_t NewSize, char PadChar = ' ') const;
 
 #define STR_PADLEFT(TYPE) \
-  static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
+  static csStringBase PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
   /** @{ */
   /** 
    * Return a new left-padded string representation of a basic type.
    */
-  STR_PADLEFT(const csString&)
+  STR_PADLEFT(const csStringBase&)
   STR_PADLEFT(const char*)
   STR_PADLEFT(char)
   STR_PADLEFT(unsigned char)
@@ -720,18 +728,18 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks Never shortens the string.  If NewSize is less than or equal to
    *   Length(), nothing happens.
    */
-  csString& PadRight (size_t NewSize, char PadChar = ' ');
+  csStringBase& PadRight (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadRight().
-  csString AsPadRight (size_t NewSize, char PadChar = ' ') const;
+  csStringBase AsPadRight (size_t NewSize, char PadChar = ' ') const;
 
 #define STR_PADRIGHT(TYPE) \
-  static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
+  static csStringBase PadRight (TYPE v, size_t iNewSize, char iChar=' ');
   /** @{ */
   /**
    * Return a new right-padded string representation of a basic type.
    */
-  STR_PADRIGHT(const csString&)
+  STR_PADRIGHT(const csStringBase&)
   STR_PADRIGHT(const char*)
   STR_PADRIGHT(char)
   STR_PADRIGHT(unsigned char)
@@ -758,18 +766,18 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    *   padded equally, then the right side will gain the extra one-character
    *   padding.
    */
-  csString& PadCenter (size_t NewSize, char PadChar = ' ');
+  csStringBase& PadCenter (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadCenter().
-  csString AsPadCenter (size_t NewSize, char PadChar = ' ') const;
+  csStringBase AsPadCenter (size_t NewSize, char PadChar = ' ') const;
 
 #define STR_PADCENTER(TYPE) \
-  static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
+  static csStringBase PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
   /** @{ */
   /**
    * Return a new left+right padded string representation of a basic type.
    */
-  STR_PADCENTER(const csString&)
+  STR_PADCENTER(const csStringBase&)
   STR_PADCENTER(const char*)
   STR_PADCENTER(char)
   STR_PADCENTER(unsigned char)
@@ -786,12 +794,12 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
   /** @} */
 
 #define STR_ASSIGN(TYPE) \
-const csString& operator = (TYPE s) { return Replace (s); }
+const csStringBase& operator = (TYPE s) { return Replace (s); }
   /** @{ */
   /**
    * Assign a formatted value to this string.
    */
-  STR_ASSIGN(const csString&)
+  STR_ASSIGN(const csStringBase&)
   STR_ASSIGN(const char*)
   STR_ASSIGN(char)
   STR_ASSIGN(unsigned char)
@@ -808,12 +816,12 @@ const csString& operator = (TYPE s) { return Replace (s); }
   /** @} */
 
 #define STR_OP_APPEND(TYPE) \
-  csString &operator += (TYPE s) { return Append (s); }
+  csStringBase &operator += (TYPE s) { return Append (s); }
   /** @{ */
   /**
    * Append a formatted value to this string.
    */
-  STR_OP_APPEND(const csString&)
+  STR_OP_APPEND(const csStringBase&)
   STR_OP_APPEND(const char*)
   STR_OP_APPEND(char)
   STR_OP_APPEND(unsigned char)
@@ -830,7 +838,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
   /** @} */
 
   /// Add another string to this one and return the result as a new string.
-  csString operator + (const csString &iStr) const
+  csStringBase operator + (const csStringBase &iStr) const
   { return Clone ().Append (iStr); }
 
   /**
@@ -849,7 +857,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * \return True if they are equal; false if not.
    * \remarks The comparison is case-sensitive.
    */
-  bool operator == (const csString& Str) const
+  bool operator == (const csStringBase& Str) const
   { return Compare (Str); }
   /**
    * Check if another string is equal to this one.
@@ -865,7 +873,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * \return True if the string is 'lesser' than \a Str, false
    *   otherwise.
    */
-  bool operator < (const csString& Str) const
+  bool operator < (const csStringBase& Str) const
   {
     return strcmp (GetDataSafe (), Str.GetDataSafe ()) < 0;
   }
@@ -885,7 +893,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * \return True if the string is 'greater' than \a Str, false
    *   otherwise.
    */
-  bool operator > (const csString& Str) const
+  bool operator > (const csStringBase& Str) const
   {
     return strcmp (GetDataSafe (), Str.GetDataSafe ()) > 0;
   }
@@ -905,7 +913,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * \return False if they are equal; true if not.
    * \remarks The comparison is case-sensitive.
    */
-  bool operator != (const csString& Str) const
+  bool operator != (const csStringBase& Str) const
   { return !Compare (Str); }
   /**
    * Check if another string is not equal to this one.
@@ -920,12 +928,12 @@ const csString& operator = (TYPE s) { return Replace (s); }
    * Convert this string to lower-case.
    * \return Reference to itself.
    */
-  csString& Downcase();
+  csStringBase& Downcase();
   /**
    * Convert this string to upper-case.
    * \return Reference to itself.
    */
-  csString& Upcase();
+  csStringBase& Upcase();
 
   /**
    * Detach the low-level null-terminated C-string buffer from the csString
@@ -937,24 +945,24 @@ const csString& operator = (TYPE s) { return Replace (s); }
    *   string buffer and is responsible for destroying it via `delete[]' when
    *   no longer needed.
    */
-  char* Detach ()
+  virtual char* Detach ()
   { char* d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
 };
 
-/// Concatenate a null-terminated C-string with a csString.
-inline csString operator + (const char* iStr1, const csString &iStr2)
+/// Concatenate a null-terminated C-string with a csStringBase.
+inline csStringBase operator + (const char* iStr1, const csStringBase &iStr2)
 {
-  return csString (iStr1).Append (iStr2);
+  return csStringBase (iStr1).Append (iStr2);
 }
 
-/// Concatenate a csString with a null-terminated C-string.
-inline csString operator + (const csString& iStr1, const char* iStr2)
+/// Concatenate a csStringBase with a null-terminated C-string.
+inline csStringBase operator + (const csStringBase& iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);
 }
 
 #define STR_SHIFT(TYPE) \
-  inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
+  inline csStringBase &operator << (csStringBase &s, TYPE v) { return s.Append (v); }
 /** @{ */
 /** 
  * Shift operator.  
@@ -963,7 +971,7 @@ inline csString operator + (const csString& iStr1, const char* iStr2)
  * s << "Hi " << name << "; see " << foo;
  * \endcode
  */
-STR_SHIFT(const csString&)
+STR_SHIFT(const csStringBase&)
 STR_SHIFT(const char*)
 STR_SHIFT(char)
 STR_SHIFT(unsigned char)
@@ -978,5 +986,126 @@ STR_SHIFT(double)
 STR_SHIFT(bool)
 #undef STR_SHIFT
 /** @} */
+
+/**
+ * Subclass of csStringBase that contains an internal buffer which is faster
+ * than teh always dynamically allocated buffer of csStringBase.
+ */
+template<int LEN = 36>
+class csStringFast : public csStringBase
+{
+protected:
+  char internalBuffer[LEN];
+  virtual void SetCapacityInternal (size_t NewSize, bool extraSpace)
+  {
+    char* oldBuf = (MaxSize > LEN) ? Data : 0;
+    char* newBuf;
+    if (NewSize < LEN)
+    {
+      newBuf = internalBuffer;
+      /* No need to honor extraSpace; later "reallocations" are free when
+       * using the internal buffer, so no need to "allocate" more than
+       * necessary. */
+    }
+    else
+    {
+      if (extraSpace)
+	NewSize = ComputeNewSize (NewSize) + 1;
+      newBuf = new char[NewSize];
+    }
+    if (newBuf != Data)
+    {
+      if (Data == 0 || Size == 0)
+	newBuf[0] = '\0';
+      else
+	memcpy(newBuf, Data, Size + 1);
+    }
+
+    MaxSize = NewSize;
+    Data = newBuf;
+    delete[] oldBuf;
+  }
+public:
+  /**
+   * Create an empty csStringFast object.
+   */
+  csStringFast () : csStringBase() { }
+  /**
+   * Create a csStringFast object and reserve space for at least Length 
+   * characters.
+   */
+  csStringFast (size_t Length) : csStringBase() { SetCapacity (Length); }
+  /**
+   * Copy constructor.
+   */
+  csStringFast (const csStringBase& copy) : csStringBase () 
+  { Append (copy); }
+  /**
+   * Copy constructor.
+   */
+  csStringFast (const csStringFast& copy) : csStringBase () 
+  { Append (copy); }
+  /**
+   * Create a csStringFast object from a null-terminated C string.
+   */
+  csStringFast (const char* src) : csStringBase() 
+  { Append (src); }
+  /// Create a csStringFast object from a single signed character.
+  csStringFast (char c) : csStringBase()
+  { Append (c); }
+  /// Create a csStringFast object from a single unsigned character.
+  csStringFast (unsigned char c) : csStringBase()
+  { Append ((char)c); }
+  /// Destroy the csStringBase.
+  virtual ~csStringFast () { if (MaxSize <= LEN) Data = 0; }
+  virtual void Free ()
+  { if (MaxSize <= LEN) Data = 0; csStringBase::Free(); }
+
+  virtual char* Detach ()
+  { 
+    char* d = (MaxSize <= LEN) ? csStrNew (Data) : Data; 
+    Data = 0; Size = 0; MaxSize = 0; return d; }
+};
+
+CS_SPECIALIZE_TEMPLATE
+class csStringFast<0> : public csStringBase
+{
+public:
+  csStringFast () : csStringBase() { }
+  csStringFast (size_t Length) : csStringBase(Length) { }
+  csStringFast (const csStringBase& copy) : csStringBase (copy) { }
+  csStringFast (const char* src) : csStringBase(src) { }
+  csStringFast (char c) : csStringBase(c) { }
+  csStringFast (unsigned char c) : csStringBase(c) { }
+};
+
+/**
+ * Thin wrapper around csStringFast<> with its default buffer size.
+ */
+class csString : public csStringFast<>
+{
+public:
+  /**
+   * Create an empty csString object.
+   */
+  csString () : csStringFast<> () { }
+  /**
+   * Create a csString object and reserve space for at least Length characters.
+   */
+  csString (size_t Length) : csStringFast<> (Length) { }
+  /**
+   * Copy constructor.
+   */
+  csString (const csStringBase& copy) : csStringFast<> (copy) { }
+  /**
+   * Create a csString object from a null-terminated C string.
+   */
+  csString (const char* src) : csStringFast<> (src) { }
+  /// Create a csString object from a single signed character.
+  csString (char c) : csStringFast<> (c) { }
+  /// Create a csString object from a single unsigned character.
+  csString (unsigned char c) : csStringFast<> (c) { }
+};
+
 
 #endif // __CS_CSSTRING_H__

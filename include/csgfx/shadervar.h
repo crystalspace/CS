@@ -24,7 +24,6 @@
 
 #include "csutil/refcount.h"
 #include "csutil/strhash.h"
-#include "iutil/string.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"

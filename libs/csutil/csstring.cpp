@@ -26,12 +26,12 @@ extern "C"
 #include "csutil/csstring.h"
 #include "csutil/snprintf.h"
 
-csString::~csString ()
+csStringBase::~csStringBase ()
 {
   Free ();
 }
 
-void csString::Free ()
+void csStringBase::Free ()
 {
   delete[] Data;
   Data = 0;
@@ -39,11 +39,11 @@ void csString::Free ()
   MaxSize = 0;
 }
 
-void csString::SetCapacity (size_t NewSize)
+void csStringBase::SetCapacityInternal (size_t NewSize, bool extraSpace)
 {
+  if (extraSpace)
+    NewSize = ComputeNewSize (NewSize);
   NewSize++; // Plus one for implicit null byte.
-  if (NewSize <= MaxSize)
-    return;
   MaxSize = NewSize;
   char* buff = new char[MaxSize];
   if (Data == 0 || Size == 0)
@@ -51,37 +51,40 @@ void csString::SetCapacity (size_t NewSize)
   else
     memcpy(buff, Data, Size + 1);
 
-  if (Data)
-    delete[] Data;
+  delete[] Data;
   Data = buff;
 }
 
-void csString::ExpandIfNeeded(size_t NewSize)
+size_t csStringBase::ComputeNewSize (size_t NewSize)
+{
+  size_t n;
+  if (!GrowExponentially)
+    n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
+  else
+  {
+    n = MaxSize != 0 ? MaxSize << 1 : size_t(DEFAULT_GROW_BY);
+    while (n < NewSize)
+      n <<= 1;
+  }
+  return n;
+}
+
+void csStringBase::SetCapacity (size_t NewSize)
+{
+  if (NewSize < MaxSize)
+    return;
+  SetCapacityInternal (NewSize, false);
+}
+
+void csStringBase::ExpandIfNeeded(size_t NewSize)
 {
   if (NewSize + 1 > MaxSize)
   {
-    size_t n;
-    if (!GrowExponentially)
-      n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
-    else
-    {
-      n = MaxSize != 0 ? MaxSize << 1 : size_t(DEFAULT_GROW_BY);
-      while (n < NewSize)
-        n <<= 1;
-    }
-    SetCapacity(n);
+    SetCapacityInternal (NewSize, true);
   }
 }
 
-void csString::Mug (csString& other)
-{
-  delete[] Data;
-  Size = other.Size;
-  MaxSize = other.MaxSize;
-  Data = other.Detach();
-}
-
-void csString::SetGrowsBy(size_t n)
+void csStringBase::SetGrowsBy (size_t n)
 {
   if (n < DEFAULT_GROW_BY)
     n = DEFAULT_GROW_BY;
@@ -90,7 +93,7 @@ void csString::SetGrowsBy(size_t n)
   GrowExponentially = false;
 }
 
-csString &csString::Reclaim()
+csStringBase &csStringBase::Reclaim()
 {
   if (Size == 0)
     Free();
@@ -106,7 +109,7 @@ csString &csString::Reclaim()
   return *this;
 }
 
-csString &csString::Truncate (size_t iPos)
+csStringBase &csStringBase::Truncate (size_t iPos)
 {
   if (iPos < Size)
   {
@@ -117,7 +120,7 @@ csString &csString::Truncate (size_t iPos)
   return *this;
 }
 
-csString &csString::DeleteAt (size_t iPos, size_t iCount)
+csStringBase &csStringBase::DeleteAt (size_t iPos, size_t iCount)
 {
   if (iCount <= 0) return *this;
   CS_ASSERT (iPos < Size && iPos + iCount <= Size);
@@ -131,7 +134,7 @@ csString &csString::DeleteAt (size_t iPos, size_t iCount)
   return *this;
 }
 
-csString &csString::Insert (size_t iPos, const csString &iStr)
+csStringBase &csStringBase::Insert (size_t iPos, const csStringBase &iStr)
 {
   CS_ASSERT(iPos <= Size);
 
@@ -147,13 +150,13 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
   return *this;
 }
 
-csString &csString::Insert (size_t iPos, char iChar)
+csStringBase &csStringBase::Insert (size_t iPos, char iChar)
 {
-  csString s(iChar);
+  csStringBase s(iChar);
   return Insert(iPos, s);
 }
 
-csString &csString::Insert (size_t iPos, const char* str)
+csStringBase &csStringBase::Insert (size_t iPos, const char* str)
 {
   CS_ASSERT(iPos <= Size);
 
@@ -169,7 +172,7 @@ csString &csString::Insert (size_t iPos, const char* str)
   return *this;
 }
 
-csString &csString::Overwrite (size_t iPos, const csString &iStr)
+csStringBase &csStringBase::Overwrite (size_t iPos, const csStringBase &iStr)
 {
   CS_ASSERT (iPos <= Size);
 
@@ -184,7 +187,7 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
   return *this;
 }
 
-csString& csString::Replace (const csString& Str, size_t Count)
+csStringBase& csStringBase::Replace (const csStringBase& Str, size_t Count)
 {
   if (this != &Str)
     Replace(Str.GetData(), Count);
@@ -193,7 +196,7 @@ csString& csString::Replace (const csString& Str, size_t Count)
   return *this;
 }
 
-csString& csString::Replace (const char* Str, size_t Count)
+csStringBase& csStringBase::Replace (const char* Str, size_t Count)
 {
   if (Str == 0 || Count == 0)
     Free();
@@ -217,12 +220,12 @@ csString& csString::Replace (const char* Str, size_t Count)
   return *this;
 }
 
-csString &csString::Append (const csString &iStr, size_t iCount)
+csStringBase &csStringBase::Append (const csStringBase &iStr, size_t iCount)
 {
   return Append(iStr.GetData(), iCount);
 }
 
-csString &csString::Append (const char *iStr, size_t iCount)
+csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
 {
   if (iStr == 0 || iCount == 0)
     return *this;
@@ -238,7 +241,7 @@ csString &csString::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
-void csString::SubString (csString& sub, size_t x, size_t len) const
+void csStringBase::SubString (csStringBase& sub, size_t x, size_t len) const
 {
   CS_ASSERT(sub.Data != Data); // Check for same string
   sub.Truncate(0);
@@ -252,14 +255,14 @@ void csString::SubString (csString& sub, size_t x, size_t len) const
   }
 }
 
-csString csString::Slice(size_t start, size_t len) const
+csStringBase csStringBase::Slice(size_t start, size_t len) const
 {
-  csString s;
+  csStringBase s;
   SubString(s, start, len);
   return s;
 }
 
-size_t csString::FindFirst (char c, size_t pos) const
+size_t csStringBase::FindFirst (char c, size_t pos) const
 {
   if (pos > Size || Data == 0)
     return (size_t)-1;
@@ -271,7 +274,7 @@ size_t csString::FindFirst (char c, size_t pos) const
   return tmp - Data;
 }
 
-size_t csString::FindFirst (const char *c, size_t pos) const
+size_t csStringBase::FindFirst (const char *c, size_t pos) const
 {
   if (pos > Size || Data == 0)
     return (size_t)-1;
@@ -283,7 +286,7 @@ size_t csString::FindFirst (const char *c, size_t pos) const
   return tmp - Data;
 }
 
-size_t csString::FindLast (char c, size_t pos) const
+size_t csStringBase::FindLast (char c, size_t pos) const
 {
   if (pos == (size_t)-1)
     pos = Size - 1;
@@ -299,7 +302,7 @@ size_t csString::FindLast (char c, size_t pos) const
   return (size_t)-1;
 }
 
-size_t csString::FindStr (const char* str, size_t pos) const
+size_t csStringBase::FindStr (const char* str, size_t pos) const
 {
   if (pos > Size || Data == 0)
     return (size_t)-1;
@@ -311,9 +314,9 @@ size_t csString::FindStr (const char* str, size_t pos) const
   return tmp - Data;
 }
 
-void csString::FindReplace (const char* str, const char* replaceWith)
+void csStringBase::FindReplace (const char* str, const char* replaceWith)
 {
-  csString newStr;
+  csStringBase newStr;
 
   size_t p = 0;
   const size_t strLen = strlen (str);
@@ -328,13 +331,13 @@ void csString::FindReplace (const char* str, const char* replaceWith)
   }
   newStr.Append (Data + p, Size - p);
 
-  Mug (newStr);
+  Replace (newStr);
 }
 
 // Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
 // If c is not an unsigned char value, or EOF, the behaviour of these functions
 // is undefined.
-csString& csString::Downcase()
+csStringBase& csStringBase::Downcase()
 {
   char* p = Data;
   if (p != 0)
@@ -350,7 +353,7 @@ csString& csString::Downcase()
 // Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
 // If c is not an unsigned char value, or EOF, the behaviour of these functions
 // is undefined.
-csString& csString::Upcase()
+csStringBase& csStringBase::Upcase()
 {
   char* p = Data;
   if (p != 0)
@@ -366,7 +369,7 @@ csString& csString::Upcase()
 // Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
 // If c is not an unsigned char value, or EOF, the behaviour of these functions
 // is undefined.
-csString &csString::LTrim()
+csStringBase &csStringBase::LTrim()
 {
   size_t i;
   for (i = 0; i < Size; i++)
@@ -383,7 +386,7 @@ csString &csString::LTrim()
 // Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
 // If c is not an unsigned char value, or EOF, the behaviour of these functions
 // is undefined.
-csString &csString::RTrim()
+csStringBase &csStringBase::RTrim()
 {
   if (Size > 0)
   {
@@ -399,12 +402,12 @@ csString &csString::RTrim()
   return *this;
 }
 
-csString &csString::Trim()
+csStringBase &csStringBase::Trim()
 {
   return LTrim().RTrim();
 }
 
-csString &csString::Collapse()
+csStringBase &csStringBase::Collapse()
 {
   if (Size > 0)
   {
@@ -434,7 +437,7 @@ csString &csString::Collapse()
   return *this;
 }
 
-csString &csString::FormatV (const char *format, va_list args)
+csStringBase &csStringBase::FormatV (const char *format, va_list args)
 {
   if (Data == 0) // Ensure that backing-store exists prior to vsnprintf().
     SetCapacity(255);
@@ -455,7 +458,7 @@ csString &csString::FormatV (const char *format, va_list args)
   return *this;
 }
 
-csString &csString::Format (const char* format, ...)
+csStringBase &csStringBase::Format (const char* format, ...)
 {
   va_list args;
   va_start (args, format);
@@ -465,8 +468,8 @@ csString &csString::Format (const char* format, ...)
 }
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
-csString csString::Format (TYPE v) \
-{ char s[SZ]; cs_snprintf (s, SZ, #FMT, v); return csString ().Append (s); }
+csStringBase csStringBase::Format (TYPE v) \
+{ char s[SZ]; cs_snprintf (s, SZ, #FMT, v); return csStringBase ().Append (s); }
   STR_FORMAT(short, %hd, 32)
   STR_FORMAT(unsigned short, %hu, 32)
   STR_FORMAT(int, %d, 32)
@@ -478,11 +481,11 @@ csString csString::Format (TYPE v) \
 #undef STR_FORMAT
 
 #define STR_FORMAT_INT(TYPE,FMT) \
-csString csString::Format (TYPE v, int width, int prec/*=0*/) \
+csStringBase csStringBase::Format (TYPE v, int width, int prec/*=0*/) \
 { char s[64], s1[64]; \
   cs_snprintf (s1, sizeof(s1), "%%%d.%d"#FMT, width, prec); \
   cs_snprintf (s, sizeof(s), s1, v); \
-  return csString ().Append (s); }
+  return csStringBase ().Append (s); }
   STR_FORMAT_INT(short, hd)
   STR_FORMAT_INT(unsigned short, hu)
   STR_FORMAT_INT(int, d)
@@ -492,16 +495,16 @@ csString csString::Format (TYPE v, int width, int prec/*=0*/) \
 #undef STR_FORMAT_INT
 
 #define STR_FORMAT_FLOAT(TYPE) \
-csString csString::Format (TYPE v, int width, int prec/*=6*/) \
+csStringBase csStringBase::Format (TYPE v, int width, int prec/*=6*/) \
 { char s[64], s1[64]; \
   cs_snprintf (s1, sizeof(s1), "%%%d.%dg", width, prec); \
   cs_snprintf (s, sizeof(s), s1, v); \
-  return csString ().Append (s); }
+  return csStringBase ().Append (s); }
   STR_FORMAT_FLOAT(float)
   STR_FORMAT_FLOAT(double)
 #undef STR_FORMAT_FLOAT
 
-csString &csString::PadLeft (size_t iNewSize, char iChar)
+csStringBase &csStringBase::PadLeft (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
@@ -516,17 +519,17 @@ csString &csString::PadLeft (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadLeft (size_t iNewSize, char iChar) const
+csStringBase csStringBase::AsPadLeft (size_t iNewSize, char iChar) const
 {
-  csString newStr = Clone ();
+  csStringBase newStr = Clone ();
   newStr.PadLeft (iChar, iNewSize);
   return newStr;
 }
 
 #define STR_PADLEFT(TYPE) \
-csString csString::PadLeft (TYPE v, size_t iNewSize, char iChar) \
-{ csString newStr; return newStr.Append (v).PadLeft (iNewSize, iChar); }
-  STR_PADLEFT(const csString&)
+csStringBase csStringBase::PadLeft (TYPE v, size_t iNewSize, char iChar) \
+{ csStringBase newStr; return newStr.Append (v).PadLeft (iNewSize, iChar); }
+  STR_PADLEFT(const csStringBase&)
   STR_PADLEFT(const char*)
   STR_PADLEFT(char)
   STR_PADLEFT(unsigned char)
@@ -541,7 +544,7 @@ csString csString::PadLeft (TYPE v, size_t iNewSize, char iChar) \
   STR_PADLEFT(bool)
 #undef STR_PADLEFT
 
-csString& csString::PadRight (size_t iNewSize, char iChar)
+csStringBase& csStringBase::PadRight (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
@@ -555,17 +558,17 @@ csString& csString::PadRight (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadRight (size_t iNewSize, char iChar) const
+csStringBase csStringBase::AsPadRight (size_t iNewSize, char iChar) const
 {
-  csString newStr = Clone ();
+  csStringBase newStr = Clone ();
   newStr.PadRight (iChar, iNewSize);
   return newStr;
 }
 
 #define STR_PADRIGHT(TYPE) \
-csString csString::PadRight (TYPE v, size_t iNewSize, char iChar) \
-{ csString newStr; return newStr.Append (v).PadRight (iNewSize, iChar); }
-  STR_PADRIGHT(const csString&)
+csStringBase csStringBase::PadRight (TYPE v, size_t iNewSize, char iChar) \
+{ csStringBase newStr; return newStr.Append (v).PadRight (iNewSize, iChar); }
+  STR_PADRIGHT(const csStringBase&)
   STR_PADRIGHT(const char*)
   STR_PADRIGHT(char)
   STR_PADRIGHT(unsigned char)
@@ -580,7 +583,7 @@ csString csString::PadRight (TYPE v, size_t iNewSize, char iChar) \
   STR_PADRIGHT(bool)
 #undef STR_PADRIGHT
 
-csString& csString::PadCenter (size_t iNewSize, char iChar)
+csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
@@ -601,17 +604,17 @@ csString& csString::PadCenter (size_t iNewSize, char iChar)
   return *this;
 }
 
-csString csString::AsPadCenter (size_t iNewSize, char iChar) const
+csStringBase csStringBase::AsPadCenter (size_t iNewSize, char iChar) const
 {
-  csString newStr = Clone ();
+  csStringBase newStr = Clone ();
   newStr.PadCenter (iChar, iNewSize);
   return newStr;
 }
 
 #define STR_PADCENTER(TYPE) \
-csString csString::PadCenter (TYPE v, size_t iNewSize, char iChar) \
-{ csString newStr; return newStr.Append (v).PadCenter (iNewSize, iChar); }
-  STR_PADCENTER(const csString&)
+csStringBase csStringBase::PadCenter (TYPE v, size_t iNewSize, char iChar) \
+{ csStringBase newStr; return newStr.Append (v).PadCenter (iNewSize, iChar); }
+  STR_PADCENTER(const csStringBase&)
   STR_PADCENTER(const char*)
   STR_PADCENTER(char)
   STR_PADCENTER(unsigned char)
