@@ -53,7 +53,7 @@ elif [ -n `checkprog "mkdirs"` ]; then
     MKDIRS="mkdirs"
   fi
 fi
-rm -rf - -p mkdtest
+rm -rf ./-p mkdtest
 
 if [ "${MKDIRS}" != "no" ]; then
   echo "CMD.MKDIRS = ${MKDIRS}"
