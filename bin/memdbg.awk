@@ -1,4 +1,4 @@
-#!/bin/awk
+#!/bin/awk -f
 #
 # This script is intended to extract all useful information from output of
 #
