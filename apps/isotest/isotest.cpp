@@ -173,7 +173,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // add the player sprite to the world
   csVector3 startpos(10,0,5);
-  player = engine->CreateFrontSprite(startpos, 1.0, 4.0);
+  player = engine->CreateFrontSprite(startpos, 0.5, 2.7);
   player->SetMaterialHandle(snow);
   world->AddSprite(player);
   player->SetGridChangeCallback(PlayerGridChange, (void*)this);
