@@ -50,7 +50,7 @@ struct iBCTerrState : public iBase
   /// Set Block info.
   virtual void SetBlockMaterial (int x_block, int z_block,
   	iMaterialWrapper* mat) = 0;
-  /// Used to create control points, needs size to be set.
+  /// Used to create control points, needs size to be set.  Use for Debug only!
   virtual void SetHeightMap (iImage* im) = 0;
   /// Test the height at point, returns y + 2.0f.
   virtual int HeightTest (csVector3 *point) = 0;
@@ -63,6 +63,28 @@ struct iBCTerrState : public iBase
       csVector3 &end) = 0;
   /// Test a ray against the mesh
   virtual void CollideRay (const csVector3 start, csVector3 &end) = 0;
+  /// Set control point by array position
+  virtual void SetControlPoint (const csVector3 point, int iter) = 0;
+  /// Set control point by x / z position
+  virtual void SetControlPoint (const csVector3 point, const int x,
+        const int z) = 0;
+  /// Set control point height
+  virtual void SetControlPointHeight (const float height, const iter) = 0;
+  /// Set control point height
+  virtual void SetControlPointHeight (const float height, const int x,
+        const int z) = 0;
+  /// Set Height to flatten edges : default = topleft.y
+  virtual void SetFlattenHeight (const float up, const float down,
+        const float left, const float right) = 0;
+  /// Make the MeshObject flatten it's edges, be sure not to set the height different for sides that touch
+  virtual void DoFlatten (const bool up, const bool down,
+        const bool left, const bool right) = 0;
+  /// Set System LOD increments
+  virtual void SetSystemInc (const int inc) = 0;
+  /// Pre Build control points, should be called before setting height or control points
+  virtual void PreBuild () = 0;
+  /// Build the mesh, prepare mesh for material calls
+  virtual void Build () = 0;
 };
 
 SCF_VERSION (iBCTerrFactoryState, 0, 0, 2);
@@ -98,7 +120,7 @@ struct iBCTerrFactoryState : public iBase
   virtual float* GetLODDistances () = 0;
   virtual void SetDefaultMaterial ( iMaterialWrapper* mat ) = 0;
   virtual iMaterialWrapper* GetDefaultMaterial () = 0;
-  /// Set number of LOD levels
+  /// Get number of LOD levels
   virtual int GetUserLOD () = 0;
   virtual float GetSystemDistance () = 0;
   /// Set distance shared edge usage stops
