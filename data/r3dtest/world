@@ -95,7 +95,7 @@
     </textures>
     <shaders>
 	<shader><file>/shader/ambient.xml</file></shader>
-	<shader><file>/shader/light.xml</file></shader>
+	<shader><file>/shader/light_bumpmap.xml</file></shader>
     </shaders>
     <materials>
       <material name="CRETE3_CEIL02A">
