@@ -38,6 +38,7 @@
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
 
+
 #include "csutil/util.h"
 
 #include "chunklod.h"
@@ -689,6 +690,25 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   return 0;
 }
 
+void csChunkLodTerrainFactory::MeshTreeNode::UpdateBufferSV ()
+{
+  csShaderVariable *sv;
+  sv = dynDomain.GetVariableAdd(pFactory->vertex_name);
+  sv->SetValue(GetRenderBuffer(pFactory->vertex_name));
+  sv = dynDomain.GetVariableAdd(pFactory->normal_name);
+  sv->SetValue(GetRenderBuffer(pFactory->normal_name));
+  sv = dynDomain.GetVariableAdd(pFactory->tangent_name);
+  sv->SetValue(GetRenderBuffer(pFactory->tangent_name));
+  sv = dynDomain.GetVariableAdd(pFactory->binormal_name);
+  sv->SetValue(GetRenderBuffer(pFactory->binormal_name));
+  sv = dynDomain.GetVariableAdd(pFactory->texcors_name);
+  sv->SetValue(GetRenderBuffer(pFactory->texcors_name));
+  sv = dynDomain.GetVariableAdd(pFactory->color_name);
+  sv->SetValue(GetRenderBuffer(pFactory->color_name));
+  sv = dynDomain.GetVariableAdd(pFactory->index_name);
+  sv->SetValue(GetRenderBuffer(pFactory->index_name));
+}
+
 void csChunkLodTerrainFactory::MeshTreeNode::InitBuffer (const Data& d, int p)
 {
   vertices.Push(d.pos); vertices.Push(d.pos);
@@ -879,7 +899,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     meshes[len].material = matwrap;
     meshes[len].z_buf_mode = CS_ZBUF_TEST;
     meshes[len].mixmode = CS_FX_COPY;
-    meshes[len].buffersource = node;
+    node->UpdateBufferSV();
+    meshes[len].dynDomain = &node->dynDomain;
     meshes[len].indexstart = 0;
     meshes[len].indexend = node->Count ();
     meshes[len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -901,7 +922,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
         palette_meshes[i][len].material = palette[i];
         palette_meshes[i][len].z_buf_mode = CS_ZBUF_TEST;
         palette_meshes[i][len].mixmode = CS_FX_COPY;
-        palette_meshes[i][len].buffersource = node;
+        node->UpdateBufferSV();
+        palette_meshes[i][len].dynDomain = &node->dynDomain;
         palette_meshes[i][len].indexstart = 0;
         palette_meshes[i][len].indexend = node->Count ();
         palette_meshes[i][len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -955,7 +977,8 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n)
     // pass back root node as default always
     meshes.GetExtend(0).z_buf_mode = CS_ZBUF_TEST;
     meshes[0].mixmode = CS_FX_COPY;
-    meshes[0].buffersource = pFactory->root;
+    pFactory->root->UpdateBufferSV ();
+    meshes[0].dynDomain = &pFactory->root->dynDomain;
     meshes[0].indexstart = 0;
     meshes[0].indexend = pFactory->root->Count ();
     meshes[0].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -1024,13 +1047,13 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
 	"crystalspace.renderer.stringset", iStringSet);
   csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
   csRef<csShaderVariable> splat_var = 
-    pFactory->shmgr->CreateVariable (strings->Request ("splat map scale"));
+    new csShaderVariable (strings->Request ("splat map scale"));
   splat_var->SetType (csShaderVariable::VECTOR2);
   splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
   matwrap->GetMaterial()->AddVariable (splat_var);
 
   csRef<csShaderVariable> lod_var = 
-    pFactory->shmgr->CreateVariable (strings->Request ("texture lod distance"));
+    new csShaderVariable (strings->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   matwrap->GetMaterial()->AddVariable (lod_var);
@@ -1055,19 +1078,19 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, CS_TEXTURE_2D);
     csRef<csShaderVariable> var = 
-      pFactory->shmgr->CreateVariable (strings->Request ("splat alpha map"));
+      new csShaderVariable (strings->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     palette[i]->GetMaterial()->AddVariable (var);
     csRef<csShaderVariable> splat_var = 
-      pFactory->shmgr->CreateVariable (strings->Request ("splat map scale"));
+      new csShaderVariable (strings->Request ("splat map scale"));
     splat_var->SetType (csShaderVariable::VECTOR2);
     splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
     matwrap->GetMaterial()->AddVariable (splat_var);
     palette[i]->GetMaterial()->AddVariable (splat_var);
 
     csRef<csShaderVariable> lod_var = 
-      pFactory->shmgr->CreateVariable (strings->Request ("texture lod distance"));
+      new csShaderVariable (strings->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     matwrap->GetMaterial()->AddVariable (lod_var);

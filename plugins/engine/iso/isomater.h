@@ -129,7 +129,7 @@ public:
   virtual void AddVariable (csShaderVariable *variable) {}
   virtual csShaderVariable* GetVariable (csStringID name) const { return 0; }
   virtual csShaderVariable* GetVariableRecursive (csStringID name) const { return 0; }
-  virtual void FillVariableList (csShaderVariableList *list) const {};
+  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const {return 0; }
 };
 
 /**

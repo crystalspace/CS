@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+09-Dec-2003
+	- Marten fixed stencil shadow renderloop plugin.
+	- Marten fixed so CLOD and ballmesh compiles, not tested yet though.
+	- Marten made isoengine compile.
 05-Dec-2003
 	- res fixed more stuff. r3dtest works now, tho no stencil shadows yet.
 03-Dec-2003
