@@ -1,6 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+20-Feb-2001
+	- Norman Kramer cleaned up the unresolved instances for meshes,
+	  loaders and factories.
+	- Norman switched the X11 canvases to iConfigManager.
 19-Feb-2001
+	- Norman Kramer changed all csSector::GetNumberXxx() to GetNumXxx().
 	- Martin Geisse modified the system driver to use the config
 	  manager as its main config object. Currently the manager uses
 	  the application config as its dynamic config, but no other
