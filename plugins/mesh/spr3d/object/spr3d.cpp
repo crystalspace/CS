@@ -1533,6 +1533,20 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   }
 }
 
+bool csSprite3DMeshObject::HitBeamBBox (const csVector3& start,
+	const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
+bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,
+	const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
 bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {

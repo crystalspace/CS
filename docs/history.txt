@@ -22,6 +22,15 @@ The history order is reversed so that new features are at the top.
 	  memory management with that type of callback. With SCF callbacks
 	  reference counting is used which is a lot cleaner.
 	- Wouter Wijngaards fixed another bug in iso engine.
+	- Added iMeshObject::HitBeamBBox() and iMeshObject::HitBeamOutline().
+	  Those are supposed to be faster versions of HitBeamObject().
+	  HitBeamBBox() will only test against the bounding box.
+	  HitBeamObject() will test correctly with object but will not
+	  return the exact place the hit occured. HitBeamObject() is
+	  (supposed to be) exact. Currently all mesh objects simply
+	  call HitBeamObject() for HitBeamBBox() and HitBeamOutline().
+	  More optimal versions will be made later.
+	- Also added these functions to iMeshWrapper.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the

@@ -415,6 +415,20 @@ void csSurfMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
+bool csSurfMeshObject::HitBeamBBox (const csVector3& start,
+  const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
+bool csSurfMeshObject::HitBeamOutline (const csVector3& start,
+  const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
 bool csSurfMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {

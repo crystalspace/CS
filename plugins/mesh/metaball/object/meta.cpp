@@ -320,6 +320,18 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
   cbox = camera_bbox;
 }
 
+bool csMetaBall::HitBeamBBox (const csVector3& start, const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
+bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
 bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   csVector3& isect, float *pr)
 {

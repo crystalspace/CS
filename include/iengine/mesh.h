@@ -110,7 +110,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 0, 14);
+SCF_VERSION (iMeshWrapper, 0, 0, 15);
 
 /**
  * This interface corresponds to the object in the engine
@@ -153,6 +153,19 @@ struct iMeshWrapper : public iBase
    * correctly updated.
    */
   virtual iMovable* GetMovable () const = 0;
+
+  /**
+   * Check if this object is hit by this object space vector.
+   * Bounding box check.
+   */
+  virtual bool HitBeamBBox (const csVector3& start, const csVector3& end) = 0;
+
+  /**
+   * Check if this object is hit by this object space vector.
+   * Outline check.
+   */
+  virtual bool HitBeamOutline (const csVector3& start,
+  	const csVector3& end) = 0;
 
   /**
    * Check if this object is hit by this object space vector.

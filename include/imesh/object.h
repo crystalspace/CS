@@ -82,7 +82,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 0, 17);
+SCF_VERSION (iMeshObject, 0, 0, 18);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -187,7 +187,29 @@ struct iMeshObject : public iBase
 
   /**
    * Check if this mesh is hit by this object space vector.
+   * This will do a rough but fast test based on bounding box only.
+   * So this means that it might return a hit even though the object
+   * isn't really hit at all. Depends on how much the bounding box
+   * overestimates the object.
+   */
+  virtual bool HitBeamBBox (const csVector3& start, const csVector3& end) = 0;
+
+  /**
+   * Check if this mesh is hit by this object space vector.
+   * This will do a test based on the outline of the object. This means
+   * that it is more accurate than HitBeamBBox() but it will not return
+   * detailed information like HitBeamObject(). Note that this routine
+   * will typically be faster than HitBeamObject().
+   */
+  virtual bool HitBeamOutline (const csVector3& start,
+  	const csVector3& end) = 0;
+
+  /**
+   * Check if this mesh is hit by this object space vector.
    * Return the collision point in object space coordinates.
+   * This is the most detailed version (and also the slowest). The
+   * returned hit will be guaranteed to be the point closest to the
+   * 'start' of the beam.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr) = 0;

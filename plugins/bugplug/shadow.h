@@ -120,6 +120,10 @@ public:
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual bool HitBeamBBox (const csVector3&, const csVector3&)
+  { return false; }
+  virtual bool HitBeamOutline (const csVector3&, const csVector3&)
+  { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return 1; }

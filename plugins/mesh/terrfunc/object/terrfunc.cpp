@@ -1380,6 +1380,20 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
 // are encompassed by an overall bounding box. 
 //
 
+bool csTerrFuncObject::HitBeamBBox (const csVector3& start,
+	const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
+bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
+	const csVector3& end)
+{
+  csVector3 isect;
+  return HitBeamObject (start, end, isect, NULL);
+}
+
 bool csTerrFuncObject::HitBeamObject (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {

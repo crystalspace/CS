@@ -291,6 +291,18 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 }
 
 
+bool csMeshWrapper::HitBeamBBox (const csVector3& start,
+  const csVector3& end)
+{
+  return mesh->HitBeamBBox (start, end);
+}
+
+bool csMeshWrapper::HitBeamOutline (const csVector3& start,
+  const csVector3& end)
+{
+  return mesh->HitBeamOutline (start, end);
+}
+
 bool csMeshWrapper::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {

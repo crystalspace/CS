@@ -250,6 +250,10 @@ public:
     Update (elaps);
   }
   virtual bool WantToDie () const { return to_delete; }
+  virtual bool HitBeamBBox (const csVector3&, const csVector3&)
+  { return false; }
+  virtual bool HitBeamOutline (const csVector3&, const csVector3&)
+  { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
