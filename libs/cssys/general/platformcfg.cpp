@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank RIchter
+	      (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
