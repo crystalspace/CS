@@ -39,6 +39,10 @@ The history order is reversed so that new features are at the top.
 	  to check if a lightmap needs recalculating. Saves some memory and
 	  is also faster to check.
 	- Fixed python plugin for latest changes. Also fixed css.h.
+	- res made the following changes to the Hammer FGD file:
+	    * some "Under Development" stuff was commented out
+	    * some things that are uncertain to work were commented out
+	    * added some convenience stuff, mostly choices for 0/1 integers
 4-Mar-2003
         - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
           a long sector name it was often cut off.  

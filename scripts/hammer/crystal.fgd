@@ -1,6 +1,6 @@
 //
 // CrystalSpace game definition file (.fgd) 
-// for Worldcraft 3.3
+// for Worldcraft 3.3 & Valve Hammer 3.4 & possibly newer
 //
 // Copyright (C) 2003 Leandro Ezequiel Lovisolo <lovisolo@datafull.com>
 //
@@ -22,8 +22,9 @@
 
 @SolidClass = worldspawn : "World entity"
 [
-	skydome(string) : "Skydome texture"
-	skydomeradius(integer) : "Skydome radius (default 800)" : 800
+// @@@ needs checking
+//	skydome(string) : "Skydome texture"
+//	skydomeradius(integer) : "Skydome radius (default 800)" : 800
 	skybox(string) : "Skybox texture"
 	skyboxsize(integer) : "Skybox size (the lenght of a side, default 1600)" : 1600
 ]
@@ -33,18 +34,26 @@
 @SolidClass = cs_sector : "Crystal Space sector brush"
 [
 	cs_name(string) : "Sector name"
-	lighting(integer) : "Lighting" : 1
-	mipmap(integer) : "Use mipmaps" : 0
-	cs_collection(string) : "Under development"
+	lighting(choices) : "Lighting" : 1 =
+	[
+		1 : "On"
+		0 : "Off"
+	]
+	mipmap(choices) : "Use mipmaps" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+//	cs_collection(string) : "Under development"
 ]
 
 
-
-@SolidClass = cs_sky : "Crystal Space sky brush"
-[
-	cs_name(string) : "This key must be set to cs_skysector"
-	sky(integer) : "Portal to sky" : 0
-]
+// @@@ auto-generated
+//@SolidClass = cs_sky : "Crystal Space sky brush"
+//[
+//	cs_name(string) : "This key must be set to cs_skysector"
+//	sky(integer) : "Portal to sky" : 0
+//]
 
 
 
@@ -52,25 +61,54 @@
 [
 	cs_name(string) : "Thing name"
 	alpha(integer) : "Transparency" : 100
-	mirror(integer) : "Mirror effect" : 0
-	solid(integer) : "if set to 0, a portal is created for every side of the entity to the given targetsector" : 1
+	mirror(choices) : "Mirror effect" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	solid(integer) : "if set to ´No, a portal is created for every side of the entity to the given targetsector" : 1 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
 	targetsector(string) : "Combine it with solid key"
 	trigger(string) : "Trigger a script event"
-	moveable(integer) : "If thing is to be activated by a script, it must be moveable" : 0
+	moveable(choices) : "If thing is to be activated by a script, it must be moveable" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
 	activate(string) : "`cs_name´ of script specified in Classname cs_script that must be used to animate the thing"
-	lighting(integer) : "Lighting" : 1
-	mipmap(integer) : "Use mipmaps" : 0
-	sky(integer) : "Act as portal to sky" : 0
-	cs_collection(string) : "Under development"
+	lighting(choices) : "Lighting" : 1 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	// @@@ still supported?
+	mipmap(choices) : "Use mipmaps" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	sky(choices) : "Act as portal to sky" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+//	cs_collection(string) : "Under development"
 ]
 
 
 
-@PointClass = light : "Crystal space light entity"
+@PointClass iconsprite("sprites/lightbulb.spr") = light : "Crystal space light entity"
 [
 	cs_name(string) : "Light name"
-	light(string) : "Red, green, blue and intensity values for the light (i.e. 255 255 255 20)" : "255 255 255 20"
-	dynamic(integer) : "Dynamic light" : 0
+	_light(color255) : "Red, green, blue and intensity values for the light (i.e. 255 255 255 20)" : "255 255 255 20"
+	dynamic(choices) : "Dynamic light" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
 	halo(string) : "Halo (value intensity cross)" : "0 0 0"
 	attenuation(choices): "Attenuation type" : 0 =
 	[
@@ -79,7 +117,7 @@
 		2 : "inverse"
 		3 : "realistic"
 	]
-	cs_collection(string) : "Under development"
+//	cs_collection(string) : "Under development"
 ]
 
 
@@ -142,34 +180,34 @@
 
 
 
-@PointClass = cs_collection : "Under development. Will be used to create functional groups for trigger events"
-[
-	cs_name(string) : "Collection name"
-	cs_collection(string) : "Parent cs_collection"
-	collitem1(string) : "First member of the cs_collection; add more as needed"
-]
+//@PointClass = cs_collection : "Under development. Will be used to create functional groups for trigger events"
+//[
+//	cs_name(string) : "Collection name"
+//	cs_collection(string) : "Parent cs_collection"
+//	collitem1(string) : "First member of the cs_collection; add more as needed"
+//]
 
 
 
-@PointClass = cs_script : "Crystal Space script entity"
-[
-	script_cmdfile(string) : "Script filename" : "csscript.txt"
-	cs_name(choices) : "Script name" : 1 =
-	[
-		0 : "message"
-		1 : "rotate_x"
-		2 : "rotate_y"
-		3 : "rotate_z"
-		4 : "rotate_xr"
-		5 : "rotate_yr"
-		6 : "rotate_zr"
-		7 : "rotate_ym"
-		8 : "rotate_xyz"
-		9 : "opendoor"
-		10 : "moveBackAndForth"
-		11 : "light1"
-		12 : "light2"
-		13 : "light3"
-		14 : "light_anim"
-	]
-]
+//@PointClass = cs_script : "Crystal Space script entity"
+//[
+//	script_cmdfile(string) : "Script filename" : "csscript.txt"
+//	cs_name(choices) : "Script name" : 1 =
+//	[
+//		0 : "message"
+//		1 : "rotate_x"
+//		2 : "rotate_y"
+//		3 : "rotate_z"
+//		4 : "rotate_xr"
+//		5 : "rotate_yr"
+//		6 : "rotate_zr"
+//		7 : "rotate_ym"
+//		8 : "rotate_xyz"
+//		9 : "opendoor"
+//		10 : "moveBackAndForth"
+//		11 : "light1"
+//		12 : "light2"
+//		13 : "light3"
+//		14 : "light_anim"
+//	]
+//]
