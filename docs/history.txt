@@ -17,6 +17,8 @@ The history order is reversed so that new features are at the top.
 	  (using -minsize option which defaults to 20%) into smaller
 	  objects (i.e. it will divide them in 8 sub-objects).
 	- Fixed levtool so it only operates on non-movable things.
+	- New Schema from Javier Santos. Is now able to validate flarge
+	  and partsys fully. Not finished yet.
 5-Dec-2002
 	- 'levtool' will now split all parts in seperate units. A unit
 	  is defined as a set of polygons that are connected and that
