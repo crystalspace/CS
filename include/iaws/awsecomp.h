@@ -302,7 +302,7 @@ public:
 
     /// Get's the component below this one, NULL if there is none.
     virtual iAwsComponent *ComponentBelow()
-    { return comp->ComponentAbove(); }
+    { return comp->ComponentBelow(); }
 
     /// Set's the component above this one
     virtual void SetComponentAbove(iAwsComponent *comp)
