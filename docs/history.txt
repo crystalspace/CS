@@ -49,6 +49,7 @@ The history order is reversed so that new features are at the top.
 	- InitializeCollisionWrapper() will now actually check if the parent
 	  factory supports GetObjectModel() and if so it will share the
 	  collider.
+	- Thing now implements GetObjectModel() in the factory.
 13-Apr-2003
 	- Wouter fixed mikmod sound loader, delete[]/realloc mismatch.
 	- Matze cleaned some jamrules.

@@ -180,6 +180,9 @@ public:
    */
   uint32 static_data_nr;
 
+  /// Object model listeners.
+  csRefArray<iObjectModelListener> listeners;
+
   /**
    * This field describes how the light hitting polygons of this thing is
    * affected by the angle by which the beam hits the polygon. If this value is
@@ -215,7 +218,7 @@ public:
   /**
    * Called if static data in some polygon has changed.
    */
-  void StaticDataChanged () { static_data_nr++; }
+  void StaticDataChanged ();
 
   /**
    * Get the static data number.
@@ -340,6 +343,9 @@ public:
   virtual float GetCosinusFactor () const { return cosinus_factor; }
   virtual void SetCosinusFactor (float c) { cosinus_factor = c; }
 
+  void FireListeners ();
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
   //-------------------- iMeshObjectFactory interface implementation ---------
 
@@ -348,7 +354,59 @@ public:
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-  virtual iObjectModel* GetObjectModel () { return NULL; }
+
+  //-------------------- iPolygonMesh interface implementation ---------------
+  struct PolyMesh : public PolyMeshHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
+    PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) { }
+  } scfiPolygonMesh;
+
+  //------------------- Lower detail iPolygonMesh implementation ---------------
+  struct PolyMeshLOD : public PolyMeshHelper
+  {
+    PolyMeshLOD ();
+    // @@@ Not embedded because we can't have two iPolygonMesh implementations
+    // in csThing.
+    SCF_DECLARE_IBASE;
+  } scfiPolygonMeshLOD;
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
+    virtual long GetShapeNumber () const { return scfParent->static_data_nr; }
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
+    virtual iPolygonMesh* GetPolygonMeshViscull ()
+    {
+      return &(scfParent->scfiPolygonMeshLOD);
+    }
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
+    { return 0; }
+    virtual void GetObjectBoundingBox (csBox3& bbox,
+    	int /*type = CS_BBOX_NORMAL*/)
+    {
+      scfParent->GetBoundingBox (bbox);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
 
@@ -398,8 +456,6 @@ private:
 
   /// Shape number.
   long shapenr;
-  /// Object model listeners.
-  csRefArray<iObjectModelListener> listeners;
 
   /**
    * This number indicates the last value of the movable number.
@@ -615,10 +671,6 @@ public:
   /// Query parent template.
   csThing *GetTemplate () const
   { return ParentTemplate; }
-
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   /// Find the real material to use if it was replaced (or NULL if not).
   iMaterialWrapper* FindRealMaterial (iMaterialWrapper* old_mat);
@@ -902,41 +954,6 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull ()
-    {
-      return &(scfParent->scfiPolygonMeshLOD);
-    }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return 0; }
-    virtual void GetObjectBoundingBox (csBox3& bbox,
-    	int /*type = CS_BBOX_NORMAL*/)
-    {
-      scfParent->static_data->GetBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->static_data->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
   {
@@ -996,7 +1013,7 @@ public:
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
     virtual iObjectModel* GetObjectModel ()
     {
-      return &(scfParent->scfiObjectModel);
+      return scfParent->static_data->GetObjectModel ();
     }
     virtual bool SetColor (const csColor&) { return false; }
     virtual bool GetColor (csColor&) const { return false; }

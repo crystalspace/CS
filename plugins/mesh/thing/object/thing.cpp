@@ -68,7 +68,6 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
@@ -81,10 +80,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
   SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::PolyMesh)
@@ -110,14 +105,29 @@ int csThing:: last_thing_id = 0;
 SCF_IMPLEMENT_IBASE(csThingStatic)
   SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 	: static_polygons (32, 64)
 {
   SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
+
+  scfiPolygonMesh.SetThing (this);
+  scfiPolygonMeshLOD.SetThing (this);
 
   max_vertices = num_vertices = 0;
   obj_verts = NULL;
@@ -735,14 +745,50 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
+void csThingStatic::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
+void csThingStatic::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csThingStatic::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
+void csThingStatic::StaticDataChanged ()
+{
+  static_data_nr++;
+  FireListeners ();
+}
+
 //----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csThingStatic::PolyMeshLOD)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+csThingStatic::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+//-------------------------------------------------------------------------
 
 csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
@@ -1080,8 +1126,6 @@ void csThing::Prepare ()
     p->RefreshFromStaticData ();
     p->Finish ();
   }
-
-  FireListeners ();
 }
 
 iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
@@ -1137,7 +1181,7 @@ void csThing::InvalidateThing ()
 
   shapenr++;
   delete [] static_data->obj_normals; static_data->obj_normals = NULL;
-  FireListeners ();
+  static_data->StaticDataChanged ();
 }
 
 iPolygonMesh* csThing::GetWriteObject ()
@@ -1682,26 +1726,6 @@ void PolyMeshHelper::Cleanup ()
 }
 
 //-------------------------------------------------------------------------
-
-void csThing::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csThing::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csThing::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
 
 bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 {
