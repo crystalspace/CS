@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '24';
+my $PROG_VERSION = '25';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -200,7 +200,7 @@ $ENV{'MSVC_QUIET'} = 'yes';
 # server, under the assumption that the huge file size is what is triggering
 # the server to drop the connection.  Enabling compression seems to side-step
 # the problem.
-my $CVSFLAGS = '-z6';
+my $CVSFLAGS = '-z9';
 
 my $PROJECT_ROOT = 'CS';
 my $CVSUSER = 'sunshine';

@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Nov-2003
+	- res fixed some visual glitches with 2D graphics on NR GL by adding 
+	  some code to choose the default texture unit and turning off alpha 
+	  test when entering 2D mode.
+	- Eric Sunshine continued working around SourceForge CVS server
+	  brokenness with regards to jobber.pl.  Specifically, the SourceForge
+	  CVS server is so mis-configured that it drops the connection any time
+	  the large Swig-generated CS/scripts/perl5/cswigpl5.inc is committed
+	  to the repository even though this script is running on a local
+	  SourceForge machine.  To work around the problem, we enable
+	  compression in order send less information to the CVS server, under
+	  the assumption that the huge file size is what is triggering the
+	  server to drop the connection.  Using -z6 resulted in some success,
+	  but it still dropped the connection at times, so now it is being
+	  bumped up to -z9.
 12-Nov-2003
 	- Eric Sunshine removed redundant SubDir invocation from
 	  cspython/Jamfile.
@@ -42,9 +57,6 @@ chronological order.
 	- res fixed misinterpretion of the 'flags' TGA header field.
 	- res removed some leftover comments from
 	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
-	- res fixed some visual glitches with 2D graphics on NR GL by adding 
-	  some code to choose the default texture unit and turning off alpha 
-	  test when entering 2D mode.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate
