@@ -157,6 +157,9 @@ public:
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
 };
 
 

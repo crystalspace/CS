@@ -43,7 +43,7 @@ private:
   csRef<iShaderProgram> pswrap;
 public:
   csShaderGLCGFP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug) { }
+    csShaderGLCGCommon (shaderPlug, "cgfp") { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();
@@ -60,6 +60,8 @@ public:
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+
+  virtual int ResolveTextureBinding (const char* binding);
 };
 
 

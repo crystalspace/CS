@@ -45,7 +45,7 @@ class csShaderGLCGVP : public csShaderGLCGCommon
   csRef<iShaderProgram> override;
 public:
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug) { }
+    csShaderGLCGCommon (shaderPlug, "cgvp") { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();

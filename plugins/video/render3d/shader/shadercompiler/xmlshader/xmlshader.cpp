@@ -479,9 +479,9 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
   {
     csRef<iDocumentNode> mapping = it->Next ();
     if (mapping->GetType() != CS_NODE_ELEMENT) continue;
-    if (mapping->GetAttribute("name") && mapping->GetAttribute("destination"))
+    const char* dest = mapping->GetAttributeValue ("destination");
+    if (mapping->GetAttribute("name") && dest)
     {
-      const char* dest = mapping->GetAttributeValue ("destination");
       char unitName[8];
       int i;
       int texUnit = -1;
@@ -494,6 +494,10 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 	  break;
 	}
       }
+
+      if ((texUnit < 0) && pass->fp)
+	texUnit = pass->fp->ResolveTextureBinding (dest);
+
       if (texUnit < 0) continue;
       csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;

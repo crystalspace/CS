@@ -148,3 +148,21 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   return true;
 }
+
+int csShaderGLCGFP::ResolveTextureBinding (const char* binding)
+{
+  int newTU = -1;
+  if (program)
+  {
+    CGparameter parameter = cgGetNamedParameter (program, binding);
+    if (parameter)
+    {
+      if (cgGetParameterBaseResource (parameter) == CG_TEXUNIT0)
+      {
+	newTU = cgGetParameterResourceIndex (parameter);
+      }
+    }
+  }
+
+  return newTU;
+}

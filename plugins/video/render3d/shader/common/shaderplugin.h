@@ -32,7 +32,7 @@ struct csShaderVarMapping
     : name(n), destination(d) {}
 };
 
-SCF_VERSION(iShaderProgram, 0,2,0);
+SCF_VERSION(iShaderProgram, 0, 2, 1);
 /**
  * A helper for shaders that which to use the general plugins.
  * This is the main program plugin interface
@@ -61,6 +61,12 @@ struct iShaderProgram : public iBase
 
   /// Compile a program
   virtual bool Compile (csArray<iShaderVariableContext*> &staticDomains) = 0;
+  
+  /**
+   * When the destination of a texture binding wasn't recognized, the FP
+   * is asked whether it can provide a TU number for it.
+   */
+  virtual int ResolveTextureBinding (const char* binding) = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin,0,1,0);

@@ -40,8 +40,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
-csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug) :
-  csShaderProgram (shaderPlug->object_reg)
+csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
+					const char* type) :
+  csShaderProgram (shaderPlug->object_reg), programType (type)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -205,7 +206,7 @@ bool csShaderGLCGCommon::Load(iDocumentNode* program)
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	shaderPlug->object_reg, iShaderManager);
 
-  csRef<iDocumentNode> variablesnode = program->GetNode("cgvp");
+  csRef<iDocumentNode> variablesnode = program->GetNode (programType);
   if(variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();

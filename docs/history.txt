@@ -26,6 +26,12 @@ chronological order.
 	  non-deletion of the contained csRenderMesh*es.
 	- res fixed csParticleSystem to disable render mesh deletion in the 
 	  holder.
+	- res added a facility to allow shader programs to resolve a texture
+	  binding destination in shaders. This way you can have 'custom' names
+	  for TUs.
+	- res augmented the Cg shader plugin to resolve texture bindings that
+	  are named like a program parameter.
+	- res added a simple vertex lighting shader utilizing Cg.
 2-Apr-2004
 	- res made the following changes:
 	    - Replaced the CS_SHADERVAR_STACK #define with a csShaderVarStack

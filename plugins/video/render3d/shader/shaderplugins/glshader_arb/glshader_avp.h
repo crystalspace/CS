@@ -52,7 +52,7 @@ public:
   {
   }
 
-  bool LoadProgramStringToGL(/* const char* programstring */);
+  bool LoadProgramStringToGL ();
 
   void SetValid(bool val) { validProgram = val; }
 
@@ -85,6 +85,9 @@ public:
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
 };
 
 

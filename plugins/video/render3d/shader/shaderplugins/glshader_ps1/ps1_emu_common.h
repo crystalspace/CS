@@ -78,6 +78,9 @@ public:
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains);
+
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
 };
 
 #endif //__GLSHADER_PS1_COMMON_H__

@@ -48,10 +48,12 @@ protected:
 
   bool validProgram;
 
+  const char* programType;
+
   bool DefaultLoadProgram (const char* programStr, CGGLenum type,
     csArray<iShaderVariableContext*> &staticContexts);
 public:
-  csShaderGLCGCommon (csGLShader_CG* shaderPlug);
+  csShaderGLCGCommon (csGLShader_CG* shaderPlug, const char* type);
   virtual ~csShaderGLCGCommon ();
 
   void SetValid(bool val) { validProgram = val; }
@@ -83,11 +85,8 @@ public:
   virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings)
   { return false; }
 
-  /**
-   * Prepares the shaderprogram for usage. Must be called before the shader
-   * is assigned to a material.
-   */
-  //virtual bool Prepare(iShaderPass *pass);
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
 };
 
 
