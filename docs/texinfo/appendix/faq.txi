@@ -330,7 +330,7 @@ instance instead. You can get this instance with @code{mesh->GetMeshObject()}.
 I don't understand when I have to use @code{DecRef()} and when not. Can
 you explain this reference counting to me?
 
-@strong{A}: Reference counting keeps track of how many times
+@strong{A1}: Reference counting keeps track of how many times
 the object is referenced throughout the system. The owner of a reference
 is also responsible for cleaning up that reference later. You are not
 responsible for cleaning up references owned by other modules (like the
@@ -372,7 +372,7 @@ iThingState* st =
   SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
 if (st)
 @{
-  st->blabla...;
+  st->blabla @dots{};
   st->DecRef ();
 @}
 @end example
@@ -380,4 +380,54 @@ if (st)
 In other cases you can store the pointer in a global class (your application
 class) and call @code{DecRef()} just before the application exits.
 
+@strong{A2}: In recent versions of Crystal Space we now have a new
+@code{csRef} class which implements a kind of smart pointer. Smart pointers
+make it easier for you to keep track of references. They will automatically
+@code{DecRef()} when they are ready. Here is an example of their usage:
+@example
+csRef<iThingState> st;
+st.Take (SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState));
+if (st)
+@{
+  st->blabla @dots{};
+@}
+@end example
+
+If you compare this to the last example in answer one you can see that
+the code is roughly the same. You can use the @samp{st} variable just like
+you would use the normal @code{iThingState} reference. The only difference
+is that you don't have to take care of calling @code{DecRef}.
+
+Note that the @code{Take()} function is important. This is a function
+of @code{csRef} that is designed so that you can transfer a reference
+that has already been increffed to a smart pointers. This is mainly useful
+now because the current API of CS doesn't yet return smart pointers.
+
+@item
+My objects are rendered incorrectly. It seems as if parts of it sometimes
+appear and sometimes disappear.
+
+@strong{A}: Incorrect rendering of objects can be caused by bugs but there
+is one common cause of this problem which is Z-buffer related. It is important
+to realize that Crystal Space does NOT clear the Z-buffer every frame (nor
+does it clear the screen). By default Crystal Space depends on the geometry
+itself to clear the Z-buffer. For example, if you have a room with a single
+object in it then you should use @samp{ZFILL} mode for the room polygons
+(so that the Z-buffer will be filled but not read) and @samp{ZUSE} for
+the object (so that the Z-buffer will be both updated and read).
+
+In many cases levels are closed (meaning that there is some exterior object
+which blocks the view into infinity). If you have such a convex closed
+object at the boundary of your level you can use @samp{ZFILL} for that.
+However, there are occasions when this is not possible. Either because there
+is no exterior object, the exterior object is not closed, or the exterior
+object is not convex. In that case you better use @samp{ZUSE} for all objects
+and enable Z-clearing every frame. In world files you can do this by
+using the @samp{settings} block and enabling the @samp{clearzbuf} option.
+
+Note that you should use @code{engine->GetBeginDrawFlags()} in your
+call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
+actually work (in fact you should @em{always} use @code{GetBeginDrawFlags()}).
+
 @end itemize
+

@@ -33,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	- Csparser no longer reports error that it cannot load a mesh object
 	  factory or mesh object. It is assumed that the mesh object loader
 	  will have reported its own error already.
+	- Added mention of csRef to the faq.
+	- Added explanation to faq of how Z-buffer initialization works in CS.
 20-Aug-2002
 	- Implemented XML version of the spr2d mesh object loader.
 	- Added new ParseBox() in syntax services (for XML).
