@@ -49,6 +49,7 @@ enum
   XMLTOKEN_FACTORY,
   XMLTOKEN_MATERIALPALETTE,
   XMLTOKEN_MATERIALMAP,
+  XMLTOKEN_LODDISTANCE,
   XMLTOKEN_ERRORTOLERANCE
 };
 
@@ -262,6 +263,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("materialpalette", XMLTOKEN_MATERIALPALETTE);
   xmltokens.Register ("materialmap", XMLTOKEN_MATERIALMAP);
+  xmltokens.Register ("loddistance", XMLTOKEN_LODDISTANCE);
   xmltokens.Register ("errortolerance", XMLTOKEN_ERRORTOLERANCE);
   return true;
 }
@@ -376,6 +378,12 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
           return 0;
         }
         break;
+      }
+      case XMLTOKEN_LODDISTANCE:
+      {
+        float dist = child->GetContentsValueAsFloat ();
+	state->SetLODDistance (dist);
+	break;
       }
       case XMLTOKEN_ERRORTOLERANCE:
       {

@@ -41,8 +41,9 @@
 #include "csutil/util.h"
 
 #include "chunklod.h"
+#include <limits.h>
 
-#define MIN_TERRAIN 33
+#define MIN_TERRAIN 129
 
 CS_IMPLEMENT_PLUGIN
 
@@ -104,11 +105,17 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
 	CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
 	"crystalspace.renderer.stringset", iStringSet);
   vertex_name = strings->Request ("vertices");
+  compressed_vertex_name = strings->Request ("compressed vertices");
   texcors_name = strings->Request ("texture coordinates");
+  compressed_texcors_name = strings->Request ("compressed texture coordinates");
   normal_name = strings->Request ("normals");
+  compressed_normal_name = strings->Request ("compressed normals");
   tangent_name = strings->Request ("tangents");
+  compressed_tangent_name = strings->Request ("compressed tangents");
   binormal_name = strings->Request ("binormals");
+  compressed_binormal_name = strings->Request ("compressed binormals");
   color_name = strings->Request ("colors");
+  compressed_color_name = strings->Request ("compressed colors");
   index_name = strings->Request ("indices");
 }
 
@@ -217,7 +224,7 @@ bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data, int w, 
 
       datamap[pos].pos.x = (i - (w>>1)) * scale.x;
       datamap[pos].pos.y = data[pos] * scale.y;
-      datamap[pos].pos.z = ((w>>1) - j) * scale.z;
+      datamap[pos].pos.z = ((h>>1) - j) * scale.z;
 
       float up = (j-1 < 0) ? data[pos] : data[pos-w];
       float dn = (j+1 >= w) ? data[pos] : data[pos+w];
@@ -304,6 +311,23 @@ bool csChunkLodTerrainFactory::RestoreState (const char *filename)
   return false;
 }
 
+csVector3 csChunkLodTerrainFactory::CollisionDetect (const csVector3 &p)
+{
+  int i = (int)(p.x / scale.x + (hm_x >> 1));
+  float i_delta = p.x / scale.x + (hm_x >> 1) - i;
+  int j = (int)(-p.z / scale.z + (hm_y >> 1));
+  float j_delta =  -p.z / scale.z + (hm_y >> 1) - j;
+  if (i < 0 || i >= hm_x-1 || j < 0 || j >= hm_y-1) 
+    return p;
+
+  float d1 = datamap[i+j*hm_x].pos.y * (1.0-i_delta) + 
+             datamap[(i+1)+j*hm_x].pos.y * i_delta;
+  float d2 = datamap[i+(j+1)*hm_x].pos.y * (1.0-i_delta) +
+             datamap[(i+1)+(j+1)*hm_x].pos.y * i_delta;
+  float d = d1 * (1.0 - j_delta) + d2 * j_delta + 2;
+  return csVector3 (p.x, (d > p.y) ? d : p.y, p.z);
+}
+
 SCF_IMPLEMENT_IBASE (csChunkLodTerrainFactory::MeshTreeNode)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
@@ -315,20 +339,38 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 
   pFactory = p;
   vertex_buffer = 0;
+  compressed_vertex_buffer = 0;
   normal_buffer = 0;
+  compressed_normal_buffer = 0;
+  tangent_buffer = 0;
+  compressed_tangent_buffer = 0;
+  binormal_buffer = 0;
+  compressed_binormal_buffer = 0;
   texcors_buffer = 0;
+  compressed_texcors_buffer = 0;
   color_buffer = 0;
+  compressed_color_buffer = 0;
   index_buffer = 0;
 
-  error = (e < 1) ? 0.0 : e;
+  error = (e < 1) ? 0.5 : e;
   int mid_w = w>>1, mid_h = h>>1;
-  radius = sqrt (mid_w*mid_w + mid_h*mid_h);
   int c = x+mid_w + (y+mid_w) * p->hm_x;
   center = p->datamap[c].pos;
   int sw = x + (y+h-1) * p->hm_x;
   int se = x+w-1 + (y+h-1) * p->hm_x;
   int ne = x+w-1 + y * p->hm_x;
   int nw = x + y * p->hm_x;
+
+  box.StartBoundingBox ();
+  for (int i = x; i < (x+w); i ++) {
+    for (int j = y; j < (y+h); j ++) {
+      box.AddBoundingVertex (p->datamap[i+j*p->hm_x].pos);
+    }
+  }
+
+  csVector3 radiusv = p->datamap[sw].pos - center;
+  radiusv.y = (box.MaxY() - box.MinY())/2;
+  radius = radiusv.Norm ();
 
   max_levels = 2 * csLog2(w) - 1;
   InitBuffer (p->datamap[sw], 0);
@@ -341,83 +383,84 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
   ProcessMap (0, c, nw, sw);
   AddVertex (p->datamap[sw], 1);
 
+  float eps = 0.00001;
   Data south, east, north, west;
-  south.pos = csVector3 (0,-error-1,0);
+  south.pos = csVector3 (0,-error-1,eps);
   south.norm = csVector3 (0,0,-1);
   south.tan = csVector3 (1,0,0);
   south.bin = csVector3 (0,-1,0);
   south.tex = csVector2 (0,error+1);
 
-  east.pos = csVector3 (0,-error-1,0);
+  east.pos = csVector3 (-eps,-error-1,0);
   east.norm = csVector3 (1,0,0);
   east.tan = csVector3 (0,0,1);
   east.bin = csVector3 (0,-1,0);
   east.tex = csVector2 (error+1,0);
 
-  north.pos = csVector3 (0,-error-1,0);
+  north.pos = csVector3 (0,-error-1,-eps);
   north.norm = csVector3 (0,0,-1);
   north.tan = csVector3 (-1,0,0);
   north.bin = csVector3 (0,-1,0);
   north.tex = csVector2 (0,-error-1);
 
-  west.pos = csVector3 (0,-error-1,0);
+  west.pos = csVector3 (eps,-error-1,0);
   west.norm = csVector3 (-1,0,0);
   west.tan = csVector3 (0,0,-1);
   west.bin = csVector3 (0,-1,0);
   west.tex = csVector2 (-error-1,0);
 
   Data southwest;
-  southwest.pos = csVector3 (0,-error-1,0);
+  southwest.pos = csVector3 (eps,-error-1,eps);
   southwest.norm = csVector3 (-.707,0,-.707);
   southwest.tan = csVector3 (.707,0,-.707);
   southwest.bin = csVector3 (0,-1,0);
   southwest.tex = csVector2 (-error-1,error+1);
-  AddEdgeVertex (p->datamap[sw]);
+  AddEdgeVertex (p->datamap[sw], southwest);
   AddSkirtVertex (p->datamap[sw], southwest);
 
   // bottom edge
   ProcessEdge (sw+1, se-1, 1, south);
 
   Data southeast;
-  southeast.pos = csVector3 (0,-error-1,0);
+  southeast.pos = csVector3 (-eps,-error-1,eps);
   southeast.norm = csVector3 (.707,0,-.707);
   southeast.tan = csVector3 (.707,0,.707);
   southeast.bin = csVector3 (0,-1,0);
   southeast.tex = csVector2 (error+1,error+1);
-  AddEdgeVertex (p->datamap[se]);
+  AddEdgeVertex (p->datamap[se], southeast);
   AddSkirtVertex (p->datamap[se], southeast);
 
   // right edge
   ProcessEdge (se-p->hm_x, ne+p->hm_x, -p->hm_x, east);
 
   Data northeast;
-  northeast.pos = csVector3 (0,-error-1,0);
+  northeast.pos = csVector3 (-eps,-error-1,-eps);
   northeast.norm = csVector3 (.707,0,.707);
   northeast.tan = csVector3 (-.707,0,.707);
   northeast.bin = csVector3 (0,-1,0);
   northeast.tex = csVector2 (error+1,-error-1);
-  AddEdgeVertex (p->datamap[ne]);
+  AddEdgeVertex (p->datamap[ne], northeast);
   AddSkirtVertex (p->datamap[ne], northeast);
 
   // top edge
   ProcessEdge (ne-1, nw+1, -1, north);
 
   Data northwest;
-  northwest.pos = csVector3 (0,-error-1,0);
+  northwest.pos = csVector3 (eps,-error-1,-eps);
   northwest.norm = csVector3 (-.707,0,.707);
   northwest.tan = csVector3 (-.707,0,-.707);
   northwest.bin = csVector3 (0,-1,0);
   northwest.tex = csVector2 (-error-1,-error-1);
-  AddEdgeVertex (p->datamap[nw]);
+  AddEdgeVertex (p->datamap[nw], northwest);
   AddSkirtVertex (p->datamap[nw], northwest);
 
   // left edge
   ProcessEdge (nw+p->hm_x, sw-p->hm_x, p->hm_x, west);
 
-  AddEdgeVertex (p->datamap[sw]);
+  AddEdgeVertex (p->datamap[sw], southwest);
   AddSkirtVertex (p->datamap[sw], southwest);
 
-  if (error > 0.0) {
+  if (error >= 1) {
     float new_error = error / 2.0;
     int new_w = mid_w + 1;
     int new_h = mid_h + 1;
@@ -431,7 +474,6 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
     children[2] = 0;
     children[3] = 0;
   }
-
 }
 
 csChunkLodTerrainFactory::MeshTreeNode::~MeshTreeNode ()
@@ -451,7 +493,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!vertex_buffer) 
     {
-      int len = vertices.Length();
+      unsigned int len = vertices.Length();
       vertex_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3, false);
@@ -461,11 +503,15 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return vertex_buffer;
   }
-  if (name == pFactory->normal_name) 
+  else if (name == pFactory->compressed_vertex_name)
+  {
+    return 0;
+  }
+  else if (name == pFactory->normal_name) 
   {
     if (!normal_buffer)
     {
-      int len = normals.Length();
+      unsigned int len = normals.Length();
       normal_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3, false);
@@ -476,11 +522,28 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return normal_buffer;
   }
-  if (name == pFactory->tangent_name) 
+  else if (name == pFactory->compressed_normal_name)
+  {
+    if (!compressed_normal_buffer)
+    {
+      unsigned int len = normals.Length();
+      compressed_normal_buffer = pFactory->r3d->CreateRenderBuffer (
+        sizeof (csVector2) * len, CS_BUF_STATIC,
+	CS_BUFCOMP_FLOAT, 2, false);
+      csVector2 *cnbuf = (csVector2*)compressed_normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+      for (unsigned int i = 0; i < len; i ++) {
+        cnbuf[i].x = normals[i].x;
+        cnbuf[i].y = normals[i].z;
+      }
+      compressed_normal_buffer->Release ();
+    }
+    return compressed_normal_buffer;
+  }
+  else if (name == pFactory->tangent_name) 
   {
     if (!tangent_buffer)
     {
-      int len = tangents.Length();
+      unsigned int len = tangents.Length();
       tangent_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3, false);
@@ -491,11 +554,15 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return tangent_buffer;
   }
-  if (name == pFactory->binormal_name) 
+  else if (name == pFactory->compressed_tangent_name)
+  {
+    return 0;
+  }
+  else if (name == pFactory->binormal_name) 
   {
     if (!binormal_buffer)
     {
-      int len = binormals.Length();
+      unsigned int len = binormals.Length();
       binormal_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3, false);
@@ -506,27 +573,64 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return binormal_buffer;
   }
-  if (name == pFactory->texcors_name) 
+  else if (name == pFactory->compressed_binormal_name)
+  {
+    return 0;
+  }
+  else if (name == pFactory->texcors_name) 
   {
     if (!texcors_buffer)
     {
-      int len = texcors.Length();
-      texcors_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csVector2) * len, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 2, false);
-
-      csVector2 *tbuf = (csVector2*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (tbuf, &texcors[0], len * sizeof (csVector2));
-      texcors_buffer->Release ();
-
+      unsigned int len = texcors.Length();
+/*
+      if (pFactory->hm_x < UCHAR_MAX && pFactory->hm_y < UCHAR_MAX) 
+      {
+        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (unsigned char)*2 * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_UNSIGNED_BYTE, 2, false);
+        unsigned char *tbuf = (unsigned char*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        for (int i = 0; i < len; i ++) 
+        {
+          tbuf[i*2+0] = (unsigned char)texcors[i].x;
+          tbuf[i*2+1] = (unsigned char)texcors[i].y;
+        }
+        texcors_buffer->Release ();
+      }
+      else if (pFactory->hm_x < USHRT_MAX && pFactory->hm_y < USHRT_MAX) 
+      {
+        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (unsigned short)*2 * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_UNSIGNED_SHORT, 2, false);
+        unsigned short *tbuf = (unsigned short*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        for (int i = 0; i < len; i ++) 
+        {
+          tbuf[i*2+0] = (unsigned short)texcors[i].x;
+          tbuf[i*2+1] = (unsigned short)texcors[i].y;
+        }
+        texcors_buffer->Release ();
+      }
+      else 
+*/
+      {
+        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (csVector2) * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_FLOAT, 2, false);
+        csVector2 *tbuf = (csVector2*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        memcpy (tbuf, &texcors[0], len * sizeof (csVector2));
+        texcors_buffer->Release ();
+      }	
     }
     return texcors_buffer;
   }
-  if (name == pFactory->color_name) 
+  else if (name == pFactory->compressed_texcors_name)
+  {
+    return 0;
+  }
+  else if (name == pFactory->color_name) 
   {
     if (!color_buffer)
     {
-      int len = colors.Length();
+      unsigned int len = colors.Length();
       color_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csColor) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3, false);
@@ -537,20 +641,48 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return color_buffer;
   }
-  if (name == pFactory->index_name) 
+  else if (name == pFactory->compressed_color_name)
+  {
+    return 0;
+  }
+  else if (name == pFactory->index_name) 
   {
     if (!index_buffer)
     {
-      int len = vertices.Length();
-      index_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (unsigned int) * len, CS_BUF_STATIC, 
-	CS_BUFCOMP_UNSIGNED_INT, 1, true);
-
-      unsigned int *ibuf = (unsigned int *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      for (int i = 0; i < len; i ++) {
-        ibuf[i] = i;
+      unsigned int len = vertices.Length();
+      if (len < UCHAR_MAX) 
+      {
+        index_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (unsigned char) * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_UNSIGNED_BYTE, 1, true);
+        unsigned char *ibuf = (unsigned char *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        for (unsigned char i = 0; i < len; i ++) {
+          ibuf[i] = i;
+        }
+        index_buffer->Release ();
+      } 
+      else if (len < USHRT_MAX)  
+      {
+        index_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (unsigned short) * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_UNSIGNED_SHORT, 1, true);
+        unsigned short *ibuf = (unsigned short *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        for (unsigned short i = 0; i < len; i ++) {
+          ibuf[i] = i;
+        }
+        index_buffer->Release ();
+      } 
+      else
+      {
+        index_buffer = pFactory->r3d->CreateRenderBuffer (
+	  sizeof (unsigned int) * len, CS_BUF_STATIC, 
+	  CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        unsigned int *ibuf = (unsigned int *)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+        for (unsigned int i = 0; i < len; i ++) {
+          ibuf[i] = i;
+        }
+        index_buffer->Release ();
       }
-      index_buffer->Release ();
     }
     return index_buffer;
   }
@@ -597,9 +729,9 @@ void csChunkLodTerrainFactory::MeshTreeNode::AddVertex (const Data& d, int p)
   parity = p;
 }
 
-void csChunkLodTerrainFactory::MeshTreeNode::AddEdgeVertex (const Data& d)
+void csChunkLodTerrainFactory::MeshTreeNode::AddEdgeVertex (const Data& d, const Data& m)
 {
-  vertices.Push(d.pos);
+  vertices.Push(d.pos+csVector3 (m.pos.x, 0.0, m.pos.z));
   normals.Push(d.norm);
   tangents.Push(d.tan);
   binormals.Push(d.bin);
@@ -639,7 +771,7 @@ void csChunkLodTerrainFactory::MeshTreeNode::ProcessEdge (int start, int end,
   {
     if (pFactory->datamap[start].error > error)
     {
-      AddEdgeVertex (pFactory->datamap[start]);
+      AddEdgeVertex (pFactory->datamap[start], mod);
       AddSkirtVertex (pFactory->datamap[start], mod);
     }
     start += move;
@@ -669,6 +801,9 @@ csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
 
   meshpp = 0;
   meshppsize = 0;
+
+  error_tolerance = 1.0;
+  lod_distance = 200.0;
 }
 
 csChunkLodTerrainObject::~csChunkLodTerrainObject ()
@@ -677,6 +812,7 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
     delete [] meshpp;
 }
 
+int optimized_meshes;
 bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv, 
 	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa) 
 {
@@ -684,6 +820,43 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   csSphere s(node->Center (), node->Radius ());
   if (!rv->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
     return false;
+  csBox2 sbox;
+  csBox3 cbox;
+  cbox.StartBoundingBox (tr_o2c * node->BBox().GetCorner(0));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(1));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(2));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(3));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(4));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(5));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(6));
+  cbox.AddBoundingVertexSmart (tr_o2c * node->BBox().GetCorner(7));
+  if ((cbox.MinZ() < 0) && (cbox.MaxZ () < 0))
+    return false;
+  // Transform from camera to screen space.
+  if (cbox.MinZ () <= 0)
+  {
+    // Mesh is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    csVector2 oneCorner;
+    rv->GetCamera()->Perspective (cbox.Max (), oneCorner);
+    sbox.StartBoundingBox (oneCorner);
+
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    rv->GetCamera()->Perspective (v, oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    rv->GetCamera()->Perspective (cbox.Min (), oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    rv->GetCamera()->Perspective (v, oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+  if (!rv->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane))
+    return false;
+
   float sq_dist = (tr_o2c * node->Center()).SquaredNorm ();
   float error_projection = node->Error() / kappa + node->Radius();
   error_projection *= error_projection;
@@ -711,23 +884,29 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     meshes[len].indexend = node->Count ();
     meshes[len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
     // meshes[len].meshtype = CS_MESHTYPE_LINESTRIP;
-    for (int i = 0; i < palette.Length(); i ++)
+
+    float texel_error_projection = node->Radius() + lod_distance;
+    texel_error_projection *= texel_error_projection;
+    if (texel_error_projection > sq_dist) 
     {
-      int len = palette_meshes[i].Length();
-      palette_meshes[i].GetExtend(len).object2camera = tr_o2c;
-      palette_meshes[i][len].clip_portal = clip_portal;
-      palette_meshes[i][len].clip_plane = clip_plane;
-      palette_meshes[i][len].clip_z_plane = clip_z_plane;
-      palette_meshes[i][len].do_mirror = rv->GetCamera()->IsMirrored();
-      palette[i]->Visit ();
-      palette_meshes[i][len].material = palette[i];
-      palette_meshes[i][len].z_buf_mode = CS_ZBUF_TEST;
-      palette_meshes[i][len].mixmode = CS_FX_COPY;
-      palette_meshes[i][len].buffersource = node;
-      palette_meshes[i][len].indexstart = 0;
-      palette_meshes[i][len].indexend = node->Count ();
-      palette_meshes[i][len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
-      // palette_meshes[i][len].meshtype = CS_MESHTYPE_LINESTRIP;
+      for (int i = 0; i < palette.Length(); i ++)
+      {
+        int len = palette_meshes[i].Length();
+        palette_meshes[i].GetExtend(len).object2camera = tr_o2c;
+        palette_meshes[i][len].clip_portal = clip_portal;
+        palette_meshes[i][len].clip_plane = clip_plane;
+        palette_meshes[i][len].clip_z_plane = clip_z_plane;
+        palette_meshes[i][len].do_mirror = rv->GetCamera()->IsMirrored();
+        palette[i]->Visit ();
+        palette_meshes[i][len].material = palette[i];
+        palette_meshes[i][len].z_buf_mode = CS_ZBUF_TEST;
+        palette_meshes[i][len].mixmode = CS_FX_COPY;
+        palette_meshes[i][len].buffersource = node;
+        palette_meshes[i][len].indexstart = 0;
+        palette_meshes[i][len].indexend = node->Count ();
+        palette_meshes[i][len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+        // palette_meshes[i][len].meshtype = CS_MESHTYPE_LINESTRIP;
+      }
     }
     tricount += node->Count () - 2;
   }
@@ -753,6 +932,8 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
   if (meshes.Length () == 0)
     return false;
+// printf ("avg triangle per mesh %f\n", (float)tricount/(float)meshes.Length());
+// printf ("tricount %d, meshcount %d\n", tricount, meshes.Length());
   scfiObjectModel.ShapeChanged ();
   return true;
 }
@@ -841,15 +1022,29 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
   csRef<iStringSet> strings = 
 	CS_QUERY_REGISTRY_TAG_INTERFACE (pFactory->object_reg,
 	"crystalspace.renderer.stringset", iStringSet);
+  csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
+  csRef<csShaderVariable> splat_var = 
+    pFactory->shmgr->CreateVariable (strings->Request ("splat map scale"));
+  splat_var->SetType (csShaderVariable::VECTOR2);
+  splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
+  matwrap->GetMaterial()->AddVariable (splat_var);
+
+  csRef<csShaderVariable> lod_var = 
+    pFactory->shmgr->CreateVariable (strings->Request ("texture lod distance"));
+  lod_var->SetType (csShaderVariable::VECTOR3);
+  lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+  matwrap->GetMaterial()->AddVariable (lod_var);
+
   for (int i = 0; i < palette.Length(); i ++) 
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
 	CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
 
     csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
-    for (int y = 0; y < h; y ++) 
+    int y, x;
+    for (y = 0; y < h; y ++) 
     {
-      for (int x = 0; x < w; x ++) 
+      for (x = 0; x < w; x ++) 
       {
         map[x + y * w].red = (data[x + y * w] == i) ? 255 : 0;
         map[x + y * w].green = (data[x + y * w] == i) ? 255 : 0;
@@ -857,17 +1052,26 @@ bool csChunkLodTerrainObject::SetMaterialMap (csArray<char> data, int w, int h)
         map[x + y * w].alpha = (data[x + y * w] == i) ? 255 : 0;
       }
     }
-    csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
+
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, CS_TEXTURE_2D);
-    csRef<csShaderVariable> var = pFactory->shmgr->CreateVariable (
-	strings->Request ("splat alpha map"));
+    csRef<csShaderVariable> var = 
+      pFactory->shmgr->CreateVariable (strings->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     palette[i]->GetMaterial()->AddVariable (var);
-    var = pFactory->shmgr->CreateVariable (strings->Request ("splat map scale"));
-    var->SetType (csShaderVariable::VECTOR2);
-    var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
-    palette[i]->GetMaterial()->AddVariable (var);
+    csRef<csShaderVariable> splat_var = 
+      pFactory->shmgr->CreateVariable (strings->Request ("splat map scale"));
+    splat_var->SetType (csShaderVariable::VECTOR2);
+    splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x, 1.0 / (float)pFactory->hm_y));
+    matwrap->GetMaterial()->AddVariable (splat_var);
+    palette[i]->GetMaterial()->AddVariable (splat_var);
+
+    csRef<csShaderVariable> lod_var = 
+      pFactory->shmgr->CreateVariable (strings->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    matwrap->GetMaterial()->AddVariable (lod_var);
+    palette[i]->GetMaterial()->AddVariable (lod_var);
   }
   return true;
 }
@@ -908,4 +1112,19 @@ bool csChunkLodTerrainObject::SaveState (const char *filename)
 bool csChunkLodTerrainObject::RestoreState (const char *filename)
 {
   return false;
+}
+
+int csChunkLodTerrainObject::CollisionDetect (iMovable *m, csTransform *t)
+{
+  csVector3 p = t->GetOrigin() - m->GetPosition ();
+  csVector3 np = pFactory->CollisionDetect (p);
+  if (np != p) 
+  {
+    t->SetOrigin (np + m->GetPosition ());
+    return 1;
+  } 
+  else 
+  {
+    return 0;
+  }
 }

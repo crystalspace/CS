@@ -93,7 +93,13 @@ private:
   csArray<Data> datamap;
   int hm_x, hm_y;
 
-  csStringID vertex_name, normal_name, tangent_name, binormal_name, texcors_name, color_name, index_name;
+  csStringID vertex_name, compressed_vertex_name; 
+  csStringID normal_name, compressed_normal_name;
+  csStringID tangent_name, compressed_tangent_name;
+  csStringID binormal_name, compressed_binormal_name;
+  csStringID texcors_name, compressed_texcors_name;
+  csStringID color_name, compressed_color_name;
+  csStringID index_name;
   csRef<iGraphics3D> r3d;
   csRef<iShaderManager> shmgr;
 
@@ -104,21 +110,28 @@ private:
     MeshTreeNode *children[4];
 
     csVector3 center;
-    float radius; // x/z plane only
+    csBox3 box;
+    float radius;
     float error;
 
     csArray<csVector3> vertices;
     csRef<iRenderBuffer> vertex_buffer;
+    csRef<iRenderBuffer> compressed_vertex_buffer;
     csArray<csVector3> normals;
     csRef<iRenderBuffer> normal_buffer;
+    csRef<iRenderBuffer> compressed_normal_buffer;
     csArray<csVector3> tangents;
     csRef<iRenderBuffer> tangent_buffer;
+    csRef<iRenderBuffer> compressed_tangent_buffer;
     csArray<csVector3> binormals;
     csRef<iRenderBuffer> binormal_buffer;
+    csRef<iRenderBuffer> compressed_binormal_buffer;
     csArray<csVector2> texcors;
     csRef<iRenderBuffer> texcors_buffer;
+    csRef<iRenderBuffer> compressed_texcors_buffer;
     csArray<csColor> colors;
     csRef<iRenderBuffer> color_buffer;
+    csRef<iRenderBuffer> compressed_color_buffer;
     csRef<iRenderBuffer> index_buffer;
 
     int parity;
@@ -127,7 +140,7 @@ private:
     void InitBuffer (const Data &d, int p);
     void AddVertex (const Data &d, int p);
     void EndBuffer (const Data &d, int p);
-    void AddEdgeVertex (const Data& d);
+    void AddEdgeVertex (const Data& d, const Data& mod);
     void AddSkirtVertex (const Data& d, const Data& mod);
     void ProcessMap (int l, int i, int j, int k);
     void ProcessEdge (int start, int end, int move, const Data& mod);
@@ -144,6 +157,7 @@ private:
     iRenderBuffer *GetRenderBuffer (csStringID name);
 
     const csVector3 &Center () { return center; }
+    const csBox3 &BBox () { return box; }
     float Radius () { return radius; }
     float Error () { return error; }
 
@@ -206,6 +220,7 @@ public:
   } scfiTerrainFactoryState;
   friend struct eiTerrainFactoryState;
 
+  csVector3 CollisionDetect (const csVector3 &p);
 };
 
 
@@ -230,6 +245,7 @@ private:
   csRefArray<iImage> alphas;
 
   float error_tolerance;
+  float lod_distance;
 
   csArray<csRenderMesh> meshes;
   csArray< csArray<csRenderMesh> > palette_meshes;
@@ -308,11 +324,14 @@ public:
   bool SetMaterialMap (csArray<char> data, int x, int y);
   bool SetMaterialMap (iImage* map);
   csArray<char> GetMaterialMap ();
+  void SetLODDistance (float distance) { lod_distance = distance; }
+  float GetLODDistance () { return lod_distance; }
   void SetErrorTolerance (float error) { error_tolerance = error; }
   float GetErrorTolerance () { return error_tolerance; }
   /// Saves the texture quad-tree into the file specified
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
+  int CollisionDetect (iMovable *m, csTransform *p);
 
   struct eiTerrainObjectState : public iTerrainObjectState
   {
@@ -327,6 +346,10 @@ public:
     { return scfParent->SetMaterialMap (map); }
     csArray<char> GetMaterialMap ()
     { return scfParent->GetMaterialMap (); }
+    void SetLODDistance (float distance)
+    { scfParent->SetLODDistance (distance); }
+    float GetLODDistance () 
+    { return scfParent->GetLODDistance (); }
     void SetErrorTolerance (float error)
     { scfParent->SetErrorTolerance (error); }
     float GetErrorTolerance ()
@@ -335,6 +358,8 @@ public:
     { return scfParent->SaveState (filename); }
     bool RestoreState (const char *filename) 
     { return scfParent->RestoreState (filename); }
+    int CollisionDetect (iMovable *m, csTransform *p)
+    { return scfParent->CollisionDetect (m, p); }
   } scfiTerrainObjectState;
   friend struct eiTerrainObjectState;
 
