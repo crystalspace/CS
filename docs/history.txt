@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+13-Feb-2002
+	- Added new tutorial app in apps/tutorial/awstut. This is a small
+	  AWS using application that demonstrates how to open and use
+	  one simple window. So it is easier to follow than awstest.
 12-Feb-2002
 	- Matt Reda moved the event-handling code in the OSX canvases 
 	  from the delegate to a new NSView-derived class.  The old code 
