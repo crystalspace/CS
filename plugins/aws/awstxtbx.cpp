@@ -521,7 +521,7 @@ awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
   RegisterConstant ("signalTextBoxChanged", awsTextBox::signalChanged);
   RegisterConstant ("signalTextBoxLostFocus", awsTextBox::signalLostFocus);
 
-  RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalChanged);
+  RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalEnterKeyPressed);
 
   RegisterConstant ("signalTabKeyPressed", awsTextBox::signalLostFocus);
 }
