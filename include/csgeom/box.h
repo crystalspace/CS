@@ -417,6 +417,15 @@ public:
     }
   }
 
+  /**
+   * Get a convex outline (not a polygon unless projected to 2D)
+   * for for this box as seen from the given position.
+   * The coordinates returned are world space coordinates.
+   * Note that you need place for at least six vectors in the array.
+   */
+  void GetConvexOutline (const csVector3& pos,
+  	csVector3* array, int& num_array);
+
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);
   /// Compute the union of a point with this bounding box.

@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/polytree.h"
 #include "csgeom/bsp.h"
+#include "csgeom/box.h"
 
 class csPolygonInt;
 class csPolygonParentInt;
@@ -49,10 +50,8 @@ class csOctreeNode : public csPolygonTreeNode
 private:
   /// Children.
   csPolygonTreeNode* children[8];
-  /// Minimum corner.
-  csVector3 min_corner;
-  /// Maximum corner.
-  csVector3 max_corner;
+  /// Bounding box;
+  csBox3 bbox;
   /// Center point for this node.
   csVector3 center;
   /// Mini-bsp tree (in this case there are no children).
@@ -83,8 +82,7 @@ private:
   /// Set box.
   void SetBox (const csVector3& bmin, const csVector3& bmax)
   {
-    min_corner = bmin;
-    max_corner = bmax;
+    bbox.Set (bmin, bmax);
     center = (bmin + bmax) / 2;
   }
 
@@ -99,22 +97,22 @@ public:
   bool IsEmpty ();
 
   /// Get center.
-  const csVector3& GetCenter () { return center; }
+  const csVector3& GetCenter () const { return center; }
 
   /// Get minimum coordinate of box.
-  const csVector3& GetMinCorner () { return min_corner; }
+  const csVector3& GetMinCorner () const { return bbox.Min (); }
 
   /// Get maximum coordinate of box.
-  const csVector3& GetMaxCorner () { return max_corner; }
+  const csVector3& GetMaxCorner () const { return bbox.Max (); }
 
   /// Get mini-bsp tree.
-  csBspTree* GetMiniBsp () { return minibsp; }
+  csBspTree* GetMiniBsp () const { return minibsp; }
 
   /// Get indices of vertices used in the mini-bsp of this leaf.
-  int* GetMiniBspVerts () { return minibsp_verts; }
+  int* GetMiniBspVerts () const { return minibsp_verts; }
 
   /// Get number of vertices.
-  int GetMiniBspNumVerts () { return minibsp_numverts; }
+  int GetMiniBspNumVerts () const { return minibsp_numverts; }
 
   /// Return type (NODE_???).
   int Type () { return NODE_OCTREE; }
@@ -128,10 +126,8 @@ class csOctree : public csPolygonTree
   friend class Dumper;
 
 private:
-  /// The main bounding box for the octree (min).
-  csVector3 min_bbox;
-  /// The main bounding box for the octree (max).
-  csVector3 max_bbox;
+  /// The main bounding box for the octree.
+  csBox3 bbox;
   /// The number of polygons at which we revert to a bsp tree.
   int bsp_num;
   /// The mode for the mini-bsp trees.
@@ -218,7 +214,10 @@ public:
    * Note that you need place for at least six vectors in the array.
    */
   void GetConvexOutline (csOctreeNode* node, const csVector3& pos,
-  	csVector3* array, int& num_array);
+  	csVector3* array, int& num_array)
+  {
+    node->bbox.GetConvexOutline (pos, array, num_array);
+  }
 
   /**
    * Build vertex tables for minibsp leaves. These tables are

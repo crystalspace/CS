@@ -23,60 +23,6 @@
 
 //---------------------------------------------------------------------------
 
-// We have a coordinate system around our node which is
-// divided into 27 regions. The center region at coordinate (1,1,1)
-// is the node itself. Every one of the 26 remaining regions
-// defines an number of vertices which are the convex outline
-// as seen from a camera view point in that region.
-// The numbers inside the outlines table are indices from 0 to
-// 7 which describe the 8 vertices outlining the node:
-//	0: left/down/front vertex
-//	1: left/down/back
-//	2: left/up/front
-//	3: left/up/back
-//	4: right/down/front
-//	5: right/down/back
-//	6: right/up/front
-//	7: right/up/back
-struct Outline
-{
-  int num;
-  int vertices[6];
-};
-/// Outline lookup table.
-static Outline outlines[27] =
-{
-  { 6, { 3, 2, 6, 4, 5, 1 } },		// 0,0,0
-  { 6, { 3, 2, 0, 4, 5, 1 } },		// 0,0,1
-  { 6, { 7, 3, 2, 0, 4, 5 } },		// 0,0,2
-  { 6, { 3, 2, 6, 4, 0, 1 } },		// 0,1,0
-  { 4, { 3, 2, 0, 1, -1, -1 } },	// 0,1,1
-  { 6, { 7, 3, 2, 0, 1, 5 } },		// 0,1,2
-  { 6, { 3, 7, 6, 4, 0, 1 } },		// 0,2,0
-  { 6, { 3, 7, 6, 2, 0, 1 } },		// 0,2,1
-  { 6, { 7, 6, 2, 0, 1, 5 } },		// 0,2,2
-  { 6, { 2, 6, 4, 5, 1, 0 } },		// 1,0,0
-  { 4, { 0, 4, 5, 1, -1, -1 } },	// 1,0,1
-  { 6, { 3, 1, 0, 4, 5, 7 } },		// 1,0,2
-  { 4, { 2, 6, 4, 0, -1, -1 } },	// 1,1,0
-  { 0, { -1, -1, -1, -1, -1, -1 } },	// 1,1,1
-  { 4, { 7, 3, 1, 5, -1, -1 } },	// 1,1,2
-  { 6, { 3, 7, 6, 4, 0, 2 } },		// 1,2,0
-  { 4, { 3, 7, 6, 2, -1, -1 } },	// 1,2,1
-  { 6, { 2, 3, 1, 5, 7, 6 } },		// 1,2,2
-  { 6, { 2, 6, 7, 5, 1, 0 } },		// 2,0,0
-  { 6, { 6, 7, 5, 1, 0, 4 } },		// 2,0,1
-  { 6, { 6, 7, 3, 1, 0, 4 } },		// 2,0,2
-  { 6, { 2, 6, 7, 5, 4, 0 } },		// 2,1,0
-  { 4, { 6, 7, 5, 4, -1, -1 } },	// 2,1,1
-  { 6, { 6, 7, 3, 1, 5, 4 } },		// 2,1,2
-  { 6, { 2, 3, 7, 5, 4, 0 } },		// 2,2,0
-  { 6, { 2, 3, 7, 5, 4, 6 } },		// 2,2,1
-  { 6, { 6, 2, 3, 1, 5, 4 } }		// 2,2,2
-};
-
-//---------------------------------------------------------------------------
-
 csOctreeNode::csOctreeNode ()
 {
   int i;
@@ -150,8 +96,7 @@ void csOctreeNode::BuildVertexTables ()
 csOctree::csOctree (csPolygonParentInt* pset, const csVector3& min_bbox,
 	const csVector3& max_bbox, int bsp_num, int mode) : csPolygonTree (pset)
 {
-  csOctree::min_bbox = min_bbox;
-  csOctree::max_bbox = max_bbox;
+  csOctree::bbox.Set (min_bbox, max_bbox);
   csOctree::bsp_num = bsp_num;
   csOctree::mode = mode;
 }
@@ -170,7 +115,7 @@ void csOctree::Build ()
 
   CHK (root = new csOctreeNode);
 
-  Build ((csOctreeNode*)root, min_bbox, max_bbox, polygons, num);
+  Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
 
   CHK (delete [] polygons);
 }
@@ -182,7 +127,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  Build ((csOctreeNode*)root, min_bbox, max_bbox, new_polygons, num);
+  Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   CHK (delete [] new_polygons);
 }
 
@@ -349,8 +294,8 @@ void csOctree::BuildDynamic (csOctreeNode* node, csPolygonInt** polygons, int nu
   }
 
   const csVector3& center = node->GetCenter ();
-  const csVector3& bmin = node->min_corner;
-  const csVector3& bmax = node->max_corner;
+  const csVector3& bmin = node->bbox.Min ();
+  const csVector3& bmax = node->bbox.Max ();
 
   int i, k;
 
@@ -530,44 +475,6 @@ void csOctree::Statistics (csOctreeNode* node, int depth, int* num_nodes,
       }
   }
   depth--;
-}
-
-void csOctree::GetConvexOutline (csOctreeNode* node, const csVector3& pos,
-	csVector3* array, int& num_array)
-{
-  const csVector3& bmin = node->GetMinCorner ();
-  const csVector3& bmax = node->GetMaxCorner ();
-  int idx;
-  // First select x part of coordinate.
-  if (pos.x < bmin.x)		idx = 0*9;
-  else if (pos.x > bmax.x)	idx = 2*9;
-  else				idx = 1*9;
-  // Then y part.
-  if (pos.y < bmin.y)		idx += 0*3;
-  else if (pos.y > bmax.y)	idx += 2*3;
-  else				idx += 1*3;
-  // Then z part.
-  if (pos.z < bmin.z)		idx += 0;
-  else if (pos.z > bmax.z)	idx += 2;
-  else				idx += 1;
-
-  const Outline& ol = outlines[idx];
-  num_array = ol.num;
-  int i;
-  for (i = 0 ; i < num_array ; i++)
-  {
-    switch (ol.vertices[i])
-    {
-      case 0: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
-      case 1: array[i].x = bmin.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
-      case 2: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
-      case 3: array[i].x = bmin.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
-      case 4: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmin.z; break;
-      case 5: array[i].x = bmax.x; array[i].y = bmin.y; array[i].z = bmax.z; break;
-      case 6: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmin.z; break;
-      case 7: array[i].x = bmax.x; array[i].y = bmax.y; array[i].z = bmax.z; break;
-    }
-  }
 }
 
 void csOctree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,
