@@ -37,10 +37,12 @@ chronological order.
 	- Eric Sunshine updated csvosa3dl.mak so that it links the plugin
 	  against csgeom.
 	- Marten removed the now deprecated iRenderBufferSource.
-	- Jorrit optimized NR version of genmesh a little bit.  Render buffers
-	  are now only recreated when really needed and not every time the
-	  dirty bit was set.  Also removed the copy of the triangle array to an
-	  int* buffer.  That's not needed.
+	- Jorrit optimized NR version of genmesh a little bit. Render
+	  buffers are now only recreated when really needed and not every
+	  time the dirty bit was set. Also removed the copy of the triangle
+	  array to an int* buffer. That's not needed.
+	- Jorrit added a sequence to the terrain level so that the sun
+	  moves. This gives nice realtime lighting effects on the landscape.
 	- Eric Sunshine simplified a number of macros in checkbuild.m4,
 	  checklib.m4, and configure.ac by removing some unnecssary
 	  m4_default() invocations.
@@ -85,6 +87,7 @@ chronological order.
 	  Added stopLock flag to animation mixer so that animation stops on the last
 	  keyframe if true.
 
+>>>>>>> 1.5703
 14-Jan-2004
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.
