@@ -161,13 +161,18 @@ EXPORT_CLASS_TABLE (sequence)
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csSequenceManager)
-  IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iSequenceManager)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSequenceManager::eiPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csSequenceManager::csSequenceManager (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   System = NULL;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
@@ -183,7 +188,7 @@ csSequenceManager::~csSequenceManager ()
 bool csSequenceManager::Initialize (iSystem *system)
 {
   System = system;
-  if (!System->CallOnEvents (this, CSMASK_Nothing))
+  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing))
     return false;
   return true;
 }

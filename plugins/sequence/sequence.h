@@ -151,7 +151,7 @@ public:
   virtual bool IsEmpty () { return first == NULL; }
 };
 
-class csSequenceManager : public iSequenceManager, iPlugIn
+class csSequenceManager : public iSequenceManager
 {
 private:
   iSystem *System;
@@ -190,6 +190,13 @@ public:
   virtual cs_time GetMainTime () { return main_time; }
   virtual iSequence* NewSequence ();
   virtual void RunSequence (cs_time time, iSequence* sequence);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(csSequenceManager);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 };
 
 #endif // __CS_SEQUENCE_H__
