@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+1-Jul-2000
+	- Added a primitive recording function for LinuxTag. Will clean
+	  it up for general use later (in WalkTest).
 29-Jun-2000
 	- Added csOctree::GetLeaf() function that calculates the leaf where
 	  the given position is in.

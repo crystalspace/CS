@@ -233,6 +233,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
+    CONPRI("  record play\n");
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -244,6 +245,34 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
     LoadCamera (Sys->VFS, "/this/coord");
+  }
+  else if (!strcasecmp (cmd, "record"))
+  {
+    if (Sys->cfg_recording == -1)
+    {
+      Sys->cfg_playrecording = -1;
+      Sys->cfg_recording = 0;
+      Sys->Printf (MSG_CONSOLE, "Start recording camera movement...\n");
+    }
+    else
+    {
+      Sys->cfg_recording = -1;
+      Sys->Printf (MSG_CONSOLE, "Stop recording.\n");
+    }
+  }
+  else if (!strcasecmp (cmd, "play"))
+  {
+    if (Sys->cfg_playrecording == -1)
+    {
+      Sys->cfg_recording = -1;
+      Sys->cfg_playrecording = 0;
+      Sys->Printf (MSG_CONSOLE, "Start playing back camera movement...\n");
+    }
+    else
+    {
+      Sys->cfg_playrecording = -1;
+      Sys->Printf (MSG_CONSOLE, "Stop playback.\n");
+    }
   }
   else if (!strcasecmp (cmd, "dumpvis"))
   {

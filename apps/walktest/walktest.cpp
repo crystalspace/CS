@@ -134,6 +134,8 @@ WalkTest::WalkTest () :
   selected_polygon = NULL;
   move_forward = false;
   cfg_draw_octree = 0;
+  cfg_recording = -1;
+  cfg_playrecording = -1;
   cfg_debug_check_frustum = 0;
 
   plbody = pllegs = NULL;
@@ -569,6 +571,33 @@ void WalkTest::DrawFrame2D (void)
 
 void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
+  if (cfg_recording >= 0)
+  {
+    // @@@ Memory leak!
+    csRecordedCamera* reccam = new csRecordedCamera ();
+    csCamera* c = view->GetCamera ();
+    const csMatrix3& m = c->GetO2T ();
+    const csVector3& v = c->GetOrigin ();
+    reccam->mat = m;
+    reccam->vec = v;
+    reccam->mirror = c->IsMirrored ();
+    reccam->sector = c->GetSector ();
+    reccam->angle = Sys->angle;
+    recording.Push ((void*)reccam);
+  }
+  if (cfg_playrecording >= 0)
+  {
+    csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
+    cfg_playrecording++;
+    if (cfg_playrecording >= recording.Length ()) cfg_playrecording = 0;
+    csCamera* c = view->GetCamera ();
+    Sys->angle = reccam->angle;
+    c->SetSector (reccam->sector);
+    c->SetMirrored (reccam->mirror);
+    c->SetO2T (reccam->mat);
+    c->SetOrigin (reccam->vec);
+  }
+
   (void)elapsed_time; (void)current_time;
 
   //not used since we need WHITE background not black

@@ -57,6 +57,16 @@ struct csKeyMap
 };
 
 ///
+struct csRecordedCamera
+{
+  csMatrix3 mat;
+  csVector3 vec;
+  bool mirror;
+  csSector* sector;
+  csVector3 angle;
+};
+
+///
 class WalkTest : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
@@ -80,7 +90,14 @@ public:
   csRAPIDCollider *legs;
   csRAPIDCollider *body;
 
+  /// Vector with recorded camera transformations.
+  csVector recording;
+
   // Various configuration values for collision detection.
+  /// If >= 0 then we're recording. The value is the current frame entry.
+  int cfg_recording;
+  /// If >= 0 then we're playing a recording.
+  int cfg_playrecording;
   /// Initial speed of jumping.
   float cfg_jumpspeed;
   /// Walk acceleration.
