@@ -50,6 +50,11 @@ chronological order.
 	  cscmdFinalProcess a short time later.  This broke the
 	  event-is-immutable invariant.  To fix, these pseudo-events are now
 	  reclaimed from the event pool just like any other event.
+	- Eric Sunshine replaced csEventQueue's unsafe spin-lock with a csMutex
+	  in order to ensure proper thread-safety.
+	- Eric Sunshine changed csEventQueue's ListenerVector to a simple
+	  csArray<> rather than a csDirtyAccessArray<>, since the "special"
+	  functionality of csDirtyAccessArray<> was neither required nor used.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
