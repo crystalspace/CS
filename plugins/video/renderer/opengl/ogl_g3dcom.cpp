@@ -2443,6 +2443,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     return;
   }
 
+  // If we don't do this then objects can disappear later.
+  // Also needed so additional passes & LMs show up properly
+  statecache->Disable_GL_ALPHA_TEST ();
+  
   //=================
   // Pass 2: Here we add all extra texture layers if there are some.
   //=================
@@ -2565,9 +2569,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
     glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
   }
-
-  // If we don't do this then objects can disappear later.
-  statecache->Disable_GL_ALPHA_TEST ();
 }
 
 static bool dp_flatlighting = false;

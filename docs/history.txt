@@ -2,6 +2,9 @@ The history order is reversed so that new features are at the top.
 
 15-Apr-2003
 	- Release of 0.96r004.
+14-Apr-2003
+	- Philip Wyett moved over Res's statecache->Disable_GL_ALPHA_TEST ();
+          relocation fix from main branch.
 5-Apr-2003
 	- Eric Sunshine applied update from Oktal: Fixed a problem with the
 	  cssocket plugin where it would only send the first packet of a
