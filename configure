@@ -21293,13 +21293,13 @@ cs_makefile_text="${cs_makefile_text}INSTALL_DIR = $cs_install_dir
 if test $prefix = NONE; then
   prefix="$ac_default_prefix"
 else
-  prefix=`echo "$prefix" | sed -e 's#//\+#/#'`
+  prefix=`echo "$prefix" | sed -e 's#///*#/#g'`
 fi
 
 if test $exec_prefix = NONE; then
   exec_prefix="\$(INSTALLDIR.PREFIX)"
 else
-  exec_prefix=`echo "$exec_prefix" | sed -e 's#//\+#/#'`
+  exec_prefix=`echo "$exec_prefix" | sed -e 's#///*#/#g'`
 fi
 
 
