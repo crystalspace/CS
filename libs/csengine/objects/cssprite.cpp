@@ -34,8 +34,16 @@
 
 csFrame::csFrame (int num_vertices)
 {
-  CHK (texels = new csVector2 [num_vertices]);
-  CHK (vertices = new csVector3 [num_vertices]);
+  if (num_vertices)
+  {
+    CHK (texels = new csVector2 [num_vertices]);
+    CHK (vertices = new csVector3 [num_vertices]);
+  }
+  else
+  {
+    texels = NULL;
+    vertices = NULL;
+  }
   name = NULL;
   max_vertex = num_vertices;
   normals = NULL;
