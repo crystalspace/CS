@@ -43,6 +43,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "video/canvas/openglcommon/iogl.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
 #include "ivideo/effects/efserver.h"
@@ -627,13 +628,11 @@ static fType fName
 # undef CSGL_FUNCTION
   virtual void InitGLExtensions ();
 
-  static bool ARB_multitexture;
-  static bool ARB_texture_compression;
-  static bool NV_vertex_array_range;
-  static bool NV_vertex_program;
-  static bool ARB_texture_env_combine;
-  static bool ARB_texture_env_dot3;
-  static bool SGIS_generate_mipmap;
+#define USE_OGL_EXT(ext) \
+  static bool ext; \
+  void Init_##ext (iOpenGLInterface *G2DGL);
+#include "ogl_suppext.h"
+#undef USE_OGL_EXT
 
 public:
   SCF_DECLARE_IBASE;

@@ -56,7 +56,6 @@
 #include "csutil/util.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
-#include "video/canvas/openglcommon/iogl.h"
 
 #include "ogl_strings.h"
 
@@ -187,13 +186,10 @@ SCF_IMPLEMENT_IBASE_END
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 iGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
 
-bool csGraphics3DOGLCommon::ARB_multitexture = false;
-bool csGraphics3DOGLCommon::ARB_texture_compression = false;
-bool csGraphics3DOGLCommon::NV_vertex_array_range = false;
-bool csGraphics3DOGLCommon::NV_vertex_program = false;
-bool csGraphics3DOGLCommon::ARB_texture_env_combine = false;
-bool csGraphics3DOGLCommon::ARB_texture_env_dot3 = false;
-bool csGraphics3DOGLCommon::SGIS_generate_mipmap = false;
+#define USE_OGL_EXT(ext) \
+  bool csGraphics3DOGLCommon::##ext = false;
+#include "ogl_suppext.h"
+#undef USE_OGL_EXT
 
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
@@ -379,17 +375,7 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 
 void csGraphics3DOGLCommon::InitGLExtensions ()
 {
-
-#ifndef CSGL_EXT_STATIC_ASSERTION
-# define CSGL_FUNCTION(fType,fName) \
-fName = (fType) G2DGL->GetProcAddress ( #fName ); \
-allFound = allFound && fName != NULL;
-#else
-# define CSGL_FUNCTION(fType,fName) \
-csGraphics3DOGLCommon::fName = (fType) ::fName; \
-allFound = allFound && fName != NULL;
-#endif
-
+#define EXT_CONFIG_KEY "Video.OpenGL.UseExtension"
   if (G2D)
   {
     iOpenGLInterface *G2DGL = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
@@ -397,186 +383,68 @@ allFound = allFound && fName != NULL;
     {
       const unsigned char* extensions = glGetString(GL_EXTENSIONS);
       if (!extensions)
-  return; //  no need to look any further
+	return; //  no need to look any further
 
       // check the extension string for each extension in turn
-      iConfigIterator *it = config->Enumerate ("Video.OpenGL.UseExtension");
+      char* extbuf = new char[strlen((const char*)extensions)+1];
+      strcpy (extbuf, (const char*)extensions);
 
-      while (it->Next ())
-      {
-  if (!it->GetBool ()) continue;
+      char* ext = extbuf;
 
-  const char *ext = it->GetKey (true)+1;
-  const char* searchresult = strstr((const char*)extensions, ext);
+      while (ext && *ext)
+      {
+        char* next = strchr(ext, ' ');
+        if (next) *next++ = 0;
 
-  while (searchresult)
-  {
-    // make sure we didn't accidently catch the
-    // substring of some other extension
-    if (*(searchresult + strlen(ext)) == ' ' ||
-        *(searchresult + strlen(ext)) == '\0')
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s", ext);
-      if (!strcmp (ext, "GL_ARB_multitexture"))
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_multitexture)
-        bool &allFound = ARB_multitexture;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_ARB_multitexture
-#             include "csglext.h"
-#             undef CSGL_ARB_multitexture
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-        else
-        {
-    GLint maxtextures;
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
-    if (maxtextures > 1)
-    {
-      m_config_options.do_multitexture_level = maxtextures;
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "Using multitexture extension with %d texture units", maxtextures);
-    }
-    else
-    {
-      ARB_multitexture = false;
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
-        " extension but only allows one texture unit!");
-    }
-        }
-#endif
+	csString cfgkey;
+	cfgkey << EXT_CONFIG_KEY << "." << ext;
+
+	#define USE_OGL_EXT(extname)		  \
+	if (!strcmp (ext, "GL_" #extname))	  \
+	{					  \
+	  if (!config->GetBool(EXT_CONFIG_KEY	  \
+	    ".GL_" #extname, false))		  \
+	  {					  \
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
+	    "... not using %s", "GL_" #extname);  \
+	  }					  \
+	  else					  \
+	  {					  \
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
+	      "... using %s", "GL_" #extname);	  \
+	    Init_##extname (G2DGL);		  \
+	  }					  \
+	} else
+
+	#include "ogl_suppext.h"
+	#undef USE_OGL_EXT
+	{ /* the last 'else' */ }
+
+	ext = next;
       }
-      else if (!strcmp (ext, "GL_ARB_texture_compression"))
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_compression)
-        bool &allFound = ARB_texture_compression;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_ARB_texture_compression
-#             include "csglext.h"
-#             undef CSGL_ARB_texture_compression
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_NV_vertex_array_range"))
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_NV_vertex_array_range)
-        bool &allFound = NV_vertex_array_range;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_NV_vertex_array_range
-#             include "csglext.h"
-#             undef CSGL_NV_vertex_array_range
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_ARB_texture_env_combine") && !ARB_texture_env_combine)
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine)
-        bool &allFound = ARB_texture_env_combine;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_ARB_texture_env_combine
-#             include "csglext.h"
-#             undef CSGL_ARB_texture_env_combine
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_EXT_texture_env_combine") && !ARB_texture_env_combine)
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine)
-        bool &allFound = ARB_texture_env_combine;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_EXT_texture_env_combine
-#             include "csglext.h"
-#             undef CSGL_EXT_texture_env_combine
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_SGIS_generate_mipmap"))
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap)
-        bool &allFound = SGIS_generate_mipmap;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_SGIS_generate_mipmap
-#             include "csglext.h"
-#             undef CSGL_SGIS_generate_mipmap
-#endif
-      }
-      else if (!strcmp (ext, "GL_NV_vertex_program") && !NV_vertex_program)
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_NV_vertex_program)
-        bool &allFound = NV_vertex_program;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_NV_vertex_program
-#             include "csglext.h"
-#             undef CSGL_NV_vertex_program
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_ARB_texture_env_dot3") && !ARB_texture_env_dot3)
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_dot3)
-        bool &allFound = ARB_texture_env_dot3;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_EXT_texture_env_dot3
-#             include "csglext.h"
-#             undef CSGL_EXT_texture_env_dot3
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-      else if (!strcmp (ext, "GL_EXT_texture_env_dot3") && !ARB_texture_env_dot3)
-      {
-#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_dot3)
-        bool &allFound = ARB_texture_env_dot3;
-        allFound = true;
-#             define _CSGLEXT_
-#             define CSGL_EXT_texture_env_dot3
-#             include "csglext.h"
-#             undef CSGL_EXT_texture_env_dot3
-        if (!allFound)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresse for %s", ext);
-#endif
-      }
-#if CS_DEBUG
-      else
-      {
-        // useful to catch typos
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "  ... but don't know what to do with %s", ext);
-      }
-#endif
-    }
-    // find next occurance -- we could have multiple matches if we match the
-    // substring of another extension, but only one will trigger the if
-    // statement above
-    searchresult = strstr(searchresult + 1, ext);
-  }
-      }
-      it->DecRef ();
       G2DGL->DecRef ();
+      delete[] extbuf;
     }
+
+    // Some diagnostic info, to detect typos etc.
+    iConfigIterator *it = config->Enumerate (EXT_CONFIG_KEY);
+    while (it->Next())
+    {
+	#define USE_OGL_EXT(extname)				    \
+	if (!strcmp (it->GetKey(), EXT_CONFIG_KEY ".GL_" #extname)) \
+	{ continue; } else
+
+	#include "ogl_suppext.h"
+	#undef USE_OGL_EXT
+	{ 
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "Extension %s was used in config but is "
+	    "actually not supported", it->GetKey());
+	}
+    }
+    it->DecRef();
   }
-# undef CSGL_FUNCTION
+#undef EXT_CONFIG_KEY
 }
 
 bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
@@ -5792,7 +5660,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA };
       int alphaop = GL_MODULATE;
 
-      if( ARB_texture_env_combine )
+      if (ARB_texture_env_combine || EXT_texture_env_combine)
       {
         glActiveTextureARB( GL_TEXTURE0_ARB + l );
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
@@ -5855,7 +5723,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         statecache->EnableState (GL_TEXTURE_2D, l);
       }
 
-      if( ARB_texture_env_combine )
+      if (ARB_texture_env_combine || EXT_texture_env_combine)
       {
         string = layer->GetStateString( csEffectStrings::color_source_1 );
         if( string != csInvalidStringID )
@@ -6001,7 +5869,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, mesh.triangles);
 
   }
-  if( ARB_texture_env_combine )
+  if (ARB_texture_env_combine || EXT_texture_env_combine)
   {
     for( int l=maxlayers-1; l>=0; l-- )
     {
@@ -7059,7 +6927,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
     SetupBlend (poly.mixmode, 1.0f, false);
   }
-  if (ARB_texture_env_combine)
+  if (ARB_texture_env_combine || EXT_texture_env_combine)
   {
     float c[4] = {1.0, 1.0, 1.0, alpha};
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
@@ -7088,7 +6956,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   SetGLZBufferFlags (z_buf_mode);
 
-  if (ARB_texture_env_combine)
+  if (ARB_texture_env_combine || EXT_texture_env_combine)
   {
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
@@ -7459,7 +7327,7 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
             (layer_state == csEffectStrings::color_source_2) ||
             (layer_state == csEffectStrings::color_source_3) )
         {
-          if( !ARB_texture_env_combine ) return false;
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
           if( (layer_statestring != csEffectStrings::vertex_color) &&
               (layer_statestring != csEffectStrings::texture_color) &&
@@ -7474,7 +7342,7 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
                    (layer_state == csEffectStrings::color_source_modifier_2) ||
                    (layer_state == csEffectStrings::color_source_modifier_3) )
         {
-          if( !ARB_texture_env_combine ) return false;
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
           if( (layer_statestring != csEffectStrings::source_color) &&
               (layer_statestring != csEffectStrings::inverted_source_color) &&
@@ -7485,7 +7353,7 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
                    (layer_state == csEffectStrings::alpha_source_2) ||
                    (layer_state == csEffectStrings::alpha_source_3) )
         {
-          if( !ARB_texture_env_combine ) return false;
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
           if( (layer_statestring != csEffectStrings::vertex_alpha) &&
               (layer_statestring != csEffectStrings::texture_alpha) &&
@@ -7496,7 +7364,7 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
                    (layer_state == csEffectStrings::alpha_source_modifier_2) ||
                    (layer_state == csEffectStrings::alpha_source_modifier_3) )
         {
-          if( !ARB_texture_env_combine ) return false;
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
           if( (layer_statestring != csEffectStrings::source_alpha) &&
               (layer_statestring != csEffectStrings::inverted_source_alpha) )
@@ -7504,7 +7372,7 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
         } else if( (layer_state == csEffectStrings::color_operation) ||
                    (layer_state == csEffectStrings::alpha_operation) )
         {
-          if( !ARB_texture_env_combine ) return false;
+          if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
           if( (layer_statestring != csEffectStrings::use_source_1) &&
               (layer_statestring != csEffectStrings::multiply) &&
@@ -7514,10 +7382,10 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
               (layer_statestring != csEffectStrings::interpolate) &&
               ( (layer_statestring != csEffectStrings::dot_product) ||
                 ( (layer_statestring == csEffectStrings::dot_product) &&
-                  !ARB_texture_env_dot3 ) ) &&
+                  (!ARB_texture_env_dot3 && !EXT_texture_env_dot3) ) ) &&
               ( (layer_statestring != csEffectStrings::dot_product_to_alpha) ||
                 ( (layer_statestring == csEffectStrings::dot_product_to_alpha) &&
-                  !ARB_texture_env_dot3 ) )
+                  (!ARB_texture_env_dot3 && !EXT_texture_env_dot3)) )
               )
             return false;
         } else if( (layer_state == csEffectStrings::texture_source) ||
