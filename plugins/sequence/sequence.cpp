@@ -22,6 +22,7 @@
 #include "cssys/sysfunc.h"
 #include "sequence.h"
 #include "csutil/scf.h"
+#include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivideo/graph3d.h"
