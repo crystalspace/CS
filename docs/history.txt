@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 16-Aug-2000
+	- Martin Geisse patched the ds3d sound renderer so that it works
+	  again and cleaned up the software sound renderer.
 	- Andrew Zabolotny did the following:
 	    - Changed InferInstallPathOf() into GetInstallPath(). Unlike
 	      before, the memory is not allocated inside the routine;
@@ -19,6 +21,10 @@ The history order has been reversed so that new features are at the top.
 	      as a general rule of thumb they will prefer the current
 	      directory first. This is so that any local installation of
 	      CS will override the global one.
+	- Andrew Zabolotny changed the way csLoadLibrary works. Now it
+	  accepts a full file name. There is a new routine called
+	  csFindLoadLibrary which does exactly the same like csLoadLibrary
+	  before.
 	- Alex Pfaffe fixed texture coordinate generation in the terrain
 	  engine. This makes the terrain look MUCH nicer.
 	- Worked around a compiler bug in Solaris/gcc 2.7.2 with collision
