@@ -98,6 +98,16 @@ struct iDynamicsMoveCallback : public iBase
   virtual void Execute (iSkeletonBone* bone, csOrthoTransform& t) = 0;
 };
 
+SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
+
+/**
+ * This is the interface for attaching a collider callback to the body
+ */
+struct iDynamicsCollisionCallback : public iBase
+{
+  virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody) = 0;
+};
+
 SCF_VERSION (iRigidBody, 0, 0, 1);
 
 /**
@@ -206,14 +216,26 @@ struct iRigidBody : public iBase
 
   /// Attach a iMeshWrapper to this body
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
+  /// Returns the attached MeshWrapper
+  virtual iMeshWrapper *GetAttachedMesh () = 0;
   /// Attach a bone to this body
   virtual void AttachBone (iSkeletonBone* bone) = 0;
+  /// Returns the attached bone
+  virtual iSkeletonBone *GetAttachedBone () = 0;
 
   /**
    * Set a callback to be executed when this body moves.
    * If NULL, no callback is executed.
    */
   virtual void SetMoveCallback (iDynamicsMoveCallback* cb) = 0;
+  /**
+   * Set a callback to be executed when this body collides with another
+   * If NULL, no callback is executed.
+   */
+  virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
+
+  /// If there's a collision callback with this body, execute it
+  virtual void Collision (iRigidBody *other) = 0;
 
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;

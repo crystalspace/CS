@@ -122,17 +122,27 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
   dContact contact[10];
   int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
-  for( int i=0; i<a; i++ )
+
+  if (a > 0) 
   {
-    float *f1 = (float*)dGeomGetData (o1);
-    float *f2 = (float*)dGeomGetData (o2);
-    
-    contact[i].surface.mode = dContactBounce;
-    contact[i].surface.mu = f1[0]*f2[0];
-    contact[i].surface.bounce = f1[1]*f2[1];
-    dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
-    	->GetWorldID(), contactjoints,contact+i );
-    dJointAttach (c,dGeomGetBody (o1),dGeomGetBody (o2)); 
+    iRigidBody *b1 = (iRigidBody *)dBodyGetData (dGeomGetBody(o1));
+    iRigidBody *b2 = (iRigidBody *)dBodyGetData (dGeomGetBody(o2));
+
+    if (b1) b1->Collision (b2);
+    if (b2) b2->Collision (b1);
+
+    for( int i=0; i<a; i++ )
+    {
+      float *f1 = (float*)dGeomGetData (o1);
+      float *f2 = (float*)dGeomGetData (o2);
+      
+      contact[i].surface.mode = dContactBounce;
+      contact[i].surface.mu = f1[0]*f2[0];
+      contact[i].surface.bounce = f1[1]*f2[1];
+      dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
+    	  ->GetWorldID(), contactjoints,contact+i );
+      dJointAttach (c,dGeomGetBody (o1),dGeomGetBody (o2)); 
+    }
   }
   return;
 }
@@ -434,17 +444,20 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   SCF_INC_REF (dynsys);
 
   bodyID = dBodyCreate (dynsys->GetWorldID());
+  dBodySetData (bodyID, this);
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
   statjoint = 0;
 
   mesh = NULL;
   bone = NULL;
   move_cb = NULL;
+  coll_cb = NULL;
 }
 
 csODERigidBody::~csODERigidBody ()
 {
   if (move_cb) move_cb->DecRef ();
+  if (coll_cb) coll_cb->DecRef ();
   SCF_DEC_REF (dynsys);
   dBodyDestroy (bodyID);
 }
@@ -836,6 +849,18 @@ void csODERigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
   if (cb) cb->IncRef ();
   if (move_cb) move_cb->DecRef ();
   move_cb = cb;
+}
+
+void csODERigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
+{
+  if (cb) cb->IncRef ();
+  if (coll_cb) coll_cb->DecRef();
+  coll_cb = cb;
+}
+
+void csODERigidBody::Collision (iRigidBody *other)
+{
+  if (coll_cb) coll_cb->Execute (this, other);
 }
 
 void csODERigidBody::Update ()

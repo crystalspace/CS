@@ -199,6 +199,7 @@ private:
   iMeshWrapper* mesh;
   iSkeletonBone* bone;
   iDynamicsMoveCallback* move_cb;
+  iDynamicsCollisionCallback* coll_cb;
 
 public:
   SCF_DECLARE_IBASE;
@@ -258,9 +259,13 @@ public:
   //int GetJointCount () const = 0;
 
   void AttachMesh (iMeshWrapper* mesh);
+  iMeshWrapper *GetAttachedMesh () { return mesh; }
   void AttachBone (iSkeletonBone* bone);
+  iSkeletonBone *GetAttachedBone () { return bone; }
   void SetMoveCallback (iDynamicsMoveCallback* cb);
+  void SetCollisionCallback (iDynamicsCollisionCallback* cb);
 
+  void Collision (iRigidBody *other);
   void Update ();
 };
 
