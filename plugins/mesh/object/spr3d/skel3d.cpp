@@ -121,8 +121,9 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
 
 void csSkelLimb::SetName (const char *newname)
 {
-  if (name != NULL)
-    name = strdup (newname);
+  if (name) name = NULL;
+
+  name = strdup (newname);
 }
 
 iSkeletonConnection* csSkelLimb::CreateConnection ()
@@ -224,8 +225,8 @@ void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
 
 void csSkelLimbState::SetName (const char *newname)
 {
-  if (name != NULL)
-    name = strdup (newname);
+  if (name) name = NULL;
+  name = strdup (newname);
 }
 
 void csSkelConnectionState::Transform (const csTransform& tr,
