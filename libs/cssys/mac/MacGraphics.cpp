@@ -128,7 +128,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 	 *	DrawSprockets is available, then use it.
 	 */
 
-	if (( FullScreen ) && ( DSpStartup() == noErr )) {
+	if (( FullScreen ) && ( DSpStartup != NULL ) && ( DSpStartup() == noErr )) {
 		// Create the display
 		mDisplayAttributes.frequency 				= 0;
 		mDisplayAttributes.displayWidth				= Width;
