@@ -1707,7 +1707,7 @@ static void InitializeFogTable ()
 {
   fog_exp_table = new float [FOG_EXP_TABLE_SIZE];
   for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
-    fog_exp_table [i] = exp (-float (i) / 256.);
+    fog_exp_table [i] = 1 - exp (-float (i) / 256.);
 }
 
 #define SMALL_D 0.01
@@ -1792,7 +1792,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       if (table_index < FOG_EXP_TABLE_SIZE)
         I2 = fog_exp_table [table_index];
       else
-        I2 = 1.;
+        I2 = 0.;
 #else
       float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
 #endif
@@ -1881,7 +1881,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       if (table_index < FOG_EXP_TABLE_SIZE)
         I2 = fog_exp_table [table_index];
       else
-        I2 = 1.;
+        I2 = 0.;
 #else
       float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
 #endif
