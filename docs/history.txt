@@ -63,7 +63,6 @@ The history order is reversed so that new features are at the top.
 	  iEventQueue::Register in the file include/iutil/eventq.h, so now
 	  that comment is up to date with the introduction of two pseudo-event 
 	  types that have a Code value of cscmdProcess and cscmdFinalProcess.
-
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.
@@ -123,35 +122,34 @@ The history order is reversed so that new features are at the top.
 	- res fixed the NULL pointer access bug in TinyXML writing introduced
 	  after my recent leak fix.
 	- res made the following changes:
-	      - To the map loader:
-		  - Procedural textures and normal textures are parsed from 
-		    the same tag, <texture>.
-		  - Both kinds of textures are loaded in the same manner, 
-		    through plugin interfaces ('normal' images are handled by 
-		    a loader built into csloader.)
-		  - A 'texture loading context' is passed to a loader, 
-		    containing some info such as the image specified in <file> 
-		    and texture flags.
-		  - Built a checkerboard texture loader into csloader (this 
-		    one is used in case a texture couldn't be loaded 
-		    otherwise.)
-		  - Animated images are detected and the ptanimimg plugin is 
-		    tried for loading.
-	    - Changed the ClassIDs of the standard PT & animation texture 
+	    - To the map loader:
+		- Procedural textures and normal textures are parsed from the
+		  same tag, <texture>.
+		- Both kinds of textures are loaded in the same manner, through
+		  plugin interfaces ('normal' images are handled by a loader
+		  built into csloader.)
+		- A 'texture loading context' is passed to a loader, containing
+		  some info such as the image specified in <file> and texture
+		  flags.
+		- Built a checkerboard texture loader into csloader (this one
+		  is used in case a texture couldn't be loaded otherwise.)
+		- Animated images are detected and the ptanimimg plugin is
+		  tried for loading.
+	    - Changed the ClassIDs of the standard PT & animation texture
 	      plugins.
 	    - Fixed the JNG/MNG plugin to better recognize animated real-world
 	      MNGs.
 	    - Augmented csCreateXORPatternImage() to accept an optional color.
-	    - Changed flarge according to the loader changes and added a 
-	      yellow checkerboard texture.
+	    - Changed flarge according to the loader changes and added a yellow
+	      checkerboard texture.
 	    - Updated the API mod docs.
-	- Oktal changed csperl5distclean to csperl5maintainerclean, after
-	  being told that that is the correct target to use to clean files
-	  that are also in CVS.
+	- Oktal changed csperl5distclean to csperl5maintainerclean, after being
+	  told that that is the correct target to use to clean files that are
+	  also in CVS.
 12-May-2003
-	- Philip Wyett brought warning level in MSVC 7 project files down
-          to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for
-          both MSVC 6 and 7.
+	- Philip Wyett brought warning level in MSVC 7 project files down to 3
+	  to match MSVC 6 ones.  Also cleaned up 'group.tpl' for both MSVC 6
+	  and 7.
 	- Eric Sunshine eliminated compilation warning about non-virtual
 	  destructor in csScfStringSet.
 	- res fixed the iPolygonMesh issue for the ball plugin.
