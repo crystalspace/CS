@@ -38,7 +38,7 @@ To finally be able to use the image loader in your application you
 need to do:
 
 @example
-  iImageIO* imgldr = QUERY_PLUGIN (System, iImageIO);
+  iImageIO* imgldr = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
 @end example
 
 When you don't need it anymore you must call @code{imgldr->DecRef ()}.
