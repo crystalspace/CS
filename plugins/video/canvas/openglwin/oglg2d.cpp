@@ -80,6 +80,10 @@ CS_IMPLEMENT_PLUGIN
 
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 
+#ifndef ENUM_CURRENT_SETTINGS
+#define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
+#endif
+
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
   LPVOID lpMsgBuf;
