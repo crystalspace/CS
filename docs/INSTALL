@@ -54,16 +54,16 @@ And of course you also need a computer :-)
 The executable and all other files must be located in the same
 directory. The level files may be put anywhere. Please
 note that the level files should NOT be extracted. Crystal Space
-can read zip files directly and this is also the preferred way.
+can read zip files directly.
 
 To run Crystal Space with a specific level you have two
 possibilities (lets assume that you have put the level in a
 directory called 'data' and this directory is located in the
 same directory as the executable):
 
-    cryst data/level.zip
+    walktest data/level.zip
 
-(replace level.zip with any level you want).
+(Replace level.zip with any level you want).
 
 Otherwise you can edit cryst.cfg and set WORLDFILE=data/level.zip
 as a configuration option.
@@ -120,4 +120,3 @@ the one in Quake). Press 'tab' to toggle between the console and
 normal output. There are several commands that you can use. Type
 'help' to get the list of commands. There is a document docs/console.txt
 describing all these commands.
-

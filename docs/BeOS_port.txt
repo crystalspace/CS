@@ -44,7 +44,7 @@ This description follows the execution of walktest.exe.
 
 The main block creates the Walktest object (derived from SysSystemDriver) at the start and sets up a pointer Sys to it.
 
-It then picks up info from the configuration files, sets up the world, COM drivers, console object (SimpleConsole), loads textures, execute the script, etc.
+It then picks up info from the configuration files, sets up the world, COM drivers, console object (csSimpleConsole), loads textures, execute the script, etc.
 
 Right at the end it invokes the method Sys->Loop, which invokes the inherited SysSystemDriver::Loop method.  This method sets up the BeOS 2D Graphics interface to obtain the display view from it.
 
