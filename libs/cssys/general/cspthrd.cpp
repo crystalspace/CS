@@ -93,7 +93,7 @@ uint32 csThreadJoin (csThread *thread, void** retValue)
 uint32 csThreadKill (csThread *thread, csThreadSignal signal)
 {
   uint32 ret = CS_THREAD_NO_ERROR;
-  int sig;
+  int sig = 0;
 
   if (signal == csThreadSignalTerminate)
     sig = SIGTERM;
@@ -244,7 +244,7 @@ uint32 csMutexDestroy (csMutex* mutex)
 uint32 csSemaphoreInit (csSemaphore* sem, uint32 value)
 {
   int rc = sem_init ((sem_t*)sem, 0, (unsigned int)value);
-  uint32 ret;
+  uint32 ret = CS_THREAD_NO_ERROR;
   if (rc)
   {
     if (errno == EINVAL)
