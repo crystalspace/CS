@@ -21,22 +21,22 @@
 #define __IOBJECT_RTTI_H__
 
 /// Use this macro in the headers of a module that wants to use RTTI.
-#define DECLARE_OBJECT_TYPE (type)					\
+#define DECLARE_OBJECT_TYPE(type)					\
 	extern int csObjectType_##type;
 
 /// Use this macro in one source file of a module that wants to use RTTI.
-#define ALLOCATE_OBJECT_TYPE (type)					\
+#define ALLOCATE_OBJECT_TYPE(type)					\
 	int csObjectType_##type = -1;
 
 /**
  * Use this macro in the Initialize() method of a module that wants
  * to use RTTI.
  */
-#define INTIALIZE_OBJECT_TYPE (StringServer, type);			\
+#define INTIALIZE_OBJECT_TYPE(StringServer, type);			\
 	csObjectType_##type = (StringServer)->Request (#type);
 
 /// This is the 'dynamic cast'.
-#define QUERY_OBJECT_TYPE (object, type)				\
+#define QUERY_OBJECT_TYPE(object, type)					\
 	((type*)(object)->QueryObjectType(csObjectType_##type))
 
 /// Put this macro in the interface definition of an RTTI object.
@@ -48,13 +48,13 @@
 	virtual void *QueryObjectType (int typeID);
 
 /// Put these in the source file for the RTTI object:
-#define IMPLEMENT_OBJECT_INTERFACE (object)				\
+#define IMPLEMENT_OBJECT_INTERFACE(object)				\
 	void *object::QueryObjectType (int Type) {
 
-#define IMPLEMENTS_OBJECT_TYPE (tvar)					\
+#define IMPLEMENTS_OBJECT_TYPE(tvar)					\
 	if (Type == tvar) return this;
 
-#define IMPLEMENTS_EMBEDDED_OBJECT_TYPE (object, tvar)			\
+#define IMPLEMENTS_EMBEDDED_OBJECT_TYPE(object, tvar)			\
 	if (Type == tvar) return (object)->QueryObjectType (Type);
 
 #define IMPLEMENT_OBJECT_INTERFACE_END					\
