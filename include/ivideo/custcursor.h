@@ -24,6 +24,8 @@
 #include "csgeom/cspoint.h"
 #include "igraphic/image.h"
 
+struct iGraphics3D;
+
 /// The default custom cursor name
 #define CSCURSOR_Default "default"
 /// The custom cursor name used when a mouse button is pressed
