@@ -66,7 +66,7 @@ $(CSCONFIG.EXE):
 	@echo "fi"					>> cs-config
 	@echo "syslibs=\"$(LIBS.EXE)\""			>> cs-config
 	@echo "common_cflags=\"$(CFLAGS)\""		>> cs-config
-	@echo "common_cxxflags=\"$(CXXFLAGS)\""		>> cs-config
+	@echo "common_cxxflags=\"$(CFLAGS)\""		>> cs-config
 	@echo ""					>> cs-config
 	@echo "makevars()"				>> cs-config
 	@echo "{"					>> cs-config
