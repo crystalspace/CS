@@ -16,6 +16,10 @@ Short-term cleanups that need to be done:
 3-Nov-1999
 	- Removed init of four function pointers in OpenGL driver because
 	  gcc fails on them.
+	- Eric Sunshine reverted Jorrit's change to the OpenGL driver (but
+	  hopefully in a GCC-compatible fashion).  Jorrit's change was simply
+	  incorrect and would have resulted in a crash since those variables
+	  would have been used uninitialized.
 2-Nov-1999
 	- Added -lmgrid and -lmonly commandline option for software renderer.
 	  -lmgrid adds an extra grid to every lightmap lumel. -lmonly doesn't
