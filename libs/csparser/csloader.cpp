@@ -3923,7 +3923,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
     fatal_exit (0, false);
   }
 
-  size_t heightmapsize;
+  size_t heightmapsize = 257;
   char* heightmap = System->VFS->ReadFile (heightmapname, heightmapsize);
   if (heightmap == NULL)
   {
