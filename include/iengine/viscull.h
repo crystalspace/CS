@@ -29,6 +29,7 @@ struct iMovable;
 struct iShadowReceiver;
 struct iPolygon3D;
 struct iMeshWrapper;
+class csVector3;
 class csBox3;
 
 SCF_VERSION (iVisibilityCuller, 0, 0, 5);

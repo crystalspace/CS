@@ -54,6 +54,9 @@ The history order is reversed so that new features are at the top.
 	  avoided the crash by adding a test for this but I'm not sure if
 	  this is the good patch actually. The problem is at line 781 of
 	  libs/cssys/win32/win32.cpp.
+	- Added empty skeleton of the new 'dynavis' plugin. This plugin
+	  will contain the implementation of the new dynamic visibility
+	  system.
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include
