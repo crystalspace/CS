@@ -1337,8 +1337,136 @@ Likewise, the following string-related functions have been renamed:
 @code{csFindReplace()} @result{} @code{csReplaceAll()}
 @end itemize
 
-@subheading @sc{rapid} Collision Detection Plugin
+@subheading @sc{rapid} Collision Detection Plugin Removal
 
-The @sc{rapid} collision detection plugin has been removed. You can now
-use the @sc{opcode} plugin instead. It is faster and uses less memory.
+The @sc{rapid} collision detection plugin has been removed. In addition to
+being slower than the @sc{opcode} plugin and consuming more memory, its license
+prevented its use in commercial applications.  You should instead now use the
+@sc{opcode} plugin.
 
+@subheading 64-Bit Portability Changes
+
+Some changes have been made to the Crystal Space @sc{api} in order to better
+support 64-bit hardware, which is now becoming common. Additional changes to
+improve 64-bit support have also been made internally, but the internal changes
+essentially are transparent to external clients.
+
+The most significant change to the @sc{api} involves methods and classes
+dealing with data opaquely. Historically, opaque data has been handled using
+@samp{void*}, and programmers would cast numbers, booleans, and pointers to
+@samp{void*} when it was necessary to deal with the data in an opaque fashion.
+This technique, however, is not portable to 64-bit platforms. For this reason,
+the new standard type @samp{intptr_t} was introduced. This type is guaranteed
+to be large enough to store any integral numeric or pointer value regardless of
+the machine's word size.
+
+Crystal Space now uniformly uses @samp{intptr_t}, rather than @samp{void*},
+when dealing with opaque data. Upgrading your code to reflect this change is
+usually quite simple. Where your code presently declares a variable or casts a
+value to @samp{void*}, change it to @samp{intptr_t}. Likewise, @samp{void**}
+becomes @samp{intptr_t*}. For example:
+
+@example
+iGraphics2D canvas = @dots{};
+iEventOutlet* outlet = @dots{};
+outlet->Broadcast(cscmdCanvasExposed, (void*)canvas);
+@end example
+
+@noindent
+Becomes:
+
+@example
+outlet->Broadcast(cscmdCanvasExposed, (intptr_t)canvas);
+@end example
+
+The event system is impacted by this change. Specifically, the following
+methods and data members now deal with @samp{intptr_t} rather than @samp{void*}
+for the opaque ``info'' member of @code{csevCommand}-type events.
+
+@itemize @bullet
+@item
+@code{csEvent::csEvent()}
+@item
+@code{csEventCommandData::Info}
+@item
+@code{iEventOutlet::Broadcast()}
+@item
+@code{iEventOutlet::ImmediateBroadcast()}
+@end itemize
+
+The deprecated @sc{csws} module (Crystal Space Windowing System) has also been
+converted. Specifically, the following methods now deal with @samp{intptr_t}
+rather than @samp{void*} for all of @sc{csws}'s opaque data needs. @sc{csws}
+callback functions are likewise impacted.
+
+@itemize @bullet
+@item
+@code{csComponent::ForEach()}
+@item
+@code{csComponent::SendBroadcast()}
+@item
+@code{csComponent::SendCommand()}
+@item
+@code{csKeyboardAccelerator::Broadcast()}
+@item
+@code{csKeyboardAccelerator::Command()}
+@item
+@code{csListBoxItem::ForEachItem()}
+@item
+@code{csTimer::csTimer()}
+@item
+@code{csTreeBox::ForEachItem()}
+@item
+@code{csTreeItem::ForEachItem()}
+@end itemize
+
+The @sc{aws} plugin (Alternate Window System) and its interfaces have been been
+updated for 64-bit platform conformance.  Specifically, the following methods
+now deal with @samp{intptr_t} rather than @samp{void*} for all of @sc{aws}'s
+opaque data needs.
+
+@itemize @bullet
+@item
+@code{iAwsComponent::GetProperty()}
+@item
+@code{iAwsComponent::SetProperty()}
+@item
+@code{iAwsParmList::AddOpaque()}
+@item
+@code{iAwsParmList::GetOpaque()}
+@item
+@code{iAwsSink::RegisterTrigger()}
+@item
+@code{iAwsSinkManager::CreateSink()}
+@end itemize
+
+@sc{aws} callback functions (@dfn{triggers}) are likewise impacted. You need to
+change the declaration of your triggers to use @samp{intptr_t} rather than
+@samp{void*}. For example:
+
+@example
+void MyTrigger(void* sink, iAwsSource* source);
+@end example
+
+@noindent
+Becomes:
+
+@example
+void MyTrigger(intptr_t sink, iAwsSource* source);
+@end example
+
+Since converting client @sc{aws} code to the new @sc{api} can be rather onerous
+on account of the amount of repetitious manual labor involved, the old
+@samp{void*} @sc{api} is still present in @sc{aws}, though heavily
+deprecated. In the interests of 64-bit portability, the old @sc{api} will be
+removed at some point in the future.  You are encouraged, therefore, to convert
+your code to the new @sc{api}. As an aid to clients in upgrading their code to
+the new @sc{api}, one of two control macros can be defined which will help to
+isolate code which needs to be updated.  Defining @samp{AWS_OBSOLETE_VOIDP}
+(via @samp{#define} before including @file{iaws/aws.h}) removes from the
+@sc{api} all methods dealing with @samp{void*}, thus invocations of any such
+methods will result in compilation errors. Alternately, defining
+@samp{AWS_DEPRECATE_VOIDP}, will cause invocations of methods dealing with
+@samp{void*} to generate compilation warnings, assuming that the compiler
+supports such deprecation warnings. (Presently, only modern version of the
+@sc{gnu} compiler are so configured.)
