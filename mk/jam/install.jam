@@ -6,7 +6,6 @@ COPYDIRS ?= "cp -R" ;
 
 INSTALL ?= "install" ;
 INSTALL_PROGRAM ?= $(INSTALL) ;
-INSTALL_SCRIPT ?= $(INSTALL) ;
 INSTALL_DATA ?= "$(INSTALL) -m644" ;
 
 # set some paths
@@ -23,17 +22,6 @@ rule InstallHeader
     SEARCH on $(<:G=installheader) = $(SUBDIR) ;
     Depends install_include : 
 	[ DoInstall $(<:G=installheader) : $(includedir) $(2) ] ;
-}
-
-##  InstallShellScript scriptname [ : subdir ]
-##    Installs a shell script into the bindir directory. A subdirectory
-##    relative to the bindir can be specified.
-rule InstallShellScript
-{
-    SEARCH on $(<:G=installscript) = $(SUBDIR) ;
-    Depends install_shellscript :
-        [ DoInstall $(<:G=installscript) : $(bindir) $(2) : $(INSTALL_SCRIPT) ]
-    ;
 }
 
 ##  InstallData files [ : subdir ]
@@ -143,8 +131,7 @@ rule DoInstall
 #----------------------------------------------------------------------------
 
 INSTALLTARGETS = install_bin install_plugin install_lib install_include
-		 install_shellscript install_data install_config
-                 install_doc ;
+		 install_data install_config install_doc ;
 
 Always install $(INSTALLTARGETS) ;
 NotFile install $(INSTALLTARGETS) ;

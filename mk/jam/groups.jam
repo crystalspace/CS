@@ -15,6 +15,9 @@ rule CompileGroups
     Depends $(_i) : $(<) ;
     Depends $(_i)clean : $(<)clean ;
   }
+
+  # Just in case client forgot to invoke RegisterCompileGroups.
+  NotFile $(>) ;
 }
 
 ##  RegisterCompileGroups
@@ -22,6 +25,6 @@ rule CompileGroups
 ##    can use them.
 rule RegisterCompileGroups
 {
-# nothing here (but msvcgen will override this)
+  NotFile $(<) ;
 }
 

@@ -62,8 +62,7 @@ rule ConfigHelper
   }
   MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
   Depends $(<) : $(MAKEVARS) ;
-
-  InstallShellScript $(<) ;
+  Depends install_bin : [ DoInstall $(<) : $(bindir) : $(INSTALL_PROGRAM) ] ;
 }
 
 ConfigHelper cs-config ;

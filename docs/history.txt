@@ -22,6 +22,11 @@ chronological order.
 	  the rule (i.e. "install_config", "install_doc", etc.).
 	- Eric Sunshine fixed bugs in several rules in docs.jam where NotFile
 	  was being invoked for actual files.
+	- Eric Sunshine fixed bug in group.jam where it failed to invoke
+	  NotFile for each group name.
+	- Eric Sunshine fixed bug in cs-config/Jamfile (and install.jam) where
+	  the install target did not know how to build cs-config if it did not
+	  already exist at installation time.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause
