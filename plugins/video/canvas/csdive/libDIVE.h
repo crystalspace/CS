@@ -177,8 +177,9 @@ private:
   void *paramFocus;                     // Parameter passed to focus handler
   tMouseHandler hMouse;                 // Called on mouse events if not NULL
   void *paramMouse;                     // Parameter passed to mouse handler
+
 public:
-       HWND diveFR, diveCL, diveMN;     // Window frame, client and menu handles
+  HWND diveFR, diveCL, diveMN;          // Window frame, client and menu handles
   ULONG FrameCount;                     // Incremented on each complete redraw
   tDiveError lastError;                 // Last error condition
 

@@ -619,13 +619,16 @@ bool csGraphics2DOS2DIVE::SetMousePosition (int x, int y)
   if ((ww <= 0) || (wh <= 0))
     return false;
 
-  int fwidth, fheight;
-  System->GetWidthSetting (fwidth);
-  System->GetHeightSetting (fheight);
+  int fw, fh;
+  System->GetWidthSetting (fw);
+  System->GetHeightSetting (fh);
 
-  x = (x * ww) / fwidth;
-  y = ((wh - 1 - y) * wh) / fheight;
-  return WinSetPointerPos (HWND_DESKTOP, x, y);
+  POINTL pp;
+  pp.x = (x * ww) / fw;
+  pp.y = ((fh - 1 - y) * wh) / fh;
+  WinMapWindowPoints (dW->diveCL, HWND_DESKTOP, &pp, 1);
+
+  return WinSetPointerPos (HWND_DESKTOP, pp.x, pp.y);
 }
 
 bool csGraphics2DOS2DIVE::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
