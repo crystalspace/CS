@@ -335,6 +335,9 @@ public:
    * is associated with given material handle.
    */
   virtual void Prepare ();
+
+  virtual iShaderBranch* QueryShaderBranch ()
+  { return (iShaderBranch*)this; } // @@@ Evil cast?
 };
 
 /*
@@ -507,6 +510,11 @@ public:
   virtual int GetTextureFormat ();
 
   //virtual csPtr<iSuperLightmap> CreateSuperLightmap(int, int);
+
+  virtual int GetMaterialIndex (iMaterialHandle* mat)
+  {
+    return materials.Find ((csGLMaterialHandle*)mat); // @@@ Evil cast?
+  }
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

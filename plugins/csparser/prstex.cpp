@@ -586,7 +586,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
             break;
           }
           const char* shadername = child->GetContentsValue ();
-          iShader* shader = shaderMgr->GetShader (shadername);
+          iShaderWrapper* shader = shaderMgr->GetShader (shadername);
           if (!shader)
           {
             ReportNotify ("Shader (%s) couldn't be found for material %s, ignoring it", shadername,matname);
@@ -600,8 +600,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           }
           shadertypes.Push (strings->Request(shadertype));
           //shaders.Push (shader);
-	  csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
-	  shaders.Push (wrapper);
+	  //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
+	  shaders.Push (shader);
         }
         break;
 #endif //CS_USE_NEW_RENDERER

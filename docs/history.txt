@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+18-Jul-2003
+	- Anders Stenberg fixed compile errors introduced by Oktal. New
+	  renderer should compile, although variable functionality is
+	  crippled. (Results in lighting failure.)
 17-Jul-2003
         - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
           have had OUT.GLRENDER3D not DIR.GLRENDER3D.

@@ -497,36 +497,6 @@ void csShaderGLMTEX::ResetState ()
 {
 }
 
-
-csBasicVector csShaderGLMTEX::GetAllVariableNames()
-{
-  csBasicVector res;
-
-  csGlobalHashIterator c( &variables);
-  while(c.HasNext())
-  {
-    res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
-  }
-  return res;
-}
-
-csSymbolTable* csShaderGLMTEX::GetSymbolTable()
-{
-  return 0;
-}
-
-iShaderVariable* csShaderGLMTEX::GetVariable(int namehash)
-{
-  csHashIterator c(&variables, namehash);
-
-  if(c.HasNext())
-  {
-    return (iShaderVariable*)c.Next();
-  }
-
-  return 0;
-}
-
 csPtr<iString> csShaderGLMTEX::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);

@@ -85,6 +85,9 @@ private:
   csHashMap variables;
   bool validProgram;
 
+  csArray<csSymbolTable> symtabs;
+  csSymbolTable *symtab;
+
   // programloading stuff
   enum
   {
@@ -207,13 +210,13 @@ public:
   virtual void AddChild(iShaderBranch *c)
     { symtab->AddChild(c->GetSymbolTable()); }
   virtual void AddVariable(iShaderVariable* variable) 
-    { return false; } // Don't allow externals to add variables
+    { return; } // Don't allow externals to add variables
   virtual iShaderVariable* GetVariable(csStringID name)
     { return (iShaderVariable *) symtab->GetSymbol(name); }
   virtual csSymbolTable* GetSymbolTable()
     { return symtab; }
   virtual void SelectSymbolTable(int index) {
-    if (symtabs.Length() < index) symtabs.SetLength(index + 1);
+    if (symtabs.Length() < index) symtabs.SetLength(index + 1, 0);
     symtab = & symtabs[index];
   }
 

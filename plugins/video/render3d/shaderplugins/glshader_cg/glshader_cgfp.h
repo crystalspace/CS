@@ -120,18 +120,18 @@ public:
 
   virtual void ResetState () {}
 
-  /*virtual void AddChild(iShaderBranch *c)
+  virtual void AddChild(iShaderBranch *c)
     { symtab->AddChild(c->GetSymbolTable()); }
   virtual void AddVariable(iShaderVariable* variable) 
-    { return false; } // Don't allow externals to add variables
+    { return; } // Don't allow externals to add variables
   virtual iShaderVariable* GetVariable(csStringID name)
     { return (iShaderVariable *) symtab->GetSymbol(name); }
   virtual csSymbolTable* GetSymbolTable()
     { return symtab; }
   virtual void SelectSymbolTable(int index) {
-    if (symtabs.Length() < index) symtabs.SetLength(index + 1);
+    if (symtabs.Length() < index) symtabs.SetLength(index + 1, 0);
     symtab = & symtabs[index];
-  }*/
+  }
 
   /* Propertybag - get property, return false if no such property found
   * Which properties there is is implementation specific
@@ -148,16 +148,6 @@ public:
   virtual bool SetProperty(const char* name, int* string) {return false;};
   virtual bool SetProperty(const char* name, csVector3* string) {return false;};
   //  virtual bool SetProperty(const char* name, csVector4* string) {return false;};
-
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable) 
-  { /*do not allow externals to add variables*/ return false; };
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
-  /// Get all variable stringnames added to this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames(); 
-  virtual csSymbolTable* GetSymbolTable();
-
 
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 

@@ -48,7 +48,7 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   // set variables
   int i;
-  for(i = 0; i < variablemap.Length(); ++i)
+  /*for(i = 0; i < variablemap.Length(); ++i)
   {
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);
     if (!e->parameter)
@@ -91,7 +91,7 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         break;
       }
     }
-  }
+  }*/
 
   for(i = 0; i < matrixtrackers.Length(); ++i)
   {
@@ -185,7 +185,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
-          csRef<iShaderVariable> var = 
+          /*csRef<iShaderVariable> var = 
             shadermgr->CreateVariable (child->GetAttributeValue ("name"));
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
@@ -210,13 +210,13 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
           }
           // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
           var->IncRef (); 
-          variables.Put( csHashCompute(var->GetName()), var);
+          variables.Put( csHashCompute(var->GetName()), var);*/
         }
         break;
       case XMLTOKEN_VARIABLEMAP:
         {
           //create a varable<->register mapping
-          variablemapentry * map = new variablemapentry();
+          /*variablemapentry * map = new variablemapentry();
           const char* varname = child->GetAttributeValue("variable");
           map->name = new char[strlen(varname)+1];
           memset(map->name, 0, strlen(varname)+1); 
@@ -230,7 +230,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
           
           map->namehash = csHashCompute(varname);
           //save it for later
-          variablemap.Push( map );
+          variablemap.Push( map );*/
         }
         break;
       default:
@@ -248,7 +248,7 @@ bool csShaderGLCGVP::Prepare()
   if (!LoadProgramStringToGL(programstring))
     return false;
 
-  for(int i = 0; i < variablemap.Length(); i++)
+  /*for(int i = 0; i < variablemap.Length(); i++)
   {
     variablemapentry* e = (variablemapentry*)variablemap.Get(i);
     e->parameter = cgGetNamedParameter (program, e->cgvarname);
@@ -261,7 +261,7 @@ bool csShaderGLCGVP::Prepare()
     }
     if (!cgIsParameterReferenced (e->parameter))
       e->parameter = 0;
-  }
+  }*/
 
   CGparameter param = cgGetFirstLeafParameter (program, CG_SOURCE);
   while (param)
@@ -364,33 +364,4 @@ csPtr<iString> csShaderGLCGVP::GetProgramID()
   scfString* str = new scfString();
   str->Append((const char*)d.data[0], 16);
   return csPtr<iString>(str);
-}
-
-csBasicVector csShaderGLCGVP::GetAllVariableNames()
-{
-  csBasicVector res;
-
-  csGlobalHashIterator c( &variables);
-  while(c.HasNext())
-  {
-    res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
-  }
-  return res;
-}
-
-csSymbolTable* csShaderGLCGVP::GetSymbolTable()
-{
-  return 0;
-}
-
-iShaderVariable* csShaderGLCGVP::GetVariable(int namehash)
-{
-  csHashIterator c(&variables, namehash);
-
-  if(c.HasNext())
-  {
-    return (iShaderVariable*)c.Next();
-  }
-
-  return 0;
 }
