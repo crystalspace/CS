@@ -28,6 +28,10 @@
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
 
+#ifndef GL_VERSION_1_1
+#error OpenGL version 1.1 required! Stopping compilation.
+#endif
+
 CS_IMPLEMENT_PLUGIN
 
 #ifndef CDS_UPDATEREGISTRY

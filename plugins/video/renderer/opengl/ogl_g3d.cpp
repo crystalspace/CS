@@ -27,6 +27,10 @@
 #include <GL/gl.h>
 #endif
 
+#ifndef GL_VERSION_1_1
+#error OpenGL version 1.1 required! Stopping compilation.
+#endif
+
 #include "ogl_g3d.h"
 
 /*=========================================================================
