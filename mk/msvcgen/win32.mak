@@ -57,10 +57,7 @@ MSVC.DSP.AUGMENTED = $(foreach d,$(MSVC.DSP),$(DSP.$d.TYPE).$d)
 MSVC.DSP += WIN32SYS
 DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
-INC.WIN32SYS = \
-  include/cssys/win32/csosdefs.h \
-  include/cssys/win32/volatile.h \
-  include/cssys/win32/win32.h
+INC.WIN32SYS = $(wildcard include/cssys/win32/*.h)
 SRC.WIN32SYS = \
   $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp) \
   libs/cssys/general/findlib.cpp \
