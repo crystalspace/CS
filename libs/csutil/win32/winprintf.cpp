@@ -108,6 +108,8 @@ static int _cs_fputs (const char* string, FILE* stream)
 		case csAnsiParser::attrInvisible:
 		  break;
 		*/
+		default:
+		  break;
 	      }
 	    }
 	    break;
@@ -127,6 +129,8 @@ static int _cs_fputs (const char* string, FILE* stream)
 		case csAnsiParser::attrInvisible:
 		  break;
 		*/
+		default:
+		  break;
 	      }
 	    }
 	    break;
@@ -137,6 +141,8 @@ static int _cs_fputs (const char* string, FILE* stream)
 	  case csAnsiParser::cmdFormatAttrBackground:
 	    textAttr = (textAttr & ~backgroundMask) 
 	      | (ansiToWindows[commandParams.colorVal] << 4);
+	    break;
+	  default:
 	    break;
 	}
       }
