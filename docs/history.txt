@@ -16,14 +16,62 @@ The history order is reversed so that new features are at the top.
 	- Fixed the crossbld makefile so that it actually links.
 	- Haze Mesh: Implement HitBeamBBox.
 	- Michael Voase did the following:
-	  Sprite2D: Implement HitBeamBBox and
-	  HitBeamOutline. Modified SetupObject() to 
-	  always calculate the radius when the object
-	  is setup, reguardless of the lighting setting.
-	  Introduced a GetObjectBoundingBox method,
-	  but it is as yet invalid. More work to be done
-	  here yet. 
-	  Sprite3D: Tidying up HitBeam.
+	    - Sprite2D: Implement HitBeamBBox and HitBeamOutline. Modified
+	      SetupObject() to always calculate the radius when the object
+	      is setup, reguardless of the lighting setting.
+	    - Introduced a GetObjectBoundingBox method, but it is as yet
+	      invalid. More work to be done here yet. 
+	    - Sprite3D: Tidying up HitBeam.
+	- Martin Geisse moved the SPR exporter to its plugin, using a
+	  subclass of csSpriteBuilder.
+	- Philip Wyett fixed a linking error in spr.mak by adding CSTOOL.
+	- Philip also added EAX plugin entry into SCF for it's imminent
+	  re-insertion back into CS after being updated by Peter Nimmervoll.
+	- Philip reports:
+	  Re-inserted EAX after repair by Peter Nimmervoll - Many thanks.
+	  Added EAX plugin to MSVC port and MSVCGEN process.
+	  Manual update of MSVC project files.
+	  Note:
+	    To build the EAX plugin you will need the EAX 2.0 SDK
+	    available from: "http://www.developer.creative.com" 10Mb
+	    download. Please remember to add the "include" and "lib"
+	    directories to point to the respective files in-order to 
+	    successfully compile.
+	- Philip Wyett did some documentation changes:
+	    - Added "isotest" to app overview list.
+	    - Changed round MSVC 5 & 6 in menu of Windows build docs.
+	    - Added a missing ")" and changed link to ssh for win32
+	      from redeye entertainment to my personal webserver.
+	- Philip cleaned up header defines and brought into line with
+	  CS coding style and standards.
+	- Philip renamed class: TextureTrans -> class csTextureTrans.
+	- Philiop changed the SCF config line from
+	  "crystalspace.sound.render.eax" to "crystalspace.sound.render.ds3d",
+	  being EAX plugin is supposed to be a higher layer on top of Direct
+	  Sound plugin.
+18-Aug-2001
+	- Martin Geisse made the following changes:
+	    - Registered all converter plugins in scf.cfg.
+	    - Added csString::Detach(). This function empties the string
+	      without deleting the contents (which is faster than copying the
+	      contents and then delete the string). The content buffer is
+	      also returned.
+	    - Moved the POV converter to its plugin.
+	    - Moved sprite building out of the crossbuilder and into its own
+	      'sprite builder' class. This makes it possible to create a
+	      subclass of the sprite builder which writes the data to a file
+	      (will be used for the SPR exporter).
+	    - Moved BuildVertexArray() from the crossbuilder to
+	      csModelDataTools.
+	    - Removed the obsolete pobject.h from csutil.
+	- Philip Wyett removed incorrect ".cvsignore" and added new one in
+	  "\lib" directory to ignore the extracted libs from winlibs package.
+	  In addition Philip updated several .cvsignore files. He reports:
+	      This change is in advance of a new winlibs release which
+	      will change the "lib" dir to "libs" and skip the already in
+	      cvs directory "lib" and allow this "cvsingore" to be
+	      correctly applied.
+	      Note: You need to now use winlibs 0.19d.
 17-Aug-2001
 	- Integrated a few patches from Matze Braun <matze@braunis.de>
 	  to make sure that CS compiles cleanly with gcc3.0. To enable
@@ -33,6 +81,29 @@ The history order is reversed so that new features are at the top.
 	  This should be done automatically by the makefile (configure
 	  time) but I don't know how to do this.
 16-Aug-2001
+	- Martin Geisse updated the list of contributors in the docs.
+	- Martin also added the following files to 'cvsignore':
+	    - In "cs/": *.dll
+	    - In "cs/include/cssys/win32/": freetype.h, fterrid.h, ftnameid.h,
+	      jconfig.h, jerror.h, jinclude.h, jmorecfg.h, jpeglib.h,
+	      lauxlib.h, lua.h, luadebug.h, lualib.h, png.h, pngconf.h,
+	      zconf.h, zlib.h, divx, lib3ds.
+	    - In "cs/libs/cssys/win32": lib
+	- Martin fixed a bug in the engine where it was using typed vectors
+	  the wrong way and added a note to typed vectors to prevent others
+	  from doing the same mistake.
+	- Christopher Nelson did the following:
+	    - Updated AWS interface again for font and event handling.
+	    - Added event handling hook. In your main event handler, you
+	      should now call aws->HandleEvent(Event) to allow the windowing
+	      system to process events.
+	    - Updated window draw code, improved window look.  Windows can
+	      now be resized by grabbing onto the grip.
+	    - Fixed the mark code a little bit to increase efficiency. The
+	      window redraw now checks to see if the window covers the entire
+	      dirty area that is being redrawn. If so, no background erasure
+	      is performed.
+	    - Added font handling abilities to the preference manager. 
 	- Eric Sunshine made the following changes to the Texinfo user's
 	  manual:
 	    - Repaired the seriously broken navigational structure which
