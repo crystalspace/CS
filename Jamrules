@@ -191,7 +191,7 @@ if $(XFREE86VM.AVAILABLE) = "yes" { STATIC.PLUGINLIST += xext86vm ; }
 if $(DIRECTX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += ddraw2d ; }
 if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glwin32 ; }
-if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cocoa2d cgdriver2d ; }
+if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cgdriver2d ; }
 if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glosx2d ; }
 

@@ -3,6 +3,5 @@ SubDir TOP plugins video canvas macosx ;
 # Jam rules are order-sensitive; Library targets must appear before Plugin.
 SubInclude TOP plugins video canvas macosx common ;
 
-SubInclude TOP plugins video canvas macosx cocoa ;
 SubInclude TOP plugins video canvas macosx coregraphics ;
 SubInclude TOP plugins video canvas macosx opengl ;

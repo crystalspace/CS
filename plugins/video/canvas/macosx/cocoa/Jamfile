@@ -1,9 +1,0 @@
-SubDir TOP plugins video canvas macosx cocoa ;
-
-if $(TARGET.OS) = "MACOS_X"
-{
-Description cocoa2d : "MacOS/X Cocoa 2D driver" ;
-Plugin cocoa2d : [ Wildcard *.cpp *.m *.h ] ;
-LinkWith cocoa2d : canvascommon csutil ;
-CompileGroups cocoa2d : drivers2d softcanvas ;
-}
