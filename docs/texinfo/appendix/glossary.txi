@@ -76,7 +76,7 @@ is very modular. The engine itself does not know how to render. It only
 knows about mesh objects. Every mesh object is responsible for rendering
 what it represents (using the 3D renderer). Crystal Space supports several
 mesh objects: things, 3D sprites, 2D sprites, particle systems, haze,
-terrain engine, metaballs, ...
+terrain engine, ...
 
 @item Object Registry
 The object registry (represented by the @samp{iObjectRegistry} interface

@@ -71,8 +71,6 @@ if $(USE_NEW_RENDERER) = "yes"
     ieplex
     imgplex
     mballldr
-    metaball
-    metagen
     motion
     motldr
     nullmesh
@@ -145,8 +143,6 @@ else
     ieplex
     imgplex
     mballldr
-    metaball
-    metagen
     motion
     motldr
     nullmesh

@@ -14,6 +14,11 @@ chronological order.
 	- Eric Sunshine fixed numerous Texinfo errors and other mark-up
 	  problems recently introduced into the user manual.  Also rewrote some
 	  of the discussion in apimod98.txi.
+	- Jorrit removed csTesselator class since it is the marching cubes
+	  algorithm and that is patented :-(
+	- Jorrit also removed metaball and metagen since both use
+	  csTesselator. They can be revived if someone can provide an
+	  alternative algorithm to do tesselation.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,

@@ -14,8 +14,6 @@ SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh impexp ;
 SubInclude TOP plugins mesh lghtng ;
-SubInclude TOP plugins mesh metaball ;
-SubInclude TOP plugins mesh metagen ;
 SubInclude TOP plugins mesh null ;
 SubInclude TOP plugins mesh rain ;
 SubInclude TOP plugins mesh snow ;

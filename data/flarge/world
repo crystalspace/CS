@@ -11,8 +11,6 @@
         <plugin name="treeFact">crystalspace.mesh.loader.factory.genmesh.tree</plugin>
         <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
         <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
-        <plugin name="metafact">crystalspace.mesh.loader.factory.metaball</plugin>
-        <plugin name="metablob">crystalspace.mesh.loader.metaball</plugin>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
         <plugin name="dots">crystalspace.texture.loader.dots</plugin>
@@ -1812,10 +1810,6 @@
             </p>
             <smooth />
         </params>
-    </meshfact>
-    <meshfact name="metablobfact">
-        <plugin>metafact</plugin>
-        <params />
     </meshfact>
     <meshfact name="billboard">
         <plugin>spr2dFact</plugin>
@@ -19180,30 +19174,6 @@
             <radius>80</radius>
             <color red="0.2" green="0.9" blue="0.1" />
         </light>
-        <meshobj name="meta">
-            <plugin>metablob</plugin>
-            <params>
-                <factory>metablobfact</factory>
-                <material>blobby</material>
-                <lighting>yes</lighting>
-                <isolevel>0.3</isolevel>
-                <charge>2.5</charge>
-                <number>3</number>
-                <rate>0.2</rate>
-                <truemap>no</truemap>
-                <texscale>1</texscale>
-                <mixmode>
-                    <alpha>0.61</alpha>
-                </mixmode>
-            </params>
-            <move>
-                <v x="19" y="-17" z="13.5" />
-                <matrix>
-                    <scale x="0.1" y="0.1" z="0.1" />
-                </matrix>
-            </move>
-            <ztest />
-        </meshobj>
     </sector>
     <sector name="kamer2l">
         <meshobj name="walls">

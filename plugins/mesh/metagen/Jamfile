@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh metagen ;
-
-SubInclude TOP plugins mesh metagen object ;

@@ -1,4 +1,0 @@
-SubDir TOP plugins mesh metaball ;
-
-SubInclude TOP plugins mesh metaball object ;
-SubInclude TOP plugins mesh metaball persist ;
