@@ -176,7 +176,7 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
-void csCurve::CalculateLighting (csLightView& lview)
+void csCurve::CalculateLighting (csFrustrumView& lview)
 {
   if (!lightmap) return;
   if (lightmap_up_to_date) return;
@@ -187,7 +187,7 @@ void csCurve::CalculateLighting (csLightView& lview)
   UByte* mapR = map.GetRed ();
   UByte* mapG = map.GetGreen ();
   UByte* mapB = map.GetBlue ();
-  csStatLight* light = (csStatLight*)lview.l;
+  csStatLight* light = (csStatLight*)lview.userdata;
 
   csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
   int l1, l2, l3;

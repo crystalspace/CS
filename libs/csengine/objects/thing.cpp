@@ -466,7 +466,7 @@ void csThing::DrawFoggy (csRenderView& d)
 }
 
 
-void csThing::CalculateLighting (csLightView& lview)
+void csThing::CheckFrustrum (csFrustrumView& lview)
 {
   csPolygon3D* p;
   int i;
@@ -485,14 +485,14 @@ void csThing::CalculateLighting (csLightView& lview)
   {
     p = GetPolygon3D (i);
     p->CamUpdate ();
-    p->CalculateLighting (&lview);
+    lview.poly_func ((csObject*)p, &lview);
   }
 
   // Loop over all curves
   for (i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
-    c->CalculateLighting (lview);
+    lview.curve_func ((csObject*)c, &lview);
   }
 
   draw_busy--;

@@ -146,7 +146,7 @@ public:
   /**
    * Update the lightmap for the given light.
    */
-  void FillLightMap (csLightView& lview);
+  void FillLightMap (csFrustrumView& lview);
 
   /**
    * Update the real lightmap for a given csLightPatch

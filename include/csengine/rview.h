@@ -29,7 +29,7 @@ class csVector3;
 class csLight;
 class csPolygon3D;
 class csRenderView;
-class csLightView;
+class csFrustrumView;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -38,7 +38,7 @@ struct iGraphics2D;
 typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
 
 /// A callback function for csLight::LightingFunc().
-typedef void (csLightingFunc) (csLightView* lview, int type, void* entity);
+typedef void (csLightingFunc) (csFrustrumView* lview, int type, void* entity);
 
 /**
  * Flags for the callbacks called via csWorld::DrawFunc() or
@@ -350,22 +350,40 @@ public:
   }
 };
 
+class csFrustrumView;
+class csObject;
+typedef void (csFrustrumViewFunc)(csObject* obj, csFrustrumView* lview);
+
 /**
- * This structure represents all information needed for static lighting.
- * It is the basic information block that is passed between the various
- * static lighting routines.
+ * This structure represents all information needed for the frustrum
+ * visibility calculator.
+ * @@@ This structure needs some cleanup. It contains too many
+ * fields that are lighting related. These should probably go to
+ * the 'userdata'.
  */
-class csLightView
+class csFrustrumView
 {
 public:
-  /// The light that we're processing.
-  csLight* l;
+  /// Data for the functions below.
+  void* userdata;
+  /// A function that is called for every polygon that is hit.
+  csFrustrumViewFunc* poly_func;
+  /// A function that is called for every curve that is hit.
+  csFrustrumViewFunc* curve_func;
+  /// If true the we process shadows for things.
+  bool things_shadow;
 
   /**
    * The current color of the light. Initially this is the same as the
    * light in csStatLight but portals may change this.
    */
   float r, g, b;
+
+  /// Radius we want to check.
+  float radius;
+
+  /// Squared radius.
+  float sq_radius;
 
   /// If space is mirrored.
   bool mirror;
@@ -413,10 +431,10 @@ public:
 
 public:
   ///
-  csLightView () : light_frustrum (NULL), callback (NULL), callback_data (NULL) { }
+  csFrustrumView () : light_frustrum (NULL), callback (NULL), callback_data (NULL) { }
  
   ///
-  ~csLightView ()
+  ~csFrustrumView ()
   {
     CHK (delete light_frustrum);
   }

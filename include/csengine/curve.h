@@ -155,7 +155,7 @@ public:
   ///
   void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
   ///
-  void CalculateLighting (csLightView& lview);
+  void CalculateLighting (csFrustrumView& lview);
   ///
   void CacheLightMaps (csPolygonSet* owner, int index);
   

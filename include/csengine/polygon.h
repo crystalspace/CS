@@ -924,7 +924,7 @@ public:
    * If the lightmaps were cached in the level archive this function will
    * do nothing.
    */
-  void FillLightMap (csLightView& lview);
+  void FillLightMap (csFrustrumView& lview);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -952,14 +952,14 @@ public:
    * This function will also discard all shadow frustrums which start at
    * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustrums (csLightView& lview, csPlane3& plane);
+  bool MarkRelevantShadowFrustrums (csFrustrumView& lview, csPlane3& plane);
 
   /**
-   * Check visibility of this polygon with the given csLightView
+   * Check visibility of this polygon with the given csFrustrumView
    * and fill the lightmap if needed (this function calls FillLightMap ()).
    * This function will also traverse through a portal if so needed.
    */
-  void CalculateLighting (csLightView* lview);
+  void CalculateLighting (csFrustrumView* lview);
 
   /**
    * Call after calling InitLightMaps and CalculateLighting to cache

@@ -245,7 +245,7 @@ void InfPortalCS::ConnectNewSector ()
   {
     int old_draw_busy = s->draw_busy;
     s->draw_busy = 0;
-    CalculateLighting (lviews->lv);
+    CheckFrustrum (lviews->lv);
     s->draw_busy = old_draw_busy;
 
     LV* n = lviews->next;
@@ -273,14 +273,14 @@ csSector* InfPortalCS::FollowSegment (csReversibleTransform& t, csVector3& new_p
   return csPortal::FollowSegment (t, new_position, mirror);
 }
 
-void InfPortalCS::CalculateLighting (csLightView& lview)
+void InfPortalCS::CheckFrustrum (csFrustrumView& lview)
 {
   if (!GetSector ())
   {
     if (!lview.dynamic)
     {
       // If we want to shine light through this portal but it doesn't
-      // really exist yet then we remember the csLightView for later.
+      // really exist yet then we remember the csFrustrumView for later.
       CHK (LV* lv = new LV ());
       lv->next = lviews;
       lviews = lv;
@@ -291,7 +291,7 @@ void InfPortalCS::CalculateLighting (csLightView& lview)
   }
   else
   {
-    csPortal::CalculateLighting (lview);
+    csPortal::CheckFrustrum (lview);
   }
 }
 

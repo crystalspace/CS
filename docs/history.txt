@@ -9,6 +9,16 @@ The history order has been reversed so that new features are at the top.
 	  corrupted after CompressVertices(). Modified CompressVertices()
 	  itself so that it recalculates the bounding box if it is
 	  there.
+	- Did a big change to csSector::CalculateLighting(). It is now
+	  called CheckFrustrum() instead. It is now a general function
+	  used to check what is visible in a frustrum. The csFrustrumView
+	  (used to be csLightView) that you give to this routine contains
+	  two callback routines (one for polygons and one for curves) which
+	  will be called for every visible polygon or curve. You can do
+	  your stuff there. The engine itself uses this for lighting.
+	  Note that there is still some stuff to clean up here. The
+	  csFrustrumView structure contains too much that is specific to
+	  lighting.
 18-Apr-2000
 	- Norman Kramer added QueueExtendedKeyEvent to support regional
 	  keyboardlayouts. For an example see HandleEvent in x2d.cpp.

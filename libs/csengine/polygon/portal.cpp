@@ -153,11 +153,11 @@ csSector* csPortal::FollowSegment (csReversibleTransform& t,
   return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
 }
 
-void csPortal::CalculateLighting (csLightView& lview)
+void csPortal::CheckFrustrum (csFrustrumView& lview)
 {
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
-  csLightView new_lview = lview;
+  csFrustrumView new_lview = lview;
   if (lview.light_frustrum)
     CHKB (new_lview.light_frustrum = new csFrustrum (*lview.light_frustrum));
 
@@ -244,7 +244,7 @@ void csPortal::CalculateLighting (csLightView& lview)
     copied_frustrums = true;
   }
 
-  sector->CalculateLighting (new_lview);
+  sector->CheckFrustrum (new_lview);
 
   if (do_warp_space)
     csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);

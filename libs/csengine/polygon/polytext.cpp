@@ -427,10 +427,10 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 }
 
 /* Modified by me to add nice lightmaps recalculations -- D.D. */
-void csPolyTexture::FillLightMap (csLightView& lview)
+void csPolyTexture::FillLightMap (csFrustrumView& lview)
 {
   if (!lm) return;
-  csStatLight* light = (csStatLight*)lview.l;
+  csStatLight* light = (csStatLight*)lview.userdata;
 
 #define QUADTREE_SHADOW 0
 #if QUADTREE_SHADOW

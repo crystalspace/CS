@@ -249,9 +249,9 @@ public:
                                   csVector3& new_position, bool& mirror);
 
   /**
-   * Update lighting of all polygons reachable through this portal.
+   * Check frustrum visibility of all polygons reachable through this portal.
    */
-  virtual void CalculateLighting (csLightView& lview);
+  virtual void CheckFrustrum (csFrustrumView& lview);
 };
 
 #endif /*PORTAL_H*/

@@ -89,7 +89,7 @@ public:
   {
   public:
     LV* next;
-    csLightView lv;
+    csFrustrumView lv;
   };
   LV* lviews;
   int x1, y1, z1;
@@ -97,7 +97,7 @@ public:
   InfPortalCS () : csPortal () { lviews = NULL; }
   void ConnectNewSector ();
   virtual bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview);
-  virtual void CalculateLighting (csLightView& lview);
+  virtual void CheckFrustrum (csFrustrumView& lview);
   virtual csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position, bool& mirror);
 };
 

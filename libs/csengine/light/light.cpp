@@ -27,6 +27,8 @@
 #include "csengine/cssprite.h"
 #include "csengine/world.h"
 #include "csengine/lppool.h"
+#include "csengine/polygon.h"
+#include "csengine/curve.h"
 
 //---------------------------------------------------------------------------
 
@@ -173,6 +175,18 @@ csStatLight::~csStatLight ()
   CHK (delete [] polygons);
 }
 
+void poly_light_func (csObject* obj, csFrustrumView* lview)
+{
+  csPolygon3D* poly = (csPolygon3D*)obj;
+  poly->CalculateLighting (lview);
+}
+
+void curve_light_func (csObject* obj, csFrustrumView* lview)
+{
+  csCurve* curve = (csCurve*)obj;
+  curve->CalculateLighting (*lview);
+}
+
 void csStatLight::CalculateLighting ()
 {
   csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
@@ -180,8 +194,13 @@ void csStatLight::CalculateLighting ()
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
-  csLightView lview;
-  lview.l = this;
+  csFrustrumView lview;
+  lview.userdata = (void*)this;
+  lview.poly_func = poly_light_func;
+  lview.curve_func = curve_light_func;
+  lview.radius = GetRadius ();
+  lview.sq_radius = GetSquaredRadius ();
+  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
   lview.mirror = false;
   lview.gouraud_only = false;
   lview.gouraud_color_reset = false;
@@ -192,7 +211,7 @@ void csStatLight::CalculateLighting ()
 
   CHK (lview.light_frustrum = new csFrustrum (center));
   lview.light_frustrum->MakeInfinite ();
-  sector->CalculateLighting (lview);
+  sector->CheckFrustrum (lview);
 }
 
 void csStatLight::CalculateLighting (csThing* th)
@@ -202,8 +221,13 @@ void csStatLight::CalculateLighting (csThing* th)
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
-  csLightView lview;
-  lview.l = this;
+  csFrustrumView lview;
+  lview.userdata = (void*)this;
+  lview.poly_func = poly_light_func;
+  lview.curve_func = curve_light_func;
+  lview.radius = GetRadius ();
+  lview.sq_radius = GetSquaredRadius ();
+  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
   lview.mirror = false;
   lview.gouraud_only = false;
   lview.gouraud_color_reset = false;
@@ -214,7 +238,7 @@ void csStatLight::CalculateLighting (csThing* th)
 
   CHK (lview.light_frustrum = new csFrustrum (center));
   lview.light_frustrum->MakeInfinite ();
-  th->CalculateLighting (lview);
+  th->CheckFrustrum (lview);
 }
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
@@ -223,8 +247,13 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
-  csLightView lview;
-  lview.l = this;
+  csFrustrumView lview;
+  lview.userdata = (void*)this;
+  lview.poly_func = poly_light_func;
+  lview.curve_func = curve_light_func;
+  lview.radius = GetRadius ();
+  lview.sq_radius = GetSquaredRadius ();
+  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
   lview.mirror = false;
   lview.gouraud_only = false;
   lview.gouraud_color_reset = false;
@@ -237,7 +266,7 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 
   CHK (lview.light_frustrum = new csFrustrum (center));
   lview.light_frustrum->MakeInfinite ();
-  sector->CalculateLighting (lview);
+  sector->CheckFrustrum (lview);
 }
 
 
@@ -347,8 +376,13 @@ void csDynLight::Setup ()
   else cc->MakeEmpty ();
   while (lightpatches)
     csWorld::current_world->lightpatch_pool->Free (lightpatches);
-  csLightView lview;
-  lview.l = this;
+  csFrustrumView lview;
+  lview.userdata = (void*)this;
+  lview.poly_func = poly_light_func;
+  lview.curve_func = curve_light_func;
+  lview.radius = GetRadius ();
+  lview.sq_radius = GetSquaredRadius ();
+  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
   lview.mirror = false;
   lview.gouraud_only = false;
   lview.gouraud_color_reset = false;
@@ -359,7 +393,7 @@ void csDynLight::Setup ()
 
   CHK (lview.light_frustrum = new csFrustrum (center));
   lview.light_frustrum->MakeInfinite ();
-  sector->CalculateLighting (lview);
+  sector->CheckFrustrum (lview);
 }
 
 void csDynLight::Move (csSector* sector, float x, float y, float z)

@@ -99,7 +99,7 @@ int collcount = 0;
 
 // Callback for LightingFunc() to show the lighting frustrum for the
 // selected light.
-void show_frustrum (csLightView* lview, int type, void* /*entity*/)
+void show_frustrum (csFrustrumView* lview, int type, void* /*entity*/)
 {
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   int white = txtmgr->FindRGB (255, 255, 255);

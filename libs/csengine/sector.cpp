@@ -329,6 +329,9 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 csSector* csSector::FollowSegment (csReversibleTransform& t,
   csVector3& new_position, bool& mirror)
 {
+//csVector3 delta = new_position-t.GetOrigin ();
+//if (!(delta < EPSILON))
+//printf ("FollowSegment (%f,%f,%f) delta=%f,%f,%f\n", new_position.x, new_position.y, new_position.z, delta.x, delta.y, delta.z);
   csVector3 isect;
   csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
   csPortal* po;
@@ -336,6 +339,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
   if (p)
   {
     po = p->GetPortal ();
+//printf ("  %s isect=(%f,%f,%f) po=%08lx\n", p->GetName (), isect.x, isect.y, isect.z, po);
     if (po)
       return po->FollowSegment (t, new_position, mirror);
     else
@@ -995,11 +999,11 @@ void csSector::Draw (csRenderView& rview)
   draw_busy--;
 }
 
-void* csSector::CalculateLightingPolygons (csSector*,
+void* csSector::CheckFrustrumPolygons (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
-  csLightView* lview = (csLightView*)data;
+  csFrustrumView* lview = (csFrustrumView*)data;
   csVector3& center = lview->light_frustrum->GetOrigin ();
   int i, j;
   for (i = 0 ; i < num ; i++)
@@ -1012,13 +1016,13 @@ void* csSector::CalculateLightingPolygons (csSector*,
       poly[j] = p->Vwor (j)-center;
     if (p->GetPortal ())
     {
-      p->CalculateLighting (lview);
+      lview->poly_func ((csObject*)p, lview);
     }
     else
     {
       //@@@ ONLY DO THIS WHEN QUADTREE IS USED!!!
       //csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
-      p->CalculateLighting (lview);
+      lview->poly_func ((csObject*)p, lview);
     }
   }
   return NULL;
@@ -1062,11 +1066,11 @@ void CompressShadowFrustrums (csFrustrumList* list)
 }
 
 //@@@ Needs to be part of sector?
-void* CalculateLightingPolygonsFB (csSector*,
+void* CheckFrustrumPolygonsFB (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
-  csLightView* lview = (csLightView*)data;
+  csFrustrumView* lview = (csFrustrumView*)data;
   csVector3& center = lview->light_frustrum->GetOrigin ();
   csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
@@ -1101,7 +1105,7 @@ void* CalculateLightingPolygonsFB (csSector*,
 #endif
     if (vis)
     {
-      p->CalculateLighting (lview);
+      lview->poly_func ((csObject*)p, lview);
 
 #if QUADTREE_SHADOW
       if (!p->GetPortal ())
@@ -1151,7 +1155,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
 
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
-  csLightView* lview = (csLightView*)data;
+  csFrustrumView* lview = (csFrustrumView*)data;
 
   const csVector3& center = lview->light_frustrum->GetOrigin ();
   csVector3 bmin = onode->GetMinCorner ()-center;
@@ -1166,7 +1170,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   if (bmin.z > 0) result.z = bmin.z;
   else if (bmax.z < 0) result.z = -bmax.z;
   float dist = result.Norm ();
-  float radius = lview->l->GetRadius ();
+  float radius = lview->radius;
   if (radius < dist)
   {
     count_cull_dist++;
@@ -1208,7 +1212,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
-csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
+csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
 {
   csFrustrum* lf = lview.light_frustrum;
   bool infinite = lf->IsInfinite ();
@@ -1306,7 +1310,7 @@ csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
   return visible_things;
 }
 
-void csSector::CalculateLighting (csLightView& lview)
+void csSector::CheckFrustrum (csFrustrumView& lview)
 {
   if (draw_busy > cfg_reflections) return;
   draw_busy++;
@@ -1339,7 +1343,7 @@ void csSector::CalculateLighting (csLightView& lview)
   // will be restored.
   csShadowFrustrum* previous_last = lview.shadows.GetLast ();
   csFrustrumList* shadows;
-  if (lview.l->flags.Get () & CS_LIGHT_THINGSHADOWS)
+  if (lview.things_shadow)
     for (i = 0 ; i < num_visible_things ; i++)
     {
       sp = visible_things[i];
@@ -1363,9 +1367,9 @@ void csSector::CalculateLighting (csLightView& lview)
     count_cull_quad = 0;
     count_cull_not = 0;
     static_thing->UpdateTransformation (center);
-    static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
+    static_tree->Front2Back (center, &CheckFrustrumPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
-    CalculateLightingPolygonsFB (this, polygons.GetArray (),
+    CheckFrustrumPolygonsFB (this, polygons.GetArray (),
       polygons.Length (), (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",
     	//count_cull_dist, count_cull_quad, count_cull_not);
@@ -1373,7 +1377,7 @@ void csSector::CalculateLighting (csLightView& lview)
   else
   {
     // Calculate lighting for all polygons in this sector.
-    CalculateLightingPolygons (this, polygons.GetArray (),
+    CheckFrustrumPolygons (this, polygons.GetArray (),
         polygons.Length (), (void*)&lview);
   }
 
@@ -1384,7 +1388,7 @@ void csSector::CalculateLighting (csLightView& lview)
   {
     sp = visible_things[i];
     if (sp != static_thing)
-      sp->CalculateLighting (lview);
+      sp->CheckFrustrum (lview);
   }
   CHK (delete [] visible_things);
 

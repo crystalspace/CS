@@ -346,7 +346,7 @@ void WalkTest::DrawFrameDebug ()
 	draw_edges, (void*)1);
   if (do_light_frust && selected_light)
   {
-    extern void show_frustrum (csLightView*, int, void*);
+    extern void show_frustrum (csFrustrumView*, int, void*);
     ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
   }
   if (cfg_draw_octree)

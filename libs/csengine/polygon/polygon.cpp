@@ -1428,7 +1428,7 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
   }
 }
 
-void csPolygon3D::FillLightMap (csLightView& lview)
+void csPolygon3D::FillLightMap (csFrustrumView& lview)
 {
   //@@@if (orig_poly) return; BE CAREFUL
   if (lview.callback)
@@ -1443,7 +1443,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
     // a light patch for this polygon.
     csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
     GetBasePolygon ()->AddLightpatch (lp);
-    csDynLight* dl = (csDynLight*)lview.l;
+    csDynLight* dl = (csDynLight*)lview.userdata;
     dl->AddLightpatch (lp);
 
     lp->Initialize (lview.light_frustrum->GetNumVertices ());
@@ -1477,7 +1477,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
     {
       // We are working for a vertex lighted polygon.
       csColor col (lview.r, lview.g, lview.b);
-      UpdateVertexLighting ((csLight*)lview.l, col, false,
+      UpdateVertexLighting ((csLight*)lview.userdata, col, false,
       	lview.gouraud_color_reset);
       return;
     }
@@ -1499,7 +1499,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
   }
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
+bool csPolygon3D::MarkRelevantShadowFrustrums (csFrustrumView& lview,
 	csPlane3& plane)
 {
   // @@@ Currently this function only checks if a shadow frustrum is inside
@@ -1545,7 +1545,7 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
   return true;
 }
 
-void csPolygon3D::CalculateLighting (csLightView* lview)
+void csPolygon3D::CalculateLighting (csFrustrumView* lview)
 {
   //@@@if (orig_poly) return; Be careful!!!
 
@@ -1568,7 +1568,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
 
   // If distance is too small or greater than the radius of the light then we
   // have a trivial case (no hit).
-  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->l->GetRadius ())
+  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->radius)
     return;
 
   // Calculate the new frustrum for this polygon.
@@ -1597,9 +1597,9 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
     		new_light_frustrum->GetVertices (),
 		new_light_frustrum->GetNumVertices (),
 		*(GetPolyPlane ()), dist_to_plane*dist_to_plane);
-    if (min_sqdist < lview->l->GetSquaredRadius ())
+    if (min_sqdist < lview->sq_radius)
     {
-      csLightView new_lview = *lview;
+      csFrustrumView new_lview = *lview;
       new_lview.light_frustrum = new_light_frustrum;
 
       // Mark all shadow frustrums in 'new_lview' which are relevant. i.e.
@@ -1627,7 +1627,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
         FillLightMap (new_lview);
 
         if (po)
-          po->CalculateLighting (new_lview);
+          po->CheckFrustrum (new_lview);
         else if (!new_lview.dynamic && csSector::do_radiosity)
         {
           // If there is no portal we simulate radiosity by creating
@@ -1639,7 +1639,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
 	  GetTextureHandle ()->GetMeanColor (r, g, b);
 	  mirror.SetFilter (r/1000., g/1000., b/1000.);
 	  mirror.SetWarp (csTransform::GetReflect ( *(GetPolyPlane ()) ));
-	  mirror.CalculateLighting (new_lview);
+	  mirror.CheckFrustrum (new_lview);
         }
       }
     }

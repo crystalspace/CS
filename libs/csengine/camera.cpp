@@ -68,7 +68,11 @@ void csCamera::MoveWorld (const csVector3& v)
 {
   csVector3 new_position = GetOrigin () + v;
   if (sector)
+  {
+  //if (!(v < EPSILON))
+  //printf ("============== csCamera::MoveWorld\n");
     sector = sector->FollowSegment (*this, new_position, mirror);
+  }
   SetOrigin (new_position);
 }
 

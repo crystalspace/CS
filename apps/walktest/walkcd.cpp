@@ -294,6 +294,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     for ( ; num_sectors-- ; )
       hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
+//printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
     for (int j=0 ; j<num_our_cd ; j++)
     {
       csCdTriangle *wall = our_cd_contact[j].tr2;
@@ -319,7 +320,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
     for ( ; num_sectors-- ; )
       hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
-    
+ 
     if (!hit)
     {
       Sys->on_ground = false;

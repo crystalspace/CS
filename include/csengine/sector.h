@@ -120,7 +120,7 @@ private:
    * This function is called by the BSP tree traversal routine
    * to update the lighting for a number of polygons.
    */
-  static void* CalculateLightingPolygons (csSector*, csPolygonInt** polygon,
+  static void* CheckFrustrumPolygons (csSector*, csPolygonInt** polygon,
   	int num, void* data);
 
   /**
@@ -277,17 +277,17 @@ public:
   void InitLightMaps (bool do_cache = true);
 
   /**
-   * Update all lighting for all things and polygons in this sector
-   * and possibly traverse through portals to other sectors.
+   * Check visibility in a frustrum way for all things and polygons in
+   * this sector and possibly traverse through portals to other sectors.
    */
-  void CalculateLighting (csLightView& lview);
+  void CheckFrustrum (csFrustrumView& lview);
 
   /**
    * Get a list of all things which are visible in the given frustrum.
    * Return an array to pointers to visible things.
    * You must delete this array after you are ready using it.
    */
-  csThing** GetVisibleThings (csLightView& lview, int& num_things);
+  csThing** GetVisibleThings (csFrustrumView& lview, int& num_things);
 
   /**
    * Cache the lightmaps for all polygons in this sector.
