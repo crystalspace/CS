@@ -911,8 +911,13 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
   WriteCentered (1, 16*3, black, -1, "see various text and geometry at various transparencies.");
 
   myG2D->DrawBox (190, 80, 50, 100, black);
-  myG2D->DrawBox (20, 100, 150, 75, MakeColor (205, 0, 125, 200));
-  myG2D->DrawBox (120, 100, 100, 50, MakeColor (120, 50, 50, 100));
+  myG2D->DrawBox (20, 100, 150, 75, myG2D->FindRGB (205, 0, 125, 200));
+  myG2D->DrawBox (120, 100, 100, 50, myG2D->FindRGB (120, 50, 50, 100));
+
+  myG2D->Write (font, 50, 140, myG2D->FindRGB (255, 255, 255, 100), -1,
+    "Here is some partially transparent text");
+  myG2D->Write (font, 50, 150, myG2D->FindRGB (0, 0, 255, 150), -1,
+    "overlaying partially transparent boxes.");
 }
 
 void G2DTestSystemDriver::DrawUnicodeTest1 ()
