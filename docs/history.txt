@@ -4,27 +4,6 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 25-May-2003
-	- Boyan made the following changes to AWS:
-		- Added AWSF_KeyboardControl global flag allowing focusing 
-		  controls using keyboard.
-		- Added features for focusing controls using keyboards
-		  Using TAB and CTRL+TAB to move to next focusable control. 
-		  Pressing ENTER calls Click event. In List Box selecting next 
-		  (or previous) element can be done by UP (or DOWN) arrow key.
-		  NOTE: This features are available only for components: Label, 
-		  Button, ListBox, Radio Button ,CheckBox, Scroll Bar and TextBox.
-		- Added triggers and signal (signalFocused) . It's now easy 
-		  to detect when control becomes focused. It's nessesary to add 
-		  property "Focusable: Yes" in .def file.  By default this property 
-		  is false.
-		- Added TabOrder in iAwsComponent. It is full not functionally 
-		  because children are ordered by their creation.
-		- Added functions for TabOrder manipulations: TabNext(iAwsComponent *comp), 
-		  TabPrev(iAwsComponent *comp), AddToTabOrder(iAwsComponent *comp), 
-		  GetTabComponent(int index) in iAwsComponent.
-		- Added events OnSetFocus() and OnUnsetFocus() in iAwsComponent.
-		- Added Focusable(), isFocused() in iAwsComponent.  
-		- This features will NOT reflect to apps that allready use AWS.
 	- Matze committed several improvements to 3ds2lev from
  	  Troy Char<troy.chard@shaw.ca>. Thanks alot!
 	  These cover a new naming scheme allowing for exact specification of
@@ -34,6 +13,35 @@ The history order is reversed so that new features are at the top.
 	  (Note from Matze: I fixed the indentation and rewrote some small
 	   parts of the patch. This is not tested yet as I don't have .3ds
 	   files lying around here)
+	- Boyan made the following changes to AWS:
+		- Added AWSF_KeyboardControl global flag allowing focusing 
+		  controls using keyboard.
+		- Added features for focusing controls using keyboards
+		  Using TAB and CTRL+TAB to move to next focusable control. 
+		  Pressing ENTER calls Click event. In List Box selecting next 
+		  (or previous) element can be done by UP (or DOWN) arrow key.
+		  NOTE: This features are available only for components: Label, 
+		  Button, ListBox, Radio Button ,CheckBox, Scroll Bar and
+		  TextBox.
+		- Added triggers and signal (signalFocused) . It's now easy 
+		  to detect when control becomes focused. It's nessesary to add 
+		  property "Focusable: Yes" in .def file.  By default this
+		  property is false.
+		- Added TabOrder in iAwsComponent. It is full not functionally 
+		  because children are ordered by their creation.
+		- Added functions for TabOrder manipulations:
+		    TabNext(iAwsComponent *comp), TabPrev(iAwsComponent *comp),
+		    AddToTabOrder(iAwsComponent *comp), 
+		    GetTabComponent(int index) in iAwsComponent.
+		- Added events OnSetFocus() and OnUnsetFocus() in iAwsComponent.
+		- Added Focusable(), isFocused() in iAwsComponent.  
+		- This features will NOT reflect to apps that allready use AWS.
+	- Matze improved the SubDir hacks for jam. On jam2.5rc3 we have now an
+	  official way to invoke rules inside subdir this makes handling in
+	  latest jam alot easier. The override SubDir rule has been moved to
+	  jamcompatibility. (Also for some reason I don't understand yet
+	  jam2.5rc3 is alot faster when scanning header files...)
+	- Matze also reordered and reindented Boyans history entry.
 24-May-2003
 	- Jorrit fixed a bug in GetObjectBoundingBox() of 2D sprites. This
 	  could cause culling errors of those sprites.
