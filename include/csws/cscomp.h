@@ -229,8 +229,12 @@ enum
  * A csComponent object is a rectangle area of screen which can contain
  * absolutely any content. The object is responsible for filling all
  * pixels within that rectangle, i.e. underlying windows will never
- * touch other window's area (and partially transparent windows like in
- * X Windows are impossible).
+ * touch other window's area. If the component's `state' field has the
+ * CSS_TRANSPARENT bit set, the component can have partially transparent
+ * parts (those are filled by underlying component(s)). In this case
+ * the underlying components are painted before this component, and then
+ * anything you draw inside the Draw() method is overlayed onto parent
+ * component's image.
  */
 class csComponent : public csBase
 {
