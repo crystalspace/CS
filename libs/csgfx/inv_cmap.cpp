@@ -47,7 +47,7 @@ static long rxsqr, gxsqr, bxsqr;
 static long rcolormax, gcolormax, bcolormax;
 static int cindex;
 
-static void maxfill (unsigned long *, long, long, long);
+static void maxfill (uint32 *, long, long, long);
 static int redloop (void);
 static int greenloop (int);
 static int blueloop (int);
@@ -469,11 +469,11 @@ static int blueloop (int restart)
   return detect;
 }
 
-static void maxfill (unsigned long *buffer, long rside, long gside, long bside)
+static void maxfill (uint32 *buffer, long rside, long gside, long bside)
 {
-  register unsigned long maxv = ~0UL;
+  register uint32 maxv = ~0UL;
   register long i;
-  register unsigned long *bp;
+  register uint32* bp;
 
   for (i = rside * gside * bside, bp = buffer; i > 0; i--, bp++)
     *bp = maxv;
