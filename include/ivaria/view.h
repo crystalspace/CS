@@ -78,6 +78,16 @@ struct iView : public iBase
   virtual iClipper2D* GetClipper () = 0;
   /// Draw 3D world as seen from the camera.
   virtual void Draw () = 0;
+  
+  /**
+   * Enable / Disable automatic resizing. When this
+   * is true (default) then the view will detect automatically
+   * when the window size changes and adapt the view
+   * and camera automatically (i.e. it will change the view
+   * rectangle and perspective center). If you don't want that
+   * then you can disable this.
+   */
+  virtual void SetAutoResize (bool state) = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

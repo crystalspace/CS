@@ -30,8 +30,9 @@ SCF_IMPLEMENT_IBASE (csView)
   SCF_IMPLEMENTS_INTERFACE (iView)
 SCF_IMPLEMENT_IBASE_END
 
+
 csView::csView (iEngine *e, iGraphics3D* ig3d) :
-  Engine (e), G3D (ig3d), RectView (0), PolyView (0)
+  Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true)
 {
   SCF_CONSTRUCT_IBASE (0);
 
@@ -126,9 +127,14 @@ void csView::UpdateView ()
   float scale_x = ((float)G3D->GetWidth ())  / ((float)OldWidth);
   float scale_y = ((float)G3D->GetHeight ()) / ((float)OldHeight);
 
+  Camera->SetPerspectiveCenter (Camera->GetShiftX() * scale_x,
+                                Camera->GetShiftY() * scale_y);
+
+  Camera->SetFOVAngle (Camera->GetFOVAngle(), G3D->GetWidth());
+
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();
-
+  
   if (PolyView)
   {
     int i;
@@ -163,7 +169,7 @@ void csView::Draw ()
 
 void csView::UpdateClipper ()
 {
-  UpdateView ();
+  if (AutoResize) UpdateView ();
 
   if (!Clipper)
   {

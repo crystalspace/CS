@@ -54,6 +54,9 @@ private:
   /// Rescale the clipper to deal with a context resize
   void UpdateView ();
 
+  /// State of the automatic resizing
+  bool AutoResize;
+
 public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
@@ -83,6 +86,9 @@ public:
   virtual void AddViewVertex (int x, int y);
   /// Clip the view clipper to the screen boundaries
   virtual void RestrictClipperToScreen ();
+
+  /// Enable / Disable automatic resizing.
+  virtual void SetAutoResize (bool state) { AutoResize = state; }
 
   /// Update the Clipper. This is usually called from Draw.
   virtual void UpdateClipper();
