@@ -20,6 +20,7 @@
 #define __CS_PARTICLE_H__
 
 #include "cstool/meshobjtmpl.h"
+#include "cstool/rendermeshholder.h"
 #include "imesh/partsys.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/rendermesh.h"
@@ -63,9 +64,8 @@ protected:
 
   bool initialized;
 #ifdef CS_USE_NEW_RENDERER
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  csRenderMesh *lastMeshPtr;
-  csShaderVariableContext* svcontext;
+  csRenderMeshHolderSingle rmHolder;
+  csRef<csShaderVariableContext> svcontext;
 
   int VertexCount;
   int TriangleCount;

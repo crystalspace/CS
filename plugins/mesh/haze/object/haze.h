@@ -136,7 +136,7 @@ class csHazeHullBox : public csHazeHull
 {
   csVector3 min, max;
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csHazeHull);
   /// create new.
   csHazeHullBox(const csVector3& a, const csVector3& b);
   ///
@@ -159,7 +159,7 @@ class csHazeHullCone : public csHazeHull
   csVector3 start, end;
   float start_radius, end_radius;
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csHazeHull);
   /// create new.
   csHazeHullCone(int nr, const csVector3& a, const csVector3& b, float ra,
     float rb);

@@ -256,10 +256,9 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
 
 //------------ csHazeHullBox -----------------------------------
 
-SCF_IMPLEMENT_IBASE (csHazeHullBox)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHull)
+SCF_IMPLEMENT_IBASE_EXT (csHazeHullBox)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullBox)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullBox::HazeHullBox)
   SCF_IMPLEMENTS_INTERFACE (iHazeHullBox)
@@ -268,7 +267,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
   : csHazeHull()
 {
-  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
   min = a;
   max = b;
@@ -313,15 +311,13 @@ csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
 csHazeHullBox::~csHazeHullBox()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
-  SCF_DESTRUCT_IBASE ();
 }
 
 //------------ csHazeHullCone -----------------------------------
 
-SCF_IMPLEMENT_IBASE (csHazeHullCone)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHull)
+SCF_IMPLEMENT_IBASE_EXT (csHazeHullCone)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullCone)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullCone::HazeHullCone)
   SCF_IMPLEMENTS_INTERFACE (iHazeHullCone)
@@ -345,7 +341,6 @@ csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
     const csVector3& end, float srad, float erad)
   : csHazeHull()
 {
-  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
   csHazeHullCone::nr_sides = nr_sides;
   csHazeHullCone::start = start;
@@ -413,7 +408,6 @@ csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
 csHazeHullCone::~csHazeHullCone()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
-  SCF_DESTRUCT_IBASE ();
 }
 
 //------------ csHazeMeshObject -------------------------------

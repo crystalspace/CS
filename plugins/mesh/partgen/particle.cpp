@@ -84,14 +84,11 @@ csNewParticleSystem::csNewParticleSystem (
 
   vertices = 0;
 
-  svcontext = new csShaderVariableContext;
+  svcontext.AttachNew (new csShaderVariableContext);
   /*mesh.variablecontext.AttachNew (new csShaderVariableContext);
   mesh.object2camera = csReversibleTransform ();
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;*/
-
-  lastMeshPtr = new csRenderMesh;
-  meshes.Push (lastMeshPtr);
 #endif
 
   texels = 0;
@@ -610,42 +607,29 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num, iRenderView* rvie
   index_buffer->CopyToBuffer (triangles,
       	sizeof (unsigned int) * TriangleCount *3);
 
-  //first, check if we have any usable mesh
-  if(lastMeshPtr->inUse == true)
+  bool meshCreated;
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+
+  if (meshCreated)
   {
-    lastMeshPtr = 0;
-    //check the list
-    int i;
-    for(i = 0; i<meshes.Length (); i++)
-    {
-      if (meshes[i]->inUse == false){
-        lastMeshPtr = meshes[i];
-        break;
-      }
-    }
-    if (lastMeshPtr == 0)
-    {
-      lastMeshPtr = new csRenderMesh;
-      meshes.Push (lastMeshPtr);
-    }
+    rm->variablecontext = svcontext;
   }
 
   // Prepare for rendering.
-  lastMeshPtr->inUse = true;
-  lastMeshPtr->mixmode = MixMode;
-  lastMeshPtr->clip_portal = ClipPortal;
-  lastMeshPtr->clip_plane = ClipPlane;
-  lastMeshPtr->clip_z_plane = ClipZ;
-  lastMeshPtr->do_mirror = camera->IsMirrored ();
-  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-  lastMeshPtr->indexstart = 0;
-  lastMeshPtr->indexend = TriangleCount * 3;
-  lastMeshPtr->material = Material;
-  lastMeshPtr->object2camera = csReversibleTransform ();
-  lastMeshPtr->variablecontext = svcontext;
+  rm->inUse = true;
+  rm->mixmode = MixMode;
+  rm->clip_portal = ClipPortal;
+  rm->clip_plane = ClipPlane;
+  rm->clip_z_plane = ClipZ;
+  rm->do_mirror = camera->IsMirrored ();
+  rm->meshtype = CS_MESHTYPE_TRIANGLES;
+  rm->indexstart = 0;
+  rm->indexend = TriangleCount * 3;
+  rm->material = Material;
+  rm->object2camera = csReversibleTransform ();
  
   num = 1;
-  return &lastMeshPtr;
+  return &rm;
 #else
   num = 0;
   return 0;

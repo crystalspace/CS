@@ -21,6 +21,10 @@ chronological order.
 	  the make system creates the library with Apple's 'libtool', whereas
 	  Jam creates it with 'ar'.)  Consequently, Jam build now runs ranlib
 	  at both build and install times.
+	- res fixed leaking of render meshes and the SV context in the new 
+	  particle system.
+	- res fixed the haze plugin to use the _EXT versions of SCF macros for
+	  descendants of csHazeHull.
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
 	- Jorrit added a new 'back2front' keyword for the genmesh factory
