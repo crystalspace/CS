@@ -12,6 +12,21 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+7-Jul-99:
+	- Major bugfix in collision detection code. It crashed completely
+	  on sprites. CD with sprites seems to be broken though. But now
+	  at least it doesn't crash anymore.
+	- Mirroring of sprites and curves is correct now.
+	- Drawing gouraud shaded polygons is also somewhat more efficient because
+	  I avoided three divides for perspective correction for every triangle
+	  (this remark is not for the sprites and curves).
+	- orig_triangle is no longer needed with DrawFilled.
+	- Made all gouraud shaded drawing (curves, sprites, and skydome) more
+	  efficient by avoiding complicated calculations if the original triangle
+	  was not clipped. This also cleans up the code a little.
+	- Changed clipper not to use memory allocation for sprite and curve
+	  triangles. This makes drawing curves and sprites faster again.
+	- Optimized curve drawing.
 6-Jul-99:
 	- Andrew Zabolotny made the movement system from Denis Dmitriev time
 	  dependent (so that movement speed is correct even if frame rate is

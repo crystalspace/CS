@@ -174,12 +174,7 @@ the complete list of polygons for the csThing or csSector or else a
 subset which was computed from a BSP tree.
 
 DrawPolygonArray() will process every polygon in the array in turn.
-For every polygon it will first do a bit of ugly code to ensure that we
-remember the original triangle for gouraud shaded polygons. Currently
-the engine can only work on triangles for that kind of polygons. This is
-an ugly limitation which will be removed in the (not too distant) future.
-
-Then it will basicly do the following three things for every polygon:
+It will basicly do the following three things for every polygon:
 	1. csPolygon3D::ClipToPlane() (libs/csengine/polygon/polygon.cpp)
 	2. csPolygon3D::DoPerspective()
 	3. csPolygon2D::ClipAgainst() (libs/csengine/polygon/polygon.cpp)
