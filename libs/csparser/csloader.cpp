@@ -344,7 +344,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          csStatLight* l = (csStatLight*)s->lights[nr];
+          csStatLight *l = (csStatLight*)s->lights[nr];
           collection->AddObject ((csObject*)l);
         }
         break;

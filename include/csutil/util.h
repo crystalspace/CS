@@ -67,22 +67,22 @@ inline float fSquare (float x)
   return x*x;
 }
 
-///	Byte swap 32 bit data.
+/// Byte swap 32 bit data.
 inline unsigned long ByteSwap32bit( const unsigned long value )
 {
-	return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
+  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
-///	Byte swap 16 bit data.
+/// Byte swap 16 bit data.
 inline unsigned short ByteSwap16bit( const unsigned short value )
 {
-	return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
+  return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
 
-///	Byte swap 32 bit data in a buffer
+/// Byte swap 32 bit data in a buffer
 void ByteSwap32bitBuffer( register unsigned long* const place, register unsigned long count );
 
-///	Byte swap 16 bit data in a buffer
+/// Byte swap 16 bit data in a buffer
 void ByteSwap16bitBuffer( register unsigned short* const place, register unsigned long count );
 
 /// finds the smallest number that is a power of two and is larger or equal to n

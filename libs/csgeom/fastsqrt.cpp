@@ -61,4 +61,3 @@ float FastSqrt (float n)
   *(int*)&n = fast_sqrt_table[(*(int *)&n >> 8) & 0xFFFF] ^ ((((*(int*)&n - 0x3F800000) >> 1) + 0x3F800000) & 0x7F800000);
   return n;
 }
-

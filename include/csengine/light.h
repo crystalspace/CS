@@ -141,7 +141,7 @@ public:
   /**
    * Get the current sector for this light.
    */
-  csSector* GetSector () { return sector; }
+  csSector* GetSector () const { return sector; }
 
   /**
    * Get the center position.
@@ -151,12 +151,12 @@ public:
   /**
    * Get the radius.
    */
-  float GetRadius () { return dist; }
+  float GetRadius () const { return dist; }
 
   /**
    * Get the squared radius.
    */
-  float GetSquaredRadius () { return sqdist; }
+  float GetSquaredRadius () const { return sqdist; }
 
   /**
    * Get the light color.
@@ -175,7 +175,7 @@ public:
   /**
    * Return the maximum intensity of the halo.
    */
-  float GetHaloMaxIntensity () { return halo_max_intensity; }
+  float GetHaloMaxIntensity () const { return halo_max_intensity; }
 
   /**
    * Set the intensity of the halo.
@@ -185,14 +185,14 @@ public:
   /**
    * Get the intensity of the halo.
    */
-  float GetHaloIntensity () { return halo_intensity; }
+  float GetHaloIntensity () const { return halo_intensity; }
 
   /**
    * Return the reference count. This counter keeps track
    * of the number of times a halo is visible. If 0 the
    * halo will slowly fade away.
    */
-  int GetReferenceCount () { return halo_ref_count; }
+  int GetReferenceCount () const { return halo_ref_count; }
 
   /**
    * Add a reference to the halo. As long as there are references
@@ -214,7 +214,7 @@ public:
   /**
    * Query if the halo is in the queue.
    */
-  bool GetHaloInQueue () { return in_halo_queue; }
+  bool GetHaloInQueue () const { return in_halo_queue; }
   
   /**
    * Change the given r, g, b value to the current mixing mode

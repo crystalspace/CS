@@ -27,6 +27,12 @@
 class csVector3;
 class csMatrix3;
 
+// this is used in inline functions (we can use fSquare from csUtil?)
+inline float fSqr (float f)
+{
+  return f * f;
+}
+
 /**
  * A 3D vector.
  */
@@ -524,7 +530,7 @@ class csSquaredDist
 public:
   /// Returns the squared distance between two points.
   static float PointPoint (const csVector3& p1, const csVector3& p2)
-  {  csVector3 v = p1-p2;  return v*v; }
+  { return fSqr (p1.x - p2.x) + fSqr (p1.y - p2.y) + fSqr (p1.z - p2.z); }
 
   /// Returns the squared distance between a point and a line.
   static float PointLine (const csVector3& p,
@@ -532,7 +538,7 @@ public:
 
   /// Returns the squared distance between a point and a normalized plane.
   static float PointPlane (const csVector3& p, const csPlane& plane)
-  { float r = plane.Classify(p);  return r*r; }
+  { float r = plane.Classify (p);  return r * r; }
 
   /**
    * Returns the squared distance between a point and a polygon.
