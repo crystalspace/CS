@@ -29,6 +29,8 @@ chronological order.
 	    - Fixed a nasty bug in csGLRender3D where CS_ASSERT() was set around
 	      an important statement in the VBO renderbuffer implementation.
 	      This had the sideeffect that VBO didn't work in releasemode.
+	- res added a missing #include to portalcontainer.cpp (older GCC 
+	  didn't like the (void)t where t's type was only forward declared.)
 20-Sep-2003
 	- Jorrit reverted nearly all his changes of yesterday. The only two
 	  changes that remain are the iPortalContainer object (but now

@@ -20,7 +20,7 @@
 #include "csgeom/sphere.h"
 #include "igeom/objmodel.h"
 #include "csengine/portalcontainer.h"
-
+#include "csgeom/transfrm.h"
 
 // ---------------------------------------------------------------------------
 // csMeshWrapper
