@@ -23,6 +23,15 @@ skin "Normal Windows"
   RadioButtonDn:	"/aws/raddn.png"
   RadioButtonOn:	"/aws/radon.png"
   RadioButtonOff:	"/aws/radoff.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeExpanded:		"/aws/treeexp.png"
+  TreeCollapsed:	"/aws/treecol.png"
+  TreeVertLine:		"/aws/treevl.png"
+  TreeHorzLine:		"/aws/treehl.png"
+  TreeChkUnmarked:	"/aws/treechke.png"
+  TreeChkMarked:	"/aws/treechkf.png"
+  TreeGrpUnmarked:	"/aws/treegrpe.png"
+  TreeGrpMarked:	"/aws/treegrpf.png"
 }
 
 skin "Metal Windows"
@@ -108,6 +117,43 @@ window "Another"
   Style: wfsNormal
   Title: "A window with lots of stuff"
 
+  component "Red" is "Command Button"
+  {
+    Frame: (20, 30) - (90, 50)
+    Style: bfsNormal
+    Caption: "Red"
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::RedClicked
+    }
+  }
+
+  component "Green" is "Command Button"
+  {
+    Frame: (20, 60) - (90, 80)
+    Style: bfsNormal
+    Caption: "Green"
+	
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::GreenClicked
+    }
+  }
+
+  component "Blue" is "Command Button"
+  {
+    Frame: (20, 90) - (90, 110)
+    Style: bfsNormal
+    Toggle: Yes
+    Caption: "Blue"
+
+    connect 
+    {
+     signalCmdButtonClicked -> testButtonSink::BlueClicked
+    }
+  }
+
   component "HideWindow" is "Command Button"
   {
     Frame: (100, 30) - (170, 50)
@@ -176,47 +222,23 @@ window "Another"
 
   }
 
-  component "Graphics" is "Group Frame"
+  component "Users" is "List Box"
   {
     Frame: (100, 210) - (300, 300)
-    Caption: " Graphics Card Type"
-    Style: gfsSunken
-  }
-
-  component "Red" is "Command Button"
-  {
-    Frame: (20, 30) - (90, 50)
-    Style: bfsNormal
-    Caption: "Red"
-
-    connect 
-    {
-      signalCmdButtonClicked -> testButtonSink::RedClicked
-    }
-  }
-
-  component "Green" is "Command Button"
-  {
-    Frame: (20, 60) - (90, 80)
-    Style: bfsNormal
-    Caption: "Green"
-	
-    connect 
-    {
-      signalCmdButtonClicked -> testButtonSink::GreenClicked
-    }
-  }
-
-  component "Blue" is "Command Button"
-  {
-    Frame: (20, 90) - (90, 110)
-    Style: bfsNormal
-    Toggle: Yes
-    Caption: "Blue"
+    Style: lbfsSunken
+    Columns: 3
+    DefaultSortCOl: 0
+    Column0Width: 50
+    Column0Caption: "Class"
+    Column1Width: 70
+    Column1Caption: "Status"
+    Column2Width: 100
+    Column2Caption: "Name"
+    Column2Align: lbAlignCenter
 
     connect 
     {
-     signalCmdButtonClicked -> testButtonSink::BlueClicked
+     signalComponentCreated -> testButtonSink::FillListBox
     }
   }
   
@@ -231,19 +253,16 @@ window "New User"
   Overlayalpha: 192
   Backalpha:    0
 
-  
-
-  component "User Name" is "Textbox"
+  component "User Name" is "Text Box"
   {
     Frame: (10, 30) - (390, 45)
     Style: NoFrame
     Caption: "Name:"
   }
 
-  component "User Sex Frame" is "3dFrame"
+  component "User Sex Frame" is "Group Frame"
   {
     Frame: (10, 50) - (250,100)
-    Style: ThreeDee
     Caption: "Sex"
 
     component "Male" is "Radio Button"
@@ -257,7 +276,5 @@ window "New User"
      Frame: (5, 35) - (200, 50)
      Caption: "Female"
     }
-
-
   }
 }
