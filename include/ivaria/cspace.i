@@ -42,7 +42,7 @@
 #include "ivaria/engseq.h"
 //OBSOLETE#include "ivideo/rndbuf.h"
 //OBSOLETE#include "ivideo/render3d.h"
-#include "ivideo/shader/shader.h"
+//#include "ivideo/shader/shader.h"
 #include "iutil/cache.h"
 
 %}
@@ -373,14 +373,14 @@ WRAP_PTR_RETURNING_METHOD(iTextureManager, RegisterMaterial)
 WRAP_PTR_RETURNING_METHOD(iVertexBufferManager, CreateBuffer)
 
 // ivideo/shader/shader.h
-WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShader)
-WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateVariable)
-WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShaderProgramFromFile)
-WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShaderProgramFromString)
-WRAP_PTR_RETURNING_METHOD(iShaderRenderInterface, CreateShaderProgram)
-WRAP_PTR_RETURNING_METHOD(iShader, CreateTechnique)
-WRAP_PTR_RETURNING_METHOD(iShaderTechnique, CreatePass)
-WRAP_PTR_RETURNING_METHOD(iShaderProgramPlugin, CreateShaderProgram)
+//WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShader)
+//WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateVariable)
+//WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShaderProgramFromFile)
+//WRAP_PTR_RETURNING_METHOD(iShaderManager, CreateShaderProgramFromString)
+//WRAP_PTR_RETURNING_METHOD(iShaderRenderInterface, CreateShaderProgram)
+//WRAP_PTR_RETURNING_METHOD(iShader, CreateTechnique)
+//WRAP_PTR_RETURNING_METHOD(iShaderTechnique, CreatePass)
+//WRAP_PTR_RETURNING_METHOD(iShaderProgramPlugin, CreateShaderProgram)
 
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_END
@@ -521,7 +521,7 @@ WRAP_PTR_RETURNING_METHOD(iShaderProgramPlugin, CreateShaderProgram)
 //OBSOLETE%include "ivideo/rndbuf.h"
 %include "ivideo/material.h"
 %include "ivideo/natwin.h"
-%include "ivideo/shader/shader.h"
+//%include "ivideo/shader/shader.h"
 %include "igraphic/image.h"
 %include "igraphic/imageio.h"
 %include "ivaria/reporter.h"
