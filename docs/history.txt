@@ -25,6 +25,8 @@ chronological order.
 	- Jorrit found out that walktest was actually using iDataObject.
 	  Instead of reviving iDataObject, fixed Walktest so that it no
 	  longer requires it.
+	- res fixed a bug in the AVI handler where a loop counter was 
+	  incremented twice.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.

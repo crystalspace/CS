@@ -194,7 +194,7 @@ bool csAVIFormat::InitVideoData ()
 	      strh.Endian ();
 	      if (strh.Is (CHUNK_STRH))
 	      {
-		nStream++;
+		//nStream++;
 		p += len_hcl;
 		memcpy (&streamheader, p, sizeof (StreamHeader));
 		streamheader.Endian ();
