@@ -410,7 +410,8 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    MSG msg;
 	    if (PeekMessage (&msg, hWnd, WM_KEYFIRST, WM_KEYLAST, PM_NOREMOVE))
 	    {
-	      if (msg.message == message)
+	      if ((msg.message & ~4) == (message & ~4)) 
+		// mask out 4 so WM_KEY* and WM_SYSKEY* messages can be compared
 	      {
 		utf32_char nextRaw, nextCooked;
 		csKeyCharType nextType;

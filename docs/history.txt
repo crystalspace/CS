@@ -37,6 +37,7 @@ chronological order.
 	  instead of an array of arrays.
 	- res added ShrinkToFit() calls for some arrays in dsplex and fixed
 	  function shaders.
+	- res fixed the Win32 keyboard RAlt quirk to also omit LCtrl up events.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable
