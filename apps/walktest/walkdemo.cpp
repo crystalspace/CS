@@ -303,6 +303,8 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   expstate->AddLight (Sys->Engine, sector, 1000);
   expstate->DecRef ();
   exp->DecRef ();
+
+  exp->PlaceMesh ();
 }
 
 //===========================================================================

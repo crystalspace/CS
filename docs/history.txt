@@ -44,6 +44,10 @@ The history order is reversed so that new features are at the top.
 	  now use the LOD keyword with mesh factories or mesh objects.
 	  Currently you can only use one keyword in LOD and that is LEVEL
 	  which is used to set the LOD level. In future more will be possible.
+	- Walktest calls PlaceMesh() on the explosion particle system.
+	  This should have fixed the problem with the explosion mesh not
+	  visible when it crosses a portal but it doesn't. So PlaceMesh()
+	  needs some debugging.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:
