@@ -13,11 +13,47 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+18-Oct-1999
+	- Scott Wood <scott@geekland.cx> sent me patches to allow CS
+	  to compile on Alpha machines.
+	- Stephan Goetter sent me a patch for allowing libraries to be
+	  built as shared libraries on Unix. I haven't been able to fully
+	  test this yet.
+	- Found the bug in quadtree. Lighting and rendering now work
+	  correctly but extremely slow. I need to rewrite this stuff. I
+	  have some ideas already.
+17-Oct-1999
+	- Implemented quadtree visibility culling for rendering.
+	  However, it does not work correctly yet.
+	- New 'quadtree' command to enable quadtree visibility culling.
+	- Fixed bug in dynamic lightmap reading (pseudo-dynamic lights).
+	  This bug only occurs in rare situations. It is unlikely someone
+	  ever hit it. But I did :-)
+16-Oct-1999
+	- Fixed infinite maze for collision detection. This
+	  means that CD init is done for all new sectors.
+	- Changed lighting routines so that it no longer uses the
+	  transformation manager. Not only is this more efficient:
+	  transforming vertices for lighting is only a translation,
+	  it makes no sense to do the complicated transformation
+	  manager overhead. But it also fixes the infinite maze
+	  so that there are no ugly glitches anymore when new
+	  sectors are created.
+	- Thomas Hieber added settings for glide2x to csCOM.cfg.
+	- Michael Dale Long fixed csObject.
+	- Update to Windows Glide from Petr Kocmid.
 15-Oct-1999
 	- Fixes to integration of landscape engine from Alex Pfaffe.
 	  Still not working properly though.
 	- Michael Dale Long did some fixes on cctest and ndrvdemo for
 	  the terrain library.
+	- Update to Squawk from Seth Galbraith. sqkView now uses screen-
+	  space coordinates like csView. sqkSystemDriver::CreateViews
+	  handles relative coordinates now.
+	- Brandon Ehle did some fixes for COM and csutil, csengine, and
+	  csobject.
+	- Brandon added support to the Win/VC project files/Makefiles for
+	  Constant MSVC Compiler (automated Win32 compiler run).
 14-Oct-1999
 	- First try at integration of landscape engine. Note that the
 	  new code doesn't even TRY to be efficient :-)
@@ -147,6 +183,7 @@ Short-term cleanups that need to be done:
 	- Seth also modified csLoader to use import/export library through
 	  VFS.
 	- Brandon Ehle added Plug-In system to csengine.
+	- Brandon also added a Code Crusader Project File for CS.
 	- Robert Bate made some fixes on terrain engine for Macintosh.
 6-Oct-1999
 	- Eric Sunshine implemented dynamic linking for the MacOS/X Server,
