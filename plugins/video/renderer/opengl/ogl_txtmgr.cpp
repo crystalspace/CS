@@ -926,8 +926,7 @@ void csTextureManagerOpenGL::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
       }
       else
       {
-	outfn.Format ("%s%d.png", 
-	  dir, i);
+	outfn.Format ("%s%lu.png", dir, (unsigned long)i);
 	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
 	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,

@@ -797,7 +797,7 @@ void csSector::Draw (iRenderView *rview)
 
   PrepareDraw (rview);
   iCamera *icam = rview->GetCamera ();
-  int i;
+  size_t i;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 

@@ -3264,8 +3264,8 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 
         csRef<iObject> iobj (
 		SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
-        printf ("  obj(%d,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
-      	  i,
+        printf ("  obj(%lu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
+      	  (unsigned long)i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
 	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
 	  visobj_wrap->history->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
