@@ -19,6 +19,17 @@ chronological order.
 	      the same names as in csArray<> as essentially the same is done.
 	- Peter Amstutz fixed the csvosa3dl plugin to remove the use
 	  of the obsolote csTextureLayer API
+	- Eric Sunshine added Contains() to iStringSet. Previously, there was
+	  no way to determine if a given string was a member of the set.
+	- Eric Sunshine fixed bug (#838885) in AWS where it was using Adler32
+	  to generate ID's from strings for slot names, sink names,
+	  etc. Unfortunately, Alder32 is merely a hashing function, which means
+	  that it does not guarantee unique results for all strings. This led
+	  to bugs within AWS when Adler32 hashing collisions occurred. Andew
+	  Mann, for example, reported collisions with just a few hundred
+	  strings. Fixed by replacing Alder32 with iStringTable, which does
+	  guarantee uniqueness.  Also performed some cleanup of the code and
+	  other minor corrections and enhancements.
 12-Mar-2005
 	- res fixed csPrintfFormatter to actually properly handle argument
 	  number specification (like in %3$d to take the 3rd argument).

@@ -87,7 +87,7 @@ private:
 
   /// Slots and a sink for getting events from the buttons.
   awsSlot slot_min, slot_zoom, slot_close;
-  awsSink sink;
+  awsSink* sink;
 
   /// True if the window is in one of these various states.
   bool is_minimized;

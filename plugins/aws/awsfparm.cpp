@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,10 +17,11 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/scfstr.h"
+#include "iaws/aws.h"
 #include <string.h>
 
 #include "awsfparm.h"
-#include "awsadler.h"
 
 const int awsParmList::INT = 0;
 const int awsParmList::FLOAT = 1;
@@ -35,15 +36,12 @@ SCF_IMPLEMENT_IBASE (awsParmList)
   SCF_IMPLEMENTS_INTERFACE (iAwsParmList)
 SCF_IMPLEMENT_IBASE_END
 
-static unsigned long NameToID (const char *name)
+unsigned long awsParmList::NameToID (const char *name) const
 {
-  return aws_adler32 (
-    aws_adler32 (0, 0, 0),
-    (unsigned char *)name,
-    strlen (name));
+  return strset->Request(name);
 }
 
-awsParmList::awsParmList ()
+awsParmList::awsParmList (iAws* p) : strset(p->GetStringTable())
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -53,9 +51,9 @@ awsParmList::~awsParmList ()
   SCF_DESTRUCT_IBASE ();
 }
 
-awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
+awsParmList::parmItem * awsParmList::FindParm (const char *n, int type) const
 {
-  unsigned long name = NameToID (_name);
+  unsigned long name = NameToID (n);
 
   size_t i;
   for (i = 0; i < parms.Length (); ++i)
@@ -124,6 +122,7 @@ void awsParmList::AddStringVector (const char *name, iStringArray *value)
   pi->name = NameToID (name);
   pi->type = STRINGVECTOR;
   pi->parm.sv = value;
+  value->IncRef();
 
   parms.Push (pi);
 }
@@ -161,7 +160,7 @@ void awsParmList::AddOpaque(const char *name, void *value)
   parms.Push (pi);
 }
 
-bool awsParmList::GetInt (const char *name, int *value)
+bool awsParmList::GetInt (const char *name, int *value) const
 {
   parmItem *pi = FindParm (name, INT);
 
@@ -173,7 +172,7 @@ bool awsParmList::GetInt (const char *name, int *value)
   return false;
 }
 
-bool awsParmList::GetFloat (const char *name, float *value)
+bool awsParmList::GetFloat (const char *name, float *value) const
 {
   parmItem *pi = FindParm (name, FLOAT);
 
@@ -185,7 +184,7 @@ bool awsParmList::GetFloat (const char *name, float *value)
   return false;
 }
 
-bool awsParmList::GetBool (const char *name, bool *value)
+bool awsParmList::GetBool (const char *name, bool *value) const
 {
   parmItem *pi = FindParm (name, BOOL);
 
@@ -197,7 +196,7 @@ bool awsParmList::GetBool (const char *name, bool *value)
   return false;
 }
 
-bool awsParmList::GetString (const char *name, iString **value)
+bool awsParmList::GetString (const char *name, iString **value) const
 {
   parmItem *pi = FindParm (name, STRING);
 
@@ -209,7 +208,18 @@ bool awsParmList::GetString (const char *name, iString **value)
   return false;
 }
 
-bool awsParmList::GetStringVector (const char *name, iStringArray **value)
+bool awsParmList::GetString (const char *name, csRef<iString> &value) const
+{
+  iString* x;
+  bool const ok = GetString(name, &x);
+  if (ok)
+    value = x;
+  else
+    value.Invalidate();
+  return ok;
+}
+
+bool awsParmList::GetStringVector(const char *name, iStringArray **value) const
 {
   parmItem *pi = FindParm (name, STRINGVECTOR);
 
@@ -221,7 +231,19 @@ bool awsParmList::GetStringVector (const char *name, iStringArray **value)
   return false;
 }
 
-bool awsParmList::GetRect (const char *name, csRect **value)
+bool awsParmList::GetStringVector(const char *name,
+  csRef<iStringArray> &value) const
+{
+  iStringArray* x;
+  bool const ok = GetStringVector(name, &x);
+  if (ok)
+    value = x;
+  else
+    value.Invalidate();
+  return ok;
+}
+
+bool awsParmList::GetRect (const char *name, csRect **value) const
 {
   parmItem *pi = FindParm (name, RECT);
 
@@ -233,7 +255,7 @@ bool awsParmList::GetRect (const char *name, csRect **value)
   return false;
 }
 
-bool awsParmList::GetPoint (const char *name, csPoint **value)
+bool awsParmList::GetPoint (const char *name, csPoint **value) const
 {
   parmItem *pi = FindParm (name, FLOAT);
 
@@ -245,7 +267,7 @@ bool awsParmList::GetPoint (const char *name, csPoint **value)
   return false;
 }
 
-bool awsParmList::GetOpaque (const char *name, void **value)
+bool awsParmList::GetOpaque (const char *name, void **value) const
 {
   parmItem *pi = FindParm (name, VOPAQUE);
 

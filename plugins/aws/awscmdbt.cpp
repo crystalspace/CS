@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -64,7 +64,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if (!pm->GetString (settings, "BitmapOverlay", tn) &&
     pm->GetString (settings, "Image", tn))
   {
-    awsStringKey* temp = new awsStringKey ("BitmapOverlay", tn);
+    awsStringKey* temp = new awsStringKey (_wmgr, "BitmapOverlay", tn);
     csRef<iAwsStringKey> key (SCF_QUERY_INTERFACE (temp, iAwsStringKey));
     settings->Add (key);
     temp->DecRef ();

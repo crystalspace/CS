@@ -22,20 +22,12 @@
 #include "csextern.h"
 #include "hash.h"
 #include "hashhandlers.h"
+#include "iutil/strset.h"
 
 /**\file
  * String-to-ID hash table
  */
  
-/**
- * An identifier for a string. This identifier is equivalent to the contents
- * of a string: If two strings have the same content, they have get the same
- * identifier. If they have different content, they get different identifiers.
- */
-typedef uint32 csStringID;
-/// this ID is the 'invalid' value
-csStringID const csInvalidStringID = (csStringID) ~0;
-
 class csStringHashIterator;
 
 /**

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -470,11 +470,10 @@ awsMenu::awsMenu ()
     child_menu (0),
     parent_menu (0),
     mouse_pos (0, 0),
-    sink (),
+    sink (0),
     mouse_captured (false),
     let_mouse_exit (true)
 {
-  sink.SetParm (this);
 }
 
 awsMenu::~awsMenu ()
@@ -484,13 +483,17 @@ awsMenu::~awsMenu ()
     child_menu->Hide ();
     child_menu->DecRef ();
   }
+  delete sink;
 }
 
 bool awsMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
-  sink.RegisterTrigger ("Select", &OnSelect);
-  sink.RegisterTrigger ("Close", &OnClose);
-  if(!awsControlBar::Setup (wmgr, settings)) return false;
+  if (!awsControlBar::Setup (wmgr, settings)) return false;
+
+  sink = new awsSink(WindowManager());
+  sink->SetParm (this);
+  sink->RegisterTrigger ("Select", &OnSelect);
+  sink->RegisterTrigger ("Close", &OnClose);
 
   // We initially fit it to size, but after that you can change
   // it to whatever you like.
@@ -522,12 +525,12 @@ void awsMenu::AddChild (iAwsComponent* comp)
     slot_select.Connect (
       comp,
       selectSignal,
-      &sink,
-      sink.GetTriggerID ("Select"));
+      sink,
+      sink->GetTriggerID ("Select"));
   }
   if (comp->GetProperty ("CloseSignal", (void**) &closeSignal))
   {
-    slot_close.Connect (comp, closeSignal, &sink, sink.GetTriggerID ("Close"));
+    slot_close.Connect (comp, closeSignal, sink, sink->GetTriggerID ("Close"));
   }
   awsControlBar::AddChild (comp);
 }
@@ -557,15 +560,15 @@ void awsMenu::RemoveChild (iAwsComponent* comp)
     slot_select.Disconnect (
       comp,
       selectSignal,
-      &sink,
-      sink.GetTriggerID ("Select"));
+      sink,
+      sink->GetTriggerID ("Select"));
   }
   if (comp->GetProperty ("CloseSignal", (void**) &closeSignal))
   {
     slot_close.Disconnect (comp,
       closeSignal,
-      &sink,
-      sink.GetTriggerID ("Close"));
+      sink,
+      sink->GetTriggerID ("Close"));
   }
   awsControlBar::RemoveChild(comp);
 }
@@ -931,12 +934,12 @@ bool awsPopupMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
   timer = new awsTimer (wmgr->GetObjectRegistry (), this);
   
-  sink.RegisterTrigger ("Timer", &OnTimer);
+  sink->RegisterTrigger ("Timer", &OnTimer);
   slot_timer.Connect (
     timer,
     awsTimer::signalTick,
-    &sink,
-    sink.GetTriggerID ("Timer"));
+    sink,
+    sink->GetTriggerID ("Timer"));
 
   if (!awsMenu::Setup (wmgr, settings))
     return false;

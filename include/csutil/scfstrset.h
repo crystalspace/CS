@@ -58,7 +58,12 @@ public:
    * Request the string for a given ID. Return 0 if the string
    * has not been requested (yet).
    */
-  virtual const char* Request (csStringID id);
+  virtual const char* Request (csStringID id) const;
+
+  /**
+   * Check if the set contains a particular string.
+   */
+  virtual bool Contains(char const*) const;
 
   /**
    * Delete all stored strings. When new strings are registered again, new

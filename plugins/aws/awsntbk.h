@@ -331,7 +331,7 @@ protected:
   int maxheight;
 
   /// Our kitchen sink.
-  awsSink sink;
+  awsSink* sink;
 
   /// Our slot.
   awsSlot slot;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -161,7 +161,7 @@ protected:
 
   /// A slots and sink for receiving events.
   awsSlot slot_select, slot_close;
-  awsSink sink;
+  awsSink* sink;
 
   /// True if we currently have captured the mouse.
   bool mouse_captured;

@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "csutil/csuctransform.h"
 
@@ -23,9 +41,8 @@ static void BlinkCursor (void *, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
 
-  //  Setting blink actually forces an inversion of blink's property, and if the textbox is the
-
-  // focus then it will be Invalidated as well.
+  // Setting blink actually forces an inversion of blink's property, and if the
+  // textbox is the focus then it will be Invalidated as well.
   comp->SetProperty ("Blink", 0);
 }
 
@@ -99,7 +116,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   pm->LookupIntKey ("ButtonTextureAlpha", alpha_level); // global get
   pm->GetInt (settings, "Style", frame_style);
-  pm->GetInt (settings, "Alpha", alpha_level);          // local overrides, if present.
+  pm->GetInt (settings, "Alpha", alpha_level); // local overrides, if present.
   pm->GetInt (settings, "Masked", should_mask);
   pm->GetString (settings, "Text", text);
   pm->GetString (settings, "Disallow", disallow);
@@ -373,7 +390,8 @@ void awsTextBox::OnDraw (csRect /*clip*/)
       // Check to see if we're getting weird.
       // this was changed to avoid 
       // jittering in the start value
-      if ((int)usedStrCursor > usedStrStart + mcc) usedStrStart = usedStrCursor - mcc;
+      if ((int)usedStrCursor > usedStrStart + mcc)
+	  usedStrStart = usedStrCursor - mcc;
       if (usedStrStart < 0) usedStrStart = 0;
 
       // Make the text the right length

@@ -174,9 +174,6 @@ private:
   /// True if button was down, and button is in switch mode (toggle = yes).
   bool was_down;
 
-  /// Holds the background texture (either the global one, or an overridden one.
-  //iTextureHandle *bkg;
-
   /// Holds the highlight overlay texture.
   iTextureHandle *highlight;
 
@@ -203,12 +200,6 @@ private:
 
   /// Image of radio button type item (marked).
   iTextureHandle *tree_grpf;
-
-  /// Flags for frame style.
-  //int frame_style;
-
-  /// Alpha level for this component.
-  //int alpha_level;
 
   /// Alpha level for highlight bitmap.
   int hi_alpha_level;
@@ -258,11 +249,11 @@ private:
   /// Our embedded scrollbar.
   awsScrollBar *scrollbar;
 
+  /// Action dispatcher.
+  awsActionDispatcher* actions;
+
   /// Trigger for catching scroll signals.
   static void ScrollChanged (void *sk, iAwsSource *source);
-
-  /// Action dispatcher.
-  awsActionDispatcher actions;
 
   /// Inserts an item.
   static void InsertItem (void *owner, iAwsParmList* parmlist);

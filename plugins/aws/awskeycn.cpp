@@ -17,32 +17,23 @@
 */
 
 #include "cssysdef.h"
-#include "iutil/string.h"
-#include "csutil/scfstr.h"
 #include "csgeom/csrect.h"
+#include "csutil/scfstr.h"
 #include "iaws/aws.h"
+#include "iutil/string.h"
 #include "awsprefs.h"
-#include "awsadler.h"
 
-iAwsKey* awsKeyContainer::Find (iString *n)
+iAwsKey* awsKeyContainer::Find (iString *n) const
 {
-  return Find (
-    aws_adler32 (
-      aws_adler32 (0, 0, 0),
-      (unsigned char *)n->GetData (),
-      n->Length ()));
+  return Find (ComputeKeyID(n->GetData()));
 }
 
-iAwsKey* awsKeyContainer::Find (const char* n)
+iAwsKey* awsKeyContainer::Find (const char* n) const
 {
-  return Find (
-    aws_adler32 (
-      aws_adler32 (0, 0, 0),
-      (unsigned char*) n,
-      strlen(n)));
+  return Find (ComputeKeyID(n));
 }
 
-iAwsKey *awsKeyContainer::Find (unsigned long idname)
+iAwsKey *awsKeyContainer::Find (unsigned long idname) const
 {
   if (aws_debug)
     printf (
@@ -129,8 +120,7 @@ void awsKeyContainer::Consume (iAwsKeyContainer *c)
    */
 }
 
-awsConnectionNode::awsConnectionNode ()
-  : awsKeyContainer ("Connect")
+awsConnectionNode::awsConnectionNode (iAws* a) : awsKeyContainer (a,"Connect")
 {
 }
 

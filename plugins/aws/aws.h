@@ -19,23 +19,24 @@
 #ifndef __CS_AWS_H__
 #define __CS_AWS_H__
 
-#include "iaws/aws.h"
-#include "iaws/awsparm.h"
-#include "iaws/awscnvs.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "csutil/array.h"
-#include "csutil/array.h"
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"
 #include "cstool/proctex.h"
+#include "csutil/array.h"
+#include "csutil/array.h"
+#include "iaws/aws.h"
+#include "iaws/awscnvs.h"
+#include "iaws/awsparm.h"
+#include "igraphic/imageio.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/strset.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "igraphic/imageio.h"
 #include "awscomp.h"
 #include "awswin.h"
 
-/**
+/**\file
  * This is the alternate windowing system plugin.  It defines a simple,
  * lightweight alternative to the current CSWS windowing system.  It supports
  * simple skinning via the .skn defintions, and creation of windows from
@@ -74,6 +75,9 @@ private:
 
   /// Handle to the sink manager.
   csRef<iAwsSinkManager> sinkmgr;
+
+  /// Shared string table.
+  csRef<iStringSet> strset;
 
   /**
    * This is the dirty region.  All clean/dirty code now utilizes the
@@ -182,6 +186,9 @@ public:
 
   /// Set the preference manager used by the window system.
   virtual void SetPrefMgr (iAwsPrefManager *pmgr);
+
+  /// Get the shared string table.
+  virtual iStringSet* GetStringTable ();
 
   /// Register a component factory.
   virtual void RegisterComponentFactory (
@@ -329,7 +336,8 @@ public:
   virtual iAwsComponent *CreateWindowFrom (const char *defname);
 
   /// Creates a new embeddable component.
-  virtual iAwsComponent *CreateEmbeddableComponent (iAwsComponent *forComponent);
+  virtual iAwsComponent *CreateEmbeddableComponent (
+    iAwsComponent *forComponent);
 
   /// Creates a new parameter list.
   virtual iAwsParmList *CreateParmList ();
@@ -355,22 +363,6 @@ public:
 
   /// Get the current context.
   virtual iAwsCanvas *GetCanvas ();
-
-  /// Create a default canvas, covering the whole screen.
-  /*virtual iAwsCanvas *CreateDefaultCanvas (
-      iEngine *engine,
-      iTextureManager *txtmgr);*/
-
-  /// Create a default canvas, just a single proctex.
-  /*virtual iAwsCanvas *CreateDefaultCanvas (
-      iEngine *engine,
-      iTextureManager *txtmgr,
-      int width,
-      int height,
-      const char *name);*/
-
-  /// Create a canvas that uses custom graphics devices (e.g. the screen).
-  //virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D ();

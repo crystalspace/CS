@@ -73,7 +73,7 @@ protected:
   csPDelArray<csString> vClipped;
   csPDelArray<csString> vText;
   eventVector vDispatcher;
-  awsActionDispatcher actions;
+  awsActionDispatcher* actions;
 
   csRef<iFont> font;
   iTextureHandle *img;

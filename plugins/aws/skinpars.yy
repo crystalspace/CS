@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 /*********
   Bison definitions for skin files.
  *********/
@@ -5,7 +23,7 @@
 /** Note:
  * The proper command-line for compiling this file with bison is:
  *
- *    bison --no-lines -d -p aws -o slparse.cpp skinlang.bsn
+ *    bison --no-lines -d -p aws -o skinpars.cpp skinpars.yy
  *
  */
 
@@ -107,7 +125,7 @@ connection_item:
 
 connection_item_list:
 	connection_item
-		{ awsKeyContainer* kc = new awsKeyContainer;
+		{ awsKeyContainer* kc = new awsKeyContainer((iAws*)windowmgr);
 		  if ($1) kc->Add($1);
 		  $$ = kc;
 		}
@@ -120,24 +138,24 @@ connection_item_list:
 
 component_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{  $$ = new awsStringKey($1, $3); free($1); free($3); }
+		{  $$ = new awsStringKey((iAws*)windowmgr, $1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' expf
-		{  $$ = new awsFloatKey($1, $3); free($1); }
+		{  $$ = new awsFloatKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
-		{  $$ = new awsIntKey($1, $3); free($1); }
+		{  $$ = new awsIntKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
-		{  $$ = new awsRGBKey($1, $3, $5, $7); free($1); }
+		{  $$ = new awsRGBKey((iAws*)windowmgr, $1, $3, $5, $7); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{  $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
+		{  $$ = new awsRectKey((iAws*)windowmgr, $1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT	'{' connection_item_list '}'
-		{ awsConnectionNode *cn = new awsConnectionNode();
+		{ awsConnectionNode *cn = new awsConnectionNode((iAws*)windowmgr);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $3;
 		  cn->Consume (kc);
 		  kc->DecRef();
 		  $$ = cn;
 		}
 	| TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
-		{ awsComponentNode *cn = new awsComponentNode($2, $4);
+		{ awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, $2, $4);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $6;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -146,7 +164,7 @@ component_item:
 		  free($4);
 		}
 	| TOKEN_WINDOW TOKEN_STR '{' component_item_list '}'
-		{ awsComponentNode *cn = new awsComponentNode($2, "Window");
+		{ awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, $2, "Window");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -157,7 +175,7 @@ component_item:
 
 component_item_list:
 	component_item
-		{ awsKeyContainer* keycontainer = new awsKeyContainer;
+		{ awsKeyContainer* keycontainer = new awsKeyContainer((iAws*)windowmgr);
 		  keycontainer->Add($1);
 		  $$ = keycontainer;
 		}
@@ -171,22 +189,22 @@ component_item_list:
 
 window_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
+		{ $$ = new awsStringKey((iAws*)windowmgr, $1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' expf
-		{ $$ = new awsFloatKey($1, $3); free($1); }
+		{ $$ = new awsFloatKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
-		{ $$ = new awsIntKey($1, $3); free($1); }
+		{ $$ = new awsIntKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
+		{ $$ = new awsRectKey((iAws*)windowmgr, $1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT '{' connection_item_list '}'
-		{ awsConnectionNode *cn = new awsConnectionNode();
+		{ awsConnectionNode *cn = new awsConnectionNode((iAws*)windowmgr);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $3;
 		  cn->Consume(kc);
                   kc->DecRef();
 		  $$=cn;
 		}
         | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
-		{ awsComponentNode *cn = new awsComponentNode($2, $4);
+		{ awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, $2, $4);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $6;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -198,7 +216,7 @@ window_item:
 
 window_item_list:
 	window_item
-	      { awsKeyContainer* cnt = new awsKeyContainer;
+	      { awsKeyContainer* cnt = new awsKeyContainer((iAws*)windowmgr);
 		cnt->Add($1);
 		$$ = cnt;
 	      }
@@ -211,7 +229,7 @@ window_item_list:
 
 window:
 	TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}'
-		{ awsComponentNode *win = new awsComponentNode($2, "Default");
+		{ awsComponentNode *win = new awsComponentNode((iAws*)windowmgr, $2, "Default");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
 		  win->Consume(kc);
                   kc->DecRef();
@@ -226,22 +244,22 @@ window:
 
 skin_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
+		{ $$ = new awsStringKey((iAws*)windowmgr, $1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
-		{ $$ = new awsRGBKey($1, $3, $5, $7); free($1); }
+		{ $$ = new awsRGBKey((iAws*)windowmgr, $1, $3, $5, $7); free($1); }
 	| TOKEN_ATTR ':' expf
-		{ $$ = new awsFloatKey($1, $3); free($1); }
+		{ $$ = new awsFloatKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
-		{ $$ = new awsIntKey($1, $3); free($1); }
+		{ $$ = new awsIntKey((iAws*)windowmgr, $1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')'
-		{ $$ = new awsPointKey($1, csPoint($4, $6)); free($1); }
+		{ $$ = new awsPointKey((iAws*)windowmgr, $1, csPoint($4, $6)); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
+		{ $$ = new awsRectKey((iAws*)windowmgr, $1, csRect($4, $6, $10, $12)); free($1); }
 ;
 
 skin_item_list:
 	skin_item
-		{ awsKeyContainer* kc = new awsKeyContainer;
+		{ awsKeyContainer* kc = new awsKeyContainer((iAws*)windowmgr);
 		  kc->Add($1);
 		  $$ = kc;
 		}
@@ -254,7 +272,7 @@ skin_item_list:
 
 skin:
 	TOKEN_SKIN TOKEN_STR '{' skin_item_list '}'
-		{ awsSkinNode *skin = new awsSkinNode($2);
+		{ awsSkinNode *skin = new awsSkinNode((iAws*)windowmgr, $2);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
                   skin->Consume(kc);
                   kc->DecRef();

@@ -1,43 +1,63 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "awsslot.h"
-#include "awsadler.h"
 #include "iaws/awsdefs.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <string.h>
 
 #define callRefMemberFunction(object, ptrToMember)  ((object).*(ptrToMember))
 #define callPtrMemberFunction(object, ptrToMember)  ((object)->*(ptrToMember))
 
-static unsigned long NameToId (const char *n)
-{
-  if (n)
-  {
-    unsigned long id = aws_adler32 (
-        aws_adler32 (0, 0, 0),
-        (unsigned char *)n,
-        strlen (n));
+////////////////////////// Signal Sink Manager ////////////////////////////////
 
-    return id;
-  }
-  else
-    return 0;
-}
-
-///////////////////////////////////// Signal Sink Manager ////////////////////////////////////////////////////
 awsSinkManager::awsSinkManager (iBase *p)
 {
   SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 awsSinkManager::~awsSinkManager ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
 
-bool awsSinkManager::Initialize (iObjectRegistry *)
+bool awsSinkManager::Setup (iObjectRegistry* r)
 {
+  strset = CS_QUERY_REGISTRY_TAG_INTERFACE(r, "crystalspace.shared.stringset",
+    iStringSet);
+  if (!strset.IsValid())
+  {
+    csReport (r, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
+      "AWS sink manager could not locate the global shared string set \""
+      "crystalspace.shared.stringset\". This is a serious error.");
+    return false;
+  }
   return true;
+}
+
+unsigned long awsSinkManager::NameToId (const char *n) const
+{
+  if (n)
+    return strset->Request(n);
+  else
+    return csInvalidStringID;
 }
 
 void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
@@ -47,8 +67,7 @@ void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
 
 bool awsSinkManager::RemoveSink (iAwsSink* sink)
 {
-  size_t i;
-  for (i = 0; i < sinks.Length (); ++i)
+  for (size_t i = 0; i < sinks.Length (); ++i)
   {
     SinkMap *sm = sinks[i];
     if (sm->sink == sink)
@@ -62,23 +81,19 @@ bool awsSinkManager::RemoveSink (iAwsSink* sink)
 
 iAwsSink *awsSinkManager::FindSink (const char *_name)
 {
-  size_t i;
   unsigned long name = NameToId (_name);
-
-  for (i = 0; i < sinks.Length (); ++i)
+  for (size_t i = 0; i < sinks.Length (); ++i)
   {
     SinkMap *sm = sinks[i];
-
     if (sm->name == name)
       return sm->sink;
   }
-
   return 0;
 }
 
 iAwsSink *awsSinkManager::CreateSink (void *parm)
 {
-  awsSink* sink = new awsSink ();
+  awsSink* sink = new awsSink (strset);
   sink->SetParm (parm);
   return sink;
 }
@@ -88,8 +103,14 @@ iAwsSlot *awsSinkManager::CreateSlot ()
   return new awsSlot ();
 }
 
-///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
-awsSink::awsSink () : parm(0), sink_err(0)
+///////////////////////// Signal Sinks ////////////////////////////////////////
+
+awsSink::awsSink (iAws* a) : parm(0), sink_err(0), strset(a->GetStringTable())
+{
+  SCF_CONSTRUCT_IBASE (0);
+}
+
+awsSink::awsSink (iStringSet* s) : parm(0), sink_err(0), strset(s)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -99,18 +120,24 @@ awsSink::~awsSink ()
   SCF_DESTRUCT_IBASE();
 }
 
+unsigned long awsSink::NameToId (const char *n) const
+{
+  if (n)
+    return strset->Request(n);
+  else
+    return csInvalidStringID;
+}
+
 unsigned long awsSink::GetTriggerID (const char *_name)
 {
   unsigned long name = NameToId (_name);
-  size_t i;
-
   sink_err=0;
 
-  for (i = 0; i < triggers.Length (); ++i)
+  for (size_t i = 0; i < triggers.Length (); ++i)
   {
     TriggerMap *tm = triggers[i];
-
-    if (tm->name == name) return i;
+    if (tm->name == name)
+      return i;
   }
 
   sink_err = AWS_ERR_SINK_TRIGGER_NOT_FOUND;
@@ -138,7 +165,8 @@ void awsSink::RegisterTrigger (const char *name,
   triggers.Push (new TriggerMap (NameToId (name), Trigger));
 }
 
-///////////////////////////////////// Signal Sources ////////////////////////////////////////////////////////
+////////////////////////// Signal Sources /////////////////////////////////////
+
 awsSource::awsSource () : owner(0)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -157,12 +185,9 @@ iAwsComponent *awsSource::GetComponent ()
 bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 {
   SlotSignalMap *ssm = new SlotSignalMap;
-
   ssm->slot = slot;
   ssm->signal = signal;
-
   slots.Push (ssm);
-
   return true;
 }
 
@@ -171,31 +196,27 @@ bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
   for (size_t i = 0; i < slots.Length (); ++i)
   {
     SlotSignalMap *ssm = slots[i];
-
     if (ssm->signal == signal && ssm->slot == slot)
     {
       slots.DeleteIndex (i);
       return true;
     }
   }
-
   return false;
 }
 
 void awsSource::Broadcast (unsigned long signal)
 {
-  size_t i;
-
-  for (i = 0; i < slots.Length (); ++i)
+  for (size_t i = 0; i < slots.Length (); ++i)
   {
     SlotSignalMap *ssm = slots[i];
-
     if (ssm->signal == signal)
 	ssm->slot->Emit (*this, signal);
   }
 }
 
-///////////////////////////////////// Slots ////////////////////////////////////////////////////////
+/////////////////////////////// Slots /////////////////////////////////////////
+
 awsSlot::awsSlot ()
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -214,16 +235,13 @@ void awsSlot::Connect (
 {
   source->RegisterSlot (this, signal);
 
-  size_t i;
-
-  for (i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.Length (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
-
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
       stm->refs++;
-      return ;
+      return;
     }
   }
 
@@ -238,34 +256,24 @@ void awsSlot::Disconnect (
 {
   source->UnregisterSlot (this, signal);
 
-  size_t i;
-
-  for (i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.Length (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
-
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
       stm->refs--;
-
       if (stm->refs == 0)
-      {
 	stmap.DeleteIndex (i);
-      }
-
-      return ;
+      return;
     }
   }
 }
 
 void awsSlot::Emit (iAwsSource &source, unsigned long signal)
 {
-  size_t i;
-
-  for (i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.Length (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
-
     if (stm->signal == signal)
       stm->sink->HandleTrigger (stm->trigger, &source);
   }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,8 @@
 #define __CS_AWS_SCR_H__
 
 #include "csutil/array.h"
+#include "iutil/strset.h"
+struct iAws;
 
 struct awsActionMap
 {
@@ -35,7 +37,11 @@ class awsActionDispatcher
 private:
   /// List of actions to execute.
   csArray<awsActionMap*> actions;
+  /// Shared string table.
+  csRef<iStringSet> strset;
 public:
+  /// Constructor.
+  awsActionDispatcher(iAws*);
   /// Register an action.
   void Register (
     const char *name,

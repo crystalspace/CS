@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "awskcfct.h"
 
-awsKeyFactory::awsKeyFactory ()
+awsKeyFactory::awsKeyFactory (iAws* a) : wmgr(a)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -31,7 +31,7 @@ awsKeyFactory::~awsKeyFactory ()
 
 void awsKeyFactory::Initialize (const char* name, const char* component_type)
 {
-  awsComponentNode* n = new awsComponentNode (name, component_type);
+  awsComponentNode* n = new awsComponentNode (wmgr, name, component_type);
   base = SCF_QUERY_INTERFACE (n, iAwsComponentNode);
   CS_ASSERT (base);
   // We have a ref for n and one for base we don't want the one for n though.
@@ -63,7 +63,7 @@ void awsKeyFactory::AddIntKey (const char* name, int v)
 {
   if (base)
   {
-    awsIntKey* temp = new awsIntKey (name, v);
+    awsIntKey* temp = new awsIntKey (wmgr, name, v);
     csRef<iAwsIntKey> key (SCF_QUERY_INTERFACE (temp, iAwsIntKey));
     CS_ASSERT (key);
 
@@ -77,7 +77,7 @@ void awsKeyFactory::AddStringKey (const char* name, const char* v)
 {
   if (base)
   {
-    awsStringKey* temp = new awsStringKey (name, v);
+    awsStringKey* temp = new awsStringKey (wmgr, name, v);
     csRef<iAwsStringKey> key (SCF_QUERY_INTERFACE (temp, iAwsStringKey));
     CS_ASSERT (key);
 
@@ -91,7 +91,7 @@ void awsKeyFactory::AddRectKey (const char* name, csRect v)
 {
   if (base)
   {
-    awsRectKey* temp = new awsRectKey (name, v);
+    awsRectKey* temp = new awsRectKey (wmgr, name, v);
     csRef<iAwsRectKey> key (SCF_QUERY_INTERFACE (temp, iAwsRectKey));
     CS_ASSERT (key);
 
@@ -109,7 +109,7 @@ void awsKeyFactory::AddRGBKey (
 {
   if (base)
   {
-    awsRGBKey* temp = new awsRGBKey (name, r, g, b);
+    awsRGBKey* temp = new awsRGBKey (wmgr, name, r, g, b);
     csRef<iAwsRGBKey> key (SCF_QUERY_INTERFACE (temp, iAwsRGBKey));
     CS_ASSERT (key);
 
@@ -123,7 +123,7 @@ void awsKeyFactory::AddPointKey (const char* name, csPoint v)
 {
   if (base)
   {
-    awsPointKey* temp = new awsPointKey (name, v);
+    awsPointKey* temp = new awsPointKey (wmgr, name, v);
     csRef<iAwsPointKey> key (SCF_QUERY_INTERFACE (temp, iAwsPointKey));
     CS_ASSERT (key);
 
@@ -141,8 +141,8 @@ void awsKeyFactory::AddConnectionKey (
 {
   if (base)
   {
-    awsConnectionKey* temp = new awsConnectionKey (name, s, t, sig);
-    csRef<iAwsConnectionKey> key (SCF_QUERY_INTERFACE (temp, iAwsConnectionKey));
+    awsConnectionKey* temp = new awsConnectionKey (wmgr, name, s, t, sig);
+    csRef<iAwsConnectionKey> key(SCF_QUERY_INTERFACE(temp, iAwsConnectionKey));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -165,7 +165,7 @@ iAwsComponentNode *awsKeyFactory::GetThisNode ()
   return base;
 }
 
-awsConnectionNodeFactory::awsConnectionNodeFactory ()
+awsConnectionNodeFactory::awsConnectionNodeFactory (iAws* a) : wmgr(a)
 {
   base = 0;
   base_in_use = false;
@@ -179,7 +179,7 @@ awsConnectionNodeFactory::~awsConnectionNodeFactory ()
 
 void awsConnectionNodeFactory::Initialize ()
 {
-  base=new awsConnectionNode ();
+  base=new awsConnectionNode (wmgr);
 }
 
 void awsConnectionNodeFactory::AddConnectionKey (
@@ -190,7 +190,7 @@ void awsConnectionNodeFactory::AddConnectionKey (
 {
   if (base)
   {
-    base->Add ((awsKey*)(new awsConnectionKey (name, s, t, sig)));
+    base->Add ((awsKey*)(new awsConnectionKey (wmgr, name, s, t, sig)));
   }
 }
 

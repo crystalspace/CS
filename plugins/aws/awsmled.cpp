@@ -35,7 +35,7 @@ CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
 static awsSlot *textbox_slot = 0;
 
-awsMultiLineEdit::awsMultiLineEdit ()
+awsMultiLineEdit::awsMultiLineEdit () : actions(0)
 {
   style = 0;
   toprow = 0;
@@ -55,15 +55,6 @@ awsMultiLineEdit::awsMultiLineEdit ()
 
   alpha_level = 128;
   img = 0;
-
-  actions.Register ("InsertRow", &actInsertRow);
-  actions.Register ("DeleteRow", &actDeleteRow);
-  actions.Register ("ReplaceRow", &actReplaceRow);
-  actions.Register ("GetRow", &actGetRow);
-  actions.Register ("GetRowCount", &actGetRowCount);
-  actions.Register ("GetText", &actGetText);
-  actions.Register ("SetText", &actSetText);
-  actions.Register ("Clear", &actClear);
 }
 
 awsMultiLineEdit::~awsMultiLineEdit ()
@@ -80,12 +71,14 @@ awsMultiLineEdit::~awsMultiLineEdit ()
         textbox_sink->GetTriggerID ("Blink"));
     delete blink_timer;
   }
+
+  delete actions;
 }
 
 bool awsMultiLineEdit::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
-  actions.Execute (action, this, parmlist);
+  actions->Execute (action, this, parmlist);
   return false;
 }
 
@@ -225,8 +218,18 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
+  actions = new awsActionDispatcher(WindowManager());
+  actions->Register ("InsertRow", &actInsertRow);
+  actions->Register ("DeleteRow", &actDeleteRow);
+  actions->Register ("ReplaceRow", &actReplaceRow);
+  actions->Register ("GetRow", &actGetRow);
+  actions->Register ("GetRowCount", &actGetRowCount);
+  actions->Register ("GetText", &actGetText);
+  actions->Register ("SetText", &actSetText);
+  actions->Register ("Clear", &actClear);
+
   pm->LookupIntKey ("ButtonTextureAlpha", alpha_level); // global get
-  pm->GetInt (settings, "Alpha", alpha_level);          // local overrides, if present.
+  pm->GetInt (settings, "Alpha", alpha_level); // local overrides, if present.
   pm->GetInt (settings, "Style", style);
   // cursor color
   unsigned char r=255,g=0,b=0;
@@ -248,7 +251,6 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   default:
     img = pm->GetTexture ("Texture");
     break;
-
   }
 
   iString *fontname=0;

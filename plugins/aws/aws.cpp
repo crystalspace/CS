@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -99,12 +99,7 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (awsSinkManager)
   SCF_IMPLEMENTS_INTERFACE (iAwsSinkManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (awsSinkManager::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (awsPrefManager)
   SCF_IMPLEMENTS_INTERFACE (iAwsPrefManager)

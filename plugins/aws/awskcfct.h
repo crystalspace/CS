@@ -20,6 +20,7 @@
 #define __CS_AWS_KCFCT_H__
 
 #include "iaws/aws.h"
+#include "iutil/strset.h"
 #include "awsprefs.h"
 
 /**
@@ -40,10 +41,12 @@ private:
    * must be added to a window eventually to be useful.
    */
   csRef<iAwsComponentNode> base;
+  /// Aws manager.
+  iAws* wmgr;	// Not a csRef<>; avoid circular references.
 public:
   SCF_DECLARE_IBASE;
 
-  awsKeyFactory ();
+  awsKeyFactory (iAws* a);
   virtual ~awsKeyFactory ();
 
   /**
@@ -102,10 +105,13 @@ private:
 
   /// This is true if we cannot delete the base when we go.
   bool base_in_use;
+
+  /// Aws manager.
+  iAws* wmgr;	// Not a csRef<>; avoid circular references.
 public:
   SCF_DECLARE_IBASE;
 
-  awsConnectionNodeFactory ();
+  awsConnectionNodeFactory (iAws*);
   virtual ~awsConnectionNodeFactory ();
 
   /// Initializes the factory.

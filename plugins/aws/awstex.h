@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +21,7 @@
 
 #include "csutil/parray.h"
 #include "igraphic/imageio.h"
+#include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
@@ -50,6 +51,9 @@ private:
   /// Contains a reference to the object registry.
   iObjectRegistry *object_reg;
 
+  /// Shared string table.
+  csRef<iStringSet> strset;
+
   struct awsTexture
   {
     ~awsTexture();
@@ -66,6 +70,9 @@ private:
 
   /// Unregisters all currently loaded textures with the texture manager.
   void UnregisterTextures ();
+
+  /// Translate name to ID.
+  unsigned long NameToId (const char*) const;
 public:
   /// Empty constructor.
   awsTextureManager ();

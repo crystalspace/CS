@@ -1,17 +1,35 @@
-#include "cssysdef.h"
-#include "awsntbk.h"
-#include "aws3dfrm.h"
-#include "awskcfct.h"
-#include "awsslot.h"
-#include "awsscrbr.h"
-#include "awsfparm.h"
+/*
+    Copyright (C) 2002 by Norman Kraemer
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
+#include "cssysdef.h"
+#include "aws3dfrm.h"
+#include "awsfparm.h"
+#include "awskcfct.h"
+#include "awsntbk.h"
+#include "awsscrbr.h"
+#include "awsslot.h"
+
+#include "csutil/csevent.h"
+#include "csutil/scfstr.h"
+#include "iutil/evdefs.h"
+#include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/fontserv.h"
-#include "csutil/scfstr.h"
-#include "csutil/csevent.h"
-#include "iutil/evdefs.h"
 
 #include <stdio.h>
 
@@ -32,14 +50,15 @@ awsNotebook::awsNotebook () :
   bb_location(nbTop),
   bb_style(nbSlide),
   maxheight (0),
-  sink()
+  sink(0)
 {
-  sink.SetParm (this);
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
 awsNotebook::~awsNotebook ()
-{}
+{
+  delete sink;
+}
 
 const char *awsNotebook::Type ()
 {
@@ -50,15 +69,18 @@ bool awsNotebook::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
-  iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+  iAws* const w = WindowManager();
+  iAwsPrefManager *pm = w->GetPrefMgr ();
 
   pm->GetInt (settings, "Location", bb_location);
   pm->GetInt (settings, "Mode", bb_style);
 
-  sink.RegisterTrigger("ActivateTab", &OnActivateTab);
-  sink.RegisterTrigger("DeactivateTab", &OnDeactivateTab);
+  sink = new awsSink(w);
+  sink->SetParm (this);
+  sink->RegisterTrigger("ActivateTab", &OnActivateTab);
+  sink->RegisterTrigger("DeactivateTab", &OnDeactivateTab);
 
-  awsKeyFactory info;
+  awsKeyFactory info(w);
 
   info.Initialize ("ButtonBar", "Notebook ButtonBar");
 
@@ -172,8 +194,10 @@ void awsNotebook::AddChild (iAwsComponent *child)
   iAwsSource* src = tab_ctrl.AddTab (str, (void*)child);
 
   // hook up the source so we receive the signals
-  slot.Connect(src, awsTab::signalActivateTab, &sink, sink.GetTriggerID("ActivateTab"));
-  slot.Connect(src, awsTab::signalDeactivateTab, &sink, sink.GetTriggerID("DeactivateTab"));
+  slot.Connect(src, awsTab::signalActivateTab,
+    sink, sink->GetTriggerID("ActivateTab"));
+  slot.Connect(src, awsTab::signalDeactivateTab,
+    sink, sink->GetTriggerID("DeactivateTab"));
 }
 
 void awsNotebook::OnActivateTab(void* param, iAwsSource* src)
@@ -218,7 +242,7 @@ iAwsComponent *awsNotebookFactory::Create ()
 }
 
 
-/********************************** Notebook Page ********************************/
+/****************************** Notebook Page ********************************/
 
 awsNotebookPage::awsNotebookPage ():
   tex(0),
@@ -330,9 +354,8 @@ const char *awsNotebookPage::Type ()
   return "Notebook Page";
 }
 
-awsNotebookPageFactory::awsNotebookPageFactory (
-  iAws *wmgr) :
-    awsComponentFactory(wmgr)
+awsNotebookPageFactory::awsNotebookPageFactory (iAws *wmgr) :
+  awsComponentFactory(wmgr)
 {
   Register ("Notebook Page");
 
@@ -372,7 +395,7 @@ bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
-  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
+  pm->GetInt (settings, "Alpha", alpha_level); // local overrides, if present.
   pm->GetInt (settings, "IconAlign", icon_align);
   pm->GetString (settings, "Caption", caption);
 
@@ -427,7 +450,8 @@ void awsNotebookButton::OnDraw (csRect)
 
   if (is_active)
   {
-    g2d->DrawLine (r.xmin + 1, is_top ? r.ymin : r.ymax, r.xmax-1, is_top ? r.ymin : r.ymax, hi);
+    g2d->DrawLine (r.xmin + 1, is_top ? r.ymin : r.ymax, r.xmax-1,
+		   is_top ? r.ymin : r.ymax, hi);
     g2d->DrawLine (r.xmin, r.ymin + 1, r.xmin, r.ymax, hi);
     g2d->DrawLine (r.xmax-1, r.ymin + 1, r.xmax-1, r.ymax, lo);
     g2d->DrawLine (r.xmax, r.ymin + 1, r.xmax, r.ymax, lo2);
@@ -435,22 +459,23 @@ void awsNotebookButton::OnDraw (csRect)
   else
   {
     g2d->DrawLine (r.xmin, r.ymin + 1, r.xmin, r.ymax, is_first ? hi2 : lo);
-    g2d->DrawLine (r.xmin + 1, is_top ? r.ymin : r.ymax, r.xmax, is_top ? r.ymin : r.ymax, hi2);
+    g2d->DrawLine (r.xmin + 1, is_top ? r.ymin : r.ymax, r.xmax,
+		   is_top ? r.ymin : r.ymax, hi2);
     g2d->DrawLine (r.xmax, r.ymin + 1, r.xmax, r.ymax, lo);
   }
 
-  g2d->DrawBox (r.xmin + 1, r.ymin + 1, r.Width () - 1, r.Height () - 1, is_active ? fill : dfill);
+  g2d->DrawBox (r.xmin + 1, r.ymin + 1, r.Width () - 1, r.Height () - 1,
+		is_active ? fill : dfill);
 
   if (tex[0])
     g3d->DrawPixmap (tex[0], r.xmin+1, r.ymin+1, r.Width ()-1, r.Height ()-1,
-                     r.xmin+1, r.ymin+1, r.Width ()-1, r.Height ()-1, alpha_level);
+                     r.xmin+1, r.ymin+1, r.Width ()-1, r.Height ()-1,
+		     alpha_level);
 
   if (tex[1])
   {
     int img_w, img_h;
-
     tex[1]->GetOriginalDimensions (img_w, img_h);
-
     g3d->DrawPixmap (tex[1], r.xmin+1, r.ymin+1, r.Width ()-1, r.Height ()-1,
                      0, 0, img_w, img_h, 0);
   }
@@ -511,13 +536,11 @@ void awsNotebookButton::OnDraw (csRect)
   // Draw the caption, if there is one and the style permits it.
   if (caption)
   {
-
     // Draw the text
     g2d->Write (pm->GetDefaultFont (), r.xmin + tx, r.ymin + ty,
                 pm->GetColor (AC_TEXTFORE), -1, caption->GetData ());
 
   }
-
 }
 
 bool awsNotebookButton::GetProperty (const char *name, void **parm)
@@ -691,12 +714,13 @@ awsNotebookButtonBar::~awsNotebookButtonBar ()
 bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
+  iAws* const w = WindowManager();
 
   // set up the next/prev buttons and hide them initially
   next = new awsSliderButton;
   prev = new awsSliderButton;
 
-  awsKeyFactory previnfo, nextinfo;
+  awsKeyFactory previnfo(w), nextinfo(w);
 
   previnfo.Initialize ("prev", "Slider Button");
   nextinfo.Initialize ("next", "Slider Button");
@@ -726,7 +750,7 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   prev->SetProperty ("Image", previmg);
   next->SetProperty ("Image", nextimg);
 
-  awsSink* _sink = new awsSink ();
+  awsSink* _sink = new awsSink (w);
   _sink->SetParm (this);
   sink = _sink;
 
@@ -869,10 +893,11 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   awsNotebookButton *btn = new awsNotebookButton;
 
   // initialize and setup the button
-  awsKeyFactory btninfo;
+  awsKeyFactory btninfo(WindowManager());
 
   btninfo.Initialize (str->GetData(), "Notebook Button");
-  btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
+  btninfo.AddRectKey (
+    "Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
   iString *icon = 0;
   if (comp->GetProperty ("Icon", (void**)&icon) && icon && icon->Length ())
@@ -919,7 +944,8 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
   // connect myself with button to keep informed about state changes
   awsSlot *slot = new awsSlot;
-  slot->Connect (btn, awsNotebookButton::signalActivateTab, sink, sink->GetTriggerID ("ActivateTab"));
+  slot->Connect (btn, awsNotebookButton::signalActivateTab,
+    sink, sink->GetTriggerID ("ActivateTab"));
   vTabs.Push (btn, slot, comp, sink);
   //csRect newFrame(Frame());
   //newFrame.ymin = newFrame.ymax+1;

@@ -31,39 +31,40 @@
 #include "iutil/string.h"
 
 struct iAws;
-struct iAwsSlot;
-struct iAwsSink;
-struct iAwsSource;
-struct iAwsParmList;
-struct iAwsComponent;
-struct iAwsPrefManager;
-struct iAwsSinkManager;
 struct iAwsCanvas;
-struct iAwsKeyFactory;
+struct iAwsComponent;
 struct iAwsComponentFactory;
 struct iAwsConnectionNodeFactory;
+struct iAwsKeyFactory;
+struct iAwsParmList;
+struct iAwsPrefManager;
+struct iAwsSink;
+struct iAwsSinkManager;
+struct iAwsSlot;
+struct iAwsSource;
 
 typedef iAwsComponent iAwsWindow;
 
-class  awsWindow;
-class  awsComponent;
-class  awsComponentNode;
-class  awsConnectionNode;
-class  awsComponentFactory;
-class  awsLayoutManager;
+class awsWindow;
+class awsComponent;
+class awsComponentNode;
+class awsConnectionNode;
+class awsComponentFactory;
+class awsLayoutManager;
 
-struct  iGraphics2D;
-struct  iGraphics3D;
-struct  iEngine;
-struct  iView;
-struct  iTextureManager;
-struct  iObjectRegistry;
-struct  iTextureHandle;
-struct  iFontServer;
-struct  iFont;
-struct  iEvent;
+struct iEngine;
+struct iEvent;
+struct iFont;
+struct iFontServer;
+struct iGraphics2D;
+struct iGraphics3D;
+struct iObjectRegistry;
+struct iStringSet;
+struct iTextureHandle;
+struct iTextureManager;
+struct iView;
 
-const   bool aws_debug=false;  // set to true to turn on debugging printf's
+const bool aws_debug = false;  // set to true to turn on debugging printf()'s
 
 /**
  * \addtogroup aws_sys_flags
@@ -75,7 +76,7 @@ const   bool aws_debug=false;  // set to true to turn on debugging printf's
  * (such as when using the single proctex mode as a surface, or to draw to the
  * high level visible context.)
  */
-const int AWSF_AlwaysEraseWindows=1;
+const int AWSF_AlwaysEraseWindows = 1;
 
 /**
  * This flag makes the windowing system redraw every time, which is necessary
@@ -84,7 +85,7 @@ const int AWSF_AlwaysEraseWindows=1;
  * drawing to the background with AWS.  In other words, if AWS has complete
  * control of the screen context.
  */
-const int AWSF_AlwaysRedrawWindows=2;
+const int AWSF_AlwaysRedrawWindows = 2;
 
 /**
  * This flag makes windows come to the front solely by moving the mouse over
@@ -108,10 +109,10 @@ SCF_VERSION(iAwsKey, 0, 0, 1);
 struct iAwsKey : public iBase
 {
   /// returns the type of key
-  virtual uint8 Type () = 0;
+  virtual uint8 Type () const = 0;
 
   /// Accessor function gets name of key
-  virtual unsigned long Name () = 0;
+  virtual unsigned long Name () const = 0;
 };
 
 SCF_VERSION(iAwsIntKey, 0, 0, 1);
@@ -120,7 +121,7 @@ SCF_VERSION(iAwsIntKey, 0, 0, 1);
 struct iAwsIntKey : public iAwsKey
 {
   /// Gets the value of this key as an integer
-  virtual int Value () = 0;
+  virtual int Value () const = 0;
 };
 
 SCF_VERSION(iAwsFloatKey, 0, 0, 1);
@@ -129,7 +130,7 @@ SCF_VERSION(iAwsFloatKey, 0, 0, 1);
 struct iAwsFloatKey : public iAwsKey
 {
   /// Gets the value of this key as a float
-  virtual float Value () = 0;
+  virtual float Value () const = 0;
 };
 
 SCF_VERSION(iAwsStringKey, 0, 0, 1);
@@ -138,7 +139,7 @@ SCF_VERSION(iAwsStringKey, 0, 0, 1);
 struct iAwsStringKey : public iAwsKey
 {
   /// Gets the value of this key as an iString
-  virtual iString* Value () = 0;
+  virtual iString* Value () const = 0;
 };
 
 SCF_VERSION(iAwsRectKey, 0, 0, 1);
@@ -147,7 +148,7 @@ SCF_VERSION(iAwsRectKey, 0, 0, 1);
 struct iAwsRectKey : public iAwsKey
 {
   /// Gets the value of this key as a rectangle
-  virtual csRect Value () = 0;
+  virtual csRect Value () const = 0;
 };
 
 SCF_VERSION(iAwsRGBKey, 0, 0, 1);
@@ -161,7 +162,7 @@ struct iAwsRGBKey : public iAwsKey
   };
   
   /// Gets the value of this key as an rgb
-  virtual iAwsRGBKey::RGB &Value() = 0;
+  virtual const iAwsRGBKey::RGB &Value() const = 0;
 };
 
 SCF_VERSION(iAwsPointKey, 0, 0, 1);
@@ -170,7 +171,7 @@ SCF_VERSION(iAwsPointKey, 0, 0, 1);
 struct iAwsPointKey : public iAwsKey
 {
   /// Gets the value of this key as a point
-  virtual csPoint Value () = 0;
+  virtual csPoint Value () const = 0;
 };
 
 SCF_VERSION(iAwsConnectionKey, 0, 0, 1);
@@ -179,13 +180,13 @@ SCF_VERSION(iAwsConnectionKey, 0, 0, 1);
 struct iAwsConnectionKey : public iAwsKey
 {
   /// Gets the sink for this key
-  virtual iAwsSink *Sink () = 0;
+  virtual iAwsSink *Sink () const = 0;
 
   /// Gets the trigger for this key
-  virtual unsigned long Trigger () = 0;
+  virtual unsigned long Trigger () const = 0;
 
   /// Gets the signal for this key
-  virtual unsigned long Signal () = 0;
+  virtual unsigned long Signal () const = 0;
 };
 
 SCF_VERSION(iAwsKeyContainer, 0, 0, 1);
@@ -194,24 +195,24 @@ SCF_VERSION(iAwsKeyContainer, 0, 0, 1);
 struct iAwsKeyContainer : public iAwsKey
 {
   /// Looks up a key based on it's name.
-  virtual iAwsKey* Find (iString* name) = 0;
+  virtual iAwsKey* Find (iString* name) const = 0;
 
   /// Looks up a key based on it's name.
-  virtual iAwsKey* Find (const char* name) = 0;
+  virtual iAwsKey* Find (const char* name) const = 0;
 
   /// Looks up a key based on it's ID.
-  virtual iAwsKey *Find (unsigned long id) = 0;
+  virtual iAwsKey *Find (unsigned long id) const = 0;
 
-  virtual const csRefArray<iAwsKey> &Children () = 0;
+  virtual const csRefArray<iAwsKey> &Children () const = 0;
 
   /// Adds an item to the container
   virtual void Add (iAwsKey *key) = 0;
 
   /// returns children number i
-  virtual iAwsKey* GetAt (int i) = 0;
+  virtual iAwsKey* GetAt (int i) const = 0;
 
   /// returns number of childrens
-  virtual int Length () = 0;
+  virtual int Length () const = 0;
     
   /// Removes an item from the container
   virtual void Remove (iString *name) = 0;
@@ -235,7 +236,7 @@ SCF_VERSION(iAwsComponentNode, 0, 0, 1);
 struct iAwsComponentNode : public iAwsKeyContainer
 {
   /// So that we can find out what sort of component type this should be
-  virtual iString *ComponentTypeName () = 0;
+  virtual iString *ComponentTypeName () const = 0;
 };
 
 
@@ -258,12 +259,15 @@ public:
   /// Set the preference manager used by the window system
   virtual void SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
+  /// Get the shared string table.
+  virtual iStringSet* GetStringTable()=0;
+
   /**
    * Allows a component to register itself for dynamic template instatiation
    * via definition files.
    */
   virtual void RegisterComponentFactory(iAwsComponentFactory *factory,
-  	const char* name)=0;
+    const char* name)=0;
 
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (const char* name)=0;
@@ -585,15 +589,19 @@ public:
 };
 
 
-SCF_VERSION (iAwsSinkManager, 0, 0, 2);
+SCF_VERSION (iAwsSinkManager, 0, 0, 3);
 
 /// Interface for the sink manager
 struct iAwsSinkManager : public iBase
 {
+  /// Performs whatever initialization is needed.
+  virtual bool Setup(iObjectRegistry *object_reg)=0;
+
   /// Registers a sink by name for lookup.
   virtual void RegisterSink(const char *name, iAwsSink *sink)=0;
 
-  virtual bool RemoveSink (iAwsSink* sink) = 0;
+  /// Remove the indicated sink.
+  virtual bool RemoveSink (iAwsSink* sink)=0;
 
   /// Finds a sink by name for connection.
   virtual iAwsSink* FindSink(const char *name)=0;

@@ -21,6 +21,7 @@
 
 #include "iaws/aws.h"
 #include "iutil/comp.h"
+#include "iutil/strset.h"
 #include "csutil/parray.h"
 
 /**
@@ -46,13 +47,19 @@ private:
   };
 
   csPDelArray<SinkMap> sinks;
+  csRef<iStringSet> strset;
+
+  unsigned long NameToId (const char*) const;
 public:
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
   awsSinkManager (iBase *p);
+  /// Destructor.
   virtual ~awsSinkManager ();
 
-  bool Initialize (iObjectRegistry *sys);
+  /// Performs whatever initialization is necessary.
+  virtual bool Setup (iObjectRegistry*);
 
   /// Registers a sink by name for lookup.
   virtual void RegisterSink (const char *name, iAwsSink *sink);
@@ -69,19 +76,8 @@ public:
    */
   virtual iAwsSink *CreateSink (void *parm);
 
-  /// Create a new embeddable slot
+  /// Create a new embeddable slot.
   virtual iAwsSlot *CreateSlot ();
-
-  /// Implement iComponent interface.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (awsSinkManager);
-    virtual bool Initialize (iObjectRegistry *p)
-    {
-      return scfParent->Initialize (p);
-    }
-  }
-  scfiComponent;
 };
 
 /**
@@ -108,14 +104,21 @@ private:
 
   /// Last error code.
   unsigned int sink_err;
+
+  /// Shared string table.
+  csRef<iStringSet> strset;
+
+  /// Convert string to ID.
+  unsigned long NameToId (const char*) const;
 public:
   SCF_DECLARE_IBASE;
 
-  /// P is the parm that is passed to triggers.
-  awsSink ();
+  awsSink (iAws*);
+  awsSink (iStringSet*);
   virtual ~awsSink ();
 
   void* GetParm () { return parm; }
+  /// P is the parm that is passed to triggers.
   void SetParm (void* p) { parm = p; }
 
   /// Maps a trigger name to a trigger id.

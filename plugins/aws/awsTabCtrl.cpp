@@ -1,5 +1,5 @@
 /*
-    Copyright (C) ???
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -327,13 +327,14 @@ awsTabCtrl::~awsTabCtrl ()
 bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
+  iAws* const w = WindowManager();
 
-  awsSink* _sink = new awsSink ();
+  awsSink* _sink = new awsSink (w);
   _sink->SetParm (this);
   sink = _sink;
   sink->RegisterTrigger ("ActivateTab", &ActivateTabCallback);
 
-  awsKeyFactory previnfo, nextinfo;
+  awsKeyFactory previnfo(w), nextinfo(w);
 
   previnfo.Initialize ("prev", "Slider Button");
   nextinfo.Initialize ("next", "Slider Button");
@@ -344,8 +345,8 @@ bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   previnfo.AddStringKey ("Icon", "ScrollBarLt");
   nextinfo.AddStringKey ("Icon", "ScrollBarRt");
 
-  nextimg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarRt");
-  previmg = WindowManager ()->GetPrefMgr ()->GetTexture ("ScrollBarLt");
+  nextimg = w->GetPrefMgr ()->GetTexture ("ScrollBarRt");
+  previmg = w->GetPrefMgr ()->GetTexture ("ScrollBarLt");
 
   if (!previmg || !nextimg) return false;
 
@@ -353,7 +354,8 @@ bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   previmg->GetOriginalDimensions (img_w, img_h);
 
-  csRect r (0, 0, 30, 30 ); // (HandleSize > img_w ? HandleSize : img_w), ( HandleSize > img_h ? HandleSize : img_h) + 15);
+  csRect r (0, 0, 30, 30 ); // (HandleSize > img_w ? HandleSize : img_w),
+			    // (HandleSize > img_h ? HandleSize : img_h) + 15);
 
   r.Move (Frame ().Width () - 2 * HandleSize - 1,
     Frame ().Height ()-HandleSize - 1);
@@ -476,7 +478,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
   awsTab *btn = new awsTab;
 
   // Initialize and setup the button.
-  awsKeyFactory btninfo;
+  awsKeyFactory btninfo(WindowManager());
 
   btninfo.Initialize (caption->GetData (), "Tab");
   btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (),

@@ -1,5 +1,5 @@
-/**************************************************************************
-    Copyright (C) 2003 by Christopher Nelson
+/*
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
+*/
 
 #include "cssysdef.h"
 
@@ -28,36 +28,30 @@
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
-#include "awsprefs.h"
-#include "awstex.h"
-#include "awsadler.h"
 #include "awskcfct.h"
 #include "awsparser.h"
+#include "awsprefs.h"
+#include "awstex.h"
 
 extern int awsparse (void *prefscont);
 
 const bool DEBUG_KEYS = false;
 const bool DEBUG_INIT = false;
 
-/// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
+// The gradient step for the slightly darker and lighter versions of the
+// highlight and shadow.
 const unsigned char GRADIENT_STEP = 25;
 
-/***************************************************************************************************************
-*   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
-* comparison.  The method of text-to-id mapping may be somewhat slower than a counter, but it does not have to *
-* worry about wrapping or collisions or running out during long execution cycles.                              *
-***************************************************************************************************************/
-void awsKey::ComputeKeyID (const char* n, size_t len)
+unsigned long awsKey::ComputeKeyID (const char* n) const
 {
-  CS_ASSERT (n);
-  
-  name = aws_adler32 (aws_adler32 (0, 0, 0), (unsigned char *)n, len);
-  
+  CS_ASSERT (n != 0);
+  unsigned long const x = strset->Request(n);
   if (DEBUG_KEYS)
-    printf ("aws-debug: new key %s mapped to %lu\n", n, name);
+    printf ("aws-debug: new key %s mapped to %lu\n", n, x);
+  return x;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 awsPrefManager::awsPrefManager (iBase *iParent) :
   def_skin(0),
   awstxtmgr(0),
@@ -99,17 +93,12 @@ unsigned long awsPrefManager::NameToId (const char *n)
 {
   if (n)
   {
-    unsigned long id = aws_adler32 (
-        aws_adler32 (0, 0, 0),
-        (unsigned char *)n,
-        strlen (n));
-
+    unsigned long id = wmgr->GetStringTable()->Request(n);
     if (DEBUG_KEYS) printf ("aws-debug: mapped %s to %lu\n", n, id);
-
     return id;
   }
   else
-    return 0;
+    return csInvalidStringID;
 }
 
 void awsPrefManager::SetColor (int index, int color)
@@ -122,12 +111,15 @@ int awsPrefManager::GetColor (int index)
   return sys_colors[index];
 }
 
-int awsPrefManager::FindColor(unsigned char r, unsigned char g, unsigned char b)
+int awsPrefManager::FindColor(unsigned char r,
+			      unsigned char g,
+			      unsigned char b)
 {
   return g2d->FindRGB (r, g, b);
 }
 
-iTextureHandle *awsPrefManager::GetTexture (const char* name, const char* filename)
+iTextureHandle *awsPrefManager::GetTexture (const char* name,
+					    const char* filename)
 {
   if (awstxtmgr)
     return awstxtmgr->GetTexture (name, filename, false);
@@ -135,7 +127,8 @@ iTextureHandle *awsPrefManager::GetTexture (const char* name, const char* filena
     return 0;
 }
 
-iTextureHandle *awsPrefManager::GetTexture (const char* name,const char* filename, 
+iTextureHandle *awsPrefManager::GetTexture (const char* name,
+					    const char* filename, 
                                             unsigned char key_r,
                                             unsigned char key_g,
                                             unsigned char key_b)
@@ -263,8 +256,8 @@ bool awsPrefManager::Load (const char *def_file)
 {
   if (wmgr == 0)
   {
-    printf (
-      "\tunable to load definitions because of an internal error: no window manager.\n");
+    printf ("\tunable to load definitions because of an internal error: "
+	    "no window manager: %s\n", def_file);
     return false;
   }
 
@@ -274,7 +267,7 @@ bool awsPrefManager::Load (const char *def_file)
   static_awsparser = new awsParser(objreg, wmgr, this);
   if (!static_awsparser->Initialize (def_file))
   {
-    printf ("Couldn't open def file\n");
+    printf ("Couldn't open def file: %s\n", def_file);
     delete static_awsparser;
     static_awsparser = 0;
     return false;
@@ -285,7 +278,7 @@ bool awsPrefManager::Load (const char *def_file)
 
   if (awsparse (wmgr))
   {
-    printf ("\tsyntax error in definition file, load failed.\n");
+    printf ("\tsyntax error in definition file, load failed: %s\n", def_file);
     return false;
   }
 
@@ -482,7 +475,8 @@ bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
   return false;
 }
 
-bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name, int &val)
+bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name,
+			     int &val)
 {
   if (!node) return false;
 
@@ -501,7 +495,8 @@ bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name, int &val
   return false;
 }
 
-bool awsPrefManager::GetFloat (iAwsComponentNode *node, const char *name, float &val)
+bool awsPrefManager::GetFloat (iAwsComponentNode *node, const char *name,
+			       float &val)
 {
   if (!node) return false;
 
@@ -546,7 +541,8 @@ bool awsPrefManager::GetRGB (iAwsComponentNode *node, const char *name,
   return false;
 }
 
-bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name, csRect &val)
+bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name,
+			      csRect &val)
 {
   if (!node) return false;
 
@@ -657,11 +653,10 @@ bool awsPrefManager::ConstantExists (const char *name)
 
 iAwsKeyFactory *awsPrefManager::CreateKeyFactory ()
 {
-  return new awsKeyFactory ();
+  return new awsKeyFactory (wmgr);
 }
 
 iAwsConnectionNodeFactory *awsPrefManager::CreateConnectionNodeFactory ()
 {
-  return new awsConnectionNodeFactory ();
+  return new awsConnectionNodeFactory (wmgr);
 }
-

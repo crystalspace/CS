@@ -367,12 +367,12 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,    89,    89,    90,    93,    94,    95,    96,   104,   109,
-     114,   122,   124,   126,   128,   130,   132,   139,   148,   159,
-     164,   173,   175,   177,   179,   181,   188,   200,   205,   213,
-     228,   230,   232,   234,   236,   238,   243,   248,   256,   270,
-     279,   280,   281,   282,   283,   284,   285,   288,   289,   290,
-     291,   292,   293,   294,   295
+       0,   107,   107,   108,   111,   112,   113,   114,   122,   127,
+     132,   140,   142,   144,   146,   148,   150,   157,   166,   177,
+     182,   191,   193,   195,   197,   199,   206,   218,   223,   231,
+     246,   248,   250,   252,   254,   256,   261,   266,   274,   288,
+     297,   298,   299,   300,   301,   302,   303,   306,   307,   308,
+     309,   310,   311,   312,   313
 };
 #endif
 
@@ -1207,7 +1207,7 @@ yyreduce:
 
   case 9:
 
-    { awsKeyContainer* kc = new awsKeyContainer;
+    { awsKeyContainer* kc = new awsKeyContainer((iAws*)windowmgr);
 		  if (yyvsp[0].key) kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;}
@@ -1223,32 +1223,32 @@ yyreduce:
 
   case 11:
 
-    {  yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
+    {  yyval.key = new awsStringKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
     break;
 
   case 12:
 
-    {  yyval.key = new awsFloatKey(yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
+    {  yyval.key = new awsFloatKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
     break;
 
   case 13:
 
-    {  yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
+    {  yyval.key = new awsIntKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
     break;
 
   case 14:
 
-    {  yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;}
+    {  yyval.key = new awsRGBKey((iAws*)windowmgr, yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;}
     break;
 
   case 15:
 
-    {  yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
+    {  yyval.key = new awsRectKey((iAws*)windowmgr, yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
     break;
 
   case 16:
 
-    { awsConnectionNode *cn = new awsConnectionNode();
+    { awsConnectionNode *cn = new awsConnectionNode((iAws*)windowmgr);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume (kc);
 		  kc->DecRef();
@@ -1258,7 +1258,7 @@ yyreduce:
 
   case 17:
 
-    { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
+    { awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, yyvsp[-5].str, yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -1270,7 +1270,7 @@ yyreduce:
 
   case 18:
 
-    { awsComponentNode *cn = new awsComponentNode(yyvsp[-3].str, "Window");
+    { awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, yyvsp[-3].str, "Window");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -1281,7 +1281,7 @@ yyreduce:
 
   case 19:
 
-    { awsKeyContainer* keycontainer = new awsKeyContainer;
+    { awsKeyContainer* keycontainer = new awsKeyContainer((iAws*)windowmgr);
 		  keycontainer->Add(yyvsp[0].key);
 		  yyval.keycont = keycontainer;
 		;}
@@ -1297,27 +1297,27 @@ yyreduce:
 
   case 21:
 
-    { yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
+    { yyval.key = new awsStringKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
     break;
 
   case 22:
 
-    { yyval.key = new awsFloatKey(yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
+    { yyval.key = new awsFloatKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
     break;
 
   case 23:
 
-    { yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
+    { yyval.key = new awsIntKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
     break;
 
   case 24:
 
-    { yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
+    { yyval.key = new awsRectKey((iAws*)windowmgr, yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
     break;
 
   case 25:
 
-    { awsConnectionNode *cn = new awsConnectionNode();
+    { awsConnectionNode *cn = new awsConnectionNode((iAws*)windowmgr);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -1327,7 +1327,7 @@ yyreduce:
 
   case 26:
 
-    { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
+    { awsComponentNode *cn = new awsComponentNode((iAws*)windowmgr, yyvsp[-5].str, yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
@@ -1339,7 +1339,7 @@ yyreduce:
 
   case 27:
 
-    { awsKeyContainer* cnt = new awsKeyContainer;
+    { awsKeyContainer* cnt = new awsKeyContainer((iAws*)windowmgr);
 		cnt->Add(yyvsp[0].key);
 		yyval.keycont = cnt;
 	      ;}
@@ -1355,7 +1355,7 @@ yyreduce:
 
   case 29:
 
-    { awsComponentNode *win = new awsComponentNode(yyvsp[-3].str, "Default");
+    { awsComponentNode *win = new awsComponentNode((iAws*)windowmgr, yyvsp[-3].str, "Default");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  win->Consume(kc);
                   kc->DecRef();
@@ -1366,37 +1366,37 @@ yyreduce:
 
   case 30:
 
-    { yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
+    { yyval.key = new awsStringKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;}
     break;
 
   case 31:
 
-    { yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;}
+    { yyval.key = new awsRGBKey((iAws*)windowmgr, yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;}
     break;
 
   case 32:
 
-    { yyval.key = new awsFloatKey(yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
+    { yyval.key = new awsFloatKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].fval); free(yyvsp[-2].str); ;}
     break;
 
   case 33:
 
-    { yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
+    { yyval.key = new awsIntKey((iAws*)windowmgr, yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;}
     break;
 
   case 34:
 
-    { yyval.key = new awsPointKey(yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;}
+    { yyval.key = new awsPointKey((iAws*)windowmgr, yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;}
     break;
 
   case 35:
 
-    { yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
+    { yyval.key = new awsRectKey((iAws*)windowmgr, yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;}
     break;
 
   case 36:
 
-    { awsKeyContainer* kc = new awsKeyContainer;
+    { awsKeyContainer* kc = new awsKeyContainer((iAws*)windowmgr);
 		  kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;}
@@ -1412,7 +1412,7 @@ yyreduce:
 
   case 38:
 
-    { awsSkinNode *skin = new awsSkinNode(yyvsp[-3].str);
+    { awsSkinNode *skin = new awsSkinNode((iAws*)windowmgr, yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
                   skin->Consume(kc);
                   kc->DecRef();

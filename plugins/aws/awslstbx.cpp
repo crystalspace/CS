@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "awslstbx.h"
 #include "awsfparm.h"
@@ -29,11 +47,10 @@ const int hsTreeBox = 0;
 const int hsState = 1;
 const int hsRow = 2;
 
-//////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 // awsListRow implementation
+///////////////////////////////////////////////////////////////////////////////
 
-//
 awsListRow::~awsListRow ()
 {
   delete[] cols;
@@ -54,11 +71,10 @@ int awsListRow::GetHeight (iAwsPrefManager *pm, int colcount)
   return minheight;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 // awsListItem implementation
+///////////////////////////////////////////////////////////////////////////////
 
-//
 awsListItem::~awsListItem ()
 {
   if (text) text->DecRef ();
@@ -79,11 +95,9 @@ int awsListItem::GetHeight (iAwsPrefManager *pm)
     return th;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 // awsListRowVector implementation
-
-//
+///////////////////////////////////////////////////////////////////////////////
 int awsListRowVector::sortcol = 0;
 
 int awsListRowVector::Compare (awsListRow* const& r1, awsListRow* const& r2)
@@ -107,11 +121,10 @@ int awsListRowVector::CompareKey (awsListRow* const& r1, iString* const& Key)
     return -1;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 // awsListBox implementation
+///////////////////////////////////////////////////////////////////////////////
 
-//
 awsListBox::awsListBox () :
   is_down(false),
   mouse_is_over(false),
@@ -130,17 +143,17 @@ awsListBox::awsListBox () :
   map_size(0),
   map_dirty(true),
   scroll_start(0),
-  drawable_count(0)
+  drawable_count(0),
+  sink(0),
+  slot(0),
+  scrollbar(0),
+  actions(0)
 {
-  actions.Register ("InsertItem", &InsertItem);
-  actions.Register ("DeleteItem", &DeleteItem);
-  actions.Register ("GetSelectedItem", &GetSelectedItem);
-  actions.Register ("GetItem", &GetItem);
-  actions.Register ("ClearList", &ClearList);
 }
 
 awsListBox::~awsListBox ()
 {
+  delete actions;
 }
 
 const char *awsListBox::Type ()
@@ -160,6 +173,13 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+
+  actions = new awsActionDispatcher(WindowManager());
+  actions->Register ("InsertItem", &InsertItem);
+  actions->Register ("DeleteItem", &DeleteItem);
+  actions->Register ("GetSelectedItem", &GetSelectedItem);
+  actions->Register ("GetItem", &GetItem);
+  actions->Register ("ClearList", &ClearList);
 
   pm->LookupIntKey ("ScrollBarHeight", sb_h);
   pm->LookupIntKey ("ScrollBarWidth", sb_w);
@@ -221,7 +241,7 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // Setup embedded scrollbar
   scrollbar = new awsScrollBar;
 
-  awsKeyFactory sbinfo;
+  awsKeyFactory sbinfo(WindowManager());
 
   sbinfo.Initialize ("vertscroll", "Scroll Bar");
 
@@ -244,7 +264,7 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   scrollbar->SetProperty ("Min", &min);
 
   // Setup trigger
-  awsSink* _sink = new awsSink ();
+  awsSink* _sink = new awsSink (WindowManager());
   _sink->SetParm (this);
   sink = _sink;
 
@@ -263,16 +283,12 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
 bool awsListBox::GetProperty (const char *name, void **parm)
 {
-  if (awsPanel::GetProperty (name, parm)) return true;
-
-  return false;
+  return awsPanel::GetProperty (name, parm);
 }
 
 bool awsListBox::SetProperty (const char *name, void *parm)
 {
-  if (awsPanel::SetProperty (name, parm)) return true;
-
-  return false;
+  return awsPanel::SetProperty (name, parm);
 }
 
 void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
@@ -295,7 +311,6 @@ void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
 
 void awsListBox::UpdateMap ()
 {
-
   if (map_dirty)
   {
     int start = 0;
@@ -308,17 +323,13 @@ void awsListBox::UpdateMap ()
     map_size = CountVisibleItems (&rows);
     map = new awsListRow *[map_size];
 
-    /* Set the scroll bar's max position.  Since we're using the
-	 * pagesize (amount visible) property of the scrollbar, the max
-	 * position will be the total number of rows.  The pagesize will
-	 * be the number of visible rows, and the current value of the
-	 * scrollbar will be the topmost visible row. 
-	 */
+    // Set the scroll bar's max position.  Since we're using the pagesize
+    // (amount visible) property of the scrollbar, the max position will be the
+    // total number of rows.  The pagesize will be the number of visible rows,
+    // and the current value of the scrollbar will be the topmost visible row.
     float max_scroll;
     max_scroll = map_size;
     scrollbar->SetProperty ("Max", &max_scroll);
-
-
 
     // Map out items
     MapVisibleItems (&rows, start, map);
@@ -407,7 +418,8 @@ static void DoRecursiveClearList (awsListRowVector *v)
   v->DeleteAll ();
 }
 
-/////////////// Scripted Actions /////////////////////////////////////////////////////////////
+/////////////// Scripted Actions //////////////////////////////////////////////
+
 void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
@@ -431,10 +443,8 @@ void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
   row->selectable = true;
   parmlist->GetBool ("selectable", &(row->selectable));
 
-  /* Fill in the columns by looking for several parameters:
-   *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX,
-   *   selectableX
-   */
+  // Fill in the columns by looking for several parameters: textX, imageX,
+  // txtalignX, imgalignX, statefulX, stateX, groupstateX, selectableX
   for (i = 0; i < lb->ncolumns; ++i)
   {
     cs_snprintf (buf, 50, "text%d", i);
@@ -510,7 +520,8 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
   if (i == selidx && selidx > -1)
   {
     int startidx=selidx;
-    while (selidx < (int)lb->rows.Length () && !((awsListRow*)lb->rows[selidx])->selectable)
+    while (selidx < (int)lb->rows.Length () &&
+	   !((awsListRow*)lb->rows[selidx])->selectable)
       selidx++;
 
     if (selidx >= (int)lb->rows.Length ())
@@ -551,8 +562,10 @@ void awsListBox::GetItem (void *owner, iAwsParmList* parmlist)
   
   awsListBox *lb = (awsListBox *)owner;
   int row=-1;
-  if (parmlist->GetInt ("row", &row) && row >= -1 && (size_t)row < lb->rows.Length ())
-    parmlist->AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row], parmlist));
+  if (parmlist->GetInt ("row", &row) && row >= -1 &&
+      (size_t)row < lb->rows.Length ())
+    parmlist->AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row],
+      parmlist));
   else
     parmlist->AddBool ("success", false);
 }
@@ -585,7 +598,8 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList* parmlist)
       usedp[i] = false;
     }
 
-    // check if they want the text or state or what. then return those in the parmlist
+    // check if they want the text or state or what. then return those in the
+    // parmlist
     for (i = 0; i < ncolumns; ++i)
     {
       cs_snprintf (buf, 50, "text%d", i);
@@ -662,7 +676,7 @@ bool awsListBox::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsPanel::Execute (action, parmlist)) return true;
 
-  actions.Execute (action, this, parmlist);
+  actions->Execute (action, this, parmlist);
 
   return false;
 }
@@ -913,7 +927,8 @@ void awsListBox::OnDraw (csRect clip)
 
       draw_this_time = true;
 
-      // Find parent of current row.  If there is no parent, then go to the next row item.
+      // Find parent of current row.  If there is no parent, then go to the
+      // next row item.
       awsListRow *parent = row->parent;
 
       if (parent == 0)
@@ -1117,7 +1132,7 @@ bool awsListBox::DrawItemsRecursively (
   // Draw columns
   for (i = 0; i < ncolumns; ++i)
   {
-    int tw = 0, th = 0, tx = 0, ty = 0, mcc;  // text width, height, position, max len.
+    int tw = 0, th = 0, tx = 0, ty = 0, mcc; // text width, hght, pos, max len.
     int cw;                 // column width
     int iw = 0, ih = 0;     // stateful image width and height
     int iws = 0;            // stateful image spacer
@@ -1559,12 +1574,12 @@ awsListBoxFactory::awsListBoxFactory (iAws *wmgr) :
   RegisterConstant ("lbAlignRight", alignRight);
   RegisterConstant ("lbAlignCenter", alignCenter);
 
-  RegisterConstant (
-    "signalListBoxSelectionChanged",
-    awsListBox::signalSelected);
+  RegisterConstant ("signalListBoxSelectionChanged",
+		    awsListBox::signalSelected);
   RegisterConstant ("signalListBoxScrolled", awsListBox::signalScrolled);
   RegisterConstant ("signalListBoxFocused", awsListBox::signalFocused);
-  RegisterConstant ("signalListBoxStateChanged", awsListBox::signalStateChanged);
+  RegisterConstant ("signalListBoxStateChanged",
+		    awsListBox::signalStateChanged);
 }
 
 awsListBoxFactory::~awsListBoxFactory ()

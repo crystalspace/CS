@@ -19,17 +19,18 @@
 #ifndef __CS_AWS_PREFS_H__
 #define __CS_AWS_PREFS_H__
 
-#include "iaws/aws.h"
-#include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
+#include "csgeom/csrect.h"
 #include "csutil/parray.h"
-#include "csutil/scfstr.h"
 #include "csutil/refarr.h"
+#include "csutil/scfstr.h"
+#include "iaws/aws.h"
+#include "iutil/strset.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "awstex.h"
 
-/**
+/**\file
  * This is the pseudo-symbol table for the definitions keeper.  Windows and
  * their sub-keys can be looked up from here. There are a few different types
  * of values possible for keys:  Strings, Integers, and Rects.  They can be
@@ -72,25 +73,27 @@ enum {
 class awsKey : public iAwsKey
 {
 private:
+  /// Shared string table.
+  csRef<iStringSet> strset;
   /// The name of the key.
   unsigned long name;
-
-  void ComputeKeyID (const char* name, size_t len);
+protected:
+  unsigned long ComputeKeyID (const char* name) const;
 public:
   SCF_DECLARE_IBASE;
 
   /// Simple constructor creates new key with name "n" (iString version).
-  awsKey (iString *n)
+  awsKey (iAws* a, iString *n) : strset(a->GetStringTable())
   { 
     SCF_CONSTRUCT_IBASE (0);
-    ComputeKeyID (n->GetData (), n->Length ());
+    name = ComputeKeyID (n->GetData ());
   }
 
   /// Simple constructor creates new key with name "n" (const char* version).
-  awsKey (const char* n)
+  awsKey (iAws* a, const char* n) : strset(a->GetStringTable())
   {
     SCF_CONSTRUCT_IBASE (0);
-    ComputeKeyID (n, strlen (n));
+    name = ComputeKeyID (n);
   }
 
   /// Simple destructor does nothing.
@@ -100,10 +103,10 @@ public:
   };
 
   /// Pure virtual function Type returns the type of key.
-  virtual uint8 Type () = 0;
+  virtual uint8 Type () const = 0;
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return name; }
+  unsigned long Name () const { return name; }
 };
 
 class awsIntKey : public awsKey, public iAwsIntKey
@@ -115,22 +118,22 @@ public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs an integer key with the given name.
-  awsIntKey (iString *name, int v) : awsKey (name), val (v) { }
+  awsIntKey (iAws* a, iString *name, int v) : awsKey (a,name), val (v) { }
 
   /// Constructs an integer key with the given name.
-  awsIntKey (const char* name, int v) : awsKey (name), val (v) { }
+  awsIntKey (iAws* a, const char* name, int v) : awsKey (a,name), val (v) { }
 
   /// Destructor does nothing.
   virtual ~awsIntKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name(); }
+  unsigned long Name () const { return awsKey::Name(); }
 
   /// So that we know it's an int key.
-  virtual uint8 Type () { return KEY_INT; }
+  virtual uint8 Type () const { return KEY_INT; }
 
   /// Gets the value of this key as an integer.
-  int Value () { return val; }
+  int Value () const { return val; }
 };
 
 class awsFloatKey : public awsKey, public iAwsFloatKey
@@ -142,69 +145,62 @@ public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs a float key with the given name.
-  awsFloatKey (iString *name, float v) :  awsKey (name), val (v) { }
+  awsFloatKey (iAws* a, iString *name, float v) : awsKey(a,name), val(v) { }
 
   /// Constructs a float key with the given name.
-  awsFloatKey (const char* name, float v) : awsKey (name), val (v) { }
+  awsFloatKey (iAws* a, const char* name, float v) : awsKey(a,name), val(v) { }
 
   /// Destructor does nothing.
   virtual ~awsFloatKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name(); }
+  unsigned long Name () const { return awsKey::Name(); }
 
   /// So that we know it's a float key.
-  virtual uint8 Type () { return KEY_FLOAT; }
+  virtual uint8 Type () const { return KEY_FLOAT; }
 
   /// Gets the value of this key as a float.
-  float Value () { return val; }
+  float Value () const { return val; }
 };
 
 class awsStringKey : public awsKey, public iAwsStringKey
 {
 private:
   /// The key's value.
-  iString *val;
+  csRef<iString> val;
 public:
-  /**
-   * Constructs a string key with the given name (this function takes ref
-   * of the iString.
-   */
-#if 0
-  awsStringKey (iString *name, iString *v) : awsKey (name), val (v) { }
-#endif
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs a string key with the given name.
-  awsStringKey (const char* name, const char* v) : awsKey (name)
+  awsStringKey (iAws* a, iString *name, iString *v) : awsKey(a,name), val(v) {}
+
+  /// Constructs a string key with the given name.
+  awsStringKey (iAws* a, const char* name, const char* v) : awsKey (a,name)
   {
-    val = new scfString (v);
+    val.AttachNew(new scfString (v));
   }
 
-  awsStringKey (const char* name, iString* v) : awsKey (name), val (v)
+  /// Constructs a string key with the given name.
+  awsStringKey(iAws* a, const char* name, iString* v) : awsKey(a,name),val(v){}
+
+  /// Constructs a string key with the given name.
+  awsStringKey (iAws* a, const awsStringKey& key) :
+    awsKey (a,key.Value()), iAwsStringKey ()
   {
-    val->IncRef ();
+    val = key.val;
   }
 
-  awsStringKey (const awsStringKey& key) : awsKey (key), iAwsStringKey ()
-  {
-    val = key.val; val->IncRef ();
-  }
-
-  /// Destructor does nothing.
-  virtual ~awsStringKey ()
-  {
-    if (val) val->DecRef ();
-  }
+  /// Destructor.
+  virtual ~awsStringKey () {}
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
   /// So that we know it's a string key.
-  virtual uint8 Type () { return KEY_STR; }
+  virtual uint8 Type () const { return KEY_STR; }
 
   /// Gets the value of this key as an iString.
-  iString* Value () { return val; }
+  iString* Value () const { return val; }
 };
 
 class awsRectKey : public awsKey, public iAwsRectKey
@@ -216,22 +212,22 @@ public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs an integer key with the given name.
-  awsRectKey (iString *name, csRect v) : awsKey (name), val (v) { }
+  awsRectKey (iAws* a, iString *name, csRect v) : awsKey (a,name), val (v) { }
 
   /// Constructs an integer key with the given name.
-  awsRectKey (const char* name, csRect v) : awsKey (name), val (v) { }
+  awsRectKey (iAws* a, const char* name, csRect v) : awsKey(a,name), val(v) { }
 
   /// Destructor does nothing.
   virtual ~awsRectKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
   /// So that we know this is a rect key.
-  virtual uint8 Type () { return KEY_RECT; }
+  virtual uint8 Type () const { return KEY_RECT; }
 
   /// Gets the value of this key as a rectangle.
-  csRect Value () { return val; }
+  csRect Value () const { return val; }
 };
 
 class awsRGBKey : public awsKey, public iAwsRGBKey
@@ -244,11 +240,12 @@ public:
 
   /// Constructs an integer key with the given name.
   awsRGBKey (
+    iAws* aws,
     iString *name,
     unsigned char r,
     unsigned char g,
     unsigned char b)
-  : awsKey (name)
+  : awsKey (aws,name)
   {
     rgb.red = r;
     rgb.green = g;
@@ -257,11 +254,12 @@ public:
 
   /// Constructs an integer key with the given name.
   awsRGBKey (
+    iAws* aws,
     const char* name,
     unsigned char r,
     unsigned char g,
     unsigned char b)
-  : awsKey(name)
+  : awsKey(aws,name)
   {
     rgb.red = r;
     rgb.green = g;
@@ -272,13 +270,13 @@ public:
   virtual ~awsRGBKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
   /// So that we know this is a rect key.
-  virtual uint8 Type () { return KEY_RGB; }
+  virtual uint8 Type () const { return KEY_RGB; }
 
   /// Gets the value of this key as a rectangle.
-  iAwsRGBKey::RGB &Value () { return rgb; }
+  const iAwsRGBKey::RGB &Value () const { return rgb; }
 };
 
 class awsPointKey : public awsKey, public iAwsPointKey
@@ -290,22 +288,22 @@ public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
   /// Constructs an integer key with the given name.
-  awsPointKey (iString *name, csPoint v) : awsKey (name), val (v) { }
+  awsPointKey(iAws* a, iString *name, csPoint v) : awsKey(a,name), val(v) {}
 
   /// Constructs an integer key with the given name.
-  awsPointKey (const char* name, csPoint v) : awsKey (name), val (v) { }
+  awsPointKey(iAws* a, const char* name, csPoint v) : awsKey(a,name), val(v) {}
 
   /// Destructor does nothing.
   virtual ~awsPointKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name(); }
+  unsigned long Name () const { return awsKey::Name(); }
 
   /// So that we know this is a rect key.
-  virtual uint8 Type () { return KEY_POINT; }
+  virtual uint8 Type () const { return KEY_POINT; }
 
   /// Gets the value of this key as a rectangle.
-  csPoint Value () { return val; }
+  csPoint Value () const { return val; }
 };
 
 class awsConnectionKey : public awsKey, public iAwsConnectionKey
@@ -324,11 +322,12 @@ public:
 
   /// Constructs an integer key with the given name.
   awsConnectionKey (
+    iAws* a,
     iString *name,
     iAwsSink *s,
     unsigned long t,
     unsigned long sig)
-  : awsKey(name),
+  : awsKey(a,name),
     sink(s),
     trigger(t),
     signal(sig)
@@ -336,11 +335,12 @@ public:
 
   /// Constructs an integer key with the given name.
   awsConnectionKey (
+    iAws* a,
     const char* name,
     iAwsSink* s,
     unsigned long t,
     unsigned long sig)
-  : awsKey(name),
+  : awsKey(a,name),
     sink(s),
     trigger(t),
     signal(sig)
@@ -350,19 +350,19 @@ public:
   virtual ~awsConnectionKey () { }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
   /// So that we know this is a rect key.
-  virtual uint8 Type () { return KEY_CONNECTION; }
+  virtual uint8 Type () const { return KEY_CONNECTION; }
 
   /// Gets the sink for this key.
-  iAwsSink *Sink () { return sink; }
+  iAwsSink *Sink () const { return sink; }
 
   /// Gets the trigger for this key.
-  unsigned long Trigger () { return trigger; }
+  unsigned long Trigger () const { return trigger; }
 
   /// Gets the signal for this key.
-  unsigned long Signal () { return signal; }
+  unsigned long Signal () const { return signal; }
 };
 
 class awsKeyContainer : public awsKey, public iAwsKeyContainer
@@ -373,14 +373,14 @@ private:
 public:
   SCF_DECLARE_IBASE_EXT (awsKey);
 
-  /// Constructor that assigns a default name.
-  awsKeyContainer () : awsKey ("Default") { }
+  /// Constructor that assigns a default name ("Default").
+  awsKeyContainer (iAws* a) : awsKey (a,"Default") { }
 
   /// Constructor that assigns name n.
-  awsKeyContainer (iString* n) : awsKey (n) { }
+  awsKeyContainer (iAws* a, iString* n) : awsKey (a,n) { }
 
   /// Constructor that assigns name n.
-  awsKeyContainer (const char* n) : awsKey (n) { }
+  awsKeyContainer (iAws* a, const char* n) : awsKey (a,n) { }
 
   /// Destructor that does nothing.
   ~awsKeyContainer ()
@@ -391,24 +391,24 @@ public:
   }
 
   /// Looks up a key based on it's name.
-  iAwsKey* Find (iString* name);
+  iAwsKey* Find (iString* name) const;
 
   /// Looks up a key based on it's name.
-  iAwsKey* Find (const char* name);
+  iAwsKey* Find (const char* name) const;
 
   /// Looks up a key based on it's ID.
-  iAwsKey *Find (unsigned long id);
+  iAwsKey *Find (unsigned long id) const;
 
-  const csRefArray<iAwsKey> &Children () { return children; }
+  const csRefArray<iAwsKey> &Children () const { return children; }
 
   /// Adds an item to the container.
   void Add (iAwsKey *key) { children.Push (key); }
 
   /// Returns children number i.
-  iAwsKey* GetAt (int i) { return children[i]; }
+  iAwsKey* GetAt (int i) const { return children[i]; }
 
   /// Returns number of childrens.
-  int Length () { return children.Length (); }
+  int Length () const { return children.Length (); }
     
   /// Removes an item from the container.
   void Remove (iString *name);
@@ -429,22 +429,22 @@ public:
   void Consume (iAwsKeyContainer *c);
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
-  virtual uint8 Type () { return KEY_CONTAINER; }
+  virtual uint8 Type () const { return KEY_CONTAINER; }
 };
 
 class awsSkinNode : public awsKeyContainer
 {
 public:
-  awsSkinNode (iString *name) : awsKeyContainer (name) { }
+  awsSkinNode (iAws* a, iString *name) : awsKeyContainer (a,name) { }
   
-  awsSkinNode (const char* name) : awsKeyContainer (name) { }
+  awsSkinNode (iAws* a, const char* name) : awsKeyContainer (a,name) { }
   
   virtual ~awsSkinNode () { }
 
   /// So that we know this is a skin node.
-  virtual uint8 Type () { return KEY_SKIN; }
+  virtual uint8 Type () const { return KEY_SKIN; }
 };
 
 class awsComponentNode : public awsKeyContainer, public iAwsComponentNode
@@ -455,36 +455,37 @@ private:
 public:
   SCF_DECLARE_IBASE_EXT (awsKeyContainer);
 
-  awsComponentNode (iString *name, iString *component_type)
-    : awsKeyContainer (name), comp_type (component_type) { }
+  awsComponentNode (iAws* a, iString *name, iString *component_type)
+    : awsKeyContainer (a,name), comp_type (component_type) { }
       
-  awsComponentNode (const char* name, const char* component_type)
-    : awsKeyContainer (name) { comp_type = new scfString (component_type); }
+  awsComponentNode (iAws* a, const char* name, const char* component_type)
+    : awsKeyContainer (a,name) { comp_type = new scfString (component_type); }
     
   virtual ~awsComponentNode () { comp_type->DecRef (); }
 
   /// Looks up a key based on it's name.
-  iAwsKey* Find (iString* name) { return awsKeyContainer::Find (name); }
+  iAwsKey* Find (iString* name) const
+  { return awsKeyContainer::Find (name); }
 
   /// Looks up a key based on it's name.
-  iAwsKey* Find (const char* name) { return awsKeyContainer::Find (name); }
+  iAwsKey* Find (const char* name) const
+  { return awsKeyContainer::Find (name); }
 
   /// Looks up a key based on it's ID.
-  iAwsKey *Find (unsigned long id) { return awsKeyContainer::Find (id); }
+  iAwsKey *Find (unsigned long id) const
+  { return awsKeyContainer::Find (id); }
 
-  const csRefArray<iAwsKey> &Children ()
-  {
-    return awsKeyContainer::Children ();
-  }
+  const csRefArray<iAwsKey> &Children () const
+  { return awsKeyContainer::Children (); }
 
   /// Adds an item to the container.
   void Add (iAwsKey *key) { awsKeyContainer::Add (key); }
 
   /// returns children number i.
-  iAwsKey* GetAt (int i) { return awsKeyContainer::GetAt (i); }
+  iAwsKey* GetAt (int i) const { return awsKeyContainer::GetAt (i); }
 
   /// returns number of childrens.
-  int Length () { return awsKeyContainer::Length (); }
+  int Length () const { return awsKeyContainer::Length (); }
     
   /// Removes an item from the container.
   void Remove (iString *name) { awsKeyContainer::Remove (name); }
@@ -505,23 +506,23 @@ public:
   void Consume (iAwsKeyContainer *c) { awsKeyContainer::Consume (c); }
 
   /// Accessor function gets name of key.
-  unsigned long Name () { return awsKey::Name (); }
+  unsigned long Name () const { return awsKey::Name (); }
 
   /// So that we know this is a component node.
-  virtual uint8 Type () { return KEY_COMPONENT; }
+  virtual uint8 Type () const { return KEY_COMPONENT; }
 
   /// So that we can find out what sort of component type this should be.
-  iString *ComponentTypeName () { return comp_type; }
+  iString *ComponentTypeName () const { return comp_type; }
 };
 
 class awsConnectionNode : public awsKeyContainer
 {
 public:
-  awsConnectionNode ();
+  awsConnectionNode (iAws*);
   virtual ~awsConnectionNode ();
 
   /// So that we know this is a component node.
-  virtual uint8 Type () { return KEY_CONNECTIONMAP; }
+  virtual uint8 Type () const { return KEY_CONNECTIONMAP; }
 };
 
 enum AWS_COLORS

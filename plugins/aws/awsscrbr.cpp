@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2001 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "awsscrbr.h"
 #include "aws3dfrm.h"
@@ -143,14 +161,15 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 		  value_page_delta=(float)ival;
   }
 
+  iAws* const w = WindowManager();
 
   // Setup embedded buttons
   incVal = new awsSliderButton;
   decVal = new awsSliderButton;
   knob = new awsSliderButton;
-  timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
+  timer = new awsTimer (w->GetObjectRegistry (), this);
 
-  awsKeyFactory incinfo, decinfo, knobinfo;
+  awsKeyFactory incinfo(w), decinfo(w), knobinfo(w);
 
   decinfo.Initialize ("decVal", "Slider Button");
   incinfo.Initialize ("incVal", "Slider Button");
@@ -230,7 +249,7 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   decVal->SetProperty ("TicksPerSecond", (void *) &t);
   knob->SetProperty ("TicksPerSecond", (void *) &t);
 
-  awsSink* _sink = new awsSink ();
+  awsSink* _sink = new awsSink (w);
   _sink->SetParm (this);
   sink = _sink;
 
@@ -835,7 +854,7 @@ bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)
   if (!awsCmdButton::Setup (wmgr, settings)) return false;
 
   timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
-  awsSink* _sink = new awsSink ();
+  awsSink* _sink = new awsSink (WindowManager());
   _sink->SetParm (this);
   sink = _sink;
 
