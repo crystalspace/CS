@@ -46,6 +46,9 @@ chronological order.
 	- res changed some more occasions of csHash<>::Get() to Fetch().
 	- res fixes some signed vs unsigned warnings in the xmlshader, cg, arb
 	  and fixed shader plugins.
+	- Eric Sunshine added java, javac, ant (Java build tool), and Java SDK
+	  checks to configure.ac.  Also added new --with-java option which is
+	  enabled by default.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

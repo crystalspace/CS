@@ -206,7 +206,7 @@ CS_BUILD_PROPERTY([CMD.FLEX], [$FLEX])
 
 AC_CHECK_PROGS([BISON], [bison])
 AS_IF([test -n "$BISON"],
-    [CS_CHECK_PROG_VERSION([bison], [$BISON -V], [1.35], [9.9],
+    [CS_CHECK_PROG_VERSION([bison], [$BISON --version], [1.35], [9.9],
 	[CS_BUILD_PROPERTY([CMD.BISON], [$BISON])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
@@ -235,8 +235,6 @@ AS_IF([test -n "$SWIG"],
 AC_CHECK_PROGS([JAM], [jam])
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_PROG_MAKE_SET
-
-
 
 #------------------------------------------------------------------------------
 # The cslibs package is a convenience archive made available to Windows users
@@ -758,6 +756,51 @@ for p in sys.path: print p'])`
 	    [$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
 	    [$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
 	    [$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if Java2 SDK is installed and which compiler and linker flags are
+# needed.  Also check if Ant build tool, which is commonly used to build Java
+# projects, is available.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_JAVA_HEADER_PATH],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    cs_java_inc=''
+    AS_IF([test -n "$$1"],
+	[cs_java_dir=`AS_DIRNAME([$$1])`
+	cs_java_dir=`AS_DIRNAME([$cs_java_dir])`])
+    AS_IF([test -z "$cs_java_dir"], [cs_java_dir="$JAVA_HOME"])
+    AS_IF([test -n "$cs_java_dir"],
+	cs_java_inc="-I$cs_java_dir/include"
+	[case $host_os in
+	    mingw*|cygwin*) cs_java_platform=win32 ;;
+	    *) cs_java_platform=`echo $host_os|sed 's/^\([[^-]]*\).*$/\1/'` ;;
+	esac
+	AS_IF([test -n "$cs_java_platform"],
+	    [cs_java_inc="$cs_java_inc $cs_java_inc/$cs_java_platform"])])])
+
+AC_PATH_PROGS([JAVA], [java], [:], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+CS_BUILD_PROPERTY([JAVA], [$JAVA])
+
+AC_PATH_PROGS([JAVAC], [javac], [:], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+CS_BUILD_PROPERTY([JAVAC], [$JAVAC])
+
+AC_PATH_PROGS([ANT], [ant], [:], [$PATH:$ANT_HOME/bin])
+CS_BUILD_PROPERTY([ANT], [$ANT])
+
+AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
+    [use Java scripting interface (default YES)])])
+AS_IF([test -z "$with_java"], [with_java=yes])
+
+AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$ANT"],
+    [CS_JAVA_HEADER_PATH([JAVAC])
+    CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
+	[AC_LANG_PROGRAM(
+	    [[#include <jni.h>
+	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
+	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([$cs_java_inc])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
 
 
 
