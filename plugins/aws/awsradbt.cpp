@@ -179,8 +179,8 @@ void awsRadButton::OnDraw (csRect /*clip*/)
   int txw = 0, txh = 0;
   int txy = 0, txx = 0;
 
-  int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
-  int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
+  // int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
+  // int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
 
   /// Get the size of our textures
   if (tex[0]) tex[0]->GetOriginalDimensions (txw, txh);

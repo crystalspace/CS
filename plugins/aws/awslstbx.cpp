@@ -1406,7 +1406,7 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
 					 /// Change scroll bar position if selected component 
 					 /// is in the bottom of our list box
 
-					 awsListRow *row;
+					 awsListRow *row = 0;
 					 UpdateMap ();
 					 if (map)
 						 row = map[drawable_count + scroll_start];
@@ -1442,7 +1442,7 @@ bool awsListBox::OnKeypress (int key, int cha, int modifiers)
 					 /// Change scroll bar position if selected component 
 					 /// is in the top of our list box
 
-					 awsListRow *row;
+					 awsListRow *row = 0;
 					 UpdateMap ();
 					 if (map)
 						 row = map[scroll_start -1];
