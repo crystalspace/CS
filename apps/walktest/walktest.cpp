@@ -659,8 +659,8 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 	i--;
       }
   }
-  // Apply lighting to all meshes
-  light_statics ();
+  // Move ghosts.
+  MoveGhosts ();
 
   //------------
   // Here comes the main call to the engine. view->Draw() actually

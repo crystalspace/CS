@@ -11,6 +11,15 @@ chronological order.
 	  use the correct texture target on a 'tex' instruction.
 	- Jorrit reverted a change res made to the sprite3d normal calculation
 	  on 7 August 2002. This change caused access to uninitialized memory.
+	- Jorrit fixed the 'addghost' command in walktest so that it no longer
+	  uses the deprecated SCF_QUERY_INTERFACE to get the polygon mesh
+	  for collision detection.
+	- Jorrit fixed a problem with the 'addghost' command. It caused an
+	  overflow in the collision detection routine because that routine
+	  was hardcoded to max 1000 triangles. The ghost was colliding with
+	  the camera because it ended up at the same spot and also made sure
+	  the table cannot overflow and cause memory corruption).
+	- Jorrit fixed movement of ghosts in walktest.
 	- res fixed a crash in CSWS caused by csApp::GetFont() having a wrong
 	  prototype.
 	- res changed glrender3d to not call G2D->FinishDraw() when finishing

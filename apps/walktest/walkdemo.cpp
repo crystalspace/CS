@@ -38,6 +38,7 @@
 #include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "qint.h"
@@ -824,7 +825,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
   iMeshObject* obj = spr->GetMeshObject ();
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (obj, iSprite3DState));
   state->SetMixMode (CS_FX_SETALPHA (0.75));
-  csRef<iPolygonMesh> mesh (SCF_QUERY_INTERFACE (obj, iPolygonMesh));
+  iPolygonMesh* mesh = obj->GetObjectModel ()->GetPolygonMeshColldet ();
   csRef<iObject> sprobj (SCF_QUERY_INTERFACE (spr, iObject));
   (new csColliderWrapper (sprobj, Sys->collide_system, mesh))->DecRef ();
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
@@ -834,6 +835,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
   AnimSkelGhost* cb = new AnimSkelGhost ();
   spr->SetDrawCallback (cb);
   cb->DecRef ();
+  Sys->ghosts.Push (spr);
 }
 
 #define MAXSECTORSOCCUPIED  20
@@ -1235,27 +1237,14 @@ void AttachRandomLight (iLight* light)
 // Light all meshes and animate the skeletal trees.
 // This function does no effort at all to optimize stuff. It does
 // not test if the mesh is visible or not.
-void light_statics ()
+void WalkTest::MoveGhosts ()
 {
-#if 0
-  iEngine* e = Sys->view->GetEngine ();
-  iMeshList* meshes = e->GetMeshes ();
   int i;
-  for (i = 0 ; i < meshes->GetCount () ; i++)
+  for (i = 0 ; i < ghosts.Length () ; i++)
   {
-    iMeshWrapper* sp = meshes->Get (i);
-    csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (sp->GetMeshObject (),
-    	iSprite3DState));
-    if (state != 0)
-    {
-      if (state->GetSkeletonState ())
-      {
-        const char* name = sp->QueryObject ()->GetName ();
-        if (!strcmp (name, "__skelghost__")) move_ghost (sp);
-      }
-    }
+    iMeshWrapper* sp = ghosts[i];
+    move_ghost (sp);
   }
-#endif
 }
 
 //===========================================================================

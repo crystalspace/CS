@@ -2176,8 +2176,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (width < 1) width = 3;
     extern void add_skeleton_tree (iSector* where, csVector3 const& pos,
     	int depth, int width);
+    csOrthoTransform& t = Sys->view->GetCamera ()->GetTransform ();
     add_skeleton_tree (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
+    	t.GetOrigin ()+t.Other2This (csVector3 (0, 0, 1)), depth, width);
   }
   else if (!strcasecmp (cmd, "addghost"))
   {
@@ -2187,8 +2188,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     else { depth = 5; width = 8; }
     extern void add_skeleton_ghost (iSector* where, csVector3 const& pos,
     	int maxdepth, int width);
+    csOrthoTransform& t = Sys->view->GetCamera ()->GetTransform ();
     add_skeleton_ghost (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), depth, width);
+    	t.GetOrigin ()+t.Other2This (csVector3 (0, 0, 1)), depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
   {

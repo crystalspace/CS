@@ -359,6 +359,8 @@ public:
   /// is actually anything visible on the canvas?
   bool canvas_exposed;
 
+  csArray<iMeshWrapper*> ghosts;
+
 public:
   ///
   WalkTest ();
@@ -408,6 +410,9 @@ public:
 
   /// Move bots, particle systems, players, etc. for each frame.
   virtual void MoveSystems (csTicks elapsed_time, csTicks current_time);
+
+  /// Move all ghosts.
+  void MoveGhosts ();
 
   /**
    * Draw all things related to debugging (mostly edge drawing).
@@ -525,9 +530,6 @@ extern void free_keymap ();
 
 extern void SaveCamera (iVFS*, const char *fName);
 extern bool LoadCamera (iVFS*, const char *fName);
-
-/// Apply lights to all static objects (currently only meshes)
-void light_statics ();
 
 // Use a view's clipping rect to calculate a bounding box
 void BoundingBoxForView(iView *view, csBox2 *box);

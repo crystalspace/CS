@@ -104,7 +104,8 @@ void WalkTest::CreateColliders ()
 #define MAXSECTORSOCCUPIED  20
 
 // No more than 1000 collisions ;)
-csCollisionPair our_cd_contact[1000];
+#define MAX_CONTACT 1000
+csCollisionPair our_cd_contact[MAX_CONTACT];
 int num_our_cd;
 
 int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
@@ -144,7 +145,11 @@ int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
     for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
+    {
+      if (num_our_cd >= MAX_CONTACT)
+	break;
       our_cd_contact[num_our_cd++] = CD_contact[j];
+    }
 
     if (Sys->collide_system->GetOneHitOnly () && hit)
       return 1;
@@ -285,7 +290,7 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 	new_pos-=vel;
 	break;
       }
-    
+
     test = csOrthoTransform (csMatrix3(), new_pos);
 
     num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius,
