@@ -77,12 +77,12 @@ rule Wildcard
 ##    Recursively scan current directory, $(SUBDIR), for files matching 'types'
 ##    and invoke 'rule' for each file which matches one of the 'types'.
 ##    'types' is a list of file extensions (with the leading dot).  'rule' will
-##    be invoked with two arguments: (1) the basename of the file, (2) a list
-##    of the path components from the current directory to the file's
-##    directory.  When 'rule' is invoked, it will see a $(SUBDIR) value of the
-##    directory containing the file (as if the rule had been invoked from
-##    within the file's directory).  'prefix' is an optional list of path
-##    components which will be prefixed to rule's second argument.
+##    be invoked with two arguments: (1) the basename of the file including the
+##    extension, (2) a list of the path components from the current directory
+##    to the file's directory.  When 'rule' is invoked, it will see a $(SUBDIR)
+##    value of the directory containing the file (as if the rule had been
+##    invoked from within the file's directory).  'prefix' is an optional list
+##    of path components which will be prepended to rule's second argument.
 rule Recurse
 {
   local rule = $(1) ;
