@@ -46,6 +46,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine applied a couple corrections to aws/quick.txi reported
 	  by <shri@vitalstate.co.uk>.
 	- Oktal implemented csTinyXmlDocument::Parse(iFile*).
+	- Marten Svanfeldt fixed an error the CData support in TinyXML.
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This

@@ -716,7 +716,7 @@ public:
 
 protected :
 	virtual const char* Parse( TiDocument* document,  const char* p );
-	TIXML_STRING	value;
+	//TIXML_STRING	value;
 };
 
 /** In correct XML the declaration is the first entry in the file.
