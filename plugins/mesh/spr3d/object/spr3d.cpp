@@ -1598,10 +1598,14 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
     {
       last_time = current_time;
       cur_frame++;
-      if (cur_frame >= cur_action->GetFrameCount ())
+      if (stoptoend && cur_frame + 1 >= cur_action->GetFrameCount ())
       {
-        if (stoptoend) cur_frame --;
-        else cur_frame = 0;
+        ret = true;
+        fullstop = true;
+      }
+      else if(cur_frame >= cur_action->GetFrameCount ())
+      {
+        cur_frame = 0;
         ret = true;
         fullstop = true;
       }
@@ -1618,12 +1622,6 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
         cur_frame++;
         if (cur_frame >= cur_action->GetFrameCount ())
         {
-          if (stoptoend)
-          {
-            cur_frame--;
-            ret = true;
-            break;
-          }
           cur_frame = 0;
           ret = true;
         }

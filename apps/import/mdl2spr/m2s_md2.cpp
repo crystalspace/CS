@@ -380,7 +380,14 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         for (j = strlen(frames[i].name)-1; j > 1; j--)
           if (!isdigit(frames[i].name[j]))
             break;
-        base_action=j + 1;
+        if(strlen(frames[i].name) > j + 3)
+        {
+            base_action=j + 2;
+        }
+        else
+        {
+            base_action=j + 1;
+        }
         strncpy(name_action, frames[i].name, base_action);
 
         fprintf(f, "\t\tACTION '%s' (", name_action);

@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+31-Aug-2002
+	- Received two small fixes from Jochen Moench
+	  <jochen.moench@de.thalesgroup.com>:
+	    - Fixed some flickering when playing a sprite animation once.
+	    - Converting from md2 files to spr concatenated all death
+	      sequences (Fixed in m2s_md2.cpp).
 30-Aug-2002
 	- Fixed several memory leaks in the odedynamics plugin. It had the
 	  following problems:
