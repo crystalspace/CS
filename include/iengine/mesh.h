@@ -26,7 +26,7 @@
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
-struct csMeshFactoryWrapper;
+class csMeshFactoryWrapper;
 struct iMeshFactoryWrapper;
 struct iRenderView;
 struct iMovable;
