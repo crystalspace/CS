@@ -226,7 +226,7 @@ void csMeshWrapper::Draw (iRenderView *rview)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-void csMeshWrapper::DrawZ (iRenderView* rview)
+csRenderMesh *csMeshWrapper::GetRenderMesh (iRenderView* rview)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
@@ -237,7 +237,7 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
   while (i >= 0)
   {
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (meshwrap, rview)) return ;
+    if (!cb->BeforeDrawing (meshwrap, rview)) return NULL;
     i--;
   }
 
@@ -255,26 +255,33 @@ void csMeshWrapper::DrawZ (iRenderView* rview)
     }
 
     UpdateDeferedLighting (movable.GetFullPosition ());
-    meshobj->DrawZ (rview, &movable.scfiMovable, zbufMode);
+    return meshobj->GetRenderMesh (rview, &movable.scfiMovable, zbufMode);
   }
+  return NULL;
 
+  /*
   for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->DrawZ (rview);
   }
+  */
 }
 
 void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
 {
+  /*
   if (cast_hardware_shadow)
     meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode, light);
+  */
 }
 
 void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
 {
+  /*
   if (draw_test) 
     meshobj->DrawLight (rview, &movable.scfiMovable, zbufMode, light);
+  */
 }
 
 void csMeshWrapper::CastHardwareShadow (bool castShadow)

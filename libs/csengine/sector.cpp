@@ -33,12 +33,15 @@
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
+#include "csengine/material.h"
 #include "iengine/rview.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "csengine/material.h"
+
+#include "ivaria/bugplug.h"
 
 // Option variable: render portals?
 bool csSector:: do_portals = true;
@@ -68,7 +71,11 @@ void csSectorLightList::PrepareItem (iLight* item)
   item->SetSector (&(sector->scfiSector));
 
   const csVector3& center = item->GetCenter ();
+#ifndef CS_USE_NEW_RENDERER
   float radius = item->GetRadius ();
+#else
+  float radius = item->GetInfluenceRadius ();
+#endif
   csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
   csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
   item->GetPrivateObject ()->SetChildNode (childnode);
@@ -134,6 +141,7 @@ csSector::csSector (csEngine *engine) :
 
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (csEngine::object_reg, iRender3D);
+  shmgr = CS_QUERY_REGISTRY (csEngine::object_reg, iShaderManager);
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -792,13 +800,13 @@ void csSector::Draw (iRenderView *rview)
       for (j = seclights->GetCount() - 1; j >= 0; j --)
       {
         // Sphere check against rview before adding it.
-	iLight* light = seclights->Get (j);
+	    iLight* light = seclights->Get (j);
         csSphere s = csSphere (light->GetCenter (), 
-          light->GetInfluenceRadius ());
+                               light->GetInfluenceRadius ());
         if (rview->TestBSphere (camTransO, s))
-	{
-	  alllights.Add (light);
-	}
+	    {
+	      alllights.Add (light);
+	    }
       }
     }
 
@@ -827,19 +835,25 @@ void csSector::Draw (iRenderView *rview)
       r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
   	    light->GetAttenuationVector());
 
+	  /*
       r3d->SetWriteMask (false, false, false, false);
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, light);
       r3d->SetWriteMask (true, true, true, true);
       r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
+	  */
+
       DrawLight (rview, light);
-      r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
+
+      // r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
 
+	/*
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
       DrawLight (rview, alllights.Get(i), true);
     }
+	*/
 
     
     delete[] objects;
@@ -892,6 +906,14 @@ void csSector::Draw (iRenderView *rview)
 }
 
 #ifdef CS_USE_NEW_RENDERER
+int qsort_meshobjs_callback (const void *b1, const void *b2)
+{
+  const csRenderMesh *r1 = (const csRenderMesh *)b1;
+  const csRenderMesh *r2 = (const csRenderMesh *)b2;
+  if (r1->mathandle == r2->mathandle || r1->streamsource == r2->streamsource)
+    return 0;
+  return r2 - r1;
+}
 void csSector::DrawZ (iRenderView* rview)
 {
   int i;
@@ -909,6 +931,7 @@ void csSector::DrawZ (iRenderView* rview)
         st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
   }
 
+  draw_objects.SetLength(0);
   for (i = 0; i < num_objects; i ++)
   {
     iMeshWrapper *sp = objects[i];
@@ -919,17 +942,31 @@ void csSector::DrawZ (iRenderView* rview)
     {
       // Mesh is not in the previous sector or there is no previous
       // sector.
-      sp->DrawZ (rview);
+      csRenderMesh *r = sp->GetRenderMesh (rview);
+	  if (r) { draw_objects.Push (r); }
     }
-    else
-    {
-      objects[i] = NULL;
-    }
+  }
+  qsort (draw_objects.GetArray(), draw_objects.Length(), sizeof (csRenderMesh*),
+    qsort_meshobjs_callback);
+
+  // TODO: Sort draw_objects here based on Shader
+
+  for (i = 0; i < draw_objects.Length(); i ++) 
+  {
+	iMaterialHandle *matsave;
+    matsave = draw_objects[i]->mathandle;
+    draw_objects[i]->mathandle = NULL;
+    uint mixsave = draw_objects[i]->mixmode;
+	draw_objects[i]->mixmode = CS_FX_COPY;
+    r3d->DrawMesh (draw_objects[i]);
+    draw_objects[i]->mathandle = matsave;
+	draw_objects[i]->mixmode = mixsave;
   }
 }
 
 void csSector::DrawShadow (iRenderView* rview, iLight* light)
 {
+#if 0
   int number = 0;
   //test if light is in front of or behind camera
   bool lightBehindCamera = false;
@@ -1036,11 +1073,13 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
     objInShadow->Next();
   }  
   //printf ("%x - %d\n",(int)light, number);
+#endif
 }
 
 void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
 {
   int i;
+  /*
   for (i = 0; i < num_objects; i ++) {
     iMeshWrapper *sp = objects[i];
     if (sp)
@@ -1049,6 +1088,62 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
         sp->DrawLight (rview, light);
     }
   }
+  */
+
+  csHashMap shader_sort;
+  for (i = 0; i < draw_objects.Length(); i ++) {
+    shader_sort.Put ((csHashKey)draw_objects[i]->mathandle->GetShader(), (csHashObject)draw_objects[i]);
+  }
+
+  csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (csEngine::object_reg, iBugPlug);
+
+  if (bugplug)
+    bugplug->ResetCounter ("Activates");
+  const csBasicVector &shader_list = shmgr->GetShaders ();
+  for (i = 0; i < shader_list.Length(); i ++) {
+	if (shader_sort.Get ((csHashKey)shader_list[i]) == NULL) { continue; }
+    iShaderTechnique *tech = ((iShader *)shader_list[i])->GetBestTechnique ();
+
+    for (int p=0; p<tech->GetPassCount (); p++)
+    {
+      iShaderPass *pass = tech->GetPass (p);
+      pass->Activate (NULL);
+      csHashIterator iter (&shader_sort, (csHashKey)shader_list[i]);
+      while (iter.HasNext ()) {
+        csRenderMesh *mesh = (csRenderMesh *)iter.Next();
+        // if (mesh->mathandle->GetShader() != shader_list[i]) { continue; }
+        pass->SetupState (mesh);
+        if (bugplug)
+          bugplug->AddCounter ("Activates", 1);
+
+        float diffuse, specular, ambient;
+        csRGBpixel matcolor;
+        csVector3 color (light->GetColor().red, light->GetColor().blue, light->GetColor().green);
+        mesh->mathandle->GetReflection (diffuse, specular, ambient);
+        mesh->mathandle->GetFlatColor (matcolor);
+        // color.x *= matcolor.red/255.0;
+        // color.y *= matcolor.blue/255.0;
+        // color.z *= matcolor.green/255.0;
+        r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, color * diffuse);
+        r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, color * specular);
+        csZBufMode zsave = mesh->z_buf_mode;
+        uint mixsave = mesh->mixmode;
+        
+        uint mixmode = pass->GetMixmodeOverride ();
+        if (mixmode != 0)
+          mesh->mixmode = mixmode;
+        
+        mesh->z_buf_mode = CS_ZBUF_TEST;
+        r3d->DrawMesh (mesh);
+        mesh->z_buf_mode = zsave;
+        mesh->mixmode = mixsave;
+
+        pass->ResetState ();
+      }
+      pass->Deactivate ();
+    }
+  }
+// printf ("Good DrawMesh %.9lf\n", end-start);
   //delete [] objects;
    
   // queue all halos in this sector to be drawn.
