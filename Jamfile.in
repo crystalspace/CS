@@ -52,9 +52,10 @@ Description openglcanvas : "canvases for the OpenGL renderer" ;
 Description softcanvas   : "canvases for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
 Description renderall    : "all renderer-related modules" ;
+Description shaders      : "shaders and related modules" ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders fontservers
 		      canvases renderers meshes walkall openglcanvas 
-		      softcanvas proctexes renderall ;
+		      softcanvas proctexes renderall shaders ;
 
 # Historic group aliases.
 NotFile drivers2d ;
