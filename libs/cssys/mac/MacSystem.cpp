@@ -266,18 +266,15 @@ void SysSystemDriver::Loop(void)
     long current_time;
 	EventRecord anEvent;
 	IMacGraphicsInfo* piG2D = NULL;
-	Boolean outEventWasProcessed;
+	bool outEventWasProcessed;
 	HRESULT	hRes;
-	bool	usingDrawSprockets = false;
+	bool	driverNeedsEvent = false;
 
 	hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
 
 	if (SUCCEEDED(hRes)) {
-		piG2D->IsDrawSprocketsEnabled( &usingDrawSprockets );
+		piG2D->DoesDriverNeedEvent( &driverNeedsEvent );
       	piG2D->SetColorPalette();
-
-		piG2D->Release();
-		piG2D = NULL;
 	}
 
     prev_time = current_time = Time();
@@ -292,37 +289,36 @@ void SysSystemDriver::Loop(void)
 #endif
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
-			if ( ! SIOUXHandleOneEvent( &anEvent )) {
+//			if ( ! SIOUXHandleOneEvent( &anEvent )) {
 				outEventWasProcessed = false;
-				if ( usingDrawSprockets )
-					DSpProcessEvent( &anEvent, &outEventWasProcessed);
+				if (( driverNeedsEvent ) && ( piG2D ))
+					piG2D->HandleEvent( &anEvent, &outEventWasProcessed);
 				if ( ! outEventWasProcessed )
-					DispatchEvent( current_time, &anEvent );
-			}
+					DispatchEvent( current_time, &anEvent, piG2D );
+//			}
 		} else {
 			Point	theMouse;
 			bool	isIn = false;
 
 			theMouse = anEvent.where;
-
-			hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
-
-			if (SUCCEEDED(hRes)) {
+			if ( piG2D ) {
 				piG2D->PointInWindow( &theMouse, &isIn );
 
-				piG2D->Release();
-				piG2D = NULL;
+				if ( isIn )
+					Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 			}
-
-			if ( isIn )
-				Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 		}
 		current_time = Time();
+	}
+
+	if ( piG2D ) {
+		piG2D->Release();
+		piG2D = NULL;
 	}
 }
 
 
-void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent )
+void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
 {
 	// dispatch the event according to its type and location
 	
@@ -330,22 +326,13 @@ void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent )
 	{
 		case mouseDown:
 		case mouseUp:
-			HandleMouseEvent( current_time, theEvent );
+			HandleMouseEvent( current_time, theEvent, piG2D );
 			break;
 
 		case activateEvt:
 			{
-				HRESULT	hRes;
-				IMacGraphicsInfo* piG2D = NULL;
-
-				hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
-
-				if (SUCCEEDED(hRes)) {
+				if ( piG2D )
 					piG2D->ActivateWindow( (WindowPtr) theEvent->message, theEvent->modifiers & activeFlag );
-
-					piG2D->Release();
-					piG2D = NULL;
-				}
 			}
 			break;
 
@@ -368,18 +355,9 @@ void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent )
 
 		case updateEvt:
 			{
-				HRESULT	hRes;
 				bool	updateDone = false;
-				IMacGraphicsInfo* piG2D = NULL;
-
-				hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
-
-				if (SUCCEEDED(hRes)) {
+				if ( piG2D )
 					piG2D->UpdateWindow( (WindowPtr) theEvent->message, &updateDone );
-
-					piG2D->Release();
-					piG2D = NULL;
-				}
 			}
 			break;
 
@@ -394,7 +372,7 @@ void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent )
 			break;
 
 		case osEvt:
-			HandleOSEvent( current_time, theEvent );
+			HandleOSEvent( current_time, theEvent, piG2D );
 			break;
 
 		default:
@@ -403,7 +381,7 @@ void SysSystemDriver::DispatchEvent( long current_time, EventRecord *theEvent )
 }
 
 
-void SysSystemDriver::HandleMouseEvent( long current_time, EventRecord *theEvent )
+void SysSystemDriver::HandleMouseEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
 {
 	WindowPtr	targetWindow;
 	short		partCode;
@@ -471,17 +449,7 @@ void SysSystemDriver::HandleMouseEvent( long current_time, EventRecord *theEvent
 			DragWindow( targetWindow, theEvent->where, &r );
 			{
 				if ( piG2D ) {
-					/*
-					 *	If the window is not double buffered,
-					 *	force a recalculation of the line
-					 *	address array.
-					 */
-
-					piG2D->GetDoubleBufferState( dblBfrState );
-					if ( ! dblBfrState ) {
-						piG2D->DoubleBuffer( true );
-						piG2D->DoubleBuffer( false );
-					}
+					piG2D->WindowChanged();
 				}
 			}
 			break;
@@ -942,7 +910,7 @@ void SysSystemDriver::HandleKey( long current_time, const char key, const char /
 }
 
 
-void SysSystemDriver::HandleOSEvent( long current_time, EventRecord *theEvent )
+void SysSystemDriver::HandleOSEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D )
 {
 	unsigned char	osEvtFlag;
 
@@ -950,21 +918,13 @@ void SysSystemDriver::HandleOSEvent( long current_time, EventRecord *theEvent )
 	if (osEvtFlag == mouseMovedMessage) {
 		Point	theMouse;
 		bool	isIn = false;
-		HRESULT	hRes;
-		IMacGraphicsInfo* piG2D = NULL;
 
 		theMouse = theEvent->where;
-
-		hRes = piGI->QueryInterface( IID_IMacGraphicsInfo, (void**)&piG2D );
-
-		if (SUCCEEDED(hRes)) {
+		if ( piG2D ) {
 			piG2D->PointInWindow( &theMouse, &isIn );
-
-			piG2D->Release();
-			piG2D = NULL;
+			if ( isIn )
+				Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 		}
-		if ( isIn )
-			Mouse->do_mousemotion( current_time, theMouse.h, theMouse.v );
 	} else if (osEvtFlag == suspendResumeMessage) {
 		if (theEvent->message & resumeFlag) {
 		} else {
@@ -1027,7 +987,7 @@ static OSErr GetPath( FSSpec theFSSpec, char *theString )
 
 
 /************************************************************************************************
- *	DoAppleEvent
+ *	HandleAppleEvent
  *
  */
 OSErr SysSystemDriver::HandleAppleEvent( AppleEvent *theEvent )

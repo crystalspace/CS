@@ -69,8 +69,10 @@ public:
 	void		 		ActivateWindow( WindowPtr theWindow, bool active );
 	void		 		UpdateWindow( WindowPtr theWindow, bool *updated );
 	void				PointInWindow( Point *thePoint, bool *inWindow );
- 	void				IsDrawSprocketsEnabled( bool *isEnabled );
+ 	void				DoesDriverNeedEvent( bool *isEnabled );
  	void				SetColorPalette( void );
+ 	void				WindowChanged( void );
+	void				HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed );
 
 protected:
 	CWindowPtr			mMainWindow;
@@ -88,6 +90,7 @@ protected:
 	DSpContextReference		mDisplayContext;
 	DSpContextAttributes	mDisplayAttributes;
 	bool					mGetBufferAddress;
+	short				mActivePage;
 
 	void				DisplayErrorDialog( short errorIndex );
 

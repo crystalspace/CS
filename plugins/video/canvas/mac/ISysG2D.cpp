@@ -65,18 +65,34 @@ STDMETHODIMP IXMacGraphicsInfo::PointInWindow( Point *thePoint, bool *inWindow )
     return S_OK;
 }
 
-STDMETHODIMP IXMacGraphicsInfo::IsDrawSprocketsEnabled( bool *isEnabled )
-{
-    METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
-    
-    pThis->IsDrawSprocketsEnabled( isEnabled );
-    return S_OK;
-}
-
 STDMETHODIMP IXMacGraphicsInfo::SetColorPalette( void )
 {
     METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
     
     pThis->SetColorPalette();
+    return S_OK;
+}
+
+STDMETHODIMP IXMacGraphicsInfo::DoesDriverNeedEvent( bool *isEnabled )
+{
+    METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
+    
+    pThis->DoesDriverNeedEvent( isEnabled );
+    return S_OK;
+}
+
+STDMETHODIMP IXMacGraphicsInfo::WindowChanged( void )
+{
+    METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
+    
+    pThis->WindowChanged();
+    return S_OK;
+}
+
+STDMETHODIMP IXMacGraphicsInfo::HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed )
+{
+    METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
+    
+    pThis->HandleEvent( inEvent, outEventWasProcessed );
     return S_OK;
 }

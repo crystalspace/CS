@@ -30,6 +30,8 @@
 
 #define	MAX_ARGS	25
 
+class IMacGraphicsInfo;
+
 class SysSystemDriver : public csSystemDriver
 {
 public:
@@ -50,13 +52,13 @@ public:
 	OSErr		HandleAppleEvent( AppleEvent *theEvent );
 
 private:
-	void		DispatchEvent( long current_time, EventRecord *theEvent );
-	void		HandleMouseEvent( long current_time, EventRecord *theEvent );
+	void		DispatchEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
+	void		HandleMouseEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
 	void		HandleMenuUpdate( void );
 	void		HandleMenuSelection( const short menuNum, const short itemNum );
 	void		HandleKey( long current_time, const char key, const char keycode, const short modifiers, bool down );
 	void		HandleHLEvent( long current_time, EventRecord *theEvent );
-	void		HandleOSEvent( long current_time, EventRecord *theEvent );
+	void		HandleOSEvent( long current_time, EventRecord *theEvent, IMacGraphicsInfo* piG2D );
 	void		ScanKeyboard( long current_time );
 	int			GetCommandLine( char ***arg );
 	int			ParseCommandLine( char *s );

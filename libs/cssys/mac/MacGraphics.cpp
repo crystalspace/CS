@@ -25,6 +25,7 @@
 	2/1999		-	Added support for 32 bit pixels.
 	
 ----------------------------------------------------------------*/
+#define SYSDEF_2DDRIVER_DEFS
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cssys/common/system.h"
@@ -65,17 +66,6 @@ END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN(csGraphics2DMac)
 
-#define kArrowCursor	128
-
-#define kGeneralErrorDialog			1026
-#define kAskForDepthChangeDialog	1027
-
-#define kErrorStrings				1025
-#define kBadDepthString				1
-#define kNoDSContext				2
-#define kUnableToOpenDSContext		3
-#define kUnableToReserveDSContext	4
-
 
 /*----------------------------------------------------------------
 	Construct a graphics object.  This object provides a place on
@@ -95,6 +85,7 @@ csGraphics2DMac::csGraphics2DMac(ISystem* piSystem)
 	mSavedPort = NULL;
 	mSavedGDHandle = NULL;
 	mDrawSprocketsEnabled = false;
+	mActivePage = 0;
 }
 
 
@@ -200,10 +191,6 @@ void csGraphics2DMac::Initialize()
 		mDrawSprocketsEnabled = true;
 	} else {
 		mDrawSprocketsEnabled = false;
-
-		mOffscreen = NULL;
-		mMainWindow = NULL;
-		mOldDepth = 0;
 
 		/*
 		 *	Get the depth of the main gdevice.
@@ -470,6 +457,8 @@ void csGraphics2DMac::Close(void)
 
 		::RestoreDeviceClut( NULL );
 	}
+
+	csGraphics2D::Close();
 }
 
 
@@ -546,6 +535,11 @@ bool csGraphics2DMac::BeginDraw()
 void csGraphics2DMac::FinishDraw()
 {
 	::SetGWorld( (GWorldPtr)mSavedPort, mSavedGDHandle );
+
+	if ( mActivePage == 0 )
+		mActivePage = 1;
+	else
+		mActivePage = 0;
 }
 
 
@@ -662,7 +656,7 @@ bool csGraphics2DMac::DoubleBuffer(bool Enable)
 ----------------------------------------------------------------*/
 int csGraphics2DMac::GetPage()
 {
-	return 0;
+	return mActivePage;
 }
 
 
@@ -787,9 +781,56 @@ void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
 }
 
 
-void csGraphics2DMac::IsDrawSprocketsEnabled( bool *isEnabled )
+void csGraphics2DMac::DoesDriverNeedEvent( bool *isEnabled )
 {
 	*isEnabled = mDrawSprocketsEnabled;
+
+	return;
+}
+
+
+void csGraphics2DMac::WindowChanged()
+{
+	int				i;
+	int				theOffset;
+	unsigned int	theRowBytes;
+
+	/*
+	 *	If DrawSprockets is not enabled and we are not double buffered,
+	 *	we need to recalc the scanline address array as the window may
+	 *	have been moved.
+	 */
+
+	if (( ! mDrawSprocketsEnabled ) && ( ! mDoubleBuffering )) {
+		mPixMap = mMainWindow->portPixMap;
+		Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
+		theRowBytes = (**mPixMap).rowBytes & 0x7fff;
+		Memory += ( theRowBytes * ( - (**mPixMap).bounds.top )) +
+							( ((**mPixMap).pixelSize / 8 ) * ( - (**mPixMap).bounds.left ));
+
+		/*
+		 *	Setup the scanline address array (offsets).
+		 */
+		for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
+			LineAddress[i] = theOffset;
+	}
+
+	return;
+}
+
+
+void csGraphics2DMac::HandleEvent( EventRecord *inEvent, bool *outEventWasProcessed )
+{
+	Boolean	processed = FALSE;
+
+	if ( mDrawSprocketsEnabled ) {
+		DSpProcessEvent( inEvent, &processed );
+	}
+
+	if ( processed )
+		*outEventWasProcessed = true;
+	else
+		*outEventWasProcessed = false;
 
 	return;
 }

@@ -1,5 +1,6 @@
 
 #include <QDOffscreen.h>
+#include <Events.h>
 #include "cscom/com.h"
 
 #ifndef __ISYSG2D_H__
@@ -21,9 +22,13 @@ interface IMacGraphicsInfo : public IUnknown
     ///
     STDMETHOD(PointInWindow)( Point *thePoint, bool *inWindow ) = 0;
     ///
-    STDMETHOD(IsDrawSprocketsEnabled)( bool *enabled ) = 0;
+    STDMETHOD(DoesDriverNeedEvent)( bool *enabled ) = 0;
     ///
     STDMETHOD(SetColorPalette)( void ) = 0;
+    ///
+    STDMETHOD(WindowChanged)( void ) = 0;
+    ///
+    STDMETHOD(HandleEvent)( EventRecord *inEvent, bool *outEventWasProcessed ) = 0;
 };
 
 #endif
