@@ -260,7 +260,8 @@ void csSoundDriverMac::SndDoubleBackProc(
 	/*
 	 *	Get more sound samples from the mixing function.
 	 */
-	m_piSoundRender->MixingFunction();
+// @@@ WHM Commented out for now to compile. Will work on this in the future.
+//	m_piSoundRender->MixingFunction();
 
 	/*
 	 *	Mark the buffer as ready to be emptied.
