@@ -21,6 +21,10 @@ The history order is reversed so that new features are at the top.
 	  children. In that case it will calculate the union of all the
 	  bounding spheres of the children. As a consequence this means that
 	  PlaceMesh() will now also consider children.
+	- Fixed a bug in the iRenderView::ClipBSphere() and ClipBBox()
+	  routines. They both would handle the portal clip plane inverted
+	  which means that objects were culled wrong. The best place to
+	  see this bug was to do 'portal sydney' in the console of WalkTest.
 1-Jan-2001
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.
