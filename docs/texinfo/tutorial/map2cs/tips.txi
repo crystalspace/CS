@@ -42,16 +42,14 @@ decorative stuff).
 Read the reference section for @file{map2cs} (@pxref{map2cs}).  @file{map2cs}
 provides quite a few features, that have not been covered in this tutorial,
 such as mirrors and volumetric fog.
-@end itemize
 
 @item
 @file{map2cs} will remove faces with certain textures (@code{aaatrigger},
-@code{clip}, @code{common/caulk} and others. See the map2cs source 
-[@file{apps/import/map2cs/texfile.cpp}] for the complete list). Assign such a
-texture to faces that won't be seen - like polygons facing "outside" the 
+@code{clip}, @code{common/caulk} and others. See the @file{map2cs} source 
+(@file{CS/apps/import/map2cs/texfile.cpp}) for the complete list. Assign such a
+texture to faces that won't be seen---like polygons facing ``outside'' the 
 level, or faces adjacent to a wall etc.
 @end itemize
 
 If you know other tips, send them to the Crystal Space mailing list 
 (@pxref{Mailing Lists}).
-

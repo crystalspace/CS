@@ -993,86 +993,104 @@ searched for @file{vfs.cfg} only in the Crystal Space installation diretory.
 
 @subheading Internationalization
 
-Some work to improve internationalization in CS has been done. This includes:
+Some work to improve internationalization support in Crystal Space has been
+performed.  Crystal Space now has more complete support for Unicode input and
+output.
 
-@subsubheading Unicode helpers
-The @code{csUnicodeTransform} class provides functions to deal with and convert 
-between UTF-8, UTF-16 and UTF-32 encoded strings.
+@subsubheading Unicode Helpers
+
+The @samp{csUnicodeTransform} class provides functions to deal with and convert
+between @sc{utf}-8, @sc{utf}-16, and @sc{utf}-32 encoded strings.
 
 @subsubheading UTF-8 strings
-Several APIs in CrystalSpace now accept UTF-8 strings. Those include:
+
+Several portions of the CrystalSpace @sc{api} now accept @sc{utf}-8-encoded
+strings. These include:
 
 @itemize @bullet
 @item
-@code{csPrintf[V]},code{csFPutErr} for console output.
+@code{csPrintf()}, @code{csPrintfV()}, @code{csFPutErr()} for console output.
 @item
-@code{iGraphics2D->Write},@code{iGraphics2D->WriteBaseline}.
+@code{iGraphics2D::Write()}, @code{iGraphics2D::WriteBaseline()}.
 @item
-@code{csReport[V]},@code{iReporter->Report[V]}.
+@code{csReport()}, @code{csReportV()}, @code{iReporter::Report()},
+@code{iReporter::ReportV()}.
 @item
 @code{iNativeWindowManager->Alert[V]},@code{iNativeWindow->SetTitle}.
 @end itemize
 
-@subheading Keyboard events
+@subheading Keyboard Events
 
-Keyboard events in the CVS have changed. The event data is not stored in a 
-struct inside the iEvent any more, but rather inside iEvent's property bag. 
-That means the way to access the event data has slightly changed; you can now 
-either query the iEvent via Find() to get a specific property, or with 
-the csKeyEventHelper class.
+Keyboard events have changed.  The event data related to keyboard events is no
+longer stored in a structure inside @samp{iEvent}, but instead now resides
+within @samp{iEvent}'s property bag.  That means the way to access the event
+data has changed slightly; you now either query for the data via
+@code{iEvent::Find()} to get a specific property, or you access it via the the
+@samp{csKeyEventHelper} class.
 
-Another change is that the csevKeyDown and csevKeyUp events have been 
-collapsed to a single csevKeyboard event; the up/down information is 
-transported along with the event data.
+Another change is that the @samp{csevKeyDown} and @samp{csevKeyUp} events have
+been collapsed to a single @samp{csevKeyboard} event; the up/down information
+is transported along with the event data.
 
-The notion of `scan code' and `characters' has been replaced with `raw' and 
-`cooked' codes. Basically, the raw code identifies the key uniquely, while the 
-`cooked' code is a processed version of it. An important aspect of this is 
-that both the `raw' and `cooked' codes are Unicode characters. Special keys
-(such as function keys) are encoded as characters from a Unicode private use
-area.
+The notion of @dfn{scan code} and @dfn{characters} has been replaced with
+@dfn{raw} and @dfn{cooked} codes.  Basically, the raw code identifies the key
+uniquely, while the cooked code is a processed version of it.  An important
+aspect of this is that both the raw and cooked codes are Unicode characters.
+Special keys (such as function keys) are encoded as characters from a Unicode
+private use area.  Almost all event handling code should consult the raw code
+because the raw code is invariant; that is, an @key{a} is an `a' even if the
+@kbd{ALT} or @kbd{SHIFT} key, or both, are depressed.  This is useful for
+games, for instance, which need to map keys to particular actions.  Cooked
+codes are useful typically only for text input, such as within a text input
+field.
 
-You can find some more information here in the Public API Documentation 
-(Module @samp{Event handling}, section @samp{Keyboard events} - 
-@uref{http://crystal.sourceforge.net/docs/online/pubapi/group__event__handling.php#Keyboard}).
+You can find additional information in Crystal Space's public @sc{api}
+documentation in the Event Handling and Keyboard Events sections.
 
-With those changes, code like this:
+To understand how to adjust your code for these changes, see the following
+examples.
+
 @example
-  if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
+iEvent& e = @dots{};
+if (e.Type == csevKeyDown && e.Key.Code == CSKEY_ESC)
+@{
 @end example
-has to be changed to:
+
+@noindent
+Change to:
+
 @example
-  if ((Event.Type == csevKeyboard) &&
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+if (e.Type == csevKeyboard &&
+    csKeyEventHelper::GetEventType(&e) == csKeyEventTypeDown) &&
+    csKeyEventHelper::GetCookedCode(&e) == CSKEY_ESC))
+  @{
 @end example
 
 Another example:
 @example
-  switch (Event.Type)
-  {
-    case csevKeyDown:
-      Foo ();
-      break;
-    case csevKeyUp:
-      Bar ();
-      break;
-  }
-@end example
-needs to be changed to:
-@example
-  switch (Event.Type)
-  {
-    case csevKeyboard:
-      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-      {
-        Foo ();
-      }
-      else
-      {
-        Bar ();
-      }
-      break;
-  }
+iEvent& e = @dots{};
+switch (e.Type)
+@{
+  case csevKeyDown:
+    Foo();
+    break;
+  case csevKeyUp:
+    Bar();
+    break;
+@}
 @end example
 
+@noindent
+Change to:
+
+@example
+switch (e.Type)
+@{
+  case csevKeyboard:
+    if (csKeyEventHelper::GetEventType (&e) == csKeyEventTypeDown)
+      Foo();
+    else
+      Bar();
+    break;
+@}
+@end example

@@ -11,6 +11,9 @@ chronological order.
 	- Jorrit added thing.cfg.
 	- Eric Sunshine augmented "thing" makefile and Jamfile to ensure that
 	  the new thing.cfg gets installed.
+	- Eric Sunshine fixed numerous Texinfo errors and other mark-up
+	  problems recently introduced into the user manual.  Also rewrote some
+	  of the discussion in apimod98.txi.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
