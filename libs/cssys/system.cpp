@@ -50,7 +50,7 @@ void csSystemDriver::ReportSys (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY ((&scfiObjectRegistry), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (&object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.system", msg, arg);
@@ -287,14 +287,9 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
 SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectRegistry)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::ObjectRegistry)
-  SCF_IMPLEMENTS_INTERFACE (iObjectRegistry)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
   SCF_IMPLEMENTS_INTERFACE (iPluginManager)
@@ -308,7 +303,6 @@ csSystemDriver::csSystemDriver () :
   VFS(0), EventQueue(0), Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectRegistry);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 
@@ -317,20 +311,20 @@ csSystemDriver::csSystemDriver () :
   CurrentTime = csTicks (-1);
 
   // Register the shared event queue.
-  iEventQueue* q = new csEventQueue(&scfiObjectRegistry);
-  scfiObjectRegistry.Register(q, "crystalspace.event.queue");
+  iEventQueue* q = new csEventQueue (&object_reg);
+  object_reg.Register (q, "crystalspace.event.queue");
   q->DecRef();
 
-  scfiObjectRegistry.Register (&scfiPluginManager, "PluginManager");
+  object_reg.Register (&scfiPluginManager, "PluginManager");
   iCommandLineParser* cmdline = new csCommandLineParser ();
-  scfiObjectRegistry.Register (cmdline, "CommandLine");
+  object_reg.Register (cmdline, "CommandLine");
   //@@@ cmdline->DecRef (); Uncomment when object registry moves out
   // of system driver.
 
   //@@@ We temporarily register iSystem with the object registry too.
   // That allows us to remove the usage of iSystem everywhere except in
   // a few places where this is still needed. This is only transitionary.
-  scfiObjectRegistry.Register (this, "System");
+  object_reg.Register (this, "System");
 
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
@@ -379,7 +373,7 @@ csSystemDriver::~csSystemDriver ()
   // the registry itself it being destroyed.  Furthermore, such objects may may
   // SCF queries as they are destroyed, so this must occur before SCF is
   // finalized (see below).
-  scfiObjectRegistry.Clear();
+  object_reg.Clear();
 
   iSCF::SCF->Finish();
 }
@@ -387,7 +381,7 @@ csSystemDriver::~csSystemDriver ()
 bool csSystemDriver::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  EventQueue = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  EventQueue = CS_QUERY_REGISTRY (&object_reg, iEventQueue);
   EventQueue->IncRef();
 
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
@@ -407,7 +401,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   iConfigFile *cfg = new csConfigFile();
   iConfigManager* Config = new csConfigManager(cfg, true);
-  scfiObjectRegistry.Register (Config, "ConfigManager");
+  object_reg.Register (Config, "ConfigManager");
   // @@@ Config->DecRef (); uncomment when object reg outside system driver
   cfg->DecRef ();
   Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
@@ -421,7 +415,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
   // look if the user-specific config domain should be used
   {
-    csConfigAccess cfgacc(&scfiObjectRegistry, "/config/system.cfg");
+    csConfigAccess cfgacc (&object_reg, "/config/system.cfg");
     if (cfgacc->GetBool("System.UserConfig", true))
     {
       // open the user-specific, application-neutral config domain
@@ -440,18 +434,18 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   
   // Register some generic pseudo-plugins.  (Some day these should probably
   // become real plugins.)
-  iKeyboardDriver* k = new csKeyboardDriver(&scfiObjectRegistry);
-  iMouseDriver*    m = new csMouseDriver   (&scfiObjectRegistry);
-  iJoystickDriver* j = new csJoystickDriver(&scfiObjectRegistry);
-  scfiObjectRegistry.Register(k, "crystalspace.driver.input.generic.keyboard");
-  scfiObjectRegistry.Register(m, "crystalspace.driver.input.generic.mouse"   );
-  scfiObjectRegistry.Register(j, "crystalspace.driver.input.generic.joystick");
+  iKeyboardDriver* k = new csKeyboardDriver (&object_reg);
+  iMouseDriver*    m = new csMouseDriver    (&object_reg);
+  iJoystickDriver* j = new csJoystickDriver (&object_reg);
+  object_reg.Register (k, "crystalspace.driver.input.generic.keyboard");
+  object_reg.Register (m, "crystalspace.driver.input.generic.mouse"   );
+  object_reg.Register (j, "crystalspace.driver.input.generic.joystick");
   j->DecRef();
   m->DecRef();
   k->DecRef();
 
   // Collect all options from command line
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
   CommandLine->Initialize (argc, argv);
 
@@ -605,10 +599,10 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
   csConfigAccess cfg;
-  cfg.AddConfig(&scfiObjectRegistry, "/config/system.cfg");
+  cfg.AddConfig (&object_reg, "/config/system.cfg");
 
   // Now analyze command line
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
   const char *val;
   if ((val = CommandLine->GetOption ("debug")))
@@ -694,7 +688,7 @@ void csSystemDriver::Help ()
 
 void csSystemDriver::QueryOptions (iPlugin *iObject)
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
 
   iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
@@ -759,7 +753,7 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
   // @@@ WARNING we have to query for the commandline by tag name
   // because SCF is not yet initialized at the point we come here.
   iCommandLineParser* CommandLine = (iCommandLineParser*)(
-  	CS_QUERY_REGISTRY_TAG ((&scfiObjectRegistry), "CommandLine"));
+  	CS_QUERY_REGISTRY_TAG (&object_reg, "CommandLine"));
   CommandLine->AddOption ("plugin", iPluginName);
 }
 
@@ -775,7 +769,7 @@ iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   else
   {
     int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
-    if (p->Initialize (&scfiObjectRegistry))
+    if (p->Initialize (&object_reg))
     {
       iBase *ret;
       if (iInterface)
@@ -800,7 +794,7 @@ bool csSystemDriver::RegisterPlugin (const char *iClassID,
   const char *iFuncID, iPlugin *iObject)
 {
   int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
-  if (iObject->Initialize (&scfiObjectRegistry))
+  if (iObject->Initialize (&object_reg))
   {
     QueryOptions (iObject);
     iObject->IncRef ();
@@ -896,92 +890,7 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
 
 #undef CHECK
 
-  scfiObjectRegistry.Unregister((iBase *)iObject, NULL);
+  object_reg.Unregister ((iBase *)iObject, NULL);
   return Plugins.Delete (idx);
 }
 
-//---------------------------------------------------------------------------
-
-void csSystemDriver::ObjectRegistry::Clear()
-{
-  clearing = true;
-  for (int i = registry.Length() - 1; i >= 0; i--)
-  {
-    // Take special care to ensure that this object is no longer on the list
-    // before calling DecRef(), since we don't want some other object asking
-    // for it during its own destruction.
-    iBase* b = (iBase*)registry[i];
-    char* t = (char*)tags[i];
-    registry.Delete(i); // Remove from list before DecRef().
-    tags.Delete(i);
-    b->DecRef();
-    delete[] t;
-  }
-  clearing = false;
-}
-
-bool csSystemDriver::ObjectRegistry::Register (iBase* obj, char const* tag)
-{
-  if (!clearing)
-  {
-    obj->IncRef();
-    registry.Push(obj);
-    tags.Push(tag ? csStrNew(tag) : 0);
-    return true;
-    }
-  return false;
-}
-
-void csSystemDriver::ObjectRegistry::Unregister (iBase* obj, char const* tag)
-{
-  if (!clearing)
-  {
-    for (int i = registry.Length() - 1; i >= 0; i--)
-    {
-      iBase* b = (iBase*)registry[i];
-      if (b == obj)
-      {
-        char* t = (char*)tags[i];
-        if ((t == 0 && tag == 0) || (t != 0 && tag != 0 && !strcmp (tag, t)))
-        {
-          delete[] t;
-          b->DecRef();
-	  registry.Delete(i);
-	  if (tag != 0) // For a tagged object, we're done.
-	    break;
-        }
-      }
-    }
-  }
-}
-
-iBase* csSystemDriver::ObjectRegistry::Get (char const* tag)
-{
-  for (int i = registry.Length() - 1; i >= 0; i--)
-  {
-    char* t = (char*)tags[i];
-    if (t && !strcmp (tag, t))
-      return (iBase*)registry[i];
-  }
-  return 0;
-}
-
-iBase* csSystemDriver::ObjectRegistry::Get (scfInterfaceID id, int version)
-{
-  iBase* found_one = 0;
-  for (int i = registry.Length() - 1; i >= 0; i--)
-  {
-    iBase* b = (iBase*)registry[i];
-    iBase* interf = (iBase*)(b->QueryInterface (id, version));
-    if (interf)
-    {
-      interf->DecRef ();
-      char* t = (char*)tags[i];
-      if (!t)
-        return interf;
-      else
-        found_one = interf;
-    }
-  }
-  return found_one;
-}

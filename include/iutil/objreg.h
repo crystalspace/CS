@@ -22,11 +22,11 @@
 #include "csutil/scf.h"
 
 #define CS_QUERY_REGISTRY_TAG(Reg,Tag)			\
-  (Reg->Get (Tag))
+  ((Reg)->Get (Tag))
 #define CS_QUERY_REGISTRY(Reg,Interface)		\
-  (Interface*)(Reg->Get (iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
+  (Interface*)((Reg)->Get (iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
 #define CS_QUERY_REGISTRY_FAST(Reg,Interface)		\
-  (Interface*)(Reg->Get (scfGetID_##Interface (), VERSION_##Interface))
+  (Interface*)((Reg)->Get (scfGetID_##Interface (), VERSION_##Interface))
 
 SCF_VERSION (iObjectRegistry, 0, 0, 1);
 

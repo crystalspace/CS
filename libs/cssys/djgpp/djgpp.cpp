@@ -88,9 +88,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   EnablePrintf = true;
 
   DosHelper* doshelper = new DosHelper (this);
-  scfiObjectRegistry.Register (doshelper, "SystemHelper");
+  object_reg.Register (doshelper, "SystemHelper");
 
-  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
   if (q != 0)
     EventOutlet = q->CreateEventOutlet (this);
 }

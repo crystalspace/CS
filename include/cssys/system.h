@@ -26,6 +26,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
+#include "csutil/objreg.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
@@ -138,6 +139,10 @@ private:
   iVFS *VFS;
   // Shared event queue.
   iEventQueue* EventQueue;
+
+protected:
+  // The object registry.
+  csObjectRegistry object_reg;
 
 public:
   /// Print something to the reporter.
@@ -261,7 +266,7 @@ public:
   /**************************** iSystem interface ****************************/
 
   /// Get the object registry.
-  virtual iObjectRegistry* GetObjectRegistry () { return &scfiObjectRegistry; }
+  virtual iObjectRegistry* GetObjectRegistry () { return &object_reg; }
 
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}
@@ -270,29 +275,6 @@ public:
   /// Query the elapsed time between last frames and absolute time.
   virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-
-  //------------------------------------------------------------------
-
-  class ObjectRegistry : public iObjectRegistry
-  {
-  private:
-    csVector registry;
-    csVector tags;
-    // True when this object is being cleared; prevents external changes.
-    bool clearing;
-
-  public:
-    ObjectRegistry() : clearing(false) {}
-    virtual ~ObjectRegistry() {} // Client must explicitly call Clear().
-    void Clear();
-
-    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
-    virtual bool Register (iBase* obj, char const* tag = NULL);
-    virtual void Unregister (iBase* obj, char const* tag = NULL);
-    virtual iBase* Get (char const* tag);
-    virtual iBase* Get (scfInterfaceID id, int version);
-  } scfiObjectRegistry;
-  friend class ObjectRegistry;
 
   //------------------------------------------------------------------
 

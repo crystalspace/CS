@@ -219,7 +219,7 @@ SysSystemDriver::SysSystemDriver()
         }
     }
 #endif
-    iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
     if (q != 0)
       EventOutlet = q->CreateEventOutlet (this);
 }

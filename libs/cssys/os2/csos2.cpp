@@ -35,7 +35,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
 
   Os2Helper* os2helper = new Os2Helper (this);
-  scfiObjectRegistry.Register (os2helper, "SystemHelper");
+  object_reg.Register (os2helper, "SystemHelper");
 }
 
 void SysSystemDriver::Sleep (int SleepTime)

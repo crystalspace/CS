@@ -29,6 +29,13 @@ The history order is reversed so that new features are at the top.
 	  for a procedural texture.
 	- Removed iWin32SystemDriver and merged the three functions
 	  (GetInstance(), GetIsActive(), and GetCmdShow()) with iWin32Helper.
+	- Philip Wyett fixed ddraw/ddraw8 canvases which still contained an
+	  include of the deleted win32itf.h.
+	- Moved implementation of iObjectRegistry from system driver to
+	  csutil (csObjectRegistry class). Replaced the object registry
+	  in the system driver with this implementation.
+	- Made CS_QUERY_REGISTRY variants safe by putting brackets around
+	  the first argument.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

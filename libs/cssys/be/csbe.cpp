@@ -60,7 +60,7 @@ SysSystemDriver::SysSystemDriver() :
   for (i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
   BeHelper* behelper = new BeHelper (this);
-  scfiObjectRegistry.Register (behelper, "SystemHelper");
+  object_reg.Register (behelper, "SystemHelper");
 }
 
 
@@ -131,7 +131,7 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
   if (strlen(path) > 0)
     chdir(path);
 
-  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
   if (q != 0)
     event_outlet = q->CreateEventOutlet(this);
 

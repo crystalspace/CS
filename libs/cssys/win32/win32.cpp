@@ -443,9 +443,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
   Win32Helper* winhelper = new Win32Helper (this);
-  scfiObjectRegistry.Register (winhelper, "SystemHelper");
+  object_reg.Register (winhelper, "SystemHelper");
 
-  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
   if (q != 0)
     EventOutlet = q->CreateEventOutlet (this);
 }
