@@ -12,6 +12,9 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in WalkTest. If you pressed the mouse button WalkTest
 	  would just continue going forward even after releasing it again.
 	  Bug fixed by Navdeep S. Tinna.
+	- Eric Sunshine eliminated several compilation warnings from MSVC
+	  (reported by Martin Geisse) in sft3dcom.cpp and avistrv.cpp about
+	  variables possibly used uninitialized.
 18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.

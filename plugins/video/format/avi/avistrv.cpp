@@ -273,7 +273,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   int th = rc.Height ();
   int ytic=th, xtic;
   int ls = 0;
-  float y,u,v, uf1, uf2, vf1, vf2;
+  float y,u,v, uf1 = 0, uf2 = 0, vf1 = 0, vf2 = 0;
   int sr=0, sc; // source row and col
 
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
