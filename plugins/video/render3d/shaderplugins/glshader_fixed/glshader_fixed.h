@@ -30,7 +30,7 @@ public:
   csConfigAccess config;
 
   bool enable;
-  int texUnits;
+  GLint texUnits;
 
   void Report (int severity, const char* msg, ...);
 public:

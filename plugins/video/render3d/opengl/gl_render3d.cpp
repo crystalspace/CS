@@ -650,9 +650,9 @@ static void FillNormalizationMapSide (unsigned char *normdata, int size,
         yo + xv*yx + yv*yy, 
         zo + xv*zx + yv*zy);
       norm.Normalize ();
-      *normdata++ = 127.5f + norm.x*127.5f;
-      *normdata++ = 127.5f + norm.y*127.5f;
-      *normdata++ = 127.5f + norm.z*127.5f;
+      *normdata++ = (unsigned char)(127.5f + norm.x*127.5f);
+      *normdata++ = (unsigned char)(127.5f + norm.y*127.5f);
+      *normdata++ = (unsigned char)(127.5f + norm.z*127.5f);
       *normdata++ = 0;
     }
   }
@@ -1701,10 +1701,10 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int oheight = txt_mm->orig_height;
   if (owidth != bitmapwidth || oheight != bitmapheight)
   {
-    tx = tx * (float)bitmapwidth / (float)owidth;
-    ty = ty * (float)bitmapheight / (float)oheight;
-    tw = tw * (float)bitmapwidth / (float)owidth;
-    th = th * (float)bitmapheight / (float)oheight;
+    tx = (int)(tx * (float)bitmapwidth  / (float)owidth );
+    ty = (int)(ty * (float)bitmapheight / (float)oheight);
+    tw = (int)(tw * (float)bitmapwidth  / (float)owidth );
+    th = (int)(th * (float)bitmapheight / (float)oheight);
   }
 
   int ClipX1, ClipY1, ClipX2, ClipY2;
@@ -1747,9 +1747,6 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 
   // cache the texture if we haven't already.
   txtcache->Cache (hTex);
-
-  // Get texture handle
-  GLuint texturehandle = ((csTxtCacheData *)txt_mm->GetCacheData ())->Handle;
 
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing

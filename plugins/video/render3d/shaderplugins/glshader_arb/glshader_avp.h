@@ -50,7 +50,7 @@ private:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
-  unsigned int program_num;
+  GLuint program_num;
 
   csStringHash xmltokens;
 

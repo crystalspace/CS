@@ -52,6 +52,8 @@ chronological order.
 	  others to use iReporter.
 	- Eric Sunshine eliminated a slew of compilation warnings in cstool
 	  which were present when the new-renderer was enabled.
+	- Eric Sunshine eliminated scads of compilation warnings from the new
+	  renderer plugins.
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.

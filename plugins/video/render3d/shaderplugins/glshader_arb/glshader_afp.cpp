@@ -119,7 +119,7 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
 
   const GLubyte * programErrorString = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 
-  int errorpos;
+  GLint errorpos;
   glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
   if(errorpos != -1)
   {

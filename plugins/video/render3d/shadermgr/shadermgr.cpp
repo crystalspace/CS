@@ -672,7 +672,7 @@ bool csShaderPass::Load (iDocumentNode* node)
       case XMLTOKEN_STREAMMAPPING:
         {
           const char* dest = child->GetAttributeValue ("destination");
-          csVertexAttrib attribute;
+          csVertexAttrib attribute = CS_VATTRIB_0;
           bool found = false;
           int i;
           for (i = 0; i<16; i++)

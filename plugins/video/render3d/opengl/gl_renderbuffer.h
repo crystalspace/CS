@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 by Mårten Svanfeldt
+  Copyright (C) 2003 by Marten Svanfeldt
                         Anders Stenberg
 
   This library is free software; you can redistribute it and/or
@@ -112,7 +112,7 @@ class csVBORenderBuffer : public csGLRenderBuffer
 {
 private:
   char* tempbuf;
-  uint bufferId;
+  GLuint bufferId;
   bool locked;
   csRenderBufferLockType lastLock;
   csGLRenderBufferLockType lastRLock;
@@ -137,9 +137,8 @@ public:
 
   virtual ~csVBORenderBuffer ()
   {
-    uint buf[1];
-    buf[0] = bufferId;
-    ext->glDeleteBuffersARB (1, buf);
+    GLuint buf = bufferId;
+    ext->glDeleteBuffersARB (1, &buf);
   }
 
   /**
