@@ -67,4 +67,5 @@ rule ExtraObjects
   EXTRAOBJECTS on $($(<)_TARGET) += $(>) ;
   Depends $($(<)_TARGET) : $(>) ;
   Clean $(<)clean : $(>) ;
+  Clean clean : $(>) ;
 }

@@ -144,6 +144,7 @@ rule LinkVersionRc
   
   MakeVersionRc $(versionrc) : $(<) ;
   Clean $(<)clean : $(versionrc) ;
+  Clean clean : $(versionrc) ;
   Win32Resource $(<) : $(versionrc) ;
 }    
 
@@ -166,6 +167,7 @@ rule LinkVersionAndMetadataRc
   MakeVersionRc $(versionrc) : $(<) ;
   MakeMetadataRc $(<) : $(metarc) ;
   Clean $(<)clean : $(versionrc) $(metarc) ;
+  Clean clean : $(versionrc) $(metarc) ;
   Win32Resource $(<) : $(versionrc) $(metarc) ;
 }
 
