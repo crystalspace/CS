@@ -142,13 +142,23 @@ public:
   { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
   /// Returns the looping frame after frame number f.
   csSpriteFrame* GetCsNextFrame (int f)
-  { f++; return f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]; }
+  {
+    if (!reverse_action)
+    { f++; return f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]; }
+    else
+    { f--; return f>=0 ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[frames.Length()-1]; }
+  }
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
   { return (iSpriteFrame*)((f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL); }
   /// Returns the looping frame after frame number f.
   virtual iSpriteFrame* GetNextFrame (int f)
-  { f++; return (iSpriteFrame*)(f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]); }
+  {
+    if (!reverse_action)
+    { f++; return (iSpriteFrame*)(f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]); }
+    else
+    { f--; return (iSpriteFrame*)(f>=0 ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[frames.Length()-1]); }
+  }
   /// Get delay for frame number f
   virtual int GetFrameDelay (int f)
   { return (int)delays [f]; }
@@ -156,10 +166,14 @@ public:
   virtual float GetFrameDisplacement (int f)
   { return * (float*) & displacements [f]; }
 
+  void SetReverseAction(bool reverse)
+  { reverse_action = reverse; }
+
   SCF_DECLARE_IBASE;
 
 private:
   char *name;
+  bool reverse_action;
   csVector frames;
   csVector delays;
   csVector displacements;
@@ -1101,6 +1115,8 @@ private:
   int cur_frame;
   /// The current action.
   csSpriteAction2* cur_action;
+  /// Is action running in reverse?  This is either 1 or -1 depending.
+  int frame_increment;
 
   /// The last frame time action.
   csTicks last_time;
@@ -1336,6 +1352,7 @@ public:
     speedfactor = speed;
     loopaction = loop;
     fullstop = false;
+    SetReverseAction(false); // always go forward by default.
     csSpriteAction2 *act;
     if ((act = factory->FindAction (name)) != NULL)
     {
@@ -1345,6 +1362,12 @@ public:
       return true;
     }
     return false;
+  }
+
+  void SetReverseAction(bool reverse)
+  { frame_increment = (reverse) ? -1:1;
+    if (cur_action)
+	cur_action->SetReverseAction(reverse);
   }
 
   /**
@@ -1591,6 +1614,11 @@ public:
     {
       return scfParent->SetAction (name, loop, speed);
     }
+    virtual void SetReverseAction (bool reverse)
+    {
+      scfParent->SetReverseAction (reverse);
+    }
+
     virtual bool PropagateAction (const char *name)
     {
       return scfParent->PropagateAction (name);

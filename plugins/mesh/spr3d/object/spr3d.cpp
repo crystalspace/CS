@@ -1308,11 +1308,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
-  csSpriteFrame * next_frame;
-  if (cur_frame + 1 < cur_action->GetFrameCount())
-    next_frame = cur_action->GetCsFrame (cur_frame + 1);
-  else
-    next_frame = cur_action->GetCsFrame (0);
+  csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -1696,7 +1692,9 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
  //     last_pos = cur_pos;
       last_displacement = cur_displacement + last_displacement -
 	          cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
-      cur_frame++;
+      cur_frame+=frame_increment;
+      if (cur_frame<0)
+	  cur_frame=cur_action->GetFrameCount() - 1;
       if (stoptoend && cur_frame + 1 >= cur_action->GetFrameCount ())
       {
         ret = true;
@@ -1722,12 +1720,17 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       	   cur_action->GetFrameDelay (cur_frame)/speedfactor)
         {
           last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
-          cur_frame++;
+          cur_frame+=frame_increment;
           if (cur_frame >= cur_action->GetFrameCount ())
           {
             cur_frame = 0;
             ret = true;
           }
+	  else if (cur_frame < 0)
+	  {
+	    cur_frame = cur_action->GetFrameCount() - 1;
+	    ret = true;
+	  }
         }
         else break;
       }
@@ -1737,12 +1740,17 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       	     cur_action->GetFrameDisplacement (cur_frame)/speedfactor)
         {
           cur_displacement -= cur_action->GetFrameDisplacement (cur_frame)/speedfactor;
-          cur_frame++;
+          cur_frame+=frame_increment;
           if (cur_frame >= cur_action->GetFrameCount ())
           {
             cur_frame = 0;
             ret = true;
           }
+	  else if (cur_frame < 0)
+	  {
+	    cur_frame = cur_action->GetFrameCount() - 1;
+	    ret = true;
+	  }
         }
         else
 	{
