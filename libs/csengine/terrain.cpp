@@ -111,8 +111,8 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 
     ddgTriIndex 
 		tva = bt->parent(tvc),
-		tv1 = bt->v0(tvc),
-		tv0 = bt->v1(tvc);
+		tv1 = mesh->v0(tvc),
+		tv0 = mesh->v1(tvc);
 
     i1 = bt->vertex(tva,&p1);
     i2 = bt->vertex(tv0,&p2);
