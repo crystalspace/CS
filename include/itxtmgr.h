@@ -108,12 +108,10 @@ public:
   /**
    * Reserve RGB. Call this function to reserve a color
    * from the palette (if any). This function only takes effect after
-   * the next call to Prepare(). If the 'privcolor' parameter is true
-   * then this color cannot be used by the textures. Otherwise it
-   * can. Note that black and white are already allocated as private
-   * colors.
+   * the next call to Prepare(). Note that black and white are already
+   * preallocated colors.
    */
-  COM_METHOD_DECL ReserveColor (int r, int g, int b, bool privcolor) PURE;
+  COM_METHOD_DECL ReserveColor (int r, int g, int b) PURE;
 
   /**
    * After calling Prepare() you can call this function to allocate
