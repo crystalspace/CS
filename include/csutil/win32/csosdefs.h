@@ -304,10 +304,12 @@ struct csMemMapInfo
 #endif
 
 // Maximal path length
-#ifdef _MAX_FNAME
-#  define CS_MAXPATHLEN _MAX_FNAME
-#else
-#  define CS_MAXPATHLEN 260 /* not 256 */
+#ifndef CS_MAXPATHLEN
+#  ifdef _MAX_FNAME
+#    define CS_MAXPATHLEN _MAX_FNAME
+#  else
+#    define CS_MAXPATHLEN 260 /* not 256 */
+#  endif
 #endif
 #define CS_PATH_DELIMITER ';'
 #define CS_PATH_SEPARATOR '\\'
