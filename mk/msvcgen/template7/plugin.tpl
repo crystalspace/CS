@@ -27,235 +27,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
-				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_STRICT_SMART_POINTERS"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
-				AssemblerListingLocation=".\csrelease\temp\%project%/"
-				ObjectFile=".\csrelease\temp\%project%/"
-				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems=""
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
-				OutputFile="csrelease\temp\%project%\%target%"
-				Version="4.0"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
-				DelayLoadDLLs="%delaylibs%"
-				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
-				SubSystem="2"
-				OptimizeReferences="1"
-				ImportLibrary=".\csrelease\temp\%project%/%project%.lib"
-				TargetMachine="1"
-				BaseAddress="" />
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\csrelease\temp\%project%/%project%.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Release Bin.
-copy &quot;$(TargetPath)&quot;  csrelease\bin
-"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\csdebug\temp\%project%"
-			IntermediateDirectory=".\csdebug\temp\%project%"
-			ConfigurationType="2"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				OptimizeForProcessor="1"
-				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
-				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_STRICT_SMART_POINTERS"
-				MinimalRebuild="TRUE"
-				RuntimeLibrary="3"
-				RuntimeTypeInfo="TRUE"
-				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
-				AssemblerListingLocation=".\csdebug\temp\%project%/"
-				ObjectFile=".\csdebug\temp\%project%/"
-				ProgramDataBaseFileName=".\csdebug\temp\%project%/%project%.pdb"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
-				Detect64BitPortabilityProblems=""
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
-				OutputFile="csdebug\temp\%project%\%target%"
-				Version="1.0"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMTD"
-				DelayLoadDLLs="%delaylibs%"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
-				SubSystem="2"
-				ImportLibrary=".\csdebug\temp\%project%/%project%.lib"
-				TargetMachine="1"
-				BaseAddress="" />
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\csdebug\temp\%project%/%project%.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Debug Bin.
-copy &quot;$(TargetPath)&quot;  csdebug\bin
-"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-		</Configuration>
-		<Configuration
-			Name="ExtensiveMemDebug|Win32"
-			OutputDirectory=".\csmemdbg\temp\%project%"
-			IntermediateDirectory=".\csmemdbg\temp\%project%"
-			ConfigurationType="2"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				OptimizeForProcessor="1"
-				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
-				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_EXTENSIVE_MEMDEBUG;CS_STRICT_SMART_POINTERS"
-				MinimalRebuild="TRUE"
-				RuntimeLibrary="3"
-				RuntimeTypeInfo="TRUE"
-				PrecompiledHeaderFile=".\csmemdbg\temp\%project%/%project%.pch"
-				AssemblerListingLocation=".\csmemdbg\temp\%project%/"
-				ObjectFile=".\csmemdbg\temp\%project%/"
-				ProgramDataBaseFileName=".\csmemdbg\temp\%project%/%project%.pdb"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
-				Detect64BitPortabilityProblems=""
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
-				OutputFile="csmemdbg\temp\%project%\%target%"
-				Version="1.0"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMTD"
-				DelayLoadDLLs="%delaylibs%"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\csmemdbg\temp\%project%/%project%.pdb"
-				SubSystem="2"
-				ImportLibrary=".\csmemdbg\temp\%project%/%project%.lib"
-				TargetMachine="1"
-				BaseAddress="" />
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\csmemdbg\temp\%project%/%project%.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Debug Bin.
-copy &quot;$(TargetPath)&quot;  csmemdbg\bin
-"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-		</Configuration>
-		<Configuration
-			Name="Release_NR|Win32"
-			OutputDirectory=".\csrelease\temp\%project%"
-			IntermediateDirectory=".\csrelease\temp\%project%"
-			ConfigurationType="2"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="TRUE"
-				OptimizeForProcessor="1"
-				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="NDEBUG;_WINDOWS;WIN32;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -273,12 +45,12 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
 				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
+				AdditionalDependencies="libceltools.lib libcstool.lib libcsgfx.lib libcsgeom.lib libcsutil.lib delayimp.lib %libs%"
 				OutputFile="csrelease\temp\%project%\%target%"
 				Version="4.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
 				DelayLoadDLLs="%delaylibs%"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
@@ -308,14 +80,14 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories=""/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
 		<Configuration
-			Name="Debug_NR|Win32"
+			Name="Debug|Win32"
 			OutputDirectory=".\csdebug\temp\%project%"
 			IntermediateDirectory=".\csdebug\temp\%project%"
 			ConfigurationType="2"
@@ -326,7 +98,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -346,12 +118,12 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
 				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
+				AdditionalDependencies="libceltools_d.lib libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib delayimp.lib %libs%"
 				OutputFile="csdebug\temp\%project%\%target%"
 				Version="1.0"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMTD"
 				DelayLoadDLLs="%delaylibs%"
 				GenerateDebugInformation="TRUE"
@@ -381,7 +153,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories=""/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
