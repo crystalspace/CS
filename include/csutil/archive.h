@@ -191,7 +191,7 @@ public:
 
   /// Get Nth file in archive or NULL
   void *GetFile (int no)
-  { return dir.Get (no); }
+  { return (no >= 0) && (no < dir.Length ()) ? dir.Get (no) : NULL; }
 
   /// Find a file in archive; returns a handle or NULL
   void *FindName (const char *name) const;
