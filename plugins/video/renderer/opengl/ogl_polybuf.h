@@ -30,6 +30,8 @@
 #include "csutil/cscolor.h"
 #include "csgeom/subrec.h"
 
+#include "ogl_g3dcom.h"
+
 class csSLMCacheData;
 
 class csTrianglesPerMaterial
@@ -37,6 +39,7 @@ class csTrianglesPerMaterial
 public:
   csTrianglesPerMaterial * next;
   int matIndex;
+  csRef<iRendererLightmap> lmh;
 
   // We need a better implementation here
   // We're duplicating info, but we need the number of vertices per
@@ -68,6 +71,11 @@ public:
     if (last == 0) return -1;
     return last->matIndex;
   }
+  iRendererLightmap* GetLastLMHandle ()
+  {
+    if (last == 0) return 0;
+    return last->lmh;
+  }
   void Add (csTrianglesPerMaterial* t);
   csTrianglesPerMaterial* GetLast () { return last; }
 };
@@ -75,7 +83,7 @@ public:
 /**
  * This class stores triangles that could share the same superlightmap
  */
-class csTrianglesPerSuperLightmap
+/*class csTrianglesPerSuperLightmap
 {
 public:
   csTrianglesPerSuperLightmap* prev;
@@ -97,6 +105,7 @@ public:
   /// Pointer to the cache data
   csSLMCacheData* cacheData;
   bool isUnlit;
+  csLightmapHandle lmh;
 
   /// Number of the queue to use for this super lightmap.
   int queue_num;
@@ -112,7 +121,7 @@ public:
 
   // Timestamp indicating when this super lightmap was last used.
   uint32 timestamp;
-};
+};*/
 
 /**
  * Single Linked List that stores all the lightmap's triangles and uv's.
@@ -122,7 +131,7 @@ public:
  * The list goes from the last to the first (as a stack would do, but without
  * popping)
  */
-class TrianglesSuperLightmapList
+/*class TrianglesSuperLightmapList
 {
 public:
   csTrianglesPerSuperLightmap* first;
@@ -142,7 +151,7 @@ public:
   void ClearLightmapsDirty() { dirty = false; }
   // Gets the dirty state.
   bool GetLightmapsDirtyState () const { return dirty; }
-};
+};*/
 
 
 /**
@@ -168,28 +177,27 @@ private:
    * Add a single vertex to the given tri/mat buffer.
    * Returns vertex index.
    */
-  int AddSingleVertex (csTrianglesPerMaterial* pol,
-	int* verts, int i, const csVector2& uv, int& cur_vt_idx);
+/*  int AddSingleVertex (csTrianglesPerMaterial* pol,
+	int* verts, int i, const csVector2& uv, int& cur_vt_idx);*/
 
   /*
    * Add a single vertex to the given suplm.
    * Returns vertex index.
    */
-  int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
+  //int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
 
   // Queue with lightmaps we still have to process.
-  csGrowingArray<csLmQueue> lmqueue;
+  //csGrowingArray<csLmQueue> lmqueue;
 
-  void ClearLmQueue ();
-  void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
-		  int num_uv, int vt_idx);
+  //void ClearLmQueue ();
+  //void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
+		  //int num_uv, int vt_idx);
   // size is the size of the super lightmap to use.
-  void ProcessLmQueue (iPolygonTexture* polytext, const csVector2* uv,
-		  int num_uv, int vt_idx, int size, int queue_num);
-
+  //void ProcessLmQueue (iPolygonTexture* polytext, const csVector2* uv,
+		  //int num_uv, int vt_idx, int size, int queue_num);
 public:
   // SuperLightMap list.
-  TrianglesSuperLightmapList superLM;
+//  TrianglesSuperLightmapList superLM;
 
 protected:
   // Mesh triangles grouped by material list.
@@ -207,10 +215,10 @@ protected:
   /// Lumels for those triangles
   csGrowingArray<csVector2> lumels;
 
-  csVector3 * vertices;
   int matCount;
-  int verticesCount;
   csGrowingArray<csTriangle> orig_triangles;
+  csVector3* vertices;
+  int num_vertices;
 
   csBox3 bbox;
 
@@ -224,13 +232,12 @@ protected:
    * 'size' is the size of the super lightmap to use.
    * 'queue_num' is the number of the super lightmap queue to use (0 to 3).
    */
-  csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
+/*  csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
     iPolygonTexture* poly_texture, csRect& rect, int size,
-    int queue_num);
-
+    int queue_num);*/
 public:
   csTrianglesPerMaterial* GetFirst () { return polygons.first; }
-  csTrianglesPerSuperLightmap* GetFirstTrianglesSLM () { return superLM.last; }
+  //csTrianglesPerSuperLightmap* GetFirstTrianglesSLM () { return superLM.last; }
 
   /// Gets the number of materials of the mesh
   virtual int GetMaterialCount() const { return matCount;}
@@ -244,11 +251,11 @@ public:
   /// Destructor
   virtual ~csTriangleArrayPolygonBuffer ();
 
-  /// Adds a polygon to the polygon buffer
-  virtual void AddPolygon (int* verts, int num_verts,
-    const csPlane3& poly_normal, int mat_index,
-    const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-    iPolygonTexture* poly_texture);
+  /// Get the number of vertices.
+  virtual int GetVertexCount () const { return num_vertices; }
+  /// Get the vertices array.
+  virtual csVector3* GetVertices () const { return vertices; }
+  virtual void SetVertexArray (csVector3* verts, int num_verts);
 
   /// Adds a material to the polygon buffer
   virtual void AddMaterial (iMaterialHandle* mat_handle);
@@ -262,19 +269,12 @@ public:
   /// Sets a material
   virtual void SetMaterial (int idx, iMaterialHandle* mat_handle);
 
-  /// Sets the mesh vertices
-  virtual void SetVertexArray (csVector3* verts, int num_verts);
-
   /// Clear the polygon buffer
   virtual void Clear ();
 
-  /// Gets the mesh vertices
-  virtual csVector3* GetVertices () const { return vertices; }
   /// Gets the original triangles.
   csTriangle* GetTriangles () { return orig_triangles.GetArray (); }
 
-  /// Gets the original vertices count
-  virtual int GetVertexCount () const { return verticesCount; }
   /// Gets the original triangle count
   int GetTriangleCount () const { return orig_triangles.Length (); }
 
@@ -287,12 +287,6 @@ public:
   /// Get the total lumels.
   csVector2* GetTotalLumels () { return lumels.GetArray (); }
 
-  /// Given a polygon triangulize it and adds it to the polygon buffer
-  void AddTriangles (csTrianglesPerMaterial* pol,
-    int* verts, int num_vertices, const csMatrix3& m_obj2tex,
-    const csVector3& v_obj2tex,iPolygonTexture* poly_texture, int mat_index,
-    int cur_vt_idx);
-
   /// Marks the polygon buffer as affected by any light
   virtual void MarkLightmapsDirty();
 
@@ -301,6 +295,17 @@ public:
 
   /// Get the bounding box.
   virtual const csBox3& GetBoundingBox () const { return bbox; }
+
+  /// Adds a polygon to the polygon buffer
+  virtual void AddPolygon (int num_verts,
+	int* verts,
+	csPolyTextureMapping* texmap,
+	csPolyLightMapMapping* lmap,
+	/*csVector2* texcoords,
+	csVector2* lmcoords,*/
+	const csPlane3& poly_normal,
+	int mat_index,
+	iRendererLightmap* lm);
 };
 
 /**
@@ -309,9 +314,13 @@ public:
  */
 class csTriangleArrayVertexBufferManager : public csVertexBufferManager
 {
+  friend class csTriangleArrayPolygonBuffer;
 public:
+  csGraphics3DOGLCommon* g3d;
+
   /// Initialize the vertex buffer manager
-  csTriangleArrayVertexBufferManager (iObjectRegistry* object_reg);
+  csTriangleArrayVertexBufferManager (iObjectRegistry* object_reg,
+    csGraphics3DOGLCommon* g3d);
   /// Destroy the vertex buffer manager
   virtual ~csTriangleArrayVertexBufferManager ();
 

@@ -656,7 +656,12 @@ bool csGLRender3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
+<<<<<<< gl_render3d.cpp
+  ext->InitGL_EXT_texture_compression_s3tc ();
   ext->InitGL_ARB_vertex_buffer_object ();
+=======
+  ext->InitGL_ARB_vertex_buffer_object ();
+>>>>>>> 1.80
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -1398,7 +1403,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       primitivetype,
       mymesh->indexend - mymesh->indexstart,
       indexbuf->compGLType,
-      ((uint8*)bufData) + (indexbuf->compSize * mymesh->indexstart));
+      ((uint8*)bufData) + (indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
 
     indexbuf->Release();
   }

@@ -27,7 +27,11 @@
 class csTextureSoftware;
 class csTextureHandleSoftware;
 class csGraphics3DSoftwareCommon;
+class csSoftRendererLightmap;
+struct csPolyTextureMapping;
+struct csPolyLightMapMapping;
 struct iPolygonTexture;
+struct iRendererLightmap;
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
 
@@ -246,7 +250,9 @@ void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
   int gbits, int bbits);
 /// Initialize the scanline variables
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt);
+  /*iPolygonTexture* tex*/csPolyTextureMapping* tmapping, 
+  csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm, 
+  csTextureHandleSoftware* texture, csTextureSoftware *untxt);
 /// Initialize the scanline variables for DrawPolygonFX
 void csScan_InitDrawFX (csTextureHandleSoftware* texture, csTextureSoftware *untxt);
 /// Pixel-depth independent routine

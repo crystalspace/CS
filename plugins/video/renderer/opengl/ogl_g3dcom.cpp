@@ -65,6 +65,7 @@
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
 #include "ivideo/effects/efstring.h"
+#include "ivideo/effects/efvector4.h"
 #include "effectdata.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
@@ -152,6 +153,8 @@ static ogl_g3dcom_clipped_fog *clipped_fog = 0;
 static ogl_g3dcom_clipped_user *clipped_user[CS_VBUF_TOTAL_USERA] = {
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0 };
+
+#define CS_GL_LIGHTMAP_USERA	0
 
 /*=========================================================================
  Method implementations
@@ -864,7 +867,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   G2D->PerformExtension("configureopengl");
 
-  vbufmgr = new csTriangleArrayVertexBufferManager (object_reg);
+  vbufmgr = new csTriangleArrayVertexBufferManager (object_reg, this);
   //vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
@@ -2281,18 +2284,18 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     // as T = M*C - V.
     float P1, P2, P3, P4;
     float Q1, Q2, Q3, Q4;
-    P1 = poly.plane.m_cam2tex->m11;
-    P2 = poly.plane.m_cam2tex->m12;
-    P3 = poly.plane.m_cam2tex->m13;
-    P4 = -(P1 * poly.plane.v_cam2tex->x
-     + P2 * poly.plane.v_cam2tex->y
-     + P3 * poly.plane.v_cam2tex->z);
-    Q1 = poly.plane.m_cam2tex->m21;
-    Q2 = poly.plane.m_cam2tex->m22;
-    Q3 = poly.plane.m_cam2tex->m23;
-    Q4 = -(Q1 * poly.plane.v_cam2tex->x
-     + Q2 * poly.plane.v_cam2tex->y
-     + Q3 * poly.plane.v_cam2tex->z);
+    P1 = poly.cam2tex.m_cam2tex->m11;
+    P2 = poly.cam2tex.m_cam2tex->m12;
+    P3 = poly.cam2tex.m_cam2tex->m13;
+    P4 = -(P1 * poly.cam2tex.v_cam2tex->x
+     + P2 * poly.cam2tex.v_cam2tex->y
+     + P3 * poly.cam2tex.v_cam2tex->z);
+    Q1 = poly.cam2tex.m_cam2tex->m21;
+    Q2 = poly.cam2tex.m_cam2tex->m22;
+    Q3 = poly.cam2tex.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.cam2tex.v_cam2tex->x
+     + Q2 * poly.cam2tex.v_cam2tex->y
+     + Q3 * poly.cam2tex.v_cam2tex->z);
 
     // Precompute everything so that we can calculate (u,v) (texture space
     // coordinates) for every (sx,sy) (screen space coordinates). We make
@@ -2316,8 +2319,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
-  iPolygonTexture *tex = poly.poly_texture;
-  iLightMap* lm = tex->GetLightMap ();
+  //iPolygonTexture *tex = poly.poly_texture;
+  //iLightMap* lm = tex->GetLightMap ();
 
   bool tex_transp = false;
   bool multimat = false;
@@ -2389,15 +2392,17 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   if (flatlighting)
   {
-    int ir = 255, ig = 255, ib = 255;
-    if (lm)
+    if (poly.rlm)
     {
-      tex->RecalculateDynamicLights ();
-      lm->GetMeanLighting(ir, ig, ib);
+      ((csGLRendererLightmap*)poly.rlm)->GetMeanColor (flat_r,
+	flat_g, flat_b);
     }
-    flat_r = ir/128.0f;
-    flat_g = ig/128.0f;
-    flat_b = ib/128.0f;
+    else
+    {
+      flat_r = 2.0f;
+      flat_g = 2.0f;
+      flat_b = 2.0f;
+    }
   }
 
   glColor4f (flat_r, flat_g, flat_b, alpha);
@@ -2457,7 +2462,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   // we set the z-buffer to second pass state.
   //=================
   bool do_lm = !flatlighting && !poly.do_fullbright
-    && m_renderstate.lighting && lm;
+    && m_renderstate.lighting && poly.rlm;
   if (multimat || do_lm || poly.use_fog)
   {
     SetGLZBufferFlagsPass2 (z_buf_mode, true);
@@ -2529,49 +2534,50 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     glColor4f (1, 1, 1, 0);
     SetupBlend (CS_FX_SRCDST, 0, false);
 
-    float txtsize;
-    int lmwidth = lm->GetWidth ();
-    int lmheight = lm->GetHeight ();
-    GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
-	txtsize);
-    tex->RecalculateDynamicLights ();
-    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
-    csRGBpixel* lm_data = lm->GetMapData ();
-    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
-	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+    csGLRendererLightmap* glrlm = (csGLRendererLightmap*)poly.rlm;
+    statecache->SetTexture (GL_TEXTURE_2D, glrlm->slm->texHandle);
 
-    float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
-    float lm_scale_u, lm_scale_v;
-    const csLightMapMapping& mapping = tex->GetMapping ();
-    mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+    struct csPolyLMCoords
+    {
+      float u1, v1, u2, v2;
+    };
 
-    // lightmap fudge factor
-    if (lm_high_u <= lm_offset_u)
-      lm_scale_u = 1.;       // @@@ Is this right?
-    else
-      lm_scale_u = 1. / (lm_high_u - lm_offset_u);
+    csPolyLMCoords lmc;
+    poly.rlm->GetRendererCoords (lmc.u1, lmc.v1,
+      lmc.u2, lmc.v2);
 
-    if (lm_high_v <= lm_offset_v)
-      lm_scale_v = 1.;       // @@@ Is this right?
-    else
-      lm_scale_v = 1. / (lm_high_v - lm_offset_v);
+    float lm_low_u = 0.0f, lm_low_v = 0.0f;
+    float lm_high_u = 1.0f, lm_high_v = 1.0f;
+    if (poly.texmap)
+      poly.texmap->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+    
+    float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+    float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
 
-    lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
-    lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
-
-    lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
-    lm_high_v += .75 / (float (lmheight) * lm_scale_v);
-
-    lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
-    lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
+    csTransform tex2lm;
+    tex2lm.SetO2T (
+      csMatrix3 (lm_scale_u, 0, 0,
+		  0, lm_scale_v, 0,
+		  0, 0, 1));
+    tex2lm.SetO2TTranslation (
+      csVector3 (
+      (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0, 
+      (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0, 
+      0));
 
     glt = gltxt;
     GLfloat* gltt = gltxttrans;
+    csVector3 ov;
+    ov.z = 0;
     for (i = 0; i < poly.num; i++)
     {
-      *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
-      *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
+      ov.x = *(glt++);
+      ov.y = *(glt++);
+      const csVector3& tc = tex2lm.Other2This (ov);
+      *gltt++ = tc.x;
+      *gltt++ = tc.y;
     }
+
     //glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
     glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
     glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
@@ -2760,18 +2766,18 @@ void csGraphics3DOGLCommon::DrawPolygonMaterialOnly (G3DPolygonDP& poly)
     // as T = M*C - V.
     float P1, P2, P3, P4;
     float Q1, Q2, Q3, Q4;
-    P1 = poly.plane.m_cam2tex->m11;
-    P2 = poly.plane.m_cam2tex->m12;
-    P3 = poly.plane.m_cam2tex->m13;
-    P4 = -(P1 * poly.plane.v_cam2tex->x
-     + P2 * poly.plane.v_cam2tex->y
-     + P3 * poly.plane.v_cam2tex->z);
-    Q1 = poly.plane.m_cam2tex->m21;
-    Q2 = poly.plane.m_cam2tex->m22;
-    Q3 = poly.plane.m_cam2tex->m23;
-    Q4 = -(Q1 * poly.plane.v_cam2tex->x
-     + Q2 * poly.plane.v_cam2tex->y
-     + Q3 * poly.plane.v_cam2tex->z);
+    P1 = poly.cam2tex.m_cam2tex->m11;
+    P2 = poly.cam2tex.m_cam2tex->m12;
+    P3 = poly.cam2tex.m_cam2tex->m13;
+    P4 = -(P1 * poly.cam2tex.v_cam2tex->x
+     + P2 * poly.cam2tex.v_cam2tex->y
+     + P3 * poly.cam2tex.v_cam2tex->z);
+    Q1 = poly.cam2tex.m_cam2tex->m21;
+    Q2 = poly.cam2tex.m_cam2tex->m22;
+    Q3 = poly.cam2tex.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.cam2tex.v_cam2tex->x
+     + Q2 * poly.cam2tex.v_cam2tex->y
+     + Q3 * poly.cam2tex.v_cam2tex->z);
 
     // Precompute everything so that we can calculate (u,v) (texture space
     // coordinates) for every (sx,sy) (screen space coordinates). We make
@@ -2797,16 +2803,17 @@ void csGraphics3DOGLCommon::DrawPolygonMaterialOnly (G3DPolygonDP& poly)
 
   if (dp_flatlighting)
   {
-    int ir = 255, ig = 255, ib = 255;
-    //@@@
-    //if (lm)
-    //{
-      //tex->RecalculateDynamicLights ();
-      //lm->GetMeanLighting(ir, ig, ib);
-    //}
-    flat_r = ir/128.0f;
-    flat_g = ig/128.0f;
-    flat_b = ib/128.0f;
+    if (poly.rlm)
+    {
+      ((csGLRendererLightmap*)poly.rlm)->GetMeanColor (flat_r,
+	flat_g, flat_b);
+    }
+    else
+    {
+      flat_r = 2.0f;
+      flat_g = 2.0f;
+      flat_b = 2.0f;
+    }
     glColor4f (flat_r, flat_g, flat_b, dp_alpha);
   }
 
@@ -2849,9 +2856,9 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;
 
-  iPolygonTexture *tex = poly.poly_texture;
-  iLightMap* lm = tex->GetLightMap ();
-  if (!lm) return;
+  //iPolygonTexture *tex = poly.poly_texture;
+  //iLightMap* lm = tex->GetLightMap ();
+  if (!poly.rlm) return;
 
   int i;
 
@@ -2915,18 +2922,18 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
     // as T = M*C - V.
     float P1, P2, P3, P4;
     float Q1, Q2, Q3, Q4;
-    P1 = poly.plane.m_cam2tex->m11;
-    P2 = poly.plane.m_cam2tex->m12;
-    P3 = poly.plane.m_cam2tex->m13;
-    P4 = -(P1 * poly.plane.v_cam2tex->x
-     + P2 * poly.plane.v_cam2tex->y
-     + P3 * poly.plane.v_cam2tex->z);
-    Q1 = poly.plane.m_cam2tex->m21;
-    Q2 = poly.plane.m_cam2tex->m22;
-    Q3 = poly.plane.m_cam2tex->m23;
-    Q4 = -(Q1 * poly.plane.v_cam2tex->x
-     + Q2 * poly.plane.v_cam2tex->y
-     + Q3 * poly.plane.v_cam2tex->z);
+    P1 = poly.cam2tex.m_cam2tex->m11;
+    P2 = poly.cam2tex.m_cam2tex->m12;
+    P3 = poly.cam2tex.m_cam2tex->m13;
+    P4 = -(P1 * poly.cam2tex.v_cam2tex->x
+     + P2 * poly.cam2tex.v_cam2tex->y
+     + P3 * poly.cam2tex.v_cam2tex->z);
+    Q1 = poly.cam2tex.m_cam2tex->m21;
+    Q2 = poly.cam2tex.m_cam2tex->m22;
+    Q3 = poly.cam2tex.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.cam2tex.v_cam2tex->x
+     + Q2 * poly.cam2tex.v_cam2tex->y
+     + Q3 * poly.cam2tex.v_cam2tex->z);
 
     // Precompute everything so that we can calculate (u,v) (texture space
     // coordinates) for every (sx,sy) (screen space coordinates). We make
@@ -2989,49 +2996,50 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
   glColor4f (1, 1, 1, 0);
   SetupBlend (CS_FX_SRCDST, 0, false);
 
-  float txtsize;
-  int lmwidth = lm->GetWidth ();
-  int lmheight = lm->GetHeight ();
-  GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
-		    txtsize);
-  tex->RecalculateDynamicLights ();
-  statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
-  csRGBpixel* lm_data = lm->GetMapData ();
-  glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
-	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+  csGLRendererLightmap* glrlm = (csGLRendererLightmap*)poly.rlm;
+  statecache->SetTexture (GL_TEXTURE_2D, glrlm->slm->texHandle);
 
-  float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
-  float lm_scale_u, lm_scale_v;
-  const csLightMapMapping& mapping = tex->GetMapping ();
-  mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+  struct csPolyLMCoords
+  {
+    float u1, v1, u2, v2;
+  };
 
-  // lightmap fudge factor
-  if (lm_high_u <= lm_offset_u)
-    lm_scale_u = 1.;       // @@@ Is this right?
-  else
-    lm_scale_u = 1. / (lm_high_u - lm_offset_u);
+  csPolyLMCoords lmc;
+  poly.rlm->GetRendererCoords (lmc.u1, lmc.v1,
+    lmc.u2, lmc.v2);
 
-  if (lm_high_v <= lm_offset_v)
-    lm_scale_v = 1.;       // @@@ Is this right?
-  else
-    lm_scale_v = 1. / (lm_high_v - lm_offset_v);
+  float lm_low_u = 0.0f, lm_low_v = 0.0f;
+  float lm_high_u = 1.0f, lm_high_v = 1.0f;
+  if (poly.texmap)
+    poly.texmap->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+  
+  float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+  float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
 
-  lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
-  lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
-
-  lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
-  lm_high_v += .75 / (float (lmheight) * lm_scale_v);
-
-  lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
-  lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
+  csTransform tex2lm;
+  tex2lm.SetO2T (
+    csMatrix3 (lm_scale_u, 0, 0,
+		0, lm_scale_v, 0,
+		0, 0, 1));
+    tex2lm.SetO2TTranslation (
+      csVector3 (
+      (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0, 
+      (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0, 
+      0));
 
   glt = gltxt;
   GLfloat* gltt = gltxttrans;
+  csVector3 ov;
+  ov.z = 0;
   for (i = 0; i < poly.num; i++)
   {
-    *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
-    *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
+    ov.x = *(glt++);
+    ov.y = *(glt++);
+    const csVector3& tc = tex2lm.Other2This (ov);
+    *gltt++ = tc.x;
+    *gltt++ = tc.y;
   }
+
   //glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
   glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
   glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
@@ -3260,8 +3268,8 @@ static void ResolveVertex (
   {
     for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
     {
-      userpointers1[u] = &user1[u*4];
-      userpointers2[u] = &user2[u*4];
+      userpointers1[u] = &(user1[u*4]);
+      userpointers2[u] = &(user2[u*4]);
     }
     init = true;
   }
@@ -3278,10 +3286,13 @@ static void ResolveVertex (
         {
 	  if( ouserarrays[u] )
 	  {
-	    for( int c=0; c<userarraycomponents[u]; c++ )
+	    float* user = userarrays[u];
+	    float* ouser = ouserarrays[u];
+	    const int uac = userarraycomponents[u];
+	    for( int c=0; c < uac; c++ )
 	    {
-	      (userarrays[u])[outi*userarraycomponents[u]+c] =
-		(ouserarrays[u])[ci->original.idx*userarraycomponents[u]+c];
+	      user[outi * uac + c] =
+		ouser[ci->original.idx * uac + c];
 	    }
 	  }
         }
@@ -3314,11 +3325,14 @@ static void ResolveVertex (
         {
 	  if( ouserarrays[u] )
 	  {
-	    for( int c=0; c<userarraycomponents[u]; c++ )
+	    const int uac = userarraycomponents[u];
+	    for( int c=0; c < uac; c++ )
 	    {
-	      (userarrays[u])[outi*userarraycomponents[u]+c] =
-		(ouserarrays[u])[i1*userarraycomponents[u]+c] * (1-r) +
-		(ouserarrays[u])[i2*userarraycomponents[u]+c] * r;
+	      float* user = userarrays[u];
+	      float* ouser = ouserarrays[u];
+	      user[outi * uac + c] =
+		ouser[i1 * uac + c] * (1-r) +
+		ouser[i2 * uac + c] * r;
 	    }
 	  }
         }
@@ -3361,9 +3375,10 @@ static void ResolveVertex (
         {
 	  if( ouserarrays[u] )
 	  {
+	    float* user = userarrays[u];
 	    for( int c=0; c<userarraycomponents[u]; c++ )
 	    {
-	      (userarrays[u])[outi*userarraycomponents[u]+c] =
+	      user[outi*userarraycomponents[u]+c] =
 		user1[u*4+c] * (1-r) + user2[u*4+c] * r;
 	    }
 	  }
@@ -3622,12 +3637,19 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
       if (userarrays)
       {
         for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
+	{
           if (userarrays[u] != 0)
           {
-            for (int c=0; c<userarraycomponents[u]; c++)
-              (*clipped_user[u])[num_clipped_vertices] =
-                (userarrays[u])[i*userarraycomponents[u]+c];
+	    const int uac = userarraycomponents[u];
+	    float* clip_user = clipped_user[u]->GetArray ();
+	    float* user = userarrays[u];
+            for (int c=0; c < uac; c++)
+	    {
+	      clip_user[num_clipped_vertices * uac + c] =
+                user[i * uac + c];
+	    }
           }
+	}
       }
       num_clipped_vertices++;
     }
@@ -3832,6 +3854,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     // needed while building the polygon buffer. Not later.
     t->ClearVertexArray ();
 
+    //trimesh.use_vertex_color = false;
     trimesh.mat_handle = polbuf->GetMaterialPolygon (t);
     if (!setup)
     {
@@ -3861,7 +3884,9 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     }
     trimesh.triangles = t->triangles.GetArray ();
     trimesh.num_triangles = t->triangles.Length ();
-    bool drawn = EffectDrawTriangleMesh (trimesh, false);
+    GLuint lmtex = t->lmh ? ((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
+    bool drawn = EffectDrawTriangleMesh (trimesh, false,
+      lmtex);
     something_was_drawn |= drawn;
     t = t->next;
   }
@@ -3889,27 +3914,25 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   trimesh.mat_handle = 0;
   SetupDTMEffect (trimesh);
 
-  csTrianglesPerSuperLightmap *sln = polbuf->GetFirstTrianglesSLM ();
-  if (m_renderstate.lighting && sln)
+  if (m_renderstate.lighting)
   {
     vbman->LockBuffer (vb, total_verts, total_lumels, 0,
-          total_verts_count, 0, polbuf->GetBoundingBox ());
-    bool dirty = polbuf->superLM.GetLightmapsDirtyState ();
-    bool modified = false;
-    while (sln != 0)
+	  total_verts_count, 0, polbuf->GetBoundingBox ());
+    t = polbuf->GetFirst ();
+    while (t != 0)
     {
-      lightmap_cache->Cache (sln, dirty, &modified);
-      if (!sln->cacheData->IsUnlit ())
+      GLuint lmtex = t->lmh ? 
+	((csGLRendererLightmap*)((iRendererLightmap*)t->lmh))->slm->texHandle : 0;
+      if (lmtex != 0) 
       {
-        trimesh.triangles = sln->triangles.GetArray ();
-        trimesh.num_triangles = sln->triangles.Length ();
-
-        EffectDrawTriangleMesh (trimesh, false, sln->cacheData->Handle);
+	trimesh.triangles = t->triangles.GetArray ();
+	trimesh.num_triangles = t->triangles.Length ();
+	EffectDrawTriangleMesh (trimesh, false, 
+	  lmtex);
       }
-      sln = sln->prev;
+      t = t->next;
     }
     vbman->UnlockBuffer (vb);
-    polbuf->superLM.ClearLightmapsDirty ();
   }
 
   //===========
@@ -3928,7 +3951,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
     {
       vis = ClassifyForClipTriangleMesh (
-            polbuf->GetVertexCount (), polbuf->GetVertices (),
+            polbuf->GetTotalVertexCount (), polbuf->GetTotalVertices (),
 	    polbuf->GetBoundingBox (),
             ci.frust_origin, ci.frustum_planes, ci.num_planes);
     }
@@ -4874,17 +4897,20 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       }
       else if (layer_data->vcord_source == ED_SOURCE_LIGHTMAP)
       {
-        if (!lightmapcoords)
+        if (!work_userarrays[CS_GL_LIGHTMAP_USERA]/*lightmapcoords*/)
         {
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
           EnableClientStateTextureArray ();
         }
 	else
 	{
-	  /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
-	          &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
-	    EnableClientStateTextureArray();*/
-	  DisableClientStateTextureArray ();
+	  glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
+	    work_userarrays[CS_GL_LIGHTMAP_USERA]
+	          /*&((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x*/);
+	    EnableClientStateTextureArray();
+          //glTexCoordPointer (2, GL_FLOAT, 0, lightmapcoords);
+          //EnableClientStateTextureArray ();
+	  //DisableClientStateTextureArray ();
         }
       }
       else if (layer_data->vcord_source == ED_SOURCE_MESH)
@@ -4910,12 +4936,12 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
       if (layer_data->inputtex==-1)
       {
-        statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+        statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle, l);
         statecache->Enable_GL_TEXTURE_2D (l);
       }
       else if (layer_data->inputtex==-2)
       {
-        statecache->SetTexture (GL_TEXTURE_2D, lightmap);
+        statecache->SetTexture (GL_TEXTURE_2D, lightmap, l);
         statecache->Enable_GL_TEXTURE_2D (l);
       }
       else if (layer_data->inputtex==0)
@@ -5656,13 +5682,13 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
   for (i = 0 ; i < mat_handle->GetTextureLayerCount () ; i++)
   {
     iTextureHandle* txt_layer_handle = mat_handle->GetTextureLayer (i)->
-      txt_handle;
+      txt_handle;						     
     if (txt_layer_handle)
       texture_cache->Cache (txt_layer_handle);
   }
 }
 
-void csGraphics3DOGLCommon::RemoveFromCache (iPolygonTexture* /*poly_texture*/)
+void csGraphics3DOGLCommon::RemoveFromCache (iRendererLightmap* /*rlm*/)
 {
 }
 
@@ -6114,9 +6140,10 @@ iTextureManager *csGraphics3DOGLCommon::GetTextureManager ()
   return txtmgr;
 }
 
-bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
+bool csGraphics3DOGLCommon::IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize)
 {
-  return lightmap_cache->IsLightmapOK (poly_texture);
+  return lightmap_cache->IsLightmapOK (lmw, lmh, lightCellSize);
 }
 
 void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle,

@@ -870,3 +870,280 @@ void csTextureManagerOpenGL::FreeImages ()
   }
 }
 
+csPtr<iSuperLightmap> csTextureManagerOpenGL::CreateSuperLightmap(int w, 
+								  int h)
+{
+  return csPtr<iSuperLightmap> 
+    (new csGLSuperLightmap (w, h));
+}
+
+void csTextureManagerOpenGL::GetMaxTextureSize (int& w, int& h, int& aspect)
+{
+  w = G3D->Caps.maxTexWidth;
+  h = G3D->Caps.maxTexHeight;
+  aspect = G3D->Caps.MaxAspectRatio;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE_INCREF(csGLRendererLightmap)					
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLRendererLightmap)				
+SCF_IMPLEMENT_IBASE_QUERY(csGLRendererLightmap)
+  SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
+SCF_IMPLEMENT_IBASE_END
+
+void csGLRendererLightmap::DecRef ()
+{
+  if (scfRefCount == 1)							
+  {									
+    CS_ASSERT (slm != 0);
+    slm->FreeRLM (this);
+    return;								
+  }									
+  scfRefCount--;							
+}
+
+csGLRendererLightmap::csGLRendererLightmap ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  mean_calculated = false;
+  mean_r = mean_g = mean_b = 0.0f;
+}
+
+csGLRendererLightmap::~csGLRendererLightmap ()
+{
+#ifdef CS_DEBUG
+  if (slm->texHandle != (GLuint)~0)
+  {
+    csRGBpixel* pat = new csRGBpixel[rect.Width () * rect.Height ()];
+    int x, y;
+    csRGBpixel* p = pat;
+    for (y = 0; y < rect.Height (); y++)
+    {
+      for (x = 0; x < rect.Width (); x++)
+      {
+	p->red = ((x ^ y) & 1) * 0xff;
+	p++;
+      }
+    }
+
+    csGraphics3DOGLCommon::statecache->SetTexture (
+      GL_TEXTURE_2D, slm->texHandle);
+
+    glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
+      rect.Width (), rect.Height (),
+      GL_RGBA, GL_UNSIGNED_BYTE, pat);
+
+    delete[] pat;
+  }
+#endif
+}
+
+void csGLRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
+    float &lm_u2, float& lm_v2)
+{
+  lm_u1 = u1;
+  lm_v1 = v1;
+  lm_u2 = u2;
+  lm_v2 = v2;
+}
+    
+void csGLRendererLightmap::GetSLMCoords (int& left, int& top, 
+    int& width, int& height)
+{
+  left = rect.xmin; top  = rect.xmin;
+  width = rect.Width (); height = rect.Height ();
+}
+    
+void csGLRendererLightmap::SetData (csRGBpixel* data)
+{
+  slm->CreateTexture ();
+
+  csGraphics3DOGLCommon::statecache->SetTexture (
+    GL_TEXTURE_2D, slm->texHandle);
+
+  glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
+    rect.Width (), rect.Height (),
+    GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  csGLRendererLightmap::data = data;
+  mean_calculated = false;
+}
+
+void csGLRendererLightmap::SetLightCellSize (int size)
+{
+  (void)size;
+}
+
+void csGLRendererLightmap::GetMeanColor (float& r, float& g, float& b)
+{
+  if (!mean_calculated)
+  {
+    mean_r = mean_g = mean_b = 0.0f;
+    csRGBpixel* p = data;
+    int n = rect.Width () * rect.Height ();
+    
+    for (int m = 0; m < n; m++)
+    {
+      mean_r += p->red;
+      mean_g += p->green;
+      mean_b += p->blue;
+      p++;
+    }
+
+    float f = 1.0f / ((float)n * 128.0f);
+    mean_r *= f;
+    mean_g *= f;
+    mean_b *= f;
+    mean_calculated = true;
+  }
+  r = mean_r;
+  g = mean_g;
+  b = mean_b;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csGLSuperLightmap)
+  SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
+SCF_IMPLEMENT_IBASE_END
+
+csGLSuperLightmap::csGLSuperLightmap (int width, int height) : RLMs(32)
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  w = width; h = height;
+  texHandle = (GLuint)~0;
+  numRLMs = 0;
+}
+
+csGLSuperLightmap::~csGLSuperLightmap ()
+{
+  DeleteTexture ();
+}
+
+void csGLSuperLightmap::CreateTexture ()
+{
+  if (texHandle == (GLuint)~0)
+  {
+    glGenTextures (1, &texHandle);
+
+    csGraphics3DOGLCommon::statecache->SetTexture (
+      GL_TEXTURE_2D, texHandle);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    csRGBpixel* data = new csRGBpixel [w * h];
+  #ifdef CS_DEBUG
+    // Fill the background for debugging purposes (to quickly see what's
+    // a lightmap and what's not; esp. useful when LMs are rather dark -
+    // would be hardly visible if at all on black)
+    // And to have it not that boring, add a neat backdrop.
+    static const uint16 debugBG[16] =
+      {0x0000, 0x3222, 0x4a36, 0x422a, 0x3222, 0x0a22, 0x4a22, 0x33a2, 
+       0x0000, 0x2232, 0x364a, 0x2a42, 0x2232, 0x220a, 0x224a, 0xa233};
+
+    csRGBpixel* p = data;
+    int y, x;
+    for (y = 0; y < h; y++)
+    {
+      for (x = 0; x < w; x++)
+      {
+	const int bitNum = 6;
+	int b = (~x) & 0xf;
+	int px = (debugBG[y & 0xf] & (1 << b));
+	if (b < bitNum)
+	{
+	  px <<= bitNum - b;
+	}
+	else
+	{
+	  px >>= b - bitNum;
+	}
+	p->blue = ~(1 << bitNum) + px;
+	p->alpha = ~((px >> 6) * 0xff);
+	p++;
+      }
+    }
+  #endif
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, 
+      GL_RGBA, GL_UNSIGNED_BYTE, data);
+    delete[] data;
+  }
+}
+
+void csGLSuperLightmap::DeleteTexture ()
+{
+  if (texHandle != (GLuint)~0)
+  {
+    csGraphics3DOGLCommon::statecache->SetTexture (
+      GL_TEXTURE_2D, 0);
+
+    glDeleteTextures (1, &texHandle);
+    texHandle = (GLuint)~0;
+  }
+}
+
+void csGLSuperLightmap::FreeRLM (csGLRendererLightmap* rlm)
+{
+  if (--numRLMs == 0)
+  {
+    DeleteTexture ();
+  }
+
+  // IncRef() ourselves manually.
+  // Otherwise freeing the RLM could trigger our own destruction -
+  // causing an assertion in block allocator (due to how BA frees items and
+  // the safety assertions on BA destruction.)
+  scfRefCount++;
+  RLMs.Free (rlm);
+  DecRef ();
+}
+
+csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top, 
+  int width, int height)
+{
+  csGLRendererLightmap* rlm = RLMs.Alloc ();
+  rlm->slm = this;
+  rlm->rect.Set (left, top, left + width, top + height);
+
+  float islmW = 1.0f / (float)w;
+  float islmH = 1.0f / (float)h;
+  // Those offsets seem to result in a look similar to the software
+  // renderer... but not perfect yet.
+  rlm->u1 = ((float)left + 0.5f) * islmW;
+  rlm->v1 = ((float)top  + 0.5f) * islmH;
+  rlm->u2 = ((float)(left + width) - 1.0f) * islmW;
+  rlm->v2 = ((float)(top  + height) - 1.0f) * islmH;
+
+  numRLMs++;
+
+  return csPtr<iRendererLightmap> (rlm);
+}
+
+csPtr<iImage> csGLSuperLightmap::Dump ()
+{
+  // @@@ hmm... or just return an empty image?
+  if (texHandle == (GLuint)~0) return 0;
+
+  int tw, th;
+  csGraphics3DOGLCommon::statecache->SetTexture (
+    GL_TEXTURE_2D, texHandle);
+
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
+
+  uint8* data = new uint8[tw * th * 4];
+  glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  csImageMemory* lmimg = 
+    new csImageMemory (tw, th,
+    data, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+
+  return csPtr<iImage> (lmimg);
+}
+

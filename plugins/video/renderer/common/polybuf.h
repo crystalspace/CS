@@ -22,6 +22,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/garray.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 
@@ -31,10 +32,12 @@ public:
   int num_vertices;
   int* vertices;
   csPlane3 normal;
-  csMatrix3 m_obj2tex;
-  csVector3 v_obj2tex;
+  //csTransform t_obj2tex;
+  //csTransform t_obj2lm;
   int mat_index;
-  iPolygonTexture* poly_texture;
+  csPolyTextureMapping* texmap;
+  csPolyLightMapMapping* lmap;
+  iRendererLightmap* rlm;
 };
 
 /**
@@ -68,11 +71,6 @@ public:
   /// Get the vertices array.
   virtual csVector3* GetVertices () const { return vertices; }
 
-  virtual void AddPolygon (int* verts, int num_verts,
-	const csPlane3& poly_normal,
-	int mat_index,
-	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-	iPolygonTexture* poly_texture);
   virtual void AddMaterial (iMaterialHandle* mat_handle);
   virtual int GetMaterialCount () const { return materials.Length (); }
   virtual iMaterialHandle* GetMaterial (int idx) const
@@ -85,6 +83,16 @@ public:
   //Does nothing as default
   virtual void MarkLightmapsDirty();
   virtual const csBox3& GetBoundingBox () const { return bbox; }
+
+  virtual void AddPolygon (int num_verts,
+	int* verts,
+	//csVector2* texcoords,
+	//csVector2* lmcoords,
+	csPolyTextureMapping* texmap,
+	csPolyLightMapMapping* lmap,
+	const csPlane3& poly_normal,
+	int mat_index,
+	iRendererLightmap* lm);
 };
 
 /**

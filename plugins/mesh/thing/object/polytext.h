@@ -254,7 +254,12 @@ private:
   csPolygon3D* polygon;
 
   /// How to map the lightmap on the polygon.
-  csLightMapMapping* mapping;
+  //csLightMapMapping* mapping;
+  csPolyLightMapMapping* mapping;
+  csPolyTextureMapping* tmapping;
+#ifdef COMBINE_LIGHTMAPS
+  csRef<iRendererLightmap> rlm;
+#endif
 
   /// LightMap.
   csLightMap* lm;
@@ -288,7 +293,9 @@ public:
   virtual ~csPolyTexture ();
 
   /// Set Lightmap mapping.
-  void SetLightMapMapping (csLightMapMapping* mapping);
+  void SetLightMapMapping (csPolyLightMapMapping* mapping);
+  void SetTextureMapping (csPolyTextureMapping* mapping);
+  void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**
    * Set the corresponding polygon for this polytexture.
@@ -355,9 +362,21 @@ public:
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;
   virtual iMaterialHandle *GetMaterialHandle ();
-  virtual const csLightMapMapping& GetMapping () const
+  virtual csPolyLightMapMapping* GetLMapping () const
   {
-    return *mapping;
+    return mapping;
+  }
+  virtual csPolyTextureMapping* GetTMapping () const
+  {
+    return tmapping;
+  }
+  virtual iRendererLightmap* GetRendererLightmap () const
+  {
+#ifdef COMBINE_LIGHTMAPS
+    return rlm;
+#else
+    return 0;
+#endif
   }
 
   /// Check if dynamic lighting information should be recalculated

@@ -36,26 +36,6 @@ csPolArrayPolygonBuffer::~csPolArrayPolygonBuffer ()
   Clear ();
 }
 
-void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
-	const csPlane3& poly_normal,
-  	int mat_index,
-	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-	iPolygonTexture* poly_texture)
-{
-  csPolArrayPolygon pol;
-  pol.num_vertices = num_verts;
-  pol.vertices = new int [num_verts];
-  memcpy (pol.vertices, verts, num_verts * sizeof (int));
-  pol.normal = poly_normal;
-  pol.m_obj2tex = m_obj2tex;
-  pol.v_obj2tex = v_obj2tex;
-  pol.mat_index = mat_index;
-  pol.poly_texture = poly_texture;
-  if (poly_texture)
-    poly_texture->IncRef ();
-  polygons.Push (pol);
-}
-
 void csPolArrayPolygonBuffer::SetVertexArray (csVector3* verts, int num_verts)
 {
   delete[] vertices;
@@ -86,8 +66,10 @@ void csPolArrayPolygonBuffer::Clear ()
   {
     csPolArrayPolygon& pol = polygons[i];
     delete[] pol.vertices;
-    if (pol.poly_texture)
-      pol.poly_texture->DecRef ();
+    //delete[] pol.lmcoords;
+    //delete[] pol.texcoords;
+    //if (pol.poly_texture)
+      //pol.poly_texture->DecRef ();
   }
   polygons.SetLength (0);
 
@@ -99,6 +81,46 @@ void csPolArrayPolygonBuffer::Clear ()
 
 void csPolArrayPolygonBuffer::MarkLightmapsDirty()
 {};
+
+void csPolArrayPolygonBuffer::AddPolygon (int num_verts,
+				  	  int* verts,
+					  csPolyTextureMapping* texmap,
+					  csPolyLightMapMapping* lmap,
+					  const csPlane3& poly_normal,
+					  int mat_index,
+					  iRendererLightmap* lm)
+{
+  csPolArrayPolygon pol;
+  pol.num_vertices = num_verts;
+  pol.vertices = new int [num_verts];
+  memcpy (pol.vertices, verts, num_verts * sizeof (int));
+  /*if (lmcoords)
+  {
+    pol.lmcoords = new csVector2 [num_verts];
+    memcpy (pol.lmcoords, lmcoords, num_verts * sizeof (csVector2));
+  }
+  else
+  {
+    pol.lmcoords = 0;
+  }
+  pol.texcoords = new csVector2 [num_verts];
+  memcpy (pol.texcoords, texcoords, num_verts * sizeof (csVector2));*/
+  //pol.t_obj2tex = t_obj2tex;
+  //pol.t_obj2lm = t_obj2lm;
+  pol.texmap = texmap;
+  pol.lmap = lmap;
+  pol.normal = poly_normal;
+  pol.mat_index = mat_index;
+  pol.rlm = lm;
+  polygons.Push (pol);
+/*  pol.m_obj2tex = m_obj2tex;
+  pol.v_obj2tex = v_obj2tex;
+  pol.mat_index = mat_index;
+  pol.poly_texture = poly_texture;
+  if (poly_texture)
+    poly_texture->IncRef ();
+  polygons.Push (pol);*/
+}
 
 csPolArrayVertexBufferManager::csPolArrayVertexBufferManager
 	(iObjectRegistry* object_reg) : csVertexBufferManager (object_reg)

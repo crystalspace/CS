@@ -31,6 +31,7 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "ivideo/txtmgr.h"
 
 class csBox3;
 class csMatrix3;
@@ -38,8 +39,11 @@ class csPlane3;
 class csVector3;
 class csVector2;
 class csColor;
+class csTransform;
 struct iPolygonTexture;
 struct iMaterialHandle;
+struct csPolyTextureMapping;
+struct csPolyLightMapMapping;
 
 SCF_VERSION (iVertexBuffer, 0, 1, 1);
 
@@ -86,7 +90,7 @@ struct iVertexBuffer : public iBase
   virtual const csBox3& GetBoundingBox () const = 0;
 };
 
-SCF_VERSION (iPolygonBuffer, 0, 1, 1);
+SCF_VERSION (iPolygonBuffer, 0, 3, 0);
 
 /**
  * This interface represents a black-box polygon buffer.
@@ -102,25 +106,18 @@ SCF_VERSION (iPolygonBuffer, 0, 1, 1);
 struct iPolygonBuffer : public iBase
 {
   /**
-   * Add a polygon to this buffer. The data pointed to by 'verts'
-   * is copied so it can be discarded after calling AddPolygon.
-   * 'mat_index' is an index in the material table (initialized
-   * with AddMaterial()). It is best to add the polygons sorted by
-   * material as that will generate the most efficient representation
-   * on hardware.
-   */
-  virtual void AddPolygon (int* verts, int num_verts,
-	const csPlane3& poly_normal,
-	int mat_index,
-	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-	iPolygonTexture* poly_texture) = 0;
-
-  /**
    * Set vertices to use for the polygons.
-   * The given array is copied.
+   * The given array is copied. 
    */
   virtual void SetVertexArray (csVector3* verts, int num_verts) = 0;
-
+  /**
+   * Gets the number of vertices.
+   */
+  virtual int iPolygonBuffer::GetVertexCount () const = 0;
+  /**
+   * Gets the array of vertices.  	
+   */
+  virtual csVector3* iPolygonBuffer::GetVertices () const = 0;
   /**
    * Add a material.
    */
@@ -133,13 +130,6 @@ struct iPolygonBuffer : public iBase
    * Get a material.
    */
   virtual iMaterialHandle* GetMaterial (int idx) const = 0;
-
-  /// Gets the numebr of vertices
-  virtual int GetVertexCount() const = 0;
-
-  ///Gets the array of vertices
-
-  virtual csVector3* GetVertices() const = 0;
 
   /**
    * Set a previously added material (this can be used to change
@@ -166,6 +156,22 @@ struct iPolygonBuffer : public iBase
    * Get a bounding box for all the vertices.
    */
   virtual const csBox3& GetBoundingBox () const = 0;
+
+  /**
+   * Add a polygon to this buffer. The data pointed to by 'verts'
+   * is copied so it can be discarded after calling AddPolygon.
+   * 'mat_index' is an index in the material table (initialized
+   * with AddMaterial()). It is best to add the polygons sorted by
+   * material as that will generate the most efficient representation
+   * on hardware.
+   */
+  virtual void AddPolygon (int num_verts,
+	int* verts,
+	csPolyTextureMapping* texmap,
+	csPolyLightMapMapping* lmap,
+	const csPlane3& poly_normal,
+	int mat_index,
+	iRendererLightmap* lm) = 0;
 };
 
 SCF_VERSION (iVertexBufferManagerClient, 0, 0, 1);

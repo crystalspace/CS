@@ -38,7 +38,6 @@
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "plugins/video/renderer/common/polybuf.h"
-#include "ogl_polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
@@ -57,6 +56,7 @@ class OpenGLTextureCache;
 class OpenGLLightmapCache;
 class csTextureHandleOpenGL;
 class csTextureManagerOpenGL;
+class csTriangleArrayVertexBufferManager;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iPluginManager;
@@ -662,7 +662,7 @@ public:
   virtual void ClearCache ();
 
   /// Remove some polygon from the cache.
-  virtual void RemoveFromCache (iPolygonTexture* poly_texture);
+  virtual void RemoveFromCache (iRendererLightmap* rlm);
 
   /// Get drawing buffer width
   virtual int GetWidth ()
@@ -770,7 +770,7 @@ public:
 
   /// Get the vertex buffer manager.
   virtual iVertexBufferManager* GetVertexBufferManager ()
-  { return vbufmgr; }
+  { return (iVertexBufferManager*)vbufmgr; }
 
   /**
    * Initiate a volumetric fog object. This function will be called
@@ -853,7 +853,8 @@ public:
   void DrawPolygonSingleTexture (G3DPolygonDP &poly);
 
   /// Check if lightmap is not too large
-  virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
+  virtual bool IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize);
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
   virtual iTextureHandle* GetRenderTarget () const

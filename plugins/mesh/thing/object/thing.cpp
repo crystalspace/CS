@@ -46,6 +46,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/array.h"
 #include "csutil/garray.h"
+#include "csutil/cfgacc.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
@@ -65,6 +66,13 @@
 
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rendermesh.h"
+#endif
+
+#ifdef COMBINE_LIGHTMAPS
+#include "igraphic/imageio.h"
+#include "csgfx/memimage.h"
+#include "csgeom/subrec.h"
+#include "csgeom/subrec2.h"
 #endif
 
 CS_IMPLEMENT_PLUGIN
@@ -1035,6 +1043,10 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
   polybuf_materials = 0;
 
   current_visnr = 1;
+
+#ifdef COMBINE_LIGHTMAPS
+  lightmapsPrepared = false;
+#endif
 }
 
 csThing::~csThing ()
@@ -1043,6 +1055,10 @@ csThing::~csThing ()
   if (polybuf) polybuf->DecRef ();
 #endif // CS_USE_NEW_RENDERER
   delete[] polybuf_materials;
+
+#ifdef COMBINE_LIGHTMAPS
+  ClearLMs ();
+#endif
 
   if (wor_verts != static_data->obj_verts)
   {
@@ -1116,6 +1132,9 @@ void csThing::MarkLightmapsDirty ()
   if (polybuf)
     polybuf->MarkLightmapsDirty ();
 #endif // CS_USE_NEW_RENDERER
+#ifdef COMBINE_LIGHTMAPS
+  lightmapsDirty = true;
+#endif
   light_version++;
 }
 
@@ -1293,9 +1312,24 @@ void csThing::Prepare ()
       if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
       else movablenr--;
 
+    #ifndef CS_USE_NEW_RENDERER
+      if (polybuf)
+      {
+	polybuf->DecRef ();
+	polybuf = 0;
+      }
+    #endif // CS_USE_NEW_RENDERER
+
+#if 1
+      delete[] polybuf_materials;
+      polybuf_materials = 0;
+
       int i;
       csPolygon3D *p;
       csPolygon3DStatic *ps;
+#ifdef COMBINE_LIGHTMAPS
+      ClearLMs ();
+#endif
       polygons.DeleteAll ();
       for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
       {
@@ -1307,6 +1341,60 @@ void csThing::Prepare ()
 	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
 	p->Finish ();
       }
+
+#else
+      /*
+        Here, only 'changes' in the static data are duplicated (i.e. adding
+	and removal of polys.) However, the algo below has the problem that if
+	a poly is removed and immediately afterward a new poly is created, the 
+	address of the new poly may be the same the old poly had - thus, it's not
+	recognized that it was removed and re-added.
+       */
+      int i;
+      csHashSet staticPolys;
+      csPolygon3DStatic *ps;
+
+      for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
+      {
+	ps = static_data->static_polygons.Get (i);
+	staticPolys.Add ((csHashObject)ps);
+      }
+
+      i = 0;
+      csPolygon3D *p;
+      while (i < polygons.Length ())
+      {
+	p = polygons.Get (i);
+	ps = p->GetStaticData ();
+	if (staticPolys.In ((csHashObject)ps))
+	{
+	  staticPolys.Delete ((csHashObject)ps);
+	  i++;
+	}
+	else
+	{
+	  polygons.Delete (i);
+	}
+      }
+      csGlobalHashIterator spIt (staticPolys.GetHashMap ());
+
+      while (spIt.HasNext ())
+      {
+	p = static_data->thing_type->blk_polygon3d.Alloc ();
+	ps = (csPolygon3DStatic*)spIt.Next ();
+	p->SetStaticData (ps);
+	p->SetParent (this);
+	polygons.Push (p);
+	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
+	p->Finish ();
+      }
+#endif
+
+      MarkLightmapsDirty ();
+#ifdef COMBINE_LIGHTMAPS
+      ClearLMs ();
+      PrepareLMs ();
+#endif
     }
     return;
   }
@@ -1353,6 +1441,9 @@ void csThing::Prepare ()
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->Finish ();
   }
+
+  // don't prepare lightmaps yet - the LMs may still be unlit,
+  // as this function is called from within 'ReadFromCache()'.
 }
 
 iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
@@ -1618,16 +1709,6 @@ struct MatPol
   csPolygon3D *poly;
 };
 
-static int compare_material (const void *p1, const void *p2)
-{
-  MatPol *sp1 = (MatPol *)p1;
-  MatPol *sp2 = (MatPol *)p2;
-  if (sp1->mat < sp2->mat)
-    return -1;
-  else if (sp1->mat > sp2->mat)
-    return 1;
-  return 0;
-}
 #endif // CS_USE_NEW_RENDERER
 
 void csThing::PreparePolygonBuffer ()
@@ -1635,6 +1716,87 @@ void csThing::PreparePolygonBuffer ()
 #ifndef CS_USE_NEW_RENDERER
   if (polybuf) return ;
 
+#ifdef COMBINE_LIGHTMAPS
+  struct csPolyLMCoords
+  {
+    float u1, v1, u2, v2;
+  };
+
+  iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
+    GetVertexBufferManager ();
+  polybuf = vbufmgr->CreatePolygonBuffer ();
+
+  csGrowingArray<int> verts;
+
+  polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
+
+  polybuf_material_count = 0;
+  delete[] polybuf_materials;
+  polybuf_materials = new iMaterialWrapper* [litPolys.Length () + unlitPolys.Length ()];
+
+  int i;
+  for (i = 0; i < litPolys.Length (); i++)
+  {
+    int mi = polybuf->GetMaterialCount ();
+    polybuf_materials[polybuf_material_count] = 
+      litPolys[i].material;
+    polybuf_material_count++;
+    polybuf->AddMaterial (litPolys[i].material->GetMaterialHandle ());
+    int j;
+    for (j = 0; j < litPolys[i].polys.Length (); j++)
+    {
+      verts.DeleteAll ();
+
+      csPolygon3D *poly = litPolys[i].polys[j];
+      csPolygon3DStatic *spoly = poly->GetStaticData ();
+      csPolyLightMapMapping *mapping = spoly->GetLightMapMapping ();
+      csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
+
+      int v;
+      for (v = 0; v < spoly->GetVertexCount (); v++)
+      {
+	const int vnum = spoly->GetVertices ().GetVertex (v);
+	verts.Push (vnum);
+      }
+
+      polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
+	tmapping, mapping, 
+	spoly->GetObjectPlane (), 
+	mi, litPolys[i].lightmaps[j]);
+    }
+  }
+
+  for (i = 0; i < unlitPolys.Length (); i++)
+  {
+    int mi = polybuf->GetMaterialCount ();
+    polybuf_materials[polybuf_material_count] = 
+      unlitPolys[i].material;
+    polybuf_material_count++;
+    polybuf->AddMaterial (unlitPolys[i].material->GetMaterialHandle ());
+    int j;
+    for (j = 0; j < unlitPolys[i].polys.Length (); j++)
+    {
+      verts.DeleteAll ();
+
+      csPolygon3D *poly = unlitPolys[i].polys[j];
+      csPolygon3DStatic *spoly = poly->GetStaticData ();
+      csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
+
+      int v;
+      for (v = 0; v < spoly->GetVertexCount (); v++)
+      {
+	const int vnum = spoly->GetVertices ().GetVertex (v);
+	verts.Push (vnum);
+      }
+
+      polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
+	tmapping, 0, spoly->GetObjectPlane (), 
+	mi, 0);
+    }
+  }
+
+  polybuf->Prepare ();
+#else
   iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
     GetVertexBufferManager ();
   polybuf = vbufmgr->CreatePolygonBuffer ();
@@ -1735,6 +1897,7 @@ void csThing::PreparePolygonBuffer ()
 
   delete[] matpol;
   polybuf->Prepare ();
+#endif // COMBINE_LIGHTMAPS
 #endif // CS_USE_NEW_RENDERER
 }
 
@@ -2024,6 +2187,9 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
   draw_busy++;
 
+  PrepareLMs ();
+  UpdateDirtyLMs ();
+
   if (static_data->flags.Check (CS_THING_FASTMESH))
     DrawPolygonArrayDPM (
       polygons.GetArray (),
@@ -2188,6 +2354,10 @@ void csThing::PrepareLighting ()
   int i;
   for (i = 0; i < polygons.Length (); i++)
     polygons.Get (i)->PrepareLighting ();
+
+#ifdef COMBINE_LIGHTMAPS
+  PrepareLMs ();
+#endif
 }
 
 void csThing::Merge (csThing *other)
@@ -2244,6 +2414,103 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 }
 #endif
 
+#ifdef COMBINE_LIGHTMAPS
+
+#ifdef CS_DEBUG
+#define LM_BORDER 1
+#else
+#define LM_BORDER 0
+#endif
+
+void csThing::PrepareLMs ()
+{
+  if (lightmapsPrepared) return;
+
+  csHashMap polysSorted;
+
+  int i;
+  for (i = 0; i < polygons.Length (); i++)
+  {
+    csPolygon3D* poly = polygons.Get (i);
+
+    csPolyTexture* polytxt = poly->GetPolyTexture ();
+    if (polytxt)
+    {
+      iMaterialWrapper* smat = poly->GetStaticData ()->GetMaterialWrapper ();
+      iMaterialWrapper* mat = FindRealMaterial (smat);
+      if (mat == 0) mat = smat;
+
+      csPolyGroup* lp = (csPolyGroup*)polysSorted.Get ((csHashKey)mat);
+
+      if (lp == 0)
+      {
+	lp = new csPolyGroup;
+	lp->material = mat;
+	polysSorted.Put ((csHashKey)mat, (csHashObject)lp);
+      }
+
+      lp->polys.Push (poly);
+    }
+  }
+  {
+    csGlobalHashIterator polyIt (&polysSorted);
+
+    litPolys.DeleteAll ();
+    unlitPolys.DeleteAll ();
+
+    while (polyIt.HasNext ())
+    {
+      csPolyGroup* lp = (csPolyGroup*)polyIt.Next ();
+
+      csPolyGroup rejectedPolys;
+
+      static_data->thing_type->AllocLightmaps (*lp, litPolys,
+	rejectedPolys);
+      unlitPolys.Push (rejectedPolys);
+
+      delete lp;
+    }
+  }
+
+  lightmapsPrepared = true;
+  lightmapsDirty = true;
+}
+
+void csThing::ClearLMs ()
+{
+  if (!lightmapsPrepared) return;
+
+  static_data->thing_type->FreeLightmaps (litPolys);
+
+  lightmapsPrepared = false;
+  lightmapsDirty = true;
+}
+
+void csThing::UpdateDirtyLMs ()
+{
+  if (!lightmapsDirty) return;
+
+  int i;
+  for (i = 0; i < litPolys.Length (); i++)
+  {
+    int j;
+    for (j = 0; j < litPolys[i].polys.Length (); j++)
+    {
+      csPolygon3D *poly = litPolys[i].polys[j];
+      csPolyTexture* lmi = poly->GetPolyTexture ();
+      if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights ())	
+      {
+	litPolys[i].lightmaps[j]->SetData (
+	  lmi->GetLightMap ()->GetMapData ());
+      }
+    }
+  }
+
+  lightmapsDirty = false;
+}
+
+#endif
+
 //---------------------------------------------------------------------------
 
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
@@ -2291,6 +2558,7 @@ SCF_IMPLEMENT_IBASE(csThingObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingEnvironment)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiComponent)
@@ -2305,6 +2573,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiConfig)
   SCF_IMPLEMENTS_INTERFACE(iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiDebugHelper)
+  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
 
@@ -2312,6 +2584,7 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_polygon3d (2000),
 	blk_polygon3dstatic (2000),
 	blk_lightmapmapping (2000),
+	blk_texturemapping (2000),
 	blk_polytex (2000),
 	blk_lightmap (2000)
 {
@@ -2320,6 +2593,7 @@ printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"); fflush (stdou
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
   render_pol2d_pool = 0;
   do_verbose = false;
@@ -2329,6 +2603,13 @@ csThingObjectType::~csThingObjectType ()
 {
   delete render_pol2d_pool;
   delete lightpatch_pool;
+
+#ifdef COMBINE_LIGHTMAPS
+  for (int i = 0; i < superLMs.Length(); i++)
+  {
+    superLMs[i].Clear ();
+  }
+#endif
 printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"); fflush (stdout);
 }
 
@@ -2354,6 +2635,28 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     do_verbose = cmdline->GetOption ("verbose") != 0;
   }
 
+#ifdef COMBINE_LIGHTMAPS
+  csRef<iTextureManager> txtmgr = g->GetTextureManager ();
+
+  int maxTW, maxTH, maxTA;
+  txtmgr->GetMaxTextureSize (maxTW, maxTH, maxTA);
+
+  csConfigAccess cfg (object_reg, "/config/thing.cfg");
+
+  minLightmapSize = cfg->GetInt ("Thing.MaxSuperlightmapSize", 32);
+  minLightmapSize = MIN (minLightmapSize, MIN (maxTW, maxTH));
+
+  maxLightmapSize = cfg->GetInt ("Thing.MaxSuperlightmapSize", 256);
+  maxLightmapSize = MIN (maxLightmapSize, MIN (maxTW, maxTH));
+
+  int lms = minLightmapSize;
+  while (lms <= maxLightmapSize)
+  {
+    superLMs.Push (csSuperLMArray (lms));
+    lms <<= 1;
+  }
+#endif
+
   return true;
 }
 
@@ -2361,9 +2664,250 @@ void csThingObjectType::Clear ()
 {
   delete lightpatch_pool;
   delete render_pol2d_pool;
+
   lightpatch_pool = new csLightPatchPool ();
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
 }
+
+#ifdef COMBINE_LIGHTMAPS
+
+static int CompareSuperLM (void* item1, void* item2)
+{
+  SuperLM* slm1 = (SuperLM*)item1;
+  SuperLM* slm2 = (SuperLM*)item2;
+
+  int d = slm2->freeLumels - slm1->freeLumels;
+  if (d != 0) return d;
+  return ((uint8*)item2 - (uint8*)item1);
+}
+
+static int ComparePolys (void* item1, void* item2)
+{
+  csPolygon3D* poly1 = (csPolygon3D*)item1;
+  csPolygon3D* poly2 = (csPolygon3D*)item2;
+
+  csLightMap* lm1 = poly1->GetPolyTexture ()->GetCSLightMap ();
+  csLightMap* lm2 = poly2->GetPolyTexture ()->GetCSLightMap ();
+
+  int maxdim1, mindim1, maxdim2, mindim2;
+
+  maxdim1 = MAX (lm1->GetRealWidth (), lm1->GetRealHeight ());
+  mindim1 = MIN (lm1->GetRealWidth (), lm1->GetRealHeight ());
+  maxdim2 = MAX (lm2->GetRealWidth (), lm2->GetRealHeight ());
+  mindim2 = MIN (lm2->GetRealWidth (), lm2->GetRealHeight ());
+
+  if (maxdim1 == maxdim2)
+  {
+    return (mindim1 - mindim2);
+  }
+
+  return (maxdim1 - maxdim2);
+}
+
+void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
+					csArray<csLitPolyGroup>& outputPolys, 
+					csPolyGroup& rejectedPolys)
+{
+  struct internalPolyGroup : public csPolyGroup
+  {
+    int totalLumels;
+    int maxlmw, maxlmh;
+  };
+
+  internalPolyGroup inputQueues[2];
+  int curQueue = 0;
+
+  int i;
+
+  rejectedPolys.material = inputPolys.material;
+  inputQueues[0].material = inputPolys.material;
+  inputQueues[0].totalLumels = 0;
+  inputQueues[0].maxlmw = 0;
+  inputQueues[0].maxlmh = 0;
+  inputQueues[1].material = inputPolys.material;
+  // Sort polys and filter out oversized polys on the way
+  for (i = 0; i < inputPolys.polys.Length(); i++)
+  {
+    csPolygon3D* poly = inputPolys.polys.Get (i);
+    csPolyTexture* polytxt = poly->GetPolyTexture ();
+    csLightMap* lm = polytxt->GetCSLightMap ();
+    if (lm == 0)
+    {
+      rejectedPolys.polys.Push (poly);
+      continue;
+    }
+
+    int lmw = (lm->GetRealWidth () + LM_BORDER);
+    int lmh = (lm->GetRealHeight () + LM_BORDER);
+
+    if ((lmw > maxLightmapSize) || (lmh > maxLightmapSize)) 
+    {
+      rejectedPolys.polys.Push (poly);
+    }
+    else
+    {
+      inputQueues[0].totalLumels += (lmw * lmh);
+      inputQueues[0].maxlmw = MAX (inputQueues[0].maxlmw, lmw);
+      inputQueues[0].maxlmh = MAX (inputQueues[0].maxlmh, lmh);
+      inputQueues[0].polys.InsertSorted (poly, ComparePolys);
+    }
+  }
+
+  while (inputQueues[curQueue].polys.Length () > 0)
+  {
+    // Find place for as much polys as possible
+    csSuperLMArray* sla = 0;
+    csSuperLMArray* masla = 0;
+    int maxAvailLumels = 0;
+    for (i = 0; i < superLMs.Length(); i++)
+    {
+      if ((superLMs[i].width >= inputQueues[curQueue].maxlmw) &&
+	  (superLMs[i].height >= inputQueues[curQueue].maxlmh))
+      {
+	if (superLMs[i].maxLumels >= maxAvailLumels)
+	{
+	  maxAvailLumels = superLMs[i].maxLumels;
+	  masla = &superLMs[i];
+	}
+	if (superLMs[i].maxLumels >= inputQueues[curQueue].totalLumels)
+	{
+	  sla = &superLMs[i];
+	  break;
+	}
+      }
+    }
+    if (sla == 0)
+    {
+      sla = masla;
+    }
+    CS_ASSERT (sla != 0);
+
+    // Now try to fit as much polys as possible into the SLM.
+    int s = 0;
+    while (s < sla->SLMs.Length ())
+    {
+      csLitPolyGroup curOutputPolys;
+      SuperLM* slm = sla->SLMs[s];
+      curOutputPolys.thingTypeSLM = slm;
+      curOutputPolys.material = inputQueues[curQueue].material;
+        
+      inputQueues[curQueue ^ 1].totalLumels = 0;
+      inputQueues[curQueue ^ 1].maxlmw = 0;
+      inputQueues[curQueue ^ 1].maxlmh = 0;
+
+      while (inputQueues[curQueue].polys.Length () > 0)
+      {
+	bool stuffed = false;
+	csRef<iRendererLightmap> rlm;
+	csSubRect2* slmSR;
+	csPolygon3D* poly = inputQueues[curQueue].polys.Pop ();
+	csPolyTexture* polytxt = poly->GetPolyTexture ();
+	csLightMap* lm = polytxt->GetCSLightMap ();
+
+	int lmw = (lm->GetRealWidth () + LM_BORDER);
+	int lmh = (lm->GetRealHeight () + LM_BORDER);
+
+	if ((lmw * lmh) <= slm->freeLumels)
+	{
+	  csRect r;
+	  if ((slmSR = slm->GetRects ()->Alloc (lmw, lmh, r)) != 0)
+	  {
+	    rlm = 
+	      slm->rendererSLM->RegisterLightmap (r.xmin, r.ymin, 
+	        lmw - LM_BORDER, lmh - LM_BORDER);
+	    //polytxt->RecalculateDynamicLights ();
+	    //rlm->SetData (lm->GetMapData ());
+
+	    rlm->SetLightCellSize (polytxt->GetLightCellSize ());
+	    polytxt->SetRendererLightmap (rlm);
+
+	    stuffed = true;
+	    slm->freeLumels -= (lmw * lmh);
+	  }
+	}
+
+	if (stuffed)
+	{
+	  curOutputPolys.polys.Push (poly);
+	  curOutputPolys.lightmaps.Push (rlm);
+	  curOutputPolys.slmSubrects.Push (slmSR);
+	}
+	else
+	{
+	  inputQueues[curQueue ^ 1].polys.InsertSorted (poly, ComparePolys);
+	  inputQueues[curQueue ^ 1].totalLumels += (lmw * lmh);
+	  inputQueues[curQueue ^ 1].maxlmw =
+	    MAX (inputQueues[curQueue ^ 1].maxlmw, lmw);
+	  inputQueues[curQueue ^ 1].maxlmh =
+	    MAX (inputQueues[curQueue ^ 1].maxlmh, lmh);
+	}
+      }
+      sla->SLMs.Delete (s);
+      int nidx = sla->SLMs.InsertSorted (slm, CompareSuperLM);
+      if (nidx <= s + 1)
+      {
+	s++;
+      }
+
+      if (curOutputPolys.polys.Length () > 0)
+      {
+	outputPolys.Push (curOutputPolys);
+      }
+    
+      curQueue ^= 1;
+    }
+
+    // Add a new empty SLM. Not all polys could be stuffed away, 
+    // so we possibly need more space.
+    if (inputQueues[curQueue].polys.Length () > 0)
+    {
+      SuperLM* newslm = new SuperLM (G3D, sla->width, sla->height);
+      sla->SLMs.InsertSorted (newslm, CompareSuperLM);
+    }
+  }
+
+}
+
+void csThingObjectType::FreeLightmaps (csArray<csLitPolyGroup>& polys)
+{
+  int i, j;
+  for (i = 0; i < polys.Length(); i++)
+  {
+    csLitPolyGroup& curPolys = polys[i];
+
+    for (j = 0; j < curPolys.polys.Length(); j++)
+    {
+      int l, t, w, h;
+      curPolys.lightmaps[j]->GetSLMCoords (l, t, w, h);
+      curPolys.thingTypeSLM->freeLumels += ((w + LM_BORDER) * (h + LM_BORDER));
+      curPolys.thingTypeSLM->GetRects ()->Reclaim (curPolys.slmSubrects[j]);
+      curPolys.lightmaps[j] = 0;	  
+    }
+  }
+  
+  polys.DeleteAll ();			    
+
+  // remove empty SLMs 
+  for (i = 0; i < superLMs.Length (); i++)
+  {
+    j = 0;
+    while (j < superLMs[i].SLMs.Length ())
+    {
+      SuperLM* slm = superLMs[i].SLMs[j];
+      if (slm->freeLumels == (slm->width * slm->height))
+      {
+	superLMs[i].SLMs.Delete (j);
+	delete slm;
+      }
+      else
+      {
+	j++;
+      }
+    }
+  }
+}
+
+#endif
 
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
@@ -2374,26 +2918,76 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
+bool csThingObjectType::DebugCommand (const char* cmd)
+{
+#ifdef COMBINE_LIGHTMAPS
+  if (strcasecmp (cmd, "dump_slms") == 0)
+  {
+    csRef<iImageIO> imgsaver =
+      CS_QUERY_REGISTRY (object_reg, iImageIO);
+    if (!imgsaver)
+    {
+      Warn ("Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs =
+      CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (!vfs)
+    {
+      Warn ("Could not get VFS.");
+      return false;
+    }
+
+    for (int i = 0; i < superLMs.Length(); i++)
+    {
+      for (int j = 0; j < superLMs[i].SLMs.Length (); j++)
+      {
+	csRef<iImage> img = superLMs[i].SLMs[j]->rendererSLM->Dump ();
+	if (img)
+	{
+	  csRef<iDataBuffer> buf = imgsaver->Save 
+	    (img, "image/png");
+	  if (!buf)
+	  {
+	    Warn ("Could not save super lightmap.");
+	  }
+	  else
+	  {
+	    csString outfn;
+	    outfn.Format ("/temp/thingslm_%03d_%d.png", 
+	      minLightmapSize << i, j);
+	    if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	    {
+	      Warn ("Could not write to %s.", outfn.GetData ());
+	    }
+	    else
+	    {
+	      Notify ("Dumped %dx%d SLM to %s", 
+		superLMs[i].SLMs[j]->width,
+		superLMs[i].SLMs[j]->height,
+		outfn.GetData ());
+	    }
+	  }
+	}
+      }
+    }
+    return true;
+  }
+#endif
+  return false;
+}
+
 void csThingObjectType::Warn (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
 
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, 
+    CS_REPORTER_SEVERITY_WARNING,
+    "crystalspace.mesh.object.thing",
+    description,
+    arg);
 
   va_end (arg);
 }
@@ -2403,21 +2997,11 @@ void csThingObjectType::Bug (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_BUG,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, 
+    CS_REPORTER_SEVERITY_BUG,
+    "crystalspace.mesh.object.thing",
+    description,
+    arg);
 
   va_end (arg);
 }
@@ -2427,21 +3011,11 @@ void csThingObjectType::Error (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, 
+    CS_REPORTER_SEVERITY_ERROR,
+    "crystalspace.mesh.object.thing",
+    description,
+    arg);
 
   va_end (arg);
 }
@@ -2451,21 +3025,11 @@ void csThingObjectType::Notify (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
-  csRef<iReporter> Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-
-  if (Reporter)
-  {
-    Reporter->ReportV (
-        CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.engine.warning",
-        description,
-        arg);
-  }
-  else
-  {
-    csPrintfV (description, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, 
+    CS_REPORTER_SEVERITY_NOTIFY,
+    "crystalspace.mesh.object.thing",
+    description,
+    arg);
 
   va_end (arg);
 }
@@ -2518,4 +3082,3 @@ bool csThingObjectType::eiConfig::GetOptionDescription (
 }
 
 //---------------------------------------------------------------------------
-

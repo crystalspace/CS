@@ -83,8 +83,8 @@ void csScan_Initialize ()
   // ~1.5K
   Scan.exp_256 = new unsigned char [EXP_256_SIZE+3];
   // 6*8K
-  memset (&Scan.BlendingTable, sizeof (Scan.BlendingTable), 0);
-  memset (&Scan.BlendingTableProc, sizeof (Scan.BlendingTableProc), 0);
+  memset (&Scan.BlendingTable, 0, sizeof (Scan.BlendingTable));
+  memset (&Scan.BlendingTableProc, 0, sizeof (Scan.BlendingTableProc));
 
   int i;
   for (i = 1; i < (1 << 12); i++)
@@ -176,7 +176,9 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  iPolygonTexture* tex, csTextureHandleSoftware* texture,
+  /*iPolygonTexture* tex*/csPolyTextureMapping* tmapping, 
+  csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm, 
+  csTextureHandleSoftware* texture,
   csTextureSoftware *untxt)
 {
   Scan.Texture = texture;
@@ -193,7 +195,8 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
 
   if (g3d->do_lighting)
   {
-    SoftwareCachedTexture *tclt = (SoftwareCachedTexture *)tex->GetCacheData (MipMap);
+    SoftwareCachedTexture *tclt = 
+      rlm ? (SoftwareCachedTexture *)rlm->cacheData[MipMap] : 0;
     if (tclt)
       Scan.bitmap2 = tclt->get_bitmap ();
     else
@@ -201,17 +204,16 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   }
   else
     Scan.bitmap2 = 0;
-  const csLightMapMapping& mapping = tex->GetMapping ();
-  Scan.tw2 = mapping.GetWidth () >> MipMap;
-  Scan.th2 = mapping.GetHeight () >> MipMap;
-  Scan.min_u = (mapping.GetIMinU () >> MipMap) << 16;
-  Scan.min_v = (mapping.GetIMinV () >> MipMap) << 16;
+  Scan.tw2 = mapping->GetWidth () >> MipMap;
+  Scan.th2 = mapping->GetHeight () >> MipMap;
+  Scan.min_u = (tmapping->GetIMinU () >> MipMap) << 16;
+  Scan.min_v = (tmapping->GetIMinV () >> MipMap) << 16;
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
   Scan.th2fp = (Scan.th2 << 16) - 1;
 #endif
-  Scan.shf_u = mapping.GetShiftU () - MipMap;
+  Scan.shf_u = tmapping->GetShiftU () - MipMap;
 
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;

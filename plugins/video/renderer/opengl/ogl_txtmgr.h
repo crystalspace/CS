@@ -20,6 +20,8 @@
 #define __CS_TXTMGR_OPENGL_H__
 
 #include "csutil/scf.h"
+#include "csutil/blockallocator.h"
+#include "csgeom/csrect.h"
 #include "video/renderer/common/txtmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -146,6 +148,65 @@ public:
   void UpdateTexture ();
 };
 
+class csGLSuperLightmap;
+
+class csGLRendererLightmap : iRendererLightmap
+{
+  friend class csGLSuperLightmap;
+  friend class csGraphics3DOGLCommon;
+
+  csRect rect;
+  float u1, v1, u2, v2;
+  csRef<csGLSuperLightmap> slm;
+  csRGBpixel* data;
+
+  bool mean_calculated;
+  float mean_r, mean_g, mean_b;
+public:
+  SCF_DECLARE_IBASE;
+
+  csGLRendererLightmap ();
+  virtual ~csGLRendererLightmap ();
+
+  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
+    float &lm_u2, float& lm_v2);
+    
+  virtual void GetSLMCoords (int& left, int& top, 
+    int& width, int& height);
+    
+  virtual void SetData (csRGBpixel* data);
+
+  virtual void SetLightCellSize (int size);
+
+  void GetMeanColor (float& r, float& g, float& b);
+};
+
+class csGLSuperLightmap : public iSuperLightmap
+{
+  friend class csGLRendererLightmap;
+  friend class csGraphics3DOGLCommon;
+
+  GLuint texHandle;
+  int w, h;
+  int numRLMs;
+
+  csBlockAllocator<csGLRendererLightmap> RLMs;
+
+  void CreateTexture ();
+  void DeleteTexture ();
+  void FreeRLM (csGLRendererLightmap* rlm);
+public:
+  SCF_DECLARE_IBASE;
+
+  csGLSuperLightmap (int width, int height);
+  virtual ~csGLSuperLightmap ();
+
+  virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
+    int width, int height);
+
+  virtual csPtr<iImage> Dump ();
+};
+
 /**
  * OpenGL version of the texture manager.
  */
@@ -207,6 +268,10 @@ public:
    * (ensures that all software proctexes have the needed textures) 
    */
   virtual void FreeImages ();
+
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
+  
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 
 #define CS_GL_FORMAT_TABLE(var) \

@@ -23,31 +23,18 @@
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_g3dcom.h"
-#include "imesh/thing/lightmap.h" //@@@!!!
-#include "imesh/thing/polygon.h"  //@@@!!!
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
 #include "video/canvas/openglcommon/glstates.h"
 
+#include "igraphic/imageio.h"
+#include "iutil/vfs.h"
+#include "csgfx/memimage.h"
 
 // need definitions of R24(), G24(), and B24()
 #ifndef CS_NORMAL_LIGHT_LEVEL
 #define CS_NORMAL_LIGHT_LEVEL 128
 #endif
-
-//------------------------------------------------------------------------//
-void csSLMCacheData::Alloc (csTrianglesPerSuperLightmap* s)
-{
-  source = s;
-  source->cacheData = this;
-  isUnlit = source->isUnlit;
-}
-
-void csSLMCacheData::Clear()
-{
-  source->cacheData = 0;
-}
-
 
 //---------------------------------------------------------------------------//
 
@@ -239,48 +226,11 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
 //----------------------------------------------------------------------------//
 
-csSuperLightMap::csSuperLightMap ()
-{
-  cacheData = 0;
-  Handle = 0;
-}
-
-csSuperLightMap::~csSuperLightMap ()
-{
-  Clear ();
-  glDeleteTextures (1, &Handle);
-}
-
-void csSuperLightMap::Alloc (csTrianglesPerSuperLightmap* s)
-{
-  cacheData->Alloc (s);
-}
-
-void csSuperLightMap::Clear ()
-{
-  if (cacheData)
-  {
-    cacheData->Clear ();
-    delete cacheData;
-    cacheData = 0;
-  }
-}
-
-//----------------------------------------------------------------------------//
-
 int OpenGLLightmapCache::super_lm_num[4];
 int OpenGLLightmapCache::super_lm_size = DEFAULT_SUPER_LM_SIZE;
 
 OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 {
-  int i;
-  for (i = 0 ; i < 4 ; i++)
-  {
-    if (super_lm_num[i])
-      suplm[i] = new csSuperLightMap [super_lm_num[i]];
-    else
-      suplm[i] = 0;
-  }
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
   global_timestamp = 0;
@@ -297,259 +247,31 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 OpenGLLightmapCache::~OpenGLLightmapCache ()
 {
   Clear ();
-  delete[] suplm[0];
-  delete[] suplm[1];
-  delete[] suplm[2];
-  delete[] suplm[3];
-
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // Delete the temporary handle
-  glDeleteTextures (1, &TempHandle0);
-  glDeleteTextures (1, &TempHandle1);
-  glDeleteTextures (1, &TempHandle2);
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//  delete[] suplm[0];
+//  delete[] suplm[1];
+//  delete[] suplm[2];
+//  delete[] suplm[3];
 }
 
 void OpenGLLightmapCache::Setup ()
 {
   if (initialized) return;
   initialized = true;
-  int size = super_lm_size;
-  int q;
-  for (q = 0 ; q < 4 ; q++)
-  {
-    int i;
-    for (i = 0 ; i < super_lm_num[q] ; i++)
-    {
-      GLuint lightmaphandle;
-      glGenTextures (1, &lightmaphandle);
-      suplm[q][i].Handle = lightmaphandle;
-      csGraphics3DOGLCommon::statecache->SetTexture (
-        GL_TEXTURE_2D, lightmaphandle);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      // Normally OpenGL specs say that the last parameter to glTexImage2D
-      // can be a 0 pointer. Unfortunatelly not all drivers seem to
-      // support that. So I give a dummy texture here.
-      char* buf = new char [size*size*4];
-      memset (buf, 0, 4*size*size);
-      glTexImage2D (GL_TEXTURE_2D, 0, 3, size, size,
-          0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-      delete[] buf;
-    }
-    size >>= 1;
-  }
-
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // Initialize the temporary handle
-  char* buf;
-  glGenTextures (1, &TempHandle0);
-  csGraphics3DOGLCommon::statecache->SetTexture (
-      GL_TEXTURE_2D, TempHandle0);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a 0 pointer. Unfortunatelly not all drivers seem to
-  // support that. So I give a dummy texture here.
-  buf = new char [super_lm_size*super_lm_size*4];
-  memset (buf, 0, 4*super_lm_size*super_lm_size);
-  glTexImage2D (GL_TEXTURE_2D, 0, 3, super_lm_size, super_lm_size,
-      0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-  delete[] buf;
-
-  glGenTextures (1, &TempHandle1);
-  csGraphics3DOGLCommon::statecache->SetTexture (
-      GL_TEXTURE_2D, TempHandle1);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a 0 pointer. Unfortunatelly not all drivers seem to
-  // support that. So I give a dummy texture here.
-  buf = new char [64*64*4];
-  memset (buf, 0, 4*64*64);
-  glTexImage2D (GL_TEXTURE_2D, 0, 3, 64, 64,
-      0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-  delete[] buf;
-
-  glGenTextures (1, &TempHandle2);
-  csGraphics3DOGLCommon::statecache->SetTexture (
-      GL_TEXTURE_2D, TempHandle2);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // Normally OpenGL specs say that the last parameter to glTexImage2D
-  // can be a 0 pointer. Unfortunatelly not all drivers seem to
-  // support that. So I give a dummy texture here.
-  buf = new char [16*16*4];
-  memset (buf, 0, 4*16*16);
-  glTexImage2D (GL_TEXTURE_2D, 0, 3, 16, 16,
-      0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-  delete[] buf;
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-}
-
-GLuint OpenGLLightmapCache::GetTempHandle (int lmwidth, int lmheight,
-	float& txtsize)
-{
-  Setup ();
-  int lms = MAX (lmwidth, lmheight);
-  if (lms > 64)
-  {
-    txtsize = float (super_lm_size);
-    return TempHandle0;
-  }
-  else if (lms > 16)
-  {
-    txtsize = 64.0;
-    return TempHandle1;
-  }
-  else
-  {
-    txtsize = 16.0;
-    return TempHandle2;
-  }
 }
 
 void OpenGLLightmapCache::Clear ()
 {
-  int q;
-  for (q = 0 ; q < 4 ; q++)
-  {
-    int i;
-    for (i = 0 ; i < super_lm_num[q] ; i++)
-    {
-      suplm[q][i].Clear ();
-    }
-  }
 }
 
 int OpenGLLightmapCache::FindFreeSuperLightmap (int q)
 {
-  int i;
-
-  for (i = 0 ; i < super_lm_num[q] ; i++)
-    if (suplm[q][i].cacheData == 0) return i;
   return -1;
 }
 
-/*
- * Caches a whole precalculated superlighmap
- * s stores:
- * Distribution of the lightmaps in the superlightmap
- * Triangles
- * uv's for each triangles' vertex
- * Basically we have to blit all the lightmaps in a free super
- * lightmap
- */
-void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
-  bool* modified)
+bool OpenGLLightmapCache::IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize)
 {
-  // Mark current super lightmap with timestamp.
-  s->timestamp = global_timestamp;
-
-  Setup ();
-  *modified = false;
-  // First: Try to find a free superlightmap
-  // Check if the superLightmap is already in the cache.
-
-  csRect* rectangleArray = s->rectangles.GetArray();
-  const csRefArray<iPolygonTexture>& lmArray = s->lightmaps;
-  const csGrowingArray<csRGBpixel*>& lmInfo = s->lm_info;
-  int q = s->queue_num;
-
-  int i;
-  int numLightmaps = s->lightmaps.Length ();
-  if (s->cacheData)
-  {
-    stats_hit[q]++;
-    // The data is already in cache, let's see
-    // if we need to recalculate the lightmaps
-    // due the effect of dynamic lights.
-
-    if (dirty || !s->initialized)
-    {
-      GLuint SLMHandle = s->cacheData->Handle;
-      csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
-
-      for (i = 0; i < numLightmaps; i++)
-      {
-        if (lmArray[i]->RecalculateDynamicLights ())
-        {
-          csRGBpixel* lm_data = lmInfo[i];
-          csRect& r = rectangleArray[i];
-          glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-            r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
-        }
-      }
-      s->initialized = true;
-    }
-
-    return;
-  }
-
-  // The superlightmap isn't in the cache, so we have to cache it.
-  stats_fail[q]++;
-  int index = FindFreeSuperLightmap (q);
-  if (index < 0)
-  {
-    // Clear one lightmap.
-    // We look for the super lightmap slot with the lowest cost in
-    // combination with how long ago it was used.
-    int best_cost_idx = -1;
-    int best_cost = 1000000000;
-    int i;
-    for (i = 0 ; i < super_lm_num[q] ; i++)
-    {
-      csTrianglesPerSuperLightmap* slm = suplm[q][i].cacheData->source;
-      int cost = slm->CalculateCost ();
-
-      // Last time we used this super lightmap (in number of frames).
-      // If it was 500 frames ago that we used this super lightmap
-      // then we will decrease the cost a lot.
-      uint32 dt = global_timestamp-slm->timestamp;
-      if (dt > 500) cost >>= 2;
-      else if (dt > 25) cost >>= 1;
-
-      if (cost < best_cost)
-      {
-        best_cost = cost;
-	best_cost_idx = i;
-      }
-    }
-    suplm[q][best_cost_idx].Clear ();
-    index = best_cost_idx;
-  }
-  //Fill the superLightmap
-  suplm[q][index].cacheData = new csSLMCacheData ();
-  //We're going to fill the whole super lightmap, so we don't give
-  //width and height
-  suplm[q][index].Alloc (s);
-  csSLMCacheData* superLMData = (csSLMCacheData*) suplm[q][index].cacheData;
-  GLuint SLMHandle;
-  superLMData->Handle = SLMHandle = suplm[q][index].Handle;
-  csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
-  for (i = 0; i < numLightmaps; i++)
-  {
-    if (dirty) lmArray[i]->RecalculateDynamicLights();
-    csRGBpixel* lm_data = lmInfo[i];
-    csRect& r = rectangleArray[i];
-    glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-      r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
-  }
-  s->initialized = true;
-}
-
-bool OpenGLLightmapCache::IsLightmapOK (iPolygonTexture *polytex)
-{
-  return (polytex->GetLightMap () &&
-    (polytex->GetLightMap ()->GetWidth () <= super_lm_size) &&
-    (polytex->GetLightMap ()->GetHeight () <= super_lm_size));
+  return ((lmw <= super_lm_size) &&
+    (lmh <= super_lm_size));
 }
 

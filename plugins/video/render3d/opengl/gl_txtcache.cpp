@@ -326,6 +326,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
       else
       {
+	/*
+	  @@@ Compress keycolored images to COMPRESSED_RGBA_S3TC_DXT1_EXT?
+	  (1-bit alpha)
+	 */
 	R3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_2D, 
 	  i, 

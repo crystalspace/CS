@@ -178,7 +178,7 @@ public:
   virtual void ClearCache () { }
 
   /// Remove some polygon from the cache.
-  virtual void RemoveFromCache (iPolygonTexture* /*poly_texture*/) { }
+  virtual void RemoveFromCache (iRendererLightmap* /*rlm*/) { }
 
   /// Get drawing buffer width.
   virtual int GetWidth () { return width; }
@@ -251,7 +251,7 @@ public:
   { return vbufmgr; }
 
   /// Check if lightmap is not too large
-  virtual bool IsLightmapOK (iPolygonTexture*)
+  virtual bool IsLightmapOK (int, int, int)
   { return true; }
 
   virtual void SetRenderTarget (iTextureHandle*, bool) { }

@@ -52,8 +52,11 @@ struct iMaterialHandle;
 struct iMaterial;
 struct iClipper2D;
 struct iHalo;
+struct iRendererLightmap;
 struct csRGBpixel;
 struct csPixelFormat;
+struct csPolyTextureMapping;
+struct csPolyLightMapMapping;
 
 #ifndef CS_USE_NEW_RENDERER
 
@@ -132,7 +135,7 @@ public:
 };
 
 /// Information about a texture plane.
-class G3DTexturePlane
+class G3DCam2TextureTransform
 {
 public:
   /// Transformation from camera space to texture space.
@@ -200,10 +203,13 @@ struct G3DPolygonDP : public G3DPolygonDFP
   iMaterialHandle* mat_handle;
 
   /// Transformation matrices for the texture. @@@ BAD NAME
-  G3DTexturePlane plane;
+  G3DCam2TextureTransform cam2tex;
 
   /// Handle to lighted textures (texture + lightmap)
-  iPolygonTexture* poly_texture;
+  //iPolygonTexture* poly_texture;
+  csPolyTextureMapping* texmap;
+  csPolyLightMapMapping* lmap;
+  iRendererLightmap* rlm;
   
   /// Draw fullbright?
   bool do_fullbright;
@@ -480,7 +486,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 5, 1, 0);
+SCF_VERSION (iGraphics3D, 5, 2, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -731,7 +737,7 @@ struct iGraphics3D : public iBase
    * You have to call this function before deleting a polygon
    * (csPolygon3D destructor will do that).
    */
-  virtual void RemoveFromCache (iPolygonTexture* poly_texture) = 0;
+  virtual void RemoveFromCache (iRendererLightmap* rlm) = 0;
 
   /**
    * Get the vertex buffer manager. This will not increment the ref count
@@ -743,7 +749,8 @@ struct iGraphics3D : public iBase
    * Check if renderer can handle a lightmap.
    * Returns true if it can, false if not.
    */
-  virtual bool IsLightmapOK (iPolygonTexture* poly_texture) = 0;
+  virtual bool IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize) = 0;
 
   /**
    * Set the target of rendering. If this is 0 then the target will

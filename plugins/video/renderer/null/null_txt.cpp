@@ -262,3 +262,14 @@ void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
   if (idx >= 0) textures.Delete (idx);
 }
 
+csPtr<iSuperLightmap> csTextureManagerNull::CreateSuperLightmap (int w, int h)
+{
+  // @@@ implement a "NullRendererLightmap"
+  return 0;
+}
+  
+void csTextureManagerNull::GetMaxTextureSize (int& w, int& h, int& aspect)
+{
+  w = h = 2048;
+  aspect = 32768;
+}

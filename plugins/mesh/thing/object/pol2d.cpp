@@ -141,14 +141,17 @@ void csPolygon2D::DrawFilled (
 
   g3dpoly.z_value = poly->Vcam (0).z;
   csPolyTexture* lmi = poly->GetPolyTexture ();
-  g3dpoly.poly_texture = lmi;
+  //g3dpoly.poly_texture = lmi;
+  g3dpoly.lmap = lmi->GetLMapping ();
+  g3dpoly.texmap = lmi->GetTMapping ();
+  g3dpoly.rlm = lmi->GetRendererLightmap ();
   g3dpoly.do_fullbright = spoly->flags.Check (CS_POLY_LM_REFUSED);
 
   csMatrix3 m_cam2tex;
   csVector3 v_cam2tex;
   lmi->WorldToCamera (icam->GetTransform (), m_cam2tex, v_cam2tex);
-  g3dpoly.plane.m_cam2tex = &m_cam2tex;
-  g3dpoly.plane.v_cam2tex = &v_cam2tex;
+  g3dpoly.cam2tex.m_cam2tex = &m_cam2tex;
+  g3dpoly.cam2tex.v_cam2tex = &v_cam2tex;
   g3dpoly.normal = camera_plane;
 
   if (debug)

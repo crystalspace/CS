@@ -111,48 +111,6 @@ protected:
 #define DEFAULT_SUPER_LM_NUM 10
 
 /**
- * Cache data for a whole superlightmap.
- */
-class csSLMCacheData
-{
-public:
-  csTrianglesPerSuperLightmap* source;
-  GLuint Handle;
-  GLuint FogHandle;
-  bool hasFog;
-  bool isUnlit;
-  void Alloc (csTrianglesPerSuperLightmap* s);
-  void Clear ();
-  bool IsPrecalcSuperlightmap () const { return true; }
-  bool HasFog () const { return hasFog; }
-  bool IsUnlit () const { return isUnlit; }
-};
-
-/**
- * This class represents a super-lightmap.
- * A super-lightmap is a collection of smaller lightmaps that
- * fit together in one big texture.
- */
-class csSuperLightMap
-{
-public:
-  /// An OpenGL texture handle.
-  GLuint Handle;
-  /// the head and tail of the cache data
-  csSLMCacheData *cacheData;
-
-  /// Constructor.
-  csSuperLightMap ();
-  /// Destructor.
-  ~csSuperLightMap ();
-
-  /// Try to allocate a lightmap here. Return 0 on failure.
-  void Alloc (csTrianglesPerSuperLightmap* s);
-  /// Clear all lightmaps in this super lightmap.
-  void Clear ();
-};
-
-/**
  * Cache for OpenGL lightmaps. This cache keeps a number of
  * super lightmaps. Every super lightmaps holds a number of lightmaps.
  */
@@ -170,20 +128,11 @@ public:
   int stats_hit[4];
   int stats_fail[4];
 
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // This OpenGL texture handle is temporary for the version of
-  // DrawPolygon that doesn't use the super lightmap cache.
-  // Should be removed in future.
-  GLuint TempHandle0;
-  GLuint TempHandle1;
-  GLuint TempHandle2;
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 private:
   csGraphics3DOGLCommon* g3d;
 
   /// Four queues with super lightmaps.
-  csSuperLightMap* suplm[4];
+//  csSuperLightMap* suplm[4];
   /// If true then setup is ok.
   bool initialized;
 
@@ -195,16 +144,6 @@ public:
   ///
   ~OpenGLLightmapCache ();
 
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // It will return the smallest texture that fits the lightmap.
-  GLuint GetTempHandle (int lmwidth, int lmheight,
-	float& txtsize);
-  // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-  /// Cache a whole precalculated superlightmap
-  void Cache(csTrianglesPerSuperLightmap* s, bool dirty,
-             bool* modified);
-
   /// Finds an empty superlightmap in a queue (returns -1 if none is found)
   int FindFreeSuperLightmap (int queue_num);
 
@@ -212,7 +151,8 @@ public:
   void Clear ();
 
   /// Check if lightmap blows size limit
-  bool IsLightmapOK (iPolygonTexture *polytex);
+  bool IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize);
 };
 
 #endif // __CS_OGL_TEXTURECACHE_H__

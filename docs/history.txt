@@ -11,6 +11,10 @@ The history order is reversed so that new features are at the top.
 	  (except possibly the shader plugin .cpp's, which I can't test since
 	  I don't have a proper GL installation.)
 	- Anders Stenberg fixed a few compile errors Oktal introduced.
+	- res moved superlightmap generation from the renderer to the thing
+	  plugin.
+	- res moved csEngine:: methods from engine/renderloop.cpp to 
+	  engine.cpp.
 18-Jul-2003
 	- Anders Stenberg fixed compile errors introduced by Oktal. New
 	  renderer should compile, although variable functionality is

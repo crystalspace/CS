@@ -1310,7 +1310,7 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
 	    render_target->GetPrivateObject ();
-      //tex_mm->DeleteMipmaps ();
+      tex_mm->DeleteMipmaps ();
       tex_mm->UpdateTexture ();
       csTextureSoftware *tex_0 = (csTextureSoftware*)(tex_mm->get_texture (0));
       int x, y;
@@ -1510,21 +1510,21 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  iPolygonTexture *tex = 0;
-  iLightMap *lm = 0;
-  if (do_lighting)
-  {
-    tex = poly.poly_texture;
-    lm = tex->GetLightMap ();
-  }
+  //iPolygonTexture *tex = 0;
+  //iLightMap *lm = 0;
+  //if (do_lighting)
+  //{
+    //tex = poly.poly_texture;
+    //lm = tex->GetLightMap ();
+  //}
 
   csRGBpixel color;
-  iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
-  if (txt_handle)
-    txt_handle->GetMeanColor (color.red, color.green, color.blue);
-  else
+  //@@@iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
+  //@@@if (txt_handle)
+  //@@@  txt_handle->GetMeanColor (color.red, color.green, color.blue);
+  //@@@else
     poly.mat_handle->GetFlatColor (color);
-
+  /*@@@
   if (lm)
   {
     // Lighted polygon
@@ -1539,14 +1539,15 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
     Scan.FlatColor = texman->encode_rgb ((color.red * lr) >> 8,
       (color.green * lg) >> 8, (color.blue * lb) >> 8);
-  }
+  }*/
+  // @@@ "else" ???
   Scan.FlatColor = texman->encode_rgb (color.red, color.green, color.blue);
 
   Scan.M = M;
 
   int alpha = poly.mixmode & CS_FX_MASK_ALPHA;
   // Select the right scanline drawing function.
-  if (do_alpha && (alpha || (txt_handle && txt_handle->GetKeyColor ())))
+  if (do_alpha && (alpha/* || (txt_handle && txt_handle->GetKeyColor ())*/))
     return;
   int scan_index = SCANPROC_FLAT_ZNONE;
   if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
@@ -1810,36 +1811,38 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   // the position in camera space coordinates. It would be better (more
   // suitable for the following calculations) if it would be written
   // as T = M*C - V.
-  P1 = poly.plane.m_cam2tex->m11;
-  P2 = poly.plane.m_cam2tex->m12;
-  P3 = poly.plane.m_cam2tex->m13;
-  P4 = - (P1 * poly.plane.v_cam2tex->x
-        + P2 * poly.plane.v_cam2tex->y
-        + P3 * poly.plane.v_cam2tex->z);
-  Q1 = poly.plane.m_cam2tex->m21;
-  Q2 = poly.plane.m_cam2tex->m22;
-  Q3 = poly.plane.m_cam2tex->m23;
-  Q4 = - (Q1 * poly.plane.v_cam2tex->x
-        + Q2 * poly.plane.v_cam2tex->y
-        + Q3 * poly.plane.v_cam2tex->z);
+  P1 = poly.cam2tex.m_cam2tex->m11;
+  P2 = poly.cam2tex.m_cam2tex->m12;
+  P3 = poly.cam2tex.m_cam2tex->m13;
+  P4 = - (P1 * poly.cam2tex.v_cam2tex->x
+        + P2 * poly.cam2tex.v_cam2tex->y
+        + P3 * poly.cam2tex.v_cam2tex->z);
+  Q1 = poly.cam2tex.m_cam2tex->m21;
+  Q2 = poly.cam2tex.m_cam2tex->m22;
+  Q3 = poly.cam2tex.m_cam2tex->m23;
+  Q4 = - (Q1 * poly.cam2tex.v_cam2tex->x
+        + Q2 * poly.cam2tex.v_cam2tex->y
+        + Q3 * poly.cam2tex.v_cam2tex->z);
 
-  iPolygonTexture *tex = poly.poly_texture;
-  const csLightMapMapping& mapping = tex->GetMapping ();
+  //iPolygonTexture *tex = poly.poly_texture;
+  csPolyLightMapMapping* mapping = poly.lmap; //tex->GetMapping ();
   csTextureHandleSoftware *tex_mm =
     (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()
     	->GetPrivateObject ();
+  csPolyTextureMapping* tmapping = poly.texmap; 
+  csSoftRendererLightmap* srlm = (csSoftRendererLightmap*)poly.rlm;
 
   float fdu, fdv;
-  if (tex)
+//  if (tex)
   {
-    fdu = mapping.GetFDU ();
-    fdv = mapping.GetFDV ();
+    fdu = tmapping->GetFDU ();
+    fdv = tmapping->GetFDV ();
   }
-  else
+/*  else
   {
     fdu = 0;
     fdv = 0;
-  }
+  }*/
 
   // Now we're in the right shape to determine the mipmap level.
   // We'll use the following formula to determine the required level of
@@ -1937,7 +1940,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // If mipmap is too small or not available, use the mipmap level
   // that is still visible or available ...
-  int shf_u = mapping.GetShiftU () - mipmap;
+  int shf_u = tmapping->GetShiftU () - mipmap;
   if (shf_u < 0) mipmap += shf_u;
   if (mipmap < 0) mipmap = 0;
   while (mipmap && !tex_mm->get_texture (mipmap))
@@ -1955,13 +1958,13 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   	mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = tex->GetLightMap () && do_lighting && !poly.do_fullbright;
+  bool has_lightmap = srlm && !poly.do_fullbright && do_lighting && mapping;
   if (has_lightmap)
   {
     // If there is a lightmap we check if the size of the lighted
     // texture would not exceed MAX_LIGHTMAP_SIZE pixels. In that case we
     // revert to unlighted texture mapping.
-    long size = mapping.GetWidth () * mapping.GetHeight ();
+    long size = mapping->GetWidth () * mapping->GetHeight ();
     if (size > MAX_LIGHTMAP_SIZE) has_lightmap = false;
   }
 
@@ -2123,9 +2126,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    tcache->fill_texture (mipmap, tex, tex_mm, u_min, v_min, u_max, v_max);
+    tcache->fill_texture (mipmap, mapping, tmapping, srlm, 
+      /*tex, */tex_mm, u_min, v_min, u_max, v_max);
   }
-  csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
+  csScan_InitDraw (mipmap, this, tmapping, mapping, srlm, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();
@@ -2215,8 +2219,8 @@ texr_done:
   if (do_alpha) 
   {
     // cached texture has different coords than original tex.
-    Scan.amap_uofs = mapping.GetIMinU() >> mipmap; 
-    Scan.amap_vofs = mapping.GetIMinV() >> mipmap; 
+    Scan.amap_uofs = tmapping->GetIMinU() >> mipmap; 
+    Scan.amap_vofs = tmapping->GetIMinV() >> mipmap; 
   }
 
   for ( ; ; )
@@ -3283,14 +3287,18 @@ void csGraphics3DSoftwareCommon::ClearCache()
   if (tcache) tcache->Clear ();
 }
 
-void csGraphics3DSoftwareCommon::RemoveFromCache (iPolygonTexture* poly_texture)
+void csGraphics3DSoftwareCommon::RemoveFromCache (
+	      iRendererLightmap* rlm
+  /*iPolygonTexture* poly_texture*/)
 {
   if (tcache)
   {
-    tcache->uncache_texture (0, poly_texture);
-    tcache->uncache_texture (1, poly_texture);
-    tcache->uncache_texture (2, poly_texture);
-    tcache->uncache_texture (3, poly_texture);
+    csSoftRendererLightmap* srlm = 
+      (csSoftRendererLightmap*)rlm;
+    tcache->uncache_texture (0, srlm);
+    tcache->uncache_texture (1, srlm);
+    tcache->uncache_texture (2, srlm);
+    tcache->uncache_texture (3, srlm);
   }
 }
 
@@ -3346,10 +3354,10 @@ float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
   return 16777216.0 / float (zbf);
 }
 
-bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
+bool csGraphics3DSoftwareCommon::IsLightmapOK (int lmw, int lmh, 
+    int lightCellSize)
 {
-  const csLightMapMapping& mapping = poly_texture->GetMapping ();
-  return ((mapping.GetWidth () * mapping.GetHeight ()) < MAX_LIGHTMAP_SIZE);
+  return ((lmw * lmh * lightCellSize * lightCellSize) < MAX_LIGHTMAP_SIZE);
 }
 
 void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle,

@@ -170,6 +170,10 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   ///
   virtual void UnregisterTexture (csTextureHandleNull* handle);
+
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
+  
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 
 #endif // __CS_NULL_TXT_H__

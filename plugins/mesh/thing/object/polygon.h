@@ -128,7 +128,9 @@ private:
    * Warning! Objects of this type are allocated on
    * csThingObjectType->blk_lightmapmapping.
    */
-  csLightMapMapping* mapping;
+  //csLightMapMapping* mapping;
+  csPolyLightMapMapping* mapping;
+  csPolyTextureMapping* tmapping;
 
   /**
    * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
@@ -220,7 +222,8 @@ public:
   /**
    * Get the lightmap mapping information.
    */
-  csLightMapMapping* GetLightMapMapping () const { return mapping; }
+  csPolyLightMapMapping* GetLightMapMapping () const { return mapping; }
+  csPolyTextureMapping* GetTextureMapping () const { return tmapping; }
 
   /**
    * Clear the polygon (remove all vertices).

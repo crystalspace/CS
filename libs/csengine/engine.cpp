@@ -1698,6 +1698,77 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 }
 #endif
 
+#if defined(CS_NR_ALTERNATE_RENDERLOOP)
+void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
+{
+}
+
+void csEngine::Draw (iCamera *c, iClipper2D *view)
+{
+  defaultRenderLoop->Draw (c, view);
+}
+
+csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
+{
+  csRef<iRenderLoop> loop = renderLoopManager->Create ();
+
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+
+  csRef<iRenderStepType> genType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.generic.type",
+      iRenderStepType);
+
+  csRef<iRenderStepFactory> genFact = genType->NewFactory ();
+
+  csRef<iRenderStep> step;
+  csRef<iGenericRenderStep> genStep;
+
+  step = genFact->Create ();
+  loop->AddStep (step);
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+  
+  genStep->SetShaderType ("ambient");
+  genStep->SetZBufMode (CS_ZBUF_USE);
+  genStep->SetZOffset (true);
+
+  csRef<iRenderStepType> liType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.lightiter.type",
+      iRenderStepType);
+
+  csRef<iRenderStepFactory> liFact = liType->NewFactory ();
+
+  step = liFact->Create ();
+  loop->AddStep (step);
+
+  csRef<iRenderStepContainer> liContainer =
+    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+
+  csRef<iRenderStepType> stencilType =
+    CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.renderloop.step.shadow.stencil.type",
+      iRenderStepType);
+
+//  csRef<iRenderStepFactory> stencilFact = stencilType->NewFactory ();
+
+//  step = stencilFact->Create ();
+//  liContainer->AddStep (step);
+
+  step = genFact->Create ();
+  liContainer->AddStep (step);
+
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+
+  genStep->SetShaderType ("diffuse");
+  genStep->SetZBufMode (CS_ZBUF_TEST);
+  genStep->SetZOffset (false);
+
+  return csPtr<iRenderLoop> (loop);
+}
+#endif
+
 void csEngine::AddHalo (csLight *Light)
 {
   if (!Light->GetHalo () || Light->flags.Check (CS_LIGHT_ACTIVEHALO))

@@ -509,7 +509,9 @@ public:
    */
   virtual int GetTextureFormat ();
 
-  //virtual csPtr<iSuperLightmap> CreateSuperLightmap(int, int);
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int, int);
+
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 
   virtual int GetMaterialIndex (iMaterialHandle* mat)
   {

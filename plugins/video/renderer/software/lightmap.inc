@@ -60,7 +60,11 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
+void LM_NAME (/*iPolygonTexture *pt, */
+	      csPolyLightMapMapping* mapping,
+	      csPolyTextureMapping* tmapping,
+	      csSoftRendererLightmap* rlm, 
+	      SoftwareCachedTexture *ct,
 	      csTextureHandleSoftware *texmm, csTextureManagerSoftware *texman,
 	      float u_min, float v_min, float u_max, float v_max)
 {
@@ -71,9 +75,11 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   csRGBpixel *tx_palette = texmm->GetColorMap ();
   uint8 *tx_bitmap = tx->get_bitmap ();
 
-  int pt_cell_size = pt->GetLightCellSize () >> mipmap;
+  //int pt_cell_size = pt->GetLightCellSize () >> mipmap; // from iRendererLightMap
+  int pt_cell_size = rlm->lightCellSize >> mipmap; 
   
-  const csLightMapMapping& mapping = pt->GetMapping ();
+  //const csLightMapMapping& mapping = pt->GetMapping ();
+  
   if (!pt_cell_size)
   {
   // this happens when the lightcell size is <8
@@ -82,19 +88,19 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   // so we need a different algorithm:
   // multiple lightmap texels are averaged
   
-    int pt_min_u = mapping.GetIMinU () >> mipmap;
-    int pt_min_v = mapping.GetIMinV () >> mipmap;
-	int pt_cell_shift = -pt->GetLightCellShift () + mipmap;
+	int pt_min_u = tmapping->GetIMinU () >> mipmap;
+	int pt_min_v = tmapping->GetIMinV () >> mipmap;
+	int pt_cell_shift = -rlm->lightCellShift /*pt->GetLightCellShift ()*/ + mipmap;
 	pt_cell_size = 1 << pt_cell_shift;
-	int pt_shfw = mapping.GetShiftU () - mipmap;
+	int pt_shfw = tmapping->GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
 	
 	int lm_color_shift = 6 - pt_cell_shift*2;
 
-	iLightMap *lm = pt->GetLightMap ();
-	int lm_w = lm->GetWidth ();
-	csRGBpixel *lm_data = lm->GetMapData ();
-	int lm_size = lm->GetSize ();
+	//iLightMap *lm = pt->GetLightMap ();
+	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
+	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
+	int lm_size = rlm->rect.Width () * rlm->rect.Height (); //lm->GetSize ();
     
 	void *dst = ct->get_bitmap ();
 	uint32 *old_lm = (uint32 *)ct->get_lightmap ();
@@ -119,10 +125,10 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((mapping.GetOriginalWidth () + mipmap_delta) >> mipmap);
+	int max_lu2 = ((mapping->GetOriginalWidth () + mipmap_delta) >> mipmap);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
-	int max_lv2 = (lm->GetHeight ()) >> pt_cell_shift;
+	int max_lv2 = (rlm->rect.Height ()) >> pt_cell_shift;
 	if (max_lv > max_lv2) max_lv = max_lv2;
 
 	int src = (min_lu << pt_cell_shift) + (min_lv << pt_cell_shift) * lm_w;
@@ -170,7 +176,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 			b <<= lm_color_shift;
 			
 			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + ((pt_min_u + uu) & tx_andw)]];
-		*out++ =
+			*out++ =
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
 				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
@@ -184,17 +190,17 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   }
   else
   {
-    int pt_min_u = mapping.GetIMinU () >> mipmap;
-    int pt_min_v = mapping.GetIMinV () >> mipmap;
-	int pt_cell_shift = pt->GetLightCellShift () - mipmap;
-	int pt_shfw = mapping.GetShiftU () - mipmap;
+	int pt_min_u = tmapping->GetIMinU () >> mipmap;
+	int pt_min_v = tmapping->GetIMinV () >> mipmap;
+	int pt_cell_shift = rlm->lightCellShift - mipmap;
+	int pt_shfw = tmapping->GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
-	int pt_h = (mapping.GetHeight () + mipmap_delta) >> mipmap;
+	int pt_h = (mapping->GetHeight () + mipmap_delta) >> mipmap;
 
-	iLightMap *lm = pt->GetLightMap ();
-	int lm_w = lm->GetWidth ();
-	csRGBpixel *lm_data = lm->GetMapData ();
-	int lm_size = lm->GetSize ();
+	//iLightMap *lm = pt->GetLightMap ();
+	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
+	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
+	int lm_size = rlm->rect.Width () * rlm->rect.Height (); //lm->GetSize ();
 
 	void *dst = ct->get_bitmap ();
 	uint32 *old_lm = (uint32 *)ct->get_lightmap ();
@@ -212,7 +218,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 		00      10  in variables called r00, g00, b00, r10, g10 and so on.
 		*--------*  The square is scanned from top to bottom; during this scan
 		|        |  the corresponding R/G/B values are kept in r0, g0, b0 and
-	0*--------*1 r1, g1, b1 and interpolated while moving from top to bottom
+	       0*--------*1 r1, g1, b1 and interpolated while moving from top to bottom
 		|        |  using r0d/g0d/b0d and r1d/g1d/b1d deltas. When scanning
 		|        |  from left to right the deltas are kept in rd, gd and bd.
 		*--------*
@@ -235,11 +241,11 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((((mapping.GetOriginalWidth () + mipmap_delta)
+	int max_lu2 = ((((mapping->GetOriginalWidth () + mipmap_delta)
 		>> mipmap) + pt_cell_size - 1) >> pt_cell_shift);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
-	int max_lv2 = lm->GetHeight ();
+	int max_lv2 = rlm->rect.Height ();
 	if (max_lv > max_lv2) max_lv = max_lv2;
 
 	int src = min_lu + min_lv * lm_w;
@@ -353,13 +359,13 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
 			for (; uu < end_uu; uu++)
 			{
-			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
-		*out++ =
+			  csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
+			  *out++ =
 				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
 				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
 				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
 			;
-			r += rd; g += gd; b += bd;
+			  r += rd; g += gd; b += bd;
 			}
 
 			out = __out + pt_w;
@@ -375,7 +381,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 }
 
 #undef LM_NAME
-#undef PI_PIXTYPE
+#undef PI_PIXTYPE	  
 #undef PI_R5G5B5
 #undef PI_R5G6B5
 #undef PI_R8G8B8

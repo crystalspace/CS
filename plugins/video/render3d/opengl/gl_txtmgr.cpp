@@ -261,7 +261,7 @@ bool csGLTextureHandle::FindFormatType ()
       }
       else
       {
-	targetFormat = (bpp == 8 ? GL_RGBA : bpp < 32 ? GL_RGB5_A1 : GL_RGBA8);
+	targetFormat = (bpp == 8 ? GL_RGBA : (bpp < 24 ? GL_RGB5_A1 : GL_RGBA8));
 	for (i=0; csGLTextureManager::glformats[i].targetFormat
 	  != targetFormat; i++);
 	formatidx = i;
@@ -926,6 +926,16 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
       case GL_RGBA:
 	compressedFormat = GL_COMPRESSED_RGBA_ARB;
 	break;
+      case GL_RGB5_A1:
+	if (R3D->ext->CS_GL_EXT_texture_compression_s3tc)
+	{
+	  compressedFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+	}
+	else
+	{
+	  compressedFormat = GL_COMPRESSED_RGBA_ARB;
+	}
+	break;
       case GL_ALPHA:
 	compressedFormat = GL_COMPRESSED_ALPHA_ARB;
 	break;
@@ -1065,8 +1075,16 @@ void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
   max_tex_size = R3D->GetMaxTextureSize ();
   DetermineStorageSizes ();
 }
-/*
+
 csPtr<iSuperLightmap> csGLTextureManager::CreateSuperLightmap(int, int)
 {
   return 0;
-}*/
+}
+
+void csGLTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
+{
+  w = max_tex_size;
+  h = max_tex_size;
+  aspect = max_tex_size;
+}
+

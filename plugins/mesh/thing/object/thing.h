@@ -19,6 +19,10 @@
 #ifndef __CS_THING_H__
 #define __CS_THING_H__
 
+#ifndef CS_USE_NEW_RENDERER
+#define	COMBINE_LIGHTMAPS
+#endif
+
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "parrays.h"
@@ -42,7 +46,14 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
+#include "iutil/dbghelp.h"
 #include "lghtmap.h"
+
+#ifdef COMBINE_LIGHTMAPS
+#include "csgeom/subrec2.h"
+#include "csgfx/memimage.h"
+#include "ivideo/txtmgr.h"
+#endif
 
 class csThing;
 class csThingStatic;
@@ -396,6 +407,23 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
+#ifdef COMBINE_LIGHTMAPS
+
+struct SuperLM;
+
+struct csPolyGroup
+{
+  iMaterialWrapper* material;
+  csPArray<csPolygon3D> polys;
+};
+
+struct csLitPolyGroup : public csPolyGroup
+{
+  csRefArray<iRendererLightmap> lightmaps;
+  csPArray<csSubRect2> slmSubrects;
+  SuperLM* thingTypeSLM;
+};
+#endif
 
 /**
  * A Thing is a set of polygons. A thing can be used for the
@@ -517,6 +545,17 @@ private:
 
   void PrepareRenderMeshes ();
   void ClearRenderMeshes ();
+#endif
+
+#ifdef COMBINE_LIGHTMAPS
+  csArray<csLitPolyGroup> litPolys;
+  csArray<csPolyGroup> unlitPolys;
+  bool lightmapsPrepared;
+  bool lightmapsDirty;
+
+  void PrepareLMs ();
+  void ClearLMs ();
+  void UpdateDirtyLMs ();
 #endif
 public:
   /**
@@ -1045,6 +1084,62 @@ public:
   friend struct MeshObject;
 };
 
+#ifdef COMBINE_LIGHTMAPS
+
+struct SuperLM
+{
+  int width, height;
+  csSubRectangles2* rects;
+  int freeLumels;
+  csRef<iSuperLightmap> rendererSLM;
+
+  SuperLM (iGraphics3D* g3d, int w, int h) : width(w), height(h)    
+  {
+    rects = 0;
+    freeLumels = width * height;
+
+    rendererSLM = g3d->GetTextureManager ()->CreateSuperLightmap (w, h);
+  }
+  ~SuperLM()
+  {
+    delete rects;
+  }
+
+  csSubRectangles2* GetRects ()
+  {
+    if (rects == 0)
+    {
+      rects = new csSubRectangles2 (csRect (0, 0, width, height));
+    }
+    return rects;
+  }
+};
+
+struct csSuperLMArray
+{
+  int width, height;
+  int maxLumels;
+  csPArray<SuperLM> SLMs;
+
+  csSuperLMArray (int size) : width(size), height(size)    
+  {
+    maxLumels = width * height;
+  }
+
+  void Clear ()
+  {
+    for (int i = 0; i < SLMs.Length(); i++)
+    {
+      SuperLM* slm = SLMs[i];
+      delete slm;
+    }
+    SLMs.DeleteAll ();
+    maxLumels = width * height;
+  };
+};
+
+#endif
+
 /**
  * Thing type. This is the plugin you have to use to create instances
  * of csThing.
@@ -1070,10 +1165,21 @@ public:
    */
   csBlockAllocator<csPolygon3D> blk_polygon3d;
   csBlockAllocator<csPolygon3DStatic> blk_polygon3dstatic;
-  csBlockAllocator<csLightMapMapping> blk_lightmapmapping;
+  csBlockAllocator<csPolyLightMapMapping> blk_lightmapmapping;
+  csBlockAllocator<csPolyTextureMapping> blk_texturemapping;
   csBlockAllocator<csPolyTexture> blk_polytex;
   csBlockAllocator<csLightMap> blk_lightmap;
 
+#ifdef COMBINE_LIGHTMAPS
+  csArray<csSuperLMArray> superLMs;
+  int minLightmapSize;
+  int maxLightmapSize;
+
+  void AllocLightmaps (const csPolyGroup& inputPolys,
+    csArray<csLitPolyGroup>& outputPolys, 
+    csPolyGroup& rejectedPolys);
+  void FreeLightmaps (csArray<csLitPolyGroup>& polys);
+#endif
 public:
   SCF_DECLARE_IBASE;
 
@@ -1094,6 +1200,9 @@ public:
 
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
+
+  /// Execute a debug command.
+  virtual bool DebugCommand (const char* cmd);
 
   /// iThingEnvironment implementation.
   struct eiThingEnvironment : public iThingEnvironment
@@ -1133,6 +1242,28 @@ public:
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
+
+  /// iDebugHelper implementation
+  struct eiDebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    virtual int GetSupportedTests () const
+    { return 0; }
+    virtual csPtr<iString> UnitTest ()
+    { return 0; }
+    virtual csPtr<iString> StateTest ()
+    { return 0; }
+    virtual csTicks Benchmark (int num_iterations)
+    { return 0; }
+    virtual csPtr<iString> Dump ()
+    { return 0; }
+  #ifndef CS_USE_NEW_RENDERER
+    virtual void Dump (iGraphics3D* g3d)
+    { }
+  #endif // CS_USE_NEW_RENDERER
+    virtual bool DebugCommand (const char* cmd)
+    { return scfParent->DebugCommand (cmd); }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_THING_H__

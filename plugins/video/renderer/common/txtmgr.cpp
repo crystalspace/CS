@@ -106,7 +106,8 @@ void csTextureHandle::CreateMipmaps ()
     if (tex[i])
     {
       DG_UNLINK (this, tex[i]);
-      delete tex [i];
+      delete tex[i];
+      tex[i] = NULL;
     }
   }
 
@@ -116,10 +117,13 @@ void csTextureHandle::CreateMipmaps ()
   // 2D textures uses just the top-level mipmap
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
-    // Create each new level by creating a level 2 mipmap from previous level
+    // Create each new level by creating a level 1 mipmap from previous level
+    int nMipmaps = image->HasMipmaps();
     csRef<iImage> i1 = image->MipMap (1, tc);
-    csRef<iImage> i2 = i1->MipMap (1, tc);
-    csRef<iImage> i3 = i2->MipMap (1, tc);
+    csRef<iImage> i2 =
+      (nMipmaps >= 2) ? image->MipMap (2, tc) : i1->MipMap (1, tc);
+    csRef<iImage> i3 =
+      (nMipmaps >= 3) ? image->MipMap (3, tc) : i2->MipMap (1, tc);
 
     tex [1] = NewTexture (i1, true);
     DG_LINK (this, tex[1]);

@@ -20,7 +20,9 @@
 #ifndef __CS_SOFT_TXT_H__
 #define __CS_SOFT_TXT_H__
 
+#include "csutil/blockallocator.h"
 #include "csutil/debug.h"
+#include "csgeom/csrect.h"
 #include "video/renderer/common/txtmgr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
@@ -188,6 +190,68 @@ public:
    * Get canvas for texture.
    */
   virtual iGraphics2D* GetCanvas ();
+
+  /**
+   * Delete all mipmaps (except mip 0).
+   */
+  void DeleteMipmaps ();
+};
+
+class csSoftSuperLightmap;
+
+class csSoftRendererLightmap : public iRendererLightmap
+{
+  friend class csSoftSuperLightmap;
+  friend class csTextureCacheSoftware;
+
+  csRect rect;
+  float u1, v1, u2, v2;
+  csRef<csSoftSuperLightmap> slm;
+
+  csRGBpixel* data;
+  bool dirty;
+
+  int lightCellSize;
+  int lightCellShift;
+public:
+  void* cacheData[4];
+
+  SCF_DECLARE_IBASE;
+
+  csSoftRendererLightmap ();
+  virtual ~csSoftRendererLightmap ();
+
+  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
+    float &lm_u2, float& lm_v2);
+    
+  virtual void GetSLMCoords (int& left, int& top, 
+    int& width, int& height);
+    
+  virtual void SetData (csRGBpixel* data);
+
+  virtual void SetLightCellSize (int size);
+  virtual int GetLightCellSize ();
+};
+
+class csSoftSuperLightmap : public iSuperLightmap
+{
+  friend class csSoftRendererLightmap;
+
+  int w, h;
+
+  csBlockAllocator<csSoftRendererLightmap> RLMs;
+
+  void FreeRLM (csSoftRendererLightmap* rlm);
+public:
+  SCF_DECLARE_IBASE;
+
+  csSoftSuperLightmap (int width, int height);
+  virtual ~csSoftSuperLightmap ();
+
+  virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
+    int width, int height);
+
+  virtual csPtr<iImage> Dump ();
 };
 
 /**
@@ -241,6 +305,11 @@ public:
   virtual void PrepareTextures ();
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
+
+  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
+    int height);
+
+  virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 
 #endif // __CS_SOFT_TXT_H__

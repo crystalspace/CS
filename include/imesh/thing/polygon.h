@@ -37,6 +37,7 @@ struct iSector;
 struct iThingState;
 struct iThingFactoryState;
 struct iPolyTexType;
+struct iRendererLightmap;
 
 class csReversibleTransform;
 class csPlane3;
@@ -304,16 +305,17 @@ struct iPolygon3D : public iBase
 };
 
 /**
- * This structure holds mapping information to map the lightmap on
+ * This structure holds mapping information to map the texture on
  * a polygon. You can get it from the iPolygonTexture below.
  */
-struct csLightMapMapping
+struct csPolyTextureMapping
 {
   /// Transformation from object to texture space.
   csMatrix3 m_obj2tex;
   /// Translation from object to texture space.
   csVector3 v_obj2tex;
 
+  // @@@ some entries really rather belong to csPolyLightMapMapping.
   float fdu, fdv;
 
   /**
@@ -329,30 +331,6 @@ struct csLightMapMapping
   ///
   uint16 shf_u;
 
-  /*
-   * New texture data with lighting added. This is an untiled texture
-   * so it is more efficient to draw. This texture data is allocated
-   * and maintained by the texture cache. If a PolyTexture is in the
-   * cache it will be allocated, otherwise it won't.
-   */
-
-  /// Width of lighted texture ('w' is a power of 2).
-  int w;
-
-  /// Height of lighted texture.
-  int h;
-
-  /// Original width (not a power of 2) (w_orig <= w).
-  int w_orig;
-
-  /// Get the u-value of the textures bounding box' lower left corner.
-  float GetFDU () const { return fdu; }
-  /// Get the v-value of the textures bounding box' lower left corner.
-  float GetFDV () const { return fdv; }
-  /// Get width of lit texture (power of 2).
-  int GetWidth () const { return w; }
-  /// Get height of lit texture.
-  int GetHeight () const { return h; }
   /**
    * Get the power of the lowest power of 2 that is not smaller than the
    * texture bounding box' width.
@@ -374,11 +352,49 @@ struct csLightMapMapping
     fMaxV = Fmax_v;
   }
 
+  /// Get the u-value of the textures bounding box' lower left corner.
+  float GetFDU () const { return fdu; }
+  /// Get the v-value of the textures bounding box' lower left corner.
+  float GetFDV () const { return fdv; }
+};
+
+/**
+ * This structure holds mapping information to map the lightmap on
+ * a polygon. You can get it from the iPolygonTexture below.
+ */
+struct csPolyLightMapMapping
+{
+  /*
+   * New texture data with lighting added. This is an untiled texture
+   * so it is more efficient to draw. This texture data is allocated
+   * and maintained by the texture cache. If a PolyTexture is in the
+   * cache it will be allocated, otherwise it won't.
+   */
+
+  /// Width of lighted texture ('w' is a power of 2).
+  int w; //@@@ renderer specific
+
+  /// Height of lighted texture.
+  int h; //@@@ renderer specific 
+
+  /// Original width (may not be a power of 2) (w_orig <= w).
+  int w_orig;  //@@@ renderer specific
+  
+  /// Light cell size
+  //int lightCellSize;
+  /// Light cell shift
+  //int lightCellShift;
+
+  /// Get width of lit texture (power of 2).
+  int GetWidth () const { return w; }
+  /// Get height of lit texture.
+  int GetHeight () const { return h; }
+
   /// Get original width.
   int GetOriginalWidth () const { return w_orig; }
 };
 
-SCF_VERSION (iPolygonTexture, 1, 1, 0);
+SCF_VERSION (iPolygonTexture, 1, 2, 0);
 
 /**
  * This is a interface to an object responsible for containing
@@ -388,8 +404,10 @@ struct iPolygonTexture : public iBase
 {
   /// Get the material handle associated with this polygon
   virtual iMaterialHandle *GetMaterialHandle () = 0;
+  /// Get the mapping to use for this texture
+  virtual csPolyTextureMapping* GetTMapping () const = 0;
   /// Get the mapping to use for this lightmap.
-  virtual const csLightMapMapping& GetMapping () const = 0;
+  virtual csPolyLightMapMapping* GetLMapping () const = 0;
 
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty () = 0;

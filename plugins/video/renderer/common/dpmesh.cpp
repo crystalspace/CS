@@ -25,6 +25,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "plugins/video/renderer/common/polybuf.h"
+#include "imesh/thing/polygon.h" // @@@
 
 //------------------------------------------------------------------------
 // Everything for mesh drawing.
@@ -190,8 +191,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   poly.mixmode = mesh.mixmode;
   poly.use_fog = mesh.do_fog;
   poly.do_fullbright = false;
-  poly.plane.m_cam2tex = &m_cam2tex;
-  poly.plane.v_cam2tex = &v_cam2tex;
+  poly.cam2tex.m_cam2tex = &m_cam2tex;
+  poly.cam2tex.v_cam2tex = &v_cam2tex;
 
   // @@@ We need to restructure a bit here to avoid
   // unneeded copy of data.
@@ -206,13 +207,18 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
     	< polbuf->GetMaterialCount ());
     poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
+  
+    poly.lmap = pol.lmap;
+    poly.texmap = pol.texmap;
+    poly.rlm = pol.rlm;
 
     // Transform object to texture transform to
     // camera to texture transformation here.
-    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
-    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
+    csTransform t_obj2tex (pol.texmap->m_obj2tex, pol.texmap->v_obj2tex);
+    m_cam2tex = t_obj2tex.GetO2T () * o2c.GetT2O ();
+    v_cam2tex = o2c.Other2This (t_obj2tex.GetO2TTranslation ());
 
-    poly.poly_texture = pol.poly_texture;
+    //poly.poly_texture = pol.poly_texture;
     int j;
     // @@@ Support mirror here.
     int vis_cnt = 0;
