@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "converter.h"
+#include <limits.h>
+#include "sysdef.h"
+#include "csutil/converter.h"
 #include "csengine/objects/thing.h"
 #include "csengine/objects/cssprite.h"
 
@@ -5992,8 +5994,6 @@ int converter::pov_write ( FILE *fileout ) {
 void converter::print_sizes ( ) {
 
 /******************************************************************************/
-
-#include <limits.h>
 
 /*
   Purpose:
