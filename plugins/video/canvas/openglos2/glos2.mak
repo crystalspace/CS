@@ -58,7 +58,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp libs/cs2d/openglos2
+vpath %.cpp libs/cs2d/openglos2 libs/cs2d/openglcommon
 
 .PHONY: glos2 glos2clean
 

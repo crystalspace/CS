@@ -62,6 +62,8 @@ glbe2d: $(OUTDIRS) $(GLBE2D)
 
 $(OUT)%$O: libs/cs2d/openglbe/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
+$(OUT)%$O: libs/cs2d/openglcommon/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
 
 $(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)
 	$(DO.PLUGIN) $(LIBS.GLBE2D)
