@@ -204,13 +204,18 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
       return NULL;
   } /* endswitch */
 
+  // alpha channel?
+  bool hasAlpha = format & CS_IMGFMT_ALPHA;
+  // number of bytes per pixel in truecolor mode
+  int bytesPerPixel = hasAlpha?4:3;
+
   if (palette && !Image->GetPalette ())
     return NULL;
 
   // calc size
   int w = Image->GetWidth ();
   int h = Image->GetHeight ();
-  size_t len = sizeof (bmpHeader)-2 + w*h*(palette?1:3) + 256*(palette?4:0);
+  size_t len = sizeof (bmpHeader)-2 + w*h*(palette?1:bytesPerPixel) + 256*(palette?4:0);
   bmpHeader hdr;
   hdr.bfTypeLo = 'B';
   hdr.bfTypeHi = 'M';
@@ -222,7 +227,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   hdr.biWidth = little_endian_long (w);
   hdr.biHeight = little_endian_long (h);
   hdr.biPlanes = little_endian_short (1);
-  hdr.biBitCount = little_endian_short (palette?8:24);
+  hdr.biBitCount = little_endian_short ((palette?1:bytesPerPixel)*8);
   hdr.biCompression = little_endian_long (0);
   hdr.biSizeImage = little_endian_long (0);
   hdr.biXPelsPerMeter = little_endian_long (0);
@@ -258,13 +263,17 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   {
     csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
     for (y=h-1; y >= 0; y--)
+    {
+      csRGBpixel *line = &pixel[y*w];
       for (x=0; x < w; x++)
       {
-	unsigned char *c = (unsigned char *)&pixel[y*w+x];
-	*p++ = *(c+2);
-	*p++ = *(c+1);
-	*p++ = *c;
+	*p++ = line->blue;
+	*p++ = line->green;
+	*p++ = line->red;
+	if (hasAlpha) *p++ = line->alpha;
+	line++;
       }
+    }
   }
 
   return csPtr<iDataBuffer> (db);
@@ -293,7 +302,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
 
   uint8 *iPtr = iBuffer + BFOFFBITS(iBuffer);
 
-  // No alpha for BMP.
+  // No alpha for BMP... at least not always
   Format &= ~CS_IMGFMT_ALPHA;
 
   // The last scanline in BMP corresponds to the top line in the image
@@ -306,8 +315,8 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
     csRGBpixel *palette = new csRGBpixel [256];
     csRGBpixel *pwork   = palette;
     uint8    *inpal   = BIPALETTE(iBuffer);
-	int scanlinewidth = 4 * ((Width+3) / 4);
-	int color;
+    int scanlinewidth = 4 * ((Width+3) / 4);
+    int color;
     for (color = 0; color < 256; color++, pwork++)
     {
       // Whacky BMP palette is in BGR order.
@@ -388,7 +397,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
   {
     csRGBpixel *buffer = new csRGBpixel [bmp_size];
 
-	int x;
+    int x;
 
     while (iPtr < iBuffer + iSize && buffer_y >= 0)
     {
@@ -398,6 +407,31 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
         d->blue    = *iPtr++;
         d->green   = *iPtr++;
         d->red     = *iPtr++;
+        d++;
+      } /* endfor */
+
+      buffer_y -= Width;
+    }
+    // Now transform the image data to target format
+    convert_rgba (buffer);
+    return true;
+  }
+  else if (BITCOUNT(iBuffer) == TRUECOLOR32)
+  {
+    Format |= CS_IMGFMT_ALPHA;
+    csRGBpixel *buffer = new csRGBpixel [bmp_size];
+
+    int x;
+
+    while (iPtr < iBuffer + iSize && buffer_y >= 0)
+    {
+      csRGBpixel *d = buffer + buffer_y;
+      for (x = Width; x; x--)
+      {
+        d->blue    = *iPtr++;
+        d->green   = *iPtr++;
+        d->red     = *iPtr++;
+	d->alpha   = *iPtr++;
         d++;
       } /* endfor */
 
