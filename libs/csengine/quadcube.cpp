@@ -90,7 +90,7 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 }
 
 bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
-	csClipper* clipper)
+	csClipper* /*clipper*/)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
@@ -100,7 +100,7 @@ bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
 }
 
 bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
-	csClipper* clipper)
+	csClipper* /*clipper*/)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
