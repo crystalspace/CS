@@ -9,6 +9,16 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a pretty severe memory leak in the c-buffer. This leak
 	  could trigger in any use of the c-buffer but it was most
 	  obvious when doing lighting or radiosity.
+	- Fixed another bug with 'rain' command in sectors that have
+	  no polygons.
+	- Martin Geisse fixed a small compilation error in mdl2spr.
+	- Martin also removed cleanup() call from Win32 system driver.
+	- Martin did a minor bugfix to dungeon plugin.
+	- Eric Sunshine fixed an error in MazeD.cfg.
+	- Wouter Wijngaards did some fixes on csQuadTree again to make
+	  it easier to grok by other compilers.
+	  Wouter also added a rediculously fast TestRectangle routine
+	  to csQuadTree :-)
 15-Jun-2000
 	- Cleaned up some debugging stuff for c-buffer from WalkTest.
 	- Moved csOjbectStuffFactory::Initialize to csObjectStub.

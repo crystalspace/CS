@@ -37,6 +37,7 @@
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
+#include "csengine/thing.h"
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
 #include "csengine/particle.h"
@@ -92,27 +93,47 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
   }
 
   csPolygonSetBBox* pset_bbox = sector->GetBoundingBox ();
+  csPolygonSet* pset = sector;
   if (!pset_bbox)
   {
     sector->CreateBoundingBox ();
     pset_bbox = sector->GetBoundingBox ();
+    if (!pset_bbox)
+    {
+      // If there still is no bbox we calculate one for the static
+      // thing inside.
+      csThing* thing = sector->GetStaticThing ();
+      pset = thing;
+      if (thing)
+      {
+        pset_bbox = thing->GetBoundingBox ();
+	if (!pset_bbox)
+	{
+	  thing->CreateBoundingBox ();
+          pset_bbox = thing->GetBoundingBox ();
+	}
+      }
+    }
   }
-  csBox3 bbox;
-  bbox.StartBoundingBox (sector->Vwor (pset_bbox->i1));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i2));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i3));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i4));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i5));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i6));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i7));
-  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i8));
+  if (pset_bbox)
+  {
+    csBox3 bbox;
+    bbox.StartBoundingBox (pset->Vwor (pset_bbox->i1));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i2));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i3));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i4));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i5));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i6));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
-  csRainParticleSystem* exp = new csRainParticleSystem (num,
-  	txt, CS_FX_MULTIPLY2, false, .3/50., .3,
-	bbox.Min (), bbox.Max (),
-	csVector3 (0, -speed, 0));
-  exp->MoveToSector (sector);
-  exp->SetColor (csColor (1,1,1));
+    csRainParticleSystem* exp = new csRainParticleSystem (num,
+  	  txt, CS_FX_MULTIPLY2, false, .3/50., .3,
+	  bbox.Min (), bbox.Max (),
+	  csVector3 (0, -speed, 0));
+    exp->MoveToSector (sector);
+    exp->SetColor (csColor (1,1,1));
+  }
 }
 
 //===========================================================================
