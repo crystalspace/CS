@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/ref.h"
+#include "igraphic/imageio.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/event.h"
@@ -32,7 +33,7 @@
 CS_IMPLEMENT_APPLICATION
 
 iObjectRegistry *objreg;
-iGraphics3D *G3D;
+csRef<iGraphics3D> G3D;
 
 bool HandleEvent (iEvent &ev)
 {
@@ -54,6 +55,9 @@ bool HandleEvent (iEvent &ev)
     csInitializer::CloseApplication (objreg);
   }
   else return false;
+
+  csSleep(5);
+
   return true;
 }
 
@@ -69,6 +73,7 @@ int main (int argc, char *argv[])
   bool ok = csInitializer::RequestPlugins (objreg,
     CS_REQUEST_SOFTWARE3D,
     CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,					  
 //  CS_REQUEST_PLUGIN ("crystalspace.gui.pico.client", iGUIClientHelper),
     CS_REQUEST_PLUGIN ("crystalspace.gui.pico.server", iGUIServer),
     CS_REQUEST_END);
@@ -78,7 +83,7 @@ int main (int argc, char *argv[])
     return 2;
   }
 
-  G3D = csRef<iGraphics3D> (CS_QUERY_REGISTRY (objreg, iGraphics3D));
+  G3D = CS_QUERY_REGISTRY (objreg, iGraphics3D);
   if (! G3D)
   {
     fprintf (stderr, "Failed to find 3d graphics driver.\n");
@@ -109,8 +114,8 @@ int main (int argc, char *argv[])
 
   csDefaultRunLoop (objreg);
 
-  G3D->Close ();
-  G3D->DecRef ();
+  // G3D->Close ();
+  G3D = 0;
   csInitializer::DestroyApplication (objreg);
   return 0;
 }

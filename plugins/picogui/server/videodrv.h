@@ -49,7 +49,7 @@ class csPGVideoDriver
   // Unsigned long for flags due to MSVC/posix typedef differences
   // Works in gcc too, right? Otherwise someone on posix fix it :)
   // - Anders Stenberg
-  static g_error SetMode (int16 x, int16 y, int16 bpp, unsigned long flags);
+  static g_error SetMode (int16 x, int16 y, int16 bpp, unsigned flags);
   static int BeginDraw (struct divnode **div, struct gropnode ***listp,
     struct groprender *rend);
   static void Close ();
@@ -70,7 +70,7 @@ class csPGVideoDriver
     hwrcolor color, int16);
   static void Blit (hwrbitmap, int16 x, int16 y, int16 w, int16 h,
     stdbitmap *pic, int16 px, int16 py, int16);
-  static g_error Load (hwrbitmap*, const uint8 *data, unsigned long len);
+  static g_error Load (hwrbitmap*, const uint8 *data, unsigned len);
   static g_error New (hwrbitmap*, int16 w, int16 h, uint16 bpp);
   static void Free (hwrbitmap hb) { delete GETBMP (hb); }
   static g_error GetSize (hwrbitmap, int16 *w, int16 *h);

@@ -55,8 +55,8 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   setvbl_linear32 (v);
   v->init			= Init;
   v->setmode			= SetMode;
-  /*v->close			= Close;
-  v->coord_logicalize		= CoordLogicalize;*/
+  v->close			= Close;
+  /* v->coord_logicalize		= CoordLogicalize;*/
   v->update			= Update;
   /*v->is_rootless		= IsRootless;
   v->color_pgtohwr		= ColorPG2CS;
@@ -97,6 +97,8 @@ g_error csPGVideoDriver::Init ()
 
 void csPGVideoDriver::Close ()
 {
+  ImageIO = 0;
+  Gfx2D = 0;
 }
 
 int csPGVideoDriver::BeginDraw (struct divnode **div, struct gropnode ***listp,
@@ -109,7 +111,7 @@ int csPGVideoDriver::BeginDraw (struct divnode **div, struct gropnode ***listp,
 // Works in gcc too, right? Otherwise someone on posix fix it :)
 // - Anders Stenberg
 g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, 
-                                  unsigned long flags)
+                                  unsigned flags)
 {
   delete vid->display->bits;
   vid->display->bits = new u8[vid->xres*vid->yres*(vid->bpp>>3)];
@@ -335,7 +337,7 @@ g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
   return 0;
 }
 
-g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned long len)
+g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned len)
 {
 
   int format;

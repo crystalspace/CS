@@ -59,6 +59,7 @@ g_error csPGFontEngine::Init ()
 
 void csPGFontEngine::Shutdown ()
 {
+  Serv = 0;
 }
 
 void csPGFontEngine::DrawChar (font_descriptor *f, stdbitmap *b,

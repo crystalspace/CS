@@ -58,7 +58,7 @@ g_error csPGInputDriver::RegFunc (inlib *i)
 {
   i->init		= Init;
   i->close		= Close;
-  i->fd_init		= 0;
+  i->fd_init		= FDInit;
   i->fd_activate	= 0;
   i->poll		= 0;
   i->ispending		= 0;
@@ -77,11 +77,20 @@ g_error csPGInputDriver::Init ()
   return 0;
 }
 
+void csPGInputDriver::FDInit (int *n, fd_set *readfds, timeval *timeout)
+{
+  timeout->tv_sec = 0;
+  timeout->tv_usec = 0;
+}
+
 void csPGInputDriver::Close ()
 {
   EvQ->RemoveListener (EvH);
 
   pointer_free (1, & Cursor);
+
+  EvH = 0;
+  EvQ = 0;
 }
 
 bool csPGInputHandler::HandleEvent (iEvent &ev)

@@ -26,6 +26,13 @@ chronological order.
 	  (highest detail possible).
 	- Matze fixed csArray::Iterator. The code was always assuming default
 	  ElementHandler.
+	- DeSigna:
+	  - Fixed pgserver plugin to compile ok on Linux. There may
+	    still be library problems, depending on pgserver build config.
+	  - Fixed segfaulting problems at pgui plugin unloading (temp
+	    fix). 
+	  - Patched in changes suggested by Dentoid to increase frame
+	    update speed.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.
