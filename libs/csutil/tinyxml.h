@@ -22,7 +22,6 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-
 #ifndef TINYXML_INCLUDED
 #define TINYXML_INCLUDED
 
@@ -36,11 +35,11 @@ distribution.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <iutil/string.h>
-#include <csutil/util.h>
-#include <csutil/array.h>
-#include <csutil/strset.h>
-#include <csutil/blockallocator.h>
+#include "iutil/string.h"
+#include "csutil/util.h"
+#include "csutil/array.h"
+#include "csutil/strset.h"
+#include "csutil/blockallocator.h"
 
 #include "tinywrap.h"
 #include "tinystr.h"
@@ -802,4 +801,3 @@ private:
 };
 
 #endif
-
