@@ -30,7 +30,7 @@
 // DDG includes
 #include "csterr/ddghemap.h"
 #include "csterr/ddgvec.h"
-//#include "csterr/ddgnoise.h"
+#include "csterr/ddgnoise.h"
 #include "csterr/ddgerror.h"
 // ----------------------------------------------------------------------
 
@@ -146,16 +146,8 @@ bool ddgHeightMap::writeTGN(char *filename, unsigned int base, unsigned int scal
 		{
 			ch1 = _pixbuffer[c + r * _cols] % 256;
 			ch2 = _pixbuffer[c + r * _cols] - ch1 * 256;
-			if  (endian)
-			{
-				fputc(ch2,fptr);
-				fputc(ch1,fptr);
-			}
-			else
-			{
-				fputc(ch1,fptr);
-				fputc(ch2,fptr);
-			}
+			fputc(ch1,fptr);
+			fputc(ch2,fptr);
 		}
 		r++;
 	}
@@ -310,31 +302,31 @@ bool ddgHeightMap::readTGN(char *file)
 
 
 
-bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float /*o*/ )
+bool ddgHeightMap::generateHeights(unsigned int r, unsigned int c, float oct )
 {
-	// Read data
     allocate(r,c);
 	unsigned int ci, ri;
+	float lacun = 2.0;
+	float fractalDim = 0.25;
+	float offset = 0.7;
+	double size = 3.0;  // sample range = 0 to 3 
 	short cc;
 	double n;
-	ddgVector3 v(0,0,0);
-//	double min = 999999, max = -999999;
+	double v[3];
+	v[0] = 0; v[1] = 0; v[2] = 0;
 	for (ri = 0; ri < r; ri++)
 	{
-		v.v[1] = 0.0f;
+		v[1] = 0.0f;
 		for (ci = 0; ci < c; ci++)
 		{
-			n = 0; //ddgNoise::four_noise(v,100);	// Returns 0 to 1.
-//			if (n < min) min = n;
-//			if (n > max) max = n;
-			n = (n*0xFFFF) - 0x7FFF;		// Scale to fill range.
-			assert(n >=-0x7FFF && n <= 0x7FFF);
-			cc = (short) n;
+			n = ddgNoise::hybridmultifractal(v,fractalDim,lacun,oct,offset);	// Returns 0 to 1.
+			cc = (short) ddgUtil::clamp(n*75.0,0,255);	// Scale to fill range.
 			set(ri,ci, cc);
-			v.v[1]+= 100.0f/c;
+			v[1]+= size/c;
 		}
-	v.v[0]+= 100.0f/r;
+	v[0]+= size/r;
 	}
+
   
 	return true;
 }
