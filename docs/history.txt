@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Oct-2004
+	- Jorrit fixed a critical bug in VFS. In case you tried to
+	  call VFS->Sync() while there were still references to open files
+	  in ZIP archives then VFS would crash because the archive entry
+	  would be deleted and the open files would get a dangling pointer.
+	  Fixed this by checking the ref count on the archive entry and
+	  only deleting the entry in case there are no open files. If there
+	  are open files the entry is only flushed so the effect of
+	  Sync() is not lost.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.

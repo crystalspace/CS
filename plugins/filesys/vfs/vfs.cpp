@@ -193,6 +193,7 @@ public:
   }
   virtual ~VfsArchive ()
   {
+    CS_ASSERT (RefCount == 0);
 #ifdef VFS_DEBUG
     printf ("VFS: archive \"%s\" closing (writing=%d)\n", GetName (), Writing);
 #endif
@@ -246,6 +247,23 @@ public:
   void DeleteAll ()
   {
     array.DeleteAll ();
+  }
+
+  void FlushAll ()
+  {
+    size_t i = 0;
+    while (i < array.Length ())
+    {
+      array[i]->Flush ();
+      if (array[i]->RefCount == 0)
+      {
+	array.DeleteIndex (i);
+      }
+      else
+      {
+	i++;
+      }
+    }
   }
 
   void CheckUp ()
@@ -1870,8 +1888,9 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
 bool csVFS::Sync ()
 {
   csScopedMutexLock lock (mutex);
-  ArchiveCache->DeleteAll ();
-  return (ArchiveCache->Length () == 0);
+  ArchiveCache->FlushAll ();
+  return true;
+  //@@@return (ArchiveCache->Length () == 0);
 }
 
 csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
