@@ -231,6 +231,12 @@ private:
   csColor* colors;
 
   /**
+   * This array contains the static colors. It is used in combination with
+   * 'colors'.  'colors=static_colors+dynamic_lights'.
+   */
+  csColor* static_colors;
+
+  /**
    * Precompute the plane normal. Normally this is done automatically by
    * set_texture_space but if needed you can call this function again when
    * something has changed.
@@ -358,6 +364,9 @@ public:
   /// Get the pointer to the vertex color table.
   csColor* GetColors () { return colors; }
 
+  /// Get the pointer to the static vertex color table.
+  csColor* GetStaticColors () { return static_colors; }
+
   /// Get the flat color for this polygon.
   csColor& GetFlatColor () { return flat_color; }
 
@@ -378,16 +387,49 @@ public:
   void ResetFlatColor () { SetFlags (CS_POLY_FLATSHADING, 0); }
 
   /**
-   * Set a color. Only use after 'set_uv' has been called for this index.
-   * When this function is called for the first time the color array will
-   * be initialized to all black.
+   * Add a color to a static array color entry.
+   * If no color information is set then this function will initialize
+   * color information (set everything to black).
+   */
+  void AddColor (int i, float r, float g, float b);
+
+  /**
+   * Add a color to a dynamic array color entry.
+   * If no color information is set then this function will initialize
+   * color information (set everything to black).
+   */
+  void AddDynamicColor (int i, float r, float g, float b);
+
+  /**
+   * Set a color in the dynamic array. Only use after 'set_uv' has been called
+   * for this index. When this function is called for the first time the color
+   * array will be initialized to all black.
+   */
+  void SetDynamicColor (int i, float r, float g, float b);
+
+  /**
+   * Reset a dynamic color to the static values.
+   */
+  void ResetDynamicColor (int i);
+
+  /**
+   * Set a color in the dynamic array. Only use after 'set_uv' has been called for
+   * this index. When this function is called for the first time the color array
+   * will be initialized to all black.
+   */
+  void SetDynamicColor (int i, csColor& c) { SetDynamicColor (i, c.red, c.green, c.blue); }
+
+  /**
+   * Set a color in the static array. Only use after 'set_uv' has been called
+   * for this index. When this function is called for the first time the color
+   * array will be initialized to all black.
    */
   void SetColor (int i, float r, float g, float b);
 
   /**
-   * Set a color. Only use after 'set_uv' has been called for this index.
-   * When this function is called for the first time the color array will
-   * be initialized to all black.
+   * Set a color in the static array. Only use after 'set_uv' has been called for
+   * this index. When this function is called for the first time the color array
+   * will be initialized to all black.
    */
   void SetColor (int i, csColor& c) { SetColor (i, c.red, c.green, c.blue); }
 
@@ -753,6 +795,21 @@ public:
    * do nothing.
    */
   void FillLightmap (csLightView& lview);
+
+  /**
+   * Update vertex lighting for this polygon. Only works if the
+   * polygon uses gouraud shading or is flat-shaded.
+   * 'dynamic' is true for a dynamic light.
+   * 'reset' is true if the light values need to be reset to 0.
+   * 'lcol' is the color of the light. It is given seperately
+   * because the color of the light may be modified by portals and
+   * other effects.<br>
+   * 'light' can be NULL in which case this function is useful
+   * for resetting dynamic light values to the static lights ('reset'
+   * must be equal to true then).
+   */
+  void UpdateVertexLighting (csLight* light, const csColor& lcol,
+  	bool dynamic, bool reset);
 
   /**
    * Check all shadow frustrums and mark all relevant ones. A shadow

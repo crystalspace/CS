@@ -28,6 +28,7 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/lghtmap.h"
+#include "csobject/nameobj.h"
 #include "igraph3d.h"
 #include "itexture.h"
 

@@ -49,9 +49,8 @@ struct LightInfo;
  */
 class csPolyTexture
 {
-  ///
   friend class csPolygon3D;
-  ///
+  friend class csPolygon2D;
   friend class Dumper;
 
 private:
