@@ -93,13 +93,13 @@ csPolygon3DStatic::~csPolygon3DStatic ()
 void csPolygon3DStatic::SetNumVertices (int count)
 {
   int old_count = polygon_data.num_vertices;
+  polygon_data.num_vertices = count;
   if (old_count == count) return;
   if (old_count >= 1 && old_count <= 3 && count >= 1 && count <= 3) return;
   if (old_count >= 7 && old_count <= 20 && count >= 7 && count <= 20) return;
   if (old_count >= 21 && count >= 21) return;
 
   int* old_data = polygon_data.vertices;
-  polygon_data.num_vertices = count;
   csThingObjectType* t = thing_static->thing_type;
   switch (count)
   {

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Nov-2003
+	- Daniel Fryer found a bug in the thing mesh plugin when adding
+	  polygon vertices one at a time. The vertex count was not correctly
+	  updated in all cases.
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared
