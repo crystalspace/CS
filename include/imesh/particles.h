@@ -224,7 +224,7 @@ struct iParticlesObjectState : public iBase
   /// Clear the color gradient
   virtual void ClearColors () = 0;
 
-  virtual csArray<csColor> &GetGradient () = 0;
+  virtual const csArray<csColor> &GetGradient () = 0;
 
   /// Set the color method to a constant color
   virtual void SetConstantColorMethod (csColor color) = 0;
@@ -453,8 +453,7 @@ struct iParticlesPhysics : public iBase
   /**
    * Register a particles object with the physics plugin
    */
-  virtual void RegisterParticles (iParticlesObjectState *particles,
-    csArray<csParticlesData> *data) = 0;
+  virtual const csArray<csParticlesData> *RegisterParticles (iParticlesObjectState *particles) = 0;
 
   /**
    * Remove a particles object from the physics plugin

@@ -24,6 +24,8 @@ chronological order.
 	- Eric Sunshine augmented win3.jam so that the "File Description"
 	  attribute emitted to the version .rc file has a reasonable default
 	  value if the target's Jamfile did not invoke the Help rule.
+	- John Harger fixed the particles interface to avoid the dangerous
+	  csArray references.
 27-Jan-2004
 	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
 	- John Harger moved everything from iParticlesObjectState::Update into

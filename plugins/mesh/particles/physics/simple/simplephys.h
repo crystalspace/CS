@@ -37,7 +37,7 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
 
   struct particles_object {
     iParticlesObjectState *particles;
-    csArray<csParticlesData> *data;
+    csArray<csParticlesData> data;
     float new_particles;
     int dead_particles;
     float total_elapsed_time;
@@ -70,8 +70,8 @@ public:
   /**
    * Register a particles object with the physics plugin
    */
-  virtual void RegisterParticles (iParticlesObjectState *particles,
-    csArray<csParticlesData> *data);
+  virtual const csArray<csParticlesData> *RegisterParticles
+    (iParticlesObjectState *particles);
 
   /**
    * Remove a particles object from the physics plugin

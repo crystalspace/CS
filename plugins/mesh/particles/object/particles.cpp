@@ -224,6 +224,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   loop_time = p->loop_time;
   color_callback = p->color_callback;
 
+  point_data = NULL; // This gets created by the physics plugin
+
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
   //dead_particles = 0;
@@ -282,7 +284,7 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
       "Could not load the particles physics plugin '%s'!", plugin_id);
     return false;
   }
-  physics->RegisterParticles (&scfiParticlesObjectState, &point_data);
+  point_data = physics->RegisterParticles (&scfiParticlesObjectState);
   return true;
 }
 
@@ -317,20 +319,21 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   int vertnum = 0;
   float new_radius = 0.0f;
 
-  for(int i=0;i<point_data.Length ();i++)
+  for(int i=0;i<point_data->Length ();i++)
   {
-    if(point_data[i].time_to_live < 0.0f) break;
+    const csParticlesData &point = point_data->Get(i);
+    if(point.time_to_live < 0.0f) break;
 
     vertnum ++;
 
     // For calculating radius
-    csVector3 dist_vect = point_data[i].position - emitter;
+    csVector3 dist_vect = point.position - emitter;
     if (dist_vect.SquaredNorm() > new_radius)
     {
       new_radius = dist_vect.SquaredNorm();
     }
   }
-  //dead_particles = point_data.Length () - vertnum;
+  //dead_particles = point_data->Length () - vertnum;
 
   if(vertnum>0) 
   {
@@ -405,9 +408,9 @@ void csParticlesObject::PreGetShaderVariableValue (csShaderVariable* var)
 
 iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
 {
-  if (!vertex_buffer || buffer_length != point_data.Length ())
+  if (!vertex_buffer || buffer_length != point_data->Length ())
   {
-    buffer_length = point_data.Length ();
+    buffer_length = point_data->Length ();
     csArray<iRenderBuffer*> buffers;
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
     pFactory->g3d->CreateInterleavedRenderBuffers (bufsize
@@ -485,11 +488,11 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     int size;
     if (point_sprites)
     {
-      int len = point_data.Length ();
+      int len = point_data->Length ();
       vertex_data.SetLength (len);
       for (int i = 0; i < len - 1; i++)
       {
-        csParticlesData &point = point_data[i];
+        const csParticlesData &point = point_data->Get(i);
         i_vertex vertex;
         vertex.position = point.position - emitter;
         vertex.color = point.color;
@@ -501,12 +504,12 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     }
     else
     {
-      int len = point_data.Length ();
+      int len = point_data->Length ();
       vertex_data.SetLength (len * 4);
       int i,j;
       for (i = 0, j = 0; i < len - 1; i++, j += 4)
       {
-        csParticlesData &point = point_data[i];
+        const csParticlesData &point = point_data->Get(i);
         i_vertex vertex;
         vertex.position = (point.position - emitter) + corners[0];
         vertex.color = point.color;
@@ -604,7 +607,7 @@ void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
 
 void csParticlesObject::Start ()
 {
-  if(point_data.Length () < 1) {
+  if(point_data->Length () < 1) {
     buffer_length = 0;
   }
   physics->Start (&scfiParticlesObjectState);

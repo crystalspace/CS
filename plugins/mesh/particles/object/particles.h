@@ -404,7 +404,7 @@ private:
   csParticleColorMethod color_method;
   csWeakRef<iParticlesColorCallback> color_callback;
 
-  csDirtyAccessArray<csParticlesData> point_data;
+  const csArray<csParticlesData> *point_data;
   struct i_vertex {
     csVector3 position;
     csVector4 color;
@@ -651,7 +651,7 @@ public:
   { return loop_time; }
   float GetBaseHeat ()
   { return base_heat; }
-  csArray<csColor> &GetGradient ()
+  const csArray<csColor> &GetGradient ()
   { return gradient_colors; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
@@ -724,7 +724,7 @@ public:
     { return scfParent->GetConstantColor (); }
     virtual float GetColorLoopTime ()
     { return scfParent->GetColorLoopTime (); }
-    virtual csArray<csColor> &GetGradient ()
+    virtual const csArray<csColor> &GetGradient ()
     { return scfParent->GetGradient (); }
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }
