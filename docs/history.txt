@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+1-May-2000
+	- Eric Sunshine fixed several build problems with the Dungeon plug-in
+	  which showed up with the introduction of Bison and Lex.
+	- Eric Sunshine eliminated several compilation warnings and problems
+	  throughout the project.
+	- Eric Sunshine repaird the project enough that it builds on NextStep
+	  once again.  Most of the programs even run, though some suffer from
+	  link problems when loading plug-in modules.
 30-Apr-2000
 	- More work on the PVS.
 	- Added csBox2 and csBox3::GetCenter().
@@ -14,7 +22,7 @@ The history order has been reversed so that new features are at the top.
 	    - Re-defined process to accomodate COMP_BC, COMP_VC & COMP_GCC.
 	    - Modified ddraw.mak to generate ddraw2d.dll for COMP_VC and
 	      COMP_GCC when shared libraries or "plugins" are being built.
-	- Andrew Zabolotny did a small fix to the unix system driver with
+	- Andrew Zabolotny did a small fix to the Unix system driver with
 	  regards to time handling.
 	- Update to VC project files from Frank O'Connor for new multiprotocol
 	  communication manager.
