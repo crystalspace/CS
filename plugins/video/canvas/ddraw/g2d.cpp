@@ -20,7 +20,6 @@
 #include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "g2d.h"
 #include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
@@ -29,6 +28,7 @@
 #include "ivaria/reporter.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
+#include "g2d.h"
 
 #ifndef DD_FALSE
   // This is normally being done in the ddraw.h file
@@ -64,7 +64,8 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_nActivePage (0),
   m_bLocked (false),
   m_bDoubleBuffer (false),
-  m_bAllowWindowed (false)
+  m_bAllowWindowed (false),
+  m_piWin32Assistant (NULL)
 {
   m_hInstance = GetModuleHandle (NULL);
 }
@@ -72,6 +73,8 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
 csGraphics2DDDraw3::~csGraphics2DDDraw3 ()
 {
   Close ();
+  if (m_piWin32Assistant)
+    m_piWin32Assistant->DecRef ();
 }
 
 void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
@@ -96,6 +99,16 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
 {
   if (!csGraphics2D::Initialize (object_reg))
     return false;
+
+  m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  if (!m_piWin32Assistant)
+  {
+    MessageBox (0, 
+      "csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.",
+      NULL,
+      MB_OK | MB_ICONERROR);
+    exit(1);
+  }
 
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
 						   iCommandLineParser);
@@ -455,16 +468,13 @@ void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
-  iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
-  CS_ASSERT (winhelper != NULL);
-  bool rc;
+bool rc;
   if (!m_bHardwareCursor) {
-    winhelper->SetCursor (csmcNone);
+    m_piWin32Assistant->SetCursor (csmcNone);
     rc = false;
   } else {
-    rc = winhelper->SetCursor (iShape);
+    rc = m_piWin32Assistant->SetCursor (iShape);
   }
-  winhelper->DecRef ();
   return rc;
 }
 
@@ -843,4 +853,17 @@ LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
       break;
   }
   return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
+}
+
+void csGraphics2DDDraw3::SetTitle (const char* title)
+{
+  csGraphics2D::SetTitle (title);
+  if (m_hWnd)
+    SetWindowText (m_hWnd, title);
+}
+
+void csGraphics2DDDraw3::AlertV (int type, const char* title, 
+    const char* okMsg, const char* msg, va_list args)
+{
+  m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, args);
 }

@@ -24,6 +24,7 @@
 #include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/natwin.h"
 #include <stdarg.h>
 #include <windows.h>
 
@@ -436,6 +437,8 @@ public:
   virtual unsigned GetPotentiallyConflictingEvents ();
   virtual unsigned QueryEventPriority (unsigned);
   virtual void DisableConsole ();
+  void AlertV (HWND window, int type, const char* title, 
+    const char* okMsg, const char* msg, va_list args);
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -503,7 +506,25 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   wc.hCursor        = NULL;
   // try the app icon...
   wc.hIcon          = LoadIcon (ModuleHandle, MAKEINTRESOURCE(1));
-  // not?
+  // not? may executable.ico?
+  if (!wc.hIcon) 
+  {
+    char apppath[MAX_PATH];
+    GetModuleFileName (0, apppath, sizeof(apppath));
+
+    char *dot = strrchr (apppath, '.');
+    if (dot) 
+    {
+      strcpy (dot, ".ico");
+    }
+    else
+    {
+      strcat (apppath, ".ico");
+    }
+    wc.hIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
+      0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+  }
+  // finally the default one
   if (!wc.hIcon) wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
   wc.lpszMenuName   = NULL;
   wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
@@ -620,6 +641,17 @@ bool Win32Assistant::HandleEvent (iEvent& e)
       m_hThread = NULL;
     }
 #   endif
+  } else if (e.Command.Code == cscmdCommandLineHelp)
+  {
+   #ifdef CS_DEBUG 
+    const char *defcon = "yes";
+   #else
+    const char *defcon = "no";
+   #endif
+
+    printf ("Win32-specific options:\n");
+    printf ("  -[no]console       Create a debug console (default = %s)\n",     
+      defcon);
   }
   return false;
 }
@@ -883,33 +915,6 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-#if 0
-//@@@ THIS PART OF CONFIG HELP IS CURRENTLY BROKEN!!!
-void Win32Assistant::Win32Assistant (iConfigManager *Config)
-{
-/*
-#ifdef CS_DEBUG
-  console_window = true;
-  if (console_window)
-  {
-    AllocConsole();
-    freopen("CONOUT$", "a", stderr); // Redirect stderr to console
-    freopen("CONOUT$", "a", stdout); // Redirect stdout to console
-  }
-#endif
-*/
-}
-#endif
-
-#if 0
-//@@@ THIS PART OF COMMANDLINE HELP IS CURRENTLY BROKEN!!!
-void Win32Assistant::Help ()
-{
-  printf ("  -[no]console       Create a debug console (default = %s)\n",
-    console_window ? "yes" : "no");
-}
-#endif
-
 bool Win32Assistant::SetCursor (int cursor)
 {
   char *CursorID;
@@ -976,4 +981,21 @@ void Win32Assistant::DisableConsole ()
   time( &aclock );
   now = localtime( &aclock );
   printf("====== %s", asctime(now));
+}
+
+void Win32Assistant::AlertV (HWND window, int type, const char* title, 
+    const char* okMsg, const char* msg, va_list args)
+{
+  UINT style = MB_OK;
+
+  if (type == CS_ALERT_ERROR)
+    style |= MB_ICONERROR;
+  else if (type == CS_ALERT_WARNING)
+    style |= MB_ICONWARNING;
+  else if (type == CS_ALERT_NOTE)
+    style |= MB_ICONINFORMATION;
+
+  char buf[4096];
+  vsprintf(buf, msg, args);
+  MessageBox (window, buf, title, style);
 }

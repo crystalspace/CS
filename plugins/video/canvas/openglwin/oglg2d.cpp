@@ -104,14 +104,16 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 
       LocalFree( lpMsgBuf );
 
-      MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", MB_OK);
+      MessageBox (NULL, szMsg, "Fatal Error in glwin32.dll", 
+	MB_OK | MB_ICONERROR);
       delete szMsg;
 
       exit(1);
     }
   }
 
-  MessageBox (NULL, str, "Fatal Error in glwin32.dll", MB_OK);
+  MessageBox (NULL, str, "Fatal Error in glwin32.dll", 
+    MB_OK | MB_ICONERROR);
 
   exit (1);
 }
@@ -259,7 +261,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!m_piWin32Assistant)
-    SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
+    SystemFatalError ("csGraphics2DOpenGL::Open(QI) -- system passed does not support iWin32Assistant.");
 
   // Get the creation parameters
   m_hInstance = m_piWin32Assistant->GetInstance ();
@@ -276,6 +278,8 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
   cmdline->DecRef ();
+
+  DepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
 
   return true;
 }
@@ -295,7 +299,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0,                              /* alpha bits (ignored) */
       0,                              /* no accumulation buffer */
       0, 0, 0, 0,                     /* accum bits (ignored) */
-      16,                             /* depth buffer */
+      DepthBits,                      /* depth buffer */
       1,                              /* no stencil buffer */
       0,                              /* no auxiliary buffers */
       PFD_MAIN_PLANE,                 /* main layer */
@@ -312,6 +316,9 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
 
   if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     SystemFatalError ("DescribePixelFormat failed.");
+
+  Depth = pfd.cColorBits;
+  DepthBits = pfd.cDepthBits;
 }
 
 bool csGraphics2DOpenGL::Open ()
@@ -368,11 +375,6 @@ bool csGraphics2DOpenGL::Open ()
     }
   }
 
-  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &dmode);
-  Depth = dmode.dmBitsPerPel;
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "Using %d bits per pixel (%d color mode).", Depth, 1 << (Depth == 32 ? 24 : Depth));
-
   if (FullScreen)
   {
     exStyle = WS_EX_TOPMOST;
@@ -396,6 +398,10 @@ bool csGraphics2DOpenGL::Open ()
 
   hDC = GetDC (m_hWnd);
   CalcPixelFormat ();
+
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Using %d bits per pixel (%d color mode), %d bits depth buffer.", 
+      Depth, 1 << (Depth == 32 ? 24 : Depth), DepthBits);
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
@@ -537,3 +543,15 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 
+void csGraphics2DOpenGL::SetTitle (const char* title)
+{
+  csGraphics2D::SetTitle (title);
+  if (m_hWnd)
+    SetWindowText (m_hWnd, title);
+}
+
+void csGraphics2DOpenGL::AlertV (int type, const char* title, const char* okMsg,
+	const char* msg, va_list arg)
+{
+  m_piWin32Assistant->AlertV (m_hWnd, type, title, okMsg, msg, arg);
+}

@@ -61,6 +61,12 @@ public:
 
   virtual bool PerformExtensionV (char const* command, va_list);
 
+  /// Set the window title
+  virtual void SetTitle (const char* title);
+  /// Display a nice message box.
+  virtual void AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list args);
+
   int m_nGraphicsReady;
 
   /**
@@ -90,6 +96,8 @@ protected:
   bool m_bPaletteChanged;
 
   bool m_bHardwareCursor;
+
+  int DepthBits;
 
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();

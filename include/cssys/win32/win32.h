@@ -27,7 +27,7 @@
 
 #define CS_WIN32_WINDOW_CLASS_NAME "CrystalSpaceWin32"
 
-SCF_VERSION (iWin32Assistant, 0, 0, 3);
+SCF_VERSION (iWin32Assistant, 0, 0, 4);
 
 /**
  * This interface describes actions specific to the Windows platform.
@@ -46,6 +46,9 @@ struct iWin32Assistant : public iBase
   virtual bool SetCursor (int cursor) = 0;
   /// Disable the console window (if present)
   virtual void DisableConsole () = 0;
+  /// Display a nice message box
+  virtual void AlertV (HWND window, int type, const char* title, 
+    const char* okMsg, const char* msg, va_list args) = 0;
 };
 
 // @@@ Delete everything below when the system driver is removed.

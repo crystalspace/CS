@@ -36,6 +36,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/fontserv.h"
 #include "csutil/cmdhelp.h"
 #include "iutil/cmdline.h"
@@ -910,7 +911,7 @@ int main (int argc, char *argv[])
         "Unable to open drivers!");
     return -1;
   }
-
+  
   if (!System.myG2D->Open ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -918,6 +919,9 @@ int main (int argc, char *argv[])
         "Unable to open graphics context!");
     return -1;
   }
+
+  iNativeWindow* nw = System.myG2D->GetNativeWindow ();
+  if (nw) nw->SetTitle (APP_TITLE);
 
   csDefaultRunLoop(object_reg);
   System.myG2D->Close();

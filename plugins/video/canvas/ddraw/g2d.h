@@ -55,6 +55,11 @@ public:
   virtual bool DoubleBuffer (bool Enable);
   virtual bool GetDoubleBufferState ();
 
+  /// Set the window title
+  virtual void SetTitle (const char* title);
+  /// Display a message box
+  virtual void AlertV (int type, const char* title, 
+    const char* okMsg, const char* msg, va_list args);
 protected:
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
@@ -69,6 +74,8 @@ protected:
   HPALETTE m_hWndPalette;
 
   HDC hdc;
+
+  iWin32Assistant* m_piWin32Assistant;
 
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;
