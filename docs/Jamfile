@@ -27,5 +27,9 @@ InstallDoc history.txt ;
 
 SubInclude TOP docs texinfo ;
 SubInclude TOP docs doxygen ;
-SubInclude TOP docs html ;
-SubInclude TOP docs pubapi ;
+
+SubDir TOP docs html ;
+ScanDocDirs : html manual ;
+
+SubDir TOP docs pubapi ;
+ScanDocDirs : html api ;

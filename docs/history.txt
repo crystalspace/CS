@@ -11,6 +11,11 @@ chronological order.
 	  reflect all the MacOS/X-specific fixes Eric applied to
 	  CS/configure.ac over the last several months (i.e. "ranlib -s",
 	  "gcc -E", etc.).
+	- Eric Sunshine inlined the functionality from CS/docs/html/Jamfile and
+	  CS/docs/pubapi/Jamfile into CS/docs/Jamfile because the Jamfiles in
+	  those two subdirectories get deleted automatically by jobber.pl
+	  (since all content of those directories is generated automatically by
+	  jobber.pl).
 25-Jan-2004
         - Matze made some updates to the Jam rules:
 	    - Decided not to fight Autoconf while using custom variable names
