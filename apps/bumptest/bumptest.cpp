@@ -86,6 +86,7 @@ BumpTest::BumpTest ()
   going_right = true;
   myG3D = NULL;
   kbd = NULL;
+  room = NULL;
 }
 
 BumpTest::~BumpTest ()
@@ -122,34 +123,25 @@ void Cleanup ()
 bool BumpTest::InitProcDemo ()
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  iMaterialWrapper* itm = engine->GetMaterialList ()->
-  	FindByName ("wood");
+  iMaterialWrapper* itm = engine->GetMaterialList ()->FindByName ("wood");
 
-  //char *vfsfilename = "/lib/std/mystone2.gif";
   char *vfsfilename = "/lib/std/stone4.gif";
   iTextureWrapper *bptex = engine->CreateTexture("bumptex", vfsfilename, 0,
     CS_TEXTURE_2D| CS_TEXTURE_3D);
   iMaterialWrapper* ibp = engine->CreateMaterial("bumptexture", bptex);
   engine->Prepare ();
-  //iImageIO *imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
-  //iVFS *VFS = CS_QUERY_PLUGIN(plugin_mgr, iVFS);
-  //iDataBuffer *buf = VFS->ReadFile (vfsfilename);
-  //iImage *map = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
-      //txtmgr->GetTextureFormat ());
-  //map->IncRef();
-  //buf->DecRef();
-  //VFS->DecRef();
-  //imgloader->DecRef();
+
   iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
-  //prBump->SetBumpMap(map);
+  bptex->DecRef ();
+
   matBump = prBump->Initialize (GetObjectRegistry (), engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
+
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
   iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-
 
   iMaterialWrapper* imatBump = SCF_QUERY_INTERFACE (matBump, iMaterialWrapper);
   iThingState* thing_state = SCF_QUERY_INTERFACE (thing_obj, iThingState);
@@ -175,12 +167,10 @@ bool BumpTest::InitProcDemo ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
   csVector3 overdist(0,0,-0.01); // to move slightly in front
 
-#if 1
   /// the bumpoverlay
   // this does not work - the texture is flat shaded too.
   p = thing_state->CreatePolygon ();
   p->SetTextureType(POLYTXT_LIGHTMAP);
-  //p->SetLightingMode(false);
   p->GetFlags().Set(CS_POLY_LIGHTING, 0); // the overlay is not lit
   p->SetMaterial (imatBump);
   p->CreateVertex (csVector3 (-dx, +dy, -dz)+overdist);
@@ -188,15 +178,10 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (+dx, -dy, -dz)+overdist);
   p->CreateVertex (csVector3 (-dx, -dy, -dz)+overdist);
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
-  //const char *conv[] = {"POLYTXT_NONE", "POLYTXT_FLAT", "POLYTXT_GOURAUD",
-    //"POLYTXT_LIGHTMAP"};
-  //printf("PolyTexType = %s\n", conv[p->GetTextureType()]);
-  //printf("MaterialWrap = %x  Handle %x\n", (int)imatBump, (int)imatBump->GetMaterialHandle());
+
   iPolyTexType *ipn = p->GetPolyTexType();
   if(!ipn) printf("No PolyTexNone info!\n");
   else ipn->SetMixMode(CS_FX_MULTIPLY2);
-  //if(ipn) ipn->SetMixMode(CS_FX_COPY);
-#endif
 
   ////// copy of bumps for debug
   p = thing_state->CreatePolygon ();
@@ -208,7 +193,6 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,0,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
 
-  //ibp->GetMaterialHandle()->Prepare();
   p = thing_state->CreatePolygon ();
   p->SetMaterial (ibp);
   p->CreateVertex (csVector3 (-dx, +0, -dz) + csVector3(2.5,1,0));
@@ -216,58 +200,7 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (+0, -dy, -dz) + csVector3(2.5,1,0));
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,1,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
-  //engine->Prepare();
 
-  /*
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->CreateVertex (csVector3 (+dx, +dy, -dz));
-  p->CreateVertex (csVector3 (-dx, +dy, -dz));
-  p->CreateVertex (csVector3 (-dx, +dy, +dz));
-  p->CreateVertex (csVector3 (+dx, +dy, +dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->CreateVertex (csVector3 (+dx, -dy, +dz));
-  p->CreateVertex (csVector3 (-dx, -dy, +dz));
-  p->CreateVertex (csVector3 (-dx, -dy, -dz));
-  p->CreateVertex (csVector3 (+dx, -dy, -dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->GetFlags().Set (CS_POLY_LIGHTING, 0);
-  p->CreateVertex (csVector3 (-dx, +dy, -dz));
-  p->CreateVertex (csVector3 (+dx, +dy, -dz));
-  p->CreateVertex (csVector3 (+dx, -dy, -dz));
-  p->CreateVertex (csVector3 (-dx, -dy, -dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 2);
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->GetFlags().Set (CS_POLY_LIGHTING, 0);
-  p->CreateVertex (csVector3 (-dx, -dy, -dz));
-  p->CreateVertex (csVector3 (-dx, -dy, +dz));
-  p->CreateVertex (csVector3 (-dx, +dy, +dz));
-  p->CreateVertex (csVector3 (-dx, +dy, -dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1);
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->CreateVertex (csVector3 (+dx, -dy, +dz));
-  p->CreateVertex (csVector3 (+dx, -dy, -dz));
-  p->CreateVertex (csVector3 (+dx, +dy, -dz));
-  p->CreateVertex (csVector3 (+dx, +dy, +dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (imatBump);
-  p->CreateVertex (csVector3 (-dx, -dy, +dz));
-  p->CreateVertex (csVector3 (+dx, -dy, +dz));
-  p->CreateVertex (csVector3 (+dx, +dy, +dz));
-  p->CreateVertex (csVector3 (-dx, +dy, +dz));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), .5);
-  */
-
-#if 0
-  iSector* iroom = SCF_QUERY_INTERFACE (room, iSector);
-#endif
   iMeshWrapper* thing_wrap = engine->CreateMeshWrapper ("Bumpy");
   thing_obj->DecRef ();
 
@@ -282,6 +215,9 @@ bool BumpTest::InitProcDemo ()
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
   linfo->DecRef ();
+  thing_wrap->DecRef ();
+  imatBump->DecRef ();
+
 
 #if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (
@@ -306,30 +242,17 @@ bool BumpTest::InitProcDemo ()
   sprfactstate->AddTriangle(0,2,3);
   sprfactstate->DecRef();
   iMeshWrapper* sprite = engine->CreateMeshWrapper(sprfact, "bumpspr",
-    iroom, csVector3(0, 5, 1) );
+    room, csVector3(0, 5, 1) );
   sprite->GetMovable ()->UpdateMove ();
   iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), 
     iSprite3DState);
 
-  //sprite->GetFlags().Set(CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
-  //sprite->GetFlags().Set(CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
   spstate->SetLighting(false);
   spstate->SetBaseColor(csColor(1.,1.,1.));
   spstate->SetMaterialWrapper(imatBump);
-  //spstate->SetMixMode(CS_FX_COPY);
   spstate->SetMixMode(CS_FX_MULTIPLY2 | CS_FX_TILING);
   spstate->DecRef ();
 #endif
-
-// @@@ mem leaks, but the engine does not IncRef these yet
-/*
-  iroom->DecRef();
-  //sprfact->DecRef(); // mem leak
-
-  thing_state->DecRef ();
-  imatBump->DecRef ();
-  itm->DecRef();
-*/
 
   return true;
 }
@@ -420,8 +343,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   LevelLoader->LoadTexture ("wood", "/lib/std/andrew_wood.gif");
-  iMaterialWrapper* tm = engine->GetMaterialList ()->
-  	FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
@@ -488,24 +410,8 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   	FindByName ("flare_spark");
 #endif
 
-  /*
-  csStatLight* light;
-  //light = new csStatLight (-3, 5, -2, 10, 1, 0, 0, false); // red
-  light = new csStatLight (-3, 5, -2, 10, 1, 1, 1, false); // white
-  light->SetHalo (new csCrossHalo (1.0, 0.7));  // intensity, crossfactor
-  room->AddLight (light);
-  bumplight = SCF_QUERY_INTERFACE(light, iLight);
-  //light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
-  //light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
-  */
-
   InitProcDemo ();
 
-  //engine->Prepare ();
-
-  // Create a -dynamic light.
-  //float angle = 0;
-  //dynlight = new csDynLight (cos (angle)*3, 5, sin (angle)*3, 7, 1, 1, 1);
   dynlight = engine->CreateDynLight (csVector3 (-3, 5, -2), 7, csColor (1, 1, 1));
   dynlight->QueryLight ()->CreateCrossHalo (1.0, 0.7);  // intensity, crossfactor
   dynlight->QueryLight ()->SetSector (room);
@@ -534,7 +440,6 @@ void BumpTest::NextFrame ()
   SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
-  //printf("elapsed_time %d\n", (int)elapsed_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -552,8 +457,8 @@ void BumpTest::NextFrame ()
   if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
+  
   // Move the -dynamic light around.
-  //angle += elapsed_time * 0.4 / 1000.;
   if(going_right)
   {
     animli += speed * 2.5;
@@ -566,13 +471,9 @@ void BumpTest::NextFrame ()
   }
   dynlight->QueryLight ()->SetSector (room);
   dynlight->QueryLight ()->SetCenter (csVector3(-3 + animli, 5, -2));
-  //printf("Moved to %g\n", -3 + animli);
   dynlight->Setup ();
+  
 
-  //while (angle >= 2.*3.1415926) angle -= 2.*3.1415926;
-  //csVector3 pos (cos (angle)*3, 17, sin (angle)*3);
-  //dynlight->Move (room, pos.x, pos.y, pos.z);
-  //dynlight->Setup ();
   csVector3 center(0,5,-1);
   csVector3 normal(0,0,-1);
   //(-1,5+1,-1); (+1,5-1,-1);
@@ -580,7 +481,6 @@ void BumpTest::NextFrame ()
   csVector3 ydir(0,-1,0);
   iLight *l = bumplight;
 
-  //prBump->Recalc(center, normal, xdir, ydir, 1, &l);
   prBump->RecalcFast(center, normal, xdir, ydir, 1, &l);
 
   // Tell 3D driver we're going to display 3D things.
