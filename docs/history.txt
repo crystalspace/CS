@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+25-Apr-2001
+	- Philip Wyett cleaned up formatting in ptlab.cfg.
+	- Martin Geisse added an SCF interface for collection (iCollection).
+	- Martin renamed csEngine::CreateCamera to CreateCameraPosition
+	  which better describes its purpose. It also returns the
+	  iCameraPosition now. CreateCollection now looks if a collection
+	  with the given name exists before creating one.
 24-Apr-2001
+	- Martin Geisse possibly fixed the lockup that Philip get when
+	  exiting Blocks. The bug was in the WaveOut sound driver.
 	- Tried to fix OpenGL colors on my system but it fails for text.
 	  Don't know what is wrong. I did fix a few things though. Colors
 	  should now be right for lines and other 2D features.
@@ -10,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  you can now override the default for the 3d card capabilities.
 	  In data/config/opengl.cfg.
 	- Martin Geisse fixed a warning for Win32/csosdefs.h.
+	- Further extended csdemo with a more descriptive display of the
+	  current selected point in the selected path (in edit mode).
 23-Apr-2001
 	- Norman Kramer fixed phyztest. Now compiles again, the chain seems
 	  to work, but the spring falls through the sector walls.

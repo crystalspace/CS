@@ -561,7 +561,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   col_red = txtmgr->FindRGB (255, 0, 0);
   col_blue = txtmgr->FindRGB (0, 0, 255);
   col_white = txtmgr->FindRGB (255, 255, 255);
-  col_gray = txtmgr->FindRGB (128, 128, 128);
+  col_gray = txtmgr->FindRGB (50, 50, 50);
   col_black = txtmgr->FindRGB (0, 0, 0);
   col_yellow = txtmgr->FindRGB (255, 255, 0);
   col_cyan = txtmgr->FindRGB (0, 255, 255);
@@ -691,6 +691,8 @@ void Demo::NextFrame ()
   if (map_enabled >= MAP_OVERLAY)
     seqmgr->DebugDrawPaths (current_time, map_selpath,
     	map_tl, map_br, map_selpoint);
+  if (map_enabled == MAP_EDIT)
+    DrawEditInfo ();
 
   int fw, fh;
   font->GetMaxSize (fw, fh);
@@ -729,6 +731,62 @@ void Demo::NextFrame ()
   G3D->FinishDraw ();
   // Print the final output.
   G3D->Print (NULL);
+}
+
+void Demo::DrawEditInfo ()
+{
+  int fw, fh;
+  font->GetMaxSize (fw, fh);
+  fh += 2;
+  int dim = G2D->GetHeight ()-10;
+  G2D->DrawBox (dim+10, 0, G2D->GetWidth ()-dim-10,
+  	G2D->GetHeight (), col_white);
+  cs_time start, total;
+  csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+  if (np)
+  {
+    int ww = dim+20;
+    int hh = 10;
+    GfxWrite (ww, hh, col_black, col_white, "Point %d", map_selpoint); hh += fh;
+    csVector3 v;
+    np->GetPositionVector (map_selpoint, v);
+    float t = np->GetTimeValue (map_selpoint);
+    cs_time tms = int (t*total);
+    GfxWrite (ww, hh, col_black, col_white, "tot time %d ms", total); hh += fh;
+    GfxWrite (ww, hh, col_black, col_white, "rel time %d ms", tms); hh += fh;
+    GfxWrite (ww, hh, col_black, col_white, "Left Path Info:"); hh += fh;
+    if (map_selpoint > 0)
+    {
+      csVector3 v1;
+      np->GetPositionVector (map_selpoint-1, v1);
+      float d = qsqrt (csSquaredDist::PointPoint (v, v1));
+      float t1 = np->GetTimeValue (map_selpoint-1);
+      float dr = t-t1;
+      float speed = fabs (dr) / d;
+      cs_time tms1 = int (t1*total);
+      GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "rel time %d ms",
+      	tms-tms1); hh += fh;
+    }
+    GfxWrite (ww, hh, col_black, col_white, "Right Path Info:"); hh += fh;
+    if (map_selpoint < np->GetNumPoints ()-1)
+    {
+      csVector3 v1;
+      np->GetPositionVector (map_selpoint+1, v1);
+      float t1 = np->GetTimeValue (map_selpoint+1);
+      float dr = t1-t;
+      float d = qsqrt (csSquaredDist::PointPoint (v, v1));
+      float speed = fabs (dr) / d;
+      cs_time tms1 = int (t1*total);
+      GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;
+      GfxWrite (ww+20, hh, col_black, col_white, "rel time %d ms",
+      	tms1-tms); hh += fh;
+    }
+  }
 }
 
 bool Demo::HandleEvent (iEvent &Event)

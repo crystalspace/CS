@@ -56,6 +56,8 @@ private:
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
   void FileWrite (iFile* file, char *str, ...);
 
+  void DrawEditInfo ();
+
 public:
   Demo ();
   virtual ~Demo ();

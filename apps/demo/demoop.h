@@ -59,7 +59,7 @@ class TestOp : public StandardOp
 public:
   virtual void Do (cs_time dt)
   {
-    printf ("dt=%d\n", dt); fflush (stdout);
+    printf ("dt=%ld\n", dt); fflush (stdout);
   }
 };
 

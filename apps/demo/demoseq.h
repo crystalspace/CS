@@ -27,6 +27,8 @@
 #include "ivaria/sequence.h"
 
 class Demo;
+class csVector3;
+class csVector2;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iCamera;
@@ -102,6 +104,10 @@ private:
 private:
   void DebugDrawPath (csNamedPath* np, bool hi,
 	const csVector2& tl, const csVector2& br, int selpoint);
+  void DrawSelPoint (
+	const csVector3& pos, const csVector3& forward,
+	const csVector2& tl, const csVector2& br,
+	int dim, int col, float fwlen);
 
 public:
   DemoSequenceManager (Demo* demo);
@@ -159,6 +165,12 @@ public:
    * Get the selected path.
    */
   csNamedPath* GetSelectedPath (const char* hilight);
+
+  /**
+   * Get the start and total time for the selected path.
+   */
+  csNamedPath* GetSelectedPath (const char* hilight, cs_time& start,
+  	cs_time& total);
 
   /**
    * Select previous path.

@@ -348,6 +348,31 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
   }
 }
 
+void DemoSequenceManager::DrawSelPoint (
+	const csVector3& pos, const csVector3& forward,
+	const csVector2& tl, const csVector2& br,
+	int dim, int col, float fwlen)
+{
+  int x = int ((pos.x-tl.x)*dim/(br.x-tl.x));
+  int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
+  if (x > 0 && x < dim && y > 0 && y < dim)
+  {
+    demo->G2D->DrawPixel (x, y, col);
+    demo->G2D->DrawPixel (x-1, y-1, col);
+    demo->G2D->DrawPixel (x-2, y-2, col);
+    demo->G2D->DrawPixel (x+1, y+1, col);
+    demo->G2D->DrawPixel (x+2, y+2, col);
+    demo->G2D->DrawPixel (x+1, y-1, col);
+    demo->G2D->DrawPixel (x+2, y-2, col);
+    demo->G2D->DrawPixel (x-1, y+1, col);
+    demo->G2D->DrawPixel (x-2, y+2, col);
+    csVector3 f = forward;
+    f.Normalize ();
+    f *= fwlen;
+    demo->G2D->DrawLine (x, y, int (x+f.x), int (y-f.z), col);
+  }
+}
+
 void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
 	const char* hilight, const csVector2& tl, const csVector2& br,
 	int selpoint)
@@ -355,64 +380,94 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
   int i;
   int len = pathForMesh.Length ();
 
+  //=====
+  // Draw the border around the map.
+  //=====
   int dim = demo->G2D->GetHeight ()-10;
   demo->G2D->DrawLine (0, 0, dim, 0, demo->col_cyan);
   demo->G2D->DrawLine (0, dim, dim, dim, demo->col_cyan);
   demo->G2D->DrawLine (0, 0, 0, dim, demo->col_cyan);
   demo->G2D->DrawLine (dim, 0, dim, dim, demo->col_cyan);
+
+  //=====
+  // Get the current selected path.
+  //=====
+  cs_time start, total, seltime = 0;
+  csNamedPath* selnp = NULL;
+  if (hilight) selnp = GetSelectedPath (hilight, start, total);
+  if (selnp)
+  {
+    // Calculate where we are in time on the selected path.
+    float t = selnp->GetTimeValue (selpoint);
+    seltime = cs_time (start + total*t);
+  }
+
+  //=====
+  // Draw all active paths.
+  //=====
   i = 0;
   while (i < len)
   {
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    csNamedPath* np = pfm->path;
-    bool hi = (hilight && !strcmp (np->GetName (), hilight));
-    DebugDrawPath (np, hi, tl, br, selpoint);
+    bool hi = (pfm->path == selnp);
+    DebugDrawPath (pfm->path, hi, tl, br, selpoint);
     i++;
   }
   if (do_camera_path && camera_path)
   {
-    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
+    bool hi = (camera_path == selnp);
     DebugDrawPath (camera_path, hi, tl, br, selpoint);
   }
 
+  //=====
+  // Indicate the current camera point on all paths.
+  // In addition also indicate points on the other paths
+  // which correspond with the current selected point on the selected path.
+  //=====
   i = 0;
   while (i < len)
   {
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    bool hi = (hilight && !strcmp (pfm->path->GetName (), hilight));
+    bool hi = (pfm->path == selnp);
+
+    // Fetch the current time, make sure we take account of suspension.
     cs_time ct = current_time;
     if (suspended) ct = suspend_time;
+
+    // Calculate where we are on this path at the moment.
+    // r should be between 0 and 1.
     float r = float (ct - pfm->start_path_time)
     	/ float (pfm->total_path_time);
     if (r >= 1) r = 1;
     pfm->path->Calculate (r);
+    // We are going to show both the position as the forward vector.
     csVector3 pos, forward;
     pfm->path->GetInterpolatedPosition (pos);
     pfm->path->GetInterpolatedForward (forward);
-    int col = demo->col_yellow;
-    int x = int ((pos.x-tl.x)*dim/(br.x-tl.x));
-    int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
-    if (x > 0 && x < dim && y > 0 && y < dim)
+    DrawSelPoint (pos, forward, tl, br, dim, demo->col_yellow, 20);
+
+    // If there is a hilighted path and we are not busy drawing the hilighted
+    // path then we will draw an additional point on this path to indicate
+    // where this path will be when the selected path is at the selected point.
+    if (!hi && selnp)
     {
-      demo->G2D->DrawPixel (x, y, col);
-      demo->G2D->DrawPixel (x-1, y-1, col);
-      demo->G2D->DrawPixel (x-2, y-2, col);
-      demo->G2D->DrawPixel (x+1, y+1, col);
-      demo->G2D->DrawPixel (x+2, y+2, col);
-      demo->G2D->DrawPixel (x+1, y-1, col);
-      demo->G2D->DrawPixel (x+2, y-2, col);
-      demo->G2D->DrawPixel (x-1, y+1, col);
-      demo->G2D->DrawPixel (x-2, y+2, col);
-      forward.Normalize ();
-      forward *= 20.;
-      demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z), col);
+      r = float (seltime - pfm->start_path_time)
+      	/ float (pfm->total_path_time);
+      if (r >= 0 && r <= 1)
+      {
+	pfm->path->Calculate (r);
+	pfm->path->GetInterpolatedPosition (pos);
+	pfm->path->GetInterpolatedForward (forward);
+        DrawSelPoint (pos, forward, tl, br, dim, demo->col_cyan, 10);
+      }
     }
+
     i++;
   }
 
   if (do_camera_path && camera_path)
   {
-    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
+    bool hi = (camera_path == selnp);
     cs_time ct = current_time;
     if (suspended) ct = suspend_time;
     float r = GetCameraIndex (ct);
@@ -422,22 +477,21 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
     camera_path->GetInterpolatedPosition (pos);
     camera_path->GetInterpolatedForward (forward);
     int col = demo->col_yellow;
-    int x = int ((pos.x-tl.x)*dim/(br.x-tl.x));
-    int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
-    if (x > 0 && x < dim && y > 0 && y < dim)
+    DrawSelPoint (pos, forward, tl, br, dim, demo->col_yellow, 20);
+
+    // If there is a hilighted path and we are not busy drawing the hilighted
+    // path then we will draw an additional point on this path to indicate
+    // where this path will be when the selected path is at the selected point.
+    if (!hi && selnp)
     {
-      demo->G2D->DrawPixel (x, y, col);
-      demo->G2D->DrawPixel (x-1, y-1, col);
-      demo->G2D->DrawPixel (x-2, y-2, col);
-      demo->G2D->DrawPixel (x+1, y+1, col);
-      demo->G2D->DrawPixel (x+2, y+2, col);
-      demo->G2D->DrawPixel (x+1, y-1, col);
-      demo->G2D->DrawPixel (x+2, y-2, col);
-      demo->G2D->DrawPixel (x-1, y+1, col);
-      demo->G2D->DrawPixel (x-2, y+2, col);
-      forward.Normalize ();
-      forward *= 20.;
-      demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z), col);
+      r = GetCameraIndex (seltime);
+      if (r >= 0 && r <= 1)
+      {
+	camera_path->Calculate (r);
+	camera_path->GetInterpolatedPosition (pos);
+	camera_path->GetInterpolatedForward (forward);
+        DrawSelPoint (pos, forward, tl, br, dim, demo->col_cyan, 10);
+      }
     }
   }
 }
@@ -518,10 +572,22 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
 
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
 {
+  cs_time s, t;
+  return GetSelectedPath (hilight, s, t);
+}
+
+csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
+	cs_time& start, cs_time& total)
+{
   if (do_camera_path && camera_path)
   {
     bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
-    if (hi) return camera_path;
+    if (hi)
+    {
+      start = start_camera_path_time;
+      total = total_camera_path_time;
+      return camera_path;
+    }
   }
 
   int i = 0;
@@ -531,7 +597,12 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     csNamedPath* np = pfm->path;
     bool hi = (hilight && !strcmp (np->GetName (), hilight));
-    if (hi) return np;
+    if (hi)
+    {
+      start = pfm->start_path_time;
+      total = pfm->total_path_time;
+      return np;
+    }
     i++;
   }
   return NULL;
