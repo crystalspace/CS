@@ -364,7 +364,7 @@ MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,\
   $(wildcard $(addprefix $(MSVC.CVS.DIR)/*,\
   .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) \
   .$(MSVC.EXT.RESOURCES)))))
-MSVC.OUT7.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,\
+MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,\
   $(wildcard $(addprefix $(MSVC.OUT.DIR)/*,\
   .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) \
   .$(MSVC.EXT.RESOURCES)))))
