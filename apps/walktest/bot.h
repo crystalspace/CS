@@ -23,6 +23,7 @@
 #include "csengine/objects/cssprite.h"
 
 class csSector;
+class csDynLight;
 
 /**
  * A bot which moves randomly through the dungeon.
@@ -40,6 +41,8 @@ private:
 public:
   ///
   Bot* next;
+  /// Optional dynamic light.
+  csDynLight* light;
 
 public:
   ///

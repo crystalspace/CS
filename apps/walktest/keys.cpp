@@ -110,8 +110,19 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
-void add_bot (float size, csSector* where, csVector3 const& pos)
+void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
 {
+  csDynLight* dyn = NULL;
+  if (dyn_radius)
+  {
+    float r, g, b;
+    RandomColor (r, g, b);
+    //@@@ MEMORY LEAK?
+    CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b));
+    Sys->view->GetWorld ()->AddDynLight (dyn);
+    dyn->SetSector (where);
+    dyn->Setup ();
+  }
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot", true);
   if (!tmpl) return;
   Bot* bot;
@@ -126,6 +137,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos)
   bot->SetAction ("default");
   bot->InitSprite ();
   bot->next = first_bot;
+  bot->light = dyn;
   first_bot = bot;
 }
 
@@ -154,7 +166,7 @@ void HandleDynLight (csDynLight* dyn)
 	    int i;
 	    if (do_bots)
 	      for (i = 0 ; i < 40 ; i++)
-                add_bot (1, dyn->GetSector (), dyn->GetCenter ());
+                add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->RemoveFromSectors ();
 	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
@@ -560,7 +572,9 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "addbot"))
   {
-    add_bot (2, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin ());
+    float radius = 0;
+    if (arg) ScanStr (arg, "%f", &radius);
+    add_bot (2, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), radius);
   }
   else if (!strcasecmp (cmd, "delbot"))
   {
@@ -943,7 +957,7 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     if (first_time == -1) { first_time = current_time; next_bot_at = current_time+1000*10; }
     if (current_time > next_bot_at)
     {
-      add_bot (2, view->GetCamera ()->GetSector (), view->GetCamera ()->GetOrigin ());
+      add_bot (2, view->GetCamera ()->GetSector (), view->GetCamera ()->GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
   }

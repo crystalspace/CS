@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "walktest/bot.h"
 #include "csengine/sector.h"
+#include "csengine/light/light.h"
 #include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(Bot,csSprite3D);
@@ -88,6 +89,11 @@ void Bot::move (long elapsed_time)
   if (s)
   {
     MoveToSector (s);
+    if (light)
+    {
+      light->Move (s, new_p.x, new_p.y, new_p.z);
+      light->Setup ();
+    }
   }
 }
 
