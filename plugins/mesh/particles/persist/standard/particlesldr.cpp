@@ -825,9 +825,9 @@ bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
   {
     case CS_PART_EMIT_BOX:
     {
-      float x = state->GetEmitXSize();
-      float y = state->GetEmitYSize();
-      float z = state->GetEmitZSize();
+      //float x = state->GetEmitXSize();
+      //float y = state->GetEmitYSize();
+      //float z = state->GetEmitZSize();
       break;
     }
 
@@ -1678,9 +1678,9 @@ bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
   {
     case CS_PART_EMIT_BOX:
     {
-      float x = object->GetEmitXSize();
-      float y = object->GetEmitYSize();
-      float z = object->GetEmitZSize();
+      //float x = object->GetEmitXSize();
+      //float y = object->GetEmitYSize();
+      //float z = object->GetEmitZSize();
       break;
     }
 
