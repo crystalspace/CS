@@ -235,7 +235,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   if (!xvis)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-      "Could not find proper GLX visual");
+      "Cannot use preferred GLX visual - Generic visual will be used.");
 
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
