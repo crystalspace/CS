@@ -1729,6 +1729,7 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 
   // Determine which idle override will be played.
   int odds = rng->Get(100);
+  idle_action = 0;
   for (int i=0; i<GetAnimCount(); i++)
   {
     if (factory->anims[i]->idle_pct > odds)

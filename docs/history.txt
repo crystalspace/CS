@@ -58,6 +58,7 @@ chronological order.
 	  distributed by www.python.org.
 	- Steven Geens added some documentation about sockets and
 	  morphanimations in sprcal3d.
+    - Andrew Craig fixed a possible uninitialized idle_action in sprcal3d;
 11-Feb-2004
 	- Jorrit optimized the csNewParticleSystem slightly (used by the
 	  rain mesh plugin) and also cleaned it up a bit.
