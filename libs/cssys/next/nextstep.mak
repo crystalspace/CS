@@ -77,5 +77,5 @@ NEXT.FRIEND=no
 ifeq ($(MAKESECTION),postdefines)
 PUBDLLSYM = $(OUTOS)$(basename $@).sym
 DO.SHARED.PLUGIN  += ; echo "_$(basename $@)_GetClassTable" > $(PUBDLLSYM) ; \
-  $(STRIP) -s $(PUBDLLSYM) $(NEXT.STRIP_FLAGS) $@
+  $(STRIP) -s $(PUBDLLSYM) -u $(NEXT.STRIP_FLAGS) $@
 endif
