@@ -1,0 +1,51 @@
+-*- The (I hope complete) difference list between old loader
+    (libs/csparser/csloader.cpp) and the stdldr plugin:
+
+    - The scripts should be enclosed in quotes. E.g. instead of
+
+	SCRIPT (prim: loop 40 { wait })
+
+      you should now write:
+
+	SCRIPT (prim: 'loop 40 { wait }')
+
+      This is related to tokenizer, not to the parser itself. The problem is
+      that tokenizer was developed to deal with world scripts, not with
+      abstract scripts (to parse the script is the responsability of the
+      interpreter, not of the geometry loader). Thus the script is passed
+      as a whole string to the interpreter. A string can span across multiple
+      lines (note that if you forget to close a quote somewhere you can get
+      an actual error message at the end of the file!).
+
+-*- Whenever possible, enclose strings in quotes. Quotes are accepted
+    everywhere, both ' and " quotes are accepted. If the string has no
+    quotes, it is finished as soon as one of non-alphanumeric and not
+    one of '_' '/' characters is encountered. E.g. FILE (/lev/texture.gif)
+    is accepted, but in any case it would be better to write '/lev/texture.gif'.
+
+-*- In general, the syntax requirements are not that strict as before. Since
+    tokenizer enforces same set of rules across entire file (e.g. it is not
+    context-dependent), you for example can use string quotes even in places
+    where before this would be a syntax error. Another thing is that keywords
+    that have no arguments can be written without round brackets, e.g.
+    instead of POLYGON (GOURAUD () MIRROR ()) you can write just
+    POLYGON (GOURAUD MIRROR). Also since at tokenization time the ','
+    symbols between numbers are removed to conserve space, you can ommit
+    these symbols even in the input file, e.g. VERTEX (1.25 2.34).
+
+-*- Obsolete keywords are considered syntax error. I think now it's the right
+    time to get rid of old stuff :-) Obsolete keywords:
+
+	- FOG in polygon descriptor
+	- NUM_TEXTURES()
+	- BSP()
+        - TEXTURE() in beziers do not accept any keywords inside brackets.
+          They are unused anyway, and I doubt the old way of describing
+          bezier texture is useful - it has to be done somewhat differently.
+
+-*- Improved much template support. Now all options non-related to thing
+    instances are useable while before thing templates and thing instances
+    had different possibilities (e.g. UV(), COLORS(), UVA() were accessible
+    from thing instances but not from templates). Now thing instances are
+    just a superset of tning templates, and contain just the additional
+    options that do not make sense for thing templates.
