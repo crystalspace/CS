@@ -17,6 +17,8 @@ chronological order.
 	  retained since it prevents problems resulting from clients including
 	  <cmath> after cosf() and cousins are faked-up.)
 	- Eric Sunshine eliminated compilation warnings throughout project.
+	- Eric Sunshine fixed bug in macosx.jam where it was emitting a
+	  slightly bogus PkgInfo file to the generated Cocoa .app wrapper.
 7-Aug-2004
 	- Jorrit added a test (debug mode only) in the generic render step
 	  to print when a material or material handle is missing.
