@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  should now be right for lines and other 2D features.
 	- Did a lot of enhancements on csdemo with regards to online editing
 	  of all the paths. Also improved the looks of the flare.
+	- Wouter Wijngaards did the following:
+	  you can now override the default for the 3d card capabilities.
+	  In data/config/opengl.cfg.
+	- Martin Geisse fixed a warning for Win32/csosdefs.h.
 23-Apr-2001
 	- Norman Kramer fixed phyztest. Now compiles again, the chain seems
 	  to work, but the spring falls through the sector walls.
