@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+23-May-2000
+	- Fixed a small potential problem with the polygon Covers
+	  function. It compared a float to 0 which seems to be a little
+	  system dependent. I made the test more robust. The effect
+	  of this bug was that the generated octree could be different
+	  on various platforms.
+	- Wouter Wijngaards fixed a bug in radiosity. Portals are
+	  traversed now. Slower, but looks great. More array bound
+	  errors, though. Perhaps the frustum code is buggy.
+	  Radiosity can also handle portals without lightmaps now.
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea()
 	  to calculate the signed area of a polygon.
@@ -20,11 +30,6 @@ The history order has been reversed so that new features are at the top.
 	- Martin Geisse converted more docs to TexInfo format.
 	- Norman Kramer adjusted vpath for oss.mak so that it compiles
 	  again.
-	- Fixed a small potential problem with the polygon Covers
-	  function. It compared a float to 0 which seems to be a little
-	  system dependent. I made the test more robust. The effect
-	  of this bug was that the generated octree could be different
-	  on various platforms.
 21-May-2000
 	- Performance optimizations to terrain engine from Alex Pfaffe.
 	- Fixed big bug in PVS building which could cause significant
