@@ -619,7 +619,7 @@ public:
     return count - 1;
   }
 
-  /*
+  /**
    * Push a element onto the tail end of the array if not already present.
    * Returns index of newly pushed element or index of already present element.
    */
