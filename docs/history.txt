@@ -11,6 +11,8 @@ The history order is reversed so that new features are at the top.
 	- Added '-nocompress' commandline option to levtool so that vertices
 	  are not compressed and unused vertices are not removed. This
 	  option implies '-nosplit'.
+	- Javier Santos worked on the CS Schema definition for the map
+	  format. Still incomplete but you can find it in scripts/xml.
 4-Dec-2002
 	- Added iDocumentNode->Equals() to compare two nodes. Comparing
 	  the pointers doesn't work because these are only wrappers

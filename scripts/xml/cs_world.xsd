@@ -1,71 +1,946 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Jorrit Tyberghein (private) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:element name="world">
-		<xs:annotation>
-			<xs:documentation>The top-level of the world</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence maxOccurs="unbounded">
-				<xs:element name="textures" minOccurs="0"/>
-				<xs:element name="materials" minOccurs="0"/>
-				<xs:element name="sector" minOccurs="0">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="meshobj">
-								<xs:complexType/>
-							</xs:element>
-							<xs:element name="light"/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="plugins" minOccurs="0"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="v">
-		<xs:complexType>
-			<xs:attribute name="x" type="xs:float" use="optional" default="0"/>
-			<xs:attribute name="y" type="xs:float" use="optional" default="0"/>
-			<xs:attribute name="z" type="xs:float" use="optional" default="0"/>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="matrix">
-		<xs:complexType>
-			<xs:sequence maxOccurs="unbounded">
-				<xs:element name="scale" minOccurs="0">
-					<xs:complexType>
-						<xs:attribute name="x" type="xs:float" use="optional" default="1"/>
-						<xs:attribute name="y" type="xs:float" use="optional" default="1"/>
-						<xs:attribute name="z" type="xs:float" use="optional" default="1"/>
-						<xs:attribute name="all" type="xs:float" use="optional" default="1"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="rotx" minOccurs="0"/>
-				<xs:element name="roty" minOccurs="0"/>
-				<xs:element name="rotz" minOccurs="0"/>
-				<xs:element name="m11" minOccurs="0"/>
-				<xs:element name="m12" minOccurs="0"/>
-				<xs:element name="m13" minOccurs="0"/>
-				<xs:element name="m21" minOccurs="0"/>
-				<xs:element name="m22" minOccurs="0"/>
-				<xs:element name="m23" minOccurs="0"/>
-				<xs:element name="m31" minOccurs="0"/>
-				<xs:element name="m32" minOccurs="0"/>
-				<xs:element name="m33" minOccurs="0"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="mixmode">
-		<xs:complexType>
-			<xs:sequence maxOccurs="unbounded">
-				<xs:element name="add" minOccurs="0"/>
-				<xs:element name="copy" minOccurs="0"/>
-				<xs:element name="transparent" minOccurs="0"/>
-				<xs:element name="alpha" minOccurs="0">
-					<xs:complexType/>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+<!--     edited with XML Spy v4.4 U (http://www.xmlspy.com) by Jorrit Tyberghein (private)     -->
+<xs:schema attributeFormDefault="unqualified"
+  elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="v">
+    <xs:annotation>
+      <xs:documentation>vertex type</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute default="0" name="x" type="xs:float" use="optional"/>
+      <xs:attribute default="0" name="y" type="xs:float" use="optional"/>
+      <xs:attribute default="0" name="z" type="xs:float" use="optional"/>
+      <xs:attribute name="u" use="optional"/>
+      <xs:attribute name="v" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="p">
+    <xs:annotation>
+      <xs:documentation>Poligon type</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="v" type="xs:string"/>
+        <xs:element minOccurs="0" name="material" type="xs:string"/>
+        <xs:element minOccurs="0" name="cosfact" type="xs:string"/>
+        <xs:element minOccurs="0" name="texmap">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" name="plane" type="xs:string"/>
+              <xs:element ref="matrix"/>
+              <xs:element ref="v"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="portal">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="sector" type="xs:string"/>
+              <xs:element minOccurs="0" name="zfill"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="name" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="world">
+    <xs:annotation>
+      <xs:documentation>The top-level of the world</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element minOccurs="0" name="textures">
+          <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="texture">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="file" type="xs:string"/>
+                    <xs:element minOccurs="0" name="transparent">
+                      <xs:complexType>
+                        <xs:attribute name="red"/>
+                        <xs:attribute name="green"/>
+                        <xs:attribute name="blue"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="proctex">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="type" type="xs:string"/>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="materials">
+          <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="material">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" name="texture" type="xs:string"/>
+                    <xs:element minOccurs="0" name="layer">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="texture"/>
+                          <xs:element name="scale">
+                            <xs:complexType>
+                              <xs:attribute name="u"/>
+                              <xs:attribute name="v"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="mixmode">
+                            <xs:complexType>
+                              <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                <xs:element name="add"/>
+                                <xs:element name="tiling"/>
+                                <xs:element name="alpha"/>
+                              </xs:choice>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="color">
+                      <xs:complexType>
+                        <xs:attribute name="red"/>
+                        <xs:attribute name="green"/>
+                        <xs:attribute name="blue"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="sector">
+          <xs:complexType>
+            <xs:choice maxOccurs="unbounded" minOccurs="0">
+              <xs:element name="meshobj">
+                <xs:complexType>
+                  <xs:choice maxOccurs="unbounded" minOccurs="0">
+                    <xs:element minOccurs="0" name="zfill"/>
+                    <xs:element name="plugin" type="xs:string"/>
+                    <xs:element name="params">
+                      <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                          <xs:element maxOccurs="unbounded"
+                            minOccurs="0" ref="v"/>
+                          <xs:element minOccurs="0" name="texlen" type="xs:string"/>
+                          <xs:element maxOccurs="unbounded"
+                            minOccurs="0" ref="p"/>
+                          <xs:element minOccurs="0" name="factory" type="xs:string"/>
+                          <xs:element minOccurs="0" name="mixmode">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" name="multiply2"/>
+                                <xs:element minOccurs="0" name="add"/>
+                                <xs:element minOccurs="0" name="copy"/>
+                                <xs:element minOccurs="0" name="multiply"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="number" type="xs:string"/>
+                          <xs:element minOccurs="0" name="material" type="xs:string"/>
+                          <xs:element minOccurs="0" name="origin">
+                            <xs:complexType>
+                              <xs:attribute name="x" type="xs:string"/>
+                              <xs:attribute name="y" type="xs:string"/>
+                              <xs:attribute name="z" type="xs:string"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="dropsize">
+                            <xs:complexType>
+                              <xs:attribute name="w" type="xs:string"/>
+                              <xs:attribute name="h" type="xs:string"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="lighting" type="xs:string"/>
+                          <xs:element minOccurs="0" name="swirl" type="xs:string"/>
+                          <xs:element minOccurs="0" name="colorscale" type="xs:string"/>
+                          <xs:element minOccurs="0" name="box">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="min">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="max">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="color">
+                            <xs:complexType>
+                              <xs:attribute name="red"/>
+                              <xs:attribute name="green"/>
+                              <xs:attribute name="blue"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="fallspeed">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="accel">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="falltime" type="xs:string"/>
+                          <xs:element minOccurs="0" name="speed" type="xs:string"/>
+                          <xs:element minOccurs="0" name="elevation" type="xs:string"/>
+                          <xs:element minOccurs="0" name="azimuth" type="xs:string"/>
+                          <xs:element minOccurs="0" name="opening" type="xs:string"/>
+                          <xs:element minOccurs="0" name="rectparticles">
+                            <xs:complexType>
+                              <xs:attribute name="w"/>
+                              <xs:attribute name="h"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="totaltime"/>
+                          <xs:element minOccurs="0" name="startpos">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" name="emitfixed">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitbox">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitsphere">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    <xs:attribute name="p"/>
+                                    <xs:attribute name="q"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitcylinder">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="p"/>
+                                    <xs:attribute name="q"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="startspeed">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" name="emitfixed">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitbox">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitcylindertangent">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="p"/>
+                                    <xs:attribute name="q"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitsphere">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    <xs:attribute name="p"/>
+                                    <xs:attribute name="q"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="startaccel">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="emitfixed">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="aging">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="color">
+                                  <xs:complexType>
+                                    <xs:attribute name="red"/>
+                                    <xs:attribute name="green"/>
+                                    <xs:attribute name="blue"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="time"/>
+                                <xs:element name="alpha"/>
+                                <xs:element name="swirl"/>
+                                <xs:element name="rotspeed"/>
+                                <xs:element name="scale"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="regularparticles">
+                            <xs:complexType>
+                              <xs:attribute name="sides"/>
+                              <xs:attribute name="radius"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="attractor">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" name="emitfixed">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="emitbox">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="attractorforce"/>
+                          <xs:element minOccurs="0" name="originbox">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="min">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="max">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="direction">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="source">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="directional">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="layer">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="scale"/>
+                                <xs:element minOccurs="0" name="hazebox">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="hazecone">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="min">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="max">
+                                    <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="p"/>
+                                    <xs:attribute name="q"/>
+                                    <xs:attribute name="number"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="action"/>
+                          <xs:element name="moveable"/>
+                          <xs:element name="numrim"/>
+                          <xs:element name="radius">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="shift">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="lmcache" type="xs:string"/>
+                    <xs:element minOccurs="0" name="priority" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ztest"/>
+                    <xs:element minOccurs="0" name="move">
+                      <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                          <xs:element ref="matrix"/>
+                          <xs:element ref="v"/>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="hardmove">
+                      <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                          <xs:element ref="matrix"/>
+                          <xs:element ref="v"/>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="key">
+                      <xs:complexType>
+                        <xs:attribute name="name"/>
+                        <xs:attribute name="value"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:choice>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="light">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="center">
+                      <xs:complexType>
+                        <xs:attribute name="x"/>
+                        <xs:attribute name="y"/>
+                        <xs:attribute name="z"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="radius"/>
+                    <xs:element name="color">
+                      <xs:complexType>
+                        <xs:attribute name="red"/>
+                        <xs:attribute name="green"/>
+                        <xs:attribute name="blue"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+            <xs:attribute name="name" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="plugins">
+          <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:element name="plugin">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="name" type="xs:string"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="start">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="sector"/>
+              <xs:element name="position">
+                <xs:complexType>
+                  <xs:attribute name="x"/>
+                  <xs:attribute name="y"/>
+                  <xs:attribute name="z"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="renderpriorities">
+          <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:element name="priority">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="level" type="xs:string"/>
+                    <xs:element name="sort" type="xs:string"/>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="meshfact">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="plugin" type="xs:string"/>
+              <xs:element minOccurs="0" name="params">
+                <xs:complexType>
+                  <xs:choice maxOccurs="unbounded" minOccurs="0">
+                    <xs:element name="numvt"/>
+                    <xs:element name="numtri"/>
+                    <xs:element ref="v"/>
+                    <xs:element name="t">
+                      <xs:complexType>
+                        <xs:attribute name="v1"/>
+                        <xs:attribute name="v2"/>
+                        <xs:attribute name="v3"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="autonormals"/>
+                    <xs:element name="material"/>
+                    <xs:element name="frame">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" ref="v"/>
+                        </xs:sequence>
+                        <xs:attribute name="name"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="action">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="f">
+                            <xs:complexType>
+                              <xs:attribute name="name"/>
+                              <xs:attribute name="delay"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="name"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="skeleton">
+                      <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                          <xs:element name="v"/>
+                          <xs:element name="limb">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="v"/>
+                                <xs:element name="transform">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="matrix">
+                                    <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element minOccurs="0" name="rotz"/>
+                                    <xs:element minOccurs="0" name="rotx"/>
+                                    <xs:element minOccurs="0" name="rotz"/>
+                                    </xs:sequence>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="name"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="name"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="smooth"/>
+                    <xs:element name="box">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="min">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="max">
+                            <xs:complexType>
+                              <xs:attribute name="x"/>
+                              <xs:attribute name="y"/>
+                              <xs:attribute name="z"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="curvecenter">
+                      <xs:complexType>
+                        <xs:attribute name="x"/>
+                        <xs:attribute name="y"/>
+                        <xs:attribute name="z"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="curvescale"/>
+                    <xs:element name="curvecontrol">
+                      <xs:complexType>
+                        <xs:attribute name="x"/>
+                        <xs:attribute name="y"/>
+                        <xs:attribute name="z"/>
+                        <xs:attribute name="u"/>
+                        <xs:attribute name="v"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="curve">
+                      <xs:complexType>
+                        <xs:attribute name="name"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="p"/>
+                    <xs:element name="fastmesh"/>
+                    <xs:element name="texlen"/>
+                  </xs:choice>
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" name="paramsfile"/>
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="meshfact">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="plugin" type="xs:string"/>
+                    <xs:element minOccurs="0" name="params">
+                      <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                          <xs:element name="numvt"/>
+                          <xs:element name="numtri"/>
+                          <xs:element ref="v"/>
+                          <xs:element name="t">
+                            <xs:complexType>
+                              <xs:attribute name="v1"/>
+                              <xs:attribute name="v2"/>
+                              <xs:attribute name="v3"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="autonormals"/>
+                          <xs:element name="material"/>
+                          <xs:element name="frame">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" ref="v"/>
+                              </xs:sequence>
+                              <xs:attribute name="name"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="action">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="f">
+                                  <xs:complexType>
+                                    <xs:attribute name="name"/>
+                                    <xs:attribute name="delay"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="name"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="skeleton">
+                            <xs:complexType>
+                              <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                <xs:element name="v"/>
+                                <xs:element name="limb">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="v"/>
+                                    <xs:element name="transform">
+                                    <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element name="matrix">
+                                    <xs:complexType>
+                                    <xs:sequence>
+                                    <xs:element
+                                    minOccurs="0" name="rotz"/>
+                                    <xs:element
+                                    minOccurs="0" name="rotx"/>
+                                    <xs:element
+                                    minOccurs="0" name="rotz"/>
+                                    </xs:sequence>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                    </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="name"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:choice>
+                              <xs:attribute name="name"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="smooth"/>
+                          <xs:element name="box">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="min">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="max">
+                                  <xs:complexType>
+                                    <xs:attribute name="x"/>
+                                    <xs:attribute name="y"/>
+                                    <xs:attribute name="z"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="paramsfile"/>
+                    <xs:element minOccurs="0" name="move">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="v"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="addon">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="plugin" type="xs:string"/>
+              <xs:element name="params">
+                <xs:complexType>
+                  <xs:choice maxOccurs="unbounded" minOccurs="0">
+                    <xs:element name="orig">
+                      <xs:complexType>
+                        <xs:attribute name="x" type="xs:string"/>
+                        <xs:attribute name="y" type="xs:string"/>
+                        <xs:attribute name="z" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="first">
+                      <xs:complexType>
+                        <xs:attribute name="x" type="xs:string"/>
+                        <xs:attribute name="y" type="xs:string"/>
+                        <xs:attribute name="z" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="firstlen" type="xs:string"/>
+                    <xs:element name="second">
+                      <xs:complexType>
+                        <xs:attribute name="x" type="xs:string"/>
+                        <xs:attribute name="y" type="xs:string"/>
+                        <xs:attribute name="z" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="secondlen" type="xs:string"/>
+                    <xs:element name="name"/>
+                    <xs:element name="material"/>
+                    <xs:element name="v"/>
+                  </xs:choice>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="matrix">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element minOccurs="0" name="scale">
+          <xs:complexType>
+            <xs:attribute default="1" name="x" type="xs:float" use="optional"/>
+            <xs:attribute default="1" name="y" type="xs:float" use="optional"/>
+            <xs:attribute default="1" name="z" type="xs:float" use="optional"/>
+            <xs:attribute default="1" name="all" type="xs:float" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="rotx"/>
+        <xs:element minOccurs="0" name="roty"/>
+        <xs:element minOccurs="0" name="rotz"/>
+        <xs:element minOccurs="0" name="m11"/>
+        <xs:element minOccurs="0" name="m12"/>
+        <xs:element minOccurs="0" name="m13"/>
+        <xs:element minOccurs="0" name="m21"/>
+        <xs:element minOccurs="0" name="m22"/>
+        <xs:element minOccurs="0" name="m23"/>
+        <xs:element minOccurs="0" name="m31"/>
+        <xs:element minOccurs="0" name="m32"/>
+        <xs:element minOccurs="0" name="m33"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="mixmode">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element minOccurs="0" name="add"/>
+        <xs:element minOccurs="0" name="copy"/>
+        <xs:element minOccurs="0" name="transparent"/>
+        <xs:element minOccurs="0" name="alpha">
+          <xs:complexType/>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
