@@ -40,8 +40,8 @@ RSC=rc.exe
 # PROP Output_Dir "csrelease\bin\libs"
 # PROP Intermediate_Dir "csrelease\temp\%project%"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /vmb /vms /Gy /GF /W4 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /vmb /vms /Gy /GF /MT /W4 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /YX /FD %cflags% /c
+# ADD BASE CPP /nologo /vmb /vms /Gy /GF /W4 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_LIB" /FD /c
+# ADD CPP /nologo /vmb /vms /Gy /GF /MT /W4 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -67,8 +67,8 @@ PostBuild_Cmds=echo File is a lib, Copy skipped.
 # PROP Output_Dir "csdebug\bin\libs"
 # PROP Intermediate_Dir "csdebug\temp\%project%"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /vmb /vms /W4 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /vmb /vms /MTd /W4 /Gm /G5 /ZI /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /YX /FD %cflags% /c
+# ADD BASE CPP /nologo /vmb /vms /W4 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /FD /c
+# ADD CPP /nologo /vmb /vms /MTd /W4 /Gm /G5 /ZI /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
