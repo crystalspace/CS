@@ -113,7 +113,8 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (void* object,
   Build_TriangleMesh(fstate, buildsource);
 
   // build all the frames
-  for (int frameindex=0; 
+  int frameindex;
+  for (frameindex = 0; 
     frameindex<=buildsource.set_animation_frame(frameindex); 
     frameindex++)
   {
@@ -143,7 +144,8 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   if (framesource->GetFrameCount() == 1)
     framesource->AddVertices(buildsource.num_cor3);
 
-  for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+  int coordindex;
+  for (coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
     // standard 3D coords seem to swap y and z axis compared to CS
     framesource->SetVertex(anm_idx, coordindex, csVector3 (
@@ -159,10 +161,12 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
 /// triangle mesh builder
 void csCrossBuild_SpriteTemplateFactory::Build_TriangleMesh(iSprite3DFactoryState* meshsource,converter& buildsource)
 {
-  for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
+  int triangleindex;
+  for (triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
     // triangulate since CS sprites handle polys of 3rd order only
-    for (int ivert=2; ivert < buildsource.face_order[triangleindex]; ivert++)
+	int ivert;
+    for (ivert=2; ivert < buildsource.face_order[triangleindex]; ivert++)
     {
       int a = buildsource.face[0][triangleindex];
       int b = buildsource.face[ivert-1][triangleindex];
@@ -253,9 +257,9 @@ iTextureWrapper *ivconload_Quake2Textures(iEngine *engine,
       {
         char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1];
         strcpy(prefixedname,prefixstring);
-	strcat(prefixedname,filename);
-	defaulttexture->SetName (prefixedname);
-	delete[] prefixedname;
+		strcat(prefixedname,filename);
+		defaulttexture->SetName (prefixedname);
+		delete[] prefixedname;
       }
       defaulttexture->SetName (filename);
     }
@@ -319,7 +323,8 @@ void csCrossBuild_ThingTemplateFactory::CrossBuild (void* object,
 void csCrossBuild_ThingTemplateFactory::Add_Vertices (
 	iThingState* thing_state, converter& buildsource)
 {
-  for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+  int coordindex;
+  for (coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
     // standard 3D coords seem to swap y and z axis compared to CS
     thing_state->CreateVertex (
@@ -335,7 +340,8 @@ void csCrossBuild_ThingTemplateFactory::Add_Vertices (
 void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh (
 	iThingState* thing_state, converter& buildsource)
 {
-  for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
+  int triangleindex;
+  for (triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
     char buf[10];
     sprintf (buf, "t%d", triangleindex);
@@ -474,7 +480,8 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 
   iTextureWrapper *defaulttexture = NULL;
 
-  for (int skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
+  int skinfileindex;
+  for (skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
   {
     char *skinfilename = skinlist->Get(skinfileindex);
 
@@ -504,9 +511,9 @@ iTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
       {
         char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1];
         strcpy(prefixedname,prefixstring);
-	strcat(prefixedname,skinfilename);
-	defaulttexture->QueryObject ()->SetName (prefixedname);
-	delete[] prefixedname;
+		strcat(prefixedname,skinfilename);
+		defaulttexture->QueryObject ()->SetName (prefixedname);
+		delete[] prefixedname;
       }
       defaulttexture->QueryObject ()->SetName (skinfilename);
 
@@ -530,7 +537,8 @@ iSpriteAction *  csCrossBuild_Quake2Importer::Make_NamedAction(
   newaction->SetName(prefixstring);
 
   // check all the frame names, do any match?
-  for (int frameindex=0; frameindex < frameholder->GetFrameCount(); frameindex++)
+  int frameindex;
+  for (frameindex=0; frameindex < frameholder->GetFrameCount(); frameindex++)
   {
     iSpriteFrame *curframe = frameholder->GetFrame(frameindex);
     const char *framename = curframe->GetName();
@@ -553,8 +561,8 @@ void              csCrossBuild_Quake2Importer::Build_Quake2Actions(
 	"pain3", "jump", "flip",  "salute", "taunt",
 	"wave", "point", "crstand", "crwalk", "crattack",
 	"crpain", "crdeath", "death1", "death2", "death3", NULL };
-
-  for (char const* const*actionname=actionnames; *actionname != NULL; actionname++)
+  const char** actionname;
+  for (actionname=actionnames; *actionname != NULL; actionname++)
   {
     Make_NamedAction(frameholder,*actionname,100);
     //printf("add action %s\n",*actionname);
