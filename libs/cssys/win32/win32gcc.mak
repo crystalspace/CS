@@ -130,7 +130,6 @@ else
 endif
 
 COMPILE_RES = windres --include-dir include $(RCFLAGS) 
-CREATE_RES = dlltool --output-def=$(OUT)/$*.def
 MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
@@ -141,7 +140,10 @@ DO.SHARED.PLUGIN.CORE = \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
-  $(CREATE_RES) $(^^) $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
+  echo $"EXPORTS$">$(OUT)/$*.def $(COMMAND_DELIM) \
+  echo $"	$*_scfInitialize$">>$(OUT)/$*.def $(COMMAND_DELIM) \
+  echo $"	$*_scfFinalize$">>$(OUT)/$*.def $(COMMAND_DELIM) \
+  echo $"	plugin_compiler$">>$(OUT)/$*.def $(COMMAND_DELIM) \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
     -mwindows

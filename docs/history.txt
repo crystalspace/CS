@@ -45,6 +45,12 @@ The history order is reversed so that new features are at the top.
 	      used for plugins, but the referenced symbols (_cs_main and
 	      ApplicationShow) do not exist in plugins.  Consequently, had to
 	      dummy up these symbols in CS_IMPLEMENT_PLATFORM_PLUGIN().
+	- Eric Sunshine changed DO.SHARED.PLUGIN.CORE in win32gcc.mak so that
+	  it now creates the .def file manually rather than using dlltool.
+	  This was necessary to work around a bug/problem with dlltool where it
+	  fails to recognize and insert into the .def file exported symbols
+	  from static libraries.  In this case, the SCF goop symbols from
+	  csengine library failed to make it into the engine plugin.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
