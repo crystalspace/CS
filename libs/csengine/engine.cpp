@@ -37,6 +37,7 @@
 #include "csengine/objwatch.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
+#include "csgeom/kdtree.h"
 #include "csgfx/csimage.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
@@ -1951,6 +1952,115 @@ static int compare_light (const void *p1, const void *p2)
   return 0;
 }
 
+// This is a static light array which is adapted to the
+// right size everytime it is used. In the beginning it means
+// that this array will grow a lot but finally it will
+// stabilize to a maximum size (not big). The advantage of
+// this approach is that we don't have a static array which can
+// overflow. And we don't have to do allocation every time we
+// come here. We register this memory to the 'cleanup' array
+// in csEngine so that it will be freed later.
+static csLightArray *light_array = NULL;
+
+static bool FindLightPos_Front2Back (csKDTree* treenode,
+	void* userdata, uint32 cur_timestamp, uint32&)
+{
+  csVector3 pos = *(csVector3*)userdata;
+
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+
+  // In the first part of this test we are going to test if the
+  // position is inside the node. If not then we don't need to continue.
+  if (!node_bbox.In (pos))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      // First test the bounding box of the object.
+      const csBox3& obj_bbox = objects[i]->GetBBox ();
+
+      if (obj_bbox.In (pos))
+      {
+        iLight* light = (iLight*)objects[i]->GetObject ();
+	float sqdist = csSquaredDist::PointPoint (pos, light->GetCenter ());
+#ifdef CS_USE_NEW_RENDERER
+	if (sqdist < light->GetInfluenceRadiusSq ())
+#else
+	if (sqdist < light->GetSquaredRadius ())
+#endif
+	{
+	  light_array->AddLight (light, sqdist);
+	}
+      }
+    }
+  }
+  return true;
+}
+
+static bool FindLightBox_Front2Back (csKDTree* treenode,
+	void* userdata, uint32 cur_timestamp, uint32&)
+{
+  csBox3* box = (csBox3*)userdata;
+
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+
+  // In the first part of this test we are going to test if the
+  // box intersects with the node. If not then we don't need to continue.
+  if (!node_bbox.TestIntersect (*box))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      // First test the bounding box of the object.
+      const csBox3& obj_bbox = objects[i]->GetBBox ();
+
+      if (obj_bbox.TestIntersect (*box))
+      {
+        iLight* light = (iLight*)objects[i]->GetObject ();
+        csBox3 b (box->Min () - light->GetCenter (),
+		  box->Max () - light->GetCenter ());
+        float sqdist = b.SquaredOriginDist ();
+#ifdef CS_USE_NEW_RENDERER
+        if (sqdist < light->GetInfluenceRadiusSq ())
+#else
+        if (sqdist < light->GetSquaredRadius ())
+#endif
+	{
+	  light_array->AddLight (light, sqdist);
+	}
+      }
+    }
+  }
+  return true;
+}
+
+
 int csEngine::GetNearbyLights (
   iSector *sector,
   const csVector3 &pos,
@@ -1961,15 +2071,6 @@ int csEngine::GetNearbyLights (
   int i;
   float sqdist;
 
-  // This is a static light array which is adapted to the
-  // right size everytime it is used. In the beginning it means
-  // that this array will grow a lot but finally it will
-  // stabilize to a maximum size (not big). The advantage of
-  // this approach is that we don't have a static array which can
-  // overflow. And we don't have to do allocation every time we
-  // come here. We register this memory to the 'cleanup' array
-  // in csEngine so that it will be freed later.
-  static csLightArray *light_array = NULL;
   if (!light_array)
   {
     light_array = new csLightArray ();
@@ -2006,28 +2107,15 @@ int csEngine::GetNearbyLights (
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    iLightList *ll = sector->GetLights ();
-    for (i = 0; i < ll->GetCount (); i++)
-    {
-      iLight *l = ll->Get (i);
-      sqdist = csSquaredDist::PointPoint (pos, l->GetCenter ());
-#ifdef CS_USE_NEW_RENDERER
-      if (sqdist < l->GetInfluenceRadiusSq ())
-#else
-      if (sqdist < l->GetSquaredRadius ())
-#endif
-      {
-        light_array->AddLight (l, sqdist);
-      }
-    }
+    csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+    csVector3 position = pos;
+    kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
   }
 
   if (light_array->num_lights <= max_num_lights)
   {
     // The number of lights that we found is smaller than what fits
-
     // in the array given us by the user. So we just copy them all
-
     // and don't need to sort.
     for (i = 0; i < light_array->num_lights; i++)
       lights[i] = light_array->GetLight (i);
@@ -2036,7 +2124,6 @@ int csEngine::GetNearbyLights (
   else
   {
     // We found more lights than we can put in the given array
-
     // so we sort the lights and then return the nearest.
     qsort (
       light_array->array,
@@ -2059,15 +2146,6 @@ int csEngine::GetNearbyLights (
   int i;
   float sqdist;
 
-  // This is a static light array which is adapted to the
-  // right size everytime it is used. In the beginning it means
-  // that this array will grow a lot but finally it will
-  // stabilize to a maximum size (not big). The advantage of
-  // this approach is that we don't have a static array which can
-  // overflow. And we don't have to do allocation every time we
-  // come here. We register this memory to the 'cleanup' array
-  // in csEngine so that it will be freed later.
-  static csLightArray *light_array = NULL;
   if (!light_array)
   {
     light_array = new csLightArray ();
@@ -2105,29 +2183,15 @@ int csEngine::GetNearbyLights (
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    iLightList *ll = sector->GetLights ();
-    for (i = 0; i < ll->GetCount (); i++)
-    {
-      iLight *l = ll->Get (i);
-      csBox3 b (box.Min () - l->GetCenter (), box.Max () - l->GetCenter ());
-      sqdist = b.SquaredOriginDist ();
-#ifdef CS_USE_NEW_RENDERER
-      if (sqdist < l->GetInfluenceRadiusSq ())
-#else
-      if (sqdist < l->GetSquaredRadius ())
-#endif
-      {
-        light_array->AddLight (l, sqdist);
-      }
-    }
+    csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+    csBox3 bbox = box;
+    kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
   }
 
   if (light_array->num_lights <= max_num_lights)
   {
     // The number of lights that we found is smaller than what fits
-
     // in the array given us by the user. So we just copy them all
-
     // and don't need to sort.
     for (i = 0; i < light_array->num_lights; i++)
       lights[i] = light_array->GetLight (i);
@@ -2136,7 +2200,6 @@ int csEngine::GetNearbyLights (
   else
   {
     // We found more lights than we can put in the given array
-
     // so we sort the lights and then return the nearest.
     qsort (
       light_array->array,

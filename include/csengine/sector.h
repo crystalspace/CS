@@ -38,6 +38,7 @@ class csProgressPulse;
 class csSector;
 class csStatLight;
 class csMeshWrapper;
+class csKDTree;
 struct iPolygon3D;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -50,12 +51,13 @@ class csSectorLightList : public csLightList
 {
 private:
   csSector* sector;
+  csKDTree* kdtree;	// kdtree to help find lights faster.
 
 public:
   /// constructor
   csSectorLightList ();
   /// destructor
-  virtual ~csSectorLightList () { RemoveAll (); }
+  virtual ~csSectorLightList ();
   /// Set the sector.
   void SetSector (csSector* s) { sector = s; }
 
@@ -63,6 +65,9 @@ public:
   virtual void PrepareItem (iLight* light);
   /// Override FreeItem
   virtual void FreeItem (iLight* item);
+
+  /// Get the kdtree for this light list.
+  csKDTree* GetLightKDTree () const { return kdtree; }
 };
 
 /// A list of meshes for a sector.
@@ -435,6 +440,9 @@ public:
 
   /// Sets dynamic ambient light for all things in the sector
   void SetDynamicAmbientLight(const csColor& color);
+
+  /// Get the kdtree for the light list.
+  csKDTree* GetLightKDTree () const { return lights.GetLightKDTree (); }
 
   //----------------------------------------------------------------------
   // Various

@@ -38,6 +38,7 @@ class csHalo;
 class csPolygon3D;
 class csCurve;
 class csSector;
+class csKDTreeChild;
 struct iMeshWrapper;
 struct iLightingInfo;
 
@@ -51,6 +52,9 @@ class csLight : public csObject
 private:
   /// ID for this light (16-byte MD5).
   char* light_id;
+
+  /// Childnode representing this light in the sector light list kdtree.
+  csKDTreeChild* childnode;
 
 protected:
   /// Home sector of the light.
@@ -142,6 +146,20 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csLight ();
+
+  /**
+   * Set the kdtree child node used by this light (in the kdtree
+   * that is maintained by the sector light list).
+   */
+  void SetChildNode (csKDTreeChild* childnode)
+  {
+    csLight::childnode = childnode;
+  }
+
+  /**
+   * Get the kdtree child node.
+   */
+  csKDTreeChild* GetChildNode () const { return childnode; }
 
   /// Get the ID of this light.
   const char* GetLightID () { return GenerateUniqueID (); }

@@ -24,6 +24,7 @@
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/objreg.h"
+#include "csgeom/kdtree.h"
 #include "igeom/clip2d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -52,17 +53,31 @@ bool csSector:: do_radiosity = false;
 csSectorLightList::csSectorLightList ()
 {
   sector = NULL;
+  kdtree = new csKDTree (NULL);
+}
+
+csSectorLightList::~csSectorLightList ()
+{
+  RemoveAll ();
+  delete kdtree;
 }
 
 void csSectorLightList::PrepareItem (iLight* item)
 {
   csLightList::PrepareItem (item);
   item->SetSector (&(sector->scfiSector));
+
+  const csVector3& center = item->GetCenter ();
+  float radius = item->GetRadius ();
+  csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
+  csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
+  item->GetPrivateObject ()->SetChildNode (childnode);
 }
 
 void csSectorLightList::FreeItem (iLight* item)
 {
   item->SetSector (NULL);
+  kdtree->RemoveObject (item->GetPrivateObject ()->GetChildNode ());
   csLightList::FreeItem (item);
 }
 

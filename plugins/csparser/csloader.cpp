@@ -1678,6 +1678,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
 		iSprite3DFactoryState));
+	    //@@@@@@@@@@@@@@@@@@@@ Use SetMaterial() on iMeshObjectFactory!
 	    if (!state)
 	    {
               SyntaxService->ReportError (

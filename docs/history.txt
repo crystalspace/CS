@@ -7,6 +7,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
 	  it is NULL or not.
+	- Added a kdtree to every sector for representing all the static
+	  and pseudo-dynamic lights. That speeds up the two GetNearbyLights()
+	  routines considerably if there are a lot of lights in the level.
+	  This also means that DeferUpdateLighting() will be faster as it uses
+	  those routines.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.
