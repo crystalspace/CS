@@ -89,19 +89,18 @@ void load_sprite (char *filename, char *templatename, char* txtname)
   }
 
   // read in the model file
-  converter * filedata;
-  filedata = new converter;
+  CHK (converter * filedata = new converter);
   if (filedata->ivcon (filename) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
-    delete filedata;
+    CHK (delete filedata);
     return;
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
   csCrossBuild_SpriteTemplateFactory builder;
   csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
-  delete filedata;
+  CHK (delete filedata);
 
   // add this sprite to the world
   csNameObject::AddName (*result, templatename);
