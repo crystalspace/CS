@@ -55,12 +55,12 @@ csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
   dpy (NULL), cmap (0), real_Memory (NULL),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
-  EventOutlet = NULL;
+  EventOutlet = 0;
 }
 
 csGraphics2DXLib::~csGraphics2DXLib(void)
 {
-  xshm = NULL;
+  xshm = 0;
 
   Close();
 
@@ -847,7 +847,7 @@ bool csGraphics2DXLib::AllocateMemory ()
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "SHM available but could not allocate. Trying without SHM.");
-    xshm = NULL;
+    xshm = 0;
     mem_valid = TryAllocateMemory();
   }
 

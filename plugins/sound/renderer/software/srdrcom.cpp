@@ -195,7 +195,7 @@ void csSoundRenderSoftware::Close()
   if (SoundDriver)
   {
     SoundDriver->Close ();
-    SoundDriver = NULL;
+    SoundDriver = 0;
   }
 
   if (Listener)
@@ -221,7 +221,7 @@ void csSoundRenderSoftware::Close()
 csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
 {
   // convert the sound
-  if (!snd->Initialize(&LoadFormat)) return NULL;
+  if (!snd->Initialize(&LoadFormat)) return 0;
 
   // create the sound handle
   csSoundHandleSoftware *hdl = new csSoundHandleSoftware(this, snd);

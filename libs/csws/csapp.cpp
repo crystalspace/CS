@@ -116,7 +116,7 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   WindowListChanged = false;
   BackgroundStyle = csabsSolid;
   InsertMode = true;
-  VFS = NULL;
+  VFS = 0;
   InFrame = false;
   object_reg = r;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);

@@ -152,5 +152,5 @@ csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
     if (snd)
       return csPtr<iSoundData> (snd);
   }
-  return NULL;
+  return 0;
 }

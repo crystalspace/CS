@@ -115,7 +115,7 @@ void csWSTexture::Register (iTextureManager *iTexMan)
 
 void csWSTexture::Unregister ()
 {
-  Handle = NULL;
+  Handle = 0;
 }
 
 void csWSTexture::Refresh ()

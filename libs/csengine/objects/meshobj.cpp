@@ -91,7 +91,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
-  csMeshWrapper::mesh = NULL;
+  csMeshWrapper::mesh = 0;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();

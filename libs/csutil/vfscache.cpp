@@ -39,7 +39,7 @@ csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_IBASE (NULL);
   csVfsCacheManager::object_reg = object_reg;
   csVfsCacheManager::vfsdir = csStrNew (vfsdir);
-  vfs = NULL;
+  vfs = 0;
   current_type = NULL;
   current_scope = NULL;
 }
@@ -128,7 +128,7 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   {
     // This is not an error. It is possible that the item
     // simply hasn't been cached.
-    return NULL;
+    return 0;
   }
 
   return csPtr<iDataBuffer> (data);

@@ -71,7 +71,7 @@ csXWindow::csXWindow (iBase* parent)
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   wm_win = ctx_win = 0;
   win_title = NULL;
-  EventOutlet = NULL;
+  EventOutlet = 0;
 
   wm_width = wm_height = 0;
 

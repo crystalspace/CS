@@ -50,7 +50,7 @@ public:
   { (void) NewWidth; (void) NewHeight; }
   /// Create a new iImage which is a mipmapped version of this one.
   virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp)
-  { (void)step; (void)transp; return NULL; }
+  { (void)step; (void)transp; return 0; }
   /// Set image file name
   virtual void SetName (const char *iName)
   { (void) iName; }
@@ -71,10 +71,10 @@ public:
   { }
   /// Create yet another image and copy this one into the new image.
   virtual csPtr<iImage> Clone ()
-  { return NULL; }
+  { return 0; }
   /// Create another image holding a subimage of current image
   virtual csPtr<iImage> Crop (int , int , int , int )
-  { return NULL; }
+  { return 0; }
   /// Check if the alpha channel is valid
   virtual void CheckAlpha ()
   { }
@@ -86,7 +86,7 @@ public:
   { r=0;g=0;b=0; }
   /// sharpen the image
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength)
-  { transp = NULL; strength = 0; return NULL; }
+  { transp = 0; strength = 0; return 0; }
 };
 
 #endif // __SCRSHOT_H__

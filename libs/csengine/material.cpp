@@ -34,12 +34,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterial::MaterialEngine)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterial::csMaterial () :
-  texture(NULL),
+  texture(0),
   num_texture_layers(0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION),
-  effect(NULL)
+  effect(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
@@ -196,7 +196,7 @@ void csMaterialWrapper::SetMaterial (iMaterial *m)
 
 void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
-  material = NULL;
+  material = 0;
 
   if (handle)
   {

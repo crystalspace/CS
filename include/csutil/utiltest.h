@@ -39,7 +39,7 @@ public:
   virtual csPtr<iString> UnitTest ();
   virtual csPtr<iString> StateTest ()
   {
-    return NULL;
+    return 0;
   }
   virtual csTicks Benchmark (int /*num_iterations*/)
   {
@@ -47,7 +47,7 @@ public:
   }
   virtual csPtr<iString> Dump ()
   {
-    return NULL;
+    return 0;
   }
   virtual void Dump (iGraphics3D* /*g3d*/)
   {

@@ -6,19 +6,24 @@ DESCRIPTION.freebsd = FreeBSD
 DESCRIPTION.OS.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/canvas/softx sound/renderer/software sound/driver/oss
-PLUGINS+=video/renderer/opengl video/canvas/openglx
-PLUGINS+=video/canvas/linex
+PLUGINS+=sound/renderer/software sound/driver/oss
+ifneq (,$(X11_PATH))
+  PLUGINS+=video/canvas/softx
+  PLUGINS+=video/canvas/linex
+  ifneq (,$(OPENGL_PATH))
+    PLUGINS+=video/renderer/opengl video/canvas/openglx
+  endif
+
+  # The X-Window plugin
+  PLUGINS+=video/canvas/xwindow
+  # Shared Memory Plugin
+  PLUGINS+=video/canvas/xextshm
+  # Video Modes Plugin
+  PLUGINS+=video/canvas/xextf86vm
+endif
 
 # udp/tcp network plugin
 PLUGINS+=net/driver/ensocket
-
-# The X-Window plugin
-PLUGINS+=video/canvas/xwindow
-# Shared Memory Plugin
-PLUGINS+=video/canvas/xextshm
-# Video Modes Plugin
-PLUGINS+=video/canvas/xextf86vm
 
 # video support
 # formats (this is the wrapping format for the video data)

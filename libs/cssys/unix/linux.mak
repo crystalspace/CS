@@ -12,17 +12,22 @@ DESCRIPTION.OS.linux = Linux
 PLUGINS+=net/driver/ensocket
 
 # Choose which 2D/3D driver combinations you want to build/use
-PLUGINS+=video/canvas/softx
-PLUGINS+=video/canvas/openglx video/renderer/opengl
-PLUGINS+=video/renderer/opengl-ext
-PLUGINS+=video/canvas/linex video/renderer/line
+ifneq (,$(X11_PATH))
+  PLUGINS+=video/canvas/softx
+  PLUGINS+=video/canvas/linex
+  ifneq (,$(OPENGL_PATH))
+    PLUGINS+=video/canvas/openglx
+    PLUGINS+=video/renderer/opengl
+    PLUGINS+=video/renderer/opengl-ext
+  endif
 
-# The X-Window plugin
-PLUGINS+=video/canvas/xwindow
-# Shared Memory Plugin
-PLUGINS+=video/canvas/xextshm
-# Video Modes Plugin
-PLUGINS+=video/canvas/xextf86vm
+  # The X-Window plugin
+  PLUGINS+=video/canvas/xwindow
+  # Shared Memory Plugin
+  PLUGINS+=video/canvas/xextshm
+  # Video Modes Plugin
+  PLUGINS+=video/canvas/xextf86vm
+endif
 
 # video support
 # formats (this is the wrapping format for the video data)

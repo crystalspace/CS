@@ -267,7 +267,7 @@ void csMaterialHandle::FreeMaterial ()
   {
     DG_UNLINK (this, texture);
   }
-  material = NULL;
+  material = 0;
 }
 
 void csMaterialHandle::Prepare ()
@@ -362,7 +362,7 @@ void csTextureManager::ResetPalette ()
 
 csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (iMaterial* material)
 {
-  if (!material) return NULL;
+  if (!material) return 0;
   csMaterialHandle *mat = new csMaterialHandle (material, this);
   materials.Push (mat);
   return csPtr<iMaterialHandle> (mat);
@@ -371,7 +371,7 @@ csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (iMaterial* material)
 csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
 	iTextureHandle* txthandle)
 {
-  if (!txthandle) return NULL;
+  if (!txthandle) return 0;
   csMaterialHandle *mat = new csMaterialHandle (txthandle, this);
   materials.Push (mat);
   return csPtr<iMaterialHandle> (mat);

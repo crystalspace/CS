@@ -124,7 +124,7 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
   if (image)
   {
     DG_UNLINK (this, image);
-    image = NULL;
+    image = 0;
   }
 
   if (handle)
@@ -160,7 +160,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle = NULL;
+    handle = 0;
   }
 
   // Now we check the size of the loaded image. Having an image, that

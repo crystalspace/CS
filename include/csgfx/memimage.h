@@ -67,10 +67,10 @@ public:
   {  }
   /// Create yet another image and copy this one into the new image.
   virtual csPtr<iImage> Clone ()
-  { return NULL; }
+  { return 0; }
   /// Create another image holding a subimage of current image
   virtual csPtr<iImage> Crop (int , int , int , int )
-  { return NULL; }
+  { return 0; }
 };
 
 

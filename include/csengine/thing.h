@@ -1322,7 +1322,7 @@ public:
       return &(scfParent->scfiPolygonMeshLOD);
     }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
+    { return 0; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {

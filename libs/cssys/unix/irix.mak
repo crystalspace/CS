@@ -5,23 +5,28 @@
 DESCRIPTION.irix = Irix
 DESCRIPTION.OS.irix = Irix
 
-# Choose which drivers you want to build/use
-PLUGINS+=video/canvas/softx sound/renderer/software
+ifneq (,$(X11_PATH))
+  PLUGINS+=video/canvas/softx
+  ifneq (,$(OPENGL_PATH))
+    PLUGINS+=video/renderer/opengl video/canvas/openglx
+   endif
 
-# udp/tcp network plugin
-#PLUGINS+=net/driver/ensocket
+  # The X-Window plugin
+  PLUGINS+=video/canvas/xwindow
+  # Shared Memory Plugin
+  PLUGINS+=video/canvas/xextshm
+  # Video Modes Plugin
+  PLUGINS+=video/canvas/xextf86vm
+endif
 
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi
-# Uncomment the following to build OpenGL stuff
-PLUGINS+=video/renderer/opengl video/canvas/openglx
 
-# The X-Window plugin
-PLUGINS+=video/canvas/xwindow
-# Shared Memory Plugin
-PLUGINS+=video/canvas/xextshm
-# Video Modes Plugin
-PLUGINS+=video/canvas/xextf86vm
+# Sound renderer.
+PLUGINS+=sound/renderer/software
+
+# udp/tcp network plugin
+#PLUGINS+=net/driver/ensocket
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

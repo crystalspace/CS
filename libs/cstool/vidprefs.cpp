@@ -53,43 +53,43 @@ void csVideoPreferences::CleanUp ()
   csRef<iPluginManager> plugmgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  aws_canvas = NULL;
+  aws_canvas = 0;
   if (imageio)
   {
     object_reg->Unregister (imageio, "iImageIO");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (imageio, iComponent));
     plugmgr->UnloadPlugin (comp);
-    imageio = NULL;
+    imageio = 0;
   }
   if (aws)
   {
     object_reg->Unregister (aws, "iAws");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (aws, iComponent));
     plugmgr->UnloadPlugin (comp);
-    aws = NULL;
+    aws = 0;
   }
   if (g3d)
   {
     object_reg->Unregister (g3d, "iGraphics3D");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (g3d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    g3d = NULL;
+    g3d = 0;
   }
   if (g2d)
   {
     object_reg->Unregister (g2d, "iGraphics2D");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (g2d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    g2d = NULL;
+    g2d = 0;
   }
   if (fontserv)
   {
     object_reg->Unregister (fontserv, "iFontServer");
     csRef<iComponent> comp (SCF_QUERY_INTERFACE (fontserv, iComponent));
     plugmgr->UnloadPlugin (comp);
-    fontserv = NULL;
+    fontserv = 0;
   }
-  vfs = NULL;
+  vfs = 0;
 
   cfgmgr->FlushRemoved ();
 }

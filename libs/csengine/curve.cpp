@@ -827,7 +827,7 @@ void csCurve::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
   {
-    scfParent->vbuf = NULL;
+    scfParent->vbuf = 0;
     scfParent->vbufmgr = NULL;
   }
 }

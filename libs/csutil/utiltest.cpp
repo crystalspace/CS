@@ -53,6 +53,6 @@ csPtr<iString> csUtilDebugHelper::UnitTest ()
   //==========================================================================
 
   rc->DecRef ();
-  return NULL;
+  return 0;
 }
 

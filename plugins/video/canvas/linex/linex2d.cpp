@@ -64,8 +64,8 @@ Display* csGraphics2DLineXLib::dpy = NULL;
 csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
   csGraphics2D (iParent), window (0), cmap (0)
 {
-  xwin = NULL;
-  EventOutlet = NULL;
+  xwin = 0;
+  EventOutlet = 0;
 }
 
 void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
@@ -579,5 +579,5 @@ csPtr<iFont> csLineX2DFontServer::LoadFont (const char *filename)
     font.IncRef ();
     return &font;
   }
-  return NULL;
+  return 0;
 }

@@ -233,7 +233,7 @@ void csImageFile::Rescale (int newwidth, int newheight)
 csPtr<iImage> csImageFile::MipMap (int steps, csRGBpixel *transp)
 {
   if (steps < 0)
-    return NULL;
+    return 0;
 
   if ( (Width == 1) && (Height == 1) )
   {
@@ -635,7 +635,7 @@ csPtr<iImage> csImageFile::Clone ()
 
 csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
 {
-  if ( x+width > Width || y+height > Height ) return NULL;
+  if ( x+width > Width || y+height > Height ) return 0;
   csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = width;
   nimg->Height = height;

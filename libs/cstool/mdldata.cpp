@@ -103,7 +103,7 @@ CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureW
 void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
 {
   if (!FileName) return;
-  Image = NULL;
+  Image = 0;
 
   csRef<iDataBuffer> dbuf (vfs->ReadFile (FileName));
   if (!dbuf) return;

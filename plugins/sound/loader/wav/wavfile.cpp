@@ -173,19 +173,19 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   // check if file has the size to be able to contain all necessary chunks
   if (size < (sizeof (riffchk) + sizeof (fmtchk) + sizeof (wavchk)))
-    return NULL;
+    return 0;
 
   // copy RIFF-header
   if (memcpy(&riffchk, &buf[0], sizeof (riffchk)) == NULL)
-    return NULL;
+    return 0;
 
   // check RIFF-header
   if (memcmp (riffchk.riff_id, "RIFF", 4) != 0)
-    return NULL;
+    return 0;
 
   // check WAVE-id
   if (memcmp (riffchk.wave_id, "WAVE", 4) != 0)
-    return NULL;
+    return 0;
 
 // find format-chunk, copy it into struct and make corrections if necessary
 
@@ -201,7 +201,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
       )
   {
     if (memcpy(&fmtchk, &buf[index], sizeof (fmtchk)) == NULL)
-      return NULL;
+      return 0;
 
     if (memcmp(fmtchk.chunk_id, "fmt ", 4) == 0)
       found = true;
@@ -214,7 +214,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   // no format-chunk found -> no valid file
   if (found == false)
-    return NULL;
+    return 0;
 
   // correct the chunk, if under big-endian system
   #ifdef CS_BIG_ENDIAN // @@@ is this correct?
@@ -230,11 +230,11 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   // only 1 or 2 channels are valid
   if (!((fmtchk.channel == 1) || (fmtchk.channel == 2)))
-     return NULL;
+     return 0;
 
   // only Microsoft PCM wave files are valid
   if (!(fmtchk.fmt_tag == 0x0001))
-    return NULL;
+    return 0;
 
 // find wav-data-chunk
   found = false; // true, if wav-data-chunk was found
@@ -245,7 +245,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
       )
   {
     if (memcpy(&wavchk, &buf[index], sizeof (wavchk)) == NULL)
-      return NULL;
+      return 0;
 
     if (memcmp(wavchk.chunk_id, "data", 4) == 0)
       found = true;
@@ -258,7 +258,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   // no wav-data-chunk found -> no valid file
   if (found == false)
-    return NULL;
+    return 0;
 
   // index points now after wav-data, so correct it
   index -= wavchk.len;
@@ -270,7 +270,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
   if (memcpy(data, &buf[index], wavchk.len)==NULL)
   {
     delete[] data;
-    return NULL;
+    return 0;
   }
 
   #ifdef CS_BIG_ENDIAN

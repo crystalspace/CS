@@ -42,7 +42,7 @@ void csSoundHandleSoftware::Unregister()
 
 csPtr<iSoundSource> csSoundHandleSoftware::CreateSource(int Mode3d)
 {
-  if (!Registered) return NULL;
+  if (!Registered) return 0;
   return csPtr<iSoundSource> (new csSoundSourceSoftware(SoundRender, this, Mode3d));
 }
 

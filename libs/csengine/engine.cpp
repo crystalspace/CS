@@ -752,7 +752,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   if (G3D)
     G2D = G3D->GetDriver2D ();
   else
-    G2D = NULL;
+    G2D = 0;
 
   // don't check for failure; the engine can work without the image loader
   ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
@@ -2236,7 +2236,7 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   const csVector3& /*pos*/)
 {
   // @@@ Not implemented yet.
-  return NULL;
+  return 0;
 }
 
 csPtr<iObjectIterator> csEngine::GetVisibleObjects (
@@ -2244,7 +2244,7 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   const csFrustum& /*frustum*/)
 {
   // @@@ Not implemented yet.
-  return NULL;
+  return 0;
 }
 
 int csEngine::GetTextureFormat () const
@@ -2504,10 +2504,10 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
       classId,
       iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  if (!type) return NULL;
+  if (!type) return 0;
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (!fact) return NULL;
+  if (!fact) return 0;
 
   // don't pass the name to avoid a second search
   csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, NULL));
@@ -2635,7 +2635,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   if (error != NULL)
   {
     // @@@ Report error?
-    return NULL;
+    return 0;
   }
 
   csRef<iPluginManager> plugin_mgr (
@@ -2646,10 +2646,10 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
       iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  if (!plug) return NULL;
+  if (!plug) return 0;
 
   csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
-  if (!fact) return NULL;
+  if (!fact) return 0;
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext ());
   csRef<iBase> mof (plug->Parse (
@@ -2657,7 +2657,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
-    return NULL;
+    return 0;
   }
 
   csRef<iMeshObjectFactory> mof2 (
@@ -2666,7 +2666,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   {
     // @@@ ERROR?
     GetMeshFactories ()->Remove (fact);
-    return NULL;
+    return 0;
   }
 
   fact->SetMeshObjectFactory (mof2);
@@ -2690,7 +2690,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   if (error != NULL)
   {
     // @@@ Report error?
-    return NULL;
+    return 0;
   }
 
   csRef<iPluginManager> plugin_mgr (
@@ -2701,7 +2701,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
       iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  if (!plug) return NULL;
+  if (!plug) return 0;
 
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
@@ -2721,7 +2721,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   {
     GetMeshes ()->Remove (imw);
     meshwrap->DecRef ();
-    return NULL;
+    return 0;
   }
 
   csRef<iMeshObject> mof2 (SCF_QUERY_INTERFACE (mof, iMeshObject));
@@ -2791,10 +2791,10 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
       plugin_mgr, classId, iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  if (!type) return NULL;
+  if (!type) return 0;
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (!fact) return NULL;
+  if (!fact) return 0;
 
   csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
   if (!mo)
@@ -2804,7 +2804,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     mo = fact->NewInstance ();
     if (mo)
       return CreateMeshWrapper (mo, name, sector, pos);
-    return NULL;
+    return 0;
   }
 
   return CreateMeshWrapper (mo, name, sector, pos);
@@ -2946,8 +2946,8 @@ csEngine::csEngineState::~csEngineState ()
   if (engine->G2D == G2D)
   {
     engine->G3D->DecRef ();
-    engine->G3D = NULL;
-    engine->G2D = NULL;
+    engine->G3D = 0;
+    engine->G2D = 0;
     engine->c_buffer = NULL;
     engine->cbufcube = NULL;
   }

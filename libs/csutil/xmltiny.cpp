@@ -86,7 +86,7 @@ void csTinyDocumentSystem::Free (csTinyXmlNode* n)
 {
   n->next_pool = pool;
   pool = n;
-  n->sys = NULL;	// Free ref.
+  n->sys = 0;	// Free ref.
 }
 
 //------------------------------------------------------------------------
@@ -491,7 +491,7 @@ csTinyXmlDocument::~csTinyXmlDocument ()
 
 void csTinyXmlDocument::Clear ()
 {
-  root = NULL;
+  root = 0;
 }
 
 csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()

@@ -5,20 +5,23 @@
 DESCRIPTION.hurd = Debian GNU/Hurd
 DESCRIPTION.OS.hurd = Debian GNU/Hurd
 
-# Choose which 2D/3D driver combinations you want to build/use
-PLUGINS+=video/canvas/softx
-# PLUGINS+=video/renderer/opengl video/canvas/openglx
-PLUGINS+=video/canvas/linex
+ifneq (,$(X11_PATH))
+  PLUGINS+=video/canvas/softx
+  PLUGINS+=video/canvas/linex
+  ifneq (,$(OPENGL_PATH))
+    PLUGINS+=video/renderer/opengl video/canvas/openglx
+  endif
+
+  # The X-Window plugin
+  PLUGINS+=video/canvas/xwindow
+  # Shared Memory Plugin
+  PLUGINS+=video/canvas/xextshm
+  # Video Modes Plugin
+  PLUGINS+=video/canvas/xextf86vm
+endif
 
 # udp/tcp network plugin
 #PLUGINS+=net/driver/ensocket
-
-# The X-Window plugin
-PLUGINS+=video/canvas/xwindow
-# Shared Memory Plugin
-PLUGINS+=video/canvas/xextshm
-# Video Modes Plugin
-PLUGINS+=video/canvas/xextf86vm
 
 # video support
 # formats (this is the wrapping format for the video data)

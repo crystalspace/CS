@@ -134,7 +134,7 @@ void csNodeIterator::NextNode ()
 {
   Iterator->Next ();
   if (Iterator->IsFinished ())
-    CurrentNode = NULL;
+    CurrentNode = 0;
   else
     CurrentNode = SCF_QUERY_INTERFACE (Iterator->GetObject (), iMapNode);
 }

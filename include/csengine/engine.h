@@ -1202,10 +1202,10 @@ private:
     {
       return 0;
     }
-    virtual csPtr<iString> UnitTest () { return NULL; }
-    virtual csPtr<iString> StateTest () { return NULL; }
+    virtual csPtr<iString> UnitTest () { return 0; }
+    virtual csPtr<iString> StateTest () { return 0; }
     virtual csTicks Benchmark (int) { return 0; }
-    virtual csPtr<iString> Dump () { return NULL; }
+    virtual csPtr<iString> Dump () { return 0; }
     virtual void Dump (iGraphics3D*) { }
     virtual bool DebugCommand (const char* cmd)
     {

@@ -30,7 +30,7 @@ csTypedObjectIterator::~csTypedObjectIterator ()
 
 void csTypedObjectIterator::FetchObject ()
 {
-  CurrentTypedObject = NULL;
+  CurrentTypedObject = 0;
   if (iter->IsFinished ())
     return;
 

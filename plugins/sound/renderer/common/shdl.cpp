@@ -65,7 +65,7 @@ csPtr<iSoundSource> csSoundHandle::Play(bool Loop)
   }
   if (Loop)
     return csPtr<iSoundSource> (src);
-  else return NULL;
+  else return 0;
 }
 
 void csSoundHandle::StartStream(bool Loop)

@@ -136,7 +136,7 @@ public:
   }
   virtual void Rewind ()
   {
-    CurrentIterator = NULL;
+    CurrentIterator = 0;
     CurrentDomain = Config->LastDomain;
     ClearIterated();
   }
@@ -153,7 +153,7 @@ public:
       }
       else
       {
-        CurrentIterator = NULL;
+        CurrentIterator = 0;
       }
     }
     // move to next domain (which actually means previous domain!)

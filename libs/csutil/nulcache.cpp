@@ -56,7 +56,7 @@ bool csNullCacheManager::CacheData (void*, uint32,
 csPtr<iDataBuffer> csNullCacheManager::ReadCache (
   	const char* /*type*/, const char* /*scope*/, uint32 /*id*/)
 {
-  return NULL;
+  return 0;
 }
 
 bool csNullCacheManager::ClearCache (const char*, const char*,
