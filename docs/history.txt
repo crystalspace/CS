@@ -14,43 +14,41 @@ Short-term cleanups that need to be done:
 
 20-Mar-2000
 	- Michael Dale Long did a few changes to CrystalClear:
-	    - Major update to ccActor. Sprite code should be fully
-	      operational now, including collision detection. Support for
+	    - Major update to ccActor.  Sprite code should be fully
+	      operational now, including collision detection.  Support for
 	      Things is in place but still untested.
-	    - Major rewrite of the iEntityManager interface. Now supports
-	      associating data with entities, as well as assigning the
-	      data to specific lists, to be used by a given CrystalClear
-	      plugin, without the need for plugins to maintain their own
-	      data lists.
-	    - All the other changes I made but have forgotten about are
-	      in here, too. :)
+	    - Major rewrite of the iEntityManager interface.  Now supports
+	      associating data with entities, as well as assigning the data to
+	      specific lists, to be used by a given CrystalClear plugin,
+	      without the need for plugins to maintain their own data lists.
+	    - All the other changes I made but have forgotten about are in
+	      here, too.  :)
 	- Michael also updated iConsole's SCF version number after Norman's
 	  changes.
 	- Jorrit removed a warning in simpcons.h.
-	- W.C.A. Wijngaards <wouterw@cs.vu.nl> suggested a better comment
-	  for csmd5.h.
-	- Wouter also suggested a fix to eliminate key lag in the line
-	  driver.
+	- W.C.A. Wijngaards <wouterw@cs.vu.nl> suggested a better comment for
+	  csmd5.h.
+	- Wouter also suggested a fix to eliminate key lag in the line driver.
 	- Finally Wouter also pointed me to a weird construct in
-	  libs/csutil/inifile.cpp. I fixed it.
+	  libs/csutil/inifile.cpp.  I fixed it.
 	- Andrew Zabolotny did the following changes:
-	    - Re-inspected the polygon clipper. The methods were enhanced
-	      a little, this also helped to catch a bug with software fog
-	      (in Sector::Draw). It was not too (visually) noticeable, but
-	      it was there.
-	    - Re-implemented the box clipper. Now both polygon and box
-	      clipper uses same core routine that makes fixing bugs
-	      easier (changes are propagated to both clippers).
-	    - Added the required functionality to the clipper to be able
-	      to clip Gouraud-shaded polygons (and possibly other kinds
-	      of polygons) correctly.
-	    - Renamed AddFogPolygon into DrawFogPolygon. No other changes
-	      to the interface.
+	    - Re-inspected the polygon clipper.  The methods were enhanced a
+	      little, this also helped to catch a bug with software fog (in
+	      Sector::Draw).  It was not too (visually) noticeable, but it was
+	      there.
+	    - Re-implemented the box clipper.  Now both polygon and box
+	      clipper uses same core routine that makes fixing bugs easier
+	      (changes are propagated to both clippers).
+	    - Added the required functionality to the clipper to be able to
+	      clip Gouraud-shaded polygons (and possibly other kinds of
+	      polygons) correctly.
+	    - Renamed AddFogPolygon into DrawFogPolygon.  No other changes to
+	      the interface.
 	    - Fixed a serious bug with fog (affected only the software
-	      renderer). The fog in mirrors was not drawn (approach to a
+	      renderer).  The fog in mirrors was not drawn (approach to a
 	      mirroring floor in old walktest and you will see).
-	- Removed some buggy debug code in the polygon clipper left over
-	  by Andrew.
+	- Removed some buggy debug code in the polygon clipper left over by
+	  Andrew.
 	- Martin Geisse provided new Texinfo conversions for the FAQ and SCF.
 	  He also rewrote some of the introduction for the Simple tutorial.
 	- Eric Sunshine did some additional mark-up work, made some
@@ -58,12 +56,20 @@ Short-term cleanups that need to be done:
 	  editing of the introduction to the tutorial.  He converted the
 	  To-Do section of the document into an Appendix instead of having it
 	  be just another section of the Contributing to CS chapter.
+	- Benjamin Sprague <sprague@core.com> submitted several patches for
+	  the code which interacts with the terrain library.
+	    - Fixed a bug in the loader that made the DETAIL() function in the
+	      file format not work correctly.
+	    - Made the terrain use the z-buffer, and fixed a couple bugs in
+	      csTerrain::Draw().
+	    - Moved the camera up 2 meters in csTerrain::CollisionDetect().
+	    - Updated terrain.zip to use the DETAIL() function properly.
 19-Mar-2000
 	- Thomas Hieber added proper support for skyboxes in maps without
 	  manual sectoring.
 	- Thomas also updated the Map2CS documentation.
-	- Seth Galbraith added MIPMAP(no) and DITHER(yes) for sky
-	  textures in Squawk.
+	- Seth Galbraith added MIPMAP(no) and DITHER(yes) for sky textures in
+	  Squawk.
 	- Norman Kramer changed the dependency rules again after Andrew
 	  changed them the last time.
 	- Eric Sunshine completed Phase Two of Eric's Big Documentation

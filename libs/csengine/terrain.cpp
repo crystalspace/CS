@@ -49,6 +49,14 @@ csTerrain::~csTerrain ()
   CHK (delete vbuf);
 }
 
+void csTerrain::SetDetail( unsigned int detail)
+{
+  mesh->minDetail(detail);
+  mesh->maxDetail(detail);
+  mesh->absMaxDetail(detail*0.25);
+}
+
+
 void csTerrain::classify (csVector3 *p, ddgColor3 *c)
 {
   // Steep normal
@@ -180,7 +188,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
   poly.txt_handle = _textureMap->GetTextureHandle ();
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false /*use_z_buf*/);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);//false /*use_z_buf*/);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
   grview = &rview;
@@ -205,7 +213,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   ddgTBinTree::initWtoC(clipbox);
   modified = mesh->calculate ();
   // For each frame.
-  if (modified)
+  if (true)//modified)
   {
     // Something changed, update the vertex buffer.
     vbuf->reset();
@@ -288,7 +296,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     triangle[2].x = p3->x * iz + rview.shift_x;
     triangle[2].y = p3->y * iz + rview.shift_y;
 
-    if (!rview.view->Clip (triangle, 3, clipped_triangle, rescount))
+    if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount))
       continue;
     poly.num = rescount;
 
@@ -331,7 +339,7 @@ int csTerrain::CollisionDetect( csTransform *transform )
     return 0;
 
   // Return height of terrain at this location in Y coord.
-  h = mesh->height (p[0],p[2]);
+  h = mesh->height (p[0],p[2])+2;
   if (h < p[1])
     return 0;
   p[1] = h;

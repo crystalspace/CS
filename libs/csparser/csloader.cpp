@@ -3789,7 +3789,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
   long cmd;
   char* params;
   char heightmapname[256];	// @@@ Hardcoded.
-  int detail;
+  unsigned int detail = 3000;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -3835,6 +3835,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     fatal_exit (0, false);
   }
 
+  terr->SetDetail(detail);
   delete[] heightmap;
   sector.terrains.Push (terr);
 }

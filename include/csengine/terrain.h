@@ -99,6 +99,8 @@ public:
 
   /// Set the texture for this surface.
   void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
+  /// Set the amount of triangles
+  void SetDetail(unsigned int detail);
   /// Choose a color for a vertex.
   void classify( csVector3 *p, ddgColor3 *c);
   /// Put a triangle into the vertex buffer.
