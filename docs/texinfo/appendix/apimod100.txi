@@ -586,7 +586,7 @@ in @samp{CS_NODE_TEXT} nodes at @code{Parse()} time.  This is no longer the
 case.  Whitespace is now preserved by default.  If the new behavior is
 unsuitable for your case, use the new argument to @code{iDocument::Parse()} to
 indicate that whitespace should be condensed.  This change was made in order to
-conform to the latest @sc{xml} specifications which state that @sc{xml}
+conform to the latest @sc{xml} specification which states that @sc{xml}
 scanners must preserve whitespace by default.  Consult the following documents
 for more information regarding this issue.
 
@@ -594,7 +594,7 @@ for more information regarding this issue.
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
 @uref{http://www.xml.com/axml/notes/AllWSAlways.html}
 
-@subheading @sc{scf} Class Name Normalization
+@subheading Naming Normalization
 
 The following @sc{scf} class names have been normalized in order to be
 consistent with the names of all other available ``null'' plugins:
@@ -606,4 +606,14 @@ consistent with the names of all other available ``null'' plugins:
 @item
 @code{crystalspace.graphics2d.null2d} @result{}
 @code{crystalspace.graphics2d.null}
+@end itemize
+
+For consistency with like-named methods in other @sc{scf} interfaces, the
+following @samp{iImage} methods have been renamed:
+
+@itemize @bullet
+@item
+@code{GetKeycolor()} @result{} @code{GetKeyColor()}
+@item
+@code{HasKeycolor()} @result{} @code{HasKeyColor()}
 @end itemize
