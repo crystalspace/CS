@@ -106,23 +106,14 @@ if [ -n "${MAKEDEP}" ]; then
   fi
 fi
 
-# Look where is X11 directory
+# Find the X11 directory
 ([ -d /usr/X11 ] && echo "X11_PATH = /usr/X11") || \
 ([ -d /usr/X11R6 ] && echo "X11_PATH = /usr/X11R6") || \
 ([ -d /usr/openwin ] && echo "X11_PATH = /usr/openwin") || \
 ([ -d /usr/lib/X11 ] && echo "X11_PATH = /usr/lib/X11") || \
 (echo "$0: Cannot find X11 directory!" >&2 && exit 1)
 
-# Find the Python header/library directory
-[ -z "${PYTHON_INC}" ] && PYTHON_INC=`ls -d /usr/include/python* 2>/dev/null`
-[ -z "${PYTHON_INC}" ] && PYTHON_INC=`ls -d /usr/local/include/python* 2>/dev/null`
-[ -z "${PYTHON_LIB}" ] && PYTHON_LIB=`ls -d /usr/lib/python* 2>/dev/null`
-[ -z "${PYTHON_LIB}" ] && PYTHON_LIB=`ls -d /usr/local/lib/python* 2>/dev/null`
+sh ${SCRIPT_DIR}/haspythn.sh ${CXX}
+sh ${SCRIPT_DIR}/booltest.sh ${CXX}
 
-if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
-# echo "Found Python headers in ${PYTHON_INC}, libs in ${PYTHON_LIB}" >&2
-  echo "PYTHON_INC = ${PYTHON_INC}"
-  echo "PYTHON_LIB = ${PYTHON_LIB}"
-fi
-
-exec ${SCRIPT_DIR}/booltest.sh ${CXX}
+exit 0
