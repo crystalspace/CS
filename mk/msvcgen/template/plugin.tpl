@@ -46,8 +46,8 @@ RSC=rc.exe
 # ADD CPP /nologo /vmb /vms /Gy /GF /MD /W4 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_WINDOWS" /D "WIN32" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /FD %cflags% /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
+# ADD BASE RSC /l 0x409 /d "NDEBUG" /i "..\..\include" /i "..\..\include\cssys\win32"
+# ADD RSC /l 0x409 /d "NDEBUG" /i "..\..\include" /i "..\..\include\cssys\win32"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -78,8 +78,8 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG"
+# ADD BASE RSC /l 0x409 /d "_DEBUG" /i "..\..\include" /i "..\..\include\cssys\win32"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include" /i "..\..\include\cssys\win32"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
