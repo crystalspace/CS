@@ -23,6 +23,7 @@
 #include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
 
+class csSkeletonLimb;
 class csPolygonTemplate;
 class csThingTemplate;
 class csTextureList;
@@ -184,6 +185,9 @@ public:
    * This function is normally called automatically by the parser.
    */
   static bool LoadSounds (csWorld* world, char* buf, Archive* ar = NULL);
+
+  /// Load a skeleton part.
+  static bool LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection);
 
   /// Load the sprite template from the world file.
   static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures);

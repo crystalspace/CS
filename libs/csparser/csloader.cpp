@@ -27,6 +27,7 @@
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
 #include "csengine/cssprite.h"
+#include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/dynlight.h"
 #include "csengine/library.h"
@@ -35,6 +36,7 @@
 #include "csengine/light.h"
 #include "csengine/texture.h"
 #include "csengine/curve.h"
+#include "csengine/dumper.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
@@ -71,7 +73,7 @@ csMatrix3 CSLoader::load_matrix (char* buf)
                                   {3, "ROT_Z"}, {0,0}};
     char* params;
     int cmd;
-    csMatrix3 M,N;
+    csMatrix3 M;
     float angle;
     while ((cmd = csGetCommand (&buf, tok_cmd, &params)) > 0)
     {
@@ -79,24 +81,15 @@ csMatrix3 CSLoader::load_matrix (char* buf)
       {
         case 1:
           ScanStr (params, "%f", &angle);
-          N.m11 = 1; N.m12 = 0;           N.m13 = 0;
-          N.m21 = 0; N.m22 = cos (angle); N.m23 = -sin(angle);
-          N.m31 = 0; N.m32 = sin (angle); N.m33 =  cos(angle);
-          M *= N;
+          M *= csMatrix3::GetXRotation (angle);
           break;
         case 2:
           ScanStr (params, "%f", &angle);
-          N.m11 = cos (angle); N.m12 = 0; N.m13 = -sin(angle);
-          N.m21 = 0;           N.m22 = 1; N.m23 = 0;
-          N.m31 = sin (angle); N.m32 = 0; N.m33 =  cos(angle);
-          M *= N;
+          M *= csMatrix3::GetYRotation (angle);
           break;
         case 3:
           ScanStr (params, "%f", &angle);
-          N.m11 = cos (angle); N.m12 = -sin(angle); N.m13 = 0;
-          N.m21 = sin (angle); N.m22 =  cos(angle); N.m23 = 0;
-          N.m31 = 0;           N.m32 = 0;           N.m33 = 1;
-          M *= N;
+          M *= csMatrix3::GetZRotation (angle);
           break;
       }
     }
@@ -3900,8 +3893,94 @@ bool CSLoader::LoadSounds (csWorld* world, char* buf, Archive* ar)
 
 //---------------------------------------------------------------------------
 
+enum { kTokenSkelLimb = 1, kTokenSkelVertices, kTokenSkelTransform };
+
+bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection)
+{
+  static tokenDesc commands[] = {
+    {kTokenSkelLimb, "LIMB"},
+    {kTokenSkelVertices, "VERTICES"},
+    {kTokenSkelTransform, "TRANSFORM"},
+    {0,0}};
+  static tokenDesc tok_matvec[] = {{1, "MATRIX"}, {2, "V"}, {0,0}};
+  char* name;
+  char* xname;
+    
+  long cmd;
+  char* params;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case kTokenSkelLimb:
+        {
+          CHK (csSkeletonConnection* con = new csSkeletonConnection ());
+	  if (!LoadSkeleton (con, params, true)) return false;
+	  limb->AddChild (con);
+	}
+        break;
+      case kTokenSkelTransform:
+        if (is_connection)
+        {
+          char* params2;
+	  csMatrix3 m;
+	  csVector3 v (0, 0, 0);
+          while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
+          {
+    	    if (!params2)
+    	    {
+      	      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      fatal_exit (0, false);
+    	    }
+            switch (cmd)
+            {
+              case 1: 
+                m = CSLoader::load_matrix (params2);
+		break;
+              case 2:
+                v = CSLoader::load_vector (params2);
+		break;
+            }
+          }
+	  csTransform tr (m, -m.GetInverse () * v);
+	  ((csSkeletonConnection*)limb)->SetTransformation (tr);
+        }
+	else
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
+	  fatal_exit (0, false);
+	}
+	break;
+      case kTokenSkelVertices:
+        {
+          int list[1000], num;	//@@@ HARDCODED!!!
+          ScanStr (params, "%D", list, &num);
+          for (int i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
+        }
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
+        csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 enum { kTokenSTplTexNr = 1, kTokenSTplFrame,
-       kTokenSTplTriangle, kTokenSTplAction };
+       kTokenSTplTriangle, kTokenSTplAction,
+       kTokenSTplSkeleton };
 
 bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures)
 {
@@ -3910,6 +3989,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
     {kTokenSTplFrame, "FRAME"},
     {kTokenSTplAction, "ACTION"},
     {kTokenSTplTriangle, "TRIANGLE"},
+    {kTokenSTplSkeleton, "SKELETON"},
     {0,0}};
   static tokenDesc tok_frame[] = {{2, "V"}, {0,0}};
   static tokenDesc tok_frameset[] = {{2, "F"}, {0,0}};
@@ -3919,6 +3999,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
   char* params;
   char* params2;
   char str[255];
+  int i, j;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -3934,6 +4015,14 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
           ScanStr (params, "%s", str);
           stemp->SetTexture (textures, str);
         }
+        break;
+
+      case kTokenSTplSkeleton:
+	{
+          CHK (csSkeleton* skeleton = new csSkeleton ());
+	  if (!LoadSkeleton (skeleton, params, false)) return false;
+	  stemp->SetSkeleton (skeleton);
+	}
         break;
 
       case kTokenSTplAction:
