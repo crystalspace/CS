@@ -159,6 +159,8 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
   sphere.SetRadius (max_object_radius);
   csReversibleTransform tr_o2c;
   tr_o2c = camtrans;
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movtrans;
   csVector3 camera_origin;
 
   if (movable_identity)
