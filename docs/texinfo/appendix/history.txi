@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @ifnottex
-@node History, Resources, Todo, Top
+@node History, Index, Todo, Top
 @appendix History
 
 This section will eventually contain Crystal Space's history log.  This

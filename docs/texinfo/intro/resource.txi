@@ -102,7 +102,7 @@ A Crystal Space texture archive is maintained at:
 
 @uref{http://server.empathy.com/crystal}.
 
-@node Mailing Lists, Feedback, Where to Get, CS Introduction
+@node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
@@ -134,3 +134,23 @@ follow the instructions there.  This page also contains instructions for
 unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs}
+
+@node Internet Relay Chat (IRC), Feedback, Mailing Lists, CS Introduction
+@section Internet Relay Chat (@sc{irc})
+@cindex Internet Relay Chat (@sc{irc})
+@cindex @sc{irc}
+
+The Crystal Space developers are often available online for live chat via the
+Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
+good place to learn about it is @uref{http://www.mirc.com/}.  The Crystal
+Space developers inhabit a channel named @code{#CrystalSpace} on any of the
+following servers (all of which are linked together):
+
+@example
+irc.linux.com:6667
+irc.openprojects.net:6667
+@end example
+
+@noindent
+In fact, any of the @sc{irc} servers with the Open Projects network may be
+used.

@@ -3,230 +3,224 @@
 @subsection Sound System
 @cindex Sound System
 
-Version 0.03 (22 sept 1999) by NooTe (aka Nathaniel Saint Martin)
+@noindent
+@emph{Written by Nathaniel Saint Martin, @email{noote@@bigfoot.com}.  Last
+updated 22 September 1999.}
 
-@email{noote@@bigfoot.com}
-@uref{http://www.bigfoot.com/~noote}
+This is a description of the Crystal Space sound system which is comprised of
+several sound renderers and sound drivers.
 
-@node Sound_OS, Sound_FF, Sound System, Sound System
-@subsubsection supported operating systems
+@subsubheading Supported Operating Systems
 
-The CS sound system supports these OSes :
+The Crystal Space sound system supports these operating systems:
 
 @itemize @bullet
 @item
-I have made a win32 driver using waveOut functions (standard win32 api). I
-have done Aureal3D 2.0, DirectSound3D (DX5), EAX 2.0 and Software renderer
-too !
+Microsoft Windows using the @emph{WaveOut} functions (standard Win32
+@sc{api}), Aureal3D 2.0, DirectSound3D (@sc{dx5}), @sc{eax} 2.0 and the
+software renderer.
 
 @item
-Gert Steenssens (@email{gsteenss@eps.agfa.be}) has made the linux driver
+Linux using an @sc{oss} driver by Gert Steenssens
+(@email{gsteenss@@eps.agfa.be}).
 (OSS).
 
 @item
-Someone (sorry I don't know, please give me your name) has done the MacIntosh
-driver
+Macintosh using the MacOS toolbox.
 @end itemize
 
-@node Sound_FF, Sound_Architecture, Sound_OS, Sound System
-@subsubsection supported file formats
+@subsubheading Supported File Formats
 
-The following file formats are supported :
+The following file formats are supported:
 
 @itemize @bullet
 @item
-sun standard @file{.au} (or @file{.snd}), 8 and 16 bit PCM, 8 bit G.711 u-Law
-(no-compressed)
-
+Sun standard @file{.au} (or @file{.snd}), 8- and 16-bit @sc{pcm} and 8-bit
+G.711 u-Law (no-compression).
 @item
-microsoft @file{.wav}, 8 and 16 bit PCM
-
+Microsoft @file{.wav}, 8- and 16-bit @sc{pcm}.
 @item
-amiga @file{.8svx}/@file{.iff}, 8 bit PCM
-
+Amiga @file{.8svx} and @file{.iff}, 8-bit @sc{pcm}.
 @item
-mac @file{.aiff}, 8 and 16 bit PCM
-
-@item
-I'm searching about other usual file format (@uref{http://www.wotsit.org}
-don't handle or give (good) information about mac @file{.aiff} format).
-
-@item
-Does some one know about @emph{Fibonacci-Delta encoding} compression in
-@file{.8svx}/@file{.iff} format ? Or about G.721 a-Law ADPCM compression ?
+Macintosh @file{.aiff}, 8- and 16-bit @sc{pcm}.
 @end itemize
 
-@node Sound_Architecture, Sound_Config, Sound_FF, Sound System
-@subsubsection How does it work ?
+@subsubheading How It Works
 
-Sound System architecture is a bit like Graphics System. There are different
-sound renderers and low-level driver access for the software renderer. Sound
-renderer enable 2d buffer (@code{iSoundBuffer}) and 3d buffer
-(@code{iSoundSource}). Attached with renderer (@code{iSoundRender}) there're
-the listener (basicly the ears of the view/player) (@code{iSoundListener})
-for the 3d mode. Ok you haven't understand this, so i resume. Here is the SCF
-architecture :
+The sound system architecture is a bit like graphics system.  There are
+different sound renderers and low-level driver accessed by the software
+renderer.  The sound renderer enables 2D buffer (via the @samp{iSoundBuffer}
+@sc{scf} interface) and 3D sound source (via the @samp{iSoundSource}
+interface).  Attached with renderer (@samp{iSoundRender}) there is a listener
+(@samp{iSoundListener})---basically the ears of the viewer/player---for the
+3D mode.
+
+Here is a run-down of the abstract @sc{scf} interface architecture :
 
 @table @code
 @item iSoundRender
-this mix, calculate@dots{} all @code{ISoundBuffer})
+This mixes and calculates all @samp{iSoundBuffer}.
 
 @item iSoundDriver
-only used by software renderer, this is the low-level access to sound OS
+This provides low-level access to the operating system sound facilities.  Only
+used by software renderer.
 
 @item iSoundBuffer
-this is the played sound, we can create this with a @code{csSoundData}
+This is the played sound.  We can create this with via @samp{csSoundData}.
 
 @item iSoundSource
-the 3d sound emmitter control)<br>
+The 3D sound emmitter control.
 
 @item iSoundListener
-The 3d listener
+The 3D listener.
 @end table
 
-Some samples better than words (hum, I hope ;)) :
+@subsubheading Examples
+
+Some examples may help to clarify the architecture.
 
 @example
-// The sound data object
-csSoundData *sounddata;
-// I load a sound file
-sounddata = csSoundDataObject::GetSound(pWorld, "beep.wav"); 
-// I create a 2d sound buffer;</p>
-iSoundBuffer *soundbuffer;
-piSystem->piSoundRender->CreateSoundBuffer(&soundbuffer, sounddata);
-// I play the sound... not really complicated ?
-soundbuffer->Play();
-// I stop this sound... hum, simple...
-soundbuffer->Stop();
-
-// And now, playing with 3d ! (a bit more complicated)
-
-// The 3d source object
-iSoundSource *source;
-
-// There are two methodes to create a 3d source : directly from ISoundRender
-// or from an iSoundBuffer
-piSystem->piSoundRender->CreateSource(&source, sounddata);
-// or...
-soundbuffer->CreateSource->(&source);
+// The sound data object.
+csSoundData* data;
+// Load a sound file.
+data = csSoundDataObject::GetSound(world, "beep.wav");
+// Create a 2D sound buffer.
+iSoundBuffer* buffer;
+system->Sound->CreateSoundBuffer(&buffer, data);
+// Play the sound.
+buffer->Play();
+// Stop this sound.
+buffer->Stop();
 @end example
 
-@node Sound_Config, Sound_WaveOut, Sound_Architecture, Sound System
-@subsubsection How to configure sound system
+And now a more complex example illustrating how to play a 3D sound:
 
-In your configuration file (e.g. @file{cryst.cfg}) you might have a
-@code{[SoundDriver]} section else make it :-) like this :
+@example
+// The 3D source object.
+iSoundSource* source;
+// There are two methods to create a 3D source.  Either
+// directly from iSoundRender or from an iSoundBuffer.
+system->Sound->CreateSource(&source, data);
+// Or...
+buffer->CreateSource->(&source);
+@end example
+
+@subsubheading Sound System Configuration
+
+In the configuration file (e.g. @file{cryst.cfg}) you can create a
+@code{[SoundDriver]} section similar to the sample below:
 
 @example
 [SoundDriver]
-; MAX_CHANNELS set the maximum of channels we can mix
+; Maximum of channels to mix.
 MAX_CHANNELS=16
-; FREQUENCY set frequency supported by sound device (44100, 22050, 11025...)
+; Frequency supported by sound device.
+; (44100, 22050, 11025, etc.)
 FREQUENCY=11025
-; 16BITS set if sound device may use 16 bits (if it supported)
+; Control whether sound device uses 16-bits (if supported).
 16BITS=false
-; STEREO enable stereo on sound device (if it supported) (for a 3d sound it
-; can be necessary)
+; Enable stereo output on sound device (if it supported).
+; For a 3D sound it is useful.
 STEREO=true
-; Active sound driver
+; Enable or disable sound driver.
 ACTIVE=true
-; Set general volume [0..1]
-; If you put -1 or a value inferior to 0, current device volume is kept.
+; Set general volume in th range [0..1].  If you put -1
+; or a value inferior to 0, current device volume is used.
 VOLUME=-1
 @end example
 
-These variable mean:
+The variables from the configuration file are described below.
 
 @table @code
 @item MAX_CHANNELS
-The maximum of channels you can mix (only for software mixing, for a hardware
-multi voice, it the sound card whose fix this) (more is this value, more it
-can take cpu).
+The maximum number of channels you can mix--only for software mixing (for a
+hardware multi-voice the sound card fixes this).  The higher this value is,
+the more @sc{cpu} resources it consumes.
 
 @item FREQUENCY
-The sample frequency for playing (more is this value, more it can take cpu),
-this value can be fixed by hardware limit, verify it from your
-manual/driver/manufacturer).
+The sample frequency for playing.  The higher this value is, the more @sc{cpu}
+resources it consumes.  This value can be fixed by a hardware limit; verify
+this by checking with your manual, driver, manufacturer, etc.
 
 @item 16BITS
-Use 16 bits instead of 8 bits playing (depends on your sound card
-capabilities)
+Use 16 bits instead of 8 bits for playing sounds.  Your sound card
+capabilities may also place a limit on this value.
 
 @item STEREO
-Use stereo output. This one depends on your sound card too. It can be
-useful for 3d sound.
+Use stereo output if ``true''.  This one depends on your sound card too.  It
+can be useful for 3D sound.
 
 @item ACTIVE
-Set this one to true to activate your sound driver. Otherwise you won't hear
+Set this one to true to activate the sound driver.  Otherwise you won't hear
 anything.
 
 @item VOLUME
-A software or hardware value, from 0 (empty) to 1 (full), it depends on your
-sound card and/or driver.
+A software or hardware value, from 0 (no sound) to 1 (full volume); it depends
+on your sound card and/or driver.
 @end table
 
-@node Sound_WaveOut, Sound_Problems, Sound_Config, Sound System
-@subsubsection waveOut win32 driver configuration
+@subsubheading WaveOut Win32 Driver Configuration
 
-The waveOut win32 driver has its own configuration in addition to general
-sound driver configuration:
+The Waveout Win32 driver has its own configuration file (@file{wodrv.cfg}) in
+addition to general sound driver configuration.  It has the following
+contents:
 
 @example
 [SoundDriver.waveOut]
-; CALLBACK can be 'function' or 'thread'
+; Call-back type can be 'function' or 'thread'.
 CALLBACK=thread
-; THREAD_PRIORITY can be 'lowest', 'normal' or 'highest'
+; Priority can be 'lowest', 'normal' or 'highest'.
 THREAD_PRIORITY=highest
-; number of refresh in a second
+; Number of refreshes per second.
 REFRESH=10
 @end example
 
-These variables mean:
+The variables from the configuration file are described below.
 
 @table @code
 @item CALLBACK
-Method have two choice : @samp{thread} or @samp{function}. Thread method
-starts a process whose fill sound data when it receive order (by waveOut).
-Function callback @samp{block} program for filling sound data, the call of
-function is done by waveOut but if us fps (Frame Per Second) is low or system
-idle is very low, calls to function can't be done (it unstable). I preconize
-thread method, (theorically) independent of main process idle.
+The call-back method has two possible settings, @samp{thread} or
+@samp{function}.  The @emph{thread} method starts a process which fills sound
+data when it receive order (by WaveOut).  The @emph{function} method
+@dfn{blocks} the program while filling sound data, the call of the function is
+done by WaveOut but if the @dfn{frames per second} (@sc{fps}) is low or system
+idle is very low, calls to function can't be done (it is unstable).  I prefer
+the thread method, which is (theoretically) independent of the main process
+idle.
 
 @item THREAD_PRIORITY
-Only for thread method, it set the priority of thread : @samp{lowest} mean
-that sound thread have a lowest priority than main process, @samp{normal} is
-equal priority for main process and sound thread, and @samp{highest} mean
-that thread priority is higher than main process! Better is @samp{highest}
-but it might not work in full screen some time (maybe a little bug from me).
+Only for thread method.  It sets the priority of the thread.  Possible values
+are @samp{lowest}, meaning that the sound thread has a very low priority
+compared to the main process; @samp{normal} meaning that the priority is equal
+to the priority of the main process; and @samp{highest} meaning that the
+thread priority is higher than main process.
 
 @item REFRESH
-The time of refresh of sound data, a @samp{10} value means refresh sound data
-10 times per second. But here, a warning (erh, it's stay an experimental
-stuff yet ;-)), if you get an fps inferior to this refresh value, it can
-crash for function callback or cut sound for thread method !
-@end itemize
+The time of refresh of sound data.  A value of 10 means refresh the sound data
+10 times per second.  But a warning, if you get an @sc{fps} value inferior to
+this refresh value, it can crash for function call-back or cut sound for
+thread method.
+@end table
 
-@node Sound_Problems, , Sound_WaveOut, Sound System
-@subsubsection Problems
+@subsubheading Problems
 
-If you have problems with the sound output, check this :
+If you have problems with the sound output, consult the following list.
 
 @itemize @bullet
 @item
-Are you sure to have a sound card ? :-)
+Are you sure to have a sound card?
 
 @item
-Are you sure that sound card is supported by your OS?
+Are you sure that sound card is supported by your operating system?
 
 @item
-Are you sure CrystalSpace has a sound driver for your OS?
+Are you sure Crystal Space has a sound driver for your operating system?
 
 @item
-See @file{debug.txt}, if return a error from sound driver, try an other
-configuration by changing @code{FREQUENCY}, @code{STEREO}, @code{16 BITS},
-@code{VOLUME} and check if @code{ACTIVE} is @samp{on}/@samp{true}/@samp{1}
+Verify that @samp{ACTIVE} is set to @samp{true} in the configuration file.
 
 @item
-Well, maybe it's a bug ?
+Consult the @file{CS/debug.txt} file.  If an error was reported in this file
+by the sound driver try another configuration by changing @samp{FREQUENCY},
+@samp{STEREO}, @samp{16BITS}, and @samp{VOLUME}.
 @end itemize
-

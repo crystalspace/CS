@@ -1,7 +1,10 @@
 @c -*-texinfo-*-
-@node 3D Sprites, Texture Cache, Visibility Culling, Concepts
+@node 3D Sprites, Dynamic Worlds, Rendering Loop, Concepts
 @section 3D Sprites
 @cindex 3D Sprites
+
+@noindent
+@emph{Written by Seth Galbraith, @email{sgalbrai@@linknet.kitsap.lib.wa.us}.}
 
 3D @dfn{sprites} are triangle-based models which can be animated by a skeleton
 or pre-calculated vertex animations.  This type of model is well suited for
@@ -13,7 +16,7 @@ smooth curves.
 * 3D Sprites Example 2:: Texturing
 * 3D Sprites Example 3:: Shading Problems
 * 3D Sprites Example 4:: A Solution
-* 3D Sprites Optimizations:: Optimizations
+* 3D Sprites Optimizations::
 @end menu
 
 @node 3D Sprites Example 1, 3D Sprites Example 2, 3D Sprites, 3D Sprites
@@ -236,7 +239,7 @@ be taken not to merge identical normals which will not be attatched to the
 same bone for skeletal animation.)
 
 @node 3D Sprites Optimizations, , 3D Sprites Example 4, 3D Sprites
-@subsection Optimizations
+@subheading Optimizations
 
 @c -+----1----+----2----+----3----+----4----+----5----+----6----+----7----+
 

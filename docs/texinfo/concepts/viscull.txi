@@ -1,8 +1,12 @@
 @c -*-texinfo-*-
-@node Visibility Culling, 3D Sprites, Rendering Loop, Concepts
+@node Visibility Culling, Rendering Loop, Texture Mapping, Concepts
 @section Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility
+
+@noindent
+@emph{Written by Jorrit Tyberghein, 
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
 @emph{NOTE:} This section describes in detail how visibility culling in
 Crystal Space works or will work in the not-to-distant future.

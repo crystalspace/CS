@@ -1,50 +1,95 @@
 @c -*-texinfo-*-
-@node Texture Mapping, Misc Notes, Texture Cache, Concepts
+
+@c ----------------------------------------------------------------------------
+@c Define the mathematical macros @Nn{N,n} which places n as subscript to N,
+@c and @Nno{N,n,o} which places o as a subscript to n which itself is a
+@c subscript to N.
+@c ----------------------------------------------------------------------------
+@ifnottex
+@macro Nn{N,n}
+@math{\N\\n\}
+@end macro
+@macro Nno{N,n,o}
+@math{\N\\n\.\o\}
+@end macro
+@end ifnottex
+@iftex
+@macro Nn{N,n}
+@tex
+$\N\_{\n\}$%
+@end tex
+@end macro
+@macro Nno{N,n,o}
+@tex
+$\N\_{\n\_\o\}$%
+@end tex
+@end macro
+@end iftex
+
+@node Texture Mapping, Visibility Culling, Space Warping, Concepts
 @section Texture Mapping
 @cindex Texture Mapping
 
-This document explains the formulas that are used to perform texture mapping
-for a polygon. This text assumes that you know about portals, different
-the coordinate systems CS uses, and about cameras and matrix transformations.
-@xref{Cameras and Matrices}.
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-@node TexMap Convections, TexMap Polygon, Texture Mapping, Texture Mapping
+This document explains the formulas that are used to perform texture mapping
+for a polygon.  This text assumes that you know about portals, different
+coordinate systems Crystal Space uses, and about cameras and matrix
+transformations.  @xref{Cameras and Matrices}.
+
+@menu
+* Texture Mapping Conventions:: Conventions
+* Texture Mapping Concepts:: General Concepts
+* Texture Mapping Perspective Correction:: Perspective Correction
+* Texture Mapping Together:: Bringing it All Together
+* Texture Mapping Instructions:: Instructions for Texture Mapper
+@end menu
+
+@node Texture Mapping Conventions, Texture Mapping Concepts, Texture Mapping, Texture Mapping
 @subsection Conventions
 
 @itemize @bullet
 @item
-@code{P<s>} denotes a polygon in some space. @code{Pw} (for example) is a 
-polygon in world space coordinates. The other spaces are @code{o} for object
-space, @code{c} for camera space, @code{t} for texture space, and @code{s}
-for screen space.
+@Nn{P,s} denotes a polygon in some space.  For example, @Nn{P,w} is a polygon
+in world space coordinates.  The other spaces are @math{o} for object space,
+@math{c} for camera space, @math{t} for texture space, and @math{s} for screen
+space.
 
 @item
-@code{V<s>} denotes a vertex in 3D. @code{Vw} is a vertex in world space.
+@Nn{V,s} denotes a vertex in 3D.  For example, @Nn{V,w} is a vertex in world
+space.
 
 @item
-@code{M<s><t>} denotes a matrix transforming space from @code{<s>} to
-@code{<t>}. For example, @code{Mow} is a matrix transforming space from
-object to world. All @code{M<s><t>} are 3x3 matrices.
+@Nn{M,st} denotes a matrix transforming space from @math{s} to @math{t}.
+For example, @Nn{M,ow} is a matrix transforming from object to world space.
+All @Nn{M,st} are 3x3 matrices.
 
 @item
-@code{V<s><t>} denotes the corresponding vector transforming space from
-@code{<s>} to @code{<t>}.
+@Nn{V,st} denotes the corresponding vector transforming space from @math{s} to
+@math{t}.
 
 @item
-@code{N<s>} denotes a plane normal vector @code{(A,B,C)} in some space.
+@Nn{N,s} denotes a plane normal vector (@math{A,B,C}) in some space.
 
 @item
-@code{V<s>.x}, @code{V<s>.y}, and @code{V<s>.z} are the respective x, y, and
-z components of a vector (for example, @code{Vw.y} is the y component of a
-vector in world space).
+@Nno{V,s,x}, @Nno{V,s,y}, and @Nno{V,s,z} are the respective @math{x},
+@math{y}, and @math{z} components of a vector.  For example, @Nno{V,w,y} is
+the @math{y} component of a vector in world space.
 
 @item
-@code{Vt.u}, and @code{Vt.v} are the respective u, and v components of a
-vector (in texture space).
+@Nno{V,t,u} and @Nno{V,t,v} are the respective @math{u}, and @math{v}
+components of a vector in texture space.
 @end itemize
 
-@node TexMap Polygon, TexMap Camera, TexMap Convections, Texture Mapping
-@subsection Polygon
+@node Texture Mapping Concepts, Texture Mapping Perspective Correction, Texture Mapping Conventions, Texture Mapping
+@subsection General Concepts
+
+This section describes general core concepts which are used by following
+discussions.
+
+@subsubheading Polygon
 
 A polygon is represented as a set of 3D vertices oriented in clockwise order
 (if the orientation is different, the polygon is not visible on screen).
@@ -52,491 +97,846 @@ There are three versions of any polygon:
 
 @enumerate
 @item
-@code{Po}: the polygon in object space. Here, the vertices of the polygon are
+@Nn{P,o} is the polygon in object space.  Here the vertices of the polygon are
 given in object space coordinates.
 
 @item
-@code{Pw}: the polygon in world space. For a sector world space is equal to
+@Nn{P,w} is the polygon in world space.  For a sector world space is equal to
 object space but for a thing there is a transformation from object space to
 world space given as:
-@example
-Vw = Mow * Vo - Vow
-@end example
-(meaning: the vertex in world space coordinates (@code{Vw}) is given as the
-vertex in object space coordinates (@code{Vo}) transformed by the matrix from
-object to world space (@code{Mow}) and the vector from object to world space
-(@code{Vow})).
+
+@ifnottex
+@quotation
+@math{Vw = Mow * Vo - Vow}
+@end quotation
+@end ifnottex
+@tex
+$$V_w = M_{ow} \times V_o - V_{ow}$$
+@end tex
+
+@noindent
+This means that the vertex in world space coordinates (@Nn{V,w}) is given as
+the vertex in object space coordinates (@Nn{V,o}) transformed by the matrix
+from object to world space (@Nn{M,ow}) and the vector from object to world
+space (@Nn{V,ow}).
 
 This transformation is recomputed whenever a thing moves.
 
 @item
-@code{Pc}: the polygon in camera space. Before viewing, every relevant vertex
-is transformed from world space to camera space using the following equation:
-@example
-Vc = Mwc * (Vw - Vwc)
-@end example
+@Nn{P,c} is the polygon in camera space.  Before viewing, every relevant
+vertex is transformed from world space to camera space using the following
+equation:
+
+@ifnottex
+@quotation
+@math{Vc = Mwc * (Vw - Vwc)}
+@end quotation
+@end ifnottex
+@tex
+$$V_c = M_{wc} \times (V_w - V_{wc})$$
+@end tex
 @end enumerate
 
-Note, all these three versions of a polygon are represented by the same
-Polygon3D object. The change from object to world and world to camera space
-happens inside the Vertex class that is referenced by Polygon3D.
+Note, all three versions of a polygon are represented by the same
+@samp{csPolygon3D} object.  The change from object to world and world to
+camera space happens inside the Vertex class that is referenced by
+@samp{csPolygon3D}.
 
 Associated with every polygon there is also a plane normal or plane equation:
-@example
-N: A*x + B*y + C*z + D = 0
-@end example
 
-There are also three versions of this plane equation (one for object
-space, one for world space, and one for camera space):
-@example
-No:   Ao*x + Bo*y + Co*z + Do = 0
-Nw:   Aw*x + Bw*y + Cw*z + Dw = 0
-Nc:   Ac*x + Bc*y + Cc*z + Dc = 0
-@end example
+@ifnottex
+@quotation
+@math{N: A * x + B * y + C * z + D = 0}
+@end quotation
+@end ifnottex
+@tex
+$$A \times x + B \times y + C \times z + D = 0 \eqno (N)$$
+@end tex
 
-@node TexMap Camera, TexMap Texture, TexMap Polygon, Texture Mapping
-@subsection Camera
+There are also three versions of this plane equation; one for object space,
+one for world space, and one for camera space:
 
-A camera is represented as a matrix (@code{Mwc}) and a vector (@code{Vwc}).
-In fact the camera describes the transformation between world and camera
-space. The inverse transformation (@code{Mcw}) from camera space to world
-space is also kept inside a Camera object because it can be used for movement
-(for example, to move forward one would want to move forward along the Z axis
+@ifnottex
+@quotation
+@math{No: Ao * x + Bo * y + Co * z + Do = 0}@*
+@math{Nw: Aw * x + Bw * y + Cw * z + Dw = 0}@*
+@math{Nc: Ac * x + Bc * y + Cc * z + Dc = 0}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalignno{
+&A_o \times x + B_o \times y + C_o \times z + D_o = 0 & (N_o) \cr
+&A_w \times x + B_w \times y + C_w \times z + D_w = 0 & (N_w) \cr
+&A_c \times x + B_c \times y + C_c \times z + D_c = 0 & (N_c) \cr
+}$$
+@end tex
+
+@subsubheading Camera
+
+A camera is represented as a matrix (@Nn{M,wc}) and a vector (@Nn{V,wc}).  In
+fact the camera describes the transformation between world and camera space.
+The inverse transformation (@Nn{M,cw}) from camera space to world space is
+also kept inside a @samp{csCamera} object because it can be used for movement
+(for example, to move forward one would want to move forward along the Z-axis
 in camera space and not in world space).
 
-@node TexMap Texture, TexMap Perspective correction, TexMap Camera, Texture Mapping
-@subsection Texture
+@subsubheading Texture
 
 There is also a texture associated with every polygon (unless it is a portal
-with no transparent overlay). The texture represents a 2 dimensional
-rectangular space where (0,0) is one corner of the texture and (1,1) is the
-opposite corner. If a texture is overlayed onto a rectangular polygon such
-that one corner is mapped onto (0,0) in texture space and the opposite corner
-is mapped onto (2,2) then the texture will be tiled four times across the
-surface of the polygon.
+with no overlay).  The texture represents a 2-dimensional rectangular space
+where (0,0) is one corner of the texture and (1,1) is the opposite corner.  If
+a texture is overlayed onto a rectangular polygon such that one corner is
+mapped onto (0,0) in texture space and the opposite corner is mapped onto
+(2,2) then the texture will be tiled four times across the surface of the
+polygon.
 
 To transform object to texture space we have the following equation:
-@example
-	Vt = Mot * (Vo - Vot)
-@end example
-similarly for world space:
-@example
-	Vt = Mwt * (Vw - Vwt)
-@end example
-and for camera space:
-@example
-	Vt = Mct * (Vc - Vct)
-@end example
 
-So, just as there are three versions of the polygon (@code{Po}, @code{Pw},
-and @code{Pc}) and three plane equations, we also have three equations
-transforming the various spaces to the texture. @code{Mot} and @code{Vot}
-(object to texture space) are fixed (calculated at load time). @code{Mwt} and
-@code{Vwt} (world to texture space) are the same for sectors but for things
-they are calculated whenever a thing moves. @code{Mct} and @code{Vct} (camera
-to texture space) are calculated every time the corresponding polygon is
-visible and needs to be drawn on screen.
+@ifnottex
+@quotation
+@math{Vt = Mot * (Vo - Vot)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{ot} \times (V_o - V_{ot})$$
+@end tex
+
+@noindent
+Similarly for world space:
+
+@ifnottex
+@quotation
+@math{Vt = Mwt * (Vw - Vwt)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{wt} \times (V_w - V_{wt})$$
+@end tex
+
+@noindent
+And for camera space:
+
+@ifnottex
+@quotation
+@math{Vt = Mct * (Vc - Vct)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{ct} \times (V_c - V_{ct})$$
+@end tex
+
+So, just as there are three versions of the polygon (@Nn{P,o}, @Nn{P,w}, and
+@Nn{P,c}) and three plane equations, we also have three equations transforming
+the various spaces to the texture.  @Nn{M,ot} and @Nn{V,ot} (object to texture
+space) are fixed (calculated at load time).  @Nn{M,wt} and @Nn{V,wt} (world to
+texture space) are the same for sectors but for things they are calculated
+whenever a thing moves.  @Nn{M,ct} and @Nn{V,ct} (camera to texture space) are
+calculated every time the corresponding polygon is visible and needs to be
+drawn on screen.
 
 Note that the texture transformation matrix is actually a transformation from
-3D to 3D. We simply don't use the Z component in texture space (it is just
+3D to 3D.  We simply don't use the Z component in texture space (it is just
 ignored).
 
-@node TexMap Perspective correction, TexMap Together, TexMap Texture, Texture Mapping
-@subsection Perspective correction
+@node Texture Mapping Perspective Correction, Texture Mapping Together, Texture Mapping Concepts, Texture Mapping
+@subsection Perspective Correction
 
-Objects in camera space are still 3D and thus not suited for immediate
-display on a 2 dimensional screen. Therefore you still need to do perspective
+Objects in camera space are still 3D and thus not suited for immediate display
+on a 2-dimensional screen.  Therefore you still need to do perspective
 correction as follows:
-@example
-        F * Vc.x
-x = ---------------
-          Vc.z
 
-        F * Vc.y
-y = ---------------
-          Vc.z
-@end example
+@ifnottex
+@quotation
+@math{x = (F * Vc.x) / Vc.z}@*
+@math{y = (F * Vc.y) / Vc.z}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+x &= {{F \times V_{c_x}} \over V_{c_z}} \cr
+y &= {{F \times V_{c_y}} \over V_{c_z}} \cr
+}$$
+@end tex
 
-(x,y) are then the 2 dimensional coordinates corresponding to the 3D vertex
-(lets call this 2D vector @code{Vs}).
+@noindent
+@math{x} and @math{y} are then the 2-dimensional coordinates corresponding to
+the 3D vertex.  We will call this 2D vector @Nn{V,s}.
 
-@code{F} is some factor needed to get a correct Field Of Vision (FOV).
-Crystal Space currently uses the height of the display (in pixels) for this.
-You can experiment with other values using the @code{-fov} commandline option
-or use the @key{f} or @kbd{SHIFT-f} keys while the program is running.
+@math{F} is some factor needed to get a correct @dfn{Field of Vision}
+(@sc{fov}).  Crystal Space currently uses the height of the display (in
+pixels) for this.  You can experiment with other values in the @file{walktest}
+application (@pxref{Walktest}) using the @samp{-fov} command-line option or
+the @kbd{f} or @kbd{@key{Shift}-f} keys while the program is running.
 
-@node TexMap Together, TexMap HowToUse, TexMap Perspective correction, Texture Mapping
-@subsection Bringing It All Together
+@node Texture Mapping Together, Texture Mapping Instructions, Texture Mapping Perspective Correction, Texture Mapping
+@subsection Bringing it All Together
 
 Using all this information we have enough to correctly map a texture on
-screen. Let's disregard clipping for the moment and just explain all the
+screen.  Let's disregard clipping for the moment and just explain all the
 steps from the original object space polygon until the final texture mapped
 polygon on screen.
 
-We will assume that the polygon (and the texture) has already been
-transformed from object to world space. So we start with a world space
-polygon: @code{Pw}.
+We will assume that the polygon (and the texture) has already been transformed
+from object to world space.  So we start with a world space polygon, @Nn{P,w}.
 
 First all vertices of the polygon are transformed to camera space (note that
 in Crystal Space this is done earlier since vertices are shared for one
-sector. This text ignores that and just concentrates on one polygon) with the
+sector.  This text ignores that and just concentrates on one polygon) with the
 equation:
-@example
-Vc = Mwc * (Vw - Vwc)
-@end example
+
+@ifnottex
+@quotation
+@math{Vc = Mwc * (Vw - Vwc)}
+@end quotation
+@end ifnottex
+@tex
+$$V_c = M_{wc} \times (V_w - V_{wc})$$
+@end tex
 
 (Also note that at this point you could discard vertices because they are
-behind the view plane (or Z=0). We assume here that the polygon is completely
-visible so this does not matter)
+behind the view plane (or @math{Z = 0}).  We assume here that the polygon is
+completely visible so this does not matter.)
 
-At this point we do perspective correction on the polygon. This means that we
-create a new 2 dimensional polygon with vertices @code{Vs} (screen space)
+At this point we do perspective correction on the polygon.  This means that we
+create a new 2-dimensional polygon with vertices @Nn{V,s} (in screen space)
 using the following equations:
-@example
-           F * Vc.x
-Vs.x = ---------------
-             Vc.z
 
-           F * Vc.y
-Vs.y = ---------------
-             Vc.z
-@end example
+@ifnottex
+@quotation
+@math{Vs.x = (F * Vc.x) / Vc.z}@*
+@math{Vs.y = (F * Vc.y) / Vc.z}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+V_{s_x} &= {{F \times V_{c_x}} \over V_{c_z}} \cr
+V_{s_y} &= {{F \times V_{c_y}} \over V_{c_z}} \cr
+}$$
+@end tex
 
 Now we create the matrix to transform camera space to texture space starting
-from the matrix to transform world space to texture space. Given:
-@example
-Vc = Mwc * (Vw - Vwc)
-@end example
+from the matrix to transform world space to texture space.  Given:
 
-we calculate (using the inverse matrix of Mwc):
-@example
-Mcw * Vc + Vwc = Vw                             (1)
-@end example
+@ifnottex
+@quotation
+@math{Vc = Mwc * (Vw - Vwc)}
+@end quotation
+@end ifnottex
+@tex
+$$V_c = M_{wc} \times (V_w - V_{wc})$$
+@end tex
 
+@noindent
+We calculate (using the inverse matrix of @Nn{M,wc}):
+
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{Mcw * Vc + Vwc = Vw} @tab (Equation 1)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$$M_{cw} \times V_c + V_{wc} = V_w \eqno (1)$$
+@end tex
+
+@noindent
 Given also:
-@example
-Vt = Mwt * (Vw - Vwt)                           (2)
-@end example
 
-we substitute (1) in (2):
-@example
-Vt = Mwt * (Mcw * Vc + Vwc - Vwt)
-@end example
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{Vt = Mwt * (Vw - Vwt)} @tab (Equation 2)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{wt} \times (V_w - V_{wt}) \eqno (2)$$
+@end tex
 
-this can also be written as:
-@example
-Vt = Mwt * (Mcw * Vc + Mcw * Mwc * (Vwc - Vwt))
-@end example
-and:
-@example
-Vt = Mwt * Mcw * (Vc + Mwc * (Vwc - Vwt))
-@end example
+@noindent
+We substitute (1) into (2) to get:
 
-if we say that:
-@example
-Mct = Mwt * Mcw
-Vct = Mwc * (Vwt - Vwc)
-@end example
-we get:
-@example
-Vt = Mct * (Vc - Vct)
-@end example
+@ifnottex
+@quotation
+@math{Vt = Mwt * (Mcw * Vc + Vwc - Vwt)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{wt} \times (M_{cw} \times V_c + V_{wc} - V_{wt})$$
+@end tex
 
-and this is the equation transforming camera space to texture space.
+@noindent
+This can also be re-written as:
+
+@ifnottex
+@quotation
+@math{Vt = Mwt * (Mcw * Vc + Mcw * Mwc * (Vwc - Vwt))}
+@end quotation
+
+@noindent
+Which simplifies to:
+
+@quotation
+@math{Vt = Mwt * Mcw * (Vc + Mwc * (Vwc - Vwt))}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+V_t &= M_{wt} \times (M_{cw} \times V_c + M_{cw} \times M_{wc} \times (V_{wc} - V_{wt})) \cr
+    &= M_{wt} \times M_{cw} \times (V_c + M_{wc} \times (V_{wc} - V_{wt})) \cr
+}$$
+@end tex
+
+@noindent
+If we say that:
+
+@ifnottex
+@quotation
+@math{Mct = Mwt * Mcw}@*
+@math{Vct = Mwc * (Vwt - Vwc)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+M_{ct} &= M_{wt} \times M_{cw} \cr
+V_{ct} &= M_{wc} \times (V_{wt} - V_{wc}) \cr
+}$$
+@end tex
+
+@noindent
+We then get:
+
+@ifnottex
+@quotation
+@math{Vt = Mct * (Vc - Vct)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{ct} \times (V_c - V_{ct})$$
+@end tex
+
+@noindent
+And this is the equation transforming camera space to texture space.
 
 Then we need to transform the world space plane equation to a camera space
-plane equation. This we do as follows:
+plane equation.  This we do as follows.
 
-The plane vector @code{Nw = (Aw,Bw,Cw)} is transformed to
-@code{Nc = (Ac,Bc,Cc)} using the following equation:
-@example
-Nc = Mwc * Nw
-@end example
+The plane vector
+@ifnottex
+@math{Nw = (Aw,Bw,Cw)}
+@end ifnottex
+@tex
+$N_w = (A_w,B_w,C_w)$
+@end tex
+is transformed to
+@ifnottex
+@math{Nc = (Ac,Bc,Cc)}
+@end ifnottex
+@tex
+$N_c = (A_c,B_c,C_c)$
+@end tex
+using the following equation:
 
-Using the first vertex of the polygon in camera space coordinates (@code{Vc})
-we then calculate @code{Dc} as follows:
+@ifnottex
+@quotation
+@math{Nc = Mwc * Nw}
+@end quotation
+@end ifnottex
+@tex
+$$N_c = M_{wc} \times N_w$$
+@end tex
+
+Using the first vertex of the polygon in camera space coordinates (@Nn{V,c})
+we then calculate @Nn{D,c} as follows.
 
 Since the plane equation in camera space is equal to:
-@example
-Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0
-@end example
 
-(for every vertex @code{Vc} on the polygon) we can calculate the missing
-@code{Dc} as follows:
-@example
-Dc = -Ac * Vc.x - Bc * Vc.y - Cc * Vc.z
-@end example
+@ifnottex
+@quotation
+@math{Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0}
+@end quotation
+@end ifnottex
+@tex
+$$A_c \times V_{c_x} + B_c \times V_{c_y} + C_c \times V_{c_z} + D_c = 0$$
+@end tex
+
+@noindent
+For every vertex @Nn{V,c} on the polygon we can calculate the missing @Nn{D,c}
+as follows:
+
+@ifnottex
+@quotation
+@math{Dc = -Ac * Vc.x - Bc * Vc.y - Cc * Vc.z}
+@end quotation
+@end ifnottex
+@tex
+$$D_c = -A_c \times V_{c_x} - B_c \times V_{c_y} - C_c \times V_{c_z}$$
+@end tex
 
 Using this information (the polygon in perspective corrected 2D coordinates,
 the transformation from camera space to texture space and the plane equation
 in camera space) we can draw the polygon on the screen and perform correct
-texture mapping. This happens as follows:
+texture mapping.  This happens as follows.
 
 From the perspective correction equations:
-@example
-           F * Vc.x
-Vs.x = ---------------
-             Vc.z
 
-           F * Vc.y
-Vs.y = ---------------
-             Vc.z
-@end example
+@ifnottex
+@quotation
+@math{Vs.x = (F * Vc.x) / Vc.z}@*
+@math{Vs.y = (F * Vc.y) / Vc.z}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+V_{s_x} &= {{F \times V_{c_x}} \over V_{c_z}} \cr
+V_{s_y} &= {{F \times V_{c_y}} \over V_{c_z}} \cr
+}$$
+@end tex
 
-we can invert them to:
-@example
-          Vs.x * Vc.z
-Vc.x = -----------------                        (1)
-               F
+@noindent
+We can invert them to:
 
-          Vs.y * Vc.z
-Vc.y = -----------------                        (2)
-               F
-@end example
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{Vc.x = (Vs.x * Vc.z) / F} @tab (Equation 3)
+@item @math{Vc.y = (Vs.y * Vc.z) / F} @tab (Equation 4)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$$\eqalignno{
+V_{c_x} &= {{V_{s_x} \times V_{c_z}} \over F} & (3) \cr
+V_{c_y} &= {{V_{s_y} \times V_{c_z}} \over F} & (4) \cr
+}$$
+@end tex
 
-we can now substiture (1) and (2) into the following equation:
-@example
-Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0
-@end example
+@noindent
+We can now substitute (3) and (4) into the following equation:
 
-and get:
-@example
-Ac * Vs.x * Vc.z   Bc * Vs.y * Vc.z   F * Cc * Vc.z
----------------- + ---------------- + ------------- = -Dc
-        F                  F                F
-@end example
-or:
-@example
-  Ac * Vs.x   Bc * Vs.y     Cc        1
-- --------- - --------- - ------ = ------
-    F*Dc        F*Dc       F*Dc     Vc.z
-@end example
+@ifnottex
+@quotation
+@math{Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0}
+@end quotation
+@end ifnottex
+@tex
+$$A_c \times V_{c_x} + B_c \times V_{c_y} + C_c \times V_{c_z} + D_c = 0$$
+@end tex
 
-This equation is very important. From this it follows that 1/z linear is in
-screen space and this can be used for perspective correct texture mapping.
-Lets define the following three new variables:
-@example
-        -Ac
-M = -------------
-       F * Dc
+@noindent
+And get:
 
-        -Bc
-N = -------------
-       F * Dc
+@ifnottex
+@quotation
+@math{(Ac * Vs.x * Vc.z) / F + (Bc * Vs.y * Vc.z) / F + (F * Cc * Vc.z) / F = -Dc}
+@end quotation
+@end ifnottex
+@tex
+$${{A_c \times V_{s_x} \times V_{c_z}} \over F} +
+  {{B_c \times V_{s_y} \times V_{c_z}} \over F} +
+  {{F \times C_c \times V_{c_z}} \over F} = -D_c$$
+@end tex
 
-        -Cc
-O = -------------
-         Dc
-@end example
+@noindent
+Or:
 
-So the 1/z equation in linear screen space is then written as:
-@example
-  1
------- = M * Vs.x + N * Vs.y + O                 (3)
- Vc.z
-@end example
+@ifnottex
+@quotation
+@math{-(Ac * Vs.x) / (F*Dc) - (Bc * Vs.y) / (F*Dc) - Cc / (F*Dc) = 1 / Vc.z}
+@end quotation
+@end ifnottex
+@tex
+$$-{{A_c \times V_{s_x}} \over {F \times D_c}} -
+   {{B_c \times V_{s_y}} \over {F \times D_c}} -
+   {C_c \over {F \times D_c}} = {1 \over V_{c_z}}$$
+@end tex
 
-So now we can easily calculate 1/z at every point in screen space. But we
-also need to calculate the texture coordinates (u,v) or @code{Vt}. Lets call
-the individual fields of the transformation matrix @code{Mct} as follows:
+This equation is very important.  From this it follows that @math{1/z} linear
+is in screen space and this can be used for perspective correct texture
+mapping.  Lets define the following three new variables:
+
+@ifnottex
+@quotation
+@math{M = -Ac / (F * Dc)}@*
+@math{N = -Bc / (F * Dc)}@*
+@math{O = -Cc / Dc}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+M &= {-A_c \over {F \times D_c}} \cr
+N &= {-B_c \over {F \times D_c}} \cr
+O &= {-C_c \over D_c} \cr
+}$$
+@end tex
+
+@noindent
+So the @math{1/z} equation in linear screen space is then written as:
+
+@ifnottex
+@quotation
+@multitable @columnfractions .35 .65
+@item @math{1 / Vc.z = M * Vs.x + N * Vs.y + O} @tab (Equation 5)
+@end multitable
+@end quotation
+@end ifnottex
+@tex
+$${1 \over V_{c_z}} = M \times V_{s_x} + N \times V_{s_y} + O \eqno (5)$$
+@end tex
+
+So now we can easily calculate @math{1/z} at every point in screen space.  But
+we also need to calculate the texture coordinates (@math{u,v}) or @Nn{V,t}.
+Let's call the individual fields of the transformation matrix @Nn{M,ct} as
+follows:
+
+@ifnottex
 @example
       / m11 m12 m13 \
 Mct = | m21 m22 m23 |   Vct = (v1 v2 v3)
       \ m31 m32 m33 /
 @end example
+@end ifnottex
+@tex
+$$M_{ct} = \pmatrix{
+m_{11} & m_{12} & m_{13} \cr
+m_{21} & m_{22} & m_{23} \cr
+m_{21} & m_{32} & m_{33} \cr
+}
+\qquad
+V_{ct} = \pmatrix{v_1 \cr v_2 \cr v_3 \cr}$$
+@end tex
 
-For simplicity lets use u for @code{Vt.u} and v for @code{Vt.v} (the (u,v)
-texture coordinates). Let us also use x, y, and z for @code{Vc.x},
-@code{Vc.y}, @code{Vc.z} respectively.
+For simplicity let's use @math{u} for @Nno{V,t,u} and @math{v} for @Nno{V,t,v}
+(the @math{u,v} texture coordinates).  Let us also use @math{x}, @math{y},
+and @math{z} for @Nno{V,c,x}, @Nno{V,c,y}, @Nno{V,c,z} respectively.
 
+@noindent
 Then from:
-@example
-Vt = Mct * (Vc - Vct)
-@end example
-we get:
-@example
-u = m11 * (x-v1) + m12 * (y-v2) + m13 * (z-v3)
-v = m21 * (x-v1) + m22 * (y-v2) + m23 * (z-v3)
-@end example
 
+@ifnottex
+@quotation
+@math{Vt = Mct * (Vc - Vct)}
+@end quotation
+@end ifnottex
+@tex
+$$V_t = M_{ct} \times (V_c - V_{ct})$$
+@end tex
+
+@noindent
+We get:
+
+@ifnottex
+@quotation
+@math{u = m11 * (x - v1) + m12 * (y - v2) + m13 * (z - v3)}@*
+@math{v = m21 * (x - v1) + m22 * (y - v2) + m23 * (z - v3)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+u &= m_{11} \times (x - v_1) + m_{12} \times (y - v_2) + m_{13} \times (z - v_3) \cr
+v &= m_{21} \times (x - v_1) + m_{22} \times (y - v_2) + m_{23} \times (z - v_3) \cr
+}$$
+@end tex
+
+@noindent
 This can be rewritten as:
-@example
-u = m11 * x + m12 * y + m13 * z - (m11*v1+m12*v2+m13*v3)
-v = m21 * x + m22 * y + m23 * z - (m21*v1+m22*v2+m23*v3)
-@end example
 
-Lets call:
-@example
-P = - (m11*v1+m12*v2+m13*v3)
-Q = - (m21*v1+m22*v2+m23*v3)
-@end example
-and we have:
-@example
-u = m11 * x + m12 * y + m13 * z + P
-v = m21 * x + m22 * y + m23 * z + Q
-@end example
+@ifnottex
+@quotation
+@math{u = m11 * x + m12 * y + m13 * z - (m11 * v1 + m12 * v2 + m13 * v3)}@*
+@math{v = m21 * x + m22 * y + m23 * z - (m21 * v1 + m22 * v2 + m23 * v3)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+u &= m_{11} \times x + m_{12} \times y + m_{13} \times z - (m_{11} \times v_1 + m_{12} \times v_2 + m_{13} \times v_3) \cr
+v &= m_{21} \times x + m_{22} \times y + m_{23} \times z - (m_{21} \times v_1 + m_{22} \times v_2 + m_{23} \times v_3) \cr
+}$$
+@end tex
 
-Like before we substitute the inverse perspective correction equations (1)
-and (2) into the previous equations and we get:
-@example
-    m11 * Vs.x * z   m12 * Vs.y * z
-u = -------------- + -------------- + m13 * z + P
-           F                F
+@noindent
+To simplify let's introduce a couple new variables to take the place of
+complicated expressions from the above equations.
 
-    m21 * Vs.x * z   m22 * Vs.y * z
-v = -------------- + -------------- + m23 * z + Q
-           F                F
-@end example
+@ifnottex
+@quotation
+@math{P = - (m11 * v1 + m12 * v2 + m13 * v3)}@*
+@math{Q = - (m21 * v1 + m22 * v2 + m23 * v3)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+P = - (m_{11} \times v_1 + m_{12} \times v_2 + m_{13} \times v_3) \cr
+Q = - (m_{21} \times v_1 + m_{22} \times v_2 + m_{23} \times v_3) \cr
+}$$
+@end tex
 
+@noindent
+And we have:
+
+@ifnottex
+@quotation
+@math{u = m11 * x + m12 * y + m13 * z + P}@*
+@math{v = m21 * x + m22 * y + m23 * z + Q}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+u &= m_{11} \times x + m_{12} \times y + m_{13} \times z + P \cr
+v &= m_{21} \times x + m_{22} \times y + m_{23} \times z + Q \cr
+}$$
+@end tex
+
+@noindent
+As earlier, we substitute the inverse perspective correction equations (3)
+and (4) into the previous equations and we get:
+
+@ifnottex
+@quotation
+@math{u = (m11 * Vs.x * z) / F + (m12 * Vs.y * z) / F + m13 * z + P}@*
+@math{v = (m21 * Vs.x * z) / F + (m22 * Vs.y * z) / F + m23 * z + Q}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+u &= {{m_{11} \times V_{s_x} \times z} \over F} + {{m_{12} \times V_{s_y} \times z} \over F} + m_{13} \times z + P \cr
+v &= {{m_{21} \times V_{s_x} \times z} \over F} + {{m_{22} \times V_{s_y} \times z} \over F} + m_{23} \times z + Q \cr
+}$$
+@end tex
+
+@noindent
+And then rewrite as:
+
+@ifnottex
+@quotation
+@math{u / z = (m11 * Vs.x) / F + (m12 * Vs.y) / F + m13 + P / z}@*
+@math{v / z = (m21 * Vs.x) / V + (m22 * Vs.y) / F + m23 + Q / z}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+{u \over z} &= {{m_{11} \times v_{s_x}} \over F} + {{m_{12} \times v_{s_y}} \over F} + m_{13} + {P \over z} \cr
+{v \over z} &= {{m_{21} \times v_{s_x}} \over V} + {{m_{22} \times v_{s_y}} \over F} + m_{23} + {Q \over z} \cr
+}$$
+@end tex
+
+@noindent
+Substitute the linear @math{1/z} equation (5) into this to get:
+
+@ifnottex
+@quotation
+@math{u / z = (m11 * Vs.x) / F + (m12 * Vs.y) / F + m13 + P * (M * Vs.x + N * Vs.y + O)}@*
+@math{v / z = (m21 * Vs.x) / F + (m22 * Vs.y) / F + m23 + Q * (M * Vs.x + N * Vs.y + O)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+{u \over z} &= {{m_{11} \times v_{s_x}} \over F} + {{m_{12} \times v_{s_y}} \over F} + m_{13} + P \times (M \times v_{s_x} + N \times v_{s_y} + O) \cr
+{v \over z} &= {{m_{21} \times v_{s_x}} \over F} + {{m_{22} \times v_{s_y}} \over F} + m_{23} + Q \times (M \times v_{s_x} + N \times v_{s_y} + O) \cr
+}$$
+@end tex
+
+@noindent
 Rewrite as:
-@example
- u    m11 * Vs.x   m12 * Vs.y          P
---- = ---------- + ---------- + m13 + ---
- z        F             F              z
 
- v    m21 * Vs.x   m22 * Vs.y          Q
---- = ---------- + ---------- + m23 + ---
- z        F             F              z
-@end example
+@ifnottex
+@quotation
+@math{u / z = (m11 * Vs.x + m12 * Vs.y + F * (m13 + P * (M*Vs.x + N*Vs.y + O)) / F}@*
+@math{v / z = (m21 * Vs.x + m22 * Vs.y + F * (m23 + Q * (M*Vs.x + N*Vs.y + O)) / F}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+{u \over z} &= {{m_{11} \times v_{s_x} + m_{12} \times v_{s_y} + F \times (m_{13} + P \times (M \times v_{s_x} + N \times v_{s_y} + O))} \over F} \cr
+{v \over z} &= {{m_{21} \times v_{s_x} + m_{22} \times v_{s_y} + F \times (m_{23} + Q \times (M \times v_{s_x} + N \times v_{s_y} + O))} \over F} \cr
+}$$
+@end tex
 
-Substitute the linear 1/z equation (3) into this:
-@example
- u    m11 * Vs.x   m12 * Vs.y
---- = ---------- + ---------- + m13 + P * (M * Vs.x + N * Vs.y + O)
- z        F             F
+@noindent
+And finally rewrite as:
 
- v    m21 * Vs.x   m22 * Vs.y
---- = ---------- + ---------- + m23 + Q * (M * Vs.x + N * Vs.y + O)
- z        F             F
-@end example
+@ifnottex
+@quotation
+@math{u / z = (m11 / F + P * M) * Vs.x + (m12 / F + P * N) * Vs.y + (m13 + P * O)}@*
+@math{v / z = (m21 / F + Q * M) * Vs.x + (m22 / F + Q * N) * Vs.y + (m23 + Q * O)}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+{u \over z} &= ({m_{11} \over F} + P \times M) \times v_{s_x} + ({m_{12} \over F} + P \times N) \times v_{s_y} + (m_{13} + P \times O) \cr
+{v \over z} &= ({m_{21} \over F} + Q \times M) \times v_{s_x} + ({m_{22} \over F} + Q \times N) \times v_{s_y} + (m_{23} + Q \times O) \cr
+}$$
+@end tex
 
-Rewrite as:
-@example
- u    m11 * Vs.x + m12 * Vs.y + F*(m13 + P*(M*Vs.x + N*Vs.y + O)
---- = ----------------------------------------------------------
- z                                 F
+These are again two important equations because they state that @math{u/z} and
+@math{v/z} are also linear in screen space.  Using this we can easily
+calculate (@math{u,v}) at every screen space point.
 
- v    m21 * Vs.x + m22 * Vs.y + F*(m23 + Q*(M*Vs.x + N*Vs.y + O)
---- = ----------------------------------------------------------
- z                                 F
-@end example
+Now let's define:
 
-Again rewrite:
-@example
- u
---- = (m11/F + P*M) * Vs.x + (m12/F + P*N) * Vs.y + (m13 + P*O)
- z
+@ifnottex
+@quotation
+@math{J1 = m11 / F + P * M}@*
+@math{J2 = m12 / F + P * N}@*
+@math{J3 = m13 + P * O}@*
+@math{K1 = m21 / F + Q * M}@*
+@math{K2 = m22 / F + Q * N}@*
+@math{K3 = m23 + Q * O}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+J_1 &= {m_{11} \over F} + P * M \cr
+J_2 &= {m_{12} \over F} + P * N \cr
+J_3 &= m_{13} + P * O \cr
+}\qquad
+\eqalign{
+K_1 &= {m_{21} \over F} + Q * M \cr
+K_2 &= {m_{22} \over F} + Q * N \cr
+K_3 &= m_{23} + Q * O \cr
+}$$
+@end tex
 
- v
---- = (m21/F + Q*M) * Vs.x + (m22/F + Q*N) * Vs.y + (m23 + Q*O)
- z
-@end example
-
-These are again two important equations because they state that u/z and v/z
-are also linear in screen space. Using this we can easily calculate (u,v) at
-every screen space point.
-
-Lets call:
-@example
-J1 = m11/F + P*M
-J2 = m12/F + P*N
-J3 = m13 + P*O
-
-K1 = m21/F + Q*M
-K2 = m22/F + Q*N
-K3 = m23 + Q*O
-@end example
-
+@noindent
 Then we have the following three equations:
-@example
- 1
---- = M * Vs.x + N * Vs.y + O
- z
 
- u
---- = J1 * Vs.x + J2 * Vs.y + J3
- z
-
- v
---- = K1 * Vs.x + K2 * Vs.y + K3
- z
-@end example
+@ifnottex
+@quotation
+@math{1 / z = M * Vs.x + N * Vs.y + O}@*
+@math{u / z = J1 * Vs.x + J2 * Vs.y + J3}@*
+@math{v / z = K1 * Vs.x + K2 * Vs.y + K3}
+@end quotation
+@end ifnottex
+@tex
+$$\eqalign{
+{1 \over z} &= M \times v_{s_x} + N \times v_{s_y} + O \cr
+{u \over z} &= J_1 \times v_{s_x} + J_2 \times v_{s_y} + J_3 \cr
+{v \over z} &= K_1 \times v_{s_x} + K_2 \times v_{s_y} + K_3 \cr
+}$$
+@end tex
 
 With these three important equations we can do all texture mapping we want.
-With the first equation we can calculate 1/z. This is useful for Z-buffering
-and also for calculating (u,v) from the two other equations.
+With the first equation we can calculate @math{1/z}.  This is useful for
+Z-buffering and also for calculating (@math{u,v}) from the two other
+equations.
 
-@node TexMap HowToUse, , TexMap Together, Texture Mapping
-@subsection Instructions for the texture mapper
+@node Texture Mapping Instructions, , Texture Mapping Together, Texture Mapping
+@subsection Instructions for Texture Mapper
 
-The @code{ORIG}/@code{FIRST}/@code{SECOND} vertex describe the texture plane.
-What CS does internally is to create a transformation matrix/vector which
-translates object space (3D coordinates) to texture space (UV coordinates).
-Here is how this works: 
+In the Crystal Space map file,
+the @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} vertex keywords describe the
+texture plane.  What Crystal Space does internally is to create a
+transformation matrix/vector which translates object space (3D coordinates) to
+texture space (@math{u,v} coordinates).  Here is how this works.
 
-First a few definitions: 
+@noindent
+First a few definitions:
+
 @itemize @bullet
 @item
-@code{ORIG} vector: @code{Vo}
-
+@code{ORIG} vector is @Nn{V,o}
 @item
-@code{FIRST} vector: @code{V1}
-
+@code{FIRST} vector is @Nn{V,1}
 @item
-@code{SECOND} vector: @code{V2}
-
+@code{SECOND} vector is @Nn{V,2}
 @item
-@code{FIRST_LEN}: @code{len1}
-
+@code{FIRST_LEN} is @Nn{L,1}
 @item
-@code{SECOND_LEN}: @code{len2}
-
+@code{SECOND_LEN} is @Nn{L,2}
 @item
-Length of @code{V1-Vo}: @code{l1}
-
+Length of
+@ifnottex
+@math{V1 - Vo}
+@end ifnottex
+@tex
+$V_1 - V_o$
+@end tex
+is @Nn{l,1}
 @item
-Length of @code{V2-Vo}: @code{l2}
+Length of
+@ifnottex
+@math{V2 - Vo}
+@end ifnottex
+@tex
+$V_2 - V_o$
+@end tex
+is @Nn{l,2}
 @end itemize
 
-@code{Vo}, @code{V1} and @code{V2} are vertices in object space. These define
-the local coordinate system for texture space. So we have the following
+@Nn{V,o}, @Nn{V,1} and @Nn{V,2} are vertices in object space.  These define
+the local coordinate system for texture space.  So we have the following
 mapping:
-@example
-Vo -> (0,0) 
-V1 -> (len1,0) 
-V2 -> (0,len2) 
-@end example
+
+@quotation
+@Nn{V,o} @expansion{} (@math{0},@math{0})@*
+@Nn{V,1} @expansion{} (@Nn{L,1},@math{0})@*
+@Nn{V,2} @expansion{} (@math{0},@Nn{L,2})
+@end quotation
 
 It is important to realize that the coordinate (0,0) in texture space is the
-top-left coordinate of the texture and (1,1) is the bottom-right corner. The
+top-left coordinate of the texture and (1,1) is the bottom-right corner.  The
 coordinate (2,2) is thus the bottom-right corner of a tiled texture (2x2
 times).
 
-The conversion to the matrix happens as follows: 
-@example  
-Vu = (len1 / l1) * (V1-Vo) 
-Vv = (len2 / l2) * (V2-Vo) 
-  
-      / Vu.x Vv.x 1 \ 
-Mot = | Vu.y Vv.y 1 | 
-      \ Vu.z Vv.z 1 / 
-@end example
+The conversion to the matrix happens as follows:
 
-(The last column represents the W texture component which is not used). 
-
+@ifnottex
+@quotation
+@math{Vu = (len1 / l1) * (V1-Vo)}@*
+@math{Vv = (len2 / l2) * (V2-Vo)}
+@end quotation
 @example
-Vot = < Vo.x Vo.y Vo.z > 
+      / Vu.x Vv.x 1 \
+Mot = | Vu.y Vv.y 1 |
+      \ Vu.z Vv.z 1 /
 @end example
+@end ifnottex
+@tex
+$$\eqalign{
+V_u &= {L_1 \over l1} \times (V_1 - V_o) \cr
+V_v &= {L_2 \over l2} \times (V_2 - V_o) \cr
+}\quad\to\quad
+M_{ot}\pmatrix{
+V_{u_x} & V_{v_x} & 1 \cr
+V_{u_y} & V_{v_y} & 1 \cr
+V_{u_z} & V_{v_z} & 1 \cr
+}$$
+@end tex
 
-So @code{Mot} and @code{Vot} are the transformation matrix/vector to go from
-object to texture space. Use these as follows: 
-@example
-T = Mot * (O - Vot)
-@end example
-with O being the object space vector that you want to convert and T the
-texture space vector. Only the x and y components are used of T.
-@samp{x} represents U and @samp{y} represents V.
- 
-Using the last equation you can convert every point of your polygon to
-texture space.
+@noindent
+The last column represents the @math{W} texture component which is not used.
 
+@ifnottex
+@quotation
+@math{Vot = <Vo.x Vo.y Vo.z>}
+@end quotation
+@end ifnottex
+@tex
+$$V_{ot} = \left\langle\matrix{V_{o_x} & V_{o_y} & V_{o_z} \cr}\right\rangle$$
+@end tex
+
+@noindent
+So @Nn{M,ot} and @Nn{V,ot} are the transformation matrix/vector to go from
+object to texture space.  Use these as follows:
+
+@ifnottex
+@quotation
+@math{T = Mot * (O - Vot)}
+@end quotation
+@end ifnottex
+@tex
+$$T = M_{ot} \times (O - V_{ot})$$
+@end tex
+
+@noindent
+With @math{O} being the object space vector that you want to convert and
+@math{T} the texture space vector.  Only the @math{x} and @math{y} components
+are used of @math{T}.  @math{x} represents @math{u} and @math{y} represents
+@math{v}.
+
+Using the last equation you can convert every point of your polygon to texture
+space.
+
+@unmacro Nno
+@unmacro Nn

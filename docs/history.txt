@@ -1,66 +1,91 @@
 The history order has been reversed so that new features are at the top.
 
 23-May-2000
-	- Fixed a small potential problem with the polygon Covers
-	  function. It compared a float to 0 which seems to be a little
-	  system dependent. I made the test more robust. The effect
-	  of this bug was that the generated octree could be different
-	  on various platforms.
-	- Wouter Wijngaards fixed a bug in radiosity. Portals are
-	  traversed now. Slower, but looks great. More array bound
-	  errors, though. Perhaps the frustum code is buggy.
-	  Radiosity can also handle portals without lightmaps now.
-	- More debugging on octree/PVS stuff...
-	- Added a patch from Samuel Humphreys with the following changes:
-	    - Pluggifies the software renderer for opengl .
+	- Fixed a small potential problem with the polygon Covers function.
+	  It compared a float to 0 which seems to be a little system
+	  dependent.  I made the test more robust.  The effect of this bug was
+	  that the generated octree could be different on various platforms.
+	- Wouter Wijngaards fixed a bug in radiosity.  Portals are traversed
+	  now.  Slower, but looks great.  More array bound errors, though.
+	  Perhaps the frustum code is buggy.  Radiosity can also handle
+	  portals without lightmaps now.
+	- More debugging on octree/PVS stuff.
+	- Added a patch from Samuel Humphreys with the following changes for
+	  dynamic textures.
+	    - OpenGL renderer now employs software renderer through its SCF
+	      interface rather than linking with it directly.
 	    - Add a back buffer style implementation for opengl based on
-	      Normans implementation. However on my system, it runs at
-	      half the speed as the software version, and it renders
-	      flipped in the x-axis, I've tried lots of stuff to get it
-	      working properly, but to no avail. Need other people to have
-	      a go at this. Also with mesa and voodoo2 the texture
-	      shifts into the blue spectrum, whereas it doesnt with software
-	      opengl...Im investigating this.
+	      Normans implementation.  However on my system, it runs at half
+	      the speed as the software version, and it renders flipped in the
+	      x-axis, I've tried lots of stuff to get it working properly, but
+	      to no avail.  Need other people to have a go at this.  Also with
+	      mesa and voodoo2 the texture shifts into the blue spectrum,
+	      whereas it doesnt with software opengl...Im investigating this.
 	    - Added further configuration stuff to opengl.cfg, so you can
-	      choose dynamic texture implementation. See comments there.
+	      choose dynamic texture implementation.  See comments there.
 	    - Implemented some outstanding methods to the opengl driver:
 	      SaveArea, RestoreArea
-	    - Fixed bug in DrawPixmap, it now correctly renders sub
-	      region of textures whose size has been modified. This was
-	      highlighted by cswstest.
-	    - Modified glx2d.cpp so that it'll give a single buffer for
-	      CSWS,--outstanding issue with paletted mode...i.e. the glx
-	      drivers will not work in paletted mode, but it wouldn't have
-	      done before my modifications anyway....a todo!
-	    - Small modification to csws so it requests a single buffer
-	      before opening the graphics drivers.
+	    - Fixed bug in DrawPixmap, it now correctly renders sub region of
+	      textures whose size has been modified.  This was highlighted by
+	      cswstest.
+	    - Modified glx2d.cpp so that it'll give a single buffer for CSWS.
+	      An outstanding issue with paletted mode, i.e.  the glx drivers
+	      will not work in paletted mode, but it wouldn't have done before
+	      my modifications anyway....a todo!
+	    - Small modification to csws so it requests a single buffer before
+	      opening the graphics drivers.
 	    - Change of signature to iGraphics3D->CreateOffScreenRenderer,
-	      have attempted to update all drivers, but I may of
-	      missed something.
+	      have attempted to update all drivers, but I may of missed
+	      something.
 	    - Promoted default implementation of
-	      iGraphics2D->CreateOffScreenCanvas to csGraphics2D (as Eric
+	      iGraphics2D::CreateOffScreenCanvas to csGraphics2D (as Eric
 	      suggested), updated all other drivers too.
 	    - oglglide now compiles again.
+	- Eric Sunshine made the following changes to the recent Texinfo
+	  conversions from Martin Geisse:
+	    - Fixed quite a few warnings and errors reported by 'makeinfo'.
+	    - Performed a much more thorough Texinfo conversion.
+	    - Fixed all the formatting problems reported by TeX (mostly
+	      involving overfull and underfull hbox's.
+	    - Major overhaul of camera.txi, warping.txi, and texmap.txi so
+	      that mathematical formulas and variables are correctly (and
+	      nicely) typeset; especially when formatted with TeX.  This was a
+	      big job, but it looks *very* nice, indeed.  :-)
+	    - Removed appendix/resource.txi since the type of information it
+	      presented was more-or-less the same as intro/resource.txi.  Also
+	      much of it was extremely out-of-date.  However, I did add the
+	      IRC reference to intro/resource.txi.
+	    - Upgraded the documentation for mdl2spr.  Added a lot of missing
+	      filler.
+	    - Completely removed miscnote.txi since its contents were
+	      incredibly out of date and mostly (if not entirely) meaningless
+	      at this point in time.  The only thing I saved from this file
+	      was the discussion of dynamic worlds and lighting which I placed
+	      in a new file named dynworld.txi.
+	    - Completely removed tcache.txi since it was 100% out-of-date and
+	      inaccurate.  It no longer reflected reality.
+	- Eric Sunshine eliminated compilation warning about */ outside of
+	  comment in soft_g3d.cpp.
 22-May-2000
-	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea()
-	  to calculate the signed area of a polygon.
+	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea() to
+	  calculate the signed area of a polygon.
 	- Fixed another small bug in PVS building.
 	- Added a new function to csFrustumView that is called for every
 	  octree node that is visited.
-	- Use CheckFrustum to optimize PVS building. Added a QAD PVS
-	  that is not correct but very fast to build. It is not correct in
-	  the sense that it will incorrectly mark nodes as invisible even
-	  if they are visible. But all nodes marked visible are SURE to
-	  be visible and this is important. This means that we can use
-	  the PVS in the first place to debug the other PVS. The real PVS
-	  should never cull nodes that are marked visible by the QAD PVS.
-	  Later we can use this QAD PVS to optimize building the real PVS
-	  because nodes marked visible by the QAD PVS do not need to be
-	  tested.
+	- Use CheckFrustum to optimize PVS building.  Added a QAD PVS that is
+	  not correct but very fast to build.  It is not correct in the sense
+	  that it will incorrectly mark nodes as invisible even if they are
+	  visible.  But all nodes marked visible are SURE to be visible and
+	  this is important.  This means that we can use the PVS in the first
+	  place to debug the other PVS.  The real PVS should never cull nodes
+	  that are marked visible by the QAD PVS.  Later we can use this QAD
+	  PVS to optimize building the real PVS because nodes marked visible
+	  by the QAD PVS do not need to be tested.
+	- Martin Geisse added Texinfo conversions for tcache.txi, texmap.txi,
+	  and csws.txi.  He also moved phyziks.txi into a new texinfo/libs
+	  chapter.
 	- Added Dumper::dump() for csOctree.
-	- Martin Geisse converted more docs to TexInfo format.
-	- Norman Kramer adjusted vpath for oss.mak so that it compiles
-	  again.
+	- Norman Kramer adjusted vpath for oss.mak so that it compiles again.
 21-May-2000
 	- Performance optimizations to terrain engine from Alex Pfaffe.
 	- Fixed big bug in PVS building which could cause significant
@@ -133,6 +158,9 @@ The history order has been reversed so that new features are at the top.
 	  bit harder to keep the generated makefile under 80 columns.
 	- Eric Sunshine performed the Texinfo conversion on the VFS
 	  documentation and merged it into the CS manual.
+	- Martin Geisse performed Texinfo conversions on camera.tex,
+	  mdl2spr.txi, miscnote.tex, render.tex, resource.tex, sound.html,
+	  and warping.tex.
 19-May-2000
 	- Alex Pfaffe did various changes to terrain engine again.
 	- Various small changes to csTerrain to help Alex integrate his

@@ -39,7 +39,8 @@ In addition to writing several documents describing various ports of Crystal
 Space in detail, Eric took on the task of acting as master editor of this
 manual.  As part of this job, he has written much of the content which ties
 together the various portions of the manual, fleshed out much of the bare
-skeleton, and written many otherwise absent sections.  His editing efforts
+skeleton, written many otherwise absent sections, and performed the extensive
+mathematical typesetting found throughout the manual.  His editing efforts
 have been very extensive, and he is responsible for the manual's current
 organization, look, and feel.  He also created several utilities and Texinfo
 extension packages which allow the documentation to build cleanly on all

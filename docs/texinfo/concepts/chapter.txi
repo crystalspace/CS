@@ -29,19 +29,17 @@ Collision Detection
 @menu
 * Cameras and Matrices::
 * Space Warping::
-* Rendering Loop::
-* Visibility Culling:: Visibility Culling In Detail
-* 3D Sprites::
-* Texture Cache::
 * Texture Mapping::
-* Misc Notes:: Miscallenous notes requiring classification (Jorrit's Brain Dump)
+* Visibility Culling:: Visibility Culling In Detail
+* Rendering Loop::
+* 3D Sprites::
+* Dynamic Worlds::
 @end menu
 
 @imports{concepts,camera.txi}
 @imports{concepts,warping.txi}
-@imports{concepts,rdrloop.txi}
-@imports{concepts,viscull.txi}
-@imports{concepts,3dsprite.txi}
-@imports{concepts,tcache.txi}
 @imports{concepts,texmap.txi}
-@imports{concepts,miscnote.txi}
+@imports{concepts,viscull.txi}
+@imports{concepts,render.txi}
+@imports{concepts,3dsprite.txi}
+@imports{concepts,dynworld.txi}

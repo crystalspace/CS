@@ -1,60 +1,78 @@
 @c -*-texinfo-*-
 @node mdl2spr, , Squawk, Applications
-@section Quake MDL Converter (@code{mdl2spr})
+@section Quake Model Converter (@code{mdl2spr})
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}
 
-A quake model (MDL/MD2) convertor for Crystal Space.
+@emph{By Nathaniel Saint Martin, @email{noote@@bigfoot.com}.
+Back seam fix and skin resizing by Seth Galbraith,
+@email{sgalbrai@@linknet.kitsap.lib.wa.us}.
+Project overhauled by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-By Nathaniel Saint Martin (@email{noote@@bigfoot.com}). @*
-Project overhauled by Eric Sunshine (@email{sunshine@@sunshineco.com}). @*
-Back seam fix and skin resizing by Seth Galbraith
-(@email{sgalbrai@@linknet.kitsap.lib.wa.us}).
+@file{mdl2spr} is a model converter for Quake1 @sc{mdl} and Quake2 @sc{md2}
+files.  It converts these files into Crystal Space's sprite format.  If the
+Quake1 @sc{mdl} contains skins, they are extracted and saved as @sc{png} image
+files.  If skin height or width is not a power of two, it will be resized.
 
-@table @emph
-@item what it does
+@subheading Usage
 
-Converts Quake1 MDL and Quake2 MD2 models to CrystalSpace sprite format. If
-the Quake1 MDL contains skins, they are extracted and saved in PNG format
-image files. If skin height or width is not a power of two, it will be
-resized.
+@file{mdl2spr} is invoked from the command line, and is given the name of an
+input @file{.mdl} or @file{.md2} model file, as well as the name of the
+desired output sprite file.
 
-@item how it works
+@example
+mdl2spr [@var{options}] @var{model-file} @var{output-sprite-name}
+@end example
 
-Usage: @code{mdl2spr [options] <model-file> <output-sprite-name>}
+Both @samp{@var{model-file}} and @samp{@var{output-sprite-name}} are required.
+@samp{@var{model-file}} is the filename of the input @file{.mdl} or
+@file{.md2} model file, and @samp{@var{output-sprite-name}} is the name of the
+output sprite without the trailing @file{.spr} extension (which will be
+appended automatically by @file{mdl2spr}).
 
-Options:
-@itemize @bullet
-@item
--h : help (this page)
+If a skin is extracted from a @sc{mdl} file, then it will be written to a file
+named @file{@var{output-srite-name}.png}.  If more than one skin exists within
+the model, then each skin will be placed in its own @sc{png} file and a number
+(and possibly letter) will be appended to the sprite name before the
+@file{.png} extension.
 
-@item
--s <float> : global scale of model (default 0.025)
+Here is a summary of the options understood by @file{mdl2spr}:
 
-@item
--d <int> : frame delay for frame which don't have delay (default 100)
+@table @code
+@item -h
+Display usage and option summary.
 
-@item
--n : disable auto naming of action frameset (enabled by default)
+@item -s <@var{float}>
+Set the global scale of model based upon the floating point number
+@samp{@var{float}}.  Default is 0.025.
 
-@item
--x <float> : sprite moving on X axis (default 0)
+@item -d <@var{int}>
+Specify the frame delay in Quake ticks from @samp{@var{int}} for frames which
+don't otherwise have a built-in delay.  Default is 100.
 
-@item
--y <float> : sprite moving on Y axis (default 0)
+@item -n
+Disable automatic naming of action frame sets.  Enabled by default.
 
-@item
--z <float> : sprite moving on Z axis (default 0)
+@item -x <@var{float}>
+Set center of sprite on X axis from @samp{@var{float}}.  Default is 0.0.
 
-@item
--r : disable automatic power-of-2 skin resizing (enabled by default).
-Only applies to MDL files (not MD2).
-@end itemize
+@item -y <@var{float}>
+Set center of sprite on Y axis from @samp{@var{float}}.  Default is 0.0.
 
-@item to do
-@itemize @bullet
-@item
-Add option to specify location of alternate palette.lmp file on command line.
-@end itemize
+@item -z <@var{float}>
+Set center of sprite on Z axis from @samp{@var{float}}.  Default is 0.0.
+
+@item -r
+Disable automatic power-of-2 skin resizing.  Enabled by default.  This option
+only applies to Quake1 @sc{mdl} files (not Quake2 @sc{md2} files).
 @end table
 
+@subheading Future Plans
+
+This is a list of planned future enhancements to @file{mdl2spr}.
+
+@itemize @bullet
+@item
+Add a command-line option so user can manually specify a replacement
+@file{palette.lmp} file rather than using the built-in one.
+@end itemize
