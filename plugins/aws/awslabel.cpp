@@ -13,7 +13,11 @@ SCF_IMPLEMENT_IBASE_END
 
 const int awsLabel::signalClicked=0x1;
 
-awsLabel::awsLabel():is_down(false), mouse_is_over(false), 
+const int awsLabel::alignLeft=0x0;
+const int awsLabel::alignRight=0x1;
+const int awsLabel::alignCenter=0x2;
+
+awsLabel::awsLabel():is_down(false), mouse_is_over(false), alignment(0), 
                      caption(NULL)
 { }
 
@@ -32,6 +36,7 @@ awsLabel::Setup(iAws *_wmgr, awsComponentNode *settings)
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
 
  pm->GetString(settings, "Caption", caption);
+ pm->GetInt(settings, "Align", alignment);
 
  return true;
 }
@@ -87,14 +92,35 @@ awsLabel::OnDraw(csRect clip)
    // Draw the caption, if there is one 
    if (caption)
     {     
-      int tw, th, tx, ty;
+      int tw, th, tx, ty, mcc;
       
+      mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(caption->GetData(), Frame().Width());
+
+      scfString tmp(caption->GetData());
+      tmp.Truncate(mcc);
+
       // Get the size of the text
-      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
+      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
 
       // Calculate the center
-      tx = (Frame().Width()>>1) -  (tw>>1);
       ty = (Frame().Height()>>1) - (th>>1);
+
+      switch(alignment)
+      {
+      case alignRight:
+        tx = Frame().Width()-tw;
+        break;
+
+      case alignCenter:
+        tx = (Frame().Width()>>1) -  (tw>>1);
+        break;
+
+      default:
+        tx = 0;
+        break;
+      }
+
+
 
       // Draw the text
       g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
@@ -102,7 +128,7 @@ awsLabel::OnDraw(csRect clip)
                  Frame().ymin+ty+is_down,
                  WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                  -1,
-                 caption->GetData());
+                 tmp.GetData());
 
     }
 }
@@ -191,6 +217,10 @@ awsLabelFactory::awsLabelFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
   Register("Label");
   RegisterConstant("signalLabelClicked",  awsLabel::signalClicked);
+
+  RegisterConstant("lblAlignLeft",  awsLabel::alignLeft);
+  RegisterConstant("lblAlignRight",  awsLabel::alignRight);
+  RegisterConstant("lblAlignCenter",  awsLabel::alignCenter);
 }
 
 awsLabelFactory::~awsLabelFactory()
