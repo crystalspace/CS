@@ -632,10 +632,13 @@ int main (int argc, char* argv[])
     world->Prepare (Gfx3D);
 
     //Create a 2D sprite for the Logo
-    int w, h;
-    ITextureHandle* phTex = texh->GetTextureHandle();
-    phTex->GetBitmapDimensions(w,h);
-    Sys->cslogo = new csSprite2D (texh, 0, 0, w, h);
+    if (texh)
+    {
+      int w, h;
+      ITextureHandle* phTex = texh->GetTextureHandle();
+      phTex->GetBitmapDimensions(w,h);
+      Sys->cslogo = new csSprite2D (texh, 0, 0, w, h);
+    }
 
     // Look for the start sector in this world.
     char* strt = (char*)(world->start_sector ? world->start_sector : "room");
