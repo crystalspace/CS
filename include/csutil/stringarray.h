@@ -20,6 +20,7 @@
 #ifndef __CS_STRINGARRAY_H__
 #define __CS_STRINGARRAY_H__
 
+#include <stdarg.h>
 #include "csutil/util.h"
 
 typedef int csStringArrayCompareFunction (char const* item1, char const* item2);

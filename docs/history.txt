@@ -6,6 +6,7 @@ The history order is reversed so that new features are at the top.
 25-Jul-2003
     - Norman Kraemer fixed pythmod_setup.py for cases with no lib entries 
       between the enclosing '--'.
+    - acraig added in missing include for va_start in stringarray.h
       
 24-Jul-2003
     - Reed Hedges made some minor updates to the AWS "Quick Start" section and 
