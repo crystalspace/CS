@@ -43,7 +43,7 @@ static char* BuildMaterialKey (int i, CMapEntity* pEntity)
   sprintf(key,"MaterialName%d",i);
   printf(key);
   if(!pEntity->GetValueOfKey(key)) return NULL;
-  sprintf(returnvalue,"KEY(\"defmaterial\",\"%s\")\n",
+  sprintf(returnvalue,"<key name=\"defmaterial\" value=\"%s\" />\n",
 	      pEntity->GetValueOfKey(key));
   return returnvalue;
 }
@@ -128,32 +128,32 @@ bool CCSSector::Write(CIWorld* pIWorld)
   assert(fd);
 
   pWorld->WriteIndent();
-  fprintf(fd, "SECTOR '%s' (\n", GetName());
+  fprintf(fd, "<sector name=\"%s\">\n", GetName());
   pWorld->Indent();
 
   pWorld->WriteIndent();
-  fprintf(fd, "MESHOBJ 'static'(\n");
+  fprintf(fd, "<meshobj name=\"static\">\n");
   pWorld->Indent();
 
   pWorld->WriteIndent();
-  fprintf(fd, "PLUGIN('thing')\n");
+  fprintf(fd, "<plugin>thing</plugin>\n");
   pWorld->WriteIndent();
-  fprintf(fd, "ZFILL()\n");
+  fprintf(fd, "<zuse />\n");
   pWorld->WriteIndent();
-  fprintf(fd, "PRIORITY('wall')\n");
+  fprintf(fd, "<priority>wall</priority>\n");
 
   CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
   CCSWorld::WriteKeys(pWorld, pEntity);
 
   pWorld->WriteIndent();
-  fprintf(fd, "PARAMS(\n");
+  fprintf(fd, "<params>\n");
   pWorld->Indent();
 
-  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
-  {
-    pWorld->WriteIndent();
-    fprintf(fd, "VISTREE()\n");
-  }
+//  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
+//  {
+//    pWorld->WriteIndent();
+//    fprintf(fd, "VISTREE()\n");
+//  }
 
   if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
@@ -173,7 +173,7 @@ bool CCSSector::Write(CIWorld* pIWorld)
         m_Portals.Length() > 0)
     {
       pWorld->WriteIndent();
-      fprintf(fd, "PART 'p1' (\n");
+      fprintf(fd, "<part name=\"p1\">\n");
       pWorld->Indent();
 
       int i, j, l;
@@ -207,25 +207,30 @@ bool CCSSector::Write(CIWorld* pIWorld)
           //vertices in reverse order, so they will have proper orientation for
           //backface culling in the engine.
           pWorld->WriteIndent();
-          fprintf(fd, "POLYGON '' ( VERTICES (");
+          fprintf(fd, "<p>\n");
+	  pWorld->Indent();
           for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
           {
-              fprintf(fd, "%d%s", Vb.GetIndex(pPolygon->GetVertex(l)),
-                                  ((l==0) ? "" : ","));
+	      pWorld->WriteIndent();
+              fprintf(fd, "<v>%d</v>\n", Vb.GetIndex(pPolygon->GetVertex(l)));
           }
-          fprintf(fd, ") "); //End of Vertices
 
           //print textureinfo
-          fprintf(fd, "MATERIAL('%s') ", pTexture->GetTexturename());
-          fprintf(fd, "TEXTURE(PLANE ('%s')) ", pPolygon->GetBaseplane()->GetName());
-          fprintf(fd, "PORTAL ('%s') ", pPortal->GetTargetSector()->GetName());
-          fprintf(fd, ")\n"); //End of Polygon
+          pWorld->WriteIndent();
+          fprintf(fd, "<material>%s</material>\n", pTexture->GetTexturename());
+          pWorld->WriteIndent();
+          fprintf(fd, "<texmap><plane>%s</plane></texmap>\n", pPolygon->GetBaseplane()->GetName());
+          pWorld->WriteIndent();
+          fprintf(fd, "<portal>%s</portal>\n", pPortal->GetTargetSector()->GetName());
+	  pWorld->Unindent();
+          pWorld->WriteIndent();
+          fprintf(fd, "</p>\n"); //End of Polygon
         }
       }
 
       pWorld->Unindent();
       pWorld->WriteIndent();
-      fprintf(fd, ")\n"); //PART
+      fprintf(fd, "</part>\n"); //PART
     } //if contains any polygons
   }
 
@@ -233,11 +238,11 @@ bool CCSSector::Write(CIWorld* pIWorld)
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n"); //End of PARAMS
+  fprintf(fd, "</params>\n"); //End of PARAMS
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n"); //End of MESHOBJ
+  fprintf(fd, "</meshobj>\n"); //End of MESHOBJ
 
   WriteFog(pWorld);
   WriteLights(pWorld);
@@ -247,15 +252,15 @@ bool CCSSector::Write(CIWorld* pIWorld)
   WriteSprites2D(pWorld);
   WriteNodes (pWorld);
 
-  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
-  {
-    pWorld->WriteIndent();
-    fprintf(fd, "CULLER('static')\n");
-  }
+//  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
+//  {
+//    pWorld->WriteIndent();
+//    fprintf(fd, "CULLER('static')\n");
+//  }
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n\n"); //End of SECTOR(
+  fprintf(fd, "</sector>\n\n"); //End of SECTOR(
   return true;
 }
 
@@ -388,26 +393,26 @@ bool CCSSector::WriteLights(CIWorld* pWorld)
           //configurable in the future)
           pWorld->WriteIndent();
 
-          fprintf(fd, "LIGHT  (");
-          fprintf(fd, "CENTER (%g,%g,%g) ",
+          fprintf(fd, "<light>");
+          fprintf(fd, "<center x=\"%g\" y=\"%g\" z=\"%g\" />",
                   origin.x*ScaleFactor,
                   origin.z*ScaleFactor,
                   origin.y*ScaleFactor);
-          fprintf(fd, "RADIUS (%g) ",radius*ScaleFactor*lightscale);
-          fprintf(fd, "COLOR  (%g,%g,%g) ",
+          fprintf(fd, "<radius>%g</radius>",radius*ScaleFactor*lightscale);
+          fprintf(fd, "<color red=\"%g\" green=\"%g\" blue=\"%g\" />",
                   (r/255) * (radius/128),
                   (g/255) * (radius/128),
                   (b/255) * (radius/128));
           if (dynamic)
           {
-            fprintf(fd, "DYNAMIC () ");
+            fprintf(fd, "<dynamic />");
           }
-          fprintf(fd, "HALO    (%g,%g,%g) ",
-                  (halo),
+          fprintf(fd, "<halo><type>cross</type><intensity>%g</intensity><cross>%g</cross></halo>",
+                  //(halo),
                   (halointen),
                   (halocross));
-          fprintf(fd, "ATTENUATION (%s) ",attenuation);
-          fprintf(fd, ")\n\n");
+          fprintf(fd, "<attenuation>%s</attenuation>",attenuation);
+          fprintf(fd, "</light>\n\n");
         } //if (light is inside this sector)
       } // if (entity had origin)
     } //if (classname == "light")
@@ -434,17 +439,17 @@ bool CCSSector::WriteNodes(CIWorld* pWorld)
     pEntity->GetOrigin(Origin);
     if (strcmp(pEntity->GetValueOfKey("classname"),"cs_model")){
     pWorld->WriteIndent();
-    fprintf(fd, "NODE '%s' (\n", pEntity->GetName());
+    fprintf(fd, "<node name=\"%s\">\n", pEntity->GetName());
     pWorld->Indent();
     CCSWorld::WriteKeys(pWorld, pEntity);
     pWorld->WriteIndent();
-    fprintf(fd, "POSITION(%g,%g,%g)\n",
+    fprintf(fd, "<position x=\"%g\" y=\"%g\" z=\"%g\" />\n",
                 Origin.x*ScaleFactor,
                 Origin.z*ScaleFactor,
                 Origin.y*ScaleFactor);
     pWorld->Unindent();
     pWorld->WriteIndent();
-    fprintf(fd, ")\n");
+    fprintf(fd, "</node>\n");
 	}
   }
 
@@ -475,35 +480,35 @@ bool CCSSector::WriteCurves(CIWorld* pWorld)
         if (pTexture->IsVisible())
         {
           pWorld->WriteIndent();
-          fprintf(fd, "MESHOBJ '%s_e%d_c%d'(\n",pEntity->GetName(), i, curve);
+          fprintf(fd, "<meshobj name=\"%s_e%d_c%d\">\n",pEntity->GetName(), i, curve);
           pWorld->Indent();
 
           pWorld->WriteIndent();
-          fprintf(fd, "PLUGIN('thing')\n");
+          fprintf(fd, "<plugin>thing</plugin>\n");
           pWorld->WriteIndent();
-          fprintf(fd, "ZUSE()\n");
+          fprintf(fd, "<zuse />\n");
           pWorld->WriteIndent();
-	  fprintf(fd, "PRIORITY('%s')\n", pEntity->GetValueOfKey("priority", "object"));
+	  fprintf(fd, "<priority>%s</priority>\n", pEntity->GetValueOfKey("priority", "object"));
 
           CCSWorld::WriteKeys(pWorld, pEntity);
 
           pWorld->WriteIndent();
-          fprintf(fd, "PARAMS(\n");
+          fprintf(fd, "<params>\n");
           pWorld->Indent();
 
           pWorld->WriteIndent();
-          fprintf(fd, "FACTORY ('curve_%s') \n", pCurve->GetName());
+          fprintf(fd, "<factory>curve_%s</factory>\n", pCurve->GetName());
 
           pWorld->Unindent();
           pWorld->WriteIndent();
-          fprintf(fd, ")\n"); //PARAMS
+          fprintf(fd, "</params>\n"); //PARAMS
 
           pWorld->WriteIndent();
-          fprintf(fd, "MOVE (V (0,0,0))\n");
+          fprintf(fd, "<move><v x=\"0\" y=\"0\" z=\"0\" /></move>\n");
 
           pWorld->Unindent();
           pWorld->WriteIndent();
-          fprintf(fd, ")\n\n"); //MESHOBJ
+          fprintf(fd, "</meshobj>\n\n"); //MESHOBJ
         }
       }
     }
@@ -579,13 +584,13 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
         if (sscanf(csnamevalue, "%s%c",mdlname, &dummy) == 1)
         {
           pWorld->WriteIndent();
-          fprintf(fd,"NODE 'SEED_MESH_OBJ' (\n");
+          fprintf(fd,"<node name=\"SEED_MESH_OBJ\">\n");
           // Key/Value pairs writting
           pWorld->Indent();
           pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"classname\",\"SEED_MESH_OBJ\")\n");
+          fprintf(fd,"<key name=\"classname\" value=\"SEED_MESH_OBJ\" />\n");
           pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"cs_name\",\"%s\")\n",csnamevalue);
+          fprintf(fd,"<key name=\"cs_name\" value=\"%s\" />\n",csnamevalue);
 
           /*Lets build all material definition
            *keys KEY("defmaterial","materialname, texturefile")
@@ -600,11 +605,11 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
 	  }
 
           pWorld->WriteIndent();
-	  fprintf(fd,"KEY(\"spritematerial\",\"%s\")\n",csspritematerial);
+	  fprintf(fd,"<key name=\"spritematerial\" value=\"%s\" />\n",csspritematerial);
           pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"factory\",\"%s\")\n",csfactname);
+          fprintf(fd,"<key name=\"factory\" value=\"%s\" />\n",csfactname);
           pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"factorymaterial\",\"%s\")\n",csfactmaterial);
+          fprintf(fd,"<key name=\"factorymaterial\" value=\"%s\" />\n",csfactmaterial);
           pWorld->WriteIndent();
 
           /*
@@ -614,7 +619,7 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
 	   * (factory without material error)
            */
 
-          fprintf(fd,"KEY(\"factoryfile\",\"%s\")\n",csmodelfile);
+          fprintf(fd,"<key name=\"factoryfile\" value=\"%s\" />\n",csmodelfile);
 
           /*
 	   * MDL files have actions defined so if model file is an mdl we
@@ -623,17 +628,17 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
            */
           pWorld->WriteIndent();
           if(!isMdlFile(csmodelfile))
-            fprintf(fd,"KEY(\"actionsfile\",\"%s\")\n",csactionsfile);
-          else fprintf(fd,"KEY(\"actionfile\",\"NONE\"\n");
+            fprintf(fd,"<key name=\"actionsfile\" value=\"%s\" />\n",csactionsfile);
+          else fprintf(fd,"<key name=\"actionfile\" value=\"NONE\" />\n");
 
 	  pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"scalefactor\",\"%s\")\n",csscalefactor);
+          fprintf(fd,"<key name=\"scalefactor\" value=\"%s\" />\n",csscalefactor);
 
           pWorld->WriteIndent();
-          fprintf(fd,"KEY(\"staticflag\",\"%s\")\n",csstaticmodel);
+          fprintf(fd,"<key name=\"staticflag\" value=\"%s\" />\n",csstaticmodel);
 
           pWorld->WriteIndent();
-          fprintf(fd, "POSITION( %g, %g, %g)\n",Origin.x*ScaleFactor,
+          fprintf(fd, "<position x=\"%g\" y=\"%g\" z=\"%g\" />\n",Origin.x*ScaleFactor,
                   Origin.z*ScaleFactor, Origin.y*ScaleFactor);
 
 
@@ -739,7 +744,7 @@ bool CCSSector::WriteSprites2D(CIWorld* pWorld)
   int i;
 
   //iterate all entities, brushes, polygons and vertices:
-  for (i=0; i<pMap->GetNumEntities(); i++)
+/*  for (i=0; i<pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = pMap->GetEntity(i);
     assert(pEntity);
@@ -835,13 +840,13 @@ bool CCSSector::WriteSprites2D(CIWorld* pWorld)
         }
       }
     }
-  }
+  }*/
   return true;
 }
 
 bool CCSSector::WriteFog(CIWorld* pWorld)
 {
-  assert(pWorld);
+/*  assert(pWorld);
 
   CMapFile* pMap        = pWorld->GetMap();
   FILE*     fd          = pWorld->GetFile();
@@ -877,6 +882,6 @@ bool CCSSector::WriteFog(CIWorld* pWorld)
         fprintf(fd, "FOG(%g,%g,%g,%g)\n", r/255.0, g/255.0, b/255.0, fogdensity);
       }
     }
-  }
+  }*/
   return true;
 }

@@ -322,7 +322,7 @@ bool CIWorld::WriteIndent()
   int i;
   for (i=0; i<m_Indent; i++)
   {
-    fprintf(m_fd, "\t");
+    fprintf(m_fd, "    ");
   }
   return true;
 }

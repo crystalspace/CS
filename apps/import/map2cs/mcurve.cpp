@@ -132,7 +132,10 @@ bool CMapCurve::Write(CCSWorld* pWorld)
     {
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
-        fprintf(fd, "    ADDON (PLUGIN ('bezier') PARAMS (NAME ('bezier_%s_%d_%d') MATERIAL ('%s') ",
+        fprintf(fd, "    <addon><plugin>bezier</plugin>"
+	  "<params>"
+	  "<name>bezier_%s_%d_%d</name>"
+	  "<material>%s</material>",
                     (const char*) m_Name, y, x, pTexture->GetTexturename());
 
         int numcols = pCurve->GetNumCols();
@@ -143,14 +146,14 @@ bool CMapCurve::Write(CCSWorld* pWorld)
         int col2 = x*2+1;
         int col3 = x*2+2;
 
-        fprintf(fd, " VERTICES(%3d,%3d,%3d,  %3d,%3d,%3d,  %3d,%3d,%3d)))\n",
+        fprintf(fd, "<v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v></params></addon>\n",
                     col1 + row1*numcols, col2 + row1*numcols, col3 + row1*numcols,
                     col1 + row2*numcols, col2 + row2*numcols, col3 + row2*numcols,
                     col1 + row3*numcols, col2 + row3*numcols, col3 + row3*numcols);
       }
     }
 
-    fprintf(fd, "    MESHFACT 'curve_%s' (PLUGIN('thingFact') PARAMS(\n", (const char*) m_Name);
+    fprintf(fd, "    <meshfact name=\"curve_%s\"><plugin>thingFact</plugin><params>\n", (const char*) m_Name);
     int row, col;
     CdVector3 Center(0,0,0);
     double    NumVect = 0.0;
@@ -160,7 +163,7 @@ bool CMapCurve::Write(CCSWorld* pWorld)
       for (col=0; col<pCurve->GetNumCols(); col++)
       {
         CMapCurvePoint* pPoint = pCurve->GetPoint(row, col);
-        fprintf(fd, "      CURVECONTROL (%g,%g,%g:%g,%g)\n",
+        fprintf(fd, "      <curvecontrol x=\"%g\" y=\"%g\" z=\"%g\" u=\"%g\" v=\"%g\" />\n",
                     pPoint->m_Pos.x*pWorld->GetScalefactor(),
                     pPoint->m_Pos.z*pWorld->GetScalefactor(),
                     pPoint->m_Pos.y*pWorld->GetScalefactor(),
@@ -176,22 +179,22 @@ bool CMapCurve::Write(CCSWorld* pWorld)
       Center *= 1.0/NumVect;
     }
 
-    fprintf(fd, "      CURVECENTER(%g,%g,%g)\n",
+    fprintf(fd, "      <curvecenter x=\"%g\" y=\"%g\" z=\"%g\" />\n",
                 Center.x*pWorld->GetScalefactor(),
                 Center.z*pWorld->GetScalefactor(),
                 Center.y*pWorld->GetScalefactor());
-    fprintf(fd, "      CURVESCALE (80)\n");
+    fprintf(fd, "      <curvescale>80</curvescale>\n");
 
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
     {
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
-        fprintf(fd, "      CURVE 'bez_%s_%d_%d' ('bezier_%s_%d_%d')\n",
+        fprintf(fd, "      <curve name=\"bez_%s_%d_%d\">bezier_%s_%d_%d</curve>\n",
                     (const char*) m_Name, y, x, (const char*) m_Name, y, x);
       }
     }
 
-    fprintf(fd, "    ))\n");
+    fprintf(fd, "    </params></addon>\n");
   }
 
   return true;

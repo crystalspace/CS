@@ -75,9 +75,6 @@ CTextureFile::~CTextureFile()
 
 void CTextureFile::SetOriginalData(char* Data, int Size)
 {
-  // create the image loader. @@@ This is a quick hack that only works
-  // because the image loader doesn't ever use the system driver!
-  // If this changes then map2cs needs a system driver too!
   static bool IL_Loaded = false;
   static iImageIO* ImageLoader = 0;
   if (!IL_Loaded)

@@ -54,21 +54,21 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   assert(fd);
 
   pWorld->WriteIndent();
-  fprintf(fd, "MESHOBJ '%s'(\n", GetName());
+  fprintf(fd, "<meshobj name=\"%s\">\n", GetName());
   pWorld->Indent();
 
   pWorld->WriteIndent();
-  fprintf(fd, "PLUGIN('thing')\n");
+  fprintf(fd, "<plugin>thing</plugin>\n");
   pWorld->WriteIndent();
-  fprintf(fd, "ZUSE()\n");
+  fprintf(fd, "<zuse />\n");
   pWorld->WriteIndent();
   if (IsSky())
-    fprintf(fd, "PRIORITY('sky')\n");
+    fprintf(fd, "<priority>sky</priority>\n");
   else
-    fprintf(fd, "PRIORITY('%s')\n", m_pOriginalEntity->GetValueOfKey("priority", "object"));
+    fprintf(fd, "<priority>%s</priority>\n", m_pOriginalEntity->GetValueOfKey("priority", "object"));
 
   //Activate a script
-  char scriptname[99] = "none";
+/*  char scriptname[99] = "none";
   const char* activateval = m_pOriginalEntity->GetValueOfKey("activate");
   if (activateval)
   {
@@ -78,9 +78,9 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
       pWorld->WriteIndent();
       fprintf(fd, "ACTIVATE ('%s')\n", scriptname);
     }
-  }
+  }*/
   //Trigger a script TRIGGER ('activate', 'scriptname')
-  const char* triggerval = m_pOriginalEntity->GetValueOfKey("trigger");
+/*  const char* triggerval = m_pOriginalEntity->GetValueOfKey("trigger");
   if (triggerval)
   {
     char dummy;
@@ -89,23 +89,23 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
       pWorld->WriteIndent();
       fprintf(fd, "TRIGGER ('activate', '%s')\n", scriptname);
     }
-  }
+  }*/
 
   CCSWorld::WriteKeys(pWorld, m_pOriginalEntity);
 
   pWorld->WriteIndent();
-  fprintf(fd, "PARAMS(\n");
+  fprintf(fd, "<params>\n");
   pWorld->Indent();
 
   WriteAsPart(pWorld, pSector);
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n"); //PARAMS
+  fprintf(fd, "</params>\n"); //PARAMS
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n\n"); //MESHOBJ
+  fprintf(fd, "</meshobj>\n\n"); //MESHOBJ
 
   return true;
 }
@@ -130,14 +130,14 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
   int i, j;
 
   //If things are moveable, they need special tagging. (needed for scripting)
-  if (IsMoveable())
-  {
-    pWorld->WriteIndent();
-    fprintf(fd, "MOVEABLE ()\n");
-  }
+  //if (IsMoveable())
+  //{
+  //  pWorld->WriteIndent();
+  //  fprintf(fd, "MOVEABLE ()\n");
+  //}
 
   pWorld->WriteIndent();
-  fprintf(fd, "PART 'part_%s' (\n", GetName());
+  fprintf(fd, "<part name=\"part_%s\">\n", GetName());
 
   CVertexBuffer Vb;
   Vb.AddVertices(&m_Polygon);
@@ -163,7 +163,7 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
 
   pWorld->Unindent();
   pWorld->WriteIndent();
-  fprintf(fd, ")\n");
+  fprintf(fd, "</part>\n");
 
   return true;
 }

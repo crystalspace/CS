@@ -25,10 +25,11 @@
 #include "mapstd.h"
 #include "map.h"
 #include "cworld.h"
-#include "xworld.h"
 #include "wad3file.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
+#include "cstool/initapp.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -46,9 +47,12 @@ void PrintSyntax()
 int main( int argc, char *argv[ ])
 {
   // this is required for the image loader
-  scfInitialize(new csConfigFile("scf.cfg"));
+  csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
 
-  printf("\nmap2cs version 0.82A, Copyright (C) 2000 by Thomas Hieber\n\n");
+  printf("\nmap2cs version 0.97, Copyright (C) 1999-2000 by Thomas Hieber\n");
+  printf("                     Copyright (C) 1999-2003 by Jorrit Tyberghein "
+    "and others\n\n");
   printf("map2cs comes with ABSOLUTELY NO WARRANTY; for details see the file 'COPYING'\n");
   printf("This is free software, and you are welcome to redistribute it under certain\n");
   printf("conditions; see `COPYING' for details.\n\n");
@@ -87,24 +91,12 @@ int main( int argc, char *argv[ ])
   Map.CreatePolygons();
   printf("Writing world '%s'\n", worldfile);
 
-  // if an output file spec begins with xml=something, then output is done via xml
-#ifndef NO_XML_SUPPORT
-  if (!strncmp(worldfile, "xml=", 4)) {
-    printf ("XML format wanted.\n");
-    CXmlWorld World;
-    World.Write(worldfile+4, &Map, mapfile);
-  }
-  else
-#endif
-  {
-    printf ("Standard CS world format wanted.\n");
-    CCSWorld World;
-    World.Write(worldfile, &Map, mapfile);
-  }
+  CCSWorld World;
+  World.Write(worldfile, &Map, mapfile);
 
   printf("done.");
 
-  iSCF::SCF->Finish();
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }
