@@ -115,7 +115,7 @@ void csIsoLight::CalcVis()
   //int size = (visw*vish+7)/8;
   //memset(vismap, 0, size*sizeof(uint8));
   int i = visw*vish-1;
-  while(i--) vismap[i] = 0.0;
+  while(i--) { CS_ASSERT (i >= 0 && i < visw*vish); vismap[i] = 0.0; }
   int mingridx, mingridy;
   grid->GetGridOffset(mingridx, mingridy);
   int multx = grid->GetGroundMultX();
@@ -176,6 +176,8 @@ void csIsoLight::SetVis(int x, int y, float val)
   //int pos = y*visw+x;
   //if(val) vismap[pos>>3] |= bitmasks[pos&0x7];
   //else vismap[pos>>3] &= ~bitmasks[pos&0x7];
+  CS_ASSERT (x >= 0 && x < visw);
+  CS_ASSERT (y >= 0 && y < vish);
   vismap[ y*visw+x ] = val;
 }
 

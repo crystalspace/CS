@@ -92,6 +92,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   // first we copy the first texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
   ALLOC_STACK_ARRAY (inpoly, G3DTexturedVertex, orig_num_vertices);
+
   int i;
   for (i = 0; i < orig_num_vertices; i++)
     inpoly[i] = g3dpoly->vertices[i];
@@ -106,6 +107,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
     {
       case CS_VERTEX_ORIGINAL:
         vt = clipped_vtstats[i].Vertex;
+	CS_ASSERT (vt >= 0 && vt < orig_num_vertices);
         g3dpoly->vertices [i].z = inpoly [vt].z;
         g3dpoly->vertices [i].u = inpoly [vt].u;
         g3dpoly->vertices [i].v = inpoly [vt].v;
@@ -118,6 +120,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
         break;
       case CS_VERTEX_ONEDGE:
         vt = clipped_vtstats[i].Vertex;
+	CS_ASSERT (vt >= 0 && vt < orig_num_vertices);
         vt2 = vt + 1; if (vt2 >= orig_num_vertices) vt2 = 0;
         t = clipped_vtstats [i].Pos;
         INTERPOLATE1 (z);
@@ -142,6 +145,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
           if ((y >= inpoly [j].sy && y <= inpoly [j1].sy) ||
               (y <= inpoly [j].sy && y >= inpoly [j1].sy))
           {
+	    CS_ASSERT (edge >= 0 && edge < 2);
             edge_from [edge] = j;
             edge_to [edge] = j1;
             edge++;
@@ -210,6 +214,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
     g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
   ALLOC_STACK_ARRAY (poly2d, csVector2, g3dpolyfx.num);
+
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
 

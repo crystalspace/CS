@@ -32,7 +32,7 @@ csIsoView::csIsoView (iBase *iParent, iIsoEngine *eng, iIsoWorld *world)
   CONSTRUCT_IBASE (iParent);
   engine = eng;
   csIsoView::world = world;
-  rect.Set(0,0,engine->GetG3D()->GetWidth(), engine->GetG3D()->GetHeight());
+  rect.Set(1,1,engine->GetG3D()->GetWidth()-1, engine->GetG3D()->GetHeight()-1);
   scroll.Set(0,0);
   // set directions
   // now assumes that screeny 0=bottom, max=top
@@ -91,6 +91,7 @@ void csIsoView::Draw()
   rview->SetG3D(engine->GetG3D());
   csBoxClipper* clipper = new csBoxClipper(rect.xmin, rect.ymin, 
     rect.xmax, rect.ymax);
+
   rview->SetClipper(clipper);
   if(rview->GetNumBuckets() < engine->GetNumMaterials())
     rview->CreateBuckets(engine->GetNumMaterials());

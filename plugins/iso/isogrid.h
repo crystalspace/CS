@@ -63,9 +63,19 @@ public:
   virtual ~csIsoGrid ();
 
   /// get a cell from the grid
-  iIsoCell *GetCell(int x, int y) const {return grid[y*width+x];}
+  iIsoCell *GetCell(int x, int y) const
+  {
+    CS_ASSERT (x >= 0 && x < width);
+    CS_ASSERT (y >= 0 && y < height);
+    return grid[y*width+x];
+  }
   /// set a cell in the grid
-  void SetCell(int x, int y, iIsoCell *val) {grid[y*width+x] = val;}
+  void SetCell(int x, int y, iIsoCell *val)
+  {
+    CS_ASSERT (x >= 0 && x < width);
+    CS_ASSERT (y >= 0 && y < height);
+    grid[y*width+x] = val;
+  }
 
   /** 
    *  Get the Cell for a given position in world space
@@ -142,9 +152,19 @@ public:
   /// get mult y
   int GetMultY() const {return multy;}
   /// set a value
-  void SetGround(int x, int y, float val) {map[y*width+x]=val;}
+  void SetGround(int x, int y, float val)
+  {
+    CS_ASSERT (x >= 0 && x < width);
+    CS_ASSERT (y >= 0 && y < height);
+    map[y*width+x]=val;
+  }
   /// get a value
-  float GetGround(int x, int y) const {return map[y*width+x];}
+  float GetGround(int x, int y) const
+  {
+    CS_ASSERT (x >= 0 && x < width);
+    CS_ASSERT (y >= 0 && y < height);
+    return map[y*width+x];
+  }
   /// see if src can hit dest
   bool HitBeam(const csVector3& src, const csVector3& dest);
 

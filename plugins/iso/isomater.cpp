@@ -208,6 +208,7 @@ int csIsoMaterialList::GetNewIndex()
 
 void csIsoMaterialList::RemoveIndex(int i)
 {
+  CS_ASSERT (i >= 0);
   if(i>=Length()) return;
   if(i==Length()-1)
   {

@@ -71,7 +71,11 @@ public:
   virtual void Draw(iIsoRenderView *rview);
   virtual void SetGrid(iIsoGrid *grid);
   virtual void SetAllColors(const csColor& color);
-  virtual const csVector3& GetVertexPosition(int i) { return poly[i];}
+  virtual const csVector3& GetVertexPosition(int i)
+  {
+    CS_ASSERT (i >= 0 && i < poly.GetNumVertices ());
+    return poly[i];
+  }
   virtual void AddToVertexColor(int i, const csColor& color);
   virtual iIsoGrid *GetGrid() const {return grid;}
   virtual void SetGridChangeCallback(GridChangeCallbackType func, void *data)

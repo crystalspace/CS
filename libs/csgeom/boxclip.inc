@@ -64,6 +64,7 @@
   csVertexStatus *InS = (ClipCount & 1) ? TempStatus : OutStatus;
   csVertexStatus *OutS = (ClipCount & 1) ? OutStatus : TempStatus;
   // Fill the input vertex status array
+  CS_ASSERT (InCount <= MAX_OUTPUT_VERTICES);
   for (int vs = 0; vs < InCount; vs++)
   {
     InS [vs].Type = CS_VERTEX_ORIGINAL;

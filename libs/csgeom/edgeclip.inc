@@ -43,6 +43,7 @@
     // Second ("current") point x/y
     float cx, cy;
     realvert = LastVertex ? 0 : vert;
+    CS_ASSERT (realvert >= 0 && realvert < InV);
     cx = InP [realvert].x;
     cy = InP [realvert].y;
 
@@ -55,9 +56,11 @@
         || ABS (px - OutP [0].x) > EPSILON
         || ABS (py - OutP [0].y) > EPSILON))
     {
+      CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
       OutP [OutV].x = px;
       OutP [OutV].y = py;
 #ifdef OUTPUT_VERTEX_STATUS
+      CS_ASSERT ((vert-1) >= 0 && (vert-1) < InV);
       OutS [OutV] = InS [vert - 1];
 #endif
       if (++OutV >= MAX_OUTPUT_VERTICES)
@@ -87,6 +90,7 @@
         || ABS (tx - OutP [0].x) > EPSILON
         || ABS (ty - OutP [0].y) > EPSILON))
       {
+        CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
         OutP [OutV].x = tx;
         OutP [OutV].y = ty;
 #ifdef OUTPUT_VERTEX_STATUS
@@ -115,6 +119,7 @@
         if (InS [vert - 1].Type == CS_VERTEX_ORIGINAL)
           if (InS [realvert].Type == CS_VERTEX_ORIGINAL)
           {
+            CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
             OutS [OutV].Type = CS_VERTEX_ONEDGE;
             OutS [OutV].Vertex = InS [vert - 1].Vertex;
             OutS [OutV].Pos = t;
@@ -123,6 +128,7 @@
           {
             // Current vertex is on edge, it cannot be CS_VERTEX_INSIDE
             // because it is connected with at least one CS_VERTEX_ORIGINAL
+            CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
             OutS [OutV].Type = CS_VERTEX_ONEDGE;
             OutS [OutV].Vertex = InS [vert - 1].Vertex;
             OutS [OutV].Pos = t * InS [realvert].Pos;
@@ -130,14 +136,21 @@
         else if (InS [vert - 1].Type == CS_VERTEX_ONEDGE)
           if (InS [realvert].Type == CS_VERTEX_ORIGINAL)
           {
+            CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
             OutS [OutV].Type = CS_VERTEX_ONEDGE;
             OutS [OutV].Vertex = InS [vert - 1].Vertex;
             OutS [OutV].Pos = InS [vert - 1].Pos + t * (1 - InS [vert - 1].Pos);
           }
           else
+	  {
+            CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
             OutS [OutV].Type = CS_VERTEX_INSIDE;
+	  }
         else
+	{
+          CS_ASSERT (OutV >= 0 && OutV < MAX_OUTPUT_VERTICES);
           OutS [OutV].Type = CS_VERTEX_INSIDE;
+	}
 #endif
         if (++OutV >= MAX_OUTPUT_VERTICES)
           break;
@@ -157,7 +170,10 @@
           memcpy (&OutP [OutV], &InP [vert], count * sizeof (OutP [0]));
 #ifdef OUTPUT_VERTEX_STATUS
           for (int vs = 0; vs < count; vs++)
+	  {
+            CS_ASSERT ((vs+OutV) >= 0 && (vs+OutV) < MAX_OUTPUT_VERTICES);
             OutS [vs + OutV] = InS [vert + vs];
+	  }
 #endif
           OutV += count;
           if (OutV >= MAX_OUTPUT_VERTICES)

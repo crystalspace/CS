@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
 31-May-2001
+	- Wyatt Miler did a fix so MacOS/X builds again.
+	- In an effort to understand how the keyframer section in 3DS
+	  works I extended 3ds2lev verbose option to also list the contents
+	  of that section. Unfortunatelly I don't understand how I'm supposed
+	  to extract frame animation from that. Any help would be
+	  appreciated.
+	- Fixed a bug in iso engine. The clipper was one pixel too big.
+	- Added several CS_ASSERT's in another effort to nail the iso+OpenGL
+	  bug.
 	- Wyatt Miler fixed NeXTSystemDriver.cpp and NeXTDriver2D.cpp to
 	  reflect Phlip's rename of version.h to csversion.h
 	- Eric Sunshine renamed csversion.h to csver.h to conform to DOS 8.3

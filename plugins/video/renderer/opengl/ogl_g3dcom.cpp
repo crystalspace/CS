@@ -1403,6 +1403,7 @@ void csFogQueue::AddTriangle (int i1, int i2, int i3)
 
 int csPolyQueue::AddVertices (int num)
 {
+  CS_ASSERT (num_vertices >= 0 && num_vertices <= max_vertices);
   num_vertices += num;
   if (num_vertices > max_vertices)
   {
@@ -1431,6 +1432,7 @@ int csPolyQueue::AddVertices (int num)
 
 void csPolyQueue::AddTriangle (int i1, int i2, int i3)
 {
+  CS_ASSERT (num_triangles >= 0 && num_triangles <= max_triangles);
   int old_num = num_triangles;
   num_triangles++;
   if (num_triangles > max_triangles)
@@ -1438,7 +1440,11 @@ void csPolyQueue::AddTriangle (int i1, int i2, int i3)
     max_triangles += 20;
     int* new_ar;
     new_ar = new int [max_triangles*3];
-    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
+    if (tris)
+    {
+      CS_ASSERT (old_num > 0);
+      memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
+    }
     delete[] tris; tris = new_ar;
   }
   tris[old_num*3+0] = i1;
@@ -1835,7 +1841,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
       *glcol++ = alpha;
     }
     float sz = poly.vertices[i].z;
-    if (ABS (sz) < SMALL_EPSILON) sz = 1.0/ SMALL_EPSILON;
+    if (ABS (sz) < SMALL_EPSILON) sz = 1. / SMALL_EPSILON;
     else sz = 1./sz;
 
     *glverts++ = poly.vertices[i].sx * sz;
