@@ -6,9 +6,6 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-02-Jul-2004
-	- res fixed the corruption of the graphics on Win32 when Alt+Tabbing 
-	  out and back into a fullscreen app with GL canvas.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
@@ -18,6 +15,8 @@ chronological order.
 	  materials are being shared between regions. Warning! Having the
 	  meshes keep materials with a real reference will not avoid the
 	  material from being deleted from the engine lists.
+	- res fixed the corruption of the graphics on Win32 when Alt+Tabbing 
+	  out and back into a fullscreen app with GL canvas.
 30-Jun-2004
 	- Peter Amstutz added search support to the csvosa3dl plugin,
 	  so that VOS servers with search support can send the world
