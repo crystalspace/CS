@@ -117,6 +117,9 @@ Simple::~Simple ()
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
   if (vc) vc->DecRef ();
+  
+  delete ProcTexture;
+  
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -308,7 +311,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simplept",
   	"Created.");
 
   view = new csView (engine, g3d);
