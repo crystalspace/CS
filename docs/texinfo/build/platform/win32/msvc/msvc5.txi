@@ -152,7 +152,7 @@ following.
 //}
 //#endif
 
-@subsubheading BisonFlex
+@subsubheading BisonFlex - Required
 
 The Alternate Window System (AWS) plugin will build correctly under MSVC.
 However, if you wish to make modifications to it's structure and/or lexer, it will
