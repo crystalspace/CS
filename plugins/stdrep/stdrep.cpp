@@ -83,7 +83,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csString csReporterListener::DefaultDebugFilename()
 {
-  csString username = "Bäh"; //csGetUsername();
+  csString username = csGetUsername();
   username.Collapse();
   csString s = "/tmp/csdebug";
   if (!username.IsEmpty())
