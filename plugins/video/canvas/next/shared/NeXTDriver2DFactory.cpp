@@ -23,7 +23,7 @@
 #include "NeXTDriver2D.h"
 #include "cscom/com.h"
 
-#define DLL_NAME "libnext2d.dl"
+#define DLL_NAME "libnext2d.dylib"
 
 static unsigned int FACTORY_REF_COUNT = 0;
 
