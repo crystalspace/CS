@@ -21,11 +21,10 @@ The history order is reversed so that new features are at the top.
           (developers can raise locally). This eliminates alot of spurious
           warnings. Also enabled C++ exeception handling, which I thought
           was enabled, but whatever.
-	- Philip Wyett made the following changes:
-	    - Updated MSVC 6 project files.  Lowered warning level (developers
-	      can raise locally).  This eliminates alot of spurious warnings.
-	      Also enabled C++ exeception handling, which I thought was
-	      enabled, but whatever.
+	- Philip Wyett updated MSVC 6 project files.  Lowered warning
+          level (developers can raise locally).  This eliminates alot of
+          spurious warnings.  Also enabled C++ exeception handling, which
+          I thought was enabled, but whatever.
 	- Eric Sunshine made the following changes:
 	    - Added the new variable %name% to msvcgen.pl which can be
 	      interpolated into any template file.  The value of this variable
@@ -128,6 +127,11 @@ The history order is reversed so that new features are at the top.
 	      This is an important distinction because the presence of the Perl
 	      command alone does not necessarily imply the presence of a
 	      working SDK.
+	- Eric Sunshine removed the hack from cs.mak which was needed to clean
+	  up the generated files from csperl5.  The hack should no longer be
+	  needed since csperl5 now presumably cleans up after itself, and only
+	  creates its transient files if the module is actually enabled, rather
+	  than always.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.
