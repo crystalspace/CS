@@ -23,6 +23,9 @@
 #include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "apps/blocks/blocdefs.h"
+#include "apps/blocks/states.h"
+
 
 class csThingTemplate;
 class csTextureHandle;
@@ -81,57 +84,6 @@ enum BlShapeType
   SHAPE_DEMO_K,
   SHAPE_DEMO_S
 };
-
-#define NUM_EASY_SHAPE (SHAPE_T1+1)
-#define NUM_MEDIUM_SHAPE (SHAPE_U+1)
-#define NUM_HARD_SHAPE (SHAPE_FLATXX+1)
-
-#define CUBE_DIM .4
-#define RAST_DIM .02
-
-// By zone we mean the space where the shapes move/fall.
-#define ZONE_DIM 6
-#define ZONE_HEIGHT 15
-
-// When blocks freeze at this height the game is over.
-#define GAMEOVER_HEIGHT ZONE_HEIGHT-3
-
-// This is a kind of padding around the world(zone).
-#define ZONE_SAFETY 2
-
-// Max cubes in a shape.
-#define MAX_CUBES 30
-
-// Maximum speed (fall down speed).
-#define MAX_FALL_SPEED 16.
-// Maximum speed in game.
-#define MAX_SPEED 8.
-// Slowest speed.
-#define MIN_SPEED .2
-
-// Menus.
-#define MENU_NOVICE 0
-#define MENU_AVERAGE 1
-#define MENU_EXPERT 2
-#define MENU_HIGHSCORES 3
-#define MENU_SETUP 4
-#define MENU_QUIT 5
-#define MENU_3X3 6
-#define MENU_4X4 7
-#define MENU_5X5 8
-#define MENU_6X6 9
-#define MENU_KEYCONFIG 10
-#define MENU_STARTGAME 11
-#define MENU_TOTAL 12	// Total number of menu entries in system.
-
-#define MAX_MENUS 20	// Maximum number of menus visible at same time.
-
-// Screens.
-#define SCREEN_STARTUP 1
-#define SCREEN_GAME 2
-#define SCREEN_KEYCONFIG 3
-#define SCREEN_GAMEOVER 4
-#define SCREEN_HIGHSCORES 5
 
 struct CubeInfo
 {
@@ -225,14 +177,13 @@ private:
   csMatrix3 full_rotate_x;
   csMatrix3 full_rotate_x_reverse;
   csMatrix3 full_rotate_y;
-  csMatrix3 full_rotate_y_reverse;  
+  csMatrix3 full_rotate_y_reverse;
   csMatrix3 full_rotate_z;
   csMatrix3 full_rotate_z_reverse;
 
   // First dimension is level (0=novice, 1=average, 2=expert).
   // Second dimension is play size (0=3x3, 1=4x4, 2=5x5, 3=6x6).
   HighScore highscores[3][4];
-  int score;
   // If true then we want the player to enter his name for the highscores.
   bool enter_highscore;
   char hs_name[20];
@@ -294,12 +245,6 @@ private:
   BlRotType queue_rot_todo;
 
   /*
-   * How much do we have to move down before we reach another
-   * cube-level?
-   */
-  float move_down_todo;
-
-  /*
    * How much distance do we have to move horizontally and in
    * what direction?
    */
@@ -319,27 +264,8 @@ private:
   int move_down_dx;
   int move_down_dy;
 
-  // Current dimensions of game area.
-  int zone_dim;
-  // New dimensions of game area (set with menu).
-  int new_zone_dim;
-
-  // Tells us wheather a cell is occupied. It's padded at both ends along
-  // each axis. It is not recomended to access it directly (eg I forgot
-  // abotut ZONE_SAFETY, and ka-booom).
-  bool game_cube[ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY]
-  	[ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY]
-	[ZONE_SAFETY+ZONE_HEIGHT+ZONE_SAFETY];
-
   int num_cubes;
   CubeInfo cube_info[MAX_CUBES];
-
-  int cube_x, cube_y, cube_z;
-
-  // Current speed.
-  float speed;
-  // Current speed depending on level.
-  float cur_speed;
 
   /// If true we are paused.
   bool pause;
@@ -353,22 +279,6 @@ private:
 
   // Difficulty setting.
   int diff_level;
-
-  /* NOTE: by a plane we mean if a certain height level is full of cubes.
-     It's the analogue of a line in tetris games (2d) */
-
-  // If true we are in the process moving cubes/things lower because
-  // at least one plane was made.
-  bool transition;
-
-  // Shows if we have a plane at a certain height.
-  bool filled_planes[ZONE_HEIGHT];
-
-  // Fog density.
-  float fog_density;
-
-  // This is the z of the plane which's dissapearance is handled right now.
-  int gone_z;
 
   // Keys...
   KeyMapping key_up;
@@ -479,11 +389,6 @@ public:
   // Handle lowering of planes.
   void HandleLoweringPlanes (time_t elapsed_time);
 
-
-  // Update the score.
-  void UpdateScore ();
-  void AddScore (int dscore);
-
   // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);
   csMatrix3 create_rotate_y (float angle);
@@ -512,20 +417,26 @@ public:
   // Debugging.
   void dump_shape ();
 
-  // Access the cubes in the playing field.
-  bool get_cube (int x, int y, int z)
-  { return game_cube[x+ZONE_SAFETY][y+ZONE_SAFETY][z+ZONE_SAFETY]; }
-  void set_cube (int x, int y, int z, bool v)
-  { game_cube[x+ZONE_SAFETY][y+ZONE_SAFETY][z+ZONE_SAFETY] = v; }
+  // removesPlanesVisual(player1) will remove all of the planes in
+  //   player1->filled_planes.
+  // So use player1->checkForPlanes first.
+  void removePlanesVisual (States* player);
 
-  // Checks to see if a plane was formed.
-  void checkForPlane ();
+  //------------- Networking stuff.
 
-  // Check if the play area is empty.
-  bool CheckEmptyPlayArea ();
+  void CheckConnection();
+  bool InitNet();
+  void Connect ();
 
-  // Remove some plane.
-  void removePlane (int z);
+  void TerminateConnection();
+  
+  int since_last_check;
+  
+  //----------------
+  // State Changes.
+  
+  States* player1;
+  
 };
 
 #endif // BLOCKS_H

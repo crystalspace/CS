@@ -51,6 +51,25 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 
+// ----------------------------------------------------
+// Start networking stuff.
+
+#include "inetdrv.h"
+
+
+#define BLOCKS_SERVER 1
+
+bool do_network = false;
+// Maybe move these into Blocks class.
+static iNetworkListener* Listener = NULL;
+static iNetworkConnection* Connection = NULL;
+// static long LastAcceptTime = 0;
+static long LastConnectTime = 0;
+
+// End networking stuff.
+// ------------------------------------------------------
+
+
 Blocks* Sys = NULL;
 csView* view = NULL;
 
@@ -229,6 +248,7 @@ void TextEntryMenu::Draw (time_t elapsed_time)
   }
 }
 
+
 TextEntryMenu::TextEntry* TextEntryMenu::GetEntry (int num)
 {
   int i;
@@ -300,9 +320,14 @@ Blocks::Blocks ()
   screen = SCREEN_STARTUP;
   dynlight = NULL;
 
-  zone_dim = ZONE_DIM;
-  new_zone_dim = ZONE_DIM;
+  // Network stuff.
+  since_last_check = 0;
+
   keyconf_menu = NULL;
+
+  // State changes.
+  player1 = new States();
+  
 }
 
 Blocks::~Blocks ()
@@ -310,21 +335,15 @@ Blocks::~Blocks ()
   delete dynlight;
   if (world) world->Clear ();
   delete keyconf_menu;
+  TerminateConnection();
 }
 
 void Blocks::InitGame ()
 {
-  int i, j, k;
-  for (k = 0 ; k < ZONE_SAFETY+ZONE_HEIGHT+ZONE_SAFETY ; k++)
-    for (j = 0 ; j < ZONE_SAFETY+zone_dim+ZONE_SAFETY ; j++)
-      for (i = 0 ; i < ZONE_SAFETY+zone_dim+ZONE_SAFETY ; i++)
-        game_cube[i][j][k] =
-	  i < ZONE_SAFETY || j < ZONE_SAFETY || k < ZONE_SAFETY ||
-	  i >= ZONE_SAFETY+zone_dim || j >= ZONE_SAFETY+zone_dim ||
-	  k >= ZONE_SAFETY+ZONE_HEIGHT;
-  transition = false;
+  player1->InitStates();
+
   initscreen = false;
-  score = 0;
+
   rot_px_todo = 0;
   rot_py_todo = 0;
   rot_pz_todo = 0;
@@ -346,7 +365,6 @@ void Blocks::InitGame ()
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
 
   pause = false;
-  cur_speed = MIN_SPEED;
 }
 
 void reset_vertex_colors (csThing* th)
@@ -497,11 +515,19 @@ void Blocks::add_hrast_template ()
   float dim = RAST_DIM;
   hrast_tmpl = new csThingTemplate ();
   hrast_tmpl->SetName ("hrast");
+
+  // zone_dim s were BIG here changed.
+
+  //hrast_tmpl->AddVertex ((-(float)(player1->zone_dim)/2.)*CUBE_DIM, .02, -dim);
+  //hrast_tmpl->AddVertex ((-(float)(player1->zone_dim)/2.)*CUBE_DIM, .02, dim);
+  //hrast_tmpl->AddVertex (((float)(player1->zone_dim)/2.)*CUBE_DIM, .02, -dim);
+  //hrast_tmpl->AddVertex (((float)(player1->zone_dim)/2.)*CUBE_DIM, .02, dim);
+
   hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
   hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
   hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
   hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
-
+  
   csPolygonTemplate* p;
   float A, B, C;
   csMatrix3 tx_matrix;
@@ -534,7 +560,8 @@ void Blocks::add_pillar (int x, int y)
   pillar->SetFlags (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, pillar_txt, 1);
   room->AddThing (pillar);
-  csVector3 v ((x-zone_dim/2)*CUBE_DIM, 0, (y-zone_dim/2)*CUBE_DIM);
+  csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0, 
+	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->SetMove (room, v);
   pillar->Transform ();
 }
@@ -548,7 +575,8 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, raster_txt, 1);
   room->AddThing (vrast);
-  csVector3 v ((x-zone_dim/2)*CUBE_DIM+dx, 0, (y-zone_dim/2)*CUBE_DIM+dy);
+  csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0, 
+	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->Transform (rot);
   vrast->SetMove (room, v);
@@ -564,7 +592,8 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, raster_txt, 1);
   room->AddThing (hrast);
-  csVector3 v ((x-zone_dim/2)*CUBE_DIM+dx, 0, (y-zone_dim/2)*CUBE_DIM+dy);
+  csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0, 
+	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->Transform (rot);
   hrast->SetMove (room, v);
@@ -681,9 +710,9 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
 	csThingTemplate* tmpl)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
-  	(x-zone_dim/2+shift_rotate.x)*CUBE_DIM,
+  	(x-(player1->zone_dim)/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
-  	(y-zone_dim/2+shift_rotate.y)*CUBE_DIM, tmpl);
+  	(y-(player1->zone_dim)/2+shift_rotate.y)*CUBE_DIM, tmpl);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
@@ -710,8 +739,8 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
 void Blocks::StartNewShape ()
 {
   int x, y, z;
-  if (zone_dim <= 4) x = y = 1;
-  else if (zone_dim <= 5) x = y = 2;
+  if ((player1->zone_dim) <= 4) x = y = 1;
+  else if ((player1->zone_dim) <= 5) x = y = 2;
   else x = y = 3;
   z = ZONE_HEIGHT-3;
   num_cubes = 0;
@@ -741,7 +770,7 @@ again:
       add_cube (1, 0, 0, x, y, z, cube_tmpl);
       break;
     case SHAPE_R4:
-      if (zone_dim <= 3) goto again;
+      if ((player1->zone_dim) <= 3) goto again;
       add_cube (-1, 0, 0, x, y, z, cube_tmpl);
       add_cube (0, 0, 0, x, y, z, cube_tmpl);
       add_cube (1, 0, 0, x, y, z, cube_tmpl);
@@ -805,7 +834,7 @@ again:
       add_cube (1, 0, -1, x, y, z, cube_tmpl);
       break;
     case SHAPE_L3:
-      if (zone_dim <= 3) goto again;
+      if ((player1->zone_dim) <= 3) goto again;
       add_cube (-1, 0, 1, x, y, z, cube_tmpl);
       add_cube (-1, 0, 0, x, y, z, cube_tmpl);
       add_cube (0, 0, 0, x, y, z, cube_tmpl);
@@ -838,11 +867,14 @@ again:
       break;
     default: break;
   }
-  move_down_todo = 0;
-  cube_x = x;
-  cube_y = y;
-  cube_z = z;
-  speed = cur_speed;
+  player1->move_down_todo = 0;
+  
+  player1->cube_x = x;
+  player1->cube_y = y;
+  player1->cube_z = z;
+  
+  
+  player1->speed = player1->cur_speed;
   int i;
   for (i = 0 ; i < num_cubes ; i++)
   {
@@ -1004,7 +1036,8 @@ void Blocks::HandleGameOverKey (int key, bool /*shift*/, bool /*alt*/, bool /*ct
   }
   else if (key == CSKEY_ENTER)
   {
-    highscores[diff_level][zone_dim-3].RegisterScore (hs_name, score);
+    highscores[diff_level][(player1->zone_dim)-3].RegisterScore (hs_name, 
+				                              player1->score);
     WriteConfig ();
     enter_highscore = false;
   }
@@ -1130,10 +1163,10 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
   else if (key_right.Match (key, shift, alt, ctrl)) start_horizontal_move (move_right_dx, move_right_dy);
   else if (key_drop.Match (key, shift, alt, ctrl))
   {
-    if (speed == MAX_FALL_SPEED)
-      speed = cur_speed;
+    if ((player1->speed) == MAX_FALL_SPEED)
+      (player1->speed) = (player1->cur_speed);
     else
-      speed = MAX_FALL_SPEED;
+      player1->speed = MAX_FALL_SPEED;
   }
   else if (key_esc.Match (key, shift, alt, ctrl))
   {
@@ -1235,7 +1268,7 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  ReplaceMenuItem (cur_menu,
 	  	MENU_3X3 + (idx_menus[cur_menu]-MENU_3X3 + 1)
 		% (MENU_6X6-MENU_3X3+1));
-	  new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
+	  player1->new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
 	  WriteConfig ();
 	}
       }
@@ -1272,7 +1305,7 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  	MENU_3X3 + (idx_menus[cur_menu]-MENU_3X3 - 1
 		+ (MENU_6X6-MENU_3X3+1))
 		% (MENU_6X6-MENU_3X3+1));
-	  new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
+	  player1->new_zone_dim = idx_menus[cur_menu]-MENU_3X3+3;
 	  WriteConfig ();
 	}
       }
@@ -1293,6 +1326,14 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  initscreen = true;
 	  break;
 	case MENU_QUIT:
+	  // Start Networking stuff.
+	  // Send disconect stuff here.
+	  if (Connection != NULL)
+            Connection->Send ("BYE", sizeof("BYE"));
+
+	  TerminateConnection ();
+	  // Finish networking stuff.
+
 	  System->Shutdown = true;
 	  break;
       }
@@ -1316,9 +1357,9 @@ void Blocks::HandleKey (int key, bool shift, bool alt, bool ctrl)
 
 void Blocks::move_shape_internal (int dx, int dy, int dz)
 {
-  cube_x += dx;
-  cube_y += dy;
-  cube_z += dz;
+  player1->cube_x += dx;
+  player1->cube_y += dy;
+  player1->cube_z += dz;
 }
 
 void Blocks::rotate_shape_internal (const csMatrix3& rot)
@@ -1378,20 +1419,27 @@ void Blocks::freeze_shape ()
 
   for (i = 0 ; i < num_cubes ; i++)
   {
-    x = cube_x+(int)cube_info[i].dx;
-    y = cube_y+(int)cube_info[i].dy;
-    z = cube_z+(int)cube_info[i].dz;
-    set_cube (x, y, z, true);
-    AddScore (10);
+    x = player1->cube_x+(int)cube_info[i].dx;
+    y = player1->cube_y+(int)cube_info[i].dy;
+    z = player1->cube_z+(int)cube_info[i].dz;
+    
+    player1->set_cube (x, y, z, true);
+    
+    if (screen != SCREEN_GAMEOVER)
+    {
+      player1->AddScore (10);
+    }
     sprintf (cubename, "cubeAt%d%d%d", x, y, z);
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
-    cube_info[i].thing->SetName (cubename); 
+    cube_info[i].thing->SetName (cubename);
     ChangeThingTexture (cube_info[i].thing, GetTextureForHeight (z));
     if (screen != SCREEN_GAMEOVER && z >= GAMEOVER_HEIGHT)
     {
       screen = SCREEN_GAMEOVER;
-      enter_highscore = highscores[diff_level][zone_dim-3].CheckScore (score);
+      enter_highscore =
+              highscores[diff_level][(player1->zone_dim)-3].CheckScore (
+							       player1->score);
       hs_pos = 0;
       hs_name[0] = 0;
     }
@@ -1409,7 +1457,7 @@ void Blocks::dump_shape ()
     y = (int)cube_info[i].dy;
     z = (int)cube_info[i].dz;
     CsPrintf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
-    	i, cube_x+x, cube_y+y, cube_z+z, x, y, z);
+    	i, player1->cube_x+x, player1->cube_y+y, player1->cube_z+z, x, y, z);
   }
 }
 
@@ -1419,10 +1467,10 @@ bool Blocks::check_new_shape_location (int dx, int dy, int dz)
   int x, y, z;
   for (i = 0 ; i < num_cubes ; i++)
   {
-    x = cube_x+(int)cube_info[i].dx + dx;
-    y = cube_y+(int)cube_info[i].dy + dy;
-    z = cube_z+(int)cube_info[i].dz + dz;
-    if (get_cube (x, y, z)) return false;
+    x = player1->cube_x+(int)cube_info[i].dx + dx;
+    y = player1->cube_y+(int)cube_info[i].dy + dy;
+    z = player1->cube_z+(int)cube_info[i].dz + dz;
+    if (player1->get_cube (x, y, z)) return false;
   }
   return true;
 }
@@ -1464,35 +1512,42 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
     if (v.z < 0) dz = ((int)(v.z-5)/10);
     else dz = ((int)(v.z+5)/10);
 
-    x = cube_x + dx;
-    y = cube_y + dy;
-    z = cube_z + dz;
-    if (get_cube (x, y, z)) return false;
+    x = player1->cube_x + dx;
+    y = player1->cube_y + dy;
+    z = player1->cube_z + dz;
+    if (player1->get_cube (x, y, z)) return false;
   }
   return true;
 }
 
-void Blocks::UpdateScore ()
-{
-  if (screen == SCREEN_GAMEOVER) return;
-  int increase = 0;
-  int i;
-	
-  for (i=0 ; i<ZONE_HEIGHT ; i++)
-  {
-    if (filled_planes[i]) increase++;
-  }
 
-  AddScore (zone_dim*zone_dim*10*increase*increase);
-}
+//void Blocks::UpdateScore ()
+//{
+//  if (screen == SCREEN_GAMEOVER) return;
+//  int increase = 0;
+//  int i;
+//
+//  for (i=0 ; i<ZONE_HEIGHT ; i++)
+//  {
+//    if (player1->filled_planes[i]) increase++;
+//  }
+//
+//  player1->AddScore ((player1->zone_dim)*(player1->zone_dim)
+//		     *10*increase*increase);
+//}
 
-void Blocks::AddScore (int dscore)
-{
-  if (screen == SCREEN_GAMEOVER) return;
-  float bonus_fact = (cur_speed - MIN_SPEED) / (MAX_SPEED-MIN_SPEED);
-  bonus_fact = bonus_fact*2+1;
-  score += (int)((float)dscore*bonus_fact);
-}
+
+
+
+
+
+//void Blocks::AddScore (int dscore)
+//{
+//  if (screen == SCREEN_GAMEOVER) return;
+//  float bonus_fact = (player1->cur_speed - MIN_SPEED) / (MAX_SPEED-MIN_SPEED);
+//  bonus_fact = bonus_fact*2+1;
+//  player1->score += (int)((float)dscore*bonus_fact);
+//}
 
 void Blocks::HandleStartupMovement (time_t elapsed_time)
 {
@@ -1528,33 +1583,38 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
   int i;
   float elapsed = (float)elapsed_time/1000.;
   float elapsed_rot = 5 * elapsed * (M_PI/2);
-  float elapsed_fall = elapsed*speed;
+  float elapsed_fall = elapsed * (player1->speed);
   float elapsed_move = elapsed*2;
 
-  if (!move_down_todo)
+  if (!player1->move_down_todo)
   {
     // dump_shape ();
     bool stop = !check_new_shape_location (0, 0, -1);
-    if (speed >= MAX_FALL_SPEED) AddScore (1);
+    if ((player1->speed >= MAX_FALL_SPEED) && (screen != SCREEN_GAMEOVER)) 
+      player1->AddScore (1);
     if (stop)
     {
       if (!(rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo ||
       	    rot_pz_todo || rot_mz_todo || move_hor_todo))
       {
         freeze_shape ();
-        checkForPlane ();
-        if (!transition) StartNewShape ();
+        player1->checkForPlane ();
+	
+	removePlanesVisual(player1);
+	
+        if (!player1->transition) StartNewShape ();
         return;
       }
     }
     else
     {
       move_shape_internal (0, 0, -1);
-      move_down_todo = CUBE_DIM;
+      player1->move_down_todo = CUBE_DIM;
     }
   }
-  if (elapsed_fall > move_down_todo) elapsed_fall = move_down_todo;
-  move_down_todo -= elapsed_fall;
+  if (elapsed_fall > player1->move_down_todo) 
+    elapsed_fall = player1->move_down_todo;
+  player1->move_down_todo -= elapsed_fall;
 
   float dx = 0, dy = 0;
   csMatrix3 rot;
@@ -1641,16 +1701,16 @@ void Blocks::HandleMovement (time_t elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
 
-  if (fog_density)
+  if (player1->fog_density)
   {
     float elapsed_fog = elapsed*.8;
-    if (elapsed_fog > fog_density) elapsed_fog = fog_density;
-    fog_density -= elapsed_fog;
+    if (elapsed_fog > player1->fog_density) elapsed_fog = player1->fog_density;
+    player1->fog_density -= elapsed_fog;
     csSector* s;
     if (screen == SCREEN_STARTUP) s = demo_room;
     else s = room;
-    if (fog_density)
-      s->SetFog (fog_density, csColor (0, 0, 0));
+    if (player1->fog_density)
+      s->SetFog (player1->fog_density, csColor (0, 0, 0));
     else
       s->DisableFog ();
     return;
@@ -1670,7 +1730,7 @@ void Blocks::HandleMovement (time_t elapsed_time)
     HandleCameraMovement ();
   }
 
-  if (transition) { HandleTransition (elapsed_time); return; }
+  if (player1->transition) { HandleTransition (elapsed_time); return; }
 
   if (pause) return;
   if (screen == SCREEN_GAMEOVER) return;
@@ -1890,7 +1950,7 @@ void Blocks::ChangePlaySize (int new_size)
 {
   int idx = Sys->world->sectors.Find ((csSome)room);
   Sys->world->sectors.Delete (idx);
-  zone_dim = new_size;
+  player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
   room->Prepare ();
@@ -1975,23 +2035,23 @@ void Blocks::InitGameRoom ()
   Sys->add_hrast_template ();
 
   Sys->add_pillar (-1, -1);
-  Sys->add_pillar (zone_dim, -1);
-  Sys->add_pillar (-1, zone_dim);
-  Sys->add_pillar (zone_dim, zone_dim);
+  Sys->add_pillar (player1->zone_dim, -1);
+  Sys->add_pillar (-1, player1->zone_dim);
+  Sys->add_pillar (player1->zone_dim, player1->zone_dim);
 
   int i;
-  for (i = 0 ; i < zone_dim-1 ; i++)
+  for (i = 0 ; i < player1->zone_dim-1 ; i++)
   {
     Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-    Sys->add_vrast (zone_dim-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
+    Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
     Sys->add_vrast (i, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
-    Sys->add_vrast (i, zone_dim-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
+    Sys->add_vrast (i, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
   }
 
   Sys->add_hrast (-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-  Sys->add_hrast (zone_dim-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+  Sys->add_hrast ((player1->zone_dim)-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
-  Sys->add_hrast (2, zone_dim-1, CUBE_DIM/2, CUBE_DIM/2, 0);
+  Sys->add_hrast (2, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
   room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
   room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
@@ -2076,8 +2136,8 @@ void Blocks::StartDemo ()
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
-  fog_density = 1;
-  demo_room->SetFog (fog_density, csColor (0, 0, 0));
+  player1->fog_density = 1;
+  demo_room->SetFog (player1->fog_density, csColor (0, 0, 0));
 
   InitMainMenu ();
   menu_hor_old_menu = NULL;
@@ -2088,7 +2148,7 @@ void Blocks::InitMainMenu ()
   InitMenu ();
   AddMenuItem (MENU_STARTGAME, false);
   AddMenuItem (MENU_NOVICE+diff_level, true);
-  AddMenuItem (MENU_3X3+new_zone_dim-3, true);
+  AddMenuItem (MENU_3X3+(player1->new_zone_dim)-3, true);
   AddMenuItem (MENU_KEYCONFIG, false);
   AddMenuItem (MENU_HIGHSCORES, false);
   AddMenuItem (MENU_QUIT, false);
@@ -2099,7 +2159,8 @@ void Blocks::InitMainMenu ()
 
 void Blocks::StartNewGame ()
 {
-  if (new_zone_dim != zone_dim) ChangePlaySize (new_zone_dim);
+  if (player1->new_zone_dim != player1->zone_dim) 
+    ChangePlaySize (player1->new_zone_dim);
 
   delete dynlight; dynlight = NULL;
 
@@ -2121,90 +2182,132 @@ void Blocks::StartNewGame ()
   Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
-  fog_density = 1;
-  room->SetFog (fog_density, csColor (0, 0, 0));
+  player1->fog_density = 1;
+  room->SetFog (player1->fog_density, csColor (0, 0, 0));
 }
 
 
-void Blocks::checkForPlane ()
-{
-  bool plane_hit;
-  int x,y,z,i;
+//void Blocks::checkForPlane ()
+//{
+//  bool plane_hit;
+//  int x,y,z,i;
 
   // We know nothing yet.
-  for (i=0 ; i<ZONE_HEIGHT ; i++) filled_planes[i] = false;
+//  for (i=0 ; i<ZONE_HEIGHT ; i++) 
+//    player1->filled_planes[i] = false;
 
+//  for (z=0 ; z<ZONE_HEIGHT ; z++)
+//  {
+//    plane_hit = true;
+//    for (x=0 ; x<player1->zone_dim ; x++)
+//      for (y=0 ; y<player1->zone_dim ; y++)
+//      {
+	// If one cube is missing we don't have a plane.
+//	if (!player1->get_cube (x, y, z)) { plane_hit = false; break; }
+//      }
+//    if (plane_hit)
+//    {
+      // We've got at least one plane, switch to transition mode.
+//      player1->transition = true;
+//      player1->filled_planes[z] = true;
+//      removePlane (z);
+      // That's how much all the cubes above the plane will lower.
+//      player1->move_down_todo = CUBE_DIM;
+      
+//      if (screen != SCREEN_GAMEOVER)
+//        UpdateScore ();
+      
+//    }
+//  }
+//}
+
+//bool Blocks::CheckEmptyPlayArea ()
+//{
+//  int x, y, z;
+//  for (z = 0 ; z < ZONE_HEIGHT ; z++)
+//    for (x = 0 ; x < player1->zone_dim ; x++)
+//      for (y = 0 ; y < player1->zone_dim ; y++)
+//        if (player1->get_cube (x, y, z)) return false;
+//  return true;
+//}
+
+
+//void Blocks::removePlane (int z)
+//{
+//  int x,y;
+//  char temp[20];
+
+//  for (x=0 ; x<player1->zone_dim ; x++)
+//    for (y=0 ; y<player1->zone_dim ; y++)
+//    {
+      // Physically remove it.
+//      sprintf (temp, "cubeAt%d%d%d", x, y, z);
+//      room->RemoveThing (room->GetThing (temp));
+      // And then remove it from game_cube[][][].
+//      player1->set_cube (x, y, z, false);
+//    }
+//}
+
+
+
+
+void Blocks::removePlanesVisual (States* player)
+{
+  int x,y,z;
+  char temp[20];
   for (z=0 ; z<ZONE_HEIGHT ; z++)
   {
-    plane_hit = true;
-    for (x=0 ; x<zone_dim ; x++)
-      for (y=0 ; y<zone_dim ; y++)
-      {
-	// If one cube is missing we don't have a plane.
-	if (!get_cube (x, y, z)) { plane_hit = false; break; }
-      }
-    if (plane_hit)
+    if(player->filled_planes[z])
     {
-      // We've got at least one plane, switch to transition mode.
-      transition = true;
-      filled_planes[z] = true;
-      removePlane (z);
-      // That's how much all the cubes above the plane will lower.
-      move_down_todo = CUBE_DIM;
-      UpdateScore ();
+    
+      for (x=0 ; x<player->zone_dim ; x++)
+        for (y=0 ; y<player->zone_dim ; y++)
+        {
+          // Physically remove it.
+          sprintf (temp, "cubeAt%d%d%d", x, y, z);
+          room->RemoveThing (room->GetThing (temp));
+        }
+      
     }
   }
 }
 
-bool Blocks::CheckEmptyPlayArea ()
-{
-  int x, y, z;
-  for (z = 0 ; z < ZONE_HEIGHT ; z++)
-    for (x = 0 ; x < zone_dim ; x++)
-      for (y = 0 ; y < zone_dim ; y++)
-        if (get_cube (x, y, z)) return false;
-  return true;
-}
 
-void Blocks::removePlane (int z)
-{
-  int x,y;
-  char temp[20];
 
-  for (x=0 ; x<zone_dim ; x++)
-    for (y=0 ; y<zone_dim ; y++)
-    {
-      // Physically remove it.
-      sprintf (temp, "cubeAt%d%d%d", x, y, z);
-      room->RemoveThing (room->GetThing (temp));
-      // And then remove it from game_cube[][][].
-      set_cube (x, y, z, false);
-    }
-}
+
+
+
+
+
+
+
 
 void Blocks::HandleTransition (time_t elapsed_time)
 {
   if (screen == SCREEN_GAMEOVER) return;
   int i;
-  transition = false;
+  player1->transition = false;
 
   for (i=0 ; i<ZONE_HEIGHT ; i++)
   {
-    if (filled_planes[i])
+    if (player1->filled_planes[i])
     {
-      transition = true;
-      gone_z = i;
+      player1->transition = true;
+// DEBUG      
+//      printf("at gone_z = i\n");
+      player1->gone_z = i;
       HandleLoweringPlanes (elapsed_time);
       break;
     }
   }
-  if (!transition)
+  if (!player1->transition)
   {
-    if (CheckEmptyPlayArea ())
+    if (player1->CheckEmptyPlayArea ())
     {
-      AddScore (800);
+      if(screen != SCREEN_GAMEOVER)
+        player1->AddScore (800);
     }
-    move_down_todo = 0;
+    player1->move_down_todo = 0;
     StartNewShape ();
   }
 }
@@ -2214,32 +2317,37 @@ void Blocks::HandleTransition (time_t elapsed_time)
 void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
-  float elapsed_fall = elapsed*speed;
+  float elapsed_fall = elapsed* (player1->speed);
 
   if (pause) return;
-
+// DEBUG
+//  printf("top key_up is:%d", key_up.key);
+  
+  
   int i;
   int x,y,z;
   char temp[20];
   csThing* t;
 
   // Finished the transition.
-  if (!move_down_todo)
+  if (!player1->move_down_todo)
   {
     // We finished handling this plane.
 
     // We lower the planes (in case the player made more then one plane).
-    for (i=gone_z ; i<ZONE_HEIGHT-1 ; i++)
-      filled_planes[i] = filled_planes[i+1];
-    filled_planes[ZONE_HEIGHT] = false; // And the last one.
+// DEBUG
+//    printf("gone_z:%d\n", player1->gone_z);
+    for (i=player1->gone_z ; i<ZONE_HEIGHT-1 ; i++)
+      player1->filled_planes[i] = player1->filled_planes[i+1];
+    player1->filled_planes[ZONE_HEIGHT] = false; // And the last one.
 
     // Now that everything is visually ok we lower(change) their names
     // accordingly and clear them from game_cube[][][].
-    for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
-      for (x=0 ; x<zone_dim ; x++)
-        for (y=0 ; y<zone_dim ; y++)
+    for (z=(player1->gone_z)+1 ; z<ZONE_HEIGHT ; z++)
+      for (x=0 ; x < player1->zone_dim ; x++)
+        for (y=0 ; y < player1->zone_dim ; y++)
 	{
-	  set_cube (x, y, z-1, get_cube (x, y, z));
+	  player1->set_cube (x, y, z-1, player1->get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
           t = room->GetThing (temp);
           if (t)
@@ -2251,21 +2359,22 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 	}
 
     // Mustn't forget the topmost level.
-    for (x=0 ; x<zone_dim ; x++)
-      for (y=0 ; y<zone_dim ; y++)
-        set_cube (x, y, ZONE_HEIGHT-1, false);
+    for (x=0 ; x < player1->zone_dim ; x++)
+      for (y=0 ; y < player1->zone_dim ; y++)
+        player1->set_cube (x, y, ZONE_HEIGHT-1, false);
     // Set movement for next plane (if needed).
-    move_down_todo = CUBE_DIM;
+    player1->move_down_todo = CUBE_DIM;
     return;
   }
 
-  if (elapsed_fall > move_down_todo) elapsed_fall = move_down_todo;
-  move_down_todo -= elapsed_fall;
+  if (elapsed_fall > player1->move_down_todo) 
+    elapsed_fall = player1->move_down_todo;
+  player1->move_down_todo -= elapsed_fall;
 
   // Move everything from above the plane that dissapeared a bit lower.
-  for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
-    for (x=0 ; x<zone_dim ; x++)
-      for (y=0 ; y<zone_dim ; y++)
+  for (z=(player1->gone_z)+1 ; z<ZONE_HEIGHT ; z++)
+    for (x=0 ; x < player1->zone_dim ; x++)
+      for (y=0 ; y < player1->zone_dim ; y++)
       {
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
@@ -2291,6 +2400,68 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
+
+  // -----------------------------------------------------------------
+  // Start network stuff.
+
+  if (do_network && NUM_FRAMES_CHK_NET >= since_last_check)
+  {
+    since_last_check = 0;
+
+    player1->EncodeStates ();
+    //    printf("Printing to before.txt\n");
+    //    player1->PrintData("before.txt");
+    //    printf("********decoding data*********\n");
+    if (!player1->DecodeStates ())
+      printf ("failed to decode\n");
+      //    printf("Printing to after.txt\n");
+      //    player1->PrintData("after.txt");
+
+
+    if (BLOCKS_SERVER)
+    {
+
+      if (Connection != NULL)
+        CheckConnection();
+      if (Connection != NULL)
+      {
+        if ((System->Time() - LastConnectTime) > 1000)
+        {
+          LastConnectTime = System->Time();
+
+          Connection = Listener->Accept();
+	  // These slow down blocks too much. 
+	  // if (Connection != NULL)
+	  //   System->Printf(MSG_INITIALIZATION, "Connection accepted\n");
+	  // else
+	  //   System->Printf(MSG_INITIALIZATION,"Awaiting connection (response %d)\n",
+	  // Listener->GetLastError());
+        }
+      }
+    
+    }
+    else
+    {
+      if (Connection != NULL)
+        CheckConnection();
+      if (Connection)
+      {
+        if ((System->Time() - LastConnectTime) > 1000)
+        {
+          LastConnectTime = System->Time ();
+          Connect();
+        }
+      }
+    
+    }
+  }
+  else  // aren't up to the number of frames yet.
+  {
+    since_last_check++;
+  }
+
+  // Finish network stuff.
+  // -----------------------------------------------------------------
 
   if (screen == SCREEN_STARTUP)
   {
@@ -2321,10 +2492,10 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     char buffer[100];
     sprintf (buffer, "Highscores for %s at %dx%d",
     	diff_level == 0 ? "novice" : diff_level == 1 ? "average" : "expert",
-	new_zone_dim, new_zone_dim);
+	player1->new_zone_dim, player1->new_zone_dim);
     Gfx2D->Write (10, 10, white, black, buffer);
     int i;
-    HighScore& hs = highscores[diff_level][new_zone_dim-3];
+    HighScore& hs = highscores[diff_level][(player1->new_zone_dim)-3];
     bool scores = false;
     for (i = 0 ; i < 10 ; i++)
     {
@@ -2355,8 +2526,8 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 
   if (!pause)
   {
-    cur_speed += ((float)elapsed_time)/(300.*1000.);
-    if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
+    player1->cur_speed += ((float)elapsed_time)/(300.*1000.);
+    if (player1->cur_speed > MAX_SPEED) player1->cur_speed = MAX_SPEED;
 
     // Tell Gfx3D we're going to display 3D things
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
@@ -2373,7 +2544,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   }
 
   char scorebuf[50];
-  sprintf (scorebuf, "%d", score);
+  sprintf (scorebuf, "%d", player1->score);
   Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
 
   // Game over!
@@ -2558,8 +2729,8 @@ void Blocks::ReadConfig ()
   NamedKey (keys.GetStr ("Keys", "VIEWDOWN", "end"), key_viewdown);
   NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
   NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
-  new_zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
-  zone_dim = new_zone_dim;
+  player1->new_zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  player1->zone_dim = player1->new_zone_dim;
   diff_level = keys.GetInt ("Game", "LEVEL", 0);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
@@ -2598,7 +2769,7 @@ void Blocks::WriteConfig ()
   keys.SetStr ("Keys", "VIEWDOWN", KeyName (key_viewdown));
   keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
   keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
-  keys.SetInt ("Game", "PLAYSIZE", new_zone_dim);
+  keys.SetInt ("Game", "PLAYSIZE", player1->new_zone_dim);
   keys.SetInt ("Game", "LEVEL", diff_level);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
@@ -2616,6 +2787,110 @@ void Blocks::WriteConfig ()
     }
   keys.Save ("blocks.cfg");
 }
+
+
+
+
+// -----------------------------------------------------------------
+// Network Changes.
+
+// TODO: add the server CheckConnection stuff in here.
+
+void Blocks::CheckConnection()
+{
+  if (!do_network) return;
+
+  const int BUFF_SIZE = 64;
+  char buff[BUFF_SIZE];
+  const int received = Connection->Receive(buff, BUFF_SIZE);
+  if (received > 0)
+  {
+    if (strcmp(buff, "BYE") == 0)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Other blocks disconnected.\n");
+      TerminateConnection();
+    }
+    else if (strcmp(buff, "OK") == 0)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Received data: %s\n", buff);
+      Connection->Send("OK", sizeof("OK"));
+    }
+    else
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
+    }
+
+  }
+  else
+  {
+    const csNetworkDriverError err = Connection->GetLastError();
+    if (err != CS_NET_ERR_NO_ERROR)
+    {
+      Sys->Printf(MSG_INITIALIZATION, "Receive error %d\n", err);
+      Connection->DecRef();
+      Connection = NULL;
+    }
+  }
+}
+
+
+
+bool Blocks::InitNet()
+{
+  LastConnectTime = Sys->Time ();
+  
+  if (BLOCKS_SERVER)
+  {
+    const char source[] = "2222";
+
+    if (!System->NetDrv) return false;
+    Listener = System->NetDrv->NewListener (source, true, false, false);
+    if (Listener != NULL)
+      Sys->Printf (MSG_INITIALIZATION, "Listening on port %s\n", source);
+    else
+      Sys->Printf (MSG_INITIALIZATION, "Error creating network listener (%d)\n",
+        Sys->NetDrv->GetLastError ());
+
+    return (Listener != NULL);
+  }
+  return true;
+}
+
+
+
+void Blocks::Connect ()
+{
+  const char target[] = "localhost:2222";
+  Sys->Printf(MSG_INITIALIZATION, "Attempting connection to %s...", target);
+  Connection = Sys->NetDrv->NewConnection(target, true, false);
+  if (Connection == NULL)
+    Sys->Printf (MSG_INITIALIZATION,"Error %d\n", Sys->NetDrv->GetLastError());
+  else
+    Sys->Printf(MSG_INITIALIZATION, "OK\nPress a key [A-Z] to send a"
+      "message to the server.\n");
+}
+
+
+
+
+void Blocks::TerminateConnection()
+{
+  if (Connection != NULL)
+  {
+    Connection->Terminate();
+    Connection->DecRef();
+    Connection = NULL;
+  }
+  if (Listener != NULL)
+  {
+    Listener->Terminate();
+    Listener->DecRef();
+    Listener = NULL;
+  }
+}
+
+
+
 
 
 /*---------------------------------------------
@@ -2643,6 +2918,7 @@ void cleanup ()
   Sys->console_out ("Cleaning up...\n");
   delete view;
   delete Sys;
+  Sys = NULL;
 }
 
 /*---------------------------------------------------------------------*
@@ -2654,6 +2930,12 @@ int main (int argc, char* argv[])
 
   // Create our main class which is the driver for Blocks.
   Sys = new Blocks ();
+  
+  // Network change.  
+  // Should be loaded in config file, can't figure out how to.
+  Sys->RequestPlugin("crystalspace.network.driver.sockets");
+  // end change.
+
   // temp hack until we find a better way
   csWorld::System = Sys;
 
@@ -2665,6 +2947,8 @@ int main (int argc, char* argv[])
     cleanup ();
     fatal_exit (0, false);
   }
+  
+//  printf("The zone_dim is:%d",Sys->player1.zone_dim);
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Sys->Open ("3D Blocks"))
@@ -2708,12 +2992,16 @@ int main (int argc, char* argv[])
   Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
   Sys->ReadConfig ();
-  Sys->InitWorld ();  
+  Sys->InitWorld ();
 
   Sys->txtmgr->SetPalette ();
   Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);
   Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
   Sys->red = Sys->txtmgr->FindRGB (255, 0, 0);
+
+  
+  // Network
+  do_network = Sys->InitNet();
 
   Sys->Loop ();
 

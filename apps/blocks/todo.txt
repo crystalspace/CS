@@ -1,0 +1,116 @@
+Random notes, and todos about blocks, networking.
+
+
+* possible bug in the network code... maybe.
+
+* need to look at the rotation stuff a bit more.  See what needs to go into States.
+
+
+* should change the size of the encoded data when zone_dim is less than 6.  For a 3x3 field this would mean ~ half as much data sent.
+
+
+
+
+ -------------------------------------------
+ | Fifth part - displaying another persons game remotely.
+
+Get blocks working so that it can be displayed on another copy of blocks.
+
+
+Figure out how we are going to decide who is server, or client.  Some sort of negotiation would be the best.  But having people decide by themselves would be easier.
+
+
+
+A Queue class for states.
+---------------------------
+
+Needed so that when the state falls behind a bit we can catch up without the motion being too jerky.
+
+Possibly just the block which is falling could be queued.
+
+
+
+
+
+ -------------------------------------------
+ | Sixth part - Getting a view in the top corner, of other persons game.
+
+While you are playing have another view of the other persons game going.
+
+Should probably also show the other persons score.  Maybe even have a bar showing the difference between the two scores.
+
+
+
+
+ -------------------------------------------
+ | Seventh part - do things that happen to oposition when you get levels.
+
+When you clear a level, the oposition should be punished :)
+
+In order of easiest to hardest.
+
+- Fog increase for 20 seconds.
+- Camera moves around sporadically for 5 seconds.
+- Key mappings are swapped arround for 5 seconds.
+- Make random blocks appear.
+- Have a ferret run around their screen for quite some time
+
+
+
+
+
+
+--------------------------------------------------------------------------
+| DONE stuff.
+
+
+
+
+DONE
+* Need to load the network driver plugin.  "cystalspace.driver.sockets"  How do you make this load through the config file?
+
+
+
+ -------------------------------------------
+ | First part -  Make blocks a peer to peer network app.  Just send data.
+
+
+Basically mimic how the ndrvdemo works, except that the program is both client and server.
+
+
+DONE
+ -------------------------------------------
+ | Second part - Seperate the state information from blocks.
+
+So we can more easily have two players state information available.  Instead of making two of each member.
+
+All stuff related to displays, and player options should not be in a game state class.  Neither should key mappings.
+
+
+
+DONE
+- not doing this, they can stay in states.
+ -------------------------------------------
+ | Third part - Move the relevant game play options to a seperate class.
+
+All the things which determine what sort of game everyone is having. 
+
+list of things to be moved:
+
+zone_dim
+diff_level
+
+
+
+
+DONE
+ -------------------------------------------
+ | Fourth part - Encoding the game state.
+
+
+*Represent all of the information from the state class in a string, or strings.
+
+*Figure out what data to send over, and how often it will need to be sent.
+- probably cube_x, cube_y, cube_z with verticle and horizontal velocity.
+
+
