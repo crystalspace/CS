@@ -12,6 +12,9 @@ chronological order.
 	  the swig stuff to work compatible between NR and OR.
 	- Jorrit removed 'waterdemo' from walkall target.
 	- Jorrit removed the gtreeldr plugin. It is pretty useless.
+	- Eric Sunshine augmented the Doxygen comments for iMouseDriver and
+	  iJoystickDriver so that they give an indication of legal values for
+	  button and joystick numbers.
 11-May-2004
 	- Eric Sunshine made some clarifications and corrections to the
 	  'simple' tutorial, AWS "getting started", and iGraphics3D Doxygen

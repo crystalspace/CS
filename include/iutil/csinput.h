@@ -44,11 +44,6 @@
 /// Maximal number of joystick buttons supported
 #define CS_MAX_JOYSTICK_BUTTONS	10
 
-SCF_VERSION(iKeyComposer, 0, 0, 1);
-
-
-SCF_VERSION(iKeyboardDriver, 0, 0, 2);
-
 /**
  * Results for attempts to process a character key.
  */
@@ -67,6 +62,8 @@ enum csKeyComposeResult
   csComposeUncomposeable
 };
 
+SCF_VERSION(iKeyComposer, 0, 0, 1);
+
 /**
  * Keyboard input handler.
  */
@@ -81,9 +78,10 @@ struct iKeyComposer : public iBase
    * \param buf Buffer to store the output in. Should be at least contain 2
    *  characters (however, the method will work with smaller buffers as well.)
    * \param bufChars Number of characters the output buffer is actually sized.
-   * \param resultChars If not 0, returns the number of characters written to the
-   *  outpuit buffer.
-   * \return The type of character(s) that has been written to the output buffer.
+   * \param resultChars If not 0, returns the number of characters written to
+   *  the output buffer.
+   * \return The type of character(s) that has been written to the output
+   *  buffer.
    */
   virtual csKeyComposeResult HandleKey (const csKeyEventData& keyEventData,
     utf32_char* buf, size_t bufChars, int* resultChars = 0) = 0;
@@ -95,12 +93,15 @@ struct iKeyComposer : public iBase
   virtual void ResetState () = 0;
 };
 
+SCF_VERSION(iKeyboardDriver, 0, 0, 2);
+
 /**
  * Generic Keyboard Driver.<p>
- * Keyboard driver should generate events and put them into an event queue.
- * Also it tracks the current state of all keys.  Typically, one instance of
- * this object is available from the shared-object registry (iObjectRegistry)
- * under the name "crystalspace.driver.input.generic.keyboard".
+ * Keyboard driver listens for keyboard-related events from the event queue,
+ * stores state about the keyboard, and possibly synthesizes additional events,
+ * such as when a character is "composed".  Typically, one instance of this
+ * object is available from the shared-object registry (iObjectRegistry) under
+ * the name "crystalspace.driver.input.generic.keyboard".
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
@@ -157,10 +158,14 @@ SCF_VERSION(iMouseDriver, 0, 0, 1);
 
 /**
  * Generic Mouse Driver.<p>
- * Mouse driver should generate events and put them into the event queue.  Also
- * it is responsible for generating double-click events.  Typically, one
- * instance of this object is available from the shared-object registry
- * (iObjectRegistry) under the name "crystalspace.driver.input.generic.mouse".
+ * The mouse driver listens for mouse-related events from the event queue and
+ * records state information about recent events.  It is responsible for
+ * synthesizing double-click events when it detects that two mouse-down events
+ * have occurred for the same mouse button within a short interval.  Mouse
+ * button numbers start at 1.  The left mouse button is 1, the right is 2, the
+ * middle 3, and so on.  Typically, one instance of this object is available
+ * from the shared-object registry (iObjectRegistry) under the name
+ * "crystalspace.driver.input.generic.mouse".
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
@@ -187,10 +192,13 @@ struct iMouseDriver : public iBase
   virtual int GetLastX () = 0;
   /// Query last mouse Y position
   virtual int GetLastY () = 0;
-  /// Query the last known mouse button state
+  /// Query the last known mouse button state. Button numbers start at 1.
   virtual bool GetLastButton (int button) = 0;
 
-  /// Call this to add a 'mouse button down/up' event to queue
+  /**
+   * Call this to add a 'mouse button down/up' event to queue. Button numbers
+   * start at one.
+   */
   virtual void DoButton (int button, bool down, int x, int y) = 0;
   /// Call this to add a 'mouse moved' event to queue
   virtual void DoMotion (int x, int y) = 0;
@@ -201,9 +209,11 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
 /**
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current joystick state and
- * also for generating joystick events.  Typically, one instance of this object
- * is available from the shared-object registry (iObjectRegistry) under the
- * name "crystalspace.driver.input.generic.joystick".
+ * also for synthesizing joystick movement events.  Multiple joysticks are
+ * supported; they are numbered starting at zero.  Joystick button numbers
+ * start at 1.  Typically, one instance of this object is available from the
+ * shared-object registry (iObjectRegistry) under the name
+ * "crystalspace.driver.input.generic.joystick".
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
@@ -223,16 +233,22 @@ struct iJoystickDriver : public iBase
    */
   virtual void Reset () = 0;
 
-  /// Query last joystick X position
+  /// Query last X position of joystick 'number'.
   virtual int GetLastX (int number) = 0;
-  /// Query last joystick Y position
+  /// Query last Y position of joystick 'number'.
   virtual int GetLastY (int number) = 0;
-  /// Query the last known joystick button state
+  /**
+   * Query the last known button state of joystick 'number'.  Joystick numbers
+   * start at 0.  Button numbers start at 1.
+   */
   virtual bool GetLastButton (int number, int button) = 0;
 
-  /// Call this to add a 'joystick button down/up' event to queue
+  /**
+   * Call this to add a 'button down/up' event to queue.  Joystick
+   * numbers start at 0.  Button numbers start at 1.
+   */
   virtual void DoButton (int number, int button, bool down, int x, int y) = 0;
-  /// Call this to add a 'joystick moved' event to queue
+  /// Call this to add a 'moved' event to queue for joystick 'number'.
   virtual void DoMotion (int number, int x, int y) = 0;
 };
 
