@@ -102,7 +102,7 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
       {
         txthandle = mesh->GetMaterialHandle ()->GetTexture ();
       } else {
-        csTextureLayer* layer = ((csMaterialHandle*)mesh->GetMaterialHandle ())
+        csTextureLayer* layer = ((csGLMaterialHandle*)mesh->GetMaterialHandle ())
           ->GetTextureLayer (e->layer-1);
         if (layer)
           txthandle = layer->txt_handle;
