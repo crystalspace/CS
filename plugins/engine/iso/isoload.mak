@@ -32,7 +32,7 @@ ifeq ($(USE_PLUGINS),yes)
   TO_INSTALL.DYNAMIC_LIBS += $(ISOLOAD)
 else
   ISOLOAD = $(OUT)$(LIB_PREFIX)isoload$(LIB)
-  DEP.EXE += $(ISO)
+  DEP.EXE += $(ISOLOAD)
   SCF.STATIC += isoload
   TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
 endif
