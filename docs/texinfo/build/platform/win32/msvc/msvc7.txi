@@ -157,11 +157,7 @@ You will now be prompted to convert all older @emph{MSVC 6} project files to the
 @emph{MSVC 7} format. Click on @emph{Yes To All}.
 
 @item
-Make @samp{grpall} your start project.  This is done by right clicking on it
-and then clicking on @emph{Set as StartUp Project}.
-
-@item
-From the file menu selct @emph{Build->Rebuild grpall}.
+From the file menu selct @emph{Build->Build Solution}.
 
 @item
 After a while the compilation should finish.  The signal for a
