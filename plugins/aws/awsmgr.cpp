@@ -1019,28 +1019,6 @@ void awsManager::UnSetModal()
 
 bool awsManager::HandleEvent (iEvent &Event)
 {  
-  //  If there is a modal_dialog check to see if we are
-  //  it's or a child of it.  If not return out.
-  if (modal_dialog)
-  {
-    iAwsComponent *comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
-
-    while (comp)
-    {
-
-      if (comp == modal_dialog)
-        break;
-
-      comp = comp->Parent();
-
-    }
-
-    if (comp == 0)
-      return true;
-
-  }
-
-
   // Find out what kind of event it is
   switch (Event.Type)
   {
@@ -1049,6 +1027,24 @@ bool awsManager::HandleEvent (iEvent &Event)
   case csevMouseClick:
   case csevMouseDown:
     {
+      //  If there is a modal_dialog check to see if we are
+      //  it or a child of it.  If not return out.
+      if (modal_dialog)
+      {
+        iAwsComponent *comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+
+        while (comp)
+        {
+          if (comp == modal_dialog)
+            break;
+
+          comp = comp->Parent();
+        }
+
+        if (comp == 0)
+          return true;
+      }
+
       // If the mouse is locked keep it there
       if (mouse_captured && mouse_focus)
         if(mouse_focus->HandleEvent (Event))
@@ -1091,6 +1087,24 @@ bool awsManager::HandleEvent (iEvent &Event)
 
       if (flags & AWSF_KeyboardControl)	
       {
+        //  If there is a modal_dialog check to see if we are
+        //  it or a child of it.  If not return out.
+        if (modal_dialog)
+        {
+          iAwsComponent *comp = GetFocusedComponent();
+
+          while (comp)
+          {
+            if (comp == modal_dialog)
+              break;
+
+            comp = comp->Parent();
+          }
+
+          if (comp == 0)
+            return true;
+        }
+
         cmp = GetFocusedComponent();
 
         csKeyModifiers m;
@@ -1148,16 +1162,32 @@ bool awsManager::HandleEvent (iEvent &Event)
         }
         if (cmp) ChangeKeyboardFocus(cmp, Event);
       }
-      
-      //
-      //If the focused component is not visible, dont pass it the event.      
 
-      //Cycle till the parent of the window the compoennt belongs to.
+      //  If there is a modal_dialog check to see if we are
+      //  it or a child of it.  If not return out.
+      if (modal_dialog)
+      {
+        iAwsComponent *comp = keyb_focus;
+
+        while (comp)
+        {
+          if (comp == modal_dialog)
+            break;
+
+          comp = comp->Parent();
+        }
+
+        if (comp == 0)
+          return true;
+      }
+      
+      //Cycle till the parent of the window the component belongs to.
       cmp = keyb_focus;
       while (cmp)
         if (cmp->Parent ())
           cmp = cmp->Parent ();
         else break;
+
       //If the component is not visible, do not pass it the keyboard event!
       if (keyb_focus && !cmp->isHidden ())
         return keyb_focus->HandleEvent (Event);
