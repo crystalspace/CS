@@ -37,7 +37,7 @@ struct iPolygonMesh;
 /**
  * A definition of one edge.
  */
-struct csPolygonMeshEdge
+struct CS_CSGEOM_EXPORT csPolygonMeshEdge
 {
   // Indices of the two vertices forming the edge.
   // vt1 < vt2.
@@ -56,7 +56,7 @@ struct csPolygonMeshEdge
 /**
  * A triangle with minimum/maximum information on x.
  */
-struct csTriangleMinMax : public csTriangle
+struct CS_CSGEOM_EXPORT csTriangleMinMax : public csTriangle
 {
   float minx, maxx;
 };
