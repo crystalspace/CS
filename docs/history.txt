@@ -6,6 +6,8 @@ he history order is reversed so that new features are at the top.
 	      canvas (for Unix).
 	    - Fixed a crash bug in the terrain mesh object when
 	      BLOCKS(4,4) and GRID(4,4) was used (same values).
+	- Removed iSector::GetName() again after Matze added this.
+	  Please use sector->QueryObject()->GetName().
 19-Jan-2002
 	- Richard Uren made the following changes to isotest app:
 	    - The code that was in isotest.cpp which looped through each
