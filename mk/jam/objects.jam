@@ -2,15 +2,15 @@
 # Rules for compiling a set of sources to object files
 #============================================================================
 # These are slightly modified versions of the Object and Objects rules from
-# jam.
+# jam. The problem with the original rules in Jambase is the handling of
+# custom file types. The solution with the UserObject rule is monolithic, you
+# can only have 1 such rule. Thus we construct a more flexible toolkit here
+# which let's you register rules for certain filetypes.
 
 ##  RegisterFileType Rulename : extension
-##    The original jam already provides support for user defined extensions
-##    through the UserObject rule. However this rule has some drawbacks as you
-##    can only defined exactly 1 such rule. Thus we build a framework around
-##    it where we can dynamically "register" new rules into our system.
-##    You can specify a rulename here and the suffix(es) for your filetypes
-##    (With the leading dot)
+##    Register a rule which is used to compile a filetype into object
+##    files. The registered rule is called with 2 arguments: the name of the
+##    objectfile which should be created and the name of the sourcefile.
 rule RegisterFileType
 {
   local type ;
@@ -20,6 +20,37 @@ rule RegisterFileType
   }
 }
 
+##  CompileObject sources
+##    Compile a set of sourcefiles into objectfiles (extension: SUFOBJ,
+##	usually .o). This rule takes care of all the complicated stuff like
+##    setting LOCATE and SEARCH variables, adding the correct grist to the
+##    files.
+##    The Application, Plugin and Library rules already use this rule
+##    internally. You should only use this rule if you have to avoid the
+##    Application, Plugin or Library rules.
+rule CompileObjects
+{
+  local f ;
+
+  for f in $(<)
+  {
+    local t = $(f:S=$(SUFOBJ)) ;
+    
+    # locate target and search for source
+    MakeLocate $(t) : $(LOCATE_TARGET) ;
+    SEARCH on $(f) = $(SEARCH_SOURCE) ;
+
+    # compile the sourcefile to targetfile
+    CompileObject $(t) : $(f) ;
+  }
+}
+
+#----------------------------------------------------------------------------
+# private part
+
+# helper rule: Compiles a sourcefile to an object file. Does header file
+# scanning, sets LOCATE and SEARCH for source and target, grists the files
+# with the current subdir and searches the correct rule in registered rules.
 rule CompileObject
 {
   # Save HDRS for -I$(HDRS) on compile.
@@ -65,26 +96,7 @@ rule CompileObject
   }
 }
 
-rule CompileObjects
-{
-  local f ;
-
-  for f in $(<)
-  {
-    local t = $(f:S=$(SUFOBJ)) ;
-    
-    # locate target and search for source
-    MakeLocate $(t) : $(LOCATE_TARGET) ;
-    SEARCH on $(f) = $(SEARCH_SOURCE) ;
-
-    # compile the sourcefile to targetfile
-    CompileObject $(t) : $(f) ;
-  }
-}
-
-#----------------------------------------------------------------------------
-
-# dummy rule
+# dummy rule: .o files are used as is
 rule UseObject
 {
 }

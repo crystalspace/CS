@@ -13,7 +13,6 @@ include $(mkdir)/variables.jam ;
 include $(mkdir)/subdir.jam ;
 
 include $(mkdir)/modus.jam ;
-include $(mkdir)/customfiles.jam ;
 include $(mkdir)/resource.jam ;
 
 include $(mkdir)/helper.jam ;
