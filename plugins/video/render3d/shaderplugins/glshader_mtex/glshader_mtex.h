@@ -22,6 +22,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ivideo/shader/shader.h"
 
+class csGLRender3D;
+
 class csGLShader_MTEX : public iShaderProgramPlugin
 {
 private:
@@ -68,7 +70,7 @@ class csShaderGLMTEX : public iShaderProgram
 {
 private:
 
-  
+  iGLTextureCache* txtcache;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
@@ -89,8 +91,6 @@ private:
     XMLTOKEN_TEXCOORDSOURCE,
     XMLTOKEN_ENVIRONMENT,
     XMLTOKEN_ALPHASOURCE,
-    XMLTOKEN_COLORMOD,
-    XMLTOKEN_ALPHAMOD,
     XMLTOKEN_COLOROP,
     XMLTOKEN_ALPHAOP,
     XMLTOKEN_COLORSCALE,
@@ -190,7 +190,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderGLMTEX(iObjectRegistry* objreg, csGLExtensionManager* ext);
+  csShaderGLMTEX(iObjectRegistry* objreg);
 
   virtual ~csShaderGLMTEX ()
   {

@@ -91,7 +91,7 @@ bool csGLShader_MTEX::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_MTEX::CreateProgram()
 {
-  return csPtr<iShaderProgram>(new csShaderGLMTEX(object_reg, ext));;
+  return csPtr<iShaderProgram>(new csShaderGLMTEX(object_reg));;
 }
 
 void csGLShader_MTEX::Open()
@@ -132,7 +132,7 @@ SCF_IMPLEMENT_IBASE(csShaderGLMTEX)
 SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg, csGLExtensionManager* ext)
+csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   this->object_reg = objreg;
@@ -140,24 +140,19 @@ csShaderGLMTEX::csShaderGLMTEX(iObjectRegistry* objreg, csGLExtensionManager* ex
   programstring = NULL;
   validProgram = true;
 
-  glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &maxlayers);
-
-  //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY(objreg, iGraphics2D);
-  g2d->PerformExtension("getstatecache", &statecache);
+  
 }
 
 void csShaderGLMTEX::BuildTokenHash()
 {
-  xmltokens.Register ("alphamodifier", XMLTOKEN_ALPHAMOD);
   xmltokens.Register ("alphaoperation", XMLTOKEN_ALPHAOP);
   xmltokens.Register ("alphasource", XMLTOKEN_ALPHASOURCE);
-  xmltokens.Register ("colormodifier", XMLTOKEN_COLORMOD);
   xmltokens.Register ("coloroperation", XMLTOKEN_COLOROP);
   xmltokens.Register ("colorsource", XMLTOKEN_COLORSOURCE);
   xmltokens.Register ("texturesource", XMLTOKEN_TEXTURESOURCE);
-  xmltokens.Register ("texturecoordinatesource", XMLTOKEN_TEXCOORDSOURCE);
+  xmltokens.Register ("texturecoordinate", XMLTOKEN_TEXCOORDSOURCE);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
+  xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
 
   xmltokens.Register("integer", 100+iShaderVariable::INT);
   xmltokens.Register("float", 100+iShaderVariable::VECTOR1);
@@ -180,6 +175,8 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register("add signed", GL_ADD_SIGNED_ARB);
   xmltokens.Register("interpolate", GL_INTERPOLATE_ARB);
   xmltokens.Register("subtract", GL_SUBTRACT_ARB);
+  xmltokens.Register("dot3", GL_DOT3_RGB_ARB);
+  xmltokens.Register("dot3 alpha", GL_DOT3_RGBA_ARB);
 }
 
 
@@ -211,6 +208,7 @@ bool csShaderGLMTEX::Load(iDocumentNode* node)
           mtexlayer* ml = new mtexlayer();
           if(!LoadLayer(ml, child))
             return false;
+          texlayers.Push(ml);
         }
         break;
       }
@@ -235,7 +233,7 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     {
     case XMLTOKEN_TEXTURESOURCE:
       {
-        int tnum = child->GetAttributeValueAsInt("nummer");
+        int tnum = child->GetAttributeValueAsInt("number");
         if(tnum < 0) continue;
         layer->texnum = tnum;
       }
@@ -308,55 +306,39 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
       {
         int num = child->GetAttributeValueAsInt("num");
         
-        if(num <= 0 || num > 3 )
+        if(num < 0 || num > 3 )
           continue;
         
         int i = xmltokens.Request(child->GetAttributeValue("source"));
         if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
           layer->colorsource[num] = i;
-      }
-      break;
-    case XMLTOKEN_ALPHASOURCE:
-      {
-        int num = child->GetAttributeValueAsInt("num");
-        
-        if(num <= 0 || num > 3 )
-          continue;
-        
-        int i = xmltokens.Request(child->GetAttributeValue("source"));
-        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
-          layer->alphasource[num] = i;
-      }
-      break;
-    case XMLTOKEN_COLORMOD:
-      {
-        int num = child->GetAttributeValueAsInt("num");
-        
-        if(num <= 0 || num > 3 )
-          continue;
 
         int m = xmltokens.Request(child->GetAttributeValue("modifier"));
         if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
           layer->colormod[num] = m;
       }
       break;
-    case XMLTOKEN_ALPHAMOD:
+    case XMLTOKEN_ALPHASOURCE:
       {
         int num = child->GetAttributeValueAsInt("num");
         
-        if(num <= 0 || num > 3 )
+        if(num < 0 || num > 3 )
           continue;
+        
+        int i = xmltokens.Request(child->GetAttributeValue("source"));
+        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+          layer->alphasource[num] = i;
 
         int m = xmltokens.Request(child->GetAttributeValue("modifier"));
         if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
-          layer->colormod[num] = m;
+          layer->alphamod[num] = m;
       }
       break;
     case XMLTOKEN_COLOROP:
       {
         int o = xmltokens.Request(child->GetAttributeValue("operation"));
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
-          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB)
+          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
           layer->colorp = o;
       }
       break;
@@ -364,8 +346,8 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
       {
         int o = xmltokens.Request(child->GetAttributeValue("operation"));
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
-          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB)
-          layer->colorp = o;
+          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
+          layer->alphap = o;
       }
       break;
     }
@@ -390,6 +372,18 @@ bool csShaderGLMTEX::Load(iDataBuffer* program)
 
 bool csShaderGLMTEX::Prepare()
 {
+  glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &maxlayers);
+
+  //get a statecache
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY(object_reg, iGraphics2D);
+  g2d->PerformExtension("getstatecache", &statecache);
+
+  //get extension-object
+  csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+
+  ext = (csGLExtensionManager*) sri->GetObject("ext");
+  txtcache = (iGLTextureCache*) sri->GetObject("txtcache");
   return true;
 }
 
@@ -451,17 +445,19 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
     GLuint texturehandle = 0;
     iTextureHandle* txt_handle = NULL;
     csRef<csMaterialHandle> mathand ( (csMaterialHandle*)mesh->GetMaterialHandle());
-    if(layer->texnum = 0)
+    if(layer->texnum == 0)
     {
       txt_handle = mathand->GetTexture();
     }
     else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
     {
-      txt_handle = mathand->GetTextureLayer(layer->texnum-1)->txt_handle;
+      csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
+      txt_handle = matlayer->txt_handle;
     }
     
     if(txt_handle)
     {
+      txtcache->Cache(txt_handle);
       csGLTextureHandle* txt_gl = (csGLTextureHandle *) txt_handle->GetPrivateObject ();
       csTxtCacheData *cachedata = (csTxtCacheData *)txt_gl->GetCacheData();
 
@@ -485,19 +481,29 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
           glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, layer->colorsource[2]);
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer->colormod[2]);
         }
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
+
+        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  == GL_DOT3_RGBA_ARB))
+          glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
+        else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
+          glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
+
 	glTexEnvfv(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer->alphasource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer->alphamod[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, layer->alphasource[1]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, layer->alphamod[1]);
-        if (layer->colorsource[2] != -1)
+        if (layer->alphasource[2] != -1)
         {
           glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, layer->alphasource[2]);
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer->alphamod[2]);
         }
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
+
+        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  == GL_DOT3_RGBA_ARB))
+          glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
+        else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
+          glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
+        
 	glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer->scale_alpha);
     }
 
