@@ -14,8 +14,8 @@ into pure Java programs. The csJava module consists of a @sc{jar} package,
 
 The Crystal Space classes, interfaces, and methods exported to Java are used in
 almost the same fashion as in C++. Consequently, the Crystal Space Public
-@sc{api} Reference can be consulted in most cases. There is also a nice sample
-program which show concretely how to utilize Crystal Space from Java. It
+@sc{api} Reference can be consulted in most cases. There is also a sample
+program which shows concretely how to utilize Crystal Space from Java. It
 performs the same functionality as the first C++ tutorial
 (@pxref{Tutorial Simple}).
 
