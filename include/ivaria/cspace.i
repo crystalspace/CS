@@ -892,7 +892,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(AddDouble) iEvent::Add(const char *, double);
 %rename(AddString) iEvent::Add(const char *, char *);
 %rename(AddBool) iEvent::Add(const char *, bool);
-%rename(AddVoidPtr) iEvent::Add(const char *, void *, uint32);
+%rename(AddVoidPtr) iEvent::Add(const char *, void *, size_t);
 %rename(RetrieveInt8) iEvent::Retrieve(const char *, int8 &) const;
 %rename(RetrieveInt16) iEvent::Retrieve(const char *, int16 &) const;
 %rename(RetrieveInt32) iEvent::Retrieve(const char *, int32 &, bool) const;
@@ -903,7 +903,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(RetrieveDouble) iEvent::Retrieve(const char *, double &) const;
 %rename(RetrieveString) iEvent::Retrieve(const char *, char **) const;
 %rename(RetrieveBool) iEvent::Retrieve(const char *, bool &) const;
-%rename(RetrieveVoidPtr) iEvent::Retrieve(const char *, void **, uint32 &) const;
+%rename(RetrieveVoidPtr) iEvent::Retrieve(const char *, void **, size_t &) const;
 #pragma SWIG nowarn=312; // nested union not supported
 
 %include "iutil/event.h"
