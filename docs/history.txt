@@ -48,6 +48,9 @@ chronological order.
 	  improved his patch by using the full transform instead of the
 	  normal transform and also testing if the transform is identity or
 	  not to avoid the work.
+	- Jorrit started work on a small csBSPTree class. Unfinished.
+	- Jorrit started work on actually implementing back2front sorting
+	  in genmesh. Unfinished.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

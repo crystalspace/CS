@@ -90,6 +90,10 @@ private:
   bool mesh_colors_dirty_flag;
 
   uint buffers_version;
+  csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
+  int num_sorted_mesh_triangles;
+  csTriangle* sorted_mesh_triangles;
+
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
 #endif
@@ -456,8 +460,6 @@ private:
   bool object_bbox_valid;
   bool initialized;
 
-  bool back2front;
-
   csMeshedPolygon* polygons;
 
   /// Calculate bounding box and radius.
@@ -498,6 +500,8 @@ public:
     index_name;
   uint buffers_version;
 
+  bool back2front;
+
   iObjectRegistry* object_reg;
   iBase* logparent;
   csGenmeshMeshObjectType* genmesh_type;
@@ -534,8 +538,8 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
-  virtual void SetBack2Front (bool b2f) { back2front = b2f; }
-  virtual bool IsBack2Front () const { return back2front; }
+  void SetBack2Front (bool b2f) { back2front = b2f; }
+  bool IsBack2Front () const { return back2front; }
 
   bool AddRenderBuffer (const char *name,
   	csRenderBufferComponentType component_type, int component_size);

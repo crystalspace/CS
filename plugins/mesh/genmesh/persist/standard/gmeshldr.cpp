@@ -358,6 +358,12 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         state->SetVertexCount (child->GetContentsValueAsInt ());
 	break;
       case XMLTOKEN_BACK2FRONT:
+	{
+	  bool b2f = false;
+          if (!synldr->ParseBool (child, b2f, true))
+	    return 0;
+	  state->SetBack2Front (b2f);
+	}
 	break;
       case XMLTOKEN_RENDERBUFFER:
 #ifdef CS_USE_NEW_RENDERER

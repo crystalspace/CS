@@ -145,6 +145,9 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   ambient_version = 0;
 
 #ifdef CS_USE_NEW_RENDERER
+  num_sorted_mesh_triangles = 0;
+  sorted_mesh_triangles = 0;
+
   svcontext = 0;
 
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
@@ -161,6 +164,9 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
   delete[] static_mesh_colors;
+#ifdef CS_USE_NEW_RENDERER
+  delete[] sorted_mesh_triangles;
+#endif
 
   ClearPseudoDynLights ();
 
@@ -534,8 +540,11 @@ void csGenmeshMeshObject::SetupObject ()
       svcontext = new csShaderVariableContext ();
 
     csShaderVariable* sv;
-    sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
-    sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    if (!factory->back2front)
+    {
+      sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
+      sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    }
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
     sv->SetAccessor (&factory->scfiShaderVariableAccessor);
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
@@ -707,8 +716,8 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
       csFrustum* shadowFrust = shadowIt->Next ();
       if (shadowFrust->Contains (v))
       {
-    inShadow = true;
-    break;
+	inShadow = true;
+	break;
       }
     }
     if (inShadow) continue;
@@ -725,23 +734,22 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     // because the vector from the object center to the light center
     // in object space is equal to the position of the light
 
-
     if (cosinus > 0)
     {
       if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
       if (pseudoDyn)
       {
-    // Pseudo-dynamic
-    float bright = li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
-    if (cosinus < 1) bright *= cosinus;
-    if (bright > 2.0f) bright = 2.0f; // @@@ clamp here?
-    shadowArr->shadowmap[i] = bright;
+	// Pseudo-dynamic
+	float bright = li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+	if (cosinus < 1) bright *= cosinus;
+	if (bright > 2.0f) bright = 2.0f; // @@@ clamp here?
+	shadowArr->shadowmap[i] = bright;
       }
       else
       {
-    col = light_color * li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
-    if (cosinus < 1) col *= cosinus;
-    colors[i] += col;
+	col = light_color * li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+	if (cosinus < 1) col *= cosinus;
+	colors[i] += col;
       }
     }
   }
@@ -1009,9 +1017,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+      clip_z_plane) == false)
     return 0;
-
 
   lighting_movable = movable;
 
@@ -1022,7 +1029,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     UpdateLighting (relevant_lights, movable);
   }
 
-
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
   if (!mater)
@@ -1032,17 +1038,17 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   }
 
   if (material_needs_visit) mater->Visit ();
- 
 
-  //first, check if we have any usable mesh
-  if(lastMeshPtr->inUse == true)
+  // First check if we have any usable mesh
+  if (lastMeshPtr->inUse == true)
   {
     lastMeshPtr = 0;
     //check the list
     int i;
-    for(i = 0; i<meshes.Length (); i++)
+    for (i = 0; i<meshes.Length (); i++)
     {
-      if (meshes[i]->inUse == false){
+      if (meshes[i]->inUse == false)
+      {
         lastMeshPtr = meshes[i];
         break;
       }
@@ -1052,6 +1058,33 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       lastMeshPtr = new csRenderMesh;
       meshes.Push (lastMeshPtr);
     }
+  }
+
+  if (factory->back2front)
+  {
+    if (!sorted_index_buffer)
+    {
+      sorted_index_buffer = g3d->CreateRenderBuffer (
+      	sizeof (unsigned int)*factory->GetTriangleCount()*3,
+	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    }
+    csShaderVariable* sv = svcontext->GetVariableAdd(
+    	csGenmeshMeshObjectFactory::index_name);
+    sv->SetValue (sorted_index_buffer);
+
+    if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
+    {
+      delete[] sorted_mesh_triangles;
+      num_sorted_mesh_triangles = factory->GetTriangleCount ();
+      sorted_mesh_triangles = new csTriangle [num_sorted_mesh_triangles];
+    }
+    //... sort ... @@@
+    csTriangle* factory_triangles = factory->GetTriangles ();
+    int i;
+    for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
+      sorted_mesh_triangles[i] = factory_triangles[i];
+    sorted_index_buffer->CopyToBuffer (sorted_mesh_triangles,
+    	sizeof (unsigned int)*num_sorted_mesh_triangles*3);
   }
 
   lastMeshPtr->inUse = true;
@@ -1070,7 +1103,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
  
   n = 1;
   return &lastMeshPtr;
-
 #else
   n = 0;
   return 0;
@@ -1197,8 +1229,8 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_colors_dirty_flag = false;
       color_buffer->CopyToBuffer (
-    do_lighting ? lit_mesh_colors : static_mesh_colors,
-    sizeof (csColor) * num_lit_mesh_colors);
+	do_lighting ? lit_mesh_colors : static_mesh_colors,
+	sizeof (csColor) * num_lit_mesh_colors);
     }
     var->SetValue(color_buffer);
     return;
@@ -1310,12 +1342,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   back2front = false;
 
 #ifdef CS_USE_NEW_RENDERER
-  vertex_buffer = 0;
-  normal_buffer = 0;
-  texel_buffer = 0;
-  color_buffer = 0;
-  index_buffer = 0;
-
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
