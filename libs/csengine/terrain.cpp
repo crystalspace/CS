@@ -264,14 +264,14 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 		g3dmesh.morph_factor = 0;
 		g3dmesh.num_vertices_pool = 1;
 		g3dmesh.num_textures = 1;
-		g3dmesh.use_vertex_color = true;
+		g3dmesh.use_vertex_color = false;
 		g3dmesh.do_clip = true;	// DEBUG THIS LATER
 		g3dmesh.do_mirror = rview.IsMirrored ();
 		g3dmesh.do_morph_texels = false;
 		g3dmesh.do_morph_colors = false;
 		g3dmesh.vertex_fog = NULL;
 		g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-		g3dmesh.fxmode = CS_FX_GOURAUD;
+		g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
 		init = true;
 	}
     g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
