@@ -37,7 +37,7 @@
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
 #include "isys/event.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 
@@ -168,7 +168,7 @@ bool csApp::Initialize ()
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
   DefaultFontSize = 8;
 
-  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
     System->Printf (MSG_WARNING,
       "No image loader. Loading images will fail.\n");

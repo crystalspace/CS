@@ -56,7 +56,7 @@
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 #include "igraphic/image.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 #include "isys/vfs.h"
 #include "ivideo/halo.h"
 #include "ivideo/txtmgr.h"
@@ -489,7 +489,7 @@ bool csEngine::Initialize (iSystem* sys)
   G2D = G3D->GetDriver2D ();
 
   // don't check for failure; the engine can work without the image loader
-  ImageLoader = QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageLoader);
+  ImageLoader = QUERY_PLUGIN_ID (sys, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
     CsPrintf (MSG_WARNING, "No image loader. Loading images will fail.\n");
 

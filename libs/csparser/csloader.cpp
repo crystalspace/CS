@@ -61,7 +61,7 @@
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 #include "igraphic/image.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 #include "csgfx/csimage.h"
 
 #include "iterrain/ddg.h"
@@ -2428,7 +2428,7 @@ bool csLoader::Initialize(iSystem *System)
   if (!VFS) return false;
 
   // get all optional plugins
-  GET_PLUGIN(ImageLoader, CS_FUNCID_IMGLOADER, iImageLoader, "image loader");
+  GET_PLUGIN(ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image loader");
   GET_PLUGIN(SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
   GET_PLUGIN(Engine, CS_FUNCID_ENGINE, iEngine, "engine");
   GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");

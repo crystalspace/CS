@@ -36,14 +36,14 @@
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
-#include "igraphic/loader.h"
+#include "igraphic/imageio.h"
 
 // helper function for image loading
 
 iImage *LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  iImageLoader *ImageLoader =
-    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
+  iImageIO *ImageLoader =
+    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) return NULL;
   iImage *img = ImageLoader->Load(iBuffer, iSize, iFormat);
   ImageLoader->DecRef();
