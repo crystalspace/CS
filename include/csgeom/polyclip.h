@@ -32,8 +32,12 @@ class Dumper;
 class csClipper
 {
 public:
-  /// Clip a set of 2D points and return a new set.
-  virtual csVector2 *Clip (csVector2 *Polygon, int Count, int &OutCount) = 0;
+  /**
+   * Clip a set of 2D points and return in 'dest_poly'.
+   * 'dest_poly' must be big enough to hold the clipped polygon.
+   * Return false if polygon is not visible (clipped away).
+   */
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount) = 0;
 
   /**
    * Clip a set of 2D points and return them in the same array.
@@ -68,8 +72,8 @@ public:
   /// Initializes the clipper object to a rectangle with the given coords.
   csBoxClipper(float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2) {}
 
-  /// Clip a set of 2D points and return a new set
-  virtual csVector2 *Clip (csVector2 *Polygon, int Count, int &OutCount);
+  /// Clip a to dest_poly.
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount);
 
   /**
    * Clip a set of 2D points and return them in the same array.
@@ -137,8 +141,8 @@ public:
   /// Destroy the polygon clipper object.
   virtual ~csPolygonClipper ();
 
-  /// Clip a set of 2D points and return a new set.
-  virtual csVector2 *Clip (csVector2 *Polygon, int Count, int &OutCount);
+  /// Clip to dest_poly.
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount);
 
   /**
    * Clip a set of 2D points and return them in the same array.

@@ -24,18 +24,16 @@
 
 //---------------------------------------------------------------------------
 
-csVector2* csBoxClipper::Clip (csVector2 *Polygon, int Count, int &OutCount)
+bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount)
 {
-  CHK (csVector2* v = new csVector2[Count+5]);
-   memcpy (v, Polygon, Count * sizeof (csVector2));
+  memcpy (dest_poly, Polygon, Count * sizeof (csVector2));
   OutCount = Count;
   csBox bbox = csBox(-100000., -100000., 100000., 100000.);
-  if (Clip(v, OutCount, Count+5, &bbox)) return v;
+  if (Clip(dest_poly, OutCount, Count+5, &bbox)) return true;
    else
    {
-    CHK (delete[] v);
     OutCount = 0;
-    return NULL;
+    return false;
    }
 }
 
@@ -303,20 +301,19 @@ bool csPolygonClipper::IsInside (float x, float y)
   return true;
 }
 
-csVector2 *csPolygonClipper::Clip (csVector2 *Polygon, int Count, int &OutCount)
+bool csPolygonClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount)
 {
-  #include "polyclip.inc"
+#  include "polyclip.inc"
 
   if (OutVertices < 3)
   {
     OutCount = 0;
-    return NULL;
+    return false;
   } else
   {
-    CHK (csVector2 *result = new csVector2 [OutVertices]);
-    memcpy (result, InPolygon, OutVertices * sizeof (csVector2));
+    memcpy (dest_poly, InPolygon, OutVertices * sizeof (csVector2));
     OutCount = OutVertices;
-    return result;
+    return true;
   } /* endif */
 }
 
@@ -326,7 +323,7 @@ bool csPolygonClipper::Clip (csVector2 *Polygon, int &Count, int MaxCount,
   if (!ClipBox.Overlap (*BoundingBox))
     return false;
 
-  #include "polyclip.inc"
+#  include "polyclip.inc"
 
   if (OutVertices < 3)
   {
