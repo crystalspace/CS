@@ -6,17 +6,19 @@
 EXEMODE = 0755 ;
 FILEMODE = 0644 ;
 
-##  InstallApplication applicationname [ : subdir ]
-##    Install an application into the bindir directory. A subdirectory
-##    relative to the bindir can be specified.
-##    This rule is already invoked by the Application rule, so usually
-##    there's no need to call it manually.
+##  InstallApplication applicationname [ : subdir [ : options ] ]
+##    Install an application into the bindir directory.  A subdirectory
+##    relative to the bindir can be specified.  Possible options are "console"
+##    if this is a console application (as opposed to a GUI application).  This
+##    rule is already invoked by the Application rule, so usually there's no
+##    need to call it manually.
 rule InstallApplication
 {
   local dir = [ FDirName $(INSTALLDIR.APPLICATION) $(2) ] ;
   local target = $(<:R=$(dir):G=install) ;
 
-  if $(CONSOLEAPP_$(<)) = "yes"
+  CheckOptions console : $(3) : $(<) ;
+  if [ IsElem console : $(3) ]
   {
     InstallApplicationConsole $(target) : $(<) ;
   }
@@ -73,7 +75,7 @@ rule InstallPlugin
 ##  InstallLibrary libraryname [ : subdir ]
 ##    Install a library into the libdir directory. A subdirectory relative to
 ##    the libdar may be specified.
-##    This rule is already invoked by the Plugin rule, so usually there's no
+##    This rule is already invoked by the Library rule, so usually there's no
 ##    need to call it manually.
 rule InstallLibrary
 {

@@ -54,10 +54,15 @@ rule Application
     Depends apps : $(target) ;
   }
 
-  # construct Install Targets
+  # construct Install target
   if ! [ IsElem noinstall : $(3) ]
   {
-    InstallApplication $(target) ;
+    local install_opts ;
+    if [ IsElem console : $(3) ]
+    {
+      install_opts += console ;
+    }
+    InstallApplication $(target) : : $(install_opts) ;
   }
 
   # Link
@@ -75,4 +80,3 @@ rule Application
 # in Jambase
 Depends exe : apps ;
 NotFile apps ;
-

@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  facility which caused the "install" target to build and install all
 	  plugin modules as static link libraries (in addition to installing
 	  them as dynamically linked modules).
+	- Eric Sunshined fixed bug in Matze's recent changes to the Jam build
+	  facility which caused installation of console applications to fail on
+	  MacOS/X.  (It attempted to install them as fully wrapped GUI
+	  applications.)
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for
