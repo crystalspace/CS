@@ -86,7 +86,11 @@ SCF_EXPORT_CLASS_TABLE (clothldr)
   //SCF_EXPORT_CLASS (csClothMeshSaver, "crystalspace.mesh.saver.cloth","Crystal Space General Mesh Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
-static void ReportError (iReporter* reporter, const char* id,
+// the following function might be unused
+namespace
+{
+
+void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)
 {
   va_list arg;
@@ -105,6 +109,8 @@ static void ReportError (iReporter* reporter, const char* id,
   }
   va_end (arg);
 };
+
+} // end of anonymous namespace
 
 /*
  bool csClothFactoryLoader::ParsePolygonAndTriangulate (  
@@ -682,11 +688,10 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
   
   type->DecRef ();
 
-  int num_tri = 0;
   int num_nor = 0;
   int num_col = 0;
-  uint        VerticeOffset   = 0;
-  uint        TriangleOffset  = 0;
+  int VerticeOffset   = 0;
+  int TriangleOffset  = 0;
   bool auto_normals = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -949,10 +954,12 @@ bool csClothFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csClothFactorySaver::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  
+
+  return true;
 };
 
 void csClothFactorySaver::WriteDown (iBase *obj, iFile *file)
 {
-	obj?file:NULL;
+  (void) obj;
+  (void) file;
 };

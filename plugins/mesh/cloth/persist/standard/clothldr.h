@@ -50,7 +50,8 @@ bool csClothFactoryLoader::ParsePolygonAndTriangulate (
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
-  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context, iBase* context) {};
+  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context, iBase* context)
+  { return NULL; };
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context, iBase* context);
@@ -86,7 +87,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse a given string and return a new object for it.
-  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context, iBase* context) {};
+  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context, iBase* context)
+  { return NULL; };
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context, iBase* context);
