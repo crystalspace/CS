@@ -115,7 +115,7 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
   int i, j;
   csTriangle * tris = mesh->GetTriangles();
   int num_triangles = mesh->GetNumTriangles();
-  CHK (csVector3 * tri_normals = new csVector3[num_triangles];)
+  CHK (csVector3 * tri_normals = new csVector3[num_triangles]);
 
   // calculate triangle normals
   // get the cross-product of 2 edges of the triangle and normalize it

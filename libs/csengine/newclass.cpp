@@ -33,7 +33,7 @@ END_INTERFACE_TABLE()
 
 #define SPAWN_CLASS_HANDLER(ClassName) \
 	if(rcid==CLSID_##ClassName) { \
-		cs##ClassName *obj=CHK(new cs##ClassName); \
+		CHK(cs##ClassName *obj=new cs##ClassName); \
 		if(obj==NULL) return E_OUTOFMEMORY; \
 		obj->QueryInterface(IID_IUnknown, (void**)&c); \
 		if(c==NULL) {\
