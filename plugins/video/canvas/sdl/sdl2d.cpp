@@ -200,13 +200,16 @@ csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D (iParent)
 
 void csGraphics2DSDL::fixlibrary()
 {
-#ifdef OS_LINUX
+#if defined(OS_LINUX)
     Dl_info dlip;
 
     dladdr(sdl2d_scfInitialize,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
     CsPrintf (CS_MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);
+#elif defined(OS_WIN32)
+	CsPrintf (CS_MSG_INITIALIZATION, "SDL generic Win32 support by Crystal"
+		" Space Development Team.\n");
 #else
     CsPrintf (CS_MSG_INITIALIZATION,
               "WARNING: Your operating system is not tested\n"
