@@ -22,7 +22,7 @@ char *strdup (const char *str);
 #ifdef SYSDEF_ACCESS
 # if __MWERKS__>=0x2400
 # include <unistd.h>
-# elif
+# else
 int access (const char *path, int mode);
 # endif
 #endif // SYSDEF_ACCESS
