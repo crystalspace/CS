@@ -331,7 +331,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 
 	for (k = adj_faces[index]->Length()-1; k >= 0; k--)
 	{
-	  AdjacentFace &adj_face = adj_faces[index]->Get(k);
+	  AdjacentFace &adj_face = (*adj_faces[index])[k];
 	  /* check if there is an adjacent triangle in the same
 	    smoothing group */
 	  if (adj_face.face->smoothing & pCurFace->smoothing)
@@ -358,7 +358,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	{
 	  normal.Normalize();
 	  normindex = Vertices->AddNormal (normal);
-	  adj_faces[index]->Get(firstadjface).normal = normindex;
+	  (*adj_faces[index])[firstadjface].normal = normindex;
 	}
 	// now add the vertex
 //	if(hasTexels) 
