@@ -132,7 +132,6 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   bool rstate_flat;
   bool rstate_alphablend;
   int rstate_mipmap;
-  bool rstate_edges;
 
   bool        m_gouraud;
   DPFXMixMode m_mixmode;

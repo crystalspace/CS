@@ -213,7 +213,6 @@ m_piSystem(piSystem)
   rstate_flat = false;
   rstate_alphablend = false;
   rstate_mipmap = false;
-  rstate_edges = false;
   rstate_gouraud = true;
 }
 
@@ -1149,11 +1148,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION optio
   case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
     rstate_flat = !value;
     break;
-  case G3DRENDERSTATE_EDGESENABLE:
-    rstate_edges = value;
-    break;
   case G3DRENDERSTATE_DEBUGENABLE :
-  case G3DRENDERSTATE_LIGHTFRUSTRUMENABLE :
   case G3DRENDERSTATE_FILTERINGENABLE :
   case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
   case G3DRENDERSTATE_LIGHTINGENABLE :
@@ -1206,9 +1201,6 @@ STDMETHODIMP csGraphics3DDirect3DDx6::GetRenderState(G3D_RENDERSTATEOPTION op, l
       break;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
       retval = !rstate_flat;
-      break;
-    case G3DRENDERSTATE_EDGESENABLE:
-      retval = rstate_edges;
       break;
     case G3DRENDERSTATE_GOURAUDENABLE:
       retval = rstate_gouraud;

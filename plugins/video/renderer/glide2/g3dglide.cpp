@@ -492,7 +492,6 @@ STDMETHODIMP csGraphics3DGlide2x::Initialize ()
   rstate_flat = true;
   rstate_alphablend = true;
   rstate_mipmap = true;
-  rstate_edges = false;
 
   return S_OK;
 }
@@ -1381,11 +1380,7 @@ STDMETHODIMP csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, l
   case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
     rstate_flat = !value;
     break;
-  case G3DRENDERSTATE_EDGESENABLE:
-    rstate_edges = value;
-    break;
   case G3DRENDERSTATE_DEBUGENABLE :
-  case G3DRENDERSTATE_LIGHTFRUSTRUMENABLE :
   case G3DRENDERSTATE_FILTERINGENABLE :
   case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
   case G3DRENDERSTATE_LIGHTINGENABLE :
@@ -1435,9 +1430,6 @@ STDMETHODIMP csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op, long&
       break;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
       retval = !rstate_flat;
-      break;
-    case G3DRENDERSTATE_EDGESENABLE:
-      retval = rstate_edges;
       break;
     case G3DRENDERSTATE_GOURAUDENABLE:
       retval = rstate_gouraud;

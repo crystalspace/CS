@@ -131,7 +131,6 @@ class csGraphics3DDirect3DDx6 : public IGraphics3D
   bool rstate_flat;
   bool rstate_alphablend;
   int rstate_mipmap;
-  bool rstate_edges;
 
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
