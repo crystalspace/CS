@@ -225,9 +225,6 @@ bool csGraphics2DGLX::CreateVisuals ()
   
   while (picker.GetNextFormat (format))
   {
-    const int colorBits = format[glpfvColorBits];
-    const int colorComponentSize = 
-	((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
     const int accumBits = format[glpfvAccumColorBits];
     const int accumComponentSize = 
 	((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
@@ -235,9 +232,7 @@ bool csGraphics2DGLX::CreateVisuals ()
     {
       GLX_RGBA,
       GLX_DEPTH_SIZE, format[glpfvDepthBits],
-      GLX_RED_SIZE, colorComponentSize,
-      GLX_BLUE_SIZE, colorComponentSize,
-      GLX_GREEN_SIZE, colorComponentSize,
+      GLX_BUFFER_SIZE, format[glpfvColorBits],
       GLX_DOUBLEBUFFER,
       GLX_ALPHA_SIZE, format[glpfvAlphaBits],
       GLX_STENCIL_SIZE, format[glpfvStencilBits],
@@ -251,19 +246,21 @@ bool csGraphics2DGLX::CreateVisuals ()
     xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
     if (xvis)
     {
-      hardwareaccelerated = true;
-      break;
+      active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
+      hardwareaccelerated = glXIsDirect (dpy, active_GLContext);
+      if (hardwareaccelerated)
+	break;
+      glXDestroyContext(dpy,active_GLContext);
     }
   }
 
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
   // found, then try to figure out why it failed
-  if (!xvis)
+  if (!xvis || !hardwareaccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Cannot use preferred GLX visual - Generic visual will be used.");
-    hardwareaccelerated = false;
 
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
@@ -301,16 +298,16 @@ bool csGraphics2DGLX::CreateVisuals ()
         }
       }
     }
+    active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
+    hardwareaccelerated = glXIsDirect (dpy, active_GLContext);
   }
 
-  active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
   cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
     xvis->visual, AllocNone);
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
-    glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
-    "(indirect renderer)");
-  if (!glXIsDirect (dpy, active_GLContext))
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "GLX video driver, %s",
+    hardwareaccelerated ? "direct renderer" : "indirect renderer");
+  if (!hardwareaccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Indirect rendering may indicate a flawed OpenGL setup if you run on "

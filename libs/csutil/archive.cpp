@@ -163,7 +163,7 @@ void csArchive::ReadDirectory ()
     dset.GetIterator();
   while (it.HasNext())
   {
-    const char* dname = it.Next();
+    csString dname (it.Next());
     if (!FileExists (dname))
     {
       ArchiveEntry* f = CreateArchiveEntry(dname, 0, 0);
