@@ -157,8 +157,8 @@ bool CsBench::CreateGeometry ()
     "crystalspace.mesh.object.genmesh", "complexmesh");
   csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
     fact->GetMeshObjectFactory (), iGeneralFactoryState);
-  //int dim = 128;
-  int dim = 64;
+  int dim = 128;
+  //int dim = 64;
   float size = 5.0f;
   factstate->SetVertexCount (dim * dim);
   factstate->SetTriangleCount (2 * (dim-1) * (dim-1));

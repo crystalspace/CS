@@ -15,6 +15,8 @@ chronological order.
 	  return to them if you first saved the camera position with 'C'
 	  (then press 'c' to return). This feature is assigned to
 	  ctrl-alt-o (don't forget ctrl-d first).
+	- Jorrit increased resolution of object in csbench to have a better
+	  test for high poly object (roughly 32000 tris now).
 19-Jul-2004
 	- PK made the following changes:
 	    - Changed viewmesh to support the iBinarySaverPlugin.
