@@ -1,0 +1,9 @@
+SubDir TOP apps tools partedit ;
+
+Application partedit
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith partedit : csgeom csgfx cssys cstool csutil  ;
+
+Help partedit : "Crystal Space particle system editor" ;
+

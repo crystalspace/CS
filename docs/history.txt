@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  instance upon each invocation.
 	- Eric Sunshine removed invalid reference to non-existent
 	  partedit/Jamfile from apps/tools/Jamfile.
+	- res added the forgotten partedit/Jamfile and re-added it to 
+	  apps/tools/Jamfile.
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
 	  aligning it with jam build.  cs_pyth.cpp will now be identical
