@@ -24,16 +24,18 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <fcntl.h>
-#if defined(OS_BSD)
-#  include <machine/soundcard.h>
-#else
-#  include <sys/soundcard.h>
-#endif
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <signal.h>
 
 #include "cssysdef.h"
+#if defined(__NetBSD__)
+#  include <soundcard.h>
+#elif defined(OS_BSD)
+#  include <machine/soundcard.h>
+#else
+#  include <sys/soundcard.h>
+#endif
 #include "csutil/scf.h"
 #include "ossdrv.h"
 #include "iutil/eventh.h"
