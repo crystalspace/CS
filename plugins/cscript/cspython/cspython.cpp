@@ -60,7 +60,7 @@ csPython::~csPython()
 }
 
 extern "C" {
-  extern PythonObject * csWrapTypedObject(void *objptr, const char *tagtype, int own);
+  extern PyObject * csWrapTypedObject(void *objptr, const char *tagtype, int own);
   extern void init_cspace();
 }
 
