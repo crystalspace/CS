@@ -824,4 +824,8 @@ to @code{iSector::HitBeamPortals()}.
 @code{iVisibilityCuller::IntersectSegment()} now returns a polygon index
 instead of a portal.
 
+@subheading Portal Changes
+
+In the map loader the syntax for specifying warp vectors for portals has changed
+from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 
