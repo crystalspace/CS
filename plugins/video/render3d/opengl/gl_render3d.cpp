@@ -1332,6 +1332,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_z_plane);*/
 
   SetZMode (mymesh->z_buf_mode);
+  // @@@ maybe GL can do this for us? or in the VPs, maybe?
   SetObjectToCamera (mymesh->transform);
 
   GLenum primitivetype;
@@ -1394,8 +1395,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   else
     SetMirrorMode (mymesh->do_mirror);
 
-  csMaterialHandle* mathandle = 
-    (csMaterialHandle*)(mymesh->mathandle);
+//  csMaterialHandle* mathandle = 
+//    (csMaterialHandle*)(mymesh->mathandle);
+  csMaterialHandle* mathandle = mymesh->material ?
+    ((csMaterialHandle*)(mymesh->material->GetMaterialHandle())) :
+    NULL;
 
   statecache->SetShadeModel (GL_SMOOTH);
 

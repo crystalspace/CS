@@ -42,6 +42,7 @@ struct iLight;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
+struct iVisibilityObject;
 struct iObject;
 struct csFog;
 struct iGraphics3D;
@@ -49,8 +50,7 @@ struct iPolygon3D;
 struct iRenderView;
 struct iFrustumView;
 struct iSector;
-
-struct csRenderMeshList;
+class csRenderMesh;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 
@@ -68,6 +68,30 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
+#ifdef CS_USE_NEW_RENDERER
+
+SCF_VERSION (iSectorRenderMeshList, 0, 0, 1);
+
+/// A list of rendermeshes in a sector.
+struct iSectorRenderMeshList : public iBase
+{
+  /// Get the number of RMs in this list.
+  virtual int GetCount () = 0;
+  /**
+   * Get an RM in the list.
+   * \param index Which rendermesh to retrieve.
+   * \param mw The mesh wrapper that belongs to this object.
+   * \param visobj The mesh wrapper's visibility object. Returned
+   *  for convenience.
+   * \param rm The actual meshobject.
+   */
+  virtual void Get (int index, 
+    iMeshWrapper*& mw, 
+    iVisibilityObject*& visobj,
+    csRenderMesh*& rm) = 0;
+};
+
+#endif
 
 SCF_VERSION (iSector, 0, 5, 2);
 
@@ -209,10 +233,8 @@ struct iSector : public iBase
    * to enable the shadows.
    */
   virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
-  
-  ///
-  virtual void CollectMeshes (iRenderView* rview, 
-			      csRenderMeshList& meshes) = 0;
+
+  virtual iSectorRenderMeshList* GetRenderMeshes () = 0;
 #endif
 
   /**

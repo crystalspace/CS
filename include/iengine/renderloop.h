@@ -31,14 +31,15 @@
 
 struct iCamera;
 struct iClipper2D;
-struct csRenderMeshList;
+struct iSector;
 class csRenderView;
 
 SCF_VERSION (iRenderStep, 0, 0, 1);
 
 struct iRenderStep : public iBase
 {
-  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes) = 0;
+//  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes) = 0;
+  virtual void Perform (csRenderView* rview, iSector* sector) = 0;
 };
  
 SCF_VERSION (iRenderLoop, 0, 0, 1);

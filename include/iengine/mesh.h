@@ -401,11 +401,9 @@ struct iMeshWrapper : public iBase
 
 #ifdef CS_USE_NEW_RENDERER
   /**
-   * Draws the Z pass which fills the zbuffer for use in shadows.
-   * This pass can also be used to draw objects which don't use lighting
-   * or cast shadows
+   * Returns the render mesh.
    */
-  virtual csRenderMesh *GetRenderMesh (iRenderView* rview) = 0;
+  virtual csRenderMesh *GetRenderMesh (/*iRenderView* rview*/) = 0;
   /**
    * Draws the shadow buffer pass.  This sets of the stencil for the lights
    */

@@ -39,6 +39,7 @@ class csColor;
 
 struct iLightingInfo;
 struct iTextureHandle;
+struct iMaterialWrapper;
 
 
 /**
@@ -198,7 +199,8 @@ public:
   iStreamSource* streamsource;
 
   /// Material used for this mesh
-  iMaterialHandle* mathandle;
+  //iMaterialHandle* mathandle;
+  iMaterialWrapper* material;
 
   /// Transform to use for this mesh
   csReversibleTransform *transform;

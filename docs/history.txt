@@ -3,6 +3,13 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+22-May-2003
+	- res made the following changes:
+	    - when using the new renderer, the sector now stores the 
+	      rendermeshes of the contained meshobjects. This is different
+	      from the old system where only the mesh objects themselves
+	      knew about the rendered meshes. Not all necessary adjustments
+	      have been done yet.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented

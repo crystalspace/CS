@@ -32,6 +32,7 @@
 
 #include "iengine/engine.h"
 #include "iengine/texture.h"
+#include "iengine/material.h"
 #include "igeom/clip2d.h"
 #include "imap/services.h"
 #include "iutil/document.h"
@@ -600,12 +601,14 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
     r3d->DeactivateBuffer ((csVertexAttrib)i);
   }
 
+  iMaterialHandle* mathandle =
+    (mesh->material) ? (mesh->material->GetMaterialHandle()) : NULL;
   for (i=0; i<TEXMAX; i++)
   {
     if (texmappinglayer[i] != -1)
     {
       if (texmappinglayer[i] >= 0)
-        if (r3d->ActivateTexture (mesh->mathandle, texmappinglayer[i], i))
+        if (r3d->ActivateTexture (mathandle, texmappinglayer[i], i))
           continue;
     }
     if (texmappingdirect[i])

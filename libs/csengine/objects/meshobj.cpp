@@ -226,22 +226,22 @@ void csMeshWrapper::Draw (iRenderView *rview)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-csRenderMesh *csMeshWrapper::GetRenderMesh (iRenderView* rview)
+csRenderMesh *csMeshWrapper::GetRenderMesh (/*iRenderView* rview*/)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
   int i;
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
-  i = draw_cb_vector.Length ()-1;
+/*  i = draw_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
     if (!cb->BeforeDrawing (meshwrap, rview)) return NULL;
     i--;
-  }
+  }*/
 
-  draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
+  /*draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
   if (draw_test)
   {
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
@@ -252,12 +252,12 @@ csRenderMesh *csMeshWrapper::GetRenderMesh (iRenderView* rview)
         meshobj->NextFrame (lt,movable.GetPosition ());
         last_anim_time = lt;
       }
-    }
+    }*/
 
     UpdateDeferedLighting (movable.GetFullPosition ());
-    return meshobj->GetRenderMesh (rview, &movable.scfiMovable, zbufMode);
-  }
-  return NULL;
+    return meshobj->GetRenderMesh (/*rview, &movable.scfiMovable, zbufMode*/);
+/*  }
+  return NULL;*/
 
   /*
   for (i = 0; i < children.GetCount (); i++)

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "ivideo/graph3d.h"
 #include "cstool/csview.h"
 #include "cstool/proctex.h"
 #include "csengine/impprctx.h"
@@ -27,7 +28,6 @@
 
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 //#include "imap/parser.h"
 #include "iengine/engine.h"

@@ -232,7 +232,7 @@ public:
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 #ifdef CS_USE_NEW_RENDERER
-  virtual csRenderMesh *GetRenderMesh (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual csRenderMesh *GetRenderMesh (/*iRenderView* rview, iMovable* movable, csZBufMode zbufMode*/);
   // virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
   // virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
 #endif // CS_USE_NEW_RENDERER

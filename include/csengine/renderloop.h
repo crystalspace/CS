@@ -40,7 +40,7 @@ public:
 
   csAmbientRenderStep (csRenderLoop* rl);
 
-  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes);
+  virtual void Perform (csRenderView* rview, iSector* sector);
 };
 
 class csLightingRenderStep : public iRenderStep
@@ -52,7 +52,9 @@ public:
 
   csLightingRenderStep (csRenderLoop* rl);
 
-  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes);
+  inline void RenderMeshes (iRender3D* r3d, iShader* shader, 
+    csRenderMesh** meshes, int num);
+  virtual void Perform (csRenderView* rview, iSector* sector);
 };
 
 class csRenderLoop : public iRenderLoop

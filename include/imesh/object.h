@@ -95,8 +95,8 @@ struct iMeshObject : public iBase
   	csZBufMode zbufMode) = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  virtual csRenderMesh *GetRenderMesh (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode) = 0;
+  virtual csRenderMesh *GetRenderMesh (/*iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode*/) = 0;
 
   /*
   virtual bool DrawShadow (iRenderView* rview, iMovable* movable,

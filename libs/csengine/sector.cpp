@@ -109,6 +109,156 @@ void csSectorMeshList::FreeItem (iMeshWrapper* item)
 }
 
 //---------------------------------------------------------------------------
+
+#ifdef CS_USE_NEW_RENDERER
+
+SCF_IMPLEMENT_IBASE(csRenderMeshList)
+  SCF_IMPLEMENTS_INTERFACE (iSectorRenderMeshList)
+SCF_IMPLEMENT_IBASE_END
+
+bool csRenderMeshList::csRMLItem::operator == (const csRMLItem& other)
+{
+  return (CompareItems (this, &other) == 0); 
+}
+
+int csRenderMeshList::CompareItems (const csRMLItem* a, 
+				    const csRMLItem* b)
+{
+  long rpdiff = 
+    a->mw->GetRenderPriority() - b->mw->GetRenderPriority();
+  
+  if (rpdiff != 0) return rpdiff;
+  
+  return ((uint8*)a->rm->material - (uint8*)b->rm->material);
+}
+
+bool csRenderMeshList::FindItem (int& index, csRMLItem* item)
+{
+  int lo = 0, hi = rendermeshes.Length() - 1;
+  int mid = 0;
+  while (lo <= hi)
+  {
+    mid = (lo + hi) / 2;
+    int c = CompareItems (item, &rendermeshes[mid]);
+    if (c == 0)
+    {
+      index = mid;
+      return true;
+    }
+    else if (c > 0)
+    {
+      lo = mid + 1;
+    }
+    else
+    {
+      hi = mid - 1;
+    }
+  }
+  index = lo;
+  return false;
+}
+
+void csRenderMeshList::Add (iMeshWrapper* mw)
+{
+  csRef<iVisibilityObject> visobj = csPtr<iVisibilityObject>
+    (SCF_QUERY_INTERFACE (mw, iVisibilityObject));
+
+  int index;
+  csRMLItem item;
+
+  // for all rendermeshes...
+  {
+    item.mw = mw;
+    item.visobj = visobj;
+    item.rm = mw->GetRenderMesh ();
+
+    if (!FindItem (index, &item))
+    {
+      rendermeshes.Insert (index, item);
+    }
+  }
+}
+
+void csRenderMeshList::Remove (iMeshWrapper* mw)
+{
+  int index;
+  csRMLItem item;
+
+  // for all rendermeshes...
+  {
+    item.mw = mw;
+    // visobj isn't considered in comparison
+    item.rm = mw->GetRenderMesh ();
+
+    if (FindItem (index, &item))
+    {
+      rendermeshes.Delete (item);
+    }
+  }
+}
+
+void csRenderMeshList::Relink (iMeshWrapper* mw)
+{
+  int index;
+  csRMLItem item;
+
+  // for all rendermeshes...
+  {
+    item.mw = mw;
+    // visobj isn't considered in comparison
+    item.rm = mw->GetRenderMesh ();
+
+    if (FindItem (index, &item))
+    {
+      int cindex = index;
+      // partial insertion sort
+      while ((cindex < (rendermeshes.Length() - 1)) &&
+	(CompareItems (&item, &rendermeshes[cindex]) > 0))
+      {
+	memcpy (&rendermeshes[cindex], &rendermeshes[cindex + 1],
+	  sizeof (csRMLItem));
+	cindex++;
+      }
+      while ((cindex > 0) &&
+	(CompareItems (&item, &rendermeshes[cindex]) < 0))
+      {
+	memcpy (&rendermeshes[cindex], &rendermeshes[cindex - 1],
+	  sizeof (csRMLItem));
+	cindex--;
+      }
+      if (index != cindex)
+      {
+	memcpy (&rendermeshes[index], &rendermeshes[cindex],
+	  sizeof (csRMLItem));
+      }
+    }
+  }
+}
+
+csRenderMeshList::csRenderMeshList()
+{
+  SCF_CONSTRUCT_IBASE(NULL);
+}
+
+int csRenderMeshList::GetCount ()
+{
+  return rendermeshes.Length();
+}
+
+void csRenderMeshList::Get (int index, 
+			    iMeshWrapper*& mw, 
+			    iVisibilityObject*& visobj,
+			    csRenderMesh*& rm)
+{
+  csRMLItem& item = rendermeshes[index];
+  mw = item.mw;
+  visobj = item.visobj;
+  rm = item.rm;
+}
+
+#endif
+
+//---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iReferencedObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
@@ -202,12 +352,18 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Add (mesh);
   if (culler) RegisterMeshToCuller (mesh);
+#ifdef CS_USE_NEW_RENDERER
+  rmeshes.Add (mesh);
+#endif
 }
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Remove (mesh);
   if (culler) UnregisterMeshToCuller (mesh);
+#ifdef CS_USE_NEW_RENDERER
+  rmeshes.Remove (mesh);
+#endif
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
@@ -216,6 +372,9 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
   // priority was known!
   RenderQueues.RemoveUnknownPriority (mesh);
   RenderQueues.Add (mesh);
+#ifdef CS_USE_NEW_RENDERER
+  rmeshes.Relink (mesh);
+#endif
 }
 
 //----------------------------------------------------------------------
@@ -910,7 +1069,7 @@ int qsort_meshobjs_callback (const void *b1, const void *b2)
 {
   const csRenderMesh *r1 = (const csRenderMesh *)b1;
   const csRenderMesh *r2 = (const csRenderMesh *)b2;
-  if (r1->mathandle == r2->mathandle || r1->streamsource == r2->streamsource)
+  if (r1->material == r2->material || r1->streamsource == r2->streamsource)
     return 0;
   return r2 - r1;
 }
@@ -942,7 +1101,7 @@ void csSector::DrawZ (iRenderView* rview)
     {
       // Mesh is not in the previous sector or there is no previous
       // sector.
-      csRenderMesh *r = sp->GetRenderMesh (rview);
+      csRenderMesh *r = sp->GetRenderMesh (/*rview*/);
 	  if (r) { draw_objects.Push (r); }
     }
   }
@@ -953,14 +1112,14 @@ void csSector::DrawZ (iRenderView* rview)
 
   for (i = 0; i < draw_objects.Length(); i ++) 
   {
-	iMaterialHandle *matsave;
+/*	iMaterialHandle *matsave;
     matsave = draw_objects[i]->mathandle;
     draw_objects[i]->mathandle = NULL;
     uint mixsave = draw_objects[i]->mixmode;
 	draw_objects[i]->mixmode = CS_FX_COPY;
     r3d->DrawMesh (draw_objects[i]);
     draw_objects[i]->mathandle = matsave;
-	draw_objects[i]->mixmode = mixsave;
+	draw_objects[i]->mixmode = mixsave;*/
   }
 }
 
@@ -1092,7 +1251,7 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
 
   csHashMap shader_sort;
   for (i = 0; i < draw_objects.Length(); i ++) {
-    shader_sort.Put ((csHashKey)draw_objects[i]->mathandle->GetShader(), (csHashObject)draw_objects[i]);
+//    shader_sort.Put ((csHashKey)draw_objects[i]->mathandle->GetShader(), (csHashObject)draw_objects[i]);
   }
 
   csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (csEngine::object_reg, iBugPlug);
@@ -1119,13 +1278,13 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
         float diffuse, specular, ambient;
         csRGBpixel matcolor;
         csVector3 color (light->GetColor().red, light->GetColor().blue, light->GetColor().green);
-        mesh->mathandle->GetReflection (diffuse, specular, ambient);
-        mesh->mathandle->GetFlatColor (matcolor);
+//        mesh->mathandle->GetReflection (diffuse, specular, ambient);
+//        mesh->mathandle->GetFlatColor (matcolor);
         // color.x *= matcolor.red/255.0;
         // color.y *= matcolor.blue/255.0;
         // color.z *= matcolor.green/255.0;
-        r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, color * diffuse);
-        r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, color * specular);
+        //r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, color * diffuse);
+        //r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, color * specular);
         csZBufMode zsave = mesh->z_buf_mode;
         uint mixsave = mesh->mixmode;
         
@@ -1154,156 +1313,10 @@ void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
 
 }
 
-void csSector::CollectMeshes (iRenderView* rview, csRenderMeshList& meshes)
+iSectorRenderMeshList* csSector::GetRenderMeshes ()
 {
-  /*
-    @@@ Doesn't consider yet it can be called multiple times (in case of
-    e.g. portals)
-    @@@ Optimize, optimize, OPTIMIZE!
-    @@@ Cleanup.
-   */
-  int i;
-
-  // get a pointer to the previous sector
-/*  iSector *prev_sector = rview->GetPreviousSector ();
-
-  // look if meshes from the previous sector should be drawn
-  bool draw_prev_sector = false;
-
-  if (prev_sector)
-  {
-    iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
-      draw_prev_sector =  st->IsTransparent () ||
-        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
-  }*/
-
-  collected.meshes.DeleteAll();
-  int mesh_offset = collected.meshes.Length();
-  collected.lights.DeleteAll();
-  int light_offset = collected.lights.Length();
-
-  csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
-
-  meshes.lightnum = 0;
-  const csOrthoTransform camTransO = rview->GetCamera()->GetTransform();
-  csReversibleTransform ct = rview->GetCamera ()->GetTransform ();
-  const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
-  const csVector3 camPos = ct.GetOrigin ();
-  for (i = secs->GetCount () - 1; i >= 0; i --)
-  {
-    csRef<iLightList> seclights = secs->Get(i)->GetLights ();
-    int j;
-    for (j = seclights->GetCount() - 1; j >= 0; j --)
-    {
-      // Sphere check against rview before adding it.
-      iLight* light = seclights->Get (j);
-      csSphere s (light->GetCenter (), light->GetInfluenceRadius ());
-      if (rview->TestBSphere (camTransO, s))
-      {
-	collected.lights.Push (light);
-	meshes.lightnum++;
-      }
-    }
-  }
-
-  // Mark visible objects.
-  culler->VisTest (rview);
-  uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
-
-  objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
-
-  meshes.num = 0;
-  for (i = 0; i < num_objects; i ++)
-  {
-    iMeshWrapper *sp = objects[i];
-/*    if (
-          !prev_sector ||
-          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1 ||
-          draw_prev_sector)*/
-    {
-      // Mesh is not in the previous sector or there is no previous
-      // sector.
-      csRenderMesh *r = sp->GetRenderMesh (rview);
-      if (r)
-      {
-        collected.meshes.Push (r);
-	collected.meshIndices.Put ((csHashKey)sp, (csHashObject)(meshes.num + 1));
-	meshes.num++;
-      }
-    }
-  }
-
-  collected.lightflags.SetLength (meshes.lightnum,
-    csBitSet ());
-  for (i = 0; i < meshes.lightnum; i++)
-  {
-    collected.lightflags[i].Resize (meshes.num);
-    collected.lightflags[i].Reset ();
-    iLight* light = collected.lights[i];
-    const csVector3 lightPos = light->GetCenter ();
-    csVector3 v = lightPos - camPos;
-    bool lightBehindCamera = (camPlaneZ * v <= 0);
-
-    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
-    csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
-    
-    csVector3 rad, center;
-    float maxRadius = 0;
-    while (!objInLight->IsFinished ())
-    {
-      iMeshWrapper *sp = objInLight->GetObject() ->GetMeshWrapper ();
-      int meshIndex = sp ? ((int)collected.meshIndices.Get ((csHashKey)sp) - 1) : -1;
-      if (meshIndex != -1) 
-      {
-	sp->GetRadius (rad, center);
-        
-	csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
-	csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
-	maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
-
-	if (!lightBehindCamera) {
-	  // light is in front of camera
-	  //test if mesh is behind camera
-	  v = pos - camPos;
-	  if (!(camPlaneZ*v < -maxRadius))
-	  {
-	    collected.lightflags[i].Set (meshIndex);
-	  }
-	}
-	else {
-	  // light is behind camera
-	  // if mesh is behind the light we don't draw it
-	  v = pos - lightPos;
-	  if (!(camPlaneZ*v < -maxRadius))
-	  {
-	    collected.lightflags[i].Set (meshIndex);
-	  }
-	} 
-      }
-      objInLight->Next ();
-    }
-  }
-
-  if (meshes.num)
-  {
-    meshes.meshes = collected.meshes.GetArray() + mesh_offset; //collected.meshes.Get (mesh_offset);
-    meshes.lightflags = collected.lightflags.GetArray() + mesh_offset;
-    meshes.lights = collected.lights.GetArray() + light_offset;
-  }
-  delete[] objects;
-/*  for (i = 0; i < draw_objects.Length(); i ++) 
-  {
-	iMaterialHandle *matsave;
-    matsave = draw_objects[i]->mathandle;
-    draw_objects[i]->mathandle = NULL;
-    uint mixsave = draw_objects[i]->mixmode;
-	draw_objects[i]->mixmode = CS_FX_COPY;
-    r3d->DrawMesh (draw_objects[i]);
-    draw_objects[i]->mathandle = matsave;
-	draw_objects[i]->mixmode = mixsave;
-  }*/
-};
-
+  return &rmeshes;
+}
 
 #endif // CS_USE_NEW_RENDERER
 

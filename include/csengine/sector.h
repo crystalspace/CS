@@ -33,7 +33,7 @@
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "csutil/bitset.h"
+#include "iengine/viscull.h"
 #endif
 
 class csEngine;
@@ -93,32 +93,45 @@ public:
   virtual void FreeItem (iMeshWrapper* item);
 };
 
-#ifdef CS_USE_NEW_RENDERER  
-struct csRenderMeshList
+#ifdef CS_USE_NEW_RENDERER
+/**
+ * A list of render meshes for a sector.
+ * This list is sorted by material and renderpriority.
+ */
+class csRenderMeshList : public iSectorRenderMeshList
 {
-  /*
-    @@@ Check whether to return the originating sector
-     and an index in its mesh list instead of 
-     csRenderMesh*es each time.
-   */
+  struct csRMLItem
+  {
+    csRef<iMeshWrapper> mw;
+    csRef<iVisibilityObject> visobj;
+    csRenderMesh* rm;
 
-  /// number of meshes in this list
-  int num;
-  /// pointer to actual mesh array
-  csRenderMesh** meshes;
-  /// number of lights used
-  int lightnum;
-  /// pointer to lightflags array
-  // <number of lights> bit sets contain <number of meshes> bits
-  // which are set if a light influences a mesh
-  csBitSet* lightflags;
-  /// lights used here
-  iLight** lights;
+    // needed for csArray
+    inline bool operator == (const csRMLItem& other);
+  };
 
-  /*
-    @@@ Prolly some more info containing portals and views,
-    returned from child meshes.
-   */
+  csArray<csRMLItem> rendermeshes;
+
+  static int CompareItems (const csRMLItem* a, 
+    const csRMLItem* b);
+  bool FindItem (int& index, csRMLItem* item);
+public:
+  /// Add all rendermeshes of a mesh wrapper.
+  void Add (iMeshWrapper* mw);
+  /// Add all rendermeshes of a mesh wrapper.
+  void Remove (iMeshWrapper* mw);
+  /// Resort all rendermeshes from this mesh wrapper.
+  void Relink (iMeshWrapper* mw);
+
+  SCF_DECLARE_IBASE;
+
+  csRenderMeshList();
+
+  virtual int GetCount ();
+  virtual void Get (int index, 
+    iMeshWrapper*& mw, 
+    iVisibilityObject*& visobj,
+    csRenderMesh*& rm);
 };
 #endif
 
@@ -149,13 +162,7 @@ private:
   csRef<iRender3D> r3d;
   csRef<iShaderManager> shmgr;
 
-  struct CollectedMeshData
-  {
-    csPArray<csRenderMesh> meshes;
-    csArray<csBitSet> lightflags;
-    csPArray<iLight> lights;
-    csHashMap meshIndices;
-  } collected;
+  csRenderMeshList rmeshes;
 #endif
 
   /**
@@ -361,8 +368,7 @@ public:
   /// Third pass
   void DrawLight (iRenderView* rview, iLight *light, bool drawAfter = false);
 
-  ///
-  void CollectMeshes (iRenderView* rview, csRenderMeshList& meshes);
+  virtual iSectorRenderMeshList* GetRenderMeshes ();
 #endif
 
   //----------------------------------------------------------------------
@@ -581,10 +587,8 @@ public:
       { scfParent->DrawShadow (rview, light); }
     virtual void DrawLight (iRenderView* rview, iLight* light)
       { scfParent->DrawLight (rview, light); }
-    virtual void CollectMeshes (iRenderView* rview, csRenderMeshList& meshes)
-    {
-      scfParent->CollectMeshes (rview, meshes);
-    }
+    virtual iSectorRenderMeshList* GetRenderMeshes ()
+    { return scfParent->GetRenderMeshes (); }
 #endif // CS_USE_NEW_RENDERER
     virtual void SetSectorCallback (iSectorCallback* cb)
     {

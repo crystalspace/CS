@@ -461,7 +461,11 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
+#ifndef CS_USE_NEW_RENDERER
+  csReversibleTransform tr_o2c;
+#endif
+  // Shouldn't this be done in the renderer?
+  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   if (hard_transform)
@@ -713,7 +717,8 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 #else
   mesh.indexstart = 0;
   mesh.indexend = factory->GetTriangleCount () * 3;
-  mesh.mathandle = mater->GetMaterialHandle ();
+  //mesh.mathandle = mater->GetMaterialHandle ();
+  mesh.material = mater;
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
   mesh.streamsource = stream;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
@@ -732,19 +737,19 @@ iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
   return factory->GetBuffer (name);
 }
 
-csRenderMesh *csGenmeshMeshObject::GetRenderMesh (iRenderView* rview, iMovable* movable,
-	csZBufMode mode)
+csRenderMesh *csGenmeshMeshObject::GetRenderMesh (/*iRenderView* rview, iMovable* movable,
+	csZBufMode mode*/)
 {
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+  //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   // iRender3D* r3d = rview->GetGraphics3D ();
 
-  iCamera* camera = rview->GetCamera ();
-  tr_o2c = camera->GetTransform ();
+//  iCamera* camera = rview->GetCamera ();
+/*  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   if (hard_transform)
-    tr_o2c /= *hard_transform;
+    tr_o2c /= *hard_transform;*/
 
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
@@ -760,12 +765,13 @@ csRenderMesh *csGenmeshMeshObject::GetRenderMesh (iRenderView* rview, iMovable* 
   mesh.transform = &tr_o2c;
 
   // Prepare for rendering.
-  mesh.z_buf_mode = mode;
-  mesh.mixmode = MixMode;
+  mesh.z_buf_mode = CS_ZBUF_TEST;// mode;
+  mesh.mixmode = CS_FX_COPY; // MixMode;
 
   mesh.indexstart = 0;
   mesh.indexend = factory->GetTriangleCount () * 3;
-  mesh.mathandle = mater->GetMaterialHandle();
+  //mesh.mathandle = mater->GetMaterialHandle();
+  mesh.material = mater;
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
   mesh.streamsource = stream;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
