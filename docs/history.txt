@@ -58,6 +58,12 @@ The history order is reversed so that new features are at the top.
 	- Changed a backslash in an include statement in the new
 	  application framework header to a slash. Backslashes in include
 	  files are not allowed.
+	- Started work on threaded loading. The basic idea is that there will
+	  be an iLoader->LoadMapFileThreaded(). That function will return
+	  an iLoadingStatus object which the loader thread will update when
+	  new objects arrive and the main thread can query to add those
+	  objects to the engine as they are loaded in the loading thread.
+	  Work on the interfaces alone at this moment.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

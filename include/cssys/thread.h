@@ -22,7 +22,7 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 
-// list of errorcodes
+/// List of errorcodes for threads.
 enum
 {
   CS_THREAD_NO_ERROR = 0,
@@ -117,10 +117,11 @@ public:
 class csMutex : public csRefCount
 {
 public:
-  /** This will create a Thread. Note that the mutexes on windows are always
+  /**
+   * This will create a Thread. Note that the mutexes on windows are always
    * recursive (ie. the same thread is able to Lock the mutex multiple times)
    * while on other platforms non recursive threads may be faster to implement.
-   * If you need recursive behaviour set needrecursive to treu.
+   * If you need recursive behaviour set needrecursive to true.
    * Note: It seems Conditionals on linux only work with non-recursive
    * mutexes.
    */
