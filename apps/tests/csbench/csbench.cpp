@@ -241,8 +241,8 @@ bool CsBench::CreateTestCaseMultipleObjects ()
   // Now create the instances:
   int i;
   csVector3 p (-9, -9, 9);
-  float step = 18.0 / float (SMALLOBJECT_NUM);
-  float zstep = 2.0 / float (SMALLOBJECT_NUM);
+  float step = 18.0f / float (SMALLOBJECT_NUM);
+  float zstep = 2.0f / float (SMALLOBJECT_NUM);
   for (i = 0 ; i < SMALLOBJECT_NUM ; i++)
   {
     csRef<iMeshWrapper> mesh =
