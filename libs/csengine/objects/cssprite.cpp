@@ -50,6 +50,8 @@ csFrame::csFrame (int num_vertices)
   }
   name = NULL;
   max_vertex = num_vertices;
+  max_texel  = num_vertices;
+  max_normal = num_vertices;
   normals = NULL;
 }
 
@@ -198,6 +200,8 @@ csSpriteTemplate::csSpriteTemplate ()
 {
   cstxt = NULL;
   num_vertices = 0;
+  num_texels   = 0;
+  num_normals  = 0;
   CHK (base_mesh = new csTriangleMesh ());
   emerge_from = NULL;
   skeleton = NULL;
@@ -311,6 +315,140 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
       return GetAction (i);
 
   return NULL;
+}
+
+void csSpriteTemplate::MergeVertices (const char * action, int frame)
+{
+  // Minimize the number of 3D coordinates:
+
+  // create an array of ints which maps old vertex indices to new ones
+  // map the first new vertex to the first old vertex
+  // set the new vertex counter to one
+
+  // FOR each old vertex
+  //   FOR each new vertex
+  //     IF the vertices have the same coordinates
+  //        map this new vertex to this old vertex
+  //        next old vertex
+  //   map this old vertex to a new new vertex
+  //   increment the new vertex counter
+
+  // At this point we can compare the old vertex count to the new one
+
+  // Each vertex of difference is one more vertex that does not have
+  // to be transformed by motion, camera movement, or skeletal animation
+
+  // Calculation of memory saved is a bit complicated
+  // Don't forget to subtract the size of one extra Triangle mesh
+
+  // STOP!  The rest of these steps will no doubt break some things:
+
+  // FOR each animation frame
+  //   create a new vertex array
+  //   copy the old vertex positions into the new array
+  //   replace the old vertex array with the new one
+
+  // Create a new anim_mesh with indices to new vertex array
+}
+
+void csSpriteTemplate::MergeNormals (const char * action, int frame)
+{
+  // Combine normals of adjacent vertices based on one special frame:
+
+  // create an array of ints which maps old vertex indices to new ones
+  // map the first new vertex to the first old vertex
+  // set the new vertex counter to one
+
+  // FOR each old vertex
+  //   FOR each new vertex
+  //     IF the vertices have the same coordinates
+  //        map this new vertex to this old vertex
+  //        next old vertex
+  //   map this old vertex to a new new vertex
+  //   increment the new vertex counter
+
+  // At this point we can compare the old normals count to the new one
+
+  // The main purpose of this function is not to save space
+  // but it will save some space in many cases
+
+  // Calculation of memory saved is a bit complicated
+  // Don't forget to subtract the size of one extra Triangle mesh
+
+  // Also each combined normal is one more normal that does not have
+  // to be transformed by motion, camera movement, or skeletal animation
+
+  // STOP!  The rest of these steps will no doubt break some things:
+
+  // FOR each animation frame
+  //   create a new normals array
+  //   copy the old normals into the new array
+  //   replace the old normals array with the new one
+
+  // Create a new norm_mesh with indices to new vertex array
+}
+
+void csSpriteTemplate::MergeTexels ()
+{
+  // Merge identical texel frames:
+
+  // start a count and a list of unique texel maps
+  csVector2* unique_texel_maps [num_vertices];
+  int unique_texel_map_count;
+
+  // add the first frame to the unique texel map list
+  unique_texel_maps [0] = ((csFrame*)frames[0])->GetTexels();
+  unique_texel_map_count = 1;
+
+  // FOR each frame
+  for (int frame = 1;  frame < frames.Length(); frame ++)
+  {
+    csVector2 * texels = ((csFrame*)frames[frame])->GetTexels();
+    bool unique = true;
+
+    // FOR each unique texel map
+    for (int map = 0; map < unique_texel_map_count; map ++)
+    {
+      // IF all texture vertices are are the same in both
+      bool same = true;
+      for (int v = 0; v < num_vertices; v ++)
+      {
+        if (texels[v] != unique_texel_maps[map][v])
+        {
+          same = false;
+          break;
+        }
+      }
+      if (same)
+      {
+        unique = false;
+
+        // delete this redundant texel map
+        CHK (delete [] texels);
+
+        // change the pointer in this frame to that texel map
+        ((csFrame*)frames[frame]) -> SetTexels(unique_texel_maps[map]);
+
+        // next frame
+        break;
+      }
+    }
+    // add this frame to the unique texel map list
+    if (unique)
+    {
+      unique_texel_maps[unique_texel_map_count] = texels;
+      unique_texel_map_count ++;
+    }
+  }
+
+/*
+  // now you can compare the frame count to the unique texel map count
+  System->Printf (MSG_INITIALIZATION, "Merged %d/%d texel maps, saving %d bytes.\n",
+    frames.Length() - unique_texel_map_count, frames.Length(),
+    // Multiply the difference by the size of a texel and the number of texels
+    // to determine the number of bytes saved.
+    (frames.Length() - unique_texel_map_count) * num_vertices * sizeof(csVector2));
+*/
 }
 
 //=============================================================================

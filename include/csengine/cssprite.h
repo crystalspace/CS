@@ -53,6 +53,8 @@ private:
   csVector3* normals;
   char* name;
   int max_vertex;
+  int max_texel;
+  int max_normal;
   /// Bounding box in object space for this frame.
   csBox3 box;
 
@@ -96,6 +98,10 @@ public:
   csVector3* GetVertices () { return vertices; }
   ///
   csVector2& GetTexel (int i) { return texels[i]; }
+  ///
+  csVector2* GetTexels () { return texels; }
+  ///
+  void SetTexels (csVector2 * t) { texels = t;}
 
   ///
   csVector3& GetNormal (int i) { return normals[i]; }
@@ -191,9 +197,15 @@ private:
 
   /// The vertices.
   int num_vertices;
+  int num_texels;
+  int num_normals;
 
   /// The triangles.
   csTriangleMesh* base_mesh;
+  /// Optimized animation mesh
+  csTriangleMesh* anim_mesh;
+  /// alternate vertex smoothing scheme mesh
+  csTriangleMesh* norm_mesh;
 
   /// An optional skeleton.
   csSkeleton* skeleton;
@@ -290,6 +302,24 @@ public:
   iTextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
   /// Set the texture used for this sprite
   void SetTexture (csTextureList* textures, const char *texname);
+
+  /**
+   * Minimize the number of 3D coordinates.
+   * Reduces the size of animation frames.
+   * Speeds up interpolation and skeletal animation.
+   */
+  void MergeVertices (const char * action, int frame);
+
+  /**
+   * Combine normals of adjacent vertices based on one special frame.
+   * Eliminates unwanted gouraud shading "seams".
+   */
+  void MergeNormals (const char * action, int frame);
+
+  /**
+   * Merge identical texel frames
+   */
+  void MergeTexels ();
 
   CSOBJTYPE;
 };
