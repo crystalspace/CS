@@ -10,12 +10,12 @@
 #
 #==============================================================================
 #-------------------------------------------------------------------------------
-# openstep.mak
+# macosxs.mak
 #
-#	Build-time configuration options for the OpenStep platform.
+#	Build-time configuration options for the MacOS/X Server platform.
 #
 # *NOTE*
-#	The OpenStep 4.2 Objective-C++ compiler has a register allocation
+#	The MacOS/X Server Objective-C++ compiler has a register allocation
 #	bug which causes it to corrupt the virtual-table pointer of classes
 #	whose parent class (and sometimes parent's parent class) have very
 #	small inline constructors.  This bug only manifests itself when the
@@ -26,12 +26,12 @@
 #	directive.
 #
 #-------------------------------------------------------------------------------
-NEXT.FLAVOR=OPENSTEP
-NEXT.DESCRIPTION=OpenStep
-NEXT.ARCHS=m68k i386 sparc
-NEXT.SOURCE_DIRS=openstep
+NEXT.FLAVOR=MACOSXS
+NEXT.DESCRIPTION=MacOS/X Server
+NEXT.ARCHS=i386 ppc
+NEXT.SOURCE_DIRS=macosxs openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
-NEXT.CFLAGS.GENERAL=-Wmost -D_POSIX_SOURCE -D__STRICT_ANSI__
+NEXT.CFLAGS.GENERAL=-Wmost
 NEXT.CFLAGS.DEBUG=-finline-functions
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
