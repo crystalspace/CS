@@ -21,6 +21,19 @@ Short-term cleanups that need to be done:
 
 27-May-99:
 	- FLATCOL shading works better now.
+	- Michael Dale Long updated the GGI makefile so that it compiles
+	  again. There is still a problem in the 2D driver though. The
+	  init code needs to be moved to Initialize.
+	- Increased lightmap resolution of curves. This enhances quality a lot
+	  but it slows down lightmap calculation time. We need to find a good
+	  trade-off here. It should also be an option specific to the curve so
+	  that we can control the lightmap size differently for every curve.
+	- Added FastSqrt() function which I received from someone
+	  (unfortunatelly I don't remember who). This function is a lot faster
+	  than the normal 'sqrt()'. FastSqrt() is currently only used in the
+	  curve lightmap calculations.
+	- I removed a limitation in the LightMap class for the size of
+	  lightmaps.
 26-May-99:
 	- Received update to MazeD from Siu-Hang <shor@cse.cuhk.edu.hk>.
 	  It enables the creation of sectors and portals so that you can
@@ -30,6 +43,11 @@ Short-term cleanups that need to be done:
 	  There are still some problems which we are investigating.
 	  He also added several other things like lights and texture
 	  support.
+	- Andrew Zabolotny did an update to an OS2 script (add check for
+	  empty SHELL variable).
+	- Robert Bate added guids for RAVE graphics on the Macintosh.
+	- Robert also updated the Mac project files and did some fixes on CS.
+	- Thomas Hieber further removed references to MFC from project files.
 25-May-99:
 	- Serguei Narojnyi (Snaar) fixed a Win32 specific bug in the sockets
 	  networking driver.
