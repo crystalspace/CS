@@ -13,6 +13,8 @@ chronological order.
 	  routine.
 	- Jorrit fixed csPoly3D::ClassifyAxis() and related to also be
 	  able to return CS_POL_SAME_PLANE.
+	- Jorrit added an epsilon parameter to the csBox3::Adjacent()
+	  routines.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 

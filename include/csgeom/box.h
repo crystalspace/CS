@@ -955,25 +955,26 @@ public:
   /**
    * Test if this box is adjacent to the other on the X side.
    */
-  bool AdjacentX (const csBox3& other) const;
+  bool AdjacentX (const csBox3& other, float epsilon = SMALL_EPSILON) const;
 
   /**
    * Test if this box is adjacent to the other on the Y side.
    */
-  bool AdjacentY (const csBox3& other) const;
+  bool AdjacentY (const csBox3& other, float epsilon = SMALL_EPSILON) const;
 
   /**
    * Test if this box is adjacent to the other on the Z side.
    */
-  bool AdjacentZ (const csBox3& other) const;
+  bool AdjacentZ (const csBox3& other, float epsilon = SMALL_EPSILON) const;
 
   /**
    * Test if this box is adjacent to the other one.
    * Return -1 if not adjacent or else any of the #CS_BOX_SIDE_x etc.
    * flags to indicate the side of this box that the other
    * box is adjacent with.
+   * The epsilon value is used to decide when adjacency is ok.
    */
-  int Adjacent (const csBox3& other) const;
+  int Adjacent (const csBox3& other, float epsilon = SMALL_EPSILON) const;
 
   /**
    * Assume that 3D space is divided into 27 areas. One is inside

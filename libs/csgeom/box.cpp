@@ -470,11 +470,11 @@ csBox2 csBox3::GetSide (int side) const
   return csBox2 ();
 }
 
-bool csBox3::AdjacentX (const csBox3 &other) const
+bool csBox3::AdjacentX (const csBox3 &other, float epsilon) const
 {
   if (
-    ABS (other.MinX () - MaxX ()) < SMALL_EPSILON ||
-    ABS (other.MaxX () - MinX ()) < SMALL_EPSILON)
+    ABS (other.MinX () - MaxX ()) < epsilon ||
+    ABS (other.MaxX () - MinX ()) < epsilon)
   {
     if (MaxY () < other.MinY () || MinY () > other.MaxY ()) return false;
     if (MaxZ () < other.MinZ () || MinZ () > other.MaxZ ()) return false;
@@ -484,11 +484,11 @@ bool csBox3::AdjacentX (const csBox3 &other) const
   return false;
 }
 
-bool csBox3::AdjacentY (const csBox3 &other) const
+bool csBox3::AdjacentY (const csBox3 &other, float epsilon) const
 {
   if (
-    ABS (other.MinY () - MaxY ()) < SMALL_EPSILON ||
-    ABS (other.MaxY () - MinY ()) < SMALL_EPSILON)
+    ABS (other.MinY () - MaxY ()) < epsilon ||
+    ABS (other.MaxY () - MinY ()) < epsilon)
   {
     if (MaxX () < other.MinX () || MinX () > other.MaxX ()) return false;
     if (MaxZ () < other.MinZ () || MinZ () > other.MaxZ ()) return false;
@@ -498,11 +498,11 @@ bool csBox3::AdjacentY (const csBox3 &other) const
   return false;
 }
 
-bool csBox3::AdjacentZ (const csBox3 &other) const
+bool csBox3::AdjacentZ (const csBox3 &other, float epsilon) const
 {
   if (
-    ABS (other.MinZ () - MaxZ ()) < SMALL_EPSILON ||
-    ABS (other.MaxZ () - MinZ ()) < SMALL_EPSILON)
+    ABS (other.MinZ () - MaxZ ()) < epsilon ||
+    ABS (other.MaxZ () - MinZ ()) < epsilon)
   {
     if (MaxX () < other.MinX () || MinX () > other.MaxX ()) return false;
     if (MaxY () < other.MinY () || MinY () > other.MaxY ()) return false;
@@ -512,9 +512,9 @@ bool csBox3::AdjacentZ (const csBox3 &other) const
   return false;
 }
 
-int csBox3::Adjacent (const csBox3 &other) const
+int csBox3::Adjacent (const csBox3 &other, float epsilon) const
 {
-  if (AdjacentX (other))
+  if (AdjacentX (other, epsilon))
   {
     if (other.MaxX () > MaxX ())
       return CS_BOX_SIDE_X;
@@ -522,7 +522,7 @@ int csBox3::Adjacent (const csBox3 &other) const
       return CS_BOX_SIDE_x;
   }
 
-  if (AdjacentY (other))
+  if (AdjacentY (other, epsilon))
   {
     if (other.MaxY () > MaxY ())
       return CS_BOX_SIDE_Y;
@@ -530,7 +530,7 @@ int csBox3::Adjacent (const csBox3 &other) const
       return CS_BOX_SIDE_y;
   }
 
-  if (AdjacentZ (other))
+  if (AdjacentZ (other, epsilon))
   {
     if (other.MaxZ () > MaxZ ())
       return CS_BOX_SIDE_Z;
