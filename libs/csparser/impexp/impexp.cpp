@@ -89,7 +89,14 @@ int converter::ivcon ( const char* input_filename, bool keep_log,
   int result = ERROR;
 
   if (keep_log)
+  {
     logfile = fopen("ivcon.log","a");
+    // If we can't log to the file then we log to stdout.
+    if (!logfile)
+    {
+      logfile = stdout;
+    }
+  }
   else
     logfile = stdout;
 

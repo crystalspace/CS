@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  of 20 frames. If the camera has not been found in that time then
 	  the hunt will be canceled.
 	- Added the ability to do mouse selection in BugPlug.
+	- Added a small patch from Alistair Leslie <AlistairL@optushome.com.au>
+	  to make sure that the impexp importer doesn't crash when it cannot
+	  write to ivcon.log. In that case it will write to standard
+	  output.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
