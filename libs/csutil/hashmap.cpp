@@ -84,7 +84,8 @@ void csHashIterator::GotoNextElement ()
     // Next bucket.
     bucket_index++;
     uint32 const nbuckets = (uint32)hash->Buckets.Length();
-    while (bucket_index < nbuckets && !hash->Buckets[bucket_index])
+    while (bucket_index < nbuckets && (!hash->Buckets[bucket_index]
+	    || hash->Buckets[bucket_index]->Length()==0))
       bucket_index++;
     if (bucket_index >= nbuckets)
       bucket = NULL;	// The end
