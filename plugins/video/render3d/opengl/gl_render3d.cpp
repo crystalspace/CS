@@ -1942,7 +1942,7 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
-  if (cliptype != CS_CLIPPER_NONE)
+  /*if (cliptype != CS_CLIPPER_NONE)
   {
     csVector2 *clippoly = clipper->GetClipPoly ();
     csBox2 scissorbox;
@@ -1956,7 +1956,7 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
     glEnable (GL_SCISSOR_TEST);
   } else {
     glDisable (GL_SCISSOR_TEST);
-  }
+  }*/
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.

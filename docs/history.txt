@@ -29,6 +29,9 @@ chronological order.
 	- Anders Stenberg added scissor clipping to NR. This means a GL
 	  scissor clipping box is applied to the bounding box of the clipper, 
 	  which in practice means some fillrate is saved.
+	- Anders reverted the latest addition (or at least commented it out)
+	  since it'll probably conflict with scissor settings in the canvas.
+	  A solution for them to live in harmony should be done eventually.
 26-Mar-2004
 	- Marten added csMatrix as a type a csShaderVariable can store.
 	- Marten made the shadermanager responsible for handling the shader-
