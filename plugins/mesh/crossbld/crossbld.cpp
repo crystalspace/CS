@@ -335,7 +335,7 @@ bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
 
 	  int FrameIndex = Frames.Find (ver);
 	  CS_ASSERT (FrameIndex != -1);
-	  spract->AddFrame (tgt->GetFrame (FrameIndex), Delay * 1000);
+	  spract->AddFrame (tgt->GetFrame (FrameIndex), int(Delay * 1000));
 	}
       }
     }
