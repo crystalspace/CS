@@ -58,9 +58,12 @@ struct mmioInfo
 
     /// Base pointer to the data
     unsigned char *data;
-
+    
     /// File size
     unsigned int file_size;
+
+    /// Close FD at unmapping
+    bool close;
 };
 
 #endif // memory-mapped I/O

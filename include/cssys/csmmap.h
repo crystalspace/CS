@@ -38,6 +38,22 @@
 extern bool MemoryMapFile(mmioInfo* info, char const* filename);
 /// Unmap a file from a memory area.
 extern void UnMemoryMapFile(mmioInfo* info);
+/**
+ * Memory map in part of a file.
+ * Provides more control than the standard MemoryMapFile().
+ * The mmioInfo struct is compatible, UnMapMemoryFile() should
+ * be used to unmap.
+ */
+extern bool MemoryMapWindow(mmioInfo*, char const* filename, unsigned int offset, unsigned int len, bool writable);
+/**
+ * Memory map in another part of an already mapped file.
+ * Provides more control than the standard MemoryMapFile().
+ * The mmioInfo struct is compatible, UnMapMemoryFile() should
+ * be used to unmap.
+ * This struct will reuse filehandles and any other possible resource
+ * from the already mapped file.
+ */
+extern bool MemoryMapWindow(mmioInfo*, mmioInfo * original, unsigned int offset, unsigned int len, bool writable);
 #endif
 
 #endif // __CS_CSSYS_CSMMAP_H__

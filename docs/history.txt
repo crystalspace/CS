@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	- Anders Stenberg 
 	  -  made sure NextFrame is called when rendering with new renderer.
 	  -  fixed a bug where xorpat assumed width == height.
+	- DeSigna 
+	  - added a pair of MemoryMapWindow() functions, allow mapping
+	    parts of files, mapping in read/write files and re-using
+	    file handles for multiple windows into the same file. 
+	  - MemoryMapFile() was modified to work with these new
+	    functions.  
 01-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).

@@ -26,31 +26,64 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+static bool map_window(mmioInfo * info, int fd, unsigned int offset, unsigned int len, bool writable) 
+{
+  unsigned char * p = (unsigned char*)mmap(0, len, PROT_READ | (writable ? PROT_WRITE : 0), MAP_PRIVATE, fd, offset);
+
+  if ((int)p != -1) {
+    info->hMappedFile = fd;
+    info->data = p;
+    info->file_size = len;
+    info->close = true;
+
+    return true;
+  }
+  
+  return false;
+}
+
+bool MemoryMapWindow(mmioInfo * info, mmioInfo * original, unsigned int offset, unsigned int len, bool writable) 
+{
+  if (map_window(info, original->hMappedFile, offset, len, writable)) {
+    info->close = false;
+
+    return true;
+  }
+
+  return false;
+}
+
+bool MemoryMapWindow(mmioInfo * info, char const * filename, unsigned int offset, unsigned int len, bool writable) 
+{
+  int fd = open(filename, (writable ? O_RDWR : O_RDONLY));
+
+  if (fd != -1 && map_window(info, fd, offset, len, writable))
+    return true;
+
+  close(fd);
+
+  return false;
+}
+
 bool MemoryMapFile(mmioInfo* info, char const* filename)
 {   
-  bool ok = false;
   struct stat st;
   int const fd = open(filename, O_RDONLY);
-  if (fd != -1 && fstat(fd, &st) != -1)
-  {
-    unsigned char* p=(unsigned char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if ((int)p != -1)
-    {
-      info->hMappedFile = fd;
-      info->data = p;
-      info->file_size = st.st_size;
-      ok = true;
-    }
-  }
-  if (!ok && fd != -1)
-    close(fd);
-  return ok;
+
+  if (fd != -1 && fstat(fd, &st) != -1 && map_window(info, fd, 0, st.st_size, false))
+    return true;
+
+  close(fd);
+  
+  return false;
 }
 
 void UnMemoryMapFile(mmioInfo* info)
 {
   if (info->data != 0)
     munmap((char*)info->data, info->file_size);
-  if (info->hMappedFile != -1)
+
+  if (info->hMappedFile != -1 && info->close)
     close(info->hMappedFile);
 }
+
