@@ -5,6 +5,16 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug that caused stray particle systems to be visible
 	  in csdemo. This bug was actually rather bad and would case
 	  children of mesh objects to be drawn several times unneeded.
+	- Martin Geisse did further work on csparser and csengine.
+	- Philip Wyett made csbumptest use a config file.
+	- Wouter Wijngaards did two small fixes to bumptest:
+	    - Improved efficiency of the procedural bumpmap, added a
+	      RecalcFast method. The new method is >10x faster. Although
+	      theoretically the quality should be lower, I cannot see
+	      any difference.
+	    - Procedural bump texture is now independent of u,v direction
+	      size.
+	    - Bumptest only does engine::Prepare once now.
 28-Apr-2001
 	- Removed a type->DecRef() in engine.cpp. The mesh object type
 	  plugins can remain in memory. This DecRef() caused crashes
