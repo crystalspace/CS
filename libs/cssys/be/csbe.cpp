@@ -101,7 +101,7 @@ bool CrystApp::QuitRequested()
 	// shutdown rendering thread first.
 	driver->Shutdown();
 	snooze(200000);
-	// put in because I have moved drawing into that thread.
+	// put in because I (dh) have moved drawing into that thread.
 	err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);
 	
 	printf("LoopThread blown away. err code is %lx \n", err_code);
@@ -315,11 +315,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 	isys->Release();
 };
 
-long csSystemDriver::Time()
-{
-	return system_time()/1000;
-}
-
 static int32 begin_loop(void* data)
 {
 	snooze(100000); // FIXME: Needed?
@@ -357,7 +352,6 @@ long SysSystemDriver::LoopThread()
 		NextFrame(curr_time - prev_time, curr_time);
 		prev_time=curr_time;
 	}	
-//	printf("LoopThread: Exiting loop.\n");
 	return 0;
 }
 
