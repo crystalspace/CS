@@ -72,6 +72,8 @@ class G2DTestSystemDriver : public SysSystemDriver
   iFont *font;
 
 public:
+  iGraphics2D *myG2D;
+public:
   G2DTestSystemDriver ();
   virtual ~G2DTestSystemDriver ();
   virtual bool CheckDrivers () { return true; }
@@ -172,10 +174,10 @@ void G2DTestSystemDriver::NextFrame ()
     case stTestTextDraw:
     case stTestTextDraw2:
     {
-      if (!G2D->BeginDraw ())
+      if (!myG2D->BeginDraw ())
         break;
 
-      G2D->Clear (black);
+      myG2D->Clear (black);
       LeaveState ();
       switch (curstate)
       {
@@ -202,9 +204,9 @@ void G2DTestSystemDriver::NextFrame ()
           EnterState (stWaitKey);
           break;
         case stBackBufferON:
-          G2D->AllowCanvasResize (false);
+          myG2D->AllowCanvasResize (false);
           EnterState (stBackBufferOFF);
-          if (G2D->DoubleBuffer (true))
+          if (myG2D->DoubleBuffer (true))
           {
             DrawBackBufferON ();
             SwitchBB = true;
@@ -213,7 +215,7 @@ void G2DTestSystemDriver::NextFrame ()
           break;
         case stBackBufferOFF:
           EnterState (stTestLineDraw);
-          if (G2D->DoubleBuffer (false))
+          if (myG2D->DoubleBuffer (false))
           {
             DrawBackBufferOFF ();
             SwitchBB = true;
@@ -249,8 +251,8 @@ void G2DTestSystemDriver::NextFrame ()
         default:
           break;
       }
-      G2D->FinishDraw ();
-      G2D->Print (NULL);
+      myG2D->FinishDraw ();
+      myG2D->Print (NULL);
       break;
     }
     case stPause:
@@ -269,7 +271,7 @@ void G2DTestSystemDriver::NextFrame ()
       {
         if (SwitchBB)
         {
-          G2D->Print (NULL);
+          myG2D->Print (NULL);
           Sleep (200);
         }
         else
@@ -294,9 +296,9 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
             for (r = 0; r < 8; r++)
               for (g = 0; g < 8; g++)
                 for (b = 0; b < 4; b++)
-                  G2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
+                  myG2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
 
-            pfmt = *G2D->GetPixelFormat ();
+            pfmt = *myG2D->GetPixelFormat ();
             white = MakeColor (255, 255, 255);
             yellow = MakeColor (255, 255, 0);
             green = MakeColor (0, 255, 0);
@@ -353,7 +355,7 @@ int G2DTestSystemDriver::MakeColor (int r, int g, int b)
 void G2DTestSystemDriver::SetFont (const char *iFontID)
 {
   if (font) font->DecRef ();
-  iFontServer *fs = G2D->GetFontServer ();
+  iFontServer *fs = myG2D->GetFontServer ();
   font = fs->LoadFont (iFontID);
 }
 
@@ -370,28 +372,28 @@ void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
   int fw, fh;
   font->GetDimensions (text, fw, fh);
 
-  int x = (G2D->GetWidth () - fw) / 2;
+  int x = (myG2D->GetWidth () - fw) / 2;
   int y = 0;
 
   switch (mode)
   {
     case 0: // centered by Y
-      y = dy + G2D->GetHeight () / 2;
+      y = dy + myG2D->GetHeight () / 2;
       break;
     case 1: // from top
       y = dy;
       break;
     case 2: // from bottom
-      y = dy + (G2D->GetHeight () - 1 - fh);
+      y = dy + (myG2D->GetHeight () - 1 - fh);
       break;
   }
 
-  G2D->Write (font, x, y, fg, bg, text);
+  myG2D->Write (font, x, y, fg, bg, text);
 }
 
 void G2DTestSystemDriver::DrawStartupScreen ()
 {
-  G2D->DrawBox (20, 20, G2D->GetWidth () - 40, G2D->GetHeight () - 40, blue);
+  myG2D->DrawBox (20, 20, myG2D->GetWidth () - 40, myG2D->GetHeight () - 40, blue);
 
   SetFont (CSFONT_ITALIC);
   WriteCentered (0, -20, white, -1, "WELCOME");
@@ -408,7 +410,7 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   SetFont (CSFONT_LARGE);
 
   WriteCentered (0,-16*3, white, -1, "Some information about graphics context");
-  WriteCentered (0,-16*2, gray,  -1, "Screen size: %d x %d", G2D->GetWidth (), G2D->GetHeight ());
+  WriteCentered (0,-16*2, gray,  -1, "Screen size: %d x %d", myG2D->GetWidth (), myG2D->GetHeight ());
   char pixfmt [50];
   if (pfmt.PalEntries)
     sprintf (pixfmt, "%d colors (Indexed)", pfmt.PalEntries);
@@ -423,9 +425,9 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   WriteCentered (0, 16*0, gray,  -1, "R/G/B masks: %s", pixfmt);
 
   WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
-    G2D->GetDoubleBufferState () ? "yes" : "no");
+    myG2D->GetDoubleBufferState () ? "yes" : "no");
   int MinX, MinY, MaxX, MaxY;
-  G2D->GetClipRect (MinX, MinY, MaxX, MaxY);
+  myG2D->GetClipRect (MinX, MinY, MaxX, MaxY);
   WriteCentered (0, 16*2, gray,  -1, "Current clipping rectangle: %d,%d - %d,%d", MinX, MinY, MaxX, MaxY);
 
   SetFont (CSFONT_COURIER);
@@ -441,7 +443,7 @@ void G2DTestSystemDriver::DrawWindowScreen ()
   WriteCentered (0,-16*1, green, -1, APP_TITLE);
 
 // By default context resizing should be disabled
-//G2D->AllowCanvasResize (false);
+//myG2D->AllowCanvasResize (false);
   WriteCentered (0, 16*1, white, -1, "Try to resize this window, you should either be");
   WriteCentered (0, 16*2, white, -1, "unable to do it, or the window contents should");
   WriteCentered (0, 16*3, white, -1, "rescale along width window (e.g. the resolution");
@@ -455,8 +457,8 @@ void G2DTestSystemDriver::DrawWindowResizeScreen ()
 {
   DrawWindowScreen ();
 
-  G2D->AllowCanvasResize (true);
-  G2D->DrawBox (0, G2D->GetHeight () / 2 + 16, G2D->GetWidth (), 16 * 4, blue);
+  myG2D->AllowCanvasResize (true);
+  myG2D->DrawBox (0, myG2D->GetHeight () / 2 + 16, myG2D->GetWidth (), 16 * 4, blue);
   SetFont (CSFONT_LARGE);
 
   WriteCentered (0, 16*1, white, -1, "Now resizing should be enabled. Try to resize the");
@@ -470,22 +472,22 @@ void G2DTestSystemDriver::DrawWindowResizeScreen ()
 
 void G2DTestSystemDriver::ResizeContext ()
 {
-  if (!G2D->BeginDraw ())
+  if (!myG2D->BeginDraw ())
     return;
 
-  G2D->Clear (black);
+  myG2D->Clear (black);
   DrawWindowResizeScreen ();
 
   char text [50];
-  sprintf (text, "Canvas [%d x %d]", G2D->GetWidth (), G2D->GetHeight ());
+  sprintf (text, "Canvas [%d x %d]", myG2D->GetWidth (), myG2D->GetHeight ());
   SetFont (CSFONT_LARGE);
   int fw, fh;
   font->GetDimensions (text, fw, fh);
-  int x = G2D->GetWidth () - fw;
-  G2D->Write (font, x, 0, red, -1, text);
+  int x = myG2D->GetWidth () - fw;
+  myG2D->Write (font, x, 0, red, -1, text);
 
-  G2D->FinishDraw ();
-  G2D->Print (NULL);
+  myG2D->FinishDraw ();
+  myG2D->Print (NULL);
 }
 
 void G2DTestSystemDriver::DrawBackBufferText ()
@@ -502,31 +504,31 @@ void G2DTestSystemDriver::DrawBackBufferText ()
   WriteCentered (0, 16*2, gray,  -1, "current canvas plugin have correctly implemented");
   WriteCentered (0, 16*3, gray,  -1, "double-backbuffer support.");
 
-  WriteCentered (0, 16*5, green, -1, "BACK BUFFER NUMBER %d", G2D->GetPage ());
+  WriteCentered (0, 16*5, green, -1, "BACK BUFFER NUMBER %d", myG2D->GetPage ());
 }
 
 void G2DTestSystemDriver::DrawBackBufferON ()
 {
-  G2D->Clear (yellow);
+  myG2D->Clear (yellow);
   DrawBackBufferText ();
-  G2D->FinishDraw ();
-  G2D->Print (NULL);
+  myG2D->FinishDraw ();
+  myG2D->Print (NULL);
 
-  if (!G2D->BeginDraw ())
+  if (!myG2D->BeginDraw ())
     return;
-  G2D->Clear (red);
+  myG2D->Clear (red);
   DrawBackBufferText ();
 }
 
 void G2DTestSystemDriver::DrawBackBufferOFF ()
 {
-  G2D->Clear (white);
-  G2D->FinishDraw ();
-  G2D->Print (NULL);
-  if (!G2D->BeginDraw ())
+  myG2D->Clear (white);
+  myG2D->FinishDraw ();
+  myG2D->Print (NULL);
+  if (!myG2D->BeginDraw ())
     return;
 
-  G2D->Clear (black);
+  myG2D->Clear (black);
 
   SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*3, white, -1, "SINGLE BACK BUFFER TEST");
@@ -542,18 +544,18 @@ void G2DTestSystemDriver::DrawLineTest ()
 #if 0
 
   // some tests for some special kinds of lines
-  G2D->DrawLine (0, 0, 200, 200, yellow);
-  G2D->DrawLine (0, 0, 205, 200, red);
-  G2D->DrawLine (0, 0, 195, 200, green);
+  myG2D->DrawLine (0, 0, 200, 200, yellow);
+  myG2D->DrawLine (0, 0, 205, 200, red);
+  myG2D->DrawLine (0, 0, 195, 200, green);
 
-  int w = G2D->GetWidth ();
-  G2D->DrawLine (0, 250, w / 3, 250, red);
-  G2D->DrawLine (w / 3, 250.1, w * 2 / 3, 250.1, red);
-  G2D->DrawLine (w * 2 / 3, 250.99, w, 250.99, red);
+  int w = myG2D->GetWidth ();
+  myG2D->DrawLine (0, 250, w / 3, 250, red);
+  myG2D->DrawLine (w / 3, 250.1, w * 2 / 3, 250.1, red);
+  myG2D->DrawLine (w * 2 / 3, 250.99, w, 250.99, red);
 
-  G2D->DrawLine (200, G2D->GetHeight () - 200, 0, G2D->GetHeight (), blue);
+  myG2D->DrawLine (200, myG2D->GetHeight () - 200, 0, myG2D->GetHeight (), blue);
 
-  G2D->DrawLine (81, 221, 519, 221, white);
+  myG2D->DrawLine (81, 221, 519, 221, white);
 
 #else
 
@@ -565,25 +567,25 @@ void G2DTestSystemDriver::DrawLineTest ()
   WriteCentered (0,-16*1, gray,  -1, "top-left corner of the canvas.");
 
   float py = -1;
-  for (int a = 0; a <= G2D->GetWidth (); a += 8)
+  for (int a = 0; a <= myG2D->GetWidth (); a += 8)
   {
     float angle = float (a) / 30;
     float y = int (80 + sin (angle) * 60);
     if (py > 0)
-      G2D->DrawLine (a - 8, py, a, y, red);
-    G2D->DrawLine (0, 0, a, y, yellow);
+      myG2D->DrawLine (a - 8, py, a, y, red);
+    myG2D->DrawLine (0, 0, a, y, yellow);
     py = y;
   }
 
   WriteCentered (0, 16*1, gray,  -1, "At the bottom of the screen you should see several");
   WriteCentered (0, 16*2, gray,  -1, "lines interruped by a white pixel in the middle.");
 
-  int w = G2D->GetWidth ();
+  int w = myG2D->GetWidth ();
   float x = (w / 2) + 0.5;
-  float y = G2D->GetHeight () - 50.5;
-  G2D->DrawPixel (int(x), int(y), white);
-  G2D->DrawLine (0, y - 0.5, x - 0.5, y - 0.5, red);
-  G2D->DrawLine (x + 0.5, y + 0.49, w, y + 0.49, red);
+  float y = myG2D->GetHeight () - 50.5;
+  myG2D->DrawPixel (int(x), int(y), white);
+  myG2D->DrawLine (0, y - 0.5, x - 0.5, y - 0.5, red);
+  myG2D->DrawLine (x + 0.5, y + 0.49, w, y + 0.49, red);
 
   // Compute the slope for a line that is going through (x,y)
   float y1 = y - 5;
@@ -591,19 +593,19 @@ void G2DTestSystemDriver::DrawLineTest ()
   float dy = float (y2 - y1) / float (w);
   float y11 = y1 + (x - 0.5 ) * dy;
   float y12 = y1 + (x + 0.5) * dy;
-  G2D->DrawLine (0, y1, x - 0.5, y11, blue);
-  G2D->DrawLine (x + 0.5, y12, w, y2, blue);
+  myG2D->DrawLine (0, y1, x - 0.5, y11, blue);
+  myG2D->DrawLine (x + 0.5, y12, w, y2, blue);
 
-  G2D->DrawLine (x, y - 20, x, y - 0.5, gray);
-  G2D->DrawLine (x, y + 0.5, x, y + 20, gray);
+  myG2D->DrawLine (x, y - 20, x, y - 0.5, gray);
+  myG2D->DrawLine (x, y + 0.5, x, y + 20, gray);
 
   WriteCentered (0, 16*4, gray,  -1, "A little above you should see four adjanced horizontal");
   WriteCentered (0, 16*5, gray,  -1, "lines of blue, green, red and yellow colors.");
 
-  G2D->DrawLine (0, y - 43 - 0.5,  w - 0.9, y - 43,        blue);
-  G2D->DrawLine (0, y - 42 + 0.49, w + 0.9, y - 42,        green);
-  G2D->DrawLine (0, y - 41,        w,       y - 41 - 0.5,  red);
-  G2D->DrawLine (0, y - 40,        w - 0.5, y - 40 + 0.49, yellow);
+  myG2D->DrawLine (0, y - 43 - 0.5,  w - 0.9, y - 43,        blue);
+  myG2D->DrawLine (0, y - 42 + 0.49, w + 0.9, y - 42,        green);
+  myG2D->DrawLine (0, y - 41,        w,       y - 41 - 0.5,  red);
+  myG2D->DrawLine (0, y - 40,        w - 0.5, y - 40 + 0.49, yellow);
 #endif
 }
 
@@ -612,22 +614,22 @@ void G2DTestSystemDriver::DrawLinePerf ()
   SetFont (CSFONT_ITALIC);
   WriteCentered (0,-16*4, white, -1, "LINE SLOPE AND PERFORMANCE TEST");
 
-  int w2 = G2D->GetWidth () / 2;
+  int w2 = myG2D->GetWidth () / 2;
   int colors [4] = { red, green, blue, yellow };
   for (int a = 0; a < 360; a += 5)
   {
     float angle = (a * 2 * PI) / 360.0;
     float x = w2 + 80 * cos (angle);
     float y = 100 + 80 * sin (angle);
-    G2D->DrawLine (w2, 100, x, y, colors [a & 3]);
+    myG2D->DrawLine (w2, 100, x, y, colors [a & 3]);
   }
 
   // Compute the size for the random lines box
   int sx = 0;
-  int sw = G2D->GetWidth ();
-  int sy = G2D->GetHeight () / 2;
+  int sw = myG2D->GetWidth ();
+  int sy = myG2D->GetHeight () / 2;
   int sh = sy;
-  G2D->DrawBox (sx, sy + 16, sw, sh - 16, dsteel);
+  myG2D->DrawBox (sx, sy + 16, sw, sh - 16, dsteel);
 
   SetFont (CSFONT_LARGE);
   WriteCentered (0,-16*2, gray,  -1, "Above this text you should see a uniformly hashed circle,");
@@ -648,11 +650,11 @@ void G2DTestSystemDriver::DrawLinePerf ()
       float y1 = sy + rng.Get () * sh;
       float x2 = sx + rng.Get () * sw;
       float y2 = sy + rng.Get () * sh;
-      G2D->DrawLine (x1, y1, x2, y2, colors [rng.Get (4)]);
+      myG2D->DrawLine (x1, y1, x2, y2, colors [rng.Get (4)]);
       x2 = QInt (x2 - x1); y2 = QInt (y2 - y1);
       pix_count += sqrt (x2 * x2 + y2 * y2);
     }
-    G2D->PerformExtension ("flush");
+    myG2D->PerformExtension ("flush");
     delta_time = Time () - start_time;
   } while (delta_time < 500);
   pix_count = pix_count * (1000.0 / delta_time);
@@ -662,12 +664,12 @@ void G2DTestSystemDriver::DrawLinePerf ()
 void G2DTestSystemDriver::DrawTextTest ()
 {
   // Draw a grid of lines so that transparent text background will be visible
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
   for (int x = 0; x < w; x += 4)
   {
-    G2D->DrawLine (x, 0, x + 50, h, dsteel);
-    G2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
+    myG2D->DrawLine (x, 0, x + 50, h, dsteel);
+    myG2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
   }
 
   SetFont (CSFONT_ITALIC);
@@ -682,7 +684,7 @@ void G2DTestSystemDriver::DrawTextTest ()
 
   SetFont (CSFONT_COURIER);
   int sx = 0, sy = h / 2 + 48, sw = w, sh = h / 2 - 48;
-  G2D->DrawBox (sx, sy, sw, sh, dsteel);
+  myG2D->DrawBox (sx, sy, sw, sh, dsteel);
   const char *text = "Crystal Space rulez";
   int tw, th;
   font->GetDimensions (text, tw, th);
@@ -701,10 +703,10 @@ void G2DTestSystemDriver::DrawTextTest ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (font, int(x), int(y), colors [rng.Get (4)], black, text);
+      myG2D->Write (font, int(x), int(y), colors [rng.Get (4)], black, text);
       char_count += cc;
     }
-    G2D->PerformExtension ("flush");
+    myG2D->PerformExtension ("flush");
     delta_time = Time () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
@@ -715,12 +717,12 @@ void G2DTestSystemDriver::DrawTextTest ()
 void G2DTestSystemDriver::DrawTextTest2 ()
 {
   // Draw a grid of lines so that transparent text background will be visible
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
   for (int x = 0; x < w; x += 4)
   {
-    G2D->DrawLine (x, 0, x + 50, h, dsteel);
-    G2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
+    myG2D->DrawLine (x, 0, x + 50, h, dsteel);
+    myG2D->DrawLine (w - x, 0, w - x - 50, h, dsteel);
   }
 
   SetFont (CSFONT_ITALIC);
@@ -732,7 +734,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
 
   SetFont (CSFONT_COURIER);
   int sx = 0, sy = h / 2 + 48, sw = w, sh = h / 2 - 48;
-  G2D->DrawBox (sx, sy, sw, sh, dsteel);
+  myG2D->DrawBox (sx, sy, sw, sh, dsteel);
   const char *text = "Crystal Space rulez";
   int tw,th;
   font->GetDimensions (text, tw, th);
@@ -751,10 +753,10 @@ void G2DTestSystemDriver::DrawTextTest2 ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (font, int(x), int(y), colors [rng.Get (4)], -1, text);
+      myG2D->Write (font, int(x), int(y), colors [rng.Get (4)], -1, text);
       char_count += cc;
     }
-    G2D->PerformExtension ("flush");
+    myG2D->PerformExtension ("flush");
     delta_time = Time () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
@@ -775,8 +777,9 @@ int main (int argc, char *argv[])
     return -1;
   }
 
+  System.myG2D = QUERY_PLUGIN (&System, iGraphics2D);
   // Now load the canvas plugin
-  if (!System.G2D)
+  if (!System.myG2D)
   {
     const char *canvas = System.GetOptionCL ("canvas");
     if (!canvas || !*canvas)
@@ -788,10 +791,12 @@ int main (int argc, char *argv[])
       strcat (tmp, canvas);
       canvas = tmp;
     }
-    System.G2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    System.myG2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
+    System.G2D = System.myG2D; // @@ temporary as long as the rest of CS relies on G2D variable in System
+    System.myG2D->IncRef ();
   }
 
-  if (!System.G2D)
+  if (!System.myG2D)
   {
     System.Printf (MSG_FATAL_ERROR, "Unable to load canvas driver!\n");
     return -1;
@@ -804,6 +809,7 @@ int main (int argc, char *argv[])
   }
 
   System.Loop ();
-  System.G2D->Close();
+  System.myG2D->Close();
+  System.myG2D->DecRef ();
   return 0;
 }
