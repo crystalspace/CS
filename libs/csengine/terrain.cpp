@@ -225,6 +225,41 @@ void csTerrain::Draw (csRenderView& /*rview*/, bool /*use_z_buf*/)
 
 			ddgAssert(s >= 0 && s + bt->visTriangle() <= vbuf->inum());
 /*
+
+	ALEX: Here you see how you can render a mesh of triangles
+	in CS. Note that a mesh can only have one texture so you
+	need to call DrawTriangleMesh for every texture you have.
+	It is best that you can collect as many triangles with that
+	texture together as you can. I don't know how your code
+	returns the triangles? Grouped per texture would be best.
+
+  // Setup the structure for DrawTriangleMesh.
+  G3DTriangleMesh mesh;
+  mesh.txt_handle[0] = _textureMap[i/2];
+  mesh.num_vertices = ALEX: number of shared vertices for all triangles
+  // All the three below arrays have num_vertices elements.
+  mesh.vertices[0] = ALEX: pointer to array of csVector3 for all those verts
+  mesh.texels[0][0] = ALEX: pointer to array of csVector2 for uv coordinates
+  mesh.vertex_colors[0] = ALEX: pointer to array of csColor for color information.
+  mesh.morph_factor = 0;
+  mesh.num_vertices_pool = 1;
+  mesh.num_textures = 1;
+
+  mesh.num_triangles = ALEX: number of triangles
+  mesh.triangles = ALEX: pointer to array of csTriangle for all triangles
+
+  mesh.use_vertex_color = true;
+  mesh.do_clip = true;	// DEBUG THIS LATER
+  mesh.do_mirror = rview.IsMirrored ();
+  mesh.do_morph_texels = false;
+  mesh.do_morph_colors = false;
+  mesh.vertex_fog = NULL;
+
+  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+  mesh.fxmode = CS_FX_GOURAUD;
+  rview.g3d->DrawTriangleMesh (mesh);
+
+  //else
 	JORRIT: Here is how I render triangles in DDG.
 
 				Really render the vertex array.  Open GL example
