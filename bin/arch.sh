@@ -34,7 +34,9 @@ if [ -z "$CPU" ]; then
   # Now find more specific
   case ${SYSTYPE} in
     linux*)
-      CPU=`cat /proc/cpuinfo | sed -ne "/^cpu     /p" | sed -e "s/.*://"`
+      if [ -r /proc/cpuinfo ]; then
+        CPU=`cat /proc/cpuinfo | sed -ne "/^cpu     /p" | sed -e "s/.*://"`
+      fi
       ;;
     hurd*)
       CPU=`dpkg --print-architecture 2>/dev/null`
