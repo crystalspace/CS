@@ -39,24 +39,53 @@ struct iCollider;
 SCF_VERSION (iPosition, 0, 1, 0);
 
 /**
- * A position in the Crystal Space world
+ * A position in the Crystal Space world, coupled together with an orientation
+ * You can create a position by using the CREATE_INSTANCE function or if you 
+ * want to create a linked position (where one object follows an other like they
+ * would be mechanically linked) by calling CreateLinkedPosition in an existing
+ * objects. 
  */
 struct iPosition : public iBase
 {
-  /// Sets the position using traditional access.
-  virtual SetPosition (csSector* pSector, const csVector3& Pos) = 0;
+  /**
+   * Sets the position using traditional access.
+   * pSector is a pointer to the sector,
+   * Pos is the worldspace position in that sector,
+   * Orientation is the orientation of the entity
+   * In oritentation: x is the roation around the upward axis,
+   *                  y is the elevation against the floor plane
+   *                  z is the rotation of the object around the 
+   *                    forward axis
+   * All angles are in Rad, which means 360° = 2Pi
+   * So the orientation will allow you, to have the object being turned
+   * in every possible orentation, but you can not stretch or bend it.
+   * (Of course that could be possible in classes that extend the 
+   * current iPosition interface.)
+   */
+  virtual SetPosition (iSector*         pSector, 
+                       const csVector3& Pos, 
+                       const csVector3& Orientation) = 0;
   
   /// Set the position, using an existing position object.
   virtual SetPosition (iPosition* pPos) = 0;
+
+  /// Gets the current sector.
+  virtual csSector* GetSector () = 0;
+
+  /// Gets the current position in the world.
+  virtual csVector3 GetVector () = 0;
+
+  /// Gets the orientation, as being set by SetOrientation
+  virtual csVector3 GetOrientation() = 0;
+
+  /// Gets Orientation and Vector in one structure
+  virtual csTransform GetTransform() = 0;
 
   /**
    * Move the Position by a relative Vector. 
    * returns false, if that move is not possible.
    */
   virtual bool Move (const csVector3& Offset) = 0;
-
-  /// Sets a new Position.
-  virtual void MoveTo (const gePosition& Pos) = 0;
 
   /**
    * Tries to Move the position to the given Vector. That can only be done, 
@@ -65,15 +94,31 @@ struct iPosition : public iBase
    * returns false, if that move is not possible.
    */
   virtual bool MoveTo (const csVector3& Pos) = 0;
+  
+  /**
+   * Change the orientation by the given angle differences
+   */
+  virtual void Rotate(const csVector& Offset) = 0;
 
-  /// Sets the current position.
-  virtual void MoveTo (csSector* pSector, const csVector3& Pos) = 0;
+  /**
+   * Sets a new orientation for the position
+   */
+  virtual void SetOrientation(const csVector& Orientation) = 0;
 
-  /// Gets the current sector.
-  virtual csSector* GetSector () = 0;
-
-  /// Gets the current position in the world.
-  virtual csVector3 GetPosition () = 0;
+  /**
+   * Create a new Position object, that is linked to this position object.
+   * How the link behaves exactly can be controlled by a combination
+   * of CS_POSLINKFLAG_xxx Flags.
+   * It is important to note, that the given transformation needs to be
+   * a transformation in worldcoordinates. The iPosition objects will
+   * convert this position to a relative position and update the linked
+   * position whenever its own coordinates change.
+   * You can use any calls to set te position of the linked object,
+   * but when the controlling object moves it will be moved according to 
+   * the linked objects new relative coordinates.
+   */
+  virtual iPosition* CreateLinkedPosition(const csTransform& Transform, 
+                                          DWORD LinkFlags);
 };
 
 //---------------------------------------------------------------------------
@@ -429,17 +474,40 @@ struct iGameCore : public iBase
   /// Add an entity to be managed by the game core.
   virtual void AddEntity (iEntity* pEntity) = 0;
 
+  /// Get the entity by the given name, or NULL, if not found.
+  virtual iEntity* GetEntity(const char* Name) = 0;
+
   /// Remove an entity from the game core.
-  virtual void RemoveEntity (const char* Name) = 0;
+  virtual void RemoveEntity (iEntity* pEntity) = 0;
+
+  /**
+   * Starts moving an entity to a new position and automatically stops the Entity
+   * at that position. Of course, if there occurs a collision on the way, the 
+   * object is stopped also, and the collision is being handled by the involved
+   * entities
+   */
+  virtual void MoveEntityTo(iEntity* pEntity, csVector3 Destination, float speed);
+
+  /**
+   * Starts rotating an entity. The Rotation vector gives the amount of rotation
+   * per second, so by picing smaller numbers you get slower roation and by
+   * picking larger numbers you get faster rotation.
+   */
+  virtual void RotateEntity(iEntity* pEntity, csVector3 Rotation);
+
+  /// Stops the current movement and rotation of an entity
+  virtual void StopEntity(iEntity* pEntiy);
 
   /**
    * Send an event directly to an entity. This is mostly a convenience 
    * function to avoid searching for an entity and calling HandleEvent 
    * directly. Anyway, using this method is the recommended way of sending 
    * events.
+   * You can give a NULL pointer as sender, but this is not recommended.
    */
-  virtual void SendEvent(const char* EntityName, 
-                         const char* EventName,
+  virtual void SendEvent(iEntity*        pSender,
+                         iEntity*        pTarget, 
+                         const char*     EventName,
                          iAttributeList* InPar,
                          iAttributeList* OutPar) = 0;
 
@@ -451,19 +519,23 @@ struct iGameCore : public iBase
    * The delay will be given in seconds. If the event is marked as 
    * persistant, then the event will be stored with the target object, 
    * when the object will be stored to disk.
+   * You can give a NULL pointer as sender, but this is not recommended.
    */
-  virtual void SendDelayedEvent(const char* EntityName, 
-                                const char* EventName,
+  virtual void SendDelayedEvent(iEntity*        pSender,
+                                iEntity*        pTarget, 
+                                const char*     EventName,
                                 iAttributeList* InPar,
-                                double delay, bool Persistant) = 0;
+                                double          delay, 
+                                bool            Persistant) = 0;
 
   /**
    * Send an event directly to all entitie within a radius around a 
    * position.
    */
-  virtual void SendEventToGroup(iPosition* pCenter, 
-                                csVector3  Radius,
-                                const char* EventName,
+  virtual void SendEventToGroup(iEntity*        pSender,
+                                iPosition*      pCenter, 
+                                csVector3       Radius,
+                                const char*     EventName,
                                 iAttributeList* InPar) = 0;
 
 
@@ -471,16 +543,19 @@ struct iGameCore : public iBase
    * Revoke an event that has been sent delayed to an entity and that
    * has not yet arrived. If there are multiple Events with the same
    * name, that wait to be delivered, all of them are removed.
+   * if pSender is NULL, all events of that type will be revoked, not 
+   * just the ones sent by giving a NULL sender!
    */
-  virtual void RevokeDelayedEvent(const char* EntityName, 
-                                  const char* EventName) = 0;
+  virtual void RevokeDelayedEvent(iEntity*        pSender,
+                                  iEntity*        pTarget, 
+                                  const char*     EventName) = 0;
 
   /**
    * Get an iterator, that will allow you to iterate across all entities 
    * within the specified box.
    */
   virtual iEntityIterator* GetAllObjectsWithinBox (iPosition* Center,
-  	const csVector3& Radius) = 0;
+                                            const csVector3& Radius) = 0;
 
   /**
    * Redirect the all user input to go as events to the specified entity
