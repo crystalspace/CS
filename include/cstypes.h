@@ -49,6 +49,9 @@ typedef int bool;
  * avoid duplicate type definition here.
  * @{ */
 #if !defined(CS_BUILTIN_SIZED_TYPES)
+
+
+#ifndef CS_HAS_STDINT_H
 /// unsigned 8-bit integer (0..255)
 typedef unsigned char uint8;
 /// signed 8-bit integer (-128..127)
@@ -61,7 +64,34 @@ typedef short int16;
 typedef unsigned long uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef long int32;
+#ifdef COMP_GCC
+/// unsigned 64 bit integer
+typedef unsigned long long uint64;
+/// signed 64 bit integer
+typedef long long int64;
+#else
+# ifdef COMP_VC
+typedef unsigned __int64 uint64;
+typedef __int64 int64;
+# else
+#  warning NO definition for 64 bit integers defined for your compiler
+# endif
+#endif // end of #ifdef COMP_GCC
+
+#else
+// we're happy and can simply use stdint.h
+#include <stdint.h>
+typedef uint8_t uint8;
+typedef int8_t int8;
+typedef uint16_t uint16;
+typedef int16_t int16;
+typedef uint32_t uint32;
+typedef int32_t int32;
+typedef uint64_t uint64;
+typedef int64_t int64;
 #endif
+
+#endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)
 /** @} */
 
 /// Used for uniquely generated id numbers

@@ -1697,7 +1697,11 @@ AC_LANG_PUSH([C++])
 AC_CHECK_TYPE([bool], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_BOOL_TYPE])])
 AC_LANG_POP([C++])
 
-
+#------------------------------------------------------------------------------
+# Check if stdint.h is available.
+#------------------------------------------------------------------------------
+AC_CHECK_HEADER([stdint.h],
+    [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])
 
 #------------------------------------------------------------------------------
 # Check for audio support.
