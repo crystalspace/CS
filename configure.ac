@@ -2148,9 +2148,14 @@ AS_IF([test $prefix = NONE],
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
 
 # Jam build system.
-AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"])
+# Handle the case when no prefix is given. And the special case when a path
+# contains more than 2 slashes, these paths seem to be correct but jam fails
+# on them.
+AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"],
+    [prefix=`echo "$prefix" | sed -e 's#//\+#/#'`])
 AS_IF([test $exec_prefix = NONE],
-    [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"])
+    [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"],
+    [exec_prefix=`echo "$exec_prefix" | sed -e 's#//\+#/#'`])
 	
 CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX], [$prefix])
 CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX], [$exec_prefix])

@@ -56,6 +56,10 @@ The history order is reversed so that new features are at the top.
 	  for plugins to get rid of that "dllwrap.exe: no export definition 
 	  file provided" message. Also fixed missing deletion of some
 	  tempoary files.
+	- Matze added a workaround to the configure scripts which collapses
+	  series of slashes in the prefix to a single slash. This was needed
+	  because jam fails with paths like /path///to/something (ie. with
+	  more than 2 following slashes).
 13-Apr-2003
 	- Wouter fixed mikmod sound loader, delete[]/realloc mismatch.
 	- Matze cleaned some jamrules.
