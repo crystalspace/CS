@@ -79,14 +79,21 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.simple2",
+	"couldn't init app! (perhaps some plugins are missing?)");
+    return false;
+  }
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simple2",
     	"No iEngine plugin!");
     exit (1);
   }

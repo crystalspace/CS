@@ -1013,7 +1013,12 @@ int main (int argc, char* argv[])
   if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
   iObjectRegistry* object_reg = System.GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "main", "couldn't init app! (perhaps some plugins are missing?");
+    return -1;
+  }
 
   if (!System.Open ())
     return -1;

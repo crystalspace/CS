@@ -798,7 +798,14 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  csInitializeApplication (object_reg);
+  if (!csInitializeApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	    "crystalspace.application.g2dtest",
+	    "couldn't init app! (perhaps some plugins are missing!)");
+    return -1;
+  }
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);

@@ -177,7 +177,13 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps some plugins are missing?)");
+    return false;
+  }
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin

@@ -30,7 +30,7 @@
 #include "isys/vfs.h"
 #include "imap/parser.h"
 
-void csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
+bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
 	bool use_reporter_listener)
 {
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -81,6 +81,9 @@ void csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
   {
     reporter = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.reporter",
     	CS_FUNCID_REPORTER, iReporter);
+    if (!reporter)
+      return false;
+    
     reporter->IncRef ();
   }
   if (reporter)
@@ -95,6 +98,9 @@ void csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
   {
     stdrep = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.stdrep",
     	"StdRep", iStandardReporterListener);
+    if (!stdrep)
+      return false;
+
     stdrep->IncRef ();
   }
   if (stdrep)
@@ -103,6 +109,8 @@ void csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
     object_reg->Register (stdrep);
     stdrep->DecRef ();
   }
+
+  return true;
 }
 
 

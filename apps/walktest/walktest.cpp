@@ -1224,7 +1224,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  csInitializeApplication (object_reg);
+  if (!csInitializeApplication (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to init application! (plugins missing?)");
+    return false;
+  }
 
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);

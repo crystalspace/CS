@@ -334,7 +334,12 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     return false;
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't init app! (plugins missing?)");
+    return false;
+  }
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);

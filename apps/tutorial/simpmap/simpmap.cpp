@@ -80,14 +80,21 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.simpmap",
+	"couldn't init app! (plugins missing?)");
+    return false;
+  }
 
   // Find the pointer to VFS.
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
+    	"crystalspace.application.simpmap",
     	"No iVFS plugin!");
     exit (1);
   }

@@ -108,7 +108,13 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     return false;
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication (object_reg);
+  
+  if (!csInitializeApplication (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps some plugins missing?)");
+    return false;
+  }
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);

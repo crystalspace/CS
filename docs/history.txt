@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 22-Aug-2001
+	- Received a patch from Matze Braun <matze@braunis.de> which fixes
+	  the apps crashing when plugins (reporter and standard reporter)
+	  are missing. Added a bool return value to csInitializeApplication
+	  for this purpose.
 	- Added GetTransform() and SetTransform to iMeshFactoryWrapper.
 	  This transform is a transformation relative to the parent of the
 	  factory wrapper. It is only useful when a factory wrapper is part

@@ -274,7 +274,12 @@ int main (int argc, char* argv[])
     fprintf (stderr, "Initialization error!\n");
     return -1;
   }
-  csInitializeApplication (System->GetObjectRegistry ());
+  
+  if (!csInitializeApplication (System->GetObjectRegistry ()))
+  {
+    fprintf (stderr, "couldn't init app! (perhaps some plugins are missing?)");
+    return -1;
+  }
 
   programname = argv [0];
 

@@ -561,7 +561,11 @@ int main (int argc, char* argv[])
     printf ("System not initialized !\n");
     return -1;
   }    
-  csInitializeApplication (object_reg);
+  if (!csInitializeApplication (object_reg))
+  {
+    printf ("couldn't init app! (plugins missing?)\n");
+    return -1;
+  }
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
