@@ -664,6 +664,12 @@ public:
   csBox2 GetSide (int side) const;
 
   /**
+   * Get axis aligned plane information from a side of this box.
+   * Side is one of #CS_BOX_SIDE_x. Axis will be one of #CS_AXIS_X.
+   */
+  void GetAxisPlane (int side, int& axis, float& where) const;
+
+  /**
    * Fill the array (which should be three long at least)
    * with all visible sides (#CS_BOX_SIDE_x etc. defines) as seen
    * from the given point.

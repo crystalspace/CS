@@ -25,7 +25,7 @@
 #include "csgeom/math3d.h"
 
 //---------------------------------------------------------------------------
-csBox2::bEdge csBox2:: edges[8] =
+csBox2::bEdge csBox2::edges[8] =
 {
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_Xy },
   { CS_BOX_CORNER_Xy, CS_BOX_CORNER_xy },
@@ -468,6 +468,33 @@ csBox2 csBox3::GetSide (int side) const
   }
 
   return csBox2 ();
+}
+
+void csBox3::GetAxisPlane (int side, int& axis, float& where) const
+{
+  axis = side / 2;
+
+  switch (side)
+  {
+    case CS_BOX_SIDE_x:
+      where = MinX ();
+      break;
+    case CS_BOX_SIDE_X:
+      where = MaxX ();
+      break;
+    case CS_BOX_SIDE_y:
+      where = MinY ();
+      break;
+    case CS_BOX_SIDE_Y:
+      where = MaxY ();
+      break;
+    case CS_BOX_SIDE_z:
+      where = MinZ ();
+      break;
+    case CS_BOX_SIDE_Z:
+      where = MaxZ ();
+      break;
+  }
 }
 
 bool csBox3::AdjacentX (const csBox3 &other, float epsilon) const

@@ -127,6 +127,16 @@ bool PVSCalcNode::HitBeam (const csSegment3& seg)
   return false;
 }
 
+const csArray<csPoly3DAxis>& PVSCalcNode::GetAxisPolygons (int axis,
+	float where)
+{
+  if (parent->axis == axis && fabs (parent->where-where) < EPSILON)
+  {
+    return parent->axis_polygons;
+  }
+  return parent->GetAxisPolygons (axis, where);
+}
+
 //-----------------------------------------------------------------------------
 
 PVSCalcSector::PVSCalcSector(PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
@@ -192,6 +202,7 @@ void PVSCalcSector::DistributePolygons (int axis, float where,
 
 void PVSCalcSector::DistributePolygons (int axis, float where,
 	const csArray<csPoly3DAxis>& polylist,
+	csArray<csPoly3DAxis>& polylist_same,
 	csArray<csPoly3DAxis>& polylist_left,
 	csArray<csPoly3DAxis>& polylist_right)
 {
@@ -199,10 +210,15 @@ void PVSCalcSector::DistributePolygons (int axis, float where,
   for (i = 0 ; i < polylist.Length () ; i++)
   {
     int split = polylist[i].GetPoly ()->ClassifyAxis (axis, where);
-    if (split == CS_POL_FRONT || split == CS_POL_SPLIT_NEEDED)
-      polylist_left.Push (polylist[i]);
-    if (split == CS_POL_BACK || split == CS_POL_SPLIT_NEEDED)
-      polylist_right.Push (polylist[i]);
+    if (split == CS_POL_SAME_PLANE)
+      polylist_same.Push (polylist[i]);
+    else
+    {
+      if (split == CS_POL_FRONT || split == CS_POL_SPLIT_NEEDED)
+        polylist_left.Push (polylist[i]);
+      if (split == CS_POL_BACK || split == CS_POL_SPLIT_NEEDED)
+        polylist_right.Push (polylist[i]);
+    }
   }
 }
 
@@ -265,7 +281,6 @@ static void SlicePolygon (const csPoly3D& poly, csPoly2D& slice, int axis)
       case CS_AXIS_Z: slice[j].x = v.x; slice[j].y = v.y; break;
     }
   }
-  //DBA(());
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -385,7 +400,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
   // because GetSide() expects a side and not an axix.
   csBox2 box_slice = node_bbox.GetSide (axis * 2);
   csPoly2D slice;
-  //DBA(("======================\nbox_slice=%2b\n", &box_slice));
+  //DBA(("======================\nbox_slice=%s\n", box_slice.Description().GetData()));
 
   mina = node_bbox.Min (axis);
   maxa = node_bbox.Max (axis);
@@ -615,14 +630,21 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   csArray<csBox3> boxlist_right;
   DistributeBoxes (axis, where, boxlist, boxlist_left, boxlist_right);
 
+  csArray<csPoly3DAxis> axis_polygons;
   csArray<csPoly3DAxis> axis_polylist_left[3];
   csArray<csPoly3DAxis> axis_polylist_right[3];
   DistributePolygons (axis, where, axis_polylist[CS_AXIS_X],
-  	axis_polylist_left[CS_AXIS_X], axis_polylist_right[CS_AXIS_X]);
+  	axis_polygons,
+	axis_polylist_left[CS_AXIS_X],
+	axis_polylist_right[CS_AXIS_X]);
   DistributePolygons (axis, where, axis_polylist[CS_AXIS_Y],
-  	axis_polylist_left[CS_AXIS_Y], axis_polylist_right[CS_AXIS_Y]);
+  	axis_polygons,
+	axis_polylist_left[CS_AXIS_Y],
+	axis_polylist_right[CS_AXIS_Y]);
   DistributePolygons (axis, where, axis_polylist[CS_AXIS_Z],
-  	axis_polylist_left[CS_AXIS_Z], axis_polylist_right[CS_AXIS_Z]);
+  	axis_polygons,
+	axis_polylist_left[CS_AXIS_Z],
+	axis_polylist_right[CS_AXIS_Z]);
 
   pvstree->SplitNode (node, axis, where, child1, child2);
   countnodes += 2;
@@ -652,6 +674,9 @@ PVSCalcNode* PVSCalcSector::BuildShadowTree (void* node)
 {
   if (!node) return 0;
   PVSCalcNode* shadow_node = new PVSCalcNode (node);
+
+  pvstree->GetAxisAndPosition (node, shadow_node->axis, shadow_node->where);
+
   shadow_node->node_bbox = pvstree->GetNodeBBox (node);
   void* child1 = pvstree->GetFirstChild (node);
   int count_child1 = 0;
@@ -659,6 +684,7 @@ PVSCalcNode* PVSCalcSector::BuildShadowTree (void* node)
   {
     PVSCalcNode* shadow_child1 = BuildShadowTree (child1);
     shadow_node->child1 = shadow_child1;
+    shadow_child1->parent = shadow_node;
     count_child1 = shadow_child1->represented_nodes;
   }
   void* child2 = pvstree->GetSecondChild (node);
@@ -667,6 +693,7 @@ PVSCalcNode* PVSCalcSector::BuildShadowTree (void* node)
   {
     PVSCalcNode* shadow_child2 = BuildShadowTree (child2);
     shadow_node->child2 = shadow_child2;
+    shadow_child2->parent = shadow_node;
     count_child2 = shadow_child2->represented_nodes;
   }
   shadow_node->represented_nodes = 1 + count_child1 + count_child2;
@@ -724,7 +751,8 @@ void PVSCalcSector::BuildShadowTreePolygons (PVSPolygonNode* node,
 }
 
 void PVSCalcSector::BuildShadowTreePolygons (PVSCalcNode* node,
-	const csArray<csPoly3DBox*>& polygons)
+	const csArray<csPoly3DBox*>& polygons,
+	const csArray<csPoly3DAxis>* axis_polygons)
 {
   if (polygons.Length () == 0) return;
 
@@ -732,14 +760,31 @@ void PVSCalcSector::BuildShadowTreePolygons (PVSCalcNode* node,
   {
     // This node has children, that means we simply have to distribute
     // the polygons over the two children.
-    int axis;
-    float where;
-    pvstree->GetAxisAndPosition (node->node, axis, where);
+    int axis = node->axis;
+    float where = node->where;
     csArray<csPoly3DBox*> polygons_left;
     csArray<csPoly3DBox*> polygons_right;
     DistributePolygons (axis, where, polygons, polygons_left, polygons_right);
-    BuildShadowTreePolygons (node->child1, polygons_left);
-    BuildShadowTreePolygons (node->child2, polygons_right);
+
+    csArray<csPoly3DAxis> axis_polylist_left[3];
+    csArray<csPoly3DAxis> axis_polylist_right[3];
+    DistributePolygons (axis, where, axis_polygons[CS_AXIS_X],
+  	  node->axis_polygons,
+	  axis_polylist_left[CS_AXIS_X],
+	  axis_polylist_right[CS_AXIS_X]);
+    DistributePolygons (axis, where, axis_polygons[CS_AXIS_Y],
+  	  node->axis_polygons,
+	  axis_polylist_left[CS_AXIS_Y],
+	  axis_polylist_right[CS_AXIS_Y]);
+    DistributePolygons (axis, where, axis_polygons[CS_AXIS_Z],
+  	  node->axis_polygons,
+	  axis_polylist_left[CS_AXIS_Z],
+	  axis_polylist_right[CS_AXIS_Z]);
+
+    BuildShadowTreePolygons (node->child1, polygons_left,
+    	axis_polylist_left);
+    BuildShadowTreePolygons (node->child2, polygons_right,
+    	axis_polylist_right);
   }
   else
   {
@@ -973,6 +1018,36 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
   return false;
 }
 
+bool PVSCalcSector::SetupProjectionPlaneAdjacent (const csBox3& source,
+	const csBox3& dest, int adjacency)
+{
+  source.GetAxisPlane (adjacency, plane.axis, plane.where);
+
+  // Get the 2D side box for both boxes and compute the union. This
+  // will be our coverage buffer.
+  csBox2 bbox = source.GetSide (adjacency);
+  csBox2 dest_side = dest.GetSide (csBox3::OtherSide (adjacency));
+  bbox += dest_side;
+
+  // Calculate offsets.
+  plane.offset = bbox.Min ();
+  plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
+  plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
+  DB(("  Hull_ADJ box: %s scale=%s offset=%s\n",
+    bbox.Description().GetData(), plane.scale.Description().GetData(),
+    plane.offset.Description().GetData()));
+
+  // Clear the coverage buffer.
+  plane.covbuf->Initialize ();
+
+  // Here we setup the box clipper that represents the boundaries of our
+  // coverage buffer.
+  delete plane.covbuf_clipper;
+  plane.covbuf_clipper = new csBoxClipper (bbox);
+
+  return true;
+}
+
 bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 	const csBox3& dest)
 {
@@ -1054,9 +1129,45 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 
   // Here we setup the box clipper that represents the boundaries of our
   // coverage buffer.
+  delete plane.covbuf_clipper;
   plane.covbuf_clipper = new csBoxClipper (bbox);
 
   return true;
+}
+
+bool PVSCalcSector::CastShadow (const csPoly3D& polygon)
+{
+  DB(("  Polygon:"));
+  size_t j;
+  for (j = 0 ; j < polygon.GetVertexCount () ; j++)
+  {
+    DB((" (%s)", polygon[j].Description().GetData()));
+  }
+  DB(("\n"));
+
+  // Project to 2D.
+  SlicePolygon (polygon, poly, plane.axis);
+
+  // Here we will project the polygon on the coverage buffer.
+  // But before we do that we first have to scale the 2D coordinates so
+  // that they match coverage buffer coordinates.
+  csVector2* pi_verts = poly.GetVertices ();
+  DB(("    -> covbuf poly:"));
+  int i;
+  for (i = 0 ; i < poly.GetVertexCount () ; i++)
+  {
+    pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
+    pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
+    DB((" (%s)", pi_verts[i].Description().GetData()));
+  }
+  DB(("\n"));
+  int nummod = plane.covbuf->InsertPolygonNoDepth (
+  	pi_verts, poly.GetVertexCount ());
+  DB(("    -> nummod = %d\n", nummod));
+
+  // If nummod > 0 then we modified the coverage buffer and we return
+  // true then.
+  return nummod > 0;
 }
 
 bool PVSCalcSector::CastAreaShadow (const csBox3& source,
@@ -1126,6 +1237,33 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   return nummod > 0;
 }
 
+int PVSCalcSector::CastShadowsUntilFullAdjacent (
+	const csArray<csPoly3DAxis>& axis_polygons)
+{
+  DB(("  Cast Axis Polygons #poly=%d (plane %d/%g)\n",
+  	axis_polygons.Length (),plane.axis, plane.where));
+
+  size_t i;
+  int status = -1;	// Coverage buffer is now empty.
+  for (i = 0 ; i < axis_polygons.Length () ; i++)
+  {
+    if (CastShadow (polygons[i]))
+    {
+      // The shadow modified the coverage buffer. Test if our buffer is
+      // full now.
+      status = plane.covbuf->StatusNoDepth ();
+      if (status == 1)
+      {
+        // Yes! Coverage buffer is full. We can return early here.
+	DB(("  Coverage Buffer Full!\n"));
+	return 1;
+      }
+    }
+  }
+
+  return status;
+}
+
 int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
 {
   // Start casting shadows starting with the biggest polygons.
@@ -1178,7 +1316,7 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
 }
 
 bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
-	const csBox3& dest)
+	const csBox3& dest, bool center_only)
 {
   // First we do a trivial test where we test if a few points of the boxes can
   // see each other. If we hit no polygon then we don't have to continue
@@ -1187,6 +1325,9 @@ bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
   	source.GetCenter (),
     	dest.GetCenter ())))
     return true;
+
+  if (center_only)
+    return false;
 
   int i, j;
   for (i = 0 ; i < 8 ; i++)
@@ -1197,6 +1338,39 @@ bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
 
   return false;
 }
+
+void PVSCalcSector::MarkInvisible (PVSCalcNode* sourcenode,
+	PVSCalcNode* destnode,
+	csSet<PVSCalcNode*>& invisible_nodes)
+{
+  invisible_nodes.Add (destnode);
+  pvstree->MarkInvisible (sourcenode->node, destnode->node);
+  sourcenode->invisible_nodes.Add (destnode);
+  int destrep = destnode->represented_nodes;
+  total_invisnodes += destrep;
+  DBA(("%d ", destrep));
+  DB(("Marked invisible %s to %s\n",
+	    sourcenode->node_bbox.Description().GetData(),
+	    destnode->node_bbox.Description().GetData()));
+
+  // If visibility for the destination node was already calculated and
+  // we are here then that means that this node was considered visible
+  // for the destination node (otherwise we wouldn't have done these
+  // calculations because of the symmetry test in the beginning of
+  // RecurseDestNodes(). But now we know that the destination node is
+  // invisible for this node so we make use of symmetry and also mark this
+  // source node as invisible in the destination node.
+  if (destnode->calculated_pvs)
+  {
+    pvstree->MarkInvisible (destnode->node, sourcenode->node);
+    destnode->invisible_nodes.Add (sourcenode);
+    int srcrep = sourcenode->represented_nodes;
+    total_invisnodes += srcrep;
+    DBA(("I%d ", srcrep));
+    DB(("Marked invisible symmetry\n"));
+  }
+}
+
 
 bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	PVSCalcNode* destnode,
@@ -1246,17 +1420,66 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   const csBox3& source = sourcenode->node_bbox;
   const csBox3& dest = destnode->node_bbox;
 
-  // If the source node is contained in the destination node then
-  // we know the destination node is visible. However we do have to continue
-  // traversing to the children so we only skip the testing part.
-  if (!dest.Overlap (source))
+  int adjacency = source.Adjacent (dest, EPSILON);
+  if (adjacency != -1)
   {
+    // If the two boxes are adjacent to each other then we can do a special
+    // case where we make a coverage buffer that is as big as the union
+    // of the two 2D boxes (where the 3D boxes touch). On that coverage
+    // buffer we will project all axis aligned polygons for both nodes.
+
+    DB(("\nTEST_ADJ(%d) %s -> %s\n", adjacency,
+    	source.Description().GetData(), dest.Description().GetData()));
+
+    // First we do a trivial test to see if the nodes can surely see each
+    // other.
+    if (!NodesSurelyVisible (source, dest, true))
+    {
+      DB(("TEST_ADJ\n"));
+      // If the projection plane failed to set up we still have to test
+      // children.
+      if (SetupProjectionPlaneAdjacent (source, dest, adjacency))
+      {
+	// First try to project all axis aligned polygons from source
+	// node.
+        int level = CastShadowsUntilFullAdjacent (
+	  	sourcenode->GetAxisPolygons (plane.axis, plane.where));
+	if (level != 1 && sourcenode->parent != destnode->parent)
+	{
+	  // Coverage buffer is not full yet. So we add the polygons
+	  // from the destination node unless source and destination node
+	  // have the same parent..
+          level = CastShadowsUntilFullAdjacent (
+	  	destnode->GetAxisPolygons (plane.axis, plane.where));
+	}
+
+	if (level == 1)
+	{
+          // The coverage buffer is full! This means the destination node
+          // cannot be seen from the source node.
+	  DBA(("A"));
+	  MarkInvisible (sourcenode, destnode, invisible_nodes);
+
+          // If the destination node is invisible that automatically implies
+          // that the children are invisible too. No need to recurse further.
+          return true;
+	}
+      }
+    }
+  }
+  else if (!dest.Overlap (source))
+  {
+    // If the source node is contained in the destination node then
+    // we know the destination node is visible. However we do have to continue
+    // traversing to the children so we only skip the testing part.
+    // Here in this case we know the two nodes don't overlap.
+
     DB(("\nTEST %s -> %s\n", source.Description().GetData(),
     	dest.Description().GetData()));
 
     // First we do a trivial test to see if the nodes can surely see each
     // other.
-    if (!NodesSurelyVisible (source, dest))
+    if (!NodesSurelyVisible (source, dest, false))
     {
       DB(("TEST\n"));
       // If the projection plane failed to set up we still have to test
@@ -1266,39 +1489,20 @@ bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
       	// Before filling coverage buffer with relevant polygons
 	// we first try to fill it with the relevant axis aligned polygons
 	// that are on the destination node.
-	// @@@ TODO
+        int level = CastShadowsUntilFullAdjacent (
+	  	destnode->GetAxisPolygons (plane.axis, plane.where));
+	if (level != 1)
+	{
+	  // Buffer is not full yet.
+	  // Try to fill coverage buffer with all relevant polygons.
+          level = CastShadowsUntilFull (source);
+	}
 
-	// Try to fill coverage buffer with all relevant polygons.
-        int level = CastShadowsUntilFull (source);
         if (level == 1)
         {
           // The coverage buffer is full! This means the destination node
           // cannot be seen from the source node.
-          invisible_nodes.Add (destnode);
-          pvstree->MarkInvisible (sourcenode->node, destnode->node);
-	  sourcenode->invisible_nodes.Add (destnode);
-	  int destrep = destnode->represented_nodes;
-          total_invisnodes += destrep;
-	  DBA(("%d ", destrep));
-          DB(("Marked invisible %s to %s\n",
-	    source.Description().GetData(), dest.Description().GetData()));
-
-	  // If visibility for the destination node was already calculated and
-	  // we are here then that means that this node was considered visible
-	  // for the destination node (otherwise we wouldn't have done these
-	  // calculations because of the symmetry test in the beginning of this
-	  // function).  But now we know that the destination node is invisible
-	  // for this node so we make use of symmetry and also mark this source
-	  // node as invisible in the destination node.
-	  if (destnode->calculated_pvs)
-	  {
-            pvstree->MarkInvisible (destnode->node, sourcenode->node);
-	    destnode->invisible_nodes.Add (sourcenode);
-	    int srcrep = sourcenode->represented_nodes;
-            total_invisnodes += srcrep;
-	    DBA(("I%d ", srcrep));
-            DB(("Marked invisible symmetry\n"));
-	  }
+	  MarkInvisible (sourcenode, destnode, invisible_nodes);
 
           // If the destination node is invisible that automatically implies
           // that the children are invisible too. No need to recurse further.
@@ -1433,7 +1637,8 @@ void PVSCalcSector::Calculate ()
   csArray<csPoly3DBox*> polygon_ptrs;
   for (i = 0 ; i < polygons.Length () ; i++)
     polygon_ptrs.Push (&polygons[i]);
-  BuildShadowTreePolygons (shadow_tree, polygon_ptrs);
+  BuildShadowTreePolygons (shadow_tree, polygon_ptrs,
+  	axis_polygons);
   parent->ReportInfo ("KDTree: Minimal node size %g,%g,%g",
   	minsize.x, minsize.y, minsize.z);
   parent->ReportInfo ("KDTree: max depth=%d, number of nodes=%d",

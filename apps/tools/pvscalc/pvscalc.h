@@ -156,6 +156,13 @@ struct PVSCalcNode
   PVSCalcNode* child1;
   PVSCalcNode* child2;
 
+  // Array of axis aligned polygons which are coplanar with the split axis.
+  csArray<csPoly3DAxis> axis_polygons;
+
+  // Axis plane.
+  int axis;
+  float where;
+
   // If this is a leaf then we keep an additional KDtree for
   // the polygons here.
   PVSPolygonNode* polygon_tree;
@@ -193,6 +200,14 @@ struct PVSCalcNode
 
   // Test if a beam hits a polygon in this node.
   bool HitBeam (const csSegment3& seg);
+
+  /**
+   * Find all axis aligned polygons that are coplanar
+   * with the given plane (which must be one of the sides
+   * of this box). This function assumes there is a parent
+   * for this node!
+   */
+  const csArray<csPoly3DAxis>& GetAxisPolygons (int axis, float where);
 };
 
 /**
@@ -266,6 +281,7 @@ private:
   /// Distribute a set of axis aligned polygons to left/right.
   static void DistributePolygons (int axis, float where,
 	const csArray<csPoly3DAxis>& polylist,
+	csArray<csPoly3DAxis>& polylist_same,
 	csArray<csPoly3DAxis>& polylist_left,
 	csArray<csPoly3DAxis>& polylist_right);
 
@@ -291,15 +307,19 @@ private:
    * build additional polygon trees in the leaves of the shadow tree.
    */
   void BuildShadowTreePolygons (PVSCalcNode* node,
-	const csArray<csPoly3DBox*>& polygons);
+	const csArray<csPoly3DBox*>& polygons,
+	const csArray<csPoly3DAxis>* axis_polygons);
 
   /**
    * This is a quick test to see if two nodes can surely see
    * each other. It works by doing a few HitBeam() calls. If there
    * is a beam that hits no polygons then the two nodes can surely
    * see each other.
+   * If 'center_only' is true we only test center. This is useful
+   * in case the two boxes are adjacent.
    */
-  bool NodesSurelyVisible (const csBox3& source, const csBox3& dest);
+  bool NodesSurelyVisible (const csBox3& source, const csBox3& dest,
+  	bool center_only);
 
   /**
    * Find a good split between 'from' and 'to' for the given
@@ -364,12 +384,29 @@ private:
   bool SetupProjectionPlane (const csBox3& source, const csBox3& dest);
 
   /**
+   * This is a special case of SetupProjectionPlane() which works for
+   * two adjacent boxes. The 'adjacency' parameter is one of CS_BOX_SIDE_...
+   * as seen from the source box.
+   * Returns false if the destination box is surely visible from the
+   * source box.
+   */
+  bool SetupProjectionPlaneAdjacent (const csBox3& source, const csBox3& dest,
+  	int adjacency);
+
+  /**
    * Calculate the area shadow on the shadow plane for a given polygon as
    * seen from the source box.
    * Also update this on the coverage buffer. This function returns true
    * if the coverage buffer was actually modified.
    */
   bool CastAreaShadow (const csBox3& source, const csPoly3D& polygon);
+
+  /**
+   * Version of CastAreaShadow() that casts a simple shadow of a polygon.
+   * This is useful when the polygon is axis aligned with the coverage
+   * buffer.
+   */
+  bool CastShadow (const csPoly3D& polygon);
 
   /**
    * Cast shadows on the previously set up projection plane until the
@@ -385,6 +422,13 @@ private:
   int CastShadowsUntilFull (const csBox3& source);
 
   /**
+   * Version of CastShadowsUntilFull() that works when both boxes
+   * are adjacent.
+   */
+  int CastShadowsUntilFullAdjacent (
+	const csArray<csPoly3DAxis>& axis_polygons);
+
+  /**
    * Find all invisible nodes for the given source node by recursively
    * traversing the destination node. This will update the set of
    * invisible nodes. This function returns true if the dest node was
@@ -393,6 +437,13 @@ private:
   bool RecurseDestNodes (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
 	csSet<PVSCalcNode*>& invisible_nodes);
 
+  /**
+   * Help function to mark destnode to be invisible from sourcenode
+   * and also look at symmetry. This function will also update
+   * the invisible_nodes set.
+   */
+  void MarkInvisible (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
+	csSet<PVSCalcNode*>& invisible_nodes);
 
   /**
    * Traverse the kdtree for source nodes and calculate the visibility set
