@@ -28,14 +28,14 @@ class csQuaternion
 {
 public:
   /// Construct a 0,0,0,0 quaternion.
-  csQuaternion () { init (0, 0, 0, 0 ); }
+  csQuaternion () { Init (0, 0, 0, 0 ); }
   /// Construct a quaternion with the given parameters.
   csQuaternion (double theR, double theX=0.0, double theY=0.0, double theZ=0.0)
-  { init (theR, theX, theY, theZ ); }
+  { Init (theR, theX, theY, theZ ); }
   /// Copy constructor.
-  csQuaternion (const csQuaternion& q) { init (q.r, q.x, q.y, q.z); }
+  csQuaternion (const csQuaternion& q) { Init (q.r, q.x, q.y, q.z); }
   /// Construct quaternion from a vector.
-  csQuaternion (const csVector3& q) { init (0, q.x, q.y, q.z); }
+  csQuaternion (const csVector3& q) { Init (0, q.x, q.y, q.z); }
   
   ///
   inline friend csQuaternion operator+ (const csQuaternion& q1, const csQuaternion& q2)
@@ -53,7 +53,7 @@ public:
   ///
   csQuaternion& operator*= (const csQuaternion& q2)
   {
-    init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
+    Init (r*q2.r -  x*q2.x - y*q2.y - z*q2.z,
 	  y*q2.z -  z*q2.y + r*q2.x + x*q2.r,
 	  z*q2.x -  x*q2.z + r*q2.y + y*q2.r,
 	  x*q2.y -  y*q2.x + r*q2.z + z*q2.r); 
