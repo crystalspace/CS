@@ -24,7 +24,7 @@
 
 /**
  * csObjVector is a version of csVector which assumes its components
- * are csBase heirs. FreeItem () deletes the object using 'delete' operator.
+ * are iBase heirs. FreeItem () decref the object .
  */
 class csObjVector : public csVector
 {
