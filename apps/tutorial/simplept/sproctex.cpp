@@ -64,6 +64,7 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   TexHandle = g3d->GetTextureManager ()->RegisterTexture (Image,
     CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT);
   TexHandle->Prepare ();
+  Image->DecRef ();
   ptG3D = TexHandle->GetProcTextureInterface ();
 
   // set up a view for the engine
