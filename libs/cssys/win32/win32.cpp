@@ -1,4 +1,4 @@
-/*
+  /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -410,7 +410,7 @@ Win32Assistant::~Win32Assistant ()
   SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
-  FreeLibrary (exceptHandlerDLL);
+  FreeLibrary ((HMODULE)exceptHandlerDLL);
 }
 
 void Win32Assistant::Shutdown()
