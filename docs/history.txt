@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Oct-2003
+	- Rhad moved emitter list initialization into the 
+	  RecreateParticleSystem() member function of partedit.  This fixes 
+	  the crash when switching graphics since the last commit (oops!).
 24-Oct-2003
 	- res re-enabled a couple of MSVC warnings and fixed some occurences
 	  of VC warnings in the source.
