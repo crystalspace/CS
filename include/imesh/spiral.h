@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,8 +33,12 @@ struct iSpiralState : public iBase
 {
   /// Set the number of particles to use.
   virtual void SetNumberParticles (int num) = 0;
+  /// Get the number of particles.
+  virtual int GetNumberParticles () const = 0;
   /// Set the source for the particles.
   virtual void SetSource (const csVector3& source) = 0;
+  /// Get the source for the particles.
+  virtual const csVector3& GetSource () const = 0;
 };
 
 #endif

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -36,7 +37,7 @@ struct iSnowState : public iBase
   virtual int GetNumberParticles () const = 0;
   /// Set the size of the drops.
   virtual void SetDropSize (float dropwidth, float dropheight) = 0;
-  /// Get the size of the rain drops.
+  /// Get the size of the snow flakes.
   virtual void GetDropSize (float& dropwidth, float& dropheight) const = 0;
   /// Set box.
   virtual void SetBox (const csVector3& minbox, const csVector3& maxbox) = 0;

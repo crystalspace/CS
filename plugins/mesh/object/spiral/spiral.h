@@ -47,6 +47,8 @@ public:
 
   /// Set the number of particles to use.
   void SetNumberParticles (int num) { initialized = false; max = num; }
+  /// Get the number of particles.
+  int GetNumberParticles () const { return max; }
 
   /// Set the source.
   void SetSource (const csVector3& source)
@@ -54,6 +56,8 @@ public:
     initialized = false;
     csSpiralMeshObject::source = source;
   }
+  /// Get the source.
+  const csVector3& GetSource () const { return source; }
 
   /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
@@ -75,6 +79,14 @@ public:
     virtual void SetSource (const csVector3& source)
     {
       scfParent->SetSource (source);
+    }
+    virtual int GetNumberParticles () const
+    {
+      return scfParent->GetNumberParticles();
+    }
+    virtual const csVector3& GetSource () const
+    {
+      return scfParent->GetSource();
     }
   } scfiSpiralState;
   friend class SpiralState;
