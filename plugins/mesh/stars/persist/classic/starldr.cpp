@@ -385,7 +385,7 @@ bool csStarSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csStarSaver::WriteDown (iBase* /*obj*/, iStrVector */*str*/)
+void csStarSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/)
 {
   // @@@ Not implemented yet.
 }
