@@ -10,6 +10,8 @@ struct iAws;
 struct iAwsSlot;
 struct iAwsSink;
 struct iAwsSource;
+struct iAwsComponent;
+struct iAwsWindow;
 struct iAwsPrefManager;
 struct iAwsSinkManager;
 
@@ -265,12 +267,104 @@ struct iAwsSlot : public iBase
 };
 
 
+SCF_VERSION (iAwsComponent, 0, 0, 1);
+struct iAwsComponent : public iAwsSource
+{
+    /// Sets up a component.
+    virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
+   
+    /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
+    virtual bool HandleEvent(iEvent& Event)=0;
+
+    /// Invalidation routine: allow the component to be redrawn when you call this
+    virtual void Invalidate()=0;
+
+    /// Invalidation routine: allow component to be redrawn, but only part of it
+    virtual void Invalidate(csRect area)=0;
+
+    /// Get this component's frame
+    virtual csRect& Frame()=0;
+
+    /// Returns the named TYPE of the component, like "Radio Button", etc.
+    virtual char *Type()=0;
+
+    /// Returns true if this window overlaps the given rect.
+    virtual bool Overlaps(csRect &r)=0;
+
+    /// Returns the state of the hidden flag
+    virtual bool isHidden()=0;
+
+    /// Hides a component
+    virtual void Hide()=0;
+
+    /// Shows a component
+    virtual void Show()=0;
+
+    /// Get's the unique id of this component.
+    virtual unsigned long GetID()=0;
+
+    /// Set's the unique id of this component. Note: only to be used by window manager.
+    virtual void SetID(unsigned long _id)=0;
+
+    /// Recursively moves children (and all nested children) by relative amount given.
+    virtual void MoveChildren(int delta_x, int delta_y)=0;
+
+    /// Adds a child into this component.   
+    virtual void AddChild(iAwsComponent* child, bool owner=true)=0;
+
+    /// Removes a child from this component. 
+    virtual void RemoveChild(iAwsComponent *child)=0;
+
+    /// Get's the number of children
+    virtual int GetChildCount()=0;
+
+    /// Get's a specific child
+    virtual iAwsComponent *GetChildAt(int i)=0;
+    
+    /// Returns true if this component has children
+    virtual bool HasChildren()=0;
+
+    /// Triggered when the component needs to draw
+    virtual void OnDraw(csRect clip)=0;
+
+    /// Triggered when the user presses a mouse button down
+    virtual bool OnMouseDown(int button, int x, int y)=0;
+    
+    /// Triggered when the user unpresses a mouse button 
+    virtual bool OnMouseUp(int button, int x, int y)=0;
+    
+    /// Triggered when the user moves the mouse
+    virtual bool OnMouseMove(int button, int x, int y)=0;
+
+    /// Triggered when the user clicks the mouse
+    virtual bool OnMouseClick(int button, int x, int y)=0;
+
+    /// Triggered when the user double clicks the mouse
+    virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
+
+    /// Triggered when this component loses mouse focus
+    virtual bool OnMouseExit()=0;
+
+    /// Triggered when this component gains mouse focus
+    virtual bool OnMouseEnter()=0;
+
+    /// Triggered when the user presses a key
+    virtual bool OnKeypress(int key, int modifiers)=0;
+    
+    /// Triggered when the keyboard focus is lost
+    virtual bool OnLostFocus()=0;
+
+    /// Triggered when the keyboard focus is gained
+    virtual bool OnGainFocus()=0;
+};
+
+
 SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
 struct iAwsComponentFactory : public iBase
 {
   /// Returns a newly created component of the type this factory handles. 
-  virtual awsComponent *Create()=0;
+  virtual iAwsComponent *Create()=0;
 
   /// Registers this factory with the window manager
   virtual void Register(char *type)=0;
@@ -278,6 +372,7 @@ struct iAwsComponentFactory : public iBase
   /// Registers constants for the parser so that we can construct right.
   virtual void RegisterConstant(char *name, int value)=0;
 };
+
 
 
 #endif // __IVARIA_AWS_H__
