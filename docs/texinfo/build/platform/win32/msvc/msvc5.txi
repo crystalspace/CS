@@ -106,7 +106,7 @@ and drag both paths you have entered to the top of the list.
 Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
 the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
-have the supported 1.2.2 development runtime for your version of @sc{msvc} be
+have the supported 1.2.3 development runtime for your version of @sc{msvc} be
 it 5 or 6.  Please remeber to add the @file{indlude} and @file{lib} directories
 to the global MSVC options, so @sc{msvc} can see them.
 
@@ -131,6 +131,11 @@ version i.e. 2.0.
 @uref{http://www.python.org}
 
 @subsubheading BisonFlex
+
+@emph{NOTE: }This tool is currently not required as the AWS plugin is not in
+the MSVC default build process at this time. For instructions on howto add
+and build the AWS plugin mail the CS Windows Port Maintainer at the address
+at the top of this page.
 
 To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
 with Visual C++ requires you have @emph{BisonFlex} by
@@ -489,13 +494,6 @@ have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 @subsubheading Miscellaneous
 
 @itemize @bullet
-@item
-Q. @emph{I don't care about Direct3D support.}
-
-A. Right click on the Direct3DRender project, and click @emph{Unload
-Project}.  It won't be compiled any longer after that.  To reload it, right
-click on it and click @emph{Load Project}.
-
 @item
 Q. @emph{My last update did compile, but now I got a new version from the
 @sc{cvs} repository and everthing seems to be broken.}

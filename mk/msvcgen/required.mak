@@ -52,7 +52,6 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/renderer/eax            \
   sound/renderer/software       \
   video/canvas/ddraw            \
-  video/canvas/ddraw8           \
   video/canvas/openglwin        \
   video/canvas/sdl              \
   video/format/avi              \
