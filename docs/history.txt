@@ -30,6 +30,10 @@ The history order is reversed so that new features are at the top.
 	  csInitializer::CreateVirtualClock() will now create and register
 	  the virtual clock.
 	- Fixed a crash-on-exit bug introduced with the changes above.
+	- Got a patch from Jorge Acereda Maci which adds the -logo/-nologo
+	  commandline option and the Walktest.Settings.DrawLogo config
+	  option. With this option you can disable the CS logo in Walktest.
+	  It is still enabled by default.
 8-Oct-2001
 	- Moved the creation of the config manager and the command line
 	  parser from the system driver to the respective csInitializer

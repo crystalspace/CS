@@ -140,6 +140,7 @@ WalkTest::WalkTest () :
   do_huge = false;
   do_cd = true;
   do_freelook = false;
+  do_logo = true;
   player_spawned = false;
   do_gravity = true;
   inverse_mouse = false;
@@ -248,6 +249,7 @@ void WalkTest::SetDefaults ()
   do_fps = Config->GetBool ("Walktest.Settings.FPS", true);
   do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
+  do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
@@ -310,6 +312,17 @@ void WalkTest::SetDefaults ()
     delete [] auto_script;
     auto_script = csStrNew (val);
   }
+
+  if (cmdline->GetOption ("logo"))
+  {
+    do_logo = true;
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo enabled.");
+  }
+  else if (cmdline->GetOption ("nologo"))
+  {
+    do_logo = false;
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
+  }
 }
 
 void WalkTest::Help ()
@@ -320,6 +333,7 @@ void WalkTest::Help ()
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   printf ("  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -huge              special huge level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
@@ -743,7 +757,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 
 void WalkTest::DrawFrame2D (void)
 {
-  if (cslogo)
+  if (do_logo && cslogo)
   {
     unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
     unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;

@@ -342,6 +342,7 @@ public:
   bool do_freelook;
   bool do_gravity;
   bool do_light_frust;
+  bool do_logo;
   int cfg_draw_octree;
   int cfg_debug_check_frustum;
   int fgcolor_stats;
