@@ -90,28 +90,30 @@ char* csGetConfigPath ()
   return 0;
 }
 
-char** csGetPluginPaths ()
+csPluginPath* csGetPluginPaths ()
 {
   const char* crystal = getenv ("CRYSTAL");
 
   if (!crystal)
   {
-    char** paths = new char* [3];
-    paths[0] = csStrNew(CS_PLUGINDIR);
-    paths[1] = csStrNew(".");
-    paths[2] = 0;
+    csPluginPath* paths = new csPluginPath [3];
+    paths[0].path = csStrNew(CS_PLUGINDIR);
+    paths[0].scanRecursive = true;
+    paths[1].path = csStrNew(".");
+    paths[2].path = 0;
 
     return paths;
   }
 
-  char** paths = new char* [4];
-  paths[0] = csStrNew(crystal);
+  csPluginPath* paths = new csPluginPath [4];
+  paths[0].path = csStrNew(crystal);
   char* temp = new char[1024];
   strncpy (temp, crystal, 1000);
   strcat (temp, "/lib");
-  paths[1] = temp;
-  paths[2] = csStrNew(".");
-  paths[3] = 0;
+  paths[1].path = temp;
+  paths[1].scanRecursive = true;
+  paths[2].path = csStrNew(".");
+  paths[3].path = 0;
 
   return paths;
 }

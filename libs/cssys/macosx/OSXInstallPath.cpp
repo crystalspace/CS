@@ -61,9 +61,9 @@ char* csGetConfigPath()
 //-----------------------------------------------------------------------------
 // csGetPluginPaths
 //-----------------------------------------------------------------------------
-char** csGetPluginPaths()
+csPluginPath* csGetPluginPaths()
 {
-  char** paths = new char*[5];			// Caller frees.
+  csPluginPath* paths = new csPluginPath[5];			// Caller frees.
   char*  buff1 = new char[FILENAME_MAX];	// Caller frees.
   char*  buff2 = new char[FILENAME_MAX];	// Caller frees.
   char*  cpath = csGetConfigPath();		// Caller frees.
@@ -76,11 +76,13 @@ char** csGetPluginPaths()
   strncat(buff2, "/crystal", FILENAME_MAX);
   buff2[FILENAME_MAX - 1] = '\0';
   
-  paths[0] = buff1;
-  paths[1] = buff2;
-  paths[2] = cpath;
-  paths[3] = csStrNew(".");
-  paths[4] = 0;
+  paths[0].path = buff1;
+  paths[0].scanRecursive = true;
+  paths[1].path = buff2;
+  paths[1].scanRecursive = true;
+  paths[2].path = cpath;
+  paths[3].path = csStrNew(".");
+  paths[4].path = 0;
 
   return paths;
 }
