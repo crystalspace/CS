@@ -30,6 +30,7 @@ except AttributeError:
 del types
 
 
+CS_WCHAR_T_SIZE = _cspace.CS_WCHAR_T_SIZE
 class csWrapPtr(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
