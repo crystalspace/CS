@@ -80,6 +80,7 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
   CursorState = false;
   InvalidAll = true;
   mutex = csMutex::Create (true);
+  putTextLevel = 0;
 }
 
 csSimpleConsole::~csSimpleConsole ()
@@ -274,6 +275,8 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 {
   csScopedMutexLock lock (mutex);
 
+  putTextLevel++;
+
   int len;
   char *dst;
   const char *src;
@@ -338,7 +341,7 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
   *dst = '\0';
 
 Done:
-  if (Update && SystemReady)
+  if (Update && SystemReady && (putTextLevel == 1))
   {
     csRect rect;
     G2D->BeginDraw ();
@@ -347,6 +350,7 @@ Done:
     G2D->FinishDraw ();
     G2D->Print (&rect);
   }
+  putTextLevel--;
 }
 
 void csSimpleConsole::SetCursorPos (int iCharNo)

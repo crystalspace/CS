@@ -37,6 +37,7 @@ class csSimpleConsole : public iConsoleOutput
 {
 private:
   csRef<csMutex> mutex;
+  int putTextLevel;
 
   /// Two possible console modes
   enum

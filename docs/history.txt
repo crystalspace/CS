@@ -39,6 +39,11 @@ chronological order.
 	  box) when <autoffset /> is specified.
 	- res slightly improved the error handling when reading shader files
 	  from world files.
+	- res fixed the simple console to draw text in PutTextV() only if the
+	  method hadn't been called recursively (on rare occasions, something
+	  was reported from inside the 2D functions, causing the 2D stuff to
+	  be called again, where again something was reported and so on, 
+	  leading to an infinite recursion resp. stack overflow).
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through
