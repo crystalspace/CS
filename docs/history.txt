@@ -5,7 +5,7 @@ The history order has been reversed so that new features are at the top.
 	- Fundamental API change for sprites. Move() has been replaced with
 	  MovePosition() (relative move). SetMove() has been replaced
 	  with SetPosition() and GetOrigin() has been replaced with
-	  SetPosition(). This is both for 2D sprites and 3D sprites.
+	  GetPosition(). This is both for 2D sprites and 3D sprites.
 	  Additinally GetPosition (previously GetOrigin) and
 	  MovePosition (previously Move) have changed direction!!!
 	  They are now correct.
