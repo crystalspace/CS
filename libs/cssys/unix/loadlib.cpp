@@ -16,13 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssys/csshlib.h"
+#include "cssysdef.h"
 #include <dlfcn.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "csutil/csstring.h"
+#include "cssys/csshlib.h"
 
 #ifdef CS_DEBUG
 #  define DLOPEN_MODE   RTLD_NOW// | RTLD_GLOBAL	// handy for debugging
