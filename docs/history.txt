@@ -19,6 +19,27 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Jun-99:
+	- Applied patch from Or Siu Hang for MazeD. Changes are:
+		- Zip file creation/edit/saving is enabled: You may now
+		  open a zip file, edit the world, and save it in the same
+		  zip or new zip file.
+		- You may choose to save model in zip file or ordinary text
+		  file by choosing different extension, i.e. "zip? denotes
+		  zip format.
+		- Portal selection make more easy by displaying only the
+		  polygons in current selection.
+		- Things description are put in the preamble area. Now you
+		  need to add the thing statement in the sector description
+		  to make it visible.
+	  Known bugs:
+		- If the world zip file has only one file, the program will
+		  report error when updating the directory of the zip.
+		- Cannot load invalid text model file, it would crash.
+		  Reason: The program has no knowledge of whether the input
+		  file is text or binary.
+	- I changed an error to a warning for texture loading (test on
+	  power of two) because MazeD will not work otherwise.
 14-Jun-99:
 	- Gary Haussmann added basic 2D functionality for OpenGL in a common
 	  directory. Currently only the X OpenGL port uses this but other
@@ -41,6 +62,7 @@ Short-term cleanups that need to be done:
 	  hasn't changed.
 	- I added unix makefiles for the new csgame library and for the
 	  Crystal Shooter application from Thomas Hieber.
+	- Small changes from Bruce Williams.
 12-Jun-99:
 	- Update to Windows documentation from Thomas Hieber.
 11-Jun-99:
@@ -6150,7 +6172,7 @@ Short-term cleanups that need to be done:
   	  For example, while moving towards some wall with shadows, the
   	  shadows would suddenly become different when a different mipmap
   	  level was selected.
-  	  This is now completely eliminated with the disadvantáge that the
+  	  This is now completely eliminated with the disadvantage that the
   	  texture cacher now needs somewhat more time to cache-in far
   	  away polygons.
   	  With the Alt-t key you can toggle between:
