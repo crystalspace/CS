@@ -48,7 +48,7 @@ class csPolygon2D;
 class csPolygon2DQueue;
 class csFrustumList;
 class csFrustumView;
-class csShadowBlock;
+struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
@@ -748,7 +748,7 @@ public:
    * thus assumes that this thing is transformed to the
    * origin of the light.
    */
-  csShadowBlock* GetShadows (csVector3& origin);
+  void AppendShadows (iShadowBlockList* shadows, csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation

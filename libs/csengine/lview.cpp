@@ -21,11 +21,11 @@
 #include "csengine/lview.h"
 #include "csengine/engine.h"
 #include "csengine/polygon.h"
-#include "csengine/sector.h"
 #include "csgeom/polyclip.h"
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
+#include "iengine/sector.h"
 
 csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   callback_data (NULL)
@@ -86,7 +86,7 @@ IMPLEMENT_IBASE (csShadowBlock)
   IMPLEMENTS_INTERFACE (iShadowBlock)
 IMPLEMENT_IBASE_END
 
-csShadowBlock::csShadowBlock (csSector* sect, int draw_busy,
+csShadowBlock::csShadowBlock (iSector* sect, int draw_busy,
 	int max_shadows, int delta) : shadows (max_shadows, delta)
 {
   CONSTRUCT_IBASE (NULL);
@@ -132,6 +132,12 @@ void csShadowBlock::AddRelevantShadows (csShadowBlock* source,
   delete shadow_it;
 }
 
+void csShadowBlock::AddRelevantShadows (iShadowBlock* source,
+  	csTransform* trans)
+{
+  AddRelevantShadows ((csShadowBlock*)source, trans);
+}
+
 void csShadowBlock::AddRelevantShadows (csShadowBlockList* source)
 {
   csShadowIterator* shadow_it = source->GetCsShadowIterator ();
@@ -147,6 +153,11 @@ void csShadowBlock::AddRelevantShadows (csShadowBlockList* source)
   delete shadow_it;
 }
 
+void csShadowBlock::AddRelevantShadows (iShadowBlockList* source)
+{
+  AddRelevantShadows ((csShadowBlockList*)source);
+}
+
 void csShadowBlock::AddAllShadows (csShadowBlockList* source)
 {
   csShadowIterator* shadow_it = source->GetCsShadowIterator ();
@@ -157,6 +168,11 @@ void csShadowBlock::AddAllShadows (csShadowBlockList* source)
     shadows.Push (csf);
   }
   delete shadow_it;
+}
+
+void csShadowBlock::AddAllShadows (iShadowBlockList* source)
+{
+  AddAllShadows ((csShadowBlockList*)source);
 }
 
 void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList* source)
@@ -183,6 +199,11 @@ void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList* source)
   delete shadow_it;
 }
 
+void csShadowBlock::AddUniqueRelevantShadows (iShadowBlockList* source)
+{
+  AddUniqueRelevantShadows ((csShadowBlockList*)source);
+}
+
 csFrustum* csShadowBlock::AddShadow (const csVector3& origin, void* userData,
     	int num_verts, csPlane3& backplane)
 {
@@ -200,11 +221,6 @@ void csShadowBlock::UnlinkShadow (int idx)
   shadows.Delete (idx);
 }
 
-iSector* csShadowBlock::GetSector ()
-{
-  return &GetCsSector ()->scfiSector;
-}
-
 //---------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csShadowBlockList)
@@ -214,6 +230,21 @@ IMPLEMENT_IBASE_END
 csShadowBlockList::csShadowBlockList () : first (NULL), last (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+}
+
+iShadowBlock* csShadowBlockList::NewShadowBlock (iSector* sector,
+	int draw_busy, int num_shadows)
+{
+  csShadowBlock* n = new csShadowBlock (sector, draw_busy, num_shadows);
+  AppendShadowBlock (n);
+  return (iShadowBlock*)n;
+}
+
+iShadowBlock* csShadowBlockList::NewShadowBlock ()
+{
+  csShadowBlock* n = new csShadowBlock ();
+  AppendShadowBlock (n);
+  return (iShadowBlock*)n;
 }
 
 //---------------------------------------------------------------------------

@@ -29,7 +29,6 @@ class csVector3;
 class csLight;
 class csFrustumView;
 class csClipper;
-class csSector;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -140,12 +139,12 @@ class csShadowBlock : public iShadowBlock
 private:
   csShadowBlock* next, * prev;
   csVector shadows;
-  csSector* sector;
+  iSector* sector;
   int draw_busy;
 
 public:
   /// Create a new empty list for a sector.
-  csShadowBlock (csSector* sector, int draw_busy, int max_shadows = 30,
+  csShadowBlock (iSector* sector, int draw_busy, int max_shadows = 30,
   	int delta = 30);
   /// Create a new empty list.
   csShadowBlock (int max_shadows = 30, int delta = 30);
@@ -154,7 +153,7 @@ public:
   virtual ~csShadowBlock ();
 
   /// Dereference all shadows in the list.
-  void DeleteShadows ()
+  virtual void DeleteShadows ()
   {
     int i;
     for (i = 0 ; i < shadows.Length () ; i++)
@@ -174,11 +173,27 @@ public:
   void AddRelevantShadows (csShadowBlock* source, csTransform* trans = NULL);
   
   /**
+   * Copy all relevant shadow frustums from another shadow block
+   * into this block. The frustums are not really copied but a new
+   * reference is kept. However, if a transformation is given then
+   * a copy is made and the shadows are transformed.
+   */
+  virtual void AddRelevantShadows (iShadowBlock* source,
+  	csTransform* trans = NULL);
+  
+  /**
    * Copy all relevant shadow frustums from another shadow block list
    * into this block. The frustums are not really copied but a new
    * reference is kept.
    */
   void AddRelevantShadows (csShadowBlockList* source);
+  
+  /**
+   * Copy all relevant shadow frustums from another shadow block list
+   * into this block. The frustums are not really copied but a new
+   * reference is kept.
+   */
+  virtual void AddRelevantShadows (iShadowBlockList* source);
   
   /**
    * Copy all shadow frustums from another shadow block list
@@ -188,6 +203,13 @@ public:
   void AddAllShadows (csShadowBlockList* source);
 
   /**
+   * Copy all shadow frustums from another shadow block list
+   * into this block. The frustums are not really copied but a new
+   * reference is kept.
+   */
+  virtual void AddAllShadows (iShadowBlockList* source);
+
+  /**
    * Add unique shadows. Only add relevant shadow frustums that are not
    * already in the current list. The frustums are not really copied
    * but a new reference is kept.
@@ -195,17 +217,25 @@ public:
   void AddUniqueRelevantShadows (csShadowBlockList* source);
   
   /**
+   * Add unique shadows. Only add relevant shadow frustums that are not
+   * already in the current list. The frustums are not really copied
+   * but a new reference is kept.
+   */
+  virtual void AddUniqueRelevantShadows (iShadowBlockList* source);
+  
+  /**
    * Add a new frustum and return a reference.
    * The frustum will have the specified number of vertices but the
    * vertices still need to be initialized.
    */
-  csFrustum* AddShadow (const csVector3& origin, void* userData, int num_verts,
-      	csPlane3& backplane);
+  virtual csFrustum* AddShadow (const csVector3& origin, void* userData,
+  	int num_verts, csPlane3& backplane);
+
   /// Unlink a shadow frustum from the list and dereference it.
-  void UnlinkShadow (int idx);
+  virtual void UnlinkShadow (int idx);
 
   /// Get the number of shadows in this list.
-  int GetNumShadows ()
+  virtual int GetNumShadows ()
   {
     return shadows.Length ();
   }
@@ -241,9 +271,7 @@ public:
   }
 
   /// Get Sector.
-  csSector* GetCsSector () { return sector; }
-  /// Get Sector.
-  virtual iSector* GetSector ();
+  virtual iSector* GetSector () { return sector; }
   /// Get draw_busy for sector.
   virtual int GetRecLevel () { return draw_busy; }
 
@@ -268,6 +296,12 @@ public:
     DeleteAllShadows ();
   }
 
+  /// Create a new shadow block and append to the list.
+  virtual iShadowBlock* NewShadowBlock (iSector* sector,
+  	int draw_busy, int num_shadows = 30);
+  /// Create a new shadow block and append to the list.
+  virtual iShadowBlock* NewShadowBlock ();
+
   /// Append a shadow block to this list.
   void AppendShadowBlock (csShadowBlock* slist)
   {
@@ -286,7 +320,7 @@ public:
   }
 
   /// Remove the last shadow block from this list.
-  void RemoveLastShadowBlock ()
+  virtual void RemoveLastShadowBlock ()
   {
     if (last)
     {
@@ -300,7 +334,7 @@ public:
   void Clear () { first = last = NULL; }
 
   /// Destroy all shadow lists and shadows in the list.
-  void DeleteAllShadows ()
+  virtual void DeleteAllShadows ()
   {
     while (first)
     {
@@ -312,10 +346,20 @@ public:
     last = NULL;
   }
 
-  csShadowBlock* GetFirstShadowBlock () { return first; }
-  csShadowBlock* GetLastShadowBlock () { return last; }
+  csShadowBlock* GetCsFirstShadowBlock () { return first; }
+  csShadowBlock* GetCsLastShadowBlock () { return last; }
   csShadowBlock* GetNextShadowBlock (csShadowBlock* s) { return s->next; }
   csShadowBlock* GetPreviousShadowBlock (csShadowBlock* s) { return s->prev; }
+  virtual iShadowBlock* GetFirstShadowBlock () { return (iShadowBlock*)first; }
+  virtual iShadowBlock* GetLastShadowBlock () { return (iShadowBlock*)last; }
+  virtual iShadowBlock* GetNextShadowBlock (iShadowBlock* s)
+  {
+    return (iShadowBlock*)(((csShadowBlock*)s)->next);
+  }
+  virtual iShadowBlock* GetPreviousShadowBlock (iShadowBlock* s)
+  {
+    return (iShadowBlock*)(((csShadowBlock*)s)->prev);
+  }
 
   /**
    * Return an iterator to iterate over all shadows in this list.
@@ -367,6 +411,19 @@ struct csFrustumViewCleanup
  */
 class csFrustumView
 {
+private:
+  /**
+   * The list of shadow frustums. Note that this list will be
+   * expanded with every traversal through a portal but it needs
+   * to be restored to original state again before returning.
+   */
+  csShadowBlockList* shadows;
+  /**
+   * This flag is true if the list of shadows is shared with some
+   * other csFrustumView.
+   */
+  bool shared;
+
 public:
   /// The head of cleanup actions
   csFrustumViewCleanup *cleanup;
@@ -423,14 +480,6 @@ public:
   csFrustum* light_frustum;
 
   /**
-   * The list of shadow frustums. Note that this list will be
-   * expanded with every traversal through a portal but it needs
-   * to be restored to original state again before returning.
-   */
-  csShadowBlockList* shadows;
-  bool shared;
-
-  /**
    * A callback function. If this is set then no actual
    * lighting is done.
    * Instead the callback function is called.
@@ -470,6 +519,9 @@ public:
 
   /// Start new shadow list for this frustum.
   void StartNewShadowBlock ();
+
+  /// Get the list of shadows.
+  iShadowBlockList* GetShadows () { return (iShadowBlockList*)shadows; }
 };
 
 #endif // __CS_LVIEW_H__

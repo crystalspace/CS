@@ -1013,9 +1013,11 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 // and also more correct in that a convex 3D object has no internal
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
-csShadowBlock* csThing::GetShadows (csVector3& origin)
+void csThing::AppendShadows (iShadowBlockList* shadows, csVector3& origin)
 {
-  csShadowBlock* list = new csShadowBlock (movable.GetSector (0),
+  iShadowBlock* list = shadows->NewShadowBlock (
+  	&(movable.GetSector (0)->scfiSector),
+	movable.GetSector (0)->draw_busy,
   	polygons.Length ());
   csFrustum* frust;
   int i, j;
@@ -1037,7 +1039,6 @@ csShadowBlock* csThing::GetShadows (csVector3& origin)
     for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       frust->GetVertex (j).Set (p->Vwor (j)-origin);
   }
-  return list;
 }
 
 void csThing::CreateBoundingBox ()

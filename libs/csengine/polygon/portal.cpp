@@ -255,14 +255,13 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
+    iShadowBlock* slist = lview.GetShadows ()->GetFirstShadowBlock ();
     while (slist)
     {
-      csShadowBlock* copy_slist = new csShadowBlock (slist->GetCsSector (),
-      	slist->GetRecLevel ());
-      new_lview.shadows->AppendShadowBlock (copy_slist);
+      iShadowBlock* copy_slist = new_lview.GetShadows ()->NewShadowBlock (
+      	slist->GetSector (), slist->GetRecLevel ());
       copy_slist->AddRelevantShadows (slist, &warp_wor);
-      slist = lview.shadows->GetNextShadowBlock (slist);
+      slist = lview.GetShadows ()->GetNextShadowBlock (slist);
     }
 
     copied_frustums = true;
@@ -298,17 +297,15 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
+    iShadowBlock* slist = lview.GetShadows ()->GetFirstShadowBlock ();
     while (slist)
     {
       copied_frustums = true; // Only set to true here
-
-      csShadowBlock* copy_slist = new csShadowBlock (slist->GetCsSector (),
-      	slist->GetRecLevel ());
-      new_lview.shadows->AppendShadowBlock (copy_slist);
+      iShadowBlock* copy_slist = new_lview.GetShadows ()->NewShadowBlock (
+      	slist->GetSector (), slist->GetRecLevel ());
       copy_slist->AddRelevantShadows (slist);
 
-      slist = lview.shadows->GetNextShadowBlock (slist);
+      slist = lview.GetShadows ()->GetNextShadowBlock (slist);
     }
   }
 
@@ -317,7 +314,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   if (copied_frustums)
   {
     // Delete all copied frustums.
-    new_lview.shadows->DeleteAllShadows ();
+    new_lview.GetShadows ()->DeleteAllShadows ();
   }
 }
 

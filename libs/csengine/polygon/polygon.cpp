@@ -1562,7 +1562,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     lp->Initialize (lview.light_frustum->GetNumVertices ());
 
     // Copy shadow frustums.
-    lp->shadows.AddRelevantShadows (lview.shadows);
+    lp->shadows.AddRelevantShadows (lview.GetShadows ());
 
     int i, mi;
     for (i = 0 ; i < lp->num_vertices ; i++)
@@ -1599,7 +1599,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // each other.
   int i, i1, j, j1;
 
-  csShadowIterator* shadow_it = lview.shadows->GetCsShadowIterator ();
+  iShadowIterator* shadow_it = lview.GetShadows ()->GetShadowIterator ();
   csFrustum *lf = lview.light_frustum;
 
   // Precalculate the normals for csFrustum::BatchClassify.
@@ -1674,12 +1674,12 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
           shadow_it->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
-	  delete shadow_it;
+	  shadow_it->DecRef ();
           return false;
       }
     }
   }
-  delete shadow_it;
+  shadow_it->DecRef ();
   return true;
 }
 

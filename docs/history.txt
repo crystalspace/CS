@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+22-Mar-2001:
+	- Rewrote the CheckFrustum and shadow stuff so that most of it now
+	  uses the SCF interfaces instead of the classes.
 21-Mar-2001:
 	- Martin Geisse did a big redesign and cleanup of the sound system:
 	    - Merged static and streamed sound data classes.

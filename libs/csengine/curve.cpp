@@ -459,7 +459,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   csVector3 pos;
   int uv;
 
-  csShadowIterator* shadow_it = lview.shadows->GetCsShadowIterator ();
+  iShadowIterator* shadow_it = lview.GetShadows ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
   
   int lm_width = lightmap->GetWidth ();
@@ -527,7 +527,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     // @@@: It would be nice if we could optimize earlier 
     // to determine relevant shadow frustums in curves and use
     // AddRelevantShadows instead.
-    lp->shadows.AddAllShadows (lview.shadows);
+    lp->shadows.AddAllShadows (lview.GetShadows ());
 
     lp->light_frustum = new csFrustum(*lview.light_frustum);
 

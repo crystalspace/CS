@@ -90,9 +90,9 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
     int GetShadowCount ()
     { return shadows.GetNumShadows (); }
 
-    csShadowIterator* GetShadowIterator ()
+    iShadowIterator* GetShadowIterator ()
     {
-      return shadows.GetCsShadowIterator ();
+      return shadows.GetShadowIterator ();
     }
 
     ~LightViewInfo ()
@@ -115,7 +115,7 @@ public:
   int GetShadowCount ()
   { return lvlist.Get (lvlist.Length () - 1)->GetShadowCount (); }
   // Get iterator to iterate over all shadows.
-  csShadowIterator* GetShadowIterator ()
+  iShadowIterator* GetShadowIterator ()
   {
     return lvlist.Get (lvlist.Length () - 1)->GetShadowIterator ();
   }
@@ -194,7 +194,7 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   CS_ASSERT (cur_poly);
 
   // Check if any shadow frustums we have now have not been seen in the past
-  lvi->shadows.AddUniqueRelevantShadows (lview->shadows);
+  lvi->shadows.AddUniqueRelevantShadows (lview->GetShadows ());
   return !lvi->unlit_poly;
 }
 
@@ -590,7 +590,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   // Now subtract all shadow polygons from the coverage matrix.
   // At the same time, add the overlapping shadows to the coverage matrix.
   int nsf;
-  csShadowIterator* shadow_it;
+  iShadowIterator* shadow_it;
   csFrustum *csf;
   if (dli)
   {
@@ -600,7 +600,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   else
   {
     nsf = 0;
-    shadow_it = lview.shadows->GetCsShadowIterator ();
+    shadow_it = lview.GetShadows ()->GetShadowIterator ();
     while (shadow_it->HasNext ())
     {
       shadow_it->Next ();
@@ -692,7 +692,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 #endif
 
   } /* endfor */
-  delete shadow_it;
+  shadow_it->DecRef ();
 
   // Free all shadow frustums
   for (i = 0; i < nsf; i++)
@@ -1014,7 +1014,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	// Check if the point on the polygon is shadowed. To do this
 	// we traverse all shadow frustums and see if it is contained in any of them.
-	csShadowIterator* shadow_it = lp->shadows.GetCsShadowIterator ();
+	iShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
 	bool shadow = false;
 	while (shadow_it->HasNext ())
 	{
@@ -1024,7 +1024,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
 	    { shadow = true; break; }
 	}
-	delete shadow_it;
+	shadow_it->DecRef ();
 
 	if (!shadow)
 	{
