@@ -187,6 +187,10 @@ Collision detection (using @sc{rapid} or @sc{opcode}).
 @xref{HOWTO Collision Detection}.
 
 @item
+Powerful sequence manager to control movement, animation and other
+features in a world. @xref{Sequence Manager}.
+
+@item
 Bitmapped and vector fonts (freefont). @xref{HOWTO Use custom font}.
 
 @item

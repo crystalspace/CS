@@ -19,6 +19,7 @@ Currently only some separate documents about the engine are available:
 * 3D Sprites::
 * Dynamic Worlds::
 * Level of Detail::
+* Sequence Manager::
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}
@@ -32,3 +33,5 @@ Currently only some separate documents about the engine are available:
 @importss{plugins,engine,3dsprite.txi}
 @importss{plugins,engine,dynworld.txi}
 @importss{plugins,engine,lod.txi}
+@importss{plugins,engine,sequence.txi}
+

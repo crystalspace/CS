@@ -9,6 +9,8 @@ chronological order.
 16-Aug-2003
 	- Jorrit added more features with references to parts of the
 	  documentation.
+	- Jorrit started some documentation about the engine sequence
+	  manager.
 15-Aug-2003
 	- Jorrit did some documentation fixes on the new lod section.
 	- Jorrit added support for <nullmesh> in factories too.

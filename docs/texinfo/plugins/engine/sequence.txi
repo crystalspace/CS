@@ -1,0 +1,138 @@
+@c -*-texinfo-*-
+@node Sequence Manager, , Dynamic Worlds, csEngine
+@subsection Sequence Manager
+@cindex Sequence Manager
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 16 August 2003.}
+
+When you define geometiry in a map file this usually define a static
+representation of the world. Using the sequence manager it is possible
+to define specific events that trigger on certain conditions. Using these
+events (sequences) you can move or animate objects, control lights, fog,
+@dots{}.
+
+The sequence manager is actually divided in two plugins. First there is
+the basic sequence manager itself. This is nothing more then a schedular
+that can schedule certain actions that should happen at certain times.
+Applications can use this sequence manager for their own purposes if they
+want.
+
+On top of the sequence manager there runs the engine sequence manager. This
+plugin predefines several actions and triggers which make it a lot easier
+to do engine related things like moving objects, controlling lights, @dots{}.
+We will discuss mainly the engine sequence manager in this section.
+
+@subsubheading Basic Example
+
+The easiest way to explain the engine sequence manager is to look at a simple
+example as how it can be used from a map file:
+
+@example
+<world>
+  @dots{}
+  <sector name="hall">
+    <light name="roomlight">
+      <center x="10" y="4" z="10" />
+      <radius>20</radius>
+      <color red="0" green="0" blue="0" />
+      <dynamic />
+    </light>
+    @dots{}
+  </sector>
+  @dots{}
+  <sequences>
+
+    <sequence name="turn_on_light">
+      <setlight light="roomlight" red="1" green="1" blue="1" />
+      <delay time="50" />
+      <setlight light="roomlight" red="0" green="0" blue="0" />
+      <delay time="80" />
+      <setlight light="roomlight" red="1" green="1" blue="1" />
+    </sequence>
+
+  </sequences>
+
+  <triggers>
+
+    <trigger name="trig_turn_on_light">
+      <sectorvis sector="hall">
+        <sphere x="10" y="4" z="10" radius="5" />
+      </sectorvis>
+      <fire delay="0" sequence="turn_on_light" />
+    </trigger>
+
+  </triggers>
+</world>
+@end example
+
+This is a simple example where we turn on a light as soon as we are
+in a certain radius of the light. Let's explain how it works. First we
+define a sequence which is called @samp{turn_on_light}. This sequence
+has three @samp{setlight} operations and two delays. Internally this is
+compiled to something which looks like this:
+
+@example
+time 0ms: setlight 'roomlight',1,1,1
+time 50ms: setlight 'roomlight',0,0,0
+time 130ms: setlight 'roomlight',1,1,1
+@end example
+
+Basically there are three operations here and the delays are only used to
+indicate when these operations are executed relative to the start of the
+entire sequence. So for example, if the sequence is fired at time 10050 then
+immediatelly at that point the first operation is executed. 50 milliseconds
+later the second operation is executed and finally, 130 milliseconds later
+the last operation is exexuted.
+
+There are a few important observations to be made about this. First, as soon
+as a sequence is executed or fired ALL operations in that sequence will
+execute at the correct relative time no matter what happens otherwise. This
+also means that if you fire another sequence then that sequence will also get
+fired at the same time and depending on the relative timing of the operations
+some of those operations might happen at the same time.
+
+Also note that there are operations that themselves have a duration. For
+example, there is a @samp{fadelight} operation which fades a light to some
+color. It has a @samp{duration} parameter. But this duration does NOT influence
+the relative timing in the sequence itself. So for example if you have this:
+
+@example
+  <fadelight light="somelight" red="0" green="0" blue="0" duration="1000" />
+  <fadelight light="somelight" red="1" green="1" blue="1" duration="1000" />
+@end example
+
+Then this will execute two fade operations on the same light at exactly
+the same time which is probably not what you want. This example is probably
+better written as:
+
+@example
+  <fadelight light="somelight" red="0" green="0" blue="0" duration="1000" />
+  <delay time="1000" />
+  <fadelight light="somelight" red="1" green="1" blue="1" duration="1000" />
+@end example
+
+This will place the two operations at a time distance of 1000 milliseconds.
+
+The reason that using @samp{duration} does not automatically advance the
+internal relative time is that it is sometimes useful to start several
+fade operations (or other operations that have a duration) at the same time.
+For example, two fade operations on two different lights.
+
+A sequence as such is not useful. It needs to be fired at some point.
+You can fire sequences manually from code or you can define a trigger
+to fire the sequence if a certain condition is true. In this case we
+have a trigger which is called @samp{trig_turn_on_light}. This trigger
+will fire if the sector @samp{hall} is visible and the camera is in the
+sphere defined by the center @samp{10,4,10} and radius @samp{5}. As soon
+as this condition is valid the @samp{turn_on_light} sequence will be
+fired immediatelly. Note that this automatically implies that the trigger
+is disabled. This is to prevent the sequence from being fired several times
+while the trigger condition remains valid. If you want a trigger that keeps
+firing you have to re-enable it in the sequence.
+
+@subsubheading More Stuff
+
+TODO @@@
+
