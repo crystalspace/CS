@@ -21,8 +21,9 @@
  * not handle parsing of texture statements in any way.
  */
 
-#include <ctype.h>
 #include "cssysdef.h"
+
+#include "ivideo/graph3d.h"
 #include "csloader.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
@@ -34,7 +35,6 @@
 #include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "imap/reader.h"
@@ -277,7 +277,11 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node,
   if (!ctx->HasImage() || !ctx->GetImage())
     return NULL;
 
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iRender3D> G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif
   if (!G3D) return NULL;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return NULL;
@@ -347,7 +351,11 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   Image.AttachNew (csCreateXORPatternImage (w, h, depth, color.red, color.green,
     color.blue));
 
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iRender3D> G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif
   if (!G3D) return NULL;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return NULL;

@@ -54,6 +54,8 @@ The history order is reversed so that new features are at the top.
 	      invoking external scripts
 	    - Introduced a debug mode for the rules
 	    - Fixed some typos/comments all over the rules
+	- res added some #ifdefs to the texture loader in csparser to make it
+	  work with render3d.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.
