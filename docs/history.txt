@@ -1,7 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+17-Aug-2002
+	- Better error message is a texture could not be loaded in
+	  the loader.
 16-Aug-2002
-	- Implemented XML loading in the csparser plugin for the following items:
+	- Implemented XML loading in the csparser plugin for the following
+	  items:
 	    - Library (LIBRARY)
 	    - Sounds (SOUNDS and SOUND)
 	    - Lod control (LOD)

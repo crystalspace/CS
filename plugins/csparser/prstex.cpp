@@ -322,6 +322,13 @@ iTextureWrapper* csLoader::ParseTexture (char *name, char* buf)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 
+  if (!tex)
+  {
+    ReportError (
+	      "crystalspace.maploader.parse.texture",
+	      "Could not load texture '%s'\n", name);
+  }
+
   return tex;
 }
 
@@ -670,6 +677,13 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   if (tex && do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
+
+  if (!tex)
+  {
+    ReportError (
+	      "crystalspace.maploader.parse.texture",
+	      "Could not load texture '%s'\n", txtname);
+  }
 
   return tex;
 }
