@@ -293,7 +293,7 @@ above, though.
 Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
 @end itemize
 
-One important note when using @samp{thing} meshes: it is @emph{VERY} important
+One important note when using @samp{thing} meshes: it is @emph{very} important
 to try to use quads instead of triangles. This is because lightmaps are
 rectangular. If you have a wall made out of two triangles then you will have
 two full square lightmaps (one for every triangle) which is a waste given
