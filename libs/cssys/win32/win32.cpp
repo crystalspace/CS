@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "cssys/win32/win32.h"
@@ -450,7 +451,7 @@ SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-void ToLower(char *dst, const char *src) 
+static void ToLower (char *dst, const char *src) 
 {
   char *d=dst;
   const char *s=src;
