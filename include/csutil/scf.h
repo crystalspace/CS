@@ -24,7 +24,7 @@
  * Crystal Space Shared Class Facility (SCF)
  */
 
-/** 
+/**
  * \addtogroup scf
  * @{ */
 
@@ -122,8 +122,8 @@ struct iBase
  */
 #define SCF_DECLARE_IBASE						\
   int scfRefCount;		/* Reference counter */			\
-  csArray<iBase**>* weak_ref_owners;					\
-  void RemoveRefOwners ();						\
+  csArray<iBase**>* scfWeakRefOwners;					\
+  void scfRemoveRefOwners ();						\
   SCF_DECLARE_EMBEDDED_IBASE (iBase)
 
 /**
@@ -150,7 +150,7 @@ public:									\
  */
 #define SCF_CONSTRUCT_IBASE(Parent)					\
   scfRefCount = 1;							\
-  weak_ref_owners = 0;							\
+  scfWeakRefOwners = 0;							\
   scfParent = Parent; if (scfParent) scfParent->IncRef();
 
 /**
@@ -168,11 +168,11 @@ public:									\
  * of an exported class (not inside an embedded interface).
  */
 #define SCF_DESTRUCT_IBASE()						\
-  RemoveRefOwners ();
+  scfRemoveRefOwners ();
 
 /**
- * The SCF_DESTRUCT_EMBEDDED_IBASE macro should be invoked inside the destructor
- * of an embedded class.
+ * The SCF_DESTRUCT_EMBEDDED_IBASE macro should be invoked inside the
+ * destructor of an embedded class.
  */
 #define SCF_DESTRUCT_EMBEDDED_IBASE()
 
@@ -202,7 +202,7 @@ void Class::DecRef ()							\
   if (scfRefCount == 1)							\
   {									\
     SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
-    RemoveRefOwners ();							\
+    scfRemoveRefOwners ();						\
     if (scfParent)							\
       scfParent->DecRef ();						\
     delete this;							\
@@ -210,16 +210,16 @@ void Class::DecRef ()							\
   }									\
   scfRefCount--;							\
 }									\
-void Class::RemoveRefOwners ()						\
+void Class::scfRemoveRefOwners ()					\
 {									\
-  if (!weak_ref_owners) return;						\
-  for (int i = 0 ; i < weak_ref_owners->Length () ; i++)		\
+  if (!scfWeakRefOwners) return;					\
+  for (int i = 0 ; i < scfWeakRefOwners->Length () ; i++)		\
   {									\
-    iBase** p = (*weak_ref_owners)[i];					\
+    iBase** p = (*scfWeakRefOwners)[i];					\
     *p = 0;								\
   }									\
-  delete weak_ref_owners;						\
-  weak_ref_owners = 0;							\
+  delete scfWeakRefOwners;						\
+  scfWeakRefOwners = 0;							\
 }
 
 /**
@@ -229,15 +229,15 @@ void Class::RemoveRefOwners ()						\
 #define SCF_IMPLEMENT_IBASE_REFOWNER(Class)				\
 void Class::AddRefOwner (iBase** ref_owner)				\
 {									\
-  if (!weak_ref_owners)							\
-    weak_ref_owners = new csArray<iBase**>;				\
-  weak_ref_owners->Push (ref_owner);					\
+  if (!scfWeakRefOwners)						\
+    scfWeakRefOwners = new csArray<iBase**>;				\
+  scfWeakRefOwners->Push (ref_owner);					\
 }									\
 void Class::RemoveRefOwner (iBase** ref_owner)				\
 {									\
-  if (!weak_ref_owners)							\
-    weak_ref_owners = new csArray<iBase**>;				\
-  weak_ref_owners->Delete (ref_owner);					\
+  if (!scfWeakRefOwners)						\
+    scfWeakRefOwners = new csArray<iBase**>;				\
+  scfWeakRefOwners->Delete (ref_owner);					\
 }
 
 /**
@@ -730,22 +730,22 @@ inline static scfInterfaceID Name##_scfGetID ()				\
   Interface##_scfGetID (), Interface##_VERSION)))
 
 /**
- * This function should be called to initialize client SCF library.  
+ * This function should be called to initialize client SCF library.
  * If a number of plugin paths are provided, the directories will be
  * scanned for plugins and their SCF-related registry data will be retrieved.
- * The root node within the registry data document should be named "plugin", 
- * and the SCF-related information should be in a child node of the root 
+ * The root node within the registry data document should be named "plugin",
+ * and the SCF-related information should be in a child node of the root
  * named "scf".
  * It is legal to call scfInitialize more than once (possibly providing a
- * different set of directories each time).  
+ * different set of directories each time).
  * \param pluginPaths Directories that will be scanned for plugins. If this
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
- * \remark The path list is ignored for static builds. 
+ * \remark The path list is ignored for static builds.
  */
 extern void scfInitialize (csPluginPaths* pluginPaths);
 
 /**
- * This function should be called to initialize client SCF library.  
+ * This function should be called to initialize client SCF library.
  * It uses the default plugin paths provided by csGetPluginPaths().
  */
 extern void scfInitialize (int argc, const char* const argv[]);
@@ -794,7 +794,7 @@ struct iSCF : public iBase
 #endif
 
   /**
-   * Read additional class descriptions from the given iDocument.  
+   * Read additional class descriptions from the given iDocument.
    */
   virtual void RegisterClasses (iDocument* metadata,
     const char* context = 0) = 0;
@@ -808,9 +808,9 @@ struct iSCF : public iBase
     const char* context = 0) = 0;
 
   /**
-   * Read additional class descriptions from the given iDocument.  
+   * Read additional class descriptions from the given iDocument.
    */
-  virtual void RegisterClasses (const char* pluginPath, 
+  virtual void RegisterClasses (const char* pluginPath,
     iDocument* metadata, const char* context = 0) = 0;
 
   /**
@@ -869,7 +869,7 @@ struct iSCF : public iBase
    * list. 'context' is an information about the source of the plugin. It
    * primarily affects whether a class conflict is reported. If the same
    * class already exists in the same context, a warning is emitted; if it's
-   * in a different context, only there is a notification only in debug mode. 
+   * in a different context, only there is a notification only in debug mode.
    */
   virtual bool RegisterClass (const char *iClassID,
 	const char *iLibraryName, const char *iFactoryClass,
@@ -935,11 +935,11 @@ struct iSCF : public iBase
    */
   virtual void ScanPluginsPath (const char* path, bool recursive = false,
     const char* context = 0) = 0;
-    
+
   /**
    * Register a single plugin.
-   * \param path (Almost) fully qualified native path to the plugin binary. 
-   *   'Almost' because it doesn't have to be the actual binary - it is 
+   * \param path (Almost) fully qualified native path to the plugin binary.
+   *   'Almost' because it doesn't have to be the actual binary - it is
    *   sufficient if the file name suffix is ".csplugin", no matter what
    *   the real extension for binaries on a platform is or whether there
    *   actually is an external .csplugin file.
