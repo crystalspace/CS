@@ -68,7 +68,6 @@ PLUGINS.DYNAMIC += video/loader/tga
 PLUGINS.DYNAMIC += video/loader/sgi
 PLUGINS.DYNAMIC += video/loader/wal
 PLUGINS.DYNAMIC += net/driver/socket
-PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += console/output/standard
 PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += dungeon
