@@ -19,7 +19,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "csutil/scf.h"
-#include "cs2d/common/graph2d.h"
+#include "video/canvas/common/graph2d.h"
 class NeXTFrameBuffer;
 @class NeXTView;
 
