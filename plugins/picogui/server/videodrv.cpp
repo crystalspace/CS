@@ -68,7 +68,7 @@ g_error csPGVideoDriver::RegFunc (vidlib *v)
   v->line			= Line;
   v->rect			= Rect;
   v->blit			= Blit;*/
-  v->bitmap_load		= Load;
+  v->bitmap_load		= Load; 
   /*v->bitmap_new			= New;
   v->bitmap_free		= Free;
   v->bitmap_getsize		= GetSize;
@@ -111,7 +111,7 @@ int csPGVideoDriver::BeginDraw (struct divnode **div, struct gropnode ***listp,
 // Works in gcc too, right? Otherwise someone on posix fix it :)
 // - Anders Stenberg
 g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, 
-                                  unsigned flags)
+                                  uint32 flags)
 {
   delete vid->display->bits;
   vid->display->bits = new u8[vid->xres*vid->yres*(vid->bpp>>3)];
@@ -337,7 +337,7 @@ g_error csPGVideoDriver::New (hwrbitmap *b, int16 w, int16 h, uint16 bpp)
   return 0;
 }
 
-g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, unsigned len)
+g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, uint32 len)
 {
 
   int format;
@@ -392,7 +392,7 @@ g_error csPGVideoDriver::GetGropRender (hwrbitmap b, groprender **g)
   return 0;
 }
 
-g_error csPGVideoDriver::GetShareMem (hwrbitmap b, unsigned long uid, pgshmbitmap *info)
+g_error csPGVideoDriver::GetShareMem (hwrbitmap b, uint32 uid, pgshmbitmap *info)
 {
 #if 0
   if (GETBMP (b)->G2D ())

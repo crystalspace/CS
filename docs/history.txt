@@ -23,6 +23,8 @@ chronological order.
 	  'AttachCollider' methods so they appear in API docs.
 	- Keith fixed sprcal3d for missing iLODControl and added a better
 	  error message on missing name attribute in <animation> tag.
+	- DeSigna changed all instances of type unsigned in the picogui plugin 
+	  to uint32.
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
