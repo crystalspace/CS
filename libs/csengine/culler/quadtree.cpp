@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Wouter Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -48,7 +49,7 @@ csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
   bbox = the_box;
   max_depth= the_depth;
   root_state = CS_QUAD_EMPTY;
-  if(depth < 1)
+  if(max_depth < 1)
   {
     CsPrintf(MSG_FATAL_ERROR, "QuadTree: Depth too small\n");
     exit(1);
@@ -59,12 +60,12 @@ csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
   /// nr of nodes in leaves at depth n is: 4**(n-1)
   /// nr of nodes in the tree with depth n: (4**n - 1) / 3
   int nr_leaves = Pow2(2* (max_depth-1) );
-  int nr_nodes = ( Pow2( 2*n ) - 1 ) / 3;
+  int nr_nodes = ( Pow2( 2*max_depth ) - 1 ) / 3;
 
   /// 4 nodes per byte, the root node is stored seperately
   state_size = (nr_nodes - 1) / 4;
-  CsPrintf(MSG_STDOUT, "QuadTree: depth %d, nodes %d, statesize %d bytes\n", 
-    max_depth, nr_nodes, state_size);
+  CsPrintf(MSG_STDOUT, "QuadTree: depth %d, nodes %d, leaves %d, statesize %d"
+    "bytes\n", max_depth, nr_nodes, nr_leaves, state_size);
 
   if(state_size > 0)
   {
@@ -190,14 +191,18 @@ void csQuadTree :: MakeEmpty()
 int csQuadTree :: mark_node_func (const csBox2& node_bbox,
   int node_depth, int node_state, int offset, int node_nr, void* data)
 {
+  (void)node_bbox;
+  (void)node_depth;
+  (void)node_state;
   SetNodeState(offset, node_nr, (int)data);
+  return (int)data;
 }
 
 
 int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
   int node_depth, int node_state, int offset, int node_nr, void* data)
 {
-  struct poly_info info& = *(struct poly_info*)data;
+  struct poly_info& info = *(struct poly_info*)data;
   if(node_state == CS_QUAD_UNKNOWN)
   {
     CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: insertpoly quad_unknown.\n");
@@ -207,7 +212,7 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     return CS_QUAD_NOCHANGE;
 
   /// perhaps none of the node is covered?
-  if (!node_bbox.Overlap (info.pol_bbox)) 
+  if (!node_bbox.Overlap (*info.pol_bbox)) 
     return CS_QUAD_NOCHANGE;
 
   ///----------------------------------------------------
@@ -216,21 +221,21 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
 
   /// is the whole node covered?
   /// first check bounding boxes then precisely.
-  if(info.pol_bbox.Contains(node_bbox) &&
+  if(info.pol_bbox->Contains(node_bbox) &&
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
     if(!info.test_only)
       SetNodeState(offset, node_nr, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
     if(node_depth < max_depth)
-      CallChildren(mark_node_func, node_bbox, node_depth, node_offset, 
-        node_nr, (void*)CS_QUAD_UNKNOWN);
+      CallChildren(mark_node_func, node_bbox, node_depth, offset, node_nr, 
+        (void*)CS_QUAD_UNKNOWN);
     return CS_QUAD_CERTAINCHANGE;
   }
   
   /// So a part of the node may be covered, perhaps none.
   /// could test some more points here.
-  if( csPoly2D::In(info.verts, info.num_verts, node_bbox->GetCenter())
+  if( csPoly2D::In(info.verts, info.num_verts, node_bbox.GetCenter())
     || node_bbox.Intersect(info.verts, info.num_verts))
   { 
     int old_node_state = node_state;
@@ -239,8 +244,8 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      CallChildren(mark_node_func, node_bbox, node_depth, node_offset, 
-        node_nr, (void*)CS_QUAD_EMPTY);
+      CallChildren(mark_node_func, node_bbox, node_depth, offset, node_nr, 
+        (void*)CS_QUAD_EMPTY);
     }
     // this node is partially covered.
     if(!info.test_only)
@@ -250,8 +255,8 @@ int csQuadTree :: insert_polygon_func (const csBox2& node_bbox,
     if(node_depth < max_depth)
     {
       int retval[4];
-      CallChildren(insert_polygon_func, node_bbox, node_depth, node_offset, 
-        node_nr, data, retval);
+      CallChildren(insert_polygon_func, node_bbox, node_depth, offset, node_nr, 
+        data, retval);
       return GetPolygonResult(retval);
     }
     /// no children, return value for change, either 
@@ -285,7 +290,7 @@ int csQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
   struct poly_info info;
   info.verts = verts;
   info.num_verts = num_verts;
-  info.pol_bbox = pol_bbox;
+  info.pol_bbox = &pol_bbox;
   info.test_only = false;
   return insert_polygon_func(bbox, 1, root_state, -1, 0, (void*)&info);
 }
@@ -297,7 +302,7 @@ int csQuadTree :: TestPolygon (csVector2* verts, int num_verts,
   struct poly_info info;
   info.verts = verts;
   info.num_verts = num_verts;
-  info.pol_bbox = pol_bbox;
+  info.pol_bbox = &pol_bbox;
   info.test_only = true;
   return insert_polygon_func(bbox, 1, root_state, -1, 0, (void*)&info);
 }
@@ -340,8 +345,8 @@ int csQuadTree :: test_point_func (const csBox2& node_bbox,
     return node_state;
   // for a partial covered node with children, call the children
   int retval[4];
-  CallChildren(test_point_func, node_bbox, node_depth, node_offset, node_nr,
-    data, retval);
+  CallChildren(test_point_func, node_bbox, node_depth, offset, node_nr, data, 
+    retval);
   return GetTestPointResult(retval);
 }
 

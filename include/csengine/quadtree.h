@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Wouter Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -135,7 +136,7 @@ private:
   struct poly_info {
     csVector2* verts;
     int num_verts;
-    const csBox2& pol_bbox;
+    const csBox2* pol_bbox;
     bool test_only;
   };
   
