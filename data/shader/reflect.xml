@@ -79,7 +79,7 @@
       <buffer source="normal" destination="normal"/>
       <vp plugin="glfixed">
         <fixedvp>  
-          <texgen type="reflection" mapping="cube" />
+          <texgen layer="0" type="reflection" mapping="cube" />
           <constantcolor layer="0" type="shadervar">reflection opacity</constantcolor>
         </fixedvp>
       </vp>
