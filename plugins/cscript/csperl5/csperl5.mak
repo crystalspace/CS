@@ -1,4 +1,5 @@
 DESCRIPTION.csperl5 = Crystal Space Perl v5 Scripting Plugin
+DESCRIPTION.csperl5dist = Everything to do with the $(DESCRIPTION.csperl5)
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION), rootdefines)
@@ -43,7 +44,7 @@ SRC.CSPERL5 = $(wildcard plugins/cscript/csperl5/*.cpp)
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
-PERLXSI.C = plugins/cscript/csperl5/csperlxs.c
+PERLXSI.C = include/cssys/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))
 
 SWIG.I = include/ivaria/cs.i
@@ -52,17 +53,36 @@ SWIG.PERL5.PM = scripts/perl5/$(SWIG.MOD).pm
 SWIG.PERL5.C = plugins/cscript/csperl5/cswigpl5.c
 SWIG.PERL5.O = $(OUT)/$(notdir $(SWIG.PERL5.C:.c=$O))
 SWIG.PERL5.DLL = scripts/perl5/$(SWIG.MOD)$(DLL)
-DEP.SWIG.PERL5.DLL = $(DEP.CSPERL5)
 SWIG.PERL5.DOC = scripts/perl5/cs_wrap.doc
 
 CEX.CSPERL5 = perl5.cex
 CIN.CSPERL5 = plugins/cscript/csperl5/perl5.cin
 
-MSVC.DSP += CSPERL5
-DSP.CSPERL5.NAME = csperl5
-DSP.CSPERL5.TYPE = plugin
-DSP.CSPERL5.LFLAGS = /L C:\perl\lib\CORE
-DSP.CSPERL5.LIBS = perl
+
+MSVC.DSP += MSCSPERL5
+DSP.MSCSPERL5.NAME = csperl5
+DSP.MSCSPERL5.TYPE = plugin
+DSP.MSCSPERL5.CFLAGS = /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "NO_STRICT" \
+                       /D "HAVE_DES_FCRYPT" /D "PERL_IMPLICIT_CONTEXT" \
+                       /D "PERL_IMPLICIT_SYS" /D "USE_PERLIO"
+                       /D "PERL_MSVCRT_READFIX"
+MSCSPERL5 = $(CSPERL5)
+LIB.MSCSPERL5 = $(LIB.CSPERL5) $(LIBPREFIX)perl58$(LIB)
+INC.MSCSPERL5 = $(INC.CSPERL5)
+SRC.MSCSPERL5 = $(SRC.CSPERL5) $(PERLXSI.C)
+OBJ.MSCSPERL5 = $(OBJ.CSPERL5) $(PERLXSI.O)
+DEP.MSCSPERL5 = $(DEP.CSPERL5)
+
+MSVC.DSP += MSCSPERL5SWIG
+DSP.MSCSPERL5SWIG.NAME = csperl5s
+DSP.MSCSPERL5SWIG.TYPE = plugin
+DSP.MSCSPERL5SWIG.CFLAGS = $(DSP.MSCSPERL5.CFLAGS) \
+                           /D "PERL_POLLUTE" /D "NO_HANDY_PERL_MACROS"
+MSCSPERL5SWIG = $(SWIG.PERL5.DLL)
+LIB.MSCSPERL5SWIG = $(LIB.MSCSPERL5)
+SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
+OBJ.MSCSPERL5SWIG = $(SWIG.PERL5.O)
+DEP.MSCSPERL5SWIG = $(DEP.CSPERL5)
 
 endif
 

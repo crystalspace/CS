@@ -1,4 +1,8 @@
 
+precondition '-n "${LINK}"'
+
+PERLXSI=include/cssys/csperlxs.c
+
 PERL5=`checktool perl5`
 if [ ! -x "$PERL5" ]; then
   PERL5=`checktool perl`
@@ -30,7 +34,7 @@ else
 
     msg_inform 'Generating csperlxs.c'
     "$PERL5" -MExtUtils::Embed -e xsinit -- \
-      -o plugins/cscript/csperl5/csperlxs.c -std $DYNA #cspace
+      -o $PERLXSI -std $DYNA cspace
   else
     msg_result no
     msg_inform 'Recommend you download the latest release of Perl 5'
@@ -59,40 +63,42 @@ else
     fi
 
     msg_inform 'Generating boilerplate csperlxs.c'
-    cat >plugins/cscript/csperl5/csperlxs.c <<EOF
+    cat >$PERLXSI <<EOF
 #if defined(__cplusplus) && !defined(PERL_OBJECT)
-#  define is_cplusplus
+  #define is_cplusplus
 #endif
 #ifdef is_cplusplus
-  extern "C" {
+	extern "C" {
 #endif
-#include <EXTERN.h>
-#include <perl.h>
-#ifdef PERL_OBJECT
-# define NO_XSLOCKS
-# include <XSUB.h>
-# include "win32iop.h"
-# include <fcntl.h>
-# include <perlhost.h>
-#endif
+  #include <EXTERN.h>
+  #include <perl.h>
+  #ifdef PERL_OBJECT
+    #define NO_XSLOCKS
+    #include <XSUB.h>
+    #include "win32iop.h"
+    #include <fcntl.h>
+    #include <perlhost.h>
+  #endif
 #ifdef is_cplusplus
-  }
-# ifndef EXTERN_C
-#   define EXTERN_C extern "C"
-# endif
+	}
+  #ifndef EXTERN_C
+    #define EXTERN_C extern "C"
+  #endif
 #else
-# ifndef EXTERN_C
-#   define EXTERN_C extern
-# endif
+  #ifndef EXTERN_C
+    #define EXTERN_C extern
+  #endif
 #endif
 EXTERN_C void xs_init (pTHXo);
 EXTERN_C void boot_DynaLoader (pTHXo_ CV* cv);
-EXTERN_C void
-xs_init(pTHXo) {
+EXTERN_C void boot_cspace (pTHXo_ CV* cv);
+EXTERN_C void xs_init(pTHXo)
+{
   char *file = __FILE__;
   dXSUB_SYS;
   /* DynaLoader is a special case */
   newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
+  newXS("cspace::bootstrap", boot_cspace, file);
 }
 EOF
   fi
@@ -106,5 +112,5 @@ EOF
   msg_result "$PERL5_LFLAGS"
 fi
 
-postcondition '${PERL5_OK} -eq 1 -o ${PERL5_OK} -eq 0'
+postcondition '${PERL5_OK} -eq 0 -o ${PERL5_OK} -eq 1'
 
