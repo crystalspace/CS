@@ -555,7 +555,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float in_obj_dist = qisqrt (obj_sq_dist);
+    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
