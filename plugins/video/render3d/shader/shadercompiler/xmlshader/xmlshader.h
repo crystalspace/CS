@@ -202,7 +202,7 @@ class csShaderConditionResolver : public iConditionResolver
   void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
     csConditionNode* trueNode, csConditionNode* falseNode);
 public:
-  csShaderConditionResolver (csXMLShader* shader);
+  csShaderConditionResolver (csXMLShaderCompiler* compiler);
   virtual ~csShaderConditionResolver ();
 
   virtual const char* ParseCondition (const char* str, size_t len, 

@@ -16,33 +16,65 @@
 	<pass>
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="colors" destination="primary color" />
-	    <buffer name="texture coordinates" destination="texture coordinate 0" />
-	    <texture name="tex diffuse" destination="unit 0" />
-	    <?if vars."tex lightmap" ?>
-	      <buffer name="lightmap coordinates" destination="texture coordinate 1" />
-	      <texture name="tex lightmap" destination="unit 1" />
-	    <?endif?>
-	    <fp plugin="glfixed">
+	    <?if !vars."tex diffuse".texture ?>
+	      <!-- flat material -->
+	      <?if vars."tex lightmap".texture ?>
+		<buffer name="lightmap coordinates" destination="texture coordinate 0" />
+		<texture name="tex lightmap" destination="unit 0" />
+	      <?else?>
+		<!-- need to bind at least some texture -->
+		<texture name="standardtex white" destination="unit 0" />
+	      <?endif?>
+	      <vp plugin="glfixed">
+		<fixedvp>
+		  <constantcolor layer="0" type="shadervar">mat flatcolor</constantcolor>
+		</fixedvp>
+	      </vp>
+	      <fp plugin="glfixed">
 		<fixedfp>
-		    <layer>
-			<colorsource num="0" source="texture" modifier="color"/>
-			<colorsource num="1" source="primary color" modifier="color"/>
-			<coloroperation operation="modulate" />
-                        <alphasource num="0" source="texture" modifier="alpha"/>
-			<alphasource num="1" source="primary color" modifier="alpha"/>
-                        <alphaoperation operation="modulate" />
-		    </layer>
-		    <?if vars."tex lightmap" ?>
-		      <layer>
-			  <colorsource num="0" source="previous layer" modifier="color"/>
-			  <colorsource num="1" source="texture" modifier="color"/>
-			  <coloroperation operation="modulate" scale="2" />
-			  <alphasource num="0" source="previous layer" modifier="alpha"/>
-			  <alphaoperation operation="replace"/>
-		      </layer>
+		  <layer>
+		    <?if vars."tex lightmap".texture ?>
+		      <colorsource num="0" source="texture" modifier="color"/>
+		    <?else?>
+		      <colorsource num="0" source="primary color" modifier="color"/>
 		    <?endif?>
+		    <colorsource num="1" source="constant color" modifier="color"/>
+		    <coloroperation operation="modulate" scale="2" />
+		    <alphasource num="0" source="constant color" modifier="alpha"/>
+		    <alphaoperation operation="replace"/>
+		  </layer>
 		</fixedfp>
-	    </fp>
+	      </fp>
+	    <?else?>
+	      <!-- textured material -->
+	      <buffer name="texture coordinates" destination="texture coordinate 0" />
+	      <texture name="tex diffuse" destination="unit 0" />
+	      <?if vars."tex lightmap".texture ?>
+		<buffer name="lightmap coordinates" destination="texture coordinate 1" />
+		<texture name="tex lightmap" destination="unit 1" />
+	      <?endif?>
+	      <fp plugin="glfixed">
+		  <fixedfp>
+		      <layer>
+			  <colorsource num="0" source="texture" modifier="color"/>
+			  <colorsource num="1" source="primary color" modifier="color"/>
+			  <coloroperation operation="modulate" />
+			  <alphasource num="0" source="texture" modifier="alpha"/>
+			  <alphasource num="1" source="primary color" modifier="alpha"/>
+			  <alphaoperation operation="modulate" />
+		      </layer>
+		      <?if vars."tex lightmap".texture ?>
+			<layer>
+			    <colorsource num="0" source="previous layer" modifier="color"/>
+			    <colorsource num="1" source="texture" modifier="color"/>
+			    <coloroperation operation="modulate" scale="2" />
+			    <alphasource num="0" source="previous layer" modifier="alpha"/>
+			    <alphaoperation operation="replace"/>
+			</layer>
+		      <?endif?>
+		  </fixedfp>
+	      </fp>
+	    <?endif?>
 	</pass>
     </technique>
     <technique priority="75">
@@ -62,7 +94,7 @@
 	    <buffer name="texture coordinates" destination="texture coordinate 0" />
 	    <texture name="tex diffuse" destination="unit 0" />
 	</pass>
-	<?if vars."tex lightmap" ?>
+	<?if vars."tex lightmap".texture ?>
 	  <pass>
 	      <mixmode><multiply2 /></mixmode><!-- @@@ probably not always desired -->
 	      <zmode><zmesh2 /></zmode>

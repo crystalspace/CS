@@ -383,14 +383,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   return true;
 }
 
-/*bool csXMLShaderTech::LoadSVBlock (iDocumentNode *node,
-  iShaderVariableContext *context)*/
 bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   iShaderVariableContext *context)
 {
-  //iStringSet* strings = parent->compiler->strings;
-  //iSyntaxService* synldr = parent->compiler->synldr;
-
   csRef<csShaderVariable> svVar;
   
   csRef<iDocumentNodeIterator> it = node->GetNodes ("shadervar");
@@ -474,14 +469,6 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iDocumentNode *node,
 
     csRef<iDocument> programDoc = docsys->CreateDocument ();
     programDoc->Parse (programFile);
-    /*csRef<iDocumentNodeIterator> it = programDoc->GetRoot ()->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      programNode = child;
-      break;
-    }*/
     programNode = programDoc->GetRoot ();
   }
   else
@@ -795,8 +782,8 @@ void csXMLShaderTech::SetFailReason (const char* reason, ...)
 
 //---------------------------------------------------------------------------
 
-csShaderConditionResolver::csShaderConditionResolver (csXMLShader* shader) :
-  evaluator (shader->compiler->strings)
+csShaderConditionResolver::csShaderConditionResolver (
+  csXMLShaderCompiler* compiler) : evaluator (compiler->strings)
 {
   rootNode = 0;
   nextVariant = 0;
@@ -1097,17 +1084,45 @@ SCF_IMPLEMENT_IBASE_END
 csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
 	iDocumentNode* templ)
 {
-  /*csArray<TechniqueKeeper> techniquesTmp;
-  ScanForTechniques (templ, techniquesTmp, -1);
+  csRef<iShaderManager> shadermgr = 
+    CS_QUERY_REGISTRY (objectreg, iShaderManager);
+  CS_ASSERT (shadermgr); // Should be present - loads us, after all
+
   csShaderPriorityList* list = new csShaderPriorityList ();
-  csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-  while (techIt.HasNext ())
+
+  /* @@@ A bit awkward, almost the same code as in 
+     csXMLShader::ScanForTechniques */
+  csRef<iDocumentNodeIterator> it = templ->GetNodes();
+
+  // Read in the techniques.
+  while (it->HasNext ())
   {
-    TechniqueKeeper tk = techIt.Next();
-    list->priorities.Push (tk.priority);
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () == CS_NODE_ELEMENT &&
+      xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
+    {
+      //save it
+      int p = child->GetAttributeValueAsInt ("priority");
+      // Compute the tag's priorities.
+      csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
+      while (tagIt->HasNext ())
+      {
+	csRef<iDocumentNode> tag = tagIt->Next ();
+	csStringID tagID = strings->Request (tag->GetContentsValue ());
+
+	csShaderTagPresence presence;
+	int priority;
+	shadermgr->GetTagOptions (tagID, presence, priority);
+	if (presence == TagNeutral)
+	{
+	  p += priority;
+	}
+      }
+      list->priorities.InsertSorted (p);
+    }
   }
-  return csPtr<iShaderPriorityList> (list);*/
-  return 0;
+
+  return csPtr<iShaderPriorityList> (list);
 }
 
 bool csXMLShaderCompiler::ValidateTemplate(iDocumentNode *templ)
@@ -1171,7 +1186,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
-  resolver = new csShaderConditionResolver (this);
+  resolver = new csShaderConditionResolver (compiler);
   csRef<iDocumentNode> wrappedNode;
   wrappedNode.AttachNew (new csWrappedDocumentNode (compiler->objectreg, 
     source, resolver));
@@ -1211,8 +1226,8 @@ void csXMLShader::ScanForTechniques (iDocumentNode* templ,
       xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
     {
       //save it
-      unsigned int p = child->GetAttributeValueAsInt ("priority");
-      if (forcepriority != -1 && int (p) != forcepriority) continue;
+      int p = child->GetAttributeValueAsInt ("priority");
+      if ((forcepriority != -1) && (p != forcepriority)) continue;
       TechniqueKeeper keeper (child, p);
       // Compute the tag's priorities.
       csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");

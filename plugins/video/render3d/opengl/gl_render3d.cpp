@@ -1010,6 +1010,7 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
+  /* @@@ All those default textures, better put them into the engine? */
 
   // @@@ These shouldn't be here, I guess.
   #define CS_FOGTABLE_SIZE 64
@@ -1123,6 +1124,22 @@ bool csGLGraphics3D::Open ()
 		strings->Request ("standardtex normalization map")));
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
+
+  {
+    csRGBpixel* white = new csRGBpixel[1];
+    white->Set (0, 255, 255);
+    img = csPtr<iImage> (new csImageMemory (1, 1, white, true, 
+      CS_IMGFMT_TRUECOLOR));
+
+    csRef<iTextureHandle> whitetex = txtmgr->RegisterTexture (
+      img, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+
+    csRef<csShaderVariable> whitevar = csPtr<csShaderVariable> (
+      new csShaderVariable (
+      strings->Request ("standardtex white")));
+    whitevar->SetValue (whitetex);
+    shadermgr->AddVariable (whitevar);
+  }
 
   cache_clip_portal = -1;
   cache_clip_plane = -1;

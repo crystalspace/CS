@@ -232,17 +232,18 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
 	      }
 	      if (okay)
 	      {
-		currentWrapper.currentCondNode = 1;
+		//currentWrapper.currentCondNode = 1;
 		WrapperStackEntry oldCurrentWrapper = currentWrapper;
 		currentWrapper = wrapperStack.Pop ();
 		WrapperStackEntry newWrapper = oldCurrentWrapper;
 		newWrapper.child = new WrappedChild;
+		newWrapper.currentCondNode = 1;
 		newWrapper.child->condition = oldCurrentWrapper.child->condition;
 		newWrapper.child->conditionValue = false;
 
 		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
-		currentWrapper = newWrapper;
 		wrapperStack.Push (currentWrapper);
+		currentWrapper = newWrapper;
 	      }
 	    }
 	    else if (TokenEquals (valStart, cmdLen, "elsif"))
@@ -262,11 +263,12 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
 	      }
 	      if (okay)
 	      {
-		currentWrapper.currentCondNode = 1;
+		//currentWrapper.currentCondNode = 1;
 		WrapperStackEntry oldCurrentWrapper = currentWrapper;
 		currentWrapper = wrapperStack.Pop ();
 		WrapperStackEntry elseWrapper = oldCurrentWrapper;
 		elseWrapper.child = new WrappedChild;
+		elseWrapper.currentCondNode = 1;
 		elseWrapper.child->condition = oldCurrentWrapper.child->condition;
 		elseWrapper.child->conditionValue = false;
 

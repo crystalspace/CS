@@ -640,6 +640,11 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
       }
     }
   }
+  else
+  {
+    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+      variablesnode, "<fixedvp> node missing");
+  }
 
   return true;
 }

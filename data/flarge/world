@@ -6425,7 +6425,7 @@
             <plugin>mesh</plugin>
             <params>
                 <factory>genMeshFact</factory>
-                <material>mosaic</material>
+                <material>green_color</material>
                 <!-- <localshadows /> -->
             </params>
             <move>
@@ -7318,6 +7318,7 @@
                     <portal>
                         <sector>shapes</sector>
                         <mirror />
+                    <clip />
                     </portal>
                     <texmap>
                         <matrix>

@@ -32,6 +32,9 @@ chronological order.
 	- res changed the generic step to have material SVs override shader 
 	  SVs.
 	- res fixed wxtest to build as a console app on Win32.
+	- res changed the or_lighting shader to also support flat materials.
+	- res improved handling of malformed fixed function programs a bit.
+	- res added a default white texture to glrender3d.
 21-Sep-2004
 	- Eric Sunshine fixed a bug in the "subsystem"-related change to
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:

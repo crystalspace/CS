@@ -71,8 +71,7 @@ CS_IMPLEMENT_APPLICATION
  */
 int main (int argc, const char* const argv[])
 {
-  return retval = WinMain (GetModuleHandle (0), 0, GetCommandLineA (), 
-    SW_SHOWNORMAL);
+  return WinMain (GetModuleHandle (0), 0, GetCommandLineA (), SW_SHOWNORMAL);
 }
 
 #endif
