@@ -693,9 +693,31 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
     {
       if (Event.Command.Code == cscmdContextResize)
       {
+        int oldCWidth = FRAME_WIDTH;
+        int oldCHeight = FRAME_HEIGHT;
 	FRAME_WIDTH = myG2D->GetWidth();
 	FRAME_HEIGHT = myG2D->GetHeight();
-	view->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
+        if (split == -1)
+            view->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
+        else
+        {
+            csBox2 bbox1, bbox2;
+            BoundingBoxForView(Sys->views[0], &bbox1);
+            BoundingBoxForView(Sys->views[1], &bbox2);
+            
+            int oldVWidth = QInt(bbox2.MaxX() - bbox1.MinX());
+            int oldVHeight = QInt(bbox1.MaxY() - bbox1.MinY());
+            int newVWidth = FRAME_WIDTH - oldCWidth + oldVWidth;
+            int newVHeight = FRAME_HEIGHT - oldCHeight + oldVHeight;
+            if ((oldVWidth != newVWidth) || (oldVHeight != newVHeight))
+            {
+                views[0]->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (newVWidth / 4),
+                                                            bbox1.MinY() + (newVHeight / 2));
+                views[1]->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (3 * newVWidth / 4),
+                                                            bbox1.MinY() + (newVHeight / 2));
+            }
+        }
+        
 	if (wf)
 	  wf->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	break;

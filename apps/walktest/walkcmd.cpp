@@ -69,6 +69,17 @@ extern WalkTest* Sys;
 char* LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
 
+
+// Use a view's clipping rect to calculate a bounding box
+void BoundingBoxForView(iView *view, csBox2 *box)
+{
+    int vertexCount = view->GetClipper()->GetVertexCount();
+    csVector2 *clip = view->GetClipper()->GetClipPoly();
+    for (int i = 0; i < vertexCount; i++)
+        box->AddBoundingVertex(clip[i]);
+};
+
+
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
 {
@@ -1143,6 +1154,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights picklight droplight");
     CONPRI("  clrlights setlight");
+    CONPRI("Views:");
+    CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
     CONPRI("  step_forward step_backward strafe_left strafe_right");
     CONPRI("  look_up look_down rotate_left rotate_right jump move3d");
@@ -2491,6 +2504,52 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "fullscreen"))
     Sys->myG2D->PerformExtension("fullscreen");
+  else if (!strcasecmp(cmd, "split_view"))
+  {
+    if (Sys->split == -1)
+    {	
+        csBox2 bbox;
+        BoundingBoxForView(Sys->view, &bbox);
+        
+        int width = QInt(bbox.MaxX() - bbox.MinX());
+        int height = QInt(bbox.MaxY() - bbox.MinY());
+        Sys->views[0]->SetRectangle(bbox.MinX(), bbox.MinY(), width / 2, height);
+        Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
+                                                        bbox.MinY() + (height / 2));
+        Sys->views[1]->SetRectangle(bbox.MinX() + (width / 2), bbox.MinY(), 
+                                    width / 2, height);
+        Sys->views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
+                                                        bbox.MinY() + (height / 2));
+        Sys->split = (Sys->view == Sys->views[0]) ? 0 : 1;
+        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Splitting to 2 views");
+    };
+  }
+  else if (!strcasecmp(cmd, "unsplit_view"))
+  {
+    if (Sys->split != -1)
+    {
+        csBox2 bbox1, bbox2;
+        BoundingBoxForView(Sys->views[0], &bbox1);
+        BoundingBoxForView(Sys->views[1], &bbox2);
+
+        int width = QInt(bbox2.MaxX() - bbox1.MinX());
+        int height = QInt(bbox1.MaxY() - bbox1.MinY());
+        Sys->view->SetRectangle(bbox1.MinX(), bbox1.MinY(), width, height);
+        Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
+                                                    bbox2.MinY() + (height / 2));
+        Sys->split = -1;
+        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
+    }
+  }
+  else if (!strcasecmp(cmd, "toggle_view"))
+  {
+    if (Sys->split != -1)
+    {
+        Sys->split = (Sys->split + 1) % 2;
+        Sys->view = Sys->views[Sys->split];
+        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
+    }
+  }
   else
     return false;
 

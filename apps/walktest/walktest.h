@@ -380,8 +380,14 @@ public:
   /// The font we'll use for writing
   iFont *Font;
 
+  /// Value to indicate split state
+  /// -1 = not split, other value is index of current view
+  int split;
+  iView *views[2];
+
   /// is actually anything visible on the canvas?
   bool canvas_exposed;
+
 public:
   ///
   WalkTest ();
@@ -556,6 +562,9 @@ extern bool LoadCamera (iVFS*, const char *fName);
 
 /// Apply lights to all static objects (currently only meshes)
 void light_statics ();
+
+// Use a view's clipping rect to calculate a bounding box
+void BoundingBoxForView(iView *view, csBox2 *box);
 
 // The global system driver
 extern WalkTest *Sys;

@@ -192,6 +192,8 @@ WalkTest::WalkTest () :
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
   do_show_debug_boxes = false;
+  
+  split = -1;			// Not split
 
   canvas_exposed = true;
 }
@@ -211,7 +213,8 @@ WalkTest::~WalkTest ()
   SCF_DEC_REF (Font);
   delete wf;
   delete [] auto_script;
-  SCF_DEC_REF (view);
+  SCF_DEC_REF (views[0]);
+  SCF_DEC_REF (views[1]);  
   delete infinite_maze;
   delete cslogo;
   /*
@@ -751,7 +754,15 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   // takes the current camera and starts rendering.
   //------------
   if (map_mode != MAP_ON && map_mode != MAP_TXT && !do_covtree_dump)
-    view->Draw ();
+  {
+    if (split == -1)
+        view->Draw ();
+    else 
+    {	
+        views[0]->Draw();
+        views[1]->Draw();
+    }
+  };
 
   // no need to clear screen anymore
   drawflags = 0;
@@ -1226,6 +1237,7 @@ void WalkTest::Create2DSprites(void)
 
 static bool WalkEventHandler (iEvent& ev)
 {
+
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
     Sys->SetupFrame ();
@@ -1418,7 +1430,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (Engine, Gfx3D);
+  views[0] = new csView (Engine, Gfx3D);
+  views[1] = new csView (Engine, Gfx3D);  
+  view = views[0];
 
   // Get the collide system plugin.
   const char* p = cfg->GetStr ("Walktest.Settings.CollDetPlugin",
@@ -1569,16 +1583,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
     {
       iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
-      if (cp->Load(view->GetCamera (), Engine))
+      if (cp->Load(views[0]->GetCamera (), Engine) &&
+	  cp->Load(views[1]->GetCamera (), Engine))
 	camok = true;
-      
     }
     if (!camok) 
     {
       iSector* room = Engine->GetSectors ()->FindByName ("room");
       if (room)
       {
-	view->GetCamera ()->SetSector (room);
+	views[0]->GetCamera ()->SetSector (room);
+	views[1]->GetCamera ()->SetSector (room);
 	camok = true;
       }
     }
