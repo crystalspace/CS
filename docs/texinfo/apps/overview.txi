@@ -32,6 +32,11 @@ A test application for the Crystal Clear library and plug-in module.
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
+@cindex @file{csvid}
+@cindex Applications, @file{csvid}
+@item csvid
+A test application for the OpenDivX video plugin.
+
 @cindex @file{cswstest}
 @cindex Applications, @file{cswstest}
 @item cswstest
