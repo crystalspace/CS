@@ -546,6 +546,19 @@ public:
   /// Scale sprite by this factor. 
   virtual void ScaleBy (float factor) = 0;
 
+  /**
+   * Check if this sprite is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   */
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr) = 0;
+  /**
+   * Check if this sprite is hit by this world space vector.
+   * Return the collision point in world space coordinates.
+   */
+  bool HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
+
   /// Rotate sprite in some manner (as defined by subclass), in radians.
   virtual void Rotate (float angle) = 0;
 
@@ -760,6 +773,15 @@ public:
   void GetObjectBoundingBox (csBox3& box);
 
   /**
+   * Get a bounding box in world space.
+   * Note that this is not accurate as it will simply
+   * take the object space box and then make a world
+   * space bounding box from that. So this bounding
+   * box will be an overestimation.
+   */
+  void GetWorldBoundingBox (csBox3& box);
+
+  /**
    * Get a radius in object space.
    */
   csVector3 GetRadius ();
@@ -850,6 +872,13 @@ public:
    * if other calls to the sprite happen.
    */
   csVector3* GetObjectVerts (csFrame* fr);
+
+  /**
+   * Check if this sprite is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   */
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
 
   CSOBJTYPE;
 

@@ -270,6 +270,16 @@ public:
   	csVector3& isect);
 
   /**
+   * Follow a beam from start to end and return the first object
+   * that is hit. Objects can be sprites, things, or sectors.
+   * In case it is a thing or sector the csPolygon3D field will be
+   * filled with the polygon that was hit.
+   * If polygonPtr is null then the polygon will not be filled in.
+   */
+  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  	csPolygon3D** polygonPtr);
+
+  /**
    * Prepare the lightmaps so that they are suitable for the
    * 3D rasterizer.
    */

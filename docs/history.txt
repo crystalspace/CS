@@ -3,7 +3,31 @@ The history order has been reversed so that new features are at the top.
 31-Oct-2000
 	- Philip Wyett fixed the CSWS VC project file after Andrew's
 	  changes.
-	- Eric Sunshine fixed a number of compilation problems throughouth
+	- Added csSprite3D::GetWorldBoundingBox() to get an inaccurate
+	  bounding box of the sprite in world space.
+	- Added csSprite::HitBeam() and HitBeamObject() which hit a beam
+	  with a sprite. It will return true if the sprite is hit and it
+	  will also return the intersection point. HitBeamObject() works
+	  in object space while HitBeam() works in world space.
+	- Added csSector::HitBeam() which is similar to the already existing
+	  HitBeam but this version returns the first object that is hit.
+	  So it also looks at sprites. The original HitBeam() only looks
+	  at things and sectors. For particle systems and 2D sprites this
+	  function will currently always return false. This is something
+	  to be implemented. Note that this function will first test the
+	  bounding box of the sprite for an easy reject. So that's fast. But
+	  if this test succeeds then it will test every triangle of the
+	  current frame. This is not very fast but it is accurate. In
+	  the future this function might change to do this with a lower
+	  LOD version of the sprite instead.
+	- Extended csIntersect3::BoxSegment() with an optional 'r' parameter
+	  so that you can get a number between 0 and 1 indicating where
+	  in the segment the intersection happened. Also fixed this function
+	  so that it will return a correct value for 'isect' if the start
+	  of the segment is in the box. This return was undefined before.
+	- Added csIntersect3::IntersectTriangle() to intersect a segment
+	  with a triangle.
+	- Eric Sunshine fixed a number of compilation problems throughout
 	  the project which were reported by Visual C++.
 	- Eric Sunshine fixed 'simple' so that it once again works correctly
 	  with csConsole following Andrew's changes.

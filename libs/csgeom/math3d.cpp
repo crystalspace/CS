@@ -363,6 +363,22 @@ bool csIntersect3::IntersectPolygon (const csPlane3& plane,
   return true;
 }
 
+bool csIntersect3::IntersectTriangle (const csVector3& tr1,
+  	const csVector3& tr2, const csVector3& tr3,
+	const csSegment3& seg, csVector3& isect)
+{
+  csPlane3 plane (tr1, tr2, tr3);
+  float dist;
+  if (!Plane (seg, plane, isect, dist)) return false;
+  // 'isect' is the intersection of the segment and the
+  // plane. Now we have to see if this intersection is
+  // in the triangle.
+  if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
+  if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
+  if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
+  return true;
+}
+
 void csIntersect3::Plane(const csVector3& u, const csVector3& v,
                          const csVector3& normal, const csVector3& a,
                          csVector3& isect)
@@ -518,7 +534,7 @@ float csIntersect3::YFrustum(
 }
 
 bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
-	csVector3& isect)
+	csVector3& isect, float* pr)
 {
   const csVector3& u = seg.Start ();
   const csVector3& v = seg.End ();
@@ -527,7 +543,7 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
   int num_sides = box.GetVisibleSides (u, sides);
   int i;
   // If there are no sides then we're in the box so we can return true.
-  if (num_sides == 0) return true;
+  if (num_sides == 0) { isect = u; if (pr) *pr = 0; return true; }
   for (i = 0 ; i < num_sides ; i++)
   {
     switch (sides[i])
@@ -546,7 +562,10 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
           isect.z = r * (v.z-u.z) + u.z;
           if (isect.y >= box.MinY () && isect.y <= box.MaxY () &&
     	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
+	  {
+	    if (pr) *pr = r;
             return true;
+	  }
 	}
 	break;
       case BOX_SIDE_y:
@@ -563,7 +582,10 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
           isect.z = r * (v.z-u.z) + u.z;
           if (isect.x >= box.MinX () && isect.x <= box.MaxX () &&
     	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
+	  {
+	    if (pr) *pr = r;
             return true;
+	  }
 	}
 	break;
       case BOX_SIDE_z:
@@ -580,7 +602,10 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
 	  isect.z = plane_pos;
           if (isect.x >= box.MinX () && isect.x <= box.MaxX () &&
     	      isect.y >= box.MinY () && isect.y <= box.MaxY ())
+	  {
+	    if (pr) *pr = r;
             return true;
+	  }
 	}
 	break;
     }

@@ -189,6 +189,23 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
   else return sector->HitBeam (start, end, isect);
 }
 
+csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
+	csPolygon3D** polygonPtr)
+{
+  if (!sector) CompleteSector ();
+
+  if (sector->draw_busy >= 5)
+    return NULL;
+  if (flags.Check (CS_PORTAL_WARP))
+  {
+    csVector3 new_start = warp_wor.Other2This (start);
+    csVector3 new_end = warp_wor.Other2This (end);
+    csObject* o = sector->HitBeam (new_start, new_end, polygonPtr);
+    return o;
+  }
+  else return sector->HitBeam (start, end, polygonPtr);
+}
+
 void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
 {
   if (!sector) CompleteSector ();

@@ -159,6 +159,14 @@ public:
    */
   virtual void Draw (csRenderView& rview);
 
+  /**
+   * Check if this sprite is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   * @@@ TO BE IMPLEMENTED!
+   */
+  virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
+  	csVector3& /*isect*/, float* /*pr*/) { return false; }
+
   CSOBJTYPE;
 };
 

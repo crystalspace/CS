@@ -474,6 +474,18 @@ void csSprite::AddDynamicLight (csLightHitsSprite* lp)
   lp->sprite = this;
 }
 
+bool csSprite::HitBeam (const csVector3& start, const csVector3& end,
+	csVector3& isect, float* pr)
+{
+  const csReversibleTransform& trans = movable.GetTransform ();
+  csVector3 startObj = trans * start;
+  csVector3 endObj = trans * end;
+  bool rc = HitBeamObject (startObj, endObj, isect, pr);
+  if (rc)
+    isect = trans.This2Other (isect);
+  return rc;
+}
+
 void csSprite::Particle::MoveToSector(csSector* s)
   { scfParent->GetMovable ().SetSector (s); scfParent->GetMovable ().UpdateMove (); }
 void csSprite::Particle::SetPosition(const csVector3& v)
@@ -748,6 +760,21 @@ void csSprite3D::GetObjectBoundingBox (csBox3& b)
     csFrame* cframe = cur_action->GetFrame (cur_frame);
     cframe->GetBoundingBox (b);
   }
+}
+
+void csSprite3D::GetWorldBoundingBox (csBox3& b)
+{
+  csBox3 ob;
+  GetObjectBoundingBox (ob);
+  csTransform& trans = GetMovable ().GetTransform ();
+  b.StartBoundingBox (trans * ob.GetCorner (0));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (1));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (2));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (3));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (4));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (5));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (6));
+  b.AddBoundingVertexSmart (trans * ob.GetCorner (7));
 }
 
 csVector3 csSprite3D::GetRadius ()
@@ -1285,6 +1312,37 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
   // Clamp all vertice colors to 2.0
   FixVertexColors ();
 }
+
+bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,
+	csVector3& isect, float* pr)
+{
+  // @@@ We might consider checking to a lower LOD version only.
+  // This function is not very fast if the bounding box test succeeds.
+  csBox3 b;
+  GetObjectBoundingBox (b);
+  csSegment3 seg (start, end);
+  if (!csIntersect3::BoxSegment (b, seg, isect, pr))
+    return false;
+  csVector3* verts = GetObjectVerts (tpl->GetFrame (cur_frame));
+  csTriangle* tris = tpl->GetTriangles ();
+  int i;
+  for (i = 0 ; i < tpl->GetNumTriangles () ; i++)
+  {
+    csTriangle& tr = tris[i];
+    if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
+    	verts[tr.c], seg, isect))
+    {
+      if (pr)
+      {
+        *pr = sqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 
 //--------------------------------------------------------------------------
 

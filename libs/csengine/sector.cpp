@@ -240,6 +240,53 @@ csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
   else return NULL;
 }
 
+csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
+	csPolygon3D** polygonPtr)
+{
+  float r, best_sprite_r = 10000000000.;
+  csSprite* near_sprite = NULL;
+  csVector3 isect;
+
+  // First check all sprites in this sector.
+  int i;
+  for (i = 0 ; i < sprites.Length () ; i++)
+  {
+    csSprite* sprite = (csSprite*)sprites[i];
+    if (sprite->HitBeam (start, end, isect, &r))
+    {
+      if (r < best_sprite_r)
+      {
+        best_sprite_r = r;
+	near_sprite = sprite;
+      }
+    }
+  }
+
+  float best_poly_r;
+  csPolygon3D* p = IntersectSegment (start, end, isect, &best_poly_r);
+  // We hit a polygon and the polygon is closer than the sprite.
+  if (p && best_poly_r < best_sprite_r)
+  {
+    csPortal* po = p->GetPortal ();
+    if (po)
+    {
+      draw_busy++;
+      csVector3 new_start = isect;
+      csObject* obj = po->HitBeam (new_start, end, polygonPtr);
+      draw_busy--;
+      return obj;
+    }
+    else
+    {
+      if (polygonPtr) *polygonPtr = p;
+      return (csObject*)(p->GetParent ());
+    }
+  }
+  // The sprite is closer (or there is no sprite).
+  if (polygonPtr) *polygonPtr = NULL;
+  return (csObject*)near_sprite;
+}
+
 void csSector::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;

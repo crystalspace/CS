@@ -258,6 +258,15 @@ public:
   	csSegment3& segment);
 
   /**
+   * Intersect a 3D segment with a triangle. Returns true if there
+   * is an intersection. In that case the intersection point will
+   * be in 'isect'.
+   */
+  static bool IntersectTriangle (const csVector3& tr1,
+  	const csVector3& tr2, const csVector3& tr3,
+	const csSegment3& seg, csVector3& isect);
+
+  /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    */
@@ -473,9 +482,13 @@ public:
   /**
    * Intersect a segment with a box and returns true if it intersects.
    * The intersection point is also returned.
+   * If 'pr' is given then a number between 0 and 1 is returned which
+   * corresponds to the position on the segment. If we were in the box
+   * this this function will also return true. In this case 'isect' will
+   * be set to the start of the segment and *pr to 0.
    */
   static bool BoxSegment (const csBox3& box, const csSegment3& segment,
-  	csVector3& isect);
+  	csVector3& isect, float* pr = NULL);
 };
 
 #endif // __CS_MATH3D_H__

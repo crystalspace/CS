@@ -170,6 +170,16 @@ public:
   	csVector3& isect);
 
   /**
+   * Follow a beam through this portal and return the object
+   * that it hits with. This function properly acounts for space
+   * warping portals and also checks for infinite recursion (does
+   * not allow traversing the same sector more than five times).
+   * Optionally returns the polygon in 'polygonPtr'.
+   */
+  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  	csPolygon3D** polygonPtr);
+
+  /**
    * Check frustum visibility of all polygons reachable through this portal.
    * Alpha is the alpha value you'd like to use to pass through this
    * portal (0 is no completely transparent, 100 is complete opaque).

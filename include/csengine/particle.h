@@ -106,8 +106,8 @@ public:
     bool lighted);
 
   /** 
-   *Add a csSprite2d n-gon with material, and given radius.
-   *  adds sprite to world list.
+   * Add a csSprite2d n-gon with material, and given radius.
+   * adds sprite to world list.
    */
   void AppendRegularSprite (int n, float radius, csMaterialWrapper* mat,
     bool lighted);
@@ -160,10 +160,10 @@ public:
   inline const csBox3& GetBoundingBox() const {return bbox;}
 
   /**
-   *  Get an iParticle for this particle system, thus you can add
-   *  the particle system as particle to another particle system,
-   *  making particle systems of particle systems.
-   *  Do not add particle systems to themselves, you'll get infinite loops.
+   * Get an iParticle for this particle system, thus you can add
+   * the particle system as particle to another particle system,
+   * making particle systems of particle systems.
+   * Do not add particle systems to themselves, you'll get infinite loops.
    */
   iParticle* GetAsParticle() { return &scfiParticle; }
 
@@ -181,7 +181,6 @@ public:
   virtual void SetMixmode (UInt mode);
   /// Rotate all particles
   virtual void Rotate(float angle);
-
 
   /**
    * Update the state of the particles as time has passed.
@@ -210,6 +209,14 @@ public:
    * Update lighting as soon as the part sys becomes visible.
    */
   virtual void DeferUpdateLighting (int flags, int num_lights);
+
+  /**
+   * Check if this sprite is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   * @@@ TO BE IMPLEMENTED!
+   */
+  virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
+  	csVector3& /*isect*/, float* /*pr*/) { return false; }
 
   CSOBJTYPE;
 };
@@ -357,25 +364,27 @@ public:
  * A rain particle system. Particles start falling down.
  * Since speed if fixed due to air friction, this is not a NewtonianPartSys.
  */
-class csRainParticleSystem : public csParticleSystem {
+class csRainParticleSystem : public csParticleSystem
+{
 protected:
   csBox3 rainbox;
   csVector3 rain_dir;
   csVector3 *part_pos;
 
 public:
-  /** creates a rain particle system given parameters.
-    * number : number of raindrops visible at one time
-    * mat: material of raindrops. mixmode = mixmode used.
-    * lighted: the particles will be lighted if true.
-    * drop_width, drop_height: size of rectangular raindrops.
-    * rainbox_min and max: give the box in the world where it will rain.
-    *   raindrops will start ...
-    *   and when they exit this box they will disappear.
-    * fall_speed: the direction and speed of the falling raindrops.
-    *   You can make slanted rain this way. Although you would also want to
-    *   slant the particles in that case...
-    */
+  /**
+   * creates a rain particle system given parameters.
+   * number : number of raindrops visible at one time
+   * mat: material of raindrops. mixmode = mixmode used.
+   * lighted: the particles will be lighted if true.
+   * drop_width, drop_height: size of rectangular raindrops.
+   * rainbox_min and max: give the box in the world where it will rain.
+   *   raindrops will start ...
+   *   and when they exit this box they will disappear.
+   * fall_speed: the direction and speed of the falling raindrops.
+   *   You can make slanted rain this way. Although you would also want to
+   *   slant the particles in that case...
+   */
   csRainParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
     UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
@@ -398,7 +407,8 @@ public:
  * A snow particle system. Particles start falling down.
  * the snow swirls around a bit, otherwise much like rain.
  */
-class csSnowParticleSystem : public csParticleSystem {
+class csSnowParticleSystem : public csParticleSystem
+{
 protected:
   csBox3 rainbox;
   csVector3 rain_dir;
@@ -407,19 +417,20 @@ protected:
   float swirl_amount;
 
 public:
-  /** creates a rain particle system given parameters.
-    * number : number of raindrops visible at one time
-    * mat: material of raindrops. mixmode = mixmode used.
-    * lighted: the particles will be lighted if true.
-    * drop_width, drop_height: size of rectangular raindrops.
-    * rainbox_min and max: give the box in the world where it will rain.
-    *   raindrops will start ...
-    *   and when they exit this box they will disappear.
-    * fall_speed: the direction and speed of the falling raindrops.
-    *   You can make slanted rain this way. Although you would also want to
-    *   slant the particles in that case...
-    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
-    */
+  /**
+   * creates a rain particle system given parameters.
+   * number : number of raindrops visible at one time
+   * mat: material of raindrops. mixmode = mixmode used.
+   * lighted: the particles will be lighted if true.
+   * drop_width, drop_height: size of rectangular raindrops.
+   * rainbox_min and max: give the box in the world where it will rain.
+   *   raindrops will start ...
+   *   and when they exit this box they will disappear.
+   * fall_speed: the direction and speed of the falling raindrops.
+   *   You can make slanted rain this way. Although you would also want to
+   *   slant the particles in that case...
+   * swirl: is the amount of swirl for a flake, 0.0 is like rain.
+   */
   csSnowParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
     UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
@@ -447,7 +458,8 @@ public:
  * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y 
  * i.e. the world y height of the pool of the fountain.
  */
-class csFountainParticleSystem : public csParticleSystem {
+class csFountainParticleSystem : public csParticleSystem
+{
 protected:
   int amt;
   csVector3 origin;
@@ -463,20 +475,21 @@ protected:
   void RestartParticle(int index, float pre_move);
 
 public:
-  /** creates a fountain particle system given parameters.
-    * number : number of raindrops visible at one time
-    * mat: material of raindrops. mixmode = mixmode used.
-    * lighted: the particles will be lighted if true.
-    * drop_width, drop_height: size of rectangular waterdrops.
-    * spot is the origin of the fountain
-    * accel is the particle acceleration, in m/s^2, the gravity.
-    * fall_time is the seconds a particle gets to fall.
-    * speed in m/s of the drops on exiting the spout.
-    * opening is the angle controlling the width of the stream.
-    * azimuth is the angle of the direction (horizontally) of the stream.
-    * elevation is the angle of the direction (up/down) of the stream.
-    *   angles in radians (2*PI is 360 degrees)
-    */
+  /**
+   * creates a fountain particle system given parameters.
+   * number : number of raindrops visible at one time
+   * mat: material of raindrops. mixmode = mixmode used.
+   * lighted: the particles will be lighted if true.
+   * drop_width, drop_height: size of rectangular waterdrops.
+   * spot is the origin of the fountain
+   * accel is the particle acceleration, in m/s^2, the gravity.
+   * fall_time is the seconds a particle gets to fall.
+   * speed in m/s of the drops on exiting the spout.
+   * opening is the angle controlling the width of the stream.
+   * azimuth is the angle of the direction (horizontally) of the stream.
+   * elevation is the angle of the direction (up/down) of the stream.
+   *   angles in radians (2*PI is 360 degrees)
+   */
   csFountainParticleSystem(csObject* theParent, int number, 
     csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
@@ -497,7 +510,8 @@ public:
 /**
  * A Fire particle system. Each x msec n particles shoot out of the fire, 
  */
-class csFireParticleSystem : public csParticleSystem {
+class csFireParticleSystem : public csParticleSystem
+{
 protected:
   int amt;
   csVector3 direction;
@@ -522,17 +536,18 @@ protected:
   void MoveAndAge(int index, float delta_t);
 
 public:
-  /** creates a fire particle system given parameters.
-    * number : number of raindrops visible at one time
-    * mat: material of raindrops. mixmode = mixmode used.
-    * lighted: the particles will be lighted if true.
-    * drop_width, drop_height: size of rectangular particles.
-    * total_time is the seconds a particle gets to burn.
-    * dir is direction of fire.
-    * origin is the starting point of the flame
-    * swirl is the amount of swirling of particles.
-    * color_scale scales the colour the particles are set to.
-    */
+  /**
+   * creates a fire particle system given parameters.
+   * number : number of raindrops visible at one time
+   * mat: material of raindrops. mixmode = mixmode used.
+   * lighted: the particles will be lighted if true.
+   * drop_width, drop_height: size of rectangular particles.
+   * total_time is the seconds a particle gets to burn.
+   * dir is direction of fire.
+   * origin is the starting point of the flame
+   * swirl is the amount of swirling of particles.
+   * color_scale scales the colour the particles are set to.
+   */
   csFireParticleSystem(csObject* theParent, int number, 
     csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
@@ -549,8 +564,9 @@ public:
 
   /// You can set a pseudo-static light here
   void SetControlledLight(csLight *l) {light = l;}
-  /** Add a new dynamic light (no need to call SetControlledLight). 
-   *  NB Will not move upon SetSector.
+  /**
+   * Add a new dynamic light (no need to call SetControlledLight). 
+   * NB Will not move upon SetSector.
    */
   void AddLight(csWorld *world, csSector *sec);
 
