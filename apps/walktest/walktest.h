@@ -64,9 +64,11 @@ public:
   csVector3 velocity;
 
   /// Camera angles. X and Y are user controllable, Z is not.
-  float angle_x,angle_y,angle_z;
+  csVector3 angle;
+  /// Angular velocity: angle_velocity.x is constantly added to angle.x and so on.
+  csVector3 angle_velocity;
 
-  /// Colliders for "legs" and "body". Intersections are handled differently
+  /// Colliders for "legs" and "body". Intersections are handled differently.
   csCollider *legs;
   csCollider *body;
 
@@ -131,8 +133,6 @@ public:
   /// Timing.
   float timeFPS;
 
-  bool pressed_walk;
-  bool pressed_strafe;
   bool on_ground;
   bool inverse_mouse;
 

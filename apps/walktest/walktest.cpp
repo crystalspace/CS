@@ -905,9 +905,9 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       else
       {
         view->GetCamera ()->SetT2O (csMatrix3 ());
-        view->GetCamera ()->RotateWorld (csVector3 (0,1,0), angle_y);
+        view->GetCamera ()->RotateWorld (csVector3 (0,1,0), angle.y);
         if (!do_gravity)
-          view->GetCamera ()->Rotate (csVector3 (1,0,0), angle_x);
+          view->GetCamera ()->Rotate (csVector3 (1,0,0), angle.x);
       }
 
       csVector3 vel = view->GetCamera ()->GetT2O ()*velocity;
@@ -923,21 +923,16 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       }
       else { check_once = false; DoGravity (pos, vel); }
 
-      if(do_gravity&&!move_3d)
-        view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+      if (do_gravity && !move_3d)
+        view->GetCamera ()->Rotate (csVector3 (1,0,0), angle.x);
+
+      // Apply angle velocity to camera angle
+      angle += angle_velocity;
     }
   }
 
-  if (!pressed_strafe)
-    velocity.x -= SIGN (velocity.x) * MIN (0.017, fabs (velocity.x));
-
-  if (!pressed_walk)
-    velocity.z -= SIGN (velocity.z) * MIN (0.017, fabs (velocity.z));
-
   if (!do_gravity)
     velocity.y -= SIGN (velocity.y) * MIN (0.017, fabs (velocity.y));
-
-//  pressed_strafe=pressed_walk=false;
 
 #if 0
   if (do_cd && csBeing::init)

@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
 #include "cssys/common/system.h"
 #include "walktest/walktest.h"
 #include "walktest/scon.h"
@@ -500,7 +501,11 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "move3d"))
     Command::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "freelook"))
+  {
     Command::change_boolean (arg, &Sys->do_freelook, "freelook");
+    if (Sys->do_freelook)
+      System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+  }
   else if (!strcasecmp (cmd, "stats"))
   {
     Command::change_boolean (arg, &Sys->do_stats, "stats");
@@ -576,49 +581,49 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_left (.1, false, false); }
-    else Sys->strafe(-1*f,0);
+    else Sys->strafe (-1*f,0);
   }
   else if (!strcasecmp (cmd, "strafe_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_right (.1, false, false); }
-    else Sys->strafe(1*f,0);
+    else Sys->strafe (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_forward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_forward (.1, false, false); }
-    else Sys->step(1*f,0);
+    else Sys->step (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_backward"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_backward (.1, false, false); }
-    else Sys->step(-1*f,0);
+    else Sys->step (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_left"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_left_camera (.1, false, false); }
-    else Sys->rotate(-1*f,0);
+    else Sys->rotate (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_right"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_right_camera (.1, false, false); }
-    else Sys->rotate(1*f,0);
+    else Sys->rotate (1*f,0);
   }
   else if (!strcasecmp (cmd, "look_up"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_right_xaxis (.1, false, false); }
-    else Sys->look(-1*f,0);
+    else Sys->look (-1*f,0);
   }
   else if (!strcasecmp (cmd, "look_down"))
   {
     float f = safe_atof (arg);
     if (Sys->move_3d || Sys->map_mode) { if (f) Sys->imm_rot_left_xaxis (.1, false, false); }
-    else Sys->look(1*f,0);
+    else Sys->look (1*f,0);
   }
   else if (!strcasecmp (cmd, "jump"))
   {
@@ -887,11 +892,12 @@ WalkTest::WalkTest () : pos (0, 0, 0), velocity (0, 0, 0), SysSystemDriver ()
   player_spawned = false;
   do_gravity = true;
   inverse_mouse = false;
-  pressed_strafe = pressed_walk = 0;
   selected_light = NULL;
   selected_polygon = NULL;
 
-  angle_x=angle_y=0;
+  velocity.Set (0, 0, 0);
+  angle.Set (0, 0, 0);
+  angle_velocity.Set (0, 0, 0);
 
 //  pl=new PhysicsLibrary;
 
@@ -1003,60 +1009,139 @@ void WalkTest::Help ()
 extern csCamera c;
 extern WalkTest* Sys;
 
-void WalkTest::strafe(float speed,int keep_old)
+void WalkTest::strafe (float speed,int keep_old)
 {
   if (move_3d || map_mode) return;
-  static float strafe_speed=0;
-  if(!keep_old)
+  static bool pressed = false;
+  static float strafe_speed = 0;
+  static long start_time = Time ();
+
+  long cur_time = Time ();
+  if (!keep_old)
   {
-    strafe_speed=speed*0.007;
-    if(fabs(speed)<0.001)
-      pressed_strafe=false;
+    bool new_pressed = fabs (speed) > 0.001;
+    if (new_pressed != pressed)
+    {
+      pressed = new_pressed;
+      strafe_speed = speed * 0.007;
+      start_time = cur_time - 100;
+    }
+  }
+
+  while ((cur_time - start_time) >= 100)
+  {
+    if (pressed)
+    {
+      // accelerate
+      if (fabs (velocity.x) < 0.1)
+        velocity.x += strafe_speed;
+    }
     else
-      pressed_strafe=true;
+    {
+      // brake!
+      if (velocity.x > 0.014)
+        velocity.x -= 0.014;
+      else if (velocity.x < -0.014)
+        velocity.x += 0.014;
+      else
+        velocity.x = 0;
+    }
+    start_time += 100;
   }
-  if(fabs(velocity.x)<0.1)
-    velocity.x+=strafe_speed;
 }
 
-void WalkTest::step(float speed,int keep_old)
+void WalkTest::step (float speed,int keep_old)
 {
   if (move_3d || map_mode) return;
-  static float step_speed=0;
-  if(!keep_old)
+
+  static bool pressed = false;
+  static float step_speed = 0;
+  static long start_time = Time ();
+
+  long cur_time = Time ();
+  if (!keep_old)
   {
-    step_speed=speed*0.007;
-    if(fabs(speed)<0.001)
-      pressed_walk=false;
+    bool new_pressed = fabs (speed) > 0.001;
+    if (new_pressed != pressed)
+    {
+      pressed = new_pressed;
+      step_speed = speed * 0.007;
+      start_time = cur_time - 100;
+    }
+  }
+
+  while ((cur_time - start_time) >= 100)
+  {
+    if (pressed)
+    {
+      // accelerate
+      if (fabs (velocity.z) < 0.1)
+        velocity.z += step_speed;
+    }
     else
-      pressed_walk=true;
+    {
+      // brake!
+      if (velocity.z > 0.014)
+        velocity.z -= 0.014;
+      else if (velocity.z < -0.014)
+        velocity.z += 0.014;
+      else
+        velocity.z = 0;
+    }
+    start_time += 100;
   }
-  if(fabs(velocity.z)<0.1)
-    velocity.z+=step_speed;
 }
 
-void WalkTest::rotate(float speed,int keep_old)
+void WalkTest::rotate (float speed,int keep_old)
 {
   if (move_3d || map_mode) return;
-  static float step_speed=0;
-  if(!keep_old)
-    step_speed=speed*0.028;
-  angle_y+=step_speed;
-}
 
-void WalkTest::look(float speed,int keep_old)
-{
-  if (move_3d || map_mode) return;
-  static float step_speed=0;
-  if(!keep_old)
-    step_speed=speed*0.028;
-  if(!move_3d)
+  static bool pressed = false;
+  static float angle_accel = 0;
+  static long start_time;
+
+  long cur_time = Time ();
+  if (!keep_old)
   {
-    if(fabs(angle_x+step_speed)<=(355.0/113.0/4))
-      angle_x+=step_speed;
+    bool new_pressed = fabs (speed) > 0.001;
+    if (new_pressed != pressed)
+    {
+      pressed = new_pressed;
+      angle_accel = speed * 0.005;
+      start_time = cur_time - 100;
+    }
   }
-  else
-    angle_x+=step_speed;
+
+  while ((cur_time - start_time) >= 100)
+  {
+    if (pressed)
+    {
+      // accelerate rotation
+      if (fabs (angle_velocity.y) < 0.03)
+        angle_velocity.y += angle_accel;
+    }
+    else
+    {
+      // brake!
+      if (angle_velocity.y > 0.015)
+        angle_velocity.y -= 0.015;
+      else if (angle_velocity.y < -0.015)
+        angle_velocity.y += 0.015;
+      else
+        angle_velocity.y = 0;
+    }
+    start_time += 100;
+  }
+}
+
+void WalkTest::look (float speed,int keep_old)
+{
+  if (move_3d || map_mode) return;
+  static float step_speed = 0;
+  if (!keep_old)
+    step_speed = speed*0.028;
+  if (fabs (angle.x+step_speed) <= (355.0/113.0/4))
+    angle.x += step_speed;
 }
 
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
@@ -1260,7 +1345,7 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     }
   }
 
-  pl->MakeStep();
+  pl->MakeStep ();
 #endif
   if (!System->Console->IsActive ())
   {
@@ -1274,7 +1359,7 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
     if (shift) speed = 2;
 
     /// Act as usual...
-    strafe(0,1); look(0,1); step(0,1); rotate(0,1);
+    strafe (0,1); look (0,1); step (0,1); rotate (0,1);
 
     ISoundListener *sndListener;
     Sys->piSound->GetListener(&sndListener);
@@ -1351,14 +1436,14 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
 	// additional command by Leslie Saputra -> freelook mode.
 	{
 	  static bool first_time = true;
-	  if(do_freelook)
+	  if (do_freelook)
 	  {
 	    int last_x, last_y;
 	    last_x = Event->Mouse.x;
 	    last_y = Event->Mouse.y;
 
             System->piG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
-	    if(!first_time)
+	    if (!first_time)
 	    {
             /*
 	      if(move_3d)
@@ -1368,8 +1453,8 @@ void WalkTest::NextFrame (long elapsed_time, long current_time)
 	      view->GetCamera ()->Rotate (VEC_TILT_UP, -((float)( last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2) );
             */
 
-              this->angle_y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
-              this->angle_x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
+              this->angle.y+=((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2);
+              this->angle.x+=((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse);
 	    }
 	    else
               first_time = false;
