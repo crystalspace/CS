@@ -508,11 +508,11 @@ public:
     }
     virtual void SetHeightFunction (iTerrainHeightFunction*)
     {
-      return;;
+      return;
     }
     virtual void SetNormalFunction (iTerrainNormalFunction*)
     {
-      return;;
+      return;
     }
     virtual void SetHeightMap (iImage*, float /*hscale*/, float /*hshift*/)
     {
