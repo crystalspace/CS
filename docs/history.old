@@ -1409,7 +1409,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      This fixes the small pauses experienced. Consistency checks
 	      stay enabled when CS_EXTENSIVE_MEMDEBUG is defined.
 	    - Also added a leak dump for MSVC debug builds when exiting an app.
-	    - Replaced some occurances of http://crystal.linuxgames.com/ with
+	    - Replaced some occurrences of http://crystal.linuxgames.com/ with
 	      http://crystal.sf.net/.
 	- Daniel Duhprey added an OpenAL plugin to CS.
 22-Oct-2002
@@ -7115,7 +7115,7 @@ updated3-Jun-2002
 7-Mar-2002
 	- Matt Reda fixed an endian-related bug in the OpenGL screenshot
 	  code.
-	- Fixed another occurance of an initializer in a cpp file.
+	- Fixed another occurrence of an initializer in a cpp file.
 	  This is not legal.
 	- The cache manager is no longer registered with the object
 	  registry. Instead I added iEngine::GetCacheManager() and
@@ -26023,7 +26023,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  to be defined in a sector but this will currently be ignored by
 	  the engine. Note that internally csBezierTemplate and csCurveTemplate
 	  are still used even if a curve is defined in a thing (without
-	  thing template). Basicly a curve template is the definition
+	  thing template). Basically a curve template is the definition
 	  of the geometry.
 	- Start work on csThing::MergeTemplate which works with csThing
 	  instead of csThingTemplate. This is also with the removal
@@ -27341,7 +27341,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  db_boxsize2 console commands to control the visibility, location,
 	  and size of the boxes.
 	- Added db_boxvis command to test the visibility between the two
-	  debug boxes in an octree. This visibility test basicly corresponds
+	  debug boxes in an octree. This visibility test basically corresponds
 	  to the routine that is used for calculating the PVS and as such
 	  is useful for debugging the PVS.
 	- Added db_boxnode1 and db_boxnode2 console commands to set the size
@@ -28656,7 +28656,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added CAMERA() keyword to the world file format for csThings.
 	- Added MIXMODE() keyword to the world file format for polygons.
 	- Added additional support for 'sky' objects in a sector. These
-	  are basicly just things like the others but you have the guarantee
+	  are basically just things like the others but you have the guarantee
 	  that they will be drawn first with Z fill before anything else
 	  is drawn.
 	- Added functions AddSky(), RemoveSky(), GetFirstSky(), and GetSky()
@@ -29056,7 +29056,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- csPolygonSet::GetBoundingBox() will now try to create the bounding
 	  box if it doesn't exist.
 	- Rene Dudfield experienced a strange crash in WalkTest which seemed
-	  to have been caused by using 'fabs'. I replaced most occurances
+	  to have been caused by using 'fabs'. I replaced most occurrences
 	  of 'fabs' with the 'ABS' macro throughout the source to avoid this
 	  problem. Maybe this problem is cyrix related? (Rene has a cyrix
 	  processor).
@@ -31820,7 +31820,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  checking. This also fixes FollowSegment.
 	- Rewrote csSector::HitBeam() to use the new IntersectSegment
 	  better. This function should now work better and faster than
-	  before. This is basicly the much requested TraceLine.
+	  before. This is basically the much requested TraceLine.
 	  HitBeam() also supports warping portals correctly now.
 	- Changed WalkTest to use the new HitBeam() function to click
 	  on objects.
@@ -32093,7 +32093,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  Doesn't work perfectly, but it is a start (still some bugs).
 	- Norman Kramer added saving/loading to/from iFile for csIniFile.
 4-Apr-2000
-	- Fixed several occurances of 'delete' that should be 'delete[]'.
+	- Fixed several occurrences of 'delete' that should be 'delete[]'.
 	  Reported by Paul Snively <psnively@earthlink.net>.
 	- Restored DrawPixmap in OpenGL which Gary Haussmann accidently
 	  removed.
@@ -36538,7 +36538,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added csVector3Array to csgeom. Rewrote csVertexArray to
 	  inherit from csVector3Array.
 	- Changed csPolygon3D to use the new csPolyIndexed class.
-	- Basicly csgeom now knows about the following four polygon classes:
+	- Basically csgeom now knows about the following four polygon classes:
 	    - csPolygonInt: which is the general base class for every
 	      polygon which should go in a BSP tree. It is a virtual
 	      class and cannot be used as such.
@@ -36805,7 +36805,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  decided that it is best to rewrite BSP handling a bit. The current
 	  way is too clumsy. Ok, let's start...
 	- Added a new class csPolygonBsp. This is a proxy polygon class
-	  which will be used in the new BSP trees. A csPolygonBsp is basicly
+	  which will be used in the new BSP trees. A csPolygonBsp is basically
 	  just a collection of vertices and a pointer back to the original
 	  polygon. The BSP tree builder will operator on csPolygonBsp
 	  instances and split them. The original csPolygon3D objects are
@@ -37704,7 +37704,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Andrew added a faster version of QInt() and QInt24() for
 	  x86/GCC platforms (and QInt24() also for M68K).
 	- Andrew also fixed a few bugs in the NASM code.
-	- Andrew changed ALL occurances of 'gouroud' still remaining to
+	- Andrew changed ALL occurrences of 'gouroud' still remaining to
 	  'gouraud' and removed an additional number of warnings.
 	- Andrew fixed OS/2 port by removing an unneeded WaitSwitch().
 	- Andrew avoided an internal compiler error for the sound loader
@@ -37736,7 +37736,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  code is not enabled by default yet.
 	- Andrew also moved the csCleanable sub-classes outside the functions.
 	  This should fix a few compilation problems for some compilers.
-	- Andrew also changed several occurances of 'gouroud' to 'gouraud' (I
+	- Andrew also changed several occurrences of 'gouroud' to 'gouraud' (I
 	  hope this doesn't break things :-)
 	- Michael Dale Long updated cvsguide.txt for the new IP number.
 	- Thomas Hieber removed a LOT of warnings!
@@ -37755,7 +37755,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  set/query boolean settings for objects in the engine.
 18-Jun-1999
 	- Fixed bug in shadow calculation for things. I think it is now
-	  correct. This basicly means that the new lighting algorithm is
+	  correct. This basically means that the new lighting algorithm is
 	  fully ready except for reflected light which has not been fully
 	  tested yet with regards to things (and will most probably not
 	  work fully) and also light frustrums which extend from a floating
@@ -37897,7 +37897,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  WalkTest.
 	- I added a new csCleanup class which is intended as a class
 	  to which you can register memory that needs to be freed at
-	  some time but for which you have no conveniant place to free
+	  some time but for which you have no convenient place to free
 	  it. I also added a 'cleanup' vector to csWorld which is
 	  freed together with the world. To this you can add temporary
 	  arrays which you need for optimizations. The new lighting
@@ -38660,7 +38660,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Changed csCamera class to new method naming convention.
 	  Also augmented the online documentation (Doc++) format.
 	- Added new 'api' target to the makefile. This target will create
-	  the API reference document in Doc++ format (HTML). It is basicly
+	  the API reference document in Doc++ format (HTML). It is basically
 	  a subset of the complete auto-documentation but contains only
 	  the classes which are useful for using from Crystal Space
 	  applications.
@@ -39404,7 +39404,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  NextStep).  Eric's changes included:
 	    - Added missing '#include "types.h"' to many files in order to
 	      define the fake 'bool' type which NextStep requires.
-	    - Fixed a number of occurances where expressions which work with
+	    - Fixed a number of occurrences where expressions which work with
 	      the real 'bool' type failed with the fake one.  Expressions of
 	      the sort: bool a = 4; bool b = 1; bool c = (a == b), or
 	      variations of this theme.
@@ -39455,7 +39455,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  opening the X11 display. This is done now.
 	- New 'move3d' console command. With this command you can toggle
 	  between pure 3D movement (the old way) and 'comfortable' movement
-	  (Quake movement). The latter is now default. This basicly affects
+	  (Quake movement). The latter is now default. This basically affects
 	  the left and right arrow keys which now rotate the camera how
 	  you would expect it. The '3' key has been assigned to this
 	  new command so that you can switch back to the old system if you

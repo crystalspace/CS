@@ -170,7 +170,7 @@ public:
 
   /**
    * Returns true if we are in a mirrored world.
-   * Basicly this means that back-face culling will
+   * Basically this means that back-face culling will
    * be reversed.
    */
   bool IsMirrored () const { return mirror; }
@@ -231,13 +231,13 @@ public:
 
   /**
    * Set the world to camera transformation matrix.
-   * This basicly defines the direction that the camera looks.
+   * This basically defines the direction that the camera looks.
    */
   inline void SetW2C (const csMatrix3& m) { SetO2T (m); }
 
   /**
    * Set the camera to world transformation matrix.
-   * This basicly defines the direction that the camera looks.
+   * This basically defines the direction that the camera looks.
    */
   inline void SetC2W (const csMatrix3& m) { SetT2O (m); }
 

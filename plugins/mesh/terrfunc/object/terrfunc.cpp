@@ -621,7 +621,7 @@ class TerrFuncTriangleVertices
 public:
   /*
    * The representation of a vertex in a triangle mesh.
-   * This is basicly used as a temporary structure to be able to
+   * This is basically used as a temporary structure to be able to
    * calculate the cost of collapsing this vertex more quickly.
    */
   class csTriangleVertex

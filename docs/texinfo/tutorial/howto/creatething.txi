@@ -94,7 +94,7 @@ has another material for the upper polygon.
 
 @subsubheading Creating a Thing from Code
 
-Here we create the same thing from code. We use a conveniance function in
+Here we create the same thing from code. We use a convenience function in
 the engine to create a thing (@code{CreateThingMesh}).
 
 @example

@@ -168,7 +168,7 @@ struct iReporter : public iBase
 
   /**
    * Remove a listener once. The listener will be DecRef()'ed by this function.
-   * If the listener is on the list multiple times only one occurance
+   * If the listener is on the list multiple times only one occurrence
    * is removed. If the listener cannot be found on the list no DecRef()
    * will happen.
    */

@@ -2855,7 +2855,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     Scan.FlatRGB.blue);
 
   //-----
-  // Get the values from the polygon for more conveniant local access.
+  // Get the values from the polygon for more convenient local access.
   // Also look for the top-most and bottom-most vertices.
   //-----
   float uu[64], vv[64], iz[64];

@@ -2233,7 +2233,7 @@ void csThing::InvalidateMaterialHandles ()
 // @@@ We need a better algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return
 // convex shadow frustums for those. This will significantly
-// reduce the number of shadow frustums. There are basicly
+// reduce the number of shadow frustums. There are basically
 // two ways to do this:
 //	- Split object into convex sub-parts in 3D.
 //	- Split object into convex sub-parts in 2D.

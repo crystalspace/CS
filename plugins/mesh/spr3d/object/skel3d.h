@@ -279,7 +279,7 @@ public:
 
 /**
  * A connection (state version, see csSkelState for more information).
- * This is basicly a transformation with a limb that
+ * This is basically a transformation with a limb that
  * is controlled by the transformation.
  */
 class csSkelConnectionState : public csSkelLimbState

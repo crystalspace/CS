@@ -20,6 +20,12 @@ chronological order.
 	  that create portals (i.e. thing mesh only at this moment) and
 	  also by the movable when objects that contain portals move.
 	  Note that this is not done yet!
+	- Eric Sunshine performed project-wide spelling corrections:
+	    basicly     --> basically
+	    conveniance --> convenience
+	    conveniant  --> convenient
+	    occurance   --> occurrence
+	    occurrance  --> occurrence
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
@@ -200,7 +206,7 @@ chronological order.
 	- Jorrit added a new csTimerEvent class (untested).  This class can
 	  schedule operations to be performed later.  It is a very low overhead
 	  scheduler since it will actually only check all events if needed.
-	- Jorrit added csEventTimer::GetStandardTimer() conveniance function.
+	- Jorrit added csEventTimer::GetStandardTimer() convenience function.
 	  This gets (or creates) the standard timer with id
 	  'crystalspace.timer.standard' from the object registry.
 	- Jorrit fixed SCF_IMPLEMENT_IBASE_WEAK_DECREF so that it now also adds
@@ -596,7 +602,7 @@ chronological order.
 	  if this is not needed.
 	- Jorrit performed some further optimizations on
 	  csShaderManager::SetupState().
-	- Jorrit fixed some occurances of Compare (changed with CompareKeys)
+	- Jorrit fixed some occurrences of Compare (changed with CompareKeys)
 	  in csHash.
 	- res fixed a bug in csHash<>::GetAll(). When you have a loop that
 	  should iterate from n-1 to 0, it's better to decrement the loop
@@ -829,7 +835,7 @@ chronological order.
 	  written in Java extending the CS iEventHandler.
 	- renej updated python scripting: initial support for easy extending
 	  VARG functions by means of include/ivaria/pythvarg.i
-	- Anders Stenberg changed 2 occurances of "render3d" to "graphics3d"
+	- Anders Stenberg changed 2 occurrences of "render3d" to "graphics3d"
 	- Jorrit started the work of merging the old renderer and new renderer
 	  branches (basically eliminating all CS_USE_NEW_RENDERER checks).
 	  This includes the following:
@@ -945,7 +951,7 @@ chronological order.
 	      do.
 	    - cslight now displays a text progress meter on the console, in
 	      addition to the graphical meter.
-	- Anders Stenberg changed most occurances of "Render3D" to
+	- Anders Stenberg changed most occurrences of "Render3D" to
 	  "Graphics3D", including some "r3d" that were changed to "g3d".
 	  Now filenames and makefile targets should be the only remnant of the
 	  stupid "render3d" naming (which was my fault, sorry for that :)
@@ -974,7 +980,7 @@ chronological order.
 	    - Added 'nrall' target for jam to compile all that is specific
 	      for the new renderer.
 	    - Added iMaterialWrapper::SetTextureWrapper() for new renderer
-	      too. This will set the diffuse texture and is a conveniance
+	      too. This will set the diffuse texture and is a convenience
 	      function.
 	    - Enabled iEngine->CreateBaseMaterial() again which was disabled
 	      for some bizare reason. This fixes bugplug again.
@@ -1828,7 +1834,7 @@ chronological order.
 	  awsSinkManager) with a csRef to do proper ref counting.
 	- Jorrit replaced pointer to sink inside SignalTriggerMap (for
 	  awsSinkManager) with a csRef to do proper ref counting.
-	- Jorrit replaced various occurances of csBasicVector:
+	- Jorrit replaced various occurrences of csBasicVector:
 	    - Replaced 'awsParmsList' in aws with a csPDelArray<parmItem>.
 	    - Replaced 'transitions' in awsManager with a
 	      csArray<awsWindowTransition*>.
@@ -1892,7 +1898,7 @@ chronological order.
 	- Jorrit modified the api documentation to reflect the pending removal
 	  of csVector and csBasicVector. Also explained how to do most common
 	  transitions.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'csLoadedPluginVector' in the isometric loader with
 	      a csPDelArray<csLoaderPluginRec>.
 	    - Replaced 'animVector' in spr2d with a
@@ -1919,11 +1925,11 @@ chronological order.
 	    - Replaced 'StreamIdx' in csavi plugin with csArray<indexentry*>.
 	    - Replaced 'StreamList' in csavi plugin with
 	      csPDelArray<StreamIdx>.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'scfLibraryVector' in scf with
 	      csPDelArray<scfSharedLibrary>.
 	    - Replaced 'scfClassRegistry' in scf with csPDelArray<scfFactory>.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'csHintManager' in csws with csArray<void*>.
 	    - Replaced 'csAccVector' in csws with csPDelArray<csAccElement>.
 	    - Replaced 'sequences' in csdemo with csPDelArray<NamedSequence>.
@@ -1945,7 +1951,7 @@ chronological order.
 	      csPDelArray<csRecordedCamera>.
 	    - Replaced 'busy_entities' in walktest with csArray<csWalkEntity*>.
 	    - Replaced 'busy_vector' in walktest with csArray<csWalkEntity*>.
-	- Jorrit replaced various occurances of csBasicVector:
+	- Jorrit replaced various occurrences of csBasicVector:
 	    - Replaced 'texlayers' in csShaderGLMTEX with csArray<mtexlayer*>.
 	    - Replaced 'techniques' in csShader with
 	      csArray<iShaderTechnique*>.
@@ -1975,7 +1981,7 @@ chronological order.
 	  csPDelArrayCompareFunction.  Also added csArrayCompareFunction which
 	  is specific to csArray.  So csArray no longer has to include
 	  "parray.h".
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'csPluginList' for csPluginLoader with a
 	      csPDelArray<csPluginLoadRec>.
 	    - Replaced 'csPluginsVector' in csPluginManager with a
@@ -1985,14 +1991,14 @@ chronological order.
 	    - csRegionTree2D::FindRegion() now uses csArray instead of
 	      csVector.
 	- Jorrit added csPDelArray::FindKey().
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'csConstraintVector' for csws layouts with a
 	      csPDelArray<csLayoutConstraint>.
 	    - csSkin now inherits from csPDelArray<csSkinSlice> instead of
 	      csVector.
 	    - Replaced 'csWSTexVector' for csws with a
 	      csPDelArray<csWSTexture>.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'TabVector' in awsTabCtrl with a csPDelArray<awsTab>.
 	    - Replaced 'awsComponentVector' in awscomp.h with a
 	      csArray<iAwsComponent*>.
@@ -2038,7 +2044,7 @@ chronological order.
 	  to load them.  Functionality is only partially implemented, but
 	  cal3d models are loadable and viewable in viewmesh at least.
 31-Jul-2003
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with
 	      csArray<csTextureOpenGL*>.
 	    - Replaced 'vClients' in csVertexBufferManager with
@@ -2050,7 +2056,7 @@ chronological order.
 	  equal_index parameter. This integer will be set to the index
 	  of a possible duplicate value (or -1 if none). This is similar
 	  to csVector::InsertSorted().
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced VfsVector in csVFS with a csPDelArray<VfsNode>.
 	    - Replaced ArchiveEntryVector in csArchive with a
 	      csPDelArray<ArchiveEntry>.
@@ -2072,12 +2078,12 @@ chronological order.
 	  all image loading plugins accordingly.
 	- Jorrit replaced the basic vector return in
 	  iAwsKeyContainer::Children() with a const csRefArray<iAwsKey>.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced TabOrder in awsComponent with csArray<iAwsComponent*>.
 	    - Replaced vClipped in awsMultiLineEdit with
 	      csPDelArray<csString>.
 	    - Replaced vText in awsMultiLineEdit with csPDelArray<csString>.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'visobj_vector' in Dynavis with
 	      csPDelArray<csVisibilityObjectWrapper>.
 	    - Replaced 'vector' in csDynVisObjIt with
@@ -2099,7 +2105,7 @@ chronological order.
 	    - Replaced 'particles' in csParticleSystem with
 	      csRefArray<iParticle>.
 	- res removed csVector from the Win32 WaveOut plugin.
-	- Jorrit replaced various occurances of csVector:
+	- Jorrit replaced various occurrences of csVector:
 	    - Replaced 'frames' in csSpriteAction2 with csArray<csSpriteFrame*>.
 	    - Replaced 'delays' in csSpriteAction2 with csArray<int>.
 	    - Replaced 'displacements' in csSpriteAction2 with csArray<float>.
@@ -2362,10 +2368,10 @@ chronological order.
 	  with the proper usage of GetObjectModel().
 	- Jorrit added a few references towards individual HOWTO's from the
 	  rest of the documentation.
-	- Jorrit replaced all occurances of NULL in the documentation with 0.
+	- Jorrit replaced all occurrences of NULL in the documentation with 0.
 	  This same replacement has been done on the source code some time ago.
 	- Jorrit fixed the ensocket documentation to use csRef.
-	- Jorrit replaced several NULL occurances with 0 throughout the CS
+	- Jorrit replaced several NULL occurrences with 0 throughout the CS
 	  sources.
 	- Philip Wyett removed some old LUA link related code from win32 gcc
 	  makefile.
@@ -2515,8 +2521,8 @@ chronological order.
 	- Jorrit renamed csPolygonMeshCube to csPolygonMeshBox. It is a box,
 	  not a cube.
 	- Eric Sunshine performed project-wide spelling corrections:
-	    conveniance --> convenience
-	    conveniant  --> convenient
+	    convenience --> convenience
+	    convenient  --> convenient
 	- res fixed a bug in the GetLongPathName() replacement for Win9x/NT:
 	  an array was allocated on the stack at runtime, but was almost
 	  immediately overwritten, causing the function to not work at all.
@@ -8757,7 +8763,7 @@ chronological order.
 	  the limit to 0.
 	- Added csPDelArray. This is similar to csPArray but it will
 	  delete elements that are removed from the array.
-	- Replaced all occurances of CS_DECLARE_TYPED_VECTOR with
+	- Replaced all occurrences of CS_DECLARE_TYPED_VECTOR with
 	  csPDelArray.
 	- Removed the CS_DECLARE_TYPED_VECTOR defines.
 	- Removed the CS_DECLARE_TYPED_IBASE_VECTOR defines.
@@ -8839,7 +8845,7 @@ chronological order.
 	  CS_DECLARE_GROWING_ARRAY. csGrowingArray is only for objects that
 	  don't require constructors and not for pointers (for pointers use
 	  csPArray or csRefArray).
-	- Replaced all occurances of CS_DECLARE_GROWING_ARRAY with
+	- Replaced all occurrences of CS_DECLARE_GROWING_ARRAY with
 	  csGrowingArray. Consequently removed the GROWING ARRAY macros.
 	- Andreas Busch modified the documentation for all meshobjects
 	  from old syntax to XML. The thing documentation needs a big

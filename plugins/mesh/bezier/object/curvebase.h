@@ -46,7 +46,7 @@ struct iStatLight;
 struct iCamera;
 
 /**
- * Tesselated curve. This is basicly a list of triangles.
+ * Tesselated curve. This is basically a list of triangles.
  */
 class csCurveTesselated
 {

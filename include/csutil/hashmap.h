@@ -281,7 +281,7 @@ public:
 
 /**
  * This class implements a basic set for objects.
- * You can basicly use this to test for the occurance
+ * You can basically use this to test for the occurrence
  * of some object quickly.
  */
 class csHashSet

@@ -27,7 +27,7 @@ class csBox2;
 
 /**
  * The csView class encapsulates the top-level Crystal Space
- * renderer interface. It is basicly a camera and a clipper.
+ * renderer interface. It is basically a camera and a clipper.
  */
 class csView : public iView
 {

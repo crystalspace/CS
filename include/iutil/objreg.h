@@ -72,7 +72,7 @@ struct iObjectRegistry : public iBase
 
   /**
    * Unregister an object with this registry. If 'tag' is not given
-   * then it will unregister all occurances of the given object
+   * then it will unregister all occurrences of the given object
    * in the registry (i.e. for all tags). If 'tag' is given then only
    * the object that has that tag will be unregistered.
    * This function will decrease the ref count of the given object.
