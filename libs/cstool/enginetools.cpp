@@ -45,7 +45,7 @@ float csEngineTools::FindShortestDistance (
 
   const csSet<iMeshWrapper*>& portal_meshes = sourceSector->GetPortalMeshes ();
   csSet<iMeshWrapper*>::GlobalIterator it = portal_meshes.GetIterator ();
-  float best_sqdist = 100000000000.0;
+  float best_sqdist = 100000000000.0f;
   bool best_found = false;
   while (it.HasNext ())
   {

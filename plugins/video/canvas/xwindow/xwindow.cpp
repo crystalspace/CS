@@ -479,7 +479,8 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
 bool csXWindow::HandleEvent (iEvent &Event)
 {
   static int buttonMapping[6] = {0, 1, 3, 2};
-  const int buttonMapCount = sizeof (buttonMapping) / sizeof (int);
+  const unsigned int buttonMapCount =
+    sizeof (buttonMapping) / sizeof (buttonMapping[0]);
   XEvent event;
   KeySym xKey;
   utf32_char csKeyRaw = 0, csKeyCooked = 0;
@@ -524,12 +525,14 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	}
 	break;
       case ButtonPress:
-        EventOutlet->Mouse (event.xbutton.button < buttonMapCount ? 
+        EventOutlet->Mouse (
+	  (unsigned int)event.xbutton.button < buttonMapCount ? 
 	  buttonMapping [event.xbutton.button] : event.xbutton.button,
           true, event.xbutton.x, event.xbutton.y);
         break;
       case ButtonRelease:
-        EventOutlet->Mouse (event.xbutton.button < buttonMapCount ? 
+        EventOutlet->Mouse (
+	  (unsigned int)event.xbutton.button < buttonMapCount ? 
 	  buttonMapping [event.xbutton.button] : event.xbutton.button,
           false, event.xbutton.x, event.xbutton.y);
         break;
