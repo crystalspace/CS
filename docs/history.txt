@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Mar-2004
+	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
+	  to avoid clashes with other external libraries which also embed
+	  TinyXML.  This corrects, for instance, a problem on MacOS/X where
+	  modules requiring both csutil and cal3d failed to link on account of
+	  symbolic collisions (since cal3d also embeds TinyXML).
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

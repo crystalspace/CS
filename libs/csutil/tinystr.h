@@ -22,6 +22,7 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#include "tinywrap.h"
 #include "tinyxml.h"
 
 

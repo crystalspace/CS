@@ -42,6 +42,7 @@ distribution.
 #include <csutil/strset.h>
 #include <csutil/blockallocator.h>
 
+#include "tinywrap.h"
 #include "tinystr.h"
 
 class TiDocument;
