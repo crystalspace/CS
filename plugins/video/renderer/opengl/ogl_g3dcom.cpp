@@ -28,6 +28,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/plane3.h"
+#include "csgeom/frustum.h"
 #include "ogl_g3dcom.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
@@ -150,6 +151,19 @@ static DECLARE_GROWING_ARRAY_REF (fog_intensities, float);
 /// Array with fog colors
 static DECLARE_GROWING_ARRAY_REF (fog_color_verts, csColor);
 
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_triangles, csTriangle);
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_translate, int);
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_vertices, csVector3);
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_texels, csVector2);
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_colors, csColor);
+/// Array for clipping.
+static DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
+
 /*=========================================================================
  Method implementations
 =========================================================================*/
@@ -193,6 +207,12 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   color_verts.IncRef ();
   fog_intensities.IncRef ();
   fog_color_verts.IncRef ();
+  clipped_triangles.IncRef ();
+  clipped_translate.IncRef ();
+  clipped_vertices.IncRef ();
+  clipped_texels.IncRef ();
+  clipped_colors.IncRef ();
+  clipped_fog.IncRef ();
 
   in_draw_poly = false;
 
@@ -213,6 +233,12 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   color_verts.DecRef ();
   fog_intensities.DecRef ();
   fog_color_verts.DecRef ();
+  clipped_triangles.DecRef ();
+  clipped_translate.DecRef ();
+  clipped_vertices.DecRef ();
+  clipped_texels.DecRef ();
+  clipped_colors.DecRef ();
+  clipped_fog.DecRef ();
 }
 
 bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
@@ -1454,6 +1480,135 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   }
 }
 
+void csGraphics3DOGLCommon::ClipTriangleMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices)
+{
+#define NEW_CLIP 0
+#if NEW_CLIP
+  // Make sure the frustum is ok.
+  CalculateFrustum ();
+
+  // Now calculate the frustum as seen in object space for the given
+  // mesh.
+  csPoly3D obj_frustum;
+  int i, j, j1;
+  for (i = 0 ; i < frustum.GetNumVertices () ; i++)
+  {
+    obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
+  }
+  csVector3 obj_frust_origin = o2c.This2Other (csVector3 (0));
+
+  // Make sure our worktables are big enough for the clipped mesh.
+  if (num_triangles*2 > clipped_triangles.Limit ())
+  {
+    // Use two times as many triangles. Hopefully this is enough.
+    clipped_triangles.SetLimit (num_triangles*2);
+  }
+  if (num_vertices*2 > clipped_vertices.Limit ())
+  {
+    clipped_translate.SetLimit (num_vertices);	// Used for original vertices.
+    clipped_vertices.SetLimit (num_vertices*2);
+    clipped_texels.SetLimit (num_vertices*2);
+    clipped_colors.SetLimit (num_vertices*2);
+    clipped_fog.SetLimit (num_vertices*2);
+  }
+
+  num_clipped_triangles = 0;
+  num_clipped_vertices = 0;
+
+  // Check all original vertices and see if they are in frustum.
+  // If yes we set clipped_translate to the new position in the transformed
+  // vertex array. Otherwise we set clipped_translate to -1.
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    const csVector3& v = vertices[i];
+    bool inside = true;
+    j1 = obj_frustum.GetNumVertices ()-1;
+    for (j = 0 ; j < obj_frustum.GetNumVertices () ; j++)
+    {
+      if (csMath3::WhichSide3D (v-obj_frust_origin, obj_frustum[j],
+	    obj_frustum[j1]) >= 0)
+      {
+	inside = false;
+	break;	// Not inside.
+      }
+      j1 = j;
+    }
+    if (inside)
+    {
+      clipped_translate[i] = num_clipped_vertices;
+      clipped_vertices[num_clipped_vertices] = v;
+      clipped_texels[num_clipped_vertices] = texels[i];
+      if (vertex_colors)
+        clipped_colors[num_clipped_vertices] = vertex_colors[i];
+      if (vertex_fog)
+        clipped_fog[num_clipped_vertices] = vertex_fog[i];
+      num_clipped_vertices++;
+    }
+    else
+      clipped_translate[i] = -1;
+  }
+
+  // Now clip all triangles.
+  for (i = 0 ; i < num_triangles ; i++)
+  {
+    csTriangle& tri = triangles[i];
+    int cnt = int (clipped_translate[tri.a] != -1)
+      	+ int (clipped_translate[tri.b] != -1)
+	+ int (clipped_translate[tri.c] != -1);
+    if (cnt == 0)
+    {
+      //=====
+      // Easiest case: triangle is not visible.
+      //=====
+      //@@@ NOTE! There are two pathological cases which are not
+      //correctly handled at this moment:
+      //  1. The view frustum is entire in the triangle. In this
+      //     case the triangle is obviously visible.
+      //  2. The view triangle intersects with the view frustum but
+      //     none of the triangle vertices is in the frustum and none
+      //     of the frustum vertices is in the triangle. This case is
+      //     most complicated to detect.
+    }
+    else if (cnt == 3)
+    {
+      //=====
+      // Easy case: the triangle is fully in view.
+      //=====
+      clipped_triangles[num_clipped_triangles].a = clipped_translate[tri.a];
+      clipped_triangles[num_clipped_triangles].b = clipped_translate[tri.b];
+      clipped_triangles[num_clipped_triangles].c = clipped_translate[tri.c];
+      num_clipped_triangles++;
+    }
+    else
+    {
+      //=====
+      // Difficult case: clipping will result in several triangles.
+      //=====
+      // @@@@@@@@@@@@@@@@@@@ NOT OPTIMAL!!! AVOID csFrustum AND COPY
+      // BETTER CODE HERE!
+      csFrustum* pol = csFrustum::Intersect (obj_frust_origin,
+	  obj_frustum.GetVertices (), obj_frustum.GetNumVertices (),
+	  vertices[tri.a], vertices[tri.b], vertices[tri.c]);
+      // Now triangulate.
+      clipped_vertices[];@@@@@@@@@@@@@@@@
+      for (j = 2 ; j < pol->GetNumVertices () ; j++)
+      {
+      }
+      delete pol;
+    }
+  }
+#endif
+}
+
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   end_draw_poly ();
@@ -1485,25 +1640,29 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     }
 #else
+#   if !NEW_CLIP
     // If we have no stencil buffer then we just use the default version.
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
     	width2, height2);
     return;
+#   endif
 #endif
   }
 
   int i,k;
 
   // Update work tables.
-  if (mesh.num_vertices > tr_verts.Limit ())
+  int num_vertices = mesh.num_vertices;
+  int num_triangles = mesh.num_triangles;
+  if (num_vertices > tr_verts.Limit ())
   {
-    tr_verts.SetLimit (mesh.num_vertices);
-    uv_verts.SetLimit (mesh.num_vertices);
-    uv_mul_verts.SetLimit (mesh.num_vertices);
-    rgba_verts.SetLimit (mesh.num_vertices*4);
-    color_verts.SetLimit (mesh.num_vertices);
-    fog_intensities.SetLimit (mesh.num_vertices*2);
-    fog_color_verts.SetLimit (mesh.num_vertices);
+    tr_verts.SetLimit (num_vertices);
+    uv_verts.SetLimit (num_vertices);
+    uv_mul_verts.SetLimit (num_vertices);
+    rgba_verts.SetLimit (num_vertices*4);
+    color_verts.SetLimit (num_vertices);
+    fog_intensities.SetLimit (num_vertices*2);
+    fog_color_verts.SetLimit (num_vertices);
   }
 
   // Do vertex tweening and/or transformation to camera space
@@ -1524,7 +1683,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     csVector3* f2 = mesh.vertices[1];
     csVector2* uv2 = mesh.texels[1];
     csColor* col2 = mesh.vertex_colors[1];
-    for (i = 0 ; i < mesh.num_vertices ; i++)
+    for (i = 0 ; i < num_vertices ; i++)
     {
       tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
       if (mesh.do_morph_texels)
@@ -1552,13 +1711,37 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     work_uv_verts = uv1;
     work_colors = col1;
   }
+  csTriangle *triangles = mesh.triangles;
+  G3DFogInfo* work_fog = mesh.vertex_fog;
 
+#if NEW_CLIP
+  // If we need clipping then we do this here.
+  if (want_clipping)
+  {
+    ClipTriangleMesh (
+	num_triangles,
+	num_vertices,
+	triangles,
+	work_verts,
+	work_uv_verts,
+	work_colors,
+	work_fog,
+	num_triangles,
+	num_vertices);
+    work_verts = clipped_vertices.GetArray ();
+    work_uv_verts = clipped_texels.GetArray ();
+    work_colors = clipped_colors.GetArray ();
+    work_fog = clipped_fog.GetArray ();
+    triangles = clipped_triangles.GetArray ();
+  }
+#endif
+  
   // set up coordinate transform
   GLfloat matrixholder[16];
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+  glMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity ();
 
   // set up world->camera transform, if needed
   if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
@@ -1595,14 +1778,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     matrixholder[3] = matrixholder[7] = matrixholder[11] =
     matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-
     matrixholder[15] = 1.0;
 
     const csVector3 &translation = o2c.GetO2TTranslation();
 
-    glMultMatrixf(matrixholder);
-
-    glTranslatef(-translation.x, -translation.y, -translation.z);
+    glMultMatrixf (matrixholder);
+    glTranslatef (-translation.x, -translation.y, -translation.z);
   }
 
   // Set up perspective transform.
@@ -1612,9 +1793,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // Here, we need to reproduce CS's perspective projection using
   // OpenGL matrices.
 
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
+  glMatrixMode (GL_PROJECTION);
+  glPushMatrix ();
+  glLoadIdentity ();
 
   // With the back buffer procedural textures the orthographic projection
   // matrix are inverted.
@@ -1624,24 +1805,19 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
 
 
-  glTranslatef(width2,height2,0);
-
-  for (i = 0 ; i < 16 ; i++)
-    matrixholder[i] = 0.0;
-
+  glTranslatef (width2, height2, 0);
+  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;
-
   matrixholder[11] = inv_aspect;
-  matrixholder[14] = -matrixholder[11];
-
-  glMultMatrixf(matrixholder);
+  matrixholder[14] = -inv_aspect;
+  glMultMatrixf (matrixholder);
 
   if (mesh.do_fog)
   {
-    for (i=0; i < mesh.num_vertices; i++)
+    for (i=0 ; i < num_vertices ; i++)
     {
       // specify fog vertex transparency
-      float I = mesh.vertex_fog[i].intensity;
+      float I = work_fog[i].intensity;
       if (I > FOG_MAXVALUE)
       	I = FOGTABLE_CLAMPVALUE;
       else
@@ -1651,13 +1827,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       fog_intensities[i*2+1] = I;
       // @@@ To avoid this copy we better structure this differently
       // inside G3DTriangleMesh.
-      fog_color_verts[i].red = mesh.vertex_fog[i].r;
-      fog_color_verts[i].green = mesh.vertex_fog[i].g;
-      fog_color_verts[i].blue = mesh.vertex_fog[i].b;
+      fog_color_verts[i].red = work_fog[i].r;
+      fog_color_verts[i].green = work_fog[i].g;
+      fog_color_verts[i].blue = work_fog[i].b;
     }
   }
-
-  csTriangle *triangles = mesh.triangles;
 
   // Draw all triangles.
   StartPolygonFX (mesh.mat_handle, mesh.fxmode);
@@ -1671,7 +1845,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     // special hack for transparent meshes
     if (mesh.fxmode & CS_FX_ALPHA)
-      for (k=0, i=0; i<mesh.num_vertices; i++)
+      for (k=0, i=0; i<num_vertices; i++)
       {
         rgba_verts[k++] = work_colors[i].red;
         rgba_verts[k++] = work_colors[i].green;
@@ -1713,7 +1887,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glShadeModel (GL_FLAT);
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
-  glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+  glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
   // mode here.
@@ -1751,7 +1925,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mat->TextureLayerTranslated (j))
       {
         mul_uv = uv_mul_verts.GetArray ();
-	for (i = 0 ; i < mesh.num_vertices ; i++)
+	for (i = 0 ; i < num_vertices ; i++)
 	{
 	  mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
 	  mul_uv[i].y = work_uv_verts[i].y * vscale + vshift;
@@ -1759,7 +1933,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       }
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
       glTexCoordPointer (2, GL_FLOAT, 0, mul_uv);
-      glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+      glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
     }
  
     // If we have to do gouraud shading we do it here.
@@ -1780,7 +1954,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
         glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
-      glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+      glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
     }
   }
 
@@ -1808,7 +1982,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glTexCoordPointer (2, GL_FLOAT, 0, & fog_intensities[0]);
     glColorPointer (3, GL_FLOAT, 0, & fog_color_verts[0]);
 
-    glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
+    glDrawElements (GL_TRIANGLES, num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
     if (!m_textured)
       glDisable (GL_TEXTURE_2D);

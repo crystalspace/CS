@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	- Started work on improved DrawTriangleMesh for OpenGL. OpenGL
 	  renderer will now keep a 3D frustum in camera space and recalc
 	  this when needed (not finished yet).
+	- Added static version of csFrustum::Intersect() and also added
+	  a version to interesect a triangle.
+	- Started working on better version of clipping DrawTriangleMesh
+	  for OpenGL. Doesn't work yet.
 	- Eric Sunshine eliminated compilation warning about variable being
 	  clobbered by longjmp() in jpgimage.cpp.
 	- Eric Sunshine fixed several problems which were recently introduced

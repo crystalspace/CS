@@ -236,6 +236,42 @@ public:
   csFrustum* Intersect (csVector3* poly, int num);
 
   /**
+   * Intersect a convex polygon with this volume. The convex polygon
+   * is given relative to the center point (origin) of this frustum.<p>
+   *
+   * Returns a new frustum which exactly covers the intersection
+   * of the polygon with the frustum (i.e. the smallest frustum
+   * which is part of this frustum and which 'sees' exactly
+   * the same of the given polygon as this frustum).<p>
+   *
+   * This function returns NULL if there is no intersection.<p>
+   *
+   * Note that the frustum polygon of the returned csFrustum is
+   * guaranteed to be coplanar with the given polygon.
+   */
+  static csFrustum* Intersect (
+    const csVector3& frust_origin, csVector3* frust, int num_frust,
+    csVector3* poly, int num);
+
+  /**
+   * Intersect a triangle with this volume. The triangle
+   * is given relative to the center point (origin) of this frustum.<p>
+   *
+   * Returns a new frustum which exactly covers the intersection
+   * of the triangle with the frustum (i.e. the smallest frustum
+   * which is part of this frustum and which 'sees' exactly
+   * the same of the given polygon as this frustum).<p>
+   *
+   * This function returns NULL if there is no intersection.<p>
+   *
+   * Note that the frustum polygon of the returned csFrustum is
+   * guaranteed to be coplanar with the given triangle.
+   */
+  static csFrustum* Intersect (
+    const csVector3& frust_origin, csVector3* frust, int num_frust,
+    const csVector3& v1, const csVector3& v2, const csVector3& v3);
+
+  /**
    * Check if a polygon intersects with the frustum (i.e.
    * is visible in the frustum). Returns one of CS_FRUST_XXX values.
    * Frustum and polygon should be given relative to (0,0,0).

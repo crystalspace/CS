@@ -308,6 +308,59 @@ csFrustum* csFrustum::Intersect (const csFrustum& other)
   return Intersect (other.vertices, other.num_vertices);
 }
 
+csFrustum* csFrustum::Intersect (
+    const csVector3& frust_origin, csVector3* frust, int num_frust,
+    const csVector3& v1, const csVector3& v2, const csVector3& v3)
+{
+  csFrustum* new_frustum;
+  // General case. Create a new frustum from the given polygon with
+  // the origin of this frustum and clip it to every plane from this
+  // frustum.
+  new_frustum = new csFrustum (frust_origin);
+  new_frustum->AddVertex (v1);
+  new_frustum->AddVertex (v2);
+  new_frustum->AddVertex (v3);
+  int i, i1;
+  i1 = num_frust-1;
+  for (i = 0 ; i < num_frust ; i++)
+  {
+    new_frustum->ClipToPlane (frust[i1], frust[i]);
+    if (new_frustum->IsEmpty ())
+    {
+      // Intersection has become empty. Return NULL.
+      delete new_frustum;
+      return NULL;
+    }
+    i1 = i;
+  }
+  return new_frustum;
+}
+
+csFrustum* csFrustum::Intersect (
+    const csVector3& frust_origin, csVector3* frust, int num_frust,
+    csVector3* poly, int num)
+{
+  csFrustum* new_frustum;
+  // General case. Create a new frustum from the given polygon with
+  // the origin of this frustum and clip it to every plane from this
+  // frustum.
+  new_frustum = new csFrustum (frust_origin, poly, num);
+  int i, i1;
+  i1 = num_frust-1;
+  for (i = 0 ; i < num_frust ; i++)
+  {
+    new_frustum->ClipToPlane (frust[i1], frust[i]);
+    if (new_frustum->IsEmpty ())
+    {
+      // Intersection has become empty. Return NULL.
+      delete new_frustum;
+      return NULL;
+    }
+    i1 = i;
+  }
+  return new_frustum;
+}
+
 csFrustum* csFrustum::Intersect (csVector3* poly, int num)
 {
   csFrustum* new_frustum;

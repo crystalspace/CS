@@ -124,6 +124,21 @@ private:
   /// Make sure the frustum is correct.
   void CalculateFrustum ();
 
+  /**
+   * Given information from a mesh, clip the mesh to the frustum.
+   * The clipped mesh will be put in the clipped_??? arrays.
+   */
+  void ClipTriangleMesh (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices);
+
 protected:
   friend class csOpenGLHalo;
 
