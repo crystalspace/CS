@@ -463,9 +463,10 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
 	  child->app->LastMouseContainer = child;
         }
 
-        retc = child->HandleEvent (*Event);
-        if (child->GetState (CSS_TRANSPARENT) == 0)
-          retc = true;
+	// after HandleEvent() returned child might've been freed,
+	// so check the state for the transparent flag in advance
+	retc = (child->GetState (CSS_TRANSPARENT) == 0);
+	retc = child->HandleEvent (*Event) || retc;
       }
       else
         retc = false;

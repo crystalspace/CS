@@ -53,7 +53,6 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "imap/services.h"
 #include "imap/parser.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdlconv.h"
