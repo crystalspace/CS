@@ -38,7 +38,6 @@ CAL3D.AVAILABLE = yes ;
 CAL3D.LIBS = cal3d.lib ;
 CG.AVAILABLE = yes ;
 CG.LIBS = cg.lib cgGL.lib ;
-CMD.NASM = ;
 DIRECTX.AVAILABLE = yes ;
 DIRECTX.LIBS = dsound.lib ddraw.lib dinput.lib ;
 FT2.AVAILABLE = yes ;
