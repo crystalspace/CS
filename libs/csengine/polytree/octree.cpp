@@ -21,6 +21,7 @@
 #include "csengine/octree.h"
 #include "csengine/bsp.h"
 #include "csengine/treeobj.h"
+#include "csengine/sector.h"
 
 //---------------------------------------------------------------------------
 
@@ -94,8 +95,9 @@ void csOctreeNode::BuildVertexTables ()
 
 //---------------------------------------------------------------------------
 
-csOctree::csOctree (csPolygonParentInt* pset, const csVector3& imin_bbox,
-	const csVector3& imax_bbox, int ibsp_num, int imode) : csPolygonTree (pset)
+csOctree::csOctree (csSector* sect, const csVector3& imin_bbox,
+	const csVector3& imax_bbox, int ibsp_num, int imode)
+	: csPolygonTree (sect)
 {
   bbox.Set (imin_bbox, imax_bbox);
   bsp_num = ibsp_num;
@@ -110,9 +112,9 @@ csOctree::~csOctree ()
 void csOctree::Build ()
 {
   int i;
-  int num = pset->GetNumPolygons ();
+  int num = sector->GetNumPolygons ();
   CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
-  for (i = 0 ; i < num ; i++) polygons[i] = pset->GetPolygon (i);
+  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygon (i);
 
   CHK (root = new csOctreeNode);
 
@@ -132,7 +134,6 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   CHK (delete [] new_polygons);
 }
 
-
 void csOctree::AddDynamicPolygons (csPolygonInt** polygons, int num)
 {
   // @@@ We should only do this copy if there is a split in the first level.
@@ -147,6 +148,58 @@ void csOctree::AddDynamicPolygons (csPolygonInt** polygons, int num)
 void csOctree::RemoveDynamicPolygons ()
 {
   if (root) root->RemoveDynamicPolygons ();
+}
+
+void csOctree::ProcessTodo (csOctreeNode* node)
+{
+  csPolygonStub* stub;
+  const csVector3& center = node->GetCenter ();
+  while (node->todo_stubs)
+  {
+    stub = node->todo_stubs;
+    node->UnlinkStub (stub);	// Unlink from todo list.
+    csPolygonStub* xf, * xb;
+    csPolyTreeObject* pto = stub->GetObject ();
+    pto->SplitWithPlaneX (stub, NULL, &xf, &xb, center.x);
+    if (xf)
+    {
+      csPolygonStub* xfyf, * xfyb;
+      pto->SplitWithPlaneX (xf, NULL, &xfyf, &xfyb, center.y);
+      if (xfyf)
+      {
+        csPolygonStub* xfyfzf, * xfyfzb;
+        pto->SplitWithPlaneX (xfyf, NULL, &xfyfzf, &xfyfzb, center.z);
+	if (xfyfzf) node->children[OCTREE_FFF]->LinkStubTodo (xfyfzf);
+	if (xfyfzb) node->children[OCTREE_FFB]->LinkStubTodo (xfyfzb);
+      }
+      if (xfyb)
+      {
+        csPolygonStub* xfybzf, * xfybzb;
+        pto->SplitWithPlaneX (xfyb, NULL, &xfybzf, &xfybzb, center.z);
+	if (xfybzf) node->children[OCTREE_FBF]->LinkStubTodo (xfybzf);
+	if (xfybzb) node->children[OCTREE_FBB]->LinkStubTodo (xfybzb);
+      }
+    }
+    if (xb)
+    {
+      csPolygonStub* xbyf, * xbyb;
+      pto->SplitWithPlaneX (xb, NULL, &xbyf, &xbyb, center.y);
+      if (xbyf)
+      {
+        csPolygonStub* xbyfzf, * xbyfzb;
+        pto->SplitWithPlaneX (xbyf, NULL, &xbyfzf, &xbyfzb, center.z);
+	if (xbyfzf) node->children[OCTREE_BFF]->LinkStubTodo (xbyfzf);
+	if (xbyfzb) node->children[OCTREE_BFB]->LinkStubTodo (xbyfzb);
+      }
+      if (xbyb)
+      {
+        csPolygonStub* xbybzf, * xbybzb;
+        pto->SplitWithPlaneX (xbyb, NULL, &xbybzf, &xbybzb, center.z);
+	if (xbybzf) node->children[OCTREE_BBF]->LinkStubTodo (xbybzf);
+	if (xbybzb) node->children[OCTREE_BBB]->LinkStubTodo (xbybzb);
+      }
+    }
+  }
 }
 
 void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
@@ -226,7 +279,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
   if (num <= bsp_num)
   {
     csBspTree* bsp;
-    CHK (bsp = new csBspTree (pset, mode));
+    CHK (bsp = new csBspTree (sector, mode));
     bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
     return;
@@ -348,7 +401,7 @@ void csOctree::BuildDynamic (csOctreeNode* node, csPolygonInt** polygons, int nu
         else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
         ((csOctreeNode*)(node->children[i]))->SetBox (bmin, bmax);
         csBspTree* bsp;
-        CHK (bsp = new csBspTree (pset, mode));
+        CHK (bsp = new csBspTree (sector, mode));
         ((csOctreeNode*)(node->children[i]))->SetMiniBsp (bsp);
       }
       BuildDynamic ((csOctreeNode*)node->children[i], polys[i], idx[i]);

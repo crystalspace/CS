@@ -12,6 +12,20 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Jan-2000
+	- Fundamental change to the polygon tree class structure (i.e.
+	  BSP and octrees). csPolygonParentInt no longer exists. Instead
+	  a csSector is always assumed to be the parent container for
+	  the polygon tree. This makes the code easier to understand and
+	  also somewhat more efficient (less virtual functions needed).
+	  The disadvantage? BSP and octrees are now tied to sectors.
+	- I also dropped support for the old BSP keyword (now only
+	  STATBSP is supported). This breaks the mirror.zip level (but
+	  it is easy to fix). The loader will print out an error message
+	  if BSP is still used.
+	- Removed debugging code which was accidently left in the
+	  c-buffer/coverage mask tree culling. This could cause a significant
+	  drop in performance.
 14-Jan-2000
 	- Noah L. Gibbs (angelbob) modified and test phyztest to work with
 	  his changes of the csPhyzik inheritance hierarchy.
@@ -25,6 +39,8 @@ Short-term cleanups that need to be done:
 	  the skeletal animation system is now completely seperate from
 	  csSprite3D.
 	- Further work on dynamic objects in polygon trees.
+	- Andrew Zabolotny updated his memory debugger so that it now works
+	  on Linux/ELF, DJGPP, and any other platform with GCC >= 2.8.0.
 13-Jan-2000
 	- Some further work on dynamic objects in polygon trees.
 	- Eric Sunshine made a fairly major change to the CVS snapshot

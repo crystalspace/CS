@@ -20,6 +20,7 @@
 #include "csengine/polyint.h"
 #include "csengine/treeobj.h"
 #include "csengine/bsp.h"
+#include "csengine/sector.h"
 
 //---------------------------------------------------------------------------
 
@@ -106,7 +107,7 @@ void csBspNode::FetchVertices (int* array, int& cur_idx)
 
 //---------------------------------------------------------------------------
 
-csBspTree::csBspTree (csPolygonParentInt* pset, int mode) : csPolygonTree (pset)
+csBspTree::csBspTree (csSector* sect, int mode) : csPolygonTree (sect)
 {
   csBspTree::mode = mode;
 }
@@ -119,9 +120,9 @@ csBspTree::~csBspTree ()
 void csBspTree::Build ()
 {
   int i;
-  int num = pset->GetNumPolygons ();
+  int num = sector->GetNumPolygons ();
   CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
-  for (i = 0 ; i < num ; i++) polygons[i] = pset->GetPolygon (i);
+  for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygon (i);
 
   CHK (root = new csBspNode);
 
@@ -383,8 +384,7 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
   CHK (delete [] back_poly);
 }
 
-void* csBspTree::HandleObjects (csBspNode* node, const csVector3& /*pos*/,
-  	csTreeVisitFunc* func, void* data)
+void csBspTree::ProcessTodo (csBspNode* node)
 {
   csPolygonStub* stub;
   while (node->todo_stubs)
@@ -400,17 +400,7 @@ void* csBspTree::HandleObjects (csBspNode* node, const csVector3& /*pos*/,
     if (stub_front) node->front->LinkStubTodo (stub_front);
     // Link the stub with back polygons to the todo list of the back node.
     if (stub_back) node->back->LinkStubTodo (stub_back);
-    // Free the old stub.
-    csPolyTreeObject::stub_pool.Free (stub);
   }
-  void* rc;
-  stub = node->first_stub;
-  while (stub)
-  {
-    rc = func (pset, stub->GetPolygons (), stub->GetNumPolygons (), data);
-    stub = stub->GetNextTree ();
-  }
-  return NULL;
 }
 
 void* csBspTree::Back2Front (const csVector3& pos, csTreeVisitFunc* func,
@@ -432,6 +422,8 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
   if (!node) return NULL;
   void* rc;
 
+  ProcessTodo (node);
+
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
   if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
@@ -439,9 +431,9 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     // Front.
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = HandleObjects (node, pos, func, data);
+    rc = node->TraverseObjects (sector, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -451,9 +443,9 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = HandleObjects (node, pos, func, data);
+    rc = node->TraverseObjects (sector, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -468,6 +460,8 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
   if (!node) return NULL;
   void* rc;
 
+  ProcessTodo (node);
+
   // Check if some polygon (just take the first) of the polygons array
   // is visible from the given point. If so, we are in front of this node.
   if (csMath3::Visible (pos, *(node->polygons.GetPolygon (0)->GetPolyPlane ())))
@@ -475,9 +469,9 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Front.
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = HandleObjects (node, pos, func, data);
+    rc = node->TraverseObjects (sector, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -487,9 +481,9 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
-    rc = func (pset, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
+    rc = func (sector, node->polygons.GetPolygons (), node->polygons.GetNumPolygons (), data);
     if (rc) return rc;
-    rc = HandleObjects (node, pos, func, data);
+    rc = node->TraverseObjects (sector, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;

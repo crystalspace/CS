@@ -20,16 +20,33 @@
 #define POLYTREE_H
 
 #include "csgeom/math3d.h"
+#include "csengine/arrays.h"
 
+class csSector;
 class csPolygonInt;
-class csPolygonParentInt;
 class csPolygonTree;
+class csPolygonTreeNode;
 class csPolygonStub;
 class csPolyTreeObject;
 
 
 #define NODE_OCTREE 1
 #define NODE_BSPTREE 2
+
+/**
+ * Visit a node in a polygon tree. If this function returns non-NULL
+ * the scanning will stop and the pointer will be returned.
+ */
+typedef void* (csTreeVisitFunc)(csSector*, csPolygonInt**,
+	int num, void*);
+
+/**
+ * Potentially cull a node from the tree just before it would otherwise
+ * have been traversed in Back2Front() or Front2Back().
+ * If this function returns true then the node is potentially visible.
+ */
+typedef bool (csTreeCullFunc)(csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& pos, void* data);
 
 /**
  * A general node in a polygon tree.
@@ -87,22 +104,14 @@ public:
    * Link a stub to the stub list.
    */
   void LinkStub (csPolygonStub* ps);
+
+  /**
+   * Traverse all the polygons in the dynamic objects
+   * added to this node.
+   */
+  void* TraverseObjects (csSector* sector, const csVector3& pos,
+  	csTreeVisitFunc* func, void* data);
 };
-
-/**
- * Visit a node in a polygon tree. If this function returns non-NULL
- * the scanning will stop and the pointer will be returned.
- */
-typedef void* (csTreeVisitFunc)(csPolygonParentInt*, csPolygonInt**,
-	int num, void*);
-
-/**
- * Potentially cull a node from the tree just before it would otherwise
- * have been traversed in Back2Front() or Front2Back().
- * If this function returns true then the node is potentially visible.
- */
-typedef bool (csTreeCullFunc)(csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& pos, void* data);
 
 /**
  * A general polygon tree. This is an abstract data type.
@@ -115,8 +124,8 @@ protected:
   /// The root of the tree.
   csPolygonTreeNode* root;
 
-  /// The parent that this tree is made for.
-  csPolygonParentInt* pset;
+  /// The parent sector that this tree is made for.
+  csSector* sector;
 
   /// Clear the nodes.
   void Clear () { CHK (delete root); }
@@ -125,15 +134,15 @@ public:
   /**
    * Constructor.
    */
-  csPolygonTree (csPolygonParentInt* ps) : root (NULL), pset (ps) { }
+  csPolygonTree (csSector* sect) : root (NULL), sector (sect) { }
 
   /**
    * Destructor.
    */
   virtual ~csPolygonTree () { }
 
-  /// Get the polygonset for this tree.
-  csPolygonParentInt* GetParent () { return pset; }
+  /// Get the sector for this tree.
+  csSector* GetSector () { return sector; }
 
   /**
    * Create the tree for the default parent set.
@@ -144,6 +153,14 @@ public:
    * Create the tree with a given set of polygons.
    */
   virtual void Build (csPolygonInt** polygons, int num) = 0;
+
+  /**
+   * Create the tree with a given set of polygons.
+   */
+  void Build (csPolygonArray& polygons)
+  {
+    Build (polygons.GetArray (), polygons.Length ());
+  }
 
   /**
    * Add a bunch of polygons to the tree. They will be marked

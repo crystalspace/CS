@@ -51,7 +51,7 @@ IMPLEMENT_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt (),
+csPolygonSet::csPolygonSet () : csObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
@@ -67,7 +67,6 @@ csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt (),
   wor_verts = NULL;
   obj_verts = NULL;
   cam_verts = NULL;
-  bsp = NULL;
   draw_busy = 0;
   fog.enabled = false;
   bbox = NULL;
@@ -83,7 +82,6 @@ csPolygonSet::~csPolygonSet ()
   CHK (delete [] obj_verts);
   CHK (delete [] curve_vertices);
   CHK (delete [] curve_texels);
-  CHK (delete bsp);
   CHK (delete bbox);
 }
 
@@ -329,12 +327,6 @@ void csPolygonSet::AddCurve (csCurve* curve)
 }
 
 
-void csPolygonSet::UseBSP ()
-{
-  CHK (delete bsp);
-  CHK (bsp = new csBspTree (this));
-}
-
 struct IntersInfo
 {
   const csVector3* start;
@@ -343,7 +335,7 @@ struct IntersInfo
   float* pr;
 };
 
-void* test_bsp_intersection (csPolygonParentInt*, csPolygonInt** polygon, int num,
+void* test_bsp_intersection (csSector*, csPolygonInt** polygon, int num,
 	void* data)
 {
   IntersInfo* d = (IntersInfo*)data;
@@ -361,22 +353,11 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
   int i;
-  if (bsp)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    IntersInfo d;
-    d.start = &start;
-    d.end = &end;
-    d.isect = &isect;
-    d.pr = pr;
-    return (csPolygon3D*) bsp->Front2Back (start, &test_bsp_intersection,
-    	(void*)&d);
+    csPolygon3D* p = polygons.Get (i);
+    if (p->IntersectSegment (start, end, isect, pr)) return p;
   }
-  else
-    for (i = 0 ; i < polygons.Length () ; i++)
-    {
-      csPolygon3D* p = polygons.Get (i);
-      if (p->IntersectSegment (start, end, isect, pr)) return p;
-    }
   return NULL;
 }
 
@@ -472,14 +453,10 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
-//@@@@@@
-extern bool stop_processing;
 
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	csRenderView* d, csPolygon2DQueue* poly_queue)
 {
-//@@@@@@
-if (stop_processing) return (void*)1;
   csPolygon3D* p;
   csPortal* po;
   csVector3* verts;
@@ -563,38 +540,12 @@ if (stop_processing) return (void*)1;
 	  if (quadtree)
             visible = quadtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  //@@@@@@@@@@@@
-	  else if (covtree && c_buffer)
-	  {
-	    bool visible1;
-            visible = covtree->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices (), clip->GetBoundingBox ());
-            visible1 = c_buffer->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
-	    if (visible && !visible1)
-	    {
-	      printf ("MISMATCH TestQueuePolygonArray covtree=%d cbuffer=%d\n",
-	      	visible, visible1);
-	    }
-	    else if (visible1 && !visible)
-	    {
-	      printf ("MISMATCH TestQueuePolygonArray covtree=%d cbuffer=%d\n",
-	      	visible, visible1);
-	      stop_processing = true;
-		extern csPolygon2D debug_poly2d;
-	debug_poly2d.MakeRoom (clip->GetNumVertices ());
-	debug_poly2d.SetVertices (clip->GetVertices (), clip->GetNumVertices ());
-	      return (void*)1;
-	    }
-	  }
 	  else if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
-	//@@@@@@@@@
-	//if (covtree) covtree->TestConsistency ();
         }
       }
       if (visible)

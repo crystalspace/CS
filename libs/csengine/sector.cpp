@@ -142,7 +142,6 @@ void csSector::UseStaticTree (int mode, bool octree)
   // @@@ Always use octrees now.
   octree = true;
 
-  CHK (delete bsp); bsp = NULL;
   CHK (delete static_tree); static_tree = NULL;
 
   if (static_thing) return;
@@ -174,14 +173,14 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     csVector3 min_bbox, max_bbox;
     static_thing->GetBoundingBox (min_bbox, max_bbox);
-    CHK (static_tree = new csOctree (static_thing, min_bbox, max_bbox, 100, mode));
+    CHK (static_tree = new csOctree (this, min_bbox, max_bbox, 100, mode));
   }
   else
   {
-    CHK (static_tree = new csBspTree (static_thing, mode));
+    CHK (static_tree = new csBspTree (this, mode));
   }
   CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
-  static_tree->Build ();
+  static_tree->Build (static_thing->GetPolygonArray ());
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
@@ -332,40 +331,22 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   return min_p;
 }
 
-void* csSector::DrawPolygons (csPolygonParentInt* pi,
+void* csSector::DrawPolygons (csSector* sector,
   csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
-  csSector* sector = (csSector*)pi;
   sector->DrawPolygonArray (polygon, num, d, false);
   return NULL;
 }
 
 csPolygon2DQueue* poly_queue;
 
-void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
+void* csSector::TestQueuePolygons (csSector* sector,
   csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
-  csSector* sector = (csSector*)pi;
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
 }
-
-//@@@ DEBUG
-//@@@int max_num_polygons = 1;
-//@@@int polygons_still_left = 1;
-
-#if 0
-void* csSector::TestQueuePolygonsQuad (csPolygonParentInt* pi,
-  csPolygonInt** polygon, int num, void* data)
-{
-  csRenderView* d = (csRenderView*)data;
-  csSector* sector = (csSector*)pi;
-//@@@
-//@@@if (polygons_still_left <= 0) return NULL;
-  return sector->TestQueuePolygonArrayQuad (polygon, num, d, poly_queue);
-}
-#endif
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
   csRenderView* rview)
@@ -397,10 +378,6 @@ static int count_cull_node_notvis_behind;
 // static int count_cull_node_vis_cutzplane;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
-
-//@@@@@@@
-bool stop_processing = false;
-csPolygon2D debug_poly2d;
 
 // @@@ This routine need to be cleaned up!!! It probably needs to
 // be part of the class.
@@ -480,9 +457,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
         i1 = i;
       }
     }
-    //@@@@@@@@@@@@@@@
-csPolygon2D copy_persp; copy_persp.MakeRoom (persp.GetNumVertices ());
-copy_persp.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
 
     if (!persp.ClipAgainst (rview->view)) return false;
 
@@ -491,45 +465,6 @@ copy_persp.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
     if (quadtree)
       vis = quadtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
-    //@@@@@@@@@@@@@@
-    else if (covtree && c_buffer)
-    {
-      bool vis1;
-      vis = covtree->TestPolygon (persp.GetVertices (),
-	persp.GetNumVertices (), persp.GetBoundingBox ());
-      vis1 = c_buffer->TestPolygon (persp.GetVertices (),
-      	persp.GetNumVertices ());
-      if (vis && !vis1)
-        printf ("MISMATCH CullOctreeNode covtree=%d cbuffer=%d!\n", vis, vis1);
-      else if (vis1 && !vis)
-      {
-        printf ("MISMATCH CullOctreeNode covtree=%d cbuffer=%d!\n", vis, vis1);
-	printf ("min=(%f,%f,%f) max=(%f,%f,%f)\n",
-		onode->GetMinCorner ().x, onode->GetMinCorner ().y,
-		onode->GetMinCorner ().z, onode->GetMaxCorner ().x,
-		onode->GetMaxCorner ().y, onode->GetMaxCorner ().z
-		);
-	printf ("pos=(%f,%f,%f)\n", pos.x, pos.y, pos.z);
-	int i;
-	for (i = 0 ; i < num_array ; i++)
-	{
-	  printf ("  %d (%f,%f,%f) cam:(%f,%f,%f)\n", i, array[i].x, array[i].y,
-	  	array[i].z, cam[i].x, cam[i].y, cam[i].z);
-	}
-	for (i = 0 ; i < persp.GetNumVertices () ; i++)
-	{
-	  printf ("  persp:%d (%f,%f)\n", i, persp[i].x, persp[i].y);
-	}
-	for (i = 0 ; i < copy_persp.GetNumVertices () ; i++)
-	{
-	  printf ("  copyp:%d (%f,%f)\n", i, copy_persp[i].x, copy_persp[i].y);
-	}
-	stop_processing = true;
-	debug_poly2d.MakeRoom (persp.GetNumVertices ());
-	debug_poly2d.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
-	return false;
-      }
-    }
     else if (covtree)
       vis = covtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
@@ -551,7 +486,9 @@ copy_persp.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
   int num_indices;
   if (onode->GetMiniBspVerts ())
   {
-    csPolygonSet* pset = (csPolygonSet*)(otree->GetParent ());
+    // Here we get the polygon set as the static thing from the
+    // sector itself.
+    csPolygonSet* pset = (csPolygonSet*)(otree->GetSector ()->GetStaticThing ());
     cam = pset->GetCameraVertices ();
     indices = onode->GetMiniBspVerts ();
     num_indices = onode->GetMiniBspNumVerts ();
@@ -663,8 +600,6 @@ void csSector::Draw (csRenderView& rview)
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
   }
-  else if (bsp)
-    bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, &rview);
   else
   {
     DrawPolygons (this, polygons.GetArray (), polygons.Length (), &rview);
@@ -877,7 +812,7 @@ void csSector::Draw (csRenderView& rview)
   draw_busy--;
 }
 
-void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
+void* csSector::CalculateLightingPolygons (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
@@ -938,7 +873,7 @@ cnt++;
 }
 
 //@@@ Needs to be part of sector?
-void* CalculateLightingPolygonsFB (csPolygonParentInt*,
+void* CalculateLightingPolygonsFB (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
@@ -1225,7 +1160,7 @@ void csSector::CalculateLighting (csLightView& lview)
     static_thing->UpdateTransformation (center);
     static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
-    CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons.GetArray (),
+    CalculateLightingPolygonsFB (this, polygons.GetArray (),
       polygons.Length (), (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",
     	//count_cull_dist, count_cull_quad, count_cull_not);
@@ -1233,10 +1168,7 @@ void csSector::CalculateLighting (csLightView& lview)
   else
   {
     // Calculate lighting for all polygons in this sector.
-    if (bsp)
-      bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
-    else
-      CalculateLightingPolygons ((csPolygonParentInt*)this, polygons.GetArray (),
+    CalculateLightingPolygons (this, polygons.GetArray (),
         polygons.Length (), (void*)&lview);
   }
 

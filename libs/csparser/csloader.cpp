@@ -898,7 +898,9 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       }
       break;
     case TOKEN_BSP:
-      info.use_bsp = true;
+      CsPrintf (MSG_FATAL_ERROR,
+        "BSP keyword is no longer supported. Use STATBSP instead after putting\n\
+all non-convex polygons in things.\n");
       break;
   }
   return ps;
@@ -1322,7 +1324,6 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
   thing->Transform ();
   thing->CompressVertices ();
   if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
-  if (info.use_bsp) thing->UseBSP ();
 
   return thing;
 }
@@ -2927,7 +2928,6 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
   char* params, * params2;
   int i, l;
   int i1, i2, i3, i4;
-  bool do_bsp = false;
   bool do_stat_bsp = false;
 
   CHK(csSector* sector = new csSector());
@@ -2978,12 +2978,12 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
     switch (cmd)
     {
       case TOKEN_BSP:
-        do_bsp = true;
-        do_stat_bsp = false;
+        CsPrintf (MSG_FATAL_ERROR,
+          "BSP keyword is no longer supported. Use STATBSP instead after putting\n\
+all non-convex polygons in things.\n");
         break;
       case TOKEN_STATBSP:
         do_stat_bsp = true;
-        do_bsp = false;
         break;
       case TOKEN_MOVE:
         {
@@ -3433,7 +3433,6 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
   }
 
   sector->CompressVertices ();
-  if (do_bsp) sector->UseBSP ();
   if (do_stat_bsp) sector->UseStaticTree ();
 
   return sector;
@@ -3494,7 +3493,6 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
         break;
       case TOKEN_STATBSP:
         do_stat_bsp = true;
-        info.use_bsp = false;
         break;
       case TOKEN_THING:
         sector->AddThing ( load_thing(name,w,params,textures,sector) );
@@ -3534,7 +3532,6 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
   }
 
   sector->CompressVertices ();
-  if (info.use_bsp) sector->UseBSP ();
   if (do_stat_bsp) sector->UseStaticTree ();
   return sector;
 }

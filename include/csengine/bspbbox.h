@@ -112,10 +112,10 @@ public:
   void World2Camera (const csTransform& trans);
 
   /**
-   * Clip this polygon the Z plane and if portal_plane is given also
+   * Clip this polygon to the Z plane and if portal_plane is given also
    * clip the polygon to that plane.
-   * @@@ NOTE @@@ This function is almost identical to one in csPolygon3D.
-   * It should be possible to reuse that code.
+   * @@@ NOTE @@@ This function is almost identical to the one in
+   * csPolygon3D. It should be possible to reuse that code.
    */
   bool ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
 	csVector3*& pverts, int& num_verts, bool cw = true);
@@ -132,7 +132,7 @@ public:
 /**
  * A container for a bunch of BSP polygons.
  */
-class csBspContainer : public csPolygonParentInt
+class csBspContainer
 {
 private:
   /// Array of vertices.
@@ -140,18 +140,14 @@ private:
   /// Array of camera space vertices.
   csVector3Array cam_vertices;
 
-  /// The array of polygons.
-  csPolygonInt** polygons;
-  /// The current number of polygons.
-  int num_polygons;
-  /// The maximum number of polygons.
-  int max_polygons;
+  /// All polygons.
+  csPolygonIntArray polygons;
 
 public:
   /// Constructor.
-  csBspContainer ();
+  csBspContainer () { }
   /// Destructor.
-  virtual ~csBspContainer ();
+  ~csBspContainer () { }
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
@@ -160,16 +156,20 @@ public:
   csVector3Array& GetCameraVertices () { return cam_vertices; }
 
   /// Add a polygon to this container.
-  void AddPolygon (csPolygonInt* poly);
+  void AddPolygon (csPolygonInt* poly)
+  {
+    polygons.AddPolygon (poly);
+    ((csBspPolygon*)poly)->SetParent (this);
+  }
 
   /// Get the number of polygons in this polygonset.
-  int GetNumPolygons () { return num_polygons; }
+  int GetNumPolygons () { return polygons.GetNumPolygons (); }
 
   /// Get the specified polygon from this set.
-  csPolygonInt* GetPolygon (int idx) { return polygons[idx]; }
+  csPolygonInt* GetPolygon (int idx) { return polygons.GetPolygon (idx); }
 
   /// Get the array of polygons.
-  csPolygonInt** GetPolygons () { return polygons; }
+  csPolygonInt** GetPolygons () { return polygons.GetPolygons (); }
 
   /// Transform the vertices of this container from world to camera.
   void World2Camera (const csTransform& trans);

@@ -156,11 +156,17 @@ private:
   void* HandleObjects (csBspNode* node, const csVector3& pos,
   	csTreeVisitFunc* func, void* data);
 
+  /**
+   * Process all todo stubs in a node and add new
+   * todo stubs to the children of this node.
+   */
+  void ProcessTodo (csBspNode* node);
+
 public:
   /**
    * Create an empty tree for a parent container.
    */
-  csBspTree (csPolygonParentInt* pset, int mode = BSP_MINIMIZE_SPLITS);
+  csBspTree (csSector* sect, int mode = BSP_MINIMIZE_SPLITS);
 
   /**
    * Destroy the whole BSP tree (but not the actual polygons and parent
@@ -177,6 +183,11 @@ public:
    * Create the tree with a given set of polygons.
    */
   void Build (csPolygonInt** polygons, int num);
+
+  /**
+   * Create the tree with a given set of polygons.
+   */
+  void Build (const csPolygonArray& polygons);
 
   /**
    * Add a bunch of polygons to the BSP tree. They will be marked

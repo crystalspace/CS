@@ -30,25 +30,6 @@
 class csPolygonInt;
 
 /**
- * The 'interface' class for the parent of a set of polygons.
- * This class is used by the BSP tree. If a class inherits from
- * this interface (using multiple inheritance if needed) then
- * it can be used by the BSP tree as a valid parent for polygons.
- */
-class csPolygonParentInt
-{
-public:
-  /// Add a polygon.
-  virtual void AddPolygon (csPolygonInt* p) = 0;
-
-  /// Get the number of polygons.
-  virtual int GetNumPolygons () = 0;
-
-  /// Get a polygon with the index.
-  virtual csPolygonInt* GetPolygon (int num) = 0;
-};
-
-/**
  * This class indicates what methods a class should use in order
  * to be a 'polygon'. It acts as an 'interface' in JAVA terminology.
  * There is no data in this class and no method implementations.<p>

@@ -154,7 +154,6 @@ void Dumper::dump (csPolygonSet* p)
     p->GetName (), p->GetID ());
   CsPrintf (MSG_DEBUG_0, "    num_vertices=%d max_vertices=%d polygons=%d\n",
     p->num_vertices, p->max_vertices, p->GetNumPolygons ());
-  CsPrintf (MSG_DEBUG_0, "This sector %s a BSP.\n", p->bsp ? "uses" : "doesn't use");
   int i;
 
   CsPrintf (MSG_DEBUG_0, "  Vertices:\n");

@@ -60,6 +60,21 @@ void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
   first_stub = ps;
 }
 
+void* csPolygonTreeNode::TraverseObjects (csSector* sector, 
+	const csVector3& /*pos*/, csTreeVisitFunc* func, void* data)
+{
+  csPolygonStub* stub;
+  void* rc;
+  stub = first_stub;
+  while (stub)
+  {
+    rc = func (sector, stub->GetPolygons (), stub->GetNumPolygons (), data);
+    if (rc) return rc;
+    stub = stub->next_tree;
+  }
+  return NULL;
+}
+
 void csPolygonTree::AddObject (csPolyTreeObject* obj)
 {
   csPolygonStub* stub = obj->GetBaseStub ();

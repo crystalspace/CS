@@ -25,7 +25,6 @@
 #include "csengine/bsp.h"
 
 class csPolygonInt;
-class csPolygonParentInt;
 class csOctree;
 class csBspTree;
 class Dumper;
@@ -159,13 +158,19 @@ private:
   	int* num_leaves, int* max_depth,
   	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
 
+  /**
+   * Process all todo stubs in a node and add new
+   * todo stubs to the children of this node.
+   */
+  void ProcessTodo (csOctreeNode* node);
+
 public:
   /**
    * Create an empty tree for the given parent, a bounding box defining the
-   * outer limits of the octree, and the number of polygons at which we revert to
-   * a BSP tree.
+   * outer limits of the octree, and the number of polygons at which we
+   * revert to a BSP tree.
    */
-  csOctree (csPolygonParentInt* pset, const csVector3& min_bbox,
+  csOctree (csSector* sect, const csVector3& min_bbox,
   	const csVector3& max_bbox, int bsp_num, int mode = BSP_MINIMIZE_SPLITS);
 
   /**
@@ -183,6 +188,11 @@ public:
    * Create the tree with a given set of polygons.
    */
   void Build (csPolygonInt** polygons, int num);
+
+  /**
+   * Create the tree with a given set of polygons.
+   */
+  void Build (const csPolygonArray& polygons);
 
   /**
    * Add a bunch of polygons to the octree. They will be marked

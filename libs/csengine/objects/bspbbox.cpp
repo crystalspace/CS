@@ -499,38 +499,6 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
-csBspContainer::csBspContainer ()
-{
-  num_polygons = 0;
-  max_polygons = 0;
-  polygons = NULL;
-}
-
-csBspContainer::~csBspContainer ()
-{
-  CHK (delete [] polygons);
-}
-
-void csBspContainer::AddPolygon (csPolygonInt* poly)
-{
-  if (!polygons)
-  {
-    max_polygons = 6;
-    CHK (polygons = new csPolygonInt* [max_polygons]);
-  }
-  while (num_polygons >= max_polygons)
-  {
-    max_polygons += 6;
-    CHK (csPolygonInt** new_polygons = new csPolygonInt* [max_polygons]);
-    memcpy (new_polygons, polygons, sizeof (csPolygonInt*)*num_polygons);
-    CHK (delete [] polygons);
-    polygons = new_polygons;
-  }
-
-  polygons[num_polygons++] = poly;
-  ((csBspPolygon*)poly)->SetParent (this);
-}
-
 void csBspContainer::World2Camera (const csTransform& trans)
 {
   int i;

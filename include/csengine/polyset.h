@@ -26,7 +26,6 @@
 #include "csobject/csobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
-#include "csengine/polyint.h"
 #include "igraph3d.h"
 #include "ipolygon.h"
 
@@ -73,10 +72,6 @@ struct csPolygonSetBBox
  * (probably) closed hull. All polygons in a set share vertices
  * from the same pool.<p>
  *
- * A recent extension also allows PolygonSets that are not convex
- * by adding an optional BSP tree. This BSP tree is only useful
- * if the PolygonSet is concave. Otherwise the tree is wasted.<p>
- *
  * Every polygon in the set has a visible and an invisible face;
  * if the vertices of the polygon are ordered clockwise then the
  * polygon is visible. Using this feature it is possible to define
@@ -88,20 +83,20 @@ struct csPolygonSetBBox
  * oriented such that they are visible from the outside. We call
  * this kind of PolygonSet a Thing (another subclass of PolygonSet).<p>
  *
- * Things and csSectors have many similarities. That's why the
+ * Things and sectors have many similarities. That's why the
  * PolygonSet class was created: to exploit these similarities.
- * However, there are some important differences between Things and
+ * However, there are some important differences between csThings and
  * csSectors:<p>
  * <ul>
  * <li> Currently, only things can move. This means that the object
- *      space coordinates of a csSector are ALWAYS equal to the world
+ *      space coordinates of a sector are ALWAYS equal to the world
  *      space coordinates. It would be possible to allow moveable
- *      csSectors but I don't how this should be integrated into an
+ *      sectors but I don't how this should be integrated into an
  *      easy model of the world.
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject, public csPolygonParentInt, public iPolygonSet
+class csPolygonSet : public csObject, public iPolygonSet
 {
   friend class Dumper;
 
@@ -134,9 +129,6 @@ protected:
 
   /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
   csSector* sector;
-
-  /// Optional bsp tree.
-  csBspTree* bsp;
 
   /// Optional oriented bounding box.
   csPolygonSetBBox* bbox;
@@ -290,7 +282,7 @@ public:
   { return polygons.Length (); }
 
   /// Get a csPolygonInt with the index.
-  virtual csPolygonInt* GetPolygon (int idx);
+  csPolygonInt* GetPolygon (int idx);
 
   /// Get the specified polygon from this set.
   csPolygon3D *GetPolygon3D (int idx)
@@ -298,6 +290,9 @@ public:
 
   /// Get the named polygon from this set.
   csPolygon3D *GetPolygon3D (char* name);
+
+  /// Get the entire array of polygons.
+  csPolygonArray& GetPolygonArray () { return polygons; }
 
   /// Add a curve to this polygonset.
   void AddCurve (csCurve* curve);
@@ -324,16 +319,6 @@ public:
 
   /// Add a curve vertex and return the index of the vertex.
   int AddCurveVertex (csVector3& v, csVector2& t);
-
-  /**
-   * Enable the optional BSP tree. This should be done AFTER
-   * all polygons and vertices have been added and all polygons
-   * are correctly initialized (textures and planes).
-   */
-  void UseBSP ();
-
-  /// Return true if there is a BSP tree used in this sector.
-  bool IsBSP () { return bsp != NULL; }
 
   /**
    * Intersect world-space segment with polygons of this set. Return

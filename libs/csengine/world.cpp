@@ -395,7 +395,7 @@ void csWorld::EnableCovtree (bool en)
   if (en)
   {
     CHK (delete quadtree); quadtree = NULL;
-    //@@@@@@@@@@@@CHK (delete c_buffer); c_buffer = NULL;
+    CHK (delete c_buffer); c_buffer = NULL;
     if (covtree) return;
     csBox box (0, 0, frame_width, frame_height);
     if (!covtree_lut)
@@ -950,9 +950,6 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
   tr_manager.NewFrame ();
 
-//@@@@@@
-extern bool stop_processing;
-stop_processing = false;
 
   if (c_buffer)
   {
@@ -967,9 +964,6 @@ stop_processing = false;
     quadtree->MakeEmpty ();
   if (covtree)
   {
-  //@@@@@@@@@@@@
-  //printf ("----------\n");
-  //covtree->MakeInvalid ();
     covtree->MakeEmpty ();
     csVector2 verts[50];	// @@@ BAD! Hardcoded!
     int i, num;

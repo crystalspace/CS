@@ -66,8 +66,6 @@ public:
   /// Unlink this stub from all lists.
   void RemoveStub ();
 
-  /// Get pointer to next in tree list.
-  csPolygonStub* GetNextTree () { return next_tree; }
   /// Get parent object for this stub.
   csPolyTreeObject* GetObject () { return object; }
   /// Get parent node for this stub.
@@ -224,7 +222,16 @@ public:
    * Split the given stub with a plane and return
    * three new stubs (all on the plane, in front, or
    * back of the plane). This is a pure virtual function that will
-   * have to be implemented by a subclass.
+   * have to be implemented by a subclass.<p>
+   *
+   * Note that this function is responsible for freeing 'stub' itself
+   * if needed. Also stub_on, stub_front, and stub_back can be NULL
+   * in which case there simply is no stub for that particular case.<p>
+   *
+   * Other note. This function should also correctly account for
+   * the case where the given stub_on pointer is NULL. In that case
+   * the tree is not interested in the polygons on the plane and those
+   * polygons should be distributed to either stub_front or stub_back.
    */
   virtual void SplitWithPlane (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
