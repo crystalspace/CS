@@ -16,12 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cal3d/cal3d.h"
-#include "cssysdef.h"
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "cssysdef.h"
 #include "qsqrt.h"
+
+#include "cal3d/cal3d.h"
+
+CS_IMPLEMENT_APPLICATION
 
 void ifprintf(FILE *f, int indent, const char *fmt, ...) {
   for(int i=0; i<indent; i++) {

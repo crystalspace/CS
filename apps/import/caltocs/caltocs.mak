@@ -32,6 +32,7 @@ vpath %.cpp apps/import/caltocs
 CALTOCS.EXE = caltocs$(EXE.CONSOLE)
 SRC.CALTOCS = $(wildcard apps/import/caltocs/*.cpp)
 OBJ.CALTOCS = $(addprefix $(OUT)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
+DEP.CALTOCS = CSSYS CSUTIL
 
 TO_INSTALL.EXE    += $(CALTOCS.EXE)
 
