@@ -428,6 +428,10 @@ public:
   
   ///--------------------- iMeshObject implementation ---------------------
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel;}
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
 
   //------------------------- iTerrFuncState implementation ----------------
   // only here for walktest use

@@ -176,6 +176,14 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    material = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState

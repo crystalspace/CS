@@ -278,8 +278,6 @@ public:
 
   void LoadMaterialGroup (iLoaderContext* ldr_context, const char *pName,
     int iStart, int iEnd);
-  /// Set the base color.
-  void SetColor (const csColor& col) { base_color = col; dirlight_number++; }
   /// Get the base color.
   csColor GetColor () const { return base_color; }
   /// Set the function to use for the terrain.
@@ -540,6 +538,16 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  /// Set the base color.
+  virtual bool SetColor (const csColor& col)
+  {
+    base_color = col;
+    dirlight_number++;
+    return true;
+  }
+  virtual bool GetColor (csColor& col) const { col = base_color; return true; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
 
   /**  RDS NOTE: this is from iTerrainObject, what matches???  **/
   //------------------------- iTerrFuncState implementation ----------------

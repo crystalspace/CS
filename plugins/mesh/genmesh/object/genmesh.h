@@ -98,11 +98,9 @@ public:
   	float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   uint GetMixMode () const { return MixMode; }
   void SetLighting (bool l) { do_lighting = l; }
   bool IsLighting () const { return do_lighting; }
-  void SetColor (const csColor& col) { color = col; }
   csColor GetColor () const { return color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
@@ -162,6 +160,14 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor& col) { color = col; return true; }
+  virtual bool GetColor (csColor& col) const { col = color; return true; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    material = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
   //------------------------- iGeneralMeshState implementation ----------------
   class GeneralMeshState : public iGeneralMeshState

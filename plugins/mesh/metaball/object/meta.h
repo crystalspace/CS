@@ -196,6 +196,14 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    SetMaterial (mat);
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return th; }
 
   ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState

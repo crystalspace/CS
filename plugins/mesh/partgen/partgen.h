@@ -287,6 +287,24 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor& col)
+  {
+    color = col;
+    SetupColor ();
+    return true;
+  }
+  virtual bool GetColor (csColor& col) const
+  {
+    col = color;
+    return true;
+  }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    initialized = false;
+    csParticleSystem::mat = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

@@ -30,6 +30,8 @@ struct iMovable;
 struct iLight;
 struct iPolygonMesh;
 struct iObjectModel;
+struct iMaterialWrapper;
+class csColor;
 class csReversibleTransform;
 
 SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
@@ -44,7 +46,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 1, 0);
+SCF_VERSION (iMeshObject, 0, 1, 1);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -169,6 +171,30 @@ struct iMeshObject : public iBase
    * Get the generic interface describing the geometry of this mesh.
    */
   virtual iObjectModel* GetObjectModel () = 0;
+
+  /**
+   * Set the base color of the mesh. This color will be added to whatever
+   * color is set for lighting. Not all meshes need to support this.
+   * This function will return true if it worked.
+   */
+  virtual bool SetColor (const csColor& color) = 0;
+
+  /**
+   * Get the base color of the mesh. Will return false if not supported.
+   */
+  virtual bool GetColor (csColor& color) const = 0;
+
+  /**
+   * Set the material of the mesh. This only works for single-material
+   * meshes. If not supported this function will return false.
+   */
+  virtual bool SetMaterialWrapper (iMaterialWrapper* material) = 0;
+
+  /**
+   * Get the material of the mesh. If not supported this will
+   * return NULL.
+   */
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 5);

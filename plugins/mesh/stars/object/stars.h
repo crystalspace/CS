@@ -99,8 +99,6 @@ public:
   /// Get max distance at which stars are visible.
   float GetMaxDistance () const { return max_dist; }
 
-  /// Set the color to use. Will be added to the lighting values.
-  void SetColor (const csColor& col) { color = col; }
   /// Get the color.
   csColor GetColor () const { return color; }
 
@@ -174,6 +172,10 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor& col) { color = col; return true; }
+  virtual bool GetColor (csColor& col) const { col = color; return true; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState

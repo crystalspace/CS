@@ -127,8 +127,6 @@ public:
   	float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
-  /// Get the material for this ball.
-  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
   uint GetMixMode () const { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
@@ -177,8 +175,6 @@ public:
   void SetLighting (bool l) { do_lighting = l; }
   /// Is lighting enabled.
   bool IsLighting () const { return do_lighting; }
-  /// Set the color to use. Will be added to the lighting values.
-  void SetColor (const csColor& col) { color = col; }
   /// Get the color.
   csColor GetColor () const { return color; }
   /// Use cylindrical texture mapping.
@@ -254,6 +250,14 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor& col) { color = col; return true; }
+  virtual bool GetColor (csColor& col) const { col = color; return true; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    material = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState

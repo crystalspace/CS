@@ -126,6 +126,10 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
 };
 
 #endif // __CS_SPIDER_H__

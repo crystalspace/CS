@@ -6,6 +6,19 @@ The history order is reversed so that new features are at the top.
 	- Optimized thing smoothing a little bit.
 	- Added a few <smooth /> options in flarge.
 	- Removed several bad IncRef() calls in csimage.
+	- Fixed 'bugplug' console command in walktest.
+	- Added iMeshObject functions: SetColor(), GetColor(),
+	  SetMaterialWrapper(), and GetMaterialWrapper(). These functions
+	  are conveniance functions so that it is easier to change
+	  color/material for all objects without having to query
+	  for the state interface. Not all mesh objects implement
+	  those functions though. For example, a thing mesh object
+	  doesn't implement either of them since it doesn't have a single
+	  color or material (every polygon has its own color/material).
+	- The change above greatly simplifies the engine sequence manager
+	  functions to set color and material.
+	- Started implementing the indexed versions of the operations in the
+	  engine sequence manager.
 1-Oct-2002
 	- Added the notion of parameters to the base sequence manager.
 	  A parameter is a generic iBase* parameter which can be any

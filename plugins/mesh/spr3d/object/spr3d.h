@@ -1482,6 +1482,25 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual bool SetColor (const csColor& col)
+  {
+    SetBaseColor (col);
+    return true;
+  }
+  virtual bool GetColor (csColor& col) const
+  {
+    GetBaseColor (col);
+    return true;
+  }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    SetMaterial (mat);
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const
+  {
+    return GetMaterial ();
+  }
 
   //--------------------- iSprite3DState implementation -------------//
   struct Sprite3DState : public iSprite3DState

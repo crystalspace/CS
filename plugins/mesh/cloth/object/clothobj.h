@@ -168,6 +168,14 @@ SCF_DECLARE_IBASE;
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; };
+  virtual bool SetColor (const csColor&) { return false; }
+  virtual bool GetColor (csColor&) const { return false; }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  {
+    material = mat;
+    return true;
+  }
+  virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
    //--------------------| BEGIN iClothMeshState implementation |----------------//
  bool              LightsEnabled;

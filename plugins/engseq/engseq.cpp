@@ -192,15 +192,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
 
-#define SETMATERIALTYPE_GENMESH 0
-#define SETMATERIALTYPE_BALL 1
-#define SETMATERIALTYPE_SPRITE3D 2
-#define SETMATERIALTYPE_PARTSYS 3
-#define SETMATERIALTYPE_CLOTH 4
-#define SETMATERIALTYPE_UNKNOWN 5
-
-#define SETMATERIALTYPE_POLYGON 6
-
 /**
  * Set material operation.
  */
@@ -208,15 +199,7 @@ class OpSetMaterial : public OpStandard
 {
 private:
   csRef<iMeshWrapper> mesh;
-
-  csRef<iGeneralMeshState> genmesh;
-  csRef<iBallState> ball;
-  csRef<iSprite3DState> sprite3d;
-  csRef<iParticleState> partsys;
-  csRef<iClothMeshState> cloth;
-  int type;
   csRef<iPolygon3D> polygon;
-
   csRef<iMaterialWrapper> material;
 
 public:
@@ -224,38 +207,62 @@ public:
   {
     OpSetMaterial::mesh = mesh;
     OpSetMaterial::material = material;
-
-    type = SETMATERIALTYPE_GENMESH;
-    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
-    if (genmesh) return; type++;
-    ball = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
-    if (ball) return; type++;
-    sprite3d = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iSprite3DState);
-    if (sprite3d) return; type++;
-    partsys = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticleState);
-    if (partsys) return; type++;
-    cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
-    if (cloth) return; type++;
   }
   OpSetMaterial (iPolygon3D* polygon, iMaterialWrapper* material)
   {
     OpSetMaterial::polygon = polygon;
     OpSetMaterial::material = material;
-    type = SETMATERIALTYPE_POLYGON;
   }
 
   virtual void Do (csTicks /*dt*/, iBase*)
   {
-    switch (type)
+    if (polygon) polygon->SetMaterial (material);
+    else mesh->GetMeshObject ()->SetMaterialWrapper (material);
+  }
+};
+
+/**
+ * Set material operation (indexed version).
+ */
+class OpSetMaterialIdx : public OpStandard
+{
+private:
+  int meshidx;
+  int polyidx;
+  int materialidx;
+
+public:
+  OpSetMaterialIdx (int meshidx, int polyidx, int materialidx)
+  {
+    OpSetMaterialIdx::materialidx = materialidx;
+    OpSetMaterialIdx::meshidx = meshidx;
+    OpSetMaterialIdx::polyidx = polyidx;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMaterialWrapper> material = SCF_QUERY_INTERFACE (
+    	par->GetParameter (materialidx), iMaterialWrapper);
+    if (!material) return;
+
+    if (polyidx != -1)
     {
-      case SETMATERIALTYPE_GENMESH: genmesh->SetMaterialWrapper (material); break;
-      case SETMATERIALTYPE_BALL: ball->SetMaterialWrapper (material); break;
-      case SETMATERIALTYPE_SPRITE3D: sprite3d->SetMaterialWrapper (material); break;
-      case SETMATERIALTYPE_PARTSYS: partsys->SetMaterialWrapper (material); break;
-      case SETMATERIALTYPE_CLOTH: cloth->SetMaterialWrapper (material); break;
-      case SETMATERIALTYPE_POLYGON: polygon->SetMaterial (material); break;
-      case SETMATERIALTYPE_UNKNOWN: break;
+      csRef<iPolygon3D> polygon = SCF_QUERY_INTERFACE (
+      	par->GetParameter (polyidx), iPolygon3D);
+      if (polygon)
+        polygon->SetMaterial (material);
+      return;
     }
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+    if (mesh)
+      mesh->GetMeshObject ()->SetMaterialWrapper (material);
   }
 };
 
@@ -344,15 +351,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
 
-#define SETCOLORTYPE_GENMESH 0
-#define SETCOLORTYPE_BALL 1
-#define SETCOLORTYPE_SPRITE3D 2
-#define SETCOLORTYPE_PARTSYS 3
-#define SETCOLORTYPE_CLOTH 4
-#define SETCOLORTYPE_TERRFUNC 5
-#define SETCOLORTYPE_STARS 6
-#define SETCOLORTYPE_UNKNOWN 7
-
 /**
  * Set mesh color operation.
  */
@@ -360,16 +358,6 @@ class OpSetMeshColor : public OpStandard
 {
 private:
   csRef<iMeshWrapper> mesh;
-
-  csRef<iGeneralMeshState> genmesh;
-  csRef<iBallState> ball;
-  csRef<iSprite3DState> sprite3d;
-  csRef<iParticleState> partsys;
-  csRef<iClothMeshState> cloth;
-  csRef<iTerrFuncState> terrfunc;
-  csRef<iStarsState> stars;
-  int type;
-
   csColor color;
 
 public:
@@ -377,36 +365,11 @@ public:
   {
     OpSetMeshColor::mesh = mesh;
     OpSetMeshColor::color = color;
-    type = SETCOLORTYPE_GENMESH;
-    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
-    if (genmesh) return; type++;
-    ball = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
-    if (ball) return; type++;
-    sprite3d = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iSprite3DState);
-    if (sprite3d) return; type++;
-    partsys = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticleState);
-    if (partsys) return; type++;
-    cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
-    if (cloth) return; type++;
-    terrfunc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iTerrFuncState);
-    if (terrfunc) return; type++;
-    stars = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iStarsState);
-    if (stars) return; type++;
   }
 
   virtual void Do (csTicks /*dt*/, iBase*)
   {
-    switch (type)
-    {
-      case SETCOLORTYPE_GENMESH: genmesh->SetColor (color); break;
-      case SETCOLORTYPE_BALL: ball->SetColor (color); break;
-      case SETCOLORTYPE_SPRITE3D: sprite3d->SetBaseColor (color); break;
-      case SETCOLORTYPE_PARTSYS: partsys->SetColor (color); break;
-      case SETCOLORTYPE_CLOTH: cloth->SetColor (color); break;
-      case SETCOLORTYPE_TERRFUNC: terrfunc->SetColor (color); break;
-      case SETCOLORTYPE_STARS: stars->SetColor (color); break;
-      case SETCOLORTYPE_UNKNOWN: break;
-    }
+    mesh->GetMeshObject ()->SetColor (color);
   }
 };
 
@@ -417,16 +380,6 @@ class OpFadeMeshColor : public OpStandard
 {
 private:
   csRef<iMeshWrapper> mesh;
-
-  csRef<iGeneralMeshState> genmesh;
-  csRef<iBallState> ball;
-  csRef<iSprite3DState> sprite3d;
-  csRef<iParticleState> partsys;
-  csRef<iClothMeshState> cloth;
-  csRef<iTerrFuncState> terrfunc;
-  csRef<iStarsState> stars;
-  int type;
-
   csColor start_col, end_col;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
@@ -440,36 +393,11 @@ public:
     OpFadeMeshColor::end_col = color;
     OpFadeMeshColor::duration = duration;
     OpFadeMeshColor::eseqmgr = eseqmgr;
-    type = SETCOLORTYPE_GENMESH;
-    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
-    if (genmesh) return; type++;
-    ball = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
-    if (ball) return; type++;
-    sprite3d = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iSprite3DState);
-    if (sprite3d) return; type++;
-    partsys = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticleState);
-    if (partsys) return; type++;
-    cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
-    if (cloth) return; type++;
-    terrfunc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iTerrFuncState);
-    if (terrfunc) return; type++;
-    stars = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iStarsState);
-    if (stars) return; type++;
   }
 
   virtual void Do (csTicks dt, iBase* params)
   {
-    switch (type)
-    {
-      case SETCOLORTYPE_GENMESH: start_col = genmesh->GetColor (); break;
-      case SETCOLORTYPE_BALL: start_col = ball->GetColor (); break;
-      case SETCOLORTYPE_SPRITE3D: sprite3d->GetBaseColor (start_col); break;
-      case SETCOLORTYPE_PARTSYS: start_col = partsys->GetColor (); break;
-      case SETCOLORTYPE_CLOTH: start_col = cloth->GetColor (); break;
-      case SETCOLORTYPE_TERRFUNC: start_col = terrfunc->GetColor (); break;
-      case SETCOLORTYPE_STARS: start_col = stars->GetColor (); break;
-      case SETCOLORTYPE_UNKNOWN: break;
-    }
+    mesh->GetMeshObject ()->GetColor (start_col);
     eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
     	params);
   }
@@ -480,17 +408,7 @@ public:
     color.red = (1-time) * start_col.red + time * end_col.red;
     color.green = (1-time) * start_col.green + time * end_col.green;
     color.blue = (1-time) * start_col.blue + time * end_col.blue;
-    switch (type)
-    {
-      case SETCOLORTYPE_GENMESH: genmesh->SetColor (color); break;
-      case SETCOLORTYPE_BALL: ball->SetColor (color); break;
-      case SETCOLORTYPE_SPRITE3D: sprite3d->SetBaseColor (color); break;
-      case SETCOLORTYPE_PARTSYS: partsys->SetColor (color); break;
-      case SETCOLORTYPE_CLOTH: cloth->SetColor (color); break;
-      case SETCOLORTYPE_TERRFUNC: terrfunc->SetColor (color); break;
-      case SETCOLORTYPE_STARS: stars->SetColor (color); break;
-      case SETCOLORTYPE_UNKNOWN: break;
-    }
+    mesh->GetMeshObject ()->SetColor (color);
   }
 
   SCF_DECLARE_IBASE_EXT (OpStandard);
@@ -908,17 +826,17 @@ void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
 void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
 	int polygonidx, int materialidx)
 {
-  //OpSetMaterial* op = new OpSetMaterial (polygon, material);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpSetMaterialIdx* op = new OpSetMaterialIdx (-1, polygonidx, materialidx);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
 	int meshidx, int materialidx)
 {
-  //OpSetMaterial* op = new OpSetMaterial (mesh, material);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpSetMaterialIdx* op = new OpSetMaterialIdx (meshidx, -1, materialidx);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetLight (csTicks time,
