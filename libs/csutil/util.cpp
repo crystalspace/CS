@@ -298,7 +298,7 @@ bool csGlobMatches (const char *fName, const char *fMask)
 }
 
 // don't forget to revert the changes above
-#if defined(__CWGIN__)
+#if defined(__CYGWGIN__)
 #define OS_WIN32
 #endif
 
