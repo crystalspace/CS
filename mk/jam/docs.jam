@@ -53,7 +53,7 @@ rule Texi2DVI
   SEARCH on $(>) = $(SUBDIR) ;
   Depends $(target) : $(>) ;
   RunTexi2DVI $(target) : $(>) ;
-  NotFile $(target) ;
+  NotFile $(<) ;
   Always $(target) ;
 }
 
@@ -80,7 +80,7 @@ rule Texi2PS
     Depends $(dvitarget) : $(>) ;
     RunTexi2DVI $(dvitarget) : $(>) ;
     RunDviPs $(target) : $(dvitarget) ;
-    NotFile $(target) $(dvitarget) ;
+    NotFile $(<) ;
     Always $(target) $(dvitarget) ;
 }
 
@@ -109,7 +109,7 @@ rule Texi2PDF
     Depends $(dvitarget) : $(>) ;
     RunTexi2DVI $(dvitarget) : $(>) ;
     RunDviPdf $(target) : $(dvitarget) ;
-    NotFile $(target) $(dvitarget) ;
+    NotFile $(<) ;
     Always $(target) $(dvitarget) ;
 }
 

@@ -20,6 +20,8 @@ chronological order.
 	  such as install_config, install_doc, etc., would uselessly create an
 	  empty subdirectory within the build directory with the same name as
 	  the rule (i.e. "install_config", "install_doc", etc.).
+	- Eric Sunshine fixed bugs in several rules in docs.jam where NotFile
+	  was being invoked for actual files.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause
