@@ -141,7 +141,7 @@ NASMFLAGS.SYSTEM=-f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = \
   libs/cssys/win32/win32.cpp \
   libs/cssys/win32/dir.cpp \
-  libs/cssys/win32/timing.cpp \
+  libs/cssys/win32/timing32.cpp \
   libs/cssys/win32/loadlib.cpp \
   libs/cssys/win32/instpath.cpp \
   libs/cssys/general/findlib.cpp \
