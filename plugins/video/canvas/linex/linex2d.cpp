@@ -28,7 +28,7 @@
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
-#include "iutil/plugin.h"
+#include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -178,7 +178,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   iPlugin *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iPlugin);
   if (fs)
   {
-    System->UnloadPlugin (fs);
+    plugin_mgr->UnloadPlugin (fs);
     fs->DecRef ();
   }
   // Also DecRef the FontServer since csGraphics2D::Initialize IncRef'ed it
