@@ -98,14 +98,6 @@ public:
   csOctreeVisible* GetNext (csOctreeVisible* ovis) { return ovis->next; }
 };
 
-/// Six sides of the octree node.
-#define OCTREE_SIDE_x 0
-#define OCTREE_SIDE_X 1
-#define OCTREE_SIDE_y 2
-#define OCTREE_SIDE_Y 3
-#define OCTREE_SIDE_z 4
-#define OCTREE_SIDE_Z 5
-
 /**
  * An octree node.
  * @@@ We should have seperate leaf/non-leaf structures as they
@@ -126,7 +118,7 @@ private:
 
   /**
    * Six masks representing solid space on the boundaries
-   * of this node. Use the OCTREE_SIDE_xxx flags to fetch them.
+   * of this node. Use the BOX_SIDE_xxx flags to fetch them.
    */
   UShort solid_masks[6];
 
@@ -233,7 +225,7 @@ public:
 
   /**
    * Get one of the masks representing solid space on the boundaries
-   * of this node. Use the OCTREE_SIDE_xxx flags to fetch them.
+   * of this node. Use the BOX_SIDE_xxx flags to fetch them.
    */
   UShort GetSolidMask (int idx) { return solid_masks[idx]; }
 
@@ -261,6 +253,13 @@ public:
   /// Count the number of children (octree nodes) for this node.
   int CountChildren ();
 
+  /**
+   * Count all the polygons in this node and children.
+   * This function only calls leaf polygons (i.e. polygons that will
+   * actually be returned by Front2Back/Back2Front).
+   */
+  int CountPolygons ();
+
   /// Get the PVS.
   csPVS& GetPVS () { return pvs; }
 
@@ -270,6 +269,18 @@ public:
    * for this node has not been computed yet.
    */
   bool PVSCanSee (const csVector3& v);
+
+  /**
+   * Create an iterator to iterate over all solid polygons that
+   * are on the specified side of this octree node.
+   */
+  void* InitSolidPolygonIterator (int plane_nr, float plane_pos);
+
+  /**
+   * Get the next solid polygon from the iterator. Returns false
+   * if there are no more polygons.
+   */
+  bool NextSolidPolygon (void* vspit, csPoly3D& poly);
 };
 
 /**
@@ -320,7 +331,10 @@ private:
   	int* tot_bsp_nodes, int* min_bsp_nodes, int* max_bsp_nodes,
 	int* tot_bsp_leaves, int* min_bsp_leaves, int* max_bsp_leaves,
 	int* tot_max_depth, int* min_max_depth, int* max_max_depth,
-	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly);
+	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly,
+	int* num_pvs_leaves,
+	int* tot_pvs_vis_nodes, int* min_pvs_vis_nodes, int* max_pvs_vis_nodes,
+	int* tot_pvs_vis_poly, int* min_pvs_vis_poly, int* max_pvs_vis_poly);
 
   /**
    * Help function for BoxCanSeeOccludee.

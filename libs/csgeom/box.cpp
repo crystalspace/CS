@@ -27,10 +27,10 @@ csVector2 csBox2::GetCorner (int corner) const
 {
   switch (corner)
   {
-    case 0: return Min ();
-    case 1: return csVector2 (MinX (), MaxY ());
-    case 2: return csVector2 (MaxX (), MinY ());
-    case 3: return Max ();
+    case BOX_CORNER_xy: return Min ();
+    case BOX_CORNER_xY: return csVector2 (MinX (), MaxY ());
+    case BOX_CORNER_Xy: return csVector2 (MaxX (), MinY ());
+    case BOX_CORNER_XY: return Max ();
   }
   return csVector2 (0, 0);
 }
@@ -231,14 +231,14 @@ csVector3 csBox3::GetCorner (int corner) const
 {
   switch (corner)
   {
-    case 0: return Min ();
-    case 1: return csVector3 (MinX (), MinY (), MaxZ ());
-    case 2: return csVector3 (MinX (), MaxY (), MinZ ());
-    case 3: return csVector3 (MinX (), MaxY (), MaxZ ());
-    case 4: return csVector3 (MaxX (), MinY (), MinZ ());
-    case 5: return csVector3 (MaxX (), MinY (), MaxZ ());
-    case 6: return csVector3 (MaxX (), MaxY (), MinZ ());
-    case 7: return Max ();
+    case BOX_CORNER_xyz: return Min ();
+    case BOX_CORNER_xyZ: return csVector3 (MinX (), MinY (), MaxZ ());
+    case BOX_CORNER_xYz: return csVector3 (MinX (), MaxY (), MinZ ());
+    case BOX_CORNER_xYZ: return csVector3 (MinX (), MaxY (), MaxZ ());
+    case BOX_CORNER_Xyz: return csVector3 (MaxX (), MinY (), MinZ ());
+    case BOX_CORNER_XyZ: return csVector3 (MaxX (), MinY (), MaxZ ());
+    case BOX_CORNER_XYz: return csVector3 (MaxX (), MaxY (), MinZ ());
+    case BOX_CORNER_XYZ: return Max ();
   }
   return csVector3 (0, 0, 0);
 }
@@ -261,6 +261,23 @@ csSegment3 csBox3::GetEdge (int edge) const
     case 11: return csSegment3 (GetCorner (2), GetCorner (6));
   }
   return csSegment3 ();
+}
+
+csBox2 csBox3::GetSide (int side) const
+{
+  switch (side)
+  {
+    case BOX_SIDE_x:
+    case BOX_SIDE_X:
+      return csBox2 (MinY (), MinZ (), MaxY (), MaxZ ());
+    case BOX_SIDE_y:
+    case BOX_SIDE_Y:
+      return csBox2 (MinX (), MinZ (), MaxX (), MaxZ ());
+    case BOX_SIDE_z:
+    case BOX_SIDE_Z:
+      return csBox2 (MinX (), MinY (), MaxX (), MaxY ());
+  }
+  return csBox2 ();
 }
 
 bool csBox3::AdjacentX (const csBox3& other) const

@@ -77,6 +77,7 @@ public:
    * to 3. This contrasts with Min() and Max() because
    * those are only the min and max corners.
    * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
+   * Use BOX_CORNER_??? defines.
    */
   csVector2 GetCorner (int corner) const;
 
@@ -285,6 +286,14 @@ public:
 #define BOX_CORNER_XYz 6
 #define BOX_CORNER_XYZ 7
 
+/// For csBox3::GetSide().
+#define BOX_SIDE_x 0
+#define BOX_SIDE_X 1
+#define BOX_SIDE_y 2
+#define BOX_SIDE_Y 3
+#define BOX_SIDE_z 4
+#define BOX_SIDE_Z 5
+
 /**
  * A bounding box in 3D space.
  * In order to operate correctly, this bounding box assumes that all values
@@ -328,6 +337,7 @@ public:
    * those are only the min and max corners.
    * Corner 0 = xyz, 1 = xyZ, 2 = xYz, 3 = xYZ,
    *        4 = Xyz, 5 = XyZ, 6 = XYz, 7 = XYZ.
+   * Use BOX_CORNER_??? defines.
    */
   csVector3 GetCorner (int corner) const;
 
@@ -335,6 +345,12 @@ public:
    * Get the center of this box.
    */
   csVector3 GetCenter () const { return (minbox+maxbox)/2; }
+
+  /**
+   * Get a side of this box as a 2D box.
+   * Use BOX_SIDE_??? defines.
+   */
+  csBox2 GetSide (int side) const;
 
   /**
    * Return every edge (segment) of this bounding box

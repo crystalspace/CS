@@ -111,6 +111,13 @@ public:
 
   /// Return type (NODE_???).
   int Type () { return NODE_BSPTREE; }
+
+  /**
+   * Count all the polygons in this node and children.
+   * This function only calls leaf polygons (i.e. polygons that will
+   * actually be returned by Front2Back/Back2Front).
+   */
+  int CountPolygons ();
 };
 
 /**
@@ -263,6 +270,15 @@ public:
     return ClassifyPolygon ((csBspNode*)root, poly);
   }
 
+  /**
+   * Count all the polygons in this tree.
+   * This function only calls leaf polygons (i.e. polygons that will
+   * actually be returned by Front2Back/Back2Front).
+   */
+  int CountPolygons ()
+  {
+    return ((csBspNode*)root)->CountPolygons ();
+  }
 };
 
 #endif /*BSP_H*/

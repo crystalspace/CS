@@ -1057,6 +1057,11 @@ public:
    */
   bool IntersectRayNoBackFace (const csVector3& start, const csVector3& end);
 
+  /**
+   * This is a given point is on (or very nearly on) this polygon.
+   */
+  bool PointOnPolygon (const csVector3& v);
+
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha ()
   { return portal ? portal->GetAlpha () : 0; }

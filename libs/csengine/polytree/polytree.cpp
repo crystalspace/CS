@@ -236,33 +236,42 @@ struct CPTraverseData
 };
 
 static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
-	int /*num*/, void* vdata)
+	int num, void* vdata)
 {
   // Only for csPolygon3D.
   if (polygons[0]->GetType () != 1) return NULL;
-  csPolygon3D* p = (csPolygon3D*)polygons[0];
 
   CPTraverseData* data = (CPTraverseData*)vdata;
-  int i;
-  for (i = 0 ; i < 6 ; i++)
-    if (!data->polygon_was_hit[i])
+  int i, j;
+  for (i = 0 ; i < num ; i++)
+  {
+    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    if (p->PointOnPolygon (data->pos))
     {
-      bool is = p->IntersectRayNoBackFace (data->pos, data->test_points[i]);
-      if (is)
-      {
-        data->polygon_was_hit[i] = true;
-	data->num_polygon_was_hit++;
-        if (p->IntersectRay (data->pos, data->test_points[i]))
-	{
-	  // We can see the polygon from 'pos'. So we are in open
-	  // space.
-	  data->is_solid = false;
-	  return (void*)1;
-	}
-	// We tested all points.
-	if (data->num_polygon_was_hit >= 6) return (void*)1;
-      }
+      data->is_solid = true;
+      data->num_polygon_was_hit = 6;
+      return (void*)1;
     }
+    for (j = 0 ; j < 6 ; j++)
+      if (!data->polygon_was_hit[j])
+      {
+        bool is = p->IntersectRayNoBackFace (data->pos, data->test_points[j]);
+        if (is)
+        {
+          data->polygon_was_hit[j] = true;
+	  data->num_polygon_was_hit++;
+          if (p->IntersectRay (data->pos, data->test_points[j]))
+	  {
+	    // We can see the polygon from 'pos'. So we are in open
+	    // space.
+	    data->is_solid = false;
+	    return (void*)1;
+	  }
+	  // We tested all points.
+	  if (data->num_polygon_was_hit >= 6) return (void*)1;
+        }
+      }
+  }
   return NULL;
 }
 

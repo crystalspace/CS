@@ -58,6 +58,12 @@ csOctreeVisible* csPVS::Add ()
 
 //---------------------------------------------------------------------------
 
+#define PLANE_X 0
+#define PLANE_Y 1
+#define PLANE_Z 2
+
+//---------------------------------------------------------------------------
+
 ULong csOctreeNode::pvs_cur_vis_nr = 1;
 
 csOctreeNode::csOctreeNode ()
@@ -130,6 +136,244 @@ int csOctreeNode::CountChildren ()
   return count;
 }
 
+int csOctreeNode::CountPolygons ()
+{
+  int i;
+  int count = 0;
+  if (GetMiniBsp ()) count += GetMiniBsp ()->CountPolygons ();
+  for (i = 0 ; i < 8 ; i++)
+    if (children[i])
+      count += ((csOctreeNode*)children[i])->CountPolygons ();
+  return count;
+}
+
+static csVector3 GetVector3 (int plane_nr, float plane_pos,
+	const csVector2& p)
+{
+  csVector3 v;
+  switch (plane_nr)
+  {
+    case PLANE_X: v.Set (plane_pos, p.x, p.y); break;
+    case PLANE_Y: v.Set (p.x, plane_pos, p.y); break;
+    case PLANE_Z: v.Set (p.x, p.y, plane_pos); break;
+  }
+  return v;
+}
+
+struct SPIt
+{
+  int plane_nr;
+  float plane_pos;
+  int side_nr;
+  int size;
+  int x, y;
+  UShort cur_mask;
+  UShort next_mask;
+  csBox2 box;
+};
+
+void* csOctreeNode::InitSolidPolygonIterator (int plane_nr, float plane_pos)
+{
+  SPIt* spit = new SPIt;
+  spit->plane_nr = plane_nr;
+  spit->plane_pos = plane_pos;
+  spit->size = 4;
+  spit->x = 0;
+  spit->y = 0;
+  if (ABS (bbox.Min (plane_nr) - plane_pos) < EPSILON) spit->side_nr = plane_nr*2;
+  else spit->side_nr = plane_nr*2+1;
+  spit->cur_mask = solid_masks[spit->side_nr];
+  spit->next_mask = solid_masks[spit->side_nr];
+  spit->box = bbox.GetSide (spit->side_nr);
+  return (void*)spit;
+}
+
+bool csOctreeNode::NextSolidPolygon (void* vspit, csPoly3D& poly)
+{
+  SPIt* spit = (SPIt*)vspit;
+  if (spit->size < 1) return false;
+  poly.MakeEmpty ();
+  csVector2 cor_xy = spit->box.GetCorner (BOX_CORNER_xy);
+  csVector2 cor_Xy = spit->box.GetCorner (BOX_CORNER_Xy);
+  csVector2 cor_xY = spit->box.GetCorner (BOX_CORNER_xY);
+  csVector2 cor_XY = spit->box.GetCorner (BOX_CORNER_XY);
+  int plane_nr = spit->plane_nr;
+  float plane_pos = spit->plane_pos;
+  UShort mask;
+  csVector2 v;
+
+  //-----
+  // 4x4 sub-masks.
+  //-----
+  if (spit->cur_mask == 0) return false;
+  if (spit->size == 4)
+  {
+    if (spit->cur_mask == (UShort)~0)
+    {
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_xy));
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_Xy));
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_XY));
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_xY));
+      spit->size = 0;
+      return true;
+    }
+    // Initialize for first 3x3 test.
+    spit->size = 3;
+    spit->x = 0;
+    spit->y = 0;
+    spit->next_mask = spit->cur_mask;
+  }
+  //-----
+  // 3x3 sub-masks.
+  //-----
+  if (spit->cur_mask == 0) return false;
+  while (spit->size == 3)
+  {
+    // Get current top-left corner of 3x3 submask.
+    int x = spit->x;
+    int y = spit->y;
+
+    // Prepare for next top-left corner of 3x3 submask or
+    // prepare to go to 2x2 submasks.
+    spit->x++;
+    if (spit->x > 1)
+    {
+      spit->x = 0;
+      spit->y++;
+      if (spit->y > 1)
+      {
+	spit->y = 0;
+	spit->size = 2;
+	spit->cur_mask = spit->next_mask;
+      }
+    }
+
+    // Fetch the 3x3 mask.
+    int bitnr = y*4+x;
+    mask  = (1<<bitnr) | (1<<(bitnr+1)) | (1<<(bitnr+2));
+    bitnr += 4;
+    mask |= (1<<bitnr) | (1<<(bitnr+1)) | (1<<(bitnr+2));
+    bitnr += 4;
+    mask |= (1<<bitnr) | (1<<(bitnr+1)) | (1<<(bitnr+2));
+    // Test if mask is completely solid.
+    if ((spit->cur_mask & mask) == mask)
+    {
+      // It is solid. First clear this sub-mask from the next mask
+      // so that we will not process it for 2x2 or 1x1 sub-masks.
+      spit->next_mask &= ~mask;
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+3)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+3)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+3)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+3)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      return true;
+    }
+  }
+  //-----
+  // 2x2 sub-masks.
+  //-----
+  if (spit->cur_mask == 0) return false;
+  while (spit->size == 2)
+  {
+    // Get current top-left corner of 2x2 submask.
+    int x = spit->x;
+    int y = spit->y;
+
+    // Prepare for next top-left corner of 2x2 submask or
+    // prepare to go to 1x1 submasks.
+    spit->x++;
+    if (spit->x > 2)
+    {
+      spit->x = 0;
+      spit->y++;
+      if (spit->y > 2)
+      {
+	spit->y = 0;
+	spit->size = 1;
+	spit->cur_mask = spit->next_mask;
+      }
+    }
+
+    // Fetch the 2x2 mask.
+    int bitnr = y*4+x;
+    mask  = (1<<bitnr) | (1<<(bitnr+1));
+    bitnr += 4;
+    mask |= (1<<bitnr) | (1<<(bitnr+1));
+    // Test if mask is completely solid.
+    if ((spit->cur_mask & mask) == mask)
+    {
+      // It is solid. First clear this sub-mask from the next mask
+      // so that we will not process it for 1x1 sub-masks.
+      spit->next_mask &= ~mask;
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+2)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+2)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+2)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+2)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      return true;
+    }
+  }
+  //-----
+  // 1x1 sub-masks.
+  //-----
+  if (spit->cur_mask == 0) return false;
+  while (spit->size == 1)
+  {
+    // Get current top-left corner of 2x2 submask.
+    int x = spit->x;
+    int y = spit->y;
+
+    // Prepare for next top-left corner of 1x1 submask.
+    spit->x++;
+    if (spit->x > 3)
+    {
+      spit->x = 0;
+      spit->y++;
+      if (spit->y > 3)
+      {
+	spit->y = 0;
+	spit->size = 0;
+      }
+    }
+
+    // Fetch the 1x1 mask.
+    int bitnr = y*4+x;
+    mask  = (1<<bitnr);
+    // Test if mask is completely solid.
+    if ((spit->cur_mask & mask) == mask)
+    {
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      return true;
+    }
+  }
+  return false;
+}
+
 //---------------------------------------------------------------------------
 
 csOctree::csOctree (csSector* sect, const csVector3& imin_bbox,
@@ -159,7 +403,7 @@ void csOctree::Build ()
 
   delete [] polygons;
 
-  //CalculateSolidMasks ((csOctreeNode*)root);
+  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::Build (csPolygonInt** polygons, int num)
@@ -172,7 +416,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   delete [] new_polygons;
 
-  //CalculateSolidMasks ((csOctreeNode*)root);
+  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)
@@ -824,10 +1068,6 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   }
 }
 
-#define PLANE_X 0
-#define PLANE_Y 1
-#define PLANE_Z 2
-
 bool csOctree::CalculatePolygonShadow (
 	const csVector3& corner,
 	csPoly3D& cur_poly,
@@ -1355,19 +1595,6 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
   return 0;
 }
 
-static csVector3 GetVector3 (int plane_nr, float plane_pos,
-	const csVector2& p)
-{
-  csVector3 v;
-  switch (plane_nr)
-  {
-    case PLANE_X: v.Set (plane_pos, p.x, p.y); break;
-    case PLANE_Y: v.Set (p.x, plane_pos, p.y); break;
-    case PLANE_Z: v.Set (p.x, p.y, plane_pos); break;
-  }
-  return v;
-}
-
 /*
  *  0123
  *  4567
@@ -1422,16 +1649,16 @@ static csBox2 GetSideBox (int octree_side, const csBox3& box)
   csBox2 box2;
   switch (octree_side)
   {
-    case OCTREE_SIDE_x:
-    case OCTREE_SIDE_X: 
+    case BOX_SIDE_x:
+    case BOX_SIDE_X: 
       box2.Set (box.MinY (), box.MinZ (), box.MaxY (), box.MaxZ ());
       break;
-    case OCTREE_SIDE_y:
-    case OCTREE_SIDE_Y: 
+    case BOX_SIDE_y:
+    case BOX_SIDE_Y: 
       box2.Set (box.MinX (), box.MinZ (), box.MaxX (), box.MaxZ ());
       break;
-    case OCTREE_SIDE_z:
-    case OCTREE_SIDE_Z: 
+    case BOX_SIDE_z:
+    case BOX_SIDE_Z: 
       box2.Set (box.MinX (), box.MinY (), box.MaxX (), box.MaxY ());
       break;
   }
@@ -1442,22 +1669,19 @@ void csOctree::CalculateSolidMasks (csOctreeNode* node)
 {
   if (!node) return;
 
-  node->solid_masks[OCTREE_SIDE_x] = ClassifyRectangle (PLANE_X,
-  	node->GetBox ().MinX (), GetSideBox (OCTREE_SIDE_x, node->GetBox ()));
-  node->solid_masks[OCTREE_SIDE_X] = ClassifyRectangle (PLANE_X,
-  	node->GetBox ().MaxX (), GetSideBox (OCTREE_SIDE_X, node->GetBox ()));
-  node->solid_masks[OCTREE_SIDE_y] = ClassifyRectangle (PLANE_Y,
-  	node->GetBox ().MinY (), GetSideBox (OCTREE_SIDE_y, node->GetBox ()));
-  node->solid_masks[OCTREE_SIDE_Y] = ClassifyRectangle (PLANE_Y,
-  	node->GetBox ().MaxY (), GetSideBox (OCTREE_SIDE_Y, node->GetBox ()));
-  node->solid_masks[OCTREE_SIDE_z] = ClassifyRectangle (PLANE_Z,
-  	node->GetBox ().MinZ (), GetSideBox (OCTREE_SIDE_z, node->GetBox ()));
-  node->solid_masks[OCTREE_SIDE_Z] = ClassifyRectangle (PLANE_Z,
-  	node->GetBox ().MaxZ (), GetSideBox (OCTREE_SIDE_Z, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_x] = ClassifyRectangle (PLANE_X,
+  	node->GetBox ().MinX (), GetSideBox (BOX_SIDE_x, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_X] = ClassifyRectangle (PLANE_X,
+  	node->GetBox ().MaxX (), GetSideBox (BOX_SIDE_X, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_y] = ClassifyRectangle (PLANE_Y,
+  	node->GetBox ().MinY (), GetSideBox (BOX_SIDE_y, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_Y] = ClassifyRectangle (PLANE_Y,
+  	node->GetBox ().MaxY (), GetSideBox (BOX_SIDE_Y, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_z] = ClassifyRectangle (PLANE_Z,
+  	node->GetBox ().MinZ (), GetSideBox (BOX_SIDE_z, node->GetBox ()));
+  node->solid_masks[BOX_SIDE_Z] = ClassifyRectangle (PLANE_Z,
+  	node->GetBox ().MaxZ (), GetSideBox (BOX_SIDE_Z, node->GetBox ()));
   int i;
-
-for (i = 0 ; i < 6 ; i++)
-if (node->solid_masks[i])printf ("%d %04x\n", i, node->solid_masks[i]);
 
   for (i = 0 ; i < 8 ; i++)
     CalculateSolidMasks ((csOctreeNode*)node->children[i]);
@@ -1470,12 +1694,18 @@ void csOctree::Statistics ()
   int tot_bsp_leaves = 0, min_bsp_leaves = 1000000000, max_bsp_leaves = 0;
   int tot_max_depth = 0, min_max_depth = 1000000000, max_max_depth = 0;
   int tot_tot_poly = 0, min_tot_poly = 1000000000, max_tot_poly = 0;
+  int num_pvs_leaves = 0;
+  int tot_pvs_vis_nodes = 0, min_pvs_vis_nodes = 1000000000, max_pvs_vis_nodes = 0;
+  int tot_pvs_vis_poly = 0, min_pvs_vis_poly = 1000000000, max_pvs_vis_poly = 0;
   Statistics ((csOctreeNode*)root, 0,
   	&num_oct_nodes, &max_oct_depth, &num_bsp_trees,
   	&tot_bsp_nodes, &min_bsp_nodes, &max_bsp_nodes,
 	&tot_bsp_leaves, &min_bsp_leaves, &max_bsp_leaves,
 	&tot_max_depth, &min_max_depth, &max_max_depth,
-	&tot_tot_poly, &min_tot_poly, &max_tot_poly);
+	&tot_tot_poly, &min_tot_poly, &max_tot_poly,
+	&num_pvs_leaves,
+	&tot_pvs_vis_nodes, &min_pvs_vis_nodes, &max_pvs_vis_nodes,
+	&tot_pvs_vis_poly, &min_pvs_vis_poly, &max_pvs_vis_poly);
   int avg_bsp_nodes = num_bsp_trees ? tot_bsp_nodes / num_bsp_trees : 0;
   int avg_bsp_leaves = num_bsp_trees ? tot_bsp_leaves / num_bsp_trees : 0;
   int avg_max_depth = num_bsp_trees ? tot_max_depth / num_bsp_trees : 0;
@@ -1490,7 +1720,17 @@ void csOctree::Statistics ()
   	tot_max_depth, avg_max_depth, min_max_depth, max_max_depth);
   CsPrintf (MSG_INITIALIZATION, "  bsp tot poly: tot=%d avg=%d min=%d max=%d\n",
   	tot_tot_poly, avg_tot_poly, min_tot_poly, max_tot_poly);
-  	
+
+  // Gather statistics about PVS.
+  int avg_pvs_vis_nodes = num_pvs_leaves ? tot_pvs_vis_nodes / num_pvs_leaves : 0;
+  int avg_pvs_vis_poly = num_pvs_leaves ? tot_pvs_vis_poly / num_pvs_leaves : 0;
+  int tot_polygons = ((csOctreeNode*)root)->CountPolygons ();
+  CsPrintf (MSG_INITIALIZATION, "  pvs vis nodes: tot=%d avg=%d min=%d max=%d\n",
+  	tot_pvs_vis_nodes, avg_pvs_vis_nodes, min_pvs_vis_nodes, max_pvs_vis_nodes);
+  CsPrintf (MSG_INITIALIZATION, "  pvs vis poly: avg=%d%% min=%d%% max=%d%%\n",
+  	avg_pvs_vis_poly * 100 / tot_polygons,
+  	min_pvs_vis_poly * 100 / tot_polygons,
+  	max_pvs_vis_poly * 100 / tot_polygons);
 }
 
 void csOctree::Statistics (csOctreeNode* node, int depth,
@@ -1498,12 +1738,39 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
   	int* tot_bsp_nodes, int* min_bsp_nodes, int* max_bsp_nodes,
 	int* tot_bsp_leaves, int* min_bsp_leaves, int* max_bsp_leaves,
 	int* tot_max_depth, int* min_max_depth, int* max_max_depth,
-	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly)
+	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly,
+	int* num_pvs_leaves,
+	int* tot_pvs_vis_nodes, int* min_pvs_vis_nodes, int* max_pvs_vis_nodes,
+	int* tot_pvs_vis_poly, int* min_pvs_vis_poly, int* max_pvs_vis_poly)
 {
   if (!node) return;
   depth++;
   if (depth > *max_oct_depth) *max_oct_depth = depth;
   (*num_oct_nodes)++;
+
+  if (node->IsLeaf ())
+  {
+    // PVS statistics.
+    (*num_pvs_leaves)++;
+    int num_vis_nodes = 0;
+    int num_vis_poly = 0;
+    csPVS& pvs = node->GetPVS ();
+    csOctreeVisible* ovis = pvs.GetFirst ();
+    while (ovis)
+    {
+      num_vis_nodes++;
+      csOctreeNode* vis_node = ovis->GetOctreeNode ();
+      if (vis_node->IsLeaf ()) num_vis_poly += vis_node->CountPolygons ();
+      ovis = pvs.GetNext (ovis);
+    }
+    (*tot_pvs_vis_nodes) += num_vis_nodes;
+    if (num_vis_nodes > *max_pvs_vis_nodes) *max_pvs_vis_nodes = num_vis_nodes;
+    if (num_vis_nodes < *min_pvs_vis_nodes) *min_pvs_vis_nodes = num_vis_nodes;
+    (*tot_pvs_vis_poly) += num_vis_poly;
+    if (num_vis_poly > *max_pvs_vis_poly) *max_pvs_vis_poly = num_vis_poly;
+    if (num_vis_poly < *min_pvs_vis_poly) *min_pvs_vis_poly = num_vis_poly;
+  }
+
   if (node->GetMiniBsp ())
   {
     (*num_bsp_trees)++;
@@ -1539,7 +1806,10 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
   	tot_bsp_nodes, min_bsp_nodes, max_bsp_nodes,
 	tot_bsp_leaves, min_bsp_leaves, max_bsp_leaves,
 	tot_max_depth, min_max_depth, max_max_depth,
-	tot_tot_poly, min_tot_poly, max_tot_poly);
+	tot_tot_poly, min_tot_poly, max_tot_poly,
+	num_pvs_leaves,
+	tot_pvs_vis_nodes, min_pvs_vis_nodes, max_pvs_vis_nodes,
+	tot_pvs_vis_poly, min_pvs_vis_poly, max_pvs_vis_poly);
       }
   }
   depth--;

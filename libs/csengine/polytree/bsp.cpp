@@ -80,6 +80,14 @@ void csBspNode::FetchVertices (int* array, int& cur_idx)
   }
 }
 
+int csBspNode::CountPolygons ()
+{
+  int count = polygons.GetNumPolygons ();
+  if (front) count += ((csBspNode*)front)->CountPolygons ();
+  if (back) count += ((csBspNode*)back)->CountPolygons ();
+  return count;
+}
+
 //---------------------------------------------------------------------------
 
 csBspTree::csBspTree (csSector* sect, int mode) : csPolygonTree (sect)

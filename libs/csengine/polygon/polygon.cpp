@@ -1315,6 +1315,29 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
   return true;
 }
 
+bool csPolygon3D::PointOnPolygon (const csVector3& v)
+{
+  // First check if point is on the plane.
+  csPlane3& pl = plane->GetWorldPlane ();
+  float dot = pl.D () + pl.A ()*v.x + pl.B ()*v.y + pl.C ()*v.z;
+  if (ABS (dot) >= SMALL_EPSILON) return false;
+
+  // Check if 'v' is on the same side of all edges.
+  int i, i1;
+  bool neg = false, pos = false;
+  i1 = GetVertices ().GetNumVertices ()-1;
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  {
+    float ar = csMath3::Area3 (v, Vwor (i1), Vwor (i));
+    if (ar < 0) neg = true;
+    else if (ar > 0) pos = true;
+    if (neg && pos) return false;
+    i1 = i;
+  }
+
+  return true;
+}
+
 bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
 {
   // First we do backface culling on the polygon with respect to

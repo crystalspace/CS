@@ -214,7 +214,6 @@ void csSector::UseStaticTree (int mode, bool octree)
     CsPrintf (MSG_INITIALIZATION, "Caching bsp/octree...\n");
     ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
   }
-  static_tree->Statistics ();
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
@@ -251,6 +250,7 @@ void csSector::UseStaticTree (int mode, bool octree)
     CsPrintf (MSG_INITIALIZATION, "Caching PVS...\n");
     ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
   }
+  static_tree->Statistics ();
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 

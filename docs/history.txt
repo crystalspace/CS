@@ -1,5 +1,23 @@
 The history order has been reversed so that new features are at the top.
 
+17-May-2000
+	- Thomas Riemer added scaffolding functions to allow loading world
+	  into NetSpace world.
+	- Paul Garceau updated jpgimage.cpp for Win32/GCC.
+	- Added csPolygon3D::PointOnPolygon to test if a point is on
+	  a polygon.
+	- Added csBox3::GetSide() with corresponding BOX_SIDE_??? defines
+	  to get the side of a box as a 2D box.
+	- Added csBspNode/csOctreeNode::CountPolygons() that will be used
+	  to gather statistics about the quality of the generated PVS.
+	- Added and printed additional statistics gathering for the PVS.
+	  You can now see the percentage of polygons culled.
+	- Did a few compile fixes on terrain engine.
+	- Paul Garceau did a few additional fixes on terrain engine.
+	- Reverted a few problematic changes from Paul Garceau (mk/user.mak
+	  and terrain engine).
+	- Wouter Wijngaards fixed the depend target of the terrain
+	  engine.
 16-May-2000
 	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.
@@ -15,6 +33,9 @@ The history order has been reversed so that new features are at the top.
 	  csPolygon3D::IntersectRay() but without back-face culling.
 	- Wouter Wijngaards made a small quality increase in radiosity.
 	- Fixed csPolygonTree::ClassifyPoint().
+	- Fixed solid mask calculation to make it more correct and
+	  faster.
+	- Made solid polygon iterator which is going to be used by PVS.
 	- Disabled the new routine to calculate the solid mask because it is
 	  too slow.  I need to make this faster.
 	- Eric Sunshine and Jorrit performed repair work on the new terrain
@@ -36,6 +57,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine worked around a problem with the NextStep compiler in
 	  octree.cpp where it failed to correctly create an array of csPoly3D
 	  objects.
+	- Frank O'Connor did a small fix to ddgcolor.cpp as well.
+	- Frank also update VC project files for csterr.
 15-May-2000
 	- Added const version of csPoly3D::operator[].
 	- Added csPoly3D::SplitWithPlaneXYZ().
