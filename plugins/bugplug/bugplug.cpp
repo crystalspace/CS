@@ -1133,7 +1133,7 @@ bool csBugPlug::EatKey (iEvent& event)
         if (debug_sector.show)
 	{
 	  debug_sector.view->GetCamera ()->GetTransform ().
-	  	RotateThis (CS_VEC_ROT_LEFT, .2);
+	  	RotateThis (CS_VEC_ROT_LEFT, 0.2f);
 	}
 	else
 	{
@@ -1145,7 +1145,7 @@ bool csBugPlug::EatKey (iEvent& event)
         if (debug_sector.show)
 	{
 	  debug_sector.view->GetCamera ()->GetTransform ().
-	  	RotateThis (CS_VEC_ROT_RIGHT, .2);
+	  	RotateThis (CS_VEC_ROT_RIGHT, 0.2f);
 	}
 	else
 	{
@@ -2120,13 +2120,13 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gfs->GenerateBox (tbox);
   gfs->CalculateNormals ();
   gfs->GetColors ()[0].Set (1, 1, 1);
-  gfs->GetColors ()[1].Set (.5, .5, .5);
-  gfs->GetColors ()[2].Set (.3, .3, .3);
-  gfs->GetColors ()[3].Set (.8, .8, .8);
-  gfs->GetColors ()[4].Set (.4, .4, .4);
-  gfs->GetColors ()[5].Set (.2, .2, .2);
-  gfs->GetColors ()[6].Set (.9, .9, .9);
-  gfs->GetColors ()[7].Set (.6, .6, .6);
+  gfs->GetColors ()[1].Set (0.5f, 0.5f, 0.5f);
+  gfs->GetColors ()[2].Set (0.3f, 0.3f, 0.3f);
+  gfs->GetColors ()[3].Set (0.8f, 0.8f, 0.8f);
+  gfs->GetColors ()[4].Set (0.4f, 0.4f, 0.4f);
+  gfs->GetColors ()[5].Set (0.2f, 0.2f, 0.2f);
+  gfs->GetColors ()[6].Set (0.9f, 0.9f, 0.9f);
+  gfs->GetColors ()[7].Set (0.6f, 0.6f, 0.6f);
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));

@@ -30,8 +30,9 @@ awsNotebook::awsNotebook () :
   bb_location(nbTop),
   bb_style(nbSlide),
   maxheight (0),
-  sink(this)
+  sink()
 {
+  sink.SetParm (this);
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
@@ -712,7 +713,9 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   prev->SetProperty ("Image", previmg);
   next->SetProperty ("Image", nextimg);
 
-  sink = new awsSink (this);
+  awsSink* _sink = new awsSink ();
+  _sink->SetParm (this);
+  sink = _sink;
 
   sink->RegisterTrigger ("Prev", &PrevClicked);
   sink->RegisterTrigger ("Next", &NextClicked);

@@ -292,7 +292,7 @@ void awsBarChart::OnDraw (csRect clip)
   // Now draw chart!
   int tw=0, th=0;
   int i;
-  float max=0.0001;
+  float max = 0.0001f;
   char buf[32];
 
   for(i=0; i<count_items; ++i)

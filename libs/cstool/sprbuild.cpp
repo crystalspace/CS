@@ -364,7 +364,7 @@ csPtr<iDataBuffer> csSpriteBuilderFile::Build (iModelDataObject *Input)
 {
   Out.Clear ();
   csSpriteBuilder::Build (Input);
-  int Size = Out.Length () + 1;
+  size_t Size = Out.Length () + 1;
   return csPtr<iDataBuffer> (new csDataBuffer (Out.Detach (), Size));
 }
 

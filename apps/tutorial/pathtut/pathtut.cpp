@@ -305,7 +305,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   }
 
   csMatrix3 m; m.Identity ();
-  m *= .3;
+  m *= 0.3f;
   imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0)));
 
   // Create the sprite and add it to the engine.

@@ -107,8 +107,11 @@ public:
   SCF_DECLARE_IBASE;
 
   /// P is the parm that is passed to triggers
-  awsSink (void *p);
+  awsSink ();
   virtual ~awsSink ();
+
+  void* GetParm() { return parm; }
+  void SetParm (void* p) { parm = p; }
 
   /// Maps a trigger name to a trigger id
   virtual unsigned long GetTriggerID (const char *name);
@@ -147,7 +150,8 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Initializes a couple things.
-  awsSource (iAwsComponent *_owner);
+  awsSource ();
+  void SetOwner (iAwsComponent *_owner) { owner = owner; }
 
   /// Does nothing
   virtual ~awsSource ();

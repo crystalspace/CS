@@ -97,7 +97,7 @@ static struct
   -1,
   false,
   0,
-  1/500.0,
+  1/500.0f,
   false,
   false,
   0
@@ -649,7 +649,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         if (optarg)
         {
           sscanf (optarg, "%g", &opt.hmscale);
-          opt.hmscale *= 1/500.0;
+          opt.hmscale *= 1/500.0f;
         }
         break;
       case 'I':

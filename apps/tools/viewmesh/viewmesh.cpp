@@ -797,19 +797,19 @@ bool ViewMesh::Initialize ()
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (0, csVector3 (-3, 10, 0), 10,
-  	csColor (.8, .8, .8), false);
+  	csColor (0.8f, 0.8f, 0.8f), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (3, 10,  0), 10,
-  	csColor (.8, .8, .8), false);
+  	csColor (0.8f, 0.8f, 0.8f), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (0, 10, -3), 10,
-  	csColor (.8, .8, .8), false);
+  	csColor (0.8f, 0.8f, 0.8f), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (0, csVector3 (0, 10,  3), 10,
-  	csColor (.8, .8, .8), false);
+  	csColor (0.8f, 0.8f, 0.8f), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();

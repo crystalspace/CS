@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Oct-2003
+	- res 'un-disabled' a couple of MSVC warnings and fixed some occurances
+	  of VC warnings in the source.
 23-Oct-2003
 	- Jorrit reduced the 'yellow-message-time' in the standard reporter
 	  from 10 to 5 seconds.

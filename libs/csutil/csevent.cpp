@@ -439,7 +439,7 @@ bool csEvent::Find(const char *name, int8 &v, int index)
     attribute *object = (attribute *) v1->Get(index);
     if (object->type == attribute::tag_int8)
     {
-      v = object->Integer;
+      v = (int8)object->Integer;
       return true;
     }
   }
@@ -469,7 +469,7 @@ bool csEvent::Find(const char *name, int16 &v, int index)
     attribute *object = (attribute *) v1->Get(index);
     if (object->type == attribute::tag_int16)
     {
-      v = object->Integer;
+      v = (int16)object->Integer;
       return true;
     }
   }
@@ -499,7 +499,7 @@ bool csEvent::Find(const char *name, int32 &v, int index)
     attribute *object = (attribute *) v1->Get(index);
     if ((object->type == attribute::tag_int32) || (object->type == attribute::tag_bool))
     {
-      v = object->Integer;
+      v = (int32)object->Integer;
       return true;
     }
   }

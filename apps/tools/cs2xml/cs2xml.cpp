@@ -1578,8 +1578,8 @@ void Cs2Xml::ParseGenerate (char const* parent_token, csParser* parser,
 void Cs2Xml::ParseHaloDefault(csRef<iDocumentNode> child, char* params)
 {
   CreateValueNode (child, "type", "cross");
-  float intensity = 2.0;
-  float cross = 0.45;
+  float intensity = 2.0f;
+  float cross = 0.45f;
   if (params)
     csScanStr (params, "%f,%f", &intensity, &cross);
   CreateValueNodeAsFloat (child, "intensity", intensity);

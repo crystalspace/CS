@@ -336,7 +336,9 @@ bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
-  sink = new awsSink (this);
+  awsSink* _sink = new awsSink ();
+  _sink->SetParm (this);
+  sink = _sink;
   sink->RegisterTrigger ("ActivateTab", &ActivateTabCallback);
 
   awsKeyFactory previnfo, nextinfo;

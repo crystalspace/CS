@@ -103,6 +103,7 @@ void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
   g3d->Print (0);
+  //csSleep (1000);
 }
 
 bool Simple::HandleEvent (iEvent& ev)

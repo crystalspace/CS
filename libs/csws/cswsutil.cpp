@@ -353,7 +353,7 @@ void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
     }
     else
     {
-      delta = 2.0 / 3.0;
+      delta = 2.0f / 3.0f;
       max = b;
       mid = r;
       min = g;
@@ -362,7 +362,7 @@ void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
   else
     if (g > b)
     {
-      delta = 1.0 / 3.0;
+      delta = 1.0f / 3.0f;
       max = g;
       if (r > b)
         mid = r, min = b, sign = -1;
@@ -371,7 +371,7 @@ void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
     }
     else
     {
-      delta = 2.0 / 3.0;
+      delta = 2.0f / 3.0f;
       max = b;
       mid = g;
       min = r;

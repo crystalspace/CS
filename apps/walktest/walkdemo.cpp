@@ -130,7 +130,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
   rainstate->SetMixMode (CS_FX_ADD);
   rainstate->SetColor (csColor (.25,.25,.25));
   rainstate->SetParticleCount (num);
-  rainstate->SetDropSize (.3/50., .3);
+  rainstate->SetDropSize (0.3f/50.0f, 0.3f);
   rainstate->SetLighting (false);
   rainstate->SetBox (bbox.Min (), bbox.Max ());
   rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
@@ -172,11 +172,11 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   csRef<iSnowState> snowstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSnowState));
   snowstate->SetParticleCount (num);
-  snowstate->SetDropSize (.07, .07);
+  snowstate->SetDropSize (0.07f, 0.07f);
   snowstate->SetLighting (false);
   snowstate->SetBox (bbox.Min (), bbox.Max ());
   snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
-  snowstate->SetSwirl (0.2);
+  snowstate->SetSwirl (0.2f);
 }
 
 //===========================================================================
@@ -213,13 +213,13 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFireState));
   firestate->SetParticleCount (num);
   //firestate->SetDropSize (.02, .04);
-  firestate->SetDropSize (.04, .08);
+  firestate->SetDropSize (0.04f, 0.08f);
   firestate->SetLighting (false);
-  firestate->SetOrigin (csBox3(origin-csVector3(.2,0,.2),
-    origin+csVector3(.2,0.2)));
-  firestate->SetDirection (csVector3 (0, 1., 0));
-  firestate->SetSwirl (1.6);
-  firestate->SetColorScale (0.2);
+  firestate->SetOrigin (csBox3(origin-csVector3(0.2f, 0, 0.2f),
+    origin + csVector3(0.2f, 0.2f)));
+  firestate->SetDirection (csVector3 (0, 1.0f, 0));
+  firestate->SetSwirl (1.6f);
+  firestate->SetColorScale (0.2f);
 }
 
 //===========================================================================
@@ -250,20 +250,20 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
-  partstate->SetColor (csColor (.25, .35, .55));
-  partstate->SetChangeRotation (7.5);
+  partstate->SetColor (csColor (0.25f, 0.35f, 0.55f));
+  partstate->SetChangeRotation (7.5f);
 
   csRef<iFountainState> fountstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFountainState));
   fountstate->SetParticleCount (num);
-  fountstate->SetDropSize (.1, .1);
+  fountstate->SetDropSize (0.1f, 0.1f);
   fountstate->SetOrigin (csVector3 (0, 0, 0));
-  fountstate->SetAcceleration (csVector3 (0, -1., 0));
-  fountstate->SetFallTime (5.0);
-  fountstate->SetSpeed (3.0);
-  fountstate->SetElevation (3.1415926/2.);
+  fountstate->SetAcceleration (csVector3 (0, -1.0f, 0));
+  fountstate->SetFallTime (5.0f);
+  fountstate->SetSpeed (3.0f);
+  fountstate->SetElevation (3.1415926f/2.0f);
   fountstate->SetAzimuth (0);
-  fountstate->SetOpening (.2);
+  fountstate->SetOpening (0.2f);
 }
 
 //===========================================================================
@@ -306,11 +306,11 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   expstate->SetCenter (csVector3 (0, 0, 0));
   expstate->SetPush (csVector3 (0, 0, 0));
   expstate->SetNrSides (6);
-  expstate->SetPartRadius (0.15);
+  expstate->SetPartRadius (0.15f);
   expstate->SetLighting (true);
-  expstate->SetSpreadPos (.6);
-  expstate->SetSpreadSpeed (2.);
-  expstate->SetSpreadAcceleration (2.);
+  expstate->SetSpreadPos (0.6f);
+  expstate->SetSpreadSpeed (2.0f);
+  expstate->SetSpreadAcceleration (2.0f);
   expstate->SetFadeSprites (500);
 
   exp->PlaceMesh ();
@@ -345,7 +345,7 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
-  partstate->SetChangeColor (csColor(+0.01,0.,-0.012));
+  partstate->SetChangeColor (csColor(+0.01f, 0.0f, -0.012f));
 
   csRef<iSpiralState> spirstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSpiralState));
@@ -376,19 +376,19 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   int anm_idx = frame->GetAnmIndex ();
   int tex_idx = frame->GetTexIndex ();
 
-  state->SetVertex (anm_idx, par_vertex_idx+0, csVector3(-.05, 0, -.05));
-  state->SetVertex (anm_idx, par_vertex_idx+1, csVector3(.05, 0, -.05));
-  state->SetVertex (anm_idx, par_vertex_idx+2, csVector3(0, 0, .05));
-  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-.05, .45, -.05));
-  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(.05, .45, -.05));
-  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, .45, .05));
+  state->SetVertex (anm_idx, par_vertex_idx+0, csVector3(-0.05f, 0, -0.05f));
+  state->SetVertex (anm_idx, par_vertex_idx+1, csVector3(0.05f, 0, -0.05f));
+  state->SetVertex (anm_idx, par_vertex_idx+2, csVector3(0, 0, 0.05f));
+  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-0.05f, 0.45f, -0.05f));
+  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(0.05f, 0.45f, -0.05f));
+  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, 0.45f, 0.05f));
 
   state->SetTexel (tex_idx, par_vertex_idx+0, csVector2(0, 0));
-  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(.99, 0));
-  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, .99));
-  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(.99, .99));
-  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(.5, .5));
-  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(.5, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(0.99f, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, 0.99f));
+  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(0.99f, 0.99f));
+  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(0.5f, 0.5f));
+  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(0.5f, 0));
 
   if (recursion > 0)
   {
@@ -419,9 +419,9 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   for (i = 0 ; i < rwidth ; i++)
   {
     con = parent->CreateConnection ();
-    csMatrix3 tr = csYRotMatrix3 (0) * csZRotMatrix3(.15) *
-                                                 csXRotMatrix3(.15);
-    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    csMatrix3 tr = csYRotMatrix3 (0) * csZRotMatrix3(0.15f) *
+                                                 csXRotMatrix3(0.15f);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, 0.5f, 0));
     con->SetTransformation (trans);
     csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (con, iSkeletonLimb));
     add_tree_limbs (state, frame, ilimb,
@@ -634,16 +634,16 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   state->SetVertex (anm_idx, par_vertex_idx+0, csVector3(-dim, 0, -dim));
   state->SetVertex (anm_idx, par_vertex_idx+1, csVector3(dim, 0, -dim));
   state->SetVertex (anm_idx, par_vertex_idx+2, csVector3(0, 0, dim));
-  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-dim, .45, -dim));
-  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(dim, .45, -dim));
-  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, .45, dim));
+  state->SetVertex (anm_idx, par_vertex_idx+3, csVector3(-dim, 0.45f, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+4, csVector3(dim, 0.45f, -dim));
+  state->SetVertex (anm_idx, par_vertex_idx+5, csVector3(0, 0.45f, dim));
 
   state->SetTexel (tex_idx, par_vertex_idx+0, csVector2(0, 0));
-  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(.99, 0));
-  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, .99));
-  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(.99, .99));
-  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(.5, .5));
-  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(.5, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+1, csVector2(0.99f, 0));
+  state->SetTexel (tex_idx, par_vertex_idx+2, csVector2(0, 0.99f));
+  state->SetTexel (tex_idx, par_vertex_idx+3, csVector2(0.99f, 0.99f));
+  state->SetTexel (tex_idx, par_vertex_idx+4, csVector2(0.5f, 0.5f));
+  state->SetTexel (tex_idx, par_vertex_idx+5, csVector2(0.5f, 0));
 
   if (recursion > 0)
   {
@@ -670,14 +670,14 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
   {
     con = parent->CreateConnection ();
     csMatrix3 tr = csYRotMatrix3 (0) *
-    	csZRotMatrix3 (.15) *
-	csXRotMatrix3 (.15);
-    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    	csZRotMatrix3 (0.15f) *
+	csXRotMatrix3 (0.15f);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, 0.5f, 0));
     con->SetTransformation (trans);
     csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (con, iSkeletonLimb));
     add_ghost_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx,
-    	maxdepth, 1, recursion+1, dim * .7);
+    	maxdepth, 1, recursion+1, dim * 0.7f);
   }
 }
 
@@ -689,7 +689,7 @@ iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
   iSkeleton* skel = state->GetSkeleton ();
   csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (skel, iSkeletonLimb));
   add_ghost_limbs (state, frame, ilimb,
-  	vertex_idx, 0, maxdepth, width, 0, .2);
+  	vertex_idx, 0, maxdepth, width, 0, 0.2f);
   return skel;
 }
 
@@ -839,7 +839,7 @@ void move_ghost (iMeshWrapper* spr)
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
   const csVector3& pos = spr->GetMovable ()->GetPosition ();
-  csVector3 vel (0, 0, .1), rad, cent;
+  csVector3 vel (0, 0, 0.1f), rad, cent;
   vel = spr->GetMovable ()->GetTransform ().GetO2T () * vel;
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
@@ -1203,7 +1203,7 @@ void AttachRandomLight (iDynLight* light)
 {
   RandomLight* rl = new RandomLight;
   rl->type = DYN_TYPE_RANDOM;
-  rl->dyn_move_dir = .2;
+  rl->dyn_move_dir = 0.2f;
   rl->dyn_move = 0;
   rl->dyn_r1 = rl->dyn_g1 = rl->dyn_b1 = 1;
   csDataObject* rldata = new csDataObject (rl);
@@ -1269,8 +1269,8 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   	iThingState);
   csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
   thing->GetMovable ()->SetSector (room);
-  float dx = 1, dy = 3, dz = .3;
-  float border = 0.3; // width of border around the portal
+  float dx = 1, dy = 3, dz = 0.3f;
+  float border = 0.3f; // width of border around the portal
 
   // bottom
   thing_fact_state->AddQuad (
@@ -1503,7 +1503,7 @@ printf ("b\n"); fflush (stdout);
       	iThingState);
       thing_fact_state = thing_state->GetFactory ();
       iMovable* tbmov = thingBack->GetMovable ();
-      tbmov->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
+      tbmov->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -0.1f));
       tbmov->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());
       tbmov->UpdateMove ();
       iPortal* portalBack;

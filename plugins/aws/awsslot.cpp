@@ -76,7 +76,9 @@ iAwsSink *awsSinkManager::FindSink (const char *_name)
 
 iAwsSink *awsSinkManager::CreateSink (void *parm)
 {
-  return new awsSink (parm);
+  awsSink* sink = new awsSink ();
+  sink->SetParm (parm);
+  return sink;
 }
 
 iAwsSlot *awsSinkManager::CreateSlot ()
@@ -85,7 +87,7 @@ iAwsSlot *awsSinkManager::CreateSlot ()
 }
 
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
-awsSink::awsSink (void *p) : parm(p), sink_err(0)
+awsSink::awsSink () : parm(0), sink_err(0)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -134,8 +136,7 @@ void awsSink::RegisterTrigger (const char *name,
 }
 
 ///////////////////////////////////// Signal Sources ////////////////////////////////////////////////////////
-awsSource::awsSource (iAwsComponent *_owner) :
-  owner(_owner)
+awsSource::awsSource () : owner(0)
 {
   SCF_CONSTRUCT_IBASE (0);
 }

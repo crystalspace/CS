@@ -25,9 +25,10 @@ awsComponent::awsComponent () :
   above(0),
   is_zoomed(false),
   flags(0),
-  signalsrc(this),
-	focusable(false)
+  signalsrc(),
+  focusable(false)
 {
+  signalsrc.SetOwner (this);
   SCF_CONSTRUCT_IBASE (0);
 }
 

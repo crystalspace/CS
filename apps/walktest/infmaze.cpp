@@ -61,9 +61,9 @@ void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
   x3 -= cx; y3 -= cy; z3 -= cz;
   x4 -= cx; y4 -= cy; z4 -= cz;
   float sx, sy, sz;
-  if (dx) { sy = sz = .9; sx = 0; }
-  else if (dy) { sx = sz = .9; sy = 0; }
-  else { sx = sy = .9; sz = 0; }
+  if (dx) { sy = sz = 0.9f; sx = 0; }
+  else if (dy) { sx = sz = 0.9f; sy = 0; }
+  else { sx = sy = 0.9f; sz = 0; }
 
   walls_state->AddQuad (
     csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1),
@@ -136,17 +136,17 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   float s = 1;
 
   create_one_side (walls_fact_state, "n", t, t2, dx-s,dy+s,dz+s,
-  		dx+s,dy+s,dz+s, dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
+  		dx+s,dy+s,dz+s, dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-0.1f);
   create_one_side (walls_fact_state, "e", t, t2, dx+s,dy+s,dz+s,
-  		dx+s,dy+s,dz-s, dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -.1,0,0);
+  		dx+s,dy+s,dz-s, dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -0.1f,0,0);
   create_one_side (walls_fact_state, "w", t, t2, dx-s,dy+s,dz+s,
-  		dx-s,dy-s,dz+s, dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, .1,0,0);
+  		dx-s,dy-s,dz+s, dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, 0.1f,0,0);
   create_one_side (walls_fact_state, "s", t, t2, dx+s,dy+s,dz-s,
-  		dx-s,dy+s,dz-s, dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,.1);
+  		dx-s,dy+s,dz-s, dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,0.1f);
   create_one_side (walls_fact_state, "f", t, t2, dx-s,dy-s,dz+s,
-  		dx+s,dy-s,dz+s, dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
+  		dx+s,dy-s,dz+s, dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,0.1f,0);
   create_one_side (walls_fact_state, "c", t, t2, dx-s,dy+s,dz-s,
-  		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
+  		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-0.1f,0);
 
   csRef<iStatLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),

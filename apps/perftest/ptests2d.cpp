@@ -108,7 +108,7 @@ void StringTester::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
     length = (int)screen_len;
     line = new char[length];
     char *buf = line;
-    int buf_len = length;
+    size_t buf_len = length;
     while (buf_len > tl_len)
     {
       strncpy (buf, tl, tl_len);

@@ -255,9 +255,9 @@ csMaterialHandle::csMaterialHandle (
   DG_TYPE (this, "csMaterialHandle");
   material = 0;
   num_texture_layers = 0;
-  diffuse = 0.7;
-  ambient = 0;
-  reflection = 0;
+  diffuse = 0.7f;
+  ambient = 0.0f;
+  reflection = 0.0f;
   if ((texture = t) != 0)
   {
     DG_LINK (this, texture);

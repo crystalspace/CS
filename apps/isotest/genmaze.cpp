@@ -26,8 +26,8 @@ csGenMaze::csGenMaze(int w, int h)
   width = w;
   height = h;
   maze = new csGenMazeNode [width*height];
-  straightness = 0.5;
-  cyclicalness = 0.1;
+  straightness = 0.5f;
+  cyclicalness = 0.1f;
   InitMaze();
 }
 

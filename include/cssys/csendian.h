@@ -184,7 +184,7 @@ static inline int64 double2longlong (double d)
 /// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
 static inline double longlong2double (int64 i)
 {
-  int64 exp = (i >> 48) & 0x7fff;
+  int exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
   double mant = double (i & CONST_INT64(0xffffffffffff)) / CONST_INT64(0x1000000000000);
   if (i & CONST_INT64(0x8000000000000000)) mant = -mant;

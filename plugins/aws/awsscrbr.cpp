@@ -35,8 +35,8 @@ awsScrollBar::awsScrollBar () :
   max(1),
   min(0),
   amntvis(0),
-  value_delta(0.1),
-  value_page_delta(0.25)
+  value_delta(0.1f),
+  value_page_delta(0.25f)
 {
   //SetFlag (AWSF_CMP_ALWAYSERASE);
   captured = false;
@@ -239,7 +239,9 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   decVal->SetProperty ("TicksPerSecond", (void *) &t);
   knob->SetProperty ("TicksPerSecond", (void *) &t);
 
-  sink = new awsSink (this);
+  awsSink* _sink = new awsSink ();
+  _sink->SetParm (this);
+  sink = _sink;
 
   sink->RegisterTrigger ("DecValue", &DecClicked);
   sink->RegisterTrigger ("IncValue", &IncClicked);
@@ -846,7 +848,9 @@ bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)
   if (!awsCmdButton::Setup (wmgr, settings)) return false;
 
   timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
-  sink = new awsSink (this);
+  awsSink* _sink = new awsSink ();
+  _sink->SetParm (this);
+  sink = _sink;
 
   sink->RegisterTrigger ("TickTock", &TickTock);
 

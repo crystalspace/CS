@@ -753,13 +753,13 @@ void WalkTest::DrawFrame2D (void)
      */
 
     // Margin to the edge of the screen, as a fraction of screen width
-    const float marginFraction = 0.01;
+    const float marginFraction = 0.01f;
     const unsigned margin = (unsigned) (FRAME_WIDTH * marginFraction);
 
 #if 1 /**** Scalable logo ****/
 
     // Width of the logo, as a fraction of screen width
-    const float widthFraction = 0.3;
+    const float widthFraction = 0.3f;
 
     // Scale the logo width to a fraction of the screen, keeping its aspect ratio
     const unsigned w = (unsigned) (FRAME_WIDTH * widthFraction);
@@ -1198,21 +1198,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Get all collision detection and movement config file parameters.
   csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
-  cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
-  cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
-  cfg_walk_brake = cfg->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
-  cfg_rotate_accelerate = cfg->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
-  cfg_rotate_maxspeed = cfg->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
-  cfg_rotate_brake = cfg->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
-  cfg_look_accelerate = cfg->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
-  cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
-  cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
-  cfg_body_depth = cfg->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
-  cfg_eye_offset = cfg->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
-  cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
-  cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
-  cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
+  cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08f);
+  cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007f);
+  cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1f);
+  cfg_walk_brake = cfg->GetFloat ("Walktest.CollDet.WalkBrake", 0.014f);
+  cfg_rotate_accelerate = cfg->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005f);
+  cfg_rotate_maxspeed = cfg->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03f);
+  cfg_rotate_brake = cfg->GetFloat ("Walktest.CollDet.RotateBrake", 0.015f);
+  cfg_look_accelerate = cfg->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028f);
+  cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 1.4f);
+  cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5f);
+  cfg_body_depth = cfg->GetFloat ("Walktest.CollDet.BodyDepth", 0.5f);
+  cfg_eye_offset = cfg->GetFloat ("Walktest.CollDet.EyeOffset", -0.7f);
+  cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4f);
+  cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4f);
+  cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1f);
 
   // Load the default font name
   const char * cfg_font = cfg->GetStr("Walktest.Font.Default", CSFONT_LARGE);

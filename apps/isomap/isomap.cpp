@@ -278,14 +278,14 @@ bool IsoMap1::Initialize (int argc, const char* const argv[],
   light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
   light->SetRadius(5.0);
-  light->SetColor(csColor(1.0, 0.4, 0.2));
+  light->SetColor(csColor(1.0f, 0.4f, 0.2f));
 
   // Find a material to use for the player sprite.
   iMaterialList *mats = engine->GetMaterialList();
   iMaterialWrapper *halo = mats->FindByName("halo");
 
   // add the player sprite to the world
-  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3, 2.7));
+  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3f, 2.7f));
   player->SetMaterialWrapper(halo);
   player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);
@@ -394,7 +394,7 @@ void IsoMap1::SetupFrame ()
   {
     // if no keyboard cursor use, and there was a click,
     // move towards last click position.
-    speed *= 1.412; // mouse move is as fast as keyboard can be
+    speed *= 1.412f; // mouse move is as fast as keyboard can be
     playermotion = lastclick - player->GetPosition();
     float playermove = playermotion.Norm(); // distance moved
     if(playermove > speed) playermotion *= speed / playermove;
@@ -459,11 +459,11 @@ bool IsoMap1::HandleEvent (iEvent &Event)
     static float settings[][5] = {
     // scale should be *displayheight.
     //xscale, yscale, zscale, zskew, xskew
-    {1./16., 1./16., 1./16., 1.0, 1.0},
-    {1./16., 1./16., 1./16., 0.6, 0.6},
-    {1./16., 1./16., 1./16., 0.5, 0.5},
-    {1./40., 1./40., 1./40., 0.5, 0.5},
-    {1./8., 1./8., 1./8., 0.5, 0.5},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 1.0f, 1.0f},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.6f, 0.6f},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.5f, 0.5f},
+    {1.0f/40.0f, 1.0f/40.0f, 1.0f/40.0f, 0.5f, 0.5f},
+    {1.0f/8.0f,  1.0f/8.0f,  1.0f/8.0f,  0.5f, 0.5f},
     };
     static int nrsettings = 5;
     static int setting = 0;

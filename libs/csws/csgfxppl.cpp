@@ -271,7 +271,7 @@ void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
   poly.vertices [3].x = x2;
   poly.vertices [3].y = y1;
   // Set plane normal to be perpendicular to OZ and very far away
-  poly.normal.Set (0, 0, -1, 1e35);
+  poly.normal.Set (0, 0, -1.0f, 1e35f);
   G3D->DrawPolygon (poly);
 }
 

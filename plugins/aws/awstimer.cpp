@@ -33,9 +33,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 const int awsTimer:: signalTick = 0x1;
 
 awsTimer::awsTimer (iObjectRegistry *object_reg, iAwsComponent *comp) :
-  awsSource(comp)
+  awsSource()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SetOwner (comp);
   this->object_reg = object_reg;
   bSetup = false;
   stopped = true;

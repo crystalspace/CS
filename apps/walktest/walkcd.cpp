@@ -282,7 +282,7 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
     {
       Sys->on_ground = false;
       if (Sys->do_gravity && !Sys->move_3d)
-	vel.y -= 0.002;
+	vel.y -= 0.002f;
     }
     else
     {

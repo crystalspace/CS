@@ -303,7 +303,7 @@ bool Simple::Initialize ()
     	"Error loading mesh object factory!");
     return false;
   }
-  csMatrix3 m; m.Identity (); m *= .05;
+  csMatrix3 m; m.Identity (); m *= 0.05f;
   csReversibleTransform tr (m, csVector3 (0));
   imeshfact->HardTransform (tr);
 

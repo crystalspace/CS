@@ -54,7 +54,7 @@ void awsStandardSink::WindowSlideOutLeft (void *_sink, iAwsSource *source)
   if (c == win)
     return;
   else
-    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_LEFT, 0.05);
+    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_LEFT, 0.05f);
 }
 
 void awsStandardSink::WindowSlideOutRight (void *_sink, iAwsSource *source)
@@ -67,7 +67,7 @@ void awsStandardSink::WindowSlideOutRight (void *_sink, iAwsSource *source)
   if (c == win)
     return;
   else
-    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_RIGHT, 0.05);
+    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_RIGHT, 0.05f);
 }
 
 void awsStandardSink::WindowSlideOutUp (void *_sink, iAwsSource *source)
@@ -80,7 +80,7 @@ void awsStandardSink::WindowSlideOutUp (void *_sink, iAwsSource *source)
   if (c == win)
     return;
   else
-    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_UP, 0.05);
+    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_UP, 0.05f);
 }
 
 void awsStandardSink::WindowSlideOutDown (void *_sink, iAwsSource *source)
@@ -93,7 +93,7 @@ void awsStandardSink::WindowSlideOutDown (void *_sink, iAwsSource *source)
   if (c == win)
     return;
   else
-    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_DOWN, 0.05);
+    sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_DOWN, 0.05f);
 }
 
 
@@ -107,8 +107,9 @@ void awsStandardSink::Invalidate (void *sink, iAwsSource *source)
 }
 
 awsStandardSink::awsStandardSink (iAws *_wmgr) :
-  awsSink(this), wmgr(_wmgr)
+  awsSink(), wmgr(_wmgr)
 {
+  SetParm (this);
   RegisterTrigger ("Show", Show);
   RegisterTrigger ("Hide", Hide);
   RegisterTrigger ("HideWindow", HideWindow);

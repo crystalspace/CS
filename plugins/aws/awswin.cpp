@@ -53,7 +53,7 @@ awsWindow::awsWindow () :
   title(0),
   resizing_mode(false),
   moving_mode(false),
-  sink(this),
+  sink(),
   is_minimized(false),
   popup(0),
   menu(0),
@@ -63,6 +63,8 @@ awsWindow::awsWindow () :
   SetFlag (AWSF_CMP_HIDDEN);
   SetFlag (AWSF_CMP_WINDOW);
   SetFlag (AWSF_CMP_TOP_SELECT);
+
+  sink.SetParm (this);
 }
 
 awsWindow::~awsWindow ()

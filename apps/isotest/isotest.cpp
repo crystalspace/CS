@@ -293,7 +293,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
 
   // add the player sprite to the world
-  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3, 2.7));
+  player = csPtr<iIsoSprite> (engine->CreateFrontSprite(startpos, 1.3f, 2.7f));
   player->SetMaterialWrapper(snow);
   player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);
@@ -308,7 +308,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetGrid(grid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
-  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->SetColor(csColor(0.0f, 0.4f, 1.0f));
 
   // add a glowing halo to the light
   sprite = engine->CreateFrontSprite(scenelight->GetPosition() -
@@ -324,7 +324,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
   light->SetRadius(5.0);
-  light->SetColor(csColor(1.0, 0.4, 0.2));
+  light->SetColor(csColor(1.0f, 0.4f, 0.2f));
 
   // make a bump to cast shadows
   for(my=0; my<multy; my++)
@@ -426,13 +426,13 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   pastate->SetMixMode(CS_FX_ADD);
   pastate->SetColor( csColor(0.125, 0.5, 1.0) );
   fostate->SetParticleCount(100);
-  fostate->SetDropSize(0.1, 0.1);
+  fostate->SetDropSize(0.1f, 0.1f);
   fostate->SetOrigin( csVector3(0,0,0) );
   fostate->SetLighting(false);
-  fostate->SetAcceleration( csVector3(0, -.3, 0) );
+  fostate->SetAcceleration( csVector3(0, -0.3f, 0) );
   fostate->SetElevation(HALF_PI);
   fostate->SetAzimuth(1.0);
-  fostate->SetOpening(0.14);
+  fostate->SetOpening(0.14f);
   fostate->SetSpeed(1.0);
   fostate->SetFallTime(6.0);
 
@@ -466,14 +466,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetGrid(grid2);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
-  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->SetColor(csColor(0.0f, 0.4f, 1.0f));
   // add the light to both grids to make it look right.
   scenelight = csPtr<iIsoLight> (engine->CreateLight());
   scenelight->SetPosition(csVector3(13,2,26));
   scenelight->SetGrid(grid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
-  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->SetColor(csColor(0.0f, 0.4f, 1.0f));
 
 
   /// add maze grid
@@ -567,7 +567,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   scenelight->SetGrid(mazegrid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(10.0 + width/2 + height/2);
-  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  scenelight->SetColor(csColor(0.0f, 0.4f, 1.0f));
 
   // add walls
 
@@ -633,7 +633,7 @@ void IsoTest::SetupFrame ()
   {
     // if no keyboard cursor use, and there was a click,
     // move towards last click position.
-    speed *= 1.412; // mouse move is as fast as keyboard can be
+    speed *= 1.412f; // mouse move is as fast as keyboard can be
     playermotion = lastclick - player->GetPosition();
     float playermove = playermotion.Norm(); // distance moved
     if(playermove > speed) playermotion *= speed / playermove;
@@ -698,11 +698,11 @@ bool IsoTest::HandleEvent (iEvent &Event)
     static float settings[][5] = {
     // scale should be *displayheight.
     //xscale, yscale, zscale, zskew, xskew
-    {1./16., 1./16., 1./16., 1.0, 1.0},
-    {1./16., 1./16., 1./16., 0.6, 0.6},
-    {1./16., 1./16., 1./16., 0.5, 0.5},
-    {1./40., 1./40., 1./40., 0.5, 0.5},
-    {1./8., 1./8., 1./8., 0.5, 0.5},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 1.0f, 1.0f},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.6f, 0.6f},
+    {1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.5f, 0.5f},
+    {1.0f/40.0f, 1.0f/40.0f, 1.0f/40.0f, 0.5f, 0.5f},
+    {1.0f/8.0f,  1.0f/8.0f,  1.0f/8.0f,  0.5f, 0.5f},
     };
     static int nrsettings = 5;
     static int setting = 0;

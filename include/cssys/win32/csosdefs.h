@@ -26,26 +26,13 @@
   #pragma warning(disable:4099)   // type seen as both 'struct' and `class'
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4102)   // 'label' : unreferenced label
-  #pragma warning(disable:4127)   // conditional expression is constant
-  #pragma warning(disable:4130)   // 'operator' : logical operation on address of string constant
   #pragma warning(disable:4146)   // unary minus operator applied to unsigned type, result still unsigned
-  #pragma warning(disable:4189)   // local variable is intialized but not referenced
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
-  #pragma warning(disable:4245)   // Signed unsigned warnings
-  #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
-  #pragma warning(disable:4005)   // 'identifier' : macro redefinition
-  #pragma warning(disable:4291)   // no matching operator delete found
-  #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
   #pragma warning(disable:4312)	  // 'variable' : conversion from 'type' to 'type' of greater size
-  #pragma warning(disable:4355)   // 'this' : used in base member initializer list
   #pragma warning(disable:4390)   // Empty control statement
   #pragma warning(disable:4505)   // 'function' : unreferenced local function has been removed
-  #pragma warning(disable:4512)   // Could not generate assignment operator
-  #pragma warning(disable:4514)   // Removal of unreferenced inline function
-  #pragma warning(disable:4514)   // Removed unreferenced inlines. Only MSVC 6 relevant.
   #pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
-  #pragma warning(disable:4701)	  // local variable 'name' may be used without having been initialized
   #pragma warning(disable:4702)   // Unreachable Code
   #pragma warning(disable:4706)   // Assignment in conditional expression
   #pragma warning(disable:4710)   // function not inlined
@@ -172,29 +159,6 @@
 #undef min
 #undef max
 #undef DeleteFile
-
-// These don't exist on some older SDKs
-#ifndef _WIN64
-  #ifndef SetWindowLongPtrA
-    #define SetWindowLongPtrA SetWindowLongA
-  #endif
-  #ifndef SetWindowLongPtrW
-    #define SetWindowLongPtrW SetWindowLongW
-  #endif
-  #ifndef SetWindowLongPtr
-    #define SetWindowLongPtr SetWindowLongA
-  #endif
-  
-  #ifndef GetWindowLongPtrA
-    #define GetWindowLongPtrA GetWindowLongA
-  #endif
-  #ifndef GetWindowLongPtrW
-    #define GetWindowLongPtrW GetWindowLongW
-  #endif
-  #ifndef GetWindowLongPtr
-    #define GetWindowLongPtr GetWindowLongA
-  #endif
-#endif
 
 /*
   LONG_PTR is used in the Win32 canvases, but it's only defined in newer 

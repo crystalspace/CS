@@ -99,7 +99,7 @@ void Simple::SetupFrame ()
 
 
   // Take small steps.
-  const float maxStep = .01;
+  const float maxStep = 0.01f;
   float ta = 0;
   float tb = speed;
   while (ta < speed)
@@ -415,8 +415,8 @@ bool Simple::Initialize ()
   const csMatrix3 tmm;
   const csVector3 tvv (0);
   csOrthoTransform tt (tmm, tvv);
-  csVector3 size (.4, .8, .4); // This should be the same size as the mesh.
-  avatarbody->AttachColliderBox (size, tt, 10, 1, .8);
+  csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh.
+  avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
   //avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, .8);
 
   return true;
@@ -441,8 +441,8 @@ iRigidBody* Simple::CreateBox (void)
   const csMatrix3 tm;
   const csVector3 tv (0);
   csOrthoTransform t (tm, tv);
-  csVector3 size (.4, .8, .4); // This should be the same size as the mesh.
-  rb->AttachColliderBox (size, t, 10, 1, .8);
+  csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh.
+  rb->AttachColliderBox (size, t, 10, 1, 0.8f);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
@@ -479,7 +479,7 @@ iRigidBody* Simple::CreateSphere (void)
   rb->AttachMesh (mesh);
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .8);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, 0.8f);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));

@@ -1514,13 +1514,13 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "db_boxsize1"))
   {
     float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
-    csCommandProcessor::change_float (arg, &size, "box1 size", 0.01, 1000);
+    csCommandProcessor::change_float (arg, &size, "box1 size", 0.01f, 1000);
     Sys->debug_box1.SetSize (csVector3 (size, size, size));
   }
   else if (!strcasecmp (cmd, "db_boxsize2"))
   {
     float size = Sys->debug_box2.MaxX ()-Sys->debug_box2.MinX ();
-    csCommandProcessor::change_float (arg, &size, "box2 size", 0.01, 1000);
+    csCommandProcessor::change_float (arg, &size, "box2 size", 0.01f, 1000);
     Sys->debug_box2.SetSize (csVector3 (size, size, size));
   }
   else if (!strcasecmp (cmd, "db_frustum"))
@@ -1661,7 +1661,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->do_fs_inter = !Sys->do_fs_inter;
     if (Sys->do_fs_inter)
     {
-      Sys->fs_inter_amount = .3;
+      Sys->fs_inter_amount = 0.3f;
       Sys->fs_inter_length = 30;
       Sys->fs_inter_anim = 0;
       if (arg)
@@ -1777,49 +1777,49 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "strafe_left"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_left (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_left (0.1f, false, false); }
     else Sys->strafe (-1*f,0);
   }
   else if (!strcasecmp (cmd, "strafe_right"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_right (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_right (0.1f, false, false); }
     else Sys->strafe (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_forward"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_forward (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_forward (0.1f, false, false); }
     else Sys->step (1*f,0);
   }
   else if (!strcasecmp (cmd, "step_backward"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_backward (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_backward (0.1f, false, false); }
     else Sys->step (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_left"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (0.1f, false, false); }
     else Sys->rotate (-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_right"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (0.1f, false, false); }
     else Sys->rotate (1*f,0);
   }
   else if (!strcasecmp (cmd, "look_up"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (0.1f, false, false); }
     else Sys->look (-1*f,0);
   }
   else if (!strcasecmp (cmd, "look_down"))
   {
     float f = safe_atof (arg);
-    if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (.1, false, false); }
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (0.1f, false, false); }
     else Sys->look (1*f,0);
   }
   else if (!strcasecmp (cmd, "jump"))
@@ -1830,72 +1830,72 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "i_forward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_forward (.1, (bool)slow, (bool)fast);
+    Sys->imm_forward (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_backward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_backward (.1, (bool)slow, (bool)fast);
+    Sys->imm_backward (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_left"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_left (.1, (bool)slow, (bool)fast);
+    Sys->imm_left (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_right"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_right (.1, (bool)slow, (bool)fast);
+    Sys->imm_right (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_up"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_up (.1, (bool)slow, (bool)fast);
+    Sys->imm_up (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_down"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_down (.1, (bool)slow, (bool)fast);
+    Sys->imm_down (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_camera (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_camera (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_world (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_world (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_camera (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_camera (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_world (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_world (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_xaxis (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_xaxis (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotleftz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_zaxis (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_zaxis (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_xaxis (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_xaxis (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "i_rotrightz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_zaxis (.1, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_zaxis (0.1f, (bool)slow, (bool)fast);
   }
   else if (!strcasecmp (cmd, "fire"))
   {
@@ -1953,7 +1953,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_snow (iSector* sector, char* txtname,
     	int num, float speed);
-    if (cnt <= 2) speed = .3;
+    if (cnt <= 2) speed = 0.3f;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "snow");
     add_particles_snow (Sys->view->GetCamera ()->GetSector (),

@@ -245,7 +245,9 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   scrollbar->SetProperty ("Min", &min);
 
   // Setup trigger
-  sink = new awsSink (this);
+  awsSink* _sink = new awsSink ();
+  _sink->SetParm (this);
+  sink = _sink;
 
   sink->RegisterTrigger ("ScrollChanged", &ScrollChanged);
 
