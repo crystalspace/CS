@@ -463,26 +463,26 @@ printf ("dist:%g\n", dist);
 
   // For every edge of the original triangle we calculate a plane
   // that is orthogonal to the plane of the triangle itself.
-  csDPlane p0, p1, p2;
-  csDMath3::CalcNormal (p0.norm,
+  csDPlane plane0, plane1, plane2;
+  csDMath3::CalcNormal (plane0.norm,
 	vectors[nonshared2], vectors[sharedvertices[0]],
 	vectors[nonshared2]+plane->norm);
-  p0.DD = -p0.norm * vectors[nonshared2];
-  csDMath3::CalcNormal (p1.norm,
+  plane0.DD = -plane0.norm * vectors[nonshared2];
+  csDMath3::CalcNormal (plane1.norm,
 	vectors[sharedvertices[1]], vectors[nonshared2],
 	vectors[sharedvertices[1]]+plane->norm);
-  p1.DD = -p1.norm * vectors[sharedvertices[1]];
-  csDMath3::CalcNormal (p2.norm,
+  plane1.DD = -plane1.norm * vectors[sharedvertices[1]];
+  csDMath3::CalcNormal (plane2.norm,
 	vectors[sharedvertices[0]], vectors[sharedvertices[1]],
 	vectors[sharedvertices[0]]+plane->norm);
-  p2.DD = -p2.norm * vectors[sharedvertices[0]];
+  plane2.DD = -plane2.norm * vectors[sharedvertices[0]];
 
   // Now classify the nonshared vertex to these three planes. Classification
   // will basically return >0 if vertex is on positive side of plane and
   // <0 otherwise.
-  double class0 = p0.Classify (vectors[nonshared]);
-  double class1 = p1.Classify (vectors[nonshared]);
-  double class2 = p2.Classify (vectors[nonshared]);
+  double class0 = plane0.Classify (vectors[nonshared]);
+  double class1 = plane1.Classify (vectors[nonshared]);
+  double class2 = plane2.Classify (vectors[nonshared]);
   int class_sign0 = class0 < 0 ? -1 : 1;
   int class_sign1 = class1 < 0 ? -1 : 1;
   int class_sign2 = class2 < 0 ? -1 : 1;
