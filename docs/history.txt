@@ -47,9 +47,62 @@ The history order is reversed so that new features are at the top.
 	      Don't forget to include "isys/plugin.h" and "iutil/objreg.h".
 	    - Fixed all apps and plugins in CS that I could compile. Also
 	      tried to fix the others but no guarantees.
+	- Philip Wyett Updated winlibs version num and links. Should have
+	  done this at the time, sorry my bad.
+	- Philip changed features.txi to add "(32 bit)" to where spec'ed for
+	  Windows as to avoid people thinking CS will run on 16 bit version
+	  of Windows.
+	- Philip also updated the LUA plugin for Jorrit's changes.
+	- Philip fixed redefinition of a function parameter in system.cpp.
+	- Norman Kramer fixed linex2d canvas plugin for Jorrit's changes.
 	- Eric Sunshine repaired several `overfull hbox' and `underfull hbox'
 	  warnings reported by TeX for the Texinfo documentation.
+21-Jul-2001
+	- Justin Miller added extended instructions for setting up external
+	  projects.
+	- Justin also fixed levload.txi because Static reg. hint is no longer
+	  needed.
+	- Wouter Wijngaards adjusted the cosinusfactor of the wooden floors
+	  and ceilings in the partsys level. Wood is grainy, and reflects the
+	  light from more directions, than say, hard plastic. Thus a higher
+	  cosinusfactor is in order, and looks nicer.
+	- Wouter also adjusted lighting in the partsys level so that lights
+	  no longer shine on exits of neighboring rooms. This looks bad, so
+	  I reduced the radius.
 20-Jul-2001
+	- Michael Voasse did the following:
+	    - pttex.cpp: Bug hunting. if EngineProcTex::Animate(),
+	      changed reference to csSector to iSector. Squashes bug
+	      in bot cam. Changed reference from csMeshFactoryWrapper
+	      to iMeshFactoryWrapper. This squashes a crasher that was
+	      occuring in 16bpp software renderer. Also corrected
+	      reporting about speed of the metaballs, and switched on
+	      the lighting for the metaballs so the texture can be seen.
+	      Note: After a little experimentation, it seems to me the
+	      CS_TEXTURE_PROC_ALONE_HINT flags dont seem to be
+	      necessary. I have not removed them, but if needed, they
+	      could possibly be removed. Further testing on other
+	      platforms would be required.
+	    - ptlab.cfg: Decrease the size of the metaballs and the
+	      window size. Makes the metaballs clearly visible and
+	      the window decrease is to allow the console messages
+	      to be seen during initialization (and to be considerate
+	      to those few individuals that are still on 640x480 res).
+	      Knocked the iso_level down ( increases size slightly,
+	      but also gives a more 'blobbier' effect ;), and
+	      icreased the speed slightly.
+	    - sproctex.cpp (simplept tutorial): Added
+	      CS_TEXTURE_PROC_ALONE_HINT flag the the
+	      procedural texture. This stops it from crashing
+	      in 3d software mode. *WARNING* If this causes
+	      simplept to crash under other renderers (eg, opengl)
+	      then please let me know, and I willrevert this patch
+	      and look closer at the problem. AFAIK the procedural
+	      texture in this case is truly alone, so the hint is
+	      probably valid in this instance.
+	- Philip Wyett added csfgen to VC++ global build process.
+	  Fixed error i.e. csfgen's lack of a csSystemDriver pointer.
+	- Philip also added libttf (FreeType) linker flag.
 	- Added iMeshWrapper::Draw() so that it is now possible to draw
 	  mesh wrappers on your own. This can be useful if you want to display
 	  an object in a CSWS window for example. Normally applications
@@ -113,6 +166,8 @@ The history order is reversed so that new features are at the top.
 	  This is a fairly dangerous modification and I could only test
 	  the MingW port (which means the ddraw and OpenGLwin canvases).
 	  Please let me know if there are problems.
+	- Martin Geisse fixed several compilation errors in some of the
+	  apps related to the above change.
 19-Jul-2001
 	- Added iMeshList and iMeshFactoryList. Added iEngine::GetMeshes()
 	  and GetMeshFactories() and removed several mesh/mesh factory
