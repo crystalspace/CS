@@ -535,6 +535,12 @@ void csGenmeshMeshObject::SetupObject ()
     sv->SetAccessor (&factory->shaderVarAccessor);*/
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (&scfiShaderVariableAccessor);
+
+    for(int i=0;i<factory->GetAnonymousNames().Length();i++)
+    {
+      sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
+      sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    }
 #endif // CS_USE_NEW_RENDERER
   }
 }
@@ -1252,6 +1258,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   index_buffer = 0;
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -1259,9 +1267,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
     (color_name == csInvalidStringID) ||
     (index_name == csInvalidStringID))
   {
-    csRef<iStringSet> strings =
-      CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-      "crystalspace.shared.stringset", iStringSet);
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     normal_name = strings->Request ("normals");
@@ -2028,6 +2033,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
   csRenderBufferComponentType component_type, int component_size)
 {
 #ifdef CS_USE_NEW_RENDERER
+  anon_buffer_names.Push (strings->Request(name));
   return anon_buffers.AddRenderBuffer (name, component_type,
     component_size, num_mesh_vertices);
 #else

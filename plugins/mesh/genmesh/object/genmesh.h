@@ -438,6 +438,7 @@ private:
   bool autonormals;
 
   csRef<iGraphics3D> g3d;
+  csRef<iStringSet> strings;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -446,6 +447,7 @@ private:
   csRef<iRenderBuffer> index_buffer;
   
   csAnonRenderBufferManager anon_buffers;
+  csArray<csStringID> anon_buffer_names;
 #endif
 
   csVector3 radius;
@@ -538,6 +540,13 @@ public:
   	int component, int value);
   bool SetRenderBuffer (const char *name, float *value);
   bool SetRenderBuffer (const char *name, int *value);
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Get the string ID's for the anonymous buffers
+   */
+  const csArray<csStringID> &GetAnonymousNames ()
+  { return anon_buffer_names; }
+#endif
 
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
