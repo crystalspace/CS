@@ -130,14 +130,15 @@ struct csCoreRenderMesh
   /// Holder of default render buffers
   csRef<csRenderBufferHolder> buffers;
 
-  /// Start of the range of indices to use
+  /** @{ */
+  /**
+   * Start and end of the range of indices to use. The indices are
+   * used in the range from \a indexstart (inclusive) to \a indexend
+   * (exclusive): indexstart <= n < indexend
+   */
   unsigned int indexstart;
-
-  /// End of the range of indices to use. Actually the
-  /// indices are used in the range from \a indexstart to \a indexend,
-  /// but not including the latter, i.e. a range of 0 to 24 will
-  /// get the indices from 0 to 23 used.
   unsigned int indexend;
+  /** @} */
 
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
@@ -145,9 +146,9 @@ struct csCoreRenderMesh
   /// Camera transform
   csOrthoTransform *camera_transform;
 
-  /// Material used for this mesh
   //iMaterialHandle* mathandle;
   // @@@ FIXME: SW needs it
+  /// Material used for this mesh
   iMaterialWrapper* material;
 };
 
