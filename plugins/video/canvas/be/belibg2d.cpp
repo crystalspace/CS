@@ -58,7 +58,7 @@ bool csGraphics2DBeLib::Initialize (iSystem* p)
   bool ok = superclass::Initialize(p);
   if (ok)
   {
-    System->Print (MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
+    System->Printf(MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
     be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
     if (be_system != 0)
     {
