@@ -134,7 +134,9 @@ private:
   /**
    * Clipping related stuff.
    */
-  bool prefer_stencil;		// If true stencil clipping is prefered.
+
+  // If number of triangles>this value we use stencil instead of plane clipping.
+  int stencil_thresshold;
   bool broken_stencil;		// Stencil clipping is broken and avoided.
   bool do_near_plane;
   csPlane3 near_plane;
@@ -208,7 +210,8 @@ private:
     bool add_near_clip, 
     bool add_z_clip);
 
-  void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
+  void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane,
+  	int tri_count);
 
   void ApplyObjectToCamera ();
   void SetupProjection ();

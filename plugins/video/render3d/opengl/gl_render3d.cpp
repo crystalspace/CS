@@ -117,7 +117,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   current_shadow_state = 0;
 
   use_hw_render_buffers = false;
-  prefer_stencil = true;
+  stencil_thresshold = 500;
   broken_stencil = false;
 
   int i;
@@ -519,7 +519,8 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
 
 void csGLGraphics3D::SetupClipper (int clip_portal,
                                  int clip_plane,
-                                 int clip_z_plane)
+                                 int clip_z_plane,
+				 int tri_count)
 {
   if (cache_clip_portal == clip_portal &&
       cache_clip_plane == clip_plane &&
@@ -552,6 +553,10 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   bool do_plane_clipping = (do_near_plane && clip_plane != CS_CLIP_NOT);
   bool do_z_plane_clipping = (clip_z_plane != CS_CLIP_NOT);
 
+  bool m_prefer_stencil;
+  if (tri_count > stencil_thresshold) m_prefer_stencil = true;
+  else m_prefer_stencil = false;
+
   // First we see how many additional planes we might need because of
   // z-plane clipping and/or near-plane clipping. These additional planes
   // will not be usable for portal clipping (if we're using OpenGL plane
@@ -561,7 +566,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   if (clip_portal != CS_CLIP_NOT && cliptype != CS_CLIPPER_OPTIONAL)
   {
     // Some clipping may be required.
-    if (prefer_stencil)
+    if (m_prefer_stencil)
       clip_with_stencil = true;
     else if (clipper->GetVertexCount () > 6-reserved_planes)
     {
@@ -795,27 +800,19 @@ bool csGLGraphics3D::Open ()
     else
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
 
-  prefer_stencil = true;
-  if (config->GetBool ("Video.OpenGL.PreferClipPlane", false))
-  {
-    prefer_stencil = false;
-  }
+  stencil_thresshold = config->GetInt ("Video.OpenGL.StencilThresshold", 500);
   broken_stencil = false;
   if (config->GetBool ("Video.OpenGL.BrokenStencil", false))
   {
     broken_stencil = true;
-    prefer_stencil = false;
+    stencil_thresshold = 1000000000;
   }
   if (verbose)
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else
     {
-      if (prefer_stencil)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is prefered.");
-      else
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Hardware plane clipping is prefered.");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is used for objects >= %d triangles.", stencil_thresshold);
     }
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
@@ -1611,9 +1608,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
   SetupProjection ();
 
   SetupClipPortals ();
+  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
-                mymesh->clip_z_plane);
+                mymesh->clip_z_plane,
+		num_tri);
 
   SetObjectToCameraInternal (mymesh->object2camera);
   
@@ -1744,7 +1743,6 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
 
     if (bugplug)
     {
-      int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
       bugplug->AddCounter ("Triangle Count", num_tri);
       bugplug->AddCounter ("Mesh Count", 1);
     }

@@ -29,6 +29,13 @@ chronological order.
 	- Jorrit optimized the NR GL renderer by only setting up the stencil
 	  clipper if the clipper is not optional. That seems to help a
 	  great deal already.
+	- Jorrit removed the Video.OpenGL.PreferClipPlane setting. Instead
+	  there is now a Video.OpenGL.StencilThresshold setting. This is
+	  the number of triangles for a single object after which the
+	  NR GL renderer will use stencil clipping instead of plane
+	  clipping. By default this is set to 500. With this optimization
+	  I managed to improve performance in walktest flarge from 87
+	  to 209 fps! (for new renderer).
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by
