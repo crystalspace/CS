@@ -1,6 +1,5 @@
 /*
-
-    Virtual Shell: a test program for Virtual File System library
+    A test program for Crystal Space canvas plugins.
     Copyright (C) 1999 Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
