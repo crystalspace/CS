@@ -1,5 +1,8 @@
 SubDir TOP apps isotest ;
 
+if [ Property build : newrenderer ] || [ Property build : projgen ]
+{
 Description isotest : "isotest demo executable" ;
 Application isotest : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith isotest : csgeom csgfx cstool csutil ;
+}

@@ -10,17 +10,19 @@ chronological order.
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
 	- res made the following changes:
-	    - Some places in GL where the COMBINE texenv mode was used also 
+	    - Some places in GL where the COMBINE texenv mode was used also
 	      check for the presence of the COMBINE ext (and not only the
 	      multitexturing ext.)
 	    - For Cg FPs, you can now also bind render buffers to a texture
 	      coordinates by specifying "texture coordinate <Texture parameter
 	      name>" as the destination.
 	    - Augmented the Cg plugin with a facility to dump out debug info of
-	      the used programs. Can be enabled by enabling the 
+	      the used programs. Can be enabled by enabling the
 	      "Video.OpenGL.Shader.Cg.DebugDump" config setting.
-	- res disabled static lighting for the mesh in waterdemo, added a 
+	- res disabled static lighting for the mesh in waterdemo, added a
 	  missing FinishDraw() call and made some code cleanups.
+	- Eric Sunshine fixed the Jamfile modfications by Jorrit so that they
+	  work correctly with msvcgen project generation.
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.
@@ -30,20 +32,21 @@ chronological order.
 	    - Changed bugplug to also clear the Z buffer when frame buffer
 	      clearing is enabled.
 	    - Made csSectorIt in the engine pooled.
-	    - Throughout the GL canvas and renderer(s) (primarily NR, with 
+	    - Throughout the GL canvas and renderer(s) (primarily NR, with
 	      some necessary OR fixes), changes were made to reduce the state
-	      switches needed. 
+	      switches needed.
 	    - The pixel write mask and vertex data array client states are now
 	      cached by the GL state cache.
-	    - The GL NR clipper now also sets a 2D clipping rect (effectively 
+	    - The GL NR clipper now also sets a 2D clipping rect (effectively
 	      a scissor rect) when using stencil clipping.
 	    - Setting the "stencil threshold" to -1 essentially means "always
 	      prefer plane clipping".
 	    - Changed the OR to use the GL extension manager, too (instead of
 	      the "custom" ext management).
-	- Rhad fixed the NV specific vertex program paths for the Cg shader plugin.
+	- Rhad fixed the NV specific vertex program paths for the Cg shader
+	  plugin.
 	- Neil Mosafi added some more dynamics code to csvosa3dl plugin, and
-	  the iVosObject3D interface now exposes it's collider to the user
+	  the iVosObject3D interface now exposes it's collider to the user.
 4-Jun-2004
         - Andrew Craig removed misplaced return in sprcal3d as reported by
           Ingie from the mailing list.
@@ -68,7 +71,7 @@ chronological order.
 	  does 'new' if needed.
 	- Neil Mosafi added support for a3dl:sphere to the csvosa3dl plugin.
 	  Neil Mosafi added support for a3dl:cylinder to the csvosa3dl plugin.
-	  It will now automatically load these objects into the engine
+	  It will now automatically load these objects into the engine.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.
@@ -103,9 +106,9 @@ chronological order.
 	- Eric Sunshine fixed msvcgen/workspaces.jam so that librenderercommon
 	  appears only in wkstypical, and librender3dcommon appears only in
 	  wksnewrenderer.
-        - Andrew Craig uncommented out the lock variable for sprcal3d 
-          animations. It was preventing animations from "locking" on the 
-          last frame. 
+        - Andrew Craig uncommented out the lock variable for sprcal3d
+          animations. It was preventing animations from "locking" on the
+          last frame.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where
@@ -274,15 +277,15 @@ chronological order.
 	- Eric Sunshine added an example to the jamtemplate-synthesized
 	  Jamfile.in which shows how to set additional compiler and linker
 	  options for msvcgen.
-	- res fixed the moving light in terrain. Due the Y offset it would 
+	- res fixed the moving light in terrain. Due the Y offset it would
 	  move higher and, until eventually the terrain was considered "out of
 	  influence radius" for the light, causing the diffuse pass not to be
 	  drawn.
-	- res augmented the syntax services to also recognize the <zequal /> 
+	- res augmented the syntax services to also recognize the <zequal />
 	  zmode.
-	- res added edge drawing support (not really all edges, but close 
+	- res added edge drawing support (not really all edges, but close
 	  enough) to the GL NR plugin.
-	- res changed terrainf to use the zequal mode for the splatting 
+	- res changed terrainf to use the zequal mode for the splatting
 	  passes. This reduces the visibility of the seams.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
@@ -325,7 +328,7 @@ chronological order.
 	  was initialized with 256,256,256. However csRGBpixel can only hold
 	  unsigned char and 256 wraps to 0 then. This could cause performance
 	  degradation.
-	- Anders added a color buffer to bruteblock, currently just initialized 
+	- Anders added a color buffer to bruteblock, currently just initialized
 	  with (0.5, 0.5, 0.5) to avoid overbright terrain.
 	- res optimized the GL text writer. It now does less state changes and
 	  draws text with background more efficiently (via some GL blend mode
@@ -376,17 +379,17 @@ chronological order.
 	  in csEngine::GetEngineSequenceManager().  Reported by David
 	  Hendrickson <onyxkana@hotmail.com>.
 22-May-2004
-	- res changed CS_EMIT_BUILD_RESULT to CS_EMIT_BUILD_PROPERTY in the 
+	- res changed CS_EMIT_BUILD_RESULT to CS_EMIT_BUILD_PROPERTY in the
 	  ODE 'extern "C"' test to fix the build property emission.
 21-May-2004
-	- res added some cleanup code to NR halo drawing to fix the problem 
+	- res added some cleanup code to NR halo drawing to fix the problem
 	  with the disappearing HUD (or, more general, stuff not being drawn).
 	- res removed the support for "normalized texture coordinates" from
 	  chunklod. (The unnormalized TCs where scaled to [0..1] in the shaders
 	  anyway).
 	- res fixed the texture coord generation in simpleformer.
 20-May-2004
-	- res updated map2cs to not write <camera /> into the sky render 
+	- res updated map2cs to not write <camera /> into the sky render
 	  priority.
 	- res re-added the ability to map2cs to have a sky without having to
 	  explicitly mark faces as sky portals. Can be avoided by setting the
@@ -395,7 +398,7 @@ chronological order.
 19-May-2004
 	- res fixed the VBO render buffer to bind a 0 buffer after buffer
 	  creation and releasing.
-	- res augmented the glwin32 canvas to support an extension 
+	- res augmented the glwin32 canvas to support an extension
 	  "setglcontext" which allows it to set it's GL context as the current
 	  (useful if CS is used alongside other GL stuff).
 	- res augmented the glx canvas with "setglcontext" support.
@@ -486,11 +489,11 @@ chronological order.
 	    - Augmented msvcgen.pl to remove duplicate supplied dependencies.
 	    - Sanitized the VC7 library template. Some experimental dynamic lib
   	      related stuff crept in.
-	    - Fixed a problem in jamtemplate's template7/ws.tpl that prevented 
+	    - Fixed a problem in jamtemplate's template7/ws.tpl that prevented
 	      the Release build config from being useable.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
-        - Andrew Craig enhanced viewmesh by letting the user select a mesh 
+        - Andrew Craig enhanced viewmesh by letting the user select a mesh
           file to load when using a socket on a model.
 	- Jorrit extended iKeyValuePair so that you can now attach multiple
 	  values (by name) to a key value pair. GetValue()/SetValue() are
@@ -500,8 +503,8 @@ chronological order.
 	  release.
 	- Steven Geens made the HitBeam methods of sprcal3d faster.
 	  They require the newest cal3d cvs.
-        - Andrew Craig updated viewmesh again.  You can now specify 
-          hardtransform rotations (via dialog box) to use when attaching 
+        - Andrew Craig updated viewmesh again.  You can now specify
+          hardtransform rotations (via dialog box) to use when attaching
           a mesh to a socket.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
@@ -536,7 +539,7 @@ chronological order.
 	      appropriate abstraction of importing config.h or config-msvc.h,
 	      depending upon the build circumstances.
 	- res added a declaration of iBase to weakref.h.
-	- res added a sanity check for the sector in the NR part in 
+	- res added a sanity check for the sector in the NR part in
 	  csEngine::Draw().
 	- res changed a few header files that incorrectly had a GPL
 	  boilerplate rather than LGPL.
@@ -571,7 +574,7 @@ chronological order.
 	  again.
 	- res fixed the partgen Jamfile to also contain a LibDepends statement.
 	- res changed the way the texture coordinates are used in the terrain
-	  plugins. chunklod now behaves like before Anders' recent terrain 
+	  plugins. chunklod now behaves like before Anders' recent terrain
 	  changes, bruteblock is unfortunately not 100% compatible to this yet.
 	- Jorrit added constructor and = operator to csWeakRef for assigning
 	  csPtr directly. It is very common to do the following:
@@ -638,12 +641,12 @@ chronological order.
 	  It must work like that since it is illegal to call
 	  DestroyApplication() from the application class destructor (the
 	  csRef's are not cleared yet at that point)
-	- Steven Geens removed the include to iutil/fontserv.h from 
+	- Steven Geens removed the include to iutil/fontserv.h from
 	  include/cstool/initapp.h.
 	- res reverted Jorrit's reversion of the Free() removal. Added a note
 	  to the source explaining why calling DestroyApplication() in the
 	  csApplicationFramework destructor is legal.
-	- res fixed include/cstool/initapp.h to correctly #include 
+	- res fixed include/cstool/initapp.h to correctly #include
 	  ivideo/fontserv.h.
 	- Vincent Knecht made the following changes to cs.spec:
 	    - Prefixed source file name with URL.
@@ -660,10 +663,10 @@ chronological order.
 	  the _cspace.so module and RPM building where it complained that it
 	  was unable to find "required and provided libraries".  Reported by
 	  Vincent Knecht and Andre Duclos.
-	- res made some minor changes to csApplicationFramework: some 
+	- res made some minor changes to csApplicationFramework: some
 	  nomenclature changes (DisplayError -> ReportError, mp_object_reg ->
 	  object_reg), made object_reg protected, made dtor protected, added
-	  new Free() method (to delete the instance and call 
+	  new Free() method (to delete the instance and call
 	  DestroyApplication() afterwards).
 	- res removed csApplicationFramework::Free(). DestroyApplication() is
 	  now called in the destructor.
@@ -686,8 +689,8 @@ chronological order.
 	    - Added include/ivaria/*.i to the list of devel %files section.
 8-May-2004
 	- res fixed csApplicationFramework to be CS_CSTOOL_EXPORT.
-	- res fixed simpmap to compile again. 
-	- res fixed the compilation of OR renderers after the DrawMesh() 
+	- res fixed simpmap to compile again.
+	- res fixed the compilation of OR renderers after the DrawMesh()
 	  recent change.
 7-May-2004
 	- Jorrit fixed a problem with the terrain loader when parsing
@@ -697,7 +700,7 @@ chronological order.
 	  needed by the preparating steps (e.g. shader pass setup). Now, the
 	  renderer is using a stripped-down version of csRenderMesh only
 	  consisting of render-relevant stuff. Also, the mesh/mix/alpha modes
-	  should be modificable by the preparating steps, so they were moved 
+	  should be modificable by the preparating steps, so they were moved
 	  into a new struct as well. Now, the preparating steps can't modify
 	  the csRenderMesh anymore (passed in as const), but can return mode
 	  data.
@@ -705,8 +708,8 @@ chronological order.
 	- res added "shader technique tags". They allow some finer control over
 	  what techniques validate than the default hardware-capability based
 	  fallback system. For example, you can tag some techniques with a tag
-	  "bumpmap", and later offer an option in the app to disable 
-	  bumpmapping, which would instruct the tag system to reject shaders 
+	  "bumpmap", and later offer an option in the app to disable
+	  bumpmapping, which would instruct the tag system to reject shaders
 	  with a "bumpmap" tag.
 	- res added some multipass techniques for the or_lighting_detail*
 	  shaders.
@@ -741,7 +744,7 @@ chronological order.
 	  perform a thorough audit.)
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
-	- res fixed texture downsampling in the NR GL renderer. It could 
+	- res fixed texture downsampling in the NR GL renderer. It could
 	  happen that a dimension of the image became 0.
 	- Anders did the following changes to terrain in NR
 	    * Made chunklod use terraformer
@@ -812,9 +815,9 @@ chronological order.
 	  to updates and respond when children (obj3d and light are changed.
 	  There is a separate relight thread which regularly checks if things
 	  need relighting.  Added some dynamics support:
-	    - Set up dynamic system 
-	    - Cube to iRigidBody
-	    - Convert PolygonMesh (if static) to iRigidBody
+	    - Set up dynamic system.
+	    - Cube to iRigidBody.
+	    - Convert PolygonMesh (if static) to iRigidBody.
 4-May-2004
 	- Eric Sunshine made the following changes to the build system:
 	    - Added ApplicationIconDefault and ApplicationIcon rules to
@@ -847,7 +850,7 @@ chronological order.
 	  the object in a sector. If the 'meshlib' was not used then the
 	  'meshobj' would remain in the engine without any sector.
 	- res changed the ApplicationIcon Jam rule to set the icon path to
-	  SEARCH_SOURCE if no path was explicitly provided. Without this 
+	  SEARCH_SOURCE if no path was explicitly provided. Without this
 	  change, was apparently not utilized and the icon file not found.
 	- Eric Sunshine applied the same SEARCH_SOURCE fix to the
 	  ApplicationIconDefault rule.
@@ -980,7 +983,7 @@ chronological order.
 	    demosky     --> DEMOSKY_OBSOLETE
 	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE
-	- res added a note about the CS_FX_GOURAUD removal to the API 
+	- res added a note about the CS_FX_GOURAUD removal to the API
 	  modification appendix.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
@@ -1016,8 +1019,8 @@ chronological order.
 	- Jorrit started a new document that explains the inner workings of
 	  the engine.
 	- res changed the sprcal3d plugin to not read from the pointer to the
-	  locked normals render buffer. While this doesn't make a difference 
-	  on drivers that don't have VBO support, it improves performances 
+	  locked normals render buffer. While this doesn't make a difference
+	  on drivers that don't have VBO support, it improves performances
 	  when VBO is available.
 	- Eric Sunshine augmented Jamrules so that it sets the property
 	  "standalone" in the container "build" when the build directory
@@ -1033,11 +1036,11 @@ chronological order.
 	  more idiomatic.
 	- Jorrit worked a bit further on the internal engine document.
 	- res updated the NR software renderer so that simple1 and 2 work.
-	- res replaced CS_FX_GOURAUD with CS_FX_FLAT, which is doing the 
+	- res replaced CS_FX_GOURAUD with CS_FX_FLAT, which is doing the
 	  opposite. Nowadays, gouraud shading is common and flat shading the
 	  exception, so it makes more sense to have the latter explicitly
 	  specified.
-	- res made some smaller changes & workarounds to NR SW. Works with 
+	- res made some smaller changes & workarounds to NR SW. Works with
 	  flarge with the sense of 'work' as in 'does not crash instantly'.
 	- res fixed a missing quoted string termination in csconf.mak.
 29-Apr-2004
@@ -1053,11 +1056,11 @@ chronological order.
 	    - Changed the cs-config generator to not have a harcoded list of
 	      libs or their dependencies, but rather extract this info from
 	      the Library Jam rules.
-	    - Added some new shaders and used them in walktest: 
+	    - Added some new shaders and used them in walktest:
 	      or_lighting_detail_alpha and or_lighting_detail_add, mimicking
 	      some layer effects used by OR; reflect.xml, a simple reflection
-	      shader, now used by the "car" in flarge; an OR lighting 
-	      compatible shader for detail textures. Those are relatively 
+	      shader, now used by the "car" in flarge; an OR lighting
+	      compatible shader for detail textures. Those are relatively
 	      cheap, but give the illusion of a higher res texture. Applied
 	      to the "mosaic" material(s) in flarge.
 	- res "fixed" csconf.mak for the cs-config changes by having it emit
@@ -1098,11 +1101,11 @@ chronological order.
 	  renderstep. In most cases this should probably be specified
 	  for the first step (i.e. ambient).
 	- res replaced the 'inUse' member of csRenderMesh with a frame number
-	  counter. If this counter is equal to the engine's frame count, it 
+	  counter. If this counter is equal to the engine's frame count, it
 	  means the render mesh is still in use. This change removes the need
 	  to set inUse to false (and fixes some bugs where this occasionally
 	  didn't happen).
-	- res changed WT to allow disabling crash dumps via the 
+	- res changed WT to allow disabling crash dumps via the
 	  Walktest.Win32.Minidumps config setting. Also, for non-VC compilers
 	  it's now disabled by default (not much useful there anyway).
 	- res fixed a crash in bindoc when 0 was set as a node value.
@@ -1154,12 +1157,12 @@ chronological order.
 	      - Material palette must be specified BEFORE material map.
 	      - LodDistance must be set before material map too.
 	- Jorrit fixed the terrain level for this change.
-	- res augmented the Jam build system to support ExternalLibs for 
+	- res augmented the Jam build system to support ExternalLibs for
 	  libraries. The required link flags are propagated to clients of the
 	  library. csutil now uses ExternalLibs to express it's dependency on
 	  zlib and pthread. The hardcoded linking of all apps resp. binaries
 	  against zlib and pthread has been removed from Jamrules. Also updated
-	  Jam msvcgen to handle ExternalLibs for libraries. 
+	  Jam msvcgen to handle ExternalLibs for libraries.
 	- Jorrit fixed an initialization error in the NR OpenGL renderer
 	  with current_drawflags.
 	- res fixed an occasional crash in genmesh (happens when multiple maps
@@ -1203,8 +1206,8 @@ chronological order.
 	- Jorrit fixed the NR GetRenderMeshes() for the portal container class
 	  so that it no longer ignores the movable transform. Moving portals
 	  simply didn't work with NR.
-	- Neil Mosafi added forward declare for iGraphics3D to 
-	  ivideo/custcursor.h
+	- Neil Mosafi added forward declare for iGraphics3D to
+	  ivideo/custcursor.h.
 	- Jorrit changed the 'particles' mesh object so that it now also
 	  uses CalculateClipSettings.
 	- Eric Sunshine augmented scripts/python/Jamfile so that it also cleans
@@ -1213,23 +1216,23 @@ chronological order.
 	  of pure Python and pure Perl modules. cspython.mak and csperl.mak now
 	  utilize the results of these checks.
 	- res fixed an issue with proctex flippedness in NR.
-	- res augmented chunklod to also cast shadows. Activated with 
+	- res augmented chunklod to also cast shadows. Activated with
 	  <castshadows> mesh object parameter.
-	- res fixed some coordinate swappage in chunklod, causing it to cast 
+	- res fixed some coordinate swappage in chunklod, causing it to cast
 	  wrong shadows.
-	- res removed the user-defined exception feature from the Win32 
+	- res removed the user-defined exception feature from the Win32
 	  assistant. This can be handled as well (if not better) by the app.
-	- res added some helpers for Win32 to easily create minidumps that 
-	  contain some extra useful info and set up an exception handler 
+	- res added some helpers for Win32 to easily create minidumps that
+	  contain some extra useful info and set up an exception handler
 	  (which creates such minidumps).
 	- res augmented walktest to create such minidumps.
 	- res fixed some gcc warnings & errors in the minidump code.
-	- Luca fixed a bug in the csIntersect3::Plane () method. It was using 
-	  the wrong formula to calculate the x value along the segment 
-	  U + x (V - U): the unknown 'x' value is got by: 
+	- Luca fixed a bug in the csIntersect3::Plane () method. It was using
+	  the wrong formula to calculate the x value along the segment
+	  U + x (V - U): the unknown 'x' value is got by:
 	  x = [(A,B,C) * U + D ] / (A,B,C) * (U - V) and NOT got by
-	  x = [(A,B,C) * U + D ] / (A,B,C) * (V - U). Look to the comments in 
-	  the code for more clarifications. He also set some default values 
+	  x = [(A,B,C) * U + D ] / (A,B,C) * (V - U). Look to the comments in
+	  the code for more clarifications. He also set some default values
 	  (and documented it) for the output arguments.
 	- res changed the walktest Make-/Jamfile to link against zlib (needed
 	  by the minidump code).
@@ -1267,14 +1270,14 @@ chronological order.
 	- res also changed win32.jam to not add /usr/include/directx  as an
 	  include dir to CCFLAGS resp. C++FLAGS, as this directory is already
 	  checked for in the DirectX configure test.
-	- res changed the PLUGIN.LFLAGS value to only include -mwindows. 
-	  (The old line "-mwindows -mconsole" was self-contradicting as it 
+	- res changed the PLUGIN.LFLAGS value to only include -mwindows.
+	  (The old line "-mwindows -mconsole" was self-contradicting as it
 	  first set the "GUI subsystem", then the "console subsystem" flags.)
 	- res fixed the waveout sound driver to convert error descriptions from
 	  the system to UTF-8.
 	- Wouter Wijngaards changed the csfx DrawPartial() to work under the
 	  new renderer, it forgot to flip the y coord.
-	- res fixed a problem in csGLGraphics3D::BeginDraw(). It set  
+	- res fixed a problem in csGLGraphics3D::BeginDraw(). It set
 	  "current drawflags" to the "new drawflags" at the very beginning of
 	  the method, causing the test for whether G2D BeginDraw() should be
 	  called to always fail.
@@ -1339,7 +1342,7 @@ chronological order.
 	      addition to Get().
 	- Neil Mosafi fixed crash in plugins/cursor/cursor.cpp where it was
 	  passing a null char* into strcmp, due to it using the internal
-	  data in an uninitialised csString
+	  data in an uninitialised csString.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
@@ -1515,7 +1518,7 @@ chronological order.
 	  jobber.pl are entirely correct.  Consequently, it can not yet be
 	  placed into production.)
 	- Neil Mosafi added a #include directive to ivideo/custcursor.h because
-	  it was not able to find the definition for csRGBcolor
+	  it was not able to find the definition for csRGBcolor.
 	- Eric Sunshine fixed bug in joywin.mak where it was trying to install
 	  the non-existent data/joywin.zip.
 20-Apr-2004
@@ -3777,11 +3780,11 @@ chronological order.
 	      increased resp. decreased.
 	- Neil Mosafi changed csvosa3dl plugin to listen to children as well
 	  as properties and use child changes to initiate property listening.
-	  This is a more correct way of doing things
+	  This is a more correct way of doing things.
 	- res removed a char too much.
 	- Neil Mosafi changed vospolygonmesh to use iMeshObjectFactory to set
 	  the CS_THING_NOCOMPRESS flag which was previously a flag of
-	  iThingFactoryState
+	  iThingFactoryState.
 	- res removed SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE from the
 	  csImageMemory ctor/dtor. csImageMemory inherits from csImageFile
 	  which already invoked those macros.
@@ -3954,7 +3957,7 @@ chronological order.
 	- Neil Mosafi added support to the csvosa3dl plugin for automatic
 	  listening to movement and orientation changes of a3dl metaobjects
 	  Also fixed orientation which was incorrectly using degress instead
-	  of radians to set the CS angle
+	  of radians to set the CS angle.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().
@@ -4554,7 +4557,7 @@ chronological order.
 	    - Fixed bug in Install1 in install.jam where it was applying
 	      $(INSTALLFLAGS) at the wrong position in the command invocation.
 	- Neil Mosafi added support for "a3dl:model" to the csvosa3dl plugin (a
-	  Sprite3D wrapper)
+	  Sprite3D wrapper).
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
@@ -4564,7 +4567,7 @@ chronological order.
 	  in csString& csString::RTrim ().
 	- Neil Mosafi added Cone and Billboard classes to the csvosa3dl plugin.
 	  This provides support for constructing CS meshwrappers corresponding
-	  to "a3dl:cone" and "a3dl:billboard" metaobjects on a VOS site
+	  to "a3dl:cone" and "a3dl:billboard" metaobjects on a VOS site.
 30-Jan-2004
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.
@@ -5042,7 +5045,7 @@ chronological order.
 	  stencil lighting is used. This still doesn't completely avoid
 	  flickering but it helps considerably.
 	- Neil Mosafi changed the custom cursor plugin to use iReporter instead
-	  of a comment and also to use csHash<> instead of csHashMapReversible
+	  of a comment and also to use csHash<> instead of csHashMapReversible.
 	- Eric Sunshine fixed memory leak in csVosA3DL::GetSector().  It was
 	  assigning a 'new' csVosSector directly to a csRef<>, thus leaking a
 	  reference.
