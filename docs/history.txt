@@ -22,6 +22,12 @@ chronological order.
 	  components of the vertical scrollbar are positioned.
 	- Norman Kraemer changed Frame's Height access from Frame.Height() to 
 	  Frame().Height()
+	- Norman Kraemer had the following to say:
+	    glshader_cg now compiles again, but it certainly won't work.
+	    I adjusted include paths, structure names and method spurs.
+	    Since i added the missing Compile method as a false returning 
+	    dummy method it certainly won't work. I guess there should go
+	    the code from the now defunct Prepare() method.
 13-Jan-2004
 	- Jorrit added a version of Top() to csArray that is not const.
 	- Jorrit multiplied the values in the two glPolygonOffset() calls
