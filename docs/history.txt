@@ -44,6 +44,8 @@ chronological order.
 	  if all other options fail.
 	- Eric Sunshine fixed problem in CS_CHECK_PROG_VERSION() macro in
 	  progver.m4 where it could construct illegal shell variable names.
+	- Marten Svanfeldt fixed a compile error in <csutil/formatter.h> on
+	  MSVC 7.1
 20-Mar-2005
 	- Jorrit changed pvsvis so that the required bounding box is now
 	  optional. PVSCalc will calculate the missing bounding box if needed
