@@ -36,6 +36,13 @@ The history order has been reversed so that new features are at the top.
 	  It will have a 3D preview of the level too.
 	  Current version is just a version of csws3d that is modified
 	  a little.
+	- Andrew Zabolotny implemented a nice engine-in-a-window in the new
+	  levtool application. This is the best try of this kind of
+	  application written until now; the engine is fully integrated
+	  into the windowing system and doesn't look alien.
+	- Andrew also committed some fixes to SGI alpha channel loading
+	  which he received from someone else.
+	- Martin Geisse updated the VC project files.
 23-Aug-2000
 	- Martin Geisse fixed a bug in the console plugin.
 	- Gary Haussmann enabled GL-level backface culling. This makes
