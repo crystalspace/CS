@@ -276,7 +276,7 @@ void csSequenceManager::Clear ()
       // We keep a real ref to the sequence to prevent the
       // sequence deleting itself.
       csRef<csSequence> keepref = (csSequence*)*seq;
-      ((csSequence*)seq)->CleanupSequences ();
+      ((csSequence*)*seq)->CleanupSequences ();
     }
     weakref_alloc.Free (seq);
   }
