@@ -15,6 +15,7 @@ chronological order.
 	  coordinates. Currently not used.
 	- Oktal added the missing code that meant csInputDefinition would not
 	  parse strings of length 1.
+	- Jorrit removed inpnames.* again.
 11-Aug-2004
 	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
 	  bug in the write down order of the other SaverPlugins.
