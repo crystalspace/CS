@@ -2595,12 +2595,15 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     CacheTexture (mesh.mat_handle);
     iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
-    csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-    	txt_handle->GetPrivateObject ();
-    csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
-    texturehandle = cachedata->Handle;
     if (txt_handle)
+    {
+      csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+      txt_handle->GetPrivateObject ();
+      csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
+      texturehandle = cachedata->Handle;
+
       txt_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
+    }
     if (((csMaterialHandle*)mesh.mat_handle)->GetNumTextureLayers () > 0)
       m_multimat = (csMaterialHandle*)mesh.mat_handle;
   }
@@ -2840,11 +2843,16 @@ void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
 {
   csMaterialHandle* mat_handle = (csMaterialHandle*)imat_handle;
   iTextureHandle* txt_handle = mat_handle->GetTexture ();
-  texture_cache->Cache (txt_handle);
+  if (txt_handle)
+    texture_cache->Cache (txt_handle);
   // Also cache all textures used in the texture layers.
   int i;
   for (i = 0 ; i < mat_handle->GetNumTextureLayers () ; i++)
-    texture_cache->Cache (mat_handle->GetTextureLayer (i)->txt_handle);
+  {
+    iTextureHandle* txt_layer_handle = mat_handle->GetTextureLayer (i)->txt_handle;
+    if (txt_layer_handle)
+      texture_cache->Cache (txt_layer_handle);
+  }
 }
 
 void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
