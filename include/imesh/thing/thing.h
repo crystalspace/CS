@@ -34,6 +34,7 @@ struct iCurveTemplate;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
+struct csFog;
 
 /**
  * If CS_THING_VISTREE is set then an octree will be calculated for the
@@ -197,7 +198,7 @@ struct iThingState : public iBase
   /// Has this thing fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled).
-  virtual csFog *GetFog () const = 0;
+  virtual csFog* GetFog () const = 0;
 };
 
 #endif
