@@ -37,6 +37,7 @@ PLUGINS += font/server/csfont
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
 PLUGINS += collide/rapid
+PLUGINS += collide/opcode
 PLUGINS += perfstat
 PLUGINS += bugplug
 PLUGINS += reporter stdrep
