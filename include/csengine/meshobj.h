@@ -297,18 +297,18 @@ protected:
    */
   virtual ~csMeshWrapper ();
 
-  /**
-   * During rendering a child mesh can ask its parent if it should
-   * be rendered or not. This is not very efficient so we should change
-   * this but for now this is our solution. @@@
-   */
-  bool IsChildVisible (iMeshWrapper* child, iRenderView* rview);
-
 public:
   /// Constructor.
   csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj);
   /// Constructor.
   csMeshWrapper (iMeshWrapper* theParent);
+
+  /**
+  * During rendering a child mesh can ask its parent if it should
+  * be rendered or not. This is not very efficient so we should change
+  * this but for now this is our solution. @@@
+  */
+  bool IsChildVisible (iMeshWrapper* child, iRenderView* rview);
 
   /// Set the mesh factory.
   void SetFactory (iMeshFactoryWrapper* factory)
@@ -606,6 +606,11 @@ public:
   float GetScreenBoundingBox (const iCamera *camera, csBox2& sbox,
   	csBox3& cbox);
 
+  csMeshWrapper* GetCsParent () const
+  { 
+    return csParent;
+  }
+
   //--------------------- SCF stuff follows ------------------------------//
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -799,6 +804,10 @@ public:
     virtual bool GetDrawAfterShadow ()
     {
       return scfParent->GetDrawAfterShadow ();
+    }
+    csMeshWrapper* GetCsMeshWrapper () const
+    { 
+      return (csMeshWrapper*)scfParent;
     }
   } scfiMeshWrapper;
   friend struct MeshWrapper;

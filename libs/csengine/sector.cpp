@@ -292,6 +292,9 @@ public:
     if (0==privMeshlist)
       return;
 
+    csMeshWrapper* csParent = 
+      ((csMeshWrapper::MeshWrapper*)mesh)->GetCsMeshWrapper ()->GetCsParent ();
+    if (csParent && !csParent->IsChildVisible (mesh, rview)) return;
     if (!mesh->GetMeshObject ()->DrawTest (rview, mesh->GetMovable ())) return;
 
     int num;
@@ -313,6 +316,11 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   static csSectorVisibleMeshCallback cb;
 
   if (rview == 0) return 0;
+
+  // This is used for csMeshObject::IsChildVisible to determine
+  // when to update its cache. Should be changed to something more
+  // sensible.
+  current_visnr++;
 
   if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
       rview->GetCamera () != cachedCamera )

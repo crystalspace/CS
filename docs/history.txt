@@ -19,6 +19,7 @@ chronological order.
 	  fail.
 	- Jorrit added 'xmlread' to Jamrules for the static compile of
 	  walktest.
+	- Anders Stenberg fixed static LOD in new renderer.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could

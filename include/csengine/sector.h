@@ -115,11 +115,6 @@ private:
   csSet<iMeshWrapper*> portal_meshes;
 
   /**
-   * Visibilty number for last VisTest call
-   */
-  uint32 current_visnr;
-
-  /**
    * The same meshes above but each mesh in their own render priority
    * queue. This is a vector of vectors.
    */
@@ -169,6 +164,11 @@ private:
   virtual ~csSector ();
 
 public:
+  /**
+  * Visibilty number for last VisTest call
+  */
+  uint32 current_visnr;
+
   /**
    * Option variable: render portals?
    * If this variable is false portals are rendered as a solid polygon.
@@ -556,6 +556,10 @@ public:
     virtual void UnregisterPortalMesh (iMeshWrapper* mesh)
     {
       scfParent->UnregisterPortalMesh (mesh);
+    }
+    csSector* GetCsSector ()
+    {
+      return scfParent;
     }
   } scfiSector;
   friend struct eiSector;

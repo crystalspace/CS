@@ -415,6 +415,9 @@ bool csMeshWrapper::IsChildVisible (iMeshWrapper* child, iRenderView* rview)
 
   if (static_lod)
   {
+    uint32 visnr = ((csSector::eiSector*)rview->GetThisSector ())->
+      GetCsSector ()->current_visnr;
+
     // If we have static lod we only draw the children for the right LOD level.
     if (cached_lod_visnr != visnr)
     {
