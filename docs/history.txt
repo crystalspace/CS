@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
+	- Oktal added a forward declaration of iConfigFile to OSXAssistant.h,
+	  fixing an error reported by Reed Hedges.
 28-May-2003
 	- Oktal reorganised the convenience functions in iReporter and
 	  csReporterHelper in reporter.h, for more compatible use of the GCC

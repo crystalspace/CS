@@ -28,6 +28,7 @@
 struct iEventQueue;
 struct iObjectRegistry;
 struct iVirtualClock;
+struct iConfigFile;
 typedef void* OSXDelegateHandle;
 
 SCF_VERSION (iOSXAssistantLocal, 0, 0, 1);
