@@ -29,12 +29,6 @@
 #include "gl_txtmgr.h"
 #include "video/canvas/openglcommon/glextmanager.h"
 
-#if defined(CS_GLU_PATH)
-#include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
-#else
-#include <GL/glu.h>
-#endif
-
 // need definitions of R24(), G24(), and B24()
 #ifndef CS_NORMAL_LIGHT_LEVEL
 #define CS_NORMAL_LIGHT_LEVEL 128

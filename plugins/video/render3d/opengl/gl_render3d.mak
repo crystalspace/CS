@@ -32,12 +32,12 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_PLUGINS),yes)
   GLRENDER3D = $(OUTDLL)/glrender3d$(DLL)
   LIB.GLRENDER3D = $(foreach d,$(DEP.GLRENDER3D),$($d.LIB))
-  LIB.GLRENDER3D.LFLAGS = $(GL.LFLAGS) $(GLU.LFLAGS)
+  LIB.GLRENDER3D.LFLAGS = $(GL.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(GLRENDER3D)
 else
   GLRENDER3D = $(OUT)/$(LIB_PREFIX)glrender3d$(LIB)
   DEP.EXE += $(GLRENDER3D)
-  LIBS.EXE += $(GL.LFLAGS) $(GLU.LFLAGS)
+  LIBS.EXE += $(GL.LFLAGS)
   SCF.STATIC += glrender3d
   TO_INSTALL.STATIC_LIBS += $(GLRENDER3D)
 endif
@@ -64,7 +64,7 @@ DSP.GLRENDER3D.NAME = glrender3d
 DSP.GLRENDER3D.TYPE = plugin
 DSP.GLRENDER3D.RESOURCES = \
   $(wildcard $(SRCDIR)/plugins/video/render3d/opengl/ext/*.inc)
-DSP.GLRENDER3D.LIBS = opengl32 glu32
+DSP.GLRENDER3D.LIBS = opengl32
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -76,7 +76,7 @@ ifeq ($(MAKESECTION),targets)
 glrender3d: $(OUTDIRS) $(GLRENDER3D)
 
 $(OUT.GLRENDER3D)/%$O: $(SRCDIR)/$(DIR.GLRENDER3D)/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) $(GLU.CFLAGS)
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(OUT.GLRENDER3D)/%$O: $(SRCDIR)/plugins/video/render3d/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
@@ -99,7 +99,7 @@ ifdef DO_DEPEND
 dep: $(OUT.GLRENDER3D) $(OUT.GLRENDER3D)/glrender3d.dep
 $(OUT.GLRENDER3D)/glrender3d.dep: $(SRC.GLRENDER3D)
 	$(DO.DEPEND1) \
-	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) $(GLU.CFLAGS) \
+	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) \
 	$(DO.DEPEND2)
 else
 -include $(OUT.GLRENDER3D)/glrender3d.dep
