@@ -634,7 +634,7 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
-                       csShaderVariable* var)
+					    csShaderVariable* var)
 {
   const char *type = node->GetAttributeValue("type");
   if (!type)
@@ -649,10 +649,6 @@ bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
     case XMLTOKEN_FLOAT:
       var->SetType (csShaderVariable::FLOAT);
       var->SetValue (node->GetContentsValueAsFloat ());
-      break;
-    case XMLTOKEN_STRING:
-      var->SetType (csShaderVariable::STRING);
-      var->SetValue (new scfString(node->GetContentsValue ()));
       break;
     case XMLTOKEN_VECTOR2:
       var->SetType (csShaderVariable::VECTOR2);

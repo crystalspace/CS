@@ -168,9 +168,6 @@ private:
  * The static data for a thing.
  */
 class csThingStatic : public iThingFactoryState, public iMeshObjectFactory
-#ifdef CS_USE_NEW_RENDERER
-		      ,public iRenderBufferSource
-#endif
 {
 public:
   csRef<csThingObjectType> thing_type;
@@ -300,21 +297,6 @@ public:
 
   csRefArray<iPolygonRenderer> polyRenderers;
 
-/*  csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
-  csRef<iRenderBuffer> color_buffer;
-  csRef<iRenderBuffer> index_buffer;
-  csRef<iRenderBuffer> tangent_buffer;
-  csRef<iRenderBuffer> binormal_buffer;
-
-  static csStringID vertex_name;
-  static csStringID texel_name;
-  static csStringID normal_name;
-  static csStringID color_name;
-  static csStringID index_name;
-  static csStringID tangent_name;
-  static csStringID binormal_name;*/
   static csStringID texLightmapName;
 #endif
 
@@ -541,8 +523,6 @@ public:
   friend class ObjectModel;
 
 #ifdef CS_USE_NEW_RENDERER
-  iRenderBuffer *GetRenderBuffer (csStringID name);
-
   void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials, uint mixmode);
 #endif

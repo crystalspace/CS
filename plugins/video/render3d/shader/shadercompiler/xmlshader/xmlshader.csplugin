@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xmlshader.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shadercompiler.xmlshader</name>
+        <implementation>csXMLShaderCompiler</implementation>
+        <description>XML-format shader compiler</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

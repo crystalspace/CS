@@ -1,12 +1,13 @@
-
-<shader name="shadowextrude_debug">
-	<technique priority="100">
-		<pass>
-			<mixmode><add /></mixmode>
-			<streammapping stream="shadow vertices" destination="attribute 0" />
-			<streammapping stream="shadow normals" destination="attribute 1" />
-			<vp type="gl_arb_vp" file="/shader/shadowextrude.avp"/>
-			<fp type="gl_fixed_fp">
+<shader type="xmlshader" name="shadowextrude">
+  <technique priority="100">
+    <pass>
+      <mixmode>
+        <add />
+      </mixmode>
+      <buffer name="shadow vertices" destination="attribute 0" />
+      <buffer name="shadow normals" destination="attribute 1" />
+      <vp plugin="glarb" file="/shader/shadowextrude.avp" />
+      <fp plugin="glfixed">
         <fixedfp>
           <layer>
             <colorsource num="0" source="primary color" modifier="color" />
@@ -14,7 +15,6 @@
           </layer>
         </fixedfp>
       </fp>
-		</pass>
-	</technique>
+    </pass>
+  </technique>
 </shader>
-

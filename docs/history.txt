@@ -9,6 +9,7 @@ chronological order.
 15-Dec-2003
         - Matze reworked some jam rules so that subdirs are more robust now.
           This should also fix some msvcgen problems on jam.
+	- Marten commited the merged branch NEW_SHADERSYS back into HEAD
 14-Dec-2003
 	- Eric Sunshine added --with[out]-python and --with[out]-perl options
 	  to configure.ac to allow users to disable these modules if desired.
@@ -45,6 +46,10 @@ chronological order.
 	- Wouter Wijngaards fixed an off-by-one bug in csconin, where if
 	  you pressed the up arrow you would get the line before the previous 
 	  line instead of the previous line.
+	- Marten removed String shadervariabletype.
+	- Marten added accessors to shadervariable system. Currently they
+	  are only implemented for genmesh buffers, but they should be
+	  implemented in all meshtypes.
 13-Dec-2003
 	- Eric Sunshine applied patch from Randall Foreman
           <eidpers@comcast.net>.  csModelConverterASE was accidentally
@@ -81,6 +86,13 @@ chronological order.
 	  instead of trying to coerce the CS makefile system into doing so;
 	  just as cspython utilizes Python's distutils to build the Python
 	  extension module.)
+	- res updated the terrain-related shaders.
+	- res fixed the distorted 2D with the GL NR.
+	- res fixed csLight::SetInfluenceRadius() to work as expected.
+	- res fixed an uninitialized member of csKDTree.
+	- res fixed the uninitialized dynDomain in the ball plugin.
+	- res made the XML shader compiler more verbose in case of errors.
+	- res updated the stencil makefile/Jamfile to link against csgfx.
 11-Dec-2003
 	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an
 	  assert if the input was reactivated by clicking on the far right of
@@ -158,6 +170,10 @@ chronological order.
 	  it was adding these flags to the normal CS build as an accidental and
 	  incorrect side-effect (even when the target did not supply those
 	  libraries).
+09-Dec-2003
+	- Marten fixed stencil shadow renderloop plugin.
+	- Marten fixed so CLOD and ballmesh compiles, not tested yet though.
+	- Marten made isoengine compile.
 8-Dec-2003
 	- Jorrit added a disabled optimization in the OpenGL canvas to Blit().
 	  It is disabled because it makes procedural textures upside down.
@@ -210,6 +226,8 @@ chronological order.
 	  csHash instantiates Iterator and GlobalIterator even though csHash is
 	  a friend of Iterator and GlobalIterator.
 	- Luca fixed a MSVC6 'for(int i=)' scope bug.
+	- res fixed more stuff in the shadersystem. r3dtest works now, tho no 
+	  stencil shadows yet.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003
@@ -220,6 +238,8 @@ chronological order.
 	- jamest commented out the setScale() function in sprcal3d
 	  so plugin would build until setScale() makes it into cal3d
 	  cvs
+	- res did a bunch of changes and fixes to shadersys. He attempted to get 
+	  the r3dtest map functional, but hadn't too much success.
 2-Dec-2003
 	- res enabled VC the warning "class has virtual functions, but
 	  destructor is not virtual". It was enabled in the past, but somehow
@@ -262,6 +282,14 @@ chronological order.
 	  patch also sets the DX cooperative level to DISCL_BACKGROUND when
 	  CS_DEBUG is defined, rather than to DISCL_FOREGROUND.
 	- Eric Sunshine added device/joystick/windows to msvc/required.mak.
+	- res changed the buffer anf texture mapping specification in shader
+	  files for consistency to be like:
+	    <buffer name="vertices" destination="position" />
+	    <texture name="tex diffuse" destination="unit 0" />
+	- res made the 'type' attribute for <fp> and <vp> optional. Defaults
+	  to 'fp' resp 'vp' now.
+	- res updated the Thing plugin.
+	- res made shader pass mixmode and alpha mode working again.
 28-Nov-2003
 	- Daniel Fryer found a bug in the thing mesh plugin when adding
 	  polygon vertices one at a time. The vertex count was not correctly
@@ -285,6 +313,9 @@ chronological order.
 	- Keith Fulton added flags options for rotating cal3d sprites to appear
 	  correctly and to auto-flip the UV coordinates.  See example .cal3d
 	  file for how to use.
+	- res added some NR VC7 projects to csall.
+	- res made lots of changes. Waterdemo now works again.
+	- res fixed missing shader program deactivation.
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared
@@ -353,6 +384,23 @@ chronological order.
 	  <rrforeman@comcast.net>.
 	- Luca fixed a compilation error in cssys/win32.cpp: the error was
 	  a bad casting.
+	- Marten Svanfeldt branched CS with the new branch NEW_SHADERSYS.
+	  The purpose of this branch is to develop the new shadersystem 
+	  without disturbing all other development. Goal is to merge it back
+	  within three weeks. Initial changes to this branch is:
+	    - Move shadermgr into plugins\video\render3d\shader\shadermgr
+	    - Moved the shaderplugins to
+	      plugins\video\render3d\shader\shaderplugins
+	    - Added an initial implementation of csXMLShader and 
+	      csXMLShaderCompiler in
+	      plugin\video\render3d\shader\shadercompiler\
+	      xmlshader. It have all methods but lacks testing.
+	    - Rewrote ivideo/shader/shader.h We should move this file to
+	      ivideo.
+	- res re-added VC7 project files.
+	- res added VC7 project files for the xmlshader plugins.
+	- res fixed xmlshader.mak.
+	- res made various compile and semantic fixes.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
 	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().

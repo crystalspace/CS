@@ -31,6 +31,8 @@
 
 #include "ivideo/rendermesh.h"
 
+#include "csgfx/shadervarcontext.h"
+
 struct iMaterialWrapper;
 struct iImage;
 struct iGraphics3D;
@@ -133,10 +135,10 @@ private:
     csRef<iRenderBuffer> color_buffer;
     csRef<iRenderBuffer> compressed_color_buffer;
     csRef<iRenderBuffer> index_buffer;
-
+    
     int parity;
     int max_levels;
-  
+
     void InitBuffer (const Data &d, int p);
     void AddVertex (const Data &d, int p);
     void EndBuffer (const Data &d, int p);
@@ -144,8 +146,9 @@ private:
     void AddSkirtVertex (const Data& d, const Data& mod);
     void ProcessMap (int l, int i, int j, int k);
     void ProcessEdge (int start, int end, int move, const Data& mod);
-  
+    
   public:
+    csShaderVariableContext dynDomain;
     SCF_DECLARE_IBASE;
   
     MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h, float error);
@@ -162,6 +165,8 @@ private:
     float Error () { return error; }
 
     int Count () { return vertices.Length(); }
+    
+    void UpdateBufferSV ();
   } *root;
 
   void ComputeError (int i, int j, int di, int dj, int n, int w);

@@ -36,6 +36,7 @@
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
 #include "csutil/garray.h"
+#include "csgfx/shadervarcontext.h"
 #include "../../common/basesteptype.h"
 #include "../../common/basesteploader.h"
 #include "../../common/parserenderstep.h"
@@ -92,6 +93,7 @@ private:
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;
+  csShaderVariableContext *dynDomain;
 
   csStencilShadowCacheEntry (csStencilShadowStep* parent, 
     iMeshWrapper* mesh);
@@ -106,6 +108,8 @@ public:
   bool ShadowCaps () { return enable_caps; }
 
   bool MeshCastsShadow () { return meshShadows; }
+
+  void UpdateBuffers() ;
 };
 
 class csStencilShadowStep : public iRenderStep,
@@ -117,6 +121,7 @@ private:
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics3D> g3d;
+  csRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
 
   static csStringID shadow_vertex_name;
@@ -129,7 +134,7 @@ private:
   csHash< csRef<csStencilShadowCacheEntry>, iMeshWrapper*> shadowcache;
 
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
-    iShaderPass *pass);
+    iShader *shader, int pass);
 
   void Report (int severity, const char* msg, ...);
 public:

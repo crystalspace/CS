@@ -1,16 +1,16 @@
-<shader name="splatting_base">
+<shader type="xmlshader" name="splatting_base">
   <technique priority="100">
     <pass>
       <mixmode><copy/></mixmode>
-      <streammapping stream="vertices" destination="attribute 0" />
-      <streammapping stream="normals" destination="attribute 2" />
-      <streammapping stream="texture coordinates" destination="attribute 3" />
-      <vp type="gl_arb_vp" file="/shader/splatting_base.avp"/>
-      <texturemapping unit="0" name="standardtex normalization map" />
-      <texturemapping unit="1" name="standardtex normalization map" />
-      <texturemapping unit="2" name="tex diffuse" />
-      <texturemapping unit="3" name="standardtex normalization map" />
-      <fp type="gl_fixed_fp">
+      <buffer name="vertices" destination="attribute 0" />
+      <buffer name="normals" destination="attribute 2" />
+      <buffer name="texture coordinates" destination="attribute 3" />
+      <vp plugin="glarb" file="/shader/splatting_base.avp"/>
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="standardtex normalization map" />
+      <texture destination="unit 2" name="tex diffuse" />
+      <texture destination="unit 3" name="standardtex normalization map" />
+      <fp plugin="glfixed">
         <fixedfp>
 	  <layer>
 	    <colorsource num="0" source="texture" modifier="color"/>

@@ -41,6 +41,8 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
+#include "csgfx/shadervar.h"
+#include "csgfx/shadervarcontext.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -82,9 +84,11 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
+  csShaderVariableContext* dynDomain;
   csRef<iGraphics3D> g3d;
 
   csReversibleTransform tr_o2c;
+  uint buffers_version;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -236,7 +240,7 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 #ifdef CS_USE_NEW_RENDERER
 
-  iRenderBuffer *GetRenderBuffer (csStringID name);
+  /*iRenderBuffer *GetRenderBuffer (csStringID name);
   //------------------------- iStreamSource implementation ----------------
   class BufferSource : public iRenderBufferSource 
   {
@@ -244,7 +248,7 @@ public:
     iRenderBuffer *GetRenderBuffer (csStringID name)
 	{ return scfParent->GetRenderBuffer (name); }
   } scfiRenderBufferSource;
-  friend class BufferSource;
+  friend class BufferSource;*/
 
 #endif
 
@@ -407,11 +411,9 @@ private:
 #ifndef CS_USE_NEW_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
-#endif
-  iMaterialWrapper* material;
-#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh top_mesh;
 #endif
+  iMaterialWrapper* material;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csVector3* mesh_normals;
@@ -437,13 +439,8 @@ private:
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
-
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
-
+  
   csAnonRenderBufferManager anon_buffers;
-  /*csRefArray<iRenderBuffer> anon_buffers;
-  csDirtyAccessArray<csStringID> anon_names;
-  csDirtyAccessArray<int> anon_size;*/
 #endif
 
   csVector3 radius;
@@ -487,16 +484,15 @@ private:
 #endif
 
 public:
+  static csStringID vertex_name, texel_name, normal_name, color_name, 
+    index_name;
+  uint buffers_version;
+
   iObjectRegistry* object_reg;
   iBase* logparent;
   csGenmeshMeshObjectType* genmesh_type;
 
   iEngine* engine;
-
-  //@@@ Crashes istest and isomap - NEW RENDERER ???
-#ifdef CS_USE_NEW_RENDERER
-  csRef<iMaterialWrapper> shadowmat;
-#endif
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -566,16 +562,6 @@ public:
     SetupFactory ();
     return top_mesh;
   }
-#else
-  iRenderBuffer *GetRenderBuffer (csStringID name);
-  //------------------------- iRenderBufferSource implementation ----------------
-  class BufferSource : public iRenderBufferSource 
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    iRenderBuffer *GetRenderBuffer (csStringID name)
-	{ return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-  friend class BufferSource;
 #endif
 
   //------------------------ iMeshObjectFactory implementation --------------
@@ -724,6 +710,23 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+
+  //------------------ iShaderVariableAccessor implementation ------------
+  class ShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    csGenmeshMeshObjectFactory* parent;
+    ShaderVariableAccessor (csGenmeshMeshObjectFactory* p) : parent(p)
+    {}
+
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      parent->PreGetShaderVariableValue (variable);
+    }
+  } shaderVarAccessor;
+  friend class ShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
 };
 
 /**

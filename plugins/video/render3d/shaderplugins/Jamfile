@@ -1,6 +1,0 @@
-SubDir TOP plugins video render3d shaderplugins ;
-
-SubInclude TOP plugins video render3d shaderplugins glshader_arb ;
-SubInclude TOP plugins video render3d shaderplugins glshader_cg ;
-SubInclude TOP plugins video render3d shaderplugins glshader_fixed ;
-SubInclude TOP plugins video render3d shaderplugins softshader ;

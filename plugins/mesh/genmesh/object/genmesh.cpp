@@ -56,7 +56,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
 #ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
+  //SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
@@ -81,9 +81,9 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
 SCF_IMPLEMENT_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::BufferSource)
+/*SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::BufferSource)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE_END*/
 #endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
@@ -111,7 +111,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+  //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif
   //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -145,8 +145,11 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
 
+  dynDomain = 0;
+
 #ifdef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+  buffers_version = (uint)-1;
 #endif
 }
 
@@ -516,6 +519,21 @@ void csGenmeshMeshObject::SetupObject ()
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
     material_needs_visit = mater->IsVisitRequired ();
+
+    if (dynDomain == 0)
+      dynDomain = new csShaderVariableContext ();
+
+    csShaderVariable* sv;
+    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);
+    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);
+    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);
+    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);
+    sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);
   }
 }
 
@@ -931,10 +949,10 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 }
 
 #ifdef CS_USE_NEW_RENDERER
-iRenderBuffer *csGenmeshMeshObject::GetRenderBuffer (csStringID name)
+/*iRenderBuffer *csGenmeshMeshObject::GetRenderBuffer (csStringID name)
 {
   return factory->GetRenderBuffer (name);
-}
+}*/
 #endif
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
@@ -942,6 +960,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+
 
   // iGraphics3D* g3d = rview->GetGraphics3D ();
 
@@ -971,10 +990,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 
   mesh.indexstart = 0;
   mesh.indexend = factory->GetTriangleCount () * 3;
-  //mesh.mathandle = mater->GetMaterialHandle();
   mesh.material = mater;
-  csRef<iRenderBufferSource> source = SCF_QUERY_INTERFACE (factory, iRenderBufferSource);
-  mesh.buffersource = source;
+  mesh.dynDomain = dynDomain;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;
   n = 1;
@@ -1112,7 +1129,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
     }
   }
 #ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
+  //SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralFactoryState)
 #ifndef CS_USE_NEW_RENDERER
@@ -1121,9 +1138,9 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::BufferSource)
+/*SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::BufferSource)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE_END*/
 #endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::GeneralFactoryState)
@@ -1141,15 +1158,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
+csStringID csGenmeshMeshObjectFactory::vertex_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::texel_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::normal_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::color_name = csInvalidStringID;
+csStringID csGenmeshMeshObjectFactory::index_name = csInvalidStringID;
+
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
       iObjectRegistry* object_reg)
 #ifdef CS_USE_NEW_RENDERER 
-     : anon_buffers(object_reg)
+     : anon_buffers(object_reg), shaderVarAccessor(this)
 #endif
 {
   SCF_CONSTRUCT_IBASE (pParent);
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+  //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -1195,14 +1218,21 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
-  vertex_name = strings->Request ("vertices");
-  texel_name = strings->Request ("texture coordinates");
-  normal_name = strings->Request ("normals");
-  color_name = strings->Request ("colors");
-  index_name = strings->Request ("indices");
+  if ((vertex_name == csInvalidStringID) ||
+    (texel_name == csInvalidStringID) ||
+    (normal_name == csInvalidStringID) ||
+    (color_name == csInvalidStringID) ||
+    (index_name == csInvalidStringID))
+  {
+    csRef<iStringSet> strings = 
+      CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+      "crystalspace.renderer.stringset", iStringSet);
+    vertex_name = strings->Request ("vertices");
+    texel_name = strings->Request ("texture coordinates");
+    normal_name = strings->Request ("normals");
+    color_name = strings->Request ("colors");
+    index_name = strings->Request ("indices");
+  }
 
   autonormals = false;
   mesh_vertices_dirty_flag = false;
@@ -1210,6 +1240,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   mesh_normals_dirty_flag = false;
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
+
+  buffers_version = 0;
 #endif
 
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -1316,10 +1348,106 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 }
 
 #ifdef CS_USE_NEW_RENDERER
+/*
+bool csGenmeshMeshObjectFactory::UpdateRenderBuffers ()
+{
+  bool changed = false;
+  if (mesh_vertices_dirty_flag)
+  {
+    vertex_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC, 
+      CS_BUFCOMP_FLOAT, 3, false);
+    mesh_vertices_dirty_flag = false;
+    csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
+    memcpy (vbuf, mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
+    vertex_buffer->Release ();
+    changed = true;
+  }
+  if (mesh_texels_dirty_flag)
+  {
+    texel_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC, 
+      CS_BUFCOMP_FLOAT, 2, false);
+    mesh_texels_dirty_flag = false;
+    csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    memcpy (tbuf, mesh_texels, sizeof (csVector2) * num_mesh_vertices);
+    texel_buffer->Release ();
+    changed = true;
+  }
+  if (mesh_normals_dirty_flag)
+  {
+    normal_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
+      CS_BUFCOMP_FLOAT, 3, false);
+    mesh_normals_dirty_flag = false;
+    csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
+    memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+    normal_buffer->Release();
+    changed = true;
+  }
+  if (mesh_colors_dirty_flag)
+  {
+    color_buffer = g3d->CreateRenderBuffer (
+      sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
+      CS_BUFCOMP_FLOAT, 3, false);
+    mesh_colors_dirty_flag = false;
+    csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
+    memcpy (cbuf, mesh_colors, sizeof (csColor) * num_mesh_vertices);
+    color_buffer->Release();
+    changed = true;
+  }
+  if (mesh_triangle_dirty_flag)
+  {
+    index_buffer = g3d->CreateRenderBuffer (
+      sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
+      CS_BUFCOMP_UNSIGNED_INT, 1, true);
+    mesh_triangle_dirty_flag = false;
+    unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
+      CS_BUF_LOCK_NORMAL);
+    int i;
+    for (i = 0; i < num_mesh_triangles; i ++) 
+    {
+      ibuf[i * 3 + 0] = mesh_triangles[i].a;
+      ibuf[i * 3 + 1] = mesh_triangles[i].b;
+      ibuf[i * 3 + 2] = mesh_triangles[i].c;
+    }
+    index_buffer->Release ();
+    changed = true;
+  }
+  if (changed) buffers_version++;
+  return changed;
+}
 
 iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
 {
+  UpdateRenderBuffers ();
   if (name == vertex_name)
+  {
+    return vertex_buffer;
+  }
+  if (name == texel_name)
+  {
+    return texel_buffer;
+  }
+  if (name == normal_name)
+  {
+    return normal_buffer;
+  }
+  if (name == color_name)
+  {
+    return color_buffer;
+  }
+  if (name == index_name)
+  {
+    return index_buffer;
+  }
+  return anon_buffers.GetRenderBuffer(name);
+}
+*/
+
+void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* var)
+{
+  if (var->Name == vertex_name)
   {
     if (mesh_vertices_dirty_flag)
     {
@@ -1329,9 +1457,10 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
       mesh_vertices_dirty_flag = false;
       vertex_buffer->CopyToBuffer (mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
     }
-    return vertex_buffer;
+    var->SetValue(vertex_buffer);
+    return;
   }
-  if (name == texel_name)
+  if (var->Name == texel_name)
   {
     if (mesh_texels_dirty_flag)
     {
@@ -1339,13 +1468,12 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
-      csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (tbuf, mesh_texels, sizeof (csVector2) * num_mesh_vertices);
-      texel_buffer->Release ();
+      texel_buffer->CopyToBuffer (mesh_texels, sizeof (csVector2)*num_mesh_vertices);
     }
-    return texel_buffer;
+    var->SetValue(texel_buffer);
+    return;
   }
-  if (name == normal_name)
+  if (var->Name == normal_name)
   {
     if (mesh_normals_dirty_flag)
     {
@@ -1355,9 +1483,10 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
       mesh_normals_dirty_flag = false;
       normal_buffer->CopyToBuffer (mesh_normals, sizeof (csVector3)*num_mesh_vertices);
     }
-    return normal_buffer;
+    var->SetValue(normal_buffer);
+    return;
   }
-  if (name == color_name)
+  if (var->Name == color_name)
   {
     if (mesh_colors_dirty_flag)
     {
@@ -1367,9 +1496,10 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
       mesh_colors_dirty_flag = false;
       color_buffer->CopyToBuffer (mesh_colors, sizeof (csColor) * num_mesh_vertices);
     }
-    return color_buffer;
+    var->SetValue(color_buffer);
+    return;
   }
-  if (name == index_name)
+  if (var->Name == index_name)
   {
     if (mesh_triangle_dirty_flag)
     {
@@ -1388,9 +1518,15 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
       index_buffer->CopyToBuffer (ibuf, sizeof (unsigned int)*num_mesh_triangles*3);
       delete [] ibuf;
     }
-    return index_buffer;
+    var->SetValue(index_buffer);
+    return;
   }
-  return anon_buffers.GetRenderBuffer(name);
+  iRenderBuffer *a = anon_buffers.GetRenderBuffer (var->Name);
+  if (a!=0)
+  {
+    var->SetValue(a);
+    return;
+  }
 }
 
 #endif

@@ -269,8 +269,8 @@ public:
   }
 
   /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-  { svContextHelper.FillVariableList (list); }
+  virtual unsigned int FillVariableList (csShaderVariableProxyList* list) const
+  { return svContextHelper.FillVariableList (list); }
 };
 
 /**

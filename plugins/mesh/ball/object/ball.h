@@ -33,6 +33,7 @@
 #include "igeom/polymesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
+#include "csgfx/shadervarcontext.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -93,7 +94,7 @@ private:
   bool ball_normals_dirty_flag;
   bool ball_colors_dirty_flag;
   bool ball_triangle_dirty_flag;
-
+  csRef<csShaderVariableContext> dynDomain;
   csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 
 #else
@@ -262,6 +263,8 @@ public:
     { return scfParent->GetRenderBuffer (name); }
   } scfiRenderBufferSource;
   friend class BufferSource;
+
+  void UpdateBufferSV();
 #endif
 
   //----------------------- iMeshObject implementation ------------------------

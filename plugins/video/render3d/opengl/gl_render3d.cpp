@@ -140,7 +140,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
     texunit[i] = 0;
     texunitenabled[i] = false;
   }
-  lastUsedShaderpass = 0;
+//  lastUsedShaderpass = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -807,8 +807,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> fogvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex fog"));
+  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex fog")));
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
@@ -881,8 +881,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_CUBEMAP);
 
-  csRef<csShaderVariable> normvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex normalization map"));
+  csRef<csShaderVariable> normvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex normalization map")));
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
 
@@ -914,8 +914,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> attvar = shadermgr->CreateVariable(
-    strings->Request ("standardtex attenuation"));
+  csRef<csShaderVariable> attvar = csPtr<csShaderVariable>( new csShaderVariable(
+    strings->Request ("standardtex attenuation")));
   attvar->SetValue (atttex);
   shadermgr->AddVariable(attvar);
 
@@ -946,16 +946,16 @@ void csGLGraphics3D::Close ()
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
-  if (lastUsedShaderpass)
+/*  if (lastUsedShaderpass)
   {
     lastUsedShaderpass->ResetState ();
     lastUsedShaderpass->Deactivate ();
   }
-
+*/
   SetWriteMask (true, true, true, true);
 
   int i = 0;
-  for (i = 0; i < 16; i++)
+  for (i = 15; i >= 0; i--)
     DeactivateTexture (i);
 
   if (render_target)
@@ -1037,22 +1037,19 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
       ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     }
-    if (ext->CS_GL_ARB_multitexture)
-    {
-      ext->glActiveTextureARB(GL_TEXTURE0_ARB);
-      ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
-    }
     statecache->Disable_GL_ALPHA_TEST ();
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     SetGlOrtho (false);
-    glViewport (1, -1, viewwidth+1, viewheight+1);
+    glViewport (0, 0, viewwidth, viewheight);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
 
     SetZMode (CS_ZBUF_NONE);
+    
+    SetMixMode (CS_FX_COPY);
     return G2D->BeginDraw ();
   }
 
@@ -1606,6 +1603,15 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   SetObjectToCamera (&mymesh->object2camera);
   //SetObjectToCamera (mymesh->transform);
 
+  CS_ASSERT(mymesh->dynDomain);
+  csShaderVariable* indexBufSV = mymesh->dynDomain->GetVariable (string_indices);
+  CS_ASSERT(indexBufSV);
+  iRenderBuffer* iIndexbuf = 0;
+  indexBufSV->GetValue (iIndexbuf);
+  CS_ASSERT(iIndexbuf);
+  csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
+    //(csGLRenderBuffer*)indexBufSV->  source->GetRenderBuffer (string_indices);
+
   GLenum primitivetype;
   switch (mymesh->meshtype)
   {
@@ -1675,11 +1681,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  iRenderBufferSource* source = mymesh->buffersource;
+  /*iRenderBufferSource* source = mymesh->buffersource;
   csGLRenderBuffer* indexbuf =
     (csGLRenderBuffer*)source->GetRenderBuffer (string_indices);
   if (!indexbuf)
-    return;
+    return;*/
 
   //indexbuf->Lock(CS_BUF_LOCK_RENDER);
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);

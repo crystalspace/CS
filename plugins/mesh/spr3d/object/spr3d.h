@@ -49,6 +49,7 @@
 #include "cstool/anonrndbuf.h"
 #include "ivideo/material.h"
 #include "qint.h"
+#include "csgfx/shadervarcontext.h"
 
 struct iObjectRegistry;
 struct iEngine;
@@ -1325,6 +1326,7 @@ private:
   csStringID vertices_name, normals_name,
     texcoords_name, colors_name, indices_name, 
     shadow_verts_name, shadow_norms_name;
+  csShaderVariableContext dynDomain;
 
 #endif // CS_USE_NEW_RENDERER
   csReversibleTransform tr_o2c;

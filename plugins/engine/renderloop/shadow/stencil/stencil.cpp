@@ -79,6 +79,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
   meshWrapper = mesh;
   model = 0;
   closedMesh = 0;
+  dynDomain = new csShaderVariableContext;
 
   csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
   model->AddListener (this);
@@ -88,6 +89,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
   delete closedMesh;
+  delete dynDomain;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -135,65 +137,6 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     csVector4 lightPos4 = entry->meshLightPos;
     lightPos4.w = 0;
 
-/*
-#if _MSC_VER >= 1300 
-    int source_index = entry->edge_start;
-
-    float* dotTable = new float [edge_start];
-    csVector4 lightdir;
-
-    for (i = 0; i < edge_count; i += 2)
-    {
-      lightdir = lightPos4 - edge_midpoints[i];
-      dotTable[i] = (lightdir * edge_normals[i]);
-      dotTable[i+1] = (lightdir * edge_normals[i+1]);
-    }
-
-    for (i = 0; i < edge_start; i+= 2)
-    {
-      source_index = edge_start + 3*i;
-
-      if (dotTable[i] * dotTable[i+1] < 0)
-      {
-        __asm
-        {
-          push esi
-          push edi
-          push ecx
-
-          mov esi, [ibuf]
-          mov edi, [buf]
-          
-          mov ecx, source_index
-          shl ecx, 2
-          add esi, ecx
-
-          mov ecx, index_range
-          shl ecx, 2
-          add edi, ecx
-
-          //do copy with mmx-routines
-          movq mm0, [esi]
-          movq mm1, [esi+8]
-          movq mm2, [esi+16]
-
-          movq [edi], mm0        
-          movq [edi+8], mm1
-          movq [edi+16], mm2
-          
-          emms
-          pop esi
-          pop edi
-          pop ecx
-        }
-        index_range += 6;
-      }
-    }
-
-    delete [] dotTable;
-    
-#else
-*/
 
     int* edge_indices_array = edge_indices.GetArray ();
     for (i = 0; i < edge_count; i += 2)
@@ -205,7 +148,6 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
 	indexRange += 6;
       }
     }
-// #endif
 
     entry->index_range = indexRange;
 
@@ -451,6 +393,17 @@ iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
   return 0;
 }
 
+void csStencilShadowCacheEntry::UpdateBuffers ()
+{
+  csShaderVariable *sv;
+  sv = dynDomain->GetVariableAdd (parent->shadow_vertex_name);
+  sv->SetValue (shadow_vertex_buffer);
+  sv = dynDomain->GetVariableAdd (parent->shadow_normal_name);
+  sv->SetValue (shadow_normal_buffer);
+  sv = dynDomain->GetVariableAdd (parent->shadow_index_name);
+  sv->SetValue (active_index_buffer);
+}
+
 //---------------------------------------------------------------------------
 
 csStringID csStencilShadowStep::shadow_index_name = csInvalidStringID;
@@ -484,6 +437,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
 	"crystalspace.renderer.stringset", iStringSet);
@@ -503,7 +457,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 }
 
 void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, 
-				      iMeshWrapper *mesh, iShaderPass *pass)
+				      iMeshWrapper *mesh, iShader* shader, int pass)
 {
   csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get(mesh);
   if (shadowCacheEntry == 0) 
@@ -540,20 +494,25 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.object2camera = tr_o2c;
   //rmesh.transform = &tr_o2c;
   rmesh.z_buf_mode = CS_ZBUF_TEST;
-  rmesh.mixmode = pass->GetMixmodeOverride (); //CS_FX_COPY;
+  //rmesh.mixmode = shader->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
-  csRef<iRenderBufferSource> buffer_source = 
-    SCF_QUERY_INTERFACE (shadowCacheEntry, iRenderBufferSource);
-  rmesh.buffersource = buffer_source;
+  //csRef<iRenderBufferSource> buffer_source = 
+    //SCF_QUERY_INTERFACE (shadowCacheEntry, iRenderBufferSource);
+//  rmesh.buffersource = buffer_source;
+  rmesh.dynDomain = shadowCacheEntry->dynDomain;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   // probably shouldn't need to check this in general
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    static csArray<iShaderVariableContext*> emptyArr;
-    // shadowWrapper->SelectMaterial (0);
-    pass->SetupState (&rmesh, emptyArr);
+    static csArray<iShaderVariableContext*> dynContext;
+    dynContext.Empty ();
+
+    shadowCacheEntry->UpdateBuffers ();
+    dynContext.Push(shadowCacheEntry->dynDomain);
+    dynContext.Push(shmgr);
+    shader->SetupPass(&rmesh, dynContext);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -575,7 +534,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
       g3d->DrawMesh (&rmesh);
     }
-    pass->ResetState ();
+    shader->TeardownPass();
   }
 }
 
@@ -589,9 +548,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	iLight* light)
 {
   iShader* shadow;
-  iShaderTechnique* tech;
-  if (((shadow = type->GetShadow ()) == 0) || 
-    ((tech = shadow->GetBestTechnique ()) == 0))
+  if ((shadow = type->GetShadow ()) == 0)
   {
     for (int i = 0; i < steps.Length (); i++)
     {
@@ -680,11 +637,9 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     csVector3 rad, center;
     float maxRadius;
-    for (int p = 0; p < tech->GetPassCount (); p ++) 
+    for (int p = 0; p < shadow->GetNumberOfPasses (); p ++) 
     {
-      iShaderPass* pass = tech->GetPass (p);
-
-      pass->Activate (0);
+      shadow->ActivatePass (p);
       for (int m = 0; m < numShadowMeshes; m++)
       {
 	iMeshWrapper*& sp = shadowMeshes[m];
@@ -708,11 +663,11 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	}
 	if (!(camPlaneZ*v < -maxRadius))
 	{
-	  DrawShadow (rview, light, sp, pass); 
+	  DrawShadow (rview, light, sp, shadow, p); 
 	}
       }
 
-      pass->Deactivate ();
+      shadow->DeactivatePass ();
     }
   }
 
@@ -847,22 +802,25 @@ iShader* csStencilShadowType::GetShadow ()
       Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve shader manager!");
       return 0;
     }
-    shadow = shmgr->CreateShader ();
-    if (!shadow) 
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to create new shader");
-      return 0;
-    }
+
+    csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
+    
     csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
     csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
     // csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
-    if (!shadow->Load (buf))
+    csRef<iDocumentSystem> docsys (
+      CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
+    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+    shaderDoc->Parse (buf);
+
+    shadow = shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
+    
+    if (!shadow)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Unable to load shadow shader");
       return 0;
     }
-    shadow->Prepare ();
-
+    
   }
   return shadow;
 }

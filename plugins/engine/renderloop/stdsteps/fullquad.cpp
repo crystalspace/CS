@@ -227,8 +227,11 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
+  /*
+    @@@ FIXME: Render buffers -> SV
+   */
+#if 0
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
-  csArray<iShaderVariableContext*> dynDomain;
 
   //g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (material);
@@ -238,16 +241,18 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
     iShader* shader = 
       mat->GetMaterialHandle()->GetShader(shadertype);
     
-    iShaderTechnique *tech = shader->GetBestTechnique ();
+    //iShaderTechnique *tech = shader->GetBestTechnique ();
 
-    if (tech != 0)
+    if (shader != 0)
     {
-      for (int p=0; p<tech->GetPassCount (); p++)
+      csArray<iShaderVariableContext*> dynDomain;
+      int numPasses = shader->GetNumberOfPasses ();
+      for (int p=0; p < numPasses; p++)
       {
         dynDomain.Empty ();
         dynDomain.Push (mat->GetMaterial ());
 
-        iShaderPass *pass = tech->GetPass (p);
+        //iShaderPass *pass = tech->GetPass (p);
 
         csRenderMesh mesh;
         mesh.clip_plane = CS_CLIP_NOT;
@@ -264,17 +269,19 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         mesh.z_buf_mode = CS_ZBUF_NONE;
         mesh.material = mat;
 
-        uint mixmode = pass->GetMixmodeOverride ();
+        /*uint mixmode = pass->GetMixmodeOverride ();
         if (mixmode != 0)
           mesh.mixmode = mixmode;
         else
           mesh.mixmode = CS_FX_COPY;
 
         pass->Activate (0);
-        pass->SetupState (&mesh, dynDomain);
+        pass->SetupState (&mesh, dynDomain);*/
+	shader->ActivatePass (p);
+	shader->SetupPass (&mesh, dynDomain);
         g3d->DrawMesh (&mesh);
-        pass->ResetState ();
-        pass->Deactivate ();
+	shader->TeardownPass ();
+	shader->DeactivatePass ();
       }
     }
   }
@@ -304,6 +311,8 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
   shader->GetBestTechnique ()->GetPass (0)->ResetState ();
   shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
   g3d->FinishDraw ();
+#endif
+
 #endif
 }
 

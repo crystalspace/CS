@@ -158,6 +158,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_normals_dirty_flag = false;
   ball_colors_dirty_flag = false;
   ball_triangle_dirty_flag = false;
+
+  dynDomain.AttachNew (new csShaderVariableContext);
 #endif
 }
 
@@ -653,6 +655,36 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
 }
 #endif
 
+void csBallMeshObject::UpdateBufferSV()
+{
+  csShaderVariable *sv;
+  if (ball_vertices_dirty_flag)
+  {
+    sv = dynDomain->GetVariableAdd (vertex_name);
+    sv->SetValue (GetRenderBuffer(vertex_name));
+  }
+  if (ball_texels_dirty_flag)
+  {
+    sv = dynDomain->GetVariableAdd (texel_name);
+    sv->SetValue (GetRenderBuffer(texel_name));
+  }
+  if (ball_normals_dirty_flag)
+  {
+    sv = dynDomain->GetVariableAdd (normal_name);
+    sv->SetValue (GetRenderBuffer(normal_name));
+  }
+  if (ball_colors_dirty_flag)
+  {
+    sv = dynDomain->GetVariableAdd (color_name);
+    sv->SetValue (GetRenderBuffer(color_name));
+  }
+  if (ball_triangle_dirty_flag)
+  {
+    sv = dynDomain->GetVariableAdd (index_name);
+    sv->SetValue (GetRenderBuffer(index_name));
+  }
+}
+
 csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
 {
 #ifdef CS_USE_NEW_RENDERER
@@ -664,8 +696,9 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
     return false;
   }
 
-  // iGraphics3D* g3d = rview->GetGraphics3D ();
 
+  // iGraphics3D* g3d = rview->GetGraphics3D ();
+  UpdateBufferSV ();
   mater->Visit ();
   //mesh.transform = &tr_o2c;
 
@@ -677,8 +710,8 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   mesh.indexend = ball_triangles * 3;
   //mesh.mathandle = mater->GetMaterialHandle();
   mesh.material = mater;
-  csRef<iRenderBufferSource> source = SCF_QUERY_INTERFACE (this, iRenderBufferSource);
-  mesh.buffersource = source;
+  mesh.dynDomain = dynDomain;
+
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;
   num = 1;

@@ -14,16 +14,16 @@
 	  <step plugin="crystalspace.renderloop.step.lightiter">
 	    <steps>
 	      <!-- stencil shadows -->
-	      <!--<step plugin="crystalspace.renderloop.step.shadow.stencil">
-		<steps>-->
+	      <step plugin="crystalspace.renderloop.step.shadow.stencil">
+		<steps>
 		  <!-- diffuse lighting -->
 		  <step plugin="crystalspace.renderloop.step.generic">
 		    <shadertype>diffuse</shadertype>
 		    <zoffset>no</zoffset>
 		    <ztest />
 		  </step>
-		<!--</steps>
-	      </step>-->
+		</steps>
+	      </step>
 	    </steps>
 	  </step>
 	</steps>

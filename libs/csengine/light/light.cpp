@@ -70,17 +70,20 @@ csLight::csLight (
 
   halo = 0;
 
-#ifndef CS_USE_NEW_RENDERER
+//#ifndef CS_USE_NEW_RENDERER
   attenuation = CS_ATTN_LINEAR;
   influenceRadius = d;
   influenceRadiusSq = d * d;
   inv_dist = 1 / d;
-#else
+  //CalculateAttenuationVector (attenuation, d, 
+  //  (attenuation == CS_ATTN_LINEAR) ? 1.0f / influenceIntensityFraction : 1.0f);
+  attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
+/*#else
   attenuation = CS_ATTN_CLQ;
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
   //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
-#endif
-  CalculateInfluenceRadius ();
+#endif*/
+  //CalculateInfluenceRadius ();
 }
 
 csLight::~csLight ()
@@ -121,17 +124,17 @@ const char* csLight::GenerateUniqueID ()
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)QInt ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-#ifndef CS_USE_NEW_RENDERER
+//#ifndef CS_USE_NEW_RENDERER
   l = convert_endian ((int32)QInt ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
-#else
+//#else
   l = convert_endian ((int32)QInt ((attenuationvec.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)QInt ((attenuationvec.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)QInt ((attenuationvec.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-#endif
+//#endif
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
 
@@ -218,7 +221,7 @@ void csLight::SetAttenuation (int a)
   attenuation = a;
 }
 
-void csLight::SetAttenuationVector(const csVector3& attenv)
+void csLight::SetAttenuationVector (const csVector3& attenv)
 {
   attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
@@ -258,17 +261,18 @@ void csLight::SetInfluenceRadius (float radius)
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-  influenceValid = true;
-#ifdef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_NEW_RENDERER
   int oldatt = attenuation;
-  CalculateAttenuationVector (attenuation, radius, 1.0);
+  CalculateAttenuationVector (attenuation, radius, 
+    1.0f / influenceIntensityFraction);
   attenuation = oldatt;
-#endif
+  influenceValid = true;
+//#endif
 }
 
 void csLight::CalculateInfluenceRadius ()
 {
-#ifdef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_NEW_RENDERER
   float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   float radius;
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
@@ -277,7 +281,7 @@ void csLight::CalculateInfluenceRadius ()
   influenceRadius = radius;
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
-#endif
+//#endif
   influenceValid = true;
 }
 
@@ -306,9 +310,6 @@ void csLight::CalculateAttenuationVector (int atttype, float radius,
 
 bool csLight::GetDistanceForBrightness (float brightness, float& distance)
 {
-#ifdef CS_USE_NEW_RENDERER
-  {
-#else
   switch (attenuation)
   {
   case CS_ATTN_NONE:      
@@ -323,7 +324,6 @@ bool csLight::GetDistanceForBrightness (float brightness, float& distance)
     distance = sqrt (1 / brightness);
     return true;
   case CS_ATTN_CLQ:
-#endif
     {
       // simple cases
       if (attenuationvec.z == 0)

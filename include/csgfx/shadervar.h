@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
+                          Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,10 +30,26 @@
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "csutil/refarr.h"
+#include "ivideo/rndbuf.h"
 
 struct iTextureHandle;
 struct iTextureWrapper;
 struct csShaderVariableWrapper;
+
+class csShaderVariable;
+
+SCF_VERSION (iShaderVariableAccessor, 0, 0, 1);
+/**
+* Interface to an accessorcallback for shadervariables.
+* This is used when we know the object providing the value of a single
+* variable, but the exact value cannot be predetermined.
+*/
+struct iShaderVariableAccessor
+{
+  /// Called before the value of the attached SV is returned
+  virtual void PreGetValue (csShaderVariable *variable) = 0;
+};
+
 
 /**
  * Storage class for inheritable variables in the shader system.
@@ -45,9 +62,9 @@ public:
   {
     INT = 1,
     FLOAT,
-    STRING,
     COLOR,
     TEXTURE,
+    RENDERBUFFER,
     VECTOR2,
     VECTOR3,
     VECTOR4
@@ -55,14 +72,15 @@ public:
 
 private:
 
-
   VariableType Type;
 
   int Int;
-  csRef<iString> String;
   csRef<iTextureHandle> TextureHandValue;
   csRef<iTextureWrapper> TextureWrapValue;
+  csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
+
+  iShaderVariableAccessor* accessor;
 
 public:
   csStringID Name;
@@ -70,43 +88,39 @@ public:
   /// Constructor
   csShaderVariable (csStringID name);
 
+  csShaderVariable& operator= (csShaderVariable& copyFrom);
+
   /// Get type of data stored
   VariableType GetType() const { return Type; }
   /// Set type (calling this after SetValue will cause undefined behaviour)
   void SetType (VariableType t) { Type = t; }
 
+  /// Set an accessor to use when getting the value
+  void SetAccessor (iShaderVariableAccessor* a) { accessor = a;}
+
   /// Get the name of the variable
   csStringID GetName() const { return Name; }
 
   /// Retireve an int
-  bool GetValue (int& value) const
+  bool GetValue (int& value)
   { 
+    if (accessor) accessor->PreGetValue (this);
     value = Int; 
     return true; 
   }
 
   /// Retrieve a float
-  bool GetValue (float& value) const
+  bool GetValue (float& value)
   { 
+    if (accessor) accessor->PreGetValue (this);
     value = VectorValue.x; 
     return true; 
   }
 
-  /// Retrieve a string
-  bool GetValue (iString*& value) const
-  { 
-    if (Type != STRING) 
-    {
-      value = 0;
-      return false;
-    }
-    value = String; 
-    return true;
-  }
-
   /// Retrieve a color
-  bool GetValue (csRGBpixel& value) const
+  bool GetValue (csRGBpixel& value)
   {
+    if (accessor) accessor->PreGetValue (this);
     value.red = (char) VectorValue.x;
     value.green = (char) VectorValue.y;
     value.blue = (char) VectorValue.z;
@@ -115,36 +129,49 @@ public:
   }
 
   /// Retrieve a texture handle
-  bool GetValue (iTextureHandle*& value) const
+  bool GetValue (iTextureHandle*& value)
   {
+    if (accessor) accessor->PreGetValue (this);
     value = TextureHandValue;
     return true;
   }
 
   /// Retrieve a texture wrapper
-  bool GetValue (iTextureWrapper*& value) const
+  bool GetValue (iTextureWrapper*& value)
   {
+    if (accessor) accessor->PreGetValue (this);
     value = TextureWrapValue;
     return true;
   }
 
-  /// Retireve a csVector2
-  bool GetValue (csVector2& value) const
+  /// Retrieve a iRenderBuffer
+  bool GetValue (iRenderBuffer*& value)
   {
+    if (accessor) accessor->PreGetValue (this);
+    value = RenderBuffer;
+    return true;
+  }
+
+  /// Retireve a csVector2
+  bool GetValue (csVector2& value)
+  {
+    if (accessor) accessor->PreGetValue (this);
     value.Set (VectorValue.x, VectorValue.y);
     return true;
   }
 
   /// Retrieve a csVector3
-  bool GetValue (csVector3& value) const
+  bool GetValue (csVector3& value)
   { 
+    if (accessor) accessor->PreGetValue (this);
     value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
     return true; 
   }
 
   /// Retrieve a csVector4
-  bool GetValue (csVector4& value) const
+  bool GetValue (csVector4& value)
   { 
+    if (accessor) accessor->PreGetValue (this);
     value = VectorValue; 
     return true; 
   }
@@ -166,21 +193,6 @@ public:
     Type = FLOAT; 
     Int = (int)value;
     VectorValue.Set (value, value, value, value);
-    return true; 
-  }
-
-  /// Store a string
-  bool SetValue (iString* value)
-  { 
-    Type = STRING; 
-    String = value; 
-    float floats[4];
-    floats[0] = floats[1] = floats[2] = 0.0f;
-    floats[3] = 1.0f;
-    sscanf (value->GetData (), "%f %f %f %f", 
-      &floats[0], &floats[1], &floats[2], &floats[3]);
-    VectorValue.Set (floats[0], floats[1], floats[2], floats[3]);
-    Int = (int)VectorValue.x;
     return true; 
   }
 
@@ -210,6 +222,14 @@ public:
     TextureWrapValue = value;
     if (value)
       TextureHandValue = value->GetTextureHandle ();
+    return true;
+  }
+
+  /// Store a render buffer
+  bool SetValue (iRenderBuffer* value)
+  {
+    Type = RENDERBUFFER;
+    RenderBuffer = value;
     return true;
   }
 
@@ -247,16 +267,18 @@ struct csShaderVariableProxy
 public:
 
   csShaderVariableProxy () :
-      Name (csInvalidStringID), userData (0), shaderVariable(0)
+      Name (csInvalidStringID), userData (0), shaderVariable(0), realLocation(0)
   {}
 
-  csShaderVariableProxy (csStringID name, int ud) :
-      Name (name), userData(ud), shaderVariable(0)
+  csShaderVariableProxy (csStringID name, void* ud, 
+    csRef<csShaderVariable>* realplace = 0) :
+      Name (name), userData(ud), shaderVariable(0), realLocation(realplace)
   {}
         
   csStringID Name;
-  int userData;
   csShaderVariable *shaderVariable;
+  csRef<csShaderVariable>* realLocation;
+  void* userData;
 };
 
 
@@ -280,12 +302,13 @@ static int ShaderVariableKeyCompare (csShaderVariable* const& item1, void* item2
 /**
  * Sorted list of shadervariables
  */
-class csShaderVariableList : 
+class csShaderVariableProxyList : 
   public csArray<csShaderVariableProxy>
 {
 public:
   int InsertSorted (csShaderVariableProxy item);
   int Push (csShaderVariableProxy item);
+  void PrepareFill ();
 };
 
 class csShaderVariableContextHelper
@@ -301,7 +324,11 @@ public:
   /// Add a variable to this context
   inline void AddVariable (csShaderVariable *variable) 
   {
-    variables.InsertSorted (variable, ShaderVariableCompare);
+    csShaderVariable* var = GetVariable(variable->Name);
+    if (var == 0)
+      variables.InsertSorted (variable, ShaderVariableCompare);
+    else
+      *var = *variable;
   }
 
   /// Get a named variable from this context
@@ -316,12 +343,13 @@ public:
   * Fill a csShaderVariableList
   * It requires the passed list to be sorted.
   */
-  inline void FillVariableList (csShaderVariableList *list) const
+  inline unsigned int FillVariableList (csShaderVariableProxyList *list) const
   {
-    if (list->Length ()== 0 || variables.Length() == 0) return;
+    unsigned int count = 0;
+    if (list->Length ()== 0 || variables.Length() == 0) return 0;
 
     csRefArray<csShaderVariable>::Iterator varIter (variables.GetIterator ());
-    csShaderVariableList::Iterator inputIter (list->GetIterator ());
+    csShaderVariableProxyList::Iterator inputIter (list->GetIterator ());
     csShaderVariable* curVar=0;
     curVar=varIter.Next ();
 
@@ -333,14 +361,21 @@ public:
         curVar=varIter.Next ();
       }
       if (curVar->Name == curInput->Name && curInput->shaderVariable == 0)
+      {
         curInput->shaderVariable = curVar;
+        if (curInput->realLocation!=0) (*curInput->realLocation) = curVar;
+        count++;
+      }
       else if (curVar->Name > curInput->Name)
         continue;
       else if (varIter.HasNext ())
         continue; //still may have more
+      else if (curVar->Name > curInput->Name)
+        continue;  
       else
-        return;
+        return count;
     }
+    return count;
   }
 
 private:

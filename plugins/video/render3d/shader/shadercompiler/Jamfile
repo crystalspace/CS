@@ -1,0 +1,3 @@
+SubDir TOP plugins video render3d shader shadercompiler ;
+
+SubInclude TOP plugins video render3d shader shadercompiler xmlshader ;
