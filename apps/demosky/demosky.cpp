@@ -388,8 +388,8 @@ Flock::Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 
   }
   state->DecRef();
-  fact->DecRef();
 }
+
 
 Flock::~Flock()
 {
