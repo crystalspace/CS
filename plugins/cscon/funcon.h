@@ -48,7 +48,7 @@ public:
   virtual ~funConsole();
   virtual bool Initialize(iSystem *);
   virtual void Draw3D(csRect *rect);
-  virtual void SetTransparency(bool trans){ csConsole::SetTransparency ( true ); }
+  virtual void SetTransparency(bool){ csConsole::SetTransparency ( true ); }
   virtual void GetPosition(int &x, int &y, int &width, int &height) const;
   virtual void SetPosition(int x, int y, int width = -1, int height = -1);
 

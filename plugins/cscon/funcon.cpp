@@ -66,7 +66,7 @@ bool funConsole::Initialize(iSystem *system)
   return succ;
 }
 
-void funConsole::Draw3D(csRect *rect)
+void funConsole::Draw3D(csRect*)
 {
   bool btext, bgour;
   int i;

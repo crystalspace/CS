@@ -46,7 +46,7 @@ public:
   virtual const csString *GetText(int line = -1) const;
   virtual void DeleteText(int start = 0, int end = -1);
   virtual void Draw(csRect *rect);
-  virtual void Draw3D(csRect *rect) {}
+  virtual void Draw3D(csRect*) {}
   virtual void SetBufferSize(int lines);
   virtual void CacheColors(iTextureManager *txtmgr);
   virtual void GetForeground(int &red, int &green, int &blue) const;
