@@ -56,6 +56,7 @@ private:
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
+  /// Current orientation of the camera.
   float rotX, rotY;
 
   /**

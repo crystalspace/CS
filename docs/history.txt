@@ -9,6 +9,9 @@ chronological order.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
+	- Eric Sunshine performed some relatively minor clean up in simple.txi,
+	  simple2.txi, and simpmap.txi: mostly grammatical, punctuational,
+	  typographical, and small content corrections.
 18-Nov-2004
 	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.h so that it
 	  also augments pkg-config's search path to reference directories which

@@ -5,7 +5,7 @@
 @cindex Simple Tutorial
 
 This tutorial continues on tutorial one. Here we will learn how to
-load a level from a map file instead of creating the geometry
+load a map from a file instead of creating the geometry
 programmatically.
 
 @menu
@@ -37,8 +37,10 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  iSector* room;
   csRef<iView> view;
+  iSector* room;
+  csVector3 pos;
+  float rotX, rotY;
  
   bool OnKeyboard (iEvent&);
   void ProcessFrame ();
@@ -57,7 +59,7 @@ public:
 #endif // __SIMPMAP_H__
 @end example
 
-Similarly for @file{simpmap.cpp}:
+Similarly, for @file{simpmap.cpp}:
 
 @example
 #include "simpmap.h"
@@ -82,18 +84,45 @@ void Simple::ProcessFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  @{
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  @}
+  else
+  @{
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis and up and downarrows cause the camera to
+    // go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  @}
+
+  // We now assign a new rotation transformation to the camera.
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw(
@@ -190,9 +219,9 @@ One important note in the code above: we removed the following line:
 engine->SetLightingCacheMode (0);
 @end example
 
-That's because when we are loading from map file we actually want
+That's because, when we are loading from map file, we actually want
 the lighting information to be read from the cache (if present).
-That's because relighting a map can be a time-consuming process.
+We do so because relighting a map can be a time-consuming process.
 
 @node Simple Loading The Map, Simple Locating the Camera, Simple Base Code, Tutorial Simple Map
 @subsection Loading The Map
@@ -224,33 +253,33 @@ bool Simple::LoadMap ()
 @}
 @end example
 
-This code will first use @code{iVFS::ChDir()} to set the current
+This code first uses @code{iVFS::ChDir()} to set the current
 directory in the virtual file system to @file{/lev/flarge}. In the
-case of @samp{flarge} this @sc{mount point} is already created in the
-config file @file{vfs.cfg}. If this is not the case for your own levels
-you can either modify @file{vfs.cfg} or else call @code{iVFS::Mount()}
+case of @samp{flarge} this @dfn{mount point} exists already in the
+configuration file @file{vfs.cfg}. If this is not the case for your own levels,
+you can either modify @file{vfs.cfg}, provide your own @file{vfs.cfg}, or
+else call @code{iVFS::Mount()}
 to map a physical file path (can be a @sc{zip} archive file as well)
 to a virtual directory.
 
 The call to @code{iLoader::LoadMapFile()} will take the given filename
 (in this case @file{world}) and open it from the current @sc{vfs}
-directory. Then it will parse that file and create the geometry which
+directory. Then, it will parse that file and create the geometry which
 is specified there.
 
-If this is successful then you must call @code{iEngine::Prepare()} to
+If loading is successful, then you must call @code{iEngine::Prepare()} to
 make sure that all lightmaps are correctly loaded from the cache
 and other necessary setup work is done (i.e. textures are registered
 and so on).
 
-We additionally change the last part of @code{Application()} to
-this:
+Additionally, change the last part of @code{Application()} to this:
 
 @example
 bool Simple::Application ()
 @{
   @dots{}
 
-  view = csPtr<iView> (new csView (engine, g3d));
+  view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -260,21 +289,22 @@ bool Simple::Application ()
 @}
 @end example
 
-So first we create our view but doesn't yet set the current sector.
-@code{LoadMap()} will do that based on the loaded level.
+So, first we create our view but haven't set the current sector.
+Instead, we will have @code{LoadMap()} do that based upon the loaded map,
+as shown below.
 
 @node Simple Locating the Camera, , Simple Loading The Map, Tutorial Simple Map
 @subsection Locating the Camera
 
 @samp{flarge} contains a number of sectors and various objects, and those
-are now all loaded in memory. However this is not enough. We also have
+are now all loaded in memory. However, this is not enough. We also have
 to set the camera to some sector and position in that world. In the
 previous tutorials we simply used the sector that we just created
-and a fixed position in that sector (keep in mind that in Crystal
+and a fixed position in that sector. (Keep in mind that in Crystal
 Space a position in space is always defined as a sector in combination
-with a position). When loading a map we can't work that way because
+with a position.) When loading a map we can't work that way because
 we don't know which sectors are in the map (unless we make an application
-that can only read one level, but that's not very flexible) and we
+that can only read one map file, but that's not very flexible) and we
 also don't know where we can safely put our camera. In the map files
 it is possible to specify one or more starting positions. We will
 query the engine for such a starting position and initialize our
@@ -310,11 +340,11 @@ add after @code{engine->Prepare()} in @code{LoadMap()}:
 @end example
 
 First, we see how many camera positions there were defined in the
-map by using @code{iEngine::GetCameraPositionCount()}. If this is 0
+map by using @code{iEngine::GetCameraPositionCount()}. If there are none,
 then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
 at (0,0,0) in that sector. But otherwise we will use the first
 starting position defined in the map.
 
 This is all. After adding this code this application will now load
-the @samp{flarge} map and display it so you can run around in this level.
+the @samp{flarge} map and display it so you can explore this map.

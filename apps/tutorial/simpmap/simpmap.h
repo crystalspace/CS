@@ -56,8 +56,10 @@ private:
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
+  /// Position of camera in map.
   csVector3 pos;
 
+  /// Current camera orientation.
   float rotX, rotY;
 
   /**

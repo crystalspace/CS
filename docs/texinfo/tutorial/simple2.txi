@@ -5,8 +5,8 @@
 @cindex Simple Tutorial 2
 
 This tutorial continues on the Simple Tutorial (@pxref{Tutorial Simple}).
-In this tutorial we explain a bit about @sc{vfs}, texture management and
-how you can add a simple sprite to the simple application.
+In this tutorial we explain a bit about @sc{vfs}, texture management, and
+how you can add a simple sprite to the room.
 
 Crystal Space has the concept of mesh factories and meshes. A mesh is basically
 some kind of 3D object. Crystal Space supports several kinds of meshes. In
@@ -20,12 +20,13 @@ meshes from this.  @xref{MeshObject}.
 In this example we are going to load a mesh factory from disk.  If you have
 the standard Crystal Space distribution then you have the file
 @file{CS/data/standard.zip}.  In that archive file there is a file called
-@samp{sprite1} which contains the definition of our mesh factory.  Extract
+@samp{sprite1} which contains the definition of our mesh factory.  If you
+would like to examine the raw sprite data, extract
 it (by using, for instance, the command @samp{unzip -x standard.zip sprite1})
-and examine it to see how mesh factories for 3D sprites are defined (mesh
-factories for other types of meshes can look different).
+and look at how mesh factories for 3D sprites are defined (mesh
+factories for other types of meshes may appear different).
 
-But how are we actually going to get that file out of that @sc{zip} archive
+But, how are we actually going to get that file out of that @sc{zip} archive
 from within the Simple application?  This is in fact very easy because Crystal
 Space supports the concept of @sc{vfs}.  Take a look at the @sc{vfs}
 documentation (@pxref{VFS}) to learn how it works.  Suffice it to say that
@@ -35,7 +36,7 @@ the @file{CS/vfs.cfg} file (and you can add more).  So, this means that our
 sprite file can be found at the path @file{/lib/std/sprite1}.
 
 If you look at the @file{sprite1} file you can see that it refers to a material
-named @samp{spark}.  So we'll have to load that material as well.  This can
+named @samp{spark}.  So, we'll have to load that material as well.  This can
 also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
 
 @menu
@@ -50,10 +51,11 @@ also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
 @cindex Simple Loading Material, Tutorial
 
 To make this example a little more interesting the material is going to be
-loaded @emph{after} the other setup of the texture manager has been done.
+loaded @emph{after} the other set-up of the texture manager has been performed.
 This is not really needed but it illustrates how a game might load materials
-dynamically later when the application is already running.  So first we edit
+dynamically after the application is already running.  So, first we edit
 @file{simple.h}:
+
 @example
 @dots{}
 class Simple
@@ -64,8 +66,7 @@ private:
   @dots{}
 @end example
 
-
-Then we edit @file{simple.cpp} and add the following in
+Then, we edit @file{simple.cpp} and add the following in
 @code{Simple::Application()} and @code{Simple::CreateSprites()}
 (before @samp{return true}):
 
@@ -91,13 +92,13 @@ void Simple::CreateSprites()
 @}
 @end example
 
-This code first loads a texture in our engine with
+This code first loads a texture with
 @code{iLoader::LoadTexture()}.  The second argument is the file name for our
 texture (@sc{vfs} path) and the first argument is how that texture should be
-named in the engine.  In this case we use @samp{spark} for that because that's
+named in the engine.  In this case we use ``spark'' for that because that's
 how the @file{sprite1} definition wants it. The third parameter indicates
 for what we want to use this texture. In this case we want to use it to texture
-map a model for the 3D engine so the texture must be prepared for 3D.
+map a model for the 3D engine, so the texture must be prepared for 3D.
 The fourth parameter is the texture manager which will be used to register
 and prepare the texture and material. This is done automatically by
 this function because the fifth parameter is set to 'true'. In the previous
@@ -108,16 +109,16 @@ doesn't have to be specified and because we were going to call
 and the last boolean parameter because @code{Prepare()} automatically
 registers and prepares all textures and materials that are loaded.
 
-If this loading succeeds this function will register our texture with the
+If loading succeeds this function will register our texture with the
 texture manager. As mentioned above this is needed because we are loading
-this texture AFTER @code{engine->Prepare()}. So this is an easy way to
+this texture @emph{after} @code{engine->Prepare()}. So, this is an easy way to
 dynamically add textures and materials even when the engine is already
-running. Note that if you plan to load many new textures and materials
+running. Note that if you plan to load many new textures and materials,
 it is more efficient to not let this function register automatically but
 instead register them manually and then call @code{txtmgr->PrepareTextures()}
 to prepare them all at once.
 
-Note that when you load a texture like this there will also be an
+Further note that when you load a texture like this, there will also be an
 associated material with the same name. The engine itself works with
 materials and doesn't directly use textures. The material in this case
 is simply a wrapper on top of the texture. But you could also add detail
@@ -147,7 +148,7 @@ void Simple::CreateSprites ()
 
 This example uses @code{iLoader::LoadMeshObjectFactory()} to load the
 mesh factory from the given location. The name of the mesh factory
-will be 'box' as that is the name given in the file @file{sprite1} itself.
+will be ``box'' as that is the name given in the file @file{sprite1} itself.
 
 This is all there is to it. After this call the mesh factory is loaded
 in the engine and can be used to create meshes. This is what we'll do
@@ -199,7 +200,7 @@ After doing movement (either updating the sectors or the position) you
 structures (i.e. the engine may use this to recalculate visibility
 information).
 
-@emph{WARNING:} The code above actually scaled the object by giving it
+@emph{WARNING}: The code above actually scaled the object by giving it
 a transformation matrix which is multiplied with 5. Don't do this in your
 own code. Many subsystems in Crystal Space (like the collision detection
 system, the visibility culling system and the lighting system) don't work
@@ -208,7 +209,7 @@ properly with scaled objects. Instead scale your object using
 
 If you read the mesh object documentation (see @pxref{MeshObject})
 carefully you will see that in order to control visual attributes
-of mesh objects you will have to get the @emph{state} interface for
+of mesh objects you will have to get the @dfn{state} interface for
 either the object or the factory. In this example we query
 @samp{iSprite3DState} from the mesh in order to set the default action.
 An action is a set of frames and is used to control animation. In our
@@ -229,8 +230,8 @@ a sector.
 @code{SetRenderPriority()} controls when this object is rendered in this
 sector. By default there are four render priorities: @dfn{sky}, @dfn{wall},
 @dfn{object}, and @dfn{alpha}. Every object can be put in a render
-priority queue. Objects in prior render priorities will be rendered before
-objects in later render priorities. In addition some render priority queues
+priority queue. Objects in lower render priorities will be rendered before
+objects in higher render priorities. In addition some render priority queues
 sort objects internally based on some other criteria. For example, the
 @samp{alpha} render priority will render all objects in that queue
 from back to front. You can create your own additional render queues if
@@ -240,9 +241,9 @@ with Z-buffer mode equal to @samp{CS_ZBUF_USE} are placed in the
 @samp{object} render priority queue.
 
 For more information on render priorities and Z-buffer mode you can look
-at the HOWTO on this subject (@pxref{HOWTO Render Priorities}).
+at the @sc{howto} on this subject (@pxref{HOWTO Render Priorities}).
 
 This concludes the second Simple tutorial.
 You can now go on to the next tutorial (@pxref{Tutorial Simple Map})) to learn
-how you can load a level from a file instead of creating your rooms in
-the code.
+how you can load a map from a file instead of creating your rooms
+programmatically.
