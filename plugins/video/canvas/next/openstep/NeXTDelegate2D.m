@@ -230,9 +230,10 @@ N2D_PROTO(void,set_window_title)(NeXTDelegateHandle2D handle, char const* s)
 //-----------------------------------------------------------------------------
 - (void)focusChanged:(BOOL)focused shouldPause:(BOOL) pause
 {
-  if (pause != paused)
+  // Pause = 1 -> "pause if not focused", not "pause now"
+  if (pause == YES)
   {
-    paused = !focused;
+    isPaused = !focused;
     [self adjustTitle];
   };
   
