@@ -22,11 +22,13 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
+#include "csutil/csvector.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
 #include "imesh/particle.h"
+#include "spr2duv.h"
 
 struct iMaterialWrapper;
 class csSprite2DMeshObjectFactory;
@@ -36,7 +38,23 @@ class csSprite2DMeshObjectFactory;
  */
 class csSprite2DMeshObject : public iMeshObject
 {
-private:
+ protected:
+  class uvAnimationControl
+  {
+  public:
+    uvAnimationControl (){animate=false;}
+    bool animate, loop, halted;
+    cs_time last_time;
+    int frameindex, framecount, style, counter;
+    iSprite2DUVAnimation *ani;
+    iSprite2DUVAnimationFrame *frame;
+    void Advance (cs_time current_time);
+    const csVector2 *GetVertices (int &num);
+  };
+
+  uvAnimationControl uvani;
+
+ private:
   iMeshObjectFactory* ifactory;
   csSprite2DMeshObjectFactory* factory;
 
@@ -107,7 +125,7 @@ public:
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return radius; }
-  virtual void NextFrame (cs_time /*current_time*/) { }
+  virtual void NextFrame (cs_time current_time);
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () { return false; }
@@ -136,6 +154,17 @@ public:
     {
       scfParent->CreateRegularVertices (n, setuv);
     }
+
+    virtual void SetUVAnimation (const char *name, int style, bool loop);
+    virtual void StopUVAnimation (int idx);
+    virtual void PlayUVAnimation (int idx, int style, bool loop);
+
+    virtual int GetUVAnimationCount ();
+    virtual iSprite2DUVAnimation *CreateUVAnimation ();
+    virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
+    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name);
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx);
+
   } scfiSprite2DState;
   friend class Sprite2DState;
 
@@ -170,7 +199,24 @@ public:
  */
 class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 {
-private:
+ protected:
+
+  class animVector : public csVector
+  {
+  public:
+    animVector () : csVector (8, 16){}
+    virtual int CompareKey (csSome Item1, csConstSome Item2, int Mode) const
+    { 
+      (void)Mode;
+      csSprite2DUVAnimation *f1 = (csSprite2DUVAnimation *)Item1;
+      const char *f2 = (const char *)Item2;
+      return strcmp (f1->GetName (), f2);
+    }
+  };
+
+  animVector vAnims;
+
+ private:
   iMaterialWrapper* material;
   UInt MixMode;
   /**
@@ -178,8 +224,8 @@ private:
    * the given colors.
    */
   bool lighting;
-
-public:
+  
+ public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iBase *pParent);
 
@@ -192,6 +238,32 @@ public:
   iMaterialWrapper* GetMaterialWrapper () { return material; }
   /// Get mixmode.
   UInt GetMixMode () { return MixMode; }
+  
+  int GetUVAnimationCount () {return vAnims.Length ();}
+  iSprite2DUVAnimation *CreateUVAnimation ()
+  { 
+    csSprite2DUVAnimation *p = new csSprite2DUVAnimation (this);
+    vAnims.Push (p);
+    return (iSprite2DUVAnimation *)p;
+  }
+  void RemoveUVAnimation (iSprite2DUVAnimation *anim)
+  {
+    int idx = vAnims.Find ((csSome)anim);
+    if (idx != -1)
+    {
+      anim->DecRef ();
+      vAnims.Delete (idx);
+    }
+  }
+  iSprite2DUVAnimation *GetUVAnimation (const char *name)
+  {
+    int idx = vAnims.FindKey ((csSome)name);
+    return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : NULL);
+  }
+  iSprite2DUVAnimation *GetUVAnimation (int idx)
+  {
+    return (iSprite2DUVAnimation *)vAnims.Get (idx);
+  }
 
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
@@ -213,6 +285,17 @@ public:
     virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
     virtual UInt GetMixMode () { return scfParent->MixMode; }
+
+    virtual int GetUVAnimationCount () {return scfParent->GetUVAnimationCount();}
+    virtual iSprite2DUVAnimation *CreateUVAnimation ()
+    { return scfParent->CreateUVAnimation (); }
+    virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim)
+    { scfParent->RemoveUVAnimation(anim); }
+    virtual iSprite2DUVAnimation *GetUVAnimation (const char *name)
+    { return scfParent->GetUVAnimation (name); }
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx)
+    { return scfParent->GetUVAnimation (idx); }
+
   } scfiSprite2DFactoryState;
   friend class Sprite2DFactoryState;
 };

@@ -293,6 +293,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   float iza = iz * camera->GetFOV ();
 
   int i;
+
   for (i = 0; i < vertices.Length (); i++)
   {
     g3dpolyfx.vertices [i].z = iz;
@@ -300,11 +301,28 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     poly2d [i].x = (cam.x + vertices [i].pos.x) * iza + camera->GetShiftX ();
     g3dpolyfx.vertices [i].sy =
     poly2d [i].y = (cam.y + vertices [i].pos.y) * iza + camera->GetShiftY ();
-    g3dpolyfx.vertices [i].u = vertices [i].u;
-    g3dpolyfx.vertices [i].v = vertices [i].v;
     g3dpolyfx.vertices [i].r = vertices [i].color.red;
     g3dpolyfx.vertices [i].g = vertices [i].color.green;
     g3dpolyfx.vertices [i].b = vertices [i].color.blue;
+  }
+
+  if (!uvani.animate)
+  {
+    for (i = 0; i < vertices.Length (); i++)
+    {
+      g3dpolyfx.vertices [i].u = vertices [i].u;
+      g3dpolyfx.vertices [i].v = vertices [i].v;
+    }
+  }
+  else
+  {
+    int n;
+    const csVector2 *uv = uvani.GetVertices (n);
+    for (i = 0; i < n; i++)
+    {
+      g3dpolyfx.vertices [i].u = uv [i].x;
+      g3dpolyfx.vertices [i].v = uv [i].y;
+    }
   }
 
   int num_clipped_verts;
@@ -355,10 +373,16 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
       vertices [i].u = vertices [i].pos.x / 2.0f + 0.5f;
       vertices [i].v = vertices [i].pos.y / 2.0f + 0.5f;
     }
-    vertices [i].color.Set (0, 0, 0);
-    vertices [i].color_init.Set (0, 0, 0);
+    vertices [i].color.Set (1, 1, 1);
+    vertices [i].color_init.Set (1, 1, 1);
   }
   shapenr++;
+}
+
+void csSprite2DMeshObject::NextFrame (cs_time current_time)
+{
+  if (uvani.animate && !uvani.halted)
+    uvani.Advance (current_time);
 }
 
 void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
@@ -418,6 +442,150 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   scfParent->shapenr++;
 }
 
+void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name, int style, bool loop)
+{
+  if (name)
+  {
+    iSprite2DUVAnimation *ani = scfParent->factory->GetUVAnimation (name);
+    if (ani && ani->GetFrameCount ())
+    {
+      scfParent->uvani.animate = true;
+      scfParent->uvani.ani = ani;
+      scfParent->uvani.last_time = 0;
+      scfParent->uvani.frameindex = 0;
+      scfParent->uvani.framecount = ani->GetFrameCount ();
+      scfParent->uvani.frame = ani->GetFrame (0);
+      scfParent->uvani.style = style;
+      scfParent->uvani.counter = 0;
+      scfParent->uvani.loop = loop;
+      scfParent->uvani.halted = false;
+    }
+  }
+  else
+  {
+    // stop animation and show the normal texture
+    scfParent->uvani.animate = false;
+  }
+}
+
+void csSprite2DMeshObject::Sprite2DState::StopUVAnimation (int idx)
+{
+  if (scfParent->uvani.animate)
+  {
+    if (idx != -1)
+    {
+      scfParent->uvani.frameindex = MIN(MAX(idx, 0), scfParent->uvani.framecount-1);
+      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (scfParent->uvani.frameindex);
+    }
+    scfParent->uvani.halted = true;
+  }
+}
+
+void csSprite2DMeshObject::Sprite2DState::PlayUVAnimation (int idx, int style, bool loop)
+{
+  if (scfParent->uvani.animate)
+  {
+    if (idx != -1)
+    {
+      scfParent->uvani.frameindex = MIN(MAX(idx, 0), scfParent->uvani.framecount-1);
+      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (scfParent->uvani.frameindex);
+    }
+    scfParent->uvani.halted = false;
+    scfParent->uvani.counter = 0;
+    scfParent->uvani.last_time = 0;
+    scfParent->uvani.loop = loop;
+    scfParent->uvani.style = style;
+  }
+}
+
+int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount () 
+{ return scfParent->factory->GetUVAnimationCount ();}
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::CreateUVAnimation ()
+{ return scfParent->factory->CreateUVAnimation ();}
+void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (iSprite2DUVAnimation *anim)
+{ return scfParent->factory->RemoveUVAnimation (anim); }
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (const char *name)
+{ return scfParent->factory->GetUVAnimation (name); }
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (int idx)
+{ return scfParent->factory->GetUVAnimation (idx); }
+
+
+void csSprite2DMeshObject::uvAnimationControl::Advance (cs_time current_time)
+{
+  int oldframeindex = frameindex;
+  // the goal is to find the next frame to show
+  if (style < 0)
+  { // every (-1*style)-th frame show a new pic
+    counter--;
+    if (counter < style)
+    {
+      counter = 0;
+      frameindex++;
+      if (frameindex == framecount)
+	if (loop)
+	  frameindex = 0;
+	else
+	{
+	  frameindex = framecount-1;
+	  halted = true;
+	}
+    }
+  }
+  else
+    if (style > 0)
+    { // skip to next frame every <style> millisecond
+      if (last_time == 0)
+	last_time = current_time;
+      counter += (current_time - last_time);
+      last_time = current_time;
+      while (counter > style)
+      {
+	counter -= style;
+	frameindex++;
+	if (frameindex == framecount)
+	  if (loop)
+	    frameindex = 0;
+	  else
+	    {
+	      frameindex = framecount-1;
+	      halted = true;
+	    }
+      }
+    }
+    else
+    { // style == 0 -> use time indices attached to the frames
+      if (last_time == 0)
+	last_time = current_time;
+      while (frame->GetDuration () + last_time < current_time)
+      {
+	frameindex++;
+	if (frameindex == framecount)
+	  if (loop)
+	  {
+	    frameindex = 0;
+	  }
+	  else
+	  {
+	    frameindex = framecount-1;
+	    halted = true;
+	    break;
+	  }
+	last_time += frame->GetDuration ();
+	frame = ani->GetFrame (frameindex);
+      }
+    }
+
+  if (oldframeindex != frameindex)
+    frame = ani->GetFrame (frameindex);
+    
+}
+
+const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (int &num)
+{
+  num = frame->GetUVCount ();
+  return frame->GetUVCoo ();
+}
+
 //----------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csSprite2DMeshObjectFactory)
@@ -473,7 +641,7 @@ csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
 {
 }
 
-bool csSprite2DMeshObjectType::Initialize (iSystem*)
+bool csSprite2DMeshObjectType::Initialize (iSystem *)
 {
   return true;
 }
