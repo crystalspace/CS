@@ -26,7 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
-#include "csutil/list.h"
+//#include "csutil/list.h"
 #include "csutil/hash.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
@@ -152,14 +152,16 @@ private:
   csRef<iVisibilityCuller> culler;
 
   /// Caching of visible meshes
-  struct visibleMeshCacheHolder {
+  struct visibleMeshCacheHolder
+  {
     csRenderMeshList *meshList;
     uint32 cachedFrameNumber;
-    iRenderView *cachedRView;
+    //iRenderView *cachedRView;
+    csRenderContext *cachedRenderContext;
   };
-  
-  csList<visibleMeshCacheHolder> visibleMeshCache;
-  
+
+  csArray<visibleMeshCacheHolder> visibleMeshCache;
+
 
 private:
   /**
@@ -280,7 +282,7 @@ public:
   {
     return sector_cb_vector.Length ();
   }
-  
+
   iSectorCallback* GetSectorCallback (int idx) const
   {
     return sector_cb_vector.Get (idx);
@@ -509,9 +511,9 @@ public:
     virtual void ShineLights (iMeshWrapper* mesh)
       { scfParent->ShineLights (mesh); }
     virtual void SetDynamicAmbientLight(const csColor& color)
-      { scfParent->SetDynamicAmbientLight(color); }  
+      { scfParent->SetDynamicAmbientLight(color); }
     virtual csColor GetDynamicAmbientLight() const
-      { return scfParent->dynamic_ambient_color; }  
+      { return scfParent->dynamic_ambient_color; }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
     virtual bool HasFog () const

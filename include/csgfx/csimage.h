@@ -96,7 +96,8 @@ protected:
    * The csRGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_pal8 (uint8 *iImage, const csRGBcolor *iPalette, int nPalColors = 256);
+  void convert_pal8 (uint8 *iImage, const csRGBcolor *iPalette,
+  	int nPalColors = 256);
 
   /**
    * Free all image data: pixels and palette. Takes care of image data format.

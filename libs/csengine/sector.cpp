@@ -265,7 +265,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csSectorVisibleMeshCallback ()
-  {  
+  {
     SCF_CONSTRUCT_IBASE(0);
     privMeshlist = 0;
   }
@@ -281,7 +281,7 @@ public:
     this->rview = rview;
   }
 
-  virtual void ObjectVisible (iVisibilityObject *visobject, 
+  virtual void ObjectVisible (iVisibilityObject *visobject,
     iMeshWrapper *mesh)
   {
     if (0==privMeshlist)
@@ -318,7 +318,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 
   // This is used for csMeshObject::IsChildVisible to determine
   // when to update its cache. Should be changed to something more
-  // sensible.
+  // sensible. @@@ What about engine frame number?
   current_visnr++;
 
 /*  if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
@@ -327,58 +327,50 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
     visibleMeshCache->Empty ();
     cb.Setup (visibleMeshCache, rview);
     GetVisibilityCuller()->VisTest (rview, &cb);
-      
+
     cachedFrameNumber = engine->GetCurrentFrameNumber ();
     cachedCamera = rview->GetCamera();
   }
 
   return visibleMeshCache;*/
-  
-  csList<visibleMeshCacheHolder>::Iterator it (visibleMeshCache);
-  bool firstEntry = true;
-  while (it.HasNext())
+
+  int i;
+  uint32 cur_framenr = engine->GetCurrentFrameNumber ();
+  for (i = 0 ; i < visibleMeshCache.Length () ; i++)
   {
-    visibleMeshCacheHolder *entry = it.Next();
-    if (entry->cachedFrameNumber == engine->GetCurrentFrameNumber () &&
-        entry->cachedRView == rview)
+    visibleMeshCacheHolder& entry = visibleMeshCache[i];
+    if (entry.cachedFrameNumber == cur_framenr &&
+        true)//entry.cachedRenderContext == rview->GetRenderContext ())
     {
-      if (!firstEntry)
-      {
-        visibleMeshCacheHolder h = *entry;
-        visibleMeshCache.Delete(it);
-        visibleMeshCache.PushFront(h);
-      }
-      return entry->meshList;
+      return entry.meshList;
     }
-    firstEntry = false;
   }
 
   //try to find a spot to do a new cache
-  csList<visibleMeshCacheHolder>::Iterator it2 (visibleMeshCache);
-  while (it2.HasNext())
+  for (i = 0 ; i < visibleMeshCache.Length () ; i++)
   {
-    visibleMeshCacheHolder *entry = it2.Next();
-    if (entry->cachedFrameNumber != engine->GetCurrentFrameNumber () )
+    visibleMeshCacheHolder& entry = visibleMeshCache[i];
+    if (entry.cachedFrameNumber != cur_framenr)
     {
       //use this slot
-      entry->meshList->Empty ();
-      cb.Setup (entry->meshList, rview);
+      entry.meshList->Empty ();
+      cb.Setup (entry.meshList, rview);
       GetVisibilityCuller()->VisTest (rview, &cb);
 
-      entry->cachedFrameNumber = engine->GetCurrentFrameNumber ();
-      entry->cachedRView = rview;
-      return entry->meshList;
+      entry.cachedFrameNumber = cur_framenr;
+      entry.cachedRenderContext = rview->GetRenderContext ();
+      return entry.meshList;
     }
   }
 
   //create a new cache entry
   visibleMeshCacheHolder holder;
-  holder.cachedFrameNumber = engine->GetCurrentFrameNumber ();
-  holder.cachedRView = rview;
-  holder.meshList = new csRenderMeshList(engine->object_reg);
+  holder.cachedFrameNumber = cur_framenr;
+  holder.cachedRenderContext = rview->GetRenderContext ();
+  holder.meshList = new csRenderMeshList (engine->object_reg);
   cb.Setup (holder.meshList, rview);
   GetVisibilityCuller()->VisTest (rview, &cb);
-  visibleMeshCache.PushFront (holder);
+  visibleMeshCache.Push (holder);
   return holder.meshList;
 }
 
