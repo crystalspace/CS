@@ -1,0 +1,26 @@
+#============================================================================
+# Jam configuration and actions for MacOS/X
+#============================================================================
+if $(PTHREAD.AVAILABLE) = "yes"
+{
+  LINKLIBS += $(PTHREAD.LFLAGS) ;
+  C++FLAGS += $(PTHREAD.CFLAGS) ;
+  CFLAGS += $(PTHREAD.CFLAGS) ;
+}
+
+APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
+APPLICATION.CONSOLE.LFLAGS = -framework AppKit -framework Foundation ;
+PLUGIN.LFLAGS = -framework AppKit -framework Foundation ;
+SUFPLUGIN ?= .csplugin ;
+
+# XXX: The actions here are just guesses, I wasn't able to properly test them.
+actions LinkPlugin bind NEEDLIBS
+{
+  $(CMD.LINK) -v -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
+
+actions LinkApplication bind NEEDLIBS
+{
+  $(CMD.LINK) -v -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
+

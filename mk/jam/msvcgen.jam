@@ -1,0 +1,222 @@
+#============================================================================
+# Rules for creating msvc projectfiles
+#============================================================================
+
+if $(MSVCGEN_CONFIG)
+{
+
+SHELL = /bin/sh ;
+MSVCGEN = "$(PERL) $(TOP)/experimental/msvcgen/msvcgen.pl" ;
+MKVERRES = "$(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh" ;
+MERGERES = "$(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh" ;
+
+MSVC_VERSION ?= 6 ;
+if $(MSVC_VERSION) = 6
+{
+  MSVCGEN_LOCATE_TARGET ?= $(TOP)/experimental/visualc ;
+  MSVCGEN_TEMPLATEDIR ?= $(TOP)/experimental/msvcgen/template ;
+  SSUFPRJ = dsp ;
+  SSUFWSP = dsw ;
+  SUFPRJ = .dsp ;
+  SUFWSP = .dsw ;
+}
+else if $(MSVC_VERSION) = 7
+{
+  SSUFPRJ = vcproj ;
+  SUFPRJ = .vcproj ;
+  SSUFWSP = sln ;
+  SUFWSP = .sln ;
+  MSVCGEN_LOCATE_TARGET ?= $(TOP)/experimental/visualc7 ;
+  MSVCGEN_TEMPLATEDIR ?= $(TOP)/experimental/msvcgen/template7 ;
+}
+else
+{
+  EXIT "No support for msvc version $(MSVC_VERSION) yet!" ;
+}
+  
+#NotFile msvcgen ;
+#Depends msvcgen : $(MSVCOUTPUT:G=dir) ;
+#MkDir $(MSVCOUTPUT:G=dir) ;
+#Clean msvcclen : $(MSVCOUTPUT:G=dir) ;
+
+#----------------------------------------------------------------------------
+# Override some rules
+
+
+## MavcProject target : sources : type : target
+rule MsvcProject
+{
+  local resource msvcname target fragments files i ;
+
+  switch $(3)
+  {
+    case appcon :
+      msvcname = app$(<) ;
+    case plugin :
+      msvcname = plg$(<) ;
+    case library :
+      msvcname = lib$(<) ;
+    case group :
+      msvcname = grp$(<) ;
+    case * :
+      exit "Unknown msvc projecttype: $(3) specified!" ;
+  }
+  $(<)_MSVCNAME = $(msvcname) ;
+      
+  fragments = [ FAppendSuffix $(msvcname) : .frag ]
+	      [ FAppendSuffix $(msvcname) : .frag.cfi ]
+	      [ FAppendSuffix $(msvcname) : .frag.dpi ]
+	      [ FAppendSuffix $(msvcname) : .frag.pji ] ;
+  target = [ FAppendSuffix $(msvcname) : $(SUFPRJ) ] $(fragments) ;
+  $(<)_TARGET = $(target) ;
+  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
+
+  # Only include cpp and h files for now
+  for i in $(>)
+  {
+    switch $(i:S)
+    {
+      case .h : files += $(i:G=msvcsources) ;
+      case .cpp : files += $(i:G=msvcsources) ;
+    }
+  }
+  # Search at the correct place for the files
+  SEARCH on $(files) = $(SEARCH_SOURCE) ;
+
+  # Add resource file
+  if $(3) = "plugin" || $(3) = "appcon"
+  {
+    resource = $(msvcname:S=.rc) ;
+    files += $(resource) ;
+    LOCATE on $(resource) = $(MSVCGEN_LOCATE_TARGET) ;
+    NAME on $(resource) = $(<) ;
+    FIXPATH on $(resource) = $(MSVCGEN_LOCATE_TARGET) ;
+    ResourceGen $(resource) ;
+    Always $(resource) ;
+  }
+  
+  PROJECTNAME on $(target) = $(<) ;
+  TARGET on $(target) = $(4) ;
+  TYPE on $(target) = $(3) ;
+  DEPEND on $(target) += $(MSVC.DEPEND) $(MSVC.DEPEND.$(3)) ;
+  LIBRARY on $(target) += $(MSVC.LIBRARY) $(MSVC.LIBRARY.$(3)) ;
+  CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(3)) ;
+
+  Depends msvcgen : $(target) ;
+  Depends $(target) : $(files) ;
+  MsvcProjectGen $(target) : $(files) ;
+  Always $(target) ;
+
+  MSVCWorkspace crystal : $(fragments) ;
+
+  Clean msvcclean : $(target) ;
+}
+
+#----------------------------------------------------------------------------
+
+rule Application
+{
+  MsvcProject $(<) : $(>) : appcon : $(<:S=.exe) ;
+  CompileGroups $(<) : all apps ;
+}
+
+rule Plugin
+{
+  MsvcProject $(<) : $(>) : plugin : $(<:S=.dll) ;
+  CompileGroups $(<) : all plugins ;
+}
+
+rule Library
+{
+  MsvcProject $(<) : $(>) : library : $(<:S=.lib) ;
+  CompileGroups $(<) : all libs ;
+}
+
+rule RegisterCompileGroups
+{
+  local i ;
+
+  for i in $(<)
+  {
+    RegisterCompileGroup $(i) ;
+  }
+}
+
+rule RegisterCompileGroup
+{
+  MsvcProject $(<) : $(>) : group ; 
+}
+
+rule CompileGroups
+{
+  for i in $(>)
+  {
+    DEPEND on $($($(i)_MSVCNAME)_TARGET) += $($(<)_MSVCNAME) ;
+  }
+}
+
+rule LinkWith
+{
+  DEPEND on $($($(<)_MSVCNAME)_TARGET) += lib$(>) ;
+}
+
+rule CFlags
+{
+  if $(>) != ""
+  {
+    CFLAGS on $($($(<)_MSVCNAME)_TARGET) += $(>) ;
+  }
+}
+
+rule LFlags
+{
+  LIBRARY on $($($(<)_MSVCNAME)_TARGET) += $(>) ;
+}
+
+rule MSVCWorkspace
+{
+  local target ;
+
+  target = [ FAppendSuffix $(<) : $(SUFWSP) ] ;
+  MakeLocate $(target) : $(MSVCGEN_LOCATE_TARGET) ;
+
+  Depends msvcgen : $(target) ;
+  Depends $(target) : $(>[1]) ;
+  MsvcWorkspaceGen $(target) : $(>[1]) ;
+
+  RmTemps $(target) : $(>) ;
+}
+
+#----------------------------------------------------------------------------
+
+actions MsvcProjectGen
+{
+  $(MSVCGEN) --quiet --project \
+  --template=$(TYPE) --template-dir=$(MSVCGEN_TEMPLATEDIR) \
+  --name=$(PROJECTNAME) --fragment=$(<[2]) --target=$(TARGET) \
+  --depend=$(DEPEND) --library=$(LIBRARY) --cflags='$(CFLAGS)' \
+  --output=$(<[1]) --projext=$(SSUFPRJ) $(>)
+}
+
+actions together MsvcWorkspaceGen
+{
+  $(MSVCGEN) --quiet --workspace \
+  --projext=$(SSUFPRJ) --wsext=$(SSUFWSP) \
+  --template-dir=$(MSVCGEN_TEMPLATEDIR) \
+  --output=$(<) $(>)
+}
+
+actions ResourceGen
+{
+  $(MKVERRES) '$(<:S=.rctmp)' '$($(NAME)_help)'
+  $(MERGERES) '$(<)' '$(FIXPATH)' '$($(NAME)_WIN32RESOURCE)' '$(<:S=.rctmp)'
+  rm -f $(<:S=.rctmp)
+}
+
+#----------------------------------------------------------------------------
+
+RegisterCompileGroups all apps plugins libs ;
+NotFile msvcgen ;
+Always msvcgen ;
+
+}

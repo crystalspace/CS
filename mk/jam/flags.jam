@@ -1,0 +1,62 @@
+#============================================================================
+# Rules for specifying compiler and linker flags
+#============================================================================
+
+##  LinkWith appname : libs
+##    Link an application with libraries. The specified libraries should have
+##    build rules in the same project. For external libraries use the
+##    ExternalLibs rule. Specify the library names without any extensions or
+##    the leading "lib".
+rule LinkWith
+{
+  local deplibs = [ CreateLibList $(>) ] ;
+  DEPENDS $($(<)_target) : $(deplibs) ;
+  NEEDLIBS on $($(<)_target) += $(deplibs) ;
+
+  if $(USE_PLUGINS) = no && $($(<)_type) = plugin
+      && [ IsElem $(<) : $(STATIC.PLUGINLIST) ]
+  {
+      STATIC.LINKWITH = [ _CreateLibList $(STATIC.LINKWITH) $(>) ] ;
+  }
+}
+
+##  CFlags target : flags
+##    Sets cflags on all sourcefiles of a library, plugin or application target
+##    This rule affects c++ and c compiler flags.
+rule CFlags
+{
+  CCFLAGS on $($(<)_objects) += $(>) ;
+  C++FLAGS on $($(<)_objects) += $(>) ;
+}
+
+##  LFlags target : flags
+##    Sets linker flags for a library, plugin or application target
+rule LFlags
+{
+  LINKLIBS on $($(<)_target) += $(>) ;
+}
+
+##  ExternalLibs appname : linkerflags
+##    Link an application with external libraries. It is possible to give a
+##    set of flags which will be passed to the linker when building the
+##    application (typically -L and -l flags).
+rule ExternalLibs
+{
+  local i ;
+  
+  for i in $(>)
+  {
+    CFlags $(<) : $($(i).CFLAGS) ;
+    LFlags $(<) : $($(i).LFLAGS) ;
+  }
+
+  if $(USE_PLUGINS) = no && $($(<)_type) = plugin 
+     && [ IsElem $(<) : $(STATIC.PLUGINLIST) ]
+  {
+    for i in $(>)
+    {
+      LFLAGS.STATIC += $($(i).LFLAGS) ;
+    }
+  }
+}
+

@@ -1,0 +1,35 @@
+#============================================================================
+# Rules for introducing new filetypes to jam
+#============================================================================
+
+##  RegisterFileType Rulename : extension
+##    The original jam already provides support for user defined extensions
+##    through the UserObject rule. However this rule has some drawbacks as you
+##    can only defined exactly 1 such rule. Thus we build a framework around
+##    it where we can dynamically "register" new rules into our system.
+##    You can specify a rulename here and the suffix(es) for your filetypes
+##    (With the leading dot)
+rule RegisterFileType
+{
+  local type ;
+  for type in $(>)
+  {
+    FILETYPE_$(type) = $(<) ;
+  }
+}
+
+#----------------------------------------------------------------------------
+
+rule UserObject
+{
+  local _suffix = $(>:S) ;
+  
+  if $(FILETYPE_$(_suffix))
+  {
+    $(FILETYPE_$(_suffix)) $(<) : $(>) ;
+  }
+  else
+  {
+    echo "*** WARNING: No rules for filetype $(_suffix) defined" ;
+  }
+}

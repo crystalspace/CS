@@ -1,0 +1,26 @@
+#============================================================================
+# Setup of compiler/linker flags for debug/optimize mode
+#============================================================================
+
+# Set modus related flags
+CCFLAGS += $(COMPILER.CFLAGS.$(MODE)) ;
+C++FLAGS += $(CFLAGS.$(MODE)) $(C++FLAGS.$(MODE)) ;
+LINKLIBS += $(LFLAGS.$(MODE)) ;
+LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(MODE) ;
+
+# Configuration for debug/optimized mode
+if $(MODE) = "debug"
+{
+  CCFLAGS += -DCS_DEBUG ;
+  C++FLAGS += -DCS_DEBUG ;
+}
+
+if $(MODE) = "profile"
+{
+# profile is optimized mode without plugins but with debug symbols
+  CCFLAGS += -g3 ;
+  C++FLAGS += -g3 ;
+  LINKLIBS += -g3 ;
+  USE_PLUGINS = no ;
+}
+

@@ -1,0 +1,108 @@
+#============================================================================
+# Rules for compiling applications
+#============================================================================
+
+##  Application appname : sources [ : options ]
+##    Build an application out of sourcefiles. All sourcefiles will be passed
+##    to the Objects rule which tries to compile them into object-files. You
+##    can create rules for your own filetypes with the UserObject rule. Header
+##    files will just be ignored. They are only used for MSVC projectfile
+##    generation.
+##    Possible options are "noinstall" if you don't want a default install
+##    target to be created and "console" if you're building a console
+##    application (an application without any graphical output which is
+##    intended to be used on commandline)
+##    Some notes: You should not add the .exe extension to the appname - jam
+##    will do that on win32.
+##    If you have sourcefiles in subdirectories, then you'll need to use the
+##    SearchSubdir rule. Never specify sourcefiles with paths, only specify
+##    the filenames.
+rule Application
+{
+  # check options
+  _Options $(<) : $(3) ;
+    
+  # filter headers
+  local sources i ;
+  for i in $(>)
+  {
+    if $(i:S) != .h
+    {
+      sources += $(i) ;
+    }
+  }
+  sources = [ FGristFiles $(sources) ] ;
+
+  if $(USE_PLUGINS) = "no"
+  {
+    BuildStaticFile ;
+    sources += $(STATICINITFILE:S=.o) ;
+  }
+
+  $(<)_type = application ;
+  $(<)_target = [ FAppendSuffix $(<) : $(SUFEXE) ] ;
+  $(<)_objects = $(sources:S=$(SUFOBJ)) ;
+  CompileObjects $(sources) ;
+  ApplicationFromObjects $(<) : $($(<)_objects) ;
+  CFlags $(<) : $(APPLICATION.CFLAGS) ;
+  LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;
+
+  if $(USE_PLUGINS) = "no"
+  {
+    LinkWith $(<) : $(STATIC.PLUGINS) $(STATIC.LINKWITH) ;
+    LFlags $(<) : $(LFLAGS.STATIC) ;
+  }
+}
+
+#----------------------------------------------------------------------------
+# private part
+
+rule ApplicationFromObjects
+{
+  local target ;
+  
+  target = $($(<)_target) ;
+
+  # so 'jam foo' works when it's really foo.exe
+  if $(target) != $(<)
+  {
+    Depends $(<) : $(target) ;
+    NotFile $(<) ;
+  }
+
+  # make compiled sources a dependency of target
+  Depends exe : $(target) ;
+  Depends $(target) : $(>) ;
+	
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+	
+  # construct Install Targets
+  if ! $(DONTINSTALL_$(<))
+  {
+    InstallApplication $(target) ;
+  }
+
+  # construct Clean Targets
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) $(>) ;
+
+  # Invoke Link rule
+  NAME on $(target) = $(<) ;
+  LinkApplication $(target) : $(>) ;
+}
+
+rule Option_console
+{
+  # XXX this needs some cflags and stuff for macosx I think
+}
+
+rule Option_noinstall
+{
+  DONTINSTALL_$(<) = yes ;
+}
+
+rule Option_install
+{
+  DONTINSTALL_$(<) = ;
+}
+

@@ -1,0 +1,26 @@
+#============================================================================
+# Jam configuration and actions for Linux/Unix
+#============================================================================
+if $(PTHREAD.AVAILABLE) = "yes"
+{
+  LINKLIBS += $(PTHREAD.LFLAGS) ;
+  C++FLAGS += $(PTHREAD.CFLAGS) ;
+  CCFLAGS += $(PTHREAD.CFLAGS) ;
+}
+
+# only use nasm on x86 for now...
+NASM.FLAGS += -f elf ;
+SUFPLUGIN ?= .so ;
+# disabled (Matze: I really think we should eanble this, regardless of the 1%
+# speed loss...)
+#PLUGIN.CFLAGS += -fPIC ;
+
+actions LinkPlugin bind NEEDLIBS
+{
+  $(CMD.LINK) -shared -Wl,-soname -Wl,$(<) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
+
+actions LinkApplication bind NEEDLIBS
+{
+  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}

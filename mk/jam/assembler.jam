@@ -1,0 +1,20 @@
+#============================================================================
+# Rules for handling assembler files
+#============================================================================
+
+if $(CMD.NASM)
+{
+
+rule Nasm
+{
+  Depends $(<) : $(>) ;
+  NASM.FLAGS on $(<) += $(NASM.FLAGS) ;
+  INCLUDEFLAGS on $(<) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+}
+RegisterFileType Nasm : .asm ;
+
+actions Nasm
+{
+  $(CMD.NASM) $(NASM.FLAGS) $(INCLUDEFLAGS) -o $(<) $(>)
+}
+}

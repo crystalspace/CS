@@ -1,0 +1,42 @@
+#============================================================================
+# Rules for C, C++ and Objective-C files
+#============================================================================
+
+if $(CMD.CC)
+{
+    
+rule Cc
+{
+    Depends $(<) : $(>) ;
+
+    CCFLAGS on $(<) += $(CCFLAGS) $(SUBDIRCCFLAGS) ;
+    CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
+    CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+}
+RegisterFileType Cc : .c ;
+
+actions Cc
+{
+    $(CMD.CC) -c -o $(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+}
+}
+
+if $(CMD.C++)
+{
+
+rule C++
+{
+    Depends $(<) : $(>) ;
+
+    C++FLAGS on $(<) += $(C++FLAGS) $(SUBDIRC++FLAGS) ;
+    CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
+    CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+}
+RegisterFileType C++ : .cpp .cc .c++ ;
+
+actions C++
+{
+    $(CMD.C++) -c -o $(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+}
+}
+

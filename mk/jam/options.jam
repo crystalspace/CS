@@ -1,0 +1,49 @@
+#============================================================================
+# Rule for setting options at targets
+#============================================================================
+
+#----------------------------------------------------------------------------
+# private rule - please specify the options in Application, Plugin or Library
+# rule and don't use this rule here directly.
+
+##  _Options target : options
+##    Specify a list of options for a target. Currently the following options
+##    are known:
+##      for Applictaion targets: console
+##	    The console flag should be specified for applications which are
+##          typically started by commandline and don't rely and provide user
+##	    interaction. (this flag is usefull on macosx where graphical
+##	    applications can't easily be used remotely or in scripts).
+##	for Libraries: static, shared
+##	    Some platforms support building libraries as shared libraries,
+##	    which should reduce memory usage and loadtimes when the library is
+##	    used by several applications or plugins.
+##	for all targets: noinstall, install(default)
+##	    Some rules like Application or Plugin are setting up default rules
+##	    for the installation of the target. You can disable this behaviour
+##	    with the noinstall flag.
+rule _Options
+{
+  local target ;
+    
+  for target in $(<)
+  {
+    for option in $(>)
+    {
+      switch $(option)
+      {
+	case console : Option_console $(target) ;
+	
+	case static : Option_static $(target) ;
+	case shared : Option_shared $(target) ;
+
+        case install : Option_install $(target) ;
+	case noinstall : Option_noinstall $(target) ;
+	  
+	case * :
+	  echo "Warning: Unknown option $(option) specified for target $(target)" ;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,52 @@
+#============================================================================
+# Main rules file - Includes all important rulefiles in correct order
+#============================================================================
+mkdir = $(TOP)/mk/jam ;
+
+include $(mkdir)/variables.jam ;
+include $(mkdir)/subdir.jam ;
+
+include $(mkdir)/modus.jam ;
+include $(mkdir)/customfiles.jam ;
+include $(mkdir)/resource.jam ;
+
+include $(mkdir)/helper.jam ;
+include $(mkdir)/help.jam ;
+include $(mkdir)/groups.jam ;
+include $(mkdir)/install.jam ;
+include $(mkdir)/clean.jam ;
+
+include $(mkdir)/objects.jam ;
+include $(mkdir)/compiler.jam ;
+include $(mkdir)/objectivec.jam ;
+include $(mkdir)/assembler.jam ;
+include $(mkdir)/bisonflex.jam ;
+
+include $(mkdir)/flags.jam ;
+include $(mkdir)/library.jam ;
+include $(mkdir)/static.jam ;
+include $(mkdir)/application.jam ;
+include $(mkdir)/plugin.jam ;
+include $(mkdir)/deps.jam ;
+include $(mkdir)/docs.jam ;
+
+include $(mkdir)/options.jam ;
+
+# leave msvcgen as last element because it overrides some of teh earlier
+# defined rules
+include $(mkdir)/msvcgen.jam ;
+
+# Include OS specific rules
+switch $(TARGET.OS)
+{
+case WIN32 :
+  include $(mkdir)/win32.jam ;
+case MACOS_X :
+  include $(mkdir)/macosx.jam ;
+case UNIX :
+  include $(mkdir)/unix.jam ;
+case * :
+  echo "WARNING: TARGET.OS not defined. Using unix" ;
+  include $(mkdir)/unix.jam ;
+}
+

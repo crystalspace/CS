@@ -1,0 +1,25 @@
+#============================================================================
+# Rules for displaying help messages about targets
+#============================================================================
+
+##  Help target : description
+##    Adds a description to a target which will be shown to the user when
+##    "jam help" is invoked.
+rule Help
+{
+  $(<)_help = $(>) ;
+  local target = $(<:G=help) ;
+  Depends help : $(target) ;
+  NotFile $(>) ;
+  PrintHelp $(target) : $(>) ;
+}
+
+#----------------------------------------------------------------------------
+                                                                                
+NotFile help ;
+Always help ;
+
+actions quietly PrintHelp
+{
+  printf " jam %-12s   Build the %-40s\n" "$(<)" "$(>)"
+}

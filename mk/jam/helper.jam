@@ -1,0 +1,109 @@
+#============================================================================
+# Helper rules
+#============================================================================
+
+##  IncludeDir [target : ] directories
+##    Description: Is used to specify the location of header files for a
+##    target or the whole project if no target is given.
+##    This rule will automatically generate the -I compiler flags and makes
+##    sure the depndency scanner is able to locate your header files. The
+##    directoreis are relative to the current subdir specified with the SubDir
+##    rule.
+##    Implementation: The directories are simply added to the HDRS variable
+##    which is respected all jam rules.
+rule IncludeDir
+{
+  if $(>)
+  {
+    HDRS on $(<) += $(SUBDIR)/$(>) ;
+  }
+  else
+  {
+    # don't fail when used in Jamrule where SUBDIR isn't defined yet.
+    if $(SUBDIR)
+    {
+      HDRS += $(SUBDIR)/$(<) ;
+    }
+    else
+    {
+      HDRS += $(<) ;
+    }
+  }   
+}
+
+##  SearchSubdir subdirectories
+##    Description: Tells jam where to find additional sourcefiles. This is
+##    usefull when your target has files in subdirectories. In this case set
+##    SearchSubdir to these subdirectories and just mention the sourcefiles
+##    without path in your other rules.
+##    Implementation: This rule sets the SEARCH_SOURCE variable to
+##    $(SUBDIR)/subdir, so this rule will only work with rules which respect
+##    the SEARCH_SOURCE variable. (All CS rules do this)
+rule SearchSubdir
+{
+  SEARCH_SOURCE += $(SUBDIR)/$(<) ;
+}
+
+##  Wildcard [ dir : ] patterns
+##    Create a list of files in a directory which match the pattern. You can
+##    optinally specify a subdirectory. The files will be returned with
+##    stripped pathnames. The difference to GLOB is that this rule respects
+##    subdirectories which may have been entered with the SubDir rule.
+rule Wildcard
+{
+  local files dir wildcards ;
+  
+  # Is a directory given?
+  if $(>) {
+    dir = $(<)/ ;
+    wildcards = $(>) ;
+  } else {
+    dir = "" ;
+    wildcards = $(<) ;
+  }
+
+  files = [ GLOB [ FDirName $(SUBDIR) $(dir) ] : $(wildcards) ] ;
+
+  return $(files:BS) ;
+}
+
+##  Filter list : filter
+##    Returns the list without the words contained in filter.
+rule Filter
+{
+  local i result ;
+
+  for i in $(<)
+  {
+    if ! [ IsElem $(i) $(>) ]
+    {
+      result += $(i) ;
+    }
+  }
+}
+
+##  Prefix list : prefix
+##    Adds a prefix to a all elements in list.
+rule Prefix
+{
+  return $(>)$(<) ;
+}
+
+##  IsElem element : list
+##    Returns "true" if the elemnt is in the least. Otherwise nothing is
+##    returned.
+rule IsElem
+{
+  local i ;
+
+  for i in $(>)
+  {
+    if $(i) = $(<)
+    {
+      return "true" ;
+    }
+  }
+
+  return ;
+}
+

@@ -1,0 +1,97 @@
+#============================================================================
+# Rules for creating Documentation
+#============================================================================
+
+# XXX: this should be detected by configure
+TEXI2HTML = $(PERL) $(TOP)/docs/support/texi2html ;
+DOXYGEN = doxygen ;
+
+##  Texi2DVI targetname : texifile : dvifile [ : subdir ]
+##    Creates dvofoöe out of the texifile
+rule Texi2DVI
+{
+  SEARCH on $(>) = $(SUBDIR) ;
+
+  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(4) ] ;
+  LOCATE on $(3) = $(_dir) ;
+  Depends $(<) : $(_dir) ;
+  MkDir $(_dir) ;
+
+  TEXIFLAGS on $(>) += -I $(SUBDIR) ;
+  Depends $(<) : $(3) ;
+  Depends $(3) : $(>) ;
+  RunTexi2DVI $(3) : $(>) ;
+}
+
+##  Texi2HTML targetname : texifile : subdir
+##    Generate html documentation from texinfo files. Flags can be specified
+##    with the TEXIFLAGS variable.
+rule Texi2HTML
+{
+  SEARCH on $(>) = $(SUBDIR) ;
+
+  # Create Output directory
+  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(3) ] ;
+  DOCDIR_$(<) = $(_dir) ;
+  Depends $(<) : $(_dir) ;
+  MkDir $(_dir) ;
+
+  TEXIFLAGS on $(<) += -subdir=$(_dir) ;
+  NotFile $(<) ;
+  Always $(<) ;
+  Depends $(<) : $(>) ;
+  RunTexi2HTML $(<) : $(>) ;
+}
+
+##  DoxyGen targetname : doxyprofile : subdir : additional files
+##    Run doxygen from TOP build dir to extract comments from headers and
+##    build an API documentation. Flags can be passed through the DOXYFLAGS
+##    variable.
+rule DoxyGen
+{
+  SEARCH on $(>) = $(SUBDIR) ;
+
+  # Create Output directory
+  local _dir = [ FDirName $(LOCATE.DOCS) $(SUBDIR) $(3) ] ;
+  DOCDIR_$(<) = $(_dir) ; 
+  Depends $(<) : $(_dir) ;
+  MkDir $(_dir) ;
+
+  NotFile $(<) ;
+  Always $(<) ;
+  Depends $(<) : $(>) ;
+  RunDoxyGen $(<) : $(>) : $(_dir) ;
+
+  local _i ;
+  for _i in $(4)
+  {
+    LOCATE on $(_i:G=copy) = $(SUBDIR) ;
+    Copy $(_i:G=copy) : $(_dir) ;
+    Always $(_i:G=copy) ;
+    Depends $(<) : $(_i:G=copy) ;
+  }
+}
+
+#----------------------------------------------------------------------------
+ 
+actions RunTexi2HTML
+{
+  $(TEXI2HTML) $(TEXIFLAGS) $(>)
+}
+
+actions RunTexi2DVI
+{
+  $(TEXI2DVI) $(TEXI2DVIFLAGS) --batch --quiet $(>)
+  mv $(>:S=.dvi) $(<)
+}
+
+actions RunDoxyGen
+{
+  $(DOXYGEN) $(>)
+}
+
+actions Copy
+{
+  cp $(<) $(>)
+}
+

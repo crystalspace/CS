@@ -1,0 +1,194 @@
+#============================================================================
+# Rules for library creation
+#============================================================================
+
+##  Library libname : sources [ : options ]
+##    Build a library out of sourcefiles. All sourcefiles will be passed
+##    to the Objects rule which tries to compile them into object-files. You
+##    can create rules for your own filetypes with the UserObject rule. Header
+##    files will just be ignored. They are only used for MSVC projectfile
+##    generation.
+##    Available options are shared if you want to build a shared library on
+##    platforms which support that. You can specify the noinstall option if
+##    you don't want that a install target is generated.
+##    Don't specify any extensions for the library name, also leave out the
+##    leading "lib". If you have sourcefiles in subdirectories, then you'll
+##    need to use the SearchSubdir rule. Don't mention the subdirectory name
+##    again for the sourcefiles.
+rule Library
+{
+  # process options
+  _Options $(<) : $(3) ;
+    
+  # filter headers
+  local sources i ;
+  for i in $(>)                             
+  {
+    if $(i:S) != .h
+    {
+      sources += $(i) ;
+    }
+  }
+  sources = [ FGristFiles $(sources) ] ;
+
+  $(<)_type = library ;
+  $(<)_target = [ FAppendSuffix lib$(<) : $(SUFLIB) ] ;
+  $(<)_objects = $(sources:S=$(SUFOBJ)) ;
+  csLibraryFromObjects $(<) : $($(<)_objects) ;
+  CompileObjects $(sources) ;
+  CFlags $(<) : $(LIBRARY.CFLAGS) ;
+  LFlags $(<) : $(LIBRARY.LFLAGS) ;
+}
+
+##  LibDepends libname : dependant libraries
+##    Make Library dependant on other libraries. This will tell the build
+##    system that your library uses functions from other libraries in the
+##    project. The build system will resolve all cyclic dependencies.
+##    Note that a library shouldn't be linked with any external library that
+##    should be done by the final application which uses the library.
+rule LibDepends
+{
+  $(<)_depends += $(>) ;
+}
+
+#----------------------------------------------------------------------------
+# private part
+
+rule csLibraryFromObjects
+{
+  local target i ;
+
+  target = $($(<)_target) ;
+  # make jam csutil working when it's really libcsutil.a
+  if $(target) != $(<)
+  {
+    Depends $(<) : $(target) ;
+    NotFile $(<) ;
+  }
+
+  # library depends on its member objects
+  if $(KEEPOBJS)
+  {
+    Depends obj : $(>) ;
+  }
+  else
+  {
+    Depends lib : $(target) ;
+  }
+
+  # Set LOCATE for the library and its contents.  The bound
+  # value shows up as $(NEEDLIBS) on the Link actions.
+  # For compatibility, we only do this if the library doesn't
+  # already have a path.
+  if ! $(target:D)
+  {
+    MakeLocate $(target) $(target)($(>:BS)) : $(LOCATE_TARGET) ;
+  }
+
+  if $(NOARSCAN)
+  {
+    # If we can't scan the library to timestamp its contents,
+    # we have to just make the library depend directly on the
+    # on-disk object files.  
+    Depends $(target) : $(>) ;
+  }
+  else
+  {
+    # If we can scan the library, we make the library depend
+    # on its members and each member depend on the on-disk
+    # object file.
+    Depends $(target) : $(target)($(>:BS)) ;
+
+    for i in $(>)
+    {
+      Depends $(target)($(i:BS)) : $(i) ;
+    }
+  }
+
+  # Generate clean rules
+  Clean $(<)clean : $(target) $(>) ;
+  Clean clean : $(target) ;
+
+  # Generate install rules
+  if ! $(DONTINSTALL_$(<))
+  {
+    InstallLibrary $(target) ;
+  }
+
+  if $(CRELIB) { CreLib $(target) : $(>[1]) ; }
+
+  Archive $(target) : $(>) ;
+
+  if $(RANLIB) { Ranlib $(target) ; }
+
+  # If we can't scan the library, we have to leave the .o's around.
+  if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(target) : $(>) ; }
+}
+
+#----------------------------------------------------------------------------
+# Helper rules to resolve inter library dependencies...
+
+# Resolving dependencies for libraries. When csutil depends on cssys und cssys
+# depend on csutil we need to get this output: -lcsutil -lcssys -lcsutil.
+# This algo isn't fully optimal, it would be possible to reorder the libs to
+# get fewer dependencies...
+rule _AddLibrary
+{
+  local added i ;
+
+  added = $(<) ;
+  cs_liblisttemp += $(<) ;
+    
+  for i in $($(<)_depends)
+  {
+    if [ IsElem $(i) : $(cs_liblisttemp) ]
+    {
+      if ! [ IsElem $(i) : $(added) ]
+      {
+  	cs_liblisttemp += $(i) ;
+      }
+    }
+    else
+    {
+      added += [ _AddLibrary $(i) ] ;
+    }
+  }
+
+  return $(added) ;
+}
+
+rule _CreateLibList
+{
+  local i ;
+
+  cs_liblisttemp = ;
+  for i in $(<)
+  {
+    if ! [ IsElem $(i) : $(cs_liblisttemp) ]
+    {
+      _AddLibrary $(i) ;
+    }
+  }
+
+  return $(cs_liblisttemp) ;
+}
+
+# Resolve dependencies for the passed library
+rule CreateLibList
+{
+  local files ;
+  
+  files = [ Prefix [ _CreateLibList $(<) ] : lib ] ;
+  files = $(files:S=$(SUFLIB)) ;
+
+  return $(files) ;
+}
+
+rule Option_shared
+{
+  echo "Error: Build rules for shared libraries are not implemented yet." ;
+}
+rule Option_static
+{
+}
+

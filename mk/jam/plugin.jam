@@ -1,0 +1,89 @@
+#============================================================================
+# Rules for plugin creation
+#============================================================================
+
+##  Plugin pluginname : sources [ : options ]
+##    Build an application out of sourcefiles. All sourcefiles will be passed
+##    to the Objects rule which tries to compile them into object-files. You
+##    can create rules for your own filetypes with the UserObject rule. Header
+##    files will just be ignored. They are only used for MSVC projectfile
+##    generator.
+##    You can specify the noinstall option if you don't want that an install
+##    target is created.
+##    Don't specify any extensions for the plugin. If you have sourcefiles in
+##    subdirectories, then you'll need to use the SearchSubdir rule. Don't
+##    mention the subdirectory name again for the sourcefiles.
+rule Plugin
+{
+  if $(USE_PLUGINS) = "no"
+  {
+    Library $(<) : $(>) : $(3) ;
+    $(<)_type = plugin ;
+    RegisterStaticPlugin $(<) ;
+  }
+  else
+  {
+    # process options
+    _Options $(<) : $(3) ;
+      
+    # filter headers
+    local sources i ;
+    for i in $(>)
+    {
+      if $(i:S) != .h
+      {
+	sources += $(i) ;
+      }
+    }
+    sources = [ FGristFiles $(sources) ] ;
+
+    # rules for compiling the source files
+    $(<)_type = plugin ;
+    $(<)_objects = $(sources:S=$(SUFOBJ)) ;
+    $(<)_target = [ FAppendSuffix $(<) : $(SUFPLUGIN) ] ;
+    CompileObjects $(sources) ;
+    CFlags $(<) : $(PLUGIN.CFLAGS) ;
+    # XXX: not sure why we have to mention LINKLIBS again, somehow the +=
+    # operator doesn't use the LINKLIBS var, while it seems doing so for
+    # CFLAGS ?!?
+    LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+    
+    PluginFromObjects $(<) : $($(<)_objects) ;
+  }
+}
+
+#----------------------------------------------------------------------------
+# private rules
+
+rule PluginFromObjects
+{
+  local souces target ;
+  
+  target = $($(<)_target) ;
+  
+  # create a simple meta target (ie. csutil instead of libcsutil.a)
+  if $(target) != $(<)
+  {
+    Depends $(<) : $(target) ;
+    NotFile $(<) ;
+  }
+
+  Depends $(target) : $(>) ;
+  Depends exe : $(target) ;   
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+
+  # Install rules
+  if ! $(DONTINSTALL_$(<))
+  {
+    InstallPlugin $(target) ;  
+  }
+
+  # Construct Clean Target
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) $(>) ;
+
+  # Invoke Link rule
+  NAME on $(target) = $(<) ;
+  LinkPlugin $(target) : $(>) ;
+}
+
