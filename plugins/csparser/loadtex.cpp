@@ -34,7 +34,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
-#include  "csgfx/xorpat.h"
+#include "csgfx/xorpat.h"
 
 iImage* csLoader::LoadImage (const char* name, int Format)
 {
@@ -58,28 +58,127 @@ iImage* csLoader::LoadImage (const char* name, int Format)
   }
 
   iImage *ifile = NULL;
-  iDataBuffer *buf = VFS->ReadFile (name);
-
-  if (!buf || !buf->GetSize ())
+  char textureFileName[VFS_MAX_PATH_LEN];
+  strcpy (textureFileName, name);
+  bool found = VFS->Exists (textureFileName);
+  if (!found)
   {
-    if (buf) buf->DecRef ();
-    ReportError (
+    ReportWarning (
 	      "crystalspace.maploader.parse.image",
-    	      "Could not open image file '%s' on VFS!", name);
-    //return NULL;
-  }
-  else
-  {
-    ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
-    buf->DecRef ();
+    	      "Could not find image file '%s' on VFS!", name);
+    ReportNotify2 (
+      "crystalspace.maploader.parse.image",
+      " Attempting alternative filenames...");
 
-    if (!ifile)
+    char* dot = strchr (textureFileName, '.');
+    if (dot == NULL) dot = strchr (textureFileName, 0);
+
+    const csVector& formats = ImageLoader->GetDescription ();
+    int i = formats.Length();
+    const char* lastMime = NULL;
+
+    while ((i >= 0) && !found)
     {
+#define CHECK_EXISTS				\
+	if (VFS->Exists (textureFileName))	\
+	{					\
+	  found = true;				\
+	  break;				\
+	}					\
+
+// jiggle extension case
+#define JIGGLE_EXT(func)			\
+	pos = dot;				\
+	while (*pos) *pos++ = func(*pos);	\
+	CHECK_EXISTS
+
+// jiggle the filename case
+#define JIGGLE_FN(func)				\
+	pos = textureFileName;			\
+	while (*pos) *pos++ = func(*pos);	\
+	CHECK_EXISTS
+
+	CHECK_EXISTS
+	char* pos;
+	JIGGLE_EXT(tolower)
+	JIGGLE_EXT(toupper)
+	JIGGLE_FN(tolower)
+	JIGGLE_EXT(toupper)
+	JIGGLE_FN(toupper)
+	JIGGLE_EXT(tolower)
+
+#undef JIGGLE_EXT
+#undef JIGGLE_FN
+#undef CHECK_EXISTS
+
+      if (i == 0) break;
+
+      iImageIO::FileFormatDescription *format;
+      do
+      {
+	format = 
+	  (iImageIO::FileFormatDescription*) formats[i-1];
+	i--;
+      }
+      while ((i > 0) && 
+	((lastMime != NULL) && !strcmp (lastMime, format->mime)));
+      lastMime = format->mime;
+
+      strcpy (textureFileName, name);
+      if (*dot == 0) *dot = '.';
+      if (i > 0)
+      {
+	const char* defext = strchr (format->mime, '/');
+	if (defext)
+	{
+	  defext++;
+	  // skip a leading "x-" in the mime type (eg "image/x-jng")
+	  if (!strncmp (defext, "x-", 2)) defext += 2; 
+	  strcpy (dot + 1, defext);
+	}
+	else
+	  *(dot + 1) = 0;
+      }
+    }
+    if (found)
+    {
+      ReportNotify2 (
+	"crystalspace.maploader.parse.image",
+	" ...using '%s'", &textureFileName[0]);
+    }
+    else
+    {
+      ReportNotify2 (
+	"crystalspace.maploader.parse.image",
+	" ...no alternative found.", &textureFileName[0]);
+      strcpy (textureFileName, name);
+    }
+  }
+
+  if (found)
+  {
+    iDataBuffer *buf = VFS->ReadFile (textureFileName);
+
+    if (!buf || !buf->GetSize ())
+    {
+      if (buf) buf->DecRef ();
       ReportError (
 		"crystalspace.maploader.parse.image",
-    		"Could not load image '%s'. Unknown format or wrong extension!",
-		name);
-      //return NULL;
+    		"Could not open image file '%s' on VFS!", 
+		&textureFileName[0]);
+    }
+    else
+    {
+      ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
+      buf->DecRef ();
+
+      if (!ifile)
+      {
+	ReportError (
+		  "crystalspace.maploader.parse.image",
+    		  "Could not load image '%s'. Unknown format or wrong extension!",
+		  &textureFileName[0]);
+      }
     }
   }
   if (!ifile)

@@ -132,8 +132,9 @@ bool csLoader::ParseMaterialList (char* buf, const char* prefix)
     switch (cmd)
     {
       case CS_TOKEN_MATERIAL:
-        if (!ParseMaterial (name, params, prefix))
-	  return false;
+//        if (!ParseMaterial (name, params, prefix))
+//	  return false;
+	ParseMaterial (name, params, prefix);
         break;
     }
   }
@@ -510,8 +511,9 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
     switch (id)
     {
       case XMLTOKEN_MATERIAL:
-        if (!ParseMaterial (child, prefix))
-	  return false;
+        //if (!ParseMaterial (child, prefix))
+	//  return false;
+	ParseMaterial (child, prefix);
         break;
       default:
         SyntaxService->ReportBadToken (child);

@@ -163,11 +163,14 @@ enum
   XMLTOKEN_VALUE
 };
 
+class StdLoaderContext;
+
 /**
  * The loader for Crystal Space maps.
  */
 class csLoader : public iLoader
 {
+  friend class StdLoaderContext;
 private:
   iLoaderContext* ldr_context;
   iLoaderContext* GetLoaderContext ();
@@ -462,6 +465,12 @@ private:
   void ReportError (const char* id, const char* description, ...);
   /// Report a notification.
   void ReportNotify (const char* description, ...);
+  /// Report a warning.
+  void ReportWarning (const char* id, const char* description, ...);
+  /// Report a notification.
+  void ReportNotifyV (const char* id, const char* description, va_list arg);
+  /// Report a notification.
+  void ReportNotify2 (const char* id, const char* description, ...);
 
 public:
   /********** iLoader implementation **********/

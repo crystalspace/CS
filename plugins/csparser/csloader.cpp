@@ -57,6 +57,7 @@
 #include "iengine/mesh.h"
 #include "iengine/lod.h"
 #include "ivideo/material.h"
+#include "ivideo/texture.h"
 #include "igraphic/imageio.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -84,8 +85,10 @@ private:
   iEngine* Engine;
   iRegion* region;
   csParser* parser;
+  csLoader* loader;
 public:
-  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion, csParser* parser);
+  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion, csParser* parser,
+    csLoader* loader);
   virtual ~StdLoaderContext ();
 
   SCF_DECLARE_IBASE;
@@ -102,7 +105,8 @@ SCF_IMPLEMENT_IBASE(StdLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 StdLoaderContext::StdLoaderContext (iEngine* Engine,
-	bool ResolveOnlyRegion, csParser* parser)
+	bool ResolveOnlyRegion, csParser* parser,
+	csLoader* loader)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   StdLoaderContext::Engine = Engine;
@@ -111,6 +115,7 @@ StdLoaderContext::StdLoaderContext (iEngine* Engine,
     region = Engine->GetCurrentRegion ();
   else
     region = NULL;
+  StdLoaderContext::loader = loader;
 }
 
 StdLoaderContext::~StdLoaderContext ()
@@ -128,7 +133,17 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
   if (mat)
     return mat;
 
+  loader->ReportWarning ("crystalspace.maploader", 
+    "Could not find material '%s'.", name);
+  loader->ReportNotify (" Creating new material ...");
   iTextureWrapper* tex = Engine->FindTexture (name, region);
+  if (!tex)
+  {
+    tex = loader->LoadTexture (name, name);
+    if (tex) loader->ReportNotify (" ...using new texture '%s'", name);
+  }
+  else
+    loader->ReportNotify (" ...using loaded texture '%s'", name);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -140,6 +155,16 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
     if (!n) n = (char*)name;
     else n++;
     mat->QueryObject()->SetName (n);
+
+    // @@@ should this be done here?
+    iTextureManager *tm;
+    if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
+    {
+      tex->Register (tm);
+      tex->GetTextureHandle()->Prepare();
+      mat->Register (tm);
+      mat->GetMaterialHandle()->Prepare();
+    }
     material->DecRef ();
     return mat;
   }
@@ -273,17 +298,48 @@ void csLoader::ReportNotify (const char* description, ...)
 {
   va_list arg;
   va_start (arg, description);
+  ReportNotifyV ("crystalspace.maploader", description, arg);
+  va_end (arg);
+}
 
+void csLoader::ReportNotifyV (const char* id, const char* description, va_list arg)
+{
   if (Reporter)
   {
-    Reporter->ReportV (CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.maploader",
+    Reporter->ReportV (CS_REPORTER_SEVERITY_NOTIFY, id,
     	description, arg);
   }
   else
   {
-    csPrintf ("crystalspace.maploader: ");
+    csPrintf ("%s: ", id);
     csPrintfV (description, arg);
     csPrintf ("\n");
+  }
+}
+
+void csLoader::ReportNotify2 (const char* id, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportNotifyV (id, description, arg);
+  va_end (arg);
+}
+
+void csLoader::ReportWarning (const char* id, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (CS_REPORTER_SEVERITY_WARNING, id, description, arg);
+  }
+  else
+  {
+    char buf[1024];
+    vsprintf (buf, description, arg);
+    csPrintf ("Warning ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
   }
   va_end (arg);
 }
@@ -2433,7 +2489,7 @@ iLoaderContext* csLoader::GetLoaderContext ()
   if (!ldr_context)
   {
     ldr_context = new StdLoaderContext (Engine, ResolveOnlyRegion,
-      &parser);
+      &parser, this);
   }
   return ldr_context;
 }

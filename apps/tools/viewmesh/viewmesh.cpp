@@ -60,6 +60,8 @@
 #include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
 #include "csutil/csstrvec.h"
+#include "iutil/cache.h"
+#include "csutil/nulcache.h"
 
 #include "iutil/plugin.h"
 #include "imap/writer.h"
@@ -279,8 +281,24 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 
 bool ViewMesh::LoadSprite(const char *filename,float scale)
 {
-  iMeshFactoryWrapper *imeshfactwrap = loader->LoadMeshObjectFactory (filename);
+  // grab the directory.
+  char *path = new char[strlen(filename)+1];
+  strcpy (path, filename);
+  char* fn = path;
+  char* slash = strrchr (path, '/');
+  char* dir;
+  if (slash)
+  {
+    fn = slash + 1;
+    *slash = 0;
+    dir = path;
+  }
+  else
+    dir = "/";
+  VFS->ChDir (dir);
 
+  iMeshFactoryWrapper *imeshfactwrap = loader->LoadMeshObjectFactory (fn);
+  delete[] path;
 
   if (!imeshfactwrap)
     return false;
@@ -488,6 +506,11 @@ bool ViewMesh::Initialize ()
 
   VM_QUERYPLUGIN (loader, iLoader, "iLoader");
   VM_QUERYPLUGIN (g3d, iGraphics3D, "iGraphics3D");
+
+  // Set up a null cache.
+  iCacheManager *cachemgr = new csNullCacheManager ();
+  engine->SetCacheManager (cachemgr);
+  cachemgr->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iGraphics2D* g2d = g3d->GetDriver2D ();
