@@ -159,7 +159,7 @@ static void BuildVertexArray (iModelDataPolygon* poly,
 	  SpriteNormal == PolyNormal &&
 	  SpriteTexel == PolyTexel)
       {
-	SpriteVertexIndex = i;
+	SpriteVertexIndex = j;
 	break;
       }
     }
