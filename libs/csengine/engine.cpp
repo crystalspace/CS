@@ -2138,6 +2138,7 @@ csPtr<iObjectIterator> csEngine::GetNearbyObjects (
 {
   csPArray<iObject>* list = new csPArray<iObject>;
   csPArray<iSector> visited_sectors;
+  visited_sectors.Push (sector);
   GetNearbyObjectList (sector, pos, radius, *list, visited_sectors, crossPortals);
   csObjectListIt *it = new csObjectListIt (list);
   return csPtr<iObjectIterator> (it);
