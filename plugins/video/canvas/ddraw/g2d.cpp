@@ -157,8 +157,8 @@ bool CreateIdentityPalette(RGBPixel *p)
   hWndPalette = CreatePalette((LOGPALETTE *)&Palette);
   
   if(!hWndPalette) 
-		return false;
-	return true;
+    return false;
+  return true;
 
 }
 
@@ -179,8 +179,8 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_bLocked(false),
   m_piWin32System(NULL),
   m_bUses3D(false),
-	m_bWindowed(true),
-	m_bReady(false)
+  m_bWindowed(true),
+  m_bReady(false)
 {
   CONSTRUCT_IBASE (iParent);
 }
@@ -199,7 +199,7 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
 
   // QI for iWin32SystemDriver //
   m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
-	ASSERT(m_piWin32System);
+  ASSERT(m_piWin32System);
 
   // Get the creation parameters //
   m_hInstance = m_piWin32System->GetInstance();
@@ -213,7 +213,7 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
 bool csGraphics2DDDraw3::Open(const char *Title)
 {
   HRESULT ddrval;
-	LPGUID pGuid = NULL;
+  LPGUID pGuid = NULL;
 
   if (!csGraphics2D::Open (Title))
     return false;
@@ -228,7 +228,7 @@ bool csGraphics2DDDraw3::Open(const char *Title)
   }
   else
   {
-	*/
+  */
     // create the window.
     DWORD exStyle = 0;
     DWORD style = WS_POPUP;
@@ -243,7 +243,7 @@ bool csGraphics2DDDraw3::Open(const char *Title)
                           (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                             (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                             wwidth, wheight, NULL, NULL, m_hInstance, NULL );
-		ASSERT(m_hWnd);
+    ASSERT(m_hWnd);
   
     ShowWindow( m_hWnd, m_nCmdShow );
     UpdateWindow( m_hWnd );
@@ -252,50 +252,50 @@ bool csGraphics2DDDraw3::Open(const char *Title)
     // Save the window size/pos for switching modes
     GetWindowRect(m_hWnd, &m_rcWindow);
 
-		//Get ahold of the main DirectDraw object...
-		if (!m_bUses3D)
-		{
-				DDetection.checkDevices2D();
-				DirectDevice = DDetection.findBestDevice2D();
-		}
-		else
-		{
-				DDetection.checkDevices3D();
-				DirectDevice = DDetection.findBestDevice3D(FullScreen);
-		}
+    //Get ahold of the main DirectDraw object...
+    if (!m_bUses3D)
+    {
+        DDetection.checkDevices2D();
+        DirectDevice = DDetection.findBestDevice2D();
+    }
+    else
+    {
+        DDetection.checkDevices3D();
+        DirectDevice = DDetection.findBestDevice3D(FullScreen);
+    }
   
-		if (DirectDevice == NULL)
-		{
-			InitFail(m_hWnd, false, "csGraphics2DDDraw3::Open(DirectDevice) -- Error creating DirectDevice.");
-			return false;
-		}
+    if (DirectDevice == NULL)
+    {
+      InitFail(m_hWnd, false, "csGraphics2DDDraw3::Open(DirectDevice) -- Error creating DirectDevice.");
+      return false;
+    }
 
-		if (!DirectDevice->IsPrimary2D)
-			pGuid = &DirectDevice->Guid2D;
+    if (!DirectDevice->IsPrimary2D)
+      pGuid = &DirectDevice->Guid2D;
   
-		// create a DD object for either the primary device or the secondary. //
-		if(!pGuid)
-			System->Printf(MSG_INITIALIZATION, "Use the primary DirectDraw device\n");
-		else 
-			System->Printf(MSG_INITIALIZATION, "Use a secondary DirectDraw device : %s (%s)\n", DirectDevice->DeviceName2D, DirectDevice->DeviceDescription2D);
+    // create a DD object for either the primary device or the secondary. //
+    if(!pGuid)
+      System->Printf(MSG_INITIALIZATION, "Use the primary DirectDraw device\n");
+    else 
+      System->Printf(MSG_INITIALIZATION, "Use a secondary DirectDraw device : %s (%s)\n", DirectDevice->DeviceName2D, DirectDevice->DeviceDescription2D);
 
-		// Create DD Object 
-		ddrval = DirectDrawCreate (pGuid, &m_lpDD, NULL);
-		if (ddrval != DD_OK)
-		{
-			InitFail(m_hWnd, ddrval, "DirectDrawCreateEx FAILED");
-			return false;
-		}
+    // Create DD Object 
+    ddrval = DirectDrawCreate (pGuid, &m_lpDD, NULL);
+    if (ddrval != DD_OK)
+    {
+      InitFail(m_hWnd, ddrval, "DirectDrawCreateEx FAILED");
+      return false;
+    }
   //}
   
   Memory=NULL;
 
-	ddrval = InitSurfaces(m_hWnd);
-	if (ddrval != DD_OK)
-		return false;
-	
-	m_bReady = TRUE;
-	return true;
+  ddrval = InitSurfaces(m_hWnd);
+  if (ddrval != DD_OK)
+    return false;
+  
+  m_bReady = TRUE;
+  return true;
 }
 
 void csGraphics2DDDraw3::Close(void)
@@ -336,7 +336,7 @@ int csGraphics2DDDraw3::GetPage ()
 
 bool csGraphics2DDDraw3::DoubleBuffer (bool Enable)
 {
-	Enable;
+  Enable;
   return true;
 }
 
@@ -349,58 +349,58 @@ void csGraphics2DDDraw3::Print (csRect* /*area*/)
 {
   HRESULT hRet;
   /*
-	TODO:
-		Use csRect for our Viewport in the blt operation????
-	*/
+  TODO:
+    Use csRect for our Viewport in the blt operation????
+  */
 
-	if (m_bReady)
-	{
-		while( 1 )
-		{
+  if (m_bReady)
+  {
+    while( 1 )
+    {
 
-			// If we are in windowed mode, perform a blt.
- 			if (m_bWindowed)
-			{
-				if(m_bPalettized)
-				{
-					HDC      hdc;
-					HPALETTE oldPal;
+      // If we are in windowed mode, perform a blt.
+      if (m_bWindowed)
+      {
+        if(m_bPalettized)
+        {
+          HDC      hdc;
+          HPALETTE oldPal;
 
-					hdc = GetDC(m_hWnd);
+          hdc = GetDC(m_hWnd);
         
-					oldPal = SelectPalette(hdc, hWndPalette, FALSE);
-					RealizePalette(hdc);
+          oldPal = SelectPalette(hdc, hWndPalette, FALSE);
+          RealizePalette(hdc);
 
-					hRet = m_lpddsPrimary->Blt(&m_rcScreen, m_lpddsBack, 
-																		 NULL/*&m_rcViewport*/, DDBLT_WAIT, NULL);
+          hRet = m_lpddsPrimary->Blt(&m_rcScreen, m_lpddsBack, 
+                                     NULL/*&m_rcViewport*/, DDBLT_WAIT, NULL);
 
-					SelectPalette(hdc, oldPal, FALSE);
-				}
-				else
-				{
+          SelectPalette(hdc, oldPal, FALSE);
+        }
+        else
+        {
 
-					hRet = m_lpddsPrimary->Blt(&m_rcScreen, m_lpddsBack, 
-																		 NULL/*&m_rcViewport*/, DDBLT_WAIT, NULL);
-				}
-			}
-			else
-			{
-					// Else we are in fullscreen mode, so perform a flip.
-					hRet = m_lpddsPrimary->Flip( NULL, 0L );
-			}
-			
-			if (hRet == DD_OK )
-					break;
-			if (hRet == DDERR_SURFACELOST )
-			{
-					hRet = m_lpddsPrimary->Restore();
-					if (hRet != DD_OK )
-						break;
-			}
-			if (hRet != DDERR_WASSTILLDRAWING )
-					break;
-		}
-	}
+          hRet = m_lpddsPrimary->Blt(&m_rcScreen, m_lpddsBack, 
+                                     NULL/*&m_rcViewport*/, DDBLT_WAIT, NULL);
+        }
+      }
+      else
+      {
+          // Else we are in fullscreen mode, so perform a flip.
+          hRet = m_lpddsPrimary->Flip( NULL, 0L );
+      }
+      
+      if (hRet == DD_OK )
+          break;
+      if (hRet == DDERR_SURFACELOST )
+      {
+          hRet = m_lpddsPrimary->Restore();
+          if (hRet != DD_OK )
+            break;
+      }
+      if (hRet != DDERR_WASSTILLDRAWING )
+          break;
+    }
+  }
 }
 /*
 HRESULT csGraphics2DDDraw3::RestoreAll()
@@ -419,8 +419,8 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf()
 
   if (m_bLocked)
   {
-      m_lpddsBack->Unlock(NULL);
-      m_bLocked = false;      
+    m_lpddsBack->Unlock(NULL);
+    m_bLocked = false;
   }
   
   ddsd.dwSize = sizeof(ddsd);
@@ -432,10 +432,10 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf()
   while (ret==DDERR_WASSTILLDRAWING);
   
   if (ret!=DD_OK)
-		{
-		InitFail(m_hWnd, ret, "There was an error locking the DirectDraw surface.");
-		System->StartShutdown();
-		}
+  {
+    InitFail(m_hWnd, ret, "There was an error locking the DirectDraw surface.");
+    System->StartShutdown();
+  }
 
   m_bLocked = true;
 
@@ -459,8 +459,9 @@ HRESULT csGraphics2DDDraw3::SetColorPalette()
 {
   HRESULT ret;
   
-#ifndef __DD_FALSE
-  HRESULT DD_FALSE;
+#ifndef DD_FALSE 
+  //This is normally being done in the ddraw.h file
+  #define DD_FALSE S_FALSE
 #endif
   
 
@@ -486,10 +487,11 @@ HRESULT csGraphics2DDDraw3::SetColorPalette()
       PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
       
       if (!CreateIdentityPalette(Palette))
-			{
-				InitFail(m_hWnd, DD_FALSE, "Error creating Identity Palette.");
-				return DD_FALSE;
-			}
+      {
+        InitFail(m_hWnd, DD_FALSE, "Error creating Identity Palette.");
+        return DD_FALSE;
+      }
+
       ClearSystemPalette();
       
       oldPal = SelectPalette(dc, hWndPalette, FALSE);
@@ -524,7 +526,7 @@ void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
   HCURSOR hCursor;
-	
+  
   switch(iShape)
   {
     case csmcNone:     hCursor = NULL; break;
@@ -536,19 +538,19 @@ bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
     case csmcSizeEW:   hCursor = LoadCursor (NULL, IDC_SIZEWE);   break;
     case csmcStop:     hCursor = LoadCursor (NULL, IDC_NO);       break;
     case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
-    default: hCursor = NULL;		//return false;
+    default: hCursor = NULL;    //return false;
   }
-	
-	if (hCursor)
-	{
-		SetCursor(hCursor);
-		return true;
-	}
-	else
-	{
-		SetCursor(NULL);
-		return false;
-	}
+  
+  if (hCursor)
+  {
+    SetCursor(hCursor);
+    return true;
+  }
+  else
+  {
+    SetCursor(NULL);
+    return false;
+  }
 }
 
 bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
@@ -593,23 +595,23 @@ void csGraphics2DDDraw3::SetFor3D(bool For3D)
 
 bool csGraphics2DDDraw3::PerformExtension (const char *args)
 {
-	csString ext(args);
+  csString ext(args);
 
-	if (ext.CompareNoCase("fullscreen"))
-	{
-		if (m_bReady)
-		{
-			System->Printf(MSG_INITIALIZATION,"Fullscreen toggle.");
-			m_bReady = FALSE;
-			if (m_bWindowed)
-					GetWindowRect(m_hWnd, &m_rcWindow);
-			m_bWindowed = !m_bWindowed;
-			ChangeCoopLevel(m_hWnd);
-			m_bReady = TRUE;	
-		}
-	}
-	
-	return true;
+  if (ext.CompareNoCase("fullscreen"))
+  {
+    if (m_bReady)
+    {
+      System->Printf(MSG_INITIALIZATION,"Fullscreen toggle.");
+      m_bReady = FALSE;
+      if (m_bWindowed)
+          GetWindowRect(m_hWnd, &m_rcWindow);
+      m_bWindowed = !m_bWindowed;
+      ChangeCoopLevel(m_hWnd);
+      m_bReady = TRUE;  
+    }
+  }
+  
+  return true;
 }
 
 
@@ -619,22 +621,22 @@ bool csGraphics2DDDraw3::PerformExtension (const char *args)
 //-----------------------------------------------------------------------------
 HRESULT csGraphics2DDDraw3::ReleaseAllObjects(HWND hWnd)
 {
-    if (m_lpDD != NULL)
+  if (m_lpDD != NULL)
+  {
+    m_lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
+    m_lpDD->RestoreDisplayMode();
+    if (m_lpddsBack != NULL)
     {
-        m_lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
-				m_lpDD->RestoreDisplayMode();
-        if (m_lpddsBack != NULL)
-        {
-            m_lpddsBack->Release();
-            m_lpddsBack = NULL;
-        }
-        if (m_lpddsPrimary != NULL)
-        {
-            m_lpddsPrimary->Release();
-            m_lpddsPrimary = NULL;
-        }
+      m_lpddsBack->Release();
+      m_lpddsBack = NULL;
     }
-    return DD_OK;
+    if (m_lpddsPrimary != NULL)
+    {
+      m_lpddsPrimary->Release();
+      m_lpddsPrimary = NULL;
+    }
+  }
+  return DD_OK;
 }
 
 
@@ -645,192 +647,192 @@ HRESULT csGraphics2DDDraw3::ReleaseAllObjects(HWND hWnd)
 //-----------------------------------------------------------------------------
 HRESULT csGraphics2DDDraw3::InitSurfaces(HWND hWnd)
 {
-    HRESULT		        hRet;
-		DDSURFACEDESC      ddsd;
-		DDSCAPS            ddscaps;
-    LPDIRECTDRAWCLIPPER pClipper;
+  HRESULT           hRet;
+  DDSURFACEDESC      ddsd;
+  DDSCAPS            ddscaps;
+  LPDIRECTDRAWCLIPPER pClipper;
 
-	  DDPIXELFORMAT ddpf;
+  DDPIXELFORMAT ddpf;
 
-		int RedMask   = 0x00FF0000;
-		int GreenMask = 0x0000FF00;
-		int BlueMask  = 0x000000FF;
+  int RedMask   = 0x00FF0000;
+  int GreenMask = 0x0000FF00;
+  int BlueMask  = 0x000000FF;
 
-    if (m_bWindowed)
-    {
-        // Get normal windowed mode
-        hRet = m_lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "SetCooperativeLevel FAILED");
+  if (m_bWindowed)
+  {
+    // Get normal windowed mode
+    hRet = m_lpDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "SetCooperativeLevel FAILED");
 
-    		// Get the dimensions of the viewport and screen bounds
-    		GetClientRect(hWnd, &m_rcViewport);
-    		GetClientRect(hWnd, &m_rcScreen);
-    		ClientToScreen(hWnd, (POINT*)&m_rcScreen.left);
-    		ClientToScreen(hWnd, (POINT*)&m_rcScreen.right);
+    // Get the dimensions of the viewport and screen bounds
+    GetClientRect(hWnd, &m_rcViewport);
+    GetClientRect(hWnd, &m_rcScreen);
+    ClientToScreen(hWnd, (POINT*)&m_rcScreen.left);
+    ClientToScreen(hWnd, (POINT*)&m_rcScreen.right);
 
-        // Create the primary surface
-        ZeroMemory(&ddsd,sizeof(ddsd));
-        ddsd.dwSize = sizeof(ddsd);
-        ddsd.dwFlags = DDSD_CAPS;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-        hRet = m_lpDD->CreateSurface(&ddsd, &m_lpddsPrimary, NULL);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "CreateSurface FAILED");
+    // Create the primary surface
+    ZeroMemory(&ddsd,sizeof(ddsd));
+    ddsd.dwSize = sizeof(ddsd);
+    ddsd.dwFlags = DDSD_CAPS;
+    ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+    hRet = m_lpDD->CreateSurface(&ddsd, &m_lpddsPrimary, NULL);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "CreateSurface FAILED");
 
-        // Create a clipper object since this is for a Windowed render
-        hRet = m_lpDD->CreateClipper(0, &pClipper, NULL);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "CreateClipper FAILED");
+    // Create a clipper object since this is for a Windowed render
+    hRet = m_lpDD->CreateClipper(0, &pClipper, NULL);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "CreateClipper FAILED");
 
-        // Associate the clipper with the window
-        pClipper->SetHWnd(0, hWnd);
-        m_lpddsPrimary->SetClipper(pClipper);
-        pClipper->Release();
-        pClipper = NULL;
+    // Associate the clipper with the window
+    pClipper->SetHWnd(0, hWnd);
+    m_lpddsPrimary->SetClipper(pClipper);
+    pClipper->Release();
+    pClipper = NULL;
 
-        // Get the backbuffer. For fullscreen mode, the backbuffer was created
-        // along with the primary, but windowed mode still needs to create one.
-        ddsd.dwFlags        = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-        ddsd.dwWidth        = Width;
-        ddsd.dwHeight       = Height;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
+    // Get the backbuffer. For fullscreen mode, the backbuffer was created
+    // along with the primary, but windowed mode still needs to create one.
+    ddsd.dwFlags        = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+    ddsd.dwWidth        = Width;
+    ddsd.dwHeight       = Height;
+    ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
 
-				if(!DirectDevice->Only2D)
-					ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
-				else 
-					ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
+    if(!DirectDevice->Only2D)
+      ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
+    else 
+      ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
 
-        hRet = m_lpDD->CreateSurface(&ddsd, &m_lpddsBack, NULL);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "CreateSurface2 FAILED");
+    hRet = m_lpDD->CreateSurface(&ddsd, &m_lpddsBack, NULL);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "CreateSurface2 FAILED");
 
-				// get the pixel format
-				memset(&ddpf, 0, sizeof(ddpf));
-				ddpf.dwSize = sizeof(ddpf);
-				hRet = m_lpddsPrimary->GetPixelFormat(&ddpf);
-				if (hRet != DD_OK)
-					return InitFail(hWnd, hRet, "Can't get pixel format descriptor FAILED");
-    
-				RedMask = ddpf.dwRBitMask;
-				GreenMask = ddpf.dwGBitMask;
-				BlueMask = ddpf.dwBBitMask;
+    // get the pixel format
+    memset(&ddpf, 0, sizeof(ddpf));
+    ddpf.dwSize = sizeof(ddpf);
+    hRet = m_lpddsPrimary->GetPixelFormat(&ddpf);
+    if (hRet != DD_OK)
+      return InitFail(hWnd, hRet, "Can't get pixel format descriptor FAILED");
 
-				// automatically determine bit-depth for windowed mode
-				if(ddpf.dwFlags & DDPF_PALETTEINDEXED8)
-					Depth=8;
-				else if(ddpf.dwRGBBitCount == 16)
-					Depth=16;
-				else if(ddpf.dwRGBBitCount == 32)
-					Depth=32;
-				else
-				{
-					return InitFail(hWnd, hRet, "Crystal Space requires desktop to be in either 8-bit, 16-bit or 32-bit mode, or to use full screen mode.");
-				}
-    }
+    RedMask = ddpf.dwRBitMask;
+    GreenMask = ddpf.dwGBitMask;
+    BlueMask = ddpf.dwBBitMask;
+
+    // automatically determine bit-depth for windowed mode
+    if(ddpf.dwFlags & DDPF_PALETTEINDEXED8)
+      Depth=8;
+    else if(ddpf.dwRGBBitCount == 16)
+      Depth=16;
+    else if(ddpf.dwRGBBitCount == 32)
+      Depth=32;
     else
     {
-        // Get exclusive mode
-        hRet = m_lpDD->SetCooperativeLevel(hWnd, DDSCL_EXCLUSIVE |
-                                                DDSCL_FULLSCREEN);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "SetCooperativeLevel FAILED");
+      return InitFail(hWnd, hRet, "Crystal Space requires desktop to be in either 8-bit, 16-bit or 32-bit mode, or to use full screen mode.");
+    }
+  }
+  else
+  {
+    // Get exclusive mode
+    hRet = m_lpDD->SetCooperativeLevel(hWnd, DDSCL_EXCLUSIVE |
+                                            DDSCL_FULLSCREEN);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "SetCooperativeLevel FAILED");
 
-        //Set FS video mode
-				hRet = m_lpDD->SetDisplayMode( Width, Height, Depth);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "SetDisplayMode FAILED");
+    //Set FS video mode
+    hRet = m_lpDD->SetDisplayMode( Width, Height, Depth);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "SetDisplayMode FAILED");
 
-    		// Get the dimensions of the viewport and screen bounds
-    		// Store the rectangle which contains the renderer
-    		SetRect(&m_rcViewport, 0, 0, Width, Height );
-    		memcpy(&m_rcScreen, &m_rcViewport, sizeof(RECT) );
+    // Get the dimensions of the viewport and screen bounds
+    // Store the rectangle which contains the renderer
+    SetRect(&m_rcViewport, 0, 0, Width, Height );
+    memcpy(&m_rcScreen, &m_rcViewport, sizeof(RECT) );
 
-        // Create the primary surface with 1 back buffer
-        ZeroMemory(&ddsd,sizeof(ddsd));
-        ddsd.dwSize = sizeof(ddsd);
-        ddsd.dwFlags = DDSD_CAPS |
-                       DDSD_BACKBUFFERCOUNT;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE |
-                			  DDSCAPS_FLIP |
-                			  DDSCAPS_COMPLEX;
-        ddsd.dwBackBufferCount = 1;
+    // Create the primary surface with 1 back buffer
+    ZeroMemory(&ddsd,sizeof(ddsd));
+    ddsd.dwSize = sizeof(ddsd);
+    ddsd.dwFlags = DDSD_CAPS |
+                   DDSD_BACKBUFFERCOUNT;
+    ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE |
+                    DDSCAPS_FLIP |
+                    DDSCAPS_COMPLEX;
+    ddsd.dwBackBufferCount = 1;
 
-				// set flags if this is a 3d device
-				if(!DirectDevice->Only2D)
-					ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
+    // set flags if this is a 3d device
+    if(!DirectDevice->Only2D)
+      ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
 
-        hRet = m_lpDD->CreateSurface( &ddsd, &m_lpddsPrimary, NULL);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "CreateSurface FAILED");
+    hRet = m_lpDD->CreateSurface( &ddsd, &m_lpddsPrimary, NULL);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "CreateSurface FAILED");
 
-        ZeroMemory(&ddscaps, sizeof(ddscaps));
-        ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-        hRet = m_lpddsPrimary->GetAttachedSurface(&ddscaps, &m_lpddsBack);
-        if (hRet != DD_OK)
-            return InitFail(hWnd, hRet, "GetAttachedSurface FAILED");
+    ZeroMemory(&ddscaps, sizeof(ddscaps));
+    ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
+    hRet = m_lpddsPrimary->GetAttachedSurface(&ddscaps, &m_lpddsBack);
+    if (hRet != DD_OK)
+        return InitFail(hWnd, hRet, "GetAttachedSurface FAILED");
 
-				if(Depth == 16)
-				{
-					RedMask   = 0x1f << 11;
-					GreenMask = 0x3f << 5;
-					BlueMask  = 0x1f;
-				}
-				else if (Depth == 32)
-				{
-					RedMask   = 0xff << 16;
-					GreenMask = 0xff << 8;
-					BlueMask  = 0xff;
-				}
-
+    if(Depth == 16)
+    {
+      RedMask   = 0x1f << 11;
+      GreenMask = 0x3f << 5;
+      BlueMask  = 0x1f;
+    }
+    else if (Depth == 32)
+    {
+      RedMask   = 0xff << 16;
+      GreenMask = 0xff << 8;
+      BlueMask  = 0xff;
     }
 
+  }
 
-		// set xx bpp mode up //
 
-		if (Depth == 16)
-		{
-			_DrawPixel = DrawPixel16;
-			_WriteChar = WriteChar16;
-			_GetPixelAt = GetPixelAt16;
+  // set xx bpp mode up //
 
-			// Set pixel format
-			pfmt.PixelBytes = 2;
-			pfmt.PalEntries = 0;
-			pfmt.RedMask = RedMask;
-			pfmt.GreenMask = GreenMask;
-			pfmt.BlueMask = BlueMask;
+  if (Depth == 16)
+  {
+    _DrawPixel = DrawPixel16;
+    _WriteChar = WriteChar16;
+    _GetPixelAt = GetPixelAt16;
 
-			pfmt.complete ();
-		}
-		else if (Depth == 32)
-		{
-			_DrawPixel = DrawPixel32;
-			_WriteChar = WriteChar32;
-			_GetPixelAt = GetPixelAt32;
-    
-			// calculate CS's pixel format structure.
-			pfmt.PixelBytes = 4;
-			pfmt.PalEntries = 0;
-   
-			pfmt.RedMask = RedMask;
-			pfmt.GreenMask = GreenMask;
-			pfmt.BlueMask = BlueMask;
-    
-			pfmt.complete ();
-		}
+    // Set pixel format
+    pfmt.PixelBytes = 2;
+    pfmt.PalEntries = 0;
+    pfmt.RedMask = RedMask;
+    pfmt.GreenMask = GreenMask;
+    pfmt.BlueMask = BlueMask;
 
-		m_lpddsBack->GetSurfaceDesc (&ddsd);
+    pfmt.complete ();
+  }
+  else if (Depth == 32)
+  {
+    _DrawPixel = DrawPixel32;
+    _WriteChar = WriteChar32;
+    _GetPixelAt = GetPixelAt32;
   
-		for(int i = 0; i < Height; i++)
-			LineAddress [i] = i * ddsd.lPitch;
+    // calculate CS's pixel format structure.
+    pfmt.PixelBytes = 4;
+    pfmt.PalEntries = 0;
+ 
+    pfmt.RedMask = RedMask;
+    pfmt.GreenMask = GreenMask;
+    pfmt.BlueMask = BlueMask;
   
-		if(Depth==8) m_bPalettized = true;
-		else m_bPalettized = false;
+    pfmt.complete ();
+  }
 
-		m_bPaletteChanged = false;
+  m_lpddsBack->GetSurfaceDesc (&ddsd);
 
-    return DD_OK;
+  for(int i = 0; i < Height; i++)
+    LineAddress [i] = i * ddsd.lPitch;
+
+  if(Depth==8) m_bPalettized = true;
+  else m_bPalettized = false;
+
+  m_bPaletteChanged = false;
+
+  return DD_OK;
 }
 
 
@@ -840,24 +842,24 @@ HRESULT csGraphics2DDDraw3::InitSurfaces(HWND hWnd)
 //-----------------------------------------------------------------------------
 HRESULT csGraphics2DDDraw3::ChangeCoopLevel(HWND hWnd )
 {
-    HRESULT hRet;
+  HRESULT hRet;
 
-    // Release all objects that need to be re-created for the new device
-    if (FAILED(hRet = ReleaseAllObjects(hWnd)))
-        return InitFail(hWnd, hRet, "ReleaseAllObjects FAILED");
+  // Release all objects that need to be re-created for the new device
+  if (FAILED(hRet = ReleaseAllObjects(hWnd)))
+      return InitFail(hWnd, hRet, "ReleaseAllObjects FAILED");
 
-    // In case we're coming from a fullscreen mode, restore the window size
-    if (m_bWindowed)
-    {
-				m_lpDD->RestoreDisplayMode();
-        SetWindowPos(hWnd, HWND_NOTOPMOST, m_rcWindow.left, m_rcWindow.top,
-                     (m_rcWindow.right - m_rcWindow.left), 
-                     (m_rcWindow.bottom - m_rcWindow.top), SWP_SHOWWINDOW );
-    }
+  // In case we're coming from a fullscreen mode, restore the window size
+  if (m_bWindowed)
+  {
+      m_lpDD->RestoreDisplayMode();
+      SetWindowPos(hWnd, HWND_NOTOPMOST, m_rcWindow.left, m_rcWindow.top,
+                   (m_rcWindow.right - m_rcWindow.left), 
+                   (m_rcWindow.bottom - m_rcWindow.top), SWP_SHOWWINDOW );
+  }
 
-    // Re-create the surfaces
-    hRet = InitSurfaces(hWnd);
-    return hRet;
+  // Re-create the surfaces
+  hRet = InitSurfaces(hWnd);
+  return hRet;
 }
 
 
@@ -867,16 +869,16 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel(HWND hWnd )
 //-----------------------------------------------------------------------------
 HRESULT csGraphics2DDDraw3::InitFail(HWND hWnd, HRESULT hRet, LPCTSTR szError, ...)
 {
-    char            szBuff[128];
-    va_list         vl;
+  char            szBuff[128];
+  va_list         vl;
 
-    va_start(vl, szError);
-    vsprintf(szBuff, szError, vl);
-    ReleaseAllObjects(hWnd);
-		System->Printf(MSG_STDOUT, szBuff);
-    MessageBox(hWnd, szBuff, "csDirectDraw", MB_OK);
-    DestroyWindow(hWnd);
-    va_end(vl);
-    return hRet;
+  va_start(vl, szError);
+  vsprintf(szBuff, szError, vl);
+  ReleaseAllObjects(hWnd);
+  System->Printf(MSG_STDOUT, szBuff);
+  MessageBox(hWnd, szBuff, "csDirectDraw", MB_OK);
+  DestroyWindow(hWnd);
+  va_end(vl);
+  return hRet;
 }
 
