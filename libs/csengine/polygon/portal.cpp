@@ -244,7 +244,7 @@ void csPortal::CheckFrustum (csFrustumView& lview)
     copied_frustums = true;
   }
 
-  sector->CheckFrustum (new_lview);
+  sector->RealCheckFrustum (new_lview);
 
   if (do_warp_space)
     csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);

@@ -191,6 +191,12 @@ public:
   /**
    * Check frustum visibility on this thing.
    */
+  void RealCheckFrustum (csFrustumView& lview);
+
+  /**
+   * Check frustum visibility on this thing.
+   * First initialize the 2D culler cube.
+   */
   void CheckFrustum (csFrustumView& lview);
 
   /**

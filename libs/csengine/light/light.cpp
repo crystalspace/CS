@@ -219,10 +219,6 @@ void curve_light_func (csObject* obj, csFrustumView* lview)
 
 void csStatLight::CalculateLighting ()
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   lview.userdata = (void*)this;
@@ -246,10 +242,6 @@ void csStatLight::CalculateLighting ()
 
 void csStatLight::CalculateLighting (csThing* th)
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
   lview.userdata = (void*)this;
@@ -273,10 +265,6 @@ void csStatLight::CalculateLighting (csThing* th)
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
   csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;
@@ -400,10 +388,6 @@ csDynLight::~csDynLight ()
 
 void csDynLight::Setup ()
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (cb) cb->MakeEmpty ();
-  else cc->MakeEmpty ();
   while (lightpatches)
     csWorld::current_world->lightpatch_pool->Free (lightpatches);
   csFrustumView lview;

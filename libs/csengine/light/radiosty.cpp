@@ -770,6 +770,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   }
 
   csFrustumView new_lview = *lview;
+  new_lview.light_frustum = NULL;
   csVector3 poly[40];
   int num_vert = 4;
   if(dest)
@@ -782,6 +783,8 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
     // empty intersection, none covered (will be skipped)
     if(!new_lview.light_frustum) return;
   }
+  else
+    new_lview.light_frustum = new csFrustum (*lview->light_frustum);
 
   // uses polygon3d of *base* polygon...
   csPortal *po = destpoly3d->GetPortal();

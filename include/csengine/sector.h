@@ -281,6 +281,14 @@ public:
   /**
    * Check visibility in a frustum way for all things and polygons in
    * this sector and possibly traverse through portals to other sectors.
+   * This version doesn't init the 2D culler cube so it can be used
+   * for recursing.
+   */
+  void RealCheckFrustum (csFrustumView& lview);
+
+  /**
+   * Check visibility in a frustum way for all things and polygons in
+   * this sector and possibly traverse through portals to other sectors.
    */
   void CheckFrustum (csFrustumView& lview);
 

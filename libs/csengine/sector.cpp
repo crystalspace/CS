@@ -1378,6 +1378,15 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
 
 void csSector::CheckFrustum (csFrustumView& lview)
 {
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
+  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  if (cb) cb->MakeEmpty ();
+  else cc->MakeEmpty ();
+  RealCheckFrustum (lview);
+}
+
+void csSector::RealCheckFrustum (csFrustumView& lview)
+{
   if (draw_busy > cfg_reflections) return;
   draw_busy++;
 
@@ -1455,7 +1464,7 @@ void csSector::CheckFrustum (csFrustumView& lview)
   {
     sp = visible_things[i];
     if (sp != static_thing)
-      sp->CheckFrustum (lview);
+      sp->RealCheckFrustum (lview);
   }
   delete [] visible_things;
 

@@ -28,6 +28,8 @@
 #include "csengine/world.h"
 #include "csengine/stats.h"
 #include "csengine/sector.h"
+#include "csengine/cbufcube.h"
+#include "csengine/covcube.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
 #include "igraph3d.h"
@@ -476,6 +478,15 @@ void csThing::DrawFoggy (csRenderView& d)
 
 
 void csThing::CheckFrustum (csFrustumView& lview)
+{
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
+  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  if (cb) cb->MakeEmpty ();
+  else cc->MakeEmpty ();
+  RealCheckFrustum (lview);
+}
+
+void csThing::RealCheckFrustum (csFrustumView& lview)
 {
   csPolygon3D* p;
   int i;

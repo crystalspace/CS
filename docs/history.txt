@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+25-May-2000
+	- Moved initialization of 2D culler cube into CheckFrustum.
+	  This fixes radiosity. As it was now it simply could not work
+	  correctly because of this bug.
+	- Fixed another bug in radiosity with handling of the light
+	  frustum.
 24-May-2000
 	- Some changes to terrain engine from Alex Pfaffe.
 	- Fixed another problem in octree building which could cause

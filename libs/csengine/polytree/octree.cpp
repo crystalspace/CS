@@ -1620,9 +1620,6 @@ void csOctree::BuildPVS (csThing* thing,
 
 void csOctree::BuildPVS (csThing* thing)
 {
-//@@@###
-Dumper::dump (this);
-
   // First setup a dummy PVS which will cause all the nodes in the
   // world to be added as visible to every other node.
   SetupDummyPVS ();
@@ -1679,32 +1676,50 @@ Dumper::dump (this);
   delete box_clipper;
 }
 
-void node_pvs_func (csOctreeNode* node, csFrustumView* lview)
+static csOctreeNode* next_visible = NULL;
+
+static void node_pvs_func (csOctreeNode* node, csFrustumView* lview)
 {
-//@@@###
-CsPrintf (MSG_DEBUG_0, "  node_pvs_func %f,%f,%f %f,%f,%f\n",
-node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
-node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
-  csOctreeNode* leaf = (csOctreeNode*)(lview->userdata);
-  csPVS& pvs = leaf->GetPVS ();
+  // When we discover a node we only mark it visible if we will
+  // hit a polygon in this node.
+  next_visible = node;
+}
+
+static void poly_pvs_func (csObject* obj, csFrustumView* lview)
+{
+  if (next_visible)
+  {
+    csPolygon3D* p = (csPolygon3D*)obj;
+    if (next_visible->GetBox ().In (p->Vwor (0)) ||
+        next_visible->GetBox ().In (p->Vwor (1)))
+    {
+      csOctreeNode* leaf = (csOctreeNode*)(lview->userdata);
+      csPVS& pvs = leaf->GetPVS ();
+      csOctreeVisible* ovis = pvs.FindNode (next_visible);
+      ovis->MarkReallyVisible ();
+    }
+    next_visible = NULL;
+  }
+}
+
+static void curve_pvs_func (csObject*, csFrustumView*)
+{
+}
+
+// If a child is really visible then its parent is really visible too.
+// This function makes sure that all parents with visible children are
+// also marked visible.
+static bool MarkParentsVisible (csPVS& pvs, csOctreeNode* node)
+{
+  if (!node) return false;
   csOctreeVisible* ovis = pvs.FindNode (node);
-  ovis->MarkReallyVisible ();
-}
-
-void poly_pvs_func (csObject* obj, csFrustumView*)
-{
-//@@@###
-csPolygon3D* p = (csPolygon3D*)obj;
-CsPrintf (MSG_DEBUG_0, "  poly_pvs_func %s\n",
-p->GetName ());
-int i;
-for (i = 0 ; i < p->GetNumVertices () ; i++)
-CsPrintf (MSG_DEBUG_0, "    %d: %f,%f,%f\n", i, p->Vwor (i).x,
-p->Vwor (i).y, p->Vwor (i).z);
-}
-
-void curve_pvs_func (csObject*, csFrustumView*)
-{
+  if (ovis->IsReallyVisible ()) return true;
+  int i;
+  bool rc = false;
+  for (i = 0 ; i < 8 ; i++)
+    rc = rc || MarkParentsVisible (pvs, node->GetChild (i));
+  if (rc) ovis->MarkReallyVisible ();
+  return rc;
 }
 
 void csOctree::BuildQADPVS (csOctreeNode* node)
@@ -1713,15 +1728,9 @@ void csOctree::BuildQADPVS (csOctreeNode* node)
 
   if (node->IsLeaf ())
   {
-//@@@###
-CsPrintf (MSG_DEBUG_0, "BuildQADPVS for leaf %f,%f,%f %f,%f,%f\n",
-node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
-node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
     // We have a leaf, here we start our QAD pvs building.
-    csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-    csCovcube* cc = csWorld::current_world->GetCovcube ();
-    if (cb) cb->MakeEmpty ();
-    else cc->MakeEmpty ();
+    csPVS& pvs = node->GetPVS ();
+
     csFrustumView lview;
     lview.userdata = (void*)node;
     lview.node_func = node_pvs_func;
@@ -1737,8 +1746,19 @@ node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
     lview.light_frustum->MakeInfinite ();
     sector->CheckFrustum (lview);
 
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+    {
+      csVector3 cor = (node->GetBox ().GetCorner (i)+cen)/2;
+      delete lview.light_frustum;
+      lview.light_frustum = new csFrustum (cor);
+      lview.light_frustum->MakeInfinite ();
+      sector->CheckFrustum (lview);
+    }
+
+    MarkParentsVisible (pvs, (csOctreeNode*)root);
+
     total_cull_node = 0;
-    csPVS& pvs = node->GetPVS ();
     csOctreeVisible* ovis = pvs.GetFirst ();
     while (ovis)
     {
@@ -1746,8 +1766,6 @@ node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
       ovis = pvs.GetNext (ovis);
     }
     total_total_cull_node += total_cull_node;
-//@@@###
-CsPrintf (MSG_DEBUG_0, "count_leaves=%d total_cull_node=%d\n", count_leaves, total_cull_node);
     if (total_cull_node)
       printf (" %d:-%d ", count_leaves, total_cull_node);
     else
@@ -1931,18 +1949,23 @@ void csOctree::CalculateSolidMasks (csOctreeNode* node)
 {
   if (!node) return;
 
+  // When classifying the sides of a node we slightly shift the rectangle
+  // that we use to test solid space with. This is to avoid hits with
+  // polygons that are exactly on the node boundary but actually belong
+  // to the neighbour node.
+  // @@@ Maybe there are better solutions for this?
   node->solid_masks[BOX_SIDE_x] = ClassifyRectangle (PLANE_X,
-  	node->GetBox ().MinX (), GetSideBox (BOX_SIDE_x, node->GetBox ()));
+  	node->GetBox ().MinX ()+.01, GetSideBox (BOX_SIDE_x, node->GetBox ()));
   node->solid_masks[BOX_SIDE_X] = ClassifyRectangle (PLANE_X,
-  	node->GetBox ().MaxX (), GetSideBox (BOX_SIDE_X, node->GetBox ()));
+  	node->GetBox ().MaxX ()-.01, GetSideBox (BOX_SIDE_X, node->GetBox ()));
   node->solid_masks[BOX_SIDE_y] = ClassifyRectangle (PLANE_Y,
-  	node->GetBox ().MinY (), GetSideBox (BOX_SIDE_y, node->GetBox ()));
+  	node->GetBox ().MinY ()+.01, GetSideBox (BOX_SIDE_y, node->GetBox ()));
   node->solid_masks[BOX_SIDE_Y] = ClassifyRectangle (PLANE_Y,
-  	node->GetBox ().MaxY (), GetSideBox (BOX_SIDE_Y, node->GetBox ()));
+  	node->GetBox ().MaxY ()-.01, GetSideBox (BOX_SIDE_Y, node->GetBox ()));
   node->solid_masks[BOX_SIDE_z] = ClassifyRectangle (PLANE_Z,
-  	node->GetBox ().MinZ (), GetSideBox (BOX_SIDE_z, node->GetBox ()));
+  	node->GetBox ().MinZ ()+.01, GetSideBox (BOX_SIDE_z, node->GetBox ()));
   node->solid_masks[BOX_SIDE_Z] = ClassifyRectangle (PLANE_Z,
-  	node->GetBox ().MaxZ (), GetSideBox (BOX_SIDE_Z, node->GetBox ()));
+  	node->GetBox ().MaxZ ()-.01, GetSideBox (BOX_SIDE_Z, node->GetBox ()));
   int i;
 
   for (i = 0 ; i < 8 ; i++)
