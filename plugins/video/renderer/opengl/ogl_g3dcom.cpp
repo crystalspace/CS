@@ -3923,7 +3923,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         || ci.do_plane_clipping || ci.do_z_plane_clipping)
     {
       vis = ClassifyForClipTriangleMesh (
-            polbuf->GetTotalVertexCount (), polbuf->GetTotalVertices (),
+            polbuf->GetVertexCount (), polbuf->GetVertices (),
 	    polbuf->GetBoundingBox (),
             ci.frust_origin, ci.frustum_planes, ci.num_planes);
     }

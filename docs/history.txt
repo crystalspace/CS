@@ -25,6 +25,8 @@ chronological order.
 	  reference each other but are no longer used (i.e. they have no
 	  scheduled operations). For those there is no other solution but
 	  to clear the sequence manager manually.
+	- Jorrit fixed fog in OpenGL (for DrawPolygonMesh). It would fail for
+	  triangles that required clipping.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:
