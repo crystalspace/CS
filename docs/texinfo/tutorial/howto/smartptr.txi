@@ -97,8 +97,8 @@ function that returns a @code{csPtr}:
 // Declaration of function.
 struct iEngine
 @{
-virtual csPtr<iLight> CreateLight (@dots{}) = 0;
-@dots{}
+  virtual csPtr<iLight> CreateLight (@dots{}) = 0;
+  @dots{}
 @}
 
 // First way to use this function (old style API):
@@ -123,6 +123,42 @@ the caller is responsible for calling @code{DecRef} manually.
 
 By using @code{csPtr} we are able to make the API smart pointer aware
 without sacrificing API compatibility.
+
+To make it easier for functions to actually return a @code{csPtr} when
+they are internally working with a @code{csRef} there is also an
+automatic conversion from @code{csRef} to @code{csPtr}. This means
+that the following construct is ok:
+
+@example
+csPtr<iBla> MyFunction ()
+@{
+  csRef<iBla> bla = @dots{};
+  @dots{}
+  return csPtr<iBla> (bla);
+@}
+@end example
+
+Basically what happens above is that the @code{csPtr} constructor
+which takes a @code{csRef} will call @code{IncRef} on the pointer.
+This is needed because when the @code{csRef} inside @code{MyFunction()}
+goes out of scope it will call @code{DecRef} potentially destroying
+the reference.
+
+However, the following is wrong:
+
+@example
+iBla* MyFunction ()
+@{
+  csRef<iBla> bla = @dots{};
+  @dots{}
+  return bla;
+@}
+@end example
+
+Because here nothing will call @code{IncRef} on the returned pointer
+but the @code{csRef} will still call @code{DecRef}. If you really want to
+return a normal pointer (which is probably not a good idea) in this case
+then you must first call @code{IncRef} manually before returning.
 
 Another way to use @code{csPtr} is as follows:
 
