@@ -12,7 +12,9 @@ instructions and @sc{faq}.
 @menu
 * MSVC5:: Microsoft Visual C++ 5
 * MSVC6:: Microsoft Visual C++ 6
+* MSVC6:: Microsoft Visual C++ 7
 @end menu
 
 @importssss{build,platform,win32,msvc,msvc5.txi}
 @importssss{build,platform,win32,msvc,msvc6.txi}
+@importssss{build,platform,win32,msvc,msvc7.txi}

@@ -1,0 +1,246 @@
+@c -*-texinfo-*-
+@node MSVC7, , MSVC6, MSVC5
+@subsubsection Microsoft Visual C++ 7
+@cindex Windows, Building
+
+In order to successfully compile the Crystal Space 3D Software Development
+Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio .NET}
+or the stand alone version of @emph{Microsoft Visual C++ 7}.
+
+@subsubheading Getting Extra Help
+
+If you need help with Crystal Space and Visual C++ or just Crystal Space in
+general.  You can subscribe and then post a message to the Crystal Space
+mailing list.  To subscribe see the following site and fill in the form:
+
+@uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
+
+Alternatively you can email the Win32 port maintainer directly at the following:
+
+@email{philipwyett@@dsl.pipex.com}.
+
+@subsubheading Required/Optional External Libraries and Software
+
+All the following libraries and Software Development Kits (@sc{sdk}) unless
+stated are not required.  However, if you choose not to install them, at
+compile time you must follow the documented instructions of how to unload these
+projects from the Crystal Space build process.
+
+@subsubheading msvc7_libs - Required
+
+Before you attempt to compile Crystal Space, you must download
+and install @file{msvc7_libs}.  msvc7_libs is a package containing all
+third party header, pre-built library and dll files used by Crystal
+Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
+@file{xmlparse.dll} etc.  The latest version of the msvc7_libs package
+@file{msvc7_libs_0.92a.zip} can be downloaded from:
+
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92a.zip}
+
+Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
+root directory.
+
+@subsubheading DirectX - Required
+
+In order to compile Crystal Space at its minimum i.e. the software render,
+requires you must have at least some form of the DirectX Software Development
+Kit (@sc{sdk}) on your system.
+
+Visual C++ 7 comes with the minimum DirectX @sc{sdk} 8.1 pre-release files
+in-order to build Crystal Space. However, I advize you download the final
+8.1 version to guarentee complete compliance.
+
+To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
+download the latest DirectX Software Development Kit (@sc{sdk}), which can be
+obtained from:
+
+@uref{http://www.msdn.microsoft.com/directx}
+
+@subsubheading Simple Direct Media Layer
+
+Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
+can be used as an alternative to the default Direct Draw canvas for use with
+the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
+have the supported 1.2.3 development runtime for your version of @sc{msvc} be
+it 5 or 6.  Please remeber to add the @file{include} and @file{lib} directories
+to the global MSVC options, so @sc{msvc} can see them.
+
+@uref{http://www.libsdl.org}
+
+Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
+or at it to your systems path before using the SDL2D canvas.
+
+For instructon on using a specific canvas including
+the @sc{sdl2d} canvas @ref{Common Command Line Options}
+
+@subsubheading Python
+
+Crystal Space contains support for Python scripting and thus has projects
+within it requires that Python be installed on your system.  If you wish to
+compile with Python support you must install Python 2.2 or later, which can be
+obtained from:
+
+@uref{http://www.python.org}
+
+@subsubheading BisonFlex - Required
+
+The Alternate Window System (AWS) plugin will build correctly under MSVC.
+However, if you wish to make modifications to it's structure and or lexer, it will
+require you re-generate @emph{sllex.cpp, slparse.cpp, slparse.cpp.h and slparse.h}.
+If you need todo this will require you have Bison and Flex on your system. The
+suggested and supported version can be obtained via the link below.
+
+For Visual C++ 6:
+
+@ifnottex
+@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.6.zip}
+@end ifnottex
+@iftex
+@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
+@code{bfwizard-1.6.zip}
+@end iftex
+
+Install this package to a location of your choice on your system. During the install
+process, it will detect MSVC and install itself in the appropraiate directories and
+the executables in the system path. Being that BisonFlex was released for MSVC 6. You
+will have to ignore the auto-detection and point to the correct locations. When prompted
+for the @emph{common} directory, direct it to the @emph{X:\msvc_install_dir\Common7} dir.
+Proceed to the next prompt where you will be asked the location of VC7, so point it
+to the @emph{X:\msvc_install_dir\Vc7}. Now just continue with the install.
+
+@subsubheading Setting up and building the AWS plugin
+
+To re-generate the files mentioned above. Open a @emph{MS-DOS Prompt/Command Prompt} and
+navigate to the @emph{CS\} root directory. Next, just enter the command lines listed
+below.
+
+@ifnottex
+@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > plugins/aws/sllex.cpp}
+@end ifnottex
+@iftex
+@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx >}@*
+@code{plugins/aws/sllex.cpp}
+@end iftex
+
+@ifnottex
+@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp plugins/aws/skinlang.bsn}
+@end ifnottex
+@iftex
+@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp}@*
+@code{ plugins/aws/skinlang.bsn}
+@end iftex
+
+Now just follow the @emph{Compiling Crystal Space} instructions to again re-build AWS
+with your modifications included.
+
+@subsubheading Creative EAX 2.0
+
+In order to build the CS EAX 2.0 enviromental audio plugin (@emph{plgsndrdreax}), requires
+you have the EAX 2.0 SDK on your system. The SDK can be obtained from the following website.
+
+@uref{http://developer.creative.com/LEFTMENU/DC_LM_Downloads.asp}
+
+After installtion you will need to point MSVC to the SDK's include and lib paths.
+
+@subsubheading Compiling Crystal Space
+
+To compile Crystal Space, you'll have to perform the following steps.  If
+anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
+
+@enumerate
+@item
+Load @file{CS\mk\visualc\csall.dsw}.
+
+@item
+You will now be prompted to convert all older @emph{MSVC 6} project files to the new
+@emph{MSVC 7} format. Click on @emph{Yes To All}.
+
+@item
+Make @samp{grpall} your start project.  This is done by right clicking on it
+and then clicking on @emph{Set as StartUp Project}.
+
+@item
+From the file menu selct @emph{Build->Rebuild grpall}.
+
+@item
+After a while the compilation should finish.  The signal for a
+successful build will be come in the form of the something similar to the
+following:
+
+@example
+Build: 1 succeeded, 0 failed, 0 skipped
+@end example
+@end enumerate
+
+@subsubheading Running the Demonstration Applications
+
+The first app you should try is Walktest.  This program shows many of the
+features of the 3D engine.  You can run it by starting it from the windows
+explorer.  It should be at @file{.../cs/walktest.exe}.  Don't start it from
+other locations or from within Visual Studio.  It won't find the required files
+if you do.
+
+If you want to run a debug session, you first have to set the working
+directory.  First select the project you wish to debug and setting it as the
+startup project. Next open @emph{Project->Properties->Debugging} and enter
+the base @file{CS\} directory as the working directory for debug sessions
+(for example, @file{C:\CS\}).  Be sure to to this for @emph{Debug} and
+@emph{Release} builds.
+
+You can now continue with the next platform-independent step.  The remaining
+Windows-specific sections are only important when you want to compile your own
+application using Crystal Space.
+
+@subsubheading Structure of the Workspace
+
+@emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
+coming with Crystal Space, don't send fixes for these files to the developers.
+These files are generated automatically, so your fixes would be useless.
+Better, send a description of the bug to the mailing list.
+
+The Crystal Space workspace is divided into several projects.  They all exist
+as separate project files (@file{*.dsp}).  All of them are being bound together
+by a workspace @file{csall.dsw}.  This workspace will also ensure correct
+linking between the various projects.
+
+The workspace uses a prefix system for naming the projects and grouping them.
+There are currently four prefixes in use.  The prefix @file{grp} is used to
+group the projects into the three main categories: @emph{libraries},
+@emph{plug-ins}, and @emph{applications}.  There is also a special group
+@samp{grpall} that contains the three major groups @samp{grplibs},
+@samp{grpapps}, and @samp{grpplugins}.
+
+The @emph{Libraries} are C++ libraries that you can link into your own
+programs.  Some of these libraries are part of the core of Crystal Space.  You
+can find more information about this in @ref{Libraries}.  Their output are
+@file{.lib} files.
+
+The @emph{Plugins} are also programming libraries, but they use a special
+mechanism called @sc{scf} as their interface to your program.  This separates
+their interface from the internals of the library and thus allows dynamic
+linking.  In fact, some of the @emph{Libraries} also use @sc{scf}.  The rule
+for the @sc{msvc} workspace is simple: The @emph{Plugins} are projects that
+build a dynamic library (@file{.dll}).  You can find more information in the
+section of this manual dealing with plug-in modules.  @xref{Plug-In Drivers}.
+
+The @emph{Applications} are programs using some of these libraries, so they
+produce @file{.exe} files.
+
+@subsubheading Compiling Your Own Program Using Crystal Space
+
+@emph{TODO} Point this to the HOWTO for creating apps under MSVC7.
+
+@subsubheading Frequently Asked Questions (@sc{faq})
+@anchor{MSVC7 FAQ}
+
+@emph{TODO}
+
+@item
+Q. @emph{I have a problem that you haven't solved here!}
+
+A. Try sending a note to the Crystal Space mailing list and asking your
+question there.  @xref{Mailing Lists}.  Be sure to include any pertinent
+information, such as the operating system you are using, the compiler, which
+version of Crystal Space, and any special configuration information.
+@end itemize
