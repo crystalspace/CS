@@ -2,7 +2,7 @@
 # Checks for an installed nasm
 
 # Create a dummy NASM program
-echo "%define TEST" >conftest.asm
+echo "%xdefine TEST" >conftest.asm
 
 # Check if NASM is installed and if it has the right version
 NASMBIN=`which nasm 2>&1 | grep -v "[Nn]o"`
