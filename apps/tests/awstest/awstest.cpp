@@ -67,7 +67,7 @@
   if (!myPlug) \
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return -1; \
+    return false; \
   }
 
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
@@ -75,25 +75,36 @@
   if (!myPlug) \
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
-    return -1; \
+    return false; \
   }
 
 
 
-awsTest::awsTest():engine(NULL), myG3D(NULL), myG2D(NULL), myVFS(NULL),
-  		   myConsole(NULL)
+awsTest::awsTest()
 {
+  engine = NULL;
+  myG3D = NULL;
+  myG2D = NULL;
+  myVFS = NULL;
+  myConsole = NULL;
+  font = NULL;
+  loader = NULL;
+  aws = NULL;
+  view = NULL;
   message[0] = 0;
 }
 
 awsTest::~awsTest()
 {
-  
-  if (engine) engine->DecRef();
-  if (myG3D)  myG3D->DecRef();
-  if (myG2D)  myG2D->DecRef();
-  if (myVFS)  myVFS->DecRef();
-  if (myConsole) myConsole->DecRef();
+  SCF_DEC_REF (view);
+  SCF_DEC_REF (font);
+  SCF_DEC_REF (aws);
+  SCF_DEC_REF (loader);
+  SCF_DEC_REF (engine);
+  SCF_DEC_REF (myG3D);
+  SCF_DEC_REF (myG2D);
+  SCF_DEC_REF (myVFS);
+  SCF_DEC_REF (myConsole);
 }
 
 
@@ -115,7 +126,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (!engine)
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the engine plugin!\n");
-    abort();
+    return false;
   }
     
   QUERY_PLUG_ID(myG3D, CS_FUNCID_VIDEO, iGraphics3D, "Couldn't load iGraphics3D plugin !\n");
@@ -130,7 +141,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (!aws)
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not load the AWS plugin!\n");
-    abort();
+    return false;
   }
     
   
@@ -138,7 +149,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!\n");
-    abort ();
+    return false;
   }
  
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -148,7 +159,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (!Open ())
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Error opening system!\n");
-    exit(1);
+    return false;
   }
 
   // Setup the texture manager
@@ -266,9 +277,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   ll->AddLight (light->QueryLight ());
   light->DecRef ();
 
-    
-    
-  
   engine->Prepare ();
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------\n");
@@ -288,7 +296,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_cyan = txtmgr->FindRGB (0, 255, 255);
   col_green = txtmgr->FindRGB (0, 255, 0);
   
-  
   /// 
   //aws->SetContext(myG2D, myG3D);
   aws->SetDefaultContext(engine, myG3D->GetTextureManager());
@@ -301,7 +308,6 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   test->Show();
   
   /////////
-    
   
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.\n");
 

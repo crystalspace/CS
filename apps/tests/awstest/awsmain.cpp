@@ -41,6 +41,6 @@ main(int argc, char *argv[])
   // Main loop.
   System->Loop();
 
- 
+  delete System;
  return 0;
 }
