@@ -28,8 +28,26 @@ class csMatrix3;
 class csVector3;
 class csLight;
 class csPolygon3D;
+class csRenderView;
+class csLightView;
 interface IGraphics3D;
 interface IGraphics2D;
+
+/// A callback function for csWorld::DrawFunc().
+typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
+
+/// A callback function for csLight::LightingFunc().
+typedef void (csLightingFunc) (csLightView* lview, int type, void* entity);
+
+/**
+ * Flags for the callbacks called via csWorld::DrawFunc() or
+ * csLight::LightingFunc().
+ * (type csDrawFunc or csLightingFunc).
+ */
+#define CALLBACK_POLYGON 1
+#define CALLBACK_POLYGON2D 2
+#define CALLBACK_POLYGONQ 3
+#define CALLBACK_SECTOR 4
 
 /**
  * This structure represents all information needed for drawing
@@ -65,13 +83,22 @@ public:
    */
   bool do_clip_plane;
 
+  /**
+   * A callback function. If this is set then no drawing is done.
+   * Instead the callback function is called.
+   */
+  csDrawFunc* callback;
+
+  /// Userdata belonging to the callback.
+  void* callback_data;
+
   ///
-  csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false) {}
+  csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
   ///
-  csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false) {}
+  csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
   ///
   csRenderView (const csCamera& c, csClipper* v, IGraphics3D* ig3d, IGraphics2D* ig2d) :
-   csCamera (c), view (v), g3d (ig3d), g2d (ig2d), do_clip_plane (false) {}
+   csCamera (c), view (v), g3d (ig3d), g2d (ig2d), do_clip_plane (false), callback (NULL), callback_data (NULL) {}
 
   ///
   void SetView (csClipper* v) { view = v; }
@@ -269,9 +296,19 @@ public:
    */
   csFrustrumList shadows;
 
+  /**
+   * A callback function. If this is set then no actual
+   * lighting is done.
+   * Instead the callback function is called.
+   */
+  csLightingFunc* callback;
+
+  /// Userdata belonging to the callback.
+  void* callback_data;
+
 public:
   ///
-  csLightView () : light_frustrum (NULL) { }
+  csLightView () : light_frustrum (NULL), callback (NULL), callback_data (NULL) { }
  
   ///
   ~csLightView ()
