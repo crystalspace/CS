@@ -21,6 +21,9 @@ chronological order.
 	  paths returned by cs-config were in DOS format (containing
 	  backslashes), which were interpreted incorrectly by the Bourne shell
 	  invoked by Jam to compile and link programs.
+	- Eric Sunshine performed Texinfo mark-up correction and cleanup in new
+	  material added to engine/internal.txi.  Also cleaned up the grammar
+	  and performed some re-writing to make the discussion more idiomatic.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you

@@ -13,12 +13,12 @@
 
 @dircategory Crystal Space
 @direntry
-* CrystalSpace: (cs). Crystal Space 3D Game Toolkit.
+* CrystalSpace: (cs). Crystal Space 3D Software Development Kit
 @end direntry
 
 @ifinfo
-This file documents Crystal Space, an open-source 3D game toolkit.  It provides
-both usage instructions and informative technical discussions.
+This file documents Crystal Space, an open-source 3D software development kit.
+It provides both usage instructions and informative technical discussions.
 
 This manual, edition @value{EDITION}, is for Crystal Space version
 @value{VERSION}, and was last updated on @value{UPDATED}.
@@ -49,7 +49,7 @@ by the copyright holders.
 
 @titlepage
 @title Crystal Space
-@subtitle Open-Source 3D Game Toolkit Documentation
+@subtitle Open-Source 3D Software Development Kit Documentation
 @subtitle Edition @value{EDITION} for Crystal Space @value{VERSION}
 @subtitle Last updated @value{UPDATED}
 @author Jorrit Tyberghein
@@ -85,9 +85,10 @@ by the copyright holders.
 @node Top, CS Introduction, , (dir)
 @top Crystal Space
 
-Crystal Space is an open-source 3D game toolkit.  It can be used for a variety
-of 3D visualization tasks.  Many people will probably be interested in using
-Crystal Space as the basis of a 3D game, for which it is well suited.
+Crystal Space is an open-source 3D software development kit.  It can be used
+for a variety of 3D visualization tasks.  Many people will probably be
+interested in using Crystal Space as the basis of a 3D game, for which it is
+well suited.
 
 This document includes usage instructions, conceptual material, and detailed
 technical information.
