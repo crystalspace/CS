@@ -28,30 +28,15 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/renderer/common
 
-# COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
-# use libdsound.a (static lib) as the place from which to get MS DirectSound.
-ifeq ($(OS),WIN32)
-  ifeq ($(COMP),GCC)
-    LIBS.DSOUND += $(LFLAGS.l)dsound
-  else
-    LIBS.DSOUND += $(LFLAGS.l)dsound$(LIB)
-  endif
-endif
-
 ifeq ($(USE_PLUGINS),yes)
   SNDOAL = $(OUTDLL)/sndoal$(DLL)
   LIB.SNDOAL = $(foreach d,$(DEP.SNDOAL),$($d.LIB))
+  LIB.SNDOAL.LFLAGS = $(OPENAL.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(SNDOAL)
 else
   SNDOAL = $(OUT)/$(LIB_PREFIX)sndoal$(LIB)
   DEP.EXE += $(SNDOAL)
-  ifeq ($(OS),WIN32)
-    ifeq ($(COMP),GCC)
-      LIBS.EXE += $(LIBS.DSOUND)
-    else
-      LIBS.EXE += $(LIBS.DSOUND)$(LIB)
-    endif
-  endif
+  LIBS.EXE += $(OPENAL.LFLAGS)
   SCF.STATIC += sndoal
   TO_INSTALL.STATIC_LIBS += $(SNDOAL)
 endif
@@ -66,7 +51,7 @@ DEP.SNDOAL = CSUTIL CSGEOM CSSYS CSUTIL
 MSVC.DSP += SNDOAL
 DSP.SNDOAL.NAME = sndoal
 DSP.SNDOAL.TYPE = plugin
-DSP.SNDOAL.LIBS = OpenAL32 ALut
+DSP.SNDOAL.LIBS = openal32 alut
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -77,13 +62,13 @@ ifeq ($(MAKESECTION),targets)
 
 sndoal: $(OUTDIRS) $(SNDOAL)
 
+$(OUT)/%$O: plugins/sound/renderer/openal/%.cpp
+	$(DO.COMPILE.CPP) $(OPENAL.CFLAGS)
+
 $(SNDOAL): $(OBJ.SNDOAL) $(LIB.SNDOAL)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(OPENAL.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
-
-$(OUT)/%$O: plugins/sound/renderer/openal/%.cpp
-	$(DO.COMPILE.CPP) $(OPENAL.CFLAGS)
 
 clean: sndoalclean
 sndoalclean:

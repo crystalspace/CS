@@ -10,8 +10,6 @@ PLUGINS += video/canvas/macosx/opengl
 PLUGINS += sound/driver/coreaudio
 PLUGINS += sound/renderer/software
 
-GL.AVAILABLE = yes
-
 DESCRIPTION.macosx = MacOS/X
 DESCRIPTION.OS.macosx = MacOS/X
 
@@ -84,10 +82,6 @@ CFLAGS.GENERAL = \
 
 # Special option for the software 3D renderer to force it to ARGB mode
 CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
-
-# OpenGL support.
-GL.CFLAGS = -DCS_OPENGL_PATH=OpenGL
-GL.LFLAGS = -framework OpenGL
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile = -pg -O -g
