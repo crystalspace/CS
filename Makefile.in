@@ -57,11 +57,11 @@ define PSEUDOHELP
   echo $"  make platforms    List the available target platforms$"
 endef
 
-MAKESECTION=rootdefines
-include mk/subs.mak
-
 help: openbanner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
   pseudohelp 
+
+MAKESECTION=rootdefines
+include mk/subs.mak
 
 dep:
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ DO_DEPEND=yes
