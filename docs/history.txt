@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Aug-2003
+	- Keith added some new enhancements to the cal3d wrapper and viewer.
+	  viewmesh now divides cal3d animations by looping and non-looping
+	  types, and dynamically updates the list of animations to remove
+	  from the blend set.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.

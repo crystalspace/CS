@@ -283,7 +283,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	default:
 	  break;
       }
-      if (ev.Command.Code > VIEWMESH_STATES_SELECT_START &&
+      if (ev.Command.Code >= VIEWMESH_STATES_SELECT_START &&
 	  ev.Command.Code < VIEWMESH_STATES_SELECT_START + 100)
       {
       	csRef<iSprite3DState> spstate (
@@ -304,7 +304,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	menu->Hide();
 	return true;
       }
-      if (ev.Command.Code > VIEWMESH_OVERRIDE_SELECT_START &&
+      if (ev.Command.Code >= VIEWMESH_OVERRIDE_SELECT_START &&
 	  ev.Command.Code < VIEWMESH_OVERRIDE_SELECT_START + 100)
       {
       	csRef<iSprite3DState> spstate (
@@ -319,13 +319,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
                iSpriteCal3DState));
           if (cal3dstate)
           {
-	    cal3dstate->SetAnimAction(stateslist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START),1,1);
+	    cal3dstate->SetAnimAction(actionlist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START),1,1);
 	  }
 	}
 	menu->Hide();
 	return true;
       }
-      if (ev.Command.Code > VIEWMESH_STATES_ADD_START &&
+      if (ev.Command.Code >= VIEWMESH_STATES_ADD_START &&
 	  ev.Command.Code < VIEWMESH_STATES_ADD_START + 100)
       {
         csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
@@ -333,18 +333,30 @@ bool ViewMesh::HandleEvent (iEvent& ev)
         if (cal3dstate)
         {
 	  cal3dstate->AddAnimCycle(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START),1,3);
+	  activelist.Push(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START));
+	  menu->Hide();
+	  (void) new csMenuItem(activemenu,stateslist.Get(ev.Command.Code - VIEWMESH_STATES_ADD_START),VIEWMESH_STATES_CLEAR_START+activelist.Length());
+	  return true;
 	}
 	menu->Hide();
 	return true;
       }
-      if (ev.Command.Code > VIEWMESH_STATES_CLEAR_START &&
+      if (ev.Command.Code >= VIEWMESH_STATES_CLEAR_START &&
 	  ev.Command.Code < VIEWMESH_STATES_CLEAR_START + 100)
       {
         csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
                 iSpriteCal3DState));
         if (cal3dstate)
         {
-	  cal3dstate->ClearAnimCycle(stateslist.Get(ev.Command.Code - VIEWMESH_STATES_CLEAR_START),3);
+	  if (ev.Command.Code > VIEWMESH_STATES_CLEAR_START)
+	  {
+	    csComponent *item = activemenu->GetItem (ev.Command.Code);
+	    cal3dstate->ClearAnimCycle (item->GetText (),3);
+	    activelist.Delete (item->GetText() );
+	    menu->Hide ();
+	    activemenu->Delete (item);
+	    return true;
+	  }
 	}
 	menu->Hide();
 	return true;
@@ -425,7 +437,10 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
       is_cal3d = true;
       for (int i=0;i<cal3dstate->GetAnimCount();i++)
       {
-        stateslist.Push (csStrNew (cal3dstate->GetAnimName (i)));
+	if (cal3dstate->GetAnimType (i) == iSpriteCal3DState::C3D_ANIM_TYPE_ACTION)
+          actionlist.Push (csStrNew (cal3dstate->GetAnimName (i)));
+	else
+          stateslist.Push (csStrNew (cal3dstate->GetAnimName (i)));
       }
     }
   }
@@ -504,25 +519,35 @@ void ViewMesh::ConstructMenu()
     (void)new csMenuItem(menu, "Add Action Loop", addmenu);
 
     // ClearActionMenu
-    csMenu *clearmenu = new csMenu(0);
+    activemenu = new csMenu(0);
+    (void)new csMenuItem(activemenu, "(All)",
+			   VIEWMESH_STATES_CLEAR_START);
+    for (i=0;i<activelist.Length();i++)
+    {
+      (void)new csMenuItem(activemenu, activelist.Get(i),
+			   VIEWMESH_STATES_CLEAR_START+i+1);
+    }
+    (void)new csMenuItem(menu, "Clear Action Loop", activemenu);
+
+    csMenu *overridemenu = new csMenu(0);
+    for (i=0;i<actionlist.Length();i++)
+    {
+      (void)new csMenuItem(overridemenu, actionlist.Get(i),
+ 	  		   VIEWMESH_OVERRIDE_SELECT_START+i);
+    }
+    (void)new csMenuItem(menu, "Overrides", overridemenu);
+  }
+  else
+  {
+    // OverrideActionMenu
+    csMenu *overridemenu = new csMenu(0);
     for (i=0;i<stateslist.Length();i++)
     {
-      (void)new csMenuItem(clearmenu, stateslist.Get(i),
-			   VIEWMESH_STATES_CLEAR_START+i);
+      (void)new csMenuItem(overridemenu, stateslist.Get(i),
+  			   VIEWMESH_OVERRIDE_SELECT_START+i);
     }
-    (void)new csMenuItem(menu, "Clear Action Loop", clearmenu);
+    (void)new csMenuItem(menu, "Overrides", overridemenu);
   }
-
-
-  // OverrideActionMenu
-  csMenu *overridemenu = new csMenu(0);
-  for (i=0;i<stateslist.Length();i++)
-  {
-    (void)new csMenuItem(overridemenu, stateslist.Get(i),
-			 VIEWMESH_OVERRIDE_SELECT_START+i);
-  }
-  (void)new csMenuItem(menu, "Overrides", overridemenu);
-
   // Camera Mode
   csMenu *cammode = new csMenu(0);
   (void)new csMenuItem(cammode, "Normal Movement", VIEWMESH_COMMAND_CAMMODE1);

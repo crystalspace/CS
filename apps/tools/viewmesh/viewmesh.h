@@ -51,9 +51,9 @@ private:
   float scale;
   bool is_cal3d;
 
-  csMenu *menu;
+  csMenu *menu,*activemenu;
   csWindow *dialog;
-  csStringArray stateslist;
+  csStringArray stateslist,actionlist,activelist;
   enum { movenormal, moveorigin, rotateorigin } cammode;
 
   void UpdateSpritePosition(csTicks elapsed);
