@@ -7,6 +7,7 @@
       <streammapping stream="normals" destination="attribute 2" />
       <streammapping stream="texture coordinates" destination="attribute 3" />
 			<vp type="gl_arb_vp" file="/shader/vertexlight.avp"/>
+      <texturemapping unit="0" layer="0" />
 			<fp type="gl_mtex_fp" file="/shader/passthrough.mtex"/>
 		</pass>
 	</technique>
