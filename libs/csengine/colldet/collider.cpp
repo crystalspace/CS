@@ -36,6 +36,16 @@ csCollider::csCollider (csObject& parent,
   collider = collide_system->CreateCollider (mesh);
 }
 
+csCollider::csCollider (iObject* parent,
+	iCollideSystem* collide_system,
+	iPolygonMesh* mesh)
+{
+  parent->ObjAdd (QUERY_INTERFACE (this, iObject));
+  csCollider::collide_system = collide_system;
+  collide_system->IncRef ();
+  collider = collide_system->CreateCollider (mesh);
+}
+
 csCollider::~csCollider ()
 {
   collide_system->DecRef ();
@@ -65,9 +75,9 @@ bool csCollider::Collide (csCollider& otherCollider,
   	pCollider2->collider, pTransform2);
 }
 
-csCollider *csCollider::GetCollider (csObject &object) 
+csCollider* csCollider::GetCollider (csObject &object) 
 {
-  csObject *o = object.GetChild (csCollider::Type);
+  csObject* o = object.GetChild (csCollider::Type);
   if (o) return (csCollider*) o;
   return NULL;
 }

@@ -24,6 +24,7 @@
 #include "iplugin.h"
 
 struct iMeshObject;
+struct iMeshWrapper;
 struct iRenderView;
 struct iMovable;
 struct iLight;
@@ -31,6 +32,9 @@ class csReversibleTransform;
 
 /// A callback function for MeshObj::Draw().
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
+	void* callbackData);
+/// A callback function for MeshWrapper::Draw().
+typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
 SCF_VERSION (iMeshObject, 0, 0, 8);
@@ -165,7 +169,7 @@ struct iMeshObjectType : public iPlugIn
   virtual iMeshObjectFactory* NewFactory () = 0;
 };
 
-SCF_VERSION (iMeshWrapper, 0, 0, 1);
+SCF_VERSION (iMeshWrapper, 0, 0, 2);
 
 /**
  * This interface corresponds to the object in the engine
@@ -215,6 +219,19 @@ struct iMeshWrapper : public iBase
    */
   virtual bool HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr) = 0;
+
+  /**
+   * Set a callback which is called just before the object is drawn.
+   * This is useful to do some expensive computations which only need
+   * to be done on a visible object. Note that this function will be
+   * called even if the object is not visible. In general it is called
+   * if there is a likely probability that the object is visible (i.e.
+   * it is in the same sector as the camera for example).
+   */
+  virtual void SetDrawCallback (csDrawCallback* cb, void* cbData) = 0;
+
+  /// Get the draw callback.
+  virtual csDrawCallback* GetDrawCallback () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);

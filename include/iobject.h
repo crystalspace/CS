@@ -23,7 +23,7 @@
 
 class csObject;
 
-SCF_VERSION (iObject, 0, 0, 1);
+SCF_VERSION (iObject, 0, 0, 2);
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
@@ -35,6 +35,18 @@ struct iObject : public iBase
 
   /// Query object name
   virtual const char *GetName () const = 0;
+
+  /// Returns the parent iObject.
+  virtual iObject* GetObjectParentI () const = 0;
+
+  /// Attach a new iObject to the tree
+  virtual void ObjAdd (iObject *obj) = 0;
+
+  /// Removes the given object from the tree, without freeing the contents
+  virtual void ObjRelease (iObject *obj) = 0;
+
+  /// Deletes the given object, removing it from the object tree
+  virtual void ObjRemove (iObject *obj) = 0;
 };
 
 #endif

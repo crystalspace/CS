@@ -166,6 +166,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory () :
   
   lod_level = DEFAULT_LOD;
   lod_level_config = CS_SPR_LOD_GLOBAL;
+  initialized = false;
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -201,6 +202,13 @@ void csSprite3DMeshObjectFactory::SetSkeleton (csSkel* sk)
 
 iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
 {
+  if (!initialized)
+  {
+    initialized = true;
+    GenerateLOD ();
+    ComputeBoundingBox ();
+  }
+
   csSprite3DMeshObject* spr;
   spr = new csSprite3DMeshObject ();
   spr->SetFactory (this);
@@ -592,6 +600,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   vis_cb = NULL;
 
   camera_cookie = 0;
+  MixMode = CS_FX_COPY;
   initialized = false;
 }
 
@@ -1105,8 +1114,6 @@ void csSprite3DMeshObject::InitSprite ()
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
 
   last_time = factory->System->GetTime ();
-
-  MixMode = CS_FX_COPY;
 }
 
 bool csSprite3DMeshObject::OldNextFrame (cs_time current_time, bool onestep, bool stoptoend)

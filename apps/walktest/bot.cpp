@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,12 +22,11 @@
 #include "csengine/light.h"
 #include "csengine/engine.h"
 
-IMPLEMENT_CSOBJTYPE (Bot,csSprite3D);
+IMPLEMENT_CSOBJTYPE (Bot,csMeshWrapper);
 
-Bot::Bot (csSpriteTemplate* tmpl, csEngine *Engine) : csSprite3D (Engine)
+Bot::Bot (csEngine* Engine, iMeshObject* botmesh) : csMeshWrapper (Engine, botmesh)
 {
   engine = Engine;
-  SetTemplate (tmpl);
   do
   {
     d.x = 6*(((float)rand ()) / (float)RAND_MAX)-3;

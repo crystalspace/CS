@@ -1058,18 +1058,15 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
       (void)new csCollider (*tp, collide_system, mesh);
     }
   }
-  // Initialize all sprites for collision detection.
-  // @@@ This routine ignores 2D sprites for the moment.
-  csSprite3D* spp;
+  // Initialize all mesh objects for collision detection.
   int i;
   for (i = 0 ; i < engine->sprites.Length () ; i++)
   {
     csSprite* sp = (csSprite*)engine->sprites[i];
     if (region && !region->IsInRegion (sp)) continue;
-    if (sp->GetType () != csSprite3D::Type) continue;
-    spp = (csSprite3D*)sp;
-    mesh = QUERY_INTERFACE (spp, iPolygonMesh);
-    (void)new csCollider (*spp, collide_system, mesh);
+    mesh = QUERY_INTERFACE (sp, iPolygonMesh);
+    if (mesh)
+      (void)new csCollider (*sp, collide_system, mesh);
   }
 
   // Create a player object that follows the camera around.

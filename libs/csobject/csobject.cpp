@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     csObject library (C) 1999 by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -170,6 +170,13 @@ void csObject::ObjAdd (csObject *obj)
   obj->SetObjectParent (this);
 }
 
+void csObject::ObjAdd (iObject *obj)
+{
+  if (!obj) return;
+  // @@@ WARNING! We assume here that casting iObject to csObject works.
+  ObjAdd ((csObject*)obj);
+}
+
 void csObject::ObjRelease (csObject *obj)
 { 
   if (!children || !obj)
@@ -186,10 +193,23 @@ void csObject::ObjRelease (csObject *obj)
     }
 }
 
+void csObject::ObjRelease (iObject *obj)
+{ 
+  if (!children || !obj) return;
+  // @@@ WARNING! We assume here that casting iObject to csObject works.
+  ObjRelease ((csObject*)obj);
+}
+
 void csObject::ObjRemove (csObject *obj)
 { 
   ObjRelease (obj);
   delete obj; 
+}
+
+void csObject::ObjRemove (iObject *obj)
+{ 
+  ObjRelease (obj);
+  obj->DecRef ();
 }
 
 //------------------------------------------------------ Object iterator -----//

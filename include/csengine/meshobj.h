@@ -25,13 +25,11 @@
 #include "csengine/movable.h"
 #include "imeshobj.h"
 
+struct iMeshWrapper;
+struct iRenderView;
 class Dumper;
 class csMeshWrapper;
 class csRenderView;
-
-/// A callback function for csMeshWrapper::Draw().
-typedef void (csDrawCallback) (csMeshWrapper* spr, csRenderView* rview,
-	void* cbData);
 
 /**
  * The holder class for all implementations of iMeshObject.
@@ -180,6 +178,14 @@ public:
   	csVector3& isect, float* pr)
     {
       return scfParent->HitBeam (start, end, isect, pr);
+    }
+    virtual void SetDrawCallback (csDrawCallback* cb, void* cbData)
+    {
+      scfParent->SetDrawCallback (cb, cbData);
+    }
+    virtual csDrawCallback* GetDrawCallback ()
+    {
+      return scfParent->GetDrawCallback ();
     }
   } scfiMeshWrapper;
 };

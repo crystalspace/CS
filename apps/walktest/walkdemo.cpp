@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -82,7 +82,7 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
-extern csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
+extern iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size);
 extern void move_sprite (csSprite* sprite, csSector* where,
 	csVector3 const& pos);
@@ -572,9 +572,10 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
   }
 }
 
-void animate_skeleton_tree_cb (csSprite3D* spr, csRenderView* /*rview*/)
+void animate_skeleton_tree_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* /*data*/)
 {
-  iSprite3DState* state = QUERY_INTERFACE (spr, iSprite3DState);
+  iMeshObject* obj = spr->GetMeshObject ();
+  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
   animate_skeleton_tree (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
 }
@@ -586,16 +587,19 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetEngine ()->sprite_templates.FindByName (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (skelname);
   if (!tmpl)
   {
-    tmpl = new csSpriteTemplate ();
-    iSprite3DFactoryState* state = QUERY_INTERFACE (tmpl, iSprite3DFactoryState);
-    tmpl->SetName (skelname);
-    Sys->engine->sprite_templates.Push (tmpl);
-    state->SetMaterialWrapper (QUERY_INTERFACE (
-    	Sys->engine->GetMaterials ()->FindByName ("white"), iMaterialWrapper));
+    tmpl = Sys->engine->CreateMeshFactory (
+    	"crystalspace.mesh.object.sprite.3d", skelname);
+    if (tmpl == NULL)
+    {
+      CsPrintf (MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      return;
+    }
+    iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
+    iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    state->SetMaterialWrapper (Sys->engine->FindMaterial ("white"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -603,12 +607,9 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skeltree (state, fr, vertex_idx, depth, width);
-    // @@@TEMPORARY
-    tmpl->GenerateLOD ();
-    tmpl->ComputeBoundingBox ();
   }
-  csSprite3D* spr = add_sprite (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
-  spr->SetDrawCallback (animate_skeleton_tree_cb);
+  iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
+  spr->SetDrawCallback (animate_skeleton_tree_cb, NULL);
 }
 
 //===========================================================================
@@ -772,9 +773,10 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
   }
 }
 
-void animate_skeleton_ghost_cb (csSprite3D* spr, csRenderView* /*rview*/)
+void animate_skeleton_ghost_cb (iMeshWrapper* spr, iRenderView* /*rview*/, void* /*data*/)
 {
-  iSprite3DState* state = QUERY_INTERFACE (spr, iSprite3DState);
+  iMeshObject* obj = spr->GetMeshObject ();
+  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
   iSkeletonState* sk_state = state->GetSkeletonState ();
   animate_skeleton_ghost (QUERY_INTERFACE (sk_state, iSkeletonLimbState));
 }
@@ -787,16 +789,19 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
 {
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
-  csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetEngine ()->sprite_templates.FindByName (skelname);
+  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (skelname);
   if (!tmpl)
   {
-    tmpl = new csSpriteTemplate ();
-    iSprite3DFactoryState* state = QUERY_INTERFACE (tmpl, iSprite3DFactoryState);
-    tmpl->SetName (skelname);
-    Sys->engine->sprite_templates.Push (tmpl);
-    state->SetMaterialWrapper (QUERY_INTERFACE (
-    	Sys->engine->GetMaterials ()->FindByName ("green"), iMaterialWrapper));
+    tmpl = Sys->engine->CreateMeshFactory (
+    	"crystalspace.mesh.object.sprite.3d", skelname);
+    if (tmpl == NULL)
+    {
+      CsPrintf (MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      return;
+    }
+    iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
+    iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+    state->SetMaterialWrapper (Sys->engine->FindMaterial ("green"));
     int vertex_idx = 0;
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName ("f");
@@ -804,18 +809,18 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skelghost (state, fr, vertex_idx, maxdepth, width);
-    // @@@ TEMPORARY
-    tmpl->GenerateLOD ();
-    tmpl->ComputeBoundingBox ();
   }
-  csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
-  spr->SetMixmode (CS_FX_SETALPHA (0.75));
-  iPolygonMesh* mesh = QUERY_INTERFACE (spr, iPolygonMesh);
-  (void)new csCollider (*spr, Sys->collide_system, mesh);
+  iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
+  iMeshObject* obj = spr->GetMeshObject ();
+  iSprite3DState* state = QUERY_INTERFACE (obj, iSprite3DState);
+  state->SetMixMode (CS_FX_SETALPHA (0.75));
+  iPolygonMesh* mesh = QUERY_INTERFACE (obj, iPolygonMesh);
+  iObject* sprobj = QUERY_INTERFACE (spr, iObject);
+  (void)new csCollider (sprobj, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
-  spr->ObjAdd (gh_info);
+  sprobj->ObjAdd (QUERY_INTERFACE (gh_info, iObject));
   gh_info->dir = 1;
-  spr->SetDrawCallback (animate_skeleton_ghost_cb);
+  spr->SetDrawCallback (animate_skeleton_ghost_cb, NULL);
 }
 
 #define MAXSECTORSOCCUPIED  20
@@ -825,7 +830,7 @@ extern int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt);
 extern csCollisionPair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
-void move_ghost (csSprite3D* spr)
+void move_ghost (csMeshWrapper* spr)
 {
   csCollider* col = csCollider::GetCollider (*spr);
   csSector* first_sector = spr->GetMovable ().GetSector (0);
@@ -922,11 +927,13 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     dyn->SetSector (where);
     dyn->Setup ();
   }
-  csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetEngine ()->sprite_templates.FindByName ("bot");
+  csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
+  	Sys->view->GetEngine ()->meshobj_factories.FindByName ("bot");
   if (!tmpl) return;
+  iMeshObject* botmesh = tmpl->GetMeshObjectFactory ()->NewInstance ();
   Bot* bot;
-  bot = new Bot (tmpl, Sys->view->GetEngine());
+  bot = new Bot (Sys->view->GetEngine(), botmesh);
+  botmesh->DecRef ();
   bot->SetName ("bot");
   Sys->view->GetEngine ()->sprites.Push (bot);
   bot->GetMovable ().SetSector (where);
@@ -935,8 +942,8 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->GetMovable ().UpdateMove ();
-  bot->SetAction ("default");
-  bot->InitSprite ();
+  iSprite3DState* state = QUERY_INTERFACE (botmesh, iSprite3DState);
+  state->SetAction ("default");
   bot->next = first_bot;
   bot->light = dyn;
   first_bot = bot;
@@ -1179,17 +1186,7 @@ void light_statics ()
   for (int i = 0 ; i < e->sprites.Length () ; i++)
   {
     csSprite* sp = (csSprite*)e->sprites [i];
-    if (sp->GetType () == csSprite3D::Type)
-    {
-      csSprite3D* sp3d = (csSprite3D *)sp;
-      csSkeletonState* sk_state = sp3d->GetSkeletonState ();
-      if (sk_state)
-      {
-        const char* name = sp3d->GetName ();
-        if (!strcmp (name, "__skelghost__")) move_ghost (sp3d);
-      }
-    }
-    else if (sp->GetType () == csMeshWrapper::Type)
+    if (sp->GetType () == csMeshWrapper::Type)
     {
       csMeshWrapper* wrap = (csMeshWrapper*)sp;
       iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
@@ -1197,8 +1194,8 @@ void light_statics ()
       {
         if (state->GetSkeletonState ())
 	{
-          //const char* name = wrap->GetName ();
-          //@@@if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
+          const char* name = wrap->GetName ();
+          if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
 	}
       }
     }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,8 +20,9 @@
 #define __CS_BOT_H__
 
 #include "csgeom/math3d.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 
+struct iMeshObject;
 class csSector;
 class csDynLight;
 class csEngine;
@@ -29,7 +30,7 @@ class csEngine;
 /**
  * A bot which moves randomly through the dungeon.
  */
-class Bot : public csSprite3D
+class Bot : public csMeshWrapper
 {
 private:
   /// Engine handle.
@@ -49,7 +50,7 @@ public:
 
 public:
   /// Constructor.
-  Bot (csSpriteTemplate* tmpl, csEngine *Engine);
+  Bot (csEngine *Engine, iMeshObject* botmesh);
   /// Destructor.
   virtual ~Bot ();
 

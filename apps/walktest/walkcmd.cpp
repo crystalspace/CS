@@ -349,6 +349,25 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
   return spr;
 }
 
+iMeshWrapper* add_meshobj (char* tname, char* sname, csSector* where,
+	csVector3 const& pos, float size)
+{
+  iMeshFactoryWrapper* tmpl = Sys->engine->FindMeshFactory (tname);
+  if (!tmpl)
+  {
+    Sys->Printf (MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
+    return NULL;
+  }
+  iMeshWrapper* spr = Sys->engine->CreateMeshObject (tmpl, sname,
+  	QUERY_INTERFACE (where, iSector), pos);
+  csMatrix3 m; m.Identity (); m = m * size;
+  spr->GetMovable ()->SetTransform (m);
+  spr->GetMovable ()->UpdateMove ();
+
+  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  return spr;
+}
+
 
 void list_sprites(void)
 {

@@ -1,5 +1,33 @@
 The history order has been reversed so that new features are at the top.
 
+8-Feb-2001
+	- Changed 'bot' code in Walktest and ptlab to use the new spr3d
+	  plugin instead of csSprite3D.
+	- Initialization of collision detection in WalkTest will now work
+	  for all mesh objects that actually support iPolygonMesh (currently
+	  only spr3d plugin does this).
+	- Fixed spr3d plugin so that GenerateLOD() and ComputeBoundingBox()
+	  will now be called upon the first creation of a sprite instance
+	  from a factory. Previously this was not done so this could give
+	  problems.
+	- Changed csDrawCallback in meshobj.h to use iMeshWrapper and
+	  iRenderView instead of csMeshWrapper and csRenderView.
+	- Extended iMeshWrapper interface with SetDrawCallback() and
+	  GetDrawCallback().
+	- Added 'add_meshobj' to walktest which is equivalent to 'add_sprite'.
+	- Ported the skeletal tree from WalkTest to use the new spr3d
+	  plugin.
+	- Added ObjAdd(), ObjRemove(), ObjRelease(), and GetObjectParentI()
+	  to iObject SCF interface so that they can be used from within
+	  plugins too.
+	- Added a new constructor to csCollider which accepts an iObject*
+	  as a parent. This will help to attach csCollider objects to
+	  mesh object plugins.
+	- Fixed bug in csMeshWrapper. It did not use the correct SCF macros
+	  to indicate that it was actually getting iBase from the parent
+	  csSprite.
+	- Fixed a bug in the spr3d plugin where it would reset the value
+	  of MixMode to CS_FX_COPY the first time it was used.
 7-Feb-2001
 	- Martin Geisse removed sound volume division by number of sources
 	  from software sound because it did not sound very good.

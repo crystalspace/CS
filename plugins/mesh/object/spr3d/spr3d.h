@@ -240,6 +240,9 @@ private:
    */
   csTriangleVertices2* tri_verts;
 
+  /// If true then this factory has been initialized.
+  bool initialized;
+
 public:
   iSystem* System;
 

@@ -48,6 +48,10 @@ public:
   csCollider (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
+  /// Create a collider based on a mesh.
+  csCollider (iObject* parent, iCollideSystem* collide_system,
+  	iPolygonMesh* mesh);
+
   /// Destroy the plugin collider object
   virtual ~csCollider ();
 
@@ -76,8 +80,8 @@ public:
    * If object has a child of type csCollider it is returned. Otherwise 0
    * is returned.
    */
-  static csCollider *GetCollider (csObject& object);
-  
+  static csCollider* GetCollider (csObject& object);
+
   CSOBJTYPE;
 };
 

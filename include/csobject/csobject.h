@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     csObject library (C) 1999 by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -81,6 +81,13 @@ public:
   { return NULL; }
 
   /**
+   * Returns the parent csObject. Implemented in csPObject class.
+   * @@@ Ugly name!
+   */
+  virtual iObject* GetObjectParentI () const
+  { return QUERY_INTERFACE_SAFE (GetObjectParent (), iObject); }
+
+  /**
    * Return the first subobject instance of the given type.
    * If 'derived' is true then this function will return the
    * first object which has the given type or a subclass of that type.
@@ -99,11 +106,20 @@ public:
   /// Attach a new csObject to the tree
   void ObjAdd (csObject *obj);
 
+  /// Attach a new iObject to the tree
+  virtual void ObjAdd (iObject *obj);
+
   /// Removes the given object from the tree, without freeing the contents
   void ObjRelease (csObject *obj);
 
+  /// Removes the given object from the tree, without freeing the contents
+  virtual void ObjRelease (iObject *obj);
+
   /// Deletes the given object, removing it from the object tree
   void ObjRemove (csObject *obj);
+
+  /// Deletes the given object, removing it from the object tree
+  virtual void ObjRemove (iObject *obj);
 
   CSOBJTYPE;
   DECLARE_IBASE;

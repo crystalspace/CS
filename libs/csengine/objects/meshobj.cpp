@@ -24,9 +24,9 @@
 
 IMPLEMENT_CSOBJTYPE (csMeshWrapper, csSprite)
 
-IMPLEMENT_IBASE (csMeshWrapper)
+IMPLEMENT_IBASE_EXT (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
   IMPLEMENTS_INTERFACE (iMeshWrapper)
@@ -121,8 +121,9 @@ void csMeshWrapper::UpdateMove ()
 
 void csMeshWrapper::Draw (csRenderView& rview)
 {
-  if (draw_cb) draw_cb (this, &rview, draw_cbData);
+  iMeshWrapper* meshwrap = QUERY_INTERFACE (this, iMeshWrapper);
   iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
+  if (draw_cb) draw_cb (meshwrap, irv, draw_cbData);
   iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
   if (mesh->DrawTest (irv, imov))
   {
