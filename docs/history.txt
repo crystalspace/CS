@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon
 	  index.
+	- Jorrit fixed an initialization error in the csGLStateCache for
+	  GL_STENCIL_BITS. This bug was reported by valgrind.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.

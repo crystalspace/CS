@@ -181,6 +181,7 @@ public:
     glGetIntegerv (GL_DEPTH_FUNC, (GLint*)&parameter_depth_func);
     glGetBooleanv (GL_DEPTH_WRITEMASK, &parameter_depth_mask);
     glGetIntegerv (GL_SHADE_MODEL, (GLint*)&parameter_shade_model);
+    glGetIntegerv (GL_STENCIL_BITS, (GLint*)&parameter_maskl);
     glGetIntegerv (GL_STENCIL_FUNC, (GLint*)&parameter_stencil_func);
     glGetIntegerv (GL_STENCIL_VALUE_MASK, (GLint*)&parameter_stencil_mask);
     glGetIntegerv (GL_STENCIL_REF, &parameter_stencil_ref);
