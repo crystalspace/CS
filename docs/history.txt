@@ -25,6 +25,10 @@ chronological order.
 	  user-specific settings.  Also upgraded to CS formatting standards.
 	- Eric Sunshine simplified overly complex code in
 	  cssys/general/platformconfig.cpp and cssys/win32/filesysconfig.cpp.
+	- Jorrit removed the world to texture transformation from
+	  csPolyTexture. This makes some operations a small bit slower (like
+	  static + dynamic lighting in case the object has moved) but it
+	  saves a lot of memory again.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

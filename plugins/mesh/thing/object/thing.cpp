@@ -2567,6 +2567,20 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
+  bool ident;
+  csReversibleTransform o2c;
+  if (cached_movable->IsFullTransformIdentity ())
+  {
+    ident = true;
+  }
+  else
+  {
+    ident = false;
+    o2c = cached_movable->GetFullTransform ();
+  }
+
+  csMatrix3 m_world2tex;
+  csVector3 v_world2tex;
 
   int i;
 
@@ -2604,7 +2618,25 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     if (dyn)
       poly->CalculateLightingDynamic (lview, movable);
     else
-      poly->CalculateLightingStatic (lview, movable, lptq, true);
+    {
+      if (ident)
+      {
+        poly->GetStaticData ()->MappingGetTextureSpace (m_world2tex,
+		v_world2tex);
+      }
+      else
+      {
+	csMatrix3 m_obj2tex;
+	csVector3 v_obj2tex;
+        poly->GetStaticData ()->MappingGetTextureSpace (m_obj2tex,
+		v_obj2tex);
+        csPolyTexture* lmi = poly->GetPolyTexture ();
+        lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
+		o2c, m_world2tex, v_world2tex);
+      }
+      poly->CalculateLightingStatic (lview, movable, lptq, true,
+      	m_world2tex, v_world2tex);
+    }
   }
 }
 
@@ -2883,6 +2915,22 @@ void csThing::UpdateDirtyLMs ()
 {
   if (!lightmapsDirty) return;
 
+  WorUpdate ();
+  bool ident;
+  csReversibleTransform o2c;
+  if (cached_movable->IsFullTransformIdentity ())
+  {
+    ident = true;
+  }
+  else
+  {
+    ident = false;
+    o2c = cached_movable->GetFullTransform ();
+  }
+
+  csMatrix3 m_world2tex;
+  csVector3 v_world2tex;
+
   int i;
   for (i = 0; i < litPolys.Length (); i++)
   {
@@ -2891,7 +2939,23 @@ void csThing::UpdateDirtyLMs ()
     {
       csPolygon3D *poly = litPolys[i]->polys[j];
       csPolyTexture* lmi = poly->GetPolyTexture ();
-      if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights ())	
+      if (ident)
+      {
+        poly->GetStaticData ()->MappingGetTextureSpace (m_world2tex,
+		v_world2tex);
+      }
+      else
+      {
+	csMatrix3 m_obj2tex;
+	csVector3 v_obj2tex;
+        poly->GetStaticData ()->MappingGetTextureSpace (m_obj2tex,
+		v_obj2tex);
+        csPolyTexture* lmi = poly->GetPolyTexture ();
+        lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
+		o2c, m_world2tex, v_world2tex);
+      }
+      if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights (
+      	m_world2tex, v_world2tex))	
       {
 	litPolys[i]->lightmaps[j]->SetData (
 	  lmi->GetLightMap ()->GetMapData ());

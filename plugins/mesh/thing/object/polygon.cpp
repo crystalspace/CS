@@ -314,14 +314,6 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
-void csPolygon3DStatic::MappingGetTextureSpace (
-  csMatrix3 &tx_matrix,
-  csVector3 &tx_vector)
-{
-  tx_matrix = polygon_data.tmapping->m_obj2tex;
-  tx_vector = polygon_data.tmapping->v_obj2tex;
-}
-
 void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
 {
   csPolygon3DStatic::thing_static = thing_static;
@@ -1101,8 +1093,9 @@ void csPolygon3D::RefreshFromStaticData ()
     txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
     txt_info->SetTextureMapping (static_data->GetTextureMapping ());
     txt_info->SetLightMapMapping (static_data->GetLightMapMapping ());
-    txt_info->m_world2tex = static_data->GetTextureMapping ()->m_obj2tex;
-    txt_info->v_world2tex = static_data->GetTextureMapping ()->v_obj2tex;
+    //@@@@@@@@@@@@@@@
+    //txt_info->m_world2tex = static_data->GetTextureMapping ()->m_obj2tex;
+    //txt_info->v_world2tex = static_data->GetTextureMapping ()->v_obj2tex;
   }
   plane_wor = static_data->GetObjectPlane ();
 }
@@ -1133,9 +1126,10 @@ void csPolygon3D::ObjectToWorld (
   // So normally it should not be a problem.
   plane_wor.Normalize ();
 
-  if (txt_info) txt_info->ObjectToWorld (
-    static_data->polygon_data.tmapping->m_obj2tex,
-    static_data->polygon_data.tmapping->v_obj2tex, t);
+  //@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  //if (txt_info) txt_info->ObjectToWorld (
+    //static_data->polygon_data.tmapping->m_obj2tex,
+    //static_data->polygon_data.tmapping->v_obj2tex, t);
 }
 
 #define TEXW(t) ((t)->w_orig)
@@ -1529,7 +1523,9 @@ stop:
 
 void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   iMovable* movable,
-  csLightingPolyTexQueue* lptq, bool vis)
+  csLightingPolyTexQueue* lptq, bool vis,
+  const csMatrix3& m_world2tex,
+  const csVector3& v_world2tex)
 {
   bool do_smooth = GetParent ()->GetStaticData ()->GetSmoothingFlag ();
 
@@ -1578,19 +1574,22 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap)
-    FillLightMapStatic (lview, lptq, vis);
+    FillLightMapStatic (lview, lptq, vis, m_world2tex, v_world2tex);
 
   if (maybeItsVisible)
     return;
 }
 
 void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
-  csLightingPolyTexQueue* lptq, bool vis)
+  csLightingPolyTexQueue* lptq, bool vis,
+  const csMatrix3& m_world2tex,
+  const csVector3& v_world2tex)
 {
   if (txt_info)
   {
     if (txt_info->lightmap_up_to_date) return ;
-    txt_info->FillLightMap (lview, lptq, vis, this);
+    txt_info->FillLightMap (lview, lptq, vis, this,
+    	m_world2tex, v_world2tex);
   }
 }
 

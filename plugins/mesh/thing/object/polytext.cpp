@@ -32,6 +32,7 @@
 #include "iengine/material.h"
 #include "iengine/shadows.h"
 #include "iengine/dynlight.h"
+#include "iengine/movable.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -41,7 +42,7 @@
 //------------------------------------------------------------------------------
 
 // Option variable: cosinus factor.
-float csPolyTexture:: cfg_cosinus_factor = 0;
+float csPolyTexture::cfg_cosinus_factor = 0;
 
 csPolyTexture::csPolyTexture ()
 {
@@ -53,29 +54,10 @@ csPolyTexture::csPolyTexture ()
   lightmap_up_to_date = false;
 }
 
-void csPolyTexture::WorldToCamera (
-  const csReversibleTransform &t,
-  csMatrix3 &m_cam2tex,
-  csVector3 &v_cam2tex)
-{
-  // Create the matrix to transform camera space to texture space.
-  // From: T = Mwt * (W - Vwt)
-  //       C = Mwc * (W - Vwc)
-  // To:   T = Mct * (C - Vct)
-  // Mcw * C + Vwc = W
-  // T = Mwt * (Mcw * C + Mcw * Mwc * (Vwc - Vwt))
-  // T = Mwt * Mcw * (C - Mwc * (Vwt-Vwc))
-  // ===>
-  // Mct = Mwt * Mcw
-  // Vct = Mwc * (Vwt - Vwc)
-  m_cam2tex = m_world2tex;
-  m_cam2tex *= t.GetT2O ();
-
-  v_cam2tex = t.Other2This (v_world2tex);
-}
-
 void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
-  const csVector3& v_obj2tex, const csReversibleTransform &obj)
+  const csVector3& v_obj2tex, const csReversibleTransform &obj,
+  csMatrix3& m_world2tex,
+  csVector3& v_world2tex)
 {
   // From: T = Mot * (O - Vot)
   //       W = Mow * O - Vow
@@ -86,6 +68,7 @@ void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
   // ===>
   // Mwt = Mot * Mwo
   // Vwt = Mow * Vot - Vow
+
   m_world2tex = m_obj2tex;
   m_world2tex *= obj.GetO2T ();
   v_world2tex = obj.This2Other (v_obj2tex);
@@ -131,7 +114,9 @@ void csPolyTexture::SetLightMap (csLightMap *lightmap)
   lm = lightmap;
 }
 
-bool csPolyTexture::RecalculateDynamicLights ()
+bool csPolyTexture::RecalculateDynamicLights (
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex)
 {
   if (!lm) return false;
 
@@ -153,7 +138,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
   csLightPatch *lp = polygon->GetLightpatches ();
   while (lp)
   {
-    ShineDynLightMap (lp);
+    ShineDynLightMap (lp, m_world2tex, v_world2tex);
     lp = lp->GetNext ();
   }
 
@@ -273,7 +258,9 @@ void csPolyTexture::FillLightMap (
   iFrustumView *lview,
   csLightingPolyTexQueue* lptq,
   bool vis,
-  csPolygon3D *subpoly)
+  csPolygon3D *subpoly,
+  const csMatrix3& m_world2tex,
+  const csVector3& v_world2tex)
 {
   if (!lm) return ;
 
@@ -327,7 +314,7 @@ void csPolyTexture::FillLightMap (
     csPolygon3D *base_poly = polygon;
     int num_vertices = 4;
     csMatrix3 m_t2w = m_world2tex.GetInverse ();
-    csVector3 &v_t2w = v_world2tex;
+    const csVector3 &v_t2w = v_world2tex;
     csVector3 v;
     float inv_ww = 1.0f / float (ww);
     float inv_hh = 1.0f / float (hh);
@@ -379,8 +366,8 @@ void csPolyTexture::FillLightMap (
     //    T.y = m21 * F.x + m22 * F.y + m23 * F.z + TL.y
     //    L.x = m11*wl * F.x + m12*wl * F.y + m13*wl * F.z + TL.x*wl + ul
     //    L.y = m11*hl * F.x + m12*hl * F.y + m13*hl * F.z + TL.y*hl + vl
-    csMatrix3 &Mw2t = m_world2tex;
-    csVector3 &Vw2t = v_world2tex;
+    const csMatrix3 &Mw2t = m_world2tex;
+    const csVector3 &Vw2t = v_world2tex;
     csVector3 TL = Mw2t * (lightpos - Vw2t);
     float wl = float (ww) * inv_lightcell_size;
     float hl = float (hh) * inv_lightcell_size;
@@ -481,7 +468,9 @@ void csPolyTexture::FillLightMap (
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
-void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
+void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
+  const csMatrix3& m_world2tex,
+  const csVector3& v_world2tex)
 {
   int lw = 1 +
     ((mapping->w_orig + csLightMap::lightcell_size - 1) >>
@@ -784,7 +773,9 @@ finish:
 void csPolyTexture::UpdateFromShadowBitmap (
   iLight *light,
   const csVector3 &lightpos,
-  const csColor &lightcolor)
+  const csColor &lightcolor,
+  const csMatrix3& m_world2tex,
+  const csVector3& v_world2tex)
 {
   CS_ASSERT (shadow_bitmap != 0);
 
@@ -805,7 +796,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
   csMatrix3 m_t2w = m_world2tex.GetInverse ();
-  csVector3 &v_t2w = v_world2tex;
+  const csVector3 &v_t2w = v_world2tex;
 
   // Cosinus factor
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
@@ -1594,7 +1585,27 @@ void csLightingPolyTexQueue::UpdateMaps (
   for (i = 0; i < polytxts.Length (); i++)
   {
     csPolyTexture *pt = polytxts[i];
-    pt->UpdateFromShadowBitmap (light, lightpos, lightcolor);
+    csPolygon3D* pol = pt->GetCSPolygon ();
+    pol->GetParent ()->WorUpdate ();
+    iMovable* mov = pol->GetParent ()->GetCachedMovable ();
+    csMatrix3 m_world2tex;
+    csVector3 v_world2tex;
+    if (mov->IsFullTransformIdentity ())
+    {
+      pol->GetStaticData ()->MappingGetTextureSpace (m_world2tex, v_world2tex);
+    }
+    else
+    {
+      csMatrix3 m_obj2tex;
+      csVector3 v_obj2tex;
+      pol->GetStaticData ()->MappingGetTextureSpace (m_obj2tex, v_obj2tex);
+      pt->ObjectToWorld (
+	m_obj2tex, v_obj2tex,
+	mov->GetFullTransform (),
+	m_world2tex, v_world2tex);
+    }
+    pt->UpdateFromShadowBitmap (light, lightpos, lightcolor,
+    	m_world2tex, v_world2tex);
   }
 
   polytxts.DeleteAll ();

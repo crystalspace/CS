@@ -720,6 +720,9 @@ public:
   /// Get the pointer to the static data.
   csThingStatic* GetStaticData () { return static_data; }
 
+  /// Get the cached movable.
+  iMovable* GetCachedMovable () const { return cached_movable; }
+
   //----------------------------------------------------------------------
   // Vertex handling functions
   //----------------------------------------------------------------------

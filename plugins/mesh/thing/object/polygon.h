@@ -165,7 +165,11 @@ public:
   			const csVector3& tx_vector);
 
   /// Get the transformation from object to texture space.
-  void MappingGetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
+  void MappingGetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector)
+  {
+    tx_matrix = polygon_data.tmapping->m_obj2tex;
+    tx_vector = polygon_data.tmapping->v_obj2tex;
+  }
 
   /**
    * Enable or disable texture mapping.
@@ -738,7 +742,9 @@ public:
    * that the polygon is totally shadowed.
    */
   void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
-  	bool vis);
+  	bool vis,
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /**
    * Check all shadow frustums and mark all relevant ones. A shadow
@@ -773,7 +779,9 @@ public:
    * This version is for static lighting.
    */
   void CalculateLightingStatic (iFrustumView* lview, iMovable* movable,
-  	csLightingPolyTexQueue* lptq, bool vis);
+  	csLightingPolyTexQueue* lptq, bool vis,
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /**
    * Transform the plane of this polygon from object space to world space.

@@ -236,12 +236,6 @@ class csPolyTexture
 {
   friend class csPolygon3D;
 
-public:
-  /// Transformation from world to texture space.
-  csMatrix3 m_world2tex;
-  /// Translation from world to texture space.
-  csVector3 v_world2tex;
-
 private:
   /**
    * This bool indicates if the lightmap is up-to-date (read from the
@@ -322,35 +316,35 @@ public:
    * not the base polygon which this csPolyTexture points too.
    */
   void FillLightMap (iFrustumView* lview, csLightingPolyTexQueue* lptq,
-  	bool vis, csPolygon3D* subpoly);
+  	bool vis, csPolygon3D* subpoly,
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap
    * and the light information below.
    */
   void UpdateFromShadowBitmap (iLight* light, const csVector3& lightpos,
-  	const csColor& lightcolor);
+  	const csColor& lightcolor,
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /**
    * Update the real lightmap for a given csLightPatch
    * (used for a dynamic light).
    */
-  void ShineDynLightMap (csLightPatch* lp);
+  void ShineDynLightMap (csLightPatch* lp,
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /**
    * Transform this plane from object space to world space using
    * the given transform.
    */
   void ObjectToWorld (const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-  	const csReversibleTransform& obj);
-
-  /**
-   * Transform this plane from world space to camera space using
-   * the given transform. The resulting transform is put in m_cam2tex
-   * and v_cam2tex.
-   */
-  void WorldToCamera (const csReversibleTransform& t,
-  	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
+  	const csReversibleTransform& obj,
+	csMatrix3& m_world2tex,
+	csVector3& v_world2tex);
 
   iMaterialHandle *GetMaterialHandle ();
   iRendererLightmap* GetRendererLightmap () const
@@ -366,7 +360,9 @@ public:
    * was a recalculation (then the texture needs to be removed
    * from the texture cache).
    */
-  bool RecalculateDynamicLights ();
+  bool RecalculateDynamicLights (
+	const csMatrix3& m_world2tex,
+	const csVector3& v_world2tex);
 
   /// Query the size of one light cell
   int GetLightCellSize ();
