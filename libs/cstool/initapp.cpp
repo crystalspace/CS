@@ -165,6 +165,8 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
   {
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs",
   	  CS_FUNCID_VFS, iVFS);
+    if (!VFS)
+      return false;
   }
 
   iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
