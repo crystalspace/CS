@@ -24,6 +24,8 @@ chronological order.
 	- Oktal removed iMaterialHandle from the list of types that can be
 	  stored by csShaderVariable, and changed the way in which it stores
 	  csRGBpixel (the four int members are stored as floats in csVector4.)
+	- Oktal added functions to iScriptObject to retrieve the pointer from
+	  an object which stores only an interface pointer.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with

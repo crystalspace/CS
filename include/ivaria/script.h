@@ -33,7 +33,7 @@ SCF_VERSION (iScriptObject, 0, 0, 1);
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.
  * The type specifier "%p" signifies an iScriptObject. Remember to explicitly
- * cast your csRef<iScriptObject>'s to plain pointers or get an error.
+ * cast your csRef's to plain pointers in the var arg list.
  */
 struct iScriptObject : public iBase
 {
@@ -42,6 +42,18 @@ struct iScriptObject : public iBase
    * the given type.
    */
   virtual bool IsType (const char *) const = 0;
+
+  /**
+   * If the object is an interface pointer from the cspace module, this will
+   * return its value, otherwise 0.
+   */
+  virtual iBase* GetPointer () const = 0;
+
+  /**
+   * If the object is an interface pointer from the cspace module, this will
+   * set its value and return true, otherwise false.
+   */
+  virtual bool SetPointer (iBase *) const = 0;
 
   /**
    * Call a method in the object, with no return value.
@@ -174,9 +186,8 @@ SCF_VERSION (iScript, 0, 0, 2);
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.
- * In the case of "%p" (pointer), it can be proceeded in the format string by
- * the type name of the object being pointed to. The "%O" (captial letter `O')
- * format specifier works like "%p", signifies an iScriptObject.
+ * The specifier "%p" signifies an iScriptObject. Remember to explicitly cast
+ * your csRef's to plain pointers in the var arg list.
  */
 struct iScript : public iBase
 {

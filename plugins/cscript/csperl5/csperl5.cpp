@@ -152,7 +152,7 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
   if (self) XPUSHs (self);
   while (*fmt++ == '%') switch (*fmt++)
   {
-    case 'd': case 'i':
+    case 'c': case 'd': case 'i':
     XPUSHs (sv_2mortal (newSViv (va_arg (va, int))));
     break;
 
@@ -161,11 +161,7 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
     break;
 
     case 'f': case 'e': case 'g': case 'E': case 'G':
-    XPUSHs (sv_2mortal (newSVnv (va_arg (va, float))));
-    break;
-
-    case 'c':
-    XPUSHs (sv_2mortal (newSVnv (va_arg (va, char))));
+    XPUSHs (sv_2mortal (newSVnv (va_arg (va, double))));
     break;
 
     case 's':
@@ -179,15 +175,15 @@ SV* csPerl5::CallV (const char *name, const char *fmt, va_list va, SV *self)
     case 'h': switch (*fmt++)
     {
       case 'd': case 'i':
-      XPUSHs (sv_2mortal (newSViv (va_arg (va, short))));
+      XPUSHs (sv_2mortal (newSViv (va_arg (va, int))));
       break;
 
       case 'o': case 'u': case 'x': case 'X':
-      XPUSHs (sv_2mortal (newSVuv (va_arg (va, unsigned short))));
+      XPUSHs (sv_2mortal (newSVuv (va_arg (va, unsigned))));
       break;
 
       case 'f': case 'e': case 'g': case 'E': case 'G':
-      XPUSHs (sv_2mortal (newSVnv (va_arg (va, float))));
+      XPUSHs (sv_2mortal (newSVnv (va_arg (va, double))));
       break;
 
       default:
