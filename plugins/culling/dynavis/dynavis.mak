@@ -46,7 +46,7 @@ INF.DYNAVIS = $(SRCDIR)/plugins/culling/dynavis/dynavis.csplugin
 INC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.h))
 SRC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.cpp))
 OBJ.DYNAVIS = $(addprefix $(OUT)/,$(notdir $(SRC.DYNAVIS:.cpp=$O)))
-DEP.DYNAVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
+DEP.DYNAVIS = CSUTIL CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += DYNAVIS
 DSP.DYNAVIS.NAME = dynavis

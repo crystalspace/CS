@@ -32,7 +32,7 @@ OUT.BUMPTEST = $(OUT)/$(DIR.BUMPTEST)
 INC.BUMPTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUMPTEST)/*.h))
 SRC.BUMPTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUMPTEST)/*.cpp))
 OBJ.BUMPTEST = $(addprefix $(OUT.BUMPTEST)/,$(notdir $(SRC.BUMPTEST:.cpp=$O)))
-DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = $(SRCDIR)/data/config/csbumptest.cfg
 

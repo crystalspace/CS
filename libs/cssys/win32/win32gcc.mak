@@ -101,7 +101,7 @@ ARFLAGS = cr
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
-# System dependent source files included into CSSYS library
+# System dependent source files included into csutil library
 SRC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.cpp) \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \

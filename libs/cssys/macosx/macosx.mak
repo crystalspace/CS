@@ -119,7 +119,7 @@ LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM =
 
-# System dependent source files included into CSSYS library
+# System dependent source files included into csutil library
 SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.c,$(MACOSX.SOURCE_PATHS)) \

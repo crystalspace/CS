@@ -39,7 +39,7 @@ INF.CSCONOUT = $(SRCDIR)/plugins/console/output/standard/csconout.csplugin
 INC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.h))
 SRC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.cpp))
 OBJ.CSCONOUT = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONOUT:.cpp=$O)))
-DEP.CSCONOUT = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.CSCONOUT = CSUTIL CSGEOM CSUTIL
 
 MSVC.DSP += CSCONOUT
 DSP.CSCONOUT.NAME = csconout

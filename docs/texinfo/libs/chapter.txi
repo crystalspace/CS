@@ -7,7 +7,6 @@ This chapter describes the features of the libraries of which Crystal Space
 consists.
 
 @menu
-* csSys:: System Library (@code{csSys})
 * csUtil:: Utility Library (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Library (@code{csGeom})
@@ -34,12 +33,6 @@ a number of predefined procedural textures. It also contains basic support
 structures for the model importers, the csColliderWrapper class and the
 notion of key-value pairs (to be attached to csObject's).
 
-@item csSys
-All system dependent functionality (non-graphics and non-sound related) is in
-this library, for example keyboard, joystick and mouse driver, system-dependent
-file handling, loading dynamic libraries etc.  This library is the main module
-to make Crystal Space applications system-independent.
-
 @item csUtil
 This library contains various utilities. There is an Archive class which can
 read/write @sc{zip} archives. There is a vector class, a sparse matrix class
@@ -64,7 +57,6 @@ A window system nicely integrated with Crystal Space. It is also platform
 independent, as it is based on the CS graphics drivers. @xref{CSWS}.
 @end table
 
-@imports{libs,cssys.txi}
 @imports{libs,csutil.txi}
 @imports{libs,scf.txi}
 @imports{libs,csgeom.txi}

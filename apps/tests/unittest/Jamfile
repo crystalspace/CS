@@ -4,7 +4,7 @@ Application unittest
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith unittest : csgeom csgfx cssys cstool csutil ;
+LinkWith unittest : csgeom csgfx cstool csutil ;
 
 Help unittest : "Crystal Space unittest tester" ;
 

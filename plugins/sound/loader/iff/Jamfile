@@ -3,7 +3,7 @@ SubDir TOP plugins sound loader iff ;
 Plugin sndiff
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndiff : soundloadercommon cssys csutil ;
+LinkWith sndiff : soundloadercommon csutil ;
 
 Help sndiff : "Crystal Space iff sound loader" ;
 CompileGroups sndiff :  soundloaders ;

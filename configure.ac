@@ -167,7 +167,7 @@ AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
     [Copyright (C)1998-2003 Jorrit Tyberghein and others],
     [http://crystal.sourceforge.net/])
-AC_CONFIG_SRCDIR([libs/cssys/cssys.mak])
+AC_CONFIG_SRCDIR([libs/csutil/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_PREFIX_DEFAULT([cs_install_dir_default])
 AC_CANONICAL_HOST

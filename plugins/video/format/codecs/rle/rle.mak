@@ -39,7 +39,7 @@ INF.RLECODEC = $(SRCDIR)/plugins/video/format/codecs/rle/rlecodec.csplugin
 INC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.h))
 SRC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.cpp))
 OBJ.RLECODEC = $(addprefix $(OUT)/,$(notdir $(SRC.RLECODEC:.cpp=$O)))
-DEP.RLECODEC = CSUTIL CSSYS
+DEP.RLECODEC = CSUTIL
 CFG.RLECODEC =
 
 TO_INSTALL.CONFIG += $(CFG.RLECODEC)

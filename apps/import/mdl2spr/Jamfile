@@ -4,7 +4,7 @@ Application mdl2spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith mdl2spr : csgeom csgfx cssys csutil ;
+LinkWith mdl2spr : csgeom csgfx csutil ;
 
 Help mdl2spr : "Quake model MDL/MD2 conversion tool" ;
 

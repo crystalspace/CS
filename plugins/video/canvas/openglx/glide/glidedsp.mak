@@ -40,7 +40,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   OGLGLIDE = $(OUT)/$(LIB_PREFIX)oglglide$(LIB)
   DEP.EXE += $(OGLGLIDE)
-  LIBS.EXE += $(LIB.OGLGLIDE.SYSTEM) $(CSUTIL.LIB) $(CSSYS.LIB)
+  LIBS.EXE += $(LIB.OGLGLIDE.SYSTEM) $(CSUTIL.LIB)
   SCF.STATIC += oglglide
 endif
 
@@ -48,7 +48,7 @@ INF.OGLGLIDE = $(SRCDIR)/plugins/video/canvas/openglx/glide/oglglide.csplugin
 INC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.h))
 SRC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.cpp))
 OBJ.OGLGLIDE = $(addprefix $(OUT)/,$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
-DEP.OGLGLIDE = CSUTIL CSSYS
+DEP.OGLGLIDE = CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

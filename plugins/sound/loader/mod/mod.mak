@@ -41,7 +41,7 @@ INF.SNDMOD = $(SRCDIR)/plugins/sound/loader/mod/sndmod.csplugin
 INC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.h))
 SRC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.cpp))
 OBJ.SNDMOD = $(addprefix $(OUT)/,$(notdir $(SRC.SNDMOD:.cpp=$O)))
-DEP.SNDMOD = CSUTIL CSSYS CSUTIL
+DEP.SNDMOD = CSUTIL CSUTIL
 
 #MSVC.DSP += SNDMOD
 #DSP.SNDMOD.NAME = sndmod

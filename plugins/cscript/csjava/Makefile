@@ -11,9 +11,6 @@ LIBS = \
 	$(TOP)/out/linuxx86/optimize/libs/cstool/libcstool.a \
 	$(TOP)/out/linuxx86/optimize/libs/csgfx/libcsgfx.a \
 	$(TOP)/out/linuxx86/optimize/libs/csgeom/libcsgeom.a \
-	$(TOP)/out/linuxx86/optimize/libs/cssys/libcssys.a \
-	$(TOP)/out/linuxx86/optimize/libs/csutil/libcsutil.a \
-	$(TOP)/out/linuxx86/optimize/libs/cssys/libcssys.a \
 	$(TOP)/out/linuxx86/optimize/libs/csutil/libcsutil.a
 
 JAVA_SOURCES = \

@@ -51,7 +51,7 @@ INF.XEXT86VM = $(SRCDIR)/plugins/video/canvas/xextf86vm/xext86vm.csplugin
 INC.XEXT86VM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextf86vm/*.h))
 SRC.XEXT86VM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextf86vm/*.cpp))
 OBJ.XEXT86VM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXT86VM:.cpp=$O)))
-DEP.XEXT86VM = CSUTIL CSSYS CSUTIL
+DEP.XEXT86VM = CSUTIL CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

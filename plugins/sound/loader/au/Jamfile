@@ -3,7 +3,7 @@ SubDir TOP plugins sound loader au ;
 Plugin sndau
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndau : soundloadercommon cssys csutil ;
+LinkWith sndau : soundloadercommon csutil ;
 
 Help sndau : "Crystal Space au sound loader" ;
 CompileGroups sndau :  soundloaders ;

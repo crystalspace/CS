@@ -3,7 +3,7 @@ SubDir TOP plugins engine renderloop shadow stencil ;
 Plugin rendstep_stencil
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rendstep_stencil : renderstepcommon csgeom cssys csutil ;
+LinkWith rendstep_stencil : renderstepcommon csgeom csutil ;
 
 Help rendstep_stencil : "Crystal Space stencil render loop steps" ;
 

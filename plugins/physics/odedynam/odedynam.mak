@@ -44,7 +44,7 @@ INF.ODEDYNAM = $(SRCDIR)/plugins/physics/odedynam/odedynam.csplugin
 INC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.h))
 SRC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.cpp))
 OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
-DEP.ODEDYNAM = CSGEOM CSUTIL CSSYS
+DEP.ODEDYNAM = CSGEOM CSUTIL
 
 MSVC.DSP += ODEDYNAM
 DSP.ODEDYNAM.NAME = odedynam

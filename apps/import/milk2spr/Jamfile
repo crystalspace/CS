@@ -4,7 +4,7 @@ Application milk2spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith milk2spr : csgeom csgfx cssys csutil ;
+LinkWith milk2spr : csgeom csgfx csutil ;
 
 Help milk2spr : "Milkshape ASCII Model conversion tool" ;
 

@@ -38,7 +38,7 @@ INF.FONTPLEX = $(SRCDIR)/plugins/font/server/fontplex/fontplex.csplugin
 INC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.h))
 SRC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.cpp))
 OBJ.FONTPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.FONTPLEX:.cpp=$O)))
-DEP.FONTPLEX = CSUTIL CSSYS CSUTIL
+DEP.FONTPLEX = CSUTIL CSUTIL
 
 MSVC.DSP += FONTPLEX
 DSP.FONTPLEX.NAME = fontplex

@@ -43,7 +43,7 @@ INF.MOTION = $(SRCDIR)/plugins/motion/standard/object/motion.csplugin
 INC.MOTION = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/object/*.h))
 SRC.MOTION = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/object/*.cpp))
 OBJ.MOTION = $(addprefix $(OUT)/,$(notdir $(SRC.MOTION:.cpp=$O)))
-DEP.MOTION = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.MOTION = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += MOTION
 DSP.MOTION.NAME = motion

@@ -2,15 +2,17 @@
 # Rules for library creation
 #============================================================================
 
-##  Library libname : sources [ : options ]
+##  Library libname : sources [[ : options ] : objects ]
 ##    Build a library out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
 ##    can create rules for your own filetypes with the UserObject rule. Header
 ##    files will just be ignored. They are only used for MSVC projectfile
-##    generation.
-##    Available options are shared if you want to build a shared library on
-##    platforms which support that. You can specify the noinstall option if
-##    you don't want that a install target is generated.
+##    generation.  If additional objects are given (fourth argument), they
+##    should be the output of CompileObjects, and will be included in the
+##    library.
+##    Available options are 'shared' if you want to build a shared library on
+##    platforms which support that. You can specify the 'noinstall' option if
+##    you don't want an install target is generated.
 ##    Don't specify any extensions for the library name, also leave out the
 ##    leading "lib". If you have sourcefiles in subdirectories, then you'll
 ##    need to use the SearchSubdir rule. Don't mention the subdirectory name
@@ -23,6 +25,10 @@ rule Library
   local target = [ ConstructLibraryTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
   local objects = [ CompileObjects $(sources) ] ;
+  if $(4)
+  {
+    objects += $(4) ;
+  }
 
   $(<)_TYPE = library ;
   $(<)_OBJECTS = $(objects) ;
@@ -39,7 +45,7 @@ rule Library
   {
     Depends $(<) : $(target) ;
     NotFile $(<) ;                                                              
-  }                                                                             
+  }
 
   # library depends on its member objects
   if ! [ IsElem independent : $(3) ]
@@ -123,13 +129,11 @@ rule LibDepends
 #----------------------------------------------------------------------------
 # Helper rules to resolve inter library dependencies...
 
-# Resolving dependencies for libraries.  When csutil depends on cssys und cssys
-# depend on csutil we need list the libraries multiple times.  In fact, there
-# are so many circular dependencies between csutil and cssys, that they
-# typically need to appear interwoven up to three times each, like this:
-# -lcssys -lcsutil -lcssys -lcsutil -lcssys -lcsutil.  Because of the multile
-# dependencies, we run throught he $($(<)_depdnds) elements multiple times.
-# This algorithm isn't fully optimal, it be might be possible to reorder the
+# Resolving dependencies for libraries.  In case there are circular
+# dependencies between libraries, we must list the libraries multiple times in
+# the link command in order to ensure that Unix linkers (which are
+# order-sensitive) will be able to link the target successfully.  This
+# algorithm isn't fully optimal, it be might be possible to reorder the
 # libraries to get fewer dependencies.
 rule _AddLibrary
 {
@@ -138,7 +142,7 @@ rule _AddLibrary
   added = $(<) ;
   cs_liblisttemp += $(<) ;
     
-  for i in $($(<)_depends) $($(<)_depends)
+  for i in $($(<)_depends)
   {
     if [ IsElem $(i) : $(cs_liblisttemp) ]
     {

@@ -39,7 +39,7 @@ INF.SPR3DLDR = $(SRCDIR)/plugins/mesh/spr3d/persist/standard/spr3dldr.csplugin
 INC.SPR3DLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/standard/*.h))
 SRC.SPR3DLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/standard/*.cpp))
 OBJ.SPR3DLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DLDR:.cpp=$O)))
-DEP.SPR3DLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SPR3DLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += SPR3DLDR
 DSP.SPR3DLDR.NAME = spr3dldr

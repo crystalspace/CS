@@ -39,7 +39,7 @@ INF.MDLIE = $(SRCDIR)/plugins/mesh/impexp/mdl/mdlie.csplugin
 INC.MDLIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/mdl/*.h))
 SRC.MDLIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/mdl/*.cpp))
 OBJ.MDLIE = $(addprefix $(OUT)/,$(notdir $(SRC.MDLIE:.cpp=$O)))
-DEP.MDLIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
+DEP.MDLIE = CSGEOM CSUTIL CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += MDLIE
 DSP.MDLIE.NAME = mdlie

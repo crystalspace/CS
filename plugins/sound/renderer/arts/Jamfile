@@ -6,7 +6,7 @@ Library csarts
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith csarts : soundrendercommon csarts.idl csgeom cssys cstool csutil ;
+LinkWith csarts : soundrendercommon csarts.idl csgeom cstool csutil ;
 ExternalLibs csarts :  ARTS ;
 
 Help csarts : "Crystal Space aRts sound renderer" ;

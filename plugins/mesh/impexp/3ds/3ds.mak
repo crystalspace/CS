@@ -37,7 +37,7 @@ INF.IE3DS = $(SRCDIR)/plugins/mesh/impexp/3ds/ie3ds.csplugin
 INC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.h))
 SRC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.cpp))
 OBJ.IE3DS = $(addprefix $(OUT)/,$(notdir $(SRC.IE3DS:.cpp=$O)))
-DEP.IE3DS = CSUTIL CSSYS CSTOOL CSUTIL CSGEOM
+DEP.IE3DS = CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += IE3DS
 DSP.IE3DS.NAME = ie3ds

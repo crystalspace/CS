@@ -3,7 +3,7 @@ SubDir TOP plugins video loader gif ;
 Plugin csgifimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csgifimg : csgfx cssys csutil ;
+LinkWith csgifimg : csgfx csutil ;
 
 Help csgifimg : "Crystal Space gif image loader" ;
 CompileGroups csgifimg :  imageloaders ;

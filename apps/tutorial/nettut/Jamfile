@@ -4,7 +4,7 @@ Application nettut
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith nettut : csgeom csgfx cssys cstool csutil ;
+LinkWith nettut : csgeom csgfx cstool csutil ;
 
 Help nettut : "Crystal Space network tutorial" ;
 

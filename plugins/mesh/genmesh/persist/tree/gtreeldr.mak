@@ -39,7 +39,7 @@ INF.GTREELDR = $(SRCDIR)/plugins/mesh/genmesh/persist/tree/gtreeldr.csplugin
 INC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.h))
 SRC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.cpp))
 OBJ.GTREELDR = $(addprefix $(OUT)/,$(notdir $(SRC.GTREELDR:.cpp=$O)))
-DEP.GTREELDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.GTREELDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += GTREELDR
 DSP.GTREELDR.NAME = gtreeldr

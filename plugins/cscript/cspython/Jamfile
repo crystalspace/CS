@@ -26,7 +26,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   Plugin cspython : 
       cs_pyth.cpp cspython.h cspython.cpp pytocs.h pytocs.cpp
   ;
-  LinkWith cspython : cstool csgfx csgeom csutil cssys ;
+  LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython : -DSWIG_GLOBAL ;
   Help cspython : "Crystal Script Python plug-in" ;

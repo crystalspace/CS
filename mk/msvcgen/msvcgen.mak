@@ -46,7 +46,7 @@
 #
 #	o DEP.PROJECT -- List of projects (typically library projects) upon
 #	  which this module depends.  Each item in this list is the core name
-#	  of some other module, such as "CSGEOM", "CSUTIL", or "CSSYS".
+#	  of some other module, such as "CSGEOM", "CSUTIL", or "CSTOOL".
 #
 #	o INF.PROJECT -- The meta-data file for this project.  This optional
 #	  file contains information related to this project which can be
@@ -403,13 +403,8 @@ MSVC.METAFILE.DIRECTIVE = \
 # appgui, appcon, plugin, library, etc.).  Items in these lists are indirect
 # project names (i.e. "CSGEOM") which are tranformed into actual project names
 # (i.e. "libcsgeom") via the variables DSP.PROJECT.NAME and DSP.PROJECT.TYPE.
-# Also, a dependency on CSSYS is translated to WIN32SYS since the SRC.CSSYS and
-# INC.CSSYS variables may not refer to the appropriate resources (if the
-# makefiles are configured for Unix, for instance), whereas SRC.WIN32SYS,
-# INC.WIN32SYS, and DSP.WIN32SYS.RESOURCES are guaranteed to refer to the
-# correct resources for the Windows platform.
-MSVC.DEPEND.LIST = $(foreach d,$(sort $(subst CSSYS,WIN32SYS,\
-  $(DEP.$*) $(DSP.$*.DEPEND) $(MSVC.DEPEND.$(DSP.$*.TYPE)))),\
+MSVC.DEPEND.LIST = $(foreach d,$(sort \
+  $(DEP.$*) $(DSP.$*.DEPEND) $(MSVC.DEPEND.$(DSP.$*.TYPE))),\
   $(MSVC.PREFIX.$(DSP.$d.TYPE))$(DSP.$d.NAME))
 
 # Macro to compose list of --depend directives from MSVC.DEPEND.LIST.

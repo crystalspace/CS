@@ -3,7 +3,7 @@ SubDir TOP plugins mesh spr3d persist standard ;
 Plugin spr3dldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr3dldr : csgeom cssys csutil ;
+LinkWith spr3dldr : csgeom csutil ;
 
 Help spr3dldr : "Sprite 3D mesh object loader" ;
 CompileGroups spr3dldr :  meshes ;

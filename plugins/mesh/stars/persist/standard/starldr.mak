@@ -39,7 +39,7 @@ INF.STARLDR = $(SRCDIR)/plugins/mesh/stars/persist/standard/starldr.csplugin
 INC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.h))
 SRC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.cpp))
 OBJ.STARLDR = $(addprefix $(OUT)/,$(notdir $(SRC.STARLDR:.cpp=$O)))
-DEP.STARLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.STARLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += STARLDR
 DSP.STARLDR.NAME = starldr

@@ -39,7 +39,7 @@ INF.OPCODE = $(SRCDIR)/plugins/collide/opcode/opcode.csplugin
 INC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.h))
 SRC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.cpp))
 OBJ.OPCODE = $(addprefix $(OUT)/,$(notdir $(SRC.OPCODE:.cpp=$O)))
-DEP.OPCODE = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.OPCODE = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += OPCODE
 DSP.OPCODE.NAME = opcode

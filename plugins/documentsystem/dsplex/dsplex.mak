@@ -42,7 +42,7 @@ INF.DSPLEX = $(SRCDIR)/$(DIR.DSPLEX)/dsplex.csplugin
 INC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.h))
 SRC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.cpp))
 OBJ.DSPLEX = $(addprefix $(OUT.DSPLEX)/,$(notdir $(SRC.DSPLEX:.cpp=$O)))
-DEP.DSPLEX = CSUTIL CSTOOL CSSYS CSUTIL
+DEP.DSPLEX = CSUTIL CSTOOL CSUTIL
 
 OUTDIRS += $(OUT.DSPLEX)
 

@@ -44,7 +44,7 @@ INC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.h))
 SRC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.cpp))
 
 OBJ.CSSGIIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSSGIIMG:.cpp=$O)))
-DEP.CSSGIIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSSGIIMG = CSUTIL CSGFX CSUTIL
 
 MSVC.DSP += CSSGIIMG
 DSP.CSSGIIMG.NAME = cssgiimg

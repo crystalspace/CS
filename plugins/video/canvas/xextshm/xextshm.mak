@@ -49,7 +49,7 @@ INF.XEXTSHM = $(SRCDIR)/plugins/video/canvas/xextshm/xextshm.csplugin
 INC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.h))
 SRC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.cpp))
 OBJ.XEXTSHM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXTSHM:.cpp=$O)))
-DEP.XEXTSHM = CSUTIL CSSYS CSGEOM CSUTIL
+DEP.XEXTSHM = CSUTIL CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

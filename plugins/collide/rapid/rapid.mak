@@ -39,7 +39,7 @@ INF.RAPID = $(SRCDIR)/plugins/collide/rapid/rapid.csplugin
 INC.RAPID = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/rapid/*.h))
 SRC.RAPID = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/rapid/*.cpp))
 OBJ.RAPID = $(addprefix $(OUT)/,$(notdir $(SRC.RAPID:.cpp=$O)))
-DEP.RAPID = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.RAPID = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += RAPID
 DSP.RAPID.NAME = rapid

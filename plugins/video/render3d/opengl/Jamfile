@@ -5,7 +5,7 @@ if $(GL.AVAILABLE) = "yes"
 Plugin glrender3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith glrender3d : render3dcommon csgeom csgfx cssys csutil cstool ;
+LinkWith glrender3d : render3dcommon csgeom csgfx csutil cstool ;
 ExternalLibs glrender3d :  GL ;
 
 Help glrender3d : "Crystal Space Render3d OpenGL driver" ;

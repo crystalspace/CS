@@ -3,7 +3,7 @@ SubDir TOP plugins mesh impexp ase ;
 Plugin aseie
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith aseie : csgeom cssys cstool csutil ;
+LinkWith aseie : csgeom cstool csutil ;
 
 Help aseie : "ASE Import/Export plug-in" ;
 

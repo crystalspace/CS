@@ -40,7 +40,7 @@ INF.ODIVX4 = $(SRCDIR)/plugins/video/format/codecs/divx4/odivx4.csplugin
 INC.ODIVX4 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/divx4/*.h))
 SRC.ODIVX4 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/divx4/*.cpp))
 OBJ.ODIVX4 = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX4:.cpp=$O)))
-DEP.ODIVX4 = CSUTIL CSSYS
+DEP.ODIVX4 = CSUTIL
 CFG.ODIVX4 =
 
 TO_INSTALL.CONFIG += $(CFG.ODIVX4)

@@ -3,7 +3,7 @@ SubDir TOP plugins console input standard ;
 Plugin csconin
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csconin : cssys csutil ;
+LinkWith csconin : csutil ;
 
 Help csconin : "Crystal Space standard input console" ;
 

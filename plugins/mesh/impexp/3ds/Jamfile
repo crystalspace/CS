@@ -5,7 +5,7 @@ if $(3DS.AVAILABLE) = "yes"
 Plugin ie3ds
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ie3ds : csgeom cssys cstool csutil ;
+LinkWith ie3ds : csgeom cstool csutil ;
 ExternalLibs ie3ds :  3DS ;
 
 Help ie3ds : "Model Import/Export 3ds plug-in" ;

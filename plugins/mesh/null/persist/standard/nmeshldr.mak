@@ -39,7 +39,7 @@ INF.NULLMESHLDR = $(SRCDIR)/plugins/mesh/null/persist/standard/nullmeshldr.csplu
 INC.NULLMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/persist/standard/*.h))
 SRC.NULLMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/persist/standard/*.cpp))
 OBJ.NULLMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.NULLMESHLDR:.cpp=$O)))
-DEP.NULLMESHLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.NULLMESHLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += NULLMESHLDR
 DSP.NULLMESHLDR.NAME = nullmeshldr

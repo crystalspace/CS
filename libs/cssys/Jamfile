@@ -1,21 +1,23 @@
 SubDir TOP libs cssys ;
 
+CSSYS_SRC = [ Wildcard *.cpp *.h ] ;
+
 switch $(TARGET.OS)
 {
-case WIN32 :
+case WIN32 :					# Windows
   SearchSubdir win32 ;
   SearchSubdir general ; 
-  SYSFILES = [ Wildcard win32 : *.cpp *.h ] 
+  CSSYS_SRC += [ Wildcard win32 : *.cpp *.h ] 
 		csprocessorcap.cpp
 		findlib.cpp
 		getopt.cpp
 		pluginpaths.cpp
 		resdir.cpp
 		runloop.cpp ;
-case MACOS_X :
+case MACOS_X :					# MacOS/X
   SearchSubdir macosx ;
   SearchSubdir general ;
-  SYSFILES = [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
+  CSSYS_SRC += [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
 		apppath.cpp
 		csprocessorcap.cpp
 		cspthrd.cpp 
@@ -28,10 +30,10 @@ case MACOS_X :
 		scanplugins.cpp
 		sysroot.cpp ;
   InstallConfig macosx.cfg ;
-case * :		# posix/unix/linux mode
+case * :					# Posix, Unix, Linux, etc.
   SearchSubdir unix ;
   SearchSubdir general ;
-  SYSFILES = [ Filter [ Wildcard unix : *.cpp *.h ] : bfdplugins.cpp ]
+  CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.h ] : bfdplugins.cpp ]
 		appdir.cpp
 		apppath.cpp
 		csprocessorcap.cpp
@@ -48,21 +50,12 @@ case * :		# posix/unix/linux mode
 		sysroot.cpp ;
   if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
-    SYSFILES += bfdplugins.cpp ;
+    CSSYS_SRC += bfdplugins.cpp ;
   }
   else
   {
-    SYSFILES += scanplugins.cpp ;
+    CSSYS_SRC += scanplugins.cpp ;
   }
 }
 
-Library cssys :
-	[ Wildcard *.cpp *.h ]
-	$(SYSFILES)
-;
-CFlags cssys :
-  -DCS_CONFIGDIR='\"$(INSTALLDIR.CONFIG)\"' 
-  -DCS_PLUGINDIR='\"$(INSTALLDIR.PLUGIN)\"' ;
-
-LibDepends cssys : csutil ;
-Help cssys : "Crystal Space system library" ;
+CSSYS_OBJ = [ CompileObjects [ DoSourceGrist $(CSSYS_SRC) ] ] ;

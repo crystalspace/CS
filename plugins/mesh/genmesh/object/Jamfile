@@ -3,7 +3,7 @@ SubDir TOP plugins mesh genmesh object ;
 Plugin genmesh
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith genmesh : cstool csgeom cssys csutil ;
+LinkWith genmesh : cstool csgeom csutil ;
 
 Help genmesh : "General mesh object plug-in" ;
 CompileGroups genmesh :  meshes ;

@@ -44,7 +44,7 @@ INC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.h))
 SRC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.cpp))
 
 OBJ.CSDDSIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSDDSIMG:.cpp=$O)))
-DEP.CSDDSIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSDDSIMG = CSUTIL CSGFX CSUTIL
 
 MSVC.DSP += CSDDSIMG
 DSP.CSDDSIMG.NAME = csddsimg

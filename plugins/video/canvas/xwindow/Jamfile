@@ -5,7 +5,7 @@ if $(X11.AVAILABLE) = "yes"
 Plugin xwin :
 	[ Wildcard *.cpp *.h ]
 ;
-LinkWith xwin : canvascommon csgeom cssys csutil ;
+LinkWith xwin : canvascommon csgeom csutil ;
 if $(XFREE86VM.AVAILABLE) = "yes"
 {
   CFlags xwin : -DXFREE86VM ;

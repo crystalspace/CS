@@ -47,7 +47,7 @@ INF.NULL2D = $(SRCDIR)/plugins/video/canvas/null2d/null2d.csplugin
 INC.NULL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/null2d/*.h   $(INC.COMMON.DRV2D)))
 SRC.NULL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/null2d/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.NULL2D = $(addprefix $(OUT)/,$(notdir $(SRC.NULL2D:.cpp=$O)))
-DEP.NULL2D = CSUTIL CSSYS CSUTIL CSGEOM
+DEP.NULL2D = CSUTIL CSUTIL CSGEOM
 
 MSVC.DSP += NULL2D
 DSP.NULL2D.NAME = null2d

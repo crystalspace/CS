@@ -47,7 +47,7 @@ INF.VFS = $(SRCDIR)/plugins/filesys/vfs/vfs.csplugin
 INC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.h))
 SRC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.cpp))
 OBJ.VFS = $(addprefix $(OUT)/,$(notdir $(SRC.VFS:.cpp=$O)))
-DEP.VFS = CSSYS CSUTIL CSSYS
+DEP.VFS = CSUTIL
 CFG.VFS = $(SRCDIR)/vfs.cfg
 
 TO_INSTALL.ROOT += $(CFG.VFS)

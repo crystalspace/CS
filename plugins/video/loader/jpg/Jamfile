@@ -5,7 +5,7 @@ if $(JPEG.AVAILABLE) = "yes"
 Plugin csjpgimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csjpgimg : csgfx cssys csutil ;
+LinkWith csjpgimg : csgfx csutil ;
 ExternalLibs csjpgimg :  JPEG ;
 
 Help csjpgimg : "Crystal Space jpg image loader" ;

@@ -51,7 +51,7 @@ SRC.GLSHADER_CG = \
   $(wildcard $(addprefix $(SRCDIR)/,\
   plugins/video/render3d/shaderplugins/glshader_cg/*.cpp))
 OBJ.GLSHADER_CG = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_CG:.cpp=$O)))
-DEP.GLSHADER_CG = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
+DEP.GLSHADER_CG = CSGEOM CSUTIL CSUTIL CSGFX
 CFG.GLSHADER_CG =
 
 TO_INSTALL.CONFIG += $(CFG.GLSHADER_CG)

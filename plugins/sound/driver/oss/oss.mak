@@ -47,7 +47,7 @@ INF.OSSDRV = $(SRCDIR)/plugins/sound/driver/oss/ossdrv.csplugin
 INC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.h))
 SRC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
 OBJ.OSSDRV = $(addprefix $(OUT)/,$(notdir $(SRC.OSSDRV:.cpp=$O)))
-DEP.OSSDRV = CSUTIL CSSYS CSUTIL
+DEP.OSSDRV = CSUTIL CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

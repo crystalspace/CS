@@ -39,7 +39,7 @@ INF.STARS = $(SRCDIR)/plugins/mesh/stars/object/stars.csplugin
 INC.STARS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/object/*.h))
 SRC.STARS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/object/*.cpp))
 OBJ.STARS = $(addprefix $(OUT)/,$(notdir $(SRC.STARS:.cpp=$O)))
-DEP.STARS = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.STARS = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += STARS
 DSP.STARS.NAME = stars

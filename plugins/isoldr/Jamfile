@@ -3,7 +3,7 @@ SubDir TOP plugins isoldr ;
 Plugin isoload
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith isoload : csgeom csgfx cssys csutil ;
+LinkWith isoload : csgeom csgfx csutil ;
 
 Help isoload : "Crystal Space isometric world loader plug-in" ;
 

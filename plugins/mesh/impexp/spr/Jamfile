@@ -3,7 +3,7 @@ SubDir TOP plugins mesh impexp spr ;
 Plugin sprie
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sprie : csgeom cssys cstool csutil ;
+LinkWith sprie : csgeom cstool csutil ;
 
 Help sprie : "SPR Import/Export plug-in" ;
 

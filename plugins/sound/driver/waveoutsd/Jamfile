@@ -5,7 +5,7 @@ if $(WAVEOUT.AVAILABLE) = "yes"
 Plugin sndwaveout
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndwaveout : cssys csutil ;
+LinkWith sndwaveout : csutil ;
 ExternalLibs sndwaveout :  WAVEOUT ;
 
 Help sndwaveout : "Crystal Space WaveOut sound driver" ;

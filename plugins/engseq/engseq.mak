@@ -46,7 +46,7 @@ INF.ENGSEQ = $(SRCDIR)/plugins/engseq/engseq.csplugin
 INC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.h))
 SRC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.cpp))
 OBJ.ENGSEQ = $(addprefix $(OUT)/,$(notdir $(SRC.ENGSEQ:.cpp=$O)))
-DEP.ENGSEQ = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.ENGSEQ = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += ENGSEQ
 DSP.ENGSEQ.NAME = engseq

@@ -39,7 +39,7 @@ INC.CSFONT = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.h))
 SRC.CSFONT = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.cpp))
 OBJ.CSFONT = $(addprefix $(OUT)/,$(notdir $(SRC.CSFONT:.cpp=$O)))
-DEP.CSFONT = CSUTIL CSSYS CSUTIL
+DEP.CSFONT = CSUTIL CSUTIL
 
 MSVC.DSP += CSFONT
 DSP.CSFONT.NAME = csfont

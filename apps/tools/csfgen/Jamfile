@@ -4,7 +4,7 @@ Application csfgen
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith csfgen : csgeom csgfx cssys cstool csutil ;
+LinkWith csfgen : csgeom csgfx cstool csutil ;
 
 Help csfgen : "TrueType to Crystal Space font converter" ;
 

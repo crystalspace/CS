@@ -51,7 +51,7 @@ SRC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GLRENDER3D)/*.cpp \
   plugins/video/render3d/common/txtmgr.cpp))
 OBJ.GLRENDER3D = \
   $(addprefix $(OUT.GLRENDER3D)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
-DEP.GLRENDER3D = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL CSGFX
+DEP.GLRENDER3D = CSTOOL CSGEOM CSUTIL CSUTIL CSGFX
 CFG.GLRENDER3D = $(addprefix $(SRCDIR)/, \
   data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg)
 

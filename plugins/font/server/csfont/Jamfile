@@ -3,7 +3,7 @@ SubDir TOP plugins font server csfont ;
 Plugin csfont
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csfont : cssys csutil ;
+LinkWith csfont : csutil ;
 
 Help csfont : "Crystal Space default font server" ;
 

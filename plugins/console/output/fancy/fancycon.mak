@@ -39,7 +39,7 @@ INF.FANCYCON = $(SRCDIR)/plugins/console/output/fancy/fancycon.csplugin
 INC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.h))
 SRC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.cpp))
 OBJ.FANCYCON = $(addprefix $(OUT)/,$(notdir $(SRC.FANCYCON:.cpp=$O)))
-DEP.FANCYCON = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.FANCYCON = CSUTIL CSGEOM CSUTIL
 CFG.FANCYCON = $(SRCDIR)/data/config/fancycon.cfg
 
 TO_INSTALL.CONFIG += $(CFG.FANCYCON)

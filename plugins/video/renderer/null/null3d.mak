@@ -54,7 +54,7 @@ SRC.NULL3D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/renderer/common/vbufmgr.cpp \
   plugins/video/renderer/common/polybuf.cpp))
 OBJ.NULL3D = $(addprefix $(OUT)/,$(notdir $(SRC.NULL3D:.cpp=$O)))
-DEP.NULL3D = CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.NULL3D = CSGFX CSUTIL CSGEOM CSUTIL
 CFG.NULL3D = $(SRCDIR)/data/config/null3d.cfg
 
 TO_INSTALL.CONFIG += $(CFG.NULL3D)

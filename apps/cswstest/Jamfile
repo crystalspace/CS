@@ -3,7 +3,7 @@ SubDir TOP apps cswstest ;
 Application cswstest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cswstest : csgeom csgfx cssys cstool csutil csws ;
+LinkWith cswstest : csgeom csgfx cstool csutil csws ;
 
 Help cswstest : "Crystal Space Windowing System test" ;
 

@@ -75,7 +75,7 @@ SRC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
   $(addsuffix /*.m,$(MACOSX.SOURCE_CG2D_PATHS))))
 OBJ.CGDRIVER2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.CGDRIVER2D:.m=$O))))
-DEP.CGDRIVER2D = CSSYS CSUTIL
+DEP.CGDRIVER2D = CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

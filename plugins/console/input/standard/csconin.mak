@@ -46,7 +46,7 @@ INF.CSCONIN = $(SRCDIR)/plugins/console/input/standard/csconin.csplugin
 INC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.h))
 SRC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.cpp))
 OBJ.CSCONIN = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONIN:.cpp=$O)))
-DEP.CSCONIN = CSUTIL CSSYS CSUTIL
+DEP.CSCONIN = CSUTIL CSUTIL
 
 MSVC.DSP += CSCONIN
 DSP.CSCONIN.NAME = csconin

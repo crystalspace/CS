@@ -46,7 +46,7 @@ INF.FRUSTVIS = $(SRCDIR)/plugins/culling/frustvis/frustvis.csplugin
 INC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.h))
 SRC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.cpp))
 OBJ.FRUSTVIS = $(addprefix $(OUT)/,$(notdir $(SRC.FRUSTVIS:.cpp=$O)))
-DEP.FRUSTVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
+DEP.FRUSTVIS = CSUTIL CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += FRUSTVIS
 DSP.FRUSTVIS.NAME = frustvis

@@ -45,7 +45,7 @@ INC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/iff/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDIFF = $(addprefix $(OUT)/,$(notdir $(SRC.SNDIFF:.cpp=$O)))
-DEP.SNDIFF = CSUTIL CSSYS CSUTIL
+DEP.SNDIFF = CSUTIL CSUTIL
 
 MSVC.DSP += SNDIFF
 DSP.SNDIFF.NAME = sndiff

@@ -48,7 +48,7 @@ INC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*
 SRC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)))
 OBJ.GLWIN32 = $(addprefix $(OUT)/,$(notdir $(SRC.GLWIN32:.cpp=$O)))
-DEP.GLWIN32 = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.GLWIN32 = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += GLWIN32
 DSP.GLWIN32.NAME = glwin32

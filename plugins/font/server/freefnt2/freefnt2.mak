@@ -38,7 +38,7 @@ INC.FREEFNT2 = \
 SRC.FREEFNT2 = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/freefnt2/*.cpp))
 OBJ.FREEFNT2 = $(addprefix $(OUT)/,$(notdir $(SRC.FREEFNT2:.cpp=$O)))
-DEP.FREEFNT2 = CSUTIL CSSYS
+DEP.FREEFNT2 = CSUTIL
 CFG.FREEFNT2 = $(SRCDIR)/data/config/freetype.cfg
 
 TO_INSTALL.CONFIG += $(CFG.FREEFNT2)

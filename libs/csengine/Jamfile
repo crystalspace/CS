@@ -12,7 +12,7 @@ Library csengine :
 ;
 
 Help csengine : "Crystal Space 3D engine" ;
-LibDepends csengine : cstool csgfx csgeom csutil cssys ;
+LibDepends csengine : cstool csgfx csgeom csutil ;
 
 InstallConfig engine.cfg ;
 

@@ -3,7 +3,7 @@ SubDir TOP plugins mesh terrfunc object ;
 Plugin terrfunc
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith terrfunc : csgeom cssys csutil ;
+LinkWith terrfunc : csgeom csutil ;
 
 Help terrfunc : "Function Terrain plug-in" ;
 CompileGroups terrfunc :  meshes ;

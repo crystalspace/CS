@@ -39,7 +39,7 @@ INF.SPRIE = $(SRCDIR)/plugins/mesh/impexp/spr/sprie.csplugin
 INC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.h))
 SRC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.cpp))
 OBJ.SPRIE = $(addprefix $(OUT)/,$(notdir $(SRC.SPRIE:.cpp=$O)))
-DEP.SPRIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
+DEP.SPRIE = CSGEOM CSUTIL CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += SPRIE
 DSP.SPRIE.NAME = sprie

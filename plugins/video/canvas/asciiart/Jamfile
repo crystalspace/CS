@@ -5,7 +5,7 @@ if $(LIBAA.AVAILABLE) = "yes"
 Plugin asciiart
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith asciiart : canvascommon cssys csutil ;
+LinkWith asciiart : canvascommon csutil ;
 ExternalLibs asciiart :  LIBAA ;
 
 Help asciiart : "Crystal Space Ascii Art driver" ;

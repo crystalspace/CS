@@ -5,7 +5,7 @@ if $(ODE.AVAILABLE) = "yes"
 Plugin physldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith physldr : csgeom cssys csutil ;
+LinkWith physldr : csgeom csutil ;
 
 Help physldr : "Crystal Space Physics Loader plug-in" ;
 

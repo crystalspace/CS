@@ -51,7 +51,7 @@ INC.SNDWAVEOUT = \
 SRC.SNDWAVEOUT = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.cpp))
 OBJ.SNDWAVEOUT = $(addprefix $(OUT)/,$(notdir $(SRC.SNDWAVEOUT:.cpp=$O)))
-DEP.SNDWAVEOUT = CSUTIL CSSYS CSUTIL
+DEP.SNDWAVEOUT = CSUTIL CSUTIL
 
 MSVC.DSP += SNDWAVEOUT
 DSP.SNDWAVEOUT.NAME = sndwaveout

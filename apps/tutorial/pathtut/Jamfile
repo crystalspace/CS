@@ -3,7 +3,7 @@ SubDir TOP apps tutorial pathtut ;
 Application pathtut
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith pathtut : csgeom csgfx cssys cstool csutil ;
+LinkWith pathtut : csgeom csgfx cstool csutil ;
 
 Help pathtut : "Crystal Space Path Tutorial" ;
 

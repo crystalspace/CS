@@ -31,7 +31,7 @@ OUT.ISOMAP = $(OUT)/$(DIR.ISOMAP)
 INC.ISOMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOMAP)/*.h))
 SRC.ISOMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOMAP)/*.cpp))
 OBJ.ISOMAP = $(addprefix $(OUT.ISOMAP)/,$(notdir $(SRC.ISOMAP:.cpp=$O)))
-DEP.ISOMAP = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS CSUTIL
+DEP.ISOMAP = CSTOOL CSGEOM CSTOOL CSGFX CSUTIL CSUTIL
 LIB.ISOMAP = $(foreach d,$(DEP.ISOMAP),$($d.LIB))
 #CFG.ISOMAP = data/config/isomap.cfg
 

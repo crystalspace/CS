@@ -124,7 +124,9 @@ loading plug-ins).
 
 @item CS/libs/cssys
 All system-dependent source and make files (non-graphics and non-sound related)
-are located here.
+are located here.  Unlike the other directories within the @file{CS/libs}
+hierarchy, the implementations in this one are not placed into a distinct
+link library.  Instead, they are incorporated into the @file{csutil} library.
 
 @table @code
 @item CS/libs/cssys/general
@@ -146,7 +148,8 @@ key-value pairs, screen effects, map nodes, and more.
 This library contains various utilities.  The utilities include an archiver,
 configuration manager, virtual clock, scheduler, strings, hash maps, @sc{scf}
 (@pxref{SCF}), @sc{md5} algorithm, map file parser, command-line parser, event
-structures, and many others.
+structures, and many others.  It also contains platform-specific
+implementations and functions from the @file{CS/libs/cssys} directory.
 
 @item CS/libs/csws
 The Crystal Space Windowing System which is nicely integrated with Crystal

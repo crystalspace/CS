@@ -3,7 +3,7 @@ SubDir TOP plugins documentsystem dsplex ;
 Plugin dsplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith dsplex : cssys cstool csutil ;
+LinkWith dsplex : cstool csutil ;
 
 Help dsplex : "Crystal Space document system multiplexer" ;
 

@@ -45,7 +45,7 @@ INC.SNDAU = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.SNDAU = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/au/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDAU = $(addprefix $(OUT)/,$(notdir $(SRC.SNDAU:.cpp=$O)))
-DEP.SNDAU = CSUTIL CSSYS CSUTIL
+DEP.SNDAU = CSUTIL CSUTIL
 
 MSVC.DSP += SNDAU
 DSP.SNDAU.NAME = sndau

@@ -32,7 +32,7 @@ OUT.MDL2SPR = $(OUT)/$(DIR.MDL2SPR)
 INC.MDL2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MDL2SPR)/*.h ))
 SRC.MDL2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MDL2SPR)/*.cpp ))
 OBJ.MDL2SPR = $(addprefix $(OUT.MDL2SPR)/,$(notdir $(SRC.MDL2SPR:.cpp=$O)))
-DEP.MDL2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
+DEP.MDL2SPR = CSGFX CSUTIL CSUTIL CSGEOM
 LIB.MDL2SPR = $(foreach d,$(DEP.MDL2SPR),$($d.LIB))
 
 OUTDIRS += $(OUT.MDL2SPR)

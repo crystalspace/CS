@@ -39,7 +39,7 @@ INF.THINGLDR = $(SRCDIR)/plugins/mesh/thing/persist/standard/thingldr.csplugin
 INC.THINGLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/persist/standard/*.h))
 SRC.THINGLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/persist/standard/*.cpp))
 OBJ.THINGLDR = $(addprefix $(OUT)/,$(notdir $(SRC.THINGLDR:.cpp=$O)))
-DEP.THINGLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.THINGLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += THINGLDR
 DSP.THINGLDR.NAME = thingldr

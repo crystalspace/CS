@@ -3,7 +3,7 @@ SubDir TOP apps examples simplevp ;
 Application simplevp
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith simplevp : csgeom csgfx cssys cstool csutil ;
+LinkWith simplevp : csgeom csgfx cstool csutil ;
 
 Help simplevp : "effects and vertex programs demonstration" ;
 

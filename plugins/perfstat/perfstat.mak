@@ -46,7 +46,7 @@ INF.PERFSTAT = $(SRCDIR)/plugins/perfstat/perfstat.csplugin
 INC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.h))
 SRC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.cpp))
 OBJ.PERFSTAT = $(addprefix $(OUT)/,$(notdir $(SRC.PERFSTAT:.cpp=$O)))
-DEP.PERFSTAT = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.PERFSTAT = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += PERFSTAT
 DSP.PERFSTAT.NAME = perfstat

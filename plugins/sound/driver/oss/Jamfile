@@ -5,7 +5,7 @@ if $(OSS.AVAILABLE) = "yes" && $(TARGET.OS) != "WIN32"
 Plugin ossdrv
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ossdrv : cssys csutil ;
+LinkWith ossdrv : csutil ;
 ExternalLibs ossdrv :  OSS ;
 
 Help ossdrv : "Crystal Space OSS sound driver" ;

@@ -39,7 +39,7 @@ INF.FIRE = $(SRCDIR)/plugins/mesh/fire/object/fire.csplugin
 INC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.h plugins/mesh/partgen/*.h))
 SRC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FIRE = $(addprefix $(OUT)/,$(notdir $(SRC.FIRE:.cpp=$O)))
-DEP.FIRE = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.FIRE = CSTOOL CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += FIRE
 DSP.FIRE.NAME = fire

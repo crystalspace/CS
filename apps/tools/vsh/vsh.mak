@@ -32,7 +32,7 @@ OUT.VSH = $(OUT)/$(DIR.VSH)
 INC.VSH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VSH)/*.h))
 SRC.VSH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VSH)/*.cpp))
 OBJ.VSH = $(addprefix $(OUT.VSH)/,$(notdir $(SRC.VSH:.cpp=$O)))
-DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSUTIL CSGEOM
+DEP.VSH = CSUTIL CSGFX CSTOOL CSUTIL CSUTIL CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
 
 OUTDIRS += $(OUT.VSH)

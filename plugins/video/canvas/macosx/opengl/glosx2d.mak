@@ -72,7 +72,7 @@ SRC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) $(SRC.COMMON
   $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
 OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
-DEP.GLOSX2D = CSGEOM CSSYS CSUTIL
+DEP.GLOSX2D = CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -48,7 +48,7 @@ INC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.h \
 SRC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)))
 OBJ.GLX2D = $(addprefix $(OUT)/,$(notdir $(SRC.GLX2D:.cpp=$O)))
-DEP.GLX2D = CSUTIL CSSYS CSGEOM CSUTIL
+DEP.GLX2D = CSUTIL CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

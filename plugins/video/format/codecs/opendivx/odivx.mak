@@ -40,7 +40,7 @@ INF.ODIVX = $(SRCDIR)/plugins/video/format/codecs/opendivx/odivx.csplugin
 INC.ODIVX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/opendivx/*.h))
 SRC.ODIVX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/opendivx/*.cpp))
 OBJ.ODIVX = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX:.cpp=$O)))
-DEP.ODIVX = CSUTIL CSSYS
+DEP.ODIVX = CSUTIL
 CFG.ODIVX =
 
 TO_INSTALL.CONFIG += $(CFG.ODIVX)

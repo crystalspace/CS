@@ -5,7 +5,7 @@ if $(EAX.AVAILABLE) = "yes"
 Plugin sndeax
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndeax : soundrendercommon csgeom cssys csutil ;
+LinkWith sndeax : soundrendercommon csgeom csutil ;
 ExternalLibs sndeax :  EAX ;
 
 Help sndeax : "Crystal Space EAX sound renderer" ;

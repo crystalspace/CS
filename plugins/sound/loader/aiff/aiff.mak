@@ -45,7 +45,7 @@ INC.SNDAIFF = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.SNDAIFF = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/aiff/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDAIFF = $(addprefix $(OUT)/,$(notdir $(SRC.SNDAIFF:.cpp=$O)))
-DEP.SNDAIFF = CSUTIL CSSYS CSUTIL
+DEP.SNDAIFF = CSUTIL CSUTIL
 
 MSVC.DSP += SNDAIFF
 DSP.SNDAIFF.NAME = sndaiff

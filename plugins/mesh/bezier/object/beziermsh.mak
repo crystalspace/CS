@@ -39,7 +39,7 @@ INF.BEZIER = $(SRCDIR)/plugins/mesh/bezier/object/bezier.csplugin
 INC.BEZIER = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/object/*.h))
 SRC.BEZIER = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/object/*.cpp))
 OBJ.BEZIER = $(addprefix $(OUT)/,$(notdir $(SRC.BEZIER:.cpp=$O)))
-DEP.BEZIER = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BEZIER = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += BEZIER
 DSP.BEZIER.NAME = bezier

@@ -39,7 +39,7 @@ INF.EMITLDR = $(SRCDIR)/plugins/mesh/emit/persist/standard/emitldr.csplugin
 INC.EMITLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/persist/standard/*.h))
 SRC.EMITLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/persist/standard/*.cpp))
 OBJ.EMITLDR = $(addprefix $(OUT)/,$(notdir $(SRC.EMITLDR:.cpp=$O)))
-DEP.EMITLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.EMITLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += EMITLDR
 DSP.EMITLDR.NAME = emitldr

@@ -41,7 +41,7 @@ INF.PHYSLDR = $(SRCDIR)/$(DIR.PHYSLDR)/physldr.csplugin
 INC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.h))
 SRC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.cpp))
 OBJ.PHYSLDR = $(addprefix $(OUT.PHYSLDR)/,$(notdir $(SRC.PHYSLDR:.cpp=$O)))
-DEP.PHYSLDR = CSGEOM CSUTIL CSSYS
+DEP.PHYSLDR = CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.PHYSLDR)
 

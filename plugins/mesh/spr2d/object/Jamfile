@@ -3,7 +3,7 @@ SubDir TOP plugins mesh spr2d object ;
 Plugin spr2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spr2d : csgeom cssys csutil ;
+LinkWith spr2d : csgeom csutil ;
 
 Help spr2d : "2D Sprite mesh object plug-in" ;
 CompileGroups spr2d :  meshes ;

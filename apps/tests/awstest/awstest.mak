@@ -34,7 +34,7 @@ OUT.AWSTEST = $(OUT)/$(DIR.AWSTEST)
 INC.AWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTEST)/*.h ))
 SRC.AWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTEST)/*.cpp ))
 OBJ.AWSTEST = $(addprefix $(OUT.AWSTEST)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
-DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
+DEP.AWSTEST = CSTOOL CSUTIL CSUTIL CSGEOM CSGFX
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
 CFG.AWSTEST = $(SRCDIR)/data/config/awstest.cfg
 

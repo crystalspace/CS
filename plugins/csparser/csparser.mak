@@ -42,7 +42,7 @@ INF.CSPARSER = $(SRCDIR)/plugins/csparser/csparser.csplugin
 INC.CSPARSER = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/*.h))
 SRC.CSPARSER = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/*.cpp))
 OBJ.CSPARSER = $(addprefix $(OUT)/,$(notdir $(SRC.CSPARSER:.cpp=$O)))
-DEP.CSPARSER = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
+DEP.CSPARSER = CSUTIL CSTOOL CSUTIL CSGEOM CSTOOL CSGFX
 
 MSVC.DSP += CSPARSER
 DSP.CSPARSER.NAME = csparser

@@ -4,7 +4,7 @@ Application tbconvert
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith tbconvert : csgeom csgfx cssys cstool csutil ;
+LinkWith tbconvert : csgeom csgfx cstool csutil ;
 
 Help tbconvert : "Crystal Space Big Terrain Conversion Tool" ;
 

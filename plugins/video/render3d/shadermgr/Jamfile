@@ -3,7 +3,7 @@ SubDir TOP plugins video render3d shadermgr ;
 Plugin shadermgr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith shadermgr : csgfx csgeom cssys cstool csutil ;
+LinkWith shadermgr : csgfx csgeom cstool csutil ;
 
 Help shadermgr : "Crystal Space Shadermanager plug-in" ;
 

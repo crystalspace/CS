@@ -3,7 +3,7 @@ SubDir TOP plugins mesh impexp mdl ;
 Plugin mdlie
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith mdlie : csgeom cssys cstool csutil ;
+LinkWith mdlie : csgeom cstool csutil ;
 
 Help mdlie : "MDL Import/Export plug-in" ;
 

@@ -39,7 +39,7 @@ INF.POVIE = $(SRCDIR)/plugins/mesh/impexp/pov/povie.csplugin
 INC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.h))
 SRC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.cpp))
 OBJ.POVIE = $(addprefix $(OUT)/,$(notdir $(SRC.POVIE:.cpp=$O)))
-DEP.POVIE = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.POVIE = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += POVIE
 DSP.POVIE.NAME = povie

@@ -37,7 +37,7 @@ OUT.PGTEST = $(OUT)/$(DIR.PGTEST)
 INC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PGTEST)/*.h))
 SRC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PGTEST)/*.cpp))
 OBJ.PGTEST = $(addprefix $(OUT.PGTEST)/,$(notdir $(SRC.PGTEST:.cpp=$O)))
-DEP.PGTEST = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
+DEP.PGTEST = CSTOOL CSGFX CSUTIL CSUTIL
 LIB.PGTEST = $(foreach d,$(DEP.PGTEST),$($d.LIB))
 
 OUTDIRS += $(OUT.PGTEST)

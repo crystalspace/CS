@@ -5,7 +5,7 @@ if $(DIVX4.AVAILABLE) = "yes"
 Plugin odivx4
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith odivx4 : cssys csutil ;
+LinkWith odivx4 : csutil ;
 ExternalLibs odivx4 :  DIVX4 ;
 
 Help odivx4 : "Crystal Space DivX4 codec" ;

@@ -14,7 +14,7 @@ Plugin soft3d :
 	[ Wildcard *.cpp *.h ]
 	$(ASMFILES)
 ;
-LinkWith soft3d : renderercommon csgeom csgfx cssys csutil ;
+LinkWith soft3d : renderercommon csgeom csgfx csutil ;
 
 Help soft3d : "Crystal Space software 3D renderer" ;
 

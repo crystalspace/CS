@@ -3,7 +3,7 @@ SubDir TOP plugins mesh null persist standard ;
 Plugin nullmeshldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith nullmeshldr : csgeom cssys csutil ;
+LinkWith nullmeshldr : csgeom csutil ;
 
 Help nullmeshldr : "Null mesh object loader" ;
 CompileGroups nullmeshldr :  meshes ;

@@ -39,7 +39,7 @@ INC.JOYLIN = \
 SRC.JOYLIN = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/device/joystick/linux/*.cpp))
 OBJ.JOYLIN = $(addprefix $(OUT)/,$(notdir $(SRC.JOYLIN:.cpp=$O)))
-DEP.JOYLIN = CSUTIL CSSYS
+DEP.JOYLIN = CSUTIL
 CFG.JOYLIN = $(SRCDIR)/data/config/joystick.cfg
 
 TO_INSTALL.CONFIG += $(CFG.JOYLIN)

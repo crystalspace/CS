@@ -30,10 +30,11 @@ vpath %.cpp $(SRCDIR)/libs/csutil
 vpath %.c $(SRCDIR)/libs/csutil
 
 CSUTIL.LIB = $(OUT)/$(LIB_PREFIX)csutil$(LIB_SUFFIX)
-INC.CSUTIL = $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
-SRC.CSUTIL = \
+INC.CSUTIL = $(INC.CSSYS) \
+  $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
+SRC.CSUTIL = $(SRC.CSSYS) \
   $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp libs/csutil/*.c))
-OBJ.CSUTIL = \
+OBJ.CSUTIL = $(OBJ.CSSYS) \
   $(addprefix $(OUT)/,$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
 CFG.CSUTIL = $(SRCDIR)/data/config/mouse.cfg
 

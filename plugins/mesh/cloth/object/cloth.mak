@@ -39,7 +39,7 @@ INF.CLOTH = $(SRCDIR)/plugins/mesh/cloth/object/cloth.csplugin
 INC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.h))
 SRC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.cpp))
 OBJ.CLOTH = $(addprefix $(OUT)/,$(notdir $(SRC.CLOTH:.cpp=$O)))
-DEP.CLOTH = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.CLOTH = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += CLOTH
 DSP.CLOTH.NAME = cloth

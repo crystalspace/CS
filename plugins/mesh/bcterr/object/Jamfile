@@ -3,7 +3,7 @@ SubDir TOP plugins mesh bcterr object ;
 Plugin bcterr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bcterr : csgeom cssys csutil ;
+LinkWith bcterr : csgeom csutil ;
 
 Help bcterr : "Bezier Terrain plug-in" ;
 

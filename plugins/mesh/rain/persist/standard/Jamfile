@@ -3,7 +3,7 @@ SubDir TOP plugins mesh rain persist standard ;
 Plugin rainldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rainldr : csgeom cssys csutil ;
+LinkWith rainldr : csgeom csutil ;
 
 Help rainldr : "Rain mesh object loader" ;
 CompileGroups rainldr :  meshes ;

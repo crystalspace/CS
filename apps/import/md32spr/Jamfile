@@ -4,7 +4,7 @@ Application md32spr
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith md32spr : csgeom csgfx cssys cstool csutil ;
+LinkWith md32spr : csgeom csgfx cstool csutil ;
 
 Help md32spr : "Quake MD3 conversion tool" ;
 

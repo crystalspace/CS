@@ -39,7 +39,7 @@ INF.HAZELDR = $(SRCDIR)/plugins/mesh/haze/persist/standard/hazeldr.csplugin
 INC.HAZELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/persist/standard/*.h))
 SRC.HAZELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/persist/standard/*.cpp))
 OBJ.HAZELDR = $(addprefix $(OUT)/,$(notdir $(SRC.HAZELDR:.cpp=$O)))
-DEP.HAZELDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.HAZELDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += HAZELDR
 DSP.HAZELDR.NAME = hazeldr

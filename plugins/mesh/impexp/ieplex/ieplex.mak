@@ -39,7 +39,7 @@ INF.IEPLEX = $(SRCDIR)/plugins/mesh/impexp/ieplex/ieplex.csplugin
 INC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.h))
 SRC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.cpp))
 OBJ.IEPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IEPLEX:.cpp=$O)))
-DEP.IEPLEX = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.IEPLEX = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += IEPLEX
 DSP.IEPLEX.NAME = ieplex

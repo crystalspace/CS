@@ -3,7 +3,7 @@ SubDir TOP apps walktest ;
 Application walktest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
+LinkWith walktest : csengine csgeom csgfx cstool csutil ;
 
 CompileGroups walktest : walkall ;
 CompileGroups vfs : walkall ;
@@ -60,7 +60,7 @@ Application walktest_static
 	: [ Wildcard *.cpp *.h ]
 	: independent noinstall
 ;
-LinkWith walktest_static : csengine csgeom csgfx cssys cstool csutil ;
+LinkWith walktest_static : csengine csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
 # this is needed because walktest links and registers libcsengine by itself if
 # this flag isn't defined

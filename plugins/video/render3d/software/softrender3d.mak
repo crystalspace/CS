@@ -63,7 +63,7 @@ ifeq ($(NASM.AVAILABLE),yes)
 endif
 OBJ.SOFTRENDER3D = \
   $(addprefix $(OUT)/,$(notdir $(subst .asm,$O,$(SRC.SOFTRENDER3D:.cpp=$O))))
-DEP.SOFTRENDER3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL
+DEP.SOFTRENDER3D = CSGEOM CSGFX CSUTIL CSUTIL
 CFG.SOFTRENDER3D = $(SRCDIR)/data/config/softrender3d.cfg
 
 NASMFLAGS.SOFTRENDER3D = -i$(SRCDIR)/plugins/video/render3d/software/i386/

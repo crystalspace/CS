@@ -3,7 +3,7 @@ SubDir TOP apps tests g2dtest ;
 Application g2dtest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith g2dtest : csgeom csgfx cssys cstool csutil ;
+LinkWith g2dtest : csgeom csgfx cstool csutil ;
 
 Help g2dtest : "Crystal Space canvas plugin test" ;
 

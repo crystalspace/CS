@@ -3,7 +3,7 @@ SubDir TOP plugins documentsystem binary ;
 Plugin bindoc
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bindoc : cssys cstool csutil ;
+LinkWith bindoc : cstool csutil ;
 
 Help bindoc : "Crystal Space binary document system" ;
 

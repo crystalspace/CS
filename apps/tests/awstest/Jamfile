@@ -3,7 +3,7 @@ SubDir TOP apps tests awstest ;
 Application awstest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith awstest : csgeom csgfx cssys cstool csutil ;
+LinkWith awstest : csgeom csgfx cstool csutil ;
 
 Help awstest : "Alternate Windowing System test" ;
 

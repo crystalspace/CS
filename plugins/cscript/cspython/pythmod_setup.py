@@ -32,7 +32,7 @@ while i < len(sys.argv) and sys.argv[i] != '--':
     i += 1
 sys.argv[1:i + 1] = []
 
-libs.extend(['cstool','csgfx','csgeom','cssys','csutil','cssys','csutil'])
+libs.extend(['cstool','csgfx','csgeom','csutil'])
 
 ext_module = Extension(
     '_cspace',

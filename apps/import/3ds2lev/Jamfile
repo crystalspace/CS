@@ -6,7 +6,7 @@ Application 3ds2lev
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith 3ds2lev : csgeom cssys csutil ;
+LinkWith 3ds2lev : csgeom csutil ;
 ExternalLibs 3ds2lev :  3DS ;
 
 Help 3ds2lev : "3DS to Crystal Space map converter" ;

@@ -62,7 +62,7 @@ INC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDSOFT)/*.h \
 SRC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDSOFT)/*.cpp \
   plugins/sound/renderer/common/*.cpp))
 OBJ.SNDSOFT = $(addprefix $(OUT.SNDSOFT)/,$(notdir $(SRC.SNDSOFT:.cpp=$O)))
-DEP.SNDSOFT = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.SNDSOFT = CSUTIL CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.SNDSOFT)
 

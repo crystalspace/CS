@@ -39,7 +39,7 @@ INF.NULLMESH = $(SRCDIR)/plugins/mesh/null/object/nullmesh.csplugin
 INC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.h))
 SRC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.cpp))
 OBJ.NULLMESH = $(addprefix $(OUT)/,$(notdir $(SRC.NULLMESH:.cpp=$O)))
-DEP.NULLMESH = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.NULLMESH = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += NULLMESH
 DSP.NULLMESH.NAME = nullmesh

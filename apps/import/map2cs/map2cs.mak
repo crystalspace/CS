@@ -32,7 +32,7 @@ OUT.MAP2CS = $(OUT)/$(DIR.MAP2CS)
 INC.MAP2CS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAP2CS)/*.h ))
 SRC.MAP2CS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAP2CS)/*.cpp ))
 OBJ.MAP2CS = $(addprefix $(OUT.MAP2CS)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
-DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
+DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = $(SRCDIR)/data/config/map2cs.cfg
 

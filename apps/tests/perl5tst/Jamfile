@@ -5,7 +5,7 @@ if $(PERL5.SDK.AVAILABLE) = "yes"
 Application perl5test
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith perl5test : cssys cstool csutil ;
+LinkWith perl5test : cstool csutil ;
 
 Help perl5test : "Crystal Space Perl5 scripting test" ;
 }

@@ -5,7 +5,7 @@ if $(GLX.AVAILABLE) = "yes"
 Plugin glx2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith glx2d : openglcommon canvascommon csgeom cssys csutil ;
+LinkWith glx2d : openglcommon canvascommon csgeom csutil ;
 ExternalLibs glx2d :  GLX ;
 
 Help glx2d : "Crystal Space GL/X 2D driver" ;

@@ -5,7 +5,7 @@ if $(PGSERVER.AVAILABLE) = "yes"
 Application pgtest
 	: pgtest.cpp
 ;
-LinkWith pgtest : csgeom csgfx cssys cstool csutil ;
+LinkWith pgtest : csgeom csgfx cstool csutil ;
 
 Help pgtesttest : "Crystal Space PicoGUI test" ;
 }

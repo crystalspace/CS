@@ -5,7 +5,7 @@ if $(SVGA.AVAILABLE) = "yes"
 Plugin svga2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith svga2d : canvascommon cssys csutil ;
+LinkWith svga2d : canvascommon csutil ;
 ExternalLibs svga2d :  SVGA ;
 
 Help svga2d : "Crystal Space SVGAlib 2D driver" ;

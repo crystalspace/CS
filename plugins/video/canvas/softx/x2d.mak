@@ -49,7 +49,7 @@ INF.X2D = $(SRCDIR)/plugins/video/canvas/softx/x2d.csplugin
 INC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)))
 SRC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.X2D = $(addprefix $(OUT)/,$(notdir $(SRC.X2D:.cpp=$O)))
-DEP.X2D = CSUTIL CSSYS CSGEOM CSUTIL
+DEP.X2D = CSUTIL CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -32,7 +32,7 @@ OUT.NETTUT = $(OUT)/$(DIR.NETTUT)
 INC.NETTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETTUT)/*.h ))
 SRC.NETTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETTUT)/*.cpp ))
 OBJ.NETTUT = $(addprefix $(OUT.NETTUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
-DEP.NETTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+DEP.NETTUT = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.NETTUT = $(foreach d,$(DEP.NETTUT),$($d.LIB))
 
 OUTDIRS += $(OUT.NETTUT)

@@ -34,7 +34,7 @@ OUT.AWSTUT = $(OUT)/$(DIR.AWSTUT)
 INC.AWSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTUT)/*.h ))
 SRC.AWSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTUT)/*.cpp ))
 OBJ.AWSTUT = $(addprefix $(OUT.AWSTUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
-DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
+DEP.AWSTUT = CSTOOL CSUTIL CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
 CFG.AWSTUT = 
 

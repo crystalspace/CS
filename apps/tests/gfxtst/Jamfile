@@ -4,7 +4,7 @@ Application gfxtest
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith gfxtest : csgeom csgfx cssys cstool csutil ;
+LinkWith gfxtest : csgeom csgfx cstool csutil ;
 
 Help gfxtest : "Crystal Space image manipulator" ;
 

@@ -44,7 +44,7 @@ INC.CSBMPIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/bmp/*.h))
 SRC.CSBMPIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/bmp/*.cpp))
 
 OBJ.CSBMPIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSBMPIMG:.cpp=$O)))
-DEP.CSBMPIMG = CSUTIL CSSYS CSGFX CSSYS CSUTIL
+DEP.CSBMPIMG = CSUTIL CSGFX CSUTIL
 
 MSVC.DSP += CSBMPIMG
 DSP.CSBMPIMG.NAME = csbmpimg

@@ -3,7 +3,7 @@ SubDir TOP plugins culling dynavis ;
 Plugin dynavis
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith dynavis : csgeom cssys csutil ;
+LinkWith dynavis : csgeom csutil ;
 
 Help dynavis : "Crystal Space Dynamic Visibility System" ;
 

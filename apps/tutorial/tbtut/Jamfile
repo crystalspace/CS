@@ -3,7 +3,7 @@ SubDir TOP apps tutorial tbtut ;
 Application tbtut
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith tbtut : csgeom csgfx cssys cstool csutil ;
+LinkWith tbtut : csgeom csgfx cstool csutil ;
 
 Help tbtut : "Crystal Space Terrbig Tutorial" ;
 

@@ -44,7 +44,7 @@ INC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.h))
 SRC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.cpp))
 
 OBJ.CSWALIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSWALIMG:.cpp=$O)))
-DEP.CSWALIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSWALIMG = CSUTIL CSGFX CSUTIL
 
 MSVC.DSP += CSWALIMG
 DSP.CSWALIMG.NAME = cswalimg

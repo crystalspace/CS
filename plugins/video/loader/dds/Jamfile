@@ -3,7 +3,7 @@ SubDir TOP plugins video loader dds ;
 Plugin csddsimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csddsimg : csgfx cssys csutil ;
+LinkWith csddsimg : csgfx csutil ;
 
 Help csddsimg : "Crystal Space dds image loader" ;
 

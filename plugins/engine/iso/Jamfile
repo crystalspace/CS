@@ -3,7 +3,7 @@ SubDir TOP plugins engine iso ;
 Plugin iso
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith iso : csgeom csgfx cssys csutil ;
+LinkWith iso : csgeom csgfx csutil ;
 
 Help iso : "Crystal Space isometric engine" ;
 

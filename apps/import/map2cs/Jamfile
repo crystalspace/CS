@@ -4,7 +4,7 @@ Application map2cs
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith map2cs : csgeom csgfx cssys cstool csutil ;
+LinkWith map2cs : csgeom csgfx cstool csutil ;
 ExternalLibs map2cs : ZLIB ;
 
 Help map2cs : "Quake map conversion tool" ;

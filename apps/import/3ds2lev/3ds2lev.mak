@@ -33,7 +33,7 @@ OUT.3DS2LEV = $(OUT)/$(DIR.3DS2LEV)
 INC.3DS2LEV = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.3DS2LEV)/*.h))
 SRC.3DS2LEV = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.3DS2LEV)/*.cpp))
 OBJ.3DS2LEV = $(addprefix $(OUT.3DS2LEV)/,$(notdir $(SRC.3DS2LEV:.cpp=$O)))
-DEP.3DS2LEV = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.3DS2LEV = CSGEOM CSUTIL CSUTIL
 LIB.3DS2LEV = $(foreach d,$(DEP.3DS2LEV),$($d.LIB))
 
 OUTDIRS += $(OUT.3DS2LEV)

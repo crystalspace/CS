@@ -3,7 +3,7 @@ SubDir TOP plugins mesh impexp pov ;
 Plugin povie
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith povie : csgeom cssys csutil ;
+LinkWith povie : csgeom csutil ;
 
 Help povie : "POV Import/Export plug-in" ;
 

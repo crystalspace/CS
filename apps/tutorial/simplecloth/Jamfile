@@ -3,7 +3,7 @@ SubDir TOP apps tutorial simplecloth ;
 Application simplecloth
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith simplecloth : csgeom csgfx cssys cstool csutil ;
+LinkWith simplecloth : csgeom csgfx cstool csutil ;
 
 Help simplecloth : "Crystal Space Cloth demonstration" ;
 

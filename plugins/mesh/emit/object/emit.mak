@@ -39,7 +39,7 @@ INF.EMIT = $(SRCDIR)/plugins/mesh/emit/object/emit.csplugin
 INC.EMIT = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/object/*.h plugins/mesh/partgen/*.h))
 SRC.EMIT = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.EMIT = $(addprefix $(OUT)/,$(notdir $(SRC.EMIT:.cpp=$O)))
-DEP.EMIT = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL
+DEP.EMIT = CSGEOM CSTOOL CSUTIL CSUTIL
 
 MSVC.DSP += EMIT
 DSP.EMIT.NAME = emit

@@ -39,7 +39,7 @@ INF.TERRFUNC = $(SRCDIR)/plugins/mesh/terrfunc/object/terrfunc.csplugin
 INC.TERRFUNC = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/object/*.h))
 SRC.TERRFUNC = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/object/*.cpp))
 OBJ.TERRFUNC = $(addprefix $(OUT)/,$(notdir $(SRC.TERRFUNC:.cpp=$O)))
-DEP.TERRFUNC = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.TERRFUNC = CSGEOM CSUTIL CSUTIL
 CFLAGS.TERRFUNC = $(CFLAGS.I)plugins/mesh/terrfunc/object
 
 MSVC.DSP += TERRFUNC

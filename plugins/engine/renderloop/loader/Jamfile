@@ -3,7 +3,7 @@ SubDir TOP plugins engine renderloop loader ;
 Plugin rendloop_loader
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rendloop_loader : renderstepcommon cssys csutil ;
+LinkWith rendloop_loader : renderstepcommon csutil ;
 
 Help rendloop_loader : "Crystal Space render loop loader" ;
 

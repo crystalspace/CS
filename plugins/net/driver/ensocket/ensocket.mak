@@ -44,7 +44,7 @@ INF.ENSOCKET = $(SRCDIR)/plugins/net/driver/ensocket/ensocket.csplugin
 INC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.h))
 SRC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.cpp))
 OBJ.ENSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.ENSOCKET:.cpp=$O)))
-DEP.ENSOCKET = CSUTIL CSSYS CSUTIL
+DEP.ENSOCKET = CSUTIL CSUTIL
 
 MSVC.DSP += ENSOCKET
 DSP.ENSOCKET.NAME = ensocket

@@ -39,7 +39,7 @@ INF.FOUNTLDR = $(SRCDIR)/plugins/mesh/fountain/persist/standard/fountldr.csplugi
 INC.FOUNTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/persist/standard/*.h))
 SRC.FOUNTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/persist/standard/*.cpp))
 OBJ.FOUNTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
-DEP.FOUNTLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.FOUNTLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += FOUNTLDR
 DSP.FOUNTLDR.NAME = fountldr

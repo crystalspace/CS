@@ -34,7 +34,7 @@ OUT.MOTTEST = $(OUT)/$(DIR.MOTTEST)
 INC.MOTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOTTEST)/*.h ))
 SRC.MOTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOTTEST)/*.cpp ))
 OBJ.MOTTEST = $(addprefix $(OUT.MOTTEST)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
-DEP.MOTTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
+DEP.MOTTEST = CSTOOL CSUTIL CSUTIL CSGEOM CSGFX
 LIB.MOTTEST = $(foreach d,$(DEP.MOTTEST),$($d.LIB))
 #CFG.MOTTEST = data/config/mottest.cfg
 

@@ -32,7 +32,7 @@ OUT.SIMPCD = $(OUT)/$(DIR.SIMPCD)
 INC.SIMPCD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPCD)/*.h ))
 SRC.SIMPCD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPCD)/*.cpp ))
 OBJ.SIMPCD = $(addprefix $(OUT.SIMPCD)/,$(notdir $(SRC.SIMPCD:.cpp=$O)))
-DEP.SIMPCD = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+DEP.SIMPCD = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.SIMPCD = $(foreach d,$(DEP.SIMPCD),$($d.LIB))
 
 OUTDIRS += $(OUT.SIMPCD)

@@ -39,7 +39,7 @@ INF.GMESHLDR = $(SRCDIR)/plugins/mesh/genmesh/persist/standard/gmeshldr.csplugin
 INC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.h))
 SRC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.cpp))
 OBJ.GMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.GMESHLDR:.cpp=$O)))
-DEP.GMESHLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.GMESHLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += GMESHLDR
 DSP.GMESHLDR.NAME = gmeshldr

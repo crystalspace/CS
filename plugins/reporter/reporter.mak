@@ -46,7 +46,7 @@ INF.REPORTER = $(SRCDIR)/plugins/reporter/reporter.csplugin
 INC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.h))
 SRC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.cpp))
 OBJ.REPORTER = $(addprefix $(OUT)/,$(notdir $(SRC.REPORTER:.cpp=$O)))
-DEP.REPORTER = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.REPORTER = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += REPORTER
 DSP.REPORTER.NAME = reporter

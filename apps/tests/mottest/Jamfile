@@ -3,7 +3,7 @@ SubDir TOP apps tests mottest ;
 Application mottest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith mottest : csgeom csgfx cssys cstool csutil ;
+LinkWith mottest : csgeom csgfx cstool csutil ;
 
 Help mottest : "Motion Manager Test" ;
 

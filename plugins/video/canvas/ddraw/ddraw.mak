@@ -54,7 +54,7 @@ SRC.DDRAW2D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/canvas/ddraw/*.cpp plugins/video/canvas/directxcommon/*.cpp \
   $(SRC.COMMON.DRV2D)))
 OBJ.DDRAW2D = $(addprefix $(OUT)/,$(notdir $(SRC.DDRAW2D:.cpp=$O)))
-DEP.DDRAW2D = CSUTIL CSSYS CSUTIL
+DEP.DDRAW2D = CSUTIL CSUTIL
 
 MSVC.DSP += DDRAW2D
 DSP.DDRAW2D.NAME = ddraw2d

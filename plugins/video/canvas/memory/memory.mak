@@ -47,7 +47,7 @@ INF.MEMORY = $(SRCDIR)/plugins/video/canvas/memory/memory.csplugin
 INC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.h   $(INC.COMMON.DRV2D)))
 SRC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.MEMORY = $(addprefix $(OUT)/,$(notdir $(SRC.MEMORY:.cpp=$O)))
-DEP.MEMORY = CSUTIL CSSYS
+DEP.MEMORY = CSUTIL
 
 MSVC.DSP += MEMORY
 DSP.MEMORY.NAME = memory

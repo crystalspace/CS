@@ -39,7 +39,7 @@ INF.BEZIERLDR = $(SRCDIR)/plugins/mesh/bezier/persist/standard/bezierldr.csplugi
 INC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.h))
 SRC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.cpp))
 OBJ.BEZIERLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BEZIERLDR:.cpp=$O)))
-DEP.BEZIERLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BEZIERLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += BEZIERLDR
 DSP.BEZIERLDR.NAME = bezierldr

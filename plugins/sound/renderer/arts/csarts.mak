@@ -81,7 +81,7 @@ LIB.CSARTS.COMMON = -lartsflow -lartsflow_idl -lmcop
 LIB.LINK.CSARTS = \
   -L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lsoundserver_idl -lstdc++
 
-DEP.CSARTS = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSARTS.IDL
+DEP.CSARTS = CSGEOM CSTOOL CSUTIL CSUTIL CSARTS.IDL
 LIB.CSARTS = $(foreach d,$(DEP.CSARTS),$($d.LIB))
 
 ARTS.CXX = libtool --mode=compile g++

@@ -84,7 +84,7 @@ LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM = -f elf
 
-# System dependent source files included into CSSYS library
+# System dependent source files included into csutil library
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
 UNIX_SRC.SYS_CSSYS = \
   $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \

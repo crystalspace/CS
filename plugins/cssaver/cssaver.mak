@@ -42,7 +42,7 @@ INF.CSSAVER = $(SRCDIR)/plugins/cssaver/cssaver.csplugin
 INC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.h))
 SRC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.cpp))
 OBJ.CSSAVER = $(addprefix $(OUT)/,$(notdir $(SRC.CSSAVER:.cpp=$O)))
-DEP.CSSAVER = CSUTIL CSTOOL CSSYS CSUTIL
+DEP.CSSAVER = CSUTIL CSTOOL CSUTIL
 
 MSVC.DSP += CSSAVER
 DSP.CSSAVER.NAME = cssaver

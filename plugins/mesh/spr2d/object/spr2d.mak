@@ -39,7 +39,7 @@ INF.SPR2D = $(SRCDIR)/plugins/mesh/spr2d/object/spr2d.csplugin
 INC.SPR2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr2d/object/*.h))
 SRC.SPR2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr2d/object/*.cpp))
 OBJ.SPR2D = $(addprefix $(OUT)/,$(notdir $(SRC.SPR2D:.cpp=$O)))
-DEP.SPR2D = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SPR2D = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += SPR2D
 DSP.SPR2D.NAME = spr2d

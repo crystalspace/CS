@@ -32,7 +32,7 @@ OUT.ISOTEST = $(OUT)/$(DIR.ISOTEST)
 INC.ISOTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOTEST)/*.h))
 SRC.ISOTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOTEST)/*.cpp))
 OBJ.ISOTEST = $(addprefix $(OUT.ISOTEST)/,$(notdir $(SRC.ISOTEST:.cpp=$O)))
-DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS CSUTIL
+DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSUTIL CSUTIL
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
 #CFG.ISOTEST = data/config/isotest.cfg
 

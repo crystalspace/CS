@@ -39,7 +39,7 @@ INF.TERRFLDR = $(SRCDIR)/plugins/mesh/terrfunc/persist/standard/terrfldr.csplugi
 INC.TERRFLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/persist/standard/*.h))
 SRC.TERRFLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/persist/standard/*.cpp))
 OBJ.TERRFLDR = $(addprefix $(OUT)/,$(notdir $(SRC.TERRFLDR:.cpp=$O)))
-DEP.TERRFLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.TERRFLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += TERRFLDR
 DSP.TERRFLDR.NAME = terrfldr

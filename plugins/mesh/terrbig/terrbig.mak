@@ -39,7 +39,7 @@ INF.TERRBIG = $(SRCDIR)/plugins/mesh/terrbig/terrbig.csplugin
 INC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.h))
 SRC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.cpp))
 OBJ.TERRBIG = $(addprefix $(OUT)/,$(notdir $(SRC.TERRBIG:.cpp=$O)))
-DEP.TERRBIG = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.TERRBIG = CSGEOM CSUTIL CSUTIL
 CFLAGS.TERRBIG = $(CFLAGS.I)plugins/mesh/terrbig
 
 MSVC.DSP += TERRBIG

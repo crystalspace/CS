@@ -39,7 +39,7 @@ INF.SPR3DBIN = $(SRCDIR)/plugins/mesh/spr3d/persist/binary/spr3dbin.csplugin
 INC.SPR3DBIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/binary/*.h))
 SRC.SPR3DBIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/binary/*.cpp))
 OBJ.SPR3DBIN = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DBIN:.cpp=$O)))
-DEP.SPR3DBIN = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SPR3DBIN = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += SPR3DBIN
 DSP.SPR3DBIN.NAME = spr3dbin

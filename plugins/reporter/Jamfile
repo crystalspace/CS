@@ -3,7 +3,7 @@ SubDir TOP plugins reporter ;
 Plugin reporter
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith reporter : csgeom cssys csutil ;
+LinkWith reporter : csgeom csutil ;
 
 Help reporter : "Crystal Space Reporter plug-in" ;
 

@@ -41,7 +41,7 @@ INF.STDPT = $(SRCDIR)/$(DIR.STDPT)/stdpt.csplugin
 INC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.h)
 SRC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.cpp)
 OBJ.STDPT = $(addprefix $(OUT.STDPT)/,$(notdir $(SRC.STDPT:.cpp=$O)))
-DEP.STDPT = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
+DEP.STDPT = CSTOOL CSGFX CSUTIL CSUTIL
 
 OUTDIRS += $(OUT.STDPT)
 

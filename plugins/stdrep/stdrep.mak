@@ -46,7 +46,7 @@ INF.STDREP = $(SRCDIR)/plugins/stdrep/stdrep.csplugin
 INC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.h))
 SRC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.cpp))
 OBJ.STDREP = $(addprefix $(OUT)/,$(notdir $(SRC.STDREP:.cpp=$O)))
-DEP.STDREP = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.STDREP = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += STDREP
 DSP.STDREP.NAME = stdrep

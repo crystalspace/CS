@@ -39,7 +39,7 @@ INF.BCTERR = $(SRCDIR)/plugins/mesh/bcterr/object/bcterr.csplugin
 INC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.h))
 SRC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.cpp))
 OBJ.BCTERR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERR:.cpp=$O)))
-DEP.BCTERR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BCTERR = CSGEOM CSUTIL CSUTIL
 CFLAGS.BCTERR = $(CFLAGS.I)plugins/mesh/bcterr/object
 
 MSVC.DSP += BCTERR

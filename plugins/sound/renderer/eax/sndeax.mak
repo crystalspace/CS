@@ -45,7 +45,7 @@ INC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.h) \
 SRC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.cpp) \)
   $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDEAX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDEAX:.cpp=$O)))
-DEP.SNDEAX = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.SNDEAX = CSUTIL CSGEOM CSUTIL
 
 MSVC.DSP += SNDEAX
 DSP.SNDEAX.NAME = sndeax

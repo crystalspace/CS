@@ -46,7 +46,7 @@ INF.BINDOC = $(SRCDIR)/$(DIR.BINDOC)/bindoc.csplugin
 INC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.h))
 SRC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.cpp))
 OBJ.BINDOC = $(addprefix $(OUT.BINDOC)/,$(notdir $(SRC.BINDOC:.cpp=$O)))
-DEP.BINDOC = CSUTIL CSTOOL CSSYS CSUTIL
+DEP.BINDOC = CSUTIL CSTOOL CSUTIL
 
 OUTDIRS += $(OUT.BINDOC)
 

@@ -5,7 +5,7 @@ if $(OPENAL.AVAILABLE) = "yes"
 Plugin sndoal
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndoal : soundrendercommon csgeom cssys csutil ;
+LinkWith sndoal : soundrendercommon csgeom csutil ;
 ExternalLibs sndoal :  OPENAL ;
 
 Help sndoal : "Crystal Space OpenAL sound renderer" ;

@@ -3,7 +3,7 @@ SubDir TOP plugins mesh crossbld ;
 Plugin crossbld
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith crossbld : csgeom cssys cstool csutil ;
+LinkWith crossbld : csgeom cstool csutil ;
 
 Help crossbld : "Mesh object cross-builder plug-in" ;
 CompileGroups crossbld :  meshes ;

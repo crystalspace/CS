@@ -39,7 +39,7 @@ INF.CLOTHLDR = $(SRCDIR)/plugins/mesh/cloth/persist/standard/clothldr.csplugin
 INC.CLOTHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/persist/standard/*.h))
 SRC.CLOTHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/persist/standard/*.cpp))
 OBJ.CLOTHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.CLOTHLDR:.cpp=$O)))
-DEP.CLOTHLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.CLOTHLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += CLOTHLDR
 DSP.CLOTHLDR.NAME = clothldr

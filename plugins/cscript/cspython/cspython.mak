@@ -102,7 +102,7 @@ INC.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cspython/*.h))
 SRC.CSPYTHON = $(filter-out $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp, \
   $(sort $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
 OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
-DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSSYS CSUTIL CSSYS CSUTIL
+DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSUTIL CSUTIL
 
 INC.PYTHMOD =
 SRC.PYTHMOD = $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp $(SWIG.CSPYTHON)

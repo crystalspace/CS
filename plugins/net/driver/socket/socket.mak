@@ -44,7 +44,7 @@ INF.CSSOCKET = $(SRCDIR)/plugins/net/driver/socket/cssocket.csplugin
 INC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.h))
 SRC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.cpp))
 OBJ.CSSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.CSSOCKET:.cpp=$O)))
-DEP.CSSOCKET = CSUTIL CSSYS CSUTIL
+DEP.CSSOCKET = CSUTIL CSUTIL
 
 MSVC.DSP += CSSOCKET
 DSP.CSSOCKET.NAME = cssocket

@@ -39,7 +39,7 @@ INF.BCTERRLDR = $(SRCDIR)/plugins/mesh/bcterr/persist/standard/bcterrldr.csplugi
 INC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.h))
 SRC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.cpp))
 OBJ.BCTERRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERRLDR:.cpp=$O)))
-DEP.BCTERRLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BCTERRLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += BCTERRLDR
 DSP.BCTERRLDR.NAME = bcterrldr

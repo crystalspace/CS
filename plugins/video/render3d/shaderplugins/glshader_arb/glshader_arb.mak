@@ -51,7 +51,7 @@ SRC.GLSHADER_ARB = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shaderplugins/glshader_arb/*.cpp))
 OBJ.GLSHADER_ARB = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_ARB:.cpp=$O)))
-DEP.GLSHADER_ARB = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
+DEP.GLSHADER_ARB = CSGEOM CSUTIL CSUTIL CSGFX
 CFG.GLSHADER_ARB =
 
 TO_INSTALL.CONFIG += $(CFG.GLSHADER_ARB)

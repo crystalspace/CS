@@ -3,7 +3,7 @@ SubDir TOP apps demo ;
 Application csdemo
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csdemo : csgeom csgfx cssys cstool csutil ;
+LinkWith csdemo : csgeom csgfx cstool csutil ;
 
 Help csdemo : "Crystal Space Demo" ;
 

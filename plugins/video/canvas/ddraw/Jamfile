@@ -5,7 +5,7 @@ if $(DIRECTX.AVAILABLE) = "yes"
 Plugin ddraw2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ddraw2d : directxcommon canvascommon cssys csutil ;
+LinkWith ddraw2d : directxcommon canvascommon csutil ;
 ExternalLibs ddraw2d :  DIRECTX ;
 
 Help ddraw2d : "Crystal Space DirectDraw 2D driver" ;

@@ -5,7 +5,7 @@ if $(DIRECTX.AVAILABLE) = "yes"
 Plugin sndds3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndds3d : soundrendercommon csgeom cssys csutil ;
+LinkWith sndds3d : soundrendercommon csgeom csutil ;
 ExternalLibs sndds3d :  DIRECTX ;
 
 Help sndds3d : "Crystal Space DirectSound 3D sound renderer" ;

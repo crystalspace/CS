@@ -3,7 +3,7 @@ SubDir TOP plugins mesh bezier persist standard ;
 Plugin bezierldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bezierldr : csgeom cssys csutil ;
+LinkWith bezierldr : csgeom csutil ;
 
 Help bezierldr : "Bezier mesh object loader" ;
 CompileGroups bezierldr :  meshes ;

@@ -46,7 +46,7 @@ INF.SIMPCON = $(SRCDIR)/plugins/console/output/simple/simpcon.csplugin
 INC.SIMPCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/simple/*.h))
 SRC.SIMPCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/simple/*.cpp))
 OBJ.SIMPCON = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPCON:.cpp=$O)))
-DEP.SIMPCON = CSUTIL CSSYS CSUTIL CSGEOM
+DEP.SIMPCON = CSUTIL CSUTIL CSGEOM
 CFG.SIMPCON = $(SRCDIR)/data/config/simpcon.cfg
 
 TO_INSTALL.CONFIG += $(CFG.SIMPCON)

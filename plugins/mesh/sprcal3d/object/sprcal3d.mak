@@ -44,7 +44,7 @@ INF.SPRCAL3D = $(SRCDIR)/plugins/mesh/sprcal3d/object/sprcal3d.csplugin
 INC.SPRCAL3D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/sprcal3d/object/*.h))
 SRC.SPRCAL3D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/sprcal3d/object/*.cpp))
 OBJ.SPRCAL3D = $(addprefix $(OUT)/,$(notdir $(SRC.SPRCAL3D:.cpp=$O)))
-DEP.SPRCAL3D = CSGEOM CSUTIL CSSYS
+DEP.SPRCAL3D = CSGEOM CSUTIL
 
 MSVC.DSP += SPRCAL3D
 DSP.SPRCAL3D.NAME = sprcal3d

@@ -85,9 +85,9 @@ will get an error message that your C-compiler cannot create executables.  The
 
 The same applies to the field @emph{Additional flags} in the @emph{Linker
 Flags} tab.  After @samp{cs-config --libs} you have to add the Crystal Space
-standard libraries @samp{cstool csutil cssys csgfx csgeom}, so that the entire
-content of the @emph{Additional flags} field should be @samp{./cs-config --libs
-cstool csutil cssys csgfx csgeom}.
+standard libraries @file{cstool}, @file{gsgfx}, @file{csgeom}, @file{csutil},
+so that the entire content of the @emph{Additional flags} field should be
+@samp{./cs-config --libs cstool csgfx csgeom csutil}.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap5}

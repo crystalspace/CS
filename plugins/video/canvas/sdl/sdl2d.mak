@@ -50,7 +50,7 @@ INF.SDL2D = $(SRCDIR)/plugins/video/canvas/sdl/sdl2d.csplugin
 INC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D)))
 SRC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.SDL2D = $(addprefix $(OUT)/,$(notdir $(SRC.SDL2D:.cpp=$O)))
-DEP.SDL2D = CSUTIL CSSYS CSUTIL CSGEOM
+DEP.SDL2D = CSUTIL CSUTIL CSGEOM
 
 MSVC.DSP += SDL2D
 DSP.SDL2D.NAME = sdl2d

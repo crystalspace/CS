@@ -5,7 +5,7 @@ if $(LINUXJOYSTICK.AVAILABLE) = "yes"
 Plugin joylin
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith joylin : cssys csutil ;
+LinkWith joylin : csutil ;
 ExternalLibs joylin :  JOYSTICK ;
 
 Help joylin : "Crystal Space Joystick plugin for Linux" ;

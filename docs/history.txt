@@ -17,6 +17,13 @@ chronological order.
 	  not needed.
 	- Jorrit changed the movable code so that it now correctly updates
 	  the list of leaving portal meshes when an object changes sector.
+	- Eric Sunshine merged the object files from cssys and csutil into a
+	  single library: csutil.  (The cssys sources are still separate.)
+	  This change solves a host of problems resulting from the severe
+	  circular dependencies between these two modules, and should help pave
+	  the way for creation of proper shared libraries in the future.
+	- Eric Sunshine augmented cs-config so that it has knowledge of the
+	  csappframe library.
 15-Sep-2003
 	- Eric Sunshine added a check for the C++ `typename' keyword to
 	  configure.ac.  If not recognized by the compiler, the

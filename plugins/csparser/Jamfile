@@ -3,7 +3,7 @@ SubDir TOP plugins csparser ;
 Plugin csparser
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csparser : csgeom csgfx cssys cstool csutil ;
+LinkWith csparser : csgeom csgfx cstool csutil ;
 
 Help csparser : "Crystal Space map file parser" ;
 

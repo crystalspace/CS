@@ -275,7 +275,7 @@ PACKAGE_VERSION='0.97'
 PACKAGE_STRING='crystal 0.97'
 PACKAGE_BUGREPORT='crystal-main@lists.sourceforge.net'
 
-ac_unique_file="libs/cssys/cssys.mak"
+ac_unique_file="libs/csutil/Jamfile"
 ac_default_prefix=/usr/local/crystal
 # Factoring default headers for most tests.
 ac_includes_default="\

@@ -39,7 +39,7 @@ INF.GENMESH = $(SRCDIR)/plugins/mesh/genmesh/object/genmesh.csplugin
 INC.GENMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/object/*.h))
 SRC.GENMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/object/*.cpp))
 OBJ.GENMESH = $(addprefix $(OUT)/,$(notdir $(SRC.GENMESH:.cpp=$O)))
-DEP.GENMESH = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.GENMESH = CSTOOL CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += GENMESH
 DSP.GENMESH.NAME = genmesh

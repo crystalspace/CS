@@ -3,7 +3,7 @@ SubDir TOP plugins console output standard ;
 Plugin csconout
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith csconout : csgeom cssys csutil ;
+LinkWith csconout : csgeom csutil ;
 
 Help csconout : "Crystal Space standard output console" ;
 

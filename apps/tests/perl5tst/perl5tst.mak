@@ -35,7 +35,7 @@ INC.PERL5TEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERL5TEST)/*.h))
 SRC.PERL5TEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERL5TEST)/*.cpp))
 OBJ.PERL5TEST = \
   $(addprefix $(OUT.PERL5TEST)/,$(notdir $(SRC.PERL5TEST:.cpp=$O)))
-DEP.PERL5TEST = CSTOOL CSUTIL CSSYS
+DEP.PERL5TEST = CSTOOL CSUTIL
 LIB.PERL5TEST = $(foreach d,$(DEP.PERL5TEST),$($d.LIB))
 
 OUTDIRS += $(OUT.PERL5TEST)

@@ -49,7 +49,7 @@ INF.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/csperl5.csplugin
 INC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.h))
 SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
-DEP.CSPERL5 = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
+DEP.CSPERL5 = CSTOOL CSGEOM CSUTIL CSUTIL
 
 PERLXSI.C = $(OUTDERIVED)/csperlxs.c
 PERLXSI.O = $(OUT)/$(notdir $(PERLXSI.C:.c=$O))

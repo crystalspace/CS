@@ -39,7 +39,7 @@ INF.ASEIE = $(SRCDIR)/plugins/mesh/impexp/ase/aseie.csplugin
 INC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.h))
 SRC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.cpp))
 OBJ.ASEIE = $(addprefix $(OUT)/,$(notdir $(SRC.ASEIE:.cpp=$O)))
-DEP.ASEIE = CSGEOM CSUTIL CSSYS CSTOOL CSGEOM CSUTIL
+DEP.ASEIE = CSGEOM CSUTIL CSTOOL CSGEOM CSUTIL
 
 MSVC.DSP += ASEIE
 DSP.ASEIE.NAME = aseie

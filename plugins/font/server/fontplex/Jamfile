@@ -3,7 +3,7 @@ SubDir TOP plugins font server fontplex ;
 Plugin fontplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fontplex : cssys csutil ;
+LinkWith fontplex : csutil ;
 
 Help fontplex : "Crystal Space multiplexing font server" ;
 

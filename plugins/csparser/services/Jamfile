@@ -3,7 +3,7 @@ SubDir TOP plugins csparser services ;
 Plugin cssynldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cssynldr : csgfx csgeom cssys cstool csutil ;
+LinkWith cssynldr : csgfx csgeom cstool csutil ;
 
 Help cssynldr : "Crystal Space format loader services" ;
 

@@ -3,7 +3,7 @@ SubDir TOP apps isotest ;
 Application isotest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith isotest : csgeom csgfx cssys cstool csutil ;
+LinkWith isotest : csgeom csgfx cstool csutil ;
 
 Help isotest : "Crystal Space isotest demo executable" ;
 

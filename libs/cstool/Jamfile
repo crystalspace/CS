@@ -4,7 +4,7 @@ Library cstool
 	: [ Wildcard *.cpp *.h ]
 ;
 
-LibDepends cstool : csgfx csgeom csutil cssys ;
+LibDepends cstool : csgfx csgeom csutil ;
 Help cstool : "Crystal Space tool Library" ;
 
 InstallConfig system.cfg ;

@@ -77,7 +77,7 @@ SRC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
   $(addsuffix /*.m,$(MACOSX.SOURCE_COCOA2D_PATHS))))
 OBJ.COCOA2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.COCOA2D:.m=$O))))
-DEP.COCOA2D = CSSYS CSUTIL
+DEP.COCOA2D = CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

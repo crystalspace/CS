@@ -41,7 +41,7 @@ INF.ISOLOAD = $(SRCDIR)/plugins/isoldr/isoload.csplugin
 INC.ISOLOAD = $(wildcard $(addprefix $(SRCDIR)/,plugins/isoldr/*.h))
 SRC.ISOLOAD = $(wildcard $(addprefix $(SRCDIR)/,plugins/isoldr/*.cpp))
 OBJ.ISOLOAD = $(addprefix $(OUT)/,$(notdir $(SRC.ISOLOAD:.cpp=$O)))
-DEP.ISOLOAD = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
+DEP.ISOLOAD = CSUTIL CSGEOM CSGFX CSUTIL
 
 MSVC.DSP += ISOLOAD
 DSP.ISOLOAD.NAME = isoload

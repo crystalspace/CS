@@ -43,7 +43,7 @@ INF.MOTLDR = $(SRCDIR)/plugins/motion/standard/persist/standard/motldr.csplugin
 INC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.h))
 SRC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.cpp))
 OBJ.MOTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.MOTLDR:.cpp=$O)))
-DEP.MOTLDR = CSGEOM CSSYS CSUTIL
+DEP.MOTLDR = CSGEOM CSUTIL
 
 MSVC.DSP += MOTLDR
 DSP.MOTLDR.NAME = motldr

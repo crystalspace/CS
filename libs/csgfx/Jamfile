@@ -5,5 +5,5 @@ Library csgfx
 ;
 
 Help csgfx : "Crystal Space graphics utility library" ;
-LibDepends csgfx : csutil cssys ;
+LibDepends csgfx : csutil ;
 

@@ -39,7 +39,7 @@ INF.EXPLOLDR = $(SRCDIR)/plugins/mesh/explo/persist/standard/exploldr.csplugin
 INC.EXPLOLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/persist/standard/*.h))
 SRC.EXPLOLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/persist/standard/*.cpp))
 OBJ.EXPLOLDR = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLOLDR:.cpp=$O)))
-DEP.EXPLOLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.EXPLOLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += EXPLOLDR
 DSP.EXPLOLDR.NAME = exploldr

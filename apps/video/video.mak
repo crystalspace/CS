@@ -34,7 +34,7 @@ OUT.CSVID = $(OUT)/$(DIR.CSVID)
 INC.CSVID = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSVID)/*.h))
 SRC.CSVID = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSVID)/*.cpp))
 OBJ.CSVID = $(addprefix $(OUT.CSVID)/,$(notdir $(SRC.CSVID:.cpp=$O)))
-DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.CSVID = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
 OUTDIRS += $(OUT.CSVID)

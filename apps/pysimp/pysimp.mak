@@ -35,7 +35,7 @@ OUT.PYSIMP = $(OUT)/$(DIR.PYSIMP)
 INC.PYSIMP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PYSIMP)/*.h))
 SRC.PYSIMP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PYSIMP)/*.cpp))
 OBJ.PYSIMP = $(addprefix $(OUT.PYSIMP)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
-DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
 OUTDIRS += $(OUT.PYSIMP)

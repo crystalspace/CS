@@ -47,7 +47,7 @@ INC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/renderer/openal/*.cpp plugins/sound/renderer/common/*.cpp))
 OBJ.SNDOAL = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOAL:.cpp=$O)))
-DEP.SNDOAL = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.SNDOAL = CSUTIL CSGEOM CSUTIL
 
 MSVC.DSP += SNDOAL
 DSP.SNDOAL.NAME = sndoal

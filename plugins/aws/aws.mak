@@ -47,7 +47,7 @@ INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,plugins/aws/*.h include/iaws/*.h))
 SRC.AWS = $(sort $(wildcard $(SRCDIR)/plugins/aws/*.cpp) \
   $(addprefix $(SRCDIR)/,plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp))
 OBJ.AWS = $(addprefix $(OUT)/,$(notdir $(SRC.AWS:.cpp=$O)))
-DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
+DEP.AWS = CSUTIL CSUTIL CSGEOM CSTOOL CSGFX
 
 TO_INSTALL.DATA += $(SRCDIR)/data/awsdef.zip
 

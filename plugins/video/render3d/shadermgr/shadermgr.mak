@@ -46,7 +46,7 @@ INF.SHADERMGR = $(SRCDIR)/plugins/video/render3d/shadermgr/shadermgr.csplugin
 INC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.h))
 SRC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.cpp))
 OBJ.SHADERMGR = $(addprefix $(OUT)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
-DEP.SHADERMGR = CSGFX CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SHADERMGR = CSGFX CSTOOL CSGEOM CSUTIL CSUTIL
 
 TO_INSTALL.CONFIG += $(CFG.SHADERMGR)
 

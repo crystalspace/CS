@@ -39,7 +39,7 @@ INF.FIRELDR = $(SRCDIR)/plugins/mesh/fire/persist/standard/fireldr.csplugin
 INC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.h))
 SRC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.cpp))
 OBJ.FIRELDR = $(addprefix $(OUT)/,$(notdir $(SRC.FIRELDR:.cpp=$O)))
-DEP.FIRELDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.FIRELDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += FIRELDR
 DSP.FIRELDR.NAME = fireldr

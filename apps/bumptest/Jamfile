@@ -3,7 +3,7 @@ SubDir TOP apps bumptest ;
 Application bumptest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith bumptest : csgeom csgfx cssys cstool csutil ;
+LinkWith bumptest : csgeom csgfx cstool csutil ;
 
 Help bumptest : "Crystal Space bumpmap test" ;
 

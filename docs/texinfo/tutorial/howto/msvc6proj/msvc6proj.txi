@@ -322,21 +322,21 @@ applications if you use the functionality contained within a given library.
 Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
 
 @iftex
-@code{libcssys_d.lib libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
+@code{libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
 @code{libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
 @end iftex
 @ifnottex
-@code{libcssys_d.lib libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
+@code{libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib libcsws_d.lib}
 @end ifnottex
 
 Crystal Space release library names:
 
 @iftex
-@code{libcssys.lib libcsengine.liblibcsutil.lib libcsgeom.lib}@*
+@code{libcsengine.liblibcsutil.lib libcsgeom.lib}@*
 @code{libcsgfx.lib libcstool.lib libcsws.lib}
 @end iftex
 @ifnottex
-@code{libcssys.lib libcsengine_d.lib libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib libcsws.lib}
+@code{libcsengine_d.lib libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib libcsws.lib}
 @end ifnottex
 
 To add the necessary libraries to link our application.  As in step 4
@@ -358,11 +358,11 @@ into the box with those already there.
 Debug:
 
 @iftex
-@code{libcssys_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
+@code{libcsutil_d.lib libcsgeom_d.lib}@*
 @code{libcsgfx_d.lib libcstool_d.lib}
 @end iftex
 @ifnottex
-@code{libcssys_d.lib libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
+@code{libcsutil_d.lib libcsgeom_d.lib libcsgfx_d.lib libcstool_d.lib}
 @end ifnottex
 
 See image below for example of debug build link settings.
@@ -374,11 +374,11 @@ See image below for example of debug build link settings.
 Release:
 
 @iftex
-@code{libcssys.lib libcsutil.lib libcsgeom.lib}@*
+@code{libcsutil.lib libcsgeom.lib}@*
 @code{libcsgfx.lib libcstool.lib}
 @end iftex
 @ifnottex
-@code{libcssys.lib libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
+@code{libcsutil.lib libcsgeom.lib libcsgfx.lib libcstool.lib}
 @end ifnottex
 
 See image below for example of release build link settings.

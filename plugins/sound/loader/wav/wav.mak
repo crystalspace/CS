@@ -45,7 +45,7 @@ INC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/wav/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDWAV = $(addprefix $(OUT)/,$(notdir $(SRC.SNDWAV:.cpp=$O)))
-DEP.SNDWAV = CSUTIL CSSYS CSUTIL
+DEP.SNDWAV = CSUTIL CSUTIL
 
 MSVC.DSP += SNDWAV
 DSP.SNDWAV.NAME = sndwav

@@ -3,7 +3,7 @@ SubDir TOP plugins video loader sgi ;
 Plugin cssgiimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cssgiimg : csgfx cssys csutil ;
+LinkWith cssgiimg : csgfx csutil ;
 
 Help cssgiimg : "Crystal Space sgi image loader" ;
 CompileGroups cssgiimg :  imageloaders ;

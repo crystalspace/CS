@@ -135,7 +135,7 @@ INC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.h))
 SRC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.cpp))
 OBJ.FOOBAR = $(addprefix $(OUT.FOOBAR)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
 # Customise the following line.
-DEP.FOOBAR = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.FOOBAR = CSTOOL CSGEOM CSUTIL CSUTIL
 # Omit this if your module does not have an associated configuration file.
 CFG.FOOBAR = $(SRCDIR)/data/config/foobar.cfg
 

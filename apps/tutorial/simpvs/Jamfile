@@ -3,7 +3,7 @@ SubDir TOP apps tutorial simpvs ;
 Application simpvs
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith simpvs : csgeom csgfx cssys cstool csutil ;
+LinkWith simpvs : csgeom csgfx cstool csutil ;
 
 Help simpvs : "Crystal Space tutorial, video selector" ;
 

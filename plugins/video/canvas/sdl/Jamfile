@@ -5,7 +5,7 @@ if $(SDL.AVAILABLE) = "yes"
 Plugin sdl2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sdl2d : canvascommon csgeom cssys csutil ;
+LinkWith sdl2d : canvascommon csgeom csutil ;
 ExternalLibs sdl2d :  SDL ;
 
 Help sdl2d : "Crystal Space SDL 2D driver" ;

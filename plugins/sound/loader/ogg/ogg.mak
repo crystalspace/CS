@@ -41,7 +41,7 @@ INF.SNDOGG = $(SRCDIR)/plugins/sound/loader/ogg/sndogg.csplugin
 INC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.h))
 SRC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.cpp))
 OBJ.SNDOGG = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOGG:.cpp=$O)))
-DEP.SNDOGG = CSUTIL CSSYS CSUTIL
+DEP.SNDOGG = CSUTIL CSUTIL
 
 MSVC.DSP += SNDOGG
 DSP.SNDOGG.NAME = sndogg

@@ -3,7 +3,7 @@ SubDir TOP apps tutorial awstut ;
 Application awstut
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith awstut : csgeom csgfx cssys cstool csutil ;
+LinkWith awstut : csgeom csgfx cstool csutil ;
 
 Help awstut : "Alternate Windowing System Tutorial" ;
 

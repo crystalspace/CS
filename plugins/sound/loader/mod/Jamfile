@@ -5,7 +5,7 @@ if $(MIKMOD.AVAILABLE) = "yes"
 Plugin sndmod
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndmod : soundloadercommon cssys csutil ;
+LinkWith sndmod : soundloadercommon csutil ;
 ExternalLibs sndmod :  MIKMOD ;
 
 Help sndmod : "Crystal Space mod MikMod sound loader" ;

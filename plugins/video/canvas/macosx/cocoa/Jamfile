@@ -5,7 +5,7 @@ if $(TARGET.OS) = "MACOS_X"
 Plugin cocoa2d
 	: [ Wildcard *.cpp *.m *.h ]
 ;
-LinkWith cocoa2d : canvascommon cssys csutil ;
+LinkWith cocoa2d : canvascommon csutil ;
 
 Help cocoa2d : "Crystal Space MacOS/X Cocoa 2D driver" ;
 CompileGroups cocoa2d :  drivers2d ;

@@ -44,7 +44,7 @@ INC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.h))
 SRC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.cpp))
 
 OBJ.CSTGAIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSTGAIMG:.cpp=$O)))
-DEP.CSTGAIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSTGAIMG = CSUTIL CSGFX CSUTIL
 
 MSVC.DSP += CSTGAIMG
 DSP.CSTGAIMG.NAME = cstgaimg

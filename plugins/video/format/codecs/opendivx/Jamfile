@@ -5,7 +5,7 @@ if $(DIVX.AVAILABLE) = "yes"
 Plugin odivx
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith odivx : cssys csutil ;
+LinkWith odivx : csutil ;
 ExternalLibs odivx :  DIVX ;
 
 Help odivx : "Crystal Space OpenDivX codec" ;

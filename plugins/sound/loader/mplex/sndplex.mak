@@ -43,7 +43,7 @@ INF.SNDPLEX = $(SRCDIR)/plugins/sound/loader/mplex/sndplex.csplugin
 INC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.h))
 SRC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.cpp))
 OBJ.SNDPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDPLEX:.cpp=$O)))
-DEP.SNDPLEX = CSUTIL CSSYS CSUTIL
+DEP.SNDPLEX = CSUTIL CSUTIL
 CFG.SNDPLEX = $(SRCDIR)/data/config/sound.cfg
 
 TO_INSTALL.CONFIG += $(CFG.SNDPLEX)

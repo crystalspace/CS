@@ -39,7 +39,7 @@ INF.RAINLDR = $(SRCDIR)/plugins/mesh/rain/persist/standard/rainldr.csplugin
 INC.RAINLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/persist/standard/*.h))
 SRC.RAINLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/persist/standard/*.cpp))
 OBJ.RAINLDR = $(addprefix $(OUT)/,$(notdir $(SRC.RAINLDR:.cpp=$O)))
-DEP.RAINLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.RAINLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += RAINLDR
 DSP.RAINLDR.NAME = rainldr

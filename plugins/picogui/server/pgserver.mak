@@ -45,7 +45,7 @@ INF.PGSERVER = $(SRCDIR)/plugins/picogui/server/pgserver.csplugin
 INC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.h))
 SRC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.cpp))
 OBJ.PGSERVER = $(addprefix $(OUT)/,$(notdir $(SRC.PGSERVER:.cpp=$O)))
-DEP.PGSERVER = CSTOOL CSGEOM CSGFX CSUTIL CSSYS CSUTIL
+DEP.PGSERVER = CSTOOL CSGEOM CSGFX CSUTIL CSUTIL
 
 MSVC.DSP += PGSERVER
 DSP.PGSERVER.NAME = pgserver

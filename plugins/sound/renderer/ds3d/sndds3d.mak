@@ -63,7 +63,7 @@ INC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDDS3D)/*.h \
 SRC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SNDDS3D)/*.cpp \
   plugins/sound/renderer/common/*.cpp))
 OBJ.SNDDS3D = $(addprefix $(OUT.SNDDS3D)/,$(notdir $(SRC.SNDDS3D:.cpp=$O)))
-DEP.SNDDS3D = CSUTIL CSGEOM CSSYS CSUTIL
+DEP.SNDDS3D = CSUTIL CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.SNDDS3D)
 

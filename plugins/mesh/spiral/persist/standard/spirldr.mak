@@ -39,7 +39,7 @@ INF.SPIRLDR = $(SRCDIR)/plugins/mesh/spiral/persist/standard/spirldr.csplugin
 INC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.h))
 SRC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.cpp))
 OBJ.SPIRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRLDR:.cpp=$O)))
-DEP.SPIRLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SPIRLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += SPIRLDR
 DSP.SPIRLDR.NAME = spirldr

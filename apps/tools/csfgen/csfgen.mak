@@ -34,7 +34,7 @@ OUT.CSFGEN = $(OUT)/$(DIR.CSFGEN)
 INC.CSFGEN = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFGEN)/*.h ))
 SRC.CSFGEN = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFGEN)/*.cpp ))
 OBJ.CSFGEN = $(addprefix $(OUT.CSFGEN)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
-DEP.CSFGEN = CSTOOL CSUTIL CSSYS CSGEOM CSUTIL CSGFX
+DEP.CSFGEN = CSTOOL CSUTIL CSGEOM CSUTIL CSGFX
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
 
 OUTDIRS += $(OUT.CSFGEN)

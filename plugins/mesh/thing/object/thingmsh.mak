@@ -39,7 +39,7 @@ INF.THING = $(SRCDIR)/plugins/mesh/thing/object/thing.csplugin
 INC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.h))
 SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.cpp))
 OBJ.THING = $(addprefix $(OUT)/,$(notdir $(SRC.THING:.cpp=$O)))
-DEP.THING = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.THING = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += THING
 DSP.THING.NAME = thing

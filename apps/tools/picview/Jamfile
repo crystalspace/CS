@@ -3,7 +3,7 @@ SubDir TOP apps tools picview ;
 Application picview
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith picview : csgeom csgfx cssys cstool csutil csws ;
+LinkWith picview : csgeom csgfx cstool csutil csws ;
 
 Help picview : "Crystal Space Picture Viewer" ;
 

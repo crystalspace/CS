@@ -42,7 +42,7 @@ INF.XMLTINY = $(SRCDIR)/$(DIR.XMLTINY)/xmltiny.csplugin
 INC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.h))
 SRC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.cpp))
 OBJ.XMLTINY = $(addprefix $(OUT.XMLTINY)/,$(notdir $(SRC.XMLTINY:.cpp=$O)))
-DEP.XMLTINY = CSUTIL CSTOOL CSSYS CSUTIL
+DEP.XMLTINY = CSUTIL CSTOOL CSUTIL
 
 OUTDIRS += $(OUT.XMLTINY)
 

@@ -7,7 +7,7 @@ Library csws :
 	[ Wildcard skins/default : *.cpp *.h ]
 ;
 
-LibDepends csws : cstool csgfx csgeom csutil cssys ;
+LibDepends csws : cstool csgfx csgeom csutil ;
 Help csws : "Crystal Space Windowing System library" ;
 
 InstallConfig csws.cfg ;

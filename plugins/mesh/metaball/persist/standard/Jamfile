@@ -3,7 +3,7 @@ SubDir TOP plugins mesh metaball persist standard ;
 Plugin mballldr
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith mballldr : csgeom cssys csutil ;
+LinkWith mballldr : csgeom csutil ;
 
 Help mballldr : "MetaBalls mesh object loader" ;
 CompileGroups mballldr :  meshes ;

@@ -46,7 +46,7 @@ INF.SEQUENCE = $(SRCDIR)/plugins/sequence/sequence.csplugin
 INC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.h))
 SRC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.cpp))
 OBJ.SEQUENCE = $(addprefix $(OUT)/,$(notdir $(SRC.SEQUENCE:.cpp=$O)))
-DEP.SEQUENCE = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.SEQUENCE = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += SEQUENCE
 DSP.SEQUENCE.NAME = sequence

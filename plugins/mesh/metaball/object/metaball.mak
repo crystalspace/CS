@@ -46,7 +46,7 @@ INF.METABALL = $(SRCDIR)/plugins/mesh/metaball/object/metaball.csplugin
 INC.METABALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/object/*.h))
 SRC.METABALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/object/*.cpp))
 OBJ.METABALL = $(addprefix $(OUT)/,$(notdir $(SRC.METABALL:.cpp=$O)))
-DEP.METABALL = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.METABALL = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += METABALL
 DSP.METABALL.NAME = metaball

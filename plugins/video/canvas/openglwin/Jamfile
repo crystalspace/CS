@@ -5,7 +5,7 @@ if $(GL.AVAILABLE) = "yes" && $(TARGET.OS) = "WIN32"
 Plugin glwin32
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith glwin32 : openglcommon canvascommon csgeom cssys csutil ;
+LinkWith glwin32 : openglcommon canvascommon csgeom csutil ;
 ExternalLibs glwin32 :  GL ;
 
 Help glwin32 : "Crystal Space GL/Win32 2D driver" ;

@@ -42,7 +42,7 @@ INF.XMLREAD = $(SRCDIR)/$(DIR.XMLREAD)/xmlread.csplugin
 INC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.h))
 SRC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.cpp))
 OBJ.XMLREAD = $(addprefix $(OUT.XMLREAD)/,$(notdir $(SRC.XMLREAD:.cpp=$O)))
-DEP.XMLREAD = CSUTIL CSTOOL CSSYS CSUTIL
+DEP.XMLREAD = CSUTIL CSTOOL CSUTIL
 
 OUTDIRS += $(OUT.XMLREAD)
 

@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#    Automatic MSVC-compliant DSW and DSP generation component
+#    Automatic MSVC-compliant workspace and project generation component
 #    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
@@ -36,31 +36,24 @@
 #	bare-word project names upon which "grpplugins" should depend.
 #
 # *NOTE* CSSYS
-#	We use a special name, WIN32SYS, for the "cssys" library, rather than
-#	the expected name, CSSYS.  This is necessary for DSP generation since
-#	the cssys library must be composed of Windows-specific resources.
-#	Therefore, we can not use the standard SRC.CSSYS and INC.CSSYS
-#	variables (see CS/libs/cssys/cssys.mak), since they may reference
-#	inappropriate resources.  (Specifically, they may refer to resources
-#	for the platform, such as Unix, which is performing the DSW and DSP
-#	generation task.)  During the project file generation step, the name
-#	WIN32SYS is automatically substituted for CSSYS in the list of
-#	dependencies mentioned by a module's DEP.PROJECT variable.  Thus, any
-#	module which actually depends upon CSSYS is made to appear as though
-#	it really depends upon WIN32SYS.
+#	We override the INC.CSSYS and SRC.CSSYS variables from the
+#	platform-specific makefile since, for project file generation, the
+#	Windows-specific resources must be used.  We can not rely upon the
+#	default SRC.CSSYS and INC.CSSYS definitions (see
+#	CS/libs/cssys/cssys.mak) since they may reference inappropriate
+#	resources if the project is configured for a non-Windows platform.  For
+#	example, it is possible to generate the project files from Unix.
 #------------------------------------------------------------------------------
 
 # Macro to generate a type-augmented project list. (*NOTE* AUGMENTED)
 MSVC.DSP.AUGMENTED = $(foreach d,$(MSVC.DSP),$(DSP.$d.TYPE).$d)
 
-# libcssys -- system-dependent library for Windows. (*NOTE* CSSYS)
-MSVC.DSP += WIN32SYS
-DSP.WIN32SYS.NAME = cssys
-DSP.WIN32SYS.TYPE = library
-INC.WIN32SYS = \
+# Platform-specific implementation for Windows. (*NOTE* CSSYS)
+ifeq ($(DO_MSVCGEN),yes)
+INC.CSSYS = \
   $(wildcard $(SRCDIR)/include/cssys/win32/*.h) \
   $(wildcard $(SRCDIR)/libs/cssys/win32/*.h)
-SRC.WIN32SYS = \
+SRC.CSSYS = \
   $(wildcard $(SRCDIR)/libs/cssys/*.cpp $(SRCDIR)/libs/cssys/win32/*.cpp) \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
@@ -68,6 +61,7 @@ SRC.WIN32SYS = \
   $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
   $(SRCDIR)/libs/cssys/general/resdir.cpp \
   $(SRCDIR)/libs/cssys/general/runloop.cpp
+endif
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.

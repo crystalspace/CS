@@ -48,7 +48,7 @@ INC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/
 SRC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.cpp))
 OBJ.CASNDDRV = $(addprefix $(OUT)/,$(notdir $(SRC.CASNDDRV:.cpp=$O)))
 LIB.CASNDDRV.COREAUDIO = -framework CoreAudio
-DEP.CASNDDRV = CSUTIL CSSYS CSUTIL
+DEP.CASNDDRV = CSUTIL CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

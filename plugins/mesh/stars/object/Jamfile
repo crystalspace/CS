@@ -3,7 +3,7 @@ SubDir TOP plugins mesh stars object ;
 Plugin stars
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith stars : csgeom cssys csutil ;
+LinkWith stars : csgeom csutil ;
 
 Help stars : "Stars mesh object plug-in" ;
 CompileGroups stars :  meshes ;

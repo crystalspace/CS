@@ -6,8 +6,8 @@
 ##    Description: Is used to specify the location of header files for a
 ##    target or the whole project if no target is given.
 ##    This rule will automatically generate the -I compiler flags and makes
-##    sure the depndency scanner is able to locate your header files. The
-##    directoreis are relative to the current subdir specified with the SubDir
+##    sure the dependency scanner is able to locate your header files. The
+##    directories are relative to the current subdir specified with the SubDir
 ##    rule.
 ##    Implementation: The directories are simply added to the HDRS variable
 ##    which is respected by all jam rules.

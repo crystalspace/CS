@@ -39,7 +39,7 @@ INF.BALLLDR = $(SRCDIR)/plugins/mesh/ball/persist/standard/ballldr.csplugin
 INC.BALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/persist/standard/*.h))
 SRC.BALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/persist/standard/*.cpp))
 OBJ.BALLLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BALLLDR:.cpp=$O)))
-DEP.BALLLDR = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.BALLLDR = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += BALLLDR
 DSP.BALLLDR.NAME = ballldr

@@ -39,7 +39,7 @@ INF.HAZE = $(SRCDIR)/plugins/mesh/haze/object/haze.csplugin
 INC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.h))
 SRC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.cpp))
 OBJ.HAZE = $(addprefix $(OUT)/,$(notdir $(SRC.HAZE:.cpp=$O)))
-DEP.HAZE = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.HAZE = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += HAZE
 DSP.HAZE.NAME = haze

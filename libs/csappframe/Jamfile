@@ -5,5 +5,5 @@ Library csappframe
 ;
 
 Help csappframe : "Crystal Space application framework" ;
-LibDepends csappframe : cstool csutil cssys ;
+LibDepends csappframe : cstool csutil ;
 

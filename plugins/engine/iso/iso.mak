@@ -41,7 +41,7 @@ INF.ISO = $(SRCDIR)/$(DIR.ISO)/iso.csplugin
 INC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.h))
 SRC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.cpp))
 OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
-DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
+DEP.ISO = CSUTIL CSGEOM CSGFX CSUTIL
 
 OUTDIRS += $(OUT.ISO)
 

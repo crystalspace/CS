@@ -37,7 +37,7 @@ the feature. The most useful documentation comes first.
 
 @itemize @bullet
 @item
-Geometrical utility library with stuff like 2D and 3D vectors,
+Geometric utility library with handy classes such as 2D and 3D vectors,
 matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
 box routines, rectangle subdivision, @dots{}. @xref{csGeom}.
 
@@ -45,11 +45,6 @@ box routines, rectangle subdivision, @dots{}. @xref{csGeom}.
 General utility library with stuff like templated arrays, smart pointer,
 hashmap, object registry, plugin manager, radix sort, bit array, optimized
 allocators, strings, @dots{}. @xref{csUtil}.
-
-@item
-System library for making abstraction of system dependent stuff like
-threads, getting system environment, unicode support, endian support,
-processor capabilities, @dots{}. @xref{csSys}.
 
 @item
 Higher level tool library containing things like some example procedural

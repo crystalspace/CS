@@ -39,7 +39,7 @@ INF.LGHTNG = $(SRCDIR)/plugins/mesh/lghtng/object/lghtng.csplugin
 INC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.h))
 SRC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.cpp))
 OBJ.LGHTNG = $(addprefix $(OUT)/,$(notdir $(SRC.LGHTNG:.cpp=$O)))
-DEP.LGHTNG = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.LGHTNG = CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += LGHTNG
 DSP.LGHTNG.NAME = lghtng

@@ -3,7 +3,7 @@ SubDir TOP plugins documentsystem xmlread ;
 Plugin xmlread
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith xmlread : cssys cstool csutil ;
+LinkWith xmlread : cstool csutil ;
 
 Help xmlread : "Crystal Space XMLRead document system" ;
 

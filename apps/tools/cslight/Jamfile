@@ -3,7 +3,7 @@ SubDir TOP apps tools cslight ;
 Application cslight
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cslight : csgeom csgfx cssys cstool csutil ;
+LinkWith cslight : csgeom csgfx cstool csutil ;
 
 Help cslight : "Crystal Space Lighting Calculator" ;
 

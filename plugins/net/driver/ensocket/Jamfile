@@ -5,7 +5,7 @@ if $(SOCKET.AVAILABLE) = "yes"
 Plugin ensocket
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith ensocket : cssys csutil ;
+LinkWith ensocket : csutil ;
 ExternalLibs ensocket :  SOCKET ;
 
 Help ensocket : "Crystal Space ensocket network driver" ;

@@ -3,7 +3,7 @@ SubDir TOP plugins mesh metaball object ;
 Plugin metaball
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith metaball : csgeom cssys csutil ;
+LinkWith metaball : csgeom csutil ;
 
 Help metaball : "MetaBalls mesh object plug-in" ;
 CompileGroups metaball :  meshes ;

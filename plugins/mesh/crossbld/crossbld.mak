@@ -39,7 +39,7 @@ INF.CROSSBLD = $(SRCDIR)/plugins/mesh/crossbld/crossbld.csplugin
 INC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.h))
 SRC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.cpp))
 OBJ.CROSSBLD = $(addprefix $(OUT)/,$(notdir $(SRC.CROSSBLD:.cpp=$O)))
-DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSGEOM
+DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSUTIL CSGEOM
 
 MSVC.DSP += CROSSBLD
 DSP.CROSSBLD.NAME = crossbld

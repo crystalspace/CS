@@ -39,7 +39,7 @@ INF.MD2IE = $(SRCDIR)/plugins/mesh/impexp/md2/md2ie.csplugin
 INC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.h))
 SRC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.cpp))
 OBJ.MD2IE = $(addprefix $(OUT)/,$(notdir $(SRC.MD2IE:.cpp=$O)))
-DEP.MD2IE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
+DEP.MD2IE = CSGEOM CSUTIL CSUTIL CSTOOL CSUTIL CSGEOM
 
 MSVC.DSP += MD2IE
 DSP.MD2IE.NAME = md2ie

@@ -4,7 +4,7 @@ Application eventtest
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith eventtest : cssys cstool csutil ;
+LinkWith eventtest : cstool csutil ;
 
 Help eventtest : "Crystal Space eventtest tester" ;
 

@@ -51,7 +51,7 @@ INC.RENDLOOP_LOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDLOOP_LOADER)/*
 SRC.RENDLOOP_LOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDLOOP_LOADER)/*.cpp \
   plugins/engine/renderloop/common/parserenderstep.cpp)) 
 OBJ.RENDLOOP_LOADER = $(addprefix $(OUT.RENDLOOP_LOADER)/,$(notdir $(SRC.RENDLOOP_LOADER:.cpp=$O)))
-DEP.RENDLOOP_LOADER = CSSYS CSUTIL
+DEP.RENDLOOP_LOADER = CSUTIL
 
 OUTDIRS += $(OUT.RENDLOOP_LOADER)
 

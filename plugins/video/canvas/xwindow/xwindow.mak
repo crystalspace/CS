@@ -57,7 +57,7 @@ INC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
 SRC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/canvas/xwindow/*.cpp plugins/video/canvas/common/x11-keys.cpp))
 OBJ.XWIN = $(addprefix $(OUT)/,$(notdir $(SRC.XWIN:.cpp=$O)))
-DEP.XWIN = CSUTIL CSSYS CSGEOM CSUTIL
+DEP.XWIN = CSUTIL CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -5,7 +5,7 @@ if $TARGET_DISABLED && ""
 Plugin oglglide
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith oglglide : cssys csutil ;
+LinkWith oglglide : csutil ;
 
 Help oglglide : "Crystal Space Glide GL/X 2D driver" ;
 

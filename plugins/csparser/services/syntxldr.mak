@@ -42,7 +42,7 @@ INF.CSSYNLDR = $(SRCDIR)/plugins/csparser/services/cssynldr.csplugin
 INC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.h))
 SRC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.cpp))
 OBJ.CSSYNLDR = $(addprefix $(OUT)/,$(notdir $(SRC.CSSYNLDR:.cpp=$O)))
-DEP.CSSYNLDR = CSGFX CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL
+DEP.CSSYNLDR = CSGFX CSUTIL CSTOOL CSUTIL CSGEOM CSTOOL
 
 MSVC.DSP += CSSYNLDR
 DSP.CSSYNLDR.NAME = cssynldr

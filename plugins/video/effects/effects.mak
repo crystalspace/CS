@@ -46,7 +46,7 @@ INF.EFFECTS = $(SRCDIR)/plugins/video/effects/effects.csplugin
 INC.EFFECTS = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/effects/*.h))
 SRC.EFFECTS = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/effects/*.cpp))
 OBJ.EFFECTS = $(addprefix $(OUT)/,$(notdir $(SRC.EFFECTS:.cpp=$O)))
-DEP.EFFECTS = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.EFFECTS = CSTOOL CSGEOM CSUTIL CSUTIL
 
 TO_INSTALL.CONFIG += $(CFG.EFFECTS)
 

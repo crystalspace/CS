@@ -48,7 +48,7 @@ INF.SVGA2D = $(SRCDIR)/plugins/video/canvas/svgalib/svga2d.csplugin
 INC.SVGA2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D)))
 SRC.SVGA2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.SVGA2D = $(addprefix $(OUT)/,$(notdir $(SRC.SVGA2D:.cpp=$O)))
-DEP.SVGA2D = CSUTIL CSSYS CSUTIL
+DEP.SVGA2D = CSUTIL CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

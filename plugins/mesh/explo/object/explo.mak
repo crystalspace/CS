@@ -39,7 +39,7 @@ INF.EXPLO = $(SRCDIR)/plugins/mesh/explo/object/explo.csplugin
 INC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.h plugins/mesh/partgen/*.h))
 SRC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.EXPLO = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLO:.cpp=$O)))
-DEP.EXPLO = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
+DEP.EXPLO = CSTOOL CSGEOM CSUTIL CSUTIL
 
 MSVC.DSP += EXPLO
 DSP.EXPLO.NAME = explo

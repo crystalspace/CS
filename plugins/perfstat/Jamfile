@@ -3,7 +3,7 @@ SubDir TOP plugins perfstat ;
 Plugin perfstat
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith perfstat : csgeom cssys csutil ;
+LinkWith perfstat : csgeom csutil ;
 
 Help perfstat : "Crystal Space performance statistics plug-in" ;
 

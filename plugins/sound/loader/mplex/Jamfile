@@ -3,7 +3,7 @@ SubDir TOP plugins sound loader mplex ;
 Plugin sndplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndplex : cssys csutil ;
+LinkWith sndplex : csutil ;
 
 Help sndplex : "Crystal Space sndplex sound loader" ;
 CompileGroups sndplex :  soundloaders ;

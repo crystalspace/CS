@@ -4,7 +4,7 @@ Application vsh
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
-LinkWith vsh : csgeom csgfx cssys cstool csutil ;
+LinkWith vsh : cstool csutil ;
 
 Help vsh : "Crystal Space Virtual Shell tool" ;
 

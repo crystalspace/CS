@@ -42,7 +42,7 @@ INF.NETMAN = $(SRCDIR)/plugins/net/manager/netman.csplugin
 INC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.h))
 SRC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.cpp))
 OBJ.NETMAN = $(addprefix $(OUT)/,$(notdir $(SRC.NETMAN:.cpp=$O)))
-DEP.NETMAN = CSUTIL CSSYS CSUTIL
+DEP.NETMAN = CSUTIL CSUTIL
 
 MSVC.DSP += NETMAN
 DSP.NETMAN.NAME = netman

@@ -5,7 +5,7 @@ if $(XFREE86VM.AVAILABLE) = "yes"
 Plugin xext86vm
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith xext86vm : cssys csutil ;
+LinkWith xext86vm : csutil ;
 ExternalLibs xext86vm :  XFREE86VM ;
 
 Help xext86vm : "Crystal Space X-Extension Video Mode Plugin" ;

@@ -3,7 +3,7 @@ SubDir TOP apps tests r3dtest ;
 Application r3dtest
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith r3dtest : csgeom csgfx cssys cstool csutil ;
+LinkWith r3dtest : csgeom csgfx cstool csutil ;
 
 CompileGroups rendstep_stencil : nrall ;
 CompileGroups rendstep_std : nrall ;

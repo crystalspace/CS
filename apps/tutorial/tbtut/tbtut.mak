@@ -32,7 +32,7 @@ OUT.TBTUT = $(OUT)/$(DIR.TBTUT)
 INC.TBTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBTUT)/*.h ))
 SRC.TBTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBTUT)/*.cpp ))
 OBJ.TBTUT = $(addprefix $(OUT.TBTUT)/,$(notdir $(SRC.TBTUT:.cpp=$O)))
-DEP.TBTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+DEP.TBTUT = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.TBTUT = $(foreach d,$(DEP.TBTUT),$($d.LIB))
 
 OUTDIRS += $(OUT.TBTUT)

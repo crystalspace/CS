@@ -3,7 +3,7 @@ SubDir TOP apps isomap ;
 Application isomap
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith isomap : csgeom csgfx cssys cstool csutil ;
+LinkWith isomap : csgeom csgfx cstool csutil ;
 
 Help isomap : "Crystal Space isomap demo executable" ;
 

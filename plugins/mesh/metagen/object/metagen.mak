@@ -46,7 +46,7 @@ INF.METAGEN = $(SRCDIR)/plugins/mesh/metagen/object/metagen.csplugin
 INC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.h))
 SRC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.cpp))
 OBJ.METAGEN = $(addprefix $(OUT)/,$(notdir $(SRC.METAGEN:.cpp=$O)))
-DEP.METAGEN = CSGEOM CSUTIL CSSYS
+DEP.METAGEN = CSGEOM CSUTIL
 
 MSVC.DSP += METAGEN
 DSP.METAGEN.NAME = metagen

@@ -3,7 +3,7 @@ SubDir TOP apps pysimp ;
 Application pysimp
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith pysimp : csgeom csgfx cssys cstool csutil ;
+LinkWith pysimp : csgeom csgfx cstool csutil ;
 
 Help pysimp : "Crystal Space Python example" ;
 

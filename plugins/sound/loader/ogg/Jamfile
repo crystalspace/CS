@@ -5,7 +5,7 @@ if $(VORBISFILE.AVAILABLE) = "yes"
 Plugin sndogg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndogg : soundloadercommon cssys csutil ;
+LinkWith sndogg : soundloadercommon csutil ;
 ExternalLibs sndogg :  VORBISFILE ;
 
 Help sndogg : "Crystal Space ogg vorbis sound loader" ;

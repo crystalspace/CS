@@ -6,7 +6,7 @@ if $(ZLIB.AVAILABLE) = "yes"
 Plugin vfs :
 	[ Wildcard *.cpp *.h ]
 ;
-LinkWith vfs : cssys csutil ;
+LinkWith vfs : csutil ;
 ExternalLibs vfs : ZLIB ;
 
 Help vfs : "Virtual File System plug-in" ;

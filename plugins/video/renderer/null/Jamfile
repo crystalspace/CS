@@ -3,7 +3,7 @@ SubDir TOP plugins video renderer null ;
 Plugin null3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith null3d : renderercommon csgeom csgfx cssys csutil ;
+LinkWith null3d : renderercommon csgeom csgfx csutil ;
 
 Help null3d : "Crystal Space null 3D renderer" ;
 CompileGroups null3d :  drivers3d ;

@@ -6,7 +6,7 @@ if $(COREAUDIO.AVAILABLE) = "yes"
 Plugin casnddrv
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith casnddrv : cssys csutil ;
+LinkWith casnddrv : csutil ;
 ExternalLibs casnddrv : COREAUDIO ;
 
 Help casnddrv : "Crystal Space MacOS/X CoreAudio sound driver" ;

@@ -3,7 +3,7 @@ SubDir TOP plugins mesh fountain object ;
 Plugin fountain
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fountain : partgen cstool csgeom cssys csutil ;
+LinkWith fountain : partgen cstool csgeom csutil ;
 
 Help fountain : "Fountain mesh object plug-in" ;
 CompileGroups fountain :  meshes ;

@@ -3,7 +3,7 @@ SubDir TOP plugins documentsystem xmltiny ;
 Plugin xmltiny
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith xmltiny : cssys cstool csutil ;
+LinkWith xmltiny : cstool csutil ;
 
 Help xmltiny : "Crystal Space TinyXML document system" ;
 

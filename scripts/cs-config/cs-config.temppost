@@ -2,13 +2,13 @@
 depends()
 {
     case $1 in
-	-lcsutil) DEPS="-lcssys -lcsgeom";;
-	-lcssys) DEPS="-lcsutil";;
-	-lcsengine) DEPS="-lcssys -lcsutil -lcstool -lcsgeom";;
-	-lcsgeom) DEPS="-lcsutil -lcssys";;
-	-lcsgfx) DEPS="-lcssys -lcsutil";;
-	-lcstool) DEPS="-lcsgfx -lcsutil -lcssys -lcsgeom";;
-	-lcsws) DEPS="-lcsgfx -lcstool -lcsgeom -lcsutil -lcssys";;
+	-lcsappframe) DEPS="-lcstool -lcsutil" ;;
+	-lcsutil) DEPS="" ;;
+	-lcsengine) DEPS="-lcstool -lcsgeom -lcsutil" ;;
+	-lcsgeom) DEPS="-lcsutil" ;;
+	-lcsgfx) DEPS="-lcsutil" ;;
+	-lcstool) DEPS="-lcsgfx -lcsgeom -lcsutil" ;;
+	-lcsws) DEPS="-lcsgfx -lcsgeom -lcstool -lcsutil" ;;
 	*)
 	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
 	    findcexfile "$CEXFILE"
@@ -26,19 +26,19 @@ depends()
 lflags=""
 
 #A standard installation
-if test -r "${exec_prefix}/lib/libcssys.a"; then
+if test -r "${exec_prefix}/lib/libcsutil.a"; then
     lflags="-L${exec_prefix}/lib"
 fi
 #is it an old make type build?
 if test -z "$libdir" -a -r "$prefix/Makefile" \
-     -a -r "$prefix/$makeout/libcssys.a"; then
+     -a -r "$prefix/$makeout/libcsutil.a"; then
     lflags="-L$prefix/$makeout"
 fi
 #new style jam build?
 if test -z "$libdir" -a -r "$prefix/Jamfile" \
-     -a -r "$prefix/$makeout/libs/cssys/libcssys.a"; then
+     -a -r "$prefix/$makeout/libs/csutil/libcsutil.a"; then
     libd=$prefix/$makeout/libs
-    lflags="-L$libd/cssys -L$libd/csutil -L$libd/cstool -L$libd/csengine -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
+    lflags="-L$libd/csutil -L$libd/cstool -L$libd/csengine -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
 fi
 
 usage()
@@ -58,10 +58,10 @@ Options:
 	[--makevars]
 	[--help]
 Libraries:
+	csappframe
 	csengine
 	csgeom
 	csgfx
-	cssys
 	cstool
 	csutil
 	csws
@@ -228,8 +228,8 @@ while test $# -gt 0; do
     --libs)
 	show_libs=true
 	;;
-    cssys)
-	addlib "-lcssys"
+    csappframe)
+	addlib "-lcsappframe"
 	;;
     csengine)
 	addlib "-lcsengine"
@@ -285,18 +285,16 @@ else
 fi    
     
 if test -n "$show_libs"; then
-    #if users specified no lib, output all
+    # if users specified no lib, output commonly needed ones
+    # we omit csengine because most client apps should use the engine plugin
     if test -z "$the_libs"; then
+	addlib "-lcsappframe"
         addlib "-lcsgfx"
         addlib "-lcsgeom"
         addlib "-lcstool"
         addlib "-lcsutil"
-        addlib "-lcssys"
     fi
-    # There are multiple levels of circular dependencies between csutil and
-    # cssys, so we need to ensure that they appear multiple times.
-    the_libs="${lflags} $the_libs $the_libs $the_libs ${syslibs}"
-
+    the_libs="${lflags} $the_libs ${syslibs}"
     echo "$the_libs"
 fi
 

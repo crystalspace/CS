@@ -32,7 +32,7 @@ OUT.SIMPVS = $(OUT)/$(DIR.SIMPVS)
 INC.SIMPVS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPVS)/*.h ))
 SRC.SIMPVS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPVS)/*.cpp ))
 OBJ.SIMPVS = $(addprefix $(OUT.SIMPVS)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
-DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSGEOM CSUTIL
 LIB.SIMPVS = $(foreach d,$(DEP.SIMPVS),$($d.LIB))
 
 OUTDIRS += $(OUT.SIMPVS)
