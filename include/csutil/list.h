@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 by Mårten Svanfeldt
+    Copyright (C) 2003 by Marten Svanfeldt
     influenced by Aapl by Adrian Thurston <adriant@ragel.ca>
 
     This program is free software; you can redistribute it and/or modify

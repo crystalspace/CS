@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2002 by Mårten Svanfeldt
-    Written by Mårten Svanfeldt
+    Copyright (C) 2002 by Marten Svanfeldt
+    Written by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -4775,7 +4775,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   statecache->Disable_GL_ALPHA_TEST ();
 
   //@@@EXPERIMENTAL!!
-  //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
+  //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Marten Svanfeldt
 
   int maxlayers = 0;
   for (int p=0 ; p<ci.technique->GetPassCount () ; p++)
@@ -6127,7 +6127,7 @@ void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle,
 
 
 ///@@@EXPERIMENTAL!!
-///CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
+///CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Marten Svanfeldt
 bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechnique* technique )
 {
   int p, l;

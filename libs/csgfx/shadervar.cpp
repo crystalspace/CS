@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002-2003 by Mårten Svanfeldt
+    Copyright (C) 2002-2003 by Marten Svanfeldt
                   2002      by Anders Stenberg
 
     This library is free software; you can redistribute it and/or

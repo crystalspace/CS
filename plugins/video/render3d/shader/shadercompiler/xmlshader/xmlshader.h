@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 by Mårten Svanfeldt
+  Copyright (C) 2003 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public

@@ -1,7 +1,7 @@
 /*
     Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
-    Extended (and some methods removed) to 4 component by Mårten
+    Extended (and some methods removed) to 4 component by Marten
     Svanfeldt
 
     This library is free software; you can redistribute it and/or
