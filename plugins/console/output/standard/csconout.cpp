@@ -68,6 +68,8 @@ csConsoleOutput::csConsoleOutput (iBase *base)
   Client = NULL;
   G3D = NULL;
   G2D = NULL;
+  // clear font for closedown
+  font = NULL;
   System = NULL;
 }
 

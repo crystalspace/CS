@@ -78,7 +78,8 @@ IMPLEMENT_EMBEDDED_IBASE(csThing::MeshObjectFactory)
   IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing () : csObject (), polygons (64, 64), curves (16, 16)
+csThing::csThing (iBase* parent) : csObject (parent),
+	polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -2416,7 +2417,7 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 
 iMeshObject* csThing::MeshObjectFactory::NewInstance ()
 {
-  csThing* thing = new csThing ();
+  csThing* thing = new csThing (scfParent);
   thing->MergeTemplate (&(scfParent->scfiThingState), NULL);
   return &thing->scfiMeshObject;
 }
@@ -2446,13 +2447,14 @@ csThingObjectType::~csThingObjectType ()
 
 bool csThingObjectType::Initialize (iSystem* pSystem)
 {
+  iSCF::SCF->RegisterStaticClass (thing_scfInitialize (iSCF::SCF));
   System = pSystem;
   return true;
 }
 
 iMeshObjectFactory* csThingObjectType::NewFactory ()
 {
-  csThing* cm = new csThing ();
+  csThing* cm = new csThing (this);
   iMeshObjectFactory* ifact = QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;

@@ -309,7 +309,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing ();
+  csThing (iBase* parent);
 
   /// Destructor.
   virtual ~csThing ();

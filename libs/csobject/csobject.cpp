@@ -102,9 +102,9 @@ IMPLEMENT_IBASE (csObject)
   IMPLEMENTS_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
-csObject::csObject () : Children (NULL), Name (NULL)
+csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
 {
-  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_IBASE (pParent);
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;

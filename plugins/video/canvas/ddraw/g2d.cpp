@@ -206,6 +206,11 @@ bool csGraphics2DDDraw3::GetDoubleBufferState ()
 void csGraphics2DDDraw3::Print (csRect *area)
 {
   bool loop = true;
+
+  // do we have a primary surface?
+  if(!m_lpddsPrimary)
+	  return;
+
   while (loop)
   {
     HRESULT hRet;

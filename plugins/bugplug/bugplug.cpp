@@ -564,7 +564,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
 void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 {
   const char* mn = meshfact->QueryObject ()->GetName ();
-  System->Printf (MSG_DEBUG_0, "    Mesh factory wrapper '%s' (%08lx)\n",
+  System->Printf (MSG_DEBUG_0, "        Mesh factory wrapper '%s' (%08lx)\n",
   	mn ? mn : "?", meshfact);
 }
 

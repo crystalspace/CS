@@ -26,6 +26,15 @@ The history order is reversed so that new features are at the top.
 	  'mipmap', 'inter', and 'fclear' debug commands from walktest
 	  since BugPlug can do those now.
 	- Fixed a crash at exit bug in OpenGL renderer.
+	- Extended csObject with an optional 'parent' object (NULL by default).
+	  This can be used to create csObject's with another SCF parent.
+	- csThing now sets up the SCF parent chain. This is to try to make sure
+	  that csThing will now implement iFactory indirectly. Unfortunatelly
+	  it still doesn't work.
+	- Gregory Austwick (g.austwick@virgin.net) contributed a few patches
+	  to CS: fix for dungeon plugin, fix for standard output console,
+	  fix for DDraw canvas and a fix in the DirectDetection code
+	  for Windows.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

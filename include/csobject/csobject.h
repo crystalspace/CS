@@ -48,7 +48,7 @@ protected:
 
 public:
   /// Initialize the csObject
-  csObject ();
+  csObject (iBase* pParent = NULL);
   /// Destroy this object and the associated children
   virtual ~csObject ();
 
