@@ -88,9 +88,9 @@ static void MIPMAP_NAME (unsigned int w, unsigned int h, const csRGBpixel *src, 
 #ifndef MIPMAP_ALPHA
 # ifdef MIPMAP_PALETTED
   // retrieve a source pixel as RGB
-#  define MIPMAP_RGB(p)		*(uint32 *)((unsigned long)pal + (long)p)
+#  define MIPMAP_RGB(p)		*((uint32 *)pal + *((uint8*)p))
   // check if source pixel is transparent
-#  define MIPMAP_ISKEY(p)	((unsigned int)p == (unsigned int)transp)
+#  define MIPMAP_ISKEY(p)	((unsigned int)(*((uint8*)p)) == (unsigned int)transp)
 # else
 #  define MIPMAP_RGB(p)		*(uint32 *)p
 #  define MIPMAP_ISKEY(p)	(*(uint32 *)p == *(uint32 *)( (intptr_t)&transp))

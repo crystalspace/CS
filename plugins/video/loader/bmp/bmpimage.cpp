@@ -359,7 +359,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
     else
       return false;
 
-    ConvertFromPal8 (buffer, palette, 16);
+    ConvertFromPal8 (buffer, 0, palette, 16);
     return true;
   }
   else if (BITCOUNT(iBuffer) == _256Color)
@@ -443,7 +443,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
       }
     }
     // Now transform the image data to target format
-    ConvertFromPal8 (buffer, palette);
+    ConvertFromPal8 (buffer, 0, palette);
     return true;
   }
   else if (BITCOUNT(iBuffer) == TRUECOLOR24)

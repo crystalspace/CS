@@ -50,30 +50,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTGAImageIO);
 
-
-/* Header definition. */
-struct TGAheader
-{
-  unsigned char IDLength;		/* length of Identifier String */
-  unsigned char CoMapType;		/* 0 = no map */
-  unsigned char ImgType;		/* image type (see below for values) */
-  unsigned char Index_lo, Index_hi;	/* index of first color map entry */
-  unsigned char Length_lo, Length_hi;	/* number of entries in color map */
-  unsigned char CoSize;			/* size of color map entry (15,16,24,32) */
-  unsigned char X_org_lo, X_org_hi;	/* x origin of image */
-  unsigned char Y_org_lo, Y_org_hi;	/* y origin of image */
-  unsigned char Width_lo, Width_hi;	/* width of image */
-  unsigned char Height_lo, Height_hi;	/* height of image */
-  unsigned char PixelSize;		/* pixel size (8,16,24,32) */
-  /* 
-    bits 7-6, interleaving flag
-    bit  5, origin: 0=lower left, 1=upper left
-    bit  4, reserved
-    bits 3-0, number of attribute bits per pixel 
-   */
-  unsigned char flags;
-};
-
 typedef char ImageIDField[256];
 
 /* Definitions for image types. */
@@ -102,16 +78,7 @@ typedef char ImageIDField[256];
 #define CSTGA_ID "Made with Crystal Space, see http://www.crystalspace3d.org/"
 #define TGA_MIME "image/tga"
 
-static int mapped, rlencoded;
-
-CS_IMPLEMENT_STATIC_VAR (GetColorMap, csRGBpixel, [MAXCOLORS])
-
-static int RLE_count = 0, RLE_flag = 0;
-
-static void readtga (uint8*& ptr, struct TGAheader* tgaP);
-static void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
-static void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
-
+//CS_IMPLEMENT_STATIC_VAR (GetColorMap, csRGBpixel, [MAXCOLORS])
 
 static iImageIO::FileFormatDescription formatlist[6] =
 {
@@ -148,8 +115,8 @@ const csImageIOFileFormatDescriptions& csTGAImageIO::GetDescription ()
 
 csPtr<iImage> csTGAImageIO::Load (iDataBuffer* buf, int iFormat)
 {
-  ImageTgaFile* i = new ImageTgaFile (iFormat);
-  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
+  ImageTgaFile* i = new ImageTgaFile (object_reg, iFormat);
+  if (i && !i->Load (buf))
   {
      delete i ;
     return 0;
@@ -267,6 +234,15 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, const char *mime,
 
 //---------------------------------------------------------------------------
 
+csRef<iImageFileLoader> ImageTgaFile::InitLoader (csRef<iDataBuffer> source)
+{
+  csRef<TgaLoader> loader;
+  loader.AttachNew (new TgaLoader (Format, source));
+  if (!loader->InitOk()) return 0;
+  return loader;
+}
+
+#if 0
 bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
 {
   (void)iSize;
@@ -274,42 +250,6 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
   int i;
   unsigned int temp1, temp2;
   int rows, cols, row, col, realrow, truerow, baserow;
-
-  /* @@todo: Add TGA format detection */
-
-  /* Read the Targa file header. */
-  readtga (iBuffer, &tga_head);
-
-  rows = (int (tga_head.Height_lo)) + (int (tga_head.Height_hi)) * 256;
-  cols = (int (tga_head.Width_lo))  + (int (tga_head.Width_hi))  * 256;
-
-  switch (tga_head.ImgType)
-  {
-    case TGA_Map:
-    case TGA_RGB:
-    case TGA_Mono:
-    case TGA_RLEMap:
-    case TGA_RLERGB:
-    case TGA_RLEMono:
-      break;
-
-    default:
-      return false;
-  }
-
-  if (tga_head.ImgType == TGA_Map ||
-      tga_head.ImgType == TGA_RLEMap ||
-      tga_head.ImgType == TGA_CompMap ||
-      tga_head.ImgType == TGA_CompMap4)
-  { /* Color-mapped image */
-    if (tga_head.CoMapType != 1)
-      return false;
-    mapped = 1;
-  }
-  else
-  { /* Not colormap */
-    mapped = 0;
-  }
 
   /* If required, read the color map information. */
   if (tga_head.CoMapType != 0)
@@ -364,12 +304,10 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
 
   return true;
 }
+#endif
 
-
-static void readtga (uint8*& iBuffer, TGAheader* tgaP)
+void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
 {
-//  unsigned char flags;
-
   tgaP->IDLength = *iBuffer++;
   tgaP->CoMapType = *iBuffer++;
   tgaP->ImgType = *iBuffer++;
@@ -393,9 +331,12 @@ static void readtga (uint8*& iBuffer, TGAheader* tgaP)
     iBuffer += tgaP->IDLength;
 }
 
-static void get_map_entry (uint8*& iBuffer, csRGBpixel* Value, int Size, bool alpha)
+void ImageTgaFile::TgaLoader::get_map_entry (uint8*& iBuffer, 
+					     csRGBpixel* Value, int Size, 
+					     bool alpha)
 {
   unsigned char j, k;
+  uint l;
 
   /* Read appropriate number of bytes, break into rgb & put in map. */
   switch (Size)
@@ -408,9 +349,13 @@ static void get_map_entry (uint8*& iBuffer, csRGBpixel* Value, int Size, bool al
     case 15:				/* Watch for byte order. */
       j = *iBuffer++;
       k = *iBuffer++;
-      Value->red = (k & 0x7C) >> 2;
-      Value->green = ((k & 0x03) << 3) + ((j & 0xE0) >> 5);
-      Value->blue = j & 0x1F;
+      l = ((unsigned int) k << 8)  + j;
+      Value->red = (k & 0x7C) << 1;
+      Value->red |= Value->red >> 5;
+      Value->green = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
+      Value->green |= Value->green >> 5;
+      Value->blue = (j & 0x1F) << 3;
+      Value->blue |= Value->blue >> 5;
       break;
 
     case 32:
@@ -430,10 +375,11 @@ static void get_map_entry (uint8*& iBuffer, csRGBpixel* Value, int Size, bool al
   }
 }
 
-static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
+void ImageTgaFile::TgaLoader::get_pixel (uint8*& iBuffer, csRGBpixel* dest, 
+					 int Size, bool alpha)
 {
-  static int Red, Grn, Blu, Alpha;
-  static unsigned int l;
+  //int Red, Grn, Blu, Alpha;
+  unsigned int l;
   unsigned char j, k;
 
   /* Check if run length encoded. */
@@ -504,9 +450,110 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
 
 PixEncode:
   if (mapped)
-    *dest = GetColorMap() [l];
+    *dest = colorMap[l];
   else
   {
     dest->red = Red; dest->green = Grn; dest->blue = Blu; dest->alpha = Alpha;
   }
 }
+
+ImageTgaFile::TgaLoader::~TgaLoader()
+{
+  delete[] colorMap;
+}
+
+bool ImageTgaFile::TgaLoader::InitOk()
+{
+  iBuffer = dataSource->GetUint8();
+  readtga (iBuffer, &tga_head);
+
+  switch (tga_head.ImgType)
+  {
+    case TGA_Map:
+    case TGA_RGB:
+    case TGA_Mono:
+    case TGA_RLEMap:
+    case TGA_RLERGB:
+    case TGA_RLEMono:
+      break;
+
+    default:
+      return false;
+  }
+
+  Height = (int (tga_head.Height_lo)) + (int (tga_head.Height_hi)) * 256;
+  Width = (int (tga_head.Width_lo))  + (int (tga_head.Width_hi))  * 256;
+
+  if (tga_head.ImgType == TGA_Map ||
+      tga_head.ImgType == TGA_RLEMap ||
+      tga_head.ImgType == TGA_CompMap ||
+      tga_head.ImgType == TGA_CompMap4)
+  { /* Color-mapped image */
+    if (tga_head.CoMapType != 1)
+      return false;
+    mapped = true;
+  }
+  else
+  { /* Not colormap */
+    mapped = false;
+  }
+
+  /* If required, read the color map information. */
+  if (tga_head.CoMapType != 0)
+  {
+    uint temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
+    uint temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
+    if ((temp1 + temp2 + 1) >= MAXCOLORS)
+      return false;
+  }
+
+  dataType = rdtRGBpixel;
+
+  return true;
+}
+
+bool ImageTgaFile::TgaLoader::LoadData ()
+{
+  if (tga_head.CoMapType != 0)
+  {
+    uint temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
+    uint temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
+    colorMap = new csRGBpixel [temp1 + temp2];
+    for (int i = temp1; i < int (temp1 + temp2); ++i)
+      get_map_entry (iBuffer, colorMap + i, tga_head.CoSize,
+        Format & CS_IMGFMT_ALPHA);
+  }
+
+  /* Check run-length encoding. */
+  rlencoded = (tga_head.ImgType == TGA_RLEMap ||
+               tga_head.ImgType == TGA_RLERGB ||
+               tga_head.ImgType == TGA_RLEMono);
+
+  // @@todo: avoid converting colormapped images into RGB,
+  // instead pass a pointer to convert_pal8
+  rgbaData = new csRGBpixel [Width * Height];
+
+  int truerow = 0;
+  int baserow = 0;
+  for (int row = 0; row < Height; ++row)
+  {
+    int realrow = truerow;
+    if ((tga_head.flags & TGA_Org_MASK) == TGA_Org_BL)
+      realrow = Height - realrow - 1;
+
+    for (int col = 0; col < Width; ++col)
+      get_pixel (iBuffer, rgbaData + (realrow * Width + col),
+        (int) tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
+    if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Four)
+      truerow += 4;
+    else if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Two)
+      truerow += 2;
+    else
+      ++truerow;
+    if (truerow >= Height)
+      truerow = ++baserow;
+  }
+
+  return true;
+}
+

@@ -17,40 +17,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file
- * Some helper functions to deal with iImage objects.
- */
- 
-/**\addtogroup gfx
- * @{ 
- */
+#ifndef __CS_IUTIL_JOB_H__
+#define __CS_IUTIL_JOB_H__
 
-#ifndef __CS_CSGFX_IMAGETOOLS_H__
-#define __CS_CSGFX_IMAGETOOLS_H__
+#include "csutil/scf.h"
 
-#include "csextern.h"
-#include "igraphic/image.h"
+SCF_VERSION (iJob, 0, 0, 1);
 
-/**
- * Some helper functions to deal with iImage objects.
- */
-class CS_CSGFX_EXPORT csImageTools
+struct iJob : public iBase
 {
-public:
-  /// Compute the size of an image data, in bytes.
-  static inline size_t ComputeDataSize (iImage* img) 
-  {
-    return img->GetWidth() * img->GetHeight() * 
-      (((img->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8) ? 1 : 
-      sizeof (csRGBpixel));
-  }
-  /**
-   * Return the closest palette index to given color. 
-   */
-  static int ClosestPaletteIndex (const csRGBpixel* Palette, 
-    const csRGBpixel& iColor, int palEntries = 256);
+  virtual void Run() = 0;
 };
 
-/** @} */
+SCF_VERSION (iJobQueue, 0, 0, 1);
 
-#endif // __CS_CSGFX_IMAGETOOLS_H__
+struct iJobQueue : public iBase
+{
+  virtual void Enqueue (iJob* job) = 0;
+  virtual void PullAndRun (iJob* job) = 0;
+};
+
+#endif // __CS_IUTIL_JOB_H__

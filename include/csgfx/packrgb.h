@@ -185,6 +185,24 @@ struct csPackRGB
     }
     return buf;
   }
+  /**
+   * Unpack a RGB byte array into an array of csRGBpixel. 
+   * \param buf Buffer to unpack the data into.
+   * \param rgb Source array of RGB data
+   * \param numPixels Number of pixels in the array
+   */
+  static void UnpackRGBtoRGBpixelBuffer (csRGBpixel* buf, uint8* rgb,
+    size_t numPixels)
+  {
+    csRGBpixel* bufptr = buf;
+    while (numPixels--)
+    {
+      bufptr->red = *rgb++;
+      bufptr->green = *rgb++;
+      bufptr->blue = *rgb++;
+      bufptr++; 
+    }
+  }
 };
 
 /**

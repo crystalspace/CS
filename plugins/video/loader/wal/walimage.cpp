@@ -153,7 +153,7 @@ bool ImageWALFile::Load (uint8* iBuffer, size_t iSize)
   memcpy (buffer, iBuffer + head.offsets[0], Width * Height);
   csRGBpixel* newPal = new csRGBpixel[256];
   memcpy (newPal, WALpalette, sizeof (csRGBpixel) * 256);
-  ConvertFromPal8 (buffer, newPal);
+  ConvertFromPal8 (buffer, 0, newPal);
 
   return true;
 }

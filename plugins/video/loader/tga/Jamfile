@@ -5,7 +5,7 @@ Description cstgaimg : "tga image loader" ;
 Plugin cstgaimg
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith cstgaimg : csgfx csutil ;
+LinkWith cstgaimg : imageloadercommon csgfx csutil ;
 
 CompileGroups cstgaimg :  imageloaders ;
 

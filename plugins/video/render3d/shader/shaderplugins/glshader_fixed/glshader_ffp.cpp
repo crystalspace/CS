@@ -84,8 +84,10 @@ void csGLShaderFFP::BuildTokenHash()
   
   tokens.Register("color", GL_SRC_COLOR);
   tokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
+  tokens.Register("one minus color", GL_ONE_MINUS_SRC_COLOR);
   tokens.Register("alpha", GL_SRC_ALPHA);
   tokens.Register("invertalpha", GL_ONE_MINUS_SRC_ALPHA);
+  tokens.Register("one minus alpha", GL_ONE_MINUS_SRC_ALPHA);
 
   tokens.Register("replace", GL_REPLACE);
   tokens.Register("modulate", GL_MODULATE);

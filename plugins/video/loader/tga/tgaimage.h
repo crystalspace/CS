@@ -24,16 +24,18 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "../common/commonimagefile.h"
 
 /**
  * The TGA image file format loader.
  */
 class csTGAImageIO : public iImageIO
 {
- protected:
+protected:
   csImageIOFileFormatDescriptions formats;
+  iObjectRegistry* object_reg;
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
   csTGAImageIO (iBase *pParent);
@@ -50,22 +52,69 @@ class csTGAImageIO : public iImageIO
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTGAImageIO);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* p) 
+    { scfParent->object_reg = p; return true; }
   } scfiComponent;
 };
 
+/* Header definition. */
+struct TGAheader
+{
+  unsigned char IDLength;		/* length of Identifier String */
+  unsigned char CoMapType;		/* 0 = no map */
+  unsigned char ImgType;		/* image type (see below for values) */
+  unsigned char Index_lo, Index_hi;	/* index of first color map entry */
+  unsigned char Length_lo, Length_hi;	/* number of entries in color map */
+  unsigned char CoSize;			/* size of color map entry (15,16,24,32) */
+  unsigned char X_org_lo, X_org_hi;	/* x origin of image */
+  unsigned char Y_org_lo, Y_org_hi;	/* y origin of image */
+  unsigned char Width_lo, Width_hi;	/* width of image */
+  unsigned char Height_lo, Height_hi;	/* height of image */
+  unsigned char PixelSize;		/* pixel size (8,16,24,32) */
+  /* 
+    bits 7-6, interleaving flag
+    bit  5, origin: 0=lower left, 1=upper left
+    bit  4, reserved
+    bits 3-0, number of attribute bits per pixel 
+   */
+  unsigned char flags;
+};
+
 /**
- * An csImageFile subclass for reading TGA files.
+ * An csCommonImageFile subclass for reading TGA files.
  */
-class ImageTgaFile : public csImageMemory
+class ImageTgaFile : public csCommonImageFile
 {
   friend class csTGAImageIO;
 
 private:
+  class TgaLoader : public csCommonImageFileLoader
+  {
+    csRef<iDataBuffer> dataSource;
+    uint8* iBuffer;
+    TGAheader tga_head;
+    bool mapped, rlencoded;
+    int RLE_count, RLE_flag;
+    int Red, Grn, Blu, Alpha;
+    csRGBpixel* colorMap;
+
+    void readtga (uint8*& ptr, struct TGAheader* tgaP);
+    void get_map_entry (uint8*& ptr, csRGBpixel* Value, int Size, bool alpha);
+    void get_pixel (uint8*& ptr, csRGBpixel* dest, int Size, bool alpha);
+  public:
+    TgaLoader (int Format, iDataBuffer* source) 
+      : csCommonImageFileLoader (Format), dataSource (source), 
+	RLE_count(0), RLE_flag (0), colorMap (0) {}
+    virtual ~TgaLoader();
+    bool InitOk();
+    virtual bool LoadData ();
+  };
+
   /// Initialize the image object
-  ImageTgaFile (int iFormat) : csImageMemory (iFormat) { };
-  /// Try to read the PNG file from the buffer and return success status
-  bool Load (uint8* iBuffer, size_t iSize);
+  ImageTgaFile (iObjectRegistry* object_reg, int iFormat) 
+    : csCommonImageFile (object_reg, iFormat) { };
+  /// Try to read the TGA file from the buffer and return success status
+  virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 };
 
 #endif // __CS_TGAIMAGE_H__

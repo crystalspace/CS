@@ -94,7 +94,7 @@ SCF_IMPLEMENT_IBASE (csGLGraphics3D::EventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
-csGLGraphics3D::csGLGraphics3D (iBase *parent)
+csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -733,6 +733,8 @@ void csGLGraphics3D::SetupProjection ()
 
 bool csGLGraphics3D::Open ()
 {
+  if (isOpen) return true;
+  isOpen = true;
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
   	object_reg, iPluginManager);
 
@@ -1041,6 +1043,8 @@ bool csGLGraphics3D::Open ()
 
 void csGLGraphics3D::Close ()
 {
+  if (!isOpen) return;
+
   glFinish ();
 
   if (txtmgr)

@@ -441,7 +441,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   }
 
   Format &= ~CS_IMGFMT_ALPHA;
-  ConvertFromPal8 (optr.get_image (), palette.get_palette ());
+  ConvertFromPal8 (optr.get_image (), 0, palette.get_palette ());
 
   return 0;
 }

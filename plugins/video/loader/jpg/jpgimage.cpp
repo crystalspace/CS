@@ -29,16 +29,6 @@
 #include "csutil/databuf.h"
 #include "ivaria/reporter.h"
 
-extern "C"
-{
-#define jpeg_boolean boolean
-#define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
-#define INT32 JPEG_INT32
-#include <jpeglib.h>
-#include <jerror.h>
-#undef INT32
-}
-
 CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
 
 CS_IMPLEMENT_PLUGIN
@@ -101,14 +91,6 @@ const csImageIOFileFormatDescriptions& csJPGImageIO::GetDescription ()
 }
 
 /* ==== Error mgmnt ==== */
-
-struct my_error_mgr
-{
-  struct jpeg_error_mgr pub;	/* "public" fields */
-  jmp_buf setjmp_buffer;	/* for return to caller */
-};
-
-typedef struct my_error_mgr *my_error_ptr;
 
 static void my_error_exit (j_common_ptr cinfo)
 {
@@ -200,8 +182,8 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
 
 csPtr<iImage> csJPGImageIO::Load (iDataBuffer* buf, int iFormat)
 {
-  ImageJpgFile* i = new ImageJpgFile (iFormat, object_reg);
-  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
+  ImageJpgFile* i = new ImageJpgFile (object_reg, iFormat);
+  if (i && !i->Load (buf))
   {
     delete i;
     return 0;
@@ -449,20 +431,22 @@ static void jpeg_memory_src (j_decompress_ptr cinfo, char *inbfr, int len)
 
 bool ImageJpgFile::dither = true;
 
-bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
+ImageJpgFile::JpegLoader::~JpegLoader()
 {
-  struct jpeg_decompress_struct cinfo;
-  struct my_error_mgr jerr;
-  int row_stride;		/* physical row width in output buffer */
+  if (decompStarted) jpeg_finish_decompress(&cinfo);
+  decompStarted = false;
+  if (decompCreated) jpeg_destroy_decompress (&cinfo);
+  decompCreated = false;
+}
 
+bool ImageJpgFile::JpegLoader::InitOk()
+{
   // For now we don't support alpha-map images
   // The libjpeg docs are unclear on this subject, it seems that alpha
   // mapped images could be supported by libjpeg (it supports a random
   // number of abstract color channels) but I (A.Z.) just don't have
   // alpha-mapped JPEG images and can't test it.
   Format &= ~CS_IMGFMT_ALPHA;
-
-  int i;
 
   /* ==== Step 1: allocate and initialize JPEG decompression object */
   /* We set up the normal JPEG error routines, then override error_exit. */
@@ -477,15 +461,17 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
       Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"%s\n", errmsg);
     }
-    jpeg_destroy_decompress (&cinfo);
+    if (decompCreated) jpeg_destroy_decompress (&cinfo);
+    decompCreated = false;
     return false;
   }
 
   /* Now we can initialize the JPEG decompression object. */
   jpeg_create_decompress (&cinfo);
+  decompCreated = true;
 
   /* ==== Step 2: specify data source (memory buffer, in this case) */
-  jpeg_memory_src (&cinfo, (char *)iBuffer, iSize);
+  jpeg_memory_src (&cinfo, dataSource->GetData(), dataSource->GetSize());
 
   /* ==== Step 3: read file parameters with jpeg_read_header() */
   (void) jpeg_read_header(&cinfo, TRUE);
@@ -498,7 +484,10 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
     cinfo.dither_mode = dither ? JDITHER_FS : JDITHER_NONE;
     cinfo.quantize_colors = TRUE;
     cinfo.desired_number_of_colors = 256;
+    dataType = rdtIndexed;
   }
+  else
+    dataType = rdtR8G8B8;
   // We almost always want RGB output (no grayscale, yuv etc)
   if (cinfo.jpeg_color_space != JCS_GRAYSCALE)
     cinfo.out_color_space = JCS_RGB;
@@ -508,21 +497,54 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
 
   /* ==== Step 5: Start decompressor */
 
-  (void) jpeg_start_decompress (&cinfo);
+  jpeg_start_decompress (&cinfo);
+  decompStarted = true;
   /* We may need to do some setup of our own at this point before reading
    * the data.  After jpeg_start_decompress() we have the correct scaled
    * output image dimensions available, as well as the output colormap
    * if we asked for color quantization.
    * In this example, we need to make an output work buffer of the right size.
    */
+  Width = cinfo.output_width;
+  Height = cinfo.output_height;
 
-  SetDimensions (cinfo.output_width, cinfo.output_height);
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = (Format & ~CS_IMGFMT_MASK) |
+      (cinfo.quantize_colors ? CS_IMGFMT_PALETTED8 : CS_IMGFMT_TRUECOLOR);
+
+  return true;
+}
+
+bool ImageJpgFile::JpegLoader::LoadData ()
+{
+  CS_ASSERT (decompCreated);
+  CS_ASSERT (decompStarted);
+
+  int row_stride;		/* physical row width in output buffer */
+
+  int i;
+
+  if (setjmp (jerr.setjmp_buffer))
+  {
+    char errmsg [256];
+    if (cinfo.err->msg_code != JERR_NO_SOI)
+    {
+      cinfo.err->format_message ((jpeg_common_struct *)&cinfo, errmsg);
+      Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"%s\n", errmsg);
+    }
+    if (decompStarted) jpeg_finish_decompress(&cinfo);
+    decompStarted = false;
+    if (decompCreated) jpeg_destroy_decompress (&cinfo);
+    decompCreated = false;
+    return false;
+  }
 
   int pixelcount = Width * Height;
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-    Image = new uint8 [pixelcount];
+    indexData = new uint8 [pixelcount];
   else
-    Image = new csRGBpixel [pixelcount];
+    rawData.AttachNew (new csDataBuffer (pixelcount * 3));
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
@@ -551,18 +573,20 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
 	// Safety.
 	if (bufp + row_stride > pixelcount) break;
         /* paletted image */
-        memcpy (((uint8 *)Image) + bufp, buffer [0], row_stride);
+	memcpy (indexData + bufp, buffer [0], row_stride);
       }
       else
       {
 	// Safety.
 	if (bufp + (int)cinfo.output_width > pixelcount) break;
 	/* Grayscale image */
-        csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
+	uint8* out = rawData->GetUint8() + bufp*3;
         for (i = 0; i < (int)cinfo.output_width; i++)
         {
-          out->red = out->green = out->blue = buffer [0][i];
-          out++;
+	  const uint8 v = buffer [0][i];
+	  *out++ = v;
+	  *out++ = v;
+	  *out++ = v;
         }
       }
     else
@@ -570,9 +594,8 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
       // Safety.
       if (bufp + (int)cinfo.output_width > pixelcount) break;
       /* rgb triplets */
-      csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
-      for (i = 0; i < (int)cinfo.output_width; i++)
-        memcpy (out++, buffer [0] + i * 3, 3);
+      uint8* out = rawData->GetUint8() + bufp*3;
+      memcpy (out, buffer[0], cinfo.output_width * 3);
     }
     bufp += cinfo.output_width;
   }
@@ -580,28 +603,25 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
   /* Get palette */
   if (cinfo.quantize_colors)
   {
-    Palette = new csRGBpixel [256];
+    palette = new csRGBpixel [256];
     int cshift = 8 - cinfo.data_precision;
     for (i = 0; i < cinfo.actual_number_of_colors; i++)
     {
-      Palette [i].red   = cinfo.colormap [0] [i] << cshift;
+      palette [i].red   = cinfo.colormap [0] [i] << cshift;
       if (cinfo.jpeg_color_space != JCS_GRAYSCALE)
       {
-        Palette [i].green = cinfo.colormap [1] [i] << cshift;
-        Palette [i].blue  = cinfo.colormap [2] [i] << cshift;
+        palette [i].green = cinfo.colormap [1] [i] << cshift;
+        palette [i].blue  = cinfo.colormap [2] [i] << cshift;
       }
       else
-        Palette [i].green = Palette [i].blue = Palette [i].red;
+        palette [i].green = palette [i].blue = palette [i].red;
     }
   }
 
-  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
-    Format = (Format & ~CS_IMGFMT_MASK) |
-      (cinfo.quantize_colors ? CS_IMGFMT_PALETTED8 : CS_IMGFMT_TRUECOLOR);
-
   /* ==== Step 7: Finish decompression */
 
-  (void) jpeg_finish_decompress(&cinfo);
+  jpeg_finish_decompress(&cinfo);
+  decompStarted = false;
   /* We can ignore the return value since suspension is not possible
    * with the buffer data source.
    */
@@ -609,7 +629,7 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
   /* ==== Step 8: Release JPEG decompression object */
   /* This is an important step since it will release a good deal of memory. */
   jpeg_destroy_decompress(&cinfo);
-
+  decompStarted = false;
 
   /* At this point you may want to check to see whether any corrupt-data
    * warnings occurred (test whether jerr.pub.num_warnings is nonzero).
@@ -617,4 +637,12 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
 
   /* And we're done! */
   return true;
+}
+
+csRef<iImageFileLoader> ImageJpgFile::InitLoader (csRef<iDataBuffer> source)
+{
+  csRef<JpegLoader> loader;
+  loader.AttachNew (new JpegLoader (Format, object_reg, source));
+  if (!loader->InitOk()) return 0;
+  return loader;
 }

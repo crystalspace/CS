@@ -114,8 +114,8 @@ const csImageIOFileFormatDescriptions& csPNGImageIO::GetDescription ()
 
 csPtr<iImage> csPNGImageIO::Load (iDataBuffer* buf, int iFormat)
 {
-  ImagePngFile* i = new ImagePngFile (iFormat);
-  if (i && !i->Load (buf->GetUint8(), buf->GetSize()))
+  ImagePngFile* i = new ImagePngFile (object_reg, iFormat);
+  if (i && !i->Load (buf))
   {
     delete i;
     return 0;
@@ -380,15 +380,8 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
 
 //---------------------------------------------------------------------------
 
-struct ImagePngRawData
-{
-  // The buffer to "read" from
-  uint8 *r_data;
-  // The buffer size
-  size_t r_size;
-};
-
-void ImagePngRead (png_structp png, png_bytep data, png_size_t size)
+void ImagePngFile::PngLoader::ImagePngRead (png_structp png, png_bytep data, 
+					    png_size_t size)
 {
   ImagePngRawData *self = (ImagePngRawData *) png->io_ptr;
 
@@ -402,64 +395,64 @@ void ImagePngRead (png_structp png, png_bytep data, png_size_t size)
   } /* endif */
 }
 
-bool ImagePngFile::Load (uint8 *iBuffer, size_t iSize)
+ImagePngFile::PngLoader::~PngLoader()
 {
-  size_t rowbytes, exp_rowbytes;
-  png_infop info;
+  if (png != 0)
+    png_destroy_read_struct (&png, &info, (png_infopp) 0);
+}
+
+bool ImagePngFile::PngLoader::InitOk ()
+{
+  const png_bytep iBuffer = dataSource->GetUint8();
+  const size_t iSize = dataSource->GetSize();
 
   if (!png_check_sig (iBuffer, iSize))
     return false;
-
-  png_structp png =
-    png_create_read_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
-
+  png = png_create_read_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
   if (!png)
   {
-nomem:
-    FreeImage ();
     return false;
   }
+
   info = png_create_info_struct (png);
   if (!info)
   {
-nomem2:
     png_destroy_read_struct (&png, (png_infopp) 0, (png_infopp) 0);
-    goto nomem;
+    png = 0;
+    return false;
   }
 
   if (setjmp (png->jmpbuf))
+  {
+nomem2:
     // If we get here, we had a problem reading the file
-    goto nomem2;
+    png_destroy_read_struct (&png, &info, (png_infopp) 0);
+    png = 0; info = 0;
+    return false;
+  }
 
-  ImagePngRawData raw = { iBuffer, iSize };
+  raw.r_data = iBuffer;
+  raw.r_size = iSize;
   png_set_read_fn (png, &raw, ImagePngRead);
 
   png_read_info (png, info);
 
   // Get picture info
-  png_uint_32 Width, Height;
-  int bit_depth, color_type;
+  png_uint_32 W, H;
 
-  png_get_IHDR (png, info, &Width, &Height, &bit_depth, &color_type,
+  png_get_IHDR (png, info, &W, &H, &bit_depth, &color_type,
     0, 0, 0);
+  Width = W;
+  Height = H;
 
-  if (bit_depth > 8)
-  {
-    // tell libpng to strip 16 bit/color files down to 8 bits/color
-    png_set_strip_16 (png);
-    bit_depth = 8;
-  }
-  else if (bit_depth < 8)
-    // Expand pictures with less than 8bpp to 8bpp
-    png_set_packing (png);
-
-  volatile enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
-  volatile int keycolor_index = -1;
+  int NewFormat;
 
   switch (color_type)
   {
     case PNG_COLOR_TYPE_GRAY:
     case PNG_COLOR_TYPE_GRAY_ALPHA:
+      dataType = rdtIndexed;
+      NewFormat = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
       if ((Format & CS_IMGFMT_ALPHA) && (color_type & PNG_COLOR_MASK_ALPHA))
       {
 	ImageType = imgGrayAlpha;
@@ -473,15 +466,17 @@ nomem2:
 	{
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
-	  has_keycolour = true;
-	  keycolour.red = csConvertEndian (trans_values->gray) & 0xff;
-	  keycolour.green = csConvertEndian (trans_values->gray) & 0xff;
-	  keycolour.blue = csConvertEndian (trans_values->gray) & 0xff;
+	  hasKeycolor = true;
+	  keycolor.red = csConvertEndian (trans_values->gray) & 0xff;
+	  keycolor.green = csConvertEndian (trans_values->gray) & 0xff;
+	  keycolor.blue = csConvertEndian (trans_values->gray) & 0xff;
 	}
       }
       break;
     case PNG_COLOR_TYPE_PALETTE:
+      NewFormat = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
       ImageType = imgPAL;
+      dataType = rdtIndexed;
       // If we need alpha, take it. If we don't, strip it.
       if (Format & CS_IMGFMT_ALPHA)
       {
@@ -512,26 +507,28 @@ nomem2:
 	    ImageType = imgRGB;
 	  }
 	  else
-	    Format &= ~CS_IMGFMT_ALPHA;
+	    NewFormat &= ~CS_IMGFMT_ALPHA;
 	}
       }
       break;
     case PNG_COLOR_TYPE_RGB:
     case PNG_COLOR_TYPE_RGB_ALPHA:
       ImageType = imgRGB;
+      dataType = rdtRGBpixel;
+      NewFormat = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
       // If there is no alpha information, fill with 0xff
       if (!(color_type & PNG_COLOR_MASK_ALPHA))
       {
-        Format &= ~CS_IMGFMT_ALPHA;
+        NewFormat &= ~CS_IMGFMT_ALPHA;
         // Check if we have keycolor transparency.
         if (png_get_valid (png, info, PNG_INFO_tRNS))
 	{
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
-	  has_keycolour = true;
-	  keycolour.red = csConvertEndian (trans_values->red) & 0xff;
-	  keycolour.green = csConvertEndian (trans_values->green) & 0xff;
-	  keycolour.blue = csConvertEndian (trans_values->blue) & 0xff;
+	  hasKeycolor = true;
+	  keycolor.red = csConvertEndian (trans_values->red) & 0xff;
+	  keycolor.green = csConvertEndian (trans_values->green) & 0xff;
+	  keycolor.blue = csConvertEndian (trans_values->blue) & 0xff;
 	}
         png_set_filler (png, 0xff, PNG_FILLER_AFTER);
       }
@@ -540,11 +537,39 @@ nomem2:
       goto nomem2;
   }
 
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = NewFormat;
+
+  return true;
+}
+
+bool ImagePngFile::PngLoader::LoadData ()
+{
+  size_t rowbytes, exp_rowbytes;
+
+  if (setjmp (png->jmpbuf))
+  {
+nomem2:
+    // If we get here, we had a problem reading the file
+    png_destroy_read_struct (&png, &info, (png_infopp) 0);
+    png = 0; info = 0;
+    return false;
+  }
+
+  if (bit_depth > 8)
+  {
+    // tell libpng to strip 16 bit/color files down to 8 bits/color
+    png_set_strip_16 (png);
+    bit_depth = 8;
+  }
+  else if (bit_depth < 8)
+    // Expand pictures with less than 8bpp to 8bpp
+    png_set_packing (png);
+
   // Update structure with the above settings
   png_read_update_info (png, info);
 
   // Allocate the memory to hold the image
-  SetDimensions (Width, Height);
   if (ImageType == imgRGB)
     exp_rowbytes = Width * 4;	  // RGBA
   else if (ImageType == imgGrayAlpha)
@@ -574,7 +599,7 @@ nomem2:
   if (!NewImage)
     goto nomem2;
 
-  for (png_uint_32 row = 0; row < Height; row++)
+  for (int row = 0; row < Height; row++)
     row_pointers [row] = ((png_bytep)NewImage) + row * rowbytes;
 
   // Read image data
@@ -585,16 +610,19 @@ nomem2:
 
   if (ImageType == imgRGB)
   {
-    csRGBpixel *rgbImage = csPackRGBA::CopyUnpackRGBAtoRGBpixel
-      (NewImage, Width * Height);
-    ConvertFromRGBA (rgbImage);
-    delete[] NewImage;
+    if (csPackRGBA::IsRGBpixelSane())
+      rgbaData = (csRGBpixel*)NewImage;
+    else
+    {
+      rgbaData = csPackRGBA::CopyUnpackRGBAtoRGBpixel
+	(NewImage, Width * Height);
+      delete[] NewImage;
+    }
   }
   else if (ImageType == imgPAL)
   {
     png_color graypal [256];
     png_color *png_palette = 0;
-    csRGBcolor *palette;
     int colors, i;
     if (!png_get_PLTE (png, info, &png_palette, &colors))
     {
@@ -607,7 +635,8 @@ nomem2:
           (i * 255) / entries;
     }
     // copy PNG palette.
-    palette = new csRGBcolor[colors];
+    palette = new csRGBpixel[colors];
+    paletteCount = colors;
     for (i = 0; i < colors; i++)
     {
       palette[i].red = png_palette[i].red;
@@ -616,44 +645,49 @@ nomem2:
     }
     if (keycolor_index != -1)
     {
-      has_keycolour = true;
-      keycolour.red = palette[keycolor_index].red;
-      keycolour.green = palette[keycolor_index].green;
-      keycolour.blue = palette[keycolor_index].blue;
+      hasKeycolor = true;
+      keycolor.red = palette[keycolor_index].red;
+      keycolor.green = palette[keycolor_index].green;
+      keycolor.blue = palette[keycolor_index].blue;
     }
-    ConvertFromPal8 ((uint8 *)NewImage, palette, colors);
-    delete[] palette;
+    indexData = NewImage;
   }
   else // grayscale + alpha
   {
     // This is a grayscale image, build a grayscale palette
-    csRGBpixel *palette = new csRGBpixel [256];
+    paletteCount = 256;
+    palette = new csRGBpixel [256];
     int i, entries = (1 << bit_depth) - 1;
     for (i = 0; i <= entries; i++)
       palette [i].red = palette [i].green = palette [i].blue =
         (i * 255) / entries;
 
     int pixels = Width * Height;
-    uint8 *image = new uint8 [pixels];
-    Alpha = new uint8 [pixels];
+    indexData = new uint8 [pixels];
+    alpha = new uint8 [pixels];
     uint8 *src = (uint8 *)NewImage;
     for (i = 0; i < pixels; i++)
     {
-      image [i] = *src++;
-      Alpha [i] = *src++;
+      indexData [i] = *src++;
+      alpha [i] = *src++;
     }
     delete [] (uint8 *)NewImage;
-    ConvertFromPal8 (image, palette);
   }
 
   // clean up after the read, and free any memory allocated
   png_destroy_read_struct (&png, &info, (png_infopp) 0);
+  png = 0; info = 0;
 
   // Free the row pointers array that is not needed anymore
   delete [] row_pointers;
 
-  // Check if the alpha channel is valid
-  CheckAlpha ();
-
   return true;
+}
+
+csRef<iImageFileLoader> ImagePngFile::InitLoader (csRef<iDataBuffer> source)
+{
+  csRef<PngLoader> loader;
+  loader.AttachNew (new PngLoader (Format, source));
+  if (!loader->InitOk()) return 0;
+  return loader;
 }

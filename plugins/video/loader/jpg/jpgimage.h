@@ -25,6 +25,17 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "../common/commonimagefile.h"
+
+extern "C"
+{
+#define jpeg_boolean boolean
+#define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
+#define INT32 JPEG_INT32
+#include <jpeglib.h>
+#include <jerror.h>
+#undef INT32
+}
 
 /**
  * The JPG image file format loader.
@@ -61,24 +72,54 @@ public:
   } scfiComponent;
 };
 
+/* ==== Error mgmnt ==== */
+struct my_error_mgr
+{
+  struct jpeg_error_mgr pub;	/* "public" fields */
+  jmp_buf setjmp_buffer;	/* for return to caller */
+};
+
+typedef struct my_error_mgr *my_error_ptr;
+
 /**
  * An csImageFile subclass for reading JPG files.<p>
  * This implementation needs libjpeg to read JFIF files.
  */
-class ImageJpgFile : public csImageMemory
+class ImageJpgFile : public csCommonImageFile
 {
   friend class csJPGImageIO;
   static bool dither;
 
 private:
-  iObjectRegistry* object_reg;
+
+  class JpegLoader : public csCommonImageFileLoader
+  {
+    iObjectRegistry* object_reg;
+    csRef<iDataBuffer> dataSource;
+
+    struct my_error_mgr jerr;
+    struct jpeg_decompress_struct cinfo;
+    bool decompStarted;
+    bool decompCreated;
+  public:
+    JpegLoader (int Format, iObjectRegistry* p, iDataBuffer* source) 
+      : csCommonImageFileLoader (Format), dataSource (source),
+      decompStarted (false), decompCreated (false)
+    { object_reg = p; };
+    virtual ~JpegLoader();
+    bool InitOk();
+    virtual bool LoadData ();
+  };
 
   /// Initialize the image object
-  ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageMemory (iFormat) 
+  /*ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageMemory (iFormat) 
     { object_reg = p; };
   /// Try to read the PNG file from the buffer and return success status
-  bool Load (uint8* iBuffer, size_t iSize);
+  bool Load (uint8* iBuffer, size_t iSize);*/
 
+  ImageJpgFile (iObjectRegistry* p, int iFormat) 
+    : csCommonImageFile (p, iFormat) { };
+  virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 public:
   CS_LEAKGUARD_DECLARE (ImageJpgFile);
 };

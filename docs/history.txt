@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Feb-2005
+	- res added background loading for images. Doesn't work right yet and
+	  is still disabled.
+	- res protected csGLGraphics3D::Close() against calls where the 
+	  renderer wasn't opened before.
+	- res added the more intuitive "one minus ..." names as possible 
+	  multitexturing modifiers.
 2-Feb-2005
 	- Jorrit removed CS_PROFSETUP. Setup is now automatic the first time
 	  you use CS_PROFSTART.

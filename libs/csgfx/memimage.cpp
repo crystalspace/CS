@@ -297,8 +297,8 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
   }
 }
 
-void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
-                                     int nPalColors)
+void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
+				     csRGBpixel *iPalette, int nPalColors)
 {
   int pixels = Width * Height;
 
@@ -319,12 +319,14 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
-      delete [] iImage;
-      delete [] iPalette;
+      delete[] iImage;
+      delete[] iPalette;
+      delete[] Alpha;
       break;
     case CS_IMGFMT_PALETTED8:
       Image = iImage;
       Palette = iPalette;
+      Alpha = alpha;
       break;
     case CS_IMGFMT_TRUECOLOR:
     {
@@ -335,9 +337,9 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
       else
         Image = out = new csRGBpixel [pixels];
 
-      if ((Format & CS_IMGFMT_ALPHA) && Alpha)
+      if ((Format & CS_IMGFMT_ALPHA) && alpha)
       {
-        uint8 *a = Alpha;
+        uint8 *a = alpha;
         while (pixels--)
         {
           *out = iPalette [*in++];
@@ -348,9 +350,9 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
       else
         while (pixels--)
           *out++ = iPalette [*in++];
-      delete [] Alpha; Alpha = 0;
-      delete [] iImage;
-      delete [] iPalette;
+      delete[] alpha;
+      delete[] iImage;
+      delete[] iPalette;
       break;
     }
   }
@@ -360,7 +362,7 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
     Format &= ~CS_IMGFMT_ALPHA;
 }
 
-void csImageMemory::ConvertFromPal8 (uint8 *iImage,
+void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
                                      const csRGBcolor *iPalette,
                                      int nPalColors)
 {
@@ -368,15 +370,7 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage,
   int i;
   for (i = 0; i < nPalColors; i++) // Default csRGBpixel constructor ensures
     newpal [i] = iPalette [i];         // palette past nPalColors is sane.
-  ConvertFromPal8 (iImage, newpal);
-}
-
-void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
-                                     const csRGBcolor *iPalette,
-                                     int nPalColors)
-{
-  delete[] Alpha; Alpha = alpha;
-  ConvertFromPal8 (iImage, iPalette, nPalColors);
+  ConvertFromPal8 (iImage, alpha, newpal);
 }
 
 void csImageMemory::SetFormat (int iFormat)
@@ -384,6 +378,8 @@ void csImageMemory::SetFormat (int iFormat)
   int pixels = Width * Height;
   int oldformat = Format;
   void *oldimage = Image;
+  uint8* oldalpha = Alpha;
+  Alpha = 0;
   Image = 0;
   Format = iFormat;
 
@@ -391,14 +387,24 @@ void csImageMemory::SetFormat (int iFormat)
     ConvertFromRGBA ((csRGBpixel *)oldimage);
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
-    if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
+    uint8* Alpha = 0;
+    if (iFormat & CS_IMGFMT_ALPHA)
     {
-      Alpha = new uint8 [pixels];
-      memset ((void*)Alpha, 0xff, pixels);
+      if (oldalpha)
+	Alpha = oldalpha; 
+      else
+      {
+	Alpha = new uint8[Width * Height];
+	memset (Alpha, 0xff, Width * Height);
+      }
+    }
+    else
+    {
+      delete[] oldalpha;
     }
     csRGBpixel* oldPalette = Palette;
     Palette = 0;
-    ConvertFromPal8 ((uint8 *)oldimage, oldPalette);
+    ConvertFromPal8 ((uint8 *)oldimage, Alpha, oldPalette);
   }
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
   {

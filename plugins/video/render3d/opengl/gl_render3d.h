@@ -123,6 +123,7 @@ private:
   csRef<iGraphics2D> G2D;
   csRef<iShaderManager> shadermgr;
   csRef<csGLVBOBufferManager> vboManager;
+  bool isOpen;
 
   csWeakRef<iBugPlug> bugplug;
 

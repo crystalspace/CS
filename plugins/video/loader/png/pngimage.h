@@ -25,6 +25,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "../common/commonimagefile.h"
 
 /**
  * The PNG image file format loader.
@@ -33,6 +34,7 @@ class csPNGImageIO : public iImageIO
 {
 protected:
   csImageIOFileFormatDescriptions formats;
+  iObjectRegistry* object_reg;
 
 public:
   SCF_DECLARE_IBASE;
@@ -52,7 +54,8 @@ public:
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPNGImageIO);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* p) 
+    { scfParent->object_reg = p; return true; }
   } scfiComponent;
 };
 
@@ -60,15 +63,44 @@ public:
  * An csImageFile subclass for reading PNG files.<p>
  * This implementation needs both zlib and pnglib to read .PNG files.
  */
-class ImagePngFile : public csImageMemory
+class ImagePngFile : public csCommonImageFile
 {
   friend class csPNGImageIO;
 private:
-  /// Initialize the image object
-  ImagePngFile (int iFormat) : csImageMemory (iFormat) { };
-  /// Try to read the PNG file from the buffer and return success status
-  bool Load (uint8* iBuffer, size_t iSize);
+  class PngLoader : public csCommonImageFileLoader
+  {
+    struct ImagePngRawData
+    {
+      // The buffer to "read" from
+      uint8 *r_data;
+      // The buffer size
+      size_t r_size;
+    };
 
+    png_structp png;
+    png_infop info;
+    int bit_depth, color_type;
+    enum { imgRGB, imgPAL, imgGrayAlpha } ImageType;
+    int keycolor_index;
+    csRef<iDataBuffer> dataSource;
+    ImagePngRawData raw;
+
+    static void ImagePngRead (png_structp png, png_bytep data, 
+      png_size_t size);
+  public:
+    PngLoader (int Format, iDataBuffer* source) 
+      : csCommonImageFileLoader (Format), png (0), info (0), 
+      keycolor_index (-1), dataSource (source) {}
+    virtual ~PngLoader();
+    bool InitOk();
+    /// Try to read the PNG file from the buffer and return success status
+    virtual bool LoadData ();
+  };
+
+  /// Initialize the image object
+  ImagePngFile (iObjectRegistry* object_reg, int iFormat) 
+    : csCommonImageFile (object_reg, iFormat) { };
+  virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 public:
   CS_LEAKGUARD_DECLARE (ImagePngFile);
 };
