@@ -43,7 +43,10 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 
-#define SCAN_KEYBOARD	0
+#define SCAN_KEYBOARD		0
+#define USE_INPUTSPROCKETS	0
+
+#define kMoreMasters		8
 
 #define kAppleMenuID			128
 #define kFileMenuID				129
@@ -80,6 +83,10 @@ SysSystemDriver::SysSystemDriver()
 	ProcessInfoRec		theInfo;
 	OSStatus			theStatus = noErr;
 	char				statusMessage[256];
+
+	::MaxApplZone();
+	for ( i = 0; i < kMoreMasters; ++i )
+		MoreMasters();
 
 	gSysSystemDriver = this;
 
@@ -143,7 +150,7 @@ SysSystemDriver::SysSystemDriver()
 				sprintf( statusMessage, "Unable to create input elements for InputSprockets.\nError Number = %d", theStatus );
 				Alert( statusMessage );
 			} else {
-				theStatus = ISpInit( gNumInputNeeds, gInputNeeds, gInputElements, theInfo.processSignature, '0001', 0, 128, 0);
+				theStatus = ISpInit( gNumInputNeeds, gInputNeeds, gInputElements, theInfo.processSignature, '0001', 0, 0, 0);
 				if ( theStatus != noErr ) {
 					sprintf( statusMessage, "Unable to initialize InputSprockts.\nError Number = %d", theStatus );
 					Alert( statusMessage );

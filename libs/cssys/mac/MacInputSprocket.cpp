@@ -42,7 +42,7 @@ ISpNeed gInputNeeds[] =
 		0,		// player number
 		0,		// group number
 		kISpElementKind_Button,
-		kISpElementLabel_None,
+		kISpElementLabel_Btn_Fire,
 		0,		// flags
 		0,		// reserved 1
 		0,		// reserved 2
@@ -54,7 +54,7 @@ ISpNeed gInputNeeds[] =
 		0,		// player number
 		0,		// group number
 		kISpElementKind_Axis,
-		kISpElementLabel_None,
+		kISpElementLabel_Axis_XAxis,
 		0,		// flags
 		0,		// reserved 1
 		0,		// reserved 2
@@ -66,7 +66,7 @@ ISpNeed gInputNeeds[] =
 		0,		// player number
 		0,		// group number
 		kISpElementKind_Axis,
-		kISpElementLabel_None,
+		kISpElementLabel_Axis_YAxis,
 		0,		// flags
 		0,		// reserved 1
 		0,		// reserved 2
@@ -76,5 +76,5 @@ ISpNeed gInputNeeds[] =
 
 int gNumInputNeeds = ( sizeof( gInputNeeds ) / sizeof( ISpNeed ));
 ISpElementReference gInputElements[ sizeof( gInputNeeds ) / sizeof( ISpNeed ) ];
-bool gInputUseKeyboard = true;
+bool gInputUseKeyboard = false;
 bool gInputUseMouse = false;
