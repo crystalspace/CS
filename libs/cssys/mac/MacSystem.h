@@ -40,7 +40,7 @@ public:
 
 	virtual void Close();
 
-	virtual bool Initialize (int argc, char *argv[], IConfig* cfg_engine);
+	virtual bool Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, IConfig* cfg_engine);
 	virtual bool ParseArg(int argc, char* argv[], int &i);
 	virtual void SystemHelp(void);
 	virtual void Loop();

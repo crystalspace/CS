@@ -181,14 +181,14 @@ void SysSystemDriver::Warn(const char* s)
 }
 
 
-bool SysSystemDriver::Initialize (int argc, char *argv[], IConfig* cfg_engine)
+bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName, const char *iVfsConfigName, IConfig* cfg_engine)
 {
 	Handle			theMenuBar;
 	MenuHandle		theMenu;
 	Str255			theText;
 
 	argc = GetCommandLine( &argv );
-	if ( ! csSystemDriver::Initialize ( argc, argv, cfg_engine ))
+	if ( ! csSystemDriver::Initialize ( argc, argv, iConfigName, iVfsConfigName, cfg_engine ))
 		return false;
 
 	/*
