@@ -276,7 +276,9 @@ public:
    * Get shader associated with a shader type
    */
   virtual iShader *GetShader (csStringID type) 
-  { return material->GetShader(type)->GetShader(); }
+  { iShaderWrapper* shader = material->GetShader(type);
+    // @@@ Need error reporter
+    if (shader != 0) return shader->GetShader(); else return 0; }
 
   /**
    * Get a texture from the material.

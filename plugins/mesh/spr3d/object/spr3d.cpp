@@ -2606,7 +2606,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       vertices = factory->g3d->CreateRenderBuffer (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3);
+		CS_BUFCOMP_FLOAT, 3, false);
     }
     void* vbuf = vertices->Lock (CS_BUF_LOCK_NORMAL);
     if (vbuf)
@@ -2622,7 +2622,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       normals = factory->g3d->CreateRenderBuffer (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3);
+		CS_BUFCOMP_FLOAT, 3, false);
     }
     void* nbuf = normals->Lock (CS_BUF_LOCK_NORMAL);
     if (nbuf)
@@ -2655,7 +2655,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       texcoords = factory->g3d->CreateRenderBuffer (
         sizeof (csVector2)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 2);
+		CS_BUFCOMP_FLOAT, 2, false);
     }
     void* tbuf = texcoords->Lock (CS_BUF_LOCK_NORMAL);
     if (tbuf)
@@ -2671,7 +2671,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       colors = factory->g3d->CreateRenderBuffer (
         sizeof (csColor)*final_num_vertices, CS_BUF_DYNAMIC,
-		CS_BUFCOMP_FLOAT, 3);
+		CS_BUFCOMP_FLOAT, 3, false);
     }
     void* vbuf = colors->Lock (CS_BUF_LOCK_NORMAL);
     if (vbuf)
@@ -2687,7 +2687,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     {
       indices = factory->g3d->CreateRenderBuffer (
         sizeof (csTriangle)*final_num_triangles*12, CS_BUF_STATIC,
-		CS_BUFCOMP_UNSIGNED_INT, 1);
+		CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
     int* ibuf = (int*)indices->Lock (CS_BUF_LOCK_NORMAL);
     if (ibuf)

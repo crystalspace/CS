@@ -45,8 +45,7 @@ struct iMaterialWrapper;
 enum csRenderBufferType
 {
   CS_BUF_DYNAMIC,
-  CS_BUF_STATIC,
-  //CS_BUF_INDEX
+  CS_BUF_STATIC
   // @@@ what about CS_BUF_STREAM ? ...
 };
 

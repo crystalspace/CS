@@ -32,6 +32,8 @@ private:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
   csRef<iSyntaxService> SyntaxService;
+
+  bool enable;
 public:
   SCF_DECLARE_IBASE;
   

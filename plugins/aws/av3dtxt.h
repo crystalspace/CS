@@ -140,6 +140,16 @@ public:
 
   /// Prepare the texture for usage
   virtual void Prepare ();
+
+#ifdef CS_USE_NEW_RENDERER
+  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
+  { return false; }
+
+  virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
+  { mw = 0; mh = 0; md = 0;}
+
+  virtual void SetTextureTarget(int target) { }
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**

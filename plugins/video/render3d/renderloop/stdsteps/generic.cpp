@@ -238,7 +238,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
     if (meshShader != shader)
     {
-      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+      // @@@ Need error reporter
+      if (shader != 0)
+        RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
 
       shader = meshShader;
       numSSM = 0;
@@ -247,7 +249,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   }
   if (numSSM != 0)
   {
-    RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+    // @@@ Need error reporter
+    if (shader != 0)
+      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
   }
   if (zOffset)
     r3d->DisableZOffset ();

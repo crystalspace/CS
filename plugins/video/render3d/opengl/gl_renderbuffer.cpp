@@ -80,12 +80,12 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
 
 csPtr<iRenderBuffer> csGLRender3D::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
-  int componentCount)
+  int componentCount, bool index)
 {
   if (use_hw_render_buffers)
   {
     csVBORenderBuffer *buffer = new csVBORenderBuffer 
-      (size, type, componentType, componentCount, ext);
+      (size, type, componentType, componentCount, index, ext);
     return csPtr<iRenderBuffer> (buffer);
   }
   else

@@ -88,7 +88,7 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
   }
   newrb->buf = r3d->CreateRenderBuffer (
         size*component_size*(numverts), CS_BUF_STATIC,
-        component_type, component_size);
+        component_type, component_size, false);
  
   newrb->name = strings->Request (name);
   newrb->size = component_size;

@@ -856,25 +856,25 @@ void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
 
   if (!vertex_buffer)
     vertex_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
 
   csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!normal_buffer)
     normal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
 
   csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!texel_buffer)
     texel_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector2), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2, false);
 
   csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!index_buffer)
     index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
-      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1);
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
 
   int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
 

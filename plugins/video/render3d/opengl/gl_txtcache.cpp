@@ -191,50 +191,120 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
     {
       glBindTexture (GL_TEXTURE_1D, d->Handle);
-      glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      if (txt_mm->flags & CS_TEXTURE_CLAMP)
+      {
+        glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+      } else {
+        glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      }
+
+      glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR : GL_NEAREST);
+
+      glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+
+      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      {
+        glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+          R3D->txtmgr->texture_filter_anisotropy);
+      }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
     {
       glBindTexture (GL_TEXTURE_2D, d->Handle);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      if (txt_mm->flags & CS_TEXTURE_CLAMP)
+      {
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      } else {
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      }
+
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR : GL_NEAREST);
+
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+
+      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      {
+        glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+          R3D->txtmgr->texture_filter_anisotropy);
+      }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
     {
       glEnable (GL_TEXTURE_3D);
       glBindTexture (GL_TEXTURE_3D, d->Handle);
-      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+      if (txt_mm->flags & CS_TEXTURE_CLAMP)
+      {
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+      } else{
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+      }
+
+      // @@@ Not sure if the following makes sense with 3D textures.
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR : GL_NEAREST);
+
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+
+      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      {
+        glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+          R3D->txtmgr->texture_filter_anisotropy);
+      }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
       glBindTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
-      // Are following lines actually useful ??
-      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+      // @@@ Temporarily disabled, although I don't know if REPEAT
+      // makes sense with cubemaps.
+      /*if (txt_mm->flags & CS_TEXTURE_CLAMP)
+      {*/
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+      /*} else {
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+      }*/
+
+      // @@@ Not sure if the following makes sense with cubemaps.
+      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR : GL_NEAREST);
+
+      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
+        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
+          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+
+      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      {
+        glTexParameterf (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+          R3D->txtmgr->texture_filter_anisotropy);
+      }
     }
   }
 
 
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
-                         : GL_NEAREST_MIPMAP_NEAREST);
-
-  if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
-  {
-    glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-      R3D->txtmgr->texture_filter_anisotropy);
-  }
-
   if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
   {
+    // @@@ Not implemented yet
   }
   else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
   {
@@ -253,7 +323,6 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	  txt_mm->SourceFormat(), 
 	  txt_mm->SourceType(), 
 	  togl->image_data);
-	//g3d->CheckGLError ("glTexImage2D()");
       }
       else
       {
@@ -314,7 +383,6 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
                       txt_mm->SourceFormat (),
                       txt_mm->SourceType (),
                       data);
-
         data += cursize;
       }
     }

@@ -111,6 +111,7 @@ SCF_VERSION(csVBORenderBuffer, 0,0,2);
 class csVBORenderBuffer : public csGLRenderBuffer
 {
 private:
+  char* tempbuf;
   uint bufferId;
   bool locked;
   csRenderBufferLockType lastLock;
@@ -119,14 +120,16 @@ private:
 public:
   csVBORenderBuffer (int size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount, 
-    csGLExtensionManager *ext) :
+    bool index, csGLExtensionManager *ext) :
     csGLRenderBuffer (size, type, comptype, compcount)
   {
     csVBORenderBuffer::ext = ext;
     locked = false;
     ext->glGenBuffersARB (1, &bufferId);
-    ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
-    ext->glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, 0, 
+    ext->glBindBufferARB (index?
+      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
+    ext->glBufferDataARB (index?
+      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, size, 0, 
       (type==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
   }
 
@@ -164,7 +167,8 @@ public:
     if (lastLock == CS_BUF_LOCK_NORMAL)
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
-      ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
+      // @@@ Should be real error check.
+      ASSERT(ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB));
     }
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;

@@ -32,6 +32,8 @@ private:
   static CGcontext context;
 
   static void ErrorCallback ();
+
+  bool enable;
 public:
   SCF_DECLARE_IBASE;
   

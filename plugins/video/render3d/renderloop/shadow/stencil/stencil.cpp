@@ -129,7 +129,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     if (entry->shadow_index_buffer == 0) { 
       entry->shadow_index_buffer = r3d->CreateRenderBuffer (
         sizeof (unsigned int)*triangle_count*12, CS_BUF_STATIC/*CS_BUF_INDEX*/,
-        CS_BUFCOMP_UNSIGNED_INT, 1);
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
 
     unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (CS_BUF_LOCK_NORMAL);
@@ -296,10 +296,10 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
     shadow_vertex_buffer = r3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
-       CS_BUFCOMP_FLOAT, 3);
+       CS_BUFCOMP_FLOAT, 3, false);
     shadow_normal_buffer = r3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
-       CS_BUFCOMP_FLOAT, 3);
+       CS_BUFCOMP_FLOAT, 3, false);
 
     csHashMap edge_stack(new_triangle_count*3);
     csArray<EdgeInfo> edge_array;

@@ -68,7 +68,7 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
             cgGLSetParameter1f(e->parameter, (float)intval);
         }
         break;
-      case iShaderVariable::VECTOR1:
+      case iShaderVariable::FLOAT:
         {
           float fval;
           if(lvar->GetValue(fval))
@@ -93,7 +93,7 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
     }
   }
 
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < matrixtrackers.Length(); ++i)
   {
     matrixtrackerentry* e = (matrixtrackerentry*)matrixtrackers.Get(i);
     cgGLSetStateMatrixParameter (e->parameter, e->matrix, e->modifier);
@@ -131,6 +131,11 @@ void csShaderGLCGVP::BuildTokenHash()
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
   xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
+
+  xmltokens.Register("integer", 100+iShaderVariable::INT);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+iShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
 
 bool csShaderGLCGVP::Load(iDataBuffer* program)
@@ -190,7 +195,7 @@ bool csShaderGLCGVP::Load(iDocumentNode* program)
           case iShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::VECTOR1:
+          case iShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
           case iShaderVariable::STRING:
@@ -359,4 +364,33 @@ csPtr<iString> csShaderGLCGVP::GetProgramID()
   scfString* str = new scfString();
   str->Append((const char*)d.data[0], 16);
   return csPtr<iString>(str);
+}
+
+csBasicVector csShaderGLCGVP::GetAllVariableNames()
+{
+  csBasicVector res;
+
+  csGlobalHashIterator c( &variables);
+  while(c.HasNext())
+  {
+    res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
+  }
+  return res;
+}
+
+csSymbolTable* csShaderGLCGVP::GetSymbolTable()
+{
+  return 0;
+}
+
+iShaderVariable* csShaderGLCGVP::GetVariable(int namehash)
+{
+  csHashIterator c(&variables, namehash);
+
+  if(c.HasNext())
+  {
+    return (iShaderVariable*)c.Next();
+  }
+
+  return 0;
 }

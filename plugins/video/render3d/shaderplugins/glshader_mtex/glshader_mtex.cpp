@@ -69,6 +69,8 @@ csGLShader_MTEX::csGLShader_MTEX(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+
+  enable = false;
 }
 
 csGLShader_MTEX::~csGLShader_MTEX()
@@ -81,6 +83,8 @@ csGLShader_MTEX::~csGLShader_MTEX()
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_MTEX::SupportType(const char* type)
 {
+  if (!enable)
+    return false;
   if( strcasecmp(type, "gl_mtex_fp") == 0)
     return true;
   return false;
@@ -99,6 +103,12 @@ void csGLShader_MTEX::Open()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
+  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  if (f != 0 && strcmp ("crystalspace.render3d.opengl", 
+    f->QueryClassID ()) == 0)
+    enable = true;
+  else return;
+
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
 
   ext->InitGL_ARB_texture_env_dot3 ();
@@ -108,6 +118,7 @@ void csGLShader_MTEX::Open()
   ext->InitGL_ARB_texture_env_combine ();
   if (!ext->CS_GL_ARB_texture_env_combine)
     ext->InitGL_EXT_texture_env_combine ();
+
 }
 
 csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)

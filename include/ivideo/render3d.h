@@ -316,7 +316,7 @@ struct iRender3D : public iBase
    */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount) = 0;
+    int componentCount, bool index) = 0;
 
   /// Activate a vertex buffer
   virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;

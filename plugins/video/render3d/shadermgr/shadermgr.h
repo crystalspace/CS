@@ -384,9 +384,9 @@ public:
   /// Check if valid
   virtual bool IsValid() const
   {
-    bool valid = true;
-    if(vp) valid = vp->IsValid();
-    if(fp) valid = fp->IsValid();
+    bool valid = false;
+    if(vp) valid |= vp->IsValid();
+    if(fp) valid &= fp->IsValid();
     return valid;
   }
 

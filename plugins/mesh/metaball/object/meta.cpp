@@ -308,7 +308,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
       rndbuf_verts = r3d->CreateRenderBuffer(
         sizeof (csVector3)*max_vertices, 
         CS_BUF_DYNAMIC, 
-        CS_BUFCOMP_FLOAT, 3);
+        CS_BUFCOMP_FLOAT, 3, false);
 
       rndbuf_verts_dirty = true;
     }
@@ -333,7 +333,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
       rndbuf_texels = r3d->CreateRenderBuffer(
         sizeof (csVector2)*max_vertices, 
         CS_BUF_DYNAMIC,
-        CS_BUFCOMP_FLOAT, 2);
+        CS_BUFCOMP_FLOAT, 2, false);
 
       rndbuf_texels_dirty = true;
 
@@ -359,7 +359,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
       rndbuf_colors = r3d->CreateRenderBuffer(
         sizeof (csColor)*max_vertices, 
         CS_BUF_DYNAMIC,
-        CS_BUFCOMP_FLOAT, 3);
+        CS_BUFCOMP_FLOAT, 3, false);
       
       rndbuf_colors_dirty = true;
       
@@ -387,7 +387,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
         sizeof (csTriangle)*int(max_vertices / 3), 
         CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT,
-        1);
+        1, true);
 
       rndbuf_index_dirty = true;
     }

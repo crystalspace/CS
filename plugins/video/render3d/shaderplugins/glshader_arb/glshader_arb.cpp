@@ -59,6 +59,8 @@ csGLShader_ARB::csGLShader_ARB(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+
+  enable = false;
 }
 
 csGLShader_ARB::~csGLShader_ARB()
@@ -71,6 +73,8 @@ csGLShader_ARB::~csGLShader_ARB()
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_ARB::SupportType(const char* type)
 {
+  if (!enable)
+    return false;
   if( strcasecmp(type, "gl_arb_vp") == 0)
     return true;
   return false;
@@ -91,6 +95,12 @@ void csGLShader_ARB::Open()
 
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+
+  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  if (f != 0 && strcmp ("crystalspace.render3d.opengl", 
+    f->QueryClassID ()) == 0)
+    enable = true;
+  else return;
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   ext->InitGL_ARB_vertex_program ();

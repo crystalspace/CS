@@ -1080,7 +1080,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     {
       vertex_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
+        CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (vbuf, mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
@@ -1098,7 +1098,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     {
       texel_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2);
+        CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, mesh_texels, sizeof (csVector2) * num_mesh_vertices);
@@ -1116,7 +1116,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     {
       normal_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3);
+        CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
@@ -1134,7 +1134,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     {
       color_buffer = r3d->CreateRenderBuffer (
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3);
+        CS_BUFCOMP_FLOAT, 3, false);
       mesh_colors_dirty_flag = false;
       csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, mesh_colors, sizeof (csColor) * num_mesh_vertices);
@@ -1152,7 +1152,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
     {
       index_buffer = r3d->CreateRenderBuffer (
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1);
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
       mesh_triangle_dirty_flag = false;
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
         CS_BUF_LOCK_NORMAL);

@@ -388,7 +388,9 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
   else
   if(images.IsValid() && (*images)[0].IsValid())
   {
-    // TODO: implement to get size from image array
+    // Dunno if this is right, but it seems to work.
+    mw = vTex[0]->get_width () >> mipmap;
+    mh = vTex[0]->get_height () >> mipmap;
   }
   else
     return false;

@@ -323,6 +323,14 @@ public:
    * is associated with given material handle.
    */
   virtual void Prepare ();
+
+#ifdef CS_USE_NEW_RENDERER
+  /**
+  * Get associated shader
+  */
+  virtual iShader* GetShader (csStringID type) 
+  { return 0; }
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**

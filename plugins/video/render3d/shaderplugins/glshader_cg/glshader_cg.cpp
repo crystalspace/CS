@@ -65,6 +65,8 @@ csGLShader_CG::csGLShader_CG(iBase* parent)
 
   context = cgCreateContext ();
   cgSetErrorCallback (ErrorCallback);
+
+  enable = false;
 }
 
 csGLShader_CG::~csGLShader_CG()
@@ -87,6 +89,8 @@ void csGLShader_CG::ErrorCallback ()
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_CG::SupportType(const char* type)
 {
+  if (!enable)
+    return false;
   if( strcasecmp(type, "gl_cg_vp") == 0)
     return true;
   if( strcasecmp(type, "gl_cg_fp") == 0)
@@ -105,11 +109,17 @@ csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 
 void csGLShader_CG::Open()
 {
+
   if(!object_reg)
     return;
 
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+
+  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  if (f != 0 && strcmp ("crystalspace.render3d.opengl", 
+    f->QueryClassID ()) == 0)
+    enable = true;
 }
 
 csPtr<iString> csGLShader_CG::GetProgramID(const char* programstring)

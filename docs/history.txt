@@ -3,6 +3,26 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+16-Jul-2003
+	- Anders Stenberg made the following new renderer additions and fixes:
+	  - Made AWS work. (Added some stub functions to comply with interface 
+	    definition. Seems like it works.)
+	  - Added CLAMP and NOFILTER flags to textures, as well as loader for 
+	    them in csparser.
+	  - Added several return value checks, to avoid some cases of broken 
+	    level/shader leading to crash. (Still lots of cases left. Need to 
+	    do some _real_ error checking/reporting here.)
+	  - Added a flag to CreateRenderBuffer to specify that a render buffer 
+	    is to be used for indices, and updated affected mesh plugins.
+	  - Disabled VBO support by default, since no nvidia cards seem to 
+	    cope with it. (Driver bug or wrong implementation?)
+	  - Made shaders check if an appropriate renderer is the current one. 
+	    (I.e. GL shaders won't load if the software renderer is used.)
+	  - Fixed broken loading of variables. (Maybe stupid since it will 
+	    soon be totally replaced, but I needed it for some tests.
+	  - Fixed bug with transform not beeing updated in some cases where 
+	    it should.
+	  - Added "rendertarget" and "fullscreenquad" render steps.
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
 	AWS entirely.  This means that a user must do all the construction

@@ -784,6 +784,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
+#ifdef CS_USE_NEW_RENDERER
+  xmltokens.Register ("clamp", XMLTOKEN_CLAMP);
+#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
   xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
   xmltokens.Register ("closed", XMLTOKEN_CLOSED);
@@ -801,6 +804,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
+#ifdef CS_USE_NEW_RENDERER
+  xmltokens.Register ("filter", XMLTOKEN_FILTER);
+#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("fog", XMLTOKEN_FOG);
   xmltokens.Register ("forward", XMLTOKEN_FORWARD);
   xmltokens.Register ("for2d", XMLTOKEN_FOR2D);

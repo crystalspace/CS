@@ -47,7 +47,7 @@
 #else
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
-#include "csutil/anonrndbuf.h"
+#include "cstool/anonrndbuf.h"
 #endif // CS_USE_NEW_RENDERER
 #include "ivideo/material.h"
 #include "qint.h"

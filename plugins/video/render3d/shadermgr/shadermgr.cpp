@@ -181,7 +181,6 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast || CSMASK_FrameProcess  );
 
-  
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
 
   csRef<iStrVector> classlist (csPtr<iStrVector> 
@@ -475,6 +474,11 @@ void csShader::BuildTokenHash()
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
   xmltokens.Register ("technique", XMLTOKEN_TECHNIQUE);
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+
+  xmltokens.Register("integer", 100+iShaderVariable::INT);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+iShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
 
 bool csShader::Load(iDocumentNode* node)
@@ -726,7 +730,10 @@ csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute) const
 void csShaderPass::AddTextureMapping (const char* name, int unit)
 {
   csRef<iEngine> engine = CS_QUERY_REGISTRY (objectreg, iEngine);
-  texmappingdirect[unit] = engine->FindTexture (name)->GetTextureHandle ();
+  csRef<iTextureWrapper> tex = engine->FindTexture (name);
+  // @@@ Maybe report error?
+  if (tex != 0)
+    texmappingdirect[unit] = tex->GetTextureHandle ();
 }
 
 void csShaderPass::AddTextureMapping (int layer, int unit)
@@ -773,6 +780,11 @@ void csShaderPass::BuildTokenHash()
   xmltokens.Register ("vp", XMLTOKEN_VP);
   xmltokens.Register ("fp", XMLTOKEN_FP);
   xmltokens.Register ("writemask", XMLTOKEN_WRITEMASK);
+
+  xmltokens.Register("integer", 100+iShaderVariable::INT);
+  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+iShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
 
 bool csShaderPass::Load(iDocumentNode* node)

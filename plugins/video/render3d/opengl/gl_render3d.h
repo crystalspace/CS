@@ -180,9 +180,7 @@ private:
   void DisableZOffset ()
   { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
-  csZBufMode GetZModePass2 (csZBufMode mode);
-
-  float SetMixMode (uint mode, float m_alpha, bool txt_alpha);
+  void SetMixMode (uint mode);
 
   void SetMirrorMode (bool mirror);
 
@@ -235,7 +233,7 @@ public:
   /// Create a renderbuffer
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    int componentCount);
+    int componentCount, bool index);
 
   /// Activate a vertex buffer
   virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);

@@ -28,6 +28,8 @@ private:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
+  bool enable;
+
 public:
   SCF_DECLARE_IBASE;
   

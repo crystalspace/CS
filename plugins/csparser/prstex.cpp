@@ -248,6 +248,30 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	if (!SyntaxService->ParseBool (child, always_animate, false))
 	  return 0;
 	break;
+#ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_CLAMP:
+        {
+          bool c;
+          if (!SyntaxService->ParseBool (child, c, true))
+            return 0;
+          if (c)
+            context.SetFlags (context.GetFlags() | CS_TEXTURE_CLAMP);
+          else
+            context.SetFlags (context.GetFlags() & ~CS_TEXTURE_CLAMP);
+        }
+        break;
+      case XMLTOKEN_FILTER:
+        {
+          bool c;
+          if (!SyntaxService->ParseBool (child, c, true))
+            return 0;
+          if (c)
+            context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOFILTER);
+          else
+            context.SetFlags (context.GetFlags() | CS_TEXTURE_NOFILTER);
+        }
+        break;
+#endif // CS_USE_NEW_RENDERER
       default:
         SyntaxService->ReportBadToken (child);
 	return 0;

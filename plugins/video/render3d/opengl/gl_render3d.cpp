@@ -238,29 +238,7 @@ void csGLRender3D::SetZMode (csZBufMode mode)
   }
 }
 
-csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode)
-{
-  switch (mode)
-  {
-  case CS_ZBUF_NONE:
-  case CS_ZBUF_TEST:
-  case CS_ZBUF_EQUAL:
-    return mode;
-    break;
-  case CS_ZBUF_FILL:
-  case CS_ZBUF_FILLONLY:
-    return CS_ZBUF_EQUAL;
-    break;
-  case CS_ZBUF_USE:
-    return CS_ZBUF_EQUAL;
-    break;
-  default:
-    break;
-  }
-  return mode;
-}
-
-float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
+void csGLRender3D::SetMixMode (uint mode)
 {
 
   // Note: In all explanations of Mixing:
@@ -273,22 +251,18 @@ float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
   {
     case CS_FX_MULTIPLY:
       // Color = SRC * DEST +   0 * SRC = DEST * SRC
-      m_alpha = 1.0f;
       statecache->SetBlendFunc (GL_ZERO, GL_SRC_COLOR);
       break;
     case CS_FX_MULTIPLY2:
       // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-      m_alpha = 1.0f;
       statecache->SetBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
       break;
     case CS_FX_ADD:
       // Color = 1 * DEST + 1 * SRC = DEST + SRC
-      m_alpha = 1.0f;
       statecache->SetBlendFunc (GL_ONE, GL_ONE);
       break;
     case CS_FX_DESTALPHAADD:
       // Color = DEST + DestAlpha * SRC
-      m_alpha = 1.0f;
       statecache->SetBlendFunc (GL_DST_ALPHA, GL_ONE);
       break;
     case CS_FX_ALPHA:
@@ -297,22 +271,11 @@ float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
       break;
     case CS_FX_TRANSPARENT:
       // Color = 1 * DEST + 0 * SRC
-      m_alpha = 0.0f;
       statecache->SetBlendFunc (GL_ZERO, GL_ONE);
       break;
     case CS_FX_COPY:
     default:
-      enable_blending = txt_alpha;
-      if (txt_alpha)
-      {
-        // Color = 0 * DEST + 1 * SRC = SRC
-        m_alpha = 1.0f;
-        statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      }
-      else
-      {
-	m_alpha = 0;
-      }
+      enable_blending = false;
       break;
   }
 
@@ -320,8 +283,6 @@ float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
     statecache->Enable_GL_BLEND ();
   else
     statecache->Disable_GL_BLEND ();
-
-  return m_alpha;
 }
 
 void csGLRender3D::SetMirrorMode (bool mirror)
@@ -695,7 +656,7 @@ bool csGLRender3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
-  //ext->InitGL_ARB_vertex_buffer_object ();
+  ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -719,8 +680,7 @@ bool csGLRender3D::Open ()
     //no special ati extensions atm
   }
   // check for support of VBO
-  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
-  printf ("JOJO: %d\n", ext->CS_GL_ARB_vertex_buffer_object);
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object && false;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -791,7 +751,6 @@ void csGLRender3D::Close ()
 bool csGLRender3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
-  
   if (lastUsedShaderpass)
   {
     lastUsedShaderpass->ResetState ();
@@ -802,10 +761,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
   int i = 0;
   for (i = 0; i < 16; i++)
-  {
-    texunit[i] = 0;
-    texunitenabled[i] = false;
-  }
+    DeactivateTexture (i);
 
   if (render_target)
   {
@@ -816,22 +772,19 @@ bool csGLRender3D::BeginDraw (int drawflags)
       G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
       G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
       rt_cliprectset = true;
-
-      glMatrixMode (GL_PROJECTION);
-      glLoadIdentity ();
-      SetGlOrtho (false);
-      glViewport (1, -1, viewwidth+1, viewheight+1);
     }
 
     if (!rt_onscreen)
     {
-      /*txtcache->Cache (render_target);
-      GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
-        ->Handle;*/
+      glMatrixMode (GL_PROJECTION);
+      glLoadIdentity ();
+      SetGlOrtho (false);
+      glViewport (1, -1, viewwidth+1, viewheight+1);
+      glMatrixMode (GL_MODELVIEW);
+      glLoadIdentity ();
+
       statecache->SetShadeModel (GL_FLAT);
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-      //statecache->Enable_GL_TEXTURE_2D ();
-      //statecache->SetTexture (GL_TEXTURE_2D, handle);
       ActivateTexture (render_target);
       statecache->Disable_GL_BLEND ();
       SetZMode (CS_ZBUF_NONE);
@@ -857,7 +810,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
   else if (drawflags & CSDRAW_CLEARSCREEN)
     glClear (GL_COLOR_BUFFER_BIT);
 
-  if (!render_target && (drawflags & CSDRAW_3DGRAPHICS))
+  if (drawflags & CSDRAW_3DGRAPHICS)
   {
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
@@ -871,9 +824,12 @@ bool csGLRender3D::BeginDraw (int drawflags)
     matrixholder[11] = 1.0/aspect;
     matrixholder[14] = -matrixholder[11];
     glMultMatrixf (matrixholder);
+
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    object2camera = csReversibleTransform();
     return true;
-  }
-  if (drawflags & CSDRAW_2DGRAPHICS)
+  } else if (drawflags & CSDRAW_2DGRAPHICS)
   {
     if (use_hw_render_buffers)
     {
@@ -1131,8 +1087,11 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
   if (vertattrib[attrib])
   {
     if (ext->glDisableVertexAttribArrayARB) 
+    {
       ext->glDisableVertexAttribArrayARB (attrib);
-    else
+      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+      ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);
+    } else
     {
       switch (attrib)
       {
@@ -1426,7 +1385,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS); //indexbuf->Lock(CS_BUF_LOCK_RENDER);
   if (bufData != (void*)-1)
   {
-    SetMixMode (mymesh->mixmode, 0, true);
+    SetMixMode (mymesh->mixmode);
 
     if (bugplug)
       bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
@@ -1523,9 +1482,9 @@ void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
   if (hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha)
-    SetMixMode (CS_FX_ALPHA, 0, false);
+    SetMixMode (CS_FX_ALPHA);
   else
-    SetMixMode (CS_FX_COPY, 0, false);
+    SetMixMode (CS_FX_COPY);
 
   statecache->Enable_GL_TEXTURE_2D ();
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
