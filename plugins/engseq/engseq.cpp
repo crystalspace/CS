@@ -65,12 +65,11 @@ CS_IMPLEMENT_PLUGIN
 class OpStandard : public iSequenceOperation
 {
 protected:
-  virtual ~OpStandard () { }
+  virtual ~OpStandard() { SCF_DESTRUCT_IBASE(); }
 
 public:
   SCF_DECLARE_IBASE;
   OpStandard () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~OpStandard() { SCF_DESTRUCT_IBASE(); }
   virtual void CleanupSequences () { }
 };
 
@@ -84,12 +83,11 @@ SCF_IMPLEMENT_IBASE_END
 class CondStandard : public iSequenceCondition
 {
 protected:
-  virtual ~CondStandard () { }
+  virtual ~CondStandard() { SCF_DESTRUCT_IBASE(); }
 
 public:
   SCF_DECLARE_IBASE;
   CondStandard () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~CondStandard() { SCF_DESTRUCT_IBASE(); }
 };
 
 SCF_IMPLEMENT_IBASE (CondStandard)
