@@ -1291,7 +1291,8 @@ void converter::init_program_data ( ) {
 
     John Burkardt
 */
-  byte_swap = FALSE;
+  extern long convert_endian (long l);
+  byte_swap = (convert_endian (0x12345678L) != 0x12345678L);
   debug = FALSE;
   num_color = 0;
   num_cor3 = 0;
