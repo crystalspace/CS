@@ -324,6 +324,7 @@ void WalkTest::Help ()
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
+  printf ("  -regions           load every map in a seperate region (default off)\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
@@ -1257,7 +1258,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     if (!myVFS->ChDir ("/tmp"))
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Temporary directory /tmp not mounted on VFS!");
+      Report (CS_REPORTER_SEVERITY_ERROR,
+      	"Temporary directory /tmp not mounted on VFS!");
       return false;
     }
 
@@ -1324,18 +1326,29 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     // Load from a map file.
     if (num_maps == 1)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->map_dir);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+      	first_map->map_dir);
     else if (num_maps == 2 && cache_map != NULL)
     {
       if (cache_map != first_map)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->map_dir);
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+		first_map->map_dir);
       else
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->next_map->map_dir);
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+		first_map->next_map->map_dir);
     }
     else if (num_maps > 1)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...", first_map->map_dir);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
+      	first_map->map_dir);
 
-    if (cache_map != NULL)
+    // Check if we have to load every seperate map in a seperate region.
+    bool do_regions = false;
+    csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+    	iCommandLineParser);
+    if (cmdline->GetOption ("regions"))
+      do_regions = true;
+      
+    if ((!do_regions) && cache_map != NULL)
     {
       // First we force a clear of the cache manager in the engine
       // so that a new one will be made soon.
@@ -1363,20 +1376,45 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
       // Load the map from the file.
       if (num_maps > 1)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'", map->map_dir);
-      if (!LevelLoader->LoadMapFile ("world", false))
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
+		map->map_dir);
+      if (do_regions)
+        Engine->SelectRegion (map->map_dir);
+      if (!LevelLoader->LoadMapFile ("world", false, !do_regions))
         return false;
+      if (do_regions)
+      {
+        // First we force a clear of the cache manager in the engine
+        // so that a new one will be made soon.
+        Engine->SetCacheManager (NULL);
+        // And finally we get the cache manager which will force it
+        // to be created based on current VFS dir.
+        Engine->GetCacheManager ();
+
+        Engine->GetCurrentRegion ()->Prepare ();
+        Engine->SelectRegion ((iRegion*)NULL);
+      }
     }
 
+    if (do_regions)
+      Engine->SelectRegion ("libdata");
     LoadLibraryData ();
+    if (do_regions)
+    {
+      Engine->GetCurrentRegion ()->Prepare ();
+      Engine->SelectRegion ((iRegion*)NULL);
+    }
     Inititalize2DTextures ();
     ParseKeyCmds ();
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
-    Engine->Prepare (meter);
-    delete meter;
+    if (!do_regions)
+    {
+      csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
+      Engine->Prepare (meter);
+      delete meter;
+    }
 
     Create2DSprites ();
 
@@ -1422,7 +1460,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     w = CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (),
 					iSoundWrapper, "whoosh.wav");
     wMissile_whoosh = w ? w->GetSound () : NULL;
-   }
+  }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"--------------------------------------");
