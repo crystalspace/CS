@@ -96,9 +96,9 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   SETFLAG ("Video.ASCII.Console.Reverse", AA_REVERSE_MASK);
   SETFLAG ("Video.ASCII.Console.All", AA_ALL);
   SETFLAG ("Video.ASCII.Console.EightBit", AA_EIGHT);
-  SETFLAG ("Video.ASCII.Console.GenFont", AA_GENFONT);
-  if (aa_defparams.supported & AA_GENFONT)
-    aa_defparams.supported |= AA_EXTENDED;
+//  SETFLAG ("Video.ASCII.Console.GenFont", AA_GENFONT);
+//  if (aa_defparams.supported & AA_GENFONT)
+//    aa_defparams.supported |= AA_EXTENDED;
 
 #undef SETFLAG
 
@@ -106,7 +106,7 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
         ("Video.ASCII.Rendering.Inverse", false);
   const char *dither = config->GetStr ("Video.ASCII.Rendering.Dither", "none");
   if (strcasecmp (dither, "none") == 0)
-    aa_defrenderparams.dither = 0;
+    aa_defrenderparams.dither = AA_NONE;
   else if (strcasecmp (dither, "floyd-steinberg") == 0)
     aa_defrenderparams.dither = AA_FLOYD_S;
   else if (strcasecmp (dither, "error-distribution") == 0)
@@ -129,7 +129,9 @@ bool csGraphics2DAA::Initialize (iObjectRegistry *object_reg)
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    EventOutlet = System->CreateEventOutlet (this);
+    //EventOutlet = System->CreateEventOutlet (this);
+    if (!EventOutlet)
+      EventOutlet = q->CreateEventOutlet (this);
     q->DecRef ();
   }
   return true;
@@ -238,7 +240,7 @@ void csGraphics2DAA::Print (csRect *area)
           case AA_RIGHT:	event = CSKEY_RIGHT;	break;
           case AA_BACKSPACE:	event = CSKEY_BACKSPACE;break;
           case AA_ESC:		event = CSKEY_ESC;	break;
-          case AA_INS:		event = CSKEY_INS;	break;
+/*          case AA_INS:		event = CSKEY_INS;	break;
           case AA_DEL:		event = CSKEY_DEL;	break;
           case AA_HOME:		event = CSKEY_HOME;	break;
           case AA_END:		event = CSKEY_END;	break;
@@ -258,7 +260,7 @@ void csGraphics2DAA::Print (csRect *area)
           case AA_F9:		event = CSKEY_F9;	break;
           case AA_F10:		event = CSKEY_F10;	break;
           case AA_F11:		event = CSKEY_F11;	break;
-          case AA_F12:		event = CSKEY_F12;	break;
+          case AA_F12:		event = CSKEY_F12;	break;*/
           case '\n':		event = CSKEY_ENTER;	break;
         }
         if (event == CSKEY_SHIFT)

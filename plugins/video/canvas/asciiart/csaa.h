@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include <aalib.h>
+#include "iutil/event.h"
 
 /**
  * The Ascii Art driver. This is a cross-platform graphics driver which
