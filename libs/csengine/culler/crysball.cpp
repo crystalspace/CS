@@ -194,7 +194,7 @@ void csCrystalBall::trinode::Transform (const csMatrix3 &m, csVector &indexVecto
 
 bool csCrystalBall::trinode::SignMatches (const csVector3 *tn, int useSign)
 {
-  bool match;
+  bool match = false;
   if (useSign < 0)
   {
     if (tn->z <= 0.0)
