@@ -1227,7 +1227,7 @@ void csTerrFuncObject::SetupObject ()
   }
 }
 
-void csSurfMeshObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, 
+void csTerrFuncObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, 
 					  iVertexBuffer *&vbuf2)
 {
  if (!vbuf1)

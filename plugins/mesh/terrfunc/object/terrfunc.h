@@ -228,7 +228,7 @@ private:
 	int& clip_portal, int& clip_plane, int& clip_z_plane);
 
   /// retrieve a vertexbuffer from the manager if not done already
-  void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2)
+  void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2);
 
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
