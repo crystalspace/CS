@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  this case and will issue a warning when that happens. In that case
 	  it will assume 256x256 max. You can then use the above option
 	  to set the real maximum size.
+	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
+	  "make depend" flags to work around problem reported by David Calkins
+	  <dcalk@verizon.net>.
 4-Feb-2003
 	- Augmented the ODE check in configure.ac so that it works in two
 	  phases.  First it checks for libode.  Second, it checks if the
