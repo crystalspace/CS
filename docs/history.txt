@@ -22,6 +22,16 @@ The history order is reversed so that new features are at the top.
 	- Removed all CreateAttribute... and MoveAttribute... functions
 	  from iDocumentNode. Instead there is only SetAttribute() which is
 	  now implemented.
+	- Added SetValueAsInt() and SetValueAsFloat() for iDocumentNode.
+	- Added iString, csString, and scfString versions of SetFastGrowing().
+	  Use this new flag if you have a string that grows a lot (i.e. lot
+	  of Append() calls). It will consume more memory but it is a LOT
+	  faster. If you don't plan on doing a lot of Append() calls then
+	  do not use this.
+	- The TinyXml output now uses this option for writing out XML to
+	  an iString. This GREATLY speeds up XML writing (from a minute to
+	  about a second :-)
+	- cs2xml now uses XML writing with TinyXML. Still not 100% operational.
 13-Aug-2002
 	- Implemented XML versions of LoadMap() and LoadSector() in the
 	  main loader.

@@ -181,6 +181,20 @@ void csTinyXmlNode::SetValue (const char* value)
   node->SetValue (value);
 }
 
+void csTinyXmlNode::SetValueAsInt (int value)
+{
+  char buf[40];
+  sprintf (buf, "%d", value);
+  node->SetValue (buf);
+}
+
+void csTinyXmlNode::SetValueAsFloat (float value)
+{
+  char buf[40];
+  sprintf (buf, "%g", value);
+  node->SetValue (buf);
+}
+
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;

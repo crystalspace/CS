@@ -154,6 +154,9 @@ public:
   virtual csDocumentNodeType GetType ();
   virtual const char* GetValue ();
   virtual void SetValue (const char* value);
+  virtual void SetValueAsInt (int value);
+  virtual void SetValueAsFloat (float value);
+
   virtual csRef<iDocumentNode> GetParent ();
 
   virtual csRef<iDocumentNodeIterator> GetNodes ();

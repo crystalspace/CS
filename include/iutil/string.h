@@ -30,6 +30,13 @@ struct iString : public iBase
   /// Set string capacity to NewSize characters (plus one for ending NULL)
   virtual void SetCapacity (size_t NewSize) = 0;
 
+  /**
+   * If this is set to true then we have a string that grows faster.
+   * Use this if memory is not really a big issue but you have a
+   * string that has a lot of Append calls.
+   */
+  virtual void SetFastGrowing (bool fast) = 0;
+
   /// Truncate the string
   virtual void Truncate (size_t iPos) = 0;
 

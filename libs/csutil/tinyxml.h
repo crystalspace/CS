@@ -64,7 +64,7 @@ static void new_fprintf (iString* file, const char* msg, ...)
   va_start (args, msg);
   str.FormatV (msg, args);
   va_end (args);
-
+  file->SetFastGrowing (true);
   file->Append (str);
 }
 static void new_fputs (const char* msg, iString* file)

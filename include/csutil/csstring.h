@@ -35,6 +35,8 @@ protected:
   size_t Size;
   /// Size in bytes of allocated string buffer.
   size_t MaxSize;
+  /// If true this string grows a lot.
+  bool grows_a_lot;
 
 public:
   /**
@@ -43,6 +45,16 @@ public:
    * memory, then use Free() or Reclaim().
    */
   void SetCapacity (size_t NewSize);
+
+  /**
+   * If this is set to true then we have a string that grows faster.
+   * Use this if memory is not really a big issue but you have a
+   * string that has a lot of Append calls.
+   */
+  void SetFastGrowing (bool fast)
+  {
+    grows_a_lot = fast;
+  }
 
   /// Free the memory allocated for the string
   void Free ();
@@ -225,26 +237,31 @@ public:
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
   /// Create an empty csString object
-  csString () : Data (NULL), Size (0), MaxSize (0) {}
+  csString () : Data (NULL), Size (0), MaxSize (0), grows_a_lot (false) {}
 
   /// Create an csString object and reserve space for iLength characters
-  csString (size_t iLength) : Data (NULL), Size (0), MaxSize (0)
+  csString (size_t iLength) : Data (NULL), Size (0), MaxSize (0),
+  	grows_a_lot (false)
   { SetCapacity (iLength); }
 
   /// Copy constructor from existing csString.
-  csString (const csString& copy) : Data (NULL), Size (0), MaxSize (0)
+  csString (const csString& copy) : Data (NULL), Size (0), MaxSize (0),
+  	grows_a_lot (false)
   { Append (copy); }
 
   /// Copy constructor from ASCIIZ string
-  csString (const char* copy) : Data (NULL), Size (0), MaxSize (0)
+  csString (const char* copy) : Data (NULL), Size (0), MaxSize (0),
+  	grows_a_lot (false)
   { Append (copy); }
 
   /// Copy constructor from a character
-  csString (char c) : Data (NULL), Size (0), MaxSize (0)
+  csString (char c) : Data (NULL), Size (0), MaxSize (0),
+  	grows_a_lot (false)
   { Append (c); }
 
   /// Copy constructor from a character (unsigned)
-  csString (unsigned char c) : Data(NULL), Size (0), MaxSize (0)
+  csString (unsigned char c) : Data(NULL), Size (0), MaxSize (0),
+  	grows_a_lot (false)
   { Append ((char) c); }
 
   /// Destroy a csString object

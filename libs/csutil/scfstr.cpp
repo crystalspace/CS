@@ -27,6 +27,9 @@ SCF_IMPLEMENT_IBASE_END
 void scfString::SetCapacity (size_t NewSize)
 { s.SetCapacity (NewSize); }
 
+void scfString::SetFastGrowing (bool fast)
+{ s.SetFastGrowing (fast); }
+
 void scfString::Truncate (size_t iPos)
 { s.Truncate (iPos); }
 

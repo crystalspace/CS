@@ -31,14 +31,11 @@ csString::~csString ()
 }
 
 void csString::Free ()
-  {
-  if (Data)
-  {
-    delete[] Data;
-    Data = 0;
-    Size = 0;
-    MaxSize = 0;
-  }
+{
+  delete[] Data;
+  Data = 0;
+  Size = 0;
+  MaxSize = 0;
 }
 
 void csString::SetCapacity (size_t NewSize)
@@ -46,7 +43,14 @@ void csString::SetCapacity (size_t NewSize)
   NewSize++; // Plus one for implicit null byte.
   if (NewSize <= MaxSize)
     return;
-  MaxSize = NewSize;
+  if (grows_a_lot)
+  {
+    MaxSize = NewSize * 2 + 1;
+  }
+  else
+  {
+    MaxSize = NewSize;
+  }
 
   char* buff = new char[MaxSize];
   if (Data == 0 || Size == 0)
@@ -223,17 +227,17 @@ csString &csString::FormatV (const char *format, va_list args)
 
   int rc = 0;
   while (1)
-    {
-      rc = cs_vsnprintf(Data, MaxSize, format, args);
-      // Buffer was big enough for entire string?
-      if (rc >= 0 && rc < (int)MaxSize)
-	break;
-      // Some vsnprintf()s return -1 on failure, others return desired capacity.
-      if (rc >= 0)
-	SetCapacity(rc); // SetCapacity() ensures room for null byte.
+  {
+    rc = cs_vsnprintf(Data, MaxSize, format, args);
+    // Buffer was big enough for entire string?
+    if (rc >= 0 && rc < (int)MaxSize)
+      break;
+    // Some vsnprintf()s return -1 on failure, others return desired capacity.
+    if (rc >= 0)
+      SetCapacity(rc); // SetCapacity() ensures room for null byte.
     else
       SetCapacity(MaxSize * 2 - 1);
-    }
+  }
   Size = rc;
   return *this;
 }

@@ -26,6 +26,7 @@ struct iVFS;
 struct iCommandLineParser;
 struct iObjectRegistry;
 struct iFile;
+struct iDocumentNode;
 class csParser;
 
 /**
@@ -41,7 +42,7 @@ public:
   void ReportError (const char* description, ...);
 
   void ParseGeneral (const char* parent_token,
-  	int indent, csParser* parser, iFile* fout, char* buf);
+  	int indent, csParser* parser, csRef<iDocumentNode>& parent, char* buf);
 
   bool IsEmpty (const char* in);
   bool IsNumeric (const char* in);

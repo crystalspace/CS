@@ -26,6 +26,8 @@
 #include "csutil/indprint.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
+#include "csutil/xmltiny.h"
+#include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
@@ -420,7 +422,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
 }
 
 void Cs2Xml::ParseGeneral (const char* parent_token,
-	int indent, csParser* parser, iFile* fout, char* buf)
+	int indent, csParser* parser, csRef<iDocumentNode>& parent, char* buf)
 {
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (ACCEL)
@@ -479,9 +481,16 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
       switch (cmd)
       {
         case CS_TOKEN_COLOR:
-	  WriteToken (indent, tokname, name, true, false);
-	  WriteVector3 (params, "r", "g", "b");
-	  PrintIndent (0, "/>\n");
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    float x, y, z;
+	    csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	    child->SetAttributeAsFloat ("red", x);
+	    child->SetAttributeAsFloat ("green", y);
+	    child->SetAttributeAsFloat ("blue", z);
+	  }
 	  break;
         case CS_TOKEN_ACCEL:
         case CS_TOKEN_CURVECONTROL:
@@ -493,20 +502,32 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_POSITION:
         case CS_TOKEN_SHIFT:
         case CS_TOKEN_VERTEX:
-	  WriteToken (indent, tokname, name, true, false);
-	  WriteVector3 (params);
-	  PrintIndent (0, "/>\n");
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    float x, y, z;
+	    csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	    child->SetAttributeAsFloat ("x", x);
+	    child->SetAttributeAsFloat ("y", y);
+	    child->SetAttributeAsFloat ("z", z);
+	  }
 	  break;
         case CS_TOKEN_V:
 	  {
 	    if (strchr (params, ':'))
 	    {
 	      // For sprites statement.
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
 	      float x, y, z, u, v;
 	      csScanStr (params, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
-	      WriteToken (indent, tokname, name, false, false);
-	      PrintIndent (0, "x=%g y=%g z=%g u=%g v=%g", x, y, z, u, v);
-              PrintIndent (0, "</%s>\n", tokname);
+	      child->SetAttributeAsFloat ("x", x);
+	      child->SetAttributeAsFloat ("y", y);
+	      child->SetAttributeAsFloat ("z", z);
+	      child->SetAttributeAsFloat ("u", u);
+	      child->SetAttributeAsFloat ("v", v);
 	    }
 	    else if (!strcmp (parent_token, "polygon"))
 	    {
@@ -515,18 +536,26 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      int list[100];
 	      int num;
 	      csScanStr (params, "%D", list, &num);
-	      PrintIndent (indent, "<v>%d</v>", list[0]);
-	      for (i = 1 ; i < num ; i++)
+	      for (i = 0 ; i < num ; i++)
 	      {
-	        PrintIndent (0, " <v>%d</v>", list[i]);
+	        csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	        child->SetValue ("v");
+		csRef<iDocumentNode> text = child->CreateNodeBefore (
+		  CS_NODE_TEXT, NULL);
+		text->SetValueAsInt (list[i]);
 	      }
-	      PrintIndent (0, "\n");
 	    }
 	    else
 	    {
-	      WriteToken (indent, tokname, name, true, false);
-	      WriteVector3 (params);
-	      PrintIndent (0, "/>\n");
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      float x, y, z;
+	      csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	      child->SetAttributeAsFloat ("x", x);
+	      child->SetAttributeAsFloat ("y", y);
+	      child->SetAttributeAsFloat ("z", z);
 	      break;
 	    }
 	  }
@@ -626,9 +655,10 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	  }
 	  else
 	  {
-	    WriteToken (indent, tokname, name, false, true);
-            ParseGeneral (tokname, indent+2, parser, fout, params);
-            PrintIndent (indent, "</%s>\n", tokname);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+            ParseGeneral (tokname, indent+2, parser, child, params);
 	  }
           break;
       }
@@ -673,14 +703,6 @@ void Cs2Xml::Main ()
     }
   }
 
-  csRef<iFile> fout;
-  //fout.Take (vfs->Open ("/this/world", VFS_FILE_WRITE));
-  //if (!fout)
-  //{
-    //ReportError ("Could not open file '/this/world'!");
-    //return;
-  //}
-
   csParser* parser = new csParser (true);
   parser->ResetParserLine ();
 
@@ -696,9 +718,15 @@ void Cs2Xml::Main ()
   {
     if (params)
     {
-      WriteToken (0, "world", NULL, false, true);
-      ParseGeneral ("", 2, parser, fout, params);
-      PrintIndent (0, "</world>\n");
+      csRef<iDocumentSystem> xml;
+      xml.Take (new csTinyDocumentSystem ());
+      csRef<iDocument> doc = xml->CreateDocument ();
+      csRef<iDocumentNode> root = doc->CreateRoot ();
+      csRef<iDocumentNode> parent = root->CreateNodeBefore (
+    	  CS_NODE_ELEMENT, NULL);
+      parent->SetValue ("world");
+      ParseGeneral ("", 2, parser, parent, params);
+      doc->Write (vfs, "/this/test.xml");
     }
   }
   else

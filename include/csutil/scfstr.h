@@ -58,6 +58,8 @@ public:
 
   /// Set string capacity to NewSize characters (plus one for ending NULL)
   virtual void SetCapacity (size_t NewSize);
+  /// Set to true for fast growing strings.
+  virtual void SetFastGrowing (bool fast);
 
   /// Truncate the string
   virtual void Truncate (size_t iPos);

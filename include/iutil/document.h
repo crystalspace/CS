@@ -102,7 +102,7 @@ struct iDocumentNodeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNode, 0, 3, 0);
+SCF_VERSION (iDocumentNode, 0, 4, 0);
 
 /**
  * This represents a node in a document.
@@ -140,6 +140,11 @@ struct iDocumentNode : public iBase
    * </ul>
    */
   virtual void SetValue (const char* value) = 0;
+  /// Set value as int.
+  virtual void SetValueAsInt (int value) = 0;
+  /// Set value as float.
+  virtual void SetValueAsFloat (float value) = 0;
+
   /// Get the parent.
   virtual csRef<iDocumentNode> GetParent () = 0;
 
