@@ -22,8 +22,6 @@
 #include "ogl_g3dcom.h"
 #include "ogl_txtmgr.h"
 #include "ogl_txtcache.h"
-#include "ogl_proctexback.h"
-#include "ogl_proctexsoft.h"
 #include "csutil/scanstr.h"
 #include "csutil/debug.h"
 #include "iutil/cfgfile.h"
@@ -49,17 +47,6 @@ csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
 csTextureOpenGL::~csTextureOpenGL ()
 {
   delete [] image_data;
-}
-
-csTextureProcOpenGL::~csTextureProcOpenGL ()
-{
-  if (texG3D) texG3D->DecRef ();
-}
-
-csTextureProcOpenGL::csTextureProcOpenGL (csTextureHandle *Parent,
-  iImage *image) : csTextureOpenGL (Parent, image), texG3D (NULL)
-{
-  DG_TYPE (this, "csTextureProcOpenGL");
 }
 
 //---------------------------------------------------------------------------
@@ -462,20 +449,12 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
 
 void csTextureHandleOpenGL::Clear ()
 {
-  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC && vTex.Length ())
-  {
-    SCF_DEC_REF (((csTextureProcOpenGL*)vTex[0])->texG3D);
-    ((csTextureProcOpenGL*)vTex[0])->texG3D = NULL;
-  }
 }
 
 csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image, bool ismipmap)
 {
   ismipmap = false;
-  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-    return new csTextureProcOpenGL (this, Image);
-  else
-    return new csTextureOpenGL (this, Image);
+  return new csTextureOpenGL (this, Image);
 }
 
 void csTextureHandleOpenGL::ShowFormat ()
@@ -491,8 +470,6 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   // textures are calculated correctly. In other words, the app writer need
   // not know about opengl texture size adjustments. smgh
   if (!image) return;
-  if (((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) && vTex.Length ())
-    return;
 
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
@@ -515,43 +492,6 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   // Determine the format and type of the source we gonna tranform the data to
   FindFormatType ();
   CreateMipmaps ();
-
-  //  printf ("proctex creation\n");
-  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-  {
-    bool alone_hint = (flags & CS_TEXTURE_PROC_ALONE_HINT) ==
-                       CS_TEXTURE_PROC_ALONE_HINT;
-    switch (texman->proc_tex_type)
-    {
-      case BACK_BUFFER_TEXTURE:
-      {
-	csOpenGLProcBackBuffer *bbtexG3D = new csOpenGLProcBackBuffer(NULL);
-	bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) ==
-                     CS_TEXTURE_PROC_PERSISTENT;
-	// already shares the texture cache/manager
-	bbtexG3D->Prepare (texman->G3D, this, pfmt, persistent);
-	((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) bbtexG3D;
-	break;
-      }
-      case SOFTWARE_TEXTURE:
-      {
-	// This is always in 32bit no matter what the pfmt.
-	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
-	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex,
-            this, pfmt, image->GetImageData (), alone_hint))
-	{
-	  ((csTextureProcOpenGL*)vTex[0])->texG3D = (iGraphics3D*) stexG3D;
-	  if (!texman->head_soft_proc_tex)
-	    texman->head_soft_proc_tex = stexG3D;
-	}
-	break;
-      }
-      case AUXILIARY_BUFFER_TEXTURE:
-      default:
-	break;
-    }
-  }
-  //  printf ("init done\n");
 }
 
 void csTextureHandleOpenGL::CreateMipmaps ()
@@ -583,8 +523,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
   transform (image, vTex[0]);
 
   // 2D textures uses just the top-level mipmap
-  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D
-      && (flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC)
+  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
     // Create each new level by creating a level 2 mipmap from previous level
     // we do this down to 1x1 as opengl defines it
@@ -663,10 +602,8 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
 
 iGraphics3D *csTextureHandleOpenGL::GetProcTextureInterface ()
 {
-  if ((flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC || vTex.Length () == 0)
-    return NULL;
-
-  return ((csTextureProcOpenGL*)vTex[0])->texG3D;
+  // @@@ REMOVE!
+  return NULL;
 }
 
 void csTextureHandleOpenGL::Prepare ()
@@ -681,7 +618,6 @@ csTextureManagerOpenGL::csTextureManagerOpenGL (iObjectRegistry* object_reg,
   : csTextureManager (object_reg, iG2D)
 {
   G3D = iG3D;
-  head_soft_proc_tex = NULL;
   read_config (config);
   Clear ();
 }
@@ -835,26 +771,11 @@ void csTextureManagerOpenGL::Clear ()
   csTextureManager::Clear ();
 }
 
-void csTextureManagerOpenGL::FreeImages()
+void csTextureManagerOpenGL::FreeImages ()
 {
-  /*
-     We are pushing all known textures into software proctex renderers
-     before freeing images. This is not optimal, but better than either
-     not freeing the images or having the software 
-     proctexes register NULL images with their renderer.
-   */
   int i;
-  csOpenGLProcSoftware *softtex;
-
   for (i = 0 ; i < textures.Length () ; i++)
   {
-    softtex = head_soft_proc_tex;
-    while (softtex)
-    {
-      if (softtex->txts_vector->FindKey(textures.Get(i)) == -1) 
-        softtex->txts_vector->RegisterAndPrepare(textures.Get(i));
-      softtex = softtex->next_soft_tex;
-    }
     textures.Get (i)->FreeImage ();
   }
 }

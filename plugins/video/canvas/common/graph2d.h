@@ -251,11 +251,6 @@ public:
   /// Do a screenshot: return a new iImage object
   virtual csPtr<iImage> ScreenShot ();
 
-  /// Create an off screen canvas
-  virtual iGraphics2D *CreateOffScreenCanvas
-  (int width, int height, void *buffer, bool alone_hint,
-   csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0);
-
   /// Enable/disable canvas resize (Over-ride in sub classes)
   virtual void AllowResize (bool /*iAllow*/) { };
 

@@ -32,6 +32,10 @@ private:
   int *palette;
   /// number of colours in palette
   int palsize;
+  /// Accumulated elapsed time.
+  csTicks elapsed;
+  /// State.
+  int state;
 
   /// make my palette, max nr of colours
   void MakePalette (int max);

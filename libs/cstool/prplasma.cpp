@@ -23,6 +23,7 @@
 #include "ivideo/graph3d.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
+#include "iutil/objreg.h"
 
 #include "cstool/prplasma.h"
 
@@ -35,7 +36,7 @@ csProcPlasma::csProcPlasma () : csProcTexture()
   mat_w = 64;
   mat_h = 64;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
 
 csProcPlasma::~csProcPlasma ()
@@ -101,6 +102,7 @@ void csProcPlasma::MakePalette (int max)
   if (palette) delete[] palette;
   palsize = max;
   palette = new int[palsize];
+  iTextureManager* ptTxtMgr = g3d->GetTextureManager ();
   palette[0] = ptTxtMgr->FindRGB (0,0,0);
   for (i = 0; i < palsize; i++)
     palette[i] = palette[0];
@@ -134,7 +136,8 @@ void csProcPlasma::Animate (csTicks current_time)
   //    (g2d->GetWidth()/palsize)+5, 10, palette[i]);
   //}
 
-  if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   uint8 curanim0, curanim1, curanim2, curanim3;
   /// draw texture
@@ -154,7 +157,7 @@ void csProcPlasma::Animate (csTicks current_time)
       thex %= mat_w;
       they %= mat_h;
 
-      ptG2D->DrawPixel (thex, they, palette[col*palsize/256] );
+      g2d->DrawPixel (thex, they, palette[col*palsize/256] );
 
       curanim0 += lineincr0;
       curanim1 += lineincr1;
@@ -163,8 +166,7 @@ void csProcPlasma::Animate (csTicks current_time)
     curanim3 += lineincr3;
   }
 
-  ptG3D->FinishDraw ();
-  ptG3D->Print (NULL);
+  g3d->FinishDraw ();
 
   anims0 += frameincr0;
   anims1 += frameincr1;

@@ -28,7 +28,6 @@
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
 class csTextureHandleSoftware;
-class csSoftProcTexture3D;
 /**
  * In 8-bit modes we build a 32K inverse colormap for converting
  * RGB values into palette indices. The following macros defines
@@ -135,28 +134,6 @@ public:
 };
 
 /**
- * csTextureSoftwareProc is a class derived from csTextureSoftware that
- * implements the additional functionality to allow acess to the texture
- * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are
- * initialised in 8bit mode and use the palette as calculated by
- * csTextureHandleSoftware, so you can render to them as usual without
- * requiring recalculation of palettes each frame.
- */
-class csTextureSoftwareProc : public csTextureSoftware
-{
-public:
-  csSoftProcTexture3D *texG3D;
-  bool proc_ok;
-
-  csTextureSoftwareProc (csTextureHandle *Parent, iImage *Image)
-    : csTextureSoftware (Parent, Image), texG3D(NULL), proc_ok(false)
-  {};
-  /// Destroy the texture
-  virtual ~csTextureSoftwareProc ();
-};
-
-
-/**
  * csTextureHandleSoftware represents a texture and all its mipmapped
  * variants.
  */
@@ -241,25 +218,8 @@ public:
    */
   virtual void Prepare ();
 
-  //-------------------------------Procedural Texture support--------------------
   /// Return the interfaces to the procedural texture buffer
   virtual iGraphics3D *GetProcTextureInterface ();
-
-  virtual void ProcTextureSync ();
-
-  /**
-   * Called when the procedural texture shares texture manager with parent
-   * context and in either 16 or 32bit. The 8bit version doesn't require
-   * repreparing. Recalculates palette and remaps texture.
-   */
-  void ReprepareProcTexture ();
-
-  /**
-   * Remaps 8bit procedural texture to the global palette as calculated either
-   * by a dedicated 8bit texture manager or the main texture manager in 8bit
-   * display mode
-   */
-  void RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr);
 };
 
 /**
@@ -378,44 +338,6 @@ public:
   virtual void ReserveColor (int r, int g, int b);
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
-
-  //-----------------------Procedural Texture Support--------------------------
-  /**
-   * When in 16/32 bit mode and a dedicated procedural texture manager is present
-   * the main texture manager needs to keep track of the first 8bit procedural
-   * texture
-   */
-  csGraphics3DSoftwareCommon *first_8bit_proc_tex;
-
-  /// Retrieve first 8bit Procedural texture registered while in true colour mode
-  csGraphics3DSoftwareCommon *GetFirst8bitProcTexture ()
-  { return (csGraphics3DSoftwareCommon *)first_8bit_proc_tex; }
-
-  ///
-  void SetMainTextureManager (csTextureManagerSoftware *main_txt_mgr)
-  { main_txtmgr = main_txt_mgr; }
-  ///
-  void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr)
-  { proc_txtmgr =  proc_txt_mgr; }
-  ///
-  csTextureManagerSoftware *GetMainTextureManager () const
-  { return main_txtmgr; }
-  ///
-  csTextureManagerSoftware *GetProcTextureManager () const
-  { return proc_txtmgr; }
-
-protected:
-  /**
-   * When in 16/32bit mode and a dedicated 8bit procedural texture manager is
-   * present, its' textures are remapped to the global palette.
-   */
-  void Reprepare8BitProcs ();
-
-  ///The dedicated procedural txtmgr (if there is one)
-  csTextureManagerSoftware *proc_txtmgr;
-
-  /// The main txtmgr (if this is the dedicated procedural texture manager)
-  csTextureManagerSoftware *main_txtmgr;
 };
 
 #endif // __SOFT_TXT_H__

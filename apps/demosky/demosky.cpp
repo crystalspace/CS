@@ -271,7 +271,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   sky = new csProcSky();
-  sky->SetAnimated(false);
+  sky->SetAnimated(object_reg, false);
   sky_f = new csProcSkyTexture(sky);
   iMaterialWrapper* imatf = sky_f->Initialize(object_reg, engine, txtmgr, "sky_f");
   sky_b = new csProcSkyTexture(sky);
@@ -433,7 +433,7 @@ bool DemoSky::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
   {
     /// toggle animation
-    sky->SetAnimated( !sky->GetAnimated(), csGetTicks ());
+    sky->SetAnimated(object_reg, !sky->GetAnimated(), csGetTicks ());
     return true;
   }
 

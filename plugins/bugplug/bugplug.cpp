@@ -188,8 +188,6 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   {
     scfiEventHandler = new EventHandler (this);
   }
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler,

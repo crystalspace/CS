@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
-#include "ogl_proctexsoft.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "igraphic/image.h"
@@ -58,19 +57,6 @@ public:
   uint8 *&get_image_data ()
   { return image_data; }
   virtual bool Compressable (){ return true;}
-};
-
-/**
- * The procedural texture object.
- */
-class csTextureProcOpenGL : public csTextureOpenGL
-{
-public:
-  iGraphics3D *texG3D;
-  csTextureProcOpenGL (csTextureHandle *Parent, iImage *image);
-  /// Destroy the texture
-  virtual ~csTextureProcOpenGL ();
-  virtual bool Compressable (){ return false;}
 };
 
 /**
@@ -184,8 +170,6 @@ public:
   int sharpen_mipmaps;
   /// downsample textures?
   int texture_downsample;
-  // The first instance of a sharing software texture
-  csOpenGLProcSoftware *head_soft_proc_tex;
   static formatDescription glformats [];
   ///
   csTextureManagerOpenGL (iObjectRegistry* object_reg,

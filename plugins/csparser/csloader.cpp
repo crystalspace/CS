@@ -705,8 +705,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
   xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
-  xmltokens.Register ("procedural", XMLTOKEN_PROCEDURAL);
-  xmltokens.Register ("persistent", XMLTOKEN_PERSISTENT);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("region", XMLTOKEN_REGION);
   xmltokens.Register ("renderpriorities", XMLTOKEN_RENDERPRIORITIES);

@@ -745,12 +745,18 @@ struct iGraphics3D : public iBase
   /**
    * Set the target of rendering. If this is NULL then the target will
    * be the main screen. Otherwise it is a texture. After calling
-   * g2d->Print() the target will automatically be reset to NULL (main
+   * g3d->FinishDraw() the target will automatically be reset to NULL (main
    * screen). Note that on some implementions rendering on a texture
    * will overwrite the screen. So you should only do this BEFORE you
    * start rendering your frame.
+   * <p>
+   * If 'persistent' is true then the current contents of the texture
+   * will be copied on screen before drawing occurs (in the first
+   * call to BeginDraw). Otherwise it is assumed that you fully render
+   * the texture.
    */
-  virtual void SetRenderTarget (iTextureHandle* handle) = 0;
+  virtual void SetRenderTarget (iTextureHandle* handle,
+  	bool persistent = false) = 0;
 
   /**
    * Get the current render target (NULL for screen).

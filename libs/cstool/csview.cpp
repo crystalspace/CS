@@ -159,7 +159,6 @@ void csView::Draw ()
   G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (),
 			      (int)Camera->GetShiftY () );
 
-  Engine->SetContext (G3D);
   Engine->Draw (Camera, Clipper);
 }
 

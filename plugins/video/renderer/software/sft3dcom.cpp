@@ -2424,8 +2424,6 @@ texr_done:
 
 finish:
   ;
-//if ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
-//  tcache->uncache_texture (0, tex);
 }
 
 void csGraphics3DSoftwareCommon::DrawPolygonDebug (G3DPolygonDP& poly)
@@ -3513,8 +3511,10 @@ bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
   return ((poly_texture->GetWidth () * poly_texture->GetHeight ()) < MAX_LIGHTMAP_SIZE);
 }
 
-void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle)
+void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle,
+	bool persistent)
 {
   (void)handle;
+  (void)persistent;
 }
 

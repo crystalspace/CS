@@ -157,24 +157,6 @@ public:
       return false;
     };
     virtual csPtr<iImage> ScreenShot () { return NULL; };
-    virtual iGraphics2D *CreateOffScreenCanvas (
-      int width,
-      int height,
-      void *buffer,
-      bool alone_hint,
-      csPixelFormat *pfmt = NULL,
-      csRGBpixel *palette = NULL,
-      int pal_size = 0)
-    {
-      (void)width;
-      (void)height;
-      (void)buffer;
-      (void)alone_hint;
-      (void)pfmt;
-      (void)palette;
-      (void)pal_size;
-      return NULL;
-    };
 
     virtual void AllowResize (bool
 
@@ -290,7 +272,7 @@ public:
     virtual void ClearCache ()                                        { }
     virtual void RemoveFromCache (iPolygonTexture *  /*poly_texture*/ )  { }
     bool IsLightmapOK (iPolygonTexture *)                             {return false;}
-    void SetRenderTarget (iTextureHandle*) { }
+    void SetRenderTarget (iTextureHandle*, bool) { }
     iTextureHandle* GetRenderTarget () const { return NULL; }
 
     virtual int GetWidth ()                                           { return width; }

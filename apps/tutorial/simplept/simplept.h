@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/ref.h"
+#include "cstool/proctex.h"
 
 struct iEngine;
 struct iLoader;
@@ -61,11 +62,9 @@ public:
   void FinishFrame ();
 };
 
-class csEngineProcTex
+class csEngineProcTex : public csProcTexture
 {
 private:
-  csRef<iTextureHandle> TexHandle;
-  csRef<iGraphics3D> ptG3D;
   csRef<iEngine> Engine;
   csRef<iView> View;
 
@@ -73,11 +72,10 @@ public:
   csEngineProcTex ();
   ~csEngineProcTex ();
 
-  bool Initialize (iGraphics3D *g3d, iEngine *engine, iVFS *vfs, iLoader *ldr);
-  void PrepareAnim ();
-  void Update (csTicks CurrentTime);
-  inline iTextureHandle *GetTextureHandle ()
-    { return TexHandle; }
+  bool LoadLevel ();
+  virtual bool PrepareAnim ();
+  virtual void Animate (csTicks current_time);
 };
 
 #endif // __SIMPLE1_H__
+

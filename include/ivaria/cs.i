@@ -204,9 +204,6 @@ struct iGraphics2D : public iBase
 //  virtual bool PerformExtension (char const* command, ...) = 0;
 //  virtual bool PerformExtensionV (char const* command, va_list) = 0;
   virtual csPtr<iImage> ScreenShot () = 0;
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
-     void *buffer, bool alone_hint, csPixelFormat *ipfmt,
-     csRGBpixel *palette = NULL, int pal_size = 0) = 0;
   virtual void AllowResize (bool iAllow) = 0;
 };
 

@@ -248,7 +248,7 @@ public:
   virtual bool IsLightmapOK (iPolygonTexture*)
   { return true; }
 
-  virtual void SetRenderTarget (iTextureHandle*) { }
+  virtual void SetRenderTarget (iTextureHandle*, bool) { }
   virtual iTextureHandle* GetRenderTarget () const { return NULL; }
 
   /// Get Z-buffer value at given X,Y position

@@ -194,17 +194,9 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS
-    | CS_TEXTURE_PROC)) == CS_TEXTURE_3D))
+  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS))
+  	== CS_TEXTURE_3D))
   {
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
-                         : GL_NEAREST_MIPMAP_NEAREST);
-  }
-  else if (((txt_mm->GetFlags () & (CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS) )
-    == CS_TEXTURE_PROC) && ( g3d->SGIS_generate_mipmap ) )
-  {
-    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
                          : GL_NEAREST_MIPMAP_NEAREST);

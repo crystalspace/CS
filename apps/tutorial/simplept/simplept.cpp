@@ -67,7 +67,7 @@ void CreatePolygon (iThingState *th, int v1, int v2, int v3, int v4,
   p->CreateVertex (v2);
   p->CreateVertex (v3);
   p->CreateVertex (v4);
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), -6);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 6);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,31 +82,6 @@ Simple::Simple (iObjectRegistry* object_reg)
 
 Simple::~Simple ()
 {
-  // @@@ this is a bug in the engine that turns up when using the software
-  // implementation of OpenGL procedural textures: The texture is created
-  // by the software renderer, so it must also be uncached by the software
-  // renderer. This is not correctly done by the engine.
-
-  // To fix the problem, we do the following: Set the engine context to
-  // the real graphics renderer and uncache the wall texture used in our
-  // small room. Then set the engine context to the procedural texture and
-  // close the system. This will shut down the engine, uncaching all
-  // textures used in the world that is displayed on the procedural texture.
-
-  // Note that this fixes one error, but only to dig up the next one
-  // which is now related to lightmap caching. I give up! My knowledge
-  // about the texture cache is not enough to fix that.       -- mgeisse
-
-  if (engine && g3d)
-  {
-    engine->SetContext(g3d);
-    engine->GetSectors()->Remove(engine->GetSectors()->FindByName("room"));
-
-    engine->SetContext(
-      ProcTexture->GetTextureHandle()->GetProcTextureInterface());
-  }
-
-  delete ProcTexture;
 }
 
 static bool SimpleEventHandler (iEvent& ev)
@@ -250,16 +225,18 @@ bool Simple::Initialize ()
     return false;
   }
 
-  if (!ProcTexture->Initialize (g3d, engine, VFS, loader))
+  iMaterialWrapper* ProcMat = ProcTexture->Initialize (object_reg, engine,
+  	txtmgr, "procmat");
+  if (!ProcMat)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simplept",
     	"Could not initialize procedural texture!");
     return false;
   }
-  iTextureWrapper *tw = engine->GetTextureList ()->NewTexture
-      (ProcTexture->GetTextureHandle());
-  iMaterialWrapper *ProcMat = engine->CreateMaterial ("procmat", tw);
+  ProcMat->QueryObject ()->ObjAdd (ProcTexture);
+  ProcTexture->LoadLevel ();
+  ProcTexture->DecRef ();
   room = engine->CreateSector ("proctex-room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
@@ -298,8 +275,6 @@ bool Simple::Initialize ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();
-
-  ProcTexture->PrepareAnim ();
 
   return true;
 }
@@ -340,9 +315,6 @@ void Simple::SetupFrame ()
     c->Move (CS_VEC_FORWARD * 4 * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (CS_VEC_BACKWARD * 4 * speed);
-
-  // Update our procedural texture
-  ProcTexture->Update (current_time);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (
@@ -387,3 +359,4 @@ int main (int argc, char* argv[])
 
   return 0;
 }
+

@@ -140,12 +140,6 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
             flags &= ~CS_TEXTURE_3D;
 	}
         break;
-      case XMLTOKEN_PERSISTENT:
-        flags |= CS_TEXTURE_PROC_PERSISTENT;
-        break;
-      case XMLTOKEN_PROCEDURAL:
-        flags |= CS_TEXTURE_PROC;
-        break;
       case XMLTOKEN_TRANSPARENT:
         do_transp = true;
 	if (!SyntaxService->ParseColor (child, transp))

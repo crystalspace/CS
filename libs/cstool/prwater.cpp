@@ -23,6 +23,7 @@
 #include "ivideo/graph3d.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
+#include "iutil/objreg.h"
 
 #include "cstool/prwater.h"
 
@@ -35,8 +36,7 @@ csProcWater::csProcWater () : csProcTexture()
   mat_w = 64;
   mat_h = 64;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS ;
-    //| CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS ;
 }
 
 csProcWater::~csProcWater ()
@@ -86,6 +86,7 @@ void csProcWater::MakePalette (int max)
   if (palette) delete[] palette;
   palsize = max;
   palette = new int[palsize];
+  iTextureManager* ptTxtMgr = g3d->GetTextureManager ();
   palette[0] = ptTxtMgr->FindRGB(0,0,0);
   for (i=0 ; i<palsize ; i++)
     palette[i] = palette[0];
@@ -171,22 +172,20 @@ void csProcWater::Animate (csTicks current_time)
       GetImage (cur_image, x,y) = wt;
     }
 
-  if (ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
-  {
-    /// draw texture
-    for (y=0; y<mat_h; y++)
-      for (x=0; x<mat_w;x++)
-      {
-        int ofx = GetImage (cur_image, x, y) - GetImage (cur_image, x, y+1);
-        //int ofy = GetImage(cur_image, x, y) - GetImage(cur_image, x+1, y);
-        int col = (128 - ofx);
-        /// now ofx/8 and ofy/8 give index in background picture to blend with
-        if (col<0)col=0;
-        if (col>255)col=255;
-        ptG2D->DrawPixel (x, y, palette[col*palsize/256] );
-      }
-    ptG3D->FinishDraw ();
-    ptG3D->Print (NULL);
-  }
+  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  /// draw texture
+  for (y=0; y<mat_h; y++)
+    for (x=0; x<mat_w;x++)
+    {
+      int ofx = GetImage (cur_image, x, y) - GetImage (cur_image, x, y+1);
+      //int ofy = GetImage(cur_image, x, y) - GetImage(cur_image, x+1, y);
+      int col = (128 - ofx);
+      /// now ofx/8 and ofy/8 give index in background picture to blend with
+      if (col<0)col=0;
+      if (col>255)col=255;
+      g2d->DrawPixel (x, y, palette[col*palsize/256] );
+    }
+  g3d->FinishDraw ();
 }
 

@@ -1271,29 +1271,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
       (G2D->GetHeight() != height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
 
-  if (render_target && !render_target_onscreen)
-  {
-    texture_cache->Cache (render_target);
-    int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
-    GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())->Handle;
-    statecache->SetShadeModel (GL_FLAT);
-    statecache->EnableState (GL_TEXTURE_2D);
-    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-    statecache->SetTexture (GL_TEXTURE_2D, handle);
-    SetupBlend (CS_FX_COPY, 0, false);
-    SetGLZBufferFlags (CS_ZBUF_NONE);
-
-    glBegin (GL_QUADS);
-    glTexCoord2f (0, 1); glVertex3i (0, 0, 0);
-    glTexCoord2f (0, 0); glVertex3i (0, txt_w, 0);
-    glTexCoord2f (1, 0); glVertex3i (txt_w, txt_h, 0);
-    glTexCoord2f (1, 1); glVertex3i (txt_w, 0, 0);
-    glEnd ();
-
-    render_target_onscreen = true;
-  }
-
   if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     FlushDrawPolygon ();
@@ -1313,6 +1290,41 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
   {
     if (!G2D->BeginDraw ())
       return false;
+  }
+
+  if (render_target)
+  {
+    int txt_w, txt_h;
+    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    if (!rt_cliprectset)
+    {
+      G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
+      G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
+      rt_cliprectset = true;
+
+      glViewport (1, -1, width, height);
+    }
+
+    if (!rt_onscreen)
+    {
+      texture_cache->Cache (render_target);
+      GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
+      	->Handle;
+      statecache->SetShadeModel (GL_FLAT);
+      statecache->EnableState (GL_TEXTURE_2D);
+      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
+      statecache->SetTexture (GL_TEXTURE_2D, handle);
+      SetupBlend (CS_FX_COPY, 0, false);
+      SetGLZBufferFlags (CS_ZBUF_NONE);
+
+      glBegin (GL_QUADS);
+      glTexCoord2f (0, 0); glVertex2i (0, height-txt_h+1);
+      glTexCoord2f (0, 1); glVertex2i (0, height-0+1);
+      glTexCoord2f (1, 1); glVertex2i (txt_w, height-0+1);
+      glTexCoord2f (1, 0); glVertex2i (txt_w, height-txt_h+1);
+      glEnd ();
+      rt_onscreen = true;
+    }
   }
 
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
@@ -1346,55 +1358,67 @@ void csGraphics3DOGLCommon::FinishDraw ()
   }
   DrawMode = 0;
 
-  if (render_target && render_target_onscreen)
+  if (render_target)
   {
-    statecache->EnableState (GL_TEXTURE_2D);
-    SetGLZBufferFlags (CS_ZBUF_NONE);
-    SetupBlend (CS_FX_COPY, 0, false);
-    statecache->DisableState (GL_ALPHA_TEST);
-    int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
-    csTextureHandleOpenGL* tex_mm = (csTextureHandleOpenGL *)
-	    render_target->GetPrivateObject ();
-    csTextureOpenGL *tex_0 = tex_mm->vTex[0];
-    csTxtCacheData *tex_data = (csTxtCacheData*)render_target->GetCacheData();
-    if (tex_data)
+    if (rt_cliprectset)
     {
-      // Texture is in tha cache, update texture directly.
-      statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
-      glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+      rt_cliprectset = false;
+      G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
+      glViewport (0, 0, width, height);
     }
-    else
-    {
-      // Not in cache.
-#     ifdef GL_VERSION_1_2x
-      if (pfmt.PixelBytes == 2)
-      {
-        char* buffer = new char[2*txt_w*txt_h]; // @@@ Alloc elsewhere!!!
-        glReadPixels (0, 0, txt_w, txt_h, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-          buffer);
 
-        csRGBpixel *dst = tex_0->get_image_data ();
-        uint16 bb = 8 - pfmt.BlueBits;
-        uint16 gb = 8 - pfmt.GreenBits;
-        uint16 rb = 8 - pfmt.RedBits;
-        uint16 *src = (uint16*) buffer;
-        int i;
-        for (i = 0 ; i < width*height ; i++, src++, dst++)
-        {
-	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
-	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
-	  dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
-        }
-	delete[] buffer;
+    if (rt_onscreen)
+    {
+      rt_onscreen = false;
+      statecache->EnableState (GL_TEXTURE_2D);
+      SetGLZBufferFlags (CS_ZBUF_NONE);
+      SetupBlend (CS_FX_COPY, 0, false);
+      statecache->DisableState (GL_ALPHA_TEST);
+      int txt_w, txt_h;
+      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      csTextureHandleOpenGL* tex_mm = (csTextureHandleOpenGL *)
+	    render_target->GetPrivateObject ();
+      csTextureOpenGL *tex_0 = tex_mm->vTex[0];
+      csTxtCacheData *tex_data = (csTxtCacheData*)render_target->GetCacheData();
+      if (tex_data)
+      {
+        // Texture is in tha cache, update texture directly.
+        statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
+        glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 1, height-txt_h,
+      	  txt_w, txt_h, 0);
       }
       else
-        glReadPixels (0, 0, txt_w, txt_h,
-          GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
-#     else
-      glReadPixels (0,0, txt_w, txt_h, tex_mm->SourceFormat (),
-        tex_mm->SourceType (), tex_0->get_image_data ());
-#     endif
+      {
+        // Not in cache.
+#       ifdef GL_VERSION_1_2x
+        if (pfmt.PixelBytes == 2)
+        {
+          char* buffer = new char[2*txt_w*txt_h]; // @@@ Alloc elsewhere!!!
+          glReadPixels (0, height-txt_h, txt_w, txt_h,
+		GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
+
+          csRGBpixel *dst = tex_0->get_image_data ();
+          uint16 bb = 8 - pfmt.BlueBits;
+          uint16 gb = 8 - pfmt.GreenBits;
+          uint16 rb = 8 - pfmt.RedBits;
+          uint16 *src = (uint16*) buffer;
+          int i;
+          for (i = 0 ; i < width*height ; i++, src++, dst++)
+          {
+	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	    dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb;
+          }
+	  delete[] buffer;
+        }
+        else
+          glReadPixels (1, height-txt_h, txt_w, txt_h,
+            GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
+#       else
+        glReadPixels (1, height-txt_h, txt_w, txt_h, tex_mm->SourceFormat (),
+          tex_mm->SourceType (), tex_0->get_image_data ());
+#       endif
+      }
     }
   }
   render_target = NULL;
@@ -5252,10 +5276,12 @@ bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
   return lightmap_cache->IsLightmapOK (poly_texture);
 }
 
-void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle)
+void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle,
+	bool persistent)
 {
   render_target = handle;
-  render_target_onscreen = false;
+  rt_onscreen = !persistent;
+  rt_cliprectset = false;
 }
 
 

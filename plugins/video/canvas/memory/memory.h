@@ -66,10 +66,6 @@ public:
   virtual void Print(csRect* area = NULL);
   virtual unsigned char *GetImage();
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
-     csPixelFormat*, void* /*buffer*/, csRGBpixel*, int /*pal_size*/)
-  { return NULL; }
-
 #if THREAD_SUPPORT
 protected:
   static void *updateThread(void *obj);

@@ -21,7 +21,6 @@
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "soft_g3d.h"
-#include "protex3d.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -34,16 +33,12 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DSoftware)
-SCF_DECLARE_FACTORY (csSoftProcTexture3D)
 
 SCF_EXPORT_CLASS_TABLE (soft3d)
   SCF_EXPORT_CLASS_DEP (csGraphics3DSoftware,
     "crystalspace.graphics3d.software",
     "Software 3D graphics driver for Crystal Space",
     "crystalspace.font.server.")
-  SCF_EXPORT_CLASS (csSoftProcTexture3D,
-    "crystalspace.graphics3d.software.offscreen",
-    "Software 3D off screen driver")
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics3DSoftware)

@@ -24,6 +24,7 @@
 #include "qsqrt.h"
 #include "qint.h"
 #include "csgeom/matrix3.h"
+#include "iutil/objreg.h"
 
 //---------- csProcSkyTexture ------------------------------------
 csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
@@ -51,13 +52,12 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
   txtv.Set(0.,-1000.,0.); // down dir
   }
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS ;// |
-    //CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
 
 csProcSkyTexture::~csProcSkyTexture()
 {
-  if(isect) {delete[] isect; isect=NULL;}
+  delete[] isect;
 }
 
 bool csProcSkyTexture::PrepareAnim ()
@@ -71,7 +71,7 @@ bool csProcSkyTexture::PrepareAnim ()
 
 void csProcSkyTexture::Animate (csTicks current_time)
 {
-  sky->DrawToTexture(this, current_time);
+  sky->DrawToTexture (this, current_time, object_reg);
 }
 
 //---------- csProcSky -------------------------------------------
@@ -140,7 +140,8 @@ csProcSky::~csProcSky()
 }
 
 
-void csProcSky::SetAnimated(bool anim, csTicks current_time)
+void csProcSky::SetAnimated (iObjectRegistry* object_reg,
+	bool anim, csTicks current_time)
 {
   animated = anim;
   if(animated && (current_time != 0)) {
@@ -155,7 +156,7 @@ void csProcSky::SetAnimated(bool anim, csTicks current_time)
       if (p->AnimPrepared())
       {
         p->ForceRerender();
-        DrawToTexture(p, current_time);
+        DrawToTexture (p, current_time, object_reg);
       }
       p = p->GetNextSky();
     }
@@ -481,15 +482,14 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   return (uint8)res;
 }
 
-void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
+void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
+	iObjectRegistry* object_reg)
 {
   int i;
   csVector3 txtorig, txtu, txtv;
   skytex->GetTextureSpace(txtorig, txtu, txtv);
   int width = skytex->GetWidth();
   int height = skytex->GetHeight();
-  iGraphics2D *g2d = skytex->GetG2D();
-  iTextureManager *txtmgr = skytex->GetTextureManager();
 
   /// if it already has a texture cache (it has been drawn to in the past)
   /// and we do not animate, and no rerender is forced,
@@ -511,8 +511,12 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
     old_time = current_time;
   }
 
-  if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
+  iGraphics3D* g3d = skytex->GetG3D ();
+  iGraphics2D* g2d = skytex->GetG2D ();
+  g3d->SetRenderTarget (skytex->GetTextureWrapper ()->GetTextureHandle (),
+  	true);
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  iTextureManager *txtmgr = g3d->GetTextureManager ();
 
   csVector3 texelu = txtu / float(width);
   csVector3 texelv = txtv / float(height);
@@ -571,8 +575,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
       g2d->DrawPixel(x,y,col);
     }
 
-  skytex->GetG3D()->FinishDraw();
-  skytex->GetG3D()->Print(NULL);
+  g3d->FinishDraw();
 
   /// did a rendering
   skytex->UnsetForceRender();

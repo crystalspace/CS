@@ -32,19 +32,76 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iutil/objreg.h"
+#include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
+#include "csutil/csvector.h"
 
 #include "cstool/proctex.h"
+
+//---------------------------------------------------------------------------
+
+/*
+ * Event handler that takes care of updating all procedural
+ * textures that were visible last frame.
+ */
+class ProcEventHandler : public iEventHandler
+{
+private:
+  iObjectRegistry* object_reg;
+  // Array of textures that needs updating next frame.
+  csVector textures;
+
+public:
+  ProcEventHandler (iObjectRegistry* object_reg)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    ProcEventHandler::object_reg = object_reg;
+  }
+  virtual ~ProcEventHandler () { }
+
+  SCF_DECLARE_IBASE;
+  virtual bool HandleEvent (iEvent& event);
+
+  void PushTexture (csProcTexture* txt)
+  {
+    textures.Push (txt);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (ProcEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
+bool ProcEventHandler::HandleEvent (iEvent& event)
+{
+  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+  csTicks elapsed_time, current_time;
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
+  if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
+  {
+    int i;
+    for (i = 0 ; i < textures.Length () ; i++)
+    {
+      csProcTexture* pt = (csProcTexture*)textures[i];
+      pt->Animate (current_time);
+      pt->last_cur_time = current_time;
+    }
+    textures.DeleteAll ();
+    return true;
+  }
+  return false;
+}
+
+//---------------------------------------------------------------------------
 
 csProcTexture::csProcTexture ()
 {
   ptReady = false;
   tex = NULL;
-  ptG3D = NULL;
-  ptG2D = NULL;
-  ptTxtMgr = NULL;
   texFlags = 0;
   key_color = false;
   object_reg = NULL;
@@ -55,6 +112,22 @@ csProcTexture::csProcTexture ()
 
 csProcTexture::~csProcTexture ()
 {
+}
+
+iEventHandler* csProcTexture::SetupProcEventHandler (
+	iObjectRegistry* object_reg)
+{
+  csRef<iEventHandler> proceh = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+  	"crystalspace.proctex.eventhandler", iEventHandler);
+  if (proceh) return proceh;
+  proceh = csPtr<iEventHandler> (new ProcEventHandler (object_reg));
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  if (q != 0)
+  {
+    q->RegisterListener (proceh, CSMASK_Nothing);
+    object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
+  }
+  return proceh;
 }
 
 struct ProcCallback : public iTextureCallback
@@ -73,20 +146,19 @@ SCF_IMPLEMENT_IBASE_END
 void ProcCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
-  csTicks elapsed_time, current_time;
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (pt->object_reg, iVirtualClock));
-  elapsed_time = vc->GetElapsedTicks ();
-  current_time = vc->GetCurrentTicks ();
-  if (pt->last_cur_time == current_time) return;
-  pt->Animate (current_time);
-  pt->last_cur_time = current_time;
+  ((ProcEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
 }
 
 bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 {
   csProcTexture::object_reg = object_reg;
+  proceh = SetupProcEventHandler (object_reg);
+
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
+
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
@@ -115,10 +187,6 @@ bool csProcTexture::PrepareAnim ()
   if (anim_prepared) return true;
   iTextureHandle* txt_handle = tex->GetTextureHandle ();
   if (!txt_handle) return false;
-  ptG3D = txt_handle->GetProcTextureInterface ();
-  if (!ptG3D) return false;
-  ptG2D = ptG3D->GetDriver2D ();
-  ptTxtMgr = ptG3D->GetTextureManager ();
   anim_prepared = true;
   return true;
 }
@@ -145,4 +213,5 @@ iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
   return mat;
 }
 
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+

@@ -392,8 +392,6 @@ SetMouseCursor(iShape)
         
 ScreenShot()
 
-CreateOffScreenCanvas(width,height,buffer,alone_hint,ipfmt,palette,pal_size)
-
 AllowResize(iAllow)
 
 1.17.  class iHalo

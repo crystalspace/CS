@@ -366,6 +366,9 @@ private:
   /// Current engine mode (one of CS_ENGINE_... flags).
   int engine_mode;
 
+  /// Current render context (proc texture) or NULL if global.
+  iTextureHandle* render_context;
+
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   csRadiosity* rad_debug;
 
@@ -1131,70 +1134,16 @@ public:
 
   //----------------Begin-Multi-Context-Support-------------------------------
 
-  /// Point engine to rendering context
-  virtual void SetContext (iGraphics3D* g3d);
-  /// Return the current drawing context
-  virtual iGraphics3D *GetContext () const;
+  /// Point engine to rendering context (for procedural textures).
+  virtual void SetContext (iTextureHandle* txt);
+  /// Return the current drawing context.
+  virtual iTextureHandle *GetContext () const;
 
 private:
   /// Resizes frame width and height dependent data members
   void Resize ();
   /// Flag set when window requires resizing.
   bool resize;
-  /**
-   * Private class which keeps state information about the engine specific to
-   * each context.
-   */
-
-  class csEngineState
-  {
-  public:
-    csEngine *engine;
-    bool resize;
-    iGraphics2D *G2D;
-    iGraphics3D *G3D;
-    csCBuffer* c_buffer;
-    csXORBuffer* xor_buffer;
-    csCBufferCube* cbufcube;
-    /// Creates an engine state by copying the relevant data members
-    csEngineState (csEngine *this_engine);
-
-    /// Destroys buffers and trees
-    virtual ~csEngineState ();
-
-    /// Swaps state into engine and deals with resizing issues.
-    void Activate ();
-  };
-
-  friend class csEngineState;
-
-  class csEngineStateVector : public csVector
-  {
-  public:
-     // Constructor
-    csEngineStateVector () : csVector (8, 8) {}
-    // Destructor
-    virtual ~csEngineStateVector () { DeleteAll (); }
-    // Free an item from array
-    virtual bool FreeItem (csSome Item)
-    { delete (csEngineState *)Item; return true; }
-    // Find a state by referenced g2d
-    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return ((csEngineState *)Item)->G3D == (iGraphics3D *)Key ? 0 : -1; }
-    // Get engine state according to index
-    inline csEngineState *Get (int n) const
-    { return (csEngineState *)csVector::Get (n); }
-
-    // Mark engine state to be resized
-    void Resize (iGraphics2D *g2d);
-
-    // Dispose of engine state dependent on g2d
-    void Close (iGraphics2D *g2d);
-  };
-
-  csEngineStateVector *engine_states;
-
-  //------------End-Multi-Context-Support-------------------------------------
 
   /**
    * This object is used in the engine as an embedded iObject interface.

@@ -29,7 +29,8 @@ class csProcSky;
 /**
  * A polygon of a sky.
 */
-class csProcSkyTexture : public csProcTexture {
+class csProcSkyTexture : public csProcTexture
+{
   /// the sky this is a part of
   csProcSky *sky;
   /// next procskytexture in this sky
@@ -56,12 +57,6 @@ public:
   /// Draw the next frame.
   virtual void Animate (csTicks current_time);
 
-  /// methods for the Sky parent - get the g2d
-  iGraphics2D* GetG2D() const {return ptG2D;}
-  /// get the g3d
-  iGraphics3D* GetG3D() const {return ptG3D;}
-  /// get the texture manager (used for encoding colors)
-  iTextureManager* GetTextureManager() const {return ptTxtMgr;}
   /// get the width of this texture
   int GetWidth() const {return mat_w;}
   /// get the height of this texture
@@ -100,7 +95,8 @@ public:
  * a sky, this represents a whole sphere of sky - so multiple polygons
  * can be rendered to.
 */
-class csProcSky {
+class csProcSky
+{
   /// the proc sky textures of this sky
   csProcSkyTexture *firstsky;
 
@@ -180,7 +176,8 @@ public:
   ~csProcSky();
 
   /// do a nextframe like drawing update
-  void DrawToTexture(csProcSkyTexture *skytex, csTicks current_time);
+  void DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
+  	iObjectRegistry* object_reg);
 
   /// Make intersection point cache in a texture
   void MakeIntersectCache(csProcSkyTexture *skytex);
@@ -193,7 +190,8 @@ public:
 
      current_time has no meaning when disabling the animation.
   */
-  void SetAnimated(bool anim=true, csTicks current_time=0);
+  void SetAnimated (iObjectRegistry* object_reg,
+  	bool anim=true, csTicks current_time=0);
   /// See if the prsky is animated
   bool GetAnimated() const {return animated;}
   /// get first sky texture with this sky

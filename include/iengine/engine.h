@@ -55,6 +55,7 @@ struct iMaterial;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iTextureWrapper;
+struct iTextureHandle;
 struct iTextureList;
 struct iCameraPosition;
 struct iCameraPositionList;
@@ -701,10 +702,14 @@ struct iEngine : public iBase
   virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
     iDrawFuncCallback* callback) = 0;
 
-  /// Set the drawing context
-  virtual void SetContext (iGraphics3D*) = 0;
-  /// Return the current drawing context
-  virtual iGraphics3D *GetContext () const = 0;
+  /**
+   * Set the drawing context. This is a texture handle that is used
+   * as the procedural texture to render on. If this is NULL then the
+   * screen is assumed.
+   */
+  virtual void SetContext (iTextureHandle* ctxt) = 0;
+  /// Return the current drawing context.
+  virtual iTextureHandle *GetContext () const = 0;
 
   /**
    * Set the amount of ambient light. This has no effect until you

@@ -104,7 +104,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 0, 2);
+SCF_VERSION (iGraphics2D, 2, 1, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -267,11 +267,6 @@ struct iGraphics2D : public iBase
 
   /// Do a screenshot: return a new iImage object
   virtual csPtr<iImage> ScreenShot () = 0;
-
-  /// Create an Off Screen Canvas
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
-     void *buffer, bool alone_hint, csPixelFormat *ipfmt,
-     csRGBpixel *palette = NULL, int pal_size = 0) = 0;
 
   /**
    * Get the native window corresponding with this canvas.

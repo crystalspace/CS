@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include "cssysdef.h"
 #include "graph2d.h"
-#include "protex2d.h"
 #include "qint.h"
 #include "scrshot.h"
 #include "iutil/plugin.h"
@@ -667,17 +666,6 @@ csPtr<iImage> csGraphics2D::ScreenShot ()
   csScreenShot *ss = new csScreenShot (this);
   FinishDraw ();
   return ss;
-}
-
-iGraphics2D *csGraphics2D::CreateOffScreenCanvas
-  (int width, int height, void *buffer, bool alone_hint,
-   csPixelFormat *pfmt, csRGBpixel *palette, int pal_size)
-{
-  // default return a software canvas
-  CS_ASSERT (object_reg != NULL);
-  csProcTextureSoft2D *tex = new csProcTextureSoft2D (object_reg);
-  return tex->CreateOffScreenCanvas (width, height, buffer, alone_hint,
-                     pfmt, palette, pal_size);
 }
 
 void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,

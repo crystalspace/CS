@@ -191,7 +191,6 @@
 #include "ivideo/halo.h"
 #include "ivideo/material.h"
 #include "ivideo/natwin.h"
-#include "ivideo/sproctxt.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"

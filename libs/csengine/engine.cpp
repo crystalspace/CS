@@ -657,6 +657,7 @@ csEngine::csEngine (iBase *iParent) :
   object_reg = NULL;
   textures = NULL;
   materials = NULL;
+  render_context = NULL;
   shared_variables = NULL;
   c_buffer = NULL;
   cbufcube = NULL;
@@ -670,7 +671,6 @@ csEngine::csEngine (iBase *iParent) :
   freeze_pvs = false;
   clear_zbuf = false;
   clear_screen = false;
-  engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
   default_max_lightmap_w = 256;
@@ -730,6 +730,7 @@ csEngine::~csEngine ()
   delete cbufcube;
   delete rad_debug;
   delete c_buffer;
+  delete shared_variables;
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -828,25 +829,13 @@ bool csEngine::HandleEvent (iEvent &Event)
 
       case cscmdContextResize:
         {
-          if (engine_states)
-            engine_states->Resize ((iGraphics2D *)Event.Command.Info);
-          else if (((iGraphics2D *)Event.Command.Info) == G2D)
+          if (((iGraphics2D *)Event.Command.Info) == G2D)
             resize = true;
           return false;
         }
 
       case cscmdContextClose:
         {
-          if (engine_states)
-          {
-            engine_states->Close ((iGraphics2D *)Event.Command.Info);
-            if (!engine_states->Length ())
-            {
-              delete engine_states;
-              engine_states = NULL;
-            }
-          }
-
           return false;
         }
     } /* endswitch */
@@ -902,6 +891,8 @@ void csEngine::DeleteAll ()
   materials = new csMaterialList ();
   delete textures;
   textures = new csTextureList ();
+  delete shared_variables;
+  shared_variables = new csSharedVariableList();
 
   csRef<iThingEnvironment> te (
   	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
@@ -909,15 +900,7 @@ void csEngine::DeleteAll ()
   te->ClearPolyTxtPlanes ();
   te->ClearCurveTemplates ();
 
-  // Delete engine states and their references to cullers before cullers are
-
-  // deleted in InitCuller below.
-  if (engine_states)
-  {
-    engine_states->DeleteAll ();
-    delete engine_states;
-    engine_states = NULL;
-  }
+  render_context = NULL;
 
   InitCuller ();
   delete render_pol2d_pool;
@@ -2929,7 +2912,6 @@ bool csEngine::RemoveObject (iBase *object)
   return false;
 }
 
-//----------------Begin-Multi-Context-Support------------------------------
 void csEngine::Resize ()
 {
   frame_width = G3D->GetWidth ();
@@ -2939,124 +2921,27 @@ void csEngine::Resize ()
   InitCuller ();
 }
 
-csEngine::csEngineState::csEngineState (csEngine *e)
+void csEngine::SetContext (iTextureHandle *txthandle)
 {
-  engine = e;
-  c_buffer = e->c_buffer;
-  cbufcube = e->cbufcube;
-  G2D = e->G2D;
-  G3D = e->G3D;
-  resize = false;
-}
-
-csEngine::csEngineState::~csEngineState ()
-{
-  if (engine->G2D == G2D)
+  if (render_context != txthandle)
   {
-    engine->G3D->DecRef ();
-    engine->G3D = 0;
-    engine->G2D = 0;
-    engine->c_buffer = NULL;
-    engine->cbufcube = NULL;
-  }
-
-  delete c_buffer;
-  delete cbufcube;
-}
-
-void csEngine::csEngineState::Activate ()
-{
-  engine->c_buffer = c_buffer;
-  engine->cbufcube = cbufcube;
-  engine->frame_width = G3D->GetWidth ();
-  engine->frame_height = G3D->GetHeight ();
-
-  if (resize)
-  {
-    engine->Resize ();
-
-    c_buffer = engine->c_buffer;
-    cbufcube = engine->cbufcube;
-    resize = false;
-  }
-}
-
-void csEngine::csEngineStateVector::Close (iGraphics2D *g2d)
-{
-  // Hack-- with the glide back buffer implementations of procedural textures
-  // circumstances are that many G3D can be associated with one G2D.
-  // It is impossible to tell which is which so destroy them all, and rely on
-  // regeneration the next time the context is set to the surviving G3Ds associated
-  // with this G2D
-  int i;
-  for (i = 0; i < Length (); i++)
-    if (((csEngineState *)root[i])->G2D == g2d)
+    render_context = txthandle;
+    if (render_context)
     {
-      //Delete (i);
-      break;
-    }
-}
-
-void csEngine::csEngineStateVector::Resize (iGraphics2D *g2d)
-{
-  // With the glide back buffer implementation of procedural textures
-  // circumstances are that many G3D can be associated with one G2D, so
-  // we test for width and height also.
-  int i;
-  for (i = 0; i < Length (); i++)
-  {
-    csEngineState *state = (csEngineState *)root[i];
-    if (state->G2D == g2d)
-    {
-      if (
-        (state->G2D->GetWidth () == state->G3D->GetWidth ()) &&
-        (state->G2D->GetHeight () == state->G3D->GetHeight ()))
-        ((csEngineState *)root[i])->resize = true;
-    }
-  }
-}
-
-void csEngine::SetContext (iGraphics3D *g3d)
-{
-  G2D = g3d->GetDriver2D ();
-  if (g3d != G3D)
-  {
-    if (G3D) G3D->DecRef ();
-    G3D = g3d;
-    if (!engine_states)
-    {
-      engine_states = new csEngineStateVector ();
-      Resize ();
-      engine_states->Push (new csEngineState (this));
+      render_context->GetMipMapDimensions (0, frame_width, frame_height);
     }
     else
     {
-      int idg3d = engine_states->FindKey (g3d);
-      if (idg3d < 0)
-      {
-        // Null out the culler which belongs to another state so its not deleted.
-        c_buffer = NULL;
-        cbufcube = NULL;
-        frame_width = G3D->GetWidth ();
-        frame_height = G3D->GetHeight ();
-        cbufcube = new csCBufferCube (1024);
-        InitCuller ();
-        engine_states->Push (new csEngineState (this));
-      }
-      else
-      {
-        csEngineState *state = (csEngineState *)engine_states->Get (idg3d);
-        state->Activate ();
-      }
+      frame_width = G3D->GetWidth ();
+      frame_height = G3D->GetHeight ();
     }
-
-    G3D->IncRef ();
+    InitCuller ();
   }
 }
 
-iGraphics3D *csEngine::GetContext () const
+iTextureHandle *csEngine::GetContext () const
 {
-  return G3D;
+  return render_context;
 }
 
 iClipper2D *csEngine::GetTopLevelClipper () const

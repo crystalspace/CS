@@ -1,15 +1,44 @@
 The history order is reversed so that new features are at the top.
 
-15-Oct-2002
+16-Oct-2002
 	- Keith Fulton added definitions and initial implementations for
 	  iSharedVariable, iSharedVariableList and iImposter.  iEngine now
 	  keeps an iSharedVariableList, and csMeshWrapper implements iImposter,
- 	  which uses iSharedVariable.  See new flarge for examples of definitions
+ 	  which uses iSharedVariable. See new flarge for examples of definitions
 	  of both.
+	- csProcTexture is now able to use the new SetRenderTarget() system.
+	  And it seems to work fine. Converted all current proc textures
+	  that inherit from csProcTexture to the new system.
+	- Added 'persistent' flag to SetRenderTarget(). If that flag is given
+	  then the original texture will be copied in BeginDraw() so that
+	  the previous contents is preserved. If that flag is not given
+	  then the previous contents is ignored and it is assumed you fully
+	  update the texture yourselves.
+	- simplept works nicer than ever with the new SetRenderTarget() system.
+	- Completely removed the old procedural texture implementation from
+	  both the software and OpenGL renderers.
+	- Here is a summary on the status of the new procedural texture system.
+	    - Software renderer procedural textures are TOTALLY broken. This
+	      needs to be redone again.
+	    - Simplept works VERY well in OpenGL (very fast and very nice
+	      looking).
+	    - The pixel drawing procedural textures (flame, plasma, dots,
+	      water, ...) are slower in OpenGL then they were before.
+	      The reason is that drawing a pixel in OpenGL is a LOT
+	      slower than in software renderer. To solve this problem
+	      I will add new API functions to either draw series of
+	      pixels or else to blit memory areas to the screen (or
+	      texture).
+	    - For some reason I cannot render at vertical line 0.
+	      i.e. a g2d->DrawPixel (i,0,color) will do nothing. That
+	      means that one line of the procedural texture will remain
+	      whatever contents the screen has at that moment.
+	      I have no clue on how to solve this yet.
+15-Oct-2002
 	- Started work on the OpenGL implementation of SetRenderTarget().
-	  Added code in BeginDraw() to copy the texture to the display.  Added
-	  code in FinishDraw() to copy the display back to the texture.  This
-	  is all untested for now.
+	  Added code in BeginDraw() to copy the texture to the display.
+	  Added code in FinishDraw() to copy the display back to the
+	  texture. This is all untested for now.
 	- Eric Sunshine made the following changes to the project configuration
 	  phase and makefiles.
 	    - Augmented chkpythn.sh so that it now also recognizes python99.lib

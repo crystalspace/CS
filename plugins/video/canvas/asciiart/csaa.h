@@ -63,10 +63,6 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/,
-     csPixelFormat*, void* /*buffer*/, csRGBpixel*, int /*pal_size*/)
-  { return NULL; }
-
   //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
