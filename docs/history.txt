@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  since this doesn't make sense. PerformExtension() doesn't follow
 	  printf formatting rules.
 	- Avoided several warnings in ogl_g3dcom.cpp.
+	- Fixed DrawTriangleMesh() in OpenGL renderer so it no longer crashes
+	  if no material is given.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
 	  and msvc7gen.mak:

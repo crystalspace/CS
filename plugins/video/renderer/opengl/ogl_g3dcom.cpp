@@ -5240,12 +5240,13 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique( G3DTriangleMesh& mes
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
-  // Jorrit to Anders: I had to use OldDrawTriangleMesh() here in all cases
-  // because otherwise I crash in the street of flarge (when moving in the
-  // street, then looking at the donut and then turning right the crash
-  // happens nearly all the time).
-//      OldDrawTriangleMesh (mesh); // Should never get here.
-//      return;
+  if (!mesh.mat_handle)
+  {
+    // If there is no material (which is legal) we temporarily use
+    // OldDrawTriangleMesh().
+    OldDrawTriangleMesh (mesh);
+    return;
+  }
 
   iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
   iEffectTechnique* technique = effectserver->SelectAppropriateTechnique( material->GetEffect() );
