@@ -42,5 +42,8 @@ void csSystemDriver::console_close ()
 void csSystemDriver::console_out (const char *str)
 {
   if (EnableConsoleOutput)
+  {
     fputs (str, stdout);
+    fflush (stdout);
+  }
 }
