@@ -58,6 +58,12 @@
 #------------------------------------------------------------------------------
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
+prog_name = "snapshot.py"
+prog_version = "1.7"
+author_name = "Eric Sunshine"
+author_email = "sunshine@sunshineco.com"
+copyright = "Copyright (C) 2000 by " + author_name + " <" + author_email + ">"
+
 #------------------------------------------------------------------------------
 # Configuration Section
 #    cvsroot - CVSROOT setting for performing the actual check out.
@@ -79,6 +85,7 @@ import commands, glob, grp, os, re, string, sys, tempfile, time
 #    keepsnaphots - Number of historical snapshots to retain.
 #    keepdiffs - Number of historical 'diffs' to retain.
 #    keeplogs - Number of historical log files to retain.
+#    workdir - Temporary working directory for checkouts.
 #    archivers - A tuple of archivers used to generate the project packages.
 #        Each tuple element is a dictionary with the following keys.  The key
 #        "name" specifies the name of the directory under 'snapdir' into which
@@ -104,6 +111,7 @@ snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
 keepsnapshots = 2
 keepdiffs = 7
 keeplogs = 7
+workdir = "/tmp";
 
 archivers = (
     {"name": "gzip",
@@ -142,7 +150,6 @@ class Snapshot:
         self.packbase = packprefix + time.strftime(
             "%Y-%m-%d.%H%M%S", time.gmtime(time.time()))
         self.linkbase = packprefix + "current-snapshot"
-        self.workdir = os.path.join(snapdir, "transient")
         self.diffext = ".diff"
         self.diffname = self.packbase + self.diffext
         self.logdir  = os.path.join(snapdir, "logs")
@@ -233,24 +240,13 @@ class Snapshot:
                 "." + dict["file"]["ext"]), keepdiffs)
 
     def purgetransient(self):
-        self.dirstack.pushdir(snapdir)
-        self.log("Purging working directory: " + self.builddir)
-        # Remove our local work directory.
+        self.log("Purging working directory")
         self.run("rm -rf " + self.builddir)
-        # Attempt to remove parent work directory.  This will only succeed if
-        # it is empty (i.e. no other snapshots are in progress).
-        try:
-            os.rmdir(self.workdir)
-            self.dirstack.popdir()
-        except Exception:
-            self.dirstack.popdir()
-            pass
 
     def preparetransient(self):
-        tempfile.tempdir = self.workdir
+        tempfile.tempdir = workdir
         self.builddir = tempfile.mktemp();
         self.log("Creating working directory: " + self.builddir)
-        self.makedirectory(self.workdir)
         self.makedirectory(self.builddir)
 
     def findcvsdirs(self, dir):
@@ -370,15 +366,17 @@ class Snapshot:
         self.makedirectory(snapdir)
         self.makedirectory(self.logdir)
         self.openlog()
+        self.log(prog_name + " version " + prog_version);
+        self.log(copyright + "\n")
         self.log("BEGIN: " + self.timenow())
         try:
             self.preparetransient()
-            os.chdir(self.builddir)
+            self.dirstack.pushdir(self.builddir)
             try:
                 self.dobulk()
             except Exception, e:
                 self.log("A fatal exception occurred: " + str(e))
-            os.chdir(snapdir)
+            self.dirstack.popdir()
             self.purgetransient()
         finally:
             self.log("END: " + self.timenow())
