@@ -40,7 +40,6 @@
 #------------------------------------------------------------------------------
 
 MSVC.PLUGINS.REQUIRED =         \
-  apps/csgamtst	                \
   cscript/cspython              \
   csgame/gamecore               \
   font/server/freefont          \
