@@ -1,15 +1,16 @@
 # Library description
 DESCRIPTION.csterr = Landscape engine
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make csterr       Make the $(DESCRIPTION.csterr)$"
+LIBHELP += \
+  $(NEWLINE)echo $"  make csterr       Make the $(DESCRIPTION.csterr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csterr
@@ -22,26 +23,20 @@ csterrclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csterr/math libs/csterr/struct libs/csterr/util
 
 # XXX is temporary until this library builds.
 XXXCSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
-SRC.CSTERR.MATH   = $(wildcard libs/csterr/math/*.cpp)
-SRC.CSTERR.STRUCT = $(wildcard libs/csterr/struct/*.cpp)
-SRC.CSTERR.UTIL   = $(wildcard libs/csterr/util/*.cpp)
-SRC.CSTERR = $(SRC.CSTERR.MATH) $(SRC.CSTERR.STRUCT) $(SRC.CSTERR.UTIL)
-OBJ.CSTERR.MATH   = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.MATH:.cpp=$O)))
-OBJ.CSTERR.STRUCT = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.STRUCT:.cpp=$O)))
-OBJ.CSTERR.UTIL   = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.UTIL:.cpp=$O)))
-OBJ.CSTERR = $(OBJ.CSTERR.MATH) $(OBJ.CSTERR.STRUCT) $(OBJ.CSTERR.UTIL)
+SRC.CSTERR = $(wildcard libs/csterr/*/*.cpp)
+OBJ.CSTERR = $(addprefix $(OUT),$(notdir $(SRC.CSTERR:.cpp=$O)))
 CFLAGS.CSTERR = -Ilibs/csterr
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csterr csterrclean
@@ -50,14 +45,21 @@ ifeq ($(MAKESECTION),targets)
 csterr: $(OUTDIRS) $(XXXCSTERR.LIB)
 clean: csterrclean
 
-$(OBJ.CSTERR.MATH): $(SRC.CSTERR.MATH)
+$(OUT)%$O: libs/csterr/math/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
 
-$(OBJ.CSTERR.STRUCT): $(SRC.CSTERR.STRUCT)
+$(OUT)%$O: libs/csterr/struct/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
 
-$(OBJ.CSTERR.UTIL): $(SRC.CSTERR.UTIL)
+$(OUT)%$O: libs/csterr/util/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
+
+# @@@ Some versions of GNU make appear to be sensitive to the order in which
+# implicit rules are seen.  Without the following rule (which is just a
+# reiteration of the original implicit rule in cs.mak), these buggy make
+# programs fail to choose the correct rules above.
+$(OUT)%$O: %.cpp
+	$(DO.COMPILE.CPP)
 
 $(XXXCSTERR.LIB): $(OBJ.CSTERR)
 	$(DO.LIBRARY)
