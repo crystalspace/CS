@@ -34,6 +34,8 @@ chronological order.
 	  if this is not needed.
 	- Jorrit performed some further optimizations on
 	  csShaderManager::SetupState().
+	- Jorrit fixed some occurances of Compare (changed with CompareKeys)
+	  in csHash.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
