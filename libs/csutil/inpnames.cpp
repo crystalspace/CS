@@ -216,7 +216,8 @@ static bool ParseKey (const char* key, utf32_char* rawCode,
     return true;
   }
 
-  if (csUnicodeTransform::UTF8Skip((utf8_char*)key, strlen(key)) < strlen(key))
+  int const x = strlen(key);
+  if (csUnicodeTransform::UTF8Skip((utf8_char*)key, x) < x)
     return false; // It's more than 1 character, so must be misspelled keyname.
 
   utf32_char ch;
