@@ -3,9 +3,9 @@ The history order is reversed so that new features are at the top.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from
-	  'CS\include\cssys\win32'. Also updated .cvs to take account
+	  'CS\include\cssys\win32'. Also updated .cvsignore to take account
 	  of latest msvc_libs changes those in 0.97dev001 and the
-	  upcoming ones in 9.97dev002.
+	  upcoming ones in 0.97dev002.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
