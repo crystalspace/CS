@@ -485,6 +485,9 @@ struct iAwsComponent : public iAwsSource
 
   /// Triggered when a child is added to the parent (triggered on the child)
   virtual void OnAdded()=0;
+
+  /// Triggered when a component is resized by the layout manager.
+  virtual void OnResized()=0;
 };
 
 
