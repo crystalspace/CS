@@ -202,11 +202,11 @@ void CreateIdentityPalette(csRGBpixel *p)
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) : 
                    csGraphics2DGLCommon (iParent),
-                   m_hWnd(NULL),
-                   m_bPaletteChanged(false),
-                   m_bPalettized(false),
                    m_nGraphicsReady(true),
-                   m_piWin32System(NULL)
+                   m_hWnd(NULL),
+                   m_piWin32System(NULL),
+                   m_bPalettized(false),
+                   m_bPaletteChanged(false)
 {
 }
 
