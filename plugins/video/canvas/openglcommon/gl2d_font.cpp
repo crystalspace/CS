@@ -367,7 +367,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   float x1 = 0.0;
 
   GLboolean vaenabled = glIsEnabled(GL_VERTEX_ARRAY);
-  GLboolean tcaenabled = glIsEnabled(GL_VERTEX_ARRAY);
+  GLboolean tcaenabled = glIsEnabled(GL_TEXTURE_COORD_ARRAY);
   GLboolean caenabled = glIsEnabled(GL_COLOR_ARRAY);
 
   if(vaenabled == GL_FALSE)
