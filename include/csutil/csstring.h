@@ -969,17 +969,13 @@ public:
   /// Destroy the csStringFast.
   virtual ~csStringFast () { }
 
-  /** @{ */
   /// Assign a value to this string.
   const csStringFast& operator = (const csStringBase& copy)
   { Replace(copy); return *this; }
-  template <int N> const csStringFast& operator = (const csStringFast<N>& copy)
-  { Replace(copy); return *this; }
-  /** @} */
 
   /// Assign a formatted value to this string.
   template<typename T>
-  const csStringFast& operator = (T s) { return Replace (s); }
+  const csStringFast& operator = (T s) { Replace (s); return *this; }
 
   virtual char* GetData ()
   { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
@@ -1038,14 +1034,10 @@ public:
   csStringFast () : csStringBase() { }
   csStringFast (size_t Length) : csStringBase(Length) { }
   csStringFast (const csStringBase& copy) : csStringBase (copy) { }
-  template <int N> csStringFast (const csStringFast<N>& copy) :
-    csStringFast<> ((const csStringBase&)copy) {}
   csStringFast (const char* src) : csStringBase(src) { }
   csStringFast (char c) : csStringBase(c) { }
   csStringFast (unsigned char c) : csStringBase(c) { }
   const csStringFast& operator = (const csStringBase& copy)
-  { Replace(copy); return *this; }
-  template <int N> const csStringFast& operator = (const csStringFast<N>& copy)
   { Replace(copy); return *this; }
   const csStringFast& operator = (char x)
   { Replace(x); return *this; }
@@ -1095,8 +1087,6 @@ public:
   csString (const csString& copy) :
     csStringFast<> ((const csStringBase&)copy) { }
   csString (const csStringBase& copy) : csStringFast<> (copy) { }
-  template <int N> csString (const csStringFast<N>& copy) :
-    csStringFast<> ((const csStringBase&)copy) { }
   /** @} */
   /// Create a csString object from a null-terminated C string.
   csString (const char* src) : csStringFast<> (src) { }
@@ -1110,8 +1100,6 @@ public:
   const csString& operator = (const csString& copy)
   { Replace(copy); return *this; }
   const csString& operator = (const csStringBase& copy)
-  { Replace(copy); return *this; }
-  template <int N> const csString& operator = (const csStringFast<N>& copy)
   { Replace(copy); return *this; }
   const csString& operator = (char x)
   { Replace(x); return *this; }

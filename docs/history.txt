@@ -25,6 +25,8 @@ chronological order.
 	  needed since csQint() should now work correctly on 64-bit platforms.)
 	- Eric Sunshine performed some more -ansi -pedantic sanitation on
 	  csstring.h for 64-bit platforms.
+	- Eric Sunshine fixed some issues in csstring.h which caused MSVC7 to
+	  barf at compile-time.
 14-Mar-2005
 	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
 	  Empty() additions to iString and scfString for API consistency.
