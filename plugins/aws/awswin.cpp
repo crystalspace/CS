@@ -164,10 +164,16 @@ awsWindow::OnMouseDown(int button, int x, int y)
       resizing_mode=true;
       WindowManager()->Mark(Frame());
       return true;
+    } else if (x<Frame().xmax && x>Frame().xmin &&
+               y<Frame().ymin + title_bar_height  && y>Frame().ymin)
+    {
+      moving_mode=true;
+      last_x=x;
+      last_y=y;
+      return true;
     }
-
-  }
-
+  } 
+  
   return false;
 }
     
@@ -179,7 +185,11 @@ awsWindow::OnMouseUp(int button, int x, int y)
     resizing_mode=false;
     WindowManager()->Mark(Frame());
     return true;
+  } else if (moving_mode)
+  {
+    moving_mode=false;
   }
+
 
   return false;
 }
@@ -199,9 +209,40 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     Frame().xmax=x;
     Frame().ymax=y;
+
+    if (Frame().xmax - Frame().xmin < grip_size<<1)
+      Frame().xmax = Frame().xmin+(grip_size<<1);
+
+    if (Frame().ymax - Frame().ymin < grip_size<<1)
+      Frame().ymax = Frame().ymin+(grip_size<<1);
+    
     
     if (!marked)
       WindowManager()->Mark(Frame());
+  } else if (moving_mode)
+  {
+    int delta_x = x-last_x;
+    int delta_y = y-last_y;
+
+    if (delta_x+Frame().xmin >=0 && 
+        delta_y+Frame().ymin >=0 &&
+        delta_x+Frame().xmax < WindowManager()->G2D()->GetWidth() &&
+        delta_y+Frame().ymax < WindowManager()->G2D()->GetHeight())
+    {
+      last_x=x;
+      last_y=y;
+      
+      // Mark old pos
+      WindowManager()->Mark(Frame());
+
+      // Move frame
+      Frame().Move(delta_x, delta_y);
+
+      // Mark new pos
+      WindowManager()->Mark(Frame());
+
+    }
+
   }
   return false;
 }
@@ -284,6 +325,8 @@ awsWindow::OnDraw(csRect clip)
   // Increase the textheight just a bit to have more room in the title bar
   th+=toff;
 
+  // Set the height of the title bar
+  title_bar_height = th+3;
   
   switch(frame_style)
   {

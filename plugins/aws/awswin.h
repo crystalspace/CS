@@ -60,8 +60,17 @@ private:
     /// Individual frame options
     unsigned int frame_options;
 
+    /// The size of the title bar as of last draw
+    int  title_bar_height;
+
+    /// The last values for x and y so that we can create deltas for moving
+    int  last_x, last_y;
+
     /// True if we are currently resizing
     bool resizing_mode;
+
+    /// True if we are currently moving
+    bool moving_mode;
 
 public:
    static const unsigned long sWindowRaised;
