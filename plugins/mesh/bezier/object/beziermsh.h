@@ -56,19 +56,19 @@ struct iMaterialWrapper;
 /**
  * A helper class for iPolygonMesh implementations used by csBezierMesh.
  */
-class PolyMeshHelper : public iPolygonMesh
+class BezierPolyMeshHelper : public iPolygonMesh
 {
 public:
   /**
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  PolyMeshHelper () :
+  BezierPolyMeshHelper () :
   	polygons (NULL), vertices (NULL) { }
-  virtual ~PolyMeshHelper () { Cleanup (); }
+  virtual ~BezierPolyMeshHelper () { Cleanup (); }
 
   void Setup ();
-  void SetThing (csBezierMesh* thing) { PolyMeshHelper::thing = thing; }
+  void SetThing (csBezierMesh* thing) { BezierPolyMeshHelper::thing = thing; }
 
   virtual int GetVertexCount ()
   {
@@ -213,7 +213,7 @@ public:
  */
 class csBezierMesh : public iBase
 {
-  friend class PolyMeshHelper;
+  friend class BezierPolyMeshHelper;
 
 public:
   /**
@@ -688,14 +688,14 @@ public:
   friend struct LightingInfo;
 
   //-------------------- iPolygonMesh interface implementation ---------------
-  struct PolyMesh : public PolyMeshHelper
+  struct PolyMesh : public BezierPolyMeshHelper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    PolyMesh () : PolyMeshHelper () { }
+    PolyMesh () : BezierPolyMeshHelper () { }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
-  struct PolyMeshLOD : public PolyMeshHelper
+  struct PolyMeshLOD : public BezierPolyMeshHelper
   {
     PolyMeshLOD ();
     // @@@ Not embedded because we can't have two iPolygonMesh implementations

@@ -660,14 +660,14 @@ SCF_IMPLEMENT_IBASE(csBezierMesh::PolyMeshLOD)
   SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
-csBezierMesh::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper ()
+csBezierMesh::PolyMeshLOD::PolyMeshLOD () : BezierPolyMeshHelper ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
 //-------------------------------------------------------------------------
 
-void PolyMeshHelper::Setup ()
+void BezierPolyMeshHelper::Setup ()
 {
   csBezierMeshStatic* static_data = thing->static_data;
 
@@ -729,7 +729,7 @@ void PolyMeshHelper::Setup ()
   }
 }
 
-void PolyMeshHelper::Cleanup ()
+void BezierPolyMeshHelper::Cleanup ()
 {
   int i;
 

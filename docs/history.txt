@@ -39,6 +39,9 @@ The history order is reversed so that new features are at the top.
 	- res augmented the configure process to check for a working INT64_C
 	  macro in <stdint.h>. It seems that it's broken on some GCC/stdint.h 
 	  combos. If such is detected, stdint.h is treated as 'not  present'.
+	- Renamed PolyMeshHelper class in bezier mesh plugin so that it
+	  doesn't conflict with PolyMeshHelper in thing plugin when doing
+	  a static compile.
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()
