@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+  </plugins>
+
+  <textures>
+    <texture name="up">
+      <file>/lev/terrain/swiss1_u.jpg</file>
+    </texture>
+    <texture name="down">
+      <file>/lev/terrain/swiss1_d.jpg</file>
+    </texture>
+    <texture name="left">
+      <file>/lev/terrain/swiss1_l.jpg</file>
+    </texture>
+    <texture name="right">
+      <file>/lev/terrain/swiss1_r.jpg</file>
+    </texture>
+    <texture name="front">
+      <file>/lev/terrain/swiss1_f.jpg</file>
+    </texture>
+    <texture name="back">
+      <file>/lev/terrain/swiss1_b.jpg</file>
+    </texture>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="blobby.jpg">
+      <file>/lib/stdtex/blobby.jpg</file>
+    </texture>
+    <texture name="blobbyDOT3.png">
+      <file>/lib/stdtex/blobbyDOT3.png</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="grassDOT3.png">
+      <file>/lev/terrain/grassDOT3.png</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/ambient.xml</file></shader>
+    <shader><file>/shader/light.xml</file></shader>
+    <shader><file>/shader/light_bumpmap.xml</file></shader>
+    <shader><file>/shader/splatting_black.xml</file></shader>
+    <shader><file>/shader/splatting_amb.xml</file></shader>
+    <shader><file>/shader/splatting_bump.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="Up">
+      <texture>up</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Down">
+      <texture>down</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Left">
+      <texture>left</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Right">
+      <texture>right</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Front">
+      <texture>front</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Back">
+      <texture>back</texture>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Blobby">
+      <texture>blobby.jpg</texture>
+      <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
+      <shader type="ambient">ambient</shader>
+      <shader type="diffuse">light</shader>
+    </material>
+    <material name="Default">
+      <color red="0" green="0" blue="0" />
+      <shader type="ambient">splatting black</shader> 
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
+      <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
+      <shader type="post-ambient">splatting_ambient</shader>
+      <shader type="diffuse">splatting_bump</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
+      <shaderparam name="texture scale" type="vector2">8,8</shaderparam>
+      <shader type="post-ambient">splatting_ambient</shader>
+      <shader type="diffuse">splatting_bump</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shaderparam name="tex normal" type="texture">grassDOT3.png</shaderparam>
+      <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
+      <shader type="post-ambient">splatting_ambient</shader>
+      <shader type="diffuse">splatting_bump</shader>
+    </material>
+  </materials>
+
+  <renderpriorities>
+    <priority name="sky">
+      <level>1</level>
+      <sort>NONE</sort>
+      <camera />
+    </priority>
+    <priority name="mirror">
+      <level>2</level>
+      <sort>FRONT2BACK</sort>
+    </priority>
+    <priority name="wall">
+      <level>3</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+      <level>4</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+      <level>5</level>
+      <sort>BACK2FRONT</sort>
+    </priority>
+  </renderpriorities>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <params>
+      <name>myLoop</name>
+      <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+          <zuse />
+        </step>
+	<step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>post-ambient</shadertype>
+	  <zoffset>yes</zoffset>
+	  <ztest />
+	</step>
+        <step plugin="crystalspace.renderloop.step.lightiter">
+          <steps>
+	        <step plugin="crystalspace.renderloop.step.generic">
+	          <shadertype>diffuse</shadertype>
+	          <zoffset>no</zoffset>
+	          <ztest />
+	        </step>
+	  </steps>
+        </step>
+      </steps>
+    </params>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>myLoop</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="5" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="TerrainFact">
+    <plugin>terrainFact</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.chunklod</plugin>
+      <scale x="1" y="40" z="1" />
+      <heightmap image="/lev/terrain/heightmap_257x257.png"/>
+    </params>
+  </meshfact>
+
+  <meshfact name="f">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-129" y="129" z="129" u="1.000" v="0.000" />
+      <v x="129" y="129" z="129" u="0.000" v="0.000" />
+      <v x="-129" y="0" z="129" u="1.000" v="1.000" />
+      <v x="129" y="0" z="129" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="b">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="129" y="0" z="-129" u="1.000" v="1.000" />
+      <v x="129" y="129" z="-129" u="1.000" v="0.000" />
+      <v x="-129" y="0" z="-129" u="0.000" v="1.000" />
+      <v x="-129" y="129" z="-129" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+    </params>
+  </meshfact>
+  <meshfact name="d">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="129" y="0" z="129" u="1.000" v="1.000" />
+      <v x="129" y="0" z="-129" u="1.000" v="0.000" />
+      <v x="-129" y="0" z="129" u="0.000" v="1.000" />
+      <v x="-129" y="0" z="-129" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="l">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="129" y="129" z="129" u="1.000" v="0.000" />
+      <v x="129" y="129" z="-129" u="0.000" v="0.000" />
+      <v x="129" y="0" z="129" u="1.000" v="1.000" />
+      <v x="129" y="0" z="-129" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="u">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-129" y="129" z="129" u="1.000" v="1.000" />
+      <v x="-129" y="129" z="-129" u="1.000" v="0.000" />
+      <v x="129" y="129" z="129" u="0.000" v="1.000" />
+      <v x="129" y="129" z="-129" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="r">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-129" y="0" z="129" u="0.000" v="1.000" />
+      <v x="-129" y="0" z="-129" u="1.000" v="1.000" />
+      <v x="-129" y="129" z="129" u="0.000" v="0.000" />
+      <v x="-129" y="129" z="-129" u="1.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+
+  <sector name="room">
+    <light name="sun">
+      <center x="75" y="75" z="75" />
+      <!-- <center x="-100" y="120" z="100" /> -->
+      <radius>0</radius>
+      <color red="1" green="1" blue="1" />
+      <influenceradius>1000</influenceradius>
+      <attenuation>realistic</attenuation>
+    </light>
+
+    <!--
+    <meshobj name="sky">
+      <plugin>thing</plugin>
+      <params>
+        <v x="-1000" y="0" z="1000" />
+        <v x="1000" y="0" z="1000" />
+        <v x="-1000" y="0" z="-1000" />
+        <v x="1000" y="0" z="-1000" />
+        <v x="-1000" y="1000" z="1000" />
+        <v x="1000" y="1000" z="1000" />
+        <v x="-1000" y="1000" z="-1000" />
+        <v x="1000" y="1000" z="-1000" />
+        <p name="up">
+          <v>6</v>
+          <v>7</v>
+          <v>5</v>
+          <v>4</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Up</material>
+          <lighting>no</lighting>
+        </p>
+        <p name="down">
+          <v>3</v>
+          <v>2</v>
+          <v>0</v>
+          <v>1</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Down</material>
+          <lighting>no</lighting>
+        </p>
+        <p name="back">
+          <v>7</v>
+          <v>6</v>
+          <v>2</v>
+          <v>3</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Back</material>
+          <lighting>no</lighting>
+        </p>
+        <p name="front">
+          <v>4</v>
+          <v>5</v>
+          <v>1</v>
+          <v>0</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Front</material>
+          <lighting>no</lighting>
+        </p>
+        <p name="left">
+          <v>6</v>
+          <v>4</v>
+          <v>0</v>
+          <v>2</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Left</material>
+          <lighting>no</lighting>
+        </p>
+        <p name="right">
+          <v>5</v>
+          <v>7</v>
+          <v>3</v>
+          <v>1</v>
+          <texmap>
+            <uv idx="0" u="0.005" v="0.005" />
+            <uv idx="1" u="0.995" v="0.005" />
+            <uv idx="2" u="0.995" v="0.995" />
+          </texmap>
+          <material>Right</material>
+          <lighting>no</lighting>
+        </p>
+      </params>
+      <camera />
+      <zfill />
+      <priority>sky</priority>
+    </meshobj>
+    -->
+
+    <meshobj name="u">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>u</factory>
+	<material>Up</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="d">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>d</factory>
+	<material>Down</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="l">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>l</factory>
+	<material>Left</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="r">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>r</factory>
+	<material>Right</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="f">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>f</factory>
+	<material>Front</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="b">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>b</factory>
+	<material>Back</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+   
+    <meshobj name="Terrain">
+      <plugin>terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <color red="0" green="1" blue="0" />
+        <material>Default</material>
+	<materialpalette>
+	  <material>Marble</material>
+	  <material>Grass</material>
+	  <material>Stone</material>
+	</materialpalette>
+	<materialmap image="/lev/terrain/materialmap.png" /> 
+	<errortolerance>4</errortolerance>
+      </params>
+      <move> 
+        <v x="0" y="5.1" z="0" /> 
+      </move>
+    </meshobj>
+
+  </sector>
+
+  <!--
+  <sequences>
+    <sequence name="moveLight">
+      <movelight light="sun" duration="1000" x="200" y="0" z="-200" />
+      <delay time="1000" />
+      <movelight light="sun" duration="1000" x="-200" y="0" z="200" />
+      <delay time="1000" />
+      <enable trigger="moveLight" />
+    </sequence>
+  </sequences>
+  <triggers>
+    <trigger name="moveLight">
+      <sectorvis sector="room" />
+      <fire delay="0" sequence="moveLight" />
+    </trigger>
+  </triggers>
+  -->
+
+</world>
