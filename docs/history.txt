@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+28-Feb-2003
+	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
+	  its contents are specific to each person's installation, thus it does
+	  not belong in the generated documentation.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
