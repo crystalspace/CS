@@ -45,8 +45,7 @@ if $(CP) = "cp -f" || $(CP[1]) = "cp" && $(CP[2]) = "-f"
 ##    mutually exclusive.  You may invoke this rule multiple times to specify
 ##    any number of header file directories.
 ##    Options:
-##	literal: "dir" is to be used literally without any interpretation. This
-##	    option implies `ignoresubdir'.
+##	literal: "dir" is to be used literally without any interpretation.
 ##	transient: "dir" is to be used at build-time only; and should not be
 ##	    recorded in any generated resources, such as project files.
 ##
