@@ -126,8 +126,12 @@ public:
   unsigned char* GetPixelAt (int x, int y);
 
   virtual void Print( csRect* area );  
-  // iGraphics2DGlide
+  /// iGraphics2DGlide
   virtual void SetVRetrace( bool wait4vr ){ m_bVRetrace = wait4vr; }
+  /// Force resolution
+  virtual void ForceResolution ( int w, int h )
+  { Width = w; Height = h; }
+  virtual float GetZbuffValue (int x, int y);
 };
 
 #endif

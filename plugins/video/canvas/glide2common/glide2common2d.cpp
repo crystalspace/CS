@@ -404,3 +404,25 @@ void csGraphics2DGlideCommon::DecodeRGB ( UShort color, UByte& r, UByte& g, UByt
     g = ((color&pfmt.GreenMask) >> pfmt.GreenShift) << 2;
     b = ((color&pfmt.BlueMask) >> pfmt.BlueShift) << 3;
 }
+
+float csGraphics2DGlideCommon::GetZbuffValue (int x, int y)
+{
+  GrLfbInfo_t lfbInfo;
+  bool succ = GlideLib_grLfbLock ( GR_LFB_READ_ONLY | GR_LFB_NOIDLE,
+                          GR_BUFFER_AUXBUFFER,
+                          GR_LFBWRITEMODE_ZA16,
+                          GR_ORIGIN_UPPER_LEFT,
+                          FXFALSE,
+                          &lfbInfo);
+  float val=0.0;
+  if (succ)
+  {
+    val = *((float*)( (unsigned char*)(lfbInfo.lfbPtr) + y*lfbInfo.strideInBytes + x + x));
+    GlideLib_grLfbUnlock ( GR_LFB_READ_ONLY | GR_LFB_NOIDLE, GR_BUFFER_AUXBUFFER);
+  }
+  else
+  {
+  printf( "could not lock depthbuffer\n");
+  }
+  return val;
+}
