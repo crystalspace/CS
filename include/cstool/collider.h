@@ -44,8 +44,8 @@ SCF_VERSION (csColliderWrapper, 0, 0, 3);
 class csColliderWrapper : public csObject
 {
 private:
-  iCollideSystem* collide_system;
-  iCollider* collider;
+  csRef<iCollideSystem> collide_system;
+  csRef<iCollider> collider;
 
 public:
   /// Create a collider based on a mesh.

@@ -19,7 +19,6 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "unittest.h"
 #include "iengine/engine.h"
 #include "iutil/string.h"
 #include "iutil/objreg.h"
@@ -39,14 +38,6 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-UnitTest::UnitTest ()
-{
-}
-
-UnitTest::~UnitTest ()
-{
-}
-
 static void Test (iBase* obj, const char* name)
 {
   if (!obj)
@@ -58,12 +49,11 @@ static void Test (iBase* obj, const char* name)
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_UNITTEST))
   {
-    iString* str = dbghelp->UnitTest ();
+    csRef<iString> str (dbghelp->UnitTest ());
     if (str)
     {
       printf ("%s unit testing failed!\n", name);
       printf ("%s\n", str->GetData ());
-      str->DecRef ();
     }
     else
     {
@@ -94,27 +84,8 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
   fflush (stdout);
 }
 
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
-int main (int argc, char* argv[])
+static int DoStuff (iObjectRegistry* object_reg)
 {
-  // Initialize the random number generator
-  srand (time (NULL));
-
-
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg)
-    return -1;
-  if (!csInitializer::RequestPlugins (object_reg,
-	CS_REQUEST_VFS,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_END))
-  {
-    csInitializer::DestroyApplication (object_reg);
-    return -1;
-  }
-
   csRef<iPluginManager> plugmgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if (!plugmgr)
@@ -160,8 +131,32 @@ int main (int argc, char* argv[])
   //Benchmark (viscull, "DynaVis", 100);
 
   printf ("================================================================\n");
+  return 0;
+}
+
+/*---------------------------------------------------------------------*
+ * Main function
+ *---------------------------------------------------------------------*/
+int main (int argc, char* argv[])
+{
+  // Initialize the random number generator
+  srand (time (NULL));
+
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg)
+    return -1;
+  if (!csInitializer::RequestPlugins (object_reg,
+	CS_REQUEST_VFS,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_END))
+  {
+    csInitializer::DestroyApplication (object_reg);
+    return -1;
+  }
+
+  int rc = DoStuff (object_reg);
 
   csInitializer::DestroyApplication (object_reg);
-  return 0;
+  return rc;
 }
 

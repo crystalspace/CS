@@ -201,9 +201,9 @@ public:
   virtual void CastShadows (iFrustumView* fview);
 
   // Debugging functions.
-  iString* Debug_UnitTest ();
-  iString* Debug_StateTest ();
-  iString* Debug_Dump ();
+  csPtr<iString> Debug_UnitTest ();
+  csPtr<iString> Debug_StateTest ();
+  csPtr<iString> Debug_Dump ();
   void Debug_Dump (iGraphics3D* g3d);
   csTicks Debug_Benchmark (int num_iterations);
   bool Debug_DebugCommand (const char* cmd);
@@ -225,11 +225,11 @@ public:
       	CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK |
 	CS_DBGHELP_GFXDUMP;
     }
-    virtual iString* UnitTest ()
+    virtual csPtr<iString> UnitTest ()
     {
       return scfParent->Debug_UnitTest ();
     }
-    virtual iString* StateTest ()
+    virtual csPtr<iString> StateTest ()
     {
       return scfParent->Debug_StateTest ();
     }
@@ -237,7 +237,7 @@ public:
     {
       return scfParent->Debug_Benchmark (num_iterations);
     }
-    virtual iString* Dump ()
+    virtual csPtr<iString> Dump ()
     {
       return scfParent->Debug_Dump ();
     }

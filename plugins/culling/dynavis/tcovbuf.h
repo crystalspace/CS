@@ -226,12 +226,12 @@ public:
   /**
    * Give a textual dump of this tile.
    */
-  iString* Debug_Dump ();
+  csPtr<iString> Debug_Dump ();
 
   /**
    * Give a textual dump of the coverage cache.
    */
-  iString* Debug_Dump_Cache ();
+  csPtr<iString> Debug_Dump_Cache ();
 };
 
 /**
@@ -359,10 +359,10 @@ public:
   bool TestPoint (const csVector2& point, float min_depth);
 
   // Debugging functions.
-  iString* Debug_UnitTest ();
+  csPtr<iString> Debug_UnitTest ();
   csTicks Debug_Benchmark (int num_iterations);
   void Debug_Dump (iGraphics3D* g3d, int zoom = 1);
-  iString* Debug_Dump ();
+  csPtr<iString> Debug_Dump ();
 
   struct DebugHelper : public iDebugHelper
   {
@@ -374,19 +374,19 @@ public:
 	     CS_DBGHELP_GFXDUMP |
 	     CS_DBGHELP_TXTDUMP;
     }
-    virtual iString* UnitTest ()
+    virtual csPtr<iString> UnitTest ()
     {
       return scfParent->Debug_UnitTest ();
     }
-    virtual iString* StateTest ()
+    virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual csTicks Benchmark (int num_iterations)
     {
       return scfParent->Debug_Benchmark (num_iterations);
     }
-    virtual iString* Dump ()
+    virtual csPtr<iString> Dump ()
     {
       return scfParent->Debug_Dump ();
     }

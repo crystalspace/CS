@@ -40,10 +40,10 @@ csUtilDebugHelper::csUtilDebugHelper ()
     ss.Format ("csUtil failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
     str.Append (ss); \
-    return rc; \
+    return csPtr<iString> (rc); \
   }
 
-iString* csUtilDebugHelper::UnitTest ()
+csPtr<iString> csUtilDebugHelper::UnitTest ()
 {
   scfString* rc = new scfString ();
   //csString& str = rc->GetCsString ();
@@ -53,6 +53,6 @@ iString* csUtilDebugHelper::UnitTest ()
   //==========================================================================
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 

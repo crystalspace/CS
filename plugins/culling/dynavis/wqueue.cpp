@@ -169,11 +169,11 @@ void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
   return NULL;
 }
 
-iString* csWriteQueue::Debug_UnitTest ()
+csPtr<iString> csWriteQueue::Debug_UnitTest ()
 {
   scfString* rc = new scfString ();
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 

@@ -91,12 +91,12 @@ csOPCODECollideSystem::~csOPCODECollideSystem ()
  };
 
 
-iCollider* csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
+csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
 {
   csOPCODECollider* col = new csOPCODECollider (mesh);
   // here we must store the caches ¿and the trees?
 
-  return col;
+  return csPtr<iCollider> (col);
 }
 
 bool csOPCODECollideSystem::Collide (

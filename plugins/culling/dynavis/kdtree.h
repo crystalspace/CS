@@ -304,7 +304,7 @@ public:
 
   // Debugging functions.
   bool Debug_CheckTree (csString& str);
-  iString* Debug_UnitTest ();
+  csPtr<iString> Debug_UnitTest ();
   void Debug_Dump (csString& str, int indent);
   void Debug_Statistics (int& tot_objects,
 	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
@@ -320,27 +320,27 @@ public:
       return CS_DBGHELP_UNITTEST | CS_DBGHELP_STATETEST |
       	CS_DBGHELP_TXTDUMP | CS_DBGHELP_BENCHMARK;
     }
-    virtual iString* UnitTest ()
+    virtual csPtr<iString> UnitTest ()
     {
       return scfParent->Debug_UnitTest ();
     }
-    virtual iString* StateTest ()
+    virtual csPtr<iString> StateTest ()
     {
       scfString* rc = new scfString ();
       if (!scfParent->Debug_CheckTree (rc->GetCsString ()))
-        return rc;
+        return csPtr<iString> (rc);
       delete rc;
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual csTicks Benchmark (int num_iterations)
     {
       return scfParent->Debug_Benchmark (num_iterations);
     }
-    virtual iString* Dump ()
+    virtual csPtr<iString> Dump ()
     {
       scfString* rc = new scfString ();
       scfParent->Debug_Dump (rc->GetCsString (), 0);
-      return rc;
+      return csPtr<iString> (rc);
     }
     virtual void Dump (iGraphics3D* /*g3d*/)
     {

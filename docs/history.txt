@@ -8,6 +8,11 @@ The history order is reversed so that new features are at the top.
 	  handle in an iso material.
 	- Engine material and texture wrappers now use csRef's to keep
 	  track of their internal image/handle/texture references.
+	- Modified a few relevant functions in iDebugHelper to return
+	  csPtr.
+	- Changed iCollideSystem->CreateCollider() to return csPtr.
+	- Removed unittest.h app header. It is not needed.
+	- Fixed unit tester of syntax services.
 8-Sep-2002
 	- Changed iModelConverter->Load() to return csPtr.
 	- Changed iModelConverter->Save() to return csPtr.

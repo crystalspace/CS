@@ -56,7 +56,7 @@ SCF_VERSION (iCollideSystem, 0, 0, 2);
 struct iCollideSystem : public iBase
 {
   /// Create an iCollider for the given geometry.
-  virtual iCollider* CreateCollider (iPolygonMesh* mesh) = 0;
+  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
 
   /**
    * Test collision between two colliders.

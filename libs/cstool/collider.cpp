@@ -33,7 +33,6 @@ csColliderWrapper::csColliderWrapper (csObject& parent,
 {
   parent.ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
-  collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
 }
 
@@ -43,14 +42,11 @@ csColliderWrapper::csColliderWrapper (iObject* parent,
 {
   parent->ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
-  collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
 }
 
 csColliderWrapper::~csColliderWrapper ()
 {
-  collide_system->DecRef ();
-  collider->DecRef ();
 }
 
 bool csColliderWrapper::Collide (csObject& otherObject,

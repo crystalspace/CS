@@ -81,7 +81,7 @@ struct iDebugHelper : public iBase
    * Otherwise an iString  is returned containing some information about
    * the errors. DecRef() this returned string after using it.
    */
-  virtual iString* UnitTest () = 0;
+  virtual csPtr<iString> UnitTest () = 0;
 
   /**
    * Perform a state test. This function will test if the current state
@@ -89,7 +89,7 @@ struct iDebugHelper : public iBase
    * Otherwise an iString  is returned containing some information about
    * the errors. DecRef() this returned string after using it.
    */
-  virtual iString* StateTest () = 0;
+  virtual csPtr<iString> StateTest () = 0;
 
   /**
    * Perform a benchmark. This function will return a number indicating
@@ -101,7 +101,7 @@ struct iDebugHelper : public iBase
    * Do a text dump of the current state of this object. Returns NULL if
    * not supported or else a string which you should DecRef() after use.
    */
-  virtual iString* Dump () = 0;
+  virtual csPtr<iString> Dump () = 0;
 
   /**
    * Do a graphical dump of the current state of this object.

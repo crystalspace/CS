@@ -868,7 +868,7 @@ csGeomDebugHelper::csGeomDebugHelper ()
     ss.Format ("csGeom failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
     str.Append (ss); \
-    return rc; \
+    return csPtr<iString> (rc); \
   }
 
 /**
@@ -983,7 +983,7 @@ static bool ContainsEdge (int* outline_edges, int num_outline_edges,
   return false;
 }
 
-iString* csGeomDebugHelper::UnitTest ()
+csPtr<iString> csGeomDebugHelper::UnitTest ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -1197,6 +1197,6 @@ iString* csGeomDebugHelper::UnitTest ()
   }
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 

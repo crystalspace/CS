@@ -496,13 +496,12 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   if (do_state_dump)
   {
-    iString* str;
+    csRef<iString> str;
     if (do_cull_tiled)
       str = tcovbuf->Debug_Dump ();
     else
       str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
-    str->DecRef ();
   }
 
   delete[] tr_z;
@@ -614,13 +613,12 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
       printf ("  E%d: %d-%d\n", j, vt1, vt2);
     }
 
-    iString* str;
+    csRef<iString> str;
     if (do_cull_tiled)
       str = tcovbuf->Debug_Dump ();
     else
       str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
-    str->DecRef ();
   }
 }
 
@@ -1421,7 +1419,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
 //======== Debugging =======================================================
 
-iString* csDynaVis::Debug_UnitTest ()
+csPtr<iString> csDynaVis::Debug_UnitTest ()
 {
   csKDTree* kdtree = new csKDTree (NULL);
   iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
@@ -1432,7 +1430,7 @@ iString* csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete kdtree;
-      return rc;
+      return csPtr<iString> (rc);
     }
   }
   delete kdtree;
@@ -1446,7 +1444,7 @@ iString* csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete covbuf;
-      return rc;
+      return csPtr<iString> (rc);
     }
   }
   delete covbuf;
@@ -1460,22 +1458,22 @@ iString* csDynaVis::Debug_UnitTest ()
     if (rc)
     {
       delete tcovbuf;
-      return rc;
+      return csPtr<iString> (rc);
     }
   }
   delete tcovbuf;
 
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
-iString* csDynaVis::Debug_StateTest ()
+csPtr<iString> csDynaVis::Debug_StateTest ()
 {
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
-iString* csDynaVis::Debug_Dump ()
+csPtr<iString> csDynaVis::Debug_Dump ()
 {
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
 struct color { int r, g, b; };

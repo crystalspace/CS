@@ -657,7 +657,7 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   Front2Back (pos, func, userdata, global_timestamp);
 }
 
-#define KDT_ASSERT(test,msg) \
+#define KDT_ASSERT_BOOL(test,msg) \
   if (!(test)) \
   { \
     csString ss; \
@@ -667,11 +667,21 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     return rc; \
   }
 
+#define KDT_ASSERT(test,msg) \
+  if (!(test)) \
+  { \
+    csString ss; \
+    ss.Format ("csKDTree failure (%d,%s): %s\n", int(__LINE__), \
+    	#msg, #test); \
+    str.Append (ss); \
+    return csPtr<iString> (rc); \
+  }
+
 bool csKDTree::Debug_CheckTree (csString& str)
 {
   bool rc = false;
 
-  KDT_ASSERT ((child1 == NULL) == (child2 == NULL), "child consistency");
+  KDT_ASSERT_BOOL ((child1 == NULL) == (child2 == NULL), "child consistency");
 
   if (child1)
   {
@@ -679,33 +689,33 @@ bool csKDTree::Debug_CheckTree (csString& str)
     // Test-cases in case this is a node.
     //-------
 
-    KDT_ASSERT (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ,
+    KDT_ASSERT_BOOL (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ,
     	"axis");
-    KDT_ASSERT (GetNodeBBox ().Contains (child1->GetNodeBBox ()),
+    KDT_ASSERT_BOOL (GetNodeBBox ().Contains (child1->GetNodeBBox ()),
     	"node_bbox mismatch");
-    KDT_ASSERT (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
+    KDT_ASSERT_BOOL (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
     	"node_bbox mismatch");
 
-    KDT_ASSERT (split_location >= GetNodeBBox ().Min (split_axis),
+    KDT_ASSERT_BOOL (split_location >= GetNodeBBox ().Min (split_axis),
     	"split/node");
-    KDT_ASSERT (split_location <= GetNodeBBox ().Max (split_axis),
+    KDT_ASSERT_BOOL (split_location <= GetNodeBBox ().Max (split_axis),
     	"split/node");
 
     csBox3 new_node_bbox = child1->GetNodeBBox ();
     new_node_bbox += child2->GetNodeBBox ();
-    KDT_ASSERT (new_node_bbox == GetNodeBBox (), "node_bbox mismatch");
+    KDT_ASSERT_BOOL (new_node_bbox == GetNodeBBox (), "node_bbox mismatch");
     if (num_objects > 0)
     {
       csBox3 intersect = GetNodeBBox () * GetObjectBBox ();
-      KDT_ASSERT (!intersect.Empty (), "node_bbox * tree_box == empty!");
+      KDT_ASSERT_BOOL (!intersect.Empty (), "node_bbox * tree_box == empty!");
     }
     else
     {
-      KDT_ASSERT (GetObjectBBox ().Empty (), "obj_bbox is not empty!");
+      KDT_ASSERT_BOOL (GetObjectBBox ().Empty (), "obj_bbox is not empty!");
     }
 
-    KDT_ASSERT (child1->parent == this, "parent check");
-    KDT_ASSERT (child2->parent == this, "parent check");
+    KDT_ASSERT_BOOL (child1->parent == this, "parent check");
+    KDT_ASSERT_BOOL (child2->parent == this, "parent check");
 
     if (!child1->Debug_CheckTree (str))
       return false;
@@ -718,26 +728,26 @@ bool csKDTree::Debug_CheckTree (csString& str)
   // objects waiting for distribution).
   //-------
 
-  KDT_ASSERT (num_objects <= max_objects, "object list");
+  KDT_ASSERT_BOOL (num_objects <= max_objects, "object list");
 
   int i, j;
   for (i = 0 ; i < num_objects ; i++)
   {
     csKDTreeChild* o = objects[i];
 
-    KDT_ASSERT (GetObjectBBox ().Contains (o->bbox), "object not in obj_bbox");
+    KDT_ASSERT_BOOL (GetObjectBBox ().Contains (o->bbox), "object not in obj_bbox");
 
-    KDT_ASSERT (o->num_leafs <= o->max_leafs, "leaf list");
+    KDT_ASSERT_BOOL (o->num_leafs <= o->max_leafs, "leaf list");
     int parcnt = 0;
     for (j = 0 ; j < o->num_leafs ; j++)
     {
       if (o->leafs[j] == this)
       {
 	parcnt++;
-        KDT_ASSERT (parcnt <= 1, "parent occurs multiple times");
+        KDT_ASSERT_BOOL (parcnt <= 1, "parent occurs multiple times");
       }
     }
-    KDT_ASSERT (parcnt == 1, "leaf list doesn't contain parent");
+    KDT_ASSERT_BOOL (parcnt == 1, "leaf list doesn't contain parent");
   }
 
   return true;
@@ -799,7 +809,7 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
   return true;
 }
 
-iString* csKDTree::Debug_UnitTest ()
+csPtr<iString> csKDTree::Debug_UnitTest ()
 {
   csTicks seed = csGetTicks ();
   srand (seed);
@@ -836,11 +846,11 @@ iString* csKDTree::Debug_UnitTest ()
   AddObject (b, (void*)3);
   b.Set (10, 11, 11, 14, 12, 14);
   AddObject (b, (void*)4);
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   Distribute ();
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   FullDistribute ();
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
 
   Clear ();
 
@@ -863,11 +873,11 @@ iString* csKDTree::Debug_UnitTest ()
     float z = rnd (100.0)-50.0;
     b.Set (x, y, z, x+rnd (7.0)+.5, y+rnd (7.0)+.5, z+rnd (7.0)+.5);
     csKDTreeChild* new_obj = AddObject (b, (void*)0);
-    if (!Debug_CheckTree (str)) return rc;
+    if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
     if (i % 20 == 0)
     {
       FullDistribute ();
-      if (!Debug_CheckTree (str)) return rc;
+      if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
       // Remove the previous object and store pointer to this one
       // for next removal.
       if (remove_obj)
@@ -910,7 +920,7 @@ iString* csKDTree::Debug_UnitTest ()
       b.SetMax (2, b.MaxZ ()+dz);
     }
     MoveObject (remove_obj, b);
-    if (!Debug_CheckTree (str)) return rc;
+    if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   }
 
   //=================
@@ -919,7 +929,7 @@ iString* csKDTree::Debug_UnitTest ()
   // This will not be extremely good since we distributed every 20 objects.
   //=================
   FullDistribute ();
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
   dbdump->DecRef ();
@@ -928,7 +938,7 @@ iString* csKDTree::Debug_UnitTest ()
   // Now we flatten the tree completely.
   //=================
   Flatten ();
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
   dbdump->DecRef ();
@@ -939,7 +949,7 @@ iString* csKDTree::Debug_UnitTest ()
   // information is available.
   //=================
   FullDistribute ();
-  if (!Debug_CheckTree (str)) return rc;
+  if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
   dbdump->DecRef ();
@@ -1032,7 +1042,7 @@ iString* csKDTree::Debug_UnitTest ()
   dbdump->DecRef ();
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,

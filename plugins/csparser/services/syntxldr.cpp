@@ -2375,11 +2375,11 @@ void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
     ss.Format ("Syntax services failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
     str.Append (ss); \
-    rc->IncRef (); \
-    return rc; \
+    rc->IncRef (); /* Prevent smart pointer release */ \
+    return csPtr<iString> (rc); \
   }
 
-iString* csTextSyntaxService::Debug_UnitTest ()
+csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
 {
   csRef<scfString> rc (csPtr<scfString> (new scfString ()));
   csString& str = rc->GetCsString ();
@@ -2398,7 +2398,7 @@ iString* csTextSyntaxService::Debug_UnitTest ()
 	<m13>1.5</m13>\
       </matrix>\
       <mixmode>\
-        <add/> <alpha>.5</alpha>\
+        <tiling/> <alpha>.5</alpha>\
       </mixmode>\
     </root>\
   ");
@@ -2431,11 +2431,11 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (mixmode_node != NULL, "mixmode_node");
   uint mixmode;
   SYN_ASSERT (ParseMixmode (mixmode_node, mixmode) == true, "");
-  uint desired_mixmode = CS_FX_ADD;
+  uint desired_mixmode = CS_FX_TILING;
   desired_mixmode &= ~CS_FX_MASK_ALPHA;
   desired_mixmode |= CS_FX_SETALPHA (.5);
   SYN_ASSERT (mixmode == desired_mixmode, "mixmode");
 
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 

@@ -484,18 +484,18 @@ public:
   {
     return CS_DBGHELP_UNITTEST;
   }
-  virtual iString* UnitTest ();
-  virtual iString* StateTest ()
+  virtual csPtr<iString> UnitTest ();
+  virtual csPtr<iString> StateTest ()
   {
-    return NULL;
+    return csPtr<iString> (NULL);
   }
   virtual csTicks Benchmark (int /*num_iterations*/)
   {
     return 0;
   }
-  virtual iString* Dump ()
+  virtual csPtr<iString> Dump ()
   {
-    return NULL;
+    return csPtr<iString> (NULL);
   }
   virtual void Dump (iGraphics3D* /*g3d*/)
   {

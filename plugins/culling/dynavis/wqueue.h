@@ -78,7 +78,7 @@ public:
   void* Fetch (const csBox2& box, float depth, float& out_depth);
 
   // Debugging functions.
-  iString* Debug_UnitTest ();
+  csPtr<iString> Debug_UnitTest ();
 
   struct DebugHelper : public iDebugHelper
   {
@@ -87,21 +87,21 @@ public:
     {
       return CS_DBGHELP_UNITTEST;
     }
-    virtual iString* UnitTest ()
+    virtual csPtr<iString> UnitTest ()
     {
       return scfParent->Debug_UnitTest ();
     }
-    virtual iString* StateTest ()
+    virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual csTicks Benchmark (int)
     {
       return 0;
     }
-    virtual iString* Dump ()
+    virtual csPtr<iString> Dump ()
     {
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual void Dump (iGraphics3D*)
     {

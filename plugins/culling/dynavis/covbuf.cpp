@@ -998,7 +998,7 @@ static int count_bits (uint32 bits)
   return cnt;
 }
 
-iString* csCoverageBuffer::Debug_Dump ()
+csPtr<iString> csCoverageBuffer::Debug_Dump ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -1034,7 +1034,7 @@ iString* csCoverageBuffer::Debug_Dump ()
     }
   }
 
-  return rc;
+  return csPtr<iString> (rc);
 }
 
 void csCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int zoom)
@@ -1424,14 +1424,14 @@ bool csCoverageBuffer::Debug_TestOneIteration (csString& str)
   return true;
 }
 
-iString* csCoverageBuffer::Debug_UnitTest ()
+csPtr<iString> csCoverageBuffer::Debug_UnitTest ()
 {
   Setup (640, 480);
 
   scfString* rc = new scfString ();
   if (!Debug_TestOneIteration (rc->GetCsString ()))
   {
-    return rc;
+    return csPtr<iString> (rc);
   }
 
   csVector2 verts[6];
@@ -1446,11 +1446,11 @@ iString* csCoverageBuffer::Debug_UnitTest ()
       sub.Format ("  (%g,%g)\n", verts[i].x, verts[i].y);
       rc->GetCsString ().Append (sub);
     }
-    return rc;
+    return csPtr<iString> (rc);
   }
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
 csTicks csCoverageBuffer::Debug_Benchmark (int num_iterations)

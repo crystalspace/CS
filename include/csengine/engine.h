@@ -1192,10 +1192,10 @@ private:
     {
       return 0;
     }
-    virtual iString* UnitTest () { return NULL; }
-    virtual iString* StateTest () { return NULL; }
+    virtual csPtr<iString> UnitTest () { return csPtr<iString> (NULL); }
+    virtual csPtr<iString> StateTest () { return csPtr<iString> (NULL); }
     virtual csTicks Benchmark (int) { return 0; }
-    virtual iString* Dump () { return NULL; }
+    virtual csPtr<iString> Dump () { return csPtr<iString> (NULL); }
     virtual void Dump (iGraphics3D*) { }
     virtual bool DebugCommand (const char* cmd)
     {

@@ -61,10 +61,10 @@ csRapidCollideSystem::~csRapidCollideSystem ()
 {
 }
 
-iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
+csPtr<iCollider> csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
 {
   csRapidCollider* col = new csRapidCollider (mesh);
-  return col;
+  return csPtr<iCollider> (col);
 }
 
 bool csRapidCollideSystem::Collide (
@@ -111,7 +111,7 @@ void csRapidCollideSystem::ResetCollisionPairs ()
   { \
     str.Format ("csRapid failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
-    return rc; \
+    return csPtr<iString> (rc); \
   }
 
 struct TriPolygonMesh : public iPolygonMesh
@@ -143,7 +143,7 @@ SCF_IMPLEMENT_IBASE (TriPolygonMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
-iString* csRapidCollideSystem::Debug_UnitTest ()
+csPtr<iString> csRapidCollideSystem::Debug_UnitTest ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -164,19 +164,17 @@ iString* csRapidCollideSystem::Debug_UnitTest ()
   trans2.Translate (csVector3 (0, 0, 8));
   trans2.RotateThis (csVector3 (0, 1, 0), 1.4);
 
-  iCollider* cd1 = CreateCollider (tri1);
-  iCollider* cd2 = CreateCollider (tri2);
+  csRef<iCollider> cd1 (CreateCollider (tri1));
+  csRef<iCollider> cd2 (CreateCollider (tri2));
 
   RAP_ASSERT (Collide (cd1, &trans1, cd2, &trans2) == true, "cd1 -> cd2");
   RAP_ASSERT (Collide (cd2, &trans2, cd1, &trans1) == true, "cd2 -> cd1");
 
-  cd1->DecRef ();
-  cd2->DecRef ();
   tri1->DecRef ();
   tri2->DecRef ();
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
 //-------------------------------------------------------------------------

@@ -659,12 +659,13 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_ENGINESTATE:
 	{
-	  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (Engine, iDebugHelper);
+	  csRef<iDebugHelper> dbghelp (
+	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
 	    {
-	      iString* rc = dbghelp->StateTest ();
+	      csRef<iString> rc (dbghelp->StateTest ());
 	      if (rc)
 	      {
                 Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -673,7 +674,6 @@ bool csBugPlug::EatKey (iEvent& event)
 	          "Engine StateTest() failed:");
                 Report (CS_REPORTER_SEVERITY_DEBUG,
 		  rc->GetData ());
-	        rc->DecRef ();
 	      }
 	      else
 	      {
@@ -686,7 +686,6 @@ bool csBugPlug::EatKey (iEvent& event)
               Report (CS_REPORTER_SEVERITY_NOTIFY,
 	        "Engine doesn't support StateTest()!");
 	    }
-	    dbghelp->DecRef ();
 	  }
 	}
         break;

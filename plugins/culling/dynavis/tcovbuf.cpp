@@ -566,7 +566,7 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
   return !c.TestBit (y);
 }
 
-iString* csCoverageTile::Debug_Dump ()
+csPtr<iString> csCoverageTile::Debug_Dump ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -628,10 +628,10 @@ iString* csCoverageTile::Debug_Dump ()
     str.Append (ss);
   }
 
-  return rc;
+  return csPtr<iString> (rc);
 }
 
-iString* csCoverageTile::Debug_Dump_Cache ()
+csPtr<iString> csCoverageTile::Debug_Dump_Cache ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -652,7 +652,7 @@ iString* csCoverageTile::Debug_Dump_Cache ()
     str.Append (ss);
   }
 
-  return rc;
+  return csPtr<iString> (rc);
 }
 
 //---------------------------------------------------------------------------
@@ -1530,7 +1530,7 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
 }
 #endif
 
-iString* csTiledCoverageBuffer::Debug_Dump ()
+csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 {
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
@@ -1563,7 +1563,7 @@ iString* csTiledCoverageBuffer::Debug_Dump ()
     }
   }
 
-  return rc;
+  return csPtr<iString> (rc);
 }
 
 void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
@@ -1616,10 +1616,10 @@ static float rnd (int totrange, int leftpad, int rightpad)
   { \
     str.Format ("csTiledCoverageBuffer failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
-    return rc; \
+    return csPtr<iString> (rc); \
   }
 
-iString* csTiledCoverageBuffer::Debug_UnitTest ()
+csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
 {
   Setup (640, 480);
 
@@ -1645,7 +1645,7 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
   COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
 
   rc->DecRef ();
-  return NULL;
+  return csPtr<iString> (NULL);
 }
 
 csTicks csTiledCoverageBuffer::Debug_Benchmark (int num_iterations)

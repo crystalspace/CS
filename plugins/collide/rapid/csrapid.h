@@ -38,7 +38,7 @@ public:
   virtual ~csRapidCollideSystem ();
 
   /// Create an iCollider for the given geometry.
-  virtual iCollider* CreateCollider (iPolygonMesh* mesh);
+  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
 
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
@@ -70,7 +70,7 @@ public:
   }
 
   // Debugging functions.
-  iString* Debug_UnitTest ();
+  csPtr<iString> Debug_UnitTest ();
 
   struct eiComponent : public iComponent
   {
@@ -85,21 +85,21 @@ public:
     {
       return CS_DBGHELP_UNITTEST;
     }
-    virtual iString* UnitTest ()
+    virtual csPtr<iString> UnitTest ()
     {
       return scfParent->Debug_UnitTest ();
     }
-    virtual iString* StateTest ()
+    virtual csPtr<iString> StateTest ()
     {
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual csTicks Benchmark (int)
     {
       return 0;
     }
-    virtual iString* Dump ()
+    virtual csPtr<iString> Dump ()
     {
-      return NULL;
+      return csPtr<iString> (NULL);
     }
     virtual void Dump (iGraphics3D*)
     {
