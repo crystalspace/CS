@@ -101,18 +101,6 @@ also very useful. One good example is simple circle shaped curves. Those
 are great for archways.
 
 @item
-Dynamic curve lighting.  This requires some thought because light-mapping a
-curve is expensive.  More precalculation may help here.
-
-@item
-@sc{rempes} visibility system or at least a subset.
-
-@item
-Improve the current c-buffer system. For example, add the ability to insert
-dynamic objects (i.e. sprites) into the c-buffer and use them for testing
-as well.
-
-@item
 Implement a @samp{make install} in the makefile system.
 
 @item
@@ -124,7 +112,7 @@ Better world loader with support for plug-ins (to allow apps to insert game
 specific data in a world file).
 
 @item
-Special effects (bumpmapping, explosions, particles, smoke, @dots{})
+Special effects (bumpmapping, explosions, smoke, @dots{})
 
 @item
 More configuration parameters for objects (like lightmap size for detail of
@@ -243,9 +231,6 @@ depend on this.
 
 @item
 Combine lightmaps in one texture for hardware renderers.
-
-@item
-Implement fast hardware versions of @code{DrawTriangleMesh()}.
 
 @item
 Joystick/mouse support.

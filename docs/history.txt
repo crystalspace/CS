@@ -4,6 +4,18 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a number of remaining black border problems with lighting.
 	  These were especially visible in the mazedex level but could
 	  occur everywhere.
+	- Wouter Wijngaards updated lighting.txi document with some info
+	  about the radiosity options.
+	- Removed several old-fashioned and obsolete flags which were
+	  (in the past) used to control lighting. i.e. I removed all the
+	  settings related to 'Shadows....' in the Lighting section.
+	- Changed ambient setting from 40 to 20 as I personally think
+	  that 40 is to high.
+	- Updated the documentation to reflect the above changes to
+	  the settings.
+	- Updated various other things in the documentation.
+	- Alex Pfaffe did an update to the terrain engine to improve
+	  visible popping.
 30-Jul-2000
 	- Samuel Humphreys did the following:
             - Little re-organisation of dtsimple, improved comments

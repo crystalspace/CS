@@ -249,12 +249,8 @@ csPolygon3D *csDelayedLightingInfo::GetNextUnlitPolygon ()
 
 //------------------------------------------------------------------------------
 
-// Option variable: do accurate lighting of things (much slower)?
-bool csPolyTexture::do_accurate_things = true;
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
-/// Account for overlapping shadows?
-bool csPolyTexture::do_accurate_shadows = false;
 
 #define lightcell_size	csLightMap::lightcell_size
 #define lightcell_shift	csLightMap::lightcell_shift

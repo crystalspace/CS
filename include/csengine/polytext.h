@@ -114,16 +114,6 @@ private:
   void *cache_data [4];
 
 public:
-  /// Option variable: do accurate lighting of things. This is much slower however.
-  static bool do_accurate_things;
-
-  /**
-   * Option variable: do accurate shadows. This is slower but more accurate.
-   * Usually it is enabled at precalculation stage (for static lighting)
-   * and disabled at runtime (for dynamic lights).
-   */
-  static bool do_accurate_shadows;
-
   /**
    * Option variable: control how much the angle of the light with the polygon
    * it hits affects the final light value. Values ranges from -1 to 1.

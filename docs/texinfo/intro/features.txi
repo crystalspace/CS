@@ -61,6 +61,9 @@ The width and height of textures must be a power of two but the
 texture need not be a square.
 
 @item
+Procedural textures.
+
+@item
 It is possible to map the texture on a polygon in various ways
 (rotated, scaled, mirrored, ...).
 
@@ -81,6 +84,9 @@ The 3d engine. It offers all the advatages of the 3d rasterizer
 @itemize @bullet
 @item
 True 6DOF engine.
+
+@item
+Integrated landscape engine.
 
 @item
 Moving objects and scripts controlling the movement.
@@ -106,6 +112,9 @@ are ignored currently).
 @item
 Support for frame and skeletal based 3D triangle mesh sprites with LOD
 via progressive meshes!
+
+@item
+Support for 2D sprites and particle systems.
 
 @item
 Portals are used for efficient and easy visibility sorting. In
@@ -186,15 +195,8 @@ Future plans:
 
 @itemize @bullet
 @item
-2D sprites and alpha-mapped 2D sprites for simulating fog and explosions
-(possibly in combination with a primitive particle system).
-
-@item
 More powerful scripting language.
 
 @item
 More and better hardware accelerator support.
-
-@item
-Support for landscape capabilities and LOD (Level Of Detail).
 @end itemize

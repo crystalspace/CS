@@ -3,32 +3,23 @@
 @subsubsection @code{[Lighting]} section
 
 @table @code
-@item REFLECT=<number>
+@item Reflections=<number>
 The number of reflections that are allowed for static lighting. The default
 for this is 1 which means that light is not reflected by mirrors. This
 number is actually the number of times that some light may affect the same
 sector. This option only has effect in combination with the @code{-relight}
 commandline option.
 
-@item RADIOSITY=<yesno>
+@item Radiosity=<yesno>
 If yes the precalculated lighting routines will also reflect light on
 normal polygons (and not only on mirrors). The number of allowed
 reflections depends on the @samp{REFLECT} variable. Using this flag you get
 a sort of simulation of radiosity. Note that it greatly increases the time
 needed for precalculated lighting. This option only has effect in
-combination with the @code{-relight} commandline option.
+combination with the @code{-relight} commandline option. Also note that this
+option is currently broken (i.e. crashes CS).
 
-@item NEWRADIOSITY=<yesno>
-Real radiosity system that operates on the lightmaps. This system is
-currently still experimental.
-
-@item ACCURATE_THINGS=<yesno>
-With this option enabled (default) precalculated lighting is much more
-accurate with regards to shadow calculation of Things. However this is also
-a lot slower (only when calculating lighting information). This option
-corresponds with the @code{-accthg}/@code{-noaccthg} commandline options.
-
-@item COSINUS_FACTOR=<float>
+@item CosinusFactor=<float>
 Control how much the angle of the light with the polygon it hits affects
 the final light value. Values ranges from -1 to 1. With -1 the polygons
 will get no light at all. With 0 it will be perfect cosine rule. With 1 the
@@ -37,7 +28,7 @@ that changing this value at runtime only has an effect on dynamic lights.
 This option corresponds to the @code{-cosfact} commandline option and the
 @samp{cosfact} console command.
 
-@item LIGHTMAP_SIZE=<size>
+@item LightmapSize=<size>
 Set the size of the lightmap boxes. Default is 16. Use 4 or 8 for more
 accurate lightmaps (but lightmap size will increase and texture cache speed
 will decrease). Use 32 for very blocky textures. Note that
@@ -46,15 +37,7 @@ automatically recompute all the lightmaps when this value changes (this
 make take a long time). Note that you can also specify this option in the
 local @file{cryst.cfg} file.
 
-@item LIGHTMAP_HIGHQUAL=<yesno>
-With this option enabled (default yet) lightmaps are calculated at a higher
-resolution internally and then scaled back to the value specified with
-@samp{LIGHTMAP_SIZE}. This results in much nicer lightmaps but calculation
-takes somewhat longer. Note that dynamic lights don't use this feature.
-Note that you can also specify this option in the local @file{cryst.cfg}
-file.
-
-@item SPRITE_HIGHQUAL=<yesno>
+@item SpriteHighQual=<yesno>
 With this option enabled (default no) sprites are lit using a higher
 quality algorithm in which the distance between the light and every vertex
 is calculated. The default setting doesn't do this and just calculates the

@@ -266,8 +266,6 @@ bool csWorld::do_not_force_relight = false;
 bool csWorld::do_force_relight = false;
 bool csWorld::do_not_force_revis = false;
 bool csWorld::do_force_revis = false;
-bool csWorld::do_accurate_statlight = true;
-bool csWorld::do_accurate_dynlight = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
@@ -684,7 +682,6 @@ void csWorld::ShineLights ()
       int ambient_blue;
       int reflect;
       int radiosity;
-      int accurate_things;
       float cosinus_factor;
       int lightmap_size;
     };
@@ -697,7 +694,6 @@ void csWorld::ShineLights ()
     current.ambient_blue = csLight::ambient_blue;
     current.reflect = csSector::cfg_reflections;
     current.radiosity = (int)csSector::do_radiosity;
-    current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
     current.lightmap_size = csLightMap::lightcell_size;
     char *reason = NULL;
@@ -732,7 +728,6 @@ void csWorld::ShineLights ()
         CHECK ("AMBIENT_BLUE", xi != current.ambient_blue, "ambient blue level")
         CHECK ("REFLECT", xi != current.reflect, "reflection value")
         CHECK ("RADIOSITY", xi != current.radiosity, "radiosity value")
-        CHECK ("ACCURATE_THINGS", xi != current.accurate_things, "'accurate things' flag")
         CHECK ("COSINUS_FACTOR", ABS (xf - current.cosinus_factor) > SMALL_EPSILON, "cosinus factor")
         CHECK ("LIGHTMAP_SIZE", xi != current.lightmap_size, "lightmap size")
 
@@ -751,12 +746,11 @@ void csWorld::ShineLights ()
         "AMBIENT_BLUE=%d\n"
         "REFLECT=%d\n"
         "RADIOSITY=%d\n"
-        "ACCURATE_THINGS=%d\n"
         "COSINUS_FACTOR=%g\n"
         "LIGHTMAP_SIZE=%d\n",
         current.lm_version, current.normal_light_level, current.ambient_red,
         current.ambient_green, current.ambient_blue, current.reflect,
-        current.radiosity, current.accurate_things, current.cosinus_factor,
+        current.radiosity, current.cosinus_factor,
         current.lightmap_size);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
@@ -808,8 +802,6 @@ void csWorld::ShineLights ()
     meter.Step();
   }
 
-  csPolyTexture::do_accurate_shadows = do_accurate_statlight;
-
   time_t start, stop;
   start = System->GetTime ();
   CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
@@ -834,8 +826,6 @@ void csWorld::ShineLights ()
     stop = System->GetTime ();
     CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)", (float)(stop-start)/1000.);
   }
-
-  csPolyTexture::do_accurate_shadows = do_accurate_dynlight;
 
   CsPrintf (MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
   meter.SetTotal (num_sectors);
@@ -1274,13 +1264,6 @@ void csWorld::ReadConfig ()
   csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
   csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SpriteHighQual", csSprite3D::do_quality_lighting);
   csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
-
-  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting",
-    "Shadows.Things", csPolyTexture::do_accurate_things);
-  do_accurate_statlight = System->ConfigGetYesNo ("Lighting",
-    "Shadows.AccurateStatic", do_accurate_statlight);
-  do_accurate_dynlight = System->ConfigGetYesNo ("Lighting",
-    "Shadows.AccurateDynamic", do_accurate_dynlight);
 
   // radiosity options
   csWorld::use_new_radiosity = System->ConfigGetYesNo ("Lighting",

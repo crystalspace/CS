@@ -983,7 +983,7 @@ void csRadiosity :: StartFrustum()
   lview->poly_func = frustum_polygon_report_func;
   lview->radius = 10000000.0; // should be enough
   lview->sq_radius = lview->radius * lview->radius;
-  lview->things_shadow = csPolyTexture::do_accurate_things; 
+  lview->things_shadow = true;
   lview->mirror = false;
   lview->gouraud_only = false;
   lview->gouraud_color_reset = false;
