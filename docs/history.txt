@@ -5,6 +5,10 @@ The history order has been reversed so that new features are at the top.
 	  Also added GetFlags() to iMeshWrapper.
 	- Added SetMeshObjectFactory() to iMeshFactoryWrapper.
 	- Added SetZBufMode() and GetZBufMode() to iMeshWrapper.
+	- Made ball plugin more efficient for OpenGL by setting do_clip
+	  right.
+	- Added a new surface mesh plugin which will make a surface for
+	  DrawTriangleMesh.
 19-Apr-2001
 	- Martin Geisse did further work on csparser.
 	- Martin also rewrote the DECLARE_TYPED_VECTOR macro to be really

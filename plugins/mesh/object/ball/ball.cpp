@@ -560,7 +560,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mat_handle[0] = mat;
   top_mesh.use_vertex_color = true;
   top_mesh.fxmode = MixMode | CS_FX_GOURAUD;
-  top_mesh.do_clip = true;
+  //top_mesh.do_clip = true;
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
 
