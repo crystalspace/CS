@@ -1245,12 +1245,12 @@ awsMultiLineEditFactory::awsMultiLineEditFactory (iAws *wmgr)
   :  awsComponentFactory(wmgr)
 {
   Register ("Multiline Edit");
-  RegisterConstant ("fsBump", awsMultiLineEdit::fsBump);
-  RegisterConstant ("fsSimple", awsMultiLineEdit::fsSimple);
-  RegisterConstant ("fsRaised", awsMultiLineEdit::fsRaised);
-  RegisterConstant ("fsSunken", awsMultiLineEdit::fsSunken);
-  RegisterConstant ("fsFlat", awsMultiLineEdit::fsFlat);
-  RegisterConstant ("fsNone", awsMultiLineEdit::fsNone);
+  RegisterConstant ("mefsBump", awsMultiLineEdit::fsBump);
+  RegisterConstant ("mefsSimple", awsMultiLineEdit::fsSimple);
+  RegisterConstant ("mefsRaised", awsMultiLineEdit::fsRaised);
+  RegisterConstant ("mefsSunken", awsMultiLineEdit::fsSunken);
+  RegisterConstant ("mefsFlat", awsMultiLineEdit::fsFlat);
+  RegisterConstant ("mefsNone", awsMultiLineEdit::fsNone);
   RegisterConstant ("meNormal", awsMultiLineEdit::meNormal);
   RegisterConstant ("meBitmap", awsMultiLineEdit::meBitmap);
   RegisterConstant ("meHScroll", awsMultiLineEdit::meHScroll);
