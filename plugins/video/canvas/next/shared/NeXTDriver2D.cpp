@@ -26,8 +26,7 @@ IMPLEMENT_FACTORY(NeXTDriver2D)
 
 EXPORT_CLASS_TABLE(next2d)
     EXPORT_CLASS(NeXTDriver2D, "crystalspace.graphics2d.next",
-	"MacOS/X Server, OpenStep, and NextStep 2D graphics driver for "
-	"Crystal Space")
+	"Crystal Space 2D driver for MacOS/X Server, OpenStep, and NextStep")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE(NeXTDriver2D)
