@@ -1,6 +1,7 @@
 SubDir TOP plugins cscript csperl5 ;
 
-if 0
+# csperl5 still fails to build properly on many platforms, so disable for now.
+if $(PERL5.REALLY_BUILD_IT) = "yes"
 {
 if $(PERL5.SDK.AVAILABLE) = "yes"
 {
@@ -66,4 +67,4 @@ if $(PERL5.SDK.AVAILABLE) = "yes"
   Clean clean : $(perlxs) ;
   Clean csperl5clean : $(perlxs) ;
 }
-} # 0 = 1
+} # PERL5.REALLY_BUILD_IT
