@@ -19,7 +19,7 @@
 #ifndef __CS_X2D_H__
 #define __CS_X2D_H__
 
-#include "plugins/video/canvas/common/graph2d.h"
+#include "csplugincommon/canvas/graph2d.h"
 #include "iutil/event.h"
 #include "plugins/video/canvas/xwindowcommon/xwindow.h"
 #include "plugins/video/canvas/xwindowcommon/xextshm.h"

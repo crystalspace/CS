@@ -32,9 +32,9 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "plugins/video/canvas/common/scancode.h"
+#include "csplugincommon/canvas/scancode.h"
 #include "igraphic/image.h"
-#include "plugins/video/canvas/common/cursorconvert.h"
+#include "csplugincommon/canvas/cursorconvert.h"
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
 // disabled by default.  In the future, we should probably provide an API for
