@@ -773,8 +773,7 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> fogvar = 
-    shvar_light_0_attenuation = shadermgr->CreateVariable(
+  csRef<csShaderVariable> fogvar = shadermgr->CreateVariable(
     strings->Request ("standardtex fog"));
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
@@ -1697,36 +1696,29 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 
 void csGLGraphics3D::SetLightParameter (int i, int param, csVector3 value)
 {
-  csVector4 v4;
   if(i != 0) return; //not implemented any other light than first yet
+  csVector4 v4 (value);
+
   switch (param)
   {
   case CS_LIGHTPARAM_POSITION:
-    v4 = value;
-    v4.w = 1;
     glLightfv (GL_LIGHT0, GL_POSITION, (float*)&v4);
     value *= object2camera;
-    shvar_light_0_pos->SetValue(csVector4(value));
+    shvar_light_0_pos->SetValue (csVector4 (value));
     break;
   case CS_LIGHTPARAM_DIFFUSE:
-    v4 = value;
-    v4.w = 1;
     glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
-    shvar_light_0_diffuse->SetValue(csVector4(value));
+    shvar_light_0_diffuse->SetValue (v4);
     break;
   case CS_LIGHTPARAM_SPECULAR:
-    v4 = value;
-    v4.w = 1;
     glLightfv (GL_LIGHT0, GL_DIFFUSE, (float*)&v4);
-    shvar_light_0_specular->SetValue(csVector4(value));
+    shvar_light_0_specular->SetValue (v4);
     break;
   case CS_LIGHTPARAM_ATTENUATION:
-    v4 = value;
-    v4.w = 0;
     glLightf (GL_LIGHT0, GL_CONSTANT_ATTENUATION, v4.x);
     glLightf (GL_LIGHT0, GL_LINEAR_ATTENUATION, v4.y);
     glLightf (GL_LIGHT0, GL_QUADRATIC_ATTENUATION, v4.z);
-    shvar_light_0_attenuation->SetValue(csVector4(value));
+    shvar_light_0_attenuation->SetValue (v4);
     break;
   }
 }

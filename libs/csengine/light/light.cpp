@@ -223,7 +223,9 @@ void csLight::SetColor (const csColor& col)
 
 void csLight::SetAttenuation (int a)
 {
-  CalculateAttenuationVector (a, influenceRadius, 1.0);
+  float dist;
+  GetDistanceForBrightness (1.0f, dist);
+  CalculateAttenuationVector (a, dist, 1.0f);
   attenuation = a;
 }
 
@@ -231,13 +233,6 @@ void csLight::SetAttenuationVector(const csVector3& attenv)
 {
   attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
-  
-/*  if (attenuationvec.x < 0)
-    attenuationvec.x = 0;
-  if (attenuationvec.y < 0)
-    attenuationvec.y = 0;
-  if (attenuationvec.z < 0)
-    attenuationvec.z = 0;*/
 
 #ifdef CS_USE_NEW_RENDERER
   influenceValid = false;
@@ -285,7 +280,10 @@ void csLight::CalculateInfluenceRadius ()
   if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
     // can't determine distance
     radius = 100000000;
-  SetInfluenceRadius (radius);
+  influenceRadius = radius;
+  influenceRadiusSq = radius*radius;
+  inv_dist = 1.0 / influenceRadius;
+  influenceValid = true;
 }
 
 #endif

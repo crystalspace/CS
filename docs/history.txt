@@ -57,6 +57,25 @@ chronological order.
 	      physics frame
 	    - fixed a bug with somehow deleting the line that saves created
 	      systems. (weird)
+	- res made the following changes:
+	    - In glrender3d, the "light attenuation" SV was overwritten with
+	      the "fog texture" SV, with the result that light attenuation
+	      couldn't be set.
+	    - glrender3d did some unnecessary Vector3->Vector4 conversions
+	      in SetLightParameter ().
+	    - csLight::CalculateInfluenceRadius () called SetInfluenceRadius ()
+	      to set it's calculated influence radius. However, this called
+	      CalculateAttenuationVector(), which in turn called 
+	      SetAttenuationVector(), which clears the "influence radius valid"
+	      flag, causing an unnecessary recalculations of the influence
+	      radius. Worse, probably due to numerical precision, the
+	      attenuation vector and influence radius wasn't the same between
+	      two calls of GetInfluenceRadius (), causing very visible 
+	      flickering.
+	    - Worked a bit on the vertex light VP. It is a bit more complete
+	      now - not just diffuse, but also specular lighting (tho FP
+	      support for this lacks), and also honors the attenuation vector
+	      now.
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another
