@@ -139,6 +139,12 @@ class csShadow;
 #define DEBUGCMD_MESHSHADMESH	1055	// Show shadow polymesh of selected mesh
 #define DEBUGCMD_MESHBASEMESH	1056	// Show base polymesh of selected mesh
 #define DEBUGCMD_ONESECTOR	1057	// Merge all in one sector
+#define DEBUGCMD_MESH_XMIN	1058	// Move mesh
+#define DEBUGCMD_MESH_XPLUS	1059	// Move mesh
+#define DEBUGCMD_MESH_YMIN	1060	// Move mesh
+#define DEBUGCMD_MESH_YPLUS	1061	// Move mesh
+#define DEBUGCMD_MESH_ZMIN	1062	// Move mesh
+#define DEBUGCMD_MESH_ZPLUS	1063	// Move mesh
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -255,6 +261,7 @@ private:
   void AddSelectedMesh (iMeshWrapper* m);
   void RemoveSelectedMesh (iMeshWrapper* m);
   bool HasSelectedMeshes () const { return selected_meshes.Length () > 0; }
+  void MoveSelectedMeshes (const csVector3& offset);
 
   // Shadow!
   csShadow* shadow;

@@ -404,6 +404,20 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   }
 }
 
+void csBugPlug::MoveSelectedMeshes (const csVector3& offset)
+{
+  size_t i;
+  size_t count = selected_meshes.Length ();
+  for (i = 0 ; i < count ; i++)
+  {
+    // Assign selected_mesh[i] to temporary variable to avoid an
+    // internal MSVC6 error. Luca
+    iMeshWrapper* mesh = selected_meshes[i];
+    mesh->GetMovable ()->MovePosition (offset);
+    mesh->GetMovable ()->UpdateMove ();
+  }
+}
+
 void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
 {
   size_t i;
@@ -1308,6 +1322,24 @@ bool csBugPlug::EatKey (iEvent& event)
 	fps_tottime = 0;
 	fps_cur = -1;
         break;
+      case DEBUGCMD_MESH_XMIN:
+        MoveSelectedMeshes (csVector3 (-1, 0, 0));
+        break;
+      case DEBUGCMD_MESH_XPLUS:
+        MoveSelectedMeshes (csVector3 (1, 0, 0));
+        break;
+      case DEBUGCMD_MESH_YMIN:
+        MoveSelectedMeshes (csVector3 (0, -1, 0));
+        break;
+      case DEBUGCMD_MESH_YPLUS:
+        MoveSelectedMeshes (csVector3 (0, 1, 0));
+        break;
+      case DEBUGCMD_MESH_ZMIN:
+        MoveSelectedMeshes (csVector3 (0, 0, -1));
+        break;
+      case DEBUGCMD_MESH_ZPLUS:
+        MoveSelectedMeshes (csVector3 (0, 0, 1));
+        break;
       case DEBUGCMD_HIDESELECTED:
         if (HasSelectedMeshes ())
 	{
@@ -2013,6 +2045,12 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "switchculler"))	return DEBUGCMD_SWITCHCULLER;
   if (!strcmp (cmd, "selectmesh"))	return DEBUGCMD_SELECTMESH;
   if (!strcmp (cmd, "onesector"))	return DEBUGCMD_ONESECTOR;
+  if (!strcmp (cmd, "mesh_xmin"))	return DEBUGCMD_MESH_XMIN;
+  if (!strcmp (cmd, "mesh_xplus"))	return DEBUGCMD_MESH_XPLUS;
+  if (!strcmp (cmd, "mesh_ymin"))	return DEBUGCMD_MESH_YMIN;
+  if (!strcmp (cmd, "mesh_yplus"))	return DEBUGCMD_MESH_YPLUS;
+  if (!strcmp (cmd, "mesh_zmin"))	return DEBUGCMD_MESH_ZMIN;
+  if (!strcmp (cmd, "mesh_zplus"))	return DEBUGCMD_MESH_ZPLUS;
 
   return DEBUGCMD_UNKNOWN;
 }

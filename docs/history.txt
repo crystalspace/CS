@@ -15,6 +15,10 @@ chronological order.
 	  a second time.
 	- Jorrit added a sanity check to the genmesh loader to test if
 	  a triangle is not using a bad vertex index.
+	- Jorrit added several new commands to move selected meshes in
+	  bugplug.
+	- Jorrit fixed several bugs in bruteblock plugin which caused it
+	  to calculate LOD wrong if the terrain was moved.
 3-Aug-2004
 	- Eric Sunshine changed the install location of Crystal Space headers
 	  from ${includedir} to ${includedir}/crystalspace in order to avoid

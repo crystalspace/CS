@@ -377,7 +377,8 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
 {
   int res = terr->GetBlockResolution ();
 
-  csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  csVector3 cam = terr->tr_o2c.GetOrigin ();
   csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
   /*csVector3 radii = (bbox.Max ()-bbox.Min ())*0.5;
   radii *= (1.0/res)*terr->lod_lcoeff;
@@ -498,7 +499,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     sv->SetValue (mesh_colors);
   }
 
-  csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  csVector3 cam = transform.GetOrigin ();
 
   int clip_portal, clip_plane, clip_z_plane;
   if (!rview->ClipBBox (terr->planes, frustum_mask,
