@@ -22,7 +22,6 @@
 #include "ddraw.h"
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/win32/win32itf.h"
 
 /// Windows version.
 class csGraphics2DDDraw3 : public csGraphics2D

@@ -23,7 +23,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/win32/win32itf.h"
 #include "i_dd8.h"
 
 class csGraphics2DDDraw8 : public csGraphics2D, public iGraphics2DDDraw8
