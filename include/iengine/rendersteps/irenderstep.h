@@ -33,7 +33,7 @@ SCF_VERSION (iRenderStep, 0, 0, 1);
 struct iRenderStep : public iBase
 {
   virtual void Perform (iRenderView* rview, iSector* sector,
-    CS_SHADERVAR_STACK &stacks) = 0;
+    csShaderVarStack &stacks) = 0;
 };
 
 #endif

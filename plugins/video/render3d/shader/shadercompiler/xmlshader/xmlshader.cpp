@@ -750,7 +750,7 @@ bool csXMLShader::DeactivatePass ()
 }
 
 bool csXMLShader::SetupPass (csRenderMesh *mesh, 
-	const CS_SHADERVAR_STACK &stacks)
+	const csShaderVarStack &stacks)
 {
   if(currentPass>=passesCount)
     return false;

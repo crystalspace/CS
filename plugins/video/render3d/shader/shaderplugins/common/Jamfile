@@ -1,0 +1,6 @@
+SubDir TOP plugins video render3d shader shaderplugins common ;
+
+Library shaderplugincommon
+	: [ Wildcard *.cpp *.h ]
+	: noinstall ;
+LibDepends shaderplugincommon : csgfx csgeom csutil ;

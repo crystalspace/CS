@@ -4137,7 +4137,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
 
-  CS_SHADERVAR_STACK stacks;
+  csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
 

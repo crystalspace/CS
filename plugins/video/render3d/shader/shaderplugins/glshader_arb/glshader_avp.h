@@ -21,71 +21,37 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_AVP_H__
 
 #include "../../common/shaderplugin.h"
+#include "../common/shaderprogram.h"
 #include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
-class csGLShader_ARB;
+#include "glshader_arb.h"
 
-class csShaderGLAVP : public iShaderProgram
+class csShaderGLAVP : public csShaderProgram
 {
 private:
-  enum
-  {
-    XMLTOKEN_ARBVP = 100,
-    XMLTOKEN_DECLARE,
-    XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_PROGRAM,
-    XMLTOKEN_DESCRIPTION
-  };
-
-  struct variablemapentry
-  {
-    variablemapentry() { name = csInvalidStringID; }
-    csStringID name;
-    int registernum;
-    // Variables that can be resolved statically at shader load
-    // or compilation is put in "statlink"
-    csRef<csShaderVariable> statlink;
-  };
-
-  csArray<variablemapentry> variablemap;
-
   csGLShader_ARB* shaderPlug;
 
   GLuint program_num;
 
-  csStringHash xmltokens;
-
-  void BuildTokenHash();
-
-  char* programstring;
-  char* description;
   bool validProgram;
 
   void Report (int severity, const char* msg, ...);
-
-  csShaderVariableContext svcontext;
-
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderGLAVP(csGLShader_ARB* shaderPlug)
+  csShaderGLAVP(csGLShader_ARB* shaderPlug) : 
+    csShaderProgram (shaderPlug->object_reg)
   {
-    SCF_CONSTRUCT_IBASE (0);
     validProgram = true;
     this->shaderPlug = shaderPlug;
-    programstring = 0;
-    description = 0;
   }
   virtual ~csShaderGLAVP ()
   {
-    delete[] programstring;
-    delete[] description;
-    SCF_DESTRUCT_IBASE ();
   }
 
-  bool LoadProgramStringToGL( const char* programstring );
+  bool LoadProgramStringToGL(/* const char* programstring */);
 
   void SetValid(bool val) { validProgram = val; }
 
@@ -101,7 +67,7 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const CS_SHADERVAR_STACK &stacks);
+    const csShaderVarStack &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -113,36 +79,11 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings)
   { return false; }
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
-
-
-  //=================== iShaderVariableContext ================//
-
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-    { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-    { return svcontext.GetVariable (name); }
-
-  /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PushVariables (CS_SHADERVAR_STACK &stacks) const
-    { svcontext.PushVariables (stacks); }
-
-  /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
-  void PopVariables (CS_SHADERVAR_STACK &stacks) const
-    { svcontext.PopVariables (stacks); }
 };
 
 

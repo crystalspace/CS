@@ -20,14 +20,16 @@
 #define __CS_SHADERPLUGIN_H__
 
 #include "csutil/scf.h"
+#include "csutil/strhash.h"
 #include "csgfx/shadervar.h"
+#include "ivideo/shader/shader.h"
 
-struct varmapping
+struct csShaderVarMapping
 {
-  csStringID source;
+  csStringID name;
   csString destination;
-  varmapping (csStringID s, char* d)
-    : source(s), destination(d) {}
+  csShaderVarMapping (csStringID n, const char* d)
+    : name(n), destination(d) {}
 };
 
 SCF_VERSION(iShaderProgram, 0,2,0);
@@ -35,7 +37,7 @@ SCF_VERSION(iShaderProgram, 0,2,0);
  * A helper for shaders that which to use the general plugins.
  * This is the main program plugin interface
  */
-struct iShaderProgram : iBase
+struct iShaderProgram : public iBase
 {
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
@@ -45,7 +47,7 @@ struct iShaderProgram : iBase
 
   /// Setup states needed for proper operation of the shaderprogram
   virtual void SetupState (csRenderMesh* mesh, 
-    const CS_SHADERVAR_STACK &stacks) = 0;
+    const csShaderVarStack &stacks) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;
@@ -54,7 +56,8 @@ struct iShaderProgram : iBase
   virtual bool Load (iDocumentNode* node) = 0;
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<varmapping> &mappings) = 0;
+  virtual bool Load (const char* program, 
+    csArray<csShaderVarMapping>& mappings) = 0;
 
   /// Compile a program
   virtual bool Compile (csArray<iShaderVariableContext*> &staticDomains) = 0;

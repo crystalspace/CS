@@ -1,14 +1,14 @@
 <arbvp>
   <!-- This should be directional light from the sun -->
-  <variablemap variable="STANDARD_LIGHT_0_POSITION" register="0" />
-  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" register="1" />
-  <variablemap variable="beta' 1" register="2" />
-  <variablemap variable="beta' 2" register="3" />
-  <variablemap variable="beta1 + beta2" register="4" />
-  <variablemap variable="1 over beta1 + beta2" register="5" />
-  <variablemap variable="hg" register="7" />
-  <variablemap variable="inscattering term" register="8" />
-  <variablemap variable="mat reflection" register="9" />
+  <variablemap variable="STANDARD_LIGHT_0_POSITION" destination="register 0" />
+  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="register 1" />
+  <variablemap variable="beta' 1" destination="register 2" />
+  <variablemap variable="beta' 2" destination="register 3" />
+  <variablemap variable="beta1 + beta2" destination="register 4" />
+  <variablemap variable="1 over beta1 + beta2" destination="register 5" />
+  <variablemap variable="hg" destination="register 7" />
+  <variablemap variable="inscattering term" destination="register 8" />
+  <variablemap variable="mat reflection" destination="register 9" />
   <program>
     <![CDATA[
       !!ARBvp1.0

@@ -146,9 +146,9 @@ public:
   bool Initialize (iObjectRegistry* objreg);
   
   void Perform (iRenderView* rview, iSector* sector,
-    CS_SHADERVAR_STACK &stacks);
+    csShaderVarStack &stacks);
   void Perform (iRenderView* rview, iSector* sector, iLight* light,
-    CS_SHADERVAR_STACK &stacks);
+    csShaderVarStack &stacks);
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();

@@ -1603,7 +1603,7 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 }
 
 void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
-  const CS_SHADERVAR_STACK &stacks)
+  const csShaderVarStack &stacks)
 {
   SetupProjection ();
 
@@ -2110,7 +2110,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
 
-  CS_SHADERVAR_STACK stacks;
+  csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
 

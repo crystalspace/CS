@@ -65,7 +65,7 @@ private:
   void UpdateStandardVariables();
 
   csShaderVariableContext svcontext;
-  CS_SHADERVAR_STACK shaderVarStack;
+  csShaderVarStack shaderVarStack;
 
 public:
   SCF_DECLARE_IBASE;
@@ -98,7 +98,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual CS_SHADERVAR_STACK& GetShaderVariableStack ()
+  virtual csShaderVarStack& GetShaderVariableStack ()
   {
     return shaderVarStack;
   }
@@ -117,14 +117,14 @@ public:
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
   */
-  void PushVariables (CS_SHADERVAR_STACK &stacks) const
+  void PushVariables (csShaderVarStack &stacks) const
     { svcontext.PushVariables (stacks); }
 
   /**
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
-  void PopVariables (CS_SHADERVAR_STACK &stacks) const
+  void PopVariables (csShaderVarStack &stacks) const
     { svcontext.PopVariables (stacks); }
 
   //==================== iComponent ====================//

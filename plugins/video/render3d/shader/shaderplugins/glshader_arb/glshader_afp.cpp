@@ -36,7 +36,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-//#include "ivideo/shader/shadervar.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
@@ -69,7 +68,7 @@ void csShaderGLAFP::Deactivate()
 }
 
 void csShaderGLAFP::SetupState (csRenderMesh *mesh, 
-	const CS_SHADERVAR_STACK &stacks)
+	const csShaderVarStack &stacks)
 {
   const csGLExtensionManager* ext = shaderPlug->ext;
   int i;
@@ -90,7 +89,7 @@ void csShaderGLAFP::SetupState (csRenderMesh *mesh,
       if (lvar->GetValue (v4))
       {
         ext->glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 
-          variablemap[i].registernum, &v4.x);
+	  variablemap[i].userInt, &v4.x);
       }
     }
   }
@@ -100,20 +99,9 @@ void csShaderGLAFP::ResetState ()
 {
 }
 
-bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
+bool csShaderGLAFP::LoadProgramStringToGL ()
 {
-  if(!programstring)
-    return false;
-  //step to first !!
-  int stringlen = strlen (programstring);
-  int i=0;
-  while (*programstring != '!' && (i < stringlen))
-  {
-    ++programstring;
-    ++i;
-  }
-
-  if(!shaderPlug->ext)
+  if (!shaderPlug->ext)
     return false;
 
   const csGLExtensionManager* ext = shaderPlug->ext;
@@ -121,11 +109,27 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
   if(!ext->CS_GL_ARB_fragment_program)
     return false;
 
+  //step to first !!
+  csRef<iDataBuffer> data = GetProgramData();
+  if (!data)
+    return false;
+
+  const char* programstring = (char*)data->GetData ();
+  int stringlen = data->GetSize ();
+
+  int i=0;
+  while (*programstring != '!' && (i < stringlen))
+  {
+    ++programstring;
+    ++i;
+  }
+  stringlen -= i;
+
   ext->glGenProgramsARB(1, &program_num);
   ext->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_num);
   
   ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, 
-    strlen(programstring), (void*) programstring);
+    stringlen, (void*) programstring);
 
   const GLubyte * programErrorString = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 
@@ -151,7 +155,7 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
       *(end-1) = 0;
 
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load fragment program \"%s\"", description);
+      "Couldn't load fragment program \"%s\"", description.GetData());
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
@@ -162,7 +166,7 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
     if ((programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for fragment program \"%s\": '%s'", description, 
+	"Warning for fragment program \"%s\": '%s'", description.GetData(), 
 	programErrorString);
     }
   }
@@ -170,31 +174,10 @@ bool csShaderGLAFP::LoadProgramStringToGL (const char* programstring)
   return true;
 }
 
-void csShaderGLAFP::BuildTokenHash()
-{
-  xmltokens.Register ("arbfp", XMLTOKEN_ARBFP);
-  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
-  xmltokens.Register ("variablemap", XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register ("program", XMLTOKEN_PROGRAM);
-  xmltokens.Register ("description", XMLTOKEN_DESCRIPTION);
-
-  // Note: to avoid collision between the XMLTOKENs and the SV types,
-  // the XMLTOKENs start with 100
-  xmltokens.Register ("integer", csShaderVariable::INT);
-  xmltokens.Register ("float", csShaderVariable::FLOAT);
-  xmltokens.Register ("vector3", csShaderVariable::VECTOR3);
-}
-
-
 bool csShaderGLAFP::Load(iDocumentNode* program)
 {
   if(!program)
     return false;
-
-  BuildTokenHash();
-
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    shaderPlug->object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbfp");
   if (variablesnode)
@@ -204,64 +187,8 @@ bool csShaderGLAFP::Load(iDocumentNode* program)
     {
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch(id)
-      {
-        case XMLTOKEN_PROGRAM:
-          //save for later loading
-          programstring = csStrNew (child->GetContentsValue ());
-          break;
-        case XMLTOKEN_DESCRIPTION:
-	  description = csStrNew (child->GetContentsValue ());
-	  break;
-        case XMLTOKEN_DECLARE:
-          {
-            //create a new variable
-            csRef<csShaderVariable> var = csPtr<csShaderVariable>(
-              new csShaderVariable (strings->Request(
-	      	child->GetAttributeValue ("name"))));
-
-            // @@@ Will leak! Should do proper refcounting.
-            // @@@ Is this still needed? Someone need to sort this out.
-            var->IncRef ();
-
-            csStringID idtype = xmltokens.Request (
-	    	child->GetAttributeValue("type") );
-            var->SetType ((csShaderVariable::VariableType) idtype);
-            switch(idtype)
-            {
-              case csShaderVariable::INT:
-                var->SetValue (child->GetAttributeValueAsInt ("default"));
-                break;
-              case csShaderVariable::FLOAT:
-                var->SetValue (child->GetAttributeValueAsFloat ("default"));
-                break;
-              case csShaderVariable::VECTOR3:
-                const char* def = child->GetAttributeValue("default");
-                csVector3 v;
-                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-                var->SetValue( v );
-                break;
-            }
-            svcontext.AddVariable (var);
-          }
-          break;
-        case XMLTOKEN_VARIABLEMAP:
-          {
-            variablemap.Push (variablemapentry ());
-            int i = variablemap.Length ()-1;
-
-            variablemap[i].name = strings->Request (
-              child->GetAttributeValue("variable"));
-
-            variablemap[i].registernum = 
-              child->GetAttributeValueAsInt("register");
-          }
-          break;
-        default:
-          return false;
-      }
+      if (!ParseCommon (child))
+	return false;
     }
   }
 
@@ -272,28 +199,24 @@ bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
 
-  csShaderVariable *var;
-  int i,j;
+  ResolveStaticVars (staticContexts);
 
-  for (i = 0; i < variablemap.Length (); i++)
+  for (int i = 0; i < variablemap.Length (); i++)
   {
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
+    int dest;
+    if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)
     {
-      // If not, check the static contexts
-      for (j=0;j<staticContexts.Length();j++)
-      {
-        var = staticContexts[j]->GetVariable (variablemap[i].name);
-        if (var) break;
-      }
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Unknown variable destination %s", 
+	variablemap[i].destination.GetData());
+      variablemap.DeleteIndex (i);
+      continue;
     }
-    if (var)
-    {
-      // We found it, so we add it as a static mapping
-      variablemap[i].statlink = var;
-    }
+
+    variablemap[i].userInt = dest;
   }
 
-  return LoadProgramStringToGL(programstring);
+  variablemap.ShrinkBestFit();
+
+  return LoadProgramStringToGL ();
 }

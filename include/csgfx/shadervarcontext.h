@@ -50,14 +50,14 @@ public:
    * supplied in the "stacks" argument
    */
   virtual void PushVariables 
-    (CS_SHADERVAR_STACK &stacks) const;
+    (csShaderVarStack &stacks) const;
 
   /**
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
   virtual void PopVariables 
-    (CS_SHADERVAR_STACK &stacks) const;
+    (csShaderVarStack &stacks) const;
 };
 
 #endif // __CS_CSGFX_SHADERVARCONTEXT_H__

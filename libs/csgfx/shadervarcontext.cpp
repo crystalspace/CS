@@ -56,7 +56,7 @@ csShaderVariable* csShaderVariableContext::GetVariable
 }
 
 void csShaderVariableContext::PushVariables 
-  (CS_SHADERVAR_STACK &stacks) const
+  (csShaderVarStack &stacks) const
 {
   for (int i=0; i<variables.Length (); ++i)
   {
@@ -68,7 +68,7 @@ void csShaderVariableContext::PushVariables
 }
 
 void csShaderVariableContext::PopVariables 
-  (CS_SHADERVAR_STACK &stacks) const
+  (csShaderVarStack &stacks) const
 {
   for (int i=0; i<variables.Length (); ++i)
   {

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Apr-2004
+	- res made the following changes:
+	    - Replaced the CS_SHADERVAR_STACK #define witha csShaderVarStack
+	      typedef.
+	    - Added a new base class for shader plugins, containing some
+	      common stuff.
+	    - Updated the glshader_arb program classes to use that new base 
+	      class.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

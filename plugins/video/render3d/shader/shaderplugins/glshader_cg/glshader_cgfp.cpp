@@ -69,7 +69,7 @@ void csShaderGLCGFP::Deactivate()
 }
 
 void csShaderGLCGFP::SetupState (csRenderMesh* mesh,
-  const CS_SHADERVAR_STACK &stacks)
+  const csShaderVarStack &stacks)
 {
   int i;
 
@@ -163,7 +163,7 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
     if (!pswrap)
       return false;
 
-    csArray<varmapping> mappings;
+    csArray<csShaderVarMapping> mappings;
     
     for (i = 0; i < variablemap.Length (); i++)
     {
@@ -180,7 +180,7 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
         // Get the register number, and create a mapping
         char regnum[2];
         sprintf (regnum, "%d", cgGetParameterResourceIndex (parameter));
-        mappings.Push (varmapping (variablemap[i].name, regnum));
+        mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
       }
     }
 

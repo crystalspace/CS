@@ -41,7 +41,12 @@ struct iShaderCompiler;
 
 struct csRenderMesh;
 
-#define CS_SHADERVAR_STACK csArray< csArray<csShaderVariable*> >
+/**
+ * A "shader variable stack".
+ * Stores a stack(the inner array) for each shader variable, indexed by 
+ * it's name. The outer array is the array of stacks.
+ */
+typedef csArray< csArray<csShaderVariable*> > csShaderVarStack;
 
 SCF_VERSION (iShaderVariableContext, 0, 0, 1);
 
@@ -76,13 +81,13 @@ struct iShaderVariableContext : public iBase
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
   */
-  virtual void PushVariables (CS_SHADERVAR_STACK &stacks) const = 0;
+  virtual void PushVariables (csShaderVarStack &stacks) const = 0;
 
   /**
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
-  virtual void PopVariables (CS_SHADERVAR_STACK &stacks) const = 0;
+  virtual void PopVariables (csShaderVarStack &stacks) const = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
@@ -108,7 +113,7 @@ struct iShaderManager : public iShaderVariableContext
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual CS_SHADERVAR_STACK& GetShaderVariableStack () =0;
+  virtual csShaderVarStack& GetShaderVariableStack () =0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
@@ -139,7 +144,7 @@ struct iShader : public iShaderVariableContext
 
   /// Setup a pass
   virtual bool SetupPass (csRenderMesh *mesh,
-    const CS_SHADERVAR_STACK &stacks) = 0;
+    const csShaderVarStack &stacks) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 

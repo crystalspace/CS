@@ -157,7 +157,7 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
 }
 
 bool csShaderGLPS1_Common::Load (const char* program, 
-                            csArray<varmapping> &mappings)
+                            csArray<csShaderVarMapping> &mappings)
 {
   programstring = csStrNew (program);
 
@@ -166,7 +166,7 @@ bool csShaderGLPS1_Common::Load (const char* program,
     variablemap.Push (variablemapentry ());
     int i = variablemap.Length ()-1;
 
-    variablemap[i].name = mappings[m].source;
+    variablemap[i].name = mappings[m].name;
 
     variablemap[i].registernum = atoi (mappings[m].destination);
   }

@@ -356,7 +356,7 @@ public:
   void Print (csRect const* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (csRenderMesh* mymesh, const CS_SHADERVAR_STACK &stacks);
+  void DrawMesh (csRenderMesh* mymesh, const csShaderVarStack &stacks);
 
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,

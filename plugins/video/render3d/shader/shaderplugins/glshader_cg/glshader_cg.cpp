@@ -137,14 +137,10 @@ void csGLShader_CG::Open()
   if (config->KeyExists ("Video.OpenGL.Shader.Cg.PSRouting"))
   {
     route = config->GetBool ("Video.OpenGL.Shader.Cg.PSRouting");
-    if (route)
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.graphics3d.shader.glcg",
-        "Routing Cg fragment programs to Pixel Shader plugin ON (forced).", 0);
-    else
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.graphics3d.shader.glcg",
-      "Routing Cg fragment programs to Pixel Shader plugin OFF (forced).", 0);
+      "Routing Cg fragment programs to Pixel Shader plugin %s (forced).", 
+      route ? "ON" : "OFF");
   }
   else
   {
@@ -155,14 +151,10 @@ void csGLShader_CG::Open()
     // we default to routing Cg fragment programs to the Pixel Shader plugin
     route = !ext->CS_GL_ARB_fragment_program && 
             ext->CS_GL_ATI_fragment_shader;
-    if (route)
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.graphics3d.shader.glcg",
-      "Routing Cg fragment programs to Pixel Shader plugin ON (default).", 0);
-    else
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.graphics3d.shader.glcg",
-      "Routing Cg fragment programs to Pixel Shader plugin OFF (default).", 0);
+      "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
+      route ? "ON" : "OFF");
   }
 
   if (route)
@@ -181,7 +173,7 @@ void csGLShader_CG::Open()
         csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
           "crystalspace.graphics3d.shader.glcg",
           "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
-          "routing unavailable.", 0);
+          "routing unavailable.");
       }
     }
   }

@@ -193,7 +193,7 @@ void csLightIterRenderStep::InitVariables ()
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
-  CS_SHADERVAR_STACK &stacks)
+  csShaderVarStack &stacks)
 {
   InitVariables ();
 

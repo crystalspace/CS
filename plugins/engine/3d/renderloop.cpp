@@ -118,7 +118,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
   //if (s) s->Draw (&rview);
   if (s)
   {
-    CS_SHADERVAR_STACK &varStack = shadermanager->GetShaderVariableStack ();
+    csShaderVarStack &varStack = shadermanager->GetShaderVariableStack ();
     shadermanager->PushVariables (varStack);
     
     s->IncRecLevel ();

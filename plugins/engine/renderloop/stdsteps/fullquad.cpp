@@ -246,7 +246,7 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
-  CS_SHADERVAR_STACK &stacks)
+  csShaderVarStack &stacks)
 {
   /*
     @@@ FIXME: Render buffers -> SV

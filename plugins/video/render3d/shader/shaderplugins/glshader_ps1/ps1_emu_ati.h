@@ -54,7 +54,7 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const CS_SHADERVAR_STACK &stacks);
+    const csShaderVarStack &stacks);
 
   /// Reset states to original
   virtual void ResetState ();

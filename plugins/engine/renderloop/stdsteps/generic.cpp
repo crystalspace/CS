@@ -178,7 +178,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                         iShader* shader, 
                                         csRenderMesh** meshes, 
                                         int num,
-                                        CS_SHADERVAR_STACK &stacks)
+                                        csShaderVarStack &stacks)
 {
   if (num == 0) return;
   ToggleStepSettings (g3d, true);
@@ -239,7 +239,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
-  CS_SHADERVAR_STACK &stacks)
+  csShaderVarStack &stacks)
 {
   Perform (rview, sector, 0, stacks);
 }
@@ -266,7 +266,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 				   iLight* light,
-                                   CS_SHADERVAR_STACK &stacks)
+                                   csShaderVarStack &stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 

@@ -69,7 +69,7 @@ public:
   virtual void Deactivate();
 
   virtual void SetupState (csRenderMesh* mesh,
-    const CS_SHADERVAR_STACK &stacks) {}
+    const csShaderVarStack &stacks) {}
 
   virtual void ResetState () {}
 
@@ -84,7 +84,7 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings)
   { return false; }
 
   /// Compile a program

@@ -74,7 +74,7 @@ void csGLShaderFVP::Deactivate()
 }
 
 void csGLShaderFVP::SetupState (
-  csRenderMesh *mesh, const CS_SHADERVAR_STACK &stacks)
+  csRenderMesh *mesh, const csShaderVarStack &stacks)
 {
   int i;
 

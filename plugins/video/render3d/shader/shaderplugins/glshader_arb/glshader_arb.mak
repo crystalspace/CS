@@ -47,10 +47,12 @@ INF.GLSHADER_ARB = $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshade
 INC.GLSHADER_ARB = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shader/shaderplugins/glshader_arb/*.h \
+  plugins/video/render3d/shader/shaderplugins/common/*.h \
   plugins/video/render3d/shader/common/*.h))
 SRC.GLSHADER_ARB = \
   $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/render3d/shader/shaderplugins/glshader_arb/*.cpp \
+  plugins/video/render3d/shader/shaderplugins/common/*.cpp \
   plugins/video/render3d/shader/common/*.cpp))
 OBJ.GLSHADER_ARB = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_ARB:.cpp=$O)))
 DEP.GLSHADER_ARB = CSGFX CSGEOM CSUTIL
@@ -78,6 +80,9 @@ glshader_arb: $(OUTDIRS) $(GLSHADER_ARB)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshader_arb/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
+
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
 
 $(GLSHADER_ARB): $(OBJ.GLSHADER_ARB) $(LIB.GLSHADER_ARB)
 	$(DO.PLUGIN.PREAMBLE) \

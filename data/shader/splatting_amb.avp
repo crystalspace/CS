@@ -1,7 +1,7 @@
 <arbvp>
-<variablemap variable="STANDARD_LIGHT_AMBIENT" register="0"/>
-<variablemap variable="texture scale" register="1" />
-<variablemap variable="splat map scale" register="2" />
+<variablemap variable="STANDARD_LIGHT_AMBIENT" destination="register 0"/>
+<variablemap variable="texture scale" destination="register 1" />
+<variablemap variable="splat map scale" destination="register 2" />
 <program>
 <![CDATA[
 !!ARBvp1.0

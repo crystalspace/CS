@@ -274,6 +274,7 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iShaderRenderInterface> sri = 
     SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
+  if (!sri) return false;
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
 
@@ -355,7 +356,7 @@ void csGLShaderFFP::Deactivate()
 }
 
 void csGLShaderFFP::SetupState (csRenderMesh *mesh, 
-                                const CS_SHADERVAR_STACK &stacks)
+                                const csShaderVarStack &stacks)
 {
 }
 

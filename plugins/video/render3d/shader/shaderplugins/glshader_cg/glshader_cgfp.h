@@ -122,7 +122,7 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (csRenderMesh* mesh,
-    const CS_SHADERVAR_STACK &stacks);
+    const csShaderVarStack &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -134,7 +134,7 @@ public:
   virtual bool Load(iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  virtual bool Load (const char* program, csArray<csShaderVarMapping> &mappings)
   { return false; }
 
   /// Compile a program
@@ -159,14 +159,14 @@ public:
   * Push the variables of this context onto the variable stacks
   * supplied in the "stacks" argument
   */
-  void PushVariables (CS_SHADERVAR_STACK &stacks) const
+  void PushVariables (csShaderVarStack &stacks) const
     { svcontext.PushVariables (stacks); }
 
   /**
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
-  void PopVariables (CS_SHADERVAR_STACK &stacks) const
+  void PopVariables (csShaderVarStack &stacks) const
     { svcontext.PopVariables (stacks); }
 };
 

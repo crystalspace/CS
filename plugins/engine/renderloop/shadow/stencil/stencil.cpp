@@ -504,7 +504,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    static CS_SHADERVAR_STACK stacks;
+    static csShaderVarStack stacks; // @@@ use STATIC macros
     stacks.Empty ();
 
     shadowCacheEntry->UpdateBuffers ();
@@ -537,14 +537,14 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 }
 
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-  CS_SHADERVAR_STACK &stacks)
+  csShaderVarStack &stacks)
 {
   /// TODO: Report error (no light)
   return;
 }
 
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-	iLight* light, CS_SHADERVAR_STACK &stacks)
+	iLight* light, csShaderVarStack &stacks)
 {
   iShader* shadow;
   if ((shadow = type->GetShadow ()) == 0)

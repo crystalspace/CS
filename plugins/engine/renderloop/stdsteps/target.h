@@ -84,7 +84,7 @@ public:
   virtual ~csTargetRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    CS_SHADERVAR_STACK &stacks);
+    csShaderVarStack &stacks);
 
   virtual int AddStep (iRenderStep* step);
   virtual int GetStepCount ();
