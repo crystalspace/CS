@@ -481,6 +481,21 @@ void csBox3::ManhattanDistance (const csBox3& other, csVector3& dist) const
   else dist.z = 0;
 }
 
+
+float csBox3::SquaredOriginDist() const
+{
+  // Thanks to Ivan Avramovic.
+  csVector3 result (0,0,0);
+  if (minbox.x > 0) result.x = minbox.x;
+  else if (maxbox.x < 0) result.x = -maxbox.x;
+  if (minbox.y > 0) result.y = minbox.y;
+  else if (maxbox.y < 0) result.y = -maxbox.y;
+  if (minbox.z > 0) result.z = minbox.z;
+  else if (maxbox.z < 0) result.z = -maxbox.z;
+  return result.SquaredNorm ();
+}
+
+
 csBox3& csBox3::operator+= (const csBox3& box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;
