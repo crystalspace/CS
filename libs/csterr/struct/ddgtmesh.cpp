@@ -486,8 +486,8 @@ bool ddgTBinMesh::mapPosToTree(float *x, float *z, ddgTBinTree **bt, unsigned in
 		return ddgFailure;
 	}
     // Find the global(mesh) column and row of this coordinate.
-	unsigned int gr = *x/ddgTBinMesh_size;
-	unsigned int gc = *z/ddgTBinMesh_size;
+	unsigned int gr = (unsigned int)(*x/ddgTBinMesh_size);
+	unsigned int gc = (unsigned int)(*z/ddgTBinMesh_size);
     // Find the offset in the tree and row and column within the tree.
     *x = *x - gr * ddgTBinMesh_size;
 	*z = *z - gc * ddgTBinMesh_size;
@@ -499,8 +499,8 @@ bool ddgTBinMesh::mapPosToTree(float *x, float *z, ddgTBinTree **bt, unsigned in
         *x = ddgTBinMesh_size - *x;
         *z = ddgTBinMesh_size - *z;
 	}
-    *r = *x;
-    *c = *z;
+    *r = (unsigned int)*x;
+    *c = (unsigned int)*z;
     // Calculate the distance from the triangle origin to the coord.
     *x = *x - *r;
     *z = *z - *c;

@@ -71,8 +71,6 @@ ddgTBinTree::~ddgTBinTree(void)
 	delete [] _rawMaxVal;
 }
 
-static float maxTh = 0;
-
 /** Initialize the bintree structure including
  *  the wedges and other mesh values.
  */
@@ -142,17 +140,17 @@ void ddgTBinTree::initTriangle( unsigned int level,
 		initTriangle(level+1,vc,va,v0,left(vc)),
 		initTriangle(level+1,vc,v1,va,right(vc));
 
-		hmax = ddgUtil::max(_rawMaxVal[left(vc)],_rawMaxVal[right(vc)]);
-		hmin = ddgUtil::min(_rawMinVal[left(vc)],_rawMinVal[right(vc)]);
+		hmax = (short)ddgUtil::max(_rawMaxVal[left(vc)],_rawMaxVal[right(vc)]);
+		hmin = (short)ddgUtil::min(_rawMinVal[left(vc)],_rawMinVal[right(vc)]);
 	}
 	else
 	{
-		hmax = ddgUtil::max(_rawHeight[v0],_rawHeight[v1]);
-		hmin = ddgUtil::min(_rawHeight[v0],_rawHeight[v1]);
+		hmax = (short)ddgUtil::max(_rawHeight[v0],_rawHeight[v1]);
+		hmin = (short)ddgUtil::min(_rawHeight[v0],_rawHeight[v1]);
 	}
 
-	_rawMaxVal[vc] = ddgUtil::max(_rawHeight[va],hmax);
-	_rawMinVal[vc] = ddgUtil::min(_rawHeight[va],hmin);
+	_rawMaxVal[vc] = (short)ddgUtil::max(_rawHeight[va],hmax);
+	_rawMinVal[vc] = (short)ddgUtil::min(_rawHeight[va],hmin);
 	_cacheIndex[vc] = 0;
 	// Copy the height map's value into this triangle.
 
@@ -507,11 +505,11 @@ bool ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	{
 		// Find the highest priority among the 4 triangles.
 		pr = priority(left(p));
-		pr = ddgUtil::max(pr,priority(right(p)));
+		pr = (ddgPriority)ddgUtil::max(pr,priority(right(p)));
 		if (n)
 		{
-			pr = ddgUtil::max(pr,nt->priority(left(n)));
-			pr = ddgUtil::max(pr,nt->priority(right(n)));
+			pr = (ddgPriority)ddgUtil::max(pr,nt->priority(left(n)));
+			pr = (ddgPriority)ddgUtil::max(pr,nt->priority(right(n)));
 		}
 	}
 
@@ -739,25 +737,19 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex)
 #endif
 	// Priority of 0 is reserved for triangles which are not visible.
 	ddgAssert(result >= 1);
-	return result >= ddgPriorityResolution ? ddgPriorityResolution-1 : result;
+	return (ddgPriority)(result >= ddgPriorityResolution ? ddgPriorityResolution-1 : result);
 
 }
-
-
-
-
-
-
 
 
 // Get height of bintree at a real location.
 float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz)
 {
 	// Is this triangle mirrored.
-    float m = (dx+dz > 1.0) ? 1.0 : 0.0;
-    float h1 = heightByPos(r+ m,  c + m);
-    float h2 = heightByPos(r,  c+1);
-    float h3 = heightByPos(r+1,c);
+    unsigned int m = (dx+dz > 1.0) ? 1 : 0;
+    float h1 = heightByPos(r + m, c + m);
+    float h2 = heightByPos(r,     c + 1);
+    float h3 = heightByPos(r + 1, c    );
 	ddgVector3 p0(m,h1,m),
 			   p1(0,h2,1),
 			   p2(1,h3,0),

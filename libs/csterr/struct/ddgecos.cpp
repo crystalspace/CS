@@ -25,7 +25,7 @@
 ddgEcoSystem::~ddgEcoSystem(void)
 {
 	unsigned int i = 0;
-	while (i < 0)
+	while (i < _size)
 	{
 		delete ecoBlocks[i];
 		i++;
@@ -41,7 +41,7 @@ bool ddgEcoSystem::init(void)
 	unsigned int _blockNumSQRT = 16;
 	blockNum = _blockNumSQRT*_blockNumSQRT;
 	unsigned int i = 0, j = 0, k = _size / (blockNum), e = 0;
-	ddgVector3 p, s, osize, wsize;
+	ddgVector3 p, s, wsize;
 	// Size of the world.
 	wsize= _bbox->size();
 	// Size of the eco blocks.
@@ -87,7 +87,7 @@ bool ddgEcoBlock::init( ddgEcoSystem *e )
 		if ( e->_ecoMap )
 		{
 			unsigned char ep;
-			e->_ecoMap->get(pos[i][0],pos[i][2],&ep);
+			e->_ecoMap->get((unsigned short)pos[i][0],(unsigned short)pos[i][2],&ep);
 			if (ep < e->_min || ep > e->_max)
 				seedSet = false;
 		}

@@ -42,6 +42,7 @@ ddgColor3::ddgColor3( const ddgColor3 *c)
 	v[2] = c->v[2];
 }
 
+#ifdef DDGSTREAM
 // Define an input and output stream operator for ddgColor3.
 // Output format is "<xxx,yyy,zzz>"
 ostream& operator << ( ostream&s, ddgColor3 v )
@@ -51,6 +52,7 @@ ostream& operator << ( ostream&s, ddgColor3* v )
 // Input format is "<xxx,yyy,zzz>"
 istream& operator >> ( istream& s, ddgColor3& v)
      { char c; s >> c >> v.v[0] >> c >> v.v[1] >> c >> v.v[2]>> c; return s; }
+#endif
 
 ddgColor4::ddgColor4( void )
 {
@@ -70,6 +72,8 @@ ddgColor4::ddgColor4( unsigned char r, unsigned char g, unsigned char b, unsigne
 
 void ddgColor4::test(ddgColor4 *cs, ddgColor4 *ce )
 {
+	(void)cs; (void)ce;
+#ifdef DDGSTREAM
 	ddgColor4 cn,cx,cc,cb;
 	float f;
 	cerr << "Linear Exponential Cosine Binlinear" << endl;
@@ -85,7 +89,12 @@ void ddgColor4::test(ddgColor4 *cs, ddgColor4 *ce )
 			<< cc << " "
 			<< cb << endl;
 	}
+#else
+	fprintf (stderr, "ddgColor4::test() unimplemented\n");
+#endif
 }
+
+#ifdef DDGSTREAM
 // Define an input and output stream operator for ddgColor4.
 // Output format is "<xxx,yyy,zzz,ttt>"
 ostream& operator << ( ostream&s, ddgColor4 v )
@@ -119,6 +128,7 @@ ostream& operator << ( ostream&s, ddgColorNode* c )
 	else
 		return s << ' ' << (c->name()?c->name():"(null)") << '[' << c->key() << ']' << c->color3;
 }
+#endif
 
 
 void ddgColorSet::spread(ddgColor3* st, ddgColor3 *en, float stk, float endk,
@@ -143,4 +153,3 @@ void ddgColorSet::spread(ddgColor3* st, ddgColor3 *en, float stk, float endk,
 		no--;
 	}
 }
-

@@ -135,8 +135,8 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	}
 
 	unsigned int scale, base;
-	scale = _scale * 65536;
-	base = _base;
+	scale = (unsigned int)(_scale * 65536);
+	base = (unsigned int)_base;
 	ch1 = scale % 256;
 	ch2 = (scale - ch1) / 256;
 	fputc(ch1,fptr);
@@ -547,7 +547,7 @@ void ddgHeightMap::canyonize(float f )
 		for (unsigned c = 0; c < _cols; c++ )
 		{
 			unsigned int d = get(r,c);
-            unsigned int d2 = ddgUtil::clamp(pow(d,f),-0x7FFF,0x7FFF);
+            unsigned int d2 = (unsigned int)ddgUtil::clamp(pow(d,f),-0x7FFF,0x7FFF);
 			set(r,c,d2);
 		}
 }
@@ -573,7 +573,7 @@ void ddgHeightMap::scale(float s )
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-            unsigned int d = ddgUtil::clamp(s * get(r,c),-0x7FFF,0x7FFF);
+            unsigned int d = (unsigned int)ddgUtil::clamp(s * get(r,c),-0x7FFF,0x7FFF);
 			set(r,c,d);
 		}
 }
@@ -583,7 +583,7 @@ void ddgHeightMap::translate(float t )
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-            unsigned int d = ddgUtil::clamp(t + get(r,c),-0x7FFF,0x7FFF);
+            unsigned int d = (unsigned int)ddgUtil::clamp(t + get(r,c),-0x7FFF,0x7FFF);
 			set(r,c,d);
 		}
 }
@@ -635,13 +635,13 @@ void ddgHeightMap::closeEdge(float l)
 	l = iconvert(l);
 	for (unsigned r = 0; r < _rows; r++)
 	{
-		set(r,0,l);
-		set(r,_cols-1,l);
+		set(r,0,(short)l);
+		set(r,_cols-1,(short)l);
 	}
 	for (unsigned c = 0; c < _cols; c++ )
 	{
-		set(0,c,l);
-		set(_rows-1,c,l);
+		set(0,c,(short)l);
+		set(_rows-1,c,(short)l);
 	}
 }
 
@@ -650,8 +650,8 @@ void ddgHeightMap::sin(void)
 	for (unsigned r = 0; r < _rows; r++)
 		for (unsigned c = 0; c < _cols; c++ )
 		{
-			set(r,c,10000*(ddgAngle::sin(180.0*(float)r/(float)_rows)
-				         + ddgAngle::sin(180.0*(float)c/(float)_cols)));
+			set(r,c,(short)(10000*(ddgAngle::sin(180.0*(float)r/(float)_rows)
+				         + ddgAngle::sin(180.0*(float)c/(float)_cols))));
 		}
 }
 

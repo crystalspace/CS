@@ -15,7 +15,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csterr
 
-#all libs: csterr
+all libs: csterr
 csterr:
 	$(MAKE_TARGET)
 csterrclean:
@@ -28,11 +28,10 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csterr/math libs/csterr/struct libs/csterr/util
 
-# XXX is temporary until this library builds.
-XXXCSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
+CSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
 SRC.CSTERR = $(wildcard libs/csterr/*/*.cpp)
 OBJ.CSTERR = $(addprefix $(OUT),$(notdir $(SRC.CSTERR:.cpp=$O)))
-CFLAGS.CSTERR = -Ilibs/csterr
+CFLAGS.CSTERR = $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)libs/csterr
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -41,8 +40,8 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: csterr csterrclean
 
-#all: $(XXXCSTERR.LIB)
-csterr: $(OUTDIRS) $(XXXCSTERR.LIB)
+all: $(CSTERR.LIB)
+csterr: $(OUTDIRS) $(CSTERR.LIB)
 clean: csterrclean
 
 $(OUT)%$O: libs/csterr/math/%.cpp
@@ -54,18 +53,18 @@ $(OUT)%$O: libs/csterr/struct/%.cpp
 $(OUT)%$O: libs/csterr/util/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
 
-# @@@ Some versions of GNU make appear to be sensitive to the order in which
+# Some versions of GNU make appear to be sensitive to the order in which
 # implicit rules are seen.  Without the following rule (which is just a
 # reiteration of the original implicit rule in cs.mak), these buggy make
 # programs fail to choose the correct rules above.
 $(OUT)%$O: %.cpp
 	$(DO.COMPILE.CPP)
 
-$(XXXCSTERR.LIB): $(OBJ.CSTERR)
+$(CSTERR.LIB): $(OBJ.CSTERR)
 	$(DO.LIBRARY)
 
 csterrclean:
-	-$(RM) $(XXXCSTERR.LIB) $(OBJ.CSTERR)
+	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csterr.dep

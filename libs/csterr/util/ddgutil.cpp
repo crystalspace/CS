@@ -34,7 +34,7 @@
 bool ddgUtil::DetectSIMD(void)
 {
 
-bool found_simd;
+bool found_simd = false;
 #ifdef WIN32
 _asm
 
@@ -69,12 +69,8 @@ NO_SIMD:
 mov found_simd,0
 DONE:
 }
-
-return found_simd;
-#else
-return ddgFailure;
 #endif
-
+return found_simd;
 }
 
 // ----------------------------------------------------------------------
@@ -111,7 +107,7 @@ float ddgAngle::cos( float angle)
 
 float ddgAngle::acos( float value)
 {
-	int i = value*180*ddgAngle_res, k;
+	int i = (int)(value*180*ddgAngle_res), k;
 	k = i;
 	if (k < 0) k = -1 *k;
 	if (k > 2880) k = 2880 - k;

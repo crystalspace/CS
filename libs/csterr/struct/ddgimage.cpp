@@ -33,7 +33,9 @@
 #include "util/ddgerror.h"
 #include "struct/ddgimage.h"
 
+#ifdef DDGPNG
 static int check_if_png(FILE *fp);
+#endif
 
 unsigned char*
 read_rgb_texture(const char *name, int *width, int *height, int *components);
@@ -393,8 +395,8 @@ bool ddgImage::writeTGA( const char *filename)
     fputc(0,fptr);                  // 1st entry
     fputc(0,fptr);                  
     fputc(0,fptr);                  // Num entries
-    fputc((channels<3?1:0),fptr);
-    fputc((channels<3?24:0),fptr);	// Depth per colormap entry.
+    fputc((_channels<3?1:0),fptr);
+    fputc((_channels<3?24:0),fptr);	// Depth per colormap entry.
 	// Image specification
     fputc(0,fptr);                  // X origin
     fputc(0,fptr);

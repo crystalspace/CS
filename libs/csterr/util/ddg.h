@@ -44,6 +44,9 @@
 #include <strstream.h> 
 #endif
 #include <stdlib.h>
+#endif
+
+#ifdef __CRYSTAL_SPACE__
 // A rare case where cssysdef.h is included from a header file :-)
 #include "cssysdef.h"
 #include "cstypes.h"
