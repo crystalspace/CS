@@ -58,7 +58,6 @@
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
 #include "ivaria/iso.h"
-#include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "ivideo/fontserv.h"

@@ -59,7 +59,6 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivaria/collider.h"
-#include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "imap/parser.h"

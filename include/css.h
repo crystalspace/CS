@@ -165,7 +165,6 @@
 #include "ivaria/iso.h"
 #include "ivaria/keyval.h"
 #include "ivaria/mapnode.h"
-#include "ivaria/perfstat.h"
 #include "ivaria/pmeter.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"

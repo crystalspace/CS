@@ -48,7 +48,6 @@ struct iSoundHandle;
 struct iCollideSystem;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iPerfStats;
 struct iConfigFile;
 struct iMaterialHandle;
 struct iLoader;

@@ -65,7 +65,6 @@
 #include <ivaria/reporter.h>
 #include <ivaria/stdrep.h>
 #include <ivaria/conout.h>
-#include <ivaria/perfstat.h>
 #include <ivaria/dynamics.h>
 
 #include <imap/parser.h>

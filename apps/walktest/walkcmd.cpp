@@ -52,7 +52,6 @@
 #include "iutil/config.h"
 #include "iengine/motion.h"
 #include "iengine/light.h"
-#include "ivaria/perfstat.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
 #include "ivaria/reporter.h"

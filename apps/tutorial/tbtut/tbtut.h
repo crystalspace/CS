@@ -29,7 +29,6 @@ struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iEvent;
-struct iPerfStats;
 struct iConsoleOutput;
 struct iFontServer;
 struct iDynamics;
