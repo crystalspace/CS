@@ -285,55 +285,6 @@ void Simple::CreateSprites ()
   // can do this.
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
-
-  csRef<iMeshFactoryWrapper> factwrap = engine->CreateMeshFactory (
-  	"crystalspace.mesh.object.sprite.2d", "label");
-  csRef<iMeshWrapper> wrap = engine->CreateMeshWrapper (factwrap,
-  	"labelmesh");
-  csRef<iSprite2DState> sp2state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-  	iSprite2DState);
-
-  {
-  csColoredVertices& vertices = sp2state->GetVertices();
-  vertices.SetLength (4);
-  vertices[3].pos.Set (-2, -.5);
-  vertices[3].u = 0; vertices[0].v = 0;
-  vertices[3].color_init.Set (1, 1, 1);
-  vertices[2].pos.Set (2, -.5);
-  vertices[2].u = 1; vertices[1].v = 0;
-  vertices[2].color_init.Set (1, 1, 1);
-  vertices[1].pos.Set (2, .5);
-  vertices[1].u = 1; vertices[2].v = 1;
-  vertices[1].color_init.Set (1, 1, 1);
-  vertices[0].pos.Set (-2, .5);
-  vertices[0].u = 0; vertices[3].v = 1;
-  vertices[0].color_init.Set (1, 1, 1);
-
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  csRef<iFont> font = g2d->GetFontServer ()->LoadFont (CSFONT_COURIER);
-  csColor transp (51/255.0F,51/255.0F,254/255.0F);
-  csRef<iTextureWrapper> txt = engine->CreateBlackTexture ("xxx",
-  	128, 32, &transp , CS_TEXTURE_3D);
-  txt->Register (txtmgr);
-
-  csRef<iMaterialWrapper> mat = engine->CreateMaterial ("xxx", txt);
-  mat->Register (txtmgr);
-  g3d->SetRenderTarget (mat->GetMaterialHandle ()->GetTexture ());
-  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-  g2d->Clear (g2d->FindRGB (51, 51, 254));
-  g2d->Write (font, 10, 10, g2d->FindRGB (255, 0, 0), -1, "TestING",
-  	CS_WRITE_NOANTIALIAS);
-  // Interesting line below: If the drawline is removed the text
-  // does NOT display for me! JORRIT
-  g2d->DrawLine (0, 0, 127, 31, g2d->FindRGB (0, 255, 0));
-  g3d->FinishDraw ();
-  sp2state->SetMaterialWrapper (mat);
-  }
-
-
-  sprite->GetChildren ()->Add (wrap);
-  wrap->GetMovable ()->SetPosition (csVector3 (0, 2, 0));
-  wrap->GetMovable ()->UpdateMove ();
 }
 /*-------------------------------------------------------------------------*
  * Main function
