@@ -212,7 +212,7 @@ public:
    * Get a pointer to the first element matching the given key, 
    * or 0 if there is none.
    */
-  const T* Get (const K& key) const
+  const T* GetPointer (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
