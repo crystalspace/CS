@@ -13,6 +13,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Oct-1999
+	- Andrew Zabolotny did more work on MazeD:
+	  - New color wheel control.
+	  - New function csColorDialog() returning a standard color choose
+	    dialog MazeD.
+	  - Replaced R/G/B spin buttons in light params dialog with a button
+	    that calls color choice dialog.
 11-Oct-1999
 	- Cleaned up world init a little more. Added an extra progress bar
 	  for even more startup fun :-)
@@ -60,11 +67,11 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed csLoader so that it doesn't leave quite as much
 	  garbage laying around in the filesystem after loading a model file.
 	- Gary Haussman fixed some problems with vertex fog:
-	    - With extra-dense fog, walls a long distance away would overrun
-	      the fog table and therefor get no fogging. Added clamping to
-	      fix this.
-	    - Vertex fog for sprites used an incorrect 'outgoing plane'
-	      demonstrating odd behaviour.
+	  - With extra-dense fog, walls a long distance away would overrun the
+	    fog table and therefor get no fogging.  Added clamping to fix
+	    this.
+	  - Vertex fog for sprites used an incorrect 'outgoing plane'
+	    demonstrating odd behaviour.
 	- Gary also changed lightmap fudge factors in OpenGL renderer to
 	  cut down on obvious lightmap seams when rendering. Still needs
 	  some tweaking.
@@ -79,18 +86,18 @@ Short-term cleanups that need to be done:
 	- Gert Steenssens fixed 'const char*' compilation errors.
 8-Oct-1999
 	- Andrew Zabolotny did some changes:
-	    - Derived csImageFile from csObject. Now each csImageFile has
-	      a name that is assigned in csparser (having just texture names
-	      are not enough since file name can differ from texture name).
-	    - Changed printf_init(), printf_close() and printf(char *,...)
-	      with console_open(), console_close() and console_out(char *).
-	      This removes the extra var-args step which is not required
-	      since everywhere CsPrintf () is used, which expands varargs
-	      itself. Replaced vsprintf() with puts(); removed NeXT's
-	      printf.cpp since it seems not needed anymore.
-	    - Partial texture support in MazeD. Textures aren't used nor
-	      shown but are at least loaded/saved correctly now.
-	    - Replaced pprintf() with console_out and removed printf_close().
+	  - Derived csImageFile from csObject.  Now each csImageFile has a
+	    name that is assigned in csparser (having just texture names are
+	    not enough since file name can differ from texture name).
+	  - Changed printf_init(), printf_close() and printf(char *,...) with
+	    console_open(), console_close() and console_out(char *).  This
+	    removes the extra var-args step which is not required since
+	    everywhere CsPrintf () is used, which expands varargs itself.
+	    Replaced vsprintf() with puts(); removed NeXT's printf.cpp since
+	    it seems not needed anymore.
+	  - Partial texture support in MazeD.  Textures aren't used nor shown
+	    but are at least loaded/saved correctly now.
+	  - Replaced pprintf() with console_out and removed printf_close().
 	- Robert Bate did some fixes related to pprintf().
 	- Robert Bate updated the Mac project files.
 7-Oct-1999
