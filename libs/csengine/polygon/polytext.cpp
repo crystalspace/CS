@@ -53,6 +53,12 @@ csPolyTexture::csPolyTexture ()
   dirty_matrix = NULL;
   lm = NULL;
   tcache_data = NULL;
+  dirty_w = dirty_h = 0;
+  dirty_size = 0;
+  dirty_cnt = 0;
+  mipmap_level = 0;
+  mipmap_size = 0;
+  mipmap_shift = 0;
 }
 
 csPolyTexture::~csPolyTexture ()

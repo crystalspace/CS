@@ -458,7 +458,7 @@ int csPolygon3D::Classify (const csPlane& pl)
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     float dot = pl.Classify (Vwor (i));
-    if (ABS (dot) < SMALL_EPSILON) dot = 0;
+    if (ABS (dot) < EPSILON) dot = 0;
     if (dot > 0) back++;
     else if (dot < 0) front++;
   }
@@ -475,8 +475,8 @@ int csPolygon3D::ClassifyX (float x)
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     float xx = Vwor (i).x-x;
-    if (xx < -SMALL_EPSILON) front++;
-    else if (xx > SMALL_EPSILON) back++;
+    if (xx < -EPSILON) front++;
+    else if (xx > EPSILON) back++;
   }
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
@@ -491,8 +491,8 @@ int csPolygon3D::ClassifyY (float y)
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     float yy = Vwor (i).y-y;
-    if (yy < -SMALL_EPSILON) front++;
-    else if (yy > SMALL_EPSILON) back++;
+    if (yy < -EPSILON) front++;
+    else if (yy > EPSILON) back++;
   }
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
@@ -507,8 +507,8 @@ int csPolygon3D::ClassifyZ (float z)
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
     float zz = Vwor (i).z-z;
-    if (zz < -SMALL_EPSILON) front++;
-    else if (zz > SMALL_EPSILON) back++;
+    if (zz < -EPSILON) front++;
+    else if (zz > EPSILON) back++;
   }
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
