@@ -25,22 +25,22 @@ The history order is reversed so that new features are at the top.
 	  is still unfinished but should at least run.  Code was by Peter
 	  Holko, who is still working on it.
 	- Eric Sunshine reverted Keith Fulton's change to csStringArray
-	  SetLength() in which he shifted to the caller the responsibility of
-	  freeing the strings.  This silently broke existing client code by
+	  SetLength() in which Keith shifted to the caller the responsibility
+	  of freeing the strings.  This silently broke existing client code by
 	  introducing memory leaks.  Moreover, his change was semantically
 	  incorrect.  csStringArray must be responsible for managing its own
 	  storage (after all, this is one of the tenets of encapsulation).
 	  This burden should not be placed upon clients.  Also fixed the actual
-	  problem, which I assume he was attempting to address with his change,
-	  which was that Pop(), and Extract() were returning already-deleted
-	  strings.
+	  problem, which I assume Keith was attempting to address with his
+	  change, which was that Pop() and Extract() were returning
+	  already-deleted strings.
 	- res made the following changes wrt Jam build:
-	    - tweaked msvcgen Jamconfig a bit. The VC project generation still
+	    - Tweaked msvcgen Jamconfig a bit. The VC project generation still
 	      has some issues, but it's already usable.
-	    - a couple of Jamfile tweaks & fixes all over the place (missing
+	    - A couple of Jamfile tweaks & fixes all over the place (missing
 	      newlines, missing external libs and such.)
-	    - added a new compile group 'walkall'.
-	    - added a Jamfile for partedit.
+	    - Added a new compile group 'walkall'.
+	    - Added a Jamfile for partedit.
 21-Jul-2003
 	- Oktal added missing doxygen comment at the top of csSymbolTable.
         - Philip Wyett removed CVS conflict data from gl_render3d.cpp.
