@@ -45,6 +45,9 @@ Short-term cleanups that need to be done:
 	- Fragdance contributed a WAL gfx loader to CS (Quake format).
 	- I fixed a bug in the X 2D driver. It didn't correctly detect 32
 	  bit display mode in all cases.
+	- Eric Sunshine fixed a problem which prevented the csGame library
+	  from compiling.  The problem was caused when csBox was broken out
+	  into its own header file.
 21-Sep-1999
 	- Jorrit reverted a fix on sprite lighting which Eric accidentally
 	  removed.
