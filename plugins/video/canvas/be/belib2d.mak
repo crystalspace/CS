@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: be2d be2dclean
-all plugins drivers drivers2d: be2d
+all softcanvas plugins drivers drivers2d: be2d
 
 be2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

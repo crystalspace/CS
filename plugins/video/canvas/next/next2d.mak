@@ -19,7 +19,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: next2d next2dclean
-all plugins drivers drivers2d: next2d
+all softcanvas plugins drivers drivers2d: next2d
 
 next2d:
 	$(MAKE_TARGET) MAKE_DLL=yes DO_NEXT2D=yes

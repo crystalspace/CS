@@ -12,6 +12,11 @@ The history order has been reversed so that new features are at the top.
 	  time it is implemented as a plugin. Great work Richard!
 	  Note that the old terrlod is currently no longer supported.
 	  Richard will do that one soon.
+	- 'make walkall' will now also compile the standard canvas that
+	  belongs with the software renderer and the OS. The way this works
+	  is that every such canvas which is for the software renderer
+	  and which is default adds itself to 'softcanvas' target.
+	  'make walkall' then depends on 'softcanvas' target as well.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:

@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: dosraw dosrawclean
 
-all plugins drivers drivers2d: dosraw
+all softcanvas plugins drivers drivers2d: dosraw
 dosraw:
 	$(MAKE_TARGET) MAKE_DLL=yes
 dosrawclean:

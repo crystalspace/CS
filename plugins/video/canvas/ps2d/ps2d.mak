@@ -18,7 +18,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ps2d ps2dclean
 
-all plugins drivers drivers2d: ps2d
+all softcanvas plugins drivers drivers2d: ps2d
 
 ps2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

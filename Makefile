@@ -6,7 +6,7 @@
 
 .PHONY: help banner showplatforms showconfig platforms all depend configure \
   configbanner clean cleanlib cleandep distclean libs plugins drivers \
-  drivers2d drivers3d snddrivers netdrivers meshes
+  drivers2d drivers3d snddrivers netdrivers meshes softcanvas
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.

@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ddraw ddrawclean
-all plugins drivers drivers2d: ddraw
+all softcanvas plugins drivers drivers2d: ddraw
 
 ddraw:
 	$(MAKE_TARGET) MAKE_DLL=yes
