@@ -7,7 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Jun-2004
-<<<<<<< history.txt
 	- Christian Bayle adapted debian scripts to the new configuration 
 	  options.
 	- Christian Bayle adapted debian scripts to the new configuration
