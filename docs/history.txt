@@ -20,6 +20,11 @@ The history order is reversed so that new features are at the top.
 	  object to use iObjectModel->"GetPolygonMeshColldet().
 	- res improved the wording on the paragraph about the iPolygonMesh
 	  changes in the api mod documentation a bit.
+	- Eric Sunshine fixed win32.jam so that mergeres.sh invocation in
+	  LinkPlugin rule passes the correct arguments.  This change had
+	  already been made to the LinkApplication rule's invocation of
+	  mergeres.sh as part of Eric's changes yesterday, but LinkPlugin
+	  slipped by unaltered.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
