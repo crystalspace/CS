@@ -214,15 +214,15 @@ void csSoundRenderSoftware::Close()
   }
 }
 
-iSoundHandle *csSoundRenderSoftware::RegisterSound(iSoundData *snd)
+csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
 {
   // convert the sound
-  if (!snd->Initialize(&LoadFormat)) return NULL;
+  if (!snd->Initialize(&LoadFormat)) return csPtr<iSoundHandle> (NULL);
 
   // create the sound handle
   csSoundHandleSoftware *hdl = new csSoundHandleSoftware(this, snd);
   SoundHandles.Push(hdl);
-  return hdl;
+  return csPtr<iSoundHandle> (hdl);
 }
 
 void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd)

@@ -207,13 +207,13 @@ float csSoundRenderDS3D::GetVolume()
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
-iSoundHandle *csSoundRenderDS3D::RegisterSound(iSoundData *snd)
+csPtr<iSoundHandle> csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 {
-  if (!snd) return NULL;
-  if (!snd->Initialize(&LoadFormat)) return NULL;
+  if (!snd) return csPtr<iSoundHandle> (NULL);
+  if (!snd->Initialize(&LoadFormat)) return csPtr<iSoundHandle> (NULL);
   csSoundHandleDS3D *hdl = new csSoundHandleDS3D(this, snd);
   SoundHandles.Push(hdl);
-  return hdl;
+  return csPtr<iSoundHandle> (hdl);
 }
 
 void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)

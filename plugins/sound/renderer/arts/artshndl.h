@@ -58,7 +58,7 @@ class csArtsHandle : public iSoundHandle, public iSoundSource
   /// play an instance of this sound
   virtual void Play(bool Loop = false);
   /// create a sound source
-  virtual iSoundSource *CreateSource(int Mode3d);
+  virtual csPtr<iSoundSource> CreateSource(int Mode3d);
 
   /// Start playing the stream (only for streamed sound)
   virtual void StartStream(bool Loop);

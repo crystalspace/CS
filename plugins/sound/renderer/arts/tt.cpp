@@ -102,23 +102,23 @@ int main(int argc, const char* const args[])
   iObjectRegistry* object_reg = sys.GetObjectRegistry ();
 
   // get a soundloader
-  iSoundLoader *pLoader = CS_QUERY_REGISTRY (object_reg, iSoundLoader);
+  csRef<iSoundLoader> pLoader (CS_QUERY_REGISTRY (object_reg, iSoundLoader));
   // we read the soundata the CS way, that is through VFS
-  iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> pVFS (CS_QUERY_REGISTRY (object_reg, iVFS));
   // well, since we want to try our renderer, we should request it now
-  iSoundRender *pSR = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+  csRef<iSoundRender> pSR (CS_QUERY_REGISTRY (object_reg, iSoundRender));
 
   // load the sound
   csRef<iDataBuffer> db (pVFS->ReadFile (args[1]));
 
   // let the soundloader create a sounddata object from the data
-  iSoundData *sd = pLoader->LoadSound (db->GetData (), db->GetSize ());
+  csRef<iSoundData> sd (pLoader->LoadSound (db->GetData (), db->GetSize ()));
 
   // retrieve a soundhandle we can play from the renderer
-  iSoundHandle *sh = pSR->RegisterSound (sd);
+  csRef<iSoundHandle> sh (pSR->RegisterSound (sd));
 
   // ok, we want to take it to the max, so we need to operate on a soundsource
-  iSoundSource *ss = sh->CreateSource (SOUND3D_RELATIVE);
+  csRef<iSoundSource> ss (sh->CreateSource (SOUND3D_RELATIVE));
 
   csVector3 pos (0, 0, 1);
 
@@ -154,12 +154,6 @@ int main(int argc, const char* const args[])
   }
   tcsetattr(0,TCSANOW,&save);
 
-  ss->DecRef ();
-  sh->DecRef ();
-  pSR->DecRef ();
-  sd->DecRef ();
-  pVFS->DecRef ();
-  pLoader->DecRef ();
-
   return 1;
 }
+

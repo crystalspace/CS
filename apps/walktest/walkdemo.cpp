@@ -975,7 +975,7 @@ struct MissileStruct
   int type;		// type == DYN_TYPE_MISSILE
   csOrthoTransform dir;
   iMeshWrapper* sprite;
-  iSoundSource *snd;
+  csRef<iSoundSource> snd;
 };
 
 struct ExplosionStruct
@@ -1032,17 +1032,15 @@ void HandleDynLight (iDynLight* dyn)
         if (ms->snd)
         {
           ms->snd->Stop();
-          ms->snd->DecRef();
         }
         delete ms;
         if (Sys->mySound)
         {
-          iSoundSource *sndsrc;
-          if ((sndsrc = Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE)))
+          csRef<iSoundSource> sndsrc (Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE));
+          if (sndsrc)
           {
             sndsrc->SetPosition (v);
             sndsrc->Play();
-            sndsrc->DecRef();
           }
         }
         ExplosionStruct* es = new ExplosionStruct;
@@ -1124,11 +1122,14 @@ void fire_missile ()
   MissileStruct* ms = new MissileStruct;
   ms->snd = NULL;
   if (Sys->mySound)
-    if ((ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE)))
+  {
+    ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE);
+    if (ms->snd)
     {
       ms->snd->SetPosition (pos);
       ms->snd->Play();
     }
+  }
   ms->type = DYN_TYPE_MISSILE;
   ms->dir = (csOrthoTransform)(Sys->view->GetCamera ()->GetTransform ());
   ms->sprite = NULL;

@@ -40,10 +40,10 @@ void csSoundHandleSoftware::Unregister()
   ReleaseSoundData();
 }
 
-iSoundSource *csSoundHandleSoftware::CreateSource(int Mode3d)
+csPtr<iSoundSource> csSoundHandleSoftware::CreateSource(int Mode3d)
 {
-  if (!Registered) return NULL;
-  return new csSoundSourceSoftware(SoundRender, this, Mode3d);
+  if (!Registered) return csPtr<iSoundSource> (NULL);
+  return csPtr<iSoundSource> (new csSoundSourceSoftware(SoundRender, this, Mode3d));
 }
 
 void csSoundHandleSoftware::vUpdate(void *buf, long Num)

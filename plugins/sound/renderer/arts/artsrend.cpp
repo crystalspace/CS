@@ -119,18 +119,18 @@ float csArtsRenderer::GetVolume ()
   return volume;
 }
 
-iSoundHandle *csArtsRenderer::RegisterSound(iSoundData *sd)
+csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
 {
   csArtsHandle *sh = new csArtsHandle (this);
   if (sh->UseData (sd))
   {
     vObject.InsertSorted (sh);
     sh->SetVolume (volume);
-    return sh;
+    return csPtr<iSoundData> (sh);
   }
   else
     delete sh;
-  return NULL;
+  return csPtr<iSoundData> (NULL);
 }
 
 void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
@@ -141,7 +141,7 @@ void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
 
 }
 
-iSoundSource *csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mode3D)
+csPtr<iSoundSource> csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mode3D)
 {
   csArtsHandle *sh = new csArtsHandle (this);
   if (sh->UseData (pHandle->sd))
@@ -149,11 +149,11 @@ iSoundSource *csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mode3D)
     vObject.InsertSorted (sh);
     sh->SetVolume (volume);
     sh->SetMode3D (Mode3D);
-    return sh;
+    return csPtr<iSoundSource> (sh);
   }
   else
     delete sh;
-  return NULL;
+  return csPtr<iSoundSource> (NULL);
 }
 
 iSoundListener *csArtsRenderer::GetListener ()

@@ -25,7 +25,8 @@ SCF_IMPLEMENT_IBASE(csSoundHandle);
   SCF_IMPLEMENTS_INTERFACE(iSoundHandle);
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundHandle::csSoundHandle(iSoundData *s) {
+csSoundHandle::csSoundHandle(iSoundData *s)
+{
   SCF_CONSTRUCT_IBASE(NULL);
 
   Data = s;
@@ -35,34 +36,45 @@ csSoundHandle::csSoundHandle(iSoundData *s) {
   LoopStream = false;
 }
 
-csSoundHandle::~csSoundHandle() {
+csSoundHandle::~csSoundHandle()
+{
   CS_ASSERT(Registered == false);
   ReleaseSoundData();
 }
 
-void csSoundHandle::ReleaseSoundData() {
-  if (Data) {
+void csSoundHandle::ReleaseSoundData()
+{
+  if (Data)
+  {
     Data->DecRef();
     Data = NULL;
   }
 }
 
-bool csSoundHandle::IsStatic() {
+bool csSoundHandle::IsStatic()
+{
   return Data->IsStatic();
 }
 
-iSoundSource *csSoundHandle::Play(bool Loop) {
-  iSoundSource *src = CreateSource(SOUND3D_DISABLE);
-  if (src) {
+csPtr<iSoundSource> csSoundHandle::Play(bool Loop)
+{
+  csRef<iSoundSource> src (CreateSource(SOUND3D_DISABLE));
+  if (src)
+  {
     src->Play(Loop ? SOUND_LOOP : 0);
-    src->DecRef();
   }
-  return (Loop ? src : (iSoundSource *)NULL);
+  if (Loop)
+  {
+    src->IncRef ();	// Avoid smart pointer release.
+    return csPtr<iSoundSource> (src);
+  }
+  else return csPtr<iSoundSource> (NULL);
 }
 
 void csSoundHandle::StartStream(bool Loop)
 {
-  if (!Data->IsStatic()) {
+  if (!Data->IsStatic())
+  {
     LoopStream = Loop;
     ActiveStream = true;
   }
@@ -94,7 +106,8 @@ void csSoundHandle::UpdateCount(long Num)
     void *buf = Data->ReadStreamed(n);
     vUpdate(buf, n);
     Num -= n;
-    if (Num > 0) {
+    if (Num > 0)
+    {
       if (!LoopStream) break;
       Data->ResetStreamed();
     }

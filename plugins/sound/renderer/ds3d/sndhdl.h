@@ -36,7 +36,7 @@ public:
 
   void Unregister();
   virtual void vUpdate(void *buf, long NumSamples);
-  virtual iSoundSource *CreateSource(int Mode3d);
+  virtual csPtr<iSoundSource> CreateSource(int Mode3d);
 };
 
 #endif // __SNDHDL_H__

@@ -369,12 +369,12 @@ void csSpriteBuilderFile::StoreActionFrame (int Frame, csTicks Delay)
   Out << "      F ('frame" << Frame << "', " << Delay << ")\n";
 }
 
-iDataBuffer *csSpriteBuilderFile::Build (iModelDataObject *Input)
+csPtr<iDataBuffer> csSpriteBuilderFile::Build (iModelDataObject *Input)
 {
   Out.Clear ();
   csSpriteBuilder::Build (Input);
   int Size = Out.Length () + 1;
-  return new csDataBuffer (Out.Detach (), Size);
+  return csPtr<iDataBuffer> (new csDataBuffer (Out.Detach (), Size));
 }
 
 // --- mesh version ----------------------------------------------------------

@@ -42,13 +42,16 @@ void csSoundHandleEAX::Unregister() {
   ReleaseSoundData();
 }
 
-iSoundSource *csSoundHandleEAX::CreateSource(int Mode3d) {
-  if (!Registered) return NULL;
+csPtr<iSoundSource> csSoundHandleEAX::CreateSource(int Mode3d)
+{
+  if (!Registered) return csPtr<iSoundSource> (NULL);
   csSoundSourceEAX *src = new csSoundSourceEAX(NULL);
-  if (src->Initialize(SoundRender, this, Mode3d, NumSamples)) return src;
-  else {
+  if (src->Initialize(SoundRender, this, Mode3d, NumSamples))
+    return csPtr<iSoundSource> (src);
+  else
+  {
     src->DecRef();
-    return NULL;
+    return csPtr<iSoundSource> (NULL);
   }
 }
 

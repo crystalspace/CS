@@ -50,7 +50,7 @@ public:
   // is this a static or streamed sound?
   virtual bool IsStatic();
   // play an instance of this sound
-  virtual iSoundSource *Play(bool Loop);
+  virtual csPtr<iSoundSource> Play(bool Loop);
   // Start playing the stream (only for streamed sound)
   virtual void StartStream(bool Loop);
   // Stop playing the stream

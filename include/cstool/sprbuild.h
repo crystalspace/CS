@@ -93,7 +93,7 @@ private:
   virtual void StoreActionFrame (int Frame, csTicks Delay);
 public:
 
-  iDataBuffer *Build (iModelDataObject *Input);
+  csPtr<iDataBuffer> Build (iModelDataObject *Input);
 };
 
 /// This sprite builder takes a sprite factory and adds the input information

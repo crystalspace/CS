@@ -68,15 +68,14 @@ bool csArtsHandle::UseData (iSoundData *sd)
 
 void csArtsHandle::Play(bool Loop)
 {
-  iSoundSource *ss = CreateSource (SOUND3D_DISABLE);
+  csRef<iSoundSource> ss (CreateSource (SOUND3D_DISABLE));
   if (ss)
   {
     ss->Play (Loop ? SOUND_LOOP : SOUND_RESTART);
-    ss->DecRef ();
   }
 }
 
-iSoundSource *csArtsHandle::CreateSource(int Mode3d)
+csPtr<iSoundSource> csArtsHandle::CreateSource(int Mode3d)
 {
   return pRend->CreateSource (this, Mode3d);
 }

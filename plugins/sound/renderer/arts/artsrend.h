@@ -62,7 +62,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
   soVector vObject;
   bool bInit;
 
-  iSoundSource *CreateSource (csArtsHandle *pHandle, int Mode3D);
+  csPtr<iSoundSource> CreateSource (csArtsHandle *pHandle, int Mode3D);
   Arts::csSoundModule *CreateArtsModule ();
 
 public:
@@ -79,7 +79,7 @@ public:
   virtual float GetVolume ();
 
   /// Register a sound
-  virtual iSoundHandle *RegisterSound(iSoundData *);
+  virtual csPtr<iSoundHandle> RegisterSound(iSoundData *);
   /// Unregister a sound
   virtual void UnregisterSound(iSoundHandle *);
 

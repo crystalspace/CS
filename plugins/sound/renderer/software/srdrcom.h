@@ -52,7 +52,7 @@ public:
   // implementation of iSoundRender
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
-  virtual iSoundHandle *RegisterSound(iSoundData *);
+  virtual csPtr<iSoundHandle> RegisterSound(iSoundData *);
   virtual void UnregisterSound(iSoundHandle *);
   virtual iSoundListener *GetListener ();
   virtual void MixingFunction ();

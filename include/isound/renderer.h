@@ -51,7 +51,7 @@ public:
   virtual float GetVolume () = 0;
 
   /// Register a sound
-  virtual iSoundHandle *RegisterSound(iSoundData *) = 0;
+  virtual csPtr<iSoundHandle> RegisterSound(iSoundData *) = 0;
   /// Unregister a sound
   virtual void UnregisterSound(iSoundHandle *) = 0;
 

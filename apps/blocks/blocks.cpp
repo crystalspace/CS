@@ -2278,7 +2278,7 @@ void Blocks::InitEngine ()
     csRef<iSoundWrapper> w (CS_GET_NAMED_CHILD_OBJECT (
       engine->QueryObject (), iSoundWrapper, "background.wav"));
     if (w)
-      backsound = csPtr<iSoundSource> (w->GetSound ()->Play (true));
+      backsound = w->GetSound ()->Play (true);
   }
 }
 

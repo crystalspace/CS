@@ -30,6 +30,7 @@
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
+#include "isound/handle.h"
 
 csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 {
@@ -47,7 +48,8 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
   }
 
   // load the sound
-  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
+  csRef<iSoundData> Sound (
+		  SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ()));
 
   // check for valid sound data
   if (!Sound)
@@ -59,6 +61,7 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
   else
     Stats->sounds_loaded++;
 
+  Sound->IncRef ();	// To prevent release from smart pointer.
   return csPtr<iSoundData> (Sound);
 }
 
@@ -67,11 +70,11 @@ csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
   if (!SoundRender)
     return csPtr<iSoundHandle> (NULL);
 
-  iSoundData *Sound = LoadSoundData(filename);
+  csRef<iSoundData> Sound (LoadSoundData(filename));
   if (!Sound) return csPtr<iSoundHandle> (NULL);
 
   /* register the sound */
-  iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
+  csRef<iSoundHandle> hdl (SoundRender->RegisterSound(Sound));
   if (!hdl)
   {
     ReportError (
@@ -79,13 +82,14 @@ csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
 	      "Cannot register sound '%s'!", filename);
   }
 
+  hdl->IncRef ();	// To prevent release from smart pointer.
   return csPtr<iSoundHandle> (hdl);
 }
 
 csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
 {
   // load the sound handle
-  iSoundHandle *Sound = LoadSound(fname);
+  csRef<iSoundHandle> Sound (LoadSound(fname));
   if (!Sound) return csPtr<iSoundWrapper> (NULL);
 
   // build wrapper object
@@ -95,3 +99,4 @@ csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
 
   return csPtr<iSoundWrapper> (Wrapper);
 }
+
