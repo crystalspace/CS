@@ -46,6 +46,9 @@ The history order is reversed so that new features are at the top.
 	- Again reduced memory usage in the OpenGL renderer by
 	  removing several unneeded growing arrays. More cleanups.
 	- Fixed a bug in OpenGL renderer which I introduced a few moments ago.
+	- Eric Sunshine fixed a bug in csArchive where it was incapable of
+	  correctly reading Zip archive directories, and where it corrupted
+	  Zip archives on 64-bit hardware.
 7-Oct-2002
 	- Removed some obsolete texmem.{cpp|h} files in the 3D renderer
 	  directories.

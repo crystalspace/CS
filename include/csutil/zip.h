@@ -43,7 +43,7 @@ extern "C" {
 
 typedef unsigned char  uch;
 typedef unsigned short ush;
-typedef unsigned long  ulg;
+typedef unsigned int   u32;
 
 #if 0            /* Optimization: use the (const) result of crc32(0L,NULL,0) */
 #  define CRCVAL_INITIAL  crc32(0L, NULL, 0)
@@ -58,9 +58,9 @@ typedef struct
   ush compression_method;
   ush last_mod_file_time;
   ush last_mod_file_date;
-  ulg crc32;
-  ulg csize;
-  ulg ucsize;
+  u32 crc32;
+  u32 csize;
+  u32 ucsize;
   ush filename_length;
   ush extra_field_length;
 } ZIP_local_file_header;
@@ -73,16 +73,16 @@ typedef struct
   ush compression_method;
   ush last_mod_file_time;
   ush last_mod_file_date;
-  ulg crc32;
-  ulg csize;
-  ulg ucsize;
+  u32 crc32;
+  u32 csize;
+  u32 ucsize;
   ush filename_length;
   ush extra_field_length;
   ush file_comment_length;
   ush disk_number_start;
   ush internal_file_attributes;
-  ulg external_file_attributes;
-  ulg relative_offset_local_header;
+  u32 external_file_attributes;
+  u32 relative_offset_local_header;
 } ZIP_central_directory_file_header;
 
 typedef struct
@@ -91,8 +91,8 @@ typedef struct
   ush num_disk_start_cdir;
   ush num_entries_centrl_dir_ths_disk;
   ush total_entries_central_dir;
-  ulg size_central_directory;
-  ulg offset_start_central_directory;
+  u32 size_central_directory;
+  u32 offset_start_central_directory;
   ush zipfile_comment_length;
 } ZIP_end_central_dir_record;
 

@@ -268,7 +268,7 @@ void csArchive::Dir () const
   for (fn = 0; fn < dir.Length (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
-    printf ("%6ld|%6ld|%6ld|%08x|%s\n", e->info.csize, e->info.ucsize,
+    printf ("%6d|%6d|%6d|%08x|%s\n", e->info.csize, e->info.ucsize,
       e->info.relative_offset_local_header, (uint)e->info.crc32, e->filename);
   }
 }
