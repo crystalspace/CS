@@ -41,6 +41,8 @@ chronological order.
 	  camera transform local. Avoids a few virtual calls and also avoids
 	  having to pass the camera along as a parameter.
 	- Jorrit fixed a MSVC6 compatibility error with sprcal3d.
+	- Reed fixed a bug in VOS/A3DL plugin: color material on static meshes
+	  not set properly.
 	- Vincent Knecht added building switches to cs.spec file.
 	  These can be used when (re)building (S)RPM files:
 	    - --with debug
