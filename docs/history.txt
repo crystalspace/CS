@@ -7,37 +7,30 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 15-Jan-2004
-	- Peter Amstutz changed the keyboard movement in the "simple"
-	  tutorials (along with the associated texinfo documentation)
-	  to follow more conventional controls for the first person
-	  view on the assumption that most people start writing CS 
-	  applications by copying "simple1" and so they should have a better
-	  set of default controls to work from :-)
-	- Jorrit fixed the .csplugin file in the ODE based physics plugin
-	  for particles. It was using the same plugin ID as the simple
-	  physics plugin.
-	- Jorrit attempted to convert the rain mesh to the NR. It doesn't
-	  yet work though.
-	- Jorrit fixed the bugs in the rain mesh object. It now works
-	  mostly with NR except that portals seem to overwrite it.
-	- Jorrit fixed the transform of the rain particle system so it
-	  renders at the correct spot with NR.
-	- Jorrit fixed a bug in the loader. By delaying to set the render
-	  priority of an object upto the end the automatic portals generated
-	  from old map files wouldn't inherit the right object priority.
-	  This could cause render errors. With OR these errors didn't come
-	  up due to coincidence but with NR they were very visible.
+	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
+	  (along with the associated texinfo documentation) to follow more
+	  conventional controls for the first person view on the assumption
+	  that most people start writing CS applications by copying "simple1"
+	  and so they should have a better set of default controls from which
+	  to work.  :-)
+	- Jorrit fixed the .csplugin file in the ODE based physics plugin for
+	  particles.  It was using the same plugin ID as the simple physics
+	  plugin.
+	- Jorrit attempted to convert the rain mesh to the NR.  It doesn't yet
+	  work though.
+	- Jorrit fixed the bugs in the rain mesh object.  It now works mostly
+	  with NR except that portals seem to overwrite it.
+	- Jorrit fixed the transform of the rain particle system so it renders
+	  at the correct spot with NR.
+	- Jorrit fixed a bug in the loader.  By delaying to set the render
+	  priority of an object up to the end the automatic portals generated
+	  from old map files wouldn't inherit the right object priority.  This
+	  could cause render errors.  With OR these errors didn't come up due
+	  to coincidence but with NR they were very visible.
+	- Eric Sunshine greatly enhanced the Doxygen documentation for
+	  iNetworkSocket so that it explains precisely what the interface
+	  represents, and how & when clients might want to use it.
 14-Jan-2004
-	- Peter Amstutz rewrote the GenerateBox() method in the genmesh
-	  plugin to create a box with better texel settings 
-	  (the old code had texture warping bugs on certain sides of
-	  the box)
-	- Peter Amstutz added support for textures and materials to
-	  the csvosa3dl plugin.  It also loads "a3dl:object3D.cube"
-	  into the engine.
-	- Peter Amstutz modified the configure.ac script to add 
-	  the flags -D_REENTRANT and -fexceptions to the VOS cflags
-	  variable.
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.
 	- res sanitized line endings in ivideo/custcursor.h and the custom
@@ -51,14 +44,21 @@ chronological order.
 	  Positioning of the components is now completely independent of magic
 	  constants, and is also entirely consistent with the way the
 	  components of the vertical scrollbar are positioned.
-	- Norman Kraemer changed Frame's Height access from Frame.Height() to 
+	- Norman Kraemer changed Frame's Height access from Frame.Height() to
 	  Frame().Height()
-	- Norman Kraemer had the following to say:
-	    glshader_cg now compiles again, but it certainly won't work.
-	    I adjusted include paths, structure names and method spurs.
-	    Since i added the missing Compile method as a false returning 
-	    dummy method it certainly won't work. I guess there should go
-	    the code from the now defunct Prepare() method.
+	- Norman Kraemer made the glshader_cg compileable once again, but says
+	  that it certainly won't work.  I adjusted include paths, structure
+	  names and method spurs.  Since i added the missing Compile method as
+	  a false returning dummy method it certainly won't work.  I guess
+	  there should go the code from the now defunct Prepare() method.
+	- Peter Amstutz rewrote the GenerateBox() method in the genmesh plugin
+	  to create a box with better texel settings (the old code had texture
+	  warping bugs on certain sides of the box)
+	- Peter Amstutz added support for textures and materials to the
+	  csvosa3dl plugin.  It also loads "a3dl:object3D.cube" into the
+	  engine.
+	- Peter Amstutz modified the configure.ac script to add the flags
+	  -D_REENTRANT and -fexceptions to the VOS cflags variable.
 13-Jan-2004
 	- Jorrit added a version of Top() to csArray that is not const.
 	- Jorrit multiplied the values in the two glPolygonOffset() calls

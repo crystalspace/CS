@@ -26,11 +26,34 @@
 SCF_VERSION (iNetworkSocket, 0, 0, 1);
 
 /**
- * This interface represents a network socket.
+ * This interface represents a network socket.  iNetworkConnection and
+ * iNetworkListener are abstract network interfaces which might be implemented
+ * in any number of ways, such as via the BSD Sockets, serial modem, direct
+ * connection, neural link (ESP), or even smoke signals.  Modules which
+ * implement these interfaces using the BSD Sockets protocol can also choose to
+ * implement the iNetworkSocket protocol, which provides access to the
+ * low-level <n>socket</n> identifier which can be used to make calls to
+ * various low-level Socket functions, such as send(), recv(), ioctl(), etc.
+ * Use SCF_QUERY_INTERFACE(), to find out if an iNetworkConnection or an
+ * iNetworkListener implements iNetworkSocket.  If SCF_QUERY_INTERFACE()
+ * returns null, then the connection or listener is implemented via some
+ * non-BSD Socket mechanism.  On the other hand, if SCF_QUERY_INTERFACE()
+ * returns an iNetworkSocket, then the connection or listener is BSD
+ * Socket-based, and you can use the methods of iNetworkSocket to manipulate
+ * the connection or listener in ways not provided by the abstract
+ * iNetworkConnection and iNetworkListener interfaces.
  */
-struct iNetworkSocket: public iBase
+struct iNetworkSocket : public iBase
 {
-  /// Retrieve the socket associated with this object.
+  /**
+   * Retrieve the socket associated with this object.  The returned socket is
+   * the low-level platform-dependent BSD Socket identifier.  The exact
+   * representation may vary from platform (typically it is an unsigned
+   * integer), though you normally need not worry about the precise
+   * representation.  The returned Socket identifier can be used in cases where
+   * you need to make calls to low-level Socket functions, such as send(),
+   * recv(), ioctl(), etc.
+   */
   virtual csNetworkSocket GetSocket() const = 0;
 };
 
