@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Anatomy, Plug-In Drivers, Concepts, Top
+@node Anatomy, Libraries, Concepts, Top
 @chapter Project Anatomy
 @cindex Anatomy
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Texture Cache
+@node Texture Cache, Texture Mapping, 3D Sprites, Concepts
 @section Texture Cache
 @cindex Texture Cache
 
@@ -95,7 +95,7 @@ and blu are bilinear interpolated values of red, green, and blue in 16:16
 fixed point format. @code{*tm++} puts the result in the lighted texture.)
 @end table
 
-@node TexCache_About
+@node TexCache_About, , Texture Cache, Texture Cache
 @subsection About the texture cache
 
 The unlighted texture maps and static light-maps are just loaded in memory

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node csPhyziks, SCF, Makefile How-To, Anatomy
+@node csPhyziks, , CSWS, Libraries
 @section csPhyziks Library (@code{csphyzik})
 @cindex Phyziks
 @cindex csphyzik

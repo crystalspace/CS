@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node 3D Sprites, Misc Notes, Visibility Culling, Concepts
+@node 3D Sprites, Texture Cache, Visibility Culling, Concepts
 @section 3D Sprites
 @cindex 3D Sprites
 

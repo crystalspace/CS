@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Texture Mapping
+@node Texture Mapping, Misc Notes, Texture Cache, Concepts
 @section Texture Mapping
 @cindex Texture Mapping
 
@@ -8,7 +8,7 @@ for a polygon. This text assumes that you know about portals, different
 the coordinate systems CS uses, and about cameras and matrix transformations.
 @xref{Cameras and Matrices}.
 
-@node TexMap Convections
+@node TexMap Convections, TexMap Polygon, Texture Mapping, Texture Mapping
 @subsection Conventions
 
 @itemize @bullet
@@ -43,7 +43,7 @@ vector in world space).
 vector (in texture space).
 @end itemize
 
-@node TexMap Polygon
+@node TexMap Polygon, TexMap Camera, TexMap Convections, Texture Mapping
 @subsection Polygon
 
 A polygon is represented as a set of 3D vertices oriented in clockwise order
@@ -94,7 +94,7 @@ Nw:   Aw*x + Bw*y + Cw*z + Dw = 0
 Nc:   Ac*x + Bc*y + Cc*z + Dc = 0
 @end example
 
-@node TexMap Camera
+@node TexMap Camera, TexMap Texture, TexMap Polygon, Texture Mapping
 @subsection Camera
 
 A camera is represented as a matrix (@code{Mwc}) and a vector (@code{Vwc}).
@@ -104,7 +104,7 @@ space is also kept inside a Camera object because it can be used for movement
 (for example, to move forward one would want to move forward along the Z axis
 in camera space and not in world space).
 
-@node TexMap Texture
+@node TexMap Texture, TexMap Perspective correction, TexMap Camera, Texture Mapping
 @subsection Texture
 
 There is also a texture associated with every polygon (unless it is a portal
@@ -141,7 +141,7 @@ Note that the texture transformation matrix is actually a transformation from
 3D to 3D. We simply don't use the Z component in texture space (it is just
 ignored).
 
-@node TexMap Perspective correction
+@node TexMap Perspective correction, TexMap Together, TexMap Texture, Texture Mapping
 @subsection Perspective correction
 
 Objects in camera space are still 3D and thus not suited for immediate
@@ -165,7 +165,7 @@ Crystal Space currently uses the height of the display (in pixels) for this.
 You can experiment with other values using the @code{-fov} commandline option
 or use the @key{f} or @kbd{SHIFT-f} keys while the program is running.
 
-@node TexMap Together
+@node TexMap Together, TexMap HowToUse, TexMap Perspective correction, Texture Mapping
 @subsection Bringing It All Together
 
 Using all this information we have enough to correctly map a texture on
@@ -466,7 +466,7 @@ With these three important equations we can do all texture mapping we want.
 With the first equation we can calculate 1/z. This is useful for Z-buffering
 and also for calculating (u,v) from the two other equations.
 
-@node TexMap HowToUse
+@node TexMap HowToUse, , TexMap Together, Texture Mapping
 @subsection Instructions for the texture mapper
 
 The @code{ORIG}/@code{FIRST}/@code{SECOND} vertex describe the texture plane.

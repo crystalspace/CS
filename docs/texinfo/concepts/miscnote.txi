@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Misc Notes, , 3D Sprites, Concepts
+@node Misc Notes, , Texture Mapping, Concepts
 @section Miscallenous notes requiring classification (Jorrit's Brain Dump)
 @cindex General Notes
 

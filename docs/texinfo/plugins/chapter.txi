@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Plug-In Drivers, Contributing, Anatomy, Top
+@node Plug-In Drivers, Contributing, Libraries, Top
 @chapter Plug-In Modules and Drivers
 @cindex Plug-In Modules and Drivers
 @cindex Modules, Plug-In

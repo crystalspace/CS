@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Libraries
+@node Libraries, Plug-In Drivers, Anatomy, Top
 @chapter Libraries
 @cindex Libraries
 
