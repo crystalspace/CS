@@ -33,6 +33,7 @@
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
+#include "iutil/strvec.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"
 
@@ -66,6 +67,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DIRECTION)
   CS_TOKEN_DEF (DIRECTIONAL)
   CS_TOKEN_DEF (DROPSIZE)
+  CS_TOKEN_DEF (DURATION)
   CS_TOKEN_DEF (EMITBOX)
   CS_TOKEN_DEF (EMITLINE)
   CS_TOKEN_DEF (EMITFIXED)
@@ -77,6 +79,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (FRAME)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HAZEBOX)
   CS_TOKEN_DEF (HAZECONE)
@@ -89,6 +92,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ORIGIN)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
+  CS_TOKEN_DEF (POS)
   CS_TOKEN_DEF (POSITION)
   CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (RADIUS)
@@ -457,6 +461,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (DIRECTION)
     CS_TOKEN_TABLE (DIRECTIONAL)
     CS_TOKEN_TABLE (DROPSIZE)
+    CS_TOKEN_TABLE (DURATION)
     CS_TOKEN_TABLE (EMITBOX)
     CS_TOKEN_TABLE (EMITLINE)
     CS_TOKEN_TABLE (EMITFIXED)
@@ -468,6 +473,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (FIRST)
     CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (FRAME)
     CS_TOKEN_TABLE (HALO)
     CS_TOKEN_TABLE (HAZEBOX)
     CS_TOKEN_TABLE (HAZECONE)
@@ -480,6 +486,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (ORIGINBOX)
     CS_TOKEN_TABLE (POLYGON)
     CS_TOKEN_TABLE (PORTAL)
+    CS_TOKEN_TABLE (POS)
     CS_TOKEN_TABLE (POSITION)
     CS_TOKEN_TABLE (PRIORITY)
     CS_TOKEN_TABLE (RADIUS)
@@ -570,6 +577,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_SECOND:
         case CS_TOKEN_ORIG:
         case CS_TOKEN_ORIGIN:
+        case CS_TOKEN_POS:
         case CS_TOKEN_POSITION:
         case CS_TOKEN_SHIFT:
         case CS_TOKEN_CURVECENTER:
@@ -607,6 +615,31 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
+	case CS_TOKEN_DURATION:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue ("duration");
+	    CreateValueNode (child, "time", name);
+            ParseGeneral (tokname, parser, child, params);
+	  }
+	  break;
+	case CS_TOKEN_FRAME:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (!strcmp (parent_token, "bone"))
+	    {
+	      CreateValueNode (child, "time", name);
+	    }
+	    else
+	    {
+	      if (name) child->SetAttribute ("name", name);
+	    }
+            ParseGeneral (tokname, parser, child, params);
+	  }
+	  break;
         case CS_TOKEN_VERTEX:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -628,13 +661,20 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	  CS_NODE_ELEMENT, NULL);
 	      child->SetValue (tokname);
-	      float x, y, z, u, v;
-	      csScanStr (params, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+	      float x, y, z, u, v, nx, ny, nz;
+	      int num = csScanStr (params, "%f,%f,%f:%f,%f:%f,%f,%f",
+	      	&x, &y, &z, &u, &v, &nx, &ny, &nz);
 	      child->SetAttributeAsFloat ("x", x);
 	      child->SetAttributeAsFloat ("y", y);
 	      child->SetAttributeAsFloat ("z", z);
 	      child->SetAttributeAsFloat ("u", u);
 	      child->SetAttributeAsFloat ("v", v);
+	      if (num > 5)
+	      {
+	        child->SetAttributeAsFloat ("nx", nx);
+	        child->SetAttributeAsFloat ("ny", ny);
+	        child->SetAttributeAsFloat ("nz", nz);
+	      }
 	      if (name) child->SetAttribute ("name", name);
 	    }
 	    else if (!strcmp (parent_token, "p"))
@@ -1310,6 +1350,133 @@ defaulthalo:
   }
 }
 
+void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
+{
+  vfs->PushDir ();
+  vfs->ChDir (vfspath);
+  csRef<iStrVector> files;
+  files.Take (vfs->FindFiles ("."));
+  int i;
+  for (i = 0 ; i < files->Length () ; i++)
+  {
+    char* str = files->Get (i);
+
+    // Test if it is a dir (@@@ rather ugly test! Needs support in VFS).
+    csRef<iStrVector> recfiles;
+    recfiles.Take (vfs->FindFiles (str));
+    if (recfiles && recfiles->Length () > 0 &&
+    	strcmp (recfiles->Get (0), str) != 0)
+    {
+      ConvertDir (str, backup);
+    }
+    else
+    {
+      ConvertFile (str, backup);
+    }
+  }
+  vfs->PopDir ();
+}
+
+bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
+{
+  char* ext = strrchr (vfspath, '.');
+  if (ext)
+  {
+    if (!strcasecmp (ext, ".gif")) return false;
+    if (!strcasecmp (ext, ".jpg")) return false;
+    if (!strcasecmp (ext, ".jpeg")) return false;
+    if (!strcasecmp (ext, ".tga")) return false;
+    if (!strcasecmp (ext, ".pcx")) return false;
+    if (!strcasecmp (ext, ".png")) return false;
+    if (!strcasecmp (ext, ".jng")) return false;
+
+    if (!strcasecmp (ext, ".mpg")) return false;
+    if (!strcasecmp (ext, ".avi")) return false;
+
+    if (!strcasecmp (ext, ".wav")) return false;
+
+    if (!strcasecmp (ext, ".bak")) return false;
+  }
+
+  printf ("Trying to convert '%s' ... ", vfspath); fflush (stdout);
+  csRef<iDataBuffer> buf;
+  buf.Take (vfs->ReadFile (vfspath));
+  if (!buf || !buf->GetSize ())
+  {
+    ReportError ("Could not read file '%s'!", vfspath);
+    return false;
+  }
+
+  csParser* parser = new csParser (true);
+  parser->ResetParserLine ();
+
+  CS_TOKEN_TABLE_START (tokens)
+  CS_TOKEN_TABLE_END
+
+  char *data = **buf;
+  char *name, *params;
+  long cmd;
+
+  bool is_converted = false;
+  if ((cmd = parser->GetObject (&data, tokens, &name, &params))
+  	!= CS_PARSERR_EOF)
+  {
+    if (params)
+    {
+      char* tokname = ToLower (parser->GetUnknownToken (), true);
+      if (*tokname != '<')
+      {
+        char* params2;
+        cmd = parser->GetObject (&params, tokens, &name, &params2);
+        if (cmd != CS_PARSERR_EOF && params2 != NULL)
+        {
+          bool is_cs = !strcmp (tokname, "world") ||
+      		   !strcmp (tokname, "library") ||
+      		   !strcmp (tokname, "meshobj") ||
+      		   !strcmp (tokname, "meshfact");
+          csRef<iDocumentSystem> xml;
+          xml.Take (new csTinyDocumentSystem ());
+          csRef<iDocument> doc = xml->CreateDocument ();
+          csRef<iDocumentNode> root = doc->CreateRoot ();
+          csRef<iDocumentNode> parent = root->CreateNodeBefore (
+    	    CS_NODE_ELEMENT, NULL);
+          parent->SetValue (tokname);
+	  // If not one of world, library, meshobj, or meshfact we
+	  // assume this is a PARAMSFILE in which case we use 'params'
+	  // as the logical parent.
+          ParseGeneral (is_cs ? "" : "params", parser, parent, params);
+
+	  // First make backup
+	  if (backup)
+	  {
+	    char* newname = new char [strlen (vfspath)+4];
+	    strcpy (newname, vfspath);
+	    strcat (newname, ".bak");
+	    vfs->WriteFile (newname, **buf, buf->GetSize ());
+	    delete[] newname;
+	  }
+
+          doc->Write (vfs, vfspath);
+	  is_converted = true;
+        }
+      }
+      delete[] tokname;
+    }
+  }
+
+  delete parser;
+  if (is_converted)
+  {
+    printf ("CONVERTED\n");
+  }
+  else
+  {
+    printf ("Not a CS file\n");
+  }
+  fflush (stdout);
+  return true;
+}
+
 //----------------------------------------------------------------------------
 
 void Cs2Xml::Main ()
@@ -1324,60 +1491,15 @@ void Cs2Xml::Main ()
     return;
   }
 
-  csRef<iDataBuffer> buf;
   if (strstr (val, ".zip"))
   {
     vfs->Mount ("/tmp/cs2xml_data", val);
-    buf.Take (vfs->ReadFile ("/tmp/cs2xml_data/world"));
-    if (!buf || !buf->GetSize ())
-    {
-      ReportError ("Archive '%s' does not seem to contain a 'world' file!",
-      	val);
-      return;
-    }
+    ConvertDir ("/tmp/cs2xml_data", true);
   }
   else
   {
-    buf.Take (vfs->ReadFile (val));
-    if (!buf || !buf->GetSize ())
-    {
-      ReportError ("Could not load file '%s'!", val);
-      return;
-    }
+    ConvertFile (val, true);
   }
-
-  csParser* parser = new csParser (true);
-  parser->ResetParserLine ();
-
-  CS_TOKEN_TABLE_START (tokens)
-  CS_TOKEN_TABLE_END
-
-  char *data = **buf;
-  char *name, *params;
-  long cmd;
-
-  if ((cmd = parser->GetObject (&data, tokens, &name, &params))
-  	!= CS_PARSERR_EOF)
-  {
-    if (params)
-    {
-      csRef<iDocumentSystem> xml;
-      xml.Take (new csTinyDocumentSystem ());
-      csRef<iDocument> doc = xml->CreateDocument ();
-      csRef<iDocumentNode> root = doc->CreateRoot ();
-      csRef<iDocumentNode> parent = root->CreateNodeBefore (
-    	  CS_NODE_ELEMENT, NULL);
-      parent->SetValue ("world");
-      ParseGeneral ("", parser, parent, params);
-      doc->Write (vfs, "/this/test.xml");
-    }
-  }
-  else
-  {
-    ReportError ("Error parsing 'file'!");
-  }
-
-  delete parser;
 }
 
 /*---------------------------------------------------------------------*

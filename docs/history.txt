@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+22-Aug-2002
+	- Fixed Cs2Xml for DURATION and FRAME commands in motion loader.
+	- Cs2Xml now supports the normal notation for vertices in 3D
+	  sprites (i.e. V (x,y,z:u,v:nx,ny,nz)).
+	- When you give a zip file as argument to Cs2Xml it will now
+	  convert all CS files it can find in that zip file (including
+	  subdirectories). In addition it will make backups of all the
+	  files that it converts (.bak extension).
 21-Aug-2002
 	- Implemented XML version of the spiral loader.
 	- Fixed a bug in cs2xml with parsing of the RADIUS

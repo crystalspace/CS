@@ -62,6 +62,12 @@ public:
   void ParseMatrix (csParser *parser, csRef<iDocumentNode>& parent,
   	char* buf);
 
+  // Convert a file. If backup == true, creates a backup of original with
+  // .bak appended. Returns false if failure.
+  bool ConvertFile (const char* vfspath, bool backup);
+  // Convert a VFS directory.
+  void ConvertDir (const char* vfspath, bool backup);
+
 public:
   Cs2Xml (iObjectRegistry* object_reg);
   ~Cs2Xml ();
