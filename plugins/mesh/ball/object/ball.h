@@ -453,12 +453,13 @@ class csBallMeshObjectFactory : public iMeshObjectFactory
 public:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iMeshObjectType* ball_type;
   iEngine* engine;
   csRef<iLightManager> light_mgr;
   csFlags flags;
 
   /// Constructor.
-  csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csBallMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csBallMeshObjectFactory ();
@@ -473,6 +474,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return ball_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 

@@ -85,7 +85,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesFactory::eiParticlesFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csParticlesFactory::csParticlesFactory (csParticlesType* p,
-	iObjectRegistry* objreg) : parent (p), object_reg (objreg)
+  iObjectRegistry* objreg) : parent (p), object_reg (objreg), particles_type(p)
 {
   SCF_CONSTRUCT_IBASE (p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesFactoryState)

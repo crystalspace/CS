@@ -396,11 +396,12 @@ private:
   /// vector of csHazeLayer
   csPDelArray<csHazeLayer> layers;
   iBase* logparent;
+  iMeshObjectType* haze_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csHazeMeshObjectFactory (iBase *pParent);
+  csHazeMeshObjectFactory (iMeshObjectType *pParent);
 
   /// Destructor.
   virtual ~csHazeMeshObjectFactory ();
@@ -426,6 +427,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return haze_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
   //------------------------- iHazeFactoryState implementation ----------------

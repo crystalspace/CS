@@ -1307,12 +1307,13 @@ SCF_IMPLEMENT_IBASE (csBallMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
+csBallMeshObjectFactory::csBallMeshObjectFactory (iMeshObjectType* pParent,
 	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   csBallMeshObjectFactory::object_reg = object_reg;
   logparent = 0;
+  ball_type = pParent;
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference.
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);

@@ -313,6 +313,8 @@ private:
   csBezierMesh* ParentTemplate;
   /// Pointer to logical parent.
   iBase* logparent;
+  /// Pointer to meshobjecttype.
+  iMeshObjectType* beziermsh_type;
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
@@ -835,6 +837,7 @@ public:
     virtual bool SupportsHardTransform () const { return true; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual iMeshObjectType* GetMeshObjectType () const { return scfParent->beziermsh_type; }
     virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;

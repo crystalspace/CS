@@ -87,6 +87,7 @@ class csChunkLodTerrainFactory : public iMeshObjectFactory
   friend class csChunkLodTerrainObject;
 public:
   iBase* parent;
+  iMeshObjectType* chunklod_type;
   iObjectRegistry *object_reg;
   csFlags flags;
   csRef<iEngine> engine;
@@ -210,6 +211,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { parent = lp; }
   virtual iBase* GetLogicalParent () const { return parent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return chunklod_type; }
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);

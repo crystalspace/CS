@@ -545,6 +545,8 @@ class csTerrainFactory : public iMeshObjectFactory
 private:
   iBase* logparent;
 
+  iMeshObjectType* brute_type;
+
   csFlags flags;
 
 public:
@@ -558,7 +560,7 @@ public:
   csVector3 scale;
 
   /// Constructor.
-  csTerrainFactory (iObjectRegistry* object_reg);
+  csTerrainFactory (iObjectRegistry* object_reg, iMeshObjectType* parent);
 
   /// Destructor.
   virtual ~csTerrainFactory ();
@@ -571,6 +573,8 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return brute_type; }
+
   void SetTerraFormer (iTerraFormer* form);
   iTerraFormer* GetTerraFormer ();
   void SetSamplerRegion (const csBox2& region);

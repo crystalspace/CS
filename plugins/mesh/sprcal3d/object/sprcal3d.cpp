@@ -163,7 +163,8 @@ void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 }
 
 csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
-  iBase *pParent, iObjectRegistry* object_reg)
+  iMeshObjectType* pParent, iObjectRegistry* object_reg)
+  : sprcal3d_type(pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpriteCal3DFactoryState);

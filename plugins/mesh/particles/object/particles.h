@@ -76,6 +76,7 @@ class csParticlesFactory : public iMeshObjectFactory
   friend class csParticlesObject;
 private:
   iBase* parent;
+  csParticlesType* particles_type;
   iObjectRegistry *object_reg;
 
   csRef<iGraphics3D> g3d;
@@ -140,6 +141,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { parent = lp; }
   virtual iBase* GetLogicalParent () const { return parent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return particles_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
   void SetMaterial (iMaterialWrapper *mat)

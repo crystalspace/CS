@@ -38,6 +38,7 @@
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph3d.h"
+#include "ivaria/reporter.h"
 #include "imap/writer.h"
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
@@ -259,39 +260,39 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
 
 bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
 {
-	csRef<iDocumentNode> rpnode = CreateNode(parent, "renderpriorities");
-	int rpcount = engine->GetRenderPriorityCount();
-	for(int i = 0; i < rpcount; i++)
-	{
-		const char *rpname = engine->GetRenderPriorityName(i);
-		if(rpname)
-		{
-			csRef<iDocumentNode> prioritynode = CreateNode(rpnode, "priority");
+  csRef<iDocumentNode> rpnode = CreateNode(parent, "renderpriorities");
+  int rpcount = engine->GetRenderPriorityCount();
+  for(int i = 0; i < rpcount; i++)
+  {
+    const char *rpname = engine->GetRenderPriorityName(i);
+    if(rpname)
+    {
+      csRef<iDocumentNode> prioritynode = CreateNode(rpnode, "priority");
 
-			rpnode->SetAttribute("name", rpname);
-			csRef<iDocumentNode> levelnode = CreateNode(prioritynode, "level");
-			levelnode->SetValueAsInt(i);
+      rpnode->SetAttribute("name", rpname);
+      csRef<iDocumentNode> levelnode = CreateNode(prioritynode, "level");
+      levelnode->SetValueAsInt(i);
 
-			csRef<iDocumentNode> sortnode = CreateNode(prioritynode, "sort");
-			int sorttype = engine->GetRenderPrioritySorting(i);
-			switch(sorttype)
-			{
-			case CS_RENDPRI_NONE:
-				sortnode->SetValue("NONE");
-				break;
-			case CS_RENDPRI_BACK2FRONT:
-				sortnode->SetValue("BACK2FRONT");
-				break;
-			case CS_RENDPRI_FRONT2BACK:
-				sortnode->SetValue("FRONT2BACK");
-				break;
-/*			case CS_RENDPRI_MATERIAL:
-				sortnode->SetValue("MATERIAL");
-				break;*/
-			}
-		}
-	}
-	return true;
+      csRef<iDocumentNode> sortnode = CreateNode(prioritynode, "sort");
+      int sorttype = engine->GetRenderPrioritySorting(i);
+      switch(sorttype)
+      {
+        case CS_RENDPRI_NONE:
+          sortnode->SetValue("NONE");
+          break;
+        case CS_RENDPRI_BACK2FRONT:
+          sortnode->SetValue("BACK2FRONT");
+          break;
+        case CS_RENDPRI_FRONT2BACK:
+          sortnode->SetValue("FRONT2BACK");
+          break;
+/*      case CS_RENDPRI_MATERIAL:
+          sortnode->SetValue("MATERIAL");
+          break;*/
+      }
+    }
+  }
+  return true;
 }
 
 
@@ -371,7 +372,8 @@ bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
     //Create the Tag for the MeshObj
     csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
     //Check if it's a portal
-    csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+    csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(),
+                                                         iPortalContainer);
     if (portal) 
     {
       meshNode->SetValue ("portal");
@@ -389,11 +391,14 @@ bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
     csRef<iFactory> factory;
     iMeshObjectFactory* meshobjectfactory = meshwrapper->GetMeshObject()->GetFactory();
     if (meshobjectfactory)
-      //TBD: implement this
-      //factory = SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
-      factory = SCF_QUERY_INTERFACE(meshobjectfactory, iFactory);
-    if (!factory) 
-      factory = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iFactory);
+      factory = SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
+    else
+    {
+      char error[128];
+      sprintf(error, "Factory less Mesh found! %s => Please fix or report to Jorrit ;)", name);
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.plugin.cssaver", error);
+    }
     if (factory)
     {
       csString pluginname = factory->QueryClassID();

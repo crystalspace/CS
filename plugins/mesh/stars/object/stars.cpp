@@ -282,10 +282,11 @@ SCF_IMPLEMENT_IBASE (csStarsMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csStarsMeshObjectFactory::csStarsMeshObjectFactory (iBase *pParent)
+csStarsMeshObjectFactory::csStarsMeshObjectFactory (iMeshObjectType* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   logparent = 0;
+  stars_type = pParent;
 }
 
 csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()

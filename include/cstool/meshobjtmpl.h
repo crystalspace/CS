@@ -32,7 +32,8 @@
 #define CS_DECLARE_SIMPLE_MESH_FACTORY(name,meshclass)                      \
   class name : public csMeshFactory {                                       \
   public:                                                                   \
-    name (iEngine *e, iObjectRegistry* reg) : csMeshFactory (e, reg) {}     \
+    name (iEngine *e, iObjectRegistry* reg, iMeshObjectType* type)          \
+    : csMeshFactory (e, reg, type) {}                                       \
     virtual csPtr<iMeshObject> NewInstance ()                               \
     { return new meshclass (Engine, this); }                                \
     virtual csPtr<iMeshObjectFactory> Clone () { return 0; }                \
@@ -44,7 +45,7 @@
   public:                                                                   \
     name (iBase *p) : csMeshType (p) {}                                     \
     virtual csPtr<iMeshObjectFactory> NewFactory ()                         \
-    { return new factclass (Engine, object_reg); }                          \
+    { return new factclass (Engine, object_reg, this); }                    \
   };
 
 /**
@@ -268,6 +269,9 @@ protected:
   /// Logical parent (usually the wrapper object from the engine)
   iBase *LogParent;
 
+  /// Pointer to the MeshObjectType
+  iMeshObjectType* mesh_type;
+
   /// Pointer to the engine if available (@@@ temporary)
   iEngine *Engine;
 
@@ -281,7 +285,8 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Constructor
-  csMeshFactory (iEngine *engine, iObjectRegistry* object_reg);
+  csMeshFactory (iEngine *engine, iObjectRegistry* object_reg,
+    iMeshObjectType* parent);
 
   /// Get the object registry.
   iObjectRegistry* GetObjectRegistry () { return object_reg; }
@@ -323,6 +328,11 @@ public:
    * completely in csMeshObject.
    */
   virtual iBase* GetLogicalParent () const;
+
+  /**
+   * Get the ObjectType for this mesh factory.
+   */
+  virtual iMeshObjectType* GetMeshObjectType () const;
 
   /**
    * See imesh/object.h for specification.

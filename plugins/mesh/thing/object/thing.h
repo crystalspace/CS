@@ -173,7 +173,7 @@ public:
   csRef<csThingObjectType> thing_type;
   /// Pointer to logical parent.
   iBase* logparent;
-
+  iMeshObjectType* thingmesh_type;
   /// Set of flags
   csFlags flags;
 
@@ -498,6 +498,7 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return thingmesh_type; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //-------------------- iPolygonMesh interface implementation ----------------

@@ -220,6 +220,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   lmprepared = false;
   cosinus_factor = -1;
   logparent = 0;
+  thingmesh_type = thing_type;
 
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (thing_type->object_reg, iGraphics3D);

@@ -159,7 +159,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObjectFactory::LightningFactoryStat
   SCF_IMPLEMENTS_INTERFACE (iLightningFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObjectRegistry *object_registry)
+csLightningMeshObjectFactory::csLightningMeshObjectFactory (iMeshObjectType *pParent,
+                                                            iObjectRegistry *object_registry)
 {
   MaxPoints = 20;
   wildness = 0.02f;
@@ -177,6 +178,7 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObj
   origin.Set (0, 0, 0);
   directional.Set (0, 0, 1);  
   logparent = 0;
+  lghtng_type = pParent;
   
   csRef<iPluginManager> PlugMgr (CS_QUERY_REGISTRY (object_registry, iPluginManager));
   CS_ASSERT (PlugMgr);

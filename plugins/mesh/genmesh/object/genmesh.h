@@ -539,14 +539,14 @@ public:
 
   iObjectRegistry* object_reg;
   iBase* logparent;
-  csGenmeshMeshObjectType* genmesh_type;
+  iMeshObjectType* genmesh_type;
   csRef<iLightManager> light_mgr;
   csFlags flags;
 
   iEngine* engine;
 
   /// Constructor.
-  csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csGenmeshMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csGenmeshMeshObjectFactory ();
@@ -681,6 +681,7 @@ public:
     CS_ASSERT (logparent != 0);
   }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return genmesh_type; }
 
   //----------------------- iGeneralFactoryState implementation -------------
   class GeneralFactoryState : public iGeneralFactoryState

@@ -494,11 +494,12 @@ class csEmitMeshObjectFactory : public iMeshObjectFactory
 private:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iMeshObjectType* emit_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csEmitMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csEmitMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csEmitMeshObjectFactory ();
@@ -513,6 +514,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return emit_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
   //------------------------- iEmitFactoryState implementation ----------------

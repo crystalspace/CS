@@ -1067,7 +1067,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeHullCreation)
   SCF_IMPLEMENTS_INTERFACE (iHazeHullCreation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
+csHazeMeshObjectFactory::csHazeMeshObjectFactory (iMeshObjectType *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
@@ -1077,6 +1077,7 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
   origin.Set(0,0,0);
   directional.Set(0,0,0);
   logparent = 0;
+  haze_type = pParent;
 }
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()

@@ -1303,7 +1303,7 @@ csStringID csGenmeshMeshObjectFactory::index_name = csInvalidStringID;
 csStringID csGenmeshMeshObjectFactory::tangent_name = csInvalidStringID;
 csStringID csGenmeshMeshObjectFactory::binormal_name = csInvalidStringID;
 
-csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
+csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
       iObjectRegistry* object_reg)
 #ifdef CS_USE_NEW_RENDERER
      : anon_buffers(object_reg)
@@ -1327,6 +1327,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMesh);
 
   logparent = 0;
+  genmesh_type = pParent;
   initialized = false;
   object_bbox_valid = false;
   mesh_tri_normals = 0;

@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 19-Jul-2004
+	- PK added GetMeshObjectType() to iMeshObjectFactory.
+	- PK worked a bit on iSaver.
+19-Jul-2004
 	- PK made the following changes:
 	    - Changed viewmesh to support the iBinarySaverPlugin.
 	    - Started with the iLight dump in iSaver.

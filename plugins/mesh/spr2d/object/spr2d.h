@@ -331,6 +331,7 @@ protected:
 private:
   csRef<iMaterialWrapper> material;
   iBase* logparent;
+  iMeshObjectType* spr2d_type;
   uint MixMode;
   /**
    * If false then we don't do lighting but instead use
@@ -348,7 +349,7 @@ public:
   csRef<iGraphics3D> g3d;
 public:
   /// Constructor.
-  csSprite2DMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csSprite2DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();
@@ -396,6 +397,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return spr2d_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
   //---------------------- iSprite2DFactoryState implementation ----------------

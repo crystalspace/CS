@@ -144,8 +144,9 @@ SCF_IMPLEMENT_IBASE (csMeshFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csMeshFactory::csMeshFactory (iEngine *eng, iObjectRegistry* reg)
-	: Engine (eng), object_reg (reg)
+csMeshFactory::csMeshFactory (
+	iEngine *eng, iObjectRegistry* reg, iMeshObjectType* parent)
+	: Engine (eng), object_reg (reg), mesh_type(parent)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -173,6 +174,11 @@ iBase* csMeshFactory::GetLogicalParent () const
 {
   return LogParent;
 }
+
+iMeshObjectType* csMeshFactory::GetMeshObjectType () const
+{
+  return mesh_type;
+}        
 
 // ---------------------
 

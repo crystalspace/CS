@@ -214,7 +214,7 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
+csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pParent) :
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -230,6 +230,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   scfiObjectModel.SetPolygonMeshShadows (0);
 
   logparent = 0;
+  spr3d_type = pParent;
   cstxt = 0;
   emerge_from = 0;
   cachename = 0;

@@ -27,6 +27,7 @@
 
 struct iMeshObject;
 struct iMeshObjectFactory;
+struct iMeshObjectType;
 struct iRenderView;
 struct iMovable;
 struct iLight;
@@ -351,6 +352,11 @@ struct iMeshObjectFactory : public iBase
    * for more information.
    */
   virtual iBase* GetLogicalParent () const = 0;
+
+  /**
+   * Get the ObjectType for this mesh factory.
+   */
+  virtual iMeshObjectType* GetMeshObjectType () const = 0;
 
   /**
    * Get the generic interface describing the geometry of this mesh factory.

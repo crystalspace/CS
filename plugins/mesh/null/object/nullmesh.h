@@ -42,6 +42,7 @@ class csNullmeshMeshObject : public iMeshObject
 private:
   iMeshObjectFactory* factory;
   iBase* logparent;
+  iMeshObjectType* nullmesh_type;
   iMeshObjectDrawCallback* vis_cb;
   float radius;
   csBox3 box;
@@ -50,7 +51,7 @@ private:
 
 public:
   /// Constructor.
-  csNullmeshMeshObject (csNullmeshMeshObject* factory);
+  csNullmeshMeshObject (csNullmeshMeshObject* factory, iMeshObjectType* parent);
 
   /// Destructor.
   virtual ~csNullmeshMeshObject ();
@@ -189,6 +190,7 @@ public:
     virtual bool SupportsHardTransform () const { return false; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual iMeshObjectType* GetMeshObjectType () const { return scfParent->nullmesh_type; }
     virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;

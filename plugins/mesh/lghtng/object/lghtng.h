@@ -243,6 +243,7 @@ private:
   csVector3 origin;
   csVector3 directional;  
   iBase* logparent;  
+  iMeshObjectType* lghtng_type;
   csFlags flags;
 
   void CalculateFractal (int left, int right, float lh, float rh, int xyz,
@@ -251,7 +252,7 @@ private:
 
 public:
   /// Constructor.
-  csLightningMeshObjectFactory (iBase *pParent,
+  csLightningMeshObjectFactory (iMeshObjectType *pParent,
   	iObjectRegistry *object_registry);
   /// Destructor.
   virtual ~csLightningMeshObjectFactory ();
@@ -285,6 +286,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return lghtng_type; }
   virtual void NextFrame (csTicks CurrentTime);
   virtual void Invalidate ()
   {     

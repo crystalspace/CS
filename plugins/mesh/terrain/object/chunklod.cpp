@@ -102,7 +102,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainFactory::eiTerrainFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p, 
-	iObjectRegistry* objreg) : parent (p), object_reg (objreg)
+	iObjectRegistry* objreg) : parent (p), object_reg (objreg), chunklod_type(p)
 {
   SCF_CONSTRUCT_IBASE (p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)

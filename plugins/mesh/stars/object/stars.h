@@ -243,11 +243,12 @@ class csStarsMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   iBase* logparent;
+  iMeshObjectType* stars_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csStarsMeshObjectFactory (iBase *pParent);
+  csStarsMeshObjectFactory (iMeshObjectType* pParent);
 
   /// Destructor.
   virtual ~csStarsMeshObjectFactory ();
@@ -262,6 +263,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return stars_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 

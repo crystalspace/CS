@@ -270,11 +270,12 @@ class csExploMeshObjectFactory : public iMeshObjectFactory
 private:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iMeshObjectType* explo_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csExploMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csExploMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csExploMeshObjectFactory ();
@@ -289,6 +290,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return explo_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 

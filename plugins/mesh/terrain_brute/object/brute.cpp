@@ -1257,13 +1257,14 @@ SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
-csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg)
+csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg, iMeshObjectType* parent)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiTerrainFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiObjectModel);
   csTerrainFactory::object_reg = object_reg;
   logparent = 0;
+  brute_type = parent;
 				
   /*terraformer = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
@@ -1327,6 +1328,6 @@ csTerrainObjectType::~csTerrainObjectType ()
 
 csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()
 {
-  csTerrainFactory *pFactory = new csTerrainFactory (object_reg);
+  csTerrainFactory *pFactory = new csTerrainFactory (object_reg, this);
   return csPtr<iMeshObjectFactory> (pFactory);
 }

@@ -290,6 +290,7 @@ private:
   /// Material handle as returned by iTextureManager.
   csRef<iMaterialWrapper> cstxt;
   iBase* logparent;
+  iMeshObjectType* spr3d_type;
 
   /// Cache name for caching sprite specific data.
   char* cachename;
@@ -391,7 +392,7 @@ public:
 
 public:
   /// Create the sprite template.
-  csSprite3DMeshObjectFactory (iBase *pParent);
+  csSprite3DMeshObjectFactory (iMeshObjectType* pParent);
   /// Destroy the template.
   virtual ~csSprite3DMeshObjectFactory ();
 
@@ -630,6 +631,7 @@ public:
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

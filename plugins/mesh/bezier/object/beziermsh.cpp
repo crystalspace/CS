@@ -187,6 +187,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   last_thing_id++;
   thing_id = last_thing_id;
   logparent = 0;
+  beziermsh_type = thing_type;
 
   dynamic_ambient.Set (0,0,0);
   light_version = 1;

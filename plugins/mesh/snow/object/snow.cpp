@@ -156,11 +156,12 @@ SCF_IMPLEMENT_IBASE (csSnowMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iObjectRegistry* s)
+csSnowMeshObjectFactory::csSnowMeshObjectFactory (iMeshObjectType* p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
   logparent = 0;
+  snow_type = p;
 }
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()

@@ -1020,12 +1020,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iObjectRegistry* s)
+csEmitMeshObjectFactory::csEmitMeshObjectFactory (iMeshObjectType *p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
   object_reg = s;
   logparent = 0;
+  emit_type = p;
 }
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()

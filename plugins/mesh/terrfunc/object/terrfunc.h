@@ -733,13 +733,14 @@ class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
 private:
   iBase* logparent;
+  iMeshObjectType* terrfunc_type;
   csFlags flags;
 
 public:
   iObjectRegistry *object_reg;
 
   /// Constructor.
-  csTerrFuncObjectFactory (iObjectRegistry* object_reg);
+  csTerrFuncObjectFactory (iObjectRegistry* object_reg, iMeshObjectType* terrfunc_type);
 
   /// Destructor.
   virtual ~csTerrFuncObjectFactory ();
@@ -753,6 +754,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return terrfunc_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 

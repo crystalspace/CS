@@ -146,6 +146,8 @@ private:
 
   /// Material handle as returned by iTextureManager.
   iBase* logparent;
+  
+  iMeshObjectType* sprcal3d_type;
 
   /// If true then this factory has been initialized.
   bool initialized;
@@ -180,7 +182,7 @@ public:
     index_name;
 
   /// Create the sprite template.
-  csSpriteCal3DMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
 
@@ -246,6 +248,7 @@ public:
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return sprcal3d_type; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
 

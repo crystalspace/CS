@@ -138,11 +138,12 @@ SCF_IMPLEMENT_IBASE (csExploMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p,
+csExploMeshObjectFactory::csExploMeshObjectFactory (iMeshObjectType *p,
 	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   logparent = 0;
+  explo_type = p;
   object_reg = s;
 }
 

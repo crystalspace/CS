@@ -2084,7 +2084,8 @@ SCF_IMPLEMENT_IBASE (csTerrFuncObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg)
+csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg,
+                                                  iMeshObjectType* terrfunc_type)
 {
   SCF_CONSTRUCT_IBASE (0);
   csTerrFuncObjectFactory::object_reg = object_reg;
@@ -2130,7 +2131,7 @@ csTerrFuncObjectType::~csTerrFuncObjectType ()
 
 csPtr<iMeshObjectFactory> csTerrFuncObjectType::NewFactory()
 {
-  csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (object_reg);
+  csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (object_reg, this);
   return csPtr<iMeshObjectFactory> (pFactory);
 }
 

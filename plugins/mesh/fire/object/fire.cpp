@@ -265,10 +265,11 @@ SCF_IMPLEMENT_IBASE (csFireMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iObjectRegistry* s)
+csFireMeshObjectFactory::csFireMeshObjectFactory(iMeshObjectType* b, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (b);
   logparent = 0;
+  fire_type= b;
   object_reg = s;
 }
 

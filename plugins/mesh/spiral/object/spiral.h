@@ -189,11 +189,12 @@ class csSpiralMeshObjectFactory : public iMeshObjectFactory
 private:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iMeshObjectType* spiral_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csSpiralMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csSpiralMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectFactory ();
@@ -208,6 +209,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return spiral_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 

@@ -188,12 +188,13 @@ SCF_IMPLEMENT_IBASE (csSpiralMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *p,
+csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iMeshObjectType* p,
 	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
   logparent = 0;
+  spiral_type = p;
 }
 
 csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()

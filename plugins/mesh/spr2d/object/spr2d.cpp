@@ -982,7 +982,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObjectFactory::Sprite2DFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iSprite2DFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent,
+csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
 	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -991,6 +991,7 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent,
   MixMode = 0;
   lighting = true;
   logparent = 0;
+  spr2d_type = pParent;
   csSprite2DMeshObjectFactory::object_reg = object_reg;
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

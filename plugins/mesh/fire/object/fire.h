@@ -264,11 +264,12 @@ class csFireMeshObjectFactory : public iMeshObjectFactory
 private:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  iMeshObjectType* fire_type;
   csFlags flags;
 
 public:
   /// Constructor.
-  csFireMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
+  csFireMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csFireMeshObjectFactory ();
@@ -283,6 +284,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return fire_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
