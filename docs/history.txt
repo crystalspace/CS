@@ -18,6 +18,9 @@ The history order is reversed so that new features are at the top.
 	  the same name.
 	- res fixed a copy'n'paste bug in the rain mesh object, pointed out
 	  by Jochen Mönch <powermonk@users.sourceforge.net>
+	- Eric Sunshine fixed bug in msvcgen.pl where the prefixes specified
+	  via --strip-paths were not being applied to the value of the
+	  %metafile% pseudo-variable.
 5-Jul-2003
         - Boyan removed circular reference between ds3d render and listener
           which prevent to unload ds3d plugin.

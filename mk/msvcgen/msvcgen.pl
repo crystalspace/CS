@@ -667,6 +667,23 @@ sub process_option_aliases {
 }
 
 #------------------------------------------------------------------------------
+# Massage paths from the command-line by stripping roots specified via
+# --strip-root and by translating forward slashes to backward slashes.
+#------------------------------------------------------------------------------
+sub massage_paths {
+    my @infiles = @_;
+    my @files;
+    foreach my $file (@infiles) {
+	$file =~ tr:/:\\:;
+	foreach my $root (@main::opt_strip_root) {
+	    last if $file =~ s/^$root//;
+	}
+	push(@files, $file);
+    }
+    return @files;
+}
+
+#------------------------------------------------------------------------------
 # Process DSP/VCPROJ project command-line options.
 #------------------------------------------------------------------------------
 sub process_project_options {
@@ -708,20 +725,10 @@ sub process_project_options {
     }
     @main::opt_strip_root = @roots;
 
-    my @infiles = @ARGV;
-    push(@infiles, $main::opt_meta_file)
-	if ($main::opt_meta_file && !grep(/$main::opt_meta_file/, @infiles));
-    $main::opt_meta_file =~ tr:/:\\:;
-
-    my @files;
-    my $file;
-    foreach $file (@infiles) {
-	$file =~ tr:/:\\:;
-	foreach $root (@main::opt_strip_root) {
-	    last if $file =~ s/^$root//;
-	}
-	push(@files, $file);
-    }
+    my @files = massage_paths(@ARGV);
+    ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
+    push(@files, $main::opt_meta_file)
+	if ($main::opt_meta_file && !grep(/$main::opt_meta_file/, @files));
 
     my $default_type = '';
     my $type;
