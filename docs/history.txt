@@ -23,6 +23,13 @@ Short-term cleanups that need to be done:
 	- Moved all remaining public include files from libs to include
 	  (csgame, csgfxldr, csscript, csws, cssys, csparser, and
 	  cssndldr).
+	- Large change from Andrew Zabolotny so that all system dependent
+	  compile flags are stored in include/volatile.h instead of
+	  as flags of the compiler. This will make it easier in the future
+	  to distribute binary distributions of CS (i.e. 'make install').
+	- Patches to makefiles for NextStep, OpenStep from Eric Sunshine.
+	- I prepared the first steps towards full sprite lighting support.
+	  It is not finished yet.
 15-Jul-99:
 	- Added support for multi-sector sprites. Also simplified the
 	  rendering process through portals a bit.

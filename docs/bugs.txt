@@ -21,7 +21,9 @@ startup room in large.zip. But it's pretty hard to find)
 SOLUTION: I think projecting code should be revisited to change it's
 operation when Z-value of polygon vertices is very little. Maybe bug in
 the clipper. (mrsigma@surrey.quik.com)
-DIFFICULTY: moderate to hard -- to solvers, I have a coord file
+DIFFICULTY: Jorrit: solved more or less by reducing SMALL_Z from 0.1 to 0.01.
+This will not avoid the problem completely but the chance of it occuring
+will be very small now.
 
 PROBLEM: Turn on 'freelook' and look around in mirror.zip. After some time
 CS will crash while trying to draw a polygon.
