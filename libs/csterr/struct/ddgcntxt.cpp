@@ -287,6 +287,7 @@ ddgInside ddgContext::clip( ddgBBox3 *bbox)
 		return _rootHull.clip(bbox);
 }
 
+
 void ddgContext::extractPlanes( ddgPlane3 planes[6])
 {
 	ddgVector3 *p = _control->position();
@@ -294,7 +295,6 @@ void ddgContext::extractPlanes( ddgPlane3 planes[6])
 	float snear = _clipbox.cornerz(0), sfar = _clipbox.cornerz(7);
 	// Derive 8 world space coords which represent the viewing frustrum.
 	// visible from the camera.
-	ddgVector3 c[8];
 	// Right
 	ddgVector3 r = _right;
 	r.multiply(_tanHalfFOV*_aspect);
@@ -312,19 +312,19 @@ void ddgContext::extractPlanes( ddgPlane3 planes[6])
 	pn = p+n;
 	pf = p+f;
 	t = u - r; t.multiply(snear);
-	c[0] = pn + t;	// Near Top Left
-	c[3] = pn - t;	// Near Bottom Right
+	fc[0] = pn + t;	// Near Top Left
+	fc[3] = pn - t;	// Near Bottom Right
 	t = u + r; t.multiply(snear);
-	c[1] = pn + t;	// Near Top Right
-	c[2] = pn - t;	// Near Bottom Left
+	fc[1] = pn + t;	// Near Top Right
+	fc[2] = pn - t;	// Near Bottom Left
 	
 	t = u - r; t.multiply(sfar);
-	c[4] = pf + t;	// Far Top Left
-	c[7] = pf - t;	// Far Bottom Right
+	fc[4] = pf + t;	// Far Top Left
+	fc[7] = pf - t;	// Far Bottom Right
 
 	t = u + r; t.multiply(sfar);
-	c[5] = pf + t;	// Far Top Right
-	c[6] = pf - t;	// Far Bottom Left
+	fc[5] = pf + t;	// Far Top Right
+	fc[6] = pf - t;	// Far Bottom Left
 	// Find the plane vectors for each side of the frustrum.
 
 	ddgVector3 pnormal, v1, v2;
@@ -334,8 +334,8 @@ void ddgContext::extractPlanes( ddgPlane3 planes[6])
 	int pv[6][3] = { {4,0,2}, {1,5,7}, {2,3,7}, {4,5,1}, {0,1,3}, {5,4,6} };
 	for (i = 0; i < 6; i++)
 	{
-		v1 = c[pv[i][1]] - c[pv[i][0]];
-		v2 = c[pv[i][2]] - c[pv[i][0]];
+		v1 = fc[pv[i][1]] - fc[pv[i][0]];
+		v2 = fc[pv[i][2]] - fc[pv[i][0]];
 		pnormal.cross(&v1 , &v2);
 		planes[i].set(pnormal,-1 * pnormal.dot(p));
 		planes[i].normalize();

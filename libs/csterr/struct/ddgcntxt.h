@@ -86,6 +86,8 @@ private:
 	/// Is the view nearly level.
 	bool				_levelView;
 public:
+	/// Frustrum corner points.
+	ddgVector3			fc[8];
 	/** 
      *  Constructor.
 	 */
