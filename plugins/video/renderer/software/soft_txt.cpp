@@ -24,6 +24,7 @@
 #include "csgfx/inv_cmap.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
+#include "csutil/debug.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -237,6 +238,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       if (destroy_image)
       {
 	// Very well, we don't need the iImage anymore, so free it
+	DG_UNLINK (t, t->image);
 	t->image->DecRef ();
 	t->image = NULL;
       }
@@ -353,6 +355,7 @@ void csTextureHandleSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware
       *dst = Scan.inv_cmap [txtmgr->encode_rgb(src->red, src->green, src->blue)];
   }
   // we have really finished with the image now
+  DG_UNLINK (t, t->image);
   t->image->DecRef ();
   t->image = NULL;
 

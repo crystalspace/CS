@@ -26,6 +26,7 @@
 #include "csgfx/csimage.h"
 #include "csgfx/quantize.h"
 #include "csutil/util.h"
+#include "csutil/debug.h"
 
 //---------------------- Helper functions ---------------------------
 
@@ -141,6 +142,8 @@ SCF_IMPLEMENT_IBASE_END
 csImageFile::csImageFile (int iFormat)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csImageFile");
   Image = NULL;
   Palette = NULL;
   fName = NULL;
@@ -156,6 +159,7 @@ csImageFile::~csImageFile ()
 {
   FreeImage ();
   delete [] fName;
+  DG_REM (this);
 }
 
 int csImageFile::GetWidth ()

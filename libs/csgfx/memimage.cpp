@@ -19,11 +19,13 @@
 #include "cssysdef.h"
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/debug.h"
 
 csImageMemory::csImageMemory (int width, int height)
   : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
   Image = (void*) new csRGBpixel[Width*Height];
@@ -35,6 +37,7 @@ csImageMemory::csImageMemory (int width, int height, csRGBpixel *buffer, bool de
   : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
   Image = buffer;

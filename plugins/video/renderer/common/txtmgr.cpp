@@ -54,6 +54,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   DG_TYPE (this, "csTextureHandle");
 
   (image = Image)->IncRef ();
+  DG_LINK (this, image);
   flags = Flags;
 
   tex [0] = tex [1] = tex [2] = tex [3] = NULL;
@@ -88,6 +89,7 @@ csTextureHandle::~csTextureHandle ()
 void csTextureHandle::FreeImage ()
 {
   if (!image) return;
+  DG_UNLINK (this, image);
   image->DecRef ();
   image = NULL;
 }
@@ -109,9 +111,13 @@ void csTextureHandle::CreateMipmaps ()
     }
   }
 
+  // @@@ Jorrit: removed the following IncRef() because I can really
+  // see no reason for it and it seems to be causing memory leaks.
+#if 0
   // Increment reference counter on image since NewTexture() expects
   // a image with an already incremented reference counter
   image->IncRef ();
+#endif
   tex [0] = NewTexture (image);
   DG_LINK (this, tex[0]);
 

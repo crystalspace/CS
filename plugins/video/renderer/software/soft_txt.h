@@ -20,6 +20,7 @@
 #ifndef __SOFT_TXT_H__
 #define __SOFT_TXT_H__
 
+#include "csutil/debug.h"
 #include "video/renderer/common/txtmgr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
@@ -111,7 +112,8 @@ public:
     bitmap = NULL;
     alphamap = NULL;
     image = Image;
-    if (image) image->IncRef ();
+    DG_LINK (this, image);
+    image->IncRef ();
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();

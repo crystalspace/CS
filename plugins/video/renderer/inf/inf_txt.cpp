@@ -23,6 +23,7 @@
 #include "inf_txt.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
+#include "csutil/debug.h"
 #include "igraphic/image.h"
 
 //-------------------------------------------------------- csTextureHandleInfinite ---//
@@ -76,6 +77,7 @@ void csTextureHandleInfinite::ComputeMeanColor ()
         t->get_size (), t->bitmap, tc);
 
       // Very well. Now we don'tex need the iImage anymore, so free it
+      DG_UNLINK (t, t->image);
       t->image->DecRef ();
       t->image = NULL;
     }
