@@ -54,7 +54,7 @@ struct iSCF:public iBase
 int MakeVersion(int version0, int version1, int version2);
 
 //***** Classes
-class csVector
+class csVector3
 {
 public:
   float x,y,z;

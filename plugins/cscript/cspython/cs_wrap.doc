@@ -176,15 +176,7 @@ self.y
 self.z
 
 csVector3(x,y,z)
-        
-        addmethods {
-         char *__str__() {
-           static char temp[256];
-           sprintf(temp,"[ %g, %g, %g ]", self->x, self->y, self->z);
-           return temp;
-         }
-          
-        
+
 1.4.  class csRGBpixel
 ----------------------
 
@@ -238,9 +230,9 @@ DrawPolygon(poly)
 DrawPolygonDebug(poly)
 
 DrawLine(v1,v2,fov,color)
-         void StartPolygonFX (iTextureHandle* handle, UInt mode);
-         void FinishPolygonFX ();
-         void DrawPolygonFX (G3DPolygonDPFX& poly);
+        oid StartPolygonFX (iTextureHandle* handle, UInt mode);
+        oid FinishPolygonFX ();
+        oid DrawPolygonFX (G3DPolygonDPFX& poly);
         
 DrawTriangleMesh(mesh)
 
@@ -251,8 +243,8 @@ OpenFogObject(id,fog)
 DrawFogPolygon(id,poly,fogtype)
 
 CloseFogObject(id)
-         bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
-         long GetRenderState (G3D_RENDERSTATEOPTION op);
+        ool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
+        ong GetRenderState (G3D_RENDERSTATEOPTION op);
         
 GetCaps()
 
@@ -344,8 +336,8 @@ GetLightMap()
 GetMaterialHandle()
 
 SetMaterial(material)
-         iPolygonTexture *GetTexture ();
-         iTextureHandle *GetTextureHandle ();
+        PolygonTexture *GetTexture ();
+        TextureHandle *GetTextureHandle ();
         
 GetVertexCount()
 
@@ -429,7 +421,7 @@ GetTextureFormat()
 ----------------------------
 
 GetMaterialHandle()
-         iTextureHandle *GetTextureHandle ();
+        TextureHandle *GetTextureHandle ();
         
 GetFDU()
 
@@ -466,7 +458,7 @@ GetCacheData(idx)
 SetCacheData(idx,d)
 
 1.16.  class iEngine
--------------------
+--------------------
 
 GetTextureFormat()
 

@@ -10,6 +10,8 @@ The history order has been reversed so that new features are at the top.
 	      block object.
 	    - Changed the room to be a cube of 10 units each side centred
 	      on the origin.
+	- Fixed a bug in cs.i for python. Eric Sunshine accidently removed
+	  the essential '3' after csVector3 :-)
 7-Dec-2000
 	- Wouter Wijngaards made the fire polygon unlit in ptlab. This
 	  looks better.
