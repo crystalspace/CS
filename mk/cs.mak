@@ -197,7 +197,7 @@ clean:
 ifneq ($(strip $(OUTDLL)),)
 	-$(RMDIR) $(patsubst %/,%,$(OUTDLL))
 endif
-	-$(RM) debug.txt precalc.zip
+	-$(RM) $(wildcard *.txt) precalc.zip
 
 cleanlib:
 

@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  versions of sed which do not understand alternation (`|').
 	- Eric Sunshine fixed several problems with dddraw.mak after recent
 	  changes caused it to stop working.
+	- Eric Sunshine fixed the "clean" target so that it removes all of
+	  those annoying debug .txt files.
 5-Aug-2002
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow
