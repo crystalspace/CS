@@ -375,6 +375,9 @@ public:
   virtual bool ConfigSave ();
   /// Put a keyboard event into event queue 
   virtual void QueueKeyEvent (int iKeyCode, bool iDown);
+  /// Put an extended keyboard event into event queue ( keycode is not translated in any way, thus
+  /// the caller must take care to calculate the right code )
+  virtual void QueueExtendedKeyEvent (int iKeyCode, int iKeyCodeTranslated, bool iDown);
   /// Put a mouse event into event queue 
   virtual void QueueMouseEvent (int iButton, bool iDown, int x, int y);
   /// Put a joystick event into event queue

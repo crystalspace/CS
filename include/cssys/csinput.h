@@ -67,6 +67,9 @@ public:
   /// Call this routine to add a key down/up event to queue
   void do_key (int key, bool down);
 
+  /// Call this routine to add an extended key down/up event to queue
+  void do_key_extended (int key, int translatedkey, bool down);
+
   /**
    * Query the state of a key. All key codes in range 0..255,
    * CSKEY_FIRST..CSKEY_LAST are supported. Returns true if
