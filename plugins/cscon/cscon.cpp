@@ -124,7 +124,7 @@ void csConsole::SetBufferSize (int lines)
   buffer->SetLength (lines);
 }
 
-void csConsole::PutText (int iMode, const char *text)
+void csConsole::PutText (int /*iMode*/, const char *text)
 {
   int i;
   csString *curline = NULL;

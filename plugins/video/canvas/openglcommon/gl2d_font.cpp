@@ -237,7 +237,8 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, int bg, const char *text
   if (!text || !*text) return;
 
   GLGlyph *glyphs = mFont_Information_Array [Font]->glyphs;
-  GLuint hLastTexture, hTexture = glyphs[*text].hTexture;
+  GLuint hLastTexture = 0;
+  GLuint hTexture     = glyphs[*text].hTexture;
   
   glPushMatrix();
   glTranslatef (x, y, 0);

@@ -67,7 +67,7 @@ public:
    * The graphics driver should be in 3D draw mode.
    */
   virtual void Draw3D (csRect *oRect = NULL)
-  { }
+  {(void) oRect;}
 
   /**
    * Clear console. If wipe = false, it just moves the top line to the

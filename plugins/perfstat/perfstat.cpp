@@ -465,6 +465,8 @@ void csPerfStats::WriteFrameHeader ()
 
 bool csPerfStats::WriteFile ()
 {
+  int i;
+
   if (!statvec)
     return false;
 
@@ -480,7 +482,7 @@ bool csPerfStats::WriteFile ()
   // subtract end of file characters
   total_len -= statvec_num;
 
-  int framevec_num;
+  int framevec_num=0;
   char *f_buf = NULL;
   int f_buf_len;
 
