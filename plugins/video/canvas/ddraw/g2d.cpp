@@ -675,9 +675,14 @@ void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DDDraw3::SetMouseCursor (int iShape, csTextureHandle* iBitmap)
+bool csGraphics2DDDraw3::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
 {
-  (void)iBitmap;
+  (void)hBitmap;
+
+  return false; //the code below needs more work on the general Win32 files, 
+                //but just returning false will give us a working MazeD for now
+
+/*
   switch(iShape)
   {
     case csmcNone: SetCursor(NULL); break;
@@ -691,7 +696,7 @@ bool csGraphics2DDDraw3::SetMouseCursor (int iShape, csTextureHandle* iBitmap)
     case csmcWait: SetCursor(LoadCursor (NULL, IDC_WAIT)); break;
     default: return false;
   }
-  return true;
+  return true;*/
 }
 
 bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
