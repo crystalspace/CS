@@ -1,6 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
 30-Aug-2000
+     	- Andrew Zabolotny:
+	    - Some fixes to MazeD. Now it works, but is unusabled due to
+	      some #if 0's I had to insert here and there. There are lots
+	      of changes to be done before MazeD will become useable again.
+	    - Transformed LibPath vector back into a static variable.
+	      I think the problem with unix/loadlib.cpp is solved now,
+	      I have removed the *real* source of problems, I believe. I
+	      hate half-solutions.
+	    - Fixed the problem with multiple similar errors popping up
+	      when a shared library is missing. I have added the
+	      csPrintLibraryError() function which prints dlerror() or
+	      whatever. It is invoked once at the end of csFindLoadLibrary,
+	      if library loading has failed.
+	    - Added csHalo::Get/SetIntensity methods. To change halo
+	      intensity, do light->Halo->Set/GetIntensity (float).
 	- Removed csSprite::GetSector and GetSectors since that is now
 	  part of the csMovable. Forgot to do that yesterday.
 	- iCamera::GetAspect and GetInvAspect returned the wrong values
