@@ -889,18 +889,14 @@ void csWorld::PrepareSectors()
 }
 
 // If a STAT_BSP level the loader call to UpdateMove is redundant when called
-// before csWorld::Prepare(). Probably the same for the rest of the sprites too.
-void csWorld::PrepareParticleSystems ()
+// before csWorld::Prepare().
+void csWorld::PrepareSprites ()
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
   {
     csSprite* sp = (csSprite*)sprites[i];
-    if (sp->GetType () >= csParticleSystem::Type)
-    {
-      csParticleSystem* partsys = (csParticleSystem*)sp;
-      partsys->GetMovable ().UpdateMove ();
-    }
+    sp->GetMovable ().UpdateMove ();
   }
 }
 
@@ -908,7 +904,7 @@ bool csWorld::Prepare ()
 {
   PrepareTextures ();
   PrepareSectors ();
-  PrepareParticleSystems ();
+  PrepareSprites ();
   // The images are no longer needed by the 3D engine.
   iTextureManager *txtmgr = G3D->GetTextureManager ();
   txtmgr->FreeImages ();

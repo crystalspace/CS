@@ -502,6 +502,14 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
 
   if (num == 0)
   {
+    // The only reason we create a BSP tree here is to solve a
+    // bug related to sprite visibility. Previously when a sprite
+    // enters an octree node containing no polygons it would not
+    // be marked visible because that node contained no bsp tree
+    // to be used for marking the visibility stubs.
+    csBspTree* bsp;
+    bsp = new csBspTree (sector, mode);
+    node->SetMiniBsp (bsp);
     node->leaf = true;
     return;
   }

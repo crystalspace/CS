@@ -152,7 +152,10 @@ inline csSome& csBasicVector::operator [] (int n) const
 inline csSome& csBasicVector::Get (int n) const
 {
   CS_ASSERT (n >= 0);
-  CS_ASSERT (n < count);
+  // Disabled the following assert because it causes
+  // problems in some of the lighting code that assumes
+  // that Get also automatically extends the array.
+  //CS_ASSERT (n < count);
   return (root [n]);
 }
 

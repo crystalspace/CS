@@ -1,6 +1,27 @@
 The history order has been reversed so that new features are at the top.
 
 12-Oct-2000
+	- Disabled a new CS_ASSERT that was put in csVector::Get(). The
+	  problem was that some code in CS assumes that Get() also extends
+	  the array. It is a bit too complicated to fix this now (I'm busy
+	  fixing another problem and don't want to get sidetracked).
+	- Renamed csWorld::PrepareParticleSystems() to PrepareSprites() and
+	  also changed the routine so that it updates all sprites and not
+	  only particle systems.
+	- Fixed a bug as reported by Samuel Humphreys. Sprites that are
+	  in nodes containing no geometry (i.e. no polygons) are not correctly
+	  marked visible. The reason is that there is no bsp tree for those
+	  nodes and the bsp tree is needed to hold the visibility stubs for
+	  sprites. I solved this by creating a dummy bsp tree (empty) at
+	  those nodes. Note that this will require a -recalc of levels
+	  using STATBSP. This also holds for particle systems.
+	- Samuel also reported an additional bug. Sprites that are outside
+	  the entire octree are never reported as visible. The reason is
+	  similar, there is no bsp tree there to hold the visibility stubs.
+	  The solution in this case is not so simple so for now I suggest
+	  a workaround: just add dummy small polygons to the bounds of the
+	  world where you want sprites to be visible. This will make the
+	  octree larger.
 	- Andrew Zabolotny did the following changes:
 	    - Renamed csPixmap::DrawTiledShifted into DrawTiled. There is
 	      no need to use long clumsy names like

@@ -608,10 +608,11 @@ public:
   void PrepareSectors();
 
   /**
-   * Calls UpdateMove for all particle systems to initialise bsp bounding boxes
-   * when sector is in front to back mode.
+   * Calls UpdateMove for all sprites to initialise bsp bounding boxes.
+   * Call this after creating a BSP tree. csWorld::Prepare() will call
+   * this function automatically so you normally don't have to call it.
    */
-  void PrepareParticleSystems ();
+  void PrepareSprites ();
 
   /**
    * Calculate all lighting information. Normally you shouldn't call

@@ -277,6 +277,7 @@ public:
    */
   int CountPolygons ()
   {
+    if (!root) return 0;
     return ((csBspNode*)root)->CountPolygons ();
   }
 };
