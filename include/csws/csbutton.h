@@ -117,7 +117,7 @@ enum csButtonFrameStyle
 class csButton : public csComponent
 {
   // Button images in normal and pressed state
-  csSprite2D *ImageNormal, *ImagePressed;
+  csPixmap *ImageNormal, *ImagePressed;
   // Should images be automatically deleted?
   bool delImages;
   // Command code emmited when button is pressed
@@ -152,10 +152,10 @@ public:
    * If iDelete is true, bitmaps will be automatically deleted when they
    * will not be needed anymore (i.e. button disposal or another SetBitmap)
    */
-  void SetBitmap (csSprite2D *iNormal, csSprite2D *iPressed, bool iDelete = true);
+  void SetBitmap (csPixmap *iNormal, csPixmap *iPressed, bool iDelete = true);
 
   /// Query button bitmaps
-  void GetBitmap (csSprite2D **iNormal, csSprite2D **iPressed);
+  void GetBitmap (csPixmap **iNormal, csPixmap **iPressed);
 
   /// Delete image bitmaps if iDelete was true on SetBitmap
   void FreeBitmaps ();

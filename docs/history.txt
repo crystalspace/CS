@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 3-Mar-2000
+	- Jason Platt removed broken and unused SIMD detection
+	  routine from terrain engine.
+	- Renamed csSprite2D to csPixmap and renamed G2D->DrawSprite
+	  to G2D->DrawPixmap. This is to make room for a new csSprite2D
+	  that will be a real engine object and thus interact in a 3D
+	  world.
 	- Thomas Giesel <skoe@freenet.de> supplied a patch to enable true
 	  full-screen support by the BeOS OpenGL driver.
 	- Eric Sunshine updated the csPython plug-in so that it once again
@@ -45,6 +51,9 @@ Short-term cleanups that need to be done:
 	  So the DeleteAll() in the destructor will simply use the
 	  original FreeItem() causing nothing to be freed. This is a big
 	  memory leak right now which we will fix shortly.
+	- Thomas Hieber added a patch from Xavier Trochu <xtrochu@yahoo.com>:
+	  Proper hardware mousecursor on Win32, bugfix to not call
+	  obj->DecRef() if obj is NULL.
 1-Mar-2000
 	- Norman Kramer did some further code cleanup and preparing for
 	  alphamap handling (halos) in glide driver.

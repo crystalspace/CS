@@ -307,7 +307,7 @@ void csGraphics2DDDraw6::SecondaryInit()
     }
     
     _DrawPixel = DrawPixel16;   _WriteChar = WriteChar16;
-    _GetPixelAt = GetPixelAt16; _DrawSprite = DrawSprite16;
+    _GetPixelAt = GetPixelAt16; _DrawPixmap = DrawPixmap16;
     
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 2;
@@ -331,7 +331,7 @@ void csGraphics2DDDraw6::SecondaryInit()
     }
     */
     _DrawPixel = DrawPixel32;   _WriteChar = WriteChar32;
-    _GetPixelAt = GetPixelAt32; _DrawSprite = DrawSprite32;
+    _GetPixelAt = GetPixelAt32; _DrawPixmap = DrawPixmap32;
       
   RedMask = 0xff << 16;
   GreenMask = 0xff << 8;
@@ -780,7 +780,7 @@ void csGraphics2DDDraw6::SetFor3D(bool For3D)
   m_bUses3D = For3D;
 }
 
-void csGraphics2DDDraw6::DrawSprite8 (csGraphics2D *This, iTextureHandle *hTex, 
+void csGraphics2DDDraw6::DrawPixmap8 (csGraphics2D *This, iTextureHandle *hTex, 
                                       int sx, int sy, int sw, int sh,
                                       int tx, int ty, int tw, int th)
 {
@@ -796,11 +796,11 @@ void csGraphics2DDDraw6::DrawSprite8 (csGraphics2D *This, iTextureHandle *hTex,
   (void) th;
 }
 
-#define DRAWSPRITE_NAME DrawSprite16
+#define DRAWSPRITE_NAME DrawPixmap16
 #define DRAWSPRITE_PIXTYPE UShort
 #include "d3ddrawsprt.inc"
 
-#define DRAWSPRITE_NAME DrawSprite32
+#define DRAWSPRITE_NAME DrawPixmap32
 #define DRAWSPRITE_PIXTYPE ULong
 #include "d3ddrawsprt.inc"
 

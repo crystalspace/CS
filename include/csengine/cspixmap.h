@@ -1,5 +1,5 @@
 /*
-    Crystal Space 3D engine: 2D sprites
+    Crystal Space 3D engine: 2D pixmaps
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -26,58 +26,58 @@
 
 /**
  * This class is an simple set of inline routines good as an abstraction
- * for simple 2D sprites. Sprites can be drawn with a transparent key color
+ * for simple 2D sprites. Pixmaps can be drawn with a transparent key color
  * as well as without transparent color: all this depends on texture handle.
  */
-class csSprite2D : public csBase
+class csPixmap : public csBase
 {
 private:
   iTextureHandle *hTex;
   int tx, ty, tw, th;
 
 public:
-  /// Set new location of sprite image on texture
+  /// Set new location of pixmap image on texture
   void SetTextureRectangle (int x, int y, int w, int h)
   { tx = x; ty = y; tw = w; th = h; }
 
-  /// Initialize the sprite from a texture.
-  csSprite2D (iTextureHandle *hTexture, int x, int y, int w, int h)
+  /// Initialize the pixmap from a texture.
+  csPixmap (iTextureHandle *hTexture, int x, int y, int w, int h)
   {
     hTex = hTexture;
     SetTextureRectangle (x, y, w, h);
   }
 
-  /// Deinitialize the sprite
-  virtual ~csSprite2D ()
+  /// Deinitialize the pixmap
+  virtual ~csPixmap ()
   {
   }
 
-  /// Return true if sprite has been initialized okay
+  /// Return true if pixmap has been initialized okay
   bool ok ()
   { return hTex != NULL; }
 
-  /// Draw the sprite given the screen position and new size
+  /// Draw the pixmap given the screen position and new size
   virtual void Draw (iGraphics2D* g2d, int sx, int sy, int sw, int sh)
   {
     if (hTex)
-      g2d->DrawSprite (hTex, sx, sy, sw, sh, tx, ty, tw, th);
+      g2d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th);
   }
 
-  /// Draw the sprite without rescale
+  /// Draw the pixmap without rescale
   void Draw (iGraphics2D* g2d, int sx, int sy)
   { Draw (g2d, sx, sy, tw, th); }
 
-  /// Return sprite width
+  /// Return pixmap width
   int Width ()
   { return tw; }
-  /// Return sprite height
+  /// Return pixmap height
   int Height ()
   { return th; }
 
-  /// Change sprite texture handle
+  /// Change pixmap texture handle
   void SetTextureHandle (iTextureHandle *hTexture)
   { hTex = hTexture; }
-  /// Query sprite texture handle
+  /// Query pixmap texture handle
   iTextureHandle *GetTextureHandle ()
   { return hTex; }
 };

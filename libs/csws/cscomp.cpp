@@ -20,7 +20,7 @@
 #include <stddef.h>
 #include <ctype.h>
 #include "sysdef.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "qint.h"
@@ -1230,7 +1230,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Sprite2D (csSprite2D *s2d, int x, int y, int w, int h)
+void csComponent::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
 {
   if (!s2d)
     return;

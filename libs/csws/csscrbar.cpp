@@ -40,10 +40,10 @@
 
 #define SCROLLBAR_TEXTURE_NAME  "csws::ScrollBar"
 
-csSprite2D *csScrollBar::sprarrows[12] =
+csPixmap *csScrollBar::sprarrows[12] =
 { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
-csSprite2D *csScrollBar::sprscroller[2] =
+csPixmap *csScrollBar::sprscroller[2] =
 { NULL, NULL };
 
 static int scrbarref = 0;
@@ -62,9 +62,9 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     {
       iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
       for (int i = 0; i < 12; i++)
-        CHKB (sprarrows [i] = new csSprite2D (scrolltex, i * 9, 0, 9, 9));
-      CHK (sprscroller [0] = new csSprite2D (scrolltex, 12 * 9 + 0, 0, 7, 8));
-      CHK (sprscroller [1] = new csSprite2D (scrolltex, 12 * 9 + 7, 0, 8, 7));
+        CHKB (sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9));
+      CHK (sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8));
+      CHK (sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7));
     } /* endif */
   } /* endif */
 

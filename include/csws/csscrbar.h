@@ -119,9 +119,9 @@ class csScrollBar : public csComponent
   /// Length of active portion of scrollbar
   int activepixlen;
   /// Images of arrows
-  static csSprite2D *sprarrows[12];
+  static csPixmap *sprarrows[12];
   /// Image of scroller
-  static csSprite2D *sprscroller[2];
+  static csPixmap *sprscroller[2];
   /// Current scroll bar status
   csScrollBarStatus status;
 

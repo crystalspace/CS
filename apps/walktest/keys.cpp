@@ -37,7 +37,7 @@
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"

@@ -206,7 +206,7 @@ void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
   glPopMatrix ();
 }
 
-void csGraphics2DGLCommon::DrawSprite (iTextureHandle *hTex,
+void csGraphics2DGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
   // cache the texture if we haven't already.

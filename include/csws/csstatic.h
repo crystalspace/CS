@@ -80,7 +80,7 @@ enum
    * <b>NOTE</b>: We don't delete the old bitmap, because we assume
    * that if you're changing bitmaps, you're going to reuse them.
    * <pre>
-   * IN:  (csSprite2D *)iBitmap
+   * IN:  (csPixmap *)iBitmap
    * </pre>
    */
   cscmdStaticSetBitmap,
@@ -88,7 +88,7 @@ enum
    * Get static control bitmap handle
    * <pre>
    * IN:  nothing
-   * OUT: (csSprite2D *)iBitmap
+   * OUT: (csPixmap *)iBitmap
    * </pre>
    */
   cscmdStaticGetBitmap
@@ -116,7 +116,7 @@ protected:
   // Component to which this label is linked
   csComponent *link;
   // The bitmap (if style == csscsBitmap)
-  csSprite2D *Bitmap;
+  csPixmap *Bitmap;
   // Text alignment (for csscsText style)
   int TextAlignment;
   // Old keyboard and mouse owner
@@ -133,7 +133,7 @@ public:
   /// Create static component object without text (by default - a rectangle)
   csStatic (csComponent *iParent, csStaticStyle iStyle = csscsRectangle);
   /// Create static bitmap object
-  csStatic (csComponent *iParent, csSprite2D *iBitmap);
+  csStatic (csComponent *iParent, csPixmap *iBitmap);
 
   /// Destroy the static object
   virtual ~csStatic ();

@@ -48,7 +48,7 @@ class csListBoxItem : public csComponent
   /// Horizontal item offset in pixels
   int deltax;
   /// Listbox item image
-  csSprite2D *ItemBitmap;
+  csPixmap *ItemBitmap;
   /// Delete bitmap on object deletion?
   bool DeleteBitmap;
   /// Horizontal and vertical content offset
@@ -75,7 +75,7 @@ public:
   virtual void SuggestSize (int &w, int &h);
 
   /// Set listbox item image
-  void SetBitmap (csSprite2D *iBitmap, bool iDelete = true);
+  void SetBitmap (csPixmap *iBitmap, bool iDelete = true);
 
   /// Set content offset
   void SetOffset (int ihOffset, int ivOffset)

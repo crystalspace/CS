@@ -298,7 +298,7 @@ void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
   } /* endif */
 }
 
-void csGraphics2DGlideCommon::DrawSprite ( iTextureHandle *hTex,
+void csGraphics2DGlideCommon::DrawPixmap ( iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
   bool transp = hTex->GetTransparent ();

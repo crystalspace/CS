@@ -88,7 +88,7 @@ class csApp;
 #include "csinput/csevent.h"		// Event class
 #include "csinput/cseventq.h"		// Event Queue class
 #include "csinput/csinput.h"		// Keyboard codes
-#include "csengine/csspr2d.h"		// 2D sprites
+#include "csengine/cspixmap.h"		// 2D sprites
 #include "csgfxppl.h"			// Graphics pipeline
 #include "cskeyacc.h"			// Keyboard accelerator class
 #include "cscomp.h"			// Windowing System Component

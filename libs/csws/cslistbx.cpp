@@ -160,7 +160,7 @@ void csListBoxItem::SetState (int mask, bool enable)
   } /* endif */
 }
 
-void csListBoxItem::SetBitmap (csSprite2D *iBitmap, bool iDelete)
+void csListBoxItem::SetBitmap (csPixmap *iBitmap, bool iDelete)
 {
   if (ItemBitmap && DeleteBitmap)
     delete ItemBitmap;

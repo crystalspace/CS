@@ -44,7 +44,7 @@
 #include "csscript/intscri.h"
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
@@ -1392,7 +1392,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       int w, h;
       iTextureHandle* phTex = texh->GetTextureHandle();
       phTex->GetMipMapDimensions (0, w, h);
-      CHK (cslogo = new csSprite2D (phTex, 0, 0, w, h));
+      CHK (cslogo = new csPixmap (phTex, 0, 0, w, h));
     }
 
     // Look for the start sector in this world.

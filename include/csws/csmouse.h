@@ -22,7 +22,7 @@
 
 #include "cscomp.h"
 #include "itexture.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 
 /**
  * This class encapsulates mouse pointer
@@ -33,7 +33,7 @@ private:
   friend class csMouse;
 
   /// Cursor sprite
-  csSprite2D *Cursor;
+  csPixmap *Cursor;
   /// Texture X, Y, width, height, hotspot X and Y
   int tX, tY, tW, tH, hsX, hsY;
   /// Area under mouse cursor

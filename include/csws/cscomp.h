@@ -23,7 +23,7 @@
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
 #include "csutil/csobjvec.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 #include "cswspal.h"
 
 class csApp;
@@ -599,9 +599,9 @@ public:
   void Text (int x, int y, int fgindx, int bgindx, const char *s);
 
   /// Draw a (scaled) 2D sprite
-  void Sprite2D (csSprite2D *s2d, int x, int y, int w, int h);
+  void Sprite2D (csPixmap *s2d, int x, int y, int w, int h);
   /// Draw a (non-scaled) 2D sprite
-  void Sprite2D (csSprite2D *s2d, int x, int y)
+  void Sprite2D (csPixmap *s2d, int x, int y)
   { Sprite2D (s2d, x, y, s2d->Width (), s2d->Height ()); }
 
   /// Return the width of given text using currently selected font

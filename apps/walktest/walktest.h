@@ -33,7 +33,7 @@ class LanguageLayer;
 class csView;
 class csSoundData;
 class csWorld;
-class csSprite2D;
+class csPixmap;
 class csWireFrameCam;
 class PhysicsLibrary;
 class InfiniteMaze;
@@ -136,7 +136,7 @@ public:
   csView* view;
 
   /// A sprite to display the Crystal Space Logo
-  csSprite2D* cslogo;
+  csPixmap* cslogo;
 
   /// Our infinite maze object if used.
   InfiniteMaze* infinite_maze;

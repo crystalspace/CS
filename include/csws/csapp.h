@@ -242,7 +242,7 @@ public:
   { GfxPpl->Text (x, y, pplColor (fg), bg >= 0 ? pplColor (bg) : bg, Font, s); }
 
   /// Draw a (scaled) 2D sprite
-  void pplSprite2D (csSprite2D *s2d, int x, int y, int w, int h)
+  void pplSprite2D (csPixmap *s2d, int x, int y, int w, int h)
   { GfxPpl->Sprite2D (s2d, x, y, w, h); }
 
   /// Save a part of screen

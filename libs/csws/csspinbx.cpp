@@ -31,7 +31,7 @@
 // The pause between first click and autorepeat
 #define AUTO_SPIN_STARTINTERVAL		500
 
-static csSprite2D *sprspin [3] = { NULL, NULL, NULL };
+static csPixmap *sprspin [3] = { NULL, NULL, NULL };
 static int spinboxref = 0;
 
 inline int sqr(int x)
@@ -54,7 +54,7 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
     // If  images are not loaded, load them
     for (int i = 0; i < 3; i++)
       if (!sprspin [i])
-        CHKB (sprspin [i] = new csSprite2D (app->GetTexture (
+        CHKB (sprspin [i] = new csPixmap (app->GetTexture (
           SPINBOX_TEXTURE_NAME), i * 16, 0, 16, 16));
   } /* endif */
 }

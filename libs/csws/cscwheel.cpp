@@ -24,7 +24,7 @@
 #define COLORWHEEL_TEXTURE_NAME	"csws::ColorWheel"
 
 static int cwref = 0;
-static csSprite2D *cwspr = NULL;
+static csPixmap *cwspr = NULL;
 
 csColorWheel::csColorWheel (csComponent *iParent) : csStatic (iParent, csscsBitmap)
 {
@@ -35,7 +35,7 @@ csColorWheel::csColorWheel (csComponent *iParent) : csStatic (iParent, csscsBitm
   {
     // If color wheel image is not loaded, load it
     if (!cwspr)
-      CHKB (cwspr = new csSprite2D (app->GetTexture (
+      CHKB (cwspr = new csPixmap (app->GetTexture (
         COLORWHEEL_TEXTURE_NAME), 0, 0, 129, 129));
   } /* endif */
   Bitmap = cwspr;

@@ -135,7 +135,7 @@ bool SysGraphics2D::Open(const char *Title)
     DrawPixel = DrawPixel16;
     WriteChar = WriteChar16;
     GetPixelAt = GetPixelAt16;
-    DrawSprite = DrawSprite16;
+    DrawPixmap = DrawPixmap16;
   } /* endif */
 
   console_Enable (false);

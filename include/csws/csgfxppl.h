@@ -22,7 +22,7 @@
 
 #include "csutil/csbase.h"
 #include "csutil/csrect.h"
-#include "csengine/csspr2d.h"
+#include "csengine/cspixmap.h"
 #include "igraph3d.h"
 
 struct iGraphics2D;
@@ -95,7 +95,7 @@ private:
       } Text;
       struct
       {
-        csSprite2D *s2d;
+        csPixmap *s2d;
         int x, y, w, h;
       } Spr2D;
       struct
@@ -167,7 +167,7 @@ private:
   void Text (int x, int y, int fg, int bg, int font, const char *s);
 
   /// Draw a 2D sprite
-  void Sprite2D (csSprite2D *s2d, int x, int y, int w, int h);
+  void Sprite2D (csPixmap *s2d, int x, int y, int w, int h);
 
   /// Save a part of screen
   void SaveArea (csImageArea **Area, int x, int y, int w, int h);

@@ -188,7 +188,7 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand, char *iText,
 }
 
 csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
-  csSprite2D *bmpup, csSprite2D *bmpdn, csButtonFrameStyle iFrameStyle,
+  csPixmap *bmpup, csPixmap *bmpdn, csButtonFrameStyle iFrameStyle,
   int iButtonStyle)
 {
   CHK (csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
@@ -200,13 +200,13 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
   return but;
 }
 
-csSprite2D *NewBitmap (csApp *app, char *texturename, int tx, int ty,
+csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   int tw, int th)
 {
   iTextureHandle *tex = app->GetTexture (texturename);
-  csSprite2D *spr;
+  csPixmap *spr;
   if (tex)
-    CHKB (spr = new csSprite2D (tex, tx, ty, tw, th))
+    CHKB (spr = new csPixmap (tex, tx, ty, tw, th))
   else
     spr = NULL;
 
@@ -247,7 +247,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
     cswfs3D));
   CHK (csDialog *Dialog = new csDialog (MsgBox));
 
-  csSprite2D *img = NULL;
+  csPixmap *img = NULL;
   csStatic *bmp = NULL;
   switch (iFlags & CSMBS_TYPEMASK)
   {
@@ -552,7 +552,7 @@ public:
 
 #define CSFDI_PATHCOMPONENT 0x9999
 static int fdref = 0;
-static csSprite2D *fdspr[2] = { NULL, NULL };
+static csPixmap *fdspr[2] = { NULL, NULL };
 
 cspFileDialog::cspFileDialog (csComponent *iParent)
   : csDialog (iParent)
@@ -564,10 +564,10 @@ cspFileDialog::cspFileDialog (csComponent *iParent)
   {
     // If images are not loaded, load them
     if (!fdspr [0])
-      CHKB (fdspr [0] = new csSprite2D (app->GetTexture (
+      CHKB (fdspr [0] = new csPixmap (app->GetTexture (
         FILEDLG_TEXTURE_NAME), 0, 0, 16, 13));
     if (!fdspr [1])
-      CHKB (fdspr [1] = new csSprite2D (app->GetTexture (
+      CHKB (fdspr [1] = new csPixmap (app->GetTexture (
         FILEDLG_TEXTURE_NAME), 16, 0, 16, 13));
   } /* endif */
 }

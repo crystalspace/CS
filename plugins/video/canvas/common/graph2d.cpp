@@ -51,7 +51,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   _DrawPixel = DrawPixel8;
   _WriteChar = WriteChar8;
   _GetPixelAt = GetPixelAt8;
-  _DrawSprite = DrawSprite8;
+  _DrawPixmap = DrawPixmap8;
   // Mark all slots in palette as free
   for (int i = 0; i < 256; i++)
   {
@@ -303,15 +303,15 @@ void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
 #define WRITECHAR_PIXTYPE ULong
 #include "writechr.inc"
 
-#define DRAWSPRITE_NAME DrawSprite8
+#define DRAWSPRITE_NAME DrawPixmap8
 #define DRAWSPRITE_PIXTYPE UByte
 #include "drawsprt.inc"
 
-#define DRAWSPRITE_NAME DrawSprite16
+#define DRAWSPRITE_NAME DrawPixmap16
 #define DRAWSPRITE_PIXTYPE UShort
 #include "drawsprt.inc"
 
-#define DRAWSPRITE_NAME DrawSprite32
+#define DRAWSPRITE_NAME DrawPixmap32
 #define DRAWSPRITE_PIXTYPE ULong
 #include "drawsprt.inc"
 

@@ -296,7 +296,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 		_DrawPixel = DrawPixel32;
 		_WriteChar = WriteChar32;
 		_GetPixelAt = GetPixelAt32;
-		_DrawSprite = DrawSprite32;
+		_DrawPixmap = DrawPixmap32;
 	} else if ( Depth == 16 ) {
 		mColorTable = NULL;			// No color table needed
 		pfmt.PalEntries = 0;
@@ -309,7 +309,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 		_DrawPixel = DrawPixel16;
 		_WriteChar = WriteChar16;
 		_GetPixelAt = GetPixelAt16;
-		_DrawSprite = DrawSprite16;
+		_DrawPixmap = DrawPixmap16;
 	} else {
 		/*
 		 *	The 8 bit pixel data was filled in by csGraphics2D

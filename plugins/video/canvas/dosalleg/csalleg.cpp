@@ -137,13 +137,13 @@ bool csGraphics2DDOSAlleg::Open (char* Title)
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
-      _DrawSprite = DrawSprite16;
+      _DrawPixmap = DrawPixmap16;
       break;
     case 4:
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
-      _DrawSprite = DrawSprite32;
+      _DrawPixmap = DrawPixmap32;
       break;
     default:
       CsPrintf (MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");

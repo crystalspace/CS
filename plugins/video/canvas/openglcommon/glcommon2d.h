@@ -87,7 +87,7 @@ public:
   /// Write a single character
   virtual void WriteChar (int x, int y, int fg, int bg, char c);
   /// Draw a 2D sprite
-  virtual void DrawSprite (iTextureHandle *hTex, int sx, int sy,
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
 
   /// Figure out GL RGB color from a packed color format

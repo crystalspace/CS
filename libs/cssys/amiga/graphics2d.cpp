@@ -87,7 +87,7 @@ SysGraphics2D::SysGraphics2D(int argc, char* argv[]) : csGraphics2D()
 			DrawPixel = DrawPixel16;
 			WriteChar = WriteChar16;
 			GetPixelAt = GetPixelAt16;
-			DrawSprite = DrawSprite16;
+			DrawPixmap = DrawPixmap16;
 		}
 
 	}

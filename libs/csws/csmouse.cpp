@@ -75,7 +75,7 @@ void csMousePointer::Free ()
 void csMousePointer::SetTexture (iTextureHandle *tex)
 {
   CHK (delete Cursor);
-  CHK (Cursor = new csSprite2D (tex, tX, tY, tW, tH));
+  CHK (Cursor = new csPixmap (tex, tX, tY, tW, tH));
   if (!Cursor->ok ())
   {
     CHK (delete Cursor);

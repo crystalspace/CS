@@ -95,9 +95,9 @@ public:
 
 protected:
   /// Menu item 'checked' image
-  static csSprite2D *sprchecked;
+  static csPixmap *sprchecked;
   /// "Open submenu" arrow image
-  static csSprite2D *sprsubmenu;
+  static csPixmap *sprsubmenu;
 
   /// Common part of constructors
   void Init ();

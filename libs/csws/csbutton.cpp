@@ -46,7 +46,7 @@ csButton::~csButton ()
   FreeBitmaps ();
 }
 
-void csButton::SetBitmap (csSprite2D *iNormal, csSprite2D *iPressed,
+void csButton::SetBitmap (csPixmap *iNormal, csPixmap *iPressed,
   bool iDelete)
 {
   FreeBitmaps ();
@@ -59,7 +59,7 @@ void csButton::SetBitmap (csSprite2D *iNormal, csSprite2D *iPressed,
   Invalidate ();
 }
 
-void csButton::GetBitmap (csSprite2D **iNormal, csSprite2D **iPressed)
+void csButton::GetBitmap (csPixmap **iNormal, csPixmap **iPressed)
 {
   if (iNormal)
     *iNormal = ImageNormal;
@@ -174,7 +174,7 @@ void csButton::Draw ()
 
   // Calculate image position
   int imgx = 0, imgy = 0, imgw = 0, imgh = 0;
-  csSprite2D *img = Pressed ? ImagePressed : ImageNormal;
+  csPixmap *img = Pressed ? ImagePressed : ImageNormal;
   if (img)
   {
     imgw = img->Width (); imgh = img->Height ();

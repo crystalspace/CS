@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-    The DrawSprite routine in a separate include file
+    The DrawPixmap routine in a separate include file
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,13 +18,13 @@
 */
 
 /*
-    This is the generalized DrawSpriteXX routine. Since the only difference
-    between DrawSprite routines was the datatype of a pixel, the former three
+    This is the generalized DrawPixmapXX routine. Since the only difference
+    between DrawPixmap routines was the datatype of a pixel, the former three
     different routines have been unified into a single file.
 
     Before including this file you should define the following macros:
 
-    DRAWSPRITE_NAME - The name of routine (DrawSprite8 etc).
+    DRAWSPRITE_NAME - The name of routine (DrawPixmap8 etc).
     DRAWSPRITE_PIXTYPE - The type of a pixel (UByte, UShort, ULong)
 */
 

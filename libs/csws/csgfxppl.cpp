@@ -115,7 +115,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const cha
   CHK (pe->Text.string = strnew (s));
 }
 
-void csGraphicsPipeline::Sprite2D (csSprite2D *s2d, int x, int y, int w, int h)
+void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
 {
   csPipeEntry *pe = AllocOp (pipeopSPR2D);
   if (!pe) return;

@@ -39,7 +39,7 @@ csStatic::csStatic (csComponent *iParent, csStaticStyle iStyle)
   SetSuggestedSize (0, 0);
 }
 
-csStatic::csStatic (csComponent *iParent, csSprite2D *iBitmap)
+csStatic::csStatic (csComponent *iParent, csPixmap *iBitmap)
   : csComponent (iParent)
 {
   Init (csscsBitmap);
@@ -152,7 +152,7 @@ bool csStatic::HandleEvent (csEvent &Event)
         case cscmdStaticSetBitmap:
           if (style == csscsBitmap)
           {
-            Bitmap = (csSprite2D *)Event.Command.Info;
+            Bitmap = (csPixmap *)Event.Command.Info;
             Event.Command.Info = NULL;
             Invalidate ();
           }

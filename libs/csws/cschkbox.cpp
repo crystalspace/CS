@@ -63,10 +63,10 @@ void csCheckBox::SetButtBitmap (char *id_n, char *id_p)
 {
   int tx,ty,tw,th;
   FindCFGBitmap (app->System, *(app->dialogdefs), id_n, &tx, &ty, &tw, &th);
-  CHK (csSprite2D *bmpn = new csSprite2D (app->GetTexture (
+  CHK (csPixmap *bmpn = new csPixmap (app->GetTexture (
     CHECKBOX_TEXTURE_NAME), tx, ty, tw, th));
   FindCFGBitmap (app->System, *(app->dialogdefs), id_p, &tx, &ty, &tw, &th);
-  CHK (csSprite2D *bmpp = new csSprite2D (app->GetTexture (
+  CHK (csPixmap *bmpp = new csPixmap (app->GetTexture (
     CHECKBOX_TEXTURE_NAME), tx, ty, tw, th));
   SetBitmap (bmpn, bmpp);
 }

@@ -35,8 +35,8 @@
 // Amount of space for \t character in menu items
 #define MENUITEM_TABSPACE       20
 
-csSprite2D *csMenuItem::sprchecked = NULL;
-csSprite2D *csMenuItem::sprsubmenu = NULL;
+csPixmap *csMenuItem::sprchecked = NULL;
+csPixmap *csMenuItem::sprsubmenu = NULL;
 static int menuitemref = 0;
 
 csMenuItem::csMenuItem (csComponent *iParent, char *iText, int iCommandCode,
@@ -84,10 +84,10 @@ void csMenuItem::Init ()
   {
     // If  'checked' and 'submenu' images are not loaded, load them
     if (!sprchecked)
-      CHKB (sprchecked = new csSprite2D (app->GetTexture (
+      CHKB (sprchecked = new csPixmap (app->GetTexture (
         MENU_TEXTURE_NAME), 0, 0, 9, 9));
     if (!sprsubmenu)
-      CHKB (sprsubmenu = new csSprite2D (app->GetTexture (
+      CHKB (sprsubmenu = new csPixmap (app->GetTexture (
         MENU_TEXTURE_NAME), 9, 0, 9, 9));
   } /* endif */
 }

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-    The DrawSprite routine in a separate include file
+    The DrawPixmap routine in a separate include file
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
