@@ -15,6 +15,9 @@ chronological order.
 	    - or_lighting* shaders have been renamed std-lighting*
 	    - the "OR compatibility" shadertype in the default renderloop is now
 	      "standard"
+        - Philip Wyett fixed a compile error with software renderer.
+	- Philip Wyett removed 'vbufmgr.h' refererence from cspace.i.
+
 12-Dec-2004
 	- Eric Sunshine worked around problem in csjava caused by new operator
 	  overrides in csColor and csColor4. Although modern C++ can deal with
