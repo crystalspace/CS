@@ -43,6 +43,9 @@ chronological order.
 	  of single polygon drawing.
 	- Eric Sunshine removed 8-bit character from csjoywin.h, csjoylin.h,
 	  and csjoylin.cpp.
+	- Eric Sunshine re-generated the configure script on Unix since the
+	  previous generation was done with Windows (presumably Autoconf 2.56)
+	  which borks the help message.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of
