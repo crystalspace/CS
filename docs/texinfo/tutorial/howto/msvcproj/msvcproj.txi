@@ -48,7 +48,7 @@ basic new Win32 GUI (Graphical User Interface) application created.
 Next thing todo is copy and paste the simple1.cpp and simple1.h from the
 CS code tree and paste into our newly created @emph{simple1} project directory.
 Hey, why bother typing the files out twice when you can cheat! :-) You
-can alternativelu use the files from the attachment and use there location as
+can alternatively use the files from the attachment and use there location as
 your guide to where to place them.
 
 @subsubheading Step 6
