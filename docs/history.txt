@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  created some effect using /blah/blah/steam1.tga and
 	  /blah/blah/steam2.tga) then point would be NULL(since there was no .
 	  extension).
+	- Eric Sunshine fixed a crasher in csLoader::ParseImposterSettings()
+	  reported by Don Lavelle <dll4@lehigh.edu>.
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.

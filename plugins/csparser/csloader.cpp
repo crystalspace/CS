@@ -2134,10 +2134,11 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
     return;
   }
   imposter->SetRotationTolerance (var2);
+  char const* const name = mesh->QueryObject()->GetName();
   ReportWarning("crystalspace.maploader.parse.meshobject", node, 
-                "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
-                mesh->QueryObject()->GetName(), imposter->GetImposterActive() ? "yes" : "no", 
-                var->Get(),var2->Get() );
+    "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
+    name ? name : "<noname>", imposter->GetImposterActive() ? "yes" : "no", 
+    var->Get(),var2->Get() );
 }
 
 bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
