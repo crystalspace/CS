@@ -44,6 +44,7 @@ esac
 case $MACHINE in
   *ppc*)	echo "PROC = POWERPC" ;;
   *i[3-9]86*)	echo "PROC = INTEL" ;;
+  *ia64*)	echo "PROC = UNKNOWN" ;;
   *sparc*)	echo "PROC = SPARC" ;;
   *mips*)	echo "PROC = MIPS" ;;
   *alpha*)	echo "PROC = ALPHA" ;;
