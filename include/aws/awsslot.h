@@ -19,7 +19,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 
-#include "ivaria/aws.h"
+#include "aws/iaws.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
 

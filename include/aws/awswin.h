@@ -17,11 +17,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "ivaria/aws.h"
+#include "aws/iaws.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
-#include "awscomp.h"
+#include "aws/awscomp.h"
 
 /***************************************************************************************************************************
 *   This file details the interface of awsWindow components.  Windows, while they are just normal components, have some    *

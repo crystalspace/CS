@@ -17,12 +17,12 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "ivaria/aws.h"
+#include "aws/iaws.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
-#include "awsprefs.h"
-#include "awsslot.h"
+#include "aws/awsprefs.h"
+#include "aws/awsslot.h"
 
 class awsCanvas;
 

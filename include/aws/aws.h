@@ -17,7 +17,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "ivaria/aws.h"
+#include "aws/iaws.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
@@ -26,8 +26,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "igraphic/imageio.h"
-#include "awscomp.h"
-#include "awswin.h"
+#include "aws/awscomp.h"
+#include "aws/awswin.h"
 
 const int awsNumRectBuckets = 32;
 

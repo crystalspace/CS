@@ -17,13 +17,13 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "ivaria/aws.h"
+#include "aws/iaws.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "csutil/csdllist.h"
 #include "csutil/csvector.h"
 
-#include "awstex.h"
+#include "aws/awstex.h"
 
 struct iString;
 
