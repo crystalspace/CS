@@ -52,8 +52,10 @@ class csTypedObjectIterator
 protected:
   csRef<iObjectIterator> iter;
   csRef<iBase> CurrentTypedObject;
+  bool fetched;
 
   void FetchObject ();
+  iBase* GetCurrentObject();
   virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const = 0;
 
 public:
@@ -65,16 +67,17 @@ public:
   /// Move forward
   iBase* Next()
   {
-    iBase* cur = CurrentTypedObject;
+    iBase* cur = GetCurrentObject();
     FetchObject ();
     return cur;
   }
   /// Reset the iterator to the beginning
-  void Reset () { iter->Reset (); FetchObject (); }
+  void Reset () { iter->Reset (); fetched = false; }
   /// Get the parent object
   iObject *GetParentObj() const { return iter->GetParentObj (); }
   /// Check if we have any children of requested type
-  bool HasNext () const { return CurrentTypedObject != 0; }
+  bool HasNext () const
+  { return const_cast<csTypedObjectIterator*>(this)->GetCurrentObject() != 0; }
   /// Find the object with the given name
   iBase* FindName (const char* name);
 };

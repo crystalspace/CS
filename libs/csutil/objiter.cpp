@@ -19,18 +19,25 @@
 #include "cssysdef.h"
 #include "csutil/objiter.h"
 
-csTypedObjectIterator::csTypedObjectIterator (iObject *Parent)
+csTypedObjectIterator::csTypedObjectIterator (iObject *Parent) : fetched(false)
 {
   iter = Parent->GetIterator ();
-  FetchObject ();
 }
 
 csTypedObjectIterator::~csTypedObjectIterator ()
 {
 }
 
+iBase* csTypedObjectIterator::GetCurrentObject()
+{
+  if (!fetched)
+    FetchObject();
+  return CurrentTypedObject;
+}
+
 void csTypedObjectIterator::FetchObject ()
 {
+  fetched = true;
   CurrentTypedObject = 0;
   if (!iter->HasNext ())
     return;

@@ -14,6 +14,8 @@ chronological order.
 	- Jorrit made the bugplug hit code a tiny bit more efficient.
 	- Jorrit added an howto with code explaining how to select objects
 	  with the mouse.
+	- Eric Sunshine fixed bug in csTypedObjectIterator where pure virtual
+	  method GetRequestedInterface() was called by constructor.
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
