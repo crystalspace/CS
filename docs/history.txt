@@ -12,6 +12,8 @@ The history order has been reversed so that new features are at the top.
 	  The embedded node_pos_info class was triggering a compiler bug (for
 	  some reason).  Also added some missing 'const' qualifiers and
 	  cleaned up the files.
+	- Eric Sunshine hacked Squawk to keep it from depositing precalc_info
+	  files where they are not wanted.
 3-Jul-2000
 	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
 	- Andrew Zabolotny did the following changes:
