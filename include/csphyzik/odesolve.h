@@ -3,6 +3,7 @@
 
 // this code was adapted from an ode solver by Brian Mirtich
 
+#include <assert.h>
 #include "csphyzik/phyztype.h"
 
 #define ODE_INITIAL_STATE_SIZE	1024
