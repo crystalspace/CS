@@ -63,6 +63,7 @@ private:
     ZIP_central_directory_file_header info;
     char *buffer;
     size_t buffer_pos;
+    size_t buffer_size;
     char *extrafield, *comment;
 
     ArchiveEntry (const char *name, ZIP_central_directory_file_header &cdfh);

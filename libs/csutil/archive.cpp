@@ -797,6 +797,7 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   extrafield = NULL;
   comment = NULL;
   buffer_pos = 0;
+  buffer_size = 0;
 }
 
 csArchive::ArchiveEntry::~ArchiveEntry ()
@@ -809,32 +810,34 @@ csArchive::ArchiveEntry::~ArchiveEntry ()
 
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
-  delete [] buffer;
+  free (buffer);
   buffer = NULL;
   buffer_pos = 0;
+  buffer_size = 0;
+  info.ucsize = 0;
 }
 
 bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
 {
-  if (!buffer || (buffer_pos + size > info.ucsize))
+  if (!buffer || (buffer_pos + size > buffer_size))
   {
-    size_t new_size = buffer_pos + size;
-    if (new_size < info.ucsize)
-      new_size = info.ucsize;
-    char *new_buffer = new char [new_size];
-    if (!new_buffer)
-      return false;				/* Not enough memory */
-    if (buffer)
+    // Increase buffer size in 1K chunks
+    buffer_size += (size + 1023) & ~1023;
+    // If the user has defined the uncompressed file size, take it
+    if (buffer_size < info.ucsize)
+      buffer_size = info.ucsize;
+    buffer = (char *)realloc (buffer, buffer_size);
+    if (!buffer)
     {
-      memcpy (new_buffer, buffer, info.ucsize);
-      delete [] buffer;
+      buffer_pos = buffer_size = info.ucsize = 0;
+      return false;				/* Not enough memory */
     }
-    if (buffer_pos + size < new_size)
-      memset (new_buffer + buffer_pos + size, 0, new_size - (buffer_pos + size));
-    buffer = new_buffer;
-    info.ucsize = new_size;
   } /* endif */
-  memcpy (&buffer[buffer_pos], data, size);
+
+  if (info.ucsize < buffer_pos + size)
+    info.ucsize = buffer_pos + size;
+
+  memcpy (buffer + buffer_pos, data, size);
   buffer_pos += size;
   return true;
 }
@@ -943,7 +946,7 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
 {
   size_t lfhoffs = ftell (outfile);
 
-  info.crc32 = crc32 (CRCVAL_INITIAL, (z_Byte *) buffer, buffer_pos);
+  info.crc32 = crc32 (CRCVAL_INITIAL, (z_Byte *)buffer, buffer_pos);
   bool finished = false;
 
   while (!finished)
