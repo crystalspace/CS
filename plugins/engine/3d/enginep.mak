@@ -40,7 +40,6 @@ endif
 INC.ENGINE = $(wildcard plugins/engine/3d/*.h)
 SRC.ENGINE = $(wildcard plugins/engine/3d/*.cpp)
 OBJ.ENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
-# @@@ Should also include "CSENGINE" but see *Mingw* note below.
 DEP.ENGINE = CSENGINE CSTOOL CSGFX CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += ENGINE
