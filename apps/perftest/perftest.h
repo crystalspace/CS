@@ -48,6 +48,8 @@ private:
   bool draw_2d;
   bool needs_setup;
   Tester* current_tester;
+  /// true if user requests to skip the rest of the test (spacebar)
+  bool test_skip;
   iMaterialHandle* materials[4];
   // Load a material.
   iMaterialHandle* LoadMaterial (char* file);

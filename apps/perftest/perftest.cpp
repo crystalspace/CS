@@ -39,6 +39,7 @@ PerfTest::PerfTest ()
   myG3D = NULL;
   myVFS = NULL;
   ImageLoader = NULL;
+  test_skip = false;
 }
 
 PerfTest::~PerfTest ()
@@ -176,10 +177,12 @@ void PerfTest::NextFrame ()
   if (current_tester)
   {
     current_tester->Draw (myG3D);
-    if (current_time-last_time >= 10000)
+    if (test_skip || (current_time-last_time >= 10000))
     {
+      test_skip = false;
+      float totalelapsed = float(current_time - last_time)/1000.f;
       Printf (MSG_INITIALIZATION, "%f FPS\n",
-      	current_tester->GetCount ()/10.);
+      	current_tester->GetCount ()/totalelapsed);
       Tester* next_tester = current_tester->NextTester ();
       delete current_tester;
       current_tester = next_tester;
@@ -238,7 +241,7 @@ bool PerfTest::HandleEvent (iEvent &Event)
   }
   else if ((Event.Type == csevKeyDown) && (Event.Key.Code == ' '))
   {
-    last_time -= 10000;
+    test_skip = true;
     return true;
   }
 
