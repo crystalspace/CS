@@ -331,8 +331,10 @@ bool csRapidCollider::CollidePath (
     numHits = 0;
     newpos = start;
     newtrans.SetOrigin (end);
-    CollideArray (&newtrans, num_colliders, colliders, transforms);
-    was_cd = true;
+    // In theory it is still possible that this will not collide with anything.
+    // This can happen because the bounding box of an object is bigger
+    // than the object and we used the bounding box for the tests above.
+    was_cd = CollideArray (&newtrans, num_colliders, colliders, transforms);
   }
   else
   {
