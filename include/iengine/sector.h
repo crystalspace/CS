@@ -52,7 +52,7 @@ struct iRenderView;
 struct iFrustumView;
 struct iSector;
 struct iPortal;
-class csRenderMesh;
+class csRenderMeshList;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
 
@@ -185,11 +185,20 @@ struct iSector : public iBase
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
+
   /**
    * Prepare the sector to draw.
    * Must be called before any rendermesh is requested.
    */
   virtual void PrepareDraw (iRenderView* rview) = 0;
+
+  /**
+   * Get a set of visible meshes for given camera. These will be cached for
+   * a given frame and camera, but if the cached result isn't enough it will
+   * be reculled. The returned pointer is valid as long as the sector exsist
+   * (the sector will delete it)
+   */
+  virtual csRenderMeshList* GetVisibleMeshes (iRenderView *) = 0;
 
   /**
    * Set the sector callback. This will call IncRef() on the callback

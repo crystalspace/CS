@@ -155,6 +155,12 @@ private:
    */
   csRef<iVisibilityCuller> culler;
 
+  /// Caching of visible meshes
+  csRenderMeshList *visibleMeshCache;
+  uint32 cachedFrameNumber;
+  iCamera *cachedCamera;
+
+
 private:
   /**
    * Destroy this sector. All things in this sector are also destroyed.
@@ -286,6 +292,14 @@ public:
    * 0 if none.
    */
   iVisibilityCuller* GetVisibilityCuller ();
+
+  /**
+   * Get a set of visible meshes for given camera. These will be cached for
+   * a given frame and camera, but if the cached result isn't enough it will
+   * be reculled. The returned pointer is valid as long as the sector exsist
+   * (the sector will delete it)
+   */
+  csRenderMeshList* GetVisibleMeshes (iRenderView *);
 
   //----------------------------------------------------------------------
   // Drawing
@@ -520,6 +534,8 @@ public:
       { scfParent->Draw (rview); }
     virtual void PrepareDraw (iRenderView* rview)
     { scfParent->PrepareDraw (rview); }
+    virtual csRenderMeshList* GetVisibleMeshes (iRenderView *rview)
+    { return scfParent->GetVisibleMeshes (rview); }
     virtual void SetSectorCallback (iSectorCallback* cb)
     {
       scfParent->SetSectorCallback (cb);

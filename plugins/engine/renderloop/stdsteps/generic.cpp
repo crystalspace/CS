@@ -209,13 +209,15 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   g3d->SetZMode (zmode);
 
   //g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
-
+/*
   iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
   ViscullCallback callback (rview, objreg);
   viscull->VisTest (rview, &callback);
   
   //draw
-  callback.meshList.GetSortedMeshList (meshes);
+  callback.meshList.GetSortedMeshList (meshes);*/
+
+  sector->GetVisibleMeshes (rview)->GetSortedMeshList (meshes);
   int num = meshes.Length ();
  
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
@@ -311,40 +313,4 @@ void csGenericRenderStep::ViscullCallback::ObjectVisible (
   int num;
   csRenderMesh** meshes = mesh->GetRenderMeshes (num);
   meshList.AddRenderMeshes (meshes, num, mesh->GetRenderPriority ());
-
-  /*CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
-  int numSSM = 0;
-  iShaderWrapper* shader = 0;
-
-  for (int n = 0; n < num; n++)
-  {
-    csRenderMesh* mesh = meshes[n];
-
-    iShaderWrapper* meshShader = 
-      mesh->material->GetMaterialHandle()->GetShader(shadertype);
-    if (meshShader != shader)
-    {
-      // @@@ Need error reporter
-      if (shader != 0)
-      {
-        csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
-	  numSSM);
-      }
-
-      shader = meshShader;
-      numSSM = 0;
-    }
-    sameShaderMeshes[numSSM++] = mesh;
-  }
-  if (numSSM != 0)
-  {
-    // @@@ Need error reporter
-    if (shader != 0)
-    {
-      csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
-        numSSM);
-    }
-  }
-
-  */
 }

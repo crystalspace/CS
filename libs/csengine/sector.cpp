@@ -48,6 +48,8 @@
 #include "ivideo/rendermesh.h"
 #endif
 
+#include "cstool/rendermeshlist.h"
+
 // Option variable: render portals?
 bool csSector:: do_portals = true;
 
@@ -141,12 +143,16 @@ csSector::csSector (csEngine *engine) : csObject()
   lights.SetSector (this);
 
   current_visnr = 1;
+  visibleMeshCache = new csRenderMeshList (engine->object_reg);
+  cachedFrameNumber = 0;
+  cachedCamera = 0;
 }
 
 csSector::~csSector ()
 {
   SCF_DESTRUCT_IBASE ();
   lights.RemoveAll ();
+  delete visibleMeshCache;
 }
 
 //----------------------------------------------------------------------
@@ -237,6 +243,66 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   CS_ASSERT (culler != 0);
   return culler;
 }
+
+class csSectorVisibleMeshCallback : public iVisibilityCullerListener
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  csSectorVisibleMeshCallback ()
+  {  
+    SCF_CONSTRUCT_IBASE(0);
+    privMeshlist = 0;
+  }
+
+  void Setup (csRenderMeshList *meshlist, iRenderView *rview)
+  {
+    privMeshlist = meshlist;
+    this->rview = rview;
+  }
+
+  virtual void ObjectVisible (iVisibilityObject *visobject, 
+    iMeshWrapper *mesh)
+  {
+    if (0==privMeshlist)
+      return;
+
+    if (!mesh->GetMeshObject ()->DrawTest (rview, mesh->GetMovable ())) return;
+
+    int num;
+    csRenderMesh** meshes = mesh->GetRenderMeshes (num);
+    privMeshlist->AddRenderMeshes (meshes, num, mesh->GetRenderPriority ());
+  }
+
+private:
+  csRenderMeshList *privMeshlist;
+  iRenderView *rview;
+};
+
+SCF_IMPLEMENT_IBASE(csSectorVisibleMeshCallback)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
+SCF_IMPLEMENT_IBASE_END
+
+csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
+{
+  static csSectorVisibleMeshCallback cb;
+
+  if(0==rview) return 0;
+
+  if (engine->GetCurrentFrameNumber () != cachedFrameNumber ||
+      rview->GetCamera () != cachedCamera )
+  {
+      visibleMeshCache->Empty ();
+      cb.Setup (visibleMeshCache, rview);
+      GetVisibilityCuller()->VisTest (rview, &cb);
+      
+      cachedFrameNumber = engine->GetCurrentFrameNumber ();
+      cachedCamera = rview->GetCamera();
+  }
+
+  return visibleMeshCache;
+}
+
 
 iPolygon3D *csSector::HitBeam (
   const csVector3 &start,
