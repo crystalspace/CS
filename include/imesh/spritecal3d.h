@@ -53,20 +53,32 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual void ReportLastError () = 0;
 
   /**
+   * This function sets the flags, which the factory sets in CalLoader
+   * when loading new models.
+   */
+  virtual void SetLoadFlags(int flags) = 0;
+
+  /**
    * This sets the path to which other filenames will be appended before
    * loading.
    */
   virtual void SetBasePath(const char *path) = 0;
 
   /**
-   * This sets the scale factor of the sprite. 1 = as-is size
+   * This loads the supplied file as the skeleton data for the sprite.
+   */
+  virtual bool LoadCoreSkeleton(const char *filename) = 0;
+
+  /**
+   * This function sets the scale by which the mesh will be multiplied when
+   * rendered.  1.0 is actual size.
    */
   virtual void SetRenderScale(float scale) = 0;
 
   /**
-   * This loads the supplied file as the skeleton data for the sprite.
+   *
    */
-  virtual bool LoadCoreSkeleton(const char *filename) = 0;
+  virtual float GetRenderScale() = 0;
 
   /**
    * This loads the supplied file as one animation action for the sprite.

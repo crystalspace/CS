@@ -44,6 +44,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "imap/ldrctxt.h"
 #include "sprcal3dldr.h"
 
+#include <cal3d/loader.h>
+
 CS_IMPLEMENT_PLUGIN
 
 enum
@@ -55,7 +57,8 @@ enum
   XMLTOKEN_MESH,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MORPHTARGET,
-  XMLTOKEN_MORPHANIMATION
+  XMLTOKEN_MORPHANIMATION,
+  XMLTOKEN_OPTIONS
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
@@ -124,6 +127,7 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("material",       XMLTOKEN_MATERIAL);
   xmltokens.Register ("morphtarget",    XMLTOKEN_MORPHTARGET);
   xmltokens.Register ("morphanimation", XMLTOKEN_MORPHANIMATION);
+  xmltokens.Register ("options",        XMLTOKEN_OPTIONS);
   return true;
 }
 
@@ -178,6 +182,13 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+    case XMLTOKEN_OPTIONS:
+      {
+          bool rotate = child->GetAttributeValueAsBool("rotate_x_axis");
+          bool invert = child->GetAttributeValueAsBool("flip_textures");
+          newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0 | invert?LOADER_INVERT_V_COORD:0 );
+          break;
+      }
     case XMLTOKEN_PATH:
       {
 	const char *path = child->GetAttributeValue("dir");

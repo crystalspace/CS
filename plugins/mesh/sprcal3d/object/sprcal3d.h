@@ -124,8 +124,9 @@ public:
   /// Create a new core object.
   bool Create(const char *name);
   void ReportLastError ();
+  void SetLoadFlags(int flags);
   void SetBasePath(const char *path);
-  void SetRenderScale(float scale);
+  void SetRenderScale(float scale) { renderScale=scale; }
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(const char *filename);
   int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
@@ -249,6 +250,11 @@ public:
     virtual bool Create(const char *name)
     { return scfParent->Create(name); }
 
+    virtual void SetLoadFlags(int flags)
+    {
+      scfParent->SetLoadFlags(flags);
+    }
+
     virtual void ReportLastError ()
     { scfParent->ReportLastError(); }
 
@@ -257,6 +263,8 @@ public:
 
     virtual void SetRenderScale(float scale)
     { scfParent->SetRenderScale(scale); }
+    virtual float GetRenderScale()
+    { return scfParent->GetRenderScale(); }
 
     virtual bool LoadCoreSkeleton(const char *filename)
     { return scfParent->LoadCoreSkeleton(filename); }

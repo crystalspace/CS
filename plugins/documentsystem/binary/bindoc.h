@@ -289,6 +289,7 @@ public:
   virtual const char* GetValue ();
   virtual int GetValueAsInt ();
   virtual float GetValueAsFloat ();
+  virtual bool  GetValueAsBool ();
   virtual void SetName (const char* name);
   virtual void SetValue (const char* value);
   virtual void SetValueAsInt (int v);
@@ -432,6 +433,7 @@ public:
   virtual const char* GetAttributeValue (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
+  virtual bool GetAttributeValueAsBool (const char* name, bool defaultvalue=false);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);

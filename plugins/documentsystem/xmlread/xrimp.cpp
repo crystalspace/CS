@@ -381,6 +381,20 @@ float csXmlReadNode::GetAttributeValueAsFloat (const char* name)
   return f;
 }
 
+bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
+{
+  TrDocumentAttribute* a = GetAttributeInternal (name);
+  if (!a || !a->Value () ) return defaultvalue;
+  if (strcasecmp(a->Value(),"true")==0 ||
+      strcasecmp(a->Value(),"yes")==0 ||
+      atoi(a->Value())!=0)
+  {
+    return true;
+  }
+  else
+    return false;
+}
+
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csXmlReadDocument)

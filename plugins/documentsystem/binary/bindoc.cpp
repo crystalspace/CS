@@ -287,6 +287,36 @@ float csBinaryDocAttribute::GetValueAsFloat ()
   }
 }
 
+bool csBinaryDocAttribute::GetValueAsBool ()
+{
+  switch (attrPtr->flags & BD_VALUE_TYPE_MASK)
+  {
+    case BD_VALUE_TYPE_STR:
+      {
+	if (!attrPtr->GetValueStr(node->doc)) return false;
+    const char *val = attrPtr->GetValueStr(node->doc);
+    if (strcasecmp(val,"true")==0 ||
+        strcasecmp(val,"yes")==0 ||
+        atoi(val)!=0)
+    {
+      return true;
+    }
+    else
+      return false;
+      }
+    case BD_VALUE_TYPE_INT:
+      {
+	return (attrPtr->value != 0);
+      }
+    case BD_VALUE_TYPE_FLOAT:
+      {
+	return (long2float (little_endian_long (attrPtr->value))== 0);
+      }
+    default:
+      return false;
+  }
+}
+
 void csBinaryDocAttribute::SetName (const char* name)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
@@ -1276,6 +1306,19 @@ float csBinaryDocNode::GetAttributeValueAsFloat (const char* name)
   else
   {
     return 0.0f;
+  }
+}
+
+bool csBinaryDocNode::GetAttributeValueAsBool (const char* name, bool defaultvalue)
+{
+  csRef<iDocumentAttribute> attr = GetAttribute (name);
+  if (attr)
+  {
+    return attr->GetValueAsBool ();
+  }
+  else
+  {
+    return defaultvalue;
   }
 }
 

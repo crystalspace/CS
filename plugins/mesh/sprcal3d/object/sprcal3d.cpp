@@ -126,7 +126,7 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
 }
 
 bool csSpriteCal3DMeshObjectFactory::Create(const char *name)
-{
+{  
   return calCoreModel.create(name);
 }
 
@@ -135,14 +135,14 @@ void csSpriteCal3DMeshObjectFactory::ReportLastError ()
   CalError::printLastError();
 }
 
+void csSpriteCal3DMeshObjectFactory::SetLoadFlags(int flags)
+{
+  CalLoader::setLoadingMode(flags);
+}
+
 void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
 {
   basePath = path;
-}
-
-void csSpriteCal3DMeshObjectFactory::SetRenderScale(float scale)
-{
-  renderScale = scale;
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(const char *filename)
@@ -215,8 +215,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(int mesh_index,
     csString path(basePath);
     path.Append(filename);
 
-    CalLoader loader;
-    CalCoreMesh *p_core_mesh = loader.loadCoreMesh((const char *)path);
+//    CalLoader loader;
+    CalCoreMesh *p_core_mesh = CalLoader::loadCoreMesh((const char *)path);
     if(p_core_mesh == 0)
       return -1;
     
@@ -474,6 +474,21 @@ csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
+
+  // update the scale being used by the skeleton for this particular model
+  // This looks like it sets per model scaling, but it does not.  The skeleton
+  // is shared by all model instances of the factory despite the naming.
+  CalSkeleton *skeleton;
+  CalBone *bone;
+  skeleton = calModel.getSkeleton();
+  std::vector < CalBone *> &bones = skeleton->getVectorBone();
+  for (unsigned int i=0; i < bones.size(); i++)
+  {
+    bone = bones[i];
+    bone->setScale (factory->GetRenderScale() );
+    bone->calculateState ();
+  }
+  skeleton->calculateState ();
 
   // attach all default meshes to the model
   int meshId;
@@ -902,6 +917,7 @@ bool csSpriteCal3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
+  // update anim frames, etc. here
   float delta = ((float)current_time - last_update_time)/1000.0F;
   calModel.update(delta);
   last_update_time = current_time;

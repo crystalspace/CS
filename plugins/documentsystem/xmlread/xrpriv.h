@@ -94,6 +94,19 @@ public:
     sscanf (val, "%f", &f);
     return f;
   }
+  virtual bool GetValueAsBool ()
+  {
+    const char* val = attr->Value ();
+    if (!val) return false;
+    if (strcasecmp(val,"true")==0 ||
+        strcasecmp(val,"yes")==0 ||
+        atoi(val)!=0)
+    {
+      return true;
+    }
+    else
+      return false;
+  }
 
   virtual void SetName (const char*) { }
   virtual void SetValue (const char*) { }
@@ -181,6 +194,7 @@ public:
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
+  virtual bool  GetAttributeValueAsBool (const char* name,bool defaultvalue=false);
   virtual const char* GetAttributeValue (const char* name);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>&) { }
   virtual void RemoveAttributes () { }
