@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+2-Feb-2003
+	- Eric Sunshine eliminated unnecessary and fragile "darwin6.3" alias
+	  from vfs.cfg.
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards
