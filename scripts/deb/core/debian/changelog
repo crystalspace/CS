@@ -1,3 +1,28 @@
+crystalspace (0.96-20030709-4) unstable; urgency=low
+
+  * New build from fresh cvs
+
+ -- Christian Bayle <bayle@debian.org>  Wed,  9 Jul 2003 21:48:09 +0200
+
+crystalspace (0.96-20030609-3) unstable; urgency=low
+
+  * Added a symlink test before rmdir (Closes: bug#198776) 
+
+ -- Christian Bayle <bayle@debian.org>  Wed, 25 Jun 2003 23:22:02 +0200
+
+crystalspace (0.96-20030609-2) unstable; urgency=low
+
+  * Remove 3ds support that make hppa FTBS should (Closes: bug#188916)
+  * Correct an error when try to move a non existant file (Closes: bug#197570)
+
+ -- Christian Bayle <bayle@debian.org>  Tue, 24 Jun 2003 21:52:56 +0200
+
+crystalspace (0.96-20030609-1) unstable; urgency=low
+
+  * Try to compile all with -fPIC for hppa should (Closes: bug#188916)
+
+ -- Christian Bayle <bayle@debian.org>  Mon,  9 Jun 2003 14:32:27 +0200
+
 crystalspace (0.96-20030205-5) unstable; urgency=low
 
   * Recompile against libvorbis0a (Closes: bug#185600)

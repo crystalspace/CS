@@ -75,8 +75,16 @@ endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
 	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
 endif
-	# Compile static libs without -fPIC
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
+	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
+endif
+
+	# Compile static libs without -fPIC (except for hppa and alpha)
+ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
+ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), alpha))
 	cd $(CURDIR)/CS; $(MAKE) libs
+endif
+endif
 	# Force -fPIC as compiling/linking option
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
@@ -107,7 +115,7 @@ clean:
 
 	dh_clean
 
-DEVBIN=map2cs mdl2spr vsh cs-config 3ds2lev cs2xml csfgen cslight maya2spr md32spr milk2spr python.cex tbconvert
+DEVBIN=map2cs mdl2spr scfreg vsh cs-config 3ds2lev cs2xml csfgen cslight maya2spr md32spr milk2spr python.cex tbconvert
 
 install: install-indep install-arch
 install-indep:
@@ -151,9 +159,10 @@ install-arch:
 
 	# dev binaries in /usr/bin
 	mkdir -p $(CURDIR)/debian/tmp/usr/bin
-	mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
+	-mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
 		 $(DEVBIN))\
 		$(CURDIR)/debian/tmp/usr/bin
+
 	# renaming picview because of name conflict with picview package
 	#mv $(CURDIR)/debian/tmp/usr/bin/picview \
 	#	$(CURDIR)/debian/tmp/usr/bin/cspicview
