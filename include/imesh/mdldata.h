@@ -25,30 +25,45 @@
 #include "csutil/csvector.h"
 #include "csutil/scf.h"
 
+struct iObject;
 
 SCF_VERSION (iModelDataMaterial, 0, 0, 1);
 
+/**
+ * This structure contains the information about a material for an
+ * imported model.
+ */
 struct iModelDataMaterial : public iBase
 {
+  /// Query the iObject for this material
+  virtual iObject* QueryObject () = 0;
 };
 
 
 SCF_VERSION (iModelDataPolygon, 0, 0, 1);
 
+/**
+ * One polygon in a model. The normals, texture coordinates and color are kept
+ * per vertex. The vertex positions are indices for the vertex list of the
+ * parent iModelDataObject.
+ */
 struct iModelDataPolygon : public iBase
 {
+  /// Query the iObject for this material
+  virtual iObject* QueryObject () = 0;
+
   /// return the number of vertices
   virtual int GetNumVertices () const = 0;
   /// Add a vertex
-  virtual void AddVertex (const csVector3 &Position, const csVector3 &Normal,
+  virtual void AddVertex (int PositionIndex, const csVector3 &Normal,
     const csColor &Color, const csVector2 &TextureCoords) = 0;
   /// Delete a vertex
   virtual void DeleteVertex (int n) = 0;
 
-  /// return the coordinates of a vertex
-  virtual const csVector3 &GetVertex (int n) const = 0;
-  /// set the coordinates of a vertex
-  virtual void SetVertex (int n, const csVector3 &v) = 0;
+  /// return the coordinate index of a vertex
+  virtual int GetVertex (int n) const = 0;
+  /// set the coordinate index of a vertex
+  virtual void SetVertex (int n, int Index) = 0;
 
   /// return the normal of a vertex
   virtual const csVector3 &GetNormal (int n) const = 0;
@@ -74,23 +89,37 @@ struct iModelDataPolygon : public iBase
 
 SCF_VERSION (iModelDataObject, 0, 0, 1);
 
+/**
+ * One object in the scene. This structure is intended for solid objects, i.e.
+ * not for lights or cameras. Children should be polygons, curves etc. <p>
+ *
+ * Every object contains a list of vertices. These vertices are shared between
+ * polygons (and curves if possible).
+ */
 struct iModelDataObject : public iBase
 {
-  /// return the number of polygons in this object
-  virtual int GetNumPolygons () const = 0;
-  /// return a single polygon
-  virtual iModelDataPolygon* GetPolygon (int n) = 0;
-  /// add a polygon
-  virtual iModelDataPolygon* CreatePolygon () = 0;
-  /// delete a polygon
-  virtual void DeletePolygon (int n) = 0;
+  /// Query the iObject for the model data
+  virtual iObject* QueryObject () = 0;
+
+  /// Return the number of vertices in the object
+  virtual int GetNumVertices () const = 0;
+  /// Return the coordinates of a vertex
+  virtual const csVector3 &GetVertex (int n) const = 0;
+  /// Set the coordinates of a vertex
+  virtual void SetVertex (int n, const csVector3 &v) = 0;
+  /// Add a vertex
+  virtual void AddVertex (const csVector3 &v) = 0;
 };
 
 
 SCF_VERSION (iModelDataCamera, 0, 0, 1);
 
+/// A camera in the scene.
 struct iModelDataCamera : public iBase
 {
+  /// Query the iObject for this camera
+  virtual iObject* QueryObject () = 0;
+
   /// return the position of the camera
   virtual const csVector3 &GetPosition () const = 0;
   /// set the position of the camera
@@ -126,8 +155,12 @@ struct iModelDataCamera : public iBase
 
 SCF_VERSION (iModelDataLight, 0, 0, 1);
 
+/// A light source in the scene.
 struct iModelDataLight : public iBase
 {
+  /// Query the iObject for this light
+  virtual iObject* QueryObject () = 0;
+
   /// Return the radius (brightness) of this light
   virtual float GetRadius () const = 0;
   /// Set the radius (brightness) of this light
@@ -142,34 +175,15 @@ struct iModelDataLight : public iBase
 
 SCF_VERSION (iModelData, 0, 0, 1);
 
+/**
+ * This structure represents a complete scene with objects, light sources,
+ * cameras etc. All these objects are added as children in the iObject
+ * hierarchy.
+ */
 struct iModelData : public iBase
 {
-  /// Get the number of objects in the scene
-  virtual int GetNumObjects () const = 0;
-  /// Return a single object
-  virtual iModelDataObject* GetObject (int n) = 0;
-  /// Add an object
-  virtual iModelDataObject* CreateObject () = 0;
-  /// Delete an object
-  virtual void DeleteObject (int n) = 0;
-
-  /// Get the number of cameras in the scene
-  virtual int GetNumCameras () const = 0;
-  /// Return a single camera
-  virtual iModelDataCamera* GetCamera (int n) = 0;
-  /// Add an camera
-  virtual iModelDataCamera* CreateCamera () = 0;
-  /// Delete an camera
-  virtual void DeleteCamera (int n) = 0;
-
-  /// Get the number of lights in the scene
-  virtual int GetNumLights () const = 0;
-  /// Return a single light
-  virtual iModelDataLight* GetLight (int n) = 0;
-  /// Add an light
-  virtual iModelDataLight* CreateLight () = 0;
-  /// Delete an light
-  virtual void DeleteLight (int n) = 0;
+  /// Query the iObject for the model data
+  virtual iObject* QueryObject () = 0;
 };
 
 #endif // __IVARIA_MDLDATA_H__

@@ -19,27 +19,18 @@
 #include "cssysdef.h"
 #include "mdldata.h"
 
-#define IMPLEMENT_VECTOR_INTERFACE(clname,type,name)			\
-  int clname::GetNum##name##s () const					\
-  { return name##s.Length (); }						\
-  i##type* clname::Get##name (int n)					\
-  { return name##s.Get (n); }						\
-  i##type* clname::Create##name ()					\
-  { cs##type *obj = new cs##type(); name##s.Push (obj);			\
-    obj->DecRef (); return obj; }					\
-  void clname::Delete##name (int n)					\
-  { name##s.Delete (n); }
+#define IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,sing_name,mult_name) \
+  type clname::Get##sing_name (int n) const				\
+  { return mult_name[n]; }						\
+  void clname::Set##sing_name (int n, type val)				\
+  { mult_name[n] = val; }
 
-#define IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,name)		\
-  type clname::Get##name (int n) const					\
-  { return name##List[n]; }						\
-  void clname::Set##name (int n, type val)				\
-  { name##List[n] = val; }
-
-#define IMPLEMENT_ARRAY_INTERFACE(clname,type,name)			\
-  IMPLEMENT_ARRAY_INTERFACE_NONUM (clname, type, name)			\
-  int clname::GetNum##name##s () const					\
-  { return name##List.Length (); }
+#define IMPLEMENT_ARRAY_INTERFACE(clname,type,sing_name,mult_name)	\
+  IMPLEMENT_ARRAY_INTERFACE_NONUM (clname, type, sing_name, mult_name)	\
+  int clname::GetNum##mult_name () const				\
+  { return mult_name.Length (); }					\
+  void clname::Add##sing_name (type v)					\
+  { mult_name.Push (v); }
 
 #define IMPLEMENT_ACCESSOR_METHOD(clname,type,name)			\
   type clname::Get##name () const					\
@@ -53,15 +44,24 @@
   void clname::Set##name (type val)					\
   { if (name) name->DecRef (); name = val; if (name) name->IncRef (); }
 
+#define IMPLEMENT_OBJECT_INTERFACE(clname)				\
+  IMPLEMENT_EMBEDDED_OBJECT (clname::Embedded_csObject);		\
+  iObject* clname::QueryObject ()					\
+  { return &scfiObject; }
+
 /*** csModelDataPolygon ***/
 
 IMPLEMENT_IBASE (csModelDataPolygon)
   IMPLEMENTS_INTERFACE (iModelDataPolygon)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataPolygon);
 
 csModelDataPolygon::csModelDataPolygon ()
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   Material = NULL;
 }
 
@@ -72,50 +72,73 @@ csModelDataPolygon::~csModelDataPolygon ()
 
 int csModelDataPolygon::GetNumVertices () const
 {
-  return VertexList.Length ();
+  return Vertices.Length ();
 }
 
-void csModelDataPolygon::AddVertex (const csVector3 &Position,
+void csModelDataPolygon::AddVertex (int PositionIndex,
   const csVector3 &Normal, const csColor &Color, const csVector2 &TexCoords)
 {
-  VertexList.Push (Position);
-  NormalList.Push (Normal);
-  ColorList.Push (Color);
-  TextureCoordsList.Push (TexCoords);
+  Vertices.Push (PositionIndex);
+  Normals.Push (Normal);
+  Colors.Push (Color);
+  TextureCoords.Push (TexCoords);
 }
 
 void csModelDataPolygon::DeleteVertex (int n)
 {
-  VertexList.Delete (n);
-  NormalList.Delete (n);
-  ColorList.Delete (n);
-  TextureCoordsList.Delete (n);
+  Vertices.Delete (n);
+  Normals.Delete (n);
+  Colors.Delete (n);
+  TextureCoords.Delete (n);
 }
 
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, const csVector3 &, Vertex);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, const csVector3 &, Normal);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, const csVector2 &, TextureCoords);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, const csColor &, Color);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
+	int, Vertex, Vertices);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
+	const csVector3 &, Normal, Normals);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
+	const csVector2 &, TextureCoords, TextureCoords);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
+	const csColor &, Color, Colors);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataPolygon, iModelDataMaterial *, Material);
 
 /*** csModelDataObject ***/
 
 IMPLEMENT_IBASE (csModelDataObject)
   IMPLEMENTS_INTERFACE (iModelDataObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_VECTOR_INTERFACE (csModelDataObject, ModelDataPolygon, Polygon);
+IMPLEMENT_OBJECT_INTERFACE (csModelDataObject);
+
+IMPLEMENT_ARRAY_INTERFACE (csModelDataObject,
+	const csVector3 &, Vertex, Vertices);
+
+csModelDataObject::csModelDataObject ()
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
 
 /*** csModelDataCamera ***/
 
 IMPLEMENT_IBASE (csModelDataCamera)
   IMPLEMENTS_INTERFACE (iModelDataCamera)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataCamera);
 
 IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, Position);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, UpVector);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, FrontVector);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, RightVector);
+
+csModelDataCamera::csModelDataCamera ()
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
 
 void csModelDataCamera::ComputeUpVector ()
 {
@@ -152,23 +175,46 @@ bool csModelDataCamera::CheckOrthogonality () const
 
 IMPLEMENT_IBASE (csModelDataLight)
   IMPLEMENTS_INTERFACE (iModelDataLight)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataLight);
 
 IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, float, Radius);
 IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csColor &, Color);
+
+csModelDataLight::csModelDataLight ()
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
 
 /*** csModelDataMaterial ***/
 
 IMPLEMENT_IBASE (csModelDataMaterial)
   IMPLEMENTS_INTERFACE (iModelDataMaterial)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial);
+
+csModelDataMaterial::csModelDataMaterial ()
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
 
 /*** csModelData ***/
 
 IMPLEMENT_IBASE (csModelData)
   IMPLEMENTS_INTERFACE (iModelData)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_VECTOR_INTERFACE (csModelData, ModelDataObject, Object);
-IMPLEMENT_VECTOR_INTERFACE (csModelData, ModelDataCamera, Camera);
-IMPLEMENT_VECTOR_INTERFACE (csModelData, ModelDataLight, Light);
+IMPLEMENT_OBJECT_INTERFACE (csModelData);
+
+csModelData::csModelData ()
+{
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}

@@ -21,29 +21,59 @@
 
 #include "imesh/mdldata.h"
 #include "csutil/garray.h"
+#include "csutil/csobject.h"
 
 #define DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\
   void Set##name (type);
 
-#define DECLARE_ARRAY_INTERFACE_NONUM(type,name)			\
-  type Get##name (int n) const;						\
-  void Set##name (int n, type);
+#define DECLARE_ARRAY_INTERFACE_NONUM(type,sing_name)			\
+  type Get##sing_name (int n) const;					\
+  void Set##sing_name (int n, type);
 
-#define DECLARE_ARRAY_INTERFACE(type,name)				\
-  DECLARE_ARRAY_INTERFACE_NONUM (type, name)				\
-  int GetNum##name##s () const;
+#define DECLARE_ARRAY_INTERFACE(type,sing_name,mult_name)		\
+  DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
+  int GetNum##mult_name () const;					\
+  void Add##sing_name (type obj);					\
+  void Delete##sing_name (int n);
+
+#define DECLARE_OBJECT_INTERFACE					\
+  DECLARE_EMBEDDED_OBJECT (csObject, iObject);				\
+  iObject *QueryObject ();
+
+/**
+ * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
+ * whereever an object should be embedded instead of an interface.
+ */
+#define DECLARE_EMBEDDED_OBJECT(clname,itf)				\
+  struct Embedded_##clname : public clname {				\
+    typedef clname __scf_superclass__;					\
+    DECLARE_EMBEDDED_IBASE (iBase);					\
+  } scf##itf;
+
+/**
+ * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
+ * whereever an object should be embedded instead of an interface.
+ */
+#define IMPLEMENT_EMBEDDED_OBJECT(Class)				\
+  IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
+  IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
+  IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
+    void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
+    if (o) return o;							\
+  IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
 
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
-  DECLARE_IBASE;
-  DECLARE_GROWING_ARRAY (VertexList, csVector3);
-  DECLARE_GROWING_ARRAY (NormalList, csVector3);
-  DECLARE_GROWING_ARRAY (ColorList, csColor);
-  DECLARE_GROWING_ARRAY (TextureCoordsList, csVector2);
+  DECLARE_GROWING_ARRAY (Vertices, int);
+  DECLARE_GROWING_ARRAY (Normals, csVector3);
+  DECLARE_GROWING_ARRAY (Colors, csColor);
+  DECLARE_GROWING_ARRAY (TextureCoords, csVector2);
   iModelDataMaterial *Material;
 public:
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
 
   /// constructor
   csModelDataPolygon ();
@@ -53,71 +83,44 @@ public:
   /// return the number of vertices
   int GetNumVertices () const;
   /// Add a vertex
-  void AddVertex (const csVector3 &Position, const csVector3 &Normal,
+  void AddVertex (int PositionIndex, const csVector3 &Normal,
     const csColor &Color, const csVector2 &TextureCoords);
   /// Delete a vertex
   void DeleteVertex (int n);
 
-  DECLARE_ARRAY_INTERFACE_NONUM (const csVector3 &, Vertex);
+  DECLARE_ARRAY_INTERFACE_NONUM (int, Vertex);
   DECLARE_ARRAY_INTERFACE_NONUM (const csVector3 &, Normal);
   DECLARE_ARRAY_INTERFACE_NONUM (const csVector2 &, TextureCoords);
   DECLARE_ARRAY_INTERFACE_NONUM (const csColor &, Color);
   DECLARE_ACCESSOR_METHODS (iModelDataMaterial*, Material);
-
-/*
-  /// return the coordinates of a vertex
-  const csVector3 &GetVertex (int n) const;
-  /// set the coordinates of a vertex
-  void SetVertex (int n, const csVector3 &v);
-
-  /// return the normal of a vertex
-  const csVector3 &GetNormal (int n) const;
-  /// set the normal of a vertex
-  void SetNormal (int n, const csVector3 &v);
-
-  /// return the color for a vertex
-  const csColor &GetColor (int n) const;
-  /// set the color for a vertex
-  void SetColor (int n, const csColor &c);
-
-  /// return the texture coordinates for a vertex
-  const csVector2 &GetTextureCoords (int n) const;
-  /// set the texture coordinates for a vertex
-  void SetTextureCoords (int n, const csVector2 &v);
-
-  /// return the current material
-  iModelDataMaterial *GetMaterial () const;
-  /// set the material
-  void SetMaterial (iModelDataMaterial *m);
-  */
 };
-
-DECLARE_TYPED_SCF_VECTOR (csModelDataPolygonVector, csModelDataPolygon);
 
 class csModelDataObject : public iModelDataObject
 {
 private:
-  DECLARE_IBASE;
-  csModelDataPolygonVector Polygons;
+  DECLARE_GROWING_ARRAY (Vertices, csVector3);
 
 public:
-  /// return the number of polygons in this object
-  int GetNumPolygons () const;
-  /// return a single polygon
-  iModelDataPolygon* GetPolygon (int n);
-  /// add a polygon
-  iModelDataPolygon* CreatePolygon ();
-  /// delete a polygon
-  void DeletePolygon (int n);
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+  DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex, Vertices);
+
+  /// constructor
+  csModelDataObject ();
 };
 
 class csModelDataCamera : public iModelDataCamera
 {
 private:
-  DECLARE_IBASE;
   csVector3 Position, UpVector, FrontVector, RightVector;
 
 public:
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// constructor
+  csModelDataCamera ();
+
   /// return the position of the camera
   const csVector3 &GetPosition () const;
   /// set the position of the camera
@@ -153,11 +156,16 @@ public:
 class csModelDataLight : public iModelDataLight
 {
 private:
-  DECLARE_IBASE;
   float Radius;
   csColor Color;
 
 public:
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// constructor
+  csModelDataLight ();
+
   /// Return the radius (brightness) of this light
   float GetRadius () const;
   /// Set the radius (brightness) of this light
@@ -172,56 +180,23 @@ public:
 class csModelDataMaterial : public iModelDataMaterial
 {
 private:
-  DECLARE_IBASE;
 
 public:
-};
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
 
-DECLARE_TYPED_SCF_VECTOR (csModelDataObjectVector, csModelDataObject);
-DECLARE_TYPED_SCF_VECTOR (csModelDataCameraVector, csModelDataCamera);
-DECLARE_TYPED_SCF_VECTOR (csModelDataLightVector, csModelDataLight);
+  /// constructor
+  csModelDataMaterial ();
+};
 
 class csModelData : public iModelData
 {
-private:
-  DECLARE_IBASE;
-
-  /// List of all objects
-  csModelDataObjectVector Objects;
-
-  /// List of all cameras
-  csModelDataCameraVector Cameras;
-
-  /// List of all lights
-  csModelDataLightVector Lights;
-
 public:
-  /// Get the number of objects in the scene
-  int GetNumObjects () const;
-  /// Return a single object
-  iModelDataObject* GetObject (int n);
-  /// Add an object
-  iModelDataObject* CreateObject ();
-  /// Delete an object
-  void DeleteObject (int n);
+  DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
 
-  /// Get the number of cameras in the scene
-  int GetNumCameras () const;
-  /// Return a single camera
-  iModelDataCamera* GetCamera (int n);
-  /// Add an camera
-  iModelDataCamera* CreateCamera ();
-  /// Delete an camera
-  void DeleteCamera (int n);
-
-  /// Get the number of lights in the scene
-  int GetNumLights () const;
-  /// Return a single light
-  iModelDataLight* GetLight (int n);
-  /// Add an light
-  iModelDataLight* CreateLight ();
-  /// Delete an light
-  void DeleteLight (int n);
+  /// constructor
+  csModelData ();
 };
 
 #endif // __MDLDATA_H__
