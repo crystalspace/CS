@@ -195,7 +195,6 @@
 	INTERFACE_APPLY(iScriptObject)
 	INTERFACE_APPLY(iSector)
 	INTERFACE_APPLY(iSectorList)
-	INTERFACE_APPLY(iShaderBranch)
 	INTERFACE_APPLY(iSoundHandle)
 	INTERFACE_APPLY(iSoundLoader)
 	INTERFACE_APPLY(iSoundRender)
