@@ -17,7 +17,6 @@
 //	Generate a menu from the INI style configuration file NeXTMenu.cfg.
 //
 //-----------------------------------------------------------------------------
-#import "util/inifile.h"
 @class NSMenu;
 
 NSMenu* NeXTMenuGenerate();

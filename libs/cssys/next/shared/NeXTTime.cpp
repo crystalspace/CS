@@ -16,7 +16,8 @@
 //	Returns time in milliseconds since first invocation.
 //
 //-----------------------------------------------------------------------------
-#include "system/system.h"
+#include "sysdef.h"
+#include "cssys/common/system.h"
 #include <libc.h>
 #include <sys/time.h>
 

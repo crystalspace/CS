@@ -16,7 +16,7 @@
 //
 //-----------------------------------------------------------------------------
 #import "NeXTMenu.h"
-#import "util/inifile.h"
+#import "csutil/inifile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSMenu.h>
@@ -47,14 +47,14 @@ size_t const MENU_SIZE = sizeof(MENU_CONFIG) / sizeof(MENU_CONFIG[0]);
 
 
 //-----------------------------------------------------------------------------
-// OpenStep 4.2 --> Rhapsody compatibility
+// OpenStep 4.2 --> MacOS/X Server compatibility
 //-----------------------------------------------------------------------------
-#if defined(OS_NEXT_RHAPSODY)
+#if defined(OS_NEXT_MACOSXS)
 
 static void menu_add_separator( NSMenu* m )
     { [m addItem:[NSMenuItem separatorItem]]; }
 
-#else // !OS_NEXT_RHAPSODY
+#else // !OS_NEXT_MACOSXS
 
 static void menu_add_separator( NSMenu* m )
     { [[m addItemWithTitle:@"-" action:0 keyEquivalent:@""] setEnabled:NO]; }
@@ -66,7 +66,7 @@ static void menu_add_separator( NSMenu* m )
 - (void)setAppleMenu:(NSMenu*)m {}
 @end
 
-#endif // OS_NEXT_RHAPSODY
+#endif // OS_NEXT_MACOSXS
 
 
 //-----------------------------------------------------------------------------

@@ -13,19 +13,20 @@
 // NeXTprintf.cpp
 //
 //	Implement NeXT-specific printf() function on behalf of csSystemDriver.
-//	Rhapsody DR2 (MacOS/X Server) generates link errors when ::printf() is
-//	used, so we can not use system/general/printf.cpp.  We work around the
-//	problem by going straight to vprintf().
+//	MacOS/X Server generates link errors when ::printf() is used, so we
+//	can not use system/general/printf.cpp.  We work around the problem by
+//	going straight to vprintf().
 //
 //-----------------------------------------------------------------------------
-#include "system/system.h"
+#include "sysdef.h"
+#include "cssys/common/system.h"
 #include <stdarg.h>
 #include <stdio.h>
 
 void csSystemDriver::printf_init () {}
 void csSystemDriver::printf_close() {}
 
-int csSystemDriver::printf( char* fmt, ... )
+int csSystemDriver::printf( char const* fmt, ... )
     {
     va_list args;
     va_start( args, fmt );

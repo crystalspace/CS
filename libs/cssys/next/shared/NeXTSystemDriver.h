@@ -17,10 +17,10 @@
 //	NeXT-specific hardware & operating/system drivers for CrystalSpace.
 //
 //-----------------------------------------------------------------------------
-#include "system/system.h"
+#include "sysdef.h"
+#include "cssys/common/system.h"
+#include "csinput/csinput.h"
 #include "cscom/com.h"
-#include "util/def.h"
-#include "util/input/csinput.h"
 class NeXTSystemProxy;
 
 //-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ private:
 public:
     SysSystemDriver();
     virtual ~SysSystemDriver();
-    virtual void Initialize( int argc, char *argv[] );
+    virtual bool Initialize( int argc, char *argv[], IConfig* cfg_engine );
     virtual void Loop ();
 
     // Conform to INeXTSystemDriver via composition.

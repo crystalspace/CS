@@ -13,12 +13,13 @@
 // NeXTfopen.cpp
 //
 //	Implement NeXT-specific fopen() function on behalf of csSystemDriver.
-//	Rhapsody DR2 (MacOS/X Server) generates link errors when ::fopen() is
-//	used, so we can not use system/general/fopen.cpp.  We work around the
-//	problem by adding an extra layer of indirection.
+//	MacOS/X Server generates link errors when ::fopen() is used, so we can
+//	not use system/general/fopen.cpp.  We work around the problem by
+//	adding an extra layer of indirection.
 //
 //-----------------------------------------------------------------------------
-#include "system/system.h"
+#include "sysdef.h"
+#include "cssys/common/system.h"
 #include <stdio.h>
 
 static FILE* call_fopen( char const* filename, char const* mode )
@@ -26,7 +27,7 @@ static FILE* call_fopen( char const* filename, char const* mode )
     return fopen( filename, mode );
     }
 
-FILE* csSystemDriver::fopen( char* filename, char* mode )
+FILE* csSystemDriver::fopen( char const* filename, char const* mode )
     {
     return call_fopen( filename, mode );
     }

@@ -20,7 +20,7 @@
 //
 // *WARNING* Do NOT include any COM or Objective-C headers in this file.
 //-----------------------------------------------------------------------------
-#include "util/types.h"	// For bool.
+#include "types.h"	// For bool.
 class SysSystemDriver;
 @class NeXTDelegate;
 
