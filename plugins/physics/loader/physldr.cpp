@@ -112,7 +112,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("elasticity", XMLTOKEN_ELASTICITY);
   xmltokens.Register ("collidermesh", XMLTOKEN_COLLIDERMESH);
   xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERSPHERE);
-  xmltokens.Register ("collidersphere", XMLTOKEN_COLLIDERCYLINDER);
+  xmltokens.Register ("collidercylinder", XMLTOKEN_COLLIDERCYLINDER);
   xmltokens.Register ("colliderbox", XMLTOKEN_COLLIDERBOX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("length", XMLTOKEN_LENGTH);
@@ -251,6 +251,7 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
           iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
           if (m) {
             body->AttachMesh (m);
+			body->SetTransform (m->GetMovable()->GetTransform());
           } else {
             synldr->ReportError ("crystalspace.dynamics.loader",
               child, "Unable to find mesh in engine");
@@ -381,14 +382,14 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   csOrthoTransform t;
+  csRef<iRigidBody> body1;
+  csRef<iRigidBody> body2;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char *value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    csRef<iRigidBody> body1 = NULL;
-    csRef<iRigidBody> body2 = NULL;
     switch (id)
     {
       case XMLTOKEN_BODY:
