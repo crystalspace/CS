@@ -60,9 +60,7 @@ csPython::~csPython()
 }
 
 extern "C" {
-  struct swig_type_info;
-  extern PyObject * SWIG_NewPointerObj(void *, swig_type_info *, int own);
-  extern swig_type_info * SWIG_TypeQuery(const char *);
+  extern PythonObject * csWrapTypedObject(void *objptr, const char *tagtype, int own);
   extern void init_cspace();
 }
 
@@ -118,8 +116,7 @@ bool csPython::RunText(const char* Text)
 
 bool csPython::Store(const char* name, void* data, void* tag)
 {
-  swig_type_info * ti = SWIG_TypeQuery((char*)tag);
-  PyObject * obj = SWIG_NewPointerObj(data, ti, 0);
+  PyObject * obj = csWrapTypedObject(data, (const char*)tag, 0);
   char *mod_name = csStrNew(name);
   char * var_name = strrchr(mod_name, '.');
   if(!var_name)
