@@ -959,10 +959,10 @@ void csSector::Draw (iRenderView *rview)
             GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
-    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
+    else if (fogmethod == G3DFOGMETHOD_VERTEX && csrview->AddedFogInfo ())
     {
-      csFogInfo *fog_info = rview->GetFirstFogInfo ();
-      rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
+      csFogInfo *fog_info = csrview->GetFirstFogInfo ();
+      csrview->SetFirstFogInfo (csrview->GetFirstFogInfo ()->next);
       delete fog_info;
     }
   }
