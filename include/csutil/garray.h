@@ -51,11 +51,11 @@
       if (newlimit != limit) SetLimit (newlimit);			\
     }									\
     Type &operator [] (int n)						\
-    { return root [n]; }						\
+    { CS_ASSERT (n < limit); return root [n]; }				\
     Type &Get (int n)							\
-    { return root [n]; }						\
+    { CS_ASSERT (n < limit); return root [n]; }				\
     void Delete (int n)							\
-    { memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (Type)); }\
+    { CS_ASSERT (n < limit); memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (Type)); }\
     Type *GetArray ()							\
     { return root; }							\
     void Push (const Type &val, int iGrowStep = 8)			\

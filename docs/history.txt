@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+13-May-2001
+	- Added CS_ASSERT to some of the functions in growing arrays to
+	  make sure we catch those kinds of errors early.
 12-May-2001
 	- Thanks to Philip Wyett I fixed a bad bug in the OpenGL
 	  software clipper. Some arrays were not correctly sized to the
@@ -13,6 +16,16 @@ The history order is reversed so that new features are at the top.
 	  definition file.
 	- Christopher also added base regular expression and regular
 	  expression compiler objects (new cslexan plugin).
+	- Martin Geisse moved textrans.cpp (.h) from csengine to csgeom.
+	- Martin did further work on engine interface and Blocks.
+	  Removed SetPosition() from iCamera because direct access
+	  to the transform should be used.
+	- Philip Wyett fixed bad bug in GL renderer.
+	  "uv_mul_verts.SetLimit (num_vertices);"
+	  to update of work table(s) at line: 2302
+	  This was done because a crash out occurred at
+	  line: 2599, when variable "uv_mul_verts" accesses
+	  "GetArray ()".
 11-May-2001
 	- Added additional HOWTO sections.
 	- Moved the FOG constants from OpenGL to ivideo/graph3d.h. They
