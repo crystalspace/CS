@@ -23,9 +23,9 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
-#include "csobject/csobject.h"
 #include "csengine/cssprite.h"
-#include "iskeleton.h"
+#include "iskel.h"
+#include "iskelbon.h"
 
 class csSkeletonLimbState;
 class csPoly3D;
@@ -35,7 +35,7 @@ class csPoly3D;
  * works by controlling the vertices in a frame. So we combine
  * frame based sprites and skeletal sprites.
  */
-class csSkeletonLimb
+class csSkeletonLimb : public iSkeletonLimb
 {
 private:
   /// Next in the list.
@@ -62,19 +62,19 @@ protected:
 
 public:
   /// Create an empty limb.
-  csSkeletonLimb () : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL) { }
+  csSkeletonLimb ();
 
   /// Destructor.
   virtual ~csSkeletonLimb ();
 
   /// Add a vertex index.
-  void AddVertex (int v);
+  virtual void AddVertex (int v);
 
   /// Get the vertex index array.
-  int* GetVertices () { return vertices; }
+  virtual int* GetVertices () { return vertices; }
 
   /// Get the number of vertices.
-  int GetNumVertices () { return num_vertices; }
+  virtual int GetNumVertices () { return num_vertices; }
 
   /// Get the bounding box.
   void GetBoundingBox (csBox3& b) { b = box; }
@@ -86,6 +86,8 @@ public:
   void SetNext (csSkeletonLimb* n) { next = n; }
   /// Linked list.
   csSkeletonLimb* GetNext () { return next; }
+  /// Linked list.
+  virtual iSkeletonLimb* GetNextSibling () { return (iSkeletonLimb*)next; }
 
   /// Create a csSkeletonState from this csSkeleton.
   virtual csSkeletonLimbState* CreateState ();
@@ -99,16 +101,20 @@ public:
   void ComputeBoundingBox (csPoly3D* source);
 
   /// Set the name for this limb.
-  void SetName (const char* name);
+  virtual void SetName (const char* name);
   /// Get the name for this limb.
-  const char* GetName () const { return name; }
+  virtual const char* GetName () const { return name; }
+  /// Create a connection.
+  virtual iSkeletonConnection* CreateConnection ();
+
+  DECLARE_IBASE;
 };
 
 /**
- * A connection. This is basicly a transformation with a limb that
+ * A connection. This is basically a transformation with a limb that
  * is controlled by the transformation.
  */
-class csSkeletonConnection : public csSkeletonLimb
+class csSkeletonConnection : public csSkeletonLimb, public iSkeletonConnection
 {
 private:
   /// A transformation with respect to the parent limb.
@@ -116,7 +122,7 @@ private:
 
 public:
   /// Create an empty limb with an identity transformation.
-  csSkeletonConnection () { }
+  csSkeletonConnection ();
 
   /// Create an empty limb with the given transformation.
   csSkeletonConnection (csTransform& tr) : trans (tr) { }
@@ -125,19 +131,21 @@ public:
   virtual ~csSkeletonConnection () { }
 
   /// Set the transformation.
-  void SetTransformation (const csTransform& tr) { trans = tr; }
+  virtual void SetTransformation (const csTransform& tr) { trans = tr; }
 
   /// Get the transformation.
-  csTransform& GetTransformation () { return trans; }
+  virtual csTransform& GetTransformation () { return trans; }
 
   /// Create a csSkeletonState from this csSkeleton.
   virtual csSkeletonLimbState* CreateState ();
+
+  DECLARE_IBASE_EXT (csSkeletonLimb);
 };
 
 /**
  * The base skeleton class (or the 'body').
  */
-class csSkeleton : public csSkeletonLimb
+class csSkeleton : public csSkeletonLimb, public iSkeleton
 {
 public:
   /// Create an empty skeleton.
@@ -148,13 +156,15 @@ public:
 
   /// Create a csSkeletonState from this csSkeleton.
   virtual csSkeletonLimbState* CreateState ();
+
+  DECLARE_IBASE_EXT (csSkeletonLimb);
 };
 
 /**
  * A limb in a skeletal system (state version, see csSkeletonState for
  * more information).
  */
-class csSkeletonLimbState : public csObject
+class csSkeletonLimbState : public iSkeletonLimbState
 {
   friend class csSkeletonLimb;
 
@@ -173,6 +183,12 @@ private:
 
   /// Children of this limb.
   csSkeletonLimbState* children;
+
+  /// The name of this Limb.
+  char* name;
+
+  /// Userdata.
+  void* data;
 
   /// Add a child limb.
   void AddChild (csSkeletonLimbState* child);
@@ -201,13 +217,26 @@ public:
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   /// Get first child.
-  csSkeletonLimbState* GetChildren () { return children; }
+  csSkeletonLimbState* GetFirstChild () { return children; }
+  /// Get first child.
+  iSkeletonLimbState* GetChildren () { return (iSkeletonLimbState*)children; }
 
   /// Get next sibling in list.
   csSkeletonLimbState* GetNext () { return next; }
+  /// Get next sibling in list.
+  iSkeletonLimbState* GetNextSibling () { return (iSkeletonLimbState*)next; }
 
-  CSOBJTYPE;
-  DECLARE_IBASE_EXT (csObject);
+  /// Set the name for this limb.
+  virtual void SetName (const char* name);
+  /// Get the name for this limb.
+  virtual const char* GetName () const { return name; }
+  /// Set userdata object.
+  virtual void SetUserData (void* data) { csSkeletonLimbState::data = data; }
+  /// Get userdata object.
+  virtual void* GetUserData () { return data; }
+
+
+  DECLARE_IBASE;
 };
 
 /**
@@ -215,7 +244,8 @@ public:
  * This is basicly a transformation with a limb that
  * is controlled by the transformation.
  */
-class csSkeletonConnectionState : public csSkeletonLimbState
+class csSkeletonConnectionState : public csSkeletonLimbState,
+	public iSkeletonConnectionState
 {
   friend class csSkeletonConnection;
 
@@ -243,37 +273,35 @@ public:
   /// Get the transformation.
   csTransform& GetTransformation () { return trans; }
 
-  CSOBJTYPE;
-
   DECLARE_IBASE_EXT (csSkeletonLimbState);
 
   struct SkeletonBone : public iSkeletonBone
   {
     DECLARE_EMBEDDED_IBASE (csSkeletonConnectionState);
 
-    ///
     virtual iSkeletonBone* GetNext ()
     {
       csSkeletonLimbState* ls=scfParent->GetNext();
       if (!ls) return NULL;
       return QUERY_INTERFACE(ls, iSkeletonBone);
     }
-    ///
     virtual iSkeletonBone* GetChildren ()
     {
-      csSkeletonLimbState* ls=scfParent->GetChildren();
+      csSkeletonLimbState* ls=scfParent->GetFirstChild ();
       if (!ls) return NULL;
       return QUERY_INTERFACE(ls, iSkeletonBone);
     }
-    ///
     virtual const char* GetName ()
     {
       return scfParent->GetName();
     }
-    ///
-    void SetTransformation (const csTransform& tr)
+    virtual void SetTransformation (const csTransform& tr)
     {
       scfParent->SetTransformation (tr);
+    }
+    virtual csTransform& GetTransformation ()
+    {
+      return scfParent->GetTransformation ();
     }
   } scfiSkeletonBone;
   friend struct SkeletonBone;
@@ -287,7 +315,7 @@ public:
  * version. There is one csSkeletonState for every csSprite3D which
  * uses a skeleton.
  */
-class csSkeletonState : public csSkeletonLimbState
+class csSkeletonState : public csSkeletonLimbState, public iSkeletonState
 {
   friend class csSkeleton;
 
@@ -306,35 +334,32 @@ public:
   /// Calculate the real bounding box for the given state.
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
-  CSOBJTYPE;
-
   DECLARE_IBASE_EXT (csSkeletonLimbState);
 
   struct SkeletonBone : public iSkeletonBone
   {
     DECLARE_EMBEDDED_IBASE (csSkeletonState);
 
-    ///
     virtual iSkeletonBone* GetNext ()
     {
       csSkeletonLimbState* ls=scfParent->GetNext();
       if(!ls) return NULL;
       return QUERY_INTERFACE(ls, iSkeletonBone);
     }
-    ///
     virtual iSkeletonBone* GetChildren ()
     {
-      csSkeletonLimbState* ls=scfParent->GetChildren();
+      csSkeletonLimbState* ls=scfParent->GetFirstChild();
       if(!ls) return NULL;
       return QUERY_INTERFACE(ls, iSkeletonBone);
     }
-    ///
     virtual const char* GetName ()
     {
       return scfParent->GetName();
     }
-    ///
-    void SetTransformation (const csTransform&) {}
+    // @@@This is ugly. Skeleton doesn't support transformations!
+    virtual void SetTransformation (const csTransform&) {}
+    csTransform dummy;
+    virtual csTransform& GetTransformation () { return dummy; }
 
   } scfiSkeletonBone;
   friend struct SkeletonBone;

@@ -23,6 +23,11 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 
+struct iMaterialWrapper;
+struct iSkeleton;
+struct iSkeletonState;
+struct iMeshObjectFactory;
+
 /**
  * Macros for the csSprite3D lighting levels.
  */
@@ -65,10 +70,44 @@
  */
 #define CS_SPR_LOD_LOCAL 2
 
-struct iMaterialWrapper;
-
 // @@@ CONFIG TODO: global_lighting_quality
 // @@@ CONFIG TODO: global_lod_level
+
+SCF_VERSION (iSpriteFrame, 0, 0, 1);
+
+/**
+ * A frame for 3D sprite animation.
+ */
+struct iSpriteFrame : public iBase
+{
+  /// Set the name.
+  virtual void SetName (char const*) = 0;
+  /// Get the name.
+  virtual char const* GetName () const = 0;
+};
+
+SCF_VERSION (iSpriteAction, 0, 0, 1);
+
+/**
+ * An action frameset for 3D sprite animation.
+ */
+struct iSpriteAction : public iBase
+{
+  /// Set the name.
+  virtual void SetName (char const*) = 0;
+  /// Get the name.
+  virtual char const* GetName () const = 0;
+  /// Get the number of frames in this action.
+  virtual int GetNumFrames () = 0;
+  /// Get the specified frame.
+  virtual iSpriteFrame* GetFrame (int f) = 0;
+  /// Get the next frame after the specified one.
+  virtual iSpriteFrame* GetNextFrame (int f) = 0;
+  /// Get the delay for the specified frame.
+  virtual int GetFrameDelay (int f) = 0;
+  /// Add a frame to this action.
+  virtual void AddFrame (iSpriteFrame* frame, int delay) = 0;
+};
 
 SCF_VERSION (iSprite3DFactoryState, 0, 0, 1);
 
@@ -82,16 +121,60 @@ struct iSprite3DFactoryState : public iBase
   /// Get material of sprite.
   virtual iMaterialWrapper* GetMaterialWrapper () = 0;
 
-  // @@@ TODO: access the vertices
-  // @@@ TODO: access the triangles
-  // @@@ TODO: access the normals
-  // @@@ TODO: access the texcoords
+  /**
+   * Add some vertices, normals, and texels. This function
+   * only reserves space for this. It will not actually update
+   * the information.
+   */
+  virtual void AddVertices (int num) = 0;
+
+  /// Query the number of texels.
+  virtual int GetNumTexels () = 0;
+  /// Get a texel.
+  virtual csVector2& GetTexel (int frame, int vertex) = 0;
+  /// Get array of texels.
+  virtual csVector2* GetTexels (int frame) = 0;
+
+  /// Query the number of vertices.
+  virtual int GetNumVertices () = 0;
+  /// Get a vertex.
+  virtual csVector3& GetVertex (int frame, int vertex) = 0;
+  /// Get vertex array.
+  virtual csVector3* GetVertices (int frame) = 0;
+
+  /// Query the number of normals.
+  virtual int GetNumNormals () = 0;
+  /// Get a normal.
+  virtual csVector3& GetNormal (int frame, int vertex) = 0;
+  /// Get normal array.
+  virtual csVector3* GetNormals (int frame) = 0;
+
+  /**
+   * Add a triangle to the normal, texel, and vertex meshes
+   * a, b and c are indices to texel vertices
+   */
+  virtual void AddTriangle (int a, int b, int c) = 0;
+  /// returns the texel indices for triangle 'x'
+  virtual csTriangle GetTriangle (int x) = 0;
+  /// returns the triangles of the texel_mesh
+  virtual csTriangle* GetTriangles () = 0;
+  /// returns the number of triangles in the sprite
+  virtual int GetNumTriangles () = 0;
+
   // @@@ TODO: access the frames
   // @@@ TODO: access the actions
-  // @@@ TODO: access the skeleton
   // @@@ TODO: something to get the triangle mesh??? Do we need that?
   // @@@ TODO: what about HardTransform()? Needs to be extension
   //  	       to csMeshWrapper.
+
+  /// Enable skeletal animation for this factory.
+  virtual void EnableSkeletalAnimation () = 0;
+  /**
+   * Get the skeleton. Will only be valid if skeletal animation
+   * has been enabled with EnableSkeletalAnimation(). Otherwise
+   * it will return NULL.
+   */
+  virtual iSkeleton* GetSkeleton () = 0;
 
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;
@@ -157,10 +240,21 @@ struct iSprite3DState : public iBase
   // @@@ TODO: dynamic light support? Probably obsolete.
   // @@@ TODO: global LOD level.
   // @@@ TODO: static int global_lighting_quality;
-  // @@@ TODO: query skeleton state and allow to modify it.
   // @@@ TODO: query actions.
   // @@@ TODO: what about conveniance functions to set colors for verts?
   // @@@ TODO: what about GetRadius()? Add to csMeshWrapper?
+
+  /**
+   * Get the reference to the factory for this sprite.
+   */
+  virtual iMeshObjectFactory* GetFactory () = 0;
+
+  /**
+   * Get the skeleton state. Will only be valid if skeletal animation
+   * has been enabled for the factory that this sprite was created from.
+   * Otherwise it will return NULL.
+   */
+  virtual iSkeletonState* GetSkeletonState () = 0;
 
   /// Go to a specified frame.
   virtual void SetFrame (int f) = 0;

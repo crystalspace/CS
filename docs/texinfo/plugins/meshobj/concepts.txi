@@ -47,7 +47,7 @@ the particle system Mesh Object plug-in modules.
 A @dfn{Mesh Object Factory} is an object from which you can generate Mesh
 Object instances.  The Mesh Objects generated from a Mesh Object Factory will
 inherit some of the characteristics from this factory.  Exactly which
-characteristics dependend upon the Mesh Object Type (see below).  Roughly
+characteristics depend upon the Mesh Object Type (see below).  Roughly
 speaking, there are three possibilities:
 
 @enumerate

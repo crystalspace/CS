@@ -503,7 +503,7 @@ csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame,
 
 // Object added to every skeletal tree node to keep the animation
 // information.
-class TreeSkelSpriteInfo : public csObject
+class TreeSkelSpriteInfo
 {
 public:
   float z_angle_base;
@@ -514,10 +514,7 @@ public:
   float dx;
   float dz;
   float dy;
-  CSOBJTYPE;
 };
-
-IMPLEMENT_CSOBJTYPE (TreeSkelSpriteInfo, csObject);
 
 // Animate a skeleton.
 void animate_skeleton_tree (csSkeletonLimbState* limb)
@@ -525,7 +522,7 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
   csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
   while (con)
   {
-    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetChild (TreeSkelSpriteInfo::Type);
+    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetUserData ();
     if (!o)
     {
       o = new TreeSkelSpriteInfo ();
@@ -549,7 +546,7 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
       }
       o->y_angle = 0;
       o->dy = (rand () & 0x4) ? .04 : -.04;
-      con->ObjAdd (o);
+      con->SetUserData (o);
     }
     o->x_angle += o->dx;
     if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;
@@ -611,7 +608,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
 
 // Object added to every skeletal tree node to keep the animation
 // information.
-class GhostSkelSpriteInfo : public csObject
+class GhostSkelSpriteInfo
 {
 public:
   float z_angle_base;
@@ -622,10 +619,7 @@ public:
   float dx;
   float dz;
   float dy;
-  CSOBJTYPE;
 };
-
-IMPLEMENT_CSOBJTYPE (GhostSkelSpriteInfo, csObject);
 
 // Object added to the ghost sprite itself to hold some information
 // about movement.
@@ -721,8 +715,7 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
   	GetChildren ();
   while (con)
   {
-    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetChild
-    	(GhostSkelSpriteInfo::Type);
+    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetUserData ();
     if (!o)
     {
       o = new GhostSkelSpriteInfo ();
@@ -746,7 +739,7 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
       }
       o->y_angle = 0;
       o->dy = (rand () & 0x4) ? .04 : -.04;
-      con->ObjAdd (o);
+      con->SetUserData (o);
     }
     o->x_angle += o->dx;
     if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;

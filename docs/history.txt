@@ -1,12 +1,49 @@
 The history order has been reversed so that new features are at the top.
 
+17-Jan-2001
+	- Renamed iskeleton.h to iskel.h to make it work on DOS.
+	- Extended iskel.h with several new interface to represent the
+	  skeleton structure of a 3D sprite: iSkeletonLimb,
+	  iSkeletonConnection, iSkeleton, iSkeletonLimbState,
+	  iSkeletonConnectionState, and iSkeletonState. iSkeletonBone
+	  is retained and moved to iskelbon.h. It is used by the motion
+	  manager and independent as it could be implemented by other
+	  bone systems.
+	- The skeleton state classes no longer extend csObject. This is
+	  not needed and it is not useful because skeleton state classes
+	  are going to be moved outside the engine anyway. However, some
+	  applications (like WalkTest) require the ability to attach
+	  data to state objects so I extended the SCF interfaces with
+	  that ability.
+	- Modifed WalkTest to use the new user-data instead of the
+	  csObject system.
+	- Extended the iSprite3DFactoryState interface with
+	  EnableSkeletalAnimation() and GetSkeleton(). Also extended
+	  iSprite3DState with GetSkeletonState().
+	- Also added GetFactory() to iSprite3DState.
+	- Extended the iSprite3DFactoryState with various functions to access
+	  the vertices, texels, normals, and triangles.
+	- Added iSpriteFrame SCF interface and let csFrame implement this.
+	- Added iSpriteAction SCF interface and let csSpriteAction implement
+	  this.
+	- Fixed the 2D sprite plugin so that the initial color table is
+	  correctly copied to the real color table at initialization time
+	  when lighting is disabled.
+	- Changed the 2D sprite plugin so that order of SetColor() and
+	  SetLighting() doesn't matter anymore.
 16-Jan-2001
 	- Eric Sunshine changed the image-copying rule in docs.mak so that it
 	  should once again work on Windows/DOS.  (It used to work, but the
 	  command-line for copying images became too long, at some point, for
 	  the DOS command-line input buffer.)
 	- Eric Sunshine removed the broken and unuspported cygwin.mak file.
+	- Martin Geisse added some hints to the docs about how to write
+	  docs.
+	- Wouter Wijngaards fixed redefinition errors in OpenGL canvas by
+	  explicitly testing for each macro before defining it. This
+	  helps opengl canvas compilation on mingw32.
 15-Jan-2001
+	- Martin Geisse added a patch to csloader by Ed Halley.
 	- Fixed a serious bug in csMeshWrapper::SetMeshObject(). This
 	  function would do a DecRef() on the given mesh (possibly
 	  deleting it).
@@ -19,6 +56,8 @@ The history order has been reversed so that new features are at the top.
 	- Added the first and incomplete include/imspr3d.h which contains
 	  the iSprite3DState and iSprite3DFactoryState SCF interfaces that
 	  will be used by to access the sprite3d plugin (when it is ready).
+	- Wouter Wijngaards increased the speed of skydem (and sky proc
+	  texture in csfx) by making the floor simpler.
 14-Jan-2001
 	- Eric Sunshine fixed vfs.cfg so that it works with MacOS/X Server
 	  again following Andrew's change to the meaning of CS_PLATFORM_NAME.

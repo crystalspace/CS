@@ -36,6 +36,7 @@
 #include "igraph3d.h"
 #include "ipolmesh.h"
 #include "isprite.h"
+#include "imspr3d.h"
 
 class Dumper;
 class csMaterialList;
@@ -51,7 +52,7 @@ struct iTextureHandle;
 /**
  * A frame for 3D sprite animation.
  */
-class csFrame : public csBase
+class csFrame : public iSpriteFrame
 {
 private:
   int animation_index;
@@ -83,9 +84,9 @@ public:
   void SetNormalsCalculated (bool n) { normals_calculated = n; }
 
   /// Set the name.
-  void SetName (char const*);
+  virtual void SetName (char const*);
   /// Get the name.
-  char const* GetName () const { return name; }
+  virtual char const* GetName () const { return name; }
 
   /**
    * Compute the object space bounding box for this frame.
@@ -98,12 +99,14 @@ public:
    * Get the bounding box in object space.
    */
   void GetBoundingBox (csBox3& b) { b = box; }
+
+  DECLARE_IBASE;
 };
 
 /**
- * A Action frameset for a 3D sprite animation.
+ * An action frameset for a 3D sprite animation.
  */
-class csSpriteAction : public csBase
+class csSpriteAction : public iSpriteAction
 {
 public:
   /// Initialize a action object
@@ -111,25 +114,34 @@ public:
   /// Destroy this action object
   virtual ~csSpriteAction ();
 
+  /// Add a frame to this action @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  void AddCsFrame (csFrame* frame, int delay);
   /// Add a frame to this action
-  void AddFrame (csFrame * frame, int delay);
+  virtual void AddFrame (iSpriteFrame* frame, int delay);
   /// Set action name
-  void SetName (char const*);
+  virtual void SetName (char const*);
   /// Get action name
-  char const* GetName () const
+  virtual char const* GetName () const
   { return name; }
   /// Get total number of frames in this action
-  int GetNumFrames ()
-  { return frames.Length (); }
-  /// Query the frame number f
-  csFrame* GetFrame (int f)
+  virtual int GetNumFrames () { return frames.Length (); }
+  /// Query the frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  csFrame* GetCsFrame (int f)
   { return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL; }
-  /// Returns the looping frame after frame number f
-  csFrame* GetNextFrame (int f)
+  /// Returns the looping frame after frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  csFrame* GetCsNextFrame (int f)
   { f++; return f<frames.Length() ? (csFrame*)frames[f]:(csFrame*)frames[0]; }
+  /// Query the frame number f.
+  virtual iSpriteFrame* GetFrame (int f)
+  { return (iSpriteFrame*)((f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL); }
+  /// Returns the looping frame after frame number f.
+  virtual iSpriteFrame* GetNextFrame (int f)
+  { f++; return (iSpriteFrame*)(f<frames.Length() ? (csFrame*)frames[f]:(csFrame*)frames[0]); }
   /// Get delay for frame number f
-  int GetFrameDelay (int f)
+  virtual int GetFrameDelay (int f)
   { return (int)delays [f]; }
+
+  DECLARE_IBASE;
 
 private:
   char *name;
@@ -146,25 +158,25 @@ private:
 #define CS_SPR_LIGHTING_RANDOM 3
 
 /**
- * Use the global value for determining which lighting level is used by the 
+ * Use the global value for determining which lighting level is used by the
  * sprite.
  */
 #define CS_SPR_LIGHT_GLOBAL 0
 
 /**
- * Use the sprites template lighting quality value for determining which 
+ * Use the sprites template lighting quality value for determining which
  * lighting level is used by the sprite.
  */
 #define CS_SPR_LIGHT_TEMPLATE 1
 
 /**
- * Use the lighting quality value local to the sprite for determining which 
+ * Use the lighting quality value local to the sprite for determining which
  * lighting level is used by the sprite.
  */
 #define CS_SPR_LIGHT_LOCAL 2
 
 /**
- * Use the global value for determining if LOD is used by the 
+ * Use the global value for determining if LOD is used by the
  * sprite, and what level it should be used at.
  */
 #define CS_SPR_LOD_GLOBAL 0
@@ -214,10 +226,10 @@ private:
 
   /// Enable tweening.
   bool do_tweening;
-  
+
   /// The lighting_quality for this template.  See macros CS_SPR_LIGHTING_*
   int lighting_quality;
-   
+ 
   /**
    * The lighting_quality_config for this template.
    * See macros CS_SPR_LIGHT_*
@@ -231,14 +243,14 @@ private:
    * is done.
    */
   float lod_level;
-  
+
   /**
    * The lod_level_config for this template.
    * See macros CS_SPR_LOD_*
    * This is used to set new sprites lod_level_config to this one.
    */
   int lod_level_config;
-   
+ 
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
@@ -284,7 +296,7 @@ public:
 
   /// Is tweening enabled?
   bool IsTweeningEnabled () { return do_tweening; }
-   
+ 
   /// Returns the lighting quality for this template.
   int GetLightingQuality() { return lighting_quality; }
 
@@ -292,7 +304,7 @@ public:
   void SetLightingQuality(int quality) {lighting_quality = quality; }
 
   /**
-   * Sets which lighting config variable that all new sprites created 
+   * Sets which lighting config variable that all new sprites created
    * from this template will use.
    * The options are:
    * <ul>
@@ -303,7 +315,7 @@ public:
    */
   void SetLightingQualityConfig (int config_flag)
   { lighting_quality_config = config_flag; };
-   
+ 
   /**
    * Returns what this template is using for determining the lighting quality.
    */
@@ -317,7 +329,7 @@ public:
   void SetLodLevel(float level) {lod_level = level; }
 
   /**
-   * Sets which lod config variable that all new sprites created 
+   * Sets which lod config variable that all new sprites created
    * from this template will use.
    * The options are:
    * <ul>
@@ -328,7 +340,7 @@ public:
    */
   void SetLodLevelConfig (int config_flag)
   { lod_level_config = config_flag; };
-   
+ 
   /**
    * Returns what this template is using for determining the lighting quality.
    */
@@ -389,7 +401,7 @@ public:
    * a, b and c are indices to texel vertices
    */
   void AddTriangle (int a, int b, int c);
-  /// returns the texel indices for triangle 'x'  
+  /// returns the texel indices for triangle 'x'
   csTriangle GetTriangle (int x) { return texel_mesh->GetTriangle(x); }
   /// returns the triangles of the texel_mesh
   csTriangle* GetTriangles ()    { return texel_mesh->GetTriangles(); }
@@ -715,7 +727,7 @@ public:
   void Rotate (float angle);
 
   /**
-   * Scale sprite by this factor. 
+   * Scale sprite by this factor.
    * This function operates by scaling the movable transform.
    */
   void ScaleBy (float factor);
@@ -760,9 +772,9 @@ public:
    * is done.
    */
   static float global_lod_level;
-   
+ 
 private:
-   
+ 
   /**
    * Used to determine where to look for the lod detail level.
    * The possible values are:
@@ -773,10 +785,10 @@ private:
    *   </ul>
    */
   int lod_level_config;
-   
+ 
   /**
-   * Configuration value for an individuals LOD. 0 is lowest detail, 
-   * 1 is maximum.  If negative then the base mesh is used and no LOD 
+   * Configuration value for an individuals LOD. 0 is lowest detail,
+   * 1 is maximum.  If negative then the base mesh is used and no LOD
    * reduction/computation is done.
    */
    float local_lod_level;
@@ -786,9 +798,9 @@ private:
    * See the CS_SPR_LIGHTING_* macros defined in this header file for the
    * different types of lighting.  This is the local setting.  It overrides the
    * template, and global lighting settings.
-   */  
+   */
   int local_lighting_quality;
-   
+ 
   /**
    * Used to determine where to look for the quality setting of the lighting.
    * The possible values are:
@@ -797,11 +809,11 @@ private:
    *     <li>CS_SPR_LIGHT_TEMPLATE
    *     <li>CS_SPR_LIGHT_LOCAL
    *   </ul>
-   */  
+   */
   int lighting_quality_config;
-  
+
 public:
-   
+ 
   /**
    * Quality setting for sprite lighting.
    * See the CS_SPR_LIGHTING_* macros defined in this header file for the
@@ -815,7 +827,7 @@ public:
    * Returns the lighting quality level used by this sprite.
    * See SPT_LIGHTING_* macros defined in this header for the different types
    * of lighting.
-   */ 
+   */
   int GetLightingQuality ()
   {
     switch (lighting_quality_config)
@@ -830,14 +842,14 @@ public:
       }
     }
   };
-   
+ 
   /**
    * Sets the local lighting quality for this sprite.  NOTE: you must use
    * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
    */
   void SetLocalLightingQuality(int lighting_quality)
   { local_lighting_quality = lighting_quality; };
-   
+ 
   /**
    * Sets the global lighting quality for all csSprite3Ds.
    * NOTE: You must use SetLightingQualityConfig(CS_SPR_LIGHT_GLOBAL) for the
@@ -845,7 +857,7 @@ public:
    */
   void SetGlobalLightingQuality (int lighting_quality)
   { global_lighting_quality = lighting_quality; };
-   
+ 
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
@@ -857,7 +869,7 @@ public:
    */
   void SetLightingQualityConfig(int config_flag)
   { lighting_quality_config = config_flag; };
-   
+ 
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
@@ -866,7 +878,7 @@ public:
 
   /**
    * Returns the lod level used by this sprite.
-   */ 
+   */
   float GetLodLevel ()
   {
     switch (lod_level_config)
@@ -881,21 +893,21 @@ public:
       }
     }
   };
-   
+ 
   /**
    * Sets the local lod level for this sprite.  NOTE: you must use
    * SetLodLevelConfig (CS_SPR_LOD_LOCAL) for the sprite to use this.
    */
   void SetLocalLodLevel(float lod_level)
   { local_lod_level = lod_level; };
-   
+ 
   /**
    * Sets the global lod level for all csSprite3Ds.  NOTE: you must use
    * SetLodLevelConfig(CS_SPR_LOD_GLOBAL) for the sprite to use this.
    */
   void SetGlobalLodLevel (float lod_level)
   { global_lod_level = lod_level; };
-   
+ 
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
@@ -907,7 +919,7 @@ public:
    */
   void SetLodLevelConfig(int config_flag)
   { lod_level_config = config_flag; };
-   
+ 
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
@@ -920,7 +932,7 @@ public:
   bool IsLodEnabled()
   { if(GetLodLevel() < 0)
       return false;
-    else 
+    else
       return true;
   };
 
@@ -928,15 +940,15 @@ public:
    * GetNumVertsToLight returns the number of vertices to light based on LOD.
    */
   int GetNumVertsToLight();
-   
+ 
 private:
-  
+
   /**
    * num_verts_for_lod represents the number of lights that are used by lod.
    * If -1 means that it is not used.
-   */  
+   */
   int num_verts_for_lod;
-   
+ 
   /**
    * A mesh which contains a number of triangles as generated
    * by the LOD algorithm. This is static since it will likely
@@ -994,7 +1006,7 @@ private:
    * This method can use tweening of the normals.
    */
   void UpdateLightingLQ (csLight** lights, int num_lights);
-   
+ 
   /**
    * Low quality Fast version of UpdateLighting() which only
    * calculates the distance once (from the center of the sprite.)
@@ -1007,10 +1019,10 @@ private:
    *  Intended for use for things like powerups.
    */
   void UpdateLightingRandom ();
-  
+
   /// random number generator used for random lighting.
   csRandomGen *rand_num;
-   
+
 protected:
   /**
    * Update this sprite in the polygon trees.

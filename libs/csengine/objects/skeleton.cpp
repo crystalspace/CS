@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +21,16 @@
 
 
 //---------------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csSkeletonLimb)
+  IMPLEMENTS_INTERFACE (iSkeletonLimb)
+IMPLEMENT_IBASE_END
+
+csSkeletonLimb::csSkeletonLimb ()
+  : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL)
+{
+  CONSTRUCT_IBASE (NULL);
+}
 
 csSkeletonLimb::~csSkeletonLimb ()
 {
@@ -118,6 +128,13 @@ void csSkeletonLimb::SetName (const char *newname)
   name = strdup (newname);
 }
 
+iSkeletonConnection* csSkeletonLimb::CreateConnection ()
+{
+  csSkeletonConnection* con = new csSkeletonConnection ();
+  AddChild (con);
+  return QUERY_INTERFACE (con, iSkeletonConnection);
+}
+
 csSkeletonLimbState* csSkeletonLimb::CreateState ()
 {
   csSkeletonLimbState* limb = new csSkeletonLimbState ();
@@ -142,16 +159,29 @@ csSkeletonLimbState* csSkeleton::CreateState ()
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csSkeletonLimbState,csObject);
-IMPLEMENT_CSOBJTYPE (csSkeletonConnectionState,csSkeletonLimbState);
-IMPLEMENT_CSOBJTYPE (csSkeletonState,csSkeletonLimbState);
-
-IMPLEMENT_IBASE_EXT (csSkeletonLimbState)
+IMPLEMENT_IBASE_EXT (csSkeletonConnection)
+  IMPLEMENTS_INTERFACE (iSkeletonConnection)
 IMPLEMENT_IBASE_EXT_END
 
+csSkeletonConnection::csSkeletonConnection ()
+{
+}
+
+IMPLEMENT_IBASE_EXT (csSkeleton)
+  IMPLEMENTS_INTERFACE (iSkeleton)
+IMPLEMENT_IBASE_EXT_END
+
+//---------------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csSkeletonLimbState)
+  IMPLEMENTS_INTERFACE (iSkeletonLimbState)
+IMPLEMENT_IBASE_END
+
 csSkeletonLimbState::csSkeletonLimbState (): 
-  next (NULL), vertices (NULL), num_vertices (0), children (NULL)
-{ 
+  next (NULL), vertices (NULL), num_vertices (0), children (NULL),
+  data (NULL)
+{
+  CONSTRUCT_IBASE (NULL);
 }
 
 csSkeletonLimbState::~csSkeletonLimbState ()
@@ -176,6 +206,12 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source, c
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     dest [vertices [i]] = tr * source[vertices [i]];
+}
+
+void csSkeletonLimbState::SetName (const char *newname)
+{
+  if (name) free (name);
+  name = strdup (newname);
 }
 
 void csSkeletonConnectionState::Transform (const csTransform& tr, csVector3* source,
@@ -211,6 +247,7 @@ void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
 }
 
 IMPLEMENT_IBASE_EXT (csSkeletonConnectionState)
+  IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
 
@@ -232,6 +269,7 @@ void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
 }
 
 IMPLEMENT_IBASE_EXT (csSkeletonState)
+  IMPLEMENTS_INTERFACE (iSkeletonState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
 

@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "iplugin.h"
-#include "iskeleton.h"
+#include "iskelbon.h"
 class csMatrix3;
 class csQuaternion;
 

@@ -45,8 +45,13 @@
 
 //--------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csFrame)
+  IMPLEMENTS_INTERFACE (iSpriteFrame)
+IMPLEMENT_IBASE_END
+
 csFrame::csFrame (int anm_idx, int tex_idx)
 {
+  CONSTRUCT_IBASE (NULL);
   name = NULL;
   animation_index = anm_idx;
   texturing_index = tex_idx;
@@ -72,8 +77,13 @@ void csFrame::SetName (char const* n)
 
 //--------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csSpriteAction)
+  IMPLEMENTS_INTERFACE (iSpriteAction)
+IMPLEMENT_IBASE_END
+
 csSpriteAction::csSpriteAction() : frames (8, 8), delays (8, 8)
 {
+  CONSTRUCT_IBASE (NULL);
   name = NULL;
 }
 
@@ -94,9 +104,15 @@ void csSpriteAction::SetName (char const* n)
     name = 0;
 }
 
-void csSpriteAction::AddFrame (csFrame * f, int d)
+void csSpriteAction::AddCsFrame (csFrame * f, int d)
 {
   frames.Push (f);
+  delays.Push ((csSome)d);
+}
+
+void csSpriteAction::AddFrame (iSpriteFrame * f, int d)
+{
+  frames.Push ((csFrame*)f);
   delays.Push ((csSome)d);
 }
 
@@ -892,7 +908,7 @@ void csSprite3D::GetObjectBoundingBox (csBox3& b)
   }
   else
   {
-    csFrame* cframe = cur_action->GetFrame (cur_frame);
+    csFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetBoundingBox (b);
   }
 }
@@ -936,7 +952,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   }
   else
   {
-    csFrame* cframe = cur_action->GetFrame (cur_frame);
+    csFrame* cframe = cur_action->GetCsFrame (cur_frame);
     csBox3 box;
     cframe->GetBoundingBox (box);
     camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
@@ -1022,14 +1038,14 @@ void csSprite3D::Draw (csRenderView& rview)
 // Moving the lighting to below the lod.
 //  UpdateDeferedLighting (movable.GetPosition ());
 
-  csFrame * cframe = cur_action->GetFrame (cur_frame);
+  csFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
   csFrame * next_frame;
   if (cur_frame + 1 < cur_action->GetNumFrames())
-    next_frame = cur_action->GetFrame (cur_frame + 1);
+    next_frame = cur_action->GetCsFrame (cur_frame + 1);
   else
-    next_frame = cur_action->GetFrame (0);
+    next_frame = cur_action->GetCsFrame (0);
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -1307,9 +1323,9 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   defered_num_lights = 0;
 
   // Make sure the normals are computed
-  tpl->ComputeNormals (cur_action->GetFrame (cur_frame));
+  tpl->ComputeNormals (cur_action->GetCsFrame (cur_frame));
   if (tween_ratio && GetLightingQuality() != CS_SPR_LIGHTING_FAST)
-    tpl->ComputeNormals (cur_action->GetNextFrame (cur_frame));
+    tpl->ComputeNormals (cur_action->GetCsNextFrame (cur_frame));
 
   // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
@@ -1390,7 +1406,7 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
   float light_bright_wor_dist;
   
   // convert frame number in current action to absolute frame number
-  int tf_idx = cur_action->GetFrame (cur_frame)->GetAnmIndex();
+  int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex();
 
   csBox3 obox;
   GetObjectBoundingBox (obox);
@@ -1492,8 +1508,8 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
   float remainder = 1 - tween_ratio;
 
   // convert frame number in current action to absolute frame number
-  int tf_idx = cur_action->GetFrame     (cur_frame)->GetAnmIndex ();
-  int nf_idx = cur_action->GetNextFrame (cur_frame)->GetAnmIndex ();
+  int tf_idx = cur_action->GetCsFrame     (cur_frame)->GetAnmIndex ();
+  int nf_idx = cur_action->GetCsNextFrame (cur_frame)->GetAnmIndex ();
 
   csBox3 obox;
   GetObjectBoundingBox (obox);
@@ -1548,8 +1564,8 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights)
   int i, j;
 
   // convert frame number in current action to absolute frame number
-  int tf_idx = cur_action->GetFrame     (cur_frame)->GetAnmIndex ();
-  int nf_idx = cur_action->GetNextFrame (cur_frame)->GetAnmIndex ();
+  int tf_idx = cur_action->GetCsFrame     (cur_frame)->GetAnmIndex ();
+  int nf_idx = cur_action->GetCsNextFrame (cur_frame)->GetAnmIndex ();
 
   float remainder = 1 - tween_ratio;
 //  int num_texels = tpl->GetNumTexels ();
@@ -1568,7 +1584,7 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights)
     object_vertices = obj_verts.GetArray ();
   }
   else
-    object_vertices = GetObjectVerts (cur_action->GetFrame (cur_frame));
+    object_vertices = GetObjectVerts (cur_action->GetCsFrame (cur_frame));
 
   csColor color;
 
@@ -1628,7 +1644,7 @@ bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,
   csSegment3 seg (start, end);
   if (!csIntersect3::BoxSegment (b, seg, isect, pr))
     return false;
-  csFrame* cframe = cur_action->GetFrame (cur_frame);
+  csFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe);
   csTriangle* tris = tpl->GetTriangles ();
   int i;

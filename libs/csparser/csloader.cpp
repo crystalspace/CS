@@ -4491,7 +4491,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
       case CS_TOKEN_SKELETON:
 	{
           csSkeleton* skeleton = new csSkeleton ();
-	  if(name) skeleton->SetName (name);
+	  if (name) skeleton->SetName (name);
 	  if (!LoadSkeleton (skeleton, params, false)) return false;
 	  stemp->SetSkeleton (skeleton);
 	}
@@ -4872,7 +4872,7 @@ csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
   }
 
   if (action_specified)
-    return (stemp->FindAction(action))->GetFrame(frame);
+    return (stemp->FindAction(action))->GetCsFrame(frame);
   else
     return stemp->GetFrame(frame);
 }

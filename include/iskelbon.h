@@ -16,26 +16,34 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISKELETON_H__
-#define __ISKELETON_H__
+#ifndef __ISKELBONE_H__
+#define __ISKELBONE_H__
 
 #include "csutil/scf.h"
-#include "iplugin.h"
+
 class csTransform;
 
-SCF_VERSION (iSkeletonBone, 0, 0, 1);
+SCF_VERSION (iSkeletonBone, 0, 0, 2);
 
-/// temporary - subject to change
+/**
+ * A bone in the skeleton system. This is a seperate interface
+ * because it is used by the motion manager seperatelly and it is
+ * possible that other skeletal systems also implement iSkeletonBone
+ * (without having to implement iSkeletonConnectionState).
+ */
 struct iSkeletonBone : public iBase
 {
-  ///
+  /// Get the next sibling of this bone.
   virtual iSkeletonBone* GetNext () = 0;
-  ///
+  /// Get the children of this bone.
   virtual iSkeletonBone* GetChildren () = 0;
-  ///
+  /// Get the name of this bone.
   virtual const char* GetName () = 0;
-  ///
+  /// Set the transformation used for this bone.
   virtual void SetTransformation (const csTransform& tr) = 0;
+  /// Get the transformation.
+  virtual csTransform& GetTransformation () = 0;
 };
 
 #endif
+
