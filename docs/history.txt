@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed bug in xmlread with parsing of attributes values that
 	  have no quotes around them.
 	- Micah added an alternative logo image to standard.zip
+	- Micah modivied walktest to use the alternative logo
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h

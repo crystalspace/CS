@@ -748,9 +748,39 @@ void WalkTest::DrawFrame2D (void)
 {
   if (do_logo && cslogo)
   {
-    unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
-    unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;
-    cslogo->DrawScaled (Gfx3D, FRAME_WIDTH - 2 - (w * 151) / 256 , 2, w, h);
+    /*
+     * This now uses a new logo designed by Micah Dowty <micah@navi.picogui.org>
+     * to look better on various backgrounds than the usual logo, which only looks
+     * good on black.
+     * The logo was drawn as an SVG image using Sodipodi, so it should be usable in
+     * many other contexts if desired. The originals should appear on sunsite.dk
+     * sometime soon. If not, email Micah to get them.
+     */
+
+    // Margin to the edge of the screen, as a fraction of screen width
+    const float marginFraction = 0.01;
+    const unsigned margin = (unsigned) (FRAME_WIDTH * marginFraction);
+
+#if 1 /**** Scalable logo ****/
+
+    // Width of the logo, as a fraction of screen width
+    const float widthFraction = 0.3;
+
+    // Scale the logo width to a fraction of the screen, keeping its aspect ratio
+    const unsigned w = (unsigned) (FRAME_WIDTH * widthFraction);
+    const unsigned h = w * cslogo->Height() / cslogo->Width();
+
+    // Stick it in the top-right corner, with some margin
+    cslogo->DrawScaled (Gfx3D, FRAME_WIDTH - w - margin, margin, w, h);
+
+#else /**** Fixed-size logo ****/
+
+    const unsigned w = cslogo->Width();
+    const unsigned h = cslogo->Height();
+
+    cslogo->Draw (Gfx3D, FRAME_WIDTH - w - margin, margin);
+
+#endif
   }
 
   // White-board for debugging purposes.
@@ -979,7 +1009,7 @@ void WalkTest::Inititalize2DTextures ()
 {
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
-  iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo");
+  iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo2");
   if (texh)
     texh->SetFlags (CS_TEXTURE_2D);
 }
@@ -992,7 +1022,7 @@ void WalkTest::Create2DSprites(void)
   iTextureHandle* phTex;
 
   // Create a 2D sprite for the Logo.
-  texh = Engine->GetTextureList ()->FindByName ("cslogo");
+  texh = Engine->GetTextureList ()->FindByName ("cslogo2");
   if (texh)
   {
     phTex = texh->GetTextureHandle();
