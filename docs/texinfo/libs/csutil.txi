@@ -86,8 +86,8 @@ object by 1.
 @subsection @code{Typed Vectors}
 @cindex @code{Typed Vectors}
 
-Crystal Space currently has six types of typed vectors. These six types
-all provide automatical growing when the array size is too small.
+Crystal Space currently has six types of typed vectors.  These arrays grow as
+needed to accomodate additions and insertions.
 
 @itemize
 @item

@@ -23,6 +23,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed documentation booboo (<texture> was used instead
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
 	  <oroszib@vpg.sulinet.hu>.
+	- Eric Sunshine repaired some poor wording in csutil.txi.
 10-Feb-2003
 	- Marten Svanfeldt fixed various bugs in TextureManager
 	- Philipp Aumayr added new TextureManager for Render3D with support
