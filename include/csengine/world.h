@@ -229,7 +229,7 @@ private:
   // The position and radius.
   csSector* sector;
   csVector3 pos;
-  float sqradius;
+  float radius;
   // Polygon index (to loop over all portals).
   // If -1 then we return current sector first.
   int cur_poly;
@@ -238,10 +238,12 @@ private:
   csSectorIt* recursive_it;
   // If true then this iterator has ended.
   bool has_ended;
+  // Last position (from Fetch).
+  csVector3 last_pos;
 
 public:
   /// Construct an iterator and initialize to start.
-  csSectorIt (csSector* sector, const csVector3& pos, float sqradius);
+  csSectorIt (csSector* sector, const csVector3& pos, float radius);
 
   /// Destructor.
   ~csSectorIt ();
@@ -251,9 +253,14 @@ public:
 
   /// Get sector from iterator. Return NULL at end.
   csSector* Fetch ();
+
+  /**
+   * Get last position that was used from Fetch. This can be
+   * different from 'pos' because of space warping.
+   */
+  const csVector3& GetLastPosition () { return last_pos; }
 };
 
-#if 0
 /**
  * Iterator to iterate over objects in the world.
  * This iterator assumes there are no fundamental changes
@@ -268,7 +275,7 @@ private:
   // The world for this iterator.
   csWorld* world;
   // The type to use.
-  csIdType* type;
+  const csIdType* type;
   bool derived;
   // The starting position and radius.
   csSector* start_sector;
@@ -278,62 +285,40 @@ private:
   csSector* cur_sector;
   csVector3 cur_pos;
   // Object type we are currently iterating over.
-  csIdType* cur_type;
+  const csIdType* cur_type;
   // Current object.
   csObject* cur_object;
   // Current index.
   int cur_idx;
-  // If true then we first return this sector.
-  bool do_this_sector;
+  // Iterator over the sectors.
+  csSectorIt* sectors_it;
 
 private:
   /// Return true if object has right type.
   bool CheckType (csObject* obj);
   /// Return true if object has right type.
-  bool CheckType (csIdType* ctype);
+  bool CheckType (const csIdType* ctype);
 
-  /// Start looking for things.
-  void StartThings ()
-  {
-    cur_type = &csThing::Type;
-    cur_object = cur_sector->GetFirstThing ();
-  }
-  /// Start looking for static lights.
-  void StartStatLights ()
-  {
-    cur_type = &csStatLight::Type;
-    cur_idx = 0;
-  }
-  /// Start looking for sprites.
-  void StartSprites ()
-  {
-    cur_type = &csSprite::Type;
-    cur_idx = 0;
-  }
-  /// Start looking for nearby sectors (through portals).
-  void StartSectors ()
-  {
-    cur_type = &csSector::Type;
-    cur_idx = 0;
-  }
-  /// End search.
-  void EndSearch ()
-  {
-    cur_type = NULL;
-  }
+  // Start looking for stuff.
+  void StartThings ();
+  void StartStatLights ();
+  void StartSprites ();
+  void EndSearch ();
 
   /// Construct an iterator and initialize to start.
   csObjectIt (csWorld* w, const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius);
 
 public:
+  /// Destructor.
+  ~csObjectIt ();
+
   /// Restart iterator.
   void Restart ();
 
   /// Get object from iterator. Return NULL at end.
   csObject* Fetch ();
 };
-#endif
 
 /**
  * The world! This class basicly represents the 3D engine.
@@ -880,7 +865,6 @@ public:
   csSectorIt* GetNearbySectors (csSector* sector,
   	const csVector3& pos, float radius);
 
-#if 0
   /**
    * This routine returns an iterator to iterate over
    * all objects of a given type that are within a radius
@@ -893,7 +877,6 @@ public:
    */
   csObjectIt* GetNearbyObjects (const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius);
-#endif
 
   /**
    * Add a halo attached to given light to the world.
