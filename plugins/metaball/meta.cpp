@@ -113,7 +113,7 @@ void csMetaBalls::SetNumberMetaBalls (int number)
 
 void csMetaBalls::SetQualityEnvironmentMapping (bool toggle)
 {
-  env_mapping = toggle;
+  env_mapping = toggle ? TRUE_ENV_MAP : FAKE_ENV_MAP;;
   InitTables ();
 }
 

@@ -28,7 +28,7 @@
 
 class csTextureHandle;
 class csIniFile;
-class G3DPolygonDPFX;
+struct G3DPolygonDPFX;
 struct iSystem;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -57,7 +57,7 @@ class csMetaBalls : public iMetaBalls
   int num_meta_balls;
   int max_triangles;
   int triangles_tesselated;
-  bool env_mapping;
+  EnvMappingModes env_mapping;
   float env_map_mult;
   float alpha;
   MetaParameters mp;
