@@ -93,7 +93,7 @@ bool csApp::csAppPlugin::HandleEvent (iEvent &Event)
          || app->PostHandleEvent (Event);
 
   if (Event.Type == csevBroadcast
-   && Event.Command.Code == cscmdPostProcess)
+   && Event.Command.Code == cscmdFinalProcess)
     app->FinishFrame ();
 
   return rc;
