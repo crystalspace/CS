@@ -22,6 +22,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the BeOS port so that vsh can link.  To do so,
 	  it was necessary to break csSystemDriver::Time() out into its own
 	  source file.
+	- Eric Sunshine fixed a shadowed-variable compiler warning in md2.cpp.
 30-Sep-1999
 	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
 	  conforms to the CS makefile system.  He was also forced to renamed
