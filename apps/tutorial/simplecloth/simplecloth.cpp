@@ -327,10 +327,6 @@ bool Simple::Initialize ()
 
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact ( engine->CreateMeshFactory("crystalspace.mesh.object.cloth","StuffFactory") );
-  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple2",
-    	"BLA!!");
-  csRef<iMaterialWrapper> mat ( engine->GetMaterialList()->FindByName("spark") );
   
   if (imeshfact == NULL)
   {
@@ -339,6 +335,8 @@ bool Simple::Initialize ()
     	"Error loading mesh object factory!");
     return false;
   }
+
+  csRef<iMaterialWrapper> mat ( engine->GetMaterialList()->FindByName("spark") );
 
   if (mat == NULL)
   {
