@@ -606,10 +606,8 @@ public:
    */
   void MergeNormals ();
 
-  void SetMixMode (uint mode)
-  { MixMode = mode; }
-  uint GetMixMode () const
-  { return MixMode; }
+  void SetMixMode (uint mode) { MixMode = mode; }
+  uint GetMixMode () const { return MixMode; } 
 
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
@@ -1222,12 +1220,19 @@ private:
    * Array of colors for the vertices. If not set then this
    * sprite does not have colored vertices.
    */
+#ifdef CS_USE_NEW_RENDERER
+  csColor4* vertex_colors;
+  /**
+   * Base color that will be added to the sprite colors.
+   */
+  csColor4 base_color;
+#else
   csColor* vertex_colors;
-
   /**
    * Base color that will be added to the sprite colors.
    */
   csColor base_color;
+#endif
 
   /// The parent.
   csSprite3DMeshObjectFactory* factory;
@@ -1315,7 +1320,7 @@ private:
   int vbuf_num_vertices;
 #else
   csVector2* final_texcoords;
-  csColor* final_colors;
+  csColor4* final_colors;
   csTriangle* final_triangles;
   csVector3* real_obj_verts;
   csVector3* real_tween_verts;
@@ -1408,7 +1413,17 @@ public:
   iMaterialWrapper* GetMaterial () const { return cstxt; }
 
   /// Sets the mode that is used, when drawing that sprite.
-  void SetMixMode (uint m) { MixMode = m; }
+  void SetMixMode (uint mode)
+  {
+    MixMode = mode;
+#ifdef CS_USE_NEW_RENDERER
+    if (MixMode & CS_FX_ALPHA)
+      base_color.alpha = float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
+    else
+      base_color.alpha = 1.0;
+#endif
+  }
+
 
   /// Gets the mode that is used, when drawing that sprite.
   uint GetMixMode () const { return MixMode; }
@@ -1437,7 +1452,11 @@ public:
   {
     delete[] vertex_colors;
     vertex_colors = 0;
-    base_color = col;
+    base_color.Set (col);
+#ifdef CS_USE_NEW_RENDERER
+    if (MixMode & CS_FX_ALPHA)
+      base_color.alpha = float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
+#endif
     ResetVertexColors ();
   }
 

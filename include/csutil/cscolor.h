@@ -117,6 +117,27 @@ public:
     blue = c.blue;
     alpha = 1.0f;
   }
+  void Set (const csColor4& c)
+  {
+    red = c.red;
+    green = c.green;
+    blue = c.blue;
+    alpha = c.alpha;
+  }
+  void Set (float r, float g, float b)
+  {
+    red = r;
+    green = g;
+    blue = b;
+    alpha = 1.0f;
+  }
+  void Set (float r, float g, float b, float a)
+  {
+    red = r;
+    green = g;
+    blue = b;
+    alpha = a;
+  }
 };
 
 /// Multiply a color by a scalar value.

@@ -7,6 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 15-Oct-2004
+	- Jorrit temporarily fixed spr3d with <alpha> mixmode for NR.
+	  The fix works by using csColor4 for the color buffer and extracting
+	  the alpha from the mixmode so that we can put the alpha component
+	  as the 4th color component. This is only temporary. We need
+	  to avoid using alpha in mixmode and add a new SetAlpha() (next
+	  to SetMixMode()) for all mesh objects. Also this fix needs
+	  to be propagated to other mesh objects too.
+	- Jorrit added a few methods to csColor4.
 	- Eric Sunshine eliminated several compilation warnings.
 14-Oct-2004
 	- Eric Sunshine added an AAlib (ASCII Art library) check to

@@ -1185,10 +1185,14 @@ void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
   if (!vertex_colors)
   {
     int vt = factory->GetVertexCount ();
+#ifdef CS_USE_NEW_RENDERER
+    vertex_colors = new csColor4 [vt];
+#else
     vertex_colors = new csColor [vt];
+#endif
     int j;
     for (j = 0 ; j < factory->GetVertexCount (); j++)
-      vertex_colors[j] = base_color;
+      vertex_colors[j].Set (base_color);
   }
   vertex_colors [i] += col;
 }
@@ -1199,7 +1203,7 @@ void csSprite3DMeshObject::ResetVertexColors ()
   {
     int i;
     for (i = 0 ; i < factory->GetVertexCount (); i++)
-      vertex_colors [i] = base_color;
+      vertex_colors [i].Set (base_color);
   }
   //delete [] vertex_colors;
   //vertex_colors = 0;
@@ -2187,23 +2191,25 @@ void csSprite3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   {
     int num_texels = factory->GetVertexCount();
     // Reseting all of the vertex_colors to the base color.
+#ifdef CS_USE_NEW_RENDERER
+    csColor4 col;
+#else
     csColor col;
+#endif
+    col.Set (base_color);
     if (factory->engine)
     {
-      factory->engine->GetAmbientLight (col);
-      col += base_color;
+      csColor ambient_col;
+      factory->engine->GetAmbientLight (ambient_col);
+      col += ambient_col;
       iSector* sect = movable->GetSectors ()->Get (0);
       if (sect)
         col += sect->GetDynamicAmbientLight ();
     }
-    else
-    {
-      col = base_color;
-    }
 
     int i;
     for (i = 0 ; i < num_texels; i++)
-      vertex_colors [i] = col;
+      vertex_colors [i].Set (col);
   }
 
 // @@@
@@ -2351,9 +2357,14 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
         cosinus = (obj_light_dir * factory->GetNormal (tf_idx, j))
 		* inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
-        vertex_colors[j].Set(light_color_r * cosinus_light + base_color.red,
-                             light_color_g * cosinus_light + base_color.green,
-                             light_color_b * cosinus_light + base_color.blue);
+        vertex_colors[j].Set(
+		light_color_r * cosinus_light + base_color.red,
+                light_color_g * cosinus_light + base_color.green,
+                light_color_b * cosinus_light + base_color.blue
+#ifdef CS_USE_NEW_RENDERER
+		, base_color.alpha
+#endif
+		);
       }
     }
     else  // The next lights should have the light color added.
@@ -2804,10 +2815,10 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     if (!colors)
     {
       colors = factory->g3d->CreateRenderBuffer (
-        sizeof (csColor)*final_num_vertices, CS_BUF_DYNAMIC,
-		    CS_BUFCOMP_FLOAT, 3);
+        sizeof (csColor4)*final_num_vertices, CS_BUF_DYNAMIC,
+		    CS_BUFCOMP_FLOAT, 4);
     }
-    colors->CopyToBuffer (final_colors, sizeof (csColor)*final_num_vertices);
+    colors->CopyToBuffer (final_colors, sizeof (csColor4)*final_num_vertices);
     variable->SetValue (colors);
   }
   else if (name == indices_name)
