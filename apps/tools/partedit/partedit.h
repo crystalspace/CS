@@ -74,6 +74,8 @@ private:
 
   EmitterState state_emitter;
   Emitter3DState state_initial_position;
+  Emitter3DState state_initial_speed;
+  Emitter3DState state_initial_acceleration;
   AttractorState state_attractor;
 
   /** Set to true on start.  Set to false when a quit event is received.

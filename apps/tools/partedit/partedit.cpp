@@ -230,6 +230,20 @@ void PartEdit::SetupFrame ()
       s->ClearInitialPositionStateChanged();
       update=true;
     }
+    if (s->InitialSpeedStateChanged())
+    {
+      e3dstate=s->GetInitialSpeedState();
+      memcpy(&state_initial_speed,e3dstate,sizeof(Emitter3DState));
+      s->ClearInitialSpeedStateChanged();
+      update=true;
+    }
+    if (s->InitialAccelerationStateChanged())
+    {
+      e3dstate=s->GetInitialAccelerationState();
+      memcpy(&state_initial_acceleration,e3dstate,sizeof(Emitter3DState));
+      s->ClearInitialAccelerationStateChanged();
+      update=true;
+    }
 
 
     if (s->AttractorStateChanged())
@@ -345,7 +359,19 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
 
   emitState = SCF_QUERY_INTERFACE (mesh, iEmitState);
 
-  csRef<iEmitGen3D> startpos;
+  csRef<iEmitGen3D> startpos,startspeed,startaccel;
+
+
+  csRef<iEmitFixed> e_pptr;
+  csRef<iEmitLine> e_lptr;
+  csRef<iEmitBox> e_bptr;
+  csRef<iEmitCylinder> e_cyptr;
+  csRef<iEmitCone> e_coptr;
+  csRef<iEmitSphere> e_sptr;
+  csRef<iEmitSphereTangent> e_stptr;
+  csRef<iEmitCylinderTangent> e_cytptr;
+
+
 
   // Determine Position Emitter
   if (state_initial_position.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
@@ -358,14 +384,14 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
   if (state_initial_position.cylindertangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDERTANGENT : EMITTER_MIX); }
 
 
-  csRef<iEmitFixed> e_pptr=csPtr<iEmitFixed> (EmitFactoryState->CreateFixed());
-  csRef<iEmitLine> e_lptr=csPtr<iEmitLine> (EmitFactoryState->CreateLine());
-  csRef<iEmitBox> e_bptr=csPtr<iEmitBox> (EmitFactoryState->CreateBox());
-  csRef<iEmitCylinder> e_cyptr=csPtr<iEmitCylinder> (EmitFactoryState->CreateCylinder());
-  csRef<iEmitCone> e_coptr=csPtr<iEmitCone> (EmitFactoryState->CreateCone());
-  csRef<iEmitSphere> e_sptr=csPtr<iEmitSphere> (EmitFactoryState->CreateSphere());
-  csRef<iEmitSphereTangent> e_stptr=csPtr<iEmitSphereTangent> (EmitFactoryState->CreateSphereTangent());
-  csRef<iEmitCylinderTangent> e_cytptr=csPtr<iEmitCylinderTangent> (EmitFactoryState->CreateCylinderTangent());
+  e_pptr=csPtr<iEmitFixed> (EmitFactoryState->CreateFixed());
+  e_lptr=csPtr<iEmitLine> (EmitFactoryState->CreateLine());
+  e_bptr=csPtr<iEmitBox> (EmitFactoryState->CreateBox());
+  e_cyptr=csPtr<iEmitCylinder> (EmitFactoryState->CreateCylinder());
+  e_coptr=csPtr<iEmitCone> (EmitFactoryState->CreateCone());
+  e_sptr=csPtr<iEmitSphere> (EmitFactoryState->CreateSphere());
+  e_stptr=csPtr<iEmitSphereTangent> (EmitFactoryState->CreateSphereTangent());
+  e_cytptr=csPtr<iEmitCylinderTangent> (EmitFactoryState->CreateCylinderTangent());
 
   
   e_pptr->SetValue(state_initial_position.fixed_position);
@@ -432,6 +458,187 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
      startpos=e_pptr;
      break;
   }
+
+
+
+
+  // Determine Speed Emitter
+  if (state_initial_speed.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
+  if (state_initial_speed.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
+  if (state_initial_speed.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
+  if (state_initial_speed.sphere_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERE : EMITTER_MIX); }
+  if (state_initial_speed.cylinder_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDER : EMITTER_MIX); }
+  if (state_initial_speed.cone_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CONE : EMITTER_MIX); }
+  if (state_initial_speed.spheretangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERETANGENT : EMITTER_MIX); }
+  if (state_initial_speed.cylindertangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDERTANGENT : EMITTER_MIX); }
+
+
+  e_pptr=csPtr<iEmitFixed> (EmitFactoryState->CreateFixed());
+  e_lptr=csPtr<iEmitLine> (EmitFactoryState->CreateLine());
+  e_bptr=csPtr<iEmitBox> (EmitFactoryState->CreateBox());
+  e_cyptr=csPtr<iEmitCylinder> (EmitFactoryState->CreateCylinder());
+  e_coptr=csPtr<iEmitCone> (EmitFactoryState->CreateCone());
+  e_sptr=csPtr<iEmitSphere> (EmitFactoryState->CreateSphere());
+  e_stptr=csPtr<iEmitSphereTangent> (EmitFactoryState->CreateSphereTangent());
+  e_cytptr=csPtr<iEmitCylinderTangent> (EmitFactoryState->CreateCylinderTangent());
+
+  
+  e_pptr->SetValue(state_initial_speed.fixed_position);
+  e_lptr->SetContent(state_initial_speed.line_start,state_initial_speed.line_end);
+  e_bptr->SetContent(state_initial_speed.box_min,state_initial_speed.box_max);
+  e_cyptr->SetContent(state_initial_speed.cylinder_start,state_initial_speed.cylinder_end,
+                    state_initial_speed.cylinder_min,state_initial_speed.cylinder_max);
+  e_coptr->SetContent(state_initial_speed.cone_elevation,state_initial_speed.cone_elevation,
+                    state_initial_speed.cone_azimuth,state_initial_speed.cone_aperture,
+                    state_initial_speed.cone_min,state_initial_speed.cone_max);
+  e_sptr->SetContent(state_initial_speed.sphere_center,state_initial_speed.sphere_min,state_initial_speed.sphere_max);
+  e_stptr->SetContent(state_initial_speed.spheretangent_center,state_initial_speed.spheretangent_min,state_initial_speed.spheretangent_max);
+  e_cytptr->SetContent(state_initial_speed.cylindertangent_start,state_initial_speed.cylindertangent_end,
+                    state_initial_speed.cylindertangent_min,state_initial_speed.cylindertangent_max);
+
+
+  switch (use_emitter)
+  {
+    case EMITTER_LINE:
+     startspeed=e_lptr;
+     break;
+    case EMITTER_BOX:
+     startspeed=e_bptr;
+     break;
+    case EMITTER_CYLINDER:
+     startspeed=e_cyptr;
+     break;
+    case EMITTER_CONE:
+     startspeed=e_coptr;
+     break;
+    case EMITTER_SPHERE:
+     startspeed=e_sptr;
+     break;
+    case EMITTER_SPHERETANGENT:
+     startspeed=e_stptr;
+     break;
+    case EMITTER_CYLINDERTANGENT:
+     startspeed=e_cytptr;
+     break;
+    case EMITTER_MIX:
+      {
+        csRef<iEmitMix> e_mptr=csPtr<iEmitMix> (EmitFactoryState->CreateMix());
+        if (state_initial_speed.fixed_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.fixed_weight,e_pptr);
+        if (state_initial_speed.line_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.line_weight,e_lptr);
+        if (state_initial_speed.box_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.box_weight,e_bptr);
+        if (state_initial_speed.cylinder_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.cylinder_weight,e_cyptr);
+        if (state_initial_speed.cone_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.cone_weight,e_coptr);
+        if (state_initial_speed.sphere_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.sphere_weight,e_sptr);
+        if (state_initial_speed.spheretangent_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.spheretangent_weight,e_stptr);
+        if (state_initial_speed.cylindertangent_weight>0)
+          e_mptr->AddEmitter(state_initial_speed.cylindertangent_weight,e_cytptr);
+        startspeed=e_mptr;
+      }
+     break;
+    case EMITTER_POINT:
+    default:
+     startspeed=e_pptr;
+     break;
+  }
+
+
+
+  // Determine Acceleration Emitter
+  if (state_initial_acceleration.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
+  if (state_initial_acceleration.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
+  if (state_initial_acceleration.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
+  if (state_initial_acceleration.sphere_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERE : EMITTER_MIX); }
+  if (state_initial_acceleration.cylinder_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDER : EMITTER_MIX); }
+  if (state_initial_acceleration.cone_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CONE : EMITTER_MIX); }
+  if (state_initial_acceleration.spheretangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERETANGENT : EMITTER_MIX); }
+  if (state_initial_acceleration.cylindertangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDERTANGENT : EMITTER_MIX); }
+
+
+  e_pptr=csPtr<iEmitFixed> (EmitFactoryState->CreateFixed());
+  e_lptr=csPtr<iEmitLine> (EmitFactoryState->CreateLine());
+  e_bptr=csPtr<iEmitBox> (EmitFactoryState->CreateBox());
+  e_cyptr=csPtr<iEmitCylinder> (EmitFactoryState->CreateCylinder());
+  e_coptr=csPtr<iEmitCone> (EmitFactoryState->CreateCone());
+  e_sptr=csPtr<iEmitSphere> (EmitFactoryState->CreateSphere());
+  e_stptr=csPtr<iEmitSphereTangent> (EmitFactoryState->CreateSphereTangent());
+  e_cytptr=csPtr<iEmitCylinderTangent> (EmitFactoryState->CreateCylinderTangent());
+
+  
+  e_pptr->SetValue(state_initial_acceleration.fixed_position);
+  e_lptr->SetContent(state_initial_acceleration.line_start,state_initial_acceleration.line_end);
+  e_bptr->SetContent(state_initial_acceleration.box_min,state_initial_acceleration.box_max);
+  e_cyptr->SetContent(state_initial_acceleration.cylinder_start,state_initial_acceleration.cylinder_end,
+                    state_initial_acceleration.cylinder_min,state_initial_acceleration.cylinder_max);
+  e_coptr->SetContent(state_initial_acceleration.cone_elevation,state_initial_acceleration.cone_elevation,
+                    state_initial_acceleration.cone_azimuth,state_initial_acceleration.cone_aperture,
+                    state_initial_acceleration.cone_min,state_initial_acceleration.cone_max);
+  e_sptr->SetContent(state_initial_acceleration.sphere_center,state_initial_acceleration.sphere_min,state_initial_acceleration.sphere_max);
+  e_stptr->SetContent(state_initial_acceleration.spheretangent_center,state_initial_acceleration.spheretangent_min,state_initial_acceleration.spheretangent_max);
+  e_cytptr->SetContent(state_initial_acceleration.cylindertangent_start,state_initial_acceleration.cylindertangent_end,
+                    state_initial_acceleration.cylindertangent_min,state_initial_acceleration.cylindertangent_max);
+
+
+  switch (use_emitter)
+  {
+    case EMITTER_LINE:
+     startaccel=e_lptr;
+     break;
+    case EMITTER_BOX:
+     startaccel=e_bptr;
+     break;
+    case EMITTER_CYLINDER:
+     startaccel=e_cyptr;
+     break;
+    case EMITTER_CONE:
+     startaccel=e_coptr;
+     break;
+    case EMITTER_SPHERE:
+     startaccel=e_sptr;
+     break;
+    case EMITTER_SPHERETANGENT:
+     startaccel=e_stptr;
+     break;
+    case EMITTER_CYLINDERTANGENT:
+     startaccel=e_cytptr;
+     break;
+    case EMITTER_MIX:
+      {
+        csRef<iEmitMix> e_mptr=csPtr<iEmitMix> (EmitFactoryState->CreateMix());
+        if (state_initial_acceleration.fixed_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.fixed_weight,e_pptr);
+        if (state_initial_acceleration.line_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.line_weight,e_lptr);
+        if (state_initial_acceleration.box_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.box_weight,e_bptr);
+        if (state_initial_acceleration.cylinder_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.cylinder_weight,e_cyptr);
+        if (state_initial_acceleration.cone_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.cone_weight,e_coptr);
+        if (state_initial_acceleration.sphere_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.sphere_weight,e_sptr);
+        if (state_initial_acceleration.spheretangent_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.spheretangent_weight,e_stptr);
+        if (state_initial_acceleration.cylindertangent_weight>0)
+          e_mptr->AddEmitter(state_initial_acceleration.cylindertangent_weight,e_cytptr);
+        startaccel=e_mptr;
+      }
+     break;
+    case EMITTER_POINT:
+    default:
+     startaccel=e_pptr;
+     break;
+  }
+
+
+
+
 
   csRef<iEmitGen3D> attractor;
   if (state_attractor.force>0.0f)
@@ -527,10 +734,6 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
 
 
 
-  iEmitFixed* startspeed = EmitFactoryState->CreateFixed();
-  iEmitFixed* startaccel = EmitFactoryState->CreateFixed();
-  startspeed->SetValue(csVector3 (0,0.5,0));
-  startaccel->SetValue(csVector3 (0,0,0));
   UpdateEmitState();
   emitState->SetStartPosEmit(startpos);
   emitState->SetStartSpeedEmit(startspeed);
@@ -752,6 +955,9 @@ bool PartEdit::Initialize ()
   state_emitter.alpha_blend=true;
 
   memset(&state_initial_position,0,sizeof(state_initial_position));
+  memset(&state_initial_speed,0,sizeof(state_initial_speed));
+  state_initial_speed.fixed_position.y=0.5;
+  memset(&state_initial_acceleration,0,sizeof(state_initial_acceleration));
   memset(&state_attractor,0,sizeof(state_attractor));
 
   RecreateParticleSystem("/lib/std/cslogo2.png");
@@ -803,6 +1009,10 @@ bool PartEdit::Initialize ()
   if (iawswindow_EmitterState) iawswindow_EmitterState->Hide();
   iAwsWindow *iawswindow_InitialPosition = aws->CreateWindowFrom("InitialPosition");
   if (iawswindow_InitialPosition) iawswindow_InitialPosition->Hide();
+  iAwsWindow *iawswindow_InitialSpeed = aws->CreateWindowFrom("InitialSpeed");
+  if (iawswindow_InitialSpeed) iawswindow_InitialSpeed->Hide();
+  iAwsWindow *iawswindow_InitialAcceleration = aws->CreateWindowFrom("InitialAcceleration");
+  if (iawswindow_InitialAcceleration) iawswindow_InitialAcceleration->Hide();
   iAwsWindow *iawswindow_Attractor = aws->CreateWindowFrom("Attractor");
   if (iawswindow_Attractor) iawswindow_Attractor->Hide();
 
@@ -813,6 +1023,8 @@ bool PartEdit::Initialize ()
   s->SetGraphicFile("cslogo2.png");
   s->SetEmitterState(&state_emitter);
   s->SetInitialPositionState(&state_initial_position);
+  s->SetInitialSpeedState(&state_initial_position);
+  s->SetInitialAccelerationState(&state_initial_position);
   s->SetAttractorState(&state_attractor);
 
 

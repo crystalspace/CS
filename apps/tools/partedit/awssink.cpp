@@ -324,6 +324,248 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetIPCYTWeight",&AwsSetIPCYTWeight);
 
 
+    // Initial Speed Options Callbacks
+    sink->RegisterTrigger("RegisterInitialSpeed",&RegisterInitialSpeed);
+    sink->RegisterTrigger("RegisterISFPX",&RegisterISFPX);
+    sink->RegisterTrigger("RegisterISFPY",&RegisterISFPY);
+    sink->RegisterTrigger("RegisterISFPZ",&RegisterISFPZ);
+    sink->RegisterTrigger("RegisterISFWeight",&RegisterISFWeight);
+    sink->RegisterTrigger("RegisterISLSX",&RegisterISLSX);
+    sink->RegisterTrigger("RegisterISLSY",&RegisterISLSY);
+    sink->RegisterTrigger("RegisterISLSZ",&RegisterISLSZ);
+    sink->RegisterTrigger("RegisterISLEX",&RegisterISLEX);
+    sink->RegisterTrigger("RegisterISLEY",&RegisterISLEY);
+    sink->RegisterTrigger("RegisterISLEZ",&RegisterISLEZ);
+    sink->RegisterTrigger("RegisterISLWeight",&RegisterISLWeight);
+    sink->RegisterTrigger("RegisterISBMX",&RegisterISBMX);
+    sink->RegisterTrigger("RegisterISBMY",&RegisterISBMY);
+    sink->RegisterTrigger("RegisterISBMZ",&RegisterISBMZ);
+    sink->RegisterTrigger("RegisterISBXX",&RegisterISBXX);
+    sink->RegisterTrigger("RegisterISBXY",&RegisterISBXY);
+    sink->RegisterTrigger("RegisterISBXZ",&RegisterISBXZ);
+    sink->RegisterTrigger("RegisterISBWeight",&RegisterISBWeight);
+    sink->RegisterTrigger("RegisterISSCX",&RegisterISSCX);
+    sink->RegisterTrigger("RegisterISSCY",&RegisterISSCY);
+    sink->RegisterTrigger("RegisterISSCZ",&RegisterISSCZ);
+    sink->RegisterTrigger("RegisterISSMin",&RegisterISSMin);
+    sink->RegisterTrigger("RegisterISSMax",&RegisterISSMax);
+    sink->RegisterTrigger("RegisterISSWeight",&RegisterISSWeight);
+    sink->RegisterTrigger("RegISCNOX",&RegisterISCNOX);
+    sink->RegisterTrigger("RegisterISCNOY",&RegisterISCNOY);
+    sink->RegisterTrigger("RegisterISCNOZ",&RegisterISCNOZ);
+    sink->RegisterTrigger("RegisterISCNElev",&RegisterISCNElev);
+    sink->RegisterTrigger("RegisterISCNAzim",&RegisterISCNAzim);
+    sink->RegisterTrigger("RegisterISCNAper",&RegisterISCNAper);
+    sink->RegisterTrigger("RegisterISCNMin",&RegisterISCNMin);
+    sink->RegisterTrigger("RegisterISCNMax",&RegisterISCNMax);
+    sink->RegisterTrigger("RegisterISCNWeight",&RegisterISCNWeight);
+    sink->RegisterTrigger("RegisterISCYSX",&RegisterISCYSX);
+    sink->RegisterTrigger("RegisterISCYSY",&RegisterISCYSY);
+    sink->RegisterTrigger("RegisterISCYSZ",&RegisterISCYSZ);
+    sink->RegisterTrigger("RegisterISCYEX",&RegisterISCYEX);
+    sink->RegisterTrigger("RegisterISCYEY",&RegisterISCYEY);
+    sink->RegisterTrigger("RegisterISCYEZ",&RegisterISCYEZ);
+    sink->RegisterTrigger("RegisterISCYMin",&RegisterISCYMin);
+    sink->RegisterTrigger("RegisterISCYMax",&RegisterISCYMax);
+    sink->RegisterTrigger("RegisterISCYWeight",&RegisterISCYWeight);
+    sink->RegisterTrigger("RegisterISSTCX",&RegisterISSTCX);
+    sink->RegisterTrigger("RegisterISSTCY",&RegisterISSTCY);
+    sink->RegisterTrigger("RegisterISSTCZ",&RegisterISSTCZ);
+    sink->RegisterTrigger("RegisterISSTMin",&RegisterISSTMin);
+    sink->RegisterTrigger("RegisterISSTMax",&RegisterISSTMax);
+    sink->RegisterTrigger("RegisterISSTWeight",&RegisterISSTWeight);
+    sink->RegisterTrigger("RegisterISCYTSX",&RegisterISCYTSX);
+    sink->RegisterTrigger("RegisterISCYTSY",&RegisterISCYTSY);
+    sink->RegisterTrigger("RegisterISCYTSZ",&RegisterISCYTSZ);
+    sink->RegisterTrigger("RegisterISCYTEX",&RegisterISCYTEX);
+    sink->RegisterTrigger("RegisterISCYTEY",&RegisterISCYTEY);
+    sink->RegisterTrigger("RegisterISCYTEZ",&RegisterISCYTEZ);
+    sink->RegisterTrigger("RegisterISCYTMin",&RegisterISCYTMin);
+    sink->RegisterTrigger("RegisterISCYTMax",&RegisterISCYTMax);
+    sink->RegisterTrigger("RegisterISCYTWeight",&RegisterISCYTWeight);
+
+
+
+    sink->RegisterTrigger("SetISFPositionX",&AwsSetISFPositionX);
+    sink->RegisterTrigger("SetISFPositionY",&AwsSetISFPositionY);
+    sink->RegisterTrigger("SetISFPositionZ",&AwsSetISFPositionZ);
+    sink->RegisterTrigger("SetISFWeight",&AwsSetISFWeight);
+    sink->RegisterTrigger("SetISLStartX",&AwsSetISLStartX);
+    sink->RegisterTrigger("SetISLStartY",&AwsSetISLStartY);
+    sink->RegisterTrigger("SetISLStartZ",&AwsSetISLStartZ);
+    sink->RegisterTrigger("SetISLEndX",&AwsSetISLEndX);
+    sink->RegisterTrigger("SetISLEndY",&AwsSetISLEndY);
+    sink->RegisterTrigger("SetISLEndZ",&AwsSetISLEndZ);
+    sink->RegisterTrigger("SetISLWeight",&AwsSetISLWeight);
+    sink->RegisterTrigger("SetISBMinX",&AwsSetISBMinX);
+    sink->RegisterTrigger("SetISBMinY",&AwsSetISBMinY);
+    sink->RegisterTrigger("SetISBMinZ",&AwsSetISBMinZ);
+    sink->RegisterTrigger("SetISBMaxX",&AwsSetISBMaxX);
+    sink->RegisterTrigger("SetISBMaxY",&AwsSetISBMaxY);
+    sink->RegisterTrigger("SetISBMaxZ",&AwsSetISBMaxZ);
+    sink->RegisterTrigger("SetISBWeight",&AwsSetISBWeight);
+    sink->RegisterTrigger("SetISSCenterX",&AwsSetISSCenterX);
+    sink->RegisterTrigger("SetISSCenterY",&AwsSetISSCenterY);
+    sink->RegisterTrigger("SetISSCenterZ",&AwsSetISSCenterZ);
+    sink->RegisterTrigger("SetISSMin",&AwsSetISSMin);
+    sink->RegisterTrigger("SetISSMax",&AwsSetISSMax);
+    sink->RegisterTrigger("SetISSWeight",&AwsSetISSWeight);
+    sink->RegisterTrigger("SetISCNOriginX",&AwsSetISCNOriginX);
+    sink->RegisterTrigger("SetISCNOriginY",&AwsSetISCNOriginY);
+    sink->RegisterTrigger("SetISCNOriginZ",&AwsSetISCNOriginZ);
+    sink->RegisterTrigger("SetISCNElev",&AwsSetISCNElev);
+    sink->RegisterTrigger("SetISCNAzim",&AwsSetISCNAzim);
+    sink->RegisterTrigger("SetISCNAper",&AwsSetISCNAper);
+    sink->RegisterTrigger("SetISCNMin",&AwsSetISCNMin);
+    sink->RegisterTrigger("SetISCNMax",&AwsSetISCNMax);
+    sink->RegisterTrigger("SetISCNWeight",&AwsSetISCNWeight);
+    sink->RegisterTrigger("SetISCYStartX",&AwsSetISCYStartX);
+    sink->RegisterTrigger("SetISCYStartY",&AwsSetISCYStartY);
+    sink->RegisterTrigger("SetISCYStartZ",&AwsSetISCYStartZ);
+    sink->RegisterTrigger("SetISCYEndX",&AwsSetISCYEndX);
+    sink->RegisterTrigger("SetISCYEndY",&AwsSetISCYEndY);
+    sink->RegisterTrigger("SetISCYEndZ",&AwsSetISCYEndZ);
+    sink->RegisterTrigger("SetISCYMin",&AwsSetISCYMin);
+    sink->RegisterTrigger("SetISCYMax",&AwsSetISCYMax);
+    sink->RegisterTrigger("SetISCYWeight",&AwsSetISCYWeight);
+    sink->RegisterTrigger("SetISSTCenterX",&AwsSetISSTCenterX);
+    sink->RegisterTrigger("SetISSTCenterY",&AwsSetISSTCenterY);
+    sink->RegisterTrigger("SetISSTCenterZ",&AwsSetISSTCenterZ);
+    sink->RegisterTrigger("SetISSTMin",&AwsSetISSTMin);
+    sink->RegisterTrigger("SetISSTMax",&AwsSetISSTMax);
+    sink->RegisterTrigger("SetISSTWeight",&AwsSetISSTWeight);
+    sink->RegisterTrigger("SetISCYTStartX",&AwsSetISCYTStartX);
+    sink->RegisterTrigger("SetISCYTStartY",&AwsSetISCYTStartY);
+    sink->RegisterTrigger("SetISCYTStartZ",&AwsSetISCYTStartZ);
+    sink->RegisterTrigger("SetISCYTEndX",&AwsSetISCYTEndX);
+    sink->RegisterTrigger("SetISCYTEndY",&AwsSetISCYTEndY);
+    sink->RegisterTrigger("SetISCYTEndZ",&AwsSetISCYTEndZ);
+    sink->RegisterTrigger("SetISCYTMin",&AwsSetISCYTMin);
+    sink->RegisterTrigger("SetISCYTMax",&AwsSetISCYTMax);
+    sink->RegisterTrigger("SetISCYTWeight",&AwsSetISCYTWeight);
+
+
+    // Initial Acceleration Options Callbacks
+    sink->RegisterTrigger("RegisterInitialAcceleration",&RegisterInitialAcceleration);
+    sink->RegisterTrigger("RegisterIAFPX",&RegisterIAFPX);
+    sink->RegisterTrigger("RegisterIAFPY",&RegisterIAFPY);
+    sink->RegisterTrigger("RegisterIAFPZ",&RegisterIAFPZ);
+    sink->RegisterTrigger("RegisterIAFWeight",&RegisterIAFWeight);
+    sink->RegisterTrigger("RegisterIALSX",&RegisterIALSX);
+    sink->RegisterTrigger("RegisterIALSY",&RegisterIALSY);
+    sink->RegisterTrigger("RegisterIALSZ",&RegisterIALSZ);
+    sink->RegisterTrigger("RegisterIALEX",&RegisterIALEX);
+    sink->RegisterTrigger("RegisterIALEY",&RegisterIALEY);
+    sink->RegisterTrigger("RegisterIALEZ",&RegisterIALEZ);
+    sink->RegisterTrigger("RegisterIALWeight",&RegisterIALWeight);
+    sink->RegisterTrigger("RegisterIABMX",&RegisterIABMX);
+    sink->RegisterTrigger("RegisterIABMY",&RegisterIABMY);
+    sink->RegisterTrigger("RegisterIABMZ",&RegisterIABMZ);
+    sink->RegisterTrigger("RegisterIABXX",&RegisterIABXX);
+    sink->RegisterTrigger("RegisterIABXY",&RegisterIABXY);
+    sink->RegisterTrigger("RegisterIABXZ",&RegisterIABXZ);
+    sink->RegisterTrigger("RegisterIABWeight",&RegisterIABWeight);
+    sink->RegisterTrigger("RegisterIASCX",&RegisterIASCX);
+    sink->RegisterTrigger("RegisterIASCY",&RegisterIASCY);
+    sink->RegisterTrigger("RegisterIASCZ",&RegisterIASCZ);
+    sink->RegisterTrigger("RegisterIASMin",&RegisterIASMin);
+    sink->RegisterTrigger("RegisterIASMax",&RegisterIASMax);
+    sink->RegisterTrigger("RegisterIASWeight",&RegisterIASWeight);
+    sink->RegisterTrigger("RegisterIACNOX",&RegisterIACNOX);
+    sink->RegisterTrigger("RegisterIACNOY",&RegisterIACNOY);
+    sink->RegisterTrigger("RegisterIACNOZ",&RegisterIACNOZ);
+    sink->RegisterTrigger("RegisterIACNElev",&RegisterIACNElev);
+    sink->RegisterTrigger("RegisterIACNAzim",&RegisterIACNAzim);
+    sink->RegisterTrigger("RegisterIACNAper",&RegisterIACNAper);
+    sink->RegisterTrigger("RegisterIACNMin",&RegisterIACNMin);
+    sink->RegisterTrigger("RegisterIACNMax",&RegisterIACNMax);
+    sink->RegisterTrigger("RegisterIACNWeight",&RegisterIACNWeight);
+    sink->RegisterTrigger("RegisterIACYSX",&RegisterIACYSX);
+    sink->RegisterTrigger("RegisterIACYSY",&RegisterIACYSY);
+    sink->RegisterTrigger("RegisterIACYSZ",&RegisterIACYSZ);
+    sink->RegisterTrigger("RegisterIACYEX",&RegisterIACYEX);
+    sink->RegisterTrigger("RegisterIACYEY",&RegisterIACYEY);
+    sink->RegisterTrigger("RegisterIACYEZ",&RegisterIACYEZ);
+    sink->RegisterTrigger("RegisterIACYMin",&RegisterIACYMin);
+    sink->RegisterTrigger("RegisterIACYMax",&RegisterIACYMax);
+    sink->RegisterTrigger("RegisterIACYWeight",&RegisterIACYWeight);
+    sink->RegisterTrigger("RegisterIASTCX",&RegisterIASTCX);
+    sink->RegisterTrigger("RegisterIASTCY",&RegisterIASTCY);
+    sink->RegisterTrigger("RegisterIASTCZ",&RegisterIASTCZ);
+    sink->RegisterTrigger("RegisterIASTMin",&RegisterIASTMin);
+    sink->RegisterTrigger("RegisterIASTMax",&RegisterIASTMax);
+    sink->RegisterTrigger("RegisterIASTWeight",&RegisterIASTWeight);
+    sink->RegisterTrigger("RegisterIACYTSX",&RegisterIACYTSX);
+    sink->RegisterTrigger("RegisterIACYTSY",&RegisterIACYTSY);
+    sink->RegisterTrigger("RegisterIACYTSZ",&RegisterIACYTSZ);
+    sink->RegisterTrigger("RegisterIACYTEX",&RegisterIACYTEX);
+    sink->RegisterTrigger("RegisterIACYTEY",&RegisterIACYTEY);
+    sink->RegisterTrigger("RegisterIACYTEZ",&RegisterIACYTEZ);
+    sink->RegisterTrigger("RegisterIACYTMin",&RegisterIACYTMin);
+    sink->RegisterTrigger("RegisterIACYTMax",&RegisterIACYTMax);
+    sink->RegisterTrigger("RegisterIACYTWeight",&RegisterIACYTWeight);
+
+
+
+    sink->RegisterTrigger("SetIAFPositionX",&AwsSetIAFPositionX);
+    sink->RegisterTrigger("SetIAFPositionY",&AwsSetIAFPositionY);
+    sink->RegisterTrigger("SetIAFPositionZ",&AwsSetIAFPositionZ);
+    sink->RegisterTrigger("SetIAFWeight",&AwsSetIAFWeight);
+    sink->RegisterTrigger("SetIALStartX",&AwsSetIALStartX);
+    sink->RegisterTrigger("SetIALStartY",&AwsSetIALStartY);
+    sink->RegisterTrigger("SetIALStartZ",&AwsSetIALStartZ);
+    sink->RegisterTrigger("SetIALEndX",&AwsSetIALEndX);
+    sink->RegisterTrigger("SetIALEndY",&AwsSetIALEndY);
+    sink->RegisterTrigger("SetIALEndZ",&AwsSetIALEndZ);
+    sink->RegisterTrigger("SetIALWeight",&AwsSetIALWeight);
+    sink->RegisterTrigger("SetIABMinX",&AwsSetIABMinX);
+    sink->RegisterTrigger("SetIABMinY",&AwsSetIABMinY);
+    sink->RegisterTrigger("SetIABMinZ",&AwsSetIABMinZ);
+    sink->RegisterTrigger("SetIABMaxX",&AwsSetIABMaxX);
+    sink->RegisterTrigger("SetIABMaxY",&AwsSetIABMaxY);
+    sink->RegisterTrigger("SetIABMaxZ",&AwsSetIABMaxZ);
+    sink->RegisterTrigger("SetIABWeight",&AwsSetIABWeight);
+    sink->RegisterTrigger("SetIASCenterX",&AwsSetIASCenterX);
+    sink->RegisterTrigger("SetIASCenterY",&AwsSetIASCenterY);
+    sink->RegisterTrigger("SetIASCenterZ",&AwsSetIASCenterZ);
+    sink->RegisterTrigger("SetIASMin",&AwsSetIASMin);
+    sink->RegisterTrigger("SetIASMax",&AwsSetIASMax);
+    sink->RegisterTrigger("SetIASWeight",&AwsSetIASWeight);
+    sink->RegisterTrigger("SetIACNOriginX",&AwsSetIACNOriginX);
+    sink->RegisterTrigger("SetIACNOriginY",&AwsSetIACNOriginY);
+    sink->RegisterTrigger("SetIACNOriginZ",&AwsSetIACNOriginZ);
+    sink->RegisterTrigger("SetIACNElev",&AwsSetIACNElev);
+    sink->RegisterTrigger("SetIACNAzim",&AwsSetIACNAzim);
+    sink->RegisterTrigger("SetIACNAper",&AwsSetIACNAper);
+    sink->RegisterTrigger("SetIACNMin",&AwsSetIACNMin);
+    sink->RegisterTrigger("SetIACNMax",&AwsSetIACNMax);
+    sink->RegisterTrigger("SetIACNWeight",&AwsSetIACNWeight);
+    sink->RegisterTrigger("SetIACYStartX",&AwsSetIACYStartX);
+    sink->RegisterTrigger("SetIACYStartY",&AwsSetIACYStartY);
+    sink->RegisterTrigger("SetIACYStartZ",&AwsSetIACYStartZ);
+    sink->RegisterTrigger("SetIACYEndX",&AwsSetIACYEndX);
+    sink->RegisterTrigger("SetIACYEndY",&AwsSetIACYEndY);
+    sink->RegisterTrigger("SetIACYEndZ",&AwsSetIACYEndZ);
+    sink->RegisterTrigger("SetIACYMin",&AwsSetIACYMin);
+    sink->RegisterTrigger("SetIACYMax",&AwsSetIACYMax);
+    sink->RegisterTrigger("SetIACYWeight",&AwsSetIACYWeight);
+    sink->RegisterTrigger("SetIASTCenterX",&AwsSetIASTCenterX);
+    sink->RegisterTrigger("SetIASTCenterY",&AwsSetIASTCenterY);
+    sink->RegisterTrigger("SetIASTCenterZ",&AwsSetIASTCenterZ);
+    sink->RegisterTrigger("SetIASTMin",&AwsSetIASTMin);
+    sink->RegisterTrigger("SetIASTMax",&AwsSetIASTMax);
+    sink->RegisterTrigger("SetIASTWeight",&AwsSetIASTWeight);
+    sink->RegisterTrigger("SetIACYTStartX",&AwsSetIACYTStartX);
+    sink->RegisterTrigger("SetIACYTStartY",&AwsSetIACYTStartY);
+    sink->RegisterTrigger("SetIACYTStartZ",&AwsSetIACYTStartZ);
+    sink->RegisterTrigger("SetIACYTEndX",&AwsSetIACYTEndX);
+    sink->RegisterTrigger("SetIACYTEndY",&AwsSetIACYTEndY);
+    sink->RegisterTrigger("SetIACYTEndZ",&AwsSetIACYTEndZ);
+    sink->RegisterTrigger("SetIACYTMin",&AwsSetIACYTMin);
+    sink->RegisterTrigger("SetIACYTMax",&AwsSetIACYTMax);
+    sink->RegisterTrigger("SetIACYTWeight",&AwsSetIACYTWeight);
+
+
     // Attractor Options Callbacks
     sink->RegisterTrigger("RegisterAttractor",&RegisterAttractor);
     sink->RegisterTrigger("RegisterATForce",&RegisterATForce);
@@ -363,13 +605,13 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterATCYSX",&RegisterATCYSX);
     sink->RegisterTrigger("RegisterATCYSY",&RegisterATCYSY);
     sink->RegisterTrigger("RegisterATCYSZ",&RegisterATCYSZ);
-    sink->RegisterTrigger("RegisterATCYEX",&RegisterATCYEX);
+    sink->RegisterTrigger("RegATCYEX",&RegisterATCYEX);
     sink->RegisterTrigger("RegisterATCYEY",&RegisterATCYEY);
     sink->RegisterTrigger("RegisterATCYEZ",&RegisterATCYEZ);
     sink->RegisterTrigger("RegisterATCYMin",&RegisterATCYMin);
     sink->RegisterTrigger("RegisterATCYMax",&RegisterATCYMax);
     sink->RegisterTrigger("RegisterATCYWeight",&RegisterATCYWeight);
-    sink->RegisterTrigger("RegisterATSTCX",&RegisterATSTCX);
+    sink->RegisterTrigger("RegATSTCX",&RegisterATSTCX);
     sink->RegisterTrigger("RegisterATSTCY",&RegisterATSTCY);
     sink->RegisterTrigger("RegisterATSTCZ",&RegisterATSTCZ);
     sink->RegisterTrigger("RegisterATSTMin",&RegisterATSTMin);
@@ -599,6 +841,24 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
       else
         asink->InitialPositionData.iawscomponent_InitialPosition->Hide();
       break;
+    case SECTION_INIT_SPEED:
+      if (asink->SectionState[i])
+      {
+        asink->InitialSpeedData.iawscomponent_InitialSpeed->Show();
+        asink->InitialSpeedData.iawscomponent_InitialSpeed->Raise();
+      }
+      else
+        asink->InitialSpeedData.iawscomponent_InitialSpeed->Hide();
+      break;
+    case SECTION_INIT_ACCELERATION:
+      if (asink->SectionState[i])
+      {
+        asink->InitialAccelerationData.iawscomponent_InitialAcceleration->Show();
+        asink->InitialAccelerationData.iawscomponent_InitialAcceleration->Raise();
+      }
+      else
+        asink->InitialAccelerationData.iawscomponent_InitialAcceleration->Hide();
+      break;
     case SECTION_ATTRACTOR:
       if (asink->SectionState[i])
       {
@@ -608,8 +868,6 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
       else
         asink->AttractorData.iawscomponent_Attractor->Hide();
       break;
-    case SECTION_INIT_SPEED:
-    case SECTION_INIT_ACCELERATION:
     case SECTION_FIELD_SPEED:
     case SECTION_FIELD_ACCELERATION:
     case SECTION_AGING_MOMENTS:
@@ -1320,6 +1578,730 @@ void awsSink::UpdateInitialPositionStateDisplay()
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+////
+//  Initial Speed Display
+////
+IMPLEMENT_REGISTER_FUNCTION(RegisterInitialSpeed,InitialSpeedData.iawscomponent_InitialSpeed)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISFPX,InitialSpeedData.iawscomponent_ISFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISFPY,InitialSpeedData.iawscomponent_ISFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISFPZ,InitialSpeedData.iawscomponent_ISFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISFWeight,InitialSpeedData.iawscomponent_ISFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLSX,InitialSpeedData.iawscomponent_ISLSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLSY,InitialSpeedData.iawscomponent_ISLSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLSZ,InitialSpeedData.iawscomponent_ISLSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLEX,InitialSpeedData.iawscomponent_ISLEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLEY,InitialSpeedData.iawscomponent_ISLEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLEZ,InitialSpeedData.iawscomponent_ISLEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISLWeight,InitialSpeedData.iawscomponent_ISLWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBMX,InitialSpeedData.iawscomponent_ISBMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBMY,InitialSpeedData.iawscomponent_ISBMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBMZ,InitialSpeedData.iawscomponent_ISBMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBXX,InitialSpeedData.iawscomponent_ISBXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBXY,InitialSpeedData.iawscomponent_ISBXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBXZ,InitialSpeedData.iawscomponent_ISBXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISBWeight,InitialSpeedData.iawscomponent_ISBWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSCX,InitialSpeedData.iawscomponent_ISSCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSCY,InitialSpeedData.iawscomponent_ISSCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSCZ,InitialSpeedData.iawscomponent_ISSCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSMin,InitialSpeedData.iawscomponent_ISSMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSMax,InitialSpeedData.iawscomponent_ISSMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSWeight,InitialSpeedData.iawscomponent_ISSWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNOX,InitialSpeedData.iawscomponent_ISCNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNOY,InitialSpeedData.iawscomponent_ISCNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNOZ,InitialSpeedData.iawscomponent_ISCNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNElev,InitialSpeedData.iawscomponent_ISCNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNAzim,InitialSpeedData.iawscomponent_ISCNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNAper,InitialSpeedData.iawscomponent_ISCNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNMin,InitialSpeedData.iawscomponent_ISCNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNMax,InitialSpeedData.iawscomponent_ISCNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCNWeight,InitialSpeedData.iawscomponent_ISCNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYSX,InitialSpeedData.iawscomponent_ISCYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYSY,InitialSpeedData.iawscomponent_ISCYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYSZ,InitialSpeedData.iawscomponent_ISCYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYEX,InitialSpeedData.iawscomponent_ISCYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYEY,InitialSpeedData.iawscomponent_ISCYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYEZ,InitialSpeedData.iawscomponent_ISCYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYMin,InitialSpeedData.iawscomponent_ISCYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYMax,InitialSpeedData.iawscomponent_ISCYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYWeight,InitialSpeedData.iawscomponent_ISCYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTCX,InitialSpeedData.iawscomponent_ISSTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTCY,InitialSpeedData.iawscomponent_ISSTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTCZ,InitialSpeedData.iawscomponent_ISSTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTMin,InitialSpeedData.iawscomponent_ISSTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTMax,InitialSpeedData.iawscomponent_ISSTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISSTWeight,InitialSpeedData.iawscomponent_ISSTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTSX,InitialSpeedData.iawscomponent_ISCYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTSY,InitialSpeedData.iawscomponent_ISCYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTSZ,InitialSpeedData.iawscomponent_ISCYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTEX,InitialSpeedData.iawscomponent_ISCYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTEY,InitialSpeedData.iawscomponent_ISCYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTEZ,InitialSpeedData.iawscomponent_ISCYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTMin,InitialSpeedData.iawscomponent_ISCYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTMax,InitialSpeedData.iawscomponent_ISCYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTWeight,InitialSpeedData.iawscomponent_ISCYTWeight)
+
+
+
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISFPositionX,
+									 InitialSpeedData.state.fixed_position.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISFPositionY,
+									 InitialSpeedData.state.fixed_position.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISFPositionZ,
+									 InitialSpeedData.state.fixed_position.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISFWeight,
+									 InitialSpeedData.state.fixed_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLStartX,
+									 InitialSpeedData.state.line_start.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLStartY,
+									 InitialSpeedData.state.line_start.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLStartZ,
+									 InitialSpeedData.state.line_start.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLEndX,
+									 InitialSpeedData.state.line_end.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLEndY,
+									 InitialSpeedData.state.line_end.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLEndZ,
+									 InitialSpeedData.state.line_end.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISLWeight,
+									 InitialSpeedData.state.line_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMinX,
+									 InitialSpeedData.state.box_min.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMinY,
+									 InitialSpeedData.state.box_min.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMinZ,
+									 InitialSpeedData.state.box_min.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMaxX,
+									 InitialSpeedData.state.box_max.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMaxY,
+									 InitialSpeedData.state.box_max.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBMaxZ,
+									 InitialSpeedData.state.box_max.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISBWeight,
+									 InitialSpeedData.state.box_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSCenterX,
+									 InitialSpeedData.state.sphere_center.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSCenterY,
+									 InitialSpeedData.state.sphere_center.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSCenterZ,
+									 InitialSpeedData.state.sphere_center.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSMin,
+									 InitialSpeedData.state.sphere_min,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSMax,
+									 InitialSpeedData.state.sphere_max,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSWeight,
+									 InitialSpeedData.state.sphere_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNOriginX,
+									 InitialSpeedData.state.cone_origin.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNOriginY,
+									 InitialSpeedData.state.cone_origin.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNOriginZ,
+									 InitialSpeedData.state.cone_origin.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNElev,
+									 InitialSpeedData.state.cone_elevation,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNAzim,
+									 InitialSpeedData.state.cone_azimuth,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNAper,
+									 InitialSpeedData.state.cone_aperture,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNMin,
+									 InitialSpeedData.state.cone_min,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNMax,
+									 InitialSpeedData.state.cone_max,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCNWeight,
+									 InitialSpeedData.state.cone_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYStartX,
+									 InitialSpeedData.state.cylinder_start.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYStartY,
+									 InitialSpeedData.state.cylinder_start.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYStartZ,
+									 InitialSpeedData.state.cylinder_start.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYEndX,
+									 InitialSpeedData.state.cylinder_end.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYEndY,
+									 InitialSpeedData.state.cylinder_end.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYEndZ,
+									 InitialSpeedData.state.cylinder_end.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYMin,
+									 InitialSpeedData.state.cylinder_min,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYMax,
+									 InitialSpeedData.state.cylinder_max,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYWeight,
+									 InitialSpeedData.state.cylinder_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTCenterX,
+									 InitialSpeedData.state.spheretangent_center.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTCenterY,
+									 InitialSpeedData.state.spheretangent_center.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTCenterZ,
+									 InitialSpeedData.state.spheretangent_center.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTMin,
+									 InitialSpeedData.state.spheretangent_min,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTMax,
+									 InitialSpeedData.state.spheretangent_max,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISSTWeight,
+									 InitialSpeedData.state.spheretangent_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTStartX,
+									 InitialSpeedData.state.cylindertangent_start.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTStartY,
+									 InitialSpeedData.state.cylindertangent_start.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTStartZ,
+									 InitialSpeedData.state.cylindertangent_start.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTEndX,
+									 InitialSpeedData.state.cylindertangent_end.x,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTEndY,
+									 InitialSpeedData.state.cylindertangent_end.y,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTEndZ,
+									 InitialSpeedData.state.cylindertangent_end.z,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTMin,
+									 InitialSpeedData.state.cylindertangent_min,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTMax,
+									 InitialSpeedData.state.cylindertangent_max,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTWeight,
+									 InitialSpeedData.state.cylindertangent_weight,InitialSpeedData.settings_changed,
+									 UpdateInitialSpeedStateDisplay)
+
+
+
+
+
+
+bool awsSink::InitialSpeedStateChanged()
+{
+  return InitialSpeedData.settings_changed;
+}
+
+void awsSink::ClearInitialSpeedStateChanged()
+{
+  InitialSpeedData.settings_changed=false;
+}
+
+Emitter3DState *awsSink::GetInitialSpeedState()
+{
+  return &(InitialSpeedData.state);
+}
+
+void awsSink::SetInitialSpeedState(Emitter3DState *source)
+{
+  memcpy(&(InitialSpeedData.state),source,sizeof(Emitter3DState));
+  ClearInitialSpeedStateChanged();
+  UpdateInitialSpeedStateDisplay();
+}
+
+void awsSink::UpdateInitialSpeedStateDisplay()
+{
+  csRef<iString> value;
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISFPX,InitialSpeedData.state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISFPY,InitialSpeedData.state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISFPZ,InitialSpeedData.state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISFWeight,InitialSpeedData.state.fixed_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLSX,InitialSpeedData.state.line_start.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLSY,InitialSpeedData.state.line_start.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLSZ,InitialSpeedData.state.line_start.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLEX,InitialSpeedData.state.line_end.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLEY,InitialSpeedData.state.line_end.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLEZ,InitialSpeedData.state.line_end.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISLWeight,InitialSpeedData.state.line_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBMX,InitialSpeedData.state.box_min.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBMY,InitialSpeedData.state.box_min.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBMZ,InitialSpeedData.state.box_min.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBXX,InitialSpeedData.state.box_max.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBXY,InitialSpeedData.state.box_max.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBXZ,InitialSpeedData.state.box_max.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISBWeight,InitialSpeedData.state.box_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSCX,InitialSpeedData.state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSCY,InitialSpeedData.state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSCZ,InitialSpeedData.state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSMin,InitialSpeedData.state.sphere_min);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSMax,InitialSpeedData.state.sphere_max);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSWeight,InitialSpeedData.state.sphere_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNOX,InitialSpeedData.state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNOY,InitialSpeedData.state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNOZ,InitialSpeedData.state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNElevation,InitialSpeedData.state.cone_elevation);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNAzimuth,InitialSpeedData.state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNAperture,InitialSpeedData.state.cone_aperture);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNMin,InitialSpeedData.state.cone_min);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNMax,InitialSpeedData.state.cone_max);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCNWeight,InitialSpeedData.state.cone_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYSX,InitialSpeedData.state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYSY,InitialSpeedData.state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYSZ,InitialSpeedData.state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYEX,InitialSpeedData.state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYEY,InitialSpeedData.state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYEZ,InitialSpeedData.state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYMin,InitialSpeedData.state.cylinder_min);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYMax,InitialSpeedData.state.cylinder_max);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYWeight,InitialSpeedData.state.cylinder_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTCX,InitialSpeedData.state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTCY,InitialSpeedData.state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTCZ,InitialSpeedData.state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTMin,InitialSpeedData.state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTMax,InitialSpeedData.state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISSTWeight,InitialSpeedData.state.spheretangent_weight);
+
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTSX,InitialSpeedData.state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTSY,InitialSpeedData.state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTSZ,InitialSpeedData.state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTEX,InitialSpeedData.state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTEY,InitialSpeedData.state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTEZ,InitialSpeedData.state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTMin,InitialSpeedData.state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTMax,InitialSpeedData.state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTWeight,InitialSpeedData.state.cylindertangent_weight);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+////
+//  Initial Acceleration Display
+////
+IMPLEMENT_REGISTER_FUNCTION(RegisterInitialAcceleration,InitialAccelerationData.iawscomponent_InitialAcceleration)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIAFPX,InitialAccelerationData.iawscomponent_IAFPX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIAFPY,InitialAccelerationData.iawscomponent_IAFPY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIAFPZ,InitialAccelerationData.iawscomponent_IAFPZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIAFWeight,InitialAccelerationData.iawscomponent_IAFWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALSX,InitialAccelerationData.iawscomponent_IALSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALSY,InitialAccelerationData.iawscomponent_IALSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALSZ,InitialAccelerationData.iawscomponent_IALSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALEX,InitialAccelerationData.iawscomponent_IALEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALEY,InitialAccelerationData.iawscomponent_IALEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALEZ,InitialAccelerationData.iawscomponent_IALEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIALWeight,InitialAccelerationData.iawscomponent_IALWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABMX,InitialAccelerationData.iawscomponent_IABMX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABMY,InitialAccelerationData.iawscomponent_IABMY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABMZ,InitialAccelerationData.iawscomponent_IABMZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABXX,InitialAccelerationData.iawscomponent_IABXX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABXY,InitialAccelerationData.iawscomponent_IABXY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABXZ,InitialAccelerationData.iawscomponent_IABXZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIABWeight,InitialAccelerationData.iawscomponent_IABWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASCX,InitialAccelerationData.iawscomponent_IASCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASCY,InitialAccelerationData.iawscomponent_IASCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASCZ,InitialAccelerationData.iawscomponent_IASCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASMin,InitialAccelerationData.iawscomponent_IASMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASMax,InitialAccelerationData.iawscomponent_IASMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASWeight,InitialAccelerationData.iawscomponent_IASWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNOX,InitialAccelerationData.iawscomponent_IACNOX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNOY,InitialAccelerationData.iawscomponent_IACNOY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNOZ,InitialAccelerationData.iawscomponent_IACNOZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNElev,InitialAccelerationData.iawscomponent_IACNElevation)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNAzim,InitialAccelerationData.iawscomponent_IACNAzimuth)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNAper,InitialAccelerationData.iawscomponent_IACNAperture)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNMin,InitialAccelerationData.iawscomponent_IACNMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNMax,InitialAccelerationData.iawscomponent_IACNMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACNWeight,InitialAccelerationData.iawscomponent_IACNWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYSX,InitialAccelerationData.iawscomponent_IACYSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYSY,InitialAccelerationData.iawscomponent_IACYSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYSZ,InitialAccelerationData.iawscomponent_IACYSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYEX,InitialAccelerationData.iawscomponent_IACYEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYEY,InitialAccelerationData.iawscomponent_IACYEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYEZ,InitialAccelerationData.iawscomponent_IACYEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYMin,InitialAccelerationData.iawscomponent_IACYMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYMax,InitialAccelerationData.iawscomponent_IACYMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYWeight,InitialAccelerationData.iawscomponent_IACYWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTCX,InitialAccelerationData.iawscomponent_IASTCX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTCY,InitialAccelerationData.iawscomponent_IASTCY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTCZ,InitialAccelerationData.iawscomponent_IASTCZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTMin,InitialAccelerationData.iawscomponent_IASTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTMax,InitialAccelerationData.iawscomponent_IASTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIASTWeight,InitialAccelerationData.iawscomponent_IASTWeight)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTSX,InitialAccelerationData.iawscomponent_IACYTSX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTSY,InitialAccelerationData.iawscomponent_IACYTSY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTSZ,InitialAccelerationData.iawscomponent_IACYTSZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTEX,InitialAccelerationData.iawscomponent_IACYTEX)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTEY,InitialAccelerationData.iawscomponent_IACYTEY)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTEZ,InitialAccelerationData.iawscomponent_IACYTEZ)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTMin,InitialAccelerationData.iawscomponent_IACYTMin)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTMax,InitialAccelerationData.iawscomponent_IACYTMax)
+IMPLEMENT_REGISTER_FUNCTION(RegisterIACYTWeight,InitialAccelerationData.iawscomponent_IACYTWeight)
+
+
+
+// Fixed Position
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIAFPositionX,
+									 InitialAccelerationData.state.fixed_position.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIAFPositionY,
+									 InitialAccelerationData.state.fixed_position.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIAFPositionZ,
+									 InitialAccelerationData.state.fixed_position.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIAFWeight,
+									 InitialAccelerationData.state.fixed_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+// Line
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALStartX,
+									 InitialAccelerationData.state.line_start.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALStartY,
+									 InitialAccelerationData.state.line_start.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALStartZ,
+									 InitialAccelerationData.state.line_start.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALEndX,
+									 InitialAccelerationData.state.line_end.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALEndY,
+									 InitialAccelerationData.state.line_end.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALEndZ,
+									 InitialAccelerationData.state.line_end.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIALWeight,
+									 InitialAccelerationData.state.line_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Box
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMinX,
+									 InitialAccelerationData.state.box_min.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMinY,
+									 InitialAccelerationData.state.box_min.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMinZ,
+									 InitialAccelerationData.state.box_min.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMaxX,
+									 InitialAccelerationData.state.box_max.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMaxY,
+									 InitialAccelerationData.state.box_max.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABMaxZ,
+									 InitialAccelerationData.state.box_max.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIABWeight,
+									 InitialAccelerationData.state.box_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Sphere
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASCenterX,
+									 InitialAccelerationData.state.sphere_center.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASCenterY,
+									 InitialAccelerationData.state.sphere_center.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASCenterZ,
+									 InitialAccelerationData.state.sphere_center.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASMin,
+									 InitialAccelerationData.state.sphere_min,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASMax,
+									 InitialAccelerationData.state.sphere_max,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASWeight,
+									 InitialAccelerationData.state.sphere_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Cone
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNOriginX,
+									 InitialAccelerationData.state.cone_origin.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNOriginY,
+									 InitialAccelerationData.state.cone_origin.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNOriginZ,
+									 InitialAccelerationData.state.cone_origin.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNElev,
+									 InitialAccelerationData.state.cone_elevation,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNAzim,
+									 InitialAccelerationData.state.cone_azimuth,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNAper,
+									 InitialAccelerationData.state.cone_aperture,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNMin,
+									 InitialAccelerationData.state.cone_min,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNMax,
+									 InitialAccelerationData.state.cone_max,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACNWeight,
+									 InitialAccelerationData.state.cone_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Cylinder
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYStartX,
+									 InitialAccelerationData.state.cylinder_start.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYStartY,
+									 InitialAccelerationData.state.cylinder_start.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYStartZ,
+									 InitialAccelerationData.state.cylinder_start.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYEndX,
+									 InitialAccelerationData.state.cylinder_end.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYEndY,
+									 InitialAccelerationData.state.cylinder_end.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYEndZ,
+									 InitialAccelerationData.state.cylinder_end.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYMin,
+									 InitialAccelerationData.state.cylinder_min,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYMax,
+									 InitialAccelerationData.state.cylinder_max,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYWeight,
+									 InitialAccelerationData.state.cylinder_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Sphere Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTCenterX,
+									 InitialAccelerationData.state.spheretangent_center.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTCenterY,
+									 InitialAccelerationData.state.spheretangent_center.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTCenterZ,
+									 InitialAccelerationData.state.spheretangent_center.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTMin,
+									 InitialAccelerationData.state.spheretangent_min,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTMax,
+									 InitialAccelerationData.state.spheretangent_max,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIASTWeight,
+									 InitialAccelerationData.state.spheretangent_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+// Cylinder Tangent
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTStartX,
+									 InitialAccelerationData.state.cylindertangent_start.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTStartY,
+									 InitialAccelerationData.state.cylindertangent_start.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTStartZ,
+									 InitialAccelerationData.state.cylindertangent_start.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTEndX,
+									 InitialAccelerationData.state.cylindertangent_end.x,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTEndY,
+									 InitialAccelerationData.state.cylindertangent_end.y,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTEndZ,
+									 InitialAccelerationData.state.cylindertangent_end.z,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTMin,
+									 InitialAccelerationData.state.cylindertangent_min,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTMax,
+									 InitialAccelerationData.state.cylindertangent_max,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTWeight,
+									 InitialAccelerationData.state.cylindertangent_weight,InitialAccelerationData.settings_changed,
+									 UpdateInitialAccelerationStateDisplay)
+
+
+
+
+
+
+bool awsSink::InitialAccelerationStateChanged()
+{
+  return InitialAccelerationData.settings_changed;
+}
+
+void awsSink::ClearInitialAccelerationStateChanged()
+{
+  InitialAccelerationData.settings_changed=false;
+}
+
+Emitter3DState *awsSink::GetInitialAccelerationState()
+{
+  return &(InitialAccelerationData.state);
+}
+
+void awsSink::SetInitialAccelerationState(Emitter3DState *source)
+{
+  memcpy(&(InitialAccelerationData.state),source,sizeof(Emitter3DState));
+  ClearInitialAccelerationStateChanged();
+  UpdateInitialAccelerationStateDisplay();
+}
+
+void awsSink::UpdateInitialAccelerationStateDisplay()
+{
+  csRef<iString> value;
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IAFPX,InitialAccelerationData.state.fixed_position.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IAFPY,InitialAccelerationData.state.fixed_position.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IAFPZ,InitialAccelerationData.state.fixed_position.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IAFWeight,InitialAccelerationData.state.fixed_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALSX,InitialAccelerationData.state.line_start.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALSY,InitialAccelerationData.state.line_start.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALSZ,InitialAccelerationData.state.line_start.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALEX,InitialAccelerationData.state.line_end.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALEY,InitialAccelerationData.state.line_end.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALEZ,InitialAccelerationData.state.line_end.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IALWeight,InitialAccelerationData.state.line_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABMX,InitialAccelerationData.state.box_min.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABMY,InitialAccelerationData.state.box_min.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABMZ,InitialAccelerationData.state.box_min.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABXX,InitialAccelerationData.state.box_max.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABXY,InitialAccelerationData.state.box_max.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABXZ,InitialAccelerationData.state.box_max.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IABWeight,InitialAccelerationData.state.box_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASCX,InitialAccelerationData.state.sphere_center.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASCY,InitialAccelerationData.state.sphere_center.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASCZ,InitialAccelerationData.state.sphere_center.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASMin,InitialAccelerationData.state.sphere_min);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASMax,InitialAccelerationData.state.sphere_max);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASWeight,InitialAccelerationData.state.sphere_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNOX,InitialAccelerationData.state.cone_origin.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNOY,InitialAccelerationData.state.cone_origin.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNOZ,InitialAccelerationData.state.cone_origin.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNElevation,InitialAccelerationData.state.cone_elevation);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNAzimuth,InitialAccelerationData.state.cone_azimuth);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNAperture,InitialAccelerationData.state.cone_aperture);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNMin,InitialAccelerationData.state.cone_min);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNMax,InitialAccelerationData.state.cone_max);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACNWeight,InitialAccelerationData.state.cone_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYSX,InitialAccelerationData.state.cylinder_start.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYSY,InitialAccelerationData.state.cylinder_start.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYSZ,InitialAccelerationData.state.cylinder_start.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYEX,InitialAccelerationData.state.cylinder_end.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYEY,InitialAccelerationData.state.cylinder_end.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYEZ,InitialAccelerationData.state.cylinder_end.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYMin,InitialAccelerationData.state.cylinder_min);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYMax,InitialAccelerationData.state.cylinder_max);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYWeight,InitialAccelerationData.state.cylinder_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTCX,InitialAccelerationData.state.spheretangent_center.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTCY,InitialAccelerationData.state.spheretangent_center.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTCZ,InitialAccelerationData.state.spheretangent_center.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTMin,InitialAccelerationData.state.spheretangent_min);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTMax,InitialAccelerationData.state.spheretangent_max);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IASTWeight,InitialAccelerationData.state.spheretangent_weight);
+
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTSX,InitialAccelerationData.state.cylindertangent_start.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTSY,InitialAccelerationData.state.cylindertangent_start.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTSZ,InitialAccelerationData.state.cylindertangent_start.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTEX,InitialAccelerationData.state.cylindertangent_end.x);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTEY,InitialAccelerationData.state.cylindertangent_end.y);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTEZ,InitialAccelerationData.state.cylindertangent_end.z);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTMin,InitialAccelerationData.state.cylindertangent_min);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTMax,InitialAccelerationData.state.cylindertangent_max);
+  SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTWeight,InitialAccelerationData.state.cylindertangent_weight);
+
+
+}
+
+
+
+
+
+
+
 
 
 

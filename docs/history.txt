@@ -50,7 +50,8 @@ chronological order.
 	  metagen, and csTesselator.
 	- Rhad did some more work on partedit.  Initial position UI and
 	  attractor UI are now complete.  Some pretty nice effects can be 
-	  seen with just these two sections. 
+	  seen with just these two sections.
+	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
