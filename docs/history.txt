@@ -56,6 +56,7 @@ The history order is reversed so that new features are at the top.
 	      for dsound.lib on Windows.
 	    - Ported OpenAL renderer (plugins/sound/renderer/openal) to
 	      MacOS/X.  Works correctly with OpenAL.framework.
+	- Philip Wyett fixed a problem in the jng image loader.
 2-Feb-2003
 	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
 	  renderer. They use less memory now and they are also more efficient.
@@ -81,6 +82,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full
 	  name of SCF and features a hyperlink to the SCF section.
 	- res fixed a crash in JNG saving
+	- Matthias Braun fixed various CSWS related bugs which caused
+	  crashes at exit.
+	- Matthias Braun did some fixes to the OGG sound plugin.
+	- Matthias Braun fixed some configure issues.
+	- Matthias Braun fixed some thread issues.
 1-Feb-2003
 	- Lightmaps with DrawPolygonMesh were not correctly aligned. This
 	  is a very old bug that was fixed for normal lightmap rendering
@@ -95,6 +101,8 @@ The history order is reversed so that new features are at the top.
 	  calculations would go wrong because the shift value (4) wasn't
 	  updated. This bug was introduced when I moved thing to a seperate
 	  plugin.
+	- Matthias Braun did various fixes to the plugin makefiles. Fixes
+	  related to configure.
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.
