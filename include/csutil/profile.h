@@ -88,7 +88,7 @@ if (!tok##__prof__init) \
   if (!profiler) \
   { \
     profiler.AttachNew (new csProfiler ()); \
-    obj_reg->Register (cs__prof__prof, "iProfiler"); \
+    obj_reg->Register (profiler, "iProfiler"); \
   } \
   if (profiler) \
     profiler->RegisterProfilePoint (__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time); \
