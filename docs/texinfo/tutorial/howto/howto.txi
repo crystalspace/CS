@@ -17,6 +17,7 @@ code.
 * HOWTO Collision Detection:: Doing Collision Detection
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
+* HOWTO Create Thing:: Creating a Thing Mesh
 * HOWTO Camera Movement:: Camera Movement
 * HOWTO Pseudo DynLight:: Pseudo-dynamic Lights
 * HOWTO Level Loading:: Loading a Level
@@ -40,6 +41,7 @@ code.
 @importss{tutorial,howto,colldet.txi}
 @importss{tutorial,howto,meshanim.txi}
 @importss{tutorial,howto,meshmove.txi}
+@importss{tutorial,howto,creatething.txi}
 @importss{tutorial,howto,cammove.txi}
 @importss{tutorial,howto,pseudolit.txi}
 @importss{tutorial,howto,levload.txi}

@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object
 	  documentation.
+	- Jorrit added a new howto about creating a thing mesh.
 19-Jul-2003
 	- Jorrit added howto about adding game data to Crystal Space objects
 	  in map files.
