@@ -278,6 +278,17 @@ window "Layout Test"
   component "Button2" is "Command Button"
   {
     Caption: "Button 2"
+    Anchor: gbcCenter
+	Fill:   gbcNone
+	GridHeight: 1
+	GridWidth:  1
+	WeightX: 1
+	WeightY: 0
+  }
+
+  component "Button3" is "Command Button"
+  {
+    Caption: "Button 3"
     Anchor: gbcWest
 	Fill:   gbcNone
 	GridHeight: 1
@@ -286,16 +297,31 @@ window "Layout Test"
 	WeightY: 0
   }
 
-  component "Button3" is "Command Button"
+  component "Users" is "List Box"
   {
-    Caption: "Button 3"
+    Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
+    Columns: 3
+    DefaultSortCOl: 0
+    Column0Width: 90
+    Column0Caption: "Class"
+    Column1Width: 70
+    Column1Caption: "Status"
+    Column2Width: 100
+    Column2Caption: "Name"
+    Column2Align: lbAlignCenter
+
     Anchor: gbcCenter
-	Fill:   gbcHorizontal
+	Fill:   gbcBoth
 	GridHeight: 1
-	GridWidth:  2
+	GridWidth:  0
 	WeightX: 1
-	WeightY: 1
+	WeightY: 2
+
+
+    connect 
+    {
+     signalComponentCreated -> testButtonSink::FillListBox
+    }
   }
-
-
 }
