@@ -32,7 +32,7 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "csutil/garray.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 
 #include "ie3ds.h"
 #include <lib3ds/camera.h>

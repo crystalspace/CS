@@ -19,8 +19,8 @@
 #ifndef __CS_CRYSBALL_H__
 #define __CS_CRYSBALL_H__
 
-#include "csutil/cstreend.h"
-#include "csutil/ptrarr.h"
+#include "csutil/tree.h"
+#include "csutil/parray.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"

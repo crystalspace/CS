@@ -30,7 +30,7 @@
 
 #include "csgeom/csrect.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"

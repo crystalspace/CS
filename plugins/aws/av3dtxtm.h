@@ -19,7 +19,7 @@
 #define __CS_TXTMGR_H__
 
 # include "csutil/csvector.h"
-# include "csutil/ptrarr.h"
+# include "csutil/parray.h"
 # include "ivideo/txtmgr.h"
 # include "ivideo/material.h"
 # include "iengine/material.h"

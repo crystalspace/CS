@@ -7,7 +7,7 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 
 #include <string.h>
 #include <math.h>

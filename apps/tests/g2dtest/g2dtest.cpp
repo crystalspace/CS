@@ -24,7 +24,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 #include "csutil/csstring.h"
 #include "cstool/initapp.h"
 #include "ivaria/reporter.h"

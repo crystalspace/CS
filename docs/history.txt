@@ -23,6 +23,14 @@ The history order is reversed so that new features are at the top.
 	- Additional optimizations to xmlread. The first text node (which
 	  is very common) is now treated specially.
 	- Added level load timing code to Walktest.
+	- Matze cleaned up csutil:
+	  -removed 2bitary.h bitay2d.h schedule.h
+	  -renamed cstreend.h to tree.h
+	  -renamed blkalloc.h to blockallocator.h
+	  -added comments to csVector that it is deprecated now
+	  -renamed rng.h to randomgen.h
+	  -moved halogen code to csengine
+	  -renamed ptrarr.h to parray.h
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h

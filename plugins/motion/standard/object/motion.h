@@ -23,7 +23,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csgeom/quaterni.h"
 
 struct csMotionFrame

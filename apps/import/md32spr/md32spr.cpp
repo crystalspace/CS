@@ -40,7 +40,6 @@
 #include "csutil/memfile.h"
 #include "csutil/csvector.h"
 #include "csutil/archive.h"
-#include "csutil/csctype.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1187,7 +1186,7 @@ char *lowercase(char *str)
 {
   int i = 0;
   while(str[i] != '\0') {
-   str[i] =  cs_tolower(str[i]);
+   str[i] =  tolower(str[i]);
     i++;
   }
   return str;

@@ -25,7 +25,7 @@
 #include "csutil/datastrm.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/util.h"
 
 // all int's in an MD2 file are little endian

@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"

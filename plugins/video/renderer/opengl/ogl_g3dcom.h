@@ -34,7 +34,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "plugins/video/renderer/common/polybuf.h"

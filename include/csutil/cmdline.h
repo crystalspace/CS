@@ -21,7 +21,7 @@
 
 #include "iutil/cmdline.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 

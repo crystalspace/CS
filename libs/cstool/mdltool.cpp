@@ -21,7 +21,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/objiter.h"
 #include "csutil/garray.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/intarray.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"

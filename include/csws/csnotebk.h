@@ -30,7 +30,7 @@
  
 #include "cscomp.h"
 #include "csbutton.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 
 /**
  * \name Notebook styles

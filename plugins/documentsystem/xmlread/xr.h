@@ -39,8 +39,7 @@ distribution.
 #include <iutil/string.h>
 #include <csutil/util.h>
 #include <csutil/array.h>
-#include <csutil/blkalloc.h>
-
+#include <csutil/blockallocator.h>
 
 class TrDocument;
 class TrDocumentNodeChildren;

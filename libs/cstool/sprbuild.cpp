@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/objiter.h"
 #include "csutil/csstring.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/intarray.h"
 #include "csutil/databuf.h"
 #include "cstool/sprbuild.h"

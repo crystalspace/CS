@@ -18,7 +18,7 @@
 */
 
 #include "iutil/document.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/strset.h"
 
 struct iDataBuffer;

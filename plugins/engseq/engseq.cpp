@@ -25,7 +25,7 @@
 #include "csgeom/math3d.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

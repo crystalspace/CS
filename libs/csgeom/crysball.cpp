@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/garray.h"
 #include "csgeom/crysball.h"
 #include "csgeom/frustum.h"

@@ -26,7 +26,7 @@
 
 #ifdef CS_DEBUG_RECT_REG
 #include <time.h>
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 #endif
 
 const int MODE_EXCLUDE = 0;

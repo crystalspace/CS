@@ -22,7 +22,7 @@
 #include "iutil/strvec.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"

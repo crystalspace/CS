@@ -28,7 +28,7 @@
  * @{ */
  
 #include "cslayout.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 
 /**
  * Subclass of csLayoutConstraint for use with csGridBagLayout.

@@ -28,7 +28,7 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 #include <stdio.h>
 #include <time.h>
 

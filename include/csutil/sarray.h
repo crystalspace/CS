@@ -19,10 +19,13 @@
 #ifndef __CS_SARRAY_H__
 #define __CS_SARRAY_H__
 
+#warning csStaticArray is DEPRECATED. Use csGrowingArray instead
+
 /**\file
  */
 
 /**
+ * \deprecated This class will be removed very soon
  * Create a static array class (descending from csStaticArray) with the given 
  * name that contains elements of the given type.
  */

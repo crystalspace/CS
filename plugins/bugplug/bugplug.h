@@ -24,7 +24,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"

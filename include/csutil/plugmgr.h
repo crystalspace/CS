@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "iutil/config.h"
 #include "iutil/plugin.h"
 

@@ -69,7 +69,7 @@
 #endif
 
 #include <stdio.h>
-#include "csutil/csctype.h"
+#include <ctype.h>
 #ifndef NETWARE
 #include <sys/types.h>
 #endif
@@ -326,7 +326,7 @@ static char *ap_gcvt(double number, int ndigit, char *buf, boolean_e altform)
 
 #define STR_TO_DEC( str, num )		\
     num = NUM( *str++ ) ;		\
-    while ( cs_isdigit( *str ) )		\
+    while ( isdigit( *str ) )		\
     {					\
 	num *= 10 ;			\
 	num += NUM( *str++ ) ;		\
@@ -548,7 +548,7 @@ static char *conv_fp(register char format, register double num,
     /*
      * Check for Infinity and NaN
      */
-    if (cs_isalpha(*p)) {
+    if (isalpha(*p)) {
 	*len = strlen(strcpy(buf, p));
 	*is_negative = FALSE;
 	return (buf);
@@ -739,7 +739,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 	    /*
 	     * Try to avoid checking for flags, width or precision
 	     */
-	    if (!cs_islower(*fmt)) {
+	    if (!islower(*fmt)) {
 		/*
 		 * Recognize flags: -, #, BLANK, +
 		 */
@@ -761,7 +761,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 		/*
 		 * Check if a width was specified
 		 */
-		if (cs_isdigit(*fmt)) {
+		if (isdigit(*fmt)) {
 		    STR_TO_DEC(fmt, min_width);
 		    adjust_width = YES;
 		}
@@ -787,7 +787,7 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 		if (*fmt == '.') {
 		    adjust_precision = YES;
 		    fmt++;
-		    if (cs_isdigit(*fmt)) {
+		    if (isdigit(*fmt)) {
 			STR_TO_DEC(fmt, precision);
 		    }
 		    else if (*fmt == '*') {

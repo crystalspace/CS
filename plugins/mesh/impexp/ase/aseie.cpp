@@ -18,7 +18,7 @@
 
 #include <ctype.h>
 #include "cssysdef.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"

@@ -40,7 +40,7 @@ distribution.
 #include <csutil/util.h>
 #include <csutil/array.h>
 #include <csutil/strset.h>
-#include <csutil/blkalloc.h>
+#include <csutil/blockallocator.h>
 
 #include "tinystr.h"
 

@@ -20,7 +20,7 @@
 #include <cssysdef.h>
 #include <csgeom/math3d.h>
 #include <csgeom/poly2d.h>
-#include <csutil/rng.h>
+#include <csutil/randomgen.h>
 #include <iengine/movable.h>
 #include <iengine/rview.h>
 #include <ivideo/graph3d.h>

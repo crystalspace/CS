@@ -22,7 +22,7 @@
 #include "csengine/halo.h"
 #include "csengine/engine.h"
 #include "csgeom/polyclip.h"
-#include "csutil/halogen.h"
+#include "halogen.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/material.h"

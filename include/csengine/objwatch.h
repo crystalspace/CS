@@ -21,7 +21,7 @@
 
 #include "csutil/csvector.h"
 #include "csutil/refarr.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "iengine/objwatch.h"
 
 struct iLight;

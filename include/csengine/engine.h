@@ -23,7 +23,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/csobject.h"
 #include "csutil/garray.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "iutil/eventh.h"

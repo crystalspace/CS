@@ -34,7 +34,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csutil/cscolor.h"
 
 #define I_PI_4 (1 / (M_PI * 4.0))

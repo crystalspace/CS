@@ -30,7 +30,7 @@
  
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "csws/csgfxppl.h"
 
 class csMouse;

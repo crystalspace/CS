@@ -22,7 +22,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
 #include "csutil/garray.h"
-#include "csutil/rng.h"
+#include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "iengine/camera.h"

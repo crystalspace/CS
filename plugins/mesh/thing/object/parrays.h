@@ -21,7 +21,7 @@
 #define __CS_PARRAYS_H__
 
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "curve.h"
 
 class csPolygon3D;

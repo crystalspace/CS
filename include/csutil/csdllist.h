@@ -21,6 +21,8 @@
 
 #include "cstypes.h"
 
+#warning csDLList is deprecated. Please use csList from csutil/list.h
+
 /**
  * \internal This structure should not need to be accessed directly.
  * It is used exclusively by the csDLinkList class.
@@ -34,6 +36,8 @@ struct csDLListItem
 
 
 /**
+ * \deprecated Use #csList instead.
+ *
  * This class implements a doubly-linked list. Note that this implementation
  * builds a circular list, that means to next pointer of the last element
  * points to the first element.

@@ -19,6 +19,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include <ctype.h>
+
 #include "qint.h"
 
 #include "csgeom/polyclip.h"
@@ -29,7 +31,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
-#include "csutil/csctype.h"
 
 #include "igeom/clip2d.h"
 

@@ -1,4 +1,7 @@
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "awstimer.h"
 #include "awstxtbx.h"
 #include "ivideo/graph2d.h"
@@ -6,7 +9,6 @@
 #include "ivideo/fontserv.h"
 #include "csutil/scfstr.h"
 #include "iutil/evdefs.h"
-#include "csutil/csctype.h"
 
 #include <stdio.h>
 
@@ -514,7 +516,7 @@ bool awsTextBox::OnKeypress (int key, int Char, int)
 
     default:
       {
-	if (!cs_isprint (Char))
+	if (!isprint (Char))
 	  break;
 	
 	if (disallow && (strchr (disallow->GetData (), Char) != 0))

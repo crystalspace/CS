@@ -20,7 +20,7 @@
 #define __CS_VBUFMGR_H__
 
 #include "csutil/csvector.h"
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 #include "ivideo/vbufmgr.h"
 #include "csgeom/box.h"
 

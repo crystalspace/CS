@@ -19,7 +19,7 @@
 #ifndef __CS_ENGINE_RDRPRIOR_H__
 #define __CS_ENGINE_RDRPRIOR_H__
 
-#include "csutil/ptrarr.h"
+#include "csutil/parray.h"
 
 struct iMeshWrapper;
 struct iRenderView;

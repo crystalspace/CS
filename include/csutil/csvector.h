@@ -22,16 +22,19 @@
 
 #include "cstypes.h"
 
+// XXX: We should enable that but too many things in CS are still using the
+// csVector classes
+//#warning The csVector classes are deprecated. Please use csArray
+//#warning csGrowingArray, csRefArray or csPArray
+
 /**
+ * \deprecated Use #csArray, #csGrowingArray, #csRefArray or #csPArray
+ * instead.
+ *
  * This is a lightweight base class for containers.  It contains no virtual
  * functions and, by default, does not preallocate any memory.  It contains all
  * the basic functionality of the derived csVector class, but none of the
  * gimmicks.
- * <p>
- * Side note: the reason CS doesn't use templates for these classes is
- * for portability. CS runs on platforms and compilers on which templates
- * are not always working nicely and even on modern compilers there can
- * be subtle but annoying differences. So we avoid them.
  */
 class csBasicVector
 {
@@ -92,6 +95,8 @@ public:
 };
 
 /**
+ * \deprecated Use csArray, csGrowingArray, csRefArray or csPArray instead.
+ *
  * csVector is an abstract class which can hold an unlimited array
  * of unspecified (void*) data. Since this is a basic object, it does
  * not presume anything about its elements, so FreeItem() is
