@@ -95,6 +95,14 @@ public:
   /// Initialize a color object with given R,G,B,A components
   csColor4 (float r, float g, float b, float a = 1.0f) : csColor (r, g, b)
   { alpha = a; }
+  csColor4 (const csColor& c) : csColor (c), alpha (1.0f) { }
+  void Set (const csColor& c)
+  {
+    red = c.red;
+    green = c.green;
+    blue = c.blue;
+    alpha = 1.0f;
+  }
 };
 
 /// Multiply a color by a scalar value.
