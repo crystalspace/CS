@@ -634,6 +634,13 @@ private:
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
 
+#ifdef __USE_MATERIALS_REPLACEMENT__
+  /// If true then a material has been added/removed from
+  /// the replace_materials array, and the polygon
+  /// buffer of the thing needs to be recalculated.
+  bool replaceMaterialChanged;
+#endif
+
   /**
    * This number is compared with the static_data_nr in the static data to
    * see if static data has changed and this thing needs to updated local
@@ -972,10 +979,18 @@ public:
     /// Prepare.
     virtual void Prepare ()
     {
+#ifdef __USE_MATERIALS_REPLACEMENT__
+      scfParent->Prepare ();
+      scfParent->ClearLMs ();
+      scfParent->PrepareLMs ();
+      scfParent->PreparePolygonBuffer ();
+#else // __USE_MATERIALS_REPLACEMENT__
       scfParent->Prepare ();
       scfParent->PreparePolygonBuffer ();
       scfParent->PrepareLMs ();
+
       scfParent->UpdateDirtyLMs ();
+#endif // __USE_MATERIALS_REPLACEMENT__
     }
 
     /// Unprepare.

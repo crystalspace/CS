@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+//#define __USE_MATERIALS_REPLACEMENT__
+
 #include "cssysdef.h"
 #include <limits.h>
 #include "csutil/csendian.h"
@@ -1316,6 +1318,9 @@ void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
   GetRealRange (range, start, end);
   for (i = start ; i <= end ; i++)
     static_polygons[i]->SetMaterial (material);
+#ifdef __USE_MATERIALS_REPLACEMENT__
+  UnprepareLMLayout ();
+#endif // __USE_MATERIALS_REPLACEMENT__
 }
 
 iMaterialWrapper* csThingStatic::GetPolygonMaterial (int polygon_idx)
@@ -1566,6 +1571,10 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
   cached_movable = 0;
 
   cfg_moving = CS_THING_MOVE_NEVER;
+
+#ifdef __USE_MATERIALS_REPLACEMENT__
+  replaceMaterialChanged = false;
+#endif
 
   prepared = false;
   static_data_nr = 0xfffffffd;	// (static_nr of csThingStatic is init to -1)
@@ -1895,12 +1904,47 @@ iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
   return 0;
 }
 
+#ifdef __USE_MATERIALS_REPLACEMENT__
+
+void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
+	iMaterialWrapper* newmat)
+{
+  //
+  //Remove the binding of oldmat, if it exists.
+  int i;
+  for (i = 0 ; i < replace_materials.Length () ; i++)
+  {
+    if (replace_materials[i].old_mat == oldmat)
+    {
+      replace_materials.DeleteIndex (i);
+      break;
+    }//if
+  }//for
+    
+  //
+  //If newmat == 0 then it means the caller want to use the standard
+  //material given by the factory mesh object. Otherwise the caller
+  //want to create a new binding.
+  if (newmat != 0)
+  {
+    //Create the binding of the 'oldmat' material with a new one.
+    replace_materials.Push (RepMaterial (oldmat, newmat));
+  }//if
+  
+  replaceMaterialChanged = true;
+}
+
+#else
+
 void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
 	iMaterialWrapper* newmat)
 {
   replace_materials.Push (RepMaterial (oldmat, newmat));
   prepared = false;
 }
+
+#endif // __USE_MATERIALS_REPLACEMENT__
+
 
 void csThing::ClearReplacedMaterials ()
 {
@@ -2011,10 +2055,12 @@ static int ComparePointer (iMaterialWrapper* const& item1,
   return 0;
 }
 
+#ifndef __USE_MATERIALS_REPLACEMENT__
+
 void csThing::PreparePolygonBuffer ()
 {
 #ifndef CS_USE_NEW_RENDERER
-  if (polybuf) return ;
+  if (polybuf) return;
 
   struct csPolyLMCoords
   {
@@ -2108,9 +2154,168 @@ void csThing::PreparePolygonBuffer ()
   }
   materials_to_visit.Truncate (ni);
 
+
   polybuf->Prepare ();
 #endif // CS_USE_NEW_RENDERER
 }
+
+#else // if __USE_MATERIALS_REPLACEMENT__
+
+void csThing::PreparePolygonBuffer ()
+{
+#ifndef CS_USE_NEW_RENDERER
+  //
+  //If 'polybuf' is null, create it.
+  if (!polybuf)
+  {    
+    struct csPolyLMCoords
+    {
+      float u1, v1, u2, v2;
+    };
+    
+    iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
+      GetVertexBufferManager ();
+    polybuf = vbufmgr->CreatePolygonBuffer ();
+    
+    csDirtyAccessArray<int> verts;
+    
+    polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
+    
+    polybuf_materials.DeleteAll ();
+    materials_to_visit.DeleteAll ();
+    polybuf_materials.SetCapacity (
+      litPolys.Length () + unlitPolys.Length ());
+    
+    int i;
+    for (i = 0; i < litPolys.Length (); i++)
+    {
+      int mi = polybuf->GetMaterialCount ();
+      csRef<iMaterialWrapper> l_mat = FindRealMaterial (litPolys[i]->material);
+      if (l_mat == 0)
+        l_mat = litPolys[i]->material;
+      polybuf_materials.Push (l_mat);
+      if (l_mat->IsVisitRequired ())
+        materials_to_visit.Push (l_mat);
+      polybuf->AddMaterial (l_mat->GetMaterialHandle ());
+      
+      int j;
+      for (j = 0; j < litPolys[i]->polys.Length (); j++)
+      {
+        verts.DeleteAll ();
+        
+        csPolygon3D *poly = litPolys[i]->polys[j];
+        csPolygon3DStatic *spoly = poly->GetStaticPoly ();
+        csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
+        
+        int v;
+        for (v = 0; v < spoly->GetVertexCount (); v++)
+        {
+          const int vnum = spoly->GetVertexIndices ()[v];
+          verts.Push (vnum);
+        }
+        
+        polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
+          tmapping, spoly->GetObjectPlane (), 
+          mi, litPolys[i]->lightmaps[j]);
+      }
+    }
+    
+    for (i = 0; i < unlitPolys.Length (); i++)
+    {
+      int mi = polybuf->GetMaterialCount ();
+      csRef<iMaterialWrapper> l_mat = FindRealMaterial (unlitPolys[i]->material);
+      if (l_mat == 0)
+        l_mat = unlitPolys[i]->material;
+      polybuf_materials.Push (l_mat);
+      if (l_mat->IsVisitRequired ())
+        materials_to_visit.Push (l_mat);
+      polybuf->AddMaterial (l_mat->GetMaterialHandle ());
+      int j;
+      for (j = 0; j < unlitPolys[i]->polys.Length (); j++)
+      {
+        verts.DeleteAll ();
+        
+        csPolygon3D *poly = unlitPolys[i]->polys[j];
+        csPolygon3DStatic *spoly = poly->GetStaticPoly ();
+        csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
+        
+        int v;
+        for (v = 0; v < spoly->GetVertexCount (); v++)
+        {
+          const int vnum = spoly->GetVertexIndices ()[v];
+          verts.Push (vnum);
+        }
+        
+        polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
+          tmapping, spoly->GetObjectPlane (), 
+          mi, 0);
+      }//for
+    }//for
+
+    //
+    //
+    replaceMaterialChanged = false;
+  }//if
+  //
+  //If the 'polybuf' has not been recreated, then we check
+  //if the replace_materials array has been modified. In this case
+  //the updating of the materials in the 'polybuf' structure it's needed.
+  else if (replaceMaterialChanged)
+  {
+    int i;
+    for (i = 0; i < static_data->litPolys.Length (); i++)
+    {
+      csRef<iMaterialWrapper> l_mW1 = static_data->litPolys.Get (i)->material;
+      csRef<iMaterialWrapper> l_mW2 = FindRealMaterial (l_mW1);
+      if (l_mW2 != 0)
+      {
+        polybuf->SetMaterial (i, l_mW2->GetMaterialHandle ());
+      }//if
+      else
+      {
+        polybuf->SetMaterial (i, l_mW1->GetMaterialHandle ());
+      }//else
+    }//for
+
+    for (i = 0; i < static_data->unlitPolys.Length (); i++)
+    {
+      csRef<iMaterialWrapper> l_mW1 = static_data->unlitPolys.Get (i)->material;
+      csRef<iMaterialWrapper> l_mW2 = FindRealMaterial (l_mW1);
+      if (l_mW2 != 0)
+      {
+        polybuf->SetMaterial (i, l_mW2->GetMaterialHandle ());
+      }//if
+      else
+      {
+        polybuf->SetMaterial (i, l_mW1->GetMaterialHandle ());
+      }//else
+    }//for
+
+    replaceMaterialChanged = false;
+  }//else if
+
+  //
+  // Optimize the array of materials to visit.
+  materials_to_visit.Sort (ComparePointer);	// Sort on pointer.
+  int i = 0;
+  int ni = 0;
+  iMaterialWrapper* prev = 0;
+  for (i = 0 ; i < materials_to_visit.Length () ; i++)
+  {
+    if (materials_to_visit[i] != prev)
+    {
+      prev = materials_to_visit[i];
+      materials_to_visit[ni++] = prev;
+    }
+  }
+  materials_to_visit.Truncate (ni);
+
+
+  polybuf->Prepare ();
+#endif // CS_USE_NEW_RENDERER
+}
+
+#endif // if __USE_MATERIALS_REPLACEMENT__
 
 void csThing::DrawPolygonArrayDPM (
   iRenderView *rview,
