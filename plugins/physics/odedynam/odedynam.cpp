@@ -361,6 +361,52 @@ bool csODERigidBody::AttachColliderMesh (iPolygonMesh *mesh,
   return false;
 }
 
+bool csODERigidBody::AttachColliderCylinder (float length, float radius,
+	csOrthoTransform& trans, float friction, float density,
+	float elasticity)
+{
+  dMass m, om;
+  dMassSetZero (&m);
+
+  dGeomID id = dCreateGeomTransform (dynsys->GetSpaceID());
+  dGeomTransformSetCleanup (id, 1);
+	
+  dGeomID gid = dCreateCCylinder (0, radius, length);
+  dGeomTransformSetGeom (id, gid);
+  dMassSetCappedCylinder (&m, density, 3, radius, length);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (gid, mat);
+  dMassRotate (&m, mat);
+
+  dGeomSetPosition (gid,
+	trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dMassTranslate (&m,
+  	trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+  dBodyGetMass (bodyID, &om);
+  dMassAdd (&om, &m);
+
+  // Old correction of center of mass. 
+  // Just stored in case it's actually needed.
+  /*dGeomSetPosition( gid, trans.GetOrigin().x-om.c[0], trans.GetOrigin().y-om.c[1], trans.GetOrigin().z-om.c[2] );
+  dMassTranslate (&om, -om.c[0], -om.c[1], -om.c[2]);*/
+
+  dBodySetMass (bodyID, &om);
+  
+  dGeomSetBody (id, bodyID);
+  ids.Push (id);
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
+}
+
 bool csODERigidBody::AttachColliderBox (csVector3 size,
 	csOrthoTransform& trans, float friction, float density,
 	float elasticity)
@@ -700,7 +746,6 @@ void csODEJoint::SetTransConstraints (bool X, bool Y, bool Z)
   transConstraint[0] = (X) ? 0 : 1;
   transConstraint[1] = (Y) ? 0 : 1;
   transConstraint[2] = (Z) ? 0 : 1;
-  maxTrans = minTrans = csVector3(0,0,0);
   BuildJoint ();
 }
 
@@ -729,7 +774,6 @@ void csODEJoint::SetRotConstraints (bool X, bool Y, bool Z)
   rotConstraint[0] = (X) ? 0 : 1;
   rotConstraint[1] = (Y) ? 0 : 1;
   rotConstraint[2] = (Z) ? 0 : 1;
-  maxAngle = minAngle = csVector3(0,0,0);
   BuildJoint ();
 }
 void csODEJoint::SetMinimumAngle (const csVector3 &min)

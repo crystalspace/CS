@@ -193,6 +193,9 @@ public:
   bool AttachColliderMesh (iPolygonMesh* mesh,
   	csOrthoTransform& trans, float friction, float density,
 	float elasticity);
+  bool AttachColliderCylinder (float length, float radius,
+  	csOrthoTransform& trans, float friction, float density,
+	float elasticity);
   bool AttachColliderBox (csVector3 size,
   	csOrthoTransform& trans, float friction, float density,
 	float elasticity);

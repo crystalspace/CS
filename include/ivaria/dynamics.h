@@ -100,6 +100,10 @@ struct iRigidBody : public iBase
   virtual bool AttachColliderMesh (iPolygonMesh* mesh,
   	csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
+  /// Cylinder orientated along its local z axis
+  virtual bool AttachColliderCylinder (float length, float radius,
+  	csOrthoTransform& trans, float friction, float density,
+	float elasticity) = 0;
   virtual bool AttachColliderBox (csVector3 size,
   	csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
