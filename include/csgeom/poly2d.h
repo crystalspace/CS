@@ -222,7 +222,7 @@ class csPoly2DFactory
 {
 public:
   /// A shared factory that you can use.
-  static csPoly2DFactory* SharedFactory();
+   CS_DECLARE_STATIC_CLASSVAR(sharedFactory,SharedFactory,csPoly2DFactory)
 
   /// Create a poly2d.
   virtual csPoly2D* Create () { csPoly2D* p = new csPoly2D (); return p; }

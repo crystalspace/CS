@@ -2678,6 +2678,8 @@ static int count_cull_node_notvis_behind;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
 
+CS_IMPLEMENT_STATIC_VAR (GetCullOctreeNodePerspPoly,csPolygon2D,)
+
 // @@@ This routine need to be cleaned up!!! It probably needs to
 
 // be part of the class.
@@ -2696,7 +2698,7 @@ bool CullOctreeNode (
 
   csCBuffer *c_buffer;
   iRenderView *rview = (iRenderView *)data;
-  static csPolygon2D persp;
+  static csPolygon2D &persp = *GetCullOctreeNodePerspPoly ();
   csVector3 array[7];
   csEngine *w = csEngine::current_engine;
   iCamera *icam = rview->GetCamera ();

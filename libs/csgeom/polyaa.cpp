@@ -41,12 +41,13 @@ static float __calc_area (int n, csVector2 *p)
 }
 
 // No doubt static vars are !!!EVIL!!! :-) but for
-
 // the sake of performance's we still use them ...
+
+CS_IMPLEMENT_STATIC_VAR(GetAAGrid, csRect,)
 static csAAPFCBPixel PutPixel;
 static csAAPFCBBox DrawBox;
-static csRect Grid;
 static void *Arg;
+static csRect &Grid = *GetAAGrid();
 
 void __poly_fill (csVector2 *iVertices, int iVertexCount)
 {

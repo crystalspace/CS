@@ -81,7 +81,8 @@ private:
 
 public:
   /// A pool of csBspPolygon.
-  static csPolygonIntPool& GetPolygonPool();
+  CS_DECLARE_STATIC_CLASSVAR(poly_fact,GetPolygonFact,csBspPolygonFactory)
+  CS_DECLARE_STATIC_CLASSVAR_REF(poly_pool,GetPolygonPool,csPolygonIntPool)
 
   /// Debug.
   void Dump();
@@ -224,16 +225,13 @@ private:
   csBox3 world_bbox;
 
 public:
-  /// A pool of polygon stubs.
-  static csPolygonStubPool stub_pool;
-  /// A factory for polygon stubs.
-  static csPolygonStubFactory stub_fact;
-
-public:
   /// Constructor.
   csPolyTreeBBox ();
   /// Destructor.
   ~csPolyTreeBBox ();
+
+  CS_DECLARE_STATIC_CLASSVAR(stub_pool,GetPolyStubPool,csPolygonStubPool)
+  CS_DECLARE_STATIC_CLASSVAR(stub_fact,GetPolyStubFactory,csPolygonStubFactory)
 
   /**
    * Remove this object from its tree.

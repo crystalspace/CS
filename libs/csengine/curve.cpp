@@ -891,7 +891,9 @@ void csCurveTemplate::SetMaterial (iMaterialWrapper *m)
 // --- code for Bezier curves follows ----------------------------------------
 
 // Initialize the cache for Bezier curves
-static csBezier2 bezierCache;
+CS_IMPLEMENT_STATIC_VAR(GetBezierCache,csBezier2,)
+
+static csBezier2 &bezierCache = *GetBezierCache ();
 
 // Should not be necessary, but without this buggy NextStep compiler
 

@@ -486,6 +486,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
  */
 #ifndef CS_IMPLEMENT_STATIC_VAR
 #define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam)    \
+CS_DECLARE_STATIC_VARIABLE_REGISTRATION                       \
 extern "C" {                                                  \
 static Type* getterFunc ();                                   \
 void getterFunc ## _kill ();                                  \
@@ -517,6 +518,12 @@ static Type *var;                                             \
 static Type *getterFunc ();                                   
 #endif
 
+#ifndef CS_DECLARE_STATIC_CLASSVAR_REF
+#define CS_DECLARE_STATIC_CLASSVAR_REF(var,getterFunc,Type)       \
+static Type *var;                                             \
+static Type &getterFunc ();                                   
+#endif
+
 /**
  * Create the static class variable that has been declared with 
  * CS_DECLARE_STATIC_CLASSVAR.
@@ -542,9 +549,33 @@ Type* Class::getterFunc ()                                                  \
   if (!var)                                                                 \
   {                                                                         \
     var = new Type (initParam);                                             \
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
     CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
   }                                                                         \
   return var;                                                               \
+}
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)   \
+Type *Class::var = 0;                                                       \
+extern "C" {                                                                \
+void Class ## _ ## getterFunc ## _kill ();                                  \
+void Class ## _ ## getterFunc ## _kill ()                                   \
+{                                                                           \
+  delete &Class::getterFunc ();                                             \
+}                                                                           \
+}                                                                           \
+Type &Class::getterFunc ()                                                  \
+{                                                                           \
+  static Type *var=0;                                                       \
+  if (!var)                                                                 \
+  {                                                                         \
+    var = new Type (initParam);                                             \
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
+    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
+  }                                                                         \
+  return *var;                                                              \
 }
 #endif
 

@@ -37,12 +37,8 @@ void csBspPolygonFactory::Init (csPolygonInt *pi)
 }
 
 //---------------------------------------------------------------------------
-csPolygonIntPool &csBspPolygon::GetPolygonPool ()
-{
-  static csBspPolygonFactory poly_fact;
-  static csPolygonIntPool poly_pool (&poly_fact);
-  return poly_pool;
-}
+CS_IMPLEMENT_STATIC_CLASSVAR(csBspPolygon,poly_fact,GetPolygonFact,csBspPolygonFactory,)
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csBspPolygon,poly_pool,GetPolygonPool,csPolygonIntPool,(csBspPolygon::GetPolygonFact()))
 
 void csBspPolygon::Dump ()
 {
@@ -1069,14 +1065,15 @@ bool csBspPolygon::IntersectSegment (
 }
 
 //---------------------------------------------------------------------------
-csPolygonStubPool csPolyTreeBBox:: stub_pool;
-csPolygonStubFactory csPolyTreeBBox:: stub_fact (
-                                        &csBspPolygon::GetPolygonPool());
+CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_pool,GetPolyStubPool,csPolygonStubPool,)
+CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_fact,GetPolyStubFactory,csPolygonStubFactory,(&csBspPolygon::GetPolygonPool()))
 
 csPolyTreeBBox::csPolyTreeBBox ()
 {
+  stub_pool = GetPolyStubPool ();
+  stub_fact = GetPolyStubFactory ();
   first_stub = NULL;
-  base_stub = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  base_stub = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
   camera_nr = -1;
 }
@@ -1086,14 +1083,14 @@ csPolyTreeBBox::~csPolyTreeBBox ()
   RemoveFromTree ();
   if (base_stub)
   {
-    stub_pool.Free (base_stub);
-    stub_pool.Free (base_stub);
+    stub_pool->Free (base_stub);
+    stub_pool->Free (base_stub);
   }
 }
 
 void csPolyTreeBBox::RemoveFromTree ()
 {
-  while (first_stub) stub_pool.Free (first_stub);
+  while (first_stub) stub_pool->Free (first_stub);
 }
 
 void csPolyTreeBBox::UnlinkStub (csPolygonStub *ps)
@@ -1346,13 +1343,13 @@ void csPolyTreeBBox::SplitWithPlane (
   const csPlane3 &plane)
 {
   csPolygonStub *stub_on, *stub_front, *stub_back;
-  stub_front = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_front = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_front);
-  stub_back = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_back = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_back);
   if (p_stub_on)
   {
-    stub_on = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+    stub_on = (csPolygonStub *)stub_pool->Alloc (stub_fact);
     LinkStub (stub_on);
   }
   else
@@ -1392,19 +1389,19 @@ void csPolyTreeBBox::SplitWithPlane (
   // If the stubs are empty (no polygons) then free them again.
   if (p_stub_on && stub_on->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_on);
+    stub_pool->Free (stub_on);
     stub_on = NULL;
   }
 
   if (stub_front->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_front);
+    stub_pool->Free (stub_front);
     stub_front = NULL;
   }
 
   if (stub_back->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_back);
+    stub_pool->Free (stub_back);
     stub_back = NULL;
   }
 
@@ -1413,7 +1410,7 @@ void csPolyTreeBBox::SplitWithPlane (
   *p_stub_front = stub_front;
   *p_stub_back = stub_back;
 
-  stub_pool.Free (stub);
+  stub_pool->Free (stub);
 }
 
 void csPolyTreeBBox::SplitWithPlaneX (
@@ -1424,9 +1421,9 @@ void csPolyTreeBBox::SplitWithPlaneX (
   float x)
 {
   csPolygonStub *stub_front, *stub_back;
-  stub_front = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_front = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_front);
-  stub_back = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_back = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_back);
   if (p_stub_on) *p_stub_on = NULL;
 
@@ -1461,13 +1458,13 @@ void csPolyTreeBBox::SplitWithPlaneX (
   // If the stubs are empty (no polygons) then free them again.
   if (stub_front->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_front);
+    stub_pool->Free (stub_front);
     stub_front = NULL;
   }
 
   if (stub_back->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_back);
+    stub_pool->Free (stub_back);
     stub_back = NULL;
   }
 
@@ -1475,7 +1472,7 @@ void csPolyTreeBBox::SplitWithPlaneX (
   *p_stub_front = stub_front;
   *p_stub_back = stub_back;
 
-  stub_pool.Free (stub);
+  stub_pool->Free (stub);
 }
 
 void csPolyTreeBBox::SplitWithPlaneY (
@@ -1486,9 +1483,9 @@ void csPolyTreeBBox::SplitWithPlaneY (
   float y)
 {
   csPolygonStub *stub_front, *stub_back;
-  stub_front = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_front = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_front);
-  stub_back = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_back = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_back);
   if (p_stub_on) *p_stub_on = NULL;
 
@@ -1523,13 +1520,13 @@ void csPolyTreeBBox::SplitWithPlaneY (
   // If the stubs are empty (no polygons) then free them again.
   if (stub_front->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_front);
+    stub_pool->Free (stub_front);
     stub_front = NULL;
   }
 
   if (stub_back->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_back);
+    stub_pool->Free (stub_back);
     stub_back = NULL;
   }
 
@@ -1537,7 +1534,7 @@ void csPolyTreeBBox::SplitWithPlaneY (
   *p_stub_front = stub_front;
   *p_stub_back = stub_back;
 
-  stub_pool.Free (stub);
+  stub_pool->Free (stub);
 }
 
 void csPolyTreeBBox::SplitWithPlaneZ (
@@ -1548,9 +1545,9 @@ void csPolyTreeBBox::SplitWithPlaneZ (
   float z)
 {
   csPolygonStub *stub_front, *stub_back;
-  stub_front = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_front = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_front);
-  stub_back = (csPolygonStub *)stub_pool.Alloc (&stub_fact);
+  stub_back = (csPolygonStub *)stub_pool->Alloc (stub_fact);
   LinkStub (stub_back);
   if (p_stub_on) *p_stub_on = NULL;
 
@@ -1585,13 +1582,13 @@ void csPolyTreeBBox::SplitWithPlaneZ (
   // If the stubs are empty (no polygons) then free them again.
   if (stub_front->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_front);
+    stub_pool->Free (stub_front);
     stub_front = NULL;
   }
 
   if (stub_back->GetPolygonCount () == 0)
   {
-    stub_pool.Free (stub_back);
+    stub_pool->Free (stub_back);
     stub_back = NULL;
   }
 
@@ -1599,5 +1596,5 @@ void csPolyTreeBBox::SplitWithPlaneZ (
   *p_stub_front = stub_front;
   *p_stub_back = stub_back;
 
-  stub_pool.Free (stub);
+  stub_pool->Free (stub);
 }

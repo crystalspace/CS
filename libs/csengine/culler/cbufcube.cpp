@@ -97,12 +97,15 @@ bool csCBufferPersp::DoPerspective (
   return true;
 }
 
+CS_IMPLEMENT_STATIC_VAR (GetInsertPolygon,csPolygon2D,)
+CS_IMPLEMENT_STATIC_VAR (GetTestPolygon,csPolygon2D,)
+
 bool csCBufferPersp::InsertPolygon (
   csVector3 *verts,
   int num_verts,
   csClipper *clipper)
 {
-  static csPolygon2D persp;
+  static csPolygon2D &persp = *GetInsertPolygon ();
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::InsertPolygon (
@@ -115,7 +118,7 @@ bool csCBufferPersp::TestPolygon (
   int num_verts,
   csClipper *clipper)
 {
-  static csPolygon2D persp;
+  static csPolygon2D &persp = *GetTestPolygon ();
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::TestPolygon (

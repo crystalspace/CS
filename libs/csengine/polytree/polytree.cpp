@@ -29,9 +29,9 @@ csPolygonTreeNode::~csPolygonTreeNode ()
   while (first_stub || todo_stubs)
   {
     if (first_stub)
-      csPolyTreeBBox::stub_pool.Free (first_stub);
+      csPolyTreeBBox::GetPolyStubPool()->Free (first_stub);
     else
-      csPolyTreeBBox::stub_pool.Free (todo_stubs);
+      csPolyTreeBBox::GetPolyStubPool()->Free (todo_stubs);
   }
 }
 

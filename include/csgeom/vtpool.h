@@ -70,7 +70,7 @@ public:
   }
 
   /// Fetch the singleton instance of this pool.
-  static csDefaultVertexArrayPool& GetDefaultPool();
+  CS_DECLARE_STATIC_CLASSVAR_REF(default_pool,GetDefaultPool,csDefaultVertexArrayPool)
 };
 
 /**
@@ -153,7 +153,7 @@ public:
   virtual void FreeVertexArray (csVector3* ar, int n);
 
   /// Fetch the singleton instance of this pool.
-  static csPooledVertexArrayPool& GetDefaultPool();
+  CS_DECLARE_STATIC_CLASSVAR_REF(default_pool,GetDefaultPool,csPooledVertexArrayPool)
 };
 
 #endif // __CS_VTPOOL_H__

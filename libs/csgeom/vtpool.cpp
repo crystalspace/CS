@@ -22,11 +22,7 @@ csDefaultVertexArrayPool::csDefaultVertexArrayPool ()
 {
 }
 
-csDefaultVertexArrayPool &csDefaultVertexArrayPool::GetDefaultPool ()
-{
-  static csDefaultVertexArrayPool default_pool;
-  return default_pool;
-}
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csDefaultVertexArrayPool,default_pool,GetDefaultPool,csDefaultVertexArrayPool,)
 
 csPooledVertexArrayPool::csPooledVertexArrayPool ()
 {
@@ -119,8 +115,5 @@ void csPooledVertexArrayPool::FreeVertexArray (csVector3 *ar, int n)
   }
 }
 
-csPooledVertexArrayPool &csPooledVertexArrayPool::GetDefaultPool ()
-{
-  static csPooledVertexArrayPool default_pool;
-  return default_pool;
-}
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(csPooledVertexArrayPool,default_pool,GetDefaultPool,csPooledVertexArrayPool,)
+
