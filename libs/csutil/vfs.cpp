@@ -119,24 +119,6 @@ public:
   // number of open for writing files in this archive
   int Writing;
 
-  VfsArchive (const char *filename) : csArchive (filename)
-  {
-    RefCount = 0;
-    Writing = 0;
-    UpdateTime ();
-#ifdef VFS_DEBUG
-    printf ("VFS: opening archive \"%s\"\n", filename);
-    if (FirstFile () == NULL)
-      printf ("VFS: archive is empty (will be created on writes)\n");
-#endif
-  }
-  virtual ~VfsArchive ()
-  {
-#ifdef VFS_DEBUG
-    printf ("VFS: archive \"%s\" closed (%d)\n", GetName (), Writing);
-#endif
-    Flush ();
-  }
   void UpdateTime ()
   {
     LastUseTime = SysGetTime ();
@@ -155,6 +137,24 @@ public:
   bool CheckUp ()
   {
     return (RefCount == 0) && (SysGetTime () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
+  }
+  VfsArchive (const char *filename) : csArchive (filename)
+  {
+    RefCount = 0;
+    Writing = 0;
+    UpdateTime (); // OpenStep compiler requires having seen this already.
+#ifdef VFS_DEBUG
+    printf ("VFS: opening archive \"%s\"\n", filename);
+    if (FirstFile () == NULL)
+      printf ("VFS: archive is empty (will be created on writes)\n");
+#endif
+  }
+  virtual ~VfsArchive ()
+  {
+#ifdef VFS_DEBUG
+    printf ("VFS: archive \"%s\" closed (%d)\n", GetName (), Writing);
+#endif
+    Flush ();
   }
 };
 
