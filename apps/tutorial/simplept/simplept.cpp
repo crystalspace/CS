@@ -116,7 +116,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // Find the pointer to VFS.
   iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
-  if (!engine)
+  if (!VFS)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
     abort ();
