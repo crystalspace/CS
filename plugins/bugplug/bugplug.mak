@@ -2,7 +2,7 @@
 # Bugplug subemakefile
 #------------------------------------------------------------------------------
 
-DESCRIPTION.bugplug = Crystal Space Debugging aid plug-in
+DESCRIPTION.bugplug = Crystal Space debugging plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -29,10 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/bugplug
-
 ifeq ($(USE_PLUGINS),yes)
-  BUGPLUG = $(OUTDLL)/bugplug$(DLL)
+  BUGPLUG = $(OUT.BUGPLUG)/bugplug$(DLL)
   LIB.BUGPLUG = $(foreach d,$(DEP.BUGPLUG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BUGPLUG)
 else
@@ -61,18 +59,18 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: bugplug bugplugclean
+.PHONY: bugplug bugplugclean bugplugcleandep
 
-bugplug: $(OUT.BUGPLUG) $(BUGPLUG)
+bugplug: $(OUTDLL) $(OUT.BUGPLUG) $(BUGPLUG)
 
 $(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
 	$(DO.COMPILE.CPP)
 
-$(OUT.BUGPLUG):
-	$(MKDIRS)
-
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)
 	$(DO.PLUGIN)
+
+$(OUT.BUGPLUG):
+	$(MKDIRS)
 
 clean: bugplugclean
 bugplugclean:
@@ -85,7 +83,7 @@ bugplugcleandep:
 ifdef DO_DEPEND
 dep: $(OUT.BUGPLUG) $(OUT.BUGPLUG)/bugplug.dep
 $(OUT.BUGPLUG)/bugplug.dep: $(SRC.BUGPLUG)
-	$(DO.DEP)
+	$(DO.DEPEND)
 else
 -include $(OUT.BUGPLUG)/bugplug.dep
 endif

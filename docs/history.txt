@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  from the G3D cache so G3D has to stay in memory until the thing
 	  object type itself has disappeared. This bug was not easy to
 	  reproduce but it happened.
+	- Eric Sunshine fixed a number of problems introduced into bugplug.mak
+	  yesterday.  (Yesterday's conversion of this makefile was incomplete.)
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from
