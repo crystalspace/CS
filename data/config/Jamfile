@@ -1,4 +1,4 @@
 SubDir TOP data config ;
 
-Config [ Wildcard *.cfg ] ;
+Config [ Wildcard *.cfg *.key ] ;
 
