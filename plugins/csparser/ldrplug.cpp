@@ -113,6 +113,28 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
     	rec->ClassID, iBase);
     if (!rec->Component)
     {
+      csRef<iLoaderPlugin> plug = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      	object_reg, rec->ClassID, iLoaderPlugin);
+      if (plug)
+        rec->Component = (iBase*)plug;
+    }
+    if (!rec->Component)
+    {
+      csRef<iBinaryLoaderPlugin> plug = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      	object_reg, rec->ClassID, iBinaryLoaderPlugin);
+      if (plug)
+        rec->Component = (iBase*)plug;
+    }
+    if (!rec->Component)
+    {
+      csRef<iComponent> plug = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      	object_reg, rec->ClassID, iComponent);
+      if (plug)
+        rec->Component = (iBase*)plug;
+    }
+
+    if (!rec->Component)
+    {
       csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,
     	  rec->ClassID, iComponent);
       rec->Component = comp;
