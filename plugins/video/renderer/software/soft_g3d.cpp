@@ -2581,20 +2581,24 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   if (haloInfo == NULL)
     return E_INVALIDARG;
 
-  if (pCenter->x > width || pCenter->x < 0 || pCenter->y > height || pCenter->y < 0  ) 
-    return S_FALSE;
- 
-  unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+  int hdiv3 = height / 3;
 
-  // first, do a z-test to make sure the halo is visible
-  if (izz < (int)zb)	      
-    hRes = S_FALSE;
+  int half=hdiv3>>1;
+
+  if (pCenter->x > width || pCenter->x < 0 || pCenter->y > height || pCenter->y < 0 ) 
+    hRes=S_FALSE;
+  else
+  {
+    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+
+    // first, do a z-test to make sure the halo is visible
+    if (izz < (int)zb)
+      hRes = S_FALSE;
+  }
 
   // now, draw the halo
   unsigned short* pBuffer = ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf;
   unsigned char* pAlphaBuffer = ((csG3DSoftwareHaloInfo*)haloInfo)->palpha;
-
-  int hdiv3 = height / 3;
 
   int nx = QInt(pCenter->x) - (hdiv3 >> 1),
       ny = QInt(pCenter->y) - (hdiv3 >> 1);
@@ -2602,7 +2606,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   int x, y;
   int hh = hdiv3, hw = hdiv3;
 
-  if (fIntensity == 0.0f)
+  if (fIntensity <= 0.0f)
     return S_FALSE;
 
   if (nx >= width || ny >= height)
@@ -2785,6 +2789,43 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
   mRed = r; mGreen = b; mBlue = b;
   mx = my = dim / 2;
 
+  int i,j;
+
+  float power=1.0/2.5;
+  float power_dist=pow(dim*dim/4,power);
+
+#define LEVEL_OF_DISTORTION   5
+
+  for(i=0,y=-dim/2;i<dim;i++,y++)
+  {
+    for(j=0,x=-dim/2;j<dim;j++,x++)
+    {
+      float dist=pow(x*x+y*y,power);
+      if(dist>power_dist)
+        continue;
+      int alpha=255*cos(0.5*M_PI*dist/power_dist)+0.5;
+
+      alpha+=rand()%(2*LEVEL_OF_DISTORTION+1)-LEVEL_OF_DISTORTION;
+      if(alpha<0)
+        alpha=0;
+      if(alpha>255)
+        alpha=255;
+
+      int zr=r*alpha;
+      int zg=g*alpha;
+      int zb=b*alpha;
+
+      zr >>= 3; zg >>= not_green_bits; zb >>= 3;
+
+      unsigned short c = (zr << red_shift) | (zg << 5) | zb;//(zr << 10) | (zg << 5) | zb;
+      mpBuffer[j+i*dim]=c;
+      mpAlphaBuffer[j+i*dim]=alpha;
+/*    unsigned short final_color=(alpha<<24)|c;
+      mpBuffer[j+i*dim]=final_color;*/
+    }
+  }
+
+#if 0
   ////// Draw the outer rim //////
 
   drawline_outerrim(-y, y, x);
@@ -2863,6 +2904,8 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
   }
 
   drawline_vertical(mx, y1, y2);
+#endif
+
 #endif
 
   FINAL_RELEASE(piGI);
