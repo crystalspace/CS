@@ -204,10 +204,20 @@ have to create a material which uses the procedural texture manually.
 @subheading Mesh factories and iPolygonMesh
 
 Some mesh factories used to support the querying of the @code{iPolygonMesh}
-interface (e.g. Thing, Sprite3D). Although this may still work in some cases,
-doing so is discouraged, and this feature is subject to be dropped without 
-further notice. Instead, if you want the polygon mesh of a factory, query for
-the @code{iObjectModel} interface instead and use one of the
-@code{GetPolygonMeshXXX()} methods, depending on what you need (the interface
-query returned the collision detection mesh.)
+interface (e.g. Thing, Sprite3D, Genmesh). Due to the way this was 
+implemented internally this caused leaks. So, querying @code{iPolygonMesh} 
+directly from the factory is now discouraged. Although it may still work in 
+some cases, this feature may be dropped without further notice and may not 
+work in all cases. 
+
+Instead, if you want the polygon mesh from a factory, query for the 
+@code{iObjectModel} interface and utilize one of the 
+@code{GetPolygonMeshXXX()} methods, depending on what you need (the old 
+interface query returned the collision detection mesh.) This has also the 
+advantages that you can get different meshes for different purposes 
+(currently, visibility culling and collision detection in addition the the 
+base mesh), and that those meshes can be overridden by user-defined meshes 
+(e.g. if the collision detection mesh needs to have a shape different from 
+the visible mesh.) 
+
 
