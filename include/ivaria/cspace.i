@@ -958,6 +958,16 @@ APPLY_FOR_EACH_INTERFACE
 
 #undef CAST_FROM_BASE
 
+// iaws/aws.h
+%extend iAws
+{
+       bool SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
+       {
+         return self->SetupCanvas(0, g2d, g3d);
+       }
+}
+
+
 // iutil/csinput.h
 %extend iKeyboardDriver
 {
