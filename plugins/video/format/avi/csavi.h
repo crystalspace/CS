@@ -61,32 +61,45 @@ class csAVIFormat : public iStreamFormat
   struct AVIDataChunk
   {
     char id[4];
-    ULong currentframe;
+    SLong currentframe;
     char *currentframepos;
     void *data;
     ULong length; // in byte
   };
 
-  struct RIFFheader
+  // this is used to read in the id and length of an AVI fileheader, 
+  // list or chunk
+  struct hcl
   {
     char id[4];
-    ULong filesize;
-    char type[4];
-    void Endian (){ filesize = little_endian_long (filesize); }
+    ULong size;
+    void Endian (){ size = little_endian_long (size); }
+    bool Is (const char *theID, const char* theType, const char* p)
+      {return !strncmp (id, theID, 4) && !strncmp (p, theType, 4);}
+    bool Is (const char* theID)
+      {return !strncmp (id, theID, 4);}
   };
-  struct RIFFchunk
-  {
-    char id[4];
-    ULong chunksize;
-    void Endian (){ chunksize = little_endian_long (chunksize); }
-  };
-  struct RIFFlist
-  {
-    char id[4];
-    ULong listsize;
-    char type[4];
-    void Endian (){ listsize = little_endian_long (listsize); }
-  };
+
+  const int len_hcl;
+  const int len_id;
+  const char *RIFF_ID;
+  const char *LIST_ID;
+
+  // recognized RIFF types
+  const char *RIFF_AVI;
+  // recognized LIST types
+  const char *LIST_HDRL;
+  const char *LIST_STRL;
+  const char *LIST_MOVI;
+  const char *LIST_REC;
+  // recognized chunk types
+  const char *CHUNK_AVIH;
+  const char *CHUNK_STRH;
+  const char *CHUNK_STRF;
+  const char *CHUNK_STRD;
+  const char *CHUNK_STRN;
+  const char *CHUNK_IDX1;
+
   struct AVIHeader
   {
     ULong msecperframe; // milliseconds per frame
@@ -185,6 +198,7 @@ class csAVIFormat : public iStreamFormat
     ULong avgbytespersecond;
     UShort blockalign;
     UShort bitspersample;
+    UShort extra;
     void Endian ()
     {
       formattag = little_endian_short (formattag);
@@ -193,6 +207,7 @@ class csAVIFormat : public iStreamFormat
       avgbytespersecond = little_endian_long (avgbytespersecond);
       blockalign = little_endian_short (blockalign);
       bitspersample = little_endian_short (bitspersample);
+      extra = little_endian_short (extra);
     }
   };
  protected:
@@ -211,9 +226,9 @@ class csAVIFormat : public iStreamFormat
   bool no_recl;
 
 
-  RIFFheader fileheader;
-  RIFFlist hdrl, strl;
-  RIFFchunk avih, strh, avichunk;
+  hcl fileheader;
+  hcl hdrl, strl;
+  hcl avih, strh, avichunk;
   ChunkList *pChunkList;
 
   AVIHeader aviheader;

@@ -24,6 +24,7 @@
 #include "csutil/csrect.h"
 #include "imater.h"
 #include "igraph3d.h"
+#include "igraph2d.h"
 #include "csgfxldr/memimage.h"
 
 class csAVIStreamVideo : public iVideoStream
@@ -38,9 +39,11 @@ class csAVIStreamVideo : public iVideoStream
   UShort nStream;
   csVideoStreamDescription strdesc;
   csAVIFormat *pAVI;
+  csImageArea *pIA;
 
   iMaterialHandle *pMaterial;
   iGraphics3D *pG3D;
+  iGraphics2D *pG2D;
   iSystem *pSystem;
   iCodec *pCodec;
   csCodecDescription cdesc;
@@ -51,6 +54,8 @@ class csAVIStreamVideo : public iVideoStream
 
   bool LoadCodec ();
   void makeMaterial ();
+  bool NextFrameGetData ();
+  void PrepImageArea ();
 
  public:
   DECLARE_IBASE;

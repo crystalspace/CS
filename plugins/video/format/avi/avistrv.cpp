@@ -36,6 +36,8 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pG3D = NULL;
   pCodec = NULL;
   pMaterial = NULL;
+
+  pIA = new csImageArea (1,1,1,1);
 }
 
 bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph, 
@@ -56,7 +58,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
-  pChunk->currentframe = 0;
+  pChunk->currentframe = -1;
   pChunk->currentframepos = NULL;
   sprintf (pChunk->id, "%02dd", nStreamNumber);
   pChunk->id[3] = '\0';
@@ -66,7 +68,17 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   (pSystem = pTheSystem)->IncRef ();
   if (pG3D) pG3D->DecRef ();
   pG3D = QUERY_PLUGIN (pSystem, iGraphics3D);
-  SetRect (0, 0, strdesc.width, strdesc.height);
+  if (pG2D) pG2D->DecRef ();
+  pG2D = QUERY_PLUGIN (pSystem, iGraphics2D);
+
+  pIA->w = 0;
+  pIA->h = 0;
+  pIA->x = 0;
+  pIA->y = 0;
+  delete pIA->data;
+  pIA->data = NULL;
+
+  SetRect(0, 0, strdesc.width, strdesc.height);
 
   bTimeSynced = false;
   fxmode = CS_FX_COPY;
@@ -97,8 +109,11 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 csAVIStreamVideo::~csAVIStreamVideo ()
 {
   delete pChunk;
+  delete pIA->data;
+  delete pIA;
   if (pMaterial) pMaterial->DecRef ();
   if (pCodec) pCodec->DecRef ();
+  if (pG2D) pG2D->DecRef ();
   if (pG3D) pG3D->DecRef ();
   if (pSystem) pSystem->DecRef ();
 }
@@ -134,8 +149,8 @@ void csAVIStreamVideo::GetStreamDescription (csVideoStreamDescription &desc)
 bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
 {
   int height = pG3D->GetHeight ()-1;
+
   rc.Set (x, y, x+w, y+h);
-  
   polyfx.vertices[0].sx = x;
   polyfx.vertices[0].sy = height - y;
   polyfx.vertices[1].sx = x+w;
@@ -144,6 +159,7 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   polyfx.vertices[2].sy = height - (y+h);
   polyfx.vertices[3].sx = x;
   polyfx.vertices[3].sy = height - (y+h);
+
   memimage.Rescale (w, h);
   return true;
 }
@@ -157,13 +173,50 @@ bool csAVIStreamVideo::SetFXMode (UInt mode)
 #include <unistd.h>
 #include <sys/types.h>
 #include <fcntl.h>
+
 iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
+{
+  if (NextFrameGetData ())
+  {
+    makeMaterial ();
+    return pMaterial;
+  }
+  return NULL;
+}
+
+void csAVIStreamVideo::PrepImageArea ()
+{
+  int nPB = pG2D->GetPixelBytes ();
+  if (rc.Height () != pIA->h || rc.Width () != pIA->w)
+  {
+    delete pIA->data;
+    pIA->data = new char [nPB * rc.Width () * rc.Height ()];
+    pIA->x = rc.xmin;
+    pIA->y = rc.ymin;
+    pIA->w = rc.Width ();
+    pIA->h = rc.Height ();
+  }
+
+  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  char *p = pIA->data;
+  iTextureManager *pTexMgr = pG3D->GetTextureManager();
+
+  for (int row=0; row<rc.Height (); row++)
+    for (int col=0; col<rc.Width (); col++)
+    {
+      int color = pTexMgr->FindRGB (pixel->red, pixel->green, pixel->blue);
+      memcpy (p, ((char*)&color), nPB);
+      p += nPB;
+      pixel++;
+    }
+}
+
+bool csAVIStreamVideo::NextFrameGetData ()
 {
   void *outdata;
 
-  if (pAVI->GetChunk (pChunk->currentframe, pChunk))
+  if (pAVI->GetChunk (pChunk->currentframe+1, pChunk))
   {
-    pChunk->currentframe++;
     pCodec->Decode ((char*)pChunk->data, pChunk->length, outdata);
     if (cdesc.decodeoutput == CS_CODECFORMAT_YUV_CHANNEL)
       //      rgb_channel_2_rgba_interleave ((char **)outdata);
@@ -176,85 +229,125 @@ iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
       rgba_channel_2_rgba_interleave ((char **)outdata);
     else
     if (cdesc.decodeoutput != CS_CODECFORMAT_RGBA_INTERLEAVED)
-      return NULL;
-    /*
-    char name[20];
-    int i=0;
-  do
-  {
-    sprintf (name, "avi%06d.png", i++);
-  } while (i < 100000 && (access (name, 0) == 0));
+      return false;
+    return true;
 
-  if (i >= 1000)
-    pSystem->Printf (MSG_CONSOLE, "Too many screenshot files in current directory\n");
-  else
-    if (!csSavePNG (name, &memimage))
-      pSystem->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
-    */
-    makeMaterial ();
-    return pMaterial;
   }
-  return NULL;
+  return false;
 }
 
 void csAVIStreamVideo::NextFrame ()
 {
-  if (NextFrameGetMaterial ())
+  if (NextFrameGetData ())
   {
-  unsigned int zbuf = pG3D->GetRenderState( G3DRENDERSTATE_ZBUFFERMODE );
-  bool btex = pG3D->GetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE ) != 0;
-  bool bgour = pG3D->GetRenderState( G3DRENDERSTATE_GOURAUDENABLE ) != 0;
+    /*
+    unsigned int zbuf = pG3D->GetRenderState( G3DRENDERSTATE_ZBUFFERMODE );
+    bool btex = pG3D->GetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE ) != 0;
+    bool bgour = pG3D->GetRenderState( G3DRENDERSTATE_GOURAUDENABLE ) != 0;
 
-  pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE );
-  pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true );
-  pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, false );
+    pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE );
+    pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true );
+    pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, false );
 
     polyfx.mat_handle = pMaterial;
     pG3D->StartPolygonFX (polyfx.mat_handle, fxmode);
     pG3D->DrawPolygonFX (polyfx);
     pG3D->FinishPolygonFX ();
 
-  pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, zbuf );
-  pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btex );
-  pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, bgour );
+    pG3D->SetRenderState( G3DRENDERSTATE_ZBUFFERMODE, zbuf );
+    pG3D->SetRenderState( G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btex );
+    pG3D->SetRenderState( G3DRENDERSTATE_GOURAUDENABLE, bgour );
+    */
+    PrepImageArea ();
+    pG2D->RestoreArea (pIA, false);
   }
 }
 
 void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
 {
+#define FIX_RANGE(x) (unsigned char)((x)>255.f ? 255 : (x) < 0.f ? 0 : (x))
+
   char *ydata = data[0];
   char *udata = data[1];
   char *vdata = data[2];
-  int idx=0;
+  int idx=0, uvidx=0, tidx=0;
+  int sw = strdesc.width;
+  int sh = strdesc.height;
+  int tw = rc.Width ();
+  int th = rc.Height ();
+  int ytic=th, xtic;
+  int ls = 0;
+  float y,u,v, uf1, uf2, vf1, vf2;
+
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int y=0; y < rc.Height (); y++)
-    for (int x=0; x < rc.Width (); x++)
+  for (int row=0; row < th; row++)
+  {
+    xtic = 0;
+    for (int col=0; col < tw; col++)
     {
-      int y=MAX(0,(ydata[idx]) - 16);
-      int u=MAX(0,(udata[idx]) - 128);
-      int v=MAX(0,(vdata[idx]) - 128);
-      pixel[idx].blue = (1.164*y + 2.018 * v);
-      pixel[idx].green= (1.164*y - 0.813 * u - 0.391 * v);
-      pixel[idx].red  = (1.164*y + 1.596 * u);
-      idx++;
+      if (uvidx != (idx>>2)) // this YUV is a 1:4:4 scheme
+      {
+	uvidx = idx >> 2;
+	v=((float)(unsigned char)udata[uvidx]) - 128.f;
+	u=((float)(unsigned char)vdata[uvidx]) - 128.f;
+	uf1 = 2.018f * u;
+	uf2 = 0.813f * u;
+	vf1 = 0.391f * v;
+	vf2 = 1.596f * v;
+      }
+      y=1.164f*(((float)(unsigned char)ydata[idx]) - 16.f);
+      pixel[tidx].blue = FIX_RANGE(y + uf1);
+      pixel[tidx].green= FIX_RANGE(y - uf2 - vf1);
+      pixel[tidx].red  = FIX_RANGE(y + vf2);
+
+      while (xtic < sw)
+      {
+	idx++;
+	xtic += tw;
+      }
+      xtic -=sw;
+      tidx++;
     }
-  /*
+    while (ytic < sh)
+    {
+      ls += sw;
+      ytic += th;
+    }
+    ytic -=sh;
+    idx = ls;
+  }
+
+#undef FIX_RANGE
+  /*    
   static int n=0;
   char tt[20];
-  sprintf (tt,"pic%03d.Y", n);
+  char xx[20];
+  int l=memimage.GetWidth()*memimage.GetHeight();
+  sprintf (tt,"pic%03d.R", n);
   int f = creat ( tt, 0);
-  write (f,ydata,idx);
+  sprintf (xx, "P5\n%d %d 255\n", memimage.GetWidth (), memimage.GetHeight ());
+  write (f,xx, strlen(xx));
+  //  write (f,ydata,idx);
+  for(idx=0; idx<l;idx++) 
+    write (f, &(pixel[idx].red), 1);
   close (f);
-  sprintf (tt,"pic%03d.U", n);
+  sprintf (tt,"pic%03d.G", n);
   f = creat ( tt, 0);
-  write (f,udata,idx);
+  write (f,xx, strlen(xx));
+  //  write (f,udata,idx);
+  for(idx=0; idx<l;idx++) 
+    write (f, &(pixel[idx].green), 1);
   close (f);
-  sprintf (tt,"pic%03d.V", n);
+  sprintf (tt,"pic%03d.B", n);
   f = creat ( tt, 0);
-  write (f,vdata,idx);
+  write (f,xx, strlen(xx));
+  //  write (f,vdata,idx);
+  for(idx=0; idx<l;idx++) 
+    write (f, &(pixel[idx].blue), 1);
   close (f);
   n++;
-  */
+  printf ("%d\n", n);
+  */  
 }
 
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
@@ -263,8 +356,8 @@ void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
   char *gdata = data[1];
   char *bdata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < rc.Height (); y++)
-    for (int x=0; x < rc.Width (); x++)
+  for (int idx=0, y=0; y < memimage.GetHeight (); y++)
+    for (int x=0; x < memimage.GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -280,8 +373,8 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
   char *bdata = data[2];
   char *adata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < rc.Height (); y++)
-    for (int x=0; x < rc.Width (); x++)
+  for (int idx=0, y=0; y < memimage.GetHeight (); y++)
+    for (int x=0; x < memimage.GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];

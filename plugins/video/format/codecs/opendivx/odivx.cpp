@@ -28,6 +28,7 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_FACTORY (csOpenDivX)
 EXPORT_CLASS_TABLE (odivx)
   EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.dvx1", "CrystalSpace OpenDivX codec")
+  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.divx", "CrystalSpace OpenDivX codec")
 EXPORT_CLASS_TABLE_END
 
 csOpenDivX::csOpenDivX (iBase *pParent)
