@@ -217,7 +217,7 @@ rule Doxygen
   Always $(<) ;
   Depends $(<) : $(>) ;
   Depends $(<) : $(dir) ;
-  MkDir $(dir) ;
+  MkDir $(dir:G=dir) ;
   CleanDir $(<)clean : $(dir) ;
   Depends cleandoc : $(<)clean ;
   RunDoxygen $(<) : $(>) ;
