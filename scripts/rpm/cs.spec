@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 4
+%define release 5
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -72,11 +72,9 @@ make all
 %install
 DESTDIR=%{buildroot} make install
 
-./cslight -canvas=null2d -video=null flarge
-cp -R data/flarge/cache %{buildroot}%{_datadir}/%{name}/data/maps/flarge
-
-./cslight -canvas=null2d -video=null partsys
-cp -R data/partsys/cache %{buildroot}%{_datadir}/%{name}/data/maps/partsys
+%post
+%{prefix}/bin/cslight -canvas=null -video=null flarge
+%{prefix}/bin/cslight -canvas=null -video=null partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -145,6 +143,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Mon Nov 22 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-5
+- Moved cslight invokations to post-install step.
+- Changed cslight invokations to use null instead of null2d.
+
 * Thu Nov 04 2004 Eric Sunshine <sunshine@sunshineco.com> 0.99-4
 - Upgraded for new location of installed map files.
 - Improved the package descriptions.
