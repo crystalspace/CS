@@ -46,8 +46,11 @@ void
 UnMemoryMapFile(mmioInfo *platform)
 {
   if (platform->data != 0)
+#ifdef OS_SOLARIS  
+    munmap((char *)platform->data, platform->file_size);
+#else
     munmap(platform->data, platform->file_size);
-
+#endif
   if (platform->hMappedFile != -1)
     close(platform->hMappedFile);
 }
