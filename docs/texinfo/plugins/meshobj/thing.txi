@@ -142,10 +142,6 @@ the given texture will be scaled once in 2 units of world space.
 @item
 Various other commands.
 @table @code
-@item <moveable>yes/no</moveable>
-This command only works for the top-level thing. It indicates that the
-thing can possibly move around. If you don't set this option then it is
-illegal to later move the thing.
 @item <fastmesh>yes/no</fastmesh>
 This command only works for the top-level thing. It indicates that this
 mesh will be rendered using a faster technique. At this moment this is
