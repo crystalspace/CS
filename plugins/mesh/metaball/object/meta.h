@@ -137,7 +137,7 @@ public:
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return false; }
   virtual bool HitBeamObject( const csVector3&, const csVector3&,
-	  csVector3 &, float *) { return false; }
+	  csVector3 &, float *);
   virtual long GetShapeNumber() const { return shape_num; }
   virtual csVector3 GetRadius() { return rad; }
   virtual UInt GetMixMode() { return MixMode; }

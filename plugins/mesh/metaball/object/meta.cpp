@@ -19,6 +19,7 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include "qsqrt.h"
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
@@ -34,6 +35,7 @@
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
 #include "isys/system.h"
+
 #include "meta.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -245,6 +247,7 @@ void csMetaBall::CreateBoundingBox()
   minx = maxx = meta_balls[0].center.x;
   miny = maxy = meta_balls[0].center.y;
   minz = maxz = meta_balls[0].center.z;
+  csBox3 bb;
   
   int maxxi = 0, maxyi = 0, maxzi = 0, minxi = 0, minyi = 0, minzi = 0;
   
@@ -262,8 +265,11 @@ void csMetaBall::CreateBoundingBox()
 	else
 	if ( mesh.vertices[0][i].z > maxz ) {maxz = mesh.vertices[0][i].z; maxzi = i; }
   }
-  object_bbox.StartBoundingBox( csVector3(minx,miny,minz));
-  object_bbox.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
+  bb.StartBoundingBox( csVector3(minx,miny,minz));
+  bb.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
+  if ( !object_bbox.Contains(bb)) shape_num++;
+  object_bbox = bb;
+  rad.Set(object_bbox.Max() - object_bbox.GetCenter());
 
 #if 0
   printf("Minimum bounding found at %d,%d,%d\n", minxi, minyi, minzi);
@@ -312,6 +318,34 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
   camera_bbox.StartBoundingBox( trans * object_bbox.Min());
   camera_bbox.AddBoundingVertexSmart( trans * object_bbox.Max());
   cbox = camera_bbox;
+}
+
+bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end, 
+  csVector3& isect, float *pr)
+{
+  // @@@ We might consider checking to a lower LOD version only.
+  // This function is not very fast if the bounding box test succeeds.
+  // Plagarism notice: Ripped form Sprite3D.
+  printf("Hit beam\n");
+  csSegment3 seg (start, end);
+  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+    return false;
+  int i, max = int(vertices_tesselated/3);
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (mesh.vertices[0][i+2], mesh.vertices[0][i+1],
+    	mesh.vertices[0][i], seg, isect))
+    {
+      if (pr)
+      {
+        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      }
+	  printf("Hit beam succesful\n");
+      return true;
+    }
+  }
+  return false;
 }
 
 void csMetaBall::NextFrame( cs_time )
