@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node API Modifications 92, API Modifications 90, API Modifications, API Modifications
+@node API Modifications 92, API Modifications 90, API Modifications 94, API Modifications
 @appendixsec @sc{api} Changes from 0.90 to 0.92
 @cindex @sc{api} Changes
 
