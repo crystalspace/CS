@@ -325,10 +325,10 @@ void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
 
-  const char* DomeName   = pEntity->GetValueOfKey   ("skydome",      "sky");
+  //const char* DomeName   = pEntity->GetValueOfKey   ("skydome",      "sky");
   //double      DomeRadius = pEntity->GetNumValueOfKey("skydomeradius", 800);
 
-  CTextureManager* pTexMan  = m_pMap->GetTextureManager();
+  //CTextureManager* pTexMan  = m_pMap->GetTextureManager();
   //CTextureFile*    pTexture = pTexMan->GetTexture(DomeName);
 
 /* @@@ TODO!
@@ -364,21 +364,20 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
    {-1, 1, 1}, { 1, 1, 1},
    {-1, 1,-1}, { 1, 1,-1}};
 
-  static struct
+  struct ThingSide
   {
     const char*   ext;
     const char*   vertices[4];
     CTextureFile* pTex;
-  }
-
-  ThingSides[] =
-  {
-    {"f", "4", "5", "1", "0", NULL},
-    {"r", "5", "7", "3", "1", NULL},
-    {"b", "7", "6", "2", "3", NULL},
-    {"l", "6", "4", "0", "2", NULL},
-    {"u", "6", "7", "5", "4", NULL},
-    {"d", "3", "2", "0", "1", NULL}
+  };
+  
+  static ThingSide ThingSides[] = {
+    {"f", { "4", "5", "1", "0"} , NULL},
+    {"r", { "5", "7", "3", "1"}, NULL},
+    {"b", { "7", "6", "2", "3"}, NULL},
+    {"l", { "6", "4", "0", "2"}, NULL},
+    {"u", { "6", "7", "5", "4"}, NULL},
+    {"d", { "3", "2", "0", "1"}, NULL}
   };
 
   //assign texture pointers to the sides of the skybox
@@ -951,7 +950,7 @@ void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
 
 void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> node)
 {
-  int i;
+  //int i;
 
   //iterate all entities, brushes, polygons and vertices:
 /*  for (i=0; i<m_pMap->GetNumEntities(); i++)

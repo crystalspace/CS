@@ -110,16 +110,17 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   strncpy (InternalName, CleanedUpTextureName, sizeof(InternalName));
 
   // clean out some chars like '/' etc.
-  int i=0;
-  for (i=0; i<strlen(InternalName); i++)
+  size_t p=0;
+  for (p=0; p<strlen(InternalName); p++)
   {
-    if (strchr ("/\\", InternalName[i]))
+    if (strchr ("/\\", InternalName[p]))
     {
-      InternalName[i] = '_';
+      InternalName[p] = '_';
     }
   }
 
   //First, we search in the array of already stored textures.
+  int i;
   for (i=0; i<m_StoredTextures.Length(); i++)
   {
     CTextureFile* pTexture = m_StoredTextures[i];

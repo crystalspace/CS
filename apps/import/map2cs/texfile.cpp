@@ -108,7 +108,7 @@ bool CTextureFile::AddToVFS(csRef<iVFS> VFS, const char* path)
   {
     size_t vfssize;
     VFS->GetFileSize (m_Filename, vfssize);
-    if (vfssize == m_OriginalData.GetSize())
+    if (vfssize == (size_t) m_OriginalData.GetSize())
     {
       res = true;
     }

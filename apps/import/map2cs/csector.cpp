@@ -38,7 +38,10 @@
 
 #include "dochelp.h"
 
-static char* BuildMaterialKey (int i, CMapEntity* pEntity)
+namespace
+{
+
+char* BuildMaterialKey (int i, CMapEntity* pEntity)
 {
   char* key = new char[1024];
   char* returnvalue = new char[1024];
@@ -51,7 +54,7 @@ static char* BuildMaterialKey (int i, CMapEntity* pEntity)
 }
 
 //Auxiliar funtion to check if the file name is a mdl file
-static bool isMdlFile(const char* csmodelfile)
+bool isMdlFile(const char* csmodelfile)
 {
   int i = 0;
   bool dot = false;
@@ -73,7 +76,7 @@ static bool isMdlFile(const char* csmodelfile)
 };
 
 //Auxiliar Function to contruct the Factory name of a cs_model
-static char* GetFactoryName(const char * csmodelfile)
+char* GetFactoryName(const char * csmodelfile)
 {
   /*
    * Searchs for the extension and substitutes ".extension" by "Fact" and
@@ -107,6 +110,8 @@ static char* GetFactoryName(const char * csmodelfile)
   aux[i-slashIndex + 3] = 0;
   return aux;
 }
+
+} // end of anonymous namespace
 
 
 CCSSector::CCSSector(CMapBrush* pBrush)
@@ -686,10 +691,10 @@ bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
   assert(pWorld);
 
   CMapFile* pMap        = pWorld->GetMap();
-  double    ScaleFactor = pWorld->GetScalefactor();
+  //double    ScaleFactor = pWorld->GetScalefactor();
   assert(pMap);
 
-  int i;
+  //int i;
 
   //iterate all entities, brushes, polygons and vertices:
 /*  for (i=0; i<pMap->GetNumEntities(); i++)
