@@ -79,6 +79,11 @@ Jochen Moench (@email{jochen.moench@@de.thalesgroup.com})
 Jochen added a patch for SetAction() in spr3d plugin.
 
 @item
+Micah Dowty (@email{micah@@navi.picogui.org})
+
+Micah fixed timer resolution in Linux.
+
+@item
 Krishnan Shrikumar (@email{krish@@urbyte.com})
 
 Krishnan wrote the sectorexport Blender export script.

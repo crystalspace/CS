@@ -6,6 +6,23 @@ The history order is reversed so that new features are at the top.
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.
+	- Added csBlockAllocator class. This is a templated class which
+	  can do very efficient internal memory allocation of objects that
+	  have the same type. It has no fragmentation and no per-object
+	  memory overhead and it is very fast. It also properly constructs
+	  and destructs the objects.
+	- TinyXML parser now uses csBlockAllocator for text and element
+	  nodes. This avoids the large number of new/delete calls which
+	  seem VERY bad in some particular cases. On MSVC there are
+	  locking calls every time a delete happens which makes the
+	  destruction of the XML node tree very slow.
+	- Applied a patch from Micah Dowty <micah@navi.picogui.org>
+	  which improves the accuracy of the Unix timer (csGetTicks())
+	  by using gettimeofday() instead of times().
+	- The Bonez team reported a bug in the OPCODE plugin with a mismatch
+	  between 'malloc' and 'delete[]'.
+	- Luca Romagnoli <lucak@qubica.net> suggested a bugfix in the spr3d
+	  loader with regards to <applymotion/>.
 31-Mar-2003
 	- Fixed a very old clipping bug with individual polygon drawing
 	  in the thing plugin in case there is rendering through a portal

@@ -17,7 +17,7 @@
 */
 
 #include <unistd.h>
-#include <sys/times.h>
+#include <sys/time.h>
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 
@@ -29,11 +29,12 @@ typedef long long csLongTicks;
 class csInitGetTicks 
 {
 public:
-    csInitGetTicks()
-    {
-        csGetTicks();
-    }    
+  csInitGetTicks()
+  {
+    csGetTicks();
+  }    
 };
+
 // Constructor called before main is invoke
 csInitGetTicks initGetTicks;
 
@@ -43,25 +44,13 @@ csInitGetTicks initGetTicks;
 // function is MT safe. 
 csTicks csGetTicks ()
 {
-  struct tms buf;
+  static struct timeval now, FirstCount;
 
-  // We shouldn't cache 1000/CLK_TCK, because we loose accuracy
-  // on platforms where CLK_TCK is 60. (16 != 16.66666...)
-  static csLongTicks Freq      = 0;
-  static csLongTicks FirstCount = 0;
+  // Start counting from first time this function is called. 
+  if (FirstCount.tv_sec == 0)
+    gettimeofday (&FirstCount, NULL);    
 
-  if (Freq == 0)
-  {
-#ifdef _SC_CLK_TCK
-    Freq = sysconf(_SC_CLK_TCK);
-#else
-    Freq = CLK_TCK;
-#endif
-    // Start counting from first time this function is called. 
-    FirstCount = (csLongTicks)times (&buf);
-  } 
-
-  csLongTicks Count = (csLongTicks)times (&buf);
-  
-  return 1000*(Count-FirstCount)/Freq;
+  gettimeofday (&now, NULL);
+  return (now.tv_sec  - FirstCount.tv_sec ) * 1000 + 
+         (now.tv_usec - FirstCount.tv_usec) / 1000;
 }

@@ -46,6 +46,7 @@ distribution.
 #include "iutil/string.h"
 #include "csutil/scfstr.h"
 #include "csutil/array.h"
+#include "csutil/blkalloc.h"
 #include "csutil/util.h"
 #include "csutil/strset.h"
 #undef FILE
@@ -342,7 +343,7 @@ public:
   TiXmlElement* NextSiblingElement( const char * ) const;
 
   /// Query the type (as an enumerated value, above) of this node.
-  virtual int Type() const = 0;
+  NodeType Type() const { return type; }
 
   /**
    * Return a pointer to the Document this node lives in.
@@ -370,7 +371,7 @@ public:
   TiXmlDeclaration* ToDeclaration() const
   { return ( Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; }
 
-  virtual TiDocumentNode* Clone() const = 0;
+  virtual TiDocumentNode* Clone(TiDocument* document) const = 0;
 
 protected:
   TiDocumentNode( );
@@ -380,6 +381,7 @@ protected:
     target->SetValue (Value () );
   }
 
+  NodeType type;
   TiDocumentNodeChildren* parent;
 
   TiDocumentNode* prev;
@@ -585,8 +587,6 @@ public:
 
   virtual ~TiXmlElement();
 
-  virtual int Type() const { return ELEMENT; }
-
   /**
    * Given an attribute name, attribute returns the value
    * for the attribute of that name, or null if none exists.
@@ -635,7 +635,7 @@ public:
    */
   void RemoveAttribute( const char * name );
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
 
   virtual void Print( FILE* cfile, int depth ) const;
@@ -676,12 +676,11 @@ class TiXmlComment : public TiDocumentNode
 {
 public:
   /// Constructs an empty comment.
-  TiXmlComment() { value = NULL; }
+  TiXmlComment() { value = NULL; type = COMMENT; }
   virtual ~TiXmlComment() { delete[] value; }
-  virtual int Type() const { return COMMENT; }
 
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
   virtual void Print( FILE* cfile, int depth ) const;
   virtual const char * Value () const { return value; }
@@ -718,11 +717,11 @@ public:
   TiXmlText ()
   {
     value = NULL;
+    type = TEXT;
   }
   virtual ~TiXmlText()
   {
   }
-  virtual int Type() const { return TEXT; }
   virtual const char * Value () const { return value; }
   void SetValueRegistered (const char * _value)
   {
@@ -732,7 +731,7 @@ public:
 
 protected :
   // [internal use] Creates a new Element and returns it.
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
   virtual void Print( FILE* cfile, int depth ) const;
   virtual void StreamOut ( TIXML_OSTREAM * out ) const;
@@ -784,14 +783,13 @@ class TiXmlDeclaration : public TiDocumentNode
 {
 public:
   /// Construct an empty declaration.
-  TiXmlDeclaration() { }
+  TiXmlDeclaration() { type = DECLARATION; }
 
   /// Construct.
-  TiXmlDeclaration::TiXmlDeclaration( const char * _version,
+  TiXmlDeclaration (const char * _version,
 		const char * _encoding, const char * _standalone );
 
   virtual ~TiXmlDeclaration() {}
-  virtual int Type() const { return DECLARATION; }
 
   /// Version. Will return empty if none was found.
   const char * Version() const { return version.c_str (); }
@@ -801,7 +799,7 @@ public:
   const char * Standalone() const { return standalone.c_str (); }
 
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
   virtual void Print( FILE* cfile, int depth ) const;
   virtual const char * Value () const { return value.c_str (); }
@@ -832,12 +830,11 @@ private:
 class TiXmlUnknown : public TiDocumentNode
 {
 public:
-  TiXmlUnknown() { }
+  TiXmlUnknown() { type = UNKNOWN; }
   virtual ~TiXmlUnknown() {}
-  virtual int Type() const { return UNKNOWN; }
 
   // [internal use]
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
   // [internal use]
   virtual void Print( FILE* cfile, int depth ) const;
   virtual const char * Value () const { return value.c_str (); }
@@ -865,6 +862,10 @@ class TiDocument : public TiDocumentNodeChildren
 public:
   /// Interned strings.
   csStringSet strings;
+  /// Block allocator for elements.
+  csBlockAllocator<TiXmlElement> blk_element;
+  /// Block allocator for text.
+  csBlockAllocator<TiXmlText> blk_text;
 
   /// Create an empty document, that has no name.
   TiDocument();
@@ -874,8 +875,21 @@ public:
    */
   TiDocument( const char * documentName );
 
-  virtual ~TiDocument() {}
-  virtual int Type() const { return DOCUMENT; }
+  virtual ~TiDocument();
+
+  /**
+   * Correctly delete a node. This will take care to use the correct
+   * memory block allocator.
+   */
+  void DeleteNode (TiDocumentNode* node)
+  {
+    switch (node->Type ())
+    {
+      case ELEMENT: blk_element.Free ((TiXmlElement*)node); break;
+      case TEXT: blk_text.Free ((TiXmlText*)node); break;
+      default: delete node;
+    }
+  }
 
   virtual const char * Value () const { return value.c_str (); }
   virtual void SetValue (const char * _value) { value = _value;}
@@ -936,7 +950,7 @@ public:
 protected :
   virtual void StreamOut ( TIXML_OSTREAM * out) const;
   // [internal use]
-  virtual TiDocumentNode* Clone() const;
+  virtual TiDocumentNode* Clone(TiDocument* document) const;
 
 private:
   bool error;

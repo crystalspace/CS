@@ -98,8 +98,8 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
     if (!m_pCollisionModel)
       return;
 
-    vertholder = (Point*) malloc (sizeof (Point) * vertcount);
-    indexholder = (unsigned int*) malloc (sizeof (unsigned int) * 3 * tri_count);
+    vertholder = new Point [vertcount];
+    indexholder = new unsigned int[3*tri_count];
 
     for (i = 0; i < vertcount; i++)
     {

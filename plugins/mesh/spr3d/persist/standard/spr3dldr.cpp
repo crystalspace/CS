@@ -791,7 +791,8 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
 	  csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
 	  	iSkeletonLimbState));
-	  if (!(limb = csPtr<iSkeletonLimbState> (limb->GetChildren())))
+	  limb = limb->GetChildren ();
+	  if (!limb)
 	  {
       	    synldr->ReportError (
 		"crystalspace.sprite3dloader.parse.motion.nochildren",
