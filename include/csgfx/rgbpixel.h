@@ -21,36 +21,33 @@
 // Implementation Note: Eric Sunshine <sunshine@sunshineco.com>      1999/02/09
 //
 // Certain portions of the Crystal Space code have strict requirements about
-// the sizes of the structures csRGBcolor, csRGBpixel, and RGBPalEntry.  In
-// particular, some pieces of code make these assumptions:
+// the sizes of the structures csRGBcolor and csRGBpixel.  In particular, some
+// pieces of code make these assumptions:
 //
-//    sizeof(csRGBcolor) == 3       (byte:rgb)
-//    sizeof(csRGBpixel) == 4       (byte:rgb + byte:alpha)
-//    sizeof(RGBPalEntry) == 8    (byte:rgb + long:count)
+//    sizeof(csRGBcolor) == 3  (byte:rgb)
+//    sizeof(csRGBpixel) == 4  (byte:rgb + byte:alpha)
 //
-// Originally, csRGBpixel and RGBPalEntry were implemented as subclasses of
-// csRGBcolor.  csRGBpixel added a byte-sized "alpha" variable, and RGBPalEntry added
-// a longword-sized "count" variable.  Thus, the original implementation made
+// Originally, csRGBpixel was implemented as a subclasse of csRGBcolor and
+// added a byte-sized "alpha" variable.  Thus, the original implementation made
 // the assumption that the compiler would not pad out the csRGBcolor structure.
 //
-// Unfortunately in some environments (such as the NextStep compiler on m68k
+// Unfortunately in some environments (such as the NextStep compiler on M68K
 // hardware) the compiler does pad csRGBcolor thus breaking the original
 // assumptions about structure sizes.  In such cases, csRGBcolor is padded out
-// to 4 bytes instead of 3 and csRGBpixel is padded out to 6 bytes instead of 4.
+// to 4 bytes instead of 3 and csRGBpixel is padded out to 6 bytes instead of
+// 4.  This padding results in problems in code which makes assumptions about
+// the sizes of each structure.  In practice, problems were observed in code
+// which expected csRGBpixel to be 4 bytes.
 //
-// This padding results in problems in code which makes assumptions about the
-// sizes of each structure.  In practice, problems were observed in code which
-// expected csRGBpixel to be 4 bytes.
-//
-// To work around this problem, I re-implemented csRGBpixel and RGBPalEntry such
-// that they are no longer derived from csRGBcolor.  An unfortunate side-effect
-// of this re-implementation is that code is no longer inherited, and is thus
+// To work around this problem, csRGBpixel has been re-implemented so that it
+// is no longer derived from csRGBcolor.  An unfortunate side-effect of this
+// re-implementation is that code is no longer inherited, and is thus
 // duplicated in each class.  However, except for this minor point, the size of
 // each structure should now be more stable between various compilers.
 //-----------------------------------------------------------------------------
 
-#ifndef RGBPIXEL_H
-#define RGBPIXEL_H
+#ifndef __CS_RGBPIXEL_H__
+#define __CS_RGBPIXEL_H__
 
 #include <stdio.h>
 #include "cstypes.h"
@@ -75,7 +72,7 @@ struct csRGBcolor
   { return csRGBcolor (c.red + red, c.green + green, c.blue + blue); }
 };
 
-// For optimized performance, we sometimes handle all R/G/B values simultaneously
+// As an optimization, we sometimes handle R/G/B values simultaneously.
 #ifdef CS_BIG_ENDIAN
 #  define RGB_MASK 0xffffff00
 #else
@@ -83,7 +80,7 @@ struct csRGBcolor
 #endif
 
 /**
- * An RGB pixel. Besides R,G,B color components this structure also
+ * An RGB pixel. In addition to R,G,B color components this structure also
  * contains the Alpha channel component, which is used in images
  * (that potentially have an alpha channel).
  */
@@ -97,7 +94,7 @@ struct csRGBpixel
   /// Copy constructor
   csRGBpixel (const csRGBpixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
-  { *(uint32 *)this = *(uint32 *)&p; }
+  { *(uint32*)this = *(uint32*)&p; }
   /// Yet another copy constructor
   csRGBpixel (const csRGBcolor& c) :
     red (c.red), green (c.green), blue (c.blue), alpha (255) {}
@@ -110,11 +107,14 @@ struct csRGBpixel
   /// Compare with an csRGBpixel (including alpha value)
   bool operator == (const csRGBpixel& p) const
   /* { return (p.red == red) && (p.green == green) && (p.blue == blue); } */
-  { return *(uint32 *)this == *(uint32 *)&p; }
+  { return *(uint32*)this == *(uint32*)&p; }
   /// Check if the csRGBpixel is not equal to an csRGBcolor
   bool operator != (const csRGBcolor& c) const
   { return !operator == (c); }
-  /// Check if the csRGBpixel is not equal to another csRGBpixel (including alpha)
+  /**
+   * Check if this csRGBpixel is not equal to another csRGBpixel (including
+   * alpha).
+   */
   bool operator != (const csRGBpixel& p) const
   { return !operator == (p); }
   /// Construct an csRGBcolor from this csRGBpixel
@@ -122,7 +122,7 @@ struct csRGBpixel
   { return csRGBcolor (red, green, blue); }
   /// Compare with another csRGBpixel, but don't take alpha into account
   bool eq (const csRGBpixel& p) const
-  { return ((*(uint32 *)this) & RGB_MASK) == ((*(uint32 *)&p) & RGB_MASK); }
+  { return ((*(uint32*)this) & RGB_MASK) == ((*(uint32*)&p) & RGB_MASK); }
   /// Get the pixel intensity
   int Intensity ()
   { return (red + green + blue) / 3; }
@@ -134,7 +134,7 @@ struct csRGBpixel
   { red = r; green = g; blue = b; alpha = a; }
   void Set (const csRGBpixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
-  { *(uint32 *)this = *(uint32 *)&p; }
+  { *(uint32*)this = *(uint32*)&p; }
 };
 
 // We don't need RGB_MASK anymore
@@ -160,4 +160,4 @@ struct csRGBpixel
 /// Blue component sensivity, squared
 #define B_COEF_SQ	114
 
-#endif // RGBPIXEL_H
+#endif // __CS_RGBPIXEL_H__

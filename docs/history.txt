@@ -17,6 +17,7 @@ The history order is reversed so that new features are at the top.
 	  really unacceptable in the long run.
 	- Eric Sunshine eliminated a couple compilation warnings about negative
 	  values being assigned to unsigned quantities in demo.cpp.
+	- Eric Sunshine fixed outdated comments in rgbpixel.h.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
