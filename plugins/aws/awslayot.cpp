@@ -765,6 +765,7 @@ awsGridBagLayout::AdjustForGravity(awsGridBagConstraints *constraints, csRect r)
     case awsGridBagConstraints::GBS_NORTHWEST:
       break;
     default:
+      printf("GridBag: bad gravity!\n");
       break;
     }
 }

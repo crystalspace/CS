@@ -413,11 +413,14 @@ awsWindow::OnMouseUp(int button, int x, int y)
       maxp.Move(delta_x, delta_y);
       closep.Move(delta_x, delta_y);
 
-      // Fix kids
-      MoveChildren(unzoomed_frame.xmin, delta_y);
-
-      // Fix frame
+       // Fix frame
       Frame().Set(unzoomed_frame);
+     
+      if (Layout())
+	RecursiveLayoutChildren(this);
+
+       // Fix kids
+      MoveChildren(unzoomed_frame.xmin, delta_y);
 
       // Fix redraw zone
       todraw_dirty=true;
@@ -437,6 +440,9 @@ awsWindow::OnMouseUp(int button, int x, int y)
       minp.Move(delta_x, delta_y);
       maxp.Move(delta_x, delta_y);
       closep.Move(delta_x, delta_y);
+
+      if (Layout())
+	RecursiveLayoutChildren(this);
 
       // Fix kids
       MoveChildren(-unzoomed_frame.xmin, delta_y);

@@ -668,7 +668,7 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
 
 	// Set it up in the parent's layout manager, if there is one.
 	if (parent->Layout())
-	  parent->Layout()->AddComponent(wmgr->GetPrefMgr(), settings, comp);
+	  parent->Layout()->AddComponent(wmgr->GetPrefMgr(), comp_node, comp);
 
         // Process all subcomponents of this component.
         CreateChildrenFromDef(wmgr, win, comp, comp_node);
