@@ -57,7 +57,7 @@ private:
   struct csFreeList
   {
     csFreeList* next;
-    size_t numfree;	// Free elements in this block.
+    size_t numfree;		// Free elements in this block.
   };
 
   // A memory block (a series of 'size' objects).
@@ -65,7 +65,7 @@ private:
   {
     void* memory;
     csFreeList* firstfree;	// Linked list of free items in this block.
-    csBlock () : memory (0) { }
+    csBlock () : memory (0), firstfree (0) {}
     ~csBlock ()
     {
       if (memory)
@@ -82,7 +82,7 @@ private:
   };
 
   csArray<csBlock> blocks;
-  size_t size;		// Number of elements per block.
+  size_t size;			// Number of elements per block.
   size_t elsize;		// Element size (bigger than 8).
   size_t blocksize;		// Size in bytes per block.
 
@@ -114,6 +114,7 @@ private:
    */
   void FindAndUpdateFreeBlock ()
   {
+    CS_ASSERT (blocks.Length() != 0);
     ++firstfreeblock;
     while (firstfreeblock < blocks.Length ()
 		&& blocks[firstfreeblock].firstfree == 0)
@@ -197,8 +198,8 @@ public:
    */
   void Compact ()
   {
-    if (blocks.Length() == 0) return;
-    size_t i = blocks.Length ()-1;
+    CS_ASSERT (blocks.Length() != 0);
+    size_t i = blocks.Length () - 1;
     while (i > firstfreeblock)
     {
       if (blocks[i].firstfree == (csFreeList*)blocks[i].memory &&
@@ -213,6 +214,8 @@ public:
    */
   T* Alloc ()
   {
+    CS_ASSERT (blocks.Length() != 0);
+
     // This routine makes sure there is ALWAYS free space available.
     csBlock& freebl = blocks[firstfreeblock];
     void* ptr = (void*)(freebl.firstfree);
@@ -392,4 +395,3 @@ public:
 #endif
 
 #endif
-
