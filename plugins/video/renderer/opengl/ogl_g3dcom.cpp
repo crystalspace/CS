@@ -5203,7 +5203,8 @@ void csGraphics3DOGLCommon::InitStockEffects()
   effectserver->Validate( StockEffects[0][1][8] );
 }
 
-iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique( G3DTriangleMesh& mesh )
+iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
+	G3DTriangleMesh& mesh)
 {
   if( (((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount() > 0) ||
       !mesh.mat_handle->GetTexture() )
@@ -5212,25 +5213,35 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique( G3DTriangleMesh& mes
   switch (mesh.mixmode & (CS_FX_MASK_MIXMODE | CS_FX_EXTRA_MODES))
   {
     case CS_FX_SRCDST:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][0] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][0] );
     case CS_FX_HALOOVF:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][1] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][1] );
     case CS_FX_MULTIPLY:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][2] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][2] );
     case CS_FX_MULTIPLY2:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][3] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][3] );
     case CS_FX_ADD:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][4] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][4] );
     case CS_FX_ALPHA:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][5] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][5] );
     case CS_FX_TRANSPARENT:
-      return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][6] );
+      return effectserver->SelectAppropriateTechnique(
+      	StockEffects[0][mesh.do_fog?1:0][6] );
     case CS_FX_COPY:
     default:
-      if( mesh.mat_handle->GetTexture()->GetKeyColor() || mesh.mat_handle->GetTexture()->GetAlphaMap () )
-        return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][7] );
+      if (mesh.mat_handle->GetTexture()->GetKeyColor()
+      		|| mesh.mat_handle->GetTexture()->GetAlphaMap ())
+        return effectserver->SelectAppropriateTechnique(
+		StockEffects[0][mesh.do_fog?1:0][7] );
       else
-        return effectserver->SelectAppropriateTechnique( StockEffects[0][mesh.do_fog?1:0][8] );
+        return effectserver->SelectAppropriateTechnique(
+		StockEffects[0][mesh.do_fog?1:0][8] );
   }
 }
 
@@ -5253,7 +5264,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
   iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
-  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique( material->GetEffect() );
+  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique(
+  	material->GetEffect() );
   if( !technique )
   {
     technique = GetStockTechnique( mesh );
@@ -5293,7 +5305,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // clipping).
   int reserved_planes =
     int (do_near_plane && mesh.clip_plane != CS_CLIP_NOT) +
-  int (mesh.clip_z_plane != CS_CLIP_NOT);
+    int (mesh.clip_z_plane != CS_CLIP_NOT);
 
   if (mesh.clip_portal != CS_CLIP_NOT)
   {
@@ -5301,7 +5313,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     // In some z-buf modes we cannot use clipping modes that depend on
     // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (technique->GetClientFlags() & EFFECTFLAG_RUINSZCLIPPING)
+    bool no_zbuf_clipping = (technique->GetClientFlags()
+      & EFFECTFLAG_RUINSZCLIPPING)
       || (z_buf_mode == CS_ZBUF_NONE || z_buf_mode == CS_ZBUF_FILL ||
       z_buf_mode == CS_ZBUF_FILLONLY);
 
@@ -5328,13 +5341,14 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
         continue;
       // We cannot use s or S if effect uses stencil.
-      if ((c == 's' || c == 'S') && (technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
+      if ((c == 's' || c == 'S')
+      		&& (technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
         continue;
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
           clipper->GetVertexCount ()
-    >= GLCaps.nr_hardware_planes-reserved_planes)
+	  >= GLCaps.nr_hardware_planes-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -5424,8 +5438,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       if (mesh.do_morph_colors)
       {
         (*color_verts)[i].red = tr * col2[i].red + remainder * col1[i].red;
-  (*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
-  (*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
+	(*color_verts)[i].green = tr * col2[i].green + remainder * col1[i].green;
+	(*color_verts)[i].blue = tr * col2[i].blue + remainder * col1[i].blue;
       }
     }
     work_verts = tr_verts->GetArray ();
@@ -5500,8 +5514,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
       statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
   }
-
-
 
   // set up coordinate transform
   GLfloat matrixholder[16];
@@ -5655,11 +5667,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
     statecache->SetShadeModel( pass_data->shade_state );
 
-		if( pass_data->vcsource == ED_VC_SOURCE_FOG )
+    if( pass_data->vcsource == ED_VC_SOURCE_FOG )
     {
       glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
       glEnableClientState(GL_COLOR_ARRAY);
-    } else {
+    }
+    else
+    {
       glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
       glEnableClientState(GL_COLOR_ARRAY);
     }
@@ -5670,16 +5684,20 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       iEffectLayer* layer = pass->GetLayer(l);
 
-			csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(layer->GetRendererData(), csOpenGlEffectLayerData);
+      csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(
+      	layer->GetRendererData(), csOpenGlEffectLayerData);
 
       //int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
-      //int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR };
+      //int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR,
+      //    GL_SRC_COLOR, GL_SRC_COLOR };
       //int colorop = GL_MODULATE;
       int alphasource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
-      int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA };
+      int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA,
+      	GL_SRC_ALPHA, GL_SRC_ALPHA };
       int alphaop = GL_MODULATE;
 
-      if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
+      if (ARB_multitexture && (ARB_texture_env_combine
+      		|| EXT_texture_env_combine))
       {
         glActiveTextureARB( GL_TEXTURE0_ARB + l );
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
@@ -5693,9 +5711,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
       if( layer_data->vcord_source == ED_SOURCE_FOG )
       {
-          glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
-          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      } else {
+        glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo),
+		&work_fog[0].intensity);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      else
+      {
         glTexCoordPointer (2, GL_FLOAT, 0, mesh.buffers[0]->GetTexels());
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       }
@@ -5714,15 +5735,18 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         CacheTexture (mesh.mat_handle);
         txt_handle = mesh.mat_handle->GetTexture ();
       }
-      else if( layer_data->inputtex-2<((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount())
+      else if( layer_data->inputtex-2<((csMaterialHandle*)mesh.mat_handle)
+      	->GetTextureLayerCount())
       {
-        csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)->GetTextureLayer (layer_data->inputtex-2);
+        csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)
+		->GetTextureLayer (layer_data->inputtex-2);
         txt_handle = lay->txt_handle;
       }
 
       if (txt_handle)
       {
-        csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
+        csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+		txt_handle->GetPrivateObject ();
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
         texturehandle = cachedata->Handle;
 
@@ -5760,8 +5784,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
-			if(pass_data->vertex_program > 0)
-				glDisable(GL_VERTEX_PROGRAM_NV);
+    if(pass_data->vertex_program > 0) glDisable(GL_VERTEX_PROGRAM_NV);
   }
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
