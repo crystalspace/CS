@@ -23,6 +23,12 @@ The history order is reversed so that new features are at the top.
 	  option.
 	- Jorrit removed scripts/lua. This was a left-over from the past.
 	- Jorrit removed a mention of the lua plugin from the documentation.
+	- Jorrit fixed the emit mesh object in two ways:
+	    - First it will now correctly de-init itself in case several
+	      of the parameters are modified. That way you can update the
+	      mesh realtime.
+	    - Secondly there were some errors with ref counting for the
+	      emitgen stuff. Replaced all with csRef's.
         - Philip Wyett corrected .csplugin filename in nmeshldr.mak, so
           nullmeshldr.csplugin is cleaned correctly.
 23-Jun-2003

@@ -282,7 +282,6 @@ csEmitMix::~csEmitMix()
   while(p)
   {
     np = p->next;
-    if(p->emit) p->emit->DecRef();
     delete p;
     p = np;
   }
@@ -308,13 +307,12 @@ void csEmitMix::GetValue(csVector3& value, csVector3 & given)
   else found->emit->GetValue(value, given);
 }
 
-void csEmitMix::AddEmitter(float weight, iEmitGen3D* emit)
+void csEmitMix::AddEmitter (float weight, iEmitGen3D* emit)
 {
   struct part *np = new struct csEmitMix::part;
   np->next = list;
   np->emit = emit;
   list = np;
-  if(emit) emit->IncRef();
   np->weight = weight;
   nr++;
   totalweight += weight;
@@ -649,12 +647,6 @@ csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   part_accel = 0;
   part_attract = 0;
   attractor_force = 1.0;
-  attractor = 0;
-  startpos = 0;
-  startspeed = 0;
-  startaccel = 0;
-  fieldspeed = 0;
-  fieldaccel = 0;
   timetolive = 1000;
   aging = 0;
   nr_aging_els = 0;
@@ -675,12 +667,6 @@ csEmitMeshObject::~csEmitMeshObject()
   delete[] part_speed;
   delete[] part_accel;
   delete[] part_attract;
-  if(startpos) startpos->DecRef();
-  if(startspeed) startspeed->DecRef();
-  if(startaccel) startaccel->DecRef();
-  if(attractor) attractor->DecRef();
-  if(fieldspeed) fieldspeed->DecRef();
-  if(fieldaccel) fieldaccel->DecRef();
   csEmitAge *p = aging, *np = 0;
   while(p)
   {

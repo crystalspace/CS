@@ -91,7 +91,12 @@ public:
 /** Mix value emitter */
 class csEmitMix : public iEmitMix
 {
-  struct part {iEmitGen3D* emit; float weight; struct part* next;} *list;
+  struct part
+  {
+    csRef<iEmitGen3D> emit;
+    float weight;
+    struct part* next;
+  } *list;
   float totalweight;
   int nr;
 public:
@@ -200,17 +205,17 @@ protected:
   ///
   bool lighted_particles;
   /// the start position generator
-  iEmitGen3D *startpos;
+  csRef<iEmitGen3D> startpos;
   /// the start speed generator
-  iEmitGen3D *startspeed;
+  csRef<iEmitGen3D> startspeed;
   /// the start accel generator
-  iEmitGen3D *startaccel;
+  csRef<iEmitGen3D> startaccel;
   /// attractor position generator (can be 0)
-  iEmitGen3D *attractor;
+  csRef<iEmitGen3D> attractor;
   /// the field speed
-  iEmitGen3D *fieldspeed;
+  csRef<iEmitGen3D> fieldspeed;
   /// the field acceleration
-  iEmitGen3D *fieldaccel;
+  csRef<iEmitGen3D> fieldaccel;
   /// attractor force
   float attractor_force;
   /// the time to live for particles in msec
@@ -246,6 +251,13 @@ protected:
 
   void SetupObject ();
 
+  // Call if object needs changing.
+  void ChangeObject ()
+  {
+    initialized = false;
+    scfiObjectModel.ShapeChanged ();
+  }
+
 public:
   /**
    */
@@ -256,17 +268,16 @@ public:
   /// Set the number of particles to use.
   void SetParticleCount (int num)
   {
-    initialized = false;
     number = num;
-    scfiObjectModel.ShapeChanged ();
+    ChangeObject ();
   }
   /// Get the number of particles
   int GetParticleCount () const { return number; }
   /// Enable or disable lighting.
   void SetLighting (bool l)
   {
-    initialized = false;
     lighted_particles = l;
+    ChangeObject ();
   }
   /// see if lighting is enabled
   bool GetLighting () const
@@ -276,82 +287,129 @@ public:
   /// get ttl
   int GetParticleTime () const { return timetolive; }
   /// set startposemit
-  void SetStartPosEmit(iEmitGen3D *emit)
-  {startpos = emit; if(startpos) startpos->IncRef();}
+  void SetStartPosEmit (iEmitGen3D *emit)
+  {
+    startpos = emit;
+    ChangeObject ();
+  }
   /// get startposemit
-  iEmitGen3D* GetStartPosEmit() const {return startpos;}
+  iEmitGen3D* GetStartPosEmit () const { return startpos; }
   /// set startspeedemit
-  void SetStartSpeedEmit(iEmitGen3D *emit)
-  {startspeed = emit; if(startspeed) startspeed->IncRef();}
+  void SetStartSpeedEmit (iEmitGen3D *emit)
+  {
+    startspeed = emit;
+    ChangeObject ();
+  }
   /// get startspeedemit
-  iEmitGen3D* GetStartSpeedEmit() const {return startspeed;}
+  iEmitGen3D* GetStartSpeedEmit() const { return startspeed; }
   /// set startaccelemit
-  void SetStartAccelEmit(iEmitGen3D *emit)
-  {startaccel = emit; if(startaccel) startaccel->IncRef();}
+  void SetStartAccelEmit (iEmitGen3D *emit)
+  {
+    startaccel = emit;
+    ChangeObject ();
+  }
   /// get startemit
-  iEmitGen3D* GetStartAccelEmit() const {return startaccel;}
+  iEmitGen3D* GetStartAccelEmit() const { return startaccel; }
   /// set startaccelemit
-  void SetAttractorEmit(iEmitGen3D *emit)
-  {attractor = emit; if(attractor) attractor->IncRef();}
+  void SetAttractorEmit (iEmitGen3D *emit)
+  {
+    attractor = emit;
+    ChangeObject ();
+  }
   /// get startemit
-  iEmitGen3D* GetAttractorEmit() const {return attractor;}
+  iEmitGen3D* GetAttractorEmit() const { return attractor; }
   /// Set attractor force
-  void SetAttractorForce(float f) {attractor_force = f;}
+  void SetAttractorForce (float f)
+  {
+    attractor_force = f;
+  }
   /// Get attractor force
-  float GetAttractorForce() const {return attractor_force;}
+  float GetAttractorForce() const { return attractor_force; }
   /// set field speed emitter object
-  void SetFieldSpeedEmit(iEmitGen3D *emit)
-  {fieldspeed = emit; if(fieldspeed) fieldspeed->IncRef();}
+  void SetFieldSpeedEmit (iEmitGen3D *emit)
+  {
+    fieldspeed = emit;
+    ChangeObject ();
+  }
   /// get field speed emitter
-  iEmitGen3D* GetFieldSpeedEmit() const {return fieldspeed;}
+  iEmitGen3D* GetFieldSpeedEmit() const { return fieldspeed; }
   /// set field accel emitter object
-  void SetFieldAccelEmit(iEmitGen3D *emit)
-  {fieldaccel = emit; if(fieldaccel) fieldaccel->IncRef();}
+  void SetFieldAccelEmit (iEmitGen3D *emit)
+  {
+    fieldaccel = emit;
+    ChangeObject ();
+  }
   /// get field accel emitter
-  iEmitGen3D* GetFieldAccelEmit() const {return fieldaccel;}
+  iEmitGen3D* GetFieldAccelEmit() const { return fieldaccel; }
 
   /// get the number of ageing moments
-  int GetAgingCount() const {return nr_aging_els;}
+  int GetAgingCount() const { return nr_aging_els; }
   /// add an age
-  void AddAge(int time, const csColor& color, float alpha,
+  void AddAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale);
   /// get aging data
-  void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
+  void GetAgingMoment (int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale);
   /// replace an age
-  void ReplaceAge(int time, const csColor& color, float alpha,
+  void ReplaceAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale);
 
   /**
    * Compensate for movement of the particle systems, to keep
    * particles sitting in the same spot, if needed.
    */
-  void CompensateForTransform(const csReversibleTransform& oldtrans,
+  void CompensateForTransform (const csReversibleTransform& oldtrans,
     const csReversibleTransform& newtrans);
 
   /// set rectangular particles
-  void SetRectParticles(float w, float h)
-  { using_rect_sprites = true; drop_width=w; drop_height=h;}
+  void SetRectParticles (float w, float h)
+  {
+    using_rect_sprites = true;
+    drop_width=w;
+    drop_height=h;
+    initialized = false;
+  }
   /// set regular polygon particles
-  void SetRegularParticles(int n, float radius)
-  { using_rect_sprites = false; drop_sides=n; drop_radius=radius;}
+  void SetRegularParticles (int n, float radius)
+  {
+    using_rect_sprites = false;
+    drop_sides=n;
+    drop_radius=radius;
+    initialized = false;
+  }
   /// is using rects?
-  bool UsingRectParticles() const { return using_rect_sprites; }
+  bool UsingRectParticles () const { return using_rect_sprites; }
   /// get rect size
-  void GetRectParticles(float &w, float &h) const
-  { w = drop_width; h = drop_height; }
+  void GetRectParticles (float &w, float &h) const
+  {
+    w = drop_width;
+    h = drop_height;
+  }
   /// get regular shape
-  void GetRegularParticles(int& n, float& radius) const
-  { n = drop_sides; radius = drop_radius;}
+  void GetRegularParticles (int& n, float& radius) const
+  {
+    n = drop_sides;
+    radius = drop_radius;
+  }
 
   /// set container box, enabled to false disables the container box
-  void SetContainerBox(bool enabled, const csVector3& min,
+  void SetContainerBox (bool enabled, const csVector3& min,
 		      const csVector3& max)
-  {has_container_box=enabled; container_min=min; container_max=max;}
+  {
+    has_container_box=enabled;
+    container_min=min;
+    container_max=max;
+    ChangeObject ();
+  }
   /// get the container box coords, returns true if enabled.
-  bool GetContainerBox(csVector3& min, csVector3& max) const
-  { if(!has_container_box)return false;
-    min=container_min; max=container_max; return has_container_box;}
+  bool GetContainerBox (csVector3& min, csVector3& max) const
+  {
+    if (!has_container_box)
+      return false;
+    min=container_min;
+    max=container_max;
+    return has_container_box;
+  }
 
   /// Update the particle system.
   virtual void Update (csTicks elapsed_time);
