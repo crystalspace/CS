@@ -1,13 +1,6 @@
 The history order is reversed so that new features are at the top.
 
 25-Apr-2001
-        - Eric Sunshine modified user.mak so that the gif, png, jpg, and mplex
-          image loaders are listed under PLUGINS rather than PLUGINS.DYNAMIC.
-          These image types are used very commonly, so they will almost
-          certainly be required by any application which is linked statically.
-          Therefore, they should appear in PLUGINS.  The other less commonly
-          used image loaders, bmp, tga, sgi, and wal are still listed under
-          PLUGINS.DYNAMIC.
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).
 	- Martin renamed csEngine::CreateCamera to CreateCameraPosition
@@ -21,6 +14,16 @@ The history order is reversed so that new features are at the top.
 	- Further improved csdemo with new path editing capabilities.
 	  Added laser beams for the fighers. Added photon torpedo.
 	  Increased the resolution of the star-field...
+        - Eric Sunshine modified user.mak so that the gif, png, jpg, and mplex
+          image loaders are listed under PLUGINS rather than PLUGINS.DYNAMIC.
+          These image types are used very commonly, so they will almost
+          certainly be required by any application which is linked statically.
+          Therefore, they should appear in PLUGINS.  The other less commonly
+          used image loaders, bmp, tga, sgi, and wal are still listed under
+          PLUGINS.DYNAMIC.
+	- Eric Sunshine added a $(Z_LIBS) reference to LIB.PNGIMG.SPECIAL in
+	  pngio.mak.  It is necessary to link this plugin with zlib since
+	  libpng requires it.
 24-Apr-2001
 	- Martin Geisse possibly fixed the lockup that Philip get when
 	  exiting Blocks. The bug was in the WaveOut sound driver.

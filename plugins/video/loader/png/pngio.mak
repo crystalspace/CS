@@ -39,7 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(PNGIMG)
 endif
 
-LIB.PNGIMG.SPECIAL += $(PNG_LIBS)
+LIB.PNGIMG.SPECIAL += $(PNG_LIBS) $(Z_LIBS)
 
 INC.PNGIMG = $(wildcard plugins/video/loader/png/*.h)
 SRC.PNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
