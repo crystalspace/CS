@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "msModel.h"
+#include "msmodel.h"
 
 
 CS_IMPLEMENT_APPLICATION
