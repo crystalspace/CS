@@ -154,7 +154,11 @@ ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG += sh bin/unixconf.sh linux $(INSTALL_DIR)>>config.tmp
 
+endif # ifeq ($(ROOTCONFIG),config)
+
+ifeq ($(ROOTCONFIG),volatile)
+
 MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define CS_UNIX_PLUGIN_REQUIRES_MAIN$">>volatile.tmp
 
-endif # ifeq ($(ROOTCONFIG),config)
+endif # ifeq ($(ROOTCONFIG),volatile)

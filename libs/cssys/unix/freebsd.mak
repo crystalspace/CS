@@ -127,7 +127,11 @@ ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG += bin/unixconf.sh freebsd>>config.tmp
 
+endif # ifeq ($(ROOTCONFIG),config)
+
+ifeq ($(ROOTCONFIG),volatile)
+
 MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define CS_UNIX_PLUGIN_REQUIRES_MAIN$">>volatile.tmp
 
-endif # ifeq ($(ROOTCONFIG),config)
+endif # ifeq ($(ROOTCONFIG),volatile)
