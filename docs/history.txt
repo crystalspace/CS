@@ -6,6 +6,15 @@ The history order has been reversed so that new features are at the top.
 	- Added a normal sprite, a skeletal sprite, and the hierarchical
 	  robot to flarge.
 	- Added 'meshes' target to 'walkall'.
+	- Philip Wyett attempted to fix a heap-related crasher in skel3d.cpp.
+	- Eric Sunshine reverted all of Philip Wyett's changes to skel3d.cpp
+	  since they were incorrect and introduced several memory leaks.  The
+	  problem was that Philip was addressing the symptom rather than the
+	  bug itself.  Instead, I (Eric) repaired this heap-related crasher by
+	  eliminating the actual bug.  In this case, the bug was that
+	  csSkelLimbState's `name' instance variable was never being
+	  initialized, and the uninitialized value was later being sent to
+	  free().
 27-Mar-2001
 	- Philip Wyett eliminated VC6 compiler warning about empty control
 	  statement.

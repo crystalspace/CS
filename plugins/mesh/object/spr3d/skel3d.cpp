@@ -38,7 +38,8 @@ csSkelLimb::~csSkelLimb ()
     delete children;
     children = n;
   }
-  if (name) free (name);
+  if (name)
+    free (name);
 }
 
 void csSkelLimb::AddVertex (int v)
@@ -49,7 +50,8 @@ void csSkelLimb::AddVertex (int v)
   {
     int* new_vertices;
     new_vertices = new int [max_vertices+16];
-    if (vertices) memcpy (new_vertices, vertices, num_vertices*sizeof (int));
+    if (vertices)
+      memcpy (new_vertices, vertices, num_vertices*sizeof (int));
     delete [] vertices;
     vertices = new_vertices;
   }
@@ -70,7 +72,8 @@ void csSkelLimbState::AddChild (csSkelLimbState* child)
 
 void csSkelLimb::UpdateState (csSkelLimbState* limb)
 {
-  if (name) limb->SetName (name);
+  if (name)
+    limb->SetName (name);
   limb->vertices = vertices;
   limb->num_vertices = num_vertices;
   limb->tmpl = this;
@@ -86,8 +89,7 @@ void csSkelLimb::RemapVertices (int* mapping)
 {
   if (num_vertices)
   {
-    int i;
-    for (i = 0 ; i < num_vertices ; i++)
+    for (int i = 0 ; i < num_vertices ; i++)
       vertices[i] = mapping[vertices[i]];
   }
 
@@ -104,11 +106,8 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
   if (num_vertices)
   {
     box.StartBoundingBox ((*source)[vertices[0]]);
-    int i;
-    for (i = 1 ; i < num_vertices ; i++)
-    {
+    for (int i = 1 ; i < num_vertices ; i++)
       box.AddBoundingVertexSmart ((*source)[vertices[i]]);
-    }
   }
 
   csSkelLimb* c = children;
@@ -121,8 +120,8 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
 
 void csSkelLimb::SetName (const char *newname)
 {
-  if (name) name = NULL;
-
+  if (name)
+    free (name);
   name = strdup (newname);
 }
 
@@ -192,8 +191,8 @@ IMPLEMENT_IBASE (csSkelLimbState)
 IMPLEMENT_IBASE_END
 
 csSkelLimbState::csSkelLimbState (): 
-  next (NULL), vertices (NULL), num_vertices (0), children (NULL),
-  data (NULL)
+  next (NULL), tmpl (NULL), vertices (NULL), num_vertices (0),
+  children (NULL), name (NULL), data (NULL)
 {
   CONSTRUCT_IBASE (NULL);
 }
@@ -218,14 +217,14 @@ void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
     c = c->GetNext ();
   }
 
-  int i;
-  for (i = 0 ; i < num_vertices ; i++)
+  for (int i = 0 ; i < num_vertices ; i++)
     dest [vertices [i]] = tr * source[vertices [i]];
 }
 
 void csSkelLimbState::SetName (const char *newname)
 {
-  if (name) name = NULL;
+  if (name)
+    free (name);
   name = strdup (newname);
 }
 
@@ -280,8 +279,8 @@ csSkelConnectionState::csSkelConnectionState ()
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
 }
 
-void csSkelConnectionState::ComputeBoundingBox (const csTransform& tr,
-	csBox3& box)
+void csSkelConnectionState::ComputeBoundingBox (
+  const csTransform& tr, csBox3& box)
 {
   csTransform tr_new = tr * trans;
   csSkelLimbState::ComputeBoundingBox (tr_new, box);
