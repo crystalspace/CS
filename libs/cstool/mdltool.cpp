@@ -26,6 +26,10 @@
 #include "iutil/object.h"
 #include "cstool/mdldata.h"
 #include "cstool/mdltool.h"
+#include "igraphic/image.h"
+#include "iengine/texture.h"
+#include "iengine/material.h"
+#include "ivideo/material.h"
 
 // ---------------------------------------------------------------------------
 

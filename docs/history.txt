@@ -79,6 +79,8 @@ chronological order.
 	- John Harger fixed the copying method in csAnonRenderBufferManager
 	  that would cause a crash if you ever tried to actually use one in
 	  certian configurations
+    - John Harger added some necessary includes to make mdltool.cpp compile
+      as a DLL.	  
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
