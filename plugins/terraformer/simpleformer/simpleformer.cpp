@@ -178,6 +178,7 @@ SCF_IMPLEMENT_IBASE_END
 csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer,
                                   csBox2 region, unsigned int resolution)
 {
+  SCF_CONSTRUCT_IBASE (terraFormer);
   // Initialize members
   csSimpleSampler::terraFormer = terraFormer;
   csSimpleSampler::region = region;
@@ -197,6 +198,7 @@ csSimpleSampler::~csSimpleSampler ()
 {
   // Do a cleanup
   Cleanup ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 inline int iround(double x)
