@@ -627,16 +627,14 @@ bool csTextSyntaxService::ParsePoly3d (
   CS_TOKEN_TABLE_END
 
   char* name;
-  int i;
   long cmd;
   char *params;
 
   iMaterialWrapper* mat = NULL;
-  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-					       iThingEnvironment);
+  iThingEnvironment* te =
+    SCF_QUERY_INTERFACE (engine->GetThingType (), iThingEnvironment);
 
   UInt texspec = 0;
-
   int tx_uv_i1 = 0;
   int tx_uv_i2 = 0;
   int tx_uv_i3 = 0;
@@ -730,7 +728,7 @@ bool csTextSyntaxService::ParsePoly3d (
 
 	  if (ParseWarp (params, flags, do_mirror, m_w, v_w_before, v_w_after))
 	  {
-	    for (int i=0; i < flags.Length (); i++)
+	    for (int i = 0; i < flags.Length (); i++)
 	      poly3d->GetPortal ()->GetFlags ().Set ((UInt)flags.Get (i));
 
 	    if (do_mirror)
@@ -832,7 +830,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	  {
             int list[100], num;
             csScanStr (params, "%D", list, &num);
-            for (i = 0 ; i < num ; i++)
+            for (int i = 0 ; i < num ; i++)
 	    {
 	      if (list[i] == list[(i-1+num)%num])
 	        printf ("Duplicate vertex-index found! Ignored...\n");
@@ -875,10 +873,10 @@ bool csTextSyntaxService::ParsePoly3d (
 	  fs->Setup (poly3d);
           float list [2 * 100];
           csScanStr (params, "%F", list, &num);
-          if (num > nv) num = nv;
-	  int j;
-          for (j = 0; j < num; j++)
-            fs->SetUV (j, list [j * 2], list [j * 2 + 1]);
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
+            fs->SetUV (i, list [i * 2], list [i * 2 + 1]);
 	  fs->DecRef ();
         }
         break;
@@ -891,11 +889,11 @@ bool csTextSyntaxService::ParsePoly3d (
 	  gs->Setup (poly3d);
           float list [3 * 100];
           csScanStr (params, "%F", list, &num);
-          if (num > nv) num = nv;
-	  int j;
-          for (j = 0; j < num; j++)
-            gs->SetColor (j, csColor (list [j * 3], list [j * 3 + 1],
-				      list [j * 3 + 2]));
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
+            gs->SetColor (i, csColor (list [i * 3], list [i * 3 + 1],
+				      list [i * 3 + 2]));
 	  gs->DecRef ();
         }
         break;
@@ -908,13 +906,13 @@ bool csTextSyntaxService::ParsePoly3d (
 	  fs->Setup (poly3d);
           float list [3 * 100];
           csScanStr (params, "%F", list, &num);
-          if (num > nv) num = nv;
-	  int j;
-          for (j = 0; j < num; j++)
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
           {
-            float a = list [j * 3] * TWO_PI / 360.;
-            fs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
-                          sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
+            float a = list [i * 3] * TWO_PI / 360.;
+            fs->SetUV (i, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
+                          sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
           }
 	  fs->DecRef ();
         }
@@ -998,10 +996,9 @@ bool csTextSyntaxService::ParsePoly3d (
     // is coplanar with the X, Y, or Z plane. In that case we will use
     // a standard plane. Otherwise we will just create a plane specific
     // for this case given the first two vertices.
-    int i;
     bool same_x = true, same_y = true, same_z = true;
     const csVector3& v = poly3d->GetVertex (0);
-    for (i = 1 ; i < poly3d->GetVertexCount () ; i++)
+    for (int i = 1 ; i < poly3d->GetVertexCount () ; i++)
     {
       const csVector3& v2 = poly3d->GetVertex (i);
       if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
