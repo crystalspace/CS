@@ -68,7 +68,7 @@
 
 extern WalkTest* Sys;
 
-char* LookForKeyValue(iObjectIterator* it,const char* key);
+csString LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
 
 
@@ -409,23 +409,23 @@ void load_thing (iObjectRegistry* object_reg,
    * I'll use only one material til i know how to register more materials
    */
 
-  char* defaultMat = LookForKeyValue(it,"factorymaterial");
-  char* fileName = LookForKeyValue(it,"factoryfile");
-  char* spriteName = LookForKeyValue(it,"cs_name");
+  csString defaultMat = LookForKeyValue(it,"factorymaterial");
+  csString fileName = LookForKeyValue(it,"factoryfile");
+  csString spriteName = LookForKeyValue(it,"cs_name");
   iMaterialWrapper *mat;
 
   mat = Engine->GetMaterialList()->FindByName(defaultMat);
   if(!mat)
   {
     Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't find material %s \
-	            for thing creation in memory!!",defaultMat);
+	            for thing creation in memory!!",(const char*)defaultMat);
     return;
   }
   csRef<iDataBuffer> buffer (Sys->myVFS->ReadFile(fileName));
   if(!buffer)
   {
     Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"There was an error loading \
-	            model %s for thing creation!", fileName);
+	            model %s for thing creation!", (const char*)fileName);
     return;
   }
 
@@ -439,7 +439,7 @@ void load_thing (iObjectRegistry* object_reg,
   }
 
   csRef<iObjectIterator> it2 (Model->QueryObject()->GetIterator());
-  GenerateThing(object_reg, it2,mat,spriteName,sector,
+  GenerateThing(object_reg, it2,mat,(char*)(const char*)spriteName,sector,
   	position, ParseScaleFactor(it));
 }
 
@@ -607,27 +607,19 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 
 
-/// Looks for a key and returns its value (VERY INNEFICIENT!)
-
-char* LookForKeyValue (iObjectIterator* it,const char* key)
+/// Looks for a key and returns its value.
+csString LookForKeyValue (iObjectIterator* it,const char* key)
 {
-  char* value = new char[1024];
   it->Reset();
   while (it->HasNext())
   {
     csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
     if(!kp)
-    {
       continue;
-    }
     if(!strcmp(key,kp->GetKey()))
-    {
-      strcpy(value ,kp->GetValue());
-      return value;
-    }
+      return kp->GetValue ();
   }
-  delete[] value;
-  return 0;
+  return csString ("");
 }
 
 /**
@@ -658,7 +650,7 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
 double ParseScaleFactor(iObjectIterator* it)
 {
   double sf;
-  char* scaleValue = LookForKeyValue(it,"scalefactor");
+  csString scaleValue = LookForKeyValue(it,"scalefactor");
 
   sf = atof(scaleValue);
   return sf;
@@ -760,13 +752,14 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
  */
 void BuildFactory(iObjectIterator* it, char* factoryName, iEngine* Engine)
 {
-  char* modelFilename = LookForKeyValue(it,"factoryfile");
-  char* materialName = LookForKeyValue(it,"factorymaterial");
+  csString modelFilename = LookForKeyValue(it,"factoryfile");
+  csString materialName = LookForKeyValue(it,"factorymaterial");
   double scaleFactor = ParseScaleFactor(it);
 
   //We had the material needed by the factory and the model file
 
-  load_meshobj(modelFilename,factoryName,materialName);
+  load_meshobj((char*)(const char*)modelFilename,
+  	(char*)(const char*)factoryName,(char*)(const char*)materialName);
 
   csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE(
 	  Engine->GetMeshFactories()->FindByName(factoryName)\
@@ -790,11 +783,12 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
    * Basically we will call add_mesh
    * We need the sprite name, the factory name and the sprite scale factor
    */
-  char* sprName		= LookForKeyValue(it,"cs_name");
-  char* factName		= LookForKeyValue(it,"factory");
+  csString sprName		= LookForKeyValue(it,"cs_name");
+  csString factName		= LookForKeyValue(it,"factory");
   //double scaleFactor	= ParseScaleFactor(it);
 
-  iMeshWrapper* sprite = GenerateSprite(factName,sprName,sector,position);
+  iMeshWrapper* sprite = GenerateSprite((char*)(const char*)factName,
+  	(char*)(const char*)sprName,sector,position);
 
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
                           iSprite3DState));
@@ -815,7 +809,7 @@ void BuildObject(iObjectRegistry* object_reg, iSector * sector,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
 	iObjectRegistry* objReg)
 {
-  char* factoryName;
+  csString factoryName;
   if(strcmp(LookForKeyValue(it,"classname"),"SEED_MESH_OBJ")) return;
   //Now we know this objects iterator belongs to a SEED_MESH_OBJECT
   //Proceeding to contruct the object
@@ -829,7 +823,7 @@ void BuildObject(iObjectRegistry* object_reg, iSector * sector,
   {
     factoryName = LookForKeyValue(it,"factory");
     if(!Engine->GetMeshFactories()->FindByName(factoryName))
-	  BuildFactory(it, factoryName, Engine);
+	  BuildFactory(it, (char*)(const char*)factoryName, Engine);
 
     BuildSprite(sector, it, position);
   }

@@ -20,6 +20,7 @@ chronological order.
 	  iSCF::SCF->object_reg but that field is only present in debug
 	  mode.
 	- Jorrit optimized the simpleformer weight function a bit.
+	- Jorrit fixed a few string memory leaks in walktest.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following
