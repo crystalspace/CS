@@ -21,8 +21,6 @@
 #ifndef __CSRECT_H__
 #define __CSRECT_H__
 
-#include "csutil/csbase.h"
-
 /**
  * Rectangle class: simple class for manipulating 2D rectangles.
  * This class is somewhat similar to Box, but uses integer coordinates.<p>
@@ -43,7 +41,7 @@
  * Vertical line 'X=3' and horizontal line 'Y=2' does NOT belong to
  * the rectangle.
  */
-class csRect : public csBase
+class csRect
 {
 public:
   /// Rectangle bounds.
