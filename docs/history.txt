@@ -47,6 +47,10 @@ chronological order.
 	  iDocument::Parse() had a potentially negative impact. These places
 	  now request Parse() to (once again) condense whitespace.
 29-Oct-2004
+    - Bjorn Hansen fixed sprcal3d->SetVelocity so that animations blend 
+      correctly and allow multiple animations with the same base velocity to 
+      blend.  Also updated the documentation to more clearly reflect what the 
+      function does
 	- Rhad changed the software renderer to account for the OSS driver
 	  blocking for long periods on calls to UnlockMemory().
 28-Oct-2004
