@@ -57,7 +57,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
 
 void csPrintLibraryError (const char *iModule)
 {
-  char * dlerr = dlerror();
+  const char * dlerr = dlerror();
   fprintf (stderr, "DLERROR (%s): %s\n", 
 	   iModule? iModule : "(null)", 
 	   dlerr? dlerr : "(null)");
