@@ -203,7 +203,7 @@ protected:
     bool RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &event);
     
     /// Recursively creates child components and adds them into a parent.  Used internally.
-    void CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponentNode *settings);
+    void CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *parent, awsComponentNode *settings);
 
     /// Checks the updatestore_dirty flag and refreshes the store accordingly.
     void UpdateStore();
@@ -214,6 +214,10 @@ protected:
 public:
     /// Instantiates a window based on a window definition.
     virtual iAwsWindow *CreateWindowFrom(char *defname);
+
+    
+    /// Creates a new embeddable component
+    virtual iAwsComponent *CreateEmbeddableComponent();
 
 public:
     /// Set the contexts however you want

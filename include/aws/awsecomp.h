@@ -24,8 +24,9 @@ class awsEmbeddedComponent : public iAwsComponent
   awsComponent *comp;
  
 public:
-    awsEmbeddedComponent();
-    virtual ~awsEmbeddedComponent();
+  awsEmbeddedComponent() :comp(NULL) {}
+  virtual ~awsEmbeddedComponent() 
+  { if (comp) comp->DecRef(); }
 
 public:
     /// Registers a slot for a signal
@@ -85,6 +86,10 @@ public:
     /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
     virtual bool SetProperty(char *name, void *parm);
     { return comp->SetProperty(name, parm); }
+
+    /// Executes scriptable actions for this window
+    virtual bool Execute(char *action, awsParmList &parmlist)
+    { return comp->Execute(action, parmlist); }
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()
@@ -156,6 +161,22 @@ public:
       * or by embedding classes. */
     iAws *WindowManager()
     { return comp->WindowManager(); }
+
+    /// Get's the window that this component resides in.
+    iAwsWindow *Window()
+    { return comp->Window(); }
+
+    /// Get's the parent component of this component;
+    iAwsComponent *Parent()
+    { return comp->Parent(); }
+
+    /// Sets the window that this component resides in.
+    virtual void SetWindow(iAwsWindow *win)
+    { comp->SetWindow(win); }
+
+    /// Sets the parent component of this component;
+    virtual void SetParent(iAwsComponent *parent)
+    { comp->SetParent(parent); }
     
 public:
     /// Triggered when the component needs to draw

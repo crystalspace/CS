@@ -2,6 +2,7 @@
 #include "aws/awsprefs.h"
 #include "aws/awscomp.h"
 #include "aws/awsslot.h"
+#include "aws/awsfparm.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 
@@ -11,7 +12,7 @@
 const bool AWS_COMP_DEBUG=true;
 
 
-awsComponent::awsComponent():wmgr(NULL),children(NULL), signalsrc(this)
+awsComponent::awsComponent():wmgr(NULL), win(NULL), parent(NULL), children(NULL), signalsrc(this)
 {
   hidden = true; // initially set it hidden to cause the marking of a dirty rectangle upon first Show ()
 }
@@ -65,9 +66,26 @@ iAws *
 awsComponent::WindowManager()
 { return wmgr; }
 
+iAwsWindow *
+awsComponent::Window()
+{ return win; }
+
+iAwsComponent *
+awsComponent::Parent()
+{ return parent; }
+
+void 
+awsComponent::SetWindow(iAwsWindow *_win)
+{ win = _win; }
+
+void 
+awsComponent::SetParent(iAwsComponent *_parent)
+{ parent = _parent; }
+
 iAwsComponent *
 awsComponent::GetComponent()
 { return this; }
+
     
 /**
  *  This function is normally called automatically by the window manager.  You may call it manually if you wish, but
@@ -131,6 +149,42 @@ awsComponent::SetProperty(char *name, void *parm)
     return true;
   }
   
+  return false;
+}
+
+bool 
+awsComponent::Execute(char *action, awsParmList &parmlist)
+{
+  if (strcmp("MoveTo", action)==0)
+  {
+
+  }
+  else if (strcmp("Hide", action)==0)
+  {
+    Hide();
+    return true;
+  }
+  else if (strcmp("Show", action)==0)
+  {
+    Show();
+    return true;
+  }
+  else if (strcmp("Invalidate", action)==0)
+  {
+    Invalidate();
+    return true;
+  }
+  else if (strcmp("Overlaps", action)==0)
+  {
+    csRect *r;
+    if (parmlist.GetRect("Rect", &r))
+    {
+      bool result= Overlaps(*r);
+      parmlist.AddBool("Result", result); 
+    }
+    return true;
+  } 
+
   return false;
 }
 

@@ -159,6 +159,14 @@ awsWindow::SetProperty(char *name, void *parm)
   return false;
 }
 
+bool 
+awsWindow::Execute(char *action, awsParmList &parmlist)
+{
+  if (comp.Execute(action, parmlist)) return true;
+
+  return false;
+}
+
 iAwsComponent *
 awsWindow::GetComponent()
 {

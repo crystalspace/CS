@@ -2,6 +2,8 @@
 #include "aws/awsstdsk.h"
 #include "aws/awscomp.h"
 
+#include <stdio.h>
+
 
 void 
 awsStandardSink::Hide(void *sink, iAwsSource *source)
@@ -30,7 +32,8 @@ awsStandardSink::HideWindow(void *sink, iAwsSource *source)
   }
   else
   { 
-    // not yet implemented, since it requires extra functionality in the window manager.
+    printf("hiding window, %s\n", c->Window()->Type());
+    //if (c->Window()) c->Window()->Hide();
   }
 }
 

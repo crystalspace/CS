@@ -10,6 +10,9 @@
 #include "iutil/event.h"
 #include "ivaria/reporter.h"
 
+// includes for registration/embedding
+#include "aws/awscomp.h"
+#include "aws/awsstdsk.h"
 #include "aws/awscmdbt.h"
 
 
@@ -121,6 +124,12 @@ awsManager::SetPrefMgr(iAwsPrefManager *pmgr)
    }
 }
 
+ 
+iAwsComponent *
+awsManager::CreateEmbeddableComponent()
+{
+  return new awsComponent();
+}
 
 void
 awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
@@ -516,13 +525,13 @@ awsManager::CreateWindowFrom(char *defname)
    up.  Nodes are created via their factory functions.  If a factory cannot be 
    found, then that node and all of it's children are ignored. */
    
-   CreateChildrenFromDef(this, win, winnode);
+   CreateChildrenFromDef(this, win, win, winnode);
      
    return win;
 }
 
 void
-awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponentNode *settings)
+awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *parent, awsComponentNode *settings)
 {
   int i;
   for(i=0; i<settings->GetLength(); ++i)
@@ -543,13 +552,17 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponen
 
         // Setup the name of the component
         comp->SetID(comp_node->Name());
+
+        // Setup window and parent of component
+        comp->SetWindow(win);
+        comp->SetParent(parent);
 		
 	// Prepare the component, and add it into it's parent
 	comp->Setup(wmgr, comp_node);
 	parent->AddChild(comp);
 	
 	// Process all subcomponents of this component.
-	CreateChildrenFromDef(wmgr, comp, comp_node);
+	CreateChildrenFromDef(wmgr, win, comp, comp_node);
       }
       
     }
@@ -730,6 +743,8 @@ awsManager::RegisterCommonComponents()
   // Components register themselves into the window manager.  Just creating a factory
   //  takes care of all the implementation details.  There's nothing else you need to do.
   (void)new awsCmdButtonFactory(this);
+
+  GetSinkMgr()->RegisterSink("awsStandardSink", new awsStandardSink());
 }
 
 iGraphics2D *

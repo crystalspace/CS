@@ -49,8 +49,14 @@ SCF_VERSION (awsComponent, 0, 0, 1);
 **************************************************************************************************************************/
 class awsComponent : public iAwsComponent
 {
-     /// The stored handle to the window manager, in case a component needs it. 
+   /// The stored handle to the window manager, in case a component needs it. 
    iAws  *wmgr;
+
+   /// The stored handle to the window 
+   iAwsWindow *win;
+
+   /// The stored handle to the parent
+   iAwsComponent *parent;
 
    /// The rectangle marking the frame of this component
    csRect frame;
@@ -101,6 +107,9 @@ public:
 
     /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
     virtual bool SetProperty(char *name, void *parm);
+
+    /// Executes a scriptable action
+    virtual bool Execute(char *action, awsParmList &parmlist);
 
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();
@@ -162,7 +171,20 @@ public:
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
     iAws *WindowManager();
+
+    /// Get's the window that this component resides in.
+    virtual iAwsWindow *Window();
+
+    /// Get's the parent component of this component;
+    virtual iAwsComponent *Parent();
     
+    /// Sets the window that this component resides in.
+    virtual void SetWindow(iAwsWindow *win);
+
+    /// Sets the parent component of this component;
+    virtual void SetParent(iAwsComponent *parent);
+    
+        
 public:
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);

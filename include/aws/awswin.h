@@ -101,6 +101,22 @@ private:
     iAws *WindowManager()
     { return comp.WindowManager(); }
 
+    /// Get's the window that this component resides in.
+    virtual iAwsWindow *Window()
+    { return comp.Window(); }
+    
+    /// Get's the parent component of this component;
+    virtual iAwsComponent *Parent()
+    { return comp.Parent(); }
+
+    /// Sets the window that this component resides in.
+    virtual void SetWindow(iAwsWindow *win)
+    { comp.SetWindow(win); }
+
+    /// Sets the parent component of this component;
+    virtual void SetParent(iAwsComponent *parent)
+    { comp.SetParent(parent); }
+
     ////////////// Component declarations for embedded wrappers ///////////////////////////////
 
     /// Invalidation routine: allow the component to be redrawn when you call this
@@ -259,6 +275,9 @@ public:
 
     /// Sets properties for this window
     bool SetProperty(char *name, void *parm);
+
+    /// Executes scriptable actions for this window
+    bool Execute(char *action, awsParmList &parmlist);
 
 public:
     /// Event triggered when a window is about to be raised

@@ -16,6 +16,7 @@ struct iAwsPrefManager;
 struct iAwsSinkManager;
 
 class  awsWindow;
+class  awsParmList;
 class  awsComponent;
 class  awsComponentNode;
 class  awsComponentFactory;
@@ -94,6 +95,9 @@ public:
   
   /// Instantiates a window based on a window definition.
   virtual iAwsWindow *CreateWindowFrom(char *defname)=0;
+
+  /// Creates a new embeddable component
+  virtual iAwsComponent *CreateEmbeddableComponent()=0;
   
 };
 
@@ -284,6 +288,9 @@ struct iAwsComponent : public iAwsSource
     /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
     virtual bool SetProperty(char *name, void *parm)=0;
 
+    /// Executes a scriptable action
+    virtual bool Execute(char *action, awsParmList &parmlist)=0;
+
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate()=0;
 
@@ -295,6 +302,18 @@ struct iAwsComponent : public iAwsSource
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
     virtual char *Type()=0;
+
+    /// Gets the window that this component resides in.
+    virtual iAwsWindow *Window()=0;
+
+    /// Gets the parent component of this component;
+    virtual iAwsComponent *Parent()=0;
+
+    /// Sets the window that this component resides in.
+    virtual void SetWindow(iAwsWindow *win)=0;
+
+    /// Sets the parent component of this component;
+    virtual void SetParent(iAwsComponent *parent)=0;
 
     /// Returns true if this window overlaps the given rect.
     virtual bool Overlaps(csRect &r)=0;
