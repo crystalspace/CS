@@ -60,15 +60,16 @@ chronological order.
 	  filtering can cause microscopic leaks... which are problematic 
 	  nonetheless if e.g. keycoloring is used. 
 25-Mar-2005
-	- Wouter Wijngaards 
-	  - changed csBitArrayHashKeyHandler::ComputeHash in bitarray.h, 
-	    int to size_t to remove signed/unsigned warning.
-	  - made size a size_t in map2cs AddFile.
-	  - added %ignore in csspace.i for csStringBase::operator[].
-	  - changed strnicmp in csShaderGLCGVP::Compile to csStrNCaseCmp.
-	  - made the asciiart renderer work again.
+	- Wouter Wijngaards made the following changes:
+	    - Changed csBitArrayHashKeyHandler::ComputeHash() in bitarray.h,
+	      int to size_t to remove signed/unsigned warning.
+	    - Made size a size_t in map2cs AddFile().
+	    - Added %ignore in csspace.i for csStringBase::operator[].
+	    - Changed strnicmp() in csShaderGLCGVP::Compile() to
+	      csStrNCaseCmp().
+	    - Made the asciiart renderer work again.
 	- Jorrit fixed a problem in syntax services where there were too
-	  few parameters to csReport.
+	  few parameters to csReport().
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
 	- res fixed a crash with the terrain level.
 	- res fixed a crash when using the std_lighting_detail shader.
@@ -102,8 +103,8 @@ chronological order.
 	- Wouter Wijngaards added a new canvas that uses libcaca. It displays 
 	  asciiart in colour. Using the console.driver set to ncurses in 
 	  data/config/cacacanvas.cfg you can even run in the linux console.
-	- Wouter Wijngaards fixed map_key in walktest so that it no longer
-	  called strcpy with overlapping src and destination.
+	- Wouter Wijngaards fixed map_key() in walktest so that it no longer
+	  calls strcpy() with overlapping source and destination.
 	- Wouter Wijngaards initialised a variable in renderbuffer to be sure.
 	- Wouter Wijngaards committed configure script generated using
 	  autogen.sh.
@@ -129,12 +130,12 @@ chronological order.
 	  loader plugin. With this keyword you can load 32-bit heightmap
 	  data for more accurate terrain representation. The format is
 	  as follows:
-	  	4 bytes: 'HM32'
-		4 bytes: width (little endian long)
-		4 bytes: height (little endian long)
-		the data order row by row. For every data there is a
-		4 byte little endian long which will be translated to a
-		floating point height value between 0 and 1.
+	    4 bytes: 'HM32'
+	    4 bytes: width (little endian long)
+	    4 bytes: height (little endian long)
+	    the data order row by row. For every data there is a
+	    4 byte little endian long which will be translated to a
+	    floating point height value between 0 and 1.
 	- res made the following changes:
 	    - Fixed a couple VC7 64bit warnings.
 	    - Fixed an issue in the syntax services where syntax error messages
