@@ -115,7 +115,7 @@ bool csGraphics3DOGLCommon::ARB_texture_env_combine = false;
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
 # define CSGL_FUNCTION(fType,fName) \
-fType  csGraphics3DOGLCommon::##fName = (fType) NULL;
+fType  csGraphics3DOGLCommon::fName = (fType) NULL;
 # include "csglext.h"
 # undef CSGL_FUNCTION
 

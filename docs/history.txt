@@ -113,6 +113,8 @@ The history order is reversed so that new features are at the top.
 	  object-registry under a single name, it implements multiple SCF
 	  interfaces.  (It is no longer possible to query the registry for an
 	  object based solely upon an SCF interface.)
+	- Eric Sunshine fixed a problem in ogl_g3dcom.cpp where GCC 3.0
+	  complained about trying to paste `::' to a token.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded
