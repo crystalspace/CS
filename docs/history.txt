@@ -7,8 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 13-Mar-2004
-    - John Harger fixed the nVidia part of the PS1 plugin so that it will
-      use the correct texture target on a 'tex' instruction.
+	- John Harger fixed the nVidia part of the PS1 plugin so that it will
+	  use the correct texture target on a 'tex' instruction.
+	- Jorrit reverted a change res made to the sprite3d normal calculation
+	  on 7 August 2002. This change caused access to uninitialized memory.
 12-Mar-2004
 	- res augmented configure.ac to look for the OpenAL, Cg, and CgGL
 	  libraries under a couple different names (differing by case) to

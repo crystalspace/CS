@@ -565,7 +565,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     if (vt.con_triangles.Length ())
     {
       csVector3 &n = GetNormal (frame_number, i);
-      if (n.IsZero())
+      //if (n.IsZero())
       {
         //n.Set (0,0,0);
         for (j = 0; j < vt.con_triangles.Length (); j++)
