@@ -1,6 +1,13 @@
 The history order is reversed so that new features are at the top.
 
 25-Apr-2001
+        - Eric Sunshine modified user.mak so that the gif, png, jpg, and mplex
+          image loaders are listed under PLUGINS rather than PLUGINS.DYNAMIC.
+          These image types are used very commonly, so they will almost
+          certainly be required by any application which is linked statically.
+          Therefore, they should appear in PLUGINS.  The other less commonly
+          used image loaders, bmp, tga, sgi, and wal are still listed under
+          PLUGINS.DYNAMIC.
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).
 	- Martin renamed csEngine::CreateCamera to CreateCameraPosition
