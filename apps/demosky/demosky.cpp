@@ -264,6 +264,8 @@ void Simple::NextFrame ()
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
+  flock->Update(elapsed_time);
+
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
@@ -327,46 +329,62 @@ bool Simple::HandleEvent (iEvent &Event)
 //--- Flock -----------------------
 Flock::Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 {
+  printf("Creating flock of %d birds\n", num);
   nr = num;
   spr = new iMeshWrapper* [nr];
+  speed = new csVector3[nr];
+  accel = new csVector3[nr];
   int i;
   iMeshFactoryWrapper *fact = engine->CreateMeshFactory(
     "crystalspace.mesh.object.sprite.2d", "BirdFactory");
   iSprite2DFactoryState *state = QUERY_INTERFACE(fact->GetMeshObjectFactory(),
     iSprite2DFactoryState);
   state->SetMaterialWrapper(mat);
-  csVector3 startpos(20,20,10);
+  state->SetLighting(false);
+
+  csVector3 startpos(20,10,20);
   csVector3 pos;
+
+  focus = startpos;
+  foc_speed.Set(-5, 0, +5);
+  foc_accel.Set(0,0,0);
+
   for(i=0; i<nr; i++)
   {
-     pos = startpos;
-     pos.x += (float(rand()+1.)/RAND_MAX)*20. - 10.;
-     pos.z += (float(rand()+1.)/RAND_MAX)*20. - 10.;
-     spr[i] = engine->CreateMeshObject(fact, "Bird", sector, startpos);
+    pos = startpos;
+    speed[i].Set(0,0,0);
+    speed[i].x = (float(rand()+1.)/float(RAND_MAX))*3. - 1.5;
+    speed[i].y = (float(rand()+1.)/float(RAND_MAX))*1. - 0.5;
+    speed[i].z = (float(rand()+1.)/float(RAND_MAX))*3. - 1.5;
+    speed[i] += foc_speed*1.0;
+    accel[i].Set(0,0,0);
+    pos.x += (float(rand()+1.)/float(RAND_MAX))*20. ;
+    pos.z -= (float(rand()+1.)/float(RAND_MAX))*20. ;
+    spr[i] = engine->CreateMeshObject(fact, "Bird", sector, pos);
 
-     iSprite2DState *sprstate = QUERY_INTERFACE(spr[i], iSprite2DState);
-     sprstate->GetVertices().SetLimit(4);
-     sprstate->GetVertices().SetLength(4);
-     sprstate->GetVertices()[0].color_init.Set(1.0,1.0,1.0);
-     sprstate->GetVertices()[1].color_init.Set(1.0,1.0,1.0);
-     sprstate->GetVertices()[2].color_init.Set(1.0,1.0,1.0);
-     sprstate->GetVertices()[3].color_init.Set(1.0,1.0,1.0);
-     float sz = 0.25;
-     sprstate->GetVertices()[0].pos.Set(-sz, sz);
-     sprstate->GetVertices()[0].u = 0.2;
-     sprstate->GetVertices()[0].v = 0;
-     sprstate->GetVertices()[1].pos.Set(+sz, sz);
-     sprstate->GetVertices()[1].u = 0.8;
-     sprstate->GetVertices()[1].v = 0;
-     sprstate->GetVertices()[2].pos.Set(+sz, -sz);
-     sprstate->GetVertices()[2].u = 0.8;
-     sprstate->GetVertices()[2].v = 1.0;
-     sprstate->GetVertices()[3].pos.Set(-sz, -sz);
-     sprstate->GetVertices()[3].u = 0.2;
-     sprstate->GetVertices()[3].v = 1.0;
-     sprstate->DecRef();
-
-     engine->meshes.Push(spr[i]);
+    iSprite2DState *sprstate = QUERY_INTERFACE(spr[i]->GetMeshObject(), 
+      iSprite2DState);
+    sprstate->GetVertices().SetLimit(4);
+    sprstate->GetVertices().SetLength(4);
+    sprstate->GetVertices()[0].color_init.Set(1.0,1.0,1.0);
+    sprstate->GetVertices()[1].color_init.Set(1.0,1.0,1.0);
+    sprstate->GetVertices()[2].color_init.Set(1.0,1.0,1.0);
+    sprstate->GetVertices()[3].color_init.Set(1.0,1.0,1.0);
+    //sprstate->CreateRegularVertices(4, true);
+    float sz = 1.0;
+    sprstate->GetVertices()[0].pos.Set(-sz, sz);
+    sprstate->GetVertices()[0].u = 0.2;
+    sprstate->GetVertices()[0].v = 0;
+    sprstate->GetVertices()[1].pos.Set(+sz, sz);
+    sprstate->GetVertices()[1].u = 0.8;
+    sprstate->GetVertices()[1].v = 0;
+    sprstate->GetVertices()[2].pos.Set(+sz, -sz);
+    sprstate->GetVertices()[2].u = 0.8;
+    sprstate->GetVertices()[2].v = 1.0;
+    sprstate->GetVertices()[3].pos.Set(-sz, -sz);
+    sprstate->GetVertices()[3].u = 0.2;
+    sprstate->GetVertices()[3].v = 1.0;
+    sprstate->DecRef();
 
   }
   state->DecRef();
@@ -379,6 +397,62 @@ Flock::~Flock()
   for(i=0; i<nr; i++)
     spr[i]->DecRef();
   delete[] spr;
+}
+
+
+static void Clamp( float &val, float max)
+{
+  if(val>max) val=max;
+  else if(val<-max) val=-max;
+}
+
+void Flock::Update(cs_time elapsed)
+{
+  float dt = float(elapsed)*0.001; /// delta t in seconds
+  /// move focus
+  /// physics
+  int i;
+  csVector3 avg(0,0,0);
+  for(i=0; i<nr; i++)
+    avg += spr[i]->GetMovable()->GetPosition();
+  avg /= nr;
+
+  foc_accel = (-avg)*0.1 - focus*0.1;
+  foc_accel.y = 0;
+  foc_speed += foc_accel * dt;
+  focus += foc_speed * dt;
+
+  /// move each bird -- going towards focus
+  for(i=0; i<nr; i++)
+  {
+    /// aim to focus
+    csVector3 want = focus - spr[i]->GetMovable()->GetPosition();
+    accel[i] += want * 0.1;
+    float maxaccel = 2.5;
+    if(accel[i].SquaredNorm() > maxaccel)
+    {
+      Clamp(accel[i].x, maxaccel);
+      Clamp(accel[i].y, maxaccel/2.0);
+      Clamp(accel[i].z, maxaccel);
+    }
+    /// physics
+    speed[i] += accel[i] * dt;
+    float maxspeed = 10.0;
+    if(accel[i].SquaredNorm() > maxspeed)
+    {
+      Clamp(speed[i].x, maxspeed);
+      Clamp(speed[i].y, maxspeed/2.0);
+      Clamp(speed[i].z, maxspeed);
+    }
+    float perturb = 0.1;
+    speed[i].x += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
+    speed[i].y += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
+    speed[i].z += (float(rand()+1.)/float(RAND_MAX))*perturb - perturb *0.5;
+    speed[i].z *= 1.0 + (float(rand()+1.)/float(RAND_MAX))*0.2 - 0.1;
+    csVector3 move = speed[i] * dt;
+    spr[i]->GetMovable()->MovePosition(move);
+    spr[i]->GetMovable()->UpdateMove();
+  }
 }
 
 

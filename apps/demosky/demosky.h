@@ -82,13 +82,21 @@ class Flock {
   int nr;
   /// the sprites
   iMeshWrapper **spr;
+  /// sprite speed, accel
+  csVector3 *speed, *accel;
 
+  /// flock focus position
+  csVector3 focus;
+  /// focus speed, accel
+  csVector3 foc_speed, foc_accel;
 
 public:
   /// create, nr , texture
   Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector);
   ///
   ~Flock();
+  /// call each frame to move birds
+  void Update(cs_time elapsed_time);
 };
 
 #endif // DEMOSKY_H
