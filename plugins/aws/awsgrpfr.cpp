@@ -6,6 +6,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
+#include "aws3dfrm.h"
 
 #include <stdio.h>
 
@@ -93,127 +94,11 @@ awsGroupFrame::OnDraw(csRect clip)
 {
 
   iGraphics2D *g2d = WindowManager()->G2D();
-  iGraphics3D *g3d = WindowManager()->G3D();
-
-  int hi    = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT);
-  int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
-  int lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW);
-  int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
-  int  fill = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
-  int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
-  int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
     
-  switch(frame_style)
-  {
-  case fsBump:
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmax-1, Frame().ymin+0, hi);
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmin+0, Frame().ymax-1, hi);
-      g2d->DrawLine(Frame().xmin+0, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
-      g2d->DrawLine(Frame().xmax-1, Frame().ymin+0, Frame().xmax-1, Frame().ymax-1, lo);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-0, Frame().xmax-0, Frame().ymax-0, black);
-      g2d->DrawLine(Frame().xmax-0, Frame().ymin+1, Frame().xmax-0, Frame().ymax-0, black);
+  aws3DFrame frame3d;
 
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-2, Frame().ymin+1, hi2);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-2, hi2);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
-      g2d->DrawLine(Frame().xmax-2, Frame().ymin+1, Frame().xmax-2, Frame().ymax-2, lo2);
-
-      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmax-3, Frame().ymin+2, lo2);
-      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmin+2, Frame().ymax-3, lo2);
-      g2d->DrawLine(Frame().xmin+2, Frame().ymax-3, Frame().xmax-3, Frame().ymax-3, hi2);
-      g2d->DrawLine(Frame().xmax-3, Frame().ymin+2, Frame().xmax-3, Frame().ymax-3, hi2);
-
-      g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmax-4, Frame().ymin+3, black);
-      g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmin+3, Frame().ymax-4, black);
-
-      if (bkg) {
-       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, 
-                       Frame().Width()-7, Frame().Height()-7, 
-                       Frame().xmin+4-Window()->Frame().xmin, 
-                       Frame().ymin+4-Window()->Frame().ymin, 
-                       Frame().Width()-7, Frame().Height()-7, 0);
-       
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
-                       Frame().Width(), 4, 
-                       Frame().xmin-Window()->Frame().xmin, 
-                       Frame().ymin-Window()->Frame().ymin, 
-                       Frame().Width(), 4, alpha_level);
-
-       g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin+4, 
-                       4, Frame().Height(), 
-                       Frame().xmin-Window()->Frame().xmin, 
-                       Frame().ymin+4-Window()->Frame().ymin, 
-                       4, Frame().Height(), alpha_level);
-
-       g3d->DrawPixmap(bkg, Frame().xmax-4, Frame().ymin+4, 
-                       4, Frame().Height(), 
-                       Frame().xmax-4-Window()->Frame().xmin, 
-                       Frame().ymin+4-Window()->Frame().ymin, 
-                       4, Frame().Height(), alpha_level);
-
-       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymax-4, 
-                       Frame().Width()-4, 4, 
-                       Frame().xmin+4-Window()->Frame().xmin, 
-                       Frame().ymax-4-Window()->Frame().ymin, 
-                       Frame().Width()-4, 4, alpha_level);
-      }
-      else
-       g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, fill);
-
-      break;
-
-  case fsSunken:
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmax-1, Frame().ymin+0, lo2);
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmin+0, Frame().ymax-1, lo2);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-0, Frame().ymin+1, lo);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-0, lo);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-0, Frame().xmax-0, Frame().ymax-0, hi);
-      g2d->DrawLine(Frame().xmax-0, Frame().ymin+1, Frame().xmax-0, Frame().ymax-0, hi);
-
-      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmax-1, Frame().ymin+2, black);
-      g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmin+2, Frame().ymax-1, black);
-      g2d->DrawLine(Frame().xmin+2, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, hi2);
-      g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
-
-      g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
-
-      if (bkg)
-        g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
-                       Frame().Width()+1, Frame().Height()+1, 
-                       Frame().xmin-Window()->Frame().xmin, 
-                       Frame().ymin-Window()->Frame().ymin, 
-                       Frame().Width()+1, Frame().Height()+1, alpha_level);
-      break;
-      
-  case fsRaised:
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmax-1, Frame().ymin+0, hi);
-      g2d->DrawLine(Frame().xmin+0, Frame().ymin+0, Frame().xmin+0, Frame().ymax-1, hi);
-      g2d->DrawLine(Frame().xmin+0, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, lo);
-      g2d->DrawLine(Frame().xmax-1, Frame().ymin+0, Frame().xmax-1, Frame().ymax-1, lo);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-0, Frame().xmax-0, Frame().ymax-0, black);
-      g2d->DrawLine(Frame().xmax-0, Frame().ymin+1, Frame().xmax-0, Frame().ymax-0, black);
-
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmax-2, Frame().ymin+1, hi2);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-2, hi2);
-      g2d->DrawLine(Frame().xmin+1, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
-      g2d->DrawLine(Frame().xmax-2, Frame().ymin+1, Frame().xmax-2, Frame().ymax-2, lo2);
-
-      g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().Width()-3, Frame().Height()-3, fill);
-
-      if (bkg)
-                g3d->DrawPixmap(bkg, Frame().xmin, Frame().ymin, 
-                       Frame().Width()+1, Frame().Height()+1, 
-                       Frame().xmin-Window()->Frame().xmin, 
-                       Frame().ymin-Window()->Frame().ymin, 
-                       Frame().Width()+1, Frame().Height()+1, alpha_level);
-      break;
-
-    case fsSimple:
-      g2d->DrawBox(Frame().xmin, Frame().ymin, Frame().Width(), Frame().Height(), black);
-      break;
-  }
-
-
+  frame3d.Draw(WindowManager(), Window(), Frame(), frame_style, bkg, alpha_level);
+  
   // Draw the caption, if there is one 
   if (caption)
   {     
