@@ -127,8 +127,8 @@ public:
   		  int triggeridx, csTicks delay);
   void AddOperationTestTrigger (csTicks time,
   		  int triggeridx,
-		  int trueSequenceidx,
-		  int falseSequenceidx);
+		  iSequence* trueSequence,
+		  iSequence* falseSequence);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -293,11 +293,11 @@ public:
     }
     virtual void AddOperationTestTrigger (csTicks time,
   		  int triggeridx,
-		  int trueSequenceidx,
-		  int falseSequenceidx)
+		  iSequence* trueSequence,
+		  iSequence* falseSequence)
     {
       scfParent->AddOperationTestTrigger (time, triggeridx,
-		      trueSequenceidx, falseSequenceidx);
+		      trueSequence, falseSequence);
     }
   } scfiSequenceWrapper;
   friend struct SequenceWrapper;

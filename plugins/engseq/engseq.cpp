@@ -1077,6 +1077,83 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (OpMove::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+/**
+ * Move operation. Indexed version.
+ */
+class OpMoveIdx : public OpStandard
+{
+private:
+  int meshidx;
+  csVector3 offset;
+  csVector3 start_pos;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpMoveIdx (int meshidx,
+	const csVector3& offset,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpMoveIdx::meshidx = meshidx;
+    OpMoveIdx::offset = offset;
+    OpMoveIdx::duration = duration;
+    OpMoveIdx::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    iMovable* movable = mesh->GetMovable ();
+    start_pos = movable->GetTransform ().GetOrigin ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
+  }
+
+  void DoTimed (float time, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    csVector3 new_pos = start_pos + time * offset;
+    mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
+    mesh->GetMovable ()->UpdateMove ();
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpMoveIdx);
+    virtual void Do (float time, iBase* params)
+    {
+      scfParent->DoTimed (time, params);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpMoveIdx)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpMoveIdx::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 //---------------------------------------------------------------------------
 
 /**
@@ -1097,6 +1174,36 @@ public:
 
   virtual void Do (csTicks /*dt*/, iBase*)
   {
+    trigger->SetEnabled (en);
+  }
+};
+
+/**
+ * Set trigger state. Indexed version.
+ */
+class OpTriggerStateIdx : public OpStandard
+{
+private:
+  int triggeridx;
+  bool en;
+
+public:
+  OpTriggerStateIdx (int triggeridx, bool en)
+  {
+    OpTriggerStateIdx::triggeridx = triggeridx;
+    OpTriggerStateIdx::en = en;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSequenceTrigger> trigger = SCF_QUERY_INTERFACE (
+    	par->GetParameter (triggeridx), iSequenceTrigger);
+
     trigger->SetEnabled (en);
   }
 };
@@ -1125,6 +1232,36 @@ public:
   }
 };
 
+/**
+ * Check trigger. Indexed version.
+ */
+class OpCheckTriggerIdx : public OpStandard
+{
+private:
+  int triggeridx;
+  csTicks delay;
+
+public:
+  OpCheckTriggerIdx (int triggeridx, csTicks delay)
+  {
+    OpCheckTriggerIdx::triggeridx = triggeridx;
+    OpCheckTriggerIdx::delay = delay;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSequenceTrigger> trigger = SCF_QUERY_INTERFACE (
+    	par->GetParameter (triggeridx), iSequenceTrigger);
+
+    trigger->TestConditions (delay);
+  }
+};
+
 //---------------------------------------------------------------------------
 
 /**
@@ -1143,6 +1280,34 @@ public:
 
   virtual bool Condition (csTicks /*dt*/, iBase*)
   {
+    return trigger->CheckState ();
+  }
+};
+
+/**
+ * Condition to test a trigger. Indexed version.
+ */
+class CondTestTriggerIdx : public CondStandard
+{
+private:
+  int triggeridx;
+
+public:
+  CondTestTriggerIdx (int triggeridx)
+  {
+    CondTestTriggerIdx::triggeridx = triggeridx;
+  }
+
+  virtual bool Condition (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSequenceTrigger> trigger = SCF_QUERY_INTERFACE (
+    	par->GetParameter (triggeridx), iSequenceTrigger);
+
     return trigger->CheckState ();
   }
 };
@@ -1371,36 +1536,36 @@ void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
 	int meshidx, const csVector3& offset,
 	csTicks duration)
 {
-  //OpMove* op = new OpMove (mesh, offset,
-	//duration, eseqmgr);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpMoveIdx* op = new OpMoveIdx (meshidx, offset,
+	duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationTriggerState (csTicks time,
 	int triggeridx, bool en)
 {
-  //OpTriggerState* op = new OpTriggerState (trigger, en);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpTriggerStateIdx* op = new OpTriggerStateIdx (triggeridx, en);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationCheckTrigger (csTicks time,
   		  int triggeridx, csTicks delay)
 {
-  //OpCheckTrigger* op = new OpCheckTrigger (trigger, delay);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpCheckTriggerIdx* op = new OpCheckTriggerIdx (triggeridx, delay);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
   		  int triggeridx,
-		  int trueSequenceidx,
-		  int falseSequenceidx)
+		  iSequence* trueSequence,
+		  iSequence* falseSequence)
 {
-  //CondTestTrigger* cond = new CondTestTrigger (trigger);
-  //sequence->AddCondition (time, cond, trueSequence, falseSequence);
-  //cond->DecRef ();
+  CondTestTriggerIdx* cond = new CondTestTriggerIdx (triggeridx);
+  sequence->AddCondition (time, cond, trueSequence, falseSequence);
+  cond->DecRef ();
 }
 
 //---------------------------------------------------------------------------

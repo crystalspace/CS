@@ -291,8 +291,8 @@ struct iSequenceWrapper : public iBase
    */
   virtual void AddOperationTestTrigger (csTicks time,
   		  int triggeridx,
-		  int trueSequenceidx,
-		  int falseSequenceidx) = 0;
+		  iSequence* trueSequence,
+		  iSequence* falseSequence) = 0;
 };
 
 SCF_VERSION (iSequenceTrigger, 0, 0, 2);
