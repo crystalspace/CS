@@ -37,23 +37,37 @@
 // 3D rasterizer if you can't do it better :-)
 //------------------------------------------------------------------------
 
-#define INTERPOLATE1(component) \
-  g3dpoly->vertices [i].component = tritexcoords [vt].component + \
-    t * (tritexcoords [vt2].component - tritexcoords [vt].component);
+#define INTERPOLATE1_S(var) \
+  g3dpoly->var [i] = tritexcoords_##var## [vt]+ \
+    t * (tritexcoords_##var## [vt2] - tritexcoords_##var## [vt]);
+
+#define INTERPOLATE1(var,component) \
+  g3dpoly->var [i].component = tritexcoords_##var## [vt].component + \
+    t * (tritexcoords_##var## [vt2].component - tritexcoords_##var## [vt].component);
 
 #define INTERPOLATE1_FOG(component) \
   g3dpoly->fog_info [i].component = trifoginfo [vt].component + \
     t * (trifoginfo [vt2].component - trifoginfo [vt].component);
 
-#define INTERPOLATE(component) \
+#define INTERPOLATE_S(var) \
 { \
-  float v1 = tritexcoords [edge1 [0]].component + \
-    t1 * (tritexcoords [edge1 [1]].component - \
-          tritexcoords [edge1 [0]].component); \
-  float v2 = tritexcoords [edge2 [0]].component + \
-    t2 * (tritexcoords [edge2 [1]].component - \
-          tritexcoords [edge2 [0]].component); \
-  g3dpoly->vertices [i].component = v1 + t * (v2 - v1); \
+  float v1 = tritexcoords_##var## [edge1 [0]] + \
+    t1 * (tritexcoords_##var## [edge1 [1]] - \
+          tritexcoords_##var## [edge1 [0]]); \
+  float v2 = tritexcoords_##var## [edge2 [0]] + \
+    t2 * (tritexcoords_##var## [edge2 [1]] - \
+          tritexcoords_##var## [edge2 [0]]); \
+  g3dpoly->var [i] = v1 + t * (v2 - v1); \
+}
+#define INTERPOLATE(var,component) \
+{ \
+  float v1 = tritexcoords_##var## [edge1 [0]].component + \
+    t1 * (tritexcoords_##var## [edge1 [1]].component - \
+          tritexcoords_##var## [edge1 [0]].component); \
+  float v2 = tritexcoords_##var## [edge2 [0]].component + \
+    t2 * (tritexcoords_##var## [edge2 [1]].component - \
+          tritexcoords_##var## [edge2 [0]].component); \
+  g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 #define INTERPOLATE_FOG(component) \
 { \
@@ -73,48 +87,44 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 {
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  G3DTexturedVertex tritexcoords [3];
+  csVector2 tritexcoords_vertices[3];
+  csVector2 tritexcoords_texels[3];
+  csColor tritexcoords_colors[3];
+  float tritexcoords_z[3];
   G3DFogInfo trifoginfo [3];
   int i;
-  for (i = 0; i < 3; i++)
-  {
-    tritexcoords [i] = g3dpoly->vertices [i];
-    trifoginfo [i] = g3dpoly->fog_info [i];
-  }
+  memcpy (tritexcoords_vertices, g3dpoly->vertices, 3 * sizeof (csVector2));
+  memcpy (tritexcoords_texels, g3dpoly->texels, 3 * sizeof (csVector2));
+  memcpy (tritexcoords_colors, g3dpoly->colors, 3 * sizeof (csColor));
+  memcpy (tritexcoords_z, g3dpoly->z, 3 * sizeof (float));
 
   int vt, vt2;
   float t;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    g3dpoly->vertices[i].x = clipped_verts[i].x;
-    g3dpoly->vertices[i].y = clipped_verts[i].y;
+    g3dpoly->vertices[i] = clipped_verts[i];
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
         vt = clipped_vtstats[i].Vertex;
-        g3dpoly->vertices[i].z = tritexcoords[vt].z;
-        g3dpoly->vertices[i].u = tritexcoords[vt].u;
-        g3dpoly->vertices[i].v = tritexcoords[vt].v;
+        g3dpoly->z[i] = tritexcoords_z[vt];
+        g3dpoly->texels[i] = tritexcoords_texels[vt];
 	if (gouraud)
-	{
-          g3dpoly->vertices[i].r = tritexcoords[vt].r;
-          g3dpoly->vertices[i].g = tritexcoords[vt].g;
-          g3dpoly->vertices[i].b = tritexcoords[vt].b;
-	}
+          g3dpoly->colors[i] = tritexcoords_colors[vt];
 	if (use_fog) g3dpoly->fog_info[i] = trifoginfo[vt];
 	break;
       case CS_VERTEX_ONEDGE:
         vt = clipped_vtstats[i].Vertex;
 	vt2 = vt + 1; if (vt2 >= 3) vt2 = 0;
 	t = clipped_vtstats[i].Pos;
-	INTERPOLATE1 (z);
-	INTERPOLATE1 (u);
-	INTERPOLATE1 (v);
+	INTERPOLATE1_S (z);
+	INTERPOLATE1 (texels,x);
+	INTERPOLATE1 (texels,y);
 	if (gouraud)
 	{
-	  INTERPOLATE1 (r);
-	  INTERPOLATE1 (g);
-	  INTERPOLATE1 (b);
+	  INTERPOLATE1 (colors,red);
+	  INTERPOLATE1 (colors,green);
+	  INTERPOLATE1 (colors,blue);
 	}
 	if (use_fog)
 	{
@@ -161,14 +171,14 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 	float x1 = A.x + t1 * (B.x - A.x);
 	float x2 = C.x + t2 * (D.x - C.x);
 	t = (x - x1) / (x2 - x1);
-	INTERPOLATE (z);
-	INTERPOLATE (u);
-	INTERPOLATE (v);
+	INTERPOLATE_S (z);
+	INTERPOLATE (texels,x);
+	INTERPOLATE (texels,y);
 	if (gouraud)
 	{
-	  INTERPOLATE (r);
-	  INTERPOLATE (g);
-	  INTERPOLATE (b);
+	  INTERPOLATE (colors,red);
+	  INTERPOLATE (colors,green);
+	  INTERPOLATE (colors,blue);
 	}
 	if (use_fog)
 	{
@@ -273,14 +283,11 @@ static void DrawTriangle (
   // If mirroring we store the vertices in the other direction.
   for (j = 0; j < 3; j++)
   {
-    poly.vertices [idx].z = z_verts[trivert [j]];
-    poly.vertices [idx].u = uv_verts[trivert [j]].x;
-    poly.vertices [idx].v = uv_verts[trivert [j]].y;
+    poly.z [idx] = z_verts[trivert [j]];
+    poly.texels [idx] = uv_verts[trivert [j]];
     if (colors)
     {
-      poly.vertices [idx].r = colors[trivert[j]].red;
-      poly.vertices [idx].g = colors[trivert[j]].green;
-      poly.vertices [idx].b = colors[trivert[j]].blue;
+      poly.colors [idx] = colors[trivert[j]];
     }
     if (poly.use_fog) poly.fog_info [idx] = fog[trivert[j]];
     idx += dir;

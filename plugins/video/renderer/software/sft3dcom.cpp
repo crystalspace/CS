@@ -2643,10 +2643,9 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   } /* endfor */
 }
 
-void csGraphics3DSoftwareCommon::OpenPortal (csVector2* poly, int num_poly)
+void csGraphics3DSoftwareCommon::OpenPortal (G3DPolygonDFP* poly)
 {
   (void)poly;
-  (void)num_poly;
 }
 
 void csGraphics3DSoftwareCommon::ClosePortal ()
@@ -2847,18 +2846,18 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   int i;
   for (i = 0 ; i < poly.num ; i++)
   {
-    uu[i] = pqinfo.tw * poly.vertices [i].u;
-    vv[i] = pqinfo.th * poly.vertices [i].v;
-    iz[i] = poly.vertices [i].z;
-    if (poly.vertices [i].r > 2.0) poly.vertices [i].r = 2.0;
-    if (poly.vertices [i].r < 0.0) poly.vertices [i].r = 0.0;
-    rr[i] = poly.vertices [i].r * pqinfo.redFact   * Scan.FlatRGB.red;
-    if (poly.vertices [i].g > 2.0) poly.vertices [i].g = 2.0;
-    if (poly.vertices [i].g < 0.0) poly.vertices [i].g = 0.0;
-    gg[i] = poly.vertices [i].g * pqinfo.greenFact * Scan.FlatRGB.green;
-    if (poly.vertices [i].b > 2.0) poly.vertices [i].b = 2.0;
-    if (poly.vertices [i].b < 0.0) poly.vertices [i].b = 0.0;
-    bb[i] = poly.vertices [i].b * pqinfo.blueFact  * Scan.FlatRGB.blue;
+    uu[i] = pqinfo.tw * poly.texels [i].x;
+    vv[i] = pqinfo.th * poly.texels [i].y;
+    iz[i] = poly.z [i];
+    if (poly.colors [i].red > 2.0) poly.colors [i].red = 2.0;
+    if (poly.colors [i].red < 0.0) poly.colors [i].red = 0.0;
+    rr[i] = poly.colors [i].red * pqinfo.redFact   * Scan.FlatRGB.red;
+    if (poly.colors [i].green > 2.0) poly.colors [i].green = 2.0;
+    if (poly.colors [i].green < 0.0) poly.colors [i].green = 0.0;
+    gg[i] = poly.colors [i].green * pqinfo.greenFact * Scan.FlatRGB.green;
+    if (poly.colors [i].blue > 2.0) poly.colors [i].blue = 2.0;
+    if (poly.colors [i].blue < 0.0) poly.colors [i].blue = 0.0;
+    bb[i] = poly.colors [i].blue * pqinfo.blueFact  * Scan.FlatRGB.blue;
     if (poly.vertices [i].y > top_y)
       top_y = poly.vertices [top = i].y;
     if (poly.vertices [i].y < bot_y)

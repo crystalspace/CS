@@ -1159,14 +1159,6 @@ void csGraphics3DOGLCommon::CommonOpen ()
   m_config_options.m_lightmap_src_blend = GL_DST_COLOR;
   m_config_options.m_lightmap_dst_blend = GL_ZERO;
   InitGLExtensions ();
-
-  // Initialize the default method calls
-  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
-
-#if 0
-  if (ARB_multitexture)
-    DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
-#endif
 }
 
 void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
@@ -1383,6 +1375,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
     FlushDrawPolygon ();
     clipportal_stack.DeleteAll ();
+    clipportal_dirty = true;
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.
@@ -1893,11 +1886,11 @@ void csGraphics3DOGLCommon::SetupStencil ()
 {
   if (stencil_init) return;
   stencil_init = true;
-  if (clipper && GLCaps.use_stencil)
+  if (clipper && GLCaps.use_stencil && !clipportal_stack.Length () <= 0)
   {
     // First set up the stencil area.
     statecache->Enable_GL_STENCIL_TEST ();
-      glClearStencil (0);
+    glClearStencil (0);
     glClear (GL_STENCIL_BUFFER_BIT);
     statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
@@ -2961,70 +2954,71 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
   //=================
   // Pass 3: Lightmaps
   //=================
-    glColor4f (1, 1, 1, 0);
-    SetupBlend (CS_FX_SRCDST, 0, false);
+  glColor4f (1, 1, 1, 0);
+  SetupBlend (CS_FX_SRCDST, 0, false);
 
-    float txtsize;
-    int lmwidth = lm->GetWidth ();
-    int lmheight = lm->GetHeight ();
-    GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
+  float txtsize;
+  int lmwidth = lm->GetWidth ();
+  int lmheight = lm->GetHeight ();
+  GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
 		    txtsize);
-    tex->RecalculateDynamicLights ();
-    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
-    csRGBpixel* lm_data = lm->GetMapData ();
-    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
+  tex->RecalculateDynamicLights ();
+  statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
+  csRGBpixel* lm_data = lm->GetMapData ();
+  glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
 	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
 
-    float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
-    float lm_scale_u, lm_scale_v;
-    const csLightMapMapping& mapping = tex->GetMapping ();
-    mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+  float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
+  float lm_scale_u, lm_scale_v;
+  const csLightMapMapping& mapping = tex->GetMapping ();
+  mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
 
-    // lightmap fudge factor
-    if (lm_high_u <= lm_offset_u)
-      lm_scale_u = 1.;       // @@@ Is this right?
-    else
-      lm_scale_u = 1. / (lm_high_u - lm_offset_u);
+  // lightmap fudge factor
+  if (lm_high_u <= lm_offset_u)
+    lm_scale_u = 1.;       // @@@ Is this right?
+  else
+    lm_scale_u = 1. / (lm_high_u - lm_offset_u);
 
-    if (lm_high_v <= lm_offset_v)
-      lm_scale_v = 1.;       // @@@ Is this right?
-    else
-      lm_scale_v = 1. / (lm_high_v - lm_offset_v);
+  if (lm_high_v <= lm_offset_v)
+    lm_scale_v = 1.;       // @@@ Is this right?
+  else
+    lm_scale_v = 1. / (lm_high_v - lm_offset_v);
 
-    lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
-    lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
+  lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
+  lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
 
-    lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
-    lm_high_v += .75 / (float (lmheight) * lm_scale_v);
+  lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
+  lm_high_v += .75 / (float (lmheight) * lm_scale_v);
 
-    lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
-    lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
+  lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
+  lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
 
-    glt = gltxt;
-    GLfloat* gltt = gltxttrans;
-    for (i = 0; i < poly.num; i++)
-    {
-      *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
-      *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
-    }
-    //glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
-    glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
-    glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+  glt = gltxt;
+  GLfloat* gltt = gltxttrans;
+  for (i = 0; i < poly.num; i++)
+  {
+    *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
+    *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
   }
+  //glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
+  glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
+  glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+}
 
-void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
+void csGraphics3DOGLCommon::DrawPolygonZFill (csVector2* vertices,
+	int num, const csPlane3& normal)
 {
-  if (poly.num < 3)
+  if (num < 3)
     return;
 
   int i;
 
   // count 'real' number of vertices
   int num_vertices = 1;
-  for (i = 1; i < poly.num; i++)
+  for (i = 1; i < num; i++)
   {
-    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
-	+ ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
+    if ((ABS (vertices[i].x - vertices[i - 1].x)
+	+ ABS (vertices[i].y - vertices[i - 1].y))
 	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
@@ -3037,10 +3031,10 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A ();
-  Bc = poly.normal.B ();
-  Cc = poly.normal.C ();
-  Dc = poly.normal.D ();
+  Ac = normal.A ();
+  Bc = normal.B ();
+  Cc = normal.C ();
+  Dc = normal.D ();
 
   float M, N, O;
   if (ABS (Dc) < SMALL_D)
@@ -3052,9 +3046,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
     // polygon.
     M = 0;
     N = 0;
-    // For O choose the transformed z value of one vertex.
-    // That way Z buffering should at least work.
-    O = 1 / poly.z_value;
+    // For O just choose 1.
+    O = 1;
   }
   else
   {
@@ -3076,14 +3069,14 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   static GLfloat glverts[4*64];
   int vtidx = 0;
   float sx, sy, sz, one_over_sz;
-  for (i = 0; i < poly.num; i++)
+  for (i = 0; i < num; i++)
   {
-    sx = poly.vertices[i].x - asp_center_x;
-    sy = poly.vertices[i].y - asp_center_y;
+    sx = vertices[i].x - asp_center_x;
+    sy = vertices[i].y - asp_center_y;
     one_over_sz = M * sx + N * sy + O;
     sz = 1.0 / one_over_sz;
-    glverts[vtidx++] = poly.vertices[i].x * sz;
-    glverts[vtidx++] = poly.vertices[i].y * sz;
+    glverts[vtidx++] = vertices[i].x * sz;
+    glverts[vtidx++] = vertices[i].y * sz;
     glverts[vtidx++] = -1.0;
     glverts[vtidx++] = sz;
   }
@@ -3092,7 +3085,7 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   p_glverts = glverts;
 
   glBegin (GL_TRIANGLE_FAN);
-  for (i = 0 ; i < poly.num ; i++)
+  for (i = 0 ; i < num ; i++)
   {
     glVertex4fv (p_glverts); p_glverts += 4;
   }
@@ -3164,13 +3157,13 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   {
     if (gouraud)
     {
-      *glcol++ = flat_r * poly.vertices[i].r;
-      *glcol++ = flat_g * poly.vertices[i].g;
-      *glcol++ = flat_b * poly.vertices[i].b;
+      *glcol++ = flat_r * poly.colors[i].red;
+      *glcol++ = flat_g * poly.colors[i].green;
+      *glcol++ = flat_b * poly.colors[i].blue;
       *glcol++ = alpha;
     }
 
-    float sz = poly.vertices[i].z;
+    float sz = poly.z[i];
     if (ABS (sz) < SMALL_EPSILON) sz = 1. / SMALL_EPSILON;
     else sz = 1./sz;
 
@@ -3179,8 +3172,8 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     *glverts++ = -1;
     *glverts++ = sz;
 
-    *gltxt++ = poly.vertices[i].u;
-    *gltxt++ = poly.vertices[i].v;
+    *gltxt++ = poly.texels[i].x;
+    *gltxt++ = poly.texels[i].y;
   }
 
   //========
@@ -4347,6 +4340,7 @@ void csGraphics3DOGLCommon::RestoreDTMTransforms ()
 void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 {
   int i;
+  bool use_clip_portals = clipportal_stack.Length () > 0;
 
   //===========
   // First we are going to find out what kind of clipping (if any)
@@ -4479,7 +4473,7 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
   //===========
   // First setup the clipper that we need.
   //===========
-  if (ci.how_clip == 's')
+  if (ci.how_clip == 's' && !use_clip_portals)
   {
     SetupStencil ();
     ci.stencil_enabled = true;
@@ -4496,6 +4490,9 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
     for (i = 0 ; i < frustum.GetVertexCount ()+ci.reserved_planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
+
+  // Optionally set up clip portals that may be in use.
+  SetupClipPortals ();
 }
 
 void csGraphics3DOGLCommon::RestoreDTMClipping ()
@@ -5504,14 +5501,71 @@ void csGraphics3DOGLCommon::CloseFogObject (CS_ID)
   // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOGLCommon::OpenPortal (csVector2* poly, int num_poly)
+void csGraphics3DOGLCommon::OpenPortal (G3DPolygonDFP* poly)
 {
-  (void)poly;
-  (void)num_poly;
+  csClipPortal* cp = new csClipPortal ();
+  cp->poly = new csVector2[poly->num];
+  memcpy (cp->poly, poly->vertices, poly->num * sizeof (csVector2));
+  cp->num_poly = poly->num;
+  cp->normal = poly->normal;
+  clipportal_stack.Push (cp);
+  clipportal_dirty = true;
 }
 
 void csGraphics3DOGLCommon::ClosePortal ()
 {
+  if (clipportal_stack.Length () <= 0) return;
+  clipportal_stack.Delete (clipportal_stack.Length ()-1);
+  clipportal_dirty = true;
+}
+
+void csGraphics3DOGLCommon::SetupClipPortals ()
+{
+  if (clipportal_dirty)
+  {
+    clipportal_dirty = false;
+    if (GLCaps.use_stencil)
+    {
+      if (clipportal_stack.Length () <= 0)
+      {
+        statecache->Disable_GL_STENCIL_TEST ();
+      }
+      else
+      {
+        printf ("STENCIL!\n"); fflush (stdout);
+        csClipPortal* cp = clipportal_stack.Top ();
+
+        // First set up the stencil area.
+        statecache->Enable_GL_STENCIL_TEST ();
+        glClearStencil (0);
+        glClear (GL_STENCIL_BUFFER_BIT);
+        statecache->SetStencilFunc (GL_ALWAYS, 1, 0);
+        statecache->SetStencilOp (GL_KEEP, GL_REPLACE, GL_KEEP);
+        glColor4f (0, 0, 0, 0);
+        statecache->SetShadeModel (GL_FLAT);
+        // USE OR FILL@@@?
+	csZBufMode old_mode = z_buf_mode;
+	z_buf_mode = CS_ZBUF_USE;
+	DrawPolygonZFill (cp->poly, cp->num_poly, cp->normal);
+
+        // Use the stencil area.
+        statecache->SetStencilFunc (GL_EQUAL, 1, 1);
+        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+	// First clear the z-buffer here.
+	z_buf_mode = CS_ZBUF_FILLONLY;
+	csVector2 screen_poly[4];
+	screen_poly[0].Set (0, 0);
+	screen_poly[1].Set (width-1, 0);
+	screen_poly[2].Set (width-1, height-1);
+	screen_poly[3].Set (0, height-1);
+	csPlane3 screen_normal (0, 0, 1, -10000000);
+	DrawPolygonZFill (screen_poly, 4, screen_normal);
+
+	z_buf_mode = old_mode;
+      }
+    }
+  }
 }
 
 void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
@@ -5758,10 +5812,10 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 {
   if (z_buf_mode == CS_ZBUF_FILLONLY)
   {
-    DrawPolygonZFill (poly);
+    DrawPolygonZFill (poly.vertices, poly.num, poly.normal);
     return;
   }
-  (this->*DrawPolygonCall)(poly);
+  DrawPolygonSingleTexture (poly);
 }
 
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,

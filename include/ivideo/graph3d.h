@@ -32,6 +32,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
 #include "csgeom/tri.h"
+#include "csutil/cscolor.h"
 
 class csMatrix3;
 class csVector3;
@@ -39,7 +40,6 @@ class csVector2;
 class csPlane3;
 class csRect;
 class csReversibleTransform;
-class csColor;
 
 struct iGraphics2D;
 struct iPolygonTexture;
@@ -115,20 +115,6 @@ struct csPixelFormat;
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 /** @} */
 
-/// Vertex Structure for use with G3DPolygonDPQ
-class G3DTexturedVertex : public csVector2
-{
-public:
-  /// inverse z value (1/real_z)
-  float z;
-
-  // Texture coordinates
-  float u, v;
-
-  // Lighting info (Used only with Gouraud shading (between 0 and 1))
-  float r, g, b;
-};
-
 /// Extra information for vertex fogging.
 class G3DFogInfo
 {
@@ -161,7 +147,14 @@ struct G3DPolygonDPFX
   /// Current number of vertices.
   int num;
   /// Vertices that form the polygon.
-  G3DTexturedVertex vertices[100];
+  csVector2 vertices[100];
+  /// 1/z for every vertex.
+  float z[100];
+  /// Texels per vertex.
+  csVector2 texels[100];
+  /// Lighting info per vertex.
+  csColor colors[100];
+
   /// Extra optional fog information.
   G3DFogInfo fog_info[100];
   /// Use fog info?
@@ -179,7 +172,7 @@ struct G3DPolygonDPFX
 
   // A dummy constructor to appease NextStep compiler which otherwise
   // complains that it is unable to create this object.  This happens when
-  // a subcomponent such as G3DTexturedVertex has a constructor.
+  // a subcomponent such as csVector2 has a constructor.
   G3DPolygonDPFX() {}
 };
 
@@ -680,10 +673,10 @@ struct iGraphics3D : public iBase
    * the current contents of the Z-buffer so that geometry will only
    * render where the Z-buffer allows it (even if zfill or znone is used).
    * Remember to close a portal later using ClosePortal().
-   * Basically this represents a stacked layer of portals. Each one
-   * gradually smaller.
+   * Basically this represents a stacked layer of portals. Each subsequent
+   * portal must be fully contained in the previous ones.
    */
-  virtual void OpenPortal (csVector2* poly, int num_poly) = 0;
+  virtual void OpenPortal (G3DPolygonDFP* poly) = 0;
 
   /**
    * Close a portal previously opened with OpenPortal().

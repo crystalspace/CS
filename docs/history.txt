@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+25-Mar-2003
+	- Changed API of OpenPortal() to accept a G3DPolygonDFP instead
+	  of a 2D polygon. I need z-information.
+	- First version of OpenGL implementation of OpenPortal().
+	- Added CS_PORTAL_FLOAT option for portals. This will enable the
+	  portal to use the new OpenPortal() code.
+	- Added <float> flag to the portal loading code to enable this new
+	  flag. Currently this new feature is not yet working properly.
+	  Needs more testing and fixing.
+	- Optimized the polygon drawing structures in graph3d.h a little.
 24-Mar-2003
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.

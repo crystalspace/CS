@@ -136,6 +136,7 @@ enum
   XMLTOKEN_MIRROR,
   XMLTOKEN_STATIC,
   XMLTOKEN_ZFILL,
+  XMLTOKEN_FLOAT,
   XMLTOKEN_CLIP,
   XMLTOKEN_SECTOR
 };
@@ -213,6 +214,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
   xmltokens.Register ("static", XMLTOKEN_STATIC);
   xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
+  xmltokens.Register ("float", XMLTOKEN_FLOAT);
   xmltokens.Register ("clip", XMLTOKEN_CLIP);
   xmltokens.Register ("sector", XMLTOKEN_SECTOR);
   return true;
@@ -798,6 +800,9 @@ bool csTextSyntaxService::ParsePortal (
         break;
       case XMLTOKEN_STATIC:
         flags.Push ((csSome)CS_PORTAL_STATICDEST);
+        break;
+      case XMLTOKEN_FLOAT:
+        flags.Push ((csSome)CS_PORTAL_FLOAT);
         break;
       case XMLTOKEN_ZFILL:
         flags.Push ((csSome)CS_PORTAL_ZFILL);

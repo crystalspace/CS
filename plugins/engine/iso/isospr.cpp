@@ -77,17 +77,30 @@ void csIsoSprite::MovePosition(const csVector3& delta)
   SetPosition(position + delta);
 }
 
-#define INTERPOLATE1(component) \
-  g3dpoly->vertices [i].component = inpoly [vt].component + \
-    t * (inpoly [vt2].component - inpoly [vt].component);
+#define INTERPOLATE1_S(var) \
+  g3dpoly->var [i]= inpoly_##var## [vt]+ \
+    t * (inpoly_##var## [vt2]- inpoly_##var## [vt]);
 
-#define INTERPOLATE(component) \
+#define INTERPOLATE1(var,component) \
+  g3dpoly->var [i].component = inpoly_##var## [vt].component + \
+    t * (inpoly_##var## [vt2].component - inpoly_##var## [vt].component);
+
+#define INTERPOLATE_S(var) \
 { \
-  float v1 = inpoly [edge_from [0]].component + \
-    t1 * (inpoly [edge_to [0]].component - inpoly [edge_from [0]].component); \
-  float v2 = inpoly [edge_from [1]].component + \
-    t2 * (inpoly [edge_to [1]].component - inpoly [edge_from [1]].component); \
-  g3dpoly->vertices [i].component = v1 + t * (v2 - v1); \
+  float v1 = inpoly_##var## [edge_from [0]] + \
+    t1 * (inpoly_##var## [edge_to [0]] - inpoly_##var## [edge_from [0]]); \
+  float v2 = inpoly_##var## [edge_from [1]] + \
+    t2 * (inpoly_##var## [edge_to [1]] - inpoly_##var## [edge_from [1]]); \
+  g3dpoly->var [i] = v1 + t * (v2 - v1); \
+}
+
+#define INTERPOLATE(var,component) \
+{ \
+  float v1 = inpoly_##var## [edge_from [0]].component + \
+    t1 * (inpoly_##var## [edge_to [0]].component - inpoly_##var## [edge_from [0]].component); \
+  float v2 = inpoly_##var## [edge_from [1]].component + \
+    t2 * (inpoly_##var## [edge_to [1]].component - inpoly_##var## [edge_from [1]].component); \
+  g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
@@ -96,46 +109,46 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 {
   // first we copy the first texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  CS_ALLOC_STACK_ARRAY (G3DTexturedVertex, inpoly, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (csVector2, inpoly_vertices, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (csVector2, inpoly_texels, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (csColor, inpoly_colors, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (float, inpoly_z, orig_num_vertices);
 
   int i;
-  for (i = 0; i < orig_num_vertices; i++)
-    inpoly[i] = g3dpoly->vertices[i];
+  memcpy (inpoly_vertices, g3dpoly->vertices,
+  	orig_num_vertices*sizeof (csVector2));
+  memcpy (inpoly_texels, g3dpoly->texels, orig_num_vertices*sizeof (csVector2));
+  memcpy (inpoly_colors, g3dpoly->colors, orig_num_vertices*sizeof (csColor));
+  memcpy (inpoly_z, g3dpoly->z, orig_num_vertices*sizeof (float));
 
   int vt, vt2;
   float t;
   for (i = 0; i < num_vertices; i++)
   {
-    g3dpoly->vertices [i].x = clipped_verts [i].x;
-    g3dpoly->vertices [i].y = clipped_verts [i].y;
+    g3dpoly->vertices [i] = clipped_verts [i];
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
         vt = clipped_vtstats[i].Vertex;
 	CS_ASSERT (vt >= 0 && vt < orig_num_vertices);
-        g3dpoly->vertices [i].z = inpoly [vt].z;
-        g3dpoly->vertices [i].u = inpoly [vt].u;
-        g3dpoly->vertices [i].v = inpoly [vt].v;
+        g3dpoly->z [i] = inpoly_z [vt];
+        g3dpoly->texels [i] = inpoly_texels [vt];
         if (gouraud)
-        {
-          g3dpoly->vertices [i].r = inpoly [vt].r;
-          g3dpoly->vertices [i].g = inpoly [vt].g;
-          g3dpoly->vertices [i].b = inpoly [vt].b;
-        }
+          g3dpoly->colors [i] = inpoly_colors [vt];
         break;
       case CS_VERTEX_ONEDGE:
         vt = clipped_vtstats[i].Vertex;
 	CS_ASSERT (vt >= 0 && vt < orig_num_vertices);
         vt2 = vt + 1; if (vt2 >= orig_num_vertices) vt2 = 0;
         t = clipped_vtstats [i].Pos;
-        INTERPOLATE1 (z);
-        INTERPOLATE1 (u);
-        INTERPOLATE1 (v);
+        INTERPOLATE1_S (z);
+        INTERPOLATE1 (texels,x);
+        INTERPOLATE1 (texels,y);
         if (gouraud)
         {
-          INTERPOLATE1 (r);
-          INTERPOLATE1 (g);
-          INTERPOLATE1 (b);
+          INTERPOLATE1 (colors,red);
+          INTERPOLATE1 (colors,green);
+          INTERPOLATE1 (colors,blue);
         }
         break;
       case CS_VERTEX_INSIDE:
@@ -147,8 +160,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
         j1 = orig_num_vertices - 1;
         for (j = 0; j < orig_num_vertices; j++)
         {
-          if ((y >= inpoly [j].y && y <= inpoly [j1].y) ||
-              (y <= inpoly [j].y && y >= inpoly [j1].y))
+          if ((y >= inpoly_vertices [j].y && y <= inpoly_vertices [j1].y) ||
+              (y <= inpoly_vertices [j].y && y >= inpoly_vertices [j1].y))
           {
 	    CS_ASSERT (edge >= 0 && edge < 2);
             edge_from [edge] = j;
@@ -164,23 +177,23 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
           edge_from [1] = edge_from [0];
           edge_to [1] = edge_to [0];
         }
-        G3DTexturedVertex& A = inpoly [edge_from [0]];
-        G3DTexturedVertex& B = inpoly [edge_to [0]];
-        G3DTexturedVertex& C = inpoly [edge_from [1]];
-        G3DTexturedVertex& D = inpoly [edge_to [1]];
+        csVector2& A = inpoly_vertices [edge_from [0]];
+        csVector2& B = inpoly_vertices [edge_to [0]];
+        csVector2& C = inpoly_vertices [edge_from [1]];
+        csVector2& D = inpoly_vertices [edge_to [1]];
         float t1 = (y - A.y) / (B.y - A.y);
         float t2 = (y - C.y) / (D.y - C.y);
         float x1 = A.x + t1 * (B.x - A.x);
         float x2 = C.x + t2 * (D.x - C.x);
         t = (x - x1) / (x2 - x1);
-        INTERPOLATE (z);
-        INTERPOLATE (u);
-        INTERPOLATE (v);
+        INTERPOLATE_S (z);
+        INTERPOLATE (texels, x);
+        INTERPOLATE (texels, y);
         if (gouraud)
         {
-          INTERPOLATE (r);
-          INTERPOLATE (g);
-          INTERPOLATE (b);
+          INTERPOLATE (colors, red);
+          INTERPOLATE (colors, green);
+          INTERPOLATE (colors, blue);
         }
         break;
     }
@@ -240,14 +253,14 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
     //if(screenpos.z < 0.0)
          //g3dpolyfx.vertices [i].z = 1.0-.5/(-screenpos.z+1.);
     //else g3dpolyfx.vertices [i].z = .5/(screenpos.z+1.);
-    g3dpolyfx.vertices [i].z = 1./(screenpos.z-zlowerbound);
+    g3dpolyfx.z [i] = 1./(screenpos.z-zlowerbound);
     g3dpolyfx.vertices [i].x = poly2d [i].x = screenpos.x;
     g3dpolyfx.vertices [i].y = poly2d [i].y = screenpos.y;
-    g3dpolyfx.vertices [i].r = colors [i].x;
-    g3dpolyfx.vertices [i].g = colors [i].y;
-    g3dpolyfx.vertices [i].b = colors [i].z;
-    g3dpolyfx.vertices [i].u = uv [i].x;
-    g3dpolyfx.vertices [i].v = uv [i].y;
+    g3dpolyfx.colors [i].red = colors [i].x;
+    g3dpolyfx.colors [i].green = colors [i].y;
+    g3dpolyfx.colors [i].blue = colors [i].z;
+    g3dpolyfx.texels [i].x = uv [i].x;
+    g3dpolyfx.texels [i].y = uv [i].y;
   }
 
   int num_clipped_verts;

@@ -71,10 +71,10 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       {
         poly.vertices [i].x = (i == 0 || i == 3) ? x : x + w;
         poly.vertices [i].y = (i == 0 || i == 1) ? y : y + h;
-        poly.vertices [i].z = 0;
-        poly.vertices [i].r = colors [i].red   * (1/255.);
-        poly.vertices [i].g = colors [i].green * (1/255.);
-        poly.vertices [i].b = colors [i].blue  * (1/255.);
+        poly.z [i] = 0;
+        poly.colors [i].red = colors [i].red   * (1/255.);
+        poly.colors [i].green = colors [i].green * (1/255.);
+        poly.colors [i].blue = colors [i].blue  * (1/255.);
       }
       poly.flat_color_r = poly.flat_color_g = poly.flat_color_b = 255;
 

@@ -64,6 +64,17 @@ class csReversibleTransform;
  */
 #define CS_PORTAL_STATICDEST 0x00000010
 
+/**
+ * If this flag is used then the portal will use possible available
+ * stencil buffer on the hardware to do good clipping. This flag should
+ * be used if you have a portal that is not at the boundary of the sector
+ * and that can be covered (or itself covers) other objects. It is usually
+ * used in combination with CS_PORTAL_ZFILL and sometimes with
+ * CS_PORTAL_CLIPDEST if the destination of the portal enters in the middle
+ * of a sector.
+ */
+#define CS_PORTAL_FLOAT 0x00000020
+
 class csTransform;
 class csMatrix3;
 class csVector3;

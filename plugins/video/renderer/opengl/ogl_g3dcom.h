@@ -34,7 +34,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
-#include "csutil/array.h"
+#include "csutil/ptrarr.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "plugins/video/renderer/common/polybuf.h"
@@ -290,6 +290,9 @@ private:
   /// Make sure the OpenGL clipping planes are correct for the current clipper.
   void SetupClipPlanes (bool add_near_clip, bool add_z_clip);
 
+  /// Setup the portals if needed.
+  void SetupClipPortals ();
+
   /// Do a performance test to find out the best configuration for OpenGL.
   void PerfTest ();
 
@@ -430,12 +433,14 @@ protected:
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
   {
-    csPoly2D* poly;
+    csVector2* poly;
     int num_poly;
+    csPlane3 normal;
     csClipPortal () : poly (NULL) { }
     ~csClipPortal () { delete[] poly; }
   };
-  csArray<csClipPortal> clipportal_stack;
+  csPDelArray<csClipPortal> clipportal_stack;
+  bool clipportal_dirty;
 
   /**
    * If true the frustum below is valid. If false
@@ -545,9 +550,6 @@ static fType fName
 
 public:
   SCF_DECLARE_IBASE;
-
-  typedef void (csGraphics3DOGLCommon::*DrawPolygonPtr)(G3DPolygonDP& poly);
-  DrawPolygonPtr DrawPolygonCall;
 
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
@@ -810,7 +812,7 @@ public:
   virtual void CloseFogObject (CS_ID id);
 
   /// Open a clipped portal.
-  virtual void OpenPortal (csVector2* poly, int num_poly);
+  virtual void OpenPortal (G3DPolygonDFP* poly);
 
   /// Close a portal previously opened with OpenPortal().
   virtual void ClosePortal ();
@@ -863,7 +865,8 @@ public:
    * Draw a polygon but only do z-fill. Do not actually render
    * anything.
    */
-  void DrawPolygonZFill (G3DPolygonDP &poly);
+  void DrawPolygonZFill (csVector2* vertices, int num_vertices,
+  	const csPlane3& normal);
 
   /// Validate a technique
   bool Validate( iEffectDefinition* effect, iEffectTechnique* technique );

@@ -33,17 +33,30 @@
  * the clipper linked into your application.
  */
 
-#define INTERPOLATE1(component) \
-  poly.vertices [j].component = orig_poly [vt].component + \
-    t * (orig_poly [vt2].component - orig_poly [vt].component);
+#define INTERPOLATE1_S(var) \
+  poly.var [j] = orig_poly_##var## [vt] + \
+    t * (orig_poly_##var## [vt2] - orig_poly_##var## [vt]);
 
-#define INTERPOLATE(component) \
+#define INTERPOLATE1(var,component) \
+  poly.var [j].component = orig_poly_##var## [vt].component + \
+    t * (orig_poly_##var## [vt2].component - orig_poly_##var## [vt].component);
+
+#define INTERPOLATE_S(var) \
 { \
-  float v1 = orig_poly [edge_from [0]].component + \
-    t1 * (orig_poly [edge_to [0]].component - orig_poly [edge_from [0]].component); \
-  float v2 = orig_poly [edge_from [1]].component + \
-    t2 * (orig_poly [edge_to [1]].component - orig_poly [edge_from [1]].component); \
-  poly.vertices [j].component = v1 + t * (v2 - v1); \
+  float v1 = orig_poly_##var## [edge_from [0]] + \
+    t1 * (orig_poly_##var## [edge_to [0]] - orig_poly_##var## [edge_from [0]]); \
+  float v2 = orig_poly_##var## [edge_from [1]] + \
+    t2 * (orig_poly_##var## [edge_to [1]] - orig_poly_##var## [edge_from [1]]); \
+  poly.var [j] = v1 + t * (v2 - v1); \
+}
+
+#define INTERPOLATE(var,component) \
+{ \
+  float v1 = orig_poly_##var## [edge_from [0]].component + \
+    t1 * (orig_poly_##var## [edge_to [0]].component - orig_poly_##var## [edge_from [0]].component); \
+  float v2 = orig_poly_##var## [edge_from [1]].component + \
+    t2 * (orig_poly_##var## [edge_to [1]].component - orig_poly_##var## [edge_from [1]].component); \
+  poly.var [j].component = v1 + t * (v2 - v1); \
 }
 
 void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
@@ -71,12 +84,18 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
   // Store the original polygon aside (for clipping)
   int orig_num_vert = poly.num;
   CS_ALLOC_STACK_ARRAY (csVector2, orig_vert, orig_num_vert);
-  CS_ALLOC_STACK_ARRAY (G3DTexturedVertex, orig_poly, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (csVector2, orig_poly_vertices, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (csVector2, orig_poly_texels, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (csColor, orig_poly_colors, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (float, orig_poly_z, orig_num_vert);
   for (i = 0; i < orig_num_vert; i++)
   {
     orig_vert [i].x = dx + poly.vertices [i].x;
     orig_vert [i].y = dy + poly.vertices [i].y;
-    orig_poly [i] = poly.vertices [i];
+    orig_poly_vertices [i] = poly.vertices [i];
+    orig_poly_texels [i] = poly.texels [i];
+    orig_poly_colors [i] = poly.colors [i];
+    orig_poly_z [i] = poly.z [i];
   }
 
   for (i = rect.Length () - 1; i >= 0; i--)
@@ -111,28 +130,23 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
         {
           case CS_VERTEX_ORIGINAL:
             vt = vstats  [j].Vertex;
-            poly.vertices [j].z = orig_poly [vt].z;
-            poly.vertices [j].u = orig_poly [vt].u;
-            poly.vertices [j].v = orig_poly [vt].v;
+            poly.z [j] = orig_poly_z [vt];
+            poly.texels [j] = orig_poly_texels [vt];
             if (mode & CS_FX_GOURAUD)
-            {
-              poly.vertices [j].r = orig_poly [vt].r;
-              poly.vertices [j].g = orig_poly [vt].g;
-              poly.vertices [j].b = orig_poly [vt].b;
-            }
+              poly.colors [j] = orig_poly_colors [vt];
             break;
           case CS_VERTEX_ONEDGE:
             vt = vstats [j].Vertex;
             vt2 = vt + 1; if (vt2 >= orig_num_vert) vt2 = 0;
             t = vstats [j].Pos;
-            INTERPOLATE1 (z);
-            INTERPOLATE1 (u);
-            INTERPOLATE1 (v);
+            INTERPOLATE1_S (z);
+            INTERPOLATE1 (texels,x);
+            INTERPOLATE1 (texels,y);
             if (mode & CS_FX_GOURAUD)
             {
-              INTERPOLATE1 (r);
-              INTERPOLATE1 (g);
-              INTERPOLATE1 (b);
+              INTERPOLATE1 (colors,red);
+              INTERPOLATE1 (colors,green);
+              INTERPOLATE1 (colors,blue);
             }
             break;
           case CS_VERTEX_INSIDE:
@@ -169,14 +183,14 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
             float x1 = A.x + t1 * (B.x - A.x);
             float x2 = C.x + t2 * (D.x - C.x);
             t = (x - x1) / (x2 - x1);
-            INTERPOLATE (z);
-            INTERPOLATE (u);
-            INTERPOLATE (v);
+            INTERPOLATE_S (z);
+            INTERPOLATE (texels,x);
+            INTERPOLATE (texels,y);
             if (mode & CS_FX_GOURAUD)
             {
-              INTERPOLATE (r);
-              INTERPOLATE (g);
-              INTERPOLATE (b);
+              INTERPOLATE (colors,red);
+              INTERPOLATE (colors,green);
+              INTERPOLATE (colors,blue);
             }
             break;
         }

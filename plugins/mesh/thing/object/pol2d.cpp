@@ -135,11 +135,7 @@ void csPolygon2D::DrawFilled (
   }
   else
   {
-    for (i = 0; i < num_vertices; i++)
-    {
-      g3dpoly.vertices[i].x = vertices[i].x;
-      g3dpoly.vertices[i].y = vertices[i].y;
-    }
+    memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
   }
 
   g3dpoly.z_value = poly->Vcam (0).z;
@@ -191,11 +187,7 @@ void csPolygon2D::FillZBuf (
   }
   else
   {
-    for (i = 0; i < num_vertices; i++)
-    {
-      g3dpoly.vertices[i].x = vertices[i].x;
-      g3dpoly.vertices[i].y = vertices[i].y;
-    }
+    memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
   }
 
   g3dpoly.z_value = poly->Vcam (0).z;
@@ -217,9 +209,6 @@ void csPolygon2D::AddFogPolygon (
   static G3DPolygonDFP g3dpoly;
   memset (&g3dpoly, 0, sizeof (g3dpoly));
   g3dpoly.num = num_vertices;
-#if 0
-  memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
-#else
   if (mirror)
   {
     for (i = 0; i < num_vertices; i++)
@@ -229,8 +218,9 @@ void csPolygon2D::AddFogPolygon (
     }
   }
   else
+  {
     memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
-#endif
+  }
 
   //g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly); //DPQFIX
   g3dpoly.normal = camera_plane;

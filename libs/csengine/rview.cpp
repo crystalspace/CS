@@ -354,7 +354,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX &poly)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1.0f / poly.vertices[i].z;
+    v.z = 1.0f / poly.z[i];
     v.x = (poly.vertices[i].x - shift_x) * v.z * inv_aspect;
     v.y = (poly.vertices[i].y - shift_y) * v.z * inv_aspect;
 

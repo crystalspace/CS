@@ -341,7 +341,7 @@ public:
   virtual void CloseFogObject (CS_ID id);
 
   /// Open a new clipped portal.
-  virtual void OpenPortal (csVector2* poly, int num_poly);
+  virtual void OpenPortal (G3DPolygonDFP* poly);
 
   /// Close a portal previously opened with OpenPortal().
   virtual void ClosePortal ();

@@ -185,12 +185,12 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   poly.vertices[0].x = persp.x;
   poly.vertices[0].y = persp.y;
-  poly.vertices[0].z = 1./v.z;
-  poly.vertices[0].u = 0;
-  poly.vertices[0].v = 0;
-  poly.vertices[0].r = c1.red;
-  poly.vertices[0].g = c1.green;
-  poly.vertices[0].b = c1.blue;
+  poly.z[0] = 1./v.z;
+  poly.texels[0].x = 0;
+  poly.texels[0].y = 0;
+  poly.colors[0].red = c1.red;
+  poly.colors[0].green = c1.green;
+  poly.colors[0].blue = c1.blue;
   v = cam->GetTransform ().Other2This (v2);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
@@ -203,12 +203,12 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   poly.vertices[1].x = persp.x;
   poly.vertices[1].y = persp.y;
-  poly.vertices[1].z = 1./v.z;
-  poly.vertices[1].u = 1;
-  poly.vertices[1].v = 0;
-  poly.vertices[1].r = c2.red;
-  poly.vertices[1].g = c2.green;
-  poly.vertices[1].b = c2.blue;
+  poly.z[1] = 1./v.z;
+  poly.texels[1].x = 1;
+  poly.texels[1].y = 0;
+  poly.colors[1].red = c2.red;
+  poly.colors[1].green = c2.green;
+  poly.colors[1].blue = c2.blue;
   v = cam->GetTransform ().Other2This (v3);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
@@ -221,12 +221,12 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   poly.vertices[2].x = persp.x;
   poly.vertices[2].y = persp.y;
-  poly.vertices[2].z = 1./v.z;
-  poly.vertices[2].u = 1;
-  poly.vertices[2].v = 1;
-  poly.vertices[2].r = c3.red;
-  poly.vertices[2].g = c3.green;
-  poly.vertices[2].b = c3.blue;
+  poly.z[2] = 1./v.z;
+  poly.texels[2].x = 1;
+  poly.texels[2].y = 1;
+  poly.colors[2].red = c3.red;
+  poly.colors[2].green = c3.green;
+  poly.colors[2].blue = c3.blue;
   v = cam->GetTransform ().Other2This (v4);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
@@ -239,12 +239,12 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
   }
   poly.vertices[3].x = persp.x;
   poly.vertices[3].y = persp.y;
-  poly.vertices[3].z = 1./v.z;
-  poly.vertices[3].u = 0;
-  poly.vertices[3].v = 1;
-  poly.vertices[3].r = c4.red;
-  poly.vertices[3].g = c4.green;
-  poly.vertices[3].b = c4.blue;
+  poly.z[3] = 1./v.z;
+  poly.texels[3].x = 0;
+  poly.texels[3].y = 1;
+  poly.colors[3].red = c4.red;
+  poly.colors[3].green = c4.green;
+  poly.colors[3].blue = c4.blue;
   poly.mat_handle = NULL;
   poly.mixmode = CS_FX_ADD|CS_FX_GOURAUD;
   if (do3d)

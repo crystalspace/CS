@@ -1304,6 +1304,17 @@ void csThing::DrawOnePolygon (
       keep_plane = camera_plane;
     }
 
+    // First call OpenPortal() if needed.
+    if (po->flags.Check (CS_PORTAL_FLOAT))
+    {
+      static G3DPolygonDFP g3dpoly;
+      g3dpoly.num = poly->GetVertexCount ();
+      memcpy (g3dpoly.vertices, poly->GetVertices (),
+      	g3dpoly.num * sizeof (csVector2));
+      g3dpoly.normal = camera_plane;
+      d->GetGraphics3D ()->OpenPortal (&g3dpoly);
+    }
+
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
@@ -1326,6 +1337,12 @@ void csThing::DrawOnePolygon (
       // into the others sector space (we cannot trust the Z-buffer here).
       if (po->flags.Check (CS_PORTAL_ZFILL))
         poly->FillZBuf (d, p, keep_plane);
+
+      // Make sure to close the portal again.
+      if (po->flags.Check (CS_PORTAL_FLOAT))
+      {
+	d->GetGraphics3D ()->ClosePortal ();
+      }
     }
     else
       poly->DrawFilled (d, p, camera_plane, zMode);
