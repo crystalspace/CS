@@ -369,23 +369,24 @@ AS_IF([test -n "$PERL"],
 # set, then use those values.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PYTHON], [python])
+AS_IF([test -n "$PYTHON"], [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])])
+
 AS_IF([test -n "$PYTHON"],
-    [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])
-    AC_CACHE_CHECK([for python distutils module], [cs_cv_python_distutils],
+    [AC_CACHE_CHECK([for python distutils module], [cs_cv_python_distutils],
 	[AS_IF([AC_RUN_LOG([$PYTHON -c 'import distutils.sysconfig' 1>&2])],
 	    [cs_cv_python_distutils=yes], [cs_cv_python_distutils=no])])
     AS_IF([test $cs_cv_python_distutils = yes],
-	[CS_BUILD_PROPERTY([PYTHON.DISTUTILS], [yes])])])
+	[CS_BUILD_PROPERTY([PYTHON.DISTUTILS], [yes])])],
+    [cs_cv_python_distutils=no])
 
 AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
     [cs_cv_python_sdk=no
-    cs_cv_python_distutils=no
     cs_python_lib_dir=''
     cs_python_makefile=''
 
     AS_IF([test -n "$PYTHON"],
 	[# Python 2.x?
-	AS_IF([AC_RUN_LOG([$PYTHON -c 'import distutils.sysconfig' 1>&2])],
+	AS_IF([test $cs_cv_python_distutils = yes],
 	    [cs_cv_python_base=`AC_RUN_LOG([$PYTHON -c \
 		'import distutils.sysconfig ; import os.path ; \
 		print os.path.basename( \
