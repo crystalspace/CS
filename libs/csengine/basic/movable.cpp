@@ -45,28 +45,17 @@ csMovableSectorList::~csMovableSectorList ()
   DeleteAll ();
 }
 
-bool csMovableSectorList::PrepareItem (csSome item)
+bool csMovableSectorList::PrepareItem (iSector* sector)
 {
-  // check for a valid item and IncRef it
-  iSector *sector = (iSector *)item;
+  // Check for a valid item.
   if (sector == NULL) return false;
 
   // if the movable has a parent, no sectors can be added.
   CS_ASSERT (movable != NULL);
   if (movable->GetParent ()) return false;
 
-  sector->IncRef ();
-
   csMeshWrapper *mw = movable->GetMeshWrapper ();
   if (mw) mw->MoveToSector (sector->GetPrivateObject ());
-  return true;
-}
-
-bool csMovableSectorList::FreeItem (void *item)
-{
-  iSector *Sector = (iSector *)item;
-
-  Sector->DecRef ();
   return true;
 }
 
@@ -82,6 +71,7 @@ iSector *csMovableSectorList::SectorList::Get (int n) const
 
 int csMovableSectorList::SectorList::Add (iSector *obj)
 {
+  if (!scfParent->PrepareItem (obj)) return -1;
   return scfParent->Push (obj);
 }
 
@@ -167,7 +157,8 @@ void csMovable::SetSector (iSector *sector)
 {
   if (sectors.Length () == 1 && sector == sectors[0]) return ;
   ClearSectors ();
-  sectors.Push (sector);
+  if (sectors.PrepareItem (sector))
+    sectors.Push (sector);
 }
 
 void csMovable::ClearSectors ()

@@ -1284,13 +1284,13 @@ private:
    * planes. Default planes which are created for polygons
    * are not in this list.
    */
-  csNamedObjVector planes;
+  csRefArrayObject<iPolyTxtPlane> planes;
 
   /**
    * List of curve templates (bezier templates). This vector contains objects of
    * type csCurveTemplate*.
    */
-  csNamedObjVector curve_templates;
+  csRefArrayObject<iCurveTemplate> curve_templates;
 
 public:
   iObjectRegistry* object_reg;

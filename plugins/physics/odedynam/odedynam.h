@@ -90,7 +90,7 @@ private:
   static int geomclassnum;
   static dJointGroupID contactjoints;
 
-  csNamedObjVector systems;
+  csRefArrayObject<iDynamicSystem> systems;
 
 public:
   SCF_DECLARE_IBASE;
@@ -155,7 +155,7 @@ private:
   csRef<iCollideSystem> collidesys;
   csRef<iDynamicsMoveCallback> move_cb;
 
-  csNamedObjVector bodies;
+  csRefArrayObject<iRigidBody> bodies;
   csObjVector groups;
   csObjVector joints;
 

@@ -16,6 +16,15 @@ The history order is reversed so that new features are at the top.
 	- Removed all usages of CS_DECLARE_OBJECT_VECTOR in CS. Consequently
 	  removed that macro.
 	- Added QueryObject() to iSharedVariable.
+	- CS_DECLARE_OBJECT_VECTOR_NOREF was not used in CS so I removed it.
+	- Replaced usage of CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR with
+	  csRefArrayObject<T> and consequently removed the vector.
+	- Removed the now unused csNamedObjectVector.
+	- Thing plugin now uses csRefArrayObject for curve templates and
+	  planes instead of csNamedObjVector.
+	- Ode dynamics plugin now uses csRefArrayObject instead of
+	  csNamedObjVector.
+	- Iso engine uses csRefArray instead of csNamedObjVector.
 12-Jan-2002
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl

@@ -3072,36 +3072,29 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)
 {
   csPolyTxtPlane *pl = new csPolyTxtPlane (this);
-  planes.Push (pl);
+  planes.Push (&(pl->scfiPolyTxtPlane));
   if (name) pl->SetName (name);
-  pl->IncRef ();
   return &(pl->scfiPolyTxtPlane);
 }
 
-iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *iName)
+iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *name)
 {
-  csPolyTxtPlane *pl;
-  pl = (csPolyTxtPlane *)planes.FindByName (iName);
-  if (!pl) return NULL;
-  return &(pl->scfiPolyTxtPlane);
+  return planes.FindByName (name);
 }
 
 csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
 {
   csBezierTemplate *ptemplate = new csBezierTemplate (this);
   if (name) ptemplate->SetName (name);
-  curve_templates.Push (ptemplate);
-  return SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
+  csRef<iCurveTemplate> tmp = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
+  curve_templates.Push (tmp);
+  tmp->DecRef ();
+  return tmp;
 }
 
-iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *iName)
+iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *name)
 {
-  csCurveTemplate *pl;
-  pl = (csCurveTemplate *)curve_templates.FindByName (iName);
-  if (!pl) return NULL;
-
-  csRef<iCurveTemplate> itmpl (SCF_QUERY_INTERFACE (pl, iCurveTemplate));
-  return itmpl;	// DecRef is ok here.
+  return curve_templates.FindByName (name);
 }
 
 void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)
@@ -3109,8 +3102,8 @@ void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)
   int i;
   for (i = 0; i < planes.Length (); i++)
   {
-    csPolyTxtPlane *pli = (csPolyTxtPlane *)planes[i];
-    if (pl == &(pli->scfiPolyTxtPlane))
+    iPolyTxtPlane *pli = planes[i];
+    if (pl == pli)
     {
       planes.Delete (i);
       return ;
@@ -3123,9 +3116,8 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate *ct)
   int i;
   for (i = 0; i < curve_templates.Length (); i++)
   {
-    csCurveTemplate *cti = (csCurveTemplate *)curve_templates[i];
-    csRef<iCurveTemplate> i_cti (SCF_QUERY_INTERFACE (cti, iCurveTemplate));
-    if (ct == i_cti)
+    iCurveTemplate *cti = curve_templates[i];
+    if (ct == cti)
     {
       curve_templates.Delete (i);
       return ;
@@ -3135,14 +3127,6 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate *ct)
 
 void csThingObjectType::ClearPolyTxtPlanes ()
 {
-  int i;
-  for (i = 0; i < planes.Length (); i++)
-  {
-    csPolyTxtPlane *p = (csPolyTxtPlane *)planes[i];
-    planes[i] = NULL;
-    p->DecRef ();
-  }
-
   planes.DeleteAll ();
 }
 

@@ -228,7 +228,7 @@ public:
 /**
  * This class is used to hold a list of materials.
  */
-class csIsoMaterialList : public csNamedObjVector
+class csIsoMaterialList : public csRefArray<csIsoMaterialWrapper>
 {
   /// the last possibly free index
   int lastindex;
@@ -249,13 +249,8 @@ public:
    */
   csIsoMaterialWrapper* NewMaterial (iMaterialHandle *ith);
 
-  /// Return material by index
-  csIsoMaterialWrapper *Get (int idx)
-  { return (csIsoMaterialWrapper *)csNamedObjVector::Get (idx); }
-
   /// Find a material by name
-  csIsoMaterialWrapper *FindByName (const char* iName)
-  { return (csIsoMaterialWrapper *)csNamedObjVector::FindByName (iName); }
+  csIsoMaterialWrapper *FindByName (const char* iName);
 
   /// remove 'index' from the list. Does DecRef().
   void RemoveIndex(int i);
@@ -321,7 +316,7 @@ public:
     }
     virtual int Find (iMaterialWrapper *imw) const
     {
-      return scfParent->Find (imw->GetPrivateObject ());
+      return scfParent->Find ((csIsoMaterialWrapper*)(imw->GetPrivateObject ()));
     }
   } scfiMaterialList;
 };

@@ -169,7 +169,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialList::MaterialList)
   SCF_IMPLEMENTS_INTERFACE (iMaterialList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csIsoMaterialList::csIsoMaterialList () : csNamedObjVector (16, 16)
+csIsoMaterialList::csIsoMaterialList () :
+	csRefArray<csIsoMaterialWrapper> (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
@@ -204,8 +205,6 @@ void csIsoMaterialList::RemoveIndex(int i)
   CS_ASSERT (i >= 0);
   if(i>=Length()) return;
 
-  iMaterialWrapper* mw = (iMaterialWrapper*)(*this)[i];
-  mw->DecRef ();
   (*this)[i] = NULL;
 
   if(i==Length()-1)
@@ -225,6 +224,20 @@ csIsoMaterialWrapper* csIsoMaterialList::NewMaterial (iMaterial* material)
   (*this)[i] = tm;
   tm->SetIndex(i);
   return tm;
+}
+
+csIsoMaterialWrapper* csIsoMaterialList::FindByName (const char* name)
+{
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+  {
+    csIsoMaterialWrapper* w = (*this)[i];
+    if (!strcmp (w->GetName (), name))
+    {
+      return w;
+    }
+  }
+  return NULL;
 }
 
 csIsoMaterialWrapper* csIsoMaterialList::NewMaterial (iMaterialHandle *ith)

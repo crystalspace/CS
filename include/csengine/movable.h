@@ -30,10 +30,9 @@ class csMovable;
 class csMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
-CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR (csSectorVector, iSector);
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : public csSectorVector
+class csMovableSectorList : public csRefArrayObject<iSector>
 {
 private:
   csMovable* movable;
@@ -42,11 +41,10 @@ public:
   SCF_DECLARE_IBASE;
 
   csMovableSectorList ();
-  ~csMovableSectorList ();
+  virtual ~csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
 
-  virtual bool PrepareItem (csSome item);
-  virtual bool FreeItem (csSome item);
+  bool PrepareItem (iSector* item);
 
   class SectorList : public iSectorList
   {

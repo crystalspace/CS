@@ -112,24 +112,25 @@ csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
   csODEDynamicSystem* system = new csODEDynamicSystem ();
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
   systems.Push (isystem);
+  isystem->DecRef ();
   return csPtr<iDynamicSystem> (isystem);
 }
 
 void csODEDynamics::RemoveSystem (iDynamicSystem* system)
 {
-  systems.Delete (system, true);
+  systems.Delete (system);
 }
 
 iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 {
-  return (iDynamicSystem *)systems.FindByName (name);
+  return systems.FindByName (name);
 }
 
 void csODEDynamics::Step (float stepsize)
 {
   for (long i=0; i<systems.Length(); i++)
   {
-    ((iDynamicSystem*)systems.Get (i))->Step (stepsize);
+    systems.Get (i)->Step (stepsize);
     dJointGroupEmpty (contactjoints);
   }
 }
@@ -622,20 +623,19 @@ csPtr<iRigidBody> csODEDynamicSystem::CreateBody ()
 {
   csODERigidBody* body = new csODERigidBody (this);
   csRef<iRigidBody> ibody (SCF_QUERY_INTERFACE (body, iRigidBody));
-  bodies.Push (body);
+  bodies.Push (ibody);
   ibody->SetMoveCallback(move_cb);
-  ibody->IncRef ();
   return csPtr<iRigidBody> (ibody);
 }
 
 void csODEDynamicSystem::RemoveBody (iRigidBody* body)
 {
-  bodies.Delete (body, true);
+  bodies.Delete (body);
 }
 
 iRigidBody *csODEDynamicSystem::FindBody (const char *name)
 {
-  return &((csODERigidBody *)bodies.FindByName (name))->scfiRigidBody;
+  return bodies.FindByName (name);
 }
 
 csPtr<iBodyGroup> csODEDynamicSystem::CreateGroup ()
@@ -681,7 +681,7 @@ void csODEDynamicSystem::Step (float stepsize)
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
   dWorldStep (worldID, stepsize);
   for (long i=0; i<bodies.Length(); i++)
-    ((csODERigidBody *)bodies.Get (i))->Update ();
+    bodies.Get (i)->Update ();
 }
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
