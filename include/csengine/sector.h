@@ -123,6 +123,12 @@ private:
    */
   csSectorLightList lights;
 
+  /**
+   * This color stores the most recently set dynamic
+   * ambient color.
+   */
+  csColor dynamic_ambient_color;
+
   /// Engine handle.
   csEngine* engine;
 
@@ -483,6 +489,8 @@ public:
       { scfParent->ShineLights (mesh); }
     virtual void SetDynamicAmbientLight(const csColor& color)
       { scfParent->SetDynamicAmbientLight(color); }  
+    virtual csColor GetDynamicAmbientLight() const
+      { return scfParent->dynamic_ambient_color; }  
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
 #ifndef CS_USE_NEW_RENDERER

@@ -106,6 +106,9 @@ struct iSector : public iBase
   /// Sets dynamic ambient light for all things in the sector
   virtual void SetDynamicAmbientLight(const csColor& color) = 0;
 
+  /// Get the last set dynamic ambient light for this sector.
+  virtual csColor GetDynamicAmbientLight() const = 0;
+  
   /**
    * Calculate the bounding box of all objects in this sector.
    * This function is not very efficient as it will traverse all objects

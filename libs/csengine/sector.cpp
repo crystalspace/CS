@@ -131,6 +131,7 @@ csSector::csSector (csEngine *engine) :
   fog.enabled = false;
 #endif // CS_USE_NEW_RENDERER
   draw_busy = 0;
+  dynamic_ambient_color.Set(0,0,0);
   meshes.SetSector (this);
   lights.SetSector (this);
 }
@@ -895,6 +896,7 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
 void csSector::SetDynamicAmbientLight (const csColor& color)
 {
   iMeshList* ml = GetMeshes ();
+  dynamic_ambient_color = color;
   for (int i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* mesh = ml->Get (i);
