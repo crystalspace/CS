@@ -75,7 +75,7 @@ void csShaderGLPS1_NV::SetupState (csRenderMesh *mesh,
     // Check if it's statically linked
     csRef<csShaderVariable> lvar = variablemap[i].statlink;
     // If not, we check the stack
-    if (!lvar && (int)variablemap[i].name<stacks.Length ()
+    if (!lvar && (int)variablemap[i].name < (csStringID)stacks.Length ()
         && stacks[variablemap[i].name].Length () > 0)
       lvar = stacks[variablemap[i].name].Top ();
 

@@ -58,6 +58,7 @@ chronological order.
 	  "apidev" for online viewing or download.  This will save another
 	  100MB.  Finally, documentation offered for download is now only
 	  published in .tar.bz2 format (rather than .tar.bz2, .tgz, and .zip).
+	- John Harger fixed the warnings in glshader_ps1.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
