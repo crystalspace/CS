@@ -5,6 +5,10 @@ CSLIB.ROOT = $(SUBDIR_TOKENS) ;
 CSLIB.DECLARED = no ;
 
 ## CsLibAddFiles files, reparent
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Adds raw filenames from `files' to the master crystalspace.lib
+##   target.  `reparent' is a list of tokens representing the relative path
+##   from this directory down to the child directory.
 rule CsLibAddFiles
 {
   local files = $(1) ;
@@ -13,6 +17,13 @@ rule CsLibAddFiles
 }
 
 ## CsLibAddWild patterns, reparent, [ rejects ]
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Performs a wildcard for sources on behalf of the directory.
+##   Adds all discovered files to the master crystalspace.lib target.
+##   `patterns' is a list of wildcard patterns to fuel the search.  `reparent'
+##   is a list of tokens representing the relative path from this directory
+##   down to the child directory.  `rejects' is a list of files (rooted at this
+##   directory) which should not be given citizenship in crystalspace.lib.
 rule CsLibAddWild
 {
   local patterns = $(1) ;
@@ -28,6 +39,13 @@ rule CsLibAddWild
 }
 
 ## CsLibAddModule [ rejects ]
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Performs a wildcard for sources on behalf of the directory, and
+##   for a like-named directory in the public header tree. Adds all discovered
+##   files to the master crystalspace.lib target. Most child directories can
+##   simply invoke this rule with no arguments in order to become citizens of
+##   crystalspace.lib.  `rejects' is a list of files (rooted at this directory)
+##   which should not be given citizenship in crystalspace.lib.
 rule CsLibAddModule
 {
   local rejects = $(1) ;
