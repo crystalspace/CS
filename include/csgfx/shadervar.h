@@ -259,13 +259,6 @@ public:
   csShaderVariable *shaderVariable;
 };
 
-static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
-                                         csShaderVariableProxy const &item2)
-{
-  if (item1.Name < item2.Name) return -1;
-  else if (item1.Name > item2.Name) return 1;
-  else return 0;
-}
 
 static int ShaderVariableCompare (csShaderVariable* const &item1,
                                   csShaderVariable* const &item2)

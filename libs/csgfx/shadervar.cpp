@@ -20,6 +20,14 @@
 #include "cssysdef.h"
 #include "csgfx/shadervar.h"
 
+static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
+                                         csShaderVariableProxy const &item2)
+{
+  if (item1.Name < item2.Name) return -1;
+  else if (item1.Name > item2.Name) return 1;
+  else return 0;
+}
+
 
 csShaderVariable::csShaderVariable (csStringID name)
 : csRefCount (), Name (name), String(0), TextureHandValue(0), TextureWrapValue(0),
