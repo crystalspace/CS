@@ -37,9 +37,9 @@ chronological order.
 	  default.
 	- Jorrit fixed changing of an alternative renderloop in the engine.
 	- Jorrit fixed various places in CS where the result of a
-	  GetContentsValue() (for XML parsing) was stored but not copied.
-	  This is not valid since the string is not guaranteed to exist
-	  for a long time. The places I fixed are:
+	  GetContentsValue() (for XML parsing) was stored but not copied.  This
+	  is not valid since the string is not guaranteed to exist for a long
+	  time.  The places I fixed are:
 	  	- Parsing of 'priority' in main loader.
 		- Parsing of 'cullerp' in main loader.
 		- Parsing of 'type' for textures.
@@ -67,8 +67,8 @@ chronological order.
 	      ignored.
 	    - Added support for .mm Objective-C++ file extension.
 	    - Converted over to new build style where generated resources are
-	      placed in a cocoa2d-specific build directory, rather than directly
-	      in $(OUT).
+	      placed in a cocoa2d-specific build directory, rather than
+	      directly in $(OUT).
 	- Eric Sunshine fixed bugs in cgdriver2d.mak and glosx2d.mak where they
 	  were prefixing one extra $(SRCDIR)/ to several of the computed path
 	  containers.
