@@ -23,6 +23,8 @@ private:
   static void SetUser(void *sink, iAwsSource *source);
   static void Login(void *sink, iAwsSource *source);
 
+  static void FillListBox(void *sink, iAwsSource *source);
+
 public:
   awsTestSink();
   virtual ~awsTestSink();

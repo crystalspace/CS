@@ -32,6 +32,7 @@ awsTestSink::SetSink(iAwsSink *s)
    sink->RegisterTrigger("SetUserName", &SetUser);
    sink->RegisterTrigger("SetPassword", &SetPass);
    sink->RegisterTrigger("Login", &Login);
+   sink->RegisterTrigger("FillListBox", &FillListBox);
  }
 }
 
@@ -46,6 +47,58 @@ void
 awsTestSink::SetWindowManager(iAws *_wmgr)
 {
   wmgr=_wmgr;
+}
+
+void 
+awsTestSink::FillListBox(void *sk, iAwsSource *source)
+{
+  awsTestSink *sink = (awsTestSink *)sk;
+  iAwsComponent *comp = source->GetComponent();
+  
+  iAwsParmList *pl=0;
+
+  printf("awstest: Filling list box.\n");
+
+  if (sink->wmgr) 
+    pl = sink->wmgr->CreateParmList();
+  else
+    printf("awstest: window manager is null.\n");
+
+  if (pl==NULL)
+  {
+    printf("awstest: internal error, parameter list NULL.\n");
+    return;
+  }
+
+  // Setup first row
+  pl->AddString("text0", new scfString("Human"));
+
+  pl->AddString("text1", new scfString("Enabled"));
+  pl->AddBool("stateful1", true);
+
+  pl->AddString("text2", new scfString("Shenobi"));
+
+  // Add it into the list
+  comp->Execute("InsertItem", *pl);
+
+  pl->Clear();
+
+  //////////////////////////
+  // Setup second row
+  pl->AddString("text0", new scfString("Android"));
+
+  pl->AddString("text1", new scfString("Enabled"));
+  pl->AddBool("stateful1", true);
+  pl->AddBool("state1", true);
+
+  pl->AddString("text2", new scfString("Tenalt"));
+
+  // Add it into the list
+  comp->Execute("InsertItem", *pl);
+
+
+  pl->Clear();
+  pl->DecRef();
 }
 
 void 

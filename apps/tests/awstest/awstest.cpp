@@ -386,6 +386,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iAwsSink    *sink =aws->GetSinkMgr()->CreateSink(s);
 
   s->SetSink(sink);
+  s->SetWindowManager(aws);
+
   aws->GetSinkMgr()->RegisterSink("testButtonSink", sink);
 
   // now load preferences
@@ -400,7 +402,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (test)  test->Show();
   //if (test2) test2->Show();
   s->SetTestWin(test2);
-  s->SetWindowManager(aws);
+  
   /////////
   
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
