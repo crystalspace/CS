@@ -93,6 +93,7 @@ private:
   bool suspended;
   bool suspend_one_frame;
   cs_time main_start_time;
+  int num_frames;
 
   //=====
   // For fading.
@@ -263,6 +264,11 @@ public:
     }
     return NULL;
   }
+
+  /**
+   * Get average FPS upto now.
+   */
+  float GetFPS ();
 };
 
 #endif // DEMOSEQ_H

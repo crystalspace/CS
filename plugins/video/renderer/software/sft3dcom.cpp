@@ -103,10 +103,18 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 #define SCANPROC_MAP_ALPHA_ZFIL         0x19
 #define SCANPROC_MAP_ALPHA_ZUSE         0x1a
 #define SCANPROC_MAP_ALPHA_ZTEST        0x1b
+#define SCANPROC_TEX_FX_ZNONE           0x1c
+#define SCANPROC_TEX_FX_ZFIL            0x1d
+#define SCANPROC_TEX_FX_ZUSE            0x1e
+#define SCANPROC_TEX_FX_ZTEST           0x1f
+#define SCANPROC_MAP_FX_ZNONE           0x20
+#define SCANPROC_MAP_FX_ZFIL            0x21
+#define SCANPROC_MAP_FX_ZUSE            0x22
+#define SCANPROC_MAP_FX_ZTEST           0x23
 // these do not have "zuse" counterparts
-#define SCANPROC_ZFIL                   0x1c
-#define SCANPROC_FOG                    0x1d
-#define SCANPROC_FOG_VIEW               0x1e
+#define SCANPROC_ZFIL                   0x24
+#define SCANPROC_FOG                    0x25
+#define SCANPROC_FOG_VIEW               0x26
 
 // The following routines have a different prototype
 
@@ -444,6 +452,15 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_8_scan_map_alpha_zuse;
       ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = csScan_8_scan_map_alpha_ztest;
 
+      ScanProc [SCANPROC_TEX_FX_ZNONE] = csScan_8_scan_tex_fx_znone;
+      ScanProc [SCANPROC_TEX_FX_ZFIL] = csScan_8_scan_tex_fx_zfil;
+      ScanProc [SCANPROC_TEX_FX_ZUSE] = csScan_8_scan_tex_fx_zuse;
+      ScanProc [SCANPROC_TEX_FX_ZTEST] = csScan_8_scan_tex_fx_ztest;
+      ScanProc [SCANPROC_MAP_FX_ZNONE] = csScan_8_scan_map_fx_znone;
+      ScanProc [SCANPROC_MAP_FX_ZFIL] = csScan_8_scan_map_fx_zfil;
+      ScanProc [SCANPROC_MAP_FX_ZUSE] = csScan_8_scan_map_fx_zuse;
+      ScanProc [SCANPROC_MAP_FX_ZTEST] = csScan_8_scan_map_fx_ztest;
+
       ScanProc [SCANPROC_FOG] = csScan_8_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_8_scan_fog_view;
 
@@ -582,6 +599,31 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_map_alpha_ztest :
         csScan_16_565_scan_map_alpha_ztest;
+
+      ScanProc [SCANPROC_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_fx_znone :
+        csScan_16_565_scan_tex_fx_znone;
+      ScanProc [SCANPROC_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_fx_zfil :
+        csScan_16_565_scan_tex_fx_zfil;
+      ScanProc [SCANPROC_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_fx_zuse :
+        csScan_16_565_scan_tex_fx_zuse;
+      ScanProc [SCANPROC_TEX_FX_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_tex_fx_ztest :
+        csScan_16_565_scan_tex_fx_ztest;
+      ScanProc [SCANPROC_MAP_FX_ZNONE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_fx_znone :
+        csScan_16_565_scan_map_fx_znone;
+      ScanProc [SCANPROC_MAP_FX_ZFIL] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_fx_zfil :
+        csScan_16_565_scan_map_fx_zfil;
+      ScanProc [SCANPROC_MAP_FX_ZUSE] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_fx_zuse :
+        csScan_16_565_scan_map_fx_zuse;
+      ScanProc [SCANPROC_MAP_FX_ZTEST] = (pfmt.GreenBits == 5) ?
+        csScan_16_555_scan_map_fx_ztest :
+        csScan_16_565_scan_map_fx_ztest;
 
       ScanProc [SCANPROC_FOG] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_fog :
@@ -778,6 +820,15 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_32_scan_map_alpha_zfil;
       ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_32_scan_map_alpha_zuse;
       ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = csScan_32_scan_map_alpha_ztest;
+
+      ScanProc [SCANPROC_TEX_FX_ZNONE] = csScan_32_scan_tex_fx_znone;
+      ScanProc [SCANPROC_TEX_FX_ZFIL] = csScan_32_scan_tex_fx_zfil;
+      ScanProc [SCANPROC_TEX_FX_ZUSE] = csScan_32_scan_tex_fx_zuse;
+      ScanProc [SCANPROC_TEX_FX_ZTEST] = csScan_32_scan_tex_fx_ztest;
+      ScanProc [SCANPROC_MAP_FX_ZNONE] = csScan_32_scan_map_fx_znone;
+      ScanProc [SCANPROC_MAP_FX_ZFIL] = csScan_32_scan_map_fx_zfil;
+      ScanProc [SCANPROC_MAP_FX_ZUSE] = csScan_32_scan_map_fx_zuse;
+      ScanProc [SCANPROC_MAP_FX_ZTEST] = csScan_32_scan_map_fx_ztest;
 
       ScanProc [SCANPROC_FOG] = csScan_32_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_scan_fog_view;
@@ -1876,7 +1927,54 @@ texr_done:
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();
   csDrawScanline* dscan;
-  if (!poly.alpha || !Scan.bitmap2 || !ScanProc_Alpha || !do_alpha)
+  if (poly.mixmode != CS_FX_COPY)
+  {
+    int scan_index = Scan.bitmap2 ?
+    	SCANPROC_MAP_FX_ZNONE :
+	SCANPROC_TEX_FX_ZNONE;
+    if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
+    else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
+    else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
+    dscan = ScanProc [scan_index];
+    UInt mode = poly.mixmode;
+    Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
+    Scan.TexturePalette = tex_mm->GetColorMap ();
+    Scan.PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
+    Scan.BlendTable = NULL;
+    // array to select blend tables from
+    unsigned char **BlendingTable = Scan.BlendingTable; 
+    switch (mode & CS_FX_MASK_MIXMODE)
+    {
+      case CS_FX_ADD:
+        Scan.BlendTable = BlendingTable [BLENDTABLE_ADD];
+        break;
+      case CS_FX_MULTIPLY:
+        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY];
+        break;
+      case CS_FX_MULTIPLY2:
+        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY2];
+        break;
+      case CS_FX_ALPHA:
+      {
+        int alpha = mode & CS_FX_MASK_ALPHA;
+        if (alpha < 12)
+          mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
+        else if (alpha < 96)
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA25];
+        else if (alpha < 160)
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA50];
+        else if (alpha < 244)
+          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA75];
+        //else
+          // goto zfill_only; @@@ Not supported here!!!
+        break;
+      }
+      case CS_FX_TRANSPARENT:
+        //@@@ Not supported!
+        break;
+    }
+  }
+  else if (!poly.alpha || !Scan.bitmap2 || !ScanProc_Alpha || !do_alpha)
   {
     int scan_index = Scan.bitmap2 ? SCANPROC_MAP_ZNONE : SCANPROC_TEX_ZNONE;
     if (z_buf_mode == CS_ZBUF_FILL) scan_index++;

@@ -62,10 +62,6 @@ IMPLEMENT_IBASE (csPolyTexType)
   IMPLEMENTS_INTERFACE (iPolyTexType)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_IBASE_EXT (csPolyTexNone)
-  IMPLEMENTS_INTERFACE (iPolyTexNone)
-IMPLEMENT_IBASE_EXT_END
-
 IMPLEMENT_IBASE_EXT (csPolyTexFlat)
   IMPLEMENTS_INTERFACE (iPolyTexFlat)
 IMPLEMENT_IBASE_EXT_END
@@ -82,6 +78,7 @@ csPolyTexType::csPolyTexType ()
 {
   CONSTRUCT_IBASE (NULL);
   Alpha = 0;
+  MixMode = CS_FX_COPY;
 }
 
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
@@ -352,7 +349,7 @@ void csPolygon3D::SetTextureType (int type)
   switch (type)
   {
     case POLYTXT_NONE:
-      txt_info = new csPolyTexNone ();
+      txt_info = new csPolyTexType ();
       break;
     case POLYTXT_FLAT:
       txt_info = new csPolyTexFlat ();

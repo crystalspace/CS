@@ -47,73 +47,7 @@
 */
 
 #include "pixtype.inc"
-
-// Masks for accessing blending table. Since blending table expects a different
-// number of bits per color component (for example, in 32bpp mode we have
-// 6 bits per color component blending tables) we should strip off
-// unused bits from color component. Since we allow 2*SRC lighting, we actually
-// use one more bit per each component (to allow multiplication overflows).
-#undef PI_RM_BLEND
-#undef PI_GM_BLEND
-#undef PI_BM_BLEND
-#undef PI_RS_GOUTEX
-#undef PI_GS_GOUTEX
-#undef PI_BS_GOUTEX
-#undef PI_RM_GOUTEX
-#undef PI_GM_GOUTEX
-#undef PI_BM_GOUTEX
-#undef PI_RBB
-#undef PI_GBB
-#undef PI_BBB
-#undef PI_RBT_OFS
-#undef PI_GBT_OFS
-#undef PI_BBT_OFS
-
-#ifdef PI_R8G8B8
-#  define PI_RB_BLEND	6
-#  define PI_GB_BLEND	6
-#  define PI_BB_BLEND	6
-#else
-#  define PI_RB_BLEND	PI_RB
-#  define PI_GB_BLEND	PI_GB
-#  define PI_BB_BLEND	PI_BB
-#endif
-
-#define PI_RM_BLEND	(((2 << PI_RB_BLEND) - 1) << PI_RB_BLEND)
-#define PI_GM_BLEND	(((2 << PI_GB_BLEND) - 1) << PI_GB_BLEND)
-#define PI_BM_BLEND	(((2 << PI_BB_BLEND) - 1) << PI_BB_BLEND)
-
-#define PI_RS_DST_BLEND	(PI_RS + (PI_RB - PI_RB_BLEND))
-#define PI_GS_DST_BLEND	(PI_GS + (PI_GB - PI_GB_BLEND))
-#define PI_BS_DST_BLEND	(PI_BS + (PI_BB - PI_BB_BLEND))
-
-#define PI_RM_GOUTEX	((PI_RM >> PI_RS) << (24 - (PI_RB - PI_RB_BLEND)))
-#define PI_GM_GOUTEX	((PI_GM >> PI_GS) << (24 - (PI_GB - PI_GB_BLEND)))
-#define PI_BM_GOUTEX	((PI_BM >> PI_BS) << (24 - (PI_BB - PI_BB_BLEND)))
-
-#define PI_RS_GOUTEX	(24 - (PI_RB - PI_RB_BLEND))
-#define PI_GS_GOUTEX	(24 - (PI_GB - PI_GB_BLEND))
-#define PI_BS_GOUTEX	(24 - (PI_BB - PI_BB_BLEND))
-
-// In 5-6-5 and 8-bit indexed modes we'll need two blending tables:
-// one for 5-bit transformations and second for 6-bit transformations
-#if (PI_GB == 6)
-#  define PI_RBT_OFS	0
-#  define PI_GBT_OFS	32*64
-#  define PI_BBT_OFS	0
-#else
-#  define PI_RBT_OFS	0
-#  define PI_GBT_OFS	0
-#  define PI_BBT_OFS	0
-#endif
-
-#if defined (PI_INDEX8)
-#  define INV_COLORMAP(x) Scan.inv_cmap [x]
-#  define SCR_COLORMAP(x) Scan.GlobalCMap [x]
-#else
-#  define INV_COLORMAP(x) x
-#  define SCR_COLORMAP(x) x
-#endif
+#include "blend.inc"
 
 /*
     For Gouraud-shaded polys additional parameters r,g,b and deltas
@@ -171,3 +105,4 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #undef PI_FLAT
 #undef PI_BLEND
 #undef PI_CLAMP_RGB
+

@@ -438,7 +438,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
 
     CS_LOCAL_STATIC(G3DPolygonDPFX,g3dpolyfx);
 
-    csPolyTexNone *ns = poly->GetNoTexInfo ();
+    csPolyTexType *ns = poly->GetNoTexInfo ();
     csPolyTexFlat *fs = poly->GetFlatInfo ();
     csPolyTexGouraud *gs = poly->GetGouraudInfo ();
 
@@ -500,7 +500,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
       orig_triangle, po_colors != NULL);
     rview->GetGraphics3D ()->StartPolygonFX (g3dpolyfx.mat_handle,
-      ns->GetMixmode () | (po_colors ? CS_FX_GOURAUD : 0));
+      ns->GetMixMode () | (po_colors ? CS_FX_GOURAUD : 0));
     rview->CalculateFogPolygon (g3dpolyfx);
     rview->GetGraphics3D ()->DrawPolygonFX (g3dpolyfx);
     rview->GetGraphics3D ()->FinishPolygonFX ();
@@ -514,6 +514,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
       poly->GetMaterialWrapper ()->Visit ();
     g3dpoly.mat_handle = poly->GetMaterialHandle ();
     g3dpoly.inv_aspect = icam->GetInvFOV ();
+    g3dpoly.mixmode = poly->GetTextureTypeInfo ()->GetMixMode ();
 
     // We are going to use DrawPolygon.
     if (mirror)
@@ -587,6 +588,7 @@ void csPolygon2D::FillZBuf (iRenderView* rview, csPolygon3D* poly,
   iCamera* icam = rview->GetCamera ();
 
   CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
+  g3dpoly.mixmode = CS_FX_COPY;
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = icam->GetInvFOV ();
 

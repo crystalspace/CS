@@ -108,6 +108,7 @@ void DemoSequenceManager::Setup (const char* sequenceFileName)
   seqmgr->Resume ();
   suspended = false;
   main_start_time = seqmgr->GetMainTime ();
+  num_frames = 0;
   delete loader;
 }
 
@@ -163,6 +164,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
     Clear ();
     seqmgr->RunSequence (0, main_sequence);
     main_start_time = seqmgr->GetMainTime ();
+    num_frames = 0;
     return;
   }
 
@@ -172,6 +174,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
     Clear ();
     seqmgr->RunSequence (0, main_sequence);
     main_start_time = seqmgr->GetMainTime ();
+    num_frames = 0;
     seqmgr->TimeWarp (dt, false);
     return;
   }
@@ -188,6 +191,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 
 void DemoSequenceManager::Draw3DEffects (iGraphics3D* g3d)
 {
+  num_frames++;
   cs_time current_time = seqmgr->GetMainTime ();
   if (!suspended)
   {
@@ -650,4 +654,12 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
   meshRotation.Push (mrot);
 }
 
+float DemoSequenceManager::GetFPS ()
+{
+  cs_time cur_time = seqmgr->GetMainTime ();
+  cs_time dt = cur_time-main_start_time;
+  return (float (num_frames) / float (dt)) * 1000.;
+}
+
 //-----------------------------------------------------------------------------
+

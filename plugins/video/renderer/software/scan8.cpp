@@ -36,6 +36,9 @@
 
 #include "scanxx.inc"
 
+#define PI_INDEX8
+#include "scanxxfx.inc"
+
 //------------------------------------------------------------------
 
 #ifndef NO_scan_map_filt_zfil

@@ -310,6 +310,10 @@ SCAN_ROUTINE (8, map_key)
 SCAN_ROUTINE (8, tex_alpha)
 /// Draw one horizontal scanline (alphamap with lighting).
 SCAN_ROUTINE (8, map_alpha)
+/// Draw one horizontal scanline (fx and no lighting).
+SCAN_ROUTINE (8, tex_fx)
+/// Draw one horizontal scanline (fx with lighting).
+SCAN_ROUTINE (8, map_fx)
 
 /// Draw one horizontal scanline (lighting and filtering).
 csDrawScanline csScan_8_scan_map_filt_zfil;
@@ -382,6 +386,12 @@ SCAN_ROUTINE (16_565, tex_alpha)
 /// Draw one horizontal scanline (alphamap with lighting).
 SCAN_ROUTINE (16_555, map_alpha)
 SCAN_ROUTINE (16_565, map_alpha)
+/// Draw one horizontal scanline (fx and no lighting).
+SCAN_ROUTINE (16_555, tex_fx)
+SCAN_ROUTINE (16_565, tex_fx)
+/// Draw one horizontal scanline (fx with lighting).
+SCAN_ROUTINE (16_555, map_fx)
+SCAN_ROUTINE (16_565, map_fx)
 
 /// Draw one horizontal scanline (lighting and filtering).
 csDrawScanline csScan_16_scan_map_filt_ztest;
@@ -478,6 +488,10 @@ SCAN_ROUTINE (32, map_key)
 SCAN_ROUTINE (32, tex_alpha)
 /// Draw one horizontal scanline (alphamap with lighting).
 SCAN_ROUTINE (32, map_alpha)
+/// Draw one horizontal scanline (fx and no lighting).
+SCAN_ROUTINE (32, tex_fx)
+/// Draw one horizontal scanline (fx with lighting).
+SCAN_ROUTINE (32, map_fx)
 
 /// Same as above but do bilinear filtering (Z-fill)
 csDrawScanline csScan_32_scan_map_filt2_znone;

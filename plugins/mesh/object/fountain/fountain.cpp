@@ -67,7 +67,7 @@ void csFountainMeshObject::SetupObject ()
     for (int i=0 ; i<number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle(i)->SetMixmode(MixMode);
+      GetParticle(i)->SetMixMode(MixMode);
       RestartParticle(i, (fall_time / float(number)) * float(number-i));
       bbox.AddBoundingVertexSmart( part_pos[i] );
     }

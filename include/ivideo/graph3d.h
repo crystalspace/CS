@@ -119,7 +119,10 @@ struct G3DPolygonDPFX
   /// Use fog info?
   bool use_fog;
 
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  /**
+   * Invert aspect ratio that was used to perspective project the
+   * vertices (1/fov)
+   */
   float inv_aspect;
 
   /// The material handle as returned by iTextureManager.
@@ -168,6 +171,9 @@ struct G3DPolygonDP : public G3DPolygonDFP
    * 0 means opaque, 255 is completely transparent.
    */
   int alpha;
+
+  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
+  UInt mixmode;
 
   /// Z value (in camera space) of vertex[0].
   float z_value;

@@ -39,6 +39,7 @@
 #include "iengine/statlght.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
+#include "iengine/ptextype.h"
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
@@ -150,6 +151,9 @@ void Demo::SetupFactories ()
   LoadFactory ("shuttle", "/data/demo/objects/shuttle",
   	"crystalspace.mesh.object.sprite.3d",
 	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("th_ship", "/data/demo/objects/th_ship",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
   LoadFactory ("fighter", "/data/demo/objects/fighter",
   	"crystalspace.mesh.object.sprite.3d",
 	"crystalspace.mesh.loader.factory.sprite.3d");
@@ -219,6 +223,7 @@ void Demo::SetupMaterials ()
   LoadMaterial ("starcross", "/data/demo/textures/starcross2.jpg");
   LoadMaterial ("fighter", "/data/demo/textures/camo.png");
   LoadMaterial ("shuttle", "/data/demo/textures/alien.jpg");
+  LoadMaterial ("th_ship", "/data/demo/textures/shiptex.jpg");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -241,76 +246,6 @@ static void SetTexSpace (iPolygon3D* poly,
   texulen += ulen * 2. / float(size);
   texvlen += vlen * 2. / float(size);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
-}
-
-void Demo::CreateStarWall (csTransform* trans)
-{
-  iMeshWrapper* stars;
-  iSurfaceState* ss;
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsF00",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-200, -200, 200));
-  ss->SetScale (200, 200);
-  ss->SetResolution (4, 4);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  if (trans) stars->HardTransform (*trans);
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsF10",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (0, -200, 200));
-  ss->SetScale (200, 200);
-  ss->SetResolution (4, 4);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  if (trans) stars->HardTransform (*trans);
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsF01",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (-200, 0, 200));
-  ss->SetScale (200, 200);
-  ss->SetResolution (4, 4);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  if (trans) stars->HardTransform (*trans);
-
-  stars = engine->CreateMeshObject (
-  	engine->FindMeshFactory ("surf_factory"), "StarsF11",
-  	room, csVector3 (0, 0, 0));
-  stars->GetFlags ().Set (CS_ENTITY_CAMERA);
-  stars->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
-  stars->SetZBufMode (CS_ZBUF_NONE);
-  ss = QUERY_INTERFACE (stars->GetMeshObject (), iSurfaceState);
-  ss->SetTopLeftCorner (csVector3 (0, 0, 200));
-  ss->SetScale (200, 200);
-  ss->SetResolution (4, 4);
-  ss->SetMaterialWrapper (engine->FindMaterial ("stars"));
-  ss->SetLighting (false);
-  ss->SetMixMode (CS_FX_ADD);
-  ss->DecRef ();
-  if (trans) stars->HardTransform (*trans);
 }
 
 void Demo::SetupSector ()
@@ -390,18 +325,86 @@ void Demo::SetupSector ()
   //====================================================================
   // Create the stars.
   //====================================================================
-  csTransform trans;
-  CreateStarWall (NULL);	// Front
-  trans = csTransform (csYRotMatrix3 (M_PI), csVector3 (0));
-  CreateStarWall (&trans);	// Back
-  trans = csTransform (csYRotMatrix3 (M_PI/2), csVector3 (0));
-  CreateStarWall (&trans);	// Right
-  trans = csTransform (csYRotMatrix3 (-M_PI/2), csVector3 (0));
-  CreateStarWall (&trans);	// Left
-  trans = csTransform (csXRotMatrix3 (M_PI/2), csVector3 (0));
-  CreateStarWall (&trans);	// Up
-  trans = csTransform (csXRotMatrix3 (-M_PI/2), csVector3 (0));
-  CreateStarWall (&trans);	// Down
+  walls = engine->CreateSectorWallsMesh (room, "stars");
+  walls->GetFlags ().Set (CS_ENTITY_CAMERA);
+  walls->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
+  walls->SetZBufMode (CS_ZBUF_NONE);
+  walls_state = QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+
+  size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
+  p = walls_state->CreatePolygon ("d");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (-size, -size, size));
+  p->CreateVertex (csVector3 (size, -size, size));
+  p->CreateVertex (csVector3 (size, -size, -size));
+  p->CreateVertex (csVector3 (-size, -size, -size));
+  SetTexSpace (p, 256, p->GetVertex (2), p->GetVertex (3),
+  	1.*size, p->GetVertex (1), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  iPolyTexType* pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  p = walls_state->CreatePolygon ("u");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (-size, size, -size));
+  p->CreateVertex (csVector3 (size, size, -size));
+  p->CreateVertex (csVector3 (size, size, size));
+  p->CreateVertex (csVector3 (-size, size, size));
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+  	1.*size, p->GetVertex (3), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  p = walls_state->CreatePolygon ("f");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (-size, size, size));
+  p->CreateVertex (csVector3 (size, size, size));
+  p->CreateVertex (csVector3 (size, -size, size));
+  p->CreateVertex (csVector3 (-size, -size, size));
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+	1.*size, p->GetVertex (3), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  p = walls_state->CreatePolygon ("r");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (size, size, size));
+  p->CreateVertex (csVector3 (size, size, -size));
+  p->CreateVertex (csVector3 (size, -size, -size));
+  p->CreateVertex (csVector3 (size, -size, size));
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+  	1.*size, p->GetVertex (3), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  p = walls_state->CreatePolygon ("l");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (-size, size, -size));
+  p->CreateVertex (csVector3 (-size, size, size));
+  p->CreateVertex (csVector3 (-size, -size, size));
+  p->CreateVertex (csVector3 (-size, -size, -size));
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+  	1.*size, p->GetVertex (3), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  p = walls_state->CreatePolygon ("b");
+  p->SetMaterial (engine->FindMaterial ("stars"));
+  p->CreateVertex (csVector3 (size, size, -size));
+  p->CreateVertex (csVector3 (-size, size, -size));
+  p->CreateVertex (csVector3 (-size, -size, -size));
+  p->CreateVertex (csVector3 (size, -size, -size));
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+	1.*size, p->GetVertex (3), 1.*size);
+  p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
+  pt = p->GetPolyTexType ();
+  pt->SetMixMode (CS_FX_ADD);
+
+  walls_state->DecRef ();
   //====================================================================
 
   iStatLight* light;
@@ -536,6 +539,23 @@ void Demo::SetupObjects ()
 
   spr3d = engine->CreateMeshObject (
   	engine->FindMeshFactory ("shuttle"), "Shuttle",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
+  spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->DecRef ();
+  tail = LoadObject ("ShuttleTail",
+  	"/data/demo/objects/shuttletail",
+  	"crystalspace.mesh.object.fire",
+	"crystalspace.mesh.loader.fire",
+	NULL, csVector3 (0));
+  tail->SetZBufMode (CS_ZBUF_TEST);
+  spr3d->AddChild (tail);
+
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("th_ship"), "Shuttle2",
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);

@@ -708,12 +708,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         {
           UInt mixmode = ParseMixmode (params);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-          iPolyTexNone* notex = QUERY_INTERFACE (ptt, iPolyTexNone);
-	  if (notex)
-	  {
-	    notex->SetMixmode (mixmode);
-	    notex->DecRef ();
-	  }
+	  ptt->SetMixMode (mixmode);
           if (mixmode & CS_FX_MASK_ALPHA)
             poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
           break;

@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+30-Apr-2001
+	- Added support for FX mode scanline drawing to DrawPolygon.
+	  So you can now use CS_FX_ADD (for example) with both lighted
+	  and unlighted polygon drawing. Only CS_FX_TRANSPARENT is not
+	  supported.
+	- Moved MixMode from csPolyTexNone to csPolyTexType.
+	- Removed csPolyTexNone and iPolyTexNone. This functionality is now
+	  in csPolyTexType and iPolyTexType.
+	- The changes above mean that MIXMODE() keyword for thing loader
+	  will now work for all polygons.
+	- Added FPS counter to csdemo. Currently displays on stdout.
+	- Modified csdemo to make the stars using a single tiled polygon
+	  with CS_FX_ADD mode (using the above new routines) instead of
+	  a surface mesh object. This increases speed in the software renderer
+	  from 10FPS to 14FPS!
+	- Also added support for new FX polygon drawing in OpenGL/DrawPolygon.
+	- Consistently renamed all GetMixmode() and SetMixmode() functions
+	  to GetMixMode() and SetMixMode().
 29-Apr-2001
 	- Fixed the python plugin again.
 	- Fixed a bug that caused stray particle systems to be visible

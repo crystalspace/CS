@@ -59,7 +59,7 @@ void csRainMeshObject::SetupObject ()
     for (int i=0 ; i < number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle (i)->SetMixmode (MixMode);
+      GetParticle (i)->SetMixMode (MixMode);
       pos = GetRandomDirection (size, rainbox.Min ()) ;
       GetParticle (i)->SetPosition (pos);
       part_pos[i] = pos;

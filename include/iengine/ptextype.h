@@ -59,7 +59,7 @@ struct iPolygon3D;
  */
 #define POLYTXT_LIGHTMAP	3
 
-SCF_VERSION (iPolyTexType, 0, 0, 1);
+SCF_VERSION (iPolyTexType, 0, 0, 2);
 
 /**
  * Kind of texturing that is used for a 3D polygon.
@@ -67,20 +67,10 @@ SCF_VERSION (iPolyTexType, 0, 0, 1);
  */
 struct iPolyTexType : public iBase
 {
-};
-
-SCF_VERSION (iPolyTexNone, 0, 0, 1);
-
-/**
- * Kind of texturing that is used for a 3D polygon which
- * has no texture mapping.
- */
-struct iPolyTexNone : public iBase
-{
-  /// Sets the mode that is used for DrawPolygonFX.
-  virtual void SetMixmode (UInt m) = 0;
-  /// Gets the mode that is used for DrawPolygonFX.
-  virtual UInt GetMixmode () = 0;
+  /// Sets the mode that is used for DrawPolygon.
+  virtual void SetMixMode (UInt m) = 0;
+  /// Gets the mode that is used for DrawPolygon.
+  virtual UInt GetMixMode () = 0;
 };
 
 SCF_VERSION (iPolyTexFlat, 0, 0, 1);

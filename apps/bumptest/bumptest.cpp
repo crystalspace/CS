@@ -152,12 +152,10 @@ bool BumpTest::InitProcDemo ()
     "POLYTXT_LIGHTMAP"};
   printf("PolyTexType = %s\n", conv[p->GetTextureType()]);
   printf("MaterialWrap = %x  Handle %x\n", (int)imatBump, (int)imatBump->GetMaterialHandle());
-  if(!p->GetPolyTexType())
-    printf("No texture type info!\n");
-  iPolyTexNone *ipn = QUERY_INTERFACE(p->GetPolyTexType(), iPolyTexNone);
+  iPolyTexType *ipn = p->GetPolyTexType();
   if(!ipn) printf("No PolyTexNone info!\n");
-  else ipn->SetMixmode(CS_FX_MULTIPLY2);
-  if(ipn) ipn->SetMixmode(CS_FX_COPY);
+  else ipn->SetMixMode(CS_FX_MULTIPLY2);
+  if(ipn) ipn->SetMixMode(CS_FX_COPY);
   */
 
   ////// copy of bumps for debug

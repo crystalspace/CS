@@ -53,8 +53,8 @@ struct iParticle : public iBase
   virtual void AddColor (const csColor& col) = 0;
   /// Scale particle by this factor. 
   virtual void ScaleBy (float factor) = 0;
-  /// Set the Mixmode for the particle.
-  virtual void SetMixmode (UInt mode) = 0;
+  /// Set the MixMode for the particle.
+  virtual void SetMixMode (UInt mode) = 0;
   /// Rotate the particle is some particle dependent manner, in radians.
   virtual void Rotate (float angle) = 0;
   /**

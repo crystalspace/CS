@@ -62,7 +62,6 @@ private:
   void FileWrite (iFile* file, char *str, ...);
 
   void DrawEditInfo ();
-  void CreateStarWall (csTransform* trans);
 
 public:
   Demo ();

@@ -181,7 +181,7 @@ public:
     virtual void SetColor (const csColor& col);
     virtual void AddColor (const csColor& col);
     virtual void ScaleBy (float factor);
-    virtual void SetMixmode (UInt mode)
+    virtual void SetMixMode (UInt mode)
     {
       scfParent->MixMode = mode;
     }

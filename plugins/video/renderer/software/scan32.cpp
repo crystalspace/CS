@@ -35,6 +35,9 @@
 
 #include "scanxx.inc"
 
+#define PI_R8G8B8
+#include "scanxxfx.inc"
+
 //------------------------------------------------------------------
 
 #ifndef NO_scan_fog

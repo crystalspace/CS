@@ -57,10 +57,7 @@ public:
 class TestOp : public StandardOp
 {
 public:
-  virtual void Do (cs_time dt)
-  {
-    printf ("dt=%ld\n", dt); fflush (stdout);
-  }
+  virtual void Do (cs_time dt);
 };
 
 /**

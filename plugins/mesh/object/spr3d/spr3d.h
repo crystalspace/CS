@@ -933,10 +933,10 @@ public:
   iMaterialWrapper* GetMaterial () { return cstxt; }
 
   /// Sets the mode that is used, when drawing that sprite.
-  void SetMixmode (UInt m) { MixMode = m; }
+  void SetMixMode (UInt m) { MixMode = m; }
 
   /// Gets the mode that is used, when drawing that sprite.
-  UInt GetMixmode () { return MixMode; }
+  UInt GetMixMode () { return MixMode; }
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }
@@ -1170,11 +1170,11 @@ public:
     }
     virtual void SetMixMode (UInt mode)
     {
-      scfParent->SetMixmode (mode);
+      scfParent->SetMixMode (mode);
     }
     virtual UInt GetMixMode ()
     {
-      return scfParent->GetMixmode ();
+      return scfParent->GetMixMode ();
     }
     virtual void SetLighting (bool l)
     {

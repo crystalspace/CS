@@ -44,6 +44,13 @@
 
 #include "scanxx.inc"
 
+#define PI_R5G6B5
+#include "scanxxfx.inc"
+#undef  PI_R5G6B5
+#define PI_R5G5B5
+#include "scanxxfx.inc"
+#undef  PI_R5G5B5
+
 //----------------------------------------------------------------------------//
 
 #ifndef NO_scan_map_filt_znone

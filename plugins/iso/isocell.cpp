@@ -127,10 +127,10 @@ static void renderfunc(csIsoCellNode *node, void *data)
 {
   iIsoRenderView* rview = (iIsoRenderView*)data;
   if( (rview->GetRenderPass()==CSISO_RENDERPASS_MAIN)
-    && ((node->drawpart->GetMixmode()&CS_FX_MASK_MIXMODE) == CS_FX_COPY))
+    && ((node->drawpart->GetMixMode()&CS_FX_MASK_MIXMODE) == CS_FX_COPY))
     node->drawpart->Draw((iIsoRenderView*)data);
   else if( (rview->GetRenderPass()==CSISO_RENDERPASS_FG)
-    && ((node->drawpart->GetMixmode()&CS_FX_MASK_MIXMODE) != CS_FX_COPY))
+    && ((node->drawpart->GetMixMode()&CS_FX_MASK_MIXMODE) != CS_FX_COPY))
     node->drawpart->Draw((iIsoRenderView*)data);
 }
 

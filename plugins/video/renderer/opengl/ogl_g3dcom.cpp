@@ -563,6 +563,63 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   // glClear(GL_COLOR_BUFFER_BIT);
 }
 
+static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
+{
+  // Note: In all explanations of Mixing:
+  // Color: resulting color
+  // SRC:   Color of the texel (content of the texture to be drawn)
+  // DEST:  Color of the pixel on screen
+  // Alpha: Alpha value of the polygon
+  bool enable_blending = true;
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+    case CS_FX_MULTIPLY:
+      // Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      break;
+    case CS_FX_MULTIPLY2:
+      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ADD:
+      // Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_ONE, GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_ALPHA:
+      // Color = Alpha * DEST + (1-Alpha) * SRC
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_TRANSPARENT:
+      // Color = 1 * DEST + 0 * SRC
+      m_alpha = 0.0f;
+      glBlendFunc (GL_ZERO, GL_ONE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+    case CS_FX_COPY:
+    default:
+      enable_blending = has_alpha;
+      // Color = 0 * DEST + 1 * SRC = SRC
+      m_alpha = 1.0f;
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      break;
+  }
+
+  if (enable_blending)
+    glEnable (GL_BLEND);
+  else
+    glDisable (GL_BLEND);
+  return m_alpha;
+}
+
+
 #define SMALL_D 0.01
 
 /**
@@ -701,116 +758,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
-#if 0
-  // @@@ This section uses display lists to do the setup for DrawPolygon.
-  // I expected this to be faster but it is not. It is slightly (but not
-  // much) slower than the normal stuff. Why?
-  static GLuint list = 0, listtxt = 0;
-  static GLuint prev_txt = 0;
-  static int prev_z_buf_mode = -1;
-  if (list == 0)
-  {
-    // Precompute five display lists for the five possible Z buffer
-    // modes.
-    list = glGenLists (5);
-    glNewList (list, GL_COMPILE);
-    glShadeModel (GL_FLAT);
-    glEnable (GL_TEXTURE_2D);
-    glDisable (GL_DEPTH_TEST);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glDisable (GL_BLEND);
-    glColor4f (flat_r, flat_g, flat_b, 0.);
-    glEndList ();
-
-    glNewList (list+1, GL_COMPILE);
-    glShadeModel (GL_FLAT);
-    glEnable (GL_TEXTURE_2D);
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_ALWAYS);
-    glDepthMask (GL_TRUE);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glDisable (GL_BLEND);
-    glColor4f (flat_r, flat_g, flat_b, 0.);
-    glEndList ();
-
-    glNewList (list+2, GL_COMPILE);
-    glShadeModel (GL_FLAT);
-    glEnable (GL_TEXTURE_2D);
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_GREATER);
-    glDepthMask (GL_FALSE);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glDisable (GL_BLEND);
-    glColor4f (flat_r, flat_g, flat_b, 0.);
-    glEndList ();
-
-    glNewList (list+3, GL_COMPILE);
-    glShadeModel (GL_FLAT);
-    glEnable (GL_TEXTURE_2D);
-    glEnable (GL_DEPTH_TEST);
-    glDepthFunc (GL_GREATER);
-    glDepthMask (GL_TRUE);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glDisable (GL_BLEND);
-    glColor4f (flat_r, flat_g, flat_b, 0.);
-    glEndList ();
-
-    listtxt = glGenLists (1);
-  }
-
-  if (m_renderstate.textured && (poly_alpha <= 0) && !tex_transp)
-  {
-    // If we have the most common case (normal lightmapped polygon)
-    // we can use a premade display list to execute our setup stuff.
-    if (prev_txt != texturehandle || prev_z_buf_mode != z_buf_mode)
-    {
-      glNewList (listtxt, GL_COMPILE);
-      glCallList (list+z_buf_mode);
-      glBindTexture (GL_TEXTURE_2D, texturehandle);
-      glEndList ();
-      prev_txt = texturehandle;
-      prev_z_buf_mode = z_buf_mode;
-    }
-    glCallList (listtxt);
-  }
-  else
-  {
-    glShadeModel (GL_FLAT);
-    if (m_renderstate.textured)
-      glEnable (GL_TEXTURE_2D);
-    else
-    {
-      glDisable (GL_TEXTURE_2D);
-      UByte r, g, b;
-      poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
-      flat_r = BYTE_TO_FLOAT (r);
-      flat_g = BYTE_TO_FLOAT (g);
-      flat_b = BYTE_TO_FLOAT (b);
-    }
-    SetGLZBufferFlags ();
-
-    if ((poly_alpha > 0) || tex_transp)
-    {
-      // Transparency.
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      glEnable (GL_BLEND);
-      if (poly_alpha > 0)
-        glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
-      else
-        glColor4f (flat_r, flat_g, flat_b, 1.0);
-    }
-    else
-    {
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      glDisable (GL_BLEND);
-      glColor4f (flat_r, flat_g, flat_b, 0.);
-    }
-
-    glBindTexture (GL_TEXTURE_2D, texturehandle);
-  }
-
-#else
   // The old code (still faster).
   glShadeModel (GL_FLAT);
   if (m_renderstate.textured)
@@ -827,7 +774,14 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   SetGLZBufferFlags ();
 
-  if ((poly_alpha > 0) || tex_transp)
+  if (poly.mixmode != CS_FX_COPY)
+  {
+    float alpha = 1.0f - BYTE_TO_FLOAT (poly_alpha);
+    bool has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
+    alpha = SetupBlend (poly.mixmode, alpha, has_alpha);
+    glColor4f (flat_r, flat_g, flat_b, alpha);
+  }
+  else if ((poly_alpha > 0) || tex_transp)
   {
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -835,9 +789,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     if (poly_alpha > 0)
       glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
     else
-    {
       glColor4f (flat_r, flat_g, flat_b, 1.0);
-    }
   }
   else
   {
@@ -847,7 +799,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   }
 
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
-#endif
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
@@ -1162,52 +1113,7 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
   else
     glShadeModel (GL_FLAT);
 
-  // Note: In all explanations of Mixing:
-  // Color: resulting color
-  // SRC:   Color of the texel (content of the texture to be drawn)
-  // DEST:  Color of the pixel on screen
-  // Alpha: Alpha value of the polygon
-  bool enable_blending = true;
-  switch (mode & CS_FX_MASK_MIXMODE)
-  {
-    case CS_FX_MULTIPLY:
-      // Color = SRC * DEST +   0 * SRC = DEST * SRC
-      m_alpha = 1.0f;
-      glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      break;
-    case CS_FX_MULTIPLY2:
-      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-      m_alpha = 1.0f;
-      glBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      break;
-    case CS_FX_ADD:
-      // Color = 1 * DEST + 1 * SRC = DEST + SRC
-      m_alpha = 1.0f;
-      glBlendFunc (GL_ONE, GL_ONE);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      break;
-    case CS_FX_ALPHA:
-      // Color = Alpha * DEST + (1-Alpha) * SRC
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      break;
-    case CS_FX_TRANSPARENT:
-      // Color = 1 * DEST + 0 * SRC
-      m_alpha = 0.0f;
-      glBlendFunc (GL_ZERO, GL_ONE);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      break;
-    case CS_FX_COPY:
-    default:
-      enable_blending = has_alpha;
-      // Color = 0 * DEST + 1 * SRC = SRC
-      m_alpha = 1.0f;
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      break;
-  }
+  m_alpha = SetupBlend (mode, m_alpha, has_alpha);
 
   m_textured = (texturehandle != 0);
   if (m_textured)
@@ -1217,11 +1123,6 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
   }
   else
     glDisable (GL_TEXTURE_2D);
-
-  if (enable_blending)
-    glEnable (GL_BLEND);
-  else
-    glDisable (GL_BLEND);
 
   SetGLZBufferFlags ();
 }
@@ -1945,7 +1846,14 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
   glActiveTextureARB (GL_TEXTURE0_ARB);
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
-  if ((poly_alpha > 0) || tex_transp)
+  if (poly.mixmode != CS_FX_COPY)
+  {
+    float alpha = 1.0f - BYTE_TO_FLOAT (poly_alpha);
+    bool has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
+    alpha = SetupBlend (poly.mixmode, alpha, has_alpha);
+    glColor4f (flat_r, flat_g, flat_b, alpha);
+  }
+  else if ((poly_alpha > 0) || tex_transp)
   {
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);

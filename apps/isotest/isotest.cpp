@@ -157,7 +157,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   csVector3 startpos(10,0,5);
   player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
   player->SetMaterialWrapper(snow);
-  player->SetMixmode(CS_FX_ADD);
+  player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);
   player->SetGridChangeCallback(PlayerGridChange, (void*)this);
 
@@ -173,7 +173,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   sprite = engine->CreateFrontSprite(scenelight->GetPosition() -
     csVector3(0,1.0,0), 2.0, 2.0);
   sprite->SetMaterialWrapper(halo);
-  sprite->SetMixmode(CS_FX_ADD);
+  sprite->SetMixMode(CS_FX_ADD);
   world->AddSprite(sprite);
 
   // add a dynamic light for the player, above players head.

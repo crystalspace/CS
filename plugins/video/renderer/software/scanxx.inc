@@ -24,6 +24,7 @@
     are expected to be defined prior to including this file:
 
 	SCAN8/SCAN16/SCAN32	The number of bits per pixel (8, 16, 32)
+	COLORMAP
 */
 
 #if defined (SCAN8)
@@ -527,6 +528,9 @@ transp_pixel:								\
   }									\
   while (_dest <= _destend)
 #include "scanln.inc"
+
+#undef PIXTYPE
+#undef SCAN_BPP
 
 #endif // NO_scan_map_key_ztest
 

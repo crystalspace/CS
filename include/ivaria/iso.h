@@ -394,9 +394,9 @@ struct iIsoSprite : public iBase
   /// Get the materialwrapper
   virtual iMaterialWrapper* GetMaterialWrapper() const = 0;
   /// Set the mixmode
-  virtual void SetMixmode(UInt mode) = 0;
+  virtual void SetMixMode (UInt mode) = 0;
   /// Get the mixmode
-  virtual UInt GetMixmode() const = 0;
+  virtual UInt GetMixMode () const = 0;
 
   /// Draw using given renderview
   virtual void Draw(iIsoRenderView *rview) = 0;

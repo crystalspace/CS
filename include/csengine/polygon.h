@@ -88,6 +88,8 @@ struct csPolygonLightInfo
  */
 class csPolyTexType : public iPolyTexType
 {
+  friend class csPolygon3D;
+
 protected:
   /**
    * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
@@ -97,6 +99,13 @@ protected:
    */
   ushort Alpha;
 
+  /**
+   * MixMode to use for drawing this polygon (plus alpha value
+   * which is stored separately). The GetMixMode() function will
+   * overlap both variables to get one compound value.
+   */
+  uint MixMode;
+
   /// Common constructor for derived classes
   csPolyTexType ();
   /// Destructor is virtual to be able to delete derived objects
@@ -104,46 +113,20 @@ protected:
 
 public:
   /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () = 0;
+  virtual int GetTextureType () { return POLYTXT_NONE; }
 
   /// Get the alpha value for this polygon
   int GetAlpha () { return Alpha; }
   /// Set the alpha value for this polygon
   void SetAlpha (int a) { Alpha = a; }
 
-  DECLARE_IBASE;
-};
-
-/**
- * Structure containing all required information
- * for polygons without texture mapping.
- */
-class csPolyTexNone : public csPolyTexType, public iPolyTexNone
-{
-  friend class csPolygon3D;
-
-protected:
-  /**
-   * Mixmode to use for drawing this polygon (plus alpha value
-   * which is stored separately). The GetMixMode() function will
-   * overlap both variables to get one compound value.
-   */
-  uint MixMode;
-
-  /// Constructor
-  csPolyTexNone () : csPolyTexType () { MixMode = CS_FX_COPY; }
-
-public:
-  /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () { return POLYTXT_NONE; }
-
   /// Sets the mode that is used for DrawPolygonFX.
-  virtual void SetMixmode (UInt m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
+  virtual void SetMixMode (UInt m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
 
   /// Gets the mode that is used for DrawPolygonFX.
-  virtual UInt GetMixmode () { return (MixMode | Alpha); }
+  virtual UInt GetMixMode () { return (MixMode | Alpha); }
 
-  DECLARE_IBASE_EXT (csPolyTexType);
+  DECLARE_IBASE;
 };
 
 /**
@@ -151,7 +134,7 @@ public:
  * flat-shaded (do not mix with flat-colored!) texture mapped
  * (or flat-shaded) polygons.
  */
-class csPolyTexFlat : public csPolyTexNone, public iPolyTexFlat
+class csPolyTexFlat : public csPolyTexType, public iPolyTexFlat
 {
   friend class csPolygon3D;
 
@@ -164,7 +147,7 @@ private:
 
 protected:
   /// Constructor.
-  csPolyTexFlat () : csPolyTexNone () { uv_coords = NULL; }
+  csPolyTexFlat () : csPolyTexType () { uv_coords = NULL; }
 
   /// Destructor.
   virtual ~csPolyTexFlat ();
@@ -208,7 +191,7 @@ public:
   /// Get the pointer to the vertex uv coordinates.
   virtual csVector2 *GetUVCoords () { return uv_coords; }
 
-  DECLARE_IBASE_EXT (csPolyTexNone);
+  DECLARE_IBASE_EXT (csPolyTexType);
 };
 
 /**
@@ -624,15 +607,15 @@ public:
   }
 
   /**
-   * This is a conveniance function to get the "none" texturing type
+   * This is a conveniance function to get the "type" texturing type
    * information structure. It returns NULL only if the polygon texture
    * type is lightmapped, because all other texturing types are subclassed
    * from NONE.
    */
-  csPolyTexNone *GetNoTexInfo ()
+  csPolyTexType *GetNoTexInfo ()
   {
     if (txt_info && txt_info->GetTextureType () != POLYTXT_LIGHTMAP)
-      return (csPolyTexNone *)txt_info;
+      return (csPolyTexType *)txt_info;
     else
       return NULL;
   }

@@ -137,7 +137,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
 void csParticleSystem::SetupMixMode ()
 {
   for (int i = 0 ; i < particles.Length () ; i++)
-    GetParticle (i)->SetMixmode (MixMode);
+    GetParticle (i)->SetMixMode (MixMode);
 }
 
 

@@ -148,7 +148,7 @@ protected:
   int Gamma;
 
   /// scan_xxx routines
-  csDrawScanline* ScanProc [0x1f];
+  csDrawScanline* ScanProc [0x28];
   /// scan_pi_xxx routines
   csDrawPIScanline* ScanProcPI [0x1c];
   /// scan_pi_xxx routines
