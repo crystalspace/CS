@@ -123,14 +123,16 @@ uint32 csKDTree::global_timestamp = 1;
 
 #define KDTREE_MAX 100000.
 
-csKDTree::csKDTree (csKDTree* parent)
+csBlockAllocator<csKDTree> csKDTree::tree_nodes (1000);
+csBlockAllocator<csKDTreeChild> csKDTree::tree_children (1000);
+
+csKDTree::csKDTree ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
 
   child1 = 0;
   child2 = 0;
-  csKDTree::parent = parent;
   objects = 0;
   num_objects = max_objects = 0;
   disallow_distribute = false;
@@ -166,14 +168,22 @@ void csKDTree::Clear ()
     objects[i]->RemoveLeaf (this);
     // Remove this object if there are no more leafs refering to it.
     if (objects[i]->num_leafs == 0)
-      delete objects[i];
+      tree_children.Free (objects[i]);
   }
   delete[] objects;
   objects = 0;
   num_objects = 0;
   max_objects = 0;
-  delete child1; child1 = 0;
-  delete child2; child2 = 0;
+  if (child1)
+  {
+    tree_nodes.Free (child1);
+    child1 = 0;
+  }
+  if (child2)
+  {
+    tree_nodes.Free (child2);
+    child2 = 0;
+  }
   disallow_distribute = false;
   SetUserObject (0);
   estimate_total_objects = 0;
@@ -369,7 +379,7 @@ void csKDTree::AddObject (const csBox3& bbox, csKDTreeChild* obj)
 
 csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
 {
-  csKDTreeChild* obj = new csKDTreeChild ();
+  csKDTreeChild* obj = tree_children.Alloc ();
   obj->object = object;
   obj->bbox = bbox;
   AddObject (bbox, obj);
@@ -393,7 +403,7 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
 void csKDTree::RemoveObject (csKDTreeChild* object)
 {
   UnlinkObject (object);
-  delete object;
+  tree_children.Free (object);
 }
 
 void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
@@ -505,8 +515,10 @@ void csKDTree::Distribute ()
     }
     if (!disallow_distribute)
     {
-      child1 = new csKDTree (this);
-      child2 = new csKDTree (this);
+      child1 = tree_nodes.Alloc ();
+      child1->SetParent (this);
+      child2 = tree_nodes.Alloc ();
+      child2->SetParent (this);
       DistributeLeafObjects ();
       CS_ASSERT (num_objects == 0);
       // Update the bounding box of this node.
@@ -600,8 +612,8 @@ void csKDTree::FlattenTo (csKDTree* node)
   c2->objects = 0;
   c2->num_objects = 0;
   c2->max_objects = 0;
-  delete c1;
-  delete c2;
+  tree_nodes.Free (c1);
+  tree_nodes.Free (c2);
   estimate_total_objects = num_objects;
 }
 

@@ -23,6 +23,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "csutil/scfstr.h"
+#include "csutil/blockallocator.h"
 #include "iutil/dbghelp.h"
 
 struct iGraphics3D;
@@ -128,6 +129,9 @@ public:
 class csKDTree : public iBase
 {
 private:
+  static csBlockAllocator<csKDTree> tree_nodes;
+  static csBlockAllocator<csKDTreeChild> tree_children;
+
   csKDTree* child1;		// If child1 is not 0 then child2 will
   csKDTree* child2;		// also be not 0.
   csKDTree* parent;		// 0 if this is the root.
@@ -214,9 +218,11 @@ private:
 
 public:
   /// Create a new empty KD-tree.
-  csKDTree (csKDTree* parent);
+  csKDTree ();
   /// Destroy the KD-tree.
   virtual ~csKDTree ();
+  /// Set the parent.
+  void SetParent (csKDTree* p) { parent = p; }
 
   /// Make the tree empty.
   void Clear ();

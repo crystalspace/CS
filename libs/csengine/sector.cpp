@@ -61,7 +61,7 @@ bool csSector:: do_radiosity = false;
 csSectorLightList::csSectorLightList ()
 {
   sector = 0;
-  kdtree = new csKDTree (0);
+  kdtree = new csKDTree ();
 }
 
 csSectorLightList::~csSectorLightList ()

@@ -10,6 +10,11 @@ chronological order.
 	- Jorrit removed obsolete bits64.h from Dynavis.
 	- Jorrit performed additional micro-optimizations in the coverage
 	  routines of Dynavis.
+	- Jorrit optimized the kdtree considerably by using a block allocator.
+	- Jorrit fixed a bug in Dynavis by moving history culling AFTER
+	  frustum culling. Otherwise Dynavis would sometimes cull wrong because
+	  objects outside of frustum kept contributing to culling. This
+	  could happen if you have sudden changes in camera position.
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory

@@ -193,7 +193,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csKDTree (0);
+  kdtree = new csKDTree ();
 
   return true;
 }

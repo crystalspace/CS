@@ -260,7 +260,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
-  kdtree = new csKDTree (0);
+  kdtree = new csKDTree ();
 
   tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
   csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
@@ -1050,7 +1050,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   // Before we do anything else we test history culling (if enabled)
   // and also if the position of the camera is inside the bounding box.
   // Finally we test view frustum culling.
-  if (do_cull_history && hist->vis_cnt >= history_frame_cnt)
+  if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox,
+	data->frustum, frustum_mask, new_mask2))
+  {
+    obj->MarkInvisible (INVISIBLE_FRUSTUM);
+    goto end;
+  }
+  else if (do_cull_history && hist->vis_cnt >= history_frame_cnt)
   {
     obj->MarkVisibleForHistory (current_vistest_nr, history_frame_cnt);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
@@ -1064,12 +1070,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
     cnt_visible++;
     vis = true;
-  }
-  else if (do_cull_frustum && !csIntersect3::BoxFrustum (obj_bbox,
-	data->frustum, frustum_mask, new_mask2))
-  {
-    obj->MarkInvisible (INVISIBLE_FRUSTUM);
-    goto end;
   }
 
   // If we come here we know that either the object is already marked
@@ -2158,7 +2158,7 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 
 csPtr<iString> csDynaVis::Debug_UnitTest ()
 {
-  csKDTree* kdtree = new csKDTree (0);
+  csKDTree* kdtree = new csKDTree ();
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
@@ -2894,7 +2894,7 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
 {
   csTicks rc = 0;
 
-  csKDTree* kdtree = new csKDTree (0);
+  csKDTree* kdtree = new csKDTree ();
   csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
