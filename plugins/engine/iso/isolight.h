@@ -19,6 +19,7 @@
 #ifndef __ISOLIGHT_H__
 #define __ISOLIGHT_H__
 
+#include "csutil/csvector.h"
 #include "ivaria/iso.h"
 #include "iengine/light.h"
 
@@ -91,6 +92,7 @@ public:
 class csIsoFakeLight : public iLight {
   csIsoLight *isolight;
   csFlags flags;
+  csVector light_cb_vector;
 
 public:
   SCF_DECLARE_IBASE;
@@ -124,6 +126,34 @@ public:
   { return isolight->GetAttenuation(d); }
   virtual csFlags& GetFlags () { return flags; }
   virtual bool IsDynamic() { return false; }
+  //----------------------------------------------------------------------
+  // Callbacks
+  //----------------------------------------------------------------------
+  virtual void SetLightCallback (iLightCallback* cb)
+  {
+    light_cb_vector.Push (cb);
+    cb->IncRef ();
+  }
+
+  virtual void RemoveLightCallback (iLightCallback* cb)
+  {
+    int idx = light_cb_vector.Find (cb);
+    if (idx != -1)
+    {
+      light_cb_vector.Delete (idx);
+      cb->DecRef ();
+    }
+  }
+
+  virtual int GetLightCallbackCount () const
+  {
+    return light_cb_vector.Length ();
+  }
+  
+  virtual iLightCallback* GetLightCallback (int idx) const
+  {
+    return (iLightCallback*)light_cb_vector.Get (idx);
+  }
 };
 
 #endif

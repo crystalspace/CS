@@ -160,6 +160,17 @@ const csColor &csLight::Light::GetColor ()
   return scfParent->GetColor ();
 }
 
+void csLight::SetColor (const csColor& col) 
+{
+  int i;
+  for (i = 0; i < light_cb_vector.Length (); i++)
+  {
+    ((iLightCallback *)light_cb_vector[i])->OnColorChange(col);
+  }
+
+  color = col; 
+}
+
 void csLight::Light::SetColor (const csColor &col)
 {
   scfParent->SetColor (col);
