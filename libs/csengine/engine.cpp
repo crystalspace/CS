@@ -2162,6 +2162,8 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   if (!fact) return NULL;
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
+  type->DecRef ();
+  fact->DecRef ();
   mesh_factories.Push (mfactwrap);
   iMeshFactoryWrapper* imfw = QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
   imfw->DecRef ();
