@@ -258,33 +258,43 @@ public:
     virtual void AddToLayout(iAwsComponent *cmp, iAwsComponentNode* settings)
     { comp->AddToLayout(cmp, settings); }
 
+    /// Set component can focus
     virtual void SetFocusable (bool _focusable)
 		{ comp->SetFocusable(_focusable); }
 
+    /// Returns component can focus
     virtual bool Focusable ()
 		{ return comp->Focusable(); }
 
+    /// Return component is focused
     virtual bool isFocused ()
 		{ return comp->isFocused(); }
 
+    /// Sets component focused
     virtual void SetFocus ()
 		{ comp->SetFocus(); }
 
+    /// Unsets component focused
     virtual void UnsetFocus ()
 		{ comp->UnsetFocus(); }
 
+    /// Add child to parent tab order
     virtual bool AddToTabOrder (iAwsComponent *cmp)
 		{ return comp->AddToTabOrder(cmp); }
 
+    /// Returns next component in tab order
     virtual iAwsComponent *TabNext (iAwsComponent *cmp)
 		{ return comp->TabNext (cmp); }
 
+    /// Returns previous component in tab order
     virtual iAwsComponent *TabPrev (iAwsComponent *cmp)
 		{ return comp->TabPrev (cmp); }
 
+    /// Returns tab order length
     virtual int GetTabLength ()
 		{ return comp->GetTabLength (); }
 
+    /// Return component by tabindex
     virtual iAwsComponent *GetTabComponent (int index)
 		{ return comp->GetTabComponent (index); }
 
@@ -483,9 +493,11 @@ public:
     virtual void SetTopChild(iAwsComponent* child)
     { comp->SetTopChild(child); }
 
+    /// Triggered when a child becomes focused
     virtual void OnSetFocus()
     { comp->OnSetFocus(); }
 
+    /// Triggered when a child looses focus
     virtual void OnUnsetFocus()
     { comp->OnUnsetFocus(); }
 };
