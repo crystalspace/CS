@@ -40,6 +40,25 @@ chronological order.
 	  correct fix would be to re-write this code completely, since it is
 	  unnecessarily obfuscated and convoluted, and about three times as
 	  long as it needs to be.)
+	- Eric Sunshine upgraded csString so that it makes a distinction
+	  between a null-string and a zero-length string.  This distinction is
+	  now clearly documented.  Client code can check for these conditions
+	  in the normal fashion by invoking csString::GetData() or operator
+	  char const*() to retrieve a C-string representation of the string.
+	  If the result is zero, then it is a null-string.  If the result is
+	  non-zero but csString::Length() returns zero, then it is a
+	  zero-length string.  This means that existing code in external
+	  projects which incorrectly relied upon the broken, indeterminate, and
+	  undocumented accidental null-string vending of the past can now rely
+	  upon the behavior as supported and deterministic.  The new
+	  convenience method csString::GetDataSafe() will always return a valid
+	  C-string, even if the underlying csString represents a null-string
+	  (in which case a zero-length C-string "" will be returned).  This
+	  means that the result of GetDataSafe() can be used directly without
+	  performing a null check.  Fixed several csString methods which would
+	  crash when the underlying representation was a null-string.  Also,
+	  completely overhauled the remaining csString and iString
+	  documentation.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only

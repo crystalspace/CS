@@ -172,6 +172,9 @@ public:
   /// Check if two strings are equal
   virtual bool operator == (const iString &iStr) const;
 
+  /// Check if two strings are not equal
+  virtual bool operator != (const iString &iStr) const;
+
   /// Convert string to lowercase.
   virtual void Downcase();
 

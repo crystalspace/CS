@@ -24,27 +24,28 @@
 #include "csextern.h"
 #include "snprintf.h"
 
-/** 
- * Define CSSTRING_BUGGY_NULL_RETURN if your code relies upon the old buggy
- * behavior where csString::GetData() and operator char* sometimes incorrectly
- * and indeterminately returned a null pointer when the string was empty
- * instead of a zero-length string.  Do not rely upon this backward-
- * compatibility hack to be present in future release; it is intended only as a
- * temporary transitional aid for projects which relied upon the buggy behavior
- */
-#ifdef CSSTRING_BUGGY_NULL_RETURN
-#define CSSTRING_RETURN_DATA(X,F) (X)
-#else
-#define CSSTRING_RETURN_DATA(X,F) ((X) != 0 ? (X) : (F))
-#endif
-
 /**
- * This is a string class with a range of useful operators and typesafe
- * overloads.  May contain arbitary binary data, including null bytes.
- * Guarantees that a null-terminator always follows the last stored character,
- * thus you can safely use the return value from GetData() and `operator char
- * const*()' in calls to functions expecting C strings.  The implicit null
- * terminator is not included in the character count returned by Length().
+ * This is a string class with a range of useful operators and type-safe
+ * overloads.  Strings may contain arbitary binary data, including null bytes.
+ * It also guarantees that a null-terminator always follows the last stored
+ * character, thus you can safely use the return value from GetData() and
+ * `operator char const*()' in calls to functions expecting C strings.  The
+ * implicit null terminator is not included in the character count returned by
+ * Length().
+ *
+ * Like a typical C character string pointer, csString can also represent a
+ * null pointer.  This allows a non-string to be distinguished from an empty
+ * (zero-length) string.  The csString will represent a null-pointer in the
+ * following cases:
+ * <ul>
+ * <li>When constructed with no arguments (the default constructor).
+ * <li>When constructed with an explicit null-pointer.
+ * <li>When assigned a null-pointer via operator=((char const*)0).
+ * <li>After an invocation of Replace((char const*)0).
+ * <li>After invocation of csString::Free() or any method which is documented
+ *     as invoking Free() as a side-effect, such as Reclaim().
+ * <li>After invocation of csString::Detach().
+ * </ul>
  */
 class CS_CSUTIL_EXPORT csString
 {
@@ -72,10 +73,11 @@ protected:
 public:
   /**
    * Advise the string that it should allocate enough space to hold up to
-   * NewSize characters.  After calling this method, the string's capacity will
-   * be at least NewSize + 1 (one for the implicit null terminator).  Never
-   * shrinks capacity.  If you need to actually reclaim memory, then use Free()
-   * or Reclaim().
+   * NewSize characters.
+   * \remarks After calling this method, the string's capacity will be at least
+   *   NewSize + 1 (one for the implicit null terminator).  Never shrinks
+   *   capacity.  If you need to actually reclaim memory, then use Free() or
+   *   Reclaim().
    */
   void SetCapacity (size_t NewSize);
 
@@ -85,10 +87,10 @@ public:
 
   /**
    * Advise the string that it should grow by approximately this many bytes
-   * when more space is required.  This value is only a suggestion.  The actual
-   * value by which it grows may be rounded up or down to an
-   * implementation-dependent allocation multiple.  This method turns off
-   * exponential growth.
+   * when more space is required.
+   * \remarks This value is only a suggestion.  The actual value by which it
+   *   grows may be rounded up or down to an implementation-dependent
+   *   allocation multiple.  This method turns off exponential growth.
    */
   void SetGrowsBy(size_t);
 
@@ -97,8 +99,8 @@ public:
   { return GrowBy; }
 
   /**
-   * Tell the string to re-size its buffer exponentially as needed.  If set to
-   * true, the GetGrowsBy() setting is ignored.
+   * Tell the string to re-size its buffer exponentially as needed.
+   * \remarks If set to true, the GetGrowsBy() setting is ignored.
    */
   void SetGrowsExponentially(bool b)
   { GrowExponentially = b; }
@@ -107,45 +109,103 @@ public:
   bool GetGrowsExponentially() const
   { return GrowExponentially; }
 
-  /// Free the memory allocated for the string
+  /**
+   * Free the memory allocated for the string.
+   * \remarks Following a call to this method, invocations of GetData() and
+   *   'operator char const*' will return a null pointer (until some new
+   *   content is added to the string).
+   */
   void Free ();
 
-  /// Truncate the string to length Len.  Returns a reference to itself.
+  /**
+   * Truncate the string.
+   * \param Len The number of characters to which the string should be
+   *   truncated (possibly 0).
+   * \return Reference to itself.
+   * \remarks Will only make a string shorter; will never extend it.
+   *   This method does not reclaim memory; it merely shortens the string,
+   *   which means that Truncate(0) is a handy method of clearing the string,
+   *   without the overhead of slow heap management.  This may be important if
+   *   you want to re-use the same string many times over.  If you need to
+   *   reclaim memory after truncating the string, then invoke Reclaim().
+   *   GetData() and 'operator char const*' will return a non-null zero-length
+   *   string if you truncate the string to 0 characters, unless the string
+   *   had already represented a null-pointer, in which case it will continue
+   *   to represent a null-pointer after truncation.
+   */
   csString& Truncate (size_t Len);
 
   /**
-   * Set string buffer capacity to exactly hold the current content.  Returns a
-   * reference to itself.
+   * Set string buffer capacity to hold exactly the current content.
+   * \return Reference to itself.
+   * \remarks If the string length is greater than zero, then the buffer's
+   *   capacity will be adjusted to exactly that size.  If the string length is
+   *   zero, then this is equivalent to an invocation of Free(), which means
+   *   that GetData() and 'operator char const*' will return a null pointer
+   *   after reclamation.
    */
   csString& Reclaim ();
 
   /**
-   * Clear the string (so that it contains only a null terminator).  Returns a
-   * reference to itself.
+   * Clear the string (so that it contains only a null terminator).
+   * \return Reference to itself.
+   * \remarks This is rigidly equivalent to Truncate(0), but more idiomatic in
+   *   terms of human language.
    */
   csString& Clear ()
   { return Truncate (0); }
 
-  /// Get a pointer to the null-terminated character array.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   * \remarks See the class description for a discussion about how and when the
+   *   string will represent a null-pointer.
+   */
   char const* GetData () const
-  { return CSSTRING_RETURN_DATA(Data,""); }
+  { return Data; }
 
   /**
-   * Get a pointer to the null-terminated character array.  Warning: this is a
-   * non-const pointer, so use this function with care!
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   * \remarks See the class description for a discussion about how and when the
+   *   string will represent a null-pointer.
+   * \warning This returns a non-const pointer, so use this function with care!
+   * \deprecated Use the 'const' version of GetData() instead.
    */
   char* GetData ()
-  { return CSSTRING_RETURN_DATA(Data,(char*)""); }
+  { return Data; }
 
-  /// Query string length.  Length does not include null terminator.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array.
+   * \remarks Unlike GetData(), this will always return a valid, non-null
+   *   C-string, even if the underlying representation is that of a
+   *   null-pointer (in which case, it will return a zero-length C-string.
+   *   This is a handy convenience which makes it possible to use the result
+   *   directly without having to perform a null check first.
+   */
+   char const* GetDataSafe() const
+   { return Data != 0 ? Data : ""; }
+
+  /**
+   * Query string length.
+   * \return The string length.
+   * \remarks The returned length does not count the implicit null terminator.
+   */
   size_t Length () const
   { return Size; }
 
-  /// Check if string is empty
+  /**
+   * Check if string is empty.
+   * \return True if the string is empty; false if it is not.
+   * \remarks This is rigidly equivalent to the expression 'Length() == 0'.
+   */
   bool IsEmpty () const
   { return (Size == 0); }
 
-  /// Get a reference to n'th character.
+  /// Get a modifiable reference to n'th character.
   char& operator [] (size_t n)
   {
     CS_ASSERT (n < Size);
@@ -160,8 +220,10 @@ public:
   }
 
   /**
-   * Set character at position `n'.  Does not expand string if `n' is greater
-   * than length of string.
+   * Set the n'th character.
+   * \remarks The n'th character position must be a valid position in the
+   *   string.  You can not expand the string by setting a character beyond the
+   *   end of string.
    */
   void SetAt (size_t n, const char c)
   {
@@ -169,91 +231,121 @@ public:
     Data [n] = c;
   }
 
-  /// Get character at n'th position.
+  /// Get the n'th character.
   char GetAt (size_t n) const
   {
     CS_ASSERT (n < Size);
     return Data [n];
   }
 
-  /// Delete Count characters at starting Pos.  Returns a reference to itself.
+  /**
+   * Delete a range of characters from the string.
+   * \param Pos Beginning of range to be deleted (zero-based).
+   * \param Count Number of characters to delete.
+   * \return Reference to itself.
+   */
   csString& DeleteAt (size_t Pos, size_t Count = 1);
 
   /**
-   * Insert another string into this one at position Pos.  Returns a reference
-   * to itself.
+   * Insert another string into this one.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param Str String to insert.
+   * \return Reference to itself.
    */
-  csString& Insert (size_t Pos, const csString&);
+  csString& Insert (size_t Pos, const csString& Str);
 
   /**
-   * Insert another string into this one at position iPos.  Returns a reference
-   * to itself.
+   * Insert another string into this one.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param Str String to insert.
+   * \return Reference to itself.
    */
-  csString& Insert (size_t iPos, const char *);
+  csString& Insert (size_t Pos, const char* Str);
 
   /**
-   * Insert a character into this string at position Pos.  Returns a reference
-   * to itself.
+   * Insert another string into this one.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param C Character to insert.
+   * \return Reference to itself.
    */
-  csString& Insert (size_t Pos, const char);
+  csString& Insert (size_t Pos, char C);
 
   /**
-   * Overlay another string onto a part of this string.  Returns a reference to
-   * itself.
+   * Overlay another string onto a part of this string.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param Str String which will be overlayed atop this string.
+   * \return Reference to itself.
+   * \remarks The target string will grow as necessary to accept the new
+   *   string.
    */
-  csString& Overwrite (size_t iPos, const csString&);
+  csString& Overwrite (size_t Pos, const csString& Str);
 
   /**
-   * Append a null-terminated string to this one.  If Count is -1, then the
-   * entire string is appended.  Otherwise, only Count characters from the
-   * string are appended.  Returns a reference to itself.
+   * Append a null-terminated C-string to this one.
+   * \param Str String which will be appended.
+   * \param Count Number of characters from Str to append; if -1 (the default),
+   *   then all characters from Str will be appended.
+   * \return Reference to itself.
    */
-  csString& Append (const char*, size_t Count = (size_t)-1);
+  csString& Append (const char* Str, size_t Count = (size_t)-1);
 
   /**
-   * Append a string to this one.  If Count is -1, then the entire string is
-   * appended.  Otherwise, only Count characters from the string are appended.
-   * Returns a reference to itself.
+   * Append a string to this one. 
+   * \param Str String which will be appended.
+   * \param Count Number of characters from Str to append; if -1 (the default),
+   *   then all characters from Str will be appended.
+   * \return Reference to itself.
    */
-  csString& Append (const csString &iStr, size_t Count = (size_t)-1);
+  csString& Append (const csString& Str, size_t Count = (size_t)-1);
 
-  /// Append a signed character to this string.  Returns a reference to itself.
+  /**
+   * Append a signed character to this string.
+   * \return Reference to itself.
+   */
   csString& Append (char c)
   { char s[2]; s[0] = c; s[1] = '\0'; return Append(s); }
 
   /**
-   * Append an unsigned character to this string.  Returns a reference to
-   * itself.
+   * Append an unsigned character to this string.
+   * \return Reference to itself.
    */
   csString& Append (unsigned char c)
   { return Append(char(c)); }
 
   /**
-   * Copy and return a portion of this string.  The substring runs from `start'
-   * for `len' characters.
+   * Copy and return a portion of this string.
+   * \param start Start position of slice (zero-based).
+   * \param len Number of characters in slice.
+   * \return The indicated string slice.
    */
   csString Slice (size_t start, size_t len) const;
 
   /**
-   * Copy a portion of this string.  The result is placed in `sub'.  The
-   * substring runs from `start' for `len' characters.  Use this method instead
-   * of Slice() for cases where you expect to extract many substrings in a
-   * tight loop, and want to avoid the overhead of allocation of a new string
-   * for each operation.  You can keep passing in the same `sub' for each
-   * invocation, thus avoiding creation of a new string object.
+   * Copy a portion of this string.
+   * \param sub Strign which will receive the indicated substring copy.
+   * \param start Start position of slice (zero-based).
+   * \param len Number of characters in slice.
+   * \remarks Use this method instead of Slice() for cases where you expect to
+   *   extract many substrings in a tight loop, and want to avoid the overhead
+   *   of allocation of a new string object for each operation.  Simply re-use
+   *   'sub' for each operation.
    */
   void SubString (csString& sub, size_t start, size_t len) const;
 
   /**
-   * Find first character 'c' from position 'p'.
-   * If the character cannot be found, this function returns (size_t)-1
+   * Find the first occurrence of a character in the string.
+   * \param c Character to locate.
+   * \param p Start position of search (default 0).
+   * \return First position of character, or (size_t)-1 if not found.
    */
   size_t FindFirst (char c, size_t p = 0) const;
 
   /**
-   * Find last character 'c', counting backwards from position 'p'. Default
-   * position is the end of the string. If the character cannot be found, this
-   * function returns (size_t)-1
+   * Find the last occurrence of a character in the string.
+   * \param c Character to locate.
+   * \param p Start position of reverse search.  Specify (size_t)-1 if you want
+   *   the search to begin at the very end of string.
+   * \return Last position of character, or (size_t)-1 if not found.
    */
   size_t FindLast (char c, size_t p = (size_t)-1) const;
 
@@ -270,31 +362,31 @@ public:
 #undef STR_APPEND
 
 #if !defined(CS_USE_FAKE_BOOL_TYPE)
-  /// Append a boolean (as a number -- 1 or 0) to this string
+  /// Append a boolean (as a number -- 1 or 0) to this string.
   csString& Append (bool b) { return Append (b ? "1" : "0"); }
 #endif
 
   /**
-   * Replace contents of this string with the contents of another.  If Count
-   * is -1, then use the entire replacement string.  Otherwise, use Count
-   * characters from the replacement string.  Returns a reference to itself.
+   * Replace contents of this string with the contents of another.
+   * \param Str String from which new content of this string will be copied.
+   * \param Count Number of characters to copy.  If (size_t)-1 is specified,
+   *   then all characters will be copied.
+   * \return Reference to itself.
+   * \remarks This string will represent a null-pointer after replacement if
+   *   and only if Str represents a null-pointer.
    */
-  csString& Replace (const csString& Str, size_t Count = (size_t)-1)
-  {
-    Size = 0;
-    return Append (Str, Count);
-  }
+  csString& Replace (const csString& Str, size_t Count = (size_t)-1);
 
   /**
-   * Replace contents of this string with the contents of another.  If Count
-   * is -1, then use the entire replacement string.  Otherwise, use Count
-   * characters from the replacement string.  Returns a reference to itself.
+   * Replace contents of this string with the contents of another.
+   * \param Str String from which new content of this string will be copied.
+   * \param Count Number of characters to copy.  If (size_t)-1 is specified,
+   *   then all characters will be copied.
+   * \return Reference to itself.
+   * \remarks This string will represent a null-pointer after replacement if
+   *   and only if Str is a null pointer.
    */
-  csString& Replace (const char* Str, size_t Count = (size_t)-1)
-  {
-    Size = 0;
-    return Append (Str, Count);
-  }
+  csString& Replace (const char* Str, size_t Count = (size_t)-1);
 
 #define STR_REPLACE(TYPE) \
 csString& Replace (TYPE s) { Size = 0; return Append(s); }
@@ -313,7 +405,12 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #endif
 #undef STR_REPLACE
 
-  /// Check if two strings are equal
+  /**
+   * Check if another string is equal to this one.
+   * \param iStr Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
   bool Compare (const csString& iStr) const
   {
     if (&iStr == this)
@@ -326,11 +423,21 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
     return (memcmp (Data, iStr.GetData (), Size) == 0);
   }
 
-  /// Check if a null-terminated string is equal to this string.
+  /**
+   * Check if a null-terminated C- string is equal to this string.
+   * \param iStr Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
   bool Compare (const char* iStr) const
   { return (strcmp (Data ? Data : "", iStr) == 0); }
 
-  /// Compare two strings ignoring case
+  /**
+   * Check if another string is equal to this one.
+   * \param iStr Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-insensitive.
+   */
   bool CompareNoCase (const csString& iStr) const
   {
     if (&iStr == this)
@@ -343,28 +450,45 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
     return (strncasecmp (Data, iStr.GetData (), Size) == 0);
   }
 
-  /// Compare ignoring case with a null-terminated string
+  /**
+   * Check if a null-terminated C- string is equal to this string.
+   * \param iStr Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-insensitive.
+   */
   bool CompareNoCase (const char* iStr) const
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
-  /// Create an empty csString object
+  /**
+   * Create an empty csString object.
+   * \remarks The newly constructed string represents a null-pointer.
+   */
   csString () : Data (0), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
     GrowExponentially (false) {}
 
   /**
-   * Create a csString object and reserve space for at least Length
-   * characters.
+   * Create a csString object and reserve space for at least Length characters.
+   * \remarks The newly constructed string represents a non-null zero-length
+   *   string.
    */
   csString (size_t Length) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { SetCapacity (Length); }
 
-  /// Copy constructor.
+  /**
+   * Copy constructor.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if the template string represented a null-pointer.
+   */
   csString (const csString& copy) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
-  /// Create a csString object from a null-terminated C string.
+  /**
+   * Create a csString object from a null-terminated C string.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if the input argument is a null-pointer.
+   */
   csString (const char* src) : Data (0), Size (0), MaxSize (0),
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (src); }
@@ -379,39 +503,62 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
     GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append ((char) c); }
 
-  /// Destroy a csString object
+  /// Destroy the csString.
   virtual ~csString ();
 
-  /// Get a copy of this string
+  /**
+   * Get a copy of this string.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if this string represents a null-pointer.
+   */
   csString Clone () const
   { return csString (*this); }
 
-  /// Trim leading whitespace.  Returns a reference to itself.
+  /**
+   * Trim leading whitespace.
+   * \return Reference to itself.
+   * \remarks This is equivalent to Truncate(n) where 'n' is the last
+   *   non-whitespace character, or zero if the string is composed entirely of
+   *   whitespace.
+   */
   csString& LTrim();
 
-  /// Trim trailing whitespace.  Returns a reference to itself.
+  /**
+   * Trim trailing whitespace.
+   * \return Reference to itself.
+   * \remarks This is equivalent to DeleteAt(0,n) where 'n' is the first
+   *   non-whitespace character, or Lenght() if the string is composed entirely
+   *   of whitespace.
+   */
   csString& RTrim();
 
-  /// Trim leading and trailing whitespace.  Returns a reference to itself.
+  /**
+   * Trim leading and trailing whitespace.
+   * \return Reference to itself.
+   * \remarks This is equivalent to LTrim() followed by RTrim().
+   */
   csString& Trim();
 
   /**
    * Trim leading and trailing whitespace, and collapse all internal
-   * whitespace to a single space.  Returns a reference to itself.
+   * whitespace to a single space.
+   * \return Reference to itself.
    */
   csString& Collapse();
 
   /**
-   * Format this string using sprintf() formatting directives.  Automatically
-   * allocates sufficient memory to hold result.  Newly formatted string
-   * overwrites previous string value.  Returns a reference to itself.
+   * Format this string using sprintf()-style formatting directives.
+   * \return Reference to itself.
+   * \remarks Automatically allocates sufficient memory to hold result.  Newly
+   *   formatted string replaces previous string value.
    */
   csString& Format(const char* format, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Format this string using sprintf() formatting directives in a va_list.
-   * Automatically allocates sufficient memory to hold result.  Newly formatted
-   * string overwrites previous string value.  Returns a reference to itself.
+   * \return Reference to itself.
+   * \remarks Automatically allocates sufficient memory to hold result.  Newly
+   *   formatted string replaces previous string value.
    */
   csString& FormatV(const char* format, va_list args);
 
@@ -444,13 +591,17 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #undef STR_FORMAT_FLOAT
 
   /**
-   * Pad to a specified size with leading characters (default: space).  Returns
-   * a reference to itself.
+   * Pad to a specified size with leading characters.
+   * \param NewSize Size to which the string should grow.
+   * \param PadChar Character with which to pad the string (default is space).
+   * \return Reference to itself.
+   * \remarks Never shortens the string.  If NewSize is less than or equal to
+   *   Length(), nothing happens.
    */
-  csString& PadLeft (size_t iNewSize, char iChar=' ');
+  csString& PadLeft (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadLeft().
-  csString AsPadLeft (size_t iNewSize, char iChar=' ') const;
+  csString AsPadLeft (size_t NewSize, char PadChar = ' ') const;
 
   // Return a new left-padded string representation of a basic type.
 #define STR_PADLEFT(TYPE) \
@@ -473,13 +624,17 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #undef STR_PADLEFT
 
   /**
-   * Pad to a specified size with trailing characters (default: space).
-   * Returns a reference to itself.
+   * Pad to a specified size with trailing characters.
+   * \param NewSize Size to which the string should grow.
+   * \param PadChar Character with which to pad the string (default is space).
+   * \return Reference to itself.
+   * \remarks Never shortens the string.  If NewSize is less than or equal to
+   *   Length(), nothing happens.
    */
-  csString& PadRight (size_t iNewSize, char iChar=' ');
+  csString& PadRight (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadRight().
-  csString AsPadRight (size_t iNewSize, char iChar=' ') const;
+  csString AsPadRight (size_t NewSize, char PadChar = ' ') const;
 
   // Return a new right-padded string representation of a basic type.
 #define STR_PADRIGHT(TYPE) \
@@ -502,13 +657,20 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 #undef STR_PADRIGHT
 
   /**
-   * Pad to a specified size between characters (any remainder is appended).
-   * Returns a reference to itself.
+   * Pad to a specified size with leading and trailing characters so as to
+   * center the string.
+   * \param NewSize Size to which the string should grow.
+   * \param PadChar Character with which to pad the string (default is space).
+   * \return Reference to itself.
+   * \remarks Never shortens the string.  If NewSize is less than or equal to
+   *   Length(), nothing happens.  If the left and right sides can not be
+   *   padded equally, then the right side will gain the extra one-character
+   *   padding.
    */
-  csString& PadCenter (size_t iNewSize, char iChar=' ');
+  csString& PadCenter (size_t NewSize, char PadChar = ' ');
 
   /// Return a copy of this string formatted with PadCenter().
-  csString AsPadCenter (size_t iNewSize, char iChar=' ') const;
+  csString AsPadCenter (size_t NewSize, char PadChar = ' ') const;
 
   // Return a new left+right padded string representation of a basic type.
 #define STR_PADCENTER(TYPE) \
@@ -569,49 +731,84 @@ const csString& operator = (TYPE s) { return Replace (s); }
 #undef STR_APPEND
 
   /// Add another string to this one and return the result as a new string.
-  const csString& operator + (const csString &iStr) const
+  csString operator + (const csString &iStr) const
   { return Clone ().Append (iStr); }
 
-  /// Return a pointer to the null-terminated character string.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   * \remarks See the class description for a discussion about how and when the
+   *   string will represent a null-pointer.
+   */
   operator const char* () const
-  { return CSSTRING_RETURN_DATA(Data,""); }
+  { return Data; }
 
-  /// Check if two strings are equal.
-  bool operator == (const csString& iStr) const
-  { return Compare (iStr); }
-  /// Check if two strings are equal.
-  bool operator == (const char* iStr) const
-  { return Compare (iStr); }
-  /// Check if two strings are not equal.
-  bool operator != (const csString& iStr) const
-  { return !Compare (iStr); }
-  /// Check if two strings are not equal.
-  bool operator != (const char* iStr) const
-  { return !Compare (iStr); }
+  /**
+   * Check if another string is equal to this one.
+   * \param Str Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool operator == (const csString& Str) const
+  { return Compare (Str); }
+  /**
+   * Check if another string is equal to this one.
+   * \param Str Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool operator == (const char* Str) const
+  { return Compare (Str); }
+  /**
+   * Check if another string is not equal to this one.
+   * \param Str Other string.
+   * \return False if they are equal; true if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool operator != (const csString& Str) const
+  { return !Compare (Str); }
+  /**
+   * Check if another string is not equal to this one.
+   * \param Str Other string.
+   * \return False if they are equal; true if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool operator != (const char* Str) const
+  { return !Compare (Str); }
 
-  /// Convert the string to lower-case.  Returns a reference to itself.
+  /**
+   * Convert this string to lower-case.
+   * \return Reference to itself.
+   */
   csString& Downcase();
-  /// Convert the string to upper-case.  Returns a reference to itself.
+  /**
+   * Convert this string to upper-case.
+   * \return Reference to itself.
+   */
   csString& Upcase();
 
   /**
-   * Detach the low-level null-terminated string buffer from the csString
-   * object.  The caller of this function becomes the owner of the returned
-   * string buffer and is responsible for destroying it via `delete[]' when
-   * no longer needed.  The returned value may be 0 if no buffer had been
-   * allocated for this string.
+   * Detach the low-level null-terminated C-string buffer from the csString
+   * object.
+   * \return The low-level null-terminated C-string buffer, or zero if this
+   *   string represents a null-pointer.  See the class description for a
+   *   discussion about how and when the string will represent a null-pointer.
+   * \remarks The caller of this function becomes the owner of the returned
+   *   string buffer and is responsible for destroying it via `delete[]' when
+   *   no longer needed.
    */
   char* Detach ()
   { char* d = Data; Data = 0; Size = 0; MaxSize = 0; return d; }
 };
 
-/// Concatenate a csString with an ASCIIZ and return resulting csString
+/// Concatenate a null-terminated C-string with a csString.
 inline csString operator + (const char* iStr1, const csString &iStr2)
 {
   return csString (iStr1).Append (iStr2);
 }
 
-/// Concatenate a csString with an ASCIIZ and return resulting csString
+/// Concatenate a csString with a null-terminated C-string.
 inline csString operator + (const csString& iStr1, const char* iStr2)
 {
   return iStr1.Clone ().Append (iStr2);

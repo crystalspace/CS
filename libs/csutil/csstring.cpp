@@ -101,6 +101,7 @@ csString &csString::Truncate (size_t iPos)
 {
   if (iPos < Size)
   {
+    CS_ASSERT(Data != 0);
     Size = iPos;
     Data [Size] = '\0';
   }
@@ -110,11 +111,13 @@ csString &csString::Truncate (size_t iPos)
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
   CS_ASSERT (iPos < Size && iPos + iCount <= Size);
-
-  if (iPos + iCount < Size)
-    memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
-  Size -= iCount;
-  Data[Size] = '\0';
+  if (Data != 0)
+  {
+    if (iPos + iCount < Size)
+      memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
+    Size -= iCount;
+    Data[Size] = '\0';
+  }
   return *this;
 }
 
@@ -134,7 +137,7 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
   return *this;
 }
 
-csString &csString::Insert (size_t iPos, const char iChar)
+csString &csString::Insert (size_t iPos, char iChar)
 {
   csString s(iChar);
   return Insert(iPos, s);
@@ -171,6 +174,24 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
   return *this;
 }
 
+csString& csString::Replace (const csString& Str, size_t Count)
+{
+  return Replace(Str.GetData(), Count);
+}
+
+csString& csString::Replace (const char* Str, size_t Count)
+{
+  if (Str == 0)
+    Free();
+  else
+  {
+    Truncate(0);
+    if (Count > 0)
+      Append (Str, Count);
+  }
+  return *this;
+}
+
 csString &csString::Append (const csString &iStr, size_t iCount)
 {
   return Append(iStr.GetData(), iCount);
@@ -178,20 +199,15 @@ csString &csString::Append (const csString &iStr, size_t iCount)
 
 csString &csString::Append (const char *iStr, size_t iCount)
 {
-  if (iStr == 0)
+  if (iStr == 0 || iCount == 0)
     return *this;
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
 
-  // We're not aborting here if iCount==0, because Replace is using it in a
-  // not fully correct way: Size=0; Append(str);
-
   size_t const NewSize = Size + iCount;
   ExpandIfNeeded (NewSize);
- 
-  if (iCount > 0)
-      memcpy (Data + Size, iStr, iCount);
-
+  CS_ASSERT(Data != 0);
+  memcpy (Data + Size, iStr, iCount);
   Size = NewSize;
   Data [Size] = '\0';
   return *this;
@@ -218,7 +234,7 @@ csString csString::Slice(size_t start, size_t len) const
 
 size_t csString::FindFirst (char c, size_t pos) const
 {
-  if (pos > Size || !Data)
+  if (pos > Size || Data == 0)
     return (size_t)-1;
 
   char const* tmp = strchr(Data + pos, c);
@@ -233,7 +249,7 @@ size_t csString::FindLast (char c, size_t pos) const
   if (pos == (size_t)-1)
     pos = Size - 1;
 
-  if (pos > Size || !Data)
+  if (pos > Size || Data == 0)
     return (size_t)-1;
 
   char const* tmp;
@@ -244,58 +260,64 @@ size_t csString::FindLast (char c, size_t pos) const
   return (size_t)-1;
 }
 
+// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
+// If c is not an unsigned char value, or EOF, the behaviour of these functions
+// is undefined.
 csString& csString::Downcase()
 {
   char* p = GetData();
-  char const* const pN = p + Length();
-  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
-   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
-   *    functions is undefined.
-   */
-  for ( ; p < pN; p++)
-    if (isalpha((unsigned char )(*p)))
-      *p = (char)tolower((unsigned char)(*p));
+  if (p != 0)
+  {
+    char const* const pN = p + Length();
+    for ( ; p < pN; p++)
+      if (isalpha((unsigned char)(*p)))
+        *p = (char)tolower((unsigned char)(*p));
+  }
   return *this;
 }
 
+// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
+// If c is not an unsigned char value, or EOF, the behaviour of these functions
+// is undefined.
 csString& csString::Upcase()
 {
   char* p = GetData();
-  char const* const pN = p + Length();
-  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
-   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
-   *    functions is undefined.
-   */
-  for ( ; p < pN; p++)
-    if (isalpha((unsigned char)(*p)))
-      *p = (char)toupper((unsigned char)(*p));
+  if (p != 0)
+  {
+    char const* const pN = p + Length();
+    for ( ; p < pN; p++)
+      if (isalpha((unsigned char)(*p)))
+        *p = (char)toupper((unsigned char)(*p));
+  }
   return *this;
 }
 
+// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
+// If c is not an unsigned char value, or EOF, the behaviour of these functions
+// is undefined.
 csString &csString::LTrim()
 {
   size_t i;
-  /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
-   *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
-   *    functions is undefined.
-   */
   for (i = 0; i < Size; i++)
+  {
+    // CS_ASSERT(Data != 0); -- commented out for efficiency.
     if (!isspace ((unsigned char)Data[i]))
       break;
+  }
   if (i > 0)
     DeleteAt (0, i);
   return *this;
 }
 
+// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
+// If c is not an unsigned char value, or EOF, the behaviour of these functions
+// is undefined.
 csString &csString::RTrim()
 {
   if (Size > 0)
   {
+    CS_ASSERT(Data != 0);
     size_t i;
-    /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
-     *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
-     *    functions is undefined.
-     */
     for (i = Size - 1; i >= 0; i--)
       if (!isspace ((unsigned char)Data[i]))
         break;
@@ -314,6 +336,7 @@ csString &csString::Collapse()
 {
   if (Size > 0)
   {
+    CS_ASSERT(Data != 0);
     char const* src = Data;
     char const* slim = Data + Size;
     char* dst = Data;
@@ -408,6 +431,7 @@ csString &csString::PadLeft (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
+    CS_ASSERT(Data != 0);
     const size_t toInsert = iNewSize - Size;
     memmove (Data + toInsert, Data, Size + 1); // Also move null terminator.
     for (size_t x = 0; x < toInsert; x++)
@@ -449,6 +473,7 @@ csString& csString::PadRight (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
+    CS_ASSERT(Data != 0);
     for (size_t x = Size; x < iNewSize; x++)
       Data [x] = iChar;
     Size = iNewSize;
@@ -489,6 +514,7 @@ csString& csString::PadCenter (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
+    CS_ASSERT(Data != 0);
     const size_t toInsert = iNewSize - Size;
     const size_t halfInsert = toInsert / 2;
     if (Size > 0)

@@ -149,6 +149,9 @@ scfString::operator char const* () const
 bool scfString::operator == (const iString& iStr) const
 { return Compare (&iStr); }
 
+bool scfString::operator != (const iString& iStr) const
+{ return !Compare (&iStr); }
+
 void scfString::Downcase()
 { s.Downcase(); }
 

@@ -1154,19 +1154,27 @@ follows a more natural calling convention.  Several @samp{iString} methods
 which were incorrectly returning raw @samp{iString*} or @samp{iString&} now
 correctly return @code{csRef<iString>}.
 
-In previous releases, @samp{csString} and at least one @samp{iString}
-implementation contained bugs where they would incorrectly and often
-indeterminately return a null pointer from @code{GetData()} and @samp{operator
-char const*} under certain circumstances if the string was empty.  This was
-buggy, undocumented, and incorrect behavior which occurred by accident, not by
-design; nor was it supported by the @sc{api}.  Projects which relied upon this
-buggy, accidental, and indeterminate behavior may define
-@samp{CSSTRING_BUGGY_NULL_RETURN} before including @file{csutil/csstring.h} in
-order to restore the old buggy behavior of incorrectly returning a null
-pointer.  This backward-compatibility measure is intended only as a temporary
-transitional aid; projects are strongly encouraged to correct their code
-rather than relying upon an accidental and buggy historic implementation
-artifact.
+@samp{csString} now makes a distinction between a null-string (think
+@samp{(char const*)0}), and a zero-length string (think @code{""}).  Client
+code can check for these conditions in the normal fashion by invoking
+@code{csString::GetData()} or @code{operator char const*()} to retrieve a
+C-string representation of the string.  If the result is zero, then it is a
+null-string.  If the result is non-zero but @code{csString::Length()} returns
+zero, then it is a zero-length string.  The new convenience method
+@code{csString::GetDataSafe()} will always return a valid C-string, even if the
+underlying @samp{csString} represents a null-string (in which case a
+zero-length C-string @code{""} will be returned).  This means that the result
+of @code{GetDataSafe()} can be used directly without performing a null check.
+
+In previous releases, @samp{csString} would also sometimes return a null
+pointer or a zero-length string from @code{csString::GetData()} or
+@code{operator char const*()}, but there was no controlled way to know when one
+or the other would be returned since @samp{csString} was doing so haphazardly.
+Worse, several of the @samp{csString} methods failed to check the underlying
+representation, and would crash if the string's state was not what the methods
+expected.  Now, however, @samp{csString} itself makes a proper distinction
+between these cases, and the user has direct (and documented) control over when
+a @samp{csString} will represent a null-string or a zero-length string.
 
 @subheading csMD5 Changes
 
