@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Sep-2004
+	- Eric Sunshine augmented configure.ac so that it is no longer a fatal
+	  error for zlib to be missing since that made it unnecessarily
+	  difficult to perform maintenance tasks (project file synthesis,
+	  documentation regeneration, Swig generation, etc.) on platforms
+	  lacking this resource. It also unnecessarily penalized clients
+	  interested in utilizing only some of the low-level portions of the CS
+	  SDK, such as the utility and geometry libraries, etc.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These
@@ -14,11 +22,11 @@ chronological order.
 	- PK added #include <ivaria/ode.h> to
 	  CS/apps/tutorial/phystut/phystut.h.
 	- PK moved the following files from cstool to plugin/proctex/standard:
-	    - prdots.cpp   / prdots.h
-	    - prfire.cpp   / prfire.h
-	    - prplasma.cpp / prplasma.h
-	    - prsky.cpp    / prsky.h
-	    - prwater.cpp  / prwater.h
+	    prdots.cpp   / prdots.h
+	    prfire.cpp   / prfire.h
+	    prplasma.cpp / prplasma.h
+	    prsky.cpp    / prsky.h
+	    prwater.cpp  / prwater.h
 	- res added functions to print formatted strings to stderr.
 	- res eliminated a static var from win32kbd.cpp.
 	- res silenced some MSVC warnings in regcomp.c and snprintf.cpp.
