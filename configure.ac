@@ -190,7 +190,8 @@ AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
 
 AC_CHECK_PROGS([BISONBIN], [bison])
 AS_IF([test -n "$BISONBIN"],
-    [AC_CHECK_BISON([1.35], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
+    [CS_CHECK_PROG_VERSION([bison], [$BISONBIN -V], [1.35], [9.9],
+	[CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
@@ -213,14 +214,10 @@ AS_IF([test -n "$INSTALL"], [CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])])
 AC_PROG_RANLIB
 AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])])
 
-# XXX: disabled for now until we have a good check for teh correct swig version
-#AC_CHECK_PROGS([SWIGBIN], [swig])
-#AS_IF([test -n "$SWIGBIN"], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])
-
-# XXX: disabled for now until we have a good check for teh correct swig version
-#AC_CHECK_PROGS([LUASWIGBIN], [luaswig])
-#AS_IF([test -n "$LUASWIGBIN"],
-#    [CS_BUILD_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
+AC_CHECK_PROGS([SWIGBIN], [swig])
+AS_IF([test -n "$SWIGBIN"],
+    [CS_CHECK_PROG_VERSION([swig], [$SWIGBIN --version 2>&1], [1.13.0],
+	[9.9.9], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])])
 
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_CHECK_PROGS([JAM], [jam])

@@ -20,6 +20,28 @@ The history order is reversed so that new features are at the top.
 	  it gets compiled as C++, rather than C).
 	- Eric Sunshine renamed vd.m4 to progver.m4 since it provides the
 	  AC_CHECK_PROG_VERSION() (not some macro named VD).
+	- Eric Sunshine made the following changes to progver.m4 and
+	  configure.ac:
+	    - Performed some cleanup of CS_CHECK_PROG_VERSION() and its support
+	      macros.  (progver.m4 could use some more reformatting, though, as
+	      it is still somewhat difficult to read.)
+	    - Fixed some potential quoting problems in progver.m4.
+	    - Upgraded progver.m4 to make better use of m4sugar facilities.
+	    - Renamed all of the shell variables in progver.m4 to better
+	      conform to Autoconf naming conventions.
+	    - Renamed AC_CHECK_PROG_VERSION() to CS_CHECK_PROG_VERSION().
+	    - CS_CHECK_PROG_VERSION() now exports the shell variable
+	      cs_cv_prog_PROG_version_ok, rather than the inverted
+	      ac_cv_check_version_PROG_bad.
+	    - Fixed issue where emitted result string from
+	      CS_CHECK_PROG_VERSION() via an uncached run did not match
+	      emitted result via a cached run.
+	    - Removed the AC_CHECK_BISON_VERSION() and AC_CHECK_SWIG_VERSION()
+	      specialization macros from progver.m4 since they polluted an
+	      otherwise general-purpose macro utility file.
+	    - Upgraded configure.ac to utilize CS_CHECK_PROG_VERSION() for
+	      Bison and Swig tests.
+	    - Eliminated now obsolete bison.m4 (AC_CHECK_BISON).
 29-Apr-2003
 	- Matze fixed bad filepermission for jam install
 	- Matze moved crystal.m4 around to mk/autoconf and merged to make and

@@ -314,7 +314,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2766,45 +2766,42 @@ fi
 done
 
 if test -n "$BISONBIN"; then
-  min_bsn_version=1.35
-echo "$as_me:$LINENO: checking for bison - version >= $min_bsn_version" >&5
-echo $ECHO_N "checking for bison - version >= $min_bsn_version... $ECHO_C" >&6
-no_bsn=""
-bsn_config_major_version=`$BISONBIN -V | \
-    sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.[0-9][0-9]*.*/\1/'`
-bsn_config_minor_version=`$BISONBIN -V | \
-    sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/'`
-bsn_min_major_version=`echo $min_bsn_version | \
-    sed 's/\([0-9][0-9]*\)\.[0-9][0-9]*/\1/'`
-bsn_min_minor_version=`echo $min_bsn_version | \
-    sed 's/[0-9][0-9]*\.\([0-9][0-9]*\)/\1/'`
-bsn_config_is_lt=""
-if test $bsn_config_major_version -lt $bsn_min_major_version ; then
-  bsn_config_is_lt=yes
+  echo "$as_me:$LINENO: checking if bison version >= 1.35" >&5
+echo $ECHO_N "checking if bison version >= 1.35... $ECHO_C" >&6
+if test "${cs_cv_prog_bison_version_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test $bsn_config_major_version -eq $bsn_min_major_version ; then
-    if test $bsn_config_minor_version -lt $bsn_min_minor_version ; then
-      bsn_config_is_lt=yes
-    fi
-  fi
+  cs_prog_bison_is_version=`$BISONBIN -V | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_bison_is_ver_1=`echo $cs_prog_bison_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_is_ver_2=`echo $cs_prog_bison_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_bison_min_ver_1=`echo $cs_prog_bison_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_min_ver_2=`echo $cs_prog_bison_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_cv_prog_bison_version_ok=''
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_1" ">=" "$cs_prog_bison_min_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_1" ">=" "$cs_prog_bison_is_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_2" ">=" "$cs_prog_bison_min_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_2" ">=" "$cs_prog_bison_is_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
+if test -z "$cs_cv_prog_bison_version_ok"; then
+  cs_cv_prog_bison_version_ok=yes
+else
+  if test $cs_cv_prog_bison_version_ok = no && test -n "$cs_prog_bison_is_version"; then
+  cs_cv_prog_bison_version_ok="no (version $cs_prog_bison_is_version)"
 fi
-if test x$bsn_config_is_lt = xyes ; then
-  no_bsn=yes
+
 fi
-if test x$no_bsn = x ; then
-   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-   cs_makefile_text="${cs_makefile_text}BISONBIN = $BISONBIN
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_bison_version_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_bison_version_ok" >&6
+if test "$cs_cv_prog_bison_version_ok" = yes; then
+  cs_makefile_text="${cs_makefile_text}BISONBIN = $BISONBIN
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$BISONBIN\" ;
 "
 else
-   echo "$as_me:$LINENO: result: no (version $bsn_config_major_version.$bsn_config_minor_version)" >&5
-echo "${ECHO_T}no (version $bsn_config_major_version.$bsn_config_minor_version)" >&6
-#   if test x$bsn_config_is_lt = xyes ; then
-#     echo "*** Your installed version of $BISONBIN is too old."
-#   fi
-   :
+  :
 fi
 
 fi
@@ -3186,14 +3183,91 @@ if test -n "$RANLIB"; then
 fi
 
 
-# XXX: disabled for now until we have a good check for teh correct swig version
-#AC_CHECK_PROGS([SWIGBIN], [swig])
-#AS_IF([test -n "$SWIGBIN"], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])
+for ac_prog in swig
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_SWIGBIN+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$SWIGBIN"; then
+  ac_cv_prog_SWIGBIN="$SWIGBIN" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_SWIGBIN="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
 
-# XXX: disabled for now until we have a good check for teh correct swig version
-#AC_CHECK_PROGS([LUASWIGBIN], [luaswig])
-#AS_IF([test -n "$LUASWIGBIN"],
-#    [CS_BUILD_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
+fi
+fi
+SWIGBIN=$ac_cv_prog_SWIGBIN
+if test -n "$SWIGBIN"; then
+  echo "$as_me:$LINENO: result: $SWIGBIN" >&5
+echo "${ECHO_T}$SWIGBIN" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$SWIGBIN" && break
+done
+
+if test -n "$SWIGBIN"; then
+  echo "$as_me:$LINENO: checking if swig version >= 1.13.0" >&5
+echo $ECHO_N "checking if swig version >= 1.13.0... $ECHO_C" >&6
+if test "${cs_cv_prog_swig_version_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_prog_swig_is_version=`$SWIGBIN --version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_swig_min_version=`echo 1.13.0 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+cs_prog_swig_is_ver_1=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_is_ver_2=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_is_ver_3=`echo $cs_prog_swig_is_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_swig_min_ver_1=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_min_ver_2=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_min_ver_3=`echo $cs_prog_swig_min_version | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_cv_prog_swig_version_ok=''
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_1" ">=" "$cs_prog_swig_min_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_1" ">=" "$cs_prog_swig_is_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_2" ">=" "$cs_prog_swig_min_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_2" ">=" "$cs_prog_swig_is_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_3" ">=" "$cs_prog_swig_min_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_3" ">=" "$cs_prog_swig_is_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+if test -z "$cs_cv_prog_swig_version_ok"; then
+  cs_cv_prog_swig_version_ok=yes
+else
+  if test $cs_cv_prog_swig_version_ok = no && test -n "$cs_prog_swig_is_version"; then
+  cs_cv_prog_swig_version_ok="no (version $cs_prog_swig_is_version)"
+fi
+
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_swig_version_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_swig_version_ok" >&6
+if test "$cs_cv_prog_swig_version_ok" = yes; then
+  cs_makefile_text="${cs_makefile_text}SWIGBIN = $SWIGBIN
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$SWIGBIN\" ;
+"
+else
+  :
+fi
+
+fi
+
 
 for ac_prog in gnumake gmake make
 do
@@ -23097,6 +23171,7 @@ s,@MAKEINFO@,$MAKEINFO,;t t
 s,@INSTALL@,$INSTALL,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@SWIGBIN@,$SWIGBIN,;t t
 s,@MAKE@,$MAKE,;t t
 s,@JAM@,$JAM,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
