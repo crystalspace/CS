@@ -73,7 +73,7 @@ rule ApplicationIcon
   local target = $(2) ;
   local icon = $(3) ;
   local iconpath = $(4) ;
-  local key = app_$(target) ;
+  local key = app_$(platform)_$(target) ;
 
   if $(icon)
   {

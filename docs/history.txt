@@ -38,6 +38,10 @@ chronological order.
 	  <anarazel@users.sourceforge.net> which causes it to emit a meaningful
 	  error message rather than crashing if <params> is not given for
 	  <meshobj> or <meshfact>.
+	- Eric Sunshine fixed bug in ApplicationIcon rule in resource.jam where
+	  it ignored the "platform" argument.  This caused macosx.jam, for
+	  instance, to use cslight.ico (which is for Windows) as the MacOS/X
+	  cslight.app icon.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when
