@@ -3176,7 +3176,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  reorganization of the file fixed the problem.
 	- Eric Sunshine eliminated signed vs. unsigned comparision compilation
 	  warnings in map2cs.
-	- Thomas Hieber added support for game sepcific data in the world
+	- Thomas Hieber added support for game specific data in the world
 	  file (KEY and NODE).
 	- Thomas also did a few further changes on Map2CS.
 4-Jan-2000
