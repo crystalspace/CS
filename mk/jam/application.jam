@@ -102,8 +102,9 @@ rule ApplicationFromObjects
   {
     cleanrule = $(APPLICATION.CLEAN.$(apptype)) ;
   }
-  $(cleanrule) clean : $(target) ;
+  Clean $(<)clean : $(>) ;
   $(cleanrule) $(<)clean : $(target) ;
+  $(cleanrule) clean : $(target) ;
 
   # Invoke Link rule
   NAME on $(target) = $(<) ;

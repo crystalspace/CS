@@ -10,6 +10,26 @@ The history order is reversed so that new features are at the top.
 	    - r3dtest properly catches/releases the mouse pointer when it
 	      gains resp. loses focus.
 	    - leak fixes.
+	- Eric Sunshine made the following changes to the Jam build facility:
+	    - Upgraded macosx.jam so that LinkApplication now knows how to
+	      create the entire application wrapper.  It no longer invokes the
+	      external appwrap.sh script.  The benefit of this approach is that
+	      Jam can now do all of its normal dependency tracking upon the
+	      resources contained in the wrapper.
+	    - Added ApplicationIconDefaultOSX and ApplicationIconOSX rules
+	      which allow setting of the default application icon, and the icon
+	      for a particular application, respectively.  (In the future, we
+	      should probably introduce platform-independent rules
+	      ApplicationIconDefault and ApplicationIcon which automatically
+	      select the correct icon extension and mechanism for binding the
+	      icon to the application.)
+	    - Fixed bug in application.jam introduced in revision 1.6 where the
+	      application-specific `clean' target (such as `simple1clean')
+	      failed to remove the built object files.
+	    - Fixed bug in CleanDir rule which caused target to be built if it
+	      did not already exist.  For instance, "jam simple1clean" followed
+	      immediately by "jam simple1clean" would cause simple1 to be built
+	      by the second invocation of the `simpel1clean' rule.
 17-May-2003
 	- res made the following changes:
 	    - extended the stdpt plugin with a fire texture loader.

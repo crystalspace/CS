@@ -13,7 +13,6 @@ rule CleanDir
   Always $(<) ;
   NotFile $(<) ;
   NoCare $(>) ;
-  Depends $(<) : $(>) ;
 }
 
 actions piecemeal together existing CleanDir

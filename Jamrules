@@ -15,12 +15,12 @@ if ! $(JAMCONFIG_READ)
 APPLICATION.LFLAGS += $(ZLIB.LFLAGS) ;
 APPLICATION.CFLAGS += $(ZLIB.CFLAGS) ;
 
-# Put output files into out/systemname
+# Put output files into out/systemname.
 LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;
 LOCATE.TARGETS = $(BUILDTOP) ;
 LOCATE.DOCS = $(BUILDTOP)/out ;
 
-# List of plugins which should be linked in when building static
+# List of plugins which should be linked in when building static.
 STATIC.PLUGINLIST =
     ball
     ballldr
@@ -90,10 +90,16 @@ STATIC.PLUGINLIST =
     xwin
     ;
 
-# Include CS build rules
+# Include CS build rules.
 include $(TOP)/mk/jam/build.jam ;
 
-# Common include directory
+# Project-specific settings.
+if $(TARGET.OS) = MACOS_X
+{
+  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs cssys macosx ;
+}
+
+# Common include directory.
 IncludeDir
     $(BUILDTOP)/include
     $(TOP)

@@ -1,6 +1,18 @@
 #============================================================================
 # Jam configuration and actions for MacOS/X
+# Copyright (C) 2003 by Eric Sunshine <sunshine@sunshineco.com>
 #============================================================================
+SHELL ?= "/bin/sh" ;
+
+APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
+APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
+PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;
+SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
+MACOSX.APP_ICON = ;
+MACOSX.ENVIRON = export MACOSX_DEPLOYMENT_TARGET=10.2 ;
+APPLICATION.CLEAN.GUI = "CleanDir" ;
+APPLICATION.CLEAN.CONSOLE = "Clean" ;
+
 if $(PTHREAD.AVAILABLE) = "yes"
 {
   LINKLIBS += $(PTHREAD.LFLAGS) ;
@@ -8,8 +20,8 @@ if $(PTHREAD.AVAILABLE) = "yes"
   CFLAGS += $(PTHREAD.CFLAGS) ;
 }
 
-# Seems jams header scanning fails on macosx. This is atleast true for jam 2.4,
-# let's hope that this will work better with jam 2.5.
+# Experience seems to indicate that library scanning misbehaves on MacOS/X with
+# Jam 2.4, consequently we disable it.
 CMD.AR = "ar ru" ;
 NOARUPDATE = true ;
 NOARSCAN = true ;
@@ -18,36 +30,253 @@ actions Archive
   $(CMD.AR) $(<) $(>)
 }
 
-SHELL ?= "/bin/sh" ;
+#------------------------------------------------------------------------------
+# Public rules.
+#------------------------------------------------------------------------------
 
-APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
-APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
-PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;
-SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
-MACOSX.APP_DIR = . ;
-MACOSX.APP_ICON = $(TOP)/libs/cssys/macosx/appicon.icns ;
-MACOSX_ENVIRON = export MACOSX_DEPLOYMENT_TARGET=10.2 ;
-APPLICATION.SUFFIX.GUI = .app ;
-APPLICATION.SUFFIX.CONSOLE = ;
-APPLICATION.CLEAN.GUI = "CleanDir" ;
-APPLICATION.CLEAN.CONSOLE = "Clean" ;
-
+## LinkPlugin plugin : objects
+##    Link a plugin module from a set of object files.
 actions LinkPlugin bind NEEDLIBS
 {
-  $(MACOSX_ENVIRON)
+  $(MACOSX.ENVIRON)
   $(CMD.LINK) -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
-actions LinkApplication bind NEEDLIBS
-{
-  $(MACOSX_ENVIRON)
-  $(TOP)/libs/cssys/macosx/appwrap.sh $(NAME) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(TOP)/include/csver.h
-  $(CMD.LINK) -o $(<)/Contents/MacOS/$(NAME) $(>) $(NEEDLIBS) $(LINKLIBS)
-  touch $(<)
-}
-
+## LinkApplicationConsole exe : objects
+##    Link a console (non-GUI) appliation from a set of object files.
 actions LinkApplicationConsole bind NEEDLIBS
 {
-  $(MACOSX_ENVIRON)
+  $(MACOSX.ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
+
+## LinkApplication basename : objects
+##    Create a complete, though minimal, application wrapper given a set of
+##    object files.  The rules ApplicationIconDefaultOSX and ApplicationIconOSX
+##    control the icon associated with the application wrapper.
+rule LinkApplication
+{
+  WrapFile $(<) : $(<) : Contents MacOS : AppExe : $(>) ;
+  WrapFile $(<) : PkgInfo : Contents : AppPkgInfo : $(>) ;
+  WrapFile $(<) : version.plist : Contents : AppVersionPlist : $(>) ;
+  WrapFile $(<) : Info.plist : Contents : AppInfoPlist : $(>) ;
+  WrapFile $(<) : InfoPlist.strings : Contents Resources English.lproj : 
+    AppInfoPlistStrings : $(>) ;
+  if $(MACOSX.APP_ICON) && ! $($(<)_APPICON
+  {
+    AppIcon $(<) : $(MACOSX.APP_ICON) ;
+  }
+  CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;
+}
+
+## ApplicationIconDefaultOSX icon [ : pathcomponents ]
+##    Specify the default icon for GUI applications.  This setting can be
+##    overriden for a individual application with the ApplicationIconOSX rule.
+rule ApplicationIconDefaultOSX
+{
+  MACOSX.APP_ICON = $(<) ;
+  if $(>)
+  {
+    SEARCH on $(<) = [ FDirName $(>) ] ;
+  }
+}
+
+## ApplicationIconOSX basename : icon [ : pathcomponents ]
+##    Specify the icon for the application given by basename.  If
+##    pathcomponents is omitted, SEARCH_SOURCE is used.  If this rule is not
+##    invoked, then the icon specified via ApplicationIconDefaultOSX is used.
+##    If ApplicationIconDefaultOSX was never invoked, then no icon is used.
+##
+##    Implementation note: The logic to get the icon copied into the wrapper is
+##    complicated by the fact that it is possible to specify no icon at all (by
+##    invoking neither ApplicationIconDefaultOSX nor ApplicationIconOSX), as
+##    well as being possible to spcify it globally or per-application.  The
+##    convolution of this logic results in a case where two icons might be
+##    copied to the wrapper (one specified with ApplicationIconDefaultOSX and
+##    one by ApplicationIconOSX).  This occurs when ApplicationIconOSX is
+##    invoked after LinkApplication.  Fortunately, other than the extra (unsed)
+##    icon in the application wrapper (the icon specified with
+##    ApplicationIconDefaultOSX), there is no negative impact.  Care is taken
+##    to ensure that Info.plist mentions the correct icon in all cases.
+rule ApplicationIconOSX
+{
+  local dir ;
+  if $(3) { dir = [ FDirName $(3) ] ; }
+  else { dir = $(SEARCH_SOURCE) ; }
+  SEARCH on $(>) = $(dir) ;
+  $(<)_APPICON = $(>) ;
+  AppIcon $(<) : $(>) ;
+}
+
+
+#------------------------------------------------------------------------------
+# Private utility rules.
+#------------------------------------------------------------------------------
+
+## Wrapper basename : suffix [ : pathcomponents ]
+##    Returns wrapper name in the directory specified by pathcomponents for
+##    the given basename.  If pathcomponents is omitted, LOCATE_TARGET is
+##    used.
+rule Wrapper
+{
+  local dir ;
+  if $(3) { dir = [ FDirName $(3) ] ; }
+  else { dir = $(LOCATE.TARGETS) ; }
+  return [ FDirName $(dir) $(1).$(2) ] ;
+}
+
+## WrapFile basename : file : pathcomponents : rule [ : objects : [ suffix ] ]
+##    Generate a file within a wrapper.  pathcomponents is a list of names
+##    which compose the relative path within the wrapper where file should be
+##    placed.  pathcomponents may be the empty list if the file should reside
+##    at the top-level of the wrapper.  rule is rule/action which should be
+##    invoked to generate file.  rule is invoked with arguments
+##    <basename.suffix/pathcomponents/file>, <objects>, and <basename>.
+##    objects is an optional list of files from which file should be built.  It
+##    may be omitted if file does not depend upon any other files.  suffix is
+##    the extension of the wrapper (not of file).  If suffix is omitted, "app"
+##    is assumed.
+##
+##    Implementation note: If basename and file are the same, then we do not
+##    grist file.  (Obviously, we also do not want to set the file dependent
+##    upon itself.)  The reason we do not grist file in this case is that the
+##    LinkWith, and LFlags rules associate the variables NEEDLIBS and
+##    LINKLIBS with the ungristed name, therefore in order to get access to
+##    these variables at AppExe action time, we must use the same (ungristed)
+##    name.  It is otherwise impossible to gain access to those variables.
+##    This is an unfortunate hack which pollutes the otherwise general-purpose
+##    WrapFile rule.
+rule WrapFile
+{
+  local suffix ;
+  if $(6) { suffix = $(6) ; } else { suffix = app ; }
+  local target = $(2) ;
+  if $(target) != $(1)
+  {
+    target = $(target:G=$(1)) ;
+    Depends $(1) : $(target) ;
+  }
+  local dir = [ FDirName [ Wrapper $(1) : $(suffix) ] $(3) ] ;
+  MakeLocate $(target) : $(dir) ;
+  if $(5) { Depends $(target) : $(5) ; }
+  BASENAME on $(target) = $(1) ;
+  $(4) $(target) : $(5) : $(1) ;
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean clean $(1)clean : [ FDirName $(dir) $(target) ] ;
+}
+
+## LinkApplication exe : objects
+actions AppExe bind NEEDLIBS
+{
+  $(MACOSX.ENVIRON)
+  $(CMD.LINK) -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+}
+
+## AppPkgInfo file
+actions AppPkgInfo
+{
+  echo 'APPL???' > $(<) ;
+}
+
+## AppInfoPlistStrings file
+actions AppInfoPlistStrings
+{
+  cat << EOT > $(<)
+CFBundleName = "$(BASENAME)";
+CFBundleShortVersionString = "$(PACKAGE.VERSION)";
+CFBundleGetInfoString = "$(BASENAME), $(PACKAGE.VERSION)";
+EOT
+}
+
+## AppVersionPlist file
+actions AppVersionPlist
+{
+  cat << EOT > $(<)
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+  <dict>
+    <key>CFBundleShortVersionString</key>
+    <string>$(PACKAGE.VERSION)</string>
+    <key>CFBundleVersion</key>
+    <string>$(PACKAGE.VERSION)</string>
+    <key>ProjectName</key>
+    <string>$(BASENAME)</string>
+  </dict>
+</plist>
+EOT
+}
+
+## AppInfoPlist filename : placeholder : basename
+##    If client did not invoke ApplicationIconOSX, then use the default icon
+##    specified via ApplicationIconDefaultOSX.
+##
+##    Implementation Note: $(BASENAME)_APPICON might be empty in the actions of
+##    this rule, if the client did not specify a default icon or a
+##    target-specific icon, in which case we need to omit both the
+##    CFBundleIconFile key and value.  To accomplish this, the key and value
+##    are placed on a single line with no intervening whitespace.  When Jam
+##    interpolates a variable, if the variable is empty, it removes all
+##    adjacent text (the key and value, in this case) which is just what we
+##    desire.
+rule AppInfoPlist
+{
+  if ! $($(3)_APPICON)
+  {
+    $(3)_APPICON = $(MACOSX.APP_ICON) ;
+  }
+}
+
+actions AppInfoPlist
+{
+  cat << EOT > $(<)
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+  <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleName</key>
+    <string>$(BASENAME)</string>
+    <key>CFBundleExecutable</key>
+    <string>$(BASENAME)</string>
+    <key>CFBundleIconFile</key><string>$($(BASENAME)_APPICON)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleVersion</key>
+    <string>0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(PACKAGE.VERSION)</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+  </dict>
+</plist>
+EOT
+}
+
+## AppIcon <basename> : <icon>
+##    Copy an icon into the wrapper.  It is assumed that some other agent has
+##    already set SEARCH on the icon, if necessary.
+##
+##    Implementation note: We can not use the File rule to copy the icon since
+##    that rule assumes the source is in SEARCH_SOURCE, which is not always a
+##    valid assumption for icons.
+rule AppIcon
+{
+  local icon = $(>:G=$(<)) ;
+  Depends $(<) : $(icon) ; 
+  Depends $(icon) : $(>) ;
+  MakeLocate $(icon) : [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
+  AppIcon1 $(icon) : $(>) ;
+  Clean clean $(<)clean : $(icon) ;
+}
+
+actions AppIcon1
+{
+    $(CP) $(>) $(<)
 }
