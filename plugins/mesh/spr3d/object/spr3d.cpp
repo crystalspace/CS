@@ -182,9 +182,10 @@ csSpriteActionVector::~csSpriteActionVector ()
 
 bool csSpriteSocketVector::FreeItem (csSome Item)
 {
-  delete (csSpriteSocketVector *) Item;
+  delete (csSpriteSocket *) Item;
   return true;
 }
+
 csSpriteSocketVector::~csSpriteSocketVector ()
 {
   DeleteAll ();
