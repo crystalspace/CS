@@ -68,6 +68,8 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   spr_factory = type->NewFactory ();
   type->DecRef ();
   shapenr = 0;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csParticleSystem::~csParticleSystem()

@@ -1,5 +1,38 @@
 The history order is reversed so that new features are at the top.
 
+8-Jun-2001
+	- Added iMeshObjectType::GetFeatures(), also added iMeshObject
+	  GetLODFeatures(), SetLODFeatures(), GetLOD(), SetLOD(), and
+	  GetLODPolygonCount(). These are all functions that have to do
+	  with LOD (both on polygon count and enabling/disabling features).
+	  In the future we'll be able to make a LOD manager in the engine
+	  using these new calls.
+	- Extended all existing mesh objects with these new features. Note
+	  that the implementations are empty at the moment. The calls
+	  will work but don't do anything useful yet.
+	- Did a fundamental change in how the engine manages mesh wrappers.
+	  engine::CreateMeshObject() used to make a new mesh wrapper and
+	  then call IncRef() on it (resulting in a ref-count of 2). The
+	  explicit IncRef() is removed (the engine only has one ref to the
+	  mesh wrapper and not two). In addition engine::UnlinkMesh() is
+	  removed. Instead you have to use engine::RemoveMesh(). If you
+	  want to keep a mesh (but still want to remove it from the engine)
+	  you should make sure you did IncRef() on the mesh as well.
+	- Also modified engine::NextFrame() to call RemoveMesh(). This
+	  means the mesh will be unlinked from the engine and all sectors
+	  and also removed IF the engine was the only one with a reference
+	  to that mesh.
+	- Added iEngine::RemoveMesh().
+	- Also removed engine::UnlinkTerrain() and added
+	  iEngine::RemoveTerrain(). Also removed the additional IncRef() that
+	  was happening in CreateTerrainObject().
+	- Removed the non-const version of csMeshWrapper::GetChildren().
+	  This is no longer safe to use. The method AddChild() take care of
+	  correctly managing ref counts.
+	- Added iMeshWrapper::RemoveChild() to remove a child in a
+	  hierarchical mesh setup.
+	- Added iMeshWrapper::GetParentContainer() to get the parent
+	  (either iEngine or iMeshWrapper) from a mesh wrapper.
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility
@@ -18,6 +51,24 @@ The history order is reversed so that new features are at the top.
 	  because the real polygons update the c-buffer and the bounding
 	  box polygons test against it.
 	- Eric Sunshine fixed the new meta.cpp so that it compiles on NextStep.
+	- Wouter Wijngaards fixed CS_ASSERT. It had a printf of the assertion,
+	  printf("..." #x ), but if the assertion contains % signs, (perhaps
+	  even %s!), this could give serious problems. Changed to
+	  printf(".... %s", .., #x).
+	- Christopher Nelson added experimental AWS plugin.  AWS is the
+	  experimental alternate window system, which aims to create a
+	  lightweight window manager that doesn't take over the software,
+	  supports definition files, and implements slots and signals.
+	  This plugin has not been added to the global make.  It is still in
+	  it's initial stages, but is committed so that people can look at
+	  it.  Eric and I discussed a number of changes that we'd like to make
+	  to csws, but they would require too much modification of the
+	  existing code.  That would be both difficult, and would break a lot
+	  of other peoples code.  All the existing CSWS components will be
+	  "ported" over to the new code.
+	  I would like to emphasize that this is completely experimental,
+	  and is not meant to replace anything.  (yet.)
+	- Norman Kramer fixed a bug in meta.cpp.
 6-Jun-2001
 	- Removed support for the quadtree, coverage mask tree, coverage mask
 	  cube, and solid tree from CS. I parked the code locally and it will

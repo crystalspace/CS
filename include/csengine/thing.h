@@ -54,6 +54,8 @@ struct iFrustumView;
 struct iMaterialWrapper;
 class Dumper;
 
+#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
+
 /**
  * This structure keeps the indices of the vertices which
  * define the bounding box of a csThing. It is calculated
@@ -213,6 +215,9 @@ private:
   int num_curve_vertices;
   /// Maximum number of vertices.
   int max_curve_vertices;
+
+  float current_lod;
+  uint32 current_features;
 
 public:
   /// Set of flags
@@ -909,6 +914,22 @@ public:
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
     virtual long GetShapeNumber () const { return 0; /*@@@*/ }
+    virtual uint32 GetLODFeatures () const
+    {
+      return scfParent->current_features;
+    }
+    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    {
+      mask &= ALL_FEATURES;
+      scfParent->current_features = (scfParent->current_features & ~mask)
+      	| (value & mask);
+    }
+    virtual void SetLOD (float lod) { scfParent->current_lod = lod; }
+    virtual float GetLOD () const { return scfParent->current_lod; }
+    virtual int GetLODPolygonCount (float /*lod*/) const
+    {
+      return 1;
+    }
   } scfiMeshObject;
   friend struct MeshObject;
 
@@ -950,6 +971,10 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 #endif // __CS_THING_H__

@@ -97,7 +97,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 12);
+SCF_VERSION (iMeshWrapper, 0, 0, 13);
 
 /**
  * This interface corresponds to the object in the engine
@@ -246,9 +246,24 @@ struct iMeshWrapper : public iBase
   virtual iMeshWrapper* GetChild (int idx) const = 0;
   /**
    * Add a child to this object. The transform of that child will be
-   * interpreted relative to this object.
+   * interpreted relative to this object. An IncRef() on the child will
+   * happen.
    */
   virtual void AddChild (iMeshWrapper* child) = 0;
+  /**
+   * Remove a child from this object. The child will be DecRef()'ed
+   * and thus removed if this was the last reference.
+   * Note that RemoveChild() will not work if the the given mesh is not
+   * a child of this mesh.
+   */
+  virtual void RemoveChild (iMeshWrapper* child) = 0;
+  /**
+   * Get the parent of this mesh. This will be either a pointer to the
+   * engine or another meshwrapper (or NULL if the mesh is not linked
+   * to anything). Use QUERY_INTERFACE/QUERY_INTERFACE_FAST to see the
+   * type of the parent.
+   */
+  virtual iBase* GetParentContainer () = 0;
   /// Get the radius of this mesh (ignoring children).
   virtual csVector3 GetRadius () const = 0;
 };

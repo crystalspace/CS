@@ -267,8 +267,6 @@ public:
   	csVector3& isect, float* pr);
 
   /// Get the children of this mesh object.
-  csNamedObjVector& GetChildren () { return children; }
-  /// Get the children of this mesh object.
   const csNamedObjVector& GetChildren () const { return children; }
 
   /// Get the radius of this mesh (ignoring children).
@@ -417,6 +415,8 @@ public:
     virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
   	csBox3& cbox);
     virtual void AddChild (iMeshWrapper* child);
+    virtual void RemoveChild (iMeshWrapper* child);
+    virtual iBase* GetParentContainer ();
     virtual int GetChildCount () const
     {
       return scfParent->GetChildren ().Length ();

@@ -2297,8 +2297,7 @@ void Blocks::StartNewGame ()
     iMeshWrapper* cube = room->GetMesh (i);
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
-      room->UnlinkMesh (cube);
-      cube->DecRef ();
+      room->RemoveMesh (cube);
     }
     else
       i++;

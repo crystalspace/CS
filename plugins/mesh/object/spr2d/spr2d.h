@@ -30,6 +30,8 @@
 #include "imesh/particle.h"
 #include "spr2duv.h"
 
+#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
+
 struct iMaterialWrapper;
 struct iSprite2DUVAnimation;
 class csSprite2DMeshObjectFactory;
@@ -66,6 +68,8 @@ class csSprite2DMeshObject : public iMeshObject
   void* vis_cbData;
   csVector3 radius;
   long shapenr;
+  float current_lod;
+  uint32 current_features;
 
   /**
    * Array of 3D vertices.
@@ -133,6 +137,18 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual uint32 GetLODFeatures () const { return current_features; }
+  virtual void SetLODFeatures (uint32 mask, uint32 value)
+  {
+    mask &= ALL_FEATURES;
+    current_features = (current_features & ~mask) | (value & mask);
+  }
+  virtual void SetLOD (float lod) { current_lod = lod; }
+  virtual float GetLOD () const { return current_lod; }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    return 1;
+  }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -322,6 +338,10 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 #endif // _SPR2D_H_

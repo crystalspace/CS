@@ -297,8 +297,8 @@ public:
 
   /**
    * List of all collections in the engine. This vector contains objects
-   * of type csCollection*. Use UnlinkCollection() and RemoveCollection()
-   * to unlink and/or remove collections from this list. These functions
+   * of type csCollection*. Use RemoveCollection()
+   * to remove collections from this list. These functions
    * take care of correctly removing the collections from all sectors
    * as well. Note that after you add a collection to the list you still
    * need to add it to all sectors that you want it to be visible in.
@@ -325,18 +325,17 @@ public:
 
   /**
    * List of all meshes in the engine. This vector contains objects
-   * of type csMeshWrapper*. Use UnlinkMesh() and RemoveMesh()
-   * to unlink and/or remove meshes from this list. These functions
-   * take care of correctly removing the meshes from all sectors
-   * as well. Note that after you add a mesh to the list you still
-   * need to add it to all sectors that you want it to be visible in.
+   * of type csMeshWrapper*. Use RemoveMesh() to remove meshes from this
+   * list. This function will take care of correctly removing the meshes
+   * from all sectors as well. Note that after you add a mesh to the list
+   * you still need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector meshes;
 
   /**
    * List of all terrain in the engine. This vector contains objects
-   * of type csTerrainWrapper*. Use UnlinkTerrain() and RemoveTerrain()
-   * to unlink and/or remove terrains from this list. These functions
+   * of type csTerrainWrapper*. Use RemoveTerrain()
+   * to remove terrains from this list. These functions
    * take care of correctly removing the terrains from all sectors
    * as well. Note that after you add a terrain to the list you still
    * need to add it to all sectors that you want it to be visible in.
@@ -892,28 +891,28 @@ public:
   virtual void NextFrame (cs_time current_time);
 
   /**
-   * Unlink a mesh from the engine (but do not delete it).
-   * It is also removed from all sectors.
-   */
-  void UnlinkMesh (csMeshWrapper* mesh);
-
-  /**
-   * Unlink and delete a mesh from the engine.
+   * Unlink and delete (using DecRef()) a mesh from the engine.
    * It is also removed from all sectors.
    */
   void RemoveMesh (csMeshWrapper* mesh);
 
   /**
-   * Unlink a terrain from the engine (but do not delete it).
+   * Unlink and delete (using DecRef()) a mesh from the engine.
    * It is also removed from all sectors.
    */
-  void UnlinkTerrain (csTerrainWrapper *pTerrain);
+  virtual void RemoveMesh (iMeshWrapper* mesh);
 
   /**
-   * Unlink and delete a terrain from the engine.
+   * Unlink and delete (using DecRef ()) a terrain from the engine.
    * It is also removed from all sectors.
    */
   void RemoveTerrain (csTerrainWrapper *pTerrain);
+
+  /**
+   * Unlink and delete (using DecRef ()) a terrain from the engine.
+   * It is also removed from all sectors.
+   */
+  virtual void RemoveTerrain (iTerrainWrapper *pTerrain);
 
   /**
    * Unlink a collection from the engine (but do not delete it).

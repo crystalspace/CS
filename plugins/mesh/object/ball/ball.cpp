@@ -69,6 +69,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.red = 0;
   color.green = 0;
   color.blue = 0;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csBallMeshObject::~csBallMeshObject ()

@@ -118,6 +118,9 @@ csThing::csThing () : csObject (), polygons (64, 64), curves (16, 16)
 
   static_tree = NULL;
   prepared = false;
+
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csThing::~csThing ()

@@ -27,6 +27,8 @@
 #include "imesh/object.h"
 #include "imesh/metaball.h"
 
+#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
+
 class csMaterialHandle;
 struct G3DTriangleMesh;
 struct iSystem;
@@ -76,6 +78,8 @@ class csMetaBall : public iMeshObject
   long cur_movable_num;
   UInt MixMode;
   csVector3 rad;
+  float current_lod;
+  uint32 current_features;
 
 public:
   DECLARE_IBASE;
@@ -146,6 +150,18 @@ public:
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
   virtual iMaterialWrapper *GetMaterial() { return th; }
+  virtual uint32 GetLODFeatures () const { return current_features; }
+  virtual void SetLODFeatures (uint32 mask, uint32 value)
+  {
+    mask &= ALL_FEATURES;
+    current_features = (current_features & ~mask) | (value & mask);
+  }
+  virtual void SetLOD (float lod) { current_lod = lod; }
+  virtual float GetLOD () const { return current_lod; }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    return 0;	// @@@ Implement me please!
+  }
 
 ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
@@ -213,6 +229,10 @@ public:
   DECLARE_IBASE;
   
   virtual iMeshObjectFactory* NewFactory();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 #endif // __META_H__

@@ -138,6 +138,10 @@ public:
   DECLARE_IBASE;
 
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 

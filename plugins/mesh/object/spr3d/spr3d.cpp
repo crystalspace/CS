@@ -615,6 +615,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   base_color.Set (0, 0, 0);
   initialized = false;
   shapenr = 0;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()

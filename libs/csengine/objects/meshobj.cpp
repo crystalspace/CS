@@ -53,12 +53,16 @@ IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
 
 void csMeshWrapper::DecRef()
 {
+  CS_ASSERT (scfRefCount >= 0);
   if (scfRefCount <= 1) // About to be deleted...
   {
     iEngine *engine = QUERY_INTERFACE_FAST (parent, iEngine);
     if (engine)
     {
-      engine->GetCsEngine ()->UnlinkMesh (this);
+      // First increase the ref count here because engine::RemoveMesh()
+      // will decrease it again.
+      scfRefCount++;
+      engine->GetCsEngine ()->RemoveMesh (this);
       engine->DecRef ();
     }
   }
@@ -415,28 +419,61 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   // First unlink the mesh from the engine or another parent.
   csMeshWrapper* c = child->GetPrivateObject ();
   csObject* par = c->GetParentContainer ();
+
+  // First we increase reference on the mesh to make sure it will
+  // not get deleted by unlinking it from it's previous parent.
+  // We will also keep this incremented because the parent mesh
+  // now holds an additional reference to this child.
+  c->IncRef ();
+
   if (par)
   {
     iEngine *engine = QUERY_INTERFACE_FAST (par, iEngine);
     if (engine)
     {
-      engine->GetCsEngine ()->UnlinkMesh (c);
+      engine->GetCsEngine ()->RemoveMesh (c);
       engine->DecRef ();
     }
     else
     {
       csMeshWrapper* old_mesh = (csMeshWrapper*)par;
-      csNamedObjVector& ch = old_mesh->GetChildren ();
+      csNamedObjVector& ch = old_mesh->children;
       int idx = ch.Find (c);
       if (idx != -1)
       {
         ch.Delete (idx, false);		// Unlink object
+	c->DecRef ();
       }
     }
   }
   c->SetParentContainer ((csMeshWrapper*)scfParent);
-  scfParent->GetChildren ().Push (c);
+  scfParent->children.Push (c);
   c->GetMovable ().SetParent (&scfParent->movable);
+}
+
+void csMeshWrapper::MeshWrapper::RemoveChild (iMeshWrapper* child)
+{
+  // First unlink the mesh from the engine or another parent.
+  csMeshWrapper* c = child->GetPrivateObject ();
+  csObject* par = c->GetParentContainer ();
+
+  if (par != scfParent) return;	// Wrong parent, nothing to do.
+  csNamedObjVector& ch = scfParent->children;
+  int idx = ch.Find (c);
+  if (idx != -1)
+  {
+    ch.Delete (idx, false);		// Unlink object
+    c->DecRef ();
+  }
+  c->SetParentContainer (NULL);
+  c->GetMovable ().SetParent (NULL);
+}
+
+iBase* csMeshWrapper::MeshWrapper::GetParentContainer ()
+{
+  csObject* par = scfParent->GetParentContainer ();
+  if (!par) return NULL;
+  return (iBase*)par;	// par == iObject == iBase
 }
 
 iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx) const

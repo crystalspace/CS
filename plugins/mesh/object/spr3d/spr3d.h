@@ -37,6 +37,8 @@
 #include "imesh/object.h"
 #include "iutil/config.h"
 
+#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
+
 struct iSystem;
 
 /**
@@ -657,7 +659,7 @@ private:
    * 1 is maximum.  If negative then the base mesh is used and no LOD
    * reduction/computation is done.
    */
-   float local_lod_level;
+  float local_lod_level;
 
   /**
    * Quality setting for sprite lighting.
@@ -677,6 +679,9 @@ private:
    *   </ul>
    */
   int lighting_quality_config;
+
+  float current_lod;
+  uint32 current_features;
 
 public:
  
@@ -1080,7 +1085,7 @@ public:
   	float fov, float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
-  ///------------------------ iMeshObject implementation ------------------------
+  ///------------------------ iMeshObject implementation ----------------------
   DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const
@@ -1114,6 +1119,18 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual uint32 GetLODFeatures () const { return current_features; }
+  virtual void SetLODFeatures (uint32 mask, uint32 value)
+  {
+    mask &= ALL_FEATURES;
+    current_features = (current_features & ~mask) | (value & mask);
+  }
+  virtual void SetLOD (float lod) { current_lod = lod; }
+  virtual float GetLOD () const { return current_lod; }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    return 0;	// @@@ Implement me please!
+  }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -1290,6 +1307,10 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 
   ///------------------- iConfig interface implementation -------------------
   struct csSprite3DConfig : public iConfig

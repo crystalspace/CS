@@ -119,7 +119,7 @@ struct iKeyValuePair;
 typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
 
-SCF_VERSION (iEngine, 0, 1, 27);
+SCF_VERSION (iEngine, 0, 1, 28);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -267,6 +267,14 @@ struct iEngine : public iPlugIn
   	bool regionOnly = false) const = 0;
 
   /**
+   * Remove a mesh from the engine and all sectors that the mesh is in.
+   * The mesh will also be DecRef()'ed which means that it might get
+   * deleted if the engine was the only one still holding a reference
+   * to the mesh.
+   */
+  virtual void RemoveMesh (iMeshWrapper* mesh) = 0;
+
+  /**
    * Delete a mesh factory by name. ONLY call this when you're sure
    * no objects are actually using this factory!
    */
@@ -291,6 +299,14 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainWrapper *FindTerrainObject (const char *iName,
   	bool regionOnly = false) const = 0;
+  /**
+   * Remove a terrain from the engine and all sectors that the terrain is in.
+   * The terrain will also be DecRef()'ed which means that it might get
+   * deleted if the engine was the only one still holding a reference
+   * to the terrain.
+   */
+  virtual void RemoveTerrain (iTerrainWrapper* terrain) = 0;
+
   /**
    * Find a terrain factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different

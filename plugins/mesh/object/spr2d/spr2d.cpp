@@ -59,6 +59,8 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   initialized = false;
   vis_cb = NULL;
   shapenr = 0;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()

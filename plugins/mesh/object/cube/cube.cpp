@@ -55,6 +55,8 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   float r = qsqrt (a*a + a*a);
   radius.Set (r, r, r);
   shapenr = 0;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csCubeMeshObject::~csCubeMeshObject ()

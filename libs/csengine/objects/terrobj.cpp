@@ -49,7 +49,12 @@ IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
 void csTerrainWrapper::DecRef()
 {
   if (scfRefCount <= 1) // About to be deleted...
-    csEngine::current_engine->UnlinkTerrain (this);
+  {
+    // Since RemoveTerrain does DecRef() we first increase
+    // ref count here.
+    scfRefCount++;
+    csEngine::current_engine->RemoveTerrain (this);
+  }
   __scf_superclass::DecRef();
 }
 

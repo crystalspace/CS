@@ -198,6 +198,10 @@ public:
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 

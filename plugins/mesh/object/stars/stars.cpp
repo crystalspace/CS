@@ -56,6 +56,8 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   max_dist = 20;
   density = .1;
   seed = 3939394;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csStarsMeshObject::~csStarsMeshObject ()

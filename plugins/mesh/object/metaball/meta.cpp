@@ -76,6 +76,8 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   mp.iso_level = 1.0;
   mp.charge = 3.5;
   mp.rate = 0.03;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csMetaBall::~csMetaBall ()

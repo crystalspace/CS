@@ -26,6 +26,8 @@
 #include "imesh/stars.h"
 #include "ivideo/graph3d.h"
 
+#define ALL_FEATURES (0)
+
 struct iMaterialWrapper;
 class csStarsMeshObjectFactory;
 
@@ -50,6 +52,8 @@ private:
   bool initialized;
   csVector3 max_radius;
   long shapenr;
+  float current_lod;
+  uint32 current_features;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -128,6 +132,18 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual uint32 GetLODFeatures () const { return current_features; }
+  virtual void SetLODFeatures (uint32 mask, uint32 value)
+  {
+    mask &= ALL_FEATURES;
+    current_features = (current_features & ~mask) | (value & mask);
+  }
+  virtual void SetLOD (float lod) { current_lod = lod; }
+  virtual float GetLOD () const { return current_lod; }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    return 0;	// @@@ Implement me please!
+  }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState
@@ -224,6 +240,10 @@ public:
 
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();
+  virtual uint32 GetFeatures () const
+  {
+    return ALL_FEATURES;
+  }
 };
 
 #endif // _STARS_H_
