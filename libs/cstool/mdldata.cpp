@@ -181,6 +181,36 @@ csModelDataVertices::csModelDataVertices ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
+csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  CopyFrom (orig);
+}
+
+csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig,
+  const iModelDataVertices *orig2)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  CopyFrom (orig);
+  CopyFrom (orig2);
+}
+
+void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
+{
+  if (!v) return;
+  int i;
+  for (i=0; i<v->GetVertexCount (); i++)
+    AddVertex (v->GetVertex (i));
+  for (i=0; i<v->GetNormalCount (); i++)
+    AddNormal (v->GetNormal (i));
+  for (i=0; i<v->GetColorCount (); i++)
+    AddColor (v->GetColor (i));
+  for (i=0; i<v->GetTexelCount (); i++)
+    AddTexel (v->GetTexel (i));
+}
+
 /*** csModelDataAction ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataAction)

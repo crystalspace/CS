@@ -58,7 +58,9 @@
     ga_type &Get (int n)						\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
     void Delete (int n)							\
-    { CS_ASSERT (n >= 0 && n < limit); memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (ga_type)); }\
+    { CS_ASSERT (n >= 0 && n < limit);					\
+      memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (ga_type)); \
+      SetLength (length-1); }						\
     ga_type *GetArray ()						\
     { return root; }							\
     void Push (const ga_type &val, int iGrowStep = 8)			\

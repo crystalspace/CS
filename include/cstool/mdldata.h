@@ -140,8 +140,16 @@ public:
 
   /// constructor
   csModelDataVertices ();
+  /// copy constructor
+  csModelDataVertices (const iModelDataVertices *orig);
+  /// concat constructor
+  csModelDataVertices (const iModelDataVertices *orig1,
+    const iModelDataVertices *orig2);
   /// Destructor
   virtual ~csModelDataVertices() {}
+
+  /// Add all data from another vertex frame to this one
+  void CopyFrom (const iModelDataVertices *Other);
 
   CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Vertex);
   CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);

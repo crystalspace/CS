@@ -177,6 +177,9 @@ struct iModelDataVertices : public iBase
   virtual int AddTexel (const csVector2 &v) = 0;
   /// Delete a texel
   virtual void DeleteTexel (int n) = 0;
+
+  /// Add all data from another vertex frame to this one
+  virtual void CopyFrom (const iModelDataVertices *Other) = 0;
 };
 
 

@@ -21,6 +21,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/objiter.h"
 #include "csutil/garray.h"
+#include "csutil/intarray.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
 #include "cstool/mdldata.h"
@@ -44,13 +45,16 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 
-CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
-CS_TYPEDEF_GROWING_ARRAY (csIntArrayArray, csIntArray);
+CS_TYPEDEF_GROWING_ARRAY (csVector3Array, csVector3);
+CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
+CS_TYPEDEF_GROWING_ARRAY (csColorArray, csColor);
+CS_DECLARE_TYPED_VECTOR (csIntArrayVector, csIntArray);
 
 CS_DECLARE_OBJECT_VECTOR (csModelDataActionVector, iModelDataAction);
 CS_DECLARE_OBJECT_VECTOR (csModelDataMaterialVector, iModelDataMaterial);
 CS_DECLARE_OBJECT_VECTOR (csModelDataObjectVector, iModelDataObject);
 CS_DECLARE_OBJECT_VECTOR (csModelDataPolygonVector, iModelDataPolygon);
+CS_DECLARE_OBJECT_VECTOR (csModelDataVerticesVector, iModelDataVertices);
 
 // ---------------------------------------------------------------------------
 // Some helper functions
@@ -74,57 +78,21 @@ static void ExtractObjects (iModelData *Parent, csModelDataObjectVector &vec)
 }
 
 /*
- * CloneVertices (): Create a copy of a vertex frame.
- *
-static iModelDataVertices *CloneVertices (iModelDataVertices *v)
-{
-  iModelDataVertices *v2 = new csModelDataVertices ();
-  int i;
-
-  for (i=0; i<v->GetVertexCount (); i++)
-    v2->AddVertex (v->GetVertex (i));
-  for (i=0; i<v->GetNormalCount (); i++)
-    v2->AddNormal (v->GetNormal (i));
-  for (i=0; i<v->GetColorCount (); i++)
-    v2->AddColor (v->GetColor (i));
-  for (i=0; i<v->GetTexelCount (); i++)
-    v2->AddTexel (v->GetTexel (i));
-  
-  return v2;
-}
-*/
-
-/*
- * MergeVertices (): Concatenate the vertex, normal, color and texel lists of
- * the given vertex frames and build a new frame from them.
+ * DumpVertices (): Copy all elements of a vertex frame into growing arrays.
  */
-static iModelDataVertices *MergeVertices (const iModelDataVertices *v1,
-	const iModelDataVertices *v2)
+static void DumpVertices (iModelDataVertices *vframe,
+  csVector3Array *Vertices, csVector3Array *Normals,
+  csColorArray *Colors, csVector2Array *Texels)
 {
-#define CS_MERGE_VERTICES_HELPER(vnum,obj)		\
-	for (i=0; i<vnum->Get##obj##Count (); i++)	\
-	  ver->Add##obj (vnum->Get##obj (i));
-
   int i;
-  iModelDataVertices *ver = new csModelDataVertices ();
-
-  if (v1)
-  {
-    CS_MERGE_VERTICES_HELPER (v1, Vertex)
-    CS_MERGE_VERTICES_HELPER (v1, Normal)
-    CS_MERGE_VERTICES_HELPER (v1, Texel)
-    CS_MERGE_VERTICES_HELPER (v1, Color)
-  }
-  if (v2)
-  {
-    CS_MERGE_VERTICES_HELPER (v2, Vertex)
-    CS_MERGE_VERTICES_HELPER (v2, Normal)
-    CS_MERGE_VERTICES_HELPER (v2, Texel)
-    CS_MERGE_VERTICES_HELPER (v2, Color)
-  }
-
-#undef CS_MERGE_VERTICES_HELPER
-  return ver;
+  for (i=0; i<vframe->GetVertexCount (); i++)
+    Vertices->Push (vframe->GetVertex (i));
+  for (i=0; i<vframe->GetNormalCount (); i++)
+    Normals->Push (vframe->GetNormal (i));
+  for (i=0; i<vframe->GetColorCount (); i++)
+    Colors->Push (vframe->GetColor (i));
+  for (i=0; i<vframe->GetTexelCount (); i++)
+    Texels->Push (vframe->GetTexel (i));
 }
 
 /*
@@ -171,7 +139,7 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
     if (ver)
     {
       iModelDataVertices *NewVertices = Swap ?
-        MergeVertices (In2, ver) : MergeVertices (ver, In2);
+        new csModelDataVertices (In2, ver) : new csModelDataVertices (ver, In2);
       Out->AddFrame (In1->GetTime (i), NewVertices->QueryObject ());
       NewVertices->DecRef ();
       ver->DecRef ();
@@ -275,7 +243,7 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
     }
 
     iModelDataVertices *MergedVertices = 
-        MergeVertices (Frame1, Frame2);
+        new csModelDataVertices (Frame1, Frame2);
     Frame1->DecRef ();
     Frame2->DecRef ();
 
@@ -405,7 +373,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   int ColorOffset = DefaultVertices ? DefaultVertices->GetColorCount () : 0;
 
   // copy the default vertices
-  iModelDataVertices *ver = MergeVertices (DefaultVertices, src->GetDefaultVertices ());
+  iModelDataVertices *ver = new csModelDataVertices (DefaultVertices, src->GetDefaultVertices ());
   dest->SetDefaultVertices (ver);
   ver->DecRef ();
 
@@ -696,10 +664,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 	{
 
 #define CS_MDLTOOL_HELPER(obj)						\
-  n = -1;								\
-  for (k=0; k<obj##IndexTable->Length (); k++)				\
-    if (obj##IndexTable->Get (k) == Polygon->Get##obj (j))		\
-      { n = k; break; }							\
+  n = obj##IndexTable->Find (Polygon->Get##obj (j));			\
   if (n != -1) {							\
     Polygon->Set##obj (j, n);						\
   } else {								\
@@ -707,7 +672,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
     Polygon->Set##obj (j, obj##IndexTable->Length () - 1);		\
   }
         
-          int n, k;
+          int n;
           CS_MDLTOOL_HELPER (Vertex);
           CS_MDLTOOL_HELPER (Normal);
           CS_MDLTOOL_HELPER (Color);
@@ -842,3 +807,222 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
 
 #undef CS_MDLTOOL_TRY_BEGIN
 #undef CS_MDLTOOL_TRY_END
+
+void csModelDataTools::CompressVertices (iModelData *Scene)
+{
+  csModelDataObjectIterator it (Scene->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    CompressVertices (it.Get ());
+    it.Next ();
+  }
+}
+
+void csModelDataTools::CompressVertices (iModelDataObject *Object)
+{
+  csModelDataVerticesVector VertexFrames;
+  csModelDataPolygonVector Polygons;
+  int i,j,k;
+
+  // collect all vertex frames and polygons
+  VertexFrames.Push (Object->GetDefaultVertices ());
+  iObjectIterator *it = Object->QueryObject ()->GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataPolygon *Polygon =
+      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataPolygon);
+    if (Polygon)
+    {
+      Polygons.Push (Polygon);
+      Polygon->DecRef ();
+    }
+
+    iModelDataAction *Action =
+      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataAction);
+    if (Action)
+    {
+      for (i=0; i<Action->GetFrameCount (); i++)
+      {
+        iModelDataVertices *ver =
+	  SCF_QUERY_INTERFACE_FAST (Action->GetState (i), iModelDataVertices);
+	if (ver)
+	{
+	  VertexFrames.PushSmart (ver);
+	  ver->DecRef ();
+	}
+      }
+    }
+    it->Next ();
+  }
+  it->DecRef ();
+
+  // extract the data from one of the vertex frames into growing arrays
+  csVector3Array VertexList;
+  csVector3Array NormalList;
+  csColorArray ColorList;
+  csVector2Array TexelList;
+
+  iModelDataVertices *ver = VertexFrames[0];
+  DumpVertices (ver, &VertexList, &NormalList, &ColorList, &TexelList);
+
+  // build the initial 'potential mergeable vertices' list
+  csIntArray *VertexListIndices = csIntArray::CreateIdentityMapping (VertexList.Length ());
+  csIntArray *NormalListIndices = csIntArray::CreateIdentityMapping (NormalList.Length ());
+  csIntArray *ColorListIndices = csIntArray::CreateIdentityMapping (ColorList.Length ());
+  csIntArray *TexelListIndices = csIntArray::CreateIdentityMapping (TexelList.Length ());
+  csIntArrayVector VertexSets;
+  csIntArrayVector NormalSets;
+  csIntArrayVector ColorSets;
+  csIntArrayVector TexelSets;
+  csIntArray UniqueVertexList;
+  csIntArray UniqueNormalList;
+  csIntArray UniqueColorList;
+  csIntArray UniqueTexelList;
+
+#define CS_MDLTOOL_HELPER(type,obj,comp)				\
+  while (obj##List.Length () > 0)					\
+  {									\
+    csIntArray *Set = new csIntArray ();				\
+    type o1 = obj##List [0];						\
+    int Index1 = obj##ListIndices->Get (0);				\
+    Set->Push (Index1);							\
+    obj##List.Delete (0);						\
+    obj##ListIndices->Delete (0);					\
+									\
+    for (i=0; i<obj##List.Length (); i++)				\
+    {									\
+      type o2 = obj##List [i];						\
+      if (comp)								\
+      {									\
+        Set->Push (obj##ListIndices->Get (i));				\
+	obj##List.Delete (i);						\
+	obj##ListIndices->Delete (i);					\
+	i--;								\
+      }									\
+    }									\
+									\
+    if (Set->Length () > 1)						\
+      obj##Sets.Push (Set);						\
+    else								\
+      { Unique##obj##List.Push (Index1); delete Set; }			\
+  }
+
+  CS_MDLTOOL_HELPER (csVector3, Vertex, (o1 - o2 < EPSILON));
+  CS_MDLTOOL_HELPER (csVector3, Normal, (o1 - o2 < EPSILON));
+  CS_MDLTOOL_HELPER (csColor, Color,
+    ABS (o1.red - o2.red) < SMALL_EPSILON &&
+    ABS (o1.green - o2.green) < SMALL_EPSILON &&
+    ABS (o1.blue - o2.blue) < SMALL_EPSILON );
+  CS_MDLTOOL_HELPER (csVector2, Texel, (o1 - o2 < EPSILON));
+#undef CS_MDLTOOL_HELPER
+
+  // now look which parts of these sets are valid for all frames
+#define CS_MDLTOOL_HELPER(type,obj,comp)				\
+  for (i=0; i<obj##Sets.Length (); i++)					\
+  {									\
+    bool FoundOther = false;						\
+    csIntArray *Set = obj##Sets [i];					\
+    csIntArray *Removed = NULL;						\
+    type o1 = ver->Get##obj (Set->Get (0));				\
+    for (j=1; j<Set->Length (); j++)					\
+    {									\
+      type o2 = ver->Get##obj (Set->Get (j));				\
+      if (!(comp)) {							\
+        if (!Removed) Removed = new csIntArray ();			\
+        Removed->Push (Set->Get (j));					\
+        Set->Delete (j); j--;						\
+      }									\
+    }									\
+    if (Removed) {							\
+      if (Removed->Length () < 2)					\
+      { Unique##obj##List.Push (Removed->Get (0)); delete Removed; }	\
+      else obj##Sets.Push (Removed);					\
+    }									\
+    if (Set->Length () < 2) {obj##Sets.Delete (i); i--;}		\
+  }
+
+  for (k=1; k<VertexFrames.Length (); k++)
+  {
+    ver = VertexFrames [k];
+
+    CS_MDLTOOL_HELPER (csVector3, Vertex, (o1 - o2 < EPSILON));
+    CS_MDLTOOL_HELPER (csVector3, Normal, (o1 - o2 < EPSILON));
+    CS_MDLTOOL_HELPER (csColor, Color,
+      ABS (o1.red - o2.red) < SMALL_EPSILON &&
+      ABS (o1.green - o2.green) < SMALL_EPSILON &&
+      ABS (o1.blue - o2.blue) < SMALL_EPSILON );
+    CS_MDLTOOL_HELPER (csVector2, Texel, (o1 - o2 < EPSILON));
+  }
+#undef CS_MDLTOOL_HELPER
+
+  // build the final mapping tables
+  csIntArray VertexMapN2O, NormalMapN2O, ColorMapN2O, TexelMapN2O;
+  csIntArray VertexMapO2N, NormalMapO2N, ColorMapO2N, TexelMapO2N;
+  VertexMapO2N.SetLength (VertexFrames[0]->GetVertexCount ());
+  NormalMapO2N.SetLength (VertexFrames[0]->GetNormalCount ());
+  ColorMapO2N.SetLength (VertexFrames[0]->GetColorCount ());
+  TexelMapO2N.SetLength (VertexFrames[0]->GetTexelCount ());
+
+#define CS_MDLTOOL_HELPER(obj)						\
+  for (i=0; i<Unique##obj##List.Length (); i++)				\
+  {									\
+    obj##MapN2O.Push (Unique##obj##List [i]);				\
+    obj##MapO2N [Unique##obj##List [i]] = i;				\
+  }									\
+  for (i=0; i<obj##Sets.Length (); i++)					\
+  {									\
+    obj##MapN2O.Push (obj##Sets [i]->Get (0));				\
+    for (j=0; j<obj##Sets [i]->Length (); j++)				\
+    {									\
+      obj##MapO2N [obj##Sets [i]->Get (j)] = Unique##obj##List.Length () + i; \
+    }									\
+  }
+
+  CS_MDLTOOL_HELPER (Vertex);
+  CS_MDLTOOL_HELPER (Normal);
+  CS_MDLTOOL_HELPER (Color);
+  CS_MDLTOOL_HELPER (Texel);
+#undef CS_MDLTOOL_HELPER
+
+  // apply the mapping to all vertex frames
+#define CS_MDLTOOL_HELPER(obj)						\
+  while (ver->Get##obj##Count () > 0)					\
+    ver->Delete##obj (0);						\
+  for (i=0; i<obj##MapN2O.Length (); i++)				\
+    ver->Add##obj (obj##List [obj##MapN2O [i]]);
+
+  while (VertexFrames.Length () > 0)
+  {
+    ver = VertexFrames.Pop ();
+    VertexList.SetLength (0);
+    NormalList.SetLength (0);
+    ColorList.SetLength (0);
+    TexelList.SetLength (0);
+    DumpVertices (ver, &VertexList, &NormalList, &ColorList, &TexelList);
+    CS_MDLTOOL_HELPER (Vertex);
+    CS_MDLTOOL_HELPER (Normal);
+    CS_MDLTOOL_HELPER (Color);
+    CS_MDLTOOL_HELPER (Texel);
+    ver->DecRef ();
+  }
+#undef CS_MDLTOOL_HELPER
+
+  // apply the mapping to all polygon
+#define CS_MDLTOOL_HELPER(obj)						\
+  for (i=0; i<poly->GetVertexCount (); i++)				\
+    Orig[i] = poly->Get##obj (i);					\
+  for (i=0; i<poly->GetVertexCount (); i++)				\
+    poly->Set##obj (i, obj##MapO2N [Orig [i]]);				\
+
+  while (Polygons.Length () > 0)
+  {
+    iModelDataPolygon *poly = Polygons.Pop ();
+    int *Orig = new int [poly->GetVertexCount ()];
+    CS_MDLTOOL_HELPER (Vertex);
+    CS_MDLTOOL_HELPER (Normal);
+    CS_MDLTOOL_HELPER (Color);
+    CS_MDLTOOL_HELPER (Texel);
+    poly->DecRef ();
+    delete[] Orig;
+  }
+}

@@ -155,6 +155,14 @@ public:
     if (what) ((iBase*)what)->IncRef ();
     return csVector::Push((csSome)what); 
   }
+  inline int PushSmart (csSome what)
+  {
+    int n = Find (what);
+    if (n != -1) return n;
+
+    if (what) ((iBase*)what)->IncRef ();
+    return csVector::Push((csSome)what); 
+  }
   inline bool Insert (int n, csSome Item)
   {
     if (Item) ((iBase*)Item)->IncRef ();
@@ -211,6 +219,8 @@ public:
     { return superclass::FindSortedKey (Key, Mode); }			\
     inline int Push (TYPE *obj)						\
     { return superclass::Push ((csSome)obj); }				\
+    inline int PushSmart (TYPE *obj)					\
+    { return superclass::PushSmart ((csSome)obj); }			\
     inline TYPE *Pop ()							\
     { return (TYPE *)superclass::Pop(); }				\
     inline bool Insert (int n, TYPE *Item)				\

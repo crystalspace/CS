@@ -69,6 +69,8 @@ public:
 
   /// Push a element on 'top' of vector
   inline int Push (csSome what);
+  /// Push an elemen on top of the vector if it is not yet contained
+  inline int PushSmart (csSome what);
   /// Pop a element from vector 'top'
   inline csSome Pop ();
 
@@ -165,6 +167,12 @@ inline int csBasicVector::Push (csSome what)
   SetLength (count + 1);
   root [count - 1] = what;
   return (count - 1);
+}
+
+inline int csBasicVector::PushSmart (csSome what)
+{
+  int n = Find (what);
+  return (n == -1) ? Push (what) : n;
 }
 
 inline csSome csBasicVector::Pop ()

@@ -70,6 +70,19 @@ struct csModelDataTools
    * Print a description of an object into a string.
    */
   static void Describe (iObject *obj, csString &s);
+
+  /**
+   * Merge duplicate vertices, normals, colors and texels
+   * in an object.
+   */
+  static void CompressVertices (iModelDataObject *Object);
+
+  /**
+   * Merge duplicate vertices, normals, colors and texels
+   * in all objects of a model data scene.
+   */
+  static void CompressVertices (iModelData *Scene);
+
 };
 
 #endif // __MDLTOOL_H__
