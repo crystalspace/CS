@@ -334,3 +334,46 @@ bool IsPowerOf2 (int n)
     return false; 
   return !(n & (n - 1));	// (n-1) ^ n >= n;
 }
+
+/**
+ * given src and dest, which are already allocated, copy source to dest.
+ * But, do not copy 'search', instead replace that with 'replace' string.
+ * max is size of dest
+*/
+void csFindReplace(char *dest, const char *src, const char *search,
+  const char *replace, int max)
+{
+  char *found = 0;
+  const char *srcpos = src;
+  char *destpos = dest;
+  int searchlen = strlen(search);
+  int replacelen = strlen(replace);
+  destpos[0] = 0;
+  int sizeleft = max;
+  /// find and replace occurrences
+  while( (found=strstr(srcpos, search)) != 0 )
+  {
+    // copy string before it
+    int beforelen = found - srcpos;
+    sizeleft -= beforelen;
+    if(sizeleft <= 0) { destpos[0]=0; return; }
+    strncpy(destpos, srcpos, beforelen);
+    destpos += beforelen; 
+    srcpos += beforelen;
+    destpos[0]=0;
+    // add replacement
+    sizeleft -= replacelen;
+    if(sizeleft <= 0) { destpos[0]=0; return; }
+    strcpy(destpos, replace); 	
+    destpos += replacelen;
+    // skip replaced string
+    srcpos += searchlen; 			
+  }
+  // add remainder of string
+  int todo = strlen(srcpos);
+  sizeleft -= todo;
+  if(sizeleft <= 0) { destpos[0]=0; return; }
+  strcpy(destpos, srcpos); 	
+  destpos += todo;
+  destpos[0]=0;
+}

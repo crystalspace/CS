@@ -119,4 +119,11 @@ static inline int csLog2 (int n)
   return l;
 }
 
+/**
+ * given src and dest, which are already allocated, copy source to dest.
+ * But, do not copy 'search', instead replace that with 'replace' string.
+ * max is size of dest.
+ */
+void csFindReplace(char *dest, const char *src, const char *search,
+  const char *replace, int max);
 #endif // __UTIL_H__
