@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+6-Feb-2002
+	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
+	  "make depend" flags to work around problem reported by David Calkins
+	  <dcalk@verizon.net>.
 4-Deb-2003
 	- Eric Sunshine disabled the experimental
 	  PTHREAD_MUTEX_HAS_RECURSIVE_NP feature since the configure test

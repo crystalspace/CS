@@ -71,7 +71,7 @@ ifdef DO_DEPEND
 dep: $(OUTOS)/freefont2.dep
 $(OUTOS)/freefont2.dep: $(SRC.FREEFONT2)
 	$(DO.DEP1) \
-	$(FT2.CFLAGS) \
+	$(FT2.CFLAGS) -DFT_UINT_MAX=0xFFFFFFFFUL -DFT_ULONG_MAX=0xFFFFFFFFUL \
 	$(DO.DEP2)
 else
 -include $(OUTOS)/freefont2.dep
