@@ -6,8 +6,11 @@ The history order is reversed so that new features are at the top.
 27-May-2003
 	- Philip Wyett added *.pyd (Python DLL's) and *.csplugin to the
           CS root directory .cvsignore file.
-	    - Corrected MSVC 6 docs build requirement of minimum Python
-              version for CS. Now specifies minimum of 2.2.
+	- Philip Wyett Corrected MSVC 6 docs build requirement of minimum Python
+          version for CS. Now specifies minimum of 2.2.
+	- Jorrit reverted a fix from res to the sequence manager which was
+	  done about two weeks ago. This fix unfortunatelly makes csdemo
+	  crash so I had to remove it.
 26-May-2003
 	- Eric Sunshine eliminated compilation warning about implicit
 	  conversion of (int*) to (GLint*) in glcommon2d.cpp.
