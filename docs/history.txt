@@ -30,6 +30,8 @@ chronological order.
 	      on images without alpha.
 	    - Added a flag to the engine to control whether data needed only
 	      for saving back the world should be kept.
+	- Eric Sunshine added fabsf() to the set of functions faked up by
+	  CS_USE_FAKE_MATH_H_FLOAT_FUNCS.
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.
