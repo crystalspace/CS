@@ -57,6 +57,10 @@ enum
     K_KP_END		= '1',
     K_KP_INSERT		= '0',
     K_KP_DELETE		= '.',
+    K_KP_MULTIPLY	= '*',
+    K_KP_DIVIDE		= '/',
+    K_KP_PLUS		= '+',
+    K_KP_MINUS		= '-',
     K_KP_ENTER		= 0x03,
     K_ED_PAGE_UP	= NSPageUpFunctionKey,
     K_ED_PAGE_DOWN	= NSPageDownFunctionKey,
@@ -349,18 +353,22 @@ enum
     int k = 0;
     switch ([s characterAtIndex:0])
 	{
-	case K_KP_CENTER:    k = CSKEY_CENTER; break;
-	case K_KP_LEFT:      k = CSKEY_LEFT;   break;
-	case K_KP_UP:        k = CSKEY_UP;     break;
-	case K_KP_RIGHT:     k = CSKEY_RIGHT;  break;
-	case K_KP_DOWN:      k = CSKEY_DOWN;   break;
-	case K_KP_PAGE_UP:   k = CSKEY_PGUP;   break;
-	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;   break;
-	case K_KP_HOME:      k = CSKEY_HOME;   break;
-	case K_KP_END:       k = CSKEY_END;    break;
-	case K_KP_INSERT:    k = CSKEY_INS;    break;
-	case K_KP_DELETE:    k = CSKEY_DEL;    break;
-	case K_KP_ENTER:     k = CSKEY_ENTER;  break;
+	case K_KP_CENTER:    k = CSKEY_CENTER;   break;
+	case K_KP_LEFT:      k = CSKEY_LEFT;     break;
+	case K_KP_UP:        k = CSKEY_UP;       break;
+	case K_KP_RIGHT:     k = CSKEY_RIGHT;    break;
+	case K_KP_DOWN:      k = CSKEY_DOWN;     break;
+	case K_KP_PAGE_UP:   k = CSKEY_PGUP;     break;
+	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;     break;
+	case K_KP_HOME:      k = CSKEY_HOME;     break;
+	case K_KP_END:       k = CSKEY_END;      break;
+	case K_KP_INSERT:    k = CSKEY_INS;      break;
+	case K_KP_DELETE:    k = CSKEY_DEL;      break;
+	case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
+	case K_KP_DIVIDE:    k = CSKEY_PADDIV;   break;
+	case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
+	case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
+	case K_KP_ENTER:     k = CSKEY_ENTER;    break;
 	};
     return k;
     }
