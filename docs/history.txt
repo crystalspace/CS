@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  installation includes the distutils module.  This variable can be
 	  used by the cspython module to adjust its build script for the
 	  environment.
+	- Bart Boatwright fixed bug in csEventQueue which caused an endless
+	  recursion leading to a stack fault during RemoveListener calls.
 20-Apr-2003
 	- Micah updated the .cvsignore files to include flarge's cache and
 	  the completed binaries without a special extension.

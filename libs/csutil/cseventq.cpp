@@ -270,7 +270,7 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
   int const n = FindListener(listener);
   if (n >= 0)
   {
-    Listeners[n].object->DecRef();
+		iBase* listener = Listeners[n].object;
     // Only delete the entry in the vector if we're not in a loop.
     if (busy_looping <= 0)
       Listeners.Delete(n);
@@ -279,6 +279,7 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
       Listeners[n].object = NULL;
       delete_occured = true;
     }
+    listener->DecRef();
   }
 }
 
@@ -286,7 +287,8 @@ void csEventQueue::RemoveAllListeners ()
 {
   for (int i = Listeners.Length() - 1; i >= 0; i--)
   {
-    Listeners[i].object->DecRef();
+		printf ("Removing listener...\n");
+		iBase* listener = Listeners[i].object;
     if (busy_looping <= 0)
     {
       Listeners.Delete (i);
@@ -296,6 +298,7 @@ void csEventQueue::RemoveAllListeners ()
       Listeners[i].object = NULL;
       delete_occured = true;
     }
+    listener->DecRef();
   }
 }
 
