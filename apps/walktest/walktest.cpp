@@ -380,10 +380,10 @@ void WalkTest::DemoWrite (const char* buf)
       bool dblbuff;
       Gfx2D->GetDoubleBufferState (dblbuff);
       Gfx2D->Clear (0);
-      if (dblbuff)
-        area.Union (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
       Console->PutText ("%s", buf);
       Console->Print (&area);
+      if (dblbuff)
+        area.Union (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1);
       Gfx2D->FinishDraw ();
       Gfx2D->Print (&area);
     }
