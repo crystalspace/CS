@@ -105,7 +105,8 @@ private:
   csRef<iVFS> vfs;
   csStringHash xmltokens;
 
-  bool ParseMaterialPalette (iDocumentNode* node, iLoaderContext *ldr_context, csArray<iMaterialWrapper*>& palette);
+  bool ParseMaterialPalette (iDocumentNode* node, iLoaderContext *ldr_context,
+  	csArray<iMaterialWrapper*>& palette);
 public:
   SCF_DECLARE_IBASE;
 

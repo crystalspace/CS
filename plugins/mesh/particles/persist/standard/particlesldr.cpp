@@ -910,7 +910,8 @@ bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
   iParticlesObjectState *state)
 {
   const char *type = node->GetAttributeValue ("type");
-  if (!type) {
+  if (!type)
+  {
     synldr->ReportError ("crystalspace.particles.object.loader",
       node, "No type specified for emitter!");
     return false;
@@ -983,7 +984,8 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
   iParticlesObjectState *state)
 {
   const char *type = node->GetAttributeValue ("type");
-  if (!type) {
+  if (!type)
+  {
     synldr->ReportError ("crystalspace.particles.object.loader",
       node, "No type specified for force!");
     return false;

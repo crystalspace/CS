@@ -78,6 +78,10 @@ chronological order.
 	- Jorrit fixed circular ref between loader and the mesh loader plugins
 	  for particles and terrain. That partially fixes some of the ref leaks
 	  in terrain, terrainf, and particles levels (bot not all).
+	- Jorrit fixed circular ref in particles mesh object. The problem
+	  is equivalent to the problem with embedded event handlers. In this
+	  case the embedded struct was an iShaderVariableAccessor. By having
+	  this as an embedded struct there was a circular reference.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

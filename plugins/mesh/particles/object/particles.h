@@ -981,13 +981,25 @@ public:
 
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
+  private:
+    csParticlesObject* parent;
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObject);
+    SCF_DECLARE_IBASE;
+    eiShaderVariableAccessor (csParticlesObject* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      eiShaderVariableAccessor::parent = parent;
+    }
+    virtual ~eiShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      scfParent->PreGetShaderVariableValue (variable);
+      parent->PreGetShaderVariableValue (variable);
     }
-  } scfiShaderVariableAccessor;
+  };
+  csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);

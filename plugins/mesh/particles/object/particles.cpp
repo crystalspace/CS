@@ -147,7 +147,6 @@ SCF_IMPLEMENT_IBASE (csParticlesObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticlesObjectState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiParticlesObjectState)
@@ -159,9 +158,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csParticlesObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csParticlesObject::csParticlesObject (csParticlesFactory* p)
   : logparent (p), pFactory (p)
@@ -169,7 +168,6 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   SCF_CONSTRUCT_IBASE (p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor)
 
   mesh = 0;
   meshpp = 0;
@@ -244,16 +242,17 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   running = false;
 
   svcontext = new csShaderVariableContext ();
+  scfiShaderVariableAccessor.AttachNew (new eiShaderVariableAccessor (this));
 
   csShaderVariable* sv;
   sv = svcontext->GetVariableAdd (vertex_name);
-  sv->SetAccessor (&scfiShaderVariableAccessor);
+  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   sv = svcontext->GetVariableAdd (color_name);
-  sv->SetAccessor (&scfiShaderVariableAccessor);
+  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   sv = svcontext->GetVariableAdd (texcoord_name);
-  sv->SetAccessor (&scfiShaderVariableAccessor);
+  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   sv = svcontext->GetVariableAdd (index_name);
-  sv->SetAccessor (&scfiShaderVariableAccessor);
+  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   sv = svcontext->GetVariableAdd (radius_name);
   sv->SetValue (particle_radius);
   sv = svcontext->GetVariableAdd (scale_name);
@@ -266,15 +265,12 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
 csParticlesObject::~csParticlesObject ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticlesObjectState)
   SCF_DESTRUCT_IBASE ()
   
-  if (meshpp)
-    delete [] meshpp;
-  if (mesh)
-    delete mesh;
+  delete [] meshpp;
+  delete mesh;
 }
 
 csPtr<iMeshObject> csParticlesObject::Clone ()
