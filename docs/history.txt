@@ -12,10 +12,10 @@ chronological order.
 	  if you have lots of cal3d objects visible. There are three thresshold
 	  distances which are controlled in the new sprcal3d.cfg. The default
 	  values are:
-	  	- less then distance 10: no skipping
-		- less then distance 20: skip 4 frames
-		- less then distance 50: skip 20 frames
-		- more then 50: skip 1000 frames
+	  	- less than distance 10: no skipping
+		- less than distance 20: skip 4 frames
+		- less than distance 50: skip 20 frames
+		- more than 50: skip 1000 frames
 	- Jorrit fixed a bug in the new sprcal3d optimization. Now it actually
 	  works.
 	- res tweaked the GL text drawing settings; the somewhat problematic
