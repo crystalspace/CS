@@ -92,7 +92,7 @@ public:
   Simple ();
   virtual ~Simple ();
 
-  virtual bool Initialize (int argc, char const* const argv[],
+  virtual bool Initialize (int argc, const char const* const argv[],
     char const *iConfigName);
 @};
 
@@ -133,7 +133,7 @@ void cleanup ()
   delete System;
 @}
 
-bool Simple::Initialize (int argc, char const* const argv[],
+bool Simple::Initialize (int argc, const char const* const argv[],
   char const* iConfigName)
 @{
   if (!superclass::Initialize (argc, argv, iConfigName))
@@ -312,7 +312,7 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-bool Simple::Initialize (int argc, char const* const argv[],
+bool Simple::Initialize (int argc, const char const* const argv[],
   char const* iConfigName)
 @{
   @dots{}
@@ -502,7 +502,7 @@ Simple::~Simple ()
 At the end of our Initialize() function we add the following:
 
 @example
-bool Simple::Initialize (int argc, char const* const argv[],
+bool Simple::Initialize (int argc, const char const* const argv[],
   char const* iConfigName)
 @{
   @dots{}
