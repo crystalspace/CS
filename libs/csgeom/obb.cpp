@@ -99,7 +99,8 @@ csVector3 csOBB::GetCorner (int corner) const
 float csOBB::Volume ()
 {
   float vol = 1;
-  for (int i = 0; i < 3; i ++)
+  int i;
+  for (i = 0; i < 3; i ++)
   {
     vol *= csBox3::Max(i) - csBox3::Min (i);
   }
@@ -118,7 +119,8 @@ csOBBTreeNode::csOBBTreeNode (csVector3 **left, csVector3 **right)
 {
   CS_ASSERT (left && right);
   mBox.StartBoundingBox ();
-  for (csVector3 **c = left; c <= right; c ++)
+  csVector3 **c;
+  for (c = left; c <= right; c ++)
   {
     CS_ASSERT (c);
     mBox.AddBoundingVertex (**c);
@@ -139,7 +141,8 @@ bool csOBBTreeNode::Split ()
   if (mLeft != NULL || mRight != NULL) { return true; }
   int dim = 0;
   float max = 0;
-  for (int i = 0; i < 3; i ++)
+  int i;
+  for (i = 0; i < 3; i ++)
   {
     float d = mBox.Max(i) - mBox.Min(i);
     if (d > max)
@@ -189,7 +192,8 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
   mDiameter = 0;
   float max = 0.0;
   int dim = 0;
-  for (int i = 0; i < 3; i ++)
+  int i;
+  for (i = 0; i < 3; i ++)
   {
     float d = box.Max(i) - box.Min (i);
     mDiameter += d * d;
@@ -200,7 +204,8 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
     }
   }
   csVector3 vmax = a->GetLeftPoint(), vmin = b->GetRightPoint();
-  for (csVector3 **c = a->GetLeftPointRef(); c < a->GetRightPointRef(); c ++)
+  csVector3 **c;
+  for (c = a->GetLeftPointRef(); c < a->GetRightPointRef(); c ++)
   {
     if ((**c)[dim] > vmax[dim])
     {
@@ -211,7 +216,7 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
       vmin = **c;
     }
   }
-  for (csVector3 **c = b->GetLeftPointRef(); c < b->GetRightPointRef(); c ++)
+  for (c = b->GetLeftPointRef(); c < b->GetRightPointRef(); c ++)
   {
     if ((**c)[dim] > vmax[dim])
     {
@@ -380,14 +385,15 @@ const csOBBLine3 csOBBTree::Diameter (float eps)
 void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
 {
   CS_ASSERT (vertex_table);
+  int i;
 
   csOBBTree *tree = new csOBBTree (vertex_table, num);
   csOBBLine3 l1 = tree->Diameter (eps);
   csVector3 dir1 = l1.Direction();
   delete tree;
-		
+
   csVector3 *proj_vt = new csVector3[num];
-  for (int i = 0; i < num; i ++)
+  for (i = 0; i < num; i ++)
   {
     proj_vt[i] = vertex_table[i] - ((dir1 * vertex_table[i])*dir1);
   }
@@ -403,7 +409,7 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
   csOBB aabb;
   mvbb.StartBoundingBox ();
   aabb.StartBoundingBox ();
-  for (int i = 0; i < num; i ++)
+  for (i = 0; i < num; i ++)
   {
     mvbb.AddBoundingVertex (vertex_table[i]);
     aabb.AddBoundingVertex (vertex_table[i]);
@@ -418,12 +424,13 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
 void csOBB::FindOBBAccurate (const csVector3 *vertex_table, int num)
 {
   CS_ASSERT (vertex_table);
+  int i, j;
 
   csVector3 dir1 = vertex_table[num-1] - vertex_table[0];
   float len1 = dir1.Norm();
-  for (int i = 0; i < num; i ++)
+  for (i = 0; i < num; i ++)
   {
-    for (int j = i; j < num; j ++)
+    for (j = i; j < num; j ++)
     {
       csVector3 n = vertex_table[j] - vertex_table[i];
       float nlen = n.Norm();
@@ -438,9 +445,9 @@ void csOBB::FindOBBAccurate (const csVector3 *vertex_table, int num)
   csVector3 dir2 = (vertex_table[num-1] - ((dir1 * vertex_table[num-1]) * dir1)) -
     (vertex_table[0] - ((dir1 * vertex_table[0]) * dir1));
   float len2 = dir2.Norm();
-  for (int i = 0; i < num; i ++)
+  for (i = 0; i < num; i ++)
   {
-    for (int j = i; j < num; j ++)
+    for (j = i; j < num; j ++)
     {
       csVector3 vi = vertex_table[i];
       vi -= (vi * dir1) * dir1;
@@ -461,7 +468,7 @@ void csOBB::FindOBBAccurate (const csVector3 *vertex_table, int num)
   csVector3 dir3 = dir1 % dir2;
 
   csOBB mvbb (dir1, dir2, dir3);
-  for (int i = 0; i < num; i ++)
+  for (i = 0; i < num; i ++)
   {
     mvbb.AddBoundingVertex (vertex_table[i]);
   }
