@@ -33,6 +33,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 #CFLAGS.LUA += $(CFLAGS.I)$(LUA_INC)
+CFLAGS.LUA += $(CFLAGS.D)LUA_MS
 
 # LUA_LIB points at the Lua library directory (often /usr/lib/lua1.5).
 # The actual static link library usually resides in a "config" subdirectory of
@@ -55,7 +56,7 @@ else
 endif
 
 SWIG.INTERFACE = plugins/cscript/common/cs.i
-#SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
+SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
 SWIG.CSLUA.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSLUA:.cpp=$O)))
 
 TRASH.CSLUA = $(wildcard $(addprefix scripts/lua/,*.pyc *.pyo))
@@ -92,7 +93,7 @@ $(OUT)%$O: plugins/cscript/cslua/%.c
 	$(DO.COMPILE.C) $(CFLAGS.LUA)
 
 $(SWIG.CSLUA): $(SWIG.INTERFACE)
-	swiglua -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
+	swiglua -multistate -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
 
 $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
 	$(DO.PLUGIN) $(LIB.CSLUA.LOCAL)

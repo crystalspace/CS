@@ -44,7 +44,7 @@ csLua::csLua(iBase *iParent) :Sys(NULL), Mode(MSG_INITIALIZATION)
   CONSTRUCT_IBASE(iParent);
 }
 
-static lua_State *L = NULL;
+lua_State *L = NULL;
 csLua::~csLua()
 {
   Mode=MSG_INTERNAL_ERROR;
@@ -53,6 +53,7 @@ csLua::~csLua()
   thisclass=NULL;
 }
 
+void cspace_init (lua_State *lua_state);
 bool csLua::Initialize(iSystem* iSys)
 {
   Sys=iSys;
@@ -67,6 +68,8 @@ bool csLua::Initialize(iSystem* iSys)
   lua_mathlibopen(L);
   lua_dblibopen(L);
 //Userinit end
+
+  cspace_init(L);
 
   Mode=MSG_STDOUT;
   return true;
