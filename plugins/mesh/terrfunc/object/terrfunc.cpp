@@ -38,6 +38,7 @@
 #include "csgfx/rgbpixel.h"
 #include "terrfunc.h"
 #include "terrvis.h"
+#include "terrdiv.h"
 #include "qint.h"
 #include "qsqrt.h"
 
@@ -74,6 +75,8 @@ csTerrBlock::csTerrBlock ()
   }
   material = NULL;
   node = NULL;
+  quaddiv = NULL;
+  framenum = 1;
 }
 
 csTerrBlock::~csTerrBlock ()
@@ -89,6 +92,110 @@ csTerrBlock::~csTerrBlock ()
     delete[] mesh[i].triangles;
     delete[] normals[i];
   }
+  delete quaddiv; quaddiv = NULL;
+}
+
+void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func)
+{
+  int depth = 9;
+  if(!quaddiv) quaddiv = new csTerrainQuadDiv(depth);
+  quaddiv->ComputeDmax(height_func, 
+    bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
+}
+
+void csTerrBlock::PrepareFrame(const csVector3& campos)
+{
+  CS_ASSERT(quaddiv);
+  /// invalidate previous divisions;
+  framenum++;
+  /// compute LOD
+  quaddiv->ComputeLOD(framenum, campos, bbox.MinX(), bbox.MinZ(), bbox.MaxX(),
+    bbox.MaxZ());
+}
+
+/// data to pass for drawing
+struct terrdata {
+  G3DTriangleMesh mesh;
+  CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+  CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
+  CS_DECLARE_GROWING_ARRAY (texels, csVector2);
+  CS_DECLARE_GROWING_ARRAY (colors, csColor);
+  csTerrBlock *block;
+};
+
+/// get triangles
+static void TerrTri(void *userdata, const csVector3& t1, 
+  const csVector3& t2, const csVector3& t3)
+{
+  struct terrdata *dat = (struct terrdata*)userdata;
+  /// get indices for triangle
+  int trinum = dat->vertices.Length();
+  dat->vertices.Push(t1);
+  dat->vertices.Push(t2);
+  dat->vertices.Push(t3);
+  csTriangle tri;
+  tri.a = trinum;
+  tri.b = trinum+1;
+  tri.c = trinum+2;
+  dat->triangles.Push( tri );
+  dat->colors.Push( csColor(1,1,1) );
+  dat->colors.Push( csColor(1,1,1) );
+  dat->colors.Push( csColor(1,1,1) );
+  dat->texels.Push( csVector2(0,0) );
+  dat->texels.Push( csVector2(1,0) );
+  dat->texels.Push( csVector2(0,1) );
+}
+
+void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
+  bool clip_z_plane)
+{
+  /// collect triangles and draw them
+  iGraphics3D *pG3D = rview->GetGraphics3D();
+  iCamera* pCamera = rview->GetCamera();
+  iVertexBufferManager* vbufmgr = pG3D->GetVertexBufferManager();
+  csReversibleTransform& camtrans = pCamera->GetTransform ();
+
+  struct terrdata m; // my data
+  m.mesh.vertex_fog = NULL;
+  m.mesh.morph_factor = 0;
+  m.mesh.num_vertices_pool = 1;
+  m.mesh.use_vertex_color = true;
+  m.mesh.do_morph_texels = false;
+  m.mesh.do_morph_colors = false;
+  m.mesh.do_fog = false;
+  m.mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+  m.mesh.mixmode = CS_FX_GOURAUD;
+  /// can use vbuf[0]
+  m.mesh.buffers[0] = vbuf[0];
+  m.mesh.buffers[1] = NULL;
+
+  m.mesh.num_triangles = 0;
+  m.mesh.triangles = NULL;
+  m.mesh.do_mirror = pCamera->IsMirrored();
+  m.mesh.clip_portal = clip_portal;
+  m.mesh.clip_plane = clip_plane;
+  m.mesh.clip_z_plane = clip_z_plane;
+  m.mesh.mat_handle = material->GetMaterialHandle();
+
+  m.block = this;
+
+  CS_ASSERT(quaddiv);
+  quaddiv->Triangulate(TerrTri, (void*)&m, framenum,
+    bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
+
+  int num_vertices = m.vertices.Length();
+
+  if( (num_vertices <= 0) || (m.mesh.num_triangles <= 0))
+    return;
+
+  CS_ASSERT(m.mesh.buffers[0]);
+  CS_ASSERT(m.mesh.buffers[0]->IsLocked ());
+  vbufmgr->LockBuffer(m.mesh.buffers[0],
+    m.vertices.GetArray(), m.texels.GetArray(), m.colors.GetArray(), 
+    num_vertices, 0);
+  rview->CalculateFogMesh(camtrans, m.mesh);
+  pG3D->DrawTriangleMesh(m.mesh);
+  vbufmgr->UnlockBuffer (m.mesh.buffers[0]);
 }
 
 //------------------------------------------------------------------------
@@ -215,6 +322,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   current_lod = 1;
   current_features = 0;
   vbufmgr = NULL;
+  quaddiv_enabled = false;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -1400,6 +1508,14 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
       	clip_z_plane))
       {
+        if(quaddiv_enabled)
+	{
+	  block.PrepareQuadDiv(height_func);
+	  block.PrepareFrame( origin );
+	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
+	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane);
+	  continue;
+	}
         csVector3& bc = block.center;
         int lod = 0;
         float sqdist = csSquaredDist::PointPoint (bc, origin);
