@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/09/29
+    1999/10/06
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -48,11 +48,6 @@ It is possible to build multi-architecture binaries (MAB) by using the
 standard Apple/NeXT makefile variable TARGET_ARCHS on the command-line.  See
 the "Architectures" section in INSTALL.NeXT for a full discussion of this
 facility.
-
-Although the current trend with non-NeXT ports of Crystal Space is to make use
-of dynamically loaded modules, this implementation does not currently provide
-such support.  Therefore, at this time, "plug-in" renderers are not supported.
-This limitation is subject to change in the future.
 
 This implementation makes use of public AppKit API to interface with the
 Window Server for all animation and event handling.  It does not make use of
@@ -173,7 +168,7 @@ Crystal Space requires.  This includes interfaces to the underlying operating
 system as well as higher-level event-loop processing as provided by the
 AppKit's Application class.  The files comprising this module are:
 
-    NeXTSystemDriver.h      The COM-capable declaration of SysSytemDriver.
+    NeXTSystemDriver.h      The COM-capable declaration of SysSystemDriver.
                             Does not include Objective-C headers.  This is the
                             sole interface through which Crystal Space
                             communicates with the platform-specific port.
@@ -210,6 +205,9 @@ AppKit's Application class.  The files comprising this module are:
                             AppKit events and forwarding them to Crystal Space
                             via NeXTSystemProxy.  Termination requests by the
                             user on the AppKit side are also forwarded.
+
+    NeXTLoadLibrary.cpp     Functions which provide dynamic linking facilities
+                            for MacOS/X Server, OpenStep, & NextStep.
 
     NeXTMenu.cpp            A utility which generates the application's main
     NeXTMenu.h              menu from INI-style configuration information.
@@ -540,9 +538,7 @@ This is a list of items which are planned for future releases of this project.
     o Possibly only flush only part of the frame buffer to the display in
       csGraphics2D::Print() rather than the entire frame buffer.  Be careful,
       though.  The current technique of flushing the entire frame buffer takes
-      advantage of out-of-line data in Mach messages, so it is very fast.  I
-      do not know if this same form of fast transport will be used if only a
-      portion of the bitmap is drawn.
+      advantage of out-of-line data in Mach messages, so it is very fast.
     o Re-write event handling so that it no longer relies on a timer to drive
       animation.  The problem with using the timer is that (1) it places an
       upper limit on the frame rate, and (2) on slow machines it can fire
@@ -592,6 +588,12 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/10/06 (15r000+CVS)
+    Implemented dynamic linking support.  The 2D driver, 3D renderer, and
+        sound & network drivers are now linked into the application
+	dynamically at run-time.  The NextStep implementation relies on RLD,
+	whereas the OpenStep and MacOS/X Server implementations rely on DYLD.
+
 1999/09/13 (15r000+CVS)
     Now uses -[NSWindow center] to center window instead of doing so manually.
 
