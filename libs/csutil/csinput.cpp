@@ -373,7 +373,7 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
 
   if (IsKeyboardDebugging())
   {
-    csPrintf ("raw: %s cooked: %s %s%s%s\n", GetKeycodeString (codeRaw), 
+    csPrintf ("raw: %s cooked: %s %s%s\n", GetKeycodeString (codeRaw), 
       GetKeycodeString (codeCooked), iDown ? "down" : "up", 
       autoRepeat ? " autoRepeat" : "");
   }
@@ -466,7 +466,7 @@ const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
   if (str != 0) return str;
 
   static char genName[13];
-  sprintf (genName, "[%lu]", code);
+  sprintf (genName, "[%lu]", (unsigned long)code);
   return genName;
 #endif
   return 0;

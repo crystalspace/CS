@@ -403,7 +403,7 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	{
 	  csPrintf ("msg: %s wp: %s lp: %.8x\n", 
 	    Win32KeyMsgNames.StringForIdent (message), GetVKName (wParam), 
-	    lParam);
+	    (uint)lParam);
 	}
 	if (Win32KeyToCSKey (wParam, lParam, raw, cooked, type))
 	{
