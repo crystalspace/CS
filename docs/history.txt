@@ -18,6 +18,11 @@ The history order is reversed so that new features are at the top.
 	  to aws scrollbar's setup. This enhancement was submitted by
 	  Logan Gabriel <gersh@sonn.com>. He also fixed documentation of
 	  aws scrollbat as hinted by Logan.
+	- res moved the imaging subset functions in the XML GL extensions list
+	  over to ARB_imaging. Although the subset is part of the OpenGL 1.2 spec,
+	  it states that it might not be supported by implementations. It is 
+	  indeed not supported by the ATI Catalyst drivers, causing the 
+	  GL_version_1_2 pseudo-extension to fail initialization.
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
