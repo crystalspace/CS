@@ -196,7 +196,7 @@ bool Video::Initialize (int argc, const char* const argv[],
     iVFS *pVFS = QUERY_PLUGIN (this, iVFS);
     if (pVFS)
     {
-      iFile *pFile = pVFS->Open ("this/data/video.avi", VFS_FILE_READ);
+      iFile *pFile = pVFS->Open ("data/video.avi", VFS_FILE_READ);
       pVFS->DecRef ();
       if (pFile && pVideoFormat->Load (pFile))
       {
