@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	  was added twice to the sector.
 	- Fixed definition of CS_GNUC_PRINTF in case an old gcc is used.
 	  Also fixed definition of CS_GNUC_SCANF.
+	- Matze removed CS_GNUC_PRINTF from pubapi and devapi docs
 26-Nov-2001
 	- Added documentation for terrain engine.
 	- Extended documentation on the format of the plugin loaders by also
