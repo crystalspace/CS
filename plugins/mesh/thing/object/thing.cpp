@@ -267,6 +267,7 @@ void csThingStatic::Prepare ()
       if (!sp->Finish ())
 	prepared = false;
     }
+    static_polygons.ShrinkBestFit ();
   }
   
   if (prepared)
@@ -353,6 +354,7 @@ void csThingStatic::PrepareLMLayout ()
   for (i = 0; i < polys.Length (); i++)
   {				      
     csStaticPolyGroup* lp = polys[i];
+    lp->polys.ShrinkBestFit ();
 
     if (lp->numLitPolys == 0)
     {
@@ -371,6 +373,9 @@ void csThingStatic::PrepareLMLayout ()
     }
   }
   delete rejectedPolys;
+
+  litPolys.ShrinkBestFit ();
+  unlitPolys.ShrinkBestFit ();
 
   lmprepared = true;
 }
@@ -565,6 +570,9 @@ void csThingStatic::DistributePolyLMs (
 
       if (curOutputPolys->polys.Length () > 0)
       {
+	curOutputPolys->slmSubrects.ShrinkBestFit ();
+	curOutputPolys->lmRects.ShrinkBestFit ();
+	curOutputPolys->polys.ShrinkBestFit ();
 	outputPolys.Push (curOutputPolys);
 	curOutputPolys = new csStaticLitPolyGroup;
       }
@@ -1787,9 +1795,9 @@ void csThing::PreparePolygons ()
     p->SetStaticPolyIdx (i);
     p->SetParent (this);
     polygons.Push (p);
-    //p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->Finish (ps);
   }
+  polygons.ShrinkBestFit ();
 }
 
 void csThing::Prepare ()
@@ -2742,9 +2750,10 @@ void csThing::PrepareLMs ()
       if (pg->material == 0) pg->material = slpg.material;
 
       int j;
+      pg->polys.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-	pg->polys.Push (polygons[slpg.polys[j]]);
+	pg->polys.Put (j, polygons[slpg.polys[j]]);
       }
 
       unlitPolys.Push (pg);
@@ -2757,6 +2766,7 @@ void csThing::PrepareLMs ()
       lpg->SLM = SLM;
 
       int j;
+      lpg->lightmaps.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
 	csPolygon3D* poly = polygons[slpg.polys[j]];
@@ -2770,7 +2780,7 @@ void csThing::PrepareLMs ()
 	rlm->SetLightCellSize (polytxt->GetLightCellSize ());
 	polytxt->SetRendererLightmap (rlm);
 
-	lpg->lightmaps.Push (rlm);
+	lpg->lightmaps.Put (j, rlm);
       }
 
       litPolys.Push (lpg);
@@ -2786,13 +2796,17 @@ void csThing::PrepareLMs ()
     if (pg->material == 0) pg->material = spg.material;
 
     int j;
+    pg->polys.SetLength (spg.polys.Length ());
     for (j = 0; j < spg.polys.Length(); j++)
     {
-      pg->polys.Push (polygons[spg.polys[j]]);
+      pg->polys.Put (j, polygons[spg.polys[j]]);
     }
 
     unlitPolys.Push (pg);
   }
+
+  litPolys.ShrinkBestFit ();
+  unlitPolys.ShrinkBestFit ();
 
   lightmapsPrepared = true;
   lightmapsDirty = true;

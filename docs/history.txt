@@ -47,6 +47,10 @@ chronological order.
 	- Jorrit removed four bytes in every polygon by removing the unnused
 	  material there. Also removed the API to set materials on polygons
 	  in a thing. This should be done by using the ReplaceMaterials api.
+	- Jorrit made thing a bit more memory efficient by calling
+	  ShrinkBestFit() on the various arrays that are used during setup of
+	  a thing. These arrays are typically not modified after they are
+	  created so it is best that they have exactly the size that they need.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
