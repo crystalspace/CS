@@ -97,7 +97,7 @@ iBase* csObjectRegistryIterator::Next ()
 void csObjectRegistryIterator::Add (iBase* obj, char const* tag)
 {
   objects.Push (obj);
-  tags.Push ((char*)tag);
+  tags.Push (tag);
 }
 
 //-------------------------------------------------------------------------
@@ -136,7 +136,6 @@ void csObjectRegistry::Clear ()
     // before calling DecRef(), since we don't want some other object asking
     // for it during its own destruction.
     iBase* b = registry[i];
-//printf ("Unregister %08lx/'%s' ref=%d\n", b, t, b->GetRefCount ()); fflush (stdout);
     registry.DeleteIndex (i); // Remove from list before DecRef().
     tags.DeleteIndex (i);
     b->DecRef ();
@@ -146,6 +145,9 @@ void csObjectRegistry::Clear ()
 
 bool csObjectRegistry::Register (iBase* obj, char const* tag)
 {
+  if (obj == 0)
+    return false;
+
   csScopedMutexLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
@@ -165,7 +167,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
 
     obj->IncRef ();
     registry.Push (obj);
-    tags.Push ((char*)tag);
+    tags.Push (tag);
     return true;
   }
   return false;
@@ -176,7 +178,7 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
   csScopedMutexLock lock (mutex);
 
   CS_ASSERT (registry.Length () == tags.Length ());
-  if (!clearing)
+  if (!clearing && obj != 0)
   {
     int i;
     for (i = registry.Length() - 1; i >= 0; i--)
@@ -232,7 +234,8 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       iBase* interf = (iBase*)(b->QueryInterface (id, version));
       if (!interf)
       {
-        printf ("WARNING! Suspicious: object with tag '%s' doesn't implement interface '%s'!\n", t, t);
+        printf ("WARNING! Suspicious: object with tag '%s' does not implement "
+	        "interface '%s'!\n", t, iSCF::SCF->GetInterfaceName(id));
 	fflush (stdout);
 	return 0;
       }

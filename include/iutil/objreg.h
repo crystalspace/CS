@@ -73,37 +73,47 @@ struct iObjectRegistry : public iBase
    * Register an object with this registry. The same object can
    * be registered multiple times but in that case it is probably
    * best to have different tags so they can be distinguished.
-   * This function will increase the ref count of the given object.
+   * \param obj Object to place into the registry.
+   * \param tag Optional tag. The tag is interpreted in any way the client sees
+   *   fit, however some facilities expect tags to follow a certain
+   *   convention, so be sure to check suitable documentation.
+   * \return False if the given tag is already registered; if obj is null; or
+   *   if the registry is in the process of being cleared.
+   * \remarks The reference count of obj will be incremented at registration
+   *   time.
    * <p>
-   * Note that a given tag (if non-0) may only be registered once.
-   * This function will return false otherwise.
-   * <p>
-   * This function will also fail if this object registry is being
-   * cleared.
+   * \remarks A particular tag can only be registered once. If you need to
+   *   re-use a tag, first unregister the object to which it is associated.
    */
-  virtual bool Register (iBase*, char const* tag = 0) = 0;
+  virtual bool Register (iBase* obj, char const* tag = 0) = 0;
 
   /**
-   * Unregister an object with this registry. If 'tag' is not given
-   * then it will unregister all occurrences of the given object
-   * in the registry (i.e. for all tags). If 'tag' is given then only
-   * the object that has that tag will be unregistered.
-   * This function will decrease the ref count of the given object.
+   * Unregister an object with this registry.
+   * \param obj Object to removed from the registry.
+   * \param tag Optional tag.
+   * \remarks If tag is not provided, * then it will unregister all occurrences
+   *   of obj * in the registry (i.e. for all tags). If tag is provided, then
+   *   only * the particular registration of obj associated with tag will be
+   *   unregistered.
+   * <p>
+   * \remarks The reference count of obj will be decremented at removal time.
    */
-  virtual void Unregister (iBase*, char const* tag = 0) = 0;
+  virtual void Unregister (iBase* obj, char const* tag = 0) = 0;
 
   /**
    * Get the registered object corresponding with the given tag.
-   * This function will increase the ref count of the returned object.
+   * \remarks The reference count of the returned object will be artifically
+   *   incremented, so clients must take care to decrement the reference when
+   *   no longer needed.
    */
   virtual iBase* Get (char const* tag) = 0;
 
   /**
    * Get the registered object corresponding with the given tag and
-   * implementing the specified interface. The iBase pointers returned
-   * by the iterator will be the requested interface itself so there is
-   * no need to do further QueryInterface().
-   * This function will increase the ref count of the returned object.
+   * implementing the specified interface.
+   * \remarks The reference count of the returned object will be artifically
+   *   incremented, so clients must take care to decrement the reference when
+   *   no longer needed.
    */
   virtual iBase* Get (char const* tag, scfInterfaceID id, int version) = 0;
 
