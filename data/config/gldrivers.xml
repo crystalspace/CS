@@ -99,6 +99,17 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="noinvertedfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <inverted_fog>
+	      <Presence>forbidden</Presence>
+	    </inverted_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -162,6 +173,24 @@
       </conditions>
       <applicable>
 	<usecfg>texturecompression</usecfg>
+      </applicable>
+    </rule>
+    <rule description="GeForce FX 5xxxXT: Slow VBO">
+      <conditions>
+	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
+	<!-- @@@ Add some version check -->
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+    <rule description="GeForce FX 5xxxXT: Broken 'Inverted fog'">
+      <conditions>
+	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
+	<!-- @@@ Add some version check -->
+      </conditions>
+      <applicable>
+	<usecfg>noinvertedfog</usecfg>
       </applicable>
     </rule>
     <!--

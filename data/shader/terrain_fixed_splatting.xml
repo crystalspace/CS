@@ -24,7 +24,7 @@
         <fixedfp>
 	  <fog>
 	    <mode>linear</mode>
-	    <start type="float">0.0001</start>
+	    <start type="float">0</start>
 	    <end type="shadervar">texture lod distance</end>
 	    <fogcolor type="vector3">0,0,0</fogcolor>
 	  </fog>

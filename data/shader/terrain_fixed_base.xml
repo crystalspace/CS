@@ -4,6 +4,7 @@
   </shadervars>
 
   <technique priority="300">
+    <tag>inverted_fog</tag>
     <pass>
       <mixmode><copy /></mixmode>
       <buffer name="vertices" destination="position" />
@@ -20,7 +21,7 @@
 	  <fog>
 	    <mode>linear</mode>
 	    <start type="shadervar">texture lod distance</start>
-	    <end type="float">0.0001</end>
+	    <end type="float">0</end>
 	    <fogcolor type="vector4">0,0,0,0</fogcolor>	
 	  </fog>
 	  <layer>
@@ -28,6 +29,82 @@
 	    <colorsource num="1" source="primary color" modifier="color"/>
 	    <coloroperation operation="modulate" scale="2" />
             <alphasource num="0" source="constant color" modifier="alpha"/>
+	    <alphaoperation operation="replace"/>
+	  </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+  <technique priority="250">
+    <pass>
+      <mixmode><copy /></mixmode>
+      <buffer name="vertices" destination="position" />
+      <buffer name="texture coordinates" destination="texture coordinate" />
+      <buffer name="colors" destination="primary color" />
+      <vp plugin="glarb">
+	<!--
+	  Certain HW does not like the "inverted fog" trick above and does
+	  not display any fog at all. In this case, the driver DB should 
+	  disable 'inverted_fog' tagged tehcniques, so the one below is used.
+	 -->
+	<arbvp>
+	  <variablemap variable="texture lod distance" destination="register 0"/>
+	  <program><![CDATA[
+	  !!ARBvp1.0
+	  OPTION ARB_position_invariant;
+	  
+	  PARAM mvp[4]		= { state.matrix.mvp };
+	  PARAM mv[4]	     	= { state.matrix.modelview };
+	  PARAM mvi[4]		= { state.matrix.modelview.inverse };
+	  PARAM one    		= { 1, 1, 1, 1 };
+	  
+	  PARAM loddist		= program.local[0];
+	  
+	  ATTRIB iPos		= vertex.position;
+	  ATTRIB iCol		= vertex.color;
+	  ATTRIB iTex		= vertex.texcoord[0];
+	  
+	  OUTPUT oTex		= result.texcoord[0];
+	  OUTPUT oCol		= result.color;
+	  
+	  TEMP fogDense;
+	  TEMP eyeVertex;
+	  #TEMP outCol;
+	  
+	  # Note transforming the vertex to viewspace isn't needed -
+	  # ARB_position_invariant does this
+
+	  # Transform position to eye
+	  DP4 eyeVertex.x, mv[0], iPos;
+	  DP4 eyeVertex.y, mv[1], iPos;
+	  DP4 eyeVertex.z, mv[2], iPos;
+	  DP4 eyeVertex.w, mv[3], iPos;
+	  
+	  # Calculate what density the "inverted fog" has at this vertex
+	  RCP fogDense, loddist.x;
+	  MUL fogDense, fogDense, eyeVertex;
+	  
+	  # Clamp
+	  MIN fogDense.z, fogDense.z, one.z;
+	  
+	  # Multiply that into color.
+	  MUL oCol.xyz, iCol, fogDense.z;
+	  MOV oCol.w, iCol.w;
+	  
+	  MOV oTex, iTex;
+	  
+	  END
+	  ]]></program>	  
+	</arbvp>
+      </vp>
+      <texture name="tex diffuse" destination="unit 0" />
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <layer>
+	    <colorsource num="0" source="texture" modifier="color"/>
+	    <colorsource num="1" source="primary color" modifier="color"/>
+	    <coloroperation operation="modulate" scale="2" />
+            <alphasource num="0" source="primary color" modifier="alpha"/>
 	    <alphaoperation operation="replace"/>
 	  </layer>
         </fixedfp>

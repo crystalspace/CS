@@ -22,6 +22,14 @@ chronological order.
 	  flarge for NR too.
 	- Jorrit fixed 'flame' command in walktest so that it puts the
 	  flame particle system at the correct position.
+	- res made the following changes:
+	    - Worked around non-working "inverted fog" (used by the fixed 
+	      terrain shaders) on certain GeForce FX cards.
+	    - Improved memory usage of bindoc a bit.
+	    - Fixed 'int' data handling in bindoc.
+	    - Changed csMemFile to not use realloc() to work around problems
+	      on VC.
+	    - csConfigDocumentIterator now properly handles a 0 subsection.
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals

@@ -93,6 +93,14 @@ csBdAttr::csBdAttr (const char* name)
   nstr = csStrNew (name);
 }
 
+csBdAttr::csBdAttr ()
+{
+  flags = BD_ATTR_MODIFIED;
+  value = 0;
+  vstr = 0;
+  nstr = 0;
+}
+
 csBdAttr::~csBdAttr ()
 {
   if (flags & BD_ATTR_MODIFIED)
@@ -100,6 +108,13 @@ csBdAttr::~csBdAttr ()
     delete[] nstr;
     delete[] vstr;
   }
+}
+
+void csBdAttr::SetName (const char* name)
+{
+  CS_ASSERT(flags & BD_ATTR_MODIFIED);
+  delete[] nstr;
+  nstr = csStrNew (name);
 }
 
 const char* csBdAttr::GetNameStr (csBinaryDocument* doc)
@@ -213,8 +228,8 @@ const char* csBinaryDocAttribute::GetValue ()
 	if (vsptr != attrPtr)
 	{
   	  char buf[50];
-	  cs_snprintf (buf, sizeof (buf) - 1, "%u", 
-	    (unsigned int)little_endian_long (attrPtr->value));
+	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
+	    (int)little_endian_long (attrPtr->value));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = attrPtr;
@@ -252,7 +267,7 @@ int csBinaryDocAttribute::GetValueAsInt ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return little_endian_long (attrPtr->value);
+	return (int)(little_endian_long (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
@@ -276,7 +291,7 @@ float csBinaryDocAttribute::GetValueAsFloat ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (float)little_endian_long (attrPtr->value);
+	return (float)((int)little_endian_long (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
@@ -371,7 +386,7 @@ void csBinaryDocAttribute::SetValue (const char* val)
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_INT;
-      attrPtr->value = little_endian_long (v);
+      attrPtr->value = little_endian_long ((long)v);
     }
     else if (checkFloat (val, f))
     {
@@ -396,7 +411,7 @@ void csBinaryDocAttribute::SetValueAsInt (int v)
     delete[] vstr; vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_INT;
-    attrPtr->value = little_endian_long (v);
+    attrPtr->value = little_endian_long ((long)v);
   }
 }
 
@@ -539,8 +554,18 @@ csBdNode::csBdNode (uint32 newType)
   value = 0;
   vstr = 0;
 
-  attrs = new csPDelArray<csBdAttr>;
-  nodes = new csPDelArray<csBdNode>;
+  attrs = new csArray<csBdAttr*>;
+  nodes = new csArray<csBdNode*>;
+}
+
+csBdNode::csBdNode ()
+{
+  flags = BD_NODE_MODIFIED;
+  value = 0;
+  vstr = 0;
+
+  attrs = new csArray<csBdAttr*>;
+  nodes = new csArray<csBdNode*>;
 }
 
 csBdNode::~csBdNode ()
@@ -548,9 +573,25 @@ csBdNode::~csBdNode ()
   if (flags & BD_NODE_MODIFIED)
   {
     delete[] vstr;
+    int i;
+    for (i = 0; i < attrs->Length(); i++)
+      doc->FreeBdAttr (attrs->Get (i));
     delete attrs;
+    for (i = 0; i < nodes->Length(); i++)
+      doc->FreeBdNode (nodes->Get (i));
     delete nodes;
   }
+}
+
+void csBdNode::SetType (uint32 newType)
+{
+  CS_ASSERT(flags & BD_NODE_MODIFIED);
+  flags = (flags & ~BD_NODE_TYPE_MASK) | newType;
+}
+
+void csBdNode::SetDoc (csBinaryDocument* doc)
+{
+  csBdNode::doc = doc;
 }
 
 bdNodeChildTab* csBdNode::GetChildTab ()
@@ -827,8 +868,8 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	if (vsptr != nodeData)
 	{
   	  char buf[50];
-	  cs_snprintf (buf, sizeof (buf) - 1, "%u", 
-	    (unsigned int)little_endian_long (nodeData->value));
+	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
+	    (int)little_endian_long (nodeData->value));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = nodeData;
@@ -1139,7 +1180,9 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
 	return 0;
     }
 
-    csBdNode* newData = new csBdNode (newType);
+    csBdNode* newData = doc->AllocBdNode ();
+    newData->SetType (newType);
+    newData->SetDoc (doc);
 
     int oldChildCount = nodeData->ctNum();
 
@@ -1231,7 +1274,8 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
   {
     if (nodeData->flags & BD_NODE_MODIFIED)
     {
-      csBdAttr* newAttr = new csBdAttr(name);
+      csBdAttr* newAttr = doc->AllocBdAttr ();
+      newAttr->SetName (name);
       int newpos = 0;
       if (nodeData->flags & BD_NODE_HAS_ATTR)
       {
@@ -1493,6 +1537,8 @@ csBinaryDocument::csBinaryDocument ()
   attrPool = 0;
   root = 0;
   outStrHash = 0;
+  attrAlloc = 0;
+  nodeAlloc = 0;
 }
 
 csBinaryDocument::~csBinaryDocument ()
@@ -1511,7 +1557,33 @@ csBinaryDocument::~csBinaryDocument ()
     attrPool = attr->pool_next;
     delete attr;
   }
+  delete attrAlloc;
+  delete nodeAlloc;
   SCF_DESTRUCT_IBASE();
+}
+
+csBdAttr* csBinaryDocument::AllocBdAttr ()
+{
+  if (!attrAlloc) attrAlloc = new csBlockAllocator<csBdAttr> (2000);
+  return attrAlloc->Alloc();
+}
+
+void csBinaryDocument::FreeBdAttr (csBdAttr* attr)
+{
+  CS_ASSERT(attrAlloc);
+  attrAlloc->Free (attr);
+}
+
+csBdNode* csBinaryDocument::AllocBdNode ()
+{
+  if (!nodeAlloc) nodeAlloc = new csBlockAllocator<csBdNode> (2000);
+  return nodeAlloc->Alloc();
+}
+
+void csBinaryDocument::FreeBdNode (csBdNode* node)
+{
+  CS_ASSERT(nodeAlloc);
+  nodeAlloc->Free (node);
 }
 
 csBinaryDocNode* csBinaryDocument::GetPoolNode ()

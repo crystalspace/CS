@@ -102,7 +102,8 @@ bool csConfigDocumentIterator::Next()
   {
     const csConfigDocument::KeyInfo* key = &iterator->Next ();
 
-    if (strncasecmp (key->originalKey, subsection, subsectionLen) == 0)
+    if ((subsection == 0) ||
+      (strncasecmp (key->originalKey, subsection, subsectionLen) == 0))
     {
       if (!key->cachedStringValue) continue;
 

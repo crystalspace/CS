@@ -20,6 +20,7 @@
 #include "iutil/document.h"
 #include "csutil/parray.h"
 #include "csutil/strset.h"
+#include "csutil/blockallocator.h"
 
 struct iDataBuffer;
 class csMemFile;
@@ -248,7 +249,10 @@ public:
 private:
 public:
   csBdAttr (const char* name);
+  csBdAttr ();
   ~csBdAttr ();
+
+  void SetName (const char* name);
 
   const char* GetValueStr (csBinaryDocument* doc);
   const char* GetNameStr (csBinaryDocument* doc);
@@ -338,9 +342,12 @@ public:
   /// value of type 'string' for mod. nodes
   char* vstr;
   /// attributes
-  csPDelArray<csBdAttr>* attrs;
+  //csPDelArray<csBdAttr>* attrs;
+  csArray<csBdAttr*>* attrs;
   /// children
-  csPDelArray<csBdNode>* nodes;
+  //csPDelArray<csBdNode>* nodes;
+  csArray<csBdNode*>* nodes;
+  csBinaryDocument* doc;
 private:
   void* GetFromOffset (uint32 offset)
   { return (void*)((uint8*)this + offset); }
@@ -349,7 +356,11 @@ private:
 public:
   csBdNode (uint32 newType);
   csBdNode (csBdNode* copyFrom);
+  csBdNode ();
   ~csBdNode ();
+
+  void SetType (uint32 newType);
+  void SetDoc (csBinaryDocument* doc);
 
   const char* GetValueStr (csBinaryDocument* doc);
 
@@ -455,6 +466,9 @@ private:
   csBinaryDocNode* nodePool;
   csBinaryDocAttribute* attrPool;
   
+  csBlockAllocator<csBdAttr>* attrAlloc;
+  csBlockAllocator<csBdNode>* nodeAlloc;
+
   csStringHash* outStrHash;
   iFile* outStrStorage;
   uint32 outStrTabOfs;
@@ -471,6 +485,11 @@ public:
 
   csBinaryDocument ();
   virtual ~csBinaryDocument ();
+
+  csBdAttr* AllocBdAttr ();
+  void FreeBdAttr (csBdAttr* attr);
+  csBdNode* AllocBdNode ();
+  void FreeBdNode (csBdNode* node);
 
   /**
    * Get an ID for a string in the output string table.

@@ -90,18 +90,28 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
       char * new_buffer;
       if (disposition == DISPOSITION_FREE)
       {
-	  new_buffer = (char*) realloc((void*) buffer, capacity);
-	  if (!new_buffer)
-	      return 0;
+	//new_buffer = (char*) realloc((void*) buffer, capacity);
+	/*
+	  @@@ This lead to problems with relative large files (several MB)
+	  on VC. Using malloc()/free() instead of realloc() solved the
+	  problems.
+	 */
+
+	new_buffer = (char*) malloc(capacity);
+	if (!new_buffer)
+	    return 0;
+        if (buffer != 0)
+          memcpy(new_buffer, buffer, size);
+	free (buffer);
       }
       else
       {
-	  new_buffer = (char*) malloc(capacity);
-          if (buffer != 0)
-            memcpy(new_buffer, buffer, size);
-	  else
-	    return 0;
-	  FreeBuffer();
+	new_buffer = (char*) malloc(capacity);
+        if (buffer != 0)
+          memcpy(new_buffer, buffer, size);
+	else
+	  return 0;
+	FreeBuffer();
       }  
       buffer = new_buffer;
       disposition = DISPOSITION_FREE;
