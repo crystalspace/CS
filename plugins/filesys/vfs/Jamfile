@@ -9,6 +9,8 @@ Plugin vfs :
 LinkWith vfs : cssys csutil ;
 ExternalLibs vfs : ZLIB ;
 
+Help vfs : "Virtual File System plug-in" ;
+
 actions VfsCfgGen
 {
   cat $(SUBDIR)/vfs.cfg.template > $(<)
