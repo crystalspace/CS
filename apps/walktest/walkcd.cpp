@@ -330,7 +330,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     {
       float max_y=-1e10;
       
-      for (int j=0 ; j<hit ; j++)
+      for (int j=0 ; j<num_our_cd ; j++)
       {
 	csCdTriangle first  = *our_cd_contact[j].tr1;
 	csCdTriangle second = *our_cd_contact[j].tr2;
