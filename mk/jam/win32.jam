@@ -1,6 +1,7 @@
 #============================================================================
 # Jam configuration and actions for Win32
 # Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
+# Copyright (C)2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -112,6 +113,11 @@ __EOF__
 
 }
 
+actions GenerateIconRc
+{
+  echo '1 ICON "$(>)"' > $(<)
+}
+
 actions together CompileResources
 {
     cat $(>) | $(CMD.WINDRES) $(WINDRES.FLAGS) --include-dir=$(>:D) -o $(<)
@@ -122,6 +128,9 @@ rule CompileResources
     Depends $(<) : $(>) ;
 }
 
+##  Win32Resource basename : rcfiles
+##    Specify .rc files for the target known as basename.  The .rc files should
+##    already have SEARCH set appropriately.
 rule Win32Resource
 {
     local target = $($(<)_TARGET) ;
@@ -143,8 +152,8 @@ if $(USE_DLLWRAP) = "yes"
 {
 rule GenerateExportDefs
 {
-  SEARCH on $(<) = $(LOCATE.OBJECTS) ;
-  MakeLocate $(<) : $(LOCATE.OBJECTS) ;
+  SEARCH on $(<) = $(LOCATE_TARGET) ;
+  MakeLocate $(<) : $(LOCATE_TARGET) ;
   Depends $(<) : $(>) ;
 }
 
@@ -204,8 +213,12 @@ rule MakeVersionRc
 
 rule MakeMetadataRc
 {
-  Depends $(<) : $($(>)_METAFILE) ;
-  GenerateWin32MetadataRc $(<) : $($(>)_METAFILE) ;
+  local metafile = $($(>)_METAFILE) ;
+  local metarc = $(<) ;
+  Depends $(metarc) : $(metafile) ;
+  GenerateWin32MetadataRc $(metarc) : $(metafile) ;
+  Clean $(>)clean : $(metarc) ;
+  Clean clean : $(metarc) ;
 }
 
 rule AppResourceWin32
@@ -218,6 +231,32 @@ rule AppResourceWin32
   Clean $(<)clean : $(versionrc) ;
   Clean clean : $(versionrc) ;
   Win32Resource $(<) : $(versionrc) ;
+
+  local icon = [ ApplicationIcon win32 : $(<) ] ;
+  if ! $(icon)
+  {
+    local apptype = gui ;
+    if [ IsElem console : $(>) ] { apptype = console ; }
+    icon = [ ApplicationIconDefault win32 : $(apptype) ] ;
+  }
+  if $(icon)
+  {
+    local iconcopy = [ DoObjectGrist $(icon) ] ;
+    MakeLocate $(iconcopy) : $(LOCATE_TARGET) ;
+    Depends $(iconcopy) : $(icon) ;
+    Copy $(iconcopy) : $(icon) ;
+    Clean $(<)clean : $(iconcopy) ;
+    Clean clean : $(iconcopy) ;
+
+    local iconrc = [ DoObjectGrist $(<)_iconrc.rc ] ;
+    MakeLocate $(iconrc) : $(LOCATE_TARGET) ;
+    Depends $(iconrc) : $(iconcopy) ;
+    GenerateIconRc $(iconrc) : $(iconcopy) ;
+    Clean $(<)clean : $(iconrc) ;
+    Clean clean : $(iconrc) ;
+
+    Win32Resource $(<) : $(iconrc) ;
+  }
 }    
 
 rule PluginResourceWin32
@@ -254,7 +293,7 @@ rule SystemLinkApplication
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 
-  AppResourceWin32 $(<) ;
+  AppResourceWin32 $(<) : $(3) ;
 }
 
 rule SystemInstallApplication

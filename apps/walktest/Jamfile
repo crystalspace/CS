@@ -3,7 +3,6 @@ SubDir TOP apps walktest ;
 Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : csgeom csgfx cstool csutil ;
-Win32Resource walktest : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
 
 CompileGroups bugplug    : walkall ;
 CompileGroups csconin    : walkall ;

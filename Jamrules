@@ -29,11 +29,9 @@ LOCATE.DOCS = $(BUILDTOP)/out/docs ;
 # Include CS build rules.
 include $(TOP)/mk/jam/build.jam ;
 
-# Project-specific settings.
-if $(TARGET.OS) = MACOS_X
-{
-  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs csutil macosx ;
-}
+# Set up default application icon.
+ApplicationIconDefault macosx : gui : appicon.icns : $(TOP) libs csutil macosx ;
+ApplicationIconDefault win32 : gui : cs1.ico : $(TOP) libs csutil win32 ;
 
 # Set up a property which clients can query to determine if the build directory
 # differs from source directory.  This allows clients to perform conditional

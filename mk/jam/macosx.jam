@@ -22,8 +22,7 @@ SHELL ?= "/bin/sh" ;
 APPLICATION.LFLAGS += "-framework AppKit -framework Foundation" ;
 APPLICATION.CONSOLE.LFLAGS += "-framework AppKit -framework Foundation" ;
 PLUGIN.LFLAGS += "-bundle -framework AppKit -framework Foundation" ;
-MACOSX.ENVIRON = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
-MACOSX.APP_ICON = ;
+MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
 
 # Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
 # MacOS/X, and this bogus value will override a RANLIB set via ?= in Jamconfig,
@@ -126,7 +125,7 @@ rule SystemLinkPlugin
 #    Link a plugin module from a set of object files.
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 {
-    $(MACOSX.ENVIRON)
+    $(MACOSX_ENVIRONMENT)
     $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
@@ -134,13 +133,13 @@ actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 #    Link a console (non-GUI) appliation from a set of object files.
 actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
 {
-    $(MACOSX.ENVIRON)
+    $(MACOSX_ENVIRONMENT)
     $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 # CreateApplicationWrapper basename : objects
 #    Create a complete, though minimal, application wrapper given a set of
-#    object files.  The rules ApplicationIconDefaultOSX and ApplicationIconOSX
+#    object files.  The rules ApplicationIconDefault and ApplicationIcon
 #    control the icon associated with the application wrapper.
 rule CreateApplicationWrapper
 {
@@ -150,49 +149,19 @@ rule CreateApplicationWrapper
     WrapFile $(<) : Info.plist : Contents : AppInfoPlist : $(>) ;
     WrapFile $(<) : InfoPlist.strings : Contents Resources English.lproj : 
         AppInfoPlistStrings : $(>) ;
-    if $(MACOSX.APP_ICON) && ! $($(<)_APPICON)
-    {
-        AppIcon $(<) : $(MACOSX.APP_ICON) ;
-    }
-}
 
-# ApplicationIconDefaultOSX icon [ : pathcomponents ]
-#    Specify the default icon for GUI applications.  This setting can be
-#    overriden for a individual application with the ApplicationIconOSX rule.
-rule ApplicationIconDefaultOSX
-{
-    MACOSX.APP_ICON = $(<) ;
-    if $(>)
+    local icon = [ ApplicationIcon macosx : $(<) ] ;
+    if ! $(icon)
     {
-        SEARCH on $(<) = [ FDirName $(>) ] ;
+      local apptype = gui ;
+      if [ IsElem console : $(>) ] { apptype = console ; }
+      icon = [ ApplicationIconDefault macosx : $(apptype) ] ;
     }
-}
-
-# ApplicationIconOSX basename : icon [ : pathcomponents ]
-#    Specify the icon for the application given by basename.  If
-#    pathcomponents is omitted, SEARCH_SOURCE is used.  If this rule is not
-#    invoked, then the icon specified via ApplicationIconDefaultOSX is used.
-#    If ApplicationIconDefaultOSX was never invoked, then no icon is used.
-#
-#    Implementation note: The logic to get the icon copied into the wrapper is
-#    complicated by the fact that it is possible to specify no icon at all (by
-#    invoking neither ApplicationIconDefaultOSX nor ApplicationIconOSX), as
-#    well as being possible to spcify it globally or per-application.  The
-#    convolution of this logic results in a case where two icons might be
-#    copied to the wrapper (one specified with ApplicationIconDefaultOSX and
-#    one by ApplicationIconOSX).  This occurs when ApplicationIconOSX is
-#    invoked after LinkApplication.  Fortunately, other than the extra (unsed)
-#    icon in the application wrapper (the icon specified with
-#    ApplicationIconDefaultOSX), there is no negative impact.  Care is taken
-#    to ensure that Info.plist mentions the correct icon in all cases.
-rule ApplicationIconOSX
-{
-    local dir ;
-    if $(3) { dir = [ FDirName $(3) ] ; }
-    else { dir = $(SEARCH_SOURCE) ; }
-    SEARCH on $(>) = $(dir) ;
-    $(<)_APPICON = $(>) ;
-    AppIcon $(<) : $(>) ;
+    if $(icon)
+    {
+	$(<)_APPICON = $(icon) ;
+        AppIcon $(<) : $(icon) ;
+    }
 }
 
 # Wrapper basename : suffix [ : pathcomponents ]
@@ -251,7 +220,7 @@ rule WrapFile
 # LinkApplication exe : objects
 actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
-    $(MACOSX.ENVIRON)
+    $(MACOSX_ENVIRONMENT)
     $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
@@ -291,9 +260,6 @@ EOT
 }
 
 # AppInfoPlist filename : placeholder : basename
-#    If client did not invoke ApplicationIconOSX, then use the default icon
-#    specified via ApplicationIconDefaultOSX.
-#
 #    Implementation Note: $(BASENAME)_APPICON might be empty in the actions of
 #    this rule, if the client did not specify a default icon or a
 #    target-specific icon, in which case we need to omit both the
@@ -302,14 +268,6 @@ EOT
 #    interpolates a variable, if the variable is empty, it removes all
 #    adjacent text (the key and value, in this case) which is just what we
 #    desire.
-rule AppInfoPlist
-{
-    if ! $($(3)_APPICON)
-    {
-        $(3)_APPICON = $(MACOSX.APP_ICON) ;
-    }
-}
-
 actions AppInfoPlist
 {
   cat << EOT > $(<)
@@ -344,10 +302,6 @@ EOT
 # AppIcon <basename> : <icon>
 #    Copy an icon into the wrapper.  It is assumed that some other agent has
 #    already set SEARCH on the icon, if necessary.
-#
-#    Implementation note: We can not use the File rule to copy the icon since
-#    that rule assumes the source is in SEARCH_SOURCE, which is not always a
-#    valid assumption for icons.
 rule AppIcon
 {
     local icon = $(>:G=$(<)) ;
@@ -355,14 +309,9 @@ rule AppIcon
     Depends $(icon) : $(>) ;
     MakeLocate $(icon) : 
       [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
-    AppIcon1 $(icon) : $(>) ;
+    Copy $(icon) : $(>) ;
     Clean clean : $(icon) ;
     Clean $(<)clean : $(icon) ;
-}
-
-actions AppIcon1
-{
-    $(CP) $(>) $(<)
 }
 
 # InstallApplicationGUI app : installdirs

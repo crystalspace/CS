@@ -3,4 +3,3 @@ SubDir TOP apps demo ;
 Description csdemo : "Demo" ;
 Application csdemo : [ Wildcard *.cpp *.h ] ;
 LinkWith csdemo : csgeom csgfx cstool csutil ;
-Win32Resource csdemo : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;

@@ -6,6 +6,24 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-May-2004
+	- Eric Sunshine made the following changes to the build system:
+	    - Added ApplicationIconDefault and ApplicationIcon rules to
+	      resource.jam.  ApplicationIconDefault allows querying and setting
+	      the default icon(s) for all GUI and/or console applications.
+	      ApplicationIcon allows querying and setting the icon for a
+	      particular application, thus overriding the default icon.  These
+	      rules are platform agnostic and work for all supported platforms.
+	    - Added application icon support to win32.jam.  It now respects
+	      icons assigned by ApplicationIconDefault and ApplicationIcon.
+	    - Augmented Jamrules so that it sets a default icon for GUI
+	      applications on Windows.  This means that all GUI Crystal Space
+	      applications now get an icon; not just Walktest and csdemo.
+	    - Added a flashy new Windows ICO in place of the old drab one.
+	    - Removed the MacOS/X-specific ApplicationIconDefaultOSX and
+	      ApplicationIconOSX rules.  Instead, macosx.jam now respect icons
+	      assigned by the generic ApplicationIconDefault and
+	      ApplicationIcon.
 3-May-2004
 	- Eric Sunshine augmented all the "build" instructions in the user
 	  manual to indicate that the project can be built with both Jam and
