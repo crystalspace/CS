@@ -1,3 +1,5 @@
+ifeq ($(USE_NEW_RENDERER),yes)
+
 # Application description
 DESCRIPTION.r3dtest = Displaying rendering of a watersurface in new renderer
 
@@ -76,3 +78,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # use new renderer
