@@ -368,12 +368,13 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
 
     // write comment
     if (n->GetComment())
+      if (*(n->GetComment()) != 0)
     {
-      char *a = (char*)(n->GetComment()), *b;
+      char *a = (char*)n->GetComment(), *b;
 
       for (b=strchr(a,'\n'); b!=NULL; b=strchr(a,'\n'))
       {
-        *b = NULL;
+        *b = 0;
         Filedata += "; ";
         Filedata += a;
         Filedata += '\n';
@@ -548,9 +549,9 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
 
     // check if this is a comment
     if (*Filedata == ';') {
-      // this is a comment. skip whitespace between comment sign and text
+      // this is a comment. skip one space between comment sign and text
       Filedata++;
-      while (*Filedata == ' ') Filedata++;
+      if (*Filedata == ' ') Filedata++;
 
       if (CurrentComment.Length() > 0)
         CurrentComment += '\n';
