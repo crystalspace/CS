@@ -1123,10 +1123,10 @@ bool csRenderView::ClipBBox (
     return false;	// Not visible.
   frustum_mask = outClipMask;
 
-  if (outClipMask & 0xf == 0)
-    clip_portal = CS_CLIP_NOT;
-  else
+  if (outClipMask & 0xf)
     clip_portal = CS_CLIP_NEEDED;
+  else
+    clip_portal = CS_CLIP_NOT;
 
   if (outClipMask & 0x10)
     clip_z_plane = CS_CLIP_NEEDED;

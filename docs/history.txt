@@ -19,6 +19,8 @@ chronological order.
 	  of calling the complicated ClipBBox()/ClipBSphere() routines. This
 	  will be a lot faster.
 	- Jorrit extended thing and genmesh to use the new system already.
+	- Jorrit extended spr2d, spr3d, ball, and sprcal3d to use the new
+	  system.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.

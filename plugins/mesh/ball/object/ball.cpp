@@ -707,19 +707,10 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
-  csVector3 radius;
-  csSphere sphere;
-  scfiObjectModel.GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-      clip_z_plane, camera_origin) == false)
-    return 0;
-
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   if (((csBallMeshObjectFactory*)factory)->light_mgr)
   {

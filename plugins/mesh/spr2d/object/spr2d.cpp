@@ -472,17 +472,9 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
     temp /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  csSphere sphere (offset, max_radius);
-  csVector3 camera_origin;
-  if (!rview->ClipBSphere (temp, sphere, clip_portal, clip_plane, 
-    clip_z_plane, camera_origin))
-  {
-    n = 0;
-    return 0;
-  }
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane, 
+    clip_z_plane);
+  csVector3 camera_origin = temp.GetT2OTranslation ();
 
   csReversibleTransform tr_o2c;
   tr_o2c.SetO2TTranslation (-temp.Other2This (offset));

@@ -1462,21 +1462,10 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
 
   //  tr_o2c *= scale_mat;
 
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane, camera_origin) == false)
-  {
-    n = 0;
-    return 0;
-  }
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   SetupRenderMeshes ();
   csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes ();
