@@ -6,6 +6,9 @@ The history order has been reversed so that new features are at the top.
 	  as well (and for a second skybox for example). Extended
 	  csPortal::CheckFrustum() so that it has the alpha as a parameter
 	  now because it needs it.
+	- Fixed Map2CS so that it works on big endian machines and also
+	  works on processors that don't allow writing short/long on
+	  odd addresses.
 6-Jul-2000
 	- Samuel Humphreys did the following changes:
             - Removed indentation from bin/dosupd.bat..hope the unix eol stuff
