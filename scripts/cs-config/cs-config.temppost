@@ -1,3 +1,18 @@
+# dependencies of CS
+depends()
+{
+    case $1 in
+	-lcsutil) DEPS="-lcssys";;
+	-lcssys) DEPS="-lcsutil";;
+	-lcsengine) DEPS="-lcssys -lcsutil -lcstool -lcsgeom";;
+	-lcsgeom) DEPS="-lcsutil -lcssys";;
+	-lcsgfx) DEPS="-lcssys -lcsutil";;
+	-lcstool) DEPS="-lcsutil -lcssys";;
+	-lcsws) DEPS="-lcsgfx -lcsgeom -lcsutil -lcssys";;
+	*) DEPS=""
+    esac
+}
+
 #is it a source distribution?
 if test -r "$prefix/Makefile"; then
 #	look for the lib files...
@@ -6,7 +21,7 @@ if test -r "$prefix/Makefile"; then
 	    libdir="$prefix/lib"
 	else
 	    #Thanks go to Jorge for this script magic...
-	    libdir=`find "$CRYSTAL" -name "libcssys.a"  | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
+	    libdir=`find "$CRYSTAL/out" -name "libcssys.a"  | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
 	    if test -z "$libdir"; then
 	        echo "Couldn't detect dir with lib files, aborting!"
 		echo "  Did you already compile CS?"
@@ -48,8 +63,7 @@ cflags=false
 libs_L=false
 libs_l=false
 
-incs="-I${includedir} -I${exec_prefix}/include"
-libs="-L${libdir} ${syslibs}"
+the_flags="-I${includedir} -I${exec_prefix}/include"
 
 while test $# -gt 0; do
   case "$1" in
@@ -97,32 +111,25 @@ while test $# -gt 0; do
 	libs_l=true
 	;;
     cssys)
-	the_libs="$the_libs ${libs} -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcssys"
 	;;
     csengine)
-	the_libs="$the_libs ${libs} -lcsengine -lcstool -lcsgeom -lcsutil -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcsengine"
 	;;
     csgeom)
-	the_libs="$the_libs ${libs} -lcsgeom -lcsutil -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcsgeom"
 	;;
     csgfx)
-	the_libs="$the_libs ${libs} -lcsgfx -lcssys -lcsutil"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcsgfx"
 	;;
     cstool)
-	the_libs="$the_libs ${libs} -lcstool -lcsutil -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcstool"
 	;;
     csutil)
-	the_libs="$the_libs ${libs} -lcsutil -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcsutil"
 	;; 
     csws)
-	the_libs="$the_libs -L${libdir} -lcsws -lcsgfx -lcsgeom -lcsutil -lcssys"
-	the_flags="$the_flags ${incs}"
+	the_libs="$the_libs -lcsws"
 	;;
     *)
       usage 1 1>&2
@@ -131,55 +138,61 @@ while test $# -gt 0; do
   shift
 done
 
-
-if test -n "$show_cflags"; then
-	all_flags="$the_flags $common_cflags"
-fi
-if test -n "$show_cxxflags"; then
-	all_flags="$the_flags $common_cxxflags"
-fi
-if $libs_L || $libs_l; then
-	all_flags="$all_flags $the_libs"
-fi
-
-if test -z "$all_flags" || test "x$all_flags" = "x "; then
-	exit 1
-fi
-
-# Straight out any possible duplicates, but be careful to
-# get '-lfoo -lbar -lbaz' for '-lfoo -lbaz -lbar -lbaz'
-other_flags=
-lib_L_flags=
-rev_libs=
-for i in $all_flags; do
-    case "$i" in
-    # a library, save it for later, in reverse order
-    -l*) rev_libs="$i $rev_libs" ;;
-    -L*|-R*)
-        if $libs_L; then
-            case " $lib_L_flags " in
-            *\ $i\ *) ;;                        # already there
-            *) lib_L_flags="$lib_L_flags $i" ;; # add it to output
-            esac
-        fi;;
-    *)
-        case " $other_flags " in
-        *\ $i\ *) ;;                            # already there
-        *) other_flags="$other_flags $i" ;;     # add it to output
-        esac ;;
+#look for dependencies
+includedeps()
+{
+# already had all dependencies of this lib? then exit
+    case " $ALREADY_TESTED " in
+    	*\ $1\ *) return 0;;
+    	*) ;;
     esac
+
+# if not add 1 dependency
+    depends $1
+    ALREADY_TESTED="$ALREADY_TESTED $1"
+    for a in $DEPS; do
+	case " $@ " in
+	    *\ $a\ *) ;;
+    	    *)  
+		LIBS_OUT="$LIBS_OUT $a"
+	    	return 1
+	    ;;
+	esac
+    done
+    shift
+    if test -n "$1"; then
+	if includedeps $@; then
+	    return 0
+	else
+	    return 1
+	fi
+    else
+	return 0
+    fi
+}
+
+LIBS_OUT="$the_libs"
+ALREADY_TESTED=""
+# loop as long new dependencies had to be added
+while ! includedeps $LIBS_OUT; do
+	ALREADY_TESTED=""
 done
 
-ord_libs=
-if $libs_l; then
-    for i in $rev_libs; do
-        case " $ord_libs " in
-        *\ $i\ *) ;;                    # already there
-        *) ord_libs="$i $ord_libs" ;;   # add it to output in reverse order
-        esac
-    done
-fi
+# reverse order
+the_libs=""
+for i in $LIBS_OUT; do
+	the_libs="$i $the_libs"
+done
 
-echo $other_flags $lib_L_flags $ord_libs
+the_libs="-L$libdir $syslibs $the_libs"
+if test -n "$show_cflags"; then
+	echo "$common_cflags"
+fi
+if test -n "$show_cxxflags"; then
+	echo "$common_cxxflags"
+fi
+if $libs_L || $libs_l; then
+	echo "$the_libs"
+fi
 
 exit 0
