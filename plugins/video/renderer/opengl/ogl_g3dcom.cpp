@@ -5718,10 +5718,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   int maxlayers = 0;
   for( int p=0; p<technique->GetPassCount(); p++ )
   {
-    int sblend = GL_ONE;
-    int dblend = GL_ZERO;
     iEffectPass* pass = technique->GetPass(p);
-    csStringID string;
 
     //get rendererdata to use
     csRef<csOpenGlEffectPassData> pass_data =
@@ -5737,7 +5734,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       ///@@@HACK.. THESE SHOULD BE CHANEGD
       glTrackMatrixNV( GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV,
         GL_IDENTITY_NV );
-      csEffectVector4 vec;
       //set all constants
       for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
       {
@@ -5790,16 +5786,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
       csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(
         layer->GetRendererData(), csOpenGlEffectLayerData);
-
-
-      //int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
-      //int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR,
-      //    GL_SRC_COLOR, GL_SRC_COLOR };
-      //int colorop = GL_MODULATE;
-      int alphasource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
-      int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA,
-        GL_SRC_ALPHA, GL_SRC_ALPHA };
-      int alphaop = GL_MODULATE;
 
       if (ARB_multitexture && (ARB_texture_env_combine
           || EXT_texture_env_combine))
