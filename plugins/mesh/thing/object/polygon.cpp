@@ -1164,7 +1164,9 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
           this, spoly,
 	  thing->GetStaticData ()->thing_type->engine);
   if (error != 0)
+  {
     txt_info.InitLightMaps ();
+  }
   return error;
 }
 

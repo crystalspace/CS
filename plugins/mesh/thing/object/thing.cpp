@@ -2629,6 +2629,21 @@ stop:
 
 void csThing::PrepareLighting ()
 {
+  csColor ambient;
+  static_data->thing_type->engine->GetAmbientLight (ambient);
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* p = polygons.Get (i);
+    csLightMap* lm = p->GetPolyTexture ()->GetLightMap ();
+    if (lm)
+    {
+      lm->CalcMaxStatic (
+          int(ambient.red * 255.0f),
+          int(ambient.green * 255.0f),
+          int(ambient.blue * 255.0f));
+    }
+  }
   ClearLMs ();
   PrepareLMs ();
 }

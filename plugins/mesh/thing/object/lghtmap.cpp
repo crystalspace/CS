@@ -383,8 +383,6 @@ const char* csLightMap::ReadFromCache (
   }
 
 stop:
-  CalcMaxStatic ();
-  
   return 0;
 }
 
@@ -514,26 +512,50 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
         max_static_color_values.blue  + ambient.blue  < 256)
     {
       // No lightmap overflows so we can use fastest loop with no checking.
-      for (int i=0; i<lm_size; i++)
+      if (static_lm)
       {
-        real_lm[i] = static_lm[i];
-        real_lm[i].UnsafeAdd (ambient);
+        for (int i=0; i<lm_size; i++)
+        {
+          real_lm[i] = static_lm[i];
+          real_lm[i].UnsafeAdd (ambient);
+        }
+      }
+      else
+      {
+        csRGBpixel t = max_static_color_values;
+	t.UnsafeAdd (ambient);
+        for (int i=0; i<lm_size; i++) real_lm[i] = t;
       }
       temp_max_color_values.UnsafeAdd (ambient);
     }
     else
     {
       // An overflow is somewhere here, so check each and every addition.
-      for (int i=0; i<lm_size; i++)
+      if (static_lm)
       {
-        real_lm[i] = static_lm[i];
-	real_lm[i].SafeAdd (ambient);
+        for (int i=0; i<lm_size; i++)
+        {
+          real_lm[i] = static_lm[i];
+	  real_lm[i].SafeAdd (ambient);
+        }
+      }
+      else
+      {
+        csRGBpixel t = max_static_color_values;
+	t.SafeAdd (ambient);
+        for (int i=0; i<lm_size; i++) real_lm[i] = t;
       }
       temp_max_color_values.SafeAdd (ambient);
     }
   }
   else
-    memcpy (real_lm, static_lm, 4 * lm_size);
+  {
+    if (static_lm)
+      memcpy (real_lm, static_lm, 4 * lm_size);
+    else
+      for (int i=0; i<lm_size; i++)
+        real_lm[i] = max_static_color_values;
+  }
 
   //---
   // Then add all pseudo-dynamic lights.
@@ -609,10 +631,10 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   return true;
 }
 
-void csLightMap::CalcMaxStatic ()
+void csLightMap::CalcMaxStatic (int r, int g, int b)
 {
-  csRGBpixel min_static_color_values(256,256,256);
-  max_static_color_values.Set(0,0,0);
+  csRGBpixel min_static_color_values (256,256,256);
+  max_static_color_values.Set (0,0,0);
 
   csRGBpixel *map = static_lm;
   long lm_size = lwidth * lheight;
@@ -634,9 +656,18 @@ void csLightMap::CalcMaxStatic ()
 
     map++;
   }
-  //printf ("dist=%d,%d,%d\n", max_static_color_values.red-min_static_color_values.red,
-  	//max_static_color_values.green-min_static_color_values.green,
-	//max_static_color_values.blue-min_static_color_values.blue);
-  //fflush (stdout);
+  if (min_static_color_values.red < r) min_static_color_values.red = r;
+  if (min_static_color_values.green < g) min_static_color_values.green = g;
+  if (min_static_color_values.blue < b) min_static_color_values.blue = b;
+
+#define THRESSHOLD 2
+  if (max_static_color_values.red - min_static_color_values.red <= THRESSHOLD &&
+      max_static_color_values.green - min_static_color_values.green <= THRESSHOLD &&
+      max_static_color_values.blue - min_static_color_values.blue <= THRESSHOLD)
+  {
+    // Optimize!
+    delete[] static_lm;
+    static_lm = 0;
+  }
 }
 

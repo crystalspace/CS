@@ -858,8 +858,6 @@ void csPolyTexture::UpdateFromShadowBitmap (
         polygon,
 	polygon_world_plane,
         cosfact);
-
-    lm->CalcMaxStatic();
   }
 
   delete shadow_bitmap;

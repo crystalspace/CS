@@ -566,6 +566,17 @@ public:
   }
 
   /**
+   * Given a pointer to an element in the array this function will return
+   * the index. Note that this function doesn't check if the returned
+   * index is actually valid. The caller of this function is responsible
+   * for testing if the returned index is within the bounds of the array.
+   */
+  int GetIndex (T* which) const
+  {
+    return which-root;
+  }
+
+  /**
    * Sort array.
    */
   void Sort (ArraySortCompareFunction* compare)

@@ -86,9 +86,6 @@ private:
   /// LightMap dimensions.
   int lwidth, lheight;
 
-  /// Calculate and save max_static_color_values after static_lm is loaded.
-  void CalcMaxStatic ();
-
   /**
    * Calculate the sizes of this lightmap.
    */
@@ -145,6 +142,14 @@ public:
    * r,g,b is the ambient light color used to initialize the lightmap.
    */
   void InitColor (int r, int g, int b);
+
+  /**
+   * Calculate and save max_static_color_values after static_lm is loaded.
+   * r,g,b is the ambient light color used to initialize the lightmap.
+   * This will be used to optimize the lightmap away in case it is mostly
+   * equal to that ambient.
+   */
+  void CalcMaxStatic (int r, int g, int b);
 
   /**
    * Create a ShadowMap for this LightMap.

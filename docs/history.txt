@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Feb-2004
+	- Jorrit added a csArray::GetIndex() function which will return the
+	  index of an element in the array (as input you give a pointer to
+	  the element in the array).
 	- Fritz Elfert fixed several msvc6 compiler warnings.
 19-Feb-2004
 	- res made the following changes:
@@ -64,6 +67,10 @@ chronological order.
 	  call lm->CalcMaxStatic() all the time which is very slow. The
 	  static lightmap doesn't change with dynamic lighting so calling
 	  this function is totally wasted.
+	- Jorrit implemented a big memory savings in the thing plugin. If a
+	  lightmap contains all the same values it will be compressed to that
+	  single value. This saves a considerable amount of memory on big
+	  maps.
 	- Eric Sunshine augmented the OpenAL check in configure.ac so that it
 	  utilizes -lm (if available).  This seems to be needed by Suse 7.3
 	  Linux.
