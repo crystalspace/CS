@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +20,7 @@
 #include "sysdef.h"
 #include "csbe.h"
 
+//-----------------------------------------------------------------------------
 // The class function Time() is maintained in its own source file in order to
 // allow console applications to make use of the system-specific time function
 // without having to link with all of the other facilities referenced by the
@@ -28,8 +28,8 @@
 // the main source file for the csSystemDriver class (csbe.cpp).  If it is
 // incorporated, then it will be much more difficult to link a simple console
 // application.
-
+//-----------------------------------------------------------------------------
 long csSystemDriver::Time()
 {
-	return system_time()/1000;
+  return system_time()/1000;
 }
