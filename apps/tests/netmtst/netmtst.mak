@@ -1,72 +1,66 @@
+DESCRIPTION.netmantest = Crystal Space network manager test
 
-DESCRIPTION.netmantest = Crystal Space Network Manager Test App
-
-#-------------------------------------------------------------- rootdefines ---#
-ifeq ($(MAKESECTION), rootdefines)
+#------------------------------------------------------------- rootdefines ---#
+ifeq ($(MAKESECTION),rootdefines)
 
 # Application
 APPHELP += \
   $(NEWLINE)@echo $"  make netmantest   Make the $(DESCRIPTION.netmantest)$"
 
-endif
+endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
-ifeq ($(MAKESECTION), roottargets)
+#------------------------------------------------------------- roottargets ---#
+ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: netmantest netmantestclean
 
-all apps netdrivers: netmantest
-
-clean: netmantestclean
+all apps: netmantest
 
 netmantest: netman
-	$(MAKE_TARGET)
+	$(MAKE_APP)
 netmantestclean:
 	$(MAKE_CLEAN)
 
-endif
+endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
-ifeq ($(MAKESECTION), postdefines)
+#------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
 
-vpath % apps/tests/netmtst
+vpath %.cpp apps/tests/netmtst
 
-NETMANTEST = netmtst$(EXE)
-LIB.NETMANTEST = $(foreach d,$(DEP.NETMANTEST),$($d.LIB))
-TO_INSTALL.EXE += $(NETMANTEST)
-
+NETMANTEST.EXE = netmtst$(EXE)
 SRC.NETMANTEST = $(wildcard apps/tests/netmtst/*.cpp)
 OBJ.NETMANTEST = $(addprefix $(OUT)/,$(notdir $(SRC.NETMANTEST:.cpp=$O)))
 DEP.NETMANTEST = NETMAN CSTOOL CSUTIL CSSYS
+LIB.NETMANTEST = $(foreach d,$(DEP.NETMANTEST),$($d.LIB))
 
 MSVC.DSP += NETMANTEST
 DSP.NETMANTEST.NAME = netmtst
 DSP.NETMANTEST.TYPE = appcon
-DSP.NETMANTEST.DEPEND = NETMAN CSTOOL CSUTIL CSSYS
 
-endif
+endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
-ifeq ($(MAKESECTION), targets)
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
 
-.PHONY: netmantest netmantestclean
+.PHONY: build.netmantest netmantestclean
 
-netmantest: $(NETMANTEST)
+all: $(NETMANTEST.EXE)
+build.netmantest: $(OUTDIRS) $(NETMANTEST.EXE)
+clean: netmantestclean
 
-$(NETMANTEST): $(OBJ.NETMANTEST) $(LIB.NETMANTEST)
+$(NETMANTEST.EXE): $(OBJ.NETMANTEST) $(LIB.NETMANTEST)
 	$(DO.LINK.EXE)
 
-$(OBJ.NETMANTEST): $(SRC.NETMANTEST)
-	$(DO.COMPILE.CPP)
-
 netmantestclean:
-	-$(RMDIR) $(NETMANTEST) $(OBJ.NETMANTEST)
+	-$(RMDIR) $(NETMANTEST.EXE) $(OBJ.NETMANTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/netmtst.dep
+$(OUTOS)/netmtst.dep: $(SRC.NETMANTEST)
+	$(DO.DEP)
 else
 -include $(OUTOS)/netmtst.dep
 endif
 
-endif
-
+endif # ifeq ($(MAKESECTION),targets)

@@ -1,35 +1,31 @@
+DESCRIPTION.netman = Crystal Space network manager
 
-DESCRIPTION.netman = Crystal Space Standard Network Manager
-
-#-------------------------------------------------------------- rootdefines ---#
-ifeq ($(MAKESECTION), rootdefines)
+#------------------------------------------------------------- rootdefines ---#
+ifeq ($(MAKESECTION),rootdefines)
 
 # Plugin
 PLUGINHELP += \
   $(NEWLINE)@echo $"  make netman       Make the $(DESCRIPTION.netman)$"
 
-endif
+endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
-ifeq ($(MAKESECTION), roottargets)
+#------------------------------------------------------------- roottargets ---#
+ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: netman netmanclean
-
 all plugins netdrivers: netman
 
-clean: netmanclean
-
-netman: ensocket
+netman:
 	$(MAKE_TARGET) MAKE_DLL=yes
 netmanclean:
 	$(MAKE_CLEAN)
 
-endif
+endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
-ifeq ($(MAKESECTION), postdefines)
+#------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
 
-vpath % plugins/net/netman
+vpath %.cpp plugins/net/netman
 
 ifeq ($(USE_PLUGINS),yes)
   NETMAN = $(OUTDLL)/netman$(DLL)
@@ -50,31 +46,29 @@ DEP.NETMAN = CSUTIL CSSYS CSUTIL
 MSVC.DSP += NETMAN
 DSP.NETMAN.NAME = netman
 DSP.NETMAN.TYPE = plugin
-DSP.NETMAN.DEPEND = CSUTIL CSSYS CSUTIL
 
-endif
+endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
-ifeq ($(MAKESECTION), targets)
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
 
 .PHONY: netman netmanclean
 
-netman: $(NETMAN)
+netman: $(OUTDIRS) $(NETMAN)
 
 $(NETMAN): $(OBJ.NETMAN) $(LIB.NETMAN)
 	$(DO.PLUGIN)
 
-$(OUT)/%$O: plugins/net/netman/%.cpp
-	$(DO.COMPILE.CPP)
-
+clean: netmanclean
 netmanclean:
-	-$(RMDIR) $(NETMAN) $(OBJ.NETMAN)
+	$(RM) $(NETMAN) $(OBJ.NETMAN)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/netman.dep
+$(OUTOS)/netman.dep: $(SRC.NETMAN)
+	$(DO.DEP)
 else
 -include $(OUTOS)/netman.dep
 endif
 
-endif
-
+endif # ifeq ($(MAKESECTION),targets)

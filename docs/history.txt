@@ -8,6 +8,13 @@ The history order is reversed so that new features are at the top.
 	  included at the appropriate place and time.  Also fixed several
 	  targets which depend upon user.mak so that they also now depend upon
 	  local.mak.
+	- Eric Sunshine made the following changes to chkperl.sh:
+	    - Fixed numerous portability problems which prevented the script
+	      from functioning correctly on some platforms.
+	    - Documented the imports and exports.
+	    - Made aesthetic improvements.
+	- Eric Sunshine fixed a slew of makefile bugs in csperl5.mak,
+	  netman.mak, netmtst.mak, perl5tst.mak, and template.mak.
 27-Nov-2002
 	- Keith Fulton added movement commands to viewmesh to allow testing
 	  of displacement-based anims.

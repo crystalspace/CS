@@ -1,15 +1,15 @@
-DESCRIPTION.csperl5 = Crystal Space Perl v5 Scripting Plugin
-DESCRIPTION.csperl5dist = Everything to do with the $(DESCRIPTION.csperl5)
+DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
+DESCRIPTION.csperl5dist = $(DESCRIPTION.csperl5)
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION), rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)@echo $"  make csperl5      Make the $(DESCRIPTION.csperl5)$"
+  $(NEWLINE)echo $"  make csperl5      Make the $(DESCRIPTION.csperl5)$"
 
 endif
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION), roottargets)
 
 .PHONY: csperl5 csperl5clean csperl5distclean
@@ -25,7 +25,7 @@ csperl5distclean:
 
 endif
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION), postdefines)
 
 ifeq ($(USE_PLUGINS),yes)
@@ -58,14 +58,14 @@ SWIG.PERL5.DOC = scripts/perl5/cs_wrap.doc
 CEX.CSPERL5 = perl5.cex
 CIN.CSPERL5 = plugins/cscript/csperl5/perl5.cin
 
-
 MSVC.DSP += MSCSPERL5
 DSP.MSCSPERL5.NAME = csperl5
 DSP.MSCSPERL5.TYPE = plugin
-DSP.MSCSPERL5.CFLAGS = /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "NO_STRICT" \
-                       /D "HAVE_DES_FCRYPT" /D "PERL_IMPLICIT_CONTEXT" \
-                       /D "PERL_IMPLICIT_SYS" /D "USE_PERLIO" \
-                       /D "PERL_MSVCRT_READFIX" \
+DSP.MSCSPERL5.CFLAGS = \
+  /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "NO_STRICT" \
+  /D "HAVE_DES_FCRYPT" /D "PERL_IMPLICIT_CONTEXT" \
+  /D "PERL_IMPLICIT_SYS" /D "USE_PERLIO" \
+  /D "PERL_MSVCRT_READFIX" \
 MSCSPERL5 = $(CSPERL5)
 LIB.MSCSPERL5 = $(LIB.CSPERL5) $(LIBPREFIX)perl58$(LIB)
 INC.MSCSPERL5 = $(INC.CSPERL5)
@@ -76,8 +76,8 @@ DEP.MSCSPERL5 = $(DEP.CSPERL5)
 MSVC.DSP += MSCSPERL5SWIG
 DSP.MSCSPERL5SWIG.NAME = csperl5s
 DSP.MSCSPERL5SWIG.TYPE = plugin
-DSP.MSCSPERL5SWIG.CFLAGS = $(DSP.MSCSPERL5.CFLAGS) \
-                           /D "PERL_POLLUTE" /D "NO_HANDY_PERL_MACROS"
+DSP.MSCSPERL5SWIG.CFLAGS = \
+  $(DSP.MSCSPERL5.CFLAGS) /D "PERL_POLLUTE" /D "NO_HANDY_PERL_MACROS"
 MSCSPERL5SWIG = $(SWIG.PERL5.DLL)
 LIB.MSCSPERL5SWIG = $(LIB.MSCSPERL5)
 SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
@@ -86,7 +86,7 @@ DEP.MSCSPERL5SWIG = $(DEP.CSPERL5)
 
 endif
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION), targets)
 
 .PHONY: csperl5 csperl5clean csperl5distclean
@@ -114,7 +114,8 @@ $(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.I)
 	$(MV) plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.C)
-	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) $(PERL5.CFLAGS) -DPERL_POLLUTE -DNO_HANDY_PERL_MACROS)
+	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
+	$(PERL5.CFLAGS) -DPERL_POLLUTE -DNO_HANDY_PERL_MACROS)
 
 $(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -130,17 +131,18 @@ clean: csperl5clean
 distclean: csperl5distclean
 
 csperl5clean:
-	-$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) \
+	$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) \
 	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 csperl5distclean: csperl5clean
-	-$(RM) $(PERLXSI.C) $(SWIG.PERL5.PM) $(SWIG.PERL5.C) $(SWIG.PERL5.DOC)
+	$(RM) $(PERLXSI.C) $(SWIG.PERL5.PM) $(SWIG.PERL5.C) $(SWIG.PERL5.DOC)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
+$(OUTOS)/csperl5.dep: $(SRC.CSPERL5)
+	$(DO.DEP1) $(PERL5.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/csperl5.dep
 endif
 
 endif
-
