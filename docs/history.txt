@@ -45,6 +45,13 @@ The history order has been reversed so that new features are at the top.
 	      fail.  The actual command is now reported (in addition to the
 	      error message which has always been reported).
 	    - Added the missing `-P' flag to the `cvs checkout' command.
+	- Martin Geisse added a "Sound System Changes" section to apimod18.txi.
+	- Eric Sunshine made the following changes to the user's manual:
+	    - Fixed a significant number of Texinfo errors and warnings which
+	      were recently introduced.
+	    - Normalized a lot of Texinfo mark-up usage.
+	    - Eliminated all overfull and underfull hbox warnings reported by
+	      TeX.
 13-Feb-2001
 	- Philip Wyett did some proof reading of the docs:
 	    - Added two missing web links for required mingw
