@@ -194,10 +194,10 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
   xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
 
-  xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+iShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+  xmltokens.Register("integer", 100+csShaderVariable::INT);
+  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 
   xmltokens.Register("primary color", GL_PRIMARY_COLOR);
   xmltokens.Register("texture", GL_TEXTURE);

@@ -122,7 +122,7 @@ private:
   csRefHash<iTextureHandle> texHandles;
   csRefHash<iTextureWrapper> texWrappers;
 
-  iShaderVariable* GetVar (csStringID name, bool create = false);
+  csShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
 
 public:
@@ -195,10 +195,10 @@ public:
     if (w) w->SelectMaterial (this);
     symtab.AddChild (c->GetSymbolTable ());
   }
-  virtual void AddVariable (iShaderVariable *v)
+  virtual void AddVariable (csShaderVariable *v)
     { symtab.SetSymbol (v->GetName (), v); }
-  virtual iShaderVariable* GetVariable (csStringID name)
-    { return (iShaderVariable *) symtab.GetSymbol (name); }
+  virtual csShaderVariable* GetVariable (csStringID name)
+    { return (csShaderVariable *) symtab.GetSymbol (name); }
   virtual csSymbolTable* GetSymbolTable () { return & symtab; }
   virtual csSymbolTable* GetSymbolTable (int i) { return & symtab; }
   virtual void SelectSymbolTable (int i) {}

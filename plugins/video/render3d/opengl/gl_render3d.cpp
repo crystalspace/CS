@@ -695,22 +695,22 @@ bool csGLRender3D::Open ()
   //position
   shvar_light_0_pos = shadermgr->CreateVariable(
     strings->Request ("STANDARD_LIGHT_0_POSITION"));
-  shvar_light_0_pos->SetType(iShaderVariable::VECTOR4);
+  shvar_light_0_pos->SetType(csShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_pos);
   
   shvar_light_0_diffuse = shadermgr->CreateVariable(
     strings->Request ("STANDARD_LIGHT_0_DIFFUSE"));
-  shvar_light_0_diffuse->SetType(iShaderVariable::VECTOR4);
+  shvar_light_0_diffuse->SetType(csShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_diffuse);
   
   shvar_light_0_specular = shadermgr->CreateVariable(
     strings->Request ("STANDARD_LIGHT_0_SPECULAR"));
-  shvar_light_0_specular->SetType(iShaderVariable::VECTOR4);
+  shvar_light_0_specular->SetType(csShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_specular);
 
   shvar_light_0_attenuation = shadermgr->CreateVariable(
     strings->Request ("STANDARD_LIGHT_0_ATTENUATION"));
-  shvar_light_0_attenuation->SetType(iShaderVariable::VECTOR4);
+  shvar_light_0_attenuation->SetType(csShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 

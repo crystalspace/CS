@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/symtable.h"
+#include "csgfx/shadervar.h"
 
 csSymbolTable::csSymbolTable (const csSymbolTable &other, int size)
  : Hash (size), Parent (0)
@@ -38,6 +39,9 @@ csSymbolTable::~csSymbolTable ()
     delete (Symbol *) iter.Next (); 
 }
 
+inline csSymbolTable::Symbol::Symbol (csStringID id, csShaderVariable *value,
+  bool authoritative) : Name (id), Val (value), Auth (authoritative) {}
+
 inline void csSymbolTable::SetParent (csSymbolTable *p)
 { 
   Parent = p;
@@ -49,7 +53,8 @@ inline void csSymbolTable::SetParent (csSymbolTable *p)
   }
 }
 
-inline void csSymbolTable::PropagateSymbol (csStringID name, iBase *value)
+inline void csSymbolTable::PropagateSymbol (csStringID name,
+  csShaderVariable *value)
 {
   for (int i = 0; i < Children.Length (); i++)
     Children[i]->SetSymbolSafe (name, value);
@@ -61,7 +66,8 @@ inline void csSymbolTable::PropagateDelete (csStringID name)
     Children[i]->DeleteSymbolSafe (name);
 }
 
-inline void csSymbolTable::SetSymbolSafe (csStringID name, iBase *value)
+inline void csSymbolTable::SetSymbolSafe (csStringID name,
+  csShaderVariable *value)
 {
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s)
@@ -106,7 +112,7 @@ void csSymbolTable::AddChildren (csArray<csSymbolTable*> &children)
   }
 }
 
-void csSymbolTable::SetSymbol (csStringID name, iBase *value)
+void csSymbolTable::SetSymbol (csStringID name, csShaderVariable *value)
 {
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s)
@@ -121,7 +127,7 @@ void csSymbolTable::SetSymbol (csStringID name, iBase *value)
 }
 
 void csSymbolTable::SetSymbols (const csArray<csStringID> &names,
-  csArray<iBase *> &values)
+  csArray<csShaderVariable *> &values)
 {
   CS_ASSERT (names.Length () == values.Length ());
   for (int i = 0; i < names.Length (); i++)
@@ -148,18 +154,22 @@ bool csSymbolTable::DeleteSymbols (const csArray<csStringID> &names)
   return ok;
 }
 
-iBase* csSymbolTable::GetSymbol (csStringID name)
+csShaderVariable* csSymbolTable::GetSymbol (csStringID name)
 {
   Symbol *s = (Symbol *) Hash.Get (name);
   if (s) return s->Val;
   else return 0;
 }
 
-csArray<iBase *> csSymbolTable::GetSymbols (const csArray<csStringID> &names)
+csArray<csShaderVariable *> csSymbolTable::GetSymbols
+  (const csArray<csStringID> &names)
 {
-  csArray<iBase *> values;
+  csArray<csShaderVariable *> values;
   for (int i = 0; i < names.Length (); i++)
-    values.Push (GetSymbol (names[i]));
+  {
+    Symbol *s = (Symbol *) Hash.Get (names[i]);
+    values.Push (s ? s->Val : 0);
+  }
   return values;
 }
 
@@ -171,6 +181,6 @@ bool csSymbolTable::SymbolExists (csStringID name)
 bool csSymbolTable::SymbolsExist (const csArray<csStringID> &names)
 {
   for (int i = 0; i < names.Length (); i++)
-    if (! SymbolExists (names[i])) return false;
+    if (! Hash.Get (names[i])) return false;
   return true;
 }

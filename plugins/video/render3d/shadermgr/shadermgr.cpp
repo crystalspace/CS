@@ -45,7 +45,6 @@
 #include "ivideo/texture.h"
 
 #include "ivideo/shader/shader.h"
-//#include "ivideo/shader/shadervar.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
@@ -80,114 +79,6 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE( csShaderPass )
   SCF_IMPLEMENTS_INTERFACE( iShaderPass )
 SCF_IMPLEMENT_IBASE_END
-
-//=================== csShaderVariable ================//
-
-SCF_IMPLEMENT_IBASE (csShaderVariable)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariable)
-SCF_IMPLEMENT_IBASE_END
-
-bool csShaderVariable::GetValue(int& value) const
-{ 
-  value = Int; 
-  return true; 
-}
-
-bool csShaderVariable::GetValue(float& value) const
-{ 
-  value = VectorValue.x; 
-  return true; 
-}
-
-bool csShaderVariable::GetValue(iString*& value) const
-{ 
-/*  value = String; 
-  switch (Type)
-  {
-    case STRING:
-      break;
-    case INT:
-      String->Format ("%d", Int);
-      break;
-    case FLOAT:
-      String->Format ("%g", VectorValue.x);
-      break;
-    case VECTOR3:
-      String->Format ("%g %g %g", VectorValue.x, VectorValue.y, VectorValue.z);
-      break;
-    case VECTOR4:
-      String->Format ("%g %g %g %g", VectorValue.x, VectorValue.y, 
-	VectorValue.z, VectorValue.w);
-      break;
-  }
-  return true; */
-  if (Type != STRING) 
-  {
-    value = 0;
-    return false;
-  }
-  value = String; 
-  return true;
-}
-
-bool csShaderVariable::GetValue(csVector3& value) const
-{ 
-  value.Set (VectorValue.x, VectorValue.y, VectorValue.z);
-  return true; 
-}
-
-bool csShaderVariable::GetValue(csVector4& value) const
-{ 
-  value = VectorValue; 
-  return true; 
-}
-
-bool csShaderVariable::SetValue(int value)
-{ 
-  Type = INT; 
-  Int = value; 
-  float f = value;
-  VectorValue.Set (f, f, f, f);
-  return true; 
-}
-
-bool csShaderVariable::SetValue(float value)
-{ 
-  Type = FLOAT; 
-  Int = (int)value;
-  VectorValue.Set (value, value, value, value);
-  return true; 
-}
-
-bool csShaderVariable::SetValue(iString* value)
-{ 
-  Type = STRING; 
-  String = value; 
-  float floats[4];
-  floats[0] = floats[1] = floats[2] = 0.0f;
-  floats[3] = 1.0f;
-  sscanf (value->GetData (), "%f %f %f %f", 
-    floats[0], floats[1], floats[2], floats[3]);
-  VectorValue.Set (floats[0], floats[1], floats[2], floats[3]);
-  Int = (int)VectorValue.x;
-  return true; 
-}
-
-bool csShaderVariable::SetValue(const csVector3 &value)
-{ 
-  Type = VECTOR3; 
-  VectorValue.Set (value.x, value.y, value.z, 1.0f);
-  Int = (int)value.x;
-  return true; 
-}
-
-bool csShaderVariable::SetValue(const csVector4 &value)
-{ 
-  Type = VECTOR4; 
-  VectorValue.Set (value.x, value.y, value.z, value.w);
-  Int = (int)value.x;
-  return true; 
-}
 
 //=================== csShaderWrapper ================//
 
@@ -348,7 +239,7 @@ csShader::~csShader()
 
   while(cIter.HasNext() )
   {
-    iShaderVariable* i = (iShaderVariable*)cIter.Next();
+    csShaderVariable* i = (csShaderVariable*)cIter.Next();
     i->DecRef();
   }
 
@@ -374,14 +265,14 @@ bool csShader::IsValid() const
   return false;
 }
 
-iShaderVariable* csShader::privateGetVariable(int namehash)
+csShaderVariable* csShader::privateGetVariable(int namehash)
 {
-  iShaderVariable* var;
+  csShaderVariable* var;
   csHashIterator cIter(variables, namehash);
 
   if( cIter.HasNext() )
   {
-    var = (iShaderVariable*)cIter.Next();
+    var = (csShaderVariable*)cIter.Next();
 
     return var;
   }
@@ -436,10 +327,10 @@ void csShader::BuildTokenHash()
   xmltokens.Register ("technique", XMLTOKEN_TECHNIQUE);
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
 
-  xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+iShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+  xmltokens.Register("integer", 100+csShaderVariable::INT);
+  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
 bool csShader::Load(iDocumentNode* node)
@@ -479,7 +370,7 @@ bool csShader::Load(iDocumentNode* node)
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
-          csRef<iShaderVariable> var = 
+          csRef<csShaderVariable> var = 
             parent->CreateVariable (
             strings->Request(child->GetAttributeValue ("name")));
 
@@ -488,19 +379,19 @@ bool csShader::Load(iDocumentNode* node)
 
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
-          var->SetType( (iShaderVariable::VariableType) idtype);
+          var->SetType( (csShaderVariable::VariableType) idtype);
           switch(idtype)
           {
-          case iShaderVariable::INT:
+          case csShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::FLOAT:
+          case csShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
-          case iShaderVariable::STRING:
+          case csShaderVariable::STRING:
             var->SetValue(new scfString( child->GetAttributeValue("default")) );
             break;
-          case iShaderVariable::VECTOR3:
+          case csShaderVariable::VECTOR3:
             const char* def = child->GetAttributeValue("default");
             csVector3 v;
             sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
@@ -730,10 +621,10 @@ void csShaderPass::BuildTokenHash()
   xmltokens.Register ("fp", XMLTOKEN_FP);
   xmltokens.Register ("writemask", XMLTOKEN_WRITEMASK);
 
-  xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+iShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+  xmltokens.Register("integer", 100+csShaderVariable::INT);
+  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
 bool csShaderPass::Load(iDocumentNode* node)
@@ -898,7 +789,7 @@ bool csShaderPass::Load(iDocumentNode* node)
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
-          csRef<iShaderVariable> var = 
+          csRef<csShaderVariable> var = 
             shadermgr->CreateVariable (
             strings->Request (child->GetAttributeValue ("name")));
 
@@ -907,19 +798,19 @@ bool csShaderPass::Load(iDocumentNode* node)
 
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
-          var->SetType( (iShaderVariable::VariableType) idtype);
+          var->SetType( (csShaderVariable::VariableType) idtype);
           switch(idtype)
           {
-          case iShaderVariable::INT:
+          case csShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::FLOAT:
+          case csShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
-          case iShaderVariable::STRING:
+          case csShaderVariable::STRING:
             var->SetValue(new scfString( child->GetAttributeValue("default")) );
             break;
-          case iShaderVariable::VECTOR3:
+          case csShaderVariable::VECTOR3:
             const char* def = child->GetAttributeValue("default");
             csVector3 v;
             sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
@@ -1031,10 +922,10 @@ void csShaderTechnique::BuildTokenHash()
   xmltokens.Register ("pass", XMLTOKEN_PASS);
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
 
-  xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+iShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+  xmltokens.Register("integer", 100+csShaderVariable::INT);
+  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 
 }
 
@@ -1074,7 +965,7 @@ bool csShaderTechnique::Load(iDocumentNode* node)
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
-          csRef<iShaderVariable> var = 
+          csRef<csShaderVariable> var = 
             shadermgr->CreateVariable (
             strings->Request(child->GetAttributeValue ("name")));
 
@@ -1083,19 +974,19 @@ bool csShaderTechnique::Load(iDocumentNode* node)
 
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
-          var->SetType( (iShaderVariable::VariableType) idtype);
+          var->SetType( (csShaderVariable::VariableType) idtype);
           switch(idtype)
           {
-          case iShaderVariable::INT:
+          case csShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::FLOAT:
+          case csShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
-          case iShaderVariable::STRING:
+          case csShaderVariable::STRING:
             var->SetValue(new scfString( child->GetAttributeValue("default")) );
             break;
-          case iShaderVariable::VECTOR3:
+          case csShaderVariable::VECTOR3:
             const char* def = child->GetAttributeValue("default");
             csVector3 v;
             sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);

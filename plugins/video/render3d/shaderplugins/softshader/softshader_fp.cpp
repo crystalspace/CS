@@ -55,10 +55,10 @@ void csSoftShader_FP::BuildTokenHash()
 {
   xmltokens.Register("softfp",XMLTOKEN_SOFTFP);
 
-  xmltokens.Register("integer", 100+iShaderVariable::INT);
-  xmltokens.Register("float", 100+iShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+iShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+  xmltokens.Register("integer", 100+csShaderVariable::INT);
+  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
+  xmltokens.Register("string", 100+csShaderVariable::STRING);
+  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
 bool csSoftShader_FP::Load(iDataBuffer* program)

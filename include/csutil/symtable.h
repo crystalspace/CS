@@ -24,11 +24,15 @@
 #include "csutil/strhash.h"
 #include "csutil/array.h"
 
+class csShaderVariable;
+
 /**
  * This class provides a system for storing inheritable properties, by allowing
  * instances to be stacked in a tree formation with parent/child relationships.
  * <p>
  * Used by the render3d shader system.
+ * <p>
+ * @@@ Only stores csShaderVariable's, maybe it should be template-ized?
  */
 class csSymbolTable
 {
@@ -36,10 +40,9 @@ private:
   struct Symbol
   {
     csStringID Name;
-    csRef<iBase> Val;
+    csRef<csShaderVariable> Val;
     bool Auth;
-    inline Symbol (csStringID id, iBase *value, bool authoritative)
-    : Name (id), Val (value), Auth (authoritative) {}
+    inline Symbol (csStringID id, csShaderVariable *value, bool authoritative);
   };
 
 protected:
@@ -52,13 +55,13 @@ protected:
   inline void SetParent (csSymbolTable *);
 
   /// Set the symbol in all children.
-  inline void PropagateSymbol (csStringID name, iBase *value);
+  inline void PropagateSymbol (csStringID name, csShaderVariable *value);
 
   /// Delete the symbol in all children.
   inline void PropagateDelete (csStringID name);
 
   /// Same as SetSymbol only if there is not already a symbol with that name.
-  inline void SetSymbolSafe (csStringID name, iBase *value);
+  inline void SetSymbolSafe (csStringID name, csShaderVariable *value);
 
   /// Same as DeleteSymbol only if the symbol is inherited from the parent.
   inline void DeleteSymbolSafe (csStringID);
@@ -91,10 +94,10 @@ public:
   void AddChildren (csArray<csSymbolTable*> &);
 
   /// Set the value of a symbol, or create a new one if it doesn't exist.
-  void SetSymbol (csStringID name, iBase *value);
+  void SetSymbol (csStringID name, csShaderVariable *value);
 
   /// SetSymbol for multiple symbols.
-  void SetSymbols (const csArray<csStringID> &names, csArray<iBase *> &);
+  void SetSymbols (const csArray<csStringID>&names,csArray<csShaderVariable*>&);
 
   /// Delete a symbol.
   bool DeleteSymbol (csStringID name);
@@ -103,10 +106,10 @@ public:
   bool DeleteSymbols (const csArray<csStringID> &names);
 
   /// Get the value of a symbol.
-  iBase* GetSymbol (csStringID name);
+  csShaderVariable* GetSymbol (csStringID name);
 
   /// Get the values of multiple symbols.
-  csArray<iBase *> GetSymbols (const csArray<csStringID> &names);
+  csArray<csShaderVariable *> GetSymbols (const csArray<csStringID> &names);
 
   /// Check if a symbol exists.
   bool SymbolExists (csStringID name);

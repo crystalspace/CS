@@ -126,9 +126,9 @@ csMaterial::~csMaterial ()
 }
 
 #ifdef CS_USE_NEW_RENDERER
-iShaderVariable* csMaterial::GetVar (csStringID name, bool create)
+csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
 {
-  csRef<iShaderVariable> var = GetVariable (name);
+  csRef<csShaderVariable> var = GetVariable (name);
   if ((var == 0) && create)
   {
     var = engine->ShaderManager->CreateVariable (name);
@@ -178,7 +178,7 @@ void csMaterial::SetReflection (float val)
 
 csRGBcolor& csMaterial::GetFlatColor ()
 { 
-  iShaderVariable* var = GetVar (nameFlatColorParam);
+  csShaderVariable* var = GetVar (nameFlatColorParam);
   if (var == 0) 
   {
     flat_color.Set (255, 255, 255);
@@ -208,7 +208,7 @@ void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
 
 float csMaterial::GetDiffuse ()
 { 
-  iShaderVariable* var = GetVar (nameDiffuseParam);
+  csShaderVariable* var = GetVar (nameDiffuseParam);
   if (var == 0) return CS_DEFMAT_DIFFUSE;
   float f;
   var->GetValue (f);
@@ -217,13 +217,13 @@ float csMaterial::GetDiffuse ()
 
 void csMaterial::SetDiffuse (float val) 
 { 
-  iShaderVariable* var = GetVar (nameDiffuseParam, true);
+  csShaderVariable* var = GetVar (nameDiffuseParam, true);
   var->SetValue (val);
 }
 
 float csMaterial::GetAmbient ()
 { 
-  iShaderVariable* var = GetVar (nameAmbientParam);
+  csShaderVariable* var = GetVar (nameAmbientParam);
   if (var == 0) return CS_DEFMAT_AMBIENT;
   float f;
   var->GetValue (f);
@@ -232,13 +232,13 @@ float csMaterial::GetAmbient ()
 
 void csMaterial::SetAmbient (float val) 
 { 
-  iShaderVariable* var = GetVar (nameAmbientParam, true);
+  csShaderVariable* var = GetVar (nameAmbientParam, true);
   var->SetValue (val);
 }
 
 float csMaterial::GetReflection ()
 { 
-  iShaderVariable* var = GetVar (nameReflectParam);
+  csShaderVariable* var = GetVar (nameReflectParam);
   if (var == 0) return CS_DEFMAT_REFLECTION;
   float f;
   var->GetValue (f);
@@ -247,13 +247,13 @@ float csMaterial::GetReflection ()
 
 void csMaterial::SetReflection (float val) 
 { 
-  iShaderVariable* var = GetVar (nameReflectParam, true);
+  csShaderVariable* var = GetVar (nameReflectParam, true);
   var->SetValue (val);
 }
 
 void csMaterial::SetFlatColor (const csRGBcolor& col)
 { 
-  iShaderVariable* var = GetVar (nameFlatColorParam, true);
+  csShaderVariable* var = GetVar (nameFlatColorParam, true);
   csVector3 v (((float)col.red) / 255.0f, ((float)col.green) / 255.0f, 
     ((float)col.blue) / 255.0f);
   var->SetValue (v);

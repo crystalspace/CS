@@ -74,9 +74,9 @@ public:
   virtual void ResetState () {}
 
   virtual void AddChild(iShaderBranch *b) {}
-  virtual void AddVariable(iShaderVariable* variable) {}
-  virtual iShaderVariable* GetVariable(csStringID s)
-    { return (iShaderVariable *) symtab->GetSymbol(s); }
+  virtual void AddVariable(csShaderVariable* variable) {}
+  virtual csShaderVariable* GetVariable(csStringID s)
+    { return symtab->GetSymbol(s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
   virtual csSymbolTable* GetSymbolTable(int i) {
     if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());

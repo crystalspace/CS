@@ -29,6 +29,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/symtable.h"
+#include "csgfx/shadervar.h"
 
 struct iString;
 struct iDataBuffer;
@@ -39,60 +40,11 @@ struct iShaderManager;
 struct iShaderRenderInterface;
 struct iShader;
 struct iShaderWrapper;
-struct iShaderVariable;
 struct iShaderTechnique;
 struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
 struct iShaderRenderInterface;
-
-SCF_VERSION (iShaderVariable, 0, 1, 0);
-
-/**
- * A variable stored in any of the shader-related classes.
- */
-struct iShaderVariable : public iBase
-{
-  /// Types of variables
-  enum VariableType
-  {
-    INT = 1,
-    STRING,
-    FLOAT,
-    VECTOR3,
-    VECTOR4
-  };
-
-  /// Set the variable's type
-  virtual void SetType(VariableType) = 0;
-  /// Get the variable's type
-  virtual VariableType GetType() const = 0;
-
-  /// Get the variable's name
-  virtual csStringID GetName() const = 0;
-
-  /// Get an int value
-  virtual bool GetValue(int& value) const = 0;
-  /// Get a float value
-  virtual bool GetValue(float& value) const = 0;
-  /// Get a string value
-  virtual bool GetValue(iString*& value) const = 0;
-  /// Get a 3-vector value
-  virtual bool GetValue(csVector3& value) const = 0;
-  /// Get a 4-vector value
-  virtual bool GetValue(csVector4& value) const = 0;
-
-  /// Set an int value
-  virtual bool SetValue(int value) = 0;
-  /// Set a float value
-  virtual bool SetValue(float value) = 0;
-  /// Set a string value
-  virtual bool SetValue(iString* value) = 0;
-  /// Set a 3-vector value
-  virtual bool SetValue(const csVector3 &value) = 0;
-  /// Set a 4-vector value
-  virtual bool SetValue(const csVector4 &value) = 0;
-};
 
 SCF_VERSION (iShaderBranch, 0, 0, 1);
 
@@ -106,10 +58,10 @@ struct iShaderBranch : public iBase
   virtual void AddChild(iShaderBranch *child) = 0;
 
   /// Add a variable to this context
-  virtual void AddVariable(iShaderVariable* variable) = 0;
+  virtual void AddVariable(csShaderVariable* variable) = 0;
 
   /// Get variable
-  virtual iShaderVariable* GetVariable(csStringID name) = 0;
+  virtual csShaderVariable* GetVariable(csStringID name) = 0;
 
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;
@@ -144,7 +96,7 @@ struct iShaderManager : iShaderBranch
   virtual const csRefArray<iShaderWrapper> &GetShaders () = 0;
 
   /// Create variable
-  virtual csPtr<iShaderVariable> CreateVariable(csStringID name) const = 0;
+  virtual csPtr<csShaderVariable> CreateVariable(csStringID name) const = 0;
 
   /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type) = 0;

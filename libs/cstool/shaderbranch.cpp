@@ -32,14 +32,14 @@ void csBaseShaderBranch::AddChild (iShaderBranch *child)
   symtab.AddChild (child->GetSymbolTable ());
 }
 
-void csBaseShaderBranch::AddVariable (iShaderVariable* variable)
+void csBaseShaderBranch::AddVariable (csShaderVariable* variable)
 {
   symtab.SetSymbol (variable->GetName (), variable);
 }
 
-iShaderVariable* csBaseShaderBranch::GetVariable (csStringID name)
+csShaderVariable* csBaseShaderBranch::GetVariable (csStringID name)
 {
-  return (iShaderVariable*)symtab.GetSymbol (name);
+  return (csShaderVariable*)symtab.GetSymbol (name);
 }
 
 csSymbolTable* csBaseShaderBranch::GetSymbolTable ()

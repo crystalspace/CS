@@ -125,10 +125,10 @@ private:
   float textureLodBias;
 
   /// Light standard variables
-  csRef<iShaderVariable> shvar_light_0_pos;
-  csRef<iShaderVariable> shvar_light_0_diffuse;
-  csRef<iShaderVariable> shvar_light_0_specular;
-  csRef<iShaderVariable> shvar_light_0_attenuation;
+  csRef<csShaderVariable> shvar_light_0_pos;
+  csRef<csShaderVariable> shvar_light_0_diffuse;
+  csRef<csShaderVariable> shvar_light_0_specular;
+  csRef<csShaderVariable> shvar_light_0_attenuation;
 
 
   bool do_near_plane;

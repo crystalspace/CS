@@ -30,8 +30,8 @@ public:
   virtual ~csBaseShaderBranch ();
 
   virtual void AddChild (iShaderBranch *child);
-  virtual void AddVariable (iShaderVariable* variable);
-  virtual iShaderVariable* GetVariable (csStringID);
+  virtual void AddVariable (csShaderVariable* variable);
+  virtual csShaderVariable* GetVariable (csStringID);
   virtual csSymbolTable* GetSymbolTable ();
   virtual csSymbolTable* GetSymbolTable (int index);
   virtual void SelectSymbolTable (int index);
