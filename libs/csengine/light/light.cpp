@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "csgeom/frustrum.h"
-#include "csgeom/quadcube.h"
+#include "csengine/quadcube.h"
 #include "csengine/sysitf.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"

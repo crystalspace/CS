@@ -32,6 +32,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
+#include "csengine/quadcube.h"
 #include "csobject/nameobj.h"
 #include "csgeom/bsp.h"
 #include "csgeom/polypool.h"
@@ -634,7 +635,7 @@ void* csPolygonSet::TestQueuePolygonArrayQuad (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i, j;
-  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
+  csQuadtreePersp* quadtree = csWorld::current_world->GetQuadtree ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;

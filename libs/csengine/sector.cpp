@@ -36,9 +36,9 @@
 #include "csengine/cbuffer.h"
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
+#include "csengine/quadcube.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
-#include "csgeom/quadcube.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
 #include "igraph3d.h"
@@ -508,7 +508,7 @@ bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
-  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
+  csQuadtreePersp* quadtree = csWorld::current_world->GetQuadtree ();
   csRenderView* rview = (csRenderView*)data;
   csVector3 array[6];
   int num_array;

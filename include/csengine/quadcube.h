@@ -22,6 +22,33 @@
 class Dumper;
 
 #include "csgeom/quadtree.h"
+#include "csengine/pol2d.h"
+
+/**
+ * Subclass of csQuadtree which adds perspective correction
+ * of 3d polygons.
+ */
+class csQuadtreePersp : public csQuadtree
+{
+private:
+  /// Perspective project a polygon. Return true if visible.
+  bool DoPerspective (csVector3* verts, int num_verts,
+    csPolygon2D& persp);
+
+public:
+  /// Constructor.
+  csQuadtreePersp (csVector2* corners, int depth) : csQuadtree (corners, depth) { }
+
+  /**
+   * Insert a polygon/frustrum into the quad-tree.
+   */
+  bool InsertPolygon (csVector3* verts, int num_verts);
+
+  /**
+   * Test for polygon/frustrum visibility with the quad-tree.
+   */
+  bool TestPolygon (csVector3* verts, int num_verts);
+};
 
 /**
  * A quad-cube is a set of six quad-trees arranged in a cube.
@@ -32,11 +59,13 @@ class csQuadcube
 
 private:
   /// The six quad-trees.
-  csQuadtree* trees[6];
+  csQuadtreePersp* trees[6];
+  /// The z value used for the box.
+  float z_dist;
 
 public:
   /// Make the quad-cube for the box.
-  csQuadcube (const csVector3& min_bbox, const csVector3& max_bbox, int depth);
+  csQuadcube (float z, int depth);
 
   /**
    * Destroy this quad-cube

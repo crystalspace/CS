@@ -28,7 +28,6 @@
 #define CS_QUAD_FULL 1
 #define CS_QUAD_PARTIAL 2
 
-class csVector3;
 class csQuadtree;
 class Dumper;
 
@@ -49,12 +48,11 @@ private:
 
   /**
    * Corners of this node.
-   * These are 3D coordinates on the quadtree plane.
    */
-  csVector3 corners[4];
+  csVector2 corners[4];
 
   /// Center point for this node.
-  csVector3 center;
+  csVector2 center;
   /// Contents state of this node.
   int state;
 
@@ -68,15 +66,15 @@ private:
   ~csQuadtreeNode ();
 
   /// Set box.
-  void SetBox (const csVector3& corner00, const csVector3& corner01,
-  	const csVector3& corner11, const csVector3& corner10);
+  void SetBox (const csVector2& corner00, const csVector2& corner01,
+  	const csVector2& corner11, const csVector2& corner10);
 
 public:
   /// Get center.
-  const csVector3& GetCenter () { return center; }
+  const csVector2& GetCenter () { return center; }
 
   /// Get corner.
-  const csVector3& GetCorner (int idx) { return corners[idx]; }
+  const csVector2& GetCorner (int idx) { return corners[idx]; }
 
   /// Get contents state.
   int GetState () { return state; }
@@ -95,36 +93,30 @@ class csQuadtree
 private:
   /// The root of the tree.
   csQuadtreeNode* root;
-  /// The plane normal of the tree.
-  csPlane plane_normal;
 
 private:
   /// Build the tree with a given depth.
-  void Build (csQuadtreeNode* node, const csVector3& corner00,
-  	const csVector3& corner01, const csVector3& corner11,
-	const csVector3& corner10, int depth);
+  void Build (csQuadtreeNode* node, const csVector2& corner00,
+  	const csVector2& corner01, const csVector2& corner11,
+	const csVector2& corner10, int depth);
 
   /// Insert a polygon in the node.
   bool InsertPolygon (csQuadtreeNode* node,
-	csVector3* verts, int num_verts,
+	csVector2* verts, int num_verts,
 	bool i00, bool i01, bool i11, bool i10);
 
   /// Test a polygon in the node.
   bool TestPolygon (csQuadtreeNode* node,
-	csVector3* verts, int num_verts,
+	csVector2* verts, int num_verts,
 	bool i00, bool i01, bool i11, bool i10);
 
 public:
   /**
-   * Create an empty tree. Although a quadtree is a 2D structure
-   * the corners are still given in 3D coordinates. The quadtree
-   * generates a 2D tree on the plane defined by those corners.
-   * 'corners' is an array of the four corners of the 2D quadtree
-   * in 3D space.<p>
+   * Create an empty tree.<br>
    * Corners are defined as:<br>
    * 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
    */
-  csQuadtree (csVector3* corners, int depth);
+  csQuadtree (csVector2* corners, int depth);
 
   /**
    * Destroy the whole quadtree.
@@ -144,21 +136,15 @@ public:
   /**
    * Insert a polygon into the quad-tree.
    * Return true if the tree was modified (i.e. if parts of the
-   * polygon were visible.<p>
-   * The polygon does not actually need to be a polygon. It can
-   * be a general frustrum. Note that the frustrum is assumed
-   * to start at (0,0,0).
+   * polygon were visible.
    */
-  bool InsertPolygon (csVector3* verts, int num_verts);
+  bool InsertPolygon (csVector2* verts, int num_verts);
 
   /**
    * Test for polygon visibility with the quad-tree.
-   * Return true if polygon is visible.<p>
-   * The polygon does not actually need to be a polygon. It can
-   * be a general frustrum. Note that the frustrum is assumed
-   * to start at (0,0,0).
+   * Return true if polygon is visible.
    */
-  bool TestPolygon (csVector3* verts, int num_verts);
+  bool TestPolygon (csVector2* verts, int num_verts);
 };
 
 #endif /*QUADTREE_H*/

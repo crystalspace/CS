@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "csgeom/quadtree.h"
 #include "csgeom/frustrum.h"
+#include "csgeom/poly2d.h"
 
 csQuadtreeNode::csQuadtreeNode ()
 {
@@ -37,8 +38,8 @@ csQuadtreeNode::~csQuadtreeNode ()
   CHK (delete children[3]);
 }
 
-void csQuadtreeNode::SetBox (const csVector3& corner00, const csVector3& corner01,
-  	const csVector3& corner11, const csVector3& corner10)
+void csQuadtreeNode::SetBox (const csVector2& corner00, const csVector2& corner01,
+  	const csVector2& corner11, const csVector2& corner10)
 {
   corners[0] = corner00;
   corners[1] = corner01;
@@ -49,13 +50,13 @@ void csQuadtreeNode::SetBox (const csVector3& corner00, const csVector3& corner0
 
 //--------------------------------------------------------------------------
 
-void csQuadtree::Build (csQuadtreeNode* node, const csVector3& corner00,
-  	const csVector3& corner01, const csVector3& corner11,
-	const csVector3& corner10, int depth)
+void csQuadtree::Build (csQuadtreeNode* node, const csVector2& corner00,
+  	const csVector2& corner01, const csVector2& corner11,
+	const csVector2& corner10, int depth)
 {
   node->SetBox (corner00, corner01, corner11, corner10);
   if (depth <= 0) return;
-  const csVector3& center = node->GetCenter ();
+  const csVector2& center = node->GetCenter ();
 
   CHK (node->children[0] = new csQuadtreeNode ());
   Build (node->children[0],
@@ -82,12 +83,10 @@ void csQuadtree::Build (csQuadtreeNode* node, const csVector3& corner00,
 	depth-1);
 }
 
-csQuadtree::csQuadtree (csVector3* corners, int depth)
+csQuadtree::csQuadtree (csVector2* corners, int depth)
 {
   CHK (root = new csQuadtreeNode ());
   Build (root, corners[0], corners[1], corners[2], corners[3], depth-1);
-  csVector3 pn = (corners[0]+corners[1]+corners[2]+corners[3]).Unit ();
-  plane_normal.Set (-pn.x, -pn.y, -pn.z, 0);
 }
 
 csQuadtree::~csQuadtree ()
@@ -95,29 +94,27 @@ csQuadtree::~csQuadtree ()
   CHK (delete root);
 }
 
-bool IsVisibleFull (const csPlane& plane,
-	csVector3* frustrum, int num_frust,
-  	csVector3* poly, int num_poly)
+bool IsVisibleFull (
+	csVector2* frustrum, int num_frust,
+  	csVector2* poly, int num_poly)
 {
   int i1, j1, i, j;
 
   // Here is the difficult case. We need to see if there is an
   // edge from the polygon which intersects a frustrum plane.
   // If so then polygon is visible. Otherwise not.
-  csVector3 normal;
-  csVector3 isect;
+  csVector2 isect;
   float dist;
   j1 = num_frust-1;
   for (j = 0 ; j < num_frust ; j++)
   {
-    normal = frustrum[j] % frustrum[j1];
     i1 = num_poly-1;
     for (i = 0 ; i < num_poly ; i++)
     {
-      if (csIntersect3::Plane (poly[i], poly[i1],
-      	normal.x, normal.y, normal.z, 0, isect, dist))
+      if (csIntersect2::Segments (poly[i], poly[i1],
+      	frustrum[j], frustrum[j1], isect, dist))
       {
-        if (csMath3::Visible (isect, plane)) return true;
+        return true;
       }
       i1 = i;
     }
@@ -128,7 +125,7 @@ bool IsVisibleFull (const csPlane& plane,
 
 
 bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
-	csVector3* verts, int num_verts,
+	csVector2* verts, int num_verts,
 	bool i00, bool i01, bool i11, bool i10)
 {
   // If node is completely full already then nothing can happen.
@@ -159,14 +156,14 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     // the polygon is visible.
     int i;
     for (i = 0 ; i < num_verts ; i++)
-      if (csFrustrum::Contains (node->corners, 4, plane_normal, verts[i]))
+      if (csPoly2D::In (node->corners, 4, verts[i]))
       {
         vis = true;
 	break;
       }
 
     if (!vis)
-      vis = IsVisibleFull (plane_normal, node->corners, 4, verts, num_verts);
+      vis = IsVisibleFull (node->corners, 4, verts, num_verts);
   }
 
   // If polygon is not visible in node then nothing happens
@@ -198,11 +195,11 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
       children[2]->SetState (CS_QUAD_EMPTY);
       children[3]->SetState (CS_QUAD_EMPTY);
     }
-    bool i0a = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (1));
-    bool i1a = csFrustrum::Contains (verts, num_verts, plane_normal, children[3]->GetCorner (2));
-    bool ia0 = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (3));
-    bool ia1 = csFrustrum::Contains (verts, num_verts, plane_normal, children[1]->GetCorner (2));
-    bool iaa = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (2));
+    bool i0a = csPoly2D::In (verts, num_verts, children[0]->GetCorner (1));
+    bool i1a = csPoly2D::In (verts, num_verts, children[3]->GetCorner (2));
+    bool ia0 = csPoly2D::In (verts, num_verts, children[0]->GetCorner (3));
+    bool ia1 = csPoly2D::In (verts, num_verts, children[1]->GetCorner (2));
+    bool iaa = csPoly2D::In (verts, num_verts, children[0]->GetCorner (2));
     bool rc0 = InsertPolygon (children[0], verts, num_verts, i00, i0a, iaa, ia0);
     bool rc1 = InsertPolygon (children[1], verts, num_verts, i0a, i01, ia1, iaa);
     bool rc3 = InsertPolygon (children[2], verts, num_verts, iaa, ia1, i11, i1a);
@@ -222,18 +219,18 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   return true;
 }
 
-bool csQuadtree::InsertPolygon (csVector3* verts, int num_verts)
+bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts)
 {
-  bool i00 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (0));
-  bool i01 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (1));
-  bool i11 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (2));
-  bool i10 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (3));
+  bool i00 = csPoly2D::In (verts, num_verts, root->GetCorner (0));
+  bool i01 = csPoly2D::In (verts, num_verts, root->GetCorner (1));
+  bool i11 = csPoly2D::In (verts, num_verts, root->GetCorner (2));
+  bool i10 = csPoly2D::In (verts, num_verts, root->GetCorner (3));
   bool rc = InsertPolygon (root, verts, num_verts, i00, i01, i11, i10);
   return rc;
 }
 
 bool csQuadtree::TestPolygon (csQuadtreeNode* node,
-	csVector3* verts, int num_verts,
+	csVector2* verts, int num_verts,
 	bool i00, bool i01, bool i11, bool i10)
 {
   // If node is completely full then polygon is not
@@ -264,14 +261,14 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     // the polygon is visible.
     int i;
     for (i = 0 ; i < num_verts ; i++)
-      if (csFrustrum::Contains (node->corners, 4, plane_normal, verts[i]))
+      if (csPoly2D::In (node->corners, 4, verts[i]))
       {
         vis = true;
 	break;
       }
 
     if (!vis)
-      vis = IsVisibleFull (plane_normal, node->corners, 4, verts, num_verts);
+      vis = IsVisibleFull (node->corners, 4, verts, num_verts);
   }
 
   // If polygon is not visible in node then nothing happens
@@ -297,11 +294,11 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   else
   {
     // This node has children.
-    bool i0a = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (1));
-    bool i1a = csFrustrum::Contains (verts, num_verts, plane_normal, children[3]->GetCorner (2));
-    bool ia0 = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (3));
-    bool ia1 = csFrustrum::Contains (verts, num_verts, plane_normal, children[1]->GetCorner (2));
-    bool iaa = csFrustrum::Contains (verts, num_verts, plane_normal, children[0]->GetCorner (2));
+    bool i0a = csPoly2D::In (verts, num_verts, children[0]->GetCorner (1));
+    bool i1a = csPoly2D::In (verts, num_verts, children[3]->GetCorner (2));
+    bool ia0 = csPoly2D::In (verts, num_verts, children[0]->GetCorner (3));
+    bool ia1 = csPoly2D::In (verts, num_verts, children[1]->GetCorner (2));
+    bool iaa = csPoly2D::In (verts, num_verts, children[0]->GetCorner (2));
     if (TestPolygon (children[0], verts, num_verts, i00, i0a, iaa, ia0)) return true;
     if (TestPolygon (children[1], verts, num_verts, i0a, i01, ia1, iaa)) return true;
     if (TestPolygon (children[2], verts, num_verts, iaa, ia1, i11, i1a)) return true;
@@ -313,12 +310,12 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   return true;
 }
 
-bool csQuadtree::TestPolygon (csVector3* verts, int num_verts)
+bool csQuadtree::TestPolygon (csVector2* verts, int num_verts)
 {
-  bool i00 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (0));
-  bool i01 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (1));
-  bool i11 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (2));
-  bool i10 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (3));
+  bool i00 = csPoly2D::In (verts, num_verts, root->GetCorner (0));
+  bool i01 = csPoly2D::In (verts, num_verts, root->GetCorner (1));
+  bool i11 = csPoly2D::In (verts, num_verts, root->GetCorner (2));
+  bool i10 = csPoly2D::In (verts, num_verts, root->GetCorner (3));
   return TestPolygon (root, verts, num_verts, i00, i01, i11, i10);
 }
 

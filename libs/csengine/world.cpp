@@ -36,6 +36,7 @@
 #include "csengine/cssprite.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
+#include "csengine/quadcube.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
@@ -45,7 +46,6 @@
 #include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
-#include "csgeom/quadcube.h"
 #include "csobject/nameobj.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
@@ -198,9 +198,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   c_buffer = NULL;
   quadtree = NULL;
 
-  csVector3 min_qbox (-10, -10, -10);
-  csVector3 max_qbox (10, 10, 10);
-  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 8));
+  CHK (quadcube = new csQuadcube (10, 8));
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
@@ -210,6 +208,9 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 
   BuildSqrtTable ();
 }
+
+// @@@ Hack
+csCamera* camera_hack = NULL;
 
 csWorld::~csWorld ()
 {
@@ -223,6 +224,7 @@ csWorld::~csWorld ()
   cs->Release();
   CHK (delete plugins);
   //  plugins->Release();
+  CHK (delete camera_hack);
 }
 
 void csWorld::Clear ()
@@ -280,15 +282,15 @@ void csWorld::EnableQuadtree (bool en)
     CHK (delete c_buffer);
     c_buffer = NULL;
     if (quadtree) return;
-    csVector3 corners[4];
+    csVector2 corners[4];
     float x = (frame_width/2) * csCamera::default_inv_aspect;
     float y = (frame_height/2) * csCamera::default_inv_aspect;
     float z = 1;
-    corners[0] = csVector3 (-x,  y, z);
-    corners[1] = csVector3 ( x,  y, z);
-    corners[2] = csVector3 ( x, -y, z);
-    corners[3] = csVector3 (-x, -y, z);
-    CHK (quadtree = new csQuadtree (corners, 5));
+    corners[0] = csVector2 (-x,  y);
+    corners[1] = csVector2 ( x,  y);
+    corners[2] = csVector2 ( x, -y);
+    corners[3] = csVector2 (-x, -y);
+    CHK (quadtree = new csQuadtreePersp (corners, 8));
   }
   else
   {
@@ -356,7 +358,7 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
   current_world = this;
   VFS = vfs;
 
-	plugins->EnumExtensions();
+  plugins->EnumExtensions ();
 
   CHK (textures = new csTextureList ());
   ReadConfig (config);
@@ -364,16 +366,15 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
   if (csCamera::default_aspect == 0) csCamera::default_aspect = frame_height;
   csCamera::default_inv_aspect = 1./csCamera::default_aspect;
 
-  StartWorld ();
+  // @@@ Ugly hack to always have a camera in current_camera.
+  // This is needed for the lighting routines.
+  if (!current_camera)
+  {
+    CHK (current_camera = new csCamera ());
+    camera_hack = current_camera;
+  }
 
-//quadcube->MakeEmpty ();
-//csVector3 poly[10];
-//poly[0] = csVector3 (-50, 50, 10);
-//poly[1] = csVector3 (50, 50, 10);
-//poly[2] = csVector3 (50, -50, 10);
-//poly[3] = csVector3 (-50, -50, 10);
-//quadcube->InsertPolygon (poly, 4);
-//Dumper::dump (quadcube);
+  StartWorld ();
 
   return true;
 }

@@ -24,8 +24,8 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
 #include "csgeom/frustrum.h"
-#include "csgeom/quadcube.h"
 #include "csgeom/quadtree.h"
+#include "csengine/quadcube.h"
 #include "csengine/sysitf.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
@@ -437,27 +437,19 @@ void Dumper::dump (csQuadtree* tree)
   CHK (buf = new char [depthp*depthp]);
 
   CsPrintf (MSG_DEBUG_0, "Depth=%d depthp=%d\n", depth, depthp);
-  CsPrintf (MSG_DEBUG_0, "plane_normal=%f,%f,%f\n",
-  	tree->plane_normal.A (),
-  	tree->plane_normal.B (),
-  	tree->plane_normal.C ());
   CsPrintf (MSG_DEBUG_0, "Corners for root:\n");
-  CsPrintf (MSG_DEBUG_0, "  0: %f,%f,%f\n",
+  CsPrintf (MSG_DEBUG_0, "  0: %f,%f\n",
   	tree->root->corners[0].x,
-  	tree->root->corners[0].y,
-  	tree->root->corners[0].z);
-  CsPrintf (MSG_DEBUG_0, "  1: %f,%f,%f\n",
+  	tree->root->corners[0].y);
+  CsPrintf (MSG_DEBUG_0, "  1: %f,%f\n",
   	tree->root->corners[1].x,
-  	tree->root->corners[1].y,
-  	tree->root->corners[1].z);
-  CsPrintf (MSG_DEBUG_0, "  2: %f,%f,%f\n",
+  	tree->root->corners[1].y);
+  CsPrintf (MSG_DEBUG_0, "  2: %f,%f\n",
   	tree->root->corners[2].x,
-  	tree->root->corners[2].y,
-  	tree->root->corners[2].z);
-  CsPrintf (MSG_DEBUG_0, "  3: %f,%f,%f\n",
+  	tree->root->corners[2].y);
+  CsPrintf (MSG_DEBUG_0, "  3: %f,%f\n",
   	tree->root->corners[3].x,
-  	tree->root->corners[3].y,
-  	tree->root->corners[3].z);
+  	tree->root->corners[3].y);
   memset (buf, '?', depthp*depthp);
   dump (tree->root, buf, depthp, depth-1,
   	0, 0, depthp-1, depthp-1);
