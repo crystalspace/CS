@@ -13,7 +13,7 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
 endif
 
 ifeq ($(DRIVER_SUBMAKEFILES),)
-  DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(DRIVERS))))
+  DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(DRIVERS) $(DRIVERS.SYSTEM))))
 endif
 ifneq ($(DRIVER_SUBMAKEFILES),)
   include $(DRIVER_SUBMAKEFILES)
