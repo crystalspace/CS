@@ -107,6 +107,8 @@ bool csGraphics2DGLCommon::Open ()
   // initialize font cache object
   fontCache = new csGLFontCache (this);
 
+  statecache->Enable_GL_SCISSOR_TEST ();
+
   if (!csGraphics2D::Open ())
     return false;
 
@@ -154,6 +156,18 @@ bool csGraphics2DGLCommon::Open ()
     }
   }
 
+  ext.InitGL_ARB_multitexture ();
+  if (ext.CS_GL_ARB_multitexture)
+  {
+    GLint texUnits;
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+    for (GLint u = texUnits - 1; u >= 0; u--)
+    {
+      statecache->SetActiveTU (u);
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+    }
+  }
+  
   ext.InitGL_ARB_multisample();
 
   if (ext.CS_GL_ARB_multisample)
@@ -234,8 +248,9 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glOrtho (0, Width, 0, Height, -1.0, 10.0);
   glViewport (0, 0, Width, Height);
 
-  statecache->Enable_GL_SCISSOR_TEST ();
-  glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
+  // not needed really, should persist between draws
+  //statecache->Enable_GL_SCISSOR_TEST ();
+  //glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -243,9 +258,26 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glClearColor (0., 0., 0., 0.);
 
   statecache->SetShadeModel (GL_FLAT);
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  if (ext.CS_GL_ARB_multitexture)
+  {
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
+  }
+  else
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #ifdef CS_USE_NEW_RENDERER
-  glColorMask (true, true, true, true);
+  statecache->SetColorMask (true, true, true, true);
 #endif
 
   return true;
@@ -256,7 +288,7 @@ void csGraphics2DGLCommon::FinishDraw ()
   ((csGLFontCache*)fontCache)->FlushText ();
   csGraphics2D::FinishDraw();
   if (FrameBufferLocked != 0) return;
-  statecache->Disable_GL_SCISSOR_TEST ();
+  //statecache->Disable_GL_SCISSOR_TEST ();
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,

@@ -1338,7 +1338,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 
   if (do_clear)
   {
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
     int bgcolor_clear = G2D->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
   }

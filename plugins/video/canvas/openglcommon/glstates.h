@@ -108,7 +108,7 @@
       func (param1); \
     } \
   } \
-  void Get##name (type1 & param1) \
+  void Get##name (type1 & param1) const\
   { \
     param1 = parameter_##param1;  \
   }
@@ -125,7 +125,7 @@
       func (param1, param2); \
     } \
   } \
-  void Get##name (type1 & param1, type2 & param2) \
+  void Get##name (type1 & param1, type2 & param2) const\
   { \
     param1 = parameter_##param1;  \
     param2 = parameter_##param2;  \
@@ -145,13 +145,87 @@
       func (param1, param2, param3); \
     } \
   } \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
   { \
     param1 = parameter_##param1;  \
     param2 = parameter_##param2;  \
     param3 = parameter_##param3;  \
   }
 
+#define IMPLEMENT_CACHED_PARAMETER_4(func, name, type1, param1, \
+    type2, param2, type3, param3, type4, param4) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2; \
+  type3 parameter_##param3; \
+  type4 parameter_##param4; \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
+    bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1) || \
+      (param2 != parameter_##param2) || \
+      (param3 != parameter_##param3) || \
+      (param4 != parameter_##param4)) \
+    { \
+      parameter_##param1 = param1;  \
+      parameter_##param2 = param2;  \
+      parameter_##param3 = param3;  \
+      parameter_##param4 = param4;  \
+      func (param1, param2, param3, param4); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
+  { \
+    param1 = parameter_##param1;  \
+    param2 = parameter_##param2;  \
+    param3 = parameter_##param3;  \
+    param4 = parameter_##param4;  \
+  }
+
+#define IMPLEMENT_CACHED_CLIENT_STATE(name)	      \
+  bool enabled_##name; \
+  void Enable_##name () \
+  { \
+    if (!enabled_##name) \
+    { \
+      enabled_##name = true;  \
+      glEnableClientState (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (enabled_##name) { \
+      enabled_##name = false;  \
+      glDisableClientState (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return enabled_##name; \
+  }
+
+
+#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	      \
+  bool enabled_##name[CS_GL_MAX_LAYER]; \
+  void Enable_##name () \
+  { \
+    if (!enabled_##name[currentUnit]) \
+    { \
+      enabled_##name[currentUnit] = true;  \
+      glEnableClientState (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (enabled_##name[currentUnit]) { \
+      enabled_##name[currentUnit] = false;  \
+      glDisableClientState (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return enabled_##name[currentUnit]; \
+  }
+  
 
 /**
  * Since this class is passed directly between plugins the
@@ -188,6 +262,12 @@ public:
     glGetIntegerv (GL_STENCIL_FAIL, (GLint*)&parameter_stencil_fail);
     glGetIntegerv (GL_STENCIL_PASS_DEPTH_FAIL, (GLint*)&parameter_stencil_zfail);
     glGetIntegerv (GL_STENCIL_PASS_DEPTH_PASS, (GLint*)&parameter_stencil_zpass);
+    GLboolean writemask[4];
+    glGetBooleanv (GL_COLOR_WRITEMASK, writemask);
+    parameter_wmRed = writemask[0];
+    parameter_wmGreen = writemask[1];
+    parameter_wmBlue = writemask[2];
+    parameter_wmAlpha = writemask[3];
     enabled_GL_DEPTH_TEST = glIsEnabled (GL_DEPTH_TEST);
     enabled_GL_BLEND = glIsEnabled (GL_BLEND);
     enabled_GL_DITHER = glIsEnabled (GL_DITHER);
@@ -204,14 +284,19 @@ public:
     enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
     enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
     enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
+    enabled_GL_TEXTURE_COORD_ARRAY[0] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
     for (i = 1 ; i < CS_GL_MAX_LAYER; i++)
     {
       enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
       enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
       enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
       enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
+      enabled_GL_TEXTURE_COORD_ARRAY[i] = enabled_GL_TEXTURE_COORD_ARRAY[0];
     }
     enabled_GL_SCISSOR_TEST = glIsEnabled (GL_SCISSOR_TEST);
+    enabled_GL_VERTEX_ARRAY = glIsEnabled (GL_VERTEX_ARRAY);
+    enabled_GL_COLOR_ARRAY = glIsEnabled (GL_COLOR_ARRAY);
+    enabled_GL_NORMAL_ARRAY = glIsEnabled (GL_NORMAL_ARRAY);
 
     memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
     currentUnit = 0;
@@ -244,6 +329,12 @@ public:
   IMPLEMENT_CACHED_PARAMETER_3 (glStencilFunc, StencilFunc, GLenum, stencil_func, GLint, stencil_ref, GLuint, stencil_mask)
   IMPLEMENT_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
   IMPLEMENT_CACHED_PARAMETER_1 (glStencilMask, StencilMask, GLuint, maskl)
+  IMPLEMENT_CACHED_PARAMETER_4 (glColorMask, ColorMask, GLboolean, wmRed, \
+    GLboolean, wmGreen, GLboolean, wmBlue, GLboolean, wmAlpha)
+  IMPLEMENT_CACHED_CLIENT_STATE (GL_VERTEX_ARRAY)
+  IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
+  IMPLEMENT_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
+  IMPLEMENT_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
 
   // Special caches
   GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers

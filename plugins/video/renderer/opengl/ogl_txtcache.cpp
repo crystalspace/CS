@@ -198,7 +198,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
-  if (g3d->EXT_texture_filter_anisotropic)
+  if (g3d->ext->CS_GL_EXT_texture_filter_anisotropic)
   {
     glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
       g3d->txtmgr->texture_filter_anisotropy);
@@ -218,7 +218,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
     else
     {
-      csGraphics3DOGLCommon::glCompressedTexImage2DARB (
+      g3d->ext->glCompressedTexImage2DARB (
         GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
 	togl->get_width (), togl->get_height (), 0,
 	togl->size, togl->image_data);

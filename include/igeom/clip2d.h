@@ -80,7 +80,7 @@ struct csVertexStatus
 /** @} */
 
 
-SCF_VERSION (iClipper2D, 0, 0, 2);
+SCF_VERSION (iClipper2D, 0, 0, 3);
 
 /**
  * This interfaces represents a 2D clipper for polygons.
@@ -143,6 +143,16 @@ struct iClipper2D : public iBase
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly () = 0;
+
+  /// The type of a clipper
+  enum ClipperType
+  {
+    /// This clipper contains a polygon.
+    clipperPoly,
+    /// This clipper contains a box. Can be used for some optimizations.
+    clipperBox
+  };
+  virtual ClipperType GetClipperType() const = 0;
 };
 
 /** @} */

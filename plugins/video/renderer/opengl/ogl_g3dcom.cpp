@@ -189,7 +189,7 @@ SCF_IMPLEMENT_IBASE_END
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = 0;
 csGLStateCache* csGraphics3DOGLCommon::statecache = 0;
 
-#define USE_OGL_EXT(ext) \
+/*#define USE_OGL_EXT(ext) \
   bool csGraphics3DOGLCommon::ext = false;
 #include "ogl_suppext.h"
 #undef USE_OGL_EXT
@@ -200,7 +200,7 @@ csGLStateCache* csGraphics3DOGLCommon::statecache = 0;
 fType  csGraphics3DOGLCommon::fName = (fType) 0;
 # include "csglext.h"
 # undef CSGL_FUNCTION
-
+*/
 float sAc, sBc, sCc, sDc;
 //csMatrix3 sM;
 //csVector3 sV;
@@ -244,7 +244,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clip_outer[1] = OPENGL_CLIP_SOFTWARE;
   clip_outer[2] = OPENGL_CLIP_SOFTWARE;
 
-  ARB_texture_compression = false;
   clipper = 0;
   cliptype = CS_CLIPPER_NONE;
   toplevel_init = false;
@@ -371,74 +370,30 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 
 void csGraphics3DOGLCommon::InitGLExtensions ()
 {
-#define EXT_CONFIG_KEY "Video.OpenGL.UseExtension"
-  if (G2D)
-  {
-    csRef<iOpenGLInterface> G2DGL (SCF_QUERY_INTERFACE (G2D, iOpenGLInterface));
-    if (G2DGL)
-    {
-      const unsigned char* extensions = glGetString(GL_EXTENSIONS);
-      if (!extensions)
-	return; //  no need to look any further
-
-      // check the extension string for each extension in turn
-      char* extbuf = new char[strlen((const char*)extensions)+1];
-      strcpy (extbuf, (const char*)extensions);
-
-      char* ext = extbuf;
-
-      while (ext && *ext)
-      {
-        char* next = strchr(ext, ' ');
-        if (next) *next++ = 0;
-
-	csString cfgkey;
-	cfgkey << EXT_CONFIG_KEY << "." << ext;
-
-#       define USE_OGL_EXT(extname)     \
-	if (!strcmp (ext, "GL_" #extname))    \
-	{           \
-	  if (!config->GetBool(EXT_CONFIG_KEY   \
-		".GL_" #extname, false))      \
-	  {           \
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
-		"... not using %s", "GL_" #extname);  \
-	  }           \
-	  else            \
-	  {           \
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,  \
-		"... using %s", "GL_" #extname);    \
-	    Init_##extname (G2DGL);     \
-	  }           \
-	} else
-
-#       include "ogl_suppext.h"
-#       undef USE_OGL_EXT
-	{ /* the last 'else' */ }
-
-	ext = next;
-      }
-      delete[] extbuf;
-    }
-
-    // Some diagnostic info, to detect typos etc.
-    csRef<iConfigIterator> it (config->Enumerate (EXT_CONFIG_KEY));
-    while (it->Next())
-    {
-#     define USE_OGL_EXT(extname)           \
-      if (!strcmp (it->GetKey(), EXT_CONFIG_KEY ".GL_" #extname)) \
-      { continue; } else
-
-#     include "ogl_suppext.h"
-#     undef USE_OGL_EXT
-      {
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Extension %s was used in config but is "
-	  "actually not supported", it->GetKey());
-      }
-    }
+  ext->InitGL_ARB_multitexture();
+  GLint maxtextures;							
+  glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);		
+  if (maxtextures > 1)						
+  {									
+    m_config_options.do_multitexture_level = maxtextures;		
+    Report (CS_REPORTER_SEVERITY_NOTIFY,				
+    "Using multitexture extension with %d texture units", maxtextures);
+  }									
+  else								
+  {									
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"	
+      " extension but only allows one texture unit!");		
   }
-#undef EXT_CONFIG_KEY
+  ext->InitGL_ARB_texture_compression();
+  ext->InitGL_ARB_texture_env_combine();
+  ext->InitGL_ARB_texture_env_dot3();
+  ext->InitGL_ARB_vertex_program();
+  ext->InitGL_EXT_texture_env_combine();
+  ext->InitGL_EXT_texture_env_dot3();
+  ext->InitGL_NV_vertex_array_range();
+  ext->InitGL_NV_vertex_program();
+  ext->InitGL_SGIS_generate_mipmap();
+  ext->InitGL_EXT_texture_filter_anisotropic();
 }
 
 bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
@@ -496,6 +451,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   }
 
   G2D->PerformExtension("getstatecache", &statecache);
+  G2D->PerformExtension	("getextmanager", &ext);
 
   width = height = -1;
 
@@ -920,9 +876,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
   else
     statecache->Disable_GL_DITHER ();
 
-  // @@@ A bit hacky...
-  statecache->extmgr->InitGL_ARB_multitexture ();
-
   if (config->GetBool ("Video.OpenGL.HintPerspectiveFast", false))
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   else
@@ -1046,7 +999,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   glCullFace (GL_FRONT);
   statecache->Enable_GL_CULL_FACE ();
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   statecache->Disable_GL_BLEND ();
 
   // Now that we know what pixelformat we use, clue the texture manager in.
@@ -1057,7 +1009,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   glCullFace (GL_FRONT);
   statecache->Enable_GL_CULL_FACE ();
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   statecache->Disable_GL_BLEND ();
 
   csEffectServer* efsrv = new csEffectServer (0);
@@ -1473,7 +1424,7 @@ void csGraphics3DOGLCommon::FinishDraw ()
 	{
 	  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
 	  {
-	    if (SGIS_generate_mipmap)
+	    if (ext->CS_GL_SGIS_generate_mipmap)
 	    {
 	      glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 	    }
@@ -1771,76 +1722,22 @@ float csGraphics3DOGLCommon::SetupBlend (uint mode,
   return m_alpha;
 }
 
-uint prev_ct = 0; // @@@ Move to class (static).
-
 void csGraphics3DOGLCommon::SetClientStates (uint ct)
 {
-  if (prev_ct == ct) return;
-
-  if (!(prev_ct & CS_CLIENTSTATE_COLOR_ARRAY) &&
-    (ct & CS_CLIENTSTATE_COLOR_ARRAY))
-    glEnableClientState (GL_COLOR_ARRAY);
-  else if (!(ct & CS_CLIENTSTATE_COLOR_ARRAY) &&
-    (prev_ct & CS_CLIENTSTATE_COLOR_ARRAY))
-    glDisableClientState (GL_COLOR_ARRAY);
-
-  if (!(prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY) &&
-    (ct & CS_CLIENTSTATE_VERTEX_ARRAY))
-    glEnableClientState (GL_VERTEX_ARRAY);
-  else if (!(ct & CS_CLIENTSTATE_VERTEX_ARRAY) &&
-    (prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY))
-    glDisableClientState (GL_VERTEX_ARRAY);
-
-  if (!(prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) &&
-    (ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY))
-    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  else if (!(ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) &&
-    (prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY))
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-  prev_ct = ct;
-}
-
-void csGraphics3DOGLCommon::EnableClientStateColorArray ()
-{
-  if (prev_ct & CS_CLIENTSTATE_COLOR_ARRAY) return;
-  glEnableClientState (GL_COLOR_ARRAY);
-  prev_ct |= CS_CLIENTSTATE_COLOR_ARRAY;
-}
-
-void csGraphics3DOGLCommon::EnableClientStateVertexArray ()
-{
-  if (prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY) return;
-  glEnableClientState (GL_VERTEX_ARRAY);
-  prev_ct |= CS_CLIENTSTATE_VERTEX_ARRAY;
-}
-
-void csGraphics3DOGLCommon::EnableClientStateTextureArray ()
-{
-  if (prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) return;
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  prev_ct |= CS_CLIENTSTATE_TEXTURE_COORD_ARRAY;
-}
-
-void csGraphics3DOGLCommon::DisableClientStateColorArray ()
-{
-  if (!(prev_ct & CS_CLIENTSTATE_COLOR_ARRAY)) return;
-  glDisableClientState (GL_COLOR_ARRAY);
-  prev_ct &= ~CS_CLIENTSTATE_COLOR_ARRAY;
-}
-
-void csGraphics3DOGLCommon::DisableClientStateVertexArray ()
-{
-  if (!(prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY)) return;
-  glDisableClientState (GL_VERTEX_ARRAY);
-  prev_ct &= ~CS_CLIENTSTATE_VERTEX_ARRAY;
-}
-
-void csGraphics3DOGLCommon::DisableClientStateTextureArray ()
-{
-  if (!(prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY)) return;
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-  prev_ct &= ~CS_CLIENTSTATE_TEXTURE_COORD_ARRAY;
+  if (ct & CS_CLIENTSTATE_COLOR_ARRAY)
+    statecache->Enable_GL_COLOR_ARRAY ();
+  else
+    statecache->Disable_GL_COLOR_ARRAY ();
+    
+  if (ct & CS_CLIENTSTATE_VERTEX_ARRAY)
+    statecache->Enable_GL_VERTEX_ARRAY ();
+  else
+    statecache->Disable_GL_VERTEX_ARRAY ();
+    
+  if (ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY)
+    statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+  else
+    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
 }
 
 static bool mirror_mode = false;
@@ -4243,7 +4140,7 @@ void csGraphics3DOGLCommon::InitStockEffects()
 iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
   G3DTriangleMesh& mesh)
 {
-  if( (((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount() > 0) ||
+  if((((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount() > 0) ||
       !mesh.mat_handle->GetTexture() )
     return 0;
 
@@ -4778,7 +4675,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           //set a float
           float var = ci.effect->GetVariableFloat(c->variableID);
-          glProgramLocalParameter4fARB((GLenum) GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB((GLenum) GL_VERTEX_PROGRAM_ARB,
             c->constantNumber, var, var, var, var);
 
         }
@@ -4786,11 +4683,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           //set a vec4
           csEffectVector4 vec = ci.effect->GetVariableVector4(c->variableID);
-          glProgramLocalParameter4fARB( (GLenum) GL_VERTEX_PROGRAM_ARB,
+          ext->glProgramLocalParameter4fARB( (GLenum) GL_VERTEX_PROGRAM_ARB,
               c->constantNumber, vec.x, vec.y, vec.z, vec.w);
         }
       }
-      glBindProgramARB((GLenum)GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+      ext->glBindProgramARB((GLenum)GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
       glEnable( (GLenum)GL_VERTEX_PROGRAM_ARB );
     }
 
@@ -4810,18 +4707,19 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     if (pass_data->vcsource == ED_SOURCE_FOG)
     {
       glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
-      EnableClientStateColorArray ();
+      statecache->Enable_GL_COLOR_ARRAY ();
     }
     else
     {
       if (mesh.buffers[0]->GetColors())
       {
         glColorPointer (3, GL_FLOAT, 0, work_colors);
-        EnableClientStateColorArray ();
+	statecache->Enable_GL_COLOR_ARRAY ();
       }
       else
       {
-        DisableClientStateColorArray ();
+        //DisableClientStateColorArray ();
+	statecache->Disable_GL_COLOR_ARRAY ();
         glColor4f (1,1,1,1);
       }
     }
@@ -4835,8 +4733,8 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE (
         layer->GetRendererData(), csOpenGlEffectLayerData);
 
-      if (ARB_multitexture && (ARB_texture_env_combine
-          || EXT_texture_env_combine))
+      if (ext->CS_GL_ARB_multitexture && (ext->CS_GL_ARB_texture_env_combine
+          || ext->CS_GL_EXT_texture_env_combine))
       {
 	statecache->SetActiveTU (l);
       }
@@ -4851,21 +4749,21 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       {
         glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo),
 		&work_fog[0].intensity);
-        EnableClientStateTextureArray ();
+        statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
       }
       else if (layer_data->vcord_source == ED_SOURCE_LIGHTMAP)
       {
         if (!work_userarrays[CS_GL_LIGHTMAP_USERA]/*lightmapcoords*/)
         {
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-          EnableClientStateTextureArray ();
+          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         }
 	else
 	{
 	  glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
 	    work_userarrays[CS_GL_LIGHTMAP_USERA]
 	          /*&((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x*/);
-	    EnableClientStateTextureArray();
+	    statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           //glTexCoordPointer (2, GL_FLOAT, 0, lightmapcoords);
           //EnableClientStateTextureArray ();
 	  //DisableClientStateTextureArray ();
@@ -4874,7 +4772,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       else if (layer_data->vcord_source == ED_SOURCE_MESH)
       {
         glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-        EnableClientStateTextureArray ();
+        statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
       }
       else if ((layer_data->vcord_source >= ED_SOURCE_USERARRAY(0)) &&
 	       (layer_data->vcord_source
@@ -4885,7 +4783,7 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           glTexCoordPointer (userarraycomponents[idx],
             GL_FLOAT, 0, work_userarrays[idx]);
-          EnableClientStateTextureArray ();
+          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         }
       }
 
@@ -4935,10 +4833,9 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         statecache->Enable_GL_TEXTURE_2D ();
       }
 
-      if (ARB_texture_env_combine || EXT_texture_env_combine)
+      if (ext->CS_GL_ARB_texture_env_combine || 
+	ext->CS_GL_EXT_texture_env_combine)
       {
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer_data->colorsource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer_data->colormod[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer_data->colorsource[1]);
@@ -4975,14 +4872,30 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   SetMirrorMode (false);
 
 
-  if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
+  if (ext->CS_GL_ARB_multitexture && 
+    (ext->CS_GL_ARB_texture_env_combine || ext->CS_GL_EXT_texture_env_combine))
   {
     for (l=maxlayers-1 ; l>=0 ; l--)
     {
       statecache->SetActiveTU (l);
       if (l>0)
         statecache->Disable_GL_TEXTURE_2D ();
-      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
+	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+	glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+	glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+    
+	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+	glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+	glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+	glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+	glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
+      }
     }
   }
 
@@ -6209,8 +6122,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       }
       else if ( pass_state == efstrings->nvvertex_program_gl )
       {
-        if( !ARB_vertex_program || !glGenProgramsARB ||
-            !glBindProgramARB || ! glProgramStringARB)
+        if (!ext->CS_GL_ARB_vertex_program || !ext->glGenProgramsARB ||
+            !ext->glBindProgramARB || ! ext->glProgramStringARB)
           return false;
 
         csStringID vp_s = pass->GetStateString(pass_state);
@@ -6227,14 +6140,15 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         if (!vp) return false;
         //create and load vertex program
 
-        glGenProgramsARB(1, &pass_data->vertex_program);
-        glBindProgramARB((GLenum) GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
+        ext->glGenProgramsARB(1, &pass_data->vertex_program);
+        ext->glBindProgramARB((GLenum) GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
 
         //load it from string
         int i = strlen((const char*)vp);
-        glProgramStringARB((GLenum) GL_VERTEX_PROGRAM_ARB, (GLenum)GL_PROGRAM_FORMAT_ASCII_ARB, i, vp);
+        ext->glProgramStringARB((GLenum) GL_VERTEX_PROGRAM_ARB, (GLenum)GL_PROGRAM_FORMAT_ASCII_ARB, i, vp);
 
-        const unsigned char * programErrorString=glGetString((GLenum) GL_PROGRAM_ERROR_STRING_ARB);
+        const unsigned char * programErrorString = 
+	  glGetString((GLenum) GL_PROGRAM_ERROR_STRING_ARB);
 
         GLint errorPos;
 	glGetIntegerv((GLenum) GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
@@ -6273,7 +6187,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       }
       pass_state = pass->GetNextState();
     }
-    if( ARB_multitexture &&
+    if (ext->CS_GL_ARB_multitexture &&
       (pass->GetLayerCount() > m_config_options.do_multitexture_level) )
       return false;
     for( l=0; l<pass->GetLayerCount(); l++ )
@@ -6290,7 +6204,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           (layer_state == efstrings->color_source_2) ||
           (layer_state == efstrings->color_source_3) )
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6314,7 +6229,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           (layer_state == efstrings->color_source_modifier_2) ||
           (layer_state == efstrings->color_source_modifier_3) )
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6341,7 +6257,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           (layer_state == efstrings->alpha_source_2) ||
           (layer_state == efstrings->alpha_source_3) )
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6364,7 +6281,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           (layer_state == efstrings->alpha_source_modifier_2) ||
           (layer_state == efstrings->alpha_source_modifier_3) )
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6384,7 +6302,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         }
         else if (layer_state == efstrings->alpha_operation)
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6402,14 +6321,16 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
             layer_data->alphap = GL_INTERPOLATE_ARB;
           else if( layer_statestring == efstrings->dot_product )
           {
-            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+            if(ext->CS_GL_ARB_texture_env_dot3 || 
+	      ext->CS_GL_EXT_texture_env_dot3)
               layer_data->alphap = GL_DOT3_RGB_ARB;
             else
               return false;
           }
           else if( layer_statestring == efstrings->dot_product_to_alpha )
           {
-            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+            if(ext->CS_GL_ARB_texture_env_dot3 || 
+	      ext->CS_GL_EXT_texture_env_dot3)
               layer_data->alphap = GL_DOT3_RGBA_ARB;
             else
               return false;
@@ -6418,7 +6339,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         }
         else if( (layer_state == efstrings->color_operation) )
         {
-          if (!ARB_texture_env_combine && !EXT_texture_env_combine)
+          if (!ext->CS_GL_ARB_texture_env_combine && 
+	    !ext->CS_GL_EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
@@ -6436,14 +6358,16 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
             layer_data->colorp = GL_INTERPOLATE_ARB;
           else if( layer_statestring == efstrings->dot_product )
           {
-            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+            if(ext->CS_GL_ARB_texture_env_dot3 || 
+	      ext->CS_GL_EXT_texture_env_dot3)
               layer_data->colorp = GL_DOT3_RGB_ARB;
             else
               return false;
           }
           else if( layer_statestring == efstrings->dot_product_to_alpha )
           {
-            if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+            if(ext->CS_GL_ARB_texture_env_dot3 || 
+	      ext->CS_GL_EXT_texture_env_dot3)
               layer_data->colorp = GL_DOT3_RGBA_ARB;
             else
               return false;

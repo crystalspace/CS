@@ -84,8 +84,6 @@ private:
   csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
 
-  bool color_red_enabled, color_green_enabled, color_blue_enabled, 
-       alpha_enabled;
   int current_drawflags;
   int current_shadow_state;
   csZBufMode current_zmode;
@@ -151,12 +149,15 @@ private:
 
   int stencilclipnum;
   bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
+  bool needStencil;
   bool clip_planes_enabled;	// glClipPlane is enabled.
   csRef<iClipper2D> clipper;	// Current clipper from engine.
   int cliptype;			// One of CS_CLIPPER_...
   int cache_clip_portal;	// Cache values for SetupClipper().
   int cache_clip_plane;
   int cache_clip_z_plane;
+  bool hasOld2dClip;
+  csRect old2dClip;
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
@@ -384,20 +385,15 @@ public:
   /// Set the masking of color and/or alpha values to framebuffer
   virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha)
   { 
-    color_red_enabled = red;
-    color_green_enabled = green;
-    color_blue_enabled = blue;
-    alpha_enabled = alpha;
-    glColorMask (red, green, blue, alpha); 
+    statecache->SetColorMask (red, green, blue, alpha);
   }
 
   virtual void GetWriteMask (bool &red, bool &green, bool &blue,
   	bool &alpha) const
   {
-    red = color_red_enabled;
-    green = color_green_enabled;
-    blue = color_blue_enabled;
-    alpha = alpha_enabled;
+    GLboolean r, g, b, a;
+    statecache->GetColorMask (r, g, b, a);
+    red = r; green = g; blue = b; alpha = a;
   }
 
   /// Controls shadow drawing

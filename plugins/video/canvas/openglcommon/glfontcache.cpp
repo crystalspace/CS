@@ -262,7 +262,6 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex,
     {
       uint8* bitData = bitmapDataBuf->GetUint8 ();
 
-      //uint8* alphaData = new uint8[rect.Width () * rect.Height ()];
       csRGBpixel* dest = rgbaData;
       uint8* src = bitData;
       uint8 byte = *src++;
@@ -301,7 +300,26 @@ void csGLFontCache::FlushArrays ()
   if (needStates)
   {
     statecache->Enable_GL_TEXTURE_2D ();
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+    if (G2D->ext.CS_GL_ARB_multitexture)
+    {
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PRIMARY_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_CONSTANT_ARB);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB);
+      glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+      glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
+    }
+    else
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
     statecache->SetBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     statecache->SetAlphaFunc (GL_GREATER, 0.0f);
 
@@ -353,7 +371,7 @@ void csGLFontCache::FlushArrays ()
       if (doFG)
       {
 	G2D->setGLColorfromint (job.fg);
-	glDrawArrays(GL_QUADS, job.vertOffset, job.vertCount);
+	glDrawArrays (GL_QUADS, job.vertOffset, job.vertCount);
       }
     }
   }
@@ -397,13 +415,13 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
   if (bg >= 0)
   {
-    texcoords.SetLength (numFloats + textLen * 16);
-    verts2d.SetLength (numFloats + textLen * 16);
+    texcoords.GetExtend (numFloats + textLen * 16);
+    verts2d.GetExtend (numFloats + textLen * 16);
   }
   else
   {
-    texcoords.SetLength (numFloats + textLen * 8);
-    verts2d.SetLength (numFloats + textLen * 8);
+    texcoords.GetExtend (numFloats + textLen * 8);
+    verts2d.GetExtend (numFloats + textLen * 8);
   }
   int bgVertOffset = (textLen + 1) * 8;
   float* tcPtr = 0;
@@ -626,13 +644,13 @@ void csGLFontCache::BeginText ()
 {
   if (textWriting) return;
 
-  vaEnabled = glIsEnabled (GL_VERTEX_ARRAY) == GL_TRUE;
-  tcaEnabled = glIsEnabled (GL_TEXTURE_COORD_ARRAY) == GL_TRUE;
-  caEnabled = glIsEnabled (GL_COLOR_ARRAY) == GL_TRUE;
+  vaEnabled = statecache->enabled_GL_VERTEX_ARRAY;
+  tcaEnabled = statecache->enabled_GL_TEXTURE_COORD_ARRAY;
+  caEnabled = statecache->enabled_GL_COLOR_ARRAY;
 
-  if (!vaEnabled) glEnableClientState (GL_VERTEX_ARRAY);
-  if (!tcaEnabled) glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  if (caEnabled) glDisableClientState (GL_COLOR_ARRAY);
+  statecache->Enable_GL_VERTEX_ARRAY();
+  statecache->Enable_GL_TEXTURE_COORD_ARRAY();
+  statecache->Disable_GL_COLOR_ARRAY();
 
   textWriting = true;
   needStates = true;
@@ -644,13 +662,30 @@ void csGLFontCache::FlushText ()
 
   FlushArrays ();
 
-  if (!vaEnabled) glDisableClientState (GL_VERTEX_ARRAY);
-  if (!tcaEnabled) glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-  if (caEnabled) glEnableClientState (GL_COLOR_ARRAY);
+  if (!vaEnabled) statecache->Disable_GL_VERTEX_ARRAY();
+  if (!tcaEnabled) statecache->Disable_GL_TEXTURE_COORD_ARRAY();
+  if (caEnabled) statecache->Enable_GL_COLOR_ARRAY();
 
   statecache->Disable_GL_BLEND ();
   statecache->Disable_GL_ALPHA_TEST ();
-  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  if (G2D->ext.CS_GL_ARB_multitexture)
+  {
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+    glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
+  }
+  else
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   PurgeEmptyPlanes ();
 

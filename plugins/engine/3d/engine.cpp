@@ -358,6 +358,7 @@ void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 class csSectorIt : public iSectorIterator
 {
 private:
+  csEngine* engine;
   // The position and radius.
   iSector *sector;
   csVector3 pos;
@@ -384,8 +385,11 @@ private:
   iSector *FetchNext ();
 
 public:
+  csSectorIt* nextPooledIt;
+
   /// Construct an iterator and initialize to start.
-  csSectorIt (iSector *sector, const csVector3 &pos, float radius);
+  csSectorIt (csEngine* engine);
+  void Init (iSector *sector, const csVector3 &pos, float radius);
 
   /// Destructor.
   virtual ~csSectorIt ();
@@ -560,16 +564,72 @@ iSector *csLightIt::GetLastSector ()
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csSectorIt)
+csSectorIt* csEngine::AllocSectorIterator (iSector *sector, 
+					   const csVector3 &pos, 
+					   float radius)
+{
+  csSectorIt* newIt;
+  if (sectorItPool)
+  {
+    newIt = sectorItPool;
+    sectorItPool = sectorItPool->nextPooledIt;
+  }
+  else
+    newIt = new csSectorIt (this);
+  newIt->Init (sector, pos, radius);
+  return newIt;
+}
+ 
+void csEngine::RecycleSectorIterator (csSectorIt* iterator)
+{
+  if (iterator == 0) return;
+  iterator->nextPooledIt = sectorItPool;
+  sectorItPool = iterator;
+}
+
+void csEngine::FreeSectorIteratorPool ()
+{
+  while (sectorItPool)
+  {
+    csSectorIt* toDelete = sectorItPool;
+    sectorItPool = sectorItPool->nextPooledIt;
+    delete toDelete;
+  }
+}
+
+void csSectorIt::IncRef ()
+{
+  scfRefCount++;
+}
+
+void csSectorIt::DecRef ()
+{
+  if (scfRefCount == 1)
+  {
+    engine->RecycleSectorIterator (this);
+    return;
+  }
+  scfRefCount--;
+}
+
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSectorIt)
+SCF_IMPLEMENT_IBASE_REFOWNER(csSectorIt)
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csSectorIt)
+SCF_IMPLEMENT_IBASE_QUERY(csSectorIt)
   SCF_IMPLEMENTS_INTERFACE(iSectorIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csSectorIt::csSectorIt (
-  iSector *sector,
-  const csVector3 &pos,
-  float radius)
+csSectorIt::csSectorIt (csEngine* engine)
 {
   SCF_CONSTRUCT_IBASE (0);
+  csSectorIt::engine = engine;
+  nextPooledIt = 0;
+}
+
+void csSectorIt::Init (iSector *sector, const csVector3 &pos,
+		       float radius)
+{
+  scfRefCount = 1;
   csSectorIt::sector = sector;
   csSectorIt::pos = pos;
   csSectorIt::radius = radius;
@@ -580,14 +640,14 @@ csSectorIt::csSectorIt (
 
 csSectorIt::~csSectorIt ()
 {
-  delete recursive_it;
+  engine->RecycleSectorIterator (recursive_it);
   SCF_DESTRUCT_IBASE ();
 }
 
 void csSectorIt::Reset ()
 {
   cur_poly = -1;
-  delete recursive_it;
+  engine->RecycleSectorIterator (recursive_it);
   recursive_it = 0;
   has_ended = false;
   current_sector = 0;
@@ -606,7 +666,7 @@ iSector *csSectorIt::FetchNext ()
       return rc;
     }
 
-    delete recursive_it;
+    engine->RecycleSectorIterator (recursive_it);
     recursive_it = 0;
   }
 
@@ -795,6 +855,7 @@ csEngine::csEngine (iBase *iParent) :
   renderLoopManager = 0;
   current_framenumber = 0;
   ClearRenderPriorities ();
+  sectorItPool = 0;
 }
 
 csEngine::~csEngine ()
@@ -2431,7 +2492,7 @@ csPtr<iSectorIterator> csEngine::GetNearbySectors (
   const csVector3 &pos,
   float radius)
 {
-  csSectorIt *it = new csSectorIt (sector, pos, radius);
+  csSectorIt *it = AllocSectorIterator (sector, pos, radius);
   return csPtr<iSectorIterator> (it);
 }
 

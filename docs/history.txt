@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Jun-2004
+	- res made the following changes:
+	    - Added the *f versions of floor and ceil to csdef.h.
+	    - csBox2 can now be constructed from a csRect.
+	    - Added a method to iClipper2D to return whether the clipper is a
+	      simple box or a poly clipper.
+	    - Changed bugplug to also clear the Z buffer when frame buffer
+	      clearing is enabled.
+	    - Made csSectorIt in the engine pooled.
+	    - Throughout the GL canvas and renderer(s) (primarily NR, with 
+	      some necessary OR fixes), changes were made to reduce the state
+	      switches needed. 
+	    - The pixel write mask and vertex data array client states are now
+	      cached by the GL state cache.
+	    - The GL NR clipper now also sets a 2D clipping rect (effectively 
+	      a scissor rect) when using stencil clipping.
+	    - Setting the "stencil threshold" to -1 essentially means "always
+	      prefer plane clipping".
+	    - Changed the OR to use the GL extension manager, too (instead of
+	      the "custom" ext management).
 4-Jun-2004
         - Andrew Craig removed misplaced return in sprcal3d as reported by
           Ingie from the mailing list.

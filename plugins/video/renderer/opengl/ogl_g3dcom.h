@@ -226,17 +226,11 @@ public:
   static float SetupBlend (uint mode, float m_alpha, bool txt_alpha);
 
   /**
-   * Setup and remember client states.
+   * Setup client states.
    * Use a combination of CS_CLIENTSTATE_...
    */
   static void SetClientStates (uint client_states);
-  static void EnableClientStateColorArray ();
-  static void EnableClientStateTextureArray ();
-  static void EnableClientStateVertexArray ();
-  static void DisableClientStateColorArray ();
-  static void DisableClientStateTextureArray ();
-  static void DisableClientStateVertexArray ();
-
+  
   /**
    * Set mirror mode for the rasterizer. Then polygons have
    * to be rendered as seen from the other side.
@@ -537,21 +531,8 @@ protected:
    */
   bool report_gl_errors;
 
-  // declare all the extension function pointers
-# define _CSGLEXT_
-# define CSGL_FOR_ALL
-# define CSGL_FUNCTION(fType,fName) \
-static fType fName
-# include "csglext.h"
-# undef CSGL_FUNCTION
   virtual void InitGLExtensions ();
-
-#define USE_OGL_EXT(ext) \
-  static bool ext; \
-  void Init_##ext (iOpenGLInterface *G2DGL);
-#include "ogl_suppext.h"
-#undef USE_OGL_EXT
-
+  csGLExtensionManager* ext;
 public:
   SCF_DECLARE_IBASE;
 

@@ -398,9 +398,6 @@ void csGLShaderFFP::Activate ()
     if(ext->CS_GL_ARB_texture_env_combine || 
       ext->CS_GL_EXT_texture_env_combine)
     {
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
-
       glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer->colorsource[0]);
       glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer->colormod[0]);
       glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer->colorsource[1]);
@@ -434,11 +431,7 @@ void csGLShaderFFP::Activate ()
 
 void csGLShaderFFP::Deactivate()
 {
-  for (int i=maxlayers - 1; i>=0; --i)
-  {
-    statecache->SetActiveTU (i);
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  }
+  statecache->SetActiveTU (0);
 }
 
 void csGLShaderFFP::SetupState (const csRenderMesh *mesh, 

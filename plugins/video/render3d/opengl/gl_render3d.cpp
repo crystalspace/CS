@@ -107,13 +107,10 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
 
   stencilclipnum = 0;
   clip_planes_enabled = false;
+  hasOld2dClip = false;
 
   render_target = 0;
 
-  color_red_enabled = false;
-  color_green_enabled = false;
-  color_blue_enabled = false;
-  alpha_enabled = false;
   current_drawflags = 0;
   current_shadow_state = 0;
   current_zmode = CS_ZBUF_NONE;
@@ -139,6 +136,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   scrapVerticesSize = 0;
 
   shadow_stencil_enabled = false;
+  needStencil = false;
   clipping_stencil_enabled = false;
   clipportal_dirty = true;
 }
@@ -184,14 +182,14 @@ void csGLGraphics3D::DisableStencilShadow ()
 void csGLGraphics3D::EnableStencilClipping ()
 {
   clipping_stencil_enabled = true;
-  statecache->Enable_GL_STENCIL_TEST ();
+  if (needStencil) statecache->Enable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::DisableStencilClipping ()
 {
   clipping_stencil_enabled = false;
   if (shadow_stencil_enabled) return;
-  statecache->Disable_GL_STENCIL_TEST ();
+  if (needStencil) statecache->Disable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
@@ -342,7 +340,7 @@ void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
       break;
     case csAlphaMode::alphaSmooth:
       statecache->Enable_GL_BLEND ();
-      statecache->Disable_GL_ALPHA_TEST ();
+      statecache->Disable_GL_ALPHA_TEST ();			      
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       break;
   }
@@ -386,6 +384,18 @@ void csGLGraphics3D::SetupStencil ()
 
   if (clipper)
   {
+#if 0
+    if (clipper->GetClipperType() == iClipper2D::clipperBox)
+    {
+      /*
+      * Convenient. No need to set up the stencil stuff, the scissor does
+      * all the clipping to the box already.
+      */
+      needStencil = false;
+      return; 
+    }
+#endif
+
     glMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
@@ -409,13 +419,13 @@ void csGLGraphics3D::SetupStencil ()
     statecache->SetShadeModel (GL_FLAT);
 
     bool oldz = statecache->IsEnabled_GL_DEPTH_TEST ();
-    if (oldz) statecache->Disable_GL_DEPTH_TEST ();
+    statecache->Disable_GL_DEPTH_TEST ();
     bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-    if (tex2d) statecache->Disable_GL_TEXTURE_2D ();
+    statecache->Disable_GL_TEXTURE_2D ();
 
-    if (color_red_enabled || color_green_enabled || color_blue_enabled ||
-        alpha_enabled)
-      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
+    statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+    statecache->SetColorMask (false, false, false, false);
 
     statecache->SetStencilMask (128);
     statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
@@ -431,15 +441,14 @@ void csGLGraphics3D::SetupStencil ()
 
     glBegin (GL_TRIANGLE_FAN);
     int i;
+    const float clipVertScaleX = 2.0f / (float)viewwidth;
+    const float clipVertScaleY = 2.0f / (float)viewheight;
     for (i = 0 ; i < nv ; i++)
-      glVertex2f (2.0*v[i].x/(float)viewwidth-1.0,
-                  2.0*v[i].y/(float)viewheight-1.0);
+      glVertex2f (v[i].x*clipVertScaleX-1.0f,
+                  v[i].y*clipVertScaleY-1.0f);
     glEnd ();
 
-    if (color_red_enabled || color_green_enabled || color_blue_enabled ||
-        alpha_enabled)
-      glColorMask (color_red_enabled, color_green_enabled, color_blue_enabled,
-        alpha_enabled);
+    statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
 
     statecache->SetStencilMask (127);
 
@@ -448,6 +457,8 @@ void csGLGraphics3D::SetupStencil ()
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
+
+    needStencil = true;
   }
 }
 
@@ -551,9 +562,8 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   bool do_plane_clipping = (do_near_plane && clip_plane != CS_CLIP_NOT);
   bool do_z_plane_clipping = (clip_z_plane != CS_CLIP_NOT);
 
-  bool m_prefer_stencil;
-  if (tri_count > stencil_threshold) m_prefer_stencil = true;
-  else m_prefer_stencil = false;
+  bool m_prefer_stencil = (stencil_threshold >= 0) && 
+    (tri_count > stencil_threshold);
 
   // First we see how many additional planes we might need because of
   // z-plane clipping and/or near-plane clipping. These additional planes
@@ -818,14 +828,24 @@ bool csGLGraphics3D::Open ()
   if (config->GetBool ("Video.OpenGL.BrokenStencil", false))
   {
     broken_stencil = true;
-    stencil_threshold = 1000000000;
+    stencil_threshold = -1;
   }
   if (verbose)
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is used for objects >= %d triangles.", stencil_threshold);
+      if (stencil_threshold >= 0)
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	  "Stencil clipping is used for objects >= %d triangles.", 
+	  stencil_threshold);
+      }
+      else
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	  "Plane clipping is preferred.");
+      }
     }
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
@@ -1430,16 +1450,16 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
         case CS_VATTRIB_POSITION:
           glVertexPointer (buffer->GetComponentCount (),
             ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-          glEnableClientState (GL_VERTEX_ARRAY);
+	  statecache->Enable_GL_VERTEX_ARRAY();
           break;
         case CS_VATTRIB_NORMAL:
           glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-          glEnableClientState (GL_NORMAL_ARRAY);
+          statecache->Enable_GL_NORMAL_ARRAY();
           break;
         case CS_VATTRIB_PRIMARY_COLOR:
           glColorPointer (buffer->GetComponentCount (),
             ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-          glEnableClientState (GL_COLOR_ARRAY);
+          statecache->Enable_GL_COLOR_ARRAY();
 	  break;
         default:
 	  if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
@@ -1453,7 +1473,7 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
 	    else if (unit != 0) return false;
 	    glTexCoordPointer (buffer->GetComponentCount (), 
 	      ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-	    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	    statecache->Enable_GL_TEXTURE_COORD_ARRAY();
 	  }
 	  break;
       }
@@ -1493,13 +1513,13 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
     switch (attrib)
     {
       case CS_VATTRIB_POSITION:
-        glDisableClientState (GL_VERTEX_ARRAY);
+        statecache->Disable_GL_VERTEX_ARRAY();
         break;
       case CS_VATTRIB_NORMAL:
-        glDisableClientState (GL_NORMAL_ARRAY);
+        statecache->Disable_GL_NORMAL_ARRAY();
         break;
       case CS_VATTRIB_PRIMARY_COLOR:
-        glDisableClientState (GL_COLOR_ARRAY);
+        statecache->Disable_GL_COLOR_ARRAY();
         break;
       default:
 	if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
@@ -1511,7 +1531,7 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
 	    statecache->SetActiveTU (unit);
 	  }
 	  else if (unit != 0) break;
-	  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	  statecache->Disable_GL_TEXTURE_COORD_ARRAY();
 	}
 	break;
     }
@@ -2019,7 +2039,9 @@ void csGLGraphics3D::SetupClipPortals ()
 
 	// First clear the z-buffer here.
 	SetZMode (CS_ZBUF_FILLONLY);
-	glColorMask (false, false, false, false);
+	GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
+	statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+	statecache->SetColorMask (false, false, false, false);
 
 	glBegin (GL_QUADS);
 	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
@@ -2030,8 +2052,7 @@ void csGLGraphics3D::SetupClipPortals ()
 	glVertex4f (0.0*100000.0, float (viewheight-1)*100000.0, -1.0, 
 	  100000.0);
 	glEnd ();
-	glColorMask (color_red_enabled, color_green_enabled, 
-	  color_blue_enabled, alpha_enabled);
+	statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
       }
     }
   }
@@ -2052,21 +2073,33 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
-  /*if (cliptype != CS_CLIPPER_NONE)
+
+  if (cliptype != CS_CLIPPER_NONE)
   {
-    csVector2 *clippoly = clipper->GetClipPoly ();
+    if (!hasOld2dClip)
+      G2D->GetClipRect (old2dClip.xmin, old2dClip.ymin, 
+	old2dClip.xmax, old2dClip.ymax);
+    hasOld2dClip = true;
+
+    csVector2* clippoly = clipper->GetClipPoly ();
     csBox2 scissorbox;
     scissorbox.AddBoundingVertex (clippoly[0]);
     for (i=1; i<clipper->GetVertexCount (); i++)
       scissorbox.AddBoundingVertexSmart (clippoly[i]);
+    scissorbox *= csBox2 (old2dClip);
 
-    glScissor (scissorbox.MinX (), scissorbox.MinY (), 
-      scissorbox.MaxX ()-scissorbox.MinX (),
-      scissorbox.MaxY ()-scissorbox.MinY ());
-    glEnable (GL_SCISSOR_TEST);
-  } else {
-    glDisable (GL_SCISSOR_TEST);
-  }*/
+    const csRect scissorRect ((int)floorf (scissorbox.MinX ()), 
+      (int)floorf (scissorbox.MinY ()), (int)ceilf (scissorbox.MaxX ()), 
+      (int)ceilf (scissorbox.MaxY ()));
+    glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+      scissorRect.Height());
+  }
+  else if (hasOld2dClip)
+  {
+    G2D->SetClipRect (old2dClip.xmin, old2dClip.ymin, 
+      old2dClip.xmax, old2dClip.ymax);
+    hasOld2dClip = false;
+  }
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.

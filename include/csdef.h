@@ -115,6 +115,8 @@
   #define sinf(X)   CS_STATIC_CAST(float,sin(X))
   #define sqrtf(X)  CS_STATIC_CAST(float,sqrt(X))
   #define tanf(X)   CS_STATIC_CAST(float,tan(X))
+  #define floorf(X) CS_STATIC_CAST(float,floor(X))
+  #define ceilf(X)  CS_STATIC_CAST(float,ceil(X))
 #endif
 
 // Platforms with compilers which do not understand the new C++ keyword

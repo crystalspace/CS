@@ -119,6 +119,8 @@ public:
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly ()
   { return ClipBox; }
+
+  virtual ClipperType GetClipperType() const { return clipperBox; }
 };
 
 /**
@@ -181,6 +183,8 @@ public:
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly ()
   { return ClipPoly; }
+
+  virtual ClipperType GetClipperType() const { return clipperPoly; }
 };
 /** @} */
 

@@ -30,6 +30,7 @@
 #include "csextern.h"
 
 #include "cstypes.h"	// for bool
+#include "csrect.h"
 #include "vector2.h"
 #include "vector3.h"
 #include "segment.h"
@@ -391,6 +392,10 @@ public:
     minbox (x1, y1), maxbox (x2, y2)
   { if (Empty ()) StartBoundingBox (); }
 
+  /// Initialize this box from the given csRect.
+  csBox2 (const csRect& r) : minbox (r.xmin, r.ymin), maxbox (r.xmax, r.ymax)
+  { }
+  
   /// Sets the bounds of the box with the given values.
   void Set (const csVector2& bmin, const csVector2& bmax)
   {

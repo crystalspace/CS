@@ -215,6 +215,8 @@ struct csEngineConfig : public iConfig
   virtual bool GetOption (int id, csVariant* value);
 };
 
+class csSectorIt;
+
 /**
  * The 3D engine.
  * This class manages all components which comprise a 3D world including
@@ -375,6 +377,11 @@ public:
   /// Verbose flag.
   static bool do_verbose;
 
+  csSectorIt* sectorItPool;
+  csSectorIt* AllocSectorIterator (iSector *sector, const csVector3 &pos, 
+    float radius);
+  void RecycleSectorIterator (csSectorIt* iterator);
+  void FreeSectorIteratorPool ();
 private:
   /// Texture and color information objects.
   csTextureList* textures;

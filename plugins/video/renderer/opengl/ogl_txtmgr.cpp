@@ -329,7 +329,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
         GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &tex->size);
       delete [] image_data;
       image_data = new uint8 [tex->size];
-      csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
+      G3D->ext->glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
         image_data);
     }
     else
@@ -768,7 +768,8 @@ void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const cha
 
   if (glformats[theOld].name)
   {
-    if (!strcmp (newTarget, "compressed") && G3D->ARB_texture_compression)
+    if (!strcmp (newTarget, "compressed") && 
+      G3D->ext->CS_GL_ARB_texture_compression)
     {
       GLint compressedFormat;
       // is the format compressable at all ?

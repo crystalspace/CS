@@ -80,6 +80,8 @@ void csFontCache::CleanupCache ()
 
 void csFontCache::PurgeEmptyPlanes ()
 {
+  if (purgeableFonts.GetSize() == 0) return;
+
   csSet<KnownFont*>::GlobalIterator fontIt (purgeableFonts.GetIterator ());
   while (fontIt.HasNext ())
   {
