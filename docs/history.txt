@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Aug-2004
+	- Jorrit removed the leak guard from csShaderVariable since somehow
+	  it prevents combination of optimize and debug plugins.
 27-Aug-2004
 	- Eric Sunshine added intptr_t / uintptr_t check to configure.ac.  If
 	  the types are available, CS_HAS_INTPTR_T is defined in csconfig.h.
