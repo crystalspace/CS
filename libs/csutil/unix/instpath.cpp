@@ -88,7 +88,7 @@ csString csGetConfigPath ()
       if (!access(file, F_OK))
 	return path;
       
-      pos = colon + 1;
+      pos += subStrLen + 1;
     }
     
     fprintf (stderr,
@@ -140,7 +140,7 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
       paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
       paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");
       
-      pos = colon + 1;
+      pos += subStrLen + 1;
     }
   }
 
