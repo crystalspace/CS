@@ -61,6 +61,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (AGING)
   CS_TOKEN_DEF (ALLMATERIAL)
   CS_TOKEN_DEF (AMBIENT)
+  CS_TOKEN_DEF (ANIMATE)
   CS_TOKEN_DEF (ATTACH)
   CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (BLOCKS)
@@ -890,6 +891,23 @@ void Cs2Xml::ParseDuration (char const* parent_token, csParser* parser,
   ParseGeneral (tokname, parser, child, params);
 }
 
+void Cs2Xml::ParseAnimate (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname)
+{
+  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+      CS_NODE_ELEMENT, NULL);
+  child->SetValue (tokname);
+
+  char uvaniName[100];
+  int timing;
+  bool loop;
+  csScanStr (params, "%s,%d,%b", uvaniName, &timing, &loop);
+  child->SetAttribute ("name", uvaniName);
+  CreateValueNodeAsInt (child, "timing", timing);
+  CreateValueNode (child, "loop", loop ? "yes" : "no");
+}
+
 void Cs2Xml::ParseFrame (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
@@ -900,6 +918,32 @@ void Cs2Xml::ParseFrame (char const* parent_token, csParser* parser,
   if (!strcmp (parent_token, "bone"))
   {
     CreateValueNode (child, "time", name);
+  }
+  else if (!strcmp (parent_token, "uvanimation"))
+  {
+    int duration;
+    float u1, v1, u2, v2, u3, v3, u4, v4;
+    csScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f,%f", 
+	       &duration, &u1, &v1, &u2, &v2, &u3, &v3, &u4, &v4);
+
+    CreateValueNodeAsInt (child, "duration", duration);
+    csRef<iDocumentNode> childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    childchild->SetValue ("v");
+    childchild->SetAttributeAsFloat ("u", u1);
+    childchild->SetAttributeAsFloat ("v", v1);
+    childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    childchild->SetValue ("v");
+    childchild->SetAttributeAsFloat ("u", u2);
+    childchild->SetAttributeAsFloat ("v", v2);
+    childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    childchild->SetValue ("v");
+    childchild->SetAttributeAsFloat ("u", u3);
+    childchild->SetAttributeAsFloat ("v", v3);
+    childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    childchild->SetValue ("v");
+    childchild->SetAttributeAsFloat ("u", u4);
+    childchild->SetAttributeAsFloat ("v", v4);
+    return;
   }
   else
   {
@@ -2109,6 +2153,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (AGING)
     CS_TOKEN_TABLE (ALLMATERIAL)
     CS_TOKEN_TABLE (AMBIENT)
+    CS_TOKEN_TABLE (ANIMATE)
     CS_TOKEN_TABLE (ATTACH)
     CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (BC)
@@ -2443,6 +2488,8 @@ void Cs2Xml::ParseGeneral1 (long cmd, char const* parent_token,
 {
   switch (cmd)
   {
+    case CS_TOKEN_ANIMATE:
+      ParseAnimate (parent_token, parser, parent, name, params, tokname);
     case CS_TOKEN_EMITCYLINDER:
     case CS_TOKEN_EMITCYLINDERTANGENT:
       ParseEmitCylinder (parent_token, parser, parent, name, params, tokname);

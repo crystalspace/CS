@@ -52,6 +52,9 @@ public:
   void ParseWarp (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname, csRef<iDocumentNode>& portal_node);
+  void ParseAnimate (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname);
   void ParseMaterial (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname);
