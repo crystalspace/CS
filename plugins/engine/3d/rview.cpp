@@ -862,6 +862,56 @@ bool csRenderView::TestBSphere (
   return true;
 }
 
+#if 0
+bool csRenderView::CalculateClipSettings (
+  uint32 frustum_mask,
+  int &clip_portal,
+  int &clip_plane,
+  int &clip_z_plane)
+{
+  if (frustum_mask & 0xf == 0)
+    clip_portal = CS_CLIP_NOT;
+  else
+    clip_portal = CS_CLIP_NEEDED;
+
+  if (frustum_mask & 0x10)
+    clip_z_plane = CS_CLIP_NEEDED;
+  else
+    clip_z_plane = CS_CLIP_NOT;
+
+  if (frustum_mask & 0x20)
+    clip_plane = CS_CLIP_NEEDED;
+  else
+    clip_plane = CS_CLIP_NOT;
+
+  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
+  {
+    if (fully_inside)
+    {
+      clip_portal = CS_CLIP_TOPLEVEL;
+    }
+    else
+    {
+      CS_ASSERT (top_ctxt != 0);
+      TestSphereFrustum (
+        top_ctxt,
+        camera_origin,
+        radius,
+        inside,
+        outside);
+
+      // Because TestSphereFrustum() is not 100% accurate it is possible
+      // that the test here returns 'outside' even though we previously
+      // tested that the sphere was not outside a smaller frustum.
+      if (outside) return false;
+      if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
+    }
+  }
+
+  return true;
+}
+#endif
+
 bool csRenderView::ClipBSphere (
   const csReversibleTransform &o2c,
   const csSphere &sphere,
@@ -1008,7 +1058,7 @@ bool csRenderView::ClipBBox (
   uint32 outClipMask;
   if (!csIntersect3::BoxFrustum (cbox, ctxt->frustum, 0xf, outClipMask))
     return false;	// Not visible.
-  if (outClipMask == 0xf)
+  if (outClipMask == 0)
     clip_portal = CS_CLIP_NOT;
   else
     clip_portal = CS_CLIP_NEEDED;
@@ -1072,7 +1122,7 @@ bool csRenderView::ClipBBox (
       CS_ASSERT (false);	// This is not possible!
       return false;
     }
-    if (outClipMask != 0xf) clip_portal = CS_CLIP_TOPLEVEL;
+    if (outClipMask != 0) clip_portal = CS_CLIP_TOPLEVEL;
   }
 
   return true;
@@ -1168,7 +1218,7 @@ bool csRenderView::ClipBBox (
     return false;	// Not visible.
   frustum_mask = outClipMask;
 
-  if (outClipMask & 0xf == 0xf)
+  if (outClipMask & 0xf == 0)
     clip_portal = CS_CLIP_NOT;
   else
     clip_portal = CS_CLIP_NEEDED;
@@ -1199,7 +1249,7 @@ bool csRenderView::ClipBBox (
       CS_ASSERT (false);	// This is not possible!
       return false;
     }
-    if (outClipMask != 0xf) clip_portal = CS_CLIP_TOPLEVEL;
+    if (outClipMask != 0) clip_portal = CS_CLIP_TOPLEVEL;
   }
 
   return true;
