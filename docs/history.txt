@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+1-Oct-1999
+	- Eric Sunshine fixed makedep so that it compiles on BeOS.
+	- Eric Sunshine fixed a compiler warning in impexp.cpp where the order
+	  of initialization of instance variables was incorrect.
 30-Sep-1999
 	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
 	  conforms to the CS makefile system.  He was also forced to renamed
