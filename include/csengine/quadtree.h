@@ -26,9 +26,9 @@
 // A quadtree node can be in three states: empty, full, or partial.
 // If empty or full the state of the children does not matter.
 #define CS_QUAD_EMPTY 0
-#define CS_QUAD_FULL 1
-#define CS_QUAD_PARTIAL 2
-#define CS_QUAD_UNKNOWN 3
+#define CS_QUAD_PARTIAL 1
+#define CS_QUAD_UNKNOWN 2
+#define CS_QUAD_FULL 3
 
 class csQuadtree;
 class Dumper;
@@ -151,6 +151,96 @@ public:
    */
   int TestPoint (const csVector2& point);
 };
+
+/**
+ *  4 child node states are stored in one byte.
+ *  2 bits per node, in sequence. topleft, topright, botright, botleft
+ */
+#define CS_QUAD_TOPLEFT_MASK   0xC0
+#define CS_QUAD_TOPLEFT_SHIFT  6
+#define CS_QUAD_TOPRIGHT_MASK  0x30
+#define CS_QUAD_TOPRIGHT_SHIFT 4
+#define CS_QUAD_BOTRIGHT_MASK  0x0C
+#define CS_QUAD_BOTRIGHT_SHIFT 2
+#define CS_QUAD_BOTLEFT_MASK   0x03
+#define CS_QUAD_BOTLEFT_SHIFT  0
+#define CS_QUAD_ALL_EMPTY 0x0 /* because CS_QUAD_EMPTY == 0 */
+#define CS_QUAD_ALL_FULL 0xFF /* because CS_QUAD_FULL == 3 */
+
+class WWQuadTree;
+
+class WWQuadTree {
+private:
+  /// bounding box of the quadtree
+  csBox2 bbox;
+  /// depth of the tree, 1 == 1 node only.
+  int depth;
+  /// the state of the root node.
+  int root_state;
+
+  /// state of all children, and their children.
+  /// they are ordered like this:
+  /// root has children in byte 0.
+  /// nodes in byte 0 have children in byte 0+node_nr(1,2,3,4).
+  /// nodes in byte 1 have children in byte 4+node_nr.
+  /// nodes in byte n have children in byte 4**n+node_nr
+  /// So for byte 0, take 0+node_nr,
+  /// for byte n, take Pow2(2*n) + node_nr
+  unsigned char* states;
+  /// convenience variable: how many bytes alloced in states
+  int state_size;
+
+
+  /// this function is used for traversing the quadtree.
+  /// it will get the nodes bounding box, state, byte offset and node_nr and 
+  /// custom clientdata.
+  typedef int WWQuadTree::quad_traverse_func(csBox2& node_bbox, 
+    int node_state, int offset, int node_nr, void* data);
+  /// private functions to help dealing with quadtree
+  /// call all four children of node at offset and node_nr
+  /// each will be passed the data.
+  /// returns return values of children in rc1,rc2,rc3,rc4
+  /// note that theoretically the state of the caller could be changed.
+  void CallChildren(quad_traverse_func func, int offset, int node_nr, 
+    void *data, int& rc1, int& rc2, int& rc3, int& rc4);
+
+public:
+  /// create a quadtree of depth, using about 2**twice depth bytes. depth >= 1
+  /// depth=1 is only the root.
+  WWQuadTree(const csBox2& the_box, int the_depth);
+  /// destroy quadtree
+  ~WWQuadTree();
+
+  /**
+   * Is the tree full?
+   */
+  bool IsFull () { return root_state == CS_QUAD_FULL; }
+
+  /**
+   * Insert a polygon into the quad-tree.
+   * Return true if the tree was modified (i.e. if parts of the
+   * polygon were visible.
+   */
+  bool InsertPolygon (csVector2* verts, int num_verts,
+  	const csBox2& pol_bbox);
+
+  /**
+   * Test for polygon visibility with the quad-tree.
+   * Return true if polygon is visible.
+   */
+  bool TestPolygon (csVector2* verts, int num_verts,
+  	const csBox2& pol_bbox);
+
+  /**
+   * Test if a given point is visible in the quad-tree.
+   * Returns CS_QUAD_FULL if not visible, CS_QUAD_EMPTY
+   * if visible and CS_QUAD_PARTIAL if undecided.
+   * This function returns CS_QUAD_UNKNOWN if the point is not
+   * in the quadtree.
+   */
+  int TestPoint (const csVector2& point);
+};
+
 
 #endif /*QUADTREE_H*/
 

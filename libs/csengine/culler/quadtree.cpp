@@ -20,6 +20,7 @@
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
 #include "csengine/quadtree.h"
+#include "isystem.h"
 
 csQuadtreeNode::csQuadtreeNode ()
 {
@@ -519,3 +520,84 @@ int csQuadtree::TestPoint (const csVector2& point)
   return TestPoint (root, point);
 }
 
+/*----------------------------------------------------------------*/
+/* Wouter's Wild QuadTree implementation */
+
+#if 0
+
+/// computes 2**x
+static int Pow2(int x)
+{
+  int res = 1;
+  for(int i=0; i<x; i++)
+    res <<= 1;
+  return res;
+}
+
+WWQuadTree :: WWQuadTree (const csBox2& the_box, int the_depth)
+{
+  bbox = the_box;
+  depth= the_depth;
+  root_state = CS_QUAD_EMPTY;
+  if(depth < 1)
+  {
+    CsPrintf(MSG_FATAL_ERROR, "QuadTree: Depth too small\n");
+    exit(1);
+  }
+  /// first calculate the number of nodes.
+  /// each depth 4* the nodes at the previous depth are added.
+  /// depth 1 has the root node.
+  int nr_leaves = 1;
+  int nr_nodes = 0;
+  for(int i=1; i<=depth; i++)
+  {
+    nr_nodes += nr_leaves;
+    nr_leaves *= 4;
+  }
+  /// 4 nodes per byte, the root node is stored seperately
+  state_size = (nr_nodes - 1) / 4;
+  CsPrintf(MSG_STDOUT, "QuadTree: depth %d, statesize %d bytes\n", depth,
+    state_size);
+
+  if(state_size > 0)
+  {
+    states = new unsigned char[state_size];
+    /// and every node is EMPTY at the start
+    memset(states, CS_QUAD_ALL_EMPTY, state_size);  
+  }
+  else states = NULL;
+}
+
+
+void WWQuadTree :: CallChildren(quad_traverse_func func, int offset, 
+  int node_nr, void *data, int& rc1, int& rc2, int& rc3, int& rc4)
+{
+
+}
+
+
+WWQuadTree :: ~WWQuadTree ()
+{
+  delete[] states;
+}
+
+
+bool WWQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
+  const csBox2& pol_bbox)
+{
+}
+
+
+bool WWQuadTree :: TestPolygon (csVector2* verts, int num_verts,
+  const csBox2& pol_bbox)
+{
+}
+
+
+int WWQuadTree :: TestPoint (const csVector2& point)
+{
+  if(root_state == CS_QUAD_FULL || root_state == CS_QUAD_EMPTY) 
+    return root_state;
+}
+
+#endif
