@@ -1,6 +1,8 @@
 The history order is reversed so that new features are at the top.
 
-
+9-Feb-2003
+  - Philip Wyett extended Cygwin docs to cover installation of MNG
+    and the Open Dynamics Engine (ODE) libraries.
 7-Feb-2002
 	- Philip Wyett fixed -fs switch under Windows GL and poor fps in
 	  fullscreen mode.
