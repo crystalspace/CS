@@ -25,6 +25,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+CSVOSA3DL.CFLAGS = $(CFLAGS.D)_REENTRANT $(CXXFLAGS.EXCEPTIONS.ENABLE)
+
 ifeq ($(USE_PLUGINS),yes)
   CSVOSA3DL = $(OUTDLL)/csvosa3dl$(DLL)
   LIB.CSVOSA3DL = $(foreach d,$(DEP.CSVOSA3DL),$($d.LIB))
@@ -63,7 +65,7 @@ ifeq ($(MAKESECTION),targets)
 csvosa3dl: $(OUTDIRS) $(CSVOSA3DL)
 
 $(OUT.CSVOSA3DL)/%$O: $(SRCDIR)/$(DIR.CSVOSA3DL)/%.cpp
-	$(DO.COMPILE.CPP) $(VOS.CFLAGS)
+	$(DO.COMPILE.CPP) $(VOS.CFLAGS) $(CSVOSA3DL.CFLAGS)
 
 $(CSVOSA3DL): $(OBJ.CSVOSA3DL) $(LIB.CSVOSA3DL)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -83,7 +85,7 @@ ifdef DO_DEPEND
 dep: $(OUT.CSVOSA3DL) $(OUT.CSVOSA3DL)/csvosa3dl.dep
 $(OUT.CSVOSA3DL)/csvosa3dl.dep: $(SRC.CSVOSA3DL)
 	$(DO.DEPEND1) \
-	$(VOS.CFLAGS) \
+	$(VOS.CFLAGS) $(CSVOSA3DL.CFLAGS) \
 	$(DO.DEPEND2)
 else
 -include $(OUT.CSVOSA3DL)/csvosa3dl.dep

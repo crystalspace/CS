@@ -37,10 +37,31 @@ chronological order.
 	- Eric Sunshine updated csvosa3dl.mak so that it links the plugin
 	  against csgeom.
 	- Marten removed the now deprecated iRenderBufferSource.
-	- Jorrit optimized NR version of genmesh a little bit. Render
-	  buffers are now only recreated when really needed and not every
-	  time the dirty bit was set. Also removed the copy of the triangle
-	  array to an int* buffer. That's not needed.
+	- Jorrit optimized NR version of genmesh a little bit.  Render buffers
+	  are now only recreated when really needed and not every time the
+	  dirty bit was set.  Also removed the copy of the triangle array to an
+	  int* buffer.  That's not needed.
+	- Eric Sunshine simplified a number of macros in checkbuild.m4,
+	  checklib.m4, and configure.ac by removing some unnecssary
+	  m4_default() invocations.
+	- Eric Sunshine fixed outdated documentation for CS_EMIT_BUILD_FLAGS()
+	  macro in configure.ac.
+	- Eric Sunshine fixed aesthetic problem in configure.ac where output of
+	  the results of certain tests for build flags (such as -Werror, -Wall)
+	  could differ between cached and uncached runs.
+	- Eric Sunshine added new enable-exceptions test to configure.ac which
+	  complements the existing disable-exceptions test.  Both tests now
+	  emit custom makefile/Jam variables which can be used by modules which
+	  need fine-grained control over exceptions.
+	- Eric Sunshine fixed problem in configure.ac's -fvtable-thunks check
+	  where it was hard-coding the flag -Werror, rather than using the
+	  computed value $cs_prog_cxx_enable_errors.
+	- Eric Sunshine fixed VOS check in configure.ac so that it no longer
+	  hard-codes -D_REENTRANT and -fexceptions CFLAGS, since doing so makes
+	  the invalid assumption that all compilers will understand these
+	  flags.  Instead, now uses the result of the new enable-exceptions
+	  configure.ac check, and takes advantage of the fact that each build
+	  system provides a portable way to specify preprocessor defines.
 14-Jan-2004
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.

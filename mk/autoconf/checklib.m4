@@ -96,9 +96,7 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	[cs_cv_lib$1=no])
 
     cs_cv_with_lib$1="$with_lib$1"
-
-    AS_IF([test "$cs_cv_lib$1" = yes],
-	[m4_default([$5],[:])], [m4_default([$6],[:])])])
+    AS_IF([test "$cs_cv_lib$1" = yes], [$5], [$6])])
 
 
 

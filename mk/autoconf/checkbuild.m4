@@ -112,8 +112,8 @@ AC_DEFUN([CS_BUILD_IFELSE],
 	[cs_build_cflags=CS_TRIM([$cs_cflags_test[]m4_ifval([$9],[],[ $6])])
 	cs_build_lflags=CS_TRIM([$cs_lflags_test[]m4_ifval([$9],[],[ $7])])
 	cs_build_libs=CS_TRIM([$cs_libs_test[]m4_ifval([$9],[],[ $8])])
-	m4_default([$4],[:])],
-	[m4_default([$5],[:])])])
+	$4],
+	[$5])])
 
 
 
@@ -147,11 +147,11 @@ AC_DEFUN([CS_CHECK_BUILD],
 		$2_libs=$cs_build_libs],
 		[$2=no], [$9], [$10], [$11], [$12])
 	    AC_MSG_RESULT([$$2])])
-    AS_IF([test $$2 = yes], [m4_default([$6],[:])],
+    AS_IF([test $$2 = yes], [$6],
 	[$2_cflags=''
 	$2_lflags=''
 	$2_libs=''
-	m4_default([$7],[:])])])
+	$7])])
 
 
 
@@ -180,4 +180,4 @@ AC_DEFUN([CS_CHECK_BUILD_FLAGS],
 	[CS_BUILD_IFELSE([], [$3], [$4],
 	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])],
 	    [$2=no], [$7], [$8], [$9], [Y])])
-    AS_IF([test "$$2" != no], m4_default([$5],[:]), m4_default([$6],[:]))])
+    AS_IF([test "$$2" != no], [$5], [$6])])

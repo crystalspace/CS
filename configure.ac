@@ -87,6 +87,8 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[CFLAGS.SYSTEM.MANDATORY], [COMPILER.CFLAGS.MANDATORY],
 	[CXXFLAGS.SYSTEM], [COMPILER.C++FLAGS],
 	[CXXFLAGS.SYSTEM.MANDATORY], [COMPILER.C++FLAGS.MANDATORY],
+	[CXXFLAGS.EXCEPTIONS.ENABLE], [COMPILER.C++FLAGS.EXCEPTIONS.ENABLE],
+	[CXXFLAGS.EXCEPTIONS.DISABLE], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE],
 	[MACOSX.LFLAGS.CONFIG], [COMPILER.LFLAGS],
 	[CFLAGS.optimize], [COMPILER.CFLAGS.optimize],
 	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
@@ -127,28 +129,24 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	Check if the compiler or linker recognizes a command-line option.
 #	MESSAGE is the "checking" message.  CACHE-VAR is the shell cache
 #	variable which receives the flag recognized by the compiler or linker,
-#	or "no" if the flag was not recognized.  FLAGS is a
-#	whitespace-delimited list of build tuples created with
-#	CS_CREATE_TUPLE().  Each tuple from FLAGS is attempted in order until
-#	one is found which is recognized by the compiler.  After that, no
-#	further flags are checked.  LANGUAGE is typically either C or C++ and
-#	specifies which compiler to use for the test.  If LANGUAGE is omitted,
-#	C is used.  MAKEFILE-VARIABLE is the name of the makefile variable to
-#	insert into the makefile and Jam text caches if a usable flag is
-#	encountered.  CACHE-VALUE is the value to assign to the makefile
-#	variable.  If omitted, it defaults to $cs_build_cflags.  If you are
-#	checking linker flags, rather than compiler flags, then you should
-#	specify $cs_build_lflags for this argument.  If APPEND is not the empty
-#	string, then CACHE-VALUE is appended to the existing value of the
-#	makefile variable.  If the command-line option was recognized, then
-#	ACTION-IF-RECOGNIZED is invoked, otherwise ACTION-IF-NOT-RECOGNIZED is
-#	invoked.
+#	or "no" if the flag was not recognized.  FLAGS is a whitespace-
+#	delimited list of build tuples created with CS_CREATE_TUPLE().  Each
+#	tuple from FLAGS is attempted in order until one is found which is
+#	recognized by the compiler.  After that, no further flags are checked.
+#	LANGUAGE is typically either C or C++ and specifies which compiler to
+#	use for the test.  If LANGUAGE is omitted, C is used.
+#	MAKEFILE-VARIABLE is the name of the variable to insert into the
+#	makefile and Jam text caches if a usable flag is encountered.  If
+#	APPEND is not the empty string, then CACHE-VALUE is appended to the
+#	existing value of the makefile variable.  If the command-line option
+#	was recognized, then ACTION-IF-RECOGNIZED is invoked, otherwise
+#	ACTION-IF-NOT-RECOGNIZED is invoked.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_FLAGS],
     [CS_CHECK_BUILD_FLAGS([$1], [$2], [$3], [$4],
 	[CS_BUILD_PROPERTY([$5], [$$2], [$6])
-	    m4_default([$7],[:])],
-	[m4_default([$8],[:])])])
+	    $7],
+	[$8])])
 
 
 
@@ -668,7 +666,9 @@ CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$LDFLAGS], [+])
 CS_EMIT_BUILD_FLAGS([how to enable compilation warnings],
     [cs_cv_prog_cxx_enable_warnings],
     [CS_CREATE_TUPLE([-Wmost]) CS_CREATE_TUPLE([-Wall])], [C++],
-    [CFLAGS.SYSTEM], [+], [], [cs_cv_prog_cxx_enable_warnings=''])
+    [CFLAGS.SYSTEM], [+],
+    [cs_prog_cxx_enable_warnings="$cs_cv_prog_cxx_enable_warnings"],
+    [cs_prog_cxx_enable_warnings=''])
 
 
 
@@ -677,7 +677,8 @@ CS_EMIT_BUILD_FLAGS([how to enable compilation warnings],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([how to treat warnings as errors],
     [cs_cv_prog_cxx_enable_errors], [CS_CREATE_TUPLE([-Werror])], [C++],
-    [], [cs_cv_prog_cxx_enable_errors=''])
+    [cs_prog_cxx_enable_errors="$cs_cv_prog_cxx_enable_errors"],
+    [cs_prog_cxx_enable_errors=''])
 
 
 
@@ -692,11 +693,17 @@ CS_EMIT_BUILD_FLAGS([[how to disable unknown #pragma warnings]],
 
 
 #------------------------------------------------------------------------------
-# Check if C++ exceptions can be disabled.
+# Check if C++ exceptions can be enabled and disabled.
 #------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([how to enable C++ exceptions],
+    [cs_cv_prog_cxx_enable_exceptions], [CS_CREATE_TUPLE([-fexceptions])],
+    [C++], [CXXFLAGS.EXCEPTIONS.ENABLE], [])
+
 CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
     [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
-    [C++], [CXXFLAGS.SYSTEM], [+])
+    [C++], [CXXFLAGS.EXCEPTIONS.DISABLE], [],
+	[CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM],
+	    [$cs_cv_prog_cxx_disable_exceptions], [+])])
 
 
 
@@ -707,8 +714,9 @@ CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
 # Objective-C.
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
-    [cs_cv_prog_link_suppress_multiple], [CS_CREATE_TUPLE([],
-    [-multiply_defined suppress])], [], [MACOSX.LFLAGS.CONFIG], [+])
+    [cs_cv_prog_link_suppress_multiple],
+    [CS_CREATE_TUPLE([], [-multiply_defined suppress])],
+    [], [MACOSX.LFLAGS.CONFIG], [+])
 
 
 
@@ -766,9 +774,10 @@ AC_DEFUN([CS_CHECK_VTABLE_THUNKS],
 	mingw*|cygwin*)
 	    CS_CHECK_BUILD_FLAGS([if -fvtable-thunks is needed],
 		[cs_cv_prog_cxx_vtable_thunks],
-		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])], [C++],
+		[CS_CREATE_TUPLE([-fvtable-thunks])], [C++],
 		[CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM.MANDATORY],
-		    [-fvtable-thunks], [+])])
+		    [$cs_cv_prog_cxx_vtable_thunks], [+])],
+		[], [$cs_prog_cxx_enable_errors])
 	    ;;
     esac])
 
@@ -949,7 +958,7 @@ AC_DEFUN([CS_CHECK_LOCAL_INCLUDE],
 	    [CS_CREATE_TUPLE([-I/usr/local/include])], [C++],
 	    [cs_cv_prog_cxx_local_include=yes],
 	    [cs_cv_prog_cxx_local_include=no],
-	    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])],
+	    [$cs_prog_cxx_enable_warnings $cs_prog_cxx_enable_errors])],
 	[cs_cv_prog_cxx_local_include=no])
     
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],
@@ -1665,7 +1674,7 @@ AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
     [AS_IF([test -n "$PKGCONFIG"],
 	[AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
 	    [cs_cv_libvos=yes
-	    cs_cv_libvos_cflags="-D_REENTRANT -fexceptions `AC_RUN_LOG(
+	    cs_cv_libvos_cflags="`AC_RUN_LOG(
 		[$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`"
 	    cs_cv_libvos_lflags=''
 	    cs_cv_libvos_libs=`AC_RUN_LOG(
