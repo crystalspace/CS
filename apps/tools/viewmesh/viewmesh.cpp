@@ -72,6 +72,7 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_SAVEMESH 77702
 #define VIEWMESH_COMMAND_LOADLIB  77703
 #define VIEWMESH_STATES_SELECT_START  77800
+#define VIEWMESH_OVERRIDE_SELECT_START  77900
 #define VIEWMESH_COMMAND_CAMMODE1 77711
 #define VIEWMESH_COMMAND_CAMMODE2 77712
 #define VIEWMESH_COMMAND_CAMMODE3 77713
@@ -289,6 +290,18 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	menu->Hide();
 	return true;
       }
+      if (ev.Command.Code > VIEWMESH_OVERRIDE_SELECT_START &&
+	  ev.Command.Code < VIEWMESH_OVERRIDE_SELECT_START + 100)
+      {
+      	csRef<iSprite3DState> spstate (
+		SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+		iSprite3DState));
+	if (spstate)
+	  spstate->SetOverrideAction(
+	      stateslist.Get(ev.Command.Code - VIEWMESH_OVERRIDE_SELECT_START) );
+	menu->Hide();
+	return true;
+      }
       break;
   }
 
@@ -404,7 +417,16 @@ void ViewMesh::ConstructMenu()
   }
   (void)new csMenuItem(menu, "States", statesmenu);
 
-  // Camer Mode
+  // OverrideActionMenu
+  csMenu *overridemenu = new csMenu(NULL);
+  for (int i=0;i<stateslist.Length();i++)
+  {
+    (void)new csMenuItem(overridemenu, stateslist.Get(i),
+			 VIEWMESH_OVERRIDE_SELECT_START+i);
+  }
+  (void)new csMenuItem(menu, "Overrides", overridemenu);
+
+  // Camera Mode
   csMenu *cammode = new csMenu(NULL);
   (void)new csMenuItem(cammode, "Normal Movement", VIEWMESH_COMMAND_CAMMODE1);
   (void)new csMenuItem(cammode, "Look to Origin", VIEWMESH_COMMAND_CAMMODE2);
