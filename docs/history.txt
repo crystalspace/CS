@@ -49,6 +49,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed some problems in cspython.mak and csjava.mak.
 	- Eric Sunshine added automatic detection of SVGALIB to unixconf.sh.
 	- Eric Sunshine removed the dead cygnus.mak makefile.
+	- Eric Sunshine eliminated several compilation warnings from
+	  crysball.cpp.
 5-Dec-2000
 	- Wouter Wijngaards created csBox3::SquaredOriginDist which returns
 	  a float with the squared distance of the box to (0,0,0). It

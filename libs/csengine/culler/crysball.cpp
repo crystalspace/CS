@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Norman Kramer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 int csCrystalBall::trinode::Add (const crysVec *normal, int tri1, int tri2, 
 				 int tri3, csVector *vP, csVector *vTP)
 {
-  int nPos;
+  int nPos = 0;
   if (IsLeaf ())
   {
     // we reached the last level
@@ -271,7 +271,7 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 		       polyset->GetVertices ()[mp.vertices[2]]
 		       );
   // which of the 8 starting triangles we add this to ?
-  int i1, i2, i3, i = 0;
+  int i1 = 0, i2 = 0, i3 = 0, i = 0;
   if (n->y < 0)
     i += 4;
   if (n->z < 0)
@@ -346,4 +346,3 @@ void csCrystalBall::Transform (const csTransform &o2c, csVector &indexVector,
   tri[7].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
 		     e1, ne2, ne3);
 }
-
