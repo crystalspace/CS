@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	- Changed iPortal->SetMirror() to accept a plane instead of a polygon.
   	- res worked around a problem in csutil/array.h caused by the 
   	  redefinition of 'new' when memory debugging is enabled.
+  	- res made the following changes to levtool:
+  	    - reformatted command line help
+  	    - leaks fixed
         - Andrew Craig removed <conio.h> from the maya2spr tool since it 
           is not a cross platform include.
 29-Mar-2003
