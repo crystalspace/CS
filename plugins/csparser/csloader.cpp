@@ -575,20 +575,22 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
-	    	->FindByName (name);
-            if (!t)
-	      t = Engine->CreateMeshFactory (name);
-            if (!LoadMeshObjectFactory (t, params))
+            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+	    if (t)
 	    {
-	      ReportError (
-	      	"crystalspace.maploader.load.library.meshfactory",
-		"Could not load mesh object factory '%s' in library!",
-		name);
-	      return false;
+	      if (!LoadMeshObjectFactory (t, params))
+	      {
+		t->DecRef ();
+		ReportError (
+			     "crystalspace.maploader.load.library.meshfactory",
+			     "Could not load mesh object factory '%s' in library!",
+			     name);
+		return false;
+	      }
+	      t->DecRef ();
 	    }
-          }
-          break;
+	  }
+	  break;
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
