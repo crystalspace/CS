@@ -514,6 +514,121 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
+// Some notes about drawing here. These notes are the start for
+// a rethinking about how rendering objects in one sector actually
+// should happen. Note that the current implementation actually
+// implements very little of the things discussed here. Currently
+// the entities are just rendered one after the other which can cause
+// some problems.
+//
+// There are a few issues here:
+//
+// 1. Z-buffering/Z-filling.
+// Some objects/entities are more efficiently rendered back
+// to front using Z-filling instead of Z-buffering. In some cases
+// Z-filling is also required because rendering a sector starts
+// with an uninitialized Z-buffer (CS normally doesn't clear the
+// Z buffer every frame). In some cases it might be more optimal
+// to use Z buffering in any case (to avoid sorting back to front)
+// (for hardware 3D) so we would like to have the option to clear
+// the Z buffer every frame and use Z-buffering.
+//
+// 2. Alpha transparency.
+// Some entities have alpha transparency. Alpha transparent surfaces
+// actually need to be sorted back to front to render correctly.
+// Also before rendering an alpha surface all objects behind it should
+// already be rendered.
+//
+// 3. Floating portals.
+// Floating portals also take some special consideration. First
+// of all the assume a new intialize of the Z buffer for the 2D
+// area of the portal in question. This is ok if the first entities
+// that are rendered through the portal use Z-fill and cover the
+// entire portal (this is the case if you use sector walls for
+// example). If Z-fill cannot be used for the portal then an
+// extra initial pass would have to clear the Z buffer for the portal
+// area in 2D. Also geometry needs to be clipped in 3D if you have
+// a floating portal. The reason is that the Z buffer information
+// outside of the floating portal may actually contain information
+// further than the contents of the portal. This would cause entities
+// visible inside the portal to be rendered as if they are in the
+// parent sector too.
+// After rendering through a floating portal, the floating portal
+// itself needs to be covered by the Z-buffer. i.e. we need to make
+// sure that the Z-buffer thinks the portal is a regular polygon.
+// This is to make sure that sprites or other entities rendered
+// afterwards will not get rendered INSIDE the portal contents.
+//
+// Here is a list of all the entities that we can draw in a sector:
+//
+// 1. Sector walls.
+// Sectors are always convex. So sectors walls are ideal for rendering
+// first through Z-fill.
+//
+// 2. Static things in octree.
+// In some cases all static things are collected into one big
+// octree with mini-bsp trees. This structure ensures that we can
+// actually easily sort polygon back to front or front to back if
+// needed. This structure can also easily be rendered using Z-fill.
+// The c-buffer/coverage mask tree can also be used to detect
+// visibility before rendering. This pushes visible polygons into
+// a queue. There is the issue here that it should be possible
+// to ignore the mini-bsp trees and only use the octree information.
+// This can be done on hardware where Z-buffering is fast. This
+// of course implies either the use of a Z-filled sector or else
+// a clear of the Z buffer every frame.
+// A related issue is when there are portals between the polygons.
+// Those portals need to be handled as floating portals (i.e. geometry
+// needs to be clipped in 3D) because the Z buffer information
+// will not be correct. If rendering the visible octree polygons
+// back to front then rendering through the portals presents no
+// other difficulties.
+//
+// 3. Terrain triangles.
+// The terrain engine generates a set of triangles. These triangles
+// can easily be sorted back to front so they are also suitable for
+// Z-fill rendering. However, this conflicts with the use of the
+// static octree. You cannot use Z-fill for both because that could
+// cause wrong rendering. Using Z-buffer for one of them might be
+// expensive but the only solution. Here there is also the issue
+// if it isn't possible to combine visibility algorithms for landscape
+// and octree stuff. i.e. cull octree nodes if occluded by a part
+// of the landscape.
+//
+// 4. 3D Sprites.
+// Sprites are entities that need to be rendered using the Z-buffer
+// because the triangles cannot easily be sorted.
+//
+// 5. Dynamic things.
+// Things that are not part of the static octree are handled much
+// like normal 3D sprites. The most important exception is when
+// such a thing has a floating portal. In this case all the normal
+// floating portal issues are valid. However, there are is an important
+// issue here: if you are rendering a floating portal that is BEHIND
+// an already rendered entity then there is a problem. The contents
+// of the portal may actually use Z-fill and thus would overrender
+// the entity in front. One obvious solution is to sort ALL entities
+// to make sure that everything is rendered back to front. That's of
+// course not always efficient and easy to do. Also it is not possible
+// in all cases to do it 100% correct (i.e. complex sprites with
+// skeletal animation and so on). The ideal solution would be to have
+// a way to clear the Z-buffer for an invisible polygon but only
+// where the polygon itself is visible according to the old Z-buffer
+// values. This is possible with software but I'm currently unsure
+// about hardware. With such a routine you could draw the floating
+// portal at any time you want. First you clear the Z-buffer for the
+// visible area. Then you force Z-buffer use for the contents inside
+// (i.e. everything normally rendered using Z-fill will use Z-buffer
+// instead), then you render. Finally you update the Z-buffer with
+// the Z-value of the polygon to make it 'hard'.
+//
+// If we can treat floating portals this way then we can in fact
+// consider them as normal polygons that behave correctly for the
+// Z buffer. Aside from the fact that they clip geometry in 3D
+// that passes through the portal. Note that 3D sprites don't
+// currently support 3D geometry clipping yet.
+
+
 void csSector::Draw (csRenderView& rview)
 {
   draw_busy++;
