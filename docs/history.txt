@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Nov-2003
+	- Eric Sunshine performed project-wide spelling corrections:
+	    seperate   --> separate
+	    seperated  --> separated
+	    seperately --> separately
+	    seperation --> separation
 1-Nov-2003
 	- Jorrit fixed a problem in Dynavis where history culling would
 	  invalidate the frustum mask that is used for hierarchical frustum
@@ -980,7 +986,7 @@ chronological order.
 	- Jorrit removed support for setting mixmode and alpha for individual
 	  polygons.  It is now only possible to set this on the entire mesh.
 	  So if you need a transparent polygon then you have to make it a
-	  seperate mesh.
+	  separate mesh.
 	- Jorrit fixed alpha support with DrawPolygonMesh by doing the above
 	  change.  However, the alpha is still to dark in combination with a
 	  lightmap.  The old OpenGL renderer still needs fixing for that.
@@ -1097,7 +1103,7 @@ chronological order.
 	- Jorrit fixed some bugs related to render priorities in case some
 	  render priorities are not specified by the map file.
 	- Jorrit changed the way the rotating door works in flarge.  The
-	  overlay texture of the portal is now a seperate child mesh in a
+	  overlay texture of the portal is now a separate child mesh in a
 	  higher render priority.  This works a lot better with the new portal
 	  container approach.  Also added a 'portal' render priority to flarge.
 	- Jorrit temporarily removed the <float> from the door portal in flarge
@@ -1193,7 +1199,7 @@ chronological order.
 	  certain conditions the leaf wouldn't be correctly added to the
 	  culler.
 	- Jorrit changed the way child meshes are treated for render
-	  priorities. A child mesh is now put as a seperate entity in a
+	  priorities. A child mesh is now put as a separate entity in a
 	  render priority. That way it is now possible to put child meshes
 	  in different render priorities (different compared to the parent
 	  mesh).
@@ -5347,7 +5353,7 @@ chronological order.
 	  shutdown-time crashes.
 	- Matze fixed a bug in csObjectIterator pointed out by groton and also
 	  cleaned the code up there.
-	- Jorrit removed Blocks from CS. Blocks is now a seperate project
+	- Jorrit removed Blocks from CS. Blocks is now a separate project
 	  (http://sf.net/projects/blocks3d).
 	- Jorrit removed several entries to Blocks from the documentation.
 	- acraig fixed the csList<T>::Delete() to use pre-increment.
@@ -7648,7 +7654,7 @@ chronological order.
 	  compile after changing something...
 	- Thing changes:
 	    - Removed obsolete csThingBBox bounding box in csThing.
-	    - Split bezier curves in seperate mesh object plugin (bezier
+	    - Split bezier curves in separate mesh object plugin (bezier
 	      plugin).
 	    - Greatly cleaned up the csThingStatic stuff and moved all static
 	      stuff to that.
@@ -8028,7 +8034,7 @@ chronological order.
 	  I optimized the fact that the warp matrix is no longer transformed
 	  if a thing moves and there is no warping.
 	- Physically split csPolygon3D into csPolygon3DStatic and csPolygon3D.
-	  This is the next step into seperating static thing and mesh objects.
+	  This is the next step into separating static thing and mesh objects.
 	- Several internal orginizations are caused by this in the thing
 	  mesh plugin.
 	- Keith Fulton committed a fix made by Andrew Mann which caused
@@ -8508,7 +8514,7 @@ chronological order.
 	  been removed and it's functionality has moved to iCurve itself.
 	  The notion of curve templates has always been a bit curious
 	  as a curve template is just a list of nine vertex indices. So
-	  it didn't make sense to seperate it. As a consequence of this
+	  it didn't make sense to separate it. As a consequence of this
 	  change the bezier addon loader has been removed. A curve like this
 	  in the past:
 		<addon>
@@ -8681,7 +8687,7 @@ chronological order.
 	  this function manually in order to increase load time but decrease
 	  the time need to setup things later.
 	- Added a -regions commandline option to walktest so that when you
-	  load multiple maps every map is loaded in a seperate region and
+	  load multiple maps every map is loaded in a separate region and
 	  lighting information is taken from that map zip file.
 	- Added a -prepare commandline option to walktest. When you give this
 	  option all things are pre-prepared (using the iThingState->Prepare()
@@ -9782,7 +9788,7 @@ chronological order.
 	- Fixed a very bad bug in the thing mesh plugin. When a lightcell
 	  size was selected different from the default 16, all shadow
 	  calculations would go wrong because the shift value (4) wasn't
-	  updated. This bug was introduced when I moved thing to a seperate
+	  updated. This bug was introduced when I moved thing to a separate
 	  plugin.
 	- Matthias Braun applied patch from damage-list@freenet.de.
 	  This patch fixed some crashers in csgrid and tries to close a memory

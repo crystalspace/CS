@@ -181,7 +181,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  debugging purposes.
 	- Added iSector->CheckFrustum() for portal traversal.
 	- Removed the 'cosfact' console command in walktest.
-	- The big step! csThing is now a seperate plugin!
+	- The big step! csThing is now a separate plugin!
 	- Removed all includes from from the include/csengine dir from css.h.
 	  Nothing (except for the engine) is supposed to include from
 	  include/csengine.
@@ -224,7 +224,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Added iLightingInfo->DynamicLightDisconnect() function.
 	- The changes above disconnect the knowledge of individual
 	  polygons and curves from the dynamic lighting system. Another
-	  step closer towards csThing/csEngine seperation.
+	  step closer towards csThing/csEngine separation.
 	- Added iLightingProcessInfo->FinalizeLighting() function.
 	- Added iLightingProcessData interface. Mesh objects can implement
 	  this interface in order to be able to add userdata to the
@@ -234,10 +234,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  and is directly used by the lighting system (as userdata
 	  for CheckFrustum()).
 	- Modified csLightingPolyTexQueue to implement iLightingProcessData
-	  so that the lightmap specific lighting stuff is now seperated
+	  so that the lightmap specific lighting stuff is now separated
 	  from the lighting stuff.
-	- Physically seperated arrays.cpp in the engine to prepare for the
-	  move of thing as a seperate plugin.
+	- Physically separated arrays.cpp in the engine to prepare for the
+	  move of thing as a separate plugin.
 	- Moved csLightPatch to lppool.cpp.
 	- Removed all includes from core engine to thing and vice versa
 	  that are not needed. This only leaves a very few dependencies
@@ -284,7 +284,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  csPortal->HitBeam().
 	- Fixed csSector, csCamera, and csPortal so they no longer use
 	  csPolygon3D but instead always uses iPolygon3D.
-	- Continued working on seperating csThing from the engine.
+	- Continued working on separating csThing from the engine.
 	  csSector no longer depends on csThing (but still uses iThingState
 	  in some places).
 	- Removed iFrustumView->SetFirstTime() and related. That way we
@@ -622,7 +622,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      it's name to multiplexer instead of multiplexor.
 	- Made the following modifications to levtool:
 	    - Added -splitpoly and -analyzep options. With this it is possible
-	      to seperate large polygons in seperate objects.
+	      to separate large polygons in separate objects.
   	    - Fixed bug with -minsize. That option was simply ignored.
 6-Dec-2002
 	- Norman Kramer did the following:
@@ -632,9 +632,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Fixed a bug in the engine where children of mesh objects wouldn't
 	  get registered to the visibility culler. This could cause culling
 	  errors and it would also cause HitBeam to fail on mesh children.
-	- Changed levtool to work in seperate steps. The -dynavis option
+	- Changed levtool to work in separate steps. The -dynavis option
 	  will only split in parts now. After that you can run -splitunit
-	  to split in seperate units (takes a long time on large
+	  to split in separate units (takes a long time on large
 	  levels).
 	- Added -analyze to levtool so you can see the distribution
 	  of objects and their relative size to the global bounding box.
@@ -656,10 +656,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Hacked the world file to remove old token 'lmcache'.
 	      Remember to use '-reclac' on first run to generate
 	      lightmap data.
-	- 'levtool' will now split all parts in seperate units. A unit
+	- 'levtool' will now split all parts in separate units. A unit
 	  is defined as a set of polygons that are connected and that
 	  doesn't connect with any other polygon from the same part.
-	  This results in a much better object seperation for Dynavis.
+	  This results in a much better object separation for Dynavis.
 	  Performance improves by doing this but is still not perfect.
 	- Added a '-nosplit' commandline option to disable this new
 	  feature so that the things are only split in parts.
@@ -2527,7 +2527,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  function a lot more. Here is what I did:
 	    - DrawPolygon no longer uses any of the polygon, lightmap, or fog
 	      queues and is fully stand alone.  This makes it slower but easier
-	      to seperate from the rest.
+	      to separate from the rest.
 	    - The fog queue has been removed and merged with the polygon queue.
 	      DrawPolygonFX is now the only function that uses the polygon
 	      queue.
@@ -3754,7 +3754,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  services).
 	- Implemented ParsePortal() in syntax services.
 	- Removed XML version of ParseShading() in syntax services. It
-	  isn't that useful to keep as a seperate routine.
+	  isn't that useful to keep as a separate routine.
 	- Added XML version of ParseBool() to syntax services.
 	- Partially implemented XML version of ParsePoly3d() for syntax
 	  services. This means that syntax services nearly completely
@@ -4280,7 +4280,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Philip Wyett Fixed a leak in Blocks during destruction.
 	- Added a new blender export script (blender2cs.py) written by
 	  John Harger. This one exports to thing mesh factories and puts
-	  those in a seperate library.
+	  those in a separate library.
 26-Jul-2002
 	- Eric Sunshine fixed problem reported by Reed Hedges
 	  <reed@zerohour.net> where aws.mak neglected to install awsdef.zip.
@@ -4710,8 +4710,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Added a 3dsMax script for converting 3dsMax levels to Crystal
 	  Space. This script is written for 3dsMax version 4 but it may
 	  also work with lower versions. This convertor is specifically
-	  designed with Dynavis in mind so it will export seperate objects
-	  in 3dsMax as seperate objects in CS. Thanks to Luca Pancallo for
+	  designed with Dynavis in mind so it will export separate objects
+	  in 3dsMax as separate objects in CS. Thanks to Luca Pancallo for
 	  creating this very useful script!
 	- Daniel Duhprey fixed some problems with the mesh colliders in the
 	  ODE dynamics plugin.
@@ -4885,7 +4885,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 		  widgets and overhauled their drawing code to use panel
 		  instead.
 	    - aws3dFrame
-		- Reworked alot of the code into seperate per-style functions
+		- Reworked alot of the code into separate per-style functions
 		  rather than one massive block. I also added some more
 		  styles, and some extra versions of the draw function
 		  for convenience. It also can make use of a rectRegion now
@@ -4946,7 +4946,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 		- The minimum size is a bit more intelligent for resize.
 		- You can draw the a gradient title bar if you want by setting
 		  a 2nd titlebar color (ala windows).
-		- Engine view is now a seperate component.
+		- Engine view is now a separate component.
 		- Messed around with the draw code alot so im not sure all
 		  the styles/option combinations work exactly like they used
 		  to. I have stopped drawing the grip for the time being as
@@ -5171,7 +5171,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Started work on csVisibilityObjectHistory class. This class
 	  contains all history-related visibility information for an
 	  object (and in the future also kdtree node). The reason
-	  for this seperation is to make it easier later on to redesign
+	  for this separation is to make it easier later on to redesign
 	  this to support multiple camera positions.
 	- csVisibilityObjectHistory is now an SCF class so that it can
 	  be embedded more generally in the csKDTree.
@@ -6111,8 +6111,8 @@ updated3-Jun-2002
 	- Thanks to the debugging help of Toni Asco Gonzalez I managed to fix
 	  a rather big bug in the lighting routines (more specifically
 	  in iSector::CheckFrustum()). The problem was csShadowIterator
-	  which is supposed to iterate over all shadows. Every seperate thing
-	  will cause a seperate shadow block in the shadow list. The
+	  which is supposed to iterate over all shadows. Every separate thing
+	  will cause a separate shadow block in the shadow list. The
 	  shadow iterator will iterate over these shadows in the shadow block
 	  list. To do that it will internally iterate over shadow blocks.
 	  However it could happen that a block containing no shadows
@@ -7001,7 +7001,7 @@ updated3-Jun-2002
 	  Changed all implementations of this interface for the new
 	  method signature.
 	- Christian Bayle did some changes to the Debian script rules.
-	- Christion added versioning/added export on tag for the Debian
+	- Christian added versioning/added export on tag for the Debian
 	  scripts.
 	- Norman Kramer did the following:
 	    - Further changes to the CS_* macros to provide static/global
@@ -8082,7 +8082,7 @@ updated3-Jun-2002
 	  anything.
 	- Matze fixed destruction (memory leak) of null 3d renderer.
 28-Jan-2002
-	- Seperated geometry and rule in the tree generator. This will make
+	- Separated geometry and rule in the tree generator. This will make
 	  it easier to setup better rules.
 	- Matze changed annotation to include a link to the page in the e-mail
 	  and mangles e-mail adress.
@@ -9258,7 +9258,7 @@ updated3-Jun-2002
 	- Removed most usages of GetThingType() in the engine. Only the
 	  engine itself and everything related to things now use
 	  GetThingType().
-	- Modified bugplug so that it now has an event handler as a seperate
+	- Modified bugplug so that it now has an event handler as a separate
 	  object instead of putting the event handler in the bugplug
 	  plugin itself. This avoids a circular reference.
 	- Fixed a bug in csThing::HardTransform(). Polygon texture planes
@@ -10864,7 +10864,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  One sympton of this problem was that -video=opengl didn't work
 	  anymore.
 	- Michael Voase did the following:
-	  - Update bin/unixconf.sh to seperate gcc from g++
+	  - Update bin/unixconf.sh to separate gcc from g++
 	- Added iLODControl interface file which will be used in the future
 	  for the LOD manager.
 	- Removed all LOD related functions from iMeshObject. Instead this
@@ -11618,7 +11618,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  So it can finally be removed!!! In addition CS_GET_SYSTEM is now
 	  also gone.
 	- Moved the virtual clock implementation in the system driver to
-	  a seperate csVirtualClock in csutil. The system driver no longer
+	  a separate csVirtualClock in csutil. The system driver no longer
 	  creates and manages the virtual clock. The already existing
 	  csInitializer::CreateVirtualClock() will now create and register
 	  the virtual clock.
@@ -13143,7 +13143,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Split iPlugin interface into iComponent and iEventHandler and removed
 	  iPlugin interface.  iComponent now contains the Initialize() function
 	  and iEventHandler contains HandleEvent.  The idea is that event
-	  handling is a seperate concept from plugins so HandleEvent does not
+	  handling is a separate concept from plugins so HandleEvent does not
 	  belong in iPlugin.  In addition the notion of initializing is not
 	  plugin specific either so it also doesn't belong to iPlugin.  This
 	  means there is actually nothing left in iPlugin so it is removed.  To
@@ -14223,7 +14223,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  instead.
 	- Removed iSystem::RemoveConfig(). Use iConfigManager::RemoveDomain()
 	  instead.
-	- Removed iSystem::CreateSeperateConfig(). Use a new instance of
+	- Removed iSystem::CreateSeparateConfig(). Use a new instance of
 	  csConfigFile instead (like 'new csConfigFile (filename, VFS)').
 	- Removed iSystem::SaveConfig().  Use iConfigManager::Save() instead.
 	- For all above funtions you can get a pointer to the config manager by
@@ -15235,7 +15235,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  will actually call IntersectSegmentFull().
 	- Renamed proctex.cpp in simplept to sproctex.cpp. Due to a limitation
 	  in the makefile system we cannot have source files that have
-	  the same name even if they are in seperate sub-projects.
+	  the same name even if they are in separate sub-projects.
 	- Renamed csPoly3D::SetGetVertexCount() to SetVertexCount().
 	- Renamed csPoly2D::SetGetVertexCount() to SetVertexCount().
 	- Renamed csWfPolygon::SetGetVertexCount() to SetVertexCount().
@@ -17400,7 +17400,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added iMeshWrapper::GetParentContainer() to get the parent
 	  (either iEngine or iMeshWrapper) from a mesh wrapper.
 	- Added clip_z_plane to G3DTriangleMesh. Clipping to the z-plane
-	  or to the (optional) near plane should be considered seperate.
+	  or to the (optional) near plane should be considered separate.
 	  It is possible for an object to go beyond both planes independently.
 	- Extended csRenderView/iRenderView::ClipBBox() with a new
 	  clip_z_plane parameter.
@@ -18415,8 +18415,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  A config option needs to be made to enable this optionally.
 	- Lightmaps are now sorted on lightmap. Every super lightmap has
 	  its own cache and they are rendered one by one when needed.
-	- Fog has its own seperate queue now and this is rendered in a
-	  totally seperate pass.
+	- Fog has its own separate queue now and this is rendered in a
+	  totally separate pass.
 	- Martin Geisse continued cleanup of the engine.
 	- Thomas Hieber updated map2cs again. Still not completely ready
 	  though.
@@ -18496,7 +18496,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Fixed Blocks so it compiles again.
 	- Did an experimental optimization. CS will now keep the lightmap
 	  in another format which is more suitable for hardware. Instead
-	  of three seperate maps of red, green, and blue data we now have
+	  of three separate maps of red, green, and blue data we now have
 	  r,g,b,0 in one array. Disadvantage: 4 bytes per lightmap entry
 	  instead of 3. Advantage: no more need to convert the lightmap
 	  in OpenGL as this format can be used like that. This gives a speed
@@ -18955,7 +18955,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  There are two kinds of clipping: portal clipping (clipping to the
 	  boundaries of the last portal we went through) and portalplane
 	  clipping (clipping to the plane of the portal itself). Both are
-	  handled seperatelly.
+	  handled separatelly.
 	  There are three cases for both portal clipping as portalplane
 	  clipping (these are set in the fields clip_portal and clip_plane):
 	  	- No clipping required (CS_CLIP_NOT): in this case the
@@ -19793,7 +19793,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  Render context data has a key (void*) and a value (iBase*).
 	- Using the above changed I fixed a potentially serious bug in the
 	  visibility culling system. The visibility culling and drawing
-	  are now seperate actions. However the thing which does the
+	  are now separate actions. However the thing which does the
 	  visibility culling wants to remember all polygons that were found
 	  visible in a queue so that when the same thing is rendered later
 	  only those polygons are rendered. This worked fine before I
@@ -21022,7 +21022,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - Changed the system driver to remove its private config file
 	      as well.
 	- Robert Bate did some work setting up the TARGET_API_* flags.
-	- Robert removed the quit and the seperator from the file menu if
+	- Robert removed the quit and the separator from the file menu if
 	  running on OSX.
 	- Robert renamed timing.cpp to avoid name collision.
 	- Robert did some updates on the Mac project files.
@@ -21068,7 +21068,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  vertex arrays.
 	- Renamed csPooledVertexArrayPool to csStackedVertexArrayPool.
 	- Started work on a completely redesigned CheckFrustum routine.
-	  I will start by making it a seperate function first and mark
+	  I will start by making it a separate function first and mark
 	  every thing I have to modify with FRUSTNEW. If all works well
 	  I can later remove the old routines.
 	- Wouter Wijngaards did the following:
@@ -21108,7 +21108,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      DIRECTINPUT_VERSION >=' thus makes this method totally
 	      backward compatible.
 	    - For Win95 and NT4. DIRECTINPUT_VERSION is set to 0x0300 as
-	      it's the highest NT4 supports and you cannot seperate NT4
+	      it's the highest NT4 supports and you cannot separate NT4
 	      and 95 by version so have to be set to the same value.
 	  Have tested on most flavors of Windows and both VC and MingW...
 	- Norman Kramer added dummy audio stream and did further work on AVI.
@@ -21365,7 +21365,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Removed the csPolyTreeObject's from csThing and csMeshWrapper.
 	  This is now the responsibility of the visibility culler.
 	- Continued working on the visibility plugin system. It is now
-	  working mostly. The next step will be to really seperate it
+	  working mostly. The next step will be to really separate it
 	  more cleanly from the engine. Note that there are still bugs
 	  in the vis system. It sometimes says something is invisible
 	  when it is visible.
@@ -21425,7 +21425,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  to define a thing which contains parts. This is mainly
 	  useful for the representation of the static thing as you can
 	  then still maintain a logical division of the static thing into
-	  seperate sub-things. Note that at this moment the engine doesn't
+	  separate sub-things. Note that at this moment the engine doesn't
 	  keep track of the logical units. It is simply the loader that
 	  allows this syntax. A 'PART' is completely similar to a THING
 	  except that it can only occur as part of another THING or PART
@@ -21435,7 +21435,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- csThing is now responsible for drawing its own static tree if
 	  it has one.
 	- Started work on iVisibilityCuller and iVisibilityObject. Using these
-	  two SCF interfaces it will be possible to seperate visibility
+	  two SCF interfaces it will be possible to separate visibility
 	  culling logically and physically from the engine itself.
 	  Objects that implement iVisibilityCuller know how to test visibility
 	  for objects. The visibility culler will work with objects that
@@ -21483,7 +21483,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Eric Sunshine fixed several Texinfo mark-up errors in the User's
 	  Manual.
 17-Feb-2001
-	- csSector is now properly seperated from csPolygonSet. Sectors
+	- csSector is now properly separated from csPolygonSet. Sectors
 	  no longer contain polygons.
 	- Added csEngine::CreateSectorWalls() which is a convenience
 	  function that will create the thing which is supposed to
@@ -23158,7 +23158,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Modified WalkTest so that it will also recognize the children
 	  of csMeshWrapper and parse the KEY statements for them.
 	- Changed iCubeMeshObject to make it more general. You can now
-	  specify the sizes for x, y, and z seperatelly. So the cube does
+	  specify the sizes for x, y, and z separatelly. So the cube does
 	  not have to be a cube anymore :-)
 	- Also added shift values so that you can shift the (0,0,0) point
 	  of the cube to another place.
@@ -25992,7 +25992,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  on new GCC's.
 17-Sep-2000
 	- Seth Galbraith did the following to docs:
-	    - Removed section on seperate vertex, texel, and normal arrays
+	    - Removed section on separate vertex, texel, and normal arrays
 	      (which didn't work out very well :-)
 	    - Added ideas for smoothing unwanted shading edges
 	      (by interfering with vertex normal calculation).
@@ -26739,7 +26739,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  Class is not yet used but preparation work for the usage
 	  of this class has started. The main benefit of this class will
 	  be to make sure that the API for moving sprites and things
-	  is the same by putting that API in a seperate class.
+	  is the same by putting that API in a separate class.
 	- Removed strange 'sector' pointer from csPolygonSet and put it
 	  in csThing instead. Sectors don't have a need for a 'sector'
 	  pointer as this is equal to 'this'. Also this will make it easier
@@ -27455,7 +27455,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	     formatted results to a file. It also prints out system info
 	     as the header. This is meant to be a tool mostly to test the
              drivers. The nested bit means it will also gather
-	     seperate statistics for a configurable 'subsection' of the
+	     separate statistics for a configurable 'subsection' of the
              main section it is gathering statistics for.
 	     Walktest has a max of three nested perfstats with the
              recsubperf command (see below).
@@ -28460,7 +28460,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  of the texture and the previous contents will still be there.
 	- Wouter Wijngaards added csMaterial class. Is now used by polygons.
 	  The API is backwards compatible though, only resulting in a
-	  seperate material for each polygon if used the old way.
+	  separate material for each polygon if used the old way.
 	- Wouter added bumpmap class, it will store a bumpmap in different
 	  formats given a source image.
 	- Wouter improved fountain command. Now uses spark
@@ -29627,7 +29627,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Wouter also made csBox2::Intersect() a const routine.
 	- Did a very significant bug fix in PVS. This seems to improve
 	  quality ENOURMOUSLY. It also results in a few errors but I'll have
-	  to debug these seperately. This looks very promising indeed.
+	  to debug these separately. This looks very promising indeed.
 	- Fix for OpenGL 8 bit mode and palette from Thomas Krug
 	  <thomas.krug@assix.de>.
 	- Thomas Hieber fixed csQuadtree to make it compile on VC again.
@@ -30146,7 +30146,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  a bug but I like to have the generated octree the same on all
 	  platforms to easy debugging and make bugs more reproducable.
 	- Received a patch from Samuel Humphreys for dynamic textures:
-	    - Seperates metademo into reusable chunks and cleans up some stuff.
+	    - Separates metademo into reusable chunks and cleans up some stuff.
 	    - dtSimple now has two animated textures. The second is the
 	      metaballs.
 	    - Use F1 to toggle on/off first texture animation; F2 for other.
@@ -33275,7 +33275,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  blue had been swapped.
 	- Norman Kramer made some fixes on the glide drivers again.
 	  Multipass filtering works now (still with some weird lightmap
-	  effects). Textured and lit drawing is seperated now.
+	  effects). Textured and lit drawing is separated now.
 	- Gary Haussmann fixed text rendering with OpenGL. The problem was
 	  that the third parameter -- which tells OpenGL the components of
 	  data you are passing in -- was '1' when it should have been
@@ -33592,7 +33592,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Changed novice/average/expert menu in Blocks so that it is now
 	  one menu which you can rotate horizontally with arrow left/right
 	  (instead of up/down).
-	- The seperate boardsize menu has also been replaced with a horizontal
+	- The separate boardsize menu has also been replaced with a horizontal
 	  one.
 	- Eric Sunshine enhanced csStrVector so that it can perform both
 	  case-sensitive and case-insensitive sorting and comparison.
@@ -34064,7 +34064,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  NeXT-friendly.
 	- Michael updated the GGI driver keyboard handler.
 	- Seth Galbraith started big changes to csSprite3D class. He
-	  seperated 3D coordinates from normals and texture coordinates
+	  separated 3D coordinates from normals and texture coordinates
 	  for faster and more flexible sprites. csFrame and csSpriteTemplate
 	  are affected.
 	- Eric Sunshine fixed support for testing CS_BIG/LITTLE_ENDIAN
@@ -34259,7 +34259,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  triangles so that there are no more unexpected crashes (in
 	  some cases viewing sydney.zip could crash CS).
 	- Samuel also made some changes to the skeleton sprites so that
-	  the skeletal animation system is now completely seperate from
+	  the skeletal animation system is now completely separate from
 	  csSprite3D.
 	- Further work on dynamic objects in polygon trees.
 	- Andrew Zabolotny updated his memory debugger so that it now works
@@ -34466,7 +34466,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  transformation work to do, c) it is more memory efficient for
 	  gouraud shaded polygons.
 29-Dec-1999
-	- Started work on seperating the plane component from the
+	- Started work on separating the plane component from the
 	  texture mapping stuff. This is so that we can preserve memory
 	  for polygons that use gouraud shading.
 	- Thomas Hieber added support for Quake 3 Arena in map2cs.
@@ -35096,7 +35096,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  a macro that defines a static object that can grow and that
 	  contains an array of given type elements. Some engine parts
 	  use a similar technique for growing some static arrays, so he
-	  thought it would be best to put all that into a seperate
+	  thought it would be best to put all that into a separate
 	  file (and add an automatic cleanup mechanism to avoid memory
 	  leaks).
 	- Andrew also fixed VSH. Now it compiles and runs again.
@@ -35619,7 +35619,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Brandon Ehle moved some of the COM stuff he added to csutil to
 	  csengine instead. He also made COM optional in some of the
 	  remaining csutil classes. The result is that csutil is once again
-	  seperate from cscom.
+	  separate from cscom.
 10-Oct-1999
 	- Fixed bug in octree outline table which caused octree visibility
 	  culling not to work correctly in some cases.
@@ -35662,7 +35662,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  This prevents the OpenGL renderer from crashing at exit.
 9-Oct-1999
 	- Michael Dale Long added CrystalClear to the CS CVS site.
-	  Previously this used to be a seperate project.
+	  Previously this used to be a separate project.
 	- Thomas Hieber removed some warnings.
 	- Thomas did some general cleanup on the Win/VC project files.
 	- Gert Steenssens fixed 'const char*' compilation errors.
@@ -36720,7 +36720,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  same name but with 'LightMap' instead.
 	- Very fundamental change in the csPolygon3D class. This is a change
 	  which has a large effect on the API of csPolygon3D. The
-	  lighting/texture information has been seperated from csPolygon3D and
+	  lighting/texture information has been separated from csPolygon3D and
 	  put in another class (csPolygonTextureType).
 	  There are two subclasses of csPolygonTextureType:
 	  csLightMapped or csGouraudShaded. The first
@@ -36728,7 +36728,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  second case is a gouraud shaded polygon. This changes makes
 	  csPolygon3D a lot cleaner and smaller. In principle this change will
 	  also make it easier to add future types. The cleanup is currently
-	  mostly in data seperation and API. Most of the lightmap handling
+	  mostly in data separation and API. Most of the lightmap handling
 	  code is still in csPolygon3D. This needs to move in the future.
 	- Andrew Zabolotny added the 'makedep' application which is a faster
 	  dependency generator. It is based on the 'makedepend' from X11
@@ -36874,7 +36874,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  improves quality for SRC*DST mode on the RIVA 128. It almost
 	  looks like 2*SRC*DST.
 	- Andrew Zabolotny did a cleanup in all 3D drivers:
-	    - Made a seperate config file for software renderer
+	    - Made a separate config file for software renderer
 	      (softrndr.cfg) and moved every related configuration
 	      parameter from cryst.cfg (etc) to it.
 	    - Removed all methods from IGraphics3D interface that are
@@ -36942,7 +36942,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  some changes in user.mak not to be reflected in volatile.h.
 	- Andrew did many small changes required to build Win32 version from
 	  command line using GNU Make and VC++. He removed DllMain() from
-	  several 3D and 2D drivers and moved it to a seperate file
+	  several 3D and 2D drivers and moved it to a separate file
 	  libs/cssys/win32/dllentry.cpp. Moved ModuleHandle to csCOM library.
 	  Fixed complete_pixel_format() to work around a bug in VC 5.
 1-Aug-1999
@@ -37485,7 +37485,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  The fix is easy and general.
 	- Ivan Avramovic moved the (nearly obsolete) csscript code out
 	  of the engine into its own library (csscript). This clean
-	  seperation means that the engine no longer depends on that
+	  separation means that the engine no longer depends on that
 	  code and that we can safely remove it when something better
 	  appears.
 	- Andrew Zabolotny modified the X 2D drivers (Software, OpenGL,
@@ -37493,7 +37493,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  the speed for walking around with the new movement code.
 	  He also added support for keypad arrow keys.
 	- Andrew also changed the makefiles so that there is no longer
-	  a seperate PIC directory if CFLAGS.DLL is empty.
+	  a separate PIC directory if CFLAGS.DLL is empty.
 8-Jul-1999
 	- Updated makefiles for ndrvdemo. There are now two makefiles. One
 	  for the client and one for the server. They generate the executables
@@ -37867,7 +37867,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  situations where a texture and a lightmap must be mixed before being
 	  rendered (this is non-functional currently). Certain situations
 	  (namely transparent lighted portals) cannot be rendered correctly
-	  with seperate texture and lightmap since the lightmap blends not
+	  with separate texture and lightmap since the lightmap blends not
 	  only the portal but also the stuff showing THROUGH the portal!
 	- And Gary also fixed a lightmap cache bug. Everytime a lightmap is
 	  cached it was simply compiling the lightmap and sending it to the
@@ -38227,7 +38227,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  However, I could not get it to run on Unix. It still crashes.
 	- Update to Macintosh port from Robert Bate (fixing things).
 6-May-1999
-	- I seperated the triangle code in csengine/basic/triangle.*. LOD
+	- I separated the triangle code in csengine/basic/triangle.*. LOD
 	  will now operate on general triangle meshes and will no longer
 	  depend on sprites.
 	- Various small fixes from Charles Duffy <cduffy@bigfoot.com> (mostly
@@ -38462,7 +38462,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 		  mode now and only for non-mipmapped texture (looks
 		  ugly for mipmapped textures).
 10-Apr-1999
-	- Seperated csparser from csengine. The engine is now independent
+	- Separated csparser from csengine. The engine is now independent
 	  of the parser while the parser uses (and requires) the engine.
 	- Added fog capabilities to the 3D rasterizer. The 3D rasterizer
 	  can now specify wether it supports Z buffered fog (like the
@@ -38489,7 +38489,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  out of the box. Expect more to follow.
 	- A few fixes from Cubesoft.
 	- *** Release of 0.13_007 ***
-	- First steps of seperating csparser and csengine. csparser will
+	- First steps of separating csparser and csengine. csparser will
 	  use csengine to built a world but csengine will not depend on
 	  csparser anymore. In fact you should be able to plug-in any
 	  parser and let it use the csengine API to built worlds.
@@ -38514,7 +38514,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 5-Apr-1999
 	- In the past PolygonInt and PolygonParentInt were ment for using
 	  with multiple inheritance. Someone removed this apparantly. I
-	  reintroduced it because I need to seperate csgeom from csengine.
+	  reintroduced it because I need to separate csgeom from csengine.
 	- PolygonInt and PolygonParentInt are renamed to csPolygonInt
 	  and csPolygonParentInt.
 	- Received patch from Andrew Zabolotny completing his large makefile
@@ -38560,7 +38560,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  to the new convention. Added both to the API.
 30-Mar-1999
 	- Patch from Ivan Avramovic to put the Visual C++ specific assembly
-	  in a seperate file so that it no longer clutters the math
+	  in a separate file so that it no longer clutters the math
 	  include files.
 	- Another patch from Ivan which fixes a very rare clipping bug
 	  which could cause polygons to be clipped away when visible.
@@ -38580,7 +38580,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Received update to the Macintosh port from Robert Bate.
 28-Mar-1999
 	- MAJOR change in the directory structure. This change helps make
-	  the distinction between all the seperate packages/components
+	  the distinction between all the separate packages/components
 	  of Crystal Space. Except for all the project files everything
 	  should almost work. I modified all source files to get the new
 	  include files at the right place but I may have made some
@@ -38611,7 +38611,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  in a way suitable for the hardware renderers.
 25-Mar-1999
 	- Did various cleanups in the code. All related to having a
-	  3D engine library which is cleanly seperated from the system
+	  3D engine library which is cleanly separated from the system
 	  dependent stuff and the 3D/2D drivers.
 	- Patch from Andrew Zabolotny to fix the OS/2 port.
 	- Update to macintosh port from Robert Bate.
@@ -39172,7 +39172,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  files where you can control this.
 	- Added opengl.cfg with two flags: ENABLE_BILINEARMAP and
 	  ENABLE_DITHER.
-	- WARNING! Having global variables in seperate libraries can be
+	- WARNING! Having global variables in separate libraries can be
 	  dangerous. In this case I was having a problem with the 'config'
 	  variable which is global and defined in CS itself and in all the
 	  3D rasterizers. It would be best to make the config variable local
@@ -39832,7 +39832,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added patch to collision detection from Alex Pfaffe.
 	  Read readmecd.txt for more information.
 	- Patch from Nathaniel on Glide and Direct3D: colorkey and
-	  alpha mapping are working. There are no seperate files for
+	  alpha mapping are working. There are no separate files for
 	  renderer configuration. Much better quality for Direct3DDX5
 	  (with a small speed penalty). There is a bug with mipmapping
 	  and D3D port so it is disabled now. There is a bug with glide2x
@@ -39994,7 +39994,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Made gouraud shader more general: support for both 555 and 565
 	  color formats and support for Z buffer in gouraud shader (so it can
 	  also be used for Things).
-	- Use csColor in Light class instead of seperate red, green, and blue
+	- Use csColor in Light class instead of separate red, green, and blue
 	  fields. This is cleaner.
 	- Implemented gouraud shading support for sprites. csSprite3D has a new
 	  set_vertex_color function with which you can set the color of one
@@ -40248,7 +40248,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  1. doesn't export skins to an image format Crystal Space knows.
 	  2. doesn't resize skins to a power of two automatically.
 	- New Visual C++ project files from Nathaniel.  Nathaniel also
-	  seperated the project files from the source files which I think is a
+	  separated the project files from the source files which I think is a
 	  very good idea.  All Visual C++ project files can now be found in
 	  cryst/src/visualc.
 	- New sound system from Nathaniel Saint Martin.  Wave files can be
@@ -40362,7 +40362,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  from the 3D Engine. For example, I moved the subtex_size
 	  and subtex_dynlight static configuration values from the
 	  TextureCache to PolyTexture.
-	- Succesfully seperated the software cache from the 3D Engine.
+	- Succesfully separated the software cache from the 3D Engine.
 	  Now the render directory is completely unused by the 3D Engine
 	  except for the COM interface include files.
 	  I also removed the COM interfaces for the texture cache as this
@@ -40513,7 +40513,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  system ('make linux', 'make solaris', 'make beos').
 	- *** Release of 0.11_036 ***
 12-Nov-1998
-	- Made the next step towards seperation of the software texture cache:
+	- Made the next step towards separation of the software texture cache:
 	  the texture cache now uses IPolygonTexture instead of IPolyTexture
 	  directly.
 10-Nov-1998
@@ -40556,7 +40556,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  code (the code using memheap is kept, the old code is removed).
 	- Removed dependency of csobject.h to trigger.h. This dependency
 	  caused troubles for make the software renderer library.
-	- Started work which will help in the seperation of the software
+	- Started work which will help in the separation of the software
 	  texture cache renderer from Crystal Space.
 5-Nov-1998
 	- Few fixes from Olivier Langlois (infinite maze).
@@ -40621,7 +40621,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- *** Release of 0.11_033 ***
 28-Oct-1998
 	- Yesterday I received the long-awaited COM patch from Dan Ogles.
-	  This patch allows seperation of the 3D and 2D graphics classes
+	  This patch allows separation of the 3D and 2D graphics classes
 	  from Crystal Space. The final goal of this is to allow
 	  plug-and-play with a similar phylosophy to what LibGGI can do.
 	- Today I started integrating this part in the Linux port and also
@@ -40827,7 +40827,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Received patch from Greg Ewing <greg@cosc.canterbury.ac.nz> which
 	  greatly speeds up the computing of the initial palette table.
 	- Received new Gnu-Win32 makefiles from Paul Garceau.
-	- Cleaned up the infinite maze code.  Made a seperate class
+	- Cleaned up the infinite maze code.  Made a separate class
 	  InfiniteMaze.  Note that the first part of the maze is not random.
 	  Go to the end of the corridor and turn left to start generating in
 	  the random maze.  Also note that it may all be black for you.  I'm
@@ -40847,7 +40847,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Cleaned up several classes a bit as a result of the new infinite
 	  maze.  Creating the infinite maze showed some deficiencies in the
 	  current API.
-	- Enhanced cs.mak so that is now also generates a seperate directory
+	- Enhanced cs.mak so that is now also generates a separate directory
 	  tree for the profiled version (<SYSTEM>_p) and automatically
 	  disables assembler as well.
 10-Oct-1998
@@ -41200,7 +41200,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Some fixes from Olivier Langlois <olanglois@sympatico.ca> on the
 	  event handling system. Apparantly there were some memory leaks.
 	- First patch from Ivan Avramovic on a OO-rewrite of the current
-	  world file loader. The intended purpose is to seperate the 3D
+	  world file loader. The intended purpose is to separate the 3D
 	  engine objects from the file loading. This makes them more
 	  independent on the actual world file format and also forces us
 	  to have a better API on the engine objects. This is the first
@@ -41689,7 +41689,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - Small patch to MazeD.
 	    - Important change in makefiles (makefiles using cs.mak). All
 	      object files are now put in a 'out/<system>' directory. There
-	      is also a seperate tree for debugging and optimizing. This
+	      is also a separate tree for debugging and optimizing. This
 	      means that you can now switch between debugging and optimizing
 	      without having to recompile everything. Note that you need
 	      GNU make for this to work (this was already the case, but now
@@ -42974,7 +42974,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 		- general (general stuff)
 		- system (system dependent stuff)
 	  The ultimate purpose of this layered approach is that there is
-	  a clean seperation between the several layers and also a clean
+	  a clean separation between the several layers and also a clean
 	  hierarchical order. For example, 'geometry' contains basic
 	  3D stuff and should be able to stand on its own without using any
 	  of the 'engine' or 'general' stuff.
@@ -43061,7 +43061,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  read-only archives. Changes to the archive are then put in
 	  a 'fallback' like directory. Using this scheme you can easily
 	  distribute a game on a CD-ROM and later apply patches by
-	  putting them in a seperate directory. These patches will then
+	  putting them in a separate directory. These patches will then
 	  override the CD-ROM versions.
 	- Little fix in watcom.cpp.
 	- *** Release of 0.09_002 ***
@@ -43336,7 +43336,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  the FltLight class. This slows down the engine somewhat though
 	  (from 11FPS to 9FPS).
 	- Received Crystal Space Configuration Utility from Nathaniel.
-	  It is a seperate application (currently only for Windows and
+	  It is a separate application (currently only for Windows and
 	  DOS) and you can find it in the 'config' directory next to
 	  'csar' and 'cryst'.
 22-Jan-1998
@@ -43403,7 +43403,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  light.tables files (one from Linux and one from Solaris) and
 	  there are a lot of differences. I have to check this closer
 	  some time.
-	- Split 'printf' into a seperate file for every system. I'd like
+	- Split 'printf' into a separate file for every system. I'd like
 	  to have almost no DO_X11, DO_WIN32, ... or whatever conditionals
 	  in the root tree of the Crystal Space code. Therefore every
 	  system has its own version of 'printf.cpp'. Currently only
@@ -43576,7 +43576,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Fixed the bug with a BSP split of a polygon and the texture for
 	  the texture cache. When a BSP splits a polygon it will create new
 	  PolyTexture objects for the split object and recompute the bounding
-	  boxes of both polygons. This way the polygons are handled seperately
+	  boxes of both polygons. This way the polygons are handled separately
 	  in the texture cache.
 	- Added WORLDFILE config option and the ability to specify a world file
 	  on the commandline. Default is still 'world'.
@@ -43697,7 +43697,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- There was a bug in the world file which I only noticed now
 	  because planes are shared (I used a wrong plane for a sloped
 	  polygon).
-	- Made a seperate class of a portal (also containing the non-
+	- Made a separate class of a portal (also containing the non-
 	  functional space warping system: mirrors).
 24-Nov-1997
 	- Moved get_uv() in polygon.cpp to attic since it is a function that
@@ -43941,7 +43941,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 -----------------------------------------------------------------------------
 21-Oct-1997
 	- Put all textures that are not used by the included world file
-	  in a seperate archive to save space.
+	  in a separate archive to save space.
 	- Prepare for distribution.
 20-Oct-1997
 	- Nathaniel sent me an input console extension!!! Now we can
