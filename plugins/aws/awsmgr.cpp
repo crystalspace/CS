@@ -57,9 +57,7 @@
 
 #include <stdio.h>
 
-const int proctex_width = 512;
-const int proctex_height = 512;
-const int DEBUG_MANAGER = false;
+//#define DEBUG_MANAGER
 
 // Implementation //////////////////////////////////////////////////////
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
@@ -108,7 +106,9 @@ awsManager::~awsManager ()
   void *p = component_factories.GetFirstItem ();
   while ((p = component_factories.GetCurrentItem ()))
   {
-    delete (awsComponentFactoryMap *)p;
+    awsComponentFactoryMap* map = (awsComponentFactoryMap*) p;
+    map->factory->DecRef ();
+    delete map;
     component_factories.RemoveItem ();
   }
 }
@@ -117,12 +117,10 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
 {
   awsManager::object_reg = object_reg;
 
-  if (DEBUG_MANAGER) printf ("aws-debug: getting preference manager.\n");
   prefmgr = SCF_CREATE_INSTANCE (
       "crystalspace.window.preferencemanager",
       iAwsPrefManager);
 
-  if (DEBUG_MANAGER) printf ("aws-debug: getting sink manager.\n");
   sinkmgr = SCF_CREATE_INSTANCE (
       "crystalspace.window.sinkmanager",
       iAwsSinkManager);
@@ -138,10 +136,6 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   }
   else
   {
-    if (DEBUG_MANAGER)
-      printf (
-        "aws-debug: initing and setting the internal preference manager.\n");
-
     prefmgr->SetWindowMgr (this);
     if (!prefmgr->Setup (object_reg)) return false;
   }
@@ -156,11 +150,7 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
     return false;
   }
 
-  if (DEBUG_MANAGER) printf ("aws-debug: registering common components.\n");
-
   RegisterCommonComponents ();
-
-  if (DEBUG_MANAGER) printf ("aws-debug: left aws initialize.\n");
 
   return true;
 }
@@ -200,10 +190,9 @@ void awsManager::RegisterComponentFactory (
   iAwsComponentFactory *factory,
   const char *name)
 {
-  awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
-
   factory->IncRef ();
-
+  
+  awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
   cfm->factory = factory;
   cfm->id = prefmgr->NameToId (name);
 
@@ -227,27 +216,14 @@ iAwsComponentFactory *awsManager::FindComponentFactory (const char *name)
   return NULL;
 }
 
-
 iAwsComponent *awsManager::CreateEmbeddableComponentFrom(const char *name)
-
 {
-
-	iAwsComponentFactory *factory = FindComponentFactory(name);
-
-    // If we have a factory for this component, then create it and set it up.
-    if (factory) 
-
-	{
-		factory->DecRef();
-
-		return factory->Create ();
-
-	}
-
-	return NULL;
-
+  iAwsComponentFactory *factory = FindComponentFactory(name);
+  if (!factory)
+    return NULL;
+  
+  return factory->Create ();
 }
-
 
 iAwsComponent *awsManager::GetTopComponent ()
 {
@@ -272,10 +248,6 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
 
     ptG2D->DoubleBuffer (false);
 
-    /*ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-    ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
-    ptG3D->FinishDraw();
-    ptG3D->Print(NULL);*/
     prefmgr->SetTextureManager (ptG3D->GetTextureManager ());
     prefmgr->SetFontServer (ptG2D->GetFontServer ());
 
@@ -287,9 +259,6 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
 
 iAwsCanvas *awsManager::GetCanvas ()
 {
-  //@@@ Jorrit: I think this is wrong, isn't it?
-  // A getter should never increase ref count:
-  // if (canvas) canvas->IncRef ();
   return canvas;
 }
 
@@ -303,9 +272,6 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       object_reg,
       engine,
       txtmgr);
-  //@@@ Jorrit: When a canvas is created it already has
-  // ref count 1. So doing another incref is not good.
-  //SCF_INC_REF (canvas);
 
   return canvas;
 }
@@ -324,9 +290,6 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       engine,
       txtmgr,
       name);
-  //@@@ Jorrit: When a canvas is created it already has
-  // ref count 1. So doing another incref is not good.
-  //SCF_INC_REF (canvas);
 
   return canvas;
 }
@@ -336,10 +299,6 @@ iAwsCanvas *awsManager::CreateCustomCanvas (
   iGraphics3D *g3d)
 {
   iAwsCanvas *canvas = new awsScreenCanvas (g2d, g3d);
-
-  //@@@ Jorrit: When a canvas is created it already has
-  // ref count 1. So doing another incref is not good.
-  //SCF_INC_REF (canvas);
 
   return canvas;
 }
@@ -406,7 +365,6 @@ void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, 
   }
 
   transitions.Push(t);
-  
 }
 
 void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)
@@ -414,8 +372,6 @@ void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type
   if (win==NULL) return;
 
   awsWindowTransition *t = new awsWindowTransition;
-  //  int w = G2D()->GetWidth();
-  //  int h = G2D()->GetHeight();
   
   t->morph=0.0;
   t->morph_step=step_size;
@@ -451,11 +407,9 @@ void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type
   }
 
   transitions.Push(t);
-  
 }
 
-bool 
-awsManager::PerformTransition(awsWindowTransition *t)
+bool awsManager::PerformTransition(awsWindowTransition *t)
 {
   float dx, dy;
   csRect interp(t->start);
@@ -464,7 +418,6 @@ awsManager::PerformTransition(awsWindowTransition *t)
   {
     t->win->Move(t->start.xmin - t->win->Frame().xmin,
 	         t->start.ymin - t->win->Frame().ymin);
-    
   }
 
   dx=t->end.xmin - t->start.xmin;
@@ -525,27 +478,25 @@ awsManager::PerformTransition(awsWindowTransition *t)
 
 iAwsComponent* awsManager::ComponentAt(int x, int y)
 {
-	for(iAwsComponent* cur = GetTopComponent(); cur; cur = cur->ComponentBelow())
-	{
-		// find the top level component which contains the point
-		iAwsComponent* child = cur->ChildAt(x,y);
-		if(cur->isHidden()) continue;
-		if(child)
-		{
-			// then iterate down the tree until a child no longer contains
-		    // the point
-			iAwsComponent* temp;
-			while( (temp = child->ChildAt(x,y)))
-				child = temp;
-			return child;
-		}
-		else if(cur->Frame().Contains(x,y))
-			return cur;
-	}
-	return NULL;
+  for(iAwsComponent* cur = GetTopComponent(); cur; cur = cur->ComponentBelow())
+  {
+    // find the top level component which contains the point
+    iAwsComponent* child = cur->ChildAt(x,y);
+    if(cur->isHidden()) continue;
+    if(child)
+    {
+      // then iterate down the tree until a child no longer contains
+      // the point
+      iAwsComponent* temp;
+      while( (temp = child->ChildAt(x,y)))
+	child = temp;
+      return child;
+    }
+    else if(cur->Frame().Contains(x,y))
+      return cur;
+  }
+  return NULL;
 }
-	
-
 
 void awsManager::Mark (const csRect &rect)
 {
@@ -749,18 +700,19 @@ void awsManager::Redraw ()
   curwin = oldwin;
   while (curwin)
   {
-    if (DEBUG_MANAGER)
-    {
+#ifdef DEBUG_MANAGER
       printf ("aws-debug: consider window: %p\n", curwin);
       printf (
         "aws-debug: redraw tag: %d/%d\n",
         curwin->RedrawTag (),
         redraw_tag);
-    }
+#endif
 
     if (redraw_tag == curwin->RedrawTag ())
     {
-      if (DEBUG_MANAGER) printf ("aws-debug: window is dirty, redraw.\n");
+#ifdef DEBUG_MANAGER
+      printf ("aws-debug: window is dirty, redraw.\n");
+#endif
 
       // Setup our dirty gathering rect.
       csRect cr;
@@ -783,7 +735,6 @@ void awsManager::Redraw ()
   //int i;
 
   // Debug code: draw boxes around dirty regions
-
   /* for(i=0; i<dirty.Count(); ++i)
   {
          csRect dr(dirty.RectAt(i));
@@ -825,7 +776,9 @@ void awsManager::RedrawWindow (iAwsComponent *win, csRect clip)
   // precondition: clip is contained inside the the window frame and 
   // also inside the canvas drawing area
 
-  if (DEBUG_MANAGER) printf ("aws-debug: start drawing window.\n");
+#ifdef DEBUG_MANAGER
+  printf ("aws-debug: start drawing window.\n");
+#endif
 
   ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
@@ -835,14 +788,18 @@ void awsManager::RedrawWindow (iAwsComponent *win, csRect clip)
   /// Draw the children
   RecursiveDrawChildren (win, clip);
 
-  if (DEBUG_MANAGER) printf ("aws-debug: finished drawing window.\n");
+#ifdef DEBUG_MANAGER
+  printf ("aws-debug: finished drawing window.\n");
+#endif
 }
 
 void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
 {
   iAwsComponent *child;
 
-  if (DEBUG_MANAGER) printf ("aws-debug: start drawing children.\n");
+#ifdef DEBUG_MANAGER
+  printf ("aws-debug: start drawing children.\n");
+#endif
 
   if(!cmp->HasChildren()) return;
 
@@ -857,8 +814,9 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
         child->Flags() & AWSF_CMP_INVISIBLE)
 	continue;
 
-    if (DEBUG_MANAGER)
-      printf ("aws-debug: entered draw children loop for %p.\n", child);
+#ifdef DEBUG_MANAGER
+    printf ("aws-debug: entered draw children loop for %p.\n", child);
+#endif
 
     csRect child_clip(child->Frame());
 
@@ -879,7 +837,9 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
 
 	RecursiveDrawChildren (child, child_clip);
   }           // End for
-  if (DEBUG_MANAGER) printf ("aws-debug: finished drawing children.\n");
+#ifdef DEBUG_MANAGER
+  printf ("aws-debug: finished drawing children.\n");
+#endif
 }
 
 iAwsParmList *awsManager::CreateParmList ()
@@ -889,16 +849,18 @@ iAwsParmList *awsManager::CreateParmList ()
 
 iAwsComponent *awsManager::CreateWindowFrom (const char* defname)
 {
-  if (DEBUG_MANAGER)
-    printf ("aws-debug: Searching for window def \"%s\"\n", defname);
+#ifdef DEBUG_MANAGER
+  printf ("aws-debug: Searching for window def \"%s\"\n", defname);
+#endif
 
   // Find the window definition
   iAwsComponentNode *cmpnode = GetPrefMgr ()->FindWindowDef (defname);
 
-  if (DEBUG_MANAGER)
-    printf (
+#ifdef DEBUG_MANAGER  
+  printf (
       "aws-debug: Window definition was %s\n",
       (cmpnode ? "found." : "not found."));
+#endif
 
   // If we couldn't find it, abort
   if (cmpnode == NULL) return NULL;
@@ -994,8 +956,9 @@ void awsManager::CreateChildrenFromDef (
 
 void awsManager::CaptureMouse (iAwsComponent *comp)
 {
-  if (DEBUG_MANAGER) printf("aws-debug: Mouse captured\n");
-
+#ifdef DEBUG_MANAGER
+  printf("aws-debug: Mouse captured\n");
+#endif
 
   mouse_captured = true;
   if (comp == NULL) comp = GetTopComponent ();
@@ -1005,7 +968,10 @@ void awsManager::CaptureMouse (iAwsComponent *comp)
 
 void awsManager::ReleaseMouse ()
 {
-  if (DEBUG_MANAGER) printf("aws-debug: Mouse released\n");
+#ifdef DEBUG_MANAGER
+  printf("aws-debug: Mouse released\n");
+#endif
+
   mouse_captured = false;
   mouse_focus = NULL;
 }
@@ -1058,7 +1024,7 @@ bool awsManager::HandleEvent (iEvent &Event)
     if (keyb_focus) keyb_focus->HandleEvent (Event);
     
     break;
-}
+  }
 
   return false;
 }
@@ -1087,7 +1053,6 @@ iAwsComponent* awsManager::FindCommonParent(iAwsComponent* cmp1, iAwsComponent* 
 // note, if this is too slow common_parent could be calculated once and then
 // passed and updated as necessary. Unless component trees get really deep though
 // I don't think it matters so I left it this way because its slightly clearer.
-
 bool awsManager::ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event)
 {
   iAwsComponent* common_parent = FindCommonParent(mouse_in, cmp);
@@ -1110,8 +1075,6 @@ bool awsManager::ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event)
   // if I don't have it
   return false;
 }
-
-
 
 bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
 {
@@ -1157,7 +1120,6 @@ bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
   return true;
 }
 
-
 void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
 {
   // Reusing this event, save the orignal type
@@ -1184,8 +1146,6 @@ void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
     }
   }
 }
-
-
 
 void awsManager::RaiseComponents(iAwsComponent* comp)
 {
@@ -1262,31 +1222,17 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("blSouth", 3);
   GetPrefMgr ()->RegisterConstant ("blWest", 4);
 
-
-
   GetPrefMgr ()->RegisterConstant ("fsBump", _3dfsBump);
-
   GetPrefMgr ()->RegisterConstant ("fsSimple", _3dfsSimple);
-
   GetPrefMgr ()->RegisterConstant ("fsRaised", _3dfsRaised);
-
   GetPrefMgr ()->RegisterConstant ("fsSunken", _3dfsSunken);
-
   GetPrefMgr ()->RegisterConstant ("fsFlat", _3dfsFlat);
-
   GetPrefMgr ()->RegisterConstant ("fsNone", _3dfsNone);
-
   GetPrefMgr ()->RegisterConstant ("fsBevel", _3dfsBevel);
-
   GetPrefMgr ()->RegisterConstant ("fsThick", _3dfsThick);
-
   GetPrefMgr ()->RegisterConstant ("fsBitmap", _3dfsBitmap);
-
   GetPrefMgr ()->RegisterConstant ("fsSmallRaised", _3dfsSmallRaised);
-
   GetPrefMgr ()->RegisterConstant ("fsSmallSunken", _3dfsSmallSunken);
-
-  
 }
 
 bool awsManager::AllWindowsHidden ()
@@ -1332,3 +1278,4 @@ unsigned int awsManager::GetFlags ()
 {
   return flags;
 }
+
