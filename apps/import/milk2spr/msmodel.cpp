@@ -53,7 +53,23 @@ MsModel::MsModel(const char* msfile) : sError(NULL)
   joints = NULL;
   nbJoints = 0;
   
-  frameDuration = 1.0;
+  frameDuration = FRAME_DURATION_DEFAULT;
+  
+  clearError();
+  ReadMsFile(msfile);
+}
+
+MsModel::MsModel(const char* msfile,float i_frameDuration) : sError(NULL)
+{
+  frames = NULL;
+  nbFrames = 0;
+  triangleList = NULL;
+  strcpy(material,"spark");
+  strcpy(materialFile,"spark.gif");
+  joints = NULL;
+  nbJoints = 0;
+  
+  frameDuration = i_frameDuration;
   
   clearError();
   ReadMsFile(msfile);
@@ -722,7 +738,7 @@ bool MsModel::WriteSPR(const char* spritename)
 
   spritefilename = new char [strlen(spritename) + 5];
   strcpy(spritefilename, spritename);
-  strcat(spritefilename, ".spr");
+  strcat(spritefilename, ".lib");
 
   if ((f = fopen(spritefilename, "w")) == NULL)
   {
@@ -846,7 +862,7 @@ bool MsModel::WriteSPR(const char* spritename)
     fprintf(f, "  PARAMS (\n");
     fprintf(f, "    MOTION 'default' (\n");  
     fprintf(f, "      DURATION '%f' ( LOOP() )\n",((float)nbFrames)*frameDuration); 
-    int i,j,k;
+    int i;
     for(i = 0; i < nbJoints;i++)
     {
       if(joints[i]->nbPositionKeys>0||joints[i]->nbRotationKeys>0)
@@ -854,13 +870,13 @@ bool MsModel::WriteSPR(const char* spritename)
         //Some rotation and position keys might be at the same time.
         //I never encounter a case in which a rotation or position key was on his own.
         bool* rotUsed = new bool[joints[i]->nbRotationKeys];
-        for(k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
+        for(int k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
         
         fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
-        for(j = 0;j < joints[i]->nbPositionKeys;j++)
+        for(int j = 0;j < joints[i]->nbPositionKeys;j++)
         {
           bool found = false;
-          for(k = 0;k < joints[i]->nbRotationKeys;k++)
+          for(int k = 0;k < joints[i]->nbRotationKeys;k++)
           {
             if(joints[i]->rotationKeys[k].time==joints[i]->positionKeys[j].time)
             {
@@ -893,7 +909,7 @@ bool MsModel::WriteSPR(const char* spritename)
                     joints[i]->positionKeys[j].data.z);
           }
         }
-        for(k = 0;k < joints[i]->nbRotationKeys;k++)
+        for(int k = 0;k < joints[i]->nbRotationKeys;k++)
         {
           if(!rotUsed[k])
           {
@@ -993,4 +1009,45 @@ void MsModel::transform(csReversibleTransform* trans, int boneIndex,int parent)
   {
     transform(trans,joints[joints[boneIndex]->children[i]]->index,boneIndex);
   }
+}
+
+void AngleMatrix (const csVector3 angles, csMatrix3* matrix )
+{
+  float angle;
+  float sr, sp, sy, cr, cp, cy;
+  
+  angle = angles[2];
+  sy = sin(angle);
+  cy = cos(angle);
+  angle = angles[1];
+  sp = sin(angle);
+  cp = cos(angle);
+  angle = angles[0];
+  sr = sin(angle);
+  cr = cos(angle);
+  
+  // matrix = (Z * Y) * X
+  /**matrix[0][0] = cp*cy;
+  *matrix[1][0] = cp*sy;
+  *matrix[2][0] = -sp;
+  *matrix[0][1] = sr*sp*cy+cr*-sy;
+  *matrix[1][1] = sr*sp*sy+cr*cy;
+  *matrix[2][1] = sr*cp;
+  *matrix[0][2] = (cr*sp*cy+-sr*-sy);
+  *matrix[1][2] = (cr*sp*sy+-sr*cy);
+  *matrix[2][2] = cr*cp;
+  *matrix[0][3] = 0.0;
+  *matrix[1][3] = 0.0;
+  *matrix[2][3] = 0.0;*/
+  matrix->Set(
+  cp*cy,
+  cp*sy,
+  -sp,
+  sr*sp*cy+cr*-sy,
+  sr*sp*sy+cr*cy,
+  sr*cp,
+  (cr*sp*cy+-sr*-sy),
+  (cr*sp*sy+-sr*cy),
+  cr*cp
+  );
 }

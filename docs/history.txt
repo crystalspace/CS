@@ -38,6 +38,9 @@ The history order is reversed so that new features are at the top.
 	  easily.
 	- Also added conveniance functions to iXmlAttribute to set values
 	  as int and float.
+	- Steven Geens added a motion test program. With this program you can
+	  see the motion manager in action.
+	- Steven Geens also fixed bugs in the Milkshape 2 CS convertor.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"

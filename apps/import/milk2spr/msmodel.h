@@ -29,6 +29,7 @@
 
 #define MS_MAX_NAME             32
 #define MS_MAX_PATH             256
+#define FRAME_DURATION_DEFAULT  1.0
 
 typedef double scalar_t;       // Scalar value,
 
@@ -143,6 +144,7 @@ public:
   static bool IsFileMsModel(const char* msfile);
   
   MsModel(const char* msfile);
+  MsModel(const char* msfile,float i_frameDuration);
   virtual ~MsModel();
   void dumpstats(FILE*);
   const char* getErrorString() const { return sError; }

@@ -24,17 +24,18 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "msmodel.h"
+#include "msModel.h"
 
 
 CS_IMPLEMENT_APPLICATION
 
 static void usage(FILE* s, int rc)
 {
-  fprintf(s, "Usage: ms2spr <option> [model-file] [sprite-name]\n[sprite-name] without the trailing .spr\n");
+  fprintf(s, "Usage: milk2spr <option> [model-file] [sprite-name]\n[sprite-name] without the trailing .lib\n");
   fprintf(s, "Options:\n");
   fprintf(s, "  -h : help (this page)\n");
-  fprintf(s, "  -c : example code for loading\n");
+  fprintf(s, "  -c : example code for loading(replaced by tutorial)\n");
+  fprintf(s, "  -d <float> : duration of a frame in seconds (default %f)\n",FRAME_DURATION_DEFAULT);
   exit(rc);
 }
 
@@ -43,33 +44,23 @@ static void okay_usage()  { usage(stdout,  0); }
 
 static void printCode(FILE* s, int rc)
 {
-  fprintf(s, "An example for loading the file(using variables from simple2):\n\n");
-  fprintf(s, "loader->LoadLibraryFile (\"/lib/std/sprfile.spr\")//assume you called the file, sprfile\n");
-  fprintf(s, "...\n");
-  fprintf(s, "engine->Prepare ();//All library loading should be before prepare\n");
-  fprintf(s, "...\n");
-  fprintf(s, "iMeshFactoryWrapper* imeshfact = engine->GetMeshFactories()->FindByName(\"sprfile\");//same name as sprite file\n");
-  fprintf(s, "iMeshWrapper* sprite = engine->CreateMeshWrapper ( imeshfact, \"MySprite\", room, pos);\n");
-  fprintf(s, "iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);\n");
-  fprintf(s, "iSkeletonState *skel_state = spstate->GetSkeletonState();\n");
-  fprintf(s, "limb->DecRef();\n");
-  fprintf(s, "iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb, iSkeletonConnectionState );\n");
-  fprintf(s, "iSkeletonBone *bone = SCF_QUERY_INTERFACE (con, iSkeletonBone);\n");
-  fprintf(s, "iMotionTemplate* motion=motman->FindMotionByName(\"default\");//The Motion is always called default\n");
-  fprintf(s, "iMotionController* mc=motman->AddController(bone);\n");
-  fprintf(s, "mc->SetMotion(motion);\n");
-  fprintf(s, "spstate->DecRef ();\n");
-  fprintf(s, "sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);\n");
-  fprintf(s, "sprite->DecRef ();\n");
+  fprintf(s, "The code example is replaced by a tutorial.\n");
+  fprintf(s, "Look in /apps/tutorial/\n");
   exit(rc);
 }
 
 int main(int argc,char *argv[])
 {
-  printf("ms2spr version 0.9\n"
+  printf("milk2spr version 0.9\n"
     "A Milk Shape ASCII model convertor for Crystal Space.\n"
     "By Steven Geens <steven.geens@student.kuleuven.ac.be>\n\n");
-
+  
+  float frameDuration = FRAME_DURATION_DEFAULT;
+  
+  if (argc < 2)
+  {
+    fatal_usage();
+  }
   if (argc < 3)
   {
     switch (argv[1][1])
@@ -94,9 +85,13 @@ int main(int argc,char *argv[])
       {
       case 'h':
       case '?':
-        okay_usage();
+        okay_usage();break;
       case 'c':
-        printCode(stdout,  0);
+        printCode(stdout,  0);break;
+      case 'd':
+        sscanf (argv[++i], "%f", &frameDuration);
+        printf("The duration of a frame set to %g seconds.\n", frameDuration);
+        break;
       default:
         fprintf(stderr, "'%s' unreconized option.\n", argv[i]);
         fatal_usage();
@@ -107,7 +102,7 @@ int main(int argc,char *argv[])
   const char* msfile = argv[argc - 2];
   MsModel* ms = NULL;
   if (MsModel::IsFileMsModel(msfile))
-    ms = new MsModel(msfile);
+    ms = new MsModel(msfile,frameDuration);
   else
   {
     fprintf(stderr, "Not a recognized model file: %s\n", msfile);
