@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Frank Richter
+    Copyright (C) 2002,2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -34,7 +34,9 @@ typedef struct _DLLVERSIONINFO
 
 typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 
+#ifndef CSIDL_PROGRAM_FILES
 #define CSIDL_PROGRAM_FILES             0x0026
+#endif
 
 static inline bool 
 MinShellDllVersion(DWORD vMajor, DWORD vMinor)
@@ -42,25 +44,25 @@ MinShellDllVersion(DWORD vMajor, DWORD vMinor)
   HINSTANCE hinstDll;
   bool result = false;
 
-  hinstDll = LoadLibrary("shell32.dll");
+  hinstDll = LoadLibrary ("shell32.dll");
 	
   if(hinstDll)
   {
     DLLGETVERSIONPROC pDllGetVersion;
 
-    pDllGetVersion = (DLLGETVERSIONPROC) GetProcAddress(hinstDll, "DllGetVersion");
+    pDllGetVersion = (DLLGETVERSIONPROC) GetProcAddress (hinstDll, "DllGetVersion");
 
-    if(pDllGetVersion)
+    if (pDllGetVersion)
     {
       DLLVERSIONINFO dvi;
       HRESULT hr;
 
-      ZeroMemory(&dvi, sizeof(dvi));
-      dvi.cbSize = sizeof(dvi);
+      memset (&dvi, 0, sizeof (dvi));
+      dvi.cbSize = sizeof (dvi);
 
       hr = (*pDllGetVersion)(&dvi);
 
-      if(SUCCEEDED(hr))
+      if (SUCCEEDED (hr))
       {
 	result = ((dvi.dwMajorVersion > vMajor) ||
 	  ((dvi.dwMajorVersion == vMajor) && 

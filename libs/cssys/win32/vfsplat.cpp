@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include <windows.h>
 #include <shlobj.h>
-#include "cssys/win32/shellstuff.h"
+#include "shellstuff.h"
 
 // Windows has built-in var "SystemRoot"
 // (env var on NT, but not 9x; so we provide it this way)
