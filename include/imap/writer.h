@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMAP_SAVER_H__
-#define __IMAP_SAVER_H__
+#ifndef __IMAP_WRITER_H__
+#define __IMAP_WRITER_H__
 
 #include "csutil/scf.h"
 
