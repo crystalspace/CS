@@ -41,6 +41,8 @@ Short-term cleanups that need to be done:
 	    - Fixed makefile bug: The win32vc platform was incorrectly
 	      specified in Makefile and mk/common.mak.
 	    - Removed unnecessary DRIVER_SUBMAKEFILES duplication from cs.mak.
+	    - The NeXT-specific makefile modifier TARGET_ARCHS is now a
+	      "sticky" option in config.mak.
 	    - Updated the Primitive Editor to work with beta 13.
 	- Large change from Andrew Zabolotny so that all system dependent
 	  compile flags are stored in include/volatile.h instead of as flags
