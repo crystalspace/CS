@@ -67,6 +67,37 @@ public:
   /// Build the quadtree for the given number of levels.
   void Build (int depth);
 
+  /**
+   * Compute visibility for this node and all the children.
+   * campos is the camera position.
+   * bbox is the bounding box of this terrainquad.
+   *   the y values are not used.
+   * horizon is the array of horizon heights.
+   * horsize is the length of the horizon array.
+   * The horizon array must be initialised by InitHorizon.
+   */
+  void ComputeVisibility(const csVector3& campos, const csBox3& bbox,
+    float *horizon, int horsize);
+
+  /// initialize a horizon array
+  void InitHorizon(float *horizon, int horsize);
+  /// compute the extent of a bbox on the horizon, the start/end angle
+  void ComputeExtent(const csVector3& campos, const csBox3& bbox,
+    int horsize, int& left, int& right);
+  /// compute the min and max dy of a bbox seen from a camera.
+  void ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
+    float &mindy, float &maxdy);
+  /// check if a dy value rises above the horizon
+  bool CheckIfAbove(float* horizon, int horsize, int left, int right, 
+    float dy);
+  /// increase the height along a stretch to be at least dy
+  void HeightenHorizon(float* horizon, int horsize, int left, int right,
+    float dy);
+  /// get index on the horizon of point
+  int GetHorIndex(const csVector3& campos, float x, float z, int horsize);
+
+
+
   /// Return true if this node is a leaf.
   bool IsLeaf () { return children[0] == NULL; }
 
