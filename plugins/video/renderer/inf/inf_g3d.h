@@ -333,8 +333,6 @@ public:
 class csGraphics2DInfinite : public csGraphics2D
 {
 public:
-  SCF_DECLARE_IBASE_EXT(csGraphics2D);
-    
   csGraphics2DInfinite (iBase* p) : csGraphics2D(p) {}
   virtual ~csGraphics2DInfinite ();
 
