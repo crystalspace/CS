@@ -1399,5 +1399,5 @@ void csXMLShader::DumpStats (csString& str)
   if (resolver->GetVariantCount () == 0)
     str.Replace ("unvarying");
   else
-    str.Format ("%lu variations", resolver->GetVariantCount ());
+    str.Format ("%ul variations", resolver->GetVariantCount ());
 }

@@ -19,6 +19,7 @@ chronological order.
 	  a lot.
         - Philip Wyett did some horrid #ifdef'ing in the sprcal3d plugin to
           keep OR build compiling.
+        - Philip Wyett eliminated compiler warning in xmlshader.cpp.
 23-Sep-2004
 	- Eric Sunshine augmented configure.ac so that it is no longer a fatal
 	  error for zlib to be missing since that made it unnecessarily
