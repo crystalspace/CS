@@ -94,6 +94,7 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Options", frame_options);
+  pm->GetString(settings, "Title", title);
 
   pm->LookupRectKey("WindowMinAt", minp);
   pm->LookupRectKey("WindowZoomAt", maxp);

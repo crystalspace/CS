@@ -120,8 +120,6 @@ awsLabel::OnDraw(csRect clip)
         break;
       }
 
-
-
       // Draw the text
       g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
                  Frame().xmin+tx+is_down,
