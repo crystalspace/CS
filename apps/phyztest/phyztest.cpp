@@ -229,7 +229,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  CHK(new csRAPIDCollider(*room, room));
+  CHK((void)new csRAPIDCollider(*room, room));
 
   world->Prepare ();
 
