@@ -32,8 +32,8 @@ class awsImageView : public awsComponent
   bool was_down;
 
   /// Holds the texture handle for the image we are viewing
- iTextureHandle *img1; // via Texture
- iTextureHandle *img2; // via Image
+  iTextureHandle *img1; // via Image
+  iTextureHandle *img2; // via Texture
 
   /// true if we should draw a solid color instead
   bool draw_color;
