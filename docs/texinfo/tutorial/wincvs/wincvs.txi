@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial, , Tutorial CrystalClear, Tutorials
+@node WinCVS Tutorial, Advanced Topics for Developers Only, Tutorial CrystalClear, Tutorials
 @section WinCVS Tutorial
 @cindex Tutorial, WinCVS
 @cindex WinCVS, Tutorial
@@ -15,14 +15,13 @@ checkout/update the Crystal Space source code directly from our CVS source
 code repository kindly hosted by Sourceforge @uref{http://www.sourceforge.net}.
 
 @menu
-* WinCVS Tutorial Step 1::Step 1: Getting the Software
-* WinCVS Tutorial Step 2::Step 2: Installing the Software
-* WinCVS Tutorial Step 3::Step 3: Creating a Home Directory
-* WinCVS Tutorial Step 4::Step 4: Setting WinCVS Preferences
-* WinCVS Tutorial Step 5::Step 5: Setting Location to Checkout Crystal Space
-* WinCVS Tutorial Step 6::Step 6: Checking out Crystal Space
-* WinCVS Tutorial Step 7::Step 7: Updating Crystal Space
-* Advanced Topics for Developers Only::Advanced Topics for Developers Only
+* WinCVS Tutorial Step 1:: Step 1: Getting the Software
+* WinCVS Tutorial Step 2:: Step 2: Installing the Software
+* WinCVS Tutorial Step 3:: Step 3: Creating a Home Directory
+* WinCVS Tutorial Step 4:: Step 4: Setting WinCVS Preferences
+* WinCVS Tutorial Step 5:: Step 5: Setting Location to Checkout Crystal Space
+* WinCVS Tutorial Step 6:: Step 6: Checking out Crystal Space
+* WinCVS Tutorial Step 7:: Step 7: Updating Crystal Space
 @end menu
 
 @importss{tutorial,wincvs,step1.txi}

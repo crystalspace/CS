@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Advanced Topics for Developers Only, , Tutorial CrystalClear, Tutorials
+@node Advanced Topics for Developers Only, , WinCVS Tutorial, Tutorials
 @section Advanced Topics for Developers Only
 @cindex Tutorial, Advanced Topics for Developers Only
 @cindex Advanced Topics for Developers Only, Tutorial
