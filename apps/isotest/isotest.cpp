@@ -195,8 +195,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iIsoEngine);
   if (!engine)
@@ -273,7 +271,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // Create our world.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "------------------------------");
 
   // create our world to play in, and a view on it.
   world = engine->CreateWorld();
@@ -421,7 +419,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iMeshObjectFactory *mesh_fact = engine->CreateMeshFactory(classId, 
     "cubeFact");
 
-  iCubeFactoryState* cubelook = SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
+  iCubeFactoryState* cubelook =
+    SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
   cubelook->SetMaterialWrapper(math2);
   cubelook->SetSize(1,1,1);
   cubelook->SetMixMode (CS_FX_COPY);
@@ -516,7 +515,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // scroll view to show player position at center of screen
-  view->SetScroll(startpos, csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
+  view->SetScroll(
+    startpos, csVector2(myG3D->GetWidth()/2, myG3D->GetHeight()/2));
 
   math1->DecRef ();
   math2->DecRef ();
@@ -557,7 +557,7 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
     world->AddSprite(sprite);
     sprite->DecRef ();
   }
-  sprite = engine->CreateFloorSprite(csVector3(y+offy,height,x+offx), 1.0, 1.0);
+  sprite = engine->CreateFloorSprite(csVector3(y+offy,height,x+offx), 1, 1);
   sprite->SetMaterialWrapper(top);
   world->AddSprite(sprite);
   sprite->DecRef ();
@@ -673,8 +673,6 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   ADDWALLFULL(gridw-1, gridh-1)
   
 }
-
-
 
 void IsoTest::SetupFrame ()
 {
