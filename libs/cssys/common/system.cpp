@@ -23,10 +23,10 @@
 #include "sysdef.h"
 #include "cssys/common/system.h"
 #include "cssys/common/sysdriv.h"
+#include "cssys/common/console.h"
 #include "csgeom/csrect.h"
 #include "csutil/inifile.h"
 #include "csinput/csinput.h"
-#include "apps/support/console.h"	//@@@???
 #include "isndrdr.h"
 #include "inetdrv.h"
 #include "inetman.h"
@@ -734,27 +734,6 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
       if (debug_level >= 2)
         debugprintf (true, "%s", buf);
       break;
-
-    case MSG_TICKER:
-    {
-      static int print_work_counter=0;
-
-      if(!strcasecmp(buf,"begin"))
-        print_work_counter=1;
-      if(!strcasecmp(buf,"end"))
-        print_work_counter=0;
-
-      if (System->DemoReady&&print_work_counter)
-      {
-        if (System->Console)
-	{
-	  System->Console->ShowWork ();
-          // @@@ Don't know how to update console in another way. Change it!
-          System->DemoWrite ("");
-	}
-      }
-      break;
-    }
   } /* endswitch */
 }
 
@@ -762,22 +741,19 @@ void csSystemDriver::DemoWrite (const char* buf)
 {
   if (Console)
   {
-    
-    if (piG2D)
-    {
+    bool const ok2d = (piG2D != 0 && SUCCEEDED (piG2D->BeginDraw()));
+    if (ok2d)
       piG2D->Clear (0);
-    }
 
     Console->PutText ("%s", buf);
     csRect area;
     Console->Print (&area);
     
-    if (piG2D)
+    if (ok2d)
     {
       piG2D->FinishDraw ();
       piG2D->Print (&area);
     }
-  
   }
 }
 
