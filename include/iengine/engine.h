@@ -294,7 +294,8 @@ struct iEngine : public iBase
   /**
    * Create a base material that can be used to give to the texture
    * manager. Assign to a csRef.
-   * \param txt The texture map this material will use.
+   * \param txt The texture map this material will use. Note that this
+   * can be 0 in which case a base material without texture will be created.
    * \note You will need to call iMaterialWrapper::Register() and 
    * iMaterialWrapper::GetMaterialHandler()->Prepare() on you new material
    * if you load the material after iEngine::Prepare() has been called.
@@ -319,7 +320,8 @@ struct iEngine : public iBase
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
-  /** Create a texture from a file.
+  /**
+   * Create a texture from a file.
    * \param name The name to use for this texture in the engine
    * \param fileName the filename (on the VFS!) of the texture to load
    * \param transp pixels in the image with this key color will be considered
@@ -327,7 +329,8 @@ struct iEngine : public iBase
    * \param flags One or more texturing flags OR'd together, flag include
    * <ul>
    * <li>CS_TEXTURE_2D image will be used only for 2D drawing
-   * <li>CS_TEXTURE_3D image will be textured onto 3D polygon (*** usually the flag you want)
+   * <li>CS_TEXTURE_3D image will be textured onto 3D polygon
+   *     (*** usually the flag you want)
    * <li>CS_TEXTURE_DITHER texture is dithered before use (?)
    * <li>CS_TEXTURE_NOMIPMAP texture will not be mipmapped before use (?)
    * </ul>
@@ -338,7 +341,8 @@ struct iEngine : public iBase
   virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *fileName, csColor *transp, int flags) = 0;
 
-  /** Create a black texture. This is mostly useful for procedural textures.
+  /**
+   * Create a black texture. This is mostly useful for procedural textures.
    * \param name The name to use for this texture in the engine
    * \param w the texture width (must be a power of 2, eg 64, 128, 256, 512...)
    * \param h the texture height (must be a power of 2, eg 64, 128, 256, 512...)
@@ -350,9 +354,10 @@ struct iEngine : public iBase
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
 	int w, int h, csColor *iTransp, int iFlags) = 0;
 
-  /** Register a material to be loaded during Prepare()
-    \param name the engine name for this material
-    \param the texture to use for this material
+  /**
+   * Register a material to be loaded during Prepare()
+   * \param name the engine name for this material
+   * \param the texture to use for this material
    */
   virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture) = 0;
@@ -623,8 +628,9 @@ struct iEngine : public iBase
    * \param radius the maximum distance at which this light will affect
    * objects 
    * \param color the color of this light (also affects light intensity)
-   * \param dyntype is the type of the light. This can be #CS_LIGHT_DYNAMICTYPE_DYNAMIC,
-   * #CS_LIGHT_DYNAMICTYPE_PSEUDO, or #CS_LIGHT_DYNAMICTYPE_STATIC.
+   * \param dyntype is the type of the light. This can be
+   * #CS_LIGHT_DYNAMICTYPE_DYNAMIC, #CS_LIGHT_DYNAMICTYPE_PSEUDO,
+   * or #CS_LIGHT_DYNAMICTYPE_STATIC.
    * Note that after creating a light you must add it to a sector
    * by calling sector->GetLights ()->Add (light);
    * If the light is dynamic you also must call Setup() to calculate lighting.
@@ -636,7 +642,8 @@ struct iEngine : public iBase
    * (i.e. no lightmaps) then the discussion above is not relevant.
    */
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
-  	float radius, const csColor& color, int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC) = 0;
+  	float radius, const csColor& color,
+	int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC) = 0;
 
   /** Find a static/pseudo-dynamic light by name.
    * \param Name the engine name of the desired light

@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Feb-2004
+	- Jorrit clarified the comment for iEngine->CreateBaseMaterial().
 5-Feb-2004
 	- res added a small convenience wrapper arounf LoadLibrary() and 
 	  FreeLibrary() for Win32.
