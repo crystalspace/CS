@@ -64,6 +64,9 @@ protected:
    */
   csBox3 bbox;
 
+  /// Bounding box for polygon trees.
+  csPolyTreeBBox ptree_bbox;
+
 protected:
   /// Update this sprite in the polygon trees.
   virtual void UpdateInPolygonTrees ();

@@ -23,6 +23,7 @@
 #include "csengine/world.h"
 #include "csengine/particle.h"
 #include "csengine/rview.h"
+#include "csengine/sector.h"
 #include "csgeom/matrix3.h"
 #include <math.h>
 #include <stdlib.h>
@@ -39,9 +40,11 @@ IMPLEMENT_CSOBJTYPE (csFireParticleSystem, csParticleSystem)
 
 
 csParticleSystem :: csParticleSystem(csObject* theParent)
-  : csSprite (theParent)
+  : csSprite (theParent), ptree_bbox (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  ptree_bbox.SetOwner (this);
+  ptree_obj = &ptree_bbox;
   particles.SetLength(0);
   self_destruct = false;
   time_to_live = 0;
@@ -63,6 +66,119 @@ csParticleSystem :: ~csParticleSystem()
   for(int i=0; i<particles.Length(); i++)
     if(particles[i])
       GetParticle(i)->DecRef();
+}
+
+void csParticleSystem::UpdateInPolygonTrees ()
+{
+  ptree_bbox.RemoveFromTree ();
+
+  // If we are not in a sector which has a polygon tree
+  // then we don't really update. We should consider if this is
+  // a good idea. Do we only want this object updated when we
+  // want to use it in a polygon tree? It is certainly more
+  // efficient to do it this way when the sprite is currently
+  // moving in normal convex sectors.
+  int i;
+  csPolygonTree* tree = NULL;
+  csNamedObjVector& sects = GetSectors ();
+  for (i = 0 ; i < sects.Length () ; i++)
+  {
+    tree = ((csSector*)sects[i])->GetStaticTree ();
+    if (tree) break;
+  }
+  if (!tree) return;
+
+  // The bounding box for a particle system is world space.
+  csBox3 b = GetBoundingBox ();
+  csVector3Array& va = ptree_bbox.GetVertices ();
+  va.MakeEmpty ();
+  csTransform trans;	// Identity transform.
+
+  // Add the eight corner points of the bounding box to the container.
+  // Transform from object to world space here.
+  int pt_xyz = va.AddVertex (b.GetCorner (BOX_CORNER_xyz));
+  int pt_Xyz = va.AddVertex (b.GetCorner (BOX_CORNER_Xyz));
+  int pt_xYz = va.AddVertex (b.GetCorner (BOX_CORNER_xYz));
+  int pt_XYz = va.AddVertex (b.GetCorner (BOX_CORNER_XYz));
+  int pt_xyZ = va.AddVertex (b.GetCorner (BOX_CORNER_xyZ));
+  int pt_XyZ = va.AddVertex (b.GetCorner (BOX_CORNER_XyZ));
+  int pt_xYZ = va.AddVertex (b.GetCorner (BOX_CORNER_xYZ));
+  int pt_XYZ = va.AddVertex (b.GetCorner (BOX_CORNER_XYZ));
+
+  csBspPolygon* poly;
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xYZ);
+  poly->GetPolygon ().AddVertex (pt_XYZ);
+  poly->GetPolygon ().AddVertex (pt_XYz);
+  poly->GetPolygon ().AddVertex (pt_xYz);
+  poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
+  poly->Transform (trans);
+
+  poly = (csBspPolygon*)csBspPolygon::GetPolygonPool().Alloc ();
+  ptree_bbox.AddPolygon (poly);
+  poly->SetOriginator (this);
+  poly->GetPolygon ().AddVertex (pt_xyz);
+  poly->GetPolygon ().AddVertex (pt_Xyz);
+  poly->GetPolygon ().AddVertex (pt_XyZ);
+  poly->GetPolygon ().AddVertex (pt_xyZ);
+  poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
+  poly->Transform (trans);
+
+  // Here we need to insert in trees where this sprite lives.
+  for (i = 0 ; i < sects.Length () ; i++)
+  {
+    tree = ((csSector*)sects[i])->GetStaticTree ();
+    if (tree)
+    {
+      // Temporarily increase reference to prevent free.
+      ptree_bbox.GetBaseStub ()->IncRef ();
+      tree->AddObject (&ptree_bbox);
+      ptree_bbox.GetBaseStub ()->DecRef ();
+    }
+  }
 }
 
 
@@ -191,10 +307,6 @@ void csParticleSystem::Draw (csRenderView& rview)
 {
   for (int i = 0; i<particles.Length(); i++)
     GetParticle(i)->Draw (rview);
-}
-
-void csParticleSystem::UpdateInPolygonTrees ()
-{
 }
 
 void csParticleSystem::UpdateLighting (csLight** lights, int num_lights)

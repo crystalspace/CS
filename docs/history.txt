@@ -23,6 +23,11 @@ The history order has been reversed so that new features are at the top.
 	  we will fix those later.
 	- Fixed a third bug in csFrustum::Classify which fixes lighting
 	  again :-)
+	- Added visibility culling system to particle systems. This
+	  will make them visible even if you turn on the c-buffer.
+	  Note that this will probably not work in all cases now because
+	  the bbox calculation in particle systems is not completely
+	  ok at the moment.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete
