@@ -520,13 +520,45 @@ public:
   virtual void Unlink()
   { comp->Unlink(); }
 
-  /// Links a component into the hierarchy as a sibling above comp
+  /// Links a component into the hierarchy as a sibling above 'other'.
   virtual void LinkAbove(iAwsComponent* other)
-  { comp->LinkAbove(other); }
+  {
+    // We must do this manually. If we instead called comp->LinkAbove(), it
+    // would incorrectly link 'comp' into the component list rather than this
+    // wrapper instance, which means that methods, such as
+    // awsManager::RecursiveDrawChildren(), would invoke methods in 'comp'
+    // (such as comp->OnDraw()) rather than the overriden methods in this
+    // wrapper.
+    if (other)
+    {
+      iAwsComponent* above = other->ComponentAbove();
+      comp->SetComponentAbove(above);
+      comp->SetComponentBelow(other);
+      other->SetComponentAbove(this);
+      if (above)
+	above->SetComponentBelow(this);
+    }
+  }
 
-  /// Links a component into the hierarchy as a sibling below comp
+  /// Links a component into the hierarchy as a sibling below 'other'.
   virtual void LinkBelow(iAwsComponent* other)
-  { comp->LinkBelow(other); }
+  {
+    // We must do this manually. If we instead called comp->LinkBelow(), it
+    // would incorrectly link 'comp' into the component list rather than this
+    // wrapper instance, which means that methods, such as
+    // awsManager::RecursiveDrawChildren(), would invoke methods in 'comp'
+    // (such as comp->OnDraw()) rather than the overriden methods in this
+    // wrapper.
+    if (other)
+    {
+      iAwsComponent* below = other->ComponentBelow();
+      comp->SetComponentAbove(other);
+      comp->SetComponentBelow(below);
+      other->SetComponentBelow(this);
+      if (below)
+	below->SetComponentAbove(this);
+    }
+  }
 
   /// Sets the top child
   virtual void SetTopChild(iAwsComponent* child)

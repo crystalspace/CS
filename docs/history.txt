@@ -48,6 +48,14 @@ chronological order.
 	- Eric Sunshine merged the csappframe library into cstool. Also updated
 	  out-of-date documentation csApplicationFramework documentation.
 	- res added some more documentation to ivideo/rendermesh.h.
+	- Eric Sunshine fixed bugs in awsEmbeddedComponent::LinkAbove() and
+	  LinkBelow() where they were linking the embedded component into the
+	  component list rather than the subclassed wrapper, with the result
+	  that methods, such as awsManager::RecursiveDrawChildren(), were
+	  invoking methods in the wrong object. (I think that other methods,
+	  such as Unlink(), and possibly those dealing with 'parent' and
+	  'top-child', suffer from the same shortcoming. Someone needs to
+	  perform a thorough audit.)
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
 	- res fixed texture downsampling in the NR GL renderer. It could 
