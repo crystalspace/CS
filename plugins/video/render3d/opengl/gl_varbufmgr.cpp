@@ -303,7 +303,7 @@ void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
 
   if(memblock->buffer)
   {
-    if(lockType != CS_BUF_LOCK_RENDER)
+    if(lockType == CS_BUF_LOCK_RENDER)
     {
       lastlock = lockType;
       locked = true;
