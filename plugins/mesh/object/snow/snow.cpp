@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "snow.h"
 #include "imater.h"
 #include <math.h>
