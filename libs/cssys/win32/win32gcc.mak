@@ -207,7 +207,7 @@ DO.SHARED.PLUGIN.CORE = \
 
 # uncomment the following to enable workaround for dllwrap bug
 #ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-#  DLLWRAPWRAP = bash bin/dllwrapwrap.sh
+#  DLLWRAPWRAP = bash libs/cssys/win32/dllwrapwrap.sh
 #else
 #  DLLWRAPWRAP = bin/dllwrapwrap.sh
 #endif
