@@ -1,5 +1,65 @@
 The history order has been reversed so that new features are at the top.
 
+11-Sep-2000
+	- Eric Sunshine made the following changes to worlfmt.txi, the Crystal
+	  Space World File Format description documentation:
+	    - *Major* typesetting and formatting overhaul.  This section now
+	      looks *much* nicer in the printed manual, and quite a bit better
+	      in the HTML and Info translations as well.
+	    - Eliminated the overfull 'hbox' warnings reported by TeX.
+	    - Added discussion about word loading semantics.
+	    - Added section explaining grammar of world file syntax.  Added
+	      grammar examples, as well.
+	- Eric Sunshine upgraded texi2html to version 1.64.
+	- Eric Sunshine moved texi2html.init configuration file from CS/bin to
+	  CS/docs/support.  Adjusted makefile, docs.mak, appropriately.
+	- Eric Sunshine made the following changes to texi2html 1.64.  Also
+	  sent patches to its maintainer so that these changes become
+	  permanant (hopefully).  These changes were necessary to make
+	  texi2html handle the newly re-formatted worldfmt.txi file.  Without
+	  these changes, texi2html would crash and burn on that file.
+	    - Fixed severe bug in macro expansion logic.  Macro argument
+	      parsing code did not handle nested braces ('{' and '}')
+	      at all, thus valid macro invocations such as
+	      "@mymacro{Hello @emph{there} @strong{world}.}" would fail.
+	      Prior to this fix, @mymacro would be handed the argument
+	      "Hello @emph{there", which is clearly incorrect.  Now @mymacro
+	      correctly receives "Hello @emph{there} @strong{world}." as its
+	      argument.  This fix also deals properly with the protected brace
+	      sequences \{, \}, @{, and @}.
+	    - Fixed severe macro expansion bug.  Macro argument parsing code
+	      did not handle arguments split over multiple, such as
+	      "@mymacro{Hello \n world.}".  Now it correctly handles macro
+	      invocations split across any number of lines, and properly flags
+	      an error at the correct location if the user forgets the closing
+	      brace '}'.
+	    - Fixed formatting errors in expansions of @SPACE, @TAB, and @NL
+	      (where SPACE, TAB, and NL represent the actual space, tab, and
+	      newline characters).  The Texinfo manual explicitly states that
+	      each of these sequences should expand to a "printable" space in
+	      the [rendered] output.  The example given in the manual
+	      shows that "Spacey@ @ @ @ example" should expand to
+	      "Spacey    example".  However, texi2html was only emitting
+	      the insignificant whitespace ' ' and '\n' into the HTML
+	      output which did not properly preserve the hard spaces in
+	      "Spacey    example".  Now each of these directives expands to
+	      '&nbsp;' instead.
+	    - Made aesthetic improvement to the output of @file{}, @option{},
+	      and @samp{}.  The argument string is now quoted with ` and '
+	      _after_ the style has been applied.  For instance, @samp{perl}
+	      now expands to "`<samp>perl</samp>'", whereas it used to expand
+	      to "<samp>`perl'</samp>".  In my tests, this change results in
+	      more aesthetically pleasing rendered output on various browsers.
+	- Eric Sunshine modified docs.mak to disable verbose output from TeX
+	  and dvips.  The output from these commands (particularly from TeX)
+	  was far too excessive to be of use in a terminal session.  Now the
+	  output of TeX is maintained in out/docs/dvi/cs-unix.log, instead.
+	  You should check the log file for under- and overfull 'hbox'
+	  warnings and other errors (usually denoted by '!') instead of
+	  relying on terminal output.
+	- Eric Sunshine modified cs.txi so that @value{TITLE} now expands to
+	  just "Crystal Space" rather than "Crytal Space" plus the version
+	  number.
 8-Sep-2000
 	- Eric Sunshine renamed several classes from the NetSpace suite which
 	  only differed from other classes in the case of the name.  This was
