@@ -257,7 +257,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   }
 
   iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
-  iImage *image = csImageLoader::Load (fbuffer->_uint8 (), fbuffer->GetSize (),
+  iImage *image = csImageLoader::Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
     txtmgr->GetTextureFormat ());
   fbuffer->DecRef ();
 
