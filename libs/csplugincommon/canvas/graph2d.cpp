@@ -509,7 +509,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	  r = *d++; g = *d++; b = *d++; a = *d++;
           SplitAlpha (FindRGB (r, g, b, a), realColor, alpha);
           if (alpha == 0)
-            *vram++;
+            vram++;
           else if (alpha == 255)
             *vram++ = realColor;
           else
@@ -534,7 +534,7 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 	  r = *d++; g = *d++; b = *d++; a = *d++;
           SplitAlpha (FindRGB (r, g, b, a), realColor, alpha);
           if (alpha == 0)
-            *vram++;
+            vram++;
           else if (alpha == 255)
             *vram++ = realColor;
           else

@@ -220,11 +220,14 @@ const char* csCommonImageFile::GetRawFormat() const
 
 csRef<iDataBuffer> csCommonImageFile::GetRawData() const
 {
+  csRef<iDataBuffer> d;
 #ifdef THREADED_LOADING
-  if (!loadJob) return 0;
+  if (!loadJob) return d;
   WaitForJob();
   csRef<iImageFileLoader> currentLoader = 
     loadJob->currentLoader;
 #endif
-  return (currentLoader.IsValid()) ? currentLoader->GetRawData() : 0;
+  if (currentLoader.IsValid())
+    d = currentLoader->GetRawData();
+  return d;
 }
