@@ -69,6 +69,25 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFrustumVis::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csFrustVisObjectWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
+  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
+SCF_IMPLEMENT_IBASE_END
+
+void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
+{
+  frustvis->UpdateObject (this);
+}
+
+void csFrustVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
+{
+  frustvis->UpdateObject (this);
+}
+
+//----------------------------------------------------------------------
+
 csFrustumVis::csFrustumVis (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -137,7 +156,8 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 
 void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
-  csFrustVisObjectWrapper* visobj_wrap = new csFrustVisObjectWrapper ();
+  csFrustVisObjectWrapper* visobj_wrap = new csFrustVisObjectWrapper (
+		  this);
   visobj_wrap->visobj = visobj;
   visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
@@ -160,6 +180,13 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 	iThingState);
   }
 
+  // Only add the listeners at the very last moment to prevent them to
+  // be called by the calls above (i.e. especially the calculation of
+  // the bounding box could cause a listener to be fired).
+  movable->AddListener ((iMovableListener*)visobj_wrap);
+  visobj->GetObjectModel ()->AddListener (
+		  (iObjectModelListener*)visobj_wrap);
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -172,6 +199,10 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
+      visobj->GetMovable ()->RemoveListener (
+		  (iMovableListener*)visobj_wrap);
+      visobj->GetObjectModel ()->RemoveListener (
+		  (iObjectModelListener*)visobj_wrap);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
       delete visobj_wrap;
@@ -181,37 +212,16 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
   }
 }
 
-void csFrustumVis::UpdateObjects ()
+void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
 {
-  int i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
-  {
-    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      visobj_vector[i];
-    iVisibilityObject* visobj = visobj_wrap->visobj;
-    iMovable* movable = visobj->GetMovable ();
-    if (visobj->GetObjectModel ()->GetShapeNumber ()
-    	!= visobj_wrap->shape_number ||
-    	movable->GetUpdateNumber () != visobj_wrap->update_number)
-    {
-      csBox3 bbox;
-      CalculateVisObjBBox (visobj, bbox);
-      kdtree->MoveObject (visobj_wrap->child, bbox);
-      visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
-      visobj_wrap->update_number = movable->GetUpdateNumber ();
-    }
-  }
+  iVisibilityObject* visobj = visobj_wrap->visobj;
+  iMovable* movable = visobj->GetMovable ();
+  csBox3 bbox;
+  CalculateVisObjBBox (visobj, bbox);
+  kdtree->MoveObject (visobj_wrap->child, bbox);
+  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
+  visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
-
-#if 0
-static void Perspective (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
-{
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-#endif
 
 struct FrustTest_Front2BackData
 {
@@ -325,9 +335,6 @@ bool csFrustumVis::VisTest (iRenderView* rview)
 {
   current_visnr++;
 
-  // Update all objects (mark them invisible and update in kdtree if needed).
-  UpdateObjects ();
-
 {
 // @@@ Temporariy work around until a bug is fixed with the kdtree
 // and moving objects!
@@ -436,7 +443,6 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
 bool csFrustumVis::VisTest (const csBox3& box)
 {
   current_visnr++;
-  UpdateObjects ();
   FrustTestBox_Front2BackData data;
   data.current_visnr = current_visnr;
   data.box = box;
@@ -499,7 +505,6 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
 bool csFrustumVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
-  UpdateObjects ();
   FrustTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
@@ -755,7 +760,6 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
   current_visnr++;
-  UpdateObjects ();
   CastShadows_Front2BackData data;
   data.current_visnr = current_visnr;
   data.fview = fview;

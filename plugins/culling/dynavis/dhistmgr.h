@@ -53,8 +53,8 @@ public:
   // automatically. The counter will be decremented then.
   int vis_cnt;
 
-  // Visibility state from previous frame.
-  bool prev_visstate;
+  // When this object was last made visible.
+  uint32 history_frame_cnt;
 
   SCF_DECLARE_IBASE;
 
@@ -62,7 +62,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE (NULL);
     vis_cnt = 0;
-    prev_visstate = true;
+    history_frame_cnt = 0;
   }
 };
 

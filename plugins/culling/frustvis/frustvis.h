@@ -29,6 +29,7 @@
 
 class csSimpleKDTree;
 class csSimpleKDTreeChild;
+class csFrustumVis;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
@@ -39,9 +40,10 @@ struct FrustTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csFrustVisObjectWrapper
+class csFrustVisObjectWrapper : public iObjectModelListener, iMovableListener
 {
 public:
+  csFrustumVis* frustvis;
   iVisibilityObject* visobj;
   csSimpleKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
@@ -53,12 +55,23 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;
 
-  csFrustVisObjectWrapper ()
+  csFrustVisObjectWrapper (csFrustumVis* frustvis)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csFrustVisObjectWrapper::frustvis = frustvis;
+  }
+  virtual ~csFrustVisObjectWrapper ()
   {
   }
-  ~csFrustVisObjectWrapper ()
-  {
-  }
+
+  SCF_DECLARE_IBASE;
+
+  /// The object model has changed.
+  virtual void ObjectModelChanged (iObjectModel* model);
+  /// The movable has changed.
+  virtual void MovableChanged (iMovable* movable);
+  /// The movable is about to be destroyed.
+  virtual void MovableDestroyed (iMovable*) { }
 };
 
 /**
@@ -72,10 +85,6 @@ private:
   csVector visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_visnr;
-
-  // Scan all objects, mark them as invisible and check if they
-  // have moved since last frame (and update them in the kdtree then).
-  void UpdateObjects ();
 
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
@@ -96,6 +105,10 @@ public:
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
   	FrustTest_Front2BackData* data);
+
+  // Update one object in FrustVis. This is called whenever the movable
+  // or object model changes.
+  void UpdateObject (csFrustVisObjectWrapper* visobj_wrap);
 
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);

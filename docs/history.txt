@@ -1,11 +1,16 @@
 The history order is reversed so that new features are at the top.
 
 3-Nov-2002
+	- Changed DynaVis to use the new movable and object model
+	  listeners. This significantly speeds up rendering and walking
+	  through huge levels already but we're not there yet.
+	- Changed FrustVis to use the same new system as DynaVis.
 	- Keith Fulton implemented distance displacement between keyframes
 	  of a sprite3d animation.  New attribute "displacement" can be used
 	  in place of "delay" on frame definitions to indicate this.  Delays
 	  and displacements can be mixed in the same sprite and same anims if
-	  desired.  See http://www.gamasutra.com/features/20021018/hansson_01.htm
+	  desired.
+	  See http://www.gamasutra.com/features/20021018/hansson_01.htm
 	  for more info on how this eliminates the "skating" effect from
 	  walking or running sprite meshes.
 2-Nov-2002

@@ -79,6 +79,25 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csVisibilityObjectWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
+  SCF_IMPLEMENTS_INTERFACE (iMovableListener)
+SCF_IMPLEMENT_IBASE_END
+
+void csVisibilityObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
+{
+  dynavis->UpdateObject (this);
+}
+
+void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
+{
+  dynavis->UpdateObject (this);
+}
+
+//----------------------------------------------------------------------
+
 // This function defines the amount to use for keeping
 // an object/node visible after it was marked visible
 // for some other reason.
@@ -97,6 +116,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
   current_visnr = 1;
+  history_frame_cnt = 2;
 
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
@@ -184,13 +204,15 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 
 void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 {
-  csVisibilityObjectWrapper* visobj_wrap = new csVisibilityObjectWrapper ();
+  csVisibilityObjectWrapper* visobj_wrap = new csVisibilityObjectWrapper (
+		  this);
   visobj_wrap->visobj = visobj;
   visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 
-  visobj_wrap->model = model_mgr->CreateObjectModel (visobj->GetObjectModel ());
+  visobj_wrap->model = model_mgr->CreateObjectModel (
+		  visobj->GetObjectModel ());
   visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
   model_mgr->CheckObjectModel (visobj_wrap->model);
 
@@ -210,6 +232,13 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 	iThingState);
   }
 
+  // Only add the listeners at the very last moment to prevent them to
+  // be called by the calls above (i.e. especially the calculation of
+  // the bounding box could cause a listener to be fired).
+  movable->AddListener ((iMovableListener*)visobj_wrap);
+  visobj_wrap->model->GetModel ()->AddListener (
+		  (iObjectModelListener*)visobj_wrap);
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -222,6 +251,10 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
+      visobj_wrap->model->GetModel ()->RemoveListener (
+		      (iObjectModelListener*)visobj_wrap);
+      iMovable* movable = visobj->GetMovable ();
+      movable->RemoveListener ((iMovableListener*)visobj_wrap);
       model_mgr->ReleaseObjectModel (visobj_wrap->model);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
@@ -232,28 +265,16 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
   }
 }
 
-void csDynaVis::UpdateObjects (bool update_prev_visstate)
+void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 {
-  int i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
-  {
-    csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-      visobj_vector[i];
-    iVisibilityObject* visobj = visobj_wrap->visobj;
-    iMovable* movable = visobj->GetMovable ();
-    model_mgr->CheckObjectModel (visobj_wrap->model);
-    if (visobj_wrap->model->GetShapeNumber () != visobj_wrap->shape_number ||
-    	movable->GetUpdateNumber () != visobj_wrap->update_number)
-    {
-      csBox3 bbox;
-      CalculateVisObjBBox (visobj, bbox);
-      kdtree->MoveObject (visobj_wrap->child, bbox);
-      visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
-      visobj_wrap->update_number = movable->GetUpdateNumber ();
-    }
-    if (update_prev_visstate)
-      visobj_wrap->MarkInvisible (INVISIBLE_PARENT);
-  }
+  iVisibilityObject* visobj = visobj_wrap->visobj;
+  iMovable* movable = visobj->GetMovable ();
+  model_mgr->CheckObjectModel (visobj_wrap->model);
+  csBox3 bbox;
+  CalculateVisObjBBox (visobj, bbox);
+  kdtree->MoveObject (visobj_wrap->child, bbox);
+  visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
+  visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
 
 static void Perspective (const csVector3& v, csVector2& p, float fov,
@@ -356,7 +377,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     iCamera* camera = data->rview->GetCamera ();
     float max_depth;
     if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
-    	camera->GetShiftX (), camera->GetShiftY (), sbox, min_depth, max_depth))
+    	camera->GetShiftX (), camera->GetShiftY (), sbox,
+	min_depth, max_depth))
     {
       bool rc;
       if (do_cull_tiled)
@@ -671,7 +693,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   {
     if (do_cull_history && hist->vis_cnt > 0)
     {
-      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_visnr);
+      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_visnr,
+		      history_frame_cnt);
       do_write_object = true;
       goto end;
     }
@@ -680,7 +703,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     const csVector3& pos = data->pos;
     if (obj_bbox.Contains (pos))
     {
-      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_visnr);
+      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_visnr,
+		      history_frame_cnt);
       do_write_object = true;
       goto end;
     }
@@ -783,7 +807,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     //---------------------------------------------------------------
 
     // Object is visible so we should write it to the coverage buffer.
-    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_visnr);
+    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_visnr, history_frame_cnt);
     do_write_object = true;
   }
 
@@ -891,6 +915,7 @@ end:
 bool csDynaVis::VisTest (iRenderView* rview)
 {
   current_visnr++;
+  history_frame_cnt++;	// Only for history culling.
 
   // Statistics and debugging.
   static csTicks t2 = 0;
@@ -912,8 +937,11 @@ bool csDynaVis::VisTest (iRenderView* rview)
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
         visobj_vector[i];
       iVisibilityObject* visobj = visobj_wrap->visobj;
-      if (visobj_wrap->history->prev_visstate)
+      if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
+      {
+	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
         visobj->SetVisibilityNumber (current_visnr);
+      }
     }
     return true;
   }
@@ -926,9 +954,6 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
   // Initialize the write queue to empty.
   write_queue->Initialize ();
-
-  // Update all objects (mark them invisible and update in kdtree if needed).
-  UpdateObjects ();
 
   // If BugPlug is currently showing the debug sector we return here
   // so that all is marked invisible and rendering goes faster.
@@ -1060,7 +1085,6 @@ bool csDynaVis::VisTest (const csBox3& box)
 {
   current_visnr++;
 
-  UpdateObjects (false);
   VisTestBox_Front2BackData data;
   data.box = box;
   data.current_visnr = current_visnr;
@@ -1123,7 +1147,6 @@ bool csDynaVis::VisTest (const csSphere& sphere)
 {
   current_visnr++;
 
-  UpdateObjects (false);
   VisTestSphere_Front2BackData data;
   data.current_visnr = current_visnr;
   data.pos = sphere.GetCenter ();
@@ -1382,7 +1405,6 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 {
   current_visnr++;
 
-  UpdateObjects (false);
   CastShadows_Front2BackData data;
   data.current_visnr = current_visnr;
   data.fview = fview;
@@ -2005,7 +2027,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetSmallerPolygonMesh ();
-      visobj_wrap->history->prev_visstate = false;
+      visobj_wrap->history->history_frame_cnt = 0;	//@@@
       if (polymesh)
       {
         int vispix, totpix;
@@ -2013,7 +2035,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	if (vispix)
 	{
 	  visobj_wrap->visobj->SetVisibilityNumber (current_visnr);
-          visobj_wrap->history->prev_visstate = true;
+          visobj_wrap->history->history_frame_cnt = 1;	//@@@
         }
       }
     }

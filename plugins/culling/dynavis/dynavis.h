@@ -24,6 +24,8 @@
 #include "iutil/dbghelp.h"
 #include "csutil/csvector.h"
 #include "csutil/scf.h"
+#include "igeom/objmodel.h"
+#include "iengine/movable.h"
 #include "csgeom/plane3.h"
 #include "iengine/viscull.h"
 #include "dmodel.h"
@@ -34,6 +36,7 @@ class csKDTreeChild;
 class csCoverageBuffer;
 class csTiledCoverageBuffer;
 class csWriteQueue;
+class csDynaVis;
 struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
@@ -60,9 +63,10 @@ struct VisTest_Front2BackData;
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
  */
-class csVisibilityObjectWrapper
+class csVisibilityObjectWrapper : public iObjectModelListener, iMovableListener
 {
 public:
+  csDynaVis* dynavis;
   iVisibilityObject* visobj;
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
@@ -75,28 +79,35 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;	// Optional.
 
-  csVisibilityObjectWrapper ()
+  csVisibilityObjectWrapper (csDynaVis* dynavis)
   {
+    SCF_CONSTRUCT_IBASE (NULL);
     history = new csVisibilityObjectHistory ();
+    csVisibilityObjectWrapper::dynavis = dynavis;
   }
-  ~csVisibilityObjectWrapper ()
+  virtual ~csVisibilityObjectWrapper ()
   {
     history->DecRef ();
   }
 
-  void MarkVisible (csVisReason reason, int cnt, uint32 current_visnr)
+  void MarkVisible (csVisReason reason, int cnt, uint32 current_visnr,
+		uint32 history_frame_cnt)
   {
     visobj->SetVisibilityNumber (current_visnr);
     history->reason = reason;
     history->vis_cnt = cnt;
-    history->prev_visstate = true;
+    if (history_frame_cnt != 0)
+      history->history_frame_cnt = history_frame_cnt;
   }
 
-  void MarkInvisible (csVisReason reason)
-  {
-    history->reason = reason;
-    history->prev_visstate = false;
-  }
+  SCF_DECLARE_IBASE;
+
+  /// The object model has changed.
+  virtual void ObjectModelChanged (iObjectModel* model);
+  /// The movable has changed.
+  virtual void MovableChanged (iMovable* movable);
+  /// The movable is about to be destroyed.
+  virtual void MovableDestroyed (iMovable*) { }
 };
 
 /**
@@ -135,6 +146,11 @@ private:
   bool do_cull_tiled;
   bool do_freeze_vis;
 
+  // For history culling: this is used by the main VisTest() routine
+  // to keep track of how many every VisTest() call. We can use that
+  // to see if some object was visible previous frame.
+  uint32 history_frame_cnt;
+
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;
 
@@ -146,13 +162,6 @@ private:
   // visibility culling proceedings during the next frame. This flag
   // will immediatelly be cleared after that dump.
   bool do_state_dump;
-
-  // Scan all objects, mark them as invisible and check if they
-  // have moved since last frame (and update them in the kdtree then).
-  // If update_prev_visstate == false then prev_visstate in the history
-  // of all objects will not be updated. This is useful for not disturbing
-  // this information.
-  void UpdateObjects (bool update_prev_visstate = true);
 
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
@@ -184,6 +193,10 @@ public:
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data);
+
+  // Update one object in Dynavis. This is called whenever the movable
+  // or object model changes.
+  void UpdateObject (csVisibilityObjectWrapper* visobj_wrap);
 
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
