@@ -195,13 +195,16 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
 
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0), false);
+  	csColor (1, .8, .8), false);
   room->AddLight (light);
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1), false);
+  	csColor (.8, .8, 1), false);
   room->AddLight (light);
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0), false);
+  	csColor (.8, 1, .8), false);
+  room->AddLight (light);
+  light = engine->CreateLight (NULL, csVector3 (0, 5,  3), 10,
+  	csColor (.8, .8, 1), false);
   room->AddLight (light);
 
   engine->Prepare ();
