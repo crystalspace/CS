@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jan-2004
+	- Eric Sunshine updated csPosixCondition::Wait() so that it also
+	  catches EINVAL from pthread_cond_timedwait().
 17-Jan-2004
 	- Eric Sunshine applied patch from Lukas Erlinghagen <erluk@web.de>
 	  which fixes crash in csSCF::RegisterClassesInt() triggered by the

@@ -295,6 +295,9 @@ bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
     case EINTR:
       lasterr = "Wait interrupted";
       break;
+    case EINVAL:
+      lasterr = "Invalid argument (timeout, mutex, or condition)";
+      break;
     case 0:
       lasterr = 0;
       break;
