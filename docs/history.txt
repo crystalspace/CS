@@ -23,6 +23,8 @@ chronological order.
 	- Eric Sunshine eliminated compilation warning from dynavis.cpp.
 	- Eric Sunshine fixed csfgen so that it once again compiles following
 	  Jorrit's change to iFont & BitmapMetrics.
+	- Eric Sunshine fixed SDL check in configure.ac so that works correctly
+	  for platforms on which SDL requires pthread.
 24-Aug-2003
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not

@@ -1256,20 +1256,30 @@ AS_IF([test $cs_cv_libcal3d = yes],
 	    [std::string s(""); CalCoreModel m; m.addAnimHelper(s,0);])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
-	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])])
+	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])],
+	[], [],
+	[$cs_cv_libcal3d_cflags],
+	[$cs_cv_libcal3d_lflags],
+	[$cs_cv_libcal3d_libs])])
 
     
 
 #------------------------------------------------------------------------------
-# Check for SDL
+# Check for SDL.
 # @@@ FIXME We should probably use sdl-config.
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([SDL],
-    [AC_LANG_PROGRAM([#include <SDL/SDL.h>], [SDL_Init(0);])],
-    [], [C++],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
-	CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
+AC_DEFUN([CS_CHECK_SDL],
+    [AC_REQUIRE([CS_CHECK_PTHREAD])
+    CS_CHECK_LIB_WITH([SDL],
+	[AC_LANG_PROGRAM([#include <SDL/SDL.h>], [SDL_Init(0);])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
+	    CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])], [],
+	[$cs_cv_sys_pthread_cflags],
+	[$cs_cv_sys_pthread_lflags],
+	[$cs_cv_sys_pthread_libs])])
 
+CS_CHECK_SDL
 
 
 #------------------------------------------------------------------------------
