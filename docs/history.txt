@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett removed unused libs from MSVC project files.
 	  Moved ddraw and other libs to makefiles where it is required.
 	  A work in progress...
+	- Fixed SCF_TRACE for embedded SCF interfaces. scfRefCount is
+	  no longer part of the embedded interface.
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
 	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
