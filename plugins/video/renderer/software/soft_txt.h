@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TXTMGR_SOFT_H
-#define TXTMGR_SOFT_H
+#ifndef __SOFT_TXT_H__
+#define __SOFT_TXT_H__
 
 #include "cscom/com.h"
 #include "cs3d/common/txtmgr.h"
@@ -512,6 +512,4 @@ public:
 
 };
 
-
-#endif // TXTMGR_SOFT_H
-
+#endif // __SOFT_TXT_H__

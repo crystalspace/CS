@@ -399,7 +399,7 @@ public:
    * any calls to the 3D rasterizer other than DrawPolygonQuick() and
    * FinishPolygonQuick().
    */
-  STDMETHOD (StartPolygonQuick) (ITextureHandle* handle, bool gouroud) PURE;
+  STDMETHOD (StartPolygonQuick) (ITextureHandle* handle, bool gouraud) PURE;
 
   /**
    * Finish drawing a series of projected polygons.
@@ -413,7 +413,7 @@ public:
    * be perspective correct since this function is generally going
    * to be used for 3D sprites which are made up of small triangles.
    */
-  STDMETHOD (DrawPolygonQuick) (G3DPolygonDPQ& poly, bool gouroud) PURE;
+  STDMETHOD (DrawPolygonQuick) (G3DPolygonDPQ& poly) PURE;
 
   /**
    * Prepare for drawing a series of Polygon FX which all use
@@ -429,12 +429,12 @@ public:
    * handle:  The texture handle as returned by ITextureManager.
    * mode:    How shall the new polygon be combined with the current 
    *          screen content.
-   * gouroud: set to true, if you want to shade the resulting texture by 
+   * gouraud: set to true, if you want to shade the resulting texture by 
    *          the colorvalues in vertices[i].r, .b, .g, if you set gouraud 
    *          to true and set all color components to 1.0, you will see no 
    *          gouraud shading.
    */
-  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, bool gouroud) PURE;
+  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, bool gouraud) PURE;
 
   /**
    * Finish drawing a series of Polygon FX.
@@ -447,7 +447,7 @@ public:
    * interface for all Polygon drawing. For now, you will have to use 
    * this method, if you need advanced possibilities.
    */
-  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly, bool gouroud) PURE;
+  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly, bool gouraud) PURE;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;

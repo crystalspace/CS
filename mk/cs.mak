@@ -9,6 +9,7 @@
 include mk/user.mak
 include mk/common.mak
 -include config.mak
+include mk/nasm.mak
 
 .PHONY: doc api depend clean cleanlib cleandep
 
@@ -41,7 +42,7 @@ ifeq ($(USE_DLL),no)
   override MAKE_DLL=no
 endif
 
-.SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h
+.SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash
 
 # Dynamically compute driver submakefiles
 DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(DRIVERS))))
@@ -53,18 +54,20 @@ vpath %.cpp support/com support/debug support/system
 
 # Directory for object files
 OUTBASE=out/
-ifeq ($(MAKE_DLL),yes)
-  OUTSUFFIX=$(DLL)
-endif
 OUTOS=$(OUTBASE)$(OS)/
 OUTPROC=$(OUTOS)$(PROC)/
-OUT=$(OUTPROC)$(MODE)$(OUTSUFFIX)/
+OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
 
 ############################################
 # Depending on the type of optimization choosen we disable assembler support.
 ifneq ($(MODE),optimize)
+ifneq ($(USE_NASM),yes)
   DO_ASM=no
+endif
+endif
+ifeq ($(DO_ASM),no)
+  USE_NASM=no
 endif
 ############################################
 
@@ -100,6 +103,9 @@ endif
 ifeq ($(DO_SOUND),yes)
   CFLAGS+=$(CFLAGS.D)DO_SOUND
 endif
+ifeq ($(USE_NASM),yes)
+  CFLAGS+=$(CFLAGS.D)DO_NASM
+endif
 
 # Use $(^^) instead of $^ when you need all dependencies except libraries
 ^^=$(filter-out %$(LIB),$^)
@@ -115,6 +121,8 @@ DO.COMPILE.C = $(CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
 DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+# How to compile a NASM source
+DO.COMPILE.ASM = $(NASM) $(NASM.@) $(NASMFLAGS) $(<<)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a dynamic library
@@ -124,17 +132,17 @@ DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) 
 # How to link a graphical executable
 DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
 # How to do either a dynamic or static library (depending on MAKE_DLL)
-ifeq ($(MAKE_DLL),no)
-  DO.LIBRARY = $(DO.STATIC.LIBRARY)
-else
+ifeq ($(MAKE_DLL),yes)
   DO.LIBRARY = $(DO.DYNAMIC.LIBRARY)
+else
+  DO.LIBRARY = $(DO.STATIC.LIBRARY)
 endif
 
 # The sed script used to build dependencies
 SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
-  DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >$@
+  DO.DEP = -$(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >$@
 endif
 
 # Directories for output files
@@ -196,6 +204,9 @@ $(OUT)%$O: %.S
 
 $(OUT)%$O: %.s
 	$(DO.COMPILE.S)
+
+$(OUT)%$O: %.asm
+	$(DO.COMPILE.ASM)
 
 $(OUTDIRS):
 	$(MKDIR)

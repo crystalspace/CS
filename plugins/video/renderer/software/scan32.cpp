@@ -18,83 +18,78 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cs3d/software/scan.h"
-#include "cs3d/software/scan32.h"
-#include "cs3d/software/tables.h"
+#include "scan.h"
+#include "tables.h"
 #include "ipolygon.h"
 #include "ilghtmap.h"
 
 #include "sttest.h"
 
-extern unsigned char* priv_to_global;
-
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_flat
+#ifndef NO_draw_scanline_flat_zfil
 
-void Scan32::draw_scanline_flat (int xx, unsigned char* d,
-			       unsigned long* z_buf,
-			       float inv_z, float u_div_z, float v_div_z)
+void csScan_32_draw_scanline_flat_zfil (int xx, unsigned char* d,
+  unsigned long* zbuf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
-  int color = Scan::flat_color;
+  int color = Scan.FlatColor;
   long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan::M);
+  long dzz = QInt24 (Scan.M);
   ULong* _dest = (ULong*)d;
   ULong* _destend = _dest + xx-1;
   do
   {
     *_dest++ = color;
-    *z_buf++ = izz;
+    *zbuf++ = izz;
     izz += dzz;
   }
   while (_dest <= _destend);
 }
 
-#endif // NO_draw_scanline_flat
+#endif // NO_draw_scanline_flat_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_z_buf_flat
+#ifndef NO_draw_scanline_flat_zuse
 
-void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
-			       unsigned long* z_buf,
-			       float inv_z, float u_div_z, float v_div_z)
+void csScan_32_draw_scanline_flat_zuse (int xx, unsigned char* d,
+  unsigned long* zbuf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
-  int color = Scan::flat_color;
+  int color = Scan.FlatColor;
   long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan::M);
+  long dzz = QInt24 (Scan.M);
   ULong* _dest = (ULong*)d;
   ULong* _destend = _dest + xx-1;
   do
   {
-    if (izz >= (int)(*z_buf))
+    if (izz >= (int)(*zbuf))
     {
       *_dest++ = color;
-      *z_buf++ = izz;
+      *zbuf++ = izz;
     }
     else
     {
       _dest++;
-      z_buf++;
+      zbuf++;
     }
     izz += dzz;
   }
   while (_dest <= _destend);
 }
 
-#endif // NO_draw_scanline_z_buf_flat
+#endif // NO_draw_scanline_flat_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline
+#ifndef NO_draw_scanline_tex_zfil
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline
+#define SCANFUNC csScan_32_draw_scanline_tex_zfil
 #define SCANLOOP \
     do									\
     {									\
@@ -112,17 +107,17 @@ void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
     while (z_buffer <= lastZbuf)
 #include "scanln32.inc"
 
-#endif // NO_draw_scanline
+#endif // NO_draw_scanline_tex_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_z_buf
+#ifndef NO_draw_scanline_tex_zuse
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline_z_buf
+#define SCANFUNC csScan_32_draw_scanline_tex_zuse
 #define SCANLOOP \
     do									\
     {									\
@@ -143,17 +138,17 @@ void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
     while (_dest <= _destend)
 #include "scanln32.inc"
 
-#endif // NO_draw_scanline_z_buf
+#endif // NO_draw_scanline_tex_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_map
+#ifndef NO_draw_scanline_map_zfil
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline_map
+#define SCANFUNC csScan_32_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP \
     do									\
@@ -172,17 +167,17 @@ void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
     while (z_buffer <= lastZbuf)
 #include "scanln32.inc"
 
-#endif // NO_draw_scanline_map
+#endif // NO_draw_scanline_map_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_z_buf_map
+#ifndef NO_draw_scanline_map_zuse
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline_z_buf_map
+#define SCANFUNC csScan_32_draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP \
     do									\
@@ -204,40 +199,38 @@ void Scan32::draw_scanline_z_buf_flat (int xx, unsigned char* d,
     while (_dest <= _destend)
 #include "scanln32.inc"
 
-#endif // NO_draw_scanline_z_buf_map
+#endif // NO_draw_scanline_map_zuse
 
 //------------------------------------------------------------------
 
 #ifndef NO_draw_scanline_fog
 
-void Scan32::draw_scanline_fog (int xx, unsigned char* d,
-                              unsigned long* z_buf,
-                              float inv_z, float u_div_z, float v_div_z)
+void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
+  unsigned long* zbuf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   ULong* _dest = (ULong*)d;
   ULong* _destend = _dest + xx-1;
-  int dzz, izz;
-  izz = QInt24 (inv_z);
-  dzz = QInt24 (Scan::M);
+  unsigned long izz = QInt24 (inv_z);
+  int dzz = QInt24 (Scan.M);
 
-  ULong fog_dens = Scan::fog_density;
-  int fog_r = 256+Scan::fog_red;
-  int fog_g = 256+Scan::fog_green;
-  int fog_b = 256+Scan::fog_blue;
+  ULong fog_dens = Scan.FogDensity;
+  int fog_r = 256+Scan.FogR;
+  int fog_g = 256+Scan.FogG;
+  int fog_b = 256+Scan.FogB;
 
   do
   {
-    if (izz < *z_buf)
+    if (izz < *zbuf)
     {
       _dest++;
       izz+=dzz;
-      z_buf++;
+      zbuf++;
     }
     else
     {
-      int dens_dist = tables.exp_table_2[fog_dens / *(z_buf) - fog_dens / izz];
+      int dens_dist = tables.exp_table_2[fog_dens / *(zbuf) - fog_dens / izz];
       int r = (*_dest) >> 16;
       int g = ((*_dest) >> 8) & 0xff;
       int b = (*_dest) & 0xff;
@@ -247,7 +240,7 @@ void Scan32::draw_scanline_fog (int xx, unsigned char* d,
       b += tables.mul_table[dens_dist+fog_b - b];
 
       *_dest++ = (r<<16) | (g<<8) | b;
-      z_buf++;
+      zbuf++;
       izz += dzz;
     }
   }
@@ -260,23 +253,22 @@ void Scan32::draw_scanline_fog (int xx, unsigned char* d,
 
 #ifndef NO_draw_scanline_fog_view
 
-void Scan32::draw_scanline_fog_view (int xx, unsigned char* d,
-                              unsigned long* z_buf,
-                              float inv_z, float u_div_z, float v_div_z)
+void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
+  unsigned long* zbuf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   ULong* _dest = (ULong*)d;
   ULong* _destend = _dest + xx-1;
 
-  ULong fog_dens = Scan::fog_density;
-  int fog_r = 256+Scan::fog_red;
-  int fog_g = 256+Scan::fog_green;
-  int fog_b = 256+Scan::fog_blue;
+  ULong fog_dens = Scan.FogDensity;
+  int fog_r = 256+Scan.FogR;
+  int fog_g = 256+Scan.FogG;
+  int fog_b = 256+Scan.FogB;
 
   do
   {
-    int dens_dist = tables.exp_table_2[fog_dens / *(z_buf)];
+    int dens_dist = tables.exp_table_2[fog_dens / *(zbuf)];
     int r = (*_dest) >> 16;
     int g = ((*_dest) >> 8) & 0xff;
     int b = (*_dest) & 0xff;
@@ -286,7 +278,7 @@ void Scan32::draw_scanline_fog_view (int xx, unsigned char* d,
     b += tables.mul_table[dens_dist+fog_b - b];
 
     *_dest++ = (r<<16) | (g<<8) | b;
-    z_buf++;
+    zbuf++;
   }
   while (_dest <= _destend);
 }
@@ -297,9 +289,8 @@ void Scan32::draw_scanline_fog_view (int xx, unsigned char* d,
 
 #ifndef NO_draw_scanline_fog_plane
 
-void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
-                              unsigned long* z_buf,
-                              float inv_z, float u_div_z, float v_div_z)
+void csScan_32_draw_scanline_fog_plane (int xx, unsigned char* d,
+  unsigned long* zbuf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
@@ -308,10 +299,10 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
   int izz;
   izz = QInt24 (inv_z);
 
-  ULong fog_dens = Scan::fog_density;
-  int fog_r = 256+Scan::fog_red;
-  int fog_g = 256+Scan::fog_green;
-  int fog_b = 256+Scan::fog_blue;
+  ULong fog_dens = Scan.FogDensity;
+  int fog_r = 256+Scan.FogR;
+  int fog_g = 256+Scan.FogG;
+  int fog_b = 256+Scan.FogB;
 
   long dist = QInt24 (1. / 1.);
   int dens_dist = tables.exp_table_2[fog_dens / dist];
@@ -328,7 +319,7 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
     b += tables.mul_table[dens_dist+fog_b - b];
 
     *_dest++ = (r<<16) | (g<<8) | b;
-    z_buf++;
+    zbuf++;
   }
   while (_dest <= _destend);
 }
@@ -337,10 +328,11 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_zfill
+#ifndef NO_draw_pi_scanline_tex_zfil
 
-void Scan32::draw_pi_scanline_zfill (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+void csScan_32_draw_pi_scanline_tex_zfil (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   ULong *_dest = (ULong *)dest;
   ULong *_destend = _dest + len;
@@ -355,14 +347,15 @@ void Scan32::draw_pi_scanline_zfill (void *dest, int len, long *zbuff, long u, l
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_zfill
+#endif // NO_draw_pi_scanline_tex_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline
+#ifndef NO_draw_pi_scanline_tex_zuse
 
-void Scan32::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+void csScan_32_draw_pi_scanline_tex_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   ULong *_dest = (ULong *)dest;
   ULong *_destend = _dest + len;
@@ -382,14 +375,15 @@ void Scan32::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline
+#endif // NO_draw_pi_scanline_tex_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouraud_zfill
+#ifndef NO_draw_pi_scanline_tex_gouraud_zfil
 
-void Scan32::draw_pi_scanline_gouraud_zfill (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+void csScan_32_draw_pi_scanline_tex_gouraud_zfil (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
   ULong *_dest = (ULong *)dest;
@@ -413,14 +407,15 @@ void Scan32::draw_pi_scanline_gouraud_zfill (void *dest, int len, long *zbuff, l
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouraud_zfill
+#endif // NO_draw_pi_scanline_tex_gouraud_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_gouraud
+#ifndef NO_draw_pi_scanline_tex_gouraud_zuse
 
-void Scan32::draw_pi_scanline_gouraud (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+void csScan_32_draw_pi_scanline_tex_gouraud_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
   ULong *_dest = (ULong *)dest;
@@ -449,14 +444,15 @@ void Scan32::draw_pi_scanline_gouraud (void *dest, int len, long *zbuff, long u,
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_gouraud
+#endif // NO_draw_pi_scanline_tex_gouraud_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat_gouraud_zfill
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfil
 
-void Scan32::draw_pi_scanline_flat_gouraud_zfill (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+void csScan_32_draw_pi_scanline_flat_gouraud_zfil (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
@@ -475,14 +471,15 @@ void Scan32::draw_pi_scanline_flat_gouraud_zfill (void *dest, int len, long *zbu
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_flat_gouraud_zfill
+#endif // NO_draw_pi_scanline_flat_gouraud_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat_gouraud
+#ifndef NO_draw_pi_scanline_flat_gouraud_zuse
 
-void Scan32::draw_pi_scanline_flat_gouraud (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
+void csScan_32_draw_pi_scanline_flat_gouraud_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
   long r, long g, long b, long dr, long dg, long db)
 {
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
@@ -506,14 +503,15 @@ void Scan32::draw_pi_scanline_flat_gouraud (void *dest, int len, long *zbuff, lo
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_flat_gouraud
+#endif // NO_draw_pi_scanline_flat_gouraud_zuse
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat_zfill
+#ifndef NO_draw_pi_scanline_flat_zfil
 
-void Scan32::draw_pi_scanline_flat_zfill (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+void csScan_32_draw_pi_scanline_flat_zfil (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
   ULong *_dest = (ULong *)dest;
@@ -526,14 +524,15 @@ void Scan32::draw_pi_scanline_flat_zfill (void *dest, int len, long *zbuff, long
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_flat_zfill
+#endif // NO_draw_pi_scanline_flat_zfil
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pi_scanline_flat
+#ifndef NO_draw_pi_scanline_flat_zuse
 
-void Scan32::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+void csScan_32_draw_pi_scanline_flat_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
   ULong *_dest = (ULong *)dest;
@@ -551,7 +550,7 @@ void Scan32::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, lo
   } /* endwhile */
 }
 
-#endif // NO_draw_pi_scanline_flat
+#endif // NO_draw_pi_scanline_flat_zuse
 
 //------------------------------------------------------------------
 
@@ -561,7 +560,7 @@ void Scan32::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, lo
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline_map_alpha50
+#define SCANFUNC csScan_32_draw_scanline_map_alpha50
 #define SCANMAP 1
 #define SCANLOOP \
     do									\
@@ -585,22 +584,22 @@ void Scan32::draw_pi_scanline_flat (void *dest, int len, long *zbuff, long u, lo
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC draw_scanline_map_alpha
+#define SCANFUNC csScan_32_draw_scanline_map_alpha
 #define SCANMAP 1
 #define SCANLOOP \
     do									\
     {									\
       ULong a = *_dest;							\
       ULong b = srcTex[((vv>>16)<<shifter) + (uu>>16)];			\
-      int r1 = a >> 16;	\
-      int g1 = (a >> 8) & 0xff;	\
-      int b1 = a & 0xff;	\
-      int r2 = b >> 16;	\
-      int g2 = (b >> 8) & 0xff;	\
-      int b2 = b & 0xff;	\
-      r1 = ((256-Scan::alpha_fact)*r1 + r2*Scan::alpha_fact) >> 8;	\
-      g1 = ((256-Scan::alpha_fact)*g1 + g2*Scan::alpha_fact) >> 8;	\
-      b1 = ((256-Scan::alpha_fact)*b1 + b2*Scan::alpha_fact) >> 8;	\
+      int r1 = a >> 16;							\
+      int g1 = (a >> 8) & 0xff;						\
+      int b1 = a & 0xff;						\
+      int r2 = b >> 16;							\
+      int g2 = (b >> 8) & 0xff;						\
+      int b2 = b & 0xff;						\
+      r1 = ((256-Scan.AlphaFact)*r1 + r2*Scan.AlphaFact) >> 8;		\
+      g1 = ((256-Scan.AlphaFact)*g1 + g2*Scan.AlphaFact) >> 8;		\
+      b1 = ((256-Scan.AlphaFact)*b1 + b2*Scan.AlphaFact) >> 8;		\
       *_dest++ = (r1<<16) | (g1<<8) | b1;				\
       uu += duu;							\
       vv += dvv;							\

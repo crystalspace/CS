@@ -1,4 +1,6 @@
 /*
+    OUTDATED: to be removed after NASM routines are debugged - A.Z.
+
     Crystal Space 8-bit csGraphics2D assembler-optimized routines
     Copyright (C) 1998 by Olivier Langlois <olanglois@sympatico.ca>
 

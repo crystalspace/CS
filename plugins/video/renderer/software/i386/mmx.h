@@ -1,4 +1,6 @@
 /*
+    OUTDATED: to be removed after NASM routines are debugged - A.Z.
+
     Crystal Space software driver MMX-related routines and definitions
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributed by Andrew Zabolotny <bit@eltech.ru>
@@ -22,82 +24,6 @@
 #ifndef __MMX_H__
 #define __MMX_H__
 
-#if defined (COMP_VC) || defined (COMP_WCC)
-
-#if _MSC_VER < 1200     // If compiler version is below 6
-#define cpuid __asm _emit 0x0F __asm _emit 0xA2
-#endif
-
-#pragma warning( disable : 4035 ) // Disable warning for functions that does not have
-                                  // return statement
-
-/**
- * Detect whenever current CPU supports MMX instructions and return its ID.
- * Memory block to hold id string should be at least 13 bytes size.
- */
-
-inline bool mmxDetect (char *id)
-{
-  bool retcode;                         // Watcom barfs if there is nor return value
-  __asm{
-                pushfd
-                pop     eax
-                mov     ebx, eax
-                xor     eax, 200000H   // The ability to modify the ID flag of EFLAGS
-                push    eax            // indicates support for the cpuid instruction
-                popfd
-                pushfd
-                pop     eax
-                cmp     eax, ebx
-                setnz   al
-                jz      label_1
-                mov     eax, 0
-                cpuid
-                mov     eax,  id
-                mov     DWORD PTR [eax],   ebx     // GenuineIntel
-                mov     DWORD PTR [eax+4], edx
-                mov     DWORD PTR [eax+8], ecx
-                mov     BYTE  PTR [eax+12],0
-                mov     eax, 1
-                cpuid
-                test    edx, 800000H  // Is MMX present ?
-                setnz   al
-label_1:        mov     retcode,al
-  }
-  return retcode;
-}
-#else
-inline bool mmxDetect (char *id)
-{
-  bool detect;
-
-  asm ("        pushfl
-                popl    %%eax
-                movl    %%eax, %%ebx
-                xorl    $0x200000, %%eax
-                pushl   %%eax
-                popfl
-                pushfl
-                popl    %%eax
-                cmpl    %%ebx, %%eax
-                setnzb  %%al
-                jz      1f
-                movl    $0, %%eax
-                cpuid
-                movl    %%ebx, 0(%%esi)
-                movl    %%edx, 4(%%esi)
-                movl    %%ecx, 8(%%esi)
-                movb    $0, 12(%%esi)
-                movl    $1, %%eax
-                cpuid
-                testl   $0x800000, %%edx
-                setnzb  %%al
-1:
-  ": "=a" (detect) : "S" (id) : "ebx", "ecx", "edx");
-  return detect;
-}
-#endif
-
 /// Call mmxEnd () before using floating-point coprocessor
 inline void mmxEnd ()
 {
@@ -108,57 +34,8 @@ inline void mmxEnd ()
 #endif
 }
 
-/// Test routine to print current MMX state
-#if defined (COMP_VC) || defined (COMP_WCC)
-inline void mmxPrintState ()
-{
-  __int64 mm0v, mm1v, mm2v, mm3v, mm4v, mm5v, mm6v, mm7v;
-
-  __asm{        movq    mm0v, mm0
-                movq    mm1v, mm1
-                movq    mm2v, mm2
-                movq    mm3v, mm3
-                movq    mm4v, mm4
-                movq    mm5v, mm5
-                movq    mm6v, mm6
-                movq    mm7v, mm7
-  }
- printf ("mm0 = %08X%08X  mm1 = %08X%08X\n",
-   (unsigned int)(mm0v >> 32), (unsigned int)mm0v, (unsigned int)(mm1v >> 32), (unsigned int)mm1v);
- printf ("mm2 = %08X%08X  mm3 = %08X%08X\n",
-   (unsigned int)(mm2v >> 32), (unsigned int)mm2v, (unsigned int)(mm3v >> 32), (unsigned int)mm3v);
- printf ("mm4 = %08x%08x  mm5 = %08x%08x\n",
-   (unsigned int)(mm4v >> 32), (unsigned int)mm4v, (unsigned int)(mm5v >> 32), (unsigned int)mm5v);
- printf ("mm6 = %08x%08x  mm7 = %08x%08x\n",
-   (unsigned int)(mm6v >> 32), (unsigned int)mm6v, (unsigned int)(mm7v >> 32), (unsigned int)mm7v);
-}
-#else
-inline void mmxPrintState ()
-{
-  unsigned long long mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
-  asm ("        movq    %%mm0, %0
-                movq    %%mm1, %1
-                movq    %%mm2, %2
-                movq    %%mm3, %3
-                movq    %%mm4, %4
-                movq    %%mm5, %5
-                movq    %%mm6, %6
-                movq    %%mm7, %7
-  " : : "m" (mm0), "m" (mm1), "m" (mm2), "m" (mm3),
-        "m" (mm4), "m" (mm5), "m" (mm6), "m" (mm7) : "eax");
- printf ("mm0 = %08X%08X  mm1 = %08X%08X\n",
-   (unsigned int)(mm0 >> 32), (unsigned int)mm0, (unsigned int)(mm1 >> 32), (unsigned int)mm1);
- printf ("mm2 = %08X%08X  mm3 = %08X%08X\n",
-   (unsigned int)(mm2 >> 32), (unsigned int)mm2, (unsigned int)(mm3 >> 32), (unsigned int)mm3);
- printf ("mm4 = %08x%08x  mm5 = %08x%08x\n",
-   (unsigned int)(mm4 >> 32), (unsigned int)mm4, (unsigned int)(mm5 >> 32), (unsigned int)mm5);
- printf ("mm6 = %08x%08x  mm7 = %08x%08x\n",
-   (unsigned int)(mm6 >> 32), (unsigned int)mm6, (unsigned int)(mm7 >> 32), (unsigned int)mm7);
-}
-#endif
-
 /**
- * The following macros can be used by Scan::draw_scanline_XXXX methods
+ * The following macros can be used by draw_scanline_XXXX methods
  * to provide high-speed assembly implementations using MMX...
  */
 
@@ -308,10 +185,6 @@ inline void mmxPrintState ()
     : "eax", "ebx", "ecx", "st", "st(1)", "st(2)", "st(3)",     \
       "st(4)", "st(5)", "st(6)", "st(7)"                        \
     );
-#endif
-
-#if defined (COMP_VC) || defined (COMP_WCC)
-#pragma warning( default : 4035 )
 #endif
 
 #endif // __MMX_H__

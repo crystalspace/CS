@@ -307,14 +307,14 @@ public:
   /**
    * Set a color for a vertex.
    * As soon as you use this function this sprite will be rendered
-   * using gouroud shading. Calling this function for the first time
+   * using gouraud shading. Calling this function for the first time
    * will initialize all colors to black.
    */
   void SetVertexColor (int i, const csColor& col);
 
   /**
    * Reset the color list. If you call this function then the
-   * sprite will no longer use gouroud shading.
+   * sprite will no longer use gouraud shading.
    */
   void ResetVertexColors ();
 

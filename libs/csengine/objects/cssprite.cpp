@@ -538,7 +538,7 @@ void csSprite3D::Draw (csRenderView& rview)
 
       PreparePolygonQuick (&poly, (csVector2 *)triangle, vertex_colors != NULL);
       // Draw resulting polygon
-      rview.g3d->DrawPolygonQuick (poly, vertex_colors != NULL);
+      rview.g3d->DrawPolygonQuick (poly);
     }
   }
 

@@ -35,3 +35,9 @@ define MAKE_TARGET
 	@echo $"`----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 endef
+
+# The suffixes for $(OUT) directory when making PIC and non-PIC code
+# Can be changed from system-dependent makefile
+OUTSUFX. =
+OUTSUFX.no =
+OUTSUFX.yes = .pic

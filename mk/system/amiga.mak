@@ -5,7 +5,6 @@
 
 # Not supported for the moment.
 override USE_DLL=no
-override MAKE_DLL=no
 
 # Choose which drivers you want to build/use
 DRIVERS=cs3d/software cs2d/x2d csnetdrv/null csnetdrv/sockets \

@@ -135,7 +135,7 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, int color);
  
   /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

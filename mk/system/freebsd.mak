@@ -83,6 +83,9 @@ LFLAGS.profile=-pg
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL=-Wl,-shared
 
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=-f aoutb -DEXTERNC_UNDERSCORE
+
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
   libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \

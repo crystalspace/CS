@@ -1011,7 +1011,7 @@ lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT );
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
+STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {    
   int i;
   HighColorCache_Data *pTexData;

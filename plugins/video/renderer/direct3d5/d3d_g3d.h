@@ -1,19 +1,19 @@
 /*
-Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles
+    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
   
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
     
-      You should have received a copy of the GNU Library General Public
-      License along with this library; if not, write to the Free
-      Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 // g3d_d3d.h
@@ -134,7 +134,7 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   int rstate_mipmap;
   bool rstate_edges;
 
-  bool        m_gouroud;
+  bool        m_gouraud;
   DPFXMixMode m_mixmode;
 
   /// Capabilities of the renderer.
@@ -191,22 +191,22 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
   
   /// Start DrawPolygonQuick drawing.
-  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouroud);
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud);
 
   /// Finish DrawPolygonQuick drawing.
   STDMETHODIMP FinishPolygonQuick ();
 
   /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
   
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon wit special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

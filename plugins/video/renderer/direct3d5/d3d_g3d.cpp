@@ -1,19 +1,19 @@
 /*
-  Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
+    Copyright (C) 1998 by Jorrit Tyberghein and Dan Ogles.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
   
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
     
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 // G3D_D3D.CPP
@@ -220,7 +220,7 @@ m_bUse24BitInternalTexture(false)
   rstate_mipmap = true;
   rstate_edges = false;
 
-  m_gouroud = true;
+  m_gouraud = true;
  
   CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D));
 }
@@ -1108,7 +1108,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
 
 
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouroud )
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouraud )
 { 
   HighColorCache_Data *pTexData;
   
@@ -1129,7 +1129,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonQuick( )
   return S_OK; 
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouraud)
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {    
   int i;
   D3DTLVERTEX vx;
@@ -1158,9 +1158,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, boo
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
 {
-  m_gouroud = gouroud;
+  m_gouraud = gouraud;
   m_mixmode = mode;
 
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
@@ -1235,7 +1235,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonFX()
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouroud)
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
 {
   int i;
   D3DTLVERTEX vx;
@@ -1256,7 +1256,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
     vx.sy = m_nHeight-poly.vertices[i].sy;
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
-    if (m_gouroud)
+    if (m_gouraud)
       vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, alpha);
     else
       vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, alpha);

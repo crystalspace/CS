@@ -473,7 +473,7 @@ csStatLight* CSLoader::load_statlight (char* buf)
   }
 
   CHK (csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn));
-  if (halo) l->EnableHalo ();
+  if (halo) l->SetFlags (CS_LIGHT_HALO, CS_LIGHT_HALO);
   return l;
 }
 
@@ -677,7 +677,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* w, char* buf,
         }
 	break;
       case kTokenSixMoveable:
-        thing->SetMoveable (true);
+        thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
 	break;
       case kTokenSixMove:
         {
@@ -890,7 +890,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* w, char* buf,
     done++;
   }
 
-  if (is_convex || thing->GetFog ().enabled) thing->SetConvex (true);
+  if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
   thing->Transform ();
 
@@ -941,7 +941,7 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
     switch (cmd)
     {
       case kTokenThingMoveable:
-        thing->SetMoveable (true);
+        thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
 	break;
       case kTokenThingConvex:
         is_convex = true;
@@ -988,7 +988,7 @@ csThing* CSLoader::load_thing (char* name, csWorld* w, char* buf,
 
   thing->SetTransform(obj);
   thing->Transform ();
-  if (is_convex || thing->GetFog ().enabled) thing->SetConvex (true);
+  if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   if (info.use_bsp) thing->UseBSP ();
  
   return thing;
@@ -1097,14 +1097,14 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
-          poly3d->SetLighting (do_lighting);
+          poly3d->SetFlags (CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
         }
 	break;
       case kTokenPolMipmap:
         {
           int do_mipmap;
           ScanStr (params, "%b", &do_mipmap);
-          poly3d->SetMipmapping (do_mipmap);
+          poly3d->SetFlags (CS_POLY_MIPMAP, do_mipmap ? CS_POLY_MIPMAP : 0);
         }
 	break;
       case kTokenPolCosFact:
@@ -2943,8 +2943,8 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
                               sector->Vwor (todo[done].tv2), len);
       else
 	p->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (colors[idx].plane));
-      p->SetMipmapping (!no_mipmap);
-      p->SetLighting (!no_lighting);
+      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING,
+      	(no_mipmap ? 0 : CS_POLY_MIPMAP) | (no_lighting ? 0 : CS_POLY_LIGHTING));
       p->theDynLight = todo[done].light;
     }
     done++;
@@ -3169,8 +3169,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       csNameObject::AddName(*p,poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetLighting (true);
-      p->SetMipmapping (false);
+      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (new_vertices[(j+1)%num]);
@@ -3186,8 +3185,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
       csNameObject::AddName(*p,poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetLighting (false);
-      p->SetMipmapping (false);
+      p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (prev_vertices[(j+1)%num]);
@@ -3226,8 +3224,7 @@ void CSLoader::skydome_process (csSector& sector, char* name, char* buf,
     csNameObject::AddName(*p,poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
-    p->SetLighting (true);
-    p->SetMipmapping (false);
+    p->SetFlags (CS_POLY_MIPMAP|CS_POLY_LIGHTING, CS_POLY_LIGHTING);
     p->SetCosinusFactor (1);
     p->AddVertex (top_vertex);
     p->AddVertex (prev_vertices[j]);

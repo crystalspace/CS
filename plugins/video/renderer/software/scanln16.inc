@@ -25,9 +25,8 @@
 // in using the Z buffer. If the code does only a Z fill, 'izz' need only
 // be updated in the Z fill loop.
 
-void Scan16::SCANFUNC (int xx, unsigned char* d,
-		     unsigned long* z_buf,
-		     float inv_z, float u_div_z, float v_div_z)
+void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
+  float u_div_z, float v_div_z)
 {
   (void)z_buf;
   if (xx <= 0) return;
@@ -46,85 +45,79 @@ void Scan16::SCANFUNC (int xx, unsigned char* d,
   // Some optimizations for processors with many registers (PowerPC, 680x0).
   // Get global variables into registers.
 # ifdef SCANMAP
-  unsigned long shifter = Scan::shf_u;
-  UShort* srcTex = (UShort*)Scan::tmap2;
+  unsigned long shifter = Scan.shf_u;
+  UShort* srcTex = (UShort*)Scan.tmap2;
 # else
-  unsigned long shifter_h = Scan::shf_h;
-  unsigned long ander_w = Scan::and_w;
-  unsigned long ander_h = Scan::and_h;
-  unsigned char* srcTex = Scan::tmap;
+  unsigned long shifter_h = Scan.shf_h;
+  unsigned long ander_w = Scan.and_w;
+  unsigned long ander_h = Scan.and_h;
+  unsigned char* srcTex = Scan.tmap;
 # endif /*SCANMAP*/
   unsigned long *z_buffer = z_buf; (void)z_buffer;
   unsigned long *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
   UShort *_destend;
   UShort *_dest = (UShort*)d;
 
-  if (xx >= Scan::INTERPOL_STEP)
-    inv_z += Scan::dM;
+  if (xx >= Scan.InterpolStep)
+    inv_z += Scan.dM;
   else
-    inv_z += Scan::M*xx;
+    inv_z += Scan.M * xx;
   z1 = 1 / inv_z;
 
-  dzz = QInt24 (Scan::M);
+  dzz = QInt24 (Scan.M);
 
 # if STUPID_TEST && SCANMAP
-  //if (uu < BOUNDARIES_OF_STUPID_TEST_U_MIN) uu = BOUNDARIES_OF_STUPID_TEST_U_MIN; else if (uu > Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) uu = Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-  //if (vv < BOUNDARIES_OF_STUPID_TEST_V_MIN) vv = BOUNDARIES_OF_STUPID_TEST_V_MIN; else if (vv > Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) vv = Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-  if (uu < 0) uu = 0; else if (uu > Scan::tw2fp) uu = Scan::tw2fp;
-  if (vv < 0) vv = 0; else if (vv > Scan::th2fp) vv = Scan::th2fp;
+  if (uu < 0) uu = 0; else if (uu > Scan.tw2fp) uu = Scan.tw2fp;
+  if (vv < 0) vv = 0; else if (vv > Scan.th2fp) vv = Scan.th2fp;
 # endif
 
   do
   {
-    if (xx < Scan::INTERPOL_STEP)
+    if (xx < Scan.InterpolStep)
     {
-      u_div_z += Scan::J1*xx;
-      v_div_z += Scan::K1*xx;
+      u_div_z += Scan.J1 * xx;
+      v_div_z += Scan.K1 * xx;
 
-      _destend = _dest + xx-1;
+      _destend = _dest + xx - 1;
 
       u1 = u_div_z * z1;
       v1 = v_div_z * z1;
       uu1 = QInt16 (u1);
       vv1 = QInt16 (v1);
 #     if STUPID_TEST && SCANMAP
-      //if (uu1 < BOUNDARIES_OF_STUPID_TEST_U_MIN) uu1 = BOUNDARIES_OF_STUPID_TEST_U_MIN; else if (uu1 > Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) uu1 = Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-      //if (vv1 < BOUNDARIES_OF_STUPID_TEST_V_MIN) vv1 = BOUNDARIES_OF_STUPID_TEST_V_MIN; else if (vv1 > Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) vv1 = Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-      if (uu1 < 0) uu1 = 0; else if (uu1 >= Scan::tw2fp) uu1 = Scan::tw2fp;
-      if (vv1 < 0) vv1 = 0; else if (vv1 >= Scan::th2fp) vv1 = Scan::th2fp;
+      if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
+      if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
 #     endif
 
-      duu = (uu1-uu)/xx;
-      dvv = (vv1-vv)/xx;
+      duu = (uu1 - uu) / xx;
+      dvv = (vv1 - vv) / xx;
 
       xx = 0;
     }
     else
     {
-      u_div_z += Scan::dJ1;
-      v_div_z += Scan::dK1;
+      u_div_z += Scan.dJ1;
+      v_div_z += Scan.dK1;
 
-      _destend = _dest + Scan::INTERPOL_STEP-1;
-      xx -= Scan::INTERPOL_STEP;
+      _destend = _dest + Scan.InterpolStep - 1;
+      xx -= Scan.InterpolStep;
 
       u1 = u_div_z * z1;
       v1 = v_div_z * z1;
       uu1 = QInt16 (u1);
       vv1 = QInt16 (v1);
 #     if STUPID_TEST && SCANMAP
-      //if (uu1 < BOUNDARIES_OF_STUPID_TEST_U_MIN) uu1 = BOUNDARIES_OF_STUPID_TEST_U_MIN; else if (uu1 > Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) uu1 = Scan::tw2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-      //if (vv1 < BOUNDARIES_OF_STUPID_TEST_V_MIN) vv1 = BOUNDARIES_OF_STUPID_TEST_V_MIN; else if (vv1 > Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX) vv1 = Scan::th2fp+BOUNDARIES_OF_STUPID_TEST_U_MAX;
-      if (uu1 < 0) uu1 = 0; else if (uu1 >= Scan::tw2fp) uu1 = Scan::tw2fp;
-      if (vv1 < 0) vv1 = 0; else if (vv1 >= Scan::th2fp) vv1 = Scan::th2fp;
+      if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
+      if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
 #     endif
 
-      if (xx >= Scan::INTERPOL_STEP)
-        inv_z += Scan::dM;
+      if (xx >= Scan.InterpolStep)
+        inv_z += Scan.dM;
       else
-        inv_z += Scan::M*xx;
+        inv_z += Scan.M * xx;
 
-      duu = (uu1-uu)>>Scan::INTERPOL_SHFT;
-      dvv = (vv1-vv)>>Scan::INTERPOL_SHFT;
+      duu = (uu1 - uu) >> Scan.InterpolShift;
+      dvv = (vv1 - vv) >> Scan.InterpolShift;
     }
 
     // The following divide should overlap with integer instructions

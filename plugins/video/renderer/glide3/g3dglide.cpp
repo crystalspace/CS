@@ -907,7 +907,7 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
 }
 
 /// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
+STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {
   HighColorCacheAndManage_Data* tcache=NULL;
 

@@ -86,7 +86,10 @@ CFLAGS.DLL=
 LFLAGS.GENERAL=-Zmt
 
 # Flags for the linker which are used when optimizing.
-LFLAGS.optimize=-s -Zsys -Zsmall-conv
+LFLAGS.optimize=-s -Zsmall-conv
+ifeq ($(USE_OMF),yes)
+LFLAGS.optimize+=-Zsys 
+endif
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g -Zcrtdll -Zstack 512
@@ -105,10 +108,12 @@ ifeq ($(USE_OMF),yes)
   ARFLAGS=cr
   CFLAGS.GENERAL += -Zomf
   LFLAGS.GENERAL += -Zomf
+  NASMFLAGS.SYSTEM=-f obj -DEXTERNC_UNDERSCORE
 else
   LIB=.a
   AR=ar
   ARFLAGS=cr
+  NASMFLAGS.SYSTEM=-f aout -DEXTERNC_UNDERSCORE
 endif
 
 # System dependent source files included into CSSYS library
@@ -156,11 +161,14 @@ RMDIR=rm -rf
 NETSOCK_LIBS=-lsocket
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e 's/\.ob*j*\:/$$O:/g'
+SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Override linker with os2link.cmd
 LINK=@cmd /c bin\\os2link.cmd OUT=$(OUT) DESCRIPTION="$(DESCRIPTION.$@)"
 LFLAGS.CONSOLE.EXE=CONSOLE
+
+# We don't need separate directories for dynamic libraries
+OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 
@@ -169,9 +177,10 @@ ifeq ($(MAKESECTION),configure)
 
 export SHELL
 
-# For some (very strange) reason the following include is ignored by make???
+# Default value for USE_OMF
+ifeq ($(USE_OMF),)
 USE_OMF = yes
--include config.mak
+endif
 
 configure:
 	@echo USE_OMF = $(USE_OMF)>>config.mak

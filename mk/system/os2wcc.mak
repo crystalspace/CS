@@ -135,6 +135,9 @@ LFLAGS.L=LIBP$(SPACE)
 # Flags for indicating an additional library to linker
 LFLAGS.l=L$(SPACE)
 
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=-f obj -DEXTERNC_UNDERSCORE
+
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
   libs/cssys/general/fopen.cpp libs/cssys/os2/csos2.cpp \
@@ -183,6 +186,9 @@ SYS_SED_DEPEND=-e "s/\.o/$$O/g"
 # Object file extension
 O=.obj
 
+# We don't need separate directories for dynamic libraries
+OUTSUFX.yes=
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #-------------------------------------------------------------- postdefines ---#
@@ -209,10 +215,7 @@ ifeq ($(MAKESECTION),configure)
 
 export SHELL
 
-USE_OMF = yes
-
 configure:
-	@echo USE_OMF = $(USE_OMF)>>config.mak
 	@cmd /c bin\\os2conf.cmd>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)

@@ -33,6 +33,7 @@ extern "C" void __ctordtorTerm (void);
 
 extern "C" unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long flag)
 {
+asm ("int $3");
   dll_handle = mod_handle;
   switch (flag)
   {

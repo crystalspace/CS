@@ -98,6 +98,9 @@ LFLAGS.profile=-pg
 #LFLAGS.DLL=-Wl,-shared -nostdlib -lgcc
 LFLAGS.DLL=-Wl,-shared
 
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=-f elf
+
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
  libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \

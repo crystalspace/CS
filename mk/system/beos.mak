@@ -126,6 +126,9 @@ SYS_SED_DEPEND=
 # the availability of XSHM.
 DO_SHM=no
 
+# We don't need separate directories for dynamic libraries
+OUTSUFX.yes=
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #---------------------------------------------------------------- configure --

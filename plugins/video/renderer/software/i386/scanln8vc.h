@@ -1,4 +1,6 @@
 /*
+    OUTDATED: to be removed after NASM routines are debugged - A.Z.
+
     Crystal Space 8-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
@@ -25,7 +27,7 @@
 #define __SCANLN8_H__
 
 #if defined (DO_MMX)
-#  include "cs3d/software/i386/mmx.h"
+#  include "mmx.h"
 #endif
 
 static short uFrac, duFrac, vFrac, dvFrac;
@@ -144,9 +146,9 @@ __asm   mov     _dest, edi                  \
 #undef SCANLOOP
 #undef SCANMAP
 
-#pragma message( "draw_scanline_map" )
-#define NO_draw_scanline_map
-#define SCANFUNC draw_scanline_map
+#pragma message( "draw_scanline_map_zfil" )
+#define NO_draw_scanline_map_zfil
+#define SCANFUNC draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND \
@@ -163,9 +165,9 @@ __asm   mov     _dest, edi                  \
 #undef SCANLOOP
 #undef SCANMAP
 
-#pragma message( "draw_scanline_z_buf_map" )
-#define NO_draw_scanline_z_buf_map
-#define SCANFUNC draw_scanline_z_buf_map
+#pragma message( "draw_scanline_map_zuse" )
+#define NO_draw_scanline_map_zuse
+#define SCANFUNC draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);  \
@@ -239,7 +241,7 @@ __asm   mov     izz, ebx  }             \
     __asm {                         \
 __asm   mov     oldEBP, ebp         /* Save EBP*/       \
 __asm   mov     edi, _dest                  \
-__asm   mov     esi, alpha_map              \
+__asm   mov     esi, AlphaMap              \
 __asm   mov      ax, vFrac                  \
 __asm   mov      dx, uFrac                  \
 __asm   mov     ebp, s              /* EBP = alpha_map*/    \
@@ -370,7 +372,7 @@ __asm   mov     _dest, edi }    \
     __asm {                         \
 __asm   mov     oldEBP, ebp         /* Save EBP*/       \
 __asm   mov     edi, _dest          \
-__asm   mov     esi, alpha_map      \
+__asm   mov     esi, AlphaMap      \
 __asm   mov      ax, vFrac          \
 __asm   mov      dx, uFrac          \
 __asm   mov     ebp, s              /* EBP = alpha_map*/    \
@@ -483,21 +485,22 @@ __asm   mov     _dest, edi }    \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#pragma message( "mmx_draw_scanline_map" )
-#define SCANFUNC mmx_draw_scanline_map
+#pragma message( "mmx_draw_scanline_map_zfil" )
+#define NO_mmx_draw_scanline_map_zfil
+#define SCANFUNC mmx_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanline.inc"
-#define NO_mmx_draw_scanline_map
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
 
-#pragma message( "mmx_draw_scanline" )
-#define SCANFUNC mmx_draw_scanline
+#pragma message( "mmx_draw_scanline_tex_zfil" )
+#define NO_mmx_draw_scanline_tex_zfil
+#define SCANFUNC mmx_draw_scanline_tex_zfil
 #define SCANLOOP \
     do                                  \
     {                                   \
@@ -508,14 +511,14 @@ __asm   mov     _dest, edi }    \
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanline.inc"
-#define NO_mmx_draw_scanline
 
 #endif // DO_MMX
 
-#define NO_draw_pi_scanline
-#pragma message( "draw_pi_scanline" )
-void Scan::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+#pragma message( "draw_pi_scanline_tex_zuse" )
+#define NO_draw_pi_scanline_tex_zuse
+void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   if (len <= 0)
     return;
@@ -564,9 +567,10 @@ label1: add     ax, dvFrac                  ; v = v + dv
 
 #ifdef DO_MMX
 
-#define NO_mmx_draw_pi_scanline
-void Scan::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+#define NO_mmx_draw_pi_scanline_tex_zuse
+void csScan_8_mmx_draw_pi_scanline_tex_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   if (len <= 0)
     return;

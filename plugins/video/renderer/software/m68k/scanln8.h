@@ -57,8 +57,8 @@ extern void DRAW_SL_MAP_M68K(   int, int, int, int, unsigned char*,
 
 #endif
 
-#define NO_draw_scanline_map
-void Scan::draw_scanline_map (int xx, unsigned char* d,
+#define NO_draw_scanline_map_zfil
+void Scan::draw_scanline_map_zfil (int xx, unsigned char* d,
                               unsigned long* z_buf,
                               float inv_z, float u_div_z, float v_div_z)
 {

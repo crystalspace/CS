@@ -144,7 +144,7 @@ protected:
   csPolygonSetBBox* bbox;
 
   /**
-   * Light frame number. Using this number one can see if gouroud shaded
+   * Light frame number. Using this number one can see if gouraud shaded
    * vertices have been initialized already.
    */
   long light_frame_number;
@@ -188,9 +188,9 @@ private:
 public:
   /**
    * Current light frame number. This is used for seeing
-   * if gouroud shading should be recalculated for this polygonset.
+   * if gouraud shading should be recalculated for this polygonset.
    * If there is a mismatch between the frame number of this set
-   * and the global number then the gouroud shading is not up-to-date.
+   * and the global number then the gouraud shading is not up-to-date.
    */
   static long current_light_frame_number;
 

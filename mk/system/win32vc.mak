@@ -117,6 +117,9 @@ LFLAGS.L=-libpath:
 # Flags for indicating an additional library to linker
 LFLAGS.l=$(OUT)
 
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
+
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/fopen.cpp libs/cssys/win32/dir.cpp \
@@ -165,6 +168,9 @@ SYS_SED_DEPEND=-e "s/\.o/$$O/g"
 
 # Object file extension
 O=.obj
+
+# We don't need separate directories for dynamic libraries
+OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 

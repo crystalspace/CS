@@ -1,4 +1,6 @@
 /*
+    OUTDATED: to be removed after NASM routines are debugged - A.Z.
+
     Crystal Space 16-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
@@ -26,7 +28,7 @@
 #define __SCANLN16_H__
 
 #if defined (DO_MMX)
-#  include "cs3d/software/i386/mmx.h"
+#  include "mmx.h"
 #endif
 
 static ULong Frac, dFrac;
@@ -158,8 +160,8 @@ __asm   mov     _dest,edi                   \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map
-#define SCANFUNC draw_scanline_map
+#define NO_draw_scanline_map_zfil
+#define SCANFUNC draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
@@ -176,8 +178,8 @@ __asm   mov     _dest,edi                   \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_z_buf_map
-#define SCANFUNC draw_scanline_z_buf_map
+#define NO_draw_scanline_map_zuse
+#define SCANFUNC draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP                                            \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);      \
@@ -232,7 +234,7 @@ __asm   mov     _dest,edi      }        \
 #include "cs3d/software/scanln16.inc"
 
 #define I386_SCANLINE_MAP_ALPHA50_16                        \
-    static UShort alpha = Textures::alpha_mask;             \
+    static UShort alpha = Textures::AlphaMask;             \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);      \
     dudvInt[1] = (((dvv >> 16) << shifter) + (duu>>16)) * 2;\
     dudvInt[3] = dudvInt[1] + 2;                            \
@@ -409,21 +411,6 @@ __asm   mov     _dest, edi         }                \
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-
-
-#if 0	// commented out since it looks like Jorrit changed the things a bit
-#pragma message( "draw_scanline_map_alpha25" )
-#define NO_draw_scanline_map_alpha25
-#define SCANFUNC draw_scanline_map_alpha25
-#define SCANMAP 1
-#define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "cs3d/software/scanln16.inc"
-
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
-
 #pragma message( "draw_scanline_map_alpha50" )
 #define NO_draw_scanline_map_alpha50
 #define SCANFUNC draw_scanline_map_alpha50
@@ -431,36 +418,25 @@ __asm   mov     _dest, edi         }                \
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "cs3d/software/scanln16.inc"
 
-#undef SCANFUNC
-#undef SCANEND
-#undef SCANLOOP
-#undef SCANMAP
-
-#define NO_draw_scanline_map_alpha75
-#define SCANFUNC draw_scanline_map_alpha75
-#define SCANMAP 1
-#define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "cs3d/software/scanln16.inc"
-#endif
-
 #if defined (DO_MMX)
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC mmx_draw_scanline_map
+#define NO_mmx_draw_scanline_map_zfil
+#define SCANFUNC mmx_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln16.inc"
-#define NO_mmx_draw_scanline_map
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC mmx_draw_scanline
+#define NO_mmx_draw_scanline_tex_zfil
+#define SCANFUNC mmx_draw_scanline_tex_zfil
 #define SCANLOOP \
     do                                  \
     {                                   \
@@ -471,12 +447,11 @@ __asm   mov     _dest, edi         }                \
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln16.inc"
-#define NO_mmx_draw_scanline
 
 #endif
 
-#define NO_draw_pi_scanline
-void Scan16::draw_pi_scanline (void *_dest, int len, long *zbuff, long uu, long duu,
+#define NO_draw_pi_scanline_tex_zuse
+void csScan_16_draw_pi_scanline_tex_zuse (void *_dest, int len, long *zbuff, long uu, long duu,
   long vv, long dvv, long z, long dz, unsigned char *srcTex, int shifter)
 {
   if (len <= 0)
@@ -537,19 +512,5 @@ label1:
 		mov		ebp,oldEBP
 	}
 }
-
-#ifdef DO_MMX
-
-//Okay Please check over my changes! This was done very late at night!
-
-#define NO_mmx_draw_pi_scanline
-void Scan16::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  // not implemented
-  abort ();
-}
-
-#endif // DO_MMX
 
 #endif // __SCANLN16_H__

@@ -139,22 +139,22 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov,  int color);
  
   /// Start DrawPolygonQuick drawing.
-  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouroud) { return S_OK; }
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud) { return S_OK; }
 
   /// Finish DrawPolygonQuick drawing.
   STDMETHODIMP FinishPolygonQuick () { return S_OK; }
 
   /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);

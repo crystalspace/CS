@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef GRAPH3D_H
-#define GRAPH3D_H
+#ifndef __SOFT_G3D_H__
+#define __SOFT_G3D_H__
 
 // GRAPH3D.H
 // csGraphics3DSoftware software rasterizer class.
@@ -27,8 +27,10 @@
 
 #include "cscom/com.h"
 #include "iconfig.h"
+#include "igraph2d.h"
 #include "igraph3d.h"
 #include "ihalo.h"
+#include "scan.h"
 
 #if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
 #  undef DO_MMX
@@ -94,7 +96,7 @@ private:
   long dbg_max_polygons_to_draw;
   /// For debugging: the current polygon number.
   long dbg_current_polygon;
-  
+
   /// Z Buffer mode to use while rendering next polygon.
   ZBufMode z_buf_mode;
 
@@ -109,22 +111,44 @@ private:
   int width2;
   /// Opt: height divided by 2.
   int height2;
+  /// The pixel format of display
+  csPixelFormat pfmt;
+#if defined (DO_MMX)
+  /// True if CPU has MMX instructions.
+  bool cpu_mmx;
+  /// True if 3D rendering should use MMX if available.
+  bool do_mmx;
+#endif
 
-  /**
-   * DAN: render-states
-   * these override any other variable settings.
-   */
+  /// Do we want dithering? (dummy for now)
   bool rstate_dither;
+  /// Do we want specular lighting? (dummy for now)
   bool rstate_specular;
-  bool rstate_bilinearmap;
-  bool rstate_trilinearmap;
+  /// Do we want Gouraud Shaded polygons?
   bool rstate_gouraud;
-  bool rstate_alphablend;
+  /// Do we want mipmaps?
   int rstate_mipmap;
+  /// Do we want visible edges (mostly debug)?
   bool rstate_edges;
 
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
+
+  /// draw_scanline_xxx routines
+  csDrawScanline ScanProc [0x14];
+  /// draw_pi_scanline_xxx routines
+  csDrawPIScanline ScanProcPI [4];
+  /// draw_pi_scanline_gouraud_xxx routines
+  csDrawPIScanlineGouraud ScanProcPIG [4];
+  /// The routine for getting the address of needed scanline_xxx_alpha
+  csDrawScanline (*ScanProc_Alpha) (csGraphics3DSoftware *This, int alpha);
+
+  /// ScanProc_Alpha for 8 bpp modes
+  static csDrawScanline ScanProc_8_Alpha (csGraphics3DSoftware *This, int alpha);
+  /// ScanProc_Alpha for 16 bpp modes
+  static csDrawScanline ScanProc_16_Alpha (csGraphics3DSoftware *This, int alpha);
+  /// ScanProc_Alpha for 32 bpp modes
+  static csDrawScanline ScanProc_32_Alpha (csGraphics3DSoftware *This, int alpha);
 
   G3D_FOGMETHOD fogMode;
 
@@ -138,13 +162,6 @@ private:
   HRESULT DrawPolygonFlat (G3DPolygonDPF& poly);
 
 public:
-#if defined (DO_MMX)
-  /// True if CPU has MMX instructions.
-  bool cpu_mmx;
-#endif
-  /// True if 3D rendering should use MMX if available.
-  bool do_mmx;
-
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DSoftware is in charge of creating and managing this.
@@ -157,7 +174,7 @@ public:
   /// The texture cache.
   TextureCache* tcache;
 
-  /// The System interface. 
+  /// The System interface.
   ISystem* m_piSystem;
 
   /// Option variable: do texture lighting?
@@ -195,6 +212,9 @@ public:
   csGraphics3DSoftware (ISystem* piSystem);
   ///
   virtual ~csGraphics3DSoftware ();
+
+  /// Setup scanline drawing routines according to current bpp and setup flags
+  void ScanSetup ();
 
   ///
   STDMETHODIMP Initialize ();
@@ -269,22 +289,22 @@ public:
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
 
   /// Start drawing.
-  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouroud);
+  STDMETHODIMP StartPolygonQuick (ITextureHandle* handle, bool gouraud);
 
   /// Finish drawing.
   STDMETHODIMP FinishPolygonQuick ();
 
   /// Draw a projected polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Start a series of DrawPolygonFX
-  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud);
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud);
 
   /// Finish a series of DrawPolygonFX
   STDMETHODIMP FinishPolygonFX();
 
   /// Draw a polygon with special effects.
-  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouraud);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
   STDMETHODIMP CacheTexture (IPolygonTexture* texture);
@@ -362,7 +382,7 @@ public:
   /// Destroy the halo.
   STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
 
-  /// Draw the halo given a center point and an intensity. 
+  /// Draw the halo given a center point and an intensity.
   STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
 
   /// Test to see if a halo would be visible (but don't attempt to draw it)
@@ -376,7 +396,7 @@ public:
   };
 
   /// Actually draws a halo the the screen.
-  class csHaloDrawer 
+  class csHaloDrawer
   {
   public:
     ///
@@ -386,7 +406,7 @@ public:
 
     unsigned short* GetBuffer() { return mpBuffer; }
     unsigned char* GetAlphaBuffer() { return mpAlphaBuffer; }
-    
+
   private:
 
     /// the width and height of the graphics context
@@ -440,6 +460,4 @@ class csGraphics3DSoftwareFactory : public IGraphicsContextFactory
     DECLARE_INTERFACE_TABLE( csGraphics3DSoftwareFactory )
 };
 
-
-#endif
-
+#endif // __SOFT_G3D_H__

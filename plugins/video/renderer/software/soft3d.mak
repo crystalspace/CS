@@ -45,7 +45,11 @@ DESCRIPTION.$(SOFT3D) = $(DESCRIPTION.soft)
 SRC.SOFT3D = $(wildcard libs/cs3d/software/*.cpp) \
   libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
   libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp
-OBJ.SOFT3D = $(addprefix $(OUT),$(notdir $(SRC.SOFT3D:.cpp=$O)))
+ifeq ($(USE_NASM),yes)
+SRC.SOFT3D += $(wildcard libs/cs3d/software/i386/*.asm)
+endif
+OBJ.SOFT3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.SOFT3D:.cpp=$O))))
+NASMFLAGS.SOFT3D = -i./libs/cs3d/software/i386/
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -63,7 +67,10 @@ soft: $(OUTDIRS) $(SOFT3D)
 
 $(OUT)%$O: libs/cs3d/software/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
- 
+
+$(OUT)%$O: libs/cs3d/software/i386/%.asm
+	$(DO.COMPILE.ASM) $(NASMFLAGS.SOFT3D)
+
 $(SOFT3D): $(OBJ.SOFT3D) $(DEP.SOFT3D)
 	$(DO.LIBRARY)
 

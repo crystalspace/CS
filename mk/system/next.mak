@@ -3,7 +3,6 @@
 
 # Loadable modules not currently supported.
 override USE_DLL=no
-override MAKE_DLL=no
 
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/next2d cs3d/software csnetdrv/null csnetdrv/sockets \
@@ -172,6 +171,9 @@ SYS_SED_DEPEND=
 # support in your X server because Crystal Space will autodetect
 # the availability of XSHM.
 DO_SHM=no
+
+# We don't need separate directories for dynamic libraries
+OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 

@@ -245,16 +245,16 @@ public:
   bool dynamic;
 
   /**
-   * If only gouroud shading should be updated then this flag is true.
+   * If only gouraud shading should be updated then this flag is true.
    */
-  bool gouroud_only;
+  bool gouraud_only;
 
   /**
-   * If 'true' then the gouroud vertices need to be initialized (set to
+   * If 'true' then the gouraud vertices need to be initialized (set to
    * black) first. Only the parent PolygonSet of a polygon can know this
    * because it is calculated using the current_light_frame_number.
    */
-  bool gouroud_color_reset;
+  bool gouraud_color_reset;
 
   /**
    * The frustrum for the light. Everthing that falls in this frustrum

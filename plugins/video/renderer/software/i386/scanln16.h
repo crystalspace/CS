@@ -1,4 +1,6 @@
 /*
+    OUTDATED: to be removed after NASM routines are debugged - A.Z.
+
     Crystal Space 16-bit software driver assembler-optimized routines
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributors:
@@ -24,7 +26,7 @@
 #define __SCANLN16_H__
 
 #if defined (DO_MMX)
-#  include "cs3d/software/i386/mmx.h"
+#  include "mmx.h"
 #endif
 
 #define I386_SCANLINE_MAP16 \
@@ -152,8 +154,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_map
-#define SCANFUNC draw_scanline_map
+#define NO_draw_scanline_map_zfil
+#define SCANFUNC csScan_16_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
@@ -169,8 +171,8 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define NO_draw_scanline_z_buf_map
-#define SCANFUNC draw_scanline_z_buf_map
+#define NO_draw_scanline_map_zuse
+#define SCANFUNC csScan_16_draw_scanline_map_zuse
 #define SCANMAP 1
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
@@ -334,7 +336,7 @@
 9:		movl	%4, %%ebp		# restore EBP"		\
     : "=D" (_dest) 							\
     : "m" (duFrac), "m" (dvFrac), "m" (_destend), "m" (oldEBP),		\
-      "m" (dudvInt[2]), "m" (xx), "m" (Scan::alpha_mask)		\
+      "m" (dudvInt[2]), "m" (xx), "m" (Scan.AlphaMask)			\
     : "%edx");								\
     uu = uu1;								\
     vv = vv1;
@@ -344,7 +346,7 @@
 #undef SCANLOOP
 #undef SCANMAP
 #define NO_draw_scanline_map_alpha50
-#define SCANFUNC draw_scanline_map_alpha50
+#define SCANFUNC csScan_16_draw_scanline_map_alpha50
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "cs3d/software/scanln16.inc"
@@ -355,35 +357,36 @@
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC mmx_draw_scanline_map
+#define NO_mmx_draw_scanline_map_zfil
+#define SCANFUNC csScan_16_mmx_draw_scanline_map_zfil
 #define SCANMAP 1
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln16.inc"
-#define NO_mmx_draw_scanline_map
 
 #undef SCANFUNC
 #undef SCANEND
 #undef SCANLOOP
 #undef SCANMAP
-#define SCANFUNC mmx_draw_scanline
+#define NO_mmx_draw_scanline_tex_zfil
+#define SCANFUNC csScan_16_mmx_draw_scanline_tex_zfil
 #define SCANLOOP \
     do									\
     {									\
-      *_dest++ = pal_table[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];\
+      *_dest++ = Scan.PaletteTable[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];\
       uu += duu;							\
       vv += dvv;							\
     }									\
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln16.inc"
-#define NO_mmx_draw_scanline
 
 #endif
 
-#define NO_draw_pi_scanline
-void Scan16::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
+#define NO_draw_pi_scanline_tex_zuse
+void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
+  unsigned long *zbuff, long u, long du, long v, long dv,
+  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
 {
   if (len <= 0)
     return;
@@ -429,22 +432,8 @@ void Scan16::draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du
 		movl	%4, %%ebp"
   : "=D" (dest)
   : "m" (duFrac), "m" (dvFrac), "m" (destend), "m" (oldEBP),
-    "m" (dudvInt[1]), "m" (dz), "m" (zbuff), "m" (pal_table)
+    "m" (dudvInt[1]), "m" (dz), "m" (zbuff), "m" (Scan.PaletteTable)
   : "eax", "%ebx", "ecx", "edx", "esi", "edi" );
 }
-
-#ifdef DO_MMX
-
-#define NO_mmx_draw_pi_scanline
-void Scan16::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  // not implemented
-  abort ();
-  (void)dest; (void)len; (void)zbuff; (void)u; (void)du; (void)v; (void)dv;
-  (void)z; (void)dz; (void)bitmap; (void)bitmap_log2w;
-}
-
-#endif // DO_MMX
 
 #endif // __SCANLN16_H__

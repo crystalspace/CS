@@ -1124,7 +1124,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 }
 
 /// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly)
 {
   //  HighColorCacheAndManage_Data* tcache=NULL;
   HighColorCache_Data* tcache=NULL;
@@ -1153,7 +1153,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool go
       verts[i].y = y + SNAP;
       x-=m_nHalfWidth;
       y-=m_nHalfHeight;
-      if(gouroud)
+      if(gouraud)
       {
         verts[i].r = poly.vertices[i].r*255;
         verts[i].g = poly.vertices[i].g*255;
@@ -1199,10 +1199,10 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool go
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
-  return StartPolygonQuick(handle, gouroud);
+  return StartPolygonQuick(handle, gouraud);
 }
 
 STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
@@ -1211,7 +1211,7 @@ STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
   return FinishPolygonQuick();
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouroud)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouraud)
 {
   //This implementation is pretty wrong, but at least, it will show something on the screen
   G3DPolygonDPQ newpoly;
@@ -1222,7 +1222,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouro
   newpoly.num        = poly.num;
   newpoly.inv_aspect = poly.inv_aspect;
   newpoly.txt_handle = poly.txt_handle;
-  return DrawPolygonQuick(newpoly, gouroud);
+  return DrawPolygonQuick(newpoly);
 }
 
 /// Give a texture to csGraphics3D to cache it.
