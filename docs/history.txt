@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+12-Jun-2002
+	- Enabled stencil again in opengl.cfg. For some reason it
+	  was disabled.
 10-Jun-2002
 	- Added an entry to the faq.
 9-Jun-2002
