@@ -128,28 +128,29 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       i2 = bt->vertex (tv0, &p2);
       i3 = bt->vertex (tv1, &p3);
 
+      // DDG vectors work with negative Z pointing forwards.
       float iz;
       float pz[3];
       csVector2 triangle[3];
-      if (p1.v[2] < SMALL_Z) continue;
-      pz[0] = 1 / p1.v[2];
+      if (p1.v[2] > SMALL_Z) goto not_vis;
+      pz[0] = 1 / -p1.v[2];
       iz = rview.aspect * pz[0];
       triangle[0].x = p1.v[0] * iz + rview.shift_x;
       triangle[0].y = p1.v[1] * iz + rview.shift_x;
-      if (p2.v[2] < SMALL_Z) continue;
-      pz[1] = 1 / p2.v[2];
+      if (p2.v[2] > SMALL_Z) goto not_vis;
+      pz[1] = 1 / -p2.v[2];
       iz = rview.aspect * pz[1];
       triangle[1].x = p2.v[0] * iz + rview.shift_x;
       triangle[1].y = p2.v[1] * iz + rview.shift_x;
-      if (p3.v[2] < SMALL_Z) continue;
-      pz[2] = 1 / p3.v[2];
+      if (p3.v[2] > SMALL_Z) goto not_vis;
+      pz[2] = 1 / -p3.v[2];
       iz = rview.aspect * pz[2];
       triangle[2].x = p3.v[0] * iz + rview.shift_x;
       triangle[2].y = p3.v[1] * iz + rview.shift_x;
 
       csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
       int rescount;
-      if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+      if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) goto not_vis;
 
       poly.vertices[0].z = pz[0];
       poly.vertices[0].u = 0;
@@ -177,6 +178,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       rview.g3d->DrawPolygonFX (poly);
     }
 
+    not_vis:
     mesh->qsi ()->next ();
   }
 
