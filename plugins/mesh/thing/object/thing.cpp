@@ -2215,6 +2215,7 @@ void PolyMeshHelper::SetThing (csThingStatic* thing)
 {
   PolyMeshHelper::thing = thing;
   static_data_nr = thing->GetStaticDataNumber ()-1;
+  num_poly = -1;
 }
 
 void PolyMeshHelper::Setup ()
@@ -2226,7 +2227,7 @@ void PolyMeshHelper::Setup ()
     ForceCleanup ();
   }
 
-  if (polygons)
+  if (polygons || num_poly == 0)
   {
     // Already set up. First we check if the object vertex array
     // is still valid.
@@ -2272,7 +2273,7 @@ void PolyMeshHelper::Setup ()
   csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
   	thing->thing_type->object_reg);
   PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
-  timer->AddTimerEvent (te, 10000);
+  timer->AddTimerEvent (te, 9000+(rand ()%2000));
   te->DecRef ();
 }
 
@@ -2285,7 +2286,7 @@ void PolyMeshHelper::Unlock ()
     csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
   	thing->thing_type->object_reg);
     PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
-    timer->AddTimerEvent (te, 1000);
+    timer->AddTimerEvent (te, 9000+(rand ()%2000));
     te->DecRef ();
   }
 }
@@ -2303,6 +2304,7 @@ void PolyMeshHelper::ForceCleanup ()
   vertices = 0;
   delete[] triangles;
   triangles = 0;
+  num_poly = -1;
 }
 
 //-------------------------------------------------------------------------

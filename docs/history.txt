@@ -30,6 +30,12 @@ chronological order.
 	  to not appear from time to time.
 	- Jorrit changed portal container so that it implements iShadowReceiver.
 	  This fixes lighting for the new portals.
+	- Jorrit fixed a bug with thing and polygon meshes. If a polygon mesh
+	  didn't have any polygons in it then the polygon mesh would be
+	  setup and cleaned all the time causing performance degradation.
+	- Jorrit added a random value to the pause between setup of polygon
+	  mesh and cleanup (in thing plugin). That way the load of cleaning
+	  up all polygon meshes will be spread in time.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the
