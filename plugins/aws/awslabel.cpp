@@ -91,6 +91,27 @@ bool awsLabel::SetProperty (char *name, void *parm)
   return false;
 }
 
+csRect awsLabel::getPreferredSize ()
+{
+  return getMinimumSize ();
+}
+
+csRect awsLabel::getMinimumSize ()
+{
+  int tw = 0, th = 0;
+
+  if (caption)
+  {
+    // Get the size of the text
+    WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+        caption->GetData (),
+        tw,
+        th);
+  }
+
+  return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
+}
+
 void awsLabel::OnDraw (csRect clip)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
