@@ -959,14 +959,16 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-	UInt mm = ParseMixmode (reporter, params);
-	if (mm == (UInt)~0)
-	{
-	  if (spr3dLook) spr3dLook->DecRef ();
-	  mesh->DecRef ();
-	  return NULL;
+        {
+	  UInt mm = ParseMixmode (reporter, params);
+	  if (mm == (UInt)~0)
+	  {
+	    if (spr3dLook) spr3dLook->DecRef ();
+	    mesh->DecRef ();
+	    return NULL;
+	  }
+          spr3dLook->SetMixMode (mm);
 	}
-        spr3dLook->SetMixMode (mm);
 	break;
       case CS_TOKEN_APPLY_MOTION:
 	{
