@@ -36,8 +36,7 @@ csSoundSourceSoftware::csSoundSourceSoftware(iBase *piBase, bool snd3d,
   CONSTRUCT_IBASE(piBase);
 
   SoundRender=srdr;
-  UserFrequencyFactor=1;
-  InternalFrequencyFactor=sndData->GetFormat()->Freq/srdr->getFrequency();
+  FrequencyFactor=1;
   Volume=1.0;
   Sound3d=snd3d;
   Position=csVector3(0,0,0);
@@ -80,11 +79,11 @@ float csSoundSourceSoftware::GetVolume() {
 }
 
 void csSoundSourceSoftware::SetFrequencyFactor(float factor) {
-  UserFrequencyFactor = factor;
+  FrequencyFactor = factor;
 }
 
 float csSoundSourceSoftware::GetFrequencyFactor() {
-  return UserFrequencyFactor;
+  return FrequencyFactor;
 }
 
 bool csSoundSourceSoftware::Is3d() {
@@ -109,7 +108,7 @@ csVector3 csSoundSourceSoftware::GetVelocity() {
 
 void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
   // frequency
-  CalcFreqFactor=UserFrequencyFactor*InternalFrequencyFactor;
+  CalcFreqFactor=FrequencyFactor;
 
   // volume
   CalcVolL=CalcVolR=Volume/VolDiv;

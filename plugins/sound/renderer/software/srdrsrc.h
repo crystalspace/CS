@@ -64,9 +64,7 @@ private:
     // pointer to the sound renderer
     csSoundRenderSoftware *SoundRender;
     // frequency factor - a factor of 1 plays the sound in its original frequency
-    // The internal factor is calculated to handle the case that the sound is stored
-    // in a different frequency than the renderer needs.
-	float UserFrequencyFactor, InternalFrequencyFactor;
+	float FrequencyFactor;
     // volume
 	float Volume;
     // is this a 3d source?
