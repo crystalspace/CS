@@ -12,6 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Jan-2000
+	- Andrew Zabolotny has CVS write access again! :-)
+	- He also fixed the change that Jorrit made with regards
+	  to SetName in csObject.
+	- Norman Kramer removed the test for important colors in 256-color
+	  bitmaps (BMP loading).
 8-Jan-2000
 	- Michael Dale Long added support for configurable colors using
 	  the iTextureManager to iConsole.  He also removed all dependencies
