@@ -62,6 +62,7 @@ The history order is reversed so that new features are at the top.
 	      draw
 	- Eric Sunshine fixed problems where csArray<T>::Pop() and Top() were
 	  accessing the non-existent `Length' instance variable.
+	- Norman Kraemer added an Autoconf macro to check program versions.
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
