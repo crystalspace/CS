@@ -41,7 +41,8 @@ m4_define([cs_lib_paths_default],
 #==============================================================================
 # INITIALIZATION
 #==============================================================================
-AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
+AC_INIT([crystalspace], [cs_version_number],
+        [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
     [Copyright (C)1998-2004 Jorrit Tyberghein and others],
     [http://crystal.sourceforge.net/])
@@ -2207,6 +2208,10 @@ CS_HEADER_PREPEND(
 #define __CS_VOLATILE_H__
 ])
 
+CS_HEADER_PROPERTY([CS_PACKAGE_NAME],
+    [AS_ESCAPE(["])$PACKAGE_NAME[]AS_ESCAPE(["])])
+CS_HEADER_PROPERTY([CS_PACKAGE_VERSION],
+    [AS_ESCAPE(["])$PACKAGE_VERSION[]AS_ESCAPE(["])])
 CS_HEADER_APPEND(
 [#endif // __CS_VOLATILE_H__
 ])

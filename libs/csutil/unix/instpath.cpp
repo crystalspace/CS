@@ -36,13 +36,13 @@
 #ifdef COMP_GCC
 #warning CS_CONFIGDIR not set
 #endif
-#define CS_CONFIGDIR "/usr/local/crystal"
+#define CS_CONFIGDIR "/usr/local/" CS_PACKAGE_NAME
 #endif
 #ifndef CS_PLUGINDIR
 #ifdef COMP_GCC
 #warning CS_PLUGINDIR not set
 #endif
-#define CS_PLUGINDIR "/usr/local/crystal/lib"
+#define CS_PLUGINDIR "/usr/local/" CS_PACKAGE_NAME "/lib"
 #endif
 
 csString csGetConfigPath ()
@@ -57,7 +57,7 @@ csString csGetConfigPath ()
     csString path, file;
 
     path = crystal;
-    path << "/etc/crystal";
+    path << "/etc/" CS_PACKAGE_NAME;
     file = path;
     file << "/vfs.cfg";
     if (!access(file, F_OK))
@@ -107,7 +107,7 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
   {
     csString libpath1, libpath2;
     libpath1 << crystal << "/lib";
-    libpath2 << libpath1 << "/crystal";
+    libpath2 << libpath1 << "/" CS_PACKAGE_NAME;
     paths->AddOnce(libpath2, DO_SCAN_RECURSION, "plugins");
     paths->AddOnce(libpath1, DO_SCAN_RECURSION, "plugins");
     paths->AddOnce(crystal,  DO_SCAN_RECURSION, "plugins");

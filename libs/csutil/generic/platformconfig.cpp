@@ -16,8 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/** This file implements a platform sepcific user configration which tries to
- * create the config files in $HOME/.crystal which is apporpriate for most
+/**
+ * This file implements a platform sepcific user configration which tries to
+ * create the config files in $HOME/.crystalspace which is apporpriate for most
  * posixish systems.
  */
 #include <sys/stat.h>
@@ -64,7 +65,7 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* key)
   
   // Construct directory and filename of the config file
   csString dir, fname;
-  dir << home << PATH_SEPARATOR << ".crystal";
+  dir << home << PATH_SEPARATOR << "." CS_PACKAGE_NAME;
   fname << dir << PATH_SEPARATOR << key << ".cfg";
 
   // Try to create the directory (we assume that $HOME is already created)

@@ -9,6 +9,27 @@ chronological order.
 8-Jul-2004
 	- Jorrit fixed a compile error in the NR GL renderer.
 	- Jorrit fixed a compile error in partgen.
+        - Matze changed some jam/configure things:
+            - Install documentation in
+              $datadir/doc/$PACKAGE_NAME-$PACKAGE_VERSION.
+            - Change PACKAGE_NAME from crystal to crystalspace.
+        - Eric Sunshine fixed a bunch of fall-out from Matze's change which
+          resulted Crystal Space being unable to find its installation
+          directory or any of its installed resources.
+            - configure.ac now emits CS_PACKAGE_NAME and CS_PACKAGE_VERSION to
+              volatile.h.
+            - Platform-specific code which attempts to determine the
+              installation location now utilizes CS_PACKAGE_NAME rather than
+              the hard-coded string "crystal".
+        - Eric Sunshine made the following changes to avoid naming conflicts
+          with other packages which have "Crystal" in their names:
+            - Windows: Now searches for installed Crystal Space at
+              "Program Files\CrystalSpace" rather than
+              "Program Files\Crystal".
+            - Unix: User defaults are now stored at $HOME/.crystalspace rather
+              than $HOME/.crystal.
+            - Unix: Plugin meta-information is now stored in BFD section
+              ".crystalspace" rather than ".crystal".
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d
