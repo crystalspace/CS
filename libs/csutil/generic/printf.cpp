@@ -26,7 +26,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 
-// Replacement for csPrintf(); exact same prototype/functionality as csPrintf()
+// Replacement for printf(); exact same prototype/functionality as printf()
 int csPrintf (char const* str, ...)
 {
   va_list args;
@@ -141,7 +141,7 @@ static int csFPutStr (FILE* file, const char* str)
   return ret;
 }
 
-// Replacement for csPrintfV()
+// Replacement for vprintf()
 int csPrintfV(char const* str, va_list args)
 {
   csString temp;
