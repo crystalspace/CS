@@ -44,6 +44,9 @@ endif
 ifneq ($(OS),NEXT)
 PTHREAD=-lpthread
 endif
+ifeq ($(OS), BSD)
+PTHREAD=-pthread
+endif
 
 ifneq (,$(strip $(PYTHON_INC)))
   CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
