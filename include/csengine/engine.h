@@ -25,6 +25,7 @@
 #include "csutil/garray.h"
 #include "csutil/ptrarr.h"
 #include "csutil/refarr.h"
+#include "csutil/hashmap.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
@@ -364,6 +365,9 @@ private:
   /// Current render context (proc texture) or NULL if global.
   iTextureHandle* render_context;
 
+  /// Array of objects that want to die next frame (iMeshWrapper*).
+  csHashSet want_to_die;
+
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   //csRadiosity* rad_debug;
 
@@ -653,6 +657,7 @@ public:
   
   virtual csPtr<iFrustumView> CreateFrustumView ();
   virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
+  virtual void WantToDie (iMeshWrapper* mesh);
 
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 
@@ -819,6 +824,10 @@ public:
   virtual long GetAlphaRenderPriority () const { return render_priority_alpha; }
   /// Clear all render priorities.
   virtual void ClearRenderPriorities ();
+  /// Get the number of render priorities.
+  virtual int GetRenderPriorityCount () const;
+  /// Get the name of the render priority.
+  virtual const char* GetRenderPriorityName (long priority) const;
 
   iMeshObjectType* GetThingType ();
 
@@ -924,7 +933,7 @@ public:
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by ID.
-  virtual iStatLight* FindLight (unsigned long light_id) const;
+  virtual iStatLight* FindLightID (const char* light_id) const;
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const;

@@ -384,11 +384,6 @@ struct iMeshWrapper : public iBase
    */
   virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
 #endif
-
-  /**
-   * Returns true if the object wants to die.
-   */
-  virtual bool WantToDie () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);

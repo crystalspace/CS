@@ -328,7 +328,7 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   CS_ASSERT(!m.mesh.buffers[0]->IsLocked ());
   vbufmgr->LockBuffer(m.mesh.buffers[0],
     m.vertices.GetArray(), m.texels.GetArray(), m.colors.GetArray(), 
-    m.vertices.Length(), 0);
+    m.vertices.Length(), 0, bbox);
   rview->CalculateFogMesh(camtrans, m.mesh);
   pG3D->DrawTriangleMesh(m.mesh);
   vbufmgr->UnlockBuffer (m.mesh.buffers[0]);
@@ -1899,7 +1899,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 		block.mesh_texels[lod],
 		block.mesh_colors[lod],
 		block.num_mesh_vertices[lod],
-		0);
+		0, global_bbox);
 	rview->CalculateFogMesh (camtrans, *m);
         pG3D->DrawTriangleMesh (*m);
 	vbufmgr->UnlockBuffer (block.vbuf[lod]);

@@ -142,6 +142,8 @@ public:
   virtual bool VisTest (iRenderView* rview);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
+  virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
+    const csVector3& start, const csVector3& end);
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
     iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);

@@ -517,7 +517,6 @@ public:
   }
 
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }
-  virtual bool WantToDie () const { return false; }
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

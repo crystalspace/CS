@@ -62,7 +62,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;
-  to_delete = false;
   // defaults
   change_size = false;
   change_color = false;
@@ -85,6 +84,8 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   shapenr = 0;
   current_lod = 1;
   current_features = 0;
+  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = eng;	// We don't want to keep a reference.
 }
 
 csParticleSystem::~csParticleSystem()
@@ -215,7 +216,12 @@ void csParticleSystem::Update (csTicks elapsed_time)
   {
     if (elapsed_time >= time_to_live)
     {
-      to_delete = true;
+      if (engine)
+      {
+        csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+	if (m)
+          engine->WantToDie (m);
+      }
       time_to_live = 0;
       /// and a calling virtual function can process without crashing
       return;

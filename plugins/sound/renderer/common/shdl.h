@@ -27,7 +27,7 @@ class csSoundHandle : public iSoundHandle
 public:
   SCF_DECLARE_IBASE;
   // the sound data for this handle
-  iSoundData *Data;
+  csRef<iSoundData> Data;
   // is this sound registered?
   bool Registered;
   // This is a streamed sound and the stream is started
@@ -36,7 +36,7 @@ public:
   bool LoopStream;
 
   // constructor
-  csSoundHandle(iSoundData *);
+  csSoundHandle(csRef<iSoundData>);
   // destructor
   virtual ~csSoundHandle();
   // release the sound data

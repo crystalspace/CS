@@ -62,7 +62,7 @@ struct iVisibilityObjectIterator : public iBase
   virtual bool IsFinished () const = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 2, 0);
+SCF_VERSION (iVisibilityCuller, 0, 3, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -107,6 +107,13 @@ struct iVisibilityCuller : public iBase
    * sphere.
    */
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere) = 0;
+
+  /**
+   * Intersect a segment with all objects in the visibility culler and
+   * return them all in an iterator.
+   */
+  virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
+    const csVector3& start, const csVector3& end) = 0;
 
   /**
    * Intersect a beam using this culler and return the intersection

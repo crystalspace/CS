@@ -388,6 +388,7 @@ public:
 /**
  * Set ambient light operation.
  */
+static iEngineSequenceManager* debug_eseqmgr;//@@@@@@@@@@@@@@@@@@@@@@@@@@
 class OpSetAmbientLight : public OpStandard
 {
 private:
@@ -409,7 +410,7 @@ public:
     }
   }
 
-  virtual void Do (csTicks /*dt*/, iBase* params)
+  virtual void Do (csTicks dt, iBase* params)
   {
     sector->SetDynamicAmbientLight (colorvar?colorvar->GetColor():color);
   }
@@ -1674,6 +1675,7 @@ csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
   scfiEventHandler = NULL;
   object_reg = NULL;
   global_framenr = 1;
+debug_eseqmgr = this;//@@@@@@@@@@@@@
 }
 
 csEngineSequenceManager::~csEngineSequenceManager ()
@@ -1714,12 +1716,14 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 
 bool csEngineSequenceManager::HandleEvent (iEvent &event)
 {
+  // Engine sequence manager must be post because frame must
+  // be rendered and this must be fired BEFORE sequence manager. @@@ HACKY
   if (event.Type == csevBroadcast
-	&& event.Command.Code == cscmdPreProcess)
+	&& event.Command.Code == cscmdPostProcess)
   {
     global_framenr++;
 
-    csTicks curtime = seqmgr->GetMainTime ();
+    csTicks curtime = seqmgr->GetMainTime () + seqmgr->GetDeltaTime ();
     int i = timed_operations.Length ()-1;
     while (i >= 0)
     {

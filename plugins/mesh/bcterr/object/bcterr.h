@@ -259,7 +259,6 @@ public:
   {
     if (factory_state) factory_state->AddTime (ticks);
   }
-  virtual bool WantToDie () const { return false; }
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

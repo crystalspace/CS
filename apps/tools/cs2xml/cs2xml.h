@@ -130,6 +130,9 @@ public:
   void ParseTriangles (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname);
+  void ParseLen (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname);
   void ParseTexture (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname);

@@ -83,12 +83,6 @@ private:
   csRGBMap real_lm;
 
   /**
-   * A flag indicating whether the lightmaps needs recalculating
-   * for dynamic lights
-   */
-  bool dyn_dirty;
-
-  /**
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
    * These shadowmaps are applied to static_lm to get real_lm.
    */
@@ -164,14 +158,15 @@ public:
   ///
   virtual ~csLightMap ();
 
-  /// set the dirty flag for this lightmap
-  void MakeDirtyDynamicLights () { dyn_dirty = true; mean_recalc = true; }
-
-  /// Rebuilds the lightmap for the poly from all the lightmaps + the ambient light if specified
-  bool UpdateRealLightMap (float dyn_ambient_r=0,
-                           float dyn_ambient_g=0,
-                           float dyn_ambient_b=0, 
-                           bool  amb_dirty=false);
+  /**
+   * Rebuilds the lightmap for the poly from all the lightmaps + the ambient
+   * light if specified.
+   */
+  bool UpdateRealLightMap (float dyn_ambient_r,
+                           float dyn_ambient_g,
+                           float dyn_ambient_b, 
+                           bool amb_dirty,
+                           bool dyn_dirty);
 
   ///
   csRGBMap& GetStaticMap () { return static_lm; }

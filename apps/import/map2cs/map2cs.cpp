@@ -25,12 +25,20 @@
 #include "mapstd.h"
 #include "map.h"
 #include "cworld.h"
-#include "xworld.h"
 #include "wad3file.h"
 #include "csutil/scf.h"
+#include "iutil/plugin.h"
 #include "csutil/cfgfile.h"
+#include "cstool/initapp.h"
+#include "iutil/objreg.h"
+#include "igraphic/imageio.h"
+#include "iutil/comp.h"
 
 CS_IMPLEMENT_APPLICATION
+
+//@@@ yup, global vars are ugly.
+bool IL_Loaded = false;
+iImageIO* ImageLoader = 0;
 
 void PrintSyntax()
 {
@@ -43,12 +51,25 @@ void PrintSyntax()
   printf("             using config data in sample.cfg\n");
 }
 
-int main( int argc, char *argv[ ])
+int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
 {
-  // this is required for the image loader
-  scfInitialize(new csConfigFile("scf.cfg"));
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
-  printf("\nmap2cs version 0.82A, Copyright (C) 2000 by Thomas Hieber\n\n");
+  csRef<iImageIO> il = CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.graphic.image.io.multiplex", iImageIO);
+  if (!il)
+  {
+    printf ("Couldn't load image multiplexer!\n");
+    return 1;
+  }
+  else
+  {
+   ImageLoader = il;
+  }
+
+  printf("\nmap2cs version 0.97, Copyright (C) 1999-2000 by Thomas Hieber\n");
+  printf("                     Copyright (C) 1999-2003 by Jorrit Tyberghein "
+    "and others\n\n");
   printf("map2cs comes with ABSOLUTELY NO WARRANTY; for details see the file 'COPYING'\n");
   printf("This is free software, and you are welcome to redistribute it under certain\n");
   printf("conditions; see `COPYING' for details.\n\n");
@@ -70,11 +91,14 @@ int main( int argc, char *argv[ ])
     const char* crystal = getenv("CRYSTAL");
     if (!crystal)
     {
-      printf ("Couldn't find Crystal Space directory! Set CRYSTAL var!\n");
-      exit(1);
+      printf ("Couldn't find Crystal Space directory (CRYSTAL var)! Using current dir!\n");
+      strcpy (filename, "data/config/map2cs.cfg");
     }
-    strcpy (filename, crystal);
-    strcat (filename, "/data/config/map2cs.cfg");
+    else
+    {
+      strcpy (filename, crystal);
+      strcat (filename, "/data/config/map2cs.cfg");
+    }
     configfile=filename;
   }
   const char* mapfile   = argv[1];
@@ -87,24 +111,23 @@ int main( int argc, char *argv[ ])
   Map.CreatePolygons();
   printf("Writing world '%s'\n", worldfile);
 
-  // if an output file spec begins with xml=something, then output is done via xml
-#ifndef NO_XML_SUPPORT
-  if (!strncmp(worldfile, "xml=", 4)) {
-    printf ("XML format wanted.\n");
-    CXmlWorld World;
-    World.Write(worldfile+4, &Map, mapfile);
-  }
-  else
-#endif
-  {
-    printf ("Standard CS world format wanted.\n");
-    CCSWorld World;
-    World.Write(worldfile, &Map, mapfile);
-  }
+  CCSWorld World;
+  World.Write(worldfile, &Map, mapfile);
 
   printf("done.");
 
-  iSCF::SCF->Finish();
-
   return 0;
+}
+
+int main (int argc, char *argv[])
+{
+  // this is required for the image loader
+  csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
+
+  int ret = appMain (object_reg, argc, argv);
+  
+  csInitializer::DestroyApplication (object_reg);
+
+  return ret;
 }

@@ -19,7 +19,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glosx2d glosx2dclean
-all softcanvas plugins drivers drivers2d: glosx2d
+all openglcanvas plugins drivers drivers2d: glosx2d
 
 glosx2d:
 	$(MAKE_TARGET) MAKE_DLL=yes DO_GLOSX2D=yes

@@ -51,6 +51,7 @@ protected:
 
   csVector3* vertices;
   int num_vertices;
+  csBox3 bbox;
 
 public:
   ///
@@ -83,6 +84,7 @@ public:
   virtual void Clear ();
   //Does nothing as default
   virtual void MarkLightmapsDirty();
+  virtual const csBox3& GetBoundingBox () const { return bbox; }
 };
 
 /**

@@ -20,10 +20,12 @@
 #include "cssys/sysfunc.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
+#include "ivaria/bugplug.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
+#include "csgeom/csrect.h"
 #include "tcovbuf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -215,7 +217,6 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
 	CS_ASSERT (op.y2 >= 0);
 	CS_ASSERT (op.y2 <= 63);
 	int y1, y2;
-	// @@@ DO WE REALLY HAVE TO SWAP HERE??? I DON'T THINK SO!
 	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
 	else { y1 = op.y2; y2 = op.y1; }
 	const csBits64& start = precalc_start_lines[y2];
@@ -409,6 +410,9 @@ bool csCoverageTile::TestFullRect (float testdepth)
 
 bool csCoverageTile::TestRect (int start, int end, float testdepth)
 {
+  // Tile is still empty.
+  if (queue_tile_empty) return true;
+
   // If the depth of this rectangle is smaller than the minimum depth
   // of this tile then this rectangle is automatically visible.
   if (testdepth <= tile_min_depth) return true;
@@ -476,6 +480,9 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
 bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   	float testdepth)
 {
+  // Tile is still empty.
+  if (queue_tile_empty) return true;
+
   // If the depth of this rectangle is smaller than the minimum depth
   // of this tile then this rectangle is automatically visible.
   if (testdepth <= tile_min_depth) return true;
@@ -544,6 +551,9 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
 {
   CS_ASSERT (x >= 0 && x < 32);
   CS_ASSERT (y >= 0 && y < 64);
+
+  // If tile is still empty we are visible.
+  if (queue_tile_empty) return true;
 
   // First check for depth.
   int xd = x >> 3;	// Depth x coordinate.
@@ -673,6 +683,7 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   tiles = NULL;
   dirty_left = NULL;
   dirty_right = NULL;
+  bugplug = NULL;
 
   Setup (w, h);
 }
@@ -726,10 +737,9 @@ void csTiledCoverageBuffer::Initialize ()
 void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	int yfurther)
 {
-//printf ("draw line %d,%d - %d,%d (yfurther=%d)\n", x1, y1, x2, y2, yfurther);
   y2 += yfurther;
 
-  if (y2 < 0 || y1 >= height)
+  if (y2 <= 0 || y1 >= height)
   {
     //------
     // Totally outside screen vertically.
@@ -739,7 +749,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   if (x1 <= 0 && x2 <= 0)
   {
-//printf ("  CLAMP\n");
     //------
     // Totally on the left side. Just clamp.
     //------
@@ -756,7 +765,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
     if (tile_y1 == tile_y2)
     {
-//printf ("    ONE TILE\n");
       //------
       // All is contained in one tile.
       //------
@@ -765,7 +773,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     }
     else
     {
-//printf ("    MULTIPLE TILES\n");
       //------
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
@@ -787,7 +794,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
   else if (x1 >= width && x2 >= width)
   {
-//printf ("  DROP\n");
     //------
     // Lines on the far right can just be dropped since they
     // will have no effect on the coverage buffer.
@@ -809,7 +815,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
   else if (x1 == x2)
   {
-//printf ("  FULLY VERTICAL\n");
     //------
     // If line is fully vertical we also have a special case that
     // is easier to resolve.
@@ -829,7 +834,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     csCoverageTile* tile = GetTile (tile_x, tile_y1);
     if (tile_y1 == tile_y2)
     {
-//printf ("    ONE TILE\n");
       //------
       // All is contained in one tile.
       //------
@@ -838,7 +842,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     }
     else
     {
-//printf ("    MULTIPLE TILES\n");
       //------
       // Multiple tiles. First do first tile, then intermediate tiles,
       // and finally the last tile.
@@ -861,85 +864,205 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   //------
   // We don't have any of the trivial vertical cases.
-  // So we must clip vertically first.
+  // So we must clip first.
   //------
-  if (y1 < 0)
+  int old_x1 = x1;
+  int old_x2 = x2;
+  int old_y1 = y1;
+  int old_y2 = y2;
+  csRect r (0, 0, width-1, height-1-yfurther);
+  y2 -= yfurther;
+  bool outside = !r.ClipLineSafe (x1, y1, x2, y2);
+
+  // @@@ Is the below good?
+  if (!outside && y1 == y2) return;  // Return if clipping results in one pixel.
+  y2 += yfurther;
+
+  if (outside)
   {
-    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-yfurther-y1);
-    y1 = 0;
-  }
-  if (y2 >= height)
-  {
-    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-yfurther-y1);
-    y2 = height-1;
-    yfurther = 0;
-  }
-//printf ("  GENERAL CASE after clip: %d,%d - %d,%d\n", x1, y1, x2, y2);
-  if (y1 == y2) return;	// Return if clipping results in one pixel.
-
-  // After clipping we have to check x1,x2 constraints again.
-  if (x1 >= width && x2 >= width)
-  {
-    //------
-    // Lines on the far right can just be dropped since they
-    // will have no effect on the coverage buffer.
-    // However we must mark the right most tiles as dirty.
-    //------
-
-    // First calculate tile coordinates of x1,y1 and x2,y2.
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
-    int t;
-    for (t = tile_y1 ; t <= tile_y2 ; t++)
-      MarkTileDirty (width_po2 >> 5, t);
-    return;
-  }
-
-  if (x1 <= 0 && x2 <= 0)
-  {
-    //------
-    // Totally on the left side. Just clamp.
-    //------
-
-    // First calculate tile coordinates of x1,y1 and x2,y2.
-    int tile_y1 = y1 >> 6;
-    int tile_y2 = (y2-1) >> 6;
-    csCoverageTile* tile = GetTile (0, tile_y1);
-
-    if (tile_y1 == tile_y2)
+    // We know the line is fully outside. Now we have to discover if the
+    // line is on the left or the right of the screen.
+    // First restore old coordinates because ClipLineSafe may have
+    // partially modified them.
+    bool right_side;
+    x1 = old_x1;
+    x2 = old_x2;
+    y1 = old_y1;
+    y2 = old_y2;
+    if (x1 < width && x2 < width)
     {
-//printf ("    ONE TILE\n");
-      //------
-      // All is contained in one tile.
-      //------
-      tile->PushVLine (0, y1 & 63, (y2-1) & 63);
-      MarkTileDirty (0, tile_y1);
+      // We're sure the line is fully on the left side.
+      right_side = false;
+    }
+    else if (x1 >= 0 && x2 >= 0)
+    {
+      // We're sure the line is fully on the right side.
+      right_side = true;
     }
     else
     {
-//printf ("    MULTIPLE TILES\n");
-      //------
-      // Multiple tiles. First do first tile, then intermediate tiles,
-      // and finally the last tile.
-      //------
-      tile->PushVLine (0, y1 & 63, 63);
-      MarkTileDirty (0, tile_y1);
-      int t;
-      for (t = tile_y1+1 ; t < tile_y2 ; t++)
-      {
-        tile += width_po2 >> 5;
-        tile->PushFullVLine (0);
-	MarkTileDirty (0, t);
-      }
-      tile += width_po2 >> 5;
-      tile->PushVLine (0, 0, (y2-1) & 63);
-      MarkTileDirty (0, tile_y2);
+      // Most general case. We have to check a bit better.
+      // We will check the x value where y=0 unless y=0 is outside
+      // the line vertically in which case we will use y=y1.
+      int y = 0;
+      if (y1 > y) y = y1;
+      int x = QInt (x1 + float (y-y1) * float (x2 - x1)
+      		/ float (y2-y1));
+      right_side = (x > 0);
     }
-    return;
+
+    // Make sure the y coordinates are clipped.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    // First calculate tile coordinates.
+    int tile_y1 = y1 >> 6;
+    int tile_y2 = (y2-1) >> 6;
+
+    if (right_side)
+    {
+      //------
+      // Lines on the far right can just be dropped since they
+      // will have no effect on the coverage buffer.
+      // However we must mark the right-most tiles as dirty.
+      //------
+      int t;
+      for (t = tile_y1 ; t <= tile_y2 ; t++)
+        MarkTileDirty (width_po2 >> 5, t);
+      return;
+    }
+    else
+    {
+      //------
+      // Totally on the left side. Just clamp.
+      //------
+      csCoverageTile* tile = GetTile (0, tile_y1);
+      if (tile_y1 == tile_y2)
+      {
+        //------
+        // All is contained in one tile.
+        //------
+        tile->PushVLine (0, y1 & 63, (y2-1) & 63);
+        MarkTileDirty (0, tile_y1);
+      }
+      else
+      {
+        //------
+        // Multiple tiles. First do first tile, then intermediate tiles,
+        // and finally the last tile.
+        //------
+        tile->PushVLine (0, y1 & 63, 63);
+        MarkTileDirty (0, tile_y1);
+        int t;
+        for (t = tile_y1+1 ; t < tile_y2 ; t++)
+        {
+          tile += width_po2 >> 5;
+          tile->PushFullVLine (0);
+	  MarkTileDirty (0, t);
+        }
+        tile += width_po2 >> 5;
+        tile->PushVLine (0, 0, (y2-1) & 63);
+        MarkTileDirty (0, tile_y2);
+      }
+      return;
+    }
+  }
+
+  //------
+  // We know that at least part of the line is on screen.
+  // We cannot ignore the part of the line that has been clipped away but 
+  // is still between the top and bottom of the screen. The reason is that
+  // on the left side this must be clamped to 0 and on the right side we
+  // need to mark the right-most tiles as dirty. We will handle this
+  // here before we draw the remainder of the line.
+  //------
+
+  // First clip the old y coordinates to the screen vertically.
+  if (old_y1 < 0) old_y1 = 0;
+  if (old_y2 >= height) old_y2 = height-1;
+
+  if (old_y1 < y1)
+  {
+    if (x1 <= 0)
+    {
+      // We have an initial part that needs to be clamped.
+      int tile_y1 = old_y1 >> 6;
+      int tile_y2 = (y1-1) >> 6;
+      csCoverageTile* tile = GetTile (0, tile_y1);
+      if (tile_y1 == tile_y2)
+      {
+        tile->PushVLine (0, old_y1 & 63, (y1-1) & 63);
+        MarkTileDirty (0, tile_y1);
+      }
+      else
+      {
+        tile->PushVLine (0, old_y1 & 63, 63);
+        MarkTileDirty (0, tile_y1);
+        int t;
+        for (t = tile_y1+1 ; t < tile_y2 ; t++)
+        {
+          tile += width_po2 >> 5;
+	  tile->PushFullVLine (0);
+	  MarkTileDirty (0, t);
+        }
+        tile += width_po2 >> 5;
+        tile->PushVLine (0, 0, (y1-1) & 63);
+        MarkTileDirty (0, tile_y2);
+      }
+    }
+    else if (x1 >= width-1)
+    {
+      // We have an initial part for which we need to mark tiles dirty.
+      int tile_y1 = old_y1 >> 6;
+      int tile_y2 = (y1-1) >> 6;
+      int t;
+      for (t = tile_y1 ; t <= tile_y2 ; t++)
+        MarkTileDirty (width_po2 >> 5, t);
+    }
+  }
+  if (old_y2 > y2)
+  {
+    if (x2 <= 0)
+    {
+      // We have a final part that needs to be clamped.
+      int tile_y1 = y2 >> 6;
+      int tile_y2 = (old_y2-1) >> 6;
+      csCoverageTile* tile = GetTile (0, tile_y1);
+      if (tile_y1 == tile_y2)
+      {
+        tile->PushVLine (0, y2 & 63, (old_y2-1) & 63);
+        MarkTileDirty (0, tile_y1);
+      }
+      else
+      {
+        tile->PushVLine (0, y2 & 63, 63);
+        MarkTileDirty (0, tile_y1);
+        int t;
+        for (t = tile_y1+1 ; t < tile_y2 ; t++)
+        {
+          tile += width_po2 >> 5;
+	  tile->PushFullVLine (0);
+	  MarkTileDirty (0, t);
+        }
+        tile += width_po2 >> 5;
+        tile->PushVLine (0, 0, (old_y2-1) & 63);
+        MarkTileDirty (0, tile_y2);
+      }
+    }
+    else if (x2 >= width-1)
+    {
+      // We have a final part for which we need to mark tiles dirty.
+      int tile_y1 = y2 >> 6;
+      int tile_y2 = (old_y2-1) >> 6;
+      int t;
+      for (t = tile_y1 ; t <= tile_y2 ; t++)
+        MarkTileDirty (width_po2 >> 5, t);
+    }
   }
 
   //------
   // First calculate tile coordinates of x1,y1 and x2,y2.
+  // Now we know that this line segment is fully on screen.
   //------
   int tile_x1 = x1 >> 5;
   int tile_y1 = y1 >> 6;
@@ -947,14 +1070,10 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   int tile_y2 = (y2-1) >> 6;
 
 # define xmask ((32<<16)-1)
+# define ymask ((64<<16)-1)
 
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // WARNING! Here it is still possible that tile_x1 goes too far!!!!
-  // Need to clip on the right and left here!!!!!!!!!!!!!!!!
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   if (tile_x1 == tile_x2 && tile_y1 == tile_y2)
   {
-//printf ("    ONE TILE\n");
     //------
     // Easy case. The line segment is fully inside one tile.
     //------
@@ -970,7 +1089,6 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
   else if (tile_x1 == tile_x2)
   {
-//printf ("    NEARLY VERTICAL\n");
     //------
     // Line is nearly vertical. This means we will stay in the same
     // column of tiles.
@@ -1000,67 +1118,42 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   }
 
   //------
-  // This is the most general case and it is extremely slow.
-  // @@@ NEED A BETTER ALGO HERE!!!
+  // This is the most general case.
+  // @@@ The loops below can be done more efficiently.
   //------
-//printf ("    MOST GENERIC\n");
   int dy = y2-y1;
-
-  int x = x1<<16;
-  int y = y1;
   int dx = ((x2-x1)<<16) / (dy-yfurther);
 
-  //------
-  // First we check if the first part of the line is out of
-  // screen (to the right). If that's the case we first do a small loop to
-  // skip that initial part. @@@ Not efficient!
-  //------
-
-
-
-//@@@@@@@@@@@ There is a bug in the following code (and beyond) which
-// causes quality degration. The reason is that when a line goes beyond
-// the right side the right most tiles (one beyond that actually) should
-// be marked as dirty. The code above handles that correctly but the
-// code below doesn't.
-
-
-
-//if (dy > 0 && x >= (width<<16))printf ("      SKIP CLIP-RIGHT\n");
-  while (dy > 0 && x >= (width<<16))
+  if (tile_y1 == tile_y2)
   {
-    x += dx;
-    y++;
-    dy--;
-  }
+    //------
+    // Line is nearly horizontal. This means we will stay in the same
+    // row of tiles.
+    //------
+    MarkTileDirty (tile_x1, tile_y1);
+    MarkTileDirty (tile_x2, tile_y1);
+    // Calculate the slope of the line.
+    int x = x1<<16;
+    int y = y1;
 
-  if (dy <= 0) return;
-
-  int last_x = x;
-  int last_y = y;
-  int cur_tile_x = x >> (16+5);
-  int cur_tile_y = y >> 6;
-  bool need_to_finish;
-
-  //------
-  // Then we check if there is an initial line segment where x is
-  // out of screen to the left. If that's the case we need to clamp.
-  // @@@ Not efficient!
-  //------
-  if (x <= 0)
-  {
-    need_to_finish = false;
-//if (dy > 0 && x <= 0)printf ("      SKIP CLAMP-LEFT\n");
-    while (dy > 0 && x <= 0)
+    //------
+    // Here is the remainder of the line until we go out screen again.
+    //------
+    bool need_to_finish = dy > 0;
+    int last_x = x;
+    int last_y = y;
+    int cur_tile_x = tile_x1;
+    csCoverageTile* stile = GetTile (tile_x1, tile_y1);
+    while (dy > 0)
     {
-      need_to_finish = true;
-      int tile_y = y >> 6;
-      if (cur_tile_y != tile_y)
+      int tile_x = x >> (16+5);
+      if (cur_tile_x != tile_x)
       {
-        csCoverageTile* tile = GetTile (0, cur_tile_y);
-        tile->PushVLine (0, last_y & 63, (y-1) & 63);
-        MarkTileDirty (0, cur_tile_y);
-        cur_tile_y = tile_y;
+        csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
+        tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
+      	  (y-1) & 63, dx);
+        cur_tile_x = tile_x;
+        last_x = x;
         last_y = y;
       }
 
@@ -1071,43 +1164,31 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
     if (need_to_finish)
     {
-      //int tile_y = (y-1) >> 6;
-      csCoverageTile* tile = GetTile (0, cur_tile_y);
-      tile->PushVLine (0, last_y & 63, (y-1) & 63);
-      MarkTileDirty (0, cur_tile_y);
+      csCoverageTile* tile = stile + (cur_tile_x-tile_x1);
+      tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
+    	  (y-1) & 63, dx);
     }
+    return;
   }
 
-  if (dy <= 0) return;
-
-  //------
-  // At this point we know that:
-  //    x,y is the first point of the line that actually is on screen.
-  //    x is shifted 16 pixels to the left.
-  //    dy contains the number of lines left to process.
-  //    dx is the slope of the line.
-  //------
-
-  last_x = x;
-  last_y = y;
-  cur_tile_x = x >> (16+5);
-  cur_tile_y = y >> 6;
-
-//printf ("      REMAINDER %d,%d\n", x>>16, y);
+  // Calculate the slope of the line.
+  int x = x1<<16;
+  int y = y1;
 
   //------
   // Here is the remainder of the line until we go out screen again.
   //------
-  need_to_finish = false;
-  while (dy > 0 && x > 0 && x < (width<<16))
+  bool need_to_finish = dy > 0;
+  int last_x = x;
+  int last_y = y;
+  int cur_tile_x = tile_x1;
+  int cur_tile_y = tile_y1;
+  while (dy > 0)
   {
-    need_to_finish = true;
     int tile_x = x >> (16+5);
     int tile_y = y >> 6;
-//printf ("        dy=%d x>>16=%d y=%d tile_x=%d tile_y=%d\n", dy, x>>16, y, tile_x, tile_y);
     if (cur_tile_x != tile_x || cur_tile_y != tile_y)
     {
-//printf ("        cur_tile_x=%d cur_tile_y=%d\n", tile_x, tile_y);
       csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
       tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
       	(y-1) & 63, dx);
@@ -1125,54 +1206,10 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 
   if (need_to_finish)
   {
-//printf ("        need_to_finish!\n");
-    //int tile_x = (x-dx) >> (16+5);
-    //int tile_y = (y-1) >> 6;
     csCoverageTile* tile = GetTile (cur_tile_x, cur_tile_y);
     tile->PushLine (last_x & xmask, last_y & 63, (x-dx) & xmask,
     	(y-1) & 63, dx);
     MarkTileDirty (cur_tile_x, cur_tile_y);
-  }
-
-  if (dy <= 0) return;
-
-  //------
-  // Now we need to check if there is a remaining part of the line
-  // that we have to clamp.
-  //------
-  if (dy > 0 && x <= 0)
-  {
-    last_x = x;
-    last_y = y;
-    cur_tile_y = y >> 6;
-
-    need_to_finish = false;
-    while (dy > 0 && x <= 0)
-    {
-      need_to_finish = true;
-      int tile_y = y >> 6;
-      if (cur_tile_y != tile_y)
-      {
-        csCoverageTile* tile = GetTile (0, cur_tile_y);
-        tile->PushVLine (0, last_y & 63, (y-1) & 63);
-        MarkTileDirty (0, cur_tile_y);
-        cur_tile_y = tile_y;
-        last_y = y;
-      }
-
-      x += dx;
-      y++;
-      dy--;
-    }
-    CS_ASSERT (x <= 0);
-
-    if (need_to_finish)
-    {
-      //int tile_y = (y-1) >> 6;
-      csCoverageTile* tile = GetTile (0, cur_tile_y);
-      tile->PushVLine (0, last_y & 63, (y-1) & 63);
-      MarkTileDirty (0, cur_tile_y);
-    }
   }
 }
 

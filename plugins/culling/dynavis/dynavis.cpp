@@ -256,7 +256,11 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   kdtree = new csKDTree (NULL);
 
   if (do_cull_tiled)
+  {
     tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
+    csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+    tcovbuf->bugplug = bugplug;
+  }
   else
     covbuf = new csCoverageBuffer (scr_width, scr_height);
 
@@ -489,12 +493,24 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
   if (do_cull_coverage != COVERAGE_NONE)
   {
+    // @@@ Do write queue here too?
     iCamera* camera = data->rview->GetCamera ();
     float max_depth;
     if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
     	camera->GetShiftX (), camera->GetShiftY (), sbox,
 	min_depth, max_depth))
     {
+#     ifdef CS_DEBUG
+      if (do_state_dump)
+      {
+        csRef<iString> str;
+        if (do_cull_tiled)
+          str = tcovbuf->Debug_Dump ();
+        else
+          str = covbuf->Debug_Dump ();
+        printf ("Before node test:\n%s\n", str->GetData ());
+      }
+#     endif
       bool rc;
       if (do_cull_tiled)
         rc = tcovbuf->TestRectangle (sbox, min_depth);
@@ -514,6 +530,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   hist->vis_cnt = RAND_HISTORY;
 
 end:
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     printf ("Node (%g,%g,%g)-(%g,%g,%g) %s\n",
@@ -538,6 +555,7 @@ end:
       printf ("\n");
     }
   }
+# endif
 
   return vis;
 }
@@ -595,6 +613,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       Perspective ((*tr_cam)[i], (*tr_verts)[i], fov, sx, sy);
   }
 
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
@@ -604,6 +623,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       	"<noname>");
     }
   }
+# endif
 
   // Then insert all polygons.
   csMeshedPolygon* poly = polymesh->GetPolygons ();
@@ -623,21 +643,26 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     {
       int vertex_idx = vi[j];
       float tz = (*tr_cam)[vertex_idx].z;
-      if (tz <= 0.1)
+      // @@@ Note: originally 0.1 was used here. However this could cause
+      // very large coordinates to be generated and our coverage line drawer
+      // cannot currently cope with that. We need to improve that line
+      // drawer considerably.
+      if (tz <= 0.2)
       {
 	max_depth = -1.0;
 	if (do_cull_clampoccluder)
 	{
-	  if (i > 0)
+	  if (j > 0)
 	  {
-	    // If i > 0 we know there was already one vertex which is in front
+	    // If j > 0 we know there was already one vertex which is in front
 	    // of the Z=0.1 plane.
 	    do_clamp = true;
 	  }
 	  else
 	  {
-	    // i == 0 so we still have to test if there are other vertices
+	    // j == 0 so we still have to test if there are other vertices
 	    // in front of the Z=0.1 plane.
+	    // NOTE: we reuse the 'j' index here!!! This is not a bug.
 	    for (++j ; j < num_verts ; j++)	// The start '++j' is not a bug!
 	    {
 	      vertex_idx = vi[j];
@@ -661,13 +686,15 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
         tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
       else
         covbuf->InsertPolygon (verts2d, num_verts, max_depth);
+#     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  max_depth=%g ", max_depth);
+        printf ("  (not clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
 	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
         printf ("\n");
       }
+#     endif
     }
     else if (do_clamp)
     {
@@ -692,16 +719,19 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
         tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
       else
         covbuf->InsertPolygon (verts2d, num_verts, max_depth);
+#     ifdef CS_DEBUG
       if (do_state_dump)
       {
-        printf ("  max_depth=%g ", max_depth);
+        printf ("  (clamped) max_depth=%g ", max_depth);
         for (j = 0 ; j < num_verts ; j++)
 	  printf ("(%g,%g) ", verts2d[j].x, verts2d[j].y);
         printf ("\n");
       }
+#     endif
     }
   }
 
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     csRef<iString> str;
@@ -711,6 +741,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
   }
+# endif
 }
 
 void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
@@ -767,7 +798,11 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     csVector3 v = verts[i] - trans_vec;
     camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
 
-    if (camv.z <= 0.1)
+    // @@@ Note: originally 0.1 was used here. However this could cause
+    // very large coordinates to be generated and our coverage line drawer
+    // cannot currently cope with that. We need to improve that line
+    // drawer considerably.
+    if (camv.z <= 0.2)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
       return;
@@ -781,6 +816,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     }
   }
 
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
@@ -793,6 +829,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     printf ("  campos_obj=%g,%g,%g\n",
     	campos_object.x, campos_object.y, campos_object.z);
   }
+# endif
 
   // Then insert the outline.
   if (do_cull_tiled)
@@ -803,6 +840,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     covbuf->InsertOutline (tr_verts, vertex_count,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     printf ("  max_depth=%g\n", max_depth);
@@ -833,6 +871,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
       str = covbuf->Debug_Dump ();
     printf ("%s\n", str->GetData ());
   }
+# endif
 }
 
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
@@ -875,6 +914,7 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
         depth = min_depth;
 
       write_queue->Append (box, depth, obj);
+#     ifdef CS_DEBUG
       if (do_state_dump)
       {
         csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
@@ -886,6 +926,7 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
 	    depth, obj->hint_goodoccluder);
         }
       }
+#     endif
     }
   }
 }
@@ -963,6 +1004,17 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       }
       if (rc)
       {
+#       ifdef CS_DEBUG
+        if (do_state_dump)
+        {
+          csRef<iString> str;
+          if (do_cull_tiled)
+            str = tcovbuf->Debug_Dump ();
+          else
+            str = covbuf->Debug_Dump ();
+          printf ("Before obj test:\n%s\n", str->GetData ());
+        }
+#       endif
         if (do_cull_tiled)
 	  rc = tcovbuf->TestRectangle (sbox, min_depth);
 	else
@@ -985,6 +1037,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    	write_queue->Fetch (sbox, min_depth, out_depth);
 	  if (qobj)
 	  {
+#           ifdef CS_DEBUG
+	    if (do_state_dump)
+	    {
+	      printf ("Adding objects from write queue!\n");
+	      fflush (stdout);
+	    }
+#           endif
 	    // We have found one such object. Insert them all.
 	    do
 	    {
@@ -1065,6 +1124,7 @@ end:
     }
   }
 
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
@@ -1088,6 +1148,7 @@ end:
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
   }
+# endif
 
   return vis;
 }
@@ -1222,6 +1283,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
     //data.frustum[3].Invert ();
   //}
 
+# ifdef CS_DEBUG
   if (do_state_dump)
   {
     printf ("==============================================================\n");
@@ -1240,6 +1302,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
       mk >>= 1;
     }
   }
+# endif
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible. In the mean time also update the coverage
@@ -1432,10 +1495,11 @@ struct IntersectSegment_Front2BackData
 {
   csSegment3 seg;
   csVector3 isect;
-  float sqdist;	// squared distance between seg.start and isect.
+  float sqdist;		// Squared distance between seg.start and isect.
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
+  csVector* vector;	// If not-null we need all objects.
 };
 
 static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
@@ -1516,7 +1580,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    csVector3 obj_isect;
 	    float r;
 
-	    if (visobj_wrap->thing_state)
+	    if (!data->vector && visobj_wrap->thing_state)
 	    {
 	      iThingState* st = visobj_wrap->thing_state;
 	      iPolygon3D* p = st->IntersectSegment (
@@ -1537,10 +1601,14 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    }
 	    else
 	    {
-	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (obj_start,
-	      	obj_end, obj_isect, &r))
+	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      	obj_start, obj_end, obj_isect, &r))
 	      {
-	        if (r < data->r)
+	        if (data->vector)
+		{
+		  data->vector->Push (visobj_wrap->visobj);
+		}
+	        else if (r < data->r)
 		{
 		  data->r = r;
 		  data->polygon = NULL;
@@ -1575,6 +1643,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   data.r = 0;
   data.mesh = NULL;
   data.polygon = NULL;
+  data.vector = NULL;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
 
   if (p_mesh) *p_mesh = data.mesh;
@@ -1583,6 +1652,23 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   isect = data.isect;
 
   return data.mesh != NULL;
+}
+
+csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
+    const csVector3& start, const csVector3& end)
+{
+  UpdateObjects ();
+  current_visnr++;
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.r = 0;
+  data.mesh = NULL;
+  data.polygon = NULL;
+  data.vector = new csVector ();
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+
+  csDynVisObjIt* vobjit = new csDynVisObjIt (data.vector, NULL);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== CastShadows =====================================================
@@ -1619,6 +1705,18 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
 
+  iFrustumView* fview = data->fview;
+  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
+    ->GetOrigin ();
+  float sqrad = fview->GetSquaredRadius ();
+
+  // First check the distance between the origin and the node box and see
+  // if we are within the radius.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  csBox3 b (node_bbox.Min ()-center, node_bbox.Max ()-center);
+  if (b.SquaredOriginDist () > sqrad)
+    return false;
+
   // First we do frustum checking if relevant. See if the current node
   // intersects with the frustum.
   if (data->planes_mask)
@@ -1637,10 +1735,6 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
-  iFrustumView* fview = data->fview;
-  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
-    ->GetOrigin ();
-
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -1651,6 +1745,8 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       	objects[i]->GetObject ();
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
+      if (b.SquaredOriginDist () > sqrad)
+	continue;
 
       if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
@@ -1678,7 +1774,6 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 }
 
 
-// @@@ USE RADIUS!!!
 void csDynaVis::CastShadows (iFrustumView* fview)
 {
   UpdateObjects ();
@@ -1708,69 +1803,32 @@ void csDynaVis::CastShadows (iFrustumView* fview)
   csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
   data.planes_mask = 0;
   int i;
-  bool infinite = lf->IsInfinite ();
-  if (!infinite)
+  // Traverse the kd-tree to find all relevant objects.
+  // @@@ What if the frustum is bigger???
+  CS_ASSERT (lf->GetVertexCount () <= 31);
+  if (lf->GetVertexCount () > 31)
   {
-    // In this case we have a frustum and we traverse the kd-tree to
-    // find all relevant objects.
-    
-    // @@@ What if the frustum is bigger???
-    CS_ASSERT (lf->GetVertexCount () <= 31);
-    if (lf->GetVertexCount () > 31)
-    {
-      printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
-      fflush (stdout);
-      return;
-    }
-    int i1 = lf->GetVertexCount () - 1;
-    for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
-    {
-      data.planes_mask = (data.planes_mask<<1)|1;
-      const csVector3 &v1 = lf->GetVertex (i);
-      const csVector3 &v2 = lf->GetVertex (i1);
-      data.planes[i].Set (center, v1+center, v2+center);
-    }
-    if (lf->GetBackPlane ())
-    {
-      // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
-      // It is possible this plane has to be inverted.
-      data.planes_mask = (data.planes_mask<<1)|1;
-      data.planes[i] = *(lf->GetBackPlane ());
-    }
+    printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
+    fflush (stdout);
+    return;
+  }
+  int i1 = lf->GetVertexCount () - 1;
+  for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
+  {
+    data.planes_mask = (data.planes_mask<<1)|1;
+    const csVector3 &v1 = lf->GetVertex (i);
+    const csVector3 &v2 = lf->GetVertex (i1);
+    data.planes[i].Set (center, v1+center, v2+center);
+  }
+  if (lf->GetBackPlane ())
+  {
+    // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
+    // It is possible this plane has to be inverted.
+    data.planes_mask = (data.planes_mask<<1)|1;
+    data.planes[i] = *(lf->GetBackPlane ());
+  }
 
-    kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
-  }
-  else
-  {
-    // The frustum is infinite so we can just add all objects
-    // (@@@ CHECK RADIUS IN FUTURE?)
-    for (i = 0 ; i < visobj_vector.Length () ; i++)
-    {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-    	visobj_vector[i];
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-      csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
-      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
-            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
-      {
-        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginDist ();
-	data.shadobjs[data.num_shadobjs].caster = visobj_wrap->caster;
-	data.shadobjs[data.num_shadobjs].mesh = NULL;
-	data.shadobjs[data.num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
-	data.num_shadobjs++;
-      }
-      if (fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
-      {
-        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
-	data.shadobjs[data.num_shadobjs].mesh = visobj_wrap->mesh;
-	data.shadobjs[data.num_shadobjs].caster = NULL;
-	data.shadobjs[data.num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
-	data.num_shadobjs++;
-      }
-    }
-  }
+  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
 
   // Now sort the list of shadow objects on radius.
   qsort (data.shadobjs, data.num_shadobjs, sizeof (ShadObj), compare_shadobj);

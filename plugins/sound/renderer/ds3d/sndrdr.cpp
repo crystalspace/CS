@@ -152,7 +152,7 @@ bool csSoundRenderDS3D::Open()
   csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
-  vc->DecRef ();
+  vc = NULL;
   LastTime = ct;
 
   return true;
@@ -165,12 +165,10 @@ void csSoundRenderDS3D::Close()
 
   while (SoundHandles.Length()>0)
   {
-    csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)SoundHandles.Pop();
+    csRef<csSoundHandleDS3D> hdl = SoundHandles.Pop();
     hdl->Unregister();
-    hdl->DecRef();
   }
 
-  if (Listener) Listener->DecRef();
   Listener = NULL;
 
   if (AudioRenderer) AudioRenderer->Release();
@@ -203,13 +201,12 @@ csPtr<iSoundHandle> csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 
 void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
 {
-  int n = SoundHandles.Find(snd);
+  csRef<csSoundHandleDS3D> hdl = (csSoundHandleDS3D *)snd;
+  int n = SoundHandles.Find(hdl);
   if (n != -1)
   {
-    csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)snd;
     SoundHandles.Delete(n);
     hdl->Unregister();
-    hdl->DecRef();
   }
 }
 
@@ -260,7 +257,6 @@ void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src)
 {
   if (ActiveSources.Find(src)==-1)
   {
-    src->IncRef();
     ActiveSources.Push(src);
   }
 }
@@ -271,7 +267,6 @@ void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src)
   if (n!=-1)
   {
     ActiveSources.Delete(n);
-    src->DecRef();
   }
 }
 

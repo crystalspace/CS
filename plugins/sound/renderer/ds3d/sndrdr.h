@@ -27,10 +27,14 @@
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
+
 #include "dsound.h"
 
 class csSoundListenerDS3D;
 class csSoundSourceDS3D;
+class csSoundHandleDS3D;
 
 class csSoundRenderDS3D : public iSoundRender
 {
@@ -61,11 +65,11 @@ public:
   const char *GetError(HRESULT result);
 
   LPDIRECTSOUND AudioRenderer;
-  iObjectRegistry *object_reg;
-  csSoundListenerDS3D *Listener;
+  csRef<iObjectRegistry> object_reg;
+  csRef<csSoundListenerDS3D> Listener;
   csSoundFormat LoadFormat;
-  csVector ActiveSources;
-  csVector SoundHandles;
+  csRefArray<csSoundSourceDS3D> ActiveSources;
+  csRefArray<csSoundHandleDS3D> SoundHandles;
   csConfigAccess Config;
   csTicks LastTime;
 

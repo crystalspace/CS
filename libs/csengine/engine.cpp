@@ -989,6 +989,17 @@ void csEngine::ClearRenderPriorities ()
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);
 }
 
+int csEngine::GetRenderPriorityCount () const
+{
+  return render_priorities.Length ();
+}
+
+const char* csEngine::GetRenderPriorityName (long priority) const
+{
+  if (priority < 0 && priority >= render_priorities.Length ()) return NULL;
+  return (const char*)render_priorities[priority];
+}
+
 void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (default_clear_zbuf);
@@ -1251,6 +1262,8 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   }
 
   int failed = 0;
+  int tot_failed_meshes = 0;
+  iMeshWrapper* failed_meshes[4];
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1263,7 +1276,14 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
           linfo->InitializeDefault ();
         else
           if (!linfo->ReadFromCache (cm))
+	  {
+	    if (tot_failed_meshes < 4)
+	    {
+	      failed_meshes[tot_failed_meshes] = s;
+	      tot_failed_meshes++;
+	    }
 	    failed++;
+          }
       }
     }
 
@@ -1271,7 +1291,13 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   }
   if (failed > 0)
   {
-    Warn ("Couldn't load cached lighting for %d objects!", failed);
+    Warn ("Couldn't load cached lighting for %d object(s):", failed);
+    for (sn = 0 ; sn < tot_failed_meshes ; sn++)
+    {
+      Warn ("    %s", failed_meshes[sn]->QueryObject ()->GetName ());
+    }
+    if (tot_failed_meshes < failed)
+      Warn ("    ...");
     Warn ("Use -relight cmd option to refresh lighting.");
   }
 
@@ -1562,7 +1588,7 @@ void csEngine::RemoveHalo (csLight *Light)
   }
 }
 
-iStatLight *csEngine::FindLight (unsigned long light_id) const
+iStatLight *csEngine::FindLightID (const char* light_id) const
 {
   for (int i = 0; i < sectors.GetCount (); i++)
   {
@@ -1628,15 +1654,13 @@ void csEngine::ControlMeshes ()
   nextframe_pending = virtual_clock->GetCurrentTicks ();
 
   // Delete particle systems that self-destructed now.
-
-  // @@@ Need to optimize this?
-  int i = meshes.GetCount () - 1;
-  while (i >= 0)
+  csHashIterator it (want_to_die.GetHashMap ());
+  while (it.HasNext ())
   {
-    iMeshWrapper *sp = meshes.Get (i);
-    if (sp->WantToDie ()) GetMeshes ()->Remove (sp);
-    i--;
+    iMeshWrapper* mesh = (iMeshWrapper*)it.Next ();
+    GetMeshes ()->Remove (mesh);
   }
+  want_to_die.DeleteAll ();
 }
 
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
@@ -2935,6 +2959,11 @@ csPtr<iObjectWatcher> csEngine::CreateObjectWatcher ()
 {
   csObjectWatcher* watch = new csObjectWatcher ();
   return csPtr<iObjectWatcher> (watch);
+}
+
+void csEngine::WantToDie (iMeshWrapper* mesh)
+{
+  want_to_die.Add (mesh);
 }
 
 bool csEngine::DebugCommand (const char* cmd)

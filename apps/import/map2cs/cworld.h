@@ -85,13 +85,13 @@ protected:
     * Write a vector to the worldfile. This will be everything, including
     * opening and closing bracket and doing the proper scaling
     */
-  bool WriteVector(const CdVector3& v);
+  bool WriteVector(const char* name, const CdVector3& v);
 
   /// Write a vector as vertex (Including the VERTEX() statement)
   bool WriteVertex(double x, double y, double z);
 
   /// Write a vector (including brackets and scaling)
-  bool WriteVector(double x, double y, double z);
+  bool WriteVector(const char* name, double x, double y, double z);
 
   /**
     * Search a map for manual sectors. All other entities are stored in an

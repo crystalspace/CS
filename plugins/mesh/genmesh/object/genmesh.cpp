@@ -39,7 +39,10 @@
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
+#include "iengine/statlght.h"
+#include "iengine/dynlight.h"
 #include "iutil/objreg.h"
+#include "iutil/cache.h"
 #include "iutil/object.h"
 #include "qsqrt.h"
 
@@ -109,6 +112,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   current_features = 0;
   do_shadows = true;
   do_shadow_rec = false;
+  lighting_dirty = true;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -225,14 +229,82 @@ char* csGenmeshMeshObject::GenerateCacheName ()
   return cachename;
 }
 
+#define LMMAGIC	    "LM04" // must be 4 chars!
+
 bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
 {
-  return true;
+  if (!do_shadow_rec) return true;
+  SetupObject ();
+  lighting_dirty = true;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", NULL, ~0);
+  if (db)
+  {
+    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
+    char magic[5];
+    if (mf.Read (magic, 4) != 4) goto stop;
+    magic[4] = 0;
+    if (strcmp (magic, LMMAGIC)) goto stop;
+
+    char cont;
+    if (mf.Read ((char*)&cont, 1) != 1) goto stop;
+    while (cont)
+    {
+      char lid[16];
+      if (mf.Read (lid, 16) != 16) goto stop;
+      iStatLight *il = factory->engine->FindLightID (lid);
+      if (!il) goto stop;
+      iLight* l = il->QueryLight ();
+      affecting_lights.Add (l);
+      il->AddAffectedLightingInfo (&scfiLightingInfo);
+      if (mf.Read ((char*)&cont, 1) != 1) goto stop;
+    }
+    rc = true;
+  }
+
+stop:
+  cache_mgr->SetCurrentScope (NULL);
+  return rc;
 }
 
 bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
 {
-  return true;
+  if (!do_shadow_rec) return true;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csMemFile mf;
+  mf.Write (LMMAGIC, 4);
+  csHashIterator it (affecting_lights.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLight* l = (iLight*)it.Next ();
+    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (l, iStatLight);
+    if (sl)
+    {
+      char cont = 1;
+      mf.Write ((char*)&cont, 1);
+      const char* lid = l->GetLightID ();
+      mf.Write ((char*)lid, 16);
+    }
+  }
+  char cont = 0;
+  mf.Write ((char*)&cont, 1);
+  if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
+    	"genmesh_lm", NULL, ~0))
+    goto stop;
+
+  rc = true;
+
+stop:
+  cache_mgr->SetCurrentScope (NULL);
+  return rc;
 }
 
 void csGenmeshMeshObject::PrepareLighting ()
@@ -242,16 +314,19 @@ void csGenmeshMeshObject::PrepareLighting ()
 void csGenmeshMeshObject::DynamicLightChanged (iDynLight* dynlight)
 {
   (void)dynlight;
+  lighting_dirty = true;
 }
 
 void csGenmeshMeshObject::DynamicLightDisconnect (iDynLight* dynlight)
 {
-  (void)dynlight;
+  affecting_lights.Delete (dynlight->QueryLight ());
+  lighting_dirty = true;
 }
 
 void csGenmeshMeshObject::StaticLightChanged (iStatLight* statlight)
 {
   (void)statlight;
+  lighting_dirty = true;
 }
 
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
@@ -469,38 +544,45 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   if (!do_shadow_rec) return;
   if (!do_lighting) return;
 
-  csFrustumContext* ctxt = fview->GetFrustumContext ();
+  //csFrustumContext* ctxt = fview->GetFrustumContext ();
   iBase* b = (iBase *)fview->GetUserdata ();
-  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE (b,
-  	iLightingProcessInfo);
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)b;
   CS_ASSERT (lpi != NULL);
 
   iLight* li = lpi->GetLight ();
+  bool dyn = lpi->IsDynamic ();
 
-  csFrustum* light_frust = ctxt->GetLightFrustum ();
-  const csVector3& light_pos = light_frust->GetOrigin ();
+  if (!dyn)
+  {
+    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (li, iStatLight);
+    sl->AddAffectedLightingInfo (&scfiLightingInfo);
+  }
+  else
+  {
+    csRef<iDynLight> dl = SCF_QUERY_INTERFACE (li, iDynLight);
+    dl->AddAffectedLightingInfo (&scfiLightingInfo);
+  }
 
-  int i;
-  CheckLitColors ();
-  csColor* colors = lit_mesh_colors;
+  affecting_lights.Add (li);
+}
+
+void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans, iLight* li)
+{
   csVector3* normals = factory->GetNormals ();
-
-  // Do the lighting.
-  csReversibleTransform trans = movable->GetFullTransform ();
-  // the object center in world coordinates. "0" because the object
-  // center in object space is obviously at (0,0,0).
-
+  csColor* colors = lit_mesh_colors;
   // Compute light position in object coordinates
-  csVector3 wor_light_pos = light_pos;
+  csVector3 wor_light_pos = li->GetCenter ();
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
   float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
   if (obj_sq_dist >= li->GetSquaredRadius ()) return;
-  float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)
-  	? qisqrt (obj_sq_dist) : 1.0f;
 
-  csColor light_color = lpi->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
+  float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+
+  csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
 
+  csColor col;
+  int i;
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
   {
     csVector3 normal = normals[i];
@@ -512,13 +594,57 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
 
     if (cosinus > 0)
     {
-      color = light_color;
+      col = light_color;
       if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-      if (cosinus < 1) color *= cosinus;
-      colors[i] += color;
-      colors[i].Clamp (2., 2., 2.);
+      if (cosinus < 1) col *= cosinus;
+       colors[i] += col;
     }
   }
+}
+
+void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
+{
+  SetupObject ();
+  CheckLitColors ();
+
+  if (do_manual_colors) return;
+  if (!do_shadow_rec) return;
+
+  if (!lighting_dirty) return;
+  lighting_dirty = false;
+
+  int i;
+  csColor* colors = lit_mesh_colors;
+
+  // Set all colors to ambient light.
+  csColor col;
+  if (factory->engine)
+  {
+    factory->engine->GetAmbientLight (col);
+    col += color;
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (sect)
+      col += sect->GetDynamicAmbientLight ();
+  }
+  else
+  {
+    col = color;
+  }
+  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    colors[i] = col;
+
+  csReversibleTransform trans = movable->GetFullTransform ();
+  csHashIterator it (affecting_lights.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLight* l = (iLight*)it.Next ();
+    UpdateLightingOne (trans, l);
+  }
+
+  // @@@ Try to avoid this loop!
+  // Clamp all vertex colors to 2.
+  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    colors[i].Clamp (2., 2., 2.);
 }
 
 void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
@@ -532,7 +658,6 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   int i, l;
   csColor* colors = lit_mesh_colors;
-  csVector3* normals = factory->GetNormals ();
 
   // Set all colors to ambient light.
   csColor col;
@@ -561,44 +686,19 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
-    // Compute light position in object coordinates
-    csVector3 wor_light_pos = li->GetCenter ();
-    csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
-    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
-    if (obj_sq_dist >= li->GetSquaredRadius ()) continue;
-
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
-
-    csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
-
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    {
-      csVector3 normal = normals[i];
-      float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
-      else cosinus = obj_light_pos * normal;
-      // because the vector from the object center to the light center
-      // in object space is equal to the position of the light
-
-      if (cosinus > 0)
-      {
-        col = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-        if (cosinus < 1) col *= cosinus;
-	colors[i] += col;
-      }
-    }
+    UpdateLightingOne (trans, li);
   }
 
+  // @@@ Try to avoid this loop!
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i].Clamp (2., 2., 2.);
 }
 
-bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
+bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {
+  UpdateLighting2 (movable);
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
   if (!mater)
@@ -637,11 +737,13 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   m.use_vertex_color = true;
   m.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
+  const csBox3& b = factory->GetObjectBoundingBox ();
   vbufmgr->LockBuffer (vbuf,
   	factory->GetVertices (),
 	factory->GetTexels (),
 	do_manual_colors ? factory->GetColors () : lit_mesh_colors,
-	factory->GetVertexCount (), 0);
+	factory->GetVertexCount (), 0,
+	b);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), m);
   g3d->DrawTriangleMesh (m);
   vbufmgr->UnlockBuffer (vbuf);

@@ -305,9 +305,11 @@ private:
 
   /**
    * Classify all vertices from a mesh for clipping (ClipTriangleMesh).
+   * Returns false if totally invisible.
    */
-  void ClassifyForClipTriangleMesh (
+  bool ClassifyForClipTriangleMesh (
     int num_vertices, csVector3* vertices,
+    const csBox3& bbox,
     const csVector3& frust_origin, csPlane3* planes, int num_planes);
 
   /**
@@ -534,8 +536,6 @@ public:
   typedef void (csGraphics3DOGLCommon::*DrawPolygonPtr)(G3DPolygonDP& poly);
   DrawPolygonPtr DrawPolygonCall;
 
-  /// The maximum texture size
-  GLint max_texture_size;
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
   /// The texture manager

@@ -42,6 +42,7 @@ class csMatrix3;
 class csVector3;
 class csVector2;
 class csColor;
+class csThing;
 
 SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
 
@@ -193,8 +194,9 @@ public:
    *     can be different from the position of the light given by 'light'
    *     itself because we can have space warping).
    * </ul>
+   * Function returns false if there was no light hitting the polygon.
    */
-  void UpdateShadowMap (unsigned char* shadowmap,
+  bool UpdateShadowMap (unsigned char* shadowmap,
 	int lightcell_shift,
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
@@ -239,6 +241,8 @@ class csPolyTexture : public iPolygonTexture
 private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
+  /// The parent thing.
+  csThing* thing;
   /// SCF pointer.
   iPolygon3D* ipolygon;
 
@@ -293,8 +297,15 @@ private:
   /// Internally used by (software) texture cache
   void *cache_data [4];
 
-  /// Compared against csThing ambient version to know whether lightmap needs updating.
+  /**
+   * Compared against csThing ambient version to know whether lightmap needs
+   * updating.
+   */
   uint32 ambient_version;
+  /**
+   * Compared against csThing version to know whether lightmap needs updating.
+   */
+  uint32 light_version;
 
 public:
   /**
@@ -315,7 +326,7 @@ public:
   /**
    * Set the corresponding polygon for this polytexture.
    */
-  void SetPolygon (csPolygon3D* p);
+  void SetPolygon (csPolygon3D* p, csThing* th);
 
   /**
    * Return the polygon corresponding to this texture
@@ -360,9 +371,6 @@ public:
    */
   void UpdateFromShadowBitmap (iLight* light, const csVector3& lightpos,
   	const csColor& lightcolor);
-
-  /// set the dirty flag for our lightmap
-  void MakeDirtyDynamicLights ();
 
   /**
    * Update the real lightmap for a given csLightPatch

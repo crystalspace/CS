@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
+#include "csutil/hashmap.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
@@ -95,6 +96,13 @@ private:
   csColor dynamic_ambient;
   uint32 ambient_version;
 
+  // If we are using the iLightingInfo lighting system then this
+  // is an array of lights that affect us right now.
+  csHashSet affecting_lights;
+  // If the following flag is dirty then some of the affecting lights
+  // has changed and we need to recalculate.
+  bool lighting_dirty;
+
   bool initialized;
   long shapenr;
   csRefArray<iObjectModelListener> listeners;
@@ -121,6 +129,17 @@ private:
    * Make sure the 'lit_mesh_colors' array has the right size.
    */
   void CheckLitColors ();
+
+  /**
+   * Process one light and add the values to the genmesh light table.
+   * The given transform is the full movable transform.
+   */
+  void UpdateLightingOne (const csReversibleTransform& trans, iLight* light);
+
+  /**
+   * Update lighting using the iLightingInfo system.
+   */
+  void UpdateLighting2 (iMovable* movable);
 
 public:
   /// Constructor.
@@ -165,6 +184,7 @@ public:
   void SetDynamicAmbientLight (const csColor& color)
   {
     dynamic_ambient = color;
+    lighting_dirty = true;
     ambient_version++;
   }
 
@@ -202,7 +222,6 @@ public:
     return vis_cb;
   }
   virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
-  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,

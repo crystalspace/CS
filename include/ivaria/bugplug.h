@@ -23,6 +23,7 @@
 
 class csBox3;
 class csVector3;
+class csVector2;
 class csReversibleTransform;
 struct iMeshObject;
 struct iBugPlug;

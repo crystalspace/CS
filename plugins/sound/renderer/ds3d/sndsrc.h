@@ -34,7 +34,7 @@ public:
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();
-  bool Initialize(csSoundRenderDS3D *srdr, csSoundHandleDS3D *hdl, int Mode3d,
+  bool Initialize(csRef<csSoundRenderDS3D> srdr, csRef<csSoundHandleDS3D> hdl, int Mode3d,
     long NumSamples);
 
   void Report (int severity, const char* msg, ...);
@@ -69,7 +69,7 @@ private:
   LPDIRECTSOUNDBUFFER Buffer2D;
 
   // renderer
-  csSoundRenderDS3D *Renderer;
+  csRef<csSoundRenderDS3D> Renderer;
 
   // frequency of sound data
   unsigned long BaseFrequency;
@@ -78,7 +78,7 @@ private:
   bool Static;
 
   // the sound handle
-  csSoundHandleDS3D *SoundHandle;
+  csRef<csSoundHandleDS3D> SoundHandle;
 
   // size of the sound buffer in bytes, size of one sample in bytes
   unsigned long BufferBytes, SampleBytes;

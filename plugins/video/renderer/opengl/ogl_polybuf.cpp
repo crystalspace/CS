@@ -386,13 +386,16 @@ void csTriangleArrayPolygonBuffer::Prepare ()
   for (i = 0 ; i < lmqueue.Length () ; i++)
   {
     csLmQueue& q = lmqueue[i];
-    iLightMap* lm = q.polytext->GetLightMap ();
-    if (lm)
+    if (q.polytext)
     {
-      int lmw = lm->GetWidth ();
-      int lmh = lm->GetHeight ();
-      if (lmw > max_dim) max_dim = lmw;
-      if (lmh > max_dim) max_dim = lmh;
+      iLightMap* lm = q.polytext->GetLightMap ();
+      if (lm)
+      {
+        int lmw = lm->GetWidth ();
+        int lmh = lm->GetHeight ();
+        if (lmw > max_dim) max_dim = lmw;
+        if (lmh > max_dim) max_dim = lmh;
+      }
     }
   }
   int suplmsize = OpenGLLightmapCache::super_lm_size;
@@ -419,14 +422,17 @@ void csTriangleArrayPolygonBuffer::Prepare ()
     for (i = 0 ; i < lmqueue.Length () ; i++)
     {
       csLmQueue& q = lmqueue[i];
-      iLightMap* lm = q.polytext->GetLightMap ();
-      if (lm)
+      if (q.polytext)
       {
-	csRect rect;
-        if (!tr->Alloc (lm->GetWidth (), lm->GetHeight (), rect))
+        iLightMap* lm = q.polytext->GetLightMap ();
+        if (lm)
         {
-	  fit = false;
-	  break;
+	  csRect rect;
+          if (!tr->Alloc (lm->GetWidth (), lm->GetHeight (), rect))
+          {
+	    fit = false;
+	    break;
+          }
         }
       }
     }
@@ -540,6 +546,10 @@ void csTriangleArrayPolygonBuffer::SetVertexArray (csVector3* verts,
   vertices = new csVector3 [num_verts];
   memcpy (vertices, verts, num_verts * sizeof (csVector3));
   verticesCount = num_verts;
+  bbox.StartBoundingBox (vertices[0]);
+  int i;
+  for (i = 1 ; i < num_verts ; i++)
+    bbox.AddBoundingVertexSmart (vertices[i]);
 }
 
 void csTriangleArrayPolygonBuffer::AddMaterial (iMaterialHandle* mat_handle)

@@ -21,6 +21,7 @@
 #define __PTESTS3D_H__
 
 #include <stdarg.h>
+#include "csgeom/box.h"
 #include "ivideo/graph3d.h"
 #include "apps/perftest/perftest.h"
 
@@ -144,6 +145,7 @@ class MeshTester : public Tester
 private:
   G3DTriangleMesh mesh;
   int num_mesh_vertices;
+  csBox3 bbox;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csRef<iVertexBuffer> vbuf;

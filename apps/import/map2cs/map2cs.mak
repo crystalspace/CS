@@ -32,7 +32,7 @@ MAP2CS.EXE = map2cs$(EXE.CONSOLE)
 INC.MAP2CS = $(wildcard apps/import/map2cs/*.h)
 SRC.MAP2CS = $(wildcard apps/import/map2cs/*.cpp)
 OBJ.MAP2CS = $(addprefix $(OUT)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
-DEP.MAP2CS = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
+DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = data/config/map2cs.cfg
 
@@ -42,7 +42,6 @@ TO_INSTALL.CONFIG += $(CFG.MAP2CS)
 MSVC.DSP += MAP2CS
 DSP.MAP2CS.NAME = map2cs
 DSP.MAP2CS.TYPE = appcon
-#DSP.MAP2CS.LIBS = libz
 DSP.MAP2CS.LIBS = zlib
 
 endif # ifeq ($(MAKESECTION),postdefines)

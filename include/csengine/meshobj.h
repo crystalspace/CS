@@ -369,8 +369,6 @@ public:
   /// This pass draws the diffuse lit mesh
   void DrawLight (iRenderView* rview, iLight* light);
 #endif
-  /// Returns true if this object wants to die.
-  bool WantToDie () { return meshobj->WantToDie (); }
 
   /**
    * Get the movable instance for this object.
@@ -686,10 +684,6 @@ public:
 	  scfParent->DrawLight (rview, light);
 	}
 #endif
-    virtual bool WantToDie ()
-    {
-      return scfParent->WantToDie ();
-    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

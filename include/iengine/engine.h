@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 15, 0);
+SCF_VERSION (iEngine, 0, 16, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -253,6 +253,10 @@ struct iEngine : public iBase
   virtual long GetAlphaRenderPriority () const = 0;
   /// Clear all render priorities.
   virtual void ClearRenderPriorities () = 0;
+  /// Get the number of render priorities.
+  virtual int GetRenderPriorityCount () const = 0;
+  /// Get the name of the render priority or NULL if none existant.
+  virtual const char* GetRenderPriorityName (long priority) const = 0;
 
   /**
    * Create a base material that can be used to give to the texture
@@ -509,8 +513,11 @@ struct iEngine : public iBase
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
-  /// Find a static/pseudo-dynamic light by id.
-  virtual iStatLight* FindLight (unsigned long light_id) const = 0;
+  /**
+   * Find a static/pseudo-dynamic light by id. An ID is a 16-byte MD5
+   * checksum for the light.
+   */
+  virtual iStatLight* FindLightID (const char* light_id) const = 0;
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef or use DecRef().
@@ -773,6 +780,14 @@ struct iEngine : public iBase
    * other objects. The engine will not keep a reference to this object.
    */
   virtual csPtr<iObjectWatcher> CreateObjectWatcher () = 0;
+
+  /**
+   * Sometimes a mesh wants to destruct itself (for example
+   * a particle system that has only limited lifetime). It can do that
+   * by calling this function on itself. The engine will then remove
+   * the object before the next frame.
+   */
+  virtual void WantToDie (iMeshWrapper* mesh) = 0;
 };
 
 /** @} */

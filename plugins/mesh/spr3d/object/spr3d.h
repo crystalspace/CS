@@ -1536,7 +1536,6 @@ public:
   {   
     OldNextFrame (current_time, new_pos, single_step, !loopaction);
   }
-  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,

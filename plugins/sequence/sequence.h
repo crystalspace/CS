@@ -171,7 +171,8 @@ public:
   virtual bool IsSuspended () { return suspended; }
   virtual void Resume ();
   virtual void TimeWarp (csTicks time, bool skip);
-  virtual csTicks GetMainTime () { return main_time; }
+  virtual csTicks GetMainTime () const { return main_time; }
+  virtual csTicks GetDeltaTime () const;
   virtual iSequence* NewSequence ();
   virtual void RunSequence (csTicks time, iSequence* sequence,
   	iBase* params = NULL);

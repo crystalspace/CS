@@ -27,6 +27,7 @@
 
 struct iGraphics2D;
 struct iGraphics3D;
+struct iBugPlug;
 class csString;
 class csBox2;
 class csTiledCoverageBuffer;
@@ -245,6 +246,9 @@ public:
  */
 class csTiledCoverageBuffer : public iBase
 {
+public:
+  iBugPlug* bugplug;	// For debugging...
+
 private:
   int width, height;
   int width_po2;	// Width after correcting for power of two.
@@ -304,6 +308,7 @@ private:
    */
   void MarkTileDirty (int tx, int ty)
   {
+    CS_ASSERT (ty >= 0 && ty < num_tile_rows);
     if (tx < dirty_left[ty]) dirty_left[ty] = tx;
     if (tx > dirty_right[ty]) dirty_right[ty] = tx;
   }

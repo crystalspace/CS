@@ -43,6 +43,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
@@ -57,6 +58,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
@@ -64,6 +68,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   csBallMeshObject::factory = factory;
   logparent = NULL;
   initialized = false;
@@ -93,6 +98,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   current_lod = 1.0f;
   current_features = 0;
   vbufmgr = NULL;
+  polygons = NULL;
 }
 
 csBallMeshObject::~csBallMeshObject ()
@@ -105,6 +111,7 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] ball_texels;
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
+  delete[] polygons;
 }
 
 void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
@@ -650,7 +657,8 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf,
-  	ball_vertices, ball_texels, ball_colors, num_ball_vertices, 0);
+  	ball_vertices, ball_texels, ball_colors, num_ball_vertices,
+	0, object_bbox);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
   vbufmgr->UnlockBuffer (vbuf);
@@ -963,6 +971,48 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   delete[] applysun;
 }
 
+csMeshedPolygon* csBallMeshObject::GetPolygons ()
+{
+  if (!polygons)
+  {
+    csTriangle* triangles = top_mesh.triangles;
+    polygons = new csMeshedPolygon [top_mesh.num_triangles];
+    int i;
+    for (i = 0 ; i < top_mesh.num_triangles ; i++)
+    {
+      polygons[i].num_vertices = 3;
+      polygons[i].vertices = &triangles[i].a;
+    }
+  }
+
+  return polygons;
+}
+
+void csBallMeshObject::PolyMesh::Cleanup ()
+{
+  delete[] scfParent->polygons;
+  scfParent->polygons = NULL;
+}
+
+int csBallMeshObject::PolyMesh::GetVertexCount ()
+{
+  return scfParent->GetVertexCount ();
+}
+
+csVector3* csBallMeshObject::PolyMesh::GetVertices ()
+{
+  return scfParent->GetVertices ();
+}
+
+int csBallMeshObject::PolyMesh::GetPolygonCount ()
+{
+  return scfParent->GetTriangleCount ();
+}
+
+csMeshedPolygon* csBallMeshObject::PolyMesh::GetPolygons ()
+{
+  return scfParent->GetPolygons ();
+}
 
 //----------------------------------------------------------------------
 

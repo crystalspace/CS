@@ -1,8 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+19-Feb-2003
+	- Fixed a memory leak in the OpenGL renderer.
 18-Feb-2003
 	- Eric Sunshine applied Matze's fix for TO_INSTALL.CONFIG in demo.mak
 	  to the 0.96 branch.
+	- Light ID's are now MD5 keys instead of simple numbers. This is
+	  done to solve a bug with multiple regions and light id's not
+	  matching with the cached light id's in the lightmap cache.
+	  This fixes a bug with pseudo-dynamic lights not working if they
+	  are loaded differently from when they were loading at relighting
+	  time.
+	- Changed iEngine->FindLight(id) to iEngine->FindLightID().
+	- Changed the engine so it now reports the first 4 objects for which
+	  it couldn't load lighting.
 17-Feb-2003
 	- Christian Bayle made debian package build ok, but it remains some
 	  problems with csdemo that is not installed by make install and
@@ -12,14 +23,104 @@ The history order is reversed so that new features are at the top.
 	  pressed.
 16-Feb-2003
 	- Christian Bayle did some other debian related changes.
+	- Significant optimization in the dynamic/pseudo-dynamic lighting
+	  system for things. In the past, when a dynamic light or
+	  pseudo-dynamic light hit a thing then all polygons would be
+	  marked as being dirty (so this would require a loop over all
+	  polygons, setting the polygon as dirty). Now this has been
+	  changed by adding a 'light_version' number to the thing and also
+	  a 'light_version' number to all polygons. This is similar to the
+	  'ambient_version' number that's already there. This saves a lot
+	  of flag setting overhead and significantly increases speed
+	  of pseudo-dynamic and dynamic lights for big levels.
 15-Feb-2003
 	- Christian Bayle did several fixes to the Debian packages.
+	- Added 'openglcanvas' target which compiles the OpenGL canvas
+	  relevant for the given OS (similar to 'softcanvas').
+	- Make 'walkall' will now compile the OpenGL renderer instead of
+	  the software renderer.
 14-Feb-2003
 	- Eric Sunshine merged Norman Kramer's fixes for the AWS notebook
 	  control into the R0_96 branch.  This fixes a bug where there was no
 	  initial page selection in the notebook.
+	- Extended iVertexBuffer and iPolygonBuffer with a bounding box.
+	  The renderers can use this to optimize clipping.
+	- Fixed a bug in the OpenGL polybuffer implementation for things
+	  that don't have lightmaps.
+	- ClassifyForClipTriangleMesh() in OpenGL renderer now uses bounding
+	  box to avoid too many classify tests on vertices. Doesn't seem
+	  to give a dramatic fps improvement though.
+	- Added iEngine->GetRenderPriorityCount() and GetRenderPriorityName()
+	  to be able to query the render priorities currently in the engine.
+	- Added 'frain' command to walktest to test a rain mesh object
+	  that follows the camera around (as opposed to 'rain' which just
+	  makes a rain mesh object that is in the current sector completely).
+	- Huge optimization with CastShadows implementation of Dynavis
+	  and Frustvis. It now actually looks at the radius of the light.
+	  This has a big impact on speed for recalculation (recalculating
+	  lighting for flarge went from 7.5 to 2.7 seconds) and it also helps
+	  a lot in case pseudo-dynamic lightmaps or genmeshes need to be
+	  updated.
+	- Optimized the creation of pseudo-dynamic lightmaps a bit more.
+	  Now a pseudo-dynamic lightmap will only be created if the light
+	  REALLY affects the polygon and not when it theoretically could
+	  affect it due to distance.
+	- Fixed a few printf related bugs in map2cs. Thanks to Wouter
+	  for reporting this.
+	- Mesh objects used to have an old system where a particle system
+	  could remove itself by returning true with WantToDie(). However
+	  this system is slow since the engine has to check this flag
+	  every frame. I replaced this with a new function in the engine
+	  (which is also called WantToDie()). With that function objects
+	  (like particle systems) can schedule themselves so that they are
+	  deleted the next frame. The engine will only have to check if
+	  there are any sheduled deletions every frame. Much faster...
+	- Added new IntersectSegment() routine to iVisibilityCuller which
+	  returns all objects that are intersected by the segment.
 13-Feb-2003
 	- Christian Bayle did some more Debian stuff.
+	- A few minor optimizations to Dynavis in the tiled coverage line
+	  drawer.
+	- Fixed a bug in all the particle systems. They were not correctly
+	  updating their change number when the shape of the particle system
+	  changed. This *can* potentially lead to culling errors.
+	- In addition to the bug above the particle systems were also not
+	  calling FireListeners() to notify cullers about possible changes.
+	- Got a patch from James Baicoianu <james@baicoianu.com> which
+	  implements iPolygonMesh for the ball mesh object so it can be used
+	  for collision detection.
+	- Removed the very inefficient 'light_statics' from walktest. This
+	  function needs to be done differently (i.e. DeferUpdateLighting()
+	  should be automatic). On large levels (i.e. PlaneShift levels) this
+	  function was second in the top (profiling).
+	- When you specify the <localshadows/> tag with a genmesh object
+	  it will no longer use the DeferUpdateLighting() system but instead
+	  it will be lit using the same system that is used for things.
+	  This means that lighting will be calculated during -relight
+	  and cached just like with things. At this moment there is no
+	  shadow information yet. So if a light touches a genmesh it will
+	  be fully lit by that light. So the cache on disk basically involves
+	  a list of all lights that affect the mesh and nothing more. In
+	  future we will cast real shadows on genmeshes.
+	  Using this system also ensures that the genmesh lighting will be
+	  automatically updated when a light changes (pseudo-dynamic or
+	  dynamic) even without having to call DeferUpdateLighting().
+12-Feb-2003
+	- Added three clipping routines to csRect. All three clip a line to
+	  a box:
+	    1. ClipLineGeneral: general clipping routine. Doesn't check for
+	       any trivial cases and is not safe for large coordinates
+	       (bigger than 15 bit int).
+	    2. ClipLine: general clipping routine. Checks for trivial cases
+	       (line fully outside box, vertical line, horizontal line)
+	       but is also not safe for large coordinates.
+	    3. ClipLineSafe: Checks for trivial cases and is safe for very
+	       large coordinates. This function will automatically switch
+	       to ClipLine() if the given coordinates are small enough.
+	- Added another trivial case to csRect::ClipLine() making it a little
+	  bit safer again.
+	- Dynavis tiled coverage buffer now uses ClipLine(). This greatly
+	  cleans up the code and makes it a lot more robust.
 11-Feb-2003
 	- Eric Sunshine fixed documentation booboo (<texture> was used instead
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
@@ -33,6 +134,27 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine merged the new csArray<T> from the main branch into the
 	  R0_96 branch so that it will be available for the 0.96r003 release.
 	- Christian Bayle added the pre-version of the 0.96 package for Debian.
+	- Fixed lightning command in walktest to also work if there is no
+	  light called 'l1'.
+	- Fixed lightning sequence in flarge a bit.
+	- Added iSequenceManager->GetDeltaTime(). This time should be added
+	  to GetMainTime() if you want to know the current main time when
+	  NOT in an operation callback! If you are in an operation callback
+	  then you should use the delta time that is given to you as a
+	  parameter instead.
+	- The sequence manager now fires in the 'final' stage
+	  (cscmdFinalProcess) instead of cscmdPostProcess. The engine
+	  sequence manager now fires in the cscmdPostProcess stage instead
+	  of cscmdPreProcess. This is to ensure that the following order
+	  of execution is guaranteed for every frame:
+	  	1. Frame is rendered.
+		2. Engine sequence manager fires and performs remaining
+		   timed operations.
+		3. Sequence manager fires and performs operations.
+	  We REALLY need a better event priority system so that we don't
+	  have to depend on those ugly 'pre', 'final', and 'post' things.
+	- Norman Kramer make the first page visible on first appearance for
+	  the AWS notebook.
 10-Feb-2003
 	- Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which
 	  caused perftest to output results twice.
@@ -44,10 +166,57 @@ The history order is reversed so that new features are at the top.
 	  'data/flarge' directory.
 	- Fixed a 'cs-config' typo in creating external app docs, reported by
 	  David Calkins.
+	- Fixed a bug in Dynavis debugging module. The code was changed
+	  to use csRef but the DecRef() wasn't removed.
+	- Extended state dumping in Dynavis a bit.
+	- Fixed a bug in Dynavis which could cause wrong culling. The
+	  problem is that making tiles empty works by setting a flag.
+	  The actual initialization of the tile only happens when somebody
+	  wants to update the tile. However, a few of the testing functions
+	  didn't properly test for this flag.
+	- Removed the state dump code in Dynavis in optimize mode.
+	- Fixed a bug in Dynavis occluder clamping (for individual polygons).
+	- Worked around a bug in Dynavis caused by the bad polygon drawer
+	  with have in the coverage buffer. This polygon drawer cannot
+	  cope well with large integer coordinates for the given polygons.
+	  Worked around this by increasing Z=.1 to Z=.2 so that the perspective
+	  corrected coordinates don't get as big.
+	- Dynamic ambient wasn't working correctly for objects using
+	  DrawPolygonMesh (fastmesh objects).
+	- res updated the DirectSound renderer to use smart pointers and fixed
+	  a DecRef() on a smart pointer there.
 9-Feb-2003
 	- Philip Wyett extended Cygwin docs to cover installation of MNG and
 	  the Open Dynamics Engine (ODE) libraries.
+8-Feb-2003
+	- Fixed a memory overwrite bug in the tiled coverage buffer of
+	  Dynavis. This could cause crashes at exit or even during running.
+	  Added an assert to protect for future equivalent bugs.
+	- Fixed a bad bug in cs2xml which I introduced yesterday.
+	- The parsing of LEN now actually works with cs2xml.
+	- res XMLified map2cs. Still needs some work. And cleanup. map2cs
+	  seems to have quite a few features not mentioned anywhere and
+	  probably unknown to everyone. 
+	- Fixed map2cs so that it takes the current directory for fetching
+	  the config file if CRYSTAL is not set.
+	- Removed the misleading messages about textures not found.
 7-Feb-2002
+	- Fixed levtool so that by default it now gives usage information
+	  instead of the -list option. That way people will not forget
+	  to add -dynavis.
+	- Possibly fixed the bug in map2cs which adds <moveable /> to the
+	  same object that has <vistree />. Wasn't able to test this due
+	  to not having a map file.
+	- Possibly fixed the bug in cs2xml with converting of LEN keyword
+	  in a polygon. Didn't test this yet.
+	- Fixed a bug in the OpenGL renderer which causes one of the objects
+	  in flarge to disappear. It was related to the rendering of
+	  transparent polygons not cleaning up properly. Unfortunatelly
+	  this doesn't seem to fix all bugs in this area. Some of the
+	  PlaneShift levels still suffer from disappearing objects and
+	  I'm sure it isn't caused by wrong visibility culling.
+	- Made the sprite loader a bit more robust. It now checks if the
+	  factory is given before using the state.
 	- Philip Wyett fixed -fs switch under Windows GL and poor fps in
 	  fullscreen mode.
 	- Eric Sunshine augmented the qsqrt() test in configure.ac so that it
@@ -80,6 +249,16 @@ The history order is reversed so that new features are at the top.
 	  because the Cygwin headers lack __stdcall, which results in link
 	  errors when linking against opengl32.lib (libopengl32.a).
 6-Feb-2002
+	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
+	  and MinTexHeight options in opengl.cfg. Instead there is now the
+	  Video.OpenGL.Caps.MaxTextureSize option. By default this is set
+	  to -1 which means the OpenGL renderer will autodetect maximum
+	  texture size.
+	- Apparently there are drivers when getting the maximum texture size
+	  with GL_MAX_TEXTURE_SIZE fails. The OpenGL renderer now detects
+	  this case and will issue a warning when that happens. In that case
+	  it will assume 256x256 max. You can then use the above option
+	  to set the real maximum size.
 	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
 	  "make depend" flags to work around problem reported by David Calkins
 	  <dcalk@verizon.net>.

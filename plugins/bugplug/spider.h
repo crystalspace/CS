@@ -99,7 +99,6 @@ public:
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }
-  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,

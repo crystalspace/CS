@@ -302,6 +302,10 @@ private:
    * is necessary in poly.
    */
   uint32 ambient_version;
+  /**
+   * Version number for dynamic/pseudo-dynamic light changes.
+   */
+  uint32 light_version;
 
   /// If convex, this holds the index to the center vertex.
   int center_idx;
@@ -947,6 +951,7 @@ public:
   {
       dynamic_ambient = color;
       ambient_version++;
+      MarkLightmapsDirty ();
   }
   /// Gets dynamic ambient light for this thing
   const csColor& GetDynamicAmbientLight()
@@ -955,8 +960,12 @@ public:
   }
 
   /// Get dynamic ambient light version to test if needs to be recalculated
-  uint32 GetDynamicAmbientVersion()
-  {   return ambient_version; }
+  uint32 GetDynamicAmbientVersion() const
+  { return ambient_version; }
+
+  /// Get light version.
+  uint32 GetLightVersion() const
+  { return light_version; }
 
   void DynamicLightChanged (iDynLight* dynlight);
   void DynamicLightDisconnect (iDynLight* dynlight);
@@ -1243,7 +1252,6 @@ public:
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }
     virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
-    virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);

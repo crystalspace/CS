@@ -246,7 +246,13 @@ public:
   virtual ~csEmitMeshObject ();
 
   /// Set the number of particles to use.
-  void SetParticleCount (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num)
+  {
+    initialized = false;
+    shapenr++;
+    number = num;
+    FireListeners ();
+  }
   /// Get the number of particles
   int GetParticleCount () const { return number; }
   /// Enable or disable lighting.

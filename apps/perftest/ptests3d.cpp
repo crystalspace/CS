@@ -309,6 +309,8 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   int x, y;
   float w = (g3d->GetWidth ()-20)/2;
   float h = (g3d->GetHeight ()-20);
+  csBox3 bbox;
+  bbox.StartBoundingBox ();
   i = 0;
   for (y = 0 ; y <= NUM_MULTIPOLTEST/2 ; y++)
     for (x = 0 ; x <= NUM_MULTIPOLTEST ; x++)
@@ -317,6 +319,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	w * float (x-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2),
       	h * float (y-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2) + h/2,
 	1.);
+      bbox.AddBoundingVertex (mesh_vertices[i]);
       mesh_texels[i].Set (
         float (x) / float (NUM_MULTIPOLTEST),
         float (y) / float (NUM_MULTIPOLTEST/2)
@@ -346,7 +349,7 @@ void MeshTester::Draw (iGraphics3D* g3d)
   g3d->SetClipper (NULL, CS_CLIPPER_NONE);
   g3d->SetPerspectiveAspect (1);//g3d->GetHeight ());
   g3d->GetVertexBufferManager ()->LockBuffer (vbuf, mesh_vertices,
-  	mesh_texels, NULL, num_mesh_vertices, 0);
+  	mesh_texels, NULL, num_mesh_vertices, 0, bbox);
   g3d->DrawTriangleMesh (mesh);
   g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
 }

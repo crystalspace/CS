@@ -230,7 +230,6 @@ public:
     const csReversibleTransform& trans, csBox3& cbox);
   void CreateBoundingBox();
   virtual void NextFrame(csTicks /* current_time */, const csVector3& /*pos*/ );
-  virtual bool WantToDie() const { return false; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return false; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,

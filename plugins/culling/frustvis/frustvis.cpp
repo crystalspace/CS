@@ -666,10 +666,11 @@ struct IntersectSegment_Front2BackData
 {
   csSegment3 seg;
   csVector3 isect;
-  float sqdist;	// squared distance between seg.start and isect.
+  float sqdist;		// Squared distance between seg.start and isect.
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
+  csVector* vector;	// If not-null we need all objects.
 };
 
 static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
@@ -749,7 +750,7 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 	    csVector3 obj_isect;
 	    float r;
 
-	    if (visobj_wrap->thing_state)
+	    if (!data->vector && visobj_wrap->thing_state)
 	    {
 	      iThingState* st = visobj_wrap->thing_state;
 	      iPolygon3D* p = st->IntersectSegment (
@@ -770,10 +771,14 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 	    }
 	    else
 	    {
-	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (obj_start,
-	      	obj_end, obj_isect, &r))
+	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      	obj_start, obj_end, obj_isect, &r))
 	      {
-	        if (r < data->r)
+	        if (data->vector)
+		{
+		  data->vector->Push (visobj_wrap->visobj);
+		}
+	        else if (r < data->r)
 		{
 		  data->r = r;
 		  data->polygon = NULL;
@@ -806,6 +811,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.r = 0;
   data.mesh = NULL;
   data.polygon = NULL;
+  data.vector = NULL;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
 
   if (p_mesh) *p_mesh = data.mesh;
@@ -814,6 +820,23 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   isect = data.isect;
 
   return data.mesh != NULL;
+}
+
+csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
+    const csVector3& start, const csVector3& end)
+{
+  UpdateObjects ();
+  current_visnr++;
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.r = 0;
+  data.mesh = NULL;
+  data.polygon = NULL;
+  data.vector = new csVector ();
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+
+  csFrustVisObjIt* vobjit = new csFrustVisObjIt (data.vector, NULL);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== CastShadows =====================================================
@@ -850,11 +873,22 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 {
   CastShadows_Front2BackData* data = (CastShadows_Front2BackData*)userdata;
 
+  iFrustumView* fview = data->fview;
+  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
+    ->GetOrigin ();
+  float sqrad = fview->GetSquaredRadius ();
+
+  // First check the distance between the origin and the node box and see
+  // if we are within the radius.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  csBox3 b (node_bbox.Min ()-center, node_bbox.Max ()-center);
+  if (b.SquaredOriginDist () > sqrad)
+    return false;
+
   // First we do frustum checking if relevant. See if the current node
   // intersects with the frustum.
   if (data->planes_mask)
   {
-    const csBox3& node_bbox = treenode->GetNodeBBox ();
     uint32 out_mask;
     if (!csIntersect3::BoxFrustum (node_bbox, data->planes, data->planes_mask,
     	out_mask))
@@ -868,10 +902,6 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
 
-  iFrustumView* fview = data->fview;
-  const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
-    ->GetOrigin ();
-
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -882,6 +912,8 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
       	objects[i]->GetObject ();
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
+      if (b.SquaredOriginDist () > sqrad)
+	continue;
 
       if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
@@ -909,7 +941,6 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 }
 
 
-// @@@ USE RADIUS!!!
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
   UpdateObjects ();
@@ -939,69 +970,33 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
   data.planes_mask = 0;
   int i;
-  bool infinite = lf->IsInfinite ();
-  if (!infinite)
-  {
-    // In this case we have a frustum and we traverse the kd-tree to
-    // find all relevant objects.
-    
-    // @@@ What if the frustum is bigger???
-    CS_ASSERT (lf->GetVertexCount () <= 31);
-    if (lf->GetVertexCount () > 31)
-    {
-      printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
-      fflush (stdout);
-      return;
-    }
-    int i1 = lf->GetVertexCount () - 1;
-    for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
-    {
-      data.planes_mask = (data.planes_mask<<1)|1;
-      const csVector3 &v1 = lf->GetVertex (i);
-      const csVector3 &v2 = lf->GetVertex (i1);
-      data.planes[i].Set (center, v1+center, v2+center);
-    }
-    if (lf->GetBackPlane ())
-    {
-      // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
-      // It is possible this plane has to be inverted.
-      data.planes_mask = (data.planes_mask<<1)|1;
-      data.planes[i] = *(lf->GetBackPlane ());
-    }
 
-    kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
-  }
-  else
+  // Traverse the kd-tree to find all relevant objects.
+  // @@@ What if the frustum is bigger???
+  CS_ASSERT (lf->GetVertexCount () <= 31);
+  if (lf->GetVertexCount () > 31)
   {
-    // The frustum is infinite so we can just add all objects
-    // (@@@ CHECK RADIUS IN FUTURE?)
-    for (i = 0 ; i < visobj_vector.Length () ; i++)
-    {
-      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-    	visobj_vector[i];
-      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
-      csBox3 b (obj_bbox.Min ()-center, obj_bbox.Max ()-center);
-      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
-            fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
-      {
-        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginDist ();
-	data.shadobjs[data.num_shadobjs].caster = visobj_wrap->caster;
-	data.shadobjs[data.num_shadobjs].mesh = NULL;
-	data.shadobjs[data.num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
-	data.num_shadobjs++;
-      }
-      if (fview->CheckProcessMask (visobj_wrap->mesh->GetFlags ().Get ()))
-      {
-        data.shadobjs[data.num_shadobjs].sqdist = b.SquaredOriginMaxDist ();
-	data.shadobjs[data.num_shadobjs].mesh = visobj_wrap->mesh;
-	data.shadobjs[data.num_shadobjs].caster = NULL;
-	data.shadobjs[data.num_shadobjs].movable =
-		visobj_wrap->visobj->GetMovable ();
-	data.num_shadobjs++;
-      }
-    }
+    printf ("INTERNAL ERROR! #vertices in GetVisibleObjects() exceeded!\n");
+    fflush (stdout);
+    return;
   }
+  int i1 = lf->GetVertexCount () - 1;
+  for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
+  {
+    data.planes_mask = (data.planes_mask<<1)|1;
+    const csVector3 &v1 = lf->GetVertex (i);
+    const csVector3 &v2 = lf->GetVertex (i1);
+    data.planes[i].Set (center, v1+center, v2+center);
+  }
+  if (lf->GetBackPlane ())
+  {
+    // @@@ UNTESTED CODE! There are no backplanes yet in frustums.
+    // It is possible this plane has to be inverted.
+    data.planes_mask = (data.planes_mask<<1)|1;
+    data.planes[i] = *(lf->GetBackPlane ());
+  }
+
+  kdtree->Front2Back (center, CastShadows_Front2Back, (void*)&data);
 
   // Now sort the list of shadow objects on radius.
   qsort (data.shadobjs, data.num_shadobjs, sizeof (ShadObj), compare_shadobj);

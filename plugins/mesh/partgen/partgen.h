@@ -36,6 +36,8 @@ struct iMaterialWrapper;
 struct iMovable;
 struct iRenderView;
 struct iObjectRegistry;
+struct iEngine;
+struct iMeshWrapper;
 
 /**
  * This class represents a particle system. It is a set of iParticles.
@@ -47,6 +49,7 @@ class csParticleSystem : public iMeshObject
 protected:
   iMeshObjectFactory* factory;
   iBase* logparent;
+  iEngine* engine;
   /// Object space radius.
   csVector3 radius;
   /// iParticle ptrs to the particles.
@@ -54,8 +57,6 @@ protected:
   /// Self destruct and when.
   bool self_destruct;
   csTicks time_to_live; // msec
-  /// If this system should be deleted.
-  bool to_delete;
   /// Color of all particles.
   csColor color;
   /// Material for all particles.
@@ -108,9 +109,6 @@ public:
 
   /**
    * Destroy particle system, and all particles.
-   * Perhaps SetDelete(true) is easier, which will delete the part.sys.
-   * at the next engine->UpdateParticleSystems, and also remove the
-   * particle system from the engine list for you.
    */
   virtual ~csParticleSystem ();
 
@@ -149,11 +147,6 @@ public:
   inline bool GetSelfDestruct () const { return self_destruct; }
   /// if the system will self destruct, returns the time to live in msec.
   inline csTicks GetTimeToLive () const { return time_to_live; }
-
-  /// Whether this system should be deleted when possible.
-  inline void SetDelete (bool b) { to_delete = b; }
-  /// Whether this system should be deleted when possible.
-  inline bool GetDelete () const { return to_delete; }
 
   /// Change color of all particles, by col per second.
   inline void SetChangeColor(const csColor& col)
@@ -259,7 +252,6 @@ public:
     prev_time = current_time;
     Update (elaps);
   }
-  virtual bool WantToDie () const { return to_delete; }
   virtual int HitBeamBBox (const csVector3&, const csVector3&,
         csVector3&, float*)
   { return -1; }

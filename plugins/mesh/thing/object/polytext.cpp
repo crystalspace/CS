@@ -55,10 +55,12 @@ csPolyTexture::csPolyTexture ()
   DG_TYPE (this, "csPolyTexture");
   lm = NULL;
   cache_data[0] = cache_data[1] = cache_data[2] = cache_data[3] = NULL;
+  thing = NULL;
   polygon = NULL;
   ipolygon = NULL;
   shadow_bitmap = NULL;
   ambient_version = 0;
+  light_version = 0;
 }
 
 csPolyTexture::~csPolyTexture ()
@@ -165,13 +167,14 @@ bool csPolyTexture::RecalculateDynamicLights ()
   csColor amb = polygon->GetParent()->GetDynamicAmbientLight();
 
   if (!lm->UpdateRealLightMap (amb.red,
-                               amb.green,
-                               amb.blue,
-                               polygon->GetParent()
-			       	->GetDynamicAmbientVersion()>ambient_version ))
-	return false;
+      amb.green,
+      amb.blue,
+      thing->GetDynamicAmbientVersion() != ambient_version,
+      thing->GetLightVersion () != light_version ))
+    return false;
 
-  ambient_version = polygon->GetParent()->GetDynamicAmbientVersion();
+  ambient_version = thing->GetDynamicAmbientVersion();
+  light_version = thing->GetLightVersion ();
 
   //---
   // Now add all dynamic lights.
@@ -840,11 +843,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
 
   if (dyn)
   {
-    csShadowMap *smap = lm->FindShadowMap (light);
-    if (!smap) smap = lm->NewShadowMap (light, w, h);
+    if (!(shadow_bitmap->IsFullyShadowed () || shadow_bitmap->IsFullyUnlit ()))
+    {
+      csShadowMap *smap = lm->FindShadowMap (light);
+      bool created = false;
+      if (!smap)
+      {
+        smap = lm->NewShadowMap (light, w, h);
+	created = true;
+      }
 
-    unsigned char *shadowmap = smap->GetArray ();
-    shadow_bitmap->UpdateShadowMap (
+      unsigned char *shadowmap = smap->GetArray ();
+      bool relevant = shadow_bitmap->UpdateShadowMap (
         shadowmap,
         csLightMap::lightcell_shift,
         Imin_u,
@@ -858,7 +868,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
         polygon,
         cosfact);
     
-    smap->CalcMaxShadow();
+      if (!relevant && created)
+      {
+        // The shadow map is just created but it is not relevant (i.e.
+	// the light really doesn't affect it).
+	// In that case we simply delete it again.
+	lm->DelShadowMap (smap);
+      }
+      else
+      {
+        smap->CalcMaxShadow();
+      }
+    }
   }
   else
   {
@@ -897,21 +918,17 @@ void csPolyTexture::GetTextureBox (
   fMaxV = Fmax_v;
 }
 
-void csPolyTexture::SetPolygon (csPolygon3D *p)
+void csPolyTexture::SetPolygon (csPolygon3D *p, csThing* thing)
 {
   csRef<iPolygon3D> ipoly (SCF_QUERY_INTERFACE (p, iPolygon3D));
   ipolygon = ipoly;
   polygon = p;	// ipoly will DecRef here.
+  csPolyTexture::thing = thing;
 }
 
 bool csPolyTexture::DynamicLightsDirty ()
 {
-  return lm && lm->dyn_dirty;
-}
-
-void csPolyTexture::MakeDirtyDynamicLights ()
-{
-  if (lm) lm->MakeDirtyDynamicLights ();
+  return thing->GetLightVersion () != light_version;
 }
 
 iLightMap *csPolyTexture::GetLightMap ()
@@ -1431,7 +1448,7 @@ void csShadowBitmap::UpdateLightMap (
   }
 }
 
-void csShadowBitmap::UpdateShadowMap (
+bool csShadowBitmap::UpdateShadowMap (
   unsigned char *shadowmap,
   int lightcell_shift,
   float shf_u,
@@ -1445,7 +1462,7 @@ void csShadowBitmap::UpdateShadowMap (
   csPolygon3D* poly,
   float cosfact)
 {
-  if (IsFullyShadowed () || IsFullyUnlit ()) return ;
+  if (IsFullyShadowed () || IsFullyUnlit ()) return false;
 
   bool ful_lit = IsFullyLit ();
   int i, j, act;
@@ -1463,6 +1480,7 @@ void csShadowBitmap::UpdateShadowMap (
   v_rv *= rv_step;
   v_ru *= ru_step;
 
+  bool relevant = false;
   for (i = 0; i < lm_h; i++)
   {
     int uv = base_uv;
@@ -1609,8 +1627,10 @@ void csShadowBitmap::UpdateShadowMap (
       int l = shadowmap[uv] + QRound (
           CS_NORMAL_LIGHT_LEVEL * lightness * brightness);
       shadowmap[uv] = l < 255 ? l : 255;
+      if ((!relevant) && shadowmap[uv] > 0) relevant = true;
     }
   }
+  return relevant;
 }
 
 //------------------------------------------------------------------------------

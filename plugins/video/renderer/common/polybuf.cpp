@@ -61,6 +61,10 @@ void csPolArrayPolygonBuffer::SetVertexArray (csVector3* verts, int num_verts)
   num_vertices = num_verts;
   vertices = new csVector3 [num_verts];
   memcpy (vertices, verts, num_verts * sizeof (csVector3));
+  bbox.StartBoundingBox (vertices[0]);
+  int i;
+  for (i = 1 ; i < num_verts ; i++)
+    bbox.AddBoundingVertexSmart (vertices[i]);
 }
 
 void csPolArrayPolygonBuffer::AddMaterial (iMaterialHandle* mat_handle)

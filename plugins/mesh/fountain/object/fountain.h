@@ -81,15 +81,23 @@ public:
   virtual ~csFountainMeshObject ();
 
   /// Set the number of particles to use.
-  void SetParticleCount (int num) { initialized = false; number = num; }
+  void SetParticleCount (int num)
+  {
+    initialized = false;
+    shapenr++;
+    number = num;
+    FireListeners ();
+  }
   /// Get the number of particles used.
   int GetParticleCount () const { return number; }
   /// Set the size of the particles.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
+    shapenr++;
     drop_width = dropwidth;
     drop_height = dropheight;
+    FireListeners ();
   }
   /// Get the size of the particles.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -101,7 +109,9 @@ public:
   void SetOrigin (const csVector3& origin)
   {
     initialized = false;
+    shapenr++;
     csFountainMeshObject::origin = origin;
+    FireListeners ();
   }
   /// Get origin of the fountain.
   const csVector3& GetOrigin () const { return origin; }
@@ -117,7 +127,9 @@ public:
   void SetAcceleration (const csVector3& accel)
   {
     initialized = false;
+    shapenr++;
     csFountainMeshObject::accel = accel;
+    FireListeners ();
   }
   /// Get acceleration.
   const csVector3& GetAcceleration () const { return accel; }
@@ -125,7 +137,9 @@ public:
   void SetElevation (float elev)
   {
     initialized = false;
+    shapenr++;
     elevation = elev;
+    FireListeners ();
   }
   /// Get elevation.
   float GetElevation () const { return elevation; }
@@ -133,7 +147,9 @@ public:
   void SetAzimuth (float azi)
   {
     initialized = false;
+    shapenr++;
     azimuth = azi;
+    FireListeners ();
   }
   /// Get azimuth.
   float GetAzimuth () const { return azimuth; }
@@ -141,7 +157,9 @@ public:
   void SetOpening (float open)
   {
     initialized = false;
+    shapenr++;
     opening = open;
+    FireListeners ();
   }
   /// Get opening.
   float GetOpening () const { return opening; }
@@ -149,7 +167,9 @@ public:
   void SetSpeed (float spd)
   {
     initialized = false;
+    shapenr++;
     speed = spd;
+    FireListeners ();
   }
   /// Get speed.
   float GetSpeed () const { return speed; }
@@ -157,7 +177,9 @@ public:
   void SetFallTime (float ftime)
   {
     initialized = false;
+    shapenr++;
     fall_time = ftime;
+    FireListeners ();
   }
   /// Get fall time.
   float GetFallTime () const { return fall_time; }
