@@ -74,6 +74,30 @@ int ctQuatRigidBody::set_state(real *sa) {
   return get_state_size();
 }
 
+int ctQuatRigidBody::set_delta_state(real *sa) {
+  Precalculate();  // just in case
+
+  sa[0] = mom[0] / mass;
+  sa[1] = mom[1] / mass;
+  sa[2] = mom[2] / mass;
+  sa[3] = F[0] / mass;
+  sa[4] = F[1] / mass;
+  sa[5] = F[2] / mass;
+
+  ctQuaternion qdot(get_omega());
+  qdot *= quat;
+  qdot.r *= 0.5;
+  sa[6] = qdot.r;
+  sa[7] = qdot.x;
+  sa[8] = qdot.y;
+  sa[9] = qdot.z;
+
+  sa[10] = T[0];
+  sa[11] = T[1];
+  sa[12] = T[2];
+  return get_state_size();
+}
+
 void ctQuatRigidBody::Precalculate() {
   if(precalculated) return;
   quat.Normalize();
