@@ -13,7 +13,7 @@ chronological order.
 	  access it without having to pass it around everywhere.
 	- Marten comitted first steps toward making NR use fog. It does not yet
 	  work though, but its progressing.
-	- res started to work on a PS1.x -> 1.4 converted. Not useable yet,
+	- res started to work on a PS1.x -> 1.4 converter. Not useable yet,
 	  though.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
