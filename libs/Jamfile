@@ -1,6 +1,5 @@
 SubDir TOP libs ;
 
-SubInclude TOP libs csappframe ;
 SubInclude TOP libs csgeom ;
 SubInclude TOP libs csgfx ;
 SubInclude TOP libs cstool ;

@@ -28,7 +28,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * @{ */
 
 #include "csextern.h"
-
 #include "cstool/initapp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
@@ -36,74 +35,78 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /**
 * Application framework class.
 * \remarks
-* In order to properly use this class, you must derive a class from it and
-* provide a constructor and implementation for the OnInitialize() and
+* This class provides a handy object-oriented wrapper around the Crystal Space
+* initialization and start-up functions. It encapsulates a callback paradigm
+* which provides methods such as OnInitialize() and OnExit() which you can
+* override to customize the framework's behavior. You should also consider
+* using csBaseEventHandler (csutil/csbaseeventh.h), which provides the same
+* sort of object-oriented wrapper for the Crystal Space event mechanism;
+* providing methods such as OnMouseClick(), OnKeyboard(), OnBroadcast(), etc.
+* \par
+* In order to properly use this class, you must derive your own class from it,
+* providing a constructor and implementation for the OnInitialize() and
 * Application() methods. You may only have one csApplicationFramework derived
 * object in existence at any time (and generally, you will only have one such
-* object in your application). The library containing the implementation of this
-* class contains an implementation of the main() function that controls the
-* use of this class. When using the csApplicationFramework class, do not
-* provide your own implementation of main(). In your source code create a
-* global instance of the overridden object, as follows:
+* object in your application).  In your source code create a global instance of
+* the overridden object, as follows:
+*
 * \code
+* //--------------------------
 * // Example.h
-* class myDerivedEngine : public csApplicationFramework
+* class MyApp : public csApplicationFramework
 * {
 * public:
-*   myDerivedEngine();
+*   MyApp();
 *   virtual bool OnInitialize();
 *   virtual bool Application();
 * };
 *
-* extern myDerivedEngine myApp;
-*
+* extern MyApp myApp;
 *
 * //--------------------------
-*
 * // Example.cpp
 * // File scope
-* myDerivedEngine myApp;
+* MyApp myApp;
 *
-* myDerivedEngine::myDerivedEngine() : myDerivedEngine()
+* MyApp::MyApp() : csApplicationFramework()
 * {
-*   SetApplicationName ("crystal.space.example.app");
+*   SetApplicationName ("my.example.app");
 * }
 *
-* myDerivedEngine::OnIntialize()
+* MyApp::OnIntialize()
 * {
 *   // Request plugins, initialize any global non-CS data and structures
 *   return true;
 * }
 * 
-* myDerivedEngine::Application()
+* MyApp::Application()
 * {
 *   // Perform initialization of CS data and structures, set event handler,
 *   // load world, etc.
 *
-*   if ( ! Open())
-*   {
+*   if (!Open())
 *     return false;
-*   }
 *
-*   ProcessQueue();
-*
+*   Run();
 *   return true;
 * }
 * 
+* //--------------------------
+* // main.cpp
 * CS_IMPLEMENT_APPLICATION
 * 
 * int main (int argc, char* argv[]) 
 * {
 *   return csApplicationFramework::Main (argc, argv);
 * }
-* 
 * \endcode
 * \par
-* This class is derived from csInitializer for convenience, allowing
-* overridden members to call csInitializer methods without qualifying them
-* with csInitializer::.
+* csApplicationFramework itself is derived from csInitializer for convenience,
+* allowing overridden members to call csInitializer methods without qualifying
+* them with csInitializer::.
 * \par
-* This class is not related to csApp or other classes related to the CSWS.
+* This class is not related to csApp or any other class from the deprecated
+* CSWS library.
 */
 class CS_CSAPPFRAME_EXPORT csApplicationFramework : public csInitializer
 {
@@ -136,12 +139,13 @@ private:
 
   /**
   * User application string name.
-  * \remarks This string is passed to the reporter to indacate message
+  * \remarks This string is passed to the reporter to indicate message
   * origins from within the derived user application class. It should be
   * set in the derived class' constructor.
   */
   static char* m_ApplicationStringName;
 
+protected:
   /**
   * Constructor
   * \remarks The csApplicationFramework constructor initializes framework
@@ -151,29 +155,20 @@ private:
   * This constructor is protected to force the derived class to provide
   * its own constructor.
   */
-protected:
   csApplicationFramework ();
 
-  /**
-  * Destructor.
-  */
-public:
-  virtual ~csApplicationFramework ();
-
-
-public:
   /**\internal
   * Initialize the csApplicationFramework class.
   * \param argc number of arguments passed on the command line
-  * (from main()).
+  * (from Main()).
   * \param argv[] list of arguments passed on the command line
-  * (from main()).
+  * (from Main()).
   * \return true if the initialization was successful, otherwise false.
-  * \remarks This function is called by the framework's main()
-  * implementation. It initializes the default environment, then calls
+  * \remarks This function is called by the framework's Main() function.
+  * It initializes the default environment, then calls
   * the application's overridden OnInitialize() function.
   * \warning This function is intended for use by the framework library's
-  * main() implementation and should not be called by the user.
+  * Main() implementation and should not be called by the user.
   */
   static bool Initialize (int argc, char* argv[]);
 
@@ -181,31 +176,37 @@ public:
   * Start application logic.
   * \return true if the application ran successfully, otherwise false.
   * \remarks
-  * This function is called by the framework's main() implementation to
-  * essentially start the program. It is called after Initialize() is called.
+  * This function is called by the framework's Main() implementation to
+  * essentially start the program. It is called after OnInitialize() is called.
   * \warning This function is intended for use by the framework library's
-  * main() implementation and should not be called by the user.
+  * Main() implementation and should not be called by the user.
   */
   static bool Start ();
 
   /**\internal
   * End application logic.
   * \remarks
-  * This function is called by the framework's main() implementation to
+  * This function is called by the framework's Main() implementation to
   * essentially end the program.
   * \warning This function is intended for use by the framework library's
-  * main() implementation and should not be called by the user.
+  * Main() implementation and should not be called by the user.
   */
-	static void End ();
+  static void End ();
+
+public:
+  /**
+  * Destructor.
+  */
+  virtual ~csApplicationFramework ();
 
   /**
   * Quit running the appliation.
   * \remarks
   * This function will send a cscmdQuit event through the event queue. If no
   * queue has been initialized, then it will terminate the program with an
-  * exit call.
+  * exit() call.
   */
-  static void Quit (void);
+  static void Quit ();
 
 protected:
   /**
@@ -237,18 +238,18 @@ protected:
   */
   virtual bool Application () = 0;
 
-	/**
-	* Perform any end of program processing.
-	* /remarks
-	* This method is called after the crystal space engine has been shut down,
-	* just before the framework is about to end the program. Unlike the other
-	* overridables of this class, you need not bother overriding this method.
-	* In general, this is provided to allow end of program debugging support.
-	*/
-	virtual void OnExit ();
+  /**
+   * Perform any end of program processing.
+   * \remarks This method is called after the crystal space engine has been
+   * shut down, just before the framework is about to end the program. Unlike
+   * the other overridables of this class, you need not bother overriding this
+   * method.  In general, this is provided to allow end of program debugging
+   * support.
+   */
+  virtual void OnExit ();
 
-  // Inline Helper Functions
 public:
+  // Inline Helper Functions
   /**
   * Returns a pointer to the object registry.
   */
@@ -291,7 +292,7 @@ public:
   * \remarks
   * This is a shorthand method of calling csDefaultRunLoop().
   */
-  static void ProcessQueue ()
+  static void Run ()
   {
     csDefaultRunLoop (mp_object_reg);
   }

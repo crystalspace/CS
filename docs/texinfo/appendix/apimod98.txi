@@ -1143,6 +1143,25 @@ projects.  Any projects which were using this library must now instead interact
 with the 3D engine via the @file{engine} plugin and the @sc{scf} interfaces in
 the @file{CS/include/iengine} directory.
 
+@subheading csAppFrame Library Removed
+
+The @file{csappframe} library has been merged into the @file{cstool} library.
+Furthermore, the @code{main()} function, which client application's got for
+free when linking against this library, has been removed since it proved to be
+an obstacle to making Crystal Space libraries available as @dfn{shared}
+libraries. Instead, you must now provide your own @code{main()} function, like
+this:
+
+@example
+// main.cpp
+CS_IMPLEMENT_APPLICATION
+
+int main (int argc, char* argv[]) 
+@{
+  return csApplicationFramework::Main(argc, argv);
+@}
+@end example
+
 @subheading csString and iString Changes
 
 The @code{csString::strlwr()} method was renamed to @code{Downcase()}.  A

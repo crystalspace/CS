@@ -18,24 +18,24 @@
 
 
 #include "cssysdef.h"
+#include "cstool/csapplicationframework.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "csutil/cmdhelp.h"
-#include "csappframe/csapplicationframework.h"
 
 // Static 
-iObjectRegistry*  csApplicationFramework::mp_object_reg            = 0;
-csApplicationFramework* csApplicationFramework::m_Ptr              = 0;
-char*             csApplicationFramework::m_ApplicationStringName  = "user app";
-const char*       csApplicationFramework::m_FoundationStringName   = "crystalspace.libcsappframe";
-
+iObjectRegistry* csApplicationFramework::mp_object_reg = 0;
+csApplicationFramework* csApplicationFramework::m_Ptr = 0;
+char* csApplicationFramework::m_ApplicationStringName = "user app";
+const char* csApplicationFramework::m_FoundationStringName =
+  "crystalspace.libcsappframe";
 
 
 csApplicationFramework::csApplicationFramework ()
 {
   // It is a fatal error to have more than one csApplicationFramework
   // derived class in an application.
-  CS_ASSERT ( 0 == m_Ptr );
+  CS_ASSERT (0 == m_Ptr);
   m_Ptr = this;
 }
 
@@ -57,7 +57,7 @@ void csApplicationFramework::End ()
   CS_ASSERT (0 != m_Ptr);
   DestroyApplication (mp_object_reg);
   mp_object_reg = 0;
-	m_Ptr->OnExit ();
+  m_Ptr->OnExit ();
 }
 
 void csApplicationFramework::OnExit ()
@@ -68,26 +68,20 @@ bool csApplicationFramework::Initialize (int argc, char *argv[])
 {
   mp_object_reg = CreateEnvironment (argc, argv);
 
-  if ( ! mp_object_reg )
-  {
+  if (mp_object_reg == 0)
     return false;
-  }
 
   CS_ASSERT (0 != m_Ptr);
   return m_Ptr->OnInitialize (argc, argv);
 }
 
-void csApplicationFramework::Quit (void)
+void csApplicationFramework::Quit ()
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry(), iEventQueue));
   if (q)
-  {
     q->GetEventOutlet()->Broadcast (cscmdQuit);
-  }
   else
-  {
     exit (2);
-  }
 
 }
 
@@ -95,26 +89,14 @@ int csApplicationFramework::Main (int argc, char* argv[])
 {
   int iReturn = 0;
 
-  if ( ! csApplicationFramework::Initialize (argc, argv) )
-  {
+  if (!Initialize (argc, argv))
     iReturn = 1;
-  }
-  else if ( 0 == csApplicationFramework::GetObjectRegistry () )
-  {
+  else if (0 == GetObjectRegistry ())
     iReturn = 1;
-  }
-  // TODO: We may want to provide a way for the developer to disable
-  // automatic help checking, but I can't think of a reason to do so.
-  else if (csCommandLineHelper::CheckHelp (
-  	csApplicationFramework::GetObjectRegistry ()))
-  {
-    csCommandLineHelper::Help (csApplicationFramework::GetObjectRegistry ());
-  }
-  else if ( ! csApplicationFramework::Start () )
-  {
+  else if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
+    csCommandLineHelper::Help (GetObjectRegistry ());
+  else if (!Start ())
     iReturn = 2;
-  }
-
-	csApplicationFramework::End ();
+  End ();
   return iReturn;
 }

@@ -1,7 +1,0 @@
-SubDir TOP libs csappframe ;
-
-Description csappframe : "application framework" ;
-Library csappframe :
-  [ Wildcard *.cpp *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csappframe ] : *.h ] ;
-LibDepends csappframe : cstool csutil ;
