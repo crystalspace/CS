@@ -2,9 +2,8 @@
 # This script prepares CS documentation for online publication by adding
 # user-annotation capability.
 
+DIRS=$@
 EFED=perl bin/efed.pl
-
-DIRS="out/docs/pubapi/ out/docs/html/"
 
 for d in $DIRS; do
   if test -d $d; then
