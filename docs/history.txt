@@ -13,7 +13,20 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Dec-1999
+	- Change to build.pl and cssh.py from Brandon Ehle.
 20-Dec-1999
+	- Thomas also added support for resizing textures to power of
+	  two coordinates in the engine.
+	- Thomas did some changes to the Dx6.1 renderer so that it
+	  almost works.
+	- Thomas also fixed some problems in the OpenGL renderer (crash
+	  on exit, wrong texture remapping).
+	- Thomas fixed a memory overwrite bug in loadlib.cpp for Windows.
+	- Thomas also updated VC project files a bit.
+	- Michael Dale Long added support to allow core dumps when a crash
+	  occurs on UNIX. Not enabled by default. See mk/user.mak for
+	  details.
 	- Fixed a bug in specifying the gouraud shading coordinates in the
 	  world loader.
 	- Applied a patch from Andrew Zabolotny (who hasn't managed to get
