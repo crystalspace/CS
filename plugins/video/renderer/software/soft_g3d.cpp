@@ -148,12 +148,11 @@ bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 4: scfParent->do_mmx = value->GetBool (); break;
 #endif
-    case 5: scfParent->texman->Gamma = value->GetFloat (); break;
+    case 5: scfParent->Gamma = (int) (65536. * value->GetFloat ()); break;
     case 6: scfParent->do_gouraud = value->GetBool (); break;
     case 7: scfParent->do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
-  scfParent->ScanSetup ();
   return true;
 }
 
