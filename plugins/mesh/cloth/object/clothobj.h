@@ -175,6 +175,7 @@ class           csStuffObject:public iMeshObject
   virtual bool SetMaterialWrapper(iMaterialWrapper * mat)
        { material = mat; return true; }
   virtual iMaterialWrapper *GetMaterialWrapper() const { return material; }
+  virtual void InvalidateMaterialHandles () { }
   virtual int GetPortalCount () const { return 0; }
   virtual iPortal* GetPortal (int) const { return 0; }
 

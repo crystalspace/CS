@@ -205,7 +205,13 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const;
 
   /**
-   * See imesh/object.h for sepcification. The default implementation
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void InvalidateMaterialHandles () { }
+
+  /**
+   * See imesh/object.h for specification. The default implementation
    * does not support portals.
    */
   virtual int GetPortalCount () const { return 0; }

@@ -1762,6 +1762,7 @@ public:
   {
     return GetMaterial ();
   }
+  virtual void InvalidateMaterialHandles () { }
   virtual int GetPortalCount () const { return 0; }
   virtual iPortal* GetPortal (int) const { return 0; }
 

@@ -769,6 +769,8 @@ public:
   void ReplaceMaterial (iMaterialWrapper* oldmat, iMaterialWrapper* newmat);
   void ClearReplacedMaterials ();
 
+  void InvalidateMaterialHandles ();
+
   //----------------------------------------------------------------------
   // Bounding information
   //----------------------------------------------------------------------
@@ -1125,6 +1127,10 @@ public:
     virtual bool GetColor (csColor&) const { return false; }
     virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
     virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+    virtual void InvalidateMaterialHandles ()
+    {
+      scfParent->InvalidateMaterialHandles ();
+    }
     virtual int GetPortalCount () const
     {
       return scfParent->static_data->GetPortalCount ();

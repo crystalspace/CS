@@ -48,7 +48,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 1, 2);
+SCF_VERSION (iMeshObject, 0, 2, 0);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -209,6 +209,15 @@ struct iMeshObject : public iBase
    * return 0.
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+
+  /**
+   * Material changed. This is an 'event' that the engine (or another
+   * party managing materials) will send out as soon as the material
+   * handles are changed in some way which requires the mesh object
+   * to fetch it again (i.e. to call materialwrapper->GetMaterialHandle())
+   * again.
+   */
+  virtual void InvalidateMaterialHandles () = 0;
 
   /**
    * Get the number of portals in this mesh object.

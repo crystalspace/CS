@@ -2194,10 +2194,6 @@ void csThing::DrawPolygonArrayDPM (
   {
     materials_to_visit[i]->Visit ();
   }
-  for (i = 0; i < polybuf_materials.Length (); i++)
-  {
-    polybuf->SetMaterial (i, polybuf_materials[i]->GetMaterialHandle ());
-  }
 
   mesh.do_fog = false;
   mesh.do_mirror = icam->IsMirrored ();
@@ -2209,6 +2205,17 @@ void csThing::DrawPolygonArrayDPM (
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
 #endif // CS_USE_NEW_RENDERER
+
+void csThing::InvalidateMaterialHandles ()
+{
+#ifndef CS_USE_NEW_RENDERER
+  int i;
+  for (i = 0; i < polybuf_materials.Length (); i++)
+  {
+    polybuf->SetMaterial (i, polybuf_materials[i]->GetMaterialHandle ());
+  }
+#endif
+}
 
 // @@@ We need a better algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return

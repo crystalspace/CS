@@ -465,6 +465,7 @@ public:
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void InvalidateMaterialHandles () { }
   virtual int GetPortalCount () const { return 0; }
   virtual iPortal* GetPortal (int) const { return 0; }
 

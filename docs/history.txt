@@ -34,6 +34,20 @@ chronological order.
 	  which caused crashes later in the Seek() function. Fixed to start at
 	  0 now.
         - Philip Wyett updated docs to reflect a new msvc_libs release.
+	- Jorrit added iMeshObject->InvalidateMaterialHandles(). The idea
+	  is that the engine (or another entity that manages materials)
+	  will call that on all mesh objects as soon as the material handles
+	  change. This can't happen at this moment but in the future this
+	  could happen if, for example, the renderer changes at runtime or
+	  if a material animates and gets different material handles.
+	  Normally mesh objects always have to go through the material
+	  wrapper and call GetMaterialHandle() ALL the time through
+	  rendering. But this is a virtual function call and if you have
+	  an object with a lot of materials (like a thing) this can get
+	  very expensive. So now a mesh object can cache the handle and
+	  it only has to call GetMaterialHandle() again when
+	  InvalidateMaterialHandles() is called.
+	- Changed Thing mesh so it now supports InvalidateMaterialHandles().
 	- Jorrit fixed a problem in the generic renderloop plugin where
 	  SCF_IMPLEMENT_IBASE was combined with
 	  SCF_IMPLEMENT_EMBEDDED_IBASE_END.
