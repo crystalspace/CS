@@ -58,7 +58,6 @@
 #include "iutil/object.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/genmesh.h"
 #include "iengine/engine.h"

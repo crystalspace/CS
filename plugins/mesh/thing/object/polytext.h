@@ -22,7 +22,6 @@
 #include "csgeom/math3d.h"
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
-#include "imesh/thing/polygon.h"
 #include "iengine/light.h"
 
 struct iFrustumView;

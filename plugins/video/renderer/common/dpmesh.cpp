@@ -24,8 +24,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
+#include "ivideo/polyrender.h"
 #include "plugins/video/renderer/common/polybuf.h"
-#include "imesh/thing/polygon.h" // @@@
 
 //------------------------------------------------------------------------
 // Everything for mesh drawing.

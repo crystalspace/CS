@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "csgeom/subrec.h"
 
-#include "imesh/thing/polygon.h"  //@@@!!!
 #include "ivaria/reporter.h"
 
 #include "gl_render3d.h"

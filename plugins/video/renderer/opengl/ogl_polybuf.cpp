@@ -22,11 +22,11 @@
 #include "cssysdef.h"
 #include "ogl_polybuf.h"
 #include "csutil/util.h"
-#include "imesh/thing/polygon.h"
 #include "csgeom/transfrm.h"
 #include "qint.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
+#include "ivideo/polyrender.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 

@@ -26,7 +26,6 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "imesh/thing/polygon.h"
 #include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>

@@ -37,7 +37,6 @@
 #include "iengine/movable.h"
 #include "iengine/material.h"
 #include "iengine/campos.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"

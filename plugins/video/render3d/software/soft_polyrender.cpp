@@ -22,8 +22,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
-#include "imesh/thing/polygon.h"
-
 #include "soft_polyrender.h"
 #include "sft3dcom.h"
 

@@ -39,7 +39,6 @@
 #include "iengine/material.h"
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"

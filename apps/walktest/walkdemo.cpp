@@ -33,7 +33,6 @@
 #include "iengine/sharevar.h"
 #include "csgeom/poly3d.h"
 #include "imesh/object.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"

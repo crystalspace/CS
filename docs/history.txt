@@ -16,6 +16,8 @@ chronological order.
 	  things moved out of the engine.
 	- Jorrit modified the engine to print out more information during
 	  lighting only when -verbose is specified on the commandline.
+	- Jorrit moved csPolyTextureMapping from include/imesh/thing/polygon.h
+	  to include/ivideo/polyrender.h where it belongs.
 22-Feb-2004
 	- Duhprey made null renderer for the NR.  (Shaders currently try to
 	  load with error, but it appears to be harmless.)

@@ -41,7 +41,6 @@
 #include "iengine/portalcontainer.h"
 #include "imesh/object.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"

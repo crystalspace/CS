@@ -38,7 +38,6 @@
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"

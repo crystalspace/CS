@@ -38,7 +38,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"

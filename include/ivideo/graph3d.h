@@ -34,6 +34,7 @@
 #include "csgeom/tri.h"
 #include "csutil/cscolor.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/polyrender.h"
 
 struct csRenderMesh;
 class csMatrix3;

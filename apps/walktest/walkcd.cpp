@@ -26,7 +26,6 @@
 #include "igeom/polymesh.h"
 #include "csgeom/polymesh.h"
 #include "ivaria/view.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/terrfunc.h"
 #include "imesh/terrain.h"

@@ -39,7 +39,6 @@
 #include "iutil/document.h"
 #include "iutil/virtclk.h"
 #include "iutil/strset.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph2d.h"

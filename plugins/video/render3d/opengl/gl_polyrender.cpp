@@ -23,8 +23,6 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 
-#include "imesh/thing/polygon.h"
-
 #include "gl_polyrender.h"
 #include "gl_render3d.h"
 

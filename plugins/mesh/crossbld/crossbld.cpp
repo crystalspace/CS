@@ -23,7 +23,6 @@
 #include "imesh/crossbld.h"
 #include "imesh/mdldata.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "iengine/engine.h"

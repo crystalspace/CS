@@ -29,7 +29,6 @@
 #include "thing.h"
 #include "polytext.h"
 #include "iengine/sector.h"
-#include "imesh/thing/polygon.h"
 #include "ivideo/polyrender.h"
 
 class csFrustumView;

@@ -31,7 +31,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "imesh/object.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/reporter.h"
 #include "csutil/cscolor.h"

@@ -46,7 +46,6 @@
 
 #include <imesh/object.h>
 #include <imesh/thing/thing.h>
-#include <imesh/thing/polygon.h>
 #include <imesh/ball.h>
 
 #include <ivideo/graph3d.h>

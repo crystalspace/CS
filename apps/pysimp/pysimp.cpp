@@ -30,7 +30,6 @@
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "igraphic/imageio.h"
-#include "imesh/thing/polygon.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "ivideo/graph3d.h"

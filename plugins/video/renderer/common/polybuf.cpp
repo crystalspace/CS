@@ -22,7 +22,6 @@
 #include "cssysdef.h"
 #include "polybuf.h"
 #include "csutil/util.h"
-#include "imesh/thing/polygon.h"
 #include "qint.h"
 
 csPolArrayPolygonBuffer::csPolArrayPolygonBuffer (iVertexBufferManager* mgr)

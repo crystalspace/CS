@@ -22,7 +22,6 @@
 #include "csutil/sparse3d.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
