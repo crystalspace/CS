@@ -310,6 +310,10 @@ public:
   void SetZbufferMode (unsigned mode)
   { GfxPpl->SetZbufferMode (mode); }
 
+  /// Begin drawing: users of CSWS should NEVER invoke G2D/G3D->BeginDraw!
+  void pplBeginDraw (unsigned mode)
+  { GfxPpl->BeginDraw (mode); }
+
 protected:
   /// Initialize configuration data: load csws.cfg
   virtual void LoadConfig ();
