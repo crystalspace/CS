@@ -275,7 +275,7 @@ float* csRadPoly :: ComputeLumelCoverage()
 
   FixCoverageMap(covmap, width, height);
 
-  delete rp;
+  delete[] rp;
   return covmap;
 }
 
