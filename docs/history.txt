@@ -96,7 +96,7 @@ chronological order.
 	  "standalone" in the container "build" when the build directory
 	  differs from the source directory.  Client Jamfiles can query this
 	  property to conditionalize behavior.  Changed Jamfile.in so that it
-	  utilzies this new property to determine if it should perform special
+	  utilizes this new property to determine if it should perform special
 	  processing for the configure-generated 'include/volatile.h', rather
 	  than performing the check manually.
 	- Jorrit added csddsimg to the walkall target. Walktest now needs it.
