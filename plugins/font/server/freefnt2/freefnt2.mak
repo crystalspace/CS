@@ -43,7 +43,7 @@ CFG.FREEFONT2 = data/config/freetype.cfg
 TO_INSTALL.CONFIG += $(CFG.FREEFONT2)
 
 MSVC.DSP += FREEFONT2
-DSP.FREEFONT2.NAME = freefont2
+DSP.FREEFONT2.NAME = freefnt2
 DSP.FREEFONT2.TYPE = plugin
 DSP.FREEFONT2.LFLAGS = /nodefaultlib:"MSVCRT"
 DSP.FREEFONT2.CFLAGS = /I "..\..\include\cssys\win32\freetype2"
