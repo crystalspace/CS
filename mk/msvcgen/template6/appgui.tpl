@@ -45,19 +45,19 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /Gy /GF /W3 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "..\.." /I "..\..\include\csutil\win32" /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_STRICT_SMART_POINTERS" /FD %cflags% /c
+# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "%sourceroot%" /I "%sourceroot%\include\csutil\win32" /I "%sourceroot%\include\cssys\win32" /I "%sourceroot%\include" /I "%sourceroot%\libs" /I "%sourceroot%\support" /I "%sourceroot%\apps" /I "%sourceroot%\plugins" /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_STRICT_SMART_POINTERS" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG" 
-# ADD RSC /l 0x409 /d "NDEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\csrelease\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "NDEBUG" /i "%sourceroot%\include\csutil\win32" /i "%sourceroot%\include\cssys\win32" /i "%sourceroot%\include" /fo".\csrelease\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"csrelease\temp\%project%\%target%" /libpath:"%sourceroot%\libs\csutil\win32\libs" /libpath:"%sourceroot%\libs\cssys\win32\libs" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath".\csrelease\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  %buildroot%	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Debug"
@@ -74,19 +74,19 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "..\..\plugins" /I "..\.." /I "..\..\include\csutil\win32" /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /FD %cflags% /c
+# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "%sourceroot%\plugins" /I "%sourceroot%" /I "%sourceroot%\include\csutil\win32" /I "%sourceroot%\include\cssys\win32" /I "%sourceroot%\include" /I "%sourceroot%\libs" /I "%sourceroot%\support" /I "%sourceroot%\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG" 
-# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\csdebug\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "%sourceroot%\include\csutil\win32" /i "%sourceroot%\include\cssys\win32" /i "%sourceroot%\include" /fo".\csdebug\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags%
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"%sourceroot%\libs\csutil\win32\libs" /libpath:"%sourceroot%\libs\cssys\win32\libs" %lflags%
 # Begin Special Build Tool
 TargetPath=".\csdebug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  %buildroot%	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 ExtensiveMemDebug"
@@ -103,19 +103,19 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "..\..\plugins" /I "..\.." /I "..\..\include\csutil\win32" /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_EXTENSIVE_MEMDEBUG" /FD %cflags% /c
+# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "%sourceroot%\plugins" /I "%sourceroot%" /I "%sourceroot%\include\csutil\win32" /I "%sourceroot%\include\cssys\win32" /I "%sourceroot%\include" /I "%sourceroot%\libs" /I "%sourceroot%\support" /I "%sourceroot%\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_EXTENSIVE_MEMDEBUG" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG" 
-# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\csmemdbg\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "%sourceroot%\include\csutil\win32" /i "%sourceroot%\include\cssys\win32" /i "%sourceroot%\include" /fo".\csmemdbg\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csmemdbg\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags%
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csmemdbg\temp\%project%\%target%" /pdbtype:sept /libpath:"%sourceroot%\libs\csutil\win32\libs" /libpath:"%sourceroot%\libs\cssys\win32\libs" %lflags%
 # Begin Special Build Tool
 TargetPath=".\csmemdbg\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csmemdbg\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  %buildroot%	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csmemdbg\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Release_NR"
@@ -132,19 +132,19 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /Gy /GF /W3 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "..\.." /I "..\..\include\csutil\win32" /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %cflags% /c
+# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "%sourceroot%" /I "%sourceroot%\include\csutil\win32" /I "%sourceroot%\include\cssys\win32" /I "%sourceroot%\include" /I "%sourceroot%\libs" /I "%sourceroot%\support" /I "%sourceroot%\apps" /I "%sourceroot%\plugins" /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG" 
-# ADD RSC /l 0x409 /d "NDEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\csrelease\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "NDEBUG" /i "%sourceroot%\include\csutil\win32" /i "%sourceroot%\include\cssys\win32" /i "%sourceroot%\include" /fo".\csrelease\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"csrelease\temp\%project%\%target%" /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"csrelease\temp\%project%\%target%" /libpath:"%sourceroot%\libs\csutil\win32\libs" /libpath:"%sourceroot%\libs\cssys\win32\libs" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath".\csrelease\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  %buildroot%	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Debug_NR"
@@ -161,19 +161,19 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "..\..\plugins" /I "..\.." /I "..\..\include\csutil\win32" /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %cflags% /c
+# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "%sourceroot%\plugins" /I "%sourceroot%" /I "%sourceroot%\include\csutil\win32" /I "%sourceroot%\include\cssys\win32" /I "%sourceroot%\include" /I "%sourceroot%\libs" /I "%sourceroot%\support" /I "%sourceroot%\apps" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG" 
-# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\csdebug\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "%sourceroot%\include\csutil\win32" /i "%sourceroot%\include\cssys\win32" /i "%sourceroot%\include" /fo".\csdebug\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags%
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /debug /machine:I386 /out:"csdebug\temp\%project%\%target%" /pdbtype:sept /libpath:"%sourceroot%\libs\csutil\win32\libs" /libpath:"%sourceroot%\libs\cssys\win32\libs" %lflags%
 # Begin Special Build Tool
 TargetPath=".\csdebug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  %buildroot%	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
 # End Special Build Tool
 
 !ENDIF 

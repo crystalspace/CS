@@ -6,6 +6,28 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-May-2004
+	- Eric Sunshine made the following msvcgen-related changes:
+	    - Added --source-root and --build-root options to msvcgen.pl, as
+	      well as %sourceroot% and %buildroot% substitutions.  If
+	      specified, these should be path (typically relative) pointing at
+	      the roots of the source and build trees. Template files can
+	      utilize these values rather than hardcoding those paths. For
+	      instance, %sourceroot% might be used to compose /I directives
+	      pointing at the project's header directory, and %buildroot% might
+	      be used to copy built targets to the top-level build location.
+	    - Augmented msvcgen.jam so that it invokes msvcgen.pl with the
+	      --source-root and --build-root options with relative paths
+	      computed from invocations of the MsvcGenSubDir rule. This makes
+	      it simple to refer to resources and locations within the source
+	      and build trees without hardcoding the paths into the templates.
+	    - Augmented jamtemplate's msvcgen template files to utilize
+	      %sourceroot% and %buildroot%. It should now be possible for many
+	      external projects to utilize these template files without
+	      modification (even if those projects have different directory
+	      structures than projects created by jamtemplate).
+	    - Augmented the CS msvcgen templates to utilize %sourceroot% and
+	      %buildroot%.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 

@@ -383,8 +383,7 @@ rule MsvcGenSubDir1
   local path = $(1) ;
   local version = $(2) ;
   SetProperty msvcgen : outdir$(version) : [ msvcgen_target_dir $(path) ] ;
-  SetProperty msvcgen : relpath$(version) :
-    [ ConcatDirs [ FSubDir $(path[2-]) ] "" ] ;
+  SetProperty msvcgen : relpath$(version) : [ FSubDir $(path[2-]) ] ;
 }
 
 ## MsvcGenTemplateDir dircomponents [ : version ]
@@ -507,7 +506,9 @@ rule MsvcProject
       if $(icon)
       {
 	local iconrc = $(resource:S=.iconrctmp) ;
-	RELPATH on $(iconrc) = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
+	# RELPATH includes trailing slash (hence the "" in ConcatDirs).
+	RELPATH on $(iconrc) =
+	  [ ConcatDirs [ Property msvcgen : relpath$(MSVC_VERSION) ] "" ] ;
 	MakeLocate $(iconrc) : $(outdir) ;
 	Depends $(iconrc) : $(icon) ;
         GenerateIconRc $(iconrc) : $(icon) ;
@@ -529,6 +530,8 @@ rule MsvcProject
   LIBRARIES on $(target) += $(MSVC.LIBRARY) $(MSVC.LIBRARY.$(type)) ;
   LFLAGS on $(target) += $(MSVC.LFLAGS) $(MSVC.LFLAGS.$(type)) ;
   CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(type)) ;
+  RELPATH on $(target) =
+    [ ConcatDirs [ Property msvcgen : relpath$(MSVC_VERSION) ] ] ;
 
   local templatedir = [ Property msvcgen : templatedir$(MSVC_VERSION) ] ;
   if $(templatedir)
@@ -792,6 +795,8 @@ actions MsvcProjectGen
   --debuglibrary=$(DEBUGLIBRARIES) \
   --debuglflags='$(DEBUGLFLAGS)' \
   --debugcflags='$(DEBUGCFLAGS)' \
+  --source-root='$(RELPATH)' \
+  --build-root='$(RELPATH)' \
   --strip-root='$(MSVCGEN_STRIP_ROOT)' \
   --accept='$(ACCEPTS)' \
   --reject='$(REJECTS)' \

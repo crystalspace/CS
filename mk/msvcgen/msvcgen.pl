@@ -34,7 +34,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 8;
+my $PROG_VERSION = 9;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -82,6 +82,8 @@ $main::opt_T = '';	# Alias for 'template-dir'.
 @main::opt_r = ();	# Alias for 'reject'.
 @main::opt_response_file = ();
 @main::opt_R = ();	# Alias for 'response-file'.
+$main::opt_source_root = '.';
+$main::opt_build_root = '.';
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
 $main::opt_quiet = 0;
@@ -133,6 +135,8 @@ my @script_options = (
     'r=s@',		# Alias for 'reject'.
     'response-file=s@',
     'R=s@',		# Alias for 'response-file'.
+    'source-root=s',
+    'build-root=s',
     'verbose!',
     'v!',		# Alias for 'verbose'.
     'quiet!',
@@ -379,11 +383,15 @@ sub interpolate_project_group {
     my $files_buffer =
 	interpolate_items($files, '%file%', $main::project_file_template);
     interpolate('%name%', $main::opt_name, \$files_buffer);
+    interpolate('%sourceroot%', $main::opt_source_root, \$files_buffer);
+    interpolate('%buildroot%', $main::opt_build_root, \$files_buffer);
     interpolate('%metafile%', $main::opt_meta_file, \$files_buffer);
 
     my $group_name = $main::patterns->{$group}->{'name'};
     my $result = $main::project_group_template;
     interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%sourceroot%', $main::opt_source_root, \$result);
+    interpolate('%buildroot%', $main::opt_build_root, \$result);
     interpolate('%metafile%', $main::opt_meta_file, \$result);
     interpolate('%group%', $group_name, \$result);
     interpolate('%files%', $files_buffer, \$result);
@@ -414,20 +422,22 @@ sub interpolate_project {
     	interpolate('%name%', $main::opt_name, \$delaylibs);
     	interpolate('%delaylib%', $delaylib, \$delaylibs);
     }
-    interpolate('%name%',      	 xmlprotect($main::opt_name),         \$result);
-    interpolate('%upcasename%',	 xmlprotect(uc($main::opt_name)),     \$result);
-    interpolate('%project%',   	 xmlprotect($main::opt_project_name), \$result);
-    interpolate('%makefile%',    xmlprotect($main::makefile),         \$result);
-    interpolate('%target%',      xmlprotect($main::opt_target),       \$result);
-    interpolate('%metafile%',    xmlprotect($main::opt_meta_file),    \$result);
-    interpolate('%libs%',      	 xmlprotect(\@main::opt_library),     \$result);
-    interpolate('%debuglibs%', 	 xmlprotect(\@main::opt_debuglibrary),\$result);
-    interpolate('%delaylibs%', 	 xmlprotect($delaylibs), 	      \$result);
-    interpolate('%lflags%', 	 xmlprotect(\@main::opt_lflags),      \$result);
-    interpolate('%debuglflags%', xmlprotect(\@main::opt_debuglflags), \$result);
-    interpolate('%cflags%', 	 xmlprotect(\@main::opt_cflags),      \$result);
-    interpolate('%debugcflags%', xmlprotect(\@main::opt_debugcflags), \$result);
-    interpolate('%groups%',      interpolate_project_groups(),        \$result);
+    interpolate('%name%',      	xmlprotect($main::opt_name),        \$result);
+    interpolate('%upcasename%',	xmlprotect(uc($main::opt_name)),    \$result);
+    interpolate('%sourceroot%', xmlprotect($main::opt_source_root), \$result);
+    interpolate('%buildroot%',  xmlprotect($main::opt_build_root),  \$result);
+    interpolate('%project%',   	xmlprotect($main::opt_project_name),\$result);
+    interpolate('%makefile%',   xmlprotect($main::makefile),        \$result);
+    interpolate('%target%',     xmlprotect($main::opt_target),      \$result);
+    interpolate('%metafile%',   xmlprotect($main::opt_meta_file),   \$result);
+    interpolate('%libs%',      	xmlprotect(\@main::opt_library),    \$result);
+    interpolate('%debuglibs%', 	xmlprotect(\@main::opt_debuglibrary),\$result);
+    interpolate('%delaylibs%', 	xmlprotect($delaylibs), 	    \$result);
+    interpolate('%lflags%', 	xmlprotect(\@main::opt_lflags),     \$result);
+    interpolate('%debuglflags%',xmlprotect(\@main::opt_debuglflags),\$result);
+    interpolate('%cflags%', 	xmlprotect(\@main::opt_cflags),     \$result);
+    interpolate('%debugcflags%',xmlprotect(\@main::opt_debugcflags),\$result);
+    interpolate('%groups%',     interpolate_project_groups(),       \$result);
     return $result;
 }
 
@@ -441,6 +451,8 @@ sub interpolate_ws_dependency {
     foreach $dependency (sort(@main::opt_depend)) {
 	my $buffer = $main::workspace_depend_template;
 	interpolate('%name%', $main::opt_name, \$buffer);
+	interpolate('%sourceroot%', $main::opt_source_root, \$buffer);
+	interpolate('%buildroot%', $main::opt_build_root, \$buffer);
 	interpolate('%depnum%', $depcnt, \$buffer);
 	interpolate('%guid%', $main::guid, \$buffer);
 	interpolate('%depguid%', guid_from_name($dependency), \$buffer);
@@ -458,6 +470,8 @@ sub interpolate_ws_project {
     my $depends_buffer = shift;
     my $result = $main::workspace_project_template;
     interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%sourceroot%', $main::opt_source_root, \$result);
+    interpolate('%buildroot%', $main::opt_build_root, \$result);
     interpolate('%project%', $main::opt_project_name, \$result);
     interpolate('%projfile%', basename($main::opt_output), \$result);
     interpolate('%depends%', $depends_buffer, \$result);
@@ -471,6 +485,8 @@ sub interpolate_ws_project {
 sub interpolate_ws_config {
     my $result = $main::workspace_config_template;
     interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%sourceroot%', $main::opt_source_root, \$result);
+    interpolate('%buildroot%', $main::opt_build_root, \$result);
     interpolate('%guid%', $main::guid, \$result);
     return $result;
 }
@@ -494,6 +510,8 @@ sub interpolate_workspace {
     }
     my $result = $main::workspace_template;
     interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%sourceroot%', $main::opt_source_root, \$result);
+    interpolate('%buildroot%', $main::opt_build_root, \$result);
     interpolate('%projects%', $proj_buffer, \$result);
     interpolate('%depends%', $depends_buffer, \$result);
     interpolate('%configs%', $config_buffer, \$result);
@@ -551,35 +569,41 @@ sub summarize_workspace_options {
 #------------------------------------------------------------------------------
 sub summarize_project_options {
     print <<"EOT";
-Mode:      project
-Name:      $main::opt_name
-Output:    $main::opt_output
-Extension: $main::opt_project_extension
+Mode:        project
+Name:        $main::opt_name
+Output:      $main::opt_output
+Extension:   $main::opt_project_extension
+EOT
+    print <<"EOT" if $main::opt_source_root;
+Source root: $main::opt_source_root
+EOT
+    print <<"EOT" if $main::opt_build_root;
+Build root:  $main::opt_build_root
 EOT
     print <<"EOT" if defined($main::opt_fragment);
-Fragment:  $main::opt_fragment
+Fragment:    $main::opt_fragment
 EOT
     print <<"EOT";
-Template:  $main::opt_template
-Project:   $main::opt_project_name
-Target:    $main::opt_target
-Makefile:  $main::makefile
+Template:    $main::opt_template
+Project:     $main::opt_project_name
+Target:      $main::opt_target
+Makefile:    $main::makefile
 EOT
     print <<"EOT" if $main::opt_meta_file;
-Libraries: $main::opt_meta_file
+Libraries:   $main::opt_meta_file
 EOT
     print <<"EOT" if @main::opt_library;
-Libraries: @main::opt_library
+Libraries:   @main::opt_library
 EOT
     print <<"EOT" if @main::opt_lflags;
-LFLAGS:    @main::opt_lflags
+LFLAGS:      @main::opt_lflags
 EOT
     print <<"EOT" if @main::opt_cflags;
-CFLAGS:    @main::opt_cflags
+CFLAGS:      @main::opt_cflags
 EOT
     my @groups = sort(keys(%{$main::groups}));
     print <<"EOT" if @groups;
-Groups:    @groups
+Groups:      @groups
 EOT
 }
 
@@ -639,6 +663,10 @@ sub validate_workspace_options {
 	if @main::opt_delaylib;
     usage_error("The --strip-root option can be used only with --project.")
 	if @main::opt_strip_root;
+    usage_error("The --source-root option can be used only with --project.")
+        if @main::opt_source_root;
+    usage_error("The --build-root option can be used only with --project.")
+        if @main::opt_build_root;
     usage_error("Must specify --name or --output.")
 	unless $main::opt_name or $main::opt_output;
     usage_error("Must specify --name or --output, but not both.")
@@ -808,6 +836,9 @@ sub process_project_options {
     }
     @main::opt_depend = @depends;
 
+    $main::opt_source_root =~ tr:/:\\:;
+    $main::opt_build_root =~ tr:/:\\:;
+
     my @roots;
     my $root;
     foreach $root (@main::opt_strip_root) {
@@ -908,34 +939,39 @@ plugin.tpl, library.tpl, and group.tpl correspond to the project types
 available via the --template option.  Template files may contain the variables
 \%name\%, \%project\%, \%target\%, \%metafile\%, \%makefile\%, \%groups\%,
 \%libs\%, \%debuglibs\%, %delaylibs%, \%lflags\%, \%debuglflags\%, \%cflags\%
-and \%debugcflags\%.  The variables \%name\%, \%project\%, \%target\%, \%libs\%, 
-\%debuglibs\%, \%cflags\%, \%debugcflags\%, \%lflags\% and \%debuglflags\% are 
-replaced with values specified via the --name, --project-name, --target, 
---library, --debuglibrary, --cflags, --debugcflags, --lflags, and --debuglflags 
-options, respectively.  The \%name\% variable can be used in any template file.  
-The replacement value for \%makefile\% is the same as the name of the generated 
-project file except that .mak is substituted for the suffix.
+and \%debugcflags\%.  The variables \%name\%, \%project\%, \%target\%,
+\%libs\%, \%debuglibs\%, \%cflags\%, \%debugcflags\%, \%lflags\%,
+\%debuglflags\%, \%sourceroot\%, and \%buildroot\% are replaced with values
+specified via the --name, --project-name, --target, --library, --debuglibrary,
+--cflags, --debugcflags, --lflags, --debuglflags, --source-root, and
+--build-root options, respectively.  The \%name\%, variable can be used in any
+template file.  Additionally, \%sourceroot\%, and \%buildroot\% can be used in
+any project-related (but not workspace-related) template.  The replacement
+value for \%makefile\% is the same as the name of the generated project file
+except that .mak is substituted for the suffix.
 
 The template prjgroup.tpi is used multiple times to build a value for the
 \%groups\% variable mentioned above.  This template is used to create the file
 groups "Source Files", "Header Files", and "Resource Files", as needed, within
-the generated project file.  This template may contain the variables \%group\%,
-\%files\%, and \%name\%.  The \%group\% variable is automatically replaced by
-the name of the group being generated (for instance "Source Files").
+the generated project file.  This template may contain the variables \%group\%
+and \%files\%, in addition to the variables available to all templates.  The
+\%group\% variable is automatically replaced by the name of the group being
+generated (for instance "Source Files").
 
 The template prjfile.tpi is used multiple times to build a value for the
 \%files\% variable mentioned above.  This template is used to specify each file
 which makes up a file group (represented by prjgroup.tpi).  This template may
 contain the variable \%file\% which represents a file name provided as an
-argument to this script during DSP/VCPROJ generation.  It may also reference
-the variable \%name\%.
+argument to this script during DSP/VCPROJ generation, as well as the globally
+available variables.
 
 The template prjdelay.tpi is used multiple times to bulid a value for the
 \%delaylibs\% variable mentioned above.  This template is used to specify each
 delayed-load library given via the --delaylib option.  The entire content of
 this template should be placed on a single line and should not end with a line
-terminator.  This template may contain the variables \%delaylib\% and \%name\%.
-The value of \%delaylib\% will be a name of a DLL specified with --delaylib.
+terminator.  This template may contain the variable \%delaylib\%, as well as
+the globally available variables.  The value of \%delaylib\% will be a name of
+a DLL specified with --delaylib.
 
 During project file generation, a couple of workspace fragment files (for
 project, configuration, and dependency information) can also be generated with
@@ -947,31 +983,32 @@ project files generated individually).  Note: MSVC 6 projects require only the
 dependency information; the templates for the other fragments may be empty.
 
 The project fragment file is created from the template wsgroup.tpi.  This
-template may contain the variables \%project\%, \%projfile\%, \%depends\%,
-\%guid\%, and \%name\%.  The \%project\% variable has the same meaning as it
-does when used with the templates specified via --template.  The \%projfile\%
-variable is replaced by the name of the generated project file (see --output),
-except that the directory portion of the path is stripped off.  The \%depends\%
-variable contains a collection of inter-project dependency information for
-projects contained in the workspace.  The value of \%guid\% is a unique
-identifier which is required by every MSVC 7 project.  This value is composed
-automatically from the project name.
+template may contain the variables \%project\%, \%projfile\%, \%depends\%, and
+\%guid\%, as well as the globally available variables.  The \%project\%
+variable has the same meaning as it does when used with the templates specified
+via --template.  The \%projfile\% variable is replaced by the name of the
+generated project file (see --output), except that the directory portion of the
+path is stripped off.  The \%depends\% variable contains a collection of
+inter-project dependency information for projects contained in the workspace.
+The value of \%guid\% is a unique identifier which is required by every MSVC 7
+project.  This value is composed automatically from the project name.
 
-To create configuration fragments, the template wscfg.tpi is used.  The only
-variable it may contain is \%guid\%.  This template is required only by MSVC 7,
-but it must also be present when creating MSVC 6 files, though it may left
-empty.
+To create configuration fragments, the template wscfg.tpi is used.  It may
+contain the variable \%guid\%, in addition to the globally available variables.
+This template is required only by MSVC 7, but it must also be present when
+creating MSVC 6 files, though it may left empty.
 
 The template wsdep.tpi is used multiple times to build a value for the
 \%depends\% variable mentioned above.  This template is used to specify
 inter-project dependencies within a workspace file.  This template may contain
-the variables \%guid\%, \%depguid\%, \%depnum\%, \%depend\%, and \%name\%.
-\%guid\% is the unique project identifier discussed above.  \%depguid\% is the
-unique project identifier of a project upon which this project depends (see
---depend), \%depend\% is the name of a project upon which this project depends
-(see --depend).  Each project named by --depend is also assigned a small number
-(starting at zero with the first --depend encountered).  When processing the
-named dependency, the associated number is available as \%depnum\%.
+the variables \%guid\%, \%depguid\%, \%depnum\%, \%depend\%, and the globally
+available variables.  \%guid\% is the unique project identifier discussed
+above.  \%depguid\% is the unique project identifier of a project upon which
+this project depends (see --depend), \%depend\% is the name of a project upon
+which this project depends (see --depend).  Each project named by --depend is
+also assigned a small number (starting at zero with the first --depend
+encountered).  When processing the named dependency, the associated number is
+available as \%depnum\%.
 
 Finally, a workspace file is generated when --workspace is specified.  The
 DSW/SLN file is created by merging the contents of fragment files into the
@@ -1114,9 +1151,9 @@ Project Options:
                  Specifies the name of an extra Windows library with which the
                  project should be linked in addition to those which are
                  already mentioned in the template file.  The named library
-                 will become part of the replacement value for the 
-		 \%debuglibs\% variable in the template files. This can be used 
-		 if another set of libraries is to be used for debug purposes. 
+                 will become part of the replacement value for the
+		 \%debuglibs\% variable in the template files. This can be used
+		 if another set of libraries is to be used for debug purposes.
     -Y <name>
     --delaylib=<name>
                  Specifies the name of a DLL which should be delay-loaded.  In
@@ -1139,8 +1176,8 @@ Project Options:
     --debuglflags=<flags>
                  Specifies extra linker options which should be used in
                  addition to those already mentioned in the template file.
-                 This is the replacement value for the \%debuglflags\% variable 
-		 in the project template files.  This can be used if another 
+                 This is the replacement value for the \%debuglflags\% variable
+		 in the project template files.  This can be used if another
 		 set of flags is to be used for debug purposes.
     -c <flags>
     --cflags=<flags>
@@ -1155,9 +1192,25 @@ Project Options:
     --cflags=<flags>
                  Specifies extra compiler options which should be used in
                  addition to those already mentioned in the template file.
-                 This is the replacement value for the \%debugcflags\% 
-		 variable in the project template files.  This can be used 
+                 This is the replacement value for the \%debugcflags\%
+		 variable in the project template files.  This can be used
 		 if another set of flags is to be used for debug purposes.
+    --source-root=<path>
+                 Specifies a (typically relative) path from the location where
+                 the project files will reside back to the root of the source
+                 tree in which they live. This is the replacement value for the
+                 \%sourceroot\% variable in project template files.  This
+                 information might be useful, for instance, when composing MSVC
+                 /I directives for specifying header locations.  Example: /I
+                 "%sourceroot\\include"
+    --build-root=<path>
+                 Specifies a (typically relative) path from the location where
+                 the project files will reside to the root of the build tree in
+                 which built targets may be placed.  This is the replacement
+                 value for the \%buildroot\% variable in project template
+                 files.  This information might be useful, for instance, when
+                 composing MSVC post-build rules if built files need to be
+                 copied to some final resting place.
     -f
     -f <path>
     --fragment

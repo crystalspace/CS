@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /Gy /GF /W3 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "." /I ".." /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /FD %cflags% /c
+# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "." /I "%sourceroot%" /I "%sourceroot%\include" /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG" 
 # ADD RSC /l 0x409 /d "NDEBUG" /fo".\release\temp\%project%\%project%.res"
 BSC32=bscmake.exe
@@ -54,7 +54,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath".\release\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" ..
+PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" %buildroot%
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Debug"
@@ -71,7 +71,7 @@ PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" ..
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "." /I ".." /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /FD %debugcflags% /c
+# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "." /I "%sourceroot%" /I "%sourceroot%\include" /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /FD %debugcflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG" 
 # ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /fo".\debug\temp\%project%\%project%.res"
 BSC32=bscmake.exe
@@ -83,7 +83,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath=".\debug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)"  ..
+PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" %buildroot%
 # End Special Build Tool
 
 !ENDIF 

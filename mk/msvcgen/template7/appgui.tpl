@@ -23,7 +23,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
+				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -48,7 +48,7 @@
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
@@ -60,7 +60,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;$(TargetPath)&quot;  %buildroot%
 echo Moving output to MSVC Debug Bin.
 copy &quot;$(TargetPath)&quot;  csdebug\bin
 "/>
@@ -72,7 +72,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -96,7 +96,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
+				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
 				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
@@ -116,7 +116,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="2"
@@ -128,7 +128,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;$(TargetPath)&quot;  %buildroot%
 echo Moving output to MSVC Release Bin.
 copy &quot;$(TargetPath)&quot;  csrelease\bin
 "/>
@@ -140,7 +140,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -159,7 +159,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
+				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -184,7 +184,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				OutputFile="csmemdbg\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csmemdbg\temp\%project%/%project%.pdb"
@@ -196,7 +196,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;$(TargetPath)&quot;  %buildroot%
 echo Moving output to MSVC Debug Bin.
 copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 "/>
@@ -208,7 +208,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -227,7 +227,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
+				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -251,7 +251,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
@@ -263,7 +263,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;$(TargetPath)&quot;  %buildroot%
 echo Moving output to MSVC Debug Bin.
 copy &quot;$(TargetPath)&quot;  csdebug\bin
 "/>
@@ -275,7 +275,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -299,7 +299,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="..\..,..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
+				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
 				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
@@ -318,7 +318,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\libs\csutil\win32\libs,..\..\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="2"
@@ -330,7 +330,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;$(TargetPath)&quot;  %buildroot%
 echo Moving output to MSVC Release Bin.
 copy &quot;$(TargetPath)&quot;  csrelease\bin
 "/>
@@ -342,7 +342,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\include\csutil\win32,..\..\include\cssys\win32,..\..\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool

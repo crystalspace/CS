@@ -27,7 +27,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories=".,.."
+				AdditionalIncludeDirectories=".,%sourceroot%,%sourceroot%\include"
 				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to build root.
-copy &quot;$(TargetPath)&quot; ..
+copy &quot;$(TargetPath)&quot; %buildroot%
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -90,7 +90,7 @@ copy &quot;$(TargetPath)&quot; ..
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%debugcflags%"
-				AdditionalIncludeDirectories=".,.."
+				AdditionalIncludeDirectories=".,%sourceroot%,%sourceroot%\include"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -129,7 +129,7 @@ copy &quot;$(TargetPath)&quot; ..
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to build root.
-copy &quot;$(TargetPath)&quot; ..
+copy &quot;$(TargetPath)&quot; %buildroot%
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
