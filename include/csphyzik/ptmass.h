@@ -105,7 +105,7 @@ class ctPointMass : public ctPointObj, public ctEntity {
   }
   int set_delta_state(real *sa) {
     sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
-    sa[0] = F[0]; sa[1] = F[1]; sa[2] = F[2];
+    sa[3] = F[0]; sa[4] = F[1]; sa[5] = F[2];
     return get_state_size();
   }
 };
