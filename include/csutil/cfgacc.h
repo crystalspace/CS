@@ -38,6 +38,8 @@ class CS_CSUTIL_EXPORT csConfigAccess
 public:
   /// constructor
   csConfigAccess();
+  /// constructor (provides access to config manager, but doesn't add file)
+  csConfigAccess(iObjectRegistry *object_reg);
   /// constructor (also adds a config file)
   csConfigAccess(iObjectRegistry *object_reg, const char *Filename,
     bool vfs = true, int Priority = iConfigManager::ConfigPriorityPlugin);

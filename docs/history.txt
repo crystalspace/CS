@@ -37,6 +37,13 @@ chronological order.
 	  program. (This may not be the best solution for synthesizing argv[0],
 	  but it is better than sending a bogus argv[] array to the C/C++
 	  function.)
+	- res added some facilities for keyboard handling debugging. Can be
+	  enabled by setting the KeyboardDriver.EnableDebugging config var to
+	  true.
+	- res augmented csConfigAccessor to also contain a simple object 
+	  registry only constructor.
+	- res slightly augmented the iGraphics3D::DrawSimpleMesh() docs to
+	  state that use of that method in 2D mode is possible, too.
 25-Nov-2004
 	- Eric Sunshine enhanced SCF so that it now recognizes the --verbose
 	  command-line option. When enabled, it emits the following additional

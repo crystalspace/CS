@@ -76,6 +76,16 @@ public:
   virtual void ResetState ();
 };
 
+#ifdef CS_DEBUG
+  #ifndef CS_KEY_DEBUG_ENABLE
+    /**
+     * Define at CrystalSpace build time to enable support for keyboard input 
+     * debugging. (By default available in debug, but not optimize builds.)
+     */
+    #define CS_KEY_DEBUG_ENABLE
+  #endif
+#endif
+
 /**
  * Generic Keyboard Driver.<p>
  * Keyboard driver should generate events and put them into
@@ -88,6 +98,8 @@ protected:
   /// Key state array.
   csHash<bool, utf32_char> keyStates;
   csKeyModifiers modifiersState;
+  bool keyDebug;
+  bool keyDebugChecked;
 
   /**
    * Set key state. For example SetKey (CSKEY_UP, true). Called
@@ -101,6 +113,9 @@ protected:
    */
   virtual void SynthesizeCooked (utf32_char codeRaw,
     const csKeyModifiers& modifiers, utf32_char& codeCooked);
+
+  const char* GetKeycodeString (utf32_char code);
+  bool IsKeyboardDebugging ();
 public:
   SCF_DECLARE_IBASE;
 

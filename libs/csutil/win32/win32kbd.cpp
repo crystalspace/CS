@@ -25,6 +25,11 @@
 #include "win32kbd.h"
 #include "csutil/win32/wintools.h"
 
+#ifdef CS_KEY_DEBUG_ENABLE
+#include "csutil/sysfunc.h"
+#include "win32kbd_identstrs.h"
+#endif
+
 static void ModifiersToKeyState (const csKeyModifiers& modifiersState,
 				 BYTE* keystate)
 {
@@ -394,6 +399,12 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    (message == WM_SYSKEYDOWN);
 	bool autoRep = ((lParam & 0x40000000) != 0);
 	csKeyCharType type;
+	if (IsKeyboardDebugging())
+	{
+	  csPrintf ("msg: %s wp: %s lp: %.8x\n", 
+	    Win32KeyMsgNames.StringForIdent (message), GetVKName (wParam), 
+	    lParam);
+	}
 	if (Win32KeyToCSKey (wParam, lParam, raw, cooked, type))
 	{
 	  bool doDoKey = true;
@@ -437,9 +448,15 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    bool rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
 
 	    if (lshiftState != lshiftDown)
+	    {
+	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
 	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, autoRep, type);
+	    }
 	    if (rshiftState != rshiftDown)
+	    {
+	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
 	      DoKey (CSKEY_SHIFT_RIGHT, CSKEY_SHIFT, rshiftDown, autoRep, type);
+	    }
 
 	    doDoKey = false;
 	  }
@@ -785,3 +802,22 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
   return false;
 }
 
+const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
+{
+#ifdef CS_KEY_DEBUG_ENABLE
+  const char* vkName = Win32VKeyNames.StringForIdent (vKey);
+  if (vkName != 0) return vkName;
+
+  static char genName[13];
+  if (((vKey >= 'A') && (vKey <= 'Z')) || ((vKey >= '0') && (vKey <= '9')))
+  {
+    genName[0] = vKey; genName[1] = 0;
+  }
+  else
+  {
+    sprintf (genName, "[%ld]", vKey);
+  }
+  return genName;
+#endif
+  return 0;
+}

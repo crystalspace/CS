@@ -30,6 +30,11 @@ csConfigAccess::csConfigAccess()
   object_reg = 0;
 }
 
+csConfigAccess::csConfigAccess(iObjectRegistry *object_reg)
+{
+  csConfigAccess::object_reg = object_reg;
+}
+
 csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, const char *fname,
   bool vfs, int priority)
 {

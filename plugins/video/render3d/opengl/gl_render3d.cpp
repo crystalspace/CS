@@ -2373,7 +2373,9 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       rmesh.object2camera.SetO2TTranslation (csVector3 (0, viewheight, 0));
       // Try to be compatible with 2D drawing mode
       G2D->PerformExtension ("glflushtext");
-    } else {
+    } 
+    else 
+      {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 

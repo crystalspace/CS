@@ -725,7 +725,8 @@ enum csSimpleMeshFlags
   /**
    * Ignore the object2camera transform in the csSimpleRenderMesh struct and
    * replace it with a transformation that effectively lets you specify the
-   * vertices in screen space.
+   * vertices in screen space. The Z components of the mesh vertices should be
+   * set to 0 when this flag is specified.
    */
   csSimpleMeshScreenspace = 0x01
 };
@@ -1219,6 +1220,11 @@ struct iGraphics3D : public iBase
    * about setting up render buffers, activating the texture etc.
    * Note that you can still provide shaders and shader variables, but those
    * are optional.
+   * \param mesh The mesh to draw.
+   * \param flags Drawing flags, a combination of csSimpleMeshFlags values.
+   * \remark This operation can also be called from 2D mode. In this case,
+   *  the csSimpleMeshScreenspace flag should be specified. If this is not the
+   *  case, you are responsible for the mess that is likely created.
    */
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     uint flags = 0) = 0;

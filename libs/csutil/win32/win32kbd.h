@@ -60,6 +60,7 @@ protected:
   csDirtyAccessArray<WCHAR> IMEComposeBuf;
   bool Win32KeyToCSKey (LONG vKey, LONG keyFlags,
     utf32_char& rawCode, utf32_char& cookedCode, csKeyCharType& charType);
+  const char* GetVKName (LONG vKey);
 public:
   csWin32KeyboardDriver (iObjectRegistry* r);
   virtual ~csWin32KeyboardDriver ();

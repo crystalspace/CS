@@ -27,6 +27,10 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
+#ifdef CS_KEY_DEBUG_ENABLE
+#include "cskey_identstrs.h"
+#endif
+
 // This array defines first 32..128 character codes with SHIFT key applied
 static char ShiftedKey [128-32] =
 {
@@ -317,6 +321,8 @@ csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
 
   memset (&modifiersState, 0, sizeof (modifiersState));
 
+  keyDebugChecked = false;
+
   Listener = &scfiEventHandler;
   StartListening();
 }
@@ -363,6 +369,13 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
   if (codeCooked == 0)
   {
     SynthesizeCooked (codeRaw, modifiersState, codeCooked);
+  }
+
+  if (IsKeyboardDebugging())
+  {
+    csPrintf ("raw: %s cooked: %s %s%s%s\n", GetKeycodeString (codeRaw), 
+      GetKeycodeString (codeCooked), iDown ? "down" : "up", 
+      autoRepeat ? " autoRepeat" : "");
   }
 
   /*
@@ -444,6 +457,36 @@ csEventError csKeyboardDriver::SynthesizeCooked (iEvent *ev)
   ev->Add ("keyModifiers", (void *) & mods, sizeof (mods));
 
   return csEventErrNone;
+}
+
+const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
+{
+#ifdef CS_KEY_DEBUG_ENABLE
+  const char* str = KeyCodeNames.StringForIdent (code);
+  if (str != 0) return str;
+
+  static char genName[13];
+  sprintf (genName, "[%lu]", code);
+  return genName;
+#endif
+  return 0;
+}
+
+bool csKeyboardDriver::IsKeyboardDebugging ()
+{
+#ifndef CS_KEY_DEBUG_ENABLE
+  return false;
+#endif
+  // Delay checking b/c at construction time the config manager is prolly
+  // not set up yet.
+  // @@@ Should probably controlled via "--verbose".
+  if (!keyDebugChecked)
+  {
+    csConfigAccess cfgAccess (Registry);
+    keyDebug = cfgAccess->GetBool ("KeyboardDriver.EnableDebugging");
+    keyDebugChecked = true;
+  }
+  return keyDebug;
 }
 
 void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
