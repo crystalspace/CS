@@ -78,11 +78,6 @@
 #include "csutil/vfs.h"
 #endif
 
-//CS Tools
-#ifndef NO_CSTOOLS
-#include "cstools/simpcons.h"
-#endif
-
 //CS Parser
 #ifndef NO_CSPARSER
 #include "csparser/csloader.h"
