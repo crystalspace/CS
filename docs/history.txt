@@ -7086,7 +7086,7 @@ chronological order.
 	  ways to iterator. The same is true for csHashIteratorReversible.
 	- Some further optimizations on csGlobalHashIterator.
 	- Several fixes to csArray::SetCapacity() and related.
-	- Anoter csArray::SetCapacity() fix.
+	- Another csArray::SetCapacity() fix.
 	- Eric Sunshine fixed some Texinfo mark-up errors reported by makeinfo.
 	- Eric Sunshine fixed a number of formatting and Texinfo mark-up
 	  problems in movierec.txi.  Also eliminated a number of `hbox'
@@ -7712,7 +7712,7 @@ chronological order.
           - Removed some unused local variables
           - Clarified some comments
         - Boyan added boolean property "Stretched" on AWS Command Button
-	- Matze
+	- Matze made the following changes:
 	    - Fixed (blindly) lots of errors when using the jambuild on
 	      MacOS/X.
 	    - Fixed several warnings through the whole project.
