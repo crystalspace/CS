@@ -54,7 +54,9 @@ public:
                     CTextureFile* pTexture,
                     double x_off, double y_off, double rot_angle,
                     double x_scale, double y_scale,
-                    bool QuarkModeTexture, bool QuarkMirrored);
+		    CdVector3 v_tx_right, CdVector3 v_tx_u,
+                    bool QuarkModeTexture, bool QuarkMirrored,
+		    bool HLTexture);
 
   /**
     * Constructs a Plane from the given color

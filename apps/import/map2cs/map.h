@@ -91,8 +91,10 @@ public:
                               double x_off, double y_off,
                               double rot_angle,
                               double x_scale, double y_scale,
+			      CdVector3 v_tx_right, CdVector3 v_tx_up,
                               bool QuarkModeTexture,
-                              bool QuarkMirrored);
+                              bool QuarkMirrored,
+			      bool HLTexture);
 
   /**
     * Adds a flatshaded plane. the given values are the color components

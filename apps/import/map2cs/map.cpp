@@ -100,8 +100,10 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
                                       double x_off, double y_off,
                                       double rot_angle,
                                       double x_scale, double y_scale,
+				      CdVector3 v_tx_right, CdVector3 v_tx_up,
                                       bool QuarkModeTexture,
-                                      bool QuarkMirrored)
+                                      bool QuarkMirrored,
+				      bool HLTexture)
 {
   CTextureFile* pTexture = m_TextureManager.GetTexture(TextureName);
   if (!pTexture)
@@ -113,7 +115,9 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
   CMapTexturedPlane* pNewPlane =
     new CMapTexturedPlane(this, v1, v2, v3, pTexture, x_off,
                           y_off, rot_angle, x_scale, y_scale,
-                          QuarkModeTexture, QuarkMirrored);
+			  v_tx_right, v_tx_up,
+                          QuarkModeTexture, QuarkMirrored,
+			  HLTexture);
   return AddPlane(pNewPlane);
 }
 

@@ -29,7 +29,9 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
                                      CTextureFile* pTexture,
                                      double x_off, double y_off, double rot_angle,
                                      double x_scale, double y_scale,
-                                     bool QuarkModeTexture, bool QuarkMirrored)
+				     CdVector3 v_tx_right, CdVector3 v_tx_up,
+                                     bool QuarkModeTexture, bool QuarkMirrored,
+				     bool HLTexture)
 {
   assert(pTexture);
 
@@ -123,7 +125,14 @@ CMapTexturedPlane::CMapTexturedPlane(CMapFile*,
     CdVector3 norm;
     CdVector3 xv;
     CdVector3 yv;
-    CalcTextureAxis(norm, xv, yv);
+    if (HLTexture)
+    {
+      xv = v_tx_right;
+      yv = v_tx_up;
+      norm = xv % yv;
+    }
+    else
+      CalcTextureAxis(norm, xv, yv);
 
     //Now we calculate points on on this plane to represent out texture
     //coordinates

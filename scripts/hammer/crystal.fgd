@@ -42,6 +42,8 @@
 	]
 	libraries(string) : "Libraries to include"
 	usermaterials(string) : "User-defined materials"
+	usertextures(string) : "User-defined textures"
+	renderloopname(string) : "Render loop name" = "*default"
 ]
 
 
@@ -150,14 +152,12 @@
 
 @PointClass = info_player_start : "Determines where the player starts"
 [
-	angle(string) : "Direction" : "360"
 ]
 
 
 
 @PointClass = info_player_deathmatch : "Determines where the player starts"
 [
-	angle(string) : "Direction" : "360"
 ]
 
 

@@ -23,6 +23,17 @@ chronological order.
 	- Eric Sunshine upgraded csEngine::HandleEvent() so that it deals more
 	  gracefully with failure to load /shader/or_lighting.xml (rather than
 	  crashing outright).
+	- res made the following changes to map2cs:
+	    - Applied a patch from Calle Lejdfors <calle.lejdfors@cs.lth.se>
+	      to generate 'new' portal statements.
+	    - Improved texturing for HL maps in some cases.
+	    - Allow more control where a library is referenced in the map file;
+	      "end:lib" puts lib at the end (useful for e.g. sequences).
+	    - The player start angle is correctly evaluated.
+	    - Added possibility to exclude certain textures from being 
+	      generated and written to the .zip (so they are supplied by the 
+	      user).
+	    - Added possibility to specify the renderloop to use.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

@@ -121,6 +121,7 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       double rot_angle = 0;
       double x_scale = 1.0;
       double y_scale = 1.0;
+      CdVector3 v_tx_right, v_tx_up;
 
       //Read the three vectors, that define the position of the plane
       if (!ReadVector(pParser, v1))       return false;
@@ -172,18 +173,15 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
         // with texture alignmets, that are not trivial.
         // Thomas Hieber 2000-06-12
 
-        // Some dummy variables, not used yet.
-        CdVector3 v_x_off, v_y_off;
-
         // Read the X Offset (3D Vector & offset)
         if (!pParser->ExpectToken ("["))     return false;
-        if (!ReadVector(pParser, v_x_off))   return false;
+        if (!ReadVector(pParser, v_tx_right))   return false;
         if (!pParser->GetFloatToken (x_off)) return false;
         if (!pParser->ExpectToken ("]"))     return false;
 
         // Read the Y Offset (3D Vector & offset)
         if (!pParser->ExpectToken ("["))     return false;
-        if (!ReadVector(pParser, v_y_off))   return false;
+        if (!ReadVector(pParser, v_tx_up))   return false;
         if (!pParser->GetFloatToken (y_off)) return false;
         if (!pParser->ExpectToken ("]"))     return false;
       }
@@ -260,7 +258,9 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
         CMapTexturedPlane* pPlane = pMap->AddPlane(v1, v2, v3, TextureName,
                                                    x_off, y_off, rot_angle,
                                                    x_scale, y_scale,
-                                                   QuarkModeTexture, QuarkMirrored);
+						   v_tx_right, v_tx_up,
+                                                   QuarkModeTexture, QuarkMirrored,
+						   WC3MAP);
         assert(pPlane);
 
         //Add that plane to the planes list.

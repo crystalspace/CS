@@ -166,16 +166,6 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   CMapEntity* pEntity = GetWorldspawn();
   
   {
-    DocNode settings = CreateNode (world, "settings");
-    CreateNode(settings, "clearzbuf", "yes");
-
-    if (const char *lmcs = pEntity->GetValueOfKey ("lightmapcellsize"))
-    {
-      CreateNode(settings, "lightmapcellsize", lmcs);
-    }
-  }
-  
-  {
     DocNode scaling = CreateNode (world, "key");
     scaling->SetAttribute ("name", "map2cs_scaling");
     scaling->SetAttributeAsFloat ("value", m_ScaleFactor);
@@ -184,6 +174,20 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   WritePlayerStart (world);
   WriteTextures (world);
   WriteLibs (world);
+
+  {
+    DocNode settings = CreateNode (world, "settings");
+    CreateNode(settings, "clearzbuf", "yes");
+
+    if (const char *lmcs = pEntity->GetValueOfKey ("lightmapcellsize"))
+    {
+      CreateNode(settings, "lightmapcellsize", lmcs);
+    }
+    if (const char *rloop = pEntity->GetValueOfKey ("renderloopname"))
+    {
+      CreateNode(settings, "renderloop", rloop);
+    }
+  }
 
   {
     DocNode renderpriorities = CreateNode (world, "renderpriorities");
@@ -224,6 +228,8 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
 
   WriteSkysector (world);
   WriteSectors (world);
+  
+  WriteLibs (world, "end");
 
   return true;
 }
@@ -525,6 +531,7 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
   FindAdditionalTextures();
 
   csSet<csStrKey, csConstCharHashKeyHandler> userMaterials;
+  csSet<csStrKey, csConstCharHashKeyHandler> userTextures;
 
   const char* mats = pEntity->GetValueOfKey("usermaterials");
   csString mat;
@@ -541,6 +548,21 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
     mats = comma ? comma + 1 : 0;
   }
 
+  const char* txts = pEntity->GetValueOfKey("usertextures");
+  csString txt;
+  while (txts && *txts)
+  {
+    txt.Clear();
+    const char* comma = strchr (txts, ',');
+    if (comma)
+      txt.Append (txts, comma - txts);
+    else
+      txt.Append (txts);
+    
+    userTextures.Add ((const char*)txt);
+    txts = comma ? comma + 1 : 0;
+  }
+
   DocNode textures = CreateNode (node, "textures");
   DocNode materials = CreateNode (node, "materials");
 
@@ -550,7 +572,11 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
     CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
     assert(pTexture);
 
-    if (pTexture->IsStored())
+    if (userTextures.In (pTexture->GetTexturename()))
+    {
+      pTexture->SetStored (false);
+    }
+    else if (pTexture->IsStored())
     {
       char replacename[255];
       const char *newtexfile;
@@ -645,9 +671,25 @@ bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
         {
           //The strings format matched
 	  CdVector3 forw(0,0,1);
+	  CdVector3 up(0,1,0);
 	  // rotate angle
 	  double angle = 0.0;
-	  if (pEntity->GetNumValueOfKey("angle", angle))
+	  double a = 0.0, b = 0.0, c = 0.0; // pitch, yaw, roll
+	  if (pEntity->GetTripleNumValueOfKey("angles", a, b, c))
+	  {
+	    const double sa = sin (a);
+	    const double ca = cos (a);
+	    const double sb = sin (b);
+	    const double cb = cos (b);
+	    const double sc = sin (c);
+	    const double cc = cos (c);
+	    CdMatrix3 rot (cb*cc, -cb*sc, sb,
+			   ca*sc + sa*sb*cc, ca*cc - sa*sb*sc, -sa*cb,
+			   sa*sc - ca*sb*cc, sa*cc + ca*sb*sc, ca*cb);
+	    up = rot * up;
+	    forw = rot * forw;
+	  }
+	  else if (pEntity->GetNumValueOfKey("angle", angle))
 	  {
 	    angle = PI * angle/180;
 	    forw = CdMatrix3 (cos(angle), 0, -sin(angle),
@@ -670,9 +712,9 @@ bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
 	  attr->SetAttributeAsFloat ("z", forw.z);
 
 	  attr = CreateNode (start, "up");
-	  attr->SetAttributeAsFloat ("x", 0.0f);
-	  attr->SetAttributeAsFloat ("y", 1.0f);
-	  attr->SetAttributeAsFloat ("z", 0.0f);
+	  attr->SetAttributeAsFloat ("x", up.x);
+	  attr->SetAttributeAsFloat ("y", up.y);
+	  attr->SetAttributeAsFloat ("z", up.z);
           return true;
         }
         else
@@ -745,7 +787,7 @@ bool CCSWorld::WriteCurvetemplates(csRef<iDocumentNode> node)
   return true;
 }
 
-bool CCSWorld::WriteLibs (csRef<iDocumentNode> node)
+bool CCSWorld::WriteLibs (csRef<iDocumentNode> node, const char* type)
 {
   const char* libs = GetWorldspawn()->GetValueOfKey("libraries");
   csString lib;
@@ -757,8 +799,18 @@ bool CCSWorld::WriteLibs (csRef<iDocumentNode> node)
       lib.Append (libs, comma - libs);
     else
       lib.Append (libs);
-    
-    CreateNode (node, "library", lib);
+
+    const char* colon = strchr (lib, ':');
+    bool writeLib = (colon == 0) && (type == 0);
+    if ((colon != 0) && (type != 0))
+    {
+      size_t cPos = colon - (const char*)lib;
+      csString prefix = lib.Slice (0, cPos);
+      writeLib = strcmp (prefix, type) == 0;
+      lib.DeleteAt (0, cPos + 1);
+    }
+
+    if (writeLib) CreateNode (node, "library", lib);
     libs = comma ? comma + 1 : 0;
   }
   return true;

@@ -150,54 +150,37 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     {
       CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
 
-      DocNode meshobj = CreateNode (sector, "meshobj");
+      DocNode meshobj = CreateNode (sector, "portals");
       csString meshname;
       meshname.Format ("%s_portals", GetName());
       if (pEntity)
       {
 	meshname = pEntity->GetValueOfKey ("cs_name", meshname);
       }
-      meshobj->SetAttribute ("name", meshname);
-      CreateNode (meshobj, "plugin", "thing");
-      CreateNode (meshobj, "zuse");
-      CreateNode (meshobj, "priority", "wall");
 
-      CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
-
-      DocNode params = CreateNode (meshobj, "params");
-
-      int i, j, l;
-
-      CVertexBuffer Vb;
-      Vb.AddVertices(&m_Walls);
-      Vb.AddVertices(&m_Portals);
-      Vb.WriteCS(params, pWorld);
+      int i, j;
 
       for (i=0; i<m_Portals.Length(); i++)
       {
         CIPortal* pPortal = m_Portals[i];
         for (j=0; j<pPortal->GetPolygonCount(); j++)
         {
-          CMapPolygon*             pPolygon = pPortal->GetPolygon(j);
-          const CMapTexturedPlane* pPlane   = pPortal->GetBaseplane();
+	  csString portalName;
+	  portalName.Format ("%s_%d_%d", meshname.GetData(), i, j);
 
-          CTextureFile* pTexture = pPlane->GetTexture();
-
-          //Because for a sector we draw the _inside_ of the brush, we spit out the
-          //vertices in reverse order, so they will have proper orientation for
-          //backface culling in the engine.
-	  DocNode p = CreateNode (params, "p");
-          for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
-          {
-	    CreateNode (p, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
-          }
-
-          //print textureinfo
-	  CreateNode (p, "material", pTexture->GetTexturename());
-	  pWorld->WriteTexMap (pPolygon->GetBaseplane (), p);
-	  //CreateNode (CreateNode (p, "texmap"), "plane", pPolygon->GetBaseplane()->GetName());
-	  CreateNode (CreateNode (p, "portal"), "sector", pPortal->GetTargetSector()->GetName());
-        }
+	  DocNode        portal = CreateNode(meshobj, "portal");
+	  portal->SetAttribute ("name", portalName);
+ 	  CMapPolygon*   pPolygon = pPortal->GetPolygon(j);
+ 	  
+ 	  CVertexBuffer Vb;
+ 	  for (int l = pPolygon->GetVertexCount() - 1 ; l >= 0; l-- ) 
+	  {
+ 	    Vb.AddVertex(pPolygon->GetVertex(l));
+ 	  }
+ 	  Vb.WriteCS(portal, pWorld);
+ 	  
+ 	  CreateNode(portal, "sector", pPortal->GetTargetSector()->GetName());        
+	}
       }
     } //if contains any polygons
   }
