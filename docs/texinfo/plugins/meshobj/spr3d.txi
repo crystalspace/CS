@@ -94,7 +94,7 @@ transformations in the skeleton connectors are identity transformations).
 @table @code
 @item <material>materialname</material>
 Material to use for the sprite.
-@item <frame name="framename"><v x="", y="", z="", u="", v="" /> @dots{}
+@item <frame name="framename"><v x="" y="" z="" u="" v="" /> @dots{}
 Define one frame.  A frame is a list of vertices which are specified using the
 @samp{v} tag.  Every vertex has a 3D position in object space and (u,v)
 coordinates in the given texture (from 0 to 1).  Note that every frame needs to
@@ -105,7 +105,7 @@ with the @samp{f} tag which contains the name of the frame to use and a
 delay.
 @item <skeleton name="skeletonname"> @dots{}
 Define a skeleton. See below for tags in skeleton.
-@item triangle <t v1="", v2="", v3="" />
+@item triangle <t v1="" v2="" v3="" />
 Define one triangle.  The three parameters are the indices for the three
 triangle vertices.
 @item <smooth>base/frame</smooth>
@@ -120,10 +120,10 @@ A skeleton is a hierarchical structure which is defined as follows:
 @item <limb name="limbname"> @dots{}
 A limb defines a connection to a child limb.  This is where the hierarchy kicks
 in.  Inside @samp{limb} you use the same tags as on this level.
-@item vertices <v v1, @dots{} />
+@item vertices <v v1="" @dots{} />
 This is a list of vertex indices from the main frame.  This limb will control
 the given vertices.
-@item <transform>@dots{}
+@item <transform> @dots{}
 Specify the default transformation to use for this limb with relation to its
 parent (cannot be used on the top level).
 @end table

@@ -115,30 +115,26 @@ definition.
 Vertex and polygon definition commands. Note that in a given part the vertex
 table always starts at index 0. Every vertex you add will use a new index.
 @table @code
-@item VERTEX(x,y,z)
+@item vertex <v x="" y="" z="" />
 Define a single vertex given three coordinates. The coordinates are given
 in local object space for this thing.
-@item V(x,y,z)
-Shorthand for @samp{VERTEX}.
-@item VBLOCK(minx,miny,minz,maxx,maxy,maxz)
+@item vblock(minx,miny,minz,maxx,maxy,maxz) FIXME: obsolete ?
 This is a conveniance command that creates eight vertices shaped in a block.
 You can then easily define polygons that use some of these vertices to form
-one surface of the block. VBLOCK expects six parameters which
+one surface of the block. vblock expects six parameters which
 are the dimensions of the block.
-@item VROOM(minx,miny,minz,maxx,maxy,maxz)
-This command is similar to VBLOCK. Except that it will generate the vertices
+@item vroom(minx,miny,minz,maxx,maxy,maxz) FIXME: obsolete ?
+This command is similar to vblock. Except that it will generate the vertices
 in a different order so that later created polygons will
 be visible from the inside instead of the outside.
-@item CIRCLE(x,y,z,rx,ry,rz,num)
+@item circle(x,y,z,rx,ry,rz,num) FIXME: obsolete ?
 Generate a circle of vertices.
 @samp{x,y,z} is the centre of the circle. @samp{rx,ry,rz} is the radius of
 the circle. @samp{num} is the number of vertices to generate. If @samp{num}
 is negative the vertices will be generated in a different direction.
-@item POLYGON(@dots{})
+@item polygon <p name=""> @dots{}
 This defines a single polygon using the vertices described above. The
 definition of a polygon is given below.
-@item P(@dots{})
-Shorthand for @samp{POLYGON}.
 @end table
 
 @item
@@ -146,16 +142,16 @@ Curve related commands. Currently only 3x3 bezier patches are supported.
 Note that to use a curve in a thing mesh object you need to describe
 a curve template first (more on this later).
 @table @code
-@item CURVECONTROL(x,y,z:u,v)
+@item <curvecontrol x="" y="" z="" u="" v="" />
 A control point for a curve. There are 9 control points (for a 3x3
-bezier patch). Every control point has the following format: @samp{x,y,z:u,v}.
+bezier patch). Every control point has the following format: @samp{x,y,z,u,v}.
 @samp{x,y,z} is the location of the point in object space. @samp{u,v} is
 the texture mapping coordinate for this control point.
-@item CURVECENTER(x,y,z)
+@item <curvecenter x="" y="" z="" />
 Set the center point (@samp{x,y,z}) of the curve.
-@item CURVESCALE(scale)
+@item <curvescale>scaleValue</curvescale>
 Set the scale of the curve.
-@item CURVE(curveTemplateName)
+@item <curve name="curveTemplateName">curveName</curve>
 Get the name of the curve template to use for this curve. Read about curve
 templates later.
 @end table
@@ -163,17 +159,17 @@ templates later.
 @item
 Material related commands.
 @table @code
-@item MATERIAL(materialName)
+@item <material>materialName</material>
 The default material to use for all following polygons. A polygon can
 still override this.
-@item MAT_SET_SELECT(materialSetName)
+@item <matsetselect>materialSetName</matsetselect>
 Use a set of textures that was defined previously.
-@item TEXLEN(scale)
+@item <texlen>scaleValue</texlen>
 This is a very general and easy command to control texture mapping on
 a polygon. It basically defines the scale of a texture. If you want more
 control over polygon texture mapping you should look at the texture mapping
 parameters in a polygon. But if you want Quick-And-Dirty texture mapping
-then this command can help you. @samp{TEXLEN} expects a single parameter
+then this command can help you. @samp{texlen} expects a single parameter
 which is a scale. A scale of 1 means that the given texture will be scaled
 once in both directions for 1 unit in world space. A scale of 2 means that
 the given texture will be scaled once in 2 units of world space.
@@ -182,159 +178,157 @@ the given texture will be scaled once in 2 units of world space.
 @item
 Various other commands.
 @table @code
-@item MOVEABLE(boolean)
+@item <moveable>yes/no</moveable>
 This command only works for the top-level thing. It indicates that the
 thing can possibly move around. If you don't set this option then it is
 illegal to later move the thing.
-@item FASTMESH(boolean)
+@item <fastmesh>yes/no</fastmesh>
 This command only works for the top-level thing. It indicates that this
 mesh will be rendered using a faster technique. At this moment this is
 not properly implemented though.
-@item FACTORY(factoryName)
+@item <factory>factoryName</factory>
 This thing will be made from the given thing factory.
-@item TEMPLATE(factoryName)
-Same as @samp{FACTORY}
-@item CLONE(thingName)
-This is similar to @samp{FACTORY} but the thing will be made from the
+@item template(factoryName) FIXME: obsolete ?
+Same as @samp{factory}
+@item <clone>thingName</clone>
+This is similar to @samp{factory} but the thing will be made from the
 given thing instead. i.e. it is a clone.
 @end table
 @end itemize
 
-A given polygon (inside the @samp{POLYGON} keyword) is defined as
+A given polygon (inside the @samp{polygon} keyword) is defined as
 follows:
 
 @table @code
-@item MATERIAL(materialName)
+@item <material>materialName</material>
 The material to use for this polygon. If not given then the default material
 will be used.
-@item TEXTURE(@dots{})
+@item <texture> @dots{}
 This keyword can be used to define additional texture mapping parameters.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Should this polygon use lighting or not. By default this is enabled. If
 disabled the texture on this polygon will be rendered using original colors
 (i.e. full-bright texture).
-@item PORTAL(sectorName)
+@item <portal><sector>sectorName</sector></portal>
 If you use this keyword then this polygon is a portal to the given sector.
-@item WARP(@dots{})
+@item <warp> @dots{} FIXME: still existing ?
 This keyword can be used to define additional parameters for the portal.
 More on this later.
-@item SHADING(shadingParm)
+@item shading(shadingParm) FIXME: still existing ?
 This describes the kind of shading to use for this polygon. Possible values
-are: @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}. Default
-is @samp{LIGHTMAP}.
-@item VERTICES(v1,@dots{})
+are: @samp{none}, @samp{flat}, @samp{gouraud}, or @samp{lightmap}. Default
+is @samp{lightmap}.
+@item vertices <v v1="" @dots{} />
 The vertices of the polygon. This is a list of vertex indices local to the
-part this polygon is in. In combination with the @samp{VBLOCK} or @samp{VROOM}
+part this polygon is in. In combination with the @samp{vblock} or @samp{vroom}
 commands this command can also contain something with the name: @samp{w},
 @samp{e}, @samp{n}, @samp{s}, @samp{u}, or @samp{d} (for west, east, north,
 south, up, or down). This will then create vertices according to the last
-@samp{VBLOCK} or @samp{VROOM}. Note that there should be no other vertex
-generating command between the @samp{VBLOCK} or @samp{VROOM} and this
-polygon command! You can also give the first index of the @samp{VBLOCK}
-or @samp{VROOM} generated vertices with a notation like this:
-@samp{VERTICES (w,8)}.
-@item V(v1,@dots{})
-Shorthand for @samp{VERTICES}.
-@item UV(u1,v1,@dots{})
+@samp{vblock} or @samp{vroom}. Note that there should be no other vertex
+generating command between the @samp{vblock} or @samp{vroom} and this
+polygon command! You can also give the first index of the @samp{vblock}
+or @samp{vroom} generated vertices with a notation like this:
+@samp{vertices (w,8)}.
+@item <uv u1="" v1="" @dots{} />
 If you use this keyword the polygon will be gouraud shaded and not
 lightmapped. This keyword allows you to describe the uv coordinates
 for the polygon with gouraud shading. Currently a gouraud shaded polygon
 is limited to three vertices. This limitation will be removed in the
-future. But for now it means that UV will be followed by six parameters (three
+future. But for now it means that uv will be followed by six parameters (three
 u,v coordinate sets).
-@item UVA(u1,v1,a1,@dots{})
-Similar to @samp{UV} but uses another technique to describe the coordinates
+@item <uva u1="" v1="" a1="" @dots{} />
+Similar to @samp{uv} but uses another technique to describe the coordinates
 using angle.
-@item COLORS(r,g,b@dots{})
-When using @samp{UV} you can use this command to give colors (r,g,b) for
+@item <color red="" green="" blue="" @dots{} />
+When using @samp{uv} you can use this command to give colors (r,g,b) for
 every vertex.
-@item COLLDET(boolean)
+@item colldet(boolean) FIXME: where is this now ?
 Enable/disable collision detection for this polygon. By default a normal
 polygon will have collision detection enabled. If the polygon has a portal
 then collision detection will be disabled unless the portal is a mirror in
-which case it will be enabled again. But using @samp{COLLDET} allows you to
+which case it will be enabled again. But using @samp{colldet} allows you to
 override all this.
-@item COSFACT(factor)
+@item <cosfact>factorValue</cosfact>
 The cosinus factor to use for lighting. The default is 0 which means
 that the strength of the light falling on this polygon will depend
 completely on the angle of the light and this polygon. This is the most
 realistic setting but in some cases it doesn't look right. To completely
 disable dependence on angle you can use 1. In between values are also
 possible.
-@item ALPHA(alpha)
+@item <alpha>alphaValue</alpha>
 Using this you can set the alpha transparency factor of this polygon.
 This is a value between 0 and 100.
-@item MIXMODE(mode)
+@item <mixmode><mode /></mixmode>
 With this you can control more blending options for the polygon.
-One of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
-@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item LEN(scale)
-This is similar to the @samp{TEXLEN} command in the part and also to the
-@samp{LEN} command in the texture definition but it is repeated here
-as a short-hand for @samp{TEXTURE (LEN (...))}.
-@item PLANE(planeName)
-This is a shorthand for @samp{TEXTURE (PLANE (...))}.
+One of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
+@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+@item len(scale) FIXME: obsolete ?
+This is similar to the @samp{texlen} command in the part and also to the
+@samp{len} command in the texture definition but it is repeated here
+as a short-hand for @samp{texture (len (...))}.
+@item plane(planeName) FIXME: no shortcut anymore ?
+This is a shorthand for @samp{texture (plane (...))}.
 @end table
 
-A texture mapping specification (the @samp{TEXTURE} keyword in a polygon)
+A texture mapping specification (the @samp{texture} keyword in a polygon)
 has the following parameters:
 
 @table @code
-@item ORIG(x,y,z)
+@item <orig x="" y="" z="" />
 The origin for texture mapping (3D coord).
-@item FIRST(x,y,z)
+@item <first x="" y="" z="" />
 The u-axis coordinate for texture mapping (3D coord).
-@item SECOND(x,y,z)
+@item <second x="" y="" z="" />
 The v-axis coordinate for texture mapping (3D coord).
-@item FIRST_LEN(scale)
+@item <firstlen>scale</firstlen>
 Scale along the u-axis.
-@item SECOND_LEN(scale)
+@item <secondlen>scale</secondlen>
 Scale along the v-axis.
-@item UVEC(x,y,z)
-Similar to @samp{FIRST} with @samp{FIRST_LEN} set to length
-of vector (@samp{FIRST}-@samp{ORIG}).
-@item VVEC(x,y,z)
-Similar to @samp{SECOND} with @samp{SECOND_LEN} set to length
-of vector (@samp{SECOND}-@samp{ORIG}).
-@item MATRIX(@dots{})
+@item <uvec x="" y="" z="" />
+Similar to @samp{first} with @samp{firstlen} set to length
+of vector (@samp{first}-@samp{orig}).
+@item <vvec x="" y="" z="" />
+Similar to @samp{second} with @samp{secondlen} set to length
+of vector (@samp{second}-@samp{orig}).
+@item <matrix> @dots{}
 Most general way to describe texture mapping using the transformation matrix.
-@item V(x,y,z)
+@item <v x="" y="" z="" />
 Most general way to describe texture mapping using the transformation vector.
-@item LEN(scale)
+@item len(scale) FIXME: obsolete ?
 Use this as an easier way to describe texture scale (i.e. instead
 of all the above).
-@item UV(idx1,u1,v1,idx2,u2,v2,idx3,u3,v3)
+@item <uv idx1="" u1="" v1="" idx2="" u2="" v2="" idx3="" u3="" v3="" />
 Directly specify u,v mapping coordinates for three given vertices.
-@item UV_SHIFT(ushift,vshift)
+@item uv_shift(ushift,vshift) FIXME: where is this now ?
 Given the mapping described above, further shift with the given
 u,v shift value.
-@item PLANE(planeName)
+@item <plane>planeName</plane>
 Use the given texture mapping plane instead of all the above.
 See how to define planes later.
 @end table
 
-The @samp{WARP} keyword as used in a polygon has the following keywords:
+The @samp{warp} keyword as used in a polygon has the following keywords:
 
 @table @code
-@item MATRIX(@dots{})
+@item <matrix> @dots{}
 The matrix to use for space warping the portal.
-@item V(x,y,z)
+@item <v x="" y="" z="" />
 The vector to use for space warping before the matrix is applied.
-@item W(x,y,z)
+@item <w x="" y="" z="" />
 The vector to use for space warping after the matrix is applied. If not
-given this is the same as @samp{V}.
-@item MIRROR()
+given this is the same as @samp{v}.
+@item <mirror />
 Short-hand to generate a mirror portal. This will automatically calculate
-@samp{MATRIX}, @samp{V}, and @samp{W}.
-@item STATIC()
+@samp{matrix}, @samp{v}, and @samp{w}.
+@item <static /> FIXME: does it still exist ?
 When this item is given the portal destination will be static. This means
 that the portal will point to the same location even if the portal polygon
 moves. Otherwise the portal destination will move accordingly.
-@item ZFILL()
+@item <zfill />
 Set this option on a portal that floats in the middle of a room. It will
 make sure that the Z-buffer is filled AFTER rendering all objects seen
 through the portal.
-@item CLIP()
+@item <clip />
 Set this option on a portal that points to the middle of a room. It will
 make sure that all geometry in the destination sector is correctly clipped
 to the portal so that it is not rendered in this sector.
@@ -350,28 +344,28 @@ mapping planes for polygons that share the same texture mapping.
 The following keywords are supported by the plane loader:
 
 @table @code
-@item NAME(planeName)
-The name of this plane. This can then be used later in @samp{PLANE} commands
+@item <name>planeName</name>
+The name of this plane. This can then be used later in @samp{p} commands
 for the texture or polygon.
-@item ORIG(x,y,z)
+@item <orig x="" y="" z="" />
 The origin for texture mapping (3D coord).
-@item FIRST(x,y,z)
+@item <first x="" y="" z="" />
 The u-axis coordinate for texture mapping (3D coord).
-@item SECOND(x,y,z)
+@item <second x="" y="" z="" />
 The v-axis coordinate for texture mapping (3D coord).
-@item FIRST_LEN(scale)
+@item <firstlen>scale</firstlen>
 Scale along the u-axis.
-@item SECOND_LEN(scale)
+@item <secondlen>scale</secondlen>
 Scale along the v-axis.
-@item UVEC(x,y,z)
-Similar to @samp{FIRST} with @samp{FIRST_LEN} set to length
-of vector (@samp{FIRST}-@samp{ORIG}).
-@item VVEC(x,y,z)
-Similar to @samp{SECOND} with @samp{SECOND_LEN} set to length
-of vector (@samp{SECOND}-@samp{ORIG}).
-@item MATRIX(@dots{})
+@item <uvec x="" y="" z="" />
+Similar to @samp{first} with @samp{firstlen} set to length
+of vector (@samp{first}-@samp{orig}).
+@item <vvec x="" y="" z="" />
+Similar to @samp{second} with @samp{secondlen} set to length
+of vector (@samp{second}-@samp{orig}).
+@item <matrix> @dots{}
 Most general way to describe texture mapping using the transformation matrix.
-@item V(x,y,z)
+@item <v x="" y="" z="" />
 Most general way to describe texture mapping using the transformation vector.
 @end table
 
@@ -383,15 +377,12 @@ template definitions.
 The following keywords are supported by the bezier curve loader:
 
 @table @code
-@item NAME(curveTemplateName)
-The name of this curve template. This can then be used later in @samp{CURVE}
+@item <name>curveTemplateName</name>
+The name of this curve template. This can then be used later in @samp{curve}
 commands in the thing part definition.
-@item MATERIAL(materialName)
+@item <material>materialName</material>
 The material to use for this curve.
-@item VERTICES(v1,@dots{})
+@item vertices <v>number</v> @dots{} nine times
 Nine vertex indices (the exact position and texture mapping coordinate will
-be defined in the thing mesh object using @samp{CURVECONTROL}).
-@item V(v1,@dots{})
-Shorthand for @samp{VERTICES}.
+be defined in the thing mesh object using @samp{curvecontrol}).
 @end table
-

@@ -82,26 +82,31 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item DROPSIZE(width,height)
+@item <dropsize w="" h="" />
 Size of the flame particles (width and height).
-@item ORIGIN(x,y,z)
+@item <origin x="" y="" z="" />
 Origin of the flame.  Usually this is (0,0,0) and the engine is responsible for
 setting the correct position of the flame.  This works better for hierarchical
 transformations.
-@item ORIGINBOX(minx,miny,minz,maxx,maxy,maxz)
+@item <originbox>
+@example
+	<min x="" y="" z="" />
+	<min x="" y="" z="" />
+</originbox>
+@end example
 Origin of the flame as a box. Usually this is (0,0,0, 0,0,0) and the engine
 is responsible for setting the correct position of the flame.  This works
 better for hierarchical transformations.
-@item DIRECTION(x,y,z)
+@item <direction x="" y="" z="" />
 Direction of the flame.
-@item SWIRL(swirlValue)
+@item <swirl>swirlValue</swirl>
 Swirl.
-@item COLORSCALE(colorScale)
-Color scale.
-@item TOTALTIME(totalTime)
+@item <colorscale>colorScaleValue</colorscale>
+Value for color scale.
+@item <totaltime>totalTime</totaltime>
 Total time.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Disable or enable lighting for the fire particles.
-@item NUMBER(nrParticles)
+@item <number>nrParticles</number>
 Number of particles to use.
 @end table

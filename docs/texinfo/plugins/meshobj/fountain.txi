@@ -82,27 +82,26 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item DROPSIZE(width,height)
+@item <dropsize w="" h="" />
 Size of the droplets for the fountain (width and height).
-@item ORIGIN(x,y,z)
+@item <origin x="" y="" z="" />
 Origin of the fountain.  Usually this is (0,0,0) and the engine is responsible
 for setting the correct position of the fountain.  This works better for
 hierarchical transformations.
-@item ACCEL(x,y,z)
+@item <accel x="" y="" z="" />
 Acceleration of the particles (x, y, and z acceleration).
-@item SPEED(speed)
+@item <speed>speedValue</speed>
 Speed of the particles.
-@item OPENING(opening)
+@item <opening>openingValue</opening>
 Opening of the fountain sprinkler.
-@item AZIMUTH(azimuth)
+@item <azimuth>azimuthValue</azimuth>
 Azimuth.
-@item ELEVATION(elevation)
+@item <elevation>elevationValue</elevation>
 Elevation.
-@item FALLTIME(falltime)
+@item <falltime>falltimeValue</falltime>
 Falltime.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Disable or enable lighting for the fountain particles.
-@item NUMBER(nrParticles)
+@item <number>nrParticles</number>
 Number of particles to use.
 @end table
-

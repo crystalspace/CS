@@ -173,48 +173,82 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item RECTPARTICLES(width,height)
+@item <rectparticles w="" h="" />
 Set the width and height of the particles rectangular shape.
-@item REGULARPARTICLES(numSides,radius)
+@item <regularparticles sides="" radius="" />
 Set the number of sides and a radius of the regular shaped particles.
-@item TOTALTIME(totalTime)
+@item <totaltime>milliseconds</totaltime>
 Set the maximum age in milliseconds.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Disable or enable lighting for the particles
-@item NUMBER(numberParticles)
+@item <number>numberparticles</number>
 Set the number of particles
-@item STARTPOS(@dots{})
+@item <startpos> @dots{}
 Give an @sc{emit} object for starting position.
-@item STARTSPEED(@dots{})
+@item <startspeed> @dots{}
 Give the starting speed @sc{emit}.
-@item STARTACCEL(@dots{})
+@item <startaccel> @dots{}
 Give the starting acceleration @sc{emit}.
-@item ATTRACTORFORCE(force)
+@item <attractorforce>forcevalue</attractorforce>
 Give the attractor force value.
-@item ATTRACTOR(@dots{})
+@item <attractor> @dots{}
 Give the @sc{emit} that makes attracting points (per particle).
-@item AGING(time,r,g,b,alpha,swirl,rotspeed,scale)
-Give a age time, colour red, colour green, colour blue, alpha, swirl, 
+@item <aging> @dots{}
+@example
+	<color red="" green="" blue="" />
+	<time>time</time>
+	<alpha>alpha</alpha>
+	<swirl>swirl</swirl>
+	<rotspeed>rotspeed</rotspeed>
+	<scale>scale</scale>
+</aging>
+@end example
+Give a colour red, colour green, colour blue, age time, alpha, swirl, 
 rotationspeed and scale. 
-@item EMITFIXED(x,y,z)
+@item <emitfixed x="" y="" z="" />
 Fixed (x, y, z) emitter.
-@item EMITBOX(minx,miny,minz,maxx,maxy,maxz)
+@item
+@example
+<emitbox>
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</emitbox>
+@end example
 Box emitter, min x,y,z, max x,y,z.
-@item EMITSPHERE(x,y,z,min,max)
+@item <emitsphere x="" y="" z="" p="" q="" r="" />
 Sphere emitter, origin x,y,z, min, max.
-@item EMITCONE(x,y,z,elevation,azimuth,aperture,minradius,maxradius)
+@item <emitcone x="" y="" z="" p="" q="" r="" s="" t="" />
 Cone emitter, start x,y,z, elevation, azimuth, aperture, min,max radius.
-@item EMITMIX(@dots{})
-Use several @samp{EMITMIX} keywords in a row to create a mix with several
-@sc{emit}s.  Inside each @samp{EMITMIX}, @code{WEIGHT(value)} can be used to
+@item <emitmix> @dots{}
+Use several @samp{emitmix} keywords in a row to create a mix with several
+@sc{emit}s.  Inside each @samp{emitmix}, @code{WEIGHT(value)} can be used to
 set the weight.
-@item EMITLINE(x1,y1,z1,x2,y2,z2)
+@item <emitline>
+@example
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</emitline>
+@end example
 Line emitter, start, end point.
-@item EMITCYLINDER(x1,y1,z1,x2,y2,z2,mindist,maxdist)
-Cylinder emitter, start, end point, min, max distance.
-@item EMITCYLINDERTANGENT(x1,y1,z1,x2,y2,z2,minspeed,maxspeed)
+@item <emitcylinder p="" q="" />
+@example
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</emitcylinder>
+@end example
+Cylinder emitter, min, max distance, start, end point.
+@item <emitcylindertangent p="" q="" />
+@example
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</emitcylindertangent>
+@end example
 CylinderTangent emitter. Give start, end point, min, max speed.
-@item EMITSPHERETANGENT(x,y,z,minspeed,maxspeed)
+@item <emitspheretangent p="" q="" />
+@example
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</emitspheretangent>
+@end example
 SphereTangent emitter. Give origin, min, max speed.
 @end table
-

@@ -82,14 +82,20 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item DROPSIZE(width,height)
+@item <dropsize w="" h="" />
 Size of the droplets for the rain (width and height).
-@item BOX(minx,miny,minz,maxx,maxy,maxz)
+@item <box>
+@example
+	<min x="" y="" z="" />
+	<max x="" y="" z="" />
+</box>
+@end example
 Box that will contain the rain particles.
-@item FALLSPEED(x,y,z)
+@item <fallspeed x="" y="" z="" />
 Speed of the rain.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Disable or enable lighting for the rain particles.
-@item NUMBER(nrParticles)
+@item <number>nrParticles</number>
 Number of particles to use.
 @end table
+

@@ -85,12 +85,14 @@ coordinates of the polygon defined by this sprite.
 @item <frame><duration><vertices @dots{}> @dots{}
 Defines a single frame within an uv animation by specifying its duration in
 milliseconds and the u,v coordinates to use.
-@itemize
+@itemize @bullet
+@example
 <frame name="framename">
  <duration>milliseconds</duration>
  <v u="" v="" />
  @dots{} u,v coo list
 </frame>
+@end example
 @end itemize
 @end table
 
@@ -115,13 +117,13 @@ Blending mode, one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
 Material to use for the polygon.
 @item <lighting>yes/no</lighting>
 Enable/disable lighting.
-@item vertices <v @dots{} />
+@item vertices <v x="" y="" /> @dots{}
 List of 2D vertices defining the polygon.
 @item <uv u="" v="" />
 List of texture mapping UV coordinates for the polygon.
 @item <color red="" green="" blue="" />
 List of rgb colors for the polygon.
-@item <animate>@dots{}
+@item <animate> @dots{}
 Select an uv animation from the list of animations declared in the template
 @itemize @bullet
 @example

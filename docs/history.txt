@@ -26,6 +26,9 @@ The history order is reversed so that new features are at the top.
 	  csNamedObjVector.
 	- Iso engine uses csRefArray instead of csNamedObjVector.
 	- Removed csNamedObjVector.
+	- Andreas Busch modified the documentation for all meshobjects
+	  from old syntax to XML. The thing documentation needs a big
+	  review, and Texinfo box-warnings need to be checked.
 12-Jan-2002
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl

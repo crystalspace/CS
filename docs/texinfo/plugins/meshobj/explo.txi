@@ -82,27 +82,27 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item DROPSIZE(width,height)
+@item <dropsize w="" h="" />
 Size of the droplets for the snow (width and height).
-@item CENTER(x,y,z)
+@item <center x="" y="" z="" />
 Center of the explosion.  In most cases you should use the origin here (0,0,0)
 and let the engine control the position of the explosion.
-@item PUSH(x,y,z)
+@item <push x="" y="" z="" />
 Initial push.
-@item FADE(number)
+@item <fade>number</fade>
 Fade.
-@item PARTRADIUS(radius)
+@item <partradius>radius</partradius>
 Radius of every part.
-@item NRSIDES(nrSides)
+@item <nrsides>nrSides</nrsides>
 Number of sides to use for the explosion particles.
-@item SPREADPOS(spreadPos)
+@item <spreadpos>spreadPos</spreadpos>
 SpreadPos.
-@item SPREADSPEED(spreadSpeed)
+@item <spreadspeed>spreadSpeed</spreadspeed>
 SpreadSpeed.
-@item SPREADACCEL(spreadAccelaration)
+@item <spreadaccel>spreadAccelaration</spreadaccel>
 SpreadAccel.
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Disable or enable lighting for the explosion particles.
-@item NUMBER(nrParticles)
+@item <number>numberparticles</number>
 Number of particles to use.
 @end table
