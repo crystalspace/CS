@@ -13,7 +13,6 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in terrfunc::HitBeamObject(). The variable 'st' was
 	  not initialized. I now initialized this to 'start'. I hope that's
 	  the right fix as I have no easy way to actually test this now.
->>>>>>> 1.3010
 26-Nov-2002
 	- Fixed a bug in the software renderer when materials are used without
 	  textures. Reported by groton.
