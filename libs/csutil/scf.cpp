@@ -333,16 +333,19 @@ void scfInitialize (iConfigFile *iConfig)
   if (iConfig)
   {
     iConfigDataIterator *iterator = iConfig->EnumData ("SCF.Registry");
-    while (iterator->Next ())
+    if (iterator)
     {
-      const char *data = (const char *)iterator->GetData ();
-      char *val = (char *)alloca (strlen (data) + 1);
-      strcpy (val, data);
-      char *depend = strchr (val, ':');
-      if (depend) *depend++ = 0;
-      scfRegisterClass (iterator->GetKey (), val, depend);
+      while (iterator->Next ())
+      {
+        const char *data = (const char *)iterator->GetData ();
+        char *val = (char *)alloca (strlen (data) + 1);
+        strcpy (val, data);
+        char *depend = strchr (val, ':');
+        if (depend) *depend++ = 0;
+        scfRegisterClass (iterator->GetKey (), val, depend);
+      }
+      iterator->DecRef ();
     }
-    iterator->DecRef ();
   }
 #else
   (void)iConfig;
