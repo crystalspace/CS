@@ -183,6 +183,17 @@ void csWaterDemo::SetupFrame ()
     return;
   console->Draw2D ();
 
+  //
+  //Display a little very informative message.
+  iTextureManager* txtmgr = r3d->GetTextureManager ();
+  int glyphWidth, glyphHeight;
+  font->GetMaxSize (glyphWidth, glyphHeight);
+  int white = r3d->GetDriver2D ()->FindRGB (255, 255, 255);
+  r3d->GetDriver2D ()->Write (font, 
+    1,
+    r3d->GetDriver2D ()->GetHeight () - (glyphHeight == -1? 20 : (glyphHeight+1)),
+    white, -1, "Press Space Bar to see a cool effect!");
+
   if(stop)
     stop=false;
 }
@@ -337,6 +348,7 @@ bool csWaterDemo::Initialize ()
     return false;
   }
 
+  font = r3d->GetDriver2D ()->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (engine == 0)
@@ -374,6 +386,7 @@ bool csWaterDemo::Initialize ()
     return false;
   }
 
+  
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
 
   // Open the main system. This will open all the previously loaded plug-ins.

@@ -46,6 +46,7 @@ private:
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
   
+  csRef<iFont> font;
 
   csRef<iMeshObject> gMesh;
   csRef<iMeshObjectFactory> gFact;
