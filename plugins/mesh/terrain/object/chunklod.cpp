@@ -1446,8 +1446,8 @@ void csChunkLodTerrainObject::InitializeDefault (bool clear)
   colorVersion++;
 }
 
-const char CachedLightingMagic[] = "chunky";
-const size_t CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
+static const char CachedLightingMagic[] = "chunky";
+static const size_t CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
 
 #define STATIC_LIGHT_SCALE	255.0f
 

@@ -32,8 +32,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/sysfunc.h"
 #include "csutil/weakref.h"
 #include "iengine/mesh.h"
+#include "iengine/shadcast.h"
+#include "iengine/lightmgr.h"
 #include "imesh/object.h"
 #include "imesh/terrain.h"
+#include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "igeom/objmodel.h"
@@ -45,6 +48,7 @@ struct iMaterialWrapper;
 struct iObjectRegistry;
 class csTerrainQuad;
 class csTerrainObject;
+class csTerrainFactory;
 class csSegment3;
 
 /**
@@ -66,14 +70,14 @@ public:
   csRef<iRenderBuffer> mesh_texcoords;
   csVector2 *texcoord_data;
   csRef<iRenderBuffer> mesh_colors;
-  csVector3 *color_data;
+  csColor *color_data;
 
-  int num_mesh_vertices;
   csArray<csRenderMesh> meshes;
   csRef<iMaterialWrapper> material;
   csVector3 center;
   float size;
   int res;
+  uint last_colorVersion;
 
   bool built;
 
@@ -102,6 +106,9 @@ public:
 
   csBitArray materialsChecked;
   csBitArray materialsUsed;
+
+  void UpdateBlockColors ();
+
 public:
   csTerrBlock (csTerrainObject *terr);
   ~csTerrBlock ();
@@ -125,6 +132,7 @@ public:
   bool IsLeaf ()  const
   { return children[0] == 0; }
 
+  void UpdateStaticLighting ();
   void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask, 
                  csReversibleTransform &transform);
 
@@ -218,6 +226,23 @@ public:
 };
 #endif
 
+/**
+ * An array giving shadow information for a pseudo-dynamic light.
+ */
+class csShadowArray
+{
+public:
+  iLight* light;
+  // For every vertex of the mesh a value.
+  float* shadowmap;
+
+  csShadowArray () : shadowmap (0) { }
+  ~csShadowArray ()
+  {
+    delete[] shadowmap;
+  }
+};
+
 class csTerrainObject : public iMeshObject
 {
 private:
@@ -245,7 +270,7 @@ private:
   iObjectRegistry* object_reg;
   csWeakRef<iGraphics3D> g3d;
   iBase* logparent;
-  csRef<iMeshObjectFactory> pFactory;
+  csTerrainFactory* pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;
   iVertexBufferManager *vbufmgr;
   float lod_lcoeff;
@@ -296,12 +321,33 @@ private:
   */
   void SetupObject ();
 
+  //=============
+  // Lighting.
+  csDirtyAccessArray<csColor> staticLights;
+  csDirtyAccessArray<csColor> staticColors;
+  int lmres;
+  uint colorVersion;
+  uint last_colorVersion;
+  csColor dynamic_ambient;
+  // If we are using the iLightingInfo lighting system then this
+  // is an array of lights that affect us right now.
+  csSet<iLight*> affecting_lights;
+  csHash<csShadowArray*, iLight*> pseudoDynInfo;
+  void UpdateColors ();
+  //=============
+
 public:
   CS_LEAKGUARD_DECLARE (csTerrainObject);
 
   /// Constructor.
-  csTerrainObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
+  csTerrainObject (iObjectRegistry* object_reg, csTerrainFactory* factory);
   virtual ~csTerrainObject ();
+
+  const csDirtyAccessArray<csColor>& GetStaticColors () const
+  {
+    return staticColors;
+  }
+  int GetLightMapResolution () const { return lmres; }
 
   bool SetColor (const csColor &color) { return false; }
   bool GetColor (csColor &color) const { return false; }
@@ -364,7 +410,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
 
-  virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
+  virtual iMeshObjectFactory* GetFactory () const;
 
   virtual bool DrawTest (iRenderView* rview, iMovable* movable, 
     uint32 frustum_mask);
@@ -405,6 +451,19 @@ public:
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
+
+  // For lighting.
+  void CastShadows (iMovable* movable, iFrustumView* fview);
+  void InitializeDefault (bool clear);
+  bool ReadFromCache (iCacheManager* cache_mgr);
+  bool WriteToCache (iCacheManager* cache_mgr);
+  void PrepareLighting ();
+  void SetDynamicAmbientLight (const csColor& color);
+  const csColor& GetDynamicAmbientLight ();
+  void LightChanged (iLight* light);
+  void LightDisconnect (iLight* light);
+  char* GenerateCacheName ();
+  void SetStaticLighting (bool enable);
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -457,6 +516,56 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+
+  //-------------------- iShadowReceiver interface implementation ----------
+  struct ShadowReceiver : public iShadowReceiver
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
+    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
+    {
+      scfParent->CastShadows (movable, fview);
+    }
+  } scfiShadowReceiver;
+  friend struct ShadowReceiver;
+
+  //------------------------- iLightingInfo interface -------------------------
+  struct LightingInfo : public iLightingInfo
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
+    virtual void InitializeDefault (bool clear)
+    {
+      scfParent->InitializeDefault (clear);
+    }
+    virtual bool ReadFromCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->ReadFromCache (cache_mgr);
+    }
+    virtual bool WriteToCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->WriteToCache (cache_mgr);
+    }
+    virtual void PrepareLighting ()
+    {
+      scfParent->PrepareLighting ();
+    }
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    {
+      scfParent->SetDynamicAmbientLight (color);
+    }
+    virtual const csColor& GetDynamicAmbientLight ()
+    {
+      return scfParent->dynamic_ambient;
+    }
+    virtual void LightChanged (iLight* light)
+    {
+      scfParent->LightChanged (light);
+    }
+    virtual void LightDisconnect (iLight* light)
+    {
+      scfParent->LightDisconnect (light);
+    }
+  } scfiLightingInfo;
+  friend struct LightingInfo;
 
   //------------------ iTerrainObjectState implementation ----------------
 
@@ -523,7 +632,7 @@ public:
 
     virtual void SetStaticLighting (bool enable)
     { 
-      scfParent->staticlighting = enable; 
+      scfParent->SetStaticLighting (enable);
     }
     
     virtual bool GetStaticLighting ()
@@ -561,9 +670,12 @@ public:
   CS_LEAKGUARD_DECLARE (csTerrainFactory);
 
   csRef<iTerraFormer> terraformer;
+  csWeakRef<iEngine> engine;
+  csRef<iLightManager> light_mgr;
 
   csBox2 samplerRegion;
-  int resolution;
+  //int resolution;
+  int hm_x, hm_y;
 
   iObjectRegistry *object_reg;
 

@@ -23,10 +23,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/segment.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
+#include "csutil/memfile.h"
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
+#include "iengine/sector.h"
 #include "iengine/rview.h"
 #include "igraphic/image.h"
 #include "ivideo/graph3d.h"
@@ -35,6 +39,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/txtmgr.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
+#include "iutil/object.h"
+#include "iutil/cache.h"
 #include "brute.h"
 #include "csqsqrt.h"
 
@@ -48,6 +54,8 @@ SCF_IMPLEMENT_IBASE (csTerrainObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainObjectState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiObjectModel)
@@ -60,6 +68,14 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiTerrainObjectState)
   SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::ShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::LightingInfo)
+  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTerrBlock::csTerrBlock (csTerrainObject *terr)
@@ -81,6 +97,7 @@ csTerrBlock::csTerrBlock (csTerrainObject *terr)
   morphnormal_data = 0;
   texcoord_data = 0;
   color_data = 0;
+  last_colorVersion = ~0;
 
   built = false;
 
@@ -98,6 +115,7 @@ csTerrBlock::~csTerrBlock ()
   delete [] normal_data;
   delete [] morphnormal_data;
   delete [] texcoord_data;
+  delete [] color_data;
 }
 
 void csTerrBlock::Detach ()
@@ -160,7 +178,7 @@ void csTerrBlock::SetupMesh ()
   delete[] normal_data;
   normal_data = new csVector3[res * res];
   delete[] color_data;
-  color_data = new csVector3[res * res];
+  color_data = new csColor[res * res];
 
   if (!terrasampler)
   {
@@ -177,19 +195,18 @@ void csTerrBlock::SetupMesh ()
     res * res * sizeof (csVector2));
   terrasampler->Cleanup ();
 
-
   bbox.Empty ();
-  int i, j;
-  for (j = 0; j < res; ++j)
+  int i;
+  int totres = res * res;
+  bbox.StartBoundingBox (vertex_data[0]);
+  color_data[0].Set (0.5, 0.5, 0.5);
+  for (i = 1 ; i < totres ; i++)
   {
-    for (i = 0; i < res; ++i)
-    {
-      const int pos = i + j * res;
-      bbox.AddBoundingVertexSmart (vertex_data[pos]);
-      color_data[pos] = csVector3(0.5, 0.5, 0.5);
-    }
+    bbox.AddBoundingVertexSmart (vertex_data[i]);
+    color_data[i].Set (0.5, 0.5, 0.5);
   }
   built = true;
+  last_colorVersion = ~0;
 }
 
 void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
@@ -410,6 +427,68 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
       children[i]->CalcLOD (rview);
 }
 
+void csTerrBlock::UpdateBlockColors ()
+{
+  const csDirtyAccessArray<csColor>& colors = terr->GetStaticColors ();
+  int lmres = terr->GetLightMapResolution ();
+  int res = terr->GetBlockResolution ();
+  const csBox3& gb = terr->global_bbox;
+  // @@@
+  // Opt by moving some precalced fields in object?
+  float lm_minx = ((bbox.MinX ()-gb.MinX ()) / (gb.MaxX ()-gb.MinX ())) * float (lmres);
+  float lm_miny = ((bbox.MinZ ()-gb.MinZ ()) / (gb.MaxZ ()-gb.MinZ ())) * float (lmres);
+  float lm_maxx = ((bbox.MaxX ()-gb.MinX ()) / (gb.MaxX ()-gb.MinX ())) * float (lmres);
+  float lm_maxy = ((bbox.MaxZ ()-gb.MinZ ()) / (gb.MaxZ ()-gb.MinZ ())) * float (lmres);
+  if (lm_minx < 0) lm_minx = 0;
+  else if (lm_minx > lmres-1) lm_minx = lmres-1;
+  if (lm_maxx < lm_minx) lm_maxx = lm_minx;
+  else if (lm_maxx > lmres-1) lm_maxx = lmres-1;
+  if (lm_miny < 0) lm_miny = 0;
+  else if (lm_miny > lmres-1) lm_miny = lmres-1;
+  if (lm_maxy < lm_miny) lm_maxy = lm_miny;
+  else if (lm_maxy > lmres-1) lm_maxy = lmres-1;
+  int x, y;
+  csColor* c = color_data;
+  for (y = 0 ; y <= res ; y++)
+  {
+    int lmy = int ((float (y) / float (res)) * (lm_maxy - lm_miny)
+      	+ lm_miny);
+    lmy *= lmres;
+    for (x = 0 ; x <= res ; x++)
+    {
+      int lmx = int ((float (x) / float (res)) * (lm_maxx - lm_minx)
+      	+ lm_minx);
+      *c++ = colors[lmy + lmx];
+    }
+  }
+}
+
+void csTerrBlock::UpdateStaticLighting ()
+{
+  if (IsLeaf ())
+  {
+    if (last_colorVersion == terr->colorVersion)
+      return;
+    last_colorVersion = terr->colorVersion;
+
+    int res = terr->GetBlockResolution ();
+    int num_mesh_vertices = (res+1)*(res+1);
+    if (!color_data)
+      color_data = new csColor[num_mesh_vertices];
+    UpdateBlockColors ();
+    if (mesh_colors)
+      mesh_colors->CopyToBuffer (color_data,
+        sizeof(csVector3)*num_mesh_vertices);
+  }
+  else
+  {
+    if (children[0]->built) children[0]->UpdateStaticLighting ();
+    if (children[1]->built) children[1]->UpdateStaticLighting ();
+    if (children[2]->built) children[2]->UpdateStaticLighting ();
+    if (children[3]->built) children[3]->UpdateStaticLighting ();
+  }
+}
+
 void csTerrBlock::DrawTest (iGraphics3D* g3d,
 			    iRenderView *rview, uint32 frustum_mask,
                             csReversibleTransform &transform)
@@ -480,13 +559,16 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     texcoord_data = 0;
 
     mesh_colors = 
-      g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
+      g3d->CreateRenderBuffer (sizeof(csColor)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3);
     mesh_colors->CopyToBuffer (color_data,
-      sizeof(csVector3)*num_mesh_vertices);
-    delete[] color_data;
-    color_data = 0;
+      sizeof(csColor)*num_mesh_vertices);
+    if (!terr->staticlighting)
+    {
+      delete[] color_data;
+      color_data = 0;
+    }
 
     csRef<csShaderVariable> sv;
     sv = svcontext->GetVariableAdd (terr->vertices_name);
@@ -694,12 +776,14 @@ csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
 
 
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
-                                    iMeshObjectFactory *pFactory)
+                                    csTerrainFactory *pFactory)
                                     : returnMeshesHolder (false)
 {
-  SCF_CONSTRUCT_IBASE (0)
+  SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   csTerrainObject::object_reg = object_reg;
   csTerrainObject::pFactory = pFactory;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -751,6 +835,13 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   /*builder = new csBlockBuilder (this);
   buildthread = csThread::Create (builder);
   buildthread->Start ();*/
+
+  staticlighting = false;
+  castshadows = false;
+
+  colorVersion = 0;
+  last_colorVersion = ~0;
+  dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
 }
 
 csTerrainObject::~csTerrainObject ()
@@ -759,6 +850,25 @@ csTerrainObject::~csTerrainObject ()
   if (vis_cb) vis_cb->DecRef ();
   delete[] polymesh_vertices;
   delete[] polymesh_triangles;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
+  SCF_DESTRUCT_IBASE ();
+}
+
+void csTerrainObject::SetStaticLighting (bool enable)
+{
+  staticlighting = enable;
+  if (staticlighting)
+  {
+    lmres = pFactory->hm_x;
+    staticLights.SetLength (lmres * lmres);
+  }
+  else
+  {
+    staticLights.DeleteAll ();
+  }
 }
 
 void csTerrainObject::FireListeners ()
@@ -851,6 +961,449 @@ void csTerrainObject::SetupObject ()
     rootblock->SetupMesh ();
     global_bbox = rootblock->bbox;
   }
+}
+
+iMeshObjectFactory* csTerrainObject::GetFactory () const
+{
+  return pFactory;
+}
+
+void csTerrainObject::InitializeDefault (bool clear)
+{
+  if (!staticlighting) return;
+
+  if (clear)
+  {
+    csColor amb;
+    float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
+    pFactory->engine->GetAmbientLight (amb);
+    amb *= lightScale;
+    for (size_t i = 0 ; i < staticLights.Length(); i++)
+    {
+      staticLights[i] = amb;
+    }
+  }
+  colorVersion++;
+}
+
+char* csTerrainObject::GenerateCacheName ()
+{
+  csBox3 b;
+  GetObjectBoundingBox (b);
+
+  csMemFile mf;
+  mf.Write ("bruteblock", 8);
+  uint32 l;
+  l = convert_endian ((uint32)pFactory->hm_x);
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((uint32)pFactory->hm_y);
+  mf.Write ((char*)&l, 4);
+
+  if (logparent)
+  {
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+    if (mw)
+    {
+      if (mw->QueryObject ()->GetName ())
+        mf.Write (mw->QueryObject ()->GetName (),
+        strlen (mw->QueryObject ()->GetName ()));
+      iMovable* movable = mw->GetMovable ();
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (sect && sect->QueryObject ()->GetName ())
+        mf.Write (sect->QueryObject ()->GetName (),
+        strlen (sect->QueryObject ()->GetName ()));
+      csVector3 pos = movable->GetFullPosition ();
+      l = convert_endian ((int32)csQint ((pos.x * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((pos.y * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((pos.z * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      csReversibleTransform tr = movable->GetFullTransform ();
+      const csMatrix3& o2t = tr.GetO2T ();
+      l = convert_endian ((int32)csQint ((o2t.m11 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m12 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m13 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m21 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m22 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m23 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m31 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m32 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)csQint ((o2t.m33 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+    }
+  }
+
+  l = convert_endian ((int32)csQint ((b.MinX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)csQint ((b.MinY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)csQint ((b.MinZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)csQint ((b.MaxX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)csQint ((b.MaxY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)csQint ((b.MaxZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  csString hex(digest.HexString());
+  return hex.Detach();
+}
+
+static const char CachedLightingMagic[] = "brute";
+static const size_t CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
+
+#define STATIC_LIGHT_SCALE	255.0f
+
+bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
+{
+  if (!staticlighting) return true;
+
+  colorVersion++;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lm", 0, ~0);
+  if (db)
+  {
+    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
+    char magic[CachedLightingMagicSize + 1];
+    if (mf.Read (magic, CachedLightingMagicSize) != CachedLightingMagicSize) 
+      goto stop;
+    magic[CachedLightingMagicSize] = 0;
+    if (strcmp (magic, CachedLightingMagic) == 0)
+    {
+      size_t v;
+      for (v = 0; v < staticLights.Length(); v++)
+      {
+	csColor& c = staticLights[v];
+	uint8 b;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.red = (float)b / STATIC_LIGHT_SCALE;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.green = (float)b / STATIC_LIGHT_SCALE;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.blue = (float)b / STATIC_LIGHT_SCALE;
+      }
+
+      uint8 c;
+      if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
+      while (c != 0)
+      {
+	char lid[16];
+	if (mf.Read (lid, 16) != 16) goto stop;
+	iLight *l = pFactory->engine->FindLightID (lid);
+	if (!l) goto stop;
+	l->AddAffectedLightingInfo (&scfiLightingInfo);
+
+	csShadowArray* shadowArr = new csShadowArray();
+	float* intensities = new float[staticLights.Length()];
+	shadowArr->shadowmap = intensities;
+	for (size_t n = 0; n < staticLights.Length(); n++)
+	{
+          uint8 b;
+          if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
+          {
+            delete shadowArr;
+            goto stop;
+          }
+          intensities[n] = (float)b / STATIC_LIGHT_SCALE;
+	}
+	pseudoDynInfo.Put (l, shadowArr);
+
+        if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
+      }
+      rc = true;
+    }
+  }
+
+stop:
+  cache_mgr->SetCurrentScope (0);
+  return rc;
+}
+
+bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
+{
+  if (!staticlighting) return true;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csMemFile mf;
+  mf.Write (CachedLightingMagic, CachedLightingMagicSize);
+  for (size_t v = 0; v < staticLights.Length(); v++)
+  {
+    const csColor& c = staticLights[v];
+    int i; uint8 b;
+
+    i = csQint (c.red * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+
+    i = csQint (c.green * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+
+    i = csQint (c.blue * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+  }
+  uint8 c = 1;
+
+  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt (
+    pseudoDynInfo.GetIterator ());
+  while (pdlIt.HasNext ())
+  {
+    mf.Write ((char*)&c, sizeof (c));
+
+    iLight* l;
+    csShadowArray* shadowArr = pdlIt.Next (l);
+    const char* lid = l->GetLightID ();
+    mf.Write ((char*)lid, 16);
+
+    float* intensities = shadowArr->shadowmap;
+    for (size_t n = 0; n < staticLights.Length(); n++)
+    {
+      int i; uint8 b;
+      i = csQint (intensities[n] * STATIC_LIGHT_SCALE);
+      if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+      mf.Write ((char*)&b, sizeof (b));
+    }
+  }
+  c = 0;
+  mf.Write ((char*)&c, sizeof (c));
+
+
+  rc = cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
+    "bruteblock_lm", 0, ~0);
+  cache_mgr->SetCurrentScope (0);
+  return rc;
+}
+
+void csTerrainObject::PrepareLighting ()
+{
+  if (!staticlighting && pFactory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = pFactory->light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    for (size_t i = 0; i < relevant_lights.Length(); i++)
+      affecting_lights.Add (relevant_lights[i]);
+  }
+}
+
+void csTerrainObject::SetDynamicAmbientLight (const csColor& color)
+{
+  dynamic_ambient = color;
+  colorVersion++;
+}
+
+const csColor& csTerrainObject::GetDynamicAmbientLight ()
+{
+  static csColor col;
+  return col;
+}
+
+void csTerrainObject::LightChanged (iLight* light)
+{
+  colorVersion++;
+}
+
+void csTerrainObject::LightDisconnect (iLight* light)
+{
+  affecting_lights.Delete (light);
+  colorVersion++;
+}
+
+void csTerrainObject::UpdateColors ()
+{
+  if (!staticlighting) return;
+  if (colorVersion == last_colorVersion) return;
+  last_colorVersion = colorVersion;
+
+  csColor baseColor (dynamic_ambient);
+      
+  staticColors.SetLength (staticLights.Length ());
+  size_t i;
+  for (i = 0; i < staticLights.Length(); i++)
+  {
+    staticColors[i] = staticLights[i] + baseColor;
+  }
+
+  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt =
+	pseudoDynInfo.GetIterator ();
+  while (pdlIt.HasNext ())
+  {
+    iLight* light;
+    csShadowArray* shadowArr = pdlIt.Next (light);
+    float* intensities = shadowArr->shadowmap;
+    const csColor& lightcol = light->GetColor ();
+
+    if (lightcol.red > EPSILON || lightcol.green > EPSILON
+        || lightcol.blue > EPSILON)
+    {
+      for (i = 0; i < staticLights.Length(); i++)
+      {
+        staticColors[i] += lightcol * intensities[i];
+      }
+    }
+  }
+}
+
+#define VERTEX_OFFSET       (10.0f * SMALL_EPSILON)
+
+/*
+  Lighting w/o local shadows:
+  - Contribution from all affecting lights is calculated and summed up
+    at runtime.
+  Lighting with local shadows:
+  - Contribution from static lights is calculated, summed and stored.
+  - For every static pseudo-dynamic lights, the intensity of contribution
+    is stored.
+  - At runtime, the static lighting colors are copied to the actual used
+    colors, the intensities of the pseudo-dynamic lights are multiplied
+    with the actual colors of that lights and added as well, and finally,
+    dynamic lighst are calculated.
+ */
+void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
+{
+  SetupObject ();
+  iBase* b = (iBase *)fview->GetUserdata ();
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)b;
+  CS_ASSERT (lpi != 0);
+
+  iLight* li = lpi->GetLight ();
+  bool dyn = lpi->IsDynamic ();
+
+  if (!dyn)
+  {
+    if (!staticlighting || 
+      li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
+    {
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
+        affecting_lights.Add (li);
+    }
+  }
+  else
+  {
+    if (!affecting_lights.In (li))
+    {
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      affecting_lights.Add (li);
+    }
+    if (staticlighting) return;
+  }
+
+  if (!staticlighting) return;
+
+  csReversibleTransform o2w (movable->GetFullTransform ());
+
+  csFrustum *light_frustum = fview->GetFrustumContext ()->GetLightFrustum ();
+  iShadowBlockList* shadows = fview->GetFrustumContext ()->GetShadows ();
+  iShadowIterator* shadowIt = shadows->GetShadowIterator ();
+
+  // Compute light position in object coordinates
+  csVector3 wor_light_pos = li->GetCenter ();
+  csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
+
+  bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+  csShadowArray* shadowArr;
+  if (pseudoDyn)
+  {
+    shadowArr = new csShadowArray ();
+    pseudoDynInfo.Put (li, shadowArr);
+    shadowArr->shadowmap = new float[staticLights.Length()];
+    memset(shadowArr->shadowmap, 0, staticLights.Length() * sizeof(float));
+  }
+
+  float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
+  csColor light_color =
+    li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
+
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      csBox2 (rootblock->center.x - rootblock->size / 2.0,
+      	      rootblock->center.z - rootblock->size / 2.0, 
+	      rootblock->center.x + rootblock->size / 2.0,
+	      rootblock->center.z + rootblock->size / 2.0), lmres);
+  const csVector3* lm_vertices = terrasampler->SampleVector3 (vertices_name);
+  const csVector3* lm_normals = terrasampler->SampleVector3 (normals_name);
+
+  csColor col;
+  size_t i;
+  for (i = 0 ; i < staticLights.Length() ; i++)
+  {
+    /*
+      A small fraction of the normal is added to prevent unwanted
+      self-shadowing (due small inaccuracies, the tri(s) this vertex
+      lies on may shadow it.)
+     */
+    csVector3 v = o2w.This2Other (lm_vertices[i] +
+    	(lm_normals[i] * VERTEX_OFFSET)) - wor_light_pos;
+
+    if (!light_frustum->Contains (v))
+    {
+      continue;
+    }
+
+    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
+      lm_vertices[i]);
+    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+
+    bool inShadow = false;
+    shadowIt->Reset ();
+    while (shadowIt->HasNext ())
+    {
+      csFrustum* shadowFrust = shadowIt->Next ();
+      if (shadowFrust->Contains (v))
+      {
+	inShadow = true;
+	break;
+      }
+    }
+    if (inShadow) continue;
+
+    float in_vrt_dist =
+      (vrt_sq_dist >= SMALL_EPSILON) ? csQisqrt (vrt_sq_dist) : 1.0f;
+
+    float cosinus;
+    if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
+    else cosinus = (obj_light_pos - lm_vertices[i]) * lm_normals[i];
+    // because the vector from the object center to the light center
+    // in object space is equal to the position of the light
+
+    if (cosinus > 0)
+    {
+      if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
+      float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
+      if (cosinus < 1) bright *= cosinus;
+      if (pseudoDyn)
+      {
+	// Pseudo-dynamic
+	bright *= lightScale;
+	if (bright > 1.0f) bright = 1.0f; // @@@ clamp here?
+	shadowArr->shadowmap[i] = bright;
+      }
+      else
+      {
+	col = light_color * bright;
+	staticLights[i] += col;
+      }
+    }
+  }
+  terrasampler->Cleanup ();
 }
 
 bool csTerrainObject::SetMaterialPalette (
@@ -1085,6 +1638,8 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+  UpdateColors ();
+
   rootblock->CalcLOD (rview);
 
   returnMeshes = &returnMeshesHolder.GetUnusedMeshes (
@@ -1101,6 +1656,8 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
 
   //rendermeshes.Empty ();
   rootblock->DrawTest (g3d, rview, 0, tr_o2c);
+  if (staticlighting)
+    rootblock->UpdateStaticLighting ();
 
   if (returnMeshes->Length () == 0)
     return false;
@@ -1264,7 +1821,8 @@ SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
-csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg, iMeshObjectType* parent)
+csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
+	iMeshObjectType* parent)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiTerrainFactoryState);
@@ -1277,10 +1835,15 @@ csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg, iMeshObjectType
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
 
   scale = csVector3(1);
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 }
 
 csTerrainFactory::~csTerrainFactory ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiTerrainFactoryState);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiObjectModel);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csTerrainFactory::NewInstance ()
@@ -1302,6 +1865,13 @@ iTerraFormer* csTerrainFactory::GetTerraFormer ()
 void csTerrainFactory::SetSamplerRegion (const csBox2& region)
 {
   samplerRegion = region;
+  // @@@ Add better control over resolution?
+  int resolution = (int)(region.MaxX () - region.MinX ());
+  // Make the resolution conform to n^2+1
+  resolution = csLog2(resolution);
+  resolution = ((int) pow(2, resolution)) + 1;
+
+  hm_x = hm_y = resolution;
 }
 
 const csBox2& csTerrainFactory::GetSamplerRegion ()
@@ -1331,6 +1901,8 @@ csTerrainObjectType::csTerrainObjectType (iBase* pParent)
 
 csTerrainObjectType::~csTerrainObjectType ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()

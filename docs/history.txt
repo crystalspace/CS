@@ -20,6 +20,14 @@ chronological order.
 	- Jorrit fixed a bug in the simpleformer so that it no longer
 	  generates small irregularities.
 	- Jorrit optimized the simpleformer a bit.
+	- Jorrit fixed a bug in bruteblock which used AddBoundingVertexSmart()
+	  inappropriatelly. So the box of the block could be wrong.
+	- Jorrit implemented static lighting in bruteblock (enable this
+	  by setting <staticlighting/> in the terrain). Shadow casting is
+	  not yet supported. Changed data/terrainf/world to use bruteblock
+	  now. It works nice now (you have to relight the lighting for
+	  terrainf to see it) but there seems to be a problem with normals
+	  so the lighting effect is not very visible right now.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data
