@@ -7821,7 +7821,7 @@ typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenu
 #endif
 
 #ifndef GL_ACTIVE_STENCIL_FACE_EXT
-#define GL_ACTIVE_STENCIL_FACE_EXT                                   0x8910
+#define GL_ACTIVE_STENCIL_FACE_EXT                                   0x8911
 #endif
 
 
