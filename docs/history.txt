@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  and iSector->HitBeam(). This flag is false by default (old behaviour)
 	  but when you set it to true HitBeamObject() is used instead
 	  of HitBeamOutline(). So this should give more accurate results.
+	- TinyXML improvements: only elements and document can have children
+	  now. This saves some memory again.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.

@@ -123,12 +123,12 @@ struct csTinyXmlNodeIterator : public iDocumentNodeIterator
 private:
   csTinyDocumentSystem* sys;
   TiDocumentNode* current;
-  TiDocumentNode* parent;
+  TiDocumentNodeChildren* parent;
   char* value;
 
 public:
   csTinyXmlNodeIterator (csTinyDocumentSystem* sys,
-	TiDocumentNode* parent, const char* value);
+	TiDocumentNodeChildren* parent, const char* value);
   virtual ~csTinyXmlNodeIterator () { delete[] value; }
 
   SCF_DECLARE_IBASE;
@@ -145,6 +145,7 @@ struct csTinyXmlNode : public iDocumentNode
 private:
   friend class csTinyDocumentSystem;
   TiDocumentNode* node;
+  TiDocumentNodeChildren* node_children;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   // We need 'sys' for the pool.
   csRef<csTinyDocumentSystem> sys;
@@ -158,7 +159,11 @@ public:
   virtual ~csTinyXmlNode ();
 
   TiDocumentNode* GetTiNode () { return node; }
-  void SetTiNode (TiDocumentNode* node) { csTinyXmlNode::node = node; }
+  void SetTiNode (TiDocumentNode* node)
+  {
+    csTinyXmlNode::node = node;
+    node_children = node->ToDocumentNodeChildren ();
+  }
 
   SCF_DECLARE_IBASE;
 

@@ -124,8 +124,6 @@ TiXmlBase::StringToBuffer::~StringToBuffer()
 TiDocumentNode::TiDocumentNode( )
 {
 	parent = 0;
-	firstChild = 0;
-	lastChild = 0;
 	prev = 0;
 	next = 0;
 }
@@ -133,6 +131,113 @@ TiDocumentNode::TiDocumentNode( )
 
 TiDocumentNode::~TiDocumentNode()
 {
+}
+
+
+TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
+{
+	TiDocumentNode* node;
+	for ( node = next; node; node = node->next )
+	{
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
+			return node;
+	}
+	return 0;
+}
+
+
+TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
+{
+	TiDocumentNode* node;
+	for ( node = prev; node; node = node->prev )
+	{
+		const char* node_val = node->Value ();
+		if (node_val && strcmp (node_val, value) == 0)
+			return node;
+	}
+	return 0;
+}
+
+TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document, const char* p )
+{
+	TiDocumentNode* returnNode = 0;
+
+	p = SkipWhiteSpace( p );
+	if( !p || !*p || *p != '<' )
+	{
+		return 0;
+	}
+
+	p = SkipWhiteSpace( p );
+
+	if ( !p || !*p )
+	{
+		return 0;
+	}
+
+	// What is this thing? 
+	// - Elements start with a letter or underscore, but xml is reserved.
+	// - Comments: <!--
+	// - Decleration: <?xml
+	// - Everthing else is unknown to tinyxml.
+	//
+
+	const char* xmlHeader = { "<?xml" };
+	const char* commentHeader = { "<!--" };
+
+	if ( StringEqual( p, xmlHeader) )
+	{
+		#ifdef DEBUG_PARSER
+			TIXML_LOG( "XML parsing Declaration\n" );
+		#endif
+		returnNode = new TiXmlDeclaration();
+	}
+	else if (    isalpha( *(p+1) )
+			  || *(p+1) == '_' )
+	{
+		#ifdef DEBUG_PARSER
+			TIXML_LOG( "XML parsing Element\n" );
+		#endif
+		returnNode = new TiXmlElement( );
+	}
+	else if ( StringEqual ( p, commentHeader) )
+	{
+		#ifdef DEBUG_PARSER
+			TIXML_LOG( "XML parsing Comment\n" );
+		#endif
+		returnNode = new TiXmlComment();
+	}
+	else
+	{
+		#ifdef DEBUG_PARSER
+			TIXML_LOG( "XML parsing Unknown\n" );
+		#endif
+		returnNode = new TiXmlUnknown();
+	}
+
+	if ( returnNode )
+	{
+		// Set the parent, so it can report errors
+		returnNode->parent = this;
+		//p = returnNode->Parse( p );
+	}
+	else
+	{
+		document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+	}
+	return returnNode;
+}
+
+// -------------------------------------------------------------------------
+TiDocumentNodeChildren::TiDocumentNodeChildren ()
+{
+	firstChild = 0;
+	lastChild = 0;
+}
+
+TiDocumentNodeChildren::~TiDocumentNodeChildren()
+{
 	TiDocumentNode* node = firstChild;
 	TiDocumentNode* temp = 0;
 
@@ -144,8 +249,7 @@ TiDocumentNode::~TiDocumentNode()
 	}	
 }
 
-
-void TiDocumentNode::Clear()
+void TiDocumentNodeChildren::Clear()
 {
 	TiDocumentNode* node = firstChild;
 	TiDocumentNode* temp = 0;
@@ -161,8 +265,7 @@ void TiDocumentNode::Clear()
 	lastChild = 0;
 }
 
-
-TiDocumentNode* TiDocumentNode::LinkEndChild( TiDocumentNode* node )
+TiDocumentNode* TiDocumentNodeChildren::LinkEndChild( TiDocumentNode* node )
 {
 	node->parent = this;
 
@@ -179,7 +282,7 @@ TiDocumentNode* TiDocumentNode::LinkEndChild( TiDocumentNode* node )
 }
 
 
-TiDocumentNode* TiDocumentNode::InsertEndChild( const TiDocumentNode& addThis )
+TiDocumentNode* TiDocumentNodeChildren::InsertEndChild( const TiDocumentNode& addThis )
 {
 	TiDocumentNode* node = addThis.Clone();
 	if ( !node )
@@ -189,7 +292,7 @@ TiDocumentNode* TiDocumentNode::InsertEndChild( const TiDocumentNode& addThis )
 }
 
 
-TiDocumentNode* TiDocumentNode::InsertBeforeChild( TiDocumentNode* beforeThis, const TiDocumentNode& addThis )
+TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild( TiDocumentNode* beforeThis, const TiDocumentNode& addThis )
 {	
 	if ( !beforeThis || beforeThis->parent != this )
 		return 0;
@@ -215,7 +318,7 @@ TiDocumentNode* TiDocumentNode::InsertBeforeChild( TiDocumentNode* beforeThis, c
 }
 
 
-TiDocumentNode* TiDocumentNode::InsertAfterChild( TiDocumentNode* afterThis, const TiDocumentNode& addThis )
+TiDocumentNode* TiDocumentNodeChildren::InsertAfterChild( TiDocumentNode* afterThis, const TiDocumentNode& addThis )
 {
 	if ( !afterThis || afterThis->parent != this )
 		return 0;
@@ -241,7 +344,7 @@ TiDocumentNode* TiDocumentNode::InsertAfterChild( TiDocumentNode* afterThis, con
 }
 
 
-TiDocumentNode* TiDocumentNode::ReplaceChild( TiDocumentNode* replaceThis, const TiDocumentNode& withThis )
+TiDocumentNode* TiDocumentNodeChildren::ReplaceChild( TiDocumentNode* replaceThis, const TiDocumentNode& withThis )
 {
 	if ( replaceThis->parent != this )
 		return 0;
@@ -269,7 +372,7 @@ TiDocumentNode* TiDocumentNode::ReplaceChild( TiDocumentNode* replaceThis, const
 }
 
 
-bool TiDocumentNode::RemoveChild( TiDocumentNode* removeThis )
+bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
 {
 	if ( removeThis->parent != this )
 	{	
@@ -291,7 +394,7 @@ bool TiDocumentNode::RemoveChild( TiDocumentNode* removeThis )
 	return true;
 }
 
-TiDocumentNode* TiDocumentNode::FirstChild( const char * value ) const
+TiDocumentNode* TiDocumentNodeChildren::FirstChild( const char * value ) const
 {
 	TiDocumentNode* node;
 	for ( node = firstChild; node; node = node->next )
@@ -303,7 +406,7 @@ TiDocumentNode* TiDocumentNode::FirstChild( const char * value ) const
 	return 0;
 }
 
-TiDocumentNode* TiDocumentNode::LastChild( const char * value ) const
+TiDocumentNode* TiDocumentNodeChildren::LastChild( const char * value ) const
 {
 	TiDocumentNode* node;
 	for ( node = lastChild; node; node = node->prev )
@@ -315,7 +418,7 @@ TiDocumentNode* TiDocumentNode::LastChild( const char * value ) const
 	return 0;
 }
 
-TiDocumentNode* TiDocumentNode::IterateChildren( TiDocumentNode* previous ) const
+TiDocumentNode* TiDocumentNodeChildren::IterateChildren( TiDocumentNode* previous ) const
 {
 	if ( !previous )
 	{
@@ -323,12 +426,11 @@ TiDocumentNode* TiDocumentNode::IterateChildren( TiDocumentNode* previous ) cons
 	}
 	else
 	{
-		assert( previous->parent == this );
 		return previous->NextSibling();
 	}
 }
 
-TiDocumentNode* TiDocumentNode::IterateChildren( const char * val, TiDocumentNode* previous ) const
+TiDocumentNode* TiDocumentNodeChildren::IterateChildren( const char * val, TiDocumentNode* previous ) const
 {
 	if ( !previous )
 	{
@@ -336,35 +438,37 @@ TiDocumentNode* TiDocumentNode::IterateChildren( const char * val, TiDocumentNod
 	}
 	else
 	{
-		assert( previous->parent == this );
 		return previous->NextSibling( val );
 	}
 }
 
-TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
+TiXmlElement* TiDocumentNodeChildren::FirstChildElement() const
 {
 	TiDocumentNode* node;
-	for ( node = next; node; node = node->next )
+
+	for (	node = FirstChild(); node; node = node->NextSibling() )
 	{
-		const char* node_val = node->Value ();
-		if (node_val && strcmp (node_val, value) == 0)
-			return node;
+		if ( node->ToElement() )
+			return node->ToElement();
+	}
+	return 0;
+}
+
+TiXmlElement* TiDocumentNodeChildren::FirstChildElement( const char * value ) const
+{
+	TiDocumentNode* node;
+
+	for (	node = FirstChild( value ); node;
+		node = node->NextSibling( value ) )
+	{
+		if ( node->ToElement() )
+			return node->ToElement();
 	}
 	return 0;
 }
 
 
-TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
-{
-	TiDocumentNode* node;
-	for ( node = prev; node; node = node->prev )
-	{
-		const char* node_val = node->Value ();
-		if (node_val && strcmp (node_val, value) == 0)
-			return node;
-	}
-	return 0;
-}
+// -------------------------------------------------------------------------
 
 void TiXmlElement::RemoveAttribute( const char * name )
 {
@@ -374,35 +478,6 @@ void TiXmlElement::RemoveAttribute( const char * name )
 		attributeSet.set.DeleteIndex (nodeidx);
 	}
 }
-
-TiXmlElement* TiDocumentNode::FirstChildElement() const
-{
-	TiDocumentNode* node;
-
-	for (	node = FirstChild();
-	node;
-	node = node->NextSibling() )
-	{
-		if ( node->ToElement() )
-			return node->ToElement();
-	}
-	return 0;
-}
-
-TiXmlElement* TiDocumentNode::FirstChildElement( const char * value ) const
-{
-	TiDocumentNode* node;
-
-	for (	node = FirstChild( value );
-	node;
-	node = node->NextSibling( value ) )
-	{
-		if ( node->ToElement() )
-			return node->ToElement();
-	}
-	return 0;
-}
-
 
 TiXmlElement* TiDocumentNode::NextSiblingElement() const
 {
@@ -449,13 +524,13 @@ TiDocument* TiDocumentNode::GetDocument() const
 
 TiXmlElement::TiXmlElement ()
 {
-	firstChild = lastChild = 0;
 	value = NULL;
 }
 
 TiXmlElement::~TiXmlElement()
 {
 }
+
 
 void TiXmlElement::SetValue (const char * name)
 {

@@ -101,6 +101,7 @@ static int new_fgets (const char*, int, iString*) { return 0; }
 #define TIXML_OSTREAM	TiXmlOutStream
 
 class TiDocument;
+class TiDocumentNodeChildren;
 class TiXmlElement;
 class TiXmlComment;
 class TiXmlUnknown;
@@ -128,509 +129,546 @@ class TiXmlDeclaration;
 		TIXML_ERROR_STRING_COUNT
 	};
 
-/** TiXmlBase is a base class for every class in TinyXml.
-	It does little except to establish that TinyXml classes
-	can be printed and provide some utility functions.
-
-	In XML, the document and elements can contain
-	other elements and other types of nodes.
-
-	@verbatim
-	A Document can contain:	Element	(container or leaf)
-							Comment (leaf)
-							Unknown (leaf)
-							Declaration( leaf )
-
-	An Element can contain:	Element (container or leaf)
-							Text	(leaf)
-							Attributes (not on tree)
-							Comment (leaf)
-							Unknown (leaf)
-
-	A Decleration contains: Attributes (not on tree)
-	@endverbatim
-*/
+/**
+ * TiXmlBase is a base class for every class in TinyXml.
+ * It does little except to establish that TinyXml classes
+ * can be printed and provide some utility functions.
+ *
+ * In XML, the document and elements can contain
+ * other elements and other types of nodes.
+ *
+ * @verbatim
+ * A Document can contain:	Element	(container or leaf)
+ *				Comment (leaf)
+ *				Unknown (leaf)
+ *				Declaration( leaf )
+ *
+ * An Element can contain:	Element (container or leaf)
+ *				Text	(leaf)
+ *				Attributes (not on tree)
+ *				Comment (leaf)
+ *				Unknown (leaf)
+ *
+ * A Decleration contains: Attributes (not on tree)
+ * @endverbatim
+ */
 class TiXmlBase
 {
-	friend class TiDocumentNode;
-	friend class TiXmlElement;
-	friend class TiDocument;
+  friend class TiDocumentNode;
+  friend class TiXmlElement;
+  friend class TiDocument;
 
 public:
-	TiXmlBase()								{}
-	virtual ~TiXmlBase()					{}
+  TiXmlBase () {}
+  virtual ~TiXmlBase () {}
 
-	/**	All TinyXml classes can print themselves to a filestream.
-		This is a formatted print, and will insert tabs and newlines.
-		
-		(For an unformatted stream, use the << operator.)
-	*/
-	virtual void Print( FILE* cfile, int depth ) const = 0;
+  /**
+   * All TinyXml classes can print themselves to a filestream.
+   * This is a formatted print, and will insert tabs and newlines.
+   * (For an unformatted stream, use the << operator.)
+   */
+  virtual void Print( FILE* cfile, int depth ) const = 0;
 
-	/**	The world does not agree on whether white space should be kept or
-		not. In order to make everyone happy, these global, static functions
-		are provided to set whether or not TinyXml will condense all white space
-		into a single space or not. The default is to condense. Note changing these
-		values is not thread safe.
-	*/
-	static void SetCondenseWhiteSpace( bool condense )		{ condenseWhiteSpace = condense; }
+  /**
+   * The world does not agree on whether white space should be kept or
+   * not. In order to make everyone happy, these global, static functions
+   * are provided to set whether or not TinyXml will condense all white space
+   * into a single space or not. The default is to condense. Note changing these
+   * values is not thread safe.
+   */
+  static void SetCondenseWhiteSpace( bool condense )
+  { condenseWhiteSpace = condense; }
 
-	/// Return the current white space setting.
-	static bool IsWhiteSpaceCondensed()						{ return condenseWhiteSpace; }
+  /// Return the current white space setting.
+  static bool IsWhiteSpaceCondensed()
+  { return condenseWhiteSpace; }
 
-	static const char*	SkipWhiteSpace( const char* );
+  static const char* SkipWhiteSpace( const char* );
 
-	/*	Reads an XML name into the string provided. Returns
-		a pointer just past the last character of the name,
-		or 0 if the function has an error.
-	*/
-	static const char* ReadName( const char* p, TIXML_STRING* name );
-	static const char* ReadName( const char* p, char* name );
+  /**
+   * Reads an XML name into the string provided. Returns
+   * a pointer just past the last character of the name,
+   * or 0 if the function has an error.
+   */
+  static const char* ReadName( const char* p, TIXML_STRING* name );
+  static const char* ReadName( const char* p, char* name );
 
-	/*	Reads text. Returns a pointer past the given end tag.
-		Wickedly complex options, but it keeps the (sensitive) code in one place.
-	*/
-	static const char* ReadText(	const char* in, TIXML_STRING* text,
-					bool ignoreWhiteSpace,
-					const char* endTag);
-	static const char* ReadText(	const char* in, char** text,
-					bool ignoreWhiteSpace,
-					const char* endTag);
+  /**
+   * Reads text. Returns a pointer past the given end tag.
+   * Wickedly complex options, but it keeps the (sensitive) code in one place.
+   */
+  static const char* ReadText(	const char* in, TIXML_STRING* text,
+				bool ignoreWhiteSpace,
+				const char* endTag);
+  static const char* ReadText(	const char* in, char** text,
+				bool ignoreWhiteSpace,
+				const char* endTag);
 
-	// Puts a string to a stream, expanding entities as it goes.
-	// Note this should not contian the '<', '>', etc, or they will be transformed into entities!
-	static void PutString( const TIXML_STRING& str, TIXML_OSTREAM* out );
-
-	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
-
+  /**
+   * Puts a string to a stream, expanding entities as it goes.
+   * Note this should not contian the '<', '>', etc, or they will be
+   * transformed into entities!
+   */
+  static void PutString( const TIXML_STRING& str, TIXML_OSTREAM* out );
+  static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
 
 protected:
-	// See STL_STRING_BUG
-	// Utility class to overcome a bug.
-	class StringToBuffer
-	{
-	  public:
-		StringToBuffer( const TIXML_STRING& str );
-		~StringToBuffer();
-		char* buffer;
-	};
+  // See STL_STRING_BUG
+  // Utility class to overcome a bug.
+  class StringToBuffer
+  {
+  public:
+    StringToBuffer( const TIXML_STRING& str );
+    ~StringToBuffer();
+    char* buffer;
+  };
 
-	inline static bool	IsWhiteSpace( int c )		{ return ( isspace( c ) || c == '\n' || c == '\r' ); }
+  virtual void StreamOut (TIXML_OSTREAM *) const = 0;
+  virtual const char* Parse( TiDocument* document, const char* p ) = 0;
 
-	virtual void StreamOut (TIXML_OSTREAM *) const = 0;
+  // If an entity has been found, transform it into a character.
+  static const char* GetEntity( const char* in, char* value );
 
-	virtual const char* Parse( TiDocument* document, const char* p ) = 0;
+  // Get a character, while interpreting entities.
+  inline static const char* GetChar( const char* p, char* value )
+  {
+    if ( *p == '&' )
+    {
+      return GetEntity( p, value );
+    }
+    else
+    {
+      *value = *p;
+      return p+1;
+    }
+  }
 
-	// If an entity has been found, transform it into a character.
-	static const char* GetEntity( const char* in, char* value );
+  // Return true if the next characters in the stream are any of the endTag
+  // sequences.
+  static bool StringEqual(const char* p, const char* endTag);
+  static bool StringEqualIgnoreCase(const char* p, const char* endTag);
 
-	// Get a character, while interpreting entities.
-	inline static const char* GetChar( const char* p, char* value )
-	{
-		if ( *p == '&' )
-		{
-			return GetEntity( p, value );
-		}
-		else
-		{
-			*value = *p;
-			return p+1;
-		}
-	}
-
-	// Return true if the next characters in the stream are any of the endTag sequences.
-	static bool StringEqual(const char* p,
-					const char* endTag);
-	static bool StringEqualIgnoreCase(const char* p,
-					const char* endTag);
-
-
-	static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
+  static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
 
 private:
-	struct Entity
-	{
-		const char*     str;
-		unsigned int	strLength;
-		char		    chr;
-	};
-	enum
-	{
-		NUM_ENTITY = 5,
-		MAX_ENTITY_LENGTH = 6
-
-	};
-	static Entity entity[ NUM_ENTITY ];
-	static bool condenseWhiteSpace;
+  struct Entity
+  {
+    const char* str;
+    unsigned int strLength;
+    char chr;
+  };
+  enum
+  {
+    NUM_ENTITY = 5,
+    MAX_ENTITY_LENGTH = 6
+  };
+  static Entity entity[ NUM_ENTITY ];
+  static bool condenseWhiteSpace;
 };
 
 
-/** The parent class for everything in the Document Object Model.
-	(Except for attributes, which are contained in elements.)
-	Nodes have siblings, a parent, and children. A node can be
-	in a document, or stand on its own. The type of a TiDocumentNode
-	can be queried, and it can be cast to its more defined type.
-*/
+/**
+ * The parent class for everything in the Document Object Model.
+ * (Except for attributes, which are contained in elements.)
+ * Nodes have siblings, a parent, and children. A node can be
+ * in a document, or stand on its own. The type of a TiDocumentNode
+ * can be queried, and it can be cast to its more defined type.
+ */
 class TiDocumentNode : public TiXmlBase
 {
-	friend class TiDocument;
-	friend class TiXmlElement;
+  friend class TiDocument;
+  friend class TiDocumentNodeChildren;
+  friend class TiXmlElement;
 
 public:
-	// Used internally, not part of the public API.
-	friend TIXML_OSTREAM& operator<< (TIXML_OSTREAM& out, const TiDocumentNode& base);
+  // Used internally, not part of the public API.
+  friend TIXML_OSTREAM& operator<< (TIXML_OSTREAM& out,
+  	const TiDocumentNode& base);
 
-	/** The types of XML nodes supported by TinyXml. (All the
-			unsupported types are picked up by UNKNOWN.)
-	*/
-	enum NodeType
-	{
-		DOCUMENT,
-		ELEMENT,
-		COMMENT,
-		UNKNOWN,
-		TEXT,
-		DECLARATION,
-		TYPECOUNT
-	};
+  /**
+   * The types of XML nodes supported by TinyXml. (All the
+   * unsupported types are picked up by UNKNOWN.)
+   */
+  enum NodeType
+  {
+    DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, DECLARATION, TYPECOUNT
+  };
 
-	virtual ~TiDocumentNode();
+  virtual ~TiDocumentNode();
 
-	/** The meaning of 'value' changes for the specific type of
-		TiDocumentNode.
-		@verbatim
-		Document:	filename of the xml file
-		Element:	name of the element
-		Comment:	the comment text
-		Unknown:	the tag contents
-		Text:		the text string
-		@endverbatim
+  /**
+   * The meaning of 'value' changes for the specific type of
+   * TiDocumentNode.
+   * @verbatim
+   * Document:	filename of the xml file
+   * Element:	name of the element
+   * Comment:	the comment text
+   * Unknown:	the tag contents
+   * Text:		the text string
+   * @endverbatim
+   * The subclasses will wrap this function.
+   */
+  virtual const char * Value () const = 0;
 
-		The subclasses will wrap this function.
-	*/
-	virtual const char * Value () const = 0;
+  /**
+   * Changes the value of the node.
+   */
+  virtual void SetValue (const char * _value) = 0;
 
-	/** Changes the value of the node. Defined as:
-		@verbatim
-		Document:	filename of the xml file
-		Element:	name of the element
-		Comment:	the comment text
-		Unknown:	the tag contents
-		Text:		the text string
-		@endverbatim
-	*/
-	virtual void SetValue (const char * _value) = 0;
+  /// One step up the DOM.
+  TiDocumentNodeChildren* Parent() const{ return parent; }
 
-	/// Delete all the children of this node. Does not affect 'this'.
-	void Clear();
+  /// Navigate to a sibling node.
+  TiDocumentNode* PreviousSibling() const { return prev; }
 
-	/// One step up the DOM.
-	TiDocumentNode* Parent() const{ return parent; }
+  /// Navigate to a sibling node.
+  TiDocumentNode* PreviousSibling( const char * ) const;
 
-	TiDocumentNode* FirstChild()	const	{ return firstChild; }		///< The first child of this node. Will be null if there are no children.
-	TiDocumentNode* FirstChild( const char * value ) const;			///< The first child of this node with the matching 'value'. Will be null if none found.
+  /// Navigate to a sibling node.
+  TiDocumentNode* NextSibling() const { return next; }
 
-	TiDocumentNode* LastChild() const	{ return lastChild; }		/// The last child of this node. Will be null if there are no children.
-	TiDocumentNode* LastChild( const char * value ) const;			/// The last child of this node matching 'value'. Will be null if there are no children.
+  /// Navigate to a sibling node with the given 'value'.
+  TiDocumentNode* NextSibling( const char * ) const;
 
-	/** An alternate way to walk the children of a node.
-		One way to iterate over nodes is:
-		@verbatim
-			for( child = parent->FirstChild(); child; child = child->NextSibling() )
-		@endverbatim
+  /**
+   * Convenience function to get through elements.
+   * Calls NextSibling and ToElement. Will skip all non-Element
+   * nodes. Returns 0 if there is not another element.
+   */
+  TiXmlElement* NextSiblingElement() const;
 
-		IterateChildren does the same thing with the syntax:
-		@verbatim
-			child = 0;
-			while( child = parent->IterateChildren( child ) )
-		@endverbatim
+  /**
+   * Convenience function to get through elements.
+   * Calls NextSibling and ToElement. Will skip all non-Element
+   * nodes. Returns 0 if there is not another element.
+   */
+  TiXmlElement* NextSiblingElement( const char * ) const;
 
-		IterateChildren takes the previous child as input and finds
-		the next one. If the previous child is null, it returns the
-		first. IterateChildren will return null when done.
-	*/
-	TiDocumentNode* IterateChildren( TiDocumentNode* previous ) const;
+  /// Query the type (as an enumerated value, above) of this node.
+  virtual int Type() const = 0;
 
-	/// This flavor of IterateChildren searches for children with a particular 'value'
-	TiDocumentNode* IterateChildren( const char * value, TiDocumentNode* previous ) const;
+  /**
+   * Return a pointer to the Document this node lives in.
+   * Returns null if not in a document.
+   */
+  TiDocument* GetDocument() const;
 
-	/** Add a new node related to this. Adds a child past the LastChild.
-		Returns a pointer to the new object or NULL if an error occured.
-	*/
-	TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
+  TiDocumentNodeChildren* ToDocumentNodeChildren() const
+  {
+    int t = Type ();
+    return ( t == DOCUMENT || t == ELEMENT )
+    	? (TiDocumentNodeChildren*) this
+	: 0;
+  }
+  TiDocument* ToDocument() const
+  { return ( Type () == DOCUMENT ) ? (TiDocument*) this : 0; }
+  TiXmlElement*  ToElement() const
+  { return ( Type () == ELEMENT  ) ? (TiXmlElement*)  this : 0; }
+  TiXmlComment*  ToComment() const
+  { return ( Type () == COMMENT  ) ? (TiXmlComment*)  this : 0; }
+  TiXmlUnknown*  ToUnknown() const
+  { return ( Type () == UNKNOWN  ) ? (TiXmlUnknown*)  this : 0; }
+  TiXmlText*   ToText()    const
+  { return ( Type () == TEXT     ) ? (TiXmlText*)     this : 0; }
+  TiXmlDeclaration* ToDeclaration() const
+  { return ( Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; }
 
-	/** Add a new node related to this. Adds a child before the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
-	*/
-	TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis, const TiDocumentNode& addThis );
-
-	/** Add a new node related to this. Adds a child after the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
-	*/
-	TiDocumentNode* InsertAfterChild(  TiDocumentNode* afterThis, const TiDocumentNode& addThis );
-
-	/** Replace a child of this node.
-		Returns a pointer to the new object or NULL if an error occured.
-	*/
-	TiDocumentNode* ReplaceChild( TiDocumentNode* replaceThis, const TiDocumentNode& withThis );
-
-	/// Delete a child of this node.
-	bool RemoveChild( TiDocumentNode* removeThis );
-
-	/// Navigate to a sibling node.
-	TiDocumentNode* PreviousSibling() const			{ return prev; }
-
-	/// Navigate to a sibling node.
-	TiDocumentNode* PreviousSibling( const char * ) const;
-
-	/// Navigate to a sibling node.
-	TiDocumentNode* NextSibling() const				{ return next; }
-
-	/// Navigate to a sibling node with the given 'value'.
-	TiDocumentNode* NextSibling( const char * ) const;
-
-	/** Convenience function to get through elements.
-		Calls NextSibling and ToElement. Will skip all non-Element
-		nodes. Returns 0 if there is not another element.
-	*/
-	TiXmlElement* NextSiblingElement() const;
-
-	/** Convenience function to get through elements.
-		Calls NextSibling and ToElement. Will skip all non-Element
-		nodes. Returns 0 if there is not another element.
-	*/
-	TiXmlElement* NextSiblingElement( const char * ) const;
-
-	/// Convenience function to get through elements.
-	TiXmlElement* FirstChildElement()	const;
-
-	/// Convenience function to get through elements.
-	TiXmlElement* FirstChildElement( const char * value ) const;
-
-	/// Query the type (as an enumerated value, above) of this node.
-	virtual int Type() const = 0;
-
-	/** Return a pointer to the Document this node lives in.
-		Returns null if not in a document.
-	*/
-	TiDocument* GetDocument() const;
-
-	/// Returns true if this node has no children.
-	bool NoChildren() const						{ return !firstChild; }
-
-	TiDocument* ToDocument() const	{ return ( this && Type () == DOCUMENT ) ? (TiDocument*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlElement*  ToElement() const		{ return ( this && Type () == ELEMENT  ) ? (TiXmlElement*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlComment*  ToComment() const		{ return ( this && Type () == COMMENT  ) ? (TiXmlComment*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlUnknown*  ToUnknown() const		{ return ( this && Type () == UNKNOWN  ) ? (TiXmlUnknown*)  this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlText*	   ToText()    const		{ return ( this && Type () == TEXT     ) ? (TiXmlText*)     this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-	TiXmlDeclaration* ToDeclaration() const	{ return ( this && Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; } ///< Cast to a more defined type. Will return null not of the requested type.
-
-	virtual TiDocumentNode* Clone() const = 0;
+  virtual TiDocumentNode* Clone() const = 0;
 
 protected:
-	TiDocumentNode( );
+  TiDocumentNode( );
 
-	// The node is passed in by ownership. This object will delete it.
-	TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
+  void CopyToClone( TiDocumentNode* target ) const
+  {
+    target->SetValue (Value () );
+  }
 
-	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
-	TiDocumentNode* Identify( TiDocument* document, const char* start );
-	void CopyToClone( TiDocumentNode* target ) const
-	{
-	  target->SetValue (Value () );
-	}
+  TiDocumentNodeChildren* parent;
 
-	TiDocumentNode*		parent;
+  TiDocumentNode* prev;
+  TiDocumentNode* next;
+};
 
-	TiDocumentNode*		firstChild;
-	TiDocumentNode*		lastChild;
+/**
+ * A document node with children.
+ */
+class TiDocumentNodeChildren : public TiDocumentNode
+{
+public:
+  /// Construct an element.
+  TiDocumentNodeChildren ();
 
-	TiDocumentNode*		prev;
-	TiDocumentNode*		next;
+  virtual ~TiDocumentNodeChildren();
+
+  /// Delete all the children of this node. Does not affect 'this'.
+  void Clear();
+
+  /// Returns true if this node has no children.
+  bool NoChildren() const { return !firstChild; }
+
+  TiDocumentNode* FirstChild()	const	{ return firstChild; }
+  TiDocumentNode* FirstChild( const char * value ) const;
+
+  TiDocumentNode* LastChild() const	{ return lastChild; }
+  TiDocumentNode* LastChild( const char * value ) const;
+
+  /**
+   * An alternate way to walk the children of a node.
+   * One way to iterate over nodes is:
+   * @verbatim
+   * for( child = parent->FirstChild(); child; child = child->NextSibling() )
+   * @endverbatim
+   *
+   * IterateChildren does the same thing with the syntax:
+   * @verbatim
+   * child = 0;
+   * while( child = parent->IterateChildren( child ) )
+   * @endverbatim
+   *
+   * IterateChildren takes the previous child as input and finds
+   * the next one. If the previous child is null, it returns the
+   * first. IterateChildren will return null when done.
+   */
+  TiDocumentNode* IterateChildren( TiDocumentNode* previous ) const;
+
+  /**
+   * This flavor of IterateChildren searches for children with a particular
+   * 'value'.
+   */
+  TiDocumentNode* IterateChildren( const char * value,
+  	TiDocumentNode* previous ) const;
+
+  /**
+   * Add a new node related to this. Adds a child past the LastChild.
+   * Returns a pointer to the new object or NULL if an error occured.
+   */
+  TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
+
+  /**
+   * Add a new node related to this. Adds a child before the specified child.
+   * Returns a pointer to the new object or NULL if an error occured.
+   */
+  TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
+  	const TiDocumentNode& addThis );
+
+  /**
+   * Add a new node related to this. Adds a child after the specified child.
+   * Returns a pointer to the new object or NULL if an error occured.
+   */
+  TiDocumentNode* InsertAfterChild(  TiDocumentNode* afterThis,
+  	const TiDocumentNode& addThis );
+
+  /**
+   * Replace a child of this node.
+   * Returns a pointer to the new object or NULL if an error occured.
+   */
+  TiDocumentNode* ReplaceChild( TiDocumentNode* replaceThis,
+  	const TiDocumentNode& withThis );
+
+  /// Delete a child of this node.
+  bool RemoveChild( TiDocumentNode* removeThis );
+
+  /// Convenience function to get through elements.
+  TiXmlElement* FirstChildElement()	const;
+
+  /// Convenience function to get through elements.
+  TiXmlElement* FirstChildElement( const char * value ) const;
+
+protected:
+  // Figure out what is at *p, and parse it. Returns null if it is not an xml
+  // node.
+  TiDocumentNode* Identify( TiDocument* document, const char* start );
+
+  // The node is passed in by ownership. This object will delete it.
+  TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
+
+  TiDocumentNode* firstChild;
+  TiDocumentNode* lastChild;
 };
 
 
-/** An attribute is a name-value pair. Elements have an arbitrary
-	number of attributes, each with a unique name.
-
-	@note The attributes are not TiDocumentNodes, since they are not
-		  part of the tinyXML document object model. There are other
-		  suggested ways to look at this problem.
-
-	@note Attributes have a parent
-*/
+/**
+ * An attribute is a name-value pair. Elements have an arbitrary
+ * number of attributes, each with a unique name.
+ *
+ * @note The attributes are not TiDocumentNodes, since they are not
+ * part of the tinyXML document object model. There are other
+ * suggested ways to look at this problem.
+ */
 class TiDocumentAttribute
 {
-	friend class TiDocumentAttributeSet;
+  friend class TiDocumentAttributeSet;
 
 public:
-	/// Construct an empty attribute.
-	TiDocumentAttribute() { name = NULL; value = NULL; }
-	~TiDocumentAttribute () { delete[] value; }
+  /// Construct an empty attribute.
+  TiDocumentAttribute() { name = NULL; value = NULL; }
+  ~TiDocumentAttribute () { delete[] value; }
 
-	const char* Name()  const { return name; }
-	const char* Value() const { return value; }
-	char* Value() { return value; }
-	const int IntValue() const;
-	const double DoubleValue() const;
+  const char* Name()  const { return name; }
+  const char* Value() const { return value; }
+  char* Value() { return value; }
+  const int IntValue() const;
+  const double DoubleValue() const;
 
-	void SetName( const char* _name )	{ name = _name; }
-	void SetValue( const char* _value )
-	{
-	  delete[] value;
-	  value = csStrNew (_value);
-	}
-	/// Take over value so that this attribute has ownership.
-	void TakeOverValue( char* _value )
-	{
-	  value = _value;
-	}
+  void SetName( const char* _name )	{ name = _name; }
+  void SetValue( const char* _value )
+  {
+    delete[] value;
+    value = csStrNew (_value);
+  }
+  /// Take over value so that this attribute has ownership.
+  void TakeOverValue( char* _value )
+  {
+    value = _value;
+  }
 
-	void SetIntValue( int value );										///< Set the value from an integer.
-	void SetDoubleValue( double value );								///< Set the value from a double.
+  void SetIntValue( int value );
+  void SetDoubleValue( double value );
 
-	bool operator==( const TiDocumentAttribute& rhs ) const
-	{
-	  return strcmp (rhs.name, name) == 0;
-	}
-	bool operator<( const TiDocumentAttribute& rhs ) const
-	{
-	  return strcmp (name, rhs.name) > 0;
-	}
-	bool operator>( const TiDocumentAttribute& rhs ) const
-	{
-	  return strcmp (name, rhs.name) < 0;
-	}
+  bool operator==( const TiDocumentAttribute& rhs ) const
+  {
+    return strcmp (rhs.name, name) == 0;
+  }
+  bool operator<( const TiDocumentAttribute& rhs ) const
+  {
+    return strcmp (name, rhs.name) > 0;
+  }
+  bool operator>( const TiDocumentAttribute& rhs ) const
+  {
+    return strcmp (name, rhs.name) < 0;
+  }
 
-	/*	[internal use]
-		Attribtue parsing starts: first letter of the name
-						 returns: the next char after the value end quote
-	*/
-	const char* Parse( TiDocument* document, const char* p );
+  /*	[internal use]
+   * Attribute parsing starts: first letter of the name
+   * returns: the next char after the value end quote
+   */
+  const char* Parse( TiDocument* document, const char* p );
 
-	// [internal use]
-	void Print( FILE* cfile, int depth ) const;
+  // [internal use]
+  void Print( FILE* cfile, int depth ) const;
 
-	void StreamOut( TIXML_OSTREAM * out ) const;
+  void StreamOut( TIXML_OSTREAM * out ) const;
 
 private:
-	const char* name;
-	char* value;
+  const char* name;
+  char* value;
 };
 
 
-/*	A class used to manage a group of attributes.
-	It is only used internally, both by the ELEMENT and the DECLARATION.
-	
-	The set can be changed transparent to the Element and Declaration
-	classes that use it, but NOT transparent to the Attribute
-	which has to implement a next() and previous() method. Which makes
-	it a bit problematic and prevents the use of STL.
-
-	This version is implemented with circular lists because:
-		- I like circular lists
-		- it demonstrates some independence from the (typical) doubly linked list.
-*/
+/**
+ * A class used to manage a group of attributes.
+ * It is only used internally, both by the ELEMENT and the DECLARATION.
+ *
+ * The set can be changed transparent to the Element and Declaration
+ * classes that use it, but NOT transparent to the Attribute
+ * which has to implement a next() and previous() method. Which makes
+ * it a bit problematic and prevents the use of STL.
+ */
 class TiDocumentAttributeSet
 {
 public:
-	csArray<TiDocumentAttribute> set;
+  csArray<TiDocumentAttribute> set;
 
-	TiDocumentAttributeSet() : set (0, 4) { }
-	int Find (const char * name) const;
-	int FindExact (const char * reg_name) const;
+  TiDocumentAttributeSet() : set (0, 4) { }
+  int Find (const char * name) const;
+  int FindExact (const char * reg_name) const;
 };
 
 
-/** The element is a container class. It has a value, the element name,
-	and can contain other elements, text, comments, and unknowns.
-	Elements also contain an arbitrary number of attributes.
-*/
-class TiXmlElement : public TiDocumentNode
+/**
+ * The element is a container class. It has a value, the element name,
+ * and can contain other elements, text, comments, and unknowns.
+ * Elements also contain an arbitrary number of attributes.
+ */
+class TiXmlElement : public TiDocumentNodeChildren
 {
 public:
-	/// Construct an element.
-	TiXmlElement ();
+  /// Construct an element.
+  TiXmlElement ();
 
-	virtual ~TiXmlElement();
+  virtual ~TiXmlElement();
 
-	virtual int Type() const { return ELEMENT; }
+  virtual int Type() const { return ELEMENT; }
 
-	/** Given an attribute name, attribute returns the value
-		for the attribute of that name, or null if none exists.
-	*/
-	const char* Attribute( const char* name ) const;
+  /**
+   * Given an attribute name, attribute returns the value
+   * for the attribute of that name, or null if none exists.
+   */
+  const char* Attribute( const char* name ) const;
 
-	/** Given an attribute name, attribute returns the value
-		for the attribute of that name, or null if none exists.
-		If the attribute exists and can be converted to an integer,
-		the integer value will be put in the return 'i', if 'i'
-		is non-null.
-	*/
-	const char* Attribute( const char* name, int* i ) const;
+  /**
+   * Given an attribute name, attribute returns the value
+   * for the attribute of that name, or null if none exists.
+   * If the attribute exists and can be converted to an integer,
+   * the integer value will be put in the return 'i', if 'i'
+   * is non-null.
+   */
+  const char* Attribute( const char* name, int* i ) const;
 
-	/** Sets an attribute of name to a given value. The attribute
-		will be created if it does not exist, or changed if it does.
-	*/
-	void SetAttribute(TiDocument* document,
-		const char* reg_name, const char * value );
-	/// Get attribute with registered name.
-	TiDocumentAttribute& GetAttributeRegistered (const char * reg_name);
+  /**
+   * Sets an attribute of name to a given value. The attribute
+   * will be created if it does not exist, or changed if it does.
+   */
+  void SetAttribute(TiDocument* document,
+    const char* reg_name, const char * value );
+  /// Get attribute with registered name.
+  TiDocumentAttribute& GetAttributeRegistered (const char * reg_name);
 
-	/** Sets an attribute of name to a given value. The attribute
-		will be created if it does not exist, or changed if it does.
-	*/
-	void SetAttribute( TiDocument* document, const char * name, int value );
+  /**
+   * Sets an attribute of name to a given value. The attribute
+   * will be created if it does not exist, or changed if it does.
+   */
+  void SetAttribute( TiDocument* document, const char * name, int value );
 
-	/// Get number of attributes.
-	int GetAttributeCount () const { return attributeSet.set.Length (); }
-	/// Get attribute.
-	const TiDocumentAttribute& GetAttribute (int idx) const
-	{
-	  return attributeSet.set[idx];
-	}
-	/// Get attribute.
-	TiDocumentAttribute& GetAttribute (int idx)
-	{
-	  return attributeSet.set[idx];
-	}
+  /// Get number of attributes.
+  int GetAttributeCount () const { return attributeSet.set.Length (); }
+  /// Get attribute.
+  const TiDocumentAttribute& GetAttribute (int idx) const
+  {
+    return attributeSet.set[idx];
+  }
+  /// Get attribute.
+  TiDocumentAttribute& GetAttribute (int idx)
+  {
+    return attributeSet.set[idx];
+  }
 
-	/** Deletes an attribute with the given name.
-	*/
-	void RemoveAttribute( const char * name );
-	// [internal use] Creates a new Element and returs it.
-	virtual TiDocumentNode* Clone() const;
-	// [internal use]
+  /**
+   * Deletes an attribute with the given name.
+   */
+  void RemoveAttribute( const char * name );
+  // [internal use] Creates a new Element and returs it.
+  virtual TiDocumentNode* Clone() const;
+  // [internal use]
 
-	virtual void Print( FILE* cfile, int depth ) const;
+  virtual void Print( FILE* cfile, int depth ) const;
 
-	virtual const char * Value () const { return value; }
-	void SetValueRegistered (const char * _value)
-	{
-	  value = _value;
-	}
-	virtual void SetValue (const char * _value);
+  virtual const char * Value () const { return value; }
+  void SetValueRegistered (const char * _value)
+  {
+    value = _value;
+  }
+  virtual void SetValue (const char * _value);
 
 protected:
+  // Used to be public [internal use]
+  virtual void StreamOut( TIXML_OSTREAM * out ) const;
 
-	// Used to be public [internal use]
-	virtual void StreamOut( TIXML_OSTREAM * out ) const;
+  /*	[internal use]
+   * Attribtue parsing starts: next char past '<'
+   * returns: next char past '>'
+   */
+  virtual const char* Parse( TiDocument* document, const char* p );
 
-	/*	[internal use]
-		Attribtue parsing starts: next char past '<'
-						 returns: next char past '>'
-	*/
-	virtual const char* Parse( TiDocument* document, const char* p );
-
-	/*	[internal use]
-		Reads the "value" of the element -- another element, or text.
-		This should terminate with the current end tag.
-	*/
-	const char* ReadValue( TiDocument* document, const char* in );
+  /*	[internal use]
+   * Reads the "value" of the element -- another element, or text.
+   * This should terminate with the current end tag.
+   */
+  const char* ReadValue( TiDocument* document, const char* in );
 
 private:
-	TiDocumentAttributeSet attributeSet;
-	const char* value;
+  TiDocumentAttributeSet attributeSet;
+  const char* value;
 };
 
 
@@ -810,7 +848,7 @@ protected:
 	XML pieces. It can be saved, loaded, and printed to the screen.
 	The 'value' of a document node is the xml file name.
 */
-class TiDocument : public TiDocumentNode
+class TiDocument : public TiDocumentNodeChildren
 {
 public:
 	/// Interned strings.
