@@ -776,7 +776,8 @@ int obb_disjoint (csMatrix3 B, csVector3 T, csVector3 a, csVector3 b)
 int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
 {
   int rc;      // return codes
-  if (csCollider::firstHit && (csCollider::numHits > 0)) return false;
+  if (csCollider::firstHit && (csCollider::numHits > 0))
+    return false;
 
   // test top level
   csCollider::boxesTested++;
@@ -825,8 +826,6 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
 
     if ((rc = CollideRecursive (b1->P, b2, cR, cT)) != false)
       return rc;
-	
-    return false;
   }
   else
   {
@@ -844,8 +843,6 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
 
     if ((rc = CollideRecursive (b1, b2->P, cR, cT)) != false)
       return rc;
-	
-    return false;
   }
 
   return false;
