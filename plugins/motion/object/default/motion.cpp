@@ -265,11 +265,12 @@ void csMotionManager::UpdateTransform( iSkeletonBone *bone, csVector3 *vec )
 
 void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 {
-  for ( int i = 0; i < fr->numqlinks; i++ )
+  int i;
+  for (i = 0; i < fr->numqlinks; i++ )
 	UpdateTransform( fr->qaffector[i], fr->qlinks[i] );
-  for ( int i = 0; i < fr->nummlinks; i++ )
+  for (i = 0; i < fr->nummlinks; i++ )
 	UpdateTransform( fr->maffector[i], fr->mlinks[i] );
-  for ( int i = 0; i < fr->numvlinks;  i++ )
+  for (i = 0; i < fr->numvlinks;  i++ )
 	UpdateTransform( fr->vaffector[i], fr->vlinks[i] );
 }
 
