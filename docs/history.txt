@@ -4,6 +4,28 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 16-Apr-2003
+	- Rhad fixed csList so that it functions to at least a greater
+	  extent than it originally did.
+	    - Iterator::HasNext() and Iterator::HasPrevious now return
+	      a boolean value as their name implies.  Code relying on
+	      the broken functionality of these members should call
+	      Iterator::HasCurrent() instead which returns true if the
+	      iterator currently points to a valid element.
+	    - csList::Delete(Iterator it) has been changed to progress
+	      the iterator forward or backward (depending on how the 
+	      iterator was created) prior to deleting the element data
+	      that the iterator operates on.  Existing code should require
+	      no change since calling this function caused the iterator to
+	      point to an element which had been delete()ed previously,
+	      and now simply points to a valid element (i.e. it used to
+	      crash if you used it again, now it wont).
+	    - csList::Delete(csListElement *) has been added to allow deletion
+	      of an element without passing through an implicit Iterator
+	      construction.
+	    - renderer3d/opengl/gl_varbufmrg.cpp has been changed to call
+	      Iterator::HasCurrent() instead of Iterator::HasNext()
+	      or Iterator::HasPrevious().  This is the only place where
+	      csList is used within the Crystal Space CVS code.
 	- Micah fixed some typos in the movie recorder HOWTO
 	- Matze did the following changes to the jambuild:
 	    - Added workarounds to make the system working with boostjam.

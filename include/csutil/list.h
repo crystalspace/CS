@@ -49,7 +49,10 @@ protected:
     /// Accual data
     T data;         
   };
-  
+
+  /// Remove specific item by explicit ref
+  void Delete (csListElement *el);
+
 public:
   /// Default constructor
   csList()
@@ -74,20 +77,25 @@ public:
     { ptr = other.ptr; }
     Iterator(const csList<T> &list, bool reverse = false) 
     {
+      reversed=reverse;
       if(reverse) ptr = list.tail;
       else ptr = list.head;
     }
     const Iterator& operator= (const Iterator& other)
     { ptr = other.ptr; return *this; }
 
+    bool HasCurrent() const
+    { return ptr != 0; }
     bool HasNext() const
-    { return ptr != 0; }
+    { return ptr && ptr->next; }
     bool HasPrevious() const
-    { return ptr != 0; }
+    { return ptr && ptr->prev; }
     bool IsFirst() const
     { return ptr && ptr->prev == 0; }
     bool IsLast() const
     { return ptr && ptr->next == 0; }
+    bool IsReverse() const
+    { return reversed; }
 
     operator T*() const
     { return &ptr->data; }
@@ -120,6 +128,7 @@ public:
 
   private:
     csListElement* ptr;
+    bool reversed;
   };
 
   /// Assignment, swallow copy
@@ -131,8 +140,8 @@ public:
   /// Add an item last in list. Copy T into the listdata
   Iterator PushBack (const T & item);
 
-  /// Remove specific item
-  void Delete (Iterator element);
+  /// Remove specific item by iterator
+  void Delete (Iterator &it);
 
   /// Empty an list
   void DeleteAll();
@@ -236,12 +245,26 @@ template <class T> typename csList<T>::Iterator csList<T>::PushFront (const T& i
   return Iterator (el);
 }
 
-template <class T> void csList<T>::Delete (Iterator it)
+
+template <class T> void csList<T>::Delete (Iterator &it)
 {
   csListElement* el = it.ptr;
 
   if (!el)
     return;
+
+  // Advance the iterator so we can delete the data its using
+  if (it.IsReverse())
+      it--;
+  else
+      it++;
+
+  Delete(el);
+}
+
+template <class T> void csList<T>::Delete (csListElement *el)
+{
+  CS_ASSERT(el);
 
   // Fix the pointers of the 2 surrounding elements
   if (el->prev)
