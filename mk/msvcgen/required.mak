@@ -44,6 +44,7 @@
 MSVC.MAKE.FLAGS = \
   HAS_CAL3D=yes \
   3DS.AVAILABLE=yes \
+  ODE.AVAILABLE=yes \
   CSPYTHON_MSVC_EXCLUDE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
@@ -56,6 +57,7 @@ MSVC.PLUGINS.REQUIRED =         \
   net/driver/socket		\
   net/driver/ensocket		\
   physics/odedynam              \
+  physics/loader                \
   sound/driver/waveoutsd        \
   sound/loader/ogg              \
   sound/renderer/ds3d           \
