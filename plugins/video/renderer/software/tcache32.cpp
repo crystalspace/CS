@@ -91,28 +91,18 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
   {
     for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
     {
-      // Note. Here we correct for the fact that level 128 in the lightmaps
-      // means fully lit. So we multiply the lightmap light level to have 256
-      // as the fully lit level. However we need to cap the final value of the
-      // texture to 255. To be fully correct we should do this in this inner loop
-      // but we already cap here. This means that in some cases we will actually
-      // interpolate wrong. Imagine interpolating from 300 to 200 in 3 steps.
-      // If we cap where we should cap then we actually get the values: 255 255 200.
-      // But we cap before interpolation so we get: 255 225 200 instead.
-      // I don't think this matters much however. The interpolation is wrong in
-      // anycase. This is just another kind of wrongness.
-      red_00 = mapR[luv] << 1; if (red_00 > 255) red_00 = 255;
-      red_10 = mapR[luv+1] << 1; if (red_10 > 255) red_10 = 255;
-      red_01 = mapR[luv+tcd.lw] << 1; if (red_01 > 255) red_01 = 255;
-      red_11 = mapR[luv+tcd.lw+1] << 1; if (red_11 > 255) red_11 = 255;
-      gre_00 = mapG[luv] << 1; if (gre_00 > 255) gre_00 = 255;
-      gre_10 = mapG[luv+1] << 1; if (gre_10 > 255) gre_10 = 255;
-      gre_01 = mapG[luv+tcd.lw] << 1; if (gre_01 > 255) gre_01 = 255;
-      gre_11 = mapG[luv+tcd.lw+1] << 1; if (gre_11 > 255) gre_11 = 255;
-      blu_00 = mapB[luv] << 1; if (blu_00 > 255) blu_00 = 255;
-      blu_10 = mapB[luv+1] << 1; if (blu_10 > 255) blu_10 = 255;
-      blu_01 = mapB[luv+tcd.lw] << 1; if (blu_01 > 255) blu_01 = 255;
-      blu_11 = mapB[luv+tcd.lw+1] << 1; if (blu_11 > 255) blu_11 = 255;
+      // NOTE: level 127 means "fully lit", levels above 127 should be
+      // clipped to 127. We do clipping *inside* lighting loop, this is
+      // not as costly to do it here (and introduce yet another inaccuracy)
+      // If we miss levels above 127, we'll never get the white color, just
+      // the original color.
+
+      red_00 = mapR[luv];        red_10 = mapR[luv+1];
+      red_01 = mapR[luv+tcd.lw]; red_11 = mapR[luv+tcd.lw+1];
+      gre_00 = mapG[luv];        gre_10 = mapG[luv+1];
+      gre_01 = mapG[luv+tcd.lw]; gre_11 = mapG[luv+tcd.lw+1];
+      blu_00 = mapB[luv];        blu_10 = mapB[luv+1];
+      blu_01 = mapB[luv+tcd.lw]; blu_11 = mapB[luv+tcd.lw+1];
 
       u = lu << tcd.mipmap_shift;
       v = lv << tcd.mipmap_shift;
@@ -127,86 +117,40 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
 	whi_0 = gre_00 << 16; whi_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
 	whi_1 = gre_10 << 16; whi_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
 
-	for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	  if (v+dv < h)
-	  {
-	    ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-	    whi = whi_0; whi_d = (whi_1-whi_0) >> tcd.mipmap_shift;
-
-	    end_u = u+tcd.mipmap_size;
-	    if (end_u > w) end_u = w;
-	    end_u += Imin_u;
-	    tm2 = tm + tcd.mipmap_size;
-	    ULong* ot = otmap+ov_idx;
-	    ULong RGB;
-	    for (uu = u+Imin_u ; uu < end_u ; uu++)
-	    {
-	      RGB = ot[uu & and_w];
-	      *tm++ = ((((RGB >> rs24) & 0xff) * (whi >> 16) >> 8) << red_shift) |
-	              ((((RGB >> gs24) & 0xff) * (whi >> 16) >> 8) << green_shift) |
-		      ((((RGB >> bs24) & 0xff) * (whi >> 16) >> 8) << blue_shift);
-	      whi += whi_d;
-	    }
-	    tm = tm2;
-
-	    whi_0 += whi_0d;
-	    whi_1 += whi_1d;
-	  }
-	  else break;
+        if (red_shift == 16)
+	  #define PI_R8G8B8
+	  #define TL_WHITE
+	  #include "texl24.inc"
+	else
+	  #define PI_B8G8R8
+	  #define TL_WHITE
+	  #include "texl24.inc"
 
 	luv++;
-	continue;
       }
+      else
+      {
+        //*****
+        // Most general case: varying levels of red, green, and blue light.
+        //*****
+        red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
+        red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
+        gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
+        gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
+        blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
+        blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
 
-      //*****
-      // Most general case: varying levels of red, green, and blue light.
-      //*****
+        if (red_shift == 16)
+	  #define PI_R8G8B8
+	  #define TL_RGB
+	  #include "texl24.inc"
+        else
+	  #define PI_B8G8R8
+	  #define TL_RGB
+	  #include "texl24.inc"
 
-      red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
-      red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
-      gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-      gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-      blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
-      blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
-
-      for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	if (v+dv < h)
-        {
-	  ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-
-	  red = red_0; red_d = (red_1-red_0) >> tcd.mipmap_shift;
-	  gre = gre_0; gre_d = (gre_1-gre_0) >> tcd.mipmap_shift;
-	  blu = blu_0; blu_d = (blu_1-blu_0) >> tcd.mipmap_shift;
-
-	  end_u = u+tcd.mipmap_size;
-	  if (end_u > w) end_u = w;
-	  end_u += Imin_u;
-	  tm2 = tm + tcd.mipmap_size;
-	  ULong* ot = otmap+ov_idx;
-	  ULong RGB;
-	  for (uu = u+Imin_u ; uu < end_u ; uu++)
-	  {
-	    RGB = ot[uu & and_w];
-	    *tm++ = ((((RGB >> rs24) & 0xff) * (red >> 16) >> 8) << red_shift) |
-	            ((((RGB >> gs24) & 0xff) * (gre >> 16) >> 8) << green_shift) |
-		    ((((RGB >> bs24) & 0xff) * (blu >> 16) >> 8) << blue_shift);
-
-	    red += red_d;
-	    gre += gre_d;
-	    blu += blu_d;
-	  }
-	  tm = tm2;
-
-	  red_0 += red_0d;
-	  red_1 += red_1d;
-	  gre_0 += gre_0d;
-	  gre_1 += gre_1d;
-	  blu_0 += blu_0d;
-	  blu_1 += blu_1d;
-	}
-	else break;
-
-      luv++;
+        luv++;
+      }
     }
     luv += tcd.d_lw;
   }
