@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit temporarily put back the old inpnames.h and inpnames.cpp
 	  until the new csInputDefinition class works well for normal keys
 	  too.
+	- Jorrit added litLightMapMapper classes to the lighter application.
+	  This class computes the mapping between a polygon and the lightmap
+	  coordinates. Currently not used.
 11-Aug-2004
 	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
 	  bug in the write down order of the other SaverPlugins.
