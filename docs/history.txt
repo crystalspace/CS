@@ -49,6 +49,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit started initial work on ThreadedLoadMapFile(). Not
 	  operational yet.
 	- Jorrit fixed a bug he introduced in his last commit with the engine.
+	- Jorrit fixed a bug he introduced in his last commit with the iso
+	  map loader.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.
