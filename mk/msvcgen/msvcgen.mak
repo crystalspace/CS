@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic MSVC-compliant DSW and DSP generation makefile
-#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -279,7 +279,6 @@ MSVC.SILENT = @
 endif
 
 MSVC.CVS.BASE = $(SRCDIR)/mk
-MSVC.OUT.BASE.0 = $(OUTBASE)/mk
 MSVC.OUT.BASE = $(OUTBASE)/mk/msvcgen
 ifeq ($(MSVCGEN_VERSION),6)
 MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc6
@@ -297,6 +296,8 @@ endif
 MSVC.EXT.FRAGMENT = frag
 MSVC.EXT.RESOURCES = rc
 MSVC.WORKSPACE = csall.$(MSVC.EXT.WORKSPACE)
+
+OUTDIRS += $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
 
 # Prefixes for particular project types.  For instance, the name "csgeom"
 # which is of type "library" is transformed into a project name "libcsgeom".
@@ -320,8 +321,8 @@ MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
 MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
-MSVC.MAKEMETARC.appgui  = 
-MSVC.MAKEMETARC.appcon  = 
+MSVC.MAKEMETARC.appgui  =
+MSVC.MAKEMETARC.appcon  =
 MSVC.MAKEMETARC.plugin  = $(MSVC.MAKEMETARC.COMMAND)
 MSVC.MAKEMETARC.library =
 MSVC.MAKEMETARC.group   =
@@ -372,14 +373,17 @@ MSVC.METARC.TEMP = $(MSVC.OUT.FRAGMENT)/meta.tmp
 MSVC.VERSIONDESC = $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkverres.sh \
+MSVC.MAKEVERRC.COMMAND = \
+  $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkverres.sh \
   '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)' '$(SRCDIR)/include/csver.h'
-MSVC.MAKEMETARC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkmetadatares.sh \
+MSVC.MAKEMETARC.COMMAND = \
+  $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkmetadatares.sh \
   '$(MSVC.METARC.TEMP)' '$(INF.$*)'
 MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)'
-MSVC.MERGERCMETA.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh \
+MSVC.MERGERCMETA.COMMAND = \
+  $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)' '$(MSVC.METARC.TEMP)'
 
@@ -475,10 +479,6 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: msvcgen msvcinst msvcgenclean dswgen
 
-# Directory creation target.
-$(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
-	$(MSVC.SILENT)$(MKDIR)
-
 # Build a project project file and an associated DSW/SLN fragment file.
 %.MAKEPROJECT:
 	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
@@ -518,8 +518,7 @@ workspacegen:
 # generated as part of the DSP/VCPROJ file synthesis process.
 msvcgen: \
   msvcgenclean \
-  $(MSVC.OUT.DIR) \
-  $(MSVC.OUT.FRAGMENT) \
+  $(OUTDIRS) \
   $(addsuffix .MAKEPROJECT,$(MSVC.DSP)) \
   workspacegen
 

@@ -10,6 +10,10 @@ chronological order.
 	- res augmented csThing::InitializeDefault() to unprepare the thing
 	  when the 'clear' flag is set.
 	- res added a sanity check to csThingObjectType::Initialize().
+	- Eric Sunshine fixed bug in msvcgen.mak introduced on 28-Jan-2004
+	  (during csutil/cssys merge) where it neglected to ensure that
+	  $(OUTBASE)/mk/msvcgen existed before trying to create subdirectories
+	  of that directory, thus leading to a crash.
 29-Jan-2004
 	- Eric Sunshine made the following changes to clean up after Matze
 	  changed the return type of csGetConfigDir(), csGetResourceDir(),
