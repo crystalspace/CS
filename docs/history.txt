@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+02-Jul-2004
+	- res fixed the corruption of the graphics on Win32 when Alt+Tabbing 
+	  out and back into a fullscreen app with GL canvas.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
