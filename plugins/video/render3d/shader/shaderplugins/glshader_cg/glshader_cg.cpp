@@ -82,11 +82,17 @@ void csGLShader_CG::ErrorCallback ()
   CGerror error = cgGetError();
   csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     "crystalspace.graphics3d.shader.glcg",
-    cgGetErrorString (error), 0);
+    "%s", cgGetErrorString (error));
   if (error == CG_COMPILER_ERROR)
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      "crystalspace.graphics3d.shader.glcg",
-      cgGetLastListing (context), 0);
+  {
+    const char* listing = cgGetLastListing (context);
+    if (listing)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.graphics3d.shader.glcg",
+	"%s", listing);
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////

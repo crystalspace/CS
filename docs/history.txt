@@ -112,6 +112,9 @@ chronological order.
 	  %ignore directives for non-Python platforms to ignore the methods
 	  which are incorrectly exported by Swig, and which the new
 	  GetFooByIndex() methods are meant to replace.
+	- res changed the Cg shader plugins to use the new shader plugin base 
+	  class.
+	- res added two simple example Cg programs.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
