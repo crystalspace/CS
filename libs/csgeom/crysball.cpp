@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csutil/garray.h"
 #include "csgeom/crysball.h"
 #include "csgeom/frustum.h"
@@ -26,8 +26,8 @@ int csCrystalBall::csTriNode::Add (
   int tri1,
   int tri2,
   int tri3,
-  csPArray<csCrystalBallVec> *vP,
-  csPArray<csVector3> *vTP)
+  csArray<csCrystalBallVec*> *vP,
+  csArray<csVector3*> *vTP)
 {
   int nPos = 0;
   if (IsLeaf ())
@@ -143,7 +143,7 @@ int csCrystalBall::csTriNode::Classify (
   int i1,
   int i2,
   int i3,
-  const csPArray<csVector3> *vTP) const
+  const csArray<csVector3*> *vTP) const
 {
   csVector3 origo (0, 0, 0);
 
@@ -161,8 +161,8 @@ void csCrystalBall::csTriNode::Transform (
   csGrowingArray<int> &indexVector,
   int useSign,
   long cookie,
-  const csPArray<csCrystalBallVec> *vP,
-  const csPArray<csVector3> *vTP,
+  const csArray<csCrystalBallVec*> *vP,
+  const csArray<csVector3*> *vTP,
   const csVector3 &v1,
   const csVector3 &v2,
   const csVector3 &v3)

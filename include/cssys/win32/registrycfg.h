@@ -23,7 +23,7 @@
 #include "iutil/cfgfile.h"
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 
 #include <windows.h>
 
@@ -50,7 +50,7 @@ private:
   } rcStatus;
   rcStatus* status;
 
-  csPArray<csWin32RegistryIterator> iters;
+  csArray<csWin32RegistryIterator*> iters;
 
   // convert CS "x.y.z" keys to registry "x\y\z"
   void ReplaceSeparators (char* key) const;

@@ -26,11 +26,11 @@
 // csVector classes
 //#ifdef __GNUC__
 //# warning The csVector classes are deprecated. Please use csArray
-//# warning csGrowingArray, csRefArray or csPArray
+//# warning csGrowingArray, csRefArray or csPDelArray
 //#endif
 
 /**
- * \deprecated Use #csArray, #csGrowingArray, #csRefArray or #csPArray
+ * \deprecated Use #csArray, #csGrowingArray, #csRefArray or #csPDelArray
  * instead.
  *
  * This is a lightweight base class for containers.  It contains no virtual
@@ -102,7 +102,7 @@ public:
 };
 
 /**
- * \deprecated Use csArray, csGrowingArray, csRefArray or csPArray instead.
+ * \deprecated Use csArray, csGrowingArray, csRefArray or csPDelArray instead.
  *
  * csVector is an abstract class which can hold an unlimited array
  * of unspecified (void*) data. Since this is a basic object, it does

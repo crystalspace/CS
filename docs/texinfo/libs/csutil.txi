@@ -22,8 +22,6 @@ type-safe.  See later sections for additional information.
 @item
 @code{csRefArrayObject<T>}
 @item
-@code{csPArray<T>},
-@item
 @code{csPDelArray<T>}
 @end itemize
 
@@ -134,17 +132,8 @@ the features of @code{csRefArray<T>} this class adds the ability to find
 elements by name.  Include file is @file{csutil/nobjvec.h}.
 
 @item
-@code{csPArray<T>}: @emph{This class is deprecated.} This array class only
-works works with with pointers to objects.  It does not initialize its
-elements.  It does not invoke an object's @code{IncRef()} and @code{DecRef()}
-methods.  Client code is fully responsible for cleaning up the items in this
-array.  In short, it is an extremely dangerous array class and shold not be
-used in new code.  @emph{Do not use this array type.} Instead, you should use
-@code{csArray<T>}.  Include file is @file{csutil/ptrarr.h}.
-
-@item
-@code{csPDelArray<T>}: This is similar to @code{csPArray<T>}. It is for
-pointers only.  It differs from @code{csPArray<T>} in that it invokes
-@samp{delete} for elements removed from the array.  Include file is
-@file{csutil/ptrarr.h}.
+@code{csPDelArray<T>}: This is an array class for
+pointers only.  It will invoke @samp{delete} for elements removed from the
+array.  Include file is
+@file{csutil/parray.h}.
 @end itemize

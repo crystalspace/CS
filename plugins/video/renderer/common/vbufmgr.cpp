@@ -87,7 +87,7 @@ csVertexBufferManager::~csVertexBufferManager()
 void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)
 {
   int idx = buffers.Find ((csVertexBuffer*)buf);
-  if (idx >= 0) buffers.Delete (idx);
+  if (idx >= 0) buffers.DeleteIndex (idx);
 }
 
 csPtr<iVertexBuffer> csVertexBufferManager::CreateBuffer (int priority)

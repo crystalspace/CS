@@ -372,7 +372,7 @@ class csMeshListIt : public iMeshWrapperIterator
 {
   friend class csEngine;
 private:
-  csPArray<iMeshWrapper>* list;
+  csArray<iMeshWrapper*>* list;
   int num_objects;
 
   // Current index.
@@ -380,7 +380,7 @@ private:
 
 private:
   /// Construct an iterator and initialize to start.
-  csMeshListIt (csPArray<iMeshWrapper>* list);
+  csMeshListIt (csArray<iMeshWrapper*>* list);
 
 public:
   /// Destructor.
@@ -400,7 +400,7 @@ class csObjectListIt : public iObjectIterator
 {
   friend class csEngine;
 private:
-  csPArray<iObject>* list;
+  csArray<iObject*>* list;
   int num_objects;
 
   // Current index.
@@ -408,7 +408,7 @@ private:
 
 private:
   /// Construct an iterator and initialize to start.
-  csObjectListIt (csPArray<iObject>* list);
+  csObjectListIt (csArray<iObject*>* list);
 
 public:
   /// Destructor.
@@ -599,7 +599,7 @@ SCF_IMPLEMENT_IBASE(csObjectListIt)
   SCF_IMPLEMENTS_INTERFACE(iObjectIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csObjectListIt::csObjectListIt (csPArray<iObject>* list)
+csObjectListIt::csObjectListIt (csArray<iObject*>* list)
 {
   SCF_CONSTRUCT_IBASE (0);
   csObjectListIt::list = list;
@@ -635,7 +635,7 @@ SCF_IMPLEMENT_IBASE(csMeshListIt)
   SCF_IMPLEMENTS_INTERFACE(iMeshWrapperIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csMeshListIt::csMeshListIt (csPArray<iMeshWrapper>* list)
+csMeshListIt::csMeshListIt (csArray<iMeshWrapper*>* list)
 {
   SCF_CONSTRUCT_IBASE (0);
   csMeshListIt::list = list;
@@ -2485,8 +2485,8 @@ csPtr<iSectorIterator> csEngine::GetNearbySectors (
 }
 
 void csEngine::GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, csPArray<iObject>& list,
-    csPArray<iSector>& visited_sectors, bool crossPortals)
+    const csVector3& pos, float radius, csArray<iObject*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2568,8 +2568,8 @@ csPtr<iObjectIterator> csEngine::GetNearbyObjects (
   float radius,
   bool crossPortals)
 {
-  csPArray<iObject>* list = new csPArray<iObject>;
-  csPArray<iSector> visited_sectors;
+  csArray<iObject*>* list = new csArray<iObject*>;
+  csArray<iSector*> visited_sectors;
   visited_sectors.Push (sector);
   GetNearbyObjectList (sector, pos, radius, *list, visited_sectors, crossPortals);
   csObjectListIt *it = new csObjectListIt (list);
@@ -2593,8 +2593,8 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
 }
 
 void csEngine::GetNearbyMeshList (iSector* sector,
-    const csVector3& pos, float radius, csPArray<iMeshWrapper>& list,
-    csPArray<iSector>& visited_sectors, bool crossPortals)
+    const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2675,8 +2675,8 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   float radius,
   bool crossPortals)
 {
-  csPArray<iMeshWrapper>* list = new csPArray<iMeshWrapper>;
-  csPArray<iSector> visited_sectors;
+  csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
+  csArray<iSector*> visited_sectors;
   visited_sectors.Push (sector);
   GetNearbyMeshList (sector, pos, radius, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);

@@ -35,12 +35,16 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Jorrit cleaned up several include files in include/imesh.
 	- Jorrit cleaned up several include files and Doxygen commments
 	  in include/ivaria.
+	- Jorrit replaced all usages of the deprecated csPArray<T> with
+	  csArray<T*>. Also removed csPArray<T>.
+	- Jorrit added InsertSorted() and FindSortedKey() to csArray<T>.
 	- Luca changed the behaviour of awsRadButton::OnKeypress, 
-	  awsCheckBox::OnKeypress and awsCmdButton::OnKeypress. Now those methods
-	  return true iff the key event is really "eaten". Before they were 
-	  returning always true, even if the key event was not used at all.
-	- Luca has fixed the method csQuaternion::GetEulerAngles accordingly to the
-	  patch provided by Troy Chard (troy.chard@shaw.ca).
+	  awsCheckBox::OnKeypress and awsCmdButton::OnKeypress. Now those
+	  methods return true iff the key event is really "eaten". Before
+	  they were returning always true, even if the key event was not used
+	  at all.
+	- Luca has fixed the method csQuaternion::GetEulerAngles accordingly
+	  to the patch provided by Troy Chard (troy.chard@shaw.ca).
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

@@ -20,7 +20,7 @@
 #define __CS_CRYSBALL_H__
 
 #include "csutil/tree.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
@@ -76,21 +76,21 @@ class csCrystalBall
 
     // find a triangle for <normal> and return the index where its been inserted into vP
     int Add (csCrystalBallVec *normal, int tri1, int tri2, int tri3,
-	      csPArray<csCrystalBallVec> *vP, csPArray<csVector3> *vTP);
+	      csArray<csCrystalBallVec*> *vP, csArray<csVector3*> *vTP);
 
     // adjust (from,len) pairs after a new point was inserted
     void Adjust (int nPos);
 
     // classify a point to lie inside or outside the spherical triangle
     int Classify (const csVector3 &n, int i1, int i2, int i3,
-		  const csPArray<csVector3> *vTP) const;
+		  const csArray<csVector3*> *vTP) const;
 
     // are all 3 normals on the side <useSign>
     // 0 ... yes
     // 1 ... partly
     // 2 ... all on other side
-    int SignMatches (const csVector3 *n1, const csVector3 *n2, const csVector3 *td,
-		     int useSign);
+    int SignMatches (const csVector3 *n1, const csVector3 *n2,
+		     const csVector3 *td, int useSign);
 
     // is the normal tn on the <useSign> side ?
     bool SignMatches (const csVector3 *tn, int useSign);
@@ -99,18 +99,18 @@ class csCrystalBall
     // which normlals point to the <useSign> side
     void Transform (const csMatrix3 &m, csGrowingArray<int> &indexVector,
 		    int useSign, long cookie,
-		    const csPArray<csCrystalBallVec> *vP,
-		    const csPArray<csVector3> *vTP,
+		    const csArray<csCrystalBallVec*> *vP,
+		    const csArray<csVector3*> *vTP,
 		    const csVector3 &v1, const csVector3 &v2,
 		    const csVector3 &v3);
   };
 
  protected:
   // here we store the normals (pointers to csCrystalBallVec)
-  csPArray<csCrystalBallVec> vPoints;
+  csArray<csCrystalBallVec*> vPoints;
   // we divide a triangle into 3 sub triangles by inserting a divider point.
   // and <vTrianglePoints> is the place where we store those points (pointers to csVector3)
-  csPArray<csVector3> vTrianglePoints;
+  csArray<csVector3*> vTrianglePoints;
   // our crystal ball is initially made of 8 spherical triangles (in the octants of a 3d cartesian coo system)
   csTriNode tri[8];
 

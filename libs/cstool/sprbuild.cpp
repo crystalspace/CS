@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/objiter.h"
 #include "csutil/csstring.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csutil/intarray.h"
 #include "csutil/databuf.h"
 #include "cstool/sprbuild.h"
@@ -27,7 +27,7 @@
 #include "imesh/mdldata.h"
 #include "imesh/sprite3d.h"
 
-typedef csPArray<iModelDataVertices> csModelFrameVector;
+typedef csArray<iModelDataVertices*> csModelFrameVector;
 
 struct UsedVertexInfo
 {

@@ -24,7 +24,7 @@
 #include "qint.h"
 #include "csutil/csstring.h"
 #include "csutil/ref.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
 #include "iutil/objreg.h"
@@ -611,7 +611,7 @@ void csSubRectangles2::Dump ()
   memset (data3, 0, w * h);
 
   int c = 0;
-  csPArray<csSubRect2> nodes;
+  csArray<csSubRect2*> nodes;
   nodes.Push (root);
   
   while (nodes.Length ())

@@ -21,7 +21,6 @@
 
 #include "csutil/strhash.h"
 #include "csutil/array.h"
-#include "csutil/parray.h"
 
 /**
  * This class provides a system for storing inheritable properties, by allowing
@@ -44,7 +43,7 @@ private:
 protected:
   csHashMap Hash;
 
-  csPArray<csSymbolTable> Children;
+  csArray<csSymbolTable*> Children;
   csSymbolTable *Parent;
 
   /// Inherit all symbols from the parent. @@@ Calling this twice will mess up.
@@ -74,13 +73,13 @@ public:
   void AddChild (csSymbolTable *);
 
   /// Add child tables which will inherit the symbols of this one.
-  void AddChildren (csPArray<csSymbolTable> &);
+  void AddChildren (csArray<csSymbolTable*> &);
 
   /// Set the value of a symbol, or create a new one if it doesn't exist.
   void SetSymbol (csStringID name, void *value);
 
   /// SetSymbol for multiple symbols.
-  void SetSymbols (const csArray<csStringID> &names, csPArray<void> &);
+  void SetSymbols (const csArray<csStringID> &names, csArray<void*> &);
 
   /// Delete a symbol.
   bool DeleteSymbol (csStringID name);
@@ -92,7 +91,7 @@ public:
   void* GetSymbol (csStringID name);
 
   /// Get the values of multiple symbols.
-  csPArray<void> GetSymbols (const csArray<csStringID> &names);
+  csArray<void*> GetSymbols (const csArray<csStringID> &names);
 
   /// Check if a symbol exists.
   bool SymbolExists (csStringID name);

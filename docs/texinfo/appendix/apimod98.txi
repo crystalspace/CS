@@ -320,3 +320,10 @@ Changed the following iterators to conform to the following iterator standard:
 @code{iAWS::CreateCustomCanvas} was removed.  To set up the AWS with a cavas,
 use @code{iAWS::SetupCanvas} instead. 
 
+@subheading csPArray removed
+@cindex @code{csPArray}
+@cindex @code{csArray}
+
+@code{csPArray} has been removed in favor of @code{csArray}. So use
+@code{csArray<T*>} instead of @code{csPArray<T>}.
+

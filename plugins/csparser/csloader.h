@@ -28,7 +28,7 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
 #include "csgeom/quaterni.h"
@@ -394,7 +394,7 @@ private:
     /// Mutex to make the plugin vector thread-safe.
     csRef<csMutex> mutex;
 
-    csPArray<csLoaderPluginRec> vector;
+    csArray<csLoaderPluginRec*> vector;
 
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPluginRec (const char* name);

@@ -20,7 +20,7 @@
 #define __CS_VBUFMGR_H__
 
 #include "csutil/csvector.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "ivideo/vbufmgr.h"
 #include "csgeom/box.h"
 
@@ -141,7 +141,7 @@ public:
 class csVertexBufferManager : public iVertexBufferManager
 {
 protected:
-  typedef csPArray<csVertexBuffer> csVBufVector;
+  typedef csArray<csVertexBuffer*> csVBufVector;
 
   /// List of vertex buffers.
   csVBufVector buffers;

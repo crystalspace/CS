@@ -414,13 +414,13 @@ struct SuperLM;
 struct csPolyGroup
 {
   iMaterialWrapper* material;
-  csPArray<csPolygon3D> polys;
+  csArray<csPolygon3D*> polys;
 };
 
 struct csLitPolyGroup : public csPolyGroup
 {
   csRefArray<iRendererLightmap> lightmaps;
-  csPArray<csSubRect2> slmSubrects;
+  csArray<csSubRect2*> slmSubrects;
   SuperLM* thingTypeSLM;
 };
 #endif
@@ -1119,7 +1119,7 @@ struct csSuperLMArray
 {
   int width, height;
   int maxLumels;
-  csPArray<SuperLM> SLMs;
+  csArray<SuperLM*> SLMs;
 
   csSuperLMArray (int size) : width(size), height(size)    
   {

@@ -316,13 +316,13 @@ class csTextureManager : public iTextureManager
 {
 protected:
 
-  typedef csPArray<csTextureHandle> csTexVector;
+  typedef csArray<csTextureHandle*> csTexVector;
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  typedef csPArray<csMaterialHandle> csMatVector;
+  typedef csArray<csMaterialHandle*> csMatVector;
 
   /// List of materials.
   csMatVector materials;

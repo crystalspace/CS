@@ -20,7 +20,7 @@
 #define __CS_OBJWATCH_H__
 
 #include "csutil/refarr.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "iengine/objwatch.h"
 
 struct iLight;
@@ -36,9 +36,9 @@ class csObjectWatcher : public iObjectWatcher
 {
 private:
   // Lights we are watching.
-  csPArray<iLight> lights;
+  csArray<iLight*> lights;
   // Movables we are watching.
-  csPArray<iMovable> movables;
+  csArray<iMovable*> movables;
   // Our light listener.
   csLightCallback* light_callback;
   // Our movable listener.

@@ -22,7 +22,7 @@
 #include "iutil/strvec.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "iutil/plugin.h"
 #include "iutil/eventh.h"
@@ -32,7 +32,7 @@
 
 #define MDLPLEX_CLASSNAME	"crystalspace.modelconverter.multiplexer"
 
-typedef csPArray<const csModelConverterFormat> csModelConverterFormatVector;
+typedef csArray<csModelConverterFormat const *> csModelConverterFormatVector;
 
 class csModelConverterMultiplexer : iModelConverter
 {

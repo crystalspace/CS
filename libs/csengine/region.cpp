@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/csvector.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -63,7 +63,7 @@ void csRegion::DeleteAll ()
 
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
-  csPArray<iObject> copy;
+  csArray<iObject*> copy;
   iter = GetIterator ();
   while (iter->HasNext ())
   {

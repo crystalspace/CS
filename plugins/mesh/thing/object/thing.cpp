@@ -2845,7 +2845,7 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 	    MAX (inputQueues[curQueue ^ 1].maxlmh, lmh);
 	}
       }
-      sla->SLMs.Delete (s);
+      sla->SLMs.DeleteIndex (s);
       int nidx = sla->SLMs.InsertSorted (slm, CompareSuperLM);
       if (nidx <= s + 1)
       {
@@ -2901,7 +2901,7 @@ void csThingObjectType::FreeLightmaps (csArray<csLitPolyGroup>& polys)
       SuperLM* slm = superLMs[i].SLMs[j];
       if (slm->freeLumels == (slm->width * slm->height))
       {
-	superLMs[i].SLMs.Delete (j);
+	superLMs[i].SLMs.DeleteIndex (j);
 	delete slm;
       }
       else

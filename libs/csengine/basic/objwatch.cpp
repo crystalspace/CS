@@ -134,8 +134,8 @@ void csObjectWatcher::Reset ()
     lights[i]->RemoveLightCallback (light_callback);
   }
 
-  movables.SetLength (0);
-  lights.SetLength (0);
+  movables.DeleteAll ();
+  lights.DeleteAll ();
 }
 
 void csObjectWatcher::ReportOperation (int op, iMovable* movable, iLight* light)
@@ -167,7 +167,7 @@ void csObjectWatcher::RemoveLight (iLight* light)
     if (lights[i] == light)
     {
       light->RemoveLightCallback (light_callback);
-      lights.Delete (i);
+      lights.DeleteIndex (i);
       break;
     }
   }
@@ -193,7 +193,7 @@ void csObjectWatcher::RemoveMovable (iMovable* movable)
     if (movables[i] == movable)
     {
       movable->RemoveListener (movable_listener);
-      movables.Delete (i);
+      movables.DeleteIndex (i);
       break;
     }
   }

@@ -23,7 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/plugmgr.h"
 #include "csutil/util.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
@@ -52,7 +52,7 @@ csPluginManager::csPlugin::~csPlugin ()
 class csPluginIterator : public iPluginIterator
 {
 public:
-  csPArray<iBase> pointers;
+  csArray<iBase*> pointers;
   int idx;
 
 public:

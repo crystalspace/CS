@@ -72,7 +72,7 @@ void csSymbolTable::AddChild (csSymbolTable *child)
   child->SetParent (this);
 }
 
-void csSymbolTable::AddChildren (csPArray<csSymbolTable> &children)
+void csSymbolTable::AddChildren (csArray<csSymbolTable*> &children)
 {
   for (int i = 0; i < children.Length (); i++)
   {
@@ -96,7 +96,7 @@ void csSymbolTable::SetSymbol (csStringID name, void *value)
   PropagateSymbol (name, value);
 }
 
-void csSymbolTable::SetSymbols (const csArray<csStringID> &names, csPArray<void> &values)
+void csSymbolTable::SetSymbols (const csArray<csStringID> &names, csArray<void*> &values)
 {
   for (int i = 0; i < names.Length (); i++)
   {
@@ -153,9 +153,9 @@ void* csSymbolTable::GetSymbol (csStringID name)
   else return 0;
 }
 
-csPArray<void> csSymbolTable::GetSymbols (const csArray<csStringID> &names)
+csArray<void*> csSymbolTable::GetSymbols (const csArray<csStringID> &names)
 {
-  csPArray<void> values;
+  csArray<void*> values;
   for (int i = 0; i < names.Length (); i++)
   {
     csStringID name = names[i];

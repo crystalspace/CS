@@ -20,7 +20,7 @@
 #define __CS_TXTMGR_H__
 
 #include "csutil/csvector.h"
-#include "csutil/parray.h"
+#include "csutil/array.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -308,13 +308,13 @@ class csTextureManager : public iTextureManager
 {
 protected:
 
-  typedef csPArray<csTextureHandle> csTexVector;
+  typedef csArray<csTextureHandle*> csTexVector;
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  typedef csPArray<csMaterialHandle> csMatVector;
+  typedef csArray<csMaterialHandle*> csMatVector;
 
   /// List of materials.
   csMatVector materials;

@@ -259,7 +259,7 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,
 void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx);
+  if (idx >= 0) textures.DeleteIndex (idx);
 }
 
 csPtr<iSuperLightmap> csTextureManagerNull::CreateSuperLightmap (int w, int h)

@@ -458,15 +458,15 @@ private:
    * Get a list of all objects in the given sphere.
    */
   void GetNearbyObjectList (iSector* sector,
-    const csVector3& pos, float radius, csPArray<iObject>& list,
-    csPArray<iSector>& visited_sectors, bool crossPortals = true);
+    const csVector3& pos, float radius, csArray<iObject*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals = true);
 
   /**
    * Get a list of all meshes in the given sphere.
    */
   void GetNearbyMeshList (iSector* sector,
-    const csVector3& pos, float radius, csPArray<iMeshWrapper>& list,
-    csPArray<iSector>& visited_sectors, bool crossPortals = true);
+    const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals = true);
 
 public:
   /**

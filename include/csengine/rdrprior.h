@@ -19,12 +19,13 @@
 #ifndef __CS_ENGINE_RDRPRIOR_H__
 #define __CS_ENGINE_RDRPRIOR_H__
 
+#include "csutil/array.h"
 #include "csutil/parray.h"
 
 struct iMeshWrapper;
 struct iRenderView;
 
-typedef csPArray<iMeshWrapper> csMeshVectorNodelete;
+typedef csArray<iMeshWrapper*> csMeshVectorNodelete;
 typedef csPDelArray<csMeshVectorNodelete> csMeshVectorNodeleteVector;
 
 /**

@@ -19,6 +19,9 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
+// For csArrayCompareKeyFunction and csArrayCompareFunction.
+#include "csutil/parray.h"
+
 // hack: work around problems caused by #defining 'new'
 #ifdef CS_EXTENSIVE_MEMDEBUG
 # undef new
@@ -375,6 +378,55 @@ public:
     }
     else
       return false;
+  }
+
+  /**
+   * Find an element based on some key.
+   */
+  int FindSortedKey (void* key, csArrayCompareKeyFunction* comparekey) const
+  {
+    int l = 0, r = Length () - 1;
+    while (l <= r)
+    {
+      int m = (l + r) / 2;
+      int cmp = comparekey (root [m], key);
+
+      if (cmp == 0)
+        return m;
+      else if (cmp < 0)
+        l = m + 1;
+      else
+        r = m - 1;
+    }
+    return -1;
+  }
+
+  /**
+   * Insert an element at a sorted position.
+   * Assumes array is already sorted.
+   */
+  int InsertSorted (T item, csArrayCompareFunction* compare)
+  {
+    int m = 0, l = 0, r = Length () - 1;
+    while (l <= r)
+    {
+      m = (l + r) / 2;
+      int cmp = compare (root [m], item);
+
+      if (cmp == 0)
+      {
+        Insert (++m, item);
+        return m;
+      }
+      else if (cmp < 0)
+        l = m + 1;
+      else
+        r = m - 1;
+    }
+    if (r == m)
+      m++;
+    Insert (m, item);
+    return m;
   }
 
   /** Iterator for the Array object */

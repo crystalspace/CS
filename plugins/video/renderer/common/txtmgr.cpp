@@ -353,7 +353,7 @@ csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
   int idx = materials.Find (handle);
-  if (idx >= 0) materials.Delete (idx);
+  if (idx >= 0) materials.DeleteIndex (idx);
 }
 
 void csTextureManager::PrepareMaterials ()
