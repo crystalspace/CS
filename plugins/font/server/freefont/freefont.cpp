@@ -264,14 +264,16 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   }
 
   int error;
-  if ((error = TT_Get_Face_Properties (face, &prop)))
+  error = TT_Get_Face_Properties (face, &prop);
+  if (error)
   {
     server->Report (CS_REPORTER_SEVERITY_WARNING,
       "Get_Face_Properties: error %d.", error);
     return false;
   }
 
-  if ((error = TT_New_Instance (face, &instance)))
+  error = TT_New_Instance (face, &instance);
+  if (error)
   {
     server->Report (CS_REPORTER_SEVERITY_WARNING,
       "Could not create an instance of Font %s."
@@ -287,7 +289,8 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   TT_UShort i = 0;
   while (i < prop.num_CharMaps)
   {
-    if ((error = TT_Get_CharMap_ID (face, i, &pID, &eID)))
+    error = TT_Get_CharMap_ID (face, i, &pID, &eID);
+    if (error)
       server->Report (CS_REPORTER_SEVERITY_WARNING,
         "Get_CharMap_ID: error %d.",error);
     if (server->platformID == pID && server->encodingID == eID)
@@ -302,7 +305,8 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
       "Font %s does not contain encoding %d for platform %d.",
       name, server->encodingID, server->platformID);
 
-    if ((error = TT_Get_CharMap_ID (face, 0, &pID, &eID)))
+    error = TT_Get_CharMap_ID (face, 0, &pID, &eID);
+    if (error)
     {
       server->Report (CS_REPORTER_SEVERITY_WARNING,
         "Get_CahrMap_ID: error %d.",error);
@@ -314,7 +318,8 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   }
 
   // ok. now lets retrieve a handle the the charmap
-  if ((error = TT_Get_CharMap (face, i, &charMap)))
+  error = TT_Get_CharMap (face, i, &charMap);
+  if (error)
   {
     server->Report (CS_REPORTER_SEVERITY_WARNING,
     	"Get_CharMap: error %d.", error);
