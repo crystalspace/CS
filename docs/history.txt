@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit performed a small optimization in iSector->FollowSegment()
 	  in case only_portals==true. Now uses GetPortalCount() to avoid
 	  the need to test a thing if there are no portals in it.
+	- Jorrit fixed an initialization bug in IntersectSegment() of
+	  Dynavis and Frustvis which could cause errors in those routines
+	  in some cases.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.

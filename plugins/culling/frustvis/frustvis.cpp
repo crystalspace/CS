@@ -881,6 +881,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   current_visnr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
+  data.sqdist = 10000000000.0;
   data.r = 0;
   data.mesh = NULL;
   data.polygon = NULL;
@@ -903,6 +904,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   current_visnr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
+  data.sqdist = 10000000000.0;
   data.r = 0;
   data.mesh = NULL;
   data.polygon = NULL;
