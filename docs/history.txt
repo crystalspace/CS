@@ -19,6 +19,62 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Jun-99:
+	- Gary Haussmann added basic 2D functionality for OpenGL in a common
+	  directory. Currently only the X OpenGL port uses this but other
+	  OpenGL 2D drivers should be rewritten to reuse the code in
+	  'openglcommon'.
+	- Gary also fixed the 3D OpenGL renderer so that partially transparent
+	  portals are actually drawn. He also enabled smooth shading when
+	  gouraud shaded sprite polygons are being drawn.
+	- Gary added CacheLightedTexture() to the OpenGL renderer for
+	  situations where a texture and a lightmap must be mixed before being
+	  rendered (this is non-functional currently). Certain situations
+	  (namely transparent lighted portals) cannot be rendered correctly
+	  with seperate texture and lightmap since the lightmap blends not
+	  only the portal but also the stuff showing THROUGH the portal!
+	- And Gary also fixed a lightmap cache bug. Everytime a lightmap is
+	  cached it was simply compiling the lightmap and sending it to the
+	  OpenGL driver. This consumed massive bandwidth even if the lightmap
+	  had not changed. Now we properly check the flag set by
+	  RecalculateDynamicLights() and don't reload the lightmap if it
+	  hasn't changed.
+	- I added unix makefiles for the new csgame library and for the
+	  Crystal Shooter application from Thomas Hieber.
+12-Jun-99:
+	- Update to Windows documentation from Thomas Hieber.
+11-Jun-99:
+	- Thomas Hieber added the 'csgame' library to CVS and he also added
+	  Crystal Shooter as a demo application of that library.
+	- Thomas also added additional error checking to several parts of
+	  WalkTest and the engine (loading textures for example).
+	- Thomas fixed the windows port so that error messages are visible
+	  again.
+	- Thomas converted all VC project files to binary in the CVS
+	  repository.
+	- Thomas moved some collision detection code back to the engine
+	  where it belongs (from csobject).
+8-Jun-99:
+	- Fixed csPolygonSet::GetPolygon so that it correctly ignores
+	  objects with no name. This fixes the '-infinite' option of
+	  WalkTest.
+	- I added a new csCleanup class which is intended as a class
+	  to which you can register memory that needs to be freed at
+	  some time but for which you have no conveniant place to free
+	  it. I also added a 'cleanup' vector to csWorld which is
+	  freed together with the world. To this you can add temporary
+	  arrays which you need for optimizations. The new lighting
+	  stuff uses an array like this.
+	- The new lighting system is enabled. All functions are now named
+	  CalculateLighting(). ShineLightmaps() is gone. Note that this
+	  new system offers NO benefits yet over the old system. It is
+	  just a rewrite in order to be able to add enhancements more
+	  easily which will be what I will be doing next.
+	  Normally there should be no difference (neither on functionality
+	  or performance) with the old system. If you notice differences,
+	  please tell me.
+	- Thomas Hieber added a document describing the directory structure
+	  fully (dir.txt).
 7-Jun-99:
 	- Started integrating new csFrustrum class into the precalculated
 	  lighting routines. To that end I created a new CalculateLightmaps()
@@ -4373,7 +4429,7 @@ Short-term cleanups that need to be done:
 	- Made several of the error messages clearer (also include a short
 	  help of what could be done to fix the problem).
 	- *** Release of 0.09_027 ***
-	- Removed gdd16.* since it is no longer needed (integrated in win32.cpp).
+	- Removed gdd16.* since it is no longer needed (integrated in win32.cpp).
 	- Fixed win32 port as directed by Nathaniel.
 	- I have confirmed that the SVGALIB port works in 15/16-bit mode
 	  (I have been able to get my SVGALIB working ok).
