@@ -515,8 +515,8 @@
 		//! Cast a Point to a HPoint. w is set to zero.
 								operator	HPoint()				const;
 
-		inline_					operator	const	float*() const	{ return &x; }
-		inline_					operator			float*()		{ return &x; }
+		inline_ float operator[](int n) const { return *(&x + n); }
+		inline_ float& operator[](int n) { return *(&x + n); }
 
 		public:
 				float			x, y, z;

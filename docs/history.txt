@@ -32,6 +32,15 @@ chronological order.
 	      for saving back the world should be kept.
 	- Eric Sunshine added fabsf() to the set of functions faked up by
 	  CS_USE_FAKE_MATH_H_FLOAT_FUNCS.
+	- Eric Sunshine added const and non-const operator[] methods to
+	  Opcode's Point class (IcePoint.h).  This works around problem with
+	  Borland compiler where it considered the following code ambiguous:
+	    Point p; float x = p[0];
+	  Other compilers correctly apply Point's float* operator and then
+	  treat the returned result as an array.  Borland, however, was unable
+	  to choose if it should use the const or non-const float* operator.
+	  Removed the float* operators. (This same fix was applied to an
+	  earlier version of Opcode on 15-Jan-2004.)
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.
