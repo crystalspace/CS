@@ -74,7 +74,7 @@ glbeclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)glbe2d.dep
 $(OUTOS)glbe2d.dep: $(SRC.GLBE2D)
-	$(DO.DEP) $(CFLAGS.GLBE2D)
+	$(DO.DEP1) $(CFLAGS.GLBE2D) $(DO.DEP1)
 else
 -include $(OUTOS)glbe2d.dep
 endif
