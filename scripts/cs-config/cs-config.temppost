@@ -65,11 +65,11 @@ Libraries:
 	csutil
 	csws
 EOF
-	exit $1
 }
 
 if test $# -eq 0; then
-	usage 1 1>&2
+	usage 1>&2
+	exit 1
 fi
 
 cflags=false
@@ -187,6 +187,10 @@ while test $# -gt 0; do
 	echo $exec_prefix
 	exit 0
 	;;
+    --help)
+	usage
+	exit 0
+	;;
     --version)
         echo $version
         exit 0
@@ -236,7 +240,7 @@ while test $# -gt 0; do
 	findcexfile "$1"
 	if test -z "$CEXFILE"; then
 	    echo "Unknown lib: $1" 1>&2
-            usage 1 1>&2
+            usage 1>&2
 	    exit 1
 	fi
 	
