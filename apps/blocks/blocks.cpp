@@ -35,6 +35,7 @@
 #include "csutil/csstring.h"
 #include "csgfx/csimage.h"
 #include "csengine/dumper.h"
+#include "csengine/meshobj.h"
 #include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
@@ -55,6 +56,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
 #include "imap/parser.h"
+#include "iengine/ptextype.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
@@ -393,15 +395,18 @@ void Blocks::InitGame ()
   pause = false;
 }
 
-void reset_vertex_colors (csThing* th)
+static void reset_vertex_colors (csMeshWrapper* th)
 {
+  iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
+  	iThingState);
   int i;
-  for (i = 0 ; i < th->GetNumPolygons () ; i++)
+  for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
-    csPolygon3D* p = th->GetPolygon3D (i);
+    iPolygon3D* p = thing_state->GetPolygon (i);
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
   }
+  thing_state->DecRef ();
 }
 
 csMatrix3 Blocks::create_rotate_x (float angle)
@@ -431,164 +436,197 @@ csMatrix3 Blocks::create_rotate_z (float angle)
   return rotate_z;
 }
 
-csPolygon3D* add_polygon_template (csThing* tmpl,
-	char* name, csMaterialWrapper* material,
+iPolygon3D* add_polygon_template (iThingState* tmpl,
+	char* name, iMaterialWrapper* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
-  csPolygon3D* p;
-  p = tmpl->NewPolygon (material);
+  iPolygon3D* p;
+  p = tmpl->CreatePolygon ();
+  p->SetMaterial (material);
   p->SetName (name);
-  p->AddVertex (vt0);
-  p->AddVertex (vt1);
-  p->AddVertex (vt2);
-  if (vt3 != -1) p->AddVertex (vt3);
-  p->ComputeNormal ();
+  p->CreateVertex (vt0);
+  p->CreateVertex (vt1);
+  p->CreateVertex (vt2);
+  if (vt3 != -1) p->CreateVertex (vt3);
+  // @@@ This is a bit ugly but we need an alternative init
+  // method instead of SetTextureSpace().
+  p->SetTextureSpace (csMatrix3 (), csVector3 (0));
   return p;
 }
 
+static csMeshFactoryWrapper* CreateMeshFactoryWrapper (
+	const char* name)
+{
+  iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
+  csMeshFactoryWrapper* tmpl = new csMeshFactoryWrapper (thing_fact);
+  thing_fact->DecRef ();
+  tmpl->SetName (name);
+  Sys->engine->mesh_factories.Push (tmpl);
+  return tmpl;
+}
+
+static csMeshWrapper* CreateMeshWrapper (const char* name)
+{
+  iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
+  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+  mesh_obj->DecRef ();
+  mesh_wrap->SetName (name);
+  Sys->engine->meshes.Push (mesh_wrap);
+  return mesh_wrap;
+}
+
+static csMeshWrapper* CreateMeshFromFactory (csMeshFactoryWrapper* fact,
+	const char* name)
+{
+  iMeshObject* mesh_obj = fact->GetMeshObjectFactory ()->NewInstance ();
+  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+  mesh_obj->DecRef ();
+  mesh_wrap->SetName (name);
+  Sys->engine->meshes.Push (mesh_wrap);
+  return mesh_wrap;
+}
+
+
 void Blocks::add_pillar_template ()
 {
+  pillar_tmpl = CreateMeshFactoryWrapper ("pillar");
   float dim = CUBE_DIM/2.;
-  pillar_tmpl = new csThing ();
-  pillar_tmpl->SetName ("pillar");
-  pillar_tmpl->AddVertex (-dim, 0, dim);
-  pillar_tmpl->AddVertex (dim, 0, dim);
-  pillar_tmpl->AddVertex (dim, 0, -dim);
-  pillar_tmpl->AddVertex (-dim, 0, -dim);
-  pillar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
-  pillar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
-  pillar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, -dim);
-  pillar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, -dim);
+  iThingState* thing_state = QUERY_INTERFACE (
+  	pillar_tmpl->GetMeshObjectFactory (), iThingState);
+  thing_state->CreateVertex (csVector3 (-dim, 0, dim));
+  thing_state->CreateVertex (csVector3 (dim, 0, dim));
+  thing_state->CreateVertex (csVector3 (dim, 0, -dim));
+  thing_state->CreateVertex (csVector3 (-dim, 0, -dim));
+  thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, dim));
+  thing_state->CreateVertex (csVector3 (dim, ZONE_HEIGHT*CUBE_DIM, dim));
+  thing_state->CreateVertex (csVector3 (dim, ZONE_HEIGHT*CUBE_DIM, -dim));
+  thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, -dim));
 
-  csPolygon3D* p;
+  iPolygon3D* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (pillar_tmpl, "d", pillar_mat, 3, 2, 1, 0);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "d", pillar_mat, 3, 2, 1, 0);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (0), pillar_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "b", pillar_mat, 0, 1, 5, 4);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "b", pillar_mat, 0, 1, 5, 4);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (0), pillar_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "t", pillar_mat, 4, 5, 6, 7);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "t", pillar_mat, 4, 5, 6, 7);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (4), pillar_tmpl->Vobj (5), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (4), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "f", pillar_mat, 7, 6, 2, 3);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "f", pillar_mat, 7, 6, 2, 3);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (7), pillar_tmpl->Vobj (6), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (7), thing_state->GetVertex (6), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "l", pillar_mat, 4, 7, 3, 0);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "l", pillar_mat, 4, 7, 3, 0);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (7), pillar_tmpl->Vobj (3), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (7), thing_state->GetVertex (3), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "r", pillar_mat, 6, 5, 1, 2);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "r", pillar_mat, 6, 5, 1, 2);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vobj (6), pillar_tmpl->Vobj (5), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (6), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  engine->thing_templates.Push (pillar_tmpl);
+  thing_state->DecRef ();
 }
 
 void Blocks::add_vrast_template ()
 {
+  vrast_tmpl = CreateMeshFactoryWrapper ("vrast");
   float dim = RAST_DIM;
-  vrast_tmpl = new csThing ();
-  vrast_tmpl->SetName ("vrast");
-  vrast_tmpl->AddVertex (-dim, 0, dim);
-  vrast_tmpl->AddVertex (dim, 0, dim);
-  vrast_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
-  vrast_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  iThingState* thing_state = QUERY_INTERFACE (
+  	vrast_tmpl->GetMeshObjectFactory (), iThingState);
+  thing_state->CreateVertex (csVector3 (-dim, 0, dim));
+  thing_state->CreateVertex (csVector3 (dim, 0, dim));
+  thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, dim));
+  thing_state->CreateVertex (csVector3 (dim, ZONE_HEIGHT*CUBE_DIM, dim));
 
-  csPolygon3D* p;
+  iPolygon3D* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (vrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	vrast_tmpl->Vobj (0), vrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
+	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
-  p = add_polygon_template (vrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "b", raster_mat, 2, 3, 1, 0);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	vrast_tmpl->Vobj (0), vrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
+	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
-
-  engine->thing_templates.Push (vrast_tmpl);
+  thing_state->DecRef ();
 }
 
 void Blocks::add_hrast_template ()
 {
+  hrast_tmpl = CreateMeshFactoryWrapper ("hrast");
   float dim = RAST_DIM;
-  hrast_tmpl = new csThing ();
-  hrast_tmpl->SetName ("hrast");
+  iThingState* thing_state = QUERY_INTERFACE (
+  	hrast_tmpl->GetMeshObjectFactory (), iThingState);
 
-  // zone_dim s were BIG here changed.
+  thing_state->CreateVertex (csVector3 ((-(float)ZONE_DIM/2.)*CUBE_DIM,
+  	.02, -dim));
+  thing_state->CreateVertex (csVector3 ((-(float)ZONE_DIM/2.)*CUBE_DIM,
+  	.02, dim));
+  thing_state->CreateVertex (csVector3 (((float)ZONE_DIM/2.)*CUBE_DIM,
+  	.02, -dim));
+  thing_state->CreateVertex (csVector3 (((float)ZONE_DIM/2.)*CUBE_DIM,
+  	.02, dim));
 
-  //hrast_tmpl->AddVertex ((-(float)(player1->zone_dim)/2.)*CUBE_DIM,.02,-dim);
-  //hrast_tmpl->AddVertex ((-(float)(player1->zone_dim)/2.)*CUBE_DIM,.02,dim);
-  //hrast_tmpl->AddVertex (((float)(player1->zone_dim)/2.)*CUBE_DIM,.02,-dim);
-  //hrast_tmpl->AddVertex (((float)(player1->zone_dim)/2.)*CUBE_DIM,.02,dim);
-
-  hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
-  hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
-  hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
-  hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
-
-  csPolygon3D* p;
+  iPolygon3D* p;
   csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (hrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	hrast_tmpl->Vobj (0), hrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
+	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
-  p = add_polygon_template (hrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
-  norm = p->GetPolyPlane ()->GetNormal ();
+  p = add_polygon_template (thing_state, "b", raster_mat, 2, 3, 1, 0);
+  norm = p->GetWorldPlane ().GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	hrast_tmpl->Vobj (0), hrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
+      	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
+	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
-  engine->thing_templates.Push (hrast_tmpl);
+  thing_state->DecRef ();
 }
-
 
 void Blocks::add_pillar (int x, int y)
 {
-  csThing* pillar;
-  pillar = new csThing ();
-  engine->things.Push (pillar);
-  pillar->SetName ("pillar");
+  csMeshWrapper* pillar = CreateMeshFromFactory (pillar_tmpl, "pillar");
   pillar->GetMovable ().SetSector (room);
-  iThingState* thing_state = QUERY_INTERFACE (pillar_tmpl, iThingState);
-  iMaterialWrapper* imat = QUERY_INTERFACE (pillar_mat, iMaterialWrapper);
-  pillar->MergeTemplate (thing_state, imat);
-  imat->DecRef ();
-  thing_state->DecRef ();
+
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->HardTransform (csTransform (csMatrix3 (), v));
@@ -598,16 +636,7 @@ void Blocks::add_pillar (int x, int y)
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
-  csThing* vrast;
-  vrast = new csThing ();
-  engine->things.Push (vrast);
-  vrast->SetName ("vrast");
-  vrast->GetMovable ().SetSector (room);
-  iThingState* thing_state = QUERY_INTERFACE (vrast_tmpl, iThingState);
-  iMaterialWrapper* imat = QUERY_INTERFACE (raster_mat, iMaterialWrapper);
-  vrast->MergeTemplate (thing_state, imat);
-  imat->DecRef ();
-  thing_state->DecRef ();
+  csMeshWrapper* vrast = CreateMeshFromFactory (vrast_tmpl, "vrast");
   vrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -618,16 +647,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
-  csThing* hrast;
-  hrast = new csThing ();
-  engine->things.Push (hrast);
-  hrast->SetName ("hrast");
-  hrast->GetMovable ().SetSector (room);
-  iThingState* thing_state = QUERY_INTERFACE (hrast_tmpl, iThingState);
-  iMaterialWrapper* imat = QUERY_INTERFACE (raster_mat, iMaterialWrapper);
-  hrast->MergeTemplate (thing_state, imat);
-  imat->DecRef ();
-  thing_state->DecRef ();
+  csMeshWrapper* hrast = CreateMeshFromFactory (hrast_tmpl, "hrast");
   hrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -636,118 +656,124 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->GetMovable ().UpdateMove ();
 }
 
-void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
+void Blocks::ChangeThingMaterial (csMeshWrapper* thing,
+	iMaterialWrapper* mat)
 {
-  for (int i = 0 ; i < thing->GetNumPolygons () ; i++)
+  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState);
+  for (int i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
-    csPolygon3D* p = thing->GetPolygon3D (i);
+    iPolygon3D* p = thing_state->GetPolygon (i);
     p->SetMaterial (mat);
   }
+  thing_state->DecRef ();
 }
 
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
-  cube_tmpl = new csThing ();
-  cube_tmpl->SetName ("cube");
-  cube_tmpl->AddVertex (-dim, -dim, dim);
-  cube_tmpl->AddVertex (dim, -dim, dim);
-  cube_tmpl->AddVertex (dim, -dim, -dim);
-  cube_tmpl->AddVertex (-dim, -dim, -dim);
-  cube_tmpl->AddVertex (-dim, dim, dim);
-  cube_tmpl->AddVertex (dim, dim, dim);
-  cube_tmpl->AddVertex (dim, dim, -dim);
-  cube_tmpl->AddVertex (-dim, dim, -dim);
+  cube_tmpl = CreateMeshFactoryWrapper ("cube");
+  iThingState* cube_state = QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
+  	iThingState);
+  cube_state->CreateVertex (csVector3 (-dim, -dim, dim));
+  cube_state->CreateVertex (csVector3 (dim, -dim, dim));
+  cube_state->CreateVertex (csVector3 (dim, -dim, -dim));
+  cube_state->CreateVertex (csVector3 (-dim, -dim, -dim));
+  cube_state->CreateVertex (csVector3 (-dim, dim, dim));
+  cube_state->CreateVertex (csVector3 (dim, dim, dim));
+  cube_state->CreateVertex (csVector3 (dim, dim, -dim));
+  cube_state->CreateVertex (csVector3 (-dim, dim, -dim));
 
-  csPolygon3D* p;
+  iPolygon3D* p;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (cube_tmpl, "d1", cube_mat, 3, 2, 1);
+  p = add_polygon_template (cube_state, "d1", cube_mat, 3, 2, 1);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "d2", cube_mat, 3, 1, 0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_tmpl, "b1", cube_mat, 0, 1, 5);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "b2", cube_mat, 0, 5, 4);
+  p = add_polygon_template (cube_state, "d2", cube_mat, 3, 1, 0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (cube_tmpl, "t1", cube_mat, 4, 5, 6);
+  p = add_polygon_template (cube_state, "b1", cube_mat, 0, 1, 5);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "t2", cube_mat, 4, 6, 7);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_tmpl, "f1", cube_mat, 7, 6, 2);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "f2", cube_mat, 7, 2, 3);
+  p = add_polygon_template (cube_state, "b2", cube_mat, 0, 5, 4);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (cube_tmpl, "l1", cube_mat, 4, 7, 3);
+  p = add_polygon_template (cube_state, "t1", cube_mat, 4, 5, 6);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "l2", cube_mat, 4, 3, 0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_tmpl, "r1", cube_mat, 6, 5, 1);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "r2", cube_mat, 6, 1, 2);
+  p = add_polygon_template (cube_state, "t2", cube_mat, 4, 6, 7);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  engine->thing_templates.Push (cube_tmpl);
+  p = add_polygon_template (cube_state, "f1", cube_mat, 7, 6, 2);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_state, "f2", cube_mat, 7, 2, 3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+  p = add_polygon_template (cube_state, "l1", cube_mat, 4, 7, 3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_state, "l2", cube_mat, 4, 3, 0);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+  p = add_polygon_template (cube_state, "r1", cube_mat, 6, 5, 1);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_state, "r2", cube_mat, 6, 1, 2);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+  cube_state->DecRef ();
 }
 
-void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
+void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
 	float u3, float v3)
 {
   p->SetTextureType (POLYTXT_GOURAUD);
-  csPolyTexGouraud* gs = p->GetGouraudInfo ();
+  iPolyTexType* ptt = p->GetPolyTexType ();
+  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
   gs->Setup (p);
-  gs->SetUV (0, u1, v1);
-  gs->SetUV (1, u2, v2);
-  gs->SetUV (2, u3, v3);
+  fs->SetUV (0, u1, v1);
+  fs->SetUV (1, u2, v2);
+  fs->SetUV (2, u3, v3);
+  fs->DecRef ();
+  gs->DecRef ();
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
-csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
-	csThing* tmpl)
+csMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
+	csMeshFactoryWrapper* tmpl)
 {
-  csThing* cube;
-  cube = new csThing ();
-  engine->things.Push (cube);
-  cube->SetName ("cubexxx");
+  csMeshWrapper* cube = CreateMeshFromFactory (tmpl, "cubexxx");
   cube->GetMovable ().SetSector (room);
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  iThingState* thing_state = QUERY_INTERFACE (tmpl, iThingState);
-  iMaterialWrapper* imat = QUERY_INTERFACE (cube_mat, iMaterialWrapper);
-  cube->MergeTemplate (thing_state, imat, &shift, NULL);
-  imat->DecRef ();
-  thing_state->DecRef ();
-  cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
+  iThingState* thing_state = QUERY_INTERFACE (cube->GetMeshObject (),
+  	iThingState);
+  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
-  csPolygon3D* p;
-  p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon3D ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon3D ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon3D ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon3D ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon3D ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon3D ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  iPolygon3D* p;
+  p = thing_state->GetPolygon ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = thing_state->GetPolygon ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = thing_state->GetPolygon ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = thing_state->GetPolygon ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = thing_state->GetPolygon ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = thing_state->GetPolygon ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = thing_state->GetPolygon ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+
+  thing_state->DecRef ();
+  cube->HardTransform (csTransform (csMatrix3 (), shift));//@@@@@@@@@@@@@@
   return cube;
 }
 
 // dx,dy,dz and x,y,z are logical coordinates (Z vertical).
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
-	csThing* tmpl)
+	csMeshFactoryWrapper* tmpl)
 {
-  csThing* cube = add_cube_thing (room, dx, dy, dz,
+  csMeshWrapper* cube = add_cube_thing (room, dx, dy, dz,
   	(x-(player1->zone_dim)/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
   	(y-(player1->zone_dim)/2+shift_rotate.y)*CUBE_DIM, tmpl);
@@ -760,17 +786,23 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
 
 // dx,dy,dz are logical coordinates (Z vertical).
 // x,y,z are physical coordinates (Y vertical).
-csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
-	float x, float y, float z, csThing* tmpl)
+csMeshWrapper* Blocks::add_cube_thing (csSector* sect,
+	float dx, float dy, float dz,
+	float x, float y, float z, csMeshFactoryWrapper* tmpl)
 {
-  csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
+  csMeshWrapper* cube = create_cube_thing (dx, dy, dz, tmpl);
+  iThingState* cube_state = QUERY_INTERFACE (cube->GetMeshObject (),
+  	iThingState);
   cube->GetMovable ().SetSector (sect);
   csVector3 v (x, y, z);
   cube->GetMovable ().SetPosition (sect, v);
   cube->GetMovable ().UpdateMove ();
-  cube->InitLightMaps (false);
-  room->ShineLights (cube);
-  cube->CreateLightMaps (Gfx3D);
+  cube_state->InitLightMaps (false);
+  iMeshWrapper* icube = QUERY_INTERFACE (cube, iMeshWrapper);
+  room->ShineLights (icube);
+  icube->DecRef ();
+  cube_state->CreateLightMaps (Gfx3D);
+  cube_state->DecRef ();
   return cube;
 }
 
@@ -915,9 +947,11 @@ again:
   int i;
   for (i = 0 ; i < num_cubes ; i++)
   {
-    csThing* t = cube_info[i].thing;
+    csMeshWrapper* t = cube_info[i].thing;
     reset_vertex_colors (t);
-    room->ShineLights (t);
+    iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
+    room->ShineLights (it);
+    it->DecRef ();
   }
   csThing::current_light_frame_number++;
 }
@@ -1442,7 +1476,7 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   shift_rotate = new_shift_rot;
 }
 
-csMaterialWrapper* Blocks::GetMaterialForHeight (int z)
+iMaterialWrapper* Blocks::GetMaterialForHeight (int z)
 {
   switch (z % 4)
   {
@@ -1690,13 +1724,15 @@ void Blocks::HandleGameMovement (cs_time elapsed_time)
 
   for (i = 0 ; i < num_cubes ; i++)
   {
-    csThing* t = cube_info[i].thing;
+    csMeshWrapper* t = cube_info[i].thing;
     if (do_rot)
       t->GetMovable ().Transform (rot);
     t->GetMovable ().MovePosition (csVector3 (dx, -elapsed_fall, dy));
     t->GetMovable ().UpdateMove ();
     reset_vertex_colors (t);
-    room->ShineLights (t);
+    iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
+    room->ShineLights (it);
+    it->DecRef ();
   }
   csThing::current_light_frame_number++;
 }
@@ -1748,23 +1784,23 @@ void Blocks::InitTextures ()
   csEngine* const e = Sys->engine;
 
   csLoader::LoadTexture (e, "pillar", "stone4.png");
-  Sys->set_pillar_material (e->GetMaterials ()->FindByName ("pillar"));
+  Sys->set_pillar_material (e->FindMaterial ("pillar"));
 
   csLoader::LoadTexture (e, "cube", "cube.png");
-  Sys->set_cube_material (e->GetMaterials ()->FindByName ("cube"));
+  Sys->set_cube_material (e->FindMaterial ("cube"));
   csLoader::LoadTexture (e, "raster", "clouds_thick1.jpg");
-  Sys->set_raster_material (e->GetMaterials ()->FindByName ("raster"));
+  Sys->set_raster_material (e->FindMaterial ("raster"));
   csLoader::LoadTexture (e, "room", "mystone2.png");
   csLoader::LoadTexture (e, "clouds", "clouds.jpg");
 
   csLoader::LoadTexture (e, "cubef1", "cubef1.png");
-  Sys->set_cube_f1_material (e->GetMaterials ()->FindByName ("cubef1"));
+  Sys->set_cube_f1_material (e->FindMaterial ("cubef1"));
   csLoader::LoadTexture (e, "cubef2", "cubef2.png");
-  Sys->set_cube_f2_material (e->GetMaterials ()->FindByName ("cubef2"));
+  Sys->set_cube_f2_material (e->FindMaterial ("cubef2"));
   csLoader::LoadTexture (e, "cubef3", "cubef3.png");
-  Sys->set_cube_f3_material (e->GetMaterials ()->FindByName ("cubef3"));
+  Sys->set_cube_f3_material (e->FindMaterial ("cubef3"));
   csLoader::LoadTexture (e, "cubef4", "cubef4.png");
-  Sys->set_cube_f4_material (e->GetMaterials ()->FindByName ("cubef4"));
+  Sys->set_cube_f4_material (e->FindMaterial ("cubef4"));
 
   csLoader::LoadTexture (e, "menu_novice", "novice.png");
   csLoader::LoadTexture (e, "menu_back", "back.png");
@@ -1859,43 +1895,51 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 
 void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
-  csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName (mat);
-  csThing* thing = new csThing ();
-  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-  engine->things.Push (thing);
+  iMaterialWrapper* tm_front = engine->FindMaterial (mat);
 
-  thing->AddVertex (-1, .25, 0);
-  thing->AddVertex (1, .25, 0);
-  thing->AddVertex (1, -.25, 0);
-  thing->AddVertex (-1, -.25, 0);
+  csMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
+  iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingState);
+  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
-  csPolygon3D* p;
+  thing_state->CreateVertex (csVector3 (-1, .25, 0));
+  thing_state->CreateVertex (csVector3 (1, .25, 0));
+  thing_state->CreateVertex (csVector3 (1, -.25, 0));
+  thing_state->CreateVertex (csVector3 (-1, -.25, 0));
+
+  iPolygon3D* p;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = thing->NewPolygon (tm_front);
-  p->AddVertex (0);
-  p->AddVertex (1);
-  p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm_front);
+  p->CreateVertex (0);
+  p->CreateVertex (1);
+  p->CreateVertex (3);
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 0, 0, 1, 0, 0, 1);
 
-  p = thing->NewPolygon (tm_front);
-  p->AddVertex (1);
-  p->AddVertex (2);
-  p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm_front);
+  p->CreateVertex (1);
+  p->CreateVertex (2);
+  p->CreateVertex (3);
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 1, 0, 1, 1, 0, 1);
 
-  src_menus[menu_nr] = thing;
+  thing_state->DecRef ();
+
+  src_menus[menu_nr] = thing_wrap;
 }
 
-csThing* Blocks::CreateMenuArrow (bool left)
+csMeshWrapper* Blocks::CreateMenuArrow (bool left)
 {
-  csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName ("menu_back");
-  csThing* thing = new csThing ();
-  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-  engine->things.Push (thing);
+  iMaterialWrapper* tm_front = engine->FindMaterial ("menu_back");
+
+  csMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
+  iThingState* thing_state = QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingState);
+  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   float pointx;
   float rearx;
@@ -1910,31 +1954,33 @@ csThing* Blocks::CreateMenuArrow (bool left)
     rearx = 1+.1;
   }
 
-  thing->AddVertex (pointx, 0, 0);
-  thing->AddVertex (rearx, .25, 0);
-  thing->AddVertex (rearx, -.25, 0);
+  thing_state->CreateVertex (csVector3 (pointx, 0, 0));
+  thing_state->CreateVertex (csVector3 (rearx, .25, 0));
+  thing_state->CreateVertex (csVector3 (rearx, -.25, 0));
 
-  csPolygon3D* p;
+  iPolygon3D* p;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = thing->NewPolygon (tm_front);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm_front);
   if (left)
   {
-    p->AddVertex (0);
-    p->AddVertex (1);
-    p->AddVertex (2);
+    p->CreateVertex (0);
+    p->CreateVertex (1);
+    p->CreateVertex (2);
   }
   else
   {
-    p->AddVertex (2);
-    p->AddVertex (1);
-    p->AddVertex (0);
+    p->CreateVertex (2);
+    p->CreateVertex (1);
+    p->CreateVertex (0);
   }
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 0, 0, 1, 0, 0, 1);
+  thing_state->DecRef ();
 
-  return thing;
+  return thing_wrap;
 }
 
 void Blocks::InitMenu ()
@@ -1974,7 +2020,6 @@ void Blocks::ChangePlaySize (int new_size)
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
-  room->Prepare ();
   room->InitLightMaps (false);
   room->ShineLights ();
   room->CreateLightMaps (Gfx3D);
@@ -2013,45 +2058,53 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("room");
+  iMaterialWrapper* tm = engine->FindMaterial ("room");
   room = Sys->engine->CreateCsSector ("room");
-  csThing* walls = Sys->engine->CreateSectorWalls (room, "walls");
+  iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (room, "walls");
+  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
   Sys->set_cube_room (room);
-  csPolygon3D* p;
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  iPolygon3D* p;
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (-5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->CreateVertex (csVector3 (5, 20, 5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (5, 20, 5));
+  p->CreateVertex (csVector3 (5, 20, -5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (5, 0, 5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (-5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 20, 5));
+  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 0, -5);
-  p->AddVertex (5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->CreateVertex (csVector3 (5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 20, -5));
+  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (5, 0, -5));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  walls_state->DecRef ();
 
   Sys->add_pillar_template ();
   Sys->add_cube_template ();
@@ -2088,17 +2141,22 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  csMaterialWrapper* demo_tm = engine->GetMaterials ()->FindByName ("clouds");
+  iMaterialWrapper* demo_tm = engine->FindMaterial ("clouds");
   demo_room = Sys->engine->CreateCsSector ("room");
-  csThing* walls = Sys->engine->CreateSectorWalls (demo_room, "walls");
+  iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (demo_room, "walls");
+  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
 
-  csPolygon3D* p;
-  p = walls->NewPolygon (demo_tm);
-  p->AddVertex (-50, 50, 50);
-  p->AddVertex (50, 50, 50);
-  p->AddVertex (50, -50, 50);
-  p->AddVertex (-50, -50, 50);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
+  iPolygon3D* p;
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (demo_tm);
+  p->CreateVertex (csVector3 (-50, 50, 50));
+  p->CreateVertex (csVector3 (50, 50, 50));
+  p->CreateVertex (csVector3 (50, -50, 50));
+  p->CreateVertex (csVector3 (-50, -50, 50));
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 100);
+
+  walls_state->DecRef ();
 
   demo_room->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
 
@@ -2195,12 +2253,12 @@ void Blocks::StartNewGame ()
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
-  while (i < room->GetNumThings ())
+  while (i < room->GetNumberMeshes ())
   {
-    csThing* cube = room->GetThing (i);
+    csMeshWrapper* cube = room->GetMesh (i);
     if (!strncmp (cube->GetName (), "cube", 4))
     {
-      room->UnlinkThing (cube);
+      room->UnlinkMesh (cube);
       delete cube;
     }
     else
@@ -2229,7 +2287,7 @@ void Blocks::removePlanesVisual (States* player)
         { // Physically remove it.
           char temp[20];
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-	  csThing* th = room->GetThing (temp);
+	  csMeshWrapper* th = room->GetMesh (temp);
 	  th->GetMovable ().ClearSectors ();
 	  th->GetMovable ().UpdateMove ();
         }
@@ -2273,7 +2331,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
   int i;
   int x,y,z;
   char temp[20];
-  csThing* t;
+  csMeshWrapper* t;
 
   // Finished the transition.
   if (!player1->move_down_todo)
@@ -2292,7 +2350,7 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	{
 	  player1->set_cube (x, y, z-1, player1->get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
-          t = room->GetThing (temp);
+          t = room->GetMesh (temp);
           if (t)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
@@ -2322,13 +2380,15 @@ void Blocks::HandleLoweringPlanes (cs_time elapsed_time)
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
 	// then CUBE_DIM lower.
-	t = room->GetThing (temp);
+	t = room->GetMesh (temp);
 	if (t)
 	{
           t->GetMovable ().MovePosition (csVector3 (0, -elapsed_fall, 0));
           t->GetMovable ().UpdateMove ();
           reset_vertex_colors (t);
-          room->ShineLights (t);
+	  iMeshWrapper* it = QUERY_INTERFACE (t, iMeshWrapper);
+          room->ShineLights (it);
+	  it->DecRef ();
 	}
       }
 
@@ -2976,6 +3036,7 @@ int main (int argc, char* argv[])
   }
   Sys->engine = engine->GetCsEngine ();
   engine->DecRef ();
+  Sys->thing_type = engine->GetThingType ();
 
   // Get a font handle
   Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);

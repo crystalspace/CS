@@ -412,12 +412,12 @@ void csPolygon3D::Reset ()
 #endif
 }
 
-void csPolygon3D::SetCSPortal (csSector* sector)
+void csPolygon3D::SetCSPortal (csSector* sector, bool null)
 {
   if (portal && portal->GetSector () == sector) return;
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   { delete portal; portal = NULL; }
-  if (!sector) return;
+  if (!null && !sector) return;
   portal = new csPortal;
   flags.Set (CS_POLY_DELETE_PORTAL);
   portal->flags.Reset (CS_PORTAL_WARP);
@@ -1606,7 +1606,7 @@ void csPolygon3D::InitLightMaps (bool do_cache)
     lmi->lightmap_up_to_date = true;
 }
 
-void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
+void csPolygon3D::UpdateVertexLighting (iLight* light, const csColor& lcol,
   bool dynamic, bool reset)
 {
   if (GetTextureType () != POLYTXT_GOURAUD) return;
@@ -1685,8 +1685,10 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     {
       // We are working for a vertex lighted polygon.
       csColor& col = linfo.GetColor ();
-      UpdateVertexLighting ((csLight*)lview.GetUserData (), col, false,
-      	ctxt->IsFirstTime ());
+      csLight* l = (csLight*)lview.GetUserData ();
+      iLight* il = QUERY_INTERFACE (l, iLight);
+      UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
+      il->DecRef ();
       return;
     }
 
@@ -1950,7 +1952,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   if (po)
   {
     if (!lview->IsDynamic () || !po->flags.Check (CS_PORTAL_MIRROR))
-      po->CheckFrustum (*lview, GetAlpha ());
+      po->CheckFrustum ((iFrustumView*)lview, GetAlpha ());
   }
   else if (!lview->IsDynamic () && csSector::do_radiosity)
   {

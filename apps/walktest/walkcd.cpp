@@ -80,102 +80,113 @@ int FindIntersection(csCollisionPair& cd,csVector3 line[2])
 
 void WalkTest::CreateColliders ()
 {
-  csPolygon3D *p;
+  iPolygon3D *p;
   iPolygonMesh* mesh;
-  plbody = new csThing ();
+  iMeshObjectFactory* thing_fact = engine->GetThingType ()->NewFactory ();
+  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+  plbody = new csMeshWrapper (engine, mesh_obj);
+  mesh_obj->DecRef ();
   plbody->SetName ("Player's Body");
+  iThingState* thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
 
-  plbody->AddVertex(-DX_2, OY,    -DZ_2);
-  plbody->AddVertex(-DX_2, OY,    DZ_2);
-  plbody->AddVertex(-DX_2, OY+DY, DZ_2);
-  plbody->AddVertex(-DX_2, OY+DY, -DZ_2);
-  plbody->AddVertex(DX_2,  OY,    -DZ_2);
-  plbody->AddVertex(DX_2,  OY,    DZ_2);
-  plbody->AddVertex(DX_2,  OY+DY, DZ_2);
-  plbody->AddVertex(DX_2,  OY+DY, -DZ_2);
+  thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
+  thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
+  thing_state->CreateVertex (csVector3 (-DX_2, OY+DY, DZ_2));
+  thing_state->CreateVertex (csVector3 (-DX_2, OY+DY, -DZ_2));
+  thing_state->CreateVertex (csVector3 (DX_2,  OY,    -DZ_2));
+  thing_state->CreateVertex (csVector3 (DX_2,  OY,    DZ_2));
+  thing_state->CreateVertex (csVector3 (DX_2,  OY+DY, DZ_2));
+  thing_state->CreateVertex (csVector3 (DX_2,  OY+DY, -DZ_2));
 
   // Left
-  p = plbody->NewPolygon (0);
-
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (2); p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (1);
+  p->CreateVertex (2); p->CreateVertex (3);
 
   // Right
-  p = plbody->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (7);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (4); p->CreateVertex (5);
+  p->CreateVertex (6); p->CreateVertex (7);
 
   // Bottom
-  p = plbody->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (5); p->AddVertex (4);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (1);
+  p->CreateVertex (5); p->CreateVertex (4);
 
   // Top
-  p = plbody->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2);
-  p->AddVertex (6); p->AddVertex (7);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (3); p->CreateVertex (2);
+  p->CreateVertex (6); p->CreateVertex (7);
 
   // Front
-  p = plbody->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (2);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (1); p->CreateVertex (5);
+  p->CreateVertex (6); p->CreateVertex (2);
 
   // Back
-  p = plbody->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4);
-  p->AddVertex (7); p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (4);
+  p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = QUERY_INTERFACE (plbody, iPolygonMesh);
+  mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   body = new csCollider (*plbody, collide_system, mesh);
   body_radius = plbody->GetRadius ();
   mesh->DecRef ();
+  thing_state->DecRef ();
 
-  pllegs = new csThing ();
+  thing_fact = engine->GetThingType ()-> NewFactory ();
+  mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+  pllegs = new csMeshWrapper (engine, mesh_obj);
+  mesh_obj->DecRef ();
+  pllegs->SetName ("Player's Legs");
+  thing_state = QUERY_INTERFACE (mesh_obj, iThingState);
 
-  pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
-  pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);
-  pllegs->AddVertex(-DX_2L, OYL+DYL, DZ_2L);
-  pllegs->AddVertex(-DX_2L, OYL+DYL, -DZ_2L);
-  pllegs->AddVertex(DX_2L,  OYL,     -DZ_2L);
-  pllegs->AddVertex(DX_2L,  OYL,     DZ_2L);
-  pllegs->AddVertex(DX_2L,  OYL+DYL, DZ_2L);
-  pllegs->AddVertex(DX_2L,  OYL+DYL, -DZ_2L);
+  thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
+  thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));
+  thing_state->CreateVertex (csVector3 (-DX_2L, OYL+DYL, DZ_2L));
+  thing_state->CreateVertex (csVector3 (-DX_2L, OYL+DYL, -DZ_2L));
+  thing_state->CreateVertex (csVector3 (DX_2L,  OYL,     -DZ_2L));
+  thing_state->CreateVertex (csVector3 (DX_2L,  OYL,     DZ_2L));
+  thing_state->CreateVertex (csVector3 (DX_2L,  OYL+DYL, DZ_2L));
+  thing_state->CreateVertex (csVector3 (DX_2L,  OYL+DYL, -DZ_2L));
 
   // Left
-  p = pllegs->NewPolygon (0);
-
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (2); p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (1);
+  p->CreateVertex (2); p->CreateVertex (3);
 
   // Right
-  p = pllegs->NewPolygon (0);
-  p->AddVertex (4); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (7);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (4); p->CreateVertex (5);
+  p->CreateVertex (6); p->CreateVertex (7);
 
   // Bottom
-  p = pllegs->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (1);
-  p->AddVertex (5); p->AddVertex (4);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (1);
+  p->CreateVertex (5); p->CreateVertex (4);
 
   // Top
-  p = pllegs->NewPolygon (0);
-  p->AddVertex (3); p->AddVertex (2);
-  p->AddVertex (6); p->AddVertex (7);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (3); p->CreateVertex (2);
+  p->CreateVertex (6); p->CreateVertex (7);
 
   // Front
-  p = pllegs->NewPolygon (0);
-  p->AddVertex (1); p->AddVertex (5);
-  p->AddVertex (6); p->AddVertex (2);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (1); p->CreateVertex (5);
+  p->CreateVertex (6); p->CreateVertex (2);
 
   // Back
-  p = pllegs->NewPolygon (0);
-  p->AddVertex (0); p->AddVertex (4);
-  p->AddVertex (7); p->AddVertex (3);
+  p = thing_state->CreatePolygon ();
+  p->CreateVertex (0); p->CreateVertex (4);
+  p->CreateVertex (7); p->CreateVertex (3);
 
-  mesh = QUERY_INTERFACE (pllegs, iPolygonMesh);
+  mesh = QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   legs = new csCollider (*pllegs, collide_system, mesh);
   legs_radius = pllegs->GetRadius ();
   mesh->DecRef ();
+  thing_state->DecRef ();
 
   if (!body || !legs)
     do_cd = false;
@@ -219,21 +230,6 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   if (Sys->collide_system->GetOneHitOnly () && hit)
     return 1;
 
-  // Check collision with the things in this sector.
-  for (i = 0 ; i < sp->GetNumThings () ; i++)
-  {
-    csThing* tp = sp->GetThing (i);
-    Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
-
-    CD_contact = Sys->collide_system->GetCollisionPairs ();
-    for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)
-      our_cd_contact[num_our_cd++] = CD_contact[j];
-
-    if (Sys->collide_system->GetOneHitOnly () && hit)
-      return 1;
-    // TODO, should test which one is the closest.
-  }
   // Check collision with the meshes in this sector.
   for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
   {

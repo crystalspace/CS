@@ -31,7 +31,6 @@ class csColor;
 struct iSector;
 struct iStatLight;
 struct iDynLight;
-struct iThing;
 struct iSprite;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
@@ -49,7 +48,7 @@ struct iClipper2D;
 struct iPolyTxtPlane;
 struct iCurveTemplate;
 
-SCF_VERSION (iEngine, 0, 1, 19);
+SCF_VERSION (iEngine, 0, 1, 20);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -127,8 +126,6 @@ struct iEngine : public iPlugIn
    * If link == true (default) the sector will be linked to the engine.
    */
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
-  /// Create a empty thing with given name
-  virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
 
   /// Query number of sectors in engine
   virtual int GetSectorCount () = 0;
@@ -143,31 +140,6 @@ struct iEngine : public iPlugIn
    */
   virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
 
-  /**
-   * Find a thing by name. If regionOnly is true then the returned
-   * thing will belong to the current region. Note that this is different
-   * from calling iRegion::FindThing() because the latter will also
-   * return things that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iThing *FindThing (const char *iName, bool regionOnly = false) = 0;
-  /**
-   * Find a sky thing by name. If regionOnly is true then the returned
-   * thing will belong to the current region. Note that this is different
-   * from calling iRegion::FindSky() because the latter will also
-   * return things that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iThing *FindSky (const char *iName, bool regionOnly = false) = 0;
-  /**
-   * Find a thing template by name. If regionOnly is true then the returned
-   * thing will belong to the current region. Note that this is different
-   * from calling iRegion::FindThingTemplate() because the latter will also
-   * return things that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iThing *FindThingTemplate (const char *iName,
-  	bool regionOnly = false) = 0;
   /**
    * Find a mesh object by name. If regionOnly is true then the returned
    * mesh object will belong to the current region. Note that this is different

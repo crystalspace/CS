@@ -87,30 +87,13 @@ csSector::csSector (csEngine* engine) : csPObject ()
 
 csSector::~csSector ()
 {
-  // Meshes, things, and collections are not deleted by the calls below. They
+  // Meshes and collections are not deleted by the calls below. They
   // belong to csEngine.
-  things.DeleteAll ();
-  skies.DeleteAll ();
   meshes.DeleteAll ();
   collections.DeleteAll ();
 
   lights.DeleteAll ();
   terrains.DeleteAll ();
-}
-
-void csSector::Prepare ()
-{
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* th = (csThing*)things[i];
-    th->Prepare ();
-  }
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* th = (csThing*)skies[i];
-    th->Prepare ();
-  }
 }
 
 //----------------------------------------------------------------------
@@ -147,86 +130,6 @@ csMeshWrapper* csSector::GetMesh (const char* name)
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* s = (csMeshWrapper*)meshes[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
-}
-
-//----------------------------------------------------------------------
-
-void csSector::AddThing (csThing* thing)
-{
-  things.Push ((csSome)thing);
-  if (culler)
-  {
-    iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
-    vo->DecRef ();
-    culler->RegisterVisObject (vo);
-  }
-}
-
-void csSector::UnlinkThing (csThing* thing)
-{
-  int idx = things.Find ((csSome)thing);
-  if (idx != -1)
-  {
-    things.Delete (idx);
-    if (culler)
-    {
-      iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
-      vo->DecRef ();
-      culler->UnregisterVisObject (vo);
-    }
-  }
-}
-
-csThing* csSector::GetThing (const char* name)
-{
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* s = (csThing*)things[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
-  }
-  return NULL;
-}
-
-//----------------------------------------------------------------------
-
-void csSector::AddSky (csThing* thing)
-{
-  skies.Push ((csSome)thing);
-  if (culler)
-  {
-    iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
-    vo->DecRef ();
-    culler->RegisterVisObject (vo);
-  }
-}
-
-void csSector::UnlinkSky (csThing* thing)
-{
-  int idx = skies.Find ((csSome)thing);
-  if (idx != -1)
-  {
-    skies.Delete (idx);
-    if (culler)
-    {
-      iVisibilityObject* vo = QUERY_INTERFACE (thing, iVisibilityObject);
-      vo->DecRef ();
-      culler->UnregisterVisObject (vo);
-    }
-  }
-}
-
-csThing* csSector::GetSky (const char* name)
-{
-  int i;
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* s = (csThing*)skies[i];
     if (!strcmp (name, s->GetName ()))
       return s;
   }
@@ -333,18 +236,6 @@ void csSector::UseStaticTree (int mode, bool octree)
 {
   if (static_thing) return;
   int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* th = (csThing*)things[i];
-    if (th->flags.Check (CS_THING_VISTREE))
-    {
-      static_thing = th;
-      static_thing->BuildStaticTree (mode, octree);
-      culler = QUERY_INTERFACE (static_thing, iVisibilityCuller);
-      culler->DecRef ();
-      break;//@@@@@@ Only support one static_thing for now!!!
-    }
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
@@ -365,14 +256,8 @@ void csSector::UseStaticTree (int mode, bool octree)
     }
   }
 
-  // Loop through all things and meshes and update their bounding box in the
+  // Loop through all meshes and update their bounding box in the
   // polygon trees.
-  // @@@ Unify when csThing becomes a mesh object.
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* th = (csThing*)things[i];
-    th->GetMovable ().UpdateMove ();
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* th = (csMeshWrapper*)meshes[i];
@@ -452,16 +337,6 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end,
 void csSector::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* sp = (csThing*)things[i];
-    sp->CreateLightMaps (g3d);
-  }
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* sp = (csThing*)skies[i];
-    sp->CreateLightMaps (g3d);
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
@@ -535,38 +410,6 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   csReversibleTransform movtrans;
 
   int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* sp = (csThing*)things[i];
-    if (sp != static_thing)
-    {
-      r = best_r;
-
-      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
-      {
-        obj_start = start;
-	obj_end = end;
-      }
-      else
-      {
-        movtrans = sp->GetMovable ().GetFullTransform ();
-        obj_start = movtrans.Other2This (start);
-	obj_end = movtrans.Other2This (end);
-      }
-      csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end, obj_isect, &r);
-      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
-        cur_isect = obj_isect;
-      else
-        cur_isect = movtrans.This2Other (obj_isect);
-
-      if (p && r < best_r)
-      {
-        best_r = r;
-	best_p = p;
-	isect = cur_isect;
-      }
-    }
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
@@ -643,7 +486,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
     po = p->GetPortal ();
     if (po)
     {
-      if (!po->GetSector ()) po->CompleteSector ();
+      po->CompleteSector (NULL);
       if (po->flags.Check (CS_PORTAL_WARP))
       {
         po->WarpSpace (t, mirror);
@@ -668,6 +511,8 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   csVector3 obj_center;
   csReversibleTransform movtrans;
 
+//@@@ Support for meshes!!!
+#if 0
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
@@ -685,21 +530,24 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
       min_p = p;
     }
   }
+#endif
 
   if (pr) *pr = min_d;
   return min_p;
 }
 
+#if 0
 int compare_z_thing (const void* p1, const void* p2)
 {
-  csThing* sp1 = *(csThing**)p1;
-  csThing* sp2 = *(csThing**)p2;
+  csMeshWrapper* sp1 = *(csMeshWrapper**)p1;
+  csMeshWrapper* sp2 = *(csMeshWrapper**)p2;
   float z1 = sp1->Vcam (sp1->GetCenter ()).z;
   float z2 = sp2->Vcam (sp2->GetCenter ()).z;
   if (z1 < z2) return -1;
   else if (z1 > z2) return 1;
   return 0;
 }
+#endif
 
 // @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
 // BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
@@ -856,21 +704,19 @@ void csSector::Draw (iRenderView* rview)
   }
 
   // First draw all 'sky' things using Z-fill.
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* th = (csThing*)skies[i];
-    th->Draw (rview, &th->GetMovable ().scfiMovable, th->GetZBufMode ());
-  }
+  //@@@ Support using render order
+  //for (i = 0 ; i < skies.Length () ; i++)
+  //{
+    //csThing* th = (csThing*)skies[i];
+    //th->Draw (rview, &th->GetMovable ().scfiMovable, th->GetZBufMode ());
+  //}
 
   // In some cases this queue will be filled with all visible
   // meshes.
   csMeshWrapper** mesh_queue = NULL;
   int num_mesh_queue = 0;
-  // For things we have a similar queue.
-  csThing** thing_queue = NULL;
-  int num_thing_queue = 0;
-  // If the following flag is true the queues are actually used.
-  bool use_object_queues = false;
+  // If the following flag is true the queue is actually used.
+  bool use_object_queue = false;
 
   // If we have a visibility culler in this sector we use it here.
   if (culler)
@@ -880,9 +726,8 @@ void csSector::Draw (iRenderView* rview)
       // The visibility culler worked and marked all registered
       // visible things as visible.
 
-      // Fill the mesh and thing queues for all meshes and things
-      // that were visible.
-      use_object_queues = true;
+      // Fill the mesh queue for all meshes that were visible.
+      use_object_queue = true;
       if (meshes.Length () > 0)
       {
 	// Push all visible meshes in a queue.
@@ -893,18 +738,6 @@ void csSector::Draw (iRenderView* rview)
         {
           csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
 	  if (sp->IsVisible ()) mesh_queue[num_mesh_queue++] = sp;
-	}
-      }
-      if (things.Length () > 0)
-      {
-        // Push all visible things in a queue.
-	// @@@ Avoid memory allocation?
-	thing_queue = new csThing* [things.Length ()];
-	num_thing_queue = 0;
-	for (i = 0 ; i < things.Length () ; i++)
-	{
-	  csThing* th = (csThing*)things[i];
-	  if (th->IsVisible ()) thing_queue[num_thing_queue++] = th;
 	}
       }
     }
@@ -925,62 +758,66 @@ void csSector::Draw (iRenderView* rview)
   {
     // If the queues are not used for things we still fill the queue here
     // just to make the code below easier.
-    if (!use_object_queues)
+    if (!use_object_queue)
     {
-      num_thing_queue = 0;
-      if (things.Length ())
+      num_mesh_queue = 0;
+      if (meshes.Length ())
       {
-        thing_queue = new csThing* [things.Length ()];
-        for (i = 0 ; i < things.Length () ; i++)
+        mesh_queue = new csMeshWrapper* [meshes.Length ()];
+        for (i = 0 ; i < meshes.Length () ; i++)
         {
-          csThing* th = (csThing*)things[i];
-          thing_queue[num_thing_queue++] = th;
+          csMeshWrapper* th = (csMeshWrapper*)meshes[i];
+          mesh_queue[num_mesh_queue++] = th;
         }
       }
       else
-        thing_queue = NULL;
+        mesh_queue = NULL;
     }
 
-    // All csThings which are not merged with the static bsp still need to
-    // be drawn. Unless they are fog objects (or transparent, this is a todo!)
+#if 0
+    // All meshes still need to be drawn.
+    // Unless they are fog objects (or transparent, this is a todo!)
     // we just render them using the Z-buffer. Fog or transparent objects
     // are z-sorted and rendered back to front.
     //
     // We should see if there are better alternatives to Z-sort which are
     // more accurate in more cases (@@@).
-    csThing* sort_list[256];    // @@@HARDCODED == BAD == EASY!
+    csMeshWrapper* sort_list[256];    // @@@HARDCODED == BAD == EASY!
     int sort_idx = 0;
     int i;
 
     // First we do z-sorting for fog objects so that they are rendered
     // correctly from back to front. All other objects are drawn using
     // the z-buffer.
-    for (i = 0 ; i < num_thing_queue ; i++)
+    for (i = 0 ; i < num_mesh_queue ; i++)
     {
-      csThing* th = thing_queue[i];
-      if (th != static_thing)
-        if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
-        else th->Draw (rview, &th->GetMovable ().scfiMovable,
+      csMeshWrapper* th = mesh_queue[i];
+      //@@@!!!
+      iThing* ith = QUERY_INTERFACE (th->GetMeshObject (), iThing);
+      if (!ith || ith->GetPrivateObject () != static_thing)
+        //if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
+        /*else*/ th->Draw (rview, &th->GetMovable ().scfiMovable,
 		th->GetZBufMode ());
     }
 
     if (sort_idx)
     {
       // Now sort the objects in sort_list.
-      qsort (sort_list, sort_idx, sizeof (csThing*), compare_z_thing);
+      qsort (sort_list, sort_idx, sizeof (csMeshWrapper*), compare_z_thing);
 
       // Draw them back to front.
       for (i = 0 ; i < sort_idx ; i++)
       {
-        csThing* th = sort_list[i];
-        if (th->GetFog ().enabled)
-	  th->DrawFoggy (rview, &th->GetMovable ().scfiMovable);
-        else th->Draw (rview, &th->GetMovable ().scfiMovable,
+        csMeshWrapper* th = sort_list[i];
+        //@@@ FOG not supported for now! if (th->GetFog ().enabled)
+	  //th->DrawFoggy (rview, &th->GetMovable ().scfiMovable);
+        /*else*/ th->Draw (rview, &th->GetMovable ().scfiMovable,
 		th->GetZBufMode ());
       }
     }
+#endif
 
-    delete [] thing_queue;
+    //delete [] mesh_queue;
 
     // Draw meshes.
     // To correctly support meshes in multiple sectors we only draw a
@@ -1009,8 +846,8 @@ void csSector::Draw (iRenderView* rview)
       if (mesh_queue) sp = mesh_queue[i];
       else sp = (csMeshWrapper*)meshes[i];
 
-      if (!previous_sector ||
-      		sp->GetMovable ().GetSectors ().Find (previous_sector->GetPrivateObject ()) == -1)
+      if (!previous_sector || sp->GetMovable ().GetSectors ().
+      	Find (previous_sector->GetPrivateObject ()) == -1)
       {
         // Mesh is not in the previous sector or there is no previous sector.
         sp->Draw (rview);
@@ -1020,7 +857,8 @@ void csSector::Draw (iRenderView* rview)
         if (
 	  previous_sector->HasFog () ||
 	  rview->GetPortalPolygon ()->IsTransparent () ||
-	  rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP))
+	  rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().
+	  	Check (CS_PORTAL_WARP))
 	{
 	  // @@@ Here we should draw clipped to the portal.
           sp->Draw (rview);
@@ -1092,69 +930,12 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
   int i, i1;
   int j;
 
-  num_objects = things.Length () + meshes.Length ();
+  num_objects = meshes.Length ();
   if (!num_objects) { return NULL; }
   csObject** visible_objects = new csObject* [num_objects];
 
   num_objects = 0;
   // @@@ Unify both loops below once csThing becomes a mesh object.
-  for (j = 0 ; j < things.Length () ; j++)
-  {
-    csThing* sp = (csThing*)things[j];
-    // If the light frustum is infinite then every thing
-    // in this sector is of course visible.
-    if (infinite) vis = true;
-    else
-    {
-      csBox3 bbox;
-      sp->GetBoundingBox (&(sp->GetMovable ().scfiMovable), bbox);
-      // Here we do a quick test to see if the bounding box is visible in
-      // in the frustum. This test is not complete in the sense that it will
-      // say that some bounding boxes are visible even if they are not. But
-      // it is correct in the sense that if it says a bounding box
-      // is invisible, then it certainly is invisible.
-      //
-      // It works by taking all vertices of the bounding box. If
-      // ALL of them are on the outside of the same plane from the
-      // frustum then the object is certainly not visible.
-      vis = true;
-      i1 = lf->GetNumVertices ()-1;
-      for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
-      {
-        csVector3& v1 = lf->GetVertex (i);
-        csVector3& v2 = lf->GetVertex (i1);
-        if (csMath3::WhichSide3D (bbox.GetCorner (0)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (1)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (2)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (3)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (4)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (5)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (6)-c, v1, v2) < 0) continue;
-        if (csMath3::WhichSide3D (bbox.GetCorner (7)-c, v1, v2) < 0) continue;
-        // Here we have a case of all vertices of the bbox being on the
-        // outside of the same plane.
-        vis = false;
-        break;
-      }
-      if (vis && lf->GetBackPlane ())
-      {
-        // If still visible then we can also check the back plane.
-        // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
-        // HAVE A BACK PLANE YET.
-        if (!csMath3::Visible (bbox.GetCorner (0)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (1)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (2)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (3)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (4)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (5)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (6)-c, *lf->GetBackPlane ()) &&
-            !csMath3::Visible (bbox.GetCorner (7)-c, *lf->GetBackPlane ()))
-          vis = false;
-      }
-    }
-
-    if (vis) visible_objects[num_objects++] = sp;
-  }
   for (j = 0 ; j < meshes.Length () ; j++)
   {
     csMeshWrapper* sp = (csMeshWrapper*)meshes[j];
@@ -1264,29 +1045,18 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
         // @@@ unify with other mesh objects as soon as possible
 	// @@@ Also use shadow caster interface to append shadows!
         csObject* o = visible_objects[i];
-	if (o->GetType () >= csThing::Type)
+	csMeshWrapper* mesh = (csMeshWrapper*)o;
+	// @@@ should not be known in engine.
+	// @@@ UGLY
+	iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+	if (ithing)
 	{
-          csThing* sp = (csThing*)o;
+	  csThing* sp = ithing->GetPrivateObject ();
 	  // Only if the thing has right flags do we consider it for shadows.
-	  if (lview->CheckShadowMask (sp->flags.Get ()))
-	    sp->AppendShadows (&(sp->GetMovable ().scfiMovable),
+	  if (lview->CheckShadowMask (mesh->flags.Get ()))
+	    sp->AppendShadows (&(mesh->GetMovable ().scfiMovable),
 	    	shadows, center);
-        }
-	else
-	{
-	  csMeshWrapper* mesh = (csMeshWrapper*)o;
-	  // @@@ should not be known in engine.
-	  // @@@ UGLY
-	  iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
-	  if (ithing)
-	  {
-	    csThing* sp = ithing->GetPrivateObject ();
-	    // Only if the thing has right flags do we consider it for shadows.
-	    if (lview->CheckShadowMask (mesh->flags.Get ()))
-	      sp->AppendShadows (&(mesh->GetMovable ().scfiMovable),
-	      	shadows, center);
-	    ithing->DecRef ();
-	  }
+	  ithing->DecRef ();
 	}
       }
     }
@@ -1297,26 +1067,17 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
       // @@@ unify with other mesh objects as soon as possible
       // @@@ Use shadow receiver interface!!!
       csObject* o = visible_objects[i];
-      if (o->GetType () >= csThing::Type)
+      csMeshWrapper* mesh = (csMeshWrapper*)o;
+      // @@@ should not be known in engine.
+      // @@@ UGLY
+      iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
+      if (ithing)
       {
-        csThing* sp = (csThing*)o;
-        if (lview->CheckProcessMask (sp->flags.Get ()))
-          sp->RealCheckFrustum (lview, &(sp->GetMovable ().scfiMovable));
-      }
-      else
-      {
-	csMeshWrapper* mesh = (csMeshWrapper*)o;
-	// @@@ should not be known in engine.
-	// @@@ UGLY
-	iThing* ithing = QUERY_INTERFACE (mesh->GetMeshObject (), iThing);
-	if (ithing)
-	{
-	  csThing* sp = ithing->GetPrivateObject ();
-	  // Only if the thing has right flags do we consider it for shadows.
-          if (lview->CheckProcessMask (mesh->flags.Get ()))
-            sp->RealCheckFrustum (lview, &(mesh->GetMovable ().scfiMovable));
-	  ithing->DecRef ();
-	}
+        csThing* sp = ithing->GetPrivateObject ();
+        // Only if the thing has right flags do we consider it for shadows.
+        if (lview->CheckProcessMask (mesh->flags.Get ()))
+          sp->RealCheckFrustum (lview, &(mesh->GetMovable ().scfiMovable));
+        ithing->DecRef ();
       }
     }
       
@@ -1339,16 +1100,6 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 void csSector::InitLightMaps (bool do_cache)
 {
   int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* sp = (csThing*)things[i];
-    sp->InitLightMaps (do_cache);
-  }
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* sp = (csThing*)skies[i];
-    sp->InitLightMaps (do_cache);
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
@@ -1366,16 +1117,6 @@ void csSector::InitLightMaps (bool do_cache)
 void csSector::CacheLightMaps ()
 {
   int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    csThing* sp = (csThing*)things[i];
-    sp->CacheLightMaps ();
-  }
-  for (i = 0 ; i < skies.Length () ; i++)
-  {
-    csThing* sp = (csThing*)skies[i];
-    sp->CacheLightMaps ();
-  }
   for (i = 0 ; i < meshes.Length () ; i++)
   {
     csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
@@ -1421,18 +1162,11 @@ void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
 }
 
 void csSector::CalculateSectorBBox (csBox3& bbox,
-	bool do_things, bool do_meshes, bool /*do_terrain*/)
+	bool do_meshes, bool /*do_terrain*/)
 {
   bbox.StartBoundingBox ();
   csBox3 b;
   int i;
-  if (do_things)
-    for (i = 0 ; i < things.Length () ; i++)
-    {
-      csThing* th = (csThing*)things[i];
-      th->GetBoundingBox (&(th->GetMovable ().scfiMovable), b);
-      bbox += b;
-    }
   if (do_meshes)
     for (i = 0 ; i < meshes.Length () ; i++)
     {
@@ -1444,26 +1178,6 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 }
 
 //---------------------------------------------------------------------------
-
-iThing *csSector::eiSector::GetSkyThing (const char *name)
-{
-  return &scfParent->GetSky (name)->scfiThing;
-}
-
-iThing *csSector::eiSector::GetSkyThing (int iIndex)
-{
-  return &((csThing*)(scfParent->skies[iIndex]))->scfiThing;
-}
-
-iThing *csSector::eiSector::GetThing (const char *name)
-{
-  return &scfParent->GetThing (name)->scfiThing;
-}
-
-iThing *csSector::eiSector::GetThing (int iIndex)
-{
-  return &((csThing*)(scfParent->things[iIndex]))->scfiThing;
-}
 
 void csSector::eiSector::AddTerrain (iTerrainWrapper *pTerrain)
 {

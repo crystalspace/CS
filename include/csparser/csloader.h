@@ -133,19 +133,6 @@ class csLoader : public iLoaderNew
   static csKeyValuePair* load_key (char* buf, csObject* pParent);
   /// Parse a map node definition and return a new object
   static csMapNode* load_node (char* name, char* buf, csSector* sec);
-  /// Parse the definition for a skydome and create the corresponding objects
-  static void skydome_process (csThing& thing, char* name, char* buf,
-    csMaterialWrapper* material, int vt_offset);
-  /// Parse the definition for a thing and create a thing object
-  static csThing* load_thing (char* name, char* buf, bool is_sky,
-      	bool is_template);
-  static void load_thing_part (csThing* thing, PSLoadInfo& info,
-	csReversibleTransform& obj, char* name, char* buf, int vt_offset,
-	bool isParent);
-  /// Parse a 3D polygon definition and return a new object
-  static csPolygon3D* load_poly3d (char* polyname, char* buf,
-    csMaterialWrapper* default_material, float default_texlen,
-    csThing* parent, int vt_offset);
 
   /// Parse and load a single texture
   static void txt_process (char *name, char* buf);
@@ -225,12 +212,6 @@ class csLoader : public iLoaderNew
   /// Find a material (and create one from texture if possible)
   static csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
 
-  /**
-   * If the polygon is a portal and has no special functions,
-   * the texturing mode is reset to POLYTXT_NONE.
-   */
-  static void OptimizePolygon (csPolygon3D *p);
-
 public:
   /// Load map file into engine.
   static bool LoadMapFile (csEngine*, const char* filename);
@@ -260,14 +241,10 @@ public:
   static csMeshFactoryWrapper* LoadMeshObjectFactory (csEngine*, const char* fname);
 
   /**
-   * Load a thing from a file.
+   * Load a mesh object from a file.
+   * The mesh object is not automatically added to the engine and sector.
    */
-  static csThing* LoadThing (csEngine*, const char* fname);
-
-  /**
-   * Load a thing template from a file.
-   */
-  static csThing* LoadThingTemplate (csEngine*, const char* fname);
+  static csMeshWrapper* LoadMeshObject (csEngine*, const char* fname);
 
   /// Load a sound and return an iSoundData object
   static iSoundHandle* LoadSoundHandle(const char* filename);

@@ -28,6 +28,18 @@ WORLD (
     MATERIAL 'white' (TEXTURE ('white.gif'))
     MATERIAL 'bricks' (TEXTURE ('bricks.gif'))
     MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
+    MATERIAL 'oldmetal' (TEXTURE ('oldmetal.gif'))
+    MATERIAL 'parket' (TEXTURE ('parket.gif'))
+    MATERIAL 'asphalt' (TEXTURE ('asphalt.gif'))
+    MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
+    MATERIAL 'oldbrick' (TEXTURE ('oldbrick.gif'))
+    MATERIAL 'window' (TEXTURE ('window.gif'))
+    MATERIAL 'red' (TEXTURE ('red.gif'))
+    MATERIAL 'green' (TEXTURE ('green.gif'))
+    MATERIAL 'blue' (TEXTURE ('blue.gif'))
+    MATERIAL 'yellow' (TEXTURE ('yellow.gif'))
+    MATERIAL 'sky' (TEXTURE ('sky.gif'))
+    MATERIAL 'misty' (TEXTURE ('misty.gif'))
   )
   PLUGINS (
     PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
@@ -109,7 +121,7 @@ WORLD (
     )
   )
 
-  MESHOBJ 'sprSkelFact' (
+  MESHFACT 'sprSkelFact' (
     PLUGIN ('spr3dFact')
     PARAMS (
       MATERIAL ('robot')
@@ -161,7 +173,7 @@ WORLD (
       )
     )
   )
-  MESHOBJ 'sprFrameFact' (
+  MESHFACT 'sprFrameFact' (
     PLUGIN ('spr3dFact')
     PARAMS (
       MATERIAL ('robot')
@@ -247,29 +259,29 @@ WORLD (
       TRIANGLE (4,5,7) TRIANGLE (4,7,6)
     )
   )
-  MESHOBJ 'fountainFactory' (
+  MESHFACT 'fountainFactory' (
     PLUGIN ('crystalspace.mesh.loader.factory.fountain')
     PARAMS ()
   )
-  MESHOBJ 'snowFactory' (
+  MESHFACT 'snowFactory' (
     PLUGIN ('crystalspace.mesh.loader.factory.snow')
     PARAMS ()
   )
-  MESHOBJ 'robotBody' (
+  MESHFACT 'robotBody' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.2,.5,.2)
     )
   )
-  MESHOBJ 'robotHead' (
+  MESHFACT 'robotHead' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
       SIZE (.17,.2,.17)
     )
   )
-  MESHOBJ 'robotLeg' (
+  MESHFACT 'robotLeg' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
@@ -277,7 +289,7 @@ WORLD (
       SHIFT (0,-.2,0)
     )
   )
-  MESHOBJ 'robotArm' (
+  MESHFACT 'robotArm' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
@@ -285,7 +297,7 @@ WORLD (
       SHIFT (0,-.15,0)
     )
   )
-  MESHOBJ 'robotHand' (
+  MESHFACT 'robotHand' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
@@ -293,7 +305,7 @@ WORLD (
       SHIFT (0,-.06,0)
     )
   )
-  MESHOBJ 'robotFoot' (
+  MESHFACT 'robotFoot' (
     PLUGIN ('cubeFact')
     PARAMS (
       MATERIAL ('robot')
@@ -301,22 +313,22 @@ WORLD (
       SHIFT (.1,-.05,0)
     )
   )
-  MESHOBJ 'spr' (
+  MESHFACT 'spr' (
     PLUGIN ('spr2dFact')
     PARAMS (
       MATERIAL ('robot')
     )
   )
-  MESHOBJ 'fireFact' (
+  MESHFACT 'fireFact' (
     PLUGIN ('crystalspace.mesh.loader.factory.fire')
     PARAMS ()
   )
-  MESHOBJ 'ballFact' (
+  MESHFACT 'ballFact' (
     PLUGIN ('crystalspace.mesh.loader.factory.ball')
     PARAMS ()
   )
 
-  MESHOBJ 'cube' (
+  MESHFACT 'cube' (
     PLUGIN ('thingFact')
     PARAMS (
     VERTEX (-0.5,-0.5,-0.5) VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5)
@@ -367,7 +379,9 @@ WORLD (
     )
     )
   )
-  THING 'stair_rail' (
+  MESHFACT 'stair_rail' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (-0.05,-0.6,-0.05)
     VERTEX (-0.05,-0.6,0.05)
     VERTEX (-0.05,0.6,-0.05)
@@ -376,7 +390,7 @@ WORLD (
     VERTEX (0.05,-0.6,0.05)
     VERTEX (0.05,0.6,-0.05)
     VERTEX (0.05,0.6,0.05)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (1,5,7,3)
       TEXTURE (
@@ -420,7 +434,10 @@ WORLD (
       )
     )
   )
-  THING 'stair' (
+  )
+  MESHFACT 'stair' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (-0.8,-0.1,-0.25)
     VERTEX (-0.8,-0.1,0.25)
     VERTEX (-0.8,0.1,-0.25)
@@ -429,7 +446,7 @@ WORLD (
     VERTEX (0.8,-0.1,0.25)
     VERTEX (0.8,0.1,-0.25)
     VERTEX (0.8,0.1,0.25)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (1,5,7,3)
       TEXTURE (
@@ -472,6 +489,7 @@ WORLD (
         V (0.8,-0.1,0.25)
       )
     )
+  )
   )
 
   ADDON (
@@ -538,7 +556,7 @@ WORLD (
     )
   )
 
-  MESHOBJ 'tunnel' (
+  MESHFACT 'tunnel' (
     PLUGIN ('thingFact')
     PARAMS (
     CURVECENTER (0,0,0)
@@ -591,27 +609,35 @@ WORLD (
     )
   )
 
-  THING 'prism4' (
+  MESHFACT 'prism4' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (0,.5,0)
     VERTEX (-.5,-.5,.5) VERTEX (.5,-.5,.5)
     VERTEX (.5,-.5,-.5) VERTEX (-.5,-.5,-.5)
-    TEXNR ('parket.gif') TEXLEN (2)
+    MATERIAL ('parket') TEXLEN (2)
     POLYGON 'poly1' (VERTICES (0,1,2))
     POLYGON 'poly2' (VERTICES (0,4,1))
     POLYGON 'poly3' (VERTICES (0,3,4))
     POLYGON 'poly4' (VERTICES (0,2,3))
     POLYGON 'polyb' (VERTICES (4,3,2,1))
+    )
   )
-  THING 'prism3' (
+  MESHFACT 'prism3' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (0,.5,0)
     VERTEX (0,-.5,.5) VERTEX (.7,-.5,-.5) VERTEX (-.7,-.5,-.5)
-    TEXNR ('parket.gif') TEXLEN (2)
+    MATERIAL ('parket') TEXLEN (2)
     POLYGON 'poly1' (VERTICES (0,2,3))
     POLYGON 'poly2' (VERTICES (0,3,1))
     POLYGON 'poly3' (VERTICES (0,1,2))
     POLYGON 'poly4' (VERTICES (3,2,1))
+    )
   )
-  THING 'circle' (
+  MESHFACT 'circle' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (0,-.3,1) VERTEX (.5,-.3,.87) VERTEX (.87,-.3,.5)
     VERTEX (1,-.3,0) VERTEX (.87,-.3,-.5) VERTEX (.5,-.3,-.87)
     VERTEX (0,-.3,-1) VERTEX (-.5,-.3,-.87) VERTEX (-.87,-.3,-.5)
@@ -622,7 +648,7 @@ WORLD (
     VERTEX (0,.3,-1) VERTEX (-.5,.3,-.87) VERTEX (-.87,.3,-.5)
     VERTEX (-1,.3,0) VERTEX (-.87,.3,.5) VERTEX (-.5,.3,.87)
 
-    TEXNR ('parket.gif') TEXLEN (2)
+    MATERIAL ('parket') TEXLEN (2)
     POLYGON 'top' (VERTICES (12,13,14,15,16,17,18,19,20,21,22,23))
     POLYGON 'bot' (VERTICES (11,10,9,8,7,6,5,4,3,2,1,0))
     POLYGON 'p1' (VERTICES (13,12,0,1))
@@ -637,8 +663,11 @@ WORLD (
     POLYGON 'p10' (VERTICES (22,21,9,10))
     POLYGON 'p11' (VERTICES (23,22,10,11))
     POLYGON 'p12' (VERTICES (12,23,11,0))
+    )
   )
-  THING 'band' (
+  MESHFACT 'band' (
+    PLUGIN ('thingFact')
+    PARAMS (
     VERTEX (0,-.1,1) VERTEX (.5,-.1,.87) VERTEX (.87,-.1,.5)
     VERTEX (1,-.1,0) VERTEX (.87,-.1,-.5) VERTEX (.5,-.1,-.87)
     VERTEX (0,-.1,-1) VERTEX (-.5,-.1,-.87) VERTEX (-.87,-.1,-.5)
@@ -659,7 +688,7 @@ WORLD (
     VERTEX (0,.1,-.9) VERTEX (-.45,.1,-.78) VERTEX (-.78,.1,-.45)
     VERTEX (-.9,.1,0) VERTEX (-.78,.1,.45) VERTEX (-.45,.1,.78)
 
-    TEXNR ('parket.gif') TEXLEN (2)
+    MATERIAL ('parket') TEXLEN (2)
     POLYGON 'p1' (VERTICES (13,12,0,1)) POLYGON 'p2' (VERTICES (14,13,1,2))
     POLYGON 'p3' (VERTICES (15,14,2,3)) POLYGON 'p4' (VERTICES (16,15,3,4))
     POLYGON 'p5' (VERTICES (17,16,4,5)) POLYGON 'p6' (VERTICES (18,17,5,6))
@@ -687,6 +716,7 @@ WORLD (
     POLYGON 't7' (VERTICES (18,19,43,42)) POLYGON 't8' (VERTICES (19,20,44,43))
     POLYGON 't9' (VERTICES (20,21,45,44)) POLYGON 't10' (VERTICES (21,22,46,45))
     POLYGON 't11' (VERTICES (22,23,47,46)) POLYGON 't12' (VERTICES (23,12,36,47))
+    )
   )
 
   SECTOR 'room' (
@@ -760,8 +790,9 @@ WORLD (
     LIGHT (0,0,0:3,1,1,1,0)
   )
   SECTOR 'test2' (
-    THING 'walls' (
-    ZFILL ()
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
+    PARAMS (
     VERTEX (-2,-1,2)
     VERTEX (-2,-1,5.6)
     VERTEX (-2,1,5.6)
@@ -778,7 +809,7 @@ WORLD (
     VERTEX (2,1,5.6)
     VERTEX (2,3,2)
     VERTEX (2,3,5.6)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (15,14,11,12)
       TEXTURE (
@@ -852,11 +883,14 @@ WORLD (
       )
     )
     )
+    ZFILL ()
+    )
     LIGHT (0,0,4:10,1,1,1,0)
   )
   SECTOR 'doorway' (
-    THING 'walls' (
-    ZFILL ()
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
+    PARAMS (
     VERTEX (-1,-1,5.6)
     VERTEX (-1,-1,6)
     VERTEX (-1,1,5.6)
@@ -865,7 +899,7 @@ WORLD (
     VERTEX (0,-1,6)
     VERTEX (0,1,5.6)
     VERTEX (0,1,6)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('large')
@@ -911,10 +945,13 @@ WORLD (
       )
     )
     )
+    ZFILL ()
+    )
   )
   SECTOR 'large' (
-    THING 'walls' (
-    ZFILL ()
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
+    PARAMS (
     VERTEX (-20,-1,6)
     VERTEX (-20,-1,10)
     VERTEX (-20,-1,11)
@@ -1028,7 +1065,7 @@ WORLD (
     VERTEX (20,14,12)
     VERTEX (20,14,14)
     VERTEX (20,14,20)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'east' (
       VERTICES (112,109,101,104)
       TEXTURE (
@@ -1301,7 +1338,7 @@ WORLD (
         V (-20,17,6)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'down1A' (
       VERTICES (2,17,16,0)
       TEXTURE (
@@ -1402,7 +1439,7 @@ WORLD (
         V (-20,-1,20)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'down2G' (
       VERTICES (87,95,94,86)
       TEXTURE (
@@ -1473,7 +1510,7 @@ WORLD (
         V (-20,-1,20)
       )
     )
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north1B1' (
       VERTICES (21,31,30,20)
       PORTAL ('door2')
@@ -1527,25 +1564,32 @@ WORLD (
       )
     )
     )
-    THING 'button1' (
+    ZFILL ()
+    )
+    MESHOBJ 'button1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (0,-0.2,-0.2)
       VERTEX (0,-0.2,0.2)
       VERTEX (0,0.2,-0.2)
       VERTEX (0,0.2,0.2)
       POLYGON 'poly' (
         VERTICES (0,2,3,1)
-        MATERIAL ('oldmetal.gif')
+        MATERIAL ('oldmetal')
         TEXTURE (
           MATRIX (0,0.5,-0,0,-0,0.5,-0.5,0,0)
           V (0,-0.2,-0.2)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.9,1,9)
       )
     )
-    THING 'switchBoard' (
+    MESHOBJ 'switchBoard' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,-1,-0.5)
       VERTEX (-1,-1,0.5)
       VERTEX (-1,0.5,-0.5)
@@ -1556,7 +1600,7 @@ WORLD (
       VERTEX (1,0.5,-0.5)
       VERTEX (1,1,0)
       VERTEX (1,1,0.5)
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'bottom' (
         VERTICES (0,5,6,1)
         TEXTURE (
@@ -1606,12 +1650,15 @@ WORLD (
           V (-1,1,0)
         )
       )
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-14,0,9)
       )
     )
-    THING 'handle1' (
+    MESHOBJ 'handle1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.05,-0.05,-0.6)
       VERTEX (-0.05,-0.05,0)
       VERTEX (-0.05,0.05,-0.6)
@@ -1620,7 +1667,7 @@ WORLD (
       VERTEX (0.05,-0.05,0)
       VERTEX (0.05,0.05,-0.6)
       VERTEX (0.05,0.05,0)
-      MATERIAL ('misty.gif')
+      MATERIAL ('misty')
       POLYGON 'back' (
         VERTICES (7,3,1,5)
         TEXTURE (
@@ -1664,12 +1711,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-14.7,0.8,8.8)
       )
     )
-    THING 'handle2' (
+    MESHOBJ 'handle2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.05,-0.05,-0.6)
       VERTEX (-0.05,-0.05,0)
       VERTEX (-0.05,0.05,-0.6)
@@ -1678,7 +1728,7 @@ WORLD (
       VERTEX (0.05,-0.05,0)
       VERTEX (0.05,0.05,-0.6)
       VERTEX (0.05,0.05,0)
-      MATERIAL ('sky.gif')
+      MATERIAL ('sky')
       POLYGON 'back' (
         VERTICES (7,3,1,5)
         TEXTURE (
@@ -1722,12 +1772,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-14,0.8,8.8)
       )
     )
-    THING 'handle3' (
+    MESHOBJ 'handle3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.05,-0.05,-0.6)
       VERTEX (-0.05,-0.05,0)
       VERTEX (-0.05,0.05,-0.6)
@@ -1736,7 +1789,7 @@ WORLD (
       VERTEX (0.05,-0.05,0)
       VERTEX (0.05,0.05,-0.6)
       VERTEX (0.05,0.05,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       POLYGON 'back' (
         VERTICES (7,3,1,5)
         TEXTURE (
@@ -1780,19 +1833,22 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-13.3,0.8,8.8)
       )
     )
-    THING 'rot_door1' (
+    MESHOBJ 'rot_door1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-2.5,0,-0.1) VERTEX (-2.5,0,0.1) VERTEX (-2.5,3.4,-0.1)
       VERTEX (-2.5,3.4,0.1) VERTEX (0,0,-0.1) VERTEX (0,0,0.1)
       VERTEX (0,3.4,-0.1) VERTEX (0,3.4,0.1) VERTEX (-2.5,0,-0.1)
       VERTEX (-2.5,0,0.1) VERTEX (-2.5,3.4,-0.1) VERTEX (-2.5,3.4,0.1)
       VERTEX (0,0,-0.1) VERTEX (0,0,0.1) VERTEX (0,3.4,-0.1)
       VERTEX (0,3.4,0.1)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -1836,19 +1892,22 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-2.5,-1,20)
       )
     )
-    THING 's_large1' (
+    MESHOBJ 's_large1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.5,-0.5,-0.5) VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5)
       VERTEX (-0.5,0.5,0.5) VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5)
       VERTEX (0.5,0.5,-0.5) VERTEX (0.5,0.5,0.5) VERTEX (-0.5,-0.5,-0.5)
       VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5) VERTEX (-0.5,0.5,0.5)
       VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5) VERTEX (0.5,0.5,-0.5)
       VERTEX (0.5,0.5,0.5)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -1892,19 +1951,22 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (15,3,8)
       )
     )
-    THING 's_large2' (
+    MESHOBJ 's_large2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.5,-0.5,-0.5) VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5)
       VERTEX (-0.5,0.5,0.5) VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5)
       VERTEX (0.5,0.5,-0.5) VERTEX (0.5,0.5,0.5) VERTEX (-0.5,-0.5,-0.5)
       VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5) VERTEX (-0.5,0.5,0.5)
       VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5) VERTEX (0.5,0.5,-0.5)
       VERTEX (0.5,0.5,0.5)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -1948,19 +2010,22 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (15,5,8)
       )
     )
-    THING 'stair_railD' (
+    MESHOBJ 'stair_railD' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-18.4,-1,15.8) VERTEX (-18.4,-1,16) VERTEX (-18.4,2.8,20)
       VERTEX (-18.4,3,20) VERTEX (-18.2,-1,15.8) VERTEX (-18.2,-1,16)
       VERTEX (-18.2,2.8,20) VERTEX (-18.2,3,20) VERTEX (-18.4,-1,15.8)
       VERTEX (-18.4,-1,20) VERTEX (-18.4,3,15.8) VERTEX (-18.4,3,20)
       VERTEX (-18.2,-1,15.8) VERTEX (-18.2,-1,20) VERTEX (-18.2,3,15.8)
       VERTEX (-18.2,3,20)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,6,2)
         TEXTURE (
@@ -2004,14 +2069,17 @@ WORLD (
         )
       )
     )
-    THING 'stair_railU' (
+    )
+    MESHOBJ 'stair_railU' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-18.4,0,15.8) VERTEX (-18.4,0.2,15.8) VERTEX (-18.4,4.2,20)
       VERTEX (-18.4,4.4,20) VERTEX (-18.2,0,15.8) VERTEX (-18.2,0.2,15.8)
       VERTEX (-18.2,4.2,20) VERTEX (-18.2,4.4,20) VERTEX (-18.4,0,15.8)
       VERTEX (-18.4,0,20) VERTEX (-18.4,4.4,15.8) VERTEX (-18.4,4.4,20)
       VERTEX (-18.2,0,15.8) VERTEX (-18.2,0,20) VERTEX (-18.2,4.4,15.8)
       VERTEX (-18.2,4.4,20)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (0,4,6,2)
         TEXTURE (
@@ -2055,92 +2123,132 @@ WORLD (
         )
       )
     )
-    THING 'stair_rail1' (
-      TEMPLATE (stair_rail)
+    )
+    MESHOBJ 'stair_rail1' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair_rail)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-18.3,-0.3,16)
       )
     )
-    THING 'stair_rail2' (
-      TEMPLATE (stair_rail)
+    MESHOBJ 'stair_rail2' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair_rail)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-18.3,0.55,16.9)
       )
     )
-    THING 'stair_rail3' (
-      TEMPLATE (stair_rail)
+    MESHOBJ 'stair_rail3' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair_rail)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-18.3,1.4,17.8)
       )
     )
-    THING 'stair_rail4' (
-      TEMPLATE (stair_rail)
+    MESHOBJ 'stair_rail4' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair_rail)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-18.3,2.25,18.7)
       )
     )
-    THING 'stair_rail5' (
-      TEMPLATE (stair_rail)
+    MESHOBJ 'stair_rail5' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair_rail)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-18.3,3.1,19.6)
       )
     )
-    THING 'stair1' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair1' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,-0.6,16.25)
       )
     )
-    THING 'stair2' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair2' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,-0.1,16.75)
       )
     )
-    THING 'stair3' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair3' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,0.4,17.25)
       )
     )
-    THING 'stair4' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair4' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,0.9,17.75)
       )
     )
-    THING 'stair5' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair5' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,1.4,18.25)
       )
     )
-    THING 'stair6' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair6' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,1.9,18.75)
       )
     )
-    THING 'stair7' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair7' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,2.4,19.25)
       )
     )
-    THING 'stair8' (
-      TEMPLATE (stair)
+    MESHOBJ 'stair8' (
+      PLUGIN ('thing')
+      PARAMS (
+        FACTORY (stair)
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-19.2,2.9,19.75)
@@ -2341,8 +2449,10 @@ WORLD (
     LIGHT (CENTER (16,8,8) RADIUS (20) COLOR (1,.7,.7) HALO ())
   )
   SECTOR 'win3a' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-8.5,0,20)
     VERTEX (-8.5,0,20.25)
     VERTEX (-8.5,2.4,20)
@@ -2353,7 +2463,7 @@ WORLD (
     VERTEX (-6,2.4,20.25)
     POLYGON 'north' (
       VERTICES (3,7,5,1)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (50)
       PORTAL ('win3b')
       TEXTURE (
@@ -2361,7 +2471,7 @@ WORLD (
         V (-8.5,2.4,20.25)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (7,6,4,5)
       TEXTURE (
@@ -2399,10 +2509,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'win3b' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-8.5,0,20.25)
     VERTEX (-8.5,0,20.5)
     VERTEX (-8.5,2.4,20.25)
@@ -2411,7 +2524,7 @@ WORLD (
     VERTEX (-6,0,20.5)
     VERTEX (-6,2.4,20.25)
     VERTEX (-6,2.4,20.5)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('room3')
@@ -2429,7 +2542,7 @@ WORLD (
     )
     POLYGON 'south' (
       VERTICES (6,2,0,4)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (50)
       PORTAL ('win3a')
       TEXTURE (
@@ -2437,7 +2550,7 @@ WORLD (
         V (-6,2.4,20.25)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'west' (
       VERTICES (2,3,1,0)
       TEXTURE (
@@ -2460,10 +2573,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'door2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-13,-1,20)
     VERTEX (-13,-1,20.5)
     VERTEX (-13,2.4,20)
@@ -2472,7 +2588,7 @@ WORLD (
     VERTEX (-10.5,-1,20.5)
     VERTEX (-10.5,2.4,20)
     VERTEX (-10.5,2.4,20.5)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('shapes')
@@ -2512,17 +2628,20 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.333333,0,0,0,-0,-0.333333,0,-0.333333,-0)
         V (-13,-1,20.5)
       )
     )
     )
+    )
   )
   SECTOR 'shapes' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,-3,20.5)
     VERTEX (-20,-3,40)
     VERTEX (-20,3,20.5)
@@ -2539,7 +2658,7 @@ WORLD (
     VERTEX (0,-3,40)
     VERTEX (0,3,20.5)
     VERTEX (0,3,40)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,15,13,1)
       TEXTURE (
@@ -2563,7 +2682,7 @@ WORLD (
     )
     POLYGON 'up' (
       VERTICES (2,14,15,3)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.333333,0,-0,0,-0,0.333333,-0,0.333333,-0)
         V (-20,3,20.5)
@@ -2571,7 +2690,7 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,13,12,0)
-      MATERIAL ('mosaic.gif')
+      MATERIAL ('mosaic')
       ALPHA (50)
       PORTAL ('shapes')
       WARP (MIRROR ())
@@ -2580,7 +2699,7 @@ WORLD (
         V (-20,-3,40)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'southA' (
       VERTICES (14,11,8,12)
       TEXTURE (
@@ -2616,6 +2735,7 @@ WORLD (
         MATRIX (-0.333333,0,-0,-0,-0.333333,-0,-0,0,-0.333333)
         V (0,3,20.5)
       )
+    )
     )
     )
     MESHOBJ 'cube2' (
@@ -2667,26 +2787,30 @@ WORLD (
       PARAMS (FACTORY ('cube'))
       HARDMOVE (MATRIX (ROT_X (45) ROT_Y (10)) V (-12,1,36))
     )
-    THING 'prism3_1' (TEMPLATE ('prism3') HARDMOVE (V (-4,0,30)))
-    THING 'prism4_1' (TEMPLATE ('prism4') HARDMOVE (V (-4,2,30)))
-    THING 'circle1' (TEMPLATE ('circle') MOVE (V (-16,1,30))
+    MESHOBJ 'prism3_1' (PLUGIN ('thing') PARAMS (FACTORY ('prism3'))
+    	HARDMOVE (V (-4,0,30)))
+    MESHOBJ 'prism4_1' (PLUGIN ('thing') PARAMS (FACTORY ('prism4'))
+    	HARDMOVE (V (-4,2,30)))
+    MESHOBJ 'circle1' (PLUGIN ('thing') PARAMS (FACTORY ('circle') MOVEABLE())
+      MOVE (V (-16,1,30))
       KEY ("entity_Rotate", "0,0,180,yes")
-      MOVEABLE ()
     )
-    THING 'band1' (TEMPLATE ('band') MOVE (MATRIX (ROT_Z (60)) V (-16,-2.6,25))
+    MESHOBJ 'band1' (PLUGIN ('thing') PARAMS (FACTORY ('band') MOVEABLE())
+      MOVE (MATRIX (ROT_Z (60)) V (-16,-2.6,25))
       KEY ("entity_Rotate", "0,270,0,yes")
-      MOVEABLE ()
     )
-    THING 'band2' (TEMPLATE ('band') MOVE (MATRIX (ROT_Z (-60)) V (-16,-1.85,25))
+    MESHOBJ 'band2' (PLUGIN ('thing') PARAMS (FACTORY ('band') MOVEABLE())
+      MOVE (MATRIX (ROT_Z (-60)) V (-16,-1.85,25))
       KEY ("entity_Rotate", "0,270,0,yes")
-      MOVEABLE ()
     )
     LIGHT (-15,0,30:17,.4,.3,.3,0)
     LIGHT (-5,0,30:14,.3,.3,.6,0)
   )
   SECTOR 'door1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-5,-1,20)
     VERTEX (-5,-1,20.5)
     VERTEX (-5,2.4,20)
@@ -2695,7 +2819,7 @@ WORLD (
     VERTEX (-2.5,-1,20.5)
     VERTEX (-2.5,2.4,20)
     VERTEX (-2.5,2.4,20.5)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('room3')
@@ -2735,17 +2859,20 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.333333,0,0,0,-0,-0.333333,0,-0.333333,-0)
         V (-5,-1,20.5)
       )
     )
     )
+    )
   )
   SECTOR 'room3' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-9,-1,20.5)
     VERTEX (-9,-1,27)
     VERTEX (-9,2.4,20.5)
@@ -2770,7 +2897,7 @@ WORLD (
     VERTEX (-2,2.4,20.5)
     VERTEX (-2,2.8,20.5)
     VERTEX (-2,2.8,27)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (23,22,19,20)
       TEXTURE (
@@ -2873,12 +3000,15 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (-8,2,24:6,.7,.5,.5,0)
     LIGHT (-3,2,24:6,.7,.5,.5,0)
   )
   SECTOR 'room3a' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-7,-1,27)
     VERTEX (-7,-1,32)
     VERTEX (-7,2.8,27)
@@ -2887,7 +3017,7 @@ WORLD (
     VERTEX (-4,-1,32)
     VERTEX (-4,2.8,27)
     VERTEX (-4,2.8,32)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('gang3')
@@ -2933,10 +3063,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'uphole1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,14,14)
     VERTEX (-20,14,20)
     VERTEX (-20,15,14)
@@ -2945,7 +3078,7 @@ WORLD (
     VERTEX (20,14,20)
     VERTEX (20,15,14)
     VERTEX (20,15,20)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -2991,10 +3124,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'uphole2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,14,6)
     VERTEX (-20,14,12)
     VERTEX (-20,15,6)
@@ -3003,7 +3139,7 @@ WORLD (
     VERTEX (20,14,12)
     VERTEX (20,15,6)
     VERTEX (20,15,12)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -3049,10 +3185,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'large2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,15,6)
     VERTEX (-20,15,12)
     VERTEX (-20,15,14)
@@ -3065,7 +3204,7 @@ WORLD (
     VERTEX (20,15,20)
     VERTEX (20,19,6)
     VERTEX (20,19,20)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (5,11,9,3)
       TEXTURE (
@@ -3125,11 +3264,14 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (-15,18,13:14,.7,.6,.6,0)
   )
   SECTOR 'hole1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,3,20)
     VERTEX (-20,3,21)
     VERTEX (-20,7,20)
@@ -3138,7 +3280,7 @@ WORLD (
     VERTEX (-11,3,21)
     VERTEX (-11,7,20)
     VERTEX (-11,7,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridor')
@@ -3184,10 +3326,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-10,3,20)
     VERTEX (-10,3,21)
     VERTEX (-10,7,20)
@@ -3196,7 +3341,7 @@ WORLD (
     VERTEX (-1,3,21)
     VERTEX (-1,7,20)
     VERTEX (-1,7,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridor')
@@ -3242,10 +3387,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole3' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,3,20)
     VERTEX (0,3,21)
     VERTEX (0,7,20)
@@ -3254,7 +3402,7 @@ WORLD (
     VERTEX (9,3,21)
     VERTEX (9,7,20)
     VERTEX (9,7,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridor')
@@ -3300,10 +3448,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole4' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (10,3,20)
     VERTEX (10,3,21)
     VERTEX (10,7,20)
@@ -3312,7 +3463,7 @@ WORLD (
     VERTEX (19,3,21)
     VERTEX (19,7,20)
     VERTEX (19,7,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridor')
@@ -3358,10 +3509,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'corridor' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,3,21)
     VERTEX (-20,3,30)
     VERTEX (-20,7,21)
@@ -3386,7 +3540,7 @@ WORLD (
     VERTEX (40,3,30)
     VERTEX (40,7,21)
     VERTEX (40,7,30)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,23,21,1)
       TEXTURE (
@@ -3417,13 +3571,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,21,20,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.2,0,0,0,-0,-0.2,0,-0.2,-0)
         V (-20,3,30)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'southA' (
       VERTICES (22,19,18,20)
       TEXTURE (
@@ -3492,6 +3646,7 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (-10,6,25:8,1,1,1,0)
     LIGHT (0,6,25:8,1,1,1,0)
     LIGHT (10,6,25:8,1,1,1,0)
@@ -3499,8 +3654,10 @@ WORLD (
     LIGHT (30,6,25:8,.5,.5,1.2,0)
   )
   SECTOR 'hole1u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,8,20)
     VERTEX (-20,8,21)
     VERTEX (-20,12,20)
@@ -3509,7 +3666,7 @@ WORLD (
     VERTEX (-11,8,21)
     VERTEX (-11,12,20)
     VERTEX (-11,12,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridoru')
@@ -3555,10 +3712,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole2u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-10,8,20)
     VERTEX (-10,8,21)
     VERTEX (-10,12,20)
@@ -3567,7 +3727,7 @@ WORLD (
     VERTEX (-1,8,21)
     VERTEX (-1,12,20)
     VERTEX (-1,12,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridoru')
@@ -3613,10 +3773,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole3u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,8,20)
     VERTEX (0,8,21)
     VERTEX (0,12,20)
@@ -3625,7 +3788,7 @@ WORLD (
     VERTEX (9,8,21)
     VERTEX (9,12,20)
     VERTEX (9,12,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridoru')
@@ -3671,10 +3834,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hole4u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (10,8,20)
     VERTEX (10,8,21)
     VERTEX (10,12,20)
@@ -3683,7 +3849,7 @@ WORLD (
     VERTEX (19,8,21)
     VERTEX (19,12,20)
     VERTEX (19,12,21)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('corridoru')
@@ -3729,10 +3895,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'corridoru' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,8,21)
     VERTEX (-20,8,30)
     VERTEX (-20,12,21)
@@ -3763,7 +3932,7 @@ WORLD (
     VERTEX (40,8,30)
     VERTEX (40,12,21)
     VERTEX (40,12,30)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (29,28,26,27)
       TEXTURE (
@@ -3787,13 +3956,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,27,26,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'northA' (
       VERTICES (3,10,7,1)
       TEXTURE (
@@ -3891,6 +4060,7 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (CENTER (-10,9,25) RADIUS (8) COLOR (.3,.3,.3))
     LIGHT (CENTER (0,9,25) RADIUS (8) COLOR (.3,.3,.3))
     LIGHT (CENTER (10,9,25) RADIUS (8) COLOR (.3,.3,.3))
@@ -3898,8 +4068,10 @@ WORLD (
     LIGHT (CENTER (30,9,25) RADIUS (7) COLOR (1,0,0))
   )
   SECTOR 'cor1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-10,8,30)
     VERTEX (-10,8,39.5)
     VERTEX (-10,11.5,30)
@@ -3922,7 +4094,7 @@ WORLD (
     VERTEX (-5,8,39.5)
     VERTEX (-5,11.5,30)
     VERTEX (-5,11.5,39.5)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (21,20,18,19)
       TEXTURE (
@@ -3947,7 +4119,7 @@ WORLD (
     )
     POLYGON 'up' (
       VERTICES (2,20,21,3)
-      MATERIAL ('mosaic.gif')
+      MATERIAL ('mosaic')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0,0.2,-0,0.2,-0)
         V (-10,11.5,30)
@@ -3955,13 +4127,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,19,18,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'northA' (
       VERTICES (3,7,4,1)
       TEXTURE (
@@ -4021,10 +4193,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'win2a' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-9.85,9,39.5)
     VERTEX (-9.85,9,39.75)
     VERTEX (-9.85,11.4,39.5)
@@ -4035,14 +4210,14 @@ WORLD (
     VERTEX (-9.15,11.4,39.75)
     POLYGON 'north' (
       VERTICES (3,7,5,1)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       PORTAL ('win2b')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0.2,0,-0,0,0.2)
         V (-9.85,11.4,39.75)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'east' (
       VERTICES (7,6,4,5)
       TEXTURE (
@@ -4080,10 +4255,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'win2b' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-9.85,9,39.75)
     VERTEX (-9.85,9,40)
     VERTEX (-9.85,11.4,39.75)
@@ -4092,7 +4270,7 @@ WORLD (
     VERTEX (-9.15,9,40)
     VERTEX (-9.15,11.4,39.75)
     VERTEX (-9.15,11.4,40)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('hall1')
@@ -4110,14 +4288,14 @@ WORLD (
     )
     POLYGON 'south' (
       VERTICES (6,2,0,4)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       PORTAL ('win2a')
       TEXTURE (
         MATRIX (-0.2,0,-0,-0,-0.2,-0,-0,0,-0.2)
         V (-9.15,11.4,39.75)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'west' (
       VERTICES (2,3,1,0)
       TEXTURE (
@@ -4140,10 +4318,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'door' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-9,8,39.5)
     VERTEX (-9,8,40)
     VERTEX (-9,11.4,39.5)
@@ -4152,7 +4333,7 @@ WORLD (
     VERTEX (-6,8,40)
     VERTEX (-6,11.4,39.5)
     VERTEX (-6,11.4,40)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('hall1')
@@ -4185,7 +4366,7 @@ WORLD (
     )
     POLYGON 'up' (
       VERTICES (2,6,7,3)
-      MATERIAL ('mosaic.gif')
+      MATERIAL ('mosaic')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0,0.2,-0,0.2,-0)
         V (-9,11.4,39.5)
@@ -4193,17 +4374,20 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
       )
     )
     )
+    )
   )
   SECTOR 'hall1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,8,40)
     VERTEX (-20,8,45)
     VERTEX (-20,10,45)
@@ -4232,7 +4416,7 @@ WORLD (
     VERTEX (0,15,45)
     VERTEX (0,18,40)
     VERTEX (0,18,45)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (27,26,21,22)
       TEXTURE (
@@ -4256,13 +4440,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,22,21,0)
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north1' (
       VERTICES (2,23,22,1)
       PORTAL ('hall2d')
@@ -4296,7 +4480,7 @@ WORLD (
     )
     POLYGON 'north2B' (
       VERTICES (8,18,17,7)
-      MATERIAL ('yellow.gif')
+      MATERIAL ('yellow')
       ALPHA (49)
       PORTAL ('box')
       TEXTURE (
@@ -4304,7 +4488,7 @@ WORLD (
         V (-20,18,45)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north2C' (
       VERTICES (18,25,23,17)
       PORTAL ('hall2r')
@@ -4358,10 +4542,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hall2d' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,8,45)
     VERTEX (-20,8,50)
     VERTEX (-20,10,45)
@@ -4374,7 +4561,7 @@ WORLD (
     VERTEX (0,8,50)
     VERTEX (0,10,45)
     VERTEX (0,10,50)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,11,9,1)
       PORTAL ('hall3')
@@ -4407,7 +4594,7 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,9,8,0)
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
@@ -4415,7 +4602,7 @@ WORLD (
     )
     POLYGON 'upA' (
       VERTICES (2,4,5,3)
-      MATERIAL ('bricks.gif')
+      MATERIAL ('bricks')
       PORTAL ('hall2l')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0,0.2,-0,0.2,-0)
@@ -4424,7 +4611,7 @@ WORLD (
     )
     POLYGON 'upB' (
       VERTICES (4,6,7,5)
-      MATERIAL ('red.gif')
+      MATERIAL ('red')
       ALPHA (49)
       PORTAL ('box')
       TEXTURE (
@@ -4434,7 +4621,7 @@ WORLD (
     )
     POLYGON 'upC' (
       VERTICES (6,10,11,7)
-      MATERIAL ('bricks.gif')
+      MATERIAL ('bricks')
       PORTAL ('hall2r')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0,0.2,-0,0.2,-0)
@@ -4442,10 +4629,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hall2u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,15,45)
     VERTEX (-20,15,50)
     VERTEX (-20,18,45)
@@ -4458,7 +4648,7 @@ WORLD (
     VERTEX (0,15,50)
     VERTEX (0,18,45)
     VERTEX (0,18,50)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,11,9,1)
       PORTAL ('hall3')
@@ -4506,7 +4696,7 @@ WORLD (
     )
     POLYGON 'downB' (
       VERTICES (5,7,6,4)
-      MATERIAL ('green.gif')
+      MATERIAL ('green')
       ALPHA (49)
       PORTAL ('box')
       TEXTURE (
@@ -4516,7 +4706,7 @@ WORLD (
     )
     POLYGON 'downC' (
       VERTICES (7,9,8,6)
-      MATERIAL ('bricks.gif')
+      MATERIAL ('bricks')
       PORTAL ('hall2r')
       TEXTURE (
         MATRIX (0.2,0,0,0,-0,-0.2,0,-0.2,-0)
@@ -4524,10 +4714,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hall2l' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,10,45)
     VERTEX (-20,10,50)
     VERTEX (-20,15,45)
@@ -4536,7 +4729,7 @@ WORLD (
     VERTEX (-10,10,50)
     VERTEX (-10,15,45)
     VERTEX (-10,15,50)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('hall3')
@@ -4585,10 +4778,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hall2r' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-7,10,45)
     VERTEX (-7,10,50)
     VERTEX (-7,15,45)
@@ -4597,7 +4793,7 @@ WORLD (
     VERTEX (0,10,50)
     VERTEX (0,15,45)
     VERTEX (0,15,50)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('hall3')
@@ -4646,10 +4842,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'hall3' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20,8,50)
     VERTEX (-20,10,50)
     VERTEX (-20,15,50)
@@ -4666,7 +4865,7 @@ WORLD (
     VERTEX (0,10,50)
     VERTEX (0,15,50)
     VERTEX (0,18,50)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (5,9,8,4)
       TEXTURE (
@@ -4697,13 +4896,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (4,8,12,0)
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-20,8,30)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'south1' (
       VERTICES (13,1,0,12)
       PORTAL ('hall2d')
@@ -4730,7 +4929,7 @@ WORLD (
     )
     POLYGON 'south2B' (
       VERTICES (11,7,6,10)
-      MATERIAL ('blue.gif')
+      MATERIAL ('blue')
       ALPHA (49)
       PORTAL ('box')
       TEXTURE (
@@ -4740,7 +4939,7 @@ WORLD (
     )
     POLYGON 'south2C' (
       VERTICES (7,2,1,6)
-      MATERIAL ('bricks.gif')
+      MATERIAL ('bricks')
       PORTAL ('hall2l')
       TEXTURE (
         MATRIX (-0.2,0,-0,-0,-0.2,-0,-0,0,-0.2)
@@ -4748,11 +4947,14 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (-17,14,51:50,.5,.5,.5,0)
   )
   SECTOR 'box' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-10,10,45)
     VERTEX (-10,10,50)
     VERTEX (-10,15,45)
@@ -4763,7 +4965,7 @@ WORLD (
     VERTEX (-7,15,50)
     POLYGON 'north' (
       VERTICES (3,7,5,1)
-      MATERIAL ('blue.gif')
+      MATERIAL ('blue')
       ALPHA (49)
       PORTAL ('hall3')
       TEXTURE (
@@ -4773,7 +4975,7 @@ WORLD (
     )
     POLYGON 'east' (
       VERTICES (7,6,4,5)
-      MATERIAL ('misty.gif')
+      MATERIAL ('misty')
       ALPHA (49)
       PORTAL ('hall2r')
       TEXTURE (
@@ -4783,7 +4985,7 @@ WORLD (
     )
     POLYGON 'south' (
       VERTICES (6,2,0,4)
-      MATERIAL ('yellow.gif')
+      MATERIAL ('yellow')
       ALPHA (49)
       PORTAL ('hall1')
       TEXTURE (
@@ -4793,7 +4995,7 @@ WORLD (
     )
     POLYGON 'west' (
       VERTICES (2,3,1,0)
-      MATERIAL ('misty.gif')
+      MATERIAL ('misty')
       ALPHA (49)
       PORTAL ('hall2l')
       TEXTURE (
@@ -4803,7 +5005,7 @@ WORLD (
     )
     POLYGON 'up' (
       VERTICES (2,6,7,3)
-      MATERIAL ('green.gif')
+      MATERIAL ('green')
       ALPHA (49)
       PORTAL ('hall2u')
       TEXTURE (
@@ -4813,7 +5015,7 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('red.gif')
+      MATERIAL ('red')
       ALPHA (49)
       PORTAL ('hall2d')
       TEXTURE (
@@ -4822,10 +5024,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'win1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-12,-1,5)
     VERTEX (-12,-1,6)
     VERTEX (-12,4,5)
@@ -4834,7 +5039,7 @@ WORLD (
     VERTEX (-10,-1,6)
     VERTEX (-10,4,5)
     VERTEX (-10,4,6)
-    MATERIAL ('mosaic.gif')
+    MATERIAL ('mosaic')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('large')
@@ -4878,6 +5083,7 @@ WORLD (
         MATRIX (0.2,0,0,0,-0,-0.2,0,-0.2,-0)
         V (-12,-1,6)
       )
+    )
     )
     )
   )
@@ -4937,8 +5143,10 @@ WORLD (
     )
   )
   SECTOR 'street1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-43,-1,-10)
     VERTEX (-43,-1,-8.5)
     VERTEX (-43,-1,-5)
@@ -5003,7 +5211,7 @@ WORLD (
     VERTEX (-3,11,-5)
     VERTEX (-3,11,0)
     VERTEX (-3,11,5)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'up' (
       VERTICES (6,60,63,9)
       PORTAL ('sky')
@@ -5153,7 +5361,7 @@ WORLD (
         V (-43,12,5)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'down2' (
       VERTICES (4,58,55,1)
       PORTAL ('street1D')
@@ -5169,7 +5377,7 @@ WORLD (
         V (-43,-1,5)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'northG1' (
       VERTICES (47,50,49,46)
       PORTAL ('win1')
@@ -5194,7 +5402,7 @@ WORLD (
     )
     POLYGON 'southE2' (
       VERTICES (34,28,27,33)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (49)
       PORTAL ('win4')
       TEXTURE (
@@ -5204,7 +5412,7 @@ WORLD (
     )
     POLYGON 'southE3' (
       VERTICES (35,29,28,34)
-      MATERIAL ('bricks.gif')
+      MATERIAL ('bricks')
       TEXTURE (
         MATRIX (0.333333,0,0,0,-0.333333,-0,0,-0,-0.111111)
         V (-43,12,-10)
@@ -5212,7 +5420,7 @@ WORLD (
     )
     POLYGON 'southE4' (
       VERTICES (36,30,29,35)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (49)
       PORTAL ('win5')
       TEXTURE (
@@ -5220,7 +5428,7 @@ WORLD (
         V (-3,11,-10)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'southE5' (
       VERTICES (37,31,30,36)
       TEXTURE (
@@ -5243,7 +5451,7 @@ WORLD (
         V (-43,12,-10)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'down1A' (
       VERTICES (1,39,38,0)
       TEXTURE (
@@ -5265,6 +5473,7 @@ WORLD (
         MATRIX (0.333333,0,0,0,-0,-0.333333,0,-0.333333,-0)
         V (-43,-1,5)
       )
+    )
     )
     )
     MESHOBJ 'snow1' (
@@ -5293,7 +5502,9 @@ WORLD (
         V (-5,3,-3)
       )
     )
-    THING 'car' (
+    MESHOBJ 'car' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-3,-1.3,-1)
       VERTEX (-3,-1.3,1)
       VERTEX (-3,-1,-1.5)
@@ -5356,7 +5567,7 @@ WORLD (
       VERTEX (3,-1.3,1.5)
       VERTEX (3,1.5,-1.5)
       VERTEX (3,1.5,1.5)
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'botL' (
         VERTICES (0,15,16,1)
         TEXTURE (
@@ -5387,13 +5598,13 @@ WORLD (
       )
       POLYGON 'windowR' (
         VERTICES (20,24,30,18)
-        MATERIAL ('sky.gif')
+        MATERIAL ('sky')
         TEXTURE (
           MATRIX (0.5,0,-0,0,-0.5,0,-0,0,0.5)
           V (-1.5,1.2,-1.5)
         )
       )
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'sideRlu' (
         VERTICES (6,26,24,20)
         TEXTURE (
@@ -5438,13 +5649,13 @@ WORLD (
       )
       POLYGON 'windowL' (
         VERTICES (25,21,19,31)
-        MATERIAL ('sky.gif')
+        MATERIAL ('sky')
         TEXTURE (
           MATRIX (-0.5,0,-0,-0,-0.5,-0,-0,0,-0.5)
           V (0.35,1.2,1.5)
         )
       )
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'sideLlu' (
         VERTICES (27,7,21,25)
         TEXTURE (
@@ -5473,7 +5684,7 @@ WORLD (
           V (-2,-1,1.5)
         )
       )
-      MATERIAL ('misty.gif')
+      MATERIAL ('misty')
       POLYGON 'roofU' (
         VERTICES (9,23,22,8)
         TEXTURE (
@@ -5495,7 +5706,7 @@ WORLD (
           V (-3,1.5,-1)
         )
       )
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'backD' (
         VERTICES (4,3,0,1)
         TEXTURE (
@@ -5512,7 +5723,7 @@ WORLD (
       )
       POLYGON 'windowU' (
         VERTICES (22,23,27,26)
-        MATERIAL ('misty.gif')
+        MATERIAL ('misty')
         TEXTURE (
           MATRIX (-0,0,0.5,0.390434,-0.312348,0,-0.312348,-0.390434,0)
           V (0.25,1.5,-1)
@@ -5520,13 +5731,13 @@ WORLD (
       )
       POLYGON 'windowD' (
         VERTICES (28,29,34,33)
-        MATERIAL ('sky.gif')
+        MATERIAL ('sky')
         TEXTURE (
           MATRIX (-0,0,0.5,0.214043,-0.451869,0,-0.451869,-0.214043,0)
           V (0.55,1.2,-1.4)
         )
       )
-      MATERIAL ('oldmetal.gif')
+      MATERIAL ('oldmetal')
       POLYGON 'windowDl' (
         VERTICES (26,28,33,32)
         TEXTURE (
@@ -5661,12 +5872,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-20,0.3,-2)
       )
     )
-    THING 'tire1' (
+    MESHOBJ 'tire1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,0,-0.35)
       VERTEX (-1,0,0.35)
       VERTEX (-0.92,-0.38,-0.35)
@@ -5707,7 +5921,7 @@ WORLD (
       VERTEX (1,-1,0.35)
       VERTEX (1,1,-0.35)
       VERTEX (1,1,0.35)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'front' (
         VERTICES (16,20,24,28,30,26,22,18,14,10,6,2,0,4,8,12)
         TEXTURE (
@@ -5835,12 +6049,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (0.5,0,0,0,0.5,0,0,0,0.5)
         V (-17.8,-0.9,-0.8)
       )
     )
-    THING 'tire2' (
+    MESHOBJ 'tire2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,0,-0.35)
       VERTEX (-1,0,0.35)
       VERTEX (-0.92,-0.38,-0.35)
@@ -5881,7 +6098,7 @@ WORLD (
       VERTEX (1,-1,0.35)
       VERTEX (1,1,-0.35)
       VERTEX (1,1,0.35)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'front' (
         VERTICES (16,20,24,28,30,26,22,18,14,10,6,2,0,4,8,12)
         TEXTURE (
@@ -6009,12 +6226,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (0.5,0,0,0,0.5,0,0,0,0.5)
         V (-17.8,-0.9,-3.2)
       )
     )
-    THING 'tire3' (
+    MESHOBJ 'tire3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,0,-0.35)
       VERTEX (-1,0,0.35)
       VERTEX (-0.92,-0.38,-0.35)
@@ -6055,7 +6275,7 @@ WORLD (
       VERTEX (1,-1,0.35)
       VERTEX (1,1,-0.35)
       VERTEX (1,1,0.35)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'front' (
         VERTICES (16,20,24,28,30,26,22,18,14,10,6,2,0,4,8,12)
         TEXTURE (
@@ -6183,12 +6403,15 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (0.5,0,0,0,0.5,0,0,0,0.5)
         V (-22.2,-0.9,-0.8)
       )
     )
-    THING 'tire4' (
+    MESHOBJ 'tire4' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,0,-0.35)
       VERTEX (-1,0,0.35)
       VERTEX (-0.92,-0.38,-0.35)
@@ -6229,7 +6452,7 @@ WORLD (
       VERTEX (1,-1,0.35)
       VERTEX (1,1,-0.35)
       VERTEX (1,1,0.35)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'front' (
         VERTICES (16,20,24,28,30,26,22,18,14,10,6,2,0,4,8,12)
         TEXTURE (
@@ -6357,6 +6580,7 @@ WORLD (
         )
       )
       MOVEABLE ()
+      )
       MOVE (
         MATRIX (0.5,0,0,0,0.5,0,0,0,0.5)
         V (-22.2,-0.9,-3.2)
@@ -6364,15 +6588,17 @@ WORLD (
     )
   )
   COLLECTION 'carCol' (
-    THING ('car')
-    THING ('tire1')
-    THING ('tire2')
-    THING ('tire3')
-    THING ('tire4')
+    MESHOBJ ('car')
+    MESHOBJ ('tire1')
+    MESHOBJ ('tire2')
+    MESHOBJ ('tire3')
+    MESHOBJ ('tire4')
   )
   SECTOR 'win4' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20.5,1,-10.5)
     VERTEX (-20.5,1,-10)
     VERTEX (-20.5,3.5,-10.5)
@@ -6383,7 +6609,7 @@ WORLD (
     VERTEX (-19,3.5,-10)
     POLYGON 'north' (
       VERTICES (3,7,5,1)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (49)
       PORTAL ('street1')
       TEXTURE (
@@ -6391,7 +6617,7 @@ WORLD (
         V (-20.5,3.5,-10)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (7,6,4,5)
       TEXTURE (
@@ -6429,10 +6655,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'win5' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-20.5,5.5,-10.5)
     VERTEX (-20.5,5.5,-10)
     VERTEX (-20.5,8,-10.5)
@@ -6443,7 +6672,7 @@ WORLD (
     VERTEX (-19,8,-10)
     POLYGON 'north' (
       VERTICES (3,7,5,1)
-      MATERIAL ('window.gif')
+      MATERIAL ('window')
       ALPHA (49)
       PORTAL ('street1')
       TEXTURE (
@@ -6451,7 +6680,7 @@ WORLD (
         V (-20.5,8,-10)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (7,6,4,5)
       TEXTURE (
@@ -6489,10 +6718,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'street1D' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-43,-1.3,-8.5)
     VERTEX (-43,-1.3,3.5)
     VERTEX (-43,-1,-8.5)
@@ -6515,13 +6747,13 @@ WORLD (
     VERTEX (-3,-1,3.5)
     POLYGON 'north' (
       VERTICES (3,19,17,1)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       TEXTURE (
         MATRIX (0.333333,0,-0,0,-0.333333,0,-0,0,0.333333)
         V (-43,-1,3.5)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (19,18,16,17)
       TEXTURE (
@@ -6536,7 +6768,7 @@ WORLD (
         V (-43,12,5)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'up' (
       VERTICES (2,18,19,3)
       PORTAL ('street1')
@@ -6567,7 +6799,7 @@ WORLD (
         V (-3,-1,-8.5)
       )
     )
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'downA' (
       VERTICES (1,5,4,0)
       TEXTURE (
@@ -6604,10 +6836,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'street1D2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-18,-1.3,-10)
     VERTEX (-18,-1.3,-8.5)
     VERTEX (-18,-1,-10)
@@ -6616,7 +6851,7 @@ WORLD (
     VERTEX (-13,-1.3,-8.5)
     VERTEX (-13,-1,-10)
     VERTEX (-13,-1,-8.5)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('street1D')
@@ -6657,17 +6892,20 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('asphalt.gif')
+      MATERIAL ('asphalt')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-43,-1.3,5)
       )
     )
     )
+    )
   )
   SECTOR 'roof1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-33,6,-10)
     VERTEX (-33,10.9,-15)
     VERTEX (-33,11,-15)
@@ -6676,7 +6914,7 @@ WORLD (
     VERTEX (-23,10.9,-15)
     VERTEX (-23,11,-15)
     VERTEX (-23,11,-10)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (3,7,4,0)
       PORTAL ('street1')
@@ -6716,17 +6954,20 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (0,4,5,1)
-      MATERIAL ('parket.gif')
+      MATERIAL ('parket')
       TEXTURE (
         MATRIX (0.2,0,0,0,0.139986,-0.142843,0,-0.142843,-0.139986)
         V (-33,6,-10)
       )
     )
     )
+    )
   )
   SECTOR 'street2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-18,-1.3,-30)
     VERTEX (-18,-1.3,-10)
     VERTEX (-18,-1,-10)
@@ -6737,7 +6978,7 @@ WORLD (
     VERTEX (-13,-1,-10)
     VERTEX (-13,11,-30)
     VERTEX (-13,11,-10)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'east' (
       VERTICES (9,8,5,6)
       TEXTURE (
@@ -6769,13 +7010,13 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,6,5,0)
-      MATERIAL ('asphalt.gif')
+      MATERIAL ('asphalt')
       TEXTURE (
         MATRIX (0.2,-0,0,-0,0,-0.2,-0,0.04,0)
         V (-43,-1.3,5)
       )
     )
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north1' (
       VERTICES (2,7,6,1)
       PORTAL ('street1D2')
@@ -6793,10 +7034,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'sky' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-3000,11,-3000)
     VERTEX (-3000,11,3000)
     VERTEX (-3000,411,-3000)
@@ -6827,7 +7071,7 @@ WORLD (
     VERTEX (3000,11,3000)
     VERTEX (3000,411,-3000)
     VERTEX (3000,411,3000)
-    MATERIAL ('sky.gif')
+    MATERIAL ('sky')
     POLYGON 'north' (
       VERTICES (3,29,27,1)
       LIGHTING (no)
@@ -6977,12 +7221,15 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (-10,100,-35:10000,.8,.8,.8,0)
     LIGHT (-10,100,0:10000,.2,.2,.25,0)
   )
   SECTOR 'inside' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-30,-1,-20)
     VERTEX (-30,-1,-10.5)
     VERTEX (-30,9,-20)
@@ -7003,7 +7250,7 @@ WORLD (
     VERTEX (-18.5,-1,-10.5)
     VERTEX (-18.5,9,-20)
     VERTEX (-18.5,9,-10.5)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'east' (
       VERTICES (19,18,16,17)
       TEXTURE (
@@ -7091,10 +7338,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'pool' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (5,-6,11)
     VERTEX (5,-6,16)
     VERTEX (5,-1,11)
@@ -7103,7 +7353,7 @@ WORLD (
     VERTEX (10,-6,16)
     VERTEX (10,-1,11)
     VERTEX (10,-1,16)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -7134,7 +7384,7 @@ WORLD (
     )
     POLYGON 'up' (
       VERTICES (2,6,7,3)
-      MATERIAL ('mosholes.gif')
+      MATERIAL ('mosholes')
       PORTAL ('large')
       TEXTURE (
         MATRIX (0.2,0,-0,0,-0,0.2,-0,0.2,-0)
@@ -7143,7 +7393,7 @@ WORLD (
     )
     POLYGON 'down' (
       VERTICES (1,5,4,0)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       PORTAL ('kamer1')
       TEXTURE (
         MATRIX (0.2,0,0,0,-0,-0.2,0,-0.2,-0)
@@ -7151,10 +7401,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'kamer1' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,-10,6)
     VERTEX (0,-10,21)
     VERTEX (5,-6,11)
@@ -7163,7 +7416,7 @@ WORLD (
     VERTEX (10,-6,16)
     VERTEX (15,-10,6)
     VERTEX (15,-10,21)
-    MATERIAL ('parket.gif')
+    MATERIAL ('parket')
     POLYGON 'north' (
       VERTICES (3,5,7,1)
       TEXTURE (
@@ -7209,10 +7462,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'kamer2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,-19,6)
     VERTEX (0,-19,11)
     VERTEX (0,-19,16)
@@ -7241,7 +7497,7 @@ WORLD (
     VERTEX (15,-14,21)
     VERTEX (15,-10,6)
     VERTEX (15,-10,21)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'up' (
       VERTICES (8,26,27,9)
       PORTAL ('kamer1')
@@ -7374,11 +7630,14 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (3,-12,19:9,.9,.7,.7,0)
   )
   SECTOR 'kamer2u' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (5,-19,21)
     VERTEX (5,-19,40)
     VERTEX (5,-14,21)
@@ -7387,7 +7646,7 @@ WORLD (
     VERTEX (10,-19,40)
     VERTEX (10,-14,21)
     VERTEX (10,-14,40)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -7432,10 +7691,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'kamer2d' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (5,-19,-13)
     VERTEX (5,-19,6)
     VERTEX (5,-14,-13)
@@ -7444,7 +7706,7 @@ WORLD (
     VERTEX (10,-19,6)
     VERTEX (10,-14,-13)
     VERTEX (10,-14,6)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('kamer2')
@@ -7489,10 +7751,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'kamer2r' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (15,-19,11)
     VERTEX (15,-19,16)
     VERTEX (15,-14,11)
@@ -7501,7 +7766,7 @@ WORLD (
     VERTEX (34,-19,16)
     VERTEX (34,-14,11)
     VERTEX (34,-14,16)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -7546,11 +7811,14 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (19,-15,13.5:10,.9,.7,.7,0)
   )
   SECTOR 'kamer2l' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-19,-19,11)
     VERTEX (-19,-19,16)
     VERTEX (-19,-14,11)
@@ -7559,7 +7827,7 @@ WORLD (
     VERTEX (0,-19,16)
     VERTEX (0,-14,11)
     VERTEX (0,-14,16)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -7604,10 +7872,13 @@ WORLD (
       )
     )
     )
+    )
   )
   SECTOR 'gang' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-30,-1,20)
     VERTEX (-30,3,20)
     VERTEX (-24,-1,20)
@@ -7616,7 +7887,7 @@ WORLD (
     VERTEX (-20,-1,16)
     VERTEX (-20,3,10)
     VERTEX (-20,3,16)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (1,3,2,0)
       PORTAL ('gang2')
@@ -7647,7 +7918,7 @@ WORLD (
         V (-20,3,10)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'up' (
       VERTICES (6,7,3,1)
       TEXTURE (
@@ -7663,11 +7934,14 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (CENTER (-23,2.8,15) RADIUS (7) COLOR (.9,.7,.7))
   )
   SECTOR 'gang2' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-30,-1,20)
     VERTEX (-30,-1,32)
     VERTEX (-30,3,20)
@@ -7676,7 +7950,7 @@ WORLD (
     VERTEX (-24,-1,32)
     VERTEX (-24,3,20)
     VERTEX (-24,3,32)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       PORTAL ('gang3')
@@ -7707,7 +7981,7 @@ WORLD (
         V (-30,3,20)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'up' (
       VERTICES (2,6,7,3)
       TEXTURE (
@@ -7723,14 +7997,17 @@ WORLD (
       )
     )
     )
-    THING 'a1' (
+    )
+    MESHOBJ 'a1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.3,-0.4,-0.2) VERTEX (-0.3,-0.4,0.2) VERTEX (-0.3,0.4,-0.2)
       VERTEX (-0.3,0.4,0.2) VERTEX (0.3,-0.4,-0.2) VERTEX (0.3,-0.4,0.2)
       VERTEX (0.3,0.4,-0.2) VERTEX (0.3,0.4,0.2) VERTEX (-0.3,-0.4,-0.2)
       VERTEX (-0.3,-0.4,0.2) VERTEX (-0.3,0.4,-0.2) VERTEX (-0.3,0.4,0.2)
       VERTEX (0.3,-0.4,-0.2) VERTEX (0.3,-0.4,0.2) VERTEX (0.3,0.4,-0.2)
       VERTEX (0.3,0.4,0.2)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -7772,20 +8049,23 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.3,-0.4,0.2)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-29.7,2,25.2)
       )
     )
-    THING 'a2' (
+    MESHOBJ 'a2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.3,-0.4,-0.2) VERTEX (-0.3,-0.4,0.2) VERTEX (-0.3,0.4,-0.2)
       VERTEX (-0.3,0.4,0.2) VERTEX (0.3,-0.4,-0.2) VERTEX (0.3,-0.4,0.2)
       VERTEX (0.3,0.4,-0.2) VERTEX (0.3,0.4,0.2) VERTEX (-0.3,-0.4,-0.2)
       VERTEX (-0.3,-0.4,0.2) VERTEX (-0.3,0.4,-0.2) VERTEX (-0.3,0.4,0.2)
       VERTEX (0.3,-0.4,-0.2) VERTEX (0.3,-0.4,0.2) VERTEX (0.3,0.4,-0.2)
       VERTEX (0.3,0.4,0.2)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -7828,19 +8108,22 @@ WORLD (
           V (0.3,-0.4,0.2)
         )
       )
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-29.7,2,26.8)
       )
     )
-    THING 'a3' (
+    MESHOBJ 'a3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.3,-0.2,-1) VERTEX (-0.3,-0.2,1) VERTEX (-0.3,0.2,-1)
       VERTEX (-0.3,0.2,1) VERTEX (0.3,-0.2,-1) VERTEX (0.3,-0.2,1)
       VERTEX (0.3,0.2,-1) VERTEX (0.3,0.2,1) VERTEX (-0.3,-0.2,-1)
       VERTEX (-0.3,-0.2,1) VERTEX (-0.3,0.2,-1) VERTEX (-0.3,0.2,1)
       VERTEX (0.3,-0.2,-1) VERTEX (0.3,-0.2,1) VERTEX (0.3,0.2,-1)
       VERTEX (0.3,0.2,1)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -7883,6 +8166,7 @@ WORLD (
           V (0.3,-0.2,1)
         )
       )
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-29.7,2.6,26)
@@ -7891,8 +8175,10 @@ WORLD (
     LIGHT (CENTER (-29.8,2,26) RADIUS (7) COLOR (.7,.7,.9))
   )
   SECTOR 'gang3' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (-30,-1,32)
     VERTEX (-30,-1,38)
     VERTEX (-30,3,32)
@@ -7909,7 +8195,7 @@ WORLD (
     VERTEX (0,-1,38)
     VERTEX (0,3,32)
     VERTEX (0,3,38)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,15,13,1)
       TEXTURE (
@@ -7932,7 +8218,7 @@ WORLD (
         V (-30,3,32)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'up' (
       VERTICES (2,14,15,3)
       TEXTURE (
@@ -7947,7 +8233,7 @@ WORLD (
         V (-20,-1,20)
       )
     )
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'southA' (
       VERTICES (14,11,9,12)
       TEXTURE (
@@ -7986,7 +8272,10 @@ WORLD (
       )
     )
     )
-    THING 'e1' (
+    )
+    MESHOBJ 'e1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -7995,7 +8284,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8037,13 +8326,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.2,-0.4,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-4.2,2,37.7)
       )
     )
-    THING 'e2' (
+    MESHOBJ 'e2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -8052,7 +8344,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8094,13 +8386,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.2,-0.4,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-5.8,2,37.7)
       )
     )
-    THING 'e3' (
+    MESHOBJ 'e3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,-0.2,-0.3) VERTEX (-1,-0.2,0.3)
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
@@ -8109,7 +8404,7 @@ WORLD (
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
       VERTEX (1,0.2,-0.3) VERTEX (1,0.2,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8151,13 +8446,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (1,-0.2,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-5,2.6,37.7)
       )
     )
-    THING 'c1' (
+    MESHOBJ 'c1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -8166,7 +8464,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8208,13 +8506,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.2,-0.4,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-14.2,2,37.7)
       )
     )
-    THING 'c2' (
+    MESHOBJ 'c2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -8223,7 +8524,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8265,13 +8566,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.2,-0.4,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-15.8,2,37.7)
       )
     )
-    THING 'c3' (
+    MESHOBJ 'c3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,-0.2,-0.3) VERTEX (-1,-0.2,0.3)
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
@@ -8280,7 +8584,7 @@ WORLD (
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
       VERTEX (1,0.2,-0.3) VERTEX (1,0.2,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8322,13 +8626,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (1,-0.2,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-15,2.6,37.7)
       )
     )
-    THING 'a1' (
+    MESHOBJ 'a1' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -8337,7 +8644,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8379,13 +8686,16 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (0.2,-0.4,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-24.2,2,37.7)
       )
     )
-    THING 'a2' (
+    MESHOBJ 'a2' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-0.2,-0.4,-0.3) VERTEX (-0.2,-0.4,0.3)
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
@@ -8394,7 +8704,7 @@ WORLD (
       VERTEX (-0.2,0.4,-0.3) VERTEX (-0.2,0.4,0.3)
       VERTEX (0.2,-0.4,-0.3) VERTEX (0.2,-0.4,0.3)
       VERTEX (0.2,0.4,-0.3) VERTEX (0.2,0.4,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8437,12 +8747,15 @@ WORLD (
           V (0.2,-0.4,0.3)
         )
       )
+      )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
         V (-25.8,2,37.7)
       )
     )
-    THING 'a3' (
+    MESHOBJ 'a3' (
+      PLUGIN ('thing')
+      PARAMS (
       VERTEX (-1,-0.2,-0.3) VERTEX (-1,-0.2,0.3)
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
@@ -8451,7 +8764,7 @@ WORLD (
       VERTEX (-1,0.2,-0.3) VERTEX (-1,0.2,0.3)
       VERTEX (1,-0.2,-0.3) VERTEX (1,-0.2,0.3)
       VERTEX (1,0.2,-0.3) VERTEX (1,0.2,0.3)
-      MATERIAL ('oldbrick.gif')
+      MATERIAL ('oldbrick')
       POLYGON 'north' (
         VERTICES (1,5,7,3)
         TEXTURE (
@@ -8493,6 +8806,7 @@ WORLD (
           MATRIX (-0.2,0,-0,0,0,-0.2,0,0.2,0)
           V (1,-0.2,0.3)
         )
+      )
       )
       HARDMOVE (
         MATRIX (1,0,0,0,1,0,0,0,1)
@@ -8504,8 +8818,10 @@ WORLD (
     LIGHT (CENTER (-25,2,37.4) RADIUS (6) COLOR (.9,.6,.6))
   )
   SECTOR 'gang4' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,-1,32)
     VERTEX (0,-1,38)
     VERTEX (0,3,32)
@@ -8526,7 +8842,7 @@ WORLD (
     VERTEX (40,7,34.7)
     VERTEX (40,7,35.3)
     VERTEX (40,7,38)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (5,19,15,1)
       TEXTURE (
@@ -8557,7 +8873,7 @@ WORLD (
         V (0,3,32)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'down' (
       VERTICES (1,15,14,0)
       TEXTURE (
@@ -8617,11 +8933,14 @@ WORLD (
       )
     )
     )
+    )
     FOG (0,1,1,0.05)
   )
   SECTOR 'gang5' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (40,3,32)
     VERTEX (40,3,38)
     VERTEX (40,7,32)
@@ -8632,7 +8951,7 @@ WORLD (
     VERTEX (50,13,24)
     VERTEX (50,13,35)
     VERTEX (50,13,46)
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'north' (
       VERTICES (3,9,6,1)
       TEXTURE (
@@ -8655,7 +8974,7 @@ WORLD (
         V (40,7,32)
       )
     )
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'up' (
       VERTICES (2,7,9,3)
       TEXTURE (
@@ -8670,7 +8989,7 @@ WORLD (
         V (40,3,38)
       )
     )
-    MATERIAL ('asphalt.gif')
+    MATERIAL ('asphalt')
     POLYGON 'eastA' (
       VERTICES (9,8,5,6)
       PORTAL ('gang5a')
@@ -8688,12 +9007,15 @@ WORLD (
       )
     )
     )
+    )
     LIGHT (41,6,35:28,.9,.6,.6,0)
     FOG (0,1,1,0.05)
   )
   SECTOR 'gang5a' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (50,-3,35)
     VERTEX (50,-3,46)
     VERTEX (50,13,35)
@@ -8702,7 +9024,7 @@ WORLD (
     VERTEX (60,-2,42)
     VERTEX (60,4,39)
     VERTEX (60,4,42)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -8747,11 +9069,14 @@ WORLD (
       )
     )
     )
+    )
     FOG (0,1,1,0.05)
   )
   SECTOR 'gang5b' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (50,-3,24)
     VERTEX (50,-3,35)
     VERTEX (50,13,24)
@@ -8760,7 +9085,7 @@ WORLD (
     VERTEX (60,3,31)
     VERTEX (60,7,28)
     VERTEX (60,7,31)
-    MATERIAL ('oldbrick.gif')
+    MATERIAL ('oldbrick')
     POLYGON 'north' (
       VERTICES (3,7,5,1)
       TEXTURE (
@@ -8805,11 +9130,14 @@ WORLD (
       )
     )
     )
+    )
     FOG (0,1,1,0.05)
   )
   SECTOR 'biglight' (
-    THING 'walls' (
+    MESHOBJ 'walls' (
+    PLUGIN ('thing')
     ZFILL ()
+    PARAMS (
     VERTEX (0,3,32)
     VERTEX (0,3,34.7)
     VERTEX (0,3,35.3)
@@ -8830,7 +9158,7 @@ WORLD (
     VERTEX (40,7,38)
     VERTEX (40,1000,32)
     VERTEX (40,1000,38)
-    MATERIAL ('sky.gif')
+    MATERIAL ('sky')
     POLYGON 'north' (
       VERTICES (5,19,17,3)
       TEXTURE (
@@ -8916,6 +9244,7 @@ WORLD (
         MATRIX (0.00497519,0.000497518,0,0,-0,-0.005,0.000497519,-0.00497519,-0)
         V (0,3,38)
       )
+    )
     )
     )
     LIGHT (20,900,35:10000,1.3,1,1.3,0)

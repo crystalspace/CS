@@ -45,6 +45,19 @@ csPortal::csPortal ()
   filter_g = 1;
   filter_b = 1;
   sector = NULL;
+  sector_cb = NULL;
+  sector_cbData = NULL;
+}
+
+bool csPortal::CompleteSector (iBase* context)
+{
+  if (sector)
+    return true;
+  else if (sector_cb)
+  {
+    return sector_cb ((iPortal*)this, context, sector_cbData);
+  }
+  return false;
 }
 
 void csPortal::ObjectToWorld (const csReversibleTransform& t)
@@ -111,7 +124,7 @@ static void InvPerspective (const csVector2& p, float z, csVector3& v,
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     	iRenderView* rview)
 {
-  if (!sector) CompleteSector ();
+  CompleteSector (rview);
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
   float inv_aspect = icam->GetInvFOV ();
@@ -195,7 +208,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 	csVector3& isect)
 {
-  if (!sector) CompleteSector ();
+  CompleteSector (NULL);
 
   if (sector->draw_busy >= 5)
     return NULL;
@@ -215,7 +228,7 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 	csPolygon3D** polygonPtr)
 {
-  if (!sector) CompleteSector ();
+  CompleteSector (NULL);
 
   if (sector->draw_busy >= 5)
     return NULL;
@@ -229,17 +242,17 @@ csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end,
   else return sector->HitBeam (start, end, polygonPtr);
 }
 
-void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
+void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
 {
-  if (!sector) CompleteSector ();
+  CompleteSector (lview);
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
-  csFrustumContext* old_ctxt = lview.GetFrustumContext ();
-  lview.CreateFrustumContext ();
-  csFrustumContext* new_ctxt = lview.GetFrustumContext ();
+  csFrustumContext* old_ctxt = lview->GetFrustumContext ();
+  lview->CreateFrustumContext ();
+  csFrustumContext* new_ctxt = lview->GetFrustumContext ();
   if (old_ctxt->GetLightFrustum ())
     new_ctxt->SetLightFrustum (new csFrustum (*old_ctxt->GetLightFrustum ()));
-  lview.StartNewShadowBlock ();
+  lview->StartNewShadowBlock ();
 
   // If copied_frustums is true we copied the frustums and we need to
   // delete them later.
@@ -316,7 +329,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     }
   }
 
-  sector->RealCheckFrustum ((iFrustumView*)&lview);
+  sector->RealCheckFrustum (lview);
 
   if (copied_frustums)
   {
@@ -325,7 +338,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   }
 
 stop:
-  lview.RestoreFrustumContext (old_ctxt);
+  lview->RestoreFrustumContext (old_ctxt);
 }
 
 iSector *csPortal::GetPortal ()

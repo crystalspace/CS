@@ -97,11 +97,6 @@ public:
     virtual bool PrepareTextures ();
 
     /**
-     * Prepare all sectors in this region.
-     */
-    virtual bool PrepareSectors ();
-
-    /**
      * Do lighting calculations (or read from cache).
      */
     virtual bool ShineLights ();
@@ -110,18 +105,12 @@ public:
      * Prepare all objects in this region. This has to be called
      * directly after loading new objects.
      * This function is equivalent to calling PrepareTextures(),
-     * followed by PrepareSectors(), followed by ShineLights().
+     * followed by ShineLights().
      */
     virtual bool Prepare ();
 
     /// Find a sector in this region by name.
     virtual iSector *FindSector (const char *iName);
-    /// Find a thing in this region by name
-    virtual iThing *FindThing (const char *iName);
-    /// Find a sky thing in this region by name
-    virtual iThing *FindSky (const char *iName);
-    /// Find a thing template in this region by name
-    virtual iThing *FindThingTemplate (const char *iName);
     /// Find a mesh in this region by name
     virtual iMeshWrapper *FindMeshObject (const char *iName);
     /// Find a mesh factory in this region by name

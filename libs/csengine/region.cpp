@@ -125,34 +125,6 @@ void csRegion::Region::DeleteAll ()
       copy[i] = NULL;
     }
 
-  // First things and only then thing templates.
-  for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
-    {
-      csThing* o = (csThing*)copy[i];
-      int idx = scfParent->engine->thing_templates.Find (o);
-      if (idx == -1)
-      {
-        delete o;
-	copy[i] = NULL;
-      }
-    }
-
-  // @@@ Should thing templates be deleted if there are still things
-  // (in other regions) using them? Maybe a ref counter. Also make
-  // sure to ObjRelease when you don't delete a thing template.
-  for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
-    {
-      csThing* o = (csThing*)copy[i];
-      int idx = scfParent->engine->thing_templates.Find (o);
-      if (idx != -1)
-      {
-        scfParent->engine->thing_templates.Delete (idx);
-	copy[i] = NULL;
-      }
-    }
-
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i] && ((csObject*)copy[i])->GetType () == csSector::Type)
     {
@@ -288,17 +260,6 @@ bool csRegion::Region::PrepareTextures ()
   return true;
 }
 
-bool csRegion::Region::PrepareSectors ()
-{
-  for (csObjIterator iter = scfParent->GetIterator (csSector::Type);
-    !iter.IsFinished () ; ++iter)
-  {
-    csSector* s = (csSector*)iter.GetObj ();
-    s->Prepare ();
-  }
-  return true;
-}
-
 bool csRegion::Region::ShineLights ()
 {
   scfParent->engine->ShineLights (scfParent);
@@ -308,7 +269,6 @@ bool csRegion::Region::ShineLights ()
 bool csRegion::Region::Prepare ()
 {
   if (!PrepareTextures ()) return false;
-  if (!PrepareSectors ()) return false;
   if (!ShineLights ()) return false;
   return true;
 }
@@ -343,57 +303,10 @@ iSector* csRegion::Region::FindSector (const char *iName)
   return &obj->scfiSector;
 }
 
-iThing* csRegion::Region::FindThing (const char *iName)
-{
-  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
-    !iter.IsFinished () ; ++iter)
-  {
-    csThing* o = (csThing*)iter.GetObj ();
-    if (!o->IsSky () && !o->IsTemplate ())
-    {
-      // Only if not a sky and not a template.
-      const char* on = o->GetName ();
-      if (on && !strcmp (on, iName)) return &o->scfiThing;
-    }
-  }
-  return NULL;
-}
-
-iThing* csRegion::Region::FindSky (const char *iName)
-{
-  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
-    !iter.IsFinished () ; ++iter)
-  {
-    csThing* o = (csThing*)iter.GetObj ();
-    if (o->IsSky () && !o->IsTemplate ())
-    {
-      // Only if a sky and not a template.
-      const char* on = o->GetName ();
-      if (on && !strcmp (on, iName)) return &o->scfiThing;
-    }
-  }
-  return NULL;
-}
-
-iThing* csRegion::Region::FindThingTemplate (const char *iName)
-{
-  for (csObjIterator iter = scfParent->GetIterator (csThing::Type, false);
-    !iter.IsFinished () ; ++iter)
-  {
-    csThing* o = (csThing*)iter.GetObj ();
-    if (o->IsTemplate ())
-    {
-      // Only if a template.
-      const char* on = o->GetName ();
-      if (on && !strcmp (on, iName)) return &o->scfiThing;
-    }
-  }
-  return NULL;
-}
-
 iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  csMeshWrapper* obj = (csMeshWrapper*)scfParent->FindObject(iName,csMeshWrapper::Type,true);
+  csMeshWrapper* obj = (csMeshWrapper*)scfParent->FindObject (iName,
+  	csMeshWrapper::Type,true);
   if (!obj) return NULL;
   return QUERY_INTERFACE (obj, iMeshWrapper);
 }

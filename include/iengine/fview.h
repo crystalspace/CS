@@ -214,7 +214,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 1);
+SCF_VERSION (iFrustumView, 0, 1, 3);
 
 /**
  * This structure represents all information needed for the frustum
@@ -232,6 +232,16 @@ struct iFrustumView : public iBase
    * (with SCF references properly incremented).
    */
   virtual void CreateFrustumContext () = 0;
+  /**
+   * Create a copy of the current frustum context and return it. This
+   * can be used to later put it back. Use SetFrustumContext() for this.
+   */
+  virtual csFrustumContext* CopyFrustumContext () = 0;
+  /**
+   * This function is similar to CreateFrustumContext() but it sets the
+   * given frustum context instead. Also restore with RestoreFrustumContext().
+   */
+  virtual void SetFrustumContext (csFrustumContext* ctxt) = 0;
   /**
    * Restore a frustum context. Use this to restore a previously overwritten
    * frustum context. This function will take care of properly cleaning
@@ -259,6 +269,9 @@ struct iFrustumView : public iBase
   virtual bool IsDynamic () = 0;
   /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
   virtual void SetDynamic (bool d) = 0;
+
+  /// Start new shadow list for this frustum.
+  virtual void StartNewShadowBlock () = 0;
 };
 
 #endif

@@ -42,7 +42,6 @@ class csTextureList;
 class csMaterialList;
 class csPolygon3D;
 class csCamera;
-class csThing;
 class csCollection;
 class csStatLight;
 class csDynLight;
@@ -138,80 +137,6 @@ struct iImageLoader;
  */
 #define CS_CULLER_COVTREE 2
 
-
-/**
- * Iterator to iterate over all polygons in the engine.
- * This iterator assumes there are no fundamental changes
- * in the engine while it is being used.
- * If changes to the engine happen the results are unpredictable.
- */
-class csPolyIt
-{
-private:
-  // The engine for this iterator.
-  csEngine* engine;
-  // The region we are iterating in (optional).
-  csRegion* region;
-  // Current sector index.
-  int sector_idx;
-  // Current thing index.
-  int thing_idx;
-  // Current polygon index.
-  int polygon_idx;
-
-  // Go to next sector. Return false if finished.
-  bool NextSector ();
-
-public:
-  /// Construct an iterator and initialize to start.
-  csPolyIt (csEngine*, csRegion* region = NULL);
-
-  /// Restart iterator.
-  void Restart ();
-
-  /// Get polygon from iterator. Return NULL at end.
-  csPolygon3D* Fetch ();
-
-  /// Get the sector for the last fetched polygon.
-  csSector* GetLastSector ();
-};
-
-/**
- * Iterator to iterate over all curves in the engine.
- * This iterator assumes there are no fundamental changes
- * in the engine while it is being used.
- * If changes to the engine happen the results are unpredictable.
- */
-class csCurveIt
-{
-private:
-  // The engine for this iterator.
-  csEngine* engine;
-  // The region we are iterating in (optional).
-  csRegion* region;
-  // Current sector index.
-  int sector_idx;
-  // Current thing index.
-  int thing_idx;
-  // Current polygon index.
-  int curve_idx;
-
-  // Go to next sector. Return false if finished.
-  bool NextSector ();
-
-public:
-  /// Construct an iterator and initialize to start.
-  csCurveIt (csEngine*, csRegion* region = NULL);
-
-  /// Restart iterator.
-  void Restart ();
-
-  /// Get curve from iterator. Return NULL at end.
-  csCurve* Fetch ();
-
-  /// Get the sector for the last fetched curve.
-  csSector* GetLastSector ();
-};
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -332,7 +257,6 @@ private:
   bool CheckType (const csIdType* ctype);
 
   // Start looking for stuff.
-  void StartThings ();
   void StartStatLights ();
   void StartMeshes ();
   void EndSearch ();
@@ -442,12 +366,6 @@ public:
   csNamedObjVector terrain_factories;
 
   /**
-   * List of thing templates. This vector contains objects of
-   * type csThing*.
-   */
-  csNamedObjVector thing_templates;
-
-  /**
    * List of curve templates (bezier templates). This vector contains objects of
    * type csCurveTemplate*.
    */
@@ -472,26 +390,6 @@ public:
    * need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector terrains;
-
-  /**
-   * List of all things in the engine. This vector contains objects
-   * of type csThing*. Use UnlinkThing() and RemoveThing() to
-   * unlink and/or remove things from this list. These functions
-   * take care of correctly removing the things from all sectors
-   * as well. Note that after you add a thing to the list you still
-   * need to add it to all sectors that you want it to be visible in.
-   */
-  csNamedObjVector things;
-
-  /**
-   * List of all skies in the engine. This vector contains objects
-   * of type csThing*. Use UnlinkSky() and RemoveSky() to
-   * unlink and/or remove skies from this list. These functions
-   * take care of correctly removing the skies from all sectors
-   * as well. Note that after you add a sky to the list you still
-   * need to add it to all sectors that you want it to be visible in.
-   */
-  csNamedObjVector skies;
 
   /**
    * The list of all camera position objects.
@@ -668,12 +566,6 @@ public:
    * the textures.
    */
   void PrepareTextures ();
-
-  /**
-   * Prepare all the loaded sectors. (Normally you shouldn't call this 
-   * function directly, because it will be called by Prepare() for you.
-   */
-  void PrepareSectors();
 
   /**
    * Calls UpdateMove for all meshes to initialise bsp bounding boxes.
@@ -923,13 +815,6 @@ public:
   /**
    * Conveniance function to create the thing containing the
    * convex outline of a sector. The thing will be empty but
-   * it will have CS_ZBUF_FILL set.
-   */
-  csThing* CreateSectorWalls (csSector* sector, const char* name);
-
-  /**
-   * Conveniance function to create the thing containing the
-   * convex outline of a sector. The thing will be empty but
    * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
    */
   iMeshWrapper* CreateSectorWallsMesh (csSector* sector, const char* name);
@@ -1067,30 +952,6 @@ public:
   void RemoveTerrain (csTerrainWrapper *pTerrain);
 
   /**
-   * Unlink a thing from the engine (but do not delete it).
-   * It is also removed from all sectors.
-   */
-  void UnlinkThing (csThing* thing);
-
-  /**
-   * Unlink and delete a thing from the engine.
-   * It is also removed from all sectors.
-   */
-  void RemoveThing (csThing* thing);
-
-  /**
-   * Unlink a sky from the engine (but do not delete it).
-   * It is also removed from all sectors.
-   */
-  void UnlinkSky (csThing* thing);
-
-  /**
-   * Unlink and delete a sky from the engine.
-   * It is also removed from all sectors.
-   */
-  void RemoveSky (csThing* thing);
-
-  /**
    * Unlink a collection from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
@@ -1101,16 +962,6 @@ public:
    * It is also removed from all sectors.
    */
   void RemoveCollection (csCollection* collection);
-
-  /**
-   * Create an iterator to iterate over all polygons of the engine.
-   */
-  csPolyIt* NewPolyIterator (csRegion* region = NULL)
-  {
-    csPolyIt* it;
-    it = new csPolyIt (this, region);
-    return it;
-  }
 
   /**
    * Create an iterator to iterate over all static lights of the engine.
@@ -1210,8 +1061,6 @@ public:
     const csMatrix3 &iMatrix);
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName, bool link = true);
-  /// Create a empty thing with given name.
-  virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
   /// Query number of sectors in engine
   virtual int GetSectorCount ()
@@ -1221,12 +1070,6 @@ public:
   /// Find a sector by name
   virtual iSector *FindSector (const char *iName, bool regionOnly = false);
 
-  /// Find a thing by name
-  virtual iThing *FindThing (const char *iName, bool regionOnly = false);
-  /// Find a sky thing by name
-  virtual iThing *FindSky (const char *iName, bool regionOnly = false);
-  /// Find a thing template by name
-  virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false);
   /// Find a mesh by name
   virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false);
   /// Find a mesh factory by name

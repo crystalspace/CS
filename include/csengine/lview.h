@@ -452,11 +452,15 @@ public:
   virtual csFrustumContext* GetFrustumContext () const { return ctxt; }
   /// Create a new frustum context.
   virtual void CreateFrustumContext ();
+  /// Create a copy.
+  virtual csFrustumContext* CopyFrustumContext ();
+  /// Set the frustum context.
+  virtual void SetFrustumContext (csFrustumContext* ctxt);
   /// Restore a frustum context.
   virtual void RestoreFrustumContext (csFrustumContext* original);
 
   /// Start new shadow list for this frustum.
-  void StartNewShadowBlock ();
+  virtual void StartNewShadowBlock ();
 
   /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
   virtual bool IsDynamic () { return dynamic; }

@@ -27,7 +27,6 @@
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
 
-class csThing;
 class csEngine;
 class csStatLight;
 class csMeshWrapper;
@@ -64,19 +63,9 @@ private:
   csVector meshes;
 
   /**
-   * List of things in this sector.
-   */
-  csVector things;
-
-  /**
    * List of collections in this sector.
    */
   csVector collections;
-
-  /**
-   * List of sky objects in this sector.
-   */
-  csVector skies;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
@@ -160,18 +149,6 @@ public:
   virtual ~csSector ();
 
   //----------------------------------------------------------------------
-  // Setup
-  //----------------------------------------------------------------------
-
-  /**
-   * Prepare all polygons for use. This function MUST be called
-   * AFTER the texture manager has been prepared. This function
-   * is normally called by csEngine::Prepare() so you only need
-   * to worry about this function when you add sectors later.
-   */
-  virtual void Prepare ();
-
-  //----------------------------------------------------------------------
   // Mesh manipulation functions
   //----------------------------------------------------------------------
 
@@ -205,76 +182,6 @@ public:
    * Find the given mesh by name.
    */
   csMeshWrapper* GetMesh (const char* name);
-
-  //----------------------------------------------------------------------
-  // Thing manipulation functions
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a thing to this sector and register it to the culler.
-   */
-  void AddThing (csThing* thing);
-
-  /**
-   * Unlink a thing from this sector and remove it from the culler.
-   */
-  void UnlinkThing (csThing* thing);
-
-  /**
-   * Get the number of things in this sector.
-   */
-  int GetNumThings ()
-  {
-    return things.Length ();
-  }
-
-  /**
-   * Get the specified thing.
-   */
-  csThing* GetThing (int idx)
-  {
-    return (csThing*)things[idx];
-  }
-
-  /**
-   * Find a thing with the given name.
-   */
-  csThing* GetThing (const char* name);
-
-  //----------------------------------------------------------------------
-  // Sky manipulation functions
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a sky thing to this sector and register it to the culler.
-   */
-  void AddSky (csThing* thing);
-
-  /**
-   * Unlink a sky thing from this sector and remove it from the culler.
-   */
-  void UnlinkSky (csThing* thing);
-
-  /**
-   * Get the number of skies in this sector.
-   */
-  int GetNumberSkies ()
-  {
-    return skies.Length ();
-  }
-
-  /**
-   * Get the specified sky.
-   */
-  csThing* GetSky (int idx)
-  {
-    return (csThing*)skies[idx];
-  }
-
-  /**
-   * Find a sky thing with the given name.
-   */
-  csThing* GetSky (const char* name);
 
   //----------------------------------------------------------------------
   // Collection manipulation functions
@@ -525,8 +432,7 @@ public:
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
-  	bool do_terrain);
+  void CalculateSectorBBox (csBox3& bbox, bool do_meshes, bool do_terrain);
 
   //------------------------------------------------
   // Everything for setting up the lighting system.
@@ -612,21 +518,13 @@ public:
     {
       return scfParent->GetVisibilityCuller ();
     }
-    virtual iThing *GetSkyThing (const char *name);
-    virtual int GetNumSkyThings ()
-    { return scfParent->skies.Length (); }
-    virtual iThing *GetSkyThing (int iIndex);
-    virtual iThing *GetThing (const char *name);
-    virtual int GetNumThings ()
-    { return scfParent->things.Length (); }
-    virtual iThing *GetThing (int iIndex);
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
     virtual void AddLight (iStatLight *light);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
-    virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,
+    virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
   	bool do_terrain)
     {
-      scfParent->CalculateSectorBBox (bbox, do_things, do_meshes, do_terrain);
+      scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain);
     }
     virtual CS_ID GetID () { return scfParent->GetID (); }
     virtual bool HasFog () { return scfParent->HasFog (); }

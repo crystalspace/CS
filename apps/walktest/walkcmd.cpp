@@ -466,16 +466,16 @@ void WalkTest::ParseKeyCmds (csObject* src)
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
-        anim_sky = ((csSector*)src)->GetSky (name);
+        anim_sky = ((csSector*)src)->GetMesh (name);
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      if (src->GetType () == csThing::Type)
+      if (src->GetType () == csMeshWrapper::Type)
       {
         csVector3 hinge;
         ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
-	csDoor* door = new csDoor ((csThing*)src);
+	csDoor* door = new csDoor ((csMeshWrapper*)src);
 	door->SetHinge (hinge);
         src->ObjAdd (door);
       }
@@ -495,7 +495,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      if (src->GetType () == csThing::Type)
+      if (src->GetType () == csMeshWrapper::Type)
       {
 	csColor start_col, end_col;
 	float act_time;
@@ -556,11 +556,6 @@ void WalkTest::ParseKeyCmds ()
     ParseKeyCmds (sector);
 
     int j;
-    for (j = 0 ; j < sector->GetNumThings () ; j++)
-    {
-      csThing* thing = sector->GetThing (j);
-      ParseKeyCmds (thing);
-    }
     for (j = 0 ; j < sector->GetNumberMeshes () ; j++)
     {
       csMeshWrapper* sprite = sector->GetMesh (j);

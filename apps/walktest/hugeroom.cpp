@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,7 +24,7 @@
 #include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/light.h"
-#include "csengine/thing.h"
+#include "csengine/meshobj.h"
 
 extern WalkTest* Sys;
 
@@ -71,12 +71,12 @@ HugeRoom::HugeRoom ()
   seed = 1654594509;
 }
 
-void HugeRoom::create_wall (csThing* thing,
+void HugeRoom::create_wall (iThingState* thing_state,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	const csVector3& p4, int hor_res, int ver_res, int txt)
 {
   int i, j;
-  csPolygon3D* p;
+  iPolygon3D* p;
   for (i = 0 ; i < hor_res ; i++)
     for (j = 0 ; j < ver_res ; j++)
     {
@@ -88,44 +88,46 @@ void HugeRoom::create_wall (csThing* thing,
       csVector3 v2 = v12b + ((float)j/(float)ver_res) * (v43b-v12b);
       csVector3 v3 = v12b + ((float)(j+1)/(float)ver_res) * (v43b-v12b);
       csVector3 v4 = v12a + ((float)(j+1)/(float)ver_res) * (v43a-v12a);
-      p = create_polygon (thing, v1, v2, v3, txt);
-      create_polygon (thing, v1, v3, v4, txt);
+      p = create_polygon (thing_state, v1, v2, v3, txt);
+      create_polygon (thing_state, v1, v3, v4, txt);
     }
 }
 
-csPolygon3D* HugeRoom::create_polygon (csThing* thing,
+iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt)
 {
   csMatrix3 t_m;
   csVector3 t_v (0, 0, 0);
 
-  csMaterialWrapper* tm = NULL;
+  iMaterialWrapper* tm = NULL;
   switch (txt)
   {
     case 0: tm = NULL; break;
-    case 1: tm = engine->GetMaterials ()->FindByName ("txt"); break;
-    case 2: tm = engine->GetMaterials ()->FindByName ("txt2"); break;
+    case 1: tm = engine->FindMaterial ("txt"); break;
+    case 2: tm = engine->FindMaterial ("txt2"); break;
   }
 
-  csPolygon3D* p = new csPolygon3D (tm);
   char polname[10];
   sprintf (polname, "p%d", pol_nr);
-  p->SetName (polname); 
+  iPolygon3D* p = thing_state->CreatePolygon (polname);
+  p->SetMaterial (tm);
   pol_nr++;
-  p->SetParent (thing);
-  thing->AddPolygon (p);
 
-  p->AddVertex (p1);
-  p->AddVertex (p2);
-  p->AddVertex (p3);
+  p->CreateVertex (p1);
+  p->CreateVertex (p2);
+  p->CreateVertex (p3);
 
   p->SetTextureType (POLYTXT_GOURAUD);
-  csPolyTexGouraud *gs = p->GetGouraudInfo ();
+  iPolyTexType* ptt = p->GetPolyTexType ();
+  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
   gs->Setup (p);
-  gs->SetUV (0, 0, 0);
-  gs->SetUV (1, 1, 0);
-  gs->SetUV (2, 0, 1);
+  fs->SetUV (0, 0, 0);
+  fs->SetUV (1, 1, 0);
+  fs->SetUV (2, 0, 1);
+  fs->DecRef ();
+  gs->DecRef ();
   // this is not needed anyway?
   p->SetTextureSpace (t_m, t_v);
 
@@ -138,17 +140,30 @@ csPolygon3D* HugeRoom::create_polygon (csThing* thing,
 //#define ROOM_SMALL
 #define ROOM_CITY
 
-csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
+static csMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  csThing* thing = new csThing ();
-  thing->SetName ("t"); 
+  iMeshObjectFactory* thing_fact = Sys->engine->GetThingType ()->NewFactory ();
+  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+  mesh_obj->DecRef ();
+  mesh_wrap->SetName (name);
+  Sys->engine->meshes.Push (mesh_wrap);
+  return mesh_wrap;
+}
+
+csMeshWrapper* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
+{
+  csMeshWrapper* thing = CreateMeshWrapper ("t");
+  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState);
 
 #ifdef ROOM_SMALL
   int txt = (rand () & 0x8) ? 1 : 2;
   csVector3 p1 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
   csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
   csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
-  create_polygon (thing, p1, p2, p3, txt);
+  create_polygon (thing_state, p1, p2, p3, txt);
 #endif
 #ifdef ROOM_CITYBLOCKS
   float y_low = -wall_dim;
@@ -162,11 +177,11 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   csVector3 p6 (thing_cityblock_dim/2,y_high,thing_cityblock_dim/2);
   csVector3 p7 (thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
   csVector3 p8 (-thing_cityblock_dim/2,y_high,-thing_cityblock_dim/2);
-  create_wall (thing, p5, p6, p7, p8, 3, 3, txt);	// Top
-  create_wall (thing, p8, p7, p3, p4, 3, 3, txt);	// Front
-  create_wall (thing, p7, p6, p2, p3, 3, 3, txt);	// Right
-  create_wall (thing, p5, p8, p4, p1, 3, 3, txt);	// Left
-  create_wall (thing, p6, p5, p1, p2, 3, 3, txt);	// Back
+  create_wall (thing_state, p5, p6, p7, p8, 3, 3, txt);	// Top
+  create_wall (thing_state, p8, p7, p3, p4, 3, 3, txt);	// Front
+  create_wall (thing_state, p7, p6, p2, p3, 3, 3, txt);	// Right
+  create_wall (thing_state, p5, p8, p4, p1, 3, 3, txt);	// Left
+  create_wall (thing_state, p6, p5, p1, p2, 3, 3, txt);	// Back
 #endif
 #ifdef ROOM_RANDOM_WALLS
   thing_min_poly = 3;
@@ -180,7 +195,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
     csVector3 p2 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
     csVector3 p4 = p2 + (p1-p2) + (p3-p2);
-    create_wall (thing, p1, p2, p3, p4, 4, 4, txt);
+    create_wall (thing_state, p1, p2, p3, p4, 4, 4, txt);
   }
 #endif
 #ifdef ROOM_PURE_RANDOM
@@ -192,8 +207,8 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   for (i = 0 ; i < num ; i++)
   {
     int txt = (rand () & 0x8) ? 1 : 2;
-    create_polygon (thing, p1, p2, p3, txt);
-    create_polygon (thing, p3, p2, p1, txt);
+    create_polygon (thing_state, p1, p2, p3, txt);
+    create_polygon (thing_state, p3, p2, p1, txt);
     p1 = p2;
     p2 = p3;
     p3 = csVector3 (rand2 (thing_max_x), rand2 (thing_max_y), rand2 (thing_max_z));
@@ -207,15 +222,18 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   obj.SetOrigin (pos);
   move.SetTransform (obj);
   move.UpdateMove ();
+  thing_state->DecRef ();
 
   return thing;
 }
 
-csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
+csMeshWrapper* HugeRoom::create_building (csSector* sector,
+	const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  csThing* thing = new csThing ();
-  thing->SetName ("t"); 
+  csMeshWrapper* thing = CreateMeshWrapper ("t");
+  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState);
 
   float y_low = -wall_dim+1;
   float y_high = y_low + ydim;
@@ -230,11 +248,11 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   csVector3 p8 (-xdim/2,y_high,-zdim/2);
   int hor_div = 3;//7	(10)
   int ver_div = 4;//14	(20)
-  create_wall (thing, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
-  create_wall (thing, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
-  create_wall (thing, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
-  create_wall (thing, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
-  create_wall (thing, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
+  create_wall (thing_state, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
+  create_wall (thing_state, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
+  create_wall (thing_state, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
+  create_wall (thing_state, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
+  create_wall (thing_state, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
 
   csMovable& move = thing->GetMovable ();
   move.SetSector (sector);
@@ -243,6 +261,7 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   obj.SetOrigin (pos);
   move.SetTransform (obj);
   move.UpdateMove ();
+  thing_state->DecRef ();
 
   return thing;
 }
@@ -396,51 +415,58 @@ csSector* HugeRoom::create_huge_world (csEngine* engine)
   }
 
 #if defined(ROOM_CITY)
-  csThing* floorthing = new csThing ();
-  floorthing->SetName ("floor"); 
-  create_wall (floorthing,
+  csMeshWrapper* floorthing = CreateMeshWrapper ("floor");
+  iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
+  	iThingState);
+  create_wall (thing_state,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, -wall_dim),
 	csVector3 (-wall_dim, -wall_dim+1, -wall_dim), 40, 40, 0);
+  thing_state->DecRef ();
   floorthing->GetMovable ().SetSector (room);
   floorthing->GetMovable ().UpdateMove ();
 #elif !defined(ROOM_SMALL)
-  csThing* floorthing = new csThing ();
-  floorthing->SetName ("floor"); 
-  create_wall (floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
+  csMeshWrapper* floorthing = CreateMeshWrapper ("floor");
+  iThingState* thing_state = QUERY_INTERFACE (floorthing->GetMeshObject (),
+  	iThingState);
+  create_wall (thing_state, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);
-  create_wall (floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
+  create_wall (thing_state, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
   	csVector3 (3, -1, 3), csVector3 (-3, -1, 3), 4, 4, 0);
+  thing_state->DecRef ();
   floorthing->GetMovable ().SetSector (room);
   floorthing->GetMovable ().UpdateMove ();
 #endif
 
-  csThing* walls = engine->CreateSectorWalls (room, "walls");
-  create_wall (walls,
+  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
+  thing_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
+  create_wall (thing_state,
   	csVector3 (-wall_dim,wall_dim,wall_dim), csVector3 (wall_dim,wall_dim,wall_dim),
 	csVector3 (wall_dim,-wall_dim,wall_dim), csVector3 (-wall_dim,-wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (walls,
+  create_wall (thing_state,
   	csVector3 (wall_dim,wall_dim,-wall_dim), csVector3 (-wall_dim,wall_dim,-wall_dim),
 	csVector3 (-wall_dim,-wall_dim,-wall_dim), csVector3 (wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (walls,
+  create_wall (thing_state,
   	csVector3 (-wall_dim,wall_dim,-wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	csVector3 (-wall_dim,-wall_dim,wall_dim), csVector3 (-wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (walls,
+  create_wall (thing_state,
   	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (wall_dim,wall_dim,-wall_dim),
 	csVector3 (wall_dim,-wall_dim,-wall_dim), csVector3 (wall_dim,-wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (walls,
+  create_wall (thing_state,
   	csVector3 (-wall_dim,-wall_dim,wall_dim), csVector3 (wall_dim,-wall_dim,wall_dim),
 	csVector3 (wall_dim,-wall_dim,-wall_dim), csVector3 (-wall_dim,-wall_dim,-wall_dim),
 	wall_num_tris, wall_num_tris, 0);
-  create_wall (walls,
+  create_wall (thing_state,
   	csVector3 (-wall_dim,wall_dim,-wall_dim), csVector3 (wall_dim,wall_dim,-wall_dim),
 	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
+  thing_state->DecRef ();
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
   room->UseStaticTree (BSP_ALMOST_MINIMIZE_SPLITS, true);

@@ -100,7 +100,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
   }
 
   csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true, false, false);
+  sector->CalculateSectorBBox (bbox, true, false);
 
   // @@@ Memory leak on factories!
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
@@ -145,7 +145,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
   }
 
   csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true, false, false);
+  sector->CalculateSectorBBox (bbox, true, false);
 
   // @@@ Memory leak on factories!
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
@@ -1171,190 +1171,218 @@ void light_statics ()
 
 //===========================================================================
 
-csThing* CreatePortalThing (const char* name, csSector* room,
-    	csMaterialWrapper* tm, csPolygon3D*& portalPoly)
+static csMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  csThing* thing = new csThing ();
-  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
-  Sys->engine->things.Push (thing);
-  thing->SetName (name);
+  iMeshObjectFactory* thing_fact = Sys->engine->GetThingType ()->NewFactory ();
+  iMeshObject* mesh_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
+  thing_fact->DecRef ();
+  csMeshWrapper* mesh_wrap = new csMeshWrapper (Sys->engine, mesh_obj);
+  mesh_obj->DecRef ();
+  mesh_wrap->SetName (name);
+  Sys->engine->meshes.Push (mesh_wrap);
+  return mesh_wrap;
+}
+
+csMeshWrapper* CreatePortalThing (const char* name, csSector* room,
+    	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
+{
+  csMeshWrapper* thing = CreateMeshWrapper (name);
+  iThingState* thing_state = QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState);
+  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
   float border = 0.3; // width of border around the portal
 
   // bottom
-  csPolygon3D* p;
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, 0, -dz);
-  p->AddVertex (dx, 0, -dz);
-  p->AddVertex (dx, 0, dz);
-  p->AddVertex (-dx, 0, dz);
+  iPolygon3D* p;
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, 0, -dz));
+  p->CreateVertex (csVector3 (dx, 0, -dz));
+  p->CreateVertex (csVector3 (dx, 0, dz));
+  p->CreateVertex (csVector3 (-dx, 0, dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.25, 0.875),
-      p->Vobj (1), csVector2 (0.75, 0.875),
-      p->Vobj (2), csVector2 (0.75, 0.75));
+      p->GetVertex (0), csVector2 (0.25, 0.875),
+      p->GetVertex (1), csVector2 (0.75, 0.875),
+      p->GetVertex (2), csVector2 (0.75, 0.75));
 
   // top
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, dy, dz);
-  p->AddVertex (dx, dy, dz);
-  p->AddVertex (dx, dy, -dz);
-  p->AddVertex (-dx, dy, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, dy, dz));
+  p->CreateVertex (csVector3 (dx, dy, dz));
+  p->CreateVertex (csVector3 (dx, dy, -dz));
+  p->CreateVertex (csVector3 (-dx, dy, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.25, 0.25),
-      p->Vobj (1), csVector2 (0.75, 0.25),
-      p->Vobj (2), csVector2 (0.75, 0.125));
+      p->GetVertex (0), csVector2 (0.25, 0.25),
+      p->GetVertex (1), csVector2 (0.75, 0.25),
+      p->GetVertex (2), csVector2 (0.75, 0.125));
 
   // back
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, 0, dz);
-  p->AddVertex (dx, 0, dz);
-  p->AddVertex (dx, dy, dz);
-  p->AddVertex (-dx, dy, dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, 0, dz));
+  p->CreateVertex (csVector3 (dx, 0, dz));
+  p->CreateVertex (csVector3 (dx, dy, dz));
+  p->CreateVertex (csVector3 (-dx, dy, dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.25, 0.75),
-      p->Vobj (1), csVector2 (0.75, 0.75),
-      p->Vobj (2), csVector2 (0.75, 0.25));
+      p->GetVertex (0), csVector2 (0.25, 0.75),
+      p->GetVertex (1), csVector2 (0.75, 0.75),
+      p->GetVertex (2), csVector2 (0.75, 0.25));
 
   // right
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (dx, 0, dz);
-  p->AddVertex (dx, 0, -dz);
-  p->AddVertex (dx, dy, -dz);
-  p->AddVertex (dx, dy, dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (dx, 0, dz));
+  p->CreateVertex (csVector3 (dx, 0, -dz));
+  p->CreateVertex (csVector3 (dx, dy, -dz));
+  p->CreateVertex (csVector3 (dx, dy, dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.75, 0.75),
-      p->Vobj (1), csVector2 (0.875, 0.75),
-      p->Vobj (2), csVector2 (0.875, 0.25));
+      p->GetVertex (0), csVector2 (0.75, 0.75),
+      p->GetVertex (1), csVector2 (0.875, 0.75),
+      p->GetVertex (2), csVector2 (0.875, 0.25));
 
   // left
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, 0, -dz);
-  p->AddVertex (-dx, 0, dz);
-  p->AddVertex (-dx, dy, dz);
-  p->AddVertex (-dx, dy, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, 0, -dz));
+  p->CreateVertex (csVector3 (-dx, 0, dz));
+  p->CreateVertex (csVector3 (-dx, dy, dz));
+  p->CreateVertex (csVector3 (-dx, dy, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 0.75),
-      p->Vobj (1), csVector2 (0.25, 0.75),
-      p->Vobj (2), csVector2 (0.25, 0.25));
+      p->GetVertex (0), csVector2 (0.125, 0.75),
+      p->GetVertex (1), csVector2 (0.25, 0.75),
+      p->GetVertex (2), csVector2 (0.25, 0.25));
 
   // front border
   // border top
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx+border, dy, -dz);
-  p->AddVertex (dx-border, dy, -dz);
-  p->AddVertex (dx-border, dy-border, -dz);
-  p->AddVertex (-dx+border, dy-border, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx+border, dy, -dz));
+  p->CreateVertex (csVector3 (dx-border, dy, -dz));
+  p->CreateVertex (csVector3 (dx-border, dy-border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, dy-border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 0.125),
-      p->Vobj (1), csVector2 (0.875, 0.125),
-      p->Vobj (2), csVector2 (0.875, 0.0));
+      p->GetVertex (0), csVector2 (0.125, 0.125),
+      p->GetVertex (1), csVector2 (0.875, 0.125),
+      p->GetVertex (2), csVector2 (0.875, 0.0));
   // border right
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (dx-border, dy-border, -dz);
-  p->AddVertex (dx, dy-border, -dz);
-  p->AddVertex (dx, border, -dz);
-  p->AddVertex (dx-border, border, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (dx-border, dy-border, -dz));
+  p->CreateVertex (csVector3 (dx, dy-border, -dz));
+  p->CreateVertex (csVector3 (dx, border, -dz));
+  p->CreateVertex (csVector3 (dx-border, border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (1.0, 0.125),
-      p->Vobj (1), csVector2 (0.875, 0.125),
-      p->Vobj (2), csVector2 (0.875, 0.875));
+      p->GetVertex (0), csVector2 (1.0, 0.125),
+      p->GetVertex (1), csVector2 (0.875, 0.125),
+      p->GetVertex (2), csVector2 (0.875, 0.875));
   // border bottom
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx+border, border, -dz);
-  p->AddVertex (+dx-border, border, -dz);
-  p->AddVertex (+dx-border, 0.0, -dz);
-  p->AddVertex (-dx+border, 0.0, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx+border, border, -dz));
+  p->CreateVertex (csVector3 (+dx-border, border, -dz));
+  p->CreateVertex (csVector3 (+dx-border, 0.0, -dz));
+  p->CreateVertex (csVector3 (-dx+border, 0.0, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 1.0),
-      p->Vobj (1), csVector2 (0.875, 1.0),
-      p->Vobj (2), csVector2 (0.875, 0.875));
+      p->GetVertex (0), csVector2 (0.125, 1.0),
+      p->GetVertex (1), csVector2 (0.875, 1.0),
+      p->GetVertex (2), csVector2 (0.875, 0.875));
   // border left
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, dy-border, -dz);
-  p->AddVertex (-dx+border, dy-border, -dz);
-  p->AddVertex (-dx+border, border, -dz);
-  p->AddVertex (-dx, border, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, dy-border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, dy-border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, border, -dz));
+  p->CreateVertex (csVector3 (-dx, border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 0.125),
-      p->Vobj (1), csVector2 (0.0, 0.125),
-      p->Vobj (2), csVector2 (0.0, 0.875));
+      p->GetVertex (0), csVector2 (0.125, 0.125),
+      p->GetVertex (1), csVector2 (0.0, 0.125),
+      p->GetVertex (2), csVector2 (0.0, 0.875));
   // border topleft
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, dy, -dz);
-  p->AddVertex (-dx+border, dy, -dz);
-  p->AddVertex (-dx+border, dy-border, -dz);
-  p->AddVertex (-dx, dy-border, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, dy, -dz));
+  p->CreateVertex (csVector3 (-dx+border, dy, -dz));
+  p->CreateVertex (csVector3 (-dx+border, dy-border, -dz));
+  p->CreateVertex (csVector3 (-dx, dy-border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 0.125),
-      p->Vobj (1), csVector2 (0.0, 0.125),
-      p->Vobj (2), csVector2 (0.0, 0.0));
+      p->GetVertex (0), csVector2 (0.125, 0.125),
+      p->GetVertex (1), csVector2 (0.0, 0.125),
+      p->GetVertex (2), csVector2 (0.0, 0.0));
   // border topright
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (dx-border, dy, -dz);
-  p->AddVertex (dx, dy, -dz);
-  p->AddVertex (dx, dy-border, -dz);
-  p->AddVertex (dx-border, dy-border, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (dx-border, dy, -dz));
+  p->CreateVertex (csVector3 (dx, dy, -dz));
+  p->CreateVertex (csVector3 (dx, dy-border, -dz));
+  p->CreateVertex (csVector3 (dx-border, dy-border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (1.0, 0.125),
-      p->Vobj (1), csVector2 (0.875, 0.125),
-      p->Vobj (2), csVector2 (0.875, 0.0));
+      p->GetVertex (0), csVector2 (1.0, 0.125),
+      p->GetVertex (1), csVector2 (0.875, 0.125),
+      p->GetVertex (2), csVector2 (0.875, 0.0));
   // border botright
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (dx-border, border, -dz);
-  p->AddVertex (dx, border, -dz);
-  p->AddVertex (dx, 0.0, -dz);
-  p->AddVertex (dx-border, 0.0, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (dx-border, border, -dz));
+  p->CreateVertex (csVector3 (dx, border, -dz));
+  p->CreateVertex (csVector3 (dx, 0.0, -dz));
+  p->CreateVertex (csVector3 (dx-border, 0.0, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (1.0, 1.0),
-      p->Vobj (1), csVector2 (0.875, 1.0),
-      p->Vobj (2), csVector2 (0.875, 0.875));
+      p->GetVertex (0), csVector2 (1.0, 1.0),
+      p->GetVertex (1), csVector2 (0.875, 1.0),
+      p->GetVertex (2), csVector2 (0.875, 0.875));
   // border botleft
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (-dx, border, -dz);
-  p->AddVertex (-dx+border, border, -dz);
-  p->AddVertex (-dx+border, 0.0, -dz);
-  p->AddVertex (-dx, 0.0, -dz);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
+  p->CreateVertex (csVector3 (-dx, border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, 0.0, -dz));
+  p->CreateVertex (csVector3 (-dx, 0.0, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0.125, 1.0),
-      p->Vobj (1), csVector2 (0.0, 1.0),
-      p->Vobj (2), csVector2 (0.0, 0.875));
+      p->GetVertex (0), csVector2 (0.125, 1.0),
+      p->GetVertex (1), csVector2 (0.0, 1.0),
+      p->GetVertex (2), csVector2 (0.0, 0.875));
 
   // front - the portal
-  p = thing->NewPolygon (tm);
-  p->flags.Reset (CS_POLY_COLLDET);
+  p = thing_state->CreatePolygon ();
+  p->SetMaterial (tm);
+  p->GetFlags ().Reset (CS_POLY_COLLDET);
   // old
   //p->AddVertex (dx, 0, -dz);
   //p->AddVertex (-dx, 0, -dz);
   //p->AddVertex (-dx, dy, -dz);
   //p->AddVertex (dx, dy, -dz);
-  p->AddVertex (dx-border, border, -dz);
-  p->AddVertex (-dx+border, border, -dz);
-  p->AddVertex (-dx+border, dy-border, -dz);
-  p->AddVertex (dx-border, dy-border, -dz);
+  p->CreateVertex (csVector3 (dx-border, border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, border, -dz));
+  p->CreateVertex (csVector3 (-dx+border, dy-border, -dz));
+  p->CreateVertex (csVector3 (dx-border, dy-border, -dz));
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0, 0),
-      p->Vobj (1), csVector2 (1, 0),
-      p->Vobj (2), csVector2 (1, 1));
+      p->GetVertex (0), csVector2 (0, 0),
+      p->GetVertex (1), csVector2 (1, 0),
+      p->GetVertex (2), csVector2 (1, 1));
   portalPoly = p;
 
-  thing->Prepare ();
-  thing->InitLightMaps (false);
-  room->ShineLights (thing);
-  thing->CreateLightMaps (Sys->G3D);
+  thing_state->InitLightMaps (false);
+  iMeshWrapper* iwrap = QUERY_INTERFACE (thing->GetMeshObject (), iMeshWrapper);
+  room->ShineLights (iwrap);
+  iwrap->DecRef ();
+  thing_state->CreateLightMaps (Sys->G3D);
+  thing_state->DecRef ();
 
   return thing;
 }
@@ -1363,10 +1391,10 @@ void OpenPortal (csView* view, char* lev)
 {
   csSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
-  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("portal");
+  iMaterialWrapper* tm = Sys->engine->FindMaterial ("portal");
 
-  csPolygon3D* portalPoly;
-  csThing* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
+  iPolygon3D* portalPoly;
+  csMeshWrapper* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);
 
   bool regionExists = (Sys->engine->regions.FindByName (lev) != NULL);
   Sys->engine->SelectRegion (lev);
@@ -1396,10 +1424,9 @@ void OpenPortal (csView* view, char* lev)
   iSector* start_sector = Sys->engine->GetCurrentRegion ()->FindSector (room_name);
   if (start_sector)
   {
-    portalPoly->SetCSPortal (start_sector->GetPrivateObject ());
-    csPortal* portal = portalPoly->GetPortal ();
-    portal->flags.Set (CS_PORTAL_ZFILL);
-    portal->flags.Set (CS_PORTAL_CLIPDEST);
+    iPortal* portal = portalPoly->CreatePortal (start_sector);
+    portal->GetFlags ().Set (CS_PORTAL_ZFILL);
+    portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
     portal->SetWarp (view->GetCamera ()->GetC2W (), topos, pos);
 
     if (!regionExists)
@@ -1407,16 +1434,17 @@ void OpenPortal (csView* view, char* lev)
       // Only if the region did not already exist do we create a portal
       // back. So even if multiple portals go to the region we only have
       // one portal back.
-      csPolygon3D* portalPolyBack;
-      csThing* thingBack = CreatePortalThing ("portalFrom",
+      iPolygon3D* portalPolyBack;
+      csMeshWrapper* thingBack = CreatePortalThing ("portalFrom",
 	  	start_sector->GetPrivateObject (), tm, portalPolyBack);
       thingBack->GetMovable ().SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -.1));
       thingBack->GetMovable ().Transform (csYRotMatrix3 (M_PI));//view->GetCamera ()->GetW2C ());
       thingBack->GetMovable ().UpdateMove ();
-      portalPolyBack->SetCSPortal (room);
-      csPortal* portalBack = portalPolyBack->GetPortal ();
-      portalBack->flags.Set (CS_PORTAL_ZFILL);
-      portalBack->flags.Set (CS_PORTAL_CLIPDEST);
+      iSector* iroom = QUERY_INTERFACE (room, iSector);
+      iPortal* portalBack = portalPolyBack->CreatePortal (iroom);
+      iroom->DecRef ();
+      portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);
+      portalBack->GetFlags ().Set (CS_PORTAL_CLIPDEST);
       portalBack->SetWarp (view->GetCamera ()->GetW2C (), pos, topos);
     }
   }

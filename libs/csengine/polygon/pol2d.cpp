@@ -417,8 +417,10 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
           bool reset = true;
           while (lp)
           {
-            unsplit->UpdateVertexLighting (lp->GetLight (),
+	    iLight* il = QUERY_INTERFACE (lp->GetLight (), iLight);
+            unsplit->UpdateVertexLighting (il,
 	    	lp->GetLight ()->GetColor (), true, reset);
+	    il->DecRef ();
 	    reset = false;
             lp = lp->GetNextPoly ();
           }

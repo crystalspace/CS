@@ -107,7 +107,7 @@ struct iThing : public iBase
   virtual iMovable* GetMovable () = 0;
 };
 
-SCF_VERSION (iThingState, 0, 0, 5);
+SCF_VERSION (iThingState, 0, 0, 6);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -129,8 +129,10 @@ struct iThingState : public iBase
 
   /// Query number of polygons in set
   virtual int GetPolygonCount () = 0;
-  /// Get a polygon from set by his index
+  /// Get a polygon from set by his index.
   virtual iPolygon3D *GetPolygon (int idx) = 0;
+  /// Get a polygon from set by name.
+  virtual iPolygon3D *GetPolygon (const char* name) = 0;
   /// Create a new polygon and return a pointer to it
   virtual iPolygon3D *CreatePolygon (const char *iName = NULL) = 0;
 

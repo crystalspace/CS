@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -178,23 +178,8 @@ void Dumper::dump (csThing* p)
   }
 }
 
-void Dumper::dump (csSector* s)
+void Dumper::dump (csSector*)
 {
-  int i;
-  //for (i = 0 ; i < s->sprites.Length () ; i++)
-  //{
-    //csSprite* sp = (csSprite*)s->sprites[i];
-  //}
-  for (i = 0 ; i < s->things.Length () ; i++)
-  {
-    csThing* th = (csThing*)s->things[i];
-    dump (th);
-  }
-  for (i = 0 ; i < s->skies.Length () ; i++)
-  {
-    csThing* th = (csThing*)s->skies[i];
-    dump (th);
-  }
 }
 
 void Dumper::dump (csEngine* e)

@@ -32,7 +32,7 @@ class csDynLight;
 class csMaterialWrapper;
 class csProcSky;
 class csProcSkyTexture;
-class csPolygon3D;
+struct iPolygon3D;
 struct iFont;
 struct iMeshWrapper;
 struct iMaterialWrapper;
@@ -63,7 +63,7 @@ private:
    * given orig,u,ulen,v,vlen,  so that you get no ugly
    * edges (connecting to other polygons
    */
-  void SetTexSpace(csProcSkyTexture *skytex, csPolygon3D *poly, int size, 
+  void SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, int size, 
     const csVector3& orig, const csVector3& upt, float ulen, 
     const csVector3& vpt, float vlen);
 

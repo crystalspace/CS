@@ -842,6 +842,7 @@ public:
     virtual void CompressVertices () { scfParent->CompressVertices(); }
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
     virtual iPolygon3D *GetPolygon (int idx);
+    virtual iPolygon3D *GetPolygon (const char* name);
     virtual iPolygon3D *CreatePolygon (const char *iName);
     virtual int GetVertexCount () { return scfParent->num_vertices; }
     virtual csVector3 &GetVertex (int i) { return scfParent->obj_verts[i]; }
@@ -979,11 +980,12 @@ public:
     }
     virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
     virtual csMeshCallback* GetVisibleCallback () { return NULL; }
-    virtual void GetObjectBoundingBox (csBox3& /*bbox*/,
+    virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {
+      scfParent->GetBoundingBox (bbox);
     }
-    virtual csVector3 GetRadius () { return csVector3 (0); }
+    virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
     virtual void NextFrame (cs_time /*current_time*/) { }
     virtual bool WantToDie () { return false; }
     virtual void HardTransform (const csReversibleTransform& t)

@@ -67,8 +67,20 @@ class csMatrix3;
 class csVector3;
 struct iSector;
 struct iPolygon3D;
+struct iPortal;
+struct iFrustumView;
 
-SCF_VERSION (iPortal, 0, 0, 3);
+/**
+ * When a sector is missing this callback will be called. If this function
+ * returns false then this portal will not be traversed. Otherwise this
+ * function has to set up the destination sector and return true.
+ * The given context will be either an instance of iRenderView, iFrustumView,
+ * or else NULL.
+ */
+typedef bool (csPortalSectorCallback) (iPortal* portal,
+	iBase* context, void* callbackData);
+
+SCF_VERSION (iPortal, 0, 0, 4);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -101,6 +113,21 @@ struct iPortal : public iBase
 
   /// Set warping transformation to mirror around given polygon
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
+
+  /// Set the missing sector callback.
+  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+  	void* cbData) = 0;
+  /// Get the missing sector callback.
+  virtual csPortalSectorCallback* GetPortalSectorCallback () = 0;
+  /// Get the missing sector callback data.
+  virtual void* GetPortalSectorCallbackData () = 0;
+
+  /**
+   * Check frustum visibility of all polygons reachable through this portal.
+   * Alpha is the alpha value you'd like to use to pass through this
+   * portal (0 is no completely transparent, 100 is complete opaque).
+   */
+  virtual void CheckFrustum (iFrustumView* lview, int alpha) = 0;
 };
 
 #endif // __IENGINE_PORTAL_H__

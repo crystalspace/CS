@@ -44,12 +44,12 @@ class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
 class csPolygon3D;
-class csLight;
 class csLightMap;
 class csLightPatch;
 class Dumper;
 class csPolyTexture;
 class csThing;
+struct iLight;
 struct iGraphics2D;
 struct iGraphics3D;
 
@@ -687,9 +687,11 @@ public:
   /**
    * If the polygon is a portal this will set the sector
    * that this portal points to. If this polygon has no portal
-   * a Crystal Space portal will be created.
+   * one will be created.
+   * If 'null' is true and sector == 'NULL' then a NULL portal
+   * is created.
    */
-  void SetCSPortal (csSector* sector);
+  void SetCSPortal (csSector* sector, bool null = false);
 
   /**
    * Set a pre-created portal on this polygon.
@@ -1012,7 +1014,7 @@ public:
    * for resetting dynamic light values to the static lights ('reset'
    * must be equal to true then).
    */
-  void UpdateVertexLighting (csLight* light, const csColor& lcol,
+  void UpdateVertexLighting (iLight* light, const csColor& lcol,
   	bool dynamic, bool reset);
 
   /**
@@ -1275,7 +1277,12 @@ public:
     virtual void SetLightingMode (bool iGouraud)
     { scfParent->SetTextureType(iGouraud ? POLYTXT_GOURAUD:POLYTXT_LIGHTMAP); }
 
-    virtual iPortal *CreatePortal (iSector *iTarget)
+    virtual iPortal* CreateNullPortal ()
+    {
+      scfParent->SetCSPortal (NULL, true);
+      return scfParent->GetPortal ();
+    }
+    virtual iPortal* CreatePortal (iSector *iTarget)
     {
       scfParent->SetCSPortal (iTarget->GetPrivateObject ());
       return scfParent->GetPortal ();
@@ -1347,6 +1354,11 @@ public:
       scfParent->SetCosinusFactor (cosfact);
     }
     virtual iPolyTexType* GetPolyTexType ();
+    virtual void UpdateVertexLighting (iLight* light, const csColor& lcol,
+  	bool dynamic, bool reset)
+    {
+      scfParent->UpdateVertexLighting (light, lcol, dynamic, reset);
+    }
   } scfiPolygon3D;
   friend struct eiPolygon3D;
 };

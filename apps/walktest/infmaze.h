@@ -27,9 +27,12 @@ class csEngine;
 class Sparse3D;
 class WideSparse3D;
 class csSector;
-class csMaterialWrapper;
-class csPolygon3D;
-class csThing;
+class csMeshWrapper;
+class csFrustumContext;
+struct iThingState;
+struct iMaterialWrapper;
+struct iMeshWrapper;
+struct iFrustumView;
 
 /**
  * Data for every room in the infinite maze.
@@ -38,7 +41,9 @@ struct InfRoomData
 {
   int x, y, z;
   csSector* sector;
-  csThing* walls;
+  iSector* isector;
+  iMeshWrapper* walls;
+  iThingState* walls_state;
 };
 
 /**
@@ -58,8 +63,8 @@ public:
 
 
   ///
-  void create_one_side (csThing* walls, char* pname,
-	csMaterialWrapper* tm, csMaterialWrapper* tm2,
+  void create_one_side (iThingState* walls_state, char* pname,
+	iMaterialWrapper* tm, iMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,
 	float x3, float y3, float z3,
@@ -81,25 +86,25 @@ public:
   void random_loose_portals (int x1, int y1, int z1);
 };
 
-/**
- * Special subclass of PortalCS which knows how to handle
- * portal for which the destination has not been defined yet.
- */
-class InfPortalCS : public csPortal
+class LV
 {
 public:
-  class LV
-  {
-  public:
-    LV* next;
-    csFrustumView lv;
-  };
+  LV* next;
+  iFrustumView* lv;
+  csFrustumContext* ctxt;
+};
+
+/**
+ * Structure that is kept with a portal to remember lighting information
+ * that still has to be computed.
+ */
+class InfPortalCS
+{
+public:
   LV* lviews;
   int x1, y1, z1;
   int x2, y2, z2;
-  InfPortalCS () : csPortal () { lviews = NULL; }
-  virtual void CheckFrustum (csFrustumView& lview, int alpha);
-  virtual void CompleteSector ();
+  InfPortalCS () { lviews = NULL; }
 };
 
 #endif //INFMAZE_H

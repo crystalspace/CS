@@ -89,6 +89,21 @@ void csFrustumView::CreateFrustumContext ()
   ctxt->SetShadows (old_ctxt->GetShadows (), true);
 }
 
+void csFrustumView::SetFrustumContext (csFrustumContext* new_ctxt)
+{
+  ctxt = new_ctxt;
+}
+
+csFrustumContext* csFrustumView::CopyFrustumContext ()
+{
+  // Leave cleanup actions alone to original copy.
+  csFrustumContext* new_ctxt = new csFrustumContext ();
+  *new_ctxt = *ctxt;
+  new_ctxt->SetCleanup (NULL);
+  new_ctxt->SetShadows (ctxt->GetShadows (), true);
+  return new_ctxt;
+}
+
 void csFrustumView::RestoreFrustumContext (csFrustumContext* original)
 {
   csFrustumContext* old_ctxt = ctxt;

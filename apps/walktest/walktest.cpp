@@ -743,6 +743,8 @@ void WalkTest::DrawFrame2D (void)
 
 void WalkTest::DrawFrameMap ()
 {
+#if 0
+//@@@
   if (map_mode == MAP_TXT)
   {
     // Texture mapped map.
@@ -846,6 +848,7 @@ void WalkTest::DrawFrameMap ()
     	view->GetClipper (), draw_map);
     wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera (), map_projection);
   }
+#endif
 }
 
 void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
@@ -1149,13 +1152,6 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
     if (region && !region->IsInRegion (sp)) continue;
     // Initialize the things in this sector.
     int i;
-    for (i = 0 ; i < sp->GetNumThings () ; i++)
-    {
-      csThing* tp = sp->GetThing (i);
-      mesh = QUERY_INTERFACE (tp, iPolygonMesh);
-      (void)new csCollider (*tp, collide_system, mesh);
-      mesh->DecRef ();
-    }
     for (i = 0 ; i < sp->GetNumberMeshes () ; i++)
     {
       csMeshWrapper* tp = sp->GetMesh (i);
@@ -1434,7 +1430,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       Printf (MSG_FATAL_ERROR, "The directory on VFS for map file does not exist!\n");
       return false;
     }
-
 
     // Load the map from the file.
     if (!csLoader::LoadMapFile (engine, "world"))

@@ -1,6 +1,43 @@
 The history order has been reversed so that new features are at the top.
 
 8-Apr-2001
+	- Extended iPortal with SetPortalSectorCallback() to set a callback
+	  that is called whenever a sector for a portal is missing. This
+	  callback will get either a reference to a iRenderView (when drawing),
+	  a iFrustumView (when doing CheckFrustum) or else NULL (for HitBeam).
+	- Changed csPortal::CompleteSector() to a function which
+	  completes the sector using the new callback above.
+	- Added CheckFrustum() to iPortal.
+	- Added iPolygon3D::CreateNullPortal() to create a NULL portal
+	  (a portal pointing to a NULL sector).
+	- Added iFrustumView::StartNewShadowBlock().
+	- Added iFrustumView::CopyFrustumContext() and SetFrustumContext().
+	  These functions are specifically used to be able to remember
+	  the current context and restore it later.
+	- Using all the above I tried to fix infinite maze but it still
+	  crashes somewhere. Will look at this later.
+	- Same for -huge option. It compiles but doesn't work (but I suspect
+	  it wasn't working before either: todo for later).
+	- Fixed WalkTest to use mesh wrappers instead of csThing.
+	- Removed csSector::Prepare() as this is no longer needed (Prepare()
+	  is called transparently by the thing).
+	- Removed csEngine::PrepareSectors().
+	- Removed support for things and skies in csSector. Only mesh objects
+	  are supported now.
+	- Removed csPolyIt and csCurveIt (polygon and curve iterators) in
+	  csEngine. Since polygons and curves are private to things these
+	  iterators don't make sense anymore.
+	- Side note: in the process of this entire engine redesign many
+	  debug commands in WalkTest are broken now. They will probably
+	  be resurrected soon.
+	- Side note: radiosity is now broken too!
+	- Removed the list of skies, things, and thing templates from
+	  the engine and all functions related to those (like FindThing(),
+	  ...).
+	- Fixed several other apps to the change from things to mesh objects.
+	- Also fixed MazeD so that it compiles again but MazeD is now getting
+	  more and more broken. MazeD can only revive if it gets the ability
+	  to edit mesh plugins (preferably through other plugins as well).
 	- Martin Geisse updated the sound system documentation.
 	- Martin fixed the garbled output from streamed sound in ds3d.
 	- Norman Kramer added interfaces iSprite2DUVAnimation and
@@ -13,6 +50,31 @@ The history order has been reversed so that new features are at the top.
 	- Norman also documented UV animation for 2D sprites and added
 	  an example.
 7-Apr-2001
+	- Renamed MESHOBJ to MESHFACT in the map file format wherever
+	  a mesh factory is wanted. This is less confusing.
+	  This affects library and map files.
+	- Fixed a bug in the thing loader when there is no default material
+	  specified in the thing itself but only in the polygon.
+	- Completely converted flarge to use mesh objects alone.
+	- Removed all support for THING, SIXFACE, and SKY keywords in
+	  the standard loader. This means that sky objects are now no longer
+	  supported. To implement sky objects in the future we will use the
+	  proposed render order setting for mesh objects in general. This
+	  is a todo for later (but not long from now).
+	- The old LoadThing() to load a thing from a file is replaced
+	  with a LoadMeshObject() that can be used to load any mesh object
+	  in general. For LoadThingTemplate() to load a thing template you can
+	  use LoadMeshObjectFactory() instead.
+	- Removed all obsolete token keywords from the default loader.
+	- Fixed a bug in LoadMeshObjectFactory(). It was deleting all loaded
+	  plugins for nothing.
+	- Changed csPolygon3D::UpdateVertexLighting() to use iLight instead
+	  of csLight and extended iPolygon3D with UpdateVertexLighting().
+	  This is also a temporary function though.
+	- Added GetPolygon(name) to iThingState.
+	- Converted Blocks to use mesh objects instead of csThing directly.
+	- GetRadius() and GetObjectBoundingBox() in iMeshObject of csThing
+	  are now correct.
 	- Martin Geisse did some clean-up work in the image loader.
 6-Apr-2001
 	- Martin Geisse did the first changes towards moving csparser to

@@ -66,187 +66,6 @@
 
 //---------------------------------------------------------------------------
 
-csPolyIt::csPolyIt (csEngine* e, csRegion* r) : engine (e), region (r)
-{
-  Restart ();
-}
-
-void csPolyIt::Restart ()
-{
-  sector_idx = -1;
-  thing_idx = -1;
-  polygon_idx = 0;
-}
-
-bool csPolyIt::NextSector ()
-{
-  sector_idx++;
-  if (region)
-    while (sector_idx < engine->sectors.Length ()
-	  && !region->IsInRegion (GetLastSector ()))
-      sector_idx++;
-  if (sector_idx >= engine->sectors.Length ()) return false;
-  return true;
-}
-
-csPolygon3D* csPolyIt::Fetch ()
-{
-  csSector* sector;
-  if (sector_idx == -1)
-  {
-    if (!NextSector ()) return NULL;
-    thing_idx = -1;
-    polygon_idx = -1;
-  }
-
-  if (sector_idx >= engine->sectors.Length ()) return NULL;
-  sector = (csSector*)(engine->sectors[sector_idx]);
-
-  // Try next polygon.
-  polygon_idx++;
-
-  if (thing_idx != -1)
-  {
-    // We are busy scanning the things of this sector.
-    // See if the current thing has the indicated polygon number.
-    // If not then we try the next thing.
-    while (polygon_idx >= sector->GetThing (thing_idx)->GetNumPolygons ())
-    {
-      thing_idx++;
-      if (thing_idx >= sector->GetNumThings ())
-      {
-        thing_idx = -1;
-	break;
-      }
-      polygon_idx = 0;
-    }
-    if (thing_idx == -1)
-    {
-      // There are no more things left. Go to the next sector.
-      if (!NextSector ()) return NULL;
-      // Initialize iterator to start of sector and recurse.
-      thing_idx = -1;
-      polygon_idx = -1;
-      return Fetch ();
-    }
-  }
-  else
-  {
-    // Start scanning things.
-    polygon_idx = -1;
-    thing_idx = 0;
-    // Recurse.
-    if (thing_idx < sector->GetNumThings ())
-      return Fetch ();
-    // No things. Go to next sector.
-    if (!NextSector ()) return NULL;
-    // Initialize iterator to start of sector and recurse.
-    thing_idx = -1;
-    return Fetch ();
-  }
-
-  return sector->GetThing (thing_idx)->GetPolygon3D (polygon_idx);
-}
-
-csSector* csPolyIt::GetLastSector ()
-{
-  return (csSector*)(engine->sectors[sector_idx]);
-}
-
-//--------------------- csCurveIt -------------------------------------------
-
-csCurveIt::csCurveIt (csEngine* e, csRegion* r) : engine (e), region (r)
-{
-  Restart ();
-}
-
-bool csCurveIt::NextSector ()
-{
-  sector_idx++;
-  if (region)
-    while (sector_idx < engine->sectors.Length ()
-	  && !region->IsInRegion (GetLastSector ()))
-      sector_idx++;
-  if (sector_idx >= engine->sectors.Length ()) return false;
-  return true;
-}
-
-void csCurveIt::Restart ()
-{
-  sector_idx = -1;
-  thing_idx = -1;
-  curve_idx = 0;
-}
-
-csCurve* csCurveIt::Fetch ()
-{
-  csSector* sector;
-  if (sector_idx == -1)
-  {
-    if (!NextSector ()) return NULL;
-    thing_idx = -1;
-    curve_idx = -1;
-  }
-
-  if (sector_idx >= engine->sectors.Length ()) return NULL;
-  sector = (csSector*)(engine->sectors[sector_idx]);
-
-  // Try next polygon.
-  curve_idx++;
-
-  if (thing_idx != -1)
-  {
-    // We are busy scanning the things of this sector.
-    // See if the current thing has the indicated curve number.
-    // If not then we try the next thing.
-    while (curve_idx >= sector->GetThing (thing_idx)->GetNumCurves ())
-    {
-      thing_idx++;
-      if (thing_idx >= sector->GetNumThings ())
-      {
-        thing_idx = -1;
-	break;
-      }
-      curve_idx = 0;
-    }
-    if (thing_idx == -1)
-    {
-      // There are no more things left. Go to the next sector.
-      if (!NextSector ()) return NULL;
-      // Initialize iterator to start of sector and recurse.
-      thing_idx = -1;
-      curve_idx = -1;
-      return Fetch ();
-    }
-  }
-  else
-  {
-    // Start scanning things.
-    curve_idx = -1;
-    thing_idx = 0;
-
-    // Recurse.
-    if (thing_idx < sector->GetNumThings ())
-      return Fetch ();
-
-    // No things. Go to next sector.
-    if (!NextSector ()) return NULL;
-
-    // Initialize iterator to start of sector and recurse.
-    thing_idx = -1;
-    return Fetch ();
-  }
-
-  return sector->GetThing (thing_idx)->GetCurve (curve_idx);
-}
-
-csSector* csCurveIt::GetLastSector ()
-{
-  return (csSector*)(engine->sectors[sector_idx]);
-}
-
-//---------------------------------------------------------------------------
-
 csLightIt::csLightIt (csEngine* e, csRegion* r) : engine (e), region (r)
 {
   Restart ();
@@ -422,12 +241,6 @@ void csObjectIt::Restart ()
   sectors_it->Restart ();
 }
 
-void csObjectIt::StartThings ()
-{
-  cur_type = &csThing::Type;
-  cur_idx = 0;
-}
-
 void csObjectIt::StartStatLights ()
 {
   cur_type = &csStatLight::Type;
@@ -488,25 +301,8 @@ csObject* csObjectIt::Fetch ()
 
     if (CheckType (cur_type))
     {
-      StartThings ();
+      StartStatLights ();
       return cur_sector;
-    }
-    else
-      StartThings ();
-  }
-  // Handle csThing.
-  if (cur_type == &csThing::Type)
-  {
-    if (CheckType (cur_type))
-    {
-      if (cur_idx >= cur_sector->GetNumThings ())
-        StartStatLights ();
-      else
-      {
-        csObject* rc = (csObject*)cur_sector->GetThing (cur_idx);
-	cur_idx++;
-        return rc;
-      }
     }
     else
       StartStatLights ();
@@ -783,12 +579,9 @@ void csEngine::Clear ()
   collections.DeleteAll ();
   meshes.DeleteAll ();
   terrains.DeleteAll();
-  things.DeleteAll ();
-  skies.DeleteAll ();
   mesh_factories.DeleteAll ();
   terrain_factories.DeleteAll();
   curve_templates.DeleteAll ();
-  thing_templates.DeleteAll ();
   sectors.DeleteAll ();
   camera_positions.DeleteAll ();
   int i;
@@ -949,16 +742,6 @@ void csEngine::PrepareTextures ()
   txtmgr->PrepareMaterials ();
 }
 
-void csEngine::PrepareSectors()
-{
-  // Now precalculate some stuff for all loaded polygons.
-  for (int i = 0 ; i < sectors.Length () ; i++)
-  {
-    csSector* s = (csSector*)sectors[i];
-    s->Prepare ();
-  }
-}
-
 // If a STAT_BSP level the loader call to UpdateMove is redundant when called
 // before csEngine::Prepare().
 void csEngine::PrepareMeshes ()
@@ -974,7 +757,6 @@ void csEngine::PrepareMeshes ()
 bool csEngine::Prepare ()
 {
   PrepareTextures ();
-  PrepareSectors ();
   PrepareMeshes ();
   // The images are no longer needed by the 3D engine.
   iTextureManager *txtmgr = G3D->GetTextureManager ();
@@ -1096,15 +878,7 @@ void csEngine::ShineLights (csRegion* region)
     csSector::cfg_reflections = 1;
   }
 
-  csPolyIt* pit = NewPolyIterator (region);
   csLightIt* lit = NewLightIterator (region);
-
-  // Count all polygons.
-  csPolygon3D* p;
-  int polygon_count = 0;
-  pit->Restart ();
-  while ((p = pit->Fetch ()) != NULL)
-    polygon_count++;
 
   // Count number of lights to process.
   csLight* l;
@@ -1170,15 +944,10 @@ void csEngine::ShineLights (csRegion* region)
     meter.Step();
   }
 
-  CsPrintf (MSG_INITIALIZATION, "\nPreparing lightmaps (%d maps):\n  ", polygon_count);
-  meter.SetTotal (polygon_count);
+  CsPrintf (MSG_INITIALIZATION, "\nPreparing lightmaps (%d meshes):\n  ",
+  	meshes.Length ());
+  meter.SetTotal (meshes.Length ());
   meter.Restart ();
-  pit->Restart ();
-  while ((p = pit->Fetch ()) != NULL)
-  {
-    p->CreateLightMaps (G3D);
-    meter.Step();
-  }
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
@@ -1191,6 +960,7 @@ void csEngine::ShineLights (csRegion* region)
       thing_state->CreateLightMaps (G3D);
       thing_state->DecRef ();
     }
+    meter.Step();
   }
 
   csThing::current_light_frame_number++;
@@ -1200,12 +970,13 @@ void csEngine::ShineLights (csRegion* region)
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 
-  delete pit;
   delete lit;
 }
 
 void csEngine::InvalidateLightmaps ()
 {
+#if 0
+//@@@@ TODO!!
   csPolyIt* pit = NewPolyIterator ();
   csPolygon3D* p;
   while ((p = pit->Fetch ()) != NULL)
@@ -1215,10 +986,13 @@ void csEngine::InvalidateLightmaps ()
       ((csLightMap*)lmi->GetLightMap ())->MakeDirtyDynamicLights ();
   }
   delete pit;
+#endif
 }
 
 bool csEngine::CheckConsistency ()
 {
+#if 0
+//@@@ TODO
   csPolyIt* pit = NewPolyIterator ();
   bool error = false;
 
@@ -1272,6 +1046,8 @@ bool csEngine::CheckConsistency ()
   delete pit;
   CsPrintf (MSG_INITIALIZATION, "DONE\n");
   return error;
+#endif
+  return false;
 }
 
 void csEngine::StartEngine ()
@@ -1592,44 +1368,6 @@ void csEngine::RemoveTerrain (csTerrainWrapper* terr)
   delete terr;
 }
 
-void csEngine::UnlinkThing (csThing* thing)
-{
-  thing->GetMovable ().ClearSectors ();
-  int idx = things.Find (thing);
-  if (idx == -1) return;
-  things[idx] = NULL;
-  things.Delete (idx);
-}
-
-void csEngine::RemoveThing (csThing* thing)
-{
-  thing->GetMovable ().ClearSectors ();
-  int idx = things.Find (thing);
-  if (idx == -1) return;
-  things[idx] = NULL;
-  things.Delete (idx);
-  delete thing;
-}
-
-void csEngine::UnlinkSky (csThing* thing)
-{
-  thing->GetMovable ().ClearSectors ();
-  int idx = skies.Find (thing);
-  if (idx == -1) return;
-  skies[idx] = NULL;
-  skies.Delete (idx);
-}
-
-void csEngine::RemoveSky (csThing* thing)
-{
-  thing->GetMovable ().ClearSectors ();
-  int idx = skies.Find (thing);
-  if (idx == -1) return;
-  skies[idx] = NULL;
-  skies.Delete (idx);
-  delete thing;
-}
-
 void csEngine::UnlinkCollection (csCollection* collection)
 {
   collection->GetMovable ().ClearSectors ();
@@ -1856,7 +1594,6 @@ bool csEngine::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
   DELETE_ALL_OBJECTS (mesh_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
-  DELETE_ALL_OBJECTS (thing_templates, csThing)
   DELETE_ALL_OBJECTS (sectors, csSector)
   DELETE_ALL_OBJECTS ((*textures), csTextureWrapper)
   DELETE_ALL_OBJECTS ((*materials), csMaterialWrapper)
@@ -1987,18 +1724,6 @@ csSector* csEngine::CreateCsSector (const char *iName, bool link)
   return sector;
 }
 
-csThing* csEngine::CreateSectorWalls (csSector* sector, const char *iName)
-{
-  csThing* thing = new csThing ();
-  thing->SetName (iName);
-  things.Push (thing);
-  thing->flags.Set (CS_ENTITY_CONVEX);
-  thing->SetZBufMode (CS_ZBUF_FILL);
-  thing->GetMovable ().SetSector (sector);
-  thing->GetMovable ().UpdateMove ();
-  return thing;
-}
-
 iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 	const char *iName)
 {
@@ -2029,18 +1754,6 @@ iSector* csEngine::CreateSector (const char *iName, bool link)
   return s;
 }
 
-iThing *csEngine::CreateThing (const char *iName, iSector *iParent)
-{
-  csThing *thing = new csThing ();
-  thing->SetName (iName);
-  csSector *sector = iParent->GetPrivateObject ();
-  thing->GetMovable ().SetSector (sector);
-  things.Push (thing);
-  iThing *p = QUERY_INTERFACE (thing, iThing);
-  thing->DecRef ();
-  return p;
-}
-
 iSector *csEngine::GetSector (int iIndex)
 {
   return &((csSector *)sectors.Get (iIndex))->scfiSector;
@@ -2068,36 +1781,6 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly)
   else
     sec = (csSector *)sectors.FindByName (iName);
   return sec ? &sec->scfiSector : NULL;
-}
-
-iThing *csEngine::FindThing (const char *iName, bool regionOnly)
-{
-  csThing* thing;
-  if (regionOnly && region)
-    thing = (csThing*)FindObjectInRegion (region, things, iName);
-  else
-    thing = (csThing*)things.FindByName (iName);
-  return thing ? &thing->scfiThing : NULL;
-}
-
-iThing *csEngine::FindSky (const char *iName, bool regionOnly)
-{
-  csThing* thing;
-  if (regionOnly && region)
-    thing = (csThing*)FindObjectInRegion (region, skies, iName);
-  else
-    thing = (csThing*)skies.FindByName (iName);
-  return thing ? &thing->scfiThing : NULL;
-}
-
-iThing *csEngine::FindThingTemplate (const char *iName, bool regionOnly)
-{
-  csThing* thing;
-  if (regionOnly && region)
-    thing = (csThing*)FindObjectInRegion (region, thing_templates, iName);
-  else
-    thing = (csThing*)thing_templates.FindByName (iName);
-  return thing ? &thing->scfiThing : NULL;
 }
 
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)

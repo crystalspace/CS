@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,8 +26,8 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 
-class csThing;
 class csLight;
+class csMeshWrapper;
 
 /**
  * A general WalkTest entity.
@@ -62,12 +62,12 @@ private:
    * the old state (1) and is_open state (representing 0 again).
    */
   float transition;
-  /// Parent thing.
-  csThing* tparent;
+  /// Parent mesh.
+  csMeshWrapper* tparent;
 
 public:
   /// Create this door.
-  csDoor (csThing* p);
+  csDoor (csMeshWrapper* p);
 
   /// Set hinge location.
   void SetHinge (const csVector3& h) { hinge = h; }

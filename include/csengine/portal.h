@@ -28,9 +28,9 @@ class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
-class csFrustumView;
 struct iRenderView;
 struct iTextureHandle;
+struct iFrustumView;
 
 /**
  * This class represents a portal. It belongs to some polygon
@@ -51,6 +51,10 @@ protected:
   csReversibleTransform warp_obj;
   /// Warp transform in world space.
   csReversibleTransform warp_wor;
+  /// Callback when a sector is missing.
+  csPortalSectorCallback* sector_cb;
+  /// Data for sector_cb;
+  void* sector_cbData;
 
   /**
    * A portal will change the intensity/color of the light that passes
@@ -81,14 +85,6 @@ public:
    * Set the sector that this portal points too.
    */
   void SetSector (csSector* s) { sector = s; }
-
-  /**
-   * Complete a sector destination. This function is called
-   * whenever a destination sector is NULL. A subclass of csPortal
-   * can implement this to dynamically create a new sector at this
-   * point.
-   */
-  virtual void CompleteSector () { }
 
   /**
    * Transform the warp matrix from object space to world space.
@@ -184,11 +180,11 @@ public:
   	csPolygon3D** polygonPtr);
 
   /**
-   * Check frustum visibility of all polygons reachable through this portal.
-   * Alpha is the alpha value you'd like to use to pass through this
-   * portal (0 is no completely transparent, 100 is complete opaque).
+   * Check if the destination sector is NULL and if so call
+   * the callback. This function returns false if the portal should
+   * not be traversed.
    */
-  virtual void CheckFrustum (csFrustumView& lview, int alpha);
+  bool CompleteSector (iBase* context);
 
   //---------------------------- iPortal interface -----------------------------
   DECLARE_IBASE;
@@ -209,6 +205,31 @@ public:
     const csVector3 &v_w_after);
   /// Set warping transformation to mirror
   virtual void SetMirror (iPolygon3D *iPoly);
+
+  /// Set the missing sector callback.
+  virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
+  	void* cbData)
+  {
+    sector_cb = cb;
+    sector_cbData = cbData;
+  }
+  /// Get the missing sector callback.
+  virtual csPortalSectorCallback* GetPortalSectorCallback ()
+  {
+    return sector_cb;
+  }
+  /// Get the missing sector callback data.
+  virtual void* GetPortalSectorCallbackData ()
+  {
+    return sector_cbData;
+  }
+
+  /**
+   * Check frustum visibility of all polygons reachable through this portal.
+   * Alpha is the alpha value you'd like to use to pass through this
+   * portal (0 is no completely transparent, 100 is complete opaque).
+   */
+  virtual void CheckFrustum (iFrustumView* lview, int alpha);
 };
 
 #endif // __CS_PORTAL_H__

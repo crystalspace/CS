@@ -145,10 +145,6 @@ csThing::csThing (bool is_sky, bool is_template) :
 
 csThing::~csThing ()
 {
-  if (is_sky)
-    csEngine::current_engine->UnlinkSky (this);
-  else
-    csEngine::current_engine->UnlinkThing (this);
   if (wor_verts == obj_verts) delete [] obj_verts;
   else { delete [] wor_verts; delete [] obj_verts; }
   delete [] cam_verts;
@@ -1264,29 +1260,14 @@ void csThing::SetConvex (bool c)
 
 void csThing::MoveToSector (csSector* s)
 {
-  if (is_sky)
-    s->AddSky (this);
-  else
-    s->AddThing (this);
+  //@@@
 }
 
 void csThing::RemoveFromSectors ()
 {
   //@@@@@@if (GetPolyTreeObject ())
     //@@@@@@GetPolyTreeObject ()->RemoveFromTree ();
-  int i;
-  csVector& sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors.Length () ; i++)
-  {
-    csSector* ss = (csSector*)sectors[i];
-    if (ss)
-    {
-      if (is_sky)
-        ss->UnlinkSky (this);
-      else
-        ss->UnlinkThing (this);
-    }
-  }
+  //@@@
 }
 
 void csThing::UpdateCurveTransform()
@@ -2538,6 +2519,12 @@ iCurve *csThing::ThingState::GetCurve (int idx)
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 {
   csPolygon3D* p = scfParent->GetPolygon3D (idx);
+  return &(p->scfiPolygon3D);
+}
+
+iPolygon3D *csThing::ThingState::GetPolygon (const char* name)
+{
+  csPolygon3D* p = scfParent->GetPolygon3D (name);
   return &(p->scfiPolygon3D);
 }
 

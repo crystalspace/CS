@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,14 +27,17 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 
-class csMaterialWrapper;
 class csSector;
 class csEngine;
-class csThing;
+class csMeshWrapper;
+class csMeshFactoryWrapper;
 class csDynLight;
+struct iMaterialWrapper;
 struct iTextureManager;
 struct iFont;
 struct iLoaderNew;
+struct iThingState;
+struct iMeshObjectType;
 
 class KeyMapping
 {
@@ -89,7 +92,7 @@ enum BlShapeType
 
 struct CubeInfo
 {
-  csThing* thing;
+  csMeshWrapper* thing;
   float dx, dy, dz;
 };
 
@@ -152,17 +155,17 @@ public:
 class Blocks : public SysSystemDriver
 {
 private:
-  csThing* cube_tmpl;
-  csThing* pillar_tmpl;
-  csThing* vrast_tmpl;
-  csThing* hrast_tmpl;
-  csMaterialWrapper* cube_mat;
-  csMaterialWrapper* cubef1_mat;
-  csMaterialWrapper* cubef2_mat;
-  csMaterialWrapper* cubef3_mat;
-  csMaterialWrapper* cubef4_mat;
-  csMaterialWrapper* pillar_mat;
-  csMaterialWrapper* raster_mat;
+  csMeshFactoryWrapper* cube_tmpl;
+  csMeshFactoryWrapper* pillar_tmpl;
+  csMeshFactoryWrapper* vrast_tmpl;
+  csMeshFactoryWrapper* hrast_tmpl;
+  iMaterialWrapper* cube_mat;
+  iMaterialWrapper* cubef1_mat;
+  iMaterialWrapper* cubef2_mat;
+  iMaterialWrapper* cubef3_mat;
+  iMaterialWrapper* cubef4_mat;
+  iMaterialWrapper* pillar_mat;
+  iMaterialWrapper* raster_mat;
   csSector* room;
   csSector* demo_room;
   csDynLight* dynlight;
@@ -187,19 +190,19 @@ private:
   int hs_pos;
 
   // For the menu.
-  csThing* menus[MAX_MENUS];
+  csMeshWrapper* menus[MAX_MENUS];
   int idx_menus[MAX_MENUS];
   bool leftright_menus[MAX_MENUS];
-  csThing* src_menus[MENU_TOTAL];
-  csThing* arrow_left;
-  csThing* arrow_right;
+  csMeshWrapper* src_menus[MENU_TOTAL];
+  csMeshWrapper* arrow_left;
+  csMeshWrapper* arrow_right;
   int cur_menu;
   int old_cur_menu;
   float menu_todo;
   float menu_hor_todo;
   float menu_hor_old_x_src, menu_hor_old_x_dst;
   float menu_hor_new_x_src, menu_hor_new_x_dst;
-  csThing* menu_hor_old_menu;
+  csMeshWrapper* menu_hor_old_menu;
   int num_menus;	// Current number of active menu entries.
 
   TextEntryMenu* keyconf_menu;
@@ -299,6 +302,7 @@ private:
   KeyMapping key_zoomout;
 
 public:
+  iMeshObjectType* thing_type;
   csEngine* engine;
   iTextureManager* txtmgr;
   static int white, black, red;
@@ -328,7 +332,7 @@ public:
   void set_cube_room (csSector* s) { room = s; }
   void InitGame ();
   void CreateMenuEntry (const char* txt, int menu_nr);
-  csThing* CreateMenuArrow (bool left);
+  csMeshWrapper* CreateMenuArrow (bool left);
   void ChangePlaySize (int new_size);
 
   void ReadConfig ();
@@ -354,12 +358,12 @@ public:
   void HandleHighscoresKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
-  csThing* create_cube_thing (float dx, float dy, float dz,
-  	csThing* tmpl);
-  csThing* add_cube_thing (csSector* sect, float dx, float dy, float dz,
-  	float x, float y, float z, csThing* tmpl);
+  csMeshWrapper* create_cube_thing (float dx, float dy, float dz,
+  	csMeshFactoryWrapper* tmpl);
+  csMeshWrapper* add_cube_thing (csSector* sect, float dx, float dy, float dz,
+  	float x, float y, float z, csMeshFactoryWrapper* tmpl);
   void add_cube (float dx, float dy, float dz, float x, float y, float z,
-  	csThing* tmpl);
+  	csMeshFactoryWrapper* tmpl);
   void add_pillar (int x, int y);
   void add_vrast (int x, int y, float dx, float dy, float rot_z);
   void add_hrast (int x, int y, float dx, float dy, float rot_z);
@@ -371,15 +375,15 @@ public:
   void add_hrast_template ();
 
   // Default textures for geometry.
-  void set_cube_material (csMaterialWrapper* ct) { cube_mat = ct; }
-  void set_cube_f1_material (csMaterialWrapper* ct) { cubef1_mat = ct; }
-  void set_cube_f2_material (csMaterialWrapper* ct) { cubef2_mat = ct; }
-  void set_cube_f3_material (csMaterialWrapper* ct) { cubef3_mat = ct; }
-  void set_cube_f4_material (csMaterialWrapper* ct) { cubef4_mat = ct; }
-  void set_pillar_material (csMaterialWrapper* ct) { pillar_mat = ct; }
-  void set_raster_material (csMaterialWrapper* ct) { raster_mat = ct; }
-  void ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat);
-  csMaterialWrapper* GetMaterialForHeight (int z);
+  void set_cube_material (iMaterialWrapper* ct) { cube_mat = ct; }
+  void set_cube_f1_material (iMaterialWrapper* ct) { cubef1_mat = ct; }
+  void set_cube_f2_material (iMaterialWrapper* ct) { cubef2_mat = ct; }
+  void set_cube_f3_material (iMaterialWrapper* ct) { cubef3_mat = ct; }
+  void set_cube_f4_material (iMaterialWrapper* ct) { cubef4_mat = ct; }
+  void set_pillar_material (iMaterialWrapper* ct) { pillar_mat = ct; }
+  void set_raster_material (iMaterialWrapper* ct) { raster_mat = ct; }
+  void ChangeThingMaterial (csMeshWrapper* thing, iMaterialWrapper* mat);
+  iMaterialWrapper* GetMaterialForHeight (int z);
 
   // Handle all time dependent movement of the game and menu.
   // This function will call some of the Handle... routines below.

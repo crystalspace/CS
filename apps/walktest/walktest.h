@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -262,7 +262,7 @@ public:
   csView* view;
 
   /// A pointer to a skybox to animate (if any).
-  csThing* anim_sky;
+  csMeshWrapper* anim_sky;
 
   /// Speed of this animation (with 1 meaning 1 full rotation in a second).
   float anim_sky_speed;
@@ -334,7 +334,7 @@ public:
   iCollideSystem* collide_system;
 
   /// Player's body (as a 3D model) and legs
-  csThing *plbody, *pllegs;
+  csMeshWrapper *plbody, *pllegs;
 
   /// The console input plugin
   iConsoleInput *ConsoleInput;

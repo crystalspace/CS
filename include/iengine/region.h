@@ -23,7 +23,6 @@
 #include "csutil/scf.h"
 
 struct iSector;
-struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
 struct iMeshWrapper;
@@ -60,11 +59,6 @@ struct iRegion : public iBase
   virtual bool PrepareTextures () = 0;
 
   /**
-   * Prepare all sectors in this region.
-   */
-  virtual bool PrepareSectors () = 0;
-
-  /**
    * Do lighting calculations (or read from cache).
    */
   virtual bool ShineLights () = 0;
@@ -73,18 +67,12 @@ struct iRegion : public iBase
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
    * This function is equivalent to calling PrepareTextures()
-   * followed by PrepareSectors().
+   * followed by ShineLights().
    */
   virtual bool Prepare () = 0;
 
   /// Find a sector in this region by name.
   virtual iSector *FindSector (const char *iName) = 0;
-  /// Find a thing in this region by name
-  virtual iThing *FindThing (const char *iName) = 0;
-  /// Find a sky thing in this region by name
-  virtual iThing *FindSky (const char *iName) = 0;
-  /// Find a thing template in this region by name
-  virtual iThing *FindThingTemplate (const char *iName) = 0;
   /// Find a sprite in this region by name
   virtual iMeshWrapper *FindMeshObject (const char *iName) = 0;
   /// Find a mesh factory in this region by name

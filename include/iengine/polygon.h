@@ -28,6 +28,7 @@ struct iMaterialWrapper;
 struct iPolygon3D;
 struct iPolyTxtPlane;
 struct iPolygonTexture;
+struct iLight;
 struct iLightMap;
 struct iPortal;
 struct iSector;
@@ -52,7 +53,7 @@ class csColor;
 #define CS_POLY_COLLDET	0x00000002
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 10);
+SCF_VERSION (iPolygon3D, 0, 1, 12);
 
 /**
  * This is the interface to 3D polygons.
@@ -121,6 +122,12 @@ struct iPolygon3D : public iBase
   /// Set Gouraud vs lightmap polygon lighting
   virtual void SetLightingMode (bool iGouraud) = 0;
 
+  /**
+   * Create a null pointer pointing to no sector.
+   * It is preferably to set a missing sector callback on the
+   * returned portal.
+   */
+  virtual iPortal* CreateNullPortal () = 0;
   /// Create a portal object pointing to given sector
   virtual iPortal *CreatePortal (iSector *iTarget) = 0;
   /**
@@ -217,6 +224,23 @@ struct iPolygon3D : public iBase
    * Get the polygon texture type.
    */
   virtual iPolyTexType* GetPolyTexType () = 0;
+
+  /**
+   * Update vertex lighting for this polygon. Only works if the
+   * polygon uses gouraud shading or is flat-shaded.
+   * 'dynamic' is true for a dynamic light.
+   * 'reset' is true if the light values need to be reset to 0.
+   * 'lcol' is the color of the light. It is given seperately
+   * because the color of the light may be modified by portals and
+   * other effects.<br>
+   * 'light' can be NULL in which case this function is useful
+   * for resetting dynamic light values to the static lights ('reset'
+   * must be equal to true then).
+   * @@@ TEMPORARY FUNCTION: it is better to use the mesh object lighting
+   * system for this!
+   */
+  virtual void UpdateVertexLighting (iLight* light, const csColor& lcol,
+  	bool dynamic, bool reset) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

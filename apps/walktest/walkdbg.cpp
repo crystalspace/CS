@@ -545,6 +545,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
     	dump_visible_indent, indent_spaces, name);
     dump_visible_indent--;
   }
+#if 0
   else if (type == CALLBACK_THING)
   {
     csThing* thing = (csThing*)entity;
@@ -570,6 +571,7 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
     	dump_visible_indent, indent_spaces, name);
     dump_visible_indent--;
   }
+#endif
 }
 
 //------------------------------------------------------------------------
@@ -814,6 +816,8 @@ void DrawOctreeBoxes (csOctreeNode* node,
 
 void DrawOctreeBoxes (int draw_level)
 {
+#if 0
+//@@@
   csCamera* cam = Sys->view->GetCamera ();
   csSector* sector = cam->GetSector ();
   csThing* stat = sector->GetStaticThing ();
@@ -821,6 +825,7 @@ void DrawOctreeBoxes (int draw_level)
   csOctree* tree = (csOctree*)stat->GetStaticTree ();
   csOctreeNode* node = tree->GetRoot ();
   DrawOctreeBoxes (node, 0, draw_level);
+#endif
 }
 
 #define PLANE_X 0
@@ -841,8 +846,11 @@ static csVector3 GetVector3 (int plane_nr, float plane_pos,
   return v;
 }
 
-void CreateSolidThings (csEngine* engine, csSector* room, csOctreeNode* node, int depth)
+void CreateSolidThings (csEngine* engine, csSector* room,
+	csOctreeNode* node, int depth)
 {
+#if 0
+//@@@
   if (!node) return;
   int side;
   csVector2 v;
@@ -930,6 +938,7 @@ void CreateSolidThings (csEngine* engine, csSector* room, csOctreeNode* node, in
   int i;
   for (i = 0 ; i < 8 ; i++)
     CreateSolidThings (engine, room, node->GetChild (i), depth+1);
+#endif
 }
 
 struct db_frust

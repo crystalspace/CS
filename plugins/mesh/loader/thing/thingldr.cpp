@@ -641,7 +641,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   char* params, * params2;
 
   iPolygon3D* poly3d = thing_state->CreatePolygon (polyname);
-  poly3d->SetMaterial (default_material);
+  if (default_material)
+    poly3d->SetMaterial (default_material);
 
   iMaterialWrapper* mat = NULL;
 
@@ -1349,7 +1350,9 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   ThingLoadInfo info;
   if (load_thing_part (info, imeshwrap, engine, thing_state,
   	buf, 0, true))
+  {
     return fact;
+  }
   else
   {
     fact->DecRef ();

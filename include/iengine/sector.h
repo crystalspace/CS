@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D engine
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 7);
+SCF_VERSION (iSector, 0, 1, 8);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -51,20 +51,6 @@ struct iSector : public iBase
   /// Has this sector fog?
   virtual bool HasFog () = 0;
 
-  /// Find a sky with the given name.
-  virtual iThing *GetSkyThing (const char *name) = 0;
-  /// Get the number of sky things in this sector.
-  virtual int GetNumSkyThings () = 0;
-  /// Get a sky thing by index
-  virtual iThing *GetSkyThing (int iIndex) = 0;
-
-  /// Find a thing with the given name.
-  virtual iThing *GetThing (const char *name) = 0;
-  /// Get the number of things in this sector.
-  virtual int GetNumThings () = 0;
-  /// Get a thing by index
-  virtual iThing *GetThing (int iIndex) = 0;
-
   /// Add a terrain object to this sector.
   virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
 
@@ -78,7 +64,7 @@ struct iSector : public iBase
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  virtual void CalculateSectorBBox (csBox3& bbox, bool do_things,
+  virtual void CalculateSectorBBox (csBox3& bbox,
   	bool do_meshes, bool do_terrain) = 0;
 
   /**

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,9 +23,10 @@
 
 class csEngine;
 class csSector;
-class csPolygon3D;
 class csPolyTxtPlane;
-class csThing;
+class csMeshWrapper;
+struct iPolygon3D;
+struct iThingState;
 
 /**
  * The Huge Room demo.
@@ -87,19 +88,19 @@ private:
 
 private:
   ///
-  csThing* create_thing (csSector* sector, const csVector3& pos);
+  csMeshWrapper* create_thing (csSector* sector, const csVector3& pos);
 
   ///
-  csThing* create_building (csSector* sector, const csVector3& pos,
+  csMeshWrapper* create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y);
 
   ///
-  csPolygon3D* create_polygon (csThing* thing,
+  iPolygon3D* create_polygon (iThingState* thing_state,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt);
 
   ///
-  void create_wall (csThing* thing,
+  void create_wall (iThingState* thing_state,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
   	const csVector3& p4, int hor_res, int ver_res, int txt);
 

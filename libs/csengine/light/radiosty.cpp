@@ -811,6 +811,8 @@ int   csRadiosity::source_patch_size = 2;
 
 csRadiosity :: csRadiosity(csEngine *current_engine)
 {
+//@@@ TEMPORARILY BROKEN!
+#if 0
   CsPrintf (MSG_INITIALIZATION, "\nPreparing radiosity...\n");
   iterations = 0;
   engine = current_engine;
@@ -852,6 +854,7 @@ csRadiosity :: csRadiosity(csEngine *current_engine)
   shadow_matrix = 0;
 
   showing_deltamaps = false;
+#endif
 }
 
 csRadiosity :: ~csRadiosity()
@@ -1240,7 +1243,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   	GetLightFrustum ()-> Intersect(poly,num_vertices));
   if (!new_ctxt->GetLightFrustum ()) goto stop;
 
-  po->CheckFrustum (*lview, destpoly3d->GetAlpha ());
+  po->CheckFrustum ((iFrustumView*)lview, destpoly3d->GetAlpha ());
 
 stop:
   lview->RestoreFrustumContext (old_ctxt);

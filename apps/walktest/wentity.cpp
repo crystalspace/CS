@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "walktest/wentity.h"
 #include "walktest/walktest.h"
-#include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csgeom/matrix3.h"
 
@@ -32,7 +31,7 @@ IMPLEMENT_CSOBJTYPE (csLightObject, csWalkEntity);
 
 //--------------------------------------------------------------------------
 
-csDoor::csDoor (csThing* p)
+csDoor::csDoor (csMeshWrapper* p)
 {
   is_open = false;
   transition = 0;
@@ -79,9 +78,7 @@ csRotatingObject::csRotatingObject (csObject* p)
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
-  if (p->GetType () == csThing::Type)
-    movable = &((csThing*)p)->GetMovable ();
-  else if (p->GetType () >= csMeshWrapper::Type)
+  if (p->GetType () >= csMeshWrapper::Type)
     movable = &((csMeshWrapper*)p)->GetMovable ();
 }
 

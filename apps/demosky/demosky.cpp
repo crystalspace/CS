@@ -82,7 +82,7 @@ Simple::~Simple ()
   delete System;
 }
 
-void Simple::SetTexSpace(csProcSkyTexture *skytex, csPolygon3D *poly, 
+void Simple::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
   int size, const csVector3& orig, const csVector3& upt, float ulen, 
   const csVector3& vpt, float vlen)
 {
@@ -181,65 +181,80 @@ bool Simple::Initialize (int argc, const char* const argv[],
   csMaterialWrapper* matu = sky_u->Initialize(this, engine, txtmgr, "sky_u");
   sky_d = new csProcSkyTexture(sky);
   csMaterialWrapper* matd = sky_d->Initialize(this, engine, txtmgr, "sky_d");
+  iMaterialWrapper* imatf = QUERY_INTERFACE (matf, iMaterialWrapper); imatf->DecRef ();
+  iMaterialWrapper* imatb = QUERY_INTERFACE (matb, iMaterialWrapper); imatb->DecRef ();
+  iMaterialWrapper* imatl = QUERY_INTERFACE (matl, iMaterialWrapper); imatl->DecRef ();
+  iMaterialWrapper* imatr = QUERY_INTERFACE (matr, iMaterialWrapper); imatr->DecRef ();
+  iMaterialWrapper* imatu = QUERY_INTERFACE (matu, iMaterialWrapper); imatu->DecRef ();
+  iMaterialWrapper* imatd = QUERY_INTERFACE (matd, iMaterialWrapper); imatd->DecRef ();
 
   room = engine->CreateCsSector ("room");
-  csThing* walls = engine->CreateSectorWalls (room, "walls");
-  csPolygon3D* p;
-  p = walls->NewPolygon (matd);
+  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
+  iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState);
+  iPolygon3D* p;
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatd);
   float size = 500.0; /// size of the skybox -- around 0,0,0 for now.
   float simi = size; //*255./256.; /// sizeminor
-  p->AddVertex (-size, -simi, size);
-  p->AddVertex (size, -simi, size);
-  p->AddVertex (size, -simi, -size);
-  p->AddVertex (-size, -simi, -size);
-  //sky_d->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_d, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p->CreateVertex (csVector3 (-size, -simi, size));
+  p->CreateVertex (csVector3 (size, -simi, size));
+  p->CreateVertex (csVector3 (size, -simi, -size));
+  p->CreateVertex (csVector3 (-size, -simi, -size));
+  //sky_d->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_d, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
-  p = walls->NewPolygon (matu);
-  p->AddVertex (-size, simi, -size);
-  p->AddVertex (size, simi, -size);
-  p->AddVertex (size, simi, size);
-  p->AddVertex (-size, simi, size);
-  //sky_u->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_u, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatu);
+  p->CreateVertex (csVector3 (-size, simi, -size));
+  p->CreateVertex (csVector3 (size, simi, -size));
+  p->CreateVertex (csVector3 (size, simi, size));
+  p->CreateVertex (csVector3 (-size, simi, size));
+  //sky_u->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_u, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
-  p = walls->NewPolygon (matf);
-  p->AddVertex (-size, size, simi);
-  p->AddVertex (size, size, simi);
-  p->AddVertex (size, -size, simi);
-  p->AddVertex (-size, -size, simi);
-  //sky_f->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_f, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatf);
+  p->CreateVertex (csVector3 (-size, size, simi));
+  p->CreateVertex (csVector3 (size, size, simi));
+  p->CreateVertex (csVector3 (size, -size, simi));
+  p->CreateVertex (csVector3 (-size, -size, simi));
+  //sky_f->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_f, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
-  p = walls->NewPolygon (matr);
-  p->AddVertex (simi, size, size);
-  p->AddVertex (simi, size, -size);
-  p->AddVertex (simi, -size, -size);
-  p->AddVertex (simi, -size, size);
-  //sky_r->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_r, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatr);
+  p->CreateVertex (csVector3 (simi, size, size));
+  p->CreateVertex (csVector3 (simi, size, -size));
+  p->CreateVertex (csVector3 (simi, -size, -size));
+  p->CreateVertex (csVector3 (simi, -size, size));
+  //sky_r->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_r, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
-  p = walls->NewPolygon (matl);
-  p->AddVertex (-simi, size, -size);
-  p->AddVertex (-simi, size, size);
-  p->AddVertex (-simi, -size, size);
-  p->AddVertex (-simi, -size, -size);
-  //sky_l->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_l, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatl);
+  p->CreateVertex (csVector3 (-simi, size, -size));
+  p->CreateVertex (csVector3 (-simi, size, size));
+  p->CreateVertex (csVector3 (-simi, -size, size));
+  p->CreateVertex (csVector3 (-simi, -size, -size));
+  //sky_l->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_l, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
 
-  p = walls->NewPolygon (matb);
-  p->AddVertex (size, size, -simi);
-  p->AddVertex (-size, size, -simi);
-  p->AddVertex (-size, -size, -simi);
-  p->AddVertex (size, -size, -simi);
-  //sky_b->SetTextureSpace(p->Vobj(0), p->Vobj(1)-p->Vobj(0), p->Vobj(3)-p->Vobj(0));
-  SetTexSpace (sky_b, p, 256, p->Vobj (0), p->Vobj (1), 2.*size, p->Vobj(3), 2.*size);
-  p->flags.Set(CS_POLY_LIGHTING, 0);
+  p = walls_state->CreatePolygon ();
+  p->SetMaterial (imatb);
+  p->CreateVertex (csVector3 (size, size, -simi));
+  p->CreateVertex (csVector3 (-size, size, -simi));
+  p->CreateVertex (csVector3 (-size, -size, -simi));
+  p->CreateVertex (csVector3 (size, -size, -simi));
+  //sky_b->SetTextureSpace(p->GetVertex (0), p->GetVertex (1)-p->GetVertex (0), p->GetVertex (3)-p->GetVertex (0));
+  SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
+  p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
+  walls_state->DecRef ();
 
   csLoader::LoadTexture (engine, "seagull", "/lib/std/seagull.gif");
   csMaterialWrapper *sg = engine->GetMaterials ()->FindByName("seagull");
