@@ -98,7 +98,10 @@ public:
 	///
 	void normalize( void )
 	{
-		n.normalize();
+		float s = n.size();
+		ddgAssert(s != 0.0);
+		n.divide(s);
+		d /= s;
 	}
     ///
 	ddgVector3 project(ddgVector3 *p0);
