@@ -16,15 +16,9 @@ mail the Crystal Space mailing list and ask for help.
 This version explains how to go from 0.16 to 0.17.
 
 @menu
-* API NextFrame:: NextFrame Prototype (elapsed_time/current_time)
-* API HandleEvent:: HandleEvent Prototype (csEvent -> iEvent)
-* API Materials:: Materials versus Textures
-* API CD:: Collision Detection Plugin
-* API Texture Mapping:: Texture Mapping Changes
-* API Sound:: Sound Changes
 @end menu
 
-@node API NextFrame, API HandleEvent, , 
+@node API NextFrame, API HandleEvent, ,
 @subsection NextFrame Prototype (elapsed_time/current_time)
 @cindex NextFrame
 @cindex elapsed time
@@ -45,7 +39,7 @@ void ...::NextFrame ()
   ...
 @end example
 
-@node API HandleEvent, API Materials, API NextFrame, 
+@node API HandleEvent, API Materials, API NextFrame,
 @subsection HandleEvent Prototype (csEvent -> iEvent)
 @cindex HandleEvent
 @cindex csEvent
@@ -55,7 +49,7 @@ The prototype of @code{csSystemDriver::HandleEvent} has changed
 from a @code{csEvent} parameter to a @code{iEvent} parameter. Update your
 subclassed versions if you have any.
 
-@node API Materials, API CD, API HandleEvent, 
+@node API Materials, API CD, API HandleEvent,
 @subsection Materials versus Textures
 @cindex materials
 @cindex textures
@@ -94,7 +88,7 @@ csLoader::LoadTexture (world, "myTexture", "/lib/std/stone4.gif");
 csMaterialWrapper* m = world->GetMaterials ()->FindByName ("myTexture");
 @end example
 
-@node API CD, API Texture Mapping, API Materials, 
+@node API CD, API Texture Mapping, API Materials,
 @subsection Collision Detection Plugin
 @cindex collision detection
 @cindex RAPID
@@ -180,7 +174,7 @@ So you have to reset it if you are no longer interested in that.
 Note that @code{csRAPIDCollider::Report} is gone. If you want that
 functionality you have to do it on your own (which is not difficult).
 
-@node API Texture Mapping, API Sound, API CD, 
+@node API Texture Mapping, API Sound, API CD,
 @subsection Texture Mapping Changes
 @cindex texture mapping
 
@@ -204,7 +198,7 @@ In practice this means that @code{csGouraudShaded} has gone and is
 now replaced with @code{csPolyTexGouraud}. @code{csLightMapped} has also
 gone and is replaced with @code{csPolyTexLightMap}.
 
-@node API Sound, , API Texture Mapping, 
+@node API Sound, , API Texture Mapping,
 @subsection Sound Changes
 @cindex sound
 
