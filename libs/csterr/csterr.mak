@@ -69,7 +69,7 @@ csterrclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)csterr.dep
 $(OUTOS)csterr.dep: $(SRC.CSTERR)
-	$(DO.DEP)
+	$(DO.DEP1) $(CFLAGS.CSTERR) $(DO.DEP2)
 else
 -include $(OUTOS)csterr.dep
 endif
