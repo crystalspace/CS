@@ -38,9 +38,6 @@
 #include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 
-
-//------------------------------------------------------------------------------
-
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
@@ -88,9 +85,8 @@ csPolyTexture::~csPolyTexture ()
 {
   if (polygon && polygon->GetParent ())
   {
-    iGraphics3D* G3D = polygon->GetParent ()->GetStaticData ()->thing_type->G3D;
-    if (G3D && rlm) G3D->RemoveFromCache (/*thismapping, tmapping, */
-      rlm);
+    iGraphics3D* G3D = polygon->GetParent()->GetStaticData()->thing_type->G3D;
+    if (G3D && rlm) G3D->RemoveFromCache (/*thismapping, tmapping, */ rlm);
   }
   delete shadow_bitmap;
   if (polygon && lm)
@@ -207,7 +203,7 @@ static bool FindSeparatingPlane (
       auxD = plane.Classify (poly1->Vwor (j) - lightpos);
       if (ABS (auxD) < EPSILON) continue;
       pointClassify = SIGN (auxD);
-      if (previousSign == pointClassify) 
+      if (previousSign == pointClassify)
       {
         overlap = true;
         break;
@@ -231,7 +227,7 @@ static bool CanCastShadow (
    * the two polygons. These are the criteria we now use in this test.
    */
   if (FindSeparatingPlane (
-      shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (), 
+      shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (),
       poly, poly->GetStaticData ()->GetVertexCount (),
       lightpos))
     return false;
@@ -376,7 +372,8 @@ void csPolyTexture::FillLightMap (
     // First render our frustum if it is not infinite.
     if (!light_frustum->IsInfinite ())
     {
-      csRef<csFrustum> new_frustum (light_frustum->Intersect (poly, num_vertices));
+      csRef<csFrustum> new_frustum(
+        light_frustum->Intersect(poly, num_vertices));
       if (new_frustum)
       {
         int nv = new_frustum->GetVertexCount ();
@@ -432,7 +429,7 @@ void csPolyTexture::FillLightMap (
       // that should not shadow.
       // @@@ TODO: Actually we don't want to intersect really. We
       // only want to project the shadow frustum on the polygon plane!!!
-      csRef<csFrustum> new_shadow (shadow_frust->Intersect (poly, num_vertices));
+      csRef<csFrustum> new_shadow(shadow_frust->Intersect(poly, num_vertices));
       if (new_shadow)
       {
         // Test if two polygons can cast shadows on each other.
@@ -480,7 +477,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   float d;
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->GetStaticData()->GetMaterialHandle();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
@@ -501,8 +498,10 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   invhh = 1.0f / (float)hh;
 
   csRGBpixel* map = lm->GetRealMap ();
-  long lm_size = lm->GetWidth () * lm->GetHeight ();
   iDynLight *light = lp->GetLight ();
+#if defined(CS_DEBUG)
+  long lm_size = lm->GetWidth () * lm->GetHeight (); // Used only for asserts.
+#endif
 
   int i;
   float miny = 1000000, maxy = -1000000;
@@ -529,7 +528,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
       mi = i;
 
       // T = Mwt * (W - Vwt)
-      //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
+      //v1 = pl->m_world2te *(lp->vertices[mi] + lp->center - pl->v_world2tex);
       v1 = m_world2tex * (lp->GetVertex (mi) + lightpos - v_world2tex);
       f_uv[i].x = (v1.x * ww - tmapping->Imin_u) * inv_lightcell_size;
       f_uv[i].y = (v1.y * hh - tmapping->Imin_v) * inv_lightcell_size;
@@ -542,17 +541,18 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
 
   int new_lw = lm->GetWidth ();
 
-  int scanL1, scanL2, scanR1, scanR2; // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;           // scanline X left/right and deltas
-  int sy, fyL, fyR;                   // scanline Y, final Y left, final Y right
+  int scanL1, scanL2, scanR1, scanR2;// scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;          // scanline X left/right and deltas
+  int sy, fyL, fyR;                  // scanline Y, final Y left, final Y right
   int xL, xR;
 
-  sxL = sxR = dxL = dxR = 0;          // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = MaxIndex;
 
-  // sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
-  sy = fyL = fyR = (QRound (ceil (f_uv[scanL2].y)) > lh - 1) ? lh - 1 : QRound (
-      ceil (f_uv[scanL2].y));
+  // sy = fyL = fyR =
+  //   (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
+  sy = fyL = fyR = (QRound (ceil (f_uv[scanL2].y)) > lh - 1) ?
+    lh - 1 : QRound (ceil (f_uv[scanL2].y));
 
   for (;;)
   {
@@ -775,7 +775,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   CS_ASSERT (shadow_bitmap != 0);
 
   int ww, hh;
-  iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
+  iMaterialHandle* mat_handle = polygon->GetStaticData()->GetMaterialHandle();
   if (mat_handle && mat_handle->GetTexture ())
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   else
@@ -823,7 +823,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         lightpos,
         polygon,
         cosfact);
-    
+
       if (!relevant && created)
       {
         // The shadow map is just created but it is not relevant (i.e.
@@ -882,7 +882,7 @@ int csPolyTexture::GetLightCellShift ()
   return csLightMap::lightcell_shift;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 csShadowBitmap::csShadowBitmap (
   int lm_w,
   int lm_h,
@@ -1328,7 +1328,7 @@ void csShadowBitmap::UpdateLightMap (
 	    if (distances[act] < 0.001f)
 	      normal += nearestNormals[act];
 	    else
-	      normal += shortestDistance * nearestNormals[act] / distances[act];
+	      normal += shortestDistance * nearestNormals[act]/distances[act];
 	  }
 	}
 
@@ -1425,14 +1425,14 @@ bool csShadowBitmap::UpdateShadowMap (
       d = qsqrt (d);
 
       csVector3 normal = poly->GetPolyPlane().Normal ();
-      if ( static_data->GetSmoothingFlag() ) 
+      if ( static_data->GetSmoothingFlag() )
       {
   int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
   csVector3* normals = static_data->GetNormals ();
   int vCount = poly->GetStaticData ()->GetVertexCount ();
   csSegment3* segments = new csSegment3[vCount];
 
-  // int nearest; 
+  // int nearest;
   csVector3* nearest = new csVector3[vCount];
   csVector3* nearestNormals = new csVector3[vCount];
   float *distances = new float[vCount];
@@ -1453,10 +1453,10 @@ bool csShadowBitmap::UpdateShadowMap (
     csVector3 v_a = segments[act].Start ();
     csVector3 v_b = segments[act].End ();
     csVector3 v_c = v;
-    float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
+    float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) +
     (v_c.y - v_a.y) * (v_b.y - v_a.y) +
     (v_c.z - v_a.z) * (v_b.z - v_a.z);
-    float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
+    float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) +
     (v_c.y - v_b.y) * (v_a.y - v_b.y) +
     (v_c.z - v_b.z) * (v_a.z - v_b.z);
 
@@ -1505,7 +1505,7 @@ bool csShadowBitmap::UpdateShadowMap (
     else
       weights[act] = shortestDistance / distances[act];
   }
-  
+
   if (!poly->GetStaticData ()->PointOnPolygon (v))
   {
     normal = nearestNormals[nearestNormal];
@@ -1547,7 +1547,7 @@ bool csShadowBitmap::UpdateShadowMap (
   return relevant;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csLightingPolyTexQueue)
   SCF_IMPLEMENTS_INTERFACE(iLightingProcessData)
 SCF_IMPLEMENT_IBASE_END
@@ -1605,6 +1605,3 @@ void csLightingPolyTexQueue::UpdateMaps (
 
   polytxts.DeleteAll ();
 }
-
-//------------------------------------------------------------------------------
-

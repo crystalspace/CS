@@ -40,11 +40,11 @@ chronological order.
 	  GetContentsValue() (for XML parsing) was stored but not copied.  This
 	  is not valid since the string is not guaranteed to exist for a long
 	  time.  The places I fixed are:
-	  	- Parsing of 'priority' in main loader.
-		- Parsing of 'cullerp' in main loader.
-		- Parsing of 'type' for textures.
-		- Parsing of cubemaps.
-		- Parsing of renderloops.
+	    - Parsing of 'priority' in main loader.
+	    - Parsing of 'cullerp' in main loader.
+	    - Parsing of 'type' for textures.
+	    - Parsing of cubemaps.
+	    - Parsing of renderloops.
 	- Jorrit fixed the cloth plugin so it no longer includes the removed
 	  tesselator class. It wasn't using the class anyway.
 	- Jorrit changed a few calls to Warn() in the engine with calls to
@@ -83,6 +83,8 @@ chronological order.
 	  objectIsForcedForKey:inDomain:] is not present.
 	- Eric Sunshine eliminated signed versus unsigned compilation warning
 	  in cskeyacc.cpp.
+	- Eric Sunshine eliminated compilation warning in thing/polytext.cpp
+	  about unused variable in non-debug mode.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
