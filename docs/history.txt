@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	  with a define.
 	- Fixed bug with software renderer and line_table which was initialized
 	  too late in some cases.
+	- Fixed iso engine so it correctly initializes the 'effect'
+	  pointer to NULL. This makes it work again in OpenGL.
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.

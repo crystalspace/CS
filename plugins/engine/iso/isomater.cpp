@@ -33,6 +33,7 @@ csIsoMaterial::csIsoMaterial () :
 {
   SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
+  effect = NULL;
 }
 
 csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
@@ -43,6 +44,7 @@ csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
   SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
   texture = w;
+  effect = NULL;
 }
 
 csIsoMaterial::~csIsoMaterial ()
