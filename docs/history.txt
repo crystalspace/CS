@@ -356,7 +356,7 @@ chronological order.
 	      a set of items (items are emitted one per line).  This rule can
 	      be invoked multiple times for the same file, allowing it to be
 	      populated incrementally.
-	    - Augmented msvcgen.jam to worked around a fatal limitation in Jam
+	    - Augmented msvcgen.jam to work around a fatal limitation in Jam
 	      which caused project file creation to bomb out frequently except
 	      when $(TOP) and $(BUILDTOP) were very short pathnames (such as
 	      "C:\CS" or "/home/foo/CS").  Jam places a fairly restrictive
@@ -376,11 +376,11 @@ chronological order.
 	  utilize the portable FDefines and FIncludes rules instead of
 	  harcoding -D and -I.
 	- Jorrit fixed a compile error in spr3d for OR.
-	- Jorrit added a new iRenderView::ClipBBox(). This versions works
-	  with an object space bbox instead of a camera space bbox. This
-	  has the advantage of being much more accurate. Instead of transforming
-	  the object bbox to camera space (which will make it larger)
-	  the frustum is now transformed from camera to object space.
+	- Jorrit added a new iRenderView::ClipBBox(). This versions works with
+	  an object space bbox instead of a camera space bbox. This has the
+	  advantage of being much more accurate. Instead of transforming the
+	  object bbox to camera space (which will make it larger) the frustum
+	  is now transformed from camera to object space.
 	- Jorrit changed chunklod mesh object plugin to use this new
 	  ClipBBox() routine.
 	- Jorrit split the new iRenderView->ClipBBox() routine in
@@ -784,7 +784,7 @@ chronological order.
 	  destinations didn't work (was only bound to the first destination).
 	- res augmented the chunklod plugin to also provide normalized tex
 	  coords (ie go from 0 to 1 over the area of the terrain).
-	- Eric Sunshine fixed a stupid oversight in install.mak where the
+	- Eric Sunshine fixed a silly oversight in install.mak where the
 	  'install' target failed to be recognized by the sub-make invocation,
 	  despite the fact that the other targets, such as 'install_config',
 	  'install_plugin', etc., were recognized.  Reported by Atis Elsts
