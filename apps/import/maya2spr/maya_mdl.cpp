@@ -265,7 +265,6 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
       socket = first_socket;
       do
       {
-        int stop,start = socket->startframe;
         csString name = socket->name;
 	int      tri  = socket->startframe; // really triangle #
 

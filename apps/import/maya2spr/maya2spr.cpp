@@ -68,7 +68,7 @@ static void usage(FILE* s, int rc)
 
 
 static void fatal_usage() { usage(stderr, -1); }
-static void okay_usage()  { usage(stdout,  0); }
+//static void okay_usage()  { usage(stdout,  0); }
 
 int proc_arg(int argc, char *argv[], int which)
 {

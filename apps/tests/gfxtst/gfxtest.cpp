@@ -491,7 +491,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
 {
   programname = argv [0];
 
-  int c, ret;
+  int c;
   while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, NULL)) != EOF)
     switch (c)
     {
