@@ -1372,15 +1372,8 @@ char* csThing::GenerateCacheName ()
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
-
-  char* cachename = new char[33];
-  sprintf (cachename,
-  	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-  	digest.data[0], digest.data[1], digest.data[2], digest.data[3],
-  	digest.data[4], digest.data[5], digest.data[6], digest.data[7],
-  	digest.data[8], digest.data[9], digest.data[10], digest.data[11],
-  	digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
-  return cachename;
+  csString hex(digest.HexString());
+  return hex.Detach();
 }
 
 void csThing::MarkLightmapsDirty ()

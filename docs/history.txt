@@ -39,6 +39,8 @@ chronological order.
 	  acceptable (presently) for csString to contain arbitrary binary data,
 	  thus embedded null characters may be present.
 	- Eric Sunshine fixed bogus logic in scfString::SubString().
+	- Eric Sunshined replaced a bunch of long, ugly copy/paste sprintf()
+	  invocations throughout the project with csMD5::Digest:HexString().
 28-Sep-2003
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
