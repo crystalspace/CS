@@ -18,6 +18,15 @@ The history order is reversed so that new features are at the top.
 	  - Cleaned up and improved bison and flex rules. They are alot more
 	    robust now as jam is aware that bison produces 2 files (a cpp and
 	    a header file)
+	- Oktal updated the Perl module:
+	  - Rearranged the generation of csperlxs.c. Configure now generates a
+	    csperlxs.inc file with Perl, and echoes out a one-line csperlxs.c
+	    file which just #include's the inc file. If that fails, the
+	    fallback inc file is switched to, by changing the #include line.
+	  - Reenabled the Jamfile (see Matze 29-Apr-2003).
+	  - Updated the Makefile in line with the changes.
+	  - Fixed the example Perl code in perl5test so it follows the
+	    conventions of the new SWIG module.
 2-May-2003
 	- Eric Sunshine augmented jobber.pl to make it possible to associate
 	  multiple directories with a single "target" (in @TARGETS).  All of
