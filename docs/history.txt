@@ -17,6 +17,7 @@ The history order is reversed so that new features are at the top.
 	  transforming the bounding box of the object to world space.
 	- Jorrit added a 'toggle_mmx' command to Dynavis. Assigned BugPlug
 	  key '8' to that. This new command toggles the mmx capability on/off.
+	- Jorrit replaced _X86_ with PROC_X86 in the tiled coverage buffer.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image
 	  View".
