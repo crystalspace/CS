@@ -290,7 +290,7 @@ bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
     {
     case ETIMEDOUT:
       lasterr = "Timeout";
-      break;
+      return false; 
     case EINTR:
       lasterr = "Wait interrupted";
       break;
