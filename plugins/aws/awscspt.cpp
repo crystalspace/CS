@@ -93,6 +93,15 @@ awsSingleProctexCanvas::Animate (csTicks current_time)
 
 void awsSingleProctexCanvas::Show (csRect *area, iGraphics3D *g3d)
 {
+  int w = (G2D()->GetWidth()  < g3d->GetWidth() ? G2D()->GetWidth() : g3d->GetWidth());
+  int h = (G2D()->GetHeight() < g3d->GetHeight() ? G2D()->GetHeight() : g3d->GetHeight());
+  
+  area->xmin = (area->xmin < 0 ? 0 : area->xmin);
+  area->ymin = (area->ymin < 0 ? 0 : area->ymin);
+
+  area->xmax = (area->xmax > w ? w : area->xmax);
+  area->ymax = (area->ymax > h ? h : area->ymax);
+
   canvas->G3D()->Print(area);
 
   if (g3d)
