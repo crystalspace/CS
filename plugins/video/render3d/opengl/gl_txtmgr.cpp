@@ -61,25 +61,26 @@ SCF_IMPLEMENT_IBASE(csGLTextureHandle)
   SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
-    GLenum sourceFormat, csGLRender3D *iR3D)
+csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int bpp,
+                                      GLenum sourceFormat, csGLRender3D *iR3D)
 {
   this->sourceFormat = sourceFormat;
   this->R3D = iR3D;
   this->flags = flags;
   this->target = target;
   cachedata = 0;
+  this->bpp = bpp;
   
-
   images = new csImageVector();
   (*images)[0] = image;
 }
 
-csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target,
+csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D)
 {
   images = image;
   
+  this->bpp = bpp;
   this->flags = flags;
   this->target = target;
   this->sourceFormat = sourceFormat;
@@ -482,6 +483,9 @@ void csGLTextureHandle::CreateMipMaps()
   // and store it in vTex
   int lcurmip; 
 
+  for (i=0; csGLTextureManager::glformats[i].sourceFormat != sourceFormat
+   && csGLTextureManager::glformats[i].components; i++);
+
   for(lcurmip = 0; lcurmip < mipmaplevelcount; lcurmip++)
   {
     csGLTexture *newtex = new csGLTexture(this);
@@ -490,19 +494,20 @@ void csGLTextureHandle::CreateMipMaps()
     newtex->h = (lheight > 1) ? lheight >> lcurmip : 1;
     newtex->d = (ldepth > 1) ? ldepth >> lcurmip : 1;
 
-    newtex->size = lwidth * lheight * ldepth * csGLTextureManager::glformats[sourceFormat].components;
+    newtex->size = lwidth * lheight * ldepth * csGLTextureManager::glformats[i].components;
     newtex->image_data = new uint8[newtex->size];
-    newtex->internalFormat = csGLTextureManager::glformats[sourceFormat].targetFormat;
+    newtex->internalFormat = csGLTextureManager::glformats[i].targetFormat;
 
 
     int lcurdepth;
     for(lcurdepth = 0; lcurdepth < ldepth; lcurdepth++)
     {
       csRef<iImage> tmpimg = (*images)[lcurdepth]->MipMap(lcurmip, 0);
+      int curdepthsize = tmpimg->GetWidth() * tmpimg->GetHeight() * csGLTextureManager::glformats[i].components;
 
-      memcpy(newtex->image_data, 
+      memcpy(newtex->image_data + curdepthsize*lcurdepth, 
         tmpimg->GetImageData(), 
-        tmpimg->GetWidth() * tmpimg->GetHeight() * csGLTextureManager::glformats[sourceFormat].components);
+        curdepthsize);
 
 //      tmpimg->DecRef();
     }
@@ -743,7 +748,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int fl
     return NULL;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D, GL_RGBA, R3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, R3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
@@ -757,7 +762,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, 
     return NULL;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target, GL_RGBA, R3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target,pfmt.PixelBytes*8, GL_RGBA, R3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }

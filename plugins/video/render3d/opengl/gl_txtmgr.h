@@ -108,10 +108,10 @@ public:
   int target;
   bool was_render_target;
 
-  csGLTextureHandle (iImage* image, int flags, int target,
+  csGLTextureHandle (iImage* image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D);
 
-  csGLTextureHandle (csRef<iImageVector> image, int flags, int target,
+  csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D);
 
   GLenum SourceType (){return sourceType;}
