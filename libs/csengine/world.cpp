@@ -255,14 +255,14 @@ csWorld::~csWorld ()
 
 bool csWorld::Initialize (iSystem* sys)
 {
-printf ("csPolygon3D %d\n", sizeof (csPolygon3D));
-printf ("csPolyPlane %d\n", sizeof (csPolyPlane));
-printf ("csPolyTxtPlane %d\n", sizeof (csPolyTxtPlane));
-printf ("csPolyTexture %d\n", sizeof (csPolyTexture));
-printf ("csPolygonSet %d\n", sizeof (csPolygonSet));
-printf ("csLightMapped %d\n", sizeof (csLightMapped));
-printf ("csGouraudShaded %d\n", sizeof (csGouraudShaded));
-printf ("csLightMap %d\n", sizeof (csLightMap));
+printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
+printf ("csPolyPlane %ld\n", (long)sizeof (csPolyPlane));
+printf ("csPolyTxtPlane %ld\n", (long)sizeof (csPolyTxtPlane));
+printf ("csPolyTexture %ld\n", (long)sizeof (csPolyTexture));
+printf ("csPolygonSet %ld\n", (long)sizeof (csPolygonSet));
+printf ("csLightMapped %ld\n", (long)sizeof (csLightMapped));
+printf ("csGouraudShaded %ld\n", (long)sizeof (csGouraudShaded));
+printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
 
   System = sys;
 
