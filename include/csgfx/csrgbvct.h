@@ -1,5 +1,5 @@
 /*
-    Crystal Space utility library: vector class interface
+    Crystal Space graphics library: vector class interface
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -23,8 +23,6 @@
 
 #include "array.h"
 #include "csgfx/rgbpixel.h"
-
-// @@@@@@@@@ THIS CLASS SHOULD MOVE TO include/csgfx probably!
 
 /**
  * This is a vector class that expects you to push

@@ -30,6 +30,9 @@ chronological order.
 	  also makes it easier to read code that uses those functions.
 	- Jorrit changed pubapi target so that it no longer includes
 	  csengine documentation.
+	- Jorrit moved csRGBVector from csutil to csgfx. Firstly it belongs
+	  there, and secondly this avoids a circular dependency between
+	  csgfx and csutil.
 18-Sep-2003
 	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
 	  yesterday which caused SHGetFolderPathW() to be used when present.
