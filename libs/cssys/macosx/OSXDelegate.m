@@ -279,9 +279,8 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //-----------------------------------------------------------------------------
 // classifyFunctionKey::
 //-----------------------------------------------------------------------------
-- (void)classifyFunctionKey:(int*)raw :(int*)cooked
+- (void)classifyFunctionKey:(unsigned int*)raw :(unsigned int*)cooked
 {
-  *cooked = -1;
   switch (*raw)
   {
     case K_LEFT:         *raw = CSKEY_LEFT;  break;
@@ -307,6 +306,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     case K_F11:          *raw = CSKEY_F11;   break;
     case K_F12:          *raw = CSKEY_F12;   break;
   }
+  *cooked = *raw;
 }
 
 
@@ -315,7 +315,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //	*NOTE* The so-called "backspace" key on the keyboard actually sends
 //	DEL, however Crystal Space would like to see it as CSKEY_BACKSPACE.
 //-----------------------------------------------------------------------------
-- (void)classifyOtherKey:(int*)raw :(int*)cooked
+- (void)classifyOtherKey:(unsigned int*)raw :(unsigned int*)cooked
 {
   switch (*raw)
   {
@@ -335,7 +335,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //-----------------------------------------------------------------------------
 // classifyNumericPadKey::
 //-----------------------------------------------------------------------------
-- (void)classifyNumericPadKey:(int*)raw :(int*)cooked
+- (void)classifyNumericPadKey:(unsigned int*)raw :(unsigned int*)cooked
 {
   switch (*raw)
   {
@@ -363,7 +363,8 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 // classifyKeyDown:raw:cooked:
 //	Translate OpenStep keystroke to Crystal Space codes.
 //-----------------------------------------------------------------------------
-- (BOOL)classifyKeyDown:(NSEvent*)p raw:(int*)raw cooked:(int*)cooked
+- (BOOL)classifyKeyDown:(NSEvent*)p
+  raw:(unsigned int*)raw cooked:(unsigned int*)cooked
 {
   BOOL ok = NO;
   unsigned int const flags = [p modifierFlags];
@@ -391,7 +392,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //	whenever a -flagsChanged: notification is posted.
 //-----------------------------------------------------------------------------
 - (void)check:(NSEvent*)p ns:(unsigned int)nsmask
-  cs:(unsigned long)csmask key:(int)key
+  cs:(unsigned long)csmask key:(unsigned int)key
 {
   BOOL const new_state = (([p modifierFlags] & nsmask) != 0);
   BOOL const old_state = ((modifiers & csmask) != 0);
@@ -400,12 +401,12 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     if (new_state)
     {
       modifiers |= csmask;
-      OSXAssistant_key_down(assistant, key, -1);
+      OSXAssistant_key_down(assistant, key, key);
     }
     else
     {
       modifiers &= ~csmask;
-      OSXAssistant_key_up(assistant, key, -1);
+      OSXAssistant_key_up(assistant, key, key);
     }
   }
 }
@@ -418,7 +419,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 {
   if (!paused)
   {
-    int raw, cooked;
+    unsigned int raw, cooked;
     if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
     {
       if (flag)

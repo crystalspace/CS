@@ -213,7 +213,7 @@ enum
 };
 
 /// Flags for all currently pressed modifiers.
-struct csKeyModifiers
+typedef struct _csKeyModifiers
 {
   /**
    * Bitmasks for different modifiers.
@@ -231,8 +231,8 @@ struct csKeyModifiers
    * bool ctrl = m.modifiers[csKeyModifierTypeAlt] != 0;
    * \endcode
    */
-  uint32 modifiers[csKeyModifierTypeLast];
-};
+  unsigned int modifiers[csKeyModifierTypeLast];
+} csKeyModifiers;
 /** @} */
 
 /** \name Modifier key masks

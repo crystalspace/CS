@@ -33,6 +33,12 @@ chronological order.
 	- Jorrit fixed the bug with software renderer fog.
 	- Jorrit changed iSequenceManager->NewSequence() so it returns a
 	  csPtr<iSequence>.
+	- Eric Sunshine removed a C++ construct and a type which is only
+	  defined by the CS C++ headers from iutil/evdefs.h since this file
+	  must not contain any C++ on account of the fact that it gets
+	  included in Objective-C code.
+	- Eric Sunshine upgraded the MacOS/X port to work with the updated key
+	  event functionality.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:

@@ -226,10 +226,10 @@ void OSXAssistant::show_mouse_pointer()
 void OSXAssistant::dispatch_event(OSXEvent e, OSXView v)
 { OSXDelegate_dispatch_event(controller, e, v); }
 
-void OSXAssistant::key_down(int raw, int cooked)
+void OSXAssistant::key_down(unsigned int raw, unsigned int cooked)
 { event_outlet->Key(raw, cooked, true); }
 
-void OSXAssistant::key_up(int raw, int cooked)
+void OSXAssistant::key_up(unsigned int raw, unsigned int cooked)
 { event_outlet->Key(raw, cooked, false); }
 
 void OSXAssistant::mouse_down(int b, int x, int y)
@@ -265,9 +265,11 @@ NSD_PROTO(void,show_mouse_pointer)(OSXAssistantHandle h)
     { NSD_ASSIST(h)->show_mouse_pointer(); }
 NSD_PROTO(void,dispatch_event)(OSXAssistantHandle h, OSXEvent e, OSXView v)
     { NSD_ASSIST(h)->dispatch_event(e, v); }
-NSD_PROTO(void,key_down)(OSXAssistantHandle h, int raw, int cooked)
+NSD_PROTO(void,key_down)(OSXAssistantHandle h,
+    unsigned int raw, unsigned int cooked)
     { NSD_ASSIST(h)->key_down(raw, cooked); }
-NSD_PROTO(void,key_up)(OSXAssistantHandle h, int raw, int cooked)
+NSD_PROTO(void,key_up)(OSXAssistantHandle h,
+    unsigned int raw, unsigned int cooked)
     { NSD_ASSIST(h)->key_up(raw, cooked); }
 NSD_PROTO(void,mouse_down)(OSXAssistantHandle h, int button, int x, int y)
     { NSD_ASSIST(h)->mouse_down(button, x, y); }
