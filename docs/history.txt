@@ -9,6 +9,8 @@ chronological order.
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.
+	- Eric Sunshine fixed libs/Jamfile so that it doesn't use `module' as a
+	  variable name since `module' is a reserved keyword in BoostJam.
 26-Mar-2005
 	- res added a check for setenv() and some (Win32 only) code to fake it
 	  up if not present.

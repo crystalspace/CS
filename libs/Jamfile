@@ -49,15 +49,15 @@ rule CsLibAddWild
 rule CsLibAddModule
 {
   local rejects = $(1) ;
-  local module = [ StripCommon $(SUBDIR_TOKENS) : $(CSLIB.ROOT) ] ;
-  local incbase = $(DOTDOT) include $(module) ;
+  local modname = [ StripCommon $(SUBDIR_TOKENS) : $(CSLIB.ROOT) ] ;
+  local incbase = $(DOTDOT) include $(modname) ;
   local srcpat = *.c *.cc *.cpp *.cxx *.C *.m *.mm *.M ;
   local incpat = *.h *.hpp *.hxx *.H ;
 
-  CsLibAddWild $(srcpat) $(incpat) : $(module) : $(rejects) ;
+  CsLibAddWild $(srcpat) $(incpat) : $(modname) : $(rejects) ;
 
   local oldsubdir = $(SUBDIR_TOKENS) ;
-  SubDir TOP include $(module) ;
+  SubDir TOP include $(modname) ;
   CsLibAddWild $(incpat) : $(incbase) : $(rejects) ;
   SubDir TOP $(oldsubdir) ;
 }
