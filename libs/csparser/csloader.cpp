@@ -1240,7 +1240,7 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
         {
 	  float f;
           ScanStr (params, "%f", &f);
-	  thing->SetCurveScale (f);
+	  thing->SetCurvesScale (f);
           break;
         }
       case CS_TOKEN_CURVECONTROL:
