@@ -150,6 +150,10 @@ rule HeaderRule
       HDRRULE on $(s) = $(HDRRULE_$(i:S)) ;
       HDRSCAN on $(s) = $(HDRPATTERN_$(i:S)) ;
     }
+    else if $(JAM_DEBUG)
+    {
+      echo "No Header rule for $(i:S) file $(i) " ;
+    }
   }
 }
 
@@ -166,6 +170,7 @@ rule UseHeaderFile
   return ;
 }
 RegisterFileType UseHeaderFile : .h .hpp ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .h .hpp .inc ;
 
 # Generates a grist suitable for output objects based on
 # SUBVARIANT and SUBDIR variable.

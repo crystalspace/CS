@@ -21,7 +21,7 @@ rule Nasm
 }
 
 NASM.HDRPATTERN = "^[ 	]*%[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
-RegisterHeaderRule HeaderRule : $(NASM.HDRPATTERN) : .asm ;
+RegisterHeaderRule HeaderRule : $(NASM.HDRPATTERN) : .asm .ash ;
 
 actions Nasm
 {

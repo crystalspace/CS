@@ -2,81 +2,54 @@
 # Main rules file - Includes all important rulefiles in correct order
 #============================================================================
 
-# boostjam is evil: It is compatible to jam 2.4 but has a version number 3.1, we
-# try to detect boostjam with the ARGV extension
-if $(ARGV[0])
-{
-# boostjam hacks
-  JAMVERSION = 2.4 ;
-  rule FIncludes
-  {
-    return -I$(<) ;
-  }
-  rule FDefines
-  {
-    return -D$(<) ;
-  }
-}
+# enable if you want debug messages
+# JAM_DEBUG = 1 ;
 
-if $(JAMVERSION) < 2.4
-{
-    EXIT "Error: This buildsystem requires jam version 2.4 or later." ;
-}
+jamrulesdir = $(TOP)/mk/jam ;
 
-# All scripts invoked by the build system expect a Bourne or compatible shell.
-# Reject C-shell and its variants (such as tcsh).  Unfortunately, this is a bit
-# of an ugly hack.  It would be nicer to perform this logic at the very end of
-# this file as a last-minute assertion.  Unfortunately, however, it seems that
-# references to $(SHELL) in any of the included files get bound at the point
-# of reference, thus we need to perform this filtering as early as possible.
-if [ Match (csh) : $(SHELL) ]
-{
-  SHELL = "/bin/sh" ;
-}
+include $(jamrulesdir)/jamcompatibility.jam ;
+include $(jamrulesdir)/subdir.jam ;
 
-mkdir = $(TOP)/mk/jam ;
+include $(jamrulesdir)/variant.jam ;
+include $(jamrulesdir)/resource.jam ;
 
-include $(mkdir)/subdir.jam ;
+include $(jamrulesdir)/helper.jam ;
+include $(jamrulesdir)/help.jam ;
+include $(jamrulesdir)/groups.jam ;
+include $(jamrulesdir)/install.jam ;
+include $(jamrulesdir)/clean.jam ;
 
-include $(mkdir)/variant.jam ;
-include $(mkdir)/resource.jam ;
+include $(jamrulesdir)/objects.jam ;
+include $(jamrulesdir)/compiler.jam ;
+include $(jamrulesdir)/objectivec.jam ;
+include $(jamrulesdir)/assembler.jam ;
+include $(jamrulesdir)/bisonflex.jam ;
+include $(jamrulesdir)/swig.jam ;
 
-include $(mkdir)/helper.jam ;
-include $(mkdir)/help.jam ;
-include $(mkdir)/groups.jam ;
-include $(mkdir)/install.jam ;
-include $(mkdir)/clean.jam ;
+include $(jamrulesdir)/flags.jam ;
+include $(jamrulesdir)/library.jam ;
+include $(jamrulesdir)/static.jam ;
+include $(jamrulesdir)/application.jam ;
+include $(jamrulesdir)/plugin.jam ;
+include $(jamrulesdir)/docs.jam ;
 
-include $(mkdir)/objects.jam ;
-include $(mkdir)/compiler.jam ;
-include $(mkdir)/objectivec.jam ;
-include $(mkdir)/assembler.jam ;
-include $(mkdir)/bisonflex.jam ;
-include $(mkdir)/swig.jam ;
-
-include $(mkdir)/flags.jam ;
-include $(mkdir)/library.jam ;
-include $(mkdir)/static.jam ;
-include $(mkdir)/application.jam ;
-include $(mkdir)/plugin.jam ;
-include $(mkdir)/docs.jam ;
-
-include $(mkdir)/options.jam ;
+include $(jamrulesdir)/options.jam ;
 
 # leave msvcgen as last element because it overrides some of teh earlier
 # defined rules
-include $(mkdir)/msvcgen.jam ;
+include $(jamrulesdir)/msvcgen.jam ;
 
 # Include OS specific rules
 switch $(TARGET.OS)
 {
 case WIN32 :
-  include $(mkdir)/win32.jam ;
+  include $(jamrulesdir)/win32.jam ;
 case MACOS_X :
-  include $(mkdir)/macosx.jam ;
+  include $(jamrulesdir)/macosx.jam ;
 case UNIX :
-  include $(mkdir)/unix.jam ;
+  include $(jamrulesdir)/unix.jam ;
 case * :
   echo "WARNING: TARGET.OS not defined. Using unix" ;
-  include $(mkdir)/unix.jam ;
+  include $(jamrulesdir)/unix.jam ;
 }
+
