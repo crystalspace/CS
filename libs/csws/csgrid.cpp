@@ -170,11 +170,13 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
     x1 = MIN(x1,x2); x2 = MAX(x1,x2);
     nSegs = linepattern[ (int)border.style ][0]; // linesegments in linepattern
     while (x1<maxX && y1<maxY){
-      i = (i+1)%nSegs;
+      i = i%nSegs;
       x2 = x1 + linepattern[ (int)border.style ][1+2*i+xcompo];
       y2 = y1 + linepattern[ (int)border.style ][1+2*i+ycompo];
-      Box (x1, y1, MIN(x2,maxX), MIN(y2,maxY), (i&1 ? CSPAL_GRIDCELL_BORDER_FG : CSPAL_GRIDCELL_BORDER_BG));
+      Box (x1, y1, MIN(x2,maxX), MIN(y2,maxY), (i&1 ? CSPAL_GRIDCELL_BORDER_BG : CSPAL_GRIDCELL_BORDER_FG));
+      //      printf("%d,%d -> %d,%d = %d\n", x1, y1, x2, y2,(i&1 ? 0 : 1));
       x1 = x2; y1=y2;
+      i++;
     }
   }
 }
@@ -527,7 +529,6 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 csGrid::~csGrid ()
 {
   int i;
-
   for (i=0; i < grid->rows.Length (); i++){
     csSparseGrid::csGridRow *r = (csSparseGrid::csGridRow*)grid->rows.Get(i)->data;
     for(int j=0; j<r->Length (); j++){
