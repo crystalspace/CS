@@ -38,7 +38,7 @@ SCF_IMPLEMENT_IBASE_END
 awsWindow::awsWindow():above(NULL), below(NULL), 
   min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
-  frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
+  frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   resizing_mode(false), moving_mode(false), 
   minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
   min_down(false), max_down(false), close_down(false),
@@ -57,7 +57,7 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
   if (!awsComponent::Setup(_wmgr, settings)) return false;
 
-  iAwsPrefs *pm = WindowManager()->GetPrefMgr();
+  iAwsPrefManager *pm = WindowManager()->GetPrefMgr();
   
   // Link into the current window hierarchy, at the top.
   if (WindowManager()->GetTopWindow()==NULL)

@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "ivaria/aws.h"
+#include "iutil/comp.h"
 #include "csutil/csvector.h"
 
 /*********************************************************************************************************************
@@ -29,6 +30,35 @@
 *    is listening or not.                                                                                            *
 *                                                                                                                    *
 *********************************************************************************************************************/
+
+class awsSinkManager : public iAwsSinkManager
+{
+
+public:
+  SCF_DECLARE_IBASE;
+
+  awsSinkManager(iBase *p);
+  virtual ~awsSinkManager();
+    
+  bool Initialize(iObjectRegistry *sys);
+  
+public:
+  /// Registers a sink by name for lookup.
+  virtual void RegisterSink(char *name, iAwsSink *sink);
+
+  /// Finds a sink by name for connection.
+  virtual iAwsSink* FindSink(char *name);
+
+
+public:
+  // Implement iComponent interface.
+  struct eiComponent : public iComponent
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(awsSinkManager);
+    virtual bool Initialize(iObjectRegistry* p)
+    { return scfParent->Initialize(p); }
+  } scfiComponent;
+};
 
 class awsSink : public iAwsSink
 {

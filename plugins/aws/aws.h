@@ -40,7 +40,10 @@ const int awsNumRectBuckets = 32;
 class awsManager : public iAws
 {
    /// Handle to the preference manager.
-   iAwsPrefs *prefmgr;
+   iAwsPrefManager *prefmgr;
+
+   /// Handle to the sink manager
+   iAwsSinkManager *sinkmgr;
 
   /** This is the dirty region.  All clean/dirty code now utilizes the update 
    *  region facility for non-contiguous rectangular spaces.  This buffer
@@ -145,10 +148,13 @@ public:
     bool Initialize(iObjectRegistry *sys);
    
     /// Get a pointer to the preference manager
-    virtual iAwsPrefs *GetPrefMgr();
+    virtual iAwsPrefManager *GetPrefMgr();
+
+    /// Get a pointer to the sink manager
+    virtual iAwsSinkManager *GetSinkMgr();
 
     /// Set the preference manager used by the window system
-    virtual void       SetPrefMgr(iAwsPrefs *pmgr);
+    virtual void       SetPrefMgr(iAwsPrefManager *pmgr);
 
     /// Register a component factory
     virtual void       RegisterComponentFactory(awsComponentFactory *factory, char *name);
@@ -227,7 +233,6 @@ public:
     /// Dispatches events to the proper components
     virtual bool HandleEvent(iEvent&);
     
-
  
   //////////////////////////////////////
 

@@ -18,6 +18,38 @@ NameToId(char *n)
 }
 
 
+///////////////////////////////////// Signal Sink Manager ////////////////////////////////////////////////////
+awsSinkManager::awsSinkManager(iBase *p)
+{
+  SCF_CONSTRUCT_IBASE (p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+
+}
+ 
+awsSinkManager::~awsSinkManager()
+{
+  return;
+}
+    
+bool 
+awsSinkManager::Initialize(iObjectRegistry *sys)
+{
+  return true;
+}
+
+void 
+awsSinkManager::RegisterSink(char *name, iAwsSink *sink)
+{
+
+}
+
+iAwsSink* 
+awsSinkManager::FindSink(char *name)
+{
+  return NULL;
+}
+
+
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
 
 awsSink::awsSink() {}

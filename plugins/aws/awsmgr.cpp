@@ -24,7 +24,7 @@ awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
   factory->DecRef ();
 }
 
-awsManager::awsManager(iBase *p):prefmgr(NULL),
+awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
                updatestore_dirty(true), 
                top(NULL), mouse_in(NULL), mouse_captured(false),
                ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
@@ -56,26 +56,29 @@ awsManager::Initialize(iObjectRegistry *object_reg)
   awsManager::object_reg = object_reg;
     
   if (DEBUG_MANAGER) printf("aws-debug: getting preference manager.\n");  
-  iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
+  prefmgr =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefManager);
+
+  if (DEBUG_MANAGER) printf("aws-debug: getting sink manager.\n");  
+  sinkmgr =  SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager", iAwsSinkManager);
   
-  if (!prefs)
+  if (!prefmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
-        "AWS could not create an instance of the default preference manager.  This is a serious error.");
+        "AWS could not create an instance of the default PREFERENCE manager. This is a serious error.");
     return false;
   }
   else
   {
     if (DEBUG_MANAGER) printf("aws-debug: initing and setting the internal preference manager.\n");
     
-    prefs->Setup(object_reg);
+    prefmgr->Setup(object_reg);
+  }
 
-    if (DEBUG_MANAGER) printf("aws-debug: inited pref manager, now setting.\n");
-
-    SetPrefMgr(prefs);
-
-    if (DEBUG_MANAGER) printf("aws-debug: decRefing the prefs manager.\n");
-    prefs->DecRef();
+  if (!sinkmgr)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
+        "AWS could not create an instance of the default SINK manager. This is a serious error.");
+    return false;
   }
 
   if (DEBUG_MANAGER) printf("aws-debug: registering common components.\n");
@@ -84,18 +87,23 @@ awsManager::Initialize(iObjectRegistry *object_reg)
   
   if (DEBUG_MANAGER) printf("aws-debug: left aws initialize.\n");
  
-
   return true;
 }
 
-iAwsPrefs *
+iAwsPrefManager *
 awsManager::GetPrefMgr()
 {
   return prefmgr;
 }
+
+iAwsSinkManager *
+awsManager::GetSinkMgr()
+{
+  return sinkmgr;
+}
  
 void
-awsManager::SetPrefMgr(iAwsPrefs *pmgr)
+awsManager::SetPrefMgr(iAwsPrefManager *pmgr)
 {
    if (prefmgr && pmgr)
    {

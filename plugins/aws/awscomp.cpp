@@ -59,7 +59,7 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
   if (settings) 
   {
   
-   iAwsPrefs *pm=WindowManager()->GetPrefMgr();
+   iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
      
    pm->GetRect(settings, "Frame", frame);
    

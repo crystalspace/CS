@@ -30,7 +30,7 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
- iAwsPrefs *pm=WindowManager()->GetPrefMgr();
+ iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
  
  pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);

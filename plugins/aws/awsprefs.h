@@ -273,7 +273,7 @@ enum AWS_COLORS { AC_HIGHLIGHT, AC_HIGHLIGHT2, AC_SHADOW, AC_SHADOW2, AC_FILL, A
                   AC_BLACK, AC_WHITE, AC_RED, AC_GREEN, AC_BLUE,
 		  AC_COLOR_COUNT };
 
-class awsPrefManager : public iAwsPrefs
+class awsPrefManager : public iAwsPrefManager
 {
    /// list of window definitions
   csDLinkList win_defs;
