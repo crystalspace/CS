@@ -6333,6 +6333,7 @@ package cspace::iSpriteCal3DFactoryState;
 *FindSocket = *cspacec::iSpriteCal3DFactoryState_FindSocket;
 *GetSocketCount = *cspacec::iSpriteCal3DFactoryState_GetSocketCount;
 *GetSocket = *cspacec::iSpriteCal3DFactoryState_GetSocket;
+*GetCal3DCoreModel = *cspacec::iSpriteCal3DFactoryState_GetCal3DCoreModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
