@@ -35,6 +35,9 @@ The history order is reversed so that new features are at the top.
 	  place.
 	- Converted simple2 tutorial to use smart pointers.
 	- Fixed csRef::Assign() so it now correctly tests for NULL pointers.
+	- Got Yet Another Blender export script from Krishnan Shrikumar
+	  <krish@urbyte.com>. This one exports entire levels. You can find
+	  it in scripts/blender/sectorexport.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.
