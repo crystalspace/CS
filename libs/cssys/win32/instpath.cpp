@@ -76,8 +76,6 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
     }
   }
 
-  //@@@ might try GetModuleFilename(NULL,...) here for application's directory
-
   // perhaps current drive/dir?
   if (1)
   {
@@ -87,6 +85,28 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
       // usr current dir
       fclose(test);
       strncpy(oInstallPath, "", iBufferSize);
+      goto got_value;
+    }
+  }
+
+  // directory where app is?
+  if (1)
+  {
+    char apppath[MAX_PATH + 1];
+    GetModuleFileName (0, apppath, sizeof(apppath)-1);
+    char* slash = strrchr (apppath, '\\');
+    if (slash) *(slash+1) = 0;
+
+    char testfn[MAX_PATH];
+    strcpy(testfn, apppath);
+    strcat(testfn, "scf.cfg");
+
+    FILE *test = fopen(testfn, "r");
+    if(test != NULL)
+    {
+      // usr current dir
+      fclose(test);
+      strncpy(oInstallPath, apppath, iBufferSize);
       goto got_value;
     }
   }

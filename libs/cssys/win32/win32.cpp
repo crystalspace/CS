@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
@@ -451,6 +452,44 @@ SCF_IMPLEMENT_IBASE_END
 
 bool csPlatformStartup(iObjectRegistry* r)
 {
+  char installDir[MAX_PATH];
+
+  /*
+    When it isn't already in the PATH environment,
+    the CS directory will be put there in fornt of all
+    other paths.
+    The idea is that DLLs required by plugins (e.g. zlib)
+    which reside in the CS directory can be found by the
+    OS even if the application is somewhere else.
+   */
+
+  // check if installdir is in the path.
+  bool gotpath = false;
+  csGetInstallPath(installDir, sizeof(installDir));
+  const char* path = getenv("PATH");
+  const char* ppos = strstr (path, installDir);
+  while (!gotpath && ppos)
+  {
+    // check if it's not part of another path
+    if (((ppos == path) || (*(ppos-1) == ';')) &&
+      ((*(ppos + strlen(installDir)) == 0) || (*(ppos + strlen(installDir)) == ';')))
+    {
+      // found it
+      gotpath = true;
+    }
+    ppos = strstr (ppos, installDir);
+  }
+  if (!gotpath)
+  {
+    // put CRYSTAL path into PATH environment.
+    char *newpath = new char[strlen(path) + strlen(installDir) + 2];
+    strcpy (newpath, installDir);
+    strcat (newpath, ";");
+    strcat (newpath, path);
+    SetEnvironmentVariable ("PATH", newpath);
+    delete[] newpath;
+  }
+
   Win32Assistant* a = new Win32Assistant(r);
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");
   if (ok)
@@ -656,28 +695,6 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   }
   return false;
 }
-
-#if 0
-// @@@ MOVE THIS CODE TO THE WINDOWS CANVASES!
-void Win32Assistant::Alert (const char* s)
-{
-  bool FullScreen = false;
-  //int width, height, depth;
-
-// @@@ IMPORTANT: FIX ME: HAVE TO GO TO CANVAS FOR THIS!!!
-  //GetSettings(width, height, depth, FullScreen);
-
-  if (FullScreen)
-  {
-    // If fullscreen mode is active, we switch to default screen, because
-    // otherwise this message will not be seen.
-    ChangeDisplaySettings (NULL, 0);
-  }
-
-  MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  DebugTextOut (true, s);
-}
-#endif
 
 HINSTANCE Win32Assistant::GetInstance () const
 {
