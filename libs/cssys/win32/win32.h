@@ -47,7 +47,6 @@
 #include "cssys/system.h"
 #include "csinput/csinput.h"
 
-
 /// Windows system driver
 class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver
 {

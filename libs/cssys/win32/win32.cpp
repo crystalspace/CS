@@ -52,7 +52,7 @@ extern void cleanup();
 
 void sys_fatalerror(char *s)
 {
-  csSystemDriver::Printf (MSG_FATAL_ERROR, "%s", s);
+  MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   cleanup ();
   exit (1);
 }

@@ -93,7 +93,7 @@ struct RGBPixel
   unsigned char red, green, blue, alpha;
   /// Constructor (initialize to zero, alpha to 255)
   RGBPixel () /* : red(0), green(0), blue(0), alpha(255) {} */
-  { *(ULong *)this = ~RGB_MASK; }
+  { *(ULong *)this = (ULong)~RGB_MASK; }
   /// Copy constructor
   RGBPixel (const RGBPixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */

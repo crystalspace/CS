@@ -67,7 +67,7 @@ void csWSTexture::SetTransparent (bool iTransparent)
     if (IsTransp)
       Handle->SetTransparent (tr, tg, tb);
     else
-      Handle->SetTransparent (-1, -1, -1);
+      Handle->SetTransparent (255, 255, 255);
 }
 
 void csWSTexture::FixTransparency ()
@@ -137,7 +137,7 @@ void csWSTexture::Refresh ()
   if (IsTransp)
     Handle->SetTransparent (tr, tg, tb);
   else
-    Handle->SetTransparent (-1, -1, -1);
+    Handle->SetTransparent (255, 255, 255);
   TexMan->PrepareTexture (Handle);
 }
 

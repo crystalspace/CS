@@ -395,23 +395,23 @@ public:
     DECLARE_EMBEDDED_IBASE (csSystemDriver);
 
     /// Wrapper for scfClassRegistered ()
-    virtual bool ClassRegistered (const char *iClassID);
+    virtual bool scfClassRegistered (const char *iClassID);
     /// Wrapper for scfCreateInstance ()
-    virtual void *CreateInstance (const char *iClassID, const char *iInterfaceID,
+    virtual void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
       int iVersion);
     /// Wrapper for scfGetClassDescription ()
-    virtual const char *GetClassDescription (const char *iClassID);
+    virtual const char *scfGetClassDescription (const char *iClassID);
     /// Wrapper for scfGetClassDependencies ()
-    virtual const char *GetClassDependencies (const char *iClassID);
+    virtual const char *scfGetClassDependencies (const char *iClassID);
     /// Wrapper for scfRegisterClass ()
-    virtual bool RegisterClass (const char *iClassID, const char *iLibraryName,
+    virtual bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
       const char *Dependencies = NULL);
     /// Wrapper for scfRegisterStaticClass ()
-    virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
+    virtual bool scfRegisterStaticClass (scfClassInfo *iClassInfo);
     /// Wrapper for scfRegisterClassList ()
-    virtual bool RegisterClassList (scfClassInfo *iClassInfo);
+    virtual bool scfRegisterClassList (scfClassInfo *iClassInfo);
     /// Wrapper for scfUnregisterClass ()
-    virtual bool UnregisterClass (char *iClassID);
+    virtual bool scfUnregisterClass (char *iClassID);
   } scfiSCF;
 };
 
