@@ -35,7 +35,7 @@ chronological order.
 	    - Fixed csGetConfigPath() for Unix so that it once again checks
 	      $CRYSTAL/etc for vfs.cfg.  Likewise, csGetPluginPaths() for Unix
 	      once again checks $CRYSTAL/lib.
-	    - Restored error checking code which had been removed, the reomval
+	    - Restored error checking code which had been removed, the removal
 	      of which could potentially cause csPluginPaths::AddOnce() to
 	      misbehave.
 	    - Generally cleaned up the code.  Also eliminated compilation
