@@ -53,18 +53,16 @@ Instructions for doing so may be found here:
 
 @uref{http://sourceforge.net/cvs/?group_id=649}
 
-Second, you can download a snapshot of the @sc{cvs} repository using @sc{http}
-or @sc{ftp}.  Snapshots are generated daily and are accompanied by standard
-@samp{diff}-style @dfn{patch} files.
+Second, you can download a snapshot of the @sc{cvs} repository using @sc{http}.
+Snapshots are generated daily and are accompanied by standard @samp{diff}-style
+@dfn{patch} files.
 
 @uref{http://crystal.sourceforge.net/cvs-snapshots/}
-
-@uref{ftp://crystal.sourceforge.net/pub/crystal/cvs-snapshots/}
 
 You can also view the contents of the @sc{cvs} repository online including
 all of the historical information and administrative information.
 
-@uref{http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi/CS/?cvsroot=crystal}
+@uref{http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/crystal/CS/}
 
 @subheading Documentation
 @cindex Documentation, Obtaining
@@ -88,24 +86,16 @@ User's Manual} is available for online viewing at this location:
 
 @url{http://crystal.sourceforge.net/docs/online/manual/}
 
-The @cite{Public @sc{api} Reference Manual}, for programmers utilizing Crystal
-Space, is available for online viewing here:
+The @cite{Public @sc{api} Reference Manual} is available for online viewing
+here:
 
 @url{http://crystal.sourceforge.net/docs/online/pubapi/}
 
-The @cite{Developer's @sc{api} Reference Manual}, for programmers actually
-working on Crystal Space itself, is available here:
-
-@url{http://crystal.sourceforge.net/docs/online/devapi/}
-
 In addition, all of the above documents may be downloaded for offline viewing
-via @sc{http} or @sc{ftp} from the following locations, and are packaged with
-a variety of compression technologies, including @sc{bzip2}, @sc{gzip}, and
-@sc{zip}.
+from the following location.  They are packaged with a variety of compression
+technologies, including @sc{bzip2}, @sc{gzip}, and @sc{zip}.
 
 @url{http://crystal.sourceforge.net/docs/download/}
-
-@url{ftp://crystal.sourceforge.net/pub/crystal/docs/download/}
 
 @noindent
 Currently these documents are only available in @sc{html} format, but may
