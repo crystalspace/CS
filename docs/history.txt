@@ -20,6 +20,11 @@ chronological order.
 	- Jorrit added a warning to the loader when objects are being scaled
 	  in the <move>. This is not allowed by CS.
 	- res fixed a copy'n'paste error in the DDS loader.
+	- Jorrit and MatzeB fixed a bug in OPCODE which only occurs in optimize
+	  mode and using X86 processor. The problem is again an aliasing problem
+	  between different types on the same memory address. This is not
+	  guaranteed to work in C++. This fixes a falling through the floor
+	  problem in walktest.
 1-Jun-2004
 	- Jorrit fixed a bug in the particles loader. The test to see if a
 	  factory is ok was wrong.
