@@ -291,7 +291,7 @@ struct iSystem : public iBase
   //----------------------- Configuration file interface ---------------------//
 
   /// Get the system configuration file: this does NOT IncRef the object
-  virtual iConfigFile *GetConfig () = 0;
+  virtual iConfigFileNew *GetConfig () = 0;
   /// Create a new configuration file object which resides on VFS
   virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true) = 0;
   /**

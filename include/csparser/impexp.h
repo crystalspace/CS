@@ -29,8 +29,6 @@
 #include <string.h>
 #include "ivfs.h"
 
-struct iConfigFile;
-
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -116,7 +114,7 @@ public:
 	  bool create_output_file = true, const char* output_filename = NULL,
           iVFS* vfs = NULL );
 
-        void ProcessConfig( iConfigFile* config );
+        void ProcessConfig( iConfigFileNew* config );
 	void set_reverse_normals( int yesno );
 
 	// set the current 'frame' of animation; the converter

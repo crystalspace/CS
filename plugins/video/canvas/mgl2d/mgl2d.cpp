@@ -23,6 +23,7 @@
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 
 IMPLEMENT_FACTORY (csGraphics2DMGL)
 
@@ -87,7 +88,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
     return false;
   }
 
-  do_hwmouse = System->GetConfig ()->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  do_hwmouse = System->GetConfig ()->GetBool ("Video.SystemMouseCursor", true);
 
   // Tell system driver to call us on every frame
   System->CallOnEvents (this, CSMASK_Nothing);

@@ -375,7 +375,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // this early is that both the application configuration file and the
   // configuration file for other plugins may (and almost always do) reside on
   // a VFS volume.
-  Config = new csIniFile;
+  Config = new csConfigFile;
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize configuration file
@@ -430,16 +430,16 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
 
   // Now load and initialize all plugins
-  iConfigDataIterator *plugin_list = Config->EnumData ("PlugIns");
+  iConfigIterator *plugin_list = Config->Enumerate ("System.PlugIns.");
   if (plugin_list)
   {
     while (plugin_list->Next ())
     {
-      const char *funcID = plugin_list->GetKey ();
+      const char *funcID = plugin_list->GetKey (true);
       // If -video was used to override 3D driver, then respect it.
       if (g3d_override && strcmp (funcID, CS_FUNCID_VIDEO) == 0)
         continue;
-      const char *classID = (const char *)plugin_list->GetData ();
+      const char *classID = plugin_list->GetStr ();
       if (classID)
         PluginList.Push (new csPluginLoadRec (funcID, classID));
     }
@@ -668,13 +668,13 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
   }
 }
 
-void csSystemDriver::SetSystemDefaults (iConfigFile *Config)
+void csSystemDriver::SetSystemDefaults (iConfigFileNew *Config)
 {
   // First look in .cfg file
-  FrameWidth = Config->GetInt ("VideoDriver", "Width", 640);
-  FrameHeight = Config->GetInt ("VideoDriver", "Height", 480);
-  Depth = Config->GetInt ("VideoDriver", "Depth", 16);
-  FullScreen = Config->GetYesNo ("VideoDriver", "FullScreen", false);
+  FrameWidth = Config->GetInt ("Video.ScreenWidth", 640);
+  FrameHeight = Config->GetInt ("Video.ScreenHeight", 480);
+  Depth = Config->GetInt ("Video.ScreenDepth", 16);
+  FullScreen = Config->GetBool ("Video.FullScreen", false);
 
   // Now analyze command line
   const char *val;
@@ -706,8 +706,8 @@ void csSystemDriver::SetSystemDefaults (iConfigFile *Config)
         "`yes' or `no' expected\n", val);
 
   Mouse.SetDoubleClickTime (
-    Config->GetInt ("MouseDriver", "DoubleClickTime", 300),
-    Config->GetInt ("MouseDriver", "DoubleClickDist", 2));
+    Config->GetInt ("MouseDriver.DoubleClickTime", 300),
+    Config->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
 void csSystemDriver::Help (iConfig* Config)
@@ -1101,7 +1101,7 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   return PlugIns.Delete (idx);
 }
 
-iConfigFile *csSystemDriver::GetConfig ()
+iConfigFileNew *csSystemDriver::GetConfig ()
 {
   return Config;
 }
@@ -1118,7 +1118,6 @@ iConfigFileNew *csSystemDriver::CreateConfigNew (const char *iFileName, bool iVF
 
 bool csSystemDriver::SaveConfig ()
 {
-  if (!Config->IsDirty ()) return true;
   return Config->Save ();
 }
 

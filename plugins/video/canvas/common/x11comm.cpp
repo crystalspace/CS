@@ -20,14 +20,15 @@
 #include "cssysdef.h"
 #include "x11comm.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
 {
-  iConfigFile *Config = iSys->GetConfig ();
-  oSimDepth = Config->GetInt ("VideoDriver", "SimulateDepth", 0);
-  oUseSHM = Config->GetYesNo ("VideoDriver", "Xshm", true);
-  oHardwareCursor = Config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  iConfigFileNew *Config = iSys->GetConfig ();
+  oSimDepth = Config->GetInt ("Video.SimulateDepth", 0);
+  oUseSHM = Config->GetBool ("Video.XSHM", true);
+  oHardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
 
   const char *val;
   if ((val = iSys->GetOptionCL ("shm")))

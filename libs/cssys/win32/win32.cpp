@@ -23,6 +23,7 @@
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 
@@ -749,10 +750,10 @@ void SysSystemDriver::Sleep (int SleepTime)
   ::Sleep (SleepTime);
 }
 
-void SysSystemDriver::SetSystemDefaults (iConfigFile *Config)
+void SysSystemDriver::SetSystemDefaults (iConfigFileNew *Config)
 {
   csSystemDriver::SetSystemDefaults (Config);
-  need_console = Config->GetYesNo ("Microsoft Windows", "DebugConsole", false);
+  need_console = Config->GetBool ("System.Win32.DebugConsole", false);
   if (GetOptionCL ("console"))
     need_console = true;
   else if (GetOptionCL ("noconsole"))

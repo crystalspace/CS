@@ -23,6 +23,7 @@
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "version.h"
@@ -127,9 +128,9 @@ int NeXTDriver2D::get_desired_depth() const
 	depth = atoi(s);
     else
 	{
-	iConfigFile* cfg = System->GetConfig();
+	iConfigFileNew* cfg = System->GetConfig();
 	if (cfg != 0)
-	    depth = cfg->GetInt( "VideoDriver", "SimulateDepth", 0 );
+	    depth = cfg->GetInt( "Video.SimulateDepth", 0 );
 	}
     return depth;
     }

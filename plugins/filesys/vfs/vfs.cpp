@@ -1164,8 +1164,7 @@ bool csVFS::Initialize (iSystem *iSys)
   iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = strnew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
-  const char *path = System->GetConfig ()->GetStr ("VFS.Options", 
-    "Config", vfsconfigpath);
+  const char *path = System->GetConfig ()->GetStr ("VFS.Config", vfsconfigpath);
   config = System->CreateConfigNew (path, false);
   if (!config)
     return false;

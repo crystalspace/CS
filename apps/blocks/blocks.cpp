@@ -32,7 +32,7 @@
 #include "blocks.h"
 #include "cssys/system.h"
 #include "csparser/csloader.h"
-#include "csutil/inifile.h"
+#include "csutil/csstring.h"
 #include "csgfxldr/csimage.h"
 #include "csengine/dumper.h"
 #include "csengine/engine.h"
@@ -53,6 +53,7 @@
 #include "csparser/snddatao.h"
 #include "isnddata.h"
 #include "ifontsrv.h"
+#include "icfgnew.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetdrv.h"
@@ -2655,29 +2656,29 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  csIniFile keys ("/config/blocks.cfg", Sys->VFS);
-  NamedKey (keys.GetStr ("Keys", "UP", "up"), key_up);
-  NamedKey (keys.GetStr ("Keys", "DOWN", "down"), key_down);
-  NamedKey (keys.GetStr ("Keys", "LEFT", "left"), key_left);
-  NamedKey (keys.GetStr ("Keys", "RIGHT", "right"), key_right);
-  NamedKey (keys.GetStr ("Keys", "ROTPX", "q"), key_rotpx);
-  NamedKey (keys.GetStr ("Keys", "ROTMX", "a"), key_rotmx);
-  NamedKey (keys.GetStr ("Keys", "ROTPY", "w"), key_rotpy);
-  NamedKey (keys.GetStr ("Keys", "ROTMY", "s"), key_rotmy);
-  NamedKey (keys.GetStr ("Keys", "ROTPZ", "e"), key_rotpz);
-  NamedKey (keys.GetStr ("Keys", "ROTMZ", "d"), key_rotmz);
-  NamedKey (keys.GetStr ("Keys", "PAUSE", "p"), key_pause);
-  NamedKey (keys.GetStr ("Keys", "ESC", "esc"), key_esc);
-  NamedKey (keys.GetStr ("Keys", "DROP", "space"), key_drop);
-  NamedKey (keys.GetStr ("Keys", "VIEWLEFT", "del"), key_viewleft);
-  NamedKey (keys.GetStr ("Keys", "VIEWRIGHT", "pgdn"), key_viewright);
-  NamedKey (keys.GetStr ("Keys", "VIEWUP", "home"), key_viewup);
-  NamedKey (keys.GetStr ("Keys", "VIEWDOWN", "end"), key_viewdown);
-  NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
-  NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
-  player1->new_zone_dim = keys.GetInt ("Game", "PLAYSIZE", 5);
+  iConfigFileNew *keys = System->GetConfig();
+  NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
+  NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
+  NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
+  NamedKey (keys->GetStr ("Blocks.Keys.Right", "right"), key_right);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotPX", "q"), key_rotpx);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotMX", "a"), key_rotmx);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotPY", "w"), key_rotpy);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotMY", "s"), key_rotmy);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotPZ", "e"), key_rotpz);
+  NamedKey (keys->GetStr ("Blocks.Keys.RotMZ", "d"), key_rotmz);
+  NamedKey (keys->GetStr ("Blocks.Keys.Pause", "p"), key_pause);
+  NamedKey (keys->GetStr ("Blocks.Keys.ESC", "esc"), key_esc);
+  NamedKey (keys->GetStr ("Blocks.Keys.Drop", "space"), key_drop);
+  NamedKey (keys->GetStr ("Blocks.Keys.ViewLeft", "del"), key_viewleft);
+  NamedKey (keys->GetStr ("Blocks.Keys.ViewRight", "pgdn"), key_viewright);
+  NamedKey (keys->GetStr ("Blocks.Keys.ViewUp", "home"), key_viewup);
+  NamedKey (keys->GetStr ("Blocks.Keys.ViewDown", "end"), key_viewdown);
+  NamedKey (keys->GetStr ("Blocks.Keys.ZoomIn", "ins"), key_zoomin);
+  NamedKey (keys->GetStr ("Blocks.Keys.ZoomOut", "pgup"), key_zoomout);
+  player1->new_zone_dim = keys->GetInt ("Blocks.Game.PlaySize", 5);
   player1->zone_dim = player1->new_zone_dim;
-  diff_level = keys.GetInt ("Game", "LEVEL", 0);
+  diff_level = keys->GetInt ("Blocks.Game.Level", 0);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
     for (size = 3 ; size <= 6 ; size++)
@@ -2685,43 +2686,43 @@ void Blocks::ReadConfig ()
       char key[50];
       for (i = 0 ; i < 10 ; i++)
       {
-        sprintf (key, "Score%d_%dx%d_%d", level, size, size, i);
-        highscores[level][size-3].Set (i, keys.GetInt ("HighScores", key, -1));
-        sprintf (key, "Name%d_%dx%d_%d", level, size, size, i);
+        sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d", level, size, size, i);
+        highscores[level][size-3].Set (i, keys->GetInt (key, -1));
+        sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d", level, size, size, i);
         highscores[level][size-3].SetName (i,
-	  keys.GetStr ("HighScores", key, NULL));
+	  keys->GetStr (key, NULL));
       }
     }
 #if defined(BLOCKS_NETWORKING)
   // Network stuff.
-  IsServer = Config->GetYesNo ("Network", "Server", false);
+  IsServer = Config->GetYesNo ("Blocks.Network.Server", false);
 #endif
 }
 
 void Blocks::WriteConfig ()
 {
-  csIniFile keys ("/config/blocks.cfg", Sys->VFS);
-  keys.SetStr ("Keys", "UP", KeyName (key_up));
-  keys.SetStr ("Keys", "DOWN", KeyName (key_down));
-  keys.SetStr ("Keys", "LEFT", KeyName (key_left));
-  keys.SetStr ("Keys", "RIGHT", KeyName (key_right));
-  keys.SetStr ("Keys", "ROTPX", KeyName (key_rotpx));
-  keys.SetStr ("Keys", "ROTMX", KeyName (key_rotmx));
-  keys.SetStr ("Keys", "ROTPY", KeyName (key_rotpy));
-  keys.SetStr ("Keys", "ROTMY", KeyName (key_rotmy));
-  keys.SetStr ("Keys", "ROTPZ", KeyName (key_rotpz));
-  keys.SetStr ("Keys", "ROTMZ", KeyName (key_rotmz));
-  keys.SetStr ("Keys", "PAUSE", KeyName (key_pause));
-  keys.SetStr ("Keys", "ESC", KeyName (key_esc));
-  keys.SetStr ("Keys", "DROP", KeyName (key_drop));
-  keys.SetStr ("Keys", "VIEWLEFT", KeyName (key_viewleft));
-  keys.SetStr ("Keys", "VIEWRIGHT", KeyName (key_viewright));
-  keys.SetStr ("Keys", "VIEWUP", KeyName (key_viewup));
-  keys.SetStr ("Keys", "VIEWDOWN", KeyName (key_viewdown));
-  keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
-  keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
-  keys.SetInt ("Game", "PLAYSIZE", player1->new_zone_dim);
-  keys.SetInt ("Game", "LEVEL", diff_level);
+  iConfigFileNew *keys = System->GetConfig();
+  keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
+  keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
+  keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));
+  keys->SetStr ("Blocks.Keys.Right", KeyName (key_right));
+  keys->SetStr ("Blocks.Keys.RotPX", KeyName (key_rotpx));
+  keys->SetStr ("Blocks.Keys.RotMX", KeyName (key_rotmx));
+  keys->SetStr ("Blocks.Keys.RotPY", KeyName (key_rotpy));
+  keys->SetStr ("Blocks.Keys.RotMY", KeyName (key_rotmy));
+  keys->SetStr ("Blocks.Keys.RotPZ", KeyName (key_rotpz));
+  keys->SetStr ("Blocks.Keys.RotMZ", KeyName (key_rotmz));
+  keys->SetStr ("Blocks.Keys.Pause", KeyName (key_pause));
+  keys->SetStr ("Blocks.Keys.ESC", KeyName (key_esc));
+  keys->SetStr ("Blocks.Keys.Drop", KeyName (key_drop));
+  keys->SetStr ("Blocks.Keys.ViewLeft", KeyName (key_viewleft));
+  keys->SetStr ("Blocks.Keys.ViewRight", KeyName (key_viewright));
+  keys->SetStr ("Blocks.Keys.ViewUp", KeyName (key_viewup));
+  keys->SetStr ("Blocks.Keys.ViewDown", KeyName (key_viewdown));
+  keys->SetStr ("Blocks.Keys.ZoomIn", KeyName (key_zoomin));
+  keys->SetStr ("Blocks.Keys.ZoomOut", KeyName (key_zoomout));
+  keys->SetInt ("Blocks.Game.PlaySize", player1->new_zone_dim);
+  keys->SetInt ("Blocks.Game.Level", diff_level);
   int level, size, i;
   for (level = 0 ; level <= 2 ; level++)
     for (size = 3 ; size <= 6 ; size++)
@@ -2730,14 +2731,13 @@ void Blocks::WriteConfig ()
       for (i = 0 ; i < 10 ; i++)
         if (highscores[level][size-3].Get (i) != -1)
         {
-          sprintf (key, "Score%d_%dx%d_%d", level, size, size, i);
-          keys.SetInt ("HighScores", key, highscores[level][size-3].Get (i));
-          sprintf (key, "Name%d_%dx%d_%d", level, size, size, i);
-	  keys.SetStr("HighScores",key,highscores[level][size-3].GetName (i));
+          sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d", level, size, size, i);
+          keys->SetInt (key, highscores[level][size-3].Get (i));
+          sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d", level, size, size, i);
+	  keys->SetStr(key,highscores[level][size-3].GetName (i));
         }
     }
-  if (keys.IsDirty ())
-    keys.Save ();
+  keys->Save ();
 }
 
 // -----------------------------------------------------------------
@@ -2983,7 +2983,7 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   //if (!)
 
-  csString world_file(Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
+  csString world_file(Sys->Config->GetStr ("Blocks.Data", "/data/blocks"));
   world_file.Append("/");
   if (!Sys->VFS->Exists (world_file.GetData()))
   {

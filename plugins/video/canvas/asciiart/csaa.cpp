@@ -70,8 +70,8 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
     return false;
 
   // Load settings from config file and setup the aa_defparams structure
-  HardwareCursor = System->GetConfig ()->GetYesNo ("VideoDriver",
-    "SystemMouseCursor", true);
+  HardwareCursor = System->GetConfig ()->GetBool
+        ("Video.SystemMouseCursor", true);
 
   aa_defparams.width =
   aa_defparams.recwidth = config->GetInt ("Video.ASCII.Console.Width", 80);

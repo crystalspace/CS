@@ -24,7 +24,6 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-struct iConfigFile;
 struct iGraphics3D;
 struct iMaterialHandle;
 

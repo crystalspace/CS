@@ -61,6 +61,7 @@
 #include "igraph3d.h"
 #include "ievent.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 #include "itranman.h"
 
 //---------------------------------------------------------------------------
@@ -1505,13 +1506,13 @@ void csEngine::NextFrame (cs_time current_time)
 void csEngine::ReadConfig ()
 {
   if (!System) return;
-  iConfigFile *Config = System->GetConfig ();
-  csLightMap::SetLightCellSize (Config->GetInt ("Lighting", "LightmapSize", 16));
+  iConfigFileNew *Config = System->GetConfig ();
+  csLightMap::SetLightCellSize (Config->GetInt ("Engine.Lighting.LightmapSize", 16));
 
-  csLight::ambient_red = Config->GetInt ("Lighting", "Ambient.Red", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = Config->GetInt ("Lighting", "Ambient.Green", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = Config->GetInt ("Lighting", "Ambient.Blue", DEFAULT_LIGHT_LEVEL);
-  int ambient_white = Config->GetInt ("Lighting", "Ambient.White", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_red = Config->GetInt ("Engine.Lighting.Ambient.Red", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = Config->GetInt ("Engine.Lighting.Ambient.Green", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = Config->GetInt ("Engine.Lighting.Ambient.Blue", DEFAULT_LIGHT_LEVEL);
+  int ambient_white = Config->GetInt ("Engine.Lighting.Ambient.White", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;
@@ -1520,30 +1521,30 @@ void csEngine::ReadConfig ()
   if (csLight::ambient_red + csLight::ambient_green + csLight::ambient_blue < 6)
     csLight::ambient_red = csLight::ambient_green = csLight::ambient_blue = 2;
 
-  csSector::cfg_reflections = Config->GetInt ("Lighting", "Reflections", csSector::cfg_reflections);
-  csPolyTexture::cfg_cosinus_factor = Config->GetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::global_lighting_quality = Config->GetInt ("Lighting", "LightingQual", csSprite3D::global_lighting_quality);
-  csSector::do_radiosity = Config->GetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
+  csSector::cfg_reflections = Config->GetInt ("Engine.Lighting.Reflections", csSector::cfg_reflections);
+  csPolyTexture::cfg_cosinus_factor = Config->GetFloat ("Engine.Lighting.CosinusFactor", csPolyTexture::cfg_cosinus_factor);
+  csSprite3D::global_lighting_quality = Config->GetInt ("Engine.Lighting.SpriteQuality", csSprite3D::global_lighting_quality);
+  csSector::do_radiosity = Config->GetBool ("Engine.Lighting.Radiosity", csSector::do_radiosity);
 
   // radiosity options
-  csEngine::use_new_radiosity = Config->GetYesNo ("Lighting",
-    "Radiosity.Enable", csEngine::use_new_radiosity);
-  csRadiosity::do_static_specular = Config->GetYesNo ("Lighting",
-    "Radiosity.DoStaticSpecular", csRadiosity::do_static_specular);
-  csRadiosity::static_specular_amount = Config->GetFloat ("Lighting",
-    "Radiosity.StaticSpecularAmount", csRadiosity::static_specular_amount);
-  csRadiosity::static_specular_tightness = Config->GetInt ("Lighting",
-    "Radiosity.StaticSpecularTightness", csRadiosity::static_specular_tightness);
-  csRadiosity::colour_bleed = Config->GetFloat ("Lighting",
-    "Radiosity.ColourBleed", csRadiosity::colour_bleed);
-  csRadiosity::stop_priority = Config->GetFloat ("Lighting",
-    "Radiosity.StopPriority", csRadiosity::stop_priority);
-  csRadiosity::stop_improvement = Config->GetFloat ("Lighting",
-    "Radiosity.StopImprovement", csRadiosity::stop_improvement);
-  csRadiosity::stop_iterations = Config->GetInt ("Lighting",
-    "Radiosity.StopIterations", csRadiosity::stop_iterations);
-  csRadiosity::source_patch_size = Config->GetInt ("Lighting",
-    "Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
+  csEngine::use_new_radiosity = Config->GetBool
+        ("Engine.Lighting.Radiosity.Enable", csEngine::use_new_radiosity);
+  csRadiosity::do_static_specular = Config->GetBool
+        ("Engine.Lighting.Radiosity.DoStaticSpecular", csRadiosity::do_static_specular);
+  csRadiosity::static_specular_amount = Config->GetFloat
+        ("Engine.Lighting.Radiosity.StaticSpecularAmount", csRadiosity::static_specular_amount);
+  csRadiosity::static_specular_tightness = Config->GetInt
+        ("Engine.Lighting.Radiosity.StaticSpecularTightness", csRadiosity::static_specular_tightness);
+  csRadiosity::colour_bleed = Config->GetFloat
+        ("Engine.Lighting.Radiosity.ColourBleed", csRadiosity::colour_bleed);
+  csRadiosity::stop_priority = Config->GetFloat
+        ("Engine.Lighting.Radiosity.StopPriority", csRadiosity::stop_priority);
+  csRadiosity::stop_improvement = Config->GetFloat
+        ("Engine.Lighting.Radiosity.StopImprovement", csRadiosity::stop_improvement);
+  csRadiosity::stop_iterations = Config->GetInt
+        ("Engine.Lighting.Radiosity.StopIterations", csRadiosity::stop_iterations);
+  csRadiosity::source_patch_size = Config->GetInt
+        ("Engine.Lighting.Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
 void csEngine::UnlinkSprite (csSprite* sprite)

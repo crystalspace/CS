@@ -13,6 +13,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/inifile.h"
+#include "csutil/cfgfile.h"
 
 #include "iname.h"
 #include "idog.h"
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #if 0
   // This method requires you register dlls with scfreg (or manually) in scf.cfg
-  csIniFile config ("scf.cfg");
+  csConfigFile config ("scf.cfg");
   scfInitialize (&config);
 #else
   // Don't use a .cfg file, instead manually register classes

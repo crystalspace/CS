@@ -148,7 +148,7 @@ bool SysSystemDriver::Open (const char *Title)
   KH.chain (0);
   KeyboardOpened = true;
 
-  SensivityFactor = Config->GetFloat ("MouseDriver", "MouseSensivity", 1.0);
+  SensivityFactor = Config->GetFloat ("MouseDriver.MouseSensivity", 1.0);
 
   if (MH.install ())
     return false;

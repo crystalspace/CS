@@ -37,10 +37,10 @@
 
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
-#include "csutil/inifile.h"
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
+#include "icfgnew.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -55,9 +55,9 @@ converter::~converter()
   delete frame_builder;
 }
 
-void converter::ProcessConfig (iConfigFile* config)
+void converter::ProcessConfig (iConfigFileNew* config)
 {
-  if ( config->SectionExists ("converter"))
+  if ( config->SubsectionExists ("Converter."))
   {
   }
 }

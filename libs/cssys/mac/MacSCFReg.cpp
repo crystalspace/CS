@@ -38,7 +38,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
-#include "csutil/inifile.h"
+#include "csutil/cfgfile.h"
 
 #define kAppleMenuID			128
 #define kFileMenuID				129
@@ -57,7 +57,7 @@
 Str255	gAppName;
 FSSpec	gAppLocation;
 bool Shutdown = false;
-csIniFile *ini = NULL;
+csConfigFile *ini = NULL;
 bool verbose = false;
 
 OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon );
@@ -73,13 +73,13 @@ void HandleOSEvent( EventRecord *theEvent );
 OSErr HandleAppleEvent( AppleEvent *theEvent );
 void SendODOCToSelf( FSSpec *theFileSpec );
 void SendRDOCToSelf( FSSpec *theFileSpec );
-bool RegisterServer (char *SharedLibraryFilename, csIniFile *ini, bool Register);
+bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Register);
 
 void main ( ) 
 {
 	Initialize();
 
-	ini = new csIniFile("scf.cfg");
+	ini = new csConfigFile("scf.cfg");
 
 	while ( ! Shutdown )
 		HandleEvents();
@@ -613,7 +613,7 @@ void SendRDOCToSelf( FSSpec *theFileSpec )
 	}
 }
 
-bool RegisterServer (char *SharedLibraryFilename, csIniFile *ini, bool Register)
+bool RegisterServer (char *SharedLibraryFilename, csConfigFile *ini, bool Register)
 {
   static bool DisplayedHeader = false;
   if (!DisplayedHeader && !verbose)
@@ -713,12 +713,12 @@ bool RegisterServer (char *SharedLibraryFilename, csIniFile *ini, bool Register)
     {
       char comment [200];
       sprintf (comment, " %s", ClassTable->Description);
-      ini->SetStr ("SCF.Registry", ClassTable->ClassID, base);
-      ini->DeleteComment ("SCF.Registry", ClassTable->ClassID);
-      ini->SetComment ("SCF.Registry", ClassTable->ClassID, comment);
+      ini->SetStr (ClassTable->ClassID, base);
+      ini->DeleteComment (ClassTable->ClassID);
+      ini->SetComment (ClassTable->ClassID, comment);
     }
     else
-      ini->DeleteKey ("SCF.Registry", ClassTable->ClassID);
+      ini->DeleteKey (ClassTable->ClassID);
     ClassTable++;
   }
 

@@ -60,7 +60,7 @@
 #include "cssys/system.h"
 #include "version.h"
 #include "qint.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isnddata.h"
@@ -185,16 +185,16 @@ WalkTest::~WalkTest ()
   if (Engine) Engine->DecRef ();
 }
 
-void WalkTest::SetSystemDefaults (iConfigFile *Config)
+void WalkTest::SetSystemDefaults (iConfigFileNew *Config)
 {
   superclass::SetSystemDefaults (Config);
-  do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
-  do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
-  do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
+  do_fps = Config->GetBool ("WalkTest.Settings.FPS", true);
+  do_stats = Config->GetBool ("WalkTest.Settings.Stats", false);
+  do_cd = Config->GetBool ("WalkTest.Settings.Colldet", true);
 
   const char *val;
   if (!(val = GetNameCL ()))
-    val = Config->GetStr ("World", "WORLDFILE", "world");
+    val = Config->GetStr ("Walktest.WorldFile");
   sprintf (map_dir, "/lev/%s", val);
 
   if (GetOptionCL ("clear"))
@@ -269,7 +269,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n", Config->GetStr ("World", "WORLDFILE", "world"));
+  Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n", Config->GetStr ("Walktest.WorldFile", "world"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1131,21 +1131,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Get all collision detection and movement config file parameters.
-  cfg_jumpspeed = Config->GetFloat ("CD", "JUMPSPEED", 0.08);
-  cfg_walk_accelerate = Config->GetFloat ("CD", "WALKACCELERATE", 0.007);
-  cfg_walk_maxspeed = Config->GetFloat ("CD", "WALKMAXSPEED", 0.1);
-  cfg_walk_brake = Config->GetFloat ("CD", "WALKBRAKE", 0.014);
-  cfg_rotate_accelerate = Config->GetFloat ("CD", "ROTATEACCELERATE", 0.005);
-  cfg_rotate_maxspeed = Config->GetFloat ("CD", "ROTATEMAXSPEED", 0.03);
-  cfg_rotate_brake = Config->GetFloat ("CD", "ROTATEBRAKE", 0.015);
-  cfg_look_accelerate = Config->GetFloat ("CD", "LOOKACCELERATE", 0.028);
-  cfg_body_height = Config->GetFloat ("CD", "BODYHEIGHT", 1.4);
-  cfg_body_width = Config->GetFloat ("CD", "BODYWIDTH", 0.5);
-  cfg_body_depth = Config->GetFloat ("CD", "BODYDEPTH", 0.5);
-  cfg_eye_offset = Config->GetFloat ("CD", "EYEOFFSET", -0.7);
-  cfg_legs_width = Config->GetFloat ("CD", "LEGSWIDTH", 0.4);
-  cfg_legs_depth = Config->GetFloat ("CD", "LEGSDEPTH", 0.4);
-  cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
+  cfg_jumpspeed = Config->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
+  cfg_walk_accelerate = Config->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
+  cfg_walk_maxspeed = Config->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
+  cfg_walk_brake = Config->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
+  cfg_rotate_accelerate = Config->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
+  cfg_rotate_maxspeed = Config->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
+  cfg_rotate_brake = Config->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
+  cfg_look_accelerate = Config->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
+  cfg_body_height = Config->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
+  cfg_body_width = Config->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
+  cfg_body_depth = Config->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
+  cfg_eye_offset = Config->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
+  cfg_legs_width = Config->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
+  cfg_legs_depth = Config->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
+  cfg_legs_offset = Config->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
 
   //--- create the converter class for testing
   ImportExport = new converter();
@@ -1205,7 +1205,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   view = new csView (engine, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN",
+  const char* p = Config->GetStr ("WalkTest.CollDetPlugIn",
   	"crystalspace.colldet.rapid");
   collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
   if (!collide_system)
@@ -1308,7 +1308,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
         //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
         //  name, name, name);
 	const char *valfiletype = "";
-	valfiletype = Config->GetStr ("World", "WORLDZIPTYPE" "");
+	valfiletype = Config->GetStr ("Walktest.WorldZipType", "");
 	if (strcmp (valfiletype, "") ==0)
 	{
 	  valfiletype = "zip";

@@ -46,7 +46,7 @@ class csPolygonSet;
 struct iSoundData;
 struct iCollideSystem;
 struct iPerfStats;
-struct iConfigFile;
+struct iConfigFileNew;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -387,7 +387,7 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
-  virtual void SetSystemDefaults (iConfigFile*);
+  virtual void SetSystemDefaults (iConfigFileNew*);
   /// Override Help to show additional arguments help
   virtual void Help ();
 

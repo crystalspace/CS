@@ -29,7 +29,6 @@
 #include "csutil/scf.h"
 
 class csRect;
-class csIniFile;
 struct iGraphics3D;
 struct iGraphics2D;
 

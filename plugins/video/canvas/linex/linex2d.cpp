@@ -26,6 +26,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "icfgfile.h"
+#include "icfgnew.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 IMPLEMENT_FACTORY (csLineX2DFontServer)
@@ -74,7 +75,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   if (XSupportsLocale ())
     XSetLocaleModifiers ("");
 
-  do_hwmouse = System->GetConfig ()->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  do_hwmouse = System->GetConfig ()->GetBool ("Video.SystemMouseCursor", true);
   if (System->GetOptionCL ("sysmouse"))
     do_hwmouse = true;
   if (System->GetOptionCL ("nosysmouse"))

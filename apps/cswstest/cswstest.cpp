@@ -22,7 +22,7 @@
 #include "csws/csws.h"
 #include "version.h"
 #include "ifontsrv.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 class csWsTest : public csApp
 {
@@ -847,7 +847,7 @@ int main (int argc, char* argv[])
   // Look for skin variant from config file
   DefaultSkin.Prefix = System.GetOptionCL ("skin");
   if (!DefaultSkin.Prefix)
-    DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS", "Skin.Variant", NULL);
+    DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
   csWsTest app (&System, DefaultSkin);

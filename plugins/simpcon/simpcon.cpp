@@ -30,7 +30,7 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 #include "isystem.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 #define SIZE_LINE	256
 
@@ -94,14 +94,14 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 
-  iConfigFile *Config = System->GetConfig ();
-  console_transparent_bg = Config->GetYesNo ("SimpleConsole", "TRANSPBG", false);
-  console_transparent_bg = Config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);
-  const char *buf = Config->GetStr ("SimpleConsole", "CONFG", "255,255,255");
+  iConfigFileNew *Config = System->GetConfig ();
+  console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", false);
+  console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", 1);
+  const char *buf = Config->GetStr ("SimpleConsole.ConFG", "255,255,255");
   sscanf (buf, "%d,%d,%d", &console_fg_r, &console_fg_g, &console_fg_b);
-  buf = Config->GetStr ("SimpleConsole", "CONBG", "0,0,0");
+  buf = Config->GetStr ("SimpleConsole.ConBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);
-  buf = Config->GetStr ("SimpleConsole", "CONFONT", "auto");
+  buf = Config->GetStr ("SimpleConsole.ConFont", "auto");
 
   const char *fontname;
   if (!strcasecmp (buf, "auto"))
@@ -134,7 +134,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   int i = fh + 2;
   LineSize = (FrameWidth / 4) + 1;
   SetBufferSize ((FrameHeight / i) - 2);
-  SetLineMessages (Config->GetInt ("SimpleConsole", "LINEMAX", 4));
+  SetLineMessages (Config->GetInt ("SimpleConsole.LineMax", 4));
 
   LineTime = System->GetTime ();
   CursorTime = System->GetTime ();
