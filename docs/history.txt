@@ -20,7 +20,16 @@ The history order has been reversed so that new features are at the top.
 	  engine so several things have been slightly rewritten.
 	- csRenderView now contains a this_sector and previous_sector pointer
 	  (also triggered by the removal of csPolygon3D::sector).
+	- Martin Geisse added some safety checks to 2d animations.
+	- Norman Kramer added missing rootdefines section to sndload.mak,
+	  fresh rebuilds ("make linux" for instance) lost information what
+	  sound decoders to build, which then resulted in "sound file ...
+	  corrupt" upon loading.
 25-Aug-2000
+	- Brandon Ehle added fixes to python to get it to compile again.
+	- Brandon Ehle started check in of Playstation 2 port.
+	  Don't get too excited just yet, may not be able to check in
+	  the platform specific code.
 	- Andrew Zabolotny implemented the following for levtool:
 	  - Implemented the per-window key handling.
 	  - Implemented multiple views. Right now there are two engine views
