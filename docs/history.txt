@@ -6,8 +6,8 @@ The history order has been reversed so that new features are at the top.
 	  have a dynamic light that doesn't move but only changes color.
 	  It is also more consistant.
 	- Changed default halo parameters a bit to more resemble a cross.
-	- Added SNOW, RAIN, and FOUNTAIN keywords to the world file format.
-	  For a simple fountain use:
+	- Added SNOW, RAIN, FIRE, and FOUNTAIN keywords to the world
+	  file format.  For a simple fountain use:
 		FOUNTAIN 'fount1' (ORIGIN (x,y,z) TEXTURE ('green.gif'))
 	  For snow use:
 		SNOW 'snow' (BOX (x1,y1,z1,x2,y2,z2) TEXTURE ('snow.jpg'))

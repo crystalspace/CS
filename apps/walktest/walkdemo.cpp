@@ -214,8 +214,8 @@ void add_particles_fire (csSector* sector, char* txtname, int num,
    csFireParticleSystem* exp = new csFireParticleSystem(
      Sys->view->GetWorld (), num, txt,
      CS_FX_ADD, false, 0.1, 0.1,
-     3.0, csVector3(0,1.0,0), origin,
-     0.2, 0.35);
+     3.0, csVector3(0,0.5,0), origin,
+     0.3, 0.40);
   exp->MoveToSector (sector);
 }
 

@@ -70,6 +70,8 @@ class csLoader
   static csCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
   static csStatLight* load_statlight (char* buf);
+  /// Parse a static fire definition and return a new object
+  static csParticleSystem* load_fire (char* name, char* buf);
   /// Parse a static fountain definition and return a new object
   static csParticleSystem* load_fountain (char* name, char* buf);
   /// Parse a static rain definition and return a new object

@@ -122,6 +122,7 @@ TOKEN_DEF_START
   TOKEN_DEF (COLLECTION)
   TOKEN_DEF (COLOR)
   TOKEN_DEF (COLORS)
+  TOKEN_DEF (COLORSCALE)
   TOKEN_DEF (CONVEX)
   TOKEN_DEF (COPY)
   TOKEN_DEF (COSFACT)
@@ -138,6 +139,7 @@ TOKEN_DEF_START
   TOKEN_DEF (FALLTIME)
   TOKEN_DEF (FILE)
   TOKEN_DEF (FILTER)
+  TOKEN_DEF (FIRE)
   TOKEN_DEF (FIRST)
   TOKEN_DEF (FIRST_LEN)
   TOKEN_DEF (FLATCOL)
@@ -229,6 +231,7 @@ TOKEN_DEF_START
   TOKEN_DEF (TEX_SET)
   TOKEN_DEF (TEX_SET_SELECT)
   TOKEN_DEF (THING)
+  TOKEN_DEF (TOTALTIME)
   TOKEN_DEF (TRANSFORM)
   TOKEN_DEF (TRANSPARENT)
   TOKEN_DEF (TRIANGLE)
@@ -827,6 +830,98 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
   return partsys;
 }
 
+csParticleSystem* csLoader::load_fire (char* name, char* buf)
+{
+  TOKEN_TABLE_START(commands)
+    TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (ORIGIN)
+    TOKEN_TABLE (SPEED)
+    TOKEN_TABLE (COLORSCALE)
+    TOKEN_TABLE (DROPSIZE)
+    TOKEN_TABLE (LIGHTING)
+    TOKEN_TABLE (NUMBER)
+    TOKEN_TABLE (MIXMODE)
+    TOKEN_TABLE (SWIRL)
+    TOKEN_TABLE (TOTALTIME)
+  TOKEN_TABLE_END
+
+  long cmd;
+  char* params;
+
+  char str[255];
+  int number = 50;
+  csTextureHandle* texture = NULL;
+  UInt mixmode = CS_FX_ADD;
+  int lighted_particles = 0;
+  float drop_width = .1;
+  float drop_height = .1;
+  csVector3 origin (0);
+  float total_time = 3.0;
+  csVector3 speed (0, 0.5, 0);
+  float colorscale = .35;
+  float swirl = 0.3;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case TOKEN_NUMBER:
+        ScanStr (params, "%d", &number);
+        break;
+      case TOKEN_TEXTURE:
+        ScanStr (params, "%s", str);
+        texture = World->GetTextures ()->FindByName (str);
+        if (texture == NULL)
+        {
+          CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
+          fatal_exit (0, true);
+        }
+        break;
+      case TOKEN_MIXMODE:
+        mixmode = ParseMixmode (params);
+        break;
+      case TOKEN_LIGHTING:
+        ScanStr (params, "%b", &lighted_particles);
+        break;
+      case TOKEN_DROPSIZE:
+        ScanStr (params, "%f,%f", &drop_width, &drop_height);
+	break;
+      case TOKEN_ORIGIN:
+        ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
+        break;
+      case TOKEN_SWIRL:
+        ScanStr (params, "%f", &swirl);
+        break;
+      case TOKEN_TOTALTIME:
+        ScanStr (params, "%f", &total_time);
+        break;
+      case TOKEN_COLORSCALE:
+        ScanStr (params, "%f", &colorscale);
+        break;
+      case TOKEN_SPEED:
+        ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
+        break;
+    }
+    if (cmd == PARSERR_TOKENNOTFOUND)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
+      fatal_exit (0, false);
+    }
+  }
+
+  if (texture == NULL)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "A fire requires a texture!\n");
+    fatal_exit (0, false);
+  }
+
+  csFireParticleSystem* partsys = new csFireParticleSystem (
+  	World, number, texture, mixmode, lighted_particles, drop_width,
+	drop_height, total_time, speed, origin, swirl, colorscale);
+  partsys->SetName (name);
+  return partsys;
+}
+
 csParticleSystem* csLoader::load_rain (char* name, char* buf)
 {
   TOKEN_TABLE_START(commands)
@@ -902,7 +997,7 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
 
   if (texture == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "A fountain requires a texture!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Rain requires a texture!\n");
     fatal_exit (0, false);
   }
 
@@ -994,7 +1089,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
 
   if (texture == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "A fountain requires a texture!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Snow requires a texture!\n");
     fatal_exit (0, false);
   }
 
@@ -3420,6 +3515,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     TOKEN_TABLE (FOUNTAIN)
     TOKEN_TABLE (RAIN)
     TOKEN_TABLE (SNOW)
+    TOKEN_TABLE (FIRE)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (portal_commands)
@@ -3627,6 +3723,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
           f.enabled = true;
           ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
         }
+        break;
+      case TOKEN_FIRE:
+        partsys = load_fire (name, params);
+	partsys->MoveToSector (sector);
         break;
       case TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
@@ -4006,6 +4106,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (FOUNTAIN)
     TOKEN_TABLE (RAIN)
     TOKEN_TABLE (SNOW)
+    TOKEN_TABLE (FIRE)
   TOKEN_TABLE_END
 
   char* name;
@@ -4039,6 +4140,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_STATBSP:
         do_stat_bsp = true;
+        break;
+      case TOKEN_FIRE:
+        partsys = load_fire (name, params);
+	partsys->MoveToSector (sector);
         break;
       case TOKEN_FOUNTAIN:
         partsys = load_fountain (name, params);
