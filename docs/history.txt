@@ -2,7 +2,7 @@ The history order is reversed so that new features are at the top.
 
 27-Jul-2002
 	- Added a new blender export script (blender2cs.py) written by
-	  Duhprey. This one exports to thing mesh factories and puts
+	  John Harger. This one exports to thing mesh factories and puts
 	  those in a seperate library.
 26-Jul-2002
 	- Eric Sunshine fixed problem reported by Reed Hedges
