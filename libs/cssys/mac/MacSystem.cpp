@@ -44,6 +44,16 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
+#define SetQDGlobalsRandomSeed( n ) ( qd.randSeed = n )
+#define GetRegionBounds( m, n ) ( *(n) = (*(m))->rgnBBox )
+#define GetWindowPort(m) ( (GrafPtr)(m) )
+#define GetDialogWindow(m) ( (WindowPtr)(m) )
+#define EnableMenuItem( m, n ) EnableItem( m,n )
+#define DisableMenuItem( m, n ) DisableItem( m,n )
+#define GetQDGlobalsArrow( m ) ( *m = qd.arrow )
+#endif
+
 #define SCAN_KEYBOARD       0
 #define USE_INPUTSPROCKETS  0
 
@@ -64,7 +74,11 @@
 #define kCommandLineString      1024
 
 static OSErr GetPath( FSSpec theFSSpec, char *theString );
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
 static OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon );
+#else
+static pascal OSErr AppleEventHandler( const AppleEvent *event, AppleEvent *reply, unsigned long refCon );
+#endif
 static AEEventHandlerUPP AppleEventHandlerUPP = NULL;
 static SysSystemDriver * gSysSystemDriver = NULL;
 
@@ -88,8 +102,11 @@ SysSystemDriver::SysSystemDriver()
     ProcessInfoRec      theInfo;
     OSStatus            theStatus = noErr;
     char                statusMessage[256];
+	long				theSeed;
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
     ::MaxApplZone();
+#endif
     for ( i = 0; i < kMoreMasters; ++i )
         MoreMasters();
 
@@ -98,16 +115,19 @@ SysSystemDriver::SysSystemDriver()
     /*
      *  Initialize all the needed managers.
      */
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
     ::InitGraf(&qd.thePort);
     ::InitFonts();
     ::InitWindows();
     ::InitMenus();
     ::TEInit();
     ::InitDialogs(nil);
+#endif
     ::InitCursor();
     ::FlushEvents ( everyEvent, 0 );
 
-    ::GetDateTime((unsigned long*) &qd.randSeed);
+    ::GetDateTime((unsigned long*) &theSeed);
+    SetQDGlobalsRandomSeed(theSeed);
 
     /*
      *  Initialise keyboard state.
@@ -209,7 +229,11 @@ SysSystemDriver::~SysSystemDriver()
     if ( AppleEventHandlerUPP ) {
         AERemoveEventHandler( typeWildCard, typeWildCard,
                               (AEEventHandlerUPP)AppleEventHandlerUPP, FALSE );
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
         DisposeRoutineDescriptor( AppleEventHandlerUPP );
+#else
+        DisposeAEEventHandlerUPP( AppleEventHandlerUPP );
+#endif
         AppleEventHandlerUPP = NULL;
     }
 
@@ -326,7 +350,7 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
          */
         theMenu = GetMenuHandle( kEditMenuID );
         if ( theMenu ) {
-            DisableItem( theMenu, 0 );
+            DisableMenuItem( theMenu, 0 );
         }
 
         /*
@@ -452,11 +476,13 @@ void SysSystemDriver::DispatchEvent( EventRecord *theEvent, iMacGraphics* piG2D 
             }
             break;
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
         case diskEvt:
                 Point dPt = {100,100};
                 if( HiWord( theEvent->message ) != 0)
                     DIBadMount( dPt, theEvent->message );
                 break;
+#endif
 
         case kHighLevelEvent:
             HandleHLEvent( theEvent );
@@ -503,15 +529,17 @@ void SysSystemDriver::HandleMouseEvent( EventRecord *theEvent, iMacGraphics* piG
 
             break;
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
         case inSysWindow:
             SystemClick( theEvent, targetWindow );  // system will handle it (DA window)
             break;
+#endif
 
         case inContent:
             if ( targetWindow )                     // the user clicked in a window
             {
                 if ( targetWindow == (WindowPtr)FrontWindow() ) {
-                    SetPort( targetWindow );
+                    SetPort( GetWindowPort( targetWindow ));
                     theMouse = theEvent->where;
                     ::GlobalToLocal( &theMouse );
                     if ( theEvent->what == mouseDown )
@@ -533,7 +561,8 @@ void SysSystemDriver::HandleMouseEvent( EventRecord *theEvent, iMacGraphics* piG
             // Drag the window.
             // Again, disallow this if the front window is modal.
             bool    dblBfrState;
-            Rect r = (*GetGrayRgn())->rgnBBox;
+            Rect	r;
+            GetRegionBounds( GetGrayRgn(), &r );
             InsetRect( &r, 4, 4 );
             DragWindow( targetWindow, theEvent->where, &r );
             if ( piG2D ) {
@@ -553,7 +582,11 @@ void SysSystemDriver::HandleMouseEvent( EventRecord *theEvent, iMacGraphics* piG
                 short newWidth = LoWord(newSize);
                 SizeWindow( targetWindow, newWidth, newHeight, true );
                 Rect invalr = {0,0,newHeight,newWidth};
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
                 InvalRect( &invalr );
+#else
+                InvalWindowRect( targetWindow, &invalr );
+#endif
             }
             break;
         }
@@ -586,9 +619,9 @@ void SysSystemDriver::HandleMenuUpdate( void )
     theMenuHandle = GetMenuHandle(kFileMenuID);
     if ( theMenuHandle ) {
         if ( mInputSprocketsAvailable )
-            EnableItem( theMenuHandle, 1 );
+            EnableMenuItem( theMenuHandle, 1 );
         else
-            DisableItem( theMenuHandle, 1 );
+            DisableMenuItem( theMenuHandle, 1 );
     }
 }
 
@@ -614,6 +647,7 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
         if (itemNum == 1) {
             // show the about box
             DoAboutDialog();
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
         } else {
             // launch Apple Menu item
             Str255 appleItemName;
@@ -622,6 +656,7 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
             GetPort( &savePort );
             OpenDeskAcc( appleItemName );
             SetPort( savePort );
+#endif
         }
         return;
     }
@@ -921,7 +956,11 @@ static int KeyToChar[128] = {
 
 void SysSystemDriver::ScanKeyboard ()
 {
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
     unsigned long   km[4];
+#else
+    long 			km[4];
+#endif
     unsigned long   keys;
     unsigned long   oldkeys;
     unsigned int    i;
@@ -1300,10 +1339,12 @@ int SysSystemDriver::GetCommandLine(char ***arg)
     theString[ 0 ] = strlen( CommandLine );
     ::SetDialogItemText( itemHandle, theString );       // Show the current command line
 
-    ::SetWTitle( theDialog, mAppName );
+    ::SetWTitle( GetDialogWindow( theDialog ), mAppName );
 
-    ::SetCursor( &qd.arrow );
-    ::ShowWindow( theDialog );
+	Cursor	theCursor;
+	GetQDGlobalsArrow( &theCursor );
+    ::SetCursor( &theCursor );
+    ::ShowWindow( GetDialogWindow( theDialog ));
 
     while (1) {
         ::ModalDialog( NULL, &theItem );
