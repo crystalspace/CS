@@ -120,7 +120,7 @@ private:
     Modulo = *p;
     CS_ASSERT (Modulo);
 
-    Elements.SetLength (Modulo, csArray<Element> (0, MIN (Modulo / GrowRate, 8)));
+    Elements.SetLength(Modulo, csArray<Element>(0, MIN(Modulo / GrowRate, 8)));
 
     for (size_t i = 0; i < elen; i++)
     {
@@ -603,23 +603,36 @@ public:
   typedef csHash<bool, T, KeyHandler> HashType;
 
 private:
-  typedef typename_qualifier HashType::GlobalIterator SuperIter;
+  typedef typename_qualifier HashType::GlobalIterator ParentIter;
   HashType map;
 
 public:
+  /* Unfortunately, MSVC6 barfs if we derive this from ParentIter. */
   /// An iterator class for the set.
-  class GlobalIterator : public SuperIter
+  class GlobalIterator
   {
   protected:
+    ParentIter iter;
     GlobalIterator () {}
-    GlobalIterator (const csSet<T, KeyHandler>* s) : SuperIter(&s->map) {}
+    GlobalIterator (const csSet<T, KeyHandler>* s) :
+      iter(s->map.GetIterator()) {}
 
   public:
     friend class csSet<T, KeyHandler>;
+
+    GlobalIterator (const GlobalIterator& o) : iter(o.iter) {}
+    GlobalIterator& operator=(const GlobalIterator& o)
+    { iter = o.iter; return *this; }
+
+    /// Returns a boolean indicating whether or not the set has more elements.
+    bool HasNext () const
+    { return iter.HasNext(); }
+
+    /// Get the next element's value.
     T Next()
     {
       T key;
-      SuperIter::Next(key);
+      iter.Next(key);
       return key;
     }
   };
