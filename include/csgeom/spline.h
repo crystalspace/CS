@@ -49,10 +49,10 @@ public:
   virtual ~csSpline ();
 
   /// Get the number of dimensions.
-  int GetDimensionCount () { return dimensions; }
+  int GetDimensionCount () const { return dimensions; }
 
   /// Get the number of points.
-  int GetPointCount () { return num_points; }
+  int GetPointCount () const { return num_points; }
 
   /**
    * Insert a point after some index. If index == -1 add a point before all
@@ -71,7 +71,7 @@ public:
    * with 1. Other values are also possible the but the values should
    * rise. The given array is copied.
    */
-  void SetTimeValues (float* t);
+  void SetTimeValues (float const* t);
 
   /**
    * Set one time point.
@@ -81,12 +81,12 @@ public:
   /**
    * Get the time values.
    */
-  float* GetTimeValues () { return time_points; }
+  float const* GetTimeValues () const { return time_points; }
 
   /**
    * Get one time point.
    */
-  float GetTimeValue (int idx) { return GetTimeValues ()[idx]; }
+  float GetTimeValue (int idx) const { return GetTimeValues ()[idx]; }
 
   /**
    * Set the values for some dimension.
@@ -94,7 +94,7 @@ public:
    * These are the values that will be interpolated. The given
    * array is copied.
    */
-  void SetDimensionValues (int dim, float* d);
+  void SetDimensionValues (int dim, float const* d);
 
   /**
    * Set a value for some dimension.
@@ -104,26 +104,28 @@ public:
   /**
    * Get the values for some dimension.
    */
-  float* GetDimensionValues (int dim) { return &points[dim*num_points]; }
+  float const* GetDimensionValues (int dim) const
+  { return &points[dim*num_points]; }
 
   /**
    * Get the value for some dimension.
    */
-  float GetDimensionValue (int dim, int idx)
+  float GetDimensionValue (int dim, int idx) const
   {
-    float* d = &points[dim*num_points];
+    float const* d = &points[dim*num_points];
     return d[idx];
   }
 
   /**
    * Sets the values of the control point at index idx.
    */
-  void SetIndexValues (int idx, float* d);
+  void SetIndexValues (int idx, float const* d);
   
   /**
-   * Gets the values of the control point at index idx.
+   * Gets the values of the control point at index idx.  Caller is responsible
+   * for invoking `delete[]' on returned array when no longer needed.
    */
-  float* GetIndexValues (int idx);
+  float* GetIndexValues (int idx) const;
   
   /**
    * Calculate internal values for this spline given some time value.
@@ -133,13 +135,13 @@ public:
   /**
    * Get the index of the current point we are in (valid after Calculate()).
    */
-  int GetCurrentIndex () { return idx; }
+  int GetCurrentIndex () const { return idx; }
 
   /**
    * After calling Calculate() you can use this to fetch the value of
    * some dimension.
    */
-  virtual float GetInterpolatedDimension (int dim) = 0;
+  virtual float GetInterpolatedDimension (int dim) const = 0;
 };
 
 /**
@@ -175,7 +177,7 @@ public:
    * After calling Calculate() you can use this to fetch the value of
    * some dimension.
    */
-  virtual float GetInterpolatedDimension (int dim);
+  virtual float GetInterpolatedDimension (int dim) const;
 };
 
 /**
@@ -190,7 +192,7 @@ private:
 
 protected:
   /// Base function for a cubic B-spline (i=-2..1).
-  virtual float BaseFunction (int i, float t);
+  virtual float BaseFunction (int i, float t) const;
 
 public:
   /// Create a B-spline with d dimensions and p points.
@@ -208,7 +210,7 @@ public:
    * After calling Calculate() you can use this to fetch the value of
    * some dimension.
    */
-  virtual float GetInterpolatedDimension (int dim);
+  virtual float GetInterpolatedDimension (int dim) const;
 };
 
 /**
@@ -218,7 +220,7 @@ class CS_CSGEOM_EXPORT csCatmullRomSpline : public csBSpline
 {
 protected:
   /// Base function for a cubic CatmullRom spline (i=-2..1).
-  virtual float BaseFunction (int i, float t);
+  virtual float BaseFunction (int i, float t) const;
 
 public:
   /// Create a CatmullRom spline with d dimensions and p points.

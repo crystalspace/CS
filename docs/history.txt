@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jun-2004
+	- Eric Sunshine added a bunch of missing 'const' directives to csSpline
+	  and its subclasses.
 17-Jun-2004
 	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
 	  flag. When this flag is set the renderer will zfill the portal area.
@@ -49,13 +52,13 @@ chronological order.
 	  another portal (floating or not) behind the floating portal then that
 	  other portal clip area is currently fully ignored. This is something
 	  we have to fix too.
-        - Matze:
-            - Fixed some warnings in csHashMap::iterator
-            - did a blind fix to csString::RTrim. It was obviously wrong and
-              icc reported that. Didn't test it though...
-            - fixed some more pointless consts in tinyxml code
-            - fixed warnings in csProcCaps
-            - some more small warning fixes for icc
+        - Matze made the following changes:
+            - Fixed some warnings in csHashMap::Iterator.
+            - Did a blind fix to csString::RTrim. It was obviously wrong and
+              icc reported that. Didn't test it though.
+            - Fixed some more pointless consts in tinyxml code.
+            - Fixed warnings in csProcCaps.
+            - Some more small warning fixes for icc.
 	- Jorrit changed g3d->OpenPortal() so that it is now called for
 	  every portal instead of only for floating portals. There is a new
 	  'floating' parameter which indicates if the portal floats or not.
@@ -81,7 +84,8 @@ chronological order.
 	  has a checkDupes parameter (default false). Also the checkdupes
 	  parameter from LoadMapFile() is passed along to LoadLibraryFile()
 	  if the map contains 'library' statements.
-	- Jorrit added a new attribute 'checkdupes' to 'library'. So if you say:
+	- Jorrit added a new attribute 'checkdupes' to 'library'.  So, if you
+	  say:
 	    <library checkdupes="true">somelib.lib</library>
 	  Then during loading of the library it will check for duplicate
 	  objects (factories, textures, materials, ...) and don't load them
@@ -96,7 +100,7 @@ chronological order.
 	  will get the shadows.
 	- res made some small comment changes in ivideo/shader/shader.h and
 	  csutil/csuctransform.h.
-	- Remi Bonnet added DeleteElement and NextNoAdvance to csHash.
+	- Remi Bonnet added DeleteElement() and NextNoAdvance() to csHash.
 	- res augmented the cslibs configure check to pass a "--compiler" flag
 	  along to cslibs-config. This will be utilized by the next
 	  cs-win32libs version to choose correct compiler-specific libs.
@@ -123,8 +127,8 @@ chronological order.
 	  external Makefile-based projects on MacOS/X.  Previously, it was
 	  quite broken.  Added cs-config/appwrap.sh, which allows external
 	  application Makfiles to create proper Cocoa application wrappers on
-	  MacOS/X when using a Makefile-based build.  (This is documented in
-	  the HOWTO.)
+	  MacOS/X when using a Makefile-based build.  (This is now documented
+	  in the HOWTO.)
 12-Jun-2004
 	- res made all Win32 platforms, not only VC, use CS' own opendir() etc 
 	  functions.

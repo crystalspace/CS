@@ -35,7 +35,7 @@ csSpline::~csSpline ()
   delete[] points;
 }
 
-static void InsertFloat (float *dst, float *src, int idx, int num)
+static void InsertFloat (float *dst, float const* src, int idx, int num)
 {
   if (idx == -1)
   {
@@ -74,7 +74,7 @@ void csSpline::InsertPoint (int idx)
   precalculation_valid = false;
 }
 
-static void RemoveFloat (float *dst, float *src, int idx, int num)
+static void RemoveFloat (float *dst, float const* src, int idx, int num)
 {
   if (idx <= 0)
   {
@@ -109,7 +109,7 @@ void csSpline::RemovePoint (int idx)
   precalculation_valid = false;
 }
 
-void csSpline::SetTimeValues (float *t)
+void csSpline::SetTimeValues (float const* t)
 {
   memcpy (time_points, t, sizeof (float) * num_points);
   precalculation_valid = false;
@@ -121,7 +121,7 @@ void csSpline::SetTimeValue (int idx, float t)
   precalculation_valid = false;
 }
 
-void csSpline::SetDimensionValues (int dim, float *d)
+void csSpline::SetDimensionValues (int dim, float const* d)
 {
   memcpy (&points[dim * num_points], d, sizeof (float) * num_points);
   precalculation_valid = false;
@@ -134,17 +134,17 @@ void csSpline::SetDimensionValue (int dim, int idx, float d)
   precalculation_valid = false;
 }
 
-void csSpline::SetIndexValues (int idx, float* d)
+void csSpline::SetIndexValues (int idx, float const* d)
 {
-  for (int a=0; a<GetDimensionCount(); ++a)
+  for (int a = 0, n = GetDimensionCount(); a < n; ++a)
     points[a * num_points + idx] = d[a];
   precalculation_valid = false;
 }
 
-float* csSpline::GetIndexValues (int idx)
+float* csSpline::GetIndexValues (int idx) const
 {
-  float *p = new float[GetDimensionCount()];
-  for (int a=0; a<GetDimensionCount(); ++a)
+  float* p = new float[GetDimensionCount()];
+  for (int a = 0, n = GetDimensionCount(); a < n; ++a)
     p[a] = points[a * num_points + idx];
   return p;
 }
@@ -236,7 +236,7 @@ void csCubicSpline::Calculate (float time)
   D = (B * B * B - B) * temp;
 }
 
-float csCubicSpline::GetInterpolatedDimension (int dim)
+float csCubicSpline::GetInterpolatedDimension (int dim) const
 {
   float *p = &points[dim * num_points];
 #if 0
@@ -258,7 +258,7 @@ csBSpline::~csBSpline ()
 {
 }
 
-float csBSpline::BaseFunction (int i, float t)
+float csBSpline::BaseFunction (int i, float t) const
 {
   switch (i)
   {
@@ -283,7 +283,7 @@ void csBSpline::Calculate (float time)
   	/ (time_points[idx + 1] - time_points[idx]);
 }
 
-float csBSpline::GetInterpolatedDimension (int dim)
+float csBSpline::GetInterpolatedDimension (int dim) const
 {
   float *p = &points[dim * num_points];
   float val = 0;
@@ -309,7 +309,7 @@ float csBSpline::GetInterpolatedDimension (int dim)
 }
 
 //---------------------------------------------------------------------------
-float csCatmullRomSpline::BaseFunction (int i, float t)
+float csCatmullRomSpline::BaseFunction (int i, float t) const
 {
   switch (i)
   {
@@ -321,5 +321,3 @@ float csCatmullRomSpline::BaseFunction (int i, float t)
 
   return 0;         // We only get here if an invalid i is specified.
 }
-
-//---------------------------------------------------------------------------
