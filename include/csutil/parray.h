@@ -26,7 +26,7 @@ typedef int csArrayCompareFunction (void* item1, void* item2);
 typedef int csArrayCompareKeyFunction (void* item, void* key);
 
 /**
- * /deprecated This is deprecated! Please use csArray instead!
+ * \deprecated This is deprecated! Please use csArray instead!
  *
  * An array of pointers. No ref counting is done on the elements in this
  * array. Use csRefArray if you want ref counting to happen. Note that
