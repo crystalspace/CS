@@ -186,6 +186,13 @@ $(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/macosx/%.mm
 $(OUT)/%$O: %.mm
 	$(DO.COMPILE.MM)
 
+# Add support C and C++ in platform-specific directory.
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/macosx/%.c
+	$(DO.COMPILE.C)
+
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/macosx/%.cpp
+	$(DO.COMPILE.CPP)
+
 # Override the default setting of OBJ.SYS_CSUTIL since we must include object
 # files from Objective-C and Objective-C++ sources.
 OBJ.SYS_CSUTIL = $(addprefix $(OUT.CSUTIL)/,$(notdir $(subst .s,$O,\
