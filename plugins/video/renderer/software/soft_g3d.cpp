@@ -978,7 +978,8 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   Scan.M = M;
 
   // Select the right scanline drawing function.
-  if (do_transp && (Scan.Texture->get_transparent ()) || poly.alpha)
+  if (do_transp
+   && (poly.alpha || (txt_mm && txt_mm->get_transparent ())))
     return S_OK;
   int scan_index = SCANPROC_FLAT_ZFIL;
   if (z_buf_mode == CS_ZBUF_USE)
@@ -2028,9 +2029,9 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX (ITextureHandle* handle,
   {
     // In flat modes we use #.16 fixed-point format for R,G,B factors
     // where # is the number of bits per component
-    pqinfo.redFact = (pfmt.RedMask >> pfmt.RedBits);
-    pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenBits);
-    pqinfo.blueFact = (pfmt.BlueMask >> pfmt.BlueBits);
+    pqinfo.redFact = (pfmt.RedMask >> pfmt.RedShift);
+    pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenShift);
+    pqinfo.blueFact = (pfmt.BlueMask >> pfmt.BlueShift);
   } /* endif */
 
   return S_OK;
@@ -2071,7 +2072,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
     return S_OK;
 
   float flat_r, flat_g, flat_b;
-  if (poly.txt_handle)
+  if (pqinfo.textured)
     flat_r = flat_g = flat_b = 1;
   else
   {

@@ -457,12 +457,11 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     // Tell Gfx3D we're going to display 3D things
     if (Gfx3D->BeginDraw (drawflags | CSDRAW_3DGRAPHICS) != S_OK)
       return;
-    if (map_mode != MAP_ON) view->Draw ();
-    // no need to clear screen anymore
-    drawflags = 0;
 
+    // Advance sprite frames
     Sys->world->AdvanceSpriteFrames (current_time);
 
+    // Apply lighting BEFORE the very first frame
     csDynLight* dyn = Sys->world->GetFirstDynLight ();
     while (dyn)
     {
@@ -473,6 +472,10 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
     }
     // Apply lighting to all sprites
     light_statics ();
+
+    if (map_mode != MAP_ON) view->Draw ();
+    // no need to clear screen anymore
+    drawflags = 0;
   }
 
   // Start drawing 2D graphics

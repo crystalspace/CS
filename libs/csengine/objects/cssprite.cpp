@@ -582,16 +582,20 @@ void csSprite3D::Draw (csRenderView& rview)
   memset (&poly, 0, sizeof(poly));
   poly.inv_aspect = csCamera::inv_aspect;
 
+  if (force_otherskin)
+    poly.txt_handle = cstxt->GetTextureHandle ();
+  else
+    poly.txt_handle = tpl->cstxt->GetTextureHandle ();
+
+  // Fill flat color if renderer decide to paint it flat-shaded
+  poly.txt_handle->GetMeanColor (poly.flat_color_r,
+    poly.flat_color_g, poly.flat_color_b);
+
   // The triangle in question
   csVector2 triangle [3];
   csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-
-  if (force_otherskin)
-    poly.txt_handle = cstxt->GetTextureHandle ();
-  else
-    poly.txt_handle = tpl->cstxt->GetTextureHandle ();
 
   if (!rview.callback)
     rview.g3d->StartPolygonFX (poly.txt_handle, MixMode
