@@ -26,6 +26,10 @@ NASM.FLAGS += -f elf ;
 # speed loss...)
 #PLUGIN.CFLAGS += -fPIC ;
 
+# The BFD tag name under which to embed meta-information into a plugin module.
+# This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
+SECTION_TAG_NAME ?= .crystalspace ;
+
 #----------------------------------------------------------------------------
 # platform specific rules
 
@@ -77,7 +81,7 @@ rule ObjTagMetaData
 }
 actions ObjTagMetaData
 {
-  $(CMD.OBJCOPY) --add-section .crystal=$(>) $(<)
+  $(CMD.OBJCOPY) --add-section $(SECTION_TAG_NAME)=$(>) $(<)
 }
 
 # SystemLinkPlugin target : objects : options
