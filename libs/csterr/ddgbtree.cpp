@@ -471,7 +471,10 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 		   	if (pmax[2]< _mesh->farclip() || pmin[2] > _mesh->nearclip())
 				tri(tvc)->_vis.visibility = ddgALLOUT;
 			else
-				tri(tvc)->_vis = _mesh->camBBox()->visibleSpace(ddgBBox(pmin,pmax),_mesh->tanHalfFOV() );
+			{
+				float thfov = _mesh->tanHalfFOV();
+				tri(tvc)->_vis = _mesh->camBBox()->visibleSpace(ddgBBox(pmin,pmax), thfov);
+			}
 		}
 		if (tri(tvc)->_state.flags.sq && !tri(tvc)->_vis.flags.none)
 			// This triangle is in the mesh and is visible.
