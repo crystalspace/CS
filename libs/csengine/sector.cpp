@@ -82,11 +82,12 @@ csSector::csSector (csWorld* world) : csPolygonSet (world)
 
 csSector::~csSector ()
 {
-  // Sprites and things are not deleted by the call below. They
+  // Sprites, things, and collections are not deleted by the calls below. They
   // belong to csWorld.
   things.DeleteAll ();
   skies.DeleteAll ();
   sprites.DeleteAll ();
+  collections.DeleteAll ();
 
   delete static_tree;
 

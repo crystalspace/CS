@@ -844,16 +844,6 @@ void csWorld::SetCuller (int culler)
   }
 }
 
-csSpriteTemplate* csWorld::GetSpriteTemplate (const char* name)
-{
-  return (csSpriteTemplate *)sprite_templates.FindByName (name);
-}
-
-csThingTemplate* csWorld::GetThingTemplate (const char* name)
-{
-  return (csThingTemplate *)thing_templates.FindByName (name);
-}
-
 csSector* csWorld::NewSector ()
 {
   csSector* s = new csSector (this);
@@ -1613,11 +1603,30 @@ void csWorld::UnlinkSky (csThing* thing)
 void csWorld::RemoveSky (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
-  int idx = things.Find (thing);
+  int idx = skies.Find (thing);
   if (idx == -1) return;
   skies[idx] = NULL;
   skies.Delete (idx);
   delete thing;
+}
+
+void csWorld::UnlinkCollection (csCollection* collection)
+{
+  collection->GetMovable ().ClearSectors ();
+  int idx = collections.Find (collection);
+  if (idx == -1) return;
+  collections[idx] = NULL;
+  collections.Delete (idx);
+}
+
+void csWorld::RemoveCollection (csCollection* collection)
+{
+  collection->GetMovable ().ClearSectors ();
+  int idx = collections.Find (collection);
+  if (idx == -1) return;
+  collections[idx] = NULL;
+  collections.Delete (idx);
+  delete collection;
 }
 
 struct LightAndDist

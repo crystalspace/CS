@@ -466,7 +466,8 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
+  csSpriteTemplate* tmpl = (csSpriteTemplate*)
+  	Sys->view->GetWorld ()->sprite_templates.FindByName (skelname);
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
@@ -663,7 +664,8 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
 {
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
+  csSpriteTemplate* tmpl = (csSpriteTemplate*)
+  	Sys->view->GetWorld ()->sprite_templates.FindByName (skelname);
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
@@ -794,7 +796,8 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     dyn->SetSector (where);
     dyn->Setup ();
   }
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot");
+  csSpriteTemplate* tmpl = (csSpriteTemplate*)
+  	Sys->view->GetWorld ()->sprite_templates.FindByName ("bot");
   if (!tmpl) return;
   Bot* bot;
   bot = new Bot (tmpl, Sys->view->GetWorld());
@@ -1005,7 +1008,8 @@ void fire_missile ()
   char misname[10];
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (misname);
+  csSpriteTemplate* tmpl = (csSpriteTemplate*)
+  	Sys->view->GetWorld ()->sprite_templates.FindByName (misname);
   if (!tmpl)
     Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite template!\n", misname);
   else

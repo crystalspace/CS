@@ -22,6 +22,7 @@
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
+#include "csengine/cscoll.h"
 #include "isector.h"
 
 //---------------------------------------------------------------------------
@@ -77,10 +78,15 @@ void csMovable::ClearSectors ()
       csThing* th = (csThing*)object;
       th->RemoveFromSectors ();
     }
-    else
+    else if (object->GetType () >= csSprite::Type)
     {
       csSprite* sp = (csSprite*)object;
       sp->RemoveFromSectors ();
+    }
+    else
+    {
+      csCollection* col = (csCollection*)object;
+      col->RemoveFromSectors ();
     }
     sectors.SetLength (0);
   }
@@ -96,10 +102,15 @@ void csMovable::AddSector (csSector* sector)
       csThing* th = (csThing*)object;
       th->MoveToSector (sector);
     }
-    else
+    else if (object->GetType () >= csSprite::Type)
     {
       csSprite* sp = (csSprite*)object;
       sp->MoveToSector (sector);
+    }
+    else
+    {
+      csCollection* col = (csCollection*)object;
+      col->MoveToSector (sector);
     }
   }
 }
@@ -111,10 +122,15 @@ void csMovable::UpdateMove ()
     csThing* th = (csThing*)object;
     th->UpdateMove ();
   }
-  else
+  else if (object->GetType () >= csSprite::Type)
   {
     csSprite* sp = (csSprite*)object;
     sp->UpdateMove ();
+  }
+  else
+  {
+    csCollection* col = (csCollection*)object;
+    col->UpdateMove ();
   }
 }
 

@@ -65,6 +65,11 @@ public:
   csVector things;
 
   /**
+   * List of collections in this sector.
+   */
+  csVector collections;
+
+  /**
    * List of sky objects in this sector.
    */
   csVector skies;

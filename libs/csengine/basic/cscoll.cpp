@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,10 +19,21 @@
 #include "cssysdef.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
+#include "csengine/world.h"
+#include "csengine/sector.h"
 
 IMPLEMENT_CSOBJTYPE (csCollection,csObject);
 
-csCollection::csCollection () : csObject(), objects(8,8) {}
+csCollection::csCollection (csWorld* world) : csObject(), objects (8,8), movable ()
+{
+  movable.SetObject (this);
+  csCollection::world = world;
+}
+
+csCollection::~csCollection ()
+{
+  world->UnlinkCollection (this);
+}
 
 csObject* csCollection::FindObject (char* name)
 {
@@ -34,39 +45,32 @@ csObject* csCollection::FindObject (char* name)
   return NULL;
 }
 
-void csCollection::Transform ()
+void csCollection::UpdateMove ()
 {
-  for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->GetMovable ().UpdateMove ();
 }
 
-void csCollection::SetPosition (csSector* home, const csVector3& pos)
+void csCollection::MoveToSector (csSector* s)
 {
-  for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->GetMovable ().SetPosition (home, pos);
+  s->collections.Push (this);
 }
 
-void csCollection::SetTransform (const csMatrix3& matrix)
+void csCollection::RemoveFromSectors ()
 {
-  for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->GetMovable ().SetTransform (matrix);
-}
-
-void csCollection::MovePosition (const csVector3& rel)
-{
-  for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->GetMovable ().MovePosition (rel);
-}
-
-void csCollection::Transform (csMatrix3& matrix)
-{
-  for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
-      ((csThing*)(objects[i]))->GetMovable ().Transform (matrix);
+  int i;
+  csVector& sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    csSector* ss = (csSector*)sectors[i];
+    if (ss)
+    {
+      int idx = ss->collections.Find (this);
+      if (idx >= 0)
+      {
+        ss->things[idx] = NULL;
+        ss->things.Delete (idx);
+      }
+    }
+  }
 }
 
 //---------------------------------------------------------------------------

@@ -390,24 +390,24 @@ public:
   csNamedObjVector planes;
 
   /**
-   * List of collections. This vector contains objects of type
-   * csCollection*.
+   * List of all collections in the world. This vector contains objects
+   * of type csCollection*. Use UnlinkCollection() and RemoveCollection()
+   * to unlink and/or remove collections from this list. These functions
+   * take care of correctly removing the collections from all sectors
+   * as well. Note that after you add a collection to the list you still
+   * need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector collections;
 
   /**
    * List of sprite templates. This vector contains objects of
-   * type csSpriteTemplate*. You can use GetSpriteTemplate() to locate
-   * a template for a sprite. This function can optionally look in
-   * all loaded libraries as well.
+   * type csSpriteTemplate*.
    */
   csNamedObjVector sprite_templates;
 
   /**
    * List of thing templates. This vector contains objects of
-   * type csThingTemplate*. You can use GetThingTemplate() to locate
-   * a template for a thing. This function can optionally look in
-   * all loaded libraries as well.
+   * type csThingTemplate*.
    */
   csNamedObjVector thing_templates;
 
@@ -814,20 +814,6 @@ public:
   csSector* NewSector ();
 
   /**
-   * Find a named sprite template in the loaded world and
-   * optionally in all loaded libraries. This template can then
-   * be used to create sprites.
-   */
-  csSpriteTemplate* GetSpriteTemplate (const char* name);
-
-  /**
-   * Find a named thing template in the loaded world and
-   * optionally in all loaded libraries. This template can then
-   * be used to create things.
-   */
-  csThingTemplate* GetThingTemplate (const char* name);
-
-  /**
    * Find a thing with a given name. This function will scan all sectors
    * of the current world and return the first thing that it can find with
    * the given name.
@@ -995,6 +981,18 @@ public:
    * It is also removed from all sectors.
    */
   void RemoveSky (csThing* thing);
+
+  /**
+   * Unlink a collection from the world (but do not delete it).
+   * It is also removed from all sectors.
+   */
+  void UnlinkCollection (csCollection* collection);
+
+  /**
+   * Unlink and delete a collection from the world.
+   * It is also removed from all sectors.
+   */
+  void RemoveCollection (csCollection* collection);
 
   /**
    * Create an iterator to iterate over all polygons of the world.

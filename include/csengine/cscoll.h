@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,8 +22,10 @@
 #include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
 #include "csutil/csvector.h"
+#include "csengine/movable.h"
 
 class csSector;
+class csWorld;
 
 /**
  * A collection object is for conveniance of the script language.
@@ -34,45 +36,51 @@ class csSector;
  */
 class csCollection : public csObject
 {
+  friend class csMovable;
+
 private:
   /// The list of objects contained in this csCollection.
   csVector objects;
+
+  /// Position in the world.
+  csMovable movable;
+
+  /// World.
+  csWorld* world;
+
+protected:
+  /// Move this collection to the specified sector. Can be called multiple times.
+  virtual void MoveToSector (csSector* s);
+
+  /// Remove this collection from all sectors it is in (but not from the world).
+  virtual void RemoveFromSectors ();
+
+  /**
+   * Update transformations after the collection has moved
+   * (through updating the movable instance).
+   * This MUST be done after you change the movable otherwise
+   * some of the internal data structures will not be updated
+   * correctly. This function is called by movable.UpdateMove().
+   */
+  virtual void UpdateMove ();
 
 public:
   /**
    * Create a new csCollection with the given name.
    */
-  csCollection ();
+  csCollection (csWorld* world);
 
   ///
-  virtual ~csCollection () {}
+  virtual ~csCollection ();
 
   /**
-   * Set the location of all objects in the collection.
+   * Get the movable instance for this collection.
+   * It is very important to call GetMovable().UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
    */
-  void SetPosition (csSector* home, const csVector3& v);
-
-  /**
-   * Set the transformation matrix for all objects in the collection.
-   */
-  void SetTransform (const csMatrix3& matrix);
-
-  /**
-   * Relative move.
-   */
-  void MovePosition (const csVector3& v);
-
-  /**
-   * Relative transform.
-   */
-  void Transform (csMatrix3& matrix);
-
-  /**
-   * Really do the transformation and moving of all objects in
-   * the collection. This should be called after calling any of
-   * the other set_move, set_transform, move or transform calls.
-   */
-  void Transform ();
+  csMovable& GetMovable () { return movable; }
 
   /**
    * Find an object with the given name inside this collection.

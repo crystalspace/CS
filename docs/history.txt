@@ -15,6 +15,16 @@ The history order has been reversed so that new features are at the top.
 	  csCamera::SetFOV() so that the FOV in angles can be computed.
 	- Added 'fovangle' console command to get/set the FOV with degrees
 	  as a parameter.
+	- Added support for csMovable in csCollection too. The plan is
+	  to support hierarchical animation with this technique. Not
+	  done yet.
+	- Added a vector of collections in csSector. This way collections
+	  work similar to sprites and things.
+	- Removed csWorld::GetSpriteTemplate and GetThingTemplate since
+	  this can easily be done on the public vectors instead.
+	- Added csWorld parameter to csCollection constructor.
+	- Fixed a bug in csWorld::RemoveSky.
+	- Added csWorld::UnlinkCollection and csWorld::RemoveCollection.
 29-Aug-2000
 	- Integrated a new SDL canvas made by George Yohng
 	  <cspace@mmts.nsys.by>.

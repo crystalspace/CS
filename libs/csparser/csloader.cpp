@@ -550,7 +550,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
   long cmd;
   char* params;
 
-  csCollection* collection = new csCollection ();
+  csCollection* collection = new csCollection (World);
   collection->SetName (name);
 
   char str[255];
@@ -1802,7 +1802,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
       case TOKEN_TEMPLATE:
         {
           ScanStr (params, "%s", str);
-          csThingTemplate* t = World->GetThingTemplate (str);
+          csThingTemplate* t = (csThingTemplate*)World->thing_templates.FindByName (str);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
@@ -4774,7 +4774,7 @@ bool csLoader::LoadWorld (char* buf)
       {
         case TOKEN_SPRITE:
           {
-            csSpriteTemplate* t = World->GetSpriteTemplate (name);
+            csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
             if (!t)
             {
               t = new csSpriteTemplate ();
@@ -4785,11 +4785,11 @@ bool csLoader::LoadWorld (char* buf)
           }
           break;
         case TOKEN_THING:
-          if (!World->GetThingTemplate (name))
+          if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_thingtpl (name, params));
           break;
         case TOKEN_SIXFACE:
-          if (!World->GetThingTemplate (name))
+          if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_sixtpl (name, params));
           break;
         case TOKEN_SECTOR:
@@ -5074,7 +5074,7 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case TOKEN_SPRITE:
           {
-            csSpriteTemplate* t = World->GetSpriteTemplate (name);
+            csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
             if (!t)
             {
               t = new csSpriteTemplate ();
@@ -5085,7 +5085,7 @@ bool csLoader::LoadLibrary (char* buf)
           }
           break;
         case TOKEN_THING:
-          if (!World->GetThingTemplate (name))
+          if (!World->thing_templates.FindByName (name))
             World->thing_templates.Push (load_thingtpl (name, params));
           break;
       }
@@ -5737,7 +5737,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         memset (str, 0, 255);
         memset (str2, 0, 255);
         ScanStr (params, "%s,%s", str, str2);
-        tpl = World->GetSpriteTemplate (str);
+        tpl = (csSpriteTemplate*)World->sprite_templates.FindByName (str);
         if (tpl == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find sprite template '%s'!\n", str);

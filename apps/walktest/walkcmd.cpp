@@ -329,7 +329,8 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size)
 {
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (tname);
+  csSpriteTemplate* tmpl = (csSpriteTemplate*)
+  	Sys->view->GetWorld ()->sprite_templates.FindByName (tname);
   if (!tmpl)
   {
     Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
