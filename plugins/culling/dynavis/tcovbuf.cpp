@@ -1240,7 +1240,6 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   //---------
   // Draw all lines.
   //---------
-printf ("bbox(%d,%d) (%d,%d)\n", bbox.minx, bbox.miny, bbox.maxx, bbox.maxy); fflush (stdout);
   j = num_verts-1;
   for (i = 0 ; i < num_verts ; i++)
   {
@@ -1261,7 +1260,6 @@ printf ("bbox(%d,%d) (%d,%d)\n", bbox.minx, bbox.miny, bbox.maxx, bbox.maxy); ff
 	ya1 = ya[j];
 	ya2 = ya[i];
       }
-printf ("  line %d,%d - %d,%d\n", xa1, ya1, xa2, ya2); fflush (stdout);
       DrawLine (xa1, ya1, xa2, ya2, ya2 == bbox.maxy ? 1 : 0);
     }
     j = i;
