@@ -134,6 +134,7 @@
 #ifdef SYSDEF_SOCKETS
   #define _WINSOCKAPI_
   #include <winsock2.h>
+  typedef int socklen_t;
   #undef SYSDEF_SOCKETS
 #endif
 
