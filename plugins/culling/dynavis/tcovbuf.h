@@ -111,11 +111,6 @@ private:
   // Maximum depth of all blocks.
   float tile_max_depth;
 
-  // For every 8x8 block a bit indicating if full.
-  uint32 blocks_full;
-  // For every 8x8 block a bit indicating if partial.
-  uint32 blocks_partial;
-
   // Line Operations that are waiting to be executed.
   int num_operations;
   int max_operations;
@@ -169,8 +164,6 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
-    blocks_full = 0;
-    blocks_partial = 0;
   }
 
   /**
@@ -184,8 +177,6 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
-    blocks_full = 0;
-    blocks_partial = 0;
   }
 
   /**
@@ -250,6 +241,30 @@ public:
    * General Flush (slowest version).
    */
   void FlushGeneral (csTileCol& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where the tile is empty.
+   * This version is for a constant fvalue for the entire tile.
+   */
+  void FlushForEmptyConstFValue (csTileCol& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where the tile is full.
+   * This version is for a constant fvalue for the entire tile.
+   */
+  void FlushForFullConstFValue (csTileCol& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where there is no depth checking.
+   * This version is for a constant fvalue for the entire tile.
+   */
+  void FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth);
+
+  /**
+   * General Flush (slowest version).
+   * This version is for a constant fvalue for the entire tile.
+   */
+  void FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth);
 
   /**
    * Perform a non-modifying flush and return true if Flush would

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Oct-2003
+	- Jorrit did various optimizations to the tiled coverage buffer
+	  in Dynavis. Added several new special cases to Flush() and
+	  considerably optimized the bit-logic in it. This gains us a few
+	  fps in general. More optimizations to Dynavis will hopefully
+	  follow soon...
 27-Oct-2003
 	- res fixed a few warnings occuring with GCC.
 	- res fixed cssaver plugin so it compiles with NR.
