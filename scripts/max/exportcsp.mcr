@@ -16,7 +16,7 @@
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
 ------------------------------------------------------------
--- Version 34
+-- Version 35
 
 macroScript Export_Level_CS
 category:"PlaneShift"
@@ -25,16 +25,17 @@ ButtonText:"Export Level CS"
 tooltip:"Export Level CS" Icon:#("Maxscript",1)
 (
 
-rollout Test1 "Export Level to CS" width:222 height:211
+rollout Test1 "Export Level to CS" width:220 height:240
 (
 	edittext edt3 "" pos:[17,32] width:192 height:21
 	label lbl1 "Export Level To:" pos:[21,7] width:142 height:20
 	button btn2 "Export!" pos:[37,110] width:152 height:24
 	label lbl6 "Scale:" pos:[58,72] width:40 height:20
 	edittext edtScale "" pos:[101,67] width:63 height:27
-	checkbox chkLights "Generate Fake lights for walktest" pos:[4,146] width:215 height:20 enabled:true
-	label lbl3 "Duration (msecs):" pos:[14,174] width:108 height:20
-	editText edtDuration "" pos:[126,173] width:76 height:22
+	checkbox chkLights "Generate Fake lights for walktest" pos:[3,189] width:215 height:20 enabled:true
+	label lbl3 "Duration (msecs):" pos:[13,217] width:108 height:20
+	edittext edtDuration "" pos:[125,216] width:76 height:22
+	checkbox chk2 "Copy textures to dest dir" pos:[3,152] width:210 height:22
 	on Test1 open do
 	(
 	   edt3.text = "D:\\Luca\\temple124"
@@ -75,6 +76,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 		global tokenize
 		global lowercase
 		global getMatFilename
+		global getMatFullPath
 	
 		-- particle variables
 		global fireNeeded = false
@@ -135,7 +137,24 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					image="MATERIALNOTDEFINED"
 			)
 		)
-	
+
+		-- get fullpath of a material
+		fn getMatFullPath m = 
+		(
+		    if (m==undefined) then
+				image="MATERIALNOTDEFINED"
+			else (
+			    mat = m.maps[2]
+				if (mat!=undefined) then
+				(
+
+
+					image = mat.filename
+				) else
+					image="MATERIALNOTDEFINED"
+			)
+		)
+
 		-- ////////////////////////
 		-- Write material function
 		-- ////////////////////////
@@ -216,6 +235,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					)
 				)
 			)
+
 		  )
 	
 	
@@ -425,6 +445,50 @@ rollout Test1 "Export Level to CS" width:222 height:211
 		)
 
 		-- ////////////////////////
+		-- copy textures to output dir
+		-- ////////////////////////
+		fn CopyTexturesToDir outFile =
+		(
+		  destDir = getFilenamePath edt3.text
+		  destFile = filenameFromPath edt3.text
+		  destDir = destDir + destFile + "textures"
+		  format "makedir % \n" destDir
+		  makeDir destDir
+		  
+		  materialsWrittenToWorld=#()
+
+		  for m in sceneMaterials do
+		  (
+		    -- handle Standardmaterials
+			if ((classOf m)==Standardmaterial) then (
+				-- if material not written, add it
+				image = getMatFullPath m
+				if (findItem materialsWrittenToWorld image==0) then (
+					destFile2 = filenameFromPath image
+					destFile2 = destDir + "\\" + destFile2
+					format "copy from % to % \n" image destFile2
+					copyFile image destFile2
+					append materialsWrittenToWorld image
+				)
+			)
+	
+		    -- handle Multi/materials
+			if ((classOf m)==Multimaterial) then (
+				for subm in m do (
+					image = getMatFullPath subm
+					if (findItem materialsWrittenToWorld image==0) then (
+						destFile2 = filenameFromPath image
+						destFile2 = destDir + "\\" + destFile2
+						format "copy from % to % \n" image destFile2
+						copyFile image destFile2
+						append materialsWrittenToWorld image
+					)
+				)
+			)
+		  )
+		)
+
+		-- ////////////////////////
 		-- Output Faces of a mesh
 		-- ////////////////////////
 		fn OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet viscull =
@@ -575,6 +639,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 	
 						for h=1 to 3 do
 						(
+	
 
 							if (findItem verts1 verts2[h]==0) then
 								additionalVertex = h
@@ -634,7 +699,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 								append Tverts (getTVert obj textVert1[h])
 							
 							if (h==3 and (not addedAdd) ) then (
- 								append verts verts2[additionalVertex]
+								append verts verts2[additionalVertex]
 								if (Tmapping) then	
 									append Tverts (getTVert obj textVert2[additionalVertex])	
 							)
@@ -644,6 +709,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 						if (debug) then format "POLY: %" verts
 		 						a = verts[3] as Integer
 						b = verts[2] as Integer
+
 						c = verts[1] as Integer
 						d = verts[4] as Integer
 		
@@ -754,7 +820,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					-- handles no lighting objects and invisible objects
 					if (lighting=="no" or csinvisibletexture=="yes") then
 						format "      <lighting>no</lighting>\n" to:outFile
-
+	
 					-- handles no collision detection objects
 					if (colldet=="no" or csinvisibletexture=="yes") then
 						format "      <colldet>no</colldet>\n" to:outFile
@@ -762,12 +828,12 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					-- additional parameter to have right visibility culler on invisible objects
 					if (csinvisibletexture=="yes") then (
 						format "      <viscull>yes</viscull>\n" to:outFile
-
+	
 					-- handles trasparent objects
 					) else if (istrasparent or viscull=="no") then (
 						format "      <viscull>no</viscull>\n" to:outFile
 					)
-
+	
 					-- no TVerts assigned
 				   if (getNumTVerts obj==0) then
 				   (
@@ -787,9 +853,9 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				)
 			)
 		  )
-        )
-
-
+	    )
+	
+	
 		-- ////////////////////////
 		-- Output culleronly polymesh
 		-- ////////////////////////
@@ -813,29 +879,29 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					)
 			)
 		)
-
+	
 		-- ////////////////////////
 		-- Defines if an object should have <colldet>
 		-- ////////////////////////
 		fn doesCollide obj groupsInfo =
 		(
-
+	
 			-- check for colldet setting
 			colldetProp = getUserProp obj "COLLDET"
-
+	
 			-- if it should not collide (e.g. water)			
 			if (colldetProp=="no") then
 				return false;
-
+	
 			-- if is not in a group by defaults it collides
 			if ( not isGroupMember obj) then
 				return true;
-
+	
 			-- check for colldet based on groups
 			
 		)
-
-
+	
+	
 		-- ////////////////////////
 		-- Main: program starts here
 		-- ////////////////////////
@@ -847,33 +913,33 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			return 1
 		)
 		roomName = fileProperties.getPropertyValue #custom customPropNumber 
-
+	
 		if (roomName==undefined) then (
 		   messageBox "ERROR: Please set a custom property named roomname"
 		   return 1
 		) else (
 		   format "Roomname: %\n" roomName
 		)
-
+	
 		-- output file
 		outFile = createFile filename
-
+	
 		-- write header
 		
 		format "<world>\n" to:outFile
-
-
+	
+	
 		-- write variables tag
 		format " <variables>\n" to:outFile
 		format "  <variable name=\"lightning reset\"><color red=\"0\" green=\"0\" blue=\"0\"/></variable>\n" to:outFile
 		format " </variables>\n" to:outFile
-
+	
 		-- create a new array with objects present in groups
 		allObjects = #()
 		emptyArray = #()
 		collvisInfo = #()
-
-
+	
+	
 		allObjects = emptyArray + objects
 		for obj in objects do
 		(
@@ -906,9 +972,9 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			) else
 				continue
 		)
-
+	
 		format "\nGROUPINFO: %\n" collvisInfo 
-
+	
 		-- Check particles: cycle on all objects in the scene
 		for obj in allObjects do 
 		(
@@ -917,25 +983,25 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				format "Found Particle Object: %\n Type: %" obj.name type
 				if (type == "fire") then ( fireNeeded = true )
 				else if (type == "emit") then ( emitNeeded = true )
-
+	
 				-- check for additional materials
 				addMaterial = getUserProp obj "MATERIAL"
 				if (addMaterial != undefined) then
 					append partMaterials addMaterial
 			)
 		)
-
-
+	
+	
 		-- write materials		
 	    WriteMaterials outFile
-
+	
 		-- write plugins
 	    format "  <plugins>\n" to:outFile
 	    format "    <plugin name=\"thing\">crystalspace.mesh.loader.thing</plugin>\n" to:outFile
 		format "    <plugin name=\"thingFact\">crystalspace.mesh.loader.factory.thing</plugin>\n" to:outFile
 	    format "    <plugin name=\"meshFact\">crystalspace.mesh.loader.factory.genmesh</plugin>\n" to:outFile
 	    format "    <plugin name=\"mesh\">crystalspace.mesh.loader.genmesh</plugin>\n" to:outFile
-
+	
 	  	if (fireNeeded) then (
 		    format "    <plugin name=\"fireFact\">crystalspace.mesh.loader.factory.fire</plugin>\n" to:outFile  
 			format "    <plugin name=\"fire\">crystalspace.mesh.loader.fire</plugin>\n" to:outFile  
@@ -945,7 +1011,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 	    	format "    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n" to:outFile 
 	  	)
 	    format "  </plugins>\n\n" to:outFile
-
+	
 		-- write particles declarations
 	  	if (fireNeeded) then (
 		    format "    <meshfact name=\"fireFact\"><plugin>fireFact</plugin><params /></meshfact>\n\n" to:outFile
@@ -953,13 +1019,13 @@ rollout Test1 "Export Level to CS" width:222 height:211
 	  	if (emitNeeded) then (
 		    format "    <meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n" to:outFile  
 	  	)
-
+	
 		-- search and write meshfacts and thingfacts
 		factoryMeshes = #()
 		factoryThingMeshes = #()
 		for obj in allObjects do
 		(
-
+	
 			-- Check for genmeshes factories
 			objName = obj.name
 			if (findString objName "_g_" !=undefined) then (
@@ -1038,7 +1104,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					format "    <autonormals /></params></meshfact>\n" a b c to:outFile
 				)
 			)
-
+	
 			-- check for thingFacts
 			if (findString objName "_f_" !=undefined) then (
 				-- factory must have name like : _f_name_0
@@ -1047,7 +1113,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				(
 					append factoryThingMeshes obj
 					format "  <meshfact name=\"%\"><plugin>thingFact</plugin><params>\n" toks[3] to:outFile
-
+	
 					-- output vertexes of the object in XZY format
 					for v in obj.verts do
 					(
@@ -1055,8 +1121,8 @@ rollout Test1 "Export Level to CS" width:222 height:211
 						yvert = (v.pos.y * yscale) + yrelocate
 						zvert = (v.pos.z * zscale) + zrelocate
 						format "      <v x=\"%\" y=\"%\" z=\"%\" />\n"  xvert zvert yvert to:outFile
-   					)
-
+					)
+	
 					istrasparent=false
 					-- alpha, ztest and zuse not supported on meshfact
 					if (findString obj.name "_t_" !=undefined) then (
@@ -1068,28 +1134,28 @@ rollout Test1 "Export Level to CS" width:222 height:211
 					  --format "      <priority>object</priority>\n" to:outFile
 					  --format "      <zuse />\n" to:outFile
 					)
-
+	
 					-- no shadow not supported on meshfact
 					noshadows = getUserProp obj "NOSHADOWS"
 					if (noshadows=="yes") then
 						format "      <noshadows />\n" to:outFile
-
+	
 					-- check for no lighting setting
 					lighting = getUserProp obj "LIGHTING"
-
+	
 					-- check for colldet based on groups
 					colldet = doesCollide obj collvisInfo
 					
 					-- check for viscull setting
 					viscull = getUserProp obj "VISCULL"
-
+	
 					-- check for culleronly setting
 					culleronly = getUserProp obj "CULLERONLY"
-
+	
 					 -- export faces of the mesh
 					 -- OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet 
 					 OutputMeshFaces obj outFile polyCombine verboseMode debug false istrasparent lighting colldet viscull
-
+	
 					format "    </params></meshfact>\n" to:outFile
 				)
 			)
@@ -1136,7 +1202,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 		lightsThresholdValues = #()
 		lightsThresholdObjs = #()
 		startingPos = null
-
+	
 		------------------------------------
 		-- cycle on all objects in the scene
 		------------------------------------ 
@@ -1189,7 +1255,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				format "Found Omnilight Object: %\n" obj.name
 				continue
 			)
-
+	
 			-- store camera for later use
 			if ( (classOf obj)==Targetcamera) then (
 			    startingPos = obj
@@ -1212,7 +1278,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 		
 			-- converts all objects to Mesh, this reduces a lot of errors BUT takes too long
 			--converttomesh obj
-
+	
 			-- give warning about Polymesh
 			if ((classOf obj)==Poly_Mesh) then (
 				format "WARNING Object % is a PolyMesh, converting to Editable Mesh... \n" obj.name
@@ -1235,19 +1301,19 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				toks = tokenize objName "_"
 				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
 					continue;
-
+	
 				format "    <meshobj name=\"%\">\n" obj.name to:outFile
 				-- check for no shadow setting
 				noshadows = getUserProp obj "NOSHADOWS"
 				if (noshadows=="yes") then
 					format "      <noshadows />\n" to:outFile
-
+	
 				format "      <plugin>mesh</plugin>\n" obj.name to:outFile
 				format "      <params><factory>%</factory>\n" toks[3] to:outFile
 				format "      <material>%</material>\n" (getMatFilename obj.mat) to:outFile
 				-- ALL genmeshes must have this to support light changes.
 				format "      <localshadows /></params>\n" to:outFile
-
+	
 				-- search factory
 				genFactObj=null
 				format "factoryMeshes: %\n" factoryMeshes.count
@@ -1281,7 +1347,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				continue;
 	
 			)
-
+	
 			-- manage thingmeshes
 			isThingMesh = false
 			objName = obj.name
@@ -1291,16 +1357,16 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				toks = tokenize objName "_"
 				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
 					continue;
-
+	
 				format "    <meshobj name=\"%\">\n" obj.name to:outFile
 				-- check for no shadow setting
 				noshadows = getUserProp obj "NOSHADOWS"
 				if (noshadows=="yes") then
 					format "      <noshadows />\n" to:outFile
-
+	
 				format "      <plugin>thing</plugin>\n" obj.name to:outFile
 				format "      <params><factory>%</factory><moveable />\n" toks[3] to:outFile
-
+	
 				-- search factory
 				genFactObj=null
 				format "factoryThingMeshes: %\n" factoryThingMeshes.count
@@ -1317,7 +1383,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				)
 				--format "genFactObj: %\n" genFactObj.name
 				--format "Obj: %\n" obj.name
-
+	
 				-- change material if necessary
 				-- cycle on all faces of object
 				matReplaced = #()
@@ -1333,7 +1399,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				    	currentOldMat = genFactObj.mat
 					else
 						currentOldMat = genFactObj.mat[matIDNew]
-
+	
 					if (currentOldMat.name!=currentNewMat.name) then
 					(
 						-- check it has not been already replaced
@@ -1343,12 +1409,13 @@ rollout Test1 "Export Level to CS" width:222 height:211
 							format "<replacematerial old=\"%\" new=\"%\" />\n" oldMatName newMatName to:outFile
 							append matReplaced oldMatName
 							format "%\n" matReplaced
+	
 						)
 					)
 				)
 				-- format "      <material>%</material></params>\n" (getMatFilename obj.mat) to:outFile NO MATERIAL CHANGE FOR NOW
 				format "      </params>\n" to:outFile
-
+	
 				xMove = (obj.pos.x * xscale) + xrelocate
 				yMove = (obj.pos.y * yscale) + yrelocate
 				zMove = (obj.pos.z * zscale) + zrelocate
@@ -1364,24 +1431,25 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				continue;
 	
 			)
-
+	
 			-- check for culleronly setting
 			culleronly = getUserProp obj "CULLERONLY"
-
+	
 		    -- output name of object and some info
 			format "\n\nFound Object Name: % Faces: %\n" obj.name obj.numfaces
 		
 		    --format "    ;Object Name: % Faces: %\n" obj.name obj.numfaces to:outFile 
-
+	
+	
 			if (culleronly=="yes") then (
 				format "    <polymesh name=\"%\">\n" obj.name to:outFile
 			) else (
 			    format "    <meshobj name=\"%\">\n" obj.name to:outFile
 				format "      <plugin>thing</plugin>\n" to:outFile
 			)
-
+	
 			isportal=false
-
+	
 			istrasparent=false
 			-- handles transparent objects
 			if (findString obj.name "_t_" !=undefined) then (
@@ -1398,7 +1466,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			else if (findString obj.name "_s_" !=undefined) then (
 			  format "      <priority>object</priority>\n" to:outFile
 			  format "      <zuse />\n" to:outFile
-
+	
 			)
 		    -- handles portal objects
 			else if (findString obj.name "_p_" !=undefined) then (
@@ -1412,11 +1480,11 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			  format "      <priority>object</priority>\n" to:outFile
 			  format "      <zuse />\n" to:outFile
 			)
-
+	
 			if (culleronly!="yes") then (
 			  format "      <params>\n" to:outFile
 			)
-
+	
 			-- check for no shadow setting
 			noshadows = getUserProp obj "NOSHADOWS"
 			if (noshadows=="yes") then
@@ -1432,7 +1500,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			smooth = getUserProp obj "SMOOTH"
 			if (smooth=="yes") then
 				format "      <smooth />\n" to:outFile
-
+	
 			-- check for viscull setting
 			viscull = getUserProp obj "VISCULL"
 	
@@ -1444,16 +1512,16 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			 zvert = (v.pos.z * zscale) + zrelocate
 		     format "      <v x=\"%\" y=\"%\" z=\"%\" />\n"  xvert zvert yvert to:outFile
 		   )
-
+	
 		   format "\n" to:outFile
-
+	
 		 -- export faces of the mesh
 		 if (culleronly=="yes") then (
 		 	OutputCullerOnly obj outFile verboseMode debug 
 		 ) else (
 			 OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet viscull
 		 )
-
+	
 		 -- close params
 		if (culleronly!="yes") then (
 		 	format "      </params>\n" to:outFile
@@ -1464,8 +1532,8 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			 format "      <viscull />\n" to:outFile
 			 format "    </polymesh>\n" to:outFile
 		)
-
-
+	
+	
 	
 		 format "\n" to:outFile
 	
@@ -1473,6 +1541,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 		  gc()
 		) 
 	
+
 		-- get info on dynamic lights
 		maxframes = animationrange.end
 	
@@ -1482,7 +1551,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			messageBox message
 			return 1
 		)
-
+	
 		format "Lights\n"
 		
 		lightColors = #()
@@ -1498,10 +1567,11 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			for curFrame=0 to maxframes do (
 				-- move to right frame
 				slidertime=curFrame
-
+	
 				-- check which lights are dynamic
 				lcount = 1
 				fLights = #()
+	
 				for ll in lightsFound do
 				(
 					--format "Lights % \n" lcount
@@ -1552,19 +1622,20 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				lcount = lcount + 1
 				continue
 			)
+	
 
 		    --format " ;Light: % \n" ll.name to:outFile
 			format "    <light name=\"%%\">\n" ll.name roomname to:outFile
-
+	
 			-- check threshold setting to flag light as dynamic
 			turnonoff_r = getUserProp ll "TURNONOFF_R"
-
+	
 			if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then 
 				format "      <dynamic />\n " to:outFile
 			else if (turnonoff_r!=undefined) then (
 				format "      <dynamic />\n " to:outFile
 			)
-
+	
 			multiplier = ll.multiplier
 	
 			if (ll.useNearAtten==false and ll.useFarAtten==false) then
@@ -1575,6 +1646,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			zlight = (ll.pos.z * zscale) + zrelocate
 			llradius = ll.farAttenEnd * xscale
 	
+
 			-- convert lights from 0-255 to 0-1
 			llred = ((ll.rgb.r)/255) * multiplier
 			llgreen = ((ll.rgb.g)/255) * multiplier
@@ -1600,10 +1672,11 @@ rollout Test1 "Export Level to CS" width:222 height:211
 	
 			format "  <start name=\"%\"><sector>%</sector><position x=\"%\" y=\"%\" z=\"%\" /></start>\n" startingPos.name roomName xstart zstart ystart to:outFile
 		)
-
+	
 		-- start sequences (if any)
+	
 		format "   <sequences>\n" to:outFile
-
+	
 		-- output lightning sequence
 		customPropNumber = fileProperties.findProperty #custom "lightning"
 		if (customPropNumber!=0) then (
@@ -1621,13 +1694,13 @@ rollout Test1 "Export Level to CS" width:222 height:211
 				format "     </sequence> \n\n" to:outFile
 			)
 		)
-
+	
 		-- debug output
 		format "   lightsThreshold: %\n\n\n" lightsThreshold
 		format "   lightsThresholdValues: %\n\n\n" lightsThresholdValues
- 		format "   lightsThresholdObjs: %\n\n\n" lightsThresholdObjs
-
-
+		format "   lightsThresholdObjs: %\n\n\n" lightsThresholdObjs
+	
+	
 		-- output threshold sequence
 		lcount = 1
 		for thr in lightsThresholdValues do
@@ -1649,7 +1722,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			)
 			format "        <enable trigger=\"light_%%_off\" /> \n " seqlightname roomname to:outFile
 			format "    </sequence> \n " to:outFile
-
+	
 			-- output turnoff sequence
 			format "    <sequence name=\"light_%%_off\"> \n " seqlightname roomname to:outFile
 			-- for each light in this threshold
@@ -1660,16 +1733,16 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			)
 			format "        <enable trigger=\"light_%%_on\" /> \n " seqlightname roomname to:outFile
 			format "    </sequence> \n " to:outFile
-
+	
 			lcount = lcount + 1
 		)
-
-
+	
+	
 		-- output Fake Sequence for testing dynamic lights
 		if (chkLights.checked) then
 		(
 			format "     <sequence name=\"%seq\">\n" roomName to:outFile
-
+	
 			-- for each hour of the day
 			fcount = 1
 			for fcount=1 to 24 do
@@ -1687,7 +1760,7 @@ rollout Test1 "Export Level to CS" width:222 height:211
 							prevColor = lightColors[24][lcount]
 						) else
 							prevColor = lightColors[fcount-1][lcount]
-
+	
 						colors = lightColors[fcount][lcount]
 						if ( prevColor[1] != colors[1] or prevColor[2] != colors[2] or prevColor[3] != colors[3]) then
 						(
@@ -1707,10 +1780,10 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			format "       <enable trigger=\"%trig\" />\n" roomName to:outFile
 			format "     </sequence>\n" to:outFile
 		)
-
+	
 		-- end sequences (if any)
 		format "   </sequences>\n" to:outFile
-
+	
 		-- start triggers (if any)
 		format "   <triggers>\n" to:outFile
 		
@@ -1726,17 +1799,17 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			format "        <lightvalue light=\"crystal%\" operator=\"greater\" red=\"%\" green=\"%\" blue=\"%\" />\n" roomname thr[1] thr[2] thr[3] to:outFile
 			format "        <fire sequence=\"light_%%_off\" /> \n " triglightname roomname to:outFile
 			format "    </trigger> \n " to:outFile
-
+	
 			-- output turn on sequence
 			format "    <trigger name=\"light_%%_off\"> \n " triglightname roomname to:outFile
 			format "        <lightvalue light=\"crystal%\" operator=\"less\" red=\"%\" green=\"%\" blue=\"%\" />\n" roomname thr[1] thr[2] thr[3] to:outFile
-
+	
 			format "        <fire sequence=\"light_%%_on\" /> \n " triglightname roomname to:outFile
 			format "    </trigger> \n " to:outFile
-
+	
 			lcount = lcount + 1
 		)
-
+	
 		-- output Fake triggers for testing dynamic lights
 		if (chkLights.checked) then
 		(
@@ -1745,22 +1818,30 @@ rollout Test1 "Export Level to CS" width:222 height:211
 			format "       <fire sequence=\"%seq\" />\n" roomName to:outFile
 			format "     </trigger>\n" to:outFile
 		)
-
+	
 		-- end triggers (if any)
 		format "   </triggers>\n" to:outFile
-
+	
 		-- close world object
 		format "</world>\n" to:outFile
 	
 		close outFile 
-	
+
+		-- copy textures to output dir
+		if (chk2.checked) then (
+		messageBox "test1"
+			format "YES!"
+			test = CopyTexturesToDir outFile 
+		)
+
 		message = "ALL DONE!"
 		messageBox message
 	
 	)
 )
-gw = newRolloutFloater "Export Level" 300 240 
+gw = newRolloutFloater "Export Level" 300 280 
 addRollout Test1 gw 
 
 )
+
 

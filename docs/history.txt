@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Nov-2003
+	- Keith committed a new version of the Max level export scripts.
+	  This version supports ThingFactories and instances now.  Also
+	  the doc is slightly updated.
 17-Nov-2003
 	- Jorrit removed obsolete bits64.h from Dynavis.
 	- Jorrit performed additional micro-optimizations in the coverage
