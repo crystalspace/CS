@@ -22,11 +22,24 @@
 #include "cssysdef.h"
 #include "txtmgr.h"
 #include "csutil/util.h"
+#include "csutil/debug.h"
 #include "qint.h"
 #include "igraphic/image.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivideo/graph2d.h"
+
+csTexture::csTexture (csTextureHandle *Parent)
+{
+  parent = Parent;
+  DG_ADD (this, "NONAME");
+  DG_TYPE (this, "csTexture");
+}
+
+csTexture::~csTexture ()
+{
+  DG_REM (this);
+}
 
 //---------------------------------------------------------- csTextureHandle -----//
 
@@ -37,6 +50,8 @@ SCF_IMPLEMENT_IBASE_END
 csTextureHandle::csTextureHandle (iImage* Image, int Flags)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csTextureHandle");
 
   (image = Image)->IncRef ();
   flags = Flags;
@@ -59,7 +74,14 @@ csTextureHandle::~csTextureHandle ()
 {
   int i;
   for (i = 0; i < 4; i++)
-    delete tex [i];
+  {
+    if (tex[i])
+    {
+      DG_UNLINK (this, tex[i]);
+      delete tex [i];
+    }
+  }
+  DG_REM (this);
   FreeImage ();
 }
 
@@ -79,12 +101,19 @@ void csTextureHandle::CreateMipmaps ()
   // Delete existing mipmaps, if any
   int i;
   for (i = 0; i < 4; i++)
-    delete tex [i];
+  {
+    if (tex[i])
+    {
+      DG_UNLINK (this, tex[i]);
+      delete tex [i];
+    }
+  }
 
   // Increment reference counter on image since NewTexture() expects
   // a image with an already incremented reference counter
   image->IncRef ();
   tex [0] = NewTexture (image);
+  DG_LINK (this, tex[0]);
 
   // 2D textures uses just the top-level mipmap
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
@@ -95,8 +124,11 @@ void csTextureHandle::CreateMipmaps ()
     iImage *i3 = i2->MipMap (1, tc);
 
     tex [1] = NewTexture (i1);
+    DG_LINK (this, tex[1]);
     tex [2] = NewTexture (i2);
+    DG_LINK (this, tex[2]);
     tex [3] = NewTexture (i3);
+    DG_LINK (this, tex[3]);
   }
 
   ComputeMeanColor ();
@@ -172,12 +204,18 @@ SCF_IMPLEMENT_IBASE_END
 csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
   if ((material = m) != 0)
   {
     material->IncRef ();
     texture = material->GetTexture ();
-    if (texture) texture->IncRef ();
+    if (texture)
+    {
+      texture->IncRef ();
+      DG_LINK (this, texture);
+    }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
     num_texture_layers = material->GetTextureLayerCount ();
@@ -199,11 +237,16 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  DG_ADDI (this, "NONAME");
+  DG_TYPE (this, "csMaterialHandle");
   material = NULL;
   num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
   if ((texture = t) != 0)
+  {
+    DG_LINK (this, texture);
     texture->IncRef ();
+  }
   (texman = parent)->IncRef ();
 }
 
@@ -212,11 +255,16 @@ csMaterialHandle::~csMaterialHandle ()
   FreeMaterial ();
   texman->UnregisterMaterial (this);
   texman->DecRef ();
+  DG_REM (this);
 }
 
 void csMaterialHandle::FreeMaterial ()
 {
-  SCF_DEC_REF (texture);
+  if (texture)
+  {
+    DG_UNLINK (this, texture);
+    SCF_DEC_REF (texture);
+  }
   if (material)
   {
     material->DecRef ();
@@ -230,9 +278,14 @@ void csMaterialHandle::Prepare ()
   {
     if (texture != material->GetTexture())
     { 
+      DG_UNLINK (this, texture);
       SCF_DEC_REF(texture);
       texture = material->GetTexture ();
-      if (texture) texture->IncRef ();
+      if (texture)
+      {
+        texture->IncRef ();
+	DG_LINK (this, texture);
+      }
     }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);

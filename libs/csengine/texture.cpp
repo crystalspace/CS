@@ -59,6 +59,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   {
     ith->IncRef ();
     flags = ith->GetFlags ();
+    DG_LINK (this, handle);
   }
   else
   {
@@ -77,6 +78,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   DG_TYPE (this, "csTextureWrapper");
 
   (handle = t.handle)->IncRef ();
+  DG_LINK (this, handle);
   (image = t.image)->IncRef ();
 
   UpdateKeyColorFromImage ();
@@ -87,7 +89,10 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
 csTextureWrapper::~csTextureWrapper ()
 {
   if (handle)
+  {
+    DG_UNLINK (this, handle);
     handle->DecRef ();
+  }
   if (image)
     image->DecRef ();
   if (use_callback)
@@ -107,8 +112,13 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 {
   if (image) { image->DecRef (); image = NULL; }
   if (tex) tex->DecRef ();
-  if (handle) handle->DecRef ();
+  if (handle)
+  {
+    DG_UNLINK (this, handle);
+    handle->DecRef ();
+  }
   handle = tex;
+  DG_LINK (this, handle);
 
   flags = handle->GetFlags ();
   UpdateKeyColorFromHandle ();
@@ -135,6 +145,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   // release old handle
   if (handle)
   {
+    DG_UNLINK (this, handle);
     handle->DecRef ();
     handle = NULL;
   }
@@ -157,7 +168,10 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
+  {
+    DG_LINK (this, handle);
     SetKeyColor (key_col_r, key_col_g, key_col_b);
+  }
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject()

@@ -25,6 +25,7 @@
 #include "ogl_proctexback.h"
 #include "ogl_proctexsoft.h"
 #include "csutil/scanstr.h"
+#include "csutil/debug.h"
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 
@@ -33,6 +34,7 @@
 csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
   : csTexture (Parent)
 {
+  DG_TYPE (this, "csTextureOpenGL");
   image_data = NULL;
   w = Image->GetWidth ();
   h = Image->GetHeight ();
@@ -49,6 +51,12 @@ csTextureOpenGL::~csTextureOpenGL ()
 csTextureProcOpenGL::~csTextureProcOpenGL ()
 {
   if (texG3D) texG3D->DecRef (); 
+}
+
+csTextureProcOpenGL::csTextureProcOpenGL (csTextureHandle *Parent,
+	iImage *image) : csTextureOpenGL (Parent, image), texG3D (NULL)
+{
+  DG_TYPE (this, "csTextureProcOpenGL");
 }
 
 //---------------------------------------------------------------------------
@@ -150,34 +158,40 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	if (!(image->GetFormat () & CS_IMGFMT_ALPHA))
 	{
 	  sourceFormat = GL_RGB;
-	  // again determine the formatidx and possible change it if we have a forced targetformat
-	  for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat != sourceFormat; i++);
+	  // Again determine the formatidx and possible change it if we
+	  // have a forced targetformat
+	  for (i=0; csTextureManagerOpenGL::glformats[i].sourceFormat
+	  	!= sourceFormat; i++);
 	  formatidx = i;
 	  if (csTextureManagerOpenGL::glformats[i].forcedFormat != 0)
 	  {
 	    targetFormat = csTextureManagerOpenGL::glformats[i].forcedFormat;
-	    for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat; i++);
-	    if (csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat)
+	    for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
+	    	!= targetFormat; i++);
+	    if (csTextureManagerOpenGL::glformats[i].targetFormat
+	    	!= targetFormat)
 	      formatidx = i;
 	  }
-	  targetFormat = csTextureManagerOpenGL::glformats[formatidx].targetFormat;
+	  targetFormat = csTextureManagerOpenGL::glformats[formatidx]
+	  	.targetFormat;
 	}
 	else
 	{
-	  // with a histogram we now could determine how many alpha values we have here
-	  // to possibly select a better targetFormat but due to laziness we leave it as is.
+	  // With a histogram we now could determine how many alpha values
+	  // we have here to possibly select a better targetFormat but due
+	  // to laziness we leave it as is.
 	}
       }
       else
       {
 	targetFormat = (bpp == 8 ? GL_RGBA : bpp < 32 ? GL_RGB5_A1 : GL_RGBA8);
-	for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat; i++);
+	for (i=0; csTextureManagerOpenGL::glformats[i].targetFormat
+		!= targetFormat; i++);
 	formatidx = i;
 	
 	int pixels = image->GetWidth () * image->GetHeight ();
 	csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
 
-	printf ("transp color is (%d, %d, %d)\n", transp_color.red, transp_color.green, transp_color.blue);
 	while (pixels--)
 	{
 	  // By default, every csRGBpixel initializes its alpha component to
@@ -212,107 +226,116 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
   int i=0;
   int nCompo;
 
-  // first we determine the exact sourceformat if targetformat is given without bit specifications
+  // First we determine the exact sourceformat if targetformat is given
+  // without bit specifications.
   switch (csTextureManagerOpenGL::glformats[formatidx].sourceFormat)
   {
-  case GL_ALPHA:
-    i++;
-  case GL_BLUE:
-    i++;
-  case GL_GREEN:
-    i++;
-  case GL_RED:
-    image_data = new uint8 [n];
-    h = (uint8*)data;
-    h += i;
-    for (i=0; i<n; i++, h += 4)
-      *image_data++ = *h;
-    break;
-  case GL_INTENSITY:
-    image_data = new uint8 [n];
-    for (i=0; i<n; i++, data++)
-      *image_data++ = data->Intensity ();
-    break;
-  case GL_LUMINANCE:
-    image_data = new uint8 [n];
-    for (i=0; i<n; i++, data++)
-      *image_data++ = data->Luminance ();
-    break;
-  case GL_LUMINANCE_ALPHA: 
-    image_data = new uint8 [n*2];
-    for (i=0; i<n; i++, data++)
-    {
-      *image_data++ = data->Luminance ();
-      *image_data++ = data->alpha;
-    }
-    break;
-  default: // RGB/RGBA branch
-    {
+    case GL_ALPHA: i++;  // Fall thru
+    case GL_BLUE: i++;  // Fall thru
+    case GL_GREEN: i++;  // Fall thru
+    case GL_RED:
+      image_data = new uint8 [n];
+      h = (uint8*)data;
+      h += i;
+      for (i=0; i<n; i++, h += 4)
+        *image_data++ = *h;
+      break;
+    case GL_INTENSITY:
+      image_data = new uint8 [n];
+      for (i=0; i<n; i++, data++)
+        *image_data++ = data->Intensity ();
+      break;
+    case GL_LUMINANCE:
+      image_data = new uint8 [n];
+      for (i=0; i<n; i++, data++)
+        *image_data++ = data->Luminance ();
+      break;
+    case GL_LUMINANCE_ALPHA: 
+      image_data = new uint8 [n*2];
+      for (i=0; i<n; i++, data++)
+      {
+        *image_data++ = data->Luminance ();
+        *image_data++ = data->alpha;
+      }
+      break;
+    default: // RGB/RGBA branch
       switch (sourceType)
       {
-      case GL_UNSIGNED_BYTE:
-	nCompo = csTextureManagerOpenGL::glformats[formatidx].components;
-	h = image_data = new uint8 [n*nCompo];
-	for (i=0; i<n; i++, data++, h+=nCompo)
-	  memcpy (h, data, nCompo);
-	break;
-      case GL_UNSIGNED_BYTE_3_3_2:
-	h = image_data = new uint8 [n];
-	for (i=0; i<n; i++, data++)
-	  *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5 | (data->blue >> 6);
-	break;
-      case GL_UNSIGNED_SHORT_4_4_4_4:
-	{
-	  image_data = new uint8 [n*2];
-	  unsigned short *ush = (unsigned short *)image_data;
+        case GL_UNSIGNED_BYTE:
+	  nCompo = csTextureManagerOpenGL::glformats[formatidx].components;
+	  h = image_data = new uint8 [n*nCompo];
+	  for (i=0; i<n; i++, data++, h+=nCompo)
+	    memcpy (h, data, nCompo);
+	  break;
+        case GL_UNSIGNED_BYTE_3_3_2:
+	  h = image_data = new uint8 [n];
 	  for (i=0; i<n; i++, data++)
-	    *ush++ = ((unsigned short)(data->red & 0xf0))<<8 | ((unsigned short)(data->green & 0xf0))<<4 | 
-	      (unsigned short)(data->blue & 0xf0) | (unsigned short)(data->alpha >> 4) ;
-	}
-	break;
-      case GL_UNSIGNED_SHORT_5_5_5_1:
-	{
-	  image_data = new uint8 [n*2];
-	  unsigned short *ush = (unsigned short *)image_data;
-	  for (i=0; i<n; i++, data++)
-	    *ush++ = ((unsigned short)(data->red & 0xf8))<<8 | ((unsigned short)(data->green & 0xf8))<<3 | 
-	      ((unsigned short)(data->blue & 0xf8))>>2 | (unsigned short)(data->alpha >> 7) ;
-	}
-	break;
-      case GL_UNSIGNED_SHORT_5_6_5:
-	{
-	  image_data = new uint8 [n*2];
-	  unsigned short *ush = (unsigned short *)image_data;
-	  for (i=0; i<n; i++, data++)
-	    *ush++ = ((unsigned short)(data->red & 0xf8))<<8 | ((unsigned short)(data->green & 0xfc))<<3 | 
-	      (unsigned short)(data->blue >> 3);
-	}
-	break;
-      default:
-	  printf ("OpenGL Warning: no sourceType %x\n", (unsigned int)sourceType);
+	    *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
+	    	| (data->blue >> 6);
+	  break;
+        case GL_UNSIGNED_SHORT_4_4_4_4:
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf0))<<8
+	      	| ((unsigned short)(data->green & 0xf0))<<4
+		| (unsigned short)(data->blue & 0xf0)
+		| (unsigned short)(data->alpha >> 4) ;
+	  }
+	  break;
+        case GL_UNSIGNED_SHORT_5_5_5_1:
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+	      	| ((unsigned short)(data->green & 0xf8))<<3
+		| ((unsigned short)(data->blue & 0xf8))>>2
+		| (unsigned short)(data->alpha >> 7) ;
+	  }
+	  break;
+        case GL_UNSIGNED_SHORT_5_6_5:
+	  {
+	    image_data = new uint8 [n*2];
+	    unsigned short *ush = (unsigned short *)image_data;
+	    for (i=0; i<n; i++, data++)
+	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
+	      	| ((unsigned short)(data->green & 0xfc))<<3
+		| (unsigned short)(data->blue >> 3);
+	  }
+	  break;
+        default:
+	    printf ("OpenGL Warning: no sourceType %x\n",
+	    	(unsigned int)sourceType);
       }
-    }
   }
 
-  if (csTextureManagerOpenGL::glformats[formatidx].compressedFormat != 0 && tex->Compressable ())
+  if (csTextureManagerOpenGL::glformats[formatidx].compressedFormat != 0
+  	&& tex->Compressable ())
   {
     GLuint t;
     glGenTextures (1, &t);
     glBindTexture (GL_TEXTURE_2D, t);
-    glTexImage2D (GL_TEXTURE_2D, 0, csTextureManagerOpenGL::glformats[formatidx].compressedFormat, 
-		  Image->GetWidth (), Image->GetHeight (), 0, 
-		  csTextureManagerOpenGL::glformats[formatidx].sourceFormat, 
-		  sourceType, image_data);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB, &tex->compressed); 
+    glTexImage2D (GL_TEXTURE_2D, 0,
+    	csTextureManagerOpenGL::glformats[formatidx].compressedFormat, 
+	Image->GetWidth (), Image->GetHeight (), 0, 
+	csTextureManagerOpenGL::glformats[formatidx].sourceFormat, 
+	sourceType, image_data);
+    glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB,
+    	&tex->compressed); 
  
     /* if the compression has been successful */ 
     if (tex->compressed == GL_TRUE) 
     { 
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &tex->internalFormat); 
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &tex->size);
+      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
+      	&tex->internalFormat); 
+      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+      	GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &tex->size);
       delete [] image_data;
       image_data = new uint8 [tex->size]; 
-      csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0, image_data); 
+      csGraphics3DOGLCommon::glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
+      	image_data); 
     }
 
     glDeleteTextures (1, &t);
@@ -324,9 +347,9 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
   return true;
 }
 
-csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat, int bpp,
-					      csGraphics3DOGLCommon *iG3D) 
-  : csTextureHandle (image, flags)
+csTextureHandleOpenGL::csTextureHandleOpenGL (
+	iImage *image, int flags, GLenum sourceFormat, int bpp,
+	csGraphics3DOGLCommon *iG3D) : csTextureHandle (image, flags)
 {
   (G3D = iG3D)->IncRef ();
   (txtmgr = G3D->txtmgr)->IncRef ();
@@ -334,6 +357,7 @@ csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags, GLenum s
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
   size = 0;
+  DG_TYPE (this, "csTextureHandleOpenGL");
 }
 
 csTextureHandleOpenGL::~csTextureHandleOpenGL ()
@@ -343,6 +367,16 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
   txtmgr->UnregisterTexture (this);
   txtmgr->DecRef();
   G3D->DecRef ();
+  int i;
+  for (i = vTex.Length ()-1; i >= 0; i--)
+  {
+    if (vTex [i]);
+    {
+      DG_UNLINK (this, vTex[i]);
+      delete vTex [i];
+    }
+  }
+  vTex.DeleteAll ();
 }
 
 void csTextureHandleOpenGL::Clear ()
@@ -364,7 +398,8 @@ csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image)
 
 void csTextureHandleOpenGL::ShowFormat ()
 {
-  printf ("TargetFormat: %s, size: %ld\n", csTextureManagerOpenGL::glformats[formatidx].name, size);
+  printf ("TargetFormat: %s, size: %ld\n",
+  	csTextureManagerOpenGL::glformats[formatidx].name, size);
 }
 
 void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
@@ -395,13 +430,9 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   // to be powers of 2.
   AdjustSizePo2 ();
 
-  // determine the format and type of the source we gonna tranform the data to
-  //  printf ("FindFormatType ()\n");
-  //  printf ("in before Format: keycolor is (%d, %d, %d)\n", transp_color.red, transp_color.green, transp_color.blue);
+  // Determine the format and type of the source we gonna tranform the data to
   FindFormatType ();
-  //  printf ("CreateMipmaps ()\n");
   CreateMipmaps ();
-  //  ShowFormat ();  
 
   //  printf ("proctex creation\n");
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
@@ -451,12 +482,20 @@ void csTextureHandleOpenGL::CreateMipmaps ()
   // Delete existing mipmaps, if any
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
-    delete vTex [i];
+  {
+    if (vTex [i]);
+    {
+      DG_UNLINK (this, vTex[i]);
+      delete vTex [i];
+    }
+  }
   vTex.DeleteAll ();
 
   size = 0;
   //  printf ("push 0\n");
-  vTex.Push (NewTexture (image));
+  csTexture* ntex = NewTexture (image);
+  vTex.Push (ntex);
+  DG_LINK (this, ntex);
 
   //  printf ("transform 0\n");
   transform (image, vTex[0]);
@@ -482,7 +521,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       //  printf ("make mipmap %d\n", nTex);
       thisImage = prevImage->MipMap (1, tc);
       //  printf ("push %d\n", nTex);
-      vTex.Push (NewTexture (thisImage));
+      csTexture* ntex = NewTexture (thisImage);
+      vTex.Push (ntex);
+      DG_LINK (this, ntex);
       //  printf ("transform %d\n", nTex);
       transform (thisImage, vTex[nTex]);
       w = thisImage->GetWidth ();
@@ -497,8 +538,8 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     prevImage->DecRef ();
   }
   else
-    ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (), (csRGBpixel *)image->GetImageData ());
-  //  printf ("done create\n");
+    ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
+    	(csRGBpixel *)image->GetImageData ());
 }
 
 void csTextureHandleOpenGL::ComputeMeanColor (int w, int h, csRGBpixel *src)

@@ -322,6 +322,7 @@ bool csOpenGLProcSoftware::Prepare(
   if (!soft_proc_tex)
   {
     isoft_proc->DecRef ();
+    isoft_proc = NULL;
     soft_proc_g3d->DecRef ();
     return false;
   }

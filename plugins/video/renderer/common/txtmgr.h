@@ -201,9 +201,9 @@ protected:
 
 public:
   /// Create a csTexture object
-  csTexture (csTextureHandle *Parent) { parent = Parent; }
+  csTexture (csTextureHandle *Parent);
   /// Destroy the texture object
-  virtual ~csTexture () {}
+  virtual ~csTexture ();
 
   ///
   int get_width () { return w; }

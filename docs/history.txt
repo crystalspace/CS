@@ -17,6 +17,15 @@ The history order is reversed so that new features are at the top.
 	  clean up. This fixes several memory leaks when reloading a map
 	  file.
 	- Fixed another memory leak in the engine with the START keyword.
+	- In an effort to fix more memory leaks I also added debug graph
+	  commands to the texture manager of the 3D renderers.
+	- Added more DG_LINK() commands in the engine so that the object
+	  graph is better defined in the graph debugger.
+	- Fixed a significant memory leak with textures in the OpenGL
+	  renderer. There is still a memory leak with procedural textures
+	  though (and this leak is OpenGL specific).
+	- Fixed a potential problem in the OpenGL proc textures implementation
+	  (a missing init to NULL if setup of texture failed).
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more

@@ -68,9 +68,7 @@ class csTextureProcOpenGL : public csTextureOpenGL
 {
 public:
   iGraphics3D *texG3D;
-  csTextureProcOpenGL (csTextureHandle *Parent, iImage *image)
-    : csTextureOpenGL (Parent, image), texG3D (NULL)
-  {};
+  csTextureProcOpenGL (csTextureHandle *Parent, iImage *image);
   /// Destroy the texture
   virtual ~csTextureProcOpenGL ();
   virtual bool Compressable (){ return false;}
@@ -111,14 +109,15 @@ public:
   long size;
 
   /// Initialize the object
-  csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat, int bpp, 
-			 csGraphics3DOGLCommon *iG3D);
+  csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat,
+  	int bpp, csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureHandleOpenGL ();
   /// Adjust size, mipmap, create procedural texture etc
   void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
 
-  virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h);
+  virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap,
+  	int &w, int &h);
 
   /// Override from csTextureHandle.
   virtual void GetOriginalDimensions (int& w, int& h)

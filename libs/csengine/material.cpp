@@ -155,6 +155,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
 
   handle = ith;
   handle->IncRef ();
+  DG_LINK (this, handle);
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
@@ -168,6 +169,7 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject (w)
   material->IncRef ();
   handle = w.handle;
   handle->IncRef ();
+  DG_LINK (this, handle);
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
@@ -175,7 +177,10 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject (w)
 csMaterialWrapper::~csMaterialWrapper ()
 {
   if (handle)
+  {
+    DG_UNLINK (this, handle);
     handle->DecRef ();
+  }
   if (material)
     material->DecRef ();
 }
@@ -191,15 +196,24 @@ void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
   if (m) m->IncRef ();
   if (material) { material->DecRef (); material = NULL; }
-  if (handle) handle->DecRef ();
+  if (handle)
+  {
+    DG_UNLINK (this, handle);
+    handle->DecRef ();
+  }
   handle = m;
+  DG_LINK (this, handle);
 }
 
 void csMaterialWrapper::Register (iTextureManager *txtmgr)
 {
   if (handle)
+  {
+    DG_UNLINK (this, handle);
     handle->DecRef ();
+  }
   handle = txtmgr->RegisterMaterial (material);
+  DG_LINK (this, handle);
 }
 
 void csMaterialWrapper::Visit ()
