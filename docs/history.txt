@@ -25,6 +25,9 @@ Short-term cleanups that need to be done:
 	  reorganization of the file fixed the problem.
 	- Eric Sunshine eliminated signed vs. unsigned comparision compilation
 	  warnings in map2cs.
+	- Thomas Hieber added support for game sepcific data in the world
+	  file (KEY and NODE).
+	- Thomas also did a few further changes on Map2CS.
 4-Jan-2000
 	- Improved style a bit in new planeclp.h.
 	- Started work on including curved surfaces to the visibility
