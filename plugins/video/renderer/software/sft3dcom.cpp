@@ -148,6 +148,8 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
   width = height = -1;
+  partner = NULL;
+  Title = NULL;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -156,6 +158,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   delete config;
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
+  if (partner) partner->DecRef ();
 }
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
@@ -182,6 +185,8 @@ void csGraphics3DSoftwareCommon::NewInitialize ()
 void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
 {
   // Avoid reading in a config file from the hard-drive
+  partner = p;
+  partner->IncRef ();
   do_smaller_rendering = p->do_smaller_rendering;
   mipmap_coef = p->mipmap_coef;
   do_interlaced = p->do_interlaced;
@@ -191,20 +196,7 @@ void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
 #endif
 }
 
-bool csGraphics3DSoftwareCommon::Open (const char* /*Title*/)
-{
-  pfmt = *G2D->GetPixelFormat ();
-  DrawMode = 0;
-  SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
-  z_buf_mode = CS_ZBUF_NONE;
-
-  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    fog_tables [i].table = NULL;
-
-  return true;
-}
-
-bool csGraphics3DSoftwareCommon::NewOpen (const char *Title)
+bool csGraphics3DSoftwareCommon::Open (const char* title)
 {
   if (!G2D->Open (Title))
   {
@@ -243,7 +235,41 @@ bool csGraphics3DSoftwareCommon::NewOpen (const char *Title)
     pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
 #endif
 
-  // Create the texture manager
+  Title = title;
+  DrawMode = 0;
+  SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
+  z_buf_mode = CS_ZBUF_NONE;
+
+  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    fog_tables [i].table = NULL;
+
+  return true;
+}
+
+bool csGraphics3DSoftwareCommon::NewOpen ()
+{
+#if defined (DO_MMX)
+  int family, features;
+  char vendor [13];
+  csDetectCPU (&family, vendor, &features);
+  cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
+  SysPrintf (MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
+    family, vendor,
+    (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
+    (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
+    (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
+#endif
+
+  alpha_mask = 0;
+  alpha_mask |= 1 << (pfmt.RedShift);
+  alpha_mask |= 1 << (pfmt.GreenShift);
+  alpha_mask |= 1 << (pfmt.BlueShift);
+  alpha_mask = ~alpha_mask;
+
+  z_buf_mode = CS_ZBUF_NONE;
+  fog_buffers = NULL;
+
+  // Create the texture manager, if one does not already exist
   texman = new csTextureManagerSoftware (System, this, config);
   texman->SetPixelFormat (pfmt);
 
@@ -267,34 +293,12 @@ bool csGraphics3DSoftwareCommon::NewOpen (const char *Title)
 
     if (!csize)
     {
-      SysPrintf (MSG_INITIALIZATION, "Invalid cache size specified, using default\n");
+      SysPrintf (MSG_INITIALIZATION, 
+		 "Invalid cache size specified, using default\n");
       csize = DEFAULT_CACHE_SIZE;
     }
   }
   tcache->set_cache_size (csize);
-
-#if defined (DO_MMX)
-  int family, features;
-  char vendor [13];
-  csDetectCPU (&family, vendor, &features);
-  cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
-  SysPrintf (MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
-    family, vendor,
-    (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
-    (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
-    (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
-#endif
-
-  alpha_mask = 0;
-  alpha_mask |= 1 << (pfmt.RedShift);
-  alpha_mask |= 1 << (pfmt.GreenShift);
-  alpha_mask |= 1 << (pfmt.BlueShift);
-  alpha_mask = ~alpha_mask;
-
-  z_buf_mode = CS_ZBUF_NONE;
-  fog_buffers = NULL;
-  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    fog_tables [i].table = NULL;
 
   ScanSetup ();
 
@@ -304,22 +308,20 @@ bool csGraphics3DSoftwareCommon::NewOpen (const char *Title)
   return true;
 }
 
-void csGraphics3DSoftwareCommon::SharedOpen (csGraphics3DSoftwareCommon* p)
+bool csGraphics3DSoftwareCommon::SharedOpen ()
 {
-  texman = p->texman;
-  tcache = p->tcache;
-  pixel_shift = p->pixel_shift;
-  fog_buffers = p->fog_buffers;
-  alpha_mask = p->alpha_mask;
-
+  pixel_shift = partner->pixel_shift;
+  fog_buffers = partner->fog_buffers;
+  alpha_mask = partner->alpha_mask;
 #if defined (DO_MMX)
-  cpu_mmx = p->cpu_mmx;
+  cpu_mmx = partner->cpu_mmx;
 #endif
-
+  texman = partner->texman;
+  tcache = partner->tcache;
   ScanSetup ();
-
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
   SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
+  return true;
 }
 
 void csGraphics3DSoftwareCommon::ScanSetup ()
@@ -607,11 +609,19 @@ void csGraphics3DSoftwareCommon::Close()
     fog_buffers = n;
   }
 
-  delete tcache; tcache = NULL;
+  if (tcache)
+  {
+    delete tcache; 
+    tcache = NULL;
+  }
   delete clipper; clipper = NULL;
 
 //    csScan_Finalize ();
-  delete texman; texman = NULL;
+  if (texman)
+  {
+    delete texman; 
+    texman = NULL;
+  }
   delete [] z_buffer; z_buffer = NULL;
   delete [] smaller_buffer; smaller_buffer = NULL;
   delete [] line_table; line_table = NULL;
@@ -1497,8 +1507,8 @@ texr_done:
 
     // check if a dynamic texture
     uncache_dynamic_texture = 
-      ((tex_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC);
-    tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
+      ((tex_mm->GetFlags () & CS_TEXTURE_PROC) == CS_TEXTURE_PROC);
+    tcache->fill_texture (mipmap, tex, tex_mm,  u_min, v_min, u_max, v_max);
   }
   csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
 

@@ -32,10 +32,20 @@
 
 class csImageMemory : public csImageFile
 {
+  /// If we are a blank image, we can take a short cut with rescaling
+  bool short_cut;
+  /// If true when these interfaces are destroyed the image is also.
+  bool destroy_image;
 public:
-
+  /// Create a blank true colour image of these dimensions.
   csImageMemory (int width, int height);
-  virtual ~csImageMemory () {};
+  /**
+   * Create an iImage interface for this true colour buffer with 
+   * these dimensions. If destroy is set to true then the supplied buffer
+   * will be destroyed when the interfaces are.
+   */ 
+  csImageMemory (int width, int height, RGBPixel *buffer, bool destroy);
+  virtual ~csImageMemory ();
 
 
   /// Rescale the image to the given size

@@ -23,17 +23,19 @@
 
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
-#include "ogl_g3d.h"
+#include "ogl_g3dcom.h"
 #include "isystem.h"
 #include "ilghtmap.h"
 #include "ipolygon.h"
 #include "igraph3d.h"
+#include "isystem.h"
 
 // need definitions of R24(), G24(), and B24()
 #ifndef NORMAL_LIGHT_LEVEL
 #define NORMAL_LIGHT_LEVEL 128
 #endif
 
+#define Printf system->Printf
 //----------------------------------------------------------------------------//
 
 OpenGLCache::OpenGLCache (int max_size, csCacheType type, int bpp)
@@ -42,8 +44,8 @@ OpenGLCache::OpenGLCache (int max_size, csCacheType type, int bpp)
   OpenGLCache::bpp = bpp;
   cache_size = max_size;
   num = 0;
-  total_size = 0;
   head = tail = NULL;
+  total_size = 0;
 }
 
 OpenGLCache::~OpenGLCache ()
@@ -342,10 +344,10 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   if ((txt_mm->GetFlags () & (CS_TEXTURE_NOMIPMAPS)) != CS_TEXTURE_NOMIPMAPS)
   {
     // generate mipmaps
-    // bind all mipmap levels required.  In OpenGL this means the original mipmap (level 0)
-    // with further levels (1,2,3...) being a reduction of the original mipmap
-    // by a factor of 2 in both directions.  You must keep reducing the mipmap size until
-    // you get down to the 1x1 size mipmap.
+    // bind all mipmap levels required.  In OpenGL this means the original 
+    // mipmap (level 0) with further levels (1,2,3...) being a reduction of 
+    // the original mipmap by a factor of 2 in both directions.  You must keep
+    //  reducing the mipmap size until you get down to the 1x1 size mipmap.
     int mipmaplevel = 0;
     transp = txt_handle->GetTransparent () ? txt_mm->get_transparent () : NULL;
     iImage *previmg = NULL;
@@ -367,8 +369,9 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 			   (mipmaplevel - 1))->get_image ()->MipMap (1, transp);
 	else
 	{
-	  // standard CS imaging will not properly mipmap a 1xN or Nx1 bitmap, so we
-	  // have to make a hack to short-circuit such situations with manual shrinkage
+	  // standard CS imaging will not properly mipmap a 1xN or Nx1 bitmap, 
+	  // so we have to make a hack to short-circuit such situations with 
+	  // manual shrinkage
 	  if ( (previmg->GetWidth() == 1) || (previmg->GetHeight() == 1) )
 	  {
 	    img=previmg;
@@ -376,10 +379,11 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	    int totalnewpixels = ( previmg->GetWidth() * previmg->GetHeight() ) / 2;
 	    for (int skippixel = 0; skippixel < totalnewpixels; skippixel ++)
 	      src[skippixel] = src[skippixel*2];
-	  
-	    // as part of the hack we have to manually track the mipmap size, as the
-	    // 'actual' image size is invalid
-	    if ( (twhack == 0) || (thhack == 0) )
+
+	    // as part of the hack we have to manually track the mipmap size,
+	    //  as the  'actual' image size is invalid
+	    if ( (twhack == 0) || (thhack = 0) )
+
 	    {
 	      twhack = previmg->GetWidth();
 	      thhack = previmg->GetHeight();
@@ -414,7 +418,8 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	while (pixels--)
 	{
 	  // By default, every RGBPixel initializes its alpha component to 255.
-	  // Thus, we should just drop to zero alpha for transparent pixels, if any
+	  // Thus, we should just drop to zero alpha for transparent pixels, 
+	  // if any
 	  if (transp->eq (*_src))
 	    _src->alpha = 0;
 	  _src++;
@@ -430,9 +435,8 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       mipmaplevel++;
 
       // if the mipmapping does not properly shrink bitmaps, it will never 
-      // terminate.
-      // this defensive check will terminate anyways
-      //    if (mipmaplevel > 20) break;
+      // terminate. This defensive check will terminate anyways 
+      // if (mipmaplevel > 20) break;
     }
 
     if (previmg) previmg->DecRef ();
@@ -454,14 +458,15 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	while (pixels--)
 	{
 	  // By default, every RGBPixel initializes its alpha component to 255.
-	  // Thus, we should just drop to zero alpha for transparent pixels, if any
+	  // Thus, we should just drop to zero alpha for transparent pixels,
+	  // if any
 	  if (transp->eq (*_src))
 	    _src->alpha = 0;
 	  _src++;
 	}
       }
       glTexImage2D (GL_TEXTURE_2D, 0, 4, tw, th,
-		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
+		    0, GL_RGB, GL_UNSIGNED_BYTE, src);
     }
   }
   d->Handle = texturehandle;

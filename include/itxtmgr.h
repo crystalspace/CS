@@ -41,22 +41,27 @@ struct iTextureHandle;
 /// You're going to yse the texture for 3D drawing
 #define CS_TEXTURE_3D			0x00000002
 /**
- * Create a dynamic texture.
+ * Create a procedural texture.
  * After the texture is prepared call 
  * iTextureHangle->GetDynamicTextureInterface to retrieve an iGraphics3D
  * interface to the texture. Render as usual.
  */
-#define CS_TEXTURE_DYNAMIC		0x00000004
+#define CS_TEXTURE_PROC  		0x00000004
 
 /**
- * Hints to the texture manager which dynamic texture implementation to utilise.
- * This flag must be set if you wish to use textures registered to the main 
- * texture manager with the dynamic texture interfaces. This is useful so that 
- * textures can be written to by csWorld for example.  Usually not setting this
- * flag and registering textures to be rendered on textures with its own 
- * texture manager  will be faster.
+ * Currently this flag is acted upon by the 16/32bit software renderer and the
+ * opengl software texture implementation only. 
+ * It has no performance penalty for the other drivers, so set it when you can,
+ *  which practically speaking will be most of the time. 
+ * Set this flag when you can safely allocate the procedural textures their
+ * own set of textures which will not be referred to when calling the main 
+ * renderer. This means that the engine for example will not be able to render
+ * to these procedural textures. 
+ * This flag allows for a big optimisation by setting up an 8bit texture 
+ * manager for the software procedural textures so that all rendering is done 
+ * within the software texture managers' native format.  
  */
-#define CS_TEXTURE_DYNAMIC_SHARE_HINT   0x00000008
+#define CS_TEXTURE_PROC_ALONE_HINT   0x00000008
 
 /**
  * Create mipmaps for this texture?<p>

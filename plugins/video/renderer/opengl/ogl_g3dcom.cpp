@@ -41,6 +41,7 @@
 #include "igraph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
+#include "csgfxldr/rgbpixel.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -309,16 +310,6 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   }
 #endif
 
-  // need some good way of determining a good texture map size and
-  // bit depth for the texture 'cache', since GL hides most of the
-  // details from us. Maybe we should just not worry about it... GJH
-
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
-
-  texture_cache = new OpenGLTextureCache (1 << 24, 24);
-  lightmap_cache = new OpenGLLightmapCache (1 << 24, 24);
-  texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
-
   // tells OpenGL driver we align texture data on byte boundaries,
   // instead of perhaps word or dword boundaries
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -353,7 +344,15 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D (GL_TEXTURE_2D, 0, 4, FOGTABLE_SIZE, 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
+
   delete[]transientfogdata;
+
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+
+  int max_cache_size = 1024*1024*16; // 32mb combined cache
+  texture_cache = new OpenGLTextureCache (max_cache_size, 24);
+  lightmap_cache = new OpenGLLightmapCache (max_cache_size, 24);
+  texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
 
   GLenum errtest;
   errtest = glGetError ();

@@ -26,6 +26,7 @@
 
 class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
+class csTextureMMSoftware;
 struct csPixelFormat;
 
 /// The default texture cache size.
@@ -123,21 +124,24 @@ protected:
 public:
   void (csTextureCacheSoftware::*create_lighted_texture) 
                         (iPolygonTexture *pt, SoftwareCachedTexture *ct, 
-		         csTextureManagerSoftware *texman,
+		   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
 		         float u_min, float v_min, float u_max, float v_max);
 
-  void create_lighted_texture_8 (iPolygonTexture *pt, 
-		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
+  void create_lighted_texture_8 (iPolygonTexture *pt, SoftwareCachedTexture *ct,
+                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
 		        float u_min, float v_min, float u_max, float v_max);
-  void create_lighted_texture_555(iPolygonTexture *pt, 
-		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
-			float u_min, float v_min, float u_max, float v_max);
-  void create_lighted_texture_565(iPolygonTexture *pt, 
-		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
-			float u_min, float v_min, float u_max, float v_max);
-  void create_lighted_texture_888(iPolygonTexture *pt, 
-		 SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
-			float u_min, float v_min, float u_max, float v_max);
+
+  void create_lighted_texture_555(iPolygonTexture *pt,SoftwareCachedTexture *ct,
+                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+		        float u_min, float v_min, float u_max, float v_max);
+
+  void create_lighted_texture_565(iPolygonTexture *pt,SoftwareCachedTexture *ct,
+                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+		        float u_min, float v_min, float u_max, float v_max);
+
+  void create_lighted_texture_888(iPolygonTexture *pt,SoftwareCachedTexture *ct,
+                   csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+		        float u_min, float v_min, float u_max, float v_max);
 
   /// Current frame number
   int frameno;
@@ -172,8 +176,9 @@ public:
    * add it if not. The parts of lighted texture that were changed
    * will be recomputed.
    */
-  void fill_texture (int MipMap, iPolygonTexture* pt,
-    float u_min, float v_min, float u_max, float v_max);
+  void fill_texture (int MipMap, iPolygonTexture* pt, 
+		     csTextureMMSoftware *tex_mm, 
+		     float u_min, float v_min, float u_max, float v_max);
 
   /**
    * Do a debugging dump.

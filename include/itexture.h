@@ -66,22 +66,20 @@ struct iTextureHandle : public iBase
   virtual void *GetPrivateObject () = 0;
 
   /**
-   * If the texture handle was created with a dynamic texture, this
+   * If the texture handle was created with as a procedural texture, this
    * function returns an iGraphics3D interface to a texture buffer which 
    * can be used in the  same way as a frame buffer based iGraphics3D.
    * This interface only becomes available once the texture has been
    * prepared by the texture manager.
    */ 
-  virtual iGraphics3D *GetDynamicTextureInterface () = 0;
+  virtual iGraphics3D *GetProcTextureInterface () = 0;
 
   /**
-   * If this is a dynamic texture, call this function after you have changed
-   * the palette on the dynamic texture iGraphics3Ds' own texture manager.
-   * This will sync palettes between the textures' texture manager and the 
-   * the texture manager which is managing the dynamic texture. Is that clear!
+   * If this is a procedural texture with mip-mapping enabled, call this 
+   * function to update its mip maps after a change. 
+   * (currently unimplemented)
    */
-
-  virtual void DynamicTextureSyncPalette () = 0;
+  virtual void ProcTextureSync () = 0;
 };
 
 #endif //ITEXTURE_H

@@ -21,18 +21,18 @@
 #define SYSDEF_SOFTWARE2D
 #include "cssysdef.h"
 #include "soft_g3d.h"
-#include "softex3d.h"
+#include "protex3d.h"
 #include "isystem.h"
 #include "igraph2d.h"
 #include "csutil/inifile.h"
 
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
-IMPLEMENT_FACTORY (csDynamicTextureSoft3D)
+IMPLEMENT_FACTORY (csSoftProcTexture3D)
 
 EXPORT_CLASS_TABLE (soft3d)
   EXPORT_CLASS (csGraphics3DSoftware, "crystalspace.graphics3d.software",
     "Software 3D graphics driver for Crystal Space")
-  EXPORT_CLASS (csDynamicTextureSoft3D, 
+  EXPORT_CLASS (csSoftProcTexture3D, 
     "crystalspace.graphics3d.software.offscreen",
     "Software 3D off screen driver")
 EXPORT_CLASS_TABLE_END
@@ -74,7 +74,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 
 bool csGraphics3DSoftware::Open (const char *Title)
 {
-  if (!csGraphics3DSoftwareCommon::Open (NULL) || !NewOpen (Title))
+  if (!csGraphics3DSoftwareCommon::Open (Title) || !NewOpen ())
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
@@ -91,17 +91,6 @@ bool csGraphics3DSoftware::Open (const char *Title)
     SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
 
   return true;
-}
-
-iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer 
-  (iGraphics3D* parent_g3d, int width, int height, csPixelFormat *pfmt, 
-   void *buffer, RGBPixel *palette, int pal_size)
-{
-  csDynamicTextureSoft3D *tex3d =  
-       new csDynamicTextureSoft3D (NULL);
-  tex3d->Initialize (System);
-  return tex3d->CreateOffScreenRenderer (parent_g3d, width, height, pfmt, 
-					 buffer, palette, pal_size);
 }
 
 //---------------------------------------------------------------------------

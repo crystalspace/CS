@@ -24,6 +24,7 @@
 #include "csgeom/plane3.h"
 #include "iplugin.h"
 
+
 class csMatrix3;
 class csVector3;
 class csVector2;
@@ -640,10 +641,6 @@ struct iGraphics3D : public iPlugIn
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th) = 0;
 
-  /// Create an Off Screen Renderer
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
-    int width, int height, csPixelFormat *pfmt, void *buffer, 
-    RGBPixel *palette, int pal_size) = 0;
 };
 
 #endif // __IGRAPH3D_H__

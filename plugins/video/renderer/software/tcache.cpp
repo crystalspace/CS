@@ -124,8 +124,8 @@ void csTextureCacheSoftware::uncache_texture (int MipMap, iPolygonTexture* pt)
   delete cached_texture;
 }
 
-SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
-  int MipMap, iPolygonTexture* pt)
+SoftwareCachedTexture *csTextureCacheSoftware::cache_texture 
+  (int MipMap, iPolygonTexture* pt)
 {
   SoftwareCachedTexture *cached_texture =
     (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
@@ -245,7 +245,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
 }
 
 void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
-  float u_min, float v_min, float u_max, float v_max)
+    csTextureMMSoftware *tex_mm, float u_min, float v_min, float u_max, float v_max)
 {
   // Recalculate the lightmaps
   // @@@ Note for Andrew: this function returns true if something
@@ -257,7 +257,7 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
   SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
 
   // Compute the rectangle on the lighted texture, if it is dirty
-  (this->*create_lighted_texture) (pt, cached_texture, texman, u_min, v_min, u_max, v_max);
+  (this->*create_lighted_texture) (pt, cached_texture, tex_mm, texman, u_min, v_min, u_max, v_max);
 }
 
 #define SysPrintf iG3D->System->Printf

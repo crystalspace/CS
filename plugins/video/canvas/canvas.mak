@@ -8,7 +8,7 @@ vpath %.cpp plugins/video/canvas/common
 
 SRC.COMMON.DRV2D=plugins/video/canvas/common/graph2d.cpp \
   plugins/video/canvas/common/scrshot.cpp \
-  plugins/video/canvas/common/dyntex2d.cpp
+  plugins/video/canvas/common/protex2d.cpp
 
 SRC.COMMON.DRV2D.OPENGL=plugins/video/canvas/openglcommon/*.cpp
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SFT3DCOM_H__
-#define __CS_SFT3DCOM_H__
+#ifndef __CSSFT3DCOM_H__
+#define __CSSFT3DCOM_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -56,6 +56,12 @@ class csGraphics3DSoftwareCommon : public iGraphics3D
 {
 protected:
   friend class csSoftHalo;
+
+  /// Driver this driver is sharing info with (if any)
+  csGraphics3DSoftwareCommon *partner;
+
+  /// ID/window name of this context
+  const char* Title;
 
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
   unsigned long* z_buffer;
@@ -247,14 +253,14 @@ public:
 
   virtual bool Open (const char *Title);
 
-  /// Helper function. Gathers all that has to be done when opening from 
+  /// Gathers all that has to be done when opening from 
   /// scratch. 
-  bool NewOpen (const char *Title);
+  bool NewOpen ();
 
-  /// Used when multiple contexts are in system, opens borrowing from other 
-  /// driver
-  void SharedOpen (csGraphics3DSoftwareCommon* p);
+  /// Used when multiple contexts are in system, opens sharing information from   /// other driver
+  bool SharedOpen ();
 
+  ///
   void ScanSetup ();
   ///
   virtual void Close ();
@@ -410,4 +416,4 @@ public:
     int tx, int ty, int tw, int th);
 };
 
-#endif // __CS_SFT3DCOM_H__
+#endif // __CSSFT3DCOM_H__

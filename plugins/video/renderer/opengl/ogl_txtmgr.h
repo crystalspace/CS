@@ -21,17 +21,19 @@
 
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
+#include "ogl_proctexsoft.h"
 #include "itexture.h"
 #include "iimage.h"
 
 class csGraphics3DOGLCommon;
-class csOpenGLDynamic;
+class csTextureManagerOpenGL;
 
-enum csGLDynTexType
+enum csGLProcTexType
 {
   SOFTWARE_TEXTURE = 1,
-  BACK_BUFFER_TEXTURE = 2,
-  AUXILIARY_BUFFER_TEXTURE = 3,
+  SOFTWARE_TEXTURE_32BIT = 2,
+  BACK_BUFFER_TEXTURE = 3,
+  AUXILIARY_BUFFER_TEXTURE = 4,
 };
 
 /**
@@ -50,19 +52,15 @@ public:
   csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureMMOpenGL ();
+  /// Adjust size, mipmap, create procedural texture etc
+  void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
-  /// Adjust size, mipmap etc
-  void InitTexture (int max_tex_size, csPixelFormat *pfmt, 
-		    csGLDynTexType dyn_tex_type);
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
-
-
-  void CreateDynamicTexture(csGraphics3DOGLCommon *parentG3D, 
-			    csGLDynTexType type, csPixelFormat *PixelFormat);
-
-  virtual iGraphics3D *GetDynamicTextureInterface ();
+  /// Returns dynamic texture interface if any.
+  virtual iGraphics3D *GetProcTextureInterface ();
 };
 
 /**
@@ -90,23 +88,18 @@ public:
 };
 
 /**
- * csTextureOpenGLDynamic is a class derived from csTextureOpenGL that
- * implements the additional functionality to allow acess to the texture
- * memory via iGraphics2D/3D interfaces.
+ * The procedural texture object.
  */
-class csTextureOpenGLDynamic : public csTextureOpenGL
+class csTextureProcOpenGL : public csTextureOpenGL
 {
 public:
   iGraphics3D *texG3D;
-
-  csTextureOpenGLDynamic (csTextureMM *Parent, iImage *Image)
-    : csTextureOpenGL (Parent, Image), texG3D (NULL)
+  bool soft;
+  csTextureProcOpenGL (csTextureMM *Parent, iImage *Image)
+    : csTextureOpenGL (Parent, Image), texG3D (NULL), soft (false)
   {};
   /// Destroy the texture
-  virtual ~csTextureOpenGLDynamic ();
-
-  void CreateInterfaces (csTextureMMOpenGL *mm_tex, csGLDynTexType type,
-			 csGraphics3DOGLCommon *parentG3D, csPixelFormat *pfmt);
+  virtual ~csTextureProcOpenGL ();
 };
 
 /**
@@ -114,11 +107,14 @@ public:
  */
 class csTextureManagerOpenGL : public csTextureManager
 {
+
 public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
-  csGLDynTexType dyn_tex_type;
   int max_tex_size;
+  csGLProcTexType proc_tex_type;
+  // The first instance of a sharing software texture
+  csOpenGLProcSoftware *head_soft_proc_tex;
 
   ///
   csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config,

@@ -53,11 +53,6 @@ public:
   ///
   virtual void Close();
 
-  /// Create an off screen renderer
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
-     int width, int height, csPixelFormat *pfmt, void *buffer, 
-     RGBPixel *palette, int pal_size);
-
 };
 
 #endif

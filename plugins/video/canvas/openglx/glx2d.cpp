@@ -266,7 +266,7 @@ bool csGraphics2DGLX::Open(const char *Title)
     pfmt.PixelBytes = 4;
   else pfmt.PixelBytes = 2;
 
-  CsPrintf (MSG_INITIALIZATION, "Visual ID: %x,  depth %dbit,  %s\n",
+  CsPrintf (MSG_INITIALIZATION, "Visual ID: %x, %dbit %s\n",
 	    active_GLVisual->visualid, Depth, 
 	    visual_class_name (active_GLVisual->c_class));
 
@@ -278,7 +278,6 @@ bool csGraphics2DGLX::Open(const char *Title)
   glXGetConfig(dpy, active_GLVisual, GLX_LEVEL, &level);
 
   int alpha_bits = 0;
-  char *colour_type;
   if (ctype)
   {
     pfmt.RedMask = active_GLVisual->red_mask;
@@ -288,41 +287,31 @@ bool csGraphics2DGLX::Open(const char *Title)
     glXGetConfig(dpy, active_GLVisual, GLX_GREEN_SIZE, &pfmt.GreenBits);
     glXGetConfig(dpy, active_GLVisual, GLX_BLUE_SIZE, &pfmt.BlueBits);
     glXGetConfig(dpy, active_GLVisual, GLX_ALPHA_SIZE, &alpha_bits);
+  }
 
+  // Report Info
+  CsPrintf (MSG_INITIALIZATION, "Frame buffer: %dbit ", frame_buffer_depth);
+  if (ctype)
+  {
     if (pfmt.RedMask > pfmt.BlueMask)
     {
-      if (alpha_bits)
-	colour_type = "RGBA";
-      else 
-	colour_type = "RGB";
+      CsPrintf (MSG_INITIALIZATION, 
+		"R%d:G%d:B%d:A%d, ", 
+		pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
     }
     else
     {
-      if (alpha_bits)
-	colour_type = "BGRA";
-      else
-	colour_type = "BGR";
+      CsPrintf (MSG_INITIALIZATION, 
+		"B%d:G%d:R%d:A%d, ", 
+		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
-  }
-
-  CsPrintf (MSG_INITIALIZATION, 
-	    "Frame buffer: Type %s,  depth %dbit, level %d, %s\n",
-	    ctype ? colour_type : "ci", frame_buffer_depth, level,
-	    double_buffer ? "double buffered" : "single buffered");
+  } 
+  CsPrintf (MSG_INITIALIZATION, "level %d, %s\n",
+	    level, double_buffer ? "double buffered," : "single buffered,");
   CsPrintf (MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
 
-  if (ctype)
-  {
-    CsPrintf (MSG_INITIALIZATION, 
-	      "Red  : bits %d, mask %d\n", pfmt.RedBits, pfmt.RedMask);
-    CsPrintf (MSG_INITIALIZATION, 
-	      "Green: bits %d, mask %d\n", pfmt.GreenBits, pfmt.GreenMask);
-    CsPrintf (MSG_INITIALIZATION, 
-	      "Blue : bits %d, mask %d\n", pfmt.BlueBits, pfmt.BlueMask);
-    CsPrintf (MSG_INITIALIZATION, 
-	      "Alpha: bits %d\n", alpha_bits);
-  } 
- 
+  pfmt.complete ();
+
   // Create window
   XSetWindowAttributes winattr;
   winattr.border_pixel = 0;
@@ -400,10 +389,6 @@ bool csGraphics2DGLX::Open(const char *Title)
     if (event.type == Expose)
       break;
   }
-
-//    Pixmap pixmap = XCreatePixmap (dpy, window, 128, 128, active_GLVisual->depth);
-
-//    GLXPixmap glx_pixmap = glXCreateGLXPixmap (dpy, active_GLVisual, pixmap);
 
   // this makes the context we created in Initialize() the current
   // context, so that all subsequent OpenGL calls will set state and

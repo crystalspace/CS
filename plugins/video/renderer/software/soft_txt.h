@@ -22,10 +22,12 @@
 
 #include "video/renderer/common/txtmgr.h"
 #include "iimage.h"
+#include "igraph2d.h"
 
-class csDynamicTextureSoft3D;
+class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
-
+class csTextureMMSoftware;
+class csSoftProcTexture3D;
 /**
  * In 8-bit modes we build a 32K inverse colormap for converting
  * RGB values into palette indices. The following macros defines
@@ -87,6 +89,61 @@ public:
 };
 
 /**
+ * csTextureSoftware is a class derived from csTexture that implements
+ * all the additional functionality required by the software renderer.
+ * Every csTextureSoftware is a 8-bit paletted image with a private
+ * colormap. The private colormap is common for all mipmapped variants.
+ * The colormap is stored inside the parent csTextureMM object.
+ */
+class csTextureSoftware : public csTexture
+{
+public:
+  /// The bitmap
+  UByte *bitmap;
+  /// The image (temporary storage)
+  iImage *image;
+
+  /// Create a csTexture object
+  csTextureSoftware (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
+  {
+    bitmap = NULL;
+    image = Image;
+    w = Image->GetWidth ();
+    h = Image->GetHeight ();
+    compute_masks ();
+  }
+  /// Destroy the texture
+  virtual ~csTextureSoftware ()
+  { delete [] bitmap; if (image) image->DecRef (); }
+  /// Return a pointer to texture data
+  UByte *get_bitmap ()
+  { return bitmap; }
+};
+
+/**
+ * csTextureSoftwareProc is a class derived from csTextureSoftware that
+ * implements the additional functionality to allow acess to the texture
+ * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are 
+ * initialised in 8bit mode and use the palette as calculated by 
+ * csTextureMMSoftware, so you can render to them as usual without
+ * requiring recalculation of palettes each frame. 
+ */
+class csTextureSoftwareProc : public csTextureSoftware
+{
+public:
+  csSoftProcTexture3D *texG3D;
+
+
+  csTextureSoftwareProc (csTextureMM *Parent, iImage *Image)
+    : csTextureSoftware (Parent, Image), texG3D(NULL)
+  {};
+  /// Destroy the texture
+  virtual ~csTextureSoftwareProc ();
+
+};
+
+
+/**
  * csTextureMMSoftware represents a texture and all its mipmapped
  * variants.
  */
@@ -106,7 +163,7 @@ protected:
 
   /// The private palette (with gamma applied)
   RGBPixel palette [256];
-/*    RGBPixel *palette; */
+
   /// Number of used colors in palette
   int palette_size;
 
@@ -147,78 +204,21 @@ public:
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
-  /// Creates the DynamicTexture object with interfaces
-  void CreateDynamicTexture (iGraphics3D *parentG3D, csPixelFormat *pfmt,
-                             RGBPixel *pal_8bit, bool share_hint);
+  /// Used in 8bit when more than one procedural texture 
+  void MapToGlobalPalette (RGBPixel *pal_8bit);
 
-  /// Return the interfaces to the dynamic texture buffer
-  virtual iGraphics3D *GetDynamicTextureInterface ();
+  /// Return the interfaces to the procedural texture buffer
+  virtual iGraphics3D *GetProcTextureInterface ();
 
   /// Called to update pal2glob with palette information created elsewhere
-  virtual void DynamicTextureSyncPalette ();
+  virtual void ProcTextureSync ();
 
-  /// Called when dynamic texture shares texture manager with parent context
-  /// and in either 16 or 32bit. The 8bit version doesn't require repreparing.
-  void RePrepareDynamicTexture ();
+  /// Called when the procedural texture shares texture manager with parent 
+  /// context and in either 16 or 32bit. The 8bit version doesn't require 
+  /// repreparing.
+  void RePrepareProcTexture ();
 };
 
-/**
- * csTextureSoftware is a class derived from csTexture that implements
- * all the additional functionality required by the software renderer.
- * Every csTextureSoftware is a 8-bit paletted image with a private
- * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureMM object.
- */
-class csTextureSoftware : public csTexture
-{
-public:
-  /// The bitmap
-  UByte *bitmap;
-  /// The image (temporary storage)
-  iImage *image;
-
-  /// Create a csTexture object
-  csTextureSoftware (csTextureMM *Parent, iImage *Image) : csTexture (Parent)
-  {
-    bitmap = NULL;
-    image = Image;
-    w = Image->GetWidth ();
-    h = Image->GetHeight ();
-    compute_masks ();
-  }
-  /// Destroy the texture
-  virtual ~csTextureSoftware ()
-  { delete [] bitmap; if (image) image->DecRef (); }
-  /// Return a pointer to texture data
-  UByte *get_bitmap ()
-  { return bitmap; }
-};
-
-/**
- * csTextureSoftwareDynamic is a class derived from csTextureSoftware that
- * implements the additional functionality to allow acess to the texture
- * memory via iGraphics2D/3D interfaces. Internally iGraphics2D/3D are 
- * initialised in 8bit mode and use the palette as calculated by 
- * csTextureMMSoftware, so you can render to them as usual without
- * requiring recalculation of palettes each frame. 
- */
-class csTextureSoftwareDynamic : public csTextureSoftware
-{
-public:
-  csDynamicTextureSoft3D *texG3D;
-
-
-  csTextureSoftwareDynamic (csTextureMM *Parent, iImage *Image)
-    : csTextureSoftware (Parent, Image)
-  {};
-  /// Destroy the texture
-  virtual ~csTextureSoftwareDynamic ();
-
-
-  void CreateInterfaces (csTextureMMSoftware *tex_mm, iGraphics3D *parentG3D, 
-			 csPixelFormat *pfmt,  
-			 RGBPixel *palette, int palette_size, bool share_hint);
-};
 
 /**
  * Software version of the texture manager. This instance of the
@@ -230,7 +230,21 @@ public:
 class csTextureManagerSoftware : public csTextureManager
 {
 private:
-  /// How strong texture manager should push 128 colors towards a uniform palette
+  /// Texture manager is responsible for the palettes of multiple 8bit canvases
+  struct canvas8bit
+  {
+    canvas8bit (iGraphics2D *new_canvas)
+      : g2d(new_canvas), next(NULL) {};
+    canvas8bit (iGraphics2D *new_canvas, canvas8bit *head_canvas)
+      : g2d(new_canvas), next(head_canvas) {};
+
+    iGraphics2D *g2d;
+    canvas8bit *next;
+  };
+  /// Head of a linked list of 8bit canvases sharing this texture manager.
+  canvas8bit *mG2D;
+  /// How strong texture manager should push 128 colors towards 
+  /// a uniform palette
   int uniform_bias;
 
   /// Which colors are locked in the global colormap
@@ -248,9 +262,12 @@ private:
   /// We need a pointer to the 2D driver
   iGraphics2D *G2D;
 
-  /// We need a pointer to the 3D driver
-  iGraphics3D *G3D;
 public:
+
+  /// We need a pointer to the 3D driver
+  csGraphics3DSoftwareCommon *G3D;
+
+  csSoftProcTexture3D *alone_proc_tex;
   /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
   bool dither_textures;
 
@@ -273,7 +290,8 @@ public:
   float Gamma;
 
   ///
-  csTextureManagerSoftware (iSystem *iSys, iGraphics3D *iG3D, csIniFile *config);
+  csTextureManagerSoftware (iSystem *iSys, csGraphics3DSoftwareCommon *iG3D, 
+			    csIniFile *config);
   ///
   virtual ~csTextureManagerSoftware ();
 
@@ -305,6 +323,10 @@ public:
 
   /// Set gamma correction value.
   void SetGamma (float iGamma);
+
+  /// Maintain a linked list of 8bit canvases for the procedural textures
+  void Register8BitCanvas (iGraphics2D *g2d8bit);
+  void UnRegister8BitCanvas (iGraphics2D *g2d8bit);
 
   /// Read configuration values from config file.
   virtual void read_config (csIniFile *config);

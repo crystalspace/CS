@@ -141,10 +141,10 @@ public:
   virtual void *GetPrivateObject ()
   { return (csTextureMM *)this; }
 
-  virtual iGraphics3D *GetDynamicTextureInterface ()
+  virtual iGraphics3D *GetProcTextureInterface ()
   { return NULL; }
 
-  virtual void DynamicTextureSyncPalette () {};
+  virtual void ProcTextureSync () {};
 };
 
 /**

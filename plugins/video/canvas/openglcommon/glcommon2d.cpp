@@ -315,10 +315,22 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
   if (!screen_shot) return NULL;
 
   //glPixelStore ()?
-  glReadPixels (0, 0, Width, Height,
-    pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
-    GL_UNSIGNED_BYTE, screen_shot);
-
+  switch (pfmt.PixelBytes)
+  {
+    case 1:
+      glReadPixels (0, 0, Width, Height, GL_COLOR_INDEX,
+		    GL_UNSIGNED_BYTE, screen_shot);
+      break;
+    case 2:
+      // experimental
+      glReadPixels (0, 0, Width, Height, GL_RGB,
+		    GL_UNSIGNED_SHORT_5_6_5, screen_shot);
+      break;
+    default:
+      glReadPixels (0, 0, Width, Height, GL_RGBA,
+		    GL_UNSIGNED_BYTE, screen_shot);
+      break;
+  }
   csScreenShot *ss = new csScreenShot (this);
 
   delete [] screen_shot;

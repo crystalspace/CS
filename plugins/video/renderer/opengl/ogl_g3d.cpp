@@ -93,15 +93,3 @@ void csGraphics3DOpenGL::Close ()
 {
   csGraphics3DOGLCommon::Close ();
 }
-
-
-iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer 
-  (iGraphics3D * /*parent_g2d*/, int width, int height,  csPixelFormat *pfmt, 
-    void *buffer, RGBPixel * /*palette*/, int /*pal_size*/)
-{
- (void) width;
- (void) height;
- (void) pfmt;
- (void) buffer;
- return NULL;
-}

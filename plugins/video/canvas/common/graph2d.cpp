@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "cssysdef.h"
 #include "video/canvas/common/graph2d.h"
-#include "video/canvas/common/dyntex2d.h"
+#include "video/canvas/common/protex2d.h"
 #include "qint.h"
 #include "scrshot.h"
 #include "isystem.h"
@@ -547,10 +547,12 @@ iImage *csGraphics2D::ScreenShot ()
   return ss;
 }
 
-iGraphics2D *csGraphics2D::CreateOffScreenCanvas (int width, int height, 
-  csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size, int flags)
+iGraphics2D *csGraphics2D::CreateOffScreenCanvas  
+  (int width, int height, void *buffer, csOffScreenBuffer hint, 
+   csPixelFormat *pfmt = NULL, RGBPixel *palette = NULL, int pal_size = 0)
 {
-  csDynamicTextureSoft2D *tex = new csDynamicTextureSoft2D (System);
-  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-				     palette, pal_size, flags);
+  // default return a software canvas
+  csProcTextureSoft2D *tex = new csProcTextureSoft2D (System);
+  return tex->CreateOffScreenCanvas (width, height, buffer, hint,
+				     pfmt, palette, pal_size);
 }

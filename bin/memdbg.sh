@@ -1,5 +1,5 @@
 #
-# Usage: memdb.sh [debug-executable] {memdbg-options}
+# Usage: memdbg.sh [debug-executable] {memdbg-options}
 #
 # The {memdbg-options} parameter is a string consisting of optional letters.
 # Each letter enables a specific debugger mode. The following options are

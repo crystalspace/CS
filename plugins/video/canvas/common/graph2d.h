@@ -245,9 +245,10 @@ public:
   virtual iImage *ScreenShot ();
 
   /// Create an off screen canvas
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size, 
-     int flags);
+  virtual iGraphics2D *CreateOffScreenCanvas
+  (int width, int height, void *buffer, csOffScreenBuffer hint, 
+   csPixelFormat *pfmt = NULL, RGBPixel *palette = NULL, int pal_size = 0);
+
 
 protected:
   /**

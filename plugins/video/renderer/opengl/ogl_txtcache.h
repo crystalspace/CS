@@ -25,6 +25,7 @@
 struct iLightMap;
 struct iTextureHandle;
 struct iPolygonTexture;
+struct iSystem;
 
 ///
 struct csGLCacheData
@@ -58,7 +59,7 @@ protected:
   long cache_size;
   /// number of items
   int num;
-  /// the total size of the cache
+
   long total_size;
 
 public:
@@ -74,6 +75,9 @@ public:
   void cache_lightmap (iPolygonTexture *polytex);
   ///
   void Clear ();
+
+  ///
+  void ReportStats ();
 
 protected:
   ///

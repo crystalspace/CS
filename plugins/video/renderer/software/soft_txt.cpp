@@ -29,7 +29,7 @@
 #include "iimage.h"
 #include "lightdef.h"
 #include "qint.h"
-#include "softex3d.h"
+#include "protex3d.h"
 
 #define SysPrintf System->Printf
 
@@ -123,6 +123,12 @@ int csColorMap::FreeEntries ()
   return colors;
 }
 
+csTextureSoftwareProc::~csTextureSoftwareProc ()
+{ 
+  if (texG3D) texG3D->DecRef ();
+
+}
+
 //---------------------------------------------------- csTextureMMSoftware ---//
 
 csTextureMMSoftware::csTextureMMSoftware (csTextureManagerSoftware *texman, 
@@ -139,12 +145,13 @@ csTextureMMSoftware::~csTextureMMSoftware ()
 {
   delete [] (UByte *)pal2glob;
   delete [] orig_palette;
+
 }
 
 csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
 {
-  if ((flags & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
-    return new csTextureSoftwareDynamic (this, Image);
+  if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
+    return new csTextureSoftwareProc (this, Image);
   else
     return new csTextureSoftware (this, Image);
 }
@@ -168,8 +175,13 @@ void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
 void csTextureMMSoftware::ComputeMeanColor ()
 {
   int i;
+
+  // If the procedural textures do not have their own texture manager
+  // the procedural textures update the iImage, so we avoid destroying them 
+  // here in the usual manner.
   bool destroy_image = true;
-  if ((flags & CS_TEXTURE_DYNAMIC_SHARE_HINT) == CS_TEXTURE_DYNAMIC_SHARE_HINT)
+  if ((flags & (CS_TEXTURE_PROC_ALONE_HINT | CS_TEXTURE_PROC))
+       != CS_TEXTURE_PROC_ALONE_HINT)
     destroy_image = false;
 
   // Compute a common palette for all three mipmaps
@@ -284,75 +296,69 @@ void csTextureMMSoftware::remap_texture ()
   }
 }
 
-void csTextureMMSoftware::DynamicTextureSyncPalette ()
+void csTextureMMSoftware::ProcTextureSync ()
 {
-  if (((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC) ||
-     ((flags & CS_TEXTURE_DYNAMIC_SHARE_HINT) == CS_TEXTURE_DYNAMIC_SHARE_HINT))
-    return;
-  // This texture has its own texture manager.
-  // Calculate pal2glob from palette created by the dynamic textures'
-  // texture manager which this texture shares.
-  remap_texture ();
+
 }
 
-iGraphics3D *csTextureMMSoftware::GetDynamicTextureInterface ()
+iGraphics3D *csTextureMMSoftware::GetProcTextureInterface ()
 {
-  if ((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC)
+  if ((flags & CS_TEXTURE_PROC) != CS_TEXTURE_PROC)
     return NULL;
 
-  return ((csTextureSoftwareDynamic*)tex[0])->texG3D;
-}
-
-void csTextureMMSoftware::CreateDynamicTexture ( iGraphics3D *parentG3D, 
-		      csPixelFormat *pfmt, RGBPixel *pal_8bit, bool share_hint)
-{
-  if (pal_8bit)
+  if (!((csTextureSoftwareProc*)tex[0])->texG3D)
   {
-    palette_size = 256;
-    memcpy (palette, pal_8bit, sizeof(RGBPixel)*256);
-    pal2glob = new UByte [256 * sizeof (UByte)];
-    memcpy (pal2glob, texman->inv_cmap, sizeof (UByte) * 256);
+    bool success;
+    bool alone_hint = (flags & CS_TEXTURE_PROC_ALONE_HINT) == 
+						CS_TEXTURE_PROC_ALONE_HINT;
+
+    csSoftProcTexture3D *stex = new csSoftProcTexture3D (NULL);
+
+    // stipulate max palette size
+    if ((texman->pfmt.PixelBytes == 1) && !alone_hint)
+    {
+      success = stex->Prepare (this, texman->G3D, 
+			       alone_hint ? texman->alone_proc_tex : NULL, 
+			       alone_hint,
+                               (void*) ((csTextureSoftware*) tex[0])->bitmap, 
+			       &texman->pfmt, palette, 256);
+      if (alone_hint && !texman->alone_proc_tex)
+	texman->alone_proc_tex = stex;
+    }
+    else if (alone_hint)
+    {
+      success = stex->Prepare (this, texman->G3D, texman->alone_proc_tex, 
+                     alone_hint, (void*) ((csTextureSoftware*) tex[0])->bitmap, 
+                               &texman->pfmt, palette, 256);
+      // temporary...need to resolve lone destruction of texture issues
+      if (!texman->alone_proc_tex)
+	texman->alone_proc_tex = stex;
+    }
+    else
+      success = stex->Prepare  (this, texman->G3D, NULL, alone_hint, 
+                 (void*) ((csTextureSoftware*) tex[0])->image->GetImageData (), 
+		  &texman->pfmt, palette, 256);
+
+    if (!success)
+      delete stex;
+    else
+      ((csTextureSoftwareProc*)tex[0])->texG3D = stex;
   }
-  ((csTextureSoftwareDynamic*)tex[0])->CreateInterfaces (this, parentG3D, pfmt,
-                                             palette, palette_size, share_hint);
+  return ((csTextureSoftwareProc*)tex[0])->texG3D;
 }
 
-void csTextureMMSoftware::RePrepareDynamicTexture ()
+void csTextureMMSoftware::MapToGlobalPalette (RGBPixel* pal_8bit)
+{
+  palette_size = 256;
+  memcpy (palette, pal_8bit, sizeof(RGBPixel)*256);
+  pal2glob = new UByte [256 * sizeof (UByte)];
+  memcpy (pal2glob, texman->inv_cmap, sizeof (UByte) * 256);
+}
+
+void csTextureMMSoftware::RePrepareProcTexture ()
 {
   ComputeMeanColor ();
   remap_texture ();
-}
-
-//----------------------------------------------- csTextureSoftwareDynamic----//
-void csTextureSoftwareDynamic::CreateInterfaces 
-  ( csTextureMMSoftware *tex_mm, iGraphics3D *parentG3D, csPixelFormat *pfmt, RGBPixel *palette, 
-    int palette_size, bool share_hint)
-{
-
-  if (share_hint)
-  {
-    texG3D = new csDynamicTextureSoft3D (NULL);
-    texG3D->SetTarget (tex_mm);
-    if (pfmt->PixelBytes == 1)
-      texG3D->CreateOffScreenRenderer (parentG3D, w, h, pfmt, 
-				       (void*)  bitmap,
-				       palette, 256);
-    else
-      texG3D->CreateOffScreenRenderer (parentG3D, w, h, pfmt, 
-				       (void*)  image->GetImageData (),
-				       palette, palette_size);
-  }
-  else
-  {
-    texG3D = (csDynamicTextureSoft3D*) 
-      parentG3D->CreateOffScreenRenderer (parentG3D, w, h, pfmt, 
-				     (void*) bitmap, palette, palette_size);
-  }
-}
-
-csTextureSoftwareDynamic::~csTextureSoftwareDynamic ()
-{ 
-  texG3D->DecRef (); 
 }
 
 //----------------------------------------------- csTextureManagerSoftware ---//
@@ -373,7 +379,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
-  iGraphics3D *iG3D, csIniFile *config) 
+  csGraphics3DSoftwareCommon *iG3D, csIniFile *config) 
   : csTextureManager (iSys, iG3D->GetDriver2D())
 {
   alpha_tables = NULL;
@@ -382,6 +388,8 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   G3D = iG3D;
   G2D = iG3D->GetDriver2D ();
   inv_cmap = NULL;
+  alone_proc_tex = NULL;
+  mG2D = NULL;
 }
 
 void csTextureManagerSoftware::SetGamma (float iGamma)
@@ -442,6 +450,18 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
    && lightmap_tables [2] != lightmap_tables [0])
     delete [] lightmap_tables [2];
   Clear ();
+
+  if (mG2D)
+  {
+    canvas8bit *c = mG2D->next;
+    while (c)
+    {
+      canvas8bit *n = c->next;
+      delete c;
+      c = n;
+    }
+    delete mG2D;
+  }
 }
 
 void csTextureManagerSoftware::Clear ()
@@ -548,7 +568,7 @@ void csTextureManagerSoftware::compute_palette ()
   for (int t = textures.Length () - 1; t >= 0; t--)
   {
     csTextureMMSoftware *txt = (csTextureMMSoftware *)textures [t];
-    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
+    if ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
       continue;
     RGBPixel colormap [256];
     int colormapsize;
@@ -625,15 +645,10 @@ void csTextureManagerSoftware::PrepareTextures ()
   {
     csTextureMMSoftware* txt = (csTextureMMSoftware*)textures.Get (i);
     txt->remap_texture ();
-    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
-    {
-      if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC_SHARE_HINT) == 
-						CS_TEXTURE_DYNAMIC_SHARE_HINT)
-	((csTextureMMSoftware*)txt)->CreateDynamicTexture (G3D, &pfmt,
-	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : 0, true);
-      else					  
-	((csTextureMMSoftware*)txt)->CreateDynamicTexture(G3D,&pfmt,NULL,false);
-    }
+    if ((pfmt.PixelBytes == 1) && 
+       ((txt->GetFlags() & (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT))
+	 == (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT)))
+	((csTextureMMSoftware*)txt)->MapToGlobalPalette (&cmap.palette[0]);
   }
 }
 
@@ -653,15 +668,10 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
   csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
   txt->CreateMipmaps ();
   txt->remap_texture ();
-  if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
-  {
-    if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC_SHARE_HINT) == 
-	                                          CS_TEXTURE_DYNAMIC_SHARE_HINT)
-      ((csTextureMMSoftware*)txt)->CreateDynamicTexture (G3D, &pfmt,
-	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : 0, true);
-    else					  
-      ((csTextureMMSoftware*)txt)->CreateDynamicTexture(G3D, &pfmt, NULL,false);
-  }
+  if ((pfmt.PixelBytes == 1) && 
+      ((txt->GetFlags() & (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT))
+       == (CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT)))
+    ((csTextureMMSoftware*)txt)->MapToGlobalPalette (&cmap.palette[0]);
 }
 
 void csTextureManagerSoftware::UnregisterTexture (iTextureHandle* handle)
@@ -703,5 +713,57 @@ void csTextureManagerSoftware::SetPalette ()
     int b = GammaTable [cmap [i].blue];
     G2D->SetRGB (i, r, g, b);
   }
+
+  if (mG2D)
+  {
+    RGBPixel *pal = G2D->GetPalette ();
+    canvas8bit *c = mG2D;
+    while (c)
+    {
+      for (int i = 0; i < 256; i++) 
+	c->g2d->SetRGB (i, pal[i].red, pal[i].green, pal[i].blue);
+      c = c->next;
+    }
+  }
 }
 
+//----------------------------------------------------------------------------
+// Procedural texture support
+
+
+void csTextureManagerSoftware::Register8BitCanvas (iGraphics2D *g2d8bit)
+{
+  if (!mG2D)
+    mG2D = new canvas8bit (g2d8bit);
+  else
+    mG2D = new canvas8bit (g2d8bit, mG2D);
+}
+
+void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D *g2d8bit)
+{
+//    if (mG2D)
+//    {
+//      canvas8bit *last = mG2D;
+//      if (mG2D->g2d == g2d8bit)
+//      {
+//        last = last->next;
+//        delete mG2D;
+//        mG2D = last;
+//      }
+//      else
+//      {
+//        canvas8bit *dead;
+//        while (last->next)
+//        {
+//  	if (last->next->g2d == g2d8bit)
+//  	{
+//  	  dead = last->next;
+//  	  last->next = last->next->next;
+//  	  delete dead;
+//  	  break;
+//  	}
+//  	last = last->next;
+//        }     
+//      }
+//    }
+}

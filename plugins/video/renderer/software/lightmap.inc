@@ -42,15 +42,13 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
-  csTextureManagerSoftware *texman,
-  float u_min, float v_min, float u_max, float v_max)
+void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct, 
+	      csTextureMMSoftware *texmm, csTextureManagerSoftware *texman,
+	      float u_min, float v_min, float u_max, float v_max)
 {
   int mipmap = ct->mipmap;
   int mipmap_delta = (1 << mipmap);
 
-  csTextureMMSoftware *texmm =
-    (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
   csTextureSoftware *tx = (csTextureSoftware *)texmm->get_texture (mipmap);
   RGBPixel *tx_palette = texmm->GetColorMap ();
   UByte *tx_bitmap = tx->get_bitmap ();

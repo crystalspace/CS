@@ -17,7 +17,7 @@
 */
 
 /**
- * This is the dynamic texture renderer for glide.
+ * This is the procedural texture renderer for glide.
  *
  * And here is the basic idea:
  * On call of a BeginDraw we copy the texture in question into the backbuffer.
@@ -93,10 +93,6 @@ class csGlideDynamic : public iGraphics3D
   virtual iHalo *CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 			     int tx, int ty, int tw, int th);
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
-    int width, int height, csPixelFormat *pfmt, void *buffer, RGBPixel *palette,
-    int pal_size);
-
 };
 
 #endif
