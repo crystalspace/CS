@@ -337,6 +337,9 @@ bool csGraphics2DGLX::Open(const char *Title)
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap, &winattr);
 
+  XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
+  	KeyReleaseMask | StructureNotifyMask);
+
   window = XCreateWindow(dpy, WMwindow, 0, 0, Width,Height, 0 /*border*/,
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);

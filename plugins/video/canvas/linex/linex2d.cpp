@@ -201,6 +201,9 @@ bool csGraphics2DLineXLib::Open(const char *Title)
     vinfo.depth, InputOutput, visual,
     CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 
+  XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
+  	KeyReleaseMask | StructureNotifyMask);
+
   window = XCreateWindow (dpy, WMwindow, 64, 16,
     Width, Height, 0, vinfo.depth, InputOutput, visual,
     CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);

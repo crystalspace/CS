@@ -36,6 +36,9 @@ The history order has been reversed so that new features are at the top.
 	      physics, like a character or door or whatever.  The
 	      correct physical behavior will still result even
 	      though one entity isn't in the physics engine.
+	- Fixes from Mike Bond to linex2d and glx2d canvas plugins
+	  related to his latest changes. These fixes restore keyboard
+	  focus when the window pops up.
 24-Jul-2000
 	- Started work on new engine plugin. This plugin will link statically
 	  with csengine but will itself be a plugin that can be used
