@@ -165,13 +165,17 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
+  // sprcal3d is absolutely predicated upon having skeleton and misbehaves (or
+  // crashes) if the skeleton is missing, thus we must take care to only
+  // consider the mesh valid if the skeleton is present.
+  bool skel_present = false;
+
   // @@@ Temporary fix to allow to set actions for objects loaded
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
   csRef<iMeshObjectFactory> fact;
   if (context)
     fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
-  // DecRef of fact will be handled later.
   // If there was no factory we create a new one.
   if (!fact)
     fact = type->NewFactory ();
@@ -212,8 +216,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	else
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badpath",
-	    child,"dir is a required attribute of <path> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badpath", child,
+	    "dir is a required attribute of <path> token in cal3d files.");
 	  return 0;
 	}
 	break;
@@ -224,8 +228,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	if (!scale)
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badvalue",
-	    child,"value is a required attribute of <scale> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badvalue", child,
+	    "value is a required attribute of <scale> token in cal3d files.");
 	  return 0;
 	}
 	break;
@@ -254,7 +258,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  if (!newspr->LoadCoreSkeleton(vfs,file))
 	  {
-        synldr->ReportError (
+	    synldr->ReportError (
   	      "crystalspace.spritecal3dfactoryloader.parse.badfile",
 	      child,"Could not load cal3d skeleton file <%s>.",file);
 
@@ -265,10 +269,13 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	else
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"file is a required attribute of <skeleton> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile", child,
+	    "file is a required attribute of <skeleton> token in cal3d "
+	    "files.");
 	  return 0;
 	}
+	// We've loaded the skeleton
+	skel_present = true;
 	break;
       }
     case XMLTOKEN_ANIMATION:
@@ -278,8 +285,9 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	if (!name)
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"name is a required attribute of <animation> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile", child,
+	    "name is a required attribute of <animation> token in cal3d "
+	    "files.");
 	  return 0;
 	}
 	int type;
@@ -329,8 +337,9 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	else
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"file is a required attribute of <animation> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile", child,
+	    "file is a required attribute of <animation> token in cal3d "
+	    "files.");
 	  return 0;
 	}
 	break;
@@ -394,8 +403,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	else
 	{
 	  synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"file is a required attribute of <mesh> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile", child,
+	    "file is a required attribute of <mesh> token in cal3d files.");
 	  return 0;
 	}
 	break;
@@ -416,7 +425,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
             case XMLTOKEN_MORPHTARGET:
             {
               const char *mesh_name = childchild->GetAttributeValue("mesh");
-              const char *morph_name = childchild->GetAttributeValue("morphtarget");
+              const char *morph_name =
+		childchild->GetAttributeValue("morphtarget");
               newspr->AddMorphTarget(morphanimationid,mesh_name,morph_name);
             }
           }
@@ -431,7 +441,6 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
           return 0;
         break;
       }
-
     case XMLTOKEN_SOCKET:
       {
         int a = child->GetAttributeValueAsInt ("tri");
@@ -442,18 +451,23 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
         sprite_socket->SetTriangleIndex (a);
         sprite_socket->SetSubmeshIndex (submesh);
         sprite_socket->SetMeshIndex (mesh);
-    
         break;
       }
-
-      break;
-
     default:
       synldr->ReportBadToken (child);
       return 0;
     }
   }
-
+	
+  // If we haven't loaded the skeleton, report error and abort load.
+  if (!skel_present)
+  {
+    synldr->ReportError(
+      "crystalspace.spritecal3dfactoryloader.parse.badfile",
+      node, "No <skeleton> token found in cal3d file.");
+    return 0;
+  }
+    
   if (scale)
     newspr->RescaleFactory(scale);  // this calls the function below itself
   else
@@ -493,8 +507,8 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(
   else
   {
     synldr->ReportError (
-      "crystalspace.spritecal3dfactoryloader.parse.badfile",
-      child,"file is a required attribute of <material> token in cal3d files.");
+      "crystalspace.spritecal3dfactoryloader.parse.badfile", child,
+      "file is a required attribute of <material> token in cal3d files.");
     return 0;
   }
   return mat;
@@ -527,10 +541,11 @@ bool csSpriteCal3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 //TBD
 bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  if (!parent) return false; //you never know...
-  if (!obj)    return false; //you never know...
+  if (!parent || !obj)
+    return false;
  
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
   paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
@@ -538,41 +553,47 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
  
   csRef<iSpriteCal3DFactoryState> cal3dfact = 
     SCF_QUERY_INTERFACE (obj, iSpriteCal3DFactoryState);
-  csRef<iMeshObjectFactory> meshfact = SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
-/* 
+  csRef<iMeshObjectFactory> meshfact =
+    SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+#if 0
   if ( cal3dfact && meshfact )
   {
     //Write Option Tag
     int flags = cal3dfact->GetLoadFlags();
     bool rotate = flags & LOADER_ROTATE_X_AXIS;
     bool invert = flags & LOADER_INVERT_V_COORD;
-    csRef<iDocumentNode> optionNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> optionNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     optionNode->SetValue("socket");
     optionNode->SetAttribute("rotate_x_axis", (rotate)?"yes":"no");
     optionNode->SetAttribute("flip_textures", (invert)?"yes":"no");
  
     //Write Path Tag
     const char* dir = cal3dfact->GetBasePath();
-    csRef<iDocumentNode> pathNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> pathNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     pathNode->SetValue("path");
     pathNode->SetAttribute("dir", dir);
  
     //Write Scale Tag
     float scale = cal3dfact->GetScale();
-    csRef<iDocumentNode> scaleNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> scaleNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     scaleNode->SetValue("scale");
     scaleNode->SetAttributeAsFloat("value", scale);
  
     //Write Skeleton Tag
     const char* skeleton = cal3dfact->GetCoreSkeleton()->GetFileName();
-    csRef<iDocumentNode> pathNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> pathNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     pathNode->SetValue("skeleton");
     pathNode->SetAttribute("file", skeleton);
  
     //Write Material Tag
     const char* file = cal3dfact->Get...
     const char* matName = cal3dfact->Get...
-    csRef<iDocumentNode> pathNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> pathNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     pathNode->SetValue("material");
     child->SetAttribute("file", file );
     child->SetAttribute("name", matName);
@@ -580,7 +601,8 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write Mesh Tags
     for (int i=0; i<cal3dfact->GetMeshCount(); i++)
     {
-      csRef<iDocumentNode> meshNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> meshNode =
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       meshNode->SetValue("mesh");
  
       const char* meshname = cal3dfact->GetMeshName(i);
@@ -592,7 +614,8 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         const char *morph_file, *morph_name;
         cal3dfact->GetCoreMorphTarget(i,morph_file,morph_name);
  
-        csRef<iDocumentNode> morphtargetNode = meshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> morphtargetNode =
+          meshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         morphtargetNode->SetValue("morphtarget");
         meshNode->SetAttribute("name", morph_name);
         meshNode->SetAttribute("file", morph_file);
@@ -603,7 +626,8 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write MorphAnimation Tags
     for (int i=0; i<cal3dfact->GetMorphAnimationCount(); i++)
     {
-      csRef<iDocumentNode> morphNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> morphNode =
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       morphNode->SetValue("morphanimation");
  
       const char* morphname = cal3dfact->GetMorphAnimationName(i);
@@ -615,7 +639,8 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
         const char *morph_file, *morph_name;
         cal3dfact->GetCoreMorphTarget(i,morph_file,morph_name);
  
-        csRef<iDocumentNode> morphtargetNode = meshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> morphtargetNode =
+          meshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         morphtargetNode->SetValue("morphtarget");
         meshNode->SetAttribute("name", morph_name);
         meshNode->SetAttribute("file", morph_file);
@@ -629,10 +654,11 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
       bool lock;
       int  type, max_interval, min_interval, idle_pct;
       float base_vel, min_vel, max_vel;
-      cal3dfact->GetCoreAnimation(i, file, name, type, base_vel, min_vel, max_vel,
-                                  min_interval, max_interval, idle_pct, lock);
+      cal3dfact->GetCoreAnimation(i, file, name, type, base_vel,
+	min_vel, max_vel, min_interval, max_interval, idle_pct, lock);
  
-      csRef<iDocumentNode> aniNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> aniNode =
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       aniNode->SetValue("animation");
  
       aniNode->SetAttribute("name", name);
@@ -661,17 +687,19 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Write Socket Tags
     for (int i=0; i<cal3dfact->GetSocketCount(); i++)
     {
-      csRef<iDocumentNode> socketNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> socketNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       socketNode->SetValue("socket");
       iSpriteCal3DSocket* sprite_socket = cal3dfact->GetSocket(i);
       socketNode->SetAttribute("name", sprite_socket->GetName());
       socketNode->SetAttributeAsInt("tri", sprite_socket->GetTriangleIndex());
-      socketNode->SetAttributeAsInt("submesh", sprite_socket->GetSubmeshIndex());
+      socketNode->SetAttributeAsInt("submesh",
+        sprite_socket->GetSubmeshIndex());
       socketNode->SetAttributeAsInt("mesh", sprite_socket->GetMeshIndex());
     }
  
   }
- */
+#endif
   return true;
 }  
 
@@ -872,12 +900,14 @@ bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
-//TBD
+
 bool csSpriteCal3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  if (!parent) return false; //you never know...
+  if (!parent)
+    return false;
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
   paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
     ("iSaverPlugin not yet supported for cal3d mesh");

@@ -32,6 +32,12 @@ chronological order.
 	  either PTHREAD_MUTEX_TIMED or PTHREAD_MUTEX_TIMED_NP). If available,
 	  configure.ac now emits CS_PTHREAD_MUTEX_TIMED to csconfig.h with the
 	  appropriate value.
+	- Eric Sunshine applied patch to sprcal3dldr from Brian DeVries
+	  <contingencyplan@gmail.com> which prevents meshes lacking skeletons
+	  from being accepted. This is necessary because sprcal3d is absolutely
+	  predicated upon the mesh having a skeleton, and will misbehave
+	  (i.e. crash) when it is lacking. The loader also now prints an
+	  informative error message for the user rather than crashing silently.
 17-Jan-2004
 	- Eric Sunshine applied patch from Lukas Erlinghagen <erluk@web.de>
 	  which fixes crash in csSCF::RegisterClassesInt() triggered by the
