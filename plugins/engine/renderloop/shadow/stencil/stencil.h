@@ -135,7 +135,7 @@ private:
   csHash< csRef<csStencilShadowCacheEntry>, iMeshWrapper*> shadowcache;
 
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
-    iShader *shader, int pass);
+    iShader *shader, size_t shaderTicket, size_t pass);
 
   void Report (int severity, const char* msg, ...);
 

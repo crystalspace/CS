@@ -2469,12 +2469,6 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       DeactivateTexture ();
   }
 
-  int passCount = 1;
-  if (mesh.shader != 0)
-  {
-    passCount = mesh.shader->GetNumberOfPasses ();
-  }
-  
   csRenderMesh rmesh;
   //rmesh.z_buf_mode = mesh.z_buf_mode;
   rmesh.mixmode = mesh.mixmode;
@@ -2547,18 +2541,27 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   csZBufMode old_zbufmode = current_zmode;
   SetZMode (mesh.z_buf_mode);
   csRenderMeshModes modes (rmesh);
-  for (int p = 0; p < passCount; p++)
+
+  size_t shaderTicket;
+  size_t passCount = 1;
+  if (mesh.shader != 0)
+  {
+    shaderTicket = mesh.shader->GetTicket (modes, stacks);
+    passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
+  }
+
+  for (size_t p = 0; p < passCount; p++)
   {
     if (mesh.shader != 0)
     {
-      mesh.shader->ActivatePass (p);
-      mesh.shader->SetupPass (&rmesh, modes, stacks);
+      mesh.shader->ActivatePass (shaderTicket, p);
+      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
     }
     DrawMesh (&rmesh, modes, stacks);
     if (mesh.shader != 0)
     {
-      mesh.shader->TeardownPass ();
-      mesh.shader->DeactivatePass ();
+      mesh.shader->TeardownPass (shaderTicket);
+      mesh.shader->DeactivatePass (shaderTicket);
     }
   }
 

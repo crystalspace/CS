@@ -2119,7 +2119,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   }
 
   // First check if it is a zip file.
-  int pathlen = strlen (path);
+  size_t pathlen = strlen (path);
   bool is_zip = pathlen >= 5 && !strcmp (path+pathlen-4, ".zip");
   char* npath = TransformPath (path, !is_zip);
 

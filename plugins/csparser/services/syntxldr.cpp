@@ -940,6 +940,30 @@ void csTextSyntaxService::Report (const char* msgid, int severity,
   va_end (arg);
 }
 
+static const char* GetDescriptiveAttribute (iDocumentNode* n,
+					    const char*& attrName)
+{
+  static const char* descriptiveAttrs[] = {
+    "name",
+    "priority",
+    0
+  };
+
+  const char* attr;
+  const char** currentAttr = descriptiveAttrs;
+  while (*currentAttr != 0)
+  {
+    attr = n->GetAttributeValue (*currentAttr);
+    if (attr != 0)
+    {
+      attrName = *currentAttr;
+      return attr;
+    }
+    currentAttr++;
+  }
+  return 0;
+}
+
 void csTextSyntaxService::ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg)
 {
@@ -952,7 +976,8 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
   while (n)
   {
     const char* v = n->GetValue ();
-    const char* name = n->GetAttributeValue ("name");
+    const char* attrName = 0;
+    const char* name = GetDescriptiveAttribute (n, attrName);
     if (name || (v && *v))
     {
       if (first) { nodepath = nodepath; first = false; }
@@ -961,6 +986,11 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
       {
         nodepath = ")" + nodepath;
         nodepath = name + nodepath;
+	if (attrName != 0)
+	{
+	  nodepath = "=" + nodepath;
+	  nodepath = attrName + nodepath;
+	}
         nodepath = "(" + nodepath;
       }
       if (v && *v)

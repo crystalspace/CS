@@ -17,9 +17,11 @@
 	    <buffer name="vertices" destination="position" />
 	    <buffer name="colors" destination="primary color" />
 	    <buffer name="texture coordinates" destination="texture coordinate 0" />
-	    <buffer name="lightmap coordinates" destination="texture coordinate 1" />
 	    <texture name="tex diffuse" destination="unit 0" />
-	    <texture name="tex lightmap" destination="unit 1" />
+	    <?if vars."tex lightmap" ?>
+	      <buffer name="lightmap coordinates" destination="texture coordinate 1" />
+	      <texture name="tex lightmap" destination="unit 1" />
+	    <?endif?>
 	    <fp plugin="glfixed">
 		<fixedfp>
 		    <layer>
@@ -30,13 +32,15 @@
 			<alphasource num="1" source="primary color" modifier="alpha"/>
                         <alphaoperation operation="modulate" />
 		    </layer>
-		    <layer>
-			<colorsource num="0" source="previous layer" modifier="color"/>
-			<colorsource num="1" source="texture" modifier="color"/>
-			<coloroperation operation="modulate" scale="2" />
-                        <alphasource num="0" source="previous layer" modifier="alpha"/>
-                        <alphaoperation operation="replace"/>
-		    </layer>
+		    <?if vars."tex lightmap" ?>
+		      <layer>
+			  <colorsource num="0" source="previous layer" modifier="color"/>
+			  <colorsource num="1" source="texture" modifier="color"/>
+			  <coloroperation operation="modulate" scale="2" />
+			  <alphasource num="0" source="previous layer" modifier="alpha"/>
+			  <alphaoperation operation="replace"/>
+		      </layer>
+		    <?endif?>
 		</fixedfp>
 	    </fp>
 	</pass>
@@ -58,12 +62,14 @@
 	    <buffer name="texture coordinates" destination="texture coordinate 0" />
 	    <texture name="tex diffuse" destination="unit 0" />
 	</pass>
-	<pass>
-	    <mixmode><multiply2 /></mixmode><!-- @@@ probably not always desired -->
-	    <zmode><zmesh2 /></zmode>
-	    <buffer name="vertices" destination="position" />
-	    <buffer name="lightmap coordinates" destination="texture coordinate 0" />
-	    <texture name="tex lightmap" destination="unit 0" />
-	</pass>
+	<?if vars."tex lightmap" ?>
+	  <pass>
+	      <mixmode><multiply2 /></mixmode><!-- @@@ probably not always desired -->
+	      <zmode><zmesh2 /></zmode>
+	      <buffer name="vertices" destination="position" />
+	      <buffer name="lightmap coordinates" destination="texture coordinate 0" />
+	      <texture name="tex lightmap" destination="unit 0" />
+	  </pass>
+	<?endif?>
     </technique>
 </shader>

@@ -20,6 +20,12 @@ chronological order.
 	- res replaced some ints with size_ts in csPoly3D.
 	- res removed the csextern.h #inclusion from csutil/hashr.h. Not needed
 	  there.
+	- res added conditionals to XML shaders. Statements like 
+	  '<?if vars."some shader var"?>' can be placed in the shader to change
+	  its behaviour based on the presence and value of shader vars at the
+	  time the mesh is rendered.
+	- res changed the generic step to have material SVs override shader 
+	  SVs.
 21-Sep-2004
 	- Eric Sunshine fixed a bug in the "subsystem"-related change to
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:

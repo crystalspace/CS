@@ -84,7 +84,7 @@ struct iShaderVariableContext : public iBase
   }
 
   /// Get Array of all ShaderVariables
-  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const =0;
+  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const = 0;
 
   /**
   * Push the variables of this context onto the variable stacks
@@ -181,11 +181,11 @@ struct iShaderRenderInterface : public iBase
   virtual void* GetPrivateObject(const char* name) = 0;
 };
 
-SCF_VERSION (iShader, 0, 1, 0);
+SCF_VERSION (iShader, 0, 3, 0);
 
 /**
  * Specific shader. Can/will be either render-specific or general
- * The shader in this form is "compiled" and cannot be modified
+ * The shader in this form is "compiled" and cannot be modified.
  */
 struct iShader : public iShaderVariableContext
 {
@@ -198,25 +198,38 @@ struct iShader : public iShaderVariableContext
   /// Set name of the File where it was loaded from.
   virtual void SetFileName (const char* filename) = 0;
 
+  /**
+   * Query a "shader ticket".
+   * Internally, a shader may choose one of several actual techniques
+   * or variants at runtime. However, the variant has to be known in
+   * order to determine the number of passes or to do pass preparation.
+   * As the decision what variant is to be used is made based on the
+   * mesh modes and the shader vars used for rendering, those have
+   * to be provided to get the actual variant, which is then identified
+   * by the "ticket".
+   */
+  virtual size_t GetTicket (const csRenderMeshModes& modes,
+    const csShaderVarStack& stacks) = 0;
+
   /// Get number of passes this shader have
-  virtual int GetNumberOfPasses() = 0;
+  virtual size_t GetNumberOfPasses (size_t ticket) = 0;
 
   /// Activate a pass for rendering
-  virtual bool ActivatePass(unsigned int number) = 0;
+  virtual bool ActivatePass (size_t ticket, size_t number) = 0;
 
   /// Setup a pass
-  virtual bool SetupPass (const csRenderMesh *mesh,
+  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks) = 0;
+    const csShaderVarStack& stacks) = 0;
 
   /**
    * Tear down current state, and prepare for a new mesh 
    * (for which SetupPass is called)
    */
-  virtual bool TeardownPass() = 0;
+  virtual bool TeardownPass (size_t ticket) = 0;
 
   /// Completly deactivate a pass
-  virtual bool DeactivatePass() = 0;
+  virtual bool DeactivatePass (size_t ticket) = 0;
 };
 
 
@@ -227,9 +240,9 @@ SCF_VERSION (iShaderPriorityList, 0,0,1);
 struct iShaderPriorityList : public iBase
 {
   /// Get number of priorities.
-  virtual int GetCount () const = 0;
+  virtual size_t GetCount () const = 0;
   /// Get priority.
-  virtual int GetPriority (int idx) const = 0;
+  virtual int GetPriority (size_t idx) const = 0;
 };
 
 SCF_VERSION (iShaderCompiler, 0,0,1);

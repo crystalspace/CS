@@ -30,6 +30,10 @@
 #include "iutil/objreg.h"
 #include "../../common/shaderplugin.h"
 
+#include "expparser.h"
+#include "docwrap.h"
+#include "condeval.h"
+
 class csXMLShaderCompiler;
 class csXMLShader;
 
@@ -105,9 +109,9 @@ private:
 
   //Array of passes
   shaderPass* passes;
-  unsigned int passesCount;
+  size_t passesCount;
 
-  unsigned int currentPass;
+  size_t currentPass;
 
   csXMLShader* parent;
   const csStringHash& xmltokens;
@@ -117,11 +121,11 @@ private:
   // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, shaderPass *pass);
   // load a shaderdefinition block
-  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
+  //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iDocumentNode *node, shaderPass *pass);
   // Set reason for failure.
-  void SetFailReason (const char* reason, ...);
+  void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
   int GetPassNumber (shaderPass* pass);
 public:
@@ -130,9 +134,9 @@ public:
   csXMLShaderTech (csXMLShader* parent);
   ~csXMLShaderTech();
 
-  int GetNumberOfPasses()
+  size_t GetNumberOfPasses()
   { return passesCount; }
-  bool ActivatePass (unsigned int number);
+  bool ActivatePass (size_t number);
   bool SetupPass  (const csRenderMesh *mesh,
     csRenderMeshModes& modes,
     const csShaderVarStack &stacks);
@@ -145,14 +149,133 @@ public:
   { return fail_reason.GetData(); }
 };
 
+struct csRealConditionNode
+{
+  csConditionID condition;
+  size_t variant;
+
+  csRealConditionNode* trueNode;
+  csRealConditionNode* falseNode;
+
+  csRealConditionNode ()
+  {
+    condition = csCondAlwaysTrue;
+    variant = csArrayItemNotFound;
+    trueNode = falseNode = 0;
+  }
+};
+
+/**
+ * A node in the condition tree.
+ * 'Clients' of the condition tree only see single nodes, although
+ * it may be backed by multiple nodes in the actual tree. (Happens
+ * if nodes need to be inserted into multiple locations in the actual
+ * tree, when multiple conditions are on the same level - the tree
+ * is just binary, after all.)
+ */
+struct csConditionNode
+{
+  csPDelArray<csRealConditionNode> nodes;
+};
+
+/**
+ * An implementation of the callback used by csWrappedDocumentNode.
+ */
+class csShaderConditionResolver : public iConditionResolver
+{
+  csExpressionTokenizer tokenizer;
+  csExpressionParser parser;
+  csConditionEvaluator evaluator;
+  
+  csPDelArray<csConditionNode> condNodes;
+  csConditionNode* rootNode;
+  size_t nextVariant;
+
+  const csRenderMeshModes* modes;
+  const csShaderVarStack* stacks;
+
+  csString lastError;
+  const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
+  csConditionNode* NewNode ();
+  csConditionNode* GetRoot ();
+  
+  void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
+    csConditionNode* trueNode, csConditionNode* falseNode);
+public:
+  csShaderConditionResolver (csXMLShader* shader);
+  virtual ~csShaderConditionResolver ();
+
+  virtual const char* ParseCondition (const char* str, size_t len, 
+    csConditionID& result);
+  virtual bool Evaluate (csConditionID condition);
+  virtual void AddNode (csConditionNode* parent,
+    csConditionID condition, csConditionNode*& trueNode, 
+    csConditionNode*& falseNode);
+
+  void SetEvalParams (const csRenderMeshModes* modes,
+    const csShaderVarStack* stacks);
+  size_t GetVariant ();
+};
+
 class csXMLShader : public iShader, public csObject
 {
+  friend class csShaderConditionResolver;
+
+  csRef<iDocumentNode> shaderSource;
+  char* vfsStartDir;
+  int forcepriority;
+
+  // struct to hold all techniques, until we decide which to use
+  struct TechniqueKeeper
+  {
+    TechniqueKeeper(iDocumentNode *n, unsigned int p) : 
+      node(n), priority(p), tagPriority(0)
+    {}
+    csRef<iDocumentNode> node;
+    unsigned int priority;
+    int tagPriority;
+  };
+
+  // Scan all techniques in the document.
+  void ScanForTechniques (iDocumentNode* templ,
+    csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
+  
+  static int CompareTechniqueKeeper (TechniqueKeeper const&,
+				     TechniqueKeeper const&);
+
+  csXMLShaderTech* activeTech;
+  csShaderConditionResolver* resolver;
+  struct ShaderVariant
+  {
+    csXMLShaderTech* tech;
+    bool prepared;
+
+    ShaderVariant() 
+    {
+      tech = 0;
+      prepared = false;
+    }
+  };
+  csArray<ShaderVariant> variants;
+
+  csShaderVariableContext globalSVContext;
+  void ParseGlobalSVs ();
+
+  csShaderVariableContext& GetUsedSVContext ()
+  {
+    return activeTech ? activeTech->svcontext : globalSVContext;
+  }
+  const csShaderVariableContext& GetUsedSVContext () const
+  {
+    return activeTech ? activeTech->svcontext : globalSVContext;
+  }
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
-  csXMLShader (csXMLShaderCompiler* compiler);
+  csXMLShader (csXMLShaderCompiler* compiler, iDocumentNode* source,
+    int forcepriority);
   virtual ~csXMLShader();
 
   virtual iObject* QueryObject () 
@@ -166,32 +289,43 @@ public:
   void SetFileName (const char* filename)
   { this->filename = csStrNew(filename); }
 
+  virtual size_t GetTicket (const csRenderMeshModes& modes,
+    const csShaderVarStack& stacks);
+
   /// Get number of passes this shader have
-  virtual int GetNumberOfPasses ()
+  virtual size_t GetNumberOfPasses (size_t ticket)
   {
-    return activeTech->GetNumberOfPasses();
+    csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
+      variants[ticket].tech : 0;
+    return tech ? tech->GetNumberOfPasses () : 0;
   }
 
   /// Activate a pass for rendering
-  virtual bool ActivatePass (unsigned int number)
-  { return activeTech->ActivatePass (number); }
+  virtual bool ActivatePass (size_t ticket, size_t number);
 
   /// Setup a pass.
-  virtual bool SetupPass (const csRenderMesh *mesh,
+  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
     csRenderMeshModes& modes,
     const csShaderVarStack &stacks)
-  { return activeTech->SetupPass (mesh, modes, stacks); }
+  { 
+    CS_ASSERT_MSG ("A pass must be activated prior calling SetupPass()",
+      activeTech);
+    return activeTech->SetupPass (mesh, modes, stacks); 
+  }
 
   /**
-  * Tear down current state, and prepare for a new mesh 
-  * (for which SetupPass is called)
-  */
-  virtual bool TeardownPass ()
-  { return activeTech->TeardownPass(); }
+   * Tear down current state, and prepare for a new mesh 
+   * (for which SetupPass is called)
+   */
+  virtual bool TeardownPass (size_t ticket)
+  { 
+    CS_ASSERT_MSG ("A pass must be activated prior calling TeardownPass()",
+      activeTech);
+    return activeTech->TeardownPass(); 
+  }
 
   /// Completly deactivate a pass
-  virtual bool DeactivatePass ()
-  { return activeTech->DeactivatePass(); }
+  virtual bool DeactivatePass (size_t ticket);	
 
   friend class csXMLShaderCompiler;
 
@@ -199,11 +333,15 @@ public:
 
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
-  { activeTech->svcontext.AddVariable (variable); }
+  { 
+    GetUsedSVContext().AddVariable (variable); 
+  }
 
   /// Get a named variable from this context
   csShaderVariable* GetVariable (csStringID name) const
-  { return activeTech->svcontext.GetVariable (name); }
+  { 
+    return GetUsedSVContext().GetVariable (name); 
+  }
 
   /// Get Array of all ShaderVariables
   const csRefArray<csShaderVariable>& GetShaderVariables () const
@@ -214,21 +352,30 @@ public:
   * supplied in the "stacks" argument
   */
   void PushVariables (csShaderVarStack &stacks) const
-  { activeTech->svcontext.PushVariables (stacks); }
+  { 
+    GetUsedSVContext().PushVariables (stacks); 
+  }
 
   /**
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
   void PopVariables (csShaderVarStack &stacks) const
-  { activeTech->svcontext.PopVariables (stacks); }
+  { 
+    GetUsedSVContext().PopVariables (stacks); 
+  }
 
 public:
   //Holders
   csXMLShaderCompiler* compiler;
-  csXMLShaderTech* activeTech;
   csRef<iGraphics3D> g3d;
+  csWeakRef<iShaderManager> shadermgr;
   char* filename;
+
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
+#include "cstool/tokenlist.h"
 };
 
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent
@@ -262,10 +409,12 @@ public:
 		  iDocumentNode* templ);
 
   void Report (int severity, const char* msg, ...);
-private:
 
+  bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
+private:
+  
   // struct to hold all techniques, until we decide which to use
-  struct TechniqueKeeper
+  /*struct TechniqueKeeper
   {
     TechniqueKeeper(iDocumentNode *n, unsigned int p) : 
       node(n), priority(p), tagPriority(0)
@@ -280,8 +429,8 @@ private:
 	csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
   
   static int CompareTechniqueKeeper (TechniqueKeeper const&,
-				     TechniqueKeeper const&);
-
+				     TechniqueKeeper const&);*/
+  
 public:
   bool do_verbose;
   /// XML Token and management
@@ -292,7 +441,8 @@ public:
   csRef<iStringSet> strings;
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
-  csWeakRef<iShaderManager> shadermgr;
+  csRef<iVFS> vfs;
+  //csWeakRef<iShaderManager> shadermgr;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

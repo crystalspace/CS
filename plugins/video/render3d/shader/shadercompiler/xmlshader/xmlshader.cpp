@@ -28,6 +28,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/scfstrset.h"
 #include "csutil/xmltiny.h"
+
 #include "xmlshader.h"
 
 CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech)
@@ -80,7 +81,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
  
   if (varNode)
-    LoadSVBlock (varNode, &pass->svcontext);
+    parent->compiler->LoadSVBlock (varNode, &pass->svcontext);
 
   //load vp
   csRef<iDocumentNode> programNode;
@@ -382,11 +383,13 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   return true;
 }
 
-bool csXMLShaderTech::LoadSVBlock (iDocumentNode *node,
+/*bool csXMLShaderTech::LoadSVBlock (iDocumentNode *node,
+  iShaderVariableContext *context)*/
+bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   iShaderVariableContext *context)
 {
-  iStringSet* strings = parent->compiler->strings;
-  iSyntaxService* synldr = parent->compiler->synldr;
+  //iStringSet* strings = parent->compiler->strings;
+  //iSyntaxService* synldr = parent->compiler->synldr;
 
   csRef<csShaderVariable> svVar;
   
@@ -506,7 +509,7 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
   }
 
   iStringSet* strings = parent->compiler->strings;
-  iShaderManager* shadermgr = parent->compiler->shadermgr;
+  iShaderManager* shadermgr = parent->shadermgr;
 
   int requiredCount;
   const csSet<csStringID>& requiredTags = 
@@ -558,14 +561,14 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
     csRef<iDocumentNode> varNode = parentSV->GetNode(
       xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
     if (varNode)
-      LoadSVBlock (varNode, &svcontext);
+      parent->compiler->LoadSVBlock (varNode, &svcontext);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
 
   if (varNode)
-    LoadSVBlock (varNode, &svcontext);
+    parent->compiler->LoadSVBlock (varNode, &svcontext);
 
   //alloc passes
   passes = new shaderPass[passesCount];
@@ -792,6 +795,201 @@ void csXMLShaderTech::SetFailReason (const char* reason, ...)
 
 //---------------------------------------------------------------------------
 
+csShaderConditionResolver::csShaderConditionResolver (csXMLShader* shader) :
+  evaluator (shader->compiler->strings)
+{
+  rootNode = 0;
+  nextVariant = 0;
+  SetEvalParams (0, 0);
+}
+
+csShaderConditionResolver::~csShaderConditionResolver ()
+{
+}
+
+const char* csShaderConditionResolver::SetLastError (const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  lastError.FormatV (msg, args);
+  va_end (args);
+  return lastError;
+}
+
+const char* csShaderConditionResolver::ParseCondition (const char* str, 
+						       size_t len, 
+						       csConditionID& result)
+{
+  csExpressionTokenList tokens;
+  const char* err = tokenizer.Tokenize (str, len, tokens);
+  if (err)
+    return SetLastError ("Tokenization: %s", err);
+  csExpression* newExpression;
+  err = parser.Parse (tokens, newExpression);
+  if (err)
+  {
+    delete newExpression;
+    return SetLastError ("Parsing: %s", err);
+  }
+
+  err = evaluator.ProcessExpression (newExpression, result);
+  delete newExpression;
+  if (err)
+    return SetLastError ("Processing: %s", err);
+
+  return 0;
+}
+
+bool csShaderConditionResolver::Evaluate (csConditionID condition)
+{
+  const csRenderMeshModes* modes = csShaderConditionResolver::modes;
+  const csShaderVarStack* stacks = csShaderConditionResolver::stacks;
+
+  return evaluator.Evaluate (condition, modes ? *modes : csRenderMeshModes(),
+    stacks ? *stacks : csShaderVarStack ());
+}
+
+csConditionNode* csShaderConditionResolver::NewNode ()
+{
+  csConditionNode* newNode = new csConditionNode;
+  condNodes.Push (newNode);
+  return newNode;
+}
+
+csConditionNode* csShaderConditionResolver::GetRoot ()
+{
+  if (rootNode == 0)
+    rootNode = NewNode ();
+  return rootNode;
+}
+
+void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode, 
+					       csConditionID condition, 
+					       csConditionNode* trueNode, 
+					       csConditionNode* falseNode)
+{
+  if (realNode->variant != csArrayItemNotFound)
+  {
+    /* There's a variant assigned, (!= csArrayItemNotFound)
+       un-assign variant but assign condition */
+    csRealConditionNode* realTrueNode = new csRealConditionNode;
+    realNode->trueNode = realTrueNode;
+    trueNode = NewNode ();
+    realTrueNode->variant = realNode->variant;
+    trueNode->nodes.Push (realTrueNode);
+
+    csRealConditionNode* realFalseNode = new csRealConditionNode;
+    realNode->falseNode = realFalseNode;
+    falseNode = NewNode ();
+    realFalseNode->variant = nextVariant++;
+    falseNode->nodes.Push (realFalseNode);
+
+    realNode->condition = condition;
+    realNode->variant = csArrayItemNotFound;
+  }
+  else
+  {
+    /* There's no variant assigned, recursively add condition
+      to T&F children */
+    AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
+    AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
+  }
+}
+
+void csShaderConditionResolver::AddNode (csConditionNode* parent,
+					 csConditionID condition, 
+					 csConditionNode*& trueNode,
+					 csConditionNode*& falseNode)
+{
+  if (rootNode == 0)
+  {
+    // This is the first condition, new node gets root
+    CS_ASSERT_MSG ("No root but parent? Weird.", parent == 0);
+    parent = GetRoot ();
+
+    csRealConditionNode* realNode = new csRealConditionNode;
+    realNode->condition = condition;
+    parent->nodes.Push (realNode);
+
+    csRealConditionNode* realTrueNode = new csRealConditionNode;
+    realNode->trueNode = realTrueNode;
+    realTrueNode->variant = nextVariant++;
+    trueNode = NewNode ();
+    trueNode->nodes.Push (realTrueNode);
+
+    csRealConditionNode* realFalseNode = new csRealConditionNode;
+    realNode->falseNode = realFalseNode;
+    realFalseNode->variant = nextVariant++;
+    falseNode = NewNode ();
+    falseNode->nodes.Push (realFalseNode);
+  }
+  else
+  {
+    if (parent == 0)
+      parent = GetRoot ();
+
+    trueNode = NewNode ();
+    falseNode = NewNode ();
+
+    const size_t n = parent->nodes.Length ();
+    for (size_t i = 0; i < n; i++)
+    {
+      if (parent->nodes[i]->condition == condition)
+      {
+	trueNode->nodes.Push (parent->nodes[i]->trueNode);
+	falseNode->nodes.Push (parent->nodes[i]->falseNode);
+      }
+      else
+      {
+	AddToRealNode (parent->nodes[i], condition, 
+	  trueNode, falseNode);
+      }
+    }
+  }
+}
+
+void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
+					       const csShaderVarStack* stacks)
+{
+  csShaderConditionResolver::modes = modes;
+  csShaderConditionResolver::stacks = stacks;
+}
+
+size_t csShaderConditionResolver::GetVariant ()
+{
+  const csRenderMeshModes& modes = *csShaderConditionResolver::modes;
+  const csShaderVarStack& stacks = *csShaderConditionResolver::stacks;
+
+  if (rootNode == 0)
+  {
+    return 0;
+  }
+  else
+  {
+    CS_ASSERT (rootNode->nodes.Length () == 1);
+
+    csRealConditionNode* currentRoot = 0;
+    csRealConditionNode* nextRoot = rootNode->nodes[0];
+
+    while (nextRoot != 0)
+    {
+      currentRoot = nextRoot;
+      if (evaluator.Evaluate (currentRoot->condition, modes, stacks))
+      {
+	nextRoot = currentRoot->trueNode;
+      }
+      else
+      {
+	nextRoot = currentRoot->falseNode;
+      }
+    }
+    CS_ASSERT (currentRoot != 0);
+    return currentRoot->variant;
+  }
+}
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 
 SCF_IMPLEMENT_IBASE(csXMLShaderCompiler)
@@ -830,6 +1028,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     object_reg, "crystalspace.shared.stringset", iStringSet);
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   if (!synldr)
@@ -858,102 +1057,16 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-int csXMLShaderCompiler::CompareTechniqueKeeper (
-  TechniqueKeeper const& t1, TechniqueKeeper const& t2)
-{
-  int v = t2.priority - t1.priority;
-  if (v == 0) v = t2.tagPriority - t1.tagPriority;
-  return v;
-}
-
-void csXMLShaderCompiler::ScanForTechniques (iDocumentNode* templ,
-		csArray<TechniqueKeeper>& techniquesTmp,
-		int forcepriority)
-{
-  csRef<iDocumentNodeIterator> it = templ->GetNodes();
-
-  // Read in the techniques.
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () == CS_NODE_ELEMENT &&
-      xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
-    {
-      //save it
-      unsigned int p = child->GetAttributeValueAsInt ("priority");
-      if (forcepriority != -1 && int (p) != forcepriority) continue;
-      TechniqueKeeper keeper (child, p);
-      // Compute the tag's priorities.
-      csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
-      while (tagIt->HasNext ())
-      {
-	csRef<iDocumentNode> tag = tagIt->Next ();
-	csStringID tagID = strings->Request (tag->GetContentsValue ());
-
-	csShaderTagPresence presence;
-	int priority;
-	shadermgr->GetTagOptions (tagID, presence, priority);
-	if (presence == TagNeutral)
-	{
-	  keeper.tagPriority += priority;
-	}
-      }
-      techniquesTmp.Push (keeper);
-    }
-  }
-
-  techniquesTmp.Sort (&CompareTechniqueKeeper);
-}
-
 csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
 		int forcepriority)
 {
   if (!ValidateTemplate (templ))
     return 0;
   
-  shadermgr = CS_QUERY_REGISTRY (objectreg, iShaderManager);
-  CS_ASSERT (shadermgr); // Should be present - loads us, after all
-
-  csArray<TechniqueKeeper> techniquesTmp;
-  ScanForTechniques (templ, techniquesTmp, forcepriority);
-
-  //now try to load them one in a time, until we are successful
+  // Create a shader. The actual loading happens later.
   csRef<csXMLShader> shader;
-  shader.AttachNew (new csXMLShader (this));
+  shader.AttachNew (new csXMLShader (this, templ, forcepriority));
   shader->SetName (templ->GetAttributeValue ("name"));
-  csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-  while (techIt.HasNext ())
-  {
-    TechniqueKeeper tk = techIt.Next();
-    csXMLShaderTech* tech = new csXMLShaderTech (shader);
-    if (tech->Load (tk.node, templ))
-    {
-      if (do_verbose)
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Shader '%s': Technique with priority %d succeeds!",
-	  shader->GetName(), tk.priority);
-      shader->activeTech = tech;
-      break;
-    }
-    else
-    {
-      if (do_verbose)
-      {
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Shader '%s': Technique with priority %d fails. Reason: %s.",
-	  shader->GetName(), tk.priority, tech->GetFailReason());
-      }
-      delete tech;
-    }
-  }
-
-  if (shader->activeTech == 0)
-  {
-    // @@@ Or a warning instead?
-    Report (CS_REPORTER_SEVERITY_WARNING,
-      "No technique validated for shader '%s'", shader->GetName());
-    return 0;
-  }
 
   csRef<iShader> ishader (shader);
   return csPtr<iShader> (ishader);
@@ -973,8 +1086,8 @@ public:
   }
 
   SCF_DECLARE_IBASE;
-  virtual int GetCount () const { return priorities.Length (); }
-  virtual int GetPriority (int idx) const { return priorities[idx]; }
+  virtual size_t GetCount () const { return priorities.Length (); }
+  virtual int GetPriority (size_t idx) const { return priorities[idx]; }
 };
 
 SCF_IMPLEMENT_IBASE (csShaderPriorityList)
@@ -984,7 +1097,7 @@ SCF_IMPLEMENT_IBASE_END
 csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
 	iDocumentNode* templ)
 {
-  csArray<TechniqueKeeper> techniquesTmp;
+  /*csArray<TechniqueKeeper> techniquesTmp;
   ScanForTechniques (templ, techniquesTmp, -1);
   csShaderPriorityList* list = new csShaderPriorityList ();
   csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
@@ -993,7 +1106,8 @@ csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
     TechniqueKeeper tk = techIt.Next();
     list->priorities.Push (tk.priority);
   }
-  return csPtr<iShaderPriorityList> (list);
+  return csPtr<iShaderPriorityList> (list);*/
+  return 0;
 }
 
 bool csXMLShaderCompiler::ValidateTemplate(iDocumentNode *templ)
@@ -1042,16 +1156,209 @@ SCF_IMPLEMENT_IBASE_EXT(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csXMLShader::csXMLShader (csXMLShaderCompiler* compiler)
+csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
+			  iDocumentNode* source,
+			  int forcepriority)
 {
+  init_token_table (xmltokens);
+
   activeTech = 0;
+  filename = 0;
   csXMLShader::compiler = compiler;
   g3d = compiler->g3d;
-  filename = 0;
+  csXMLShader::forcepriority = forcepriority;
+
+  shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
+  CS_ASSERT (shadermgr); // Should be present - loads us, after all
+
+  resolver = new csShaderConditionResolver (this);
+  csRef<iDocumentNode> wrappedNode;
+  wrappedNode.AttachNew (new csWrappedDocumentNode (compiler->objectreg, 
+    source, resolver));
+  shaderSource = wrappedNode;
+  vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
+
+  ParseGlobalSVs ();
 }
 
 csXMLShader::~csXMLShader ()
 {
   if (filename) delete [] filename;
   delete activeTech;
+  delete resolver;
+  delete[] vfsStartDir;
+}
+
+int csXMLShader::CompareTechniqueKeeper (
+  TechniqueKeeper const& t1, TechniqueKeeper const& t2)
+{
+  int v = t2.priority - t1.priority;
+  if (v == 0) v = t2.tagPriority - t1.tagPriority;
+  return v;
+}
+
+void csXMLShader::ScanForTechniques (iDocumentNode* templ,
+		csArray<TechniqueKeeper>& techniquesTmp,
+		int forcepriority)
+{
+  csRef<iDocumentNodeIterator> it = templ->GetNodes();
+
+  // Read in the techniques.
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () == CS_NODE_ELEMENT &&
+      xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
+    {
+      //save it
+      unsigned int p = child->GetAttributeValueAsInt ("priority");
+      if (forcepriority != -1 && int (p) != forcepriority) continue;
+      TechniqueKeeper keeper (child, p);
+      // Compute the tag's priorities.
+      csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
+      while (tagIt->HasNext ())
+      {
+	csRef<iDocumentNode> tag = tagIt->Next ();
+	csStringID tagID = compiler->strings->Request (tag->GetContentsValue ());
+
+	csShaderTagPresence presence;
+	int priority;
+	shadermgr->GetTagOptions (tagID, presence, priority);
+	if (presence == TagNeutral)
+	{
+	  keeper.tagPriority += priority;
+	}
+      }
+      techniquesTmp.Push (keeper);
+    }
+  }
+
+  techniquesTmp.Sort (&CompareTechniqueKeeper);
+}
+
+/**
+ * A wrapped class to have a csShaderVarStack synced to an
+ * iShaderVariableContext*.
+ */
+class SVCWrapper : public iShaderVariableContext
+{
+  iShaderVariableContext* wrappedSVC;
+public:
+  csShaderVarStack svStack;
+
+  SCF_DECLARE_IBASE;
+  SVCWrapper (iShaderVariableContext* wrappedSVC)
+  {
+    SCF_CONSTRUCT_IBASE(0);
+    SVCWrapper::wrappedSVC = wrappedSVC;
+    wrappedSVC->PushVariables (svStack);
+  }
+  virtual ~SVCWrapper ()
+  {
+    wrappedSVC->PopVariables (svStack);
+    SCF_DESTRUCT_IBASE();
+  }
+
+  virtual void AddVariable (csShaderVariable *variable)
+  {
+    wrappedSVC->PopVariables (svStack);
+    wrappedSVC->AddVariable (variable);
+    wrappedSVC->PushVariables (svStack);
+  }
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  { return wrappedSVC->GetVariable (name); }
+  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return wrappedSVC->GetShaderVariables (); }
+  virtual void PushVariables (csShaderVarStack &stacks) const
+  { wrappedSVC->PushVariables (stacks); }
+  virtual void PopVariables (csShaderVarStack &stacks) const
+  { wrappedSVC->PopVariables (stacks); }
+};
+
+SCF_IMPLEMENT_IBASE(SVCWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
+SCF_IMPLEMENT_IBASE_END
+
+void csXMLShader::ParseGlobalSVs ()
+{
+  SVCWrapper wrapper (&globalSVContext);
+  resolver->SetEvalParams (0, &wrapper.svStack);
+  compiler->LoadSVBlock (shaderSource, &wrapper);
+  resolver->SetEvalParams (0, 0);
+}
+
+size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
+			       const csShaderVarStack& stacks)
+{
+  resolver->SetEvalParams (&modes, &stacks);
+  size_t vi = resolver->GetVariant (/*modes, stacks*/);
+
+  if (vi != csArrayItemNotFound)
+  {
+    ShaderVariant& var = variants.GetExtend (vi);
+
+    if (!var.prepared)
+    {
+      // So external files are found correctly
+      compiler->vfs->PushDir ();
+      compiler->vfs->ChDir (vfsStartDir);
+
+      csArray<TechniqueKeeper> techniquesTmp;
+      ScanForTechniques (shaderSource, techniquesTmp, forcepriority);
+
+      csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
+      while (techIt.HasNext ())
+      {
+	TechniqueKeeper tk = techIt.Next();
+	csXMLShaderTech* tech = new csXMLShaderTech (this);
+	if (tech->Load (tk.node, shaderSource))
+	{
+	  if (compiler->do_verbose)
+	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "Shader '%s': Technique with priority %d succeeds!",
+	      GetName(), tk.priority);
+	  var.tech = tech;
+	  break;
+	}
+	else
+	{
+	  if (compiler->do_verbose)
+	  {
+	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "Shader '%s': Technique with priority %d fails. Reason: %s.",
+	      GetName(), tk.priority, tech->GetFailReason());
+	  }
+	  delete tech;
+	}
+      }
+      compiler->vfs->PopDir ();
+
+      if (var.tech == 0)
+      {
+	// @@@ Or a warning instead?
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "No technique validated for shader '%s'", GetName());
+      }
+
+      var.prepared = true;
+    }
+  }
+  resolver->SetEvalParams (0, 0);
+  return vi;
+}
+
+bool csXMLShader::ActivatePass (size_t ticket, size_t number)
+{ 
+  CS_ASSERT_MSG ("ActivatePass() has already been called.",
+    activeTech == 0);
+  activeTech = (ticket != csArrayItemNotFound) ? variants[ticket].tech :
+    0;
+  return activeTech ? activeTech->ActivatePass (number) : false;
+}
+
+bool csXMLShader::DeactivatePass (size_t ticket)
+{ 
+  bool ret = activeTech ? activeTech->DeactivatePass() : false; 
+  activeTech = 0;
+  return ret;
 }

@@ -34,6 +34,7 @@
 #include "ivideo/material.h"
 #include "imesh/object.h"
 #include "iengine/portalcontainer.h"
+#include "csutil/sysfunc.h"
 
 #include "generic.h"
 
@@ -167,6 +168,9 @@ csGenericRenderStep::csGenericRenderStep (
   o2c_vector_name = strings->Request ("object2camera vector");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
+  
+  shadervars.GetVariableAdd (o2c_matrix_name);
+  shadervars.GetVariableAdd (o2c_vector_name);
 }
 
 csGenericRenderStep::~csGenericRenderStep ()
@@ -175,10 +179,10 @@ csGenericRenderStep::~csGenericRenderStep ()
 }
 
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
-                                        iShader* shader, 
+                                        iShader* shader, size_t ticket,
                                         csRenderMesh** meshes, 
                                         int num,
-                                        csShaderVarStack &stacks)
+                                        csShaderVarStack& stacks)
 {
   if (num == 0) return;
   ToggleStepSettings (g3d, true);
@@ -189,11 +193,10 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 
   iMaterial *material = 0;
   
-  
-  int numPasses = shader->GetNumberOfPasses ();
-  for (int p=0; p < numPasses; p++)
+  size_t numPasses = shader->GetNumberOfPasses (ticket);
+  for (size_t p = 0; p < numPasses; p++)
   {
-    shader->ActivatePass (p);
+    shader->ActivatePass (ticket, p);
 
     int j;
     for (j = 0; j < num; j++)
@@ -202,41 +205,41 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       if ((!portalTraversal) && mesh->portal != 0) continue;
       csShaderVariable *sv;
       
-      sv = shadervars.GetVariableAdd (o2c_matrix_name);
+      sv = shadervars.GetVariable (o2c_matrix_name);
       sv->SetValue (mesh->object2camera.GetO2T ());
-      sv = shadervars.GetVariableAdd (o2c_vector_name);
+      sv = shadervars.GetVariable (o2c_vector_name);
       sv->SetValue (mesh->object2camera.GetO2TTranslation ());
 
       if (mesh->material->GetMaterial () != material)
       {
         if (material != 0)
         {
-          shader->PopVariables (stacks);
           material->PopVariables (stacks);
+          shader->PopVariables (stacks);
         }
         material = mesh->material->GetMaterial ();
-        material->PushVariables (stacks);
         shader->PushVariables (stacks);
+        material->PushVariables (stacks);
       }
       shadervars.PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
       
       csRenderMeshModes modes (*mesh);
-      shader->SetupPass (mesh, modes, stacks);
+      shader->SetupPass (ticket, mesh, modes, stacks);
       g3d->DrawMesh (mesh, modes, stacks);
-      shader->TeardownPass ();
+      shader->TeardownPass (ticket);
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
       shadervars.PopVariables (stacks);
     }
-    shader->DeactivatePass ();
+    shader->DeactivatePass (ticket);
   }
 
   if (material != 0)
   {
-    shader->PopVariables (stacks);
     material->PopVariables (stacks);
+    shader->PopVariables (stacks);
   }
 }
 
@@ -266,6 +269,70 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
   }
 }
 
+class ShaderTicketHelper
+{
+  csShaderVarStack& stacks;
+  csShaderVariableContext& shadervars;
+
+  iMaterial* lastMat;
+  iShader* lastShader;
+  size_t matShadTicket;
+
+  void Reset ()
+  {
+    matShadTicket = (size_t)~0;
+  }
+public:
+  ShaderTicketHelper (csShaderVarStack& Stacks,
+    csShaderVariableContext& svcontext) : stacks (Stacks), 
+    shadervars (svcontext)
+  {
+    lastMat = 0;
+    lastShader = 0;
+    Reset ();
+  }
+
+  size_t GetTicket (iMaterial* material, iShader* shader, 
+    csRenderMesh* mesh)
+  {
+    if ((material != lastMat) || (shader != lastShader))
+    {
+      Reset ();
+      lastMat = material;
+      lastShader = shader;
+    }
+    if (mesh->variablecontext.IsValid ())
+    {
+      shader->PushVariables (stacks);
+      material->PushVariables (stacks);
+      mesh->variablecontext->PushVariables (stacks);
+      shadervars.PushVariables (stacks);
+      csRenderMeshModes modes (*mesh);
+      size_t retTicket = shader->GetTicket (modes, stacks);
+      shadervars.PopVariables (stacks);
+      mesh->variablecontext->PopVariables (stacks);
+      material->PopVariables (stacks);
+      shader->PopVariables (stacks);
+      return retTicket;
+    }
+    else
+    {
+      if (matShadTicket == (size_t)~0)
+      {
+        shader->PushVariables (stacks);
+        material->PushVariables (stacks);
+	shadervars.PushVariables (stacks);
+	csRenderMeshModes modes (*mesh);
+	matShadTicket = shader->GetTicket (modes, stacks);
+	shadervars.PopVariables (stacks);
+	material->PopVariables (stacks);
+	shader->PopVariables (stacks);
+      }
+      return matShadTicket;
+    }
+  }
+};
+
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 				   iLight* light,
                                    csShaderVarStack &stacks)
@@ -282,13 +349,14 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     meshlist->CullToSphere (sphere);
   }
 #endif
-  int num = meshlist->SortMeshLists ();
+  size_t num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   meshlist->GetSortedMeshes (sameShaderMeshes);
  
-  int lastidx = 0;
-  int numSSM = 0;
+  size_t lastidx = 0;
+  size_t numSSM = 0;
   iShader* shader = 0;
+  size_t currentTicket = ~0;
 
   csRef<csShaderVariable> sv;
   sv = shadervars.GetVariableAdd (fogdensity_name);
@@ -322,7 +390,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   /*sv = shadervars.GetVariableAdd (fogplane_name);
   sv->SetValue (fogPlane);*/
 
-  for (int n = 0; n < num; n++)
+  ShaderTicketHelper ticketHelper (stacks, shadervars);
+
+  for (size_t n = 0; n < num; n++)
   {
     csRenderMesh* mesh = sameShaderMeshes[n];
 
@@ -332,8 +402,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       {
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
-            numSSM, stacks);
+          RenderMeshes (g3d, shader, currentTicket, 
+	    sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
 	}
         numSSM = 0;
@@ -350,9 +420,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #ifdef CS_DEBUG
       if (!mesh->material)
       {
-        fprintf (stderr, "INTERNAL ERROR: mesh '%s' is missing a material!\n",
-		mesh->db_mesh_name);
-        fflush (stdout);
+	csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
+	  mesh->db_mesh_name);
 	exit (-1);
       }
 #endif
@@ -360,24 +429,25 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #ifdef CS_DEBUG
       if (!hdl)
       {
-        fprintf (stderr,
-		"INTERNAL ERROR: mesh '%s' is missing a material handle!\n",
-		mesh->db_mesh_name);
-        fflush (stdout);
+        csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material handle!\n",
+	  mesh->db_mesh_name);
 	exit (-1);
       }
 #endif
-      iShader* meshShader = hdl->GetShader(shadertype);
-      if (meshShader != shader)
+      iShader* meshShader = hdl->GetShader (shadertype);
+      size_t newTicket = ticketHelper.GetTicket (
+	mesh->material->GetMaterial (), meshShader, mesh);
+      if ((meshShader != shader) || (newTicket != currentTicket))
       {
         // @@@ Need error reporter
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
-            numSSM, stacks);
+          RenderMeshes (g3d, shader, currentTicket, 
+	    sameShaderMeshes + lastidx, numSSM, stacks);
 	}
 	lastidx = n;
         shader = meshShader;
+	currentTicket = newTicket;
         numSSM = 0;
       }
       numSSM++;
@@ -388,8 +458,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   {
     // @@@ Need error reporter
     if (shader != 0)
-      RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, 
-        numSSM, stacks);
+      RenderMeshes (g3d, shader, currentTicket, 
+        sameShaderMeshes + lastidx, numSSM, stacks);
   }
 
   stacks[fogplane_name].Pop ();

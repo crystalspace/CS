@@ -465,7 +465,8 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 }
 
 void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, 
-				      iMeshWrapper *mesh, iShader* shader, int pass)
+				      iMeshWrapper *mesh, iShader* shader, 
+				      size_t shaderTicket, size_t pass)
 {
   csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
     shadowcache.Get (mesh, 0);
@@ -519,7 +520,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);
     shadowCacheEntry->svcontext->PushVariables (stacks);
-    shader->SetupPass(&rmesh, modes, stacks);
+    shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -541,7 +542,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
       g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
-    shader->TeardownPass();
+    shader->TeardownPass (shaderTicket);
   }
 }
 
@@ -646,9 +647,12 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     csVector3 rad, center;
     float maxRadius;
-    for (int p = 0; p < shadow->GetNumberOfPasses (); p ++) 
+    csRenderMeshModes modes;
+    modes.z_buf_mode = CS_ZBUF_TEST;
+    size_t shaderTicket = shadow->GetTicket (modes, stacks);
+    for (size_t p = 0; p < shadow->GetNumberOfPasses (shaderTicket); p ++) 
     {
-      shadow->ActivatePass (p);
+      shadow->ActivatePass (shaderTicket, p);
       for (int m = 0; m < numShadowMeshes; m++)
       {
 	iMeshWrapper*& sp = shadowMeshes[m];
@@ -672,17 +676,17 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	}
 	if (!(camPlaneZ*v < -maxRadius))
 	{
-	  DrawShadow (rview, light, sp, shadow, p); 
+	  DrawShadow (rview, light, sp, shadow, shaderTicket, p); 
 	}
       }
 
-      shadow->DeactivatePass ();
+      shadow->DeactivatePass (shaderTicket);
     }
   }
 
   //disable the reverses
   objInShadow->Reset ();
-  while (!objInShadow->HasNext() )
+  while (objInShadow->HasNext() )
   {
     iMeshWrapper* sp = objInShadow->Next()->GetMeshWrapper ();
     csRef<csStencilShadowCacheEntry> shadowCacheEntry = 

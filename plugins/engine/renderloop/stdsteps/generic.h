@@ -117,7 +117,7 @@ public:
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode () const;
 
-  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 
+  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, size_t ticket,
     csRenderMesh** meshes, int num, csShaderVarStack &stacks);
 
   /// Enables/disables z offset and z mode as needed
