@@ -454,7 +454,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 	  LPTHREAD_START_ROUTINE(func), ptr, CREATE_SUSPENDED, 0)
 #endif
 #ifndef _endthread
-#define _endthread
+#define _endthread()  {}
 #endif
 #endif
 
