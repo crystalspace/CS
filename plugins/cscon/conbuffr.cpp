@@ -48,7 +48,7 @@ void csConsoleBuffer::NewLine(bool snap)
   // Assign the empty display string to avoid NULL pointer ugliness
   if(buffer[current_line]==NULL)
     buffer[current_line] = empty;
-  
+
   // Increment the current line and account for going past the end of the buffer
   current_line++;
   if(current_line>=len) {
@@ -98,7 +98,7 @@ csString *csConsoleBuffer::WriteLine()
   return buffer[current_line];
 }
 
-const csString *csConsoleBuffer::GetLine(int line, bool &dirty_line)
+const csString *csConsoleBuffer::GetLine(int line, bool *dirty_line)
 {
 
   // Tsk tsk...
@@ -109,7 +109,8 @@ const csString *csConsoleBuffer::GetLine(int line, bool &dirty_line)
   int pos = display_top + line;
 
   // Return the current dirty flag
-  dirty_line = dirty[pos];
+  if(dirty_line)
+    *dirty_line = dirty[pos];
 
   // Clear the dirty flag
   dirty[pos] = false;

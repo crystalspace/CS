@@ -189,6 +189,23 @@ public:
   csString Clone () const
   { return csString (*this); }
 
+  /// Trim all of the white space off of the left side of the string
+  csString &LTrim();
+
+  /// Trim all of the white space off of the right side of the string
+  csString &RTrim();
+
+  /// Does both LTrim() and RTrim()
+  csString &Trim();
+
+  /// Does Trim() and then consolidates internal consecutive whitespace to a single space
+  csString &Collapse();
+
+  /// Provides sprintf capabilities.  Overwrites whatever is currently in the string.
+  /// Disabled due to issues with vsnprintf on some OSes
+  //csString &Format(const char *format, ...);
+
+
   /// Assign a string to another
   csString &operator = (const csString &iStr)
   { return Replace (iStr); }

@@ -27,7 +27,7 @@ public:
 
   void NewLine(bool snap = true);
   csString *WriteLine();
-  const csString *GetLine(int line, bool &dirty);
+  const csString *GetLine(int line, bool *dirty = NULL);
   void SetLength(int length);
   void Clear();
   void SetPageSize(int size);
@@ -39,6 +39,7 @@ public:
   inline int GetPageSize() const { return page_size; }
   inline int GetTopLine() const { return display_top; }
   inline int GetCurLine() const { return current_line; }
+  inline bool IsLineEmpty(int line) const { return ((buffer[line]==NULL)||(buffer[line]->IsEmpty())||(buffer[line]==empty)); }
 
 private:
 

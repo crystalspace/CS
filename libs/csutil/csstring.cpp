@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
+#include <stdarg.h>
 #include "sysdef.h"
 #include "csutil/csstring.h"
 
@@ -157,3 +159,93 @@ csString &csString::Append (const char *iStr, size_t iCount)
 
   return *this;
 }
+
+csString &csString::LTrim()
+{
+  size_t i;
+  for(i = 0; i < Size; i++) {
+    if(!isspace(Data[i]))
+      return DeleteAt(0, i);
+  }
+  return *this;
+}
+
+csString &csString::RTrim()
+{
+  int i;
+  for(i = Size - 1; i >= 0; i--) {
+    if(!isspace(Data[i])) {
+      i++;
+      return DeleteAt(i, Size - i);
+    }
+  }
+  return *this;
+}
+
+csString &csString::Trim()
+{
+  LTrim();
+  return RTrim();
+}
+
+csString &csString::Collapse()
+{
+  size_t i, start = (size_t) -1;
+
+  Trim();
+
+  for(i = 0; i < Size; i++) {
+
+    if(isspace(Data[i])) {
+
+      // We skip over the first whitespace, and make sure the first space IS a space
+      if(start==(size_t) -1) {
+	start = i + 1;
+	Data[i] = ' ';
+      }
+
+    } else {
+
+      // Delete any extra whitespace
+      if((start!=(size_t) -1)&&(start!=i)) {
+	DeleteAt(start, i - start);
+	i -= i - start;
+      }
+
+      start = (size_t) -1;
+    }
+  }
+
+  return *this;
+}
+
+#if 0 // Disabled due to lack of vsnprintf on some OSes
+csString &csString::Format(const char *format, ...)
+{
+  va_list args;
+  int NewSize = -1;
+
+  va_start(args, format);
+
+  // Keep trying until the buffer is big enough to hold the entire string
+  while(NewSize < 0) {
+    NewSize = vsnprintf(Data, MaxSize, format, args);
+    // Increasing by the size of the format streams seems logical enough
+    if(NewSize < 0)
+      SetSize(MaxSize + strlen(format));
+    // In this case we know what size it wants
+    if((size_t) NewSize>=MaxSize) {
+      SetSize(NewSize + 1);
+      NewSize = -1; // Don't break the while loop just yet!
+    } 
+  }
+
+  // Add in the terminating NULL
+  Size = NewSize + 1;
+
+  va_end(args);
+
+  return *this;
+
+}
+#endif // DISABLED

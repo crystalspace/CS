@@ -171,8 +171,7 @@ void csConsole::PutText(const char *text)
 
 const csString *csConsole::GetText(int line) const
 {
-  bool dirty;
-  return buffer->GetLine((line==-1) ? (buffer->GetCurLine() - buffer->GetTopLine()) : line, dirty);
+  return buffer->GetLine((line==-1) ? (buffer->GetCurLine() - buffer->GetTopLine()) : line);
 }
 
 void csConsole::DeleteText(int start, int end)
@@ -225,7 +224,7 @@ void csConsole::Draw(csRect *area)
   for (i=0; i<buffer->GetPageSize(); i++) {
 
     // Retrieve the line from the buffer and it's dirty flag
-    text = buffer->GetLine(i, dirty);
+    text = buffer->GetLine(i, &dirty);
 
     // A NULL line indicates it's the last printed line on the page
     if(text==NULL)
@@ -259,7 +258,7 @@ void csConsole::Draw(csRect *area)
     int cx_pix, cy_pix;
 
     // Get the line of text that the cursor is on
-    text = buffer->GetLine(cy, dirty);
+    text = buffer->GetLine(cy);
 
     if(text==NULL) {
 
@@ -455,9 +454,8 @@ void csConsole::GetCursorPos(int &x, int &y) const
 
 void csConsole::SetCursorPos(int x, int y)
 {
-  bool dummy;
   int max_x, max_y = buffer->GetPageSize();
-  const csString *curline = buffer->GetLine(cy, dummy);
+  const csString *curline = buffer->GetLine(cy);
 
   if(curline)
     max_x = curline->Length();
