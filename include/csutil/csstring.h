@@ -30,11 +30,10 @@
 #define NO_EXCEPTIONS
 
 #define PRINTF printf
-
 #ifndef NO_EXCEPTIONS
-#define csTHROW(Exception) { throw csException Exception; }
+#define csTHROW(Exception) do { throw csException Exception; } while(0)
 #else
-#define csTHROW(Exception) { PRINTF((csException Exception).GetMessage()); exit(1); }
+#define csTHROW(Exception) do { PRINTF((csException Exception).GetExceptionMessage()); exit(1); } while(0)
 #endif
 
 #ifndef CHK
@@ -59,7 +58,7 @@ public:
 	csException(const char* tError, const char* tHint="", unsigned long int tErrorVal=0)
 		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
 
-	const char* GetMessage();
+	const char* GetExceptionMessage();
 };
 
 #ifndef NO_STRING_COM
@@ -332,7 +331,7 @@ inline csSTR IntToStr(unsigned long int Value) {
 	return str;
 }
 
-inline const char* csException::GetMessage() {
+inline const char* csException::GetExceptionMessage() {
 	csSTR Msg("Exception: ");
 	Msg+=Error;
 
