@@ -132,7 +132,7 @@ public :
     }
     else
     {
-      SysPrintf(MSG_CONSOLE, "Dublicate Tex Address %X\n", Address);
+      m_piSystem->Printf(MSG_CONSOLE, "Dublicate Tex Address %X\n", Address);
     }
 #else
     SetStageState(0, D3DTSS_ADDRESS, Address);

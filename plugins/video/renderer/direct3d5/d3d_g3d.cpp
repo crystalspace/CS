@@ -51,8 +51,6 @@
 #include "ilghtmap.h"
 #include "igraph2d.h"
 
-#define SysPrintf m_piSystem->Printf
-
 /***** File-scope variables *****/
 
 static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
@@ -213,7 +211,7 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nDirect3DRender selected\n");
 
   iVFS* v = m_piSystem->GetVFS();
   config = new csIniFile (v, "/config/direct3ddx5.cfg");
@@ -357,13 +355,13 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
 
   if (lpD3dDeviceDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
   {
-    SysPrintf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
-    SysPrintf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
     m_Caps.MaxAspectRatio = 1;
   }
   else
   {
-    SysPrintf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
     m_Caps.MaxAspectRatio = 32768;
   }
 
@@ -384,7 +382,7 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
     return false; 
   
   if(m_bVerbose)
-    SysPrintf (MSG_INITIALIZATION, " Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
+    m_piSystem->Printf (MSG_INITIALIZATION, " Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
 
   // get the device interface
   hRes = m_lpD3D->CreateDevice(m_Guid, m_lpddDevice, &m_lpd3dDevice);
@@ -408,7 +406,7 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
-    SysPrintf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
     hRes = E_FAIL;
     return false;
   }    
@@ -416,9 +414,9 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   if(m_bVerbose)
   {
     if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-      SysPrintf (MSG_INITIALIZATION, " Use 16 bits texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " Use 16 bits texture format.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " Use 32 bits texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " Use 32 bits texture format.\n");
   }
 
   // select type of lightmapping
@@ -430,33 +428,33 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
     }
     else
     {
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Bad lightmapping supported.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Bad lightmapping supported.\n");
       m_iTypeLightmap = 2;
     }
   }
   else
   {
     if(config->GetYesNo("Direct3DDX5","DISABLE_LIGHTMAP", false))
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disable by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disable by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hadware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hadware.\n");
     m_iTypeLightmap = 0;
   }
 
   if(!m_iTypeLightmap)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disable.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disable.\n");
   }
   else
   {
     if(m_bVerbose)
     {
       if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==8)
-        SysPrintf (MSG_INITIALIZATION, " Use 8 bits palettized format for lightmap memory.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Use 8 bits palettized format for lightmap memory.\n");
       else if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-        SysPrintf (MSG_INITIALIZATION, " Use 16 bits lightmap format.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Use 16 bits lightmap format.\n");
       else
-        SysPrintf (MSG_INITIALIZATION, " Use 32 bits lightmap format.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Use 32 bits lightmap format.\n");
     }
   }
  
@@ -466,32 +464,32 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   else
   {
     if(m_pDirectDevice->GetAlphaBlendHalo() && config->GetYesNo("Direct3DDX5","DISABLE_HALO", false))
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect disable by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disable by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect not support by hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect not support by hardware.\n");
     m_bHaloEffect = false;
   }
 
   if (!bGotHaloDesc && m_bHaloEffect)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : No halo texture format supported by hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : No halo texture format supported by hardware.\n");
     m_bHaloEffect = false;
   }
 
   if(!m_bHaloEffect)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect disable.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disable.\n");
   }
   else
   {
     if(m_bVerbose)
-      SysPrintf (MSG_INITIALIZATION, " Use %d bits format for halo effect\n",
+      m_piSystem->Printf (MSG_INITIALIZATION, " Use %d bits format for halo effect\n",
         m_ddsdHaloSurfDesc.ddpfPixelFormat.dwRGBBitCount);
   }
 
   if(m_bVerbose)
   {
-    SysPrintf (MSG_INITIALIZATION, " Use 24 bits internal format for texture\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " Use 24 bits internal format for texture\n");
   }
 
   // set mipmapping configuration
@@ -501,14 +499,14 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   {
     if(config->GetYesNo("Direct3DDX5","DISABLE_MIPMAP", false)
       && m_pDirectDevice->GetMipmap())
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping disable by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disable by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping not supported in hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping not supported in hardware.\n");
     bMipmapping = false;
   }
   if(!bMipmapping)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping disable.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disable.\n");
   }
 
   // create a black background

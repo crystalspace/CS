@@ -57,8 +57,6 @@
 #pragma warning(disable : 4701)
 #endif
 
-#define SysPrintf m_piSystem->Printf
-
 /***** File-scope variables *****/
 
 static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
@@ -318,7 +316,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
 
   iVFS* v = m_piSystem->GetVFS();
   config = new csIniFile(v, "/config/direct3ddx6.cfg");
@@ -423,14 +421,14 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // dwTotal = dd6caps.dwVidMemTotal;
   // dwFree = dd6caps.dwVidMemFree;
   
-  SysPrintf (MSG_INITIALIZATION, " %d bytes VideoMem Total \n", dwTotal);
-  SysPrintf (MSG_INITIALIZATION, " %d bytes VideoMem Free \n", dwFree);
+  m_piSystem->Printf (MSG_INITIALIZATION, " %d bytes VideoMem Total \n", dwTotal);
+  m_piSystem->Printf (MSG_INITIALIZATION, " %d bytes VideoMem Free \n", dwFree);
 
   FINAL_RELEASE (lpDD4);
   
   if ( FAILED(hRes) )
   { 
-    SysPrintf (MSG_FATAL_ERROR, "Error in: 'GetAvailableVidMem' ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "Error in: 'GetAvailableVidMem' ! \n");
     return false;
   }
   // get direct3d interface
@@ -438,7 +436,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpDD4->QueryInterface(IID_IDirect3D3, (LPVOID *)&m_lpD3D);
   if(FAILED(hRes))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Query for 'IID_IDirect3D3' failed! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "Query for 'IID_IDirect3D3' failed! \n");
     return false;
   }
 
@@ -447,7 +445,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpddPrimary->GetSurfaceDesc(&ddsd);
   if( FAILED(hRes) )
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error in 'GetSurfaceDesc' ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "Error in 'GetSurfaceDesc' ! \n");
     return false;
   }
 
@@ -466,7 +464,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     ASSERT( FALSE );
   }
   
-  SysPrintf (MSG_INITIALIZATION, " %d-bit Colordepth selected\n", ddsd.ddpfPixelFormat.dwRGBBitCount);
+  m_piSystem->Printf (MSG_INITIALIZATION, " %d-bit Colordepth selected\n", ddsd.ddpfPixelFormat.dwRGBBitCount);
   // assign globals for software/hardware
   lpD3dDeviceDesc = m_pDirectDevice->GetDesc3D();
   memcpy(&m_Guid, m_pDirectDevice->GetGuid3D(), sizeof(GUID));
@@ -480,7 +478,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Create Z-buffer
   if (!lpD3dDeviceDesc->dwDeviceZBufferBitDepth && m_bIsHardware)
   {
-    SysPrintf (MSG_FATAL_ERROR, "No Z-Buffer ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, "No Z-Buffer ! \n");
     return false;
   }
 
@@ -493,12 +491,12 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpddDevice->GetPixelFormat(&ddpfTest);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_FATAL_ERROR, " Cannot get pixel-format of rendering target. ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, " Cannot get pixel-format of rendering target. ! \n");
     return false;   
   }
 
   dwZBufferBitDepth = ddpfTest.dwRGBBitCount;
-  SysPrintf (MSG_INITIALIZATION, " %d-bit Z-Buffer depth selected\n", dwZBufferBitDepth);
+  m_piSystem->Printf (MSG_INITIALIZATION, " %d-bit Z-Buffer depth selected\n", dwZBufferBitDepth);
  
   m_Caps.minTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
   m_Caps.minTexWidth  = lpD3dDeviceDesc->dwMinTextureWidth;
@@ -507,13 +505,13 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (lpD3dDeviceDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
   {
-    SysPrintf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
-    SysPrintf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " Warning: Your Direct3D Device supports only square textures!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "          This is a potential performance hit!\n");
     m_Caps.MaxAspectRatio = 1;
   }
   else
   {
-    SysPrintf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Your Direct3D Device also supports non square textures - that's good.\n");
     m_Caps.MaxAspectRatio = 32768;
   }
 
@@ -539,11 +537,11 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (FAILED(hRes) || ddsd.ddpfPixelFormat.dwSize == 0)
   {
-    SysPrintf (MSG_FATAL_ERROR, " Z-Buffer enumeration failed. ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, " Z-Buffer enumeration failed. ! \n");
     return false;   
   }
  
-  SysPrintf (MSG_INITIALIZATION, " Resolution: %d x %d selected\n", ddsd.dwWidth, ddsd.dwHeight);
+  m_piSystem->Printf (MSG_INITIALIZATION, " Resolution: %d x %d selected\n", ddsd.dwWidth, ddsd.dwHeight);
  
  // ddsd.dwZBufferBitDepth = dwZBufferBitDepth;
  // dwZBufferBitDepth is not longer part of ddsd under DX6.x
@@ -552,7 +550,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpDD4->CreateSurface(&ddsd, &m_lpddZBuffer, NULL);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_FATAL_ERROR, " Error creating Z-Buffer, 'CreateSurface' failed ! \n");
+    m_piSystem->Printf (MSG_FATAL_ERROR, " Error creating Z-Buffer, 'CreateSurface' failed ! \n");
     return false;   
   }
 
@@ -561,7 +559,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     return false; 
 
   if(m_bVerbose)
-    SysPrintf (MSG_INITIALIZATION, " Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
+    m_piSystem->Printf (MSG_INITIALIZATION, " Use %d depth for ZBuffer.\n", dwZBufferBitDepth);
 
   // get the device interface
   hRes = m_lpD3D->CreateDevice(m_Guid, m_lpddDevice, &m_lpd3dDevice2, NULL);
@@ -599,7 +597,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
-    SysPrintf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " ERROR : No 16 or 32 bits texture format supported in hardware.\n");
     hRes = E_FAIL;
     return false;
   }    
@@ -607,9 +605,9 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   if(m_bVerbose)
   {
     if(m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-      SysPrintf (MSG_INITIALIZATION, " Using 16-bit texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " Using 16-bit texture format.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " Using 32-bit texture format.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " Using 32-bit texture format.\n");
   }
 
   // select type of lightmapping
@@ -621,33 +619,33 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     }
     else
     {
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Bad lightmapping supported.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Bad lightmapping supported.\n");
       m_iTypeLightmap = 2;
     }
   }
   else
   {
     if (config->GetYesNo ("Direct3DDX6", "DISABLE_LIGHTMAP", false))
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hardware.\n");
     m_iTypeLightmap = 0;
   }
 
   if (!m_iTypeLightmap)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled.\n");
   }
   else
   {
     if(m_bVerbose)
     {
       if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==8)
-        SysPrintf (MSG_INITIALIZATION, " Using 8-bit palettized format for lightmap memory.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Using 8-bit palettized format for lightmap memory.\n");
       else if(m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount==16)
-        SysPrintf (MSG_INITIALIZATION, " Using 16-bit lightmap format.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Using 16-bit lightmap format.\n");
       else
-        SysPrintf (MSG_INITIALIZATION, " Using 32-bit lightmap format.\n");
+        m_piSystem->Printf (MSG_INITIALIZATION, " Using 32-bit lightmap format.\n");
     }
   }
 
@@ -657,58 +655,58 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   else
   {
     if(m_pDirectDevice->GetAlphaBlendHalo() && config->GetYesNo("Direct3DDX6","DISABLE_HALO", false))
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect disabled by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disabled by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect not supported by hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect not supported by hardware.\n");
     m_bHaloEffect = false;
   }
 
   if (!bGotHaloDesc && m_bHaloEffect)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : No halo texture format supported by hardware.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : No halo texture format supported by hardware.\n");
     m_bHaloEffect = false;
   }
 
   if(!m_bHaloEffect)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Halo effect disabled.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Halo effect disabled.\n");
   }
   else
   {
     if(m_bVerbose)
-      SysPrintf (MSG_INITIALIZATION, " Using %d-bit format for halo effect\n",
+      m_piSystem->Printf (MSG_INITIALIZATION, " Using %d-bit format for halo effect\n",
         m_ddsdHaloSurfDesc.ddpfPixelFormat.dwRGBBitCount);
   }
 
   if(m_bVerbose)
   {
-    SysPrintf (MSG_INITIALIZATION, " Using 24-bit internal format for texture\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " Using 24-bit internal format for texture\n");
   }
 
   // set mipmapping configuration
   if (m_pDirectDevice->GetMipmap() && !config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false))
   {  bMipmapping = true;
-     SysPrintf (MSG_INITIALIZATION, " Mipmapping enabled and supported\n");
+     m_piSystem->Printf (MSG_INITIALIZATION, " Mipmapping enabled and supported\n");
   }
   else
   {
     if(config->GetYesNo("Direct3DDX6","DISABLE_MIPMAP", false)
       && m_pDirectDevice->GetMipmap())
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled by user.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled by user.\n");
     else
-      SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping not supported in hardware.\n");
+      m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping not supported in hardware.\n");
     bMipmapping = false;
   }
   if(!bMipmapping)
   {
-    SysPrintf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled.\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " WARNING : Mipmapping disabled.\n");
   }
 
   // create a black background
   hRes = m_lpD3D->CreateMaterial(&m_lpd3dBackMat, NULL);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, " Error creating Backgroundmaterial!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, " Error creating Backgroundmaterial!\n");
     return false;
   }
   memset(&d3dMaterial, 0, sizeof(d3dMaterial));
@@ -718,14 +716,14 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpd3dBackMat->SetMaterial(&d3dMaterial);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, "Error setting Backgroundmaterial!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Error setting Backgroundmaterial!\n");
     return false;     
   }
 
   hRes = m_lpd3dBackMat->GetHandle(m_lpd3dDevice2, &m_hd3dBackMat);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, "Error getting handle for Backgroundmaterial!\n"); 
+    m_piSystem->Printf (MSG_INITIALIZATION, "Error getting handle for Backgroundmaterial!\n"); 
     return false;
   }
   // create the viewport
@@ -733,7 +731,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpD3D->CreateViewport(&m_lpd3dViewport, NULL);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, "Error creating viewport!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Error creating viewport!\n");
     return false;
   }
   
@@ -742,7 +740,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpd3dDevice2->AddViewport(m_lpd3dViewport);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, "Error assigning viewport!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Error assigning viewport!\n");
     return false;
   }
   // assign the background to the viewport
@@ -750,7 +748,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpd3dViewport->SetBackground(m_hd3dBackMat);
   if (FAILED(hRes))
   {
-    SysPrintf (MSG_INITIALIZATION, "Error assigning background to viewport!\n");
+    m_piSystem->Printf (MSG_INITIALIZATION, "Error assigning background to viewport!\n");
     return false;
   }
   // set default render-states.
@@ -785,7 +783,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   
   // save half of the memory for textures,
   // half for lightmaps
-  SysPrintf (MSG_INITIALIZATION, "Initializing lightmap- and texturecache...");
+  m_piSystem->Printf (MSG_INITIALIZATION, "Initializing lightmap- and texturecache...");
   // Here is the "Assertion failed!"-bug I get on my machine
   if (m_iTypeLightmap != 0)
   {
@@ -798,12 +796,12 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     m_pLightmapCache = NULL;
   }
   
-  SysPrintf (MSG_INITIALIZATION, "completed!\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "completed!\n");
 
   // init the viewport.
  
   SetDimensions(m_nWidth, m_nHeight);
-  SysPrintf (MSG_INITIALIZATION, "SetDimensions succesfull!\n");
+  m_piSystem->Printf (MSG_INITIALIZATION, "SetDimensions succesfull!\n");
 
   // clear the Z-buffer    
   rect.x1 = 0; rect.y1 = 0; 
@@ -974,7 +972,7 @@ void csGraphics3DDirect3DDx6::ConfigureRendering()
 
     if (!FoundGoodTextureOp)
     {
-      SysPrintf(MSG_INITIALIZATION, "WARNING : Cant find any decent lightmap TextureOp for stage1\n");
+      m_piSystem->Printf(MSG_INITIALIZATION, "WARNING : Cant find any decent lightmap TextureOp for stage1\n");
       // fall back upon lame multipass
       m_bMultiTexture = false;
     }

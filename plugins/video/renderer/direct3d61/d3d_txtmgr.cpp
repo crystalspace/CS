@@ -29,8 +29,6 @@
 #include "iimage.h"
 #include "isystem.h"
 
-#define SysPrintf System->Printf
-
 //---------------------------------------------------------------------------
 
 csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent, 
@@ -277,9 +275,9 @@ int csTextureManagerDirect3D::FindRGB (int r, int g, int b)
 
 void csTextureManagerDirect3D::PrepareTextures ()
 {
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose) System->Printf (MSG_INITIALIZATION, "Preparing textures...\n");
 
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+  if (verbose) System->Printf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
   for (int i = 0; i < textures.Length (); i++)
