@@ -213,7 +213,7 @@ size_t csString::FindFirst (char c, size_t pos)
 size_t csString::FindLast (char c, size_t pos)
 {
   if (pos == (size_t)-1)
-    pos = Size;
+    pos = Size - 1;
 
   if (pos > Size || !Data)
     return (size_t)-1;

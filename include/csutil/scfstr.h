@@ -112,8 +112,14 @@ public:
   virtual void SubString (iString * sub, size_t start, size_t len);
 
   /// Find first character 'c' from position 'p'.
+  /**
+   * If the character cannot be found, this function returns (size_t)-1
+   */
   virtual size_t FindFirst (const char c, size_t p = (size_t)-1);
   /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+  /**
+   * If the character cannot be found, this function returns (size_t)-1
+   */
   virtual size_t FindLast (const char c, size_t p = (size_t)-1);
 
   /// Format.

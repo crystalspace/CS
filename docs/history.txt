@@ -17,6 +17,10 @@ The history order is reversed so that new features are at the top.
 	- DeSigna added csString::FindLast(). iString/scfString has
 	  been updated for new SubString, FindFirst and FindLast
 	  members. 
+	- DeSigna fixed minor off-by-one bug in
+	  csString::FindLast(). Documentation for FindFirst/FindLast
+	  has been updated to include the not-found status return
+	  value. 
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
