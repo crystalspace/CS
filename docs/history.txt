@@ -15,6 +15,12 @@ chronological order.
 	  texture data on each access, i.e. leak enormous amounts of memory.
 	- Jorrit disabled the use of VBO in the new renderer since this doesn't
 	  appear to be working right at the moment.
+	- res applied some changes needed by the cs-win32libs package.
+	- res changed the manual to state cs-win32libs instead of msvc_libs
+	  resp. csmingw-libs as the Win32 support package.
+	- res generally updated some of the information in the Win32 build 
+	  docs.
+	- res extended the "External Libraries" list somewhat.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)

@@ -4,8 +4,8 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 7
-February 2003.}
+written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 19
+March 2004.}
 
 These instructions are for building Crystal Space with MinGW, the
 @emph{Minimalist @sc{gnu} compiler for Windows}.
@@ -20,7 +20,7 @@ Download the following packages:
 @itemize @bullet
 @item
 The most recent version of the MinGW compiler and related tools.  This package
-is typically named @file{MinGW-2.?.?-?.exe}, where the question marks stand for
+is typically named @file{MinGW-3.?.?-?.exe}, where the question marks stand for
 the actual version number.
 
 @noindent
@@ -38,15 +38,11 @@ the question marks stand for the actual version number.
 @uref{http://www.mingw.org/}
 
 @item
-The most recent Crystal Space MinGW support package.  This package provides a
+The most recent Crystal Space Win32 Libs package.  This package provides a
 minimal set of additional resources needed to build Crystal Space, such as
 zlib, libpng, libjpeg, @sc{ode} @sc{sdk}, Python @sc{sdk}, @sc{nasm}, the
-Netwide Assembler, etc.  This package has the name
-@file{csmingwlibs_?.??r?.exe}, where the question marks stand for the actual
-version number.  You should download the one with the highest version number.
-
-@noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/}
+Netwide Assembler, etc.  
+To obtain the package @pxref{The ``cs-win32libs'' package}.
 @end itemize
 
 @subsubheading Installation
@@ -68,15 +64,20 @@ building Crystal Space.  Be sure to enter the correct path (@file{C:\mingw32},
 in our example) when prompted.
 
 @item
-Install the @file{csmingwlibs} package.  This is a self-extracting executable.
-During the installation, the @sc{msys} shell startup file will be augmented
-with the addition of several environment variables which are consulted when
-building Crystal Space.  If you are interested, see the @file{README} file in
-the @file{csmingwlibs} directory after installation for all the gory details.
+Install the @file{cs-win32libs} package.  This is a self-extracting executable.
+After the installation, when support for the @sc{msys} development environment 
+was opted to be installed, the @sc{msys} shell startup file will be augmented 
+so a helper script named ``cslibs-config'' can be found when building Crystal 
+Space, causing the contained library and header files to be used.
+
+You may want to select ``MSYS/MinGW typical'' in the ``Select Components'' 
+screen. You can further adjust the selection of installed components depending 
+on your actual set up (e.g. install VisualC-related components if you plan to 
+also use CrystalSpace with VisualC).
 @end itemize
 
-@emph{Note}: If you ever install a new version of @sc{msys}, then you must also
-re-install the @file{csmingwlibs} package.
+@emph{Note}: If you ever install a new version of @sc{msys}, then you should 
+also re-install the @file{cs-win32libs} package.
 
 @subsubheading Building Crystal Space
 
@@ -150,9 +151,10 @@ stuff\CS}, try renaming the path to @file{C:\my_stuff\CS} or
 
 If you were previously using the older, deprecated @file{cs_mingw_0.??.exe}
 package which contained the entire MinGW distribution along with other
-unrelated tools and resources, it is highly recommend that you first remove
-that package, as well as any residual files and resources before installing the
-newer MinGW, @sc{msys}, and @file{csmingwlibs} packages.  For best results, it
-would probably be wise to remove the entire old @file{MinGW} directory (though
-you may want to make a backup copy of it just in case) and clean your
-environment variables of any references to the old resource directories.
+unrelated tools and resources, or the @file{csmingwlibs} package, it is highly 
+recommended that you first remove that package, as well as any residual files 
+and resources before installing the newer MinGW, @sc{msys}, and 
+@file{cs-win32libs} packages.  For best results, it would probably be wise to 
+remove the entire old @file{MinGW} directory (though you may want to make a 
+backup copy of it just in case) and clean your environment variables of any 
+references to the old resource directories.

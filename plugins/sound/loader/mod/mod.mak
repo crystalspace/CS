@@ -43,10 +43,10 @@ SRC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.cpp))
 OBJ.SNDMOD = $(addprefix $(OUT)/,$(notdir $(SRC.SNDMOD:.cpp=$O)))
 DEP.SNDMOD = CSUTIL CSUTIL
 
-#MSVC.DSP += SNDMOD
-#DSP.SNDMOD.NAME = sndmod
-#DSP.SNDMOD.TYPE = plugin
-#DSP.SNDMOD.LIBS = mikmod
+MSVC.DSP += SNDMOD
+DSP.SNDMOD.NAME = sndmod
+DSP.SNDMOD.TYPE = plugin
+DSP.SNDMOD.LIBS = mikmod
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

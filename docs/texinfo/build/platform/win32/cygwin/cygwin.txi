@@ -164,6 +164,28 @@ After all this you will be prompted with a dialog to tell you that the
 installation is complete.  Click on the @emph{Ok} button to finish the
 installation process.
 
+@subsubheading Using cs-win32libs
+
+You can use the ``cs-win32libs'' package to obtain the third-party libraries
+to build Crystal Space.  To obtain the package 
+@pxref{The ``cs-win32libs'' package}.
+
+You may want to select ``Cygwin typical'' in the ``Select Components'' screen. 
+You can further adjust the selection of installed components depending on your 
+actual set up (e.g. install MinGW-related components if you plan to also use 
+CrystalSpace with MinGW/MSYS).
+
+After the installation, when support for the Cygwin development environment 
+was opted to be installed, the Cygwin shell startup file will be augmented 
+so a helper script named ``cslibs-config'' can be found when building Crystal 
+Space, causing the contained library and header files to be used.
+
+Alternatively, you can also use the @code{zlib}, @code{libpng} and 
+@code{libjpg} versions that are shipped with Cygwin and compile the remaining
+third-party libraries yourself.  In this case, follow the instructions in the
+next paragraphs; otherwise, you can skip to the paragraph 
+``Building Crystal Space''.
+
 @subsubheading Installing DirectX 8 @sc{sdk} for Cygwin
 
 The Microsoft DirectX 8 @sc{sdk} which the Cygwin port uses is one created

@@ -28,75 +28,40 @@ stated are not required.  However, if you choose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
 
-@subsubheading msvc_libs - Required
+@subsubheading cs-win32libs - Required
 
 Before you attempt to compile Crystal Space, you must download
-and install the ``msvc_libs'' archive.  This archive contains alot of the
+and install the ``cs-win32libs'' archive.  This archive contains alot of the
 third party header, pre-built libraries and dll files used by Crystal
-Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll}, etc.
-The latest version of this archive can be downloaded from:
+Space, i.e. @file{libz.dll}, @file{libjpeg.dll}, @file{libpng.dll}, etc.
+To obtain the package @pxref{The ``cs-win32libs'' package}.
 
-msvc_libs with Python 2.2.3 debug components.
+Once you have downloaded the cs-win32libs package, execute the binary and
+follow the setup instructions.  You may want to select ``VC typical'' in the
+``Select Components'' screen. You can further adjust the selection of installed 
+components depending on your actual set up (e.g. install MinGW-related 
+components if you plan to also use CrystalSpace with MinGW/MSYS).
 
-@noindent
-@ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev006_py223.zip}
-@end ifnottex
-@iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc_libs_0.97dev006_py223.zip}
-@end iftex
+@subsubheading DirectX - Optional
 
-msvc_libs with Python 2.3.0 debug components.
+In order to compile Crystal Space at its minimum i.e. the software renderer,
+you must have at least some form of the DirectX Software Development Kit 
+(@sc{sdk}) on your system. 
 
-@noindent
-@ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev006_py230.zip}
-@end ifnottex
-@iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc_libs_0.97dev006_py230.zip}
-@end iftex
+Visual C++ 6 comes with the minimum DirectX @sc{sdk} 5 files required in-order 
+to build Crystal Space. 
 
-Once you have downloaded the msvc_libs package, extract it to your @file{CS\}
-root directory.
+The ``cs-win32libs'' package also come with minimum headers and libraries that 
+suffice to compile the parts of Crystal Space that utilize DirectX. The version 
+included in cs-win32libs is DirectX 7.
 
-@subsubheading DirectX - Required
-
-In order to compile Crystal Space at its minimum i.e. the software render,
-requires you must have at least some form of the DirectX Software Development
-Kit (@sc{sdk}) on your system.
-
-@itemize @bullet
-@item
-DirectX 5.0 or higher is required.  With this, you get sound output and
-non-accelerated graphics.
-package.
-
-@item
-DirectX 6.1 or higher (including DirectX 8a) allows hardware-accelerated 3D
-graphics.
-@end itemize
-
-Visual C++ 6 comes with the minimum DirectX @sc{sdk} 5 files in-order to build
-Crystal Space.
-
-To enable you to build Crystal Space to it's optimum @sc{d3d} support, you must
-download the latest DirectX Software Development Kit (@sc{sdk}), which can be
-obtained from:
+You can optionally use the latest DirectX Software Development Kit (@sc{sdk}), 
+which can be obtained from:
 
 @uref{http://www.msdn.microsoft.com/directx}
 
-If you are unable to accomplish the 200+@sc{mb} (For the full @sc{sdk}) or
-43@sc{mb} (For the VisualC only parts of the @sc{sdk}) download of the DirectX
-9 @sc{sdk} from the link above.  You can obtain cut down older versions (6 & 7
-with no documents or example code) of the DirectX @sc{sdk}'s from the following
-website:
-
-@uref{http://www.multimania.com/noote/CrystalSpace}
-
 Thanks, to the miracle which is Microsoft.  If you download and install the
-latest DirectX 8a Software Development Kit (@sc{sdk}) and already have Visual
+latest DirectX  Software Development Kit (@sc{sdk}) and already have Visual
 C++ installed, it will ask you if you wish to add the paths to the @sc{sdk} to
 Visual C++ so it can use it.  We recommend you accept when offered this option.
 If it is not the latest @sc{sdk} you install you will have to manually point
@@ -107,7 +72,7 @@ include files and libraries and being that we wish Visual C++ to see and use
 this new @sc{sdk} before all possible others on your system, you must click on
 and drag both paths you have entered to the top of the list.
 
-@subsubheading Simple Direct Media Layer
+@subsubheading Simple Direct Media Layer - Optional
 
 Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
@@ -124,7 +89,7 @@ or add it to your systems path before using the SDL2D canvas.
 For instructions on using a specific canvas including
 the @sc{sdl2d} canvas @ref{Common Command Line Options}
 
-@subsubheading Python
+@subsubheading Python - Optional
 
 Crystal Space contains support for Python scripting and thus has projects
 within it requires that Python be installed on your system.  Make sure you add
@@ -134,12 +99,7 @@ must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
-@sc{note}: To have parity with one of the latest versions of msvc_libs and take
-full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
-installed on your system. Whichever version you decide to use, make sure you
-download the comparable msvc_libs.
-
-@subsubheading Creative @sc{eax} 2.0
+@subsubheading Creative @sc{eax} 2.0 - Optional
 
 In order to build the Crytal Space @sc{eax} 2.0 environmental audio plugin
 (@emph{plgsndrdreax}), requires you have the @sc{eax} 2.0 @sc{sdk} on your
@@ -180,10 +140,9 @@ Load @file{CS\mk\visualc6\wkstypical.dsw}.
 
 @item
 Remove all projects you don't want to compile.  To do this, right-click on the
-project in the list and select @emph{Unload Project}.  Examples of projects
-which you don't want to compile might include @file{plgopengl} if you do not
-have the OpenGL @sc{sdk} installed, or @file{plgcspython} if you do not have
-the Python @sc{sdk} installed.
+project in the list and select @emph{Unload Project}.  Examples of a project
+which you don't want to compile might include @file{plgcspython} if you do not 
+have the Python @sc{sdk} installed.
 
 @item
 Make @samp{grpall-typical} your active project.  This is done by right clicking
@@ -365,15 +324,15 @@ Q. @emph{Where are the @file{zlib.h}, @file{png.h} and @file{jpeglib.h} files?}
 A. Those files are not part of the Crystal Space project, but they are
 required to build it.  You must get a version of the following packages, most
 of which can be easily found on the Internet.  You can download precompiled
-versions of these libraries i.e. @emph{msvc_libs} or grab the source code and
+versions of these libraries i.e. @emph{cs-win32libs} or grab the source code and
 compile it yourself if you prefer.  @xref{External Libraries}.
 
 The resources from these packages should be placed in the following locations.
 
 @example
 CS\libjpeg.dll
-CS\png.dll
-CS\zlib.dll
+CS\libpng.dll
+CS\libz.dll
 CS\include\csutil\win32\jconfig.h
 CS\include\csutil\win32\jerror.h
 CS\include\csutil\win32\jinclude.h
@@ -507,6 +466,30 @@ the Crystal Space project is installed.  Next set the working directory to
 If after doing this, you are still getting the same error, make sure that you 
 have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 @end itemize
+
+@subheading Blasting the Past
+
+If you have previously used the @file{msvc_libs} package, it's recommended you
+remove it before installing the @file{cs-win32libs} package as outlined above.
+Unfortunately, the @file{msvc_libs} package was a simple @sc{ZIP} file with no
+means of uninstalling whatsoever. However, the header and library files were
+located in the @file{include\cssys\win32} resp. @file{libs\cssys\win32\cssys}
+directories, but as the @code{cssys} library has been merged into @code{csutil},
+CS' files in those directories has been relocated as well, so you can safely 
+remove these directories.
+
+However, the @file{msvc_libs} package also contained a couple of @sc{dll} 
+files, copied to CS' root directory.  To remove them, use the following batch 
+file that removes all @sc{dll} files contained in the different versions of 
+the @file{msvc_libs} package:
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/win32/remove_msvc_libs.bat}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/win32/remove_msvc_libs.bat}
+@end iftex
 
 @subsubheading Miscellaneous
 

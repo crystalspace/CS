@@ -130,9 +130,9 @@ csODEDynamics::csODEDynamics (iBase* parent)
   cfm = 1e-5f;
 
   rateenabled = false;
-  steptime = 0.1;
-  limittime = 1.0;
-  total_elapsed = 0.0;
+  steptime = 0.1f;
+  limittime = 1.0f;
+  total_elapsed = 0.0f;
 
   stepfast = false;
   sfiter = 10;
@@ -347,10 +347,23 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
   return i;*/
 }
 
+#ifdef OS_WIN32
+/*
+  The ODE version contained in the win32libs package defines the dCollide*
+  functions as extern "C" (otherwise the DLL couldn't be shared by different
+  compilers). For other platforms, it's not the case.
+ */
+#define ODE_EXTERN  extern "C"
+#else
+#define ODE_EXTERN  extern
+#endif
 /* defined in ode */
-extern int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
-extern int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
-extern int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int skip);
+ODE_EXTERN int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, 
+				 dContactGeom *outcontacts, int skip);
+ODE_EXTERN int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, 
+				       dContactGeom *outcontacts, int skip);
+ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags, 
+				 dContactGeom *contact, int skip);
 
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 

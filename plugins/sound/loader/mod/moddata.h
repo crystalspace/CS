@@ -24,6 +24,7 @@
  */
 
 #include "isound/data.h"
+#define _DLL
 #include <mikmod.h>
 
 class csModSoundData : public iSoundData

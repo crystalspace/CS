@@ -12,62 +12,40 @@ development libraries.  These libraries are:
 @code{libpng}
 @item
 @code{libjpeg}
+@item
+Freetype2
+@item
+@sc{ode}
+@item
+@code{lib3ds}
+@item
+Ogg Vorbis libraries
+@item
+@code{libmng}
+@item
+MikMod
 @end itemize
 
 Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-Microsoft Visual C++ 6 users can download a single package
-which contains all headers, pre-built library files, and dynamic link libraries
-in pre-compiled form from the following location on the Crystal Space server:
+Note that all libraries except @code{zlib} are optional. CrystalSpace will
+compile and work, but not all plugins will be available.
 
-msvc_libs with Python 2.2.3 debug components.
+@subheading The ``cs-win32libs'' package
 
-@noindent
-@ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev006_py223.zip}
-@end ifnottex
-@iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc_libs_0.97dev006_py223.zip}
-@end iftex
-
-msvc_libs with Python 2.3.0 debug components.
+Microsoft Visual C++ 6 and above, MinGW/MSYS and Cygwin users can download a 
+single package which contains all headers, pre-built library files, and dynamic 
+link libraries in pre-compiled form from the following location:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.97dev006_py230.zip}
+@uref{ftp://sunsite.dk/projects/crystal/support/win32/cs-win32libs-0.97rcvs_003.exe}
 @end ifnottex
 @iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc_libs_0.97dev006_py230.zip}
-@end iftex
-
-Microsoft Visual C++ 7 and newer users can download a single package which
-contains all headers, pre-built library files, and dynamic link libraries in
-pre-compiled form from the following location on the Crystal Space server:
-
-msvc7_libs with Python 2.2.3 debug components.
-
-@noindent
-@ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev006_py223.zip}
-@end ifnottex
-@iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc7/msvc7_libs_0.97dev006_py223.zip}
-@end iftex
-
-msvc7_libs with Python 2.3.0 debug components.
-
-@noindent
-@ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev006_py230.zip}
-@end ifnottex
-@iftex
-@code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc7/msvc7_libs_0.97dev006_py230.zip}
+@code{ftp://sunsite.dk/projects/crystal/support/win32/}@*
+@code{cs-win32libs-0.97rcvs_003.exe}
 @end iftex
 
 @subheading zlib
@@ -115,6 +93,37 @@ graphic files.  You can download @code{libjpeg} from:
 After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/jpeg*}.  In general,
 if you have permission to do so, it is best to install the library.
+
+@subheading Freetype2
+@cindex Freetype2
+@cindex Libraries, Freetype2
+
+Crystal Space can utilize the Freetype2 library to display TrueType fonts. You
+can get the latest version at:
+
+@noindent
+@uref{http://www.freetype.org/}
+
+@subheading @sc{ode}
+@cindex @sc{ode}
+@cindex Libraries, @sc{ode}
+@cindex Physics library
+
+Crystal Space contains a plugin providing physics through @sc{ode}. You can get
+the latest version at:
+
+@noindent
+@uref{http://opende.sourceforge.net/download.html}
+
+@subheading Ogg Vorbis libraries
+@cindex Ogg Vorbis
+@cindex Libraries, Ogg Vorbis
+
+With this libraries you can use the Ogg Vorbis sound plugin. You can get the
+latest version at:
+
+@noindent
+@uref{http://www.vorbis.com/download.psp}
 
 @subheading libmng
 @cindex libmng
