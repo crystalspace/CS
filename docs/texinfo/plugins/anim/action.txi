@@ -57,10 +57,10 @@ like this:
       <v x="0" y="0" z="1.2" u="0" v="0"/>
     </frame>
     
-    <triangle t1="0" t2="1" t3="2"/>
-    <triangle t1="0" t2="3" t3="1"/>
-    <triangle t1="0" t2="2" t3="3"/>
-    <triangle t1="1" t2="3" t3="2"/>
+    <t t1="0" t2="1" t3="2"/>
+    <t t1="0" t2="3" t3="1"/>
+    <t t1="0" t2="2" t3="3"/>
+    <t t1="1" t2="3" t3="2"/>
     
     <action name="default">
       <f name="first" delay="200"/>
@@ -107,9 +107,9 @@ name is used to reference the frame. This applies to both map files and
 the sprite 3D interface.
 
 After the frames have been defined, a list of triangles is then declared.
-Note that the @samp{triangle} tokens are declared after the frames. Trying
+Note that the @samp{t} tokens are declared after the frames. Trying
 to define the triangles before the frames will result in an error and will
-be flagged as such. Each @samp{triangle} declaration contains three indices
+be flagged as such. Each @samp{t} declaration contains three indices
 to the defined frame vertices. The index starts at zero and has a maximum
 value equal the number of vertices minus one. During the course of animation
 the triangle lists are applied to the corresponding frame and are then

@@ -48,14 +48,14 @@ add an animation to make the top pyramid wobble backward and forward.
       <v x="1" y="2" z="0" u="0" v="0"/>
     </frame>
 
-    <triangle t1="0" t2="2" t3="3"/>
-    <triangle t1="0" t2="3" t3="1"/>
-    <triangle t1="0" t2="1" t3="2"/>
-    <triangle t1="2" t2="1" t3="3"/>
-    <triangle t1="4" t2="6" t3="1"/>
-    <triangle t1="4" t2="5" t3="6"/>
-    <triangle t1="5" t2="4" t3="1"/>
-    <triangle t1="6" t2="5" t3="1"/>
+    <t t1="0" t2="2" t3="3"/>
+    <t t1="0" t2="3" t3="1"/>
+    <t t1="0" t2="1" t3="2"/>
+    <t t1="2" t2="1" t3="3"/>
+    <t t1="4" t2="6" t3="1"/>
+    <t t1="4" t2="5" t3="6"/>
+    <t t1="5" t2="4" t3="1"/>
+    <t t1="6" t2="5" t3="1"/>
 
     <action name="default>
       <f name="the_frame" delay="1000"/>

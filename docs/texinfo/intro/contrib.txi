@@ -42,6 +42,11 @@ Rene did some modifications for SWIG 1.3 support in the python plugin.
 Rene also fixed the OPCODE plugin.
 
 @item
+Simon Posnjak (@email{simon.posnjak@@siol.net})
+
+Simon did some documentation fixes.
+
+@item
 Mendrak (@email{mendrak@@worldnet.att.net})
 
 Mendrak added @code{MountRoot()} to VFS and also extended standard font
