@@ -29,6 +29,8 @@
 #include "cs3d/software/tcache16.h"
 #include "cs3d/software/tcache32.h"
 #include "cs3d/software/soft_txt.h"
+#include "cs3d/common/memheap.h"
+#include "csutil/inifile.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -210,7 +212,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   do_lighting = true;
   do_transp = true;
   do_textured = true;
-  do_debug = false;
   do_interlaced = -1;
   ilace_fastmove = false;
   do_texel_filt = false;
@@ -539,10 +540,31 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_32_Alpha
   return csScan_32_draw_scanline_map_alpha;
 }
 
+void csGraphics3DSoftware::SetCacheSize (long size)
+{
+  if (tcache)
+    tcache->set_cache_size (size);
+  else
+    TextureCache::set_default_cache_size (size);
+}
+
 STDMETHODIMP csGraphics3DSoftware::Initialize ()
 {
+  txtmgr->SetConfig (config = new csIniFile ("softrndr.cfg"));
+
   m_piG2D->Initialize ();
   txtmgr->InitSystem ();
+
+  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
+  do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
+  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
+    config->GetYesNo ("Hardware", "INTERLACING", false));
+
+  SetCacheSize (config->GetInt ("Hardware", "CACHE", DEFAULT_CACHE_SIZE));
+
+  zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
+  zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
+  zdist_mipmap3 = config->GetFloat ("Mipmapping", "DMIPMAP3", 40.0);
 
   width = height = -1;
   return S_OK;
@@ -2553,9 +2575,6 @@ STDMETHODIMP csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
       Scan.InterpolMode = value;
       break;
-    case G3DRENDERSTATE_DEBUGENABLE:
-      do_debug = value;
-      break;
     case G3DRENDERSTATE_FILTERINGENABLE:
       do_texel_filt = value;
       ScanSetup ();
@@ -2624,9 +2643,6 @@ STDMETHODIMP csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op, long
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
       retval = Scan.InterpolMode;
       break;
-    case G3DRENDERSTATE_DEBUGENABLE:
-      retval = do_debug;
-      break;
     case G3DRENDERSTATE_FILTERINGENABLE:
       retval = do_texel_filt;
       break;
@@ -2674,13 +2690,6 @@ STDMETHODIMP csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
 STDMETHODIMP csGraphics3DSoftware::ClearCache()
 {
   if (tcache) tcache->clear ();
-  return S_OK;
-}
-
-STDMETHODIMP csGraphics3DSoftware::SetCacheSize (long size)
-{
-  if (tcache) tcache->set_cache_size (size);
-  else TextureCache::set_default_cache_size (size);
   return S_OK;
 }
 

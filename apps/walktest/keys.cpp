@@ -1723,9 +1723,12 @@ void WalkTest::look (float speed,int keep_old)
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyUp (speed, slow, fast); return; }
-  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_FORWARD);
-  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_FORWARD);
-  else Sys->view->GetCamera ()->Move (speed*.6*VEC_FORWARD);
+  if (slow)
+    Sys->view->GetCamera ()->Move (speed * 0.01 * VEC_FORWARD);
+  else if (fast)
+    Sys->view->GetCamera ()->Move (speed * 4.0 * VEC_FORWARD);
+  else
+    Sys->view->GetCamera ()->Move (speed * 1.0 * VEC_FORWARD);
 }
 
 void WalkTest::imm_backward (float speed, bool slow, bool fast)
@@ -1739,97 +1742,133 @@ void WalkTest::imm_backward (float speed, bool slow, bool fast)
 void WalkTest::imm_left (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_LEFT);
-  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_LEFT);
-  else Sys->view->GetCamera ()->Move (speed*.6*VEC_LEFT);
+  if (slow)
+    Sys->view->GetCamera ()->Move (speed * 0.01 * VEC_LEFT);
+  else if (fast)
+    Sys->view->GetCamera ()->Move (speed * 4.0 * VEC_LEFT);
+  else
+    Sys->view->GetCamera ()->Move (speed * 1.0 * VEC_LEFT);
 }
 
 void WalkTest::imm_right (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_RIGHT);
-  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_RIGHT);
-  else Sys->view->GetCamera ()->Move (speed*.6*VEC_RIGHT);
+  if (slow)
+    Sys->view->GetCamera ()->Move (speed * 0.01 * VEC_RIGHT);
+  else if (fast)
+    Sys->view->GetCamera ()->Move (speed * 4.0 * VEC_RIGHT);
+  else
+    Sys->view->GetCamera ()->Move (speed * 1.0 * VEC_RIGHT);
 }
 
 void WalkTest::imm_up (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_UP);
-  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_UP);
-  else Sys->view->GetCamera ()->Move (speed*.6*VEC_UP);
+  if (slow)
+    Sys->view->GetCamera ()->Move (speed * 0.01 * VEC_UP);
+  else if (fast)
+    Sys->view->GetCamera ()->Move (speed * 4.0 * VEC_UP);
+  else
+    Sys->view->GetCamera ()->Move (speed * 1.0 * VEC_UP);
 }
 
 void WalkTest::imm_down (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Move (speed*.01*VEC_DOWN);
-  else if (fast) Sys->view->GetCamera ()->Move (speed*1.2*VEC_DOWN);
-  else Sys->view->GetCamera ()->Move (speed*.6*VEC_DOWN);
+  if (slow)
+    Sys->view->GetCamera ()->Move (speed * 0.01 * VEC_DOWN);
+  else if (fast)
+    Sys->view->GetCamera ()->Move (speed * 4.0 * VEC_DOWN);
+  else
+    Sys->view->GetCamera ()->Move (speed * 1.0 * VEC_DOWN);
 }
 
 void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyLeft (speed, slow, fast); return; }
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.2);
-  else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .4);
+  else
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyRight (speed, slow, fast); return; }
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.2);
-  else Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .4);
+  else
+    Sys->view->GetCamera ()->RotateWorld (VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgDn (speed, slow, fast); return; }
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed * .2);
 }
 
 void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) { wf->KeyPgUp (speed, slow, fast); return; }
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_UP, speed * .2);
 }
 
 void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 {
   if (map_mode) return;
-  if (slow) Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.005);
-  else if (fast) Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.2);
-  else Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed*.1);
+  if (slow)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .005);
+  else if (fast)
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .4);
+  else
+    Sys->view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .2);
 }
 
 void WalkTest::eatkeypress (int status,int key, bool shift, bool alt, bool ctrl)

@@ -144,9 +144,9 @@ bool csMouseDriver::Open (ISystem* System, csEventQueue *EvQueue)
   EventQueue = EvQueue;
   Reset ();
   int val;
-  System->ConfigGetInt ("MouseDriver", "DOUBLE_CLICK_TIME", val, 300);
+  System->ConfigGetInt ("MouseDriver", "DoubleClockTime", val, 300);
   DoubleClickTime = val;
-  System->ConfigGetInt ("MouseDriver", "DOUBLE_CLICK_DIST", val, 2);
+  System->ConfigGetInt ("MouseDriver", "DoubleClickDist", val, 2);
   DoubleClickDist = val;
   LastMouseX = LastMouseY = -99999;
   return (EvQueue != NULL);

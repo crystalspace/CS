@@ -145,14 +145,6 @@ public:
   /// Initialize Network system
   virtual bool InitNetwork ();
 
-  /// this stores all of the cached command-line settings that are passed to IGraphics3D on creation.
-  struct 
-  {
-    bool do_debug;
-    bool cfg_interlacing;
-    long cache_size;
-  } G3DSettings;
-
   /**
    * Open the graphics context (with optional title on titlebar),
    * mouse and keyboard.

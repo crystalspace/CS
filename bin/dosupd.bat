@@ -15,3 +15,8 @@
 
 :doremove
   rm -f %1
+
+  if /%WINDIR%/ == // goto nowindoze
+  sleep 1
+
+:nowindoze

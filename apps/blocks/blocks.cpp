@@ -857,7 +857,6 @@ int main (int argc, char* argv[])
   }
 
   // Some settings.
-  Gfx3D->SetRenderState (G3DRENDERSTATE_DEBUGENABLE, (long)false);
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...

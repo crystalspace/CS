@@ -23,37 +23,37 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
+class csIniFile;
 class csTextureMMSoftware;
 class csTextureManagerSoftware;
 struct HighColorCache_Data;
 interface IImageFile;
 
 /// The internal texture mapping modes.
-#define TXT_GLOBAL 0    // Textures are mapped with a single palette
-#define TXT_PRIVATE 1   // Every texture has it's own 256-color palette
-#define TXT_24BIT 2     // Every texture is represented in 24-bits (RGB)
+#define TXT_GLOBAL	0	// Textures are mapped with a single palette
+#define TXT_PRIVATE	1	// Every texture has it's own 256-color palette
+#define TXT_24BIT	2	// Every texture is represented in 24-bits (RGB)
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):
-#define BITS_RED 6
-#define BITS_GREEN 6
-#define BITS_BLUE 4
-#define MASK_RED ((1<<BITS_RED)-1)
-#define MASK_GREEN ((1<<BITS_GREEN)-1)
-#define MASK_BLUE ((1<<BITS_BLUE)-1)
-#define NUM_RED (1<<BITS_RED)
-#define NUM_GREEN (1<<BITS_GREEN)
-#define NUM_BLUE (1<<BITS_BLUE)
+#define BITS_RED	6
+#define BITS_GREEN	6
+#define BITS_BLUE	4
+#define MASK_RED	((1 << BITS_RED) - 1)
+#define MASK_GREEN	((1 << BITS_GREEN) - 1)
+#define MASK_BLUE	((1 << BITS_BLUE) - 1)
+#define NUM_RED		(1 << BITS_RED)
+#define NUM_GREEN	(1 << BITS_GREEN)
+#define NUM_BLUE	(1 << BITS_BLUE)
 
-#define TABLE_WHITE 0
-#define TABLE_RED 1
-#define TABLE_GREEN 2
-#define TABLE_BLUE 3
-#define TABLE_WHITE_HI 4
-#define TABLE_RED_HI 5
-#define TABLE_GREEN_HI 6
-#define TABLE_BLUE_HI 7
-
+#define TABLE_WHITE	0
+#define TABLE_RED	1
+#define TABLE_GREEN	2
+#define TABLE_BLUE	3
+#define TABLE_WHITE_HI	4
+#define TABLE_RED_HI	5
+#define TABLE_GREEN_HI	6
+#define TABLE_BLUE_HI	7
 
 /**
  * Define a small (3 pixels) margin at the bottom and top of
@@ -275,6 +275,9 @@ class csTextureManagerSoftware : public csTextureManager
 {
 private:
   int num_red, num_green, num_blue;
+
+  /// The configuration file (duplicate! should not be freed)
+  csIniFile* config;
 
   /// Did we initialized?
   bool initialized;
@@ -508,6 +511,9 @@ public:
 	   pil->blue[b>>16];
   }
 
+  /// Set configuration file for use inside Initialize() call
+  void SetConfig (csIniFile* newconfig)
+  { config = newconfig; }
 };
 
 #endif // __SOFT_TXT_H__

@@ -237,7 +237,6 @@ enum G3D_RENDERSTATEOPTION
   G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
   G3DRENDERSTATE_TRANSPARENCYENABLE,
   G3DRENDERSTATE_MIPMAPENABLE,
-  G3DRENDERSTATE_DEBUGENABLE,
   G3DRENDERSTATE_TEXTUREMAPPINGENABLE,
   G3DRENDERSTATE_FILTERINGENABLE,
   G3DRENDERSTATE_PERFECTMAPPINGENABLE,	// OBSOLETE
@@ -481,9 +480,6 @@ public:
 
   /// Debugging: get the value of the Z buffer at some location.
   STDMETHOD (GetZBufPoint) (int x, int y, unsigned long** nResult) PURE;
-
-  /// Set the texture cache size.
-  STDMETHOD (SetCacheSize) (long size) PURE;
 
   /// Dump the texture cache.
   STDMETHOD (DumpCache) (void) PURE;

@@ -27,12 +27,6 @@
 #include "isystem.h"
 #include "lightdef.h"
 
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#if ! __option( global_optimizer )
-#pragma global_optimizer on
-#endif
-#endif
-
 // Ignore image file loading errors?
 bool csTextureMM::fIgnoreLoadingErrors = false;
 
@@ -41,12 +35,13 @@ bool csTextureMM::fIgnoreLoadingErrors = false;
 IMPLEMENT_UNKNOWN_NODELETE (csTextureMM)
 
 BEGIN_INTERFACE_TABLE (csTextureMM)
-        IMPLEMENTS_COMPOSITE_INTERFACE (TextureHandle)
+  IMPLEMENTS_COMPOSITE_INTERFACE (TextureHandle)
 END_INTERFACE_TABLE ()
 
 csTextureMM::csTextureMM (IImageFile* image)
 {
   t1 = t2 = t3 = t4 = t2d = NULL;
+  rs24 = 16; gs24 = 8; bs24 = 0;
 
   usage = NULL;
   istransp = false;
@@ -268,7 +263,7 @@ void csTextureMM::remap_texture (csTextureManager* new_palette)
   if (!ifile) return;
 
   if (for_2d ())
-    if (new_palette->get_display_depth() == 16) 
+    if (new_palette->get_display_depth () == 16) 
       remap_texture_16 (new_palette);
     else 
       remap_texture_32 (new_palette);
@@ -282,145 +277,96 @@ void csTextureMM::remap_palette_24bit (csTextureManager* new_palette)
   compute_color_usage ();
   if (!usage) return;
 
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int s;
+  ifile->GetSize (s);
   RGBPixel* src;
   ifile->GetImageData (&src);
   ULong* dest = t1->get_bitmap32 ();
-  int x, y;
 
   // Map the texture to the RGB palette.
 
-  //Approximation for black, because we can't use real black. Value 0 is 
-  //reserved for transparent pixels!
-  ULong  black = new_palette->get_almost_black(); 
+  // Approximation for black, because we can't use real black. Value 0 is
+  // reserved for transparent pixels!
+  ULong black = new_palette->get_almost_black ();
 
   if (get_transparent ())
-  {
-    //transparent Textures need special processing. Every texel, that is transp_color
-    //will be transformed to 0, because that is the color we use internally to mark
-    //transparent texels.
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
+    // transparent Textures need special processing. Every texel, that is transp_color
+    // will be transformed to 0, because that is the color we use internally to mark
+    // transparent texels.
+    for (; s; src++, s--)
+      if (transp_color == *src)
+        *dest++ = 0;
+      else
       {
-        if (transp_color == *src)
-        {
-          *dest++ = 0;
-        }
-        else
-        {
-          ULong texel = (src->red<<16) | (src->green<<8) | src->blue;;
-          *dest++ = texel ? texel : black; //transform 0 to become "black"
-        }
-        src++;
+        ULong texel = (src->red << rs24) | (src->green << gs24) | (src->blue << bs24);
+        *dest++ = texel ? texel : black; // transform 0 to become "black"
       }
-  }
   else
-  {
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
-      {
-        *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
-        src++;
-      }
-  }
+    for (; s; src++, s--)
+      *dest++ = (src->red << rs24) | (src->green << gs24) | (src->blue << bs24);
 }
 
 void csTextureMM::remap_texture_16 (csTextureManager* new_palette)
 {
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int s;
+  ifile->GetSize (s);
   RGBPixel* src;
   ifile->GetImageData (&src);
   UShort* dest = t2d->get_bitmap16 ();
-  int x, y;
 
-  //Approximation for black, because we can't use real black. Value 0 is 
-  //reserved for transparent pixels!
+  // Approximation for black, because we can't use real black. Value 0 is 
+  // reserved for transparent pixels!
   UShort black = new_palette->get_almost_black();
 
   if (get_transparent ())
-  {
-    //transparent Textures need special processing. Every texel, that is transp_color
-    //will be transformed to 0, because that is the color we use internally to mark
-    //transparent texels.
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
+    // transparent Textures need special processing. Every texel, that is transp_color
+    // will be transformed to 0, because that is the color we use internally to mark
+    // transparent texels.
+    for (; s; src++, s--)
+      if (transp_color == *src)
+        *dest++ = 0;
+      else
       {
-        if (transp_color == *src)
-        {
-          *dest++ = 0;
-        }
-        else
-        {
-          UShort texel = new_palette->find_color (src->red, src->green, src->blue);
-          *dest++ = texel ? texel : black; //transform 0 to become "black"
-        }
-        src++;
+        UShort texel = new_palette->find_color (src->red, src->green, src->blue);
+        *dest++ = texel ? texel : black;	// transform 0 to become "black"
       }
-  }
   else
-  {
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
-      {
-        *dest++ = new_palette->find_color (src->red, src->green, src->blue);
-        src++;
-      }
-  }
+    for (; s; src++, s--)
+      *dest++ = new_palette->find_color (src->red, src->green, src->blue);
 }
 
 void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
 {
-  int w, h;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
+  int s;
+  ifile->GetSize (s);
   RGBPixel* src;
   ifile->GetImageData (&src);
   ULong* dest = t2d->get_bitmap32 ();
-  int x, y;
   
-  //Approximation for black, because we can't use real black. Value 0 is 
-  //reserved for transparent pixels!
-  ULong  black = new_palette->get_almost_black(); 
+  // Approximation for black, because we can't use real black. Value 0 is 
+  // reserved for transparent pixels!
+  ULong black = new_palette->get_almost_black(); 
 
   if (get_transparent ())
-  {
-    //transparent Textures need special processing. Every texel, that is transp_color
-    //will be transformed to 0, because that is the color we use internally to mark
-    //transparent texels.
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
+    // transparent Textures need special processing. Every texel, that is transp_color
+    // will be transformed to 0, because that is the color we use internally to mark
+    // transparent texels.
+    for (; s; src++, s--)
+      if (transp_color == *src)
+        *dest++ = 0;
+      else
       {
-        if (transp_color == *src)
-        {
-          *dest++ = 0;
-        }
-        else
-        {
-          ULong texel = new_palette->find_color (src->red, src->green, src->blue);
-          *dest++ = texel ? texel : black; //transform 0 to become "black"
-        }
-        src++;
+        ULong texel = new_palette->find_color (src->red, src->green, src->blue);
+        *dest++ = texel ? texel : black; //transform 0 to become "black"
       }
-  }
   else
-  {
-    for (y = 0 ; y < h ; y++)
-      for (x = 0 ; x < w ; x++)
-      {
-        *dest++ = new_palette->find_color (src->red, src->green, src->blue);
-        src++;
-      }
-  }
+    for (; s; src++, s--)
+      *dest++ = new_palette->find_color (src->red, src->green, src->blue);
 }
 
 
-void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* tex,
-                                                          IImageFile* imfile, 
-                                                          unsigned char* bm)
+void csHardwareAcceleratedTextureMM::convert_to_internal
+  (csTextureManager* tex, IImageFile* imfile, unsigned char* bm)
 {
   int s;
   imfile->GetSize (s);
@@ -435,34 +381,20 @@ void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* tex,
   ULong  black = tex->get_almost_black(); 
 
   if (get_transparent ())
-  {
-    //transparent Textures need special processing. Every texel, that is transp_color
-    //will be transformed to 0, because that is the color we use internally to mark
-    //transparent texels.
-    while (s>0)
-    {
+    // transparent Textures need special processing. Every texel, that is transp_color
+    // will be transformed to 0, because that is the color we use internally to mark
+    // transparent texels.
+    for (; s; src++, s--)
       if (transp_color == *src)
-      {
         *dest++ = 0;
-      }
       else
       {
-        ULong texel = (src->red<<16) | (src->green<<8) | src->blue;;
+        ULong texel = (src->red << rs24) | (src->green << gs24) | (src->blue << bs24);
         *dest++ = texel ? texel : black; //transform 0 to become "black"
       }
-      src++;
-      s--;
-    }
-  }
   else
-  {
-    while (s>0)
-    {
-      *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
-      src++;
-      s--;
-    }
-  }
+    for (; s; src++, s--)
+      *dest++ = (src->red << rs24) | (src->green << gs24) | (src->blue << bs24);
 }
 
 //---------------------------------------------------------------------------
@@ -660,9 +592,3 @@ int csTextureManager::get_almost_black ()
   // huh ?!
   return 0;
 }
-
-
-//---------------------------------------------------------------------------
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#pragma global_optimizer reset
-#endif

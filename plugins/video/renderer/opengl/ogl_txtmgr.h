@@ -23,6 +23,7 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
+class csIniFile;
 class csTextureManagerOpenGL;
 interface IImageFile;
 
@@ -83,6 +84,8 @@ class csTextureManagerOpenGL : public csTextureManager
 {
 private:
   int num_red, num_green, num_blue;
+  /// The configuration file (duplicate! should not be freed)
+  csIniFile* config;
 
   /// Configuration values for color matching.
   int prefered_dist;
@@ -159,8 +162,10 @@ public:
    * Remap all textures.
    */
   void remap_textures ();
+
+  /// Set configuration file for use inside Initialize() call
+  void SetConfig (csIniFile* newconfig)
+  { config = newconfig; }
 };
 
-
 #endif // TXTMGR_OPENGL_H
-

@@ -24,6 +24,7 @@
 #include "cs3d/common/inv_cmap.h"
 #include "csgfxldr/boxfilt.h"
 #include "csutil/scanstr.h"
+#include "csutil/inifile.h"
 #include "isystem.h"
 #include "iimage.h"
 #include "lightdef.h"
@@ -132,7 +133,7 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
       *bm++ = tex->find_rgb (bmsrc->red, bmsrc->green, bmsrc->blue);
 }
 
-void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* /*tex*/,
+void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *tex,
   IImageFile* imfile, unsigned char* bm)
 {
   int s;
@@ -145,10 +146,10 @@ void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware* /
       if (transp_color == *bmsrc)
         *bml++ = 0;
       else
-        *bml++ = (bmsrc->red << 16) | (bmsrc->green << 8) | bmsrc->blue;
+        *bml++ = (bmsrc->red << rs24) | (bmsrc->green << gs24) | (bmsrc->blue << bs24);
   else
     for (; s > 0; s--, bmsrc++)
-      *bml++ = (bmsrc->red << 16) | (bmsrc->green << 8) | bmsrc->blue;
+      *bml++ = (bmsrc->red << rs24) | (bmsrc->green << gs24) | (bmsrc->blue << bs24);
 }
 
 void csTextureMMSoftware::convert_to_internal_private (csTextureManagerSoftware* /*tex*/,
@@ -173,6 +174,17 @@ void csTextureMMSoftware::remap_texture (csTextureManager* new_palette)
 {
   if (!ifile) return;
   csTextureManagerSoftware* psoft = (csTextureManagerSoftware*)new_palette;
+
+  // If we're running at 32bpp, save R,G,B shift values
+  // since we will have to use the native pixel format
+  // (so that unlighted textures can be fetched from bitmap pointer)
+  const csPixelFormat &pfmt = psoft->pixel_format ();
+  if (pfmt.PixelBytes == 4)
+  {
+    rs24 = pfmt.RedShift;
+    gs24 = pfmt.GreenShift;
+    bs24 = pfmt.BlueShift;
+  }
 
   if (for_2d ())
     if (psoft->get_display_depth () == 8)
@@ -367,9 +379,12 @@ void csTextureManagerSoftware::InitSystem ()
 
 bool csTextureManagerSoftware::force_txtmode (char* p)
 {
-  if (!strcmp (p, "global")) force_txtMode = TXT_GLOBAL;
-  else if (!strcmp (p, "private")) force_txtMode = TXT_PRIVATE;
-  else if (!strcmp (p, "24bit")) force_txtMode = TXT_24BIT;
+  if (!strcmp (p, "global"))
+    force_txtMode = TXT_GLOBAL;
+  else if (!strcmp (p, "private"))
+    force_txtMode = TXT_PRIVATE;
+  else if (!strcmp (p, "24bit"))
+    force_txtMode = TXT_24BIT;
   else
   {
     SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for TXTMODE (use 'global', 'private', or '24bit')!\n", p);
@@ -392,16 +407,11 @@ bool csTextureManagerSoftware::force_mixing (char* mix)
 
 void csTextureManagerSoftware::read_config ()
 {
-  char* p;
-  ISystem* sys = m_piSystem;
-  // @@@ WARNING! The following code only examines the
-  // main cryst.cfg file and not the one which overrides values
-  // in the world file. We need to support this someway in the ISystem
-  // interface as well.
+  char *p;
 
-  sys->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", do_blend_mipmap0, false);
+  do_blend_mipmap0 = config->GetYesNo ("Mipmapping", "BLEND_MIPMAP", false);
 
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_1", p, "-");
+  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_1", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -413,7 +423,7 @@ void csTextureManagerSoftware::read_config ()
       mipmap_filter_1.f21+mipmap_filter_1.f22+mipmap_filter_1.f23+
       mipmap_filter_1.f31+mipmap_filter_1.f32+mipmap_filter_1.f33;
   }
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_2", p, "-");
+  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_2", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -429,7 +439,7 @@ void csTextureManagerSoftware::read_config ()
       mipmap_filter_2.f30+mipmap_filter_2.f31+mipmap_filter_2.f32+mipmap_filter_2.f33+mipmap_filter_2.f34+
       mipmap_filter_2.f40+mipmap_filter_2.f41+mipmap_filter_2.f42+mipmap_filter_2.f43+mipmap_filter_2.f44;
   }
-  sys->ConfigGetStr ("TextureMapper", "BLEND_FILTER", p, "-");
+  p = config->GetStr ("Mipmapping", "BLEND_FILTER", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -442,9 +452,9 @@ void csTextureManagerSoftware::read_config ()
       blend_filter.f31+blend_filter.f32+blend_filter.f33;
   }
 
-  sys->ConfigGetInt ("World", "RGB_DIST", prefered_dist, PREFERED_DIST);
-  sys->ConfigGetInt ("World", "RGB_COL_DIST", prefered_col_dist, PREFERED_COL_DIST);
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_NICE", p, "nice");
+  prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
+  prefered_col_dist = config->GetInt ("TextureManager", "RGB_COL_DIST", PREFERED_COL_DIST);
+  p = config->GetStr ("Mipmapping", "MIPMAP_NICE", "nice");
   if (!strcmp (p, "nice"))
   {
     mipmap_nice = MIPMAP_NICE;
@@ -471,15 +481,15 @@ void csTextureManagerSoftware::read_config ()
     exit (0);	//@@@
   }
 
-  if (force_mix != -1) mixing = force_mix;
+  if (force_mix != -1)
+    mixing = force_mix;
   else
   {
-    char buf[100];
-    sys->ConfigGetStr ("World", "MIXLIGHTS", p, "true_rgb");
-    strcpy (buf, p);
-
-    if (!strcmp (p, "true_rgb")) mixing = MIX_TRUE_RGB;
-    else if (!strcmp (p, "nocolor")) mixing = MIX_NOCOLOR;
+    p = config->GetStr ("TextureManager", "MIXLIGHTS", "true_rgb");
+    if (!strcmp (p, "true_rgb"))
+      mixing = MIX_TRUE_RGB;
+    else if (!strcmp (p, "nocolor"))
+      mixing = MIX_NOCOLOR;
     else
     {
       SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIXLIGHTS (use 'true_rgb' or 'nocolor')!\n", p);
@@ -497,13 +507,13 @@ void csTextureManagerSoftware::read_config ()
     txtMode = force_txtMode;
   else
   {
-    char buf[100];
-    sys->ConfigGetStr ("World", "TXTMODE", p, "global");
-    strcpy (buf, p);
-
-    if (!strcmp (p, "global")) txtMode = TXT_GLOBAL;
-    else if (!strcmp (p, "private")) txtMode = TXT_PRIVATE;
-    else if (!strcmp (p, "24bit")) txtMode = TXT_24BIT;
+    p = config->GetStr ("TextureManager", "TXTMODE", "global");
+    if (!strcmp (p, "global"))
+      txtMode = TXT_GLOBAL;
+    else if (!strcmp (p, "private"))
+      txtMode = TXT_PRIVATE;
+    else if (!strcmp (p, "24bit"))
+      txtMode = TXT_24BIT;
     else
     {
       SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for TXTMODE (use 'global', 'private', or '24bit')!\n", p);
@@ -592,7 +602,8 @@ void csTextureManagerSoftware::clear ()
 csTextureMMSoftware* csTextureManagerSoftware::new_texture (IImageFile* image)
 {
   CHK (csTextureMMSoftware* tm = new csTextureMMSoftware (image));
-  if (tm->loaded_correctly ()) textures.Push (tm);
+  if (tm->loaded_correctly ())
+    textures.Push (tm);
   return tm;
 }
 

@@ -262,14 +262,6 @@ OnError:
     fatal_exit (0, false);
   }
 
-  if (piG3D != NULL)
-  {
-    // Initialize default setting as given by the commandline.
-    piG3D->SetRenderState (G3DRENDERSTATE_DEBUGENABLE, G3DSettings.do_debug);
-    piG3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, G3DSettings.cfg_interlacing);
-    piG3D->SetCacheSize (G3DSettings.cache_size);
-  }
-
   return (piG3D != NULL  &&  piG2D != NULL  &&  piGI != NULL);
 }
 
@@ -354,9 +346,6 @@ void csSystemDriver::SetSystemDefaults ()
   FrameWidth = 640; if (config) FrameWidth = config->GetInt ("VideoDriver", "WIDTH", FrameWidth);
   FrameHeight = 480; if (config) FrameHeight = config->GetInt ("VideoDriver", "HEIGHT", FrameHeight);
   Depth = 8; if (config) Depth = config->GetInt ("VideoDriver", "DEPTH", Depth);
-  G3DSettings.cfg_interlacing = false; if (config) G3DSettings.cfg_interlacing = config->GetYesNo ("VideoDriver", "INTERLACING", G3DSettings.cfg_interlacing);
-  G3DSettings.cache_size = 5242880; if (config) G3DSettings.cache_size = config->GetInt ("TextureMapper", "CACHE", G3DSettings.cache_size);
-  G3DSettings.do_debug = false;
 }
 
 bool csSystemDriver::ParseCmdLineDriver (int argc, char* argv[])
@@ -466,33 +455,6 @@ bool csSystemDriver::ParseArg (int argc, char* argv[], int& i)
   {
     Help ();
     exit (0);
-  }
-  else if (strcasecmp ("-debug", argv[i]) == 0)
-  {
-    G3DSettings.do_debug = true;
-    Printf (MSG_INITIALIZATION, "Debugging info enabled.\n");
-  }
-  else if (strcasecmp ("-nodebug", argv[i]) == 0)
-  {
-    G3DSettings.do_debug = false;
-    Printf (MSG_INITIALIZATION, "Debugging info disabled.\n");
-  }
-  else if (strcasecmp ("-cache", argv[i]) == 0)
-  {
-    i++;
-    if (i < argc) sscanf (argv[i], "%ld", &G3DSettings.cache_size);
-  }
-  else if (strcasecmp ("-mixing", argv[i]) == 0)
-  {
-  //@@@
-    i++;
-    //if (i < argc) if (!Textures::force_mixing (argv[i])) fatal_exit (0,false);
-  }
-  else if (strcasecmp ("-txtmode", argv[i]) == 0)
-  {
-    //@@@
-    i++;
-    //if (i < argc) if (!Textures::force_txtmode (argv[i])) fatal_exit (0,false);
   }
   else if (strcasecmp ("-mode", argv[i]) == 0)
   {
@@ -621,10 +583,6 @@ void csSystemDriver::Help ()
   }
   Printf (MSG_STDOUT, "General options:\n");
   Printf (MSG_STDOUT, "  -help              this help\n");
-  Printf (MSG_STDOUT, "  -debug/nodebug     keep more debugging info for crashes (default '%sdebug')\n", G3DSettings.do_debug ? "" : "no");
-  Printf (MSG_STDOUT, "  -cache <size>      set the texture cache size (default=%d)\n", G3DSettings.cache_size);
-  Printf (MSG_STDOUT, "  -mixing <mode>     set the mode used for mixing\n");
-  Printf (MSG_STDOUT, "  -txtmode <mode>    set the texture mode\n");
   Printf (MSG_STDOUT, "  -mode <w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
   Printf (MSG_STDOUT, "  -depth <d>         set depth (default=%d bpp)\n", Depth);
   Printf (MSG_STDOUT, "  -driver <s>        the 3D driver (opengl, glide, software, ...)\n");

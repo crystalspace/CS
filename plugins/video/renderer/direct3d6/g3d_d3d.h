@@ -199,9 +199,6 @@ public:
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
   STDMETHODIMP GetCaps(G3D_CAPS *caps);
   
-  /// Set the texture cache size.
-  STDMETHODIMP SetCacheSize (long size) { return S_OK; }
-
   /// Dump the texture cache.
   STDMETHODIMP DumpCache(void);
   

@@ -90,7 +90,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   }
 }
 
-void SysSystemDriver::Loop(void)
+void SysSystemDriver::Loop ()
 {
   while (!Shutdown && !ExitLoop)
   {
@@ -204,7 +204,7 @@ SysMouseDriver::SysMouseDriver () : csMouseDriver ()
 
   SensivityFactor = 1.0;
   if (config)
-    SensivityFactor = config->GetFloat ("VideoDriver", "MouseSensivity", SensivityFactor);
+    SensivityFactor = config->GetFloat ("MouseDriver", "MouseSensivity", SensivityFactor);
 }
 
 SysMouseDriver::~SysMouseDriver ()

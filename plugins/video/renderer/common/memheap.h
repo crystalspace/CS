@@ -22,25 +22,25 @@
 #include <stddef.h> // For size_t
 
 /// The default texture cache size.
-#define DEFAULT_CACHE_SIZE 5000000
+#define DEFAULT_CACHE_SIZE	5*1024*1024
 
 /*
  * Structures
  */
 
-struct s_bufhd     /* Buffer header */
+struct s_bufhd		// Buffer header
 {
-	ULong size;  /* Size of the buffer + its header */
-	ULong full;  /* ULong have been used instead of a bool to */
-	             /* ensure that sizeof(bufhd) will have the same value */
-	             /* with different compilers. */
+  ULong size;		// Size of the buffer + its header
+  ULong full;		// ULong have been used instead of a bool to
+			// ensure that sizeof(bufhd) will have the same value
+			// with different compilers.
 };
 
-struct s_heap      /* Heap header */
+struct s_heap		// Heap header
 {
-	ULong start;      /* A pointer on the first buffer header */
-	ULong first_free; /* A pointer on the first free buffer */
-	ULong end;        /* A pointer on the end of the heap */
+  ULong start;		// A pointer on the first buffer header
+  ULong first_free;	// A pointer on the first free buffer
+  ULong end;		// A pointer on the end of the heap
 };
 
 typedef struct s_bufhd bufhd;
@@ -62,7 +62,7 @@ class MemoryHeap
 {
 public:
   /// s: Size of Memory heap
-  MemoryHeap( size_t s  = DEFAULT_CACHE_SIZE );
+  MemoryHeap (size_t s  = DEFAULT_CACHE_SIZE);
   ///
   ~MemoryHeap();
 
@@ -86,15 +86,15 @@ public:
   int free( void *buf );
 
 private:
-	/// Address of the memory buffer
-	char *memory;
-	size_t cache_size;
+  /// Address of the memory buffer
+  char *memory;
+  size_t cache_size;
 
-	/*
-	 * dump_pool() is outside the MemoryHeap class in order to
-	 * decouple system.h from this class.
-	 */
-	friend void dump_pool( MemoryHeap * );
+  /*
+   * dump_pool() is outside the MemoryHeap class in order to
+   * decouple system.h from this class.
+   */
+  friend void dump_pool( MemoryHeap * );
 };
 
 #endif /* _MEMHEAP_H_ */

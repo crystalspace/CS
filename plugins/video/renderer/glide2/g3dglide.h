@@ -159,9 +159,6 @@ public:
   /// Release a texture from the cache.
   STDMETHODIMP UncacheTexture (IPolygonTexture *piPT);
 
-  /// Set the texture cache size.
-  STDMETHODIMP SetCacheSize (long /*size*/) { return S_OK; }
-
   /// Dump the texture cache.
   STDMETHODIMP DumpCache(void);
   

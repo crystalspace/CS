@@ -47,6 +47,7 @@ interface IGraphics2D;
 class csTextureManagerSoftware;
 class TextureCache;
 class TextureCache16;
+class csIniFile;
 extern const CLSID CLSID_SoftwareGraphics3D;
 struct csFog;
 
@@ -183,12 +184,18 @@ private:
   /// Build the table used for fog in paletted modes
   unsigned char *BuildIndexedFogTable ();
 
+  /// Set the texture cache size.
+  void SetCacheSize (long size);
+
 public:
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DSoftware is in charge of creating and managing this.
    */
   IGraphics2D* m_piG2D;
+
+  /// The configuration file
+  csIniFile* config;
 
   /// The texture manager.
   csTextureManagerSoftware* txtmgr;
@@ -216,8 +223,6 @@ public:
   /// Do we want Gouraud Shaded polygons?
   bool rstate_gouraud;
 
-  /// @@todo: remove this
-  bool do_debug;
   /// Do interlacing? (-1 - no, 0/1 - yes)
   int do_interlaced;
   /**
@@ -350,9 +355,6 @@ public:
 
   /// Get address of Z-buffer at specific point
   STDMETHODIMP GetZBufPoint(int x, int y, unsigned long** retval) { *retval = z_buffer + x + y*width; return S_OK; }
-
-  /// Set the texture cache size.
-  STDMETHODIMP SetCacheSize (long size);
 
   /// Dump the texture cache.
   STDMETHODIMP DumpCache (void);

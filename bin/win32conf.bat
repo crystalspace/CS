@@ -17,9 +17,6 @@
 :nonasm
   del conftest.asm
 
-  copy config.tmp + bin\win32conf.var tmp >nul
-  if errorlevel 1 goto exit
-  del config.tmp >nul
-  ren tmp config.tmp >nul
+  type bin\win32conf.var >>config.tmp
 
 :exit

@@ -25,6 +25,7 @@
 #include "cs3d/common/inv_cmap.h"
 #include "csgfxldr/boxfilt.h"
 #include "csutil/scanstr.h"
+#include "csutil/inifile.h"
 #include "isystem.h"
 #include "iimage.h"
 #include "lightdef.h"
@@ -68,16 +69,10 @@ bool csTextureManagerOpenGL::force_mixing (char* mix)
 
 void csTextureManagerOpenGL::read_config ()
 {
-  char* p;
-  ISystem* sys = m_piSystem;
-  // @@@ WARNING! The following code only examines the
-  // main cryst.cfg file and not the one which overrides values
-  // in the world file. We need to support this someway in the ISystem
-  // interface as well.
+  char *p;
+  do_blend_mipmap0 = config->GetYesNo ("Mipmapping", "BLEND_MIPMAP", false);
 
-  sys->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", do_blend_mipmap0, false);
-
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_1", p, "-");
+  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_1", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -89,7 +84,7 @@ void csTextureManagerOpenGL::read_config ()
       mipmap_filter_1.f21+mipmap_filter_1.f22+mipmap_filter_1.f23+
       mipmap_filter_1.f31+mipmap_filter_1.f32+mipmap_filter_1.f33;
   }
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_FILTER_2", p, "-");
+  p = config->GetStr ("Mipmapping", "MIPMAP_FILTER_2", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -105,7 +100,7 @@ void csTextureManagerOpenGL::read_config ()
       mipmap_filter_2.f30+mipmap_filter_2.f31+mipmap_filter_2.f32+mipmap_filter_2.f33+mipmap_filter_2.f34+
       mipmap_filter_2.f40+mipmap_filter_2.f41+mipmap_filter_2.f42+mipmap_filter_2.f43+mipmap_filter_2.f44;
   }
-  sys->ConfigGetStr ("TextureMapper", "BLEND_FILTER", p, "-");
+  p = config->GetStr ("Mipmapping", "BLEND_FILTER", "-");
   if (*p != '-')
   {
     ScanStr (p, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
@@ -118,9 +113,9 @@ void csTextureManagerOpenGL::read_config ()
       blend_filter.f31+blend_filter.f32+blend_filter.f33;
   }
 
-  sys->ConfigGetInt ("World", "RGB_DIST", prefered_dist, PREFERED_DIST);
-  sys->ConfigGetInt ("World", "RGB_COL_DIST", prefered_col_dist, PREFERED_COL_DIST);
-  sys->ConfigGetStr ("TextureMapper", "MIPMAP_NICE", p, "nice");
+  prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
+  prefered_col_dist = config->GetInt ("TextureManager", "RGB_COL_DIST", PREFERED_COL_DIST);
+  p = config->GetStr ("Mipmapping", "MIPMAP_NICE", "nice");
   if (!strcmp (p, "nice"))
   {
     mipmap_nice = MIPMAP_NICE;
@@ -158,12 +153,12 @@ void csTextureManagerOpenGL::read_config ()
   if (force_mix != -1) mixing = force_mix;
   else
   {
-    char buf[100];
-    sys->ConfigGetStr ("World", "MIXLIGHTS", p, "true_rgb");
-    strcpy (buf, p);
+    p = config->GetStr ("TextureManager", "MIXLIGHTS", "true_rgb");
 
-    if (!strcmp (p, "true_rgb")) mixing = MIX_TRUE_RGB;
-    else if (!strcmp (p, "nocolor")) mixing = MIX_NOCOLOR;
+    if (!strcmp (p, "true_rgb"))
+      mixing = MIX_TRUE_RGB;
+    else if (!strcmp (p, "nocolor"))
+      mixing = MIX_NOCOLOR;
     else
     {
       SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIXLIGHTS (use 'true_rgb' or 'nocolor')!\n", p);

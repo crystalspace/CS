@@ -27,7 +27,6 @@
 #include "igraph2d.h"
 #include "igraph3d.h"
 
-
 //---------------------------------------------------------------------------
 
 int TextureCache::cache_size = DEFAULT_CACHE_SIZE;
@@ -457,8 +456,8 @@ void TextureCache::init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTe
   tcd.d_lw = tcd.lw-(tcd.lu2-tcd.lu1);
 }
 
-void TextureCache::create_lighted_nocolor (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+void TextureCache::create_lighted_nocolor (TCacheData& tcd,
+  TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
 {
   int w = tcd.width;
   int h = tcd.height;

@@ -79,6 +79,12 @@ protected:
   csTexture* t2d;
 
   /**
+   * In 32bpp we have to use the native pixel format
+   * These are the shift values for R,G and B
+   */
+  int rs24, gs24, bs24;
+
+  /**
    * Create a mipmapped bitmap from a previous level.
    * 'steps' is the number of steps to mipmap (only 1, 2, or 3 supported).
    */
@@ -508,6 +514,9 @@ public:
    * Get depth of the display for which this texture manager is used.
    */
   int get_display_depth () { return pfmt.PixelBytes * 8; }
+
+  /// Get pixel format structure
+  const csPixelFormat &pixel_format () const { return pfmt; }
 
   ///
   int red () { return red_color; }

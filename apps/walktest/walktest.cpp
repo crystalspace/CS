@@ -1355,10 +1355,6 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
-  // For debugging purposes.
-  Gfx3D->SetRenderState (G3DRENDERSTATE_DEBUGENABLE,
-    config->GetYesNo ("WalkTest", "DEBUG", false));
-
   // Create console object for text and commands.
   CHK (System->Console = new csSimpleConsole (Command::SharedInstance()));
 

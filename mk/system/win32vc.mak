@@ -144,7 +144,7 @@ CC=cl -c
 CXX=cl -c
 
 # The linker.
-DEFFILE=$(subst /,\,$(OUTOS)$*.def)
+DEFFILE=$(subst /,\,$(OUT)$*.def)
 define LINK
   @bin\win32link.bat $(DEFFILE) "$(DESCRIPTION.$@)" $(filter %.exe,$@)
   link -def:$(DEFFILE)
