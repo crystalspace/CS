@@ -32,26 +32,11 @@
 
 class csSLMCacheData;
 
-struct Indexes
-{
-  int vertex;
-  int uv;
-};
-
-class csVertexIndexArrayNode
-{
-public:
-  csGrowingArray<Indexes> indices;
-};
-
-typedef csVertexIndexArrayNode* csIndexVertex;
-
 class csTrianglesPerMaterial
 {
 public:
   csTrianglesPerMaterial * next;
   int matIndex;
-  int numTriangles;
 
   // We need a better implementation here
   // We're duplicating info, but we need the number of vertices per
@@ -66,7 +51,7 @@ public:
   void ClearVertexArray ();
 
   /// Return the number of triangles
-  int TriangleCount () const { return numTriangles; }
+  int TriangleCount () const { return triangles.Length (); }
 };
 
 
@@ -106,8 +91,6 @@ public:
 
   csSubRectangles* region;
 
-  int numTriangles;
-
   csTrianglesPerSuperLightmap();
   ~csTrianglesPerSuperLightmap();
 
@@ -117,12 +100,6 @@ public:
 
   // Checks if the superlightmap is initialized or not
   bool initialized;
-
-  // Cache for the combined super lightmaps.
-  uint8* suplm_data;
-  int suplm_width, suplm_height;
-  // Calculate the combined super lightmap cache.
-  void CalculateSuplmData ();
 
   // Cost of this super lightmap. A high number means that
   // this super lightmap requires a lot of work to update. This number

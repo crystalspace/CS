@@ -16,6 +16,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the comments in configure.ac to more fully
 	  inform the reader about the Autoconf bugs which configure.ac works
 	  around.
+	- Removed redundant number of triangles in the polygon buffer.
+	- Cleaned up OpenGL polybuf code a bit more.
+	- Removed an unneeded IncRef() on iPolyTexture in the polygon buffer
+	  implementation.
 	- Eric Sunshine made the following changes to the new csArray template:
 	    - Fixed bad bug: Public SetLength() allowed client to
 	      indiscriminately add and remove elements from the array without

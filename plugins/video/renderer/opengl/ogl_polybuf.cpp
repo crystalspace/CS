@@ -62,7 +62,6 @@ void TrianglesList::Add (csTrianglesPerMaterial* t)
 
 csTrianglesPerMaterial::csTrianglesPerMaterial()
 {
-  numTriangles = 0;
   next = NULL;
 }
 
@@ -83,12 +82,10 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
     csRect (0, 0, OpenGLLightmapCache::super_lm_size,
   OpenGLLightmapCache::super_lm_size));
 
-  numTriangles = 0;
   cacheData = NULL;
   isUnlit = false;
   initialized = false;
   prev = NULL;
-  suplm_data = NULL;
   cost = -1;
 }
 
@@ -96,26 +93,6 @@ csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap ()
 {
   if (cacheData) cacheData->Clear();
   delete region;
-  delete[] suplm_data;
-}
-
-void csTrianglesPerSuperLightmap::CalculateSuplmData ()
-{
-  if (suplm_data) return;
-  int i;
-  suplm_width = 0;
-  suplm_height = 0;
-  for (i = 0 ; i < rectangles.Length () ; i++)
-  {
-    //iLightMap* lm = sln->lightmaps[i]->GetLightMap();
-    //int lmwidth = lm->GetWidth ();
-    //int lmheigth = lm->GetHeight ();
-    const csRect& r = rectangles[i];
-    if (r.xmax > suplm_width) suplm_width = r.xmax;
-    if (r.ymax > suplm_height) suplm_height = r.ymax;
-  }
-printf ("%dx%d\n", suplm_width, suplm_height); fflush (stdout);
-  suplm_data = new uint8[suplm_width * suplm_height * 4];
 }
 
 int csTrianglesPerSuperLightmap::CalculateCost ()
@@ -261,15 +238,13 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     triangle.b = AddSingleVertex (pol, verts, i, uv[i], cur_vt_idx);
     triangle.c = AddSingleVertex (pol, verts, i+1, uv[i+1], cur_vt_idx);
     pol->triangles.Push (triangle);
-
-    pol->numTriangles++;
   }
 
   pol->matIndex = mat_index;
 
 
 
-//poly_texture, num_vertices, old_cur_vt_idx, uv0, transform
+//poly_texture, num_vertices, old_cur_vt_idx, uv
 
   // Lightmap handling.
   csRect rect;
@@ -351,8 +326,6 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     triangle.b = AddSingleVertexLM (uvLightmap[i], cur_vt_idx);
     triangle.c = AddSingleVertexLM (uvLightmap[i+1], cur_vt_idx);
     triSuperLM->triangles.Push (triangle);
-    poly_texture->IncRef ();
-    triSuperLM->numTriangles++;
   }
 
   triSuperLM->rectangles.Push (rect);

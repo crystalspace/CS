@@ -3759,7 +3759,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       }
     }
     trimesh.triangles = t->triangles.GetArray ();
-    trimesh.num_triangles = t->numTriangles;
+    trimesh.num_triangles = t->triangles.Length ();
     bool drawn = EffectDrawTriangleMesh (trimesh, false);
     something_was_drawn |= drawn;
     t = t->next;
@@ -3800,7 +3800,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       if (!sln->cacheData->IsUnlit ())
       {
         trimesh.triangles = sln->triangles.GetArray ();
-        trimesh.num_triangles = sln->numTriangles;
+        trimesh.num_triangles = sln->triangles.Length ();
 
         EffectDrawTriangleMesh (trimesh, false, sln->cacheData->Handle);
       }
