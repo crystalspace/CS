@@ -40,6 +40,8 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
+#include "imesh/crossbld.h"
+#include "imesh/mdlconv.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -168,6 +170,8 @@ bool Vostest::Initialize ()
                                       CS_REQUEST_REPORTER,
                                       CS_REQUEST_REPORTERLISTENER,
                                       CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
+									  CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder", iCrossBuilder),
+									  CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer", iModelConverter),
                                       CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
