@@ -11060,6 +11060,7 @@ package cspace::iImage;
 *GetImageData = *cspacec::iImage_GetImageData;
 *GetWidth = *cspacec::iImage_GetWidth;
 *GetHeight = *cspacec::iImage_GetHeight;
+*GetDepth = *cspacec::iImage_GetDepth;
 *SetName = *cspacec::iImage_SetName;
 *GetName = *cspacec::iImage_GetName;
 *GetFormat = *cspacec::iImage_GetFormat;
@@ -11071,6 +11072,11 @@ package cspace::iImage;
 *GetKeycolor = *cspacec::iImage_GetKeycolor;
 *HasMipmaps = *cspacec::iImage_HasMipmaps;
 *GetMipmap = *cspacec::iImage_GetMipmap;
+*GetRawFormat = *cspacec::iImage_GetRawFormat;
+*GetRawData = *cspacec::iImage_GetRawData;
+*GetImageType = *cspacec::iImage_GetImageType;
+*HasSubImages = *cspacec::iImage_HasSubImages;
+*GetSubImage = *cspacec::iImage_GetSubImage;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13029,6 +13035,9 @@ sub CS_IMGFMT_PALETTED8 () { $cspacec::CS_IMGFMT_PALETTED8 }
 sub CS_IMGFMT_ANY () { $cspacec::CS_IMGFMT_ANY }
 sub CS_IMGFMT_ALPHA () { $cspacec::CS_IMGFMT_ALPHA }
 sub CS_IMGFMT_INVALID () { $cspacec::CS_IMGFMT_INVALID }
+sub csimg2D () { $cspacec::csimg2D }
+sub csimg3D () { $cspacec::csimg3D }
+sub csimgCube () { $cspacec::csimgCube }
 sub CS_IMAGEIO_LOAD () { $cspacec::CS_IMAGEIO_LOAD }
 sub CS_IMAGEIO_SAVE () { $cspacec::CS_IMAGEIO_SAVE }
 sub CS_REPORTER_SEVERITY_BUG () { $cspacec::CS_REPORTER_SEVERITY_BUG }
