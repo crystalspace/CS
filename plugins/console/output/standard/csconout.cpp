@@ -383,8 +383,8 @@ void csConsoleOutput::Draw2D (csRect *area)
 	  cy_pix + (height-3), fg);
         break;
       case csConNormalCursor:
-        G2D->DrawBox (cx_pix + 1, cy_pix + 1, line.xmax - 1,
-	  cy_pix + (height - 1), fg);
+        G2D->DrawBox (cx_pix + 1, cy_pix + 1, line.xmax - 1 - (cx_pix + 1),
+	  (height - 1) - 1, fg);
         break;
 #ifdef CS_DEBUG
       default:
