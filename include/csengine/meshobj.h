@@ -157,11 +157,9 @@ class csMeshWrapper : public csObject
   friend class csMovableSectorList;
 
 protected:
-  /**
-   * Points to the parent container object of this object.
-   * This is usually csEngine or another csMeshWrapper.
-   */
-  csObject* parent;
+
+  /// The parent mesh object, or NULL
+  iMeshWrapper *Parent;
 
   /**
    * Bounding box in world space.
@@ -261,14 +259,14 @@ protected:
 
 public:
   /// Constructor.
-  csMeshWrapper (csObject* theParent, iMeshObject* mesh);
+  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* mesh);
   /// Constructor.
-  csMeshWrapper (csObject* theParent);
+  csMeshWrapper (iMeshWrapper* theParent);
 
   /// Set parent container for this object.
-  void SetParentContainer (csObject* newParent) { parent = newParent; }
+  void SetParentContainer (iMeshWrapper* newParent) { Parent = newParent; }
   /// Get parent container for this object.
-  csObject* GetParentContainer () const { return parent; }
+  iMeshWrapper* GetParentContainer () const { return Parent; }
 
   /// Set the mesh factory.
   void SetFactory (csMeshFactoryWrapper* factory)
@@ -564,7 +562,10 @@ public:
     {
       return &(scfParent->children.scfiMeshList);
     }
-    virtual iBase* GetParentContainer ();
+    virtual iMeshWrapper* GetParentContainer ()
+    {
+      return scfParent->GetParentContainer ();
+    }
     virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
 	  { scfParent->GetRadius (rad,cent); }
     virtual void Draw (iRenderView* rview)

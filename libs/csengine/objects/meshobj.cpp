@@ -76,7 +76,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::VisObject)
   SCF_IMPLEMENTS_INTERFACE (iVisibilityObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
+csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject* mesh)
 	: csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
@@ -88,15 +88,9 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   last_anim_time = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
-  parent = theParent;
+  Parent = theParent;
   movable.SetMeshWrapper (&scfiMeshWrapper);
-
-  iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
-  if (sparent)
-  {
-    movable.SetParent (sparent->GetMovable());
-    sparent->DecRef ();
-  }
+  if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = mesh;
@@ -108,7 +102,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   children.SetMesh (this);
 }
 
-csMeshWrapper::csMeshWrapper (csObject* theParent)
+csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent)
 	: csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
@@ -120,15 +114,9 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   last_anim_time = 0;
   is_visible = false;
   wor_bbox_movablenr = -1;
-  parent = theParent;
+  Parent = theParent;
   movable.SetMeshWrapper (&scfiMeshWrapper);
-
-  iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
-  if (sparent)
-  {
-    movable.SetParent (sparent->GetMovable());
-    sparent->DecRef ();
-  }
+  if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = NULL;
@@ -167,18 +155,13 @@ void csMeshWrapper::MoveToSector (csSector* s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
-  if (e)
-  {
-    s->AddMesh (this);
-    e->DecRef ();
-  }
+  if (!Parent) s->AddMesh (this);
 }
 
 void csMeshWrapper::RemoveFromSectors ()
 {
-  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
-  if (!e) return;
+  if (Parent) return;
+
   int i;
   const iSectorList *sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors->GetSectorCount () ; i++)
@@ -187,14 +170,14 @@ void csMeshWrapper::RemoveFromSectors ()
     if (ss)
       ss->GetMeshes ()->RemoveMesh (&scfiMeshWrapper);
   }
-  e->DecRef ();
 }
 
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
-  iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
-  if (!e) return;
+
+  if (Parent) return;
+
   int i;
   const iSectorList *sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors->GetSectorCount () ; i++)
@@ -202,7 +185,6 @@ void csMeshWrapper::SetRenderPriority (long rp)
     iSector* ss = sectors->GetSector (i);
     if (ss) ss->GetPrivateObject ()->RelinkMesh (this);
   }
-  e->DecRef ();
 }
 
 /// The list of lights that hit the mesh
@@ -505,63 +487,40 @@ float csMeshWrapper::GetScreenBoundingBox (
 
 void csMeshWrapper::AddChild (iMeshWrapper* child)
 {
-  // First unlink the mesh from the engine or another parent.
-  csMeshWrapper* c = child->GetPrivateObject ();
-  csObject* par = c->GetParentContainer ();
-
   // First we increase reference on the mesh to make sure it will
   // not get deleted by unlinking it from it's previous parent.
   // We will also keep this incremented because the parent mesh
   // now holds an additional reference to this child.
-  c->IncRef ();
+  child->IncRef ();
 
-  if (par)
-  {
-    iEngine *engine = SCF_QUERY_INTERFACE_FAST (par, iEngine);
-    if (engine)
-    {
-      engine->GetMeshes ()->RemoveMesh (child);
-      engine->DecRef ();
-    }
-    else
-    {
-      csMeshWrapper* old_mesh = (csMeshWrapper*)par;
-      csMeshMeshList& ch = old_mesh->children;
-      int idx = ch.Find (child);
-      CS_ASSERT (idx != -1);	// Impossible!
-      ch.Delete (idx);		// Remove object
-    }
-  }
-  c->SetParentContainer (this);
+  // First unlink the mesh from the engine or another parent.
+  iMeshWrapper *oldParent = child->GetParentContainer ();
+  if (oldParent)
+    oldParent->GetChildren ()->RemoveMesh (child);
+  else
+    csEngine::current_engine->GetMeshes ()->RemoveMesh (child);
+
+  child->GetPrivateObject ()->SetParentContainer (&scfiMeshWrapper);
   children.Push (child);
   child->GetMovable ()->SetParent (&movable.scfiMovable);
 }
 
 void csMeshWrapper::RemoveChild (iMeshWrapper* child)
 {
-  // First unlink the mesh from the engine or another parent.
-  csMeshWrapper* c = child->GetPrivateObject ();
-  csObject* par = c->GetParentContainer ();
+  // @@@ is this test really required?
+  if (child->GetParentContainer () != &scfiMeshWrapper) return;
 
-  if (par != this) return;	// Wrong parent, nothing to do.
   csMeshMeshList& ch = children;
   int idx = ch.Find (child);
   CS_ASSERT (idx != -1);
   ch.Delete (idx);		// Remove object
-  c->SetParentContainer (NULL);
+  child->GetPrivateObject ()->SetParentContainer (NULL);
   child->GetMovable ()->SetParent (NULL);
 }
 
 void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 {
   scfParent->SetFactory (factory->GetPrivateObject ());
-}
-
-iBase* csMeshWrapper::MeshWrapper::GetParentContainer ()
-{
-  csObject* par = scfParent->GetParentContainer ();
-  if (!par) return NULL;
-  return (iBase*)par;	// par == iObject == iBase
 }
 
 float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
@@ -629,8 +588,7 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
 csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
 {
   iMeshObject* mesh = meshFact->NewInstance ();
-  csMeshWrapper* meshObj = new csMeshWrapper (
-  	csEngine::current_engine->QueryCsObject (), mesh);
+  csMeshWrapper* meshObj = new csMeshWrapper (NULL, mesh);
   mesh->DecRef ();
   if (GetName ()) meshObj->SetName (GetName ());
   meshObj->SetFactory (this);

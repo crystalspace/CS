@@ -1806,7 +1806,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   iMeshObject* thing_obj = SCF_QUERY_INTERFACE_FAST (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
-  csMeshWrapper* thing_wrap = new csMeshWrapper (&scfiObject, thing_obj);
+  csMeshWrapper* thing_wrap = new csMeshWrapper (NULL, thing_obj);
 
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
@@ -1997,7 +1997,7 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
   if (!plug)
     return NULL;
 
-  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
+  csMeshWrapper* meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   meshwrap->IncRef ();
   GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
@@ -2037,7 +2037,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshFactoryWrapper* factory,
 iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
   	const char* name, iSector* sector, const csVector3& pos)
 {
-  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject, mesh);
+  csMeshWrapper* meshwrap = new csMeshWrapper (NULL, mesh);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   if (sector)
@@ -2051,7 +2051,7 @@ iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
 
 iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
 {
-  csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
+  csMeshWrapper* meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->AddMesh (&(meshwrap->scfiMeshWrapper));
   return &meshwrap->scfiMeshWrapper;

@@ -294,12 +294,10 @@ struct iMeshWrapper : public iBase
    */
   virtual iMeshList* GetChildren () = 0;
   /**
-   * Get the parent of this mesh. This will be either a pointer to the
-   * engine or another meshwrapper (or NULL if the mesh is not linked
-   * to anything). Use SCF_QUERY_INTERFACE/SCF_QUERY_INTERFACE_FAST to see the
-   * type of the parent.
+   * Get the parent of this mesh. Returns NULL if the mesh has no parent (i.e.
+   * it is contained in the engine directly).
    */
-  virtual iBase* GetParentContainer () = 0;
+  virtual iMeshWrapper* GetParentContainer () = 0;
   /// Get the radius of this mesh (ignoring children).
   virtual void GetRadius (csVector3& rad, csVector3& cent) const = 0;
 

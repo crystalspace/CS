@@ -24,7 +24,7 @@
 #include "iengine/sector.h"
 
 Bot::Bot (csEngine* Engine, iMeshObject* botmesh) :
-  csMeshWrapper (Engine->QueryCsObject (), botmesh)
+  csMeshWrapper (NULL, botmesh)
 {
   engine = Engine;
   do
