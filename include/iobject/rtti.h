@@ -118,4 +118,11 @@
 #define IMPLEMENT_OBJECT_INTERFACE_EXT_END				\
 	return objParentClass::QueryObjectType(Type); }
 
+/**
+ * Sometimes functions want you to pass a type ID number. You can get the
+ * number with this macro.
+ */
+#define OBJECT_TYPE_ID(type)						\
+	(csObjectType_##type)
+
 #endif // __IOBJECT_RTTI_H__

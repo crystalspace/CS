@@ -42,6 +42,7 @@ class csObject : public csBase, public iObject
 {
 protected:
   friend class csObjIterator;
+  friend class csObjectIterator;
   friend class csObjectNoDel;
   /// Each object have a unique ID associated with it
   CS_ID csid;
@@ -120,6 +121,27 @@ public:
 
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj);
+
+  /**
+   * Look for a child object that implements the given type. You can
+   * optionally pass a name to look for. If FirstName is true then the
+   * method will stop at the first object with the requested name, even
+   * if it did not implement the requested type. Note that the returned
+   * object may only be cast to the requested type, no other type, not
+   * even iObject!
+   */
+  virtual void* GetChild (int TypeID, const char *Name = NULL,
+    bool FirstName = false) const;
+
+  /// Return the first child object with the given name
+  virtual iObject *GetChild (const char *Name) const;
+
+  /**
+   * Return an iterator for all child objects. You may optionally
+   * request only objects with a given type. Note that you should not
+   * remove child objects while iterating.
+   */
+  virtual iObjectIterator *GetIterator (int TypeID = -1);
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;

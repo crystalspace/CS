@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "iobject/rtti.h"
 
-class csObject;
+struct iObjectIterator;
 
 SCF_VERSION (iObject, 0, 0, 2);
 
@@ -49,7 +49,65 @@ struct iObject : public iBase
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj) = 0;
 
+  /**
+   * Look for a child object that implements the given type. You can
+   * optionally pass a name to look for. If FirstName is true then the
+   * method will stop at the first object with the requested name, even
+   * if it did not implement the requested type. Note that the returned
+   * object may only be cast to the requested type, no other type, not
+   * even iObject!
+   */
+  virtual void* GetChild (int TypeID, const char *Name = NULL,
+    bool FirstName = false) const = 0;
+
+  /// Return the first child object with the given name
+  virtual iObject *GetChild (const char *Name) const = 0;
+
+  /**
+   * Return an iterator for all child objects. You may optionally
+   * request only objects with a given type. Note that you should not
+   * remove child objects while iterating.
+   */
+  virtual iObjectIterator *GetIterator (int TypeID = -1) = 0;
+
   DECLARE_ABSTRACT_OBJECT_INTERFACE;
+};
+
+
+SCF_VERSION (iObjectIterator, 0, 0, 1);
+
+/// This is an iterator for child objects of a csObject.
+struct iObjectIterator : public iBase
+{
+  /// Move forward
+  virtual bool Next() = 0;
+
+  /// Reset the iterator to the beginning
+  virtual void Reset() = 0;
+
+  /**
+   * Get the object we are pointing at. You should cast this pointer to the
+   * type you requested when you created the iterator. Don't cast it to
+   * another type, not even iObject!
+   */
+  virtual void* GetTypedObj() const = 0;
+
+  /// Get the object we are pointing at as a iObject
+  virtual iObject *GetiObject () const = 0;
+
+  /// Get the parent object
+  virtual iObject* GetParentObj() const = 0;
+
+  /// Check if we have any children of requested type
+  virtual bool IsFinished () const = 0;
+
+  /**
+   * traverses all csObjects and looks for an object with the given name
+   * returns true, if found, false if not found. You can then get the
+   * object by calling GetObj, and can continue search by calling Next and
+   * then do an other FindName, if you like.
+   */
+  virtual bool FindName (const char* name) = 0;
 };
 
 #endif

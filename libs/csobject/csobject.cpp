@@ -39,6 +39,85 @@ public:
   static void SetLimit (csObjContainer *&iContainer, int iLimit);
 };
 
+class csObjectIterator : public iObjectIterator
+{
+public:
+  DECLARE_IBASE;
+  csObject *Object;
+  void *TypedObject;
+  int Type, Position;
+
+  bool TypeCheck ()
+  {
+    TypedObject = Object->children->obj [Position]->QueryObjectType (Type);
+    return (TypedObject != NULL);
+  }
+
+  csObjectIterator (csObject *obj, int type_id)
+    : Object (obj), Type (type_id)
+  {
+    CONSTRUCT_IBASE (NULL);
+    Object->IncRef ();
+    Reset ();
+  }
+  ~csObjectIterator ()
+  {
+    Object->DecRef ();
+  }
+  virtual bool Next()
+  {
+    if (Position < 0)
+      return false;
+
+    while (1) {
+      Position++;
+      if (Position == Object->children->count)
+      {
+        Position = -1;
+        return false;
+      }
+      if (TypeCheck ())
+        return true;
+    }
+  }
+  virtual void Reset()
+  {
+    Position = 0;
+    if (!TypeCheck ())
+      Next ();
+  }
+  virtual void* GetTypedObj() const
+  {
+    return TypedObject;
+  }
+  virtual iObject *GetiObject () const
+  {
+    return Object->children->obj[Position];
+  }
+  virtual iObject* GetParentObj() const
+  {
+    return Object;
+  }
+  virtual bool IsFinished () const
+  {
+    return (Position < 0);
+  }
+  virtual bool FindName (const char* name)
+  {
+    while (!IsFinished ())
+    {
+      if (strcmp (GetiObject ()->GetName (), name) == 0)
+        return true;
+      Next ();
+    }
+    return false;
+  }
+};
+
+IMPLEMENT_IBASE (csObjectIterator)
+  IMPLEMENTS_INTERFACE (iObjectIterator)
+IMPLEMENT_IBASE_END
+
 void csObjContainer::SetLimit (csObjContainer *&iContainer, int iLimit)
 {
   if (iLimit == 0)
@@ -215,6 +294,50 @@ void csObject::ObjRemove (iObject *obj)
 { 
   ObjRelease (obj);
   obj->DecRef ();
+}
+
+void* csObject::GetChild (int TypeID, const char *Name, bool fn) const
+{
+  if (!children)
+    return NULL;
+
+  if (fn)
+  {
+    iObject *obj = GetChild(Name);
+    return obj ? obj->QueryObjectType (TypeID) : NULL;
+  }
+
+  for (int i = 0; i < children->count; i++)
+  {
+    void *obj = children->obj[i]->QueryObjectType (TypeID);
+    if (!obj)
+      continue;
+
+    if (Name && strcmp(children->obj[i]->GetName (), Name))
+      continue;
+  
+    return obj;
+  }
+
+  return NULL;
+}
+
+iObject* csObject::GetChild (const char *Name) const
+{
+  if (!children || !Name)
+    return NULL;
+  
+  for (int i = 0; i < children->count; i++)
+  {
+    if (!strcmp (children->obj[i]->GetName (), Name))
+      return children->obj[i];
+  }
+  return NULL;
+}
+
+iObjectIterator *csObject::GetIterator (int TypeID)
+{
+  return new csObjectIterator (this, TypeID);
 }
 
 //------------------------------------------------------ Object iterator -----//
