@@ -18,6 +18,16 @@ chronological order.
 	  function that can detect what kind of XML file it is trying to load
 	  and act accordingly. Currently it supports world files, library files,
 	  mesh factories, and objects.
+	- Jorrit changed iMaterialWrapper->Register() and
+	  iTextureWrapper->Register() so that they no longer attempt to
+	  register again if they were already registered. That makes it
+	  safe to call Register() multiple times.
+	- Jorrit changed the loader so that it will now automatically
+	  register textures and materials if the texture manager is already
+	  present during loading. That makes it easier to use the new
+	  Load() function because after loading a library you have no way
+	  of knowing what textures and materials are new so there was no way
+	  to register them.
 8-Sep-2004
 	- Jorrit fixed a bug in all particle systems that depend on
 	  csNewParticleSystem (rain and fountain). 'camera_origin' was

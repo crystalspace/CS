@@ -145,15 +145,10 @@ void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 
 void csTextureWrapper::Register (iTextureManager *txtmgr)
 {
+  if (handle) return;
+
   // if we have no image, we cannot register it.
   if (!image) return ;
-
-  // release old handle
-  if (handle)
-  {
-    DG_UNLINK (this, handle);
-    handle = 0;
-  }
 
   // Now we check the size of the loaded image. Having an image, that
   // is not a power of two will result in strange errors while

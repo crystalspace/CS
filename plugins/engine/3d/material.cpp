@@ -531,6 +531,7 @@ void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 
 void csMaterialWrapper::Register (iTextureManager *txtmgr)
 {
+  if (handle) return;
   handle = txtmgr->RegisterMaterial (material);
 }
 

@@ -452,6 +452,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       else
 	return 0;
     }
+
+    iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+    if (tm) tex->Register (tm);
   }
 
   return tex;
@@ -730,6 +733,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       return 0;
   }
   AddToRegion (ldr_context, mat->QueryObject ());
+
+  iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+  if (tm) mat->Register (tm);
+
   return mat;
 }
 
