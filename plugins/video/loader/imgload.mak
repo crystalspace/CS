@@ -61,13 +61,13 @@ ifeq ($(DO_PNG),yes)
   INC.IMGLOAD += plugins/video/loader/pngimage.h
   SRC.IMGLOAD += plugins/video/loader/pngimage.cpp
   CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_PNG
-  LIB.IMGLOAD += $(PNG_LIBS)
+  DYNLIB.IMGLOAD += $(PNG_LIBS)
 endif
 ifeq ($(DO_JPG),yes)
   INC.IMGLOAD += plugins/video/loader/jpgimage.h
   SRC.IMGLOAD += plugins/video/loader/jpgimage.cpp
   CFLAGS.IMG_FORMATS += $(CFLAGS.D)DO_JPG
-  LIB.IMGLOAD += $(JPG_LIBS)
+  DYNLIB.IMGLOAD += $(JPG_LIBS)
 endif
 ifeq ($(DO_WAL),yes)
   INC.IMGLOAD += plugins/video/loader/walimage.h plugins/video/loader/walpal.h
@@ -81,7 +81,7 @@ ifeq ($(DO_SGI),yes)
 endif
 
 OBJ.IMGLOAD = $(addprefix $(OUT),$(notdir $(SRC.IMGLOAD:.cpp=$O)))
-DEP.IMGLOAD = CSUTIL CSSYS CSGFX
+DEP.IMGLOAD = CSUTIL CSSYS CSGFX CSUTIL 
 
 MSVC.DSP += IMGLOAD
 DSP.IMGLOAD.NAME = imgload
@@ -100,7 +100,7 @@ $(OUT)imgload$O: imgload.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.IMG_FORMATS)
 
 $(IMGLOAD): $(OBJ.IMGLOAD) $(LIB.IMGLOAD)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN) $(DYNLIB.IMGLOAD)
 
 clean: imgloadclean
 imgloadclean:

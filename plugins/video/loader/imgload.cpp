@@ -68,7 +68,7 @@ public:
     CONSTRUCT_IBASE(p);
   }
 
-  ~csImageLoaderPlugin()
+  virtual ~csImageLoaderPlugin()
   {
     csImageLoader *ldr, *next;
     for (ldr = loaderlist; ldr != NULL; ldr = next)
