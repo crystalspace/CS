@@ -30,7 +30,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/parray.h"
 
 #include "ie3ds.h"

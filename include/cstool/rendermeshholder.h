@@ -28,7 +28,7 @@
 
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 #include "framedataholder.h"
 

@@ -20,7 +20,7 @@
 #define __CS_CHUNKLOD_H__
 
 #include "csutil/cscolor.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 
 #include "csgeom/transfrm.h"

@@ -46,7 +46,7 @@
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
 #include "csutil/array.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/cfgacc.h"
 #include "csutil/timer.h"
 #include "csutil/weakref.h"

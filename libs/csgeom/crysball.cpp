@@ -17,7 +17,7 @@
 */
 #include "cssysdef.h"
 #include "csutil/array.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgeom/crysball.h"
 #include "csgeom/frustum.h"
 

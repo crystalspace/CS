@@ -22,7 +22,7 @@
 #include "csextern.h"
 
 #include "csutil/ref.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "csutil/objreg.h"
 #include "ivideo/rndbuf.h"

@@ -25,7 +25,7 @@
 #include "csutil/datastrm.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 // all int's in an MDL file are little endian
 #include "csutil/csendian.h"

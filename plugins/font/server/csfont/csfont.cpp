@@ -25,7 +25,7 @@
 #include "iutil/vfs.h"
 #include "csutil/util.h"
 #include "csutil/databuf.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
 #include "ivaria/reporter.h"

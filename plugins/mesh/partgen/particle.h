@@ -26,7 +26,7 @@
 #include "ivideo/rendermesh.h"
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 
 /**

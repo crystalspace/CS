@@ -28,7 +28,7 @@
 #include "csqsqrt.h"
 #include "csqint.h"
 #include "csgeom/math3d.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "emit.h"
 #include <math.h>
 #include <stdlib.h>

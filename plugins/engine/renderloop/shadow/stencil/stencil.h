@@ -35,7 +35,7 @@
 #include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgfx/shadervarcontext.h"
 #include "../../common/basesteptype.h"

@@ -509,3 +509,10 @@ background colors, it is recommended for transparent backgrounds, instead
 of using @samp{-1} as the color value, to obtain a color value from 
 @code{FindRGB()} that has the same R, G, B components as the foreground color, 
 but an alpha component of 0.
+
+@subheading @file{csutil/garray.h} Deprecated
+
+The @file{csutil/garray.h} file, containing the class 
+@code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
+file name @file{csutil/dirtyaccessarray.h}. Functional changes have not been
+made.

@@ -25,7 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/scfstr.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "iutil/vfs.h"
 #include "iutil/document.h"
 #include "iutil/object.h"

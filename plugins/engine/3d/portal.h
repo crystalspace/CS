@@ -23,7 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgeom/transfrm.h"
 #include "iengine/sector.h"

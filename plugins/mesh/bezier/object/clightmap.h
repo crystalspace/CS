@@ -20,7 +20,7 @@
 #define __CS_BEZIER_LIGHTMAP_H__
 
 #include "csutil/scf.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgfx/rgbpixel.h"
 
 class csPolyTexture;

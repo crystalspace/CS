@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/xmltiny.h"
 #include "csgeom/transfrm.h"

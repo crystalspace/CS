@@ -22,7 +22,7 @@
 
 #include "iengine/portalcontainer.h"
 #include "csutil/refarr.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgeom/vector3.h"
 #include "csgeom/pmtools.h"
 #include "plugins/engine/3d/portal.h"

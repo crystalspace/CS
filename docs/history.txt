@@ -16,6 +16,9 @@ chronological order.
 	  compiler plugins in '-verbose' mode.
 	- Jorrit fixed spr3d so that the alpha which is extracted from
 	  mixmode gets a reversed meaning (how it worked with OR).
+	- res moved csDirtyAccessArray<> into a new (and sensibly named) file
+	  csutil/dirtyaccessarray.h. Usage of csutil/garray.h is now 
+	  deprecated.
 18-Oct-2004
 	- res enhanced the OpenGL canvases so blending is always functioning
 	  (lack of an alpha channel in the frame buffer isn't really a reason

@@ -32,7 +32,7 @@
 
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"

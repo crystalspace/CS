@@ -22,7 +22,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csutil/weakref.h"

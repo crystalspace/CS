@@ -53,7 +53,7 @@
 #include "ivideo/material.h"
 #include "csqint.h"
 #include "csgfx/shadervarcontext.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 struct iObjectRegistry;
 struct iEngine;

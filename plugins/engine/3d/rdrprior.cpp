@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/rdrprior.h"
 #include "iengine/mesh.h"

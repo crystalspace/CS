@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "csgeom/frustum.h"

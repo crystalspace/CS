@@ -63,7 +63,7 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "csqint.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgeom/transfrm.h"
 #include "rapcol.h"
 #include "prapid.h"

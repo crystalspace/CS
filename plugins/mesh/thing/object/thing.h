@@ -31,7 +31,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
 #include "csutil/flags.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"

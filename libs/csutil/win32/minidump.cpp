@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/archive.h"
 #include "csutil/callstack.h"

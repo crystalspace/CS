@@ -23,7 +23,7 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/nobjvec.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "csgeom/transfrm.h"

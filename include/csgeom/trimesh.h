@@ -23,8 +23,8 @@
 
 #include "csgeom/tri.h"
 #include "csgeom/math3d.h"
-#include "csutil/garray.h"
 #include "csutil/array.h"
+#include "csutil/dirtyaccessarray.h"
 
 /**
  * A mesh of triangles. Note that a mesh of triangles is only valid

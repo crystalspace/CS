@@ -24,7 +24,7 @@
 #include "thing.h"
 #include "csgeom/frustum.h"
 #include "csgeom/textrans.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"

@@ -20,7 +20,7 @@
 #include "csutil/scf.h"
 #include "csutil/nobjvec.h"
 #include "csutil/objiter.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/parray.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"

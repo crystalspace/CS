@@ -22,7 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/polyclip.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/sphere.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"

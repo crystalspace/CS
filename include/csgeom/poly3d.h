@@ -27,7 +27,7 @@
 
 #include "csextern.h"
 
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csgeom/math3d.h"
 
 // Values returned by classify.

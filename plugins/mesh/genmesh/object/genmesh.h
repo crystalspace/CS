@@ -26,7 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "csutil/hash.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "imesh/object.h"

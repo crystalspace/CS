@@ -22,7 +22,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/vector3.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "terrvis.h"
 #include "csqint.h"
 #include "csqsqrt.h"

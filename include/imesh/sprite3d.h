@@ -20,7 +20,7 @@
 #define __CS_IMESH_SPRITE3D_H__
 
 #include "csutil/scf.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/cscolor.h"
 #include "ivideo/graph3d.h"
 

@@ -22,7 +22,7 @@
 
 #include "csgeom/subrec2.h"
 #include "csgeom/vector2.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 #include "../common/fontcache.h"
 

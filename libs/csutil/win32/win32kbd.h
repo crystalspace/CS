@@ -23,7 +23,7 @@
 #include "csextern.h"
 #include "iutil/csinput.h"
 #include "csutil/csinput.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 // Some #defines from newer PSDKs
 #ifndef WM_UNICHAR

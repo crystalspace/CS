@@ -41,7 +41,7 @@
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
 #include "csutil/array.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"

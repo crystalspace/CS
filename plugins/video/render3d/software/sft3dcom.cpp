@@ -32,7 +32,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/rendermesh.h"
 #include "sft3dcom.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/scfstrset.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"

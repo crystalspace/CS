@@ -22,7 +22,7 @@
 #include "csextern.h"
 #include "plane3.h"
 #include "csutil/array.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 

@@ -24,7 +24,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/flags.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "plugins/engine/3d/movable.h"

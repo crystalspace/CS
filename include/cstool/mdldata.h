@@ -22,7 +22,7 @@
 #include "csextern.h"
 
 #include "imesh/mdldata.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/csobject.h"
 #include "csutil/refarr.h"
 

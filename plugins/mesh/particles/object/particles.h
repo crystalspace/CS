@@ -21,7 +21,7 @@
 
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/ref.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"

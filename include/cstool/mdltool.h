@@ -21,7 +21,7 @@
 
 #include "csextern.h"
 
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 
 class csString;
 struct iObject;

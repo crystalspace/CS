@@ -20,7 +20,7 @@
 #define __CS_IMESH_FOLIAGEMESH_H__
 
 #include "csutil/scf.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csgeom/tri.h"

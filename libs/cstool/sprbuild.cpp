@@ -20,7 +20,7 @@
 #include "csutil/objiter.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"
-#include "csutil/garray.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/databuf.h"
 #include "cstool/sprbuild.h"
 #include "cstool/mdltool.h"
