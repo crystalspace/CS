@@ -5,7 +5,7 @@ rm -f $CURDIR/debian/crystalspace-data.menu
 for videotype in software opengl
 do
 
-for name in dmburg jngtest maze newsky room sydney 
+for name in dmburg maze newsky room sydney #jngtest mazedex
 do
 	cat >> $CURDIR/debian/crystalspace-data.menu <<-FIN
 ?package(crystalspace-data):needs=X11 \\
