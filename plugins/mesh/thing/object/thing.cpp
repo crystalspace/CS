@@ -244,7 +244,7 @@ csThingStatic::~csThingStatic ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csThingStatic::Prepare ()
+void csThingStatic::Prepare (iBase* thing_logparent)
 {
   if (!prepared) 
   {
@@ -267,7 +267,7 @@ void csThingStatic::Prepare ()
       // If a Finish() call returns false this means the textures are not
       // completely ready yet. In that case we set 'prepared' to false
       // again so that we force a new prepare later.
-      if (!sp->Finish ())
+      if (!sp->Finish (thing_logparent))
 	prepared = false;
     }
     static_polygons.ShrinkBestFit ();
@@ -1808,7 +1808,7 @@ void csThing::PreparePolygons ()
 
 void csThing::Prepare ()
 {
-  static_data->Prepare ();
+  static_data->Prepare (logparent);
 
   if (prepared)
   {
@@ -2288,7 +2288,7 @@ void PolyMeshHelper::SetThing (csThingStatic* thing)
 
 void PolyMeshHelper::Setup ()
 {
-  thing->Prepare ();
+  thing->Prepare (0);
   if (static_data_nr != thing->GetStaticDataNumber ())
   {
     static_data_nr = thing->GetStaticDataNumber ();

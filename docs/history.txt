@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in the engine so that engine->RemoveObject()
 	  will correctly link a mesh from its parent if it is a hierarchical
 	  mesh.
+	- Jorrit extended thing so that when it gives an oversized lightmap
+	  warning it will also show the name of the mesh instead of only
+	  the name of the polygon.
 26-May-2004
 	- Keith fixed bug in HitBeam code which assumed that all meshes for
 	  a sprcal3d were attached to the model instance.  This is not required.

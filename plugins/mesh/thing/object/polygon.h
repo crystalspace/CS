@@ -250,7 +250,7 @@ public:
    * In that case the initialization is not completely correct yet and has
    * to be redone later when the texture is prepared.
    */
-  bool Finish ();
+  bool Finish (iBase* thing_logparent);
 
   /**
    * Set the thing that this polygon belongs to.

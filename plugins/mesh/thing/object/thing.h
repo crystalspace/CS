@@ -310,7 +310,7 @@ public:
    * to worry about this function when you add sectors or things
    * later.
    */
-  void Prepare ();
+  void Prepare (iBase* thing_logparent);
   /**
    * Sets up a layout of lightmaps on a super lightmap that all instances
    * of this factory can reuse.

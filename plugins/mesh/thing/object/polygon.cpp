@@ -561,7 +561,7 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
 #define TEXW(t) ((t)->w_orig)
 #define TEXH(t) ((t)->h)
 
-bool csPolygon3DStatic::Finish ()
+bool csPolygon3DStatic::Finish (iBase* thing_logparent)
 {
   bool rc = true;
 
@@ -593,9 +593,18 @@ bool csPolygon3DStatic::Finish ()
     thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
     {
+      const char* mname = 0;
+      if (thing_logparent)
+      {
+        csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (thing_logparent,
+      	  iMeshWrapper);
+        if (m) mname = m->QueryObject ()->GetName ();
+        else mname = "<unknown>";
+      }
+      else mname = "<unknown>";
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
-        "for polygon '%s'", lmw, lmh,
-        max_lmw, max_lmh, GetName());
+        "for polygon '%s/%s'", lmw, lmh,
+        max_lmw, max_lmh, mname, GetName());
     }
   }
 
