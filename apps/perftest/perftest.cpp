@@ -93,13 +93,13 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  myG3D = QUERY_PLUGIN(this, iGraphics3D);
+  myG3D = QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D) {
     Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
 
-  myVFS = QUERY_PLUGIN(this, iVFS);
+  myVFS = QUERY_PLUGIN_ID(this, CS_FUNCID_VFS, iVFS);
   if (!myVFS) {
     Printf (MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
     return false;
