@@ -46,6 +46,10 @@ chronological order.
 	  leading to an infinite recursion resp. stack overflow).
 	- res changed csShaderVariable::SetValue(csVector2) to set the 3rd
 	  component of the internally stored Vector4 to 0 instead of 1.
+	- res added a small hack to the material shader storage to clear the
+	  assigned OR compatibility shader if a shader for some shader type
+	  is set. This was done to allow the removal of the implicitly set
+	  OR compatibility shader.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

@@ -82,8 +82,15 @@ private:
 
   csShaderVariableContext svcontext;
 
-
 public:
+  /**
+   * @@@ Slight hack: when the engine creates a material, it implicitly sets
+   * the "OR compatibility" shader. When later a shader is set and 
+   * shadersCustomized is false, the "OR compatibility" shader will be set to
+   * 0. This is done so users can "unset" the OR compar shader.
+   */
+  bool shadersCustomized;
+
   /**
    * create an empty material
    */

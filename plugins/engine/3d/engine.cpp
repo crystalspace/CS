@@ -2770,11 +2770,12 @@ iMaterialWrapper *csEngine::CreateMaterial (
   csMaterial *mat = new csMaterial (this, texture);
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
-  mat->DecRef ();
 
 #ifdef CS_USE_NEW_RENDERER
-  wrapper->GetMaterial ()->SetShader (default_shadertype, default_shader);
+  mat->SetShader (default_shadertype, default_shader);
+  mat->shadersCustomized = false;
 #endif // CS_USE_NEW_RENDERER
+  mat->DecRef ();
 
   return wrapper;
 }
@@ -2817,11 +2818,13 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   if (txt) mat->SetTextureWrapper (txt);
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-  mat->DecRef ();
 
 #ifdef CS_USE_NEW_RENDERER
-  imat->SetShader (default_shadertype, default_shader);
+  mat->SetShader (default_shadertype, default_shader);
+  mat->shadersCustomized = false;
 #endif // CS_USE_NEW_RENDERER
+  mat->DecRef ();
+
   return csPtr<iMaterial> (imat);
 }
 
@@ -2849,11 +2852,12 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
 #endif
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-  mat->DecRef ();
 
 #ifdef CS_USE_NEW_RENDERER
-  imat->SetShader (default_shadertype, default_shader);
+  mat->SetShader (default_shadertype, default_shader);
+  mat->shadersCustomized = false;
 #endif // CS_USE_NEW_RENDERER
+  mat->DecRef ();
 
   return csPtr<iMaterial> (imat);
 }

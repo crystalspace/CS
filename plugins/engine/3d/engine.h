@@ -431,6 +431,7 @@ private:
   /// Default shader to attach to all materials
   csRef<iShader> default_shader;
 
+public:
   /// Default shadertype to attach to all materials
   csStringID default_shadertype;
 

@@ -71,6 +71,7 @@ csMaterial::csMaterial (csEngine* engine)
   SetDiffuse (CS_DEFMAT_DIFFUSE);
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
+  shadersCustomized = false;
 
 #ifndef CS_USE_NEW_RENDERER
   num_texture_layers = 0;
@@ -98,6 +99,7 @@ csMaterial::csMaterial (csEngine* engine,
   SetDiffuse (CS_DEFMAT_DIFFUSE);
   SetAmbient (CS_DEFMAT_AMBIENT);
   SetReflection (CS_DEFMAT_REFLECTION);
+  shadersCustomized = false;
 
 #ifndef CS_USE_NEW_RENDERER
   num_texture_layers = 0;
@@ -326,6 +328,12 @@ void csMaterial::AddTextureLayer (
 void csMaterial::SetShader (csStringID type, iShader* shd)
 {
 #ifdef CS_USE_NEW_RENDERER
+  if (!shadersCustomized)
+  {
+    shaders.PutFirst (engine->default_shadertype, 0);
+    shadersCustomized = true;
+  }
+
   shaders.PutFirst (type, shd);
 #else
   (void)type;
