@@ -124,6 +124,21 @@ void csPolygonMeshTools::CalculatePlanes (iPolygonMesh* mesh,
     poly++;
   }
 }
+
+void csPolygonMeshTools::CalculatePlanes (csVector3* vertices,
+	csTriangleMinMax* tris, int num_tris,
+  	csPlane3* planes)
+{
+  int p;
+  for (p = 0 ; p < num_tris ; p++)
+  {
+    planes[p].Set (
+    	vertices[tris[p].a],
+    	vertices[tris[p].b],
+    	vertices[tris[p].c]);
+  }
+}
+
 /// used by CalculateEdges()
 struct LinkedEdge : public csPolygonMeshEdge
 {
@@ -665,5 +680,150 @@ void csPolygonMeshTools::Polygonize (iPolygonMesh* polymesh,
     poly.num_vertices = 3;
     poly.vertices = (int*)&tris[p];
   }
+}
+
+static int compare_sort_x (const void* v1, const void* v2)
+{
+  const csTriangleMinMax* t1 = (csTriangleMinMax*)v1;
+  const csTriangleMinMax* t2 = (csTriangleMinMax*)v2;
+
+  float minx1 = t1->minx;
+  float minx2 = t2->minx;
+
+  if (minx1 < minx2) return -1;
+  else if (minx1 > minx2) return 1;
+  else return 0;
+}
+
+void csPolygonMeshTools::SortTrianglesX (iPolygonMesh* polymesh,
+  	csTriangleMinMax*& tris, int& tri_count,
+	csPlane3*& planes)
+{
+  csTriangle* mesh_tris;
+  bool delete_mesh_tris = false;
+  int i;
+  if (polymesh->GetFlags ().Check (CS_POLYMESH_TRIANGLEMESH))
+  {
+    tri_count = polymesh->GetTriangleCount ();
+    mesh_tris = polymesh->GetTriangles ();
+  }
+  else
+  {
+    Triangulate (polymesh, mesh_tris, tri_count);
+    delete_mesh_tris = true;
+  }
+  tris = new csTriangleMinMax[tri_count];
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    tris[i].a = mesh_tris[i].a;
+    tris[i].b = mesh_tris[i].b;
+    tris[i].c = mesh_tris[i].c;
+  }
+  if (delete_mesh_tris) delete[] mesh_tris;
+
+  csVector3* vertices = polymesh->GetVertices ();
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    float x;
+    float minx1 = vertices[tris[i].a].x;
+    float maxx1 = minx1;
+    x = vertices[tris[i].b].x;
+    if (x < minx1) minx1 = x;
+    if (x > maxx1) maxx1 = x;
+    x = vertices[tris[i].c].x;
+    if (x < minx1) minx1 = x;
+    if (x > maxx1) maxx1 = x;
+    tris[i].minx = minx1;
+    tris[i].maxx = maxx1;
+  }
+
+  qsort (tris, tri_count, sizeof (csTriangleMinMax), compare_sort_x);
+
+  planes = new csPlane3[tri_count];
+  CalculatePlanes (polymesh->GetVertices (),
+	tris, tri_count, planes);
+}
+
+static bool IntersectPlane_X (
+	const csVector3& point,
+	const csPlane3& p,
+	csVector3& isect)
+{
+  float denom = -p.norm.x;
+  if (fabs (denom) < SMALL_EPSILON) return false;
+  float dist = (p.norm * point + p.DD) / denom;
+  if (dist < -SMALL_EPSILON) return false;
+
+  isect.Set (point.x + dist, point.y, point.z);
+  return true;
+}
+
+static int WhichSide2D_X (const csVector3& v,
+                          const csVector3& s1, const csVector3& s2)
+{
+  float k  = (s1.z - v.z)*(s2.y - s1.y);
+  float k1 = (s1.y - v.y)*(s2.z - s1.z);
+  if (k < k1) return -1;
+  else if (k > k1) return 1;
+  else return 0;
+}
+
+static bool In2D_X (const csVector3& v1, const csVector3& v2,
+	const csVector3& v3, const csVector3 &v)
+{
+  int side = WhichSide2D_X (v, v1, v2);
+  int s = WhichSide2D_X (v, v2, v3);
+  if ((side < 0 && s > 0) || (side > 0 && s < 0)) return false;
+  s = WhichSide2D_X (v, v3, v1);
+  if ((side < 0 && s > 0) || (side > 0 && s < 0)) return false;
+  return true;
+}
+
+bool csPolygonMeshTools::SortedIn (const csVector3& point,
+  	csVector3* vertices,
+  	csTriangleMinMax* tris, int tri_count,
+	csPlane3* planes)
+{
+  // This algorithm assumes the triangles are sorted from left to right
+  // (minimum x). That way we can do some quick rejections.
+  float nearest_found_x = 1000000000.0f;
+  int nearest_idx = -1;
+  int i;
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    // If the minimum x is greater then the nearest found x then
+    // we can stop testing.
+    if (tris[i].minx > nearest_found_x) break;
+
+    // If the maximum x is smaller then point.x then we don't have
+    // to test this triangle.
+    if (tris[i].maxx <= point.x) continue;
+
+    // Try to intersect.
+    csVector3 isect;
+    if (IntersectPlane_X (point, planes[i], isect))
+    {
+      // If the intersection point is greater then nearest_found_x
+      // then we don't have to test further.
+      if (isect.x < nearest_found_x)
+        if (In2D_X (vertices[tris[i].a], vertices[tris[i].b],
+      	  vertices[tris[i].c], point))
+        {
+	  nearest_idx = i;
+	  nearest_found_x = isect.x;
+        }
+    }
+  }
+
+  if (nearest_idx == -1)
+  {
+    // We found no triangle. So we are certainly outside.
+    return false;
+  }
+
+  // Now we found the triangle that is closest to our point. We
+  // check if we can see that triangle (backface culling). If we can
+  // then it means we are outside the object. Otherwise we are inside.
+  return planes[nearest_idx].Classify (point) < 0;
 }
 

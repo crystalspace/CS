@@ -54,10 +54,22 @@ struct csPolygonMeshEdge
 };
 
 /**
+ * A triangle with minimum/maximum information on x.
+ */
+struct csTriangleMinMax : public csTriangle
+{
+  float minx, maxx;
+};
+
+/**
  * A set of tools to work with iPolygonMesh instances.
  */
 class CS_CSGEOM_EXPORT csPolygonMeshTools
 {
+private:
+  static void CalculatePlanes (csVector3* vertices,
+  	csTriangleMinMax* tris, int num_tris, csPlane3* planes);
+
 public:
   /**
    * This function will calculate normals for all polygons in the mesh.
@@ -142,7 +154,10 @@ public:
 
   /**
    * Triangulate a mesh from the polygon mesh data in the iPolygonMesh.
-   * Returns a table of triangles (delete with delete[]).
+   * Returns a table of triangles (delete with delete[]). Note that this
+   * function will always triangulate the polygons even if there is a
+   * perfectly usable array of triangles in the mesh. You should test for
+   * this outside of this function.
    */
   static void Triangulate (iPolygonMesh* polymesh,
   	csTriangle*& tris, int& tri_count);
@@ -154,6 +169,30 @@ public:
    */
   static void Polygonize (iPolygonMesh* polymesh,
   	csMeshedPolygon*& polygons, int& poly_count);
+
+  /**
+   * Take a polygon mesh and sort triangles on maximum x coordinate.
+   * That means that the first triangle in the returned array will
+   * have a minimum x coordinates that is lower then further triangles.
+   * This is useful for the SortedIn() routine below. This routine
+   * will also calculate planes.
+   * When done delete the returned arrays.
+   */
+  static void SortTrianglesX (iPolygonMesh* polymesh,
+  	csTriangleMinMax*& tris, int& tri_count,
+	csPlane3*& planes);
+
+  /**
+   * Test if a point is in a closed mesh. The mesh is defined by an
+   * array of triangles which should be sorted on x using the SortTrianglesX()
+   * function. This function does not check if the mesh is really closed.
+   * This function also needs an array of planes. You can calculate that
+   * with CalculatePlanes().
+   */
+  static bool SortedIn (const csVector3& point,
+  	csVector3* vertices,
+  	csTriangleMinMax* tris, int tri_count,
+	csPlane3* planes);
 };
 
 /** @} */
