@@ -121,6 +121,9 @@ public:
   /// Append a string to this one (possibly iCount characters from the string)
   csString &Append (const csString &iStr, size_t iCount = (size_t)-1);
 
+  /// Append a character to this string
+  csString &Append (char c){ char s[2]; s[0] = c; s[1] = 0; return Append(s); }
+
   /// Replace contents of this string with the contents of another
   csString &Replace (const csString &iStr, size_t iCount = (size_t)-1)
   {
