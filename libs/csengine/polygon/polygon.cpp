@@ -663,8 +663,8 @@ bool csPolygon3D::IsTransparent ()
     return true;
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
-  return (txt_handle->GetAlphaMap ()
-       || txt_handle->GetKeyColor ());
+  return txt_handle && ((txt_handle->GetAlphaMap ()
+       || txt_handle->GetKeyColor ()));
 }
 
 int csPolygon3D::Classify (const csPlane3& pl)

@@ -1,5 +1,13 @@
 he history order is reversed so that new features are at the top.
 
+21-Jan-2002
+	- Tobias Brueckner suggested a fix for OpenGL with materials
+	  that have no associated texture. The fix was incomplete
+	  so I tried to complete it. At this moment the OpenGL renderer
+	  no longer crashes but the color is still not used. Have
+	  to investigate further.
+	- Fixed a bug in the engine which caused crashes if a material
+	  was defined without a texture.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL

@@ -1687,20 +1687,23 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   {
     multimat = mat_handle->GetTextureLayerCount () > 0;
     txt_handle = mat_handle->GetTexture ();
-    txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
-    tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
-    // Initialize our static drawing information and cache
-    // the texture in the texture cache (if this is not already the case).
-    CacheTexture (queue.mat_handle);
-    texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
-    texturehandle = texturecache_data->Handle;
+    if (txt_handle)
+    {
+      txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
+      tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+      // Initialize our static drawing information and cache
+      // the texture in the texture cache (if this is not already the case).
+      CacheTexture (queue.mat_handle);
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
+      texturehandle = texturecache_data->Handle;
+    }
   }
 
   float flat_r = queue.flat_color_r;
   float flat_g = queue.flat_color_g;
   float flat_b = queue.flat_color_b;
 
-  if (m_renderstate.textured && mat_handle)
+  if (m_renderstate.textured && txt_handle)
   {
     glEnable (GL_TEXTURE_2D);
     if (txt_mm->GetKeyColor())
@@ -1716,13 +1719,21 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   else
   {
     glDisable (GL_TEXTURE_2D);
-    if (mat_handle)
+    if (txt_handle)
     {
       uint8 r, g, b;
-      mat_handle->GetTexture ()->GetMeanColor (r, g, b);
+      txt_handle->GetMeanColor (r, g, b);
       flat_r = BYTE_TO_FLOAT (r);
       flat_g = BYTE_TO_FLOAT (g);
       flat_b = BYTE_TO_FLOAT (b);
+    }
+    else if (mat_handle)
+    {
+      csRGBpixel color;
+      mat_handle->GetFlatColor (color);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
     }
   }
 
@@ -1732,7 +1743,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   alpha = SetupBlend (queue.mixmode, alpha, tex_transp);
   glColor4f (flat_r, flat_g, flat_b, alpha);
 
-  if (mat_handle)
+  if (txt_handle)
     glBindTexture (GL_TEXTURE_2D, texturehandle);
 
   //=================
@@ -3204,18 +3215,27 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
   else
   {
-    if (!m_textured)
+    // Fill flat color if renderer decide to paint it flat-shaded
+    uint8 r,g,b;
+    if (mesh.mat_handle)
     {
-      // Fill flat color if renderer decide to paint it flat-shaded
-      uint8 r,g,b;
-      if (mesh.mat_handle)
-        mesh.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
+      iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();
+      if (txt_handle)
+        txt_handle->GetMeanColor (r, g, b);
       else
-        r = g = b = 1;
-      flat_r = BYTE_TO_FLOAT (r);
-      flat_g = BYTE_TO_FLOAT (g);
-      flat_b = BYTE_TO_FLOAT (b);
+      {
+        csRGBpixel color;
+        mesh.mat_handle->GetFlatColor (color);
+	r = color.red;
+	g = color.green;
+	b = color.blue;
+      }
     }
+    else
+      r = g = b = 1;
+    flat_r = BYTE_TO_FLOAT (r);
+    flat_g = BYTE_TO_FLOAT (g);
+    flat_b = BYTE_TO_FLOAT (b);
   }
 
   //===========
