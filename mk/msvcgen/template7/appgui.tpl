@@ -23,7 +23,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -48,7 +48,7 @@
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
@@ -72,7 +72,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -96,7 +96,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
@@ -116,7 +116,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="2"
@@ -140,7 +140,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -159,7 +159,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -184,7 +184,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				OutputFile="csmemdbg\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csmemdbg\temp\%project%/%project%.pdb"
@@ -208,7 +208,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -227,7 +227,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%\plugins,%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -251,7 +251,7 @@ copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
@@ -275,7 +275,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -299,7 +299,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
@@ -318,7 +318,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs,%sourceroot%\libs\cssys\win32\libs"
+				AdditionalLibraryDirectories="%sourceroot%\libs\csutil\win32\libs"
 				IgnoreDefaultLibraryNames="LIBC"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
 				SubSystem="2"
@@ -342,7 +342,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool

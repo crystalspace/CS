@@ -190,13 +190,3 @@ if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
 if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cgdriver2d ; }
 if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glosx2d ; }
-
-# Common include directory.
-IncludeDir
-    $(BUILDTOP)/include
-    $(TOP)
-    $(TOP)/include
-    $(TOP)/apps
-    $(TOP)/libs
-    $(TOP)/plugins
-    ;

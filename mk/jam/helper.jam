@@ -32,36 +32,47 @@ if $(CP) = "cp -f" || $(CP[1]) = "cp" && $(CP[2]) = "-f"
   CP = cp ;
 }
 
-##  IncludeDir [ target : ] directories
-##    Description: Is used to specify the location of header files for a
-##    target or the whole project if no target is given.
-##    This rule will automatically generate the -I compiler flags and makes
-##    sure the dependency scanner is able to locate your header files. The
-##    directories are relative to the current subdir specified with the SubDir
-##    rule.
-##    Implementation: The directories are simply added to the HDRS variable
-##    which is respected by all jam rules.
+##  IncludeDir [ dir [ : target [ : options ]]]
+##    Specify the location of a directory containing header files for a target,
+##    or for the whole project if no target is given.  "dir" is a list of
+##    components composing the path.  This rule will automatically generate the
+##    -I compiler flags and makes sure the dependency scanner is able to locate
+##    your header files.  "dir" is assumed to be relative to the current
+##    subdirectory specified with the SubDir rule unless the "ignoresubdir"
+##    option is given, in which case "dir" is used literally.  If "dir" is
+##    omitted, then the current subdirectory specified with SubDir is used as
+##    the header directory.  An omitted "dir" and the "ignoresubdir" option are
+##    mutually exclusive.  You may invoke this rule multiple times to specify
+##    any number of header file directories.
+##    Options:
+##	ignoresubdir: Do not prepend $(SUBDIR) to "dir".
+##
+##    Implementation: The directory is simply added to the HDRS variable which
+##    is respected by all Jam rules.
 rule IncludeDir
 {
-  if $(>)
+  local dir = $(1) ;
+  local target = $(2) ;
+  local options = $(3) ;
+
+  CheckOptions ignoresubdir : $(options) : $(dir) ;
+  if ! $(dir) || ! [ IsElem ignoresubdir : $(options) ]
+  {
+    dir = $(SUBDIR) $(dir) ;
+  }
+  dir = [ ConcatDirs $(dir) ] ;
+
+  if $(target)
   {
     local o ;
-    for o in $($(<)_OBJECTS)
+    for o in $($(target)_OBJECTS)
     {
-	CCHDRS on $(o) += [ FIncludes $(SUBDIR)/$(>) ] ;
+      CCHDRS on $(o) += [ FIncludes $(dir) ] ;
     }
   }
   else
   {
-    # don't fail when used in Jamrule where SUBDIR isn't defined yet.
-    if $(SUBDIR)
-    {
-      HDRS += $(SUBDIR)/$(<) ;
-    }
-    else
-    {
-      HDRS += $(<) ;
-    }
+    HDRS += $(dir) ;
   }   
 }
 

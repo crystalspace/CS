@@ -27,7 +27,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -59,7 +59,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
@@ -75,7 +75,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -109,7 +109,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
@@ -125,7 +125,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -159,7 +159,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
@@ -180,7 +180,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -211,7 +211,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
@@ -227,7 +227,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
-				AdditionalIncludeDirectories="%sourceroot%,%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include,%sourceroot%\libs,%sourceroot%\support,%sourceroot%\apps,%sourceroot%\plugins"
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
@@ -260,7 +260,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include\cssys\win32,%sourceroot%\include"/>
+				AdditionalIncludeDirectories="%sourceroot%\include\csutil\win32,%sourceroot%\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>

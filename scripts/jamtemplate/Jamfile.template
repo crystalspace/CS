@@ -2,6 +2,11 @@ TOP ?= "@top_srcdir@" ;
 BUILDTOP ?= "@top_builddir@" ;
 
 SubDir TOP ;
+
+IncludeDir ;
+IncludeDir src ;
+IncludeDir $(BUILDTOP) : : ignoresubdir ;
+
 CleanDir clean :
     out ;
 Clean distclean :

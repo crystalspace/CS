@@ -340,25 +340,45 @@ else
 }
   
 MSVC.DEPEND ?= ;
+MSVC_DEBUG.DEPEND ?= ;
 MSVC.LIBRARY ?= ;
+MSVC_DEBUG.LIBRARY ?= ;
 MSVC.LFLAGS ?= ;
+MSVC_DEBUG.LFLAGS ?= ;
 MSVC.CFLAGS ?= ;
+MSVC_DEBUG.CFLAGS ?= ;
 MSVC.DEPEND.appgui ?= ;
+MSVC.DEPEND_DEBUG.appgui ?= ;
 MSVC.LIBRARY.appgui ?= ;
+MSVC.LIBRARY_DEBUG.appgui ?= ;
 MSVC.LFLAGS.appgui ?= ;
+MSVC.LFLAGS_DEBUG.appgui ?= ;
 MSVC.CFLAGS.appgui ?= ;
+MSVC.CFLAGS_DEBUG.appgui ?= ;
 MSVC.DEPEND.appcon ?= ;
+MSVC.DEPEND_DEBUG.appcon ?= ;
 MSVC.LIBRARY.appcon ?= ;
+MSVC.LIBRARY_DEBUG.appcon ?= ;
 MSVC.LFLAGS.appcon ?= ;
+MSVC.LFLAGS_DEBUG.appcon ?= ;
 MSVC.CFLAGS.appcon ?= ;
+MSVC.CFLAGS_DEBUG.appcon ?= ;
 MSVC.DEPEND.plugin ?= ;
+MSVC.DEPEND_DEBUG.plugin ?= ;
 MSVC.LIBRARY.plugin ?= ;
+MSVC.LIBRARY_DEBUG.plugin ?= ;
 MSVC.LFLAGS.plugin ?= ;
+MSVC.LFLAGS_DEBUG.plugin ?= ;
 MSVC.CFLAGS.plugin ?= ;
+MSVC.CFLAGS_DEBUG.plugin ?= ;
 MSVC.DEPEND.library ?= ;
+MSVC.DEPEND_DEBUG.library ?= ;
 MSVC.LIBRARY.library ?= ;
+MSVC.LIBRARY_DEBUG.library ?= ;
 MSVC.LFLAGS.library ?= ;
+MSVC.LFLAGS_DEBUG.library ?= ;
 MSVC.CFLAGS.library ?= ;
+MSVC.CFLAGS_DEBUG.library ?= ;
 
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
@@ -521,6 +541,7 @@ rule MsvcProject
     Always $(resource) ;
   }
   
+  local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
   RAWNAME on $(target) = $(rawname) ;
   PROJECTNAME on $(target) = $(msvcname) ;
   TARGET on $(target) = $(decorated) ;
@@ -528,10 +549,31 @@ rule MsvcProject
   FRAGMENT_ROOT on $(target) = $(fragroot) ;
   DEPEND on $(target) += $(MSVC.DEPEND) $(MSVC.DEPEND.$(type)) ;
   LIBRARIES on $(target) += $(MSVC.LIBRARY) $(MSVC.LIBRARY.$(type)) ;
+  LIBRARIES_DEBUG on $(target) +=
+    $(MSVC.LIBRARY_DEBUG) $(MSVC.LIBRARY_DEBUG.$(type)) ;
   LFLAGS on $(target) += $(MSVC.LFLAGS) $(MSVC.LFLAGS.$(type)) ;
+  LFLAGS_DEBUG on $(target) +=
+    $(MSVC.LFLAGS_DEBUG) $(MSVC.LFLAGS_DEBUG.$(type)) ;
   CFLAGS on $(target) += $(MSVC.CFLAGS) $(MSVC.CFLAGS.$(type)) ;
-  RELPATH on $(target) =
-    [ ConcatDirs [ Property msvcgen : relpath$(MSVC_VERSION) ] ] ;
+  CFLAGS_DEBUG on $(target) +=
+    $(MSVC.CFLAGS_DEBUG) $(MSVC.CFLAGS_DEBUG.$(type)) ;
+  RELPATH on $(target) = [ ConcatDirs $(relpath) ] ;
+
+  local incdirs ;
+  for incdirs in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
+  {
+    local incdir ;
+    if $(incdirs) = "."
+    {
+      incdir = $(relpath) ;
+    }
+    else
+    {
+      incdir = [ ConcatDirs $(relpath) $(incdirs) ] ;
+    }
+    INCDIRS on $(target) +=
+      "/I `echo '\"$(incdir)\"' | $(SED) 's:/:\\\\\\:g'`" ;
+  }
 
   local templatedir = [ Property msvcgen : templatedir$(MSVC_VERSION) ] ;
   if $(templatedir)
@@ -707,17 +749,17 @@ rule MsvcLFlags
 
 rule MsvcExternalDebugLibrary
 {
-  if $(>) { DEBUGLIBRARIES on $($(<)_TARGET) += $(>) ; }
+  if $(>) { LIBRARIES_DEBUG on $($(<)_TARGET) += $(>) ; }
 }
 
 rule MsvcDebugCFlags
 {
-  if $(>) { DEBUGCFLAGS on $($(<)_TARGET) += $(>) ; }
+  if $(>) { CFLAGS_DEBUG on $($(<)_TARGET) += $(>) ; }
 }
 
 rule MsvcDebugLFlags
 {
-  if $(>) { DEBUGLFLAGS on $($(<)_TARGET) += $(>) ; }
+  if $(>) { LFLAGS_DEBUG on $($(<)_TARGET) += $(>) ; }
 }
 
 rule ExternalLibs
@@ -760,6 +802,35 @@ rule ExternalLibs
   }
 }
 
+rule IncludeDir
+{
+  local dir = $(1) ;
+  local target = $(2) ;
+  local options = $(3) ;
+
+  # We prefer directories in source tree and ignore others.
+  if ! [ IsElem ignoresubdir : $(options) ]
+  {
+    if $(dir)
+    {
+      dir = [ ConcatDirs $(dir) ] ;
+    }
+    else
+    {
+      dir = "." ;
+    }
+
+    if $(target)
+    {
+      MSVC.INCDIRS.$(target) += $(dir) ;
+    }
+    else
+    {
+      MSVC.INCDIRS += $(dir) ;
+    }
+  }
+}
+
 # Normal invocations of these two rules are made using Unix-style flags;
 # possibly determined by an Autoconf configuration script.  Such flags are
 # unsuitable for MSVC, so we ignore them.
@@ -793,9 +864,11 @@ actions MsvcProjectGen
   --library=$(LIBRARIES) \
   --lflags='$(LFLAGS)' \
   --cflags='$(CFLAGS)' \
-  --debuglibrary=$(DEBUGLIBRARIES) \
-  --debuglflags='$(DEBUGLFLAGS)' \
-  --debugcflags='$(DEBUGCFLAGS)' \
+  --cflags="$(INCDIRS)" \
+  --debuglibrary=$(LIBRARIES_DEBUG) \
+  --debuglflags='$(LFLAGS_DEBUG)' \
+  --debugcflags='$(CFLAGS_DEBUG)' \
+  --debugcflags="$(INCDIRS)" \
   --source-root='$(RELPATH)' \
   --build-root='$(RELPATH)' \
   --strip-root='$(MSVCGEN_STRIP_ROOT)' \
@@ -823,9 +896,6 @@ actions together MergeResources
   cat $(>) > $(<)
 }
 
-# Note that whitespace in sed expression is intentional; it allows us to take
-# advantage of Jam's product-wise variable interpolation to compose multiple
-# sed commands automatically.
 actions GenerateIconRc
 {
   sedexpr=`echo 's^$(MSVCGEN_STRIP_ROOT)^^;' | $(MSVCGEN_SED_PROTECT)`

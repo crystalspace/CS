@@ -42,6 +42,20 @@ chronological order.
 	  it ignored the "platform" argument.  This caused macosx.jam, for
 	  instance, to use cslight.ico (which is for Windows) as the MacOS/X
 	  cslight.app icon.
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Changed the IncludeDir rule usage.  It must now be invoked with
+	      only a single directory at a time, rather than multiple
+	      directories.  The directory is now specified as a
+	      whitespace-delimited list of tokens (much like with the SubDir
+	      rule, except that the path is relative to the current directory),
+	      rather than a raw pathname.  It now understands the
+	      "ignoresubdir" option, which tells it to use the directory
+	      literally rather than assuming it is relative to the current
+	      subdirectory.
+	    - Augmented msvcgen.jam so that it now also overrides the
+	      IncludeDir rule.  It collects the specified directories and
+	      applies them automatically to (via /I directives) to the
+	      generated project files.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when
