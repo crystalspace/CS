@@ -388,7 +388,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
   
   // Add system driver configuration
-  AddConfig(ConfigPriorityPlugIn, "/config/system.cfg");
+  AddConfig("/config/system.cfg");
 
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -1092,11 +1092,17 @@ iConfigManager *csSystemDriver::GetConfig ()
   return Config;
 }
 
-void csSystemDriver::AddConfig(int Priority, const char *iFileName, bool iVFS)
+iConfigFileNew *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
 {
   iConfigFileNew *cfg = CreateSeparateConfig(iFileName, iVFS);
   Config->AddDomain(cfg, Priority);
   cfg->DecRef();
+  return cfg;
+}
+
+void csSystemDriver::RemoveConfig(iConfigFileNew *cfg)
+{
+  Config->RemoveDomain(cfg);
 }
 
 iConfigFile *csSystemDriver::CreateINIConfig (const char *iFileName, bool iVFS)

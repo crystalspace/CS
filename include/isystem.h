@@ -302,8 +302,15 @@ struct iSystem : public iBase
   };
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig () = 0;
-  /// Add a config file to the global config manager (convenience method)
-  virtual void AddConfig(int Priority, const char *iFileName, bool iVFS = true) = 0;
+  /**
+   * Add a config file to the global config manager (convenience method).
+   * The returned config file is the newly loaded file. You must keep the
+   * pointer to call RemoveConfig() later.
+   */
+  virtual iConfigFileNew *AddConfig(const char *iFileName,
+    bool iVFS = true, int Priority = ConfigPriorityPlugIn) = 0;
+  /// Remove a config file that was added with AddConfig()
+  virtual void RemoveConfig(iConfigFileNew *ConfigFile) = 0;
   /**
    * Create a new configuration file object which resides on VFS without
    * adding it to the config manager. NOTE: The config file uses the soon
