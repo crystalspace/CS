@@ -46,6 +46,18 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed csSCF::QueryClassList() so that it no longer
 	  leaks an scfStrVector object.  The reference count on the returned
 	  object was incorrect; it should have been 1 but was actually 2.
+	- Eric Sunshine changed the Apple/NeXT plugin loading mechanism so that
+	  it now keeps track of currently plugins loaded.  This is necessary
+	  since plugins can only be unloaded in reverse order on Apple/NeXT,
+	  whereas SCF expects a platform to be able to unload plugins in any
+	  order.  This issue is further complicated by the fact that SCF
+	  blindly assumes that plugin unloading operations always succeed.
+	  This creates problems if, for example, SCF requests to have a plugin
+	  unloaded, the unload fails, and then SCF later requests to have it
+	  re-loaded.  By manually maintaining a list of loaded plugins, the
+	  Apple/NeXT plugin loading mechanism can simply return the handle of
+	  an already-loaded plugin (one which could not be unloaded), if
+	  necessary.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter

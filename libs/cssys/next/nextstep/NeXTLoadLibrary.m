@@ -115,7 +115,7 @@ void* NeXTGetLibrarySymbol(NeXTLibraryHandle handle, char const* s)
 int NeXTUnloadLibrary(NeXTLibraryHandle handle)
 {
   (void)handle;
-  return 1; // Unimplemented (1=success).
+  return 0; // Unimplemented (0=failure).
 }
 
 
