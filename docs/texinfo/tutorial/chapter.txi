@@ -10,7 +10,8 @@ environment.
 @menu
 * Tutorial Introduction:: Developing a Crystal Space Application
 * Tutorial Simple:: Simple Tutorial 1
-* Tutorial Simple 2:: Simple Tutorial 2
+* Tutorial Simple 2:: Simple Tutorial 2: Sprites
+* Tutorial Simple Map:: Simple Tutorial 3: Map Loading
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * WinCVS Tutorial:: WinCVS Tutorial
 * HOWTO:: HOWTO
@@ -19,6 +20,7 @@ environment.
 @imports{tutorial,intro.txi}
 @imports{tutorial,simple.txi}
 @imports{tutorial,simple2.txi}
+@imports{tutorial,simpmap.txi}
 @importss{tutorial,map2cs,map2cs.txi}
 @importss{tutorial,wincvs,wincvs.txi}
 @importss{tutorial,howto,howto.txi}

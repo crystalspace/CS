@@ -32,6 +32,10 @@ The history order is reversed so that new features are at the top.
 	- Added 'simpmap' tutorial app. This app is not yet in the tutorials
 	  because it doesn't work yet. I have to investigate why it is
 	  crashing.
+	- Seems like simpmap is working after all. I only had to recompile
+	  the engine plugin :-)
+	- Added a new simple tutorial to the documentation. Now there
+	  are three chapters.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Tutorial Simple 2, map2cs Tutorial, Tutorial Simple, Tutorials
-@section Simple Tutorial 2
+@node Tutorial Simple 2, Tutorial Simple Map, Tutorial Simple, Tutorials
+@section Simple Tutorial 2: Sprites
 @cindex Tutorial, Simple, Sprite, VFS, Texture
 @cindex Simple Tutorial 2
 
@@ -219,3 +219,6 @@ itself moves. Note that this function is not very expensive. It will only
 recalculate lighting when the object is really visible.
 
 This concludes the second Simple tutorial.
+You can now go on to the next tutorial (@pxref{Tutorial Simple Map})) to learn
+how you can load a level from a file instead of creating your rooms in
+the code.
