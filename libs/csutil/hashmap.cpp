@@ -41,10 +41,7 @@ csHashKey csHashCompute(char const* s, int n)
   csHashKey h = 0;
   char const* slim = s + n;
   while (s < slim)
-  {
-    rotate_bits_right(h, 3);
-    h += *s++;
-  }
+    h = rotate_bits_right(h, 3) + *s++;
   return h;
 }
 

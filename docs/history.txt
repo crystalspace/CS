@@ -45,6 +45,8 @@ The history order has been reversed so that new features are at the top.
 	- Added support for portals in the thing loader.
 	- Added support for setting materials in the thing loader.
 	- Added support for CIRCLE command in the thing loader.
+	- Eric Sunshine fixed a silly typographical error in csHashCompute()
+	  which rendered the function almost completely inoperative.
 3-Apr-2001
 	- Norman Kramer fixed a warning about explicit initialization
 	  of iBase in copy constructor of csCamera.
@@ -116,7 +118,7 @@ The history order has been reversed so that new features are at the top.
 	    - csGrid notifies its parent if the cursor changed.
 	    - csGridView has a new border that is colored differently
 	      based on the active state of the gridview.
-	    - Added added GetStringAt() to grid.
+	    - Added GetStringAt() to csGrid.
 	- Michael Voase did the following:
 	    - Added iBase parameter to iLoaderPlugIn::Parse() command.
 	    - Added factory passing between LoadMeshObjectFactory()
