@@ -115,8 +115,8 @@ bool csGraphics2DDDraw6::Open (const char *Title)
   HDC hdc = GetDC (m_hWnd);
   m_bAllowWindowed = (GetDeviceCaps (hdc, BITSPIXEL) == Depth);
   ReleaseDC (m_hWnd, hdc);
-  if (!m_bAllowWindowed)
-    FullScreen = true;
+  if (m_bAllowWindowed)
+    FullScreen = false;
 
   // Create the DirectDraw device //
   if (!m_bUses3D)
