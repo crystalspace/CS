@@ -138,7 +138,7 @@ $(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.cpp
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(PYTHON.CFLAGS)
 
-SWIGFLAGS=-python -c++ -shadow -Iinclude/
+SWIGFLAGS=-python -c++ -shadow -I$(SRCDIR)/include
 SWIG.CSPYTHON.DEPS=\
 	$(SRCDIR)/include/ivaria/pythpre.i \
 	$(SRCDIR)/include/ivaria/pythpost.i
