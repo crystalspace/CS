@@ -28,7 +28,7 @@ struct iGraphics3D;
 struct iSector;
 struct iView;
 struct iTextureHandle;
-class csEngineProcTex;
+class csProcWater;
 
 class Simple : public SysSystemDriver
 {
@@ -39,7 +39,7 @@ private:
   iGraphics3D* g3d;
   iSector* room;
   iView* view;
-  csEngineProcTex* ProcTexture;
+  csProcWater* ProcTexture;
  
 public:
   Simple ();
@@ -51,6 +51,7 @@ public:
   virtual void NextFrame ();
 };
 
+#if 0
 class csEngineProcTex
 {
 private:
@@ -68,5 +69,6 @@ public:
   inline iTextureHandle *GetTextureHandle ()
     { return TexHandle; }
 };
+#endif
 
 #endif // __SIMPLE1_H__

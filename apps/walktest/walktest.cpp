@@ -1597,8 +1597,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // real window for example).
   int w3d = Gfx3D->GetWidth ();
   int h3d = Gfx3D->GetHeight ();
+#ifdef CS_DEBUG
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
-
+  myG2D->SetClipRect (2, 2, w3d - 2, h3d - 2);
+#else
+  view->SetRectangle (0, 0, w3d, h3d);
+#endif
   // clear all backbuffers to black
   myG2D->BeginDraw ();
   myG2D->ClearAll (txtmgr->FindRGB(0,0,0));

@@ -1538,6 +1538,8 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 {
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
+  // Added a full check of all vertices in the sweep. Its a LOT
+  // slower, but is 100% accurate.
   csBox3 b;
   GetObjectBoundingBox (b);
   csSegment3 seg (start, end);
@@ -1545,26 +1547,29 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   if (csIntersect3::BoxSegment (b, seg, isect, pr) < 0)
     return false;
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-  csVector3* verts = GetObjectVerts (cframe);
+  csVector3* verts = GetObjectVerts (cframe), tsect;
   csTriangle* tris = factory->GetTriangles ();
   int i;
+  float d, t, max = csSquaredDist::PointPoint (start, end), ibeam_len = 1 /max;
+  t = d = max;
   for (i = 0 ; i < factory->GetTriangleCount () ; i++)
   {
     csTriangle& tr = tris[i];
     if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
-    	verts[tr.c], seg, isect) ||
+    	verts[tr.c], seg, tsect) ||
 	csIntersect3::IntersectTriangle (verts[tr.c], verts[tr.b],
-    	verts[tr.a], seg, isect))
+    	verts[tr.a], seg, tsect))
     {
-      if (pr)
+      if (d > (t = csSquaredDist::PointPoint (start, tsect)))
       {
-        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-		csSquaredDist::PointPoint (start, end));
+          d = t;
+	  isect = tsect;
+          if (pr) *pr = qsqrt (d * ibeam_len);
       }
-      return true;
     }
   }
-  return false;
+  if ( d == max ) return false;
+  return true;
 }
 
 //--------------------------------------------------------------------------
