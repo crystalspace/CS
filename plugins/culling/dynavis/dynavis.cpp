@@ -196,6 +196,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_ignoresmall = false;
   do_cull_clampoccluder = false;
   do_cull_vpt = true;
+  do_cull_outline_splatting = true;
   do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
@@ -837,7 +838,8 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   tcovbuf->InsertOutline (trans, camera->GetFOV (), camera->GetShiftX (),
   	camera->GetShiftY (), verts, vertex_count,
   	outline_info.outline_verts,
-  	outline_info.outline_edges, outline_info.num_outline_edges);
+  	outline_info.outline_edges, outline_info.num_outline_edges,
+	do_cull_outline_splatting);
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
@@ -1617,7 +1619,8 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
       {
 	if (data->viscallback)
 	{
-	  data->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
+	  data->viscallback->ObjectVisible (visobj_wrap->visobj,
+	  	visobj_wrap->mesh);
 	}
 	else
 	{
@@ -2418,7 +2421,7 @@ public:
     csReversibleTransform trans;
     tcovbuf->InsertOutline (trans, ol.depth, 0.0, 0.0,
     	ol.verts3d, ol.num_verts, ol.used_verts,
-    	ol.edges, ol.num_edges);
+    	ol.edges, ol.num_edges, false);
   }
 
   virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug)
@@ -2560,6 +2563,14 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     do_cull_vpt = !do_cull_vpt;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s vpt culling!", do_cull_vpt ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_splatting"))
+  {
+    do_cull_outline_splatting = !do_cull_outline_splatting;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s outline splatting!",
+	do_cull_outline_splatting ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_history"))

@@ -176,6 +176,7 @@ private:
   bool do_cull_ignoresmall;
   bool do_cull_clampoccluder;
   bool do_cull_vpt;
+  bool do_cull_outline_splatting;
   bool do_freeze_vis;
 
   // This hash set holds references to csVisibilityObjectWrapper instances

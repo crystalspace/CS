@@ -375,12 +375,13 @@ private:
    * Draw an outline on the coverage buffer.
    * Returns false if outline is outside screen.
    * The 'used_verts' contains true for all vertices that are used.
+   * If 'splat_outline' is true then outline splatting is used.
    */
   bool DrawOutline (const csReversibleTransform& trans,
   	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
   	int* edges, int num_edges, csBox2Int& bbox,
-	float& max_depth);
+	float& max_depth, bool splat_outline);
 
   /**
    * Find a given tile.
@@ -445,11 +446,12 @@ public:
    * The given array of edges is an array of two integers (vertex indices)
    * per edge.
    * The 'used_verts' contains true for all vertices that are used.
+   * If 'splat_outline' is true then outline splatting is used.
    */
   void InsertOutline (const csReversibleTransform& trans,
   	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges);
+  	int* edges, int num_edges, bool splat_outline);
 
   /**
    * Prepare data for TestRectangle. If this returns false you have

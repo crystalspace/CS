@@ -1835,6 +1835,17 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   return true;
 }
 
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / .2;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
 static void Perspective (const csVector3& v, csVector2& p,
 	float fov, float sx, float sy)
 {
@@ -1848,20 +1859,24 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
 	csVector3* verts, int num_verts,
 	bool* used_verts,
 	int* edges, int num_edges,
-	csBox2Int& bbox, float& max_depth)
+	csBox2Int& bbox, float& max_depth,
+	bool splat_outline)
 {
   int i;
 
   static int* xa = 0, * ya = 0;
+  static csVector3* camv = 0;
   static int max_tr_verts = 0;
   if (num_verts > max_tr_verts)
   {
     //@@@ MEMORY LEAK!!!
     delete[] xa;
     delete[] ya;
+    delete[] camv;
     max_tr_verts = num_verts+20;
     xa = new int[max_tr_verts];
     ya = new int[max_tr_verts];
+    camv = new csVector3[max_tr_verts];
   }
 
   //---------
@@ -1872,7 +1887,6 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
   //@@@ TODO: pre-shift x with 16
   //---------
   max_depth = -1.0;
-  csVector3 camv;
   const csMatrix3& trans_mat = trans.GetO2T ();
   const csVector3& trans_vec = trans.GetO2TTranslation ();
 
@@ -1882,6 +1896,7 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
   bbox.maxy = -1000000;
   csVector2 tr_vert;
 
+  bool need_splatting = false;
   for (i = 0 ; i < num_verts ; i++)
   {
     // Normally we would calculate:
@@ -1889,24 +1904,28 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
     // But since we often only need the z of the transformed vertex
     // we only calculate z and calculate x,y later if needed.
     csVector3 v = verts[i] - trans_vec;
-    camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
+    camv[i].z = trans_mat.m31*v.x + trans_mat.m32*v.y + trans_mat.m33*v.z;
 
-    if (camv.z > max_depth) max_depth = camv.z;
+    if (camv[i].z > max_depth) max_depth = camv[i].z;
     if (used_verts[i])
     {
+      camv[i].x = trans_mat.m11*v.x + trans_mat.m12*v.y + trans_mat.m13*v.z;
+      camv[i].y = trans_mat.m21*v.x + trans_mat.m22*v.y + trans_mat.m23*v.z;
+
       // @@@ Note: originally 0.1 was used here. However this could cause
       // very large coordinates to be generated and our coverage line drawer
       // cannot currently cope with that. We need to improve that line
       // drawer considerably.
-      if (camv.z <= 0.2)
+      if (camv[i].z <= 0.2)
       {
-        // @@@ Later we should clamp instead of ignoring this outline.
-        return false;
+        if (!splat_outline) return false;
+	need_splatting = true;
+        PerspectiveWrong (camv[i], tr_vert, fov, sx, sy);
       }
-
-      camv.x = trans_mat.m11 * v.x + trans_mat.m12 * v.y + trans_mat.m13 * v.z;
-      camv.y = trans_mat.m21 * v.x + trans_mat.m22 * v.y + trans_mat.m23 * v.z;
-      Perspective (camv, tr_vert, fov, sx, sy);
+      else
+      {
+        Perspective (camv[i], tr_vert, fov, sx, sy);
+      }
 
       xa[i] = QRound (tr_vert.x);
       ya[i] = QRound (tr_vert.y);
@@ -1932,34 +1951,63 @@ bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
     dirty_right[i] = -1;
   }
 
+#undef COV_DRAW_LINE
+#define COV_DRAW_LINE(a_xa1,a_ya1,a_xa2,a_ya2) { \
+      int ya1 = a_ya1; \
+      int ya2 = a_ya2; \
+      if (ya1 != ya2) \
+      { \
+        int xa1, xa2; \
+        if (ya1 < ya2) \
+        { \
+	  xa1 = a_xa1; \
+          xa2 = a_xa2; \
+        } \
+        else \
+        { \
+          int y = ya1; \
+	  ya1 = ya2; \
+	  ya2 = y; \
+	  xa1 = a_xa2; \
+          xa2 = a_xa1; \
+        } \
+        DrawLine (xa1, ya1, xa2, ya2, 0); \
+      } }
+
   //---------
   // Draw all edges.
   //---------
-  for (i = 0 ; i < num_edges ; i++)
-  {
-    int vt1 = *edges++;
-    int vt2 = *edges++;
-    int ya1 = ya[vt1];
-    int ya2 = ya[vt2];
-    if (ya1 != ya2)
+  if (need_splatting)
+    for (i = 0 ; i < num_edges ; i++)
     {
-      int xa1, xa2;
-      if (ya1 < ya2)
+      int vt1 = *edges++;
+      int vt2 = *edges++;
+      float z1 = camv[vt1].z;
+      float z2 = camv[vt2].z;
+      if ((z1 <= .200001 && z2 > .200001) ||
+          (z1 > .200001 && z2 <= .200001))
       {
-	xa1 = xa[vt1];
-        xa2 = xa[vt2];
+        csVector3 isect;
+        csIntersect3::ZPlane (.2, camv[vt1], camv[vt2], isect);
+        PerspectiveWrong (isect, tr_vert, fov, sx, sy);
+        int isect_xa = QRound (tr_vert.x);
+        int isect_ya = QRound (tr_vert.y);
+        COV_DRAW_LINE (xa[vt1], ya[vt1], isect_xa, isect_ya);
+        COV_DRAW_LINE (isect_xa, isect_ya, xa[vt2], ya[vt2]);
       }
-      else
+      else // Both < .2 and or > .2
       {
-        int y = ya1;
-	ya1 = ya2;
-	ya2 = y;
-	xa1 = xa[vt2];
-        xa2 = xa[vt1];
+        COV_DRAW_LINE (xa[vt1], ya[vt1], xa[vt2], ya[vt2]);
       }
-      DrawLine (xa1, ya1, xa2, ya2, 0);	// @@@ last parm 1 on last row?
     }
-  }
+  else
+    for (i = 0 ; i < num_edges ; i++)
+    {
+      int vt1 = *edges++;
+      int vt2 = *edges++;
+      COV_DRAW_LINE (xa[vt1], ya[vt1], xa[vt2], ya[vt2]);
+    }
+#undef COV_DRAW_LINE
 
   return true;
 }
@@ -2034,12 +2082,12 @@ void csTiledCoverageBuffer::InsertOutline (
 	const csReversibleTransform& trans, float fov, float sx, float sy,
 	csVector3* verts, int num_verts,
 	bool* used_verts,
-	int* edges, int num_edges)
+	int* edges, int num_edges, bool splat_outline)
 {
   csBox2Int bbox;
   float max_depth;
   if (!DrawOutline (trans, fov, sx, sy, verts, num_verts, used_verts, edges,
-  	num_edges, bbox, max_depth))
+  	num_edges, bbox, max_depth, splat_outline))
     return;
 
   int tx, ty;

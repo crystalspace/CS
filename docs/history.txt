@@ -16,6 +16,12 @@ chronological order.
 	  parameter specified in csTicks instead of using a step_size parameter.
 	  This approach has the benefit of making the transitions take the same
 	  amount of time on computers with different processor speeds.
+	- Jorrit implemented the silhouette splatting optimization in Dynavis.
+	  With this optimization, outlines that are partially behind the view
+	  plane are now splatted to the view plane instead of simply discarded.
+	  At some spots this optimization can really help a lot.
+	- Jorrit added a 'toggle_splatting' command to Dynavis. Assigned the
+	  ctrl-d 8 key to that command.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 
