@@ -5896,7 +5896,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   if (owidth != bitmapwidth || oheight != bitmapheight)
   {
     tw = tw * bitmapwidth / owidth;
-    th = sh * bitmapheight / oheight;
+    th = th * bitmapheight / oheight;
   }
 
   int ClipX1, ClipY1, ClipX2, ClipY2;
