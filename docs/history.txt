@@ -7,6 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Apr-2004
+	- Jorrit changed the way render priorities work in the engine. The
+	  RenderQueues field no longer contains all meshes for all render
+	  priorities but only the meshes with CAMERA flag set. The other
+	  meshes are not needed there.
+	- Jorrit added a new 'visible' array to RenderQueues. This array
+	  is used with OR only and updated during visibility testing. This
+	  replaces the SetVisibilityNumber() that was otherwise used. It
+	  also makes OR handling of more meshes more efficient.
+	  The RenderQueues.SortAll() method no longer has to test for
+	  visibility as it will use the 'visible' array instead of the
+	  'queues'.
 	- Eric Sunshine augmented jobber.pl so that the Crystal Space version
 	  number and copyright are now gleaned from the configure script rather
 	  than being hard-coded into jobber.pl.

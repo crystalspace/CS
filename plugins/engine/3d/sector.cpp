@@ -332,7 +332,7 @@ public:
 	  cmesh->GetZBufMode (), box);
     }
 #else
-    cmesh->SetVisibilityNumber (sector->current_visnr);
+    sector->GetRenderQueues ().AddVisible (&(cmesh->scfiMeshWrapper));
 #endif
   }
 
@@ -632,39 +632,23 @@ void csSector::PrepareDraw (iRenderView *rview)
     i--;
   }
 
-  // Here we check all render queues to see if there is a render queue
-  // that has the 'do_camera' flag set. If so then we check all meshes
-  // in that render queue to see if there is one that has CS_ENTITY_CAMERA
-  // set. If so we move that mesh to the right position.
-  for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
+  // CS_ENTITY_CAMERA meshes have to be moved to right position first.
+  const csArrayMeshPtr& cm = RenderQueues.GetCameraMeshes ();
+  for (i = 0 ; i < cm.Length () ; i++)
   {
-    if (csEngine::current_engine->GetRenderPriorityCamera (i))
+    iMeshWrapper* m = cm.Get (i);
+    if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
     {
-      csMeshVectorNodelete* mv = RenderQueues.GetQueue (i);
-      if (mv)
-      {
-        int j;
-	for (j = 0 ; j < mv->Length () ; j++)
-	{
-	  iMeshWrapper* m = mv->Get (j);
-	  if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
-	  {
-	    iMovable* mov = m->GetMovable ();
-	    // Temporarily move the object to the current camera.
-	    csReversibleTransform &mov_trans = mov->GetTransform ();
-// @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
-mov_trans.SetOrigin (csVector3 (0));
-//	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
-	    iCamera *orig_cam = rview->GetOriginalCamera ();
-	    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
-	    csVector3 v = orig_trans.GetO2TTranslation ();
-	    mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
-	    mov->UpdateMove ();
-    //mov_trans.SetOrigin (old_movable_pos);
-    //movable.UpdateMove ();
-	  }
-	}
-      }
+      iMovable* mov = m->GetMovable ();
+      // Temporarily move the object to the current camera.
+      csReversibleTransform &mov_trans = mov->GetTransform ();
+      // @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
+      mov_trans.SetOrigin (csVector3 (0));
+      iCamera *orig_cam = rview->GetOriginalCamera ();
+      csOrthoTransform &orig_trans = orig_cam->GetTransform ();
+      csVector3 v = orig_trans.GetO2TTranslation ();
+      mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
+      mov->UpdateMove ();
     }
   }
 }
@@ -831,7 +815,6 @@ void csSector::Draw (iRenderView *rview)
 
   if (csrview->AddedFogInfo ())
     csrview->GetFirstFogInfo ()->has_outgoing_plane = false;
-#endif // CS_USE_NEW_RENDERER
 
   /*
    * Draw meshes.
@@ -847,12 +830,12 @@ void csSector::Draw (iRenderView *rview)
    * draw it clipped (in 3D) to the portal polygon. This is currently not
    * done.
    */
-#ifndef CS_USE_NEW_RENDERER
 
   if (meshes.GetCount () > 0)
   {
     // Mark visible objects.
     current_visnr++;
+    RenderQueues.ClearVisible ();
     GetVisMeshCb ()->Setup (this, rview);
     culler->VisTest (rview, GetVisMeshCb ());
     //uint32 current_visnr = culler->GetCurrentVisibilityNumber ();

@@ -226,6 +226,9 @@ public:
   iMeshList* GetMeshes ()
     { return &meshes; }
 
+  /// Get render queues (for rendering priorities).
+  csRenderQueueSet& GetRenderQueues () { return RenderQueues; }
+
   /**
    * Register a mesh and all children to the visibility culler.
    */

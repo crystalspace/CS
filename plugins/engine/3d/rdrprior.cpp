@@ -32,6 +32,34 @@ csRenderQueueSet::~csRenderQueueSet ()
 {
 }
 
+void csRenderQueueSet::ClearVisible ()
+{
+  int i;
+  for (i = 0 ; i < visible.Length () ; i++)
+    if (visible[i])
+      visible[i]->SetLength (0);
+}
+
+void csRenderQueueSet::AddVisible (iMeshWrapper *mesh)
+{
+  long pri = mesh->GetRenderPriority ();
+
+  // look if the desired priority queue exists, and possibly
+  // extend the list of visible.
+  if (pri >= visible.Length ())
+    visible.SetLength (pri+1);
+
+  // look if the desired queue exists, and create it if not
+  if (!visible[pri])
+  {
+    csArrayMeshPtr* mvnd = new csArrayMeshPtr ();
+    visible.Put (pri, mvnd);
+  }
+
+  // add the mesh wrapper
+  visible[pri]->Push (mesh);
+}
+
 void csRenderQueueSet::Add (iMeshWrapper *mesh)
 {
   long pri = mesh->GetRenderPriority ();
@@ -43,49 +71,23 @@ void csRenderQueueSet::Add (iMeshWrapper *mesh)
   {
     csEngine::current_engine->SetRenderPriorityCamera (pri, do_camera);
   }
-
-  // look if the desired priority queue exists, and possibly
-  // extend the list of queues
-  if (pri >= Queues.Length ())
-    Queues.SetLength (pri+1);
-
-  // look if the desired queue exists, and create it if not
-  if (!Queues[pri])
+  else
   {
-    csMeshVectorNodelete* mvnd = new csMeshVectorNodelete ();
-    Queues.Put (pri, mvnd);
+    // We only add CAMERA meshes!
+    return;
   }
 
-  // add the mesh wrapper
-  Queues[pri]->Push (mesh);
+  camera_meshes.Push (mesh);
 }
 
 void csRenderQueueSet::Remove (iMeshWrapper *mesh)
 {
-  long pri = mesh->GetRenderPriority ();
-
-  // look if the queue of the mesh exists
-  if (pri < Queues.Length () && Queues[pri] != 0)
-  {
-    // delete the object from the queue
-    Queues[pri]->Delete (mesh);
-  }
+  camera_meshes.Delete (mesh);
 }
 
 void csRenderQueueSet::RemoveUnknownPriority (iMeshWrapper *mesh)
 {
-  for (int i = 0; i < Queues.Length (); i++)
-  {
-    if (Queues[i])
-    {
-      int n = Queues[i]->Find (mesh);
-      if (n != -1)
-      {
-        Queues[i]->DeleteIndex (n);
-        return ;
-      }
-    }
-  }
+  camera_meshes.Delete (mesh);
 }
 
 struct comp_mesh_comp
@@ -116,27 +118,24 @@ iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
 
   int tot_objects = 0;
   int priority;
-  for (priority = 0 ; priority < Queues.Length () ; priority++)
+  for (priority = 0 ; priority < visible.Length () ; priority++)
   {
     Sort (rview, priority);
-    csMeshVectorNodelete* v = Queues[priority];
+    csArrayMeshPtr* v = visible[priority];
     if (v)
       tot_objects += v->Length ();
   }
   if (!tot_objects) return 0;
 
   iMeshWrapper** meshes = new iMeshWrapper* [tot_objects];
-  for (priority = 0 ; priority < Queues.Length () ; priority++)
+  for (priority = 0 ; priority < visible.Length () ; priority++)
   {
-    csMeshVectorNodelete* v = Queues[priority];
+    csArrayMeshPtr* v = visible[priority];
     if (v)
       for (int i = 0 ; i < v->Length () ; i++)
       {
         iMeshWrapper *sp = v->Get (i);
-        if (sp->GetVisibilityNumber () == current_visnr)
-        {
-          meshes[tot_num++] = sp;
-        }
+        meshes[tot_num++] = sp;
       }
   }
 
@@ -146,13 +145,13 @@ iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
 void csRenderQueueSet::Sort (iRenderView *rview, int priority)
 {
   static engine3d_comp_mesh_z &comp_mesh_z = *GetStaticComp_Mesh_Comp ();
-  if (!Queues[priority]) return ;
+  if (!visible[priority]) return ;
 
   int rendsort = csEngine::current_engine->GetRenderPrioritySorting (
       priority);
   if (rendsort == CS_RENDPRI_NONE) return ;
 
-  csMeshVectorNodelete *v = Queues[priority];
+  csArrayMeshPtr *v = visible[priority];
   if (v->Length () > comp_mesh_z.Length ())
     comp_mesh_z.SetLength (v->Length ());
 

@@ -25,8 +25,8 @@
 struct iMeshWrapper;
 struct iRenderView;
 
-typedef csArray<iMeshWrapper*> csMeshVectorNodelete;
-typedef csPDelArray<csMeshVectorNodelete> csMeshVectorNodeleteVector;
+typedef csArray<iMeshWrapper*> csArrayMeshPtr;
+typedef csPDelArray<csArrayMeshPtr> csArrayMeshPtrVector;
 
 /**
  * This class contains a list of rendering queues, each of which is a list
@@ -36,8 +36,11 @@ typedef csPDelArray<csMeshVectorNodelete> csMeshVectorNodeleteVector;
 class csRenderQueueSet
 {
 private:
-  // the list of queues
-  csMeshVectorNodeleteVector Queues;
+  // The list of meshes with CAMERA keyword set.
+  csArrayMeshPtr camera_meshes;
+  // List of visiblel meshes per render priority. Updating
+  // during VisTest() (OR only!)
+  csArrayMeshPtrVector visible;
 
 public:
 
@@ -46,7 +49,16 @@ public:
   /// Destructor.
   ~csRenderQueueSet ();
 
-  /// Add a mesh object.
+  /// Clear all visible meshes.
+  void ClearVisible ();
+  
+  /// Register a visible mesh object.
+  void AddVisible (iMeshWrapper *mesh);
+
+  /**
+   * Add a mesh object. This will only have an effect if that mesh
+   * has the CS_ENTITY_CAMERA flag set.
+   */
   void Add (iMeshWrapper *mesh);
 
   /// Remove a mesh object.
@@ -56,12 +68,16 @@ public:
   void RemoveUnknownPriority (iMeshWrapper *mesh);
 
   /// Return the number of rendering queues (the maximum priority value).
-  int GetQueueCount () { return Queues.Length (); }
+  //int GetQueueCount () { return queues.Length (); }
 
-  /// Return a single queue, or 0 if no queue exists for the given priority.
-  csMeshVectorNodelete *GetQueue (int priority)
+  /**
+   * Return a single queue, or 0 if no queue exists for the given priority.
+   * Beware! Only the render priorities for CAMERA are not empty!
+   * The other lists are unused.
+   */
+  const csArrayMeshPtr& GetCameraMeshes () const
   {
-    return Queues[priority];
+    return camera_meshes;
   }
 
   /**
