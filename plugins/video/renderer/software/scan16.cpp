@@ -638,6 +638,28 @@
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_map_fixalpha50_key
+
+#define SCANFUNC csScan_16_scan_map_fixalpha50_key
+#define SCANMAP
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      if (tex)								\
+        *_dest++ = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
+      else								\
+        ++_dest;							\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_fixalpha50_key
+
+//------------------------------------------------------------------
+
 #ifndef NO_555_scan_map_fixalpha
 
 #define SCANFUNC csScan_16_555_scan_map_fixalpha
@@ -663,6 +685,91 @@
 
 //------------------------------------------------------------------
 
+#ifndef NO_555_scan_map_fixalpha_key
+
+#define SCANFUNC csScan_16_555_scan_map_fixalpha_key
+#define SCANMAP
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      if (tex)								\
+      {									\
+        int tr = *_dest & 0x7c00;					\
+        int tg = *_dest & 0x03e0;					\
+        int tb = *_dest & 0x001f;					\
+        int r = (Scan.AlphaFact * ((tex & 0x7c00) - tr) >> 8) + tr;	\
+        int g = (Scan.AlphaFact * ((tex & 0x03e0) - tg) >> 8) + tg;	\
+        int b = (Scan.AlphaFact * ((tex & 0x001f) - tb) >> 8) + tb;	\
+        *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;			\
+      }									\
+      else								\
+        ++_dest;							\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_555_scan_map_fixalpha_key
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_map_fixalpha_alphamap
+
+#define SCANFUNC csScan_16_555_scan_map_fixalpha_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = (Scan.AlphaFact *					\
+        Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]>>5);\
+      int tr = *_dest & 0x7c00;						\
+      int tg = *_dest & 0x03e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (alpha * ((tex & 0x7c00) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x03e0) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_555_scan_map_fixalpha_alphamap
+
+//------------------------------------------------------------------
+
+#ifndef NO_555_scan_map_fixalpha50_alphamap
+
+#define SCANFUNC csScan_16_555_scan_map_fixalpha50_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]<<2;\
+      int tr = *_dest & 0x7c00;						\
+      int tg = *_dest & 0x03e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (alpha * ((tex & 0x7c00) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x03e0) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_555_scan_map_fixalpha50_alphamap
+
+//------------------------------------------------------------------
+
 #ifndef NO_565_scan_map_fixalpha
 
 #define SCANFUNC csScan_16_565_scan_map_fixalpha
@@ -685,6 +792,92 @@
 #include "scanln.inc"
 
 #endif // NO_565_scan_map_fixalpha
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_fixalpha_key
+
+#define SCANFUNC csScan_16_565_scan_map_fixalpha_key
+#define SCANMAP
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      if (tex)								\
+      {									\
+        int tr = *_dest & 0xf800;					\
+        int tg = *_dest & 0x07e0;					\
+        int tb = *_dest & 0x001f;					\
+        int r = (Scan.AlphaFact * ((tex & 0xf800) - tr) >> 8) + tr;	\
+        int g = (Scan.AlphaFact * ((tex & 0x07e0) - tg) >> 8) + tg;	\
+        int b = (Scan.AlphaFact * ((tex & 0x001f) - tb) >> 8) + tb;	\
+        *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;			\
+      }									\
+      else								\
+        ++_dest;							\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_565_scan_map_fixalpha_key
+
+//------------------------------------------------------------------
+
+#ifndef NO_565_scan_map_fixalpha_alphamap
+
+#define SCANFUNC csScan_16_565_scan_map_fixalpha_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = (Scan.AlphaFact *					\
+        Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]>>5);\
+      int tr = *_dest & 0xf800;						\
+      int tg = *_dest & 0x07e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (alpha * ((tex & 0xf800) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x07e0) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_565_scan_map_fixalpha_alphamap
+
+//------------------------------------------------------------------
+
+
+#ifndef NO_565_scan_map_fixalpha50_alphamap
+
+#define SCANFUNC csScan_16_565_scan_map_fixalpha50_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint16 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]<<2;\
+      int tr = *_dest & 0xf800;						\
+      int tg = *_dest & 0x07e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (alpha * ((tex & 0xf800) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x07e0) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_565_scan_map_fixalpha50_alphamap
 
 //------------------------------------------------------------------
 

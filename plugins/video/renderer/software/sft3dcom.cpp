@@ -1062,6 +1062,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = csScan_32_scan_tex_alpha_zfil;
       ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = csScan_32_scan_tex_alpha_zuse;
       ScanProc [SCANPROC_TEX_ALPHA_ZTEST] = csScan_32_scan_tex_alpha_ztest;
+
       ScanProc [SCANPROC_MAP_ALPHA_ZNONE] = csScan_32_scan_map_alpha_znone;
       ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_32_scan_map_alpha_zfil;
       ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_32_scan_map_alpha_zuse;
@@ -1185,7 +1186,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
-  (csGraphics3DSoftwareCommon *This, int alpha)
+  (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
 {
   csAlphaTables *alpha_tables = This->texman->alpha_tables;
 
@@ -1212,45 +1213,68 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_16_Alpha
-  (csGraphics3DSoftwareCommon *This, int alpha)
+  (csGraphics3DSoftwareCommon *This, int alpha, bool keycolor, bool alphamap)
 {
+  csDrawScanline* const ScanProcs[24] = {
+    NULL, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_565_scan_map_fixalpha,
+    NULL, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_565_scan_map_fixalpha_key,
+    NULL, csScan_16_565_scan_map_fixalpha50_alphamap, csScan_16_565_scan_map_alpha_zfil, csScan_16_565_scan_map_fixalpha_alphamap,
+    NULL, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_555_scan_map_fixalpha,
+    NULL, csScan_16_scan_map_fixalpha50_key, csScan_16_scan_map_key_zfil, csScan_16_555_scan_map_fixalpha_key,
+    NULL, csScan_16_555_scan_map_fixalpha50_alphamap, csScan_16_555_scan_map_alpha_zfil, csScan_16_555_scan_map_fixalpha_alphamap
+  };
+
   Scan.AlphaMask = This->alpha_mask;
   Scan.AlphaFact = alpha;
 
   // In 16 bits mode we can get max 32 levels of transparency
 
+  int scanproc = 3;
+
   // completely transparent?
   if (alpha <= 256/32)
-    return NULL;
+    scanproc = 0;
   // approximate alpha from 47% to 53% with fast 50% routine
   if ((alpha >= 128 - 256/32) && (alpha <= 128 + 256/32))
-    return csScan_16_scan_map_fixalpha50;
+    scanproc = 1;
   // completely opaque?
   if (alpha >= 256 - 256/32)
-    return csScan_16_scan_map_zfil;
-  // general case
+    scanproc = 2;
+  if (keycolor) 
+    scanproc += 4;
+  else if (alphamap) 
+    scanproc += 8;
   if (This->pfmt.GreenBits == 5)
-    return csScan_16_555_scan_map_fixalpha;
-  // General case
-  return csScan_16_565_scan_map_fixalpha;
+    scanproc += 12;
+  return ScanProcs[scanproc];
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
-  (csGraphics3DSoftwareCommon* /*This*/, int alpha)
+  (csGraphics3DSoftwareCommon* /*This*/, int alpha, bool keycolor, bool alphamap)
 {
+  csDrawScanline* const ScanProcs[12] = {
+    NULL, csScan_32_scan_map_fixalpha50, csScan_32_scan_map_zfil, csScan_32_scan_map_fixalpha,
+    NULL, csScan_32_scan_map_fixalpha50_key, csScan_32_scan_map_key_zfil, csScan_32_scan_map_fixalpha_key,
+    NULL, csScan_32_scan_map_fixalpha50_alphamap, csScan_32_scan_map_alpha_zfil, csScan_32_scan_map_fixalpha_alphamap};
+
   Scan.AlphaFact = alpha;
+
+  int scanproc = 3;
 
   // completely transparent?
   if (alpha <= 1)
-    return NULL;
+    scanproc = 0;
   // for 50% use fast routine
   else if (alpha >= 127 && alpha <= 129)
-    return csScan_32_scan_map_fixalpha50;
+    scanproc = 1;
   // completely opaque?
   else if (alpha >= 254)
-    return csScan_32_scan_map_zfil;
-  // general case
-  return csScan_32_scan_map_fixalpha;
+    scanproc = 2;
+  if (keycolor) 
+    scanproc += 4;
+  else if (alphamap) 
+    scanproc += 8;
+  return ScanProcs[scanproc];
 }
 
 void csGraphics3DSoftwareCommon::Close ()
@@ -2288,7 +2312,9 @@ texr_done:
     dscan = ScanProc [scan_index];
   }
   else
-    dscan = ScanProc_Alpha (this, alpha);
+    dscan = ScanProc_Alpha (this, alpha, tex_keycolor, (Scan.AlphaMap = txt_unl->get_alphamap ()));
+
+  if (!dscan) return;
 
   sxL = sxR = dxL = dxR = 0; // Avoid warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;

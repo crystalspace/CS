@@ -172,17 +172,17 @@ protected:
   csDrawPIScanlineGouraud* ScanProcPIG [0x28];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha);
+  csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha, bool keycolor, bool alphamap);
 
   /// ScanProc_Alpha for 8 bpp modes
   static csDrawScanline* ScanProc_8_Alpha (csGraphics3DSoftwareCommon*,
-    int alpha);
+    int alpha, bool keycolor, bool alphamap);
   /// ScanProc_Alpha for 16 bpp modes
   static csDrawScanline* ScanProc_16_Alpha (csGraphics3DSoftwareCommon*,
-    int alpha);
+    int alpha, bool keycolor, bool alphamap);
   /// ScanProc_Alpha for 32 bpp modes
   static csDrawScanline* ScanProc_32_Alpha (csGraphics3DSoftwareCommon*,
-    int alpha);
+    int alpha, bool keycolor, bool alphamap);
 
   /// Look for a given fog buffer
   FogBuffer* find_fog_buffer (CS_ID id);

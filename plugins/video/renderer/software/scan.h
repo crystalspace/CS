@@ -437,9 +437,20 @@ csDrawScanline csScan_16_565_scan_fog_view;
 
 /// Draw one horizontal scanline (lighting and fixed alpha transparency).
 csDrawScanline csScan_16_scan_map_fixalpha50;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap).
+csDrawScanline csScan_16_555_scan_map_fixalpha50_alphamap;
+csDrawScanline csScan_16_565_scan_map_fixalpha50_alphamap;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency and keycolor).
+csDrawScanline csScan_16_scan_map_fixalpha50_key;
 /// Draw one horizontal scanline (lighting and fixed alpha transparency). General case.
 csDrawScanline csScan_16_555_scan_map_fixalpha;
 csDrawScanline csScan_16_565_scan_map_fixalpha;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency and keycolor). General case.
+csDrawScanline csScan_16_555_scan_map_fixalpha_key;
+csDrawScanline csScan_16_565_scan_map_fixalpha_key;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency and alphamap). General case.
+csDrawScanline csScan_16_555_scan_map_fixalpha_alphamap;
+csDrawScanline csScan_16_565_scan_map_fixalpha_alphamap;
 
 /// Draw a flat-lighted perspective-incorrect line
 PI_SCAN_ROUTINE (16, flat)
@@ -524,8 +535,12 @@ SCAN_ROUTINE (32, tex_key)
 SCAN_ROUTINE (32, map_key)
 /// Draw one horizontal scanline (alphamap and no lighting).
 SCAN_ROUTINE (32, tex_alpha)
+/// Draw one horizontal scanline (alphamap+key and no lighting).
+SCAN_ROUTINE (32, tex_alphakey)
 /// Draw one horizontal scanline (alphamap with lighting).
 SCAN_ROUTINE (32, map_alpha)
+/// Draw one horizontal scanline (alphamap+key with lighting).
+SCAN_ROUTINE (32, map_alphakey)
 /// Draw one horizontal scanline (fx and no lighting).
 SCAN_ROUTINE (32, tex_fx)
 /// Draw one horizontal scanline (fx with lighting).
@@ -547,8 +562,16 @@ csDrawScanline csScan_32_scan_fog_view;
 
 /// Draw one horizontal scanline (lighting and fixed alpha transparency).
 csDrawScanline csScan_32_scan_map_fixalpha50;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency with keycolor).
+csDrawScanline csScan_32_scan_map_fixalpha50_key;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap).
+csDrawScanline csScan_32_scan_map_fixalpha50_alphamap;
 /// Draw one horizontal scanline (lighting and fixed alpha transparency). General case.
 csDrawScanline csScan_32_scan_map_fixalpha;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency with keycolor). General case.
+csDrawScanline csScan_32_scan_map_fixalpha_key;
+/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap). General case.
+csDrawScanline csScan_32_scan_map_fixalpha_alphamap;
 
 /// Draw a flat-lighted perspective-incorrect line
 PI_SCAN_ROUTINE (32, flat)

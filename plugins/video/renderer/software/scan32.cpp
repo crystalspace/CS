@@ -156,6 +156,58 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+#ifndef NO_scan_map_fixalpha50_key
+
+#define SCANFUNC csScan_32_scan_map_fixalpha50_key
+#define SCANMAP
+#define SCANLOOP \
+    do									\
+    {									\
+      uint32 b = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      if (b)								\
+      {									\
+        uint32 a = *_dest;						\
+        *_dest++ = ((a & 0xfefefefe) >> 1) + ((b & 0xfefefefe) >> 1);	\
+      }									\
+      else								\
+	++_dest;							\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_fixalpha50_key
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_fixalpha50_alphamap
+
+#define SCANFUNC csScan_32_scan_map_fixalpha50_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint32 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]>>1;\
+      int tr = *_dest & 0xff0000;					\
+      int tg = *_dest & 0x00ff00;					\
+      int tb = *_dest & 0x0000ff;					\
+      int r = (alpha * ((tex & 0xff0000) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x00ff00) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x0000ff) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0xff0000) | (g & 0x00ff00) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_fixalpha50_alphamap
+
+//------------------------------------------------------------------
+
 #ifndef NO_scan_map_fixalpha
 
 // Note that we don't actually need separate procedures for RGB and BGR
@@ -182,6 +234,72 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #include "scanln.inc"
 
 #endif // NO_scan_map_fixalpha
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_fixalpha_key
+
+// Note that we don't actually need separate procedures for RGB and BGR
+// encodings: the cause is that R,G and B variables below are named so
+// not because they will always contain respective values, but just
+// for cleaner understanding how the procedure works.
+#define SCANFUNC csScan_32_scan_map_fixalpha_key
+#define SCANMAP
+#define SCANLOOP \
+    do									\
+    {									\
+      uint32 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      if (tex)								\
+      {									\
+        int tr = *_dest & 0xff0000;					\
+        int tg = *_dest & 0x00ff00;					\
+        int tb = *_dest & 0x0000ff;					\
+        int r = (Scan.AlphaFact * ((tex & 0xff0000) - tr) >> 8) + tr;	\
+        int g = (Scan.AlphaFact * ((tex & 0x00ff00) - tg) >> 8) + tg;	\
+        int b = (Scan.AlphaFact * ((tex & 0x0000ff) - tb) >> 8) + tb;	\
+        *_dest++ = (r & 0xff0000) | (g & 0x00ff00) | b;			\
+      }									\
+      else								\
+        ++_dest;							\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_fixalpha_key
+
+//------------------------------------------------------------------
+
+#ifndef NO_scan_map_fixalpha_alphamap
+
+// Note that we don't actually need separate procedures for RGB and BGR
+// encodings: the cause is that R,G and B variables below are named so
+// not because they will always contain respective values, but just
+// for cleaner understanding how the procedure works.
+#define SCANFUNC csScan_32_scan_map_fixalpha_alphamap
+#define SCANMAP
+#define TEXCOORDS
+#define SCANLOOP \
+    do									\
+    {									\
+      uint32 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint8 alpha = (Scan.AlphaFact *					\
+        Scan.AlphaMap[((uu >> 16) & ander_w) + ((vv >> shifter_h) & ander_h)]>>8);\
+      int tr = *_dest & 0xff0000;					\
+      int tg = *_dest & 0x00ff00;					\
+      int tb = *_dest & 0x0000ff;					\
+      int r = (alpha * ((tex & 0xff0000) - tr) >> 8) + tr;	\
+      int g = (alpha * ((tex & 0x00ff00) - tg) >> 8) + tg;	\
+      int b = (alpha * ((tex & 0x0000ff) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0xff0000) | (g & 0x00ff00) | b;			\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
+    while (_dest <= _destend)
+#include "scanln.inc"
+
+#endif // NO_scan_map_fixalpha_alphamap
 
 //------------------------------------------------------------------
 
