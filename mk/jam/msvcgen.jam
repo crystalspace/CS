@@ -61,18 +61,21 @@ MSVCGEN_BUILD_TEMP ?= [ ConcatDirs $(MSVCGEN_BUILD_ROOT) msvcgen ] ;
 ##   configure script, which the Jamfiles reference via the ExternalLibs rule.
 ##   Such fallbacks consist of variables named TAG.CFLAGS, TAG.LFLAGS, and
 ##   TAG.LIBS, where TAG represents the library's identifier exported by the
-##   configure script.  For instance, to provide MSVC-specific fallback values
-##   for the FreeType2 library, which the configure script might identify as
-##   FT2, you can define variables named FT2.CFLAGS, FT2.LFLAGS, and FT2.LIBS.
-##   The msvcgen process will consult these variables when it encounters
-##   invocations of the ExternalLibs rule, and apply the overrides to the
-##   generated project files.  If yours is a multi-platform project which
-##   conditionally defines Application, Plugin, and Library targets based upon
-##   the platform, then you should also define whatever additional variables or
-##   properties are needed to ensure that your project's Jamfiles invoke the
-##   Application, Plugin, and Library rules for modules suitable for Windows,
-##   and that they do not invoke those rules for modules specific to other
-##   platforms.
+##   configure script.  Because project generation allows for finer-grained
+##   control, you can also optionally set the variables TAG.DEFINES,
+##   TAG.INCDIRS, and TAG.LIBDIRS.  TAG.DEFINES is a set of tokens of the form
+##   "key" or "key=value".  For instance, to provide MSVC-specific fallback
+##   values for the FreeType2 library, which the configure script might
+##   identify as FT2, you can define variables named FT2.CFLAGS, FT2.LFLAGS,
+##   FT2.LIBS, FT2.DEFINES, FT2.INCDIRS, and FT2.LIBDIRS.  The msvcgen process
+##   will consult these variables when it encounters invocations of the
+##   ExternalLibs rule, and apply the overrides to the generated project files.
+##   If yours is a multi-platform project which conditionally defines
+##   Application, Plugin, and Library targets based upon the platform, then you
+##   should also define whatever additional variables or properties are needed
+##   to ensure that your project's Jamfiles invoke the Application, Plugin, and
+##   Library rules for modules suitable for Windows, and that they do not
+##   invoke those rules for modules specific to other platforms.
 rule MsvcGenConfig { MsvcGenConfig1 $(1) : $(2) ; }
 rule MsvcGenConfig1 { }
 
@@ -903,22 +906,40 @@ rule MsvcClassifyMode
   return $(c) ;
 }
 
+# _MsvcRespEmit target : items : tag [ : mode [ : options ]]
+#   Emit `items' to the response file for `target' using the response file tag
+#   `tag'. `mode' is either "release", "debug", or empty, in which case it
+#   applies to release and debug modes. If options contains "ignoremode", then
+#   `mode' is not consulted.
+rule _MsvcRespEmit
+{
+  local target = $(1) ;
+  local items = $(2) ;
+  local tag = $(3) ;
+  local mode = $(4) ;
+  local options = $(5) ;
+  local modes = "" ;
+
+  CheckOptions ignoremode : $(options) : $(target) ;
+  if ! [ IsElem ignoremode ] { modes = [ MsvcClassifyMode $(mode) ] ; }
+
+  local item ;
+  for item in $(items)
+  {
+    local m ;
+    for m in $(modes)
+    {
+      ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(m)|$(item)" :
+	notfile : $($(target)_PRJ_RESPDIR) ;
+    }
+  }
+}
+
 # MsvcExternalLibrary target [ : libs [ : mode ]]
 #   (See documentation above.)
 rule MsvcExternalLibrary1
 {
-  local target = $(1) ;
-  local libs = $(2) ;
-  local mode = $(3) ;
-  if $(libs)
-  {
-    local m ;
-    for m in [ MsvcClassifyMode $(mode) ]
-    {
-      ResponseFile $($(target)_PRJ_RESPFILE) : "library$(m)|$(libs)" :
-	notfile : $($(target)_PRJ_RESPDIR) ;
-    }
-  }
+  _MsvcRespEmit $(1) : $(2) : library : $(3) ;
 }
 
 # MsvcDefine target [ : key [ : value [ : mode ]]]
@@ -940,49 +961,64 @@ rule MsvcDefine1
     {
       def = $(key) ;
     }
-
-    local m ;
-    for m in [ MsvcClassifyMode $(mode) ]
-    {
-      ResponseFile $($(target)_PRJ_RESPFILE) : "define$(m)|$(def)" :
-	notfile : $($(target)_PRJ_RESPDIR) ;
-    }
+    _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
   }
+}
+
+# _MsvcDefine target : tuples [ : mode ]
+#   Similar to MsvcDefine, but works with a list of `key=value' tuples. Also
+#   understands `key' with no value.
+rule _MsvcDefine
+{
+  _MsvcRespEmit $(1) : $(2) : define : $(3) ;
 }
 
 # MsvcCFLags target [ : cflags [ : mode ]]
 #   (See documentation above.)
 rule MsvcCFlags1
 {
-  local target = $(1) ;
-  local flags = $(2) ;
-  local mode = $(3) ;
-  if $(flags)
-  {
-    local m ;
-    for m in [ MsvcClassifyMode $(mode) ]
-    {
-      ResponseFile $($(target)_PRJ_RESPFILE) : "cflags$(m)|$(flags)" :
-	notfile : $($(target)_PRJ_RESPDIR) ;
-    }
-  }
+  _MsvcRespEmit $(1) : $(2) : cflags : $(3) ;
 }
 
 # MsvcLFlags target [ : lflags [ : mode ]]
 #   (See documentation above.)
 rule MsvcLFlags1
 {
+  _MsvcRespEmit $(1) : $(2) : lflags : $(3) ;
+}
+
+# _MsvcIncDirs target : incdirs [ : mode ]
+#   Helper for ExternalLibs which processes the contents of TAG.INCDIRS for
+#   an external library.
+rule _MsvcIncDirs
+{
+  _MsvcRespEmit $(1) : $(2) : include : : ignoremode ;
+}
+
+# _MsvcLibDirs target : libdirs [ : mode ]
+#   Helper for ExternalLibs which processes the contents of TAG.LIBDIRS for
+#   an external library.
+rule _MsvcLibDirs
+{
+  _MsvcRespEmit $(1) : $(2) : libdir : : ignoremode ;
+}
+
+# _ExternalLibsHelperMsvc target : libtag : subrule : attribute
+rule _ExternalLibsHelperMsvc
+{
   local target = $(1) ;
-  local flags = $(2) ;
-  local mode = $(3) ;
-  if $(flags)
+  local lib = $(2) ;
+  local rulename = $(3) ;
+  local attrib = $(4) ;
+
+  if $($(lib).$(attrib).DEBUG)
   {
-    local m ;
-    for m in [ MsvcClassifyMode $(mode) ]
-    {
-      ResponseFile $($(target)_PRJ_RESPFILE) : "lflags$(m)|$(flags)" :
-	notfile : $($(target)_PRJ_RESPDIR) ;
-    }
+    $(rulename) $(target) : $($(lib).$(attrib)) : release ;
+    $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug ;
+  }
+  else
+  {
+    $(rulename) $(target) : $($(lib).$(attrib)) ;
   }
 }
 
@@ -991,33 +1027,12 @@ rule ExternalLibs
   local i ;
   for i in $(>)
   {
-    if $($(i).CFLAGS.DEBUG)
-    {
-      MsvcCFlags $(<) : $($(i).CFLAGS) : release ;
-      MsvcCFlags $(<) : $($(i).CFLAGS.DEBUG) : debug ;
-    }
-    else
-    {
-      MsvcCFlags $(<) : $($(i).CFLAGS) ;
-    }
-    if $($(i).LFLAGS.DEBUG)
-    {
-      MsvcLFlags $(<) : $($(i).LFLAGS) : release ;
-      MsvcLFlags $(<) : $($(i).LFLAGS.DEBUG) : debug ;
-    }
-    else
-    {
-      MsvcLFlags $(<) : $($(i).LFLAGS) ;
-    }
-    if $($(i).LIBS.DEBUG)
-    {
-      MsvcExternalLibrary $(<) : $($(i).LIBS) : release ;
-      MsvcExternalLibrary $(<) : $($(i).LIBS.DEBUG) : debug ;
-    }
-    else
-    {
-      MsvcExternalLibrary $(<) : $($(i).LIBS) ;
-    }
+    _ExternalLibsHelperMsvc $(<) : $(i) : MsvcCFlags : CFLAGS ;
+    _ExternalLibsHelperMsvc $(<) : $(i) : MsvcLFlags : LFLAGS ;
+    _ExternalLibsHelperMsvc $(<) : $(i) : MsvcExternalLibrary : LIBS ;
+    _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcDefine  : DEFINES ;
+    _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcIncDirs : INCDIRS ;
+    _ExternalLibsHelperMsvc $(<) : $(i) : _MsvcLibDirs : LIBDIRS ;
     
     if $($(<)_TYPE) = library
     {

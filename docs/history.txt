@@ -7,10 +7,39 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Nov-2004
-	- res changed the static var cleanup code to employ a variable with
-	  a pointer to the cleanup function instead of using it directly.
-	- res added very crude, very hackish, very experimental but working
+	- res changed the static variable cleanup code to employ a variable
+	  with a pointer to the cleanup function instead of using it directly.
+	- res added very crude, very hackish, very experimental, but working
 	  shared libs support for MinGW.
+	- Eric Sunshine augmented msvcgen to make it possible to specify
+	  additional header and library directories, and raw macro definitions
+	  (without resorting to compiler-specific option syntax) for external
+	  projects.  In addition to EXTLIB.CFLAGS, EXTLIB.LFLAGS, and
+	  EXTLIB.LIBS, msvcgen now also recognizes EXTLIB.DEFINES,
+	  EXTLIB.INCDIRS, and EXTLIB.LIBDIRS. (You normally set up the
+	  EXTLIB.FOO variables with the MsvcGenConfig or MsvcGenConfigFile
+	  rule; and the information is consulted by msvcgen when the
+	  ExternalLib rule is invoked.) These new settings are reflected in the
+	  MSVC project attributes "PreprocessorDefinitions",
+	  "AdditionalIncludeDirectories", and "AdditionalLibraryDirectories".
+	- Eric Sunshine enhanced `jamtemplate' so that the synthesized
+	  Jamfile.in also sets the MSVC search path for CRYSTAL and CEL
+	  libraries.  (On 10-Sep-2004, `jamptemplate' was augmented to also set
+	  the MSVC search path for CRYSTAL and CEL headers. Prior to that,
+	  neither header nor library search path was set for CRYSTAL or CEL.)
+	  In particular, it adds these directories to the library search list:
+	    ../CS/out/release/libs
+	    ../CS/out/debug/libs
+	    ../CS/libs/csutil/win32
+	    $(CRYSTAL)/out/release/libs
+	    $(CRYSTAL)/out/debug/libs
+	    $(CRYSTAL)/libs
+	    $(CRYSTAL)/libs/csutil/win32
+	    ../cel/out/release/libs
+	    ../cel/out/debug/libs
+	    $(CEL)/out/debug/libs
+	    $(CEL)/out/release/libs
+	    $(CEL)/libs
 28-Nov-2004
 	- Eric Sunshine made the new-renderer the default. Users wanting to use
 	  the old-renderer must select it manually.

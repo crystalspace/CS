@@ -38,39 +38,47 @@ MsvcGenSubDir TOP msvc : 7 ;
 MsvcGenTemplateDir TOP mk msvcgen ;
 MsvcGenWorkspace #PROJECTNAME# ;
 
+local hash = "\$" ;
 MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
-MsvcGenConfig CRYSTAL.CFLAGS ;
-MsvcGenConfig CRYSTAL.LFLAGS ;
 MsvcGenConfig CRYSTAL.LIBS : 
   "libcstool.lib libcsgfx.lib libcsgeom.lib libcsutil.lib" ;
-MsvcGenConfig CRYSTAL.CFLAGS.DEBUG ;
-MsvcGenConfig CRYSTAL.LFLAGS.DEBUG ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
   "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
-if [ Property build : projgen ]
-{
-  local hash = "\$" ;
-  IncludeDir .. .. CS include : : literal ;
-  IncludeDir "$(hash)(CRYSTAL)" include : : literal ;
-  IncludeDir "$(hash)(CRYSTAL)" include crystalspace : : literal ;
-}
+MsvcGenConfig CRYSTAL.INCDIRS :
+  [ ConcatDirs .. .. .. CS include ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" include ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" include crystalspace ] ;
+MsvcGenConfig CRYSTAL.LIBDIRS :
+  [ ConcatDirs .. .. .. CS out release libs ]
+  [ ConcatDirs .. .. .. CS libs csutil win32 ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" out release libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 ] ;
+MsvcGenConfig CRYSTAL.LIBDIRS.DEBUG :
+  [ ConcatDirs .. .. .. CS out debug libs ]
+  [ ConcatDirs .. .. .. CS libs csutil win32 ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" out debug libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs ]
+  [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 ] ;
 
 if $(CEL.DESIRED) = yes
 {
   MsvcGenConfig CEL.AVAILABLE : yes ;
-  MsvcGenConfig CEL.CFLAGS : "/D \"USE_CEL\"" ;
-  MsvcGenConfig CEL.LFLAGS ;
+  MsvcGenConfig CEL.DEFINES : USE_CEL ;
   MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
-  MsvcGenConfig CEL.CFLAGS.DEBUG : "/D \"USE_CEL\"" ;
-  MsvcGenConfig CEL.LFLAGS.DEBUG ;
   MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
-  if [ Property build : projgen ]
-  {
-    local hash = "\$" ;
-    IncludeDir .. .. cel include : : literal ;
-    IncludeDir "$(hash)(CEL)" include : : literal ;
-    IncludeDir "$(hash)(CEL)" include cel : : literal ;
-  }
+  MsvcGenConfig CEL.INCDIRS :
+    [ ConcatDirs .. .. .. cel include ]
+    [ ConcatDirs "$(hash)(CEL)" include ]
+    [ ConcatDirs "$(hash)(CEL)" include cel ] ;
+  MsvcGenConfig CEL.LIBDIRS :
+    [ ConcatDirs .. .. .. cel out release libs ]
+    [ ConcatDirs "$(hash)(CEL)" out release libs ]
+    [ ConcatDirs "$(hash)(CEL)" libs ] ;
+  MsvcGenConfig CEL.LIBDIRS.DEBUG :
+    [ ConcatDirs .. .. .. cel out debug libs ]
+    [ ConcatDirs "$(hash)(CEL)" out debug libs ]
+    [ ConcatDirs "$(hash)(CEL)" libs ] ;
 }
 
 # Set project-specific compiler and linker options for msvcgen.
