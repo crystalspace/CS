@@ -16,21 +16,40 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IGRAPHIC_LOADER_H__
-#define __IGRAPHIC_LOADER_H__
+#ifndef __IGRAPHIC_IMAGEIO_H__
+#define __IGRAPHIC_IMAGEIO_H__
 
 #include "isys/plugin.h"
 struct iImage;
-
+struct iDataBuffer;
+class csVector;
 
 SCF_VERSION (iImageIO, 0, 0, 1);
 
 /**
- * The image loader is used to load graphic files. Several file formats are
- * supported. 
+ * The iImageIO interface is used to save and load graphic files.
  */
+
+#define CS_IMAGEIO_LOAD 1
+#define CS_IMAGEIO_SAVE 2
+
 struct iImageIO : public iPlugIn
 {
+  struct FileFormatDescription
+  {
+    /// mime type of image, e.g. "image/png"
+    const char *mime;
+    /// descriptive format specifier, e.g. "8 bit palettized"
+    const char *subtype;
+    /// a combination of CS_IMGAEIO_* flags
+    int cap;
+  };
+
+  /**
+   * Propagate the image fileformats handled by this plugin.
+   */
+  virtual const csVector& GetDescription () = 0;
+
   /**
    * Load an image from a buffer.<p>
    * This routine will read from the buffer buf of length size, try to
@@ -51,7 +70,18 @@ struct iImageIO : public iPlugIn
    * affect all truecolor->paletted image conversions.
    */
   virtual void SetDithering (bool iEnable) = 0;
+
+  /**
+   * Save an image using a prefered format.
+   */
+  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format) = 0;
+
+  /**
+   * Save an image using format <mime>.
+   * If omitted format selection is left to the plugin.
+   */
+  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL) = 0; 
 };
 
-#endif // __IGRAPHIC_LOADER_H__
+#endif // __IGRAPHIC_IMAGEIO_H__
 
