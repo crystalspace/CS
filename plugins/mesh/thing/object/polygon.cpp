@@ -536,15 +536,27 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
+#define csQroundVerySure(v,x) \
+  { \
+    int v1 = csQroundSure((x)-0.001);\
+    int v2 = csQroundSure((x)+0.001);\
+    if (v1 == v2) v = csQroundSure(x); \
+    else  v = csQroundSure((x)-0.2); \
+  }
 
   float min_u_ww = min_u * ww;
   float min_v_hh = min_v * hh;
   float max_u_ww = max_u * ww;
   float max_v_hh = max_v * hh;
-  polygon_data.tmapping->SetIMinUV (csQroundSure (min_u_ww),
-    csQroundSure (min_v_hh));
-  int Imax_u = csQroundSure (max_u_ww);
-  int Imax_v = csQroundSure (max_v_hh);
+  int Imin_u, Imin_v, Imax_u, Imax_v;
+  csQroundVerySure (Imin_u, min_u_ww);
+  csQroundVerySure (Imin_v, min_v_hh);
+  polygon_data.tmapping->SetIMinUV (Imin_u, Imin_v);
+  csQroundVerySure (Imax_u, max_u_ww);
+  csQroundVerySure (Imax_v, max_v_hh);
+//printf ("min_u=%g ww=%d min_u_ww=%g\n", min_u, ww, min_u_ww);
+//printf ("max_u=%g ww=%d max_u_ww=%g\n", max_u, ww, max_u_ww);
+//printf ("%d,%d,%d,%d\n", Imin_u, Imin_v, Imax_u, Imax_v); fflush (stdout);
 
   int h = Imax_v - polygon_data.tmapping->GetIMinV ();
   int w_orig = Imax_u - polygon_data.tmapping->GetIMinU ();

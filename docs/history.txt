@@ -26,6 +26,15 @@ chronological order.
 	- PK implemented iSaverPlugin for hazemesh.
 	- PK implemented iSaverPlugin for lightningmesh.
 	- PK added the saving of uvanimations to spr2d
+	- Jorrit again fixed a stability problem to thing lightmap cache.
+	  Turned out that csQround() of a value VERY close to x.5 can either
+	  round down or up depending on system/debug mode. So I made the
+	  rounding more robust by forcing a certain direction in case
+	  it is close to x.5. This might invalidate lightmap caches for
+	  certain objects if you're unlucky. It is still not perfect.
+	  There are still cases where there are differences between debug
+	  and optimize mode calculations. I'm uncertain on how to solve them
+	  though.
 25-Sep-2004
 	- res copied Matze's change of GLAPI in glextmanager.h (empty instead 
 	  of 'extern') over to the GL extension manager templates.
