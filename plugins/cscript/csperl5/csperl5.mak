@@ -191,7 +191,7 @@ endif
 .PHONY: install_perlmod
 install_script: install_perlmod
 install_perlmod: $(SWIG.PERL5.DLL)
-	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
+	@$(CMD.MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
 	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/deleteme.dir$" >> $(INSTALL_LOG)
 	$(CP) $(SWIG.PERL5.DLL) $(INSTALL_SCRIPTS.DIR)/perl5
 	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/$(notdir $(SWIG.PERL5.DLL))$" >> \
@@ -201,7 +201,7 @@ ifneq (,$(CMD.SWIG))
 .PHONY: install_cspace_pm
 install_script: install_cspace_pm
 install_cspace_pm: $(SWIG.PERL5.PM.IN)
-	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
+	@$(CMD.MKDIRS) $(INSTALL_SCRIPTS.DIR)/perl5
 	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/deleteme.dir$" >> $(INSTALL_LOG)
 	$(CP) $(SWIG.PERL5.PM.IN) $(INSTALL_SCRIPTS.DIR)/perl5
 	@echo $"$(INSTALL_SCRIPTS.DIR)/perl5/$(notdir $(SWIG.PERL5.PM.IN))$" \

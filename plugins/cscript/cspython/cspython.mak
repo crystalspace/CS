@@ -260,7 +260,7 @@ $(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
 .PHONY: install_pythmod
 install_script: install_pythmod
 install_pythmod: $(PYTHMOD)
-	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
+	@$(CMD.MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
 	@echo $"$(INSTALL_SCRIPTS.DIR)/python/deleteme.dir$" >> $(INSTALL_LOG)
 	$(CP) $(PYTHMOD) $(INSTALL_SCRIPTS.DIR)/python
 	@echo $"$(INSTALL_SCRIPTS.DIR)/python/$(notdir $(PYTHMOD))$" >> \
@@ -270,7 +270,7 @@ ifneq (,$(CMD.SWIG))
 .PHONY: install_cspace_py
 install_script: install_cspace_py
 install_cspace_py: $(SWIG.CSPYTHON.PY)
-	@$(MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
+	@$(CMD.MKDIRS) $(INSTALL_SCRIPTS.DIR)/python
 	@echo $"$(INSTALL_SCRIPTS.DIR)/python/deleteme.dir$" >> $(INSTALL_LOG)
 	$(CP) $(SWIG.CSPYTHON.PY) $(INSTALL_SCRIPTS.DIR)/python
 	@echo $"$(INSTALL_SCRIPTS.DIR)/python/$(notdir $(SWIG.CSPYTHON.PY))$" \

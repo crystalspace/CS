@@ -120,7 +120,7 @@ INSTALL_DOCS.FILES = \
 # macro to be invoked from $(foreach) for a set of files, and we want the
 # expansion to be a series of copy commands, one per line.
 define INSTALL.DEEP_COPY
-  @test -r $(INSTALL.DEEP_DIR) || { $(MKDIRS) $(INSTALL.DEEP_DIR); \
+  @test -r $(INSTALL.DEEP_DIR) || { $(CMD.MKDIRS) $(INSTALL.DEEP_DIR); \
     echo $"$(INSTALL.DEEP_DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
   $(CP) $(F) $(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))
   @echo $"$(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))$" >> $(INSTALL_LOG)
@@ -149,7 +149,7 @@ INSTALL.DEEP_DIR = \
 # line.
 ifeq (,$(strip $(INSTALL.DO_PLUGIN)))
 define INSTALL.DO_PLUGIN
-  @test -r $(INSTALL_DLL.DIR) || { $(MKDIRS) $(INSTALL_DLL.DIR); \
+  @test -r $(INSTALL_DLL.DIR) || { $(CMD.MKDIRS) $(INSTALL_DLL.DIR); \
     echo $"$(INSTALL_DLL.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
   $(CP) $(F) $(INSTALL_DLL.DIR)/$(notdir $(F))
   @echo $"$(INSTALL_DLL.DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
@@ -168,7 +168,7 @@ endif
 # a variable named F.  Also takes care of recording the installation in
 # $(INSTALL_LOG) and running $(RANLIB) on the installed library.
 define INSTALL.DO_LIBRARY
-  @test -r $(INSTALL_LIB.DIR) || { $(MKDIRS) $(INSTALL_LIB.DIR); \
+  @test -r $(INSTALL_LIB.DIR) || { $(CMD.MKDIRS) $(INSTALL_LIB.DIR); \
     echo $"$(INSTALL_LIB.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
   $(CP) $(F) $(INSTALL_LIB.DIR)/$(notdir $(F))
   @echo $"$(INSTALL_LIB.DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
@@ -184,7 +184,7 @@ endif
 # a variable named F.  Also takes care of recording the installation in
 # $(INSTALL_LOG).
 define INSTALL.DO_ROOT
-  @test -r $(INSTALL_DIR) || { $(MKDIRS) $(INSTALL_DIR); \
+  @test -r $(INSTALL_DIR) || { $(CMD.MKDIRS) $(INSTALL_DIR); \
     echo $"$(INSTALL_DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
   $(CP) $(F) $(INSTALL_DIR)/$(notdir $(F))
   @echo $"$(INSTALL_DIR)/$(notdir $(F))$" >> $(INSTALL_LOG)
@@ -196,7 +196,7 @@ endef
 # in a variable named F.  Also takes care of recording the installation in
 # $(INSTALL_LOG). Uses recursive copy (-r) to handle MacOS/X .app wrappers.
 define INSTALL.DO_EXE
-  @test -r $(INSTALL_EXE.DIR) || { $(MKDIRS) $(INSTALL_EXE.DIR); \
+  @test -r $(INSTALL_EXE.DIR) || { $(CMD.MKDIRS) $(INSTALL_EXE.DIR); \
     echo $"$(INSTALL_EXE.DIR)/deleteme.dir$" >> $(INSTALL_LOG); }
   $(CP) -r $(F) $(INSTALL_EXE.DIR)/$(notdir $(F))
   @echo $"$(INSTALL_DIR)/bin/$(notdir $(F))$" >> $(INSTALL_LOG)
@@ -273,7 +273,7 @@ ifneq ($(SRCDIR),.)
 install_include: install_volatile
 install_volatile:
 	@test -r $(INSTALL_DIR)/include || \
-	{ $(MKDIRS) $(INSTALL_DIR)/include; \
+	{ $(CMD.MKDIRS) $(INSTALL_DIR)/include; \
 	echo $"$(INSTALL_DIR)/include/deleteme.dir$" >> $(INSTALL_LOG); }
 	$(CP) include/volatile.h $(INSTALL_DIR)/include/volatile.h
 	@echo $"$(INSTALL_DIR)/include/volatile.h$" >> $(INSTALL_LOG)

@@ -16,6 +16,10 @@ chronological order.
 	- Eric Sunshine fixed bug in csModelConverterSPR where it reported that
 	  it could neither load nor save sprites, thus rendering itself quite
 	  useless as a sprite importer/exporter.
+	- Eric Sunshine fixed a bug in install.mak where the sub-install rules,
+	  such as install_config, install_doc, etc., would uselessly create an
+	  empty subdirectory within the build directory with the same name as
+	  the rule (i.e. "install_config", "install_doc", etc.).
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause
