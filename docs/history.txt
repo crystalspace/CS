@@ -5,6 +5,14 @@ The history order has been reversed so that new features are at the top.
 	  (i.e. change from Frank O'Connor).
 	- Andrew also fixed all warnings and compilation errors left in
 	  dungeon plugin.
+	- Andrew made a fix after his last plugin system changes.
+	  Simple application now properly specifies the function ID for
+	  every requested plugin.
+	- Found a bug in Newtonian particle system. SetAccel() sets the
+	  speed array instead of the acceleration array.
+	- Spiral particle system now looks like a fountain :-)
+	- Made OpenGL DrawTriangleMesh a bit faster. It now does less
+	  copy of data.
 20-Apr-2000
 	- Andrew Zabolotny did another try to fix the Windows port
 	  by adding an assembly version of memcpy.

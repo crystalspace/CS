@@ -185,12 +185,23 @@ void csParticleSystem :: Update(time_t elapsed_time)
 //---------------------------------------------------------------------
 
 /// helping func. Returns vector of with -1..+1 members. Varying length!
-static csVector3& GetRandomDirection()
+static csVector3& GetRandomDirection ()
 {
   static csVector3 dir;
   dir.x = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
   dir.y = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
   dir.z = 2.0 * rand() / (1.0+RAND_MAX) - 1.0;
+  return dir;
+}
+
+static csVector3& GetRandomDirection (const csVector3& magnitude,
+	const csVector3& offset)
+{
+  static csVector3 dir;
+  dir.x = (rand() / (1.0+RAND_MAX)) * magnitude.x;
+  dir.y = (rand() / (1.0+RAND_MAX)) * magnitude.y;
+  dir.z = (rand() / (1.0+RAND_MAX)) * magnitude.z;
+  dir = dir + offset;
   return dir;
 }
 
@@ -220,9 +231,9 @@ void csSpiralParticleSystem::MoveToSector (csSector *sector)
 void csSpiralParticleSystem::Update (time_t elapsed_time)
 {
   time_before_new_particle -= elapsed_time;
-  if (time_before_new_particle < 0)
+  while (time_before_new_particle < 0)
   {
-    time_before_new_particle = 300;	// @@@ PARAMETER
+    time_before_new_particle += 30;	// @@@ PARAMETER
     int num = GetNumParticles ();
     int part_idx;
     if (num >= max)
@@ -232,17 +243,16 @@ void csSpiralParticleSystem::Update (time_t elapsed_time)
     }
     else
     {
-      AppendRegularSprite (6, .2, txt, false);	// @@@ PARAMETER
+      AppendRegularSprite (3, .02, txt, false);	// @@@ PARAMETER
       part_idx = GetNumParticles ()-1;
       GetParticle (part_idx)->MoveToSector (this_sector);
     }
     iParticle* part = GetParticle (part_idx);
     part->SetPosition (source);
     csVector3 dir;
-    dir = GetRandomDirection ();
-    if (dir.y < 0) dir.y = -dir.y;
+    dir = GetRandomDirection (csVector3 (.4, .1, .4), csVector3 (-.2, .5, -.2));
     SetSpeed (part_idx, dir);
-    SetAccel (part_idx, csVector3 (1, 1, 1));
+    SetAccel (part_idx, csVector3 (0, 0, 0));
   }
   csNewtonianParticleSystem::Update (elapsed_time);
 }

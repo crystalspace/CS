@@ -205,7 +205,7 @@ public:
   inline csVector3& GetAccel (int idx) { return part_accel[idx]; }
   /// Set a particles acceleration. accelerations are in metres/second.
   inline void SetAccel (int idx, const csVector3& acl) 
-  { part_speed[idx] = acl; }
+  { part_accel[idx] = acl; }
 
   CSOBJTYPE;
 };

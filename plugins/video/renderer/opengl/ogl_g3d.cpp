@@ -1060,9 +1060,9 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   /// Static uv array.
   static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
   /// The perspective corrected vertices.
-  static DECLARE_GROWING_ARRAY (persp, csVector3);
+  //static DECLARE_GROWING_ARRAY (persp, csVector3);
   /// Array which indicates which vertices are visible and which are not.
-  static DECLARE_GROWING_ARRAY (visible, bool);
+  //static DECLARE_GROWING_ARRAY (visible, bool);
   /// Array with colors.
   static DECLARE_GROWING_ARRAY (color_verts, csColor);
   /// Array with fog values.
@@ -1080,8 +1080,8 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     tr_verts.SetLimit (mesh.num_vertices);
     //z_verts.SetLimit (mesh.num_vertices);
     uv_verts.SetLimit (mesh.num_vertices);
-    persp.SetLimit (mesh.num_vertices);
-    visible.SetLimit (mesh.num_vertices);
+    //persp.SetLimit (mesh.num_vertices);
+    //visible.SetLimit (mesh.num_vertices);
     color_verts.SetLimit (mesh.num_vertices);
     fog_intensities.SetLimit (mesh.num_vertices);
     fog_color_verts.SetLimit (mesh.num_vertices);
@@ -1202,15 +1202,15 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMultMatrixf(matrixholder);
 
   // old perspective transform
-  for (i = 0 ; i < mesh.num_vertices ; i++)
-  {
-    {
-      persp[i].x = work_verts[i].x;
-      persp[i].y = work_verts[i].y;
-      persp[i].z = work_verts[i].z;
-      visible[i] = true;
-    }
-  }
+  //for (i = 0 ; i < mesh.num_vertices ; i++)
+  //{
+    //{
+      //persp[i].x = work_verts[i].x;
+      //persp[i].y = work_verts[i].y;
+      //persp[i].z = work_verts[i].z;
+      //visible[i] = true;
+    //}
+  //}
 
   // Fill flat color if renderer decide to paint it flat-shaded
   G3DPolygonDPFX poly;
@@ -1242,14 +1242,14 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   for (i=0; i<mesh.num_triangles; i++)
   {
-    if ( ( visible [ triangles[i].a ] ) &&
-         ( visible [ triangles[i].b ] ) &&
-         ( visible [ triangles[i].c ] ) )
-    {
+    //if ( ( visible [ triangles[i].a ] ) &&
+         //( visible [ triangles[i].b ] ) &&
+         //( visible [ triangles[i].c ] ) )
+    //{
       visible_indices[visible_index_count++] = triangles[i].a;
       visible_indices[visible_index_count++] = triangles[i].b;
       visible_indices[visible_index_count++] = triangles[i].c;
-    }
+    //}
   }
 
   // no vertices?
@@ -1277,7 +1277,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, & persp[0]);
+  glVertexPointer(3, GL_FLOAT, 0, & work_verts[0]);
   glTexCoordPointer(2, GL_FLOAT, 0, & work_uv_verts[0]);
   glDrawElements(GL_TRIANGLES, visible_index_count, GL_UNSIGNED_INT, & visible_indices[0]);
 
