@@ -160,7 +160,7 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
     for (x = 0 ; x <= xres ; x++)
     {
       u = float (x) / float (xres);
-      rx = topleft.x + xscale * x;
+      rx = topleft.x + xscale * u;
       vertices[num_vertices].Set (rx, ry, topleft.z);
       uvverts[num_vertices].Set (u, v);
       num_vertices++;
@@ -172,13 +172,13 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
   {
     for (x = 0 ; x < xres ; x++, i++)
     {
-      triangles[num_triangles].a = i;
+      triangles[num_triangles].c = i;
       triangles[num_triangles].b = i+1;
-      triangles[num_triangles].c = i+xres+1;
+      triangles[num_triangles].a = i+xres+1;
       num_triangles++;
-      triangles[num_triangles].a = i+1;
+      triangles[num_triangles].c = i+1;
       triangles[num_triangles].b = i+xres+1+1;
-      triangles[num_triangles].c = i+xres+1;
+      triangles[num_triangles].a = i+xres+1;
       num_triangles++;
     }
     i++;
