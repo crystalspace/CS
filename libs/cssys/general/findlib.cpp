@@ -56,15 +56,15 @@ public:
   
   virtual int File (const char *file)
   {
-    struct stat st;
-    if (stat (file, &st) == 0)
-    {
+    //struct stat st;
+    //if (stat (file, &st) == 0)
+    //{
       _handle = csLoadLibrary (file);
       if (!_handle) return CALLBACK_CONTINUE;
       _file_found++;
       return CALLBACK_STOP;
-    }
-    return CALLBACK_CONTINUE;
+    //}
+    //return CALLBACK_CONTINUE;
   }
 
   csLibraryHandle _handle;

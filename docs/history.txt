@@ -4,6 +4,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the patch from Loic which prevented CS
 	  from properly working if CRYSTAL var is unset and if
 	  so files from current dir are being loaded (linux).
+	- Additionally removed the 'stat' test completely for finding
+	  out if a library can be loaded. 'stat' and 'csLoadLibrary'
+	  are not compatible so 'stat' cannot be used to test if
+	  'csLoadLibrary' will work or not.
 22-Mar-2002
 	- Fixed a bug in the calculation of LOD for sprites. This
 	  bug could cause crashes due to an array access at -1.
