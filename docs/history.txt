@@ -1,9 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
 19-Jun-2000
+	- Martin Geisse fixed a number of compiler warnings all over
+	  the place.
 	- Wouter Wijngaards added a new snow particle system.
 	- Added 'snow' console command that works almost the same as the
 	  'rain' console command.
+	- Wouter also fixed a bug in csQuadTree as reported by Martin
+	  Geisse.
 	- Fixed a bug in 'rain' and 'snow' commands with speeds other than the
 	  default.  Also made raindrop.png and snow.jpg default so you can
 	  type just 'rain' or 'snow'.  Default number of particles is now 500.
