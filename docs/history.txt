@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit removed support for lua in the pysimp application. Now it
 	  only uses python. It is also no longer required to use a commandline
 	  option.
+	- Jorrit removed scripts/lua. This was a left-over from the past.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild
