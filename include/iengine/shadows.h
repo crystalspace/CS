@@ -24,7 +24,6 @@
 
 struct iShadowBlock;
 struct iShadowBlockList;
-struct iSector;
 class csFrustum;
 class csTransform;
 class csPlane3;
@@ -69,10 +68,6 @@ struct iShadowBlock : public iBase
 {
   /// Get an iterator to iterate over all shadows in this block.
   virtual iShadowIterator* GetShadowIterator (bool reverse = false) = 0;
-  /// Get a pointer to the sector in which this block was generated.
-  virtual iSector* GetSector () = 0;
-  /// Get the recursion level of this sector in our frustum check.
-  virtual int GetRecLevel () = 0;
   /// Dereference all shadows in the list.
   virtual void DeleteShadows () = 0;
 
@@ -129,7 +124,7 @@ struct iShadowBlock : public iBase
   virtual void Transform (csTransform* trans) = 0;
 };
 
-SCF_VERSION (iShadowBlockList, 0, 0, 2);
+SCF_VERSION (iShadowBlockList, 0, 0, 4);
 
 /**
  * This is a list of shadow blocks. An iShadowReceiver will get
@@ -141,10 +136,7 @@ struct iShadowBlockList : public iBase
   virtual iShadowIterator* GetShadowIterator (bool reverse = false) = 0;
 
   /// Create a new shadow block and append to the list.
-  virtual iShadowBlock* NewShadowBlock (iSector* sector, int draw_busy,
-  	int num_shadows = 30) = 0;
-  /// Create a new shadow block and append to the list.
-  virtual iShadowBlock* NewShadowBlock () = 0;
+  virtual iShadowBlock* NewShadowBlock (int num_shadows = 30) = 0;
 
   /// Get first shadow block in the list.
   virtual iShadowBlock* GetFirstShadowBlock () = 0;
@@ -158,6 +150,26 @@ struct iShadowBlockList : public iBase
   virtual void RemoveLastShadowBlock () = 0;
   /// Destroy all shadow lists and shadows in the list.
   virtual void DeleteAllShadows () = 0;
+
+  /**
+   * Mark a new region of shadow blocks. This is usually called
+   * after entering a portal and it allows us to easily restore
+   * the shadow list upto the point of the last portal traversal.
+   * Returns the original region.
+   */
+  virtual uint32 MarkNewRegion () = 0;
+
+  /**
+   * Restore a region (as parameter use the number returned
+   * by MarkNewRegion()).
+   */
+  virtual void RestoreRegion (uint32 prev) = 0;
+
+  /**
+   * Returns true if the shadow block belongs to the current
+   * region.
+   */
+  virtual bool FromCurrentRegion (iShadowBlock* block) = 0;
 };
 
 #endif // __I_SHADOWS_H__

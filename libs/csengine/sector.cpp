@@ -976,18 +976,15 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   int i;
 
   // Translate this sector so that it is oriented around
-
   // the position of the light (position of the light becomes
-
   // the new origin).
   csVector3 &center = lview->GetFrustumContext ()->GetLightFrustum ()
     ->GetOrigin ();
 
   iShadowBlockList *shadows = lview->GetFrustumContext ()->GetShadows ();
 
-  // Remember the previous last shadow so that we can remove all
-  // shadows that are added in this routine.
-  iShadowBlock *previous_last = shadows->GetLastShadowBlock ();
+  // Mark a new region so that we can restore the shadows later.
+  uint32 prev_region = shadows->MarkNewRegion ();
 
   if (culler && culler->SupportsShadowCasting ())
   {
@@ -1068,12 +1065,15 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   // Restore the shadow list in 'lview' and then delete
   // all the shadow frustums that were added in this recursion
   // level.
-  while (shadows->GetLastShadowBlock () != previous_last)
+  while (shadows->GetLastShadowBlock ())
   {
     iShadowBlock *sh = shadows->GetLastShadowBlock ();
+    if (!shadows->FromCurrentRegion (sh))
+      break;
     shadows->RemoveLastShadowBlock ();
     sh->DecRef ();
   }
+  shadows->RestoreRegion (prev_region);
 
   draw_busy--;
 }

@@ -2040,14 +2040,10 @@ void *csThing::TestQueuePolygonArray (
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
 void csThing::AppendShadows (
-  iMovable *movable,
   iShadowBlockList *shadows,
   csVector3 &origin)
 {
-  iSector *isect = movable->GetSectors ()->Get (0);
   iShadowBlock *list = shadows->NewShadowBlock (
-      isect,
-      isect->GetRecLevel (),
       polygons.Length ());
   csFrustum *frust;
   int i, j;
@@ -3479,15 +3475,11 @@ static void CompressShadowFrustums (iShadowBlockList *list)
   csCBufferCube *cb = csEngine::current_engine->GetCBufCube ();
   cb->MakeEmpty ();
 
-  iSector *cur_sector = shadow_it->GetNextShadowBlock ()->GetSector ();
-  int cur_draw_busy = shadow_it->GetNextShadowBlock ()->GetRecLevel ();
   while (shadow_it->HasNext ())
   {
     iShadowBlock *shadlist = shadow_it->GetNextShadowBlock ();
     sf = shadow_it->Next ();
-    if (
-      shadlist->GetSector () != cur_sector ||
-      shadlist->GetRecLevel () != cur_draw_busy)
+    if (!list->FromCurrentRegion (shadlist))
       break;
 
     bool vis = cb->InsertPolygon (sf->GetVertices (), sf->GetVertexCount ());
@@ -3566,10 +3558,7 @@ static void *CheckFrustumPolygonsFB (
                   if (
                       (!mesh->GetFlags ().Check (CS_ENTITY_CAMERA)) &&
                       fview->CheckShadowMask (th->flags.Get ()))
-                    th->AppendShadows (
-                        obj->visobj->GetMovable (),
-                        shadows,
-                        center);
+                    th->AppendShadows (shadows, center);
                 }
               }
 

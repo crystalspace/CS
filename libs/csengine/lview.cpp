@@ -24,7 +24,6 @@
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 #include "iengine/camera.h"
-#include "iengine/sector.h"
 
 SCF_IMPLEMENT_IBASE(csFrustumView)
   SCF_IMPLEMENTS_INTERFACE(iFrustumView)
@@ -101,8 +100,7 @@ SCF_IMPLEMENT_IBASE(csShadowBlock)
 SCF_IMPLEMENT_IBASE_END
 
 csShadowBlock::csShadowBlock (
-  iSector *sect,
-  int draw_busy,
+  uint32 region,
   int max_shadows,
   int delta) :
     next(NULL),
@@ -110,18 +108,7 @@ csShadowBlock::csShadowBlock (
     shadows(max_shadows, delta)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  sector = sect;
-  csShadowBlock::draw_busy = draw_busy;
-}
-
-csShadowBlock::csShadowBlock (int max_shadows, int delta) :
-  next(NULL),
-  prev(NULL),
-  shadows(max_shadows, delta)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  sector = NULL;
-  draw_busy = -1;
+  shadow_region = region;
 }
 
 csShadowBlock::~csShadowBlock ()
@@ -261,21 +248,13 @@ csShadowBlockList::csShadowBlockList () :
   last(NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  cur_shadow_region = 0;
 }
 
 iShadowBlock *csShadowBlockList::NewShadowBlock (
-  iSector *sector,
-  int draw_busy,
   int num_shadows)
 {
-  csShadowBlock *n = new csShadowBlock (sector, draw_busy, num_shadows);
-  AppendShadowBlock (n);
-  return (iShadowBlock *)n;
-}
-
-iShadowBlock *csShadowBlockList::NewShadowBlock ()
-{
-  csShadowBlock *n = new csShadowBlock ();
+  csShadowBlock *n = new csShadowBlock (cur_shadow_region, num_shadows);
   AppendShadowBlock (n);
   return (iShadowBlock *)n;
 }

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+29-Jun-2002
+	- Removed the dependency on iSector from iShadowBlock and
+	  iShadowBlockList. This means that it is now easier to use
+	  iShadowBlock outside the engine (i.e. from within Dynavis soon).
 27-Jun-2002
 	- Eric Sunshine fixed a significant number of problems in the Texinfo
 	  source files.  Also eliminated all TeX overfull and underfull 'hbox'

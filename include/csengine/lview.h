@@ -133,15 +133,12 @@ class csShadowBlock : public iShadowBlock
 private:
   csShadowBlock* next, * prev;
   csVector shadows;
-  iSector* sector;
-  int draw_busy;
+  uint32 shadow_region;
 
 public:
-  /// Create a new empty list for a sector.
-  csShadowBlock (iSector* sector, int draw_busy, int max_shadows = 30,
-  	int delta = 30);
   /// Create a new empty list.
-  csShadowBlock (int max_shadows = 30, int delta = 30);
+  csShadowBlock (uint32 region = -1, int max_shadows = 30,
+  	int delta = 30);
 
   /// Destroy the list and release all shadow references.
   virtual ~csShadowBlock ();
@@ -269,10 +266,8 @@ public:
     	reverse ? -1 : 1));
   }
 
-  /// Get Sector.
-  virtual iSector* GetSector () { return sector; }
-  /// Get draw_busy for sector.
-  virtual int GetRecLevel () { return draw_busy; }
+  /// Get the region for this shadow block.
+  uint32 GetShadowRegion () const { return shadow_region; }
 
   SCF_DECLARE_IBASE;
 };
@@ -285,6 +280,7 @@ class csShadowBlockList : public iShadowBlockList
 private:
   csShadowBlock* first;
   csShadowBlock* last;
+  uint32 cur_shadow_region;
 
 public:
   /// Create a new empty list.
@@ -296,10 +292,7 @@ public:
   }
 
   /// Create a new shadow block and append to the list.
-  virtual iShadowBlock* NewShadowBlock (iSector* sector,
-  	int draw_busy, int num_shadows = 30);
-  /// Create a new shadow block and append to the list.
-  virtual iShadowBlock* NewShadowBlock ();
+  virtual iShadowBlock* NewShadowBlock (int num_shadows = 30);
 
   /// Append a shadow block to this list.
   void AppendShadowBlock (csShadowBlock* slist)
@@ -393,6 +386,22 @@ public:
   {
     return (iShadowIterator*)(new csShadowIterator (first, false,
     	reverse ? -1 : 1));
+  }
+
+  virtual uint32 MarkNewRegion ()
+  {
+    cur_shadow_region++;
+    return cur_shadow_region-1;
+  }
+
+  virtual void RestoreRegion (uint32 prev)
+  {
+    cur_shadow_region = prev;
+  }
+
+  virtual bool FromCurrentRegion (iShadowBlock* block)
+  {
+    return ((csShadowBlock*)block)->GetShadowRegion () == cur_shadow_region;
   }
 
   SCF_DECLARE_IBASE;

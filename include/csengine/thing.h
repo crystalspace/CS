@@ -919,8 +919,7 @@ public:
    * thus assumes that this thing is transformed to the
    * origin of the light.
    */
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	csVector3& origin);
+  void AppendShadows (iShadowBlockList* shadows, csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
