@@ -23,7 +23,7 @@
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
 #include "apps/support/command.h"
-#include "csapputil/simpcons.h"
+#include "cstools/simpcons.h"
 #include "csengine/camera.h"
 #include "csengine/world.h"
 #include "csengine/csview.h"

@@ -24,7 +24,7 @@
 #include "qint.h"
 #include "cssys/common/system.h"
 #include "apps/support/command.h"
-#include "csapputil/simpcons.h"
+#include "cstools/simpcons.h"
 #include "csparser/csloader.h"
 #include "csgeom/csrect.h"
 #include "csgeom/frustrum.h"
