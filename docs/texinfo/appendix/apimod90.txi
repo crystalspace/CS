@@ -524,7 +524,7 @@ polluting the global namespace.
 Plugin management macro names are now prefixed with @samp{CS_} in order to
 avoid polluting the global namespace.
 
-@itemize
+@itemize @bullet
 @item
 @code{QUERY_PLUGIN_CLASS} @result{} @code{CS_QUERY_PLUGIN_CLASS}
 @item
@@ -536,7 +536,7 @@ avoid polluting the global namespace.
 Macros for classifying events are now prefixed with @samp{CS_} in order to
 avoid polluting the global namespace.
 
-@itemize
+@itemize @bullet
 @item
 @code{IS_KEYBOARD_EVENT} @result{} @code{CS_IS_KEYBOARD_EVENT}
 @item

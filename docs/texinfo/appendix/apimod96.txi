@@ -21,7 +21,7 @@ The following functions have been removed.  Instead there is now a new routine
 called @code{iMeshObject::GetObjectModel()} which will return an instance of
 @code{iObjectModel}.  The functions can be called from that instance.
 
-@itemize
+@itemize @bullet
 @item
 @code{iMeshObject::GetShapeNumber()}
 @item
@@ -49,17 +49,17 @@ into the @code{csParser} class.
 
 The following macros have been removed:
 
-@itemize
+@itemize @bullet
 @item
-cindex @code{SCF_QUERY_INTERFACE_FAST}
+@code{SCF_QUERY_INTERFACE_FAST}
 @item
-cindex @code{CS_GET_CHILD_OBJECT_FAST}
+@code{CS_GET_CHILD_OBJECT_FAST}
 @item
-cindex @code{CS_GET_NAMED_CHILD_OBJECT_FAST}
+@code{CS_GET_NAMED_CHILD_OBJECT_FAST}
 @item
-cindex @code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
+@code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
 @item
-cindex @code{SCF_DECLARE_FAST_INTERFACE}
+@code{SCF_DECLARE_FAST_INTERFACE}
 @end itemize
 
 Fast interfaces are now default. Just use the
@@ -73,26 +73,40 @@ For Interfaces the @code{scfGetID_Interfacename} and the
 namespaces working nicely with them.
 
 @subheading @code{make} Targets 
-Some targets for the @code{make} process(all apps, some plugins) have changed. 
-In general, the name of a target is now equal to the name of the resulting 
-binary (without suffix). E.g. @code{walktest} is now built with @code{make 
-walktest} instead of @code{malk walk}. However, the 'mass' targets have been
-unchanged. To build @code{walktest} and all required plugins, the target is
-still @code{walkall}.
+
+Some targets for the @code{make} process (all applications, some plugins) have
+changed.  In general, the name of a target is now the same as the name of the
+resulting binary (without suffix).  For example, @file{walktest} is now built
+with @samp{make -k walktest} instead of @samp{make -k walk}.  However, the
+composite target names have not been changed.  To build @file{walktest} and all
+required plugins, one still invokes @samp{make -k walkall}.
 
 @subheading Ref count changes
-The @code{iLoader->LoadSound()} that returns an @code{iSoundWrapper}
+The @code{iLoader::LoadSound()} that returns an @code{iSoundWrapper}
 now returns a pointer that is increffed (one ref count more compared
 to before).
 
 @subheading iTextureManager changes
-@code{iTextureManager->FindRGB()} has been moved to
-@code{iGraphics2D->FindRGB()}.
-Additionally removed @code{iTextureManager->SetPalette()},
-@code{iTextureManager->ResetPalette()}, and
-@code{iTextureManager->ReserveColor()}.
+
+The following methods have moved:
+
+@itemize @bullet
+@item
+@code{iTextureManager::FindRGB()} @result{} @code{iGraphics2D::FindRGB()}
+@end itemize
+
+The following methods were removed:
+
+@itemize @bullet
+@item
+@code{iTextureManager::SetPalette()}
+@item
+@code{iTextureManager::ResetPalette()}
+@item
+@code{iTextureManager::ReserveColor()}
+@end itemize
 
 @subheading Procedural Textures
-The procedural texture system has been rewritten. Check out
-@code{iGraphics3D->SetRenderTarget()}.
 
+The procedural texture system has been rewritten. See the documentation for
+@code{iGraphics3D::SetRenderTarget()} for details.

@@ -1,34 +1,39 @@
 The history order is reversed so that new features are at the top.
 
+29-Oct-2002
+	- Eric Sunshine updated the MinGW build instructions in the user manual
+	  to discuss the new preferred MinGW+MSYS procedure for building
+	  Crystal Space.
+	- Eric Sunshine eliminated some overfull- and underfull-hbox warnings
+	  in the Texinfo files reported by TeX.
 27-Oct-2002
-	- Fixed a few bugs in iThingState->GetPolygon() as reported
-	  by Groton.
+	- Fixed a few bugs in iThingState::GetPolygon() as reported by Groton.
 20-Oct-2002
 	- Removed some old palette code from the software texture manager.
-	- iGraphics2D->FindRGB() now works again in palette mode.
-	- Added iGraphics2D->CreateOffscreenCanvas() to make a canvas
-	  that will work in off-screen mode.
-	- Added iTextureHandle->GetCanvas() which will return a canvas
-	  that can be used to render on the given texture.
-	- Implemented GetCanvas() correctly in the software renderer.
-	  OpenGL implementation doesn't work yet.
-	- Modified simplept so it 'shimmers' the proc texture portal.
-	  This gives a water like effect.
-	- From Jochen Moench: patch to iCamera->SetFovAngle().
+	- iGraphics2D::FindRGB() now works again in palette mode.
+	- Added iGraphics2D::CreateOffscreenCanvas() to make a canvas that will
+	  work in off-screen mode.
+	- Added iTextureHandle::GetCanvas() which will return a canvas that can
+	  be used to render on the given texture.
+	- Implemented GetCanvas() correctly in the software renderer.  OpenGL
+	  implementation doesn't work yet.
+	- Modified simplept so it 'shimmers' the proc texture portal.  This
+	  gives a water like effect.
+	- From Jochen Moench: patch to iCamera::SetFovAngle().
 19-Oct-2002
-	- After my changes yesterday the NASM version of the software
-	  renderer was totally broken. After long debugging I found
-	  out why. Seems that in scan.ash there is a mirror of
-	  the scan.h include file but for assembly. I removed several
-	  fields in scan.h but I forgot to remove them in scan.ash
-	  with the result that the two structures didn't match.
+	- After my changes yesterday the NASM version of the software renderer
+	  was totally broken.  After long debugging I found out why.  Seems
+	  that in scan.ash there is a mirror of the scan.h include file but for
+	  assembly.  I removed several fields in scan.h but I forgot to remove
+	  them in scan.ash with the result that the two structures didn't
+	  match.
 18-Oct-2002
-	- Removed support for gamma setting in the renderers. This was
-	  only supported by the software renderer and then only working
-	  properly in 8-bit mode.
-	- Added SetGamma/GetGamma to iGraphics2D where it belongs. Gamma
-	  is a canvas feature. Note that currently there are no canvases
-	  that support this.
+	- Removed support for gamma setting in the renderers.  This was only
+	  supported by the software renderer and then only working properly in
+	  8-bit mode.
+	- Added SetGamma/GetGamma to iGraphics2D where it belongs.  Gamma is a
+	  canvas feature.  Note that currently there are no canvases that
+	  support this.
 	- Eric Sunshine eliminated compilation warnings from several modules.
 	- Eric Sunshine fixed a compilation error in cspthrd.cpp for platforms
 	  which do not publish sys_errlist[].

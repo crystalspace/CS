@@ -3,15 +3,15 @@
 @subsection Windows using MinGW
 
 @noindent
-@emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
-@noindent
-@emph{Last updated December 11, 2001}
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
+written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 29
+October 2002.}
 
-These instructions are for building Crystal Space with MinGW---a @sc{gnu}
-compiler for Windows.  There are many different versions of the @sc{gnu}
-Windows compiler and problems arise with some Windows header files
-containing non-standard code used by Microsoft, so we recommend
-the MinGW compiler which is currently best supported by Crystal Space.
+These instructions are for building Crystal Space with MinGW, the
+@emph{Minimalist @sc{gnu} compiler for Windows}.
+
+@noindent
+@uref{http://www.mingw.org/}
 
 @subsubheading Necessary Resources
 
@@ -19,142 +19,146 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MinGW package @file{cs_mingw_0.92.exe} from the @emph{mingw32} support
-directory at Sunsite.  This package contains all the recent MinGW package
-releases (i.e. all the files necessary to compile Crystal Space successfully).
+The most recent version of the MinGW compiler and related tools.  This package
+is typically named @file{MinGW-2.?.?-?.exe}, where the question marks stand for
+the actual version number.
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.92.exe}
+@uref{http://www.mingw.org/}
 
 @item
-@sc{nasm} (Netwide Assembler) for Windows @file{nasm-0.98e-bin-w32.zip}
+The most recent version of @sc{msys}.  This is an adjunct package for MinGW
+which provides additional useful utilities as well as a convenient shell
+environment.  @sc{msys} provides a more reliable and robust environment for the
+configuration and build phases of Crystal Space.  It is available from the
+MinGW web site.  This package is typically named @file{MSYS-1.?.?.exe}, where
+the question marks stand for the actual version number.
 
-@iftex
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
-@uref{support/nasm/nasm-0.98e-bin-w32.zip}
-@end iftex
-@ifnottex
+@uref{http://www.mingw.org/}
+
+@item
+The most recent Crystal Space MinGW support package.  This package provides a
+minimal set of additional resources needed to build Crystal Space, such as
+zlib, libpng, libjpeg, @sc{ode} @sc{sdk}, Python @sc{sdk}, @sc{nasm}, the
+Netwide Assembler, etc.  This package has the name
+@file{csmingwlibs_?.??r?.exe}, where the question marks stand for the actual
+version number.  You should download the one with the highest version number.
+
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-w32.zip}
-@end ifnottex
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/}
 @end itemize
 
 @subsubheading Installation
 
 Follow these instructions to install the packages which you downloaded.
+Be sure to install them in the order shown.
 
 @itemize @bullet
 @item
-First install the MinGW compiler.  The file is a self extracting executable and
-will create the @file{mingw32} directory for you.  So if you wish to install it
-to your @file{C:\} drive as @file{C:\mingw32\}, extract the archive to
-@file{C:\}.
-
-The following instructions assume the MinGW package is installed in
-@file{C:\mingw32}.
+Install the MinGW compiler.  The is a self-extracting executable.  The
+following instructions assume you have installed the MinGW package at
+@file{C:\mingw32}, though you are free to install it wherever you like.
 
 @item
-Unzip the @sc{nasm} archive files and copy the @file{.exe} files into
-@file{C:\mingw32\bin}.
+Install @sc{msys}.  This is a self-extracting executable.  During the
+installation, you will be asked for the location of the MinGW installation.
+This allows @sc{msys} to correctly locate the MinGW tools later on when
+building Crystal Space.  Be sure to enter the correct path (@file{C:\mingw32},
+in our example).
 
 @item
-Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 and ME edit
-the @file{C:\autoexec.bat} file add the following entry:
-
-@example
-SET PATH=C:\mingw32\bin
-@end example
-
-You must also add the following variables, so that @sc{gcc} can find the Python
-header files.
-
-@example
-SET PYTHON_INC=C:\mingw32\include\python1.5
-SET PYTHONPATH=C:\mingw32\lib\python1.5
-@end example
-
-@noindent
-On Windows @sc{nt}, 2000 and @sc{xp}, use the System control panel to edit the
-environment variable.
-
-If you fail to do so, then the @file{makedep} tool will not know where to look
-for Mingw32's system include files, and will emit a lot of warnings.
-
-@item
-Reboot your computer.
+Install the @file{csmingwlibs} package.  This is a self-extracting executable.
+During the installation, the @sc{msys} shell startup file will be augmented
+with the addition of several environment variables which are consulted when
+building Crystal Space.  If you are interested, see the @file{README} file in
+the @file{csmingwlibs} directory after installation for all the gory details.
 @end itemize
 
 @subsubheading Building
 
-From within the Crystal Space directory (@file{CS\}), run the @samp{make}
-command and follow the instructions.  Typically, you would issue the following
-commands:
+The most robust way to configure and build Crystal Space is from within the
+@sc{msys} shell environment.  To start this environment, click on the
+@sc{msys} icon which the installation procedure placed upon your desktop, or
+choose the @sc{msys} item from the Start menu.  This will launch a Unix-like
+shell window into which you type commands.
+
+From
+this shell, go to your @file{CS} directory with the @samp{cd} command.  For
+example, if Crystal Space resides at @file{C:\work\CS}, invoke the command
+@samp{cd /c/work/CS}.  Next, build the project with the following sequence
+of commands:
 
 @example
-make win32gcc MODE=debug
+make win32gcc
 make depend
 make -k all
 @end example
 
-Some Windows ME users have reported a system crash when running the 
-@samp{make win32gcc} command. If you have that problem, try adding
+The @samp{-k} option used in @samp{make -k all} instructs the @file{make}
+utility to ignore errors and continue building the project.  This may be
+necessary in cases where some Crystal Space modules require resources not
+installed on your computer and not included with @file{csmingwlibs}.  It may
+also be necessary if you are using the bleeding-edge version of Crystal Space
+from the @sc{cvs} repository, and some module fails to build correctly.
+
+If you prefer to build a @dfn{debug} version of Crystal Space, substitute
+the following command for the one above:
+
+@example
+make win32gcc MODE=debug
+@end example
+
+Some Windows @sc{me} users have reported a system crash when running the
+@samp{make win32gcc} command.  If you experience this problem, try adding
 @samp{FORCEBUCK=SS} to the command line, like this:
 
 @example
-make win32gcc MODE=debug FORCEBUCK=SS
+make win32gcc FORCEBUCK=SS
 make depend
 make -k all
 @end example
 
-Note that making the @samp{depend} target is not absolutely required.  If
-doing so presents problems, then you can safely omit it:
+Note that the @samp{depend} target is not absolutely required.  If you
+experience problems with dependency generation, you can safely omit that step.
+
+@subsubheading Additional Build Options
+
+Sometimes it is a good idea to remove all of the built programs and executable
+files and start from scratch.  You can do this with the following commands:
 
 @example
-make win32gcc MODE=debug
+make clean
 make -k all
 @end example
 
-@subsubheading Additional Command Line Compile Options
-
-You can also insert the @samp{clean} makefile target into the @samp{make}
-command, as follows:
+Once in a while it is even a good idea to completely clean and re-configure the
+project.  This may be required if you are using the bleeding-edge version of
+Crystal Space from the @sc{cvs} repository after some radical change.
 
 @example
-make -k clean all
+make distclean
+make win32gcc
+make depend
+make -k all
 @end example
-
-@noindent
-This will first remove all object files, libraries, etc.  from the
-@file{CS\out\WIN32\X86\debug} directory and will then build the entire project.
-
-The @samp{-k} option used in the @samp{make -k all} command instructs the
-compiler to ignore errors and continue compiling regardless.
-
-@subsubheading Customizing
-
-You may need to customize settings in @file{CS\libs\cssys\win32\win32gcc.mak},
-the Mingw32 makefile.  Check the following variables:
-
-@itemize @bullet
-@item
-@code{LIBS.GL3D.SYSTEM}
-@item
-@code{LIBS.SOCKET.SYSTEM}
-@item
-@code{LIBS.SOUND.SYSTEM}
-@end itemize
-
-Adjust them to match your system libraries.  For example, if you use the
-@sc{sgi} OpenGL @sc{sdk} instead of Microsoft's OpenGL, change
-@samp{-lopengl32} and @samp{-lglut32} to @samp{-lopengl} and @samp{-lglut} in
-@samp{LIBS.GL3D.SYSTEM}.  Also in the file @file{CS\mk\user.mak} select which
-plugins you wish to compile.
 
 @subsubheading Troubleshooting
 
-If you successfully compiled Crystal Space, yet find that you cannot run the
+If you successfully compiled Crystal Space, yet find that you can not run the
 applications from the @file{CS\} root directory, a possible cause might be that
-the pathname leading up to the @file{CS\} directory may have whitespace in it.
-For instance, if you installed the project in @file{C:\my stuff\CS}, try
-renaming the path to @file{C:\my_stuff\CS} or @file{C:\mystuff\CS}.
+the pathname leading up to the @file{CS\} directory might have embedded
+whitespace.  For instance, if you installed the project in @file{C:\my
+stuff\CS}, try renaming the path to @file{C:\my_stuff\CS} or
+@file{C:\mystuff\CS}.
+
+@subheading Blasting the Past
+
+If you were previously using the older, deprecated @file{cs_mingw_0.??.exe}
+package which contained the entire MinGW distribution along with other
+unrelated tools and resources, it is highly recommend that you first remove
+that package, as well as any residual files and resources before installing the
+newer MinGW, @sc{msys}, and @file{csmingwlibs} packages.  For best results, it
+would probably be wise to remove the entire old @file{MinGW} directory (though
+you may want to make a backup copy of it just in case) and clean your
+environment variables of any references to the old resource directories.

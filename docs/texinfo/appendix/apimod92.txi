@@ -123,7 +123,7 @@ from a @sc{vfs} path.
 Added @code{iIsoEngine::GetMeshFactories()} and removed the following
 functions.
 
-@itemize
+@itemize @bullet
 @item
 @code{AddMeshFactory()}
 @item
