@@ -1399,6 +1399,34 @@ bool awsWindow::HasChildren ()
   return comp.HasChildren ();
 }
 
+iAwsComponent *awsWindow::DoFindChild(iAwsComponent *parent, unsigned id)
+{
+  if (!parent->HasChildren ()) return NULL;
+
+  int i;
+  for (i = 0; i < parent->GetChildCount (); ++i)
+  {
+    iAwsComponent *child = parent->GetChildAt (i);
+
+    // if this child matches, good.
+    if (child->GetID() == id)
+      return child;
+
+    // otherwise, check this child
+    if ((child=DoFindChild(child, id))!=NULL)
+      return child;
+  }
+
+  return NULL;
+}
+
+iAwsComponent *awsWindow::FindChild(char *name)
+{
+  unsigned id = WindowManager()->GetPrefMgr()->NameToId(name);
+
+  return DoFindChild(this, id);
+}
+
 iAwsWindow *awsWindow::Window ()
 {
   return comp.Window ();

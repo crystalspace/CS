@@ -133,6 +133,9 @@ private:
   /// Lays out children.
   void RecursiveLayoutChildren (iAwsComponent *cmp, bool move_kids=false);
 
+  /// Performs the work of actually finding a child
+  iAwsComponent *DoFindChild(iAwsComponent *parent, unsigned id);
+
   ////////////// Component declarations for embedded wrappers ///////////////////////////////
   //
   //    /// Invalidation routine: allow the component to be redrawn when you call this
@@ -317,6 +320,9 @@ public:
 
   /// Gets the inset amounts that are need to fit components properly.
   virtual csRect getInsets ();
+
+  /// Gets a child component by name, returns NULL on failure.
+  virtual iAwsComponent *FindChild(char *name);
 public:
   /// Event triggered when a window is about to be raised
   virtual void OnRaise ();
