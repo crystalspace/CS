@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  left/right lines.
 	- Polygon insertion into coverage buffer is now also more robust
 	  and faster because it doesn't care about left/right lines anymore.
+	- Implemented a work-around for csImageFile::MipMap() in case steps
+	  is 0 and width or height is 1.
 26-May-2002
 	- Fixed a bug in the KD-tree of Dynavis. It was possible for
 	  a split axis to be outside the node bounding box.

@@ -241,6 +241,12 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
     return Clone ();
   }
 
+  if ( steps == 0 && ((Width == 1) || (Height == 1)) )
+  {
+    // @@@ Workaround for a bug in mipmap_0...
+    return Clone ();
+  }
+
   csImageFile* nimg = NULL;
 
   if (steps == 0)
