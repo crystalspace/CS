@@ -34,7 +34,7 @@ CSFGEN.EXE = csfgen$(EXE)
 INC.CSFGEN = $(wildcard apps/tools/csfgen/*.h)
 SRC.CSFGEN = $(wildcard apps/tools/csfgen/*.cpp)
 OBJ.CSFGEN = $(addprefix $(OUT),$(notdir $(SRC.CSFGEN:.cpp=$O)))
-DEP.CSFGEN = CSSYS CSUTIL CSGEOM
+DEP.CSFGEN = CSSYS CSUTIL CSGEOM CSTOOL
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
 
 TO_INSTALL.EXE += $(CSFGEN.EXE)
