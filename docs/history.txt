@@ -1,5 +1,49 @@
 The history order has been reversed so that new features are at the top.
 
+24-Mar-2001
+	- Eric Sunshine made the following changes to the project:
+	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().
+	      This bug has been present since the introduction of SCF on
+	      November 5, 1999.  Rather than returning the explicitly requested
+	      SCF interface, LoadPlugIn() was _always_ returning the plugin's
+	      iPlugIn interface.  The problem was further compounded by the
+	      LOAD_PLUGIN() macro which then performed a blind cast of the
+	      returned pointer to the requested type, with the result that a
+	      completely bogus pointer was being returned to the caller.  It
+	      was only by pure luck that this problem was not noticed earlier.
+	      It remained hidden because, up until now, all SCF interfaces
+	      implemented by plugin modules have themselves inherited from
+	      iPlugIn.  Thus, by pure chance, the returned iPlugIn pointer also
+	      happened to be the correct pointer to the requested type.
+	      However, if embedding or multiple-inheritance is instead used to
+	      implement iPlugIn, then the one-to-one pointer relationship no
+	      longer applies and the application crashes on account of receipt
+	      of a pointer to iPlugIn when it was expecting something entirely
+	      other.
+	    - Renamed iConsole to iConsoleOutput for consistency with existing
+	      iConsoleInput.
+	    - The iConsoleInput and iConsoleOutput interfaces no longer
+	      incorrectly inherit from iPlugIn.  This was incorrect because it
+	      made the assumption that anything implementing these interfaces
+	      _must_ also be a plug-in module.  This was an unnecessary
+	      restriction.
+	    - Relocated plugins/cscon to plugins/console/output/standard.
+	    - Renamed csConsole to csConsoleOutput.
+	    - Relocated plugins/simpcon to plugins/console/output/simple.
+	    - Renamed csSimpleInput to csConsoleInput and moved the related
+	      implementation files from plugins/simpcon to
+	      plugins/console/input/standard.  This implementation now resides
+	      in its own plug-in module rather than being bundled with the
+	      `simple' output console.
+	    - Relocated the `funky' console from plugins/cscon to
+	      plugins/console/output/fancy.  This console is now a stand-alone
+	      plug-in module rather than being bundled with `cscon'.  Instead
+	      of inheriting directly from csConsoleOutput, it now loads and
+	      utilizes the csConsoleOutput plugin.
+	    - Renamed funConsole to csFancyConsole.
+	    - Renamed funcon.cfg to fancycon.cfg.
+	    - Renamed funcon.zip to fancycon.zip.
+	    - Fixed several positional computation bugs in csFancyConsole.
 23-Mar-2001:
 	- Wouter Wijngaards made 'make win32gcc' correctly detect the
 	  presence of a bash (or other) shell used by the makefile system.
