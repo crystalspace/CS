@@ -13,7 +13,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 6-Jan-2000
-	- Eric Sunshine added Append(char) to csString.
+	- Eric Sunshine added Append(char) to csString.  He also added a
+	  constructor which accepts a (char).
 	- Michael Dale Long fixed several bugs in makefile.py.
 5-Jan-2000
 	- Some further changes on support for curves in visibility system
