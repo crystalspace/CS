@@ -17,6 +17,7 @@ chronological order.
 	- Jorrit fixed a memory leak in thing polygons. They were not
 	  releasing the vertex indices from the block allocators. This caused
 	  simple1 to crash at exit due to an assert in csBlockAllocator.
+	- Jorrit forgot to remove some instances of FASTMESH.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.

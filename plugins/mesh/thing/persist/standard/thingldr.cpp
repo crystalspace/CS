@@ -59,7 +59,6 @@ enum
   XMLTOKEN_CLONE = 1,
   XMLTOKEN_COSFACT,
   XMLTOKEN_FACTORY,
-  XMLTOKEN_FASTMESH,
   XMLTOKEN_FOG,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_REPLACEMATERIAL,
@@ -141,7 +140,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("fog", XMLTOKEN_FOG);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("replacematerial", XMLTOKEN_REPLACEMATERIAL);
@@ -896,12 +894,6 @@ if (!info.thing_fact_state) \
 	CREATE_FACTORY_IF_NEEDED;
         info.thing_fact_state->SetCosinusFactor (
 		child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_FASTMESH:
-        CHECK_TOPLEVEL("fastmesh");
-	CHECK_DONTEXTENDFACTORY;
-	CREATE_FACTORY_IF_NEEDED;
-        info.thing_fact_state->GetFlags ().Set (CS_THING_FASTMESH);
         break;
       case XMLTOKEN_MOVEABLE:
         CHECK_TOPLEVEL("moveable");

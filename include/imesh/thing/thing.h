@@ -108,12 +108,6 @@ struct csPolygonRange
 /** \name Thing flags
  * @{ */
 /**
- * If CS_THING_FASTMESH is set then this thing will be drawn using
- * the faster DrawPolygonMesh.
- */
-#define CS_THING_FASTMESH 2
-
-/**
  * If CS_THING_NOCOMPRESS is set then vertices of this thing will not
  * be compressed. By default the vertex table is compressed before the
  * thing is used for the first time (this means that duplicate vertices
