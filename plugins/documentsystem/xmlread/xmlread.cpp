@@ -82,8 +82,9 @@ csRef<iDocumentNode> csXmlReadDocWrapper::GetRoot ()
 
 const char* csXmlReadDocWrapper::Parse (iFile* file)
 {
-  char *buf = new char[file->GetSize()];
+  char *buf = new char[file->GetSize()+1];
   file->Read (buf, file->GetSize());
+  buf[file->GetSize ()] = 0;
   const char *ret = ParseInPlace (buf);
   return ret;
 }
