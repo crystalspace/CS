@@ -1,21 +1,22 @@
 # This is a subinclude file used to define the rules needed
-# to build DOS Allegro driver alleg2d
+# to build Allegro driver alleg2d
 
 # Driver description
 DESCRIPTION.alleg2d = Crystal Space Allegro driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: alleg2d
+.PHONY: alleg2d alleg2dclean
 
 all plugins drivers drivers2d: alleg2d
 
@@ -26,7 +27,7 @@ alleg2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Link with Allegro libraries.
@@ -51,7 +52,7 @@ CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/allegro
@@ -69,7 +70,7 @@ $(ALLEG2D): $(OBJ.ALLEG2D) $(DEP.ALLEG2D)
 	$(DO.PLUGIN) $(LIBS.ALLEG2D)
 
 alleg2dclean:
-	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D)
+	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D) $(OUTOS)alleg2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)alleg2d.dep

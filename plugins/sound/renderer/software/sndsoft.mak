@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.sndsoft = Crystal Space software sound renderer
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make sndsoft      Make the $(DESCRIPTION.sndsoft)$"
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make sndsoft      Make the $(DESCRIPTION.sndsoft)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndsoft
+.PHONY: sndsoft sndsoftclean
 
 all plugins drivers snddrivers: sndsoft
 
@@ -26,7 +27,7 @@ sndsoftclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/renderer/software
@@ -46,7 +47,7 @@ OBJ.SNDSOFT = $(addprefix $(OUT),$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: sndsoft sndsoftclean
@@ -61,7 +62,7 @@ $(SNDSOFT): $(OBJ.SNDSOFT) $(DEP.SNDSOFT)
 	$(DO.PLUGIN)
 
 sndsoftclean:
-	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT)
+	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT) $(OUTOS)sndsoft.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)sndsoft.dep

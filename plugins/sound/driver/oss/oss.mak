@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.oss = Crystal Space OSS sound driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make oss          Make the $(DESCRIPTION.oss)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: oss
+.PHONY: oss ossclean
 
 all plugins drivers snddrivers: oss
 
@@ -26,7 +27,7 @@ ossclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/driver/oss
@@ -46,7 +47,7 @@ OBJ.SNDOSS = $(addprefix $(OUT),$(notdir $(SRC.SNDOSS:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oss ossclean
@@ -60,7 +61,7 @@ $(SNDOSS): $(OBJ.SNDOSS) $(DEP.OSS)
 	$(DO.PLUGIN)
 
 ossclean:
-	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
+	$(RM) $(SNDOSS) $(OBJ.SNDOSS) $(OUTOS)oss.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)oss.dep
