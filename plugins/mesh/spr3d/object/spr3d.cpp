@@ -530,7 +530,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     for (j = 0; j < i; j++)
     {
       csVector3 difference = base_verts[i] - base_verts[j];
-      if (difference.Norm () < 0.01)
+      if (difference.SquaredNorm () < 0.0001)
       {
         merge[i] = j;
         break;
@@ -547,14 +547,15 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   	obj_verts, GetVertexCount());
 
   // calculate vertex normals, by averaging connected triangle normals
+  csVector3* fr_normals = GetNormals (frame);
   for (i = 0; i < GetVertexCount(); i++)
   {
     csTriangleVertex2 &vt = tv->GetVertex (i);
     if (vt.num_con_triangles)
     {
-      csVector3 &n = GetNormal (frame, i);
-      n = csVector3 (0,0,0);
-      for (j = 0; j < vt.num_con_triangles; j++)
+      csVector3 &n = fr_normals[i];
+      n.Set (tri_normals[vt.con_triangles[0]]);
+      for (j = 1; j < vt.num_con_triangles; j++)
         n += tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
@@ -565,8 +566,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   // one last loop to fill in all of the merged vertex normals
   for (i = 0; i < GetVertexCount(); i++)
   {
-    csVector3 &n = GetNormal (frame, i);
-    n = GetNormal (frame, merge [i]);
+    fr_normals[i].Set (fr_normals[merge[i]]);
   }
 
   delete[] tri_normals;
