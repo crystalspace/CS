@@ -381,6 +381,11 @@
 #  undef DO_NASM
 #endif
 
+// Use fast QInt and QRound on CPUs that are known to support it
+#if !defined (CS_IEEE_DOUBLE_FORMAT) && (defined (PROC_INTEL) || defined (PROC_M68K))
+#  define CS_IEEE_DOUBLE_FORMAT
+#endif
+
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 

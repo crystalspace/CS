@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Andrew Zabolotny
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -98,7 +98,18 @@
     that FPU is in rounding mode by default, e.g. no need to toggle FPU
     control word). QRound executes 2 clocks on Celeron while FISTP
     executes 13 clocks, i.e. about 6 times slower.
+
+    All said above is true for all CPU types that uses standard IEEE
+    format for "double" type, with the respective corrections for endianess.
 */
+
+#ifdef CS_BIG_ENDIAN
+#  define CS_LOWER_WORD_BYTE	4
+#else
+#  define CS_LOWER_WORD_BYTE	0
+#endif
+
+#define CS_LONG_AT_BYTE(x,b)	*(long *)(((char *)&x) + b)
 
 /**
  * We'll add 2^36 to create a 32.16 fixed-point value and then will pick
@@ -114,7 +125,7 @@ static inline long QInt (double inval)
   double dtemp = FIST_MAGIC_QINT + inval;
   // Note that on both low-endian (x86) and big-endian (m68k) we have
   // to shift by two bytes. So no need for an #ifdef.
-  long result = *(long *)(((char *)&dtemp) + 2);
+  long result = CS_LONG_AT_BYTE (dtemp, 2);
   return result < 0 ? (result >> 1) + 1 : result;
 }
 
@@ -128,7 +139,7 @@ static inline long QInt (double inval)
 static inline long QRound (double inval)
 {
   double dtemp = FIST_MAGIC_QROUND + inval;
-  return *((long *)&dtemp) - 0x80000000;
+  return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
 /**
@@ -141,7 +152,7 @@ static inline long QRound (double inval)
 inline long QInt8 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT8 + inval;
-  return ((*(long *)&dtemp) - 0x80000000);
+  return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
 /**
@@ -154,7 +165,7 @@ inline long QInt8 (float inval)
 inline long QInt16 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT16 + inval;
-  return ((*(long *)&dtemp) - 0x80000000);
+  return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
 
 /**
@@ -166,17 +177,17 @@ inline long QInt16 (float inval)
 inline long QInt24 (float inval)
 {
   double dtemp = FIST_MAGIC_QINT24 + inval;
-  return ((*(long *)&dtemp) - 0x80000000);
+  return CS_LONG_AT_BYTE (dtemp, CS_LOWER_WORD_BYTE) - 0x80000000;
 }
     
-#else
+#else /* not CS_IEEE_DOUBLE_FORMAT */
 
-#define QRound(x) (int ((x)+.5))
+#define QRound(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 #define QInt(x)   (int (x))
 #define QInt8(x)  (int ((x)*256.))
 #define QInt16(x) (int ((x)*65536.))
 #define QInt24(x) (int ((x)*16777216.))
 	
-#endif
+#endif /* CS_IEEE_DOUBLE_FORMAT */
 
 #endif // __QINT_H__
