@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 9-Apr-2003
+        - Boyan added boolean property "Stretched" on AWS Command Button
 	- Matze
 	  - fixed (blindly) lots of errors when using the jambuild on  macosx.
 	  - fixed several warnings through the whole project.
