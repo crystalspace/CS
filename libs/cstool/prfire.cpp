@@ -213,13 +213,12 @@ void csProcFire::Animate (csTicks /*current_time*/)
   {  
     /// draw firetexture
     im = image;
-    int tot = mat_w * mat_h;
-    while (tot > 0)
-    {
-      int col = *im++;
-      ptG2D->DrawPixel (x, y, palette[col*palsize/256]);
-      tot--;
-    }
+    for (y = 0 ; y < mat_h ; y++)
+      for (x = 0 ; x < mat_w ; x++)
+      {
+        int col = *im++;
+        ptG2D->DrawPixel (x, y, palette[col*palsize/256]);
+      }
     ptG3D->FinishDraw ();
     ptG3D->Print (NULL);
   }

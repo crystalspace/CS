@@ -142,7 +142,7 @@ public:
 
   static int GetRandom (int max)
   {
-    return QInt ((float(max)*rand()/(RAND_MAX+1.0)));
+    return int ((float(max)*rand()/(RAND_MAX+1.0)));
   }
 };
 
