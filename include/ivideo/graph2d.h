@@ -45,8 +45,15 @@ struct iGraphics2D;
 /// iGraphics2D::Write() flags.
 enum
 {
-  CS_WRITE_BASELINE    = (1 << 0), // Write by baseline.
-  CS_WRITE_NOANTIALIAS = (1 << 1), // Disable anti-aliasing.
+  /**
+   * Write by baseline, \p x and \p y are treated as the pen position on
+   * a baseline. 
+   */
+  CS_WRITE_BASELINE    = (1 << 0),
+  /**
+   * Don't use anti-aliased glyphs.
+   */
+  CS_WRITE_NOANTIALIAS = (1 << 1), 
 };
 
 /// Simple 2D pixel coordinate
@@ -142,7 +149,7 @@ struct iOffscreenCanvasCallback : public iBase
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
 
-SCF_VERSION (iGraphics2D, 2, 3, 1);
+SCF_VERSION (iGraphics2D, 2, 4, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -232,7 +239,7 @@ struct iGraphics2D : public iBase
   virtual void ClearAll (int color) = 0;
 
   /// Draw a line.
-  virtual void DrawLine(float x1, float y1, float x2, float y2, int color) = 0;
+  virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
 
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
@@ -278,12 +285,14 @@ struct iGraphics2D : public iBase
    * color will not draw the background.
    */
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
-    const char *str, uint flags=0) = 0;
+    const char *str, uint flags = 0) = 0;
 
   /**
    * Write a text string into the back buffer. A negative value for bg
    * color will not draw the background. x and y are the pen position on
    * a baseline. The actual font baseline is shifted up by the font's descent.
+   * \deprecated
+   * Instead, use Write() with the #CS_WRITE_BASELINE flag set.
    */
   virtual void WriteBaseline (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;

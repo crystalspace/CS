@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Nov-2003
+	- res bumped the version of the iGraphics2D interface and updated
+	  some doxygen comments in include/graph2d.h. (Basically the 
+	  differences between his local copy he forgot to commit and 
+	  Eric Sunshine's recent update to this file to fix compilation.)
 5-Nov-2003
 	- Jorrit optimized the kdtree a bit so that it now does 20 attempts
 	  instead of 10 to find the best split location. Also the cost is
