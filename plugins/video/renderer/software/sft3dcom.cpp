@@ -2628,9 +2628,10 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   } /* endfor */
 }
 
-void csGraphics3DSoftwareCommon::OpenPortal (G3DPolygonDFP* poly)
+void csGraphics3DSoftwareCommon::OpenPortal (size_t /*numVertices*/, 
+					     const csVector2* /*vertices*/,
+					     const csPlane3& /*normal*/)
 {
-  (void)poly;
 }
 
 void csGraphics3DSoftwareCommon::ClosePortal ()

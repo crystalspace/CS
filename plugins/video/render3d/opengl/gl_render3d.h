@@ -99,6 +99,18 @@ private:
   csPoly3D frustum;
   bool frustum_valid;
 
+  // Structure used for maintaining a stack of clipper portals.
+  struct csClipPortal
+  {
+    csVector2* poly;
+    int num_poly;
+    csPlane3 normal;
+    csClipPortal () : poly (0) { }
+    ~csClipPortal () { delete[] poly; }
+  };
+  csPDelArray<csClipPortal> clipportal_stack;
+  bool clipportal_dirty;
+
   csReversibleTransform object2camera;
 
   bool verbose;
@@ -385,6 +397,15 @@ public:
   /// Controls shadow drawing
   virtual void SetShadowState (int state);
 
+  /// Enter a new clipped portal. Basically this routine will restrict
+  virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
+    const csPlane3& normal);
+
+  /// Close a portal previously opened with OpenPortal().
+  virtual void ClosePortal ();
+
+  void SetupClipPortals ();
+
   /// Draw a line
   virtual void DrawLine(const csVector3 & v1,
     const csVector3 & v2, float fov, int color);
@@ -445,8 +466,6 @@ public:
   virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
   virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&,int) { CS_ASSERT (false); }
   virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
-  virtual void OpenPortal (G3DPolygonDFP*) { CS_ASSERT (false); }
-  virtual void ClosePortal () { CS_ASSERT (false); }
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }
   virtual void DumpCache () { }

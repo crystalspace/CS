@@ -708,7 +708,8 @@ public:
   virtual void OpenFogObject (CS_ID, csFog*) { CS_ASSERT (false); }
   virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&,int) { CS_ASSERT (false); }
   virtual void CloseFogObject (CS_ID) { CS_ASSERT (false); }
-  virtual void OpenPortal (G3DPolygonDFP*) { CS_ASSERT (false); }
+  virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
+    const csPlane3& normal) { CS_ASSERT (false); }
   virtual void ClosePortal () { CS_ASSERT (false); }
   virtual iHalo *CreateHalo (float, float, float,
     unsigned char *, int, int) { return 0; }

@@ -1608,6 +1608,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
 {
   SetupProjection ();
 
+  SetupClipPortals ();
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);
@@ -1940,6 +1941,93 @@ void csGLGraphics3D::SetShadowState (int state)
   }
 }
 
+void csGLGraphics3D::OpenPortal (size_t numVertices, 
+				 const csVector2* vertices,
+				 const csPlane3& normal)
+{
+  csClipPortal* cp = new csClipPortal ();
+  cp->poly = new csVector2[numVertices];
+  memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
+  cp->num_poly = numVertices;
+  cp->normal = normal;
+  clipportal_stack.Push (cp);
+  clipportal_dirty = true;
+}
+
+void csGLGraphics3D::ClosePortal ()
+{
+  if (clipportal_stack.Length () <= 0) return;
+  csClipPortal* cp = clipportal_stack.Pop ();
+  delete cp;
+  clipportal_dirty = true;
+}
+
+void csGLGraphics3D::SetupClipPortals ()
+{
+  if (clipportal_dirty)
+  {
+    clipportal_dirty = false;
+    //if (GLCaps.use_stencil)
+    {
+      if (clipportal_stack.Length () <= 0)
+      {
+        statecache->Disable_GL_STENCIL_TEST ();
+      }
+      else
+      {
+        csClipPortal* cp = clipportal_stack.Top ();
+
+        // First set up the stencil area.
+        statecache->Enable_GL_STENCIL_TEST ();
+        glClearStencil (0);
+        glClear (GL_STENCIL_BUFFER_BIT);
+        statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
+        statecache->SetStencilOp (GL_KEEP, GL_ZERO, GL_REPLACE);
+
+	CS_ALLOC_STACK_ARRAY(csVector3, vertices3, cp->num_poly);
+	CS_ALLOC_STACK_ARRAY(uint, indices, cp->num_poly);
+	for (int v = 0; v < cp->num_poly; v++)
+	{
+	  vertices3[v].Set (cp->poly[v].x, cp->poly[v].y, 0.0f);
+	  indices[v] = v;
+	}
+	csSimpleRenderMesh simpleRM;
+	simpleRM.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+	simpleRM.indexCount = cp->num_poly;
+	simpleRM.indices = indices;
+	simpleRM.vertexCount = cp->num_poly;
+	simpleRM.vertices = vertices3;
+	simpleRM.texcoords = 0;
+        // USE OR FILL@@@?
+	simpleRM.z_buf_mode = CS_ZBUF_USE;
+
+	DrawSimpleMesh (simpleRM);
+
+	//DrawPolygonZFill (cp->poly, cp->num_poly, cp->normal);
+
+        // Use the stencil area.
+        statecache->SetStencilFunc (GL_EQUAL, 1, 1);
+        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+	// First clear the z-buffer here.
+	SetZMode (CS_ZBUF_FILLONLY);
+	glColorMask (false, false, false, false);
+
+	glBegin (GL_QUADS);
+	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
+	glVertex4f (float (viewwidth-1)*100000.0, 0.0*100000.0, -1.0, 
+	  100000.0);
+	glVertex4f (float (viewwidth-1)*100000.0, 
+	  float (viewheight-1)*100000.0, -1.0, 100000.0);
+	glVertex4f (0.0*100000.0, float (viewheight-1)*100000.0, -1.0, 
+	  100000.0);
+	glEnd ();
+	glColorMask (color_red_enabled, color_green_enabled, 
+	  color_blue_enabled, alpha_enabled);
+      }
+    }
+  }
+}
 
 void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 {

@@ -2,23 +2,24 @@ Comparing walktest between NR and OR:
 	- Fog is missing.
 	- Halos are missing.
 	- Lens-flare is missing.
-	- Snow is missing.
-	- 2D sprites (bird, CS logo, ...) are missing.
+	- Snow is missing. (Fixed)
+	- 2D sprites (bird, CS logo, ...) are missing. (Fixed)
 	- The torus in the street is missing (bezier mesh needs porting).
-	- Procedural textures are not working (rotating cube is black)
+	- Procedural textures are not working (rotating cube is black) (Fixed)
 	- Frame based interpolation for spr3d doesn't appear to be working.
 	  In OR the animation of the pulsating box is smooth. In NR it
 	  is choppy. Frame based interpolation should take care of the smooth
 	  animation. In OR this is done by giving two vertex arrays to the
-	  renderer in G3DTriangleMesh. Does the NR not support this yet?
+	  renderer in G3DTriangleMesh. Does the NR not support this yet? (Fixed)
 	- Mixmode of fountain is wrong. Seems to use COPY instead of ADD.
+	  (Fixed)
 	- The rotating door is full bright in NR and dark in OR (in OR it
 	  is actually too dark but in NR it is too bright).
 	- The start room of flarge has a multi-layered texture. We need
 	  to implement the equivalent functionality in NR.
 	- The spiked sprite in the main hall is green in OR and white in NR.
 	- The semi-transparent window left of the rotating door doesn't
-	  seem to be transparent with NR.
+	  seem to be transparent with NR. (Fixed)
 	- The NR still has portal clipping portals in some situations.
 	- The space warping portal in the dungeon that goes back to the main
 	  hall is simply black with NR.
@@ -27,8 +28,6 @@ Comparing walktest between NR and OR:
 Things that need to be done in new renderer:
 
 	- iThingState->ReplaceMaterial() will not work in NR.
-	- Fix lightmapped things to use an appropriate shader so that it
-	  doesn't get very slow in case only two TU's are available.
 	- Support static LOD. This is a special case of a hierarchical mesh
 	  where only one of the children is drawn based on distance
 	  related conditions.
@@ -59,8 +58,12 @@ Things that need to be done in new renderer:
 	- Variable system DONE
 	- Materials DONE
 	- Pseudo VP with similar functionality as old texture layers.
-	- Fix smoothed things. (Done)
+	- Fix smoothed things. 
 	- Better error handling. Everything is too crashy.
+	- Fix lightmapped things to use an appropriate shader so that it
+	  doesn't get very slow in case only two TU's are available.
+	  (Actually, it doesn't cause a slowdown. Tho might still be nice to
+	   have appropriate shaders nevertheless)
 
 
 What happens in one frame using the new renderer (assuming the generic

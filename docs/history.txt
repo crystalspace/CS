@@ -9,6 +9,8 @@ chronological order.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to handle recursively the flags
 	  in meshes' children if needed.
+	- res ported OpenPortal() to NR. Still has issues, tho.
+	- res updated todo_newrenderer.txt.
 11-Apr-2004
 	- Eric Sunshine applied a patch from Andres Freund <andres@anarazel.de>
 	  to several of the templated csArray<> subclasses which ensures that

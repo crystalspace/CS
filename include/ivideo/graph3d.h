@@ -185,42 +185,62 @@ enum csZBufMode
 /**
  * For NR:
  * Vertex attributes.
- * @@@ Document me better!
  */
 enum csVertexAttrib
 {
-  CS_VATTRIB_0 = 0,
-  CS_VATTRIB_1 = 1,
-  CS_VATTRIB_2 = 2,
-  CS_VATTRIB_3 = 3,
-  CS_VATTRIB_4 = 4,
-  CS_VATTRIB_5 = 5,
-  CS_VATTRIB_6 = 6,
-  CS_VATTRIB_7 = 7,
-  CS_VATTRIB_8 = 8,
-  CS_VATTRIB_9 = 9,
+  //@{
+  /**
+   * General vertex attribute
+   */
+  CS_VATTRIB_0	= 0,
+  CS_VATTRIB_1	= 1,
+  CS_VATTRIB_2	= 2,
+  CS_VATTRIB_3	= 3,
+  CS_VATTRIB_4	= 4,
+  CS_VATTRIB_5	= 5,
+  CS_VATTRIB_6	= 6,
+  CS_VATTRIB_7	= 7,
+  CS_VATTRIB_8	= 8,
+  CS_VATTRIB_9	= 9,
   CS_VATTRIB_10 = 10,
   CS_VATTRIB_11 = 11,
   CS_VATTRIB_12 = 12,
   CS_VATTRIB_13 = 13,
   CS_VATTRIB_14 = 14,
   CS_VATTRIB_15 = 15,
-  CS_VATTRIB_POSITION = CS_VATTRIB_SPECIFIC_FIRST + 0,
-  CS_VATTRIB_WEIGHT = CS_VATTRIB_SPECIFIC_FIRST + 1,
-  CS_VATTRIB_NORMAL = CS_VATTRIB_SPECIFIC_FIRST + 2,
-  CS_VATTRIB_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 3,
-  CS_VATTRIB_PRIMARY_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 3,
-  CS_VATTRIB_SECONDARY_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 4,
-  CS_VATTRIB_FOGCOORD = CS_VATTRIB_SPECIFIC_FIRST + 5,
-  CS_VATTRIB_TEXCOORD = CS_VATTRIB_SPECIFIC_FIRST + 8,
-  CS_VATTRIB_TEXCOORD0 = CS_VATTRIB_SPECIFIC_FIRST + 8,
-  CS_VATTRIB_TEXCOORD1 = CS_VATTRIB_SPECIFIC_FIRST + 9,
-  CS_VATTRIB_TEXCOORD2 = CS_VATTRIB_SPECIFIC_FIRST + 10,
-  CS_VATTRIB_TEXCOORD3 = CS_VATTRIB_SPECIFIC_FIRST + 11,
-  CS_VATTRIB_TEXCOORD4 = CS_VATTRIB_SPECIFIC_FIRST + 12,
-  CS_VATTRIB_TEXCOORD5 = CS_VATTRIB_SPECIFIC_FIRST + 13,
-  CS_VATTRIB_TEXCOORD6 = CS_VATTRIB_SPECIFIC_FIRST + 14,
-  CS_VATTRIB_TEXCOORD7 = CS_VATTRIB_SPECIFIC_FIRST + 15,
+  //@}
+  /// Position vertex attribute
+  CS_VATTRIB_POSITION	      = CS_VATTRIB_SPECIFIC_FIRST + 0,
+  /// Vertex weight attribute
+  CS_VATTRIB_WEIGHT	      = CS_VATTRIB_SPECIFIC_FIRST + 1,
+  /// Normal attribute
+  CS_VATTRIB_NORMAL	      = CS_VATTRIB_SPECIFIC_FIRST + 2,
+  /// Primary color attribute
+  CS_VATTRIB_COLOR	      = CS_VATTRIB_SPECIFIC_FIRST + 3,
+  /// Primary color attribute
+  CS_VATTRIB_PRIMARY_COLOR    = CS_VATTRIB_SPECIFIC_FIRST + 3,
+  /// Secondary color attribute
+  CS_VATTRIB_SECONDARY_COLOR  = CS_VATTRIB_SPECIFIC_FIRST + 4,
+  /// Fog coordinate attribute
+  CS_VATTRIB_FOGCOORD	      = CS_VATTRIB_SPECIFIC_FIRST + 5,
+  /// TU 0 texture coordinates
+  CS_VATTRIB_TEXCOORD	      = CS_VATTRIB_SPECIFIC_FIRST + 8,
+  /// TU 0 texture coordinates
+  CS_VATTRIB_TEXCOORD0	      = CS_VATTRIB_SPECIFIC_FIRST + 8,
+  /// TU 1 texture coordinates
+  CS_VATTRIB_TEXCOORD1	      = CS_VATTRIB_SPECIFIC_FIRST + 9,
+  /// TU 2 texture coordinates
+  CS_VATTRIB_TEXCOORD2	      = CS_VATTRIB_SPECIFIC_FIRST + 10,
+  /// TU 3 texture coordinates
+  CS_VATTRIB_TEXCOORD3	      = CS_VATTRIB_SPECIFIC_FIRST + 11,
+  /// TU 4 texture coordinates
+  CS_VATTRIB_TEXCOORD4	      = CS_VATTRIB_SPECIFIC_FIRST + 12,
+  /// TU 5 texture coordinates
+  CS_VATTRIB_TEXCOORD5	      = CS_VATTRIB_SPECIFIC_FIRST + 13,
+  /// TU 6 texture coordinates
+  CS_VATTRIB_TEXCOORD6	      = CS_VATTRIB_SPECIFIC_FIRST + 14,
+  /// TU 7 texture coordinates
+  CS_VATTRIB_TEXCOORD7	      = CS_VATTRIB_SPECIFIC_FIRST + 15,
 };
 
 /// 
@@ -701,7 +721,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 2, 2);
+SCF_VERSION (iGraphics3D, 5, 3, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -1017,7 +1037,8 @@ struct iGraphics3D : public iBase
    * Basically this represents a stacked layer of portals. Each subsequent
    * portal must be fully contained in the previous ones.
    */
-  virtual void OpenPortal (G3DPolygonDFP* poly) = 0;
+  virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
+    const csPlane3& normal) = 0;
 
   /**
    * Close a portal previously opened with OpenPortal().

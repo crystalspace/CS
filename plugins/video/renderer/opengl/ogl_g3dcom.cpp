@@ -5551,13 +5551,15 @@ void csGraphics3DOGLCommon::CloseFogObject (CS_ID)
   // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOGLCommon::OpenPortal (G3DPolygonDFP* poly)
+void csGraphics3DOGLCommon::OpenPortal (size_t numVertices, 
+					const csVector2* vertices,
+					const csPlane3& normal)
 {
   csClipPortal* cp = new csClipPortal ();
-  cp->poly = new csVector2[poly->num];
-  memcpy (cp->poly, poly->vertices, poly->num * sizeof (csVector2));
-  cp->num_poly = poly->num;
-  cp->normal = poly->normal;
+  cp->poly = new csVector2[numVertices];
+  memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
+  cp->num_poly = numVertices;
+  cp->normal = normal;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;
 }

@@ -858,19 +858,10 @@ void csPortalContainer::DrawOnePortal (
   // First call OpenPortal() if needed.
   bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
   
-#ifdef CS_USE_NEW_RENDERER
-  if (use_float_portal)
-    return;
-#endif
-
   if (use_float_portal)
   {
-    static G3DPolygonDFP g3dpoly;
-    g3dpoly.num = poly.GetVertexCount ();
-    memcpy (g3dpoly.vertices, poly.GetVertices (),
-    	g3dpoly.num * sizeof (csVector2));
-    g3dpoly.normal = camera_plane;
-    g3d->OpenPortal (&g3dpoly);
+    g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
+      camera_plane);
   }
 
   // Draw through the portal. If this fails we draw the original polygon
@@ -896,11 +887,9 @@ void csPortalContainer::DrawOnePortal (
 #endif
   }
 
-#ifndef CS_USE_NEW_RENDERER
   // Make sure to close the portal again.
   if (use_float_portal)
     g3d->ClosePortal ();
-#endif
 }
 
 //------------------- For iShadowReceiver ----------------------------//
