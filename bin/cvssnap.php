@@ -15,8 +15,8 @@
 //
 //     Options FollowSymLinks
 //     RewriteEngine on
-//     RewriteRule "^cvs-snapshots(/)?$" "cvssnap.php?$1" [L]
-//     RewriteRule "^cvs-snapshots/(.+)$" "cvssnap.php?$1" [L]
+//     RewriteRule "^cvs-snapshots(/)?$" "/cvssnap.php?$1" [L]
+//     RewriteRule "^cvs-snapshots/(.+)$" "/cvssnap.php?$1" [L]
 //
 // This sample .htaccess file specifies a pseudo-directory named
 // "cvs-snapshots" and invokes this script (cvssnap.php) with various input
@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'cvssnap.php';
-$prog_version = '1.1';
+$prog_version = '1.2';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 $copyright = "Copyright &copy; 2000 by $author_name " .
