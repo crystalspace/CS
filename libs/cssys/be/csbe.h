@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,83 +27,35 @@
 #include "cssys/common/system.h"
 #include "cssys/be/beitf.h"
 #include "igraph2d.h"
+class CrystApp;
 
-/// BeLIB version.
+class SysKeyboardDriver : public csKeyboardDriver {};
+class SysMouseDriver : public csMouseDriver {};
+
 class SysSystemDriver : public csSystemDriver
 {
-  /// Use system cursor if true; otherwise use builtin CSWS software cursors
-  bool HardwareCursor;
-  /// Use shared-memory extension? (ONLY FOR X2D DRIVER)
-  bool UseSHM;
-  /// Simulated depth (ONLY FOR X2D DRIVER)
-  int SimDepth;
-  /// The main loop callback
-  LoopCallback Callback;
-  /// The loop callback parameter
-  void *CallbackParam;
-  
+protected:
+  bool running;
+  CrystApp* app;
+  void ProcessUserEvent(BMessage*);
+  bool SetMouseCursor(int shape);
 public:
-  SysSystemDriver ();
+  SysSystemDriver();
 
-  /// Check for system-specific INI entries
-  void SetSystemDefaults ();
   // Main event loop
-  virtual void Loop ();
-  // Parse an unknown argument on command-line
-  virtual bool ParseArg (int argc, char* argv [], int& i);
-  // Display system-specific help
-  virtual void Help ();
-
+  virtual void Loop();
   long LoopThread();
 
   /// Implementation of IBeLibSystemDriver
   class XBeLibSystemDriver : public IBeLibSystemDriver
   {
     DECLARE_IUNKNOWN()
-    /// Get user settings
-    STDMETHOD (GetSettings) (int &SimDepth, bool &UseSHM, bool &HardwareCursor);
-    /// Get Unix-specific keyboard event handler routine
-    STDMETHOD (GetKeyboardHandler) (BeKeyboardHandler &Handler, void *&Parm);
-    /// Get Unix-specific mouse event handler routine
-    STDMETHOD (GetMouseHandler) (BeMouseHandler &Handler, void *&Parm);
-    /// Get Unix-specific focus change event handler routine
-    STDMETHOD (GetFocusHandler) (BeFocusHandler &Handler, void *&Parm);
-    /// Set a callback that gets called from inside the main event loop
-    STDMETHOD (SetLoopCallback) (LoopCallback Callback, void *Param);
+    STDMETHOD(ProcessUserEvent)(BMessage*);
+    STDMETHOD(SetMouseCursor)(int shape, ITextureHandle*);
   };
-  // COM stuff
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (SysSystemDriver)
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (BeLibSystemDriver);
-  
-private:
-  /// Called when CrystalSpace window changes its "focused" state
-  static void SysFocusChange (void *Self, int Enable);
-};
-
-/// BeLIB version.
-class SysKeyboardDriver : public csKeyboardDriver
-{
-//  friend class csSystemDriver;
-public:
-  SysKeyboardDriver();
-
-  static void Handler (void *param, int Key, bool Down);
-//  virtual bool Open (csEventQueue *EvQueue);
-//  virtual void Close ();
-};
-
-/// BeLIB version.
-class SysMouseDriver : public csMouseDriver
-{
-//  friend class csSystemDriver;
-public:
-  SysMouseDriver ();
-
-  static void Handler (void *param, int Button, int Down, int x, int y,
-    int ShiftFlags);
-//  virtual bool Open (csEventQueue *EvQueue);
-//  virtual void Close ();
+  DECLARE_IUNKNOWN()
+  DECLARE_INTERFACE_TABLE(SysSystemDriver)
+  DECLARE_COMPOSITE_INTERFACE_EMBEDDED(BeLibSystemDriver);
 };
 
 #endif // CSBE_H

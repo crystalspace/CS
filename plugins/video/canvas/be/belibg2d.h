@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,79 +21,74 @@
 #ifndef BELIBG2D_H
 #define BELIBG2D_H
 
+#include "GraphicsDefs.h"
+#include "Rect.h"
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
 #include "cs2d/be/besysg2d.h"
-#include "cs2d/be/CrystWindow.h"
+#include "cssys/be/beitf.h"
+class CrystView;
+class CrystWindow;
 
-// The CLSID to create csGraphics2DBELib instances
 extern const CLSID CLSID_BeLibGraphics2D;
 
-///
 class csGraphics2DBeLibFactory : public IGraphics2DFactory
 {
 public:
   DECLARE_IUNKNOWN()
   DECLARE_INTERFACE_TABLE(csGraphics2DBeLibFactory)
-
-  STDMETHOD(CreateInstance)(REFIID riid, ISystem* piSystem, void** ppv);
+  STDMETHOD(CreateInstance)(REFIID riid, ISystem*, void** ppv);
   STDMETHOD(LockServer)(COMBOOL bLock);
 };
 
-///
-
-/// BELib version.
+/// Be 2D Graphics Driver
 class csGraphics2DBeLib : public csGraphics2D
 {
-  friend class csGraphics3DSoftware;
-  friend class CrystWindow;
-private:
-  CrystView*	dpy;
-  int 			display_width, display_height;//actual screen dimensions, as opposed to window dimensions
-  CrystWindow	*window;
-//  BBitmap		*cryst_bitmap;	// this points to the BBitmap used by CrystWindow in non-direct framebuffer mode.
-  								// this is the single buffer version.
-  color_space	curr_color_space;
+protected:
+  ISystem* cs_system;
+  IBeLibSystemDriver* be_system;
+  CrystView* dpy;
+  CrystWindow* window;
+  color_space curr_color_space;
+  BRect screen_frame;
   
   // double buffer implementation
-#define			NO_OF_BUFFERS 2
-  BBitmap		*cryst_bitmap[NO_OF_BUFFERS];
-  int			curr_page;
+#define BUFFER_COUNT 2
+  BBitmap* cryst_bitmap[BUFFER_COUNT];
+  int curr_page;
+  bool double_buffered;
   
   // stuff to implement BDirectWindow  
+#if 0
 protected:
-  BLocker		*locker;
-  bool			fDirty;
-  bool			fConnected;
-  bool			fConnectionDisabled;
-  bool			fDrawingThreadSuspended;
-		
-
-// Everything for simulated depth
-  int depth;
-  csPixelFormat real_pfmt;	// Contains the real pfmt is simulating stuff
-  unsigned char* real_Memory;	// Real memory to the display
+  BLocker* locker;
+  bool fDirty;
+  bool fConnected;
+  bool fConnectionDisabled;
+  bool fDrawingThreadSuspended;
+#endif		
 
 public:
-  csGraphics2DBeLib(ISystem* piSystem, bool bUses3D);
-  virtual ~csGraphics2DBeLib(void);
+  csGraphics2DBeLib(ISystem*);
+  virtual ~csGraphics2DBeLib();
 
-  virtual bool Open (char *Title);
   virtual void Initialize ();
+  virtual bool Open (char* title);
   virtual void Close ();
 
-  virtual bool BeginDraw () /*{ return (Memory != NULL); }*/;
+  virtual bool BeginDraw ();
+  virtual void Print (csRect* area = NULL);
   virtual void FinishDraw ();
 
-  virtual void Print (csRect *area = NULL);
+  virtual bool DoubleBuffer (bool Enable);
+  virtual bool DoubleBuffer ();
   virtual int  GetPage ();
-  virtual void SetRGB (int i, int r, int g, int b);
-  virtual void ApplyDepthInfo(color_space this_color_space);
+  virtual bool SetMouseCursor (int shape, ITextureHandle*);
+  virtual void ApplyDepthInfo(color_space);
 
 protected:
   DECLARE_IUNKNOWN()
   DECLARE_INTERFACE_TABLE(csGraphics2DBeLib)
-
   DECLARE_COMPOSITE_INTERFACE(XBeLibGraphicsInfo)
 };
 

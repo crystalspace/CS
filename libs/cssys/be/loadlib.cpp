@@ -33,7 +33,6 @@ CS_HLIBRARY SysLoadLibrary (char* szLibName)
   image_id Handle = load_add_on (szLibName);
   if (Handle > 0)
   {
-//  printf("add on loaded with id=%lx\n",Handle);
     HRESULT (*DllInitialize) ();
     if (get_image_symbol (Handle, "DllInitialize", B_SYMBOL_TYPE_TEXT, (void**)&DllInitialize) != B_OK)
     {

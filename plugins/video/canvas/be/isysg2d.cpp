@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+	Written by Xavier Planet.
+	Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -43,6 +45,8 @@ STDMETHODIMP IXBeLibGraphicsInfo::GetWindow (BWindow ** cryst_window)
 
 STDMETHODIMP IXBeLibGraphicsInfo::DirectConnect (direct_buffer_info *info)
 {
+// FIXME: Re-implement/re-enable DirectWindow mode.
+#if 0
     METHOD_PROLOGUE( csGraphics2DBeLib, XBeLibGraphicsInfo);
 
 	if (!pThis->fConnected && pThis->fConnectionDisabled) {
@@ -100,5 +104,6 @@ STDMETHODIMP IXBeLibGraphicsInfo::DirectConnect (direct_buffer_info *info)
 	
 	pThis->locker->Unlock();
 //    printf("leaving IXBeLibGraphicsInfo::DirectConnected \n");
+#endif
     return S_OK;
 }

@@ -1,77 +1,72 @@
 /*
-	
-	CrystWindow.h
-	
-	by Pierre Raynaud-Richard.
-	
-	Copyright 1998 Be Incorporated, All Rights Reserved.
-	
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef CRYST_WINDOW_H
 #define CRYST_WINDOW_H
 
-#ifndef _APPLICATION_H
 #include <Application.h>
-#endif
-
-#ifndef _WINDOW_H
 #include <Window.h>
-#endif
-#ifndef _VIEW_H
 #include <View.h>
-#endif
-#ifndef _BITMAP_H
 #include <Bitmap.h>
-#endif
-//#include <WindowScreen.h>
 #include <DirectWindow.h>
-
-//#include <OS.h>
-
+class ISystem;
+class csGraphics2DBeLib;
+class IBeLibSystemDriver;
 
 class CrystView : public BView {
 
 public:
-		// standard constructor and destrcutor
-				CrystView(BRect frame); 
-virtual			~CrystView();
+		CrystView(BRect frame, IBeLibSystemDriver*); 
+virtual	~CrystView();
 
-		// standard window member
-//virtual	void	MessageReceived(BMessage *message);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
-    virtual void KeyUp(const char *bytes, int32 numBytes);
-   	virtual void MouseDown(BPoint point);
-  	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
+virtual void KeyDown(char const* bytes, int32 numBytes);
+virtual void KeyUp(char const* bytes, int32 numBytes);
+virtual void MouseDown(BPoint);
+virtual void MouseUp(BPoint);
+virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
 
-   	bool IsInMotion(void);
-
-	int 	inmotion;
-	BPoint 	lastloc;
+protected:
+		IBeLibSystemDriver* be_system;
+		void ProcessUserEvent() const;
 };
-class csGraphics2DBeLib;
 
 class CrystWindow : public BDirectWindow { // BWindowScreen {
 
 public:
-		// standard constructor and destructor
-				CrystWindow(BRect frame, const char *name, CrystView *v, csGraphics2DBeLib *piBeG2D); 
-virtual			~CrystWindow();
+		CrystWindow(BRect, char const*, CrystView*,
+			csGraphics2DBeLib*, ISystem*, IBeLibSystemDriver*);
+virtual	~CrystWindow();
 
-		// standard window member
-virtual	bool	QuitRequested();
-virtual	void	MessageReceived(BMessage *message);
+virtual	bool QuitRequested();
+virtual	void MessageReceived(BMessage*);
 
-virtual void	DirectConnected(direct_buffer_info *info);
+virtual void DirectConnected(direct_buffer_info*);
 
-		CrystView		*view;
-		//	stuff to implement BDirectWindow
-		IBeLibGraphicsInfo	*piG2D;// new pointer to 2D driver info method interface.
-		csGraphics2DBeLib	*pi_BeG2D;//local copy of this pointer to csGraphics2DBeLib.
-		
-		// the drawing thread function.
-static	long	StarAnimation(void *data);
+protected:
+		CrystView* view;
+		ISystem* cs_system;
+		IBeLibSystemDriver* be_system;
+		// Stuff to implement BDirectWindow
+		// FIXME: Why keep pi_BeG2D when piG2D is around?
+		IBeLibGraphicsInfo* piG2D;   // New pointer to 2D driver info method interface.
+		csGraphics2DBeLib* pi_BeG2D; // Local copy of this pointer to csGraphics2DBeLib.
 };
 
-
-#endif
+#endif CRYST_WINDOW_H

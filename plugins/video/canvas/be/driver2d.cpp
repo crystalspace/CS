@@ -22,8 +22,6 @@
 #include "cscom/com.h"
 #include "cs2d/be/belibg2d.h"
 
-// This is the name of the DLL. Make sure to change this if you change the DLL name!
-// DAN: this might have to be changed for each OS, cuz each OS has a different extension for DLLs.
 #define DLL_NAME "be2d.so"
 
 static unsigned int gRefCount = 0;
@@ -57,12 +55,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease(void)
+void STDAPICALLTYPE ModuleRelease()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef(void)
+void STDAPICALLTYPE ModuleAddRef()
 {
   gRefCount++;
 }   
@@ -99,7 +97,7 @@ STDAPI DllUnregisterServer()
 
 #endif
 
-// Implementation of the csGraphics2DBeLib factory... ///////////
+// Implementation of the csGraphics2DBeLib factory.
 
 IMPLEMENT_UNKNOWN_NODELETE( csGraphics2DBeLibFactory )
 
@@ -115,7 +113,7 @@ STDMETHODIMP csGraphics2DBeLibFactory::CreateInstance(REFIID riid, ISystem* piSy
 		return E_INVALIDARG;
 	}
 
-	CHK (csGraphics2DBeLib* pNew = new csGraphics2DBeLib(piSystem, false));
+	CHK (csGraphics2DBeLib* pNew = new csGraphics2DBeLib(piSystem));
 	if (!pNew)
 	{
 		*ppv = 0;

@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,28 +22,15 @@
 #define __IBEOS_H__
 
 #include "cscom/com.h"
-
+class BMessage;
+class ITextureHandle;
 
 extern const IID IID_IBeLibSystemDriver;
 
-typedef void (*BeKeyboardHandler) (void *param, int Key, bool Down);
-typedef void (*BeMouseHandler) (void *param, int Button, int Down,
-  int x, int y, int ShiftFlags);
-typedef void (*BeFocusHandler) (void *param, int Enable);
-typedef void (*LoopCallback) (void *param);
-
 interface IBeLibSystemDriver : public IUnknown
 {
-  /// Get user settings
-  STDMETHOD (GetSettings) (int &SimDepth, bool &UseSHM, bool &HardwareCursor) PURE;
-  /// Get Unix-specific keyboard event handler routine
-  STDMETHOD (GetKeyboardHandler) (BeKeyboardHandler &Handler, void *&Parm) PURE;
-  /// Get Unix-specific mouse event handler routine
-  STDMETHOD (GetMouseHandler) (BeMouseHandler &Handler, void *&Parm) PURE;
-  /// Get Unix-specific focus change event handler routine
-  STDMETHOD (GetFocusHandler) (BeFocusHandler &Handler, void *&Parm) PURE;
-  /// Set a callback that gets called from inside the main event loop
-  STDMETHOD (SetLoopCallback) (LoopCallback Callback, void *Param) PURE;
+  STDMETHOD (ProcessUserEvent) (BMessage*) PURE;
+  STDMETHOD (SetMouseCursor) (int shape, ITextureHandle*) PURE;
 };
 
 #endif // __IBE_H__

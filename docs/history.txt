@@ -13,6 +13,63 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Aug-1999
+	- Eric Sunshine performed a major overhaul and re-engineering of the
+	  BeOS port of Crystal Space.  The port is now about 95% usable
+	  versus 25% prior to this effort.  In addition, numerous bugs were
+	  eradicated and the source code has been cleaned up considerably
+	  (though it still needs more work).  His changes include:
+	    - MazeD is now fully functional.  Previously the user could not
+	      even interact with it at any level.
+	    - WalkTest is now fully functional.  Previously about 65% of the
+	      key bindings were inaccessible.
+	    - Completely re-engineered the mouse handling code so that all
+	      aspects of the mouse mechanism are now correctly implemented.
+	      Previously only mouse-down was implemented properly, which was
+	      not very useful.
+	    - Completely re-engineered the keyboard handling code so that all
+	      aspects of the keyboard mechanism are now correctly implemented.
+	      The modifier keys (shift, alternate, control) are now fully
+	      implemented.  Previously they were not implemented at all.
+	      Fixed a problem with the handling of control-keys.  The old
+	      code was not translating them into a form suitable for CS.
+	    - Re-engineered SysSystemDriver::Loop() so that it correctly
+	      handles the case where it is called recursively.  This case
+	      arises when CSWS launches a modal panel.  In the old code, the
+	      recursive case was 100% broken.
+	    - Fixed the 2D driver so that it completely implements the
+	      double-buffering protocol rather than only partially
+	      implementing it.  This fixes severe display anomalies in MazeD
+	      and CSWS.
+	    - Implemented csGraphics2D::SetMouseCursor() so that the mouse
+	      pointer is displayed properly in MazeD and CSWS.
+	    - The Be application now terminates when Crystal Space requests
+	      a shutdown (for instance, when "q" is pressed in WalkTest).
+	      Previously it would go into a semi-comatose state where it
+	      would only shut down when the user explicitly closed the
+	      window.
+	    - The rendering window is now closed when the application
+	      terminates.  Previously it would hang out for a few seconds
+	      after termination since the connection to the display server
+	      was not being correctly severed.
+	    - Crystal Space is now given a chance to shut down cleanly when
+	      the user closes the window or terminates the application via
+	      BeOS events (such as cmd-q or cmd-w or closing the window via
+	      the mouse).  Previously these type of events forcibly
+	      terminated the application without giving Crystal Space a
+	      chance to clean up after itself.
+	    - The application no longer crashes at termination time when
+	      using the OpenGL driver.
+	    - Removed a significant amount of unused and dysfunctional code
+	      which was copied over from the X-windows port when Xavier
+	      first created the BeOS port.
+	    - The display window is now centered on the desktop at launch
+	      time rather than appearing in the upper-left corner.
+	    - Updated the BeOS port documentation to reflect these changes.
+	- Eric Sunshine fixed a bug in the common OpenGL makefile where the
+	  "clean" target was trying to delete the X-windows OpenGL driver
+	  even on non-X platforms.
+	- Eric Sunshine removed some obnoxious debugging output from MazeD.
 20-Aug-1999
 	- Eric Sunshine fixed a new compilation warning about an uninitialized
 	  variable in WalkTest.

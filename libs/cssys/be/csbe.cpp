@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,19 +22,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
-#include <Beep.h>
 #include <sys/param.h>
+#include <Application.h>
+#include <Beep.h>
 
 #include "sysdef.h"
 #include "cssys/common/system.h"
 #include "csbe.h"
 #include "csutil/inifile.h"
-//#include "cs3d/software/graph3d.h"	//@@@VERY DOUBTFUL! This should not be needed!!!
 
-#include "cs2d/be/isysg2d.h"		//@@@WHY?
-#include "cs2d/be/CrystWindow.h"	//@@@WHY?
-static bool LoopStarted = false;// For Print() to know whenever to flush output
-#define Gfx2D System->piG2D			//	put in by DH
+#define CSBE_MOUSE_BUTTON_COUNT 3
 
 // The System driver ////////////////
 
@@ -42,77 +41,56 @@ BEGIN_INTERFACE_TABLE(SysSystemDriver)
 END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(SysSystemDriver)
+IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(SysSystemDriver, BeLibSystemDriver)
 
-/*
- * Signal handler to clean up and give some
- * final debugging information.
- */
-extern void debug_dump ();
-extern void cleanup ();
-
-/* not too much to be said... */
-class CrystApp : public BApplication {
+class CrystApp : public BApplication
+{
 public:
-	CrystApp(SysSystemDriver *from) : BApplication("application/x-vnd.xsware-crystal") {
-		driver = from;
-		mspf = 100 * 1000;
-		time = system_time();//dhdebug
-	};
-	void Pulse(void);
+	CrystApp(ISystem*);
+	~CrystApp();
 	bool QuitRequested();
-	void CrystApp::MessageReceived(BMessage *message);
+	void MessageReceived(BMessage*);
+	void HideMouse();
+	void ShowMouse();
+	bool SetMouse(int shape);
+	void checkMouseMoved();
 
-	void doMouseAction(BPoint point, int16 button, bool shift, bool alt, bool ctrl);
-	void doKeyAction(int key, bool down, bool shift, bool alt, bool ctrl);
-	bigtime_t mspf;
-	bigtime_t time;//dhdebug
 private:
-	
-	SysSystemDriver	*driver;
-	BWindow			*aWindow;
-	bigtime_t		milisecpf;
+	ISystem* driver;
+	bool shift_down;
+	bool alt_down;
+	bool ctrl_down;
+	bool button_state[CSBE_MOUSE_BUTTON_COUNT];
+	bool real_mouse;
+	bool mouse_moved;
+	BPoint mouse_point;
+
+	void doMouseMotion(BMessage*);
+	void doMouseAction(BMessage*);
+	void doKeyAction(BMessage*);
+	void queueMouseEvent(int button, bool down, BPoint);
+	void checkButton(int button, int32 buttons, int32 mask, BPoint);
+	void checkButtons(BMessage*);
+	void checkModifiers(BMessage*);
+	void checkModifier(long flags, long mask, int tag, bool& state) const;
+	int classifyFunctionKey(BMessage*) const;
+	int classifyAsciiKey(int) const;
 };
 
-void handler (int sig)
+CrystApp::CrystApp(ISystem* isys) :
+	BApplication("application/x-vnd.xsware-crystal"),
+	driver(isys), shift_down(false), alt_down(false), ctrl_down(false),
+	real_mouse(true), mouse_moved(false), mouse_point(0,0)
 {
-  static bool in_exit = false;
-  if (in_exit)
-    exit (1);
-  in_exit = true;
+	driver->AddRef();
+	for (int i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
+		button_state[i] = false;
+};
 
-  if (sig == SIGINT)
-    fprintf (stderr, "\n^C\n");
-  else
-    fprintf (stderr, "SIGNAL %d CAUGHT!!!\n", sig);
-
-  int err;
-  err = errno;
-  printf ("error %d: [%s]\n", err, strerror (err));
-
-  if (sig != SIGINT)
-    debug_dump ();
-
-  cleanup ();
-  exit (1);
-} 
-
-void init_sig ()
+CrystApp::~CrystApp()
 {
-  signal (SIGHUP, handler);
-  signal (SIGINT, handler);
-//  signal (SIGTRAP, handler);
-  signal (SIGABRT, handler);
-  signal (SIGALRM, handler);
-  signal (SIGTERM, handler);
-  signal (SIGPIPE, handler);
-  signal (SIGSEGV, handler);
-  signal (SIGBUS, handler);
-  signal (SIGFPE, handler);
-  signal (SIGILL, handler);
+	driver->Release();
 }
-
-static CrystApp *app = NULL;
-static bool firstRun;
 
 bool CrystApp::QuitRequested()
 {
@@ -121,421 +99,299 @@ bool CrystApp::QuitRequested()
 	printf("CrystApp::QuitRequested() entered. \n");
 	
 	// shutdown rendering thread first.
-	driver->Shutdown = true;
+	driver->Shutdown();
 	snooze(200000);
-	err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);//put in because I have moved drawing into that thread.
+	// put in because I have moved drawing into that thread.
+	err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);
 	
 	printf("LoopThread blown away. err code is %lx \n", err_code);
-	return(TRUE);
+	return true;
 }
 
-void CrystApp::Pulse() {
-//	bigtime_t		time;
+void CrystApp::HideMouse()
+{
+	if (!IsCursorHidden())
+		HideCursor();
+}
 
-//	time = system_time()+milisecpf;
-//PostMessage('next');
-//    driver->NextFrame();
-//	time -= system_time();
-#if 0
-	if( time < 0) {
-		SetPulseRate(1000000/reqfps);
+void CrystApp::ShowMouse()
+{
+	if (IsCursorHidden())
+		ShowCursor();
+}
+
+bool CrystApp::SetMouse(int shape)
+{
+	real_mouse = false;
+	if (shape == csmcArrow) {
+		SetCursor(B_HAND_CURSOR);
+		real_mouse = true;
 	}
-    if(g2d->win->Lock()){
-    	if(g2d->view->IsInMotion())
-    		Mouse->do_mousemotion (SysGetTime (), g2d->view->lastloc.x, g2d->view->lastloc.y);
-    	g2d->win->Unlock();
-    }
-#endif
+
+	if (real_mouse)
+		ShowMouse();
+	else
+		HideMouse();
+
+	return real_mouse;
 }
 
-void CrystApp::MessageReceived(BMessage *msg)
+void CrystApp::MessageReceived(BMessage* m)
 {	
-//	bigtime_t	time = system_time();
-//	bigtime_t pre_draw_microsecs, post_draw_microsecs;//dhdebug
-//	static long prev_frame_time = csSystemDriver::Time();//dhdebug
-//	long curr_time;//dhdebug
-//	printf("got something %4s\n",&msg->what);
-	switch(msg->what) {
-	// Switch between full-screen mode and windowed mode.
-/*	case 'next' :
-		{
-//		driver->NextFrame(system_time () - time, system_time ());
-		pre_draw_microsecs = system_time();
-		curr_time = pre_draw_microsecs / 1000;
-		driver->NextFrame(curr_time - prev_frame_time, curr_time);//dhdebug
-		post_draw_microsecs = system_time();
-		printf("curr_time, prev_frame_time: %u  %u \n", curr_time, prev_frame_time);//dhdebug
-//		time = system_time() - time;
-		prev_frame_time = curr_time;//dhdebug
-//		mspf = time;
-		mspf = post_draw_microsecs - pre_draw_microsecs;//dhdebug
-		BMessageQueue *queu = MessageQueue();
-		printf("queue size is %d \n", queu->CountMessages());
-		BMessage *mmsg = NULL;
-		int32 i,nxt = 'next';
-		i=0;
-		while((mmsg = queu->FindMessage(nxt, 1))){
-			queu->RemoveMessage(mmsg);
-			printf("removed a next message");
-			i++;
-		}
-//			printf("%4d was queed\n",i);
-		}
-		break;*/
-	case 'keys' :
-		doKeyAction(msg->FindInt16("key"), msg->FindBool("down"),
-			msg->FindBool("shift"),msg->FindBool("alt"),msg->FindBool("ctrl"));
-		break;
-	case 'mous' :
-		doMouseAction(msg->FindPoint("loc"),msg->FindInt16("butn"),
-			msg->FindBool("shift"),msg->FindBool("alt"),msg->FindBool("ctrl"));
-		break;
-	default :
-		BApplication::MessageReceived(msg);
-		break;
+	switch(m->what) {
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+			doKeyAction(m);
+			break;
+		case B_MOUSE_DOWN:
+		case B_MOUSE_UP:
+			doMouseAction(m);
+			break;
+		case B_MOUSE_MOVED:
+			doMouseMotion(m);
+			break;
+		default:
+			BApplication::MessageReceived(m);
+			break;
 	}
 }
 
-void CrystApp::doMouseAction(BPoint point, int16 button, bool shift, bool alt, bool ctrl) 
+void CrystApp::queueMouseEvent(int button, bool down, BPoint where)
 {
-//  		Mouse->do_mousemotion (g2d->view->lastloc.x, g2d->view->lastloc.y);
-	if(button)
-		driver->Mouse->do_buttonpress (SysGetTime (), button, point.x, point.y, shift, alt, ctrl);
-	else
-		driver->Mouse->do_buttonrelease (SysGetTime (), button, point.x, point.y);
-}
-
-void CrystApp::doKeyAction(int key, bool down, bool shift, bool alt, bool ctrl)
-{
-	switch (key) {
-//		case B_Alt_L:
-//		case B_Alt_R:      key = CSKEY_ALT; break;
-//		case B_Control_L:
-//		case B_Control_R:  key = CSKEY_CTRL; break;
-//		case B_Shift_L:
-//		case B_Shift_R:    key = CSKEY_SHIFT; break;
-		case B_UP_ARROW:         	key = CSKEY_UP; break;
-		case B_DOWN_ARROW:       	key = CSKEY_DOWN; break;
-		case B_LEFT_ARROW:       	key = CSKEY_LEFT; break;
-	    case B_RIGHT_ARROW:      	key = CSKEY_RIGHT; break;
-	    case B_BACKSPACE:  			key = CSKEY_BACKSPACE; break;
-	    case B_INSERT:     			key = CSKEY_INS; break;
-	    case B_DELETE:     			key = CSKEY_DEL; break;
-	    case B_PAGE_UP:    			key = CSKEY_PGUP; break;
-	    case B_PAGE_DOWN:  			key = CSKEY_PGDN; break;
-	    case B_HOME:       			key = CSKEY_HOME; break;
-	    case B_END:        			key = CSKEY_END; break;
-	    case B_ESCAPE:     			key = CSKEY_ESC; break;
-	    case B_TAB:        			key = CSKEY_TAB; break;
-	    case B_RETURN:     			key = CSKEY_ENTER; break;
-//	    case B_F1_KEY:				key = CSKEY_F1; break;
-//	    case B_F2_KEY:				key = CSKEY_F2; break;
-//	    case B_F3_KEY:				key = CSKEY_F3; break;
-//	    case B_F4_KEY:				key = CSKEY_F4; break;
-//	    case B_F5_KEY:				key = CSKEY_F5; break;
-//	    case B_F6_KEY:				key = CSKEY_F6; break;
-//	    case B_F7_KEY:				key = CSKEY_F7; break;
-//	    case B_F8_KEY:				key = CSKEY_F8; break;
-//	    case B_F9_KEY:				key = CSKEY_F9; break;
-//	    case B_F10_KEY:				key = CSKEY_F10; break;
-//	    case B_F11_KEY:				key = CSKEY_F11; break;
-//	    case B_F12_KEY:				key = CSKEY_F12; break;
-        default:            		break;
+	if (where.x >= 0 && where.y >= 0) {
+		driver->QueueMouseEvent(button, down, where.x, where.y,
+			(shift_down ? CSMASK_SHIFT : 0) |
+			(alt_down   ? CSMASK_ALT   : 0) |
+			(ctrl_down  ? CSMASK_CTRL  : 0));
 	}
-	if (down)
-		driver->Keyboard->do_keypress (SysGetTime (), key); //, shift, alt, ctrl);
-	else
-		driver->Keyboard->do_keyrelease (SysGetTime (), key);
 }
 
+void CrystApp::checkMouseMoved() {
+	if (mouse_moved) {
+		queueMouseEvent(0, false, mouse_point);
+		mouse_moved = false;
+	}
+}
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver()
+void CrystApp::checkButton(int button, int32 buttons, int32 mask, BPoint where)
 {
-  CHK (app = new CrystApp(this));
-  firstRun = true;
-//  void init_sig ();
-//  init_sig ();
+	if (button < CSBE_MOUSE_BUTTON_COUNT) {
+		bool const state = (buttons & mask) != 0;
+		if (state != button_state[button]) {
+			button_state[button] = state;
+			checkMouseMoved();
+			queueMouseEvent(button + 1, state, where);
+		}
+	}
+}
+
+void CrystApp::checkButtons(BMessage* m)
+{
+	BPoint where;
+	int32 buttons;
+	if (m->FindPoint("where",   &where  ) == B_OK &&
+		m->FindInt32("buttons", &buttons) == B_OK) {
+		checkButton(0, buttons, B_PRIMARY_MOUSE_BUTTON,   where);
+		checkButton(1, buttons, B_SECONDARY_MOUSE_BUTTON, where);
+		checkButton(2, buttons, B_TERTIARY_MOUSE_BUTTON,  where);
+	}
+}
+
+void CrystApp::checkModifier(long flags, long mask, int tag, bool& state) const
+{
+	bool const new_state = (flags & mask) != 0;
+	if (state != new_state) {
+		state = new_state;
+		driver->QueueKeyEvent(tag, state);
+	}
+}
+
+void CrystApp::checkModifiers(BMessage* m)
+{
+	int32 flags;
+	if (m->FindInt32("modifiers", &flags) == B_OK) {
+		checkModifier(flags, B_SHIFT_KEY,   CSKEY_SHIFT, shift_down);
+		checkModifier(flags, B_OPTION_KEY,  CSKEY_ALT,   alt_down  );
+		checkModifier(flags, B_CONTROL_KEY, CSKEY_CTRL,  ctrl_down );
+	}
+}
+
+void CrystApp::doMouseAction(BMessage* m)
+{
+	checkModifiers(m);
+	checkButtons(m);
+}
+
+void CrystApp::doMouseMotion(BMessage* m)
+{
+	checkModifiers(m);
+	int32 transit;
+	if (m->FindInt32("be:transit", &transit) == B_OK) {
+		if (transit == B_EXITED_VIEW)
+			ShowMouse();
+		else if (transit == B_ENTERED_VIEW) {
+			if (!real_mouse)
+				HideMouse();
+		}
+		else {
+			BPoint where;
+			if (m->FindPoint("where", &where) == B_OK && where != mouse_point) {
+				mouse_moved = true;
+				mouse_point = where;
+			}
+		}
+	}
+}
+
+void CrystApp::doKeyAction(BMessage* m)
+{
+	checkModifiers(m);
+
+	char const* bytes;
+	if (m->FindString("bytes", &bytes) == B_OK && strlen(bytes) == 1) {
+		int const c = bytes[0];
+		int key = 0;
+		if (c == B_FUNCTION_KEY)
+			key = classifyFunctionKey(m);
+		else
+			key = classifyAsciiKey(c);
+		driver->QueueKeyEvent(key, m->what == B_KEY_DOWN);
+	}
+}
+
+int CrystApp::classifyFunctionKey(BMessage* m) const
+{
+	int cs_key = 0;
+	int32 be_key;
+	if (m->FindInt32("key", &be_key) == B_OK) {
+		switch (be_key) {
+		    case B_F1_KEY:	cs_key = CSKEY_F1;	break;
+		    case B_F2_KEY:	cs_key = CSKEY_F2;	break;
+		    case B_F3_KEY:	cs_key = CSKEY_F3;	break;
+		    case B_F4_KEY:	cs_key = CSKEY_F4;	break;
+		    case B_F5_KEY:	cs_key = CSKEY_F5;	break;
+		    case B_F6_KEY:	cs_key = CSKEY_F6;	break;
+		    case B_F7_KEY:	cs_key = CSKEY_F7;	break;
+		    case B_F8_KEY:	cs_key = CSKEY_F8;	break;
+		    case B_F9_KEY:	cs_key = CSKEY_F9;	break;
+		    case B_F10_KEY:	cs_key = CSKEY_F10;	break;
+		    case B_F11_KEY:	cs_key = CSKEY_F11;	break;
+		    case B_F12_KEY:	cs_key = CSKEY_F12;	break;
+		}
+	}
+	return cs_key;
+}
+
+// *NOTE* CrystalSpace wants control-keys translated to their lower-case
+// equivalents; that is: 'ctrl-c' --> 'c'.
+int CrystApp::classifyAsciiKey(int c) const
+{
+	int cs_key = 0;
+	switch (c) {
+		case B_UP_ARROW:	cs_key = CSKEY_UP;					break;
+		case B_DOWN_ARROW: 	cs_key = CSKEY_DOWN;				break;
+		case B_LEFT_ARROW: 	cs_key = CSKEY_LEFT;				break;
+	    case B_RIGHT_ARROW:	cs_key = CSKEY_RIGHT;				break;
+	    case B_BACKSPACE:	cs_key = CSKEY_BACKSPACE;			break;
+	    case B_INSERT:		cs_key = CSKEY_INS;					break;
+	    case B_DELETE:		cs_key = CSKEY_DEL;					break;
+	    case B_PAGE_UP:		cs_key = CSKEY_PGUP;				break;
+	    case B_PAGE_DOWN:	cs_key = CSKEY_PGDN;				break;
+	    case B_HOME:		cs_key = CSKEY_HOME;				break;
+	    case B_END:			cs_key = CSKEY_END;					break;
+	    case B_ESCAPE:		cs_key = CSKEY_ESC;					break;
+	    case B_TAB:			cs_key = CSKEY_TAB;					break;
+	    case B_RETURN:		cs_key = CSKEY_ENTER;				break;
+		default:			cs_key = (c < ' ' ? c + '`' : c);	break; // *NOTE*
+	}
+	return cs_key;
+}
+
+SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
+{
+	ISystem* isys;
+	QueryInterface((REFIID)IID_ISystem, (void**)&isys);
+	CHK (app = new CrystApp(isys));
+	isys->Release();
 };
 
 long csSystemDriver::Time()
 {
-  return system_time()/1000;
-}
-
-void SysSystemDriver::SetSystemDefaults ()
-{
-  csSystemDriver::SetSystemDefaults ();
-
-  SimDepth = 0;
-  //FULL_SCREEN = false;
-  if (config)
-  {
-    SimDepth = config->GetInt ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
-//  UseDW = config->GetYesNo ("VideoDriver", "DIRECT_WINDOW", 0);
-//  HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", 1);
-  }
-}
-
-bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
-{
-  if (strcasecmp ("-sdepth", argv[i]) == 0)
-  {
-    i++;
-    sscanf (argv[i], "%d", &SimDepth);
-    if (SimDepth != 8 && SimDepth != 15 && SimDepth != 16 && SimDepth != 32)
-    {
-      Printf (MSG_FATAL_ERROR, "Crystal Space can't run in this simulated depth! (use 8, 15, 16, or 32)!\n");
-      return false;
-    }
-  }
-  else
-    return csSystemDriver::ParseArg (argc, argv, i);
-  return true;
-}
-
-void SysSystemDriver::Help ()
-{
-  csSystemDriver::Help ();
-  Printf (MSG_STDOUT, "  -sdepth <depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-}
-
-void SysSystemDriver::SysFocusChange (void *Self, int Enable)
-{
-  if (((SysSystemDriver *)Self)->EventQueue)
-    ((SysSystemDriver *)Self)->do_focus (Enable);
+	return system_time()/1000;
 }
 
 static int32 begin_loop(void* data)
 {
-  return ((SysSystemDriver*)data)->LoopThread();
+	snooze(100000); // FIXME: Needed?
+	int32 const rc = ((SysSystemDriver*)data)->LoopThread();
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return rc;
 }
 
-// System loop !
-void SysSystemDriver::Loop(void)
+// Note that Loop() must be able to handle recursive calls properly.
+// For instance, CSWS calls it recursively to implement modal loops.
+// The first time Loop() is called, it is called from the "main" thread.
+// All subsequent (recursive) calls come from "LoopThread", the thread
+// which is actually driving the Crystal Space run-loop.
+void SysSystemDriver::Loop()
 {
-	LoopStarted = true;
-	bigtime_t		time;
-	BView *dpy;
-	int	reqfps = 8;
-	thread_id	my_thread;
-
-	IBeLibGraphicsInfo* piG2D = NULL;
-	HRESULT hRes = Gfx2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
-	if (SUCCEEDED(hRes))
-	{
-    hRes = piG2D->GetDisplay (&dpy);
-		piG2D->Release ();
-		piG2D = NULL;
-	}
-
-	if(firstRun) {
-		firstRun = false;
-		my_thread = spawn_thread(begin_loop, "LoopThread",
+	if (running)
+		LoopThread();
+	else {
+		running = true;
+		thread_id my_thread = spawn_thread(begin_loop, "LoopThread",
 							 B_DISPLAY_PRIORITY, (void*)this);
 		resume_thread(my_thread);
-//		app->SetPulseRate(1000000/reqfps);//dhdebug
 		app->Run();
-	} else while (!Shutdown && !ExitLoop) {
-		// we want a frame to take at least 16 ms.
-		time = system_time()+1000000/reqfps;
-//		NextFrame();
-#if 0
-	    if(g2d->win->Lock()){
-	    	if(g2d->view->IsInMotion())
-	    		Mouse->do_mousemotion (SysGetTime (), g2d->view->lastloc.x, g2d->view->lastloc.y);
-	    	g2d->win->Unlock();
-	    }
-#endif
-		time -= system_time();
-		if (time > 0)
-			snooze(time);
+		app->ShowMouse();
 	}
 }
-
-
-// COM Implementation
-
-IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, BeLibSystemDriver )
-
-STDMETHODIMP SysSystemDriver::XBeLibSystemDriver::GetSettings (int &SimDepth,
-  bool &UseSHM, bool &HardwareCursor)
-{
-  METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
-  SimDepth = pThis->SimDepth;
-  UseSHM = pThis->UseSHM;
-  HardwareCursor = pThis->HardwareCursor;
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XBeLibSystemDriver::GetKeyboardHandler (
-  BeKeyboardHandler &Handler, void *&Parm)
-{
-  METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
-  Handler = SysKeyboardDriver::Handler;
-  Parm = pThis->Keyboard;
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XBeLibSystemDriver::GetMouseHandler (
-  BeMouseHandler &Handler, void *&Parm)
-{
-  METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
-  Handler = SysMouseDriver::Handler;
-  Parm = pThis->Mouse;
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XBeLibSystemDriver::GetFocusHandler (
-  BeFocusHandler &Handler, void *&Parm)
-{
-  METHOD_PROLOGUE(SysSystemDriver, BeLibSystemDriver)
-  Handler = SysSystemDriver::SysFocusChange;
-  Parm = pThis;
-  return S_OK;
-}
-
-STDMETHODIMP SysSystemDriver::XBeLibSystemDriver::SetLoopCallback (
-  LoopCallback Callback, void *Param)
-{
-  METHOD_PROLOGUE(SysSystemDriver, BeLibSystemDriver)
-  pThis->Callback = Callback;
-  pThis->CallbackParam = Param;
-  return S_OK;
-}
-
-/*********************************************************/
-
-// Keyboard fonctions
-SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
-{
-  // Create your keyboard interface
-}
-
-void SysKeyboardDriver::Handler(void *Self, int Key, bool Down)
-{
-  csKeyboardDriver *Keyboard = (csKeyboardDriver *)Self;
-  if (!Keyboard->Ready ())
-    return;
-    
-  if (Key)
-  {
-    if (Down)
-      Keyboard->do_keypress (System->Time (), Key);
-    else
-      Keyboard->do_keyrelease (System->Time (), Key);
-  } /* endif */
-}
-
-//bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
-//{
-//  csKeyboardDriver::Open (EvQueue);
-  // Open your keyboard interface
-//  return true;
-//}
-
-//void SysKeyboardDriver::Close ()
-//{
-//  csKeyboardDriver::Close();
-//  // Close your keyboard interface
-//}
-
-// Mouse fonctions
-SysMouseDriver::SysMouseDriver() : csMouseDriver ()
-{
-// Initialize mouse system
-}
-
-void SysMouseDriver::Handler (void *Self, int Button, int Down, int x, int y,
-  int ShiftFlags)
-{
-  csMouseDriver *Mouse = (csMouseDriver *)Self;
-  if (!Mouse->Ready ())
-    return;
-    
-  if (Button == 0)
-    Mouse->do_mousemotion (System->Time (), x, y);
-  else if (Down)
-    Mouse->do_buttonpress (System->Time (), Button, x, y, ShiftFlags & CSMASK_SHIFT,
-      ShiftFlags & CSMASK_ALT, ShiftFlags & CSMASK_CTRL);
-  else
-    Mouse->do_buttonrelease (System->Time (), Button, x, y);
-}
-
-//bool SysMouseDriver::Open(csEventQueue *EvQueue)
-//{
-//  csMouseDriver::Open (EvQueue);
-// Open mouse system
-//  return 1;
-//}
-
-//void SysMouseDriver::Close()
-//{
-// Close mouse system
-//}
-
-
-//@@@ JORRIT: this is a bad place but I don't know where to define it otherwise
-bool ModuleIsStopping ()
-{
-  return false;
-}
-
 
 // This is the thread doing the loop itself.
 long SysSystemDriver::LoopThread()
 {
-//	bigtime_t			delay;
-	static bigtime_t	prev_frame = Time();
-	bigtime_t			curr_time;
-//	SysSystemDriver		*sys = this;
-//	bool				*fConnected, *fConnectionDisabled;
-//	bool	shutdown = false;
-	
-	snooze(100000);
-	
-	// initialise pointer-pointers
-/*
-	IBeLibGraphicsInfo* piG2D = NULL;
-	HRESULT hRes = Gfx2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
-	if (FAILED(hRes))	{
-		printf("Loopthread: can't get access to 2d graphics driver.\n");
-		exit(1);
-	}*/
-//	piG2D->GetfConnected(&fConnected);
-//	piG2D->GetfConnectionDisabled(&fConnectionDisabled);
-		
-	// loop, frame after frame, until asked to quit.
-	while (!Shutdown /* && !(*fConnectionDisabled)*/) {
-	long render_time;
-	bigtime_t before,after;
-//		printf("LoopThread: loop executing\n");
-//		piG2D->SetFrameBufferLock(true);// change to implement BeginDraw/FinishDraw
-//		if (*fConnected)	{		// change to implement BeginDraw/FinishDraw
-		// get the right to do direct screen access.
-		//acquire_sem(w->drawing_lock);
-//		app->PostMessage('next');//dhdebug
-//		printf("LoopThread: NextFrame executing\n");
-		curr_time = Time();
-		before = curr_time;
-		/*driver->*/NextFrame(curr_time - prev_frame, curr_time);
-		after = Time();
-		render_time = (after - before);
-//		printf ("render time is %d milliseconds.\n", render_time);
-		prev_frame=curr_time;
-//		if(be_app->Lock()) {
-//			shutdown = sys->Shutdown;
-//			delay = sys->mspf;
-//			be_app->Unlock();
-//		}
-//		if(delay>0)
-//			snooze(delay);
-//	snooze(app->mspf);//dhdebug
-
-		// release the direct screen access
-		//release_sem(w->drawing_lock);
-//		}// change to implement BeginDraw/FinishDraw
-//		piG2D->SetFrameBufferLock(false);// change to implement BeginDraw/FinishDraw
+	bigtime_t prev_time = Time();	
+	while (!Shutdown && !ExitLoop) {
+		app->checkMouseMoved(); // FIXME: Probably want to lock "moved" flag.
+		bigtime_t curr_time = Time();
+		NextFrame(curr_time - prev_time, curr_time);
+		prev_time=curr_time;
 	}	
-	printf("LoopThread: Shutdown detected.\n");//dh
+//	printf("LoopThread: Exiting loop.\n");
 	return 0;
+}
+
+void SysSystemDriver::ProcessUserEvent (BMessage* m)
+{
+	if (running) {
+		switch (m->what) {
+			case B_KEY_DOWN:
+			case B_KEY_UP:
+			case B_MOUSE_DOWN:
+			case B_MOUSE_MOVED:
+			case B_MOUSE_UP:
+				app->PostMessage(m, 0);
+				break;
+		}
+	}
+}
+
+bool SysSystemDriver::SetMouseCursor (int shape)
+{
+	return app->SetMouse(shape);
+}
+
+STDMETHODIMP
+SysSystemDriver::XBeLibSystemDriver::ProcessUserEvent (BMessage* m)
+{
+ 	METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
+	pThis->ProcessUserEvent(m);
+	return S_OK;
+}
+
+STDMETHODIMP
+SysSystemDriver::XBeLibSystemDriver::SetMouseCursor(int shape, ITextureHandle*)
+{
+ 	METHOD_PROLOGUE (SysSystemDriver, BeLibSystemDriver)
+	return (pThis->SetMouseCursor(shape) ? S_OK : S_FALSE);
 }

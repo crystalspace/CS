@@ -1,7 +1,8 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    original Be version written by Xavier Pianet
-     modified by David Huen to conform more closely to ddraw version.
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Modified for better DDraw conformance by David Huen.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,8 +23,8 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cs2d/be/belibg2d.h"
-#include "cssys/be/beitf.h"
 #include "cs2d/be/CrystWindow.h"
+#include "cssys/be/beitf.h"
 #include "csgeom/csrect.h"
 #include "isystem.h"
 
@@ -35,162 +36,148 @@ END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DBeLib)
 
-//	currently no palette stuff
-
-// csGraphics2DXLib functions
-csGraphics2DBeLib::csGraphics2DBeLib(ISystem* piSystem, bool bUses3D) : csGraphics2D (piSystem)
+csGraphics2DBeLib::csGraphics2DBeLib(ISystem* piSystem) :
+  csGraphics2D(piSystem), curr_page(0), double_buffered(true)
 {
-//  Screen* screen_ptr;
-  HRESULT rc;
-  IBeLibSystemDriver* piBeLib = NULL;
-
-  rc = piSystem->QueryInterface ((REFIID)IID_IBeLibSystemDriver, (void**)&piBeLib);
-  if (FAILED (rc))
-  {
-    //CsPrintf (MSG_FATAL_ERROR, "csGraphics2DBeLib::Open() -- ISystem does not support IBeLibSystemDriver.");
-    printf ("csGraphics2DBeLib::Open() -- ISystem does not support IBeLibSystemDriver.");
+  HRESULT const rc = piSystem->QueryInterface(
+    (REFIID)IID_IBeLibSystemDriver, (void**)&be_system);
+  if (FAILED (rc)) {
+    system->Print (MSG_FATAL_ERROR, "FATAL: The system driver does not "
+      "implement the IBeLibSystemDriver interface\n");
     exit (1);
   }
   
   // set up interface flags
   // locker is set up in crystwindow as are these flags
+#if 0
   fConnected = false;
   fConnectionDisabled=false;
   fDrawingThreadSuspended=false;
+#endif
 
-  //CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows version");
-  printf ("Crystal Space BeOS version.\n");
-
+  system->Print (MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
 }
 
-csGraphics2DBeLib::~csGraphics2DBeLib(void)
+csGraphics2DBeLib::~csGraphics2DBeLib()
 {
-  // Destroy your graphic interface
   Close();
-  //if (Memory && sim_depth != 0) CHKB (delete [] Memory);
+  // FIXME: Free the bitmaps in cryst_bitmap.
+  be_system->Release();
 }
 
 void csGraphics2DBeLib::Initialize ()
 {
-  // this sets system parameters (screen size, "depth", fullscreen mode, default pixelformats)
   csGraphics2D::Initialize();
 
-  // get current screen depth
-  curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();
+  // Get current screen information.
+  BScreen screen(B_MAIN_SCREEN_ID);
+  screen_frame = screen.Frame();
+  curr_color_space = screen.ColorSpace();
   ApplyDepthInfo(curr_color_space);
-  // create buffers
+
+  // Create buffers.
+  double_buffered = true;
   curr_page = 0;
-  int i;
-  for (i=0; i < NO_OF_BUFFERS; i++)
-  	CHK (cryst_bitmap[i] = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
+  BRect const r(0, 0, Width - 1, Height - 1);
+  for (int i=0; i < BUFFER_COUNT; i++)
+  	CHK (cryst_bitmap[i] = new BBitmap(r, curr_color_space));
 }
 
-bool csGraphics2DBeLib::Open(char *Title)
-{/*
-	// This call loads the Be settings of the graphics interface
-	curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();	
-	ApplyDepthInfo(curr_color_space);
-*/	
-	// This call initializes the LineAddress array and needs Height, Width and pfmt.
-	if (!csGraphics2D::Open (Title)) return false;// remove for direct buffer access
+bool csGraphics2DBeLib::Open(char* title)
+{
+  if (!csGraphics2D::Open (title)) return false;
+
+  int const INSET = 32;
+  int const sw = screen_frame.IntegerWidth();
+  int const sh = screen_frame.IntegerHeight();
+  int const vw = Width  - 1;
+  int const vh = Height - 1;
+  BRect win_rect(INSET, INSET, vw + INSET, vh + INSET);
+
+  if (vw <= sw && vh <= sh) {	// Center the window.
+    float const x = floor((sw - vw) / 2);
+    float const y = floor((sh - vh) / 2);
+    win_rect.Set(x, y, x + vw, y + vh);
+  }
+
+  dpy = CHK(new CrystView(BRect(0, 0, vw, vh), be_system));
+  window = CHK(new CrystWindow(win_rect, title, dpy, this, system, be_system));
 	
-	dpy = CHK (new CrystView(BRect(0,0,Width-1,Height-1)));
-	window = CHK (new CrystWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this));
+  window->Show();
+  if(window->Lock()) {
+    dpy->MakeFocus();
+    window->Unlock();
+  }
 	
-	window->Show();
-	if(window->Lock()) {
-		dpy->MakeFocus();
-		window->Unlock();
-	}
-	
-//	CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
-	Memory = (unsigned char *)cryst_bitmap[curr_page]->Bits();// comment this for direct framebuffer access.
-//	for(int i = 0; i < FRAME_HEIGHT; i++)
-//		LineAddress [i] = i * cryst_bitmap->BytesPerRow();
-
-//  return 1;
-  // Open window
-//   = new BWindow (BRect(64, 16, Width, Height), "Yes man", TITLED_WINDOW);
-
-//  attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-//  	FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
-//  XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
-
-  // Create backing store
-//  if (!xim)
-//  {
-//    xim = XGetImage (dpy, window, 0, 0, Width, Height, AllPlanes, ZPixmap);
-//    real_Memory = (unsigned char*)(xim->data);
-
-    // If not simulating depth then Memory is equal to real_Memory.
-    // If simulating then we allocate a new Memory array in the faked format.
-//    if (!sim_depth) Memory = real_Memory;
-//    else
-//    {
-//      CHK (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
-//    }
-//CHK (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
-//  }
-//  Clear (0);// this blows up BDirectWindow as it gets to draw before BDirectWindow is set up!
+  Memory = (unsigned char *)cryst_bitmap[curr_page]->Bits();
   return true;
 }
 
-void csGraphics2DBeLib::Close(void)
+void csGraphics2DBeLib::Close()
 {
-  // Close your graphic interface
-  csGraphics2D::Close ();
+  window->Lock();
+  window->Quit();
+  window = NULL;
+  csGraphics2D::Close();
 }
 
-bool csGraphics2DBeLib::BeginDraw ()
+bool csGraphics2DBeLib::BeginDraw()
 {
-	// check that I do have a draw buffer!
-	if (Memory == NULL) return false;
-/*	
-	// if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
-	// fConnectionDisabled is set true by the csGraphics2DBeLib destructor.
-	// If true, then the Window is being destroyed so this thread should go as well!
-	// The application object may try to kill it too but it doesn't matter: you can only die once!
-	if (fConnectionDisabled) kill_thread(find_thread(NULL));
-	
-	// lock 2D driver object
-	locker->Lock();
-	
-	// this implements the fConnected feature with suspend_thread
-	// it is only feasible because this is the only place that suspends that thread.
-	// if you put in suspension elsewhere, use a proper semaphore
-	if (!fConnected)	{
-		fDrawingThreadSuspended = true;
-		locker->Unlock();
-		suspend_thread(find_thread(NULL));	
-	}*/ //uncomment for direct buffer access
-	return true;
+  if (Memory == NULL) return false;
+#if 0
+  // if fConnectionDisabled, then I will suspend the drawing thread and await shutdown.
+  // fConnectionDisabled is set true by the csGraphics2DBeLib destructor.
+  // If true, then the Window is being destroyed so this thread should go as well!
+  // The application object may try to kill it too but it doesn't matter: you can only die once!
+  if (fConnectionDisabled) kill_thread(find_thread(NULL));
+
+  // lock 2D driver object
+  locker->Lock();
+
+  // this implements the fConnected feature with suspend_thread
+  // it is only feasible because this is the only place that suspends that thread.
+  // if you put in suspension elsewhere, use a proper semaphore
+  if (!fConnected)	{
+    fDrawingThreadSuspended = true;
+    locker->Unlock();
+    suspend_thread(find_thread(NULL));	
+  }
+#endif
+  return true;
 }
 
 void csGraphics2DBeLib::FinishDraw ()
 {
-	// unlock 2D driver object
+#if 0
 	locker->Unlock();
+#endif
 }
 
-void csGraphics2DBeLib::Print (csRect *area)
+void csGraphics2DBeLib::Print (csRect* area)
 {
-//bigtime_t before, after, blit_time;//dhdebug
-//before=system_time();
-	if( window->Lock()) {
-		dpy->Sync();
-		dpy->DrawBitmapAsync(cryst_bitmap[curr_page]);
-		dpy->Flush();
-		
-		//advance video page
-		curr_page = (++curr_page)%NO_OF_BUFFERS;
-		Memory = (unsigned char *)cryst_bitmap[curr_page]->Bits();
-		
+	if(window->Lock()) {
+		if(!double_buffered)
+			dpy->DrawBitmap(cryst_bitmap[curr_page]);
+		else {
+			dpy->Sync();
+			dpy->DrawBitmapAsync(cryst_bitmap[curr_page]);
+			dpy->Flush();
+			curr_page = ++curr_page % BUFFER_COUNT;
+			Memory = (unsigned char*)cryst_bitmap[curr_page]->Bits();
+		}
 		window->Unlock();
-//after=system_time();
-//blit_time=after-before;
-//printf("blit time is %i \n", blit_time);
-	} //remove this for direct frame buffer access
-//      XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
+	}
+}
+
+bool csGraphics2DBeLib::DoubleBuffer (bool Enable)
+{
+  double_buffered = Enable;
+  return true;
+}
+
+bool csGraphics2DBeLib::DoubleBuffer ()
+{
+  return double_buffered;
 }
 
 int csGraphics2DBeLib::GetPage ()
@@ -198,9 +185,8 @@ int csGraphics2DBeLib::GetPage ()
   return curr_page;
 }
 
-void csGraphics2DBeLib::SetRGB(int i, int r, int g, int b)
-{
-  csGraphics2D::SetRGB (i, r, g, b);
+bool csGraphics2DBeLib::SetMouseCursor (int shape, ITextureHandle* bitmap) {
+  return (be_system->SetMouseCursor(shape, bitmap) == S_OK);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
@@ -209,8 +195,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   
   switch (this_color_space) {
   	case B_RGB15: 
-//			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15));
 		Depth	  = 15;
   		RedMask   = 0x1f << 10;
   		GreenMask = 0x1f << 5;
@@ -230,8 +214,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		complete_pixel_format();
   		break;
   	case B_RGB16:
-//			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16));
   		Depth	  = 16;
   		RedMask   = 0x1f << 11;
   		GreenMask = 0x3f << 5;
@@ -252,8 +234,6 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		break;
   	case B_RGB32:
   	case B_RGBA32:
-//			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32));
 		Depth	  = 32;
   		RedMask   = 0xff << 16;
   		GreenMask = 0xff << 8;
@@ -273,12 +253,8 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space this_color_space)
   		complete_pixel_format();
   		break;
   	default:
-  	// an unimplemented colorspace, give up and die
-  	printf("Unimplemented color depth in Be 2D driver, depth = %i\n", Depth);
-  	exit(1);
+  		printf("Unimplemented color depth in Be 2D driver, depth = %i\n", Depth);
+  		exit(1);
   		break;
   }
 }
-  
-
-

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,124 +24,83 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-
 #include "sysdef.h"
-#include "cs2d/openglbe/glbe2d.h"
 #include "isystem.h"
+#include "cs2d/openglbe/glbe2d.h"
+#include "cs2d/openglbe/CrystGLWindow.h"
+#include "cssys/be/beitf.h"
 
-#ifndef CRYST_WINDOW_H
-#include "CrystGLWindow.h"
-#endif
-
-static void doKey(int key, bool down) ;
-
-CrystGLView::CrystGLView(BRect frame)
-	: BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE)
+CrystGLView::CrystGLView(BRect frame, IBeLibSystemDriver* isys) :
+	BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
+	be_system(isys)
 {
-	inmotion = false;
+	be_system->AddRef();
 }
 
-CrystGLView::~CrystGLView(){}
-
-void CrystGLView::KeyDown(const char *bytes, int32 numBytes)
+CrystGLView::~CrystGLView()
 {
-// printf("got a key\n");
-	if(numBytes == 1) {
-		doKey((int)*bytes, true);
-	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-//		printf("got a function key=%x\n",bytes[1]);
-	}
+	be_system->Release();
 }
 
-void CrystGLView::KeyUp(const char *bytes, int32 numBytes)
+void CrystGLView::ProcessUserEvent() const
 {
-	if(numBytes == 1) {
-		doKey((int)*bytes, false);
-	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-	}
+	be_system->ProcessUserEvent(Looper()->CurrentMessage());
 }
 
-static void doKey(int key, bool down) 
+void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
 {
-	uint32 kinfo = modifiers();
-	BMessage	msg('keys');
-	msg.AddInt16("key",key);
-	msg.AddBool ("down", down);
-	msg.AddBool ("shift", kinfo & B_SHIFT_KEY);
-	msg.AddBool ("alt", kinfo & B_COMMAND_KEY);
-	msg.AddBool ("ctrl", kinfo & B_CONTROL_KEY);
-
-	be_app->PostMessage(&msg);
+	ProcessUserEvent();
 }
 
-void CrystGLView::MouseMoved(BPoint point, uint32 transit, const BMessage *message) {
-#if 0
-	System->Mouse->do_mousemotion (point.x, point.y);
-#endif
+void CrystGLView::KeyUp(char const* bytes, int32 numBytes)
+{
+	ProcessUserEvent();
+}
+
+void CrystGLView::MouseMoved(BPoint point, uint32 transit, const BMessage* m)
+{
+	ProcessUserEvent();
 }
 
 void CrystGLView::MouseDown(BPoint point)
 {
-// printf("got a mouse\n");
-	uint32 buttons;
-	BPoint p;
-	uint32 kinfo = modifiers();
-	GetMouse(&p,&buttons);
-
-	if(buttons & B_PRIMARY_MOUSE_BUTTON )			buttons = 1;
-	else if(buttons & B_SECONDARY_MOUSE_BUTTON)		buttons = 2;
-	else if(buttons & B_TERTIARY_MOUSE_BUTTON)		buttons = 3;
-
-	BMessage	msg('mous');
-	msg.AddInt16("butn",buttons);
-	msg.AddPoint("loc",p);
-	msg.AddBool ("shift", kinfo & B_SHIFT_KEY);
-	msg.AddBool ("alt", kinfo & B_COMMAND_KEY);
-	msg.AddBool ("ctrl", kinfo & B_CONTROL_KEY);
-
-	be_app->PostMessage(&msg);
-
-	if((buttons!=0) && (!IsFocus()))
+	ProcessUserEvent();
+	if (!IsFocus())
 		MakeFocus();
-	inmotion = buttons;
 }
 
-bool CrystGLView::IsInMotion(void) {
-	uint32 buttons;
-	BPoint p;
-	GetMouse(&p,&buttons);
-
-	if(buttons) {
-		lastloc = p;
-	} else if(inmotion) { // the button was just released
-		MouseDown(p);
-		inmotion = false;
-	}
-	return inmotion;
-}
-
-void	CrystGLView::AttachedToWindow()
+void CrystGLView::MouseUp(BPoint point)
 {
-      LockGL(); 
-      BGLView::AttachedToWindow(); 
-      UnlockGL();
+	ProcessUserEvent();
 }
 
-CrystGLWindow::CrystGLWindow(BRect frame, const char *name, CrystGLView *theview, csGraphics2DGLBe *piBeG2D)
-//			: BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0)
-//			: BGLScreen(name, B_16_BIT_640x480, 0, &res, 0)
-			: BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0)
-//			: BWindowScreen(name, B_8_BIT_640x480, res, 0)
+void CrystGLView::AttachedToWindow()
 {
-	view = theview;
-/*
-	//	initialise local flags
+	LockGL(); 
+	BGLView::AttachedToWindow(); 
+	UnlockGL();
+}
+
+CrystGLWindow::CrystGLWindow(BRect frame, char const* name, CrystGLView *v,
+	csGraphics2DGLBe *piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
+//	BWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE,0),
+//	BGLScreen(name, B_16_BIT_640x480, 0, &res, 0),
+	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0),
+//	BWindowScreen(name, B_8_BIT_640x480, res, 0),
+	view(v), cs_system(isys), be_system(bsys)
+{
+	cs_system->AddRef();
+	be_system->AddRef();
+
+	// Initialise local flags
+#if 0
 	fConnected = false;
 	fConnectionDisabled = false;
 	fDrawingThreadSuspended=false;
-	locker = new BLocker();*/ //dh:remove for conventional DirectConnected
+	locker = new BLocker(); // dh:remove for conventional DirectConnected
+#endif
 	
-	// cache the pointer to the 2D graphics driver object
+	// Cache the pointer to the 2D graphics driver object
 	pi_BeG2D = piBeG2D;
 	
 	view->SetViewColor(0, 0, 0);
@@ -156,56 +116,35 @@ CrystGLWindow::CrystGLWindow(BRect frame, const char *name, CrystGLView *theview
 
 CrystGLWindow::~CrystGLWindow()
 {
-//	long		result;
+	Hide();
+	Flush();
+	be_system->Release();
+	cs_system->Release();
 }
 
 bool CrystGLWindow::QuitRequested()
 {
-	bool sys_shutdown;
-	
-	pi_BeG2D->system->GetShutdown(sys_shutdown);
-	printf ("entering CrystGLWindow::QuitRequested(): Shutdown is %d \n", sys_shutdown);
-	
-	pi_BeG2D->dpy->EnableDirectMode( false );
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	
-	// allow quit only when done from application itself
-	// there's a problem in that while in this routine, the window is locked.
-	// the shutdown flag can't work unless LoopThread gets to read it which it can't till this exits.
-	pi_BeG2D->system->GetShutdown(sys_shutdown);
-	
-	printf ("exitting CrystGLWindow::QuitRequested(): Shutdown is %d \n", sys_shutdown);
-	return sys_shutdown;
-	
-/*	
-	// this window is destroyed, prevent the csGraphics2DGLBe::Close() method from trying to close it again!
-	pi_BeG2D->window = NULL;
-	
-	// but don't destroy the window till LoopThread has had a chance to finish!
-	pi_BeG2D->system->Shutdown();
-	Unlock();//dh: will this allow things to finish?
-	status_t exit_value;
-	wait_for_thread(find_thread("LoopThread"), &exit_value);
-	Lock();//dh: BWindows insist that the window is locked before blowing it away.
-	
-	return(TRUE);*/
+	pi_BeG2D->dpy->EnableDirectMode(false);
+	cs_system->Shutdown();
+	// FIXME: Don't destroy window before "LoopThread" has finished.
+	return true;
 }
 
-void CrystGLWindow::MessageReceived(BMessage *message)
+void CrystGLWindow::MessageReceived(BMessage* m)
 {
-	switch(message->what) {
-	// Switch between full-screen mode and windowed mode.
-	case 'full' :
-		SetFullScreen(!IsFullScreen());
-		break;
-	default :
-		BWindow::MessageReceived(message);
-		break;
+	switch(m->what) {
+		case 'full':
+			SetFullScreen(!IsFullScreen());
+			break;
+		default:
+			BWindow::MessageReceived(m);
+			break;
 	}
 }
 
 void CrystGLWindow::DirectConnected(direct_buffer_info *info)
-{/*
+{
+#if 0
 printf("Entered CrystWindow::DirectConnected \n");
 	if (!fConnected && fConnectionDisabled) {
 		return S_OK;
@@ -248,10 +187,5 @@ printf("Entered CrystWindow::DirectConnected \n");
 	
 //	this bit just keeps conventional window behaviour until I've sorted out DirectConnected
 //BDirectWindow::DirectConnected(info);
+#endif
 }
-
-long CrystGLWindow::StarAnimation(void *data)
-{
-	return 0;
-}
-

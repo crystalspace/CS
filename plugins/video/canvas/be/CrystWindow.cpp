@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Written by Xavier Planet.
+    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,112 +23,74 @@
 #include <string.h>
 #include <sys/param.h>
 #include "sysdef.h"
+#include "isystem.h"
 #include "cs2d/be/belibg2d.h"
-#ifndef CRYST_WINDOW_H
 #include "cs2d/be/CrystWindow.h"
-#endif
+#include "cssys/be/beitf.h"
 
-static void doKey(int key, bool down) ;
-
-CrystView::CrystView(BRect frame) : BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
+CrystView::CrystView(BRect frame, IBeLibSystemDriver* isys) :
+	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), be_system(isys)
 {
-	inmotion = false;
+	be_system->AddRef();
 }
 
-CrystView::~CrystView(){}
+CrystView::~CrystView()
+{
+	be_system->Release();
+}
+
+void CrystView::ProcessUserEvent() const
+{
+	be_system->ProcessUserEvent(Looper()->CurrentMessage());
+}
 
 void CrystView::KeyDown(const char *bytes, int32 numBytes)
 {
-	if(numBytes == 1) {
-		doKey((int)*bytes, true);
-	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-//		printf("got a function key=%x\n",bytes[1]);
-	}
+	ProcessUserEvent();
 }
 
 void CrystView::KeyUp(const char *bytes, int32 numBytes)
 {
-	if(numBytes == 1) {
-		doKey((int)*bytes, false);
-	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-	}
+	ProcessUserEvent();
 }
 
-static void doKey(int key, bool down) 
+void CrystView::MouseMoved(BPoint point, uint32 transit, BMessage const* m)
 {
-	uint32 kinfo = modifiers();
-	BMessage	msg('keys');
-	msg.AddInt16("key",key);
-	msg.AddBool ("down", down);
-	msg.AddBool ("shift", kinfo & B_SHIFT_KEY);
-	msg.AddBool ("alt", kinfo & B_COMMAND_KEY);
-	msg.AddBool ("ctrl", kinfo & B_CONTROL_KEY);
-
-	be_app->PostMessage(&msg);
-}
-
-void CrystView::MouseMoved(BPoint point, uint32 transit, const BMessage *message) {
-#if 0
-	System->Mouse->do_mousemotion (point.x, point.y);
-#endif
+	ProcessUserEvent();
 }
 
 void CrystView::MouseDown(BPoint point)
 {
-//printf("got a mouse\n");
-	uint32 buttons;
-	BPoint p;
-	uint32 kinfo = modifiers();
-	GetMouse(&p,&buttons);
-
-	if(buttons & B_PRIMARY_MOUSE_BUTTON )			buttons = 1;
-	else if(buttons & B_SECONDARY_MOUSE_BUTTON)		buttons = 2;
-	else if(buttons & B_TERTIARY_MOUSE_BUTTON)		buttons = 3;
-
-	BMessage	msg('mous');
-	msg.AddInt16("butn",buttons);
-	msg.AddPoint("loc",p);
-	msg.AddBool ("shift", kinfo & B_SHIFT_KEY);
-	msg.AddBool ("alt", kinfo & B_COMMAND_KEY);
-	msg.AddBool ("ctrl", kinfo & B_CONTROL_KEY);
-
-	be_app->PostMessage(&msg);
-
-	if((buttons!=0) && (!IsFocus()))
+	ProcessUserEvent();
+	if (!IsFocus())
 		MakeFocus();
-	inmotion = buttons;
 }
 
-bool CrystView::IsInMotion(void) {
-	uint32 buttons;
-	BPoint p;
-	GetMouse(&p,&buttons);
-
-	if(buttons) {
-		lastloc = p;
-	} else if(inmotion) { // the button was just released
-		MouseDown(p);
-		inmotion = false;
-	}
-	return inmotion;
-}
-
-CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview, csGraphics2DBeLib *piBeG2D)
-//			: BWindow(frame,name, B_TITLED_WINDOW, 0, 0)
-//			: BDirectWindow(frame,name, B_TITLED_WINDOW, 0, 0)
-			: BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
-//			: BWindowScreen(name, B_8_BIT_640x480, res, 0)
+void CrystView::MouseUp(BPoint point)
 {
-	view = theview;
+	ProcessUserEvent();
+}
+
+CrystWindow::CrystWindow(BRect frame, char const* name, CrystView* v,
+	csGraphics2DBeLib* piBeG2D, ISystem* isys, IBeLibSystemDriver* bsys) :
+	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
+	view(v), cs_system(isys), be_system(bsys)
+{
+	cs_system->AddRef();
+	be_system->AddRef();
 	
-	//	initialise local flags
-	pi_BeG2D = piBeG2D;// cache a pointer to the csGraphics2DBeLib object for later use.
+	// Initialise local flags
+#if 0
+	pi_BeG2D = piBeG2D;
 	pi_BeG2D->fConnected = false;
 	pi_BeG2D->fConnectionDisabled = false;
 	pi_BeG2D->locker = new BLocker();
+#endif
 	
+	// FIXME: Is this level of abstraction needed?  Why not just use the
+	// incoming piBeG2D?
 	HRESULT hRes = piBeG2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
-	if (SUCCEEDED(hRes))	{
+	if (SUCCEEDED(hRes)) {
 //		printf("piBeG2D->QueryInterface succeeded \n");
 	}
 
@@ -135,53 +99,51 @@ CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview, csGr
 	AddChild(view);
 
 	// Add a shortcut to switch in and out of fullscreen mode.
-	AddShortcut('f', B_COMMAND_KEY, new BMessage('full'));
+//	AddShortcut('f', B_COMMAND_KEY, new BMessage('full'));
 	
 	// As we said before, the window shouldn't get wider than 2048 in any
 	// direction, so those limits will do.
-	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);//this isn't needed in BDirectWindow
+	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0); // This isn't needed in BDirectWindow
 }
 
 CrystWindow::~CrystWindow()
 {
-//	long		result;
-	pi_BeG2D->fConnectionDisabled = true;
+//	pi_BeG2D->fConnectionDisabled = true;
 	Hide();
 	Flush();
-	delete pi_BeG2D->locker;
+//	delete pi_BeG2D->locker;
+//	pi_BeG2D->locker = 0;
 	piG2D->Release();
+	be_system->Release();
+	cs_system->Release();
 }
 
 bool CrystWindow::QuitRequested()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(TRUE);
+	cs_system->Shutdown();
+	// FIXME: Don't destroy window before "LoopThread" has finished.
+	return true;
 }
 
-void CrystWindow::MessageReceived(BMessage *message)
+void CrystWindow::MessageReceived(BMessage* m)
 {
-	switch(message->what) {
-	// Switch between full-screen mode and windowed mode.
-	case 'full' :
-//		SetFullScreen(!IsFullScreen());
-		break;
-	default :
-		BWindow::MessageReceived(message);
-		break;
+	switch(m->what) {
+#if 0
+		case 'full' :
+			SetFullScreen(!IsFullScreen());
+			break;
+#endif
+		default :
+			BWindow::MessageReceived(m);
+			break;
 	}
 }
 
 void CrystWindow::DirectConnected(direct_buffer_info *info)
 {
-//printf("Entered CrystWindow::DirectConnected \n");
-//HRESULT hRes = piG2D->DirectConnect(info);//dh:uncomment this to get direct framebuffer access
+//	printf("Entered CrystWindow::DirectConnected \n");
+//	HRESULT hRes = piG2D->DirectConnect(info); //dh:uncomment this to get direct framebuffer access
 
-//	this bit just keeps conventional window behaviour until I've sorted out DirectConnected
-BDirectWindow::DirectConnected(info);
+//	This bit just keeps conventional window behaviour until DH has sorted out DirectConnected
+	BDirectWindow::DirectConnected(info);
 }
-
-long CrystWindow::StarAnimation(void *data)
-{
-	return 0;
-}
-

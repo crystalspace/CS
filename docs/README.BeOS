@@ -1,7 +1,8 @@
 Description of BeOS port internals
 ==================================
 Written by David Huen(smh1008@cus.cam.ac.uk)
-Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/08
+Heavily amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/23
+(on acocunt of his major overhaul and re-engineering of the port).
 
 Contents
 ========
@@ -10,7 +11,8 @@ Contents
 1.1 Operation of SysSystemDriver
 2.0 Description of BeOS 2D Graphics Driver
 2.1 Operation of BeOS 2D Graphics Driver
-3.0 Bug List
+3.0 Bug List and To-Do Items
+
 
 0.0 Introduction
 ===============
@@ -20,105 +22,116 @@ Anyway, I thought that if I'm going to invest all this time and effort, I might 
 
 This document serves as an aide-memoire for myself on BeOS CS and I will be periodically releasing updates to it.
 
+
 1.0 Description of the BeOS SysSystemDriver
 ===========================================
 CrystalSpace-based applications are derived from a single class of type SysSystemDriver. It is necessary to understand how this class relates to the standard BeOS class BApplication.
 
-For example, in the demo application, walktest.cpp, the main block begins with a creating an instance of Walktest:-
+For example, in the demo application, walktest.cpp, the main block begins with a creating an instance of Walktest:
 CHK(Sys = new Walktest());  [see apps/walktest/walktest.cpp]
 
-Walktest itself is derived from SysSystemDriver (which is derived from csSystemDriver) so SysSystemDriver::SysSystemDriver is invoked.  This in turn creates an instance of CrystApp:-
-CHK (app = new CrystApp(this)); [see CS/libs/cssys/be/csbe]
+Walktest itself is derived from SysSystemDriver (which is derived from csSystemDriver) so SysSystemDriver::SysSystemDriver is invoked.  This in turn creates an instance of CrystApp:
+CHK (new CrystApp(this)); [see CS/libs/cssys/be/csbe]
 
-app is a global pointer that points to CrystApp (and therefore the BApplication).
+A pointer to the newly-created CrystApp is automatically assigned to the global variable be_app.
 
-CrystApp is derived from BApplication and the CrystApp constructor:-
+CrystApp is derived from BApplication and the CrystApp constructor:
 
-CrystApp::CrystApp(SysSystemDriver *from)
+CrystApp::CrystApp(ISystem* isys)
 
-takes the argument 'from' and assigns it to the pointer 'driver' within CrystApp.  driver then points to the walktest object and can access all class members of walktest.  You probably need 'driver' because CrystApp is derived from BApplication rather than SysSystemDriver and needs access to SysSystemDriver members for its operation.
+takes the argument 'isys' and assigns it to the pointer 'driver' within CrystApp.  driver then points to the walktest object and can access all methods exported by the ISystem interface.  The high level SysSystemDriver can be queried and controlled via the 'driver' pointer.
+
 
 1.1 Operation of SysSystemDriver
 ================================
-This description follows the execution of walktest.exe.
+This description follows the execution of walktest.
 
 The main block creates the Walktest object (derived from SysSystemDriver) at the start and sets up a pointer Sys to it.
 
 It then picks up info from the configuration files, sets up the world, COM drivers, console object (csSimpleConsole), loads textures, execute the script, etc.
 
-Right at the end it invokes the method Sys->Loop, which invokes the inherited SysSystemDriver::Loop method.  This method sets up the BeOS 2D Graphics interface to obtain the display view from it.
+Right at the end it invokes the method Sys->Loop(), which invokes the inherited SysSystemDriver::Loop() method.  This method sets up the BeOS 2D Graphics interface to obtain the display view from it.
 
-On first passage, it starts a thread with SysSystemDriver::LoopThread, initialises the pulse rate and calls app->Run which beging message processing on the Walktest (=SysSystemDriver) object.  While there is more code in the method, it appears to be unreachable to me and it does not appear that the Run method is called again from anywhere else.
+On first passage, it starts a thread with SysSystemDriver::LoopThread() and calls app->Run() which begins message processing on the Walktest (SysSystemDriver) object.  Loop() can be called recursively by the Crystal Space Windowing System (CSWS) when it wants to begin a modal loop (for instance, when an alert panel is launched), so this case is handled specially.
 
-The LoopThread method runs in its own thread separately and receives from its caller a pointer 'data' to the SysSystemDriver object but it already has that from app.  At any rate, 'data' is never used.  What LoopThread does do is to post a 'next' message to the SysSystemDriver roughly every app->mspf milliseconds.  Loop termination is detected by a local variable 'shutdown' which as far as I'm concerned will never be TRUE!  Weird.
+The LoopThread() method runs in its own thread separately.  It repeatedly calls SysSystemDriver::NextFrame() as quickly as the CPU can process it.  Termination is detected by checking the instance variables Shutdown and ExitLoop which are set appropriately by different parts of the system.  ExitLoop is set when CSWS wants to exit from a modal loop, and Shutdown is set when CrystalSpace wants to shut down the application entirely.  NextFrame() is a method in SysSystemDriver, though it is overridden in walktest.  Walktest::NextFrame does all the stuff needed to setup and draw the next frame.
 
-The 'next' message is posted to the SysSystemDriver object's BHandler's MessageReceived and that will be CrystApp::MessageReceived.  MessageReceived calls driver(which points to the walktest object)->NextFrame.  This would be Walktest::NextFrame which first invokes SysSystemDriver::NextFrame.  SysSystemDriver::NextFrame doesn't not exist but invokes the inherited csSystemDriver which merely calls piSound->Update to update the sound driver state.  MessageReceived also strips out all outstanding 'next' events from the queue before returning as a means of dealing with excessively slow rendering.
-
-After this Walktest::NextFrame does all the stuff needed to setup and draw the next frame.
 
 2.0 Description of BeOS 2D Graphics Driver
 ==========================================
 The BeOS-specific 2D Graphics class is csGraphics2DBeLib and it is derived from the general 2D graphics class csGraphics2D.
 
+
 2.1 Operation of BeOS 2D Graphics Driver
 ========================================
-During the initialisation of COM by:-
+During the initialisation of COM by:
   if (!Sys->Initialize (argc, argv, world->GetEngineConfigCOM ()))
 
-csSystemDriver::Initialize is called and in this method, csSystemDriver::InitGraphics is eventually called.  This first sets up the graphics context class factory.  This factory is then used to create an instance of the 3D graphics object by a call to the method csGraphics3DSoftwareFactory::CreateInstance.  This method creates a new Graphics3DSoftware and returns a pointer to its interface.  The csGraphics3DSoftware::csGraphics3DSoftware constructor initialises the class factory for the 2D driver and creates an instance of csGraphics2DBeLib via COM.
+csSystemDriver::Initialize() is called and in this method, csSystemDriver::InitGraphics() is eventually called.  This first sets up the graphics context class factory.  This factory is then used to create an instance of the 3D graphics object by a call to the method csGraphics3DSoftwareFactory::CreateInstance().  This method creates a new Graphics3DSoftware and returns a pointer to its interface.  The csGraphics3DSoftware::csGraphics3DSoftware() constructor initialises the class factory for the 2D driver and creates an instance of csGraphics2DBeLib via COM.
 
-csGraphics2DBeLib::csGraphics2DBeLib checks that the interace has been succesfully created.  It doesn't call the csGraphics2D constructor.
+The csGraphics2DBeLib constructor checks that the interface has been succesfully created.
 
-When csGraphics3DSoftware::Initialize executes, it calls csGraphics2DBeLib::Initialize.  This method begins by calling csGraphics2D::Initialize which initialises default values for parameters like pixel format, screen size and the actual methods used to implement the virtual methods GetPixelAt, DrawPixel, WriteChar and DrawSprite.  csGraphics2DBeLib::Initialize then uses BScreen to access the current color_space setting and uses it to set the correct values for all these parameters.  it also creates a bitmap of the required color_space pointed to by private BBitMap *cryst_bitmap.
+When csGraphics3DSoftware::Initialize() executes, it calls csGraphics2DBeLib::Initialize().  This method begins by calling csGraphics2D::Initialize() which initialises default values for parameters like pixel format, screen size and the actual methods used to implement the virtual methods GetPixelAt(), DrawPixel(), WriteChar() and DrawSprite().  csGraphics2DBeLib::Initialize() then uses BScreen to access the current color_space setting and uses it to set the correct values for all these parameters.  it also creates a bitmap of the required color_space pointed to by private BBitMap* cryst_bitmap[].
 
-csGraphics3DSoftware::Open calls csSystemDriver::Open [defined in cs2d/be/belibg2d.cpp] which begins by calling the inherited csGraphics2D::Open method [defined in cs2d/common/graph2d.cpp].  csGraphics2D::Open creates an int array with the number of scanlines designated in cryst.cfg and sets up the static csGraphics2D::ScanLine pointer to it. It then initialises it with precalculated addresses of each scanline in the bitmap.  A new instance of CrystView and attached to a new instance of CrystWindow.  [N.B.: if changeable screen sizes are to be implemented, Scanline may have to be deleted and recreated.]
+csGraphics3DSoftware::Open() calls csGraphics2DBeLib::Open() [defined in cs2d/be/belibg2d.cpp] which begins by calling the inherited csGraphics2D::Open() method [defined in cs2d/common/graph2d.cpp].  csGraphics2D::Open() creates an int array with the number of scanlines designated in cryst.cfg and sets up the static csGraphics2D::ScanLine pointer to it.  It then initialises it with precalculated addresses of each scanline in the bitmap.  A new instance of CrystView and attached to a new instance of CrystWindow.  [N.B.: If changeable screen sizes are to be implemented, Scanline may have to be deleted and recreated.]
 
-CrystView is derived from BView and implements handlers for key and mouse actions.  CrystWindow is derived from BDirectWindow and implements a MessageReceived method to deal with events.  This MessageReceived handles the periodic 'next' events from LoopThread.  As you will note, CrystApp doesn't currently use BDirectWindow in the prescribed manner, e.g. using a separate drawing thread to render it.  This doesn't matter currently as direct framebuffer manipulation is not currently used but could eventually take on a greater significance when that is done.
+CrystView is derived from BView and implements handlers for key and mouse actions.  CrystWindow is derived from BDirectWindow.  It notifies the system driver that the application should terminate when the user closes the window.  CrystApp doesn't currently use BDirectWindow in the prescribed manner, e.g. using a separate drawing thread to render it.  This doesn't matter currently as direct framebuffer manipulation is not currently used but could eventually take on a greater significance when that is done.
 
-The current implementation of the software renderer calls:-
+The current implementation of the software renderer calls:
 
-Gfx3D->Print
+Gfx3D->Print()
 
-from Walktest::DrawFrame.  csGraphics3DSoftware::Print then calls:-
+from Walktest::DrawFrame().  csGraphics3DSoftware::Print() then calls:
   m_piG2D->Print (area);
-which invokes the 2D method csGraphics2DBeLib::Print (csRect *area).
+which invokes the 2D method csGraphics2DBeLib::Print (csRect* area).
 
-As currently implemented, the software renderer draws to a BBitMap of the same color_space as screen.  This bitmap is pointed to by the static:-
+As currently implemented, the software renderer draws to a BBitMap of the same color_space as screen.  This bitmap is pointed to by the static:
 
-unsigned char *csGraphics2D::Memory = NULL;
+unsigned char* csGraphics2D::Memory = NULL;
 
-This Print method  displays the bitmap by locking the window, blitting the BBitmap to the CrystView, then unlocking the window.
+The Print() method displays the bitmap by locking the window, blitting the BBitmap to the CrystView, then unlocking the window.
 
 
-3.0 Bug List
+3.0 Bug List and To-Do Items
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
-- should auto-detect buggy egcs compiler
-- application does not exit when CS requests termination
-- window is not closed when alt-q is used to terminat application
-- it is possible to close the window while the application is starting, yet the application does not terminate.
-- application bombs when window is closed when using OpenGL driver.
-- modified key strokes not translated properly (can not use shift modifier in walktest)
-- something in the make process is executing "rm -f" during 'clean'
-- mazed does not respond to the mouse at all (which makes it entirely useless); presumably mouse related functionality has not yet been implemented.
-- cswstest experiences some very bizarre display anomalies when the right mouse button is clicked; it appears to be a double-buffer problem.
-- metademo and squawk crash upon initialization when using OpenGL driver (may be fixed for metademo; I fixed a bug in its command line argument parsing)
-- glide does not compile
-- usage of simulated depth appears to crash most applications, and is ignored by others
+- Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
+- The various 2D graphics drivers (software, OpenGL, Glide) should all be derived from a common class rather than being nearly identical copies of one another.
+- It is probably safe to remove Crystal.rsrc from libs/cssys since it is unused at this time.
+- Should be using DirectWindow rather than DirectBitmap where supported since DirectWindow puts much less load on the CPU.  Auto-detect if DirectWindow is available and use it if so.
+- It is possible to close the window while the application is starting, yet the application does not terminate.
+- Glide driver does not compile.
+- It is probably not safe to be inserting mouse and keyboard events into CS's event queue from the main thread while the queue is being processed by a secondary thread.  It is also probably unsafe to cascade mouse moved events from inside "LoopThread" thread.
+- Should auto-detect buggy egcs compiler.
 
-This is the list of bugs which have recently been fixed.
+This is the list of problems which have recently been fixed.
 
-- compilation warnings abound
-- does not support png
-- does not support jpeg
-- shooter does not work (needs png)
-- cswstest does not work (needs png)
-- mazed does not work (needs png)
-- squawk does not work (needs jpeg)
-- version/description string says "Unix-Intel-GCC" but should say "BeOS-Intel-GCC"
-- network socket library does not compile (BeOS does not support sockets)
-- ndriverdemo does not work (needs socket library)
-- opengl compiles with warnings
-- squawk is displaying detritus console text in the gaps between 3D views every other frame; this appears to be a double-buffer problem.
-- glrender.mak tries linking with libraries which do not exist on BeOS
+- Project spews compilation warnings.
+- Project fails to support png, which causes a number of programs to fail.
+- Project fails to support jpeg, which causes a number of programs to fail.
+- Shooter does not work (needs png).
+- Cswstest does not work (needs png).
+- MazeD does not work (needs png).
+- Squawk does not work (needs jpeg).
+- Version string says "Unix-Intel-GCC" but should say "BeOS-Intel-GCC".
+- Network socket library does not compile (BeOS does not support sockets).
+- NetworkDriverDemo does not work (needs socket library).
+- OpenGL compiles with warnings.
+- Squawk is displaying detritus text from the console in the gaps between 3D views every other frame.  This is a double-buffer problem (in Squawk itself).
+- The makefile glrender.mak tries linking with libraries which do not exist on BeOS.
+- CSWS exhibits serious display anomalies since the 2D driver does not properly implement the double-buffer protocol.
+- Something in the make process is executing "rm -f" during 'clean'.
+- Center window instead of launching it in the upper left corner of screen.
+- Remove all of the unused "simulated depth" code.
+- Modified key strokes are not translated properly.  Can not use shift, alternate, and control modifiers in walktest.  Control keys are not translated correctly.
+- MazeD does not respond to the mouse at all (which makes it entirely useless).  Mouse handling is highly broken.
+- Re-engineer the mouse-moved messages.  Currently they are too numerous for CS and cause CSWS to crawl when it is drawing a software cursor.  Perhaps try cascading the mouse-moved messages in between NextFrame() calls.
+- Implement csGraphics2DBeLib::SetMouseCursor()
+- Be-specific SysSystemDriver::Loop() does not implement the recursive case correctly.  Consequently modal loops initiated by MazeD (and CSWS specifically) will not work.  Be careful enough to ensure that it safely exits from recursive invocations whenever Shutdown becomes true (such as when the window is closed).
+- The application does not exit when CS requests termination.
+- The window is not closed when alt-q is used to terminate the application.
+- Closing the main window causes the application to terminate without going through the normal CS shutdown sequence.
+- Update the OpenGL driver to match the implementation of the default 2D (software) driver.
+- Squawk crashes upon initialization when using OpenGL driver.
+- Application bombs at termination when using OpenGL driver.
