@@ -41,6 +41,7 @@
 #include "csengine/scripts/intscri.h"
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/objtrig.h"
+#include "csgeom/fastsqrt.h"
 #include "csobject/nameobj.h"
 #include "csutil/archive.h"
 #include "csutil/inifile.h"
@@ -71,6 +72,7 @@ csWorld::csWorld () : csObject()
   piHR = NULL;
   textures = NULL;
   CHK (cfg_engine = new csEngineConfig ());
+  BuildSqrtTable ();
 }
 
 csWorld::~csWorld ()
