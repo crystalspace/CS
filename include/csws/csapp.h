@@ -78,6 +78,10 @@ protected:
   virtual bool InitialSetup (int argc, const char* const argv[],
     const char *iConfigName, const char* iDataDir);
 
+  /// Force redrawing of full screen
+  void ForceFullRedraw (bool bFull)
+  { GfxPpl->bFullRedraw = bFull; }
+  
 public:
   /// The system driver
   cswsSystemDriver *System;

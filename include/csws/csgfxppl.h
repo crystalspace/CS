@@ -93,6 +93,9 @@ private:
   // The 3D graphics driver
   iGraphics3D *G3D;
 
+  // Force redrawing of whole screen instead of changed area only
+  bool bFullRedraw;
+  
   /// Initialize pipeline
   csGraphicsPipeline (iSystem *System);
   /// Deinitialize pipeline

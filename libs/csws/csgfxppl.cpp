@@ -59,6 +59,7 @@ csGraphicsPipeline::csGraphicsPipeline (iSystem *System)
     FrameHeight = G2D->GetHeight ();
   }
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  bFullRedraw = false;
 }
 
 csGraphicsPipeline::~csGraphicsPipeline ()
@@ -336,7 +337,7 @@ void csGraphicsPipeline::FinishDraw ()
   FinishDrawImp ();
 
   if (!RefreshRect.IsEmpty ())
-    G3D->Print (&RefreshRect);
+    G3D->Print (bFullRedraw ? NULL : &RefreshRect);
   DrawMode = 0;
 
   // Clear refresh rectangle now
