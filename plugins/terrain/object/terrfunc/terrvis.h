@@ -44,6 +44,21 @@ private:
   int visnr;	// Visible if equal to global_visnr;
   static int global_visnr;
 
+  /// compute the extent of a bbox on the horizon, the start/end angle
+  void ComputeExtent(const csVector3& campos, const csBox3& bbox,
+    int horsize, int& left, int& right);
+  /// compute the min and max dy of a bbox seen from a camera.
+  void ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
+    float &mindy, float &maxdy);
+  /// check if a dy value rises above the horizon
+  bool CheckIfAbove(float* horizon, int horsize, int left, int right, 
+    float dy);
+  /// increase the height along a stretch to be at least dy
+  void HeightenHorizon(float* horizon, int horsize, int left, int right,
+    float dy);
+  /// get index on the horizon of point
+  int GetHorIndex(const csVector3& campos, float x, float z, int horsize);
+
 public:
   csTerrainQuad ();
   ~csTerrainQuad ();
@@ -81,22 +96,6 @@ public:
 
   /// initialize a horizon array
   void InitHorizon(float *horizon, int horsize);
-  /// compute the extent of a bbox on the horizon, the start/end angle
-  void ComputeExtent(const csVector3& campos, const csBox3& bbox,
-    int horsize, int& left, int& right);
-  /// compute the min and max dy of a bbox seen from a camera.
-  void ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
-    float &mindy, float &maxdy);
-  /// check if a dy value rises above the horizon
-  bool CheckIfAbove(float* horizon, int horsize, int left, int right, 
-    float dy);
-  /// increase the height along a stretch to be at least dy
-  void HeightenHorizon(float* horizon, int horsize, int left, int right,
-    float dy);
-  /// get index on the horizon of point
-  int GetHorIndex(const csVector3& campos, float x, float z, int horsize);
-
-
 
   /// Return true if this node is a leaf.
   bool IsLeaf () { return children[0] == NULL; }
