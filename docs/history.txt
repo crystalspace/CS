@@ -49,6 +49,11 @@ chronological order.
 	- Eric Sunshine added a hack to sound/loader/ogg/oggdata.h which works
 	  around a build problem with some installations of Ogg/Vorbis on
 	  Cygwin where it attempts to #include the non-existent <_G_config.h>.
+	- Eric Sunshine added a patch to win32.jam to work around a problem
+	  with natively-built Jam on Cygwin where it fails to perform library
+	  scanning properly, with the result that it thinks that the contained
+	  object files need to be rebuilt (along with all targets which depend
+	  upon those files).
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support

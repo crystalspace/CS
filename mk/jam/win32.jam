@@ -28,6 +28,21 @@ if "$(USE_DLLWRAP)" = "yes"
 PLUGIN.LFLAGS = [ Filter $(PLUGIN.LFLAGS) : -shared ] ;
 }
 
+# Natively-built Jam 2.5 (and probably earlier) on Cygwin fails to perform
+# library scanning properly and think that all object files need to be rebuilt
+# (along with everything which depends upon them) when "jam install" follows
+# "jam all", so disable this feature.
+if $(OS) = "CYGWIN"
+{
+CMD.AR = "ar ru" ;
+NOARUPDATE = true ;
+NOARSCAN = true ;
+actions Archive
+{
+  $(CMD.AR) $(<) $(>)
+}
+}
+
 #----------------------------------------------------------------------------
 # resource handling
 # Unfortunately we can't simply specify resources on the source list, because
