@@ -140,6 +140,7 @@ WalkTest::WalkTest () :
   cfg_recording = -1;
   recorded_perf_stats_name = NULL;
   recorded_perf_stats = NULL;
+  perf_stats = NULL;
   recorded_cmd = NULL;
   recorded_arg = NULL;
   cfg_playrecording = -1;
@@ -180,7 +181,7 @@ WalkTest::~WalkTest ()
   delete plbody;
   delete pllegs;
   delete [] recorded_perf_stats_name;
-  perf_stats->DecRef ();
+  if (perf_stats) perf_stats->DecRef ();
   if (World) World->DecRef ();
 }
 
@@ -282,13 +283,14 @@ void WalkTest::NextFrame ()
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
-  timeFPS = perf_stats->GetFPS ();
+  if (perf_stats) timeFPS = perf_stats->GetFPS ();
+  else timeFPS = 0;
 
   if (!Console || !Console->GetVisible ())
   {
     // If the console was turned off last frame no stats have been accumulated
     // as it was paused so we return here and loop again.
-    if (perf_stats->Pause (false))
+    if (perf_stats && perf_stats->Pause (false))
       return;
     // Emit recorded commands directly to the CommandHandler
     if (cfg_playrecording > 0 &&
@@ -301,7 +303,7 @@ void WalkTest::NextFrame ()
   }
   else
     // The console has been turned on so we pause the stats plugin.
-    perf_stats->Pause (true);
+    if (perf_stats) perf_stats->Pause (true);
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
@@ -786,7 +788,7 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
 	  // A performance measuring demo has finished..stop and write to
 	  // file
 	  cfg_playrecording = -1;
-	  perf_stats->FinishSubsection ();
+	  if (perf_stats) perf_stats->FinishSubsection ();
 	  recorded_perf_stats = NULL;
 	  Sys->Printf (MSG_CONSOLE, "Demo '%s' finished\n", 
 		       recorded_perf_stats_name);
@@ -1189,8 +1191,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   perf_stats = QUERY_PLUGIN (this, iPerfStats);
   if (!perf_stats)
   {
-    Printf (MSG_FATAL_ERROR, "No iPerfStats plugin!\n");
-    return false;
+    Printf (MSG_WARNING, "No iPerfStats plugin: you will have no performance statistics!\n");
   }
 
   // csView is a view encapsulating both a camera and a clipper.

@@ -597,7 +597,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "loadrec"))
   {
-    if (Sys->recorded_perf_stats)
+    if (Sys->perf_stats && Sys->recorded_perf_stats)
       Sys->perf_stats->FinishSubsection ();
     Sys->recorded_perf_stats = NULL;
     delete [] Sys->recorded_perf_stats_name;
@@ -624,13 +624,15 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->cfg_playrecording = -1;
       Sys->cfg_recording = 0;
       Sys->Printf (MSG_CONSOLE, "Start recording camera movement...\n");
-      Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
+      if (Sys->perf_stats)
+        Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
     }
     else
     {
       Sys->cfg_recording = -1;
       Sys->Printf (MSG_CONSOLE, "Stop recording.\n");
-      Sys->perf_stats->FinishSubsection ();
+      if (Sys->perf_stats)
+        Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
     }
   }
@@ -648,10 +650,12 @@ bool CommandHandler (const char *cmd, const char *arg)
 	char name[50], option[50];
 	int resolution = 0;
 	ScanStr (arg, "%s,%d,%s", option, &resolution, name);
-	Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (name);
+	if (Sys->perf_stats)
+	  Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (name);
 	if (!strcasecmp (option, "res") && (resolution >= 1))
 	{
-	  Sys->perf_stats->SetResolution (resolution);
+	  if (Sys->perf_stats)
+	    Sys->perf_stats->SetResolution (resolution);
 	  summary = false;
 	}
 	else if (!strcasecmp (option, "break") && (resolution >= 1))
@@ -676,7 +680,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->cfg_playrecording = -1;
       Sys->Printf (MSG_CONSOLE, "Stop playback.\n");
-      Sys->perf_stats->FinishSubsection ();
+      if (Sys->perf_stats)
+        Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
     }
   }

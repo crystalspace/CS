@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 17-Aug-2000
+	- Made the perfstat plugin optional for walktest.
 	- Some fixes to csphyzik from Michael Ewert.
 	- Increased far clipping plane in csTerrain::SetDetail() and
 	  decreased near clipping plane.
