@@ -27,7 +27,7 @@
 #endif
 
 #ifdef CS_USE_NEW_RENDERER
-#include "video/render3d/opengl/glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 #endif // CS_USE_NEW_RENDERER
 
 #define IMPLEMENT_CACHED_BOOL( name ) \
