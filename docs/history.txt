@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  this is no longer required.
 	- Jorrit removed <moveable/> output from map2cs.
 	- Jorrit removed mention of <moveable/> from documentation.
+	- Jorrit fixed a bug in DeferUpdateLighting(). It was not correctly
+	  transforming the bounding box of the object to world space.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image 
 	  View".

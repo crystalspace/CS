@@ -203,7 +203,7 @@ protected:
    */
   long render_priority;
 
-  /// Get the bounding box in object space but correct in hierarchy.
+  /// Get the bounding box in world space and correct in hierarchy.
   void GetFullBBox (csBox3& box);
 
   /// Update defered lighting.

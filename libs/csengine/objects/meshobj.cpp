@@ -331,10 +331,10 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
   meshobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
-  if (movable.GetParent ())
+  iMovable* mov = &movable.scfiMovable;
+  while (mov)
   {
-    iMovable* mov = &movable.scfiMovable;
-    while (mov->GetParent ())
+    if (!mov->IsTransformIdentity ())
     {
       const csReversibleTransform& trans = mov->GetTransform ();
       csBox3 b (trans.This2Other (box.GetCorner (0)));
@@ -346,8 +346,8 @@ void csMeshWrapper::GetFullBBox (csBox3& box)
       b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
       b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
       box = b;
-      mov = mov->GetParent ();
     }
+    mov = mov->GetParent ();
   }
 }
 
