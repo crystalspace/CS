@@ -98,6 +98,13 @@ public:
     m31 = o31; m32 = o32; m33 = o33;
   }
 
+  void Set (csMatrix3 const &o)
+  {
+    m11 = o.m11; m12 = o.m12; m13 = o.m13;
+    m21 = o.m21; m22 = o.m22; m23 = o.m23;
+    m31 = o.m31; m32 = o.m32; m33 = o.m33;
+  }
+
   /// Initialize matrix with a quaternion.
   void Set (const csQuaternion&);
 
