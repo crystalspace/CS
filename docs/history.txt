@@ -6,9 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Apr-2004
+	- Jorrit changed the PreferClipPlane default to enabled for the new
+	  renderer. Now clipping planes are enabled by default and only
+	  disabled in some cases (like on GF Go hardware).
 12-Apr-2004
-	- Luca added some code to csloader.cpp/*.h to handle recursively the flags
-	  in meshes' children if needed.
+	- Luca added some code to csloader.cpp/*.h to recursively handle the
+	  flags in meshes' children if needed.
 	- res ported OpenPortal() to NR. Still has issues, tho.
 	- res updated todo_newrenderer.txt.
 	- res ported the halo stuff to NR. Work somewhat (except flares), but

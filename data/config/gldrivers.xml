@@ -32,10 +32,10 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="preferclipplane">
+    <config name="preferstencil">
       <Video>
 	<OpenGL>
-	  <PreferClipPlane>true</PreferClipPlane>
+	  <PreferClipPlane>false</PreferClipPlane>
 	</OpenGL>
       </Video>
     </config>
@@ -155,7 +155,7 @@
 	<usecfg>3dfxhacks</usecfg>
       </applicable>
     </rule>
-    <rule description="GeForce settings">
+    <rule description="GeForce settings: Texture Compression">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce" />
       </conditions>
@@ -169,7 +169,15 @@
       </conditions>
       <applicable>
 	<usecfg>texturecompression</usecfg>
-	<usecfg>preferclipplane</usecfg>
+      </applicable>
+    </rule>
+    <rule description="GeForce MX/Go class HW: Prefer Stencil">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="^GeForce.*MX" />
+	<regexp	string="renderer" pattern="^GeForce.*Go" />
+      </conditions>
+      <applicable>
+	<usecfg>preferstencil</usecfg>
       </applicable>
     </rule>
     <!--
