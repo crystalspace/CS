@@ -20,6 +20,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/pol2d.h"
 #include "csengine/cssprite.h"
+#include "csengine/skeleton.h"
 #include "csengine/light.h"
 #include "csengine/triangle.h"
 #include "csengine/camera.h"
@@ -94,22 +95,22 @@ void csFrame::RemapVertices (int* mapping, int num_vertices)
   texels = new_texels;
 }
 
-void csFrame::ComputeNormals (csTriangleMesh *mesh, int num_vertices)
+void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int num_vertices)
 {
   CHK (delete [] normals);
   CHK (normals = new csVector3 [num_vertices]);
-  CHK (csTriangleVertices *tr_verts = new csTriangleVertices (mesh, vertices, num_vertices));
+  CHK (csTriangleVertices *tr_verts = new csTriangleVertices (mesh, object_verts, num_vertices));
   for (int i = 0; i < num_vertices; i++)
   {
     csTriangleVertex &vt = tr_verts->GetVertex (i);
     if (vt.num_con_vertices)
     {
-      csVector3 &v = vertices [i];
+      csVector3 &v = object_verts [i];
       csVector3 &n = normals [i];
       // for some strange reason we have to compute the normal reversed
-      n = v - vertices [vt.con_vertices [0]];
+      n = v - object_verts [vt.con_vertices [0]];
       for (int j = 1 ; j < vt.num_con_vertices ; j++)
-        n += (v - vertices [vt.con_vertices [j]]);
+        n += (v - object_verts [vt.con_vertices [j]]);
       float norm = n.Norm ();
       if (norm)
         n /= norm;
@@ -156,12 +157,20 @@ csSpriteTemplate::csSpriteTemplate ()
   num_vertices = 0;
   CHK (base_mesh = new csTriangleMesh ());
   emerge_from = NULL;
+  skeleton = NULL;
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
 {
   CHK (delete base_mesh);
   CHK (delete [] emerge_from);
+  CHK (delete skeleton);
+}
+
+void csSpriteTemplate::SetSkeleton (csSkeleton* sk)
+{
+  CHK (delete skeleton);
+  skeleton = sk;
 }
 
 csSprite3D* csSpriteTemplate::NewSprite ()
@@ -188,6 +197,7 @@ void csSpriteTemplate::GenerateLOD ()
     csFrame* fr = (csFrame*)frames[i];
     fr->RemapVertices (translate, num_vertices);
   }
+  if (skeleton) skeleton->RemapVertices (translate);
   for (i = 0 ; i < GetBaseMesh ()->GetNumTriangles () ; i++)
   {
     csTriangle& tr = GetBaseMesh ()->GetTriangles ()[i];
@@ -261,14 +271,12 @@ csSprite3D::csSprite3D () : csObject ()
   v_obj2world.y = 0;
   v_obj2world.z = 0;
   cur_frame = 0;
-  tr_frame = NULL;
-  persp = NULL;
-  visible = NULL;
   tpl = NULL;
   force_otherskin = false;
   cur_action = NULL;
   vertex_colors = NULL;
   dynamiclights = NULL;
+  skeleton_state = NULL;
   MixMode = FX_Copy;
   Alpha   = 0.0f;
 }
@@ -276,10 +284,8 @@ csSprite3D::csSprite3D () : csObject ()
 csSprite3D::~csSprite3D ()
 {
   while (dynamiclights) CHKB (delete dynamiclights);
-  CHK (delete tr_frame);
-  CHK (delete [] persp);
-  CHK (delete [] visible);
   CHK (delete [] vertex_colors);
+  CHK (delete skeleton_state);
   RemoveFromSectors ();
 }
 
@@ -303,36 +309,8 @@ void csSprite3D::Move (float dx, float dy, float dz)
   v_obj2world.y += dy;
   v_obj2world.z += dz;
 }
-/*
-BOOL gePosition::MoveTo(csVector3 Pos)
-{
-  //A valid position needs to be set first!
-  ASSERT(m_pSector);
 
-  csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), m_Pos);
-
-  csVector3 NewPos     = Pos;
-  csSector* pNewSector = m_pSector;
-
-  bool mirror = false;
-  pNewSector = m_pSector->FollowSegment (OldPos, NewPos, mirror);
-
-  if (pNewSector &&
-      ABS (NewPos.x-Pos.x) < SMALL_EPSILON &&
-      ABS (NewPos.y-Pos.y) < SMALL_EPSILON &&
-      ABS (NewPos.z-Pos.z) < SMALL_EPSILON)
-  {
-    m_pSector = pNewSector;
-    m_Pos     = NewPos;
-    return TRUE;
-  }
-  else
-  {
-    return FALSE; //Object would leave space...
-  }
-}
-*/
-bool csSprite3D::MoveTo(const csVector3 &move_to)
+bool csSprite3D::MoveTo (const csVector3 &move_to)
 {
   csVector3 old_place(v_obj2world.x,v_obj2world.y,v_obj2world.z);
   csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), old_place);
@@ -373,6 +351,9 @@ void csSprite3D::Transform (csMatrix3& matrix)
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
 {
   tpl = tmpl;
+  CHK (delete skeleton_state);
+  skeleton_state = NULL;
+  if (tmpl->GetSkeleton ()) skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
 }
 
 void csSprite3D::SetTexture (char * name, csTextureList* textures)
@@ -452,6 +433,32 @@ void csSprite3D::GenerateSpriteLOD (int num_vts)
   }
 }
 
+// @@@ The below arrays are never cleaned up.
+static int max_work_sprite_size = 0;
+csVector3* csSprite3D::tr_verts = NULL;
+float* csSprite3D::z_verts = NULL;
+csVector2* csSprite3D::uv_verts = NULL;
+csVector2* csSprite3D::persp = NULL;
+bool* csSprite3D::visible = NULL;
+
+void csSprite3D::UpdateWorkTables (int max_size)
+{
+  if (max_size > max_work_sprite_size)
+  {
+    CHK (delete [] tr_verts);
+    CHK (delete [] z_verts);
+    CHK (delete [] uv_verts);
+    CHK (delete [] persp);
+    CHK (delete [] visible);
+    max_work_sprite_size = max_size;
+    CHK (tr_verts = new csVector3 [max_work_sprite_size]);
+    CHK (z_verts = new float [max_work_sprite_size]);
+    CHK (uv_verts = new csVector2 [max_work_sprite_size]);
+    CHK (persp = new csVector2 [max_work_sprite_size]);
+    CHK (visible = new bool [max_work_sprite_size]);
+  }
+}
+
 void csSprite3D::Draw (csRenderView& rview)
 {
   if (!tpl->cstxt)
@@ -460,7 +467,10 @@ void csSprite3D::Draw (csRenderView& rview)
     fatal_exit (0, false);
   }
 
+  UpdateWorkTables (tpl->num_vertices);
+
   int i;
+  csFrame * cframe = cur_action->GetFrame (cur_frame);
 
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -468,11 +478,18 @@ void csSprite3D::Draw (csRenderView& rview)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csMatrix3 m_o2c = rview.GetO2T ();
-  m_o2c *= m_obj2world;
-  csVector3 v_o2c = rview.Other2This (-v_obj2world);
+  csTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * v_obj2world);
 
-  csFrame * cframe = cur_action->GetFrame (cur_frame);
+  // Now we transform all vertices to camera space. There are two possibilities.
+  // If we have a skeleton then we let the skeleton do the transformation.
+  // Otherwise we just transform all vertices.
+  if (skeleton_state)
+    skeleton_state->Transform (tr_o2c, cframe, tr_verts);
+  else
+  {
+    for (i = 0 ; i < tpl->num_vertices ; i++)
+      tr_verts[i] = tr_o2c * cframe->GetVertex (i);
+  }
 
   // Calculate the right LOD level for this sprite.
   // Select the appropriate mesh.
@@ -499,27 +516,25 @@ void csSprite3D::Draw (csRenderView& rview)
     emerge_from = tpl->GetEmergeFrom ();
   }
 
-  // Transform all vertices from object to camera space and do perspective
-  // correction as well.
+  // Do vertex morphing if needed and then perspective correction.
   for (i = 0 ; i < num_verts ; i++)
   {
     csVector3 v;
     csVector2 uv;
     if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
     {
-      v = cframe->GetVertex (i);
+      v = tr_verts[i];
       uv = cframe->GetTexel (i);
     }
     else
     {
       // Morph between the last vertex and the one we morphed from.
-      v = (1-fnum)*cframe->GetVertex (emerge_from[i]) + fnum*cframe->GetVertex (i);
+      v = (1-fnum)*tr_verts[emerge_from[i]] + fnum*tr_verts[i];
       uv = (1-fnum)*cframe->GetTexel (emerge_from[i]) + fnum*cframe->GetTexel (i);
     }
-    v = m_o2c * v + v_o2c;
 
-    tr_frame->SetVertex (i, v.x, v.y, v.z);
-    tr_frame->SetTexel (i, uv.x, uv.y);
+    z_verts[i] = v.z;
+    uv_verts[i] = uv;
     if (v.z >= SMALL_Z)
     {
       float iz = csCamera::aspect/v.z;
@@ -591,9 +606,9 @@ void csSprite3D::Draw (csRenderView& rview)
       else { idx = 0; dir = 1; }
       for (j = 0; j < 3; j++)
       {
-        poly.vertices [idx].z = 1 / tr_frame->GetVertex (trivert [j]).z;
-        poly.vertices [idx].u = tr_frame->GetTexel (trivert [j]).x;
-        poly.vertices [idx].v = tr_frame->GetTexel (trivert [j]).y;
+        poly.vertices [idx].z = 1 / z_verts[trivert [j]];
+        poly.vertices [idx].u = uv_verts[trivert [j]].x;
+        poly.vertices [idx].v = uv_verts[trivert [j]].y;
         if (vertex_colors)
         {
           poly.vertices [idx].r = vertex_colors[trivert[j]].red;
@@ -627,9 +642,9 @@ void csSprite3D::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = tpl->GetFirstAction (); }
 
-  CHK (tr_frame = new csFrame (tpl->num_vertices));
-  CHK (persp = new csVector2 [tpl->num_vertices]);
-  CHK (visible = new bool [tpl->num_vertices]);
+  //CHK (tr_frame = new csFrame (tpl->num_vertices));
+  //CHK (persp = new csVector2 [tpl->num_vertices]);
+  //CHK (visible = new bool [tpl->num_vertices]);
 
   time_t tm;
   csWorld::isys->GetTime (tm);
@@ -701,7 +716,7 @@ void csSprite3D::RemoveFromSectors ()
     sectors[0] = NULL;
     sectors.Pop ();
     int idx = ss->sprites.Find (this);
-    if (idx>=0)
+    if (idx >= 0)
     {
       ss->sprites[idx] = NULL;
       ss->sprites.Delete (idx);
@@ -720,8 +735,22 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   int i, j;
 
   csFrame* this_frame = tpl->GetFrame (cur_frame);
-  if (!this_frame->HasNormals ())
-    this_frame->ComputeNormals (tpl->GetBaseMesh (), tpl->GetNumVertices ());
+  csVector3* object_vertices;
+  if (skeleton_state)
+  {
+    UpdateWorkTables (tpl->num_vertices);
+    skeleton_state->Transform (csTransform (m_obj2world, m_world2obj * v_obj2world), this_frame, tr_verts);
+    object_vertices = tr_verts;
+    // @@@ Computing normals every time is not efficient. We need to do it
+    // only when something changes.
+    this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
+  }
+  else
+  {
+    object_vertices = this_frame->GetVertices ();
+    if (!this_frame->HasNormals ())
+      this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
+  }
 
   ResetVertexColors ();
   for (i = 0 ; i < num_lights ; i++)
@@ -738,7 +767,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
     for (j = 0 ; j < tpl->GetNumVertices () ; j++)
     {
-      csVector3 &vertex = this_frame->GetVertex (j);
+      csVector3& vertex = object_vertices[j];
       csVector3 light_vec = light_pos - vertex;
       float dist = sqrt (csSquaredDist::PointPoint (light_pos, vertex));
       float cosinus;
