@@ -33,7 +33,7 @@ vpath %.cpp libs/csgfxldr
 
 SRC.CSGFXLDR = libs/csgfxldr/csimage.cpp libs/csgfxldr/imgload.cpp \
   libs/csgfxldr/quantize.cpp libs/csgfxldr/inv_cmap.cpp \
-  libs/csgfxldr/memimage.cpp
+  libs/csgfxldr/memimage.cpp libs/csgfxldr/bumpmap.cpp
 
 ifeq ($(DO_GIF),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/gifimage.cpp
