@@ -1336,7 +1336,7 @@ void csSprite3D::Draw (csRenderView& rview)
   int cf_idx = cframe->GetAnmIndex();
 
   csVector3* real_obj_verts;
-  csVector3* real_tween_verts;
+  csVector3* real_tween_verts = NULL;
 
   if (tpl->VerticesAreCompressed ())
   {
