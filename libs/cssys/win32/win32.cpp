@@ -32,10 +32,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
-// Remove this to have a DirectInput Keyboard Support (xtrochu@yahoo.com)
-//#define DO_DINPUT_KEYBOARD
-//
-#ifdef DO_DINPUT_KEYBOARD
+#ifdef DO_DINPUT_KEYBOARD //New keyboard handling by Xavier Trochu (xtrochu@yahoo.com)
 #include <dinput.h>
 #endif
 #include <stdio.h>
@@ -137,6 +134,14 @@ SysKeyboardDriver::~SysKeyboardDriver(void)
 
 #ifdef DO_DINPUT_KEYBOARD
 
+/*
+ * This table performs the translation from keycode to character.
+ * It use this english keyboard layout.
+ * ----
+ * PS: They may be some errors, it's quite difficult to check. So if you
+ * have some keys that are not handled correctly, You'd better check this first.
+ *
+*/
 static int s_KeyTable[257]= {
 	0,
 	CSKEY_ESC,'1','2','3','4','5','6','7','8','9','0','-','=',CSKEY_BACKSPACE,CSKEY_TAB,
@@ -156,29 +161,43 @@ static int s_KeyTable[257]= {
 	CSKEY_HOME,CSKEY_UP,CSKEY_PGUP,0,CSKEY_LEFT,0,CSKEY_RIGHT,0,CSKEY_END,CSKEY_DOWN,CSKEY_PGDN,CSKEY_INS,CSKEY_DEL
 };
 
+// This macro is for COM calls. If it fails, it shows a MessageBox then Kills the whole process. It's brutal, but as I use another thread, it's safer this way
 #define CHK_FAILED(x)  { if(FAILED(x)) { ::MessageBox(::GetFocus(), #x " Failed!", NULL,MB_OK|MB_ICONERROR); ::ExitProcess(1); } }
+// This macro is for COM Release calls
 #define CHK_RELEASE(x)  { if((x) != NULL) { (x)->Release(); (x)=NULL; } }
-extern "C" DWORD WINAPI s_threadroutine(LPVOID param)
+
+/*
+ * The thread entry point. Called by CsKeyboardDriver::Open()
+ *
+*/
+DWORD WINAPI s_threadroutine(LPVOID param)
 {
 	SysKeyboardDriver * kbd=(SysKeyboardDriver*)param;
 	HRESULT hr;
 	char * buffer, *oldbuffer=NULL;
 	LPDIRECTINPUT lpdi=NULL;
 	LPDIRECTINPUTDEVICE lpKbd=NULL; 
-	HANDLE hEvent;
+	HANDLE hEvent[2];
 	int i;
 
 	CHK_FAILED(::DirectInputCreate(gb_hInstance, 0X300, &lpdi, NULL));  // 0X300 instead of DIRECTINPUT_VERSION allow the binaries to stay compatible with NT4
 	CHK_FAILED(lpdi->CreateDevice(GUID_SysKeyboard, &lpKbd, NULL));
 	CHK_FAILED(lpKbd->SetDataFormat(&c_dfDIKeyboard)); 
 	CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(NAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
-	hEvent=::CreateEvent(NULL,FALSE,FALSE,NULL);
-	if(hEvent==NULL)
+	hEvent[0]=::CreateEvent(NULL,FALSE,FALSE,NULL);
+	if(hEvent[0]==NULL)
 	{
 		::MessageBox(::GetFocus(), "CreateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
 		::ExitProcess(1);
 	}
-	hr=lpKbd->SetEventNotification(hEvent);
+	if(!::DuplicateHandle(::GetCurrentProcess(),kbd->m_hEvent,
+						 ::GetCurrentProcess(),&hEvent[1],
+						 0,FALSE,DUPLICATE_SAME_ACCESS))
+	{
+		::MessageBox(::GetFocus(), "DuplicateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
+		::ExitProcess(1);
+	}
+	hr=lpKbd->SetEventNotification(hEvent[0]);
 	switch(hr) {
 	case DI_OK:
 		break;
@@ -191,7 +210,7 @@ extern "C" DWORD WINAPI s_threadroutine(LPVOID param)
 	oldbuffer=new char[256];
 	hr=lpKbd->GetDeviceState(256,oldbuffer);
 	while(1) {
-		switch(::WaitForSingleObject(hEvent,INFINITE))
+		switch(::WaitForMultipleObjects(2,hEvent,FALSE,INFINITE))
 		{
 		case WAIT_OBJECT_0:
 			buffer=new char[256];
@@ -223,9 +242,11 @@ extern "C" DWORD WINAPI s_threadroutine(LPVOID param)
 			delete[] oldbuffer;
 			oldbuffer=buffer;
 			break;
+		case WAIT_OBJECT_0+1:
 		case WAIT_TIMEOUT:
 			lpKbd->Unacquire();
-			CloseHandle(hEvent);
+			CloseHandle(hEvent[0]);
+			CloseHandle(hEvent[1]);
 			CHK_RELEASE(lpKbd);
 			CHK_RELEASE(lpdi);
 			return 0;
@@ -235,20 +256,32 @@ extern "C" DWORD WINAPI s_threadroutine(LPVOID param)
 
 #undef CHK_RELEASE
 #undef CHK_FAILED
-#endif
+#endif	// DO_DINPUT_KEYBOARD
 
 bool SysKeyboardDriver::Open(csEventQueue *EvQueue)
 {
   csKeyboardDriver::Open (EvQueue);
 #ifdef DO_DINPUT_KEYBOARD
   DWORD dwThreadId;
-  ::CloseHandle(::CreateThread(NULL,0,s_threadroutine,this,0,&dwThreadId));
+  m_hEvent=::CreateEvent(NULL,FALSE,FALSE,NULL);
+  m_hThread=::CreateThread(NULL,0,s_threadroutine,this,0,&dwThreadId);
+  if(m_hEvent==NULL||m_hThread==NULL)
+  {
+	::MessageBox(::GetFocus(), "CreateEvent() Failed!", NULL,MB_OK|MB_ICONERROR);
+	::ExitProcess(1);
+  }
 #endif
   return true;
 }
 
 void SysKeyboardDriver::Close(void)
 {
+#ifdef DO_DINPUT_KEYBOARD
+	::SetEvent(m_hEvent);
+	::CloseHandle(m_hEvent);
+	::WaitForSingleObject(m_hThread,1000);
+	::CloseHandle(m_hThread);
+#endif
   // Close your keyboard interface
 }
 

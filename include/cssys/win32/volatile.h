@@ -20,6 +20,7 @@
   #define DO_AU
   #define DO_MMX
   #define ZLIB_DLL
+  #undef DO_DINPUT_KEYBOARD // undefine this if you have problems with keyboard handling
 
   //#ifdef _DEBUG
     //Right now, Inline assembler doesn' work any more on MSVC, 

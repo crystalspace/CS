@@ -122,6 +122,12 @@ public:
 /// Windows version.
 class SysKeyboardDriver : public csKeyboardDriver
 {
+#ifdef DO_DINPUT_KEYBOARD
+private:
+	HANDLE m_hEvent;
+	HANDLE m_hThread;
+	friend DWORD WINAPI s_threadroutine(LPVOID param);
+#endif
 public:
   SysKeyboardDriver();
   ~SysKeyboardDriver(void);
