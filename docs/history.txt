@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	  CS_HEADER_LOCAL() from cssysdef.h so that they work with newer, more
 	  restrictive preprocessors.  This allows the OpenGL renderer and
 	  canvas to build correctly with Jaguar MacOS/X.
+	- Eric Sunshine fixed a bug he introduced into cs2xml yesterday.
+	  ParseGeneral() was not recognizing all known tokens.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for
