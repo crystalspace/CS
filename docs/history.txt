@@ -15,6 +15,16 @@ chronological order.
 	  around the border the material map would get accessed out of bounds.
 	- res changed csEvent to use a csHash<> to store the event attributes.
 	- res made a small 64bit warning fix to csHash<>.
+	- Keith added function CalculateAllBoneBoundingBoxes in sprcal3d to
+	  more closely match the cal3d api.  This function is very slow in
+	  cal3d and should only be called when absolutely necessary--i.e. the
+	  first time the model is fully loaded. Note that calling the per-frame
+	  GetBoundingBox is very efficient once this previous function has setup
+	  all the base data for it.
+	- Keith modified the sprcal3d loader to automatically call this function
+	  when models are loaded from a .cal3d file.  Loading sprcal3d models
+	  is about 4x faster now due to this refactoring.
+
 6-Jul-2004
 	- Reed changed VOSA3DL to load required plugins on demand rather than 
 	  assume they were already loaded.
