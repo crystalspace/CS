@@ -56,6 +56,8 @@
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
+#include "csobject/csobject.h"  
+#include "csobject/objiter.h"
 #include "cssfxldr/common/snddata.h"
 #include "csgfxldr/pngsave.h"
 #include "csparser/snddatao.h"
@@ -1067,11 +1069,34 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
-  if (w && Sound) Sound->PlayEphemeral (w);
+  //csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
+  //if (w && Sound) Sound->PlayEphemeral (w);
 
   wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
   wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
+  //For 2D (nonmoveable) background sound, no control, loop
+  csObjIterator sobj = world->GetIterator (csSoundDataObject::Type);
+  while (!sobj.IsNull ())
+  {
+    //sounds (other than standard) are from a zip specified in world file 
+    //SOUNDS section and specified in vfs.cfg in lib/sounds
+    csSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound(); 
+    if (wSoundData && Sound) 
+    {
+      //don't play now if loaded for missile
+      if ( wSoundData == csSoundDataObject::GetSound(*world, "tada.wav") ||
+	   wSoundData == csSoundDataObject::GetSound(*world, "boom.wav") ||
+	   wSoundData == csSoundDataObject::GetSound(*world, "whoosh.wav"))
+      {
+        ++sobj;
+      }
+      else
+      {
+        Sound->PlayEphemeral (wSoundData, true);
+        ++sobj;
+      }
+    }
+  }
 #endif
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
