@@ -289,6 +289,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   int cloudmin = 180;
   int cloudlen = 420 - cloudmin;
   res = (res-cloudmin)*255/cloudlen;
+  res = (res*res)>>7; //// square the cloudyness
 
   if(res>255) res=255;
   return (uint8)res;
