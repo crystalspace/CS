@@ -137,7 +137,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_GetClassTable -E djgpp $(LFLAGS.DLL) $(LFLAGS.L)$(OUT)
+DO.SHARED.PLUGIN.CORE = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_GetClassTable -E djgpp $(LFLAGS.DLL) $(LFLAGS.L)$(OUT)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

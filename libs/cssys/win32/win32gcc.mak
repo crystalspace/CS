@@ -176,13 +176,13 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make a shared AKA dynamic library
-DO.SHARED.PLUGIN = \
+DO.SHARED.PLUGIN.CORE = \
   dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
-DO.SHARED.PLUGIN += -mconsole
+DO.SHARED.PLUGIN.CORE += -mconsole
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
