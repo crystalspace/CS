@@ -25,7 +25,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
-#include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "csgeom/plane3.h"
 #include "igeom/objmodel.h"
 #include "iengine/viscull.h"
@@ -103,7 +103,7 @@ private:
 
   // This hash set holds references to csFrustVisObjectWrapper instances
   // that require updating in the culler.
-  csHashSet update_queue;
+  csSet<csFrustVisObjectWrapper*> update_queue;
   // The 'updating' flag is true if the objects are being updated. This flag
   // is to prevent us from updating it again (if the callback is fired
   // again).

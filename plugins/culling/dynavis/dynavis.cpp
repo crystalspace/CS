@@ -409,10 +409,10 @@ void csDynaVis::UpdateObjects ()
 {
   updating = true;
   {
-    csGlobalHashIterator it (update_queue.GetHashMap ());
+    csSet<csVisibilityObjectWrapper*>::GlobalIterator it = update_queue.GetIterator ();
     while (it.HasNext ())
     {
-      csVisibilityObjectWrapper* vw = (csVisibilityObjectWrapper*)it.Next ();
+      csVisibilityObjectWrapper* vw = it.Next ();
       UpdateObject (vw);
     }
   }

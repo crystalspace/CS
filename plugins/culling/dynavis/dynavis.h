@@ -24,7 +24,7 @@
 #include "iutil/dbghelp.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
-#include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 #include "csutil/scf.h"
 #include "igeom/objmodel.h"
@@ -193,7 +193,7 @@ private:
 
   // This hash set holds references to csVisibilityObjectWrapper instances
   // that require updating in the culler.
-  csHashSet update_queue;
+  csSet<csVisibilityObjectWrapper*> update_queue;
   // The 'updating' flag is true if the objects are being updated. This flag
   // is to prevent us from updating it again (if the callback is fired
   // again).

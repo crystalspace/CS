@@ -303,10 +303,10 @@ void csFrustumVis::UpdateObjects ()
 {
   updating = true;
   {
-    csGlobalHashIterator it (update_queue.GetHashMap ());
+    csSet<csFrustVisObjectWrapper*>::GlobalIterator it = update_queue.GetIterator ();
     while (it.HasNext ())
     {
-      csFrustVisObjectWrapper* vw = (csFrustVisObjectWrapper*)it.Next ();
+      csFrustVisObjectWrapper* vw = it.Next ();
       UpdateObject (vw);
     }
   }

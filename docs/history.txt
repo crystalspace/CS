@@ -27,6 +27,8 @@ chronological order.
 	  longer requires it.
 	- res fixed a bug in the AVI handler where a loop counter was 
 	  incremented twice.
+	- Jorrit implemented a considerable optimization in Dynavis
+	  and Frustvis by replacing csHashSet with csSet<T>.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.
