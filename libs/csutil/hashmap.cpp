@@ -60,7 +60,7 @@ csHashIterator::csHashIterator (csHashMap *hm)
 
 csHashIterator::csHashIterator (csHashMap *hm, csHashKey hkey)
 {
-  uint32 idx = key % hm->NumBuckets;
+  uint32 idx = hkey % hm->NumBuckets;
 
   hash = hm;
   bucket = hm->Buckets[idx]; // NULL if bucket is empty.
