@@ -20,7 +20,7 @@
 #define __CS_GL2D_FONT_H__
 
 #include <GL/gl.h>
-#include "ifontsvr.h"
+#include "ifontsrv.h"
 
 /**
   This class contains
