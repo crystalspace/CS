@@ -33,7 +33,6 @@
 #include "iutil/strvec.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
-#include "iutil/document.h"
 #include "csgeom/transfrm.h"
 #include "cstool/initapp.h"
 #include "csutil/xmltiny.h"

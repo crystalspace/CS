@@ -59,7 +59,6 @@
 #include "iengine/dynlight.h"
 #include "iengine/camera.h"
 #include "igraphic/imageio.h"
-#include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"

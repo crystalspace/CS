@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "cstool/collider.h"
 #include "iutil/objreg.h"
-#include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
 #include "igeom/polymesh.h"

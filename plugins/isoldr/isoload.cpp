@@ -65,8 +65,6 @@
 #include "ivaria/iso.h"
 #include "ivaria/isoldr.h"
 
-#include "qint.h"
-
 #include "isoload.h"
 
 // ---------- Plugin Stuff -------------

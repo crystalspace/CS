@@ -36,7 +36,6 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/strvec.h"
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"

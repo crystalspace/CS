@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+4-Jan-2002
+	- Andreas Busch removed duplicate #include lines from various
+	  source files and correcty named the multiple-include-protection
+	  define in shadervar.h.
 3-Jan-2002
 	- Eric Sunshine made the following changes:
 	    - Configuration phase now detects libmng automatically.  Added

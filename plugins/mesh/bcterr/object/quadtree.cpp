@@ -40,7 +40,6 @@
 #include "qint.h"
 #include "qsqrt.h"
 #include "ivaria/reporter.h"
-#include "quadtree.h"
 
 static bool Inside (csBox3 bbox, csVector3 *point)
 {

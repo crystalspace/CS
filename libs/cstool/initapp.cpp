@@ -41,7 +41,6 @@
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
-#include "iutil/eventq.h"
 #include "iutil/cmdline.h"
 #include "iutil/cfgmgr.h"
 #include "isound/renderer.h"

@@ -46,7 +46,6 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "iutil/plugin.h"

@@ -23,7 +23,6 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/event.h"
-#include "iutil/comp.h"
 #include "iutil/strvec.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
