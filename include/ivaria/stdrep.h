@@ -68,7 +68,8 @@ struct iStandardReporterListener : public iBase
    * this is only done for fatal, bug, and debug severity levels.
    */
   virtual void ShowMessageID (int severity, bool showid) = 0;
-  /// Set the debug file that is used.
+
+  /// Get the debug file name (or null if a debug file is not used).
   virtual const char* GetDebugFile () = 0;
 };
 
