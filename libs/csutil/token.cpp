@@ -21,8 +21,6 @@
 #include "cssysdef.h"
 #include "csutil/token.h"
 
-//---------------------------------------------------------------------------
-
 float get_token_float (char** buf)
 {
   char* t = get_token (buf);
@@ -102,16 +100,8 @@ char* get_token (char** buf)
   return token;
 }
 
-#ifdef COMP_WCC
-void skip_token (char** buf, char* tok){skip_token (buf, tok, NULL);}
-void skip_token (char** buf, char* tok, char* msg)
-#else
 void skip_token (char** buf, char* tok, char* /*msg*/)
-#endif
 {
   char* t = get_token (buf);
   if (strcmp (t, tok)) return; // Error
 }
-
-//---------------------------------------------------------------------------
-

@@ -86,11 +86,6 @@ The scripting plug-in modules allows support for Python and Java scripts.
 @xref{csPython}.
 
 @item
-@emph{Authentification}
-
-@@@@@@FIXME: What is this?
-
-@item
 @emph{Font Server}
 
 The font server can be used to display different fonts in your application.
@@ -98,17 +93,12 @@ The font server can be used to display different fonts in your application.
 @item
 @emph{Motion Manager}
 
-@@@@@@FIXME: What is this?
+Skeletal motion manager.
 
 @item
 @emph{Game Core}
 
 This plug-in also tries to make writing games easier, like Crystal Clear.
-
-@item
-@emph{Netspace}
-
-@@@@@@FIXME: What is this?
 
 @item
 @emph{Performance Statistics}

@@ -40,11 +40,6 @@ is designed to provide a clean, effective and cross-platform base for creating
 CrystalSpace-related utilites.  Currently there is only one such utility under
 development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
 
-@cindex @file{demonets}
-@cindex Applications, @file{demonets}
-@item demonets
-The Crystal Space Networking demo.
-
 @cindex @file{dnapp}
 @cindex Applications, @file{dnapp}
 @item dnapp
@@ -98,16 +93,6 @@ converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 A demostration application which draws texture-mapped meta-balls in a
 free-form, dynamic blob.
 
-@cindex @file{ndrvdemo}
-@cindex Applications, @file{ndrvdemo}
-@item ndrvdemo
-An example demonstrating use of the Crystal Space network driver.
-
-@cindex @file{nstp}
-@cindex Applications, @file{nstp}
-@item nstp
-The Netspace test application.
-
 @cindex @file{perftest}
 @cindex Applications, @file{perftest}
 @item perftest
@@ -129,11 +114,6 @@ A test application for procedural textures.
 @item pysimp
 An extremely simple example demonstrating use of the Python plug-in module.
 
-@cindex @file{pytest}
-@cindex Applications, @file{pytest}
-@item pytest
-A test application for the Python plug-in module.
-
 @cindex @file{scfreg}
 @cindex Applications, @file{scfreg}
 @item scfreg
@@ -145,13 +125,6 @@ hardware renderers, with Crystal Space's @sc{scf} mechanism.
 @item scftutor
 An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
 @xref{SCF}.
-
-@cindex @file{shooter}
-@cindex Applications, @file{shooter}
-@item shooter
-Crystal Shooter.  An application that is intended to grow into a classic
-@dfn{First Person Shooter}.  Right now it is more some sort of feasability
-study.  It is also a demo application of the @file{csgame} gaming library.
 
 @cindex @file{simple}
 @cindex Applications, @file{simple}
@@ -165,7 +138,8 @@ application is the subject of a Crystal Space programming tutorial,
 @cindex @file{simplep}
 @cindex Applications, @file{simplep}
 @item simplep
-A simple plug-in example.
+A simple example illustrating how to use the Crystal Space engine as a plug-in
+module rather than a statically linked library.
 
 @cindex @file{squawk}
 @cindex Applications, @file{squawk}
@@ -176,7 +150,7 @@ systems.  @xref{Squawk}.
 @cindex @file{t3d2cs}
 @cindex Applications, @file{t3d2cs}
 @item t3d2cs
-This is a utility to convert Unreal maps (@file{t3d}) to CS maps.
+This is a utility to convert Unreal maps (@file{t3d}) to Crystal Space maps.
 
 @cindex @file{textconv}
 @cindex Applications, @file{textconv}
@@ -187,6 +161,12 @@ A @sc{dos}/Unix line termination conversion tool.
 @cindex Applications, @file{uninst}
 @item uninst
 An uninstall program.
+
+@cindex @file{vfstest}
+@cindex Applications, @file{vfstest}
+@item vfstest
+A simple test program which measures the speed of the Virtual File System
+(@sc{vfs}).  @xref{VFS}.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}
@@ -202,10 +182,4 @@ harness for most of the features which get added to the engine.  It is not
 necessarily a good programming example, but if you are interested in seeing
 an engine feature in action, this is probably the place to look.
 @xref{Walktest}.
-
-@cindex @file{vfstest}
-@cindex Applications, @file{vfstest}
-@item vfstest
-A simple test program which measures the speed of the Virtual File System
-(@sc{vfs}).  @xref{VFS}.
 @end table

@@ -17,8 +17,6 @@
 #  define OS_VERSION OS_NEXT_DESCRIPTION    /* Must appear before OS_UNIX */
 #elif defined(OS_BE)
 #  define OS_VERSION "BeOS"                 /* Must appear before OS_UNIX */
-#elif defined(OS_PS2)
-#  define OS_VERSION "Playstation 2"
 #elif defined(OS_UNIX)
 #  define OS_VERSION "Unix"
 #elif defined(OS_DOS)
@@ -29,6 +27,8 @@
 #  define OS_VERSION "Win32"
 #elif defined(OS_OS2)
 #  define OS_VERSION "OS/2"
+#elif defined(OS_PS2)
+#  define OS_VERSION "Playstation/2"
 #elif defined(OS_UNKNOWN)
 #  define OS_VERSION "Unknown"
 #else
@@ -59,14 +59,12 @@
 
 #if defined(COMP_GCC)
 #  define CC_VERSION "GCC"
-#elif defined(COMP_WCC)
-#  define CC_VERSION "WATCOM"
 #elif defined(COMP_MWERKS)
 #  define CC_VERSION "MWERKS"
 #elif defined(COMP_VC)
 #  define CC_VERSION "VisualC"
 #elif defined(COMP_BC)
-#  define CC_VERSION "BorlandCPP"
+#  define CC_VERSION "Borland"
 #elif defined(COMP_UNKNOWN)
 #  define CC_VERSION "Unknown"
 #else

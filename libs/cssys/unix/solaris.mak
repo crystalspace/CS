@@ -31,7 +31,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Operating system. Can be one of: SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, AMIGAOS, WIN32, OS2, BE
 OS=SOLARIS
 
-# Compiler. Can be one of: GCC, WCC (Watcom C++), MPWERKS, VC (Visual C++), UNKNOWN
+# Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))

@@ -54,8 +54,6 @@ Sound.mcp 				- generates the mac sound driver shared library and
 
 These next 3 projects are not up to date:
 GlideRender.mcp			- generates the Glide Render shared library.
-NetworkDriverNull.mcp	- generates the null network driver shared library.
-NetworkMgrNull.mcp  	- generates the null network manager shared library.
 
 10 projects that generate applications
 Blocks.mcp		- A Tetris type game
@@ -65,7 +63,6 @@ MazeD.mcp		- The Crystal Space Editor.
 MetaDemo.mcp	- A demo application
 Primedit.mcp	- Another Crystal Space Editor. (Not up to date)
 Simple.mcp  	- Simple Crystal Space application.
-Shooter.mcp  	- A Crystal Space application.
 Squawk.mcp  	- A Crystal Space application.
 Walktest.mcp	- Another Simple Crystal Space application.
 

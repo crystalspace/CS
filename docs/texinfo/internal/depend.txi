@@ -72,7 +72,7 @@ than actually linking with a library.
 @item
 @code{csws}
 @item
-@code{csgame}
+@code{csphyzik}
 @end itemize
 
 @item Level 6: @emph{Application}

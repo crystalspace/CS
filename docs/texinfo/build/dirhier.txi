@@ -69,6 +69,10 @@ which resides here.
 This is a temporary staging area for documentation which has not yet been
 converted to Texinfo format.  Much of this documentation is useful and worth
 perusing.
+
+@item CS/docs/pubapi
+This directory contains the Crystal Space SDK's public API reference manual
+rendered into @sc{html} format.
 @end table
 
 @item CS/include
@@ -100,11 +104,6 @@ Sprites and things
 Polygon related functionality
 @end table
 
-@item CS/libs/csgame
-The Crystal Space Game library.  This is set of utility classes that focus on
-creating a real game.  You can think of it, as an easier way to use Crystal
-Space in your own games, at the cost of some flexibility.
-
 @item CS/libs/csgeom
 The geometry library.  Various geometry related functions and classes can be
 found here: matrices, vectors, @sc{bsp} trees, clipper, planes, etc.
@@ -124,29 +123,6 @@ dynamically be attached to objects at run-time.
 A library which parses @sc{ascii} world files and imports the world into the
 3D engine.
 
-@item CS/libs/cssfxldr
-Routines to support loading various sound file formats and put them internally
-in the same format.  This library supports @sc{wav}, @sc{aiff}, @sc{au}, etc.
-
-@table @code
-@item CS/libs/cssfxldr/common
-Code common to many sound loaders.
-@end table
-
-@item CS/libs/cssndrdr
-System dependent sound renderers.
-
-@table @code
-@item CS/libs/cssndrdr/software
-Software based sound renderer
-@item CS/libs/cssndrdr/a3d
-3D sound renderer for @sc{a3d}
-@item CS/libs/cssndrdr/ds3d
-3D sound renderer for Direct Sound 3D
-@item CS/libs/cssndrdr/eax
-3D sound renderer for @sc{eax}
-@end table
-
 @item CS/libs/cssys
 All system dependent stuff (non-graphics and non-sound related) is in this
 library.
@@ -158,26 +134,17 @@ Code which may be shared between system drivers which can make use of it.
 BeOS
 @item CS/libs/cssys/djgpp
 @sc{dos} using the @sc{djgpp} compiler
-@item CS/libs/cssys/wcc
-@sc{dos} using the Watcom compiler
 @item CS/libs/cssys/mac
 Macintosh
 @item CS/libs/cssys/next
 MacOS/X Server, OpenStep, NextStep
 @item CS/libs/cssys/os2
-@sc{os}/2
+@sc{os/2}
 @item CS/libs/cssys/unix
 Unix, including Linux, Solaris, Irix, etc.
 @item CS/libs/cssys/win32
 Win32
 @end table
-
-@item CS/libs/tools
-High level application tools. This are specialized objects which provide
-applications with high-level functionality. Though specialized, they are
-still general enough to be useful to certain types of applications. An
-example is csSimpleConsole which provides basic input/output facilities
-within an application framework.
 
 @item CS/libs/csutil
 This library contains various utilities.  There is an Archive class which can
@@ -208,8 +175,11 @@ This directory contains the common parts of the makefiles for many systems
 @table @code
 @item CS/mk/mwcw
 Project files for Macintosh CodeWarrior
+@item CS/mk/msvcgen
+Component for automatic generation of Visual C++ project files based upon
+information gleaned from @sc{gnu} makefiles project-wide.
 @item CS/mk/visualc
-Project files for Win32 using MSVC 5.0/ 6.0
+Project files for Win32 using @sc{msvc} 5.0/ 6.0
 @end table
 
 @item CS/plugins
@@ -326,8 +296,6 @@ The Crystal Clear plug-in, a game abstraction library.
 @item CS/plugins/cscon
 A console plug-in for displaying a textual console within the graphic
 environment.
-@item CS/plugins/cspython
-A Python interpreter plug-in (unfinished).
 @end table
 
 @item CS/support
@@ -337,6 +305,6 @@ Support routines.
 @item CS/support/debug
 Support routines for extensive memory checking.
 @item CS/support/gnu
-Replacement for getopt (missing on some systems).
+Replacement for @file{bison.simple}, which is missing on some systems.
 @end table
 @end table

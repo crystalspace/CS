@@ -64,11 +64,7 @@ The sound renderer, used for all sound output.  Possible values are:
 
 @table @samp
 @item crystalspace.sound.render.software
-This sound renderer uses some system-dependent sound API.  Should work
-well but you won't get special effects like with A3D.
-
-@item crystalspace.sound.render.a3D
-This uses Aureal3D for sound output.
+This sound renderer uses some system-dependent sound @sc{api}.
 
 @item crystalspace.sound.render.ds3D
 This uses DirectSound3D for sound output.  Requires DirectX run-time libraries.
@@ -80,21 +76,6 @@ The network driver.  This performs all basic communication operations.
 @table @samp
 @item crystalspace.network.driver.sockets
 This uses Sockets for network communication.
-@end table
-
-@item NetManager=
-The network manager. This provides high-level network operations that are
-only useful for games.
-
-@emph{Warning}: This module is obsolete and will be decommissioned soon.
-Do not use it.
-
-@table @samp
-@item crystalspace.network.manager.simple
-A simple network manager.
-
-@item crystalspace.network.manager.deadreckoning
-A dead-reckoning network manager.
 @end table
 
 @item Engine=

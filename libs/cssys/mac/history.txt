@@ -24,7 +24,7 @@ History:
 	- Adding scfreg application and removing csregsvr.
 11-Aug-99
 	- Bringing documentation up to date.
-	- Added four more application projects: Blocks.mcp, MetaCemo.mcp, Shooter.mcp and Squawk.mcp.
+	- Added four more application projects: Blocks.mcp, MetaCemo.mcp, and Squawk.mcp.
 	- Fixed all known (to me) bugs.
 27-May-99
 	- Added fastsqrt.cpp to CSpace.mcp.

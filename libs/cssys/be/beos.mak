@@ -36,7 +36,7 @@ PROC=INTEL
 # MACOS, AMIGAOS, WIN32, OS2, BE
 OS=BE
 
-# Compiler. Can be one of: GCC, WCC (Watcom C++), MPWERKS, VC (Visual C++),
+# Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++),
 # UNKNOWN
 COMP=GCC
 

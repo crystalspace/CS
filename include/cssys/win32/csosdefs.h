@@ -52,9 +52,9 @@
   #define main csMain
 #endif
 
-#if defined(COMP_WCC) || defined(COMP_BC)
-  // The WATCOM C++ compiler does not accept a 'main' routine
-  // in a program which already contains WinMain. This is a 'fix'.
+#if defined(COMP_BC)
+  // The Borland C++ compiler does not accept a 'main' routine
+  // in a program which already contains WinMain. This is a work-around.
   #define main csMain
 #endif
 
@@ -90,7 +90,7 @@
 #  endif
 #endif
 
-#if defined (COMP_WCC) || defined (COMP_BC)
+#if defined (COMP_BC)
 #  define strcasecmp stricmp
 #  define strncasecmp strnicmp
 #endif
@@ -117,7 +117,7 @@
   /// Directory read functions
 #if !defined(COMP_GCC)	  
   
-  #if !(defined(COMP_BC) || defined(COMP_WCC))
+  #if !defined(COMP_BC)
     #define __NEED_OPENDIR_PROTOTYPE
     #include <io.h>
 
@@ -146,7 +146,7 @@
     extern "C" dirent *readdir (DIR *dirp);
     extern "C" int closedir (DIR *dirp);
 
-#	endif // end if !(defined(COMP_BC)...(COMP_WCC))
+#   endif // end if !defined(COMP_BC)
 # endif
 #endif
 

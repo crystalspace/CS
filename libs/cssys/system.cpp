@@ -35,7 +35,6 @@
 #include "iconsole.h"
 #include "isndrdr.h"
 #include "inetdrv.h"
-#include "inetman.h"
 #include "iconfig.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -302,9 +301,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   G3D = NULL;
   G2D = NULL;
   NetDrv = NULL;
-  NetMan = NULL;
-  NetProtocol = NULL;
-  CmdManager = NULL;
   Sound = NULL;
   MotionMan = NULL;
 
@@ -332,9 +328,6 @@ csSystemDriver::~csSystemDriver ()
 
   // Deregister all known drivers and plugins
   if (Console) Console->DecRef ();
-  if (CmdManager) CmdManager->DecRef();
-  if (NetProtocol) NetProtocol->DecRef ();
-  if (NetMan) NetMan->DecRef ();
   if (NetDrv) NetDrv->DecRef ();
   if (Sound) Sound->DecRef ();
   if (G2D) G2D->DecRef ();
@@ -483,12 +476,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     G2D = QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
-  NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
-  NetProtocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iNetSpaceProtocol);
-  CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCommandManager);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
-  Auth = QUERY_PLUGIN_ID (this, CS_FUNCID_AUTH, iAuth);
-	MotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
+  MotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
@@ -517,13 +506,6 @@ bool csSystemDriver::Open (const char *Title)
   if (NetDrv)
     if (!NetDrv->Open ())
       return false;
-  if (NetMan)
-    if (!NetMan->Open ())
-      return false;
-
-  if (Auth)
-    if (!Auth->Open())
-      return false;
 
   // Now pass the open event to all plugins
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
@@ -540,16 +522,8 @@ void csSystemDriver::Close ()
 
   if (Sound)
     Sound->Close ();
-  if (NetMan)
-    NetMan->Close ();
   if (NetDrv)
     NetDrv->Close ();
-  if (NetProtocol)
-    NetProtocol->Close ();
-  if (CmdManager)
-    CmdManager->Close ();
-  if (Auth)
-    Auth->Close();
   if (G3D)
     G3D->Close ();
 }
@@ -610,8 +584,6 @@ void csSystemDriver::NextFrame ()
 //@@@@@@@@@@@@@
   if (Sound)
     Sound->Update ();
-  if (NetMan)
-    NetMan->Update();
 //@@@@@@@@@@@@@@ END @@@@@@@@@@@@@@@@
 
   // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
@@ -1090,8 +1062,6 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   CHECK (G2D, CS_FUNCID_CANVAS)
   CHECK (Sound, CS_FUNCID_SOUND)
   CHECK (NetDrv, CS_FUNCID_NETDRV)
-  CHECK (NetMan, CS_FUNCID_NETMAN)
-  CHECK (Auth, CS_FUNCID_AUTH)
   CHECK (Console, CS_FUNCID_CONSOLE)
 
 #undef CHECK

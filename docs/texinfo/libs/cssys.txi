@@ -42,7 +42,7 @@ It calls additional startup and shutdown functions of some basic plug-in
 modules, called the @dfn{drivers}.
 
 @item
-All these methods are @code{virtual} methods, so you can override them.
+All these methods are @dfn{virtual} methods, so you can override them.
 @end itemize
 
 @subheading How to Use the System Driver
@@ -59,7 +59,7 @@ A typical application would perform the following steps:
 
 @itemize @bullet
 @item
-Create an instance of its subclass of @code{SysSystemDriver}.
+Create an instance of its subclass of @samp{SysSystemDriver}.
 
 @item
 Call @code{System->Initialize()}. This will process the command-line, load

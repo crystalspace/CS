@@ -35,7 +35,7 @@
 #include "cssys/win32/win32itf.h"
 #include <objbase.h>
 
-#if defined(COMP_VC) || defined(COMP_WCC)
+#if defined(COMP_VC)
 #include "cssys/csinput.h"
 #include "igraph2D.h"
 #endif
@@ -44,7 +44,8 @@
 #include "cssys/csinput.h"
 
 /// Windows system driver
-class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver, public iEventPlug
+class SysSystemDriver :
+  public csSystemDriver, public iWin32SystemDriver, public iEventPlug
 {
 public:
   SysSystemDriver ();
@@ -80,7 +81,7 @@ public:
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
   DECLARE_IBASE_EXT (csSystemDriver);
 
   virtual unsigned GetPotentiallyConflictingEvents ()

@@ -30,15 +30,13 @@ PLUGINS.DYNAMIC += cscon
 PLUGINS.DYNAMIC += csclear
 PLUGINS.DYNAMIC += dungeon
 PLUGINS.DYNAMIC += engine
-PLUGINS.DYNAMIC += net/driver/socket net/netman
+PLUGINS.DYNAMIC += net/driver/socket
 #PLUGINS.DYNAMIC += font/server/freefont
-#PLUGINS.DYNAMIC += csgame/gamecore
 PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += csstdldr
-PLUGINS.DYNAMIC += netspace/nstp netspace/nsmgr
-PLUGINS.DYNAMIC += csauth/simple
 PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
+#PLUGINS.DYNAMIC += csgame/gamecore
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

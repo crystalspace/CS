@@ -14,10 +14,10 @@ The 3d engine is currently moved to a separate plug-in. For documentation on
 the engine, have a look at @ref{csEngine}.
 
 @item csSys
-All system dependent stuff (non-graphics and non-sound related) is in this
-library, for example keyboard, joystick and mouse driver, system-dependent
-file handling, loading dynamic libraries etc. This library the main module to
-make CS apps system-independent.
+All system dependent functionality (non-graphics and non-sound related) is in
+this library, for example keyboard, joystick and mouse driver, system-dependent
+file handling, loading dynamic libraries etc.  This library the main module to
+make Crystal Space applications system-independent.
 
 @item csUtil
 This library contains various utilities. There is an Archive class which can
@@ -62,9 +62,6 @@ This is the statically-linked part of the Crystal Clear plug-in module.
 @item csGame
 This libary is an attempt to build a gaming system that is specialized on
 3d shooters.
-
-@item csS
-@@@@@@FIXME: What is this?
 
 @item csPhyzik
 This module supports calculation of various physical properties.

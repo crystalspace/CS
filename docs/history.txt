@@ -17,6 +17,70 @@ The history order has been reversed so that new features are at the top.
 	      working directory.  This should prevent the problem of
 	      "permission denied" errors which occurred for some users when
 	      committing files.
+	- Eric Sunshine added missing FontPlex registration to static.cpp.
+	- Eric Sunshine fixed copy/paste error in fontplex.mak.
+	- Eric Sunshine removed references to the obsolete and long dead
+	  Amiga and Watcom ports.
+	- Eric Sunshine removed the following modules and resources from the
+	  project.  Also removed all references to these modules from
+	  documentation, source and header files, configuration files, etc.
+	    - Defunct NetSpace project and its supporting modules:
+		apps/demonets
+		apps/nstp
+		docs/incoming/nstpimp.html
+		include/iauth.h
+		include/icmdmgr.h
+		include/inetcmd.h
+		include/inetman.h
+		include/iproto.h
+		plugins/csauth/simple
+		plugins/net/netman
+		plugins/netspace/nsmgr
+		plugins/netspace/nstp
+	    - Defunct and unmaintained video drivers:
+		plugins/video/canvas/dosalleg
+	    - Defunct and unmaintained sound renderers:
+		plugins/sound/renderer/a3d
+		plugins/sound/renderer/eax
+	    - Old networking resources and poorly designed cruft:
+		apps/ndrvdemo
+		mk/mwcw/NetworkDriverNull.mcp
+		mk/mwcw/NetworkMgrNull.mcp
+	    - Old csGame resources and Shooter demonstration program:
+		apps/shooter
+		data/shtlib_g.zip
+		data/shtlib_m.zip
+		data/config/shooter.cfg
+		include/csgame
+		mk/mwcw/Shooter.mcp
+	    - Limited-value applications:
+		apps/wscs3d
+		data/config/wscs3d.cfg
+	    - Old scripting cruft left around by Brandon:
+		apps/support/spawn.cpp
+		apps/test/pytest
+		include/css/cssint.h
+		include/ispawn.h
+		include/tests.h
+	    - Out of date documentation:
+		docs/incoming/changes.txt
+		docs/incoming/mazedtut.txi
+		docs/incoming/mazed123
+		docs/incoming/script.txt
+	    - Out of date scripts and makefiles:
+		bin/helpread.tcl
+		bin/launcryst.tcl
+		bin/makeman.py
+		bin/mshelp.py
+		bin/win32link.bat
+		libs/cssys/os2/os2wcc.mak
+		libs/cssys/win32/win32vc.mak
+	    - Other useless and out of date flotsam:
+		coordper
+		bin/indent.pro
+		data/entry.t3d
+		include/cssys/wcc
+		scripts/python/unrmap.py
 27-Nov-2000
 	- Fixed a bug in sprites recently introduced by Seth. The problem
 	  was a divide by zero when normalizing the null vector.

@@ -189,7 +189,7 @@ walktest -relight flarge
 @end example
 
 Other interesting example applications which you can run are @file{blocks},
-@file{metademo}, @file{shooter}, and @file{mazed}.
+@file{metademo}, and @file{mazed}.
 
 @node BeOS Notes, , BeOS Running, BeOS
 @subsubsection Final Notes

@@ -68,28 +68,29 @@
 
 #ifndef HAVE_CONFIG_H
 
-#if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || defined(OS_PS2) || \
-	 defined(OS_BSD) || defined(OS_BE) || defined(OS_NEXT)) && \
-	 !defined(OS_UNIX)
+#if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || \
+    defined(OS_PS2) || defined(OS_BSD) || defined(OS_BE) || \
+    defined(OS_NEXT)) && !defined(OS_UNIX)
 #  define OS_UNIX
 #endif
 
 #if !defined(OS_SOLARIS) && !defined(OS_LINUX) && !defined(OS_DOS) && \
-    !defined(OS_UNIX) && !defined(OS_MACOS) && !defined(OS_AMIGAOS) && \
-    !defined(OS_WIN32) && !defined(OS_OS2) && !defined(OS_IRIX) && \
-    !defined(OS_BSD) && !defined(OS_BE) && !defined(OS_NEXT) && \
-    !defined(OS_WINNT) && !defined(OS_PS2)
+    !defined(OS_UNIX) && !defined(OS_MACOS) && !defined(OS_WIN32) && \
+    !defined(OS_OS2) && !defined(OS_IRIX) && !defined(OS_BSD) && \
+    !defined(OS_BE) && !defined(OS_NEXT) && !defined(OS_WINNT) && \
+    !defined(OS_PS2)
 #  error Please specify the operating system in the makefile! (OS=...)
 #endif
 
-#if !defined(COMP_GCC) && !defined(COMP_WCC) && !defined(COMP_UNKNOWN) && \
-    !defined(COMP_MWERKS) && !defined(COMP_VC) && !defined(COMP_BC)
+#if !defined(COMP_GCC) && !defined(COMP_UNKNOWN) && !defined(COMP_MWERKS) && \
+    !defined(COMP_VC) && !defined(COMP_BC)
 #  error Please specify the compiler in the makefile! (COMP=...)
 #endif
 
 #if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && \
     !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && \
-    !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA) && !defined(PROC_EE)
+    !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA) && \
+    !defined(PROC_EE)
 #  error Please specify the processor in the makefile! (PROC=...)
 #endif
 
@@ -126,7 +127,7 @@
 #  define ABS(x) ((x)<0?-(x):(x))
 #endif
 
-#if !defined(SIGN) && !defined(OS_AMIGAOS)
+#if !defined(SIGN)
 #  define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 

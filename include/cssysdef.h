@@ -98,10 +98,6 @@
 #  include "cssys/win32/csosdefs.h"
 #endif
 
-#if defined (COMP_WCC) && defined (OS_DOS)
-#  include "cssys/wcc/csosdefs.h"
-#endif
-
 #if defined (COMP_GCC) && defined (OS_DOS)
 #  include "cssys/djgpp/csosdefs.h"
 #endif
@@ -241,12 +237,12 @@
 #      include <stat.h>
 #    else
 #      include <sys/types.h>
-#      if !(defined (OS_WIN32) && defined (COMP_WCC)) && !defined(OS_PS2)
+#      if !defined(OS_WIN32) && !defined(OS_PS2)
 #        include <dirent.h>
 #      endif
-#	 if defined(__CYGWIN32__)
-#		include <sys/dirent.h>
-#	 endif
+#      if defined(__CYGWIN32__)
+#        include <sys/dirent.h>
+#      endif
 #      include <sys/stat.h>
 #    endif
      static inline bool isdir (const char *path, struct dirent *de)
@@ -275,7 +271,8 @@
 
 #ifdef SYSDEF_ALLOCA
 // Prototypes for dynamic stack memory allocation
-#  if defined(COMP_WCC) || defined (COMP_VC) || defined(COMP_BC) || (defined(COMP_GCC) && defined(OS_WIN32))
+#  if defined (COMP_VC) || defined(COMP_BC) || \
+     (defined(COMP_GCC) && defined(OS_WIN32))
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>

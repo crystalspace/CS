@@ -49,14 +49,6 @@ extern "C" unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long 
   }
 }
 
-#elif defined (COMP_WCC)
-
-extern "C" unsigned __dll_initialize (unsigned long mod_handle)
-{
-  dll_handle = mod_handle;
-  return 1;
-}
-
 #else
 
 #error "no DLL initialization/finalization routines for current runtime"

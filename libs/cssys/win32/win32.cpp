@@ -41,8 +41,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#if defined(COMP_WCC) || defined(COMP_VC)
-#include <sys\timeb.h>
+#if defined(COMP_VC)
+#include <sys/timeb.h>
 #endif
 
 #if defined(COMP_BC)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef __CS_SYSTEM_H__
+#define __CS_SYSTEM_H__
 
 #include <stdio.h>
 
@@ -31,8 +31,6 @@
 #include "ivfs.h"
 #include "ievent.h"
 #include "iconfig.h"
-#include "iproto.h"
-#include "iauth.h"
 
 class csKeyboardDriver;
 class csMouseDriver;
@@ -40,7 +38,6 @@ class csMouseDriver;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iNetworkDriver;
-struct iNetworkManager;
 struct iSoundRender;
 struct iConfig;
 struct iConsole;
@@ -257,17 +254,9 @@ public:
   iSoundRender* Sound;
   /// Network driver
   iNetworkDriver* NetDrv;
-  /// Network manager
-  iNetworkManager* NetMan;
-  /// Network User Protocol Layer
-  iNetSpaceProtocol *NetProtocol;
-  /// Network Command Manager
-  iCommandManager *CmdManager;
   /// System console
   iConsole *Console;
-  /// Authentication method
-  iAuth *Auth;  
-  /// Authentication method
+  /// Motion manager
   iMotionManager *MotionMan;
 
   /// the width of this frame
@@ -503,4 +492,4 @@ extern csSystemDriver *System;
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 
-#endif // SYSTEM_H
+#endif // __CS_SYSTEM_H__

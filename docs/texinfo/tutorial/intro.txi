@@ -162,6 +162,7 @@ The CS modules themselves look for some standard plug-ins at standardized
 identifiers. For example, the 3d engine looks for the graphics driver at the
 @samp{VideoDriver} identifier. So the engine will only work correctly if you
 use these standardized identifiers for the drivers. These are:
+
 @table @code
 @item VFS
 the virtual file system
@@ -174,15 +175,6 @@ standard sound output
 
 @item NetDriver
 network driver
-
-@item NetManager
-network manager
-
-@item Protocol
-network protocol layer
-
-@item CmdManager
-network command manager
 
 @item Console
 the console

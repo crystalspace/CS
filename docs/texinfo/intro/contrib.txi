@@ -707,7 +707,8 @@ procedurally and use that texture on a polygon as usual.
 @item
 Thomas Riemer (@email{triemer@@apt4g.a3nyc.com})
 
-Thomas contributed a new ``network manager'' and @sc{nstp}.
+Thomas contributed a temporary ``network manager'' and @sc{nstp}, a plug-in
+for the now defunct NetSpace project.
 
 @item
 Chris Bruner (@email{cbruner@@ionline.net})

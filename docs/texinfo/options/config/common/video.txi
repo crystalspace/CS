@@ -14,13 +14,14 @@ dependent but often it is 200. The width and height can also be set with
 the @code{-mode} commandline option.
 
 @item Depth=<depth>
-This option is for all ports of Crystal Space where it is possible to
-control the depth of the display from within Crystal Space itself
-(currently SVGALIB, Windows (fullscreen), GGI, OS/2, Watcom/DOS, and DJGPP
-(with ALLEGRO) support this option). Use 8, 15, or 16 here (default is 8).
-Note that 15 is not supported by the Windows version. Note that the Windows
-version ignores the given depth if it is running in windowed mode. Note
-also that there is also an equivalent commandline option -depth. @*
+This option is for all ports of Crystal Space where it is possible to control
+the depth of the display from within Crystal Space itself (currently
+@sc{svgalib}, Windows (fullscreen), @sc{ggi}, @sc{os/2}, and @sc{djgpp} (with
+Allegro) support this option).  Use 8, 15, or 16 here (default is 8).  Note
+that 15 is not supported by the Windows version.  Note that the Windows version
+ignores the given depth if it is running in windowed mode.  Note also that
+there is also an equivalent commandline option -depth.
+
 Special note for the X11 version: normally the X11 version will also
 ignore the @code{-depth} commandline option as it will open a window to
 match the given depth of the display. However if you give a negative depth
@@ -39,21 +40,21 @@ extension can also be enabled/disabled with the @code{-shm}/@code{-noshm}
 commandline options.
 
 @item FullScreen=<yesno>
-This option is only for the Win32 and OS/2 versions of Crystal Space and is
-@samp{yes} by default. It is used to set the Crystal Space window to
+This option is only for the Windows and @sc{os/2} versions of Crystal Space and
+is @samp{yes} by default.  It is used to set the Crystal Space window to
 fullscreen.
 
 @item WINDOWX=<windowx>
-For OS/2 only. Window X position relative to bottom-left corner (percentage
-of total screen size).
+For @sc{os/2} only.  Window X position relative to bottom-left corner
+(percentage of total screen size).
 
 @item WINDOWY=<windowy>
-For OS/2 only. Window Y position relative to bottom-left corner (percentage
-of total screen size).
+For @sc{os/2} only.  Window Y position relative to bottom-left corner
+(percentage of total screen size).
 
 @item WINDOWWIDTH=<width>
-For OS/2 only. Absolute window size (without frame and titlebar).
+For @sc{os/2} only. Absolute window size (without frame and titlebar).
 
 @item WINDOWHEIGHT=<height>
-For OS/2 only. Absolute window size (without frame and titlebar).
+For @sc{os/2} only. Absolute window size (without frame and titlebar).
 @end table

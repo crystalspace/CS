@@ -80,15 +80,11 @@ library.
 @end table
 
 @noindent
-These next three projects are not up to date:
+These projects are not up to date:
 
 @table @code
 @item GlideRender.mcp
 Generates the Glide Render shared library.
-@item NetworkDriverNull.mcp
-Generates the null network driver shared library.
-@item NetworkMgrNull.mcp
-Generates the null network manager shared library.
 @end table
 
 @noindent
@@ -107,8 +103,6 @@ The Crystal Space Editor.
 A meta-balls demo application.
 @item Simple.mcp
 Simple Crystal Space application.
-@item Shooter.mcp
-A Crystal Space application.
 @item Squawk.mcp
 A Crystal Space application.
 @item Walktest.mcp
