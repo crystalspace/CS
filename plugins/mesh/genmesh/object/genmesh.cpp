@@ -851,6 +851,16 @@ csMeshedPolygon* csGenmeshMeshObject::PolyMesh::GetPolygons ()
   return scfParent->factory->GetPolygons ();
 }
 
+int csGenmeshMeshObject::PolyMesh::GetTriangleCount ()
+{
+  return scfParent->factory->GetTriangleCount ();
+}
+
+csTriangle* csGenmeshMeshObject::PolyMesh::GetTriangles ()
+{
+  return scfParent->factory->GetTriangles ();
+}
+
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 {
   return factory->GetObjectModel ();
@@ -1579,6 +1589,16 @@ int csGenmeshMeshObjectFactory::PolyMesh::GetPolygonCount ()
 csMeshedPolygon* csGenmeshMeshObjectFactory::PolyMesh::GetPolygons ()
 {
   return factory->GetPolygons ();
+}
+
+int csGenmeshMeshObjectFactory::PolyMesh::GetTriangleCount ()
+{
+  return factory->GetTriangleCount ();
+}
+
+csTriangle* csGenmeshMeshObjectFactory::PolyMesh::GetTriangles ()
+{
+  return factory->GetTriangles ();
 }
 
 void csGenmeshMeshObjectFactory::HardTransform (

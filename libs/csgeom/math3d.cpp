@@ -881,9 +881,11 @@ private:
   csMeshedPolygon poly[6];
   int vertices[4*6];
   csFlags flags;
+  csTriangle* triangles;
   
 public:
   UnitCubeMesh ();
+  virtual ~UnitCubeMesh () { delete[] triangles; }
 
   ///---------------------- iPolygonMesh implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -891,6 +893,8 @@ public:
   virtual csVector3* GetVertices () { return verts; }
   virtual int GetPolygonCount () { return 6; }
   virtual csMeshedPolygon* GetPolygons () { return poly; }
+  virtual int GetTriangleCount () { return 12; }
+  virtual csTriangle* GetTriangles () { return triangles; }
   virtual void Cleanup () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
@@ -943,6 +947,8 @@ UnitCubeMesh::UnitCubeMesh ()
   vertices[5*4+1] = 1;
   vertices[5*4+2] = 3;
   vertices[5*4+3] = 2;
+  int tc;
+  csPolygonMeshTools::Triangulate (this, triangles, tc);
 }
 
 static bool ContainsEdge (csPolygonMeshEdge* edges, int num_edges,

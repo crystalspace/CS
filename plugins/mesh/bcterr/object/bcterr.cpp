@@ -1382,6 +1382,7 @@ BCPolyMesh::BCPolyMesh ()
   culling = false;
   square_verts = 0;
   culling_mesh = 0;
+  triangles = 0;
 }
 BCPolyMesh::~BCPolyMesh ()
 {
@@ -1391,6 +1392,7 @@ BCPolyMesh::~BCPolyMesh ()
     delete [] culling_mesh[0].vertices;
     delete culling_mesh;
   }    
+  delete[] triangles;
 } 
 
 

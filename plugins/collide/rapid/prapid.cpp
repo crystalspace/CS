@@ -68,6 +68,7 @@
 #include "rapcol.h"
 #include "prapid.h"
 #include "igeom/polymesh.h"
+#include "csgeom/tri.h"
 #include "ivaria/collider.h"
 
 #define CD_MAX_COLLISION    1000
@@ -124,17 +125,11 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
 
   CD_contact->IncRef ();
 
-  int i, v;
-  int tri_count = 0;
+  int i;
+  int tri_count = mesh->GetTriangleCount ();
   // first, count the number of triangles polyset contains
   csVector3* vertices = mesh->GetVertices ();
-  csMeshedPolygon* polygons = mesh->GetPolygons ();
-  int polycnt = mesh->GetPolygonCount ();
-  for (i = 0; i < polycnt ; i++)
-  {
-    csMeshedPolygon& p = polygons[i];
-    tri_count += p.num_vertices - 2;
-  }
+  csTriangle* triangles = mesh->GetTriangles ();
 
   csBox3 object_bbox;
   object_bbox.StartBoundingBox ();
@@ -144,20 +139,15 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
     if (!m_pCollisionModel)
       return;
 
-    for (i = 0; i < polycnt ; i++)
+    for (i = 0; i < tri_count ; i++)
     {
-      csMeshedPolygon& p = polygons[i];
-      int* vidx = p.vertices;
-      // Collision detection only works with triangles.
-      object_bbox.AddBoundingVertex (vertices[vidx[0]]);
-      object_bbox.AddBoundingVertex (vertices[vidx[1]]);
-      for (v = 2; v < p.num_vertices; v++)
-      {
-        m_pCollisionModel->AddTriangle (vertices[vidx[v - 1]],
-                                        vertices[vidx[v]],
-                                        vertices[vidx[0]]);
-        object_bbox.AddBoundingVertex (vertices[vidx[v]]);
-      }
+      csTriangle& p = triangles[i];
+      object_bbox.AddBoundingVertex (vertices[p.a]);
+      object_bbox.AddBoundingVertex (vertices[p.b]);
+      object_bbox.AddBoundingVertex (vertices[p.c]);
+      m_pCollisionModel->AddTriangle (vertices[p.a],
+                                      vertices[p.b],
+                                      vertices[p.c]);
     }
     m_pCollisionModel->BuildHierarchy ();
   }

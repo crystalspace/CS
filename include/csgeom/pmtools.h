@@ -131,6 +131,21 @@ public:
    */
   static void CloseMesh (iPolygonMesh* polyMesh, 
     csArray<csMeshedPolygon>& newPolys);
+
+  /**
+   * Triangulate a mesh from the polygon mesh data in the iPolygonMesh.
+   * Returns a table of triangles (delete with delete[]).
+   */
+  static void Triangulate (iPolygonMesh* polymesh,
+  	csTriangle*& tris, int& tri_count);
+
+  /**
+   * Take a polygon mesh that has a valid set of triangles and generate
+   * a polygon table for that (delete with delete[]). Note that the
+   * polygons will point inside the triangle table!
+   */
+  static void Polygonize (iPolygonMesh* polymesh,
+  	csMeshedPolygon*& polygons, int& poly_count);
 };
 
 /** @} */

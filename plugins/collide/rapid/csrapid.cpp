@@ -21,6 +21,7 @@
 #include "rapcol.h"
 #include "igeom/polymesh.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
 
@@ -113,6 +114,7 @@ struct TriPolygonMesh : public iPolygonMesh
 {
   csVector3 verts[3];
   csMeshedPolygon poly[1];
+  csTriangle triangle;
   int vt_idx[3];
   csFlags flags;
 
@@ -126,12 +128,17 @@ struct TriPolygonMesh : public iPolygonMesh
     vt_idx[2] = 2;
     poly[0].num_vertices = 3;
     poly[0].vertices = vt_idx;
+    triangle.a = 0;
+    triangle.b = 1;
+    triangle.c = 2;
   }
 
   virtual int GetVertexCount () { return 3; }
   virtual csVector3* GetVertices () { return verts; }
   virtual int GetPolygonCount () { return 1; }
   virtual csMeshedPolygon* GetPolygons () { return poly; }
+  virtual int GetTriangleCount () { return 1; }
+  virtual csTriangle* GetTriangles () { return &triangle; }
   virtual void Cleanup () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }

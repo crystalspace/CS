@@ -411,6 +411,18 @@ public:
     virtual csVector3* GetVertices ();
     virtual int GetPolygonCount ();
     virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ()
+    {
+      return ball->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+#ifdef CS_USE_NEW_RENDERER
+      return (csTriangle*)(ball->ball_indices);
+#else
+      return ball->top_mesh.triangles;
+#endif
+    }
     virtual void Cleanup ();
     
     virtual csFlags& GetFlags () { return flags;  }

@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "csgeom/pmtools.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "csutil/cscolor.h"
@@ -128,6 +129,7 @@ public:
   bool culling;
   csVector3* square_verts;
   csFlags flags;
+  csTriangle* triangles;
 
   SCF_DECLARE_IBASE;
   BCPolyMesh ();
@@ -135,31 +137,41 @@ public:
   
   virtual int GetVertexCount ()
   {
-    if (culling)
-      return 4;
-    else
-      return 0;
+    if (culling) return 4;
+    else return 0;
   }
   virtual csVector3* GetVertices ()
   {
-    if (culling)
-      return square_verts;
-    else
-      return 0;
+    if (culling) return square_verts;
+    else return 0;
   }
   virtual int GetPolygonCount ()
   {
-    if (culling)
-      return 1;
-    else
-      return 0;
+    if (culling) return 1;
+    else return 0;
   }
   virtual csMeshedPolygon* GetPolygons ()
   {
+    if (culling) return culling_mesh;
+    else return 0;
+  }
+  virtual int GetTriangleCount ()
+  {
+    if (culling) return 2;
+    else return 0;
+  }
+  virtual csTriange* GetTriangles ()
+  {
     if (culling)
-      return culling_mesh;
-    else
-      return 0;
+    {
+      if (!triangles)
+      {
+	int tc;
+        csPolygonMeshTools::Triangulate (this, triangles, tc);
+      }
+      return triangles;
+    }
+    return 0;
   }
   virtual void Cleanup () 
   {

@@ -266,6 +266,9 @@ the visible mesh.)
 In @code{iPolygonMesh} the @code{IsDeformable()} method has been replaced
 with the more general @code{GetFlags()}.
 
+@code{iPolygonMesh} now has @code{GetTriangles()} and @code{GetTriangleCount()}.
+Check out the @sc{api} docs for implementation details.
+
 @subheading Iterator Changes
 @cindex @code{iVisibilityObjectIterator}
 @cindex @code{iLightIterator}

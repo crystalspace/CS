@@ -29,12 +29,14 @@
  
 /** \name flags for iPolygonMesh.
  * @{ */
+
 /**
  * If this flag is set then the object is closed. With closed we mean
  * that if you run a beam of light through the object it will always
  * hit an even amount of faces (one going in, and one going out).
  */
 #define CS_POLYMESH_CLOSED 1
+
 /**
  * If this flag is set then the object is not closed.
  * This is the opposite of CS_POLYMESH_CLOSED. Use this flag if you are
@@ -44,12 +46,14 @@
  * may test it if it wants.
  */
 #define CS_POLYMESH_NOTCLOSED 2
+
 /**
  * If this flag is set then the object is convex. With convex we mean
  * that if you run a beam of light through the object it will always
  * hit an two faces (one going in, and one going out).
  */
 #define CS_POLYMESH_CONVEX 4
+
 /**
  * If this flag is set then the object is not convex.
  * This is the opposite of CS_POLYMESH_CONVEX. Use this flag if you are
@@ -59,10 +63,12 @@
  * may test it if it wants.
  */
 #define CS_POLYMESH_NOTCONVEX 8
+
 /**
  * Set this flag if the polygon mesh is deformable.
  */
 #define CS_POLYMESH_DEFORMABLE 16
+
 /** @} */
 
 /**
@@ -77,8 +83,9 @@ struct csMeshedPolygon
 };
 
 class csVector3;
+class csTriangle;
 
-SCF_VERSION (iPolygonMesh, 0, 3, 0);
+SCF_VERSION (iPolygonMesh, 0, 4, 0);
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
@@ -86,9 +93,14 @@ SCF_VERSION (iPolygonMesh, 0, 3, 0);
  * be useful is for communicating geometry information to the collision
  * detection plugin.<br>
  * All Crystal Space mesh objects (things, sprites, ...)
- * should implement and/or embed an implementation of this interface.<p>
- *
+ * should implement and/or embed an implementation of this interface.
+ * <p>
  * A polygon mesh has the concept of a vertex buffer and an array of polygons.
+ * A triangle mesh is also supported. A mesh object typically only implements
+ * either a polygon mesh or a triangle mesh. In that case requesting
+ * the other type of mesh will automatically generate the new format.
+ * iPolygonMesh can use csPolygonMeshTools::Triangulate() and
+ * csPolygonMeshTools::Polygonize() to help with that.
  */
 struct iPolygonMesh : public iBase
 {
@@ -100,6 +112,10 @@ struct iPolygonMesh : public iBase
   virtual int GetPolygonCount () = 0;
   /// Get the pointer to the array of polygons.
   virtual csMeshedPolygon* GetPolygons () = 0;
+  /// Get the number of triangles for this mesh.
+  virtual int GetTriangleCount () = 0;
+  /// Get the triangle table for this mesh.
+  virtual csTriangle* GetTriangles () = 0;
   /**
    * Cleanup: this is called by the polygon mesh user
    * when it is ready extracting the data from the iPolygonMesh.

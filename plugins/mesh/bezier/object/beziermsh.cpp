@@ -771,6 +771,9 @@ void BezierPolyMeshHelper::Cleanup ()
 
   delete[] vertices;
   vertices = 0;
+
+  delete[] triangles;
+  triangles = 0;
 }
 
 //-------------------------------------------------------------------------

@@ -1413,13 +1413,13 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 
 //--------------------------------------------------------------------
 
-// Private class implementing iPolygonMesh for a general mesh.
+// Private class implementing iPolygonMesh for a general triangle mesh.
 class PolygonMeshMesh : public iPolygonMesh
 {
 private:
   csVector3* vertices;
   csMeshedPolygon* polygons;
-  int* vertex_indices;
+  csTriangle* vertex_indices;
   int num_verts;
   int num_tris;
   csFlags flags;
@@ -1432,13 +1432,13 @@ public:
     PolygonMeshMesh::num_tris = num_tris;
     vertices = new csVector3[num_verts];
     polygons = new csMeshedPolygon[num_tris];
-    vertex_indices = new int[num_tris*3];
+    vertex_indices = new csTriangle[num_tris];
 
     int i;
     for (i = 0 ; i < num_tris ; i++)
     {
       polygons[i].num_vertices = 3;
-      polygons[i].vertices = &vertex_indices[i*3];
+      polygons[i].vertices = (int*)&vertex_indices[i];
     }
   }
   virtual ~PolygonMeshMesh ()
@@ -1454,6 +1454,8 @@ public:
   virtual csVector3* GetVertices () { return vertices; }
   virtual int GetPolygonCount () { return num_tris; }
   virtual csMeshedPolygon* GetPolygons () { return polygons; }
+  virtual int GetTriangleCount () { return num_tris; }
+  virtual csTriangle* GetTriangles () { return vertex_indices; }
   virtual void Cleanup () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }

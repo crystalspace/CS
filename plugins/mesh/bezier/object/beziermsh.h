@@ -30,6 +30,7 @@
 #include "csutil/refarr.h"
 #include "igeom/polymesh.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/pmtools.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -63,7 +64,7 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   BezierPolyMeshHelper () :
-  	polygons (0), vertices (0) { }
+  	polygons (0), vertices (0), triangles (0) { }
   virtual ~BezierPolyMeshHelper () { Cleanup (); }
 
   void Setup ();
@@ -89,6 +90,18 @@ public:
     Setup ();
     return polygons;
   }
+  virtual int GetTriangleCount ()
+  {
+    Setup ();
+    Triangulate ();
+    return tri_count;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Setup ();
+    Triangulate ();
+    return triangles;
+  }
   virtual void Cleanup ();
   
   virtual csFlags& GetFlags () { return flags;  }
@@ -101,6 +114,14 @@ private:
   int num_poly;			// Total number of polygons.
   int num_verts;		// Total number of vertices.
   csFlags flags;
+  csTriangle* triangles;
+  int tri_count;
+
+  void Triangulate ()
+  {
+    if (triangles) return;
+    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
+  }
 };
 
 /**

@@ -170,29 +170,31 @@ public:
       factory = Factory;
     }
 
-    /// Get the number of vertices for this mesh.
     virtual int GetVertexCount ()
     {
       return factory->GetVertexCount ();
     }
-    /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
     {
       return factory->GetVertices ();
     }
-    /// Get the number of polygons for this mesh.
     virtual int GetPolygonCount ()
     {
       return factory->GetTriangleCount ();
     }
-
-    /// Get the pointer to the array of polygons.
     virtual csMeshedPolygon* GetPolygons ()
     {
       return factory->GetPolygons();
     }
+    virtual int GetTriangleCount ()
+    {
+      return factory->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      return factory->GetTriangles();
+    }
 
-    /// Cleanup.
     virtual void Cleanup () { } //  delete[] polygons; polygons = 0; }
     
     virtual csFlags& GetFlags () { return flags;  }
@@ -454,6 +456,16 @@ public:
     {
       csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetTriangleCount ();
+    }
+    virtual int GetTriangleCount ()
+    {
+      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
+      return fact->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
+      return fact->GetTriangles();
     }
 
     /// Get the pointer to the array of polygons.

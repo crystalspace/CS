@@ -30,6 +30,19 @@ chronological order.
 	- Jorrit moved the entire renderloop stuff from
 	  plugins/video/render3d/renderloop to plugins/engine/renderloop
 	  where it belongs.
+	- Jorrit added csPolygonMeshTools::Triangulate() and
+	  csPolygonMeshTools::Polygonize().
+	- Jorrit added the notion of a triangle mesh to iPolygonMesh.
+	  Many modules prefer to hand over triangle meshes instead of
+	  the clumsy polygon mesh. Additionally many modules prefer
+	  to receive triangle meshes too. To solve that iPolygonMesh can
+	  now also support triangle meshes but it is always required that
+	  the other type works too. The conversion should be transparent
+	  and is the responsibility of the iPolygonMesh implementer
+	  (the new functions csPolygonMeshTools::Triangulate() and
+	  csPolygonMeshTools::Polygonize() can be used to assist with that).
+	- Jorrit reports: Rapid collision detection plugin now uses
+	  GetTriangles() to get the mesh information.
         - res removed plugins/engine/renderloop/stdsteps/lightiter.pp.
           This file was a leftover from some debugging times ago which must
           have made it's way to CVS by accident.

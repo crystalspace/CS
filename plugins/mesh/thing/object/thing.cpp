@@ -2370,6 +2370,8 @@ void PolyMeshHelper::Cleanup ()
   delete[] polygons;
   polygons = 0;
   vertices = 0;
+  delete[] triangles;
+  triangles = 0;
 }
 
 //-------------------------------------------------------------------------

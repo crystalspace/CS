@@ -644,26 +644,30 @@ public:
       factory = Factory;
     }
 
-    /// Get the number of vertices for this mesh.
     virtual int GetVertexCount ()
     {
       return factory->GetVertexCount ();
     }
-    /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
     {
       return factory->GetVertices (0);
     }
-    /// Get the number of polygons for this mesh.
     virtual int GetPolygonCount ()
     {
       return factory->GetTriangleCount ();
     }
 
-    /// Get the pointer to the array of polygons.
     virtual csMeshedPolygon* GetPolygons ();
 
-    /// Cleanup.
+    virtual int GetTriangleCount ()
+    {
+      return factory->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      return factory->GetTriangles ();
+    }
+
     virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
     virtual csFlags& GetFlags () { return flags;  }
@@ -1679,29 +1683,35 @@ public:
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
 
-    /// Get the number of vertices for this mesh.
     virtual int GetVertexCount ()
     {
       csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetVertexCount ();
     }
-    /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
     {
       csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetVertices (0);
     }
-    /// Get the number of polygons for this mesh.
     virtual int GetPolygonCount ()
     {
       csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetTriangleCount ();
     }
 
-    /// Get the pointer to the array of polygons.
     virtual csMeshedPolygon* GetPolygons ();
 
-    /// Cleanup.
+    virtual int GetTriangleCount ()
+    {
+      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
+      return fact->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
+      return fact->GetTriangles ();
+    }
+
     virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
     virtual csFlags& GetFlags () { return flags;  }

@@ -23,6 +23,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/pmtools.h"
 #include "igeom/polymesh.h"
+#include "csgeom/polymesh.h"
 
 void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
   csVector3* normals)
@@ -497,6 +498,50 @@ void csPolygonMeshTools::CloseMesh (iPolygonMesh* polyMesh,
       newPoly.vertices[v] = poly.vertices[poly.num_vertices - 1 - v];
     }
     newPolys.Push (newPoly);
+  }
+}
+
+void csPolygonMeshTools::Triangulate (iPolygonMesh* polymesh,
+	csTriangle*& tris, int& tri_count)
+{
+  tri_count = 0;
+  int pc = polymesh->GetPolygonCount ();
+  csMeshedPolygon* polys = polymesh->GetPolygons ();
+  int p;
+  for (p = 0 ; p < pc ; p++)
+  {
+    const csMeshedPolygon& poly = polys[p];
+    tri_count += poly.num_vertices-2;
+  }
+
+  tris = new csTriangle[tri_count];
+  tri_count = 0;
+  for (p = 0 ; p < pc ; p++)
+  {
+    const csMeshedPolygon& poly = polys[p];
+    int i;
+    for (i = 2 ; i < poly.num_vertices ; i++)
+    {
+      tris[tri_count].a = poly.vertices[i-1];
+      tris[tri_count].b = poly.vertices[i];
+      tris[tri_count].c = poly.vertices[0];
+      tri_count++;
+    }
+  }
+}
+
+void csPolygonMeshTools::Polygonize (iPolygonMesh* polymesh,
+  	csMeshedPolygon*& polygons, int& poly_count)
+{
+  poly_count = polymesh->GetTriangleCount ();
+  csTriangle* tris = polymesh->GetTriangles ();
+  polygons = new csMeshedPolygon[poly_count];
+  int p;
+  for (p = 0 ; p < poly_count ; p++)
+  {
+    csMeshedPolygon& poly = polygons[p];
+    poly.num_vertices = 3;
+    poly.vertices = (int*)&tris[p];
   }
 }
 

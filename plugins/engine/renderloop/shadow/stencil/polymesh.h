@@ -21,12 +21,28 @@
 #define __CS_STENCIL_POLYMESH_H__
 
 #include "csgeom/polymesh.h"
+#include "csgeom/pmtools.h"
 
 class csStencilPolygonMesh : public csPolygonMesh
 {
+private:
   csDirtyAccessArray<csVector3> verts;
   csDirtyAccessArray<csMeshedPolygon> polys;
+  csTriangle* triangles;
+  int tri_count;
+
+  void Triangulate ()
+  {
+    if (triangles) return;
+    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
+  }
+
 public:
+  csStencilPolygonMesh ()
+  {
+    triangles = 0;
+  }
+
   virtual ~csStencilPolygonMesh ()
   {
     int i;
@@ -88,6 +104,16 @@ public:
   virtual csMeshedPolygon* GetPolygons () 
   { 
     return polys.GetArray ();
+  }
+  virtual int GetTriangleCount ()
+  {
+    Triangulate ();
+    return tri_count;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Triangulate ();
+    return triangles;
   }
 };
 

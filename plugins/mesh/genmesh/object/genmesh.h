@@ -369,6 +369,8 @@ public:
     virtual csVector3* GetVertices ();
     virtual int GetPolygonCount ();
     virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
     virtual void Cleanup () { }
     
     virtual csFlags& GetFlags () { return flags;  }
@@ -672,6 +674,8 @@ public:
     virtual csVector3* GetVertices ();
     virtual int GetPolygonCount ();
     virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
     virtual void Cleanup () { }
     
     virtual csFlags& GetFlags () { return flags;  }

@@ -23,6 +23,7 @@
 #include "igeom/polymesh.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csgeom/tri.h"
 
 /**
  * \addtogroup geom_utils
@@ -30,7 +31,8 @@
  
 /**
  * A convenience polygon mesh implementation that you can feed
- * with vertices and polygons from another source.
+ * with vertices and polygons from another source. It will automatically
+ * calculate the triangles if requested.
  */
 class csPolygonMesh : public iPolygonMesh
 {
@@ -45,7 +47,16 @@ private:
   csMeshedPolygon* po;
   bool delete_po;	// If true this class is responsible for cleanup.
 
+  int* po_indices;	// Index table used in 'po'.
+  bool delete_po_indices;
+
   csFlags flags;
+
+  // Not given by default but automatically calculated.
+  csTriangle* triangles;
+  int triangle_count;
+
+  void Triangulate ();
 
 public:
   /**
@@ -61,12 +72,18 @@ public:
     po = 0;
     po_count = 0;
     delete_po = false;
+    po_indices = 0;
+    delete_po_indices = false;
+    triangles = 0;
+    triangle_count = 0;
   }
 
   virtual ~csPolygonMesh ()
   {
     if (delete_vt) delete[] vt;
     if (delete_po) delete[] po;
+    if (delete_po_indices) delete[] po_indices;
+    delete[] triangles;
   }
 
   /**
@@ -95,6 +112,34 @@ public:
     csPolygonMesh::po_count = po_count;
     csPolygonMesh::delete_po = delete_po;
     ShapeChanged ();
+  }
+
+  /**
+   * Set polygon indices used by SetPolygons().
+   */
+  void SetPolygonIndices (int* po_indices, bool delete_po_indices)
+  {
+    csPolygonMesh::po_indices = po_indices;
+    csPolygonMesh::delete_po_indices = delete_po_indices;
+    ShapeChanged ();
+  }
+
+  /**
+   * Set polygon index count. This will make room for the specified number
+   * of polygon indices so that the user can update them. This class will delete
+   * the indices itself later.
+   */
+  void SetPolygonIndexCount (int po_index_count)
+  {
+    po_indices = new int[po_index_count];
+    delete_po_indices = true;
+    ShapeChanged ();
+  }
+
+  /// Get the polygon index table.
+  int* GetPolygonIndices ()
+  {
+    return po_indices;
   }
 
   /**
@@ -137,6 +182,16 @@ public:
   virtual csVector3* GetVertices () { return vt; }
   virtual int GetPolygonCount () { return po_count; }
   virtual csMeshedPolygon* GetPolygons () { return po; }
+  virtual int GetTriangleCount ()
+  {
+    Triangulate ();
+    return triangle_count;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Triangulate ();
+    return triangles;
+  }
   virtual void Cleanup () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
@@ -150,6 +205,7 @@ class csPolygonMeshBox : public iPolygonMesh
 private:
   csVector3 vertices[8];
   csMeshedPolygon polygons[6];
+  csTriangle* triangles;
   int vertex_indices[4*6];
   uint32 change_nr;
   csFlags flags;
@@ -195,10 +251,12 @@ public:
     SetBox (box);
 
     flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
+    triangles = 0;
   }
 
   virtual ~csPolygonMeshBox ()
   {
+    delete[] triangles;
   }
 
   /**
@@ -223,6 +281,8 @@ public:
   virtual csVector3* GetVertices () { return vertices; }
   virtual int GetPolygonCount () { return 6; }
   virtual csMeshedPolygon* GetPolygons () { return polygons; }
+  virtual int GetTriangleCount () { return 12; }
+  virtual csTriangle* GetTriangles ();
   virtual void Cleanup () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }

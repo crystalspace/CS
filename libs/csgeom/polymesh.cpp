@@ -19,13 +19,28 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csgeom/polymesh.h"
+#include "csgeom/pmtools.h"
 
 
 SCF_IMPLEMENT_IBASE (csPolygonMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
+void csPolygonMesh::Triangulate ()
+{
+  if (triangles) return;
+  csPolygonMeshTools::Triangulate (this, triangles, triangle_count);
+}
+
 SCF_IMPLEMENT_IBASE (csPolygonMeshBox)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
+
+csTriangle* csPolygonMeshBox::GetTriangles ()
+{
+  if (triangles) return triangles;
+  int tc;
+  csPolygonMeshTools::Triangulate (this, triangles, tc);
+  return triangles;
+}
 

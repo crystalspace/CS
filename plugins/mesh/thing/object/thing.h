@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/pmtools.h"
 #include "parrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
@@ -88,7 +89,7 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   PolyMeshHelper (uint32 flag) :
-  	polygons (0), vertices (0), poly_flag (flag) { }
+  	polygons (0), vertices (0), poly_flag (flag), triangles (0) { }
   virtual ~PolyMeshHelper () { Cleanup (); }
 
   void Setup ();
@@ -114,6 +115,16 @@ public:
     Setup ();
     return polygons;
   }
+  virtual int GetTriangleCount ()
+  {
+    Triangulate ();
+    return tri_count;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Triangulate ();
+    return triangles;
+  }
   virtual void Cleanup ();
   
   virtual csFlags& GetFlags () { return flags;  }
@@ -128,6 +139,14 @@ private:
   int num_verts;		// Total number of vertices.
   uint32 poly_flag;		// Polygons must match with this flag.
   csFlags flags;
+  csTriangle* triangles;
+  int tri_count;
+
+  void Triangulate ()
+  {
+    if (triangles) return;
+    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
+  }
 };
 
 /**
