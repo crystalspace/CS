@@ -29,15 +29,12 @@ class csSector;
 class csPolygon3D;
 class Vertex;
 class csEngine;
-class Dumper;
 
 /**
  * A camera positioned in the 3D world.
  */
 class csCamera : public csOrthoTransform, public iBase
 {
-  friend class Dumper;
-
 private:
   /// The sector the camera is in.
   csSector* sector;

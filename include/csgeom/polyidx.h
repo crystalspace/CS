@@ -19,8 +19,6 @@
 #ifndef POLYIDX_H
 #define POLYIDX_H
 
-class Dumper;
-
 /**
  * The following class represents a general polygon.
  * Vertices are indexed relative to some vertex array instead of directly
@@ -30,8 +28,6 @@ class Dumper;
  */
 class csPolyIndexed
 {
-  friend class Dumper;
-
 protected:
   /// The vertex indices.
   int* vertices_idx;

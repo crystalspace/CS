@@ -31,7 +31,6 @@
 struct iMeshWrapper;
 struct iRenderView;
 struct iMovable;
-class Dumper;
 class csMeshWrapper;
 class csCamera;
 class csMeshFactoryWrapper;
@@ -44,7 +43,6 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
  */
 class csMeshWrapper : public csObject
 {
-  friend class Dumper;
   friend class csMovable;
 
 protected:
@@ -447,8 +445,6 @@ SCF_VERSION (csMeshFactoryWrapper, 0, 0, 1);
  */
 class csMeshFactoryWrapper : public csObject
 {
-  friend class Dumper;
-
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
   iMeshObjectFactory* meshFact;

@@ -46,7 +46,6 @@ class csPolygon2D;
 class csPolygon3D;
 class csLightMap;
 class csLightPatch;
-class Dumper;
 class csPolyTexture;
 class csThing;
 struct iLight;
@@ -447,7 +446,6 @@ class csPolygon3D : public csPolygonInt, public csObject
 // WHERE CODE BLATANTLY SWITCHES BETWEEN csPolygon3D AND csPolygonInt TYPES
 // WITHOUT GIVING TO THE C++ COMPILER EVEN A CHANCE TO ADJUST THE POINTER!!!
 {
-  friend class Dumper;
   friend class csPolyTexture;
 
 private:

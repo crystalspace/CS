@@ -21,8 +21,6 @@
 
 #include "csengine/light.h"
 
-class Dumper;
-
 /**
  * This is an object pool which holds objects of type
  * csLightPatch. You can ask new instances from this pool.
@@ -31,8 +29,6 @@ class Dumper;
  */
 class csLightPatchPool
 {
-  friend class Dumper;
-
 private:
   struct PoolObj
   {

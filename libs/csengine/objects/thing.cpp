@@ -530,7 +530,7 @@ csCurve* csThing::GetCurve (char* name)
 
 void csThing::AddCurve (csCurve* curve)
 {
-  curve->SetParent (this);
+  curve->SetParentThing (this);
   curves.Push (curve);
 }
 
@@ -538,7 +538,7 @@ iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)
 {
   iCurve* curve = tmpl->MakeCurve ();
   csCurve* c = curve->GetOriginalObject ();
-  c->SetParent (this);
+  c->SetParentThing (this);
   int i;
   for (i = 0 ; i < tmpl->GetVertexCount () ; i++)
     curve->SetControlPoint (i, tmpl->GetVertex (i));
@@ -1312,7 +1312,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     // If the lightmap was updated or the new tesselation doesn't yet
     // have a valid colors table we need to update colors here.
     if (updated_lm || !tess->AreColorsValid ())
-      tess->UpdateColors (c->lightmap);
+      tess->UpdateColors (c->LightMap);
 
     // Setup the structure for DrawTriangleMesh.
     if (tess->GetVertexCount () > fog_verts.Limit ())
@@ -1320,7 +1320,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
       fog_verts.SetLimit (tess->GetVertexCount ());
     }
 
-    c->GetMaterialWrapper ()->Visit ();
+    c->GetMaterial ()->Visit ();
     mesh.mat_handle = c->GetMaterialHandle ();
     mesh.num_vertices = tess->GetVertexCount ();
     mesh.vertices[0] = tess->GetVertices ();
@@ -1332,7 +1332,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.clip_plane = clip_plane;
     mesh.clip_z_plane = clip_z_plane;
     mesh.vertex_fog = fog_verts.GetArray ();
-    bool gouraud = !!c->lightmap;
+    bool gouraud = !!c->LightMap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
@@ -2248,7 +2248,7 @@ void csThing::InitializeDefault ()
   for (i = 0 ; i < polygons.Length () ; i++)
     polygons.Get (i)->InitializeDefault ();
   for (i = 0 ; i < GetCurveCount () ; i++)
-    curves.Get (i)->InitializeDefault ();
+    curves.Get (i)->InitializeDefaultLighting ();
 }
 
 bool csThing::ReadFromCache (int id)

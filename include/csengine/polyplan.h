@@ -22,8 +22,6 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 
-class Dumper;
-
 /**
  * This class represents a polygon plane.
  * Never 'delete' an instance of this class directly
@@ -35,8 +33,6 @@ class csPolyPlane
   friend class csPolygon2D;
   ///
   friend class csPolyTexture;
-  ///
-  friend class Dumper;
 
 private:
   /// The object space plane equation (this is fixed).

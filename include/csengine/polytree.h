@@ -31,7 +31,6 @@ class csPolygonTree;
 class csPolygonTreeNode;
 class csPolygonStub;
 class csPolyTreeBBox;
-class Dumper;
 struct iFile;
 
 
@@ -60,8 +59,6 @@ typedef bool (csTreeCullFunc)(csPolygonTree* tree, csPolygonTreeNode* node,
  */
 class csPolygonTreeNode
 {
-  friend class Dumper;
-
 protected:
   /**
    * A linked list for all stubs that are added
@@ -125,8 +122,6 @@ public:
  */
 class csPolygonTree
 {
-  friend class Dumper;
-
 protected:
   /// The root of the tree.
   csPolygonTreeNode* root;

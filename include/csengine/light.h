@@ -30,7 +30,6 @@
 #include "iengine/dynlight.h"
 #include "iengine/sector.h"
 
-class Dumper;
 class csLightMap;
 class csDynLight;
 class csLightPatchPool;
@@ -397,7 +396,6 @@ public:
  */
 class csLightPatch
 {
-  friend class Dumper;
   friend class csLightPatchPool;
 
 private:

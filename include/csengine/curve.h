@@ -33,9 +33,15 @@
 #include "ivideo/graph3d.h"
 #include "imesh/thing/curve.h"
 
-struct iMaterialHandle;
+class csThing;
+class csCurveTemplate;
+class csLightPatch;
+class csSector;
+class csRadCurve;
 class csBspContainer;
 class csFrustumView;
+struct csCoverageMatrix;
+struct iMaterialHandle;
 
 /**
  * Tesselated curve. This is basicly a list of triangles.
@@ -44,47 +50,50 @@ class csCurveTesselated
 {
 private:
   // Object space coordinates.
-  csVector3* object_coords;
+  csVector3* ObjectCoords;
   // Texture coordinates.
-  csVector2* txt_coords;
+  csVector2* TextureCoords;
   // Original control points.
-  csVector2* controls;
+  csVector2* ControlPoints;
   // Colors for the vertices.
-  csColor* colors;
+  csColor* Colors;
   // Triangles.
-  csTriangle* triangles;
+  csTriangle* Triangles;
 
-  int num_vertices;
-  int num_triangles;
-
+  // Number of vertices
+  int NumVertices;
+  // Number of triangles
+  int NumTriangles;
   // A flag which indicates if the color table is filled in.
-  bool colors_valid;
+  bool ColorsValid;
 
 public:
   /**
    * Allocate a new tesselated curve with the given
    * number of vertices and triangles.
    */
-  csCurveTesselated (int num_v, int num_t);
-  ///
+  csCurveTesselated (int NumVertices, int NumTriangles);
+  /// destructor
   ~csCurveTesselated ();
 
-  ///
-  int GetVertexCount () { return num_vertices; }
-  ///
-  int GetTriangleCount () { return num_triangles; }
-  ///
-  csVector3* GetVertices () { return object_coords; }
-  ///
-  csVector2* GetTxtCoords () { return txt_coords; }
-  ///
-  csVector2* GetControlPoints () { return controls; }
-  ///
-  csColor* GetColors () { return colors; }
-  ///
-  csTriangle* GetTriangles () { return triangles; }
-  ///
-  csTriangle& GetTriangle (int i) { return triangles[i]; }
+  /// Return the number of vertices
+  inline int GetVertexCount () const;
+  /// Return the number of triangles
+  inline int GetTriangleCount () const;
+  /// Return the array of vertices
+  inline csVector3* GetVertices ();
+  /// Return the array of texture coordinates
+  inline csVector2* GetTxtCoords ();
+  /// Return the array of control points
+  inline csVector2* GetControlPoints ();
+  /// Return the array of vertex colors
+  inline csColor* GetColors ();
+  /// Return the array of triangles
+  inline csTriangle* GetTriangles ();
+  /// Return a single triangle @@@ why?
+  inline csTriangle& GetTriangle (int i);
+  /// Return true if the colors table is valid.
+  inline bool AreColorsValid () const;
 
   /**
    * Update the 'colors' array in this tesselation given
@@ -92,44 +101,36 @@ public:
    * changes and the curve needs to be rendered.
    */
   void UpdateColors (csLightMap* lightmap);
-
-  /// Return true if the colors table is valid.
-  bool AreColorsValid () { return colors_valid; }
 };
-
-class csThing;
-class csCurveTemplate;
-class csLightPatch;
-class csSector;
-class csRadCurve;
-class Dumper;
-struct csCoverageMatrix;
 
 /**
  * This is an abstract class for all curves in Crystal Space.
  */
 class csCurve : public csObject
 {
-  // allow csRadCurve to use our UV Buffers
+  /// allow csRadCurve to use our UV Buffers
   friend class csRadCurve;
-  friend class Dumper;
 
 private:
   /// ID for this curve.
-  unsigned long curve_id;
+  unsigned long CurveID;
   /// Last used ID.
-  static unsigned long last_curve_id;
+  static unsigned long LastCurveID;
 
-  csMaterialWrapper* cstxt;
-  // Pointer to the parent template.
-  csCurveTemplate* parent_template;
+  /// Material for this curve
+  iMaterialWrapper* Material;
+
+  /// Pointer to the template for this curve
+  csCurveTemplate* CurveTemplate;
   
-  // list of light patches
-  csLightPatch* lightpatches;
+  /// list of light patches
+  csLightPatch* LightPatches;
 
-  // Object to world transformation (Needed by CalculateLighting & 
-  // ShineDynLight)
-  csReversibleTransform* _o2w;
+  /**
+   * Object to world transformation (Needed by CalculateLighting & 
+   * ShineDynLight).
+   */
+  csReversibleTransform* O2W;
 
   /*
    * Position Buffer: this is an array which coordinates u,v lightmap
@@ -138,7 +139,7 @@ private:
    * i.e. in a 10x10 lightmap uv2World[5][5] is the world space coordinate
    *   of the lightmap texel 5,5 on the lightmap
    */
-  csVector3* _uv2World;
+  csVector3* uv2World;
 
   /*
    * Normal Buffer: this is an array which coordinates u,v lightmap
@@ -146,25 +147,71 @@ private:
    * i.e. in a 10x10 lightmap uv2Normal[5][5] is the normal vector which
    * corresponds to the lightmap texel 5,5 on the lightmap
    */
-  csVector3* _uv2Normal;
+  csVector3* uv2Normal;
 
 public:
   /// The polygon set parent.
-  csThing* parent;
+  csThing* ParentThing;
 
   /// This is the lightmap to be placed on the curve.
-  csLightMap* lightmap;
-  bool lightmap_up_to_date;
+  csLightMap* LightMap;
+
+  /// This flag indicates whether the lightmap is up-to-date
+  bool LightmapUpToDate;
 
 public:
-  ///
-  csCurve (csCurveTemplate* parent_tmpl);
 
+  /// Constructor
+  csCurve (csCurveTemplate* parent_tmpl);
   /// Destructor
   virtual ~csCurve ();
 
   /// Get the ID of this curve.
-  unsigned long GetCurveID () { return curve_id; }
+  inline unsigned long GetCurveID () const;
+
+  /// Return the material handle for this curve
+  inline iMaterialHandle* GetMaterialHandle () const;
+  /// Return the material wrapper for this curve
+  inline iMaterialWrapper* GetMaterial () const;
+  /// Set the material wrapper for this curve
+  void SetMaterial (iMaterialWrapper* h);
+
+  /// Get the parent template used for this curve.
+  inline csCurveTemplate* GetParentTemplate () const;
+
+  /// @@@
+  void MakeDirtyDynamicLights ();
+  /// Add a lightpatch to this curves list of light patches
+  void AddLightPatch (csLightPatch* lp);
+  /// Remove a lightpatch from this curves list
+  void UnlinkLightPatch (csLightPatch* lp);
+  /// update the real lightmap with all light info
+  bool RecalculateDynamicLights ();
+  /// update the real lightmap with info from the lightpatch
+  void ShineDynLight (csLightPatch* lp);
+
+  /// Set the current object to world space transformation
+  void SetObject2World (const csReversibleTransform *o2w);
+  /// Return the current object to world space transformation
+  inline const csReversibleTransform *GetObject2World () const;
+
+  /// Set the parent thing for this curve
+  inline void SetParentThing (csThing* p);
+  /// Return the parent thing for this curve
+  inline csThing* GetParentThing () const;
+
+  /// Get the lightmap.
+  inline csLightMap* GetLightMap () const;
+  /// calculate the lighting for this curve
+  void CalculateLighting (csFrustumView& lview);
+  /// Initialize default lighting.
+  void InitializeDefaultLighting ();
+  /// Read lighting from cache.
+  bool ReadFromCache (int id);
+  /// Cache the curve lightmaps.
+  bool WriteToCache (int id);
+  /// Prepare lighting.
+  void PrepareLighting ();
 
   /**
    * Populate a coverage matrix which relates shadow information for this 
@@ -174,21 +221,8 @@ public:
 
   /// return an approximation of the area of this curve
   float GetArea();
-  
-  /// Set the current object to world space transformation
-  void SetObject2World (csReversibleTransform* o2w);
-  
-  /// Sets the parent thing for this Curve
-  void SetParent (csThing* p) { parent = p; }
 
-  void MakeDirtyDynamicLights ();
-
-  /// Get the parent template used for this curve.
-  csCurveTemplate* GetParentTemplate () { return parent_template; }
-
-  /// Get the lightmap.
-  csLightMap* GetLightMap () { return lightmap; }
-
+  /// @@@
   void CalcUVBuffers();
 
   /**
@@ -203,13 +237,6 @@ public:
    * in the parent csThing)
    */
   virtual void SetControlPoint (int index, int control_id) = 0;
-
-  ///
-  iMaterialHandle* GetMaterialHandle () { return cstxt ? cstxt->GetMaterialHandle () : (iMaterialHandle*)NULL; }
-  ///
-  csMaterialWrapper* GetMaterialWrapper () { return cstxt; }
-  ///
-  void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   /// Return a bounding box in object space for this curve.
   virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
@@ -241,37 +268,10 @@ public:
    * want them lighted.
    */
   virtual bool IsLightable ();
-  ///
+  /// Helper function for lighting. Override for different types of curves.
   virtual void PosInSpace (csVector3& vec, double u, double v);
-  ///
+  /// Helper function for lighting. Override for different types of curves.
   virtual void Normal (csVector3& vec, double u, double v);
-
-  /// Add a lightpatch to this curves list of light patches
-  void AddLightPatch (csLightPatch* lp);
-
-  /// Remove a lightpatch from this curves list
-  void UnlinkLightPatch (csLightPatch* lp);
-
-  /// update the real lightmap with all light info
-  bool RecalculateDynamicLights ();
-
-  /// update the real lightmap with info from the lightpatch
-  void ShineDynLight (csLightPatch* lp);
-
-  /// calculate the lighting for this curve
-  void CalculateLighting (csFrustumView& lview);
-
-  /// Initialize default lighting.
-  void InitializeDefault ();
-
-  /// Read lighting from cache.
-  bool ReadFromCache (int id);
-
-  /// Cache the curve lightmaps.
-  bool WriteToCache (int id);
-
-  /// Prepare lighting.
-  void PrepareLighting ();
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
@@ -282,17 +282,22 @@ public:
   struct Curve : public iCurve
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCurve);
-    virtual csCurve* GetOriginalObject () { return (csCurve*)scfParent; }
-    virtual iObject *QueryObject() {return scfParent;}
+
+    virtual csCurve* GetOriginalObject ()
+    { return scfParent; }
+    virtual iObject *QueryObject()
+    { return scfParent; }
     virtual iCurveTemplate* GetParentTemplate ();
-    virtual void SetMaterial (iMaterialWrapper* mat);
-    virtual iMaterialWrapper* GetMaterial ();
-    virtual void SetName (const char* name) { scfParent->SetName (name); }
-    virtual const char* GetName () const { return scfParent->GetName (); }
+    virtual void SetMaterial (iMaterialWrapper* mat)
+    { scfParent->SetMaterial (mat); }
+    virtual iMaterialWrapper* GetMaterial ()
+    { return scfParent->GetMaterial (); }
+    virtual void SetName (const char* name)
+    { scfParent->SetName (name); }
+    virtual const char* GetName () const
+    { return scfParent->GetName (); }
     virtual void SetControlPoint (int idx, int control_id)
-    {
-      scfParent->SetControlPoint (idx, control_id);
-    }
+    { scfParent->SetControlPoint (idx, control_id); }
   } scfiCurve;
   friend struct Curve;
 };
@@ -306,29 +311,30 @@ SCF_VERSION (csCurveTemplate, 0, 0, 1);
 class csCurveTemplate : public csObject
 {
 protected:
-  csMaterialWrapper* cstxt;
+  iMaterialWrapper* Material;
 
 protected:
   ///
-  virtual ~csCurveTemplate () { }
+  virtual ~csCurveTemplate ();
 
 public:
   ///
   csCurveTemplate();
 
-  ///
+  /// Create an instance of this template.
   virtual csCurve* MakeCurve () = 0;
 
-  /// Tesselate this curve.
+  /// Set a vertex of the template
   virtual void SetVertex (int index, int ver_ind) = 0;
-  ///
+  /// Return a vertex of the template
   virtual int GetVertex (int index)  = 0;
-  ///
+  /// Return the number of vertices in the template
   virtual int GetVertexCount () = 0;
-  ///
-  csMaterialWrapper* GetMaterialWrapper () { return cstxt; }
-  ///
-  void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
+
+  /// Return the current material.
+  iMaterialWrapper* GetMaterial () { return Material; }
+  /// Set the current material.
+  void SetMaterial (iMaterialWrapper* h);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -337,21 +343,19 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCurveTemplate);
     virtual iObject *QueryObject()
-    {
-      return scfParent;
-    }
-    virtual void SetMaterial (iMaterialWrapper* mat);
-    virtual iMaterialWrapper* GetMaterial ();
-    virtual iCurve* MakeCurve ();
-    virtual int GetVertexCount () const { return scfParent->GetVertexCount (); }
+    { return scfParent; }
+    virtual void SetMaterial (iMaterialWrapper* mat)
+    { scfParent->SetMaterial (mat); }
+    virtual iMaterialWrapper* GetMaterial ()
+    { return scfParent->GetMaterial (); }
+    virtual iCurve* MakeCurve ()
+    { return &(scfParent->MakeCurve ()->scfiCurve); }
+    virtual int GetVertexCount () const
+    { return scfParent->GetVertexCount (); }
     virtual int GetVertex (int idx) const
-    {
-      return scfParent->GetVertex (idx);
-    }
+    { return scfParent->GetVertex (idx); }
     virtual void SetVertex (int idx, int vt)
-    {
-      scfParent->SetVertex (idx, vt);
-    }
+    { scfParent->SetVertex (idx, vt); }
   } scfiCurveTemplate;
   friend struct CurveTemplate;
 };
@@ -432,5 +436,45 @@ public:
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
 };
+
+/*
+ * Implementation of inline functions
+ */
+
+inline int csCurveTesselated::GetVertexCount () const
+{ return NumVertices; }
+inline int csCurveTesselated::GetTriangleCount () const
+{ return NumTriangles; }
+inline csVector3* csCurveTesselated::GetVertices ()
+{ return ObjectCoords; }
+inline csVector2* csCurveTesselated::GetTxtCoords ()
+{ return TextureCoords; }
+inline csVector2* csCurveTesselated::GetControlPoints ()
+{ return ControlPoints; }
+inline csColor* csCurveTesselated::GetColors ()
+{ return Colors; }
+inline csTriangle* csCurveTesselated::GetTriangles ()
+{ return Triangles; }
+inline csTriangle& csCurveTesselated::GetTriangle (int i)
+{ return Triangles[i]; }
+inline bool csCurveTesselated::AreColorsValid () const
+{ return ColorsValid; }
+
+inline unsigned long csCurve::GetCurveID () const
+{ return CurveID; }
+inline iMaterialHandle* csCurve::GetMaterialHandle () const
+{ return Material ? Material->GetMaterialHandle() : NULL; }
+inline iMaterialWrapper* csCurve::GetMaterial () const
+{ return Material; }
+inline csCurveTemplate* csCurve::GetParentTemplate () const
+{ return CurveTemplate; }
+inline csLightMap* csCurve::GetLightMap () const
+{ return LightMap; }
+inline void csCurve::SetParentThing (csThing* p)
+{ ParentThing = p; }
+inline csThing* csCurve::GetParentThing () const
+{ return ParentThing; }
+inline const csReversibleTransform *csCurve::GetObject2World () const
+{ return O2W; }
 
 #endif // __CS_CURVE_H__

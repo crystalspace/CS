@@ -47,7 +47,6 @@ class csStatLight;
 class csDynLight;
 class csCBufferCube;
 class csEngine;
-class Dumper;
 class csLight;
 class csCBuffer;
 class csPoly2DPool;
@@ -251,8 +250,6 @@ struct csEngineConfig : public iConfig
  */
 class csEngine : public iEngine
 {
-  friend class Dumper;
-
 public:
   /**
    * This is the Virtual File System object where all the files

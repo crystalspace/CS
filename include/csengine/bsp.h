@@ -26,7 +26,6 @@
 
 class csBspTree;
 class csPolygonArrayNoFree;
-class Dumper;
 struct iFile;
 
 // The BSP tree can be build using the following criteria:
@@ -45,8 +44,6 @@ struct iFile;
 class csBspNode : public csPolygonTreeNode
 {
   friend class csBspTree;
-  friend class Dumper;
-
 private:
   /**
    * All the polygons in this node.
@@ -125,8 +122,6 @@ public:
  */
 class csBspTree : public csPolygonTree
 {
-  friend class Dumper;
-
 private:
   /// The mode.
   int mode;

@@ -38,7 +38,6 @@ class csCamera;
 class csDynLight;
 class csPolygon2DQueue;
 class csProgressPulse;
-class Dumper;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -55,8 +54,6 @@ SCF_VERSION (csSector, 0, 0, 1);
  */
 class csSector : public csObject
 {
-  friend class Dumper;
-
 private:
   /**
    * List of meshes in this sector. Note that meshes also

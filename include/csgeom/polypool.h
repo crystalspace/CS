@@ -21,8 +21,6 @@
 
 #include "csgeom/poly2d.h"
 
-class Dumper;
-
 /**
  * This is an object pool which holds objects of type
  * csPolygon2D. You can ask new instances from this pool.
@@ -31,8 +29,6 @@ class Dumper;
  */
 class csPoly2DPool
 {
-  friend class Dumper;
-
 private:
   struct PoolObj
   {

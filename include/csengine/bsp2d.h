@@ -26,7 +26,6 @@
 #include "csutil/csvector.h"
 
 class csBspTree2D;
-class Dumper;
 
 /**
  * An dynamic array of csSegment2 objects.
@@ -65,8 +64,6 @@ public:
 class csBspNode2D
 {
   friend class csBspTree2D;
-  friend class Dumper;
-
 private:
   /**
    * All the lines in this node.
@@ -107,8 +104,6 @@ typedef void* (csTree2DVisitFunc)(csSegment2**, int num, void*);
  */
 class csBspTree2D
 {
-  friend class Dumper;
-
 private:
   /// The root.
   csBspNode2D* root;

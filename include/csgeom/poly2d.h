@@ -22,7 +22,6 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 
-class Dumper;
 struct iClipper2D;
 
 /**
@@ -31,8 +30,6 @@ struct iClipper2D;
  */
 class csPoly2D
 {
-  friend class Dumper;
-
 protected:
   /// The 2D vertices.
   csVector2* vertices;

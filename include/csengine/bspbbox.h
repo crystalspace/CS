@@ -188,8 +188,6 @@ public:
  */
 class csPolyTreeBBox
 {
-  friend class Dumper;
-
 private:
   /**
    * A linked list for all object stubs that are added

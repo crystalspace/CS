@@ -252,7 +252,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   }
 
   // get texture of element
-  csMaterialWrapper* mathandle = GetMaterialWrapper ();
+  iMaterialWrapper* mathandle = GetMaterialWrapper ();
 
   if(mathandle == NULL) // no material: flatcol is enough.
     return map;
@@ -530,13 +530,13 @@ void csRadCurve::Setup()
 void csRadCurve :: Lumel2World(csVector3& res, int x, int y)
 {
   /// use the curves precalculated uv buffers
-  res = curve->_uv2World[y*width + x];
+  res = curve->uv2World[y*width + x];
 }
 
 const csVector3& csRadCurve::GetNormal(int x, int y) const
 {
   /// use the curves precalculated uv buffers
-  return curve->_uv2Normal[y*width + x];
+  return curve->uv2Normal[y*width + x];
 }
 
 //--------------- csRadTree --------------------------------------

@@ -32,7 +32,6 @@ class csFrustumView;
 struct iFrustumView;
 struct csFrustumViewCleanup;
 class csBitSet;
-class Dumper;
 struct iMaterialHandle;
 struct iPolygon3D;
 struct LightInfo;
@@ -64,7 +63,6 @@ class csPolyTexture : public iPolygonTexture
 {
   friend class csPolygon3D;
   friend class csPolygon2D;
-  friend class Dumper;
 
 private:
   /// The corresponding polygon.

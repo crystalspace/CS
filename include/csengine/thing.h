@@ -54,7 +54,6 @@ struct iRenderView;
 struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
-class Dumper;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
@@ -102,8 +101,6 @@ struct csThingBBox
  */
 class csThing : public csObject
 {
-  friend class Dumper;
-
 private:
   /// ID for this thing (will be >0).
   unsigned int thing_id;

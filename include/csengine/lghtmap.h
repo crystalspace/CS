@@ -29,7 +29,6 @@ class csPolygon3D;
 class csCurve;
 class csLight;
 class csEngine;
-class Dumper;
 class csDelayedLightingInfo;
 class csObject;
 
@@ -43,7 +42,6 @@ class csShadowMap
   ///
   friend class csPolyTexture;
   friend class csCurve;
-  friend class Dumper;
 
 private:
   csShadowMap* next;
@@ -124,8 +122,6 @@ class csLightMap : public iLightMap
 {
   ///
   friend class csPolyTexture;
-  ///
-  friend class Dumper;
 
 private:
   /**

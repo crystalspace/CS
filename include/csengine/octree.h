@@ -29,7 +29,6 @@ class csOctree;
 class csOctreeNode;
 class csBspTree;
 class csThing;
-class Dumper;
 struct iVFS;
 struct iFile;
 
@@ -50,7 +49,6 @@ struct iFile;
 class csOctreeNode : public csPolygonTreeNode
 {
   friend class csOctree;
-  friend class Dumper;
 
 private:
   /// Children.
@@ -201,8 +199,6 @@ public:
  */
 class csOctree : public csPolygonTree
 {
-  friend class Dumper;
-
 private:
   /// The main bounding box for the octree.
   csBox3 bbox;

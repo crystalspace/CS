@@ -30,8 +30,6 @@ class csEngine;
  */
 class csRegion : public csObject
 {
-  friend class Dumper;
-
 private:
   csEngine* engine;
 

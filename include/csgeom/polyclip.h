@@ -26,8 +26,6 @@
 #include "csgeom/polypool.h"
 #include "igeom/clip2d.h"
 
-class Dumper;
-
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.
  */
@@ -124,8 +122,6 @@ public:
  */
 class csPolygonClipper : public csClipper
 {
-  friend class Dumper;
-
   /// Equation for all edges of clipping polygon
   csVector2 *ClipData;
   /// Clipper polygon itself

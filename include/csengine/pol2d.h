@@ -40,8 +40,6 @@ struct iGraphics3D;
  */
 class csPolygon2D : public csPoly2D
 {
-  friend class Dumper;
-
 public:
   /**
    * Compute the perspective transformation of a 3D vertex and add it to the polygon.

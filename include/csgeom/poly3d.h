@@ -27,7 +27,6 @@
 #define POL_BACK 2
 #define POL_SPLIT_NEEDED 3
 
-class Dumper;
 class csPoly2D;
 
 /**
@@ -35,8 +34,6 @@ class csPoly2D;
  */
 class csPoly3D
 {
-  friend class Dumper;
-
 protected:
   /// The 3D vertices.
   csVector3* vertices;

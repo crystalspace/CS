@@ -23,8 +23,6 @@
 #include "csutil/csobject.h"
 #include "imesh/thing/polytmap.h"
 
-class Dumper;
-
 
 SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
 
@@ -39,8 +37,6 @@ class csPolyTxtPlane : public csObject
   friend class csPolygon2D;
   ///
   friend class csPolyTexture;
-  ///
-  friend class Dumper;
 
 private:
   /// Transformation from object to texture space.
