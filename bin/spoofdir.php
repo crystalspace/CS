@@ -104,7 +104,7 @@
 //-----------------------------------------------------------------------------
 
 $prog_name = 'spoofdir.php';
-$prog_version = '6';
+$prog_version = '7';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
 
@@ -440,7 +440,7 @@ if (count($dirlist) == 0)
     $dirlist[] = '.';
 
 $copyright = "Copyright &copy;2000,2002 by $author_name " .
-    "&lt;<a href=\"mailto:$author_email\">" .
+    "&lt;<a href=\"mailto:" . urlencode($author_email) . "\">" .
     "<font color=\"$banner_linkcolor\">$author_email</font></a>&gt;";
 
 //-----------------------------------------------------------------------------
@@ -470,6 +470,12 @@ function pretty_size($bytes)
     else
 	$s = "$bytes";
     return $s;
+}
+
+function url_encode_path($path)
+{
+    // Prevent urlencode() from encoding slashes.
+    return str_replace('%2F', '/', str_replace('%2f', '/', urlencode($path)));
 }
 
 function sort_array(&$a)
@@ -652,8 +658,8 @@ function parent_link($path, $link = '../')
     {
 	$s = parent_link(dirname($path), "../$link");
 	$f = basename($path);
-	$s .= "<a href=\"$link\"><font color=\"$banner_linkcolor\">" .
-	    "$f</font></a>/";
+	$s .= "<a href=\"" . url_encode_path($link) . "\">" . 
+	    "<font color=\"$banner_linkcolor\">$f</font></a>/";
     }
     return $s;    
 }
@@ -693,7 +699,7 @@ function print_entry($link, $info1, $info2)
     global $row_colors;
     static $color = 0;
     print("<tr bgcolor=\"$row_colors[$color]\">\n" .
-	"<td><a href=\"$link\">$link</a></td>\n" .
+	"<td><a href=\"" . url_encode_path($link) . "\">$link</a></td>\n" .
 	"<td align=\"right\">$info1</td>\n" .
 	"<td>$info2</td>\n</tr>\n");
     $color = !$color;

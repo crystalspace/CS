@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+25-Sep-2002
+	- Eric Sunshine fixed spoofdir.php so that synthesis valid URLs for
+	  pathnames containing embedded spaces and other special characters.
 24-Sep-2002
 	- Relaxed the sequence and trigger loader so that you can now refer to
 	  triggers and sequences that haven't been defined yet.
