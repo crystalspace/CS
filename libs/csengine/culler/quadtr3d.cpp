@@ -458,9 +458,7 @@ int csQuadTree3D :: TestPoint (const csVector3& point)
 {
   node_pos_info start_pos;
   start_pos.set_root(this);
-  csVector3 testpoint = point - center;
-  return test_point_func(this, root_state, &start_pos, 
-    (void*)&testpoint);
+  return test_point_func(this, root_state, &start_pos, (void*)&point);
 }
 
 

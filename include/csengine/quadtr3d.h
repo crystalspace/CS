@@ -55,7 +55,7 @@ class node_pos_info;
 
 
 /**
- *  QuadTree
+ *  QuadTree3D
  */
 class csQuadTree3D {
   friend class Dumper;
@@ -278,6 +278,7 @@ public:
 
   /**
    * Insert a polygon into the quad-tree.
+   *   polygon must be relative to the center point.
    * Return true if the tree was modified (i.e. if parts of the
    * polygon were visible. More precisely:
    * Returns CS_QUAD3D_NOCHANGE if no change to the tree.
@@ -289,6 +290,7 @@ public:
 
   /**
    * Test for polygon visibility with the quad-tree.
+   *   polygon must be relative to the center point.
    * Returns CS3D_QUAD_NOCHANGE if no change to the tree.
    *  CS_QUAD3D_POSSIBLECHANGE if it probably changed, and 
    *  CS_QUAD3D_CERTAINCHANGE if it changed for certain.
@@ -298,17 +300,13 @@ public:
 
   /**
    * Test if a given point is visible in the quad-tree.
+   *   point must be relative to the center point.
    * Returns CS_QUAD3D_FULL if not visible, CS_QUAD3D_EMPTY
    * if visible and CS_QUAD3D_PARTIAL if undecided.
    * This function returns CS_QUAD3D_UNKNOWN if the point is not
    * in the quadtree.
    */
   int TestPoint (const csVector3& point);
-
-  /**
-   *  4x4 bit array (2bytes) -> Quadtree of depth 3.
-   *  depth3 quadtree->4x4 array (partial -> empty)
-   */
 
   /** a TestRectangle function that will test on leaf-coordinates, for full. 
    *  Give depth of the node-plane to test on, the x and y integer node coords
