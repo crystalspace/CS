@@ -38,7 +38,7 @@ endif
 INC.FANCYCON = $(wildcard plugins/console/output/fancy/*.h)
 SRC.FANCYCON = $(wildcard plugins/console/output/fancy/*.cpp)
 OBJ.FANCYCON = $(addprefix $(OUT),$(notdir $(SRC.FANCYCON:.cpp=$O)))
-DEP.FANCYCON = CSUTIL CSSYS
+DEP.FANCYCON = CSUTIL CSGEOM CSSYS
 CFG.FANCYCON = data/config/fancycon.cfg
 
 TO_INSTALL.CONFIG += $(CFG.FANCYCON)
