@@ -60,6 +60,7 @@ DEP.GLWIN32 = CSUTIL CSSYS
 MSVC.DSP += GLWIN32
 DSP.GLWIN32.NAME = glwin32
 DSP.GLWIN32.TYPE = plugin
+DSP.GLWIN32.LIBS = opengl32 glu32
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

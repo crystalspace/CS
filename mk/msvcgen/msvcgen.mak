@@ -31,6 +31,114 @@
 #	working target.  Thus, the headache associated with manual maintenance
 #	of the MSVC project files becomes a problem of the past.
 #
+# IMPORTS
+#	In the discussion which follows, assume that "PROJECT" is the core name
+#	of the module represented by a particular makefile.
+#
+#	The following general-purpose makefile variables are imported from
+#	other makefiles, project-wide, in order to glean information needed to
+#	generate MSVC project files.
+#
+#	o SRC.PROJECT -- List of source files which comprise this module.
+#
+#	o INC.PROJECT -- List of header files related to this module.
+#
+#	o DEP.PROJECT -- List of projects (typically library projects) upon
+#	  which this module depends.  Each item in this list is the core name
+#	  of some other module, such as "CSGEOM", "CSUTIL", or "CSSYS".
+#
+#	o CFG.PROJECT -- List of configuration files related to this module.
+#
+#	Furthermore, the following variables specifically control DSW and
+#	DSP project file creation.  These variables should only appear in
+#	makefiles for which a corresponding DSP file should be generated.
+#
+#	o MSVC.DSP -- Master list of modules for which project files should be
+#	  generated.  Entries must be *appended* to this list with the "+="
+#	  operator.  Each entry is the core name of a module as used within its
+#	  makefile.  For example, soft3d.mak, modifies this variable with the
+#	  expression "MSVC.DSP += SOFT3D".
+#
+#	o DSP.PROJECT.NAME -- Base name (such as "soft3d") for the generated
+#	  project and target.  This name is used to compose the DSP file name,
+#	  the end target name (such as "soft3d.dll"), and the displayed project
+#	  name in the Visual-C++ IDE.  In general, it should be identical to
+#	  the base name of the target which is generated for non-Windows
+#	  platforms.
+#
+#	o DSP.PROJECT.TYPE -- Module's type.  It should be one of "appgui",
+#	  "appcon", "library", "plugin", or "group", which stand for GUI
+#	  application, console application, static library, plug-in module, and
+#	  pseudo-dependency group, respectively.
+#
+#	o DSP.PROJECT.RESOURCES -- List of extra human-readable resources
+#	  related to this module which are not covered by CFG.PROJECT.  These
+#	  resources are made available for browsing in the Visual-C++ IDE as a
+#	  convenience to the user.  Some good candidates, among others, for
+#	  this variable are files having the suffixes .inc, .y (yacc), .l
+#	  (lex), and .txt.
+#
+#	o DSP.PROJECT.DEPEND -- List of extra dependencies for this module.
+#	  Entries in this list have the same format as those in the DEP.PROJECT
+#	  list.  This variable is generally only used for pseudo-dependency
+#	  group projects (see CS/mk/msvcgen/win32.mak).
+#
+#	o DSP.PROJECT.LIBS -- List of extra Windows-specific libraries with
+#	  which this module should be linked in addition to those already
+#	  mentioned in the template file for this project type.  A .lib suffix
+#	  is automatically added to each item in this list if absent.
+#	  Typically, libraries are only specified for executable and plug-in
+#	  projects.  This variable differs from DSP.PROJECT.DEPEND in that it
+#	  refers to libraries which exist outside of the project graph (such as
+#	  wsock32.lib or opengl32.lib), whereas DSP.PROJECT.DEPEND always
+#	  refers to modules which are members of the project graph.
+#
+#	o DSP.PROJECT.LFLAGS -- Specifies extra Windows-specific linker options
+#	  which should be used in addition to those already mentioned in the
+#	  template file.  Typically, linker options are only specified for
+#	  executable and plug-in projects.  Keep in mind that these flags are
+#	  passed through the (Bourne) shell during the project file generation
+#	  process, thus it may be necessary to specially protect any embedded
+#	  quote characters.
+#
+#	o DSP.PROJECT.CFLAGS -- Specifies extra Windows-specific compiler
+#	  options which should be used in addition to those already mentioned
+#	  in the template file.  Keep in mind that these flags are passed
+#	  through the (Bourne) shell during the project file generation
+#	  process, thus it may be necessary to specially protect embedded quote
+#	  characters.
+#
+#	The automatic MSVC project file generation mechanism also employs
+#	additional makefile components from the CS/mk/msvcgen directory.
+#
+#	o win32.mak -- Extends MSVC.DSP with extra project targets which are
+#	  specific to Windows or which are not otherwise represented by
+#	  stand-alone makefiles within the project hierarchy.
+#
+#	o required.mak -- Sets the value of the MSVC.PLUGINS.REQUIRED variable.
+#	  This variable supplements the list of plug-in modules defined by the
+#	  PLUGINS variable (see CS/mk/user.mak) and ensures that the correct
+#	  set of DSP files are generated even when invoking the project file
+#	  generation process from a non-Windows platform such as Unix.
+#
+# EXPORTS
+#	The following files are exported by this makefile:
+#
+#	o A DSP project file is generated for each project mentioned by the
+#	  MSVC.DSP variable.
+#
+#	o A single DSW file, named csall.dsw, is generated.  It contains
+#	  dependency information for all generated DSP projects.
+#
+#	The following makefile targets are exported:
+#
+#	o msvcgen -- Generates the DSW file csall.dsw, as well as one DSP
+#	  project files for each module mentioned by the MSVC.DSP variable.
+#
+#	o msvcinst -- Copies the newly generated project files over top of the
+#	  existing files from the CVS repository and informs the user as to
+#	  exactly which CVS commands must be invoked in order to permanently
+#	  commit the new files to the repository.
 #------------------------------------------------------------------------------
 
 # Target description
@@ -143,6 +251,22 @@ MSVC.DEPEND.LIST = $(foreach d,$(sort $(subst CSSYS,WIN32SYS,\
   $(DEP.$*) $(DSP.$*.DEPEND) $(MSVC.DEPEND.$(DSP.$*.TYPE)))),\
   $(MSVC.PREFIX.$(DSP.$d.TYPE))$(DSP.$d.NAME))
 
+# Macro to compose list of --depend directives from MSVC.DEPEND.LIST.
+MSVC.DEPEND.DIRECTIVES = $(foreach d,$(MSVC.DEPEND.LIST),--depend=$d)
+
+# Macro to compose list of --library directives from DSP.PROJECT.LIBS.
+MSVC.LIBRARY.DIRECTIVES = $(foreach l,$(DSP.$*.LIBS),--library=$l)
+
+# Macros to compose --lflags and --cflags directives from DSP.PROJECT.LFLAGS
+# and DSP.PROJECT.CFLAGS.  These are slightly complicated because it is valid
+# for LFLAGS and CFLAGS to contain embedded whitespace, and also by the fact
+# that --lflags and --cflags should only appear on the command-line if the
+# corresponding values of LFLAGS and CFLAGS, respectively, are non-empty.  The
+# extra $(subst) step is used to eliminate the --lflags or --cflags directive
+# in the event that LFLAGS or CFLAGS is empty.
+MSVC.LFLAGS.DIRECTIVE = $(subst --lflags='',,--lflags='$(DSP.$*.LFLAGS)')
+MSVC.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
+
 # Macros to compose lists of existing and newly created DSW and DSP files.
 MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,$(wildcard \
   $(addprefix $(MSVC.CVS.DIR)/*,$(MSVC.EXT.DSP) $(MSVC.EXT.DSW)))))
@@ -189,20 +313,23 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 # Build a DSP project file and an associated DSW fragment file.
 %.MAKEDSP:
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --dsp \
-	--name $(DSP.$*.NAME) \
-	--template $(DSP.$*.TYPE) \
-	--project $(MSVC.PROJECT) \
-	--output $(MSVC.OUTPUT) \
-	--fragment $(MSVC.FRAGMENT) \
-	$(foreach d,$(MSVC.DEPEND.LIST),--depend $d) \
-	--template-dir $(MSVC.TEMPLATE.DIR) \
+	--name=$(DSP.$*.NAME) \
+	--template=$(DSP.$*.TYPE) \
+	--template-dir=$(MSVC.TEMPLATE.DIR) \
+	--project=$(MSVC.PROJECT) \
+	--output=$(MSVC.OUTPUT) \
+	--fragment=$(MSVC.FRAGMENT) \
+	$(MSVC.DEPEND.DIRECTIVES) \
+	$(MSVC.LIBRARY.DIRECTIVES) \
+	$(MSVC.LFLAGS.DIRECTIVE) \
+	$(MSVC.CFLAGS.DIRECTIVE) \
 	$(MSVC.CONTENTS)
 
 # Build the project-wide DSW file (csall.dsw).
 dswgen:
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --dsw \
-	--output $(MSVC.OUT.DIR)/$(MSVC.DSW) \
-	--template-dir $(MSVC.TEMPLATE.DIR) \
+	--output=$(MSVC.OUT.DIR)/$(MSVC.DSW) \
+	--template-dir=$(MSVC.TEMPLATE.DIR) \
 	$(wildcard $(MSVC.OUT.FRAGMENT)/*$(MSVC.EXT.FRAGMENT))
 
 # Build all Visual-C++ DSW and DSP project files.  The DSW file is built last

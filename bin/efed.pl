@@ -32,7 +32,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'efed.pl';
-my $PROG_VERSION = '1.1';
+my $PROG_VERSION = 3;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -248,6 +248,7 @@ sub load_file {
     my $size = -s $path;
     if ($size) {
 	open(FILE, "<$path") or fatal("Unable to open $path: $!");
+	binmode(FILE);
 	read(FILE, $content, $size) == $size
 	    or fatal("Failed to read all $size bytes of $path: $!");
 	close(FILE);
@@ -261,6 +262,7 @@ sub load_file {
 sub save_file {
     my ($path, $content) = @_;
     open (FILE, ">$path") or fatal("Unable to create $path: $!");
+    binmode(FILE);
     print FILE $content if length($content);
     close(FILE);
 }

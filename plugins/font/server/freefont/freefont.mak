@@ -46,6 +46,7 @@ TO_INSTALL.CONFIG += $(CFG.FREEFONT)
 MSVC.DSP += FREEFONT
 DSP.FREEFONT.NAME = freefont
 DSP.FREEFONT.TYPE = plugin
+DSP.FREEFONT.LIBS = freetype
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

@@ -53,6 +53,7 @@ DEP.SOCKET = CSSYS CSUTIL
 MSVC.DSP += SOCKET
 DSP.SOCKET.NAME = cssocket
 DSP.SOCKET.TYPE = plugin
+DSP.SOCKET.LIBS = wsock32
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

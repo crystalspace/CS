@@ -83,6 +83,7 @@ MSVC.DSP += GL3D
 DSP.GL3D.NAME = gl3d
 DSP.GL3D.TYPE = plugin
 DSP.GL3D.RESOURCES = $(wildcard plugins/video/renderer/opengl/ext/*.inc)
+DSP.GL3D.LIBS = opengl32 glu32
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

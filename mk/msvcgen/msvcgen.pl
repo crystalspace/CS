@@ -33,7 +33,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = '1.0';
+my $PROG_VERSION = 2;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -49,6 +49,11 @@ $main::opt_t = '';	# Alias for 'template'.
 $main::opt_project = '';
 $main::opt_target = '';
 $main::opt_g = '';	# Alias for 'target'.
+@main::opt_library = ();
+@main::opt_L = ();	# Alias for 'library'.
+@main::opt_lflags = ();
+@main::opt_l = ();	# Alias for 'lflags'.
+@main::opt_cflags = ();
 $main::opt_output = '';
 $main::opt_fragment = undef;
 @main::opt_depend = ();
@@ -74,6 +79,11 @@ my @script_options = (
     'project=s',
     'target=s',
     'g=s',		# Alias for 'target'.
+    'library=s@',
+    'L=s@',		# Alias for 'library'.
+    'lflags=s@',
+    'l=s@',		# Alias for 'lflags'.
+    'cflags=s@',
     'output=s',
     'fragment:s',
     'depend=s@',
@@ -199,6 +209,7 @@ sub load_file {
     fatal("Failed to load file $path: $!") unless defined($size);
     if ($size) {
 	open(FILE, "<$path") or fatal("Unable to open $path: $!");
+	binmode(FILE);
 	read(FILE, $content, $size) == $size
 	    or fatal("Failed to read all $size bytes of $path: $!");
 	close(FILE);
@@ -212,6 +223,7 @@ sub load_file {
 sub save_file {
     my ($path, $content) = @_;
     open (FILE, ">$path") or fatal("Unable to open $path: $!");
+    binmode(FILE);
     print FILE $content if length($content);
     close(FILE);
 }
@@ -241,10 +253,13 @@ sub load_templates {
 }
 
 #------------------------------------------------------------------------------
-# Interpolate a value into a string
+# Interpolate a value into a string.  If the value is an array reference, then
+# compose a string out of the array elements and use the result as the
+# replacement value.  Otherwise assume that the value is a simple string.
 #------------------------------------------------------------------------------
 sub interpolate {
     my ($pattern, $value, $buffer) = @_;
+    $value = join(' ', @{$value}) if ref($value) eq 'ARRAY';
     ${$buffer} =~ s/$pattern/$value/g;
 }
 
@@ -299,6 +314,9 @@ sub interpolate_dsp {
     interpolate('%project%',  $main::opt_project,       \$result);
     interpolate('%makefile%', $main::makefile,          \$result);
     interpolate('%target%',   $main::opt_target,        \$result);
+    interpolate('%libs%',     \@main::opt_library,      \$result);
+    interpolate('%lflags%',   \@main::opt_lflags,       \$result);
+    interpolate('%cflags%',   \@main::opt_cflags,       \$result);
     interpolate('%groups%',   interpolate_dsp_groups(), \$result);
     return $result;
 }
@@ -365,22 +383,31 @@ sub summarize_dsw_options {
 #------------------------------------------------------------------------------
 sub summarize_dsp_options {
     print <<"EOT";
-Mode:     dsp
-Name:     $main::opt_name
-Output:   $main::opt_output
+Mode:      dsp
+Name:      $main::opt_name
+Output:    $main::opt_output
 EOT
     print <<"EOT" if defined($main::opt_fragment);
-Fragment: $main::opt_fragment
+Fragment:  $main::opt_fragment
 EOT
     print <<"EOT";
-Template: $main::opt_template
-Project:  $main::opt_project
-Target:   $main::opt_target
-Makefile: $main::makefile
+Template:  $main::opt_template
+Project:   $main::opt_project
+Target:    $main::opt_target
+Makefile:  $main::makefile
+EOT
+    print <<"EOT" if @main::opt_library;
+Libraries: @main::opt_library
+EOT
+    print <<"EOT" if @main::opt_lflags;
+LFLAGS:    @main::opt_lflags
+EOT
+    print <<"EOT" if @main::opt_cflags;
+CFLAGS:    @main::opt_cflags
 EOT
     my @groups = sort(keys(%{$main::groups}));
     print <<"EOT" if @groups;
-Groups:   @groups
+Groups:    @groups
 EOT
 }
 
@@ -416,6 +443,12 @@ sub validate_dsw_options {
 	if $main::opt_project;
     usage_error("The --target option can be used only with --dsp.")
 	if $main::opt_target;
+    usage_error("The --library option can be used only with --dsp.")
+	if @main::opt_library;
+    usage_error("The --lflags option can be used only with --dsp.")
+	if @main::opt_lflags;
+    usage_error("The --cflags option can be used only with --dsp.")
+	if @main::opt_cflags;
     usage_error("The --fragment option can be used only with --dsp.")
 	if defined($main::opt_fragment);
     usage_error("The --depend option can be used only with --dsp.")
@@ -461,7 +494,9 @@ sub process_option_aliases {
     $main::opt_target = $main::opt_g unless $main::opt_target;
     $main::opt_template = $main::opt_t unless $main::opt_template;
     $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
-    push(@main::opt_depend, @main::opt_D);
+    push(@main::opt_library, @main::opt_L);
+    push(@main::opt_lflags,  @main::opt_l);
+    push(@main::opt_depend,  @main::opt_D);
 }
 
 #------------------------------------------------------------------------------
@@ -479,6 +514,14 @@ sub process_dsp_options {
     $main::opt_fragment = $main::opt_name
 	if defined($main::opt_fragment) and !$main::opt_fragment;
     add_suffix($main::opt_fragment, 'dwi') if defined($main::opt_fragment);
+
+    my @libraries;
+    my $library;
+    foreach $library (@main::opt_library) {
+	add_suffix($library, 'lib');
+	push(@libraries, $library);
+    }
+    @main::opt_library = @libraries;
 
     my @depends;
     my $depend;
@@ -554,11 +597,12 @@ Template files are loaded from the current working directory or from a named
 template directory.  The template files appgui.tpl, appcon.tpl, plugin.tpl,
 library.tpl, and group.tpl correspond to the project types available via the
 --template option.  Template files may contain the variables \%project\%,
-\%target\%, \%makefile\%, and \%groups\%.  The variables \%project\% and
-\%target\% are replaced with values specified via the --project and --target
-options.  The replacement value for \%makefile\% is the same as the name of
-the generated DSP file with the exception that .mak is substituted for .dsp
-as the suffix.
+\%target\%, \%makefile\%, \%groups\%, \%libs\%, \%lflags\%, and \%cflags\%.
+The variables \%project\%, \%target\%, \%libs\%, \%flags\%, and \%cflags\%
+are replaced with values specified via the --project, --target, --library,
+--lflags, and --cflags options, respectively.  The replacement value for
+\%makefile\% is the same as the name of the generated DSP file with the
+exception that .mak is substituted for .dsp as the suffix.
 
 The template dspgroup.tpi is used multiple times to build a value for the
 \%groups\% variable mentioned above.  This template is used to create the
@@ -661,6 +705,41 @@ DSP Options:
                  target name.  If the name does not end with an appropriate
                  suffix (one of .exe, .dll, or .lib), then the suffix is
                  added automatically.
+    -L <name>
+    --library=<name>
+                 Specifies the name of an extra Windows library with which
+                 the project should be linked in addition to those which are
+                 already mentioned in the template file.  This is the
+                 replacement value for the \%libs\% variable in the template
+                 files.  Typically, libraries are only specified for
+                 executable and plug-in templates.  A .lib suffix is added
+                 to the name automatically if absent.  The --library option
+                 may be given any number of times to specify any number of
+                 additional libraries, or not at all if no additional
+                 libraries are required.  The --library option differs from
+                 the --depend option in that it refers to libraries which
+                 exist outside of the project graph, whereas --depend always
+                 refers to projects which are members of the project graph.
+    -l <flags>
+    --lflags=<flags>
+                 Specifies extra linker options which should be used in
+                 addition to those already mentioned in the template file.
+                 This is the replacement value for the \%lflags\% variable
+                 in the template files.  Typically, linker options are only
+                 specified for executable and plug-in templates.  The
+                 --lflags option may be specified any number of times, in
+                 which case the effects are cumulative, or not at all if no
+                 extra linker options are required.
+    -c <flags>
+    --cflags=<flags>
+                 Specifies extra compiler options which should be used in
+                 addition to those already mentioned in the template file.
+                 This is the replacement value for the \%cflags\% variable
+                 in the template files.  The --cflags option may be
+                 specified any number of times, in which case the effects
+                 are cumulative, or not at all if no extra compiler options
+                 are required.  As an example, a pre-processor macro named
+                 __FOOBAR__ can be defined with: --cflags='/D "__FOOBAR__"'
     -f
     -f <path>
     --fragment

@@ -2,6 +2,62 @@ The history order has been reversed so that new features are at the top.
 
 12-Nov-2000
 	- Eric Sunshine enabled automatic DSP generation for 3ds2lev.
+	- Eric Sunshine removed the obsolete and unused CS/bin/build.pl script.
+	  (It can always be recovered from the CVS Attic if someone wants to
+	  revive it.)
+	- Eric Sunshine fixed efed.pl and msvcgen.pl so that they open files in
+	  "binary" mode to be Windows-correct; since these scripts treat a file
+	  as a raw stream of bytes rather than as text.
+	- Eric Sunshine updated the mechanism for generating Visual-C++ project
+	  files so that it is now possible to individually specify extra
+	  Windows-specific libraries, linker directives, and compiler
+	  directives for any given project.  Details follow:
+	    - Modified msvcgen.mak so that it now pays attention to the
+	      following new makefiles variables when generating Visual-C++ DSW
+	      and DSP files:
+		o DSP.PROJECT.LIBS -- List of extra Windows-specific libraries
+		  with which this module should be linked in addition to those
+		  already mentioned in the template file for this project type.
+		  A .lib suffix is automatically added to each item in this
+		  list if absent.  Typically, libraries are only specified for
+		  executable and plug-in projects.  This variable differs from
+		  DSP.PROJECT.DEPEND in that it refers to libraries which exist
+		  outside of the project graph (such as wsock32.lib or
+		  opengl32.lib), whereas DSP.PROJECT.DEPEND always refers to
+		  modules which are members of the project graph.
+		o DSP.PROJECT.LFLAGS -- Specifies extra Windows-specific linker
+		  options which should be used in addition to those already
+		  mentioned in the template file.  Typically, linker options
+		  are only specified for executable and plug-in projects.  Keep
+		  in mind that these flags are passed through the (Bourne)
+		  shell during the project file generation process, thus it may
+		  be necessary to specially protect any embedded quote
+		  characters.
+		o DSP.PROJECT.CFLAGS -- Specifies extra Windows-specific
+		  compiler options which should be used in addition to those
+		  already mentioned in the template file.  Keep in mind that
+		  these flags are passed through the (Bourne) shell during the
+		  project file generation process, thus it may be necessary to
+		  specially protect embedded quote characters.
+	    - Added a copious amount of new documentation to msvcgen.mak
+	      explaining the entire spectrum of variables and information which
+	      it imports, along with the files and makefile targets which it
+	      exports.
+	    - Added new command-line options --library, --lflags, and --cflags
+	      to msvcgen.pl.  The arguments to these options are used as
+	      replacement values for the new template variables %libs%,
+	      %lflags%, and %cflags%, respectively.
+	    - Incorporated the new template variables %libs%, %lflags%, and
+	      %cflags% into the template files appcon.tpl, appgui.tpl,
+	      group.tpl, library.tpl, and plugin.tpl.
+	    - Added DSP.GL3D.LIBS and DSP.GLWIN32.LIBS to glrender.mak and
+	      glwin32.mak, respectively, and set the value of each to
+	      "opengl32.lib glu32.lib".
+	    - Added DSP.FREEFONT.LIBS to freefont.mak and set its value to
+	      freetype.lib.
+	    - Removed wsock32.lib from plugin.tpl.  This library is now
+	      mentioned explicitly by DSP.SOCKET.LIBS and DSP.CSNETMAN.LIBS,
+	      instead.
 10-Nov-2000
 	- Samuel Humphreys did some fixes for bit rot in the procedural
 	  textures and prepared for dumping dtsimple.
