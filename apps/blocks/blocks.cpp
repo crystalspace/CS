@@ -879,9 +879,9 @@ int main (int argc, char* argv[])
   // Create our world.
   csSector* room;
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
-  csPolygon3D::do_force_recalc = true;
+  Sys->world->EnableLightingCache (false);
 
-  char const* path = config->GetStr ("Blocks", "ARCHIVE", "../data/blocks.zip");
+  char const* path = config->GetStr ("Blocks", "ARCHIVE", "data/blocks.zip");
   Archive* archive = new Archive (path, true);
 
   Sys->set_pilar_texture (CSLoader::LoadTexture (Sys->world, "txt", "stone4.gif", archive));

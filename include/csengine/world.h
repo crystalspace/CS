@@ -177,6 +177,8 @@ private:
   IHaloRasterizer* piHR;
   /// The engine configurator object.
   csEngineConfig* cfg_engine;
+  /// If true then the lighting cache is enabled.
+  bool do_lighting_cache;
 
   ///
   void ShineLights ();
@@ -229,6 +231,19 @@ public:
    * locally now).
    */
   bool Prepare (IGraphics3D* g3d);
+
+  /**
+   * Cache lighting. If true (default) then lighting will be cached in
+   * either the world file or else 'precalc.zip'. If false then this
+   * will not happen and lighting will be calculated at startup.
+   * If set to 'false' recalculating of lightmaps will be forced.
+   * If set to 'true' recalculating of lightmaps will depend on
+   * wether or not the lightmap was cached.
+   */
+  void EnableLightingCache (bool en);
+
+  /// Return true if lighting cache is enabled.
+  bool IsLightingCacheEnabled () { return do_lighting_cache; }
 
   /**
    * Read configuration file for all engine specific values.

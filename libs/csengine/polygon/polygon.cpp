@@ -1141,7 +1141,11 @@ void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
   if (orig_poly) return;
   if (!tex->lm) return;
   if (!do_cache) { lightmap_up_to_date = false; return; }
-  if (do_force_recalc) { tex->InitLightmaps (); lightmap_up_to_date = false; }
+  if (do_force_recalc || !csWorld::current_world->IsLightingCacheEnabled ())
+  {
+    tex->InitLightmaps ();
+    lightmap_up_to_date = false;
+  }
   else if (!tex->lm->ReadFromCache (TEXW(tex), TEXH(tex), def_mipmap_size, owner, this, index, csWorld::current_world))
   {
     tex->InitLightmaps ();
@@ -1449,7 +1453,8 @@ void csPolygon3D::CacheLightmaps (csPolygonSet* owner, int index)
   if (!lightmap_up_to_date)
   {
     lightmap_up_to_date = true;
-    tex->lm->Cache (owner, this, index, csWorld::current_world);
+    if (csWorld::current_world->IsLightingCacheEnabled ())
+      tex->lm->Cache (owner, this, index, csWorld::current_world);
   }
   tex->lm->ConvertToMixingMode ();
 }

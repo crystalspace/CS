@@ -59,6 +59,7 @@ CSOBJTYPE_IMPL(csWorld,csObject);
 
 csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 {
+  do_lighting_cache = true;
   first_dyn_lights = NULL;
   world_file = NULL;
   start_sector = NULL;
@@ -96,6 +97,12 @@ void csWorld::Clear ()
   CHK (delete [] start_sector); start_sector = NULL;
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
+}
+
+void csWorld::EnableLightingCache (bool en)
+{
+  do_lighting_cache = en;
+  if (!do_lighting_cache) csPolygon3D::do_force_recalc = true;
 }
 
 IConfig* csWorld::GetEngineConfigCOM ()
@@ -242,7 +249,11 @@ piHR = 0;
 
 Archive* csWorld::GetWorldFile ()
 {
-  if (!world_file) CHKB (world_file = new Archive ("precalc.zip"));
+  if (do_lighting_cache)
+  {
+    if (!world_file) CHKB (world_file = new Archive ("precalc.zip"));
+  }
+  else world_file = NULL;
   return world_file;
 }
 
@@ -303,7 +314,7 @@ void csWorld::ShineLights ()
     char* reason = NULL;
 
     Archive* ar = GetWorldFile ();
-    char* data = ar->read ("precalc_info");
+    char* data = ar ? ar->read ("precalc_info") : (char*)NULL;
     if (data)
     {
       char* p1, * p2;
@@ -331,7 +342,7 @@ void csWorld::ShineLights ()
     }
     else { force = true; reason = "no 'precalc_info' found"; }
 
-    if (force)
+    if (ar && force)
     {
       CHK (data = new char [5000]);
       sprintf (data, "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_WHITE=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\n\

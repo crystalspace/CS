@@ -1399,8 +1399,7 @@ int main (int argc, char* argv[])
     // The infinite maze.
 
     Sys->Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
-    //@@@ Think
-    csPolygon3D::do_force_recalc = true;
+    world->EnableLightingCache (false);
 
     // Disable collision detection for the infinite maze because
     // it does not work here yet.
