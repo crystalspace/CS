@@ -10,22 +10,28 @@ up @file{map2cs.cfg} in you favourite editor and edit it, so it looks like the
 following template:
 
 @example
-[texturesettings]
-defaulttexture = a_4hewn
-wad1 = D:\Crystal\Wads\cstex_1.wad
+Map2CS.TextureSettings.DefaultTexture = liquids/bubbles
+Map2CS.TextureSettings.wad1 = E:\SIERRA\Half-Life\valve\halflife.wad
+Map2CS.TextureSettings.wad2 = E:\SIERRA\Half-Life\valve\xeno.wad
+Map2CS.TextureSettings.wad3 = E:\SIERRA\Half-Life\valve\liquids.wad
+Map2CS.TextureSettings.wad4 = E:\SIERRA\Half-Life\valve\texpack.wad
+Map2CS.TextureSettings.pk1 = D:\GAMES\Quake III Arena\baseq3\pak0.pk3
+Map2CS.TextureSettings.pk2 = D:\GAMES\Quake III Arena\baseq3\mapmedia.pk3
 
-[general]
-scaling = 0.025
-usebsp = 1
-removehidden = 0
-lightscale = 15
+Map2CS.General.Scaling = 0.025
+Map2CS.General.UseBSP = 1
+Map2CS.General.RemoveHidden = 0
+Map2CS.General.LightScale=30
+
+System.ApplicationID = Map2CS
 @end example
 
 The only thing you will probably need to adjust in the supplied
-@file{map2cs.cfg} is the texture path (setting for @samp{wad1}).  If you need
-more wads, you need to add them as @file{wad2}, @file{wad3} and so on.  If you
-have Quake3-style texture files, you can add them by @file{pk1=@dots{}},
-@file{pk2=@dots{}}, and so on.
+@file{map2cs.cfg} is the texture path (setting for
+@samp{Map2CS.TextureSettings.wad1} etc.). If you need more wads, you need to
+add them as @file{wad5}, @file{wad6} and so on. If you have Quake3-style
+texture files, you can add them by @file{Map2CS.TextureSettings.pk3=@dots{}},
+@file{Map2CS.TextureSettings.pk4=@dots{}}, and so on.
 
 Now Windows and @sc{dos} users need to create a batch file to compile and run
 a map. The batch file should be stored as @file{D:\Crystal\LevBuild.bat}
