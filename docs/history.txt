@@ -23,6 +23,10 @@ chronological order.
 	- res changed csMaterialHandle to also store a iTextureHandle ref.
 	  Fixes crashes when fancycon is used with SW rendering.
 	- res removed some old layer stuff from iMaterial.
+	- res augmented csPrintfFormatter (and hence indirectly pretty much 
+	  everywhere in CS format strings are used) to support the '*' syntax
+	  to supply width/precision as an argument in the arg list.
+	- res fixed background transparency of the fancy console.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin
