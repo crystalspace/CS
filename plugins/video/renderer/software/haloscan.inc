@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     This include file defines a single scanline drawing routine for halo,
     either scaled or not, R,G,B can be clipped to 1.0 or not and so on.

@@ -104,7 +104,7 @@ bool csSoftProcTexture3D::Prepare
   }
   else
   {
-    // alone_hint is true, but we are the first procedural texture
+    // alone_hint is true and we are the first procedural texture
     NewInitialize ();
     if (!Open (NULL) || !NewOpen ())
       return false;
@@ -122,7 +122,7 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   iGraphics2D *parent_g2d = parent_g3d->GetDriver2D ();
 
   // Here we create additional images for this texture which are registered as 
-  // procedural textures with out own texture manager. This way if the procedural
+  // procedural textures with our own texture manager. This way if the procedural
   // texture is written to with itself, this texture manager will know about it
   // and act accordingly. This is done for both alone and sharing procedural
   // textures. In the case of the alone procedural texture it will never be 

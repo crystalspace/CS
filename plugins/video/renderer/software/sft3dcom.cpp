@@ -289,7 +289,6 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   alpha_mask |= 1 << (pfmt.BlueShift);
   alpha_mask = ~alpha_mask;
 
-  z_buf_mode = CS_ZBUF_NONE;
   fog_buffers = NULL;
 
   // Create the texture manager
@@ -608,7 +607,8 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       break;
   } /* endswitch */
 
-  static int o_rbits = -1, o_gbits, o_bbits;
+  //static
+  int o_rbits = -1, o_gbits, o_bbits;
   if ((o_rbits != pfmt.RedBits)
    || (o_gbits != pfmt.GreenBits)
    || (o_bbits != pfmt.BlueBits))

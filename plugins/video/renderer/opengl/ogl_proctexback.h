@@ -73,7 +73,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   virtual bool Open (const char* /*Title*/)
   { return false; }
 
-  virtual void Close () {}
+  virtual void Close ();
 
   virtual bool BeginDraw (int DrawFlags);
 

@@ -433,9 +433,13 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
   ARB_multitexture = d->ARB_multitexture;
   m_config_options.do_multitexture_level =  
     d->m_config_options.do_multitexture_level;
+  m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
+  m_config_options.m_lightmap_src_blend = d->m_config_options.m_lightmap_src_blend;
+  m_config_options.m_lightmap_dst_blend = d->m_config_options.m_lightmap_dst_blend;
+  m_fogtexturehandle = d->m_fogtexturehandle;
   texture_cache = d->texture_cache;
   lightmap_cache = d->lightmap_cache;
-  m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
+
 }
 
 void csGraphics3DOGLCommon::Close ()

@@ -52,6 +52,11 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   m_fogtexturehandle = 0;
 }
 
+void csOpenGLProcBackBuffer::Close ()
+{
+  m_fogtexturehandle = 0;
+}
+
 void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d, 
 			     csTextureMMOpenGL *tex, csPixelFormat *ipfmt)
 { 
