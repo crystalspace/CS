@@ -291,7 +291,8 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
     {
       if (!same_plane)
       {
-	csVector3 isect;
+        /* initialize this vector to something to avoid compiler warnings */
+        csVector3 isect(0);
         for (i = 0 ; i < num ; i++)
 	{
           csPolygon3D* p = sorted_polygons[i].pol;

@@ -192,7 +192,8 @@ void csCurve::CalculateLighting (csFrustumView& lview)
   csShadowFrustum* sf = NULL;
   csShadowMap* smap;
 
-  csColor color;
+  /* initialize color to something to avoid compiler warnings */
+  csColor color(0,0,0);
 
   if (dyn)
   {
