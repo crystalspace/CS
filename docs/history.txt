@@ -17,6 +17,10 @@ chronological order.
 	  the Jam rules are presently (and unfortunately) order-sensitive, such
 	  that Jam must see LibDepends invocations before it sees associated
 	  LinkWith invocations.
+	- Eric Sunshine updated the OpenDivX "sufficiently recent" configure
+	  check so that it tests for DEC_PARAM::color_depth rather than just
+	  checking for DEC_PARAM.  Apparently, the color_depth member was added
+	  to OpenDivX some time after DEC_PARAM was introduced.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

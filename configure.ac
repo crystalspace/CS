@@ -1779,7 +1779,7 @@ CS_CHECK_BUILD([for DivX4], [cs_cv_libdivxdecore4],
 	[[#include <divx4/decore.h>]],
 	[DEC_MEM_REQS r; decore(0, DEC_OPT_MEMORY_REQS, 0, &r);])],
     [CS_CREATE_TUPLE([],[],[-ldivxdecore])], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore4], [OPENDIVX4])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore4], [DIVX4])])
 
 AS_IF([test $cs_cv_libdivxdecore4 != yes],
     [CS_CHECK_BUILD([for OpenDivX], [cs_cv_libdivxdecore],
@@ -1792,7 +1792,7 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 	    [cs_cv_libdivxdecore_recent],
 	    [AC_LANG_PROGRAM(
 		[[#include <decore.h>]],
-		[DEC_PARAM d; d.x_dim = 0;])],
+		[DEC_PARAM d; d.color_depth = 0;])],
 	    [], [],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore], [OPENDIVX])], [], [],
 	    [$cs_cv_libdivxdecore_cflags],

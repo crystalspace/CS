@@ -27830,25 +27830,25 @@ fi
   if test "$cs_cv_libdivxdecore4" = yes; then
   cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}OPENDIVX4.AVAILABLE = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}DIVX4.AVAILABLE = $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENDIVX4.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIVX4.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
 	cs_build_prop_val=`echo x$cs_cv_libdivxdecore4_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}OPENDIVX4.CFLAGS = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}DIVX4.CFLAGS = $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENDIVX4.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIVX4.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
 	cs_build_prop_val=`echo x$cs_cv_libdivxdecore4_lflags $cs_cv_libdivxdecore4_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}OPENDIVX4.LFLAGS = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}DIVX4.LFLAGS = $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}OPENDIVX4.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIVX4.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -28266,7 +28266,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-DEC_PARAM d; d.x_dim = 0;
+DEC_PARAM d; d.color_depth = 0;
   ;
   return 0;
 }
@@ -28417,7 +28417,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-DEC_PARAM d; d.x_dim = 0;
+DEC_PARAM d; d.color_depth = 0;
   ;
   return 0;
 }

@@ -1,4 +1,4 @@
-DESCRIPTION.odivx4 = Crystal Space OpenDivX4 codec
+DESCRIPTION.odivx4 = Crystal Space DivX4 codec
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -28,12 +28,12 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_PLUGINS),yes)
   ODIVX4 = $(OUTDLL)/odivx4$(DLL)
   LIB.ODIVX4 = $(foreach d,$(DEP.ODIVX4),$($d.LIB))
-  LIB.ODIVX4.LOCAL = $(OPENDIVX4.LFLAGS)
+  LIB.ODIVX4.LOCAL = $(DIVX4.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(ODIVX4)
 else
   ODIVX4 = $(OUT)/$(LIB_PREFIX)odivx4$(LIB)
   DEP.EXE += $(ODIVX4)
-  LIBS.EXE += $(OPENDIVX4.LFLAGS)
+  LIBS.EXE += $(DIVX4.LFLAGS)
   SCF.STATIC += odivx4
   TO_INSTALL.STATIC_LIBS += $(ODIVX4)
 endif
@@ -63,7 +63,7 @@ ifeq ($(MAKESECTION),targets)
 odivx4: $(OUTDIRS) $(ODIVX4)
 
 $(OUT.ODIVX4)/%$O: $(SRCDIR)/$(DIR.ODIVX4)/%.cpp
-	$(DO.COMPILE.CPP) $(OPENDIVX4.CFLAGS)
+	$(DO.COMPILE.CPP) $(DIVX4.CFLAGS)
 
 $(ODIVX4): $(OBJ.ODIVX4) $(LIB.ODIVX4)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -81,7 +81,7 @@ odivx4cleandep:
 ifdef DO_DEPEND
 dep: $(OUT.ODIVX4) $(OUT.ODIVX4)/odivx4.dep
 $(OUT.ODIVX4)/odivx4.dep: $(SRC.ODIVX4)
-	$(DO.DEPEND1) $(OPENDIVX4.CFLAGS) $(DO.DEPEND2)
+	$(DO.DEPEND1) $(DIVX4.CFLAGS) $(DO.DEPEND2)
 else
 -include $(OUT.ODIVX4)/odivx4.dep
 endif

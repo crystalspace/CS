@@ -1,12 +1,12 @@
 SubDir TOP plugins video format codecs divx4 ;
 
-if $(OPENDIVX4.AVAILABLE) = "yes" 
+if $(DIVX4.AVAILABLE) = "yes" 
 {
-Help odivx4 : "Crystal Space OpenDivX4 codec" ;
+Help odivx4 : "Crystal Space DivX4 codec" ;
 
 Plugin odivx4
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith odivx4 : csutil ;
-ExternalLibs odivx4 : OPENDIVX4 ;
+ExternalLibs odivx4 : DIVX4 ;
 }

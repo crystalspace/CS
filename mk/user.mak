@@ -224,7 +224,7 @@ endif
 
 PLUGINS.DYNAMIC += video/format/avi
 PLUGINS.DYNAMIC += video/format/codecs/rle
-ifeq ($(OPENDIVX4.AVAILABLE),yes)
+ifeq ($(DIVX4.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/format/codecs/divx4
 endif
 ifeq ($(OPENDIVX.AVAILABLE),yes)
