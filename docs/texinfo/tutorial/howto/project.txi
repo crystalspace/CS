@@ -77,7 +77,7 @@ reside at:
 
 @noindent
 where @code{$@{prefix@}} is the package installation location (typically,
-@file{/usr/local}. Alternately, you may run the script directly from the
+@file{/usr/local}). Alternately, you may run the script directly from the
 Crystal Space source tree, where it resides at:
 
 @noindent
@@ -102,7 +102,7 @@ you have installed the Crystal Space @sc{sdk} (via @samp{make install} or
 
 @noindent
 where @code{$@{prefix@}} is the package installation location (typically,
-@file{/usr/local}. Alternately, you may access the files directly from the
+@file{/usr/local}). Alternately, you may access the files directly from the
 Crystal Space source tree, where they resides at:
 
 @noindent
