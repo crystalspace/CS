@@ -205,9 +205,23 @@ void csSoundSourceSoftware::Prepare(float BaseVolume)
 #define READLEFTSAMP        ((int)(Input[2*i])-NullSample)
 #define READRIGHTSAMP       ((int)(Input[2*i+1])-NullSample)
 
-#define WRITEMONOSAMP(x)    Output[i]+=(stype)((x)*(CalcVolL+CalcVolR)/2);
-#define WRITELEFTSAMP(x)    Output[2*i]+=(stype)((x)*CalcVolL);
-#define WRITERIGHTSAMP(x)   Output[2*i+1]+=(stype)((x)*CalcVolR);
+#define CALCMONOSAMP(x)     ((x)*(CalcVolL+CalcVolR)/2)
+#define CALCLEFTSAMP(x)     ((x)*CalcVolL)
+#define CALCRIGHTSAMP(x)    ((x)*CalcVolR)
+
+#define ADDCHECK(x, y)      {int q = (int)x+int(y); \
+				if(q<MINSAMPLE) x = (stype)MINSAMPLE; \
+				else if(q>MAXSAMPLE) x = (stype)MAXSAMPLE; \
+				else x = (stype)(q); }
+
+#define WRITEMONOSAMP(x)    ADDCHECK(Output[i], CALCMONOSAMP(x))
+#define WRITELEFTSAMP(x)    ADDCHECK(Output[2*i], CALCLEFTSAMP(x))
+#define WRITERIGHTSAMP(x)   ADDCHECK(Output[2*i+1], CALCRIGHTSAMP(x))
+
+//unclamped output macros
+//#define WRITEMONOSAMP(x)    Output[i]+=(stype)((x)*(CalcVolL+CalcVolR)/2);
+//#define WRITELEFTSAMP(x)    Output[2*i]+=(stype)((x)*CalcVolL);
+//#define WRITERIGHTSAMP(x)   Output[2*i+1]+=(stype)((x)*CalcVolR);
 
 #define READMONO3D          int samp=READMONOSAMP;
 #define READSTEREO3D        int samp=(READLEFTSAMP+READRIGHTSAMP)/2;
@@ -284,7 +298,11 @@ void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
   {
     #define stype short
     #define NullSample 0
+    #define MINSAMPLE (-32700)
+    #define MAXSAMPLE 32700
     ADDTOBUFFER_BITS
+    #undef MINSAMPLE
+    #undef MAXSAMPLE
     #undef stype
     #undef NullSample
   }
@@ -292,7 +310,11 @@ void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
   {
     #define stype unsigned char
     #define NullSample 128
+    #define MINSAMPLE 0x00
+    #define MAXSAMPLE 0xFF
     ADDTOBUFFER_BITS
+    #undef MINSAMPLE
+    #undef MAXSAMPLE
     #undef stype
     #undef NullSample
   }
