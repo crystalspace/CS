@@ -17,8 +17,9 @@ The history order is reversed so that new features are at the top.
 	  rather than hard-coding it into the makefile.  Although this option
 	  was recommended for earlier versions of Mingw, in the most recent
 	  Mingw (gcc 3.2) it is deprecated.
-	- Eric Sunshine eliminated compilation warning in ddraw canvas
-	  regarding promotion of bool to int when passed through vararg (...).
+	- Eric Sunshine eliminated compilation warning in ddraw and ddraw8
+	  canvases regarding promotion of bool to int when passed through
+	  vararg (...).
 24-Sep-2002
 	- Relaxed the sequence and trigger loader so that you can now refer to
 	  triggers and sequences that haven't been defined yet.
