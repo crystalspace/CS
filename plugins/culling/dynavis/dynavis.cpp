@@ -191,6 +191,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_history = true;
   do_cull_writequeue = true;
   do_cull_tiled = false;
+  do_cull_ignoresmall = false;
   do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
@@ -726,6 +727,10 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
     if (box.MaxX () > 0 && box.MaxY () > 0 &&
         box.MinX () < scr_width && box.MinY () < scr_height)
     {
+      if (do_cull_ignoresmall)
+	if ((box.MaxX ()-box.MinX ()) < 10 && (box.MaxY ()-box.MinY ()) < 10)
+	  return;
+
       write_queue->Append (box, max_depth, obj);
       if (do_state_dump)
       {
@@ -2080,6 +2085,14 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"BugPlug not found!");
     }
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_ignoresmall"))
+  {
+    do_cull_ignoresmall = !do_cull_ignoresmall;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s ignore small objects!",
+	do_cull_ignoresmall ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_frustum"))

@@ -12,6 +12,14 @@ The history order is reversed so that new features are at the top.
 	  you have BugPlug in memory you can enable it by pressing the
 	  following keys one after the other:
 	  	ctrl-d v ctrl-d 5 ctrl-d v
+	- Added new 'toggle_ignoresmall' command to Dynavis (assigned
+	  to '6' key in BugPlug) with which you can enable the feature
+	  that small objects (less than 10x10 pixels on screen) are
+	  not written to the coverage buffer. Since these small objects
+	  are unlikely to contribute to culling it doesn't make sense
+	  to write them to the coverage buffer. This feature only works
+	  when the write queue is enabled (which is the case by default).
+	  This feature is disabled by default.
 5-Nov-2002
 	- Fixed an old bug in frustvis and dynavis with relation to frustum
 	  culling. The cause of the bug was that the kdtree node bounding

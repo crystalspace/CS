@@ -149,6 +149,7 @@ private:
   bool do_cull_history;
   bool do_cull_writequeue;
   bool do_cull_tiled;
+  bool do_cull_ignoresmall;
   bool do_freeze_vis;
 
   // For history culling: this is used by the main VisTest() routine
