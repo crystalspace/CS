@@ -123,7 +123,7 @@ struct iDataBuffer;
 #define CS_CULLER_COVTREE 2
 
 
-SCF_VERSION (iEngine, 0, 1, 22);
+SCF_VERSION (iEngine, 0, 1, 23);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -456,6 +456,11 @@ struct iEngine : public iPlugIn
    * Get the list of all materials.
    */
   virtual iMaterialList* GetMaterialList () = 0;
+
+  /**
+   * Advance the frames of all objects given the current time.
+   */
+  virtual void NextFrame (cs_time current_time) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

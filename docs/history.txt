@@ -18,6 +18,7 @@ The history order is reversed so that new features are at the top.
 	  parent (can be the engine or another mesh).
 	- Fixed sector handling in mesh wrapper so that children will now
 	  automatically be moved to the correct sector when the parent is.
+	- Added iEngine::NextFrame() (to complement csEngine::NextFrame()).
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).

@@ -883,7 +883,7 @@ public:
   /**
    * Advance the frames of all objects given the current time.
    */
-  void NextFrame (cs_time current_time);
+  virtual void NextFrame (cs_time current_time);
 
   /**
    * Unlink a mesh from the engine (but do not delete it).
