@@ -169,7 +169,7 @@ bool csFreeTypeRender::CreateGlyphBitmaps (FT *font, int size)
     int maxDesc;
     int lineGap;
     if (font->prop.os2->version == 0xffff){
-      maxDesc = font->prop.horizontal->Descender;
+      maxDesc = -ABS(font->prop.horizontal->Descender);
       lineGap = font->prop.horizontal->Line_Gap;
       maxY= font->prop.horizontal->Ascender - maxDesc + lineGap;
     }else{
