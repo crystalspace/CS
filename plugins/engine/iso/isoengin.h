@@ -116,7 +116,7 @@ public:
   {
     return &(meshfactories.scfiMeshFactoryList);
   }
-  virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
+  virtual iMeshFactoryWrapper *CreateMeshFactory(const char* classId,
       const char *name);
 };
 

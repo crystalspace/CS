@@ -335,23 +335,18 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   return mat_wrap;
 }
 
-iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
+iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
     const char *name) 
 {
   iMeshObjectFactory *mesh_fact;
   iMeshObjectType *mesh_type;
 
-  if(name)
+  if (name)
   {
     iMeshFactoryWrapper* wrap = meshfactories.
     	scfiMeshFactoryList.FindByName (name);
-    if (wrap) mesh_fact = wrap->GetMeshObjectFactory ();
-    else mesh_fact = NULL;
-    if (mesh_fact)
-    {
-      mesh_fact->IncRef ();
-      return mesh_fact;
-    }
+    if (wrap)
+      return wrap;
   }
   
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -363,20 +358,23 @@ iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
   if(!mesh_type) 
     return NULL;
 
+  csIsoMeshFactoryWrapper* wrap = NULL;
   mesh_fact = mesh_type->NewFactory ();
-  if(mesh_fact)
+  if (mesh_fact)
   {
     //AddMeshFactory (mesh_fact, name);
     //mesh_fact->DecRef ();
-    csIsoMeshFactoryWrapper* wrap = new csIsoMeshFactoryWrapper (mesh_fact);
+    wrap = new csIsoMeshFactoryWrapper (mesh_fact);
     iObject* obj = SCF_QUERY_INTERFACE (wrap, iObject);
     obj->SetName (name);
     obj->DecRef ();
     meshfactories.scfiMeshFactoryList.Add (&(wrap->scfiMeshFactoryWrapper));
     wrap->DecRef ();
+    mesh_type->DecRef ();
+    return &(wrap->scfiMeshFactoryWrapper);
   }
   mesh_type->DecRef ();
-  return mesh_fact;
+  return NULL;
 }
 
 

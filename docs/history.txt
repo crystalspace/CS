@@ -1,5 +1,10 @@
 he history order is reversed so that new features are at the top.
 
+15-Jan-2002
+	- Changed iIsoEngine::CreateMeshFactory() to return
+	  iMeshFactoryWrapper instead of iMeshObjectFactory.
+	  It also no longer does an incref on the returned factory if
+	  the factory already existed.
 14-Jan-2002
 	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
 	  and updated various Makefiles to support these changes.

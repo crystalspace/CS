@@ -38,6 +38,7 @@ struct iMaterialHandle;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMeshFactoryList;
+struct iMeshFactoryWrapper;
 struct iClipper2D;
 struct iIsoWorld;
 struct iIsoView;
@@ -117,8 +118,8 @@ struct iIsoEngine : public iBase
 
   /// Get the list of mesh factories
   virtual iMeshFactoryList* GetMeshFactories () = 0;
-  /// load and add a mesh factory, given classID under given name.
-  virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
+  /// Load and add a mesh factory, given classID under given name.
+  virtual iMeshFactoryWrapper *CreateMeshFactory(const char* classId,
     const char *name) = 0;
 };
 
