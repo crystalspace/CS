@@ -240,6 +240,7 @@ void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
 void csSpriteCal3DMeshObjectFactory::RescaleFactory(float factor)
 {
   calCoreModel.scale(factor);
+  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton(iVFS *vfs,const char *filename)
@@ -332,6 +333,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh(iVFS *vfs,const char *filename,
       mesh->default_material  = defmat;
 
       submeshes.Push(mesh);
+
+      calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 
       return mesh->index;
     }
@@ -580,6 +583,7 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (const csReversibleTransform&
       }
     }
   }
+  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
 //=============================================================================
@@ -787,13 +791,15 @@ void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   rad.Set(r1,r2,r3);
 }
 
+#define CAL3D_EXACT_BOXES true 
+
 void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 {
 //  bbox.Set(-1,0,-1,1,2,1);
 
   if (bboxVersion == meshVersion) return;
 
-  CalBoundingBox &calBoundingBox  = calModel.getBoundingBox();
+  CalBoundingBox &calBoundingBox  = calModel.getBoundingBox(CAL3D_EXACT_BOXES);
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
@@ -821,7 +827,7 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
 void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox, int type)
 {
   CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
-  skel->calculateBoundingBox(&calCoreModel);
+  skel->calculateBoundingBoxes(&calCoreModel);
   std::vector<CalCoreBone*> &vectorCoreBone = skel->getVectorCoreBone();
   CalBoundingBox &calBoundingBox  = vectorCoreBone[0]->getBoundingBox();
   CalVector p[8];
