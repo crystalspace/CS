@@ -26,19 +26,7 @@
 
 #include "../common/fontcache.h"
 
-/*
-  ATI Radeon9700P, Cat3.6 driver, exhibit the following problem:
-  When uploading glyphs with glTexSubImage2D(), a number of the
-  first drawn glyphs doesn't show up right (rather, instead of the
-  expected texture content only the top left texel is drawn over the
-  whole area of the glyph on-screen.) The problem does not appear if
-  glTexImage2D() is used. Hence this ugly hack, where super texture
-  is stored in RAM, glyphs are written to it in RAM and the whole
-  thing is uploaded at once.
-  [res]
-  Update: As of Cat3.8, the problem seems to be fixed.
- */
-//#define HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+class csGLStateCache;
 
 class csGraphics2DGLCommon;
 
@@ -53,30 +41,26 @@ class csGLFontCache : public csFontCache
   };
 
   csGraphics2DGLCommon* G2D;
+  csGLStateCache* statecache;
 
   int texSize, maxTxts;
+  uint32 usedTexs;
+  bool compressPages;
+  int glyphAlign;
+  GLuint texWhite;
 
   struct CacheTexture
   {
     GLuint handle;
     csSubRectangles2* glyphRects;
-#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
-    uint8* data;
-#endif
 
     CacheTexture () 
     { 
       glyphRects = 0; 
-#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
-      data = 0;
-#endif
     }
     ~CacheTexture () 
     { 
       delete glyphRects; 
-#ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
-      delete [] data;
-#endif
     }
     void InitRects (int size) 
     { 
@@ -86,18 +70,40 @@ class csGLFontCache : public csFontCache
   csArray<CacheTexture> textures;
   csBlockAllocator<GLGlyphCacheData> cacheDataAlloc;
 
-  csDirtyAccessArray<csVector2> wtVerts2d;
-  csDirtyAccessArray<csVector2> wtTexcoords;
+  struct TextJob
+  {
+    GLuint texture;
+    int fg, bg;
+    int vertOffset, vertCount, bgVertOffset, bgVertCount;
 
-  inline void FlushArrays (GLuint texture, int& numverts, 
-    int bgVertsOffset, int& numBgVerts, const int fg, const int bg);
+    void ClearRanges()
+    {
+      vertOffset = vertCount = bgVertOffset = bgVertCount = 0;
+    }
+  };
+  csArray<TextJob> jobs;
+  int jobCount;
+  bool textWriting;
+  bool needStates;
+  int envColor;
+  int numFloats;
+  int maxFloats;
+  bool tcaEnabled, vaEnabled, caEnabled;
+  csDirtyAccessArray<float> verts2d;
+  csDirtyAccessArray<float> texcoords;
+
+  TextJob& GetJob (int fg, int bg, GLuint texture, int bgOffset);
+
+  inline void FlushArrays ();
+  void BeginText ();
 protected:
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
     utf32_char glyph, uint flags);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
-  void CopyGlyphData (iFont* font, utf32_char glyph, int tex,
-    const csRect& rect, iDataBuffer* bitmapDataBuf, iDataBuffer* alphaDataBuf);
+  void CopyGlyphData (iFont* font, utf32_char glyph, int tex, 
+    const csBitmapMetrics& bmetrics, const csRect& texRect, 
+    iDataBuffer* bitmapDataBuf, iDataBuffer* alphaDataBuf);
 public:
   csGLFontCache (csGraphics2DGLCommon* G2D);
   virtual ~csGLFontCache ();
@@ -107,6 +113,19 @@ public:
    */
   virtual void WriteString (iFont *font, int pen_x, int pen_y, 
     int fg, int bg, const utf8_char* text, uint flags);
+
+  /**
+   * Flush the cached text vertices.
+   * The text writer caches some text (and sets some needed states).
+   * Before drawing anything else, the text cache has to be flushed
+   * (and the states reset).
+   */
+  void FlushText ();
+
+  /**
+   * Create images of all the texture pages used for caching.
+   */
+  void DumpFontCache (csRefArray<iImage>& pages);
 };
 
 #endif // __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__

@@ -5876,6 +5876,14 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  /*
+    @@@ DrawPixmap is called in 2D mode quite often.
+    To reduce state changes, the text drawing states are reset as late
+    as possible. The 2D canvas methods call a routine to flush all text to
+    the screen, do the same here.
+   */
+  G2D->PerformExtension ("glflushtext");
+
   FlushDrawPolygon ();
 
   // If original dimensions are different from current dimensions (because

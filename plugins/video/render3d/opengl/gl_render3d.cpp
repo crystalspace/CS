@@ -1082,6 +1082,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     if (!G2D->BeginDraw ())
       return false;
   }
+  const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
 
   if (render_target)
@@ -1146,44 +1147,48 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   }
   else if (drawflags & CSDRAW_2DGRAPHICS)
   {
-    /*
-      Turn off some stuff that isn't needed for 2d (or even can
-      cause visual glitches.)
-     */
-    if (use_hw_render_buffers)
+    // Don't set up the 2D stuff if we already are in 2D mode
+    if (!(old_drawflags & CSDRAW_2DGRAPHICS))
     {
-      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-      ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
-    statecache->Disable_GL_ALPHA_TEST ();
-    if (ext->CS_GL_ARB_multitexture)
-      statecache->SetActiveTU (0);
-
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    if (render_target)
-    {
-      int txt_w, txt_h;
-      render_target->GetMipMapDimensions (0, txt_w, txt_h);
       /*
-	Render target: draw everything in top-left corner, but flipped.
+	Turn off some stuff that isn't needed for 2d (or even can
+	cause visual glitches.)
       */
-      glOrtho (0., (GLdouble) viewwidth, (GLdouble) (2 * viewheight - txt_h), 
-	(GLdouble) (viewheight - txt_h), -1.0, 10.0);
-      glCullFace (GL_BACK);
+      if (use_hw_render_buffers)
+      {
+	ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+      }
+      statecache->Disable_GL_ALPHA_TEST ();
+      if (ext->CS_GL_ARB_multitexture)
+	statecache->SetActiveTU (0);
+
+      glMatrixMode (GL_PROJECTION);
+      glLoadIdentity ();
+      if (render_target)
+      {
+	int txt_w, txt_h;
+	render_target->GetMipMapDimensions (0, txt_w, txt_h);
+	/*
+	  Render target: draw everything in top-left corner, but flipped.
+	*/
+	glOrtho (0., (GLdouble) viewwidth, (GLdouble) (2 * viewheight - txt_h), 
+	  (GLdouble) (viewheight - txt_h), -1.0, 10.0);
+	glCullFace (GL_BACK);
+      }
+      else
+	SetGlOrtho (false);
+      //glViewport (0, 0, viewwidth, viewheight);
+      glViewport (0, 0, viewwidth, viewheight);
+
+      glMatrixMode (GL_MODELVIEW);
+      glLoadIdentity ();
+
+      SetZMode (CS_ZBUF_NONE);
+      
+      SetMixMode (CS_FX_COPY);
+      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     }
-    else
-      SetGlOrtho (false);
-    //glViewport (0, 0, viewwidth, viewheight);
-    glViewport (0, 0, viewwidth, viewheight);
-
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
-
-    SetZMode (CS_ZBUF_NONE);
-    
-    SetMixMode (CS_FX_COPY);
-    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     return true;//G2D->BeginDraw ();
   }
 
@@ -1821,6 +1826,14 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  /*
+    @@@ DrawPixmap is called in 2D mode quite often.
+    To reduce state changes, the text drawing states are reset as late
+    as possible. The 2D canvas methods call a routine to flush all text to
+    the screen, do the same here.
+   */
+  G2D->PerformExtension ("glflushtext");
+
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)
   // we correct the input coordinates here.

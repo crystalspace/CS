@@ -425,7 +425,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
     pen_x += cacheData->glyphMetrics.advance;
     advance += cacheData->glyphMetrics.advance - (charW + bmetrics->left);
   }
-  PurgeEmptyPlanes (knownFont);
+  PurgeEmptyPlanes ();
 }
 
 #undef WS_NAME

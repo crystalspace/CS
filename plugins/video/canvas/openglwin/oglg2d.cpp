@@ -633,6 +633,8 @@ bool csGraphics2DOpenGL::RestoreDisplayMode ()
 void csGraphics2DOpenGL::Close (void)
 {
   if (!is_open) return;
+  
+  csGraphics2DGLCommon::Close ();
 
   if (hGLRC)
   {
@@ -644,7 +646,6 @@ void csGraphics2DOpenGL::Close (void)
   ReleaseDC (m_hWnd, hDC);
 
   RestoreDisplayMode ();
-  csGraphics2DGLCommon::Close ();
 }
 
 void csGraphics2DOpenGL::Print (csRect const* /*area*/)

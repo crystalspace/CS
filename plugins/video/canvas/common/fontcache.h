@@ -140,11 +140,11 @@ protected:
     /// The font size this font was cached for
     int fontSize;
     PlaneGlyphsArray planeGlyphs;
-    bool purgeNeeded;
   };
 
   /// Array of known fonts.
   csArray<KnownFont*> knownFonts;
+  csSet<KnownFont*> purgeableFonts;
 
   /// Find an LRU entry for a specific font/glyph pair.
   LRUEntry* FindLRUEntry (KnownFont* font, utf32_char glyph);
@@ -200,8 +200,8 @@ protected:
   /// the current clipping rect
   int ClipX1, ClipY1, ClipX2, ClipY2;
 
-  /// Delete empty PlaneGlyphs
-  void PurgeEmptyPlanes (KnownFont* knownFont);
+  /// Delete empty PlaneGlyphs from known fonts
+  void PurgeEmptyPlanes ();
 public:
   csFontCache ();
   virtual ~csFontCache ();

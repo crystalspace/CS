@@ -20,6 +20,9 @@ chronological order.
 	  degradation.
 	- Anders added a color buffer to bruteblock, currently just initialized 
 	  with (0.5, 0.5, 0.5) to avoid overbright terrain.
+	- res optimized the GL text writer. It now does less state changes and
+	  draws text with background more efficiently (via some GL blend mode
+	  setup instead of using quads to create a background).
 26-May-2004
 	- Keith fixed bug in HitBeam code which assumed that all meshes for
 	  a sprcal3d were attached to the model instance.  This is not required.

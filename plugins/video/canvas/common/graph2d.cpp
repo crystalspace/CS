@@ -43,6 +43,7 @@ SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindowManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindow)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiComponent)
@@ -55,6 +56,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindow)
   SCF_IMPLEMENTS_INTERFACE (iNativeWindow)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiDebugHelper)
+  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindowManager)
@@ -72,6 +77,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   scfiEventHandler = 0;
   Memory = 0;
   LineAddress = 0;
@@ -237,6 +243,7 @@ csGraphics2D::~csGraphics2D ()
   delete [] Palette;
   delete [] win_title;
 
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
@@ -1050,6 +1057,11 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     delete g2d;
     return 0;
   }
+}
+
+bool csGraphics2D::DebugCommand (const char* cmd)
+{
+  return false;
 }
 
 //---------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
+#include "iutil/dbghelp.h"
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 
@@ -431,6 +432,28 @@ protected:
     }
   } scfiNativeWindow;
   friend struct NativeWindow;
+
+  /// Execute a debug command.
+  virtual bool DebugCommand (const char* cmd);
+
+  struct eiDebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
+    virtual int GetSupportedTests () const
+    { return 0; }
+    virtual csPtr<iString> UnitTest ()
+    { return 0; }
+    virtual csPtr<iString> StateTest ()
+    { return 0; }
+    virtual csTicks Benchmark (int num_iterations)
+    { return 0; }
+    virtual csPtr<iString> Dump ()
+    { return 0; }
+    virtual void Dump (iGraphics3D* g3d)
+    { }
+    virtual bool DebugCommand (const char* cmd)
+    { return scfParent->DebugCommand (cmd); }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_GRAPH2D_H__

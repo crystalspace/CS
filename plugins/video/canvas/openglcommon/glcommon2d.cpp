@@ -22,8 +22,11 @@
 #include "video/canvas/common/scrshot.h"
 #include "csgeom/csrect.h"
 #include "iutil/objreg.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
 #include "video/canvas/openglcommon/glstates.h"
 
 // This header should be moved
@@ -98,6 +101,9 @@ bool csGraphics2DGLCommon::Open ()
 
   statecache->InitCache();
 
+  ext.Open ();
+  driverdb.Open (this);
+
   // initialize font cache object
   fontCache = new csGLFontCache (this);
 
@@ -121,9 +127,6 @@ bool csGraphics2DGLCommon::Open ()
       "crystalspace.canvas.openglcommon",
       "Using %s mode at resolution %dx%d.",
       FullScreen ? "full screen" : "windowed", Width, Height);
-
-  driverdb.Open (this);
-  ext.Open ();
 
   if (version)
   {
@@ -206,8 +209,6 @@ bool csGraphics2DGLCommon::Open ()
 void csGraphics2DGLCommon::Close ()
 {
   if (!is_open) return;
-  delete fontCache;
-  fontCache = 0;
   ext.Close ();
   driverdb.Close ();
   csGraphics2D::Close ();
@@ -215,6 +216,8 @@ void csGraphics2DGLCommon::Close ()
 
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
   glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
 }
@@ -240,7 +243,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glClearColor (0., 0., 0., 0.);
 
   statecache->SetShadeModel (GL_FLAT);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #ifdef CS_USE_NEW_RENDERER
   glColorMask (true, true, true, true);
 #endif
@@ -250,6 +253,7 @@ bool csGraphics2DGLCommon::BeginDraw ()
 
 void csGraphics2DGLCommon::FinishDraw ()
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
   csGraphics2D::FinishDraw();
   if (FrameBufferLocked != 0) return;
   statecache->Disable_GL_SCISSOR_TEST ();
@@ -341,6 +345,8 @@ const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
 
 void csGraphics2DGLCommon::Clear (int color)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   float r, g, b;
   DecomposeColor (color, r, g, b);
   glClearColor (r, g, b, 0.0);
@@ -355,6 +361,8 @@ void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)
 void csGraphics2DGLCommon::DrawLine (
   float x1, float y1, float x2, float y2, int color)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   // prepare for 2D drawing--so we need no fancy GL effects!
   statecache->Disable_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
@@ -413,6 +421,8 @@ void csGraphics2DGLCommon::DrawLine (
 
 void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   statecache->Disable_GL_TEXTURE_2D ();
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
@@ -428,6 +438,8 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   // prepare for 2D drawing--so we need no fancy GL effects!
   statecache->Disable_GL_TEXTURE_2D ();
 
@@ -445,6 +457,8 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 void csGraphics2DGLCommon::DrawPixels (
   csPixelCoord const* pixels, int num_pixels, int color)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   // prepare for 2D drawing--so we need no fancy GL effects!
   statecache->Disable_GL_TEXTURE_2D ();
 
@@ -465,6 +479,8 @@ void csGraphics2DGLCommon::DrawPixels (
 void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 	unsigned char const* data)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   int orig_x = x;
   int orig_y = y;
 
@@ -501,6 +517,8 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   /// left as Height-y-1 to keep within offscreen bitmap.
   /// but for opengl itself you'd need Height-y.
   return screen_shot ?
@@ -509,6 +527,8 @@ unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   // For the time being copy data into system memory.
 #ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
@@ -572,6 +592,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
 
 void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   statecache->Disable_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
@@ -610,6 +632,8 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 
 csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 {
+  ((csGLFontCache*)fontCache)->FlushText ();
+
 /*#ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
     return 0;
@@ -649,6 +673,82 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
     *extmgr = &ext;
     return true;
   }
+  if (!strcasecmp (command, "glflushtext"))
+  {
+    ((csGLFontCache*)fontCache)->FlushText ();
+  }
+  return false;
+}
+
+bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
+{
+  CS_ALLOC_STACK_ARRAY(char, cmd, strlen (cmdstr) + 1);
+  strcpy (cmd, cmdstr);
+  char* param = 0;
+  char* space = strchr (cmdstr, ' ');
+  if (space)
+  {
+    param = space + 1;
+    *space = 0;
+  }
+
+  if (strcasecmp (cmd, "dump_fontcache") == 0)
+  {
+    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+    if (!imgsaver)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.canvas.openglcommon",
+        "Could not get image saver.");
+      return false;
+    }
+
+    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    if (!vfs)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.canvas.openglcommon",
+	"Could not get VFS.");
+      return false;
+    }
+
+    const char* dir = 
+      ((param != 0) && (*param != 0)) ? param : "/tmp/fontcachedump/";
+    csRefArray<iImage> images;
+    ((csGLFontCache*)fontCache)->DumpFontCache (images);
+
+    csString outfn;
+    for (int i = 0; i < images.Length(); i++)
+    {
+      csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
+      if (!buf)
+      {
+	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.canvas.openglcommon",
+	  "Could not save font cache page.");
+      }
+      else
+      {
+	outfn.Format ("%s%d.png", 
+	  dir, i);
+	if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	{
+	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	    "crystalspace.canvas.openglcommon",
+	    "Could not write to %s.", outfn.GetData ());
+	}
+	else
+	{
+	  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	    "crystalspace.canvas.openglcommon",
+	    "Dumped font cache page to %s", outfn.GetData ());
+	}
+      }
+    }
+
+    return true;
+  }
+
   return false;
 }
 
@@ -662,6 +762,9 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   }
   if (!AllowResizing)
     return false;
+
+  ((csGLFontCache*)fontCache)->FlushText ();
+
   Width = width;
   Height = height;
   SetClipRect (0, 0, Width, Height);

@@ -192,6 +192,9 @@ public:
   /// Perform extension commands
   virtual bool PerformExtensionV (char const* command, va_list);
 
+  /// Execute a debug command.
+  virtual bool DebugCommand (const char* cmd);
+
   //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()

@@ -78,10 +78,13 @@ void csFontCache::CleanupCache ()
   delete deleteCallback; deleteCallback = 0;
 }
 
-void csFontCache::PurgeEmptyPlanes (KnownFont* knownFont)
+void csFontCache::PurgeEmptyPlanes ()
 {
-  if (knownFont->purgeNeeded)
+  csSet<KnownFont*>::GlobalIterator fontIt (purgeableFonts.GetIterator ());
+  while (fontIt.HasNext ())
   {
+    KnownFont* knownFont = fontIt.Next ();
+
     PlaneGlyphsArray& planeGlyphs = knownFont->planeGlyphs;
     for (int j = 0; j < planeGlyphs.Length(); j++)
     {
@@ -95,8 +98,8 @@ void csFontCache::PurgeEmptyPlanes (KnownFont* knownFont)
 	}
       }
     }
-    knownFont->purgeNeeded = false;
   }
+  purgeableFonts.DeleteAll ();
 }
 
 csFontCache::LRUEntry* csFontCache::FindLRUEntry (
@@ -169,7 +172,7 @@ csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
 	}
       }
       knownFont->fontSize = font->GetSize ();
-      knownFont->purgeNeeded = false;
+      purgeableFonts.Delete (knownFont);
     }
   }
   return knownFont;
@@ -180,7 +183,6 @@ csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
   KnownFont* knownFont = new KnownFont;
   knownFont->font = font;
   knownFont->fontSize = font->GetSize ();
-  knownFont->purgeNeeded = false;
 
   knownFonts.InsertSorted (knownFont, KnownFontArrayCompareItems);
 
@@ -308,7 +310,7 @@ csFontCache::GlyphCacheData* csFontCache::GetLeastUsed ()
     }
   }
 
-  cacheData->font->purgeNeeded = true;
+  purgeableFonts.Add (cacheData->font);
 
   return cacheData;
 }
@@ -455,7 +457,7 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
     }
   }
 
-  cacheData->font->purgeNeeded = true;
+  purgeableFonts.Add (cacheData->font);
 
   RemoveCacheData (cacheData);
   InternalUncacheGlyph (cacheData);
