@@ -62,6 +62,7 @@ struct iParameterESM : public iBase
    * Get the value based on userdata which is given to the
    * operations. If IsConstant() returns true then the params
    * parameter will not be used!
+   * \params is given to the operations as userdata.
    */
   virtual iBase* GetValue (iBase* params = 0) const = 0;
 
@@ -158,16 +159,17 @@ SCF_VERSION (iSequenceWrapper, 0, 3, 0);
 struct iSequenceWrapper : public iBase
 {
   /**
-   * Query object.
+   * Query iObject that is implemented by the sequence manager.
    */
   virtual iObject* QueryObject () = 0;
 
   /**
-   * Get the sequence. It is allowed to use the underlying sequence
-   * for general sequence operations like adding conditions, operations,
-   * and general sequence management. The AddOperationBla() functions
-   * provided in this wrapper do nothing more than add custom operations
-   * through the regular iSequence->AddOperation().
+   * Get the sequence that this wrapper maintains. It is allowed to use
+   * the underlying sequence for general sequence operations like adding
+   * conditions, operations, and general sequence management. The
+   * AddOperationBla() functions provided in this wrapper do nothing
+   * more than add custom operations through the regular
+   * iSequence->AddOperation().
    */
   virtual iSequence* GetSequence () = 0;
 
@@ -203,6 +205,11 @@ struct iSequenceWrapper : public iBase
    * Operation: set a variable to a floating point value.
    * If 'dvalue' is not 0 then that will be used instead of the absolute
    * value. In that case 'dvalue' is added.
+   * \param var is the variable that will be set by this operation. The
+   * value that is set is the 'value' parameter.
+   * \param value is the new value for 'var'.
+   * \param dvalue is a difference that is added. Only used if it is
+   * not 0.
    */
   virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, float value, float dvalue = 0) = 0;

@@ -76,22 +76,28 @@ struct iConsoleOutput : public iBase
    * this way: PutText ("some text\r"); This message will disappear
    * as soon as any other message will be sent to console.
    */
-  virtual void PutText (const char *iText, ...) CS_GNUC_PRINTF (2, 3) = 0;
+  virtual void PutText (const char *text, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
   /**
    * Var_args version of PutText.
    */
-  virtual void PutTextV (const char *iText, va_list args)
+  virtual void PutTextV (const char *text, va_list args)
       CS_GNUC_PRINTF (2, 0) = 0;
 
-  /// Return a line from the buffer (-1 = current line)
-  virtual const char *GetLine (int iLine = -1) const = 0;
+  /**
+   * Return a line from the buffer.
+   * \param line is the line to get or -1 (default) for the current line.
+   */
+  virtual const char *GetLine (int line = -1) const = 0;
 
   /**
    * Display the console and return the dirty rectangle.
    * The graphics driver should be in 2D draw mode.
    * Only call this function from the same thread that maintains
    * the graphics subsystem!
+   * \param oRect will be set to the dirty rectangle so you can
+   * choose to update only that part of the screen. You can
+   * also supply 0 (default) if you are not interested in that.
    */
   virtual void Draw2D (csRect *oRect = 0) = 0;
 
@@ -100,47 +106,52 @@ struct iConsoleOutput : public iBase
    * The graphics driver should be in 3D draw mode.
    * Only call this function from the same thread that maintains
    * the graphics subsystem!
+   * \param oRect will be set to the dirty rectangle so you can
+   * choose to update only that part of the screen. You can
+   * also supply 0 (default) if you are not interested in that.
    */
   virtual void Draw3D (csRect *oRect = 0) = 0;
 
   /**
-   * Clear console. If wipe = false, it just moves the top line to the
-   * current line; if wipe is true, it clears the buffer completely.
+   * Clear console.
+   * \param wipe If true then the buffer is completely cleared. Else (default)
+   * the top line is moved to the current line.
    */
-  virtual void Clear (bool iWipe = false) = 0;
+  virtual void Clear (bool wipe = false) = 0;
 
-  /// Set the buffer size in lines
-  virtual void SetBufferSize (int iMaxLines) = 0;
+  /// Set the buffer size in lines.
+  virtual void SetBufferSize (int maxLines) = 0;
 
-  /// Retrieve the transparency setting
+  /// Retrieve the transparency setting.
   virtual bool GetTransparency () const = 0;
-  /// Set transparency
-  virtual void SetTransparency (bool iTransp) = 0;
+  /// Set transparency.
+  virtual void SetTransparency (bool transp) = 0;
 
   /// Gets the current font.
   virtual iFont *GetFont () const = 0;
-  /// Sets the type of the font.
-  virtual void SetFont (iFont *Font) = 0;
+  /// Sets the font.
+  virtual void SetFont (iFont *font) = 0;
 
-  /// Get the current top line being displayed
+  /// Get the current top line being displayed.
   virtual int GetTopLine () const = 0;
   /**
    * Set the current top line, or use of the constants above for scrolling.
-   * If snap is true, the console returns to the very bottom of the display
+   * \param topLine is the new top line.
+   * \param snap If true the console returns to the very bottom of the display
    * when a new line is printed.
    */
-  virtual void ScrollTo (int iTopLine, bool iSnap = true) = 0;
+  virtual void ScrollTo (int topLine, bool snap = true) = 0;
 
-  /// Retrieve the cursor style
+  /// Retrieve the cursor style.
   virtual int GetCursorStyle () const = 0;
-  /// Assign the cursor style
-  virtual void SetCursorStyle (int iStyle) = 0;
+  /// Assign the cursor style.
+  virtual void SetCursorStyle (int style) = 0;
 
   /**
    * Show/hide the console. In 'hidden' state console should not display
    * anything at all (when Draw() is called) or draw some minimal information
    */
-  virtual void SetVisible (bool iShow) = 0;
+  virtual void SetVisible (bool show) = 0;
   /**
    * Query whether the console is visible or hidden.
    */
@@ -157,10 +168,10 @@ struct iConsoleOutput : public iBase
    * But in that case you MUST use AutoUpdate(false) because access to
    * graphics is not thread-safe.
    */
-  virtual void AutoUpdate (bool iAutoUpdate) = 0;
+  virtual void AutoUpdate (bool autoUpdate) = 0;
 
   /// Set cursor horizontal position (-1 == follow output)
-  virtual void SetCursorPos (int iCharNo) = 0;
+  virtual void SetCursorPos (int charNo) = 0;
 
   /// Query maximal line width in characters
   virtual int GetMaxLineWidth () = 0;
@@ -172,10 +183,10 @@ struct iConsoleOutput : public iBase
   virtual void RegisterWatcher (iConsoleWatcher*) = 0;
 
   /// Implement simple extension commands.
-  virtual bool PerformExtension (const char *iCommand, ...) = 0;
+  virtual bool PerformExtension (const char *command, ...) = 0;
 
   /// Implement simple extension commands.
-  virtual bool PerformExtensionV (const char *iCommand, va_list) = 0;
+  virtual bool PerformExtensionV (const char *command, va_list) = 0;
 };
 
 #endif // __CS_IVARIA_CONOUT_H__

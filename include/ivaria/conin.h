@@ -52,16 +52,26 @@ SCF_VERSION (iConsoleInput, 1, 0, 1);
  */
 struct iConsoleInput : public iBase
 {
-  /// Bind to a console.
-  virtual void Bind (iConsoleOutput*) = 0;
+  /**
+   * Bind to an output console.
+   * \param console
+   */
+  virtual void Bind (iConsoleOutput* console) = 0;
 
-  /// Set the command execution callback.
-  virtual void SetExecuteCallback (iConsoleExecCallback* iCallback) = 0;
+  /**
+   * Set the command execution callback.
+   * \param callback will be called whenever the user presses enter
+   * so the application can then perform the command that was entered.
+   */
+  virtual void SetExecuteCallback (iConsoleExecCallback* callback) = 0;
   /// Get the command execution callback.
   virtual iConsoleExecCallback* GetExecuteCallback () = 0;
 
-  /// Return a line from the input buffer (-1 = current line).
-  virtual const char *GetText (int iLine = -1) const = 0;
+  /**
+   * Return a line from the input buffer.
+   * \param line is the line number to get or -1 (default) for current line.
+   */
+  virtual const char *GetText (int line = -1) const = 0;
 
   /// Return the current input line number.
   virtual int GetCurLine () const = 0;
@@ -69,14 +79,17 @@ struct iConsoleInput : public iBase
   /// Retrieve the size of the history buffer.
   virtual int GetBufferSize () const = 0;
 
-  /// Set the size of the history buffer.
-  virtual void SetBufferSize (int iSize) = 0;
+  /**
+   * Set the size of the history buffer.
+   * \param size is the size in lines of the history buffer.
+   */
+  virtual void SetBufferSize (int size) = 0;
 
   /// Clear the history buffer.
   virtual void Clear () = 0;
 
   /// Set the prompt string.
-  virtual void SetPrompt (const char *iPrompt) = 0;
+  virtual void SetPrompt (const char *prompt) = 0;
 
   /**
    * Handle a console-related event. Do NOT use the event handler

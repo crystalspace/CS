@@ -92,7 +92,7 @@ struct iDynamicSystem : public iBase
   virtual csPtr<iRigidBody> CreateBody () = 0;
 
   /// Create a rigid body and add it to the simulation
-  virtual void RemoveBody( iRigidBody* body ) = 0;
+  virtual void RemoveBody (iRigidBody* body) = 0;
 
   /// Finds a body within a system
   virtual iRigidBody *FindBody (const char *name) = 0;
@@ -112,7 +112,8 @@ struct iDynamicSystem : public iBase
   /// Get the default move callback.
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
-  /** Attaches a static collider mesh to world
+  /**
+   * Attaches a static collider mesh to world
    * \param mesh the mesh to use for collision detection
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -128,7 +129,8 @@ struct iDynamicSystem : public iBase
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f) = 0;
 
-  /** Attaches a static collider cylinder to world (oriented along it's Z axis)
+  /**
+   * Attaches a static collider cylinder to world (oriented along it's Z axis)
    * \param length the cylinder length along the axis
    * \param radius the cylinder radius
    * \param trans a hard transform to apply to the mesh
@@ -145,7 +147,8 @@ struct iDynamicSystem : public iBase
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f) = 0;
 
-  /** Attaches a static collider box to world
+  /**
+   * Attaches a static collider box to world
    * \param size the box size along each axis
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -161,7 +164,8 @@ struct iDynamicSystem : public iBase
     const csOrthoTransform& trans, float friction,
     float elasticity, float softness = 0.01f) = 0;
 
-  /** Attaches a static collider sphere to world
+  /**
+   * Attaches a static collider sphere to world
    * \param radius the radius of the sphere
    * \param offset a translation of the sphere's center
    * from the default (0,0,0)
@@ -178,7 +182,8 @@ struct iDynamicSystem : public iBase
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
     float friction, float elasticity, float softness = 0.01f) = 0;
 
-  /** Attaches a static collider plane to world
+  /**
+   * Attaches a static collider plane to world
    * \param plane describes the plane to added
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
@@ -262,7 +267,8 @@ struct iRigidBody : public iBase
   /// Returns which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
 
-    /** Add a collider with a associated friction coefficient
+  /**
+   * Add a collider with a associated friction coefficient
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -279,7 +285,8 @@ struct iRigidBody : public iBase
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f) = 0;
 
-    /** Cylinder orientated along its local z axis
+  /**
+   * Cylinder orientated along its local z axis
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -296,7 +303,8 @@ struct iRigidBody : public iBase
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f) = 0;
 
-    /** Add a collider box with given properties
+  /**
+   * Add a collider box with given properties
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -313,7 +321,8 @@ struct iRigidBody : public iBase
     const csOrthoTransform& trans, float friction, float density,
     float elasticity, float softness = 0.01f) = 0;
 
-    /** Add a collider sphere with given properties
+  /**
+   * Add a collider sphere with given properties
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
@@ -330,7 +339,8 @@ struct iRigidBody : public iBase
     float friction, float density, float elasticity,
     float softness = 0.01f) = 0;
 
-    /** Add a collider plane with given properties
+  /**
+   * Add a collider plane with given properties
    * \param trans a hard transform to apply to the mesh
    * \param friction how much friction this body has,
    * ranges from 0 (no friction) to infinity (perfect friction)
