@@ -1063,7 +1063,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
-    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette\n");
+    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette, db_octree\n");
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
@@ -1102,6 +1102,8 @@ static bool CommandHandler (char *cmd, char *arg)
     Command::change_boolean (arg, &Sys->do_light_frust, "frustrum");
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
+  else if (!strcasecmp (cmd, "db_octree"))
+    Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", 0, 10);
   else if (!strcasecmp (cmd, "palette"))
     Command::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
@@ -1631,6 +1633,7 @@ WalkTest::WalkTest () :
   selected_light = NULL;
   selected_polygon = NULL;
   move_forward = false;
+  cfg_draw_octree = 0;
 
   velocity.Set (0, 0, 0);
   angle.Set (0, 0, 0);

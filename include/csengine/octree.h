@@ -212,6 +212,9 @@ public:
   /// Get box.
   const csBox3& GetBox () { return bbox; }
 
+  /// Get a child.
+  csOctreeNode* GetChild (int i) { return (csOctreeNode*)children[i]; }
+
   /**
    * Get the list of all unsplit polygons in this node.
    * These are the original unsplit polygons. Further
@@ -319,6 +322,11 @@ public:
    * objects).
    */
   virtual ~csOctree ();
+
+  /**
+   * Get the root.
+   */
+  csOctreeNode* GetRoot () { return (csOctreeNode*)root; }
 
   /**
    * Create the tree for the default parent set.

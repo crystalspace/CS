@@ -1453,7 +1453,8 @@ void csGraphics3DOpenGL::DumpCache ()
 {
 }
 
-void csGraphics3DOpenGL::DrawLine (csVector3 & v1, csVector3 & v2, float fov, int color)
+void csGraphics3DOpenGL::DrawLine (const csVector3 & v1, const csVector3 & v2,
+	float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;

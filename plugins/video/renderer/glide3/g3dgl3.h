@@ -185,7 +185,7 @@ public:
   virtual void DrawPolygonDebug(G3DPolygonDP& /*poly*/) { }
 
   /// Draw a Line.
-  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
  
   /// Start a series of DrawPolygonFX
   virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);

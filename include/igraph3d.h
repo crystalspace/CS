@@ -414,7 +414,8 @@ struct iGraphics3D : public iPlugIn
   virtual void DrawPolygonDebug (G3DPolygonDP& poly) = 0;
 
   /// Draw a line in camera space.
-  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color) = 0;
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2,
+  	float fov, int color) = 0;
 
   /**
    * Prepare for drawing a series of Polygon FX which all use

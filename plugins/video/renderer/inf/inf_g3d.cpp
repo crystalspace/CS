@@ -343,7 +343,7 @@ long csGraphics3DInfinite::GetRenderState (G3D_RENDERSTATEOPTION op)
   }
 }
 
-void csGraphics3DInfinite::DrawLine (csVector3&, csVector3&, float, int)
+void csGraphics3DInfinite::DrawLine (const csVector3&, const csVector3&, float, int)
 {
 }
 

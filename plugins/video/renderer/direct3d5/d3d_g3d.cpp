@@ -1281,7 +1281,7 @@ void csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly)
   }
 }
 
-void csGraphics3DDirect3DDx5::DrawLine (csVector3& v1, csVector3& v2, float aspect, int color)
+void csGraphics3DDirect3DDx5::DrawLine (const csVector3& v1, const csVector3& v2, float aspect, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return;
   

@@ -311,7 +311,8 @@ long csGraphics3DLine::GetRenderState (G3D_RENDERSTATEOPTION op)
   }
 }
 
-void csGraphics3DLine::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DLine::DrawLine (const csVector3& v1, const csVector3& v2,
+	float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;

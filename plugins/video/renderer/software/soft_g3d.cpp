@@ -2587,7 +2587,8 @@ void csGraphics3DSoftware::DumpCache()
   if (tcache) tcache->dump (this);
 }
 
-void csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DSoftware::DrawLine (const csVector3& v1, const csVector3& v2,
+	float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;

@@ -150,7 +150,7 @@ public:
   virtual void CloseFogObject (CS_ID) { }
 
   /// Draw a line in camera space.
-  virtual void DrawLine (csVector3& v1, csVector3& v2, float fov, int color);
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
 
   /// Start a series of DrawPolygonFX
   virtual void StartPolygonFX (iTextureHandle*, UInt) { }

@@ -166,6 +166,7 @@ public:
   bool do_freelook;
   bool do_gravity;
   bool do_light_frust;
+  int cfg_draw_octree;
 
   /// The selected light.
   csLight* selected_light;

@@ -394,6 +394,11 @@ public:
   /// Initialize this box with one point.
   csBox3 (const csVector3& v) : minbox (v), maxbox (v) { }
 
+  /// Initialize this box with two points.
+  csBox3 (const csVector3& v1, const csVector3& v2) :
+  	minbox (v1), maxbox (v2)
+  { if (Empty ()) StartBoundingBox (); }
+
   /// Initialize this box with the given values.
   csBox3 (float x1, float y1, float z1, float x2, float y2, float z2) :
     minbox (x1, y1, z1), maxbox (x2, y2, z2)

@@ -1351,7 +1351,7 @@ void csGraphics3DGlide2x::ClearCache (void)
   if (m_pLightmapCache) m_pLightmapCache->Clear ();
 }
 
-void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
+void csGraphics3DGlide2x::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z) return ;
 
