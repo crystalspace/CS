@@ -94,7 +94,7 @@ private:
 
     /// True if the child exclusion region needs to be updated
     bool todraw_dirty;
-
+    
     /// The frame cache for storing frame state while the window is zoomed.
     csRect unzoomed_frame;
 

@@ -244,6 +244,8 @@ void awsMultiProctexCanvas::awscG2D::Print (csRect *area)
                                   rect.xmin-canvasRect->xmin, rect.ymin-canvasRect->ymin, 
                                   rect.Width()+1,rect.Height()+1,
                                   0);
+
+      //awsc->realG3D()->GetDriver2D()->DrawBox(rect.xmin, rect.ymin, rect.Width(), rect.Height(), 0);
     }
   }
 

@@ -30,6 +30,8 @@ const int proctex_width=512;
 const int proctex_height=512; 
 const int DEBUG_MANAGER = false;
 
+// Implementation //////////////////////////////////////////////////////
+
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 {
   factory->DecRef ();
@@ -40,7 +42,7 @@ awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
                top(NULL), mouse_in(NULL), keyb_focus(NULL),
                mouse_captured(false),
                ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
-               canvas(NULL)
+               canvas(NULL), flags(0)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -247,6 +249,18 @@ awsManager::Unmark(csRect &rect)
   dirty.Exclude(rect);  
 }
 
+void       
+awsManager::Erase(csRect &rect)
+{
+  erase.Include(rect);
+}
+
+void       
+awsManager::MaskEraser(csRect &rect)
+{
+  erase.Exclude(rect);
+}
+
 void
 awsManager::InvalidateUpdateStore()
 {
@@ -295,19 +309,31 @@ void
 awsManager::Print(iGraphics3D *g3d)
 {
   UpdateStore();
-  
-  int i;
-  for(i=0; i<updatestore.Count(); ++i)
-  {
-    csRect r(updatestore.RectAt(i));
-    /*g3d->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
-                    r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
-                    r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
-                    0);*/
-    
-    canvas->Show(&r);
 
-    //printf("update: (%d,%d)-(%d,%d)\n", r.xmin, r.ymin, r.xmax, r.ymax);
+  int i;
+
+  // Merge erase areas if we have to do both. Otherwise, just update normally.
+  if (erase.Count() > 0)
+  {
+    for(i=0; i<updatestore.Count(); ++i)
+      erase.Include(updatestore.RectAt(i));
+  
+    for(i=0; i<erase.Count(); ++i)
+    {
+      csRect r(erase.RectAt(i));
+      canvas->Show(&r);
+    }
+
+    erase.makeEmpty();
+  }
+  else
+  {
+
+    for(i=0; i<updatestore.Count(); ++i)
+    {
+      csRect r(updatestore.RectAt(i));
+      canvas->Show(&r);   
+    }
   }
 
 
@@ -337,9 +363,8 @@ awsManager::Redraw()
    redraw_tag++;
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
-   
    ptG2D->SetClipRect(0,0,ptG2D->GetWidth(), ptG2D->GetHeight());
-
+      
    //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
        
@@ -347,12 +372,9 @@ awsManager::Redraw()
    if (dirty.Count() == 0) 
       return;
    
-   /******* The following code is only executed if there is something to redraw *************/
+   /******* The following coawsde is only executed if there is something to redraw *************/
    
-   //if (updatestore_dirty)
-     //ptG2D->DrawBox(0,0, proctex_width,proctex_height,erasefill);
-
-
+     
    iAwsWindow *curwin=top, *oldwin = 0;
    
    // check to see if any part of this window needs redrawn
@@ -432,11 +454,22 @@ awsManager::Redraw()
           ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
    }*/
    
-   //ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
+   // This draws all of the erasure areas.
+   if (flags & AWSF_AlwaysEraseWindows)
+   {     
+     for(i=0; i<dirty.Count(); ++i)
+       erase.Exclude(dirty.RectAt(i));
+
+     for(i=0; i<erase.Count(); ++i)
+     {
+       csRect r(erase.RectAt(i));
+       ptG2D->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(),erasefill);
+     }       
+   }
 
    // This only needs to happen when drawing to the default context.
-    
    ptG3D->FinishDraw ();
+
    //ptG3D->Print(&bounds);
 
      //UpdateStore();
@@ -460,7 +493,7 @@ awsManager::RedrawWindow(iAwsWindow *win, csRect &dirtyarea)
        return;
 
      /// Draw the window first.
-     csRect clip(win->Frame());
+     //csRect clip(win->Frame());
 
      /// Clip the window to it's intersection with the dirty rectangle
      //clip.Intersect(dirtyarea);
@@ -821,4 +854,16 @@ awsManager::G2D()
 iGraphics3D *
 awsManager::G3D() 
 { return ptG3D; }
+
+void 
+awsManager::SetFlag(unsigned int _flags)
+{ flags |= _flags; }
+
+void 
+awsManager::ClearFlag(unsigned int _flags)
+{ flags &= (~_flags); }
+ 
+unsigned int 
+awsManager::GetFlags()
+{ return flags; }
     

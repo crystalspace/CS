@@ -323,6 +323,10 @@ awsWindow::OnMouseDown(int button, int x, int y)
       WindowManager()->CaptureMouse();
       WindowManager()->Mark(Frame());
 
+      // Erase the old frame if it needs it
+      if (WindowManager()->GetFlags() & AWSF_AlwaysEraseWindows)
+        WindowManager()->Erase(Frame());
+
       if (DEBUG_WINDOW_EVENTS)
         printf("aws-debug: Window resize mode=true\n");
 
@@ -347,6 +351,15 @@ awsWindow::OnMouseDown(int button, int x, int y)
       last_x=x;
       last_y=y;
 
+      // Erase the old frame if it needs it
+      if (WindowManager()->GetFlags() & AWSF_AlwaysEraseWindows)
+      {
+        csRect r(Frame());
+
+        r.Outset(5);
+        WindowManager()->Erase(r);
+      }
+
       if (DEBUG_WINDOW_EVENTS)
         printf("aws-debug: Window move mode=true\n");
 
@@ -370,6 +383,9 @@ awsWindow::OnMouseUp(int button, int x, int y)
         int delta_x = unzoomed_frame.xmax - Frame().xmax, delta_y=unzoomed_frame.ymin;
         is_zoomed=false;
         
+        if (WindowManager()->GetFlags() & AWSF_AlwaysEraseWindows)
+          WindowManager()->Erase(Frame());
+
         // Fix controls
         minp.Move(delta_x, delta_y);
         maxp.Move(delta_x, delta_y);
@@ -458,8 +474,8 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     if (x<Frame().xmax || y<Frame().ymax)
     {
-      WindowManager()->Mark(Frame());
-      marked=true;
+     if (WindowManager()->GetFlags() & AWSF_AlwaysEraseWindows)
+       WindowManager()->Erase(Frame());
     }
 
     int delta_x, old_x = Frame().xmax;
@@ -485,8 +501,8 @@ awsWindow::OnMouseMove(int button, int x, int y)
     maxp.Move(delta_x,   0);
     closep.Move(delta_x, 0);
 
-    if (!marked)
-      WindowManager()->Mark(Frame());
+    //if (!marked)
+    WindowManager()->Mark(Frame());
   
     // Fix update zones
     WindowManager()->InvalidateUpdateStore();
@@ -499,6 +515,10 @@ awsWindow::OnMouseMove(int button, int x, int y)
     int delta_x = x-last_x;
     int delta_y = y-last_y;
 
+    csRect dirty1(Frame());
+
+    dirty1.Outset(2);
+    
     last_x=x;
     last_y=y;
 
@@ -511,9 +531,7 @@ awsWindow::OnMouseMove(int button, int x, int y)
       delta_y=-Frame().ymin;
     else if (delta_y+Frame().ymax > WindowManager()->G2D()->GetHeight())
       delta_y=WindowManager()->G2D()->GetHeight() - Frame().ymax;
-         
-    csRect dirty1(Frame());
-   
+        
     // Move frame
     Frame().xmin+=delta_x;
     Frame().ymin+=delta_y;
@@ -528,14 +546,14 @@ awsWindow::OnMouseMove(int button, int x, int y)
     MoveChildren(delta_x, delta_y);
 
     //if (DEBUG_WINDOW_EVENTS)
-        //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
-
-    csRect dirty2(Frame());
-
+       //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
+         
+    // Erase the old frame if it needs it
+    if (WindowManager()->GetFlags() & AWSF_AlwaysEraseWindows) 
+      WindowManager()->Erase(dirty1);
+    
     // Mark changed pos
-    WindowManager()->Mark(dirty1);
-    WindowManager()->Mark(dirty2);
-
+    WindowManager()->Mark(Frame());
     WindowManager()->InvalidateUpdateStore();
     todraw_dirty=true;
   }

@@ -33,6 +33,7 @@
 
 const int awsNumRectBuckets = 32;
 
+
 /**
  *
  *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
@@ -52,6 +53,14 @@ class awsManager : public iAws
    *  holds an infinite amount of optimal rectangular regions.
    */
    csRectRegion dirty;
+
+  /** This is the erase region.  All windows will call the Erase() function if the
+   *  AlwaysEraseWindows flag is set.  That function will add a rect into this region
+   *  which requires erasure.  Right before final redraw, all dirty regions will be
+   *  excluded from the erasure region, and the erasure region will be painted with
+   *  the transparent color.
+   */
+   csRectRegion erase;
 
   /** This is the update store.  The update store contains all of the regions
    *  that actually contain anything useful, and thus the only regions that 
@@ -104,18 +113,9 @@ class awsManager : public iAws
 
    /// Contains the list of factory to ID mappings.
    csDLinkList component_factories;
-   
-//   /// Is true if the window manager is using the internal canvas, else false.
-//   bool UsingDefaultContext;
-   
-   /** Is true if the default context has already been initialized.  This is
-     neccessary because csProcTex has some unusual assumptions about the
-     state of the system, so I cannot initialize it until a number of conditions
-     are true.  Therefore, it is initialized in SetDefaultContext.  If a user
-     switches to a different context, and then switches back, we wouldn't want
-     them to possibly die by re-initing the thing again.
-   */
-   //bool DefaultContextInitialized;
+
+   /// Mode flags for the engine
+   unsigned int flags;
    
 public:
     SCF_DECLARE_IBASE;
@@ -160,6 +160,12 @@ public:
 
     /// Mark a section of the screen clean.
     virtual void       Unmark(csRect &rect);
+
+    /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
+    virtual void       Erase(csRect &rect);
+
+    /// Mask off a section that has been marked to erase.  This part won't be erased.
+    virtual void       MaskEraser(csRect &rect);
 
     /// Tell the system to rebuild the update store
     virtual void       InvalidateUpdateStore();
@@ -224,8 +230,16 @@ public:
  
     /// Dispatches events to the proper components
     virtual bool HandleEvent(iEvent&);
-    
- 
+
+    /// Sets one or more flags for different operating modes
+    virtual void SetFlag(unsigned int flags);
+
+    /// Clears one or more flags for different operating modes
+    virtual void ClearFlag(unsigned int flags);
+
+    /// Returns the current flags 
+    virtual unsigned int GetFlags();
+  
   //////////////////////////////////////
 
   // Implement iComponent interface.
