@@ -236,7 +236,7 @@ csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
 {
   int dupentry;
   ArchiveEntry *e = new ArchiveEntry (name, cdfh);
-  dir.InsertSorted (e, &dupentry);
+  dir.InsertSorted (e, dir.Compare, &dupentry);
   if (dupentry >= 0)
     dir.Delete (dupentry);
   return e;
@@ -275,7 +275,7 @@ void csArchive::Dir () const
 
 void *csArchive::FindName (const char *name) const
 {
-  int idx = dir.FindSortedKey (name);
+  int idx = dir.FindSortedKey ((void*)name, dir.CompareKey);
   if (idx < 0)
     return 0;
   return dir.Get (idx);
@@ -684,8 +684,8 @@ void csArchive::UpdateDirectory ()
   {
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();
-    dir.InsertSorted (e);
-    lazy [n] = 0;
+    dir.InsertSorted (e, dir.Compare);
+    lazy.Put (n, 0);
   }
   lazy.DeleteAll ();
 }

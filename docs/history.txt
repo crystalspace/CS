@@ -11,6 +11,17 @@ for each given day, however, are in normal (ascending) chronological order.
 	      csArray<csTextureOpenGL*>.
 	    - Replaced 'vClients' in csVertexBufferManager with
 	      csArray<iVertexBufferManagerClient*>.
+	- Jorrit removed csArrayCompareKeyFunction. It is not needed
+	  and the same as csArrayCompareFunction.
+	- Jorrit added csPDelArray::Sort().
+	- Jorrit extended csPDelArray::InsertSorted() with an optional
+	  equal_index parameter. This integer will be set to the index
+	  of a possible duplicate value (or -1 if none). This is similar
+	  to csVector::InsertSorted().
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced VfsVector in csVFS with a csPDelArray<VfsNode>.
+	    - Replaced ArchiveEntryVector in csArchive with a
+	      csPDelArray<ArchiveEntry>.
 30-Jul-2003
 	- Anders Stenberg brought the variable system for the new renderer
 	  back up and running, now using Oktal's symbol table which should

@@ -22,8 +22,7 @@
 
 #include "csutil/ref.h"
 
-typedef int csArrayCompareFunction (void* item1, void* item2);
-typedef int csArrayCompareKeyFunction (void* item, void* key);
+typedef int csArrayCompareFunction (void const* item1, void const* item2);
 
 /**
  * An array of pointers. No ref counting is done on the elements in this
@@ -286,7 +285,7 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindSortedKey (void* key, csArrayCompareKeyFunction* comparekey) const
+  int FindSortedKey (void* key, csArrayCompareFunction* comparekey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -307,8 +306,12 @@ public:
   /**
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
+   * If 'equal_index' is not 0 then this integer will be set
+   * to the index of a duplicate item (if found). If no such
+   * duplicate item exists it will be set to -1.
    */
-  int InsertSorted (T* item, csArrayCompareFunction* compare)
+  int InsertSorted (T* item, csArrayCompareFunction* compare,
+	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -318,6 +321,7 @@ public:
 
       if (cmp == 0)
       {
+	if (equal_index) *equal_index = m;
         Insert (++m, item);
         return m;
       }
@@ -328,8 +332,17 @@ public:
     }
     if (r == m)
       m++;
+    if (equal_index) *equal_index = -1;
     Insert (m, item);
     return m;
+  }
+
+  /**
+   * Sort array.
+   */
+  void Sort (csArrayCompareFunction* compare)
+  {
+    qsort (root, Length (), sizeof (T*), compare);
   }
 };
 

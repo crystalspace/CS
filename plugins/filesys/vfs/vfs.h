@@ -21,7 +21,7 @@
 #define __CS_VFS_H__
 
 #include "csutil/cfgfile.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
@@ -113,14 +113,10 @@ private:
   friend class VfsNode;
 
   // A vector of VFS nodes
-  class VfsVector : public csVector
+  class VfsVector : public csPDelArray<VfsNode>
   {
   public:
-    VfsVector ();
-    virtual ~VfsVector ();
-    virtual bool FreeItem (void* Item);
-    virtual int Compare (void* Item1, void* Item2, int Mode) const;
-    virtual int CompareKey (void* Item, const void* Key, int Mode) const;
+    static int Compare (void const* Item1, void const* Item2);
   } NodeList;
 
   // Current working directory (in fact, the automaticaly-added prefix path)

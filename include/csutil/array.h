@@ -19,7 +19,7 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
-// For csArrayCompareKeyFunction and csArrayCompareFunction.
+// For csArrayCompareFunction.
 #include "csutil/parray.h"
 
 // hack: work around problems caused by #defining 'new'
@@ -383,7 +383,7 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindSortedKey (void* key, csArrayCompareKeyFunction* comparekey) const
+  int FindSortedKey (void* key, csArrayCompareFunction* comparekey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)

@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include "csutil/zip.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/stringarray.h"
 
 struct csFileTime;
@@ -80,20 +80,15 @@ private:
   friend class ArchiveEntry;
 
   /// A vector of ArchiveEntries
-  class ArchiveEntryVector : public csVector
+  class ArchiveEntryVector : public csPDelArray<ArchiveEntry>
   {
   public:
-    ArchiveEntryVector () : csVector (256, 256) {}
-    virtual ~ArchiveEntryVector () { DeleteAll (); }
-    virtual bool FreeItem (void* Item)
-    { delete (ArchiveEntry *)Item; return true; }
-    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
+    ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}
+    static int Compare (void const* Item1, void const* Item2)
     { return strcmp (((ArchiveEntry *)Item1)->filename,
 	((ArchiveEntry *)Item2)->filename); }
-    virtual int CompareKey (void* Item, const void* Key, int /*Mode*/) const
+    static int CompareKey (void const* Item, void const* Key)
     { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
-    ArchiveEntry *Get (int n) const
-    { return (ArchiveEntry *)csVector::Get (n); }
   };
 
   ArchiveEntryVector dir;	// Archive directory: chain head (sorted)

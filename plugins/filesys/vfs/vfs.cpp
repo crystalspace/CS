@@ -266,7 +266,7 @@ public:
 
 // Private structure used to keep a "node" in virtual filesystem tree.
 // The program can be made even fancier if we use a object for each
-// "real" path (i.e. each VfsNode will contain an csVector of real-world
+// "real" path (i.e. each VfsNode will contain an array of real-world
 // nodes - both "directory" and "archive" types) but since we have to
 // balance between pretty understandable code and effective code, this
 // time we choose effectivity - the cost can become very big in this case.
@@ -1415,31 +1415,9 @@ bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
 
 // ----------------------------------------------------------- VfsVector --- //
 
-csVFS::VfsVector::VfsVector () : csVector (16, 16)
+int csVFS::VfsVector::Compare (void const* Item1, void const* Item2)
 {
-}
-
-csVFS::VfsVector::~VfsVector ()
-{
-  DeleteAll ();
-}
-
-bool csVFS::VfsVector::FreeItem (void* Item)
-{
-  delete (VfsNode *)Item;
-  return true;
-}
-
-int csVFS::VfsVector::Compare (void* Item1, void* Item2, int Mode) const
-{
-  (void)Mode;
-  return strcmp (((VfsNode *)Item1)->VPath, ((VfsNode *)Item2)->VPath);
-}
-
-int csVFS::VfsVector::CompareKey (void* Item, const void* Key, int Mode) const
-{
-  (void)Mode;
-  return strcmp (((VfsNode *)Item)->VPath, (char *)Key);
+  return strcmp ((*(VfsNode **)Item1)->VPath, (*(VfsNode **)Item2)->VPath);
 }
 
 // --------------------------------------------------------------- csVFS --- //
@@ -1506,7 +1484,7 @@ bool csVFS::ReadConfig ()
   csRef<iConfigIterator> iterator (config.Enumerate ("VFS.Mount."));
   while (iterator->Next ())
     AddLink (iterator->GetKey (true), iterator->GetStr ());
-  NodeList.QuickSort (0);
+  NodeList.Sort (NodeList.Compare);
   return true;
 }
 
