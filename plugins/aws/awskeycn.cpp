@@ -3,9 +3,9 @@
 #include "csutil/scfstr.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
-#include "ivaria/aws.h"
-#include "awsprefs.h"
-#include "awsadler.h"
+#include "aws/iaws.h"
+#include "aws/awsprefs.h"
+#include "aws/awsadler.h"
 
 awsKey *
 awsKeyContainer::Find(iString *n)

@@ -428,11 +428,13 @@ char *yytext;
 #define INITIAL 0
 /*******
   Flex definition for the .skn file parser.
+
+  to compile do:  flex -L skinlang.flx
  *********/
  
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
-#include "awsprefs.h"
+#include "aws/awsprefs.h"
 
 #include <stdlib.h>
 #include <string.h>

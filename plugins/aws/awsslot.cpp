@@ -1,6 +1,6 @@
 #include "cssysdef.h"
-#include "awsslot.h"
-#include "awsadler.h"
+#include "aws/awsslot.h"
+#include "aws/awsadler.h"
 #include <string.h>
 
 static unsigned long 

@@ -1,7 +1,7 @@
 #include "cssysdef.h"
-#include "awsprefs.h"
-#include "awscomp.h"
-#include "awsslot.h"
+#include "aws/awsprefs.h"
+#include "aws/awscomp.h"
+#include "aws/awsslot.h"
 #include "iutil/event.h"
 
 #include <stdio.h>

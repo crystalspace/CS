@@ -29,8 +29,8 @@
 #include "csgeom/csrect.h"
 #include "csutil/scfstr.h"
 #include "csutil/csdllist.h"
-#include "aws.h"
-#include "awsprefs.h"
+#include "aws/aws.h"
+#include "aws/awsprefs.h"
 #include <stdio.h>
 
 

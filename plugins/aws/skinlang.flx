@@ -9,7 +9,7 @@
  
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
-#include "awsprefs.h"
+#include "aws/awsprefs.h"
 
 #include <stdlib.h>
 #include <string.h>

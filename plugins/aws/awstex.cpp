@@ -9,8 +9,8 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-#include "awstex.h"
-#include "awsadler.h"
+#include "aws/awstex.h"
+#include "aws/awsadler.h"
 #include <string.h>
 #include <stdio.h>
 

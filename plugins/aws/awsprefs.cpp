@@ -5,9 +5,9 @@
 #include "ivideo/fontserv.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
-#include "awsprefs.h"
-#include "awstex.h"
-#include "awsadler.h"
+#include "aws/awsprefs.h"
+#include "aws/awstex.h"
+#include "aws/awsadler.h"
 #include <stdio.h>
 #include <string.h>
  

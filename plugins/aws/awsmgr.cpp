@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "iutil/plugin.h"
-#include "aws.h"
-#include "awsprefs.h"
+#include "aws/aws.h"
+#include "aws/awsprefs.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
 #include "iutil/eventh.h"
@@ -10,7 +10,7 @@
 #include "iutil/event.h"
 #include "ivaria/reporter.h"
 
-#include "awscmdbt.h"
+#include "aws/awscmdbt.h"
 
 
 #include <stdio.h>
