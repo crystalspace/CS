@@ -21787,20 +21787,23 @@
                 <v x="-25" y="2.6" z="37.7" />
             </hardmove>
         </meshobj>
-        <light>
+        <light name="ganglight1">
             <center x="-5" y="2" z="37.4" />
             <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
+            <dynamic />
         </light>
-        <light>
+        <light name="ganglight2">
             <center x="-15" y="2" z="37.4" />
             <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
+            <dynamic />
         </light>
-        <light>
+        <light name="ganglight3">
             <center x="-25" y="2" z="37.4" />
             <radius>6</radius>
             <color red="0.9" green="0.6" blue="0.6" />
+            <dynamic />
         </light>
     </sector>
     <sector name="gang4">
@@ -22917,22 +22920,22 @@
         <sequence name="fogloop">
 	    <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.05"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.02"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.01"
 		duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <run sequence="fogloop" />
 	</sequence>
 
         <sequence name="fog">
 	    <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <run sequence="fogloop" />
 	</sequence>
 
@@ -22942,19 +22945,19 @@
 	    </args>
 	    <fadelight light_par="light" red="0" green="0" blue="0"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadelight light_par="light" red="1" green="1" blue="1"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadelight light_par="light" red="1" green="0" blue="0"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadelight light_par="light" red="0" green="1" blue="0"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <fadelight light_par="light" red="0" green="0" blue="1"
 	    	duration="1000" />
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <enable trigger="animlight" />
 	</sequence>
 
@@ -22962,19 +22965,19 @@
 	    /* Time of day simulation */
 	    <fadeambient sector="street1" red="1" green="1" blue="1"
 	    	duration="1000" />
-	    <delay>2000</delay>
+	    <delay time="1000" />
 	    <fadeambient sector="street1" red="0" green="0" blue="0"
 	    	duration="1000" />
-	    <delay>2000</delay>
+	    <delay time="2000" />
 	    /* Time of day simulation */
 	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
-	    <delay>75</delay>
+	    <delay time="75" />
 	    <setambient sector="street1" red="0" green="0" blue="0" />
-	    <delay>75</delay>
+	    <delay time="75" />
 	    <setambient sector="street1" red="1.5" green="1.5" blue="1.5" />
-	    <delay>150</delay>
+	    <delay time="150" />
 	    <setambient sector="street1" red="0" green="0" blue="0" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <enable trigger="anim_sky" />
 	</sequence>
 
@@ -22999,41 +23002,66 @@
 	<sequence name="seq_lightning">
 	    <!-- Sequence fired by application and not by trigger.-->
 	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
-	    <delay>120</delay>
+	    <delay time="75" />
 	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
-	    <delay>200</delay>
+	    <delay time="75" />
 	    <fadeambient sector="large" red="1.0" green="1.0" blue="1.5" duration="80" />
-	    <delay>120</delay>
+	    <delay time="150" />
 	    <fadeambient sector="large" red="0" green="0" blue="0" duration="120" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	</sequence>
 
+    <sequence name="flicker1">
+        <!-- demo of randomly flickering light -->
+        <delay min="50" max="100" />
+        <setlight light="ganglight1" red=".982" green=".815" blue=".616" />
+        <delay min="100" max="1500" />
+        <setlight light="ganglight1" red=".960" green=".570" blue=".379" />
+        <enable trigger="flicker1" />
+    </sequence>
+    <sequence name="flicker2">
+        <!-- demo of randomly flickering light -->
+        <delay min="50" max="100" />
+        <setlight light="ganglight2" red=".982" green=".815" blue=".616" />
+        <delay min="100" max="1500" />
+        <setlight light="ganglight2" red=".960" green=".570" blue=".379" />
+        <enable trigger="flicker2" />
+    </sequence>
+    <sequence name="flicker3">
+        <!-- demo of randomly flickering light -->
+        <delay min="50" max="100" />
+        <setlight light="ganglight3" red=".982" green=".815" blue=".616" />
+        <delay min="100" max="1500" />
+        <setlight light="ganglight3" red=".960" green=".570" blue=".379" />
+        <enable trigger="flicker3" />
+    </sequence>
+    
 	<sequence name="animhugelight">
 	    <fadelight light="hugeroom_light1" red="0" green="0" blue=".2"
 	    	duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green=".1" blue="0"
 	    	duration="3000" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <fadelight light="hugeroom_light1" red="0" green=".3" blue=".8"
 	        duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".3"
 	        duration="3000" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <fadelight light="hugeroom_light1" red="0" green=".2" blue=".3"
 	        duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green="0" blue=".8"
 	        duration="3000" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <fadelight light="hugeroom_light1" red="0" green=".4" blue=".7"
 	        duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green=".4" blue=".3"
 	        duration="3000" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <fadelight light="hugeroom_light1" red="0" green=".1" blue=".5"
 	        duration="3000" />
 	    <fadelight light="hugeroom_light2" red="0" green=".2" blue=".6"
 	        duration="3000" />
-	    <delay>3000</delay>
+	    <delay time="3000" />
 	    <enable trigger="animhugelight" />
 	</sequence>
 
@@ -23062,17 +23090,17 @@
 	        <roty>3</roty>
                 <v x="-16" y="-1.85" z="25" />
 	    </rotate>
-	    <delay>400</delay>
+	    <delay time="400" />
 	    <rotate mesh="cube2" duration="300">
 	        <roty>.5</roty>
                 <v x="-16" y="-1" z="36" />
 	    </rotate>
-	    <delay>300</delay>
+	    <delay time="300" />
 	    <rotate mesh="cube2" duration="300">
 	        <rotz>.5</rotz>
                 <v x="-16" y="-1" z="36" />
 	    </rotate>
-	    <delay>300</delay>
+	    <delay time="300" />
 	    <enable trigger="rot_shapes" />
 	</sequence>
 
@@ -23102,7 +23130,7 @@
 	        <rotz>-.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
 	    </rotate>
-	    <delay>500</delay>
+	    <delay time="500" />
 	    <rotate mesh="cubard:robotArmRight" duration="500">
 	        <rotz>1.8</rotz>
                 <v x="0" y="0.23" z="-0.15" />
@@ -23111,7 +23139,7 @@
 	        <rotz>.4</rotz>
                 <v x="0" y="0.23" z="0.15" />
 	    </rotate>
-	    <delay>500</delay>
+	    <delay time="500" />
 	    <enable trigger="rot_cubard" />
 	</sequence>
 
@@ -23120,7 +23148,7 @@
 	        <roty>3</roty>
                 <v x="15" y="4" z="14" />
 	    </rotate>
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <enable trigger="rot_transpBall" />
 	</sequence>
 
@@ -23131,7 +23159,7 @@
 	        <rotz>.34</rotz>
                 <v x="15" y="3" z="8" />
 	    </rotate>
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <enable trigger="rot_s_large1" />
 	</sequence>
 
@@ -23140,7 +23168,7 @@
 	        <roty>9</roty>
                 <v x="-1" y="0.3" z="11" />
 	    </rotate>
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <enable trigger="rot_cubeHierarchy" />
 	</sequence>
 
@@ -23152,9 +23180,9 @@
 	<sequence name="movebox">
 	<!-- Disabled because of problems for now:
 	    <move mesh="floorplate" duration="10000" x="0" y="-10" z="0" />
-	    <delay>10000</delay>
+	    <delay time="10000" />
 	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
-	    <delay>10000</delay>
+	    <delay time="10000" />
 	    <run sequence="movebox" />
 	-->
 	</sequence>
@@ -23196,7 +23224,7 @@
 	        <rotx>1.5707963</rotx>
 		<v x="0" y="4" z="0" />
 	    </rotate>
-	    <delay>6000</delay>
+	    <delay time="6000" />
 	    <rotate mesh="floorplate:plateL" duration="6000">
 	        <rotz>1.5707963</rotz>
 		<v x="-2" y="0" z="0" />
@@ -23229,7 +23257,7 @@
 	        <rotx>-1.5707963</rotx>
 		<v x="0" y="4" z="0" />
 	    </rotate>
-	    <delay>6000</delay>
+	    <delay time="6000" />
 	    <run sequence="openbox" />
 	</sequence>
 
@@ -23238,7 +23266,7 @@
 	        <rotx>.4</rotx>
                 <v x="-14.7" y="0.8" z="8.8" />
 	    </rotate>
-	    <delay>500</delay>
+	    <delay time="500" />
 	    <enable trigger="handle1off" />
 	</sequence>
 	<sequence name="handle1off">
@@ -23246,7 +23274,7 @@
 	        <rotx>-.4</rotx>
                 <v x="-14.7" y="0.8" z="8.8" />
 	    </rotate>
-	    <delay>500</delay>
+	    <delay time="500" />
 	    <enable trigger="handle1" />
 	</sequence>
 
@@ -23266,7 +23294,7 @@
 	        <roty>-1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
 	    </rotate>
-	    <delay>2000</delay>
+	    <delay time="2000" />
 	    <check trigger="opendoor1" delay="500" />
 	    <check trigger="opendoor2" delay="500" />
 	    <run sequence="testdoor" />
@@ -23278,7 +23306,7 @@
 	 *** camera has moved away from the door and we can close it.
 	 -->
 	<sequence name="testdoor">
-	    <delay>1000</delay>
+	    <delay time="1000" />
 	    <test trigger="opendoor1"
 	    	truesequence="testdoor"
 		falsesequence="testdoor2" />
@@ -23303,7 +23331,7 @@
 	        <roty>1.5707963</roty>
                 <v x="-2.5" y="-1" z="20" />
 	    </rotate>
-	    <delay>2000</delay>
+	    <delay time="2000" />
 	    <enable trigger="opendoor1" />
 	    <enable trigger="opendoor2" />
         </sequence>
@@ -23325,6 +23353,20 @@
 	<trigger name="anim_sky">
 	    <sectorvis sector="street1" />
 	    <fire sequence="anim_sky" />
+	</trigger>
+
+        <!-- These 3 triggers control the flickering lights in the fog hallway-->
+        <trigger name="flicker1">
+	    <sectorvis sector="gang3" />
+	    <fire sequence="flicker1" />
+	</trigger>
+        <trigger name="flicker2">
+	    <sectorvis sector="gang3" />
+	    <fire sequence="flicker2" />
+	</trigger>
+        <trigger name="flicker3">
+	    <sectorvis sector="gang3" />
+	    <fire sequence="flicker3" />
 	</trigger>
 	
 	<trigger name="light_listener_on">
