@@ -2227,6 +2227,32 @@ finish:
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  return StartPolygonQuick(handle, gouroud);
+}
+
+STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  return FinishPolygonQuick();
+}
+
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouroud)
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  G3DPolygonDPQ newpoly;
+  for (int i=0; i<poly.num; i++)
+  {
+    newpoly.vertices[i] = poly.vertices[i];
+  }
+  newpoly.num        = poly.num;
+  newpoly.inv_aspect = poly.inv_aspect;
+  newpoly.txt_handle = poly.txt_handle;
+  return DrawPolygonQuick(newpoly, gouroud);
+};
+
 STDMETHODIMP csGraphics3DSoftware::CacheTexture (IPolygonTexture* texture)
 {
   tcache->use_texture (texture, txtmgr);

@@ -277,6 +277,15 @@ public:
   /// Draw a projected polygon.
   STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
 
+  /// Start a series of DrawPolygonFX
+  STDMETHODIMP StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud);
+
+  /// Finish a series of DrawPolygonFX
+  STDMETHODIMP FinishPolygonFX();
+
+  /// Draw a polygon with special effects.
+  STDMETHODIMP DrawPolygonFX    (G3DPolygonDPFX& poly, bool gouroud);
+
   /// Give a texture to csGraphics3DSoftware to cache it.
   STDMETHODIMP CacheTexture (IPolygonTexture* texture);
 

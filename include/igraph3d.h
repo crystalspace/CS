@@ -176,6 +176,37 @@ struct G3DPolygonAFP
   G3DPolyNormal normal;
 };
 
+typedef enum 
+{
+  Multiply,
+  Multiply2,
+  Add,
+  Copy,
+  Alpha
+} DPFXMixMode;
+
+///Structure containing all info needed by DrawPolygonFX (DPFX)
+struct G3DPolygonDPFX
+{
+  /// Current number of vertices.
+  int num;
+  /// Vertices that form the polygon.
+  G3DTexturedVertex vertices[200];
+
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  float inv_aspect;
+
+  /// The texture handle as returned by ITextureManager.
+  ITextureHandle* txt_handle;
+
+  /** 
+    * AlphaValue of the polygon. Ranges from 0.0 to 1.0. 0 means opaque, 1.0 is 
+    * comletely transparent.
+    */
+  float alpha;
+};
+
+
 ///
 class G3DFltLight
 {
@@ -383,6 +414,40 @@ public:
    * to be used for 3D sprites which are made up of small triangles.
    */
   STDMETHOD (DrawPolygonQuick) (G3DPolygonDPQ& poly, bool gouroud) PURE;
+
+  /**
+   * Prepare for drawing a series of Polygon FX which all use
+   * the same settings. You must call this function before calling a
+   * series of DrawPolygonFX(). After calling the series you should
+   * call FinishPolygonFX().<p>
+   *
+   * Warning! After calling this function you are not allowed to do
+   * any calls to the 3D rasterizer other than DrawPolygonFX() and
+   * FinishPolygonFX().
+   * 
+   * parameters:
+   * handle:  The texture handle as returned by ITextureManager.
+   * mode:    How shall the new polygon be combined with the current 
+   *          screen content.
+   * gouroud: set to true, if you want to shade the resulting texture by 
+   *          the colorvalues in vertices[i].r, .b, .g, if you set gouraud 
+   *          to true and set all color components to 1.0, you will see no 
+   *          gouraud shading.
+   */
+  STDMETHOD (StartPolygonFX)  (ITextureHandle* handle, DPFXMixMode mode, bool gouroud) PURE;
+
+  /**
+   * Finish drawing a series of Polygon FX.
+   */
+  STDMETHOD (FinishPolygonFX) () PURE;
+
+  /**
+   * Draw a polygon with special effects. This is the most rich and slowest
+   * variant of DrawPolygonXxx. In future, we should try to use a common 
+   * interface for all Polygon drawing. For now, you will have to use 
+   * this method, if you need advanced possibilities.
+   */
+  STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly, bool gouroud) PURE;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;

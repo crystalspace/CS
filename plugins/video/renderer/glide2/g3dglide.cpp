@@ -1199,6 +1199,32 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool go
   return S_OK;
 }
 
+STDMETHODIMP csGraphics3DGlide2x::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  return StartPolygonQuick(handle, gouroud);
+}
+
+STDMETHODIMP csGraphics3DGlide2x::FinishPolygonFX()
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  return FinishPolygonQuick();
+}
+
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly, bool gouroud)
+{
+  //This implementation is pretty wrong, but at least, it will show something on the screen
+  G3DPolygonDPQ newpoly;
+  for (int i=0; i<poly.num; i++)
+  {
+    newpoly.vertices[i] = poly.vertices[i];
+  }
+  newpoly.num        = poly.num;
+  newpoly.inv_aspect = poly.inv_aspect;
+  newpoly.txt_handle = poly.txt_handle;
+  return DrawPolygonQuick(newpoly, gouroud);
+}
+
 /// Give a texture to csGraphics3D to cache it.
 STDMETHODIMP csGraphics3DGlide2x::CacheTexture (IPolygonTexture *texture)
 {
