@@ -34,28 +34,28 @@
  */
 
 #define INTERPOLATE1_S(var) \
-  poly.var [j] = orig_poly_##var## [vt] + \
-    t * (orig_poly_##var## [vt2] - orig_poly_##var## [vt]);
+  poly.var [j] = orig_poly_##var [vt] + \
+    t * (orig_poly_##var [vt2] - orig_poly_ ##var [vt]);
 
 #define INTERPOLATE1(var,component) \
-  poly.var [j].component = orig_poly_##var## [vt].component + \
-    t * (orig_poly_##var## [vt2].component - orig_poly_##var## [vt].component);
+  poly.var [j].component = orig_poly_##var [vt].component + \
+    t * (orig_poly_##var [vt2].component - orig_poly_##var [vt].component);
 
 #define INTERPOLATE_S(var) \
 { \
-  float v1 = orig_poly_##var## [edge_from [0]] + \
-    t1 * (orig_poly_##var## [edge_to [0]] - orig_poly_##var## [edge_from [0]]); \
-  float v2 = orig_poly_##var## [edge_from [1]] + \
-    t2 * (orig_poly_##var## [edge_to [1]] - orig_poly_##var## [edge_from [1]]); \
+  float v1 = orig_poly_##var [edge_from [0]] + \
+    t1 * (orig_poly_##var [edge_to [0]] - orig_poly_##var [edge_from [0]]); \
+  float v2 = orig_poly_##var [edge_from [1]] + \
+    t2 * (orig_poly_##var [edge_to [1]] - orig_poly_##var [edge_from [1]]); \
   poly.var [j] = v1 + t * (v2 - v1); \
 }
 
 #define INTERPOLATE(var,component) \
 { \
-  float v1 = orig_poly_##var## [edge_from [0]].component + \
-    t1 * (orig_poly_##var## [edge_to [0]].component - orig_poly_##var## [edge_from [0]].component); \
-  float v2 = orig_poly_##var## [edge_from [1]].component + \
-    t2 * (orig_poly_##var## [edge_to [1]].component - orig_poly_##var## [edge_from [1]].component); \
+  float v1 = orig_poly_##var [edge_from [0]].component + \
+    t1 * (orig_poly_##var [edge_to [0]].component - orig_poly_##var [edge_from [0]].component); \
+  float v2 = orig_poly_##var [edge_from [1]].component + \
+    t2 * (orig_poly_##var [edge_to [1]].component - orig_poly_##var [edge_from [1]].component); \
   poly.var [j].component = v1 + t * (v2 - v1); \
 }
 
