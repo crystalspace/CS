@@ -246,15 +246,22 @@ AC_CHECK_PROGS([JAM], [jam])
 AC_PROG_MAKE_SET
 
 
+
+#------------------------------------------------------------------------------
+# The cslibs package is a convenience archive made available to Windows users
+# of Crystal Space.  It contains common libraries, headers, and tools usable by
+# MSVC, Mingw/MSYS, and Cygwin users.
+#------------------------------------------------------------------------------
 AC_CHECK_PROGS([CSLIBS_CONFIG], [cslibs-config])
 AS_IF([test -n "$CSLIBS_CONFIG"],
-  [CSLIBS_CFLAGS=`$CSLIBS_CONFIG --cflags`
-   CSLIBS_LFLAGS=`$CSLIBS_CONFIG --lflags`
-   CFLAGS="$CFLAGS $CSLIBS_CFLAGS"
-   CPPFLAGS="$CPPFLAGS $CSLIBS_CFLAGS"
-   LDFLAGS="$LDFLAGS $CSLIBS_LFLAGS"
-   PATH=`$CSLIBS_CONFIG --binpath`:$PATH
-   ])
+    [CSLIBS_CFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
+    CSLIBS_LFLAGS=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
+    CSLIBS_BINPATH=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`
+    CFLAGS="$CFLAGS $CSLIBS_CFLAGS"
+    CPPFLAGS="$CPPFLAGS $CSLIBS_CFLAGS"
+    LDFLAGS="$LDFLAGS $CSLIBS_LFLAGS"
+    PATH="$CSLIBS_BINPATH:$PATH"])
+
 
 
 #------------------------------------------------------------------------------

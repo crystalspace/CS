@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Nov-2003
+	- Eric Sunshine performed minor clean up of the new cslibs test in
+	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().
+	  Added documentation.  Minor whitespace cleanup.  Re-generated
+	  configure script with Autoconf 2.57 on Unix to fix formatting of
+	  --help, which Windows Autoconf messes up.
 23-Nov-2003
         - Matze fixed jam clean target for libraries
         - Matze fixed a bug when SubInclude rule was placed in the middle of a
