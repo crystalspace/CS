@@ -47,8 +47,10 @@ The history order is reversed so that new features are at the top.
 	      optional suffix, "/tcp" or "/udp".
 	    - That means that the reliable flags are now deprecated.
 	    - Switched to csPtr in appropriate places.
-	- Oktal fixed WaitForConnection in he ensocket driver; it was failing
+	- Oktal fixed WaitForConnection in the ensocket driver; it was failing
 	  for UDP sockets.
+	- res fixed mismatching de-/allocation of CDATA nodes in TinyXML
+	  (block allocator vs. new).
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.

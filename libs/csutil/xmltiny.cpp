@@ -224,7 +224,9 @@ csDocumentNodeType csTinyXmlNode::GetType ()
     case TiDocumentNode::DOCUMENT: return CS_NODE_DOCUMENT;
     case TiDocumentNode::ELEMENT: return CS_NODE_ELEMENT;
     case TiDocumentNode::COMMENT: return CS_NODE_COMMENT;
-    case TiDocumentNode::TEXT: return CS_NODE_TEXT;
+    case TiDocumentNode::CDATA:
+    case TiDocumentNode::TEXT:
+      return CS_NODE_TEXT;
     case TiDocumentNode::DECLARATION: return CS_NODE_DECLARATION;
     default: return CS_NODE_UNKNOWN;
   }
@@ -383,7 +385,8 @@ const char* csTinyXmlNode::GetContentsValue ()
   TiDocumentNode* child = node_children->FirstChild ();
   while (child)
   {
-    if (child->Type () == TiDocumentNode::TEXT)
+    if ((child->Type () == TiDocumentNode::TEXT)
+      || (child->Type () == TiDocumentNode::CDATA))
     {
       return child->Value ();
     }

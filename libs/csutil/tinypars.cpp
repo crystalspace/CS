@@ -425,9 +425,9 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       else
         document->DeleteNode (textNode);
     } 
-                else if ( StringEqual(p, "<![CDATA[") )
-                {
-                        TiXmlCData* cdataNode = new TiXmlCData( );
+    else if ( StringEqual(p, "<![CDATA[") )
+    {
+      TiXmlCData* cdataNode = new TiXmlCData( );
 
       if ( !cdataNode )
       {
@@ -441,7 +441,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         LinkEndChild( cdataNode );
       else
         delete cdataNode;
-                }
+    }
     else 
     {
       // We hit a '<'

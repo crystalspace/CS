@@ -216,7 +216,7 @@ public:
    */
   enum NodeType
   {
-    DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, DECLARATION, TYPECOUNT
+    DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, CDATA, DECLARATION, TYPECOUNT
   };
 
   virtual ~TiDocumentNode();
@@ -294,7 +294,7 @@ public:
   TiXmlUnknown*  ToUnknown() const
   { return ( Type () == UNKNOWN  ) ? (TiXmlUnknown*)  this : 0; }
   TiXmlText*   ToText()    const
-  { return ( Type () == TEXT     ) ? (TiXmlText*)     this : 0; }
+  { return ((Type () == TEXT) || (Type () == CDATA)) ? (TiXmlText*)this : 0; }
   TiXmlDeclaration* ToDeclaration() const
   { return ( Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; }
 
@@ -628,6 +628,7 @@ public:
   /// Constructor.
   TiXmlCData () : TiXmlText ()
   {
+    type = CDATA;
   }
   virtual ~TiXmlCData() {}
 
