@@ -81,6 +81,7 @@ DemoSky::DemoSky ()
   LevelLoader = NULL;
   kbd = NULL;
   skydome = NULL;
+  skytime = 0.0;
 }
 
 DemoSky::~DemoSky ()
@@ -231,8 +232,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   ballstate->SetReversed(true);
   ballstate->SetTopOnly(false);
   ballstate->SetLighting(false);
-  ballstate->SetColor( csColor(0,0,1) );
 
+  /*  Test stuff
+  ballstate->SetColor( csColor(0,0,1) );
   float start[] = {0.0, 1,0,1};
   float end[] = {1.0, 0,0,0};
   float* testgrad[] = { start, end, NULL};
@@ -260,6 +262,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   float sunset2[] = {1.0, 1,-0.9,1};
   float* testgrad4[] = {sunset0, sunset1, sunset2, NULL};
   ballstate->ApplyLightSpot( csVector3(-30,-20,-20), 2.0, testgrad4);
+  */
+
+  ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
 
   ballstate->DecRef();
 
@@ -287,8 +292,17 @@ void DemoSky::NextFrame ()
   csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
-  // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
+  // animate sky
+  float secsperday = 30.;
+  skytime += (elapsed_time / ( 1000. * secsperday ));
+  while(skytime > 1.0) skytime -= 1.0;
+  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(), 
+    iBallState);
+  ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
+  ballstate->DecRef();
+
+  // Now rotate the camera according to keyboard state
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
@@ -304,8 +318,7 @@ void DemoSky::NextFrame ()
     view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
-    | CSDRAW_CLEARSCREEN ))
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   view->Draw ();
@@ -316,9 +329,9 @@ void DemoSky::NextFrame ()
   const char *text = "Escape to quit. Arrow keys/pgup/pgdown to move.";
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;
-  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(80,80,80), 
+  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(0,0,0), 
     -1, text);
-  myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(255,255,255),
+  myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(192,192,192),
     -1, text);
 
   // Drawing code ends here.

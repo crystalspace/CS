@@ -88,6 +88,7 @@ struct iBallState : public iBase
    */ 
   virtual void ApplyVertGradient(float horizon_height, float zenith_height,
     float** gradient) = 0;
+
   /** Create a lightspot on the colours of the dome.
    *  The position indicates the direction of center of the lightspot
    *  wrt. the center of the ball mesh.
@@ -97,6 +98,14 @@ struct iBallState : public iBase
    */
   virtual void ApplyLightSpot(const csVector3& position, float size,
     float **gradient) = 0;
+
+  /** Animate the ball as a skydome for earth.
+   *  Give a time - from 0.0 to 1.0.
+   *   0.0 is sunrise, daytime after, 0.5 is sunset, night following.
+   *  If you pass NULL for the gradients, a default will be used.
+   */
+  virtual void PaintSky(float time, float **dayvert, float **nightvert,
+    float **topsun, float **sunset) = 0;
 
 };
 

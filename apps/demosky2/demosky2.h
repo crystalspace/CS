@@ -54,6 +54,7 @@ private:
 
   /// the sky 
   iMeshWrapper *skydome;
+  float skytime;
 
 public:
   DemoSky ();

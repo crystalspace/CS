@@ -775,6 +775,137 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
   }
 }
 
+
+void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
+  float **topsun, float **sunset)
+{
+  // apply defaults if needed
+  float sky1[] = {0.0, .5, .6, 1.};
+  float sky2[] = {1.0, .1, .3, .8};
+  float* def_dayvert[] = {sky1, sky2, NULL};
+
+  float night1[] = {0.0, 0.1,0.1,0.1};
+  float night2[] = {1.0, 0,0,0};
+  float* def_nightvert[] = {night1, night2, NULL};
+
+  float sun0[] = {0., 1.,1., .6};
+  float sun1[] = {0.5,1.,0.9,.6};
+  float sun2[] = {1., 1.,0.8,.6};
+  float *def_topsun[] = {sun0, sun1, sun2, NULL};
+
+  float sunset0[] = {0.0, 0.9,0.9,-0.9};
+  float sunset1[] = {0.5, 0.1,-0.6,-0.8};
+  float sunset2[] = {1.0, 1,-0.9,1};
+  float* def_sunset[] = {sunset0, sunset1, sunset2, NULL};
+
+  if(!dayvert) dayvert = def_dayvert;
+  if(!nightvert) nightvert = def_nightvert;
+  if(!topsun) topsun = def_topsun;
+  if(!sunset) sunset = def_sunset;
+  // scale time to 0-1.
+  while(time < 0.0) time += 1.0;
+  while(time >= 1.0) time -= 1.0;
+  // allocate application gradients
+  int vertlen = 0;
+  int sunlen = 0;
+  int i = 0;
+  while(dayvert[i] != 0) {vertlen++; i++;}
+  i = 0;
+  while(topsun[i] != 0) {sunlen++; i++;}
+  float ** applyvert = new float* [vertlen+1];
+  applyvert[vertlen] = 0;
+  float ** applysun = new float* [sunlen+1];
+  applysun[sunlen] = 0;
+  for(i=0; i<vertlen; i++)
+    applyvert[i] = new float [4];
+  for(i=0; i<sunlen; i++)
+    applysun[i] = new float [4];
+
+  // interpolate the gradients
+  float day_amount = 1.0;
+  // 0.9 -- 0.1 is night to day shift
+  if(time <= 0.1) day_amount = (time + 0.1) / 0.2;
+  if(time >= 0.9) day_amount = (time - 0.9) / 0.2;
+  // 0.4 -- 0.6 is day to night shift
+  if( (time >= 0.4) && (time <= 0.6))
+    day_amount = (0.6 - time) / 0.2;
+  // 0.6 -- 0.9 is night
+  if( (time > 0.6) && (time < 0.9))
+    day_amount = 0.0;
+
+  float sc1 = day_amount;
+  float sc2 = 1.0 - day_amount;
+  for(i=0; i<vertlen; i++)
+  {
+    CS_ASSERT( dayvert[i][0] == nightvert[i][0] ) ;
+    applyvert[i][0] = dayvert[i][0];
+    applyvert[i][1] = sc1 * dayvert[i][1] + sc2 * nightvert[i][1];
+    applyvert[i][2] = sc1 * dayvert[i][2] + sc2 * nightvert[i][2];
+    applyvert[i][3] = sc1 * dayvert[i][3] + sc2 * nightvert[i][3];
+  }
+
+  float sunset_amount = 0.0;
+  if(time <= 0.1) sunset_amount = (0.1 - time) / 0.2;
+  if(time >= 0.9) sunset_amount = (1.1 - time) / 0.2;
+  if( (time >= 0.4) && (time <= 0.6))
+    sunset_amount = (time - 0.4) / 0.2;
+  if( (time > 0.6) && (time < 0.9))
+    sunset_amount = 1.0;
+
+  sc1 = 1.0 - sunset_amount;
+  sc2 = sunset_amount;
+  for(i=0; i<sunlen; i++)
+  {
+    CS_ASSERT( topsun[i][0] == sunset[i][0] ) ;
+    applysun[i][0] = topsun[i][0];
+    applysun[i][1] = sc1 * topsun[i][1] + sc2 * sunset[i][1];
+    applysun[i][2] = sc1 * topsun[i][2] + sc2 * sunset[i][2];
+    applysun[i][3] = sc1 * topsun[i][3] + sc2 * sunset[i][3];
+  }
+  float sun_size = 1.0;
+  float sunset_size = 2.0;
+  float apply_size = sun_size * sc1 + sunset_size * sc2;
+
+  /// apply the gradients
+  ApplyVertGradient(shift.y, shift.y + radiusy, applyvert);
+  /// compute sun position
+  // 0.0 is east, 0.5 is west.
+  csVector3 sunpos = shift;
+  float scaletime = time * PI * 2.0;
+  sunpos.x += cos( scaletime ) * radiusx;
+  sunpos.y += sin( scaletime ) * radiusy;
+  sunpos.z -= sin( scaletime ) * radiusz;
+  ApplyLightSpot(sunpos, apply_size, applysun);
+
+  /// compute apparent light
+  csColor apparent(1,1,1);
+  if(sunpos.y >= shift.y)
+    GetGradientColor(applysun, 0.0, apparent);
+  else
+  {
+    float maxdist = radiusy * apply_size / 1.4;
+    if(sunpos.y < shift.y - maxdist)
+      apparent.Set(0,0,0); // deep night
+    else
+      GetGradientColor(applysun, (shift.y - sunpos.y)/maxdist, apparent);
+  }
+  csColor skyatsun;
+  GetGradientColor(applyvert, 0.0, skyatsun);
+  apparent += skyatsun;
+  for(int i=0; i<num_ball_vertices; i++)
+    if(ball_vertices[i].y < shift.y)
+      ball_colors[i] = apparent;
+
+  /// delete gradients
+  for(i=0; i<vertlen; i++)
+    delete[] applyvert[i];
+  delete[] applyvert;
+  for(i=0; i<sunlen; i++)
+    delete[] applysun[i];
+  delete[] applysun;
+}
+
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csBallMeshObjectFactory)

@@ -198,6 +198,9 @@ public:
     float** gradient);
   /// apply light spot
   void ApplyLightSpot(const csVector3& position, float size, float** gradient);
+  /// paint a sky
+  void PaintSky(float time, float **dayvert, float **nightvert,
+    float **topsun, float **sunset);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -303,6 +306,11 @@ public:
       float** gradient)
     {
       scfParent->ApplyLightSpot(position, size, gradient);
+    }
+    virtual void PaintSky(float time, float **dayvert, float **nightvert,
+      float **topsun, float **sunset)
+    {
+      scfParent->PaintSky(time, dayvert, nightvert, topsun, sunset);
     }
   } scfiBallState;
   friend class BallState;
