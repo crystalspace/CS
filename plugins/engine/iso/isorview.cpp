@@ -64,6 +64,9 @@ void csIsoRenderView::DrawBuckets()
       np = p->next;
       p->next = prebuck;
       prebuck = p;
+#if CS_DEBUG
+      prebuck->g3dpolyfx = NULL;
+#endif
       p = np;
       //num++;
     }

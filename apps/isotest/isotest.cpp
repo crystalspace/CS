@@ -375,7 +375,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
 
   /// add maze grid
-  //AddMazeGrid(world, 20, 20, math2, math1);
+  printf("Adding maze grid.\n");
+  AddMazeGrid(world, 20, 20, math2, math1);
+  printf("Adding maze grid done.\n");
 
   // prepare texture manager
   txtmgr->PrepareTextures ();
@@ -395,6 +397,8 @@ static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
   float bot, float height, 
   iMaterialWrapper *side, iMaterialWrapper *top)
 {
+  height = 0;
+  return;
   for(int my=0; my<multy; my++)
     for(int mx=0; mx<multx; mx++)
       grid->SetGroundValue(x, y, mx, my, height);
@@ -432,7 +436,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   int x,y;
   for(x=1; x<width; x+=3)
     maze->MakeAccess(x, 0);
-  maze->GenerateMaze(0,0);
+  //maze->GenerateMaze(0,0);
 
   /// debug display
 #if 0
@@ -474,6 +478,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
   int gridw = width*2+1;
   int gridh = height*2+1;
   iIsoGrid *mazegrid = world->CreateGrid(gridw, gridh);
+  return;
   mazegrid->SetSpace((int)posy, (int)posx, -1.0, +10.0);
   int multx = 1;
   int multy = 1;
@@ -492,7 +497,7 @@ void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
         for(mx=0; mx<multx; mx++)
           mazegrid->SetGroundValue(x-posx, y-posy, mx, my, 0.0);
     }
-    */
+   */
 
 
   // add a light

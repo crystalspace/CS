@@ -77,12 +77,14 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
 
 void csIsoGrid::RemoveSprite(iIsoSprite *sprite)
 {
-  GetCell(sprite->GetPosition())->RemoveSprite(sprite, sprite->GetPosition());
+  iIsoCell *cell = GetCell(sprite->GetPosition());
+  if(cell) cell->RemoveSprite(sprite, sprite->GetPosition());
 }
 
 void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     const csVector3& newpos)
 {
+  //printf("IsoGrid::MoveSprite\n");
   /// same as below, but detect edging errors.
   //if(box.In(newpos)), must be epsilon from the border at least.
   if( (newpos.x - box.MinX() > EPSILON)
@@ -94,7 +96,8 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     )
   {
     //printf("Sprite moved to new pos\n");
-    GetCell(oldpos)->RemoveSprite(sprite, oldpos);
+    iIsoCell *oldcell = GetCell(oldpos);
+    if(oldcell) oldcell->RemoveSprite(sprite, oldpos);
     AddSprite(sprite, newpos);
     return;
   }
@@ -104,17 +107,20 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
   {
     // uh oh sprite moved out of *all* grids
     // disallow the movement
+    //printf("Grid: no grid, disallowed movement\n");
     sprite->ForcePosition(oldpos);
     return;
   }
   //printf("Grid: Sprite moved to new grid\n");
-  GetCell(oldpos)->RemoveSprite(sprite, oldpos);
+  iIsoCell *prevcell = GetCell(oldpos);
+  if(prevcell) prevcell->RemoveSprite(sprite, oldpos);
   sprite->SetGrid(newgrid);
   newgrid->AddSprite(sprite, newpos);
 }
 
 void csIsoGrid::Draw(iIsoRenderView *rview)
 {
+  //printf("IsoGrid::Draw pass %d\n", rview->GetRenderPass());
   // only draw all the cells in the main render pass
   if((rview->GetRenderPass() == CSISO_RENDERPASS_MAIN)
     || (rview->GetRenderPass() == CSISO_RENDERPASS_FG))
@@ -416,6 +422,8 @@ csIsoGroundMap::csIsoGroundMap(iIsoGrid *grid, int multx, int multy)
   width = grid->GetWidth() * multx;
   height = grid->GetHeight() * multy;
   map = new float[width*height];
+  for(int i=0; i<width*height; i++)
+    map[i] = 0.0f;
 }
 
 csIsoGroundMap::~csIsoGroundMap()

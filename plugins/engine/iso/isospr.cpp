@@ -36,6 +36,7 @@ csIsoSprite::csIsoSprite (iBase *iParent)
   SCF_CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
   material = NULL;
+  g3dpolyfx.num = 0;
   g3dpolyfx.mixmode = CS_FX_COPY;
   g3dpolyfx.use_fog = false;
   g3dpolyfx.mat_handle = NULL;

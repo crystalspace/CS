@@ -103,9 +103,10 @@ void csIsoView::Draw()
   
   for(int pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)
   {
+    //printf("Renderpass %d\n", pass);
     rview->SetRenderPass(pass);
     world->Draw(rview);
-    if(pass == CSISO_RENDERPASS_MAIN)
+    //if(pass == CSISO_RENDERPASS_MAIN)
       rview->DrawBuckets();
     if(pass == CSISO_RENDERPASS_PRE)
     {
@@ -116,6 +117,7 @@ void csIsoView::Draw()
 
   rview->GetG3D()->SetClipper(NULL, CS_CLIPPER_NONE);
   delete clipper;
+  //printf("IsoView::Draw done\n");
 }
 
 void csIsoView::SetScroll(const csVector3& worldpos, const csVector2& coord)
