@@ -5,7 +5,7 @@ ReadValue()
 {
     TEXT="$2"
     VARNAME="$1"
-    echo -n "$TEXT"
+    echo -n "$TEXT "
     read READVAL
     eval "$VARNAME=\"$READVAL\" ; export $VARNAME"
 }
@@ -17,7 +17,7 @@ ReadValueStrict()
     READVAL=""
     
     while test -z "$READVAL"; do
-	echo -n "$TEXT"
+	echo -n "$TEXT "
 	read READVAL
 	if test -z "$READVAL"; then
 	    echo "Please enter a value."
@@ -32,26 +32,27 @@ CheckYesNo()
     VARNAME="$1"
     TEXT="$2"
     DEFAULT="$3"
-    READOK=no
     
-    while test "$READOK" = "no"; do
-        echo -n "$TEXT"
+    while true; do
+        echo -n "$TEXT? [$DEFAULT] "
 	read READVAL       
-	
-	if test -z "$READVAL"; then
-	    eval "$VARNAME=\"$DEFAULT\" ; export $VARNAME"
-	    READOK=yes
-	elif test "$READVAL" = "yes"; then
-	    eval "$VARNAME=yes ; export $VARNAME"
-	    READOK=yes
-	elif test "$READVAL" = "no"; then
-	    eval "$VARNAME=no ; export $VARNAME"
-	    READOK=yes
-	fi
-	
-	if test "$READOK" = "no"; then
-	    echo 'Please enter "yes" or "no".'
-	fi
+	case $READVAL in
+	    "")
+		eval "$VARNAME=\"$DEFAULT\" ; export $VARNAME"
+		break
+		;;
+	    [Yy]|[Yy][Ee]|[Yy][Ee][Ss])
+		eval "$VARNAME=yes ; export $VARNAME"
+		break
+		;;
+	    [Nn]|[Nn][Oo])
+		eval "$VARNAME=no ; export $VARNAME"
+		break
+		;;
+	    *)
+		echo 'Please enter "yes" or "no".'
+		;;
+	esac
     done
 }
 
@@ -83,22 +84,36 @@ for Ducky".  You may also provide an address for the project's home page.
 Please specify a complete URI.  For example: http://www.spacefighter.org/
 
 __EOF__
-ReadValueStrict PROJECTNAME "Short name: "
-ReadValueStrict LONGNAME "Long name: "
-ReadValueStrict VERSION "Version: "
-ReadValue HOMEPAGE "Home page URI: "
+ReadValueStrict PROJECTNAME "Short name:"
+ReadValueStrict LONGNAME "Long name:"
+ReadValueStrict VERSION "Version:"
+ReadValue HOMEPAGE "Home page URI:"
 
 cat << __EOF__
 
 **** Contact
 The information about the author is mentioned in the README file and in the
 configuration script so that people see a support address when they invoke
-"./configure --help".
+"./configure --help".  When asked for the copyright information, type the full
+copyright notice as you wish it to appear in the generated files. For instance:
+"Copyright (C)2004 by Duffer McFluffer"
 
 __EOF__
-ReadValueStrict AUTHOR "Author: "
-ReadValueStrict EMAIL "Email: "
-ReadValue COPYRIGHT "Copyright: "
+ReadValueStrict AUTHOR "Author:"
+ReadValueStrict EMAIL "Email:"
+ReadValue COPYRIGHT "Copyright:"
+
+cat << __EOF__
+
+**** Dependencies
+The Crystal Entity Layer (CEL) is a set of classes and modules which layer
+game-oriented facilities atop Crystal Space. (http://cel.sourceforge.net)
+The Autoconf configuration script and Jam build system can be set up to work
+with CEL if your project will utilize this SDK.
+
+__EOF__
+
+CheckYesNo USECEL "Utilize CEL" no
 
 echo ""
 echo "*Creating project: $PROJECTNAME"
@@ -120,6 +135,7 @@ Instantiate()
 	s^#AUTHOR#^$AUTHOR^g; \
 	s^#VERSION#^$VERSION^g; \
 	s^#COPYRIGHT#^$COPYRIGHT^g; \
+	s^#USECEL#^$USECEL^g; \
 	" > "$TARGET"
 }
 
@@ -152,6 +168,7 @@ Instantiate "$TEMPLATEDIR/projheader.template" \
 Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
 Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
 
+cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
 cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
 
 chmod +x "$PROJECTNAME/autogen.sh"

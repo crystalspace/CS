@@ -66,13 +66,30 @@ AC_ARG_WITH([cs], [AC_HELP_STRING([--without-cs],
 AS_IF([test -z "$with_cs"], [with_cs=yes])
 
 AS_IF([test $with_cs != no],
-[CS_PATH_CRYSTAL_JAM([0.96], [],
+[CS_PATH_CRYSTAL_JAM([0.97], [],
   [AC_MSG_ERROR([
 *** Crystal Space could not be found. The latest version is always available
 *** from http://crystal.sourceforge.net/
 *** Also, be sure that you have either installed Crystal Space or set the
 *** CRYSTAL environment variable properly.
 ])], [cstool csgfx csgeom csutil])])
+
+m4_define([cel_desired], [#USECEL#])
+CS_EMIT_BUILD_PROPERTY([CEL.DESIRED], [cel_desired])
+m4_if(cel_desired, [yes],
+[AC_ARG_WITH([cel], [AC_HELP_STRING([--without-cel],
+  [do not look for an installed Crystal Entity Layer SDK; this option is useful
+  only if you need to perform routine maintenance tasks, such as generating
+  project files or converting documentation, without having the CEL SDK
+  installed])])
+AS_IF([test -z "$with_cel"], [with_cel=yes])
+
+AS_IF([test $with_cel != no],
+[CS_PATH_CEL([0.97], [],
+  [AC_MSG_ERROR([
+*** CEL could not be found. The latest version is always available from
+*** http://cel.sourceforge.net/
+])])])])
 
 #----------------------------------------------------------------------------
 # Package configuration switches

@@ -5,6 +5,6 @@ CS_IMPLEMENT_APPLICATION
 int main(int argc, char** argv)
 {
   (void)argc; (void)argv;
-  printf("This is the insanely great #PROJECTNAME# project.\n");
+  printf("This is #PROJECTNAME# version #VERSION# by #AUTHOR#.\n");
   return 0;
 }

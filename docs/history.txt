@@ -13,6 +13,9 @@ chronological order.
 	- Eric Sunshine completely rewrote documentation for the ExternalLibs
 	  rule in flags.jam.  The existing documentation was 100% incorrect and
 	  highly misleading.
+	- Eric Sunshine augmented jamtemplate/createproject.sh so that it can
+	  optionally set up a dependency upon CEL in the generated Autoconf and
+	  Jam support files, if requested.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where

@@ -47,6 +47,17 @@ MsvcGenConfig CRYSTAL.LFLAGS.DEBUG ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
   "libcstool_d.lib libcsgfx_d.lib libcsgeom_d.lib libcsutil_d.lib" ;
 
+if $(CEL.DESIRED) = yes
+{
+MsvcGenConfig CEL.AVAILABLE : yes ;
+MsvcGenConfig CEL.CFLAGS ;
+MsvcGenConfig CEL.LFLAGS ;
+MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
+MsvcGenConfig CEL.CFLAGS.DEBUG ;
+MsvcGenConfig CEL.LFLAGS.DEBUG ;
+MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
+}
+
 # Set project-specific compiler and linker options for msvcgen.
 #MsvcGenConfig MSVC.CFLAGS : "/D \"MY_DEFINE\"" ;
 #MsvcGenConfig MSVC.CFLAGS_DEBUG : "/D \"MY_DEBUG_DEFINE\"" ;

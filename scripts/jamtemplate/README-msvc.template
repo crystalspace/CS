@@ -5,7 +5,7 @@ If the project files become outdated, you can re-generate them by invoking
 "jam msvcgen". Copy the generated files from the build subdirectory `out/msvc'
 to `#PROJECTNAME#/msvc'.
 
-MSVC6 project and workspce files (.dsp and .dsw) must be committed to a CVS
+MSVC6 project and workspace files (.dsp and .dsw) must be committed to a CVS
 repository as "binary" files.  For example: `cvs add -kb *.dsp *.dsw'.
 Generated .rc files and all MSVC7 project and solution files can be committed
 as plain text.  For example: `cvs add *.rc *.vcproj *.sln'.
