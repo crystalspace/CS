@@ -1251,10 +1251,10 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
     thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
 
-  if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->Transform ();
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
+  if (!(flags & CS_LOADER_NOTRANSFORM))
+    thing->Transform ();
 
   return thing;
 }
@@ -1386,10 +1386,10 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
   }
 
   thing->SetTransform (obj);
-  if (!(flags & CS_LOADER_NOTRANSFORM))
-    thing->Transform ();
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
+  if (!(flags & CS_LOADER_NOTRANSFORM))
+    thing->Transform ();
   if (is_convex || thing->GetFog ().enabled)
     thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
 
