@@ -81,12 +81,17 @@ def SetupFrame ():
 	ft2 = sprite2.GetMovable().GetFullTransform()
 	cd = cdsys.Collide(sprite1_col, ft1, sprite2_col, ft2)
 	if cd:
+		if snd and boom:
+			sndsrc = boom.CreateSource(SOUND3D_ABSOLUTE)
+			if sndsrc:
+				sndsrc.Play()
 		sprite1.GetMovable().SetTransform(old_trans1)
 		sprite1.GetMovable().UpdateMove()
 		sprite2.GetMovable().SetTransform(old_trans2)
 		sprite2.GetMovable().UpdateMove()
 		rot1_direction = -rot1_direction
 		rot2_direction = -rot2_direction
+
 	parent_sprite.DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10)
 
 	# Now rotate the camera according to keyboard state
@@ -148,9 +153,8 @@ def InitCollider (mesh):
 	polmesh = SCF_QUERY_INTERFACE(mesh.GetMeshObject(), iPolygonMesh)
 	if polmesh:
 		wrap = csColliderWrapper(
-			mesh.QueryObject(), cdsys.__deref__(), polmesh.__deref__()
+			mesh.QueryObject(), cdsys, polmesh
 		)
-		wrap.DecRef()
 		if 1: # Not needed in C++, but necessary here... strange... TODO
 			wrap.GetCollider().IncRef()
 		return wrap.GetCollider()
@@ -175,6 +179,9 @@ plugin_requests = [
 	CS_REQUEST_ENGINE,
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_PLUGIN("crystalspace.sound.loader.wav", iSoundLoader),
+	CS_REQUEST_PLUGIN("crystalspace.sound.driver.oss", iSoundDriver),
+	CS_REQUEST_PLUGIN("crystalspace.sound.render.software", iSoundRender),
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER, 
 	CS_REQUEST_REPORTERLISTENER,
@@ -226,6 +233,10 @@ if not kbd:
 	Report(CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!")
 	sys.exit(1)
 
+snd = CS_QUERY_REGISTRY(object_reg, iSoundRender)
+if not snd:
+	Report(CS_REPORTER_SEVERITY_ERROR, "No iSoundRender!")
+
 # Open the main system. This will open all the previously loaded plug-ins.
 nw = myG3D.GetDriver2D().GetNativeWindow()
 if nw:
@@ -269,7 +280,7 @@ Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------")
 # You don't have to use csView as you can do the same by
 # manually creating a camera and a clipper but it makes things a little
 # easier.
-view = csView(engine.__deref__(), myG3D.__deref__())
+view = csView(engine, myG3D)
 view.GetCamera().SetSector(room)
 view.GetCamera().GetTransform().SetOrigin(csVector3(0, 5, -6))
 g2d = myG3D.GetDriver2D()
@@ -287,14 +298,16 @@ if not txt:
 
 imeshfact = loader.LoadMeshObjectFactory("/lib/std/sprite2")
 if not imeshfact:
-	csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	csReport(
+		object_reg, CS_REPORTER_SEVERITY_ERROR,
 		"crystalspace.application.pysimpcd",
-		"Error loading mesh object factory!")
+		"Error loading mesh object factory!"
+	)
 	sys.exit(1)
 
 # First create the parent sprite.
 parent_sprite = engine.CreateMeshWrapper(
-	imeshfact.__deref__(), "Parent", room, csVector3(0, 5, 3.5)
+	imeshfact, "Parent", room, csVector3(0, 5, 3.5)
 )
 spstate = SCF_QUERY_INTERFACE(parent_sprite.GetMeshObject(), iSprite3DState)
 spstate.SetAction("default")
@@ -303,22 +316,22 @@ parent_sprite.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 parent_sprite.GetMovable().UpdateMove()
 
 # Now create the first child.
-sprite1 = engine.CreateMeshWrapper(imeshfact.__deref__(), "Rotater1")
+sprite1 = engine.CreateMeshWrapper(imeshfact, "Rotater1")
 sprite1.GetMovable().SetPosition(csVector3(0, -.5, -.5))
 sprite1.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 sprite1.GetMovable().UpdateMove() 
 spstate = SCF_QUERY_INTERFACE(sprite1.GetMeshObject(), iSprite3DState)
 spstate.SetAction("default")
-parent_sprite.GetChildren().Add(sprite1.__deref__())
+parent_sprite.GetChildren().Add(sprite1)
 
 # Now create the second child.
-sprite2 = engine.CreateMeshWrapper(imeshfact.__deref__(), "Rotater2")
+sprite2 = engine.CreateMeshWrapper(imeshfact, "Rotater2")
 sprite2.GetMovable().SetPosition(csVector3(0, .5, -.5))
 sprite2.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 sprite2.GetMovable().UpdateMove()
 spstate = SCF_QUERY_INTERFACE(sprite2.GetMeshObject(), iSprite3DState)
 spstate.SetAction("default")
-parent_sprite.GetChildren().Add(sprite2.__deref__())
+parent_sprite.GetChildren().Add(sprite2)
     
 # We only do collision detection for the rotating children
 # so that's the only colliders we have to create.
@@ -328,6 +341,16 @@ if not sprite1_col:
 sprite2_col = InitCollider(sprite2)
 if not sprite2_col:
 	sys.exit(1)
+
+if snd:
+	w = LevelLoader.LoadSound('boom', '/lib/std/whoosh.wav')
+	if w:
+		boom = w.GetSound()
+	else:
+		csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
+			"crystalspace.application.pysimpcd", "Error getting sound!"
+		)
+		boom = None
 
 csDefaultRunLoop(object_reg)
 

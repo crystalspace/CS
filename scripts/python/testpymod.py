@@ -213,7 +213,7 @@ if 0:
 	Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading script.python plugin...")
 	# Initialize the python plugin.
 	script = CS_LOAD_PLUGIN(
-		plugin_mgr.__deref__(), "crystalspace.script.python", iScript
+		plugin_mgr, "crystalspace.script.python", iScript
 	)
 	if script:
 		Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading pysimp module...")
@@ -244,7 +244,7 @@ Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------")
 # You don't have to use csView as you can do the same by
 # manually creating a camera and a clipper but it makes things a little
 # easier.
-view = csView(engine.__deref__(), myG3D.__deref__())
+view = csView(engine, myG3D)
 view.GetCamera().SetSector(room)
 view.GetCamera().GetTransform().SetOrigin(csVector3(0, 2, 0))
 g2d = myG3D.GetDriver2D()
