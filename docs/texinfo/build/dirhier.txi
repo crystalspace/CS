@@ -73,11 +73,6 @@ This directory contains the @sc{html} conversion of the Texinfo Crystal Space
 documentation.  Most users will want to look at the file
 @file{CS/docs/html/index.html} that resides here.
 
-@item CS/docs/incoming
-This is a temporary staging area for documentation which has not yet been
-converted to Texinfo format.  Much of this documentation is useful and worth
-perusing.
-
 @item CS/docs/pubapi
 This directory contains the Crystal Space @sc{sdk}'s public @sc{api} reference
 manual rendered in @sc{html} format.
@@ -139,8 +134,6 @@ are located here.
 @table @code
 @item CS/libs/cssys/general
 Code which may be shared between system drivers that can make use of it.
-@item CS/libs/cssys/be
-BeOS
 @item CS/libs/cssys/djgpp
 @sc{dos} using the @sc{djgpp} compiler
 @item CS/libs/cssys/next
@@ -148,7 +141,7 @@ MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep
 @item CS/libs/cssys/os2
 @sc{os/2}
 @item CS/libs/cssys/unix
-Linux, FreeBSD, NetBSD, Solaris, Irix, @sc{gnu/hurd}
+Unix, Linux, FreeBSD, NetBSD, Solaris, Irix, etc.
 @item CS/libs/cssys/win32
 Windows 32-bit (9x, @sc{nt}, @sc{me}, 2000, @sc{xp})
 @end table
@@ -177,7 +170,9 @@ This directory contains the common parts of the makefiles for many systems
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from @sc{gnu} makefiles project-wide.
 @item CS/mk/visualc
-Project files for Win32 using @sc{msvc} 5.0/6.0/7.0
+Project files for Win32 using @sc{msvc} 5.0/6.0
+@item CS/mk/visualc7
+Project files for Win32 using @sc{msvc} 7.0
 @end table
 
 @item CS/plugins
@@ -191,10 +186,17 @@ Alternate Windowing System
 @item CS/plugins/bugplug
 Crystal Space Debugger
 
+@item CS/plugins/collide
+Collision detection plugins.
+
+@table @code
 @item CS/plugins/collide/rapid
-This is the @sc{rapid} collision detection plugin. In the future we may
-have other collision detection plugins in the @file{CS/plugins/collide}
-directory.
+This is the @sc{rapid} collision detection plugin.
+
+@item CS/plugins/collide/opcode
+This is the Opcode collision detection plugin which is based upon the Opcode
+library.
+@end table
 
 @item CS/plugins/console
 Various console plugins for input/output. A console is typically overlayed
@@ -211,9 +213,6 @@ Lua @sc{swig} interface
 @item CS/plugins/cscript/cspython
 Python @sc{swig} interface
 @end table
-
-@item CS/plugins/cslexan
-A lexical analyzer which can be used to break text into tokens.
 
 @item CS/plugins/csparser
 A plugin which parses @sc{ascii} map files and imports the map into the
@@ -280,7 +279,7 @@ the old isometric world loader plug-in
 @item CS/plugins/mesh
 Various mesh object implementations (@pxref{MeshObject}). For every mesh object
 there is typically one implementation in @file{object/} and one or more
-loader/saver plugins in @file{persist/}. @file{persist/classic/} is the loader
+loader/saver plugins in @file{persist/}. @file{persist/standard/} is the loader
 in Crystal Space format.
 
 @item CS/plugins/motion
@@ -384,9 +383,6 @@ Allegro Game driver
 @item CS/plugins/video/canvas/asciiart
 @sc{ascii} Art driver
 
-@item CS/plugins/video/canvas/be
-BeOS driver
-
 @item CS/plugins/video/canvas/common
 Common code for 2D drivers
 
@@ -422,9 +418,6 @@ MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep drivers
 
 @item CS/plugins/video/canvas/openglcommon
 Common code for all OpenGL 2D drivers
-
-@item CS/plugins/video/canvas/openglbe
-OpenGL 2D driver for BeOS
 
 @item CS/plugins/video/canvas/openglos2
 OpenGL 2D driver for @sc{os/2}

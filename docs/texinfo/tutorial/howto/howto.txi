@@ -25,6 +25,7 @@ code.
 * HOWTO User Objects:: Attaching User Objects to CS Objects
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC Application:: Creating an External @sc{msvc} Application
+* HOWTO Creating External Application using KDevelop:: Creating an External Application using KDevelop
 * HOWTO Setting the CRYSTAL enviroment variable:: Setting the CRYSTAL enviroment variable
 * HOWTO Create Your Own Plugin:: Create Your Own Plugin
 * HOWTO Simple Map Example:: Simple Map Example
@@ -43,6 +44,7 @@ code.
 @importss{tutorial,howto,userobj.txi}
 @importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvcproj,msvcproj.txi}
+@importsss{tutorial,howto,kdevproj,kdevproj.txi}
 @importss{tutorial,howto,envvar.txi}
 @importss{tutorial,howto,plugin.txi}
 @importss{tutorial,howto,simpmap.txi}

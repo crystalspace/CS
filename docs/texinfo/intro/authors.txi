@@ -184,6 +184,11 @@ Philip Wyett (@email{philipwyett@@dsl.pipex.com})
 Philip has taken over from Frank O'Connor as the Windows port maintainer.
 He also maintains the instructions for building Crystal Space on Windows.
 
+@item
+Andreas Busch (@email{nobita@@t-online.de})
+
+Andreas wrote documentation explaining how to build Crystal Space with
+KDevelop.
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.

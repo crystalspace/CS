@@ -30,6 +30,18 @@ The history order is reversed so that new features are at the top.
 	  synthesized file is more preprocessor-friendly (that it, the change
 	  eliminates thousands of warnings emitted by the preprocessor when
 	  processing the synthesized file).
+	- Eric Sunshine made the following documentation-related changes:
+	    - Fixed mark-up problems in howto/envvar.txi.
+	    - Added discussion of C-shell to howto/envvar.txi.
+	    - Added MacOS/X-specific discussion to howto/envvar.txi.
+	    - Updated dirhier.txi.  Removed obsolete entries.  Added missing
+	      entries.
+	    - Scaled down an EPS image in the "Cygwin build" instructions so
+	      that it actually fits on a printed piece of paper.
+	    - Added a new How-To from Andreas Busch <nobita@t-online.de> which
+	      illustrates creation of external CS programs using KDevelop.
+	    - Applied a couple minor typographical corrections pointed out by
+	      Andreas Busch.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking

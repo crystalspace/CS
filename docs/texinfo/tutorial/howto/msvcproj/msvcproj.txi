@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External MSVC Application, HOWTO Setting the CRYSTAL enviroment variable, HOWTO CS Project, HOWTO
+@node HOWTO Creating External MSVC Application, HOWTO Creating External Application using KDevelop, HOWTO CS Project, HOWTO
 @subsection Creating an External @sc{msvc} Application
 
 This @sc{howto} is a step by step guide for creating a Crystal Space
@@ -51,7 +51,7 @@ ready to be filled in.
 
 Next, copy and paste the @file{simple1.cpp} and @file{simple1.h} from the
 Crystal Space code tree and paste them into the newly created @file{simple1}
-project directory.  Thes files can be found here:
+project directory.  These files can be found here:
 
 @noindent
 @file{CS/apps/tutorial/simple1}
