@@ -14,9 +14,10 @@
 //-----------------------------------------------------------------------------
 // osdefs.h
 //
-//	Platform-specific interface to common functionality.
+//	Platform-specific interface to common functionality.  Compatible
+//	with MacOS/X Server, OpenStep, and NextStep.
 //
-// *NOTE* This file is included by system/sysdef.h and must not be renamed.
+// *NOTE* This file is included by include/sysdef.h and must not be renamed.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -24,6 +25,12 @@
 //-----------------------------------------------------------------------------
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
+
+
+//-----------------------------------------------------------------------------
+// NeXT does not know about wchar_t, so fake one up for the COM system.
+//-----------------------------------------------------------------------------
+typedef unsigned short wchar_t;
 
 
 //-----------------------------------------------------------------------------
