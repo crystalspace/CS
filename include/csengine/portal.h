@@ -28,6 +28,7 @@ class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
 class csObject;
+class csMeshWrapper;
 struct iRenderView;
 struct iFrustumView;
 
@@ -197,7 +198,7 @@ public:
    * not allow traversing the same sector more than five times).
    * Optionally returns the polygon in 'polygonPtr'.
    */
-  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect, csPolygon3D** polygonPtr);
 
   /**

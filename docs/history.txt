@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+21-Sep-2001
+	- Fixed csSector::IntersectSegment() so that it no longer ignores
+	  all the other meshes if there is a culler. The culler is now
+	  used in addition to the other meshes.
+	- Added a new optional parameter to csSector::IntersectSegment()
+	  to return the mesh wrapper that is hit.
+	- Changed the return value of csSector::HitBeam() to csMeshWrapper
+	  (instead of csObject) and the return value of iSector::HitBeam()
+	  to iMeshWrapper.
+	- Modified csSector::HitBeam() so that it will actually return the
+	  mesh wrapper that is hit instead of the csObject. This mesh will
+	  also be returned in all cases now.
+	- Accordingly modified csPortal::HitBeam().
 20-Sep-2001
 	- Fixed the bug in csFrustum::Classify() and BatchClassify().
 	  It now seems to work properly in all cases I could find.

@@ -299,12 +299,11 @@ public:
 
   /**
    * Follow a beam from start to end and return the first object
-   * that is hit. Objects can be meshes, things, or sectors.
-   * In case it is a thing or sector the csPolygon3D field will be
+   * that is hit. In case it is a thing the csPolygon3D field will be
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  csObject* HitBeam (const csVector3& start, const csVector3& end,
+  csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& intersect, csPolygon3D** polygonPtr);
 
   /**
@@ -375,19 +374,21 @@ public:
    * This function is an extension of csPolygonSet::intersect_segment in
    * that it will also test for hits against things.<p>
    *
-   * If 'only_portals' == true only portals are checked.
+   * If 'only_portals' == true only portals are checked.<p>
+   *
+   * If 'mesh' != NULL the mesh will be filled in.
    */
-  virtual csPolygon3D* IntersectSegment (const csVector3& start,
+  csPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false);
+	float* pr = NULL, bool only_portals = false,
+	csMeshWrapper** p_mesh = NULL);
 
   /**
    * Calculate the bounding box of all objects in this sector.
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  void CalculateSectorBBox (csBox3& bbox, bool do_meshes)
-    const;
+  void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const;
 
   //------------------------------------------------
   // Everything for setting up the lighting system.
@@ -489,7 +490,7 @@ public:
     { scfParent->DisableFog (); }
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
-    virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
+    virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& intersect, iPolygon3D** polygonPtr);
     virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror, bool only_portals = false);

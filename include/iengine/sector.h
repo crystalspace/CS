@@ -40,7 +40,7 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 4, 0);
+SCF_VERSION (iSector, 0, 4, 1);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -116,12 +116,11 @@ struct iSector : public iBase
 
   /**
    * Follow a beam from start to end and return the first object
-   * that is hit. Objects can be meshes, things, or sectors.
-   * In case it is a thing or sector the iPolygon3D field will be
+   * that is hit. In case it is a thing the iPolygon3D field will be
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  virtual iObject* HitBeam (const csVector3& start, const csVector3& end,
+  virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& intersect, iPolygon3D** polygonPtr) = 0;
 
   /**

@@ -368,8 +368,8 @@ csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
   else return NULL;
 }
 
-csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVector3& isect,
-	csPolygon3D** polygonPtr)
+csMeshWrapper* csSector::HitBeam (const csVector3& start,
+	const csVector3& end, csVector3& isect, csPolygon3D** polygonPtr)
 {
   float r, best_mesh_r = 10000000000.;
   iMeshWrapper* near_mesh = NULL;
@@ -392,7 +392,9 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
   }
 
   float best_poly_r;
-  csPolygon3D* p = IntersectSegment (start, end, isect, &best_poly_r);
+  csMeshWrapper* poly_mesh;
+  csPolygon3D* p = IntersectSegment (start, end, isect, &best_poly_r,
+  	false, &poly_mesh);
   // We hit a polygon and the polygon is closer than the mesh.
   if (p && best_poly_r < best_mesh_r)
   {
@@ -401,25 +403,26 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
     {
       draw_busy++;
       csVector3 new_start = isect;
-      csObject* obj = po->HitBeam (new_start, end, isect, polygonPtr);
+      csMeshWrapper* obj = po->HitBeam (new_start, end, isect, polygonPtr);
       draw_busy--;
       return obj;
     }
     else
     {
       if (polygonPtr) *polygonPtr = p;
-      return (csObject*)(p->GetParent ());
+      return poly_mesh;
     }
   }
   // The mesh is closer (or there is no mesh).
   if (polygonPtr) *polygonPtr = NULL;
   isect = tsect;
-  return (csObject*)near_mesh;
+  return near_mesh->GetPrivateObject ();
 }
 
 
 csPolygon3D* csSector::IntersectSegment (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr, bool only_portals)
+  const csVector3& end, csVector3& isect, float* pr, bool only_portals,
+  csMeshWrapper** p_mesh)
 {
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
@@ -432,54 +435,59 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
     iPolygon3D* ip = culler->IntersectSegment (start, end,
-	isect, pr);
-    if (ip) return ip->GetPrivateObject ();
-    else return NULL;
-  }
-  else
-  {
-    int i;
-    for (i = 0 ; i < meshes.Length () ; i++)
+	isect, &r);
+    if (ip)
     {
-      iMeshWrapper* mesh = meshes.Get (i);
-      // @@@ UGLY!!!
-      iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
-      	iThingState);
-      if (ith)
-      {
-        csThing* sp = (csThing*)(ith->GetPrivateObject ());
-        r = best_r;
-	//@@@ Put this in csMeshWrapper???
-        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
-        {
-          obj_start = start;
-	  obj_end = end;
-        }
-        else
-        {
-          movtrans = mesh->GetMovable ()->GetFullTransform ();
-          obj_start = movtrans.Other2This (start);
-	  obj_end = movtrans.Other2This (end);
-        }
-        csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end,
-		obj_isect, &r, only_portals);
-        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
-          cur_isect = obj_isect;
-        else
-          cur_isect = movtrans.This2Other (obj_isect);
-
-        if (p && r < best_r)
-        {
-          best_r = r;
-	  best_p = p;
-	  isect = cur_isect;
-        }
-        ith->DecRef ();
-      }
+      best_p = ip->GetPrivateObject ();
+      best_r = r;
+      if (p_mesh) *p_mesh = culler_mesh;
     }
-    if (pr) *pr = best_r;
-    return best_p;
   }
+
+  int i;
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    iMeshWrapper* mesh = meshes.Get (i);
+    if (culler_mesh && !only_portals && mesh == &(culler_mesh->scfiMeshWrapper))
+      continue;	// Already handled above.
+    // @@@ UGLY!!!
+    iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
+      	iThingState);
+    if (ith)
+    {
+      csThing* sp = (csThing*)(ith->GetPrivateObject ());
+      r = best_r;
+      //@@@ Put this in csMeshWrapper???
+      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+      {
+        obj_start = start;
+	obj_end = end;
+      }
+      else
+      {
+        movtrans = mesh->GetMovable ()->GetFullTransform ();
+        obj_start = movtrans.Other2This (start);
+	obj_end = movtrans.Other2This (end);
+      }
+      csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end,
+		obj_isect, &r, only_portals);
+      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+        cur_isect = obj_isect;
+      else
+        cur_isect = movtrans.This2Other (obj_isect);
+
+      if (p && r < best_r)
+      {
+        best_r = r;
+	best_p = p;
+	isect = cur_isect;
+	if (p_mesh) *p_mesh = mesh->GetPrivateObject ();
+      }
+      ith->DecRef ();
+    }
+  }
+  if (pr) *pr = best_r;
+  return best_p;
 }
 
 csSector* csSector::FollowSegment (csReversibleTransform& t,
@@ -1117,11 +1125,12 @@ iPolygon3D* csSector::eiSector::HitBeam (const csVector3& start,
   else return NULL;
 }
 
-iObject* csSector::eiSector::HitBeam (const csVector3& start,
+iMeshWrapper* csSector::eiSector::HitBeam (const csVector3& start,
 	const csVector3& end, csVector3& isect, iPolygon3D** polygonPtr)
 {
   csPolygon3D* p = NULL;
-  csObject* obj = scfParent->HitBeam (start, end, isect, polygonPtr ? &p : NULL);
+  csMeshWrapper* obj = scfParent->HitBeam (start, end, isect,
+    polygonPtr ? &p : NULL);
   if (obj)
   {
     if (p)
@@ -1129,7 +1138,7 @@ iObject* csSector::eiSector::HitBeam (const csVector3& start,
       *polygonPtr = &(p->scfiPolygon3D);
     }
   }
-  return (iObject*)obj;
+  return &(obj->scfiMeshWrapper);
 }
 
 iSector* csSector::eiSector::FollowSegment (csReversibleTransform& t,

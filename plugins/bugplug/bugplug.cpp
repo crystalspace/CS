@@ -297,7 +297,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   sector->HitBeam (origin, end, isect);
   iPolygon3D* poly = NULL;
-  iObject* sel = sector->HitBeam (origin, end, isect, &poly);
+  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
   const char* poly_name;
   unsigned long poly_id;
   if (poly)
@@ -323,33 +323,28 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   if (sel)
   {
-    iMeshWrapper* mesh = SCF_QUERY_INTERFACE (sel, iMeshWrapper);
-    if (mesh)
-    {
-      // First release the ref to the previous selected_mesh.
-      if (selected_mesh) selected_mesh->DecRef ();
+    // First release the ref to the previous selected_mesh.
+    if (selected_mesh) selected_mesh->DecRef ();
 
-      // The SCF_QUERY_INTERFACE increased the reference to this mesh. We
-      // don't DecRef() it to make sure it doesn't get deleted while
-      // BugPlug still has a reference.
-      // But of course we have to make sure that it will actually get
-      // deleted when the app/engine wants it deleted. So BugPlug will
-      // monitor the ref count of this mesh and decrease its own reference
-      // as soon as the ref count reaches one.
-      selected_mesh = mesh;
-      const char* n = selected_mesh->QueryObject ()->GetName ();
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
+    // Here we incref our mesh.
+    sel->IncRef ();
+    // But of course we have to make sure that it will actually get
+    // deleted when the app/engine wants it deleted. So BugPlug will
+    // monitor the ref count of this mesh and decrease its own reference
+    // as soon as the ref count reaches one.
+    selected_mesh = sel;
+    const char* n = selected_mesh->QueryObject ()->GetName ();
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
-      bool bbox, rad, bm;
-      shadow->GetShowOptions (bbox, rad, bm);
-      shadow->SetShadowMesh (selected_mesh);
+    bool bbox, rad, bm;
+    shadow->GetShowOptions (bbox, rad, bm);
+    shadow->SetShadowMesh (selected_mesh);
 
-      shadow->SetBeam (origin, end, isect);
-      if (bbox || rad || bm)
-	shadow->AddToEngine (Engine);
-      else
-	shadow->RemoveFromEngine (Engine);
-    }
+    shadow->SetBeam (origin, end, isect);
+    if (bbox || rad || bm)
+      shadow->AddToEngine (Engine);
+    else
+      shadow->RemoveFromEngine (Engine);
   }
 }
 

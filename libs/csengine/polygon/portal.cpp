@@ -339,8 +339,8 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
   }
 }
 
-csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end, csVector3& isect,
-	csPolygon3D** polygonPtr)
+csMeshWrapper* csPortal::HitBeam (const csVector3& start,
+	const csVector3& end, csVector3& isect, csPolygon3D** polygonPtr)
 {
   if (!CompleteSector (NULL)) return NULL;
 
@@ -350,10 +350,12 @@ csObject* csPortal::HitBeam (const csVector3& start, const csVector3& end, csVec
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
-    csObject* o = sector->GetPrivateObject ()->HitBeam (new_start, new_end, isect, polygonPtr);
+    csMeshWrapper* o = sector->GetPrivateObject ()
+    	->HitBeam (new_start, new_end, isect, polygonPtr);
     return o;
   }
-  else return sector->GetPrivateObject ()->HitBeam (start, end, isect, polygonPtr);
+  else return sector->GetPrivateObject ()
+  	->HitBeam (start, end, isect, polygonPtr);
 }
 
 void csPortal::CheckFrustum (iFrustumView* lview, int alpha)
