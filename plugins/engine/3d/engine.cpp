@@ -77,6 +77,8 @@
 #include "iengine/rendersteps/irsfact.h"
 #include "iengine/rendersteps/igeneric.h"
 
+CS_IMPLEMENT_PLUGIN
+
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)
 {
