@@ -745,7 +745,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
-  csRef<csImageVector> cubetextures = new csImageVector();
+  csRef<iImageVector> cubetextures = csPtr<iImageVector>(new csImageVector());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
@@ -870,13 +870,13 @@ error:
 iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
-   csRef<csImageVector> cubetextures = new csImageVector();
+   csRef<iImageVector> cubetextures = csPtr<iImageVector>(new csImageVector());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
   int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
   
-  csRef<iImageVector> imagevec = new csImageVector();
+  csRef<iImageVector> imagevec = csPtr<iImageVector>(new csImageVector());
   csRef<iImage> image;
 
   const char* texname = node->GetAttributeValue ("name");
