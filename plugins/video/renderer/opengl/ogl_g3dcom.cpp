@@ -1829,6 +1829,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     {
       glEnable (GL_ALPHA_TEST);
       glAlphaFunc (GL_GEQUAL, 0.8);
+      SetupBlend (queue.mixmode, 1.0f, false);
     }
     else
     {
@@ -5959,6 +5960,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   {
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.8);
+    SetupBlend (queue.mixmode, 1.0f, false);
   }
   if (ARB_texture_env_combine)
   {
