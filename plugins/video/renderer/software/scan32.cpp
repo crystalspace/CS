@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "scan.h"
-#include "tables.h"
 #include "ipolygon.h"
 #include "ilghtmap.h"
 
@@ -228,17 +227,17 @@ void csScan_32_draw_scanline_fog_RGB (int xx, unsigned char* d,
       // inside it; however we should handle this case as well.
       if ((izb < 0x1000000) && (izz > izb))
       {
-        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        fd = fog_dens * (Scan.one_div_z [izb >> 12] - (Scan.one_div_z [izz >> 20] >> 8)) >> 12;
         goto fd_done;
       }
     }
     else if (izz > izb)
     {
-      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+      fd = fog_dens * (Scan.one_div_z [izb >> 12] - Scan.one_div_z [izz >> 12]) >> 12;
 fd_done:
       if (fd < EXP_256_SIZE)
       {
-        fd = tables.exp_256 [fd];
+        fd = Scan.exp_256 [fd];
         register int r = (fd * ((*_dest & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((*_dest & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
@@ -283,17 +282,17 @@ void csScan_32_draw_scanline_fog_BGR (int xx, unsigned char* d,
       // inside it; however we should handle this case as well.
       if ((izb < 0x1000000) && (izz > izb))
       {
-        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        fd = fog_dens * (Scan.one_div_z [izb >> 12] - (Scan.one_div_z [izz >> 20] >> 8)) >> 12;
         goto fd_done;
       }
     }
     else if (izz > izb)
     {
-      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+      fd = fog_dens * (Scan.one_div_z [izb >> 12] - Scan.one_div_z [izz >> 12]) >> 12;
 fd_done:
       if (fd < EXP_256_SIZE)
       {
-        fd = tables.exp_256 [fd];
+        fd = Scan.exp_256 [fd];
         register int r = (fd * ((*_dest & 0x000000ff) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((*_dest & 0x00ff0000) - Scan.FogB) >> 8) + Scan.FogB;
@@ -330,10 +329,10 @@ void csScan_32_draw_scanline_fog_view_RGB (int xx, unsigned char* d,
     unsigned long izb = *z_buf;
     if (izb < 0x1000000)
     {
-      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
+      int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
       if (fd < EXP_256_SIZE)
       {
-        fd = tables.exp_256 [fd];
+        fd = Scan.exp_256 [fd];
         register int r = (fd * ((*_dest & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((*_dest & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
@@ -369,10 +368,10 @@ void csScan_32_draw_scanline_fog_view_BGR (int xx, unsigned char* d,
     unsigned long izb = *z_buf;
     if (izb < 0x1000000)
     {
-      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
+      int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
       if (fd < EXP_256_SIZE)
       {
-        fd = tables.exp_256 [fd];
+        fd = Scan.exp_256 [fd];
         register int r = (fd * ((*_dest & 0x000000ff) - Scan.FogR) >> 8) + Scan.FogR;
         register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
         register int b = (fd * ((*_dest & 0x00ff0000) - Scan.FogB) >> 8) + Scan.FogB;
@@ -400,7 +399,7 @@ void csScan_32_draw_scanline_fog_plane_RGB (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
+  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
 
   do
   {
@@ -425,7 +424,7 @@ void csScan_32_draw_scanline_fog_plane_BGR (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
+  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
 
   do
   {

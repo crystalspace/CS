@@ -110,6 +110,16 @@ __TEXT_SECT__
 %define unsigned_int		__dword_field
 %define unsigned_short_P	__dword_field
 %define RGB8map_P		__dword_field
+%define int_P			__dword_field
+%define unsigned_int_P		__dword_field
+
+; A coefficient for planar fog density: bigger is denser
+%define PLANAR_FOG_DENSITY_COEF	6
+
+; At this point QRound (255 * exp (-float (i) / 256.)) reaches zero
+%define EXP_256_SIZE			1420
+; Same for QRound (32 * exp (-float (i) / 256.))
+%define EXP_32_SIZE			1065
 
 struc csScanSetup
   ; Interpolation step for semi-perspective correct texture mapping
@@ -123,12 +133,12 @@ struc csScanSetup
   int FogR;
   int FogG;
   int FogB;
-  ; The fog table for paletted (currently only 8-bit) modes
-  unsigned_char_P Fog8;
+  ; The pixel value of fog (FogR|FogG|FogB for truecolor modes)
+  int FogPix;
   ; Fog density
   unsigned_long FogDensity;
-  ; The index into palette of fog color
-  int FogIndex;
+  ; The fog table for paletted (currently only 8-bit) modes
+  unsigned_char_P Fog8;
 
   ; A pointer to the texture.
   csTextureMMSoftware_P Texture;
@@ -209,6 +219,20 @@ struc csScanSetup
   unsigned_short_P PaletteTable;
   ; Set up by poly renderer to alpha blending table
   RGB8map_P AlphaMap;
+
+  ; table used for bilinear filtering
+  int_P filter_mul_table;
+
+  ; table used for DrawPolygonFX
+  unsigned_short_P color_565_table;
+
+  ; 4096 1/z values where z is in fixed-point 0.12 format
+  unsigned_int_P one_div_z;
+
+  ; A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
+  unsigned_char_P exp_256;
+  ; Same in the range 0..31 for 8-bit fog
+  unsigned_char_P exp_16;
 endstruc
 
 ; The only external variable of csScanSetup type

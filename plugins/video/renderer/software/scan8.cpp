@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "scan.h"
-#include "tables.h"
 #include "tcache.h"
 #include "isystem.h"
 #include "ipolygon.h"
@@ -565,7 +564,7 @@ void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
   ULong fog_dens = Scan.FogDensity;
-  unsigned char fog_pix = Scan.FogIndex;
+  unsigned char fog_pix = Scan.FogPix;
 
   do
   {
@@ -578,16 +577,16 @@ void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
       // inside it; however we should handle this case as well.
       if ((izb < 0x1000000) && (izz > izb))
       {
-        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        fd = fog_dens * (Scan.one_div_z [izb >> 12] - (Scan.one_div_z [izz >> 20] >> 8)) >> 12;
         goto fd_done;
       }
     }
     else if (izz > izb)
     {
-      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+      fd = fog_dens * (Scan.one_div_z [izb >> 12] - Scan.one_div_z [izz >> 12]) >> 12;
 fd_done:
-      if (fd < EXP_16_SIZE)
-        *_dest = Scan.Fog8 [(tables.exp_16 [fd] << 8) | *_dest];
+      if (fd < EXP_32_SIZE)
+        *_dest = Scan.Fog8 [(Scan.exp_16 [fd] << 8) | *_dest];
       else
         *_dest = fog_pix;
     }
@@ -612,16 +611,16 @@ void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
   unsigned char *_dest = (unsigned char *)d;
   unsigned char *_destend = _dest + xx;
   ULong fog_dens = Scan.FogDensity;
-  unsigned char fog_pix = Scan.FogIndex;
+  unsigned char fog_pix = Scan.FogPix;
 
   do
   {
     unsigned long izb = *z_buf;
     if (izb < 0x1000000)
     {
-      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
-      if (fd < EXP_16_SIZE)
-        *_dest = Scan.Fog8 [(tables.exp_16 [fd] << 8) | *_dest];
+      int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
+      if (fd < EXP_32_SIZE)
+        *_dest = Scan.Fog8 [(Scan.exp_16 [fd] << 8) | *_dest];
       else
         *_dest = fog_pix;
     }

@@ -45,6 +45,27 @@ typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 // A coefficient for planar fog density: bigger is denser
 #define PLANAR_FOG_DENSITY_COEF	6
 
+/**
+ * These define the quality of bilinear filtering. The higher these values
+ * are the higher is the quality of picture you'll see. However, memory
+ * consumptions are also growing rapidly.
+ */
+#define LOG2_STEPS_X			6
+#define LOG2_STEPS_Y			6
+#define LOG2_NUM_LIGHT_INTENSITIES	5
+
+/**
+ * Do not change manually! This will break the code.
+ */
+#define NUM_LIGHT_INTENSITIES		(1<<LOG2_NUM_LIGHT_INTENSITIES)
+#define X_AND_FILTER			(0xffff-(1<<(17-LOG2_STEPS_X))+1)
+#define Y_AND_FILTER			(0xffff-(1<<(17-LOG2_STEPS_Y))+1)
+
+/// At this point QRound (255 * exp (-float (i) / 256.)) reaches zero
+#define EXP_256_SIZE			1420
+/// Same for QRound (32 * exp (-float (i) / 256.))
+#define EXP_32_SIZE			1065
+
 //---//---//---//---//---//---//---//---//---//---//---/ Precomputed data /---//
 
 /*
@@ -68,12 +89,12 @@ struct csScanSetup
   int FogR;
   int FogG;
   int FogB;
+  /// The fog pixel (R|G|B for true/hicolor) or index into palette of fog color
+  int FogPix;
   /// Fog density
   unsigned long FogDensity;
   /// The fog table for paletted (currently only 8-bit) modes
   unsigned char *Fog8;
-  /// The index into palette of fog color
-  int FogIndex;
 
   /// A pointer to the texture.
   csTextureMMSoftware *Texture;
@@ -154,6 +175,42 @@ struct csScanSetup
   unsigned short *PaletteTable;
   /// Set up by poly renderer to alpha blending table
   RGB8map *AlphaMap;
+
+  /**
+   * These tables are used for bilinear filtering. This feature is still
+   * (and IMHO, till Merced III-10GHz, will remain) experimental. - D.D.
+   * <i>To all familiar with MMX: implementation in MMX can be fast -- routine
+   *    makes the same things for four pixels values. And quality could jump
+   *    (for speed and memory consumption I'm using 16 grades).</i>
+   * <p>
+   * This table incorporates values (1-x)*(1-y), (1-x)*y, x*(1-y), and x*y
+   */
+  int* filter_mul_table;
+
+  /**
+   * This table is really two tables in one (they have the same size --
+   * notice the 2 as a multiplier). It removes all the multiplications from
+   * the function. Sorry for lack of details, but there's a lot to be said.
+   * If you really want to know what is this table for, see "math3d.cpp" and
+   * "scan16.cpp" -- generation of the table, and it's usage respectively.
+   */
+  unsigned short *color_565_table;
+
+  /**
+   * A table of 4096 1/z values where z is in fixed-point 0.12 format
+   * Used in fog routines to get the real value of Z. The result is
+   * an 8.24 fixed-point number.
+   */
+  unsigned int *one_div_z;
+
+  /**
+   * A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
+   */
+  unsigned char *exp_256;
+  /**
+   * Same in the range 0..31 for 8-bit fog
+   */
+  unsigned char *exp_16;
 };
 
 /// The only instance of this structure
@@ -181,6 +238,10 @@ typedef void (csDrawPIScanlineFX)
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 
+/// Initialize all required tables
+extern "C" void csScan_Initialize ();
+/// Free all tables
+extern "C" void csScan_Finalize ();
 /// Initialize the scanline variables
 extern "C" void csScan_InitDraw (csGraphics3DSoftware* g3d,
   IPolygonTexture* tex, csTextureMMSoftware* texture, csTexture* untxt);

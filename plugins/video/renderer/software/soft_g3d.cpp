@@ -29,7 +29,6 @@
 #include "cs3d/software/tcache16.h"
 #include "cs3d/software/tcache32.h"
 #include "cs3d/software/soft_txt.h"
-#include "cs3d/software/tables.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -237,6 +236,11 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
 
   fogMode = G3DFOGMETHOD_ZBUFFER;
   //fogMode = G3DFOGMETHOD_PLANES;
+
+  z_buffer = NULL;
+  line_table = NULL;
+
+  csScan_Initialize ();
 }
 
 csGraphics3DSoftware::~csGraphics3DSoftware ()
@@ -245,13 +249,7 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
   CHK (delete [] z_buffer);
   FINAL_RELEASE (m_piG2D);
 
-  while (fog_buffers)
-  {
-    FogBuffer* n = fog_buffers->next;
-    CHK (delete fog_buffers);
-    fog_buffers = n;
-  }
-
+  csScan_Finalize ();
   CHK (delete [] line_table);
   CHK (delete txtmgr);
 }
@@ -577,18 +575,10 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_32_Alpha
 
 STDMETHODIMP csGraphics3DSoftware::Initialize ()
 {
-  tables.Initialize ();
-
   m_piG2D->Initialize ();
   txtmgr->InitSystem ();
 
-  z_buffer = NULL;
-  z_buf_mode = ZBuf_None;
-
   width = height = -1;
-
-  fog_buffers = NULL;
-  line_table = NULL;
   return S_OK;
 }
 
@@ -665,6 +655,8 @@ STDMETHODIMP csGraphics3DSoftware::Open (char *Title)
 
   FINAL_RELEASE (piGI);
 
+  z_buf_mode = ZBuf_None;
+  fog_buffers = NULL;
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     fog_tables [i].table = NULL;
 
@@ -677,6 +669,13 @@ STDMETHODIMP csGraphics3DSoftware::Close()
   for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
     if (fog_tables [i].table)
       delete [] fog_tables [i].table;
+
+  while (fog_buffers)
+  {
+    FogBuffer* n = fog_buffers->next;
+    CHK (delete fog_buffers);
+    fog_buffers = n;
+  }
 
   CHK (delete tcache); tcache = NULL;
 
@@ -1668,6 +1667,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
     Scan.FogR = QRound (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
     Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
     Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
+    Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
   }
   else
   {
@@ -1675,7 +1675,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
     Scan.FogG = QRound (fb->green * 255);
     Scan.FogB = QRound (fb->blue * 255);
     Scan.Fog8 = BuildIndexedFogTable ();
-    Scan.FogIndex = txtmgr->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+    Scan.FogPix = txtmgr->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
   }
 
   // Steps for interpolating horizontally accross a scanline.

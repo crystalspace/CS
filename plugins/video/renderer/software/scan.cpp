@@ -51,6 +51,78 @@ void csScan_draw_scanline_zfil (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
+void csScan_Initialize ()
+{
+  // 64K
+  CHK (Scan.filter_mul_table = new int [4 * (1 << LOG2_STEPS_X) * (1 << LOG2_STEPS_Y)]);
+  // 20K
+  CHK (Scan.color_565_table = new unsigned short [2 * NUM_LIGHT_INTENSITIES * 2048]);
+  // 16K
+  CHK (Scan.one_div_z = new unsigned int [1 << 12]);
+  // ~1.5K
+  CHK (Scan.exp_256 = new unsigned char [EXP_256_SIZE+3]);
+  // ~1K
+  CHK (Scan.exp_16 = new unsigned char [EXP_32_SIZE+3]);
+
+  int i, j;
+  int mx = 1 << LOG2_STEPS_X, my = 1 << LOG2_STEPS_Y;
+  int shifter = LOG2_STEPS_X + LOG2_STEPS_Y - LOG2_NUM_LIGHT_INTENSITIES;
+
+  for (i = 0; i < my; i++)
+  {
+    for (j = 0; j < mx; j++)
+    {
+      int _ = 4 * (i * mx + j), total;
+      total =  Scan.filter_mul_table [_ + 0] = (mx - j - 1) * (my - i - 1) >> shifter;
+      total += Scan.filter_mul_table [_ + 1] = (mx - j - 1) * i >> shifter;
+      total += Scan.filter_mul_table [_ + 2] = j * (my - i - 1) >> shifter;
+      total += Scan.filter_mul_table [_ + 3] = j * i >> shifter;
+
+      while (total < NUM_LIGHT_INTENSITIES - 1)
+      {
+        Scan.filter_mul_table [_ + rand () % 4]++;
+	total++;
+      }
+
+      Scan.filter_mul_table [_+0] *= 2048;	// 2048 -- number of colors that can be
+      Scan.filter_mul_table [_+1] *= 2048;	// made of green and blue in 16 bit
+      Scan.filter_mul_table [_+2] *= 2048;	// hicolor mode
+      Scan.filter_mul_table [_+3] *= 2048;
+    }
+  }
+
+  for (i = 0; i < 2048; i++)
+  {
+    int g = i >> 5, b = i & 31;
+    for (j = 0; j < NUM_LIGHT_INTENSITIES; j++)
+    {
+      int w_g = 64 * j * g / 63;
+      int w_b = 32 * j * b / 31;
+      Scan.color_565_table [i + j * 2048] =
+        ((w_g & ~(NUM_LIGHT_INTENSITIES - 1)) << 5) |
+         (w_b & ~(NUM_LIGHT_INTENSITIES - 1));
+    }
+  }
+
+  for (i = 1; i < (1 << 12); i++)
+    Scan.one_div_z [i] = QRound (float (0x1000000) / float (i));
+  Scan.one_div_z [0] = Scan.one_div_z [1];
+
+  for (i = 0; i < EXP_256_SIZE; i++)
+    Scan.exp_256 [i] = QRound (255 * exp (-float (i) / 256.));
+  for (i = 0; i < EXP_32_SIZE; i++)
+    Scan.exp_16 [i] = QRound (32 * exp (-float (i) / 256.)) - 1;
+}
+
+void csScan_Finalize ()
+{
+  CHK (delete [] Scan.exp_16);
+  CHK (delete [] Scan.exp_256);
+  CHK (delete [] Scan.one_div_z);
+  CHK (delete [] Scan.color_565_table);
+  CHK (delete [] Scan.filter_mul_table);
+}
+
 void csScan_InitDraw (csGraphics3DSoftware* g3d, IPolygonTexture* tex,
   csTextureMMSoftware* texture, csTexture* untxt)
 {

@@ -923,6 +923,602 @@ proc		csScan_16_mmx_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 %$sexit:	emms
 endproc
 
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+; Summary:
+;   Draw a fog scanline when we're not inside fog for 5/5/5 modes
+; Arguments:
+;   int xx, unsigned char *d, unsigned long *z_buf,
+;   float inv_z, float u_div_z, float v_div_z
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+proc		csScan_16_draw_scanline_fog_555,52,ebx,esi,edi,ebp
+		targ	%$width		; int
+		targ	%$dest		; unsigned char *
+		targ	%$zbuff		; unsigned long *
+		targ	%$inv_z		; float
+		targ	%$u_div_z	; float
+		targ	%$v_div_z	; float
+
+		tloc	%$destend	; unsigned char * (dest + width)
+		tloc	%$const24	; float 16777216
+		tloc	%$dzz		; QInt24 (Scan.M)
+		tloc	%$izz		; QInt24 (inv_z)
+		tloc	%$fogpix	; r|g|b
+		tloc	%$fogdens	; FogDensity
+		tloc	%$fogr		; FogR
+		tloc	%$fogg		; FogG
+		tloc	%$fogb		; FogB
+		tloc	%$fogr8		; FogR << 8
+		tloc	%$fogg8		; FogG << 8
+		tloc	%$fogb8		; FogB << 8
+		tloc	%$pix		; *dest
+
+; if (xx <= 0) return;
+		mov	eax,%$width
+		mov	edi,%$dest
+		test	eax,eax
+		exit	le
+
+		lea	eax,[edi+eax*2]
+		mov	ecx,0x4B800000	; 16777216F
+		mov	%$destend,eax
+		mov	%$const24,ecx
+
+; unsigned long izz = QInt24 (inv_z);
+; int dzz = QInt24 (Scan.M);
+		fld	%$inv_z		; inv_z				; 0/1
+		fld	M		; M,inv_z			; 1/1
+		fmul	%$const24	; M*16777216,inv_z		; 2/3
+		fxch			; inv_z,M*16777216		; 2
+		fmul	%$const24	; inv_z*16777216,M*16777216	; 3/3
+		fxch			; M*16777216,inv_z*16777216	; 3
+		fistp	%$dzz		; inv_z*16777216		; 5/6
+		fistp	%$izz		; 				; 6/6
+
+; Copy global vars to local stack
+		mov	eax,FogPix					; 7
+		mov	ecx,FogDensity					; 7
+		mov	%$fogpix,eax					; 8
+		mov	%$fogdens,ecx					; 8
+		mov	eax,FogR					; 9
+		mov	ecx,FogG					; 9
+		mov	edx,FogB					; 10
+		mov	%$fogr,eax					; 10
+		shl	eax,8						; 11
+		mov	%$fogg,ecx					; 11
+		shl	ecx,8						; 12
+		mov	%$fogb,edx					; 12
+		shl	edx,8						; 13
+		mov	%$fogr8,eax					; 13
+		mov	%$fogg8,ecx					; 14
+		mov	%$fogb8,edx					; 14
+
+; EAX	/	  ESI	izz
+; EBX	fd	  EDI	dest
+; ECX	/	  EBP	zbuff
+; EDX   /
+		mov	esi,%$izz					; 15
+		mov	ebp,%$zbuff					; 15
+		xor	ebx,ebx
+%$fogloop:
+; if (izz >= 0x1000000)
+		mov	eax,[ebp]					; 0
+		mov	ecx,esi						; 0
+		cmp	esi,0x01000000					; 1
+		if	ae,short					; 1
+	; izz exceeds our 1/x table, so compute fd aproximatively and go on.
+	; This happens seldom, only when we're very close to fog, but not
+	; inside it; however we should handle this case as well.
+; if ((izb < 0x1000000) && (izz > izb))
+			cmp	eax,0x01000000				; 2
+			jae	near %$endif				; 2
+			cmp	esi,eax					; 3
+			jb	near %$endif				; 3
+
+; fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+			shr	eax,12					; 4
+			mov	edx,one_div_z				; 4
+			shr	ecx,20					; 5 (np)
+			mov	eax,[edx+eax*4]				; 6 (np)
+			mov	ecx,[edx+ecx*4]				; 7
+			mov	edx,%$fogdens				; 7
+			shr	ecx,8					; 8 (np)
+			sub	eax,ecx					; 9
+			mul	edx					; 10(9)
+			shr	eax,12					; 19
+
+			mov	ecx,exp_256				; 19
+			mov	edx,%$fogpix				; 20
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 20
+			jl	%$get_fd				; 21
+		else
+; if (izz > izb)
+			cmp	esi,eax					; 2
+			jle	near %$endif				; 2
+
+; fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+			shr	eax,12					; 3
+			mov	edx,one_div_z				; 3
+			shr	ecx,12					; 4 (np)
+			mov	eax,[edx+eax*4]				; 5 (np)
+			mov	ecx,[edx+ecx*4]				; 6
+			mov	edx,%$fogdens				; 6
+			sub	eax,ecx					; 7 (np)
+			mul	edx					; 8(9)
+			shr	eax,12					; 17
+
+			mov	ecx,exp_256				; 17
+			mov	edx,%$fogpix				; 18
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 18
+			if	l,short
+; fd = tables.exp_256 [fd];
+%$$get_fd:			mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	dx,[edi]			; 0
+				mov	ecx,%$fogr			; 0
+				mov	%$pix,edx			; 1
+				and	edx,0x7c00			; 1
+				sub	edx,ecx				; 2
+				mov	eax,%$fogr8			; 2
+				imul	edx,ebx				; 3(9)
+				mov	%$izz,esi			; 3
+				add	eax,edx				; 12
+				mov	edx,%$pix			; 12
+				and	eax,0x7c0000			; 13
+; g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
+				mov	ecx,%$fogg			; 13
+				and	edx,0x03e0			; 14
+				mov	esi,%$fogg8			; 14
+				sub	edx,ecx				; 15
+				imul	edx,ebx				; 16(9)
+				add	esi,edx				; 25
+				mov	edx,%$pix			; 25
+				and	esi,0x03e000			; 26 (np)
+				add	eax,esi				; 27
+; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
+				mov	ecx,%$fogb			; 27
+				and	edx,0x001f			; 28
+				mov	esi,%$fogb8			; 28
+				sub	edx,ecx				; 29
+				imul	edx,ebx				; 30(9)
+				add	edx,esi				; 39 (np)
+				and	edx,0x001f00			; 40 (np)
+				add	edx,eax				; 41 (np)
+				shr	edx,8				; 42
+				mov	esi,%$izz			; 42
+			endif
+			mov	[edi],dx
+		endif
+
+		add	edi,2			; _dest++;
+		mov	eax,%$dzz
+		add	ebp,4			; z_buf++;
+		add	esi,eax			; izz += dzz;
+		cmp	edi,%$destend
+		jb	near %$fogloop
+%$fogexit:
+endproc
+
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+; Summary:
+;   Draw a fog scanline when we're not inside fog for 5/6/5 modes
+; Arguments:
+;   int xx, unsigned char *d, unsigned long *z_buf,
+;   float inv_z, float u_div_z, float v_div_z
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+proc		csScan_16_draw_scanline_fog_565,52,ebx,esi,edi,ebp
+		targ	%$width		; int
+		targ	%$dest		; unsigned char *
+		targ	%$zbuff		; unsigned long *
+		targ	%$inv_z		; float
+		targ	%$u_div_z	; float
+		targ	%$v_div_z	; float
+
+		tloc	%$destend	; unsigned char * (dest + width)
+		tloc	%$const24	; float 16777216
+		tloc	%$dzz		; QInt24 (Scan.M)
+		tloc	%$izz		; QInt24 (inv_z)
+		tloc	%$fogpix	; r|g|b
+		tloc	%$fogdens	; FogDensity
+		tloc	%$fogr		; FogR
+		tloc	%$fogg		; FogG
+		tloc	%$fogb		; FogB
+		tloc	%$fogr8		; FogR << 8
+		tloc	%$fogg8		; FogG << 8
+		tloc	%$fogb8		; FogB << 8
+		tloc	%$pix		; *dest
+
+; if (xx <= 0) return;
+		mov	eax,%$width
+		mov	edi,%$dest
+		test	eax,eax
+		exit	le
+
+		lea	eax,[edi+eax*2]
+		mov	ecx,0x4B800000	; 16777216F
+		mov	%$destend,eax
+		mov	%$const24,ecx
+
+; unsigned long izz = QInt24 (inv_z);
+; int dzz = QInt24 (Scan.M);
+		fld	%$inv_z		; inv_z				; 0/1
+		fld	M		; M,inv_z			; 1/1
+		fmul	%$const24	; M*16777216,inv_z		; 2/3
+		fxch			; inv_z,M*16777216		; 2
+		fmul	%$const24	; inv_z*16777216,M*16777216	; 3/3
+		fxch			; M*16777216,inv_z*16777216	; 3
+		fistp	%$dzz		; inv_z*16777216		; 5/6
+		fistp	%$izz		; 				; 6/6
+
+; Copy global vars to local stack
+		mov	eax,FogPix					; 7
+		mov	ecx,FogDensity					; 7
+		mov	%$fogpix,eax					; 8
+		mov	%$fogdens,ecx					; 8
+		mov	eax,FogR					; 9
+		mov	ecx,FogG					; 9
+		mov	edx,FogB					; 10
+		mov	%$fogr,eax					; 10
+		shl	eax,8						; 11
+		mov	%$fogg,ecx					; 11
+		shl	ecx,8						; 12
+		mov	%$fogb,edx					; 12
+		shl	edx,8						; 13
+		mov	%$fogr8,eax					; 13
+		mov	%$fogg8,ecx					; 14
+		mov	%$fogb8,edx					; 14
+
+; EAX	/	  ESI	izz
+; EBX	fd	  EDI	dest
+; ECX	/	  EBP	zbuff
+; EDX   /
+		mov	esi,%$izz					; 15
+		mov	ebp,%$zbuff					; 15
+		xor	ebx,ebx
+%$fogloop:
+; if (izz >= 0x1000000)
+		mov	eax,[ebp]					; 0
+		mov	ecx,esi						; 0
+		cmp	esi,0x01000000					; 1
+		if	ae,short					; 1
+	; izz exceeds our 1/x table, so compute fd aproximatively and go on.
+	; This happens seldom, only when we're very close to fog, but not
+	; inside it; however we should handle this case as well.
+; if ((izb < 0x1000000) && (izz > izb))
+			cmp	eax,0x01000000				; 2
+			jae	near %$endif				; 2
+			cmp	esi,eax					; 3
+			jb	near %$endif				; 3
+
+; fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+			shr	eax,12					; 4
+			mov	edx,one_div_z				; 4
+			shr	ecx,20					; 5 (np)
+			mov	eax,[edx+eax*4]				; 6 (np)
+			mov	ecx,[edx+ecx*4]				; 7
+			mov	edx,%$fogdens				; 7
+			shr	ecx,8					; 8 (np)
+			sub	eax,ecx					; 9
+			mul	edx					; 10(9)
+			shr	eax,12					; 19
+
+			mov	ecx,exp_256				; 19
+			mov	edx,%$fogpix				; 20
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 20
+			jl	%$get_fd				; 21
+		else
+; if (izz > izb)
+			cmp	esi,eax					; 2
+			jle	near %$endif				; 2
+
+; fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+			shr	eax,12					; 3
+			mov	edx,one_div_z				; 3
+			shr	ecx,12					; 4 (np)
+			mov	eax,[edx+eax*4]				; 5 (np)
+			mov	ecx,[edx+ecx*4]				; 6
+			mov	edx,%$fogdens				; 6
+			sub	eax,ecx					; 7 (np)
+			mul	edx					; 8(9)
+			shr	eax,12					; 17
+
+			mov	ecx,exp_256				; 17
+			mov	edx,%$fogpix				; 18
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 18
+			if	l,short
+; fd = tables.exp_256 [fd];
+%$$get_fd:			mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	dx,[edi]			; 0
+				mov	ecx,%$fogr			; 0
+				mov	%$pix,edx			; 1
+				and	edx,0xf800			; 1
+				sub	edx,ecx				; 2
+				mov	eax,%$fogr8			; 2
+				imul	edx,ebx				; 3(9)
+				mov	%$izz,esi			; 3
+				add	eax,edx				; 12
+				mov	edx,%$pix			; 12
+				and	eax,0xf80000			; 13
+; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+				mov	ecx,%$fogg			; 13
+				and	edx,0x07e0			; 14
+				mov	esi,%$fogg8			; 14
+				sub	edx,ecx				; 15
+				imul	edx,ebx				; 16(9)
+				add	esi,edx				; 25
+				mov	edx,%$pix			; 25
+				and	esi,0x07e000			; 26 (np)
+				add	eax,esi				; 27
+; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
+				mov	ecx,%$fogb			; 27
+				and	edx,0x001f			; 28
+				mov	esi,%$fogb8			; 28
+				sub	edx,ecx				; 29
+				imul	edx,ebx				; 30(9)
+				add	edx,esi				; 39 (np)
+				and	edx,0x001f00			; 40 (np)
+				add	edx,eax				; 41 (np)
+				shr	edx,8				; 42
+				mov	esi,%$izz			; 42
+			endif
+			mov	[edi],dx
+		endif
+
+		add	edi,2			; _dest++;
+		mov	eax,%$dzz
+		add	ebp,4			; z_buf++;
+		add	esi,eax			; izz += dzz;
+		cmp	edi,%$destend
+		jb	near %$fogloop
+%$fogexit:
+endproc
+
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+; Summary:
+;   Draw a fog scanline when we're inside fog for 5/5/5 modes
+; Arguments:
+;   int xx, unsigned char *d, unsigned long *z_buf,
+;   float inv_z, float u_div_z, float v_div_z
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+proc		csScan_16_draw_scanline_fog_view_555,40,ebx,esi,edi,ebp
+		targ	%$width		; int
+		targ	%$dest		; unsigned char *
+		targ	%$zbuff		; unsigned long *
+		targ	%$inv_z		; float
+		targ	%$u_div_z	; float
+		targ	%$v_div_z	; float
+
+		tloc	%$destend	; unsigned char * (dest + width)
+		tloc	%$fogpix	; r|g|b
+		tloc	%$fogdens	; FogDensity
+		tloc	%$fogr		; FogR
+		tloc	%$fogg		; FogG
+		tloc	%$fogb		; FogB
+		tloc	%$fogr8		; FogR << 8
+		tloc	%$fogg8		; FogG << 8
+		tloc	%$fogb8		; FogB << 8
+		tloc	%$pix		; *dest
+
+; if (xx <= 0) return;
+		mov	eax,%$width
+		mov	edi,%$dest
+		test	eax,eax
+		exit	le
+
+		lea	eax,[edi+eax*2]
+		mov	%$destend,eax
+
+; Copy global vars to local stack
+		mov	eax,FogPix					; 0
+		mov	ecx,FogDensity					; 0
+		mov	%$fogpix,eax					; 1
+		mov	%$fogdens,ecx					; 1
+		mov	eax,FogR					; 2
+		mov	ecx,FogG					; 2
+		mov	edx,FogB					; 3
+		mov	%$fogr,eax					; 3
+		shl	eax,8						; 4
+		mov	%$fogg,ecx					; 4
+		shl	ecx,8						; 5
+		mov	%$fogb,edx					; 5
+		shl	edx,8						; 6
+		mov	%$fogr8,eax					; 6
+		mov	%$fogg8,ecx					; 7
+		mov	%$fogb8,edx					; 7
+
+; EAX	/	  ESI	/
+; EBX	fd	  EDI	dest
+; ECX	/	  EBP	zbuff
+; EDX   /
+		mov	ebp,%$zbuff					; 8
+		xor	ebx,ebx						; 8
+%$fogloop:
+; if (izz >= 0x1000000)
+		mov	eax,[ebp]					; 0
+		add	ebp,4			; z_buf++;		; 0
+		cmp	eax,0x01000000					; 1
+		if	b						; 1
+; fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
+			shr	eax,12					; 3
+			mov	esi,one_div_z				; 3
+			mov	edx,%$fogdens				; 4 (np)
+			mov	eax,[esi+eax*4]				; 5 (np)
+			mul	edx					; 6(9)
+			shr	eax,12					; 15
+
+			mov	ecx,exp_256				; 15
+			mov	edx,%$fogpix				; 16
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 16
+			if	l,short
+; fd = tables.exp_256 [fd];
+%$$get_fd:			mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	dx,[edi]			; 0
+				mov	ecx,%$fogr			; 0
+				mov	%$pix,edx			; 1
+				and	edx,0x7c00			; 1
+				sub	edx,ecx				; 2
+				mov	eax,%$fogr8			; 2
+				imul	edx,ebx				; 3(9) (np)
+				add	eax,edx				; 12
+				mov	edx,%$pix			; 12
+				and	eax,0x7c0000			; 13
+; g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
+				mov	ecx,%$fogg			; 14
+				and	edx,0x03e0			; 15
+				mov	esi,%$fogg8			; 15
+				sub	edx,ecx				; 16
+				imul	edx,ebx				; 17(9)
+				add	esi,edx				; 26
+				mov	edx,%$pix			; 26
+				and	esi,0x03e000			; 27 (np)
+				add	eax,esi				; 28
+; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
+				mov	ecx,%$fogb			; 28
+				and	edx,0x001f			; 29
+				mov	esi,%$fogb8			; 29
+				sub	edx,ecx				; 30
+				imul	edx,ebx				; 31(9)
+				add	edx,esi				; 40 (np)
+				and	edx,0x001f00			; 41 (np)
+				add	edx,eax				; 42 (np)
+				shr	edx,8				; 43
+			endif
+			mov	[edi],dx
+		endif
+
+		add	edi,2			; _dest++;
+		cmp	edi,%$destend
+		jb	near %$fogloop
+%$fogexit:
+endproc
+
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+; Summary:
+;   Draw a fog scanline when we're inside fog for 5/5/5 modes
+; Arguments:
+;   int xx, unsigned char *d, unsigned long *z_buf,
+;   float inv_z, float u_div_z, float v_div_z
+;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
+proc		csScan_16_draw_scanline_fog_view_565,40,ebx,esi,edi,ebp
+		targ	%$width		; int
+		targ	%$dest		; unsigned char *
+		targ	%$zbuff		; unsigned long *
+		targ	%$inv_z		; float
+		targ	%$u_div_z	; float
+		targ	%$v_div_z	; float
+
+		tloc	%$destend	; unsigned char * (dest + width)
+		tloc	%$fogpix	; r|g|b
+		tloc	%$fogdens	; FogDensity
+		tloc	%$fogr		; FogR
+		tloc	%$fogg		; FogG
+		tloc	%$fogb		; FogB
+		tloc	%$fogr8		; FogR << 8
+		tloc	%$fogg8		; FogG << 8
+		tloc	%$fogb8		; FogB << 8
+		tloc	%$pix		; *dest
+
+; if (xx <= 0) return;
+		mov	eax,%$width
+		mov	edi,%$dest
+		test	eax,eax
+		exit	le
+
+		lea	eax,[edi+eax*2]
+		mov	%$destend,eax
+
+; Copy global vars to local stack
+		mov	eax,FogPix					; 0
+		mov	ecx,FogDensity					; 0
+		mov	%$fogpix,eax					; 1
+		mov	%$fogdens,ecx					; 1
+		mov	eax,FogR					; 2
+		mov	ecx,FogG					; 2
+		mov	edx,FogB					; 3
+		mov	%$fogr,eax					; 3
+		shl	eax,8						; 4
+		mov	%$fogg,ecx					; 4
+		shl	ecx,8						; 5
+		mov	%$fogb,edx					; 5
+		shl	edx,8						; 6
+		mov	%$fogr8,eax					; 6
+		mov	%$fogg8,ecx					; 7
+		mov	%$fogb8,edx					; 7
+
+; EAX	/	  ESI	/
+; EBX	fd	  EDI	dest
+; ECX	/	  EBP	zbuff
+; EDX   /
+		mov	ebp,%$zbuff					; 8
+		xor	ebx,ebx						; 8
+%$fogloop:
+; if (izz >= 0x1000000)
+		mov	eax,[ebp]					; 0
+		add	ebp,4			; z_buf++;		; 0
+		cmp	eax,0x01000000					; 1
+		if	b						; 1
+; fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
+			shr	eax,12					; 3
+			mov	esi,one_div_z				; 3
+			mov	edx,%$fogdens				; 4 (np)
+			mov	eax,[esi+eax*4]				; 5 (np)
+			mul	edx					; 6(9)
+			shr	eax,12					; 15
+
+			mov	ecx,exp_256				; 15
+			mov	edx,%$fogpix				; 16
+; if (fd < EXP_256_SIZE)
+			cmp	eax,EXP_256_SIZE			; 16
+			if	l,short
+; fd = tables.exp_256 [fd];
+%$$get_fd:			mov	bl,[ecx+eax]			; 0
+; r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+				mov	dx,[edi]			; 0
+				mov	ecx,%$fogr			; 0
+				mov	%$pix,edx			; 1
+				and	edx,0xf800			; 1
+				sub	edx,ecx				; 2
+				mov	eax,%$fogr8			; 2
+				imul	edx,ebx				; 3(9) (np)
+				add	eax,edx				; 12
+				mov	edx,%$pix			; 12
+				and	eax,0xf80000			; 13
+; g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+				mov	ecx,%$fogg			; 14
+				and	edx,0x07e0			; 15
+				mov	esi,%$fogg8			; 15
+				sub	edx,ecx				; 16
+				imul	edx,ebx				; 17(9)
+				add	esi,edx				; 26
+				mov	edx,%$pix			; 26
+				and	esi,0x07e000			; 27 (np)
+				add	eax,esi				; 28
+; b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
+				mov	ecx,%$fogb			; 28
+				and	edx,0x001f			; 29
+				mov	esi,%$fogb8			; 29
+				sub	edx,ecx				; 30
+				imul	edx,ebx				; 31(9)
+				add	edx,esi				; 40 (np)
+				and	edx,0x001f00			; 41 (np)
+				add	edx,eax				; 42 (np)
+				shr	edx,8				; 43
+			endif
+			mov	[edi],dx
+		endif
+
+		add	edi,2			; _dest++;
+		cmp	edi,%$destend
+		jb	near %$fogloop
+%$fogexit:
+endproc
+
 scanproc 16,draw_scanline_map_zfil,SCANPROC_MAP,scanloop_map
 scanproc 16,mmx_draw_scanline_map_zfil,SCANPROC_MAP|SCANPROC_MMX,mmx_scanloop_map
 scanproc 16,draw_scanline_map_zuse,SCANPROC_MAP,scanloop_map_z
