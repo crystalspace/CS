@@ -97,6 +97,8 @@ struct iDocumentAttribute : public iBase
   virtual int GetValueAsInt () = 0;
   /// Get value of this attribute as float.
   virtual float GetValueAsFloat () = 0;
+  /// Get value of this attribute as float.
+  virtual bool GetValueAsBool () = 0;
   /// Set name of this attribute.
   virtual void SetName (const char* name) = 0;
   /// Set value of this attribute.
@@ -234,6 +236,8 @@ struct iDocumentNode : public iBase
   virtual int GetAttributeValueAsInt (const char* name) = 0;
   /// Get an attribute value by name as a floating point value.
   virtual float GetAttributeValueAsFloat (const char* name) = 0;
+  /// Get an attribute value by name as a bool.  "yes", "true", and "1" all are returned as true.
+  virtual bool GetAttributeValueAsBool (const char* name,bool defaultvalue=false) = 0;
 
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) = 0;

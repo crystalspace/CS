@@ -498,6 +498,7 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
 								    iSpriteCal3DFactoryState));
       if (factstate)
       {
+        factstate->SetRenderScale(scale);
 	  for (int i=0; i<factstate->GetMeshCount(); i++)
 	  {
 	      csString push;
@@ -870,6 +871,8 @@ bool ViewMesh::Initialize ()
     sscanf (scaleTxt, "%f", &scale);
     printf ("Scaling: %f\n", scale);
   }
+  else
+      scale = 1.0F;
 
   // Load specified Libraries
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Loading libs...");

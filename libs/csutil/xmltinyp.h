@@ -95,6 +95,19 @@ public:
     return f;
   }
 
+  virtual bool GetValueAsBool ()
+  {
+    if (!attr || !attr->Value() ) return false;
+    if (strcasecmp(attr->Value(),"true")==0 ||
+        strcasecmp(attr->Value(),"yes")==0 ||
+        atoi(attr->Value())!=0)
+    {
+      return true;
+    }
+    else
+      return false;
+  }
+
   virtual void SetName (const char* name)
   {
     attr->SetName (name);
@@ -195,6 +208,7 @@ public:
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
+  virtual bool  GetAttributeValueAsBool (const char* name,bool defaultvalue=false);
   virtual const char* GetAttributeValue (const char* name);
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();

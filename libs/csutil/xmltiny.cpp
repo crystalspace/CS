@@ -445,6 +445,20 @@ float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
   return f;
 }
 
+bool csTinyXmlNode::GetAttributeValueAsBool (const char* name, bool defaultvalue)
+{
+  TiDocumentAttribute* a = GetAttributeInternal (name);
+  if (!a || !a->Value () ) return defaultvalue;
+  if (strcasecmp(a->Value(),"true")==0 ||
+      strcasecmp(a->Value(),"yes")==0 ||
+      atoi(a->Value())!=0)
+  {
+    return true;
+  }
+  else
+    return false;
+}
+
 void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>&)
 {
   // @@@ TODO
