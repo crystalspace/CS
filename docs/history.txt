@@ -14,6 +14,9 @@ chronological order.
 	  caused run-time errors in configure.
 	- Eric Sunshine worked around gcc 2.95.x complaint about ambiguous
 	  csRef<csFoo> to csRef<iFoo> assignment in particles plugin.
+	- Eric Sunshine fixed bugs in walktest/Jamfile and walktest.mak where
+	  `walkall' target unconditionally tried to build the OpenGL canvas and
+	  renderer even if OpenGL was not detected.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

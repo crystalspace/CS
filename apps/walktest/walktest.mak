@@ -18,10 +18,14 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walktest walktestclean walkall
 
-walkall: walktest engine vfs gl3d softcanvas openglcanvas csfont \
+walkall: walktest engine vfs soft3d softcanvas csfont \
   csconin simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg \
   csbmpimg reporter stdrep csparser frustvis bugplug sequence engseq xmlread \
   stdpt ptanimimg dynavis gtreeldr
+ifeq ($(GL.AVAILABLE),yes)
+walkall: gl3d openglcanvas
+endif
+
 all apps: walktest
 walktest:
 	$(MAKE_APP)
