@@ -165,8 +165,12 @@ ctRigidBody *pe_g;  // this handle
 		return;
 	}
 
-  // if we are not at root
-  if( jnt != NULL && jnt->inboard != NULL ){
+  // if we are at root
+  if( jnt == NULL || jnt->inboard == NULL ){
+    const ctMatrix3 & T_wt = pe_g->get_world_to_this();
+    w_body = T_wt * pe_g->get_angular_v();
+    v_body = T_wt * pe_g->get_v();
+  }else{
 
 	  pe_f = jnt->inboard->handle;
 	  if( !pe_f ){
@@ -180,18 +184,16 @@ ctRigidBody *pe_g;  // this handle
 	  // vector from C.O.M. of F to G in G's ref frame.
 	  r_fg = pe_g->get_T()*( pe_g->get_org_world() - pe_f->get_org_world() );
 
-	  // calc contribution to v and w from parent link.
-  //!me 1Dec99	pe_g->w = T_fg*pe_f->get_angular_v();
-  //!me	1Dec99  pe_g->v = T_fg*pe_f->get_v() + pe_g->get_angular_v() % r_fg;
-  
-    ctVector3 w_prime = T_fg*pe_f->get_angular_v();
-    ctVector3 v_prime = T_fg*pe_f->get_v() + w_prime % r_fg;
-
+	  // calc contribution to v and w from parent link.  
+    w_body = T_fg*jnt->inboard->w_body;
+    v_body = T_fg*jnt->inboard->v_body + (w_body % r_fg);
+    
 	  // get joint to calculate final result for v and angular v ( w )
-	  jnt->calc_vw( v_prime, w_prime );
+	  jnt->calc_vw( v_body, w_body );
 	  
-    pe_g->set_angular_v( w_prime );
-    pe_g->set_v( v_prime );
+    //!me this doesn't really need to be done, but better safe than sorry
+    pe_g->set_angular_v( pe_g->get_this_to_world()*w_body );
+    pe_g->set_v( pe_g->get_this_to_world()*v_body );
   }
   
 	// iterate to next links

@@ -21,11 +21,9 @@
 #ifndef CT_FEATHERSTONE_ALGORITHM
 #define CT_FEATHERSTONE_ALGORITHM
 
-//!me something is may be wrong here.  Period of simple pendulum is taking too long.
 //!me T = 2*pi*sqrt( length/g )  
-//!me consistently higher by 50% or so.
 //!me period of a meter long rod should be 1.64s under g=9.81 and 1 world unit = 1 m
-//!me retest this sucker.  I may have calced the wrong size I at the time. may be OK
+//!me actual period observed is ~1.70s  could be acceptable numerical error.. or not..
 
 #include "csphyzik/solver.h"
 #include "csphyzik/math3d.h"

@@ -46,16 +46,8 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	ab.apply_forces( t );
 
 	// propagate velocity of links ( w & v ) from base to leaves
-	if( ab.handle ){
-		// base of chain doesn't move
-		ab.handle->set_angular_v( ctVector3( 0,0,0 ) );
-		ab.handle->set_v( ctVector3( 0,0,0 ) );
-		out_link = ab.outboard_links.get_first();
-		while( out_link ){
-			out_link->compute_link_velocities();
-			out_link = ab.outboard_links.get_next();
-		}
-	}
+  // also computes T_fg and r_fg
+  ab.compute_link_velocities();
 
 	// initialize values for each articulated body/joint
 	init_link();
@@ -96,17 +88,11 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// calc forces applied to this handle. Doesn't include forces from other links
 	ab.apply_forces( t );
 
-	// propagate velocity of links ( w & v ) from base to leaves
-	if( ab.handle ){
-    //!me hmmmm.... what effect does w and v of base have here
-		out_link = ab.outboard_links.get_first();
-		while( out_link ){
-			out_link->compute_link_velocities();
-			out_link = ab.outboard_links.get_next();
-		}
-	}
-
-	// initialize values for each articulated body/joint
+  // propagate velocity of links ( w & v ) from base to leaves
+  // also computes T_fg and r_fg
+  ab.compute_link_velocities();
+	
+  // initialize values for each articulated body/joint
 	init_link();
 
 	// modify Ia and Za for all links ( start by calling compute_Ia_Za on 
@@ -121,7 +107,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// compute joint and spatial acceleration of links
 	
 	// linear a and alpha for link 0 is calculated by solving for spatial a:
-	// Ia*a = -Za
+  // Ia*a = -Za
   Ia.solve( a, Za*(-1.0) );
 
  // 	a.zero();
@@ -159,8 +145,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// -applied because this is actualy force and torque needed to 
 	// keep link from NOT accelerating.
 	Za.set_a( pe_g->get_T()*(-1.0)*pe_g->get_F());
-	Za.set_b( pe_g->get_angular_v() % (pe_g->get_I() * pe_g->get_angular_v()) - (pe_g->get_T()*pe_g->get_torque()) );  
-//!me need to put in proper frame right? Za.set_b( pe_g->w % (pe_g->get_I() * pe_g->w) - pe_g->get_torque() );  
+  Za.set_b( ab.w_body % (pe_g->get_I() * ab.w_body) - (pe_g->get_T()*pe_g->get_torque()) );  
 
 	jnt = ab.inboard_joint;
 
@@ -175,8 +160,8 @@ ctFeatherstoneAlgorithm *out_link_solver;
 		pe_f = jnt->inboard->handle;
 
 		if( pe_f ){
-			jnt->calc_coriolus( ab.r_fg, ab.T_fg*pe_f->get_angular_v(), c );
-		}else{
+      jnt->calc_coriolus( ab.r_fg, ab.T_fg*jnt->inboard->w_body, c );
+    }else{
 			ctSpatialVector ct( 0.0,0.0,0.0,0.0,0.0,0.0 );
 			c = ct;
 		}
@@ -229,12 +214,7 @@ ctFeatherstoneAlgorithm *svr_f;
 	ctSpatialVector s = jnt->get_spatial_joint_axis();
 
 	sIs = (!s)*(Ia*s);
- //!me
-/*	if( CT_DEBUG_LEVEL > 0 ){
-		Debug::logf( CT_DEBUG_LEVEL, "Ia============\n" );
-		Ia.debug_print();
-	}
-*/
+ 
 	ctSpatialMatrix innerM;
 	innerM = ( Ia*s*(!s)*Ia )*(1.0L/sIs);
 	// calc Ia for parent link
@@ -277,8 +257,6 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// Alright! finaly we get the result all that code was for.
 	jnt->qa = ( QsZIc - (!s)*( (Ia*gXf)*prev_link_solver->a ) )/sIs;
 	a = gXf*prev_link_solver->a + c + s*jnt->qa;
-
-//	Debug::log( CT_DEBUG_LEVEL, "QzZIc %lf sIs %lf\n", QsZIc, sIs );
 
 	// iterate to next link
 	out_link = ab.outboard_links.get_first();

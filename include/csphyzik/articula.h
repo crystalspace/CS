@@ -33,7 +33,7 @@ class ctInverseKinematics;
 
 // articulated body.  Definition: a handle ( rigid body ) with 0 or more  
 // articulated bodies attached to it via joints
-class ctArticulatedBody : public ctPhysicalEntity
+class ctArticulatedBody : public ctEntity
 {
 public:
 
@@ -109,7 +109,7 @@ public:
 protected:
 
 	ctRigidBody *handle;	// rigid body for the root of this articulated body
-	ctJoint *inboard_joint;  // joint attaching this body to parent
+	ctJoint *inboard_joint;  // joint attaching this body to parent. NULL if root
 	ctLinkList_ctArticulatedBody outboard_links;  // children 
 
 	bool is_grounded;  // is it fixed to the world frame?
@@ -121,6 +121,11 @@ protected:
 					// frame to this frame
 	ctVector3 r_fg; // vector from center of inboard frame to this frame in this
 					// frame's coords
+
+  // angular and linear velocity calculated in this bodies frame.
+  // calculated in compute_link_velocities 
+  ctVector3 w_body;
+  ctVector3 v_body;
 
 };
 
