@@ -5708,6 +5708,8 @@ class iSpriteCal3DFactoryState(iBase):
     def GetSocketCount(*args): return _cspace.iSpriteCal3DFactoryState_GetSocketCount(*args)
     def GetSocket(*args): return _cspace.iSpriteCal3DFactoryState_GetSocket(*args)
     def GetCal3DCoreModel(*args): return _cspace.iSpriteCal3DFactoryState_GetCal3DCoreModel(*args)
+    def RegisterAnimCallback(*args): return _cspace.iSpriteCal3DFactoryState_RegisterAnimCallback(*args)
+    def RemoveAnimCallback(*args): return _cspace.iSpriteCal3DFactoryState_RemoveAnimCallback(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DFactoryState):
         try:
             if self.thisown: destroy(self)
@@ -5763,6 +5765,7 @@ class iSpriteCal3DState(iBase):
     def GetAnimationDuration(*args): return _cspace.iSpriteCal3DState_GetAnimationDuration(*args)
     def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
     def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
+    def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
             if self.thisown: destroy(self)
