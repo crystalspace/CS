@@ -28,16 +28,24 @@ class csPolygonInt;
 class csPolygon3D;
 
 /// A dynamic array of csCurve objects
-CS_BEGIN_TYPED_VECTOR (CS_DECLARE_TYPED_VECTOR_USERDELETE, csCurvesArray, csCurve)
-  CS_TYPED_VECTOR_CONSTRUCTOR (csCurvesArray)
+CS_DECLARE_TYPED_VECTOR_NODELETE (csCurvesArrayHelper, csCurve);
+
+class csCurvesArray : public csCurvesArrayHelper {
+public:
+  virtual bool FreeItem (csSome item);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-CS_FINISH_TYPED_VECTOR;
+  csCurvesArray (int l=8, int t=8) : csCurvesArrayHelper (l, t) {}
+};
 
 /// A dynamic array of csLightHalo objects
-CS_BEGIN_TYPED_VECTOR (CS_DECLARE_TYPED_VECTOR_USERDELETE, csHaloArray, csLightHalo)
-  CS_TYPED_VECTOR_CONSTRUCTOR (csHaloArray)
+CS_DECLARE_TYPED_VECTOR_NODELETE (csHaloArrayHelper, csLightHalo);
+
+class csHaloArray : public csHaloArrayHelper {
+public:
+  virtual bool FreeItem (csSome item);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-CS_FINISH_TYPED_VECTOR;
+  csHaloArray (int l=8, int t=8) : csHaloArrayHelper (l, t) {}
+};
 
 /**
  * An dynamic array of csPolygon3D objects.

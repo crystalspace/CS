@@ -20,11 +20,12 @@ reference to see if it is already implemented. The usage of these classes
 will not be explained further, as most functions are self-explanatory. The
 comments in the @sc{api} reference and the header files should also help.
 
-One exception should be made here for the @code{csObject} class. This class
-will be explained in the next section.
+Exceptions should be made here for the @code{csObject} class and for typed
+vectors. They will be explained in the next sections.
 
 @menu
 * csObject:: @code{csObject}
+* Typed Vectors::
 @end menu
 
 @node csObject, , csUtil, csUtil
@@ -66,3 +67,56 @@ There is also a @samp{@dots{}_FAST} version of each macro that uses the fast
 interface feature of @sc{scf}, i.e. you must declare a fast interface by using
 @code{SCF_DECLARE_FAST_INTERFACE} before using them. Note that all these
 macros increase the reference count of the returned object by 1.
+
+@node Typed Vectors
+@subsection @code{Typed Vectors}
+@cindex @code{Typed Vectors}
+
+Typed vectors are the type-safe equivalent to the @code{csVector} class. They
+work similar to templates, but use @code{#define}'s instead. Using one of
+these macros, you can create a vector class for a specific type of objects.
+There are several different macros which produce slightly different
+behaviour:
+
+@table @code
+@item CS_DECLARE_TYPED_VECTOR
+The standard macro. The elements of the vector are accessible like those of
+@code{csVector}. Objects which are removed with the @code{DeleteIt} parameter
+set to @code{true}, or objects left in the vector at destruction are deleted
+with the @code{delete} operator.
+
+@item CS_DECLARE_TYPED_VECTOR_NODELETE
+Like the above, but removed objects are never deleted. Instead, the pointer
+is just thrown away.
+
+@item CS_DECLARE_TYPED_VECTOR_DECREF
+Like the above, but removed objects are cast to @code{iBase} and
+@code{DecRef()} is called.
+
+@item CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR
+This vector is completely different from the above. Its elements cannot be
+accessed directly (i.e. with @code{operator[]}), but only by real methods.
+For every added object, @code{PrepareItem()} is called; for every removed
+object, @code{FreeItem()} is called. This time it really applies to
+@emph{every} object, since there is no @code{DeleteIt} parameter for methods
+that can remove elements.
+
+@item CS_DECLARE_TYPED_IBASE_VECTOR
+An example where restricted access vectors are useful. This vector holds a
+counted reference to all contained objects.
+@end table
+
+In addition, so-called @dfn{object vectors} are provided. They are specially
+suited to contain objects of type @code{csObject} and add special methods,
+for example to find an object by name. These macros are:
+@table @code
+@item CS_DECLARE_OBJECT_VECTOR_NOREF(NAME,TYPE)
+Object vector equivalent to @code{CS_DECLARE_TYPED_VECTOR_NODELETE}.
+
+@item CS_DECLARE_RESTRICTED_ACCESS_OBJECT_VECTOR(NAME,TYPE)
+Object vector equivalent to @code{CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR}.
+
+@item CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)
+Object vector equivalent to @code{CS_DECLARE_TYPED_IBASE_VECTOR}.
+@end table
+

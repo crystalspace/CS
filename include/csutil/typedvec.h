@@ -73,29 +73,11 @@
 
 /**
  * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
- * This macro lets you define how items are deleted. You have to define
- * the following function for this: <p>
- *
- * bool NAME::FreeTypedItem (TYPE *item);
- */
-#define CS_DECLARE_TYPED_VECTOR_USERDELETE(NAME,TYPE)			\
-  CS_PRIVATE_DECLARE_TYPED_VECTOR_USERDELETE (NAME, TYPE)
-
-/**
- * 
+ * The vector calls DecRef on the items in FreeItem ().
  */
 
 #define CS_DECLARE_TYPED_VECTOR_DECREF(NAME, TYPE) \
  CS_PRIVATE_DECLARE_TYPED_VECTOR_DECREF(NAME, TYPE)
-
-/**
- * Implement Name::FreeTypedItem() for CS_DECLARE_TYPED_VECTOR_USERDELETE to
- * delete the item. This combination can be used instead of
- * CS_DECLARE_TYPED_VECTOR if the contained type is undefined at the time
- * you declare the vector class.
- */
-#define CS_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)			\
-  CS_PRIVATE_IMPLEMENT_TYPED_VECTOR_DELETE(NAME,TYPE)
 
 /**
  * Construct a typed vector class called 'NAME', storing (TYPE*) objects.
@@ -117,45 +99,6 @@
  */
 #define CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR(NAME,TYPE)		\
   CS_PRIVATE_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR (NAME, TYPE)
-
-/**
- * Begin the class definition of a typed vector. The 'macro' parameter
- * determines which of the above macros is used, and by this the type
- * of vector to use. After this macro, add any number of user-defined
- * members and functions, then close the class definition with
- * CS_FINISH_TYPED_VECTOR. This actually creates an empty subclass of
- * a typed vector class called "NAME_Helper". This also means that by
- * default there is no constructor that takes any parameters. Note that
- * when using CS_DECLARE_TYPED_VECTOR_USERDELETE for MACRO, the function
- * to implement is called "NAME_Helper::FreeTypedItem", Not "NAME::..." <p>
- *
- * IMPORTANT: FreeTypedItem() is not virtual. If you define that function
- * between CS_BEGIN_TYPED_VECTOR() and CS_FINISH_TYPED_VECTOR(), it will
- * not be called! (more exactly: It will not override the FreeTypedItem
- * that is defined by 'MACRO')
- *
- * EVEN MORE IMPORTANT: If you override FreeItem(), you *must* call
- * DeleteAll() in the destructor of your derived class. Don't rely on the
- * superclass to do this. Due to the way destruction works in C++, this
- * would cause the *non-derived* FreeItem() to be called from the destructor.
- * @@@
- */
-#define CS_BEGIN_TYPED_VECTOR(MACRO,NAME,TYPE)				\
-  CS_PRIVATE_BEGIN_USER_VECTOR(MACRO,NAME,TYPE)
-
-/**
- * Finish the class definition of a typed vector.
- */
-#define CS_FINISH_TYPED_VECTOR						\
-  CS_PRIVATE_FINISH_USER_VECTOR
-
-/**
- * Define the default constructor in a typed vector (must be placed into
- * the class definition).
- */
-#define CS_TYPED_VECTOR_CONSTRUCTOR(NAME)				\
-  CS_PRIVATE_TYPED_VECTOR_CONSTRUCTOR (NAME)
-
 
 //----------------------------------------------------------------------------
 //--- implementation of the above macros follows -----------------------------

@@ -182,7 +182,8 @@ public:
     CS_DECLARE_TYPED_RESTRICTED_ACCESS_VECTOR, NAME, TYPE)
 
 #define CS_PRIVATE_DECLARE_OBJECT_VECTOR_COMMON(MACRO,NAME,TYPE)	\
-  CS_BEGIN_TYPED_VECTOR (MACRO, NAME, TYPE)				\
+  MACRO (NAME##_Helper, TYPE);						\
+  class NAME : public NAME##_Helper {					\
   private:								\
     csNamedObjectVector ObjVec;						\
   public:								\
@@ -206,7 +207,7 @@ public:
       { return csNamedObjectVector::Compare (Item1, Item2, Mode); }	\
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const \
       { return csNamedObjectVector::CompareKey (Item, Key, Mode); }	\
-  CS_FINISH_TYPED_VECTOR
+  }
 
 // implementation of inline functions follows
 inline csNamedObjectVector::csNamedObjectVector ()

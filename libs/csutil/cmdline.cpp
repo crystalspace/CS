@@ -36,8 +36,11 @@ struct csCommandLineOption
   { delete [] Name; delete [] Value; }
 };
 
-CS_IMPLEMENT_TYPED_VECTOR_DELETE (
-  csCommandLineParser::csCommandLineOptionVector_Helper, csCommandLineOption);
+bool csCommandLineParser::csCommandLineOptionVector::FreeItem (csSome item)
+{
+  delete ((csCommandLineOption*)item);
+  return true;
+}
 
 int csCommandLineParser::csCommandLineOptionVector::CompareKey
   (csSome Item, csConstSome Key, int /*Mode*/) const
