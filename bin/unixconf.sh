@@ -17,7 +17,7 @@ INSTALL_DIR=$2
 SCRIPT_NAME=`basename $0`
 SCRIPT_DIR=`expr $0 : "\(.*\)/${SCRIPT_NAME}"`
 [ -z "${SCRIPT_DIR}" ] && SCRIPT_DIR="./"
-SCRIPT_DIR=`(cd ${SCRIPT_DIR}; pwd)`	# Convert to absolute path.
+SCRIPT_DIR=`(cd ${SCRIPT_DIR} > /dev/null; pwd)`	# Convert to absolute path.
 
 # First get a string describing current machine and processor types
 # Initially set to reasonable defaults
