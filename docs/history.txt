@@ -17,6 +17,10 @@ The history order is reversed so that new features are at the top.
 	    generated file was not added to the clean target.
 	- Oktal added loaders for the nullmesh object and factory, needed for
 	  blend2cs and hierarchical meshes.
+	- Eric Sunshine fixed the following problems with cspython.mak:
+	    - Neglected to include swigpythgen and swigpythinst targets in
+	      "make help" output.
+	    - Neglected to install _cspace.so (_cspace.dll) via "make install".
 22-Jun-2003
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method

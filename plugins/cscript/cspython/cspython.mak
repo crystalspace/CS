@@ -13,6 +13,9 @@ ifeq ($(MAKESECTION),rootdefines)
 # Plugin-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make cspython     Make the $(DESCRIPTION.cspython)$"
+PSEUDOHELP += \
+  $(NEWLINE)echo $"  make swigpythgen  Make the $(DESCRIPTION.swigpythgen)$" \
+  $(NEWLINE)echo $"  make swigpythinst $(DESCRIPTION.swigpythinst)$"
 ifneq ($(MAKE_PYTHON_MODULE),no)
 PLUGINHELP += \
   $(NEWLINE)echo $"  make pythmod      Make the $(DESCRIPTION.pythmod)$"
@@ -73,6 +76,10 @@ PYTHMOD.INSTALLDIR=$(OUTPROC)/python
 PYTHMOD = $(PYTHMOD.INSTALLDIR)/_cspace$(DLL)
 LIB.PYTHMOD = $(LIB.CSPYTHON)
 LIB.PYTHMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
+
+ifneq ($(MAKE_PYTHON_MODULE),no)
+TO_INSTALL.DYNAMIC_LIBS += $(PYTHMOD.BUILDBASE)
+endif
 
 TO_INSTALL.EXE += python.cex
 
