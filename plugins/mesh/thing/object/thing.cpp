@@ -847,41 +847,28 @@ void csThingStatic::CalculateNormals ()
 {
   int polyCount = static_polygons.Length();
   int i, k;
-  size_t j;
 
   delete[] obj_normals;
   obj_normals = new csVector3[num_vertices];
+  memset (obj_normals, 0, sizeof (csVector3)*num_vertices);
 
-  // First build a table so that we can find all polygons that connect
-  // to a vertex easily.
-  PolygonsForVertex* pvv = new PolygonsForVertex[num_vertices];
   for (i = 0 ; i < polyCount ; i++)
   {
     csPolygon3DStatic* p = static_polygons.Get (i);
+    const csVector3& normal = p->GetObjectPlane ().Normal();
     int* vtidx = p->GetVertexIndices ();
     for (k = 0 ; k < p->GetVertexCount () ; k++)
     {
       CS_ASSERT (vtidx[k] >= 0 && vtidx[k] < num_vertices);
-      pvv[vtidx[k]].poly_indices.Push (i);
+      obj_normals[vtidx[k]] += normal;
     }
   }
 
   // Now calculate normals.
   for (i = 0 ; i < num_vertices ; i++)
   {
-    csVector3 n (0);
-    for (j = 0 ; j < pvv[i].poly_indices.Length () ; j++)
-    {
-      csPolygon3DStatic* p = static_polygons.Get (pvv[i].poly_indices[j]);
-      const csVector3& normal = p->GetObjectPlane ().Normal();
-      n += normal;
-    }
-    float norm = n.Norm ();
-    if (norm) n /= norm;
-    obj_normals[i] = n;
+    obj_normals[i].Normalize ();
   }
-
-  delete[] pvv;
 }
 
 int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)

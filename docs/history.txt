@@ -14,6 +14,8 @@ chronological order.
 	  (before main()), thus before the `libraryNames' string set has been
 	  initialized.  (Problem was introduced on 25-Nov-2004 when SCF was
 	  changed to make it legal to scan the same directory multiple times.)
+	- Jorrit optimized the routine in thing to calculate normals. Thanks
+	  to Marten for suggesting this.
 16-Jan-2004
 	- res reduced the iImage interface to a container for pixel data,
 	  merged csImageFile and csImageMemory and moved the image 
