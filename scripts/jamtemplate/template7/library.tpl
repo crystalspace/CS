@@ -12,7 +12,7 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\release\temp\%project%"
+			OutputDirectory=".\release\libs"
 			IntermediateDirectory=".\release\temp\%project%"
 			ConfigurationType="4"
 			UseOfMFC="0"
@@ -38,34 +38,19 @@
 				ProgramDataBaseFileName=".\release\temp\%project%/%project%.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%lflags%"
-				AdditionalDependencies="delayimp.lib %libs%"
-				OutputFile="release\temp\%project%\%name%_vc7.dll"
-				Version="4.0"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
-				DelayLoadDLLs="%delaylibs%"
-				ProgramDatabaseFile=".\release\temp\%project%/%project%.pdb"
-				SubSystem="2"
-				OptimizeReferences="1"
-				ImportLibrary=".\release\bin\libs\%project%.lib"
-				TargetMachine="1"
-				BaseAddress="" />
+				Name="VCLibrarianTool"
+				OutputFile=".\release\libs\%project%.lib"
+				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to build root.
-copy &quot;$(TargetPath)&quot; %buildroot%
-"/>
+				CommandLine="echo File is a lib, Copy skipped."/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -80,7 +65,7 @@ copy &quot;$(TargetPath)&quot; %buildroot%
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\debug\temp\%project%"
+			OutputDirectory=".\debug\libs"
 			IntermediateDirectory=".\debug\temp\%project%"
 			ConfigurationType="4"
 			UseOfMFC="0"
@@ -103,34 +88,19 @@ copy &quot;$(TargetPath)&quot; %buildroot%
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="%debuglflags%"
-				AdditionalDependencies="delayimp.lib %debuglibs%"
-				OutputFile="debug\temp\%project%\%name%_vc7d.dll"
-				Version="1.0"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMTD"
-				DelayLoadDLLs="%delaylibs%"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\debug\temp\%project%/%project%.pdb"
-				SubSystem="2"
-				ImportLibrary=".\debug\bin\libs/%project%_d.lib"
-				TargetMachine="1"
-				BaseAddress="" />
+				Name="VCLibrarianTool"
+				OutputFile="debug\libs\%project%_d.lib"
+				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to build root.
-copy &quot;$(TargetPath)&quot; %buildroot%
-"/>
+				CommandLine="echo File is a lib, Copy skipped."/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool

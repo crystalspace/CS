@@ -52,6 +52,13 @@ chronological order.
 	  even if Plugin rule had been invoked with "noinstall" option.
 	- Eric Sunshine added "nohelp" option to Plugin invocation for
 	  'dynavis_debug' target in dynavis/Jamfile.
+	- res made the following changes:
+	    - Fixed msvcgen to correctly honor LibDepends dependencies.
+	    - Augmented msvcgen.pl to remove duplicate supplied dependencies.
+	    - Sanitized the VC7 library template. Some experimental dynamic lib
+  	      related stuff crept in.
+	    - Fixed a problem in jamtemplate's template7/ws.tpl that prevented 
+	      the Release build config from being useable.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 

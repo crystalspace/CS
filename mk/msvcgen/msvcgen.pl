@@ -828,13 +828,13 @@ sub process_project_options {
     }
     @main::opt_library = @libraries;
 
-    my @depends;
+    my %depends;
     my $depend;
     foreach $depend (filter(@main::opt_depend)) {
 	remove_suffix($depend, $main::opt_project_extension);
-	push(@depends, $depend);
+	if (!exists ($depends{$depend})) { $depends{$depend} = 1; }
     }
-    @main::opt_depend = @depends;
+    @main::opt_depend = keys(%depends);
 
     $main::opt_source_root =~ tr:/:\\:;
     $main::opt_build_root =~ tr:/:\\:;

@@ -685,6 +685,7 @@ rule CompileGroups
 rule LinkWith
 {
   DEPEND on $($(<)_TARGET) += lib$(>) ;
+  DEPEND on $($(<)_TARGET) += lib$($(>)_depends) ;
   MsvcLFlags $(<) : $($($(>).EXTERNALLIBS).LFLAGS) ;
   MsvcExternalLibrary $(<) : $($($(>).EXTERNALLIBS).LIBS) ;
 }
