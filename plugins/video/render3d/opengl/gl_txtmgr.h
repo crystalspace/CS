@@ -124,6 +124,8 @@ public:
   csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D);
 
+  virtual ~csGLTextureHandle () { }
+
   GLenum SourceType (){return sourceType;}
   GLenum SourceFormat (){return sourceFormat;}
   GLenum TargetFormat (){return targetFormat;}
@@ -379,6 +381,8 @@ public:
         iGraphics2D* iG2D, iConfigFile *config,
         csGLRender3D *R3D);
 
+  virtual ~csGLTextureManager () { }
+
   /// Read configuration values from config file.
   void read_config (iConfigFile *config);
   void Clear ();
@@ -506,3 +510,4 @@ csGLTextureManager::formatDescription var[] = {
 
 
 #endif // __CS_GL_TXTMGR_H__
+

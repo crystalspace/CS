@@ -56,8 +56,8 @@ csVaoRenderBuffer::~csVaoRenderBuffer()
 {
   vaomgr->render3d->ext.glFreeObjectBufferATI(VAObufferID);
   //release other buffers
-  delete[] tempbuffer;
-  delete[] indexbuffer;
+  delete[] (char *)tempbuffer;
+  delete[] (char *)indexbuffer;
 }
 
 void csVaoRenderBuffer::Release()
@@ -82,3 +82,4 @@ bool csVaoRenderBufferManager::Initialize(csGLRender3D* render3d)
     csVaoRenderBufferManager::render3d = render3d;
     return true;
 }
+

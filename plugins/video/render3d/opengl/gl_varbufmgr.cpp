@@ -396,7 +396,7 @@ csVARRenderBuffer::~csVARRenderBuffer()
   {
     int i;
     for(i = 0; i < MAXMEMORYBLOCKS; ++i)
-      delete memblock[i].buffer;
+      delete [] (char *)memblock[i].buffer;
   }else
   {
     int i;
