@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	        horizontal index lookup table.
 	- Added 'csparser' to 'make walkall' target.
 	- Fix to python plugin for csparser.
+	- Fixed the balls in csdemo.
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).

@@ -479,7 +479,7 @@ void Demo::SetupObjects ()
   sat->SetRenderPriority (engine->GetRenderPriority ("object"));
   sat->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (sat->GetMeshObject (), iBallState);
-  bs->SetRadius (100, 100, 100);
+  bs->SetRadius (50, 50, 50);
   bs->SetMaterialWrapper (engine->FindMaterial ("saturn"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
@@ -493,7 +493,7 @@ void Demo::SetupObjects ()
   jup->SetRenderPriority (engine->GetRenderPriority ("object"));
   jup->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (jup->GetMeshObject (), iBallState);
-  bs->SetRadius (100, 100, 100);
+  bs->SetRadius (50, 50, 50);
   bs->SetMaterialWrapper (engine->FindMaterial ("jupiter"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
@@ -507,7 +507,7 @@ void Demo::SetupObjects ()
   earth->SetRenderPriority (engine->GetRenderPriority ("object"));
   earth->SetZBufMode (CS_ZBUF_USE);
   bs = SCF_QUERY_INTERFACE (earth->GetMeshObject (), iBallState);
-  bs->SetRadius (50, 50, 50);
+  bs->SetRadius (25, 25, 25);
   bs->SetMaterialWrapper (engine->FindMaterial ("earth"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
@@ -521,7 +521,7 @@ void Demo::SetupObjects ()
   clouds->SetRenderPriority (engine->GetRenderPriority ("alpha"));
   clouds->SetZBufMode (CS_ZBUF_TEST);
   bs = SCF_QUERY_INTERFACE (clouds->GetMeshObject (), iBallState);
-  bs->SetRadius (55, 55, 55);
+  bs->SetRadius (27.5, 27.5, 27.5);
   bs->SetMaterialWrapper (engine->FindMaterial ("earthclouds"));
   bs->SetCylindricalMapping (true);
   bs->SetRimVertices (16);
