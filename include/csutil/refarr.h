@@ -167,7 +167,7 @@ public:
   {
     csRef<T> ret = root [count - 1];
     SetLength (count - 1);
-    return ret;
+    return csPtr<T> (ret);
   }
 
   /// Return the top element but don't remove it.
