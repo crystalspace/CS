@@ -134,7 +134,7 @@ public:
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 
     CharRange* glyphs, int height, int ascent, int descent,
-	int text_height, int underline_position, int underline_thickness,
+    int text_height, int underline_position, int underline_thickness,
     csGlyphMetrics* gMetrics,
     iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
     iDataBuffer* alpha = 0, csBitmapMetrics* aMetrics = 0);
@@ -183,6 +183,10 @@ public:
    * Return the width and height of text written with this font.
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH);
+
+  /**
+   * Return the width, height, and descender of text written with this font.
+   */
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
 
   /**
@@ -211,6 +215,7 @@ public:
    */
   virtual int GetAscent (); 
 
+  /// Does the font contain a glyph for this character?
   virtual bool HasGlyph (utf32_char c); 
 
   /** 
@@ -282,4 +287,3 @@ public:
 };
 
 #endif // __CS_CSFONT_H__
-

@@ -61,14 +61,38 @@ struct csFontDef
 
 static csFontDef const FontList [] =
 {
-  { CSFONT_LARGE,	8, 1, font_Police,  sizeof (font_Police),  
-    width_Police,  ranges_Police, underline_position_Police, underline_thickness_Police, text_height_Police },
-  { CSFONT_ITALIC,	8, 1, font_Italic,  sizeof (font_Italic),  
-    width_Italic,  ranges_Italic, underline_position_Italic, underline_thickness_Italic, text_height_Italic },
-  { CSFONT_COURIER,	8, 1, font_Courier, sizeof (font_Courier),  
-    width_Courier, ranges_Courier, underline_position_Courier, underline_thickness_Courier, text_height_Courier },
-  { CSFONT_SMALL,	6, 1, font_Tiny,    sizeof (font_Tiny),  
-    width_Tiny,    ranges_Tiny, underline_position_Tiny, underline_thickness_Tiny, text_height_Tiny }
+  {
+    CSFONT_LARGE,
+    8, 1,
+    font_Police, sizeof (font_Police),  
+    width_Police, ranges_Police,
+    underline_position_Police, underline_thickness_Police,
+    text_height_Police
+  },
+  {
+    CSFONT_ITALIC,
+    8, 1,
+    font_Italic, sizeof (font_Italic),  
+    width_Italic, ranges_Italic,
+    underline_position_Italic, underline_thickness_Italic,
+    text_height_Italic
+  },
+  {
+    CSFONT_COURIER,
+    8, 1,
+    font_Courier, sizeof (font_Courier),  
+    width_Courier, ranges_Courier,
+    underline_position_Courier, underline_thickness_Courier,
+    text_height_Courier
+  },
+  {
+    CSFONT_SMALL,
+    6, 1,
+    font_Tiny, sizeof (font_Tiny),  
+    width_Tiny, ranges_Tiny,
+    underline_position_Tiny, underline_thickness_Tiny,
+    text_height_Tiny
+  }
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -84,7 +108,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
 
-
 csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -99,20 +122,16 @@ csDefaultFontServer::~csDefaultFontServer()
 
 csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
 {
-  int i;
-
   // First of all, look for an already loaded font
   csDefaultFont* font = fonts.Get (filename, 0);
   if (font != 0)
-  {
     return csPtr<iFont> (csRef<iFont> ((iFont*)font));
-  }
 
   csRef<csDefaultFont> newfont;
   // Now check the list of static fonts
   if (filename [0] == '*')
   {
-    for (i = 0; i < FontListCount; i++)
+    for (int i = 0; i < FontListCount; i++)
     {
       if (!strcmp (filename, FontList [i].Name))
       {
@@ -128,8 +147,8 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
 	bMetrics.SetLength (numGlyphs);
 	csDirtyAccessArray<csGlyphMetrics> gMetrics;
 	gMetrics.SetLength (numGlyphs);
-	int j;
-	for (j = 0; j < numGlyphs; j++)
+
+	for (int j = 0; j < numGlyphs; j++)
 	{
 	  bMetrics[j].width = FontList [i].IndividualWidth[j];
 	  bMetrics[j].height = FontList [i].Height;
@@ -141,12 +160,18 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
 	csRef<iDataBuffer> db;
 	db.AttachNew (new csDataBuffer ((char*)FontList[i].FontBitmap,
 	  FontList[i].bitmapSize, false));
-	newfont.AttachNew (new csDefaultFont (this, FontList [i].Name,
-          FontList [i].ranges,
-	  FontList [i].Height, FontList [i].Height-FontList [i].Baseline,
-	  FontList [i].Baseline,
-	  FontList[i].text_height, FontList[i].underline_position, FontList[i].underline_thickness,
-	  gMetrics.GetArray (), db, bMetrics.GetArray ()));
+	newfont.AttachNew (new csDefaultFont (this,
+          FontList[i].Name,
+          FontList[i].ranges,
+	  FontList[i].Height,
+          FontList[i].Height-FontList[i].Baseline,
+	  FontList[i].Baseline,
+	  FontList[i].text_height,
+	  FontList[i].underline_position,
+          FontList[i].underline_thickness,
+	  gMetrics.GetArray(),
+          db,
+          bMetrics.GetArray()));
 	break;
       }
     }
@@ -212,7 +237,6 @@ error:
   int fontdefFirst = 0;
   bool fontdefAlpha = false;
   bool hasTextHeight = false;
-  int text_height = 0;
   fontdef.underline_position = 1;
   fontdef.underline_thickness = 1;
 
@@ -285,10 +309,10 @@ error:
       else if (!strcmp (kw, "HasGlyphAdvance"))
 	hasGlyphAdvance = (n != 0);
       else if (!strcmp (kw, "TextHeight"))
-	  {
-        fontdef.text_height = n;
-        hasTextHeight = true;
-	  }
+      {
+	fontdef.text_height = n;
+	hasTextHeight = true;
+      }
       else if (!strcmp (kw, "UnderlinePosition"))
         fontdef.underline_position = n;
       else if (!strcmp (kw, "UnderlineThickness"))
@@ -305,12 +329,12 @@ error:
 
   if(!hasTextHeight)
   {
-	  // Default text height looks good at about 1.75times the fonts actual hieght. 
-	  fontdef.text_height = (int)(fontdef.Height * 1.75);
+    // Default text height looks good at about 1.75times the font's actual
+    // height. 
+    fontdef.text_height = (int)(fontdef.Height * 1.75);
   }
 
   bool newStyleFont = (hasCharRanges | hasBitmapMetrics | hasGlyphAdvance);
-
   if (newStyleFont)
   {
   #if defined(CS_DEBUG)
@@ -397,8 +421,7 @@ error:
     else
     {
       uint8* individualWidths = (uint8*)binary;
-      int j;
-      for (j = 0; j < numGlyphs; j++)
+      for (int j = 0; j < numGlyphs; j++)
       {
 	memset (&(bMetrics[j]), 0, sizeof (csBitmapMetrics));
 	bMetrics[j].width = individualWidths[j];
@@ -407,9 +430,7 @@ error:
 	bMetrics[j].top = ascent;
 
 	if (fontdefAlpha)
-	{
 	  memcpy (&(aMetrics[j]), &(bMetrics[j]), sizeof (csBitmapMetrics));
-	}
 	bitmapSize += ((individualWidths[j] + 7) / 8) * fontdef.Height;
 	alphaSize += individualWidths[j] * fontdef.Height;
       }
@@ -419,8 +440,7 @@ error:
     gMetrics.SetLength (numGlyphs);
     if (hasGlyphAdvance)
     {
-      int j;
-      for (j = 0; j < numGlyphs; j++)
+      for (int j = 0; j < numGlyphs; j++)
       {
 	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
 	gMetrics[j].advance = get_le_long (binary);
@@ -429,8 +449,7 @@ error:
     }
     else
     {
-      int j;
-      for (j = 0; j < numGlyphs; j++)
+      for (int j = 0; j < numGlyphs; j++)
       {
 	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
 	gMetrics[j].advance = bMetrics[j].width;
@@ -438,9 +457,9 @@ error:
     }
 
     size_t bitmapOffs = binary - data;
-    csRef<iDataBuffer> bitmapData = csPtr<iDataBuffer> 
-      (new csParasiticDataBuffer (fntfile, bitmapOffs,
-        bitmapSize));
+    csRef<iDataBuffer> bitmapData;
+    bitmapData.AttachNew(
+      new csParasiticDataBuffer (fntfile, bitmapOffs, bitmapSize));
 
     csRef<iDataBuffer> alphaData;
     if (fontdefAlpha)
@@ -449,9 +468,8 @@ error:
 	bitmapOffs + bitmapSize, alphaSize));
     }
     return new csDefaultFont (this, fontdef.Name, ranges.GetArray (), 
-      fontdef.Height, ascent, descent,
-	  fontdef.text_height, fontdef.underline_position, fontdef.underline_thickness,
-
+      fontdef.Height, ascent, descent, fontdef.text_height,
+      fontdef.underline_position, fontdef.underline_thickness,
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
       alphaData, fontdefAlpha ? aMetrics.GetArray () : 0);
   }
@@ -460,7 +478,8 @@ error:
   #if defined(CS_DEBUG)
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.font.csfont",
-      "Reading old style Font %s, height %d, baseline %d, First %d, %d Glyphs", 
+      "Reading old style font %s, height %d, baseline %d, first %d, "
+      "%d glyphs", 
       fontdef.Name, fontdef.Height, fontdef.Baseline, fontdefFirst, 
       fontdefGlyphs);
   #endif
@@ -470,8 +489,7 @@ error:
     bMetrics.SetLength (fontdefGlyphs);
     csDirtyAccessArray<csGlyphMetrics> gMetrics;
     gMetrics.SetLength (fontdefGlyphs);
-    int j;
-    for (j = 0; j < fontdefGlyphs; j++)
+    for (int j = 0; j < fontdefGlyphs; j++)
     {
       bMetrics[j].width = individualWidths[j];
       bMetrics[j].height = fontdef.Height;
@@ -481,8 +499,8 @@ error:
     }
 
     // Compute the font size
-    int c, fontsize = 0, alphasize = 0;
-    for (c = 0; c < fontdefGlyphs; c++)
+    int fontsize = 0, alphasize = 0;
+    for (int c = 0; c < fontdefGlyphs; c++)
     {
       fontsize += ((individualWidths [c] + 7) / 8) * fontdef.Height;
       alphasize += individualWidths [c] * fontdef.Height;
@@ -490,9 +508,9 @@ error:
 
     size_t binOffs = binary - data;
 
-    csRef<iDataBuffer> bitmapData = csPtr<iDataBuffer> 
-      (new csParasiticDataBuffer (fntfile, binOffs + fontdefGlyphs,
-        fontsize));
+    csRef<iDataBuffer> bitmapData;
+    bitmapData.AttachNew(
+      new csParasiticDataBuffer (fntfile, binOffs + fontdefGlyphs, fontsize));
 
     csDefaultFont::CharRange ranges[2];
     ranges[0].startChar = fontdefFirst;
@@ -507,8 +525,8 @@ error:
 	binOffs + fontdefGlyphs + fontsize, alphasize));
     }
     return new csDefaultFont (this, fontdef.Name, ranges, fontdef.Height,
-      fontdef.Height - fontdef.Baseline, fontdef.Baseline,
-	  fontdef.text_height, fontdef.underline_position, fontdef.underline_thickness,
+      fontdef.Height - fontdef.Baseline, fontdef.Baseline, fontdef.text_height,
+      fontdef.underline_position, fontdef.underline_thickness,
       gMetrics.GetArray (), bitmapData, bMetrics.GetArray (),
       alphaData, fontdefAlpha ? bMetrics.GetArray () : 0);
   }
@@ -524,7 +542,8 @@ SCF_IMPLEMENT_IBASE_END
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
 			      CharRange* glyphRanges, int height, 
 			      int ascent, int descent,
-			      int text_height, int underline_position, int underline_thickness,
+			      int text_height, int underline_position,
+			      int underline_thickness,
 			      csGlyphMetrics* gMetrics,
 			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
 			      iDataBuffer* alpha, csBitmapMetrics* aMetrics) 
@@ -582,9 +601,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
       }
 
       memcpy (&glyphData.gMetrics, &(gMetrics[i]), sizeof (csGlyphMetrics));
-
       glyphs.Put (glyph, glyphData);
-
       glyph++;
       numGlyphs--;
       i++;
@@ -607,9 +624,8 @@ csDefaultFont::~csDefaultFont ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csDefaultFont::SetSize (int iSize)
+void csDefaultFont::SetSize (int)
 {
-  (void)iSize;
 }
 
 int csDefaultFont::GetSize ()
@@ -636,14 +652,14 @@ bool csDefaultFont::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
   }
 
   metrics = glyphData->gMetrics;
-
   return true;
 }
 
 csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
     csBitmapMetrics& metrics)
 {
-  if (bitData == 0) return 0;
+  if (bitData == 0)
+    return 0;
 
   Glyph* glyphData = glyphs.GetElementPointer (c);
   if (glyphData == 0) 
@@ -663,7 +679,8 @@ csPtr<iDataBuffer> csDefaultFont::GetGlyphBitmap (utf32_char c,
 csPtr<iDataBuffer> csDefaultFont::GetGlyphAlphaBitmap (utf32_char c,
     csBitmapMetrics& metrics)
 {
-  if (alphaData == 0) return 0;
+  if (alphaData == 0)
+    return 0;
 
   Glyph* glyphData = glyphs.GetElementPointer (c);
   if (glyphData == 0) 
@@ -702,9 +719,10 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
   while (textLen > 0)
   {
     utf32_char glyph;
-    int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, 
-      glyph, 0);
-    if (skip == 0) break;
+    int skip =
+      csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, glyph, 0);
+    if (skip == 0)
+      break;
 
     text += skip;
     textLen -= skip;
@@ -717,7 +735,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
     }
 
     if ((glyphData->bitmapSize != (size_t)~0) || 
-      (glyphData->alphaSize != (size_t)~0))
+        (glyphData->alphaSize != (size_t)~0))
       oW += glyphData->gMetrics.advance;
     else
       oW += defW;
@@ -736,9 +754,10 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
   while (textLen > 0)
   {
     utf32_char glyph;
-    int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, 
-      glyph, 0);
-    if (skip == 0) break;
+    int skip =
+      csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, glyph, 0);
+    if (skip == 0)
+      break;
 
     text += skip;
     textLen -= skip;
@@ -795,7 +814,6 @@ int csDefaultFont::GetDescent ()
 bool csDefaultFont::HasGlyph (utf32_char c)
 {
   Glyph* glyphData = glyphs.GetElementPointer (c);
-
   return ((glyphData != 0) 
     && ((glyphData->bitmapSize != (size_t)~0) 
     || (glyphData->alphaSize != (size_t)~0)));
@@ -803,15 +821,15 @@ bool csDefaultFont::HasGlyph (utf32_char c)
 
 int csDefaultFont::GetTextHeight ()
 {
-	return TextHeight;
+  return TextHeight;
 }
 
 int csDefaultFont::GetUnderlinePosition ()
 {
-	return UnderlinePosition;
+  return UnderlinePosition;
 }
 
 int csDefaultFont::GetUnderlineThickness ()
 {
-	return UnderlineThickness;
+  return UnderlineThickness;
 }
