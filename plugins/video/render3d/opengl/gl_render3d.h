@@ -42,6 +42,8 @@
 #include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/glstates.h"
 
+#include "ivaria/bugplug.h"
+
 #include "glextmanager.h"
 #include "gl_sysbufmgr.h"
 #include "gl_varbufmgr.h"
@@ -91,6 +93,8 @@ private:
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
   csRef<iShaderManager> shadermgr;
+
+  csRef<iBugPlug> bugplug;
 
   static csGLStateCache* statecache;
 
@@ -195,7 +199,9 @@ private:
 
 
   iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
+  bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
   iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
+  bool texunitenabled[16]; // @@@ Hardcoded max number of units
 
   iShaderPass* lastUsedShaderpass;
 
@@ -236,13 +242,16 @@ public:
     { return lightmgr; }
 
   /// Activate a vertex buffer
-  virtual void ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
+  virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
 
   /// Deactivate a vertex buffer
   virtual void DeactivateBuffer (csVertexAttrib attrib);
 
   /// Activate a texture
-  virtual void ActivateTexture (iTextureHandle *txthandle, int unit = 0);
+  virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);
+
+  /// Activate a texture (Should probably handled some better way)
+  virtual bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0);
 
   /// Deactivate a texture
   virtual void DeactivateTexture (int unit = 0);

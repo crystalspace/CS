@@ -23,8 +23,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 
-#include "CG/cg.h"
-#include "CG/cgGL.h"
+#include "cg/cg.h"
+#include "cg/cgGL.h"
 
 class csShaderGLCGVP : public iShaderProgram
 {
@@ -34,7 +34,6 @@ private:
     XMLTOKEN_CGVP = 1,
     XMLTOKEN_DECLARE,
     XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_STREAMMAP,
     XMLTOKEN_PROGRAM
   };
 
@@ -48,12 +47,10 @@ private:
     CGparameter parameter;
   };
 
-  struct streammapentry
+  struct matrixtrackerentry
   {
-    streammapentry() { name = 0; }
-    ~streammapentry() { if(cgvarname) delete cgvarname; }
-    csStringID name;
-    char* cgvarname;
+    CGGLenum matrix;
+    CGGLenum modifier;
     CGparameter parameter;
   };
 
@@ -64,7 +61,7 @@ private:
 
   csHashMap variables;
   csBasicVector variablemap;
-  csBasicVector streammap;
+  csBasicVector matrixtrackers;
   csStringHash xmltokens;
 
   void BuildTokenHash();
@@ -107,7 +104,11 @@ public:
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Deactivate(iShaderPass* current);
+
+  virtual void SetupState (iShaderPass *current, csRenderMesh *mesh) {}
+
+  virtual void ResetState () {}
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific

@@ -194,7 +194,7 @@ struct iShaderPass : iBase
   /// Get texture mapping for a certain unit as a layer index
   virtual int GetTextureMappingAsLayer (int unit) = 0;
   /// Get texture mapping for a certain unit as a texture name
-  virtual const char* GetTextureMappingAsName (int unit) = 0;
+  virtual iTextureHandle* GetTextureMappingAsDirect (int unit) = 0;
 
   /// Get mixmode override
   virtual uint GetMixmodeOverride () = 0;

@@ -37,7 +37,6 @@ private:
     XMLTOKEN_CGFP = 1,
     XMLTOKEN_DECLARE,
     XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_TEXTUREMAP,
     XMLTOKEN_PROGRAM
   };
 
@@ -113,7 +112,11 @@ public:
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh);
+  virtual void Deactivate(iShaderPass* current);
+
+  virtual void SetupState (iShaderPass *current, csRenderMesh *mesh) {}
+
+  virtual void ResetState () {}
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific

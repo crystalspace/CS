@@ -154,21 +154,11 @@ private:
   unsigned int indexstart, indexend;
   csRef<iStreamSource> streamsource;
   csRef<iMaterialHandle> mathandle;
-  const char *defaultvertices;
-  const char *defaulttexcoords;
-  const char *defaultnormals;
-  const char *defaultcolors;
-  const char *defaultindices;
 
 public:
 
   csRenderMesh () 
   {
-    defaultvertices = "vertices";
-    defaulttexcoords = "texture coordinates";
-    defaultnormals = "normals";
-    defaultcolors = "colors";
-    defaultindices = "indices";
     mixmode = CS_FX_COPY;
   }
 

@@ -85,43 +85,14 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
             cgGLSetParameter3f(e->parameter, v3.x, v3.y, v3.z);
         }
         break;
+      case iShaderVariable::VECTOR4:
+        {
+          csVector4 v4;
+          if(lvar->GetValue(v4))
+            cgGLSetParameter4f(e->parameter, v4.x, v4.y, v4.z, v4.w);
+        }
+        break;
       }
-    }
-  }
-
-  for(i = 0; i < texturemap.Length(); ++i)
-  {
-    texturemapentry* e = (texturemapentry*)texturemap.Get(i);
-    if (!e->parameter)
-      continue;
-
-    if (mesh->GetMaterialHandle () && e->layer != -1)
-    {
-      csRef<iTextureHandle> txthandle;
-      if (e->layer == 0)
-      {
-        txthandle = mesh->GetMaterialHandle ()->GetTexture ();
-      } else {
-        csTextureLayer* layer = ((csGLMaterialHandle*)mesh->GetMaterialHandle ())
-          ->GetTextureLayer (e->layer-1);
-        if (layer)
-          txthandle = layer->txt_handle;
-      }
-
-      if (txthandle)
-      {
-        txtcache->Cache (txthandle);
-        csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-          txthandle->GetPrivateObject ();
-        csTxtCacheData *cachedata =
-          (csTxtCacheData *)gltxthandle->GetCacheData ();
-
-        cgGLSetTextureParameter (e->parameter, cachedata->Handle);
-        cgGLEnableTextureParameter (e->parameter);
-      }
-    } else if (e->name)
-    {
-      // @@@ Find and load a named texture /Anders Stenberg
     }
   }
 
@@ -129,14 +100,8 @@ void csShaderGLCGFP::Activate(iShaderPass* current, csRenderMesh* mesh)
   cgGLBindProgram (program);
 }
 
-void csShaderGLCGFP::Deactivate(iShaderPass* current, csRenderMesh* mesh)
+void csShaderGLCGFP::Deactivate(iShaderPass* current)
 {
-  for (int i = 0; i < texturemap.Length(); ++i)
-    cgGLDisableTextureParameter (((texturemapentry*)texturemap.Get(i))->parameter);
-  // @@@ HACK! Probably we should handle all states ourselves
-  for (int i = 0; i < 4; ++i)
-    statecache->Disable_GL_TEXTURE_2D (i);
-
   cgGLDisableProfile (cgGetProgramProfile (program));
 }
 
@@ -154,36 +119,6 @@ bool csShaderGLCGFP::LoadProgramStringToGL(const char* programstring)
 
   cgGLLoadProgram (program);
 
-  for(int i = 0; i < variablemap.Length(); i++)
-  {
-    variablemapentry* e = (variablemapentry*)variablemap.Get(i);
-    e->parameter = cgGetNamedParameter (program, e->cgvarname);
-    if (!e->parameter)
-    {
-      char msg[500];
-      sprintf (msg, "Variablemap warning: Variable '%s' not found in CG program.", e->cgvarname);
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-        msg, NULL);
-    }
-    if (!cgIsParameterReferenced (e->parameter))
-      e->parameter = NULL;
-  }
-
-  for(int i = 0; i < texturemap.Length(); i++)
-  {
-    texturemapentry* e = (texturemapentry*)texturemap.Get(i);
-    e->parameter = cgGetNamedParameter (program, e->cgvarname);
-    if (!e->parameter)
-    {
-      char msg[500];
-      sprintf (msg, "Texturemap warning: Variable '%s' not found in CG program.", e->cgvarname);
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
-        msg, NULL);
-    }
-    if (!cgIsParameterReferenced (e->parameter))
-      e->parameter = NULL;
-  }
-
   return true;
 }
 
@@ -192,7 +127,6 @@ void csShaderGLCGFP::BuildTokenHash()
   xmltokens.Register("CGFP",XMLTOKEN_CGFP);
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
   xmltokens.Register("variablemap", XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register("texturemap", XMLTOKEN_TEXTUREMAP);
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
 }
 
@@ -292,30 +226,6 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
           variablemap.Push( map );
         }
         break;
-      case XMLTOKEN_TEXTUREMAP:
-        {
-          //create a varable<->register mapping
-          texturemapentry * map = new texturemapentry();
-          const char* texname = child->GetAttributeValue("texturename");
-          if (texname)
-          {
-            map->name = new char[strlen(texname)+1];
-            memset(map->name, 0, strlen(texname)+1); 
-            memcpy(map->name, texname, strlen(texname));
-          } else {
-            map->layer = child->GetAttributeValueAsInt("materiallayer");
-          }
-
-          const char* cgvarname = child->GetAttributeValue("cgvar");
-          map->cgvarname = new char[strlen(cgvarname)+1];
-          memset(map->cgvarname, 0, strlen(cgvarname)+1); 
-          memcpy(map->cgvarname, cgvarname, strlen(cgvarname));
-          map->parameter = NULL;
-
-          //save it for later
-          texturemap.Push( map );
-        }
-        break;
       default:
         return false;
       }
@@ -328,13 +238,25 @@ bool csShaderGLCGFP::Load(iDocumentNode* program)
   
 bool csShaderGLCGFP::Prepare()
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE (r3d, iShaderRenderInterface);
-  
-  txtcache = (iGLTextureCache*) sri->GetPrivateObject ("txtcache");
-  r3d->GetDriver2D ()->PerformExtension("getstatecache", &statecache);
+  if (!LoadProgramStringToGL(programstring))
+    return false;
 
-  return LoadProgramStringToGL(programstring);
+  for(int i = 0; i < variablemap.Length(); i++)
+  {
+    variablemapentry* e = (variablemapentry*)variablemap.Get(i);
+    e->parameter = cgGetNamedParameter (program, e->cgvarname);
+    if (!e->parameter)
+    {
+      char msg[500];
+      sprintf (msg, "Variablemap warning: Variable '%s' not found in CG program.", e->cgvarname);
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glcg",
+        msg, NULL);
+    }
+    if (!cgIsParameterReferenced (e->parameter))
+      e->parameter = NULL;
+  }
+
+  return true;
 }
 
 

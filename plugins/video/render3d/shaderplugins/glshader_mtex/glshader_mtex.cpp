@@ -362,7 +362,7 @@ bool csShaderGLMTEX::Prepare()
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
   txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
 
-  if (texlayers.Length () > GL_MAX_TEXTURE_UNITS_ARB)
+  if (texlayers.Length () > maxlayers)
     return false;
 
   return true;
@@ -421,52 +421,17 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 
 void csShaderGLMTEX::Deactivate(iShaderPass* current)
 {
+  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
+  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
 void csShaderGLMTEX::SetupState (iShaderPass *curret, csRenderMesh *mesh)
 {
-  for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
-  {
-    mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
-    ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
-    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
-
-    GLuint texturehandle = 0;
-    iTextureHandle* txt_handle = layer->texturehandle;
-
-    if (layer->texnum >= 0)
-    {
-      csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
-      if(layer->texnum == 0)
-      {
-        txt_handle = mathand->GetTexture();
-      }
-      else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
-      {
-        csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
-        txt_handle = matlayer->txt_handle;
-      }
-    }
-    if (txt_handle)
-      r3d->ActivateTexture (txt_handle, i);
-  }
-  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
-  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
 void csShaderGLMTEX::ResetState ()
 {
-  if(!validProgram) return;
-
-  for(int i = MIN(maxlayers, texlayers.Length()); i >= 0 ; --i)
-  {
-    r3d->DeactivateTexture (i);
-//    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  }
-
-  ext->glActiveTextureARB(GL_TEXTURE0_ARB);
-  ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
 

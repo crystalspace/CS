@@ -30,15 +30,18 @@
 #include "csutil/hashmap.h"
 #include "csutil/xmltiny.h"
 
+#include "iengine/engine.h"
+#include "iengine/texture.h"
+#include "igeom/clip2d.h"
 #include "imap/services.h"
 #include "iutil/document.h"
-#include "igeom/clip2d.h"
 #include "iutil/vfs.h"
 #include "iutil/eventq.h"
 #include "iutil/virtclk.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
+#include "ivideo/texture.h"
 
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"
@@ -570,6 +573,15 @@ void csShaderPass::Deactivate()
 {
   if(vp) vp->Deactivate(this);
   if(fp) fp->Deactivate(this);
+
+  int i;
+  for (i=TEXMAX-1; i>=0; i--)
+  {
+    if (texmappingdirect[i] || texmappinglayer[i] != -1)
+    {
+      r3d->DeactivateTexture (i);
+    }
+  }
 }
 
 void csShaderPass::SetupState (csRenderMesh *mesh)
@@ -579,11 +591,26 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      csRef<iRenderBuffer> buf (
-        mesh->GetStreamSource ()->GetBuffer (streammapping[i]));
+      iRenderBuffer* buf  = mesh->GetStreamSource ()->GetBuffer (streammapping[i]);
       if (buf)
         r3d->ActivateBuffer ((csVertexAttrib)i, buf);
     }
+  }
+
+  for (i=0; i<TEXMAX; i++)
+  {
+    if (texmappinglayer[i] != -1)
+    {
+      if (texmappinglayer[i] >= 0)
+        if (r3d->ActivateTexture (mesh->GetMaterialHandle (), texmappinglayer[i], i))
+          continue;
+    }
+    if (texmappingdirect[i])
+    {
+      r3d->ActivateTexture (texmappingdirect[i], i);
+      continue;
+    }
+    r3d->DeactivateTexture (i);
   }
 
   r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
@@ -603,6 +630,13 @@ void csShaderPass::ResetState ()
       r3d->DeactivateBuffer ((csVertexAttrib)i);
     }
   }
+  /*for (i=TEXMAX-1; i>=0; i--)
+  {
+    if (texmappingdirect[i] || texmappinglayer[i] != -1)
+    {
+      r3d->DeactivateTexture (i);
+    }
+  }*/
   if (vp) vp->ResetState ();
   if (fp) fp->ResetState ();
 
@@ -621,9 +655,8 @@ csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute)
 
 void csShaderPass::AddTextureMapping (const char* name, int unit)
 {
-  delete[] texmappingname[unit];
-  texmappingname[unit] = new char[strlen(name)+1];
-  strcpy (texmappingname[unit], name);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (objectreg, iEngine);
+  texmappingdirect[unit] = engine->FindTexture (name)->GetTextureHandle ();
 }
 
 void csShaderPass::AddTextureMapping (int layer, int unit)
@@ -636,9 +669,9 @@ int csShaderPass::GetTextureMappingAsLayer (int unit)
   return texmappinglayer[unit];
 }
 
-const char* csShaderPass::GetTextureMappingAsName (int unit)
+iTextureHandle* csShaderPass::GetTextureMappingAsDirect (int unit)
 {
-  return texmappingname[unit];
+  return texmappingdirect[unit];
 }
 
 iShaderVariable* csShaderPass::privateGetVariable(int namehash)

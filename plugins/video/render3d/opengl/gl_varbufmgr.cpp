@@ -252,7 +252,7 @@ bool csVARRenderBufferManager::Initialize(csGLRender3D* render3d)
     return false;
 
   render3d->ext.glVertexArrayRangeNV(CS_VAR_ALLOC_SIZE, var_buffer);
-  glEnableClientState(GL_VERTEX_ARRAY_RANGE_NV);
+  //glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
 
   myalloc = new csBuddyAllocator();
@@ -360,8 +360,11 @@ bool csVARRenderBufferManager::ReclaimMemory()
 void* csVARRenderBuffer::AllocData(int size)
 {
   long offset;
+  /*
   while( ((offset = (long) bm->myalloc->alloc(size)) == -1) && bm->ReclaimMemory())
-    {};
+    {};*/
+
+  offset = (long) bm->myalloc->alloc(size);
 
   if(offset == -1) return NULL; //could not alloc memory
 
@@ -398,7 +401,7 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, csRenderBufferType 
 
 csVARRenderBuffer::~csVARRenderBuffer()
 {
-  bm->RemoveBlockInLRU(this);
+  //bm->RemoveBlockInLRU(this);
 
   if( type == CS_BUF_INDEX)
   {
@@ -432,7 +435,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
     {
       locked = true;
       lastlock = lockType;
-      bm->TouchBlockInLRU(this);
+      //bm->TouchBlockInLRU(this);
       return memblock[currentBlock].buffer;
     }
     return NULL;
@@ -535,5 +538,7 @@ bool csVARRenderBuffer::Discard()
   discarded = true;
   return true;
 }
+
+
 
 

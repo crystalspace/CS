@@ -91,8 +91,6 @@ SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
-int tricnt = 0;
-
 csGLRender3D::csGLRender3D (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -142,7 +140,9 @@ csGLRender3D::csGLRender3D (iBase *parent)
   for (i=0; i<16; i++)
   {
     vertattrib[i] = NULL;
+    vertattribenabled[i] = false;
     texunit[i] = NULL;
+    texunitenabled[i] = false;
   }
   lastUsedShaderpass = NULL;
 }
@@ -747,8 +747,9 @@ bool csGLRender3D::Open ()
   shvar_light_0_attenuation->SetType(iShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
+  bool useVAR = config->GetBool ("Video.OpenGL.UseExtension.GL_NV_vertex_array_range");
 
-  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( useVAR && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -766,7 +767,7 @@ bool csGLRender3D::Open ()
     buffermgr = new csSysRenderBufferManager();
   }
 
-  txtcache = new csGLTextureCache (1024*1024*32, this);
+  txtcache = new csGLTextureCache (1024*1024*64, this);
   txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
 
   glClearDepth (0.0);
@@ -808,7 +809,6 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
   SetWriteMask (true,true,true,true);
 
-  tricnt = 0;
   if (render_target)
   {
     int txt_w, txt_h;
@@ -877,6 +877,13 @@ bool csGLRender3D::BeginDraw (int drawflags)
   }
   if (drawflags & CSDRAW_2DGRAPHICS)
   {
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    SetGlOrtho (false);
+    glViewport (1, -1, viewwidth+1, viewheight+1);
+
     SetZMode (CS_ZBUF_NONE);
     return G2D->BeginDraw ();
   }
@@ -887,8 +894,6 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
-  //printf ("Number of tris: %i\n", tricnt);
-  tricnt = 0;
   SetMirrorMode (false);
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -986,6 +991,8 @@ void csGLRender3D::FinishDraw ()
 void csGLRender3D::Print (csRect* area)
 {
   //glFinish ();
+  if (bugplug)
+    bugplug->ResetCounter ("Triangle Count");
   G2D->Print (area);
 }
 
@@ -1038,51 +1045,35 @@ void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fo
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-void csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
+bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
 {
+  bool bind = true;
   if (vertattrib[attrib] == buffer)
-    return;
-  if (vertattrib[attrib])
+  {
+    if (vertattribenabled[attrib])
+      return true;
+    bind = false;
+  }
+  if (bind && vertattrib[attrib])
   {
     vertattrib[attrib]->Release ();
     vertattrib[attrib] = NULL;
   }
-  GLenum type;
-  switch (buffer->GetComponentType ())
-  {
-  case CS_BUFCOMP_BYTE:
-    type = GL_BYTE;
-    break;
-  case CS_BUFCOMP_UNSIGNED_BYTE:
-    type = GL_UNSIGNED_BYTE;
-    break;
-  case CS_BUFCOMP_SHORT:
-    type = GL_SHORT;
-    break;
-  case CS_BUFCOMP_UNSIGNED_SHORT:
-    type = GL_UNSIGNED_SHORT;
-    break;
-  case CS_BUFCOMP_INT:
-    type = GL_INT;
-    break;
-  case CS_BUFCOMP_UNSIGNED_INT:
-    type = GL_UNSIGNED_INT;
-    break;
-  case CS_BUFCOMP_FLOAT:
-    type = GL_FLOAT;
-    break;
-  case CS_BUFCOMP_DOUBLE:
-    type = GL_DOUBLE;
-    break;
-  }
+  
+  static GLenum type[] = {GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, 
+    GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE };
   void* data = buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data)
   {
     ext.glEnableVertexAttribArrayARB (attrib);
-    varr.VertexAttribPointer (
-      attrib, buffer->GetComponentCount (), type, true, 0, data);
+    if (bind)
+      varr.VertexAttribPointer (
+        attrib, buffer->GetComponentCount (), 
+        type[buffer->GetComponentType ()], true, 0, data);
     vertattrib[attrib] = buffer;
+    vertattribenabled[attrib] = true;
   }
+  return true;
 }
 
 void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
@@ -1091,23 +1082,28 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
   {
     ext.glDisableVertexAttribArrayARB (attrib);
     vertattrib[attrib]->Release ();
-    vertattrib[attrib] = NULL;
+    vertattribenabled[attrib] = false;
   }
 }
 
-void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
+bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
+  bool bind = true;
   if (texunit[unit] == txthandle)
-    return;
+  {
+    if (texunitenabled[unit])
+      return true;
+    bind = false;
+  }
 
-  if (texunit[unit])
+  if (bind && texunit[unit])
     DeactivateTexture (unit);
 
   if (ext.CS_GL_ARB_multitexture)
   {
     ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
     ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  } else if (unit != 0) return;
+  } else if (unit != 0) return false;
 
   txtcache->Cache (txthandle);
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
@@ -1118,32 +1114,121 @@ void csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   switch (gltxthandle->target)
   {
   case iTextureHandle::CS_TEX_IMG_1D:
-    statecache->Enable_GL_TEXTURE_1D (unit);;
-    glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
+    statecache->Enable_GL_TEXTURE_1D (unit);
+    if (bind)
+      glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
     texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_2D:
     statecache->Enable_GL_TEXTURE_2D (unit);
-    glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
+    if (bind)
+      glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
     glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, -2); //big hack
     texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_3D:
     statecache->Enable_GL_TEXTURE_3D (unit);
-    glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
+    if (bind)
+      glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
     texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
     break;
   case iTextureHandle::CS_TEX_IMG_CUBEMAP:
     statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
-    glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+    if (bind)
+      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
     texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
     break;
+  default:
+    return false;
   }
+  return true;
 }
+
+bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
+{
+  iTextureHandle* txthandle = NULL;
+  csMaterialHandle* mathand = (csMaterialHandle*)mathandle;
+  if(layer == 0)
+  {
+    txthandle = mathand->GetTexture();
+    if (!txthandle)
+      return false;
+  } else if(layer > 0 && layer <= mathand->GetTextureLayerCount() )
+  {
+    csTextureLayer* matlayer = mathand->GetTextureLayer(layer-1);
+    txthandle = matlayer->txt_handle;
+    if (!txthandle)
+      return false;
+  } else return false;
+
+  bool bind = true;
+  if (texunit[unit] == txthandle)
+  {
+    if (texunitenabled[unit])
+      return true;
+    bind = false;
+  }
+
+  if (bind && texunit[unit])
+    DeactivateTexture (unit);
+
+  if (ext.CS_GL_ARB_multitexture)
+  {
+    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+  } else if (unit != 0) return false;
+
+  txtcache->Cache (txthandle);
+  csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+    txthandle->GetPrivateObject ();
+  csTxtCacheData *cachedata =
+    (csTxtCacheData *)gltxthandle->GetCacheData ();
+
+  switch (gltxthandle->target)
+  {
+  case iTextureHandle::CS_TEX_IMG_1D:
+    statecache->Enable_GL_TEXTURE_1D (unit);
+    if (bind)
+      glBindTexture (GL_TEXTURE_1D, cachedata->Handle );
+    texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
+    break;
+  case iTextureHandle::CS_TEX_IMG_2D:
+    statecache->Enable_GL_TEXTURE_2D (unit);
+    if (bind)
+      glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
+    glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, -2); //big hack
+    texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
+    break;
+  case iTextureHandle::CS_TEX_IMG_3D:
+    statecache->Enable_GL_TEXTURE_3D (unit);
+    if (bind)
+      glBindTexture (GL_TEXTURE_3D, cachedata->Handle );
+    texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
+    break;
+  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+    statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
+    if (bind)
+      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+    texunit[unit] = txthandle;
+    texunitenabled[unit] = true;
+    break;
+  default:
+    return false;
+  }
+  return true;
+}
+
 
 void csGLRender3D::DeactivateTexture (int unit)
 {
-  if (!texunit[unit])
+  if (!texunitenabled[unit])
     return;
 
   if (ext.CS_GL_ARB_multitexture)
@@ -1173,14 +1258,14 @@ void csGLRender3D::DeactivateTexture (int unit)
     //glBindTexture (GL_TEXTURE_CUBE_MAP, NULL);
     break;
   }
-  texunit[unit] = NULL;
+  texunitenabled[unit] = false;
 }
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
-  SetupClipper (mymesh->clip_portal, 
+  /*SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
-                mymesh->clip_z_plane);
+                mymesh->clip_z_plane);*/
 
   SetZMode (mymesh->z_buf_mode);
   GLenum primitivetype;
@@ -1248,8 +1333,6 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  tricnt += (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3;
-
   csRef<iTextureHandle> txthandle;
   if (mathandle)
     txthandle = mathandle->GetTexture ();
@@ -1281,6 +1364,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   if (mathandle)
      shader = mathandle->GetMaterial()->GetShader();
 
+  glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
   bool useshader = false;
   if(shader && shader->IsValid())
   {
@@ -1312,6 +1396,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       }
       pass->SetupState (mymesh);
 
+      /*if (bugplug)
+        bugplug->AddCounter ("Triangle Count", (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);*/
       glDrawElements (
         primitivetype,
         mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1332,16 +1418,16 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       lastUsedShaderpass = NULL;
     }
 
-    csRef<iStreamSource> source = mymesh->GetStreamSource ();
-    csRef<iRenderBuffer> vertexbuf =
+    iStreamSource* source = mymesh->GetStreamSource ();
+    iRenderBuffer* vertexbuf =
       source->GetBuffer (string_vertices);
-    csRef<iRenderBuffer> texcoordbuf =
-      source->GetBuffer (string_texture_coordinates);
-    csRef<iRenderBuffer> normalbuf = 
-      source->GetBuffer (string_normals);
-    csRef<iRenderBuffer> colorbuf = 
-      source->GetBuffer (string_colors);
-    csRef<iRenderBuffer> indexbuf =
+    iRenderBuffer* texcoordbuf = NULL;
+      //source->GetBuffer (string_texture_coordinates);
+    iRenderBuffer* normalbuf = NULL;
+      //source->GetBuffer (string_normals);
+    iRenderBuffer* colorbuf = NULL;
+      //source->GetBuffer (string_colors);
+    iRenderBuffer* indexbuf =
       source->GetBuffer (string_indices);
 
     if (!vertexbuf || vertexbuf->IsDiscarded())
@@ -1391,14 +1477,14 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         if (txthandle)
         {
           ActivateTexture (txthandle);
-          /*txtcache->Cache (txthandle);
+          txtcache->Cache (txthandle);
           csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
             txthandle->GetPrivateObject ();
           csTxtCacheData *cachedata =
             (csTxtCacheData *)gltxthandle->GetCacheData ();
 
           statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-          statecache->Enable_GL_TEXTURE_2D ();*/
+          statecache->Enable_GL_TEXTURE_2D ();
         } else continue;
 
         alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
@@ -1420,6 +1506,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         // @@@ Shift is ignored for now.
         glLoadMatrixf (scalematrix);
 
+        /*if (bugplug)
+          bugplug->AddCounter ("Triangle Count", 
+            (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3);*/
         glDrawElements (
           primitivetype,
           mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1450,10 +1539,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       normalbuf->Release();
     }
   }
-
-  // @@@ HACK
-  glDisable (GL_TEXTURE_CUBE_MAP);
-  glDisable (GL_TEXTURE_3D);
+  glDisableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
   if (clip_planes_enabled)
   {
@@ -1561,6 +1647,8 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
   scfiShaderRenderInterface.Initialize(p);
+
+  bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
   return true;
 }
 

@@ -1462,9 +1462,11 @@ static int compare_material (const void *p1, const void *p2)
     return 1;
   return 0;
 }
+#endif // CS_USE_NEW_RENDERER
 
 void csThing::PreparePolygonBuffer ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (polybuf) return ;
 
   iVertexBufferManager *vbufmgr = thing_type->G3D->
@@ -1568,8 +1570,8 @@ void csThing::PreparePolygonBuffer ()
 
   delete[] matpol;
   polybuf->Prepare ();
-}
 #endif // CS_USE_NEW_RENDERER
+}
 
 void csThing::GetTransformedBoundingBox (
   const csReversibleTransform &trans,

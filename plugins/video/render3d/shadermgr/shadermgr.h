@@ -264,7 +264,7 @@ private:
 
   csStringID streammapping[STREAMMAX];
   int texmappinglayer[TEXMAX];
-  char* texmappingname[TEXMAX];
+  iTextureHandle* texmappingdirect[TEXMAX];
 
     //loading related
   enum
@@ -307,7 +307,7 @@ public:
     for (i=0; i<TEXMAX; i++)
     {
       texmappinglayer[i] = -1;
-      texmappingname[i] = NULL;
+      texmappingdirect[i] = NULL;
     }
 
     writemaskRed = true;
@@ -329,7 +329,7 @@ public:
   /// Get texture mapping for a certain unit as a layer index
   virtual int GetTextureMappingAsLayer (int unit);
   /// Get texture mapping for a certain unit as a texture name
-  virtual const char* GetTextureMappingAsName (int unit);
+  virtual iTextureHandle* GetTextureMappingAsDirect (int unit);
 
   /// Get mixmode override
   virtual uint GetMixmodeOverride ()

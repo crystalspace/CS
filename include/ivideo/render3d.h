@@ -40,6 +40,7 @@ class csRenderMesh;
 
 struct iClipper2D;
 struct iGraphics2D;
+struct iMaterialHandle;
 struct iTextureManager;
 struct iTextureHandle;
 struct iRenderBuffer;
@@ -312,13 +313,16 @@ struct iRender3D : public iBase
   virtual iLightingManager* GetLightingManager () = 0;
 
   /// Activate a vertex buffer
-  virtual void ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;
+  virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;
 
   /// Deactivate a vertex buffer
   virtual void DeactivateBuffer (csVertexAttrib attrib) = 0;
 
   /// Activate a texture
-  virtual void ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
+  virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
+
+  /// Activate a texture (Should probably handled some better way)
+  virtual bool ActivateTexture (iMaterialHandle *matwrapper, int layer, int unit = 0) = 0;
 
   /// Deactivate a texture
   virtual void DeactivateTexture (int unit = 0) = 0;

@@ -97,13 +97,13 @@ void csPolygon2D::Draw (iGraphics2D * g2d, int col)
 }
 
 //---------------------------------------------------------------------------
+#ifndef CS_USE_NEW_RENDERER
 void csPolygon2D::DrawFilled (
   iRenderView *rview,
   csPolygon3D *poly,
   const csPlane3& camera_plane,
   csZBufMode zbufMode)
 {
-#ifndef CS_USE_NEW_RENDERER
   if (!poly->IsTextureMappingEnabled ()) return;
   int i;
   bool debug = false;
@@ -186,7 +186,6 @@ void csPolygon2D::DrawFilled (
   poly->isClipped = false;
   g3dpoly.uvz = NULL;
 #endif
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csPolygon2D::FillZBuf (
@@ -194,7 +193,6 @@ void csPolygon2D::FillZBuf (
   csPolygon3D *poly,
   const csPlane3& camera_plane)
 {
-#ifndef CS_USE_NEW_RENDERER
 
   rview->GetGraphics3D ()->SetRenderState (
       G3DRENDERSTATE_ZBUFFERMODE,
@@ -229,7 +227,6 @@ void csPolygon2D::FillZBuf (
   g3dpoly.normal = camera_plane;
 
   rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csPolygon2D::AddFogPolygon (
@@ -240,7 +237,6 @@ void csPolygon2D::AddFogPolygon (
   CS_ID id,
   int fogtype)
 {
-#ifndef CS_USE_NEW_RENDERER
   int i;
 
   static G3DPolygonDFP g3dpoly;
@@ -266,8 +262,8 @@ void csPolygon2D::AddFogPolygon (
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawFogPolygon (id, g3dpoly, fogtype);
-#endif // CS_USE_NEW_RENDERER
 }
+#endif // CS_USE_NEW_RENDERER
 
 //---------------------------------------------------------------------------
 csPolygon2DQueue::csPolygon2DQueue (int max_size)
