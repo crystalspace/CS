@@ -7,6 +7,17 @@ The history order is reversed so that new features are at the top.
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
 	  flags.
+	- Matze did several changes in the jamrules:
+	  - rewrote custom filetype registration in the jamrules. Now the
+	    rules can decide themself what objects result from sourcefiles. This
+	    allows cleaner handling of header files and makes it possible to
+	    output multiple object files from 1 sourcefile
+	  - Headerfile scanning has to be enabled explicitely for registered
+	    rules. This avoids incorrect headerfilescanning in bison and flex
+	    files.
+	  - Cleaned up and improved bison and flex rules. They are alot more
+	    robust now as jam is aware that bison produces 2 files (a cpp and
+	    a header file)
 2-May-2003
 	- Eric Sunshine augmented jobber.pl to make it possible to associate
 	  multiple directories with a single "target" (in @TARGETS).  All of

@@ -5,6 +5,24 @@
 if $(CMD.OBJC)
 {
 
+rule ObjCRule
+{
+  local object = $(<:S=$(SUFOBJ)) ;
+  ObjC $(object) : $(<) ;
+  return $(object) ;
+}
+RegisterFileType ObjCRule : .m ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .m ;
+
+rule ObjC++Rule
+{
+  local object = $(<:S=$(SUFOBJ)) ;
+  ObjC++ $(object) : $(<) ;
+  return $(object) ;
+}
+RegisterFileType ObjC++Rule : .mm .M ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .mm .M ;
+
 rule ObjC
 {
   Depends $(<) : $(>) ;
@@ -13,7 +31,6 @@ rule ObjC
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType ObjC : .m ;
 
 actions ObjC
 {
@@ -31,7 +48,6 @@ rule ObjC++
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType ObjC++ : .mm .M ;
 
 actions ObjC++
 {

@@ -23,8 +23,13 @@ if $(CMD.SWIG)
 
   rule SimpleSwig
   {
-    C++ $(<) : $(<:S=.cpp) ;
-    SwigHelp $(<:S=.cpp) : $(>) ;
+    local object = $(<:S=$(SUFOBJ)) ;
+    local cppfile = $(<:S=.cpp) ;
+    
+    C++ $(object) : $(cppfile) ;
+    SwigHelp $(cppfile) : $(<) ;
+
+    return $(object) ;
   }
   RegisterFileType SimpleSwig : .i ;
 

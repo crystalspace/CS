@@ -21,21 +21,12 @@ rule Library
   _Options $(<) : $(3) ;
     
   # filter headers
-  local sources i ;
-  for i in $(>)                             
-  {
-    if $(i:S) != .h
-    {
-      sources += $(i) ;
-    }
-  }
-  sources = [ FGristFiles $(sources) ] ;
+  local sources  = [ FGristFiles $(>) ] ;
 
   $(<)_type = library ;
   $(<)_target = [ FAppendSuffix lib$(<) : $(SUFLIB) ] ;
-  $(<)_objects = $(sources:S=$(SUFOBJ)) ;
+  $(<)_objects = [ CompileObjects $(sources) ] ;
   csLibraryFromObjects $(<) : $($(<)_objects) ;
-  CompileObjects $(sources) ;
   CFlags $(<) : $(LIBRARY.CFLAGS) ;
   LFlags $(<) : $(LIBRARY.LFLAGS) ;
 }

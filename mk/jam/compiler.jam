@@ -4,7 +4,16 @@
 
 if $(CMD.CC)
 {
-    
+
+rule CcRule
+{
+    local object = $(<:S=$(SUFOBJ)) ;
+    Cc $(object) : $(<) ;
+    return $(object) ;
+}
+RegisterFileType CcRule : .c ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .c ;
+
 rule Cc
 {
     Depends $(<) : $(>) ;
@@ -13,7 +22,6 @@ rule Cc
     CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
     CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType Cc : .c ;
 
 actions Cc
 {
@@ -24,6 +32,15 @@ actions Cc
 if $(CMD.C++)
 {
 
+rule C++Rule
+{
+    local object = $(<:S=$(SUFOBJ)) ;
+    C++ $(object) : $(<) ;
+    return $(object) ;
+}
+RegisterFileType C++Rule : .cpp .cc .c++ ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .cpp .cc .c++ ;
+
 rule C++
 {
     Depends $(<) : $(>) ;
@@ -32,7 +49,6 @@ rule C++
     CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
     CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType C++ : .cpp .cc .c++ ;
 
 actions C++
 {

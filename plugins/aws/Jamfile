@@ -6,7 +6,7 @@ if $(CMD.BISON) && $(CMD.FLEX)
 {
   FILES = [ Filter $(FILES) : skinlex.cpp skinpars.cpp ] 
 	  skinlex.ll skinpars.yy ;
-  BISON.FLAGS on [ FGristFiles skinpars.cpp ] += -p aws ;
+  BisonFlags skinpars.yy : "-p aws" ;
 }
 
 Plugin aws :

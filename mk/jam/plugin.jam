@@ -27,21 +27,12 @@ rule Plugin
     _Options $(<) : $(3) ;
       
     # filter headers
-    local sources i ;
-    for i in $(>)
-    {
-      if $(i:S) != .h
-      {
-	sources += $(i) ;
-      }
-    }
-    sources = [ FGristFiles $(sources) ] ;
+    local sources  = [ FGristFiles $(>) ] ;
 
     # rules for compiling the source files
     $(<)_type = plugin ;
-    $(<)_objects = $(sources:S=$(SUFOBJ)) ;
     $(<)_target = [ FAppendSuffix $(<) : $(SUFPLUGIN) ] ;
-    CompileObjects $(sources) ;
+    $(<)_objects = [ CompileObjects $(sources) ] ;
     CFlags $(<) : $(PLUGIN.CFLAGS) ;
     # XXX: not sure why we have to mention LINKLIBS again, somehow the +=
     # operator doesn't use the LINKLIBS var, while it seems doing so for

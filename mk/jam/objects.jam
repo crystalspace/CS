@@ -9,8 +9,9 @@
 
 ##  RegisterFileType Rulename : extensions
 ##    Register a rule which is used to compile a filetype into object
-##    files. The registered rule is called with 2 arguments: the name of the
-##    objectfile which should be created and the name of the sourcefile.
+##    files. The registered rule is called with the name of the
+##    sourcefile as argument and should return a list of objectfiles which are
+##    created.
 rule RegisterFileType
 {
   local suffix ;
@@ -35,27 +36,29 @@ rule RegisterHeaderRule
 
 ##  CompileObject sources
 ##    Compile a set of sourcefiles into objectfiles (extension: SUFOBJ,
-##	usually .o). This rule takes care of all the complicated stuff like
-##    setting LOCATE and SEARCH variables, adding the correct grist to the
-##    files.
+##	usually .o). This rule takes care of setting LOCATE and SEARCH
+##    variables to the $(SEARCH_SOURCE) and $(LOCATE_SOURCE) variables.
 ##    The Application, Plugin and Library rules already use this rule
 ##    internally. You should only use this rule if you have to avoid the
 ##    Application, Plugin or Library rules.
 rule CompileObjects
 {
-  local f ;
+  local source ;
+  local targets ;
 
-  for f in $(<)
+  # Search the source
+  SEARCH on $(<) = $(SEARCH_SOURCE) ;      
+
+  for source in $(<)
   {
-    local t = $(f:S=$(SUFOBJ)) ;
-    
-    # locate target and search for source
-    MakeLocate $(t) : $(LOCATE_TARGET) ;
-    SEARCH on $(f) = $(SEARCH_SOURCE) ;
-
     # compile the sourcefile to targetfile
-    CompileObject $(t) : $(f) ;
+    targets += [ CompileObject $(source) ] ;
   }
+  
+  # locate the targets
+  MakeLocate $(targets) : $(LOCATE_TARGET) ;
+
+  return $(targets) ;
 }
 
 #----------------------------------------------------------------------------
@@ -66,14 +69,6 @@ rule CompileObjects
 # with the current subdir and searches the correct rule in registered rules.
 rule CompileObject
 {
-  # Save HDRS for -I$(HDRS) on compile.
-  # We shouldn't need -I$(SEARCH_SOURCE) as cc can find headers
-  # in the .c file's directory, but generated .c files (from
-  # yacc, lex, etc) are located in $(LOCATE_TARGET), possibly
-  # different from $(SEARCH_SOURCE).
-
-  HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
-
   # handle #includes for source: Jam scans for headers with
   # the regexp pattern $(HDRSCAN) and then invokes $(HDRRULE)
   # with the scanned file as the target and the found headers
@@ -85,35 +80,44 @@ rule CompileObject
   # $(SEARCH_SOURCE:E) is where cc first looks for #include 
   # "foo.h" files.  If the source file is in a distant directory, 
   # look there.  Else, look in "" (the current directory).
-  HDRSEARCH on $(>) = 
-    $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;  
-  HDRGRIST on $(>) = $(HDRGRIST) ;
+  if $(HDRRULE_$(<:S))
+  {
+    HDRSEARCH on $(<) = 
+	$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;  
+    HDRGRIST on $(<) = $(HDRGRIST) ;                               
+    HDRRULE on $(<) = $(HDRRULE_$(<:S)) ;
+    HDRSCAN on $(<) = $(HDRPATTERN_$(<:S)) ;
+  }
+
+  local targets ;
   
-  if $(HDRRULE_$(>:S))
-  {
-    HDRRULE on $(>) = $(HDRRULE_$(>:S)) ;
-    HDRSCAN on $(>) = $(HDRPATTERN_$(>:S)) ;
-  }
-  else
-  {
-    HDRRULE on $(>) = HeaderRule ;
-    HDRSCAN on $(>) = $(HDRPATTERN) ;
-  }
-
-  # propagate target specific-defines
-  DEFINES on $(<) += $(DEFINES) ;
-
   # Invoke filetype specific rule
-  if $(FILETYPE_$(>:S))
+  if $(FILETYPE_$(<:S))
   {
-    $(FILETYPE_$(>:S)) $(<) : $(>) ;
-    # construct clean target
-    Clean clean : $(<) ;
+    targets = [ $(FILETYPE_$(<:S)) $(<) ] ;
   }
   else
   {
     echo "Warning: no rules for filetype $(>:S) defined (at file $(>))." ;
   }
+
+  if $(targets)
+  {
+    # construct clean target
+    Clean clean : $(targets) ;
+
+    # Save HDRS for -I$(HDRS) on compile.
+    # We shouldn't need -I$(SEARCH_SOURCE) as cc can find headers
+    # in the .c file's directory, but generated .c files (from
+    # yacc, lex, etc) are located in $(LOCATE_TARGET), possibly
+    # different from $(SEARCH_SOURCE).
+    HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+
+    # propagate target specific-defines
+    DEFINES on $(<) += $(DEFINES) ;
+  }
+
+  return $(targets) ;
 }
 
 ##  HeaderRule source : headers
@@ -135,22 +139,16 @@ rule HeaderRule
   Includes $(<) : $(s) ;
   SEARCH on $(s) = $(HDRSEARCH) ;
   NoCare $(s) ;
-                                                                                
+ 
   local i ;
   for i in $(s)
   {
-    HDRGRIST on $(s) = $(HDRGRIST) ;
-    HDRSEARCH on $(s) = $(HDRSEARCH) ;
-                                                                                
     if $(HDRRULE_$(i:S))
     {
+      HDRGRIST on $(s) = $(HDRGRIST) ;
+      HDRSEARCH on $(s) = $(HDRSEARCH) ;	
       HDRRULE on $(s) = $(HDRRULE_$(i:S)) ;
       HDRSCAN on $(s) = $(HDRPATTERN_$(i:S)) ;
-    }
-    else
-    {
-      HDRRULE on $(s) = HeaderRule ;
-      HDRSCAN on $(s) = $(HDRPATTERN) ;
     }
   }
 }
@@ -158,5 +156,14 @@ rule HeaderRule
 # dummy rule: .o files are used as is
 rule UseObjectFile
 {
+  return $(<) ;
 }
 RegisterFileType UseObjectFile : .o ;
+
+# ignore header files
+rule UseHeaderFile
+{
+  return ;
+}
+RegisterFileType UseHeaderFile : .h .hpp ;
+

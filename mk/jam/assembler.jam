@@ -5,13 +5,20 @@
 if $(CMD.NASM)
 {
 
+rule NasmRule
+{
+  local object = $(<:S=$(SUFOBJ)) ;
+  Nasm $(object) : $(<) ;
+  return $(object) ;
+}
+RegisterFileType NasmRule : .asm ;
+
 rule Nasm
 {
   Depends $(<) : $(>) ;
   NASM.FLAGS on $(<) += $(NASM.FLAGS) ;
   INCLUDEFLAGS on $(<) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 }
-RegisterFileType Nasm : .asm ;
 
 NASM.HDRPATTERN = "^[ 	]*%[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
 RegisterHeaderRule HeaderRule : $(NASM.HDRPATTERN) : .asm ;

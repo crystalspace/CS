@@ -23,15 +23,7 @@ rule Application
   _Options $(<) : $(3) ;
     
   # filter headers
-  local sources i ;
-  for i in $(>)
-  {
-    if $(i:S) != .h
-    {
-      sources += $(i) ;
-    }
-  }
-  sources = [ FGristFiles $(sources) ] ;
+  local sources = [ FGristFiles $(>) ] ;
 
   if $(USE_PLUGINS) = "no"
   {
@@ -59,8 +51,7 @@ rule Application
 
   $(<)_type = application ;
   $(<)_target = [ FAppendSuffix $(<) : $(SUFEXE) ] ;
-  $(<)_objects = $(sources:S=$(SUFOBJ)) ;
-  CompileObjects $(sources) ;
+  $(<)_objects = [ CompileObjects $(sources) ] ;
   ApplicationFromObjects $(<) : $($(<)_objects) ;
   CFlags $(<) : $(APPLICATION.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;
