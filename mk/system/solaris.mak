@@ -127,6 +127,11 @@ RMDIR=rm -rf
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=
 
+# If we don't use -fpic we don't need separate output directories
+ifeq ($(CFLAGS.DLL),)
+OUTSUFX.yes=
+endif
+
 #==================================================
 # Extra operation system dependent options.
 #==================================================
