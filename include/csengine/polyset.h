@@ -95,7 +95,7 @@ struct csPolygonSetBBox
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject, public iPolygonSet
+class csPolygonSet : public iPolygonSet, public csObject
 {
   friend class Dumper;
 
