@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003
+    Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -17,9 +17,8 @@
 */
 
 // This file implements extra glue needed by the pure Perl cspace module.
+// Not used by the csperl5 Crystal Space plugin.
 
 #include "cssysdef.h"
 
-// We must ensure that cs_static_var_cleanup is defined in order to pacify
-// dynamic linker when Perl loads cspace module.
-CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
+CS_IMPLEMENT_FOREIGN_DLL

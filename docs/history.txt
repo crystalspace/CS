@@ -11,6 +11,11 @@ chronological order.
 	  --libs' did not include "-framework AppKit -framework Foundation".
 	- Eric Sunshine fixed some 64-bit build problems on Windows in
 	  cswinCallStackHelper and csProcessorCapability.
+	- Eric Sunshine added the new macro CS_IMPLEMENT_FOREIGN_DLL. This is
+	  analogous to CS_IMPLEMENT_PLUGIN, except that is for foreign dynamic
+	  load libraries which we might build, rather than for Crystal Space
+	  plugin modules. Obvious examples of foreign DLL's are the pure
+	  extension modules for Python, Perl, and Java.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.

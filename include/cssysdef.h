@@ -288,6 +288,29 @@ void Name (void (*p)())                                                \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif
 
+/**\def CS_IMPLEMENT_FOREIGN_DLL
+ * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
+ * exactly one compilation unit comprising a foreign (non-Crystal Space)
+ * module.  For maximum portability, each such module should employ this macro.
+ * This is useful for situations in which a dynamic load library (DLL) is being
+ * built for some other facility. Obvious examples are pure extension modules
+ * for Python, Perl, and Java. For Crystal Space plugins, instead use
+ * CS_IMPLEMENT_PLUGIN.  Platforms may override the definition of this macro in
+ * order to augment the implementation of the foreign module with any special
+ * implementation details required by the platform.
+ */
+#ifndef CS_IMPLEMENT_FOREIGN_DLL
+#  if defined(CS_BUILD_SHARED_LIBS)
+#    define CS_IMPLEMENT_FOREIGN_DLL \
+       CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);
+#  else
+#    define CS_IMPLEMENT_FOREIGN_DLL \
+       CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION; \
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+#  endif
+#endif
+
 /**\def CS_IMPLEMENT_PLUGIN
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
