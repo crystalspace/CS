@@ -107,14 +107,16 @@ Demo::Demo ()
   myVFS = NULL;
   kbd = NULL;
   myConsole = NULL;
-
+  view = NULL;
   message[0] = 0;
+  font = NULL;
 }
 
 Demo::~Demo ()
 {
-  if (engine)
-    engine->DecRef ();
+  if (font) font->DecRef ();
+  if (view) view->DecRef ();
+  if (engine) engine->DecRef ();
   if (myG3D) myG3D->DecRef ();
   if (myG2D) myG2D->DecRef ();
   if (myVFS) myVFS->DecRef ();
@@ -175,6 +177,7 @@ void Demo::LoadFactory (const char* factname, const char* filename,
 	filename);
     exit (0);
   }
+  fact->DecRef ();
 }
 
 void Demo::SetupFactories ()
@@ -187,6 +190,7 @@ void Demo::SetupFactories ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not open ball plugin!");
     exit (0);
   }
+  fact->DecRef ();
 
   fact = engine->CreateMeshFactory ("crystalspace.mesh.object.surface",
   	"surf_factory");
@@ -195,6 +199,7 @@ void Demo::SetupFactories ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not open surface plugin!");
     exit (0);
   }
+  fact->DecRef ();
 
   fact = engine->CreateMeshFactory ("crystalspace.mesh.object.fire",
   	"fire_factory");
@@ -203,6 +208,7 @@ void Demo::SetupFactories ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not open fire plugin!");
     exit (0);
   }
+  fact->DecRef ();
 
   //=====
   // Load all factories.
@@ -539,6 +545,7 @@ void Demo::SetupObjects ()
   bs->SetRimVertices (16);
   sat->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
+  sat->DecRef ();
 
   // Create jupiter.
   iMeshWrapper* jup = engine->CreateMeshWrapper (
@@ -554,6 +561,7 @@ void Demo::SetupObjects ()
   bs->SetRimVertices (16);
   jup->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
+  jup->DecRef ();
 
   // Create the earth.
   iMeshWrapper* earth = engine->CreateMeshWrapper (
@@ -569,6 +577,7 @@ void Demo::SetupObjects ()
   bs->SetRimVertices (16);
   earth->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
+  earth->DecRef ();
 
   // Create the clouds for earth.
   iMeshWrapper* clouds = engine->CreateMeshWrapper (
@@ -585,6 +594,7 @@ void Demo::SetupObjects ()
   bs->SetMixMode (CS_FX_ADD);
   clouds->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   bs->DecRef ();
+  clouds->DecRef ();
  
   // Create fighters.
   iMeshWrapper* spr3d;
@@ -598,6 +608,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
+
   iMeshWrapper* tail = LoadObject ("FighterTail1",
   	"/data/demo/objects/fightertail",
   	"crystalspace.mesh.object.fire",
@@ -605,6 +616,8 @@ void Demo::SetupObjects ()
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->AddMesh (tail);
+  tail->DecRef ();
+  spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("fighter"), "Fighter2",
@@ -615,6 +628,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
+  
   tail = LoadObject ("FighterTail2",
   	"/data/demo/objects/fightertail",
   	"crystalspace.mesh.object.fire",
@@ -622,6 +636,9 @@ void Demo::SetupObjects ()
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->AddMesh (tail);
+  tail->DecRef ();
+  
+  spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("shuttle"), "Shuttle",
@@ -632,6 +649,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
+  
   tail = LoadObject ("ShuttleTail",
   	"/data/demo/objects/shuttletail",
   	"crystalspace.mesh.object.fire",
@@ -639,6 +657,9 @@ void Demo::SetupObjects ()
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->AddMesh (tail);
+  tail->DecRef ();
+  
+  spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("th_ship"), "Shuttle2",
@@ -649,6 +670,7 @@ void Demo::SetupObjects ()
   s3d = SCF_QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
   s3d->SetBaseColor (csColor (.15, .15, .15));
   s3d->DecRef ();
+  
   tail = LoadObject ("ShuttleTail2",
   	"/data/demo/objects/shuttletail2",
   	"crystalspace.mesh.object.fire",
@@ -656,6 +678,9 @@ void Demo::SetupObjects ()
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->GetChildren ()->AddMesh (tail);
+  tail->DecRef ();
+  
+  spr3d->DecRef ();
 
   // Create laser.
   spr3d = engine->CreateMeshWrapper (
@@ -668,6 +693,7 @@ void Demo::SetupObjects ()
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
   s3d->DecRef ();
+  spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("laser"), "LaserBeam2",
@@ -679,6 +705,7 @@ void Demo::SetupObjects ()
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
   s3d->DecRef ();
+  spr3d->DecRef ();
 
   spr3d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("laser"), "LaserBeam3",
@@ -690,6 +717,7 @@ void Demo::SetupObjects ()
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
   s3d->DecRef ();
+  spr3d->DecRef ();
 
   //=====
   // Setup the space station.
@@ -700,6 +728,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
+  spr3d->DecRef ();
 
   //=====
   // Setup the space station.
@@ -717,6 +746,7 @@ void Demo::SetupObjects ()
   spr3d_tower->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tower->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_tower);
+  spr3d_tower->DecRef ();
 
   iMeshWrapper* spr3d_spoke = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_spoke"), "SS1_Spoke",
@@ -724,6 +754,7 @@ void Demo::SetupObjects ()
   spr3d_spoke->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_spoke->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_spoke);
+  spr3d_spoke->DecRef ();
 
   iMeshWrapper* spr3d_dome = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_dome"), "SS1_Dome",
@@ -731,6 +762,7 @@ void Demo::SetupObjects ()
   spr3d_dome->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_dome->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_dome);
+  spr3d_dome->DecRef ();
 
   iMeshWrapper* spr3d_tail = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_tail"), "SS1_Tail",
@@ -738,6 +770,7 @@ void Demo::SetupObjects ()
   spr3d_tail->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tail->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_tail);
+  spr3d_tail->DecRef ();
 
   iMeshWrapper* spr3d_arm = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_arm1"), "SS1_Arm1",
@@ -745,6 +778,7 @@ void Demo::SetupObjects ()
   spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_arm);
+  spr3d_arm->DecRef ();
 
   spr3d_arm = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_arm1"), "SS1_Arm1",
@@ -755,6 +789,7 @@ void Demo::SetupObjects ()
   spr3d_arm->GetMovable ()->GetTransform ().RotateThis (csVector3 (0, 1, 0),
   	M_PI/2.);
   spr3d_arm->GetMovable ()->UpdateMove ();
+  spr3d_arm->DecRef ();
 
   iMeshWrapper* spr3d_pod1 = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("ss1_pod1"), "SS1_Pod1",
@@ -762,9 +797,11 @@ void Demo::SetupObjects ()
   spr3d_pod1->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_pod1->SetZBufMode (CS_ZBUF_USE);
   spr3d->GetChildren ()->AddMesh (spr3d_pod1);
+  spr3d_pod1->DecRef ();
+  spr3d->DecRef ();
 
   //=====
-
+  
   iMeshWrapper* spr2d;
   iSprite2DState* s2d;
   iParticle* part;
@@ -776,9 +813,12 @@ void Demo::SetupObjects ()
   s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
+  
   part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
+  
+  spr2d->DecRef ();
 
   spr2d = engine->CreateMeshWrapper (
   	engine->GetMeshFactories ()->FindByName ("photonTorpedo"), "PhotonTorpedo2",
@@ -788,9 +828,13 @@ void Demo::SetupObjects ()
   s2d = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
+  
   part = SCF_QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
   part->ScaleBy (3);
   part->DecRef ();
+  
+  spr2d->DecRef ();
+  
 }
 
 bool Demo::Initialize (int argc, const char* const argv[],
@@ -818,9 +862,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
-  engine =
-    CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d",
-    	CS_FUNCID_ENGINE, iEngine);
+  engine = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d",
+			   CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
