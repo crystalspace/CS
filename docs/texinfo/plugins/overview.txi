@@ -92,8 +92,7 @@ similar to the console in Quake.
 @item
 @emph{Scripting}
 
-The scripting plug-in modules allows support for Python, Perl, and Lua scripts.
-@xref{csPython}.
+The scripting plug-in modules allow support for Python and Perl.
 
 @item
 @emph{Font Server}

@@ -34,7 +34,7 @@ information you need in the introduction to the simple tutorial
 * csParser:: The Map File Parser (@code{csParser})
 * XML File Format:: Format of Map File (XML)
 * MeshObject:: Mesh Object Plug-In System
-* csPython::
+* Scripting Languages::
 * Animation::
 * Model Conversion:: Importing Model Files
 * AWS:: Alternate Windowing System (@sc{aws})
@@ -48,7 +48,7 @@ information you need in the introduction to the simple tutorial
 @importss{plugins,engine,engine.txi}
 @imports{plugins,csparser.txi}
 @importss{plugins,meshobj,meshobj.txi}
-@imports{plugins,python.txi}
+@importss{plugins,script,script.txi}
 @importss{plugins,anim,anim.txi}
 @imports{plugins,model.txi}
 @importss{plugins,aws,aws.txi}

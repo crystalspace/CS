@@ -1,0 +1,9 @@
+@node Python Bindings, , Perl Bindings, Scripting Languages
+@subsection Python Bindings
+@cindex Python
+@cindex @code{csPython}
+
+The CS Python bindings are extensive, but not yet documented.
+
+There are, however, a few example apps written entirely in Python, distributed
+as part of CS.

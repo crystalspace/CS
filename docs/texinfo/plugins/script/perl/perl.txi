@@ -1,0 +1,130 @@
+@node Perl Bindings, Python Bindings, , Scripting Languages
+@subsection Perl Bindings
+@cindex Perl
+@cindex @code{csPerl}
+
+CS has extensive bindings for Perl version 5.
+
+@subheading Getting Started
+
+To make use of CS classes from a Perl script, first make sure that the file
+cspace.pm (found in your CS/scripts/perl5 directory) is available to Perl.
+The easiest way to do this is with this code near the top of your script:
+@example
+BEGIN @{ push @@INC, "$ENV@{CRYSTAL@}/scripts/perl5" @}
+@end example
+
+Also make sure that the cspace.so (Unix/Linux/MacOSX) or cspace.dll (Windows)
+file is in the same directory as the cspace.pm file.
+
+Then add this line near the top of the script:
+@example
+use cspace;
+@end example
+
+@subheading Functions and Classes
+
+CS has several global functions, which can be accessed easily from Perl.
+For instance, in C++, one might do:
+@example
+const char *str = "Hello, world!";
+int key = csHashCompute (str);
+@end example
+Perl is almost exactly the same, the most notable difference being the
+@code{cspace::} prefix:
+@example
+$str = "Hello, world!";
+$key = cspace::csHashCompute ($str);
+@end example
+
+To create an object instance, we use the @code{new} "keyword":
+@example
+$vect = new cspace::csVector3 (1, 2, 3);
+@end example
+The object will be deleted automatically when it goes out of scope.
+Perl also has built-in reference counting, so if the object is still referenced
+in some other Perl code when it goes out of scope, it will still exist until
+there are no more references to it in Perl.
+
+There are three ways to access object properties:
+@example
+print $vect->x;		# Preferred way, conforms to Perl convention
+print $vect->{"x"};	# Swig's generated primary way
+print $vect->get_x();	# Swig's generated secondary way
+@end example
+
+And three ways to modify object properties:
+@example
+$vect->x(123);		# Preferred way, conforms to Perl convention
+$vect->{"x"} = 123;	# Swig's generated primary way
+$vect->set_x(123);	# Swig's generated secondary way
+@end example
+
+Calling methods works as you might expect:
+@example
+$vect->Norm();
+@end example
+
+@subheading Operator Overloading
+
+Operator overloading is not yet supported. All the code required to support it
+has been written, but the code requires some non-existant features of Swig.
+
+The operators that exist in C++ and which Perl can overload are:
+@code{+ - * / % << >> & | ^ && || ! ~ < <= == >= > != ++ --
+= += -= *= /= %= <<= >>= &= |= ^=}
+
+And: @code{** **=} (expontentiation), @code{lt le eq ge gt ne} (string
+comparison), @code{<>} (iteration), @code{x x=} (repeat), @code{. .=}
+(concatenate), @code{$ @@ % * &} (convert to Perl native types: scalar, array,
+hash, glob, subroutine), @code{abs} (absolute value), truth evaluation,
+stringify and numerify.
+
+@subheading Interface Pointers
+
+Supposing you call a function that returns a pointer to some interface.
+You can store the returned value in a variable, and use it similarly to how
+objects are used in Perl (see above). You can call their methods in the same
+way, and pass them on to further functions as parameters where appropriate.
+
+The Perl bindings automatically correctly handle csRef and csPtr.
+
+@subheading Implementing Interfaces
+
+The feature of writing your own implementions of certain interfaces in Perl is
+not yet supported. For instance, you may want to write an implementation of
+@code{iEventHandler} or @code{iAwsSink}, purely in script. Work is progressing
+on this feature.
+
+@subheading Special Cases
+
+@subsubheading Macros that take Interfaces as Parameters
+
+In Perl, CS macros that take interface names as parameters, for instance
+@code{CS_QUERY_REGISTRY}, take those interface names as strings:
+@example
+$engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
+@end example
+
+@subsubheading @code{csRGBpixel}
+
+To convert a @code{csRGBpixel} to a @code{csRGBcolor}, use the
+@code{asRGBcolor} method:
+@example
+$color = $pixel->asRGBcolor();
+@end example
+
+@subsubheading @code{iSprite2DState}
+
+@code{iSprite2DState} has an extra method in Perl, @code{GetVertexByIndex},
+which takes a single integer parameter, an array index, and returns a
+@code{csSprite2DVertex} from the sprite's array of vertices.
+
+@subsubheading @code{iEvent}
+
+The overloaded @code{Add} and @code{Find} methods in @code{iEvent} are
+replaced in Perl with ones with names which explicitly specify the types
+of their parameters (since otherwise Perl wouldn't know which C++ function to
+call): @code{AddInt8 AddInt16 AddInt32 AddUInt8 AddUInt16 AddUInt32 AddFloat
+AddDouble AddString AddBool AddVoidPtr FindInt8 FindInt16 FindInt32 FindUInt8
+FindUInt16 FindUInt32 FindFloat FindDouble FindString FindBool FindVoidPtr}.
