@@ -87,7 +87,7 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
     GenState->SetLighting (false);
     GenState->SetColor (csColor (1.f, 1.f, 1.f));
     GenState->SetManualColors (true);
-    GenState->SetMixMode (MixMode);
+    GenState->SetMixMode (MixMode);    
   }
 }
 
@@ -104,21 +104,6 @@ void csLightningMeshObject::SetupObject ()
 	int l, i;
     initialized = true;
   }
-}
-
-
-void csLightningMeshObject::GetTransformedBoundingBox (long cameranr,
-        long movablenr, const csReversibleTransform& trans, csBox3& cbox)
-{
-
-}
-
-static void Perspective (const csVector3& v, csVector2& p, float fov,
-        float sx, float sy)
-{
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
 }
 
 
@@ -159,10 +144,12 @@ bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
   return GenMesh->Draw (rview, movable, mode);  
 }
 
-void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)
+
+void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int type)
 {
-  SetupObject ();  
+  
 }
+
 
 void csLightningMeshObject::HardTransform (const csReversibleTransform& t)
 {
@@ -224,7 +211,6 @@ void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
     float lh, float rh, int xyz, csVector3 *Vertices)
 {
   int mid = (left + right) / 2;
-  int res = (left + right) % 2;
   float fracScale = ((float)(right - left)) / (float)(MaxPoints);
   float midh = (lh + rh) / 2 + (fracScale * wildness * csRndNum(-10, 10))
       - (fracScale * wildness) / 2;
@@ -240,9 +226,6 @@ void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
       break;    
   }
 
-  if (res == 1)
-    Vertices[(right - 1) * 2] = Vertices[right * 2];
-
   if ((mid - left) > 1)
     CalculateFractal(left, mid, lh, midh, xyz, Vertices);
   if ((right - mid) > 1)
@@ -256,16 +239,15 @@ void csLightningMeshObjectFactory::CalculateFractal()
 
   csVector3 *Vertices = GenFactState->GetVertices();
 
+  Vertices[0] = origin;    
+
   CalculateFractal(0, MaxPoints - 1, 0, 0, 0, GenFactState->GetVertices());
   CalculateFractal(0, MaxPoints - 1, 0, 0, 1, GenFactState->GetVertices());  
   
-  Vertices[0] = origin;
   
   float CurrZ = 0;
   float ZStep = length / (float)MaxPoints;
-  
-  Vertices[m2 - 2].x = origin.x;
-
+    
   for ( i = 0; i < m2; i += 2 )
   {
     Vertices[i + 1].x = Vertices[i].x + bandwidth;
@@ -273,8 +255,10 @@ void csLightningMeshObjectFactory::CalculateFractal()
     Vertices[i].z = CurrZ + origin.z;
     Vertices[i + 1].z = Vertices[i].z;
     CurrZ += ZStep;
-  }  
-  
+  }    
+
+  Vertices[m2 - 2].x = origin.x;
+  Vertices[m2 - 2].y = origin.y;
 }
 
 void csLightningMeshObjectFactory::NextFrame (csTicks CurrentTime)
