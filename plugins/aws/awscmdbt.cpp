@@ -3,6 +3,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
+#include "csutil/scfstr.h"
 
 #include <stdio.h>
 
@@ -72,6 +73,48 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 
  return true;
 }
+
+bool 
+awsCmdButton::GetProperty(char *name, void **parm)
+{
+  if (awsComponent::GetProperty(name, parm)) return true;
+
+  if (strcmp("Caption", name)==0)
+  {
+    char *st = NULL;
+
+    if (caption) st=caption->GetData();
+
+    iString *s = new scfString(st);
+    *parm = (void *)s;
+    return true;
+  }
+
+  return false;
+}
+
+bool 
+awsCmdButton::SetProperty(char *name, void **parm)
+{  
+  if (awsComponent::SetProperty(name, parm)) return true;
+
+  if (strcmp("Caption", name)==0)
+  {
+    iString *s = (iString *)(*parm);
+
+    if (s)
+    {
+      if (caption) caption->DecRef();
+      caption->IncRef();
+      Invalidate();
+    }
+    
+    return true;
+  }
+  
+  return false;
+}
+
 
 void 
 awsCmdButton::OnDraw(csRect clip)

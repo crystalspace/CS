@@ -121,6 +121,8 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 bool 
 awsWindow::GetProperty(char *name, void **parm)
 {
+  if (comp.GetProperty(name, parm)) return true;
+
   if (strcmp("Title", name)==0)
   {
     char *st=NULL;
@@ -138,6 +140,8 @@ awsWindow::GetProperty(char *name, void **parm)
 bool 
 awsWindow::SetProperty(char *name, void **parm)
 {  
+  if (comp.SetProperty(name, parm)) return true;
+
   if (strcmp("Title", name)==0)
   {
     iString *t = (iString *)(*parm);

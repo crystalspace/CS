@@ -42,7 +42,7 @@ awsStandardSink::Invalidate(void *sink, iAwsSource *source)
   c->Invalidate();
 }
 
-awsStandardSink::awsStandardSink()
+awsStandardSink::awsStandardSink():awsSink(NULL)
 {
   RegisterTrigger("Show", Show);
   RegisterTrigger("Hide", Hide);
