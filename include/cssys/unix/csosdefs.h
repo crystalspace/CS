@@ -95,8 +95,4 @@ int main (int argc, char* argv[]) \
 }
 #endif // !CS_STATIC_LINKED && CS_UNIX_PLUGIN_REQUIRES_MAIN
 
-#ifdef CS_THREADS
-#include CS_THREADS_INC
-#endif
-
 #endif // __CSOSDEFS_H__

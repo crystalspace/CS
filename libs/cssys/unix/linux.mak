@@ -132,9 +132,9 @@ SRC.SYS_CSSYS= $(wildcard libs/cssys/unix/*.cpp) \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp
 
-ifeq ($(THREADS),pthread)
+ifeq ($(PTHREAD.AVAILABLE),yes)
 SRC.SYS_CSSYS += libs/cssys/general/cspthrd.cpp
-LIBS.EXE+=$(LFLAGS.l)pthread
+LIBS.EXE+=$(PTHREAD.LFLAGS)
 endif
 
 # The C compiler.
