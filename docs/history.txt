@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+12-Dec-2002
+	- Keith Fulton changed format of sequence delay tag from
+	  <delay>1000</delay> to <delay time="1000" />.
+	- Keith Fulton added min and max attributes (optional) to
+	  this delay tag.  Min and max, when specified, cause a
+	  random delay between those two values.
+	- Keith Fulton modified flarge/world to demonstrate use
+	  of this feature to simulate torch flicker in the long
+	  hallway before the fog.
 11-Dec-2002
 	- Optimization in frustvis where the updates of objects in the
 	  visibility culler are put on a queue and only performed when
