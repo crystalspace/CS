@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+2-May-2001
+	- Fixed the color bug in OpenGL DrawTriangleMesh with multi-
+	  texturing.
 1-May-2001
 	- Fixed a bug in software renderer so that tiling really works.
 	- Extended the iMaterial structure in preparation of multi-texturing

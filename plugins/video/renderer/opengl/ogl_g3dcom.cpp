@@ -1613,7 +1613,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       flat_g = BYTE_TO_FLOAT (g);
       flat_b = BYTE_TO_FLOAT (b);
     }
-    glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
 
   glEnableClientState (GL_VERTEX_ARRAY);
@@ -1633,7 +1632,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
   }
   else
+  {
     glShadeModel (GL_FLAT);
+    glColor4f (flat_r, flat_g, flat_b, m_alpha);
+  }
   glDrawElements (GL_TRIANGLES, mesh.num_triangles*3 , GL_UNSIGNED_INT, & triangles[0]);
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
