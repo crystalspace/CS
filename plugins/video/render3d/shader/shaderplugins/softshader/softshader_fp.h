@@ -22,6 +22,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
+#include "csgfx/shadervarcontext.h"
+#include "../../common/shaderplugin.h"
 
 class csSoftShader_FP : public iShaderProgram
 {
@@ -39,7 +41,7 @@ private:
 
   bool validProgram;
 
-  csShaderVariableContextHelper svContextHelper;
+  csShaderVariableContext svContextHelper;
 public:
   SCF_DECLARE_IBASE;
 
@@ -61,13 +63,13 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /// Sets this program to be the one used when rendering
-  virtual void Activate(csRenderMesh* mesh);
+  virtual void Activate();
 
   /// Deactivate program so that it's not used in next rendering
   virtual void Deactivate();
 
-  virtual void SetupState (csRenderMesh *mesh, 
-    const csArray<iShaderVariableContext*> &dynamicDomains) {}
+  virtual void SetupState (csRenderMesh* mesh,
+    const CS_SHADERVAR_STACK &stacks) {}
 
   virtual void ResetState () {}
 
@@ -81,33 +83,8 @@ public:
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
-  /**
-   * Prepares the shaderprogram for usage. Must be called before the shader
-   * is assigned to a material.
-   */
-  virtual bool Prepare(iShaderPass *pass);
-
-  //=================== iShaderVariableContext ================//
-  /// Add a variable to this context
-  virtual void AddVariable (csShaderVariable *variable)
-  { svContextHelper.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  virtual csShaderVariable* GetVariable (csStringID name) const
-  { return svContextHelper.GetVariable (name); }
-
-  /// Fill a csShaderVariableList
-  virtual void FillVariableList (csShaderVariableList *list) const
-  { svContextHelper.FillVariableList (list); }
-
-  /// Get a named variable from this context, and any context above/outer
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const
-  {
-    csShaderVariable* var;
-    var=GetVariable (name);
-    if(var) return var;
-    return 0;
-  }
+  /// Compile a program
+  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
 };
 
 

@@ -76,22 +76,22 @@ void csSoftPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   PrepareBuffers (mesh.indexstart, mesh.indexend);
 
   csShaderVariable* sv;
-  sv = mesh.dynDomain->GetVariableAdd (index_name);
+  sv = mesh.variablecontext->GetVariableAdd (index_name);
   sv->SetValue (index_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (vertex_name);
+  sv = mesh.variablecontext->GetVariableAdd (vertex_name);
   sv->SetValue (vertex_buffer);
   /*
-  sv = mesh.dynDomain->GetVariableAdd (texel_name);
+  sv = mesh.variablecontext->GetVariableAdd (texel_name);
   sv->SetValue (texel_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (normal_name);
+  sv = mesh.variablecontext->GetVariableAdd (normal_name);
   sv->SetValue (normal_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (binormal_name);
+  sv = mesh.variablecontext->GetVariableAdd (binormal_name);
   sv->SetValue (binormal_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (tangent_name);
+  sv = mesh.variablecontext->GetVariableAdd (tangent_name);
   sv->SetValue (tangent_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (lmcoords_name);
+  sv = mesh.variablecontext->GetVariableAdd (lmcoords_name);
   sv->SetValue (lmcoords_buffer);
-  sv = mesh.dynDomain->GetVariableAdd (color_name);
+  sv = mesh.variablecontext->GetVariableAdd (color_name);
   sv->SetValue (color_buffer);
   */
 }

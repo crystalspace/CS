@@ -172,7 +172,7 @@ protected:
   csRef<iRenderBuffer> scrapVertices;
   csRef<iRenderBuffer> scrapTexcoords;
   csRef<iRenderBuffer> scrapColors;
-  csShaderVariableContext scrapDomain;
+  csShaderVariableContext scrapContext;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -223,6 +223,13 @@ protected:
 
 
   csRef<iStringSet> strings;
+  csStringID string_vertices;
+  csStringID string_texture_coordinates;
+  csStringID string_normals;
+  csStringID string_colors;
+  csStringID string_indices;
+  csStringID string_texture_diffuse;
+
   csRef<iShaderManager> shadermgr;
 
   iRenderBuffer* activebuffers[CS_VATTRIB_SPECIFIC_LAST - 
@@ -634,8 +641,10 @@ public:
   }
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (csRenderMesh* mymesh);
-  void DrawPolysMesh (csRenderMesh* mesh);
+  virtual void DrawMesh (csRenderMesh* mymesh,
+    const csArray< csArray<csShaderVariable*> > &stacks);
+  void DrawPolysMesh (csRenderMesh* mesh,
+    const csArray< csArray<csShaderVariable*> > &stack);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh);
 
   /// Controls shadow drawing

@@ -324,6 +324,12 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
+  string_vertices = strings->Request ("vertices");
+  string_texture_coordinates = strings->Request ("texture coordinates");
+  string_normals = strings->Request ("normals");
+  string_colors = strings->Request ("colors");
+  string_indices = strings->Request ("indices");
+  string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
   return true;
 }
@@ -351,7 +357,7 @@ void csSoftwareGraphics3DCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/soft3d.cfg");
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
-  mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
+  mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3f);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
 #ifdef DO_MMX
@@ -4069,7 +4075,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   }
 
   csShaderVariable* sv;
-  sv = scrapDomain.GetVariableAdd (strings->Request ("indices"));
+  sv = scrapContext.GetVariableAdd (strings->Request ("indices"));
   if (mesh.indices)
   {
     scrapIndices->CopyToBuffer (mesh.indices, 
@@ -4080,7 +4086,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   {
     sv->SetValue (0);
   }
-  sv = scrapDomain.GetVariableAdd (strings->Request ("vertices"));
+  sv = scrapContext.GetVariableAdd (strings->Request ("vertices"));
   if (mesh.vertices)
   {
     scrapVertices->CopyToBuffer (mesh.vertices, 
@@ -4091,7 +4097,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   {
     DeactivateBuffer (CS_VATTRIB_POSITION);
   }
-  sv = scrapDomain.GetVariableAdd (strings->Request ("texture coordinates"));
+  sv = scrapContext.GetVariableAdd (strings->Request ("texture coordinates"));
   if (mesh.texcoords)
   {
     scrapTexcoords->CopyToBuffer (mesh.texcoords, 
@@ -4102,7 +4108,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   {
     DeactivateBuffer (CS_VATTRIB_TEXCOORD);
   }
-  sv = scrapDomain.GetVariableAdd (strings->Request ("colors"));
+  sv = scrapContext.GetVariableAdd (strings->Request ("colors"));
   if (mesh.colors)
   {
     scrapColors->CopyToBuffer (mesh.colors, 
@@ -4129,18 +4135,23 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
   rmesh.meshtype = mesh.meshtype;
   rmesh.indexstart = 0;
   rmesh.indexend = mesh.indexCount;
-  rmesh.dynDomain = &scrapDomain;
+  rmesh.variablecontext = &scrapContext;
+
+  CS_SHADERVAR_STACK stacks;
+  shadermgr->PushVariables (stacks);
+  scrapContext.PushVariables (stacks);
 
   if (mesh.alphaType.autoAlphaMode)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    if ((mesh.alphaType.autoModeTexture != csInvalidStringID) &&
-      (mesh.dynDomain != 0))
+    if (mesh.alphaType.autoModeTexture != csInvalidStringID
+        && mesh.alphaType.autoModeTexture < (csStringID)stacks.Length ()
+        && stacks[mesh.alphaType.autoModeTexture].Length () > 0)
     {
-      csShaderVariable* texVar = mesh.dynDomain->GetVariableRecursive (
-	mesh.alphaType.autoModeTexture);
+      csShaderVariable* texVar = 
+        stacks[mesh.alphaType.autoModeTexture].Top ();
       if (texVar)
 	texVar->GetValue (tex);
     }
@@ -4156,13 +4167,12 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
     rmesh.alphaType = mesh.alphaType.alphaType;
   }
 
-  csArray<iShaderVariableContext*> dynDomain;
-
   SetZMode (mesh.z_buf_mode);
-  DrawMesh (&rmesh);
+  DrawMesh (&rmesh, stacks);
 }
 
-void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
+void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
+  const csArray< csArray<csShaderVariable*> > &stack)
 {
   return;
   /*
@@ -4309,11 +4319,12 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
   //indexbuf->Release ();
 }
 
-void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
+void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
+  const csArray< csArray<csShaderVariable*> > &stacks)
 {
   if (mesh->meshtype == CS_MESHTYPE_POLYGON)
   {
-    DrawPolysMesh (mesh);
+    DrawPolysMesh (mesh, stacks);
     return;
   }
 
@@ -4328,12 +4339,12 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
     color_verts = Get_color_verts ();
   }
 
-  csShaderVariable* indexBufSV = mesh->dynDomain->GetVariable (
-    strings->Request ("indices"));
+  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+      && stacks[string_indices].Length () > 0);
+  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
   iRenderBuffer* indexbuf = 0;
   indexBufSV->GetValue (indexbuf);
-  if (!indexbuf)
-    return;
+  CS_ASSERT(indexbuf);
 
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
 
@@ -4477,8 +4488,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
       //=====
 
       // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1. / (SMALL_Z*10);
-      float com_iz = aspect * (1. / (SMALL_Z*10));
+      float com_zv = 1.0f / (SMALL_Z*10);
+      float com_iz = aspect * (1.0f / (SMALL_Z*10));
 
       csVector3 va = work_verts[a];
       csVector3 vb = work_verts[b];

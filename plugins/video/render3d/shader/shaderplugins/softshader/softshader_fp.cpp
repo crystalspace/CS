@@ -43,7 +43,7 @@ SCF_IMPLEMENT_IBASE(csSoftShader_FP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-void csSoftShader_FP::Activate(csRenderMesh* mesh)
+void csSoftShader_FP::Activate()
 {
 }
 
@@ -57,7 +57,6 @@ void csSoftShader_FP::BuildTokenHash()
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+csShaderVariable::STRING);
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
@@ -109,8 +108,8 @@ bool csSoftShader_FP::Load(iDocumentNode* program)
   return true;
 }
 
-  
-bool csSoftShader_FP::Prepare(iShaderPass *pass)
+bool csSoftShader_FP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   return true;
 }
+ 
