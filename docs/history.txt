@@ -51,6 +51,9 @@ chronological order.
 	    printf("%p %p", ip, p);
 	- Eric Sunshine rewrote some bogus logic in the "well formed integer"
 	  check in the map2cs brush parser.
+	- Eric Sunshine added a `#define __STDC_FORMAT_MACROS' to cstypes.h to
+	  ensure that the various PRIx99 macros are properly defined (at least
+	  on platforms which provide them). This fixes a bunch of build errors.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than
