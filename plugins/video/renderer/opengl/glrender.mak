@@ -87,6 +87,9 @@ gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT.GL3D)/%$O: $(SRCDIR)/$(DIR.GL3D)/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
+        
+$(OUT.GL3D)/%$O: $(SRCDIR)/$(DIR.GL3D)/effects/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(OUT.GL3D)/%$O: $(SRCDIR)/plugins/video/renderer/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
