@@ -145,7 +145,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
     csRGBpixel *palette = new csRGBpixel [256];
     csRGBpixel *pwork   = palette;
     UByte    *inpal   = BIPALETTE(iBuffer);
-
+	int scanlinewidth = 4 * ((Width+3) / 4);
     for (int color = 0; color < 256; color++, pwork++)
     {  
       // Whacky BMP palette is in BGR order.
@@ -162,7 +162,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
       while (iPtr < iBuffer + iSize && buffer_y >= 0)
       {
         memcpy (buffer + buffer_y, iPtr, Width);
-        iPtr += Width;
+        iPtr += scanlinewidth;
         buffer_y -= Width;
       } /* endwhile */
     }
