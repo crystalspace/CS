@@ -392,7 +392,7 @@ csDataStream *pData;
 
   if ( !lib3ds_file_read( pFile, pLibIO ) )
   {
-    free( pFile );
+    lib3ds_file_free( pFile );
     return NULL;
   }
 
