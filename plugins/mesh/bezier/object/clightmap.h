@@ -22,7 +22,6 @@
 #include "csutil/scf.h"
 #include "csutil/garray.h"
 #include "csgfx/rgbpixel.h"
-#include "imesh/thing/lightmap.h"
 
 class csPolyTexture;
 class csThing;
