@@ -89,7 +89,7 @@ csMatrix3& csMatrix3::operator-= (const csMatrix3& m)
 
 csMatrix3& csMatrix3::operator*= (const csMatrix3& m)
 {
-  csMatrix3 r;
+static csMatrix3 r;
   r.m11 = m11*m.m11 + m12*m.m21 + m13*m.m31;
   r.m12 = m11*m.m12 + m12*m.m22 + m13*m.m32;
   r.m13 = m11*m.m13 + m12*m.m23 + m13*m.m33;
@@ -99,6 +99,7 @@ csMatrix3& csMatrix3::operator*= (const csMatrix3& m)
   r.m31 = m31*m.m11 + m32*m.m21 + m33*m.m31;
   r.m32 = m31*m.m12 + m32*m.m22 + m33*m.m32;
   r.m33 = m31*m.m13 + m32*m.m23 + m33*m.m33;
+
   *this = r;
   return *this;
 }
