@@ -1089,8 +1089,94 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygon& poly)
   }
 
   return S_OK;
-}
+} 
 
+
+
+
+
+// begin work in progress Bruce Williams brucewil@pacbell.net 
+
+
+STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonQuick(ITextureHandle* handle, bool gouroud ){ return S_OK; }
+STDMETHODIMP csGraphics3DDirect3DDx5::FinishPolygonQuick( ){ return S_OK; }
+
+
+/*
+
+ //---------------------------------------------
+// A custom vertex format that includes XYZ, a
+// diffuse color & two sets of texture coords.
+//---------------------------------------------
+struct MTVERTEX
+{
+    FLOAT x, y, z;
+    DWORD dwColor;
+    FLOAT tuBase, tvBase;
+    FLOAT tuLightMap, tvLightMap;
+};
+ 
+// Make an array of custom vertices.
+MTVERTEX g_avVertices[36];
+// Fill the array.
+//  (vertex at index 0)
+//  .
+//  .
+//  .
+//  (vertex at index 35)
+
+typedef struct D3DDRAWPRIMITIVESTRIDEDDATA  {
+    D3DDP_PTRSTRIDE position;
+    D3DDP_PTRSTRIDE normal;
+    D3DDP_PTRSTRIDE diffuse;
+    D3DDP_PTRSTRIDE specular;
+    D3DDP_PTRSTRIDE textureCoords[D3DDP_MAXTEXCOORD];
+} D3DDRAWPRIMITIVESTRIDEDDATA , *LPD3DDRAWPRIMITIVESTRIDEDDATA;
+ 
+Members
+position and normal 
+D3DDP_PTRSTRIDE structures that point to arrays of position and normal vectors 
+for a collection of vertices (each vector is a 3-element array of float values). 
+
+diffuse and specular 
+D3DDP_PTRSTRIDE structures that point to diffuse and specular color information 
+for a collection of vertices. Each color component is an 8-8-8-8 RGBA value. 
+
+textureCoords 
+An 8-element array of D3DDP_PTRSTRIDE structures. Each element in the array is 
+an array of texture coordinates for the collection of vertices. Your application 
+determines which array of texture coordinates is used for a given texture stage 
+by calling the IDirect3DDevice3::SetTextureStageState method with the 
+D3DTSS_TEXCOORDINDEX stage state value. 
+
+
+// Construct strided vertices vertex using the array of
+// custom vertices already defined.
+D3DDRAWPRIMITIVESTRIDEDDATA g_StridedData;
+ 
+// Assign the addresses of the various interleaved components 
+// to their corresponding strided members.
+g_StridedData.position.lpvData          = &g_avWallVertices[24].x;
+g_StridedData.diffuse.lpvData           = &g_avWallVertices[24].dwColor;
+g_StridedData.textureCoords[0].lpvData  = &g_avWallVertices[24].tuBase;
+g_StridedData.textureCoords[1].lpvData  = &g_avWallVertices[24].tuLightMap;
+g_StridedData.position.dwStride         = sizeof(MTVERTEX);
+g_StridedData.diffuse.dwStride          = sizeof(MTVERTEX);
+g_StridedData.textureCoords[0].dwStride = sizeof(MTVERTEX);
+g_StridedData.textureCoords[1].dwStride = sizeof(MTVERTEX);
+ 
+// Render the vertices with multiple texture blending (Modulate).
+g_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_MODULATE );
+g_pd3dDevice->SetTexture( 0, g_BaseTextureMap);
+g_pd3dDevice->SetTexture( 1, g_LightMap);
+g_pd3dDevice->DrawPrimitiveStrided( D3DPT_TRIANGLELIST,
+                        D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX2,
+                        &g_StridedData, 12, NULL );
+ 
+*/
+
+
+// end work in progress Bruce Williams  brucewil@pacbell.net 
 
 STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
 {    
