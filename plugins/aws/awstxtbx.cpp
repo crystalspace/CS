@@ -19,8 +19,8 @@ const int awsTextBox:: fsBitmap = 0x1;
 const int awsTextBox:: signalChanged = 0x1;
 const int awsTextBox:: signalLostFocus = 0x2;
 
-iAwsSink *textbox_sink = 0;
-awsSlot textbox_slot;
+static iAwsSink *textbox_sink = 0;
+static awsSlot textbox_slot;
 
 static void BlinkCursor (void *parm, iAwsSource *source)
 {

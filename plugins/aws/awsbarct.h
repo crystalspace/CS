@@ -18,7 +18,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-# include "awscomp.h"
+#include "awscomp.h"
+#include "awstimer.h"
 
 class awsBarChart :
   public awsComponent
@@ -62,6 +63,10 @@ class awsBarChart :
 
   /// Color for bars
   int bar_color;
+
+  /// The timer that drives the update for the chart
+  awsTimer *update_timer;
+
 
 public:
   awsBarChart ();
@@ -114,6 +119,9 @@ public:
 
   /// An up and down motion for the button
   static const int signalClicked;
+
+  /// A signal that tells the app it should update the rolling chart.
+  static const int signalTimer;
 
 public:
   /// Get's the texture handle and the title, plus style if there is one.

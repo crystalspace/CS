@@ -30,6 +30,18 @@ const int awsBarChart:: coHorzGridLines=0x8;
 const int awsBarChart:: coVerticalChart=0x10;
 
 const int awsBarChart:: signalClicked = 0x1;
+const int awsBarChart:: signalTimer = 0x2;
+
+
+static iAwsSink *chart_sink = 0;
+static awsSlot chart_slot;
+
+static void DriveTimer (void *parm, iAwsSource *source)
+{
+  iAwsComponent *comp = source->GetComponent ();
+
+  comp->Broadcast(awsBarChart::signalTimer);
+}
 
 awsBarChart::awsBarChart () :
   frame_style(0),
@@ -48,6 +60,15 @@ awsBarChart::awsBarChart () :
 
 awsBarChart::~awsBarChart ()
 {
+  if (update_timer != 0)
+  {
+    chart_slot.Disconnect (
+        update_timer,
+        awsTimer::signalTick,
+        chart_sink,
+        chart_sink->GetTriggerID ("Tick"));
+    delete update_timer;
+  }
 }
 
 char *awsBarChart::Type ()
@@ -59,15 +80,18 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
+
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
   unsigned char r=0, g=0, b=0;
+  int timer_interval=1000;
 
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "InnerStyle", inner_frame_style);
   pm->GetInt (settings, "Options", chart_options);
   pm->GetInt (settings, "MaxItems", max_items);
+  pm->GetInt (settings, "UpdateInterval", timer_interval);
   pm->GetString (settings, "Caption", caption);
   pm->GetString (settings, "XLegend", xText);
   pm->GetString (settings, "YLegend", yText);
@@ -77,6 +101,26 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
   bar_color = pm->FindColor(r,g,b);
 
   bkg = pm->GetTexture ("Texture");
+
+  if (chart_options & coRolling)
+  {
+    // Setup blink event handling
+    if (chart_sink == 0)
+    {
+      chart_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
+      chart_sink->RegisterTrigger ("Tick", &DriveTimer);
+    }
+
+    update_timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
+    update_timer->SetTimer (timer_interval);
+    update_timer->Start ();
+
+    chart_slot.Connect (
+      update_timer,
+      awsTimer::signalTick,
+      chart_sink,
+      chart_sink->GetTriggerID ("Tick"));
+  }
 
   return true;
 }
@@ -287,6 +331,8 @@ void awsBarChart::OnDraw (csRect clip)
         tw, 
         th);
 
+  if (items.Length()<1) return;
+
   // Setup some variables
   int bw = inner_frame.Width() / items.Length();
   int bh = inner_frame.Height() / items.Length();
@@ -452,6 +498,7 @@ awsBarChartFactory::awsBarChartFactory (
   RegisterConstant ("bcoVerticalChart", awsBarChart::coVerticalChart);
 
   RegisterConstant ("signalBarChartClicked", awsBarChart::signalClicked);
+  RegisterConstant ("signalBarChartTimer", awsBarChart::signalTimer);
 }
 
 awsBarChartFactory::~awsBarChartFactory ()
