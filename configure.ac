@@ -1547,7 +1547,7 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],
-	[$cs_cv_sys_pthread_libs $cs_cv_libdl_libs])])
+	[$cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_cv_libm_libs])])
 
 CS_CHECK_LIBOPENAL
 

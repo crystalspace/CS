@@ -9,17 +9,17 @@ chronological order.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
-	    - In the common texture manager code, 0 was assigned to a struct 
+	    - In the common texture manager code, 0 was assigned to a struct
 	      in NR builds.
-	    - The iBase implementation of csGenericRenderStepFactory 
-	      errorneously used SCF_IMPLEMENT_EMBEDDED_IBASE_END instead of 
+	    - The iBase implementation of csGenericRenderStepFactory
+	      errorneously used SCF_IMPLEMENT_EMBEDDED_IBASE_END instead of
 	      SCF_IMPLEMENT_IBASE_END.
 	    - Enabled RTTI for VC debug builds.
 	    - Commented out "RTTI enabled" #error in opcode.
 	    - Added an interface to obtain call stacks.
 	    - Added an call stack implementation for Win32. Pretty much only
 	      supports VC debug symbols atm, tho.
-	    - Added a mechanism to track where interfaces and references are 
+	    - Added a mechanism to track where interfaces and references are
 	      increased resp. decreased.
 	- Neil Mosafi changed csvosa3dl plugin to listen to children as well
 	  as properties and use child changes to initiate property listening.
@@ -28,7 +28,7 @@ chronological order.
 	- Neil Mosafi changed vospolygonmesh to use iMeshObjectFactory to set
 	  the CS_THING_NOCOMPRESS flag which was previously a flag of
 	  iThingFactoryState
-	- res removed SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE from the 
+	- res removed SCF_CONSTRUCT_IBASE/SCF_DESTRUCT_IBASE from the
 	  csImageMemory ctor/dtor. csImageMemory inherits from csImageFile
 	  which already invoked those macros.
 	- res fixed a leak where shadervars were created with new, but not
@@ -62,6 +62,9 @@ chronological order.
 	  call lm->CalcMaxStatic() all the time which is very slow. The
 	  static lightmap doesn't change with dynamic lighting so calling
 	  this function is totally wasted.
+	- Eric Sunshine augmented the OpenAL check in configure.ac so that it
+	  utilizes -lm (if available).  This seems to be needed by Suse 7.3
+	  Linux.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
@@ -178,7 +181,7 @@ chronological order.
 	  USE_PLUGINS=no.
 	- Eric Sunshine moved more PLUGINS.DYNAMIC assignements out of
 	  platform-specific makefiles and into user.mak.
-	- Norman Kraemer introduced a csWrapTypedObject function to the swig 
+	- Norman Kraemer introduced a csWrapTypedObject function to the swig
 	  wrapper to get around those swig versions having SWIG_TypeQuery and
 	  others declared as defines and not as functions. So refering to them
 	  in the main cspython module would fail.
@@ -186,7 +189,7 @@ chronological order.
 	- Steven Geens cleaned up the fountain creation code in the socket
 	  test of viewmesh. You still have to move around a bit before you can
 	  see the fountain, probably a culling problem.
-	- Neil Mosafi added support to the csvosa3dl plugin for automatic 
+	- Neil Mosafi added support to the csvosa3dl plugin for automatic
 	  listening to movement and orientation changes of a3dl metaobjects
 	  Also fixed orientation which was incorrectly using degress instead
 	  of radians to set the CS angle
