@@ -59,6 +59,12 @@ The history order is reversed so that new features are at the top.
 	- Wouter Wijngaards commented out -ldl on the LIBS line of the sdl
 	  canvas. The SDL canvas works (--canvas=sdl2d option) for me on
 	  mingw, SDL 1.2.0. Even gives a 4% speedup, over regular plugin :-)
+	- Eric Sunshine eliminated compilation warnings about "non-virtual
+	  destructor in class with virtual methods" from the following classes:
+	  csModelDataObject, csModelDataCamera, csModelDataLight,
+	  csModelDataMaterial, and csModelData.
+	- Eric Sunshine eliminated several compilation warnings about implicit
+	  conversion from double to integer in csEngine::SetAmbientLight().
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python

@@ -2387,9 +2387,9 @@ iCameraPosition* csEngine::GetCameraPosition (const char* name) const
 
 void csEngine::SetAmbientLight (const csColor &c)
 {
-  csLight::ambient_red = c.red * 255.0;
-  csLight::ambient_green = c.green * 255.0;
-  csLight::ambient_blue = c.blue * 255.0;
+  csLight::ambient_red = int(c.red * 255);
+  csLight::ambient_green = int(c.green * 255);
+  csLight::ambient_blue = int(c.blue * 255.0);
 }
 
 void csEngine::GetAmbientLight (csColor &c) const

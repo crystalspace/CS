@@ -106,8 +106,10 @@ public:
   DECLARE_OBJECT_INTERFACE;
   DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex);
 
-  /// constructor
+  /// Constructor
   csModelDataObject ();
+  /// Destructor
+  virtual ~csModelDataObject() {}
 };
 
 class csModelDataCamera : public iModelDataCamera
@@ -119,8 +121,10 @@ public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
-  /// constructor
+  /// Constructor
   csModelDataCamera ();
+  // Destructor
+  virtual ~csModelDataCamera () {}
 
   DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
   DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
@@ -151,8 +155,10 @@ public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
-  /// constructor
+  /// Constructor
   csModelDataLight ();
+  // Destructor
+  virtual ~csModelDataLight () {}
 
   DECLARE_ACCESSOR_METHODS (float, Radius);
   DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
@@ -167,8 +173,10 @@ public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
-  /// constructor
+  /// Constructor
   csModelDataMaterial ();
+  /// Destructor
+  virtual ~csModelDataMaterial () {}
 };
 
 class csModelData : public iModelData
@@ -177,8 +185,10 @@ public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
 
-  /// constructor
+  /// Constructor
   csModelData ();
+  /// Destructor
+  virtual ~csModelData () {}
 };
 
 #endif // __MDLDATA_H__
