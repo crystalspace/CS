@@ -40,13 +40,20 @@
 class CS_CSGEOM_EXPORT csVector3
 {
 public:
-  /// The X component of the vector
-  float x;
-  /// The Y component of the vector
-  float y;
-  /// The Z component of the vector
-  float z;
-
+  union
+  {
+    float f[3];
+    struct
+    {
+      /// The X component of the vector
+      float x;
+      /// The Y component of the vector
+      float y;
+      /// The Z component of the vector
+      float z;
+    };
+  };
+  
   /**
    * Make a new vector. The vector is not
    * initialized. This makes the code slightly faster as
