@@ -23,6 +23,7 @@
 
 #include "csgeom/csrect.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 
@@ -37,6 +38,7 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
+
 #include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
@@ -57,16 +59,16 @@ struct iLightingManager;
 struct iEvent;
 
 
-#define CS_GL_CLIP_AUTO    'a' // Used for auto-detection.
-#define CS_GL_CLIP_NONE    'n'
-#define CS_GL_CLIP_ZBUF    'z'
-#define CS_GL_CLIP_STENCIL   's'
-#define CS_GL_CLIP_PLANES    'p'
-#define CS_GL_CLIP_SOFTWARE    '0'
-#define CS_GL_CLIP_LAZY_NONE   'N'
-#define CS_GL_CLIP_LAZY_ZBUF   'Z'
-#define CS_GL_CLIP_LAZY_STENCIL  'S'
-#define CS_GL_CLIP_LAZY_PLANES   'P'
+#define CS_GL_CLIP_AUTO           'a' // Used for auto-detection.
+#define CS_GL_CLIP_NONE           'n'
+#define CS_GL_CLIP_ZBUF           'z'
+#define CS_GL_CLIP_STENCIL        's'
+#define CS_GL_CLIP_PLANES         'p'
+#define CS_GL_CLIP_SOFTWARE       '0'
+#define CS_GL_CLIP_LAZY_NONE      'N'
+#define CS_GL_CLIP_LAZY_ZBUF      'Z'
+#define CS_GL_CLIP_LAZY_STENCIL   'S'
+#define CS_GL_CLIP_LAZY_PLANES    'P'
 
 class csGLRender3D : public iRender3D
 {
@@ -102,11 +104,14 @@ private:
   csPoly3D frustum;
   bool frustum_valid;
 
+  csReversibleTransform object2camera;
+
   csRender3dCaps rendercaps;
 
   csStringSet* strings;
 
   csConfigAccess config;
+
 
   bool do_near_plane;
   csPlane3 near_plane;
@@ -147,6 +152,8 @@ private:
   void SetGlOrtho (bool inverted);
 
   void SetZMode (csZBufMode mode);
+
+  float SetMixMode (uint mode, float m_alpha, bool txt_alpha);
   
   csZBufMode GetZModePass2 (csZBufMode mode);
 
@@ -161,6 +168,8 @@ private:
     bool add_z_clip);
 
   void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
+
+  void ApplyObjectToCamera ();
 
 public:
   SCF_DECLARE_IBASE;

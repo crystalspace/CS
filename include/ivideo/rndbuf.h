@@ -158,6 +158,9 @@ public:
   /// Z mode to use
   csZBufMode z_buf_mode;
 
+  /// mixmode to use
+  uint mixmode;
+
   /// Clipping parameter
   int clip_portal;
   

@@ -99,14 +99,12 @@ protected:
    */
   uint16 Alpha;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * MixMode to use for drawing this polygon (plus alpha value
    * which is stored separately). The GetMixMode() function will
    * overlap both variables to get one compound value.
    */
   uint MixMode;
-#endif // CS_USE_NEW_RENDERER
 
   /// Common constructor for derived classes
   csPolyTexType ();
@@ -122,13 +120,11 @@ public:
   /// Set the alpha value for this polygon
   void SetAlpha (int a) { Alpha = a; }
 
-#ifndef CS_USE_NEW_RENDERER
   /// Sets the mode that is used for DrawPolygonFX.
   virtual void SetMixMode (uint m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
 
   /// Gets the mode that is used for DrawPolygonFX.
   virtual uint GetMixMode () { return (MixMode | Alpha); }
-#endif // CS_USE_NEW_RENDERER
 
   SCF_DECLARE_IBASE;
 };

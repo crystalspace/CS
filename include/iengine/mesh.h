@@ -29,14 +29,7 @@
 #include "csgeom/box.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/graph3d.h"
-#else
-#include "ivideo/render3d.h"
-#define iGraphics3D iRender3D
-#endif // CS_USE_NEW_RENDERER
-
 
 struct iMeshObject;
 struct iCamera;

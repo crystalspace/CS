@@ -49,6 +49,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gl_txtmgr.h"
 #include "glextmanager.h"
 
+#define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
+
 
 csRef<iGLStateCache> csGLRender3D::statecache;
 
@@ -82,6 +84,8 @@ SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
 SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+
+int tricnt = 0;
 
 csGLRender3D::csGLRender3D (iBase *parent)
 {
@@ -205,10 +209,16 @@ void csGLRender3D::SetZMode (csZBufMode mode)
     statecache->SetDepthFunc (GL_GREATER);
     statecache->SetDepthMask (GL_FALSE);
     break;
+  case CS_ZBUF_INVERT:
+    current_zmode = mode;
+    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->SetDepthFunc (GL_LESS);
+    statecache->SetDepthMask (GL_FALSE);
+    break;
   case CS_ZBUF_USE:
     current_zmode = mode;
     statecache->EnableState (GL_DEPTH_TEST);
-    statecache->SetDepthFunc (GL_GREATER);
+    statecache->SetDepthFunc (GL_GEQUAL);
     statecache->SetDepthMask (GL_TRUE);
     break;
   default:
@@ -238,6 +248,64 @@ csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode)
   return mode;
 }
 
+float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
+{
+
+  // Note: In all explanations of Mixing:
+  // Color: resulting color
+  // SRC:   Color of the texel (content of the texture to be drawn)
+  // DEST:  Color of the pixel on screen
+  // Alpha: Alpha value of the polygon
+  bool enable_blending = true;
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+    case CS_FX_MULTIPLY:
+      // Color = SRC * DEST +   0 * SRC = DEST * SRC
+      m_alpha = 1.0f;
+      statecache->SetBlendFunc (GL_ZERO, GL_SRC_COLOR);
+      break;
+    case CS_FX_MULTIPLY2:
+      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
+      m_alpha = 1.0f;
+      statecache->SetBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
+      break;
+    case CS_FX_ADD:
+      // Color = 1 * DEST + 1 * SRC = DEST + SRC
+      m_alpha = 1.0f;
+      statecache->SetBlendFunc (GL_ONE, GL_ONE);
+      break;
+    case CS_FX_ALPHA:
+      // Color = Alpha * DEST + (1-Alpha) * SRC
+      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      break;
+    case CS_FX_TRANSPARENT:
+      // Color = 1 * DEST + 0 * SRC
+      m_alpha = 0.0f;
+      statecache->SetBlendFunc (GL_ZERO, GL_ONE);
+      break;
+    case CS_FX_COPY:
+    default:
+      enable_blending = txt_alpha;
+      if (txt_alpha)
+      {
+        // Color = 0 * DEST + 1 * SRC = SRC
+        m_alpha = 1.0f;
+        statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
+      else
+      {
+	m_alpha = 0;
+      }
+      break;
+  }
+
+  if (enable_blending)
+    statecache->EnableState (GL_BLEND);
+  else
+    statecache->DisableState (GL_BLEND);
+
+  return m_alpha;
+}
 
 void csGLRender3D::SetMirrorMode (bool mirror)
 {
@@ -278,10 +346,9 @@ void csGLRender3D::SetupStencil ()
   if (clipper)
   {
     glMatrixMode (GL_PROJECTION);
-    glPushMatrix ();
+    //glPushMatrix ();
     glLoadIdentity ();
     glMatrixMode (GL_MODELVIEW);
-    glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
     statecache->EnableState (GL_STENCIL_TEST);
@@ -310,9 +377,9 @@ void csGLRender3D::SetupStencil ()
     glEnd ();
     glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     statecache->DisableState (GL_STENCIL_TEST);
-    glPopMatrix ();
+    /*glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
-    glPopMatrix ();
+    glPopMatrix ();*/
   }
 }
 
@@ -328,7 +395,6 @@ int csGLRender3D::SetupClipPlanes (bool add_clipper,
   clipplane_initialized = true;*/
 
   glMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
   glLoadIdentity ();
 
   int i = 0;
@@ -372,7 +438,7 @@ int csGLRender3D::SetupClipPlanes (bool add_clipper,
       i++;
     }
   }
-  glPopMatrix ();
+
   return i;
 }
 
@@ -514,6 +580,35 @@ void csGLRender3D::SetupClipper (int clip_portal,
   }
 }
 
+void csGLRender3D::ApplyObjectToCamera ()
+{
+  GLfloat matrixholder[16];
+  const csMatrix3 &orientation = object2camera.GetO2T();
+
+  matrixholder[0] = orientation.m11;
+  matrixholder[1] = orientation.m21;
+  matrixholder[2] = orientation.m31;
+
+  matrixholder[4] = orientation.m12;
+  matrixholder[5] = orientation.m22;
+  matrixholder[6] = orientation.m32;
+
+  matrixholder[8] = orientation.m13;
+  matrixholder[9] = orientation.m23;
+  matrixholder[10] = orientation.m33;
+
+  matrixholder[3] = matrixholder[7] = matrixholder[11] =
+    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
+  matrixholder[15] = 1.0;
+
+  const csVector3 &translation = object2camera.GetO2TTranslation();
+
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+  glMultMatrixf (matrixholder);
+  glTranslatef (-translation.x, -translation.y, -translation.z);
+}
+
 
 
 
@@ -575,7 +670,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if (false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -605,6 +700,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
 
+  tricnt = 0;
   if (render_target)
   {
     int txt_w, txt_h;
@@ -682,6 +778,8 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
+//  printf ("Number of tris: %i\n", tricnt);
+  tricnt = 0;
   SetMirrorMode (false);
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
@@ -777,6 +875,7 @@ void csGLRender3D::FinishDraw ()
 
 void csGLRender3D::Print (csRect* area)
 {
+  glFinish ();
   G2D->Print (area);
 }
 
@@ -787,31 +886,8 @@ csReversibleTransform* csGLRender3D::GetWVMatrix()
 
 void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
 {
-  GLfloat matrixholder[16];
-  const csMatrix3 &orientation = wvmatrix->GetO2T();
-
-  matrixholder[0] = orientation.m11;
-  matrixholder[1] = orientation.m21;
-  matrixholder[2] = orientation.m31;
-
-  matrixholder[4] = orientation.m12;
-  matrixholder[5] = orientation.m22;
-  matrixholder[6] = orientation.m32;
-
-  matrixholder[8] = orientation.m13;
-  matrixholder[9] = orientation.m23;
-  matrixholder[10] = orientation.m33;
-
-  matrixholder[3] = matrixholder[7] = matrixholder[11] =
-    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-  matrixholder[15] = 1.0;
-
-  const csVector3 &translation = wvmatrix->GetO2TTranslation();
-
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
-  glMultMatrixf (matrixholder);
-  glTranslatef (-translation.x, -translation.y, -translation.z);
+  object2camera = *wvmatrix;
+  ApplyObjectToCamera ();
 }
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
@@ -836,31 +912,12 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_z_plane);
 
   SetZMode (mymesh->z_buf_mode);
-
   SetMirrorMode (mymesh->do_mirror);
 
   csRef<iMaterialHandle> mathandle;
   if (mymesh->GetMaterialWrapper ())
     mathandle = mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
 
-  csRef<iTextureHandle> txthandle;
-  if (mathandle)
-    txthandle = mathandle->GetTexture ();
-
-  if (txthandle)
-  {
-    txtcache->Cache (txthandle);
-    csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-      txthandle->GetPrivateObject ();
-    csTxtCacheData *cachedata =
-      (csTxtCacheData *)gltxthandle->GetCacheData ();
-
-    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-    statecache->EnableState (GL_TEXTURE_2D);
-  } else statecache->DisableState (GL_TEXTURE_2D);
-
-
-  glColor3f (1,1,1);
   glVertexPointer (3, GL_FLOAT, 0,
     (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
   glEnableClientState (GL_VERTEX_ARRAY);
@@ -880,7 +937,54 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  /// HACK: Dentoid, help!! how should i do this
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+  SetGlOrtho (false);
+  glViewport (1, -1, viewwidth+1, viewheight+1);
+  glTranslatef (viewwidth/2, viewheight/2, 0);
+
+  GLfloat matrixholder[16];
+  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  matrixholder[0] = matrixholder[5] = 1.0;
+  matrixholder[11] = 1.0/aspect;
+  matrixholder[14] = -matrixholder[11];
+  glMultMatrixf (matrixholder);
+
+  ApplyObjectToCamera ();
+
+  tricnt += (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3;
+
+  csRef<iTextureHandle> txthandle;
+  if (mathandle)
+    txthandle = mathandle->GetTexture ();
+
+  float red = 1, green = 1, blue = 1, alpha = 1;
+  if (txthandle)
+  {
+    txtcache->Cache (txthandle);
+    csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+      txthandle->GetPrivateObject ();
+    csTxtCacheData *cachedata =
+      (csTxtCacheData *)gltxthandle->GetCacheData ();
+
+    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+    statecache->EnableState (GL_TEXTURE_2D);
+  } else {
+    statecache->DisableState (GL_TEXTURE_2D);
+
+    csRGBpixel color;
+    mathandle->GetFlatColor (color);
+    
+    red = BYTE_TO_FLOAT (color.red);
+    green = BYTE_TO_FLOAT (color.green);
+    blue = BYTE_TO_FLOAT (color.blue);
+  }
+
+  alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
+  alpha = SetMixMode (mymesh->mixmode, alpha, 
+    txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
+
+  glColor4f (red, green, blue, alpha);
 
   glDrawElements (
     GL_TRIANGLES,
@@ -888,6 +992,52 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     GL_UNSIGNED_INT,
     ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
     +mymesh->GetIndexStart ());
+
+  csMaterialHandle* handle = (csMaterialHandle*)mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
+  for (int l=0; l<handle->GetTextureLayerCount (); l++)
+  {
+    csTextureLayer* layer = handle->GetTextureLayer (l);
+    txthandle = layer->txt_handle;
+    if (txthandle)
+    {
+      txtcache->Cache (txthandle);
+      csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+        txthandle->GetPrivateObject ();
+      csTxtCacheData *cachedata =
+        (csTxtCacheData *)gltxthandle->GetCacheData ();
+
+      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+      statecache->EnableState (GL_TEXTURE_2D);
+    } else continue;
+
+    alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+    alpha = SetMixMode (layer->mode, alpha, 
+      txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
+    glColor4f (1, 1, 1, alpha);
+
+    glMatrixMode (GL_TEXTURE);
+    glPushMatrix ();
+    glLoadIdentity ();
+    GLfloat scalematrix[16];
+    for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
+    scalematrix[0] = layer->uscale;
+    scalematrix[5] = layer->vscale;
+    scalematrix[10] = 1;
+    scalematrix[15] = 1;
+    scalematrix[12] = layer->ushift*layer->uscale; 
+    scalematrix[13] = layer->vshift*layer->vscale;
+    // @@@ Shift is ignored for now.
+    glMultMatrixf (scalematrix);
+
+    glDrawElements (
+      GL_TRIANGLES,
+      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+      GL_UNSIGNED_INT,
+      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+      +mymesh->GetIndexStart ());
+
+    glPopMatrix ();
+  }
 
   vertexbuf->Release();
   glDisableClientState (GL_VERTEX_ARRAY);

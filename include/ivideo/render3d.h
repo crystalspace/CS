@@ -116,7 +116,43 @@ enum csZBufMode
   CS_ZBUF_FILLONLY = 0x00000004,
   /// test if equal
   CS_ZBUF_EQUAL    = 0x00000005,
+  /// inverted test
+  CS_ZBUF_INVERT   = 0x00000006,
 };
+
+/**\name Mix modes for DrawPolygonFX ()
+ * The constants can be ORed together if they belong to different masks.
+ * @{ */
+/// SRC/DST mixing mode mask
+#define CS_FX_MASK_MIXMODE 0xF0000000 
+/// =SRC
+#define CS_FX_COPY         0x00000000 
+/// =SRC*DST
+#define CS_FX_MULTIPLY     0x10000000 
+/// =2*SRC*DST
+#define CS_FX_MULTIPLY2    0x20000000 
+/// =SRC+DST
+#define CS_FX_ADD          0x30000000 
+/// =(1-alpha)*SRC + alpha*DST
+#define CS_FX_ALPHA        0x40000000 
+/// =DST
+#define CS_FX_TRANSPARENT  0x50000000 
+/// color 0 is transparent
+#define CS_FX_KEYCOLOR     0x08000000 
+/// Gouraud shading
+#define CS_FX_GOURAUD      0x04000000 
+/// Tiling
+#define CS_FX_TILING       0x02000000 
+/// alpha = 0..FF (opaque..transparent)
+#define CS_FX_MASK_ALPHA   0x000000FF 
+
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
+#define CS_FX_SETALPHA(alpha) \
+  (CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
+#define CS_FX_SETALPHA_INT(alpha) \
+  (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
+/** @} */
 
 /**\name Light parameters
  * @{ */
