@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -26,11 +26,8 @@
 
 
 /**
- * A plane in 3D space.
- * The plane is given by the equation AAx + BBy + CCz + DD = 0,
- * Where (AA,BB,CC) is given by the vector 'norm'.
+ * A special version of csPlane which can clip polygons.
  */
-
 class csPlaneClip : public csPlane
 {
 public:
@@ -43,21 +40,23 @@ public:
   /// Initialize the plane.
   csPlaneClip (float a, float b, float c, float d=0) : csPlane( a,b,c,d ) { init(100); }
 
-  /// Clip the polygon in pverts ( having num_verts vertices ) to this plane.
-  /// The vertices are expected in screenspace.
-  /// Method returns true if theres something visible false otherwise.
-  bool ClipPolygon( csVector3*& pverts, int& num_verts ){
-
+  /**
+   * Clip the polygon in pverts ( having num_verts vertices ) to this plane.
+   * The vertices are expected in camera space.
+   * Method returns true if there is something visible, false otherwise.
+   */
+  bool ClipPolygon (csVector3*& pverts, int& num_verts )
+  {
     int i,i1, num_vertices = num_verts, cnt_vis=0;
     bool zs, z1s;
     float r;
 
     if ( num_verts > verts.GetLimit() ) init( num_verts );
     for (i = 0 ; i < num_vertices ; i++)
-      {
-	vis[i] = Classify (pverts[i]) >= 0;
-	if (vis[i]) cnt_vis++;
-      }
+    {
+      vis[i] = Classify (pverts[i]) >= 0;
+      if (vis[i]) cnt_vis++;
+    }
     
     if (cnt_vis == 0) return false; // Polygon is not visible.
     
@@ -70,37 +69,36 @@ public:
     i1 = num_vertices-1;
     
     for (i = 0 ; i < num_vertices ; i++)
-      {
-	zs = vis[i];
-	z1s = vis[i1];
+    {
+      zs = vis[i];
+      z1s = vis[i1];
 	
-	if (!z1s && zs)
-	  {
-	    csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
-	    num_verts++;
-	    verts[num_verts++] = pverts[i];
-	  }                                                                                               
-	else if (z1s && !zs)
-	  {
-	    csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
-	    num_verts++;
-	  }
-	else if (z1s && zs)
-	  {
-	    verts[num_verts++] = pverts[i];
-	  }
-	i1 = i;
+      if (!z1s && zs)
+      {
+	csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
+	num_verts++;
+	verts[num_verts++] = pverts[i];
+      }                                                                                               
+      else if (z1s && !zs)
+      {
+	csIntersect3::Plane (pverts[i1], pverts[i], *this, verts[num_verts], r);
+	num_verts++;
       }
+      else if (z1s && zs)
+      {
+	verts[num_verts++] = pverts[i];
+      }
+      i1 = i;
+    }
     pverts = verts.GetArray();
 
     return true;
   }
 
- protected:
+protected:
   DECLARE_GROWING_ARRAY(; , verts, csVector3 );
   DECLARE_GROWING_ARRAY(; , vis, bool );
-  void init( int len){ verts.SetLimit( len ); vis.SetLimit( len ); }
-
+  void init (int len) { verts.SetLimit (len); vis.SetLimit (len); }
 };
 
 #endif /*__PLANECLP_H__*/
