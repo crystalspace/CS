@@ -77,6 +77,7 @@ Or for even more fine-grained control:
 @example
 make drivers2d
 make drivers3d
+make csfont
 make netdrivers
 make cscon
 @end example

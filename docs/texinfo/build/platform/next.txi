@@ -308,6 +308,7 @@ applications, you can invoke their targets individually.  For example:
 
 @example
 % gnumake drivers # @r{Builds the plug-in drivers}
+% gnumake csfont  # @r{Builds the standard font renderer}
 % gnumake walk    # @r{Builds @code{walktest}, the level exploration program}
 % gnumake meta    # @r{Builds @code{metademo}, the MetaBalls demonstration}
 % gnumake mzed    # @r{Builds @code{mazed}, the Crystal Space level editor}
