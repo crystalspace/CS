@@ -31,8 +31,6 @@
 #include "imesh/fountain.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
-#include "iutil/strvec.h"
-#include "csutil/util.h"
 #include "csutil/csstring.h"
 #include "iutil/vfs.h"
 #include "iutil/object.h"

@@ -30,8 +30,6 @@
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
-#include "iutil/strvec.h"
-#include "csutil/util.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
