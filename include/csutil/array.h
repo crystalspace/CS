@@ -506,14 +506,14 @@ public:
   /// Get an element (non-const).
   T& Get (size_t n)
   {
-    CS_ASSERT (n >= 0 && n < count);
+    CS_ASSERT (n < count);
     return root[n];
   }
 
   /// Get an element (const).
   T const& Get (size_t n) const
   {
-    CS_ASSERT (n >= 0 && n < count);
+    CS_ASSERT (n < count);
     return root[n];
   }
 
@@ -523,7 +523,6 @@ public:
    */
   T& GetExtend (size_t n)
   {
-    CS_ASSERT (n >= 0);
     if (n >= count)
       SetLength (n+1);
     return root[n];
@@ -544,7 +543,6 @@ public:
   /// Put an element at some position.
   void Put (size_t n, T const& what)
   {
-    CS_ASSERT (n >= 0);
     if (n >= count)
       SetLength (n+1);
     ElementHandler::Destroy (root + n);
@@ -769,7 +767,6 @@ public:
    */
   void Truncate (size_t n)
   {
-    CS_ASSERT(n >= 0);
     CS_ASSERT(n <= count);
     if (n < count)
     {
@@ -825,7 +822,7 @@ public:
   /// Delete element number 'n' from vector.
   bool DeleteIndex (size_t n)
   {
-    if (n >= 0 && n < count)
+    if (n < count)
     {
       size_t const ncount = count - 1;
       size_t const nmove = ncount - n;
