@@ -92,6 +92,9 @@ endif
 ifeq ($(CS_NO_QSQRT),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_NO_QSQRT$">>volatile.tmp
 endif
+ifeq ($(CS_QINT_WORKAROUND),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_QINT_WORKAROUND$">>volatile.tmp
+endif
 ifdef CS_LITTLE_ENDIAN
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_LITTLE_ENDIAN$">>volatile.tmp
 endif

@@ -120,6 +120,21 @@
 #define FIST_MAGIC_QINT   (65536.0 * 65536.0 * 16.0)
 
 /// Truncate the fractional part of a floating-point value and convert to integer
+/**
+ * well, for QInt gcc 2.96 and above compilers (we tested up to 3.0.1) seems to
+ * be buggy, we've got a workaround which seems to be buggy in vc :) so we have
+ * to differentiate between compilers here (Matze)
+ */
+#ifdef CS_QINT_WORKAROUND
+static inline long QInt (double inval)
+{
+  union { double dtemp; long result; } x;
+
+  x.dtemp = FIST_MAGIC_QINT + inval;
+  x.result = CS_LONG_AT_BYTE (x.dtemp, 2);
+  return x.result < 0 ? (x.result >> 1) + 1 : x.result;
+}
+#else
 static inline long QInt (double inval)
 {
   double dtemp = FIST_MAGIC_QINT + inval;
@@ -128,6 +143,7 @@ static inline long QInt (double inval)
   long result = CS_LONG_AT_BYTE (dtemp, 2);
   return result < 0 ? (result >> 1) + 1 : result;
 }
+#endif
 
 /**
  * To round an floating-point value we'll add 2^52+0.5*2^32 to it,

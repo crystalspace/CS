@@ -32,6 +32,17 @@ The history order is reversed so that new features are at the top.
 	  there is now a warning about ignored pragma though.
 	  Note that I could not remove the extern "C" in cs_pyth.cpp since
 	  that file is automatically generated. We have to fix that somehow.
+	- Matze Braun <matze@braunis.de> and Jorrit investigated a bug with
+	  the QInt() function which triggers on gcc 2.96 or higher (gcc 3) if
+	  optimization level -O2 is selected (or higher). After speaking with
+	  some people from the gcc community we discovered that this is
+	  actually a bug in gcc and not a bug in the QInt() implementation
+	  that we use. We came up with a work-arround which unfortunatelly
+	  doesn't seem to work for MSVC. So Matze extended the configuration
+	  pass by adding an additional test in bin/comptest.sh which tests
+	  if this bug is present or not. This means that the right version
+	  of QInt() will automatically be selected after you do 'make linux'
+	  (or 'make win32gcc' whatever).
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
 	- Started work on vertex buffer support in the 3D renderers. There is

@@ -64,7 +64,31 @@ ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_NO_QSQRT = yes"
 fi
 
 #------------------------------------------------------------------------------
+# The following test tries to detect a compiler bug discovered in gcc 2.96
+# (redhat and other unstables...) and gcc 3.0.1
+# Note: This fails for crosscompiling because you can't execute the result then
+# -----------------------------------------------------------------------------
+cat << TEST > comptest.cpp
+static inline long double2int(double val)
+{
+long *l;
+val += 68719476736.0;
+l = (long*) ((char*)&val + 2);
+return *l;
+}
+
+int main()
+{
+if ( double2int(255.99) !=255 )
+	return 1;
+return 0;
+}
+TEST
+${CXX} -O2 comptest.cpp -o comptest 
+./comptest 2>/dev/null || echo "CS_QINT_WORKAROUND = yes"
+
+#------------------------------------------------------------------------------
 # Clean up.
 #------------------------------------------------------------------------------
-rm -f comptest.cpp comptest.o
+rm -f comptest.cpp comptest.o comptest
 exit 0
