@@ -123,8 +123,14 @@ void ConstructPolygonMeshTask::doTask()
       {
         thingfac->RemovePolygon(polymap[i]);
         polymap[i] = -1;
+        std::string coords;
+        for(size_t c = 0; c < polys[i].size(); c++) {
+            if(c != 0) coords += ", ";
+            coords += polys[i][c];
+        }
         LOG("ConstructPolygonMeshTask", 2, "Discarded polygon "
-                     << i << " with three colinear or coincident vertices");
+                     << i << " with three colinear or coincident vertices: ("
+                     << coords << ")");
       }
       else
       {
@@ -134,6 +140,7 @@ void ConstructPolygonMeshTask::doTask()
                                            1);
       }
     }
+
 
     if(texels.size() > 0)
     {
@@ -220,7 +227,10 @@ void ConstructPolygonMeshTask::doTask()
           */
 
         if(i >= texsp.size()) {
-          thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
+          // Just throw the material at the polygon. 
+          // (this takes care of objects with color but no textures.)
+          vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(*materials);
+          thingfac->SetPolygonMaterial(p, mat->GetMaterialWrapper());
           continue;
         }
 
@@ -546,13 +556,13 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
     getTexels(cpmt->texels);
     LOG("csMetaPolygonMesh", 2, "got texels");
   }
-  catch(NoSuchObjectError)
+  catch(NoSuchObjectError&)
   {
     LOG("csMetaPolygonMesh", 2, "getting texturespaces");
     try
     {
       getTextureSpaces(cpmt->texsp);
-    } catch(NoSuchObjectError)
+    } catch(NoSuchObjectError&)
     {
     }
     LOG("csMetaPolygonMesh", 2, "got texturespaces");

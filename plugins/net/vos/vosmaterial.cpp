@@ -283,6 +283,9 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
   else
   {
     getColor(cmt->R, cmt->G, cmt->B);
+    LOG("CSA3DL Material", 2, 
+            "CS Material: material has no textures, assuming it's color. (" <<
+            cmt->R << ", " << cmt->G << ", " << cmt->B << ")");
     cmt->iscolor = true;
   }
 
