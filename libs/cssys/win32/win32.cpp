@@ -118,9 +118,6 @@ public:
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
   virtual HWND GetApplicationWindow();
-#ifdef DO_DINPUT_KEYBOARD
-  virtual HANDLE GetEventHandle();
-#endif
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -959,10 +956,3 @@ HWND Win32Assistant::GetApplicationWindow()
 {
   return ApplicationWnd;
 }
-
-#ifdef DO_DINPUT_KEYBOARD
-HANDLE Win32Assistant::GetEventHandle()
-{
-  return m_hEvent;
-}
-#endif

@@ -1,7 +1,8 @@
 /*
-  This header is used by COMP_BC, COMP_VC and COMP_GCC for all OS_WIN32 builds.
-  You can change these macros to suit your own needs.
-  For a description of what each macro does, see mk/user.mak.
+  This header is used by COMP_VC and COMP_BC for OS_WIN32 builds.  It is
+  not used for COMP_GCC builds under normal circumstances since GCC builds
+  are performed in concert with invocation of the CS configure script which
+  generates a suitable volatile.h file.
 */
 #ifndef __CS_WIN32_VOLATILE_H__
 #define __CS_WIN32_VOLATILE_H__
@@ -38,24 +39,19 @@
 #  define DO_MMX
 #endif
 
-//#define CS_USE_NEW_RENDERER
-
-// If you don't want to use direct input, comment this out
-// keyboard handler will default to window message handling.
-#if defined(COMP_GCC)
-//#  define DO_DINPUT_KEYBOARD
-#else
-#  undef DO_DINPUT_KEYBOARD
-#endif
-
 #define CS_RGBCOLOR_SANE
 #define CS_RGBPIXEL_SANE
+
+#define CS_HAS_WCHAR_H
+#define CS_WCHAR_T_SIZE 2
+
+#define CS_EMBED_PLUGIN_META
 
 #ifdef _WIN64
   #define CS_PLATFORM_IS_64BITS
 #endif
 
-#define CS_HAS_WCHAR_H
-#define CS_WCHAR_T_SIZE 2
+// Experimental.
+#undef CS_USE_NEW_RENDERER
 
 #endif // __CS_WIN32_VOLATILE_H__

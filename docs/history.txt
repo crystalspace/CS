@@ -12,6 +12,20 @@ chronological order.
 	- res changed r3dtest so the twisted torii aren't bump mapped for now.
 	  genmesh currently doesn't provide all the informations required for
 	  dot3 at the moment, causing visual glitches on some hardware.
+	- Eric Sunshine added an --enable-meta-info-embedding option to the
+	  configure script.  When enabled, plugin meta-information is embedded
+	  directly in the plugin module (if supported by the platform).  When
+	  disabled, the meta information is placed alongside the plugin module
+	  in a separate .csplugin file.  Embedding is enabled by default.
+	- Eric Sunshine augmented CS_BUILD_PROPERTY() in configure.ac so that
+	  it no longer emits properties for which the value is empty.  Not only
+	  does this eliminate empty assignments in the generated configuration
+	  files, but it also simplifies numerous callers of
+	  CS_BUILD_PROPERTY().
+	- Eric Sunshine relocated cleanup of autom4te.cache from the
+	  "maintainerclean" target to the "distclean" target.
+	- Eric Sunshine removed the last remnant (DO_DINPUT_KEYBOARD) of
+	  DirecInput support; the bulk of which was removed some time ago.
 11-Sep-2003
 	- Jorrit cleaned up some sources in the stencil renderloop.
 	- Jorrit did the following optimizations with regards to

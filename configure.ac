@@ -57,11 +57,15 @@ m4_define([cs_lib_paths_default],
 #	automatically, so if you have a situation in which a build variable is
 #	mentioned in VALUE, then you should instead invoke
 #	CS_MAKEFILE_PROPERTY() and CS_JAMCONFIG_PROPERTY() manually with the
-#	appropriate values.
+#	appropriate values.  As a convenience, the property is emitted only if
+#	the value is non-empty (after stripping whitespace).
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_BUILD_PROPERTY],
-    [CS_MAKEFILE_PROPERTY([$1], [$2], [$3])
-    CS_JAMCONFIG_PROPERTY([_CS_TRANSLATE_MAKE_TO_JAM([$1])], [$2], [$3])])
+    [cs_build_prop_val=CS_TRIM([$2])
+    AS_IF([test -n "$cs_build_prop_val"],
+	[CS_MAKEFILE_PROPERTY([$1], [$cs_build_prop_val], [$3])
+	CS_JAMCONFIG_PROPERTY([_CS_TRANSLATE_MAKE_TO_JAM([$1])],
+	    [$cs_build_prop_val], [$3])])])
 
 
 
@@ -108,12 +112,8 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
 	[CS_BUILD_PROPERTY([$2.AVAILABLE], [yes])
-	cs_result_cflags=CS_TRIM([$$1_cflags])
-	cs_result_lflags=CS_TRIM([$$1_lflags $$1_libs])
-	AS_IF([test -n "$cs_result_cflags"],
-	    [CS_BUILD_PROPERTY([$2.CFLAGS], [$cs_result_cflags])])
-	AS_IF([test -n "$cs_result_lflags"],
-	    [CS_BUILD_PROPERTY([$2.LFLAGS], [$cs_result_lflags])])])])
+	CS_BUILD_PROPERTY([$2.CFLAGS], [$$1_cflags])
+	CS_BUILD_PROPERTY([$2.LFLAGS], [$$1_lflags $$1_libs])])])
 
 
 
@@ -152,9 +152,9 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 
 
 
-#===============================================================================
+#==============================================================================
 # INITIALIZATION
-#===============================================================================
+#==============================================================================
 AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
     [Copyright (C)1998-2003 Jorrit Tyberghein and others],
@@ -190,7 +190,7 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
 AC_CHECK_PROGS([FLEXBIN], [flex])
-AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
+CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])
 
 AC_CHECK_PROGS([BISONBIN], [bison])
 AS_IF([test -n "$BISONBIN"],
@@ -198,25 +198,25 @@ AS_IF([test -n "$BISONBIN"],
 	[CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
-AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
+CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
 
 AC_CHECK_PROGS([TEXI2DVI], [texi2dvi])
-AS_IF([test -n "$TEXI2DVI"], [CS_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])])
+CS_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])
 
 AC_CHECK_PROGS([DVIPS], [dvips])
-AS_IF([test -n "$DVIPS"], [CS_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])])
+CS_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])
 
 AC_CHECK_PROGS([DVIPDF], [dvipdf])
-AS_IF([test -n "$DVIPDF"], [CS_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])])
+CS_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])
 
 AC_CHECK_PROGS([MAKEINFO], [makeinfo])
-AS_IF([test -n "$MAKEINFO"], [CS_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])])
+CS_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
 
 AC_CHECK_PROGS([INSTALL], [install])
-AS_IF([test -n "$INSTALL"], [CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])])
+CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])
 
 AC_PROG_RANLIB
-AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])])
+CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])
 
 AC_CHECK_PROGS([SWIGBIN], [swig])
 AS_IF([test -n "$SWIGBIN"],
@@ -406,18 +406,12 @@ AS_IF([test -n "$PERL"],
     cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
 	[CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])
-	AS_IF([test -n "$cs_cv_perl_cflags"],
-	    [CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
-	AS_IF([test -n "$cs_cv_perl_lflags"],
-	    [CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])])
+	CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])
+	CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])
 
 #@@@ The following is intended to check whether the Perl SDK builds correctly.
 # However, I [res] get link errors on cygwin, tho in theory the SDK should be
 # usable.
-#   AS_IF([test -n "$cs_cv_perl_cflags"],
-#	[CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
-#   AS_IF([test -n "$cs_cv_perl_lflags"],
-#	[CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])
 #   CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
 #       [AC_LANG_PROGRAM([
 #            #include <EXTERN.h>
@@ -444,7 +438,7 @@ AS_IF([test -n "$PERL"],
 # set, then use those values.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PYTHON], [python])
-AS_IF([test -n "$PYTHON"], [CS_BUILD_PROPERTY([PYTHON], [$PYTHON])])
+CS_BUILD_PROPERTY([PYTHON], [$PYTHON])
 
 AS_IF([test -n "$PYTHON"],
     [AC_CACHE_CHECK([for python distutils module], [cs_cv_python_distutils],
@@ -576,9 +570,9 @@ CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 CFLAGS=`echo "$CFLAGS" | sed 's/-O.//g;s/-g.//g'`
 CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-O.//g;s/-g.//g'`
 
-CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$CPPFLAGS $CFLAGS])
-CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [$CPPFLAGS $CXXFLAGS])
-CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$LDFLAGS])
+CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$CPPFLAGS $CFLAGS], [+])
+CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [$CPPFLAGS $CXXFLAGS], [+])
+CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$LDFLAGS], [+])
 
 
 
@@ -1897,14 +1891,30 @@ CS_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 #------------------------------------------------------------------------------
 # Determine if modules should be built as plugins or static link libraries.
+# Also determine if plugin meta-information should be embedded directly into
+# the plugin module or if it should exist in a stand-alone .csplugin file.
 #------------------------------------------------------------------------------
-AC_MSG_CHECKING([if building plugins])
+AC_MSG_CHECKING([whether to build plugins])
 AC_ARG_ENABLE([plugins], [AC_HELP_STRING([--enable-plugins],
     [create plugin modules instead of static link libraries (default YES)])],
     [], [enable_plugins=yes])
 AC_MSG_RESULT([$enable_plugins])
 CS_BUILD_PROPERTY([USE_PLUGINS], [$enable_plugins])
 AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
+
+AS_IF([test $enable_plugins = yes],
+    [AC_MSG_CHECKING([whether to embed plugin meta-information])
+    AC_ARG_ENABLE([meta-info-embedding],
+	[AC_HELP_STRING([--enable-meta-info-embedding],
+	    [store plugin meta-information directly inside plugin modules if
+	    supported by platform (default YES); if disabled, meta-information
+	    is stored in stand-alone .csplugin files])],
+	[], [enable_meta_info_embedding=yes])
+    AC_MSG_RESULT([$enable_meta_info_embedding])
+    CS_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding])
+    AS_IF([test $enable_meta_info_embedding = yes],
+	[CS_HEADER_PROPERTY([CS_EMBED_PLUGIN_META])])],
+    [CS_BUILD_PROPERTY([EMBED_META], [no])])
 
 
 

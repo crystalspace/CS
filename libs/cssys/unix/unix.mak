@@ -101,7 +101,7 @@ UNIX_SRC.SYS_CSSYS = \
   $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
 
-ifeq ($(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyes)
+ifeq ($(EMBED_META)$(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyesyes)
   SRC.SYS_CSSYS = $(UNIX_SRC.SYS_CSSYS)
 else
   SRC.SYS_CSSYS = $(filter-out $(SRCDIR)/libs/cssys/unix/bfdplugins.cpp, \
@@ -116,7 +116,8 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifeq ($(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyes)
+ifeq ($(EMBED_META)$(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyesyes)
+  # Override default preamble which simply copies .csplugin file.
   DO.SHARED.PLUGIN.PREAMBLE =
   # Blank line in macro is relevant; do not remove.
   define DO.SHARED.PLUGIN.POSTAMBLE

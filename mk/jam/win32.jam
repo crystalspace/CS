@@ -139,7 +139,13 @@ rule MakeVersionRc
   GenerateWin32VersionRc $(<) ;
 }
 
-rule LinkVersionRc
+rule MakeMetadataRc
+{
+  Depends $(<) : $($(>)_METAFILE) ;
+  GenerateWin32MetadataRc $(<) : $($(>)_METAFILE) ;
+}
+
+rule AppResourceWin32
 {
   local versionrc = [ DoObjectGrist _versionrc.rc ] ;
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
@@ -151,26 +157,27 @@ rule LinkVersionRc
   Win32Resource $(<) : $(versionrc) ;
 }    
 
-rule MakeMetadataRc
+rule PluginResourceWin32
 {
-  GenerateWin32MetadataRc $(>) : $($(<)_METAFILE) ;
-  Depends $(>) : $($(<)_METAFILE) ;
-}
+  local versionrc, metarc ;
 
-rule LinkVersionAndMetadataRc
-{
-  local versionrc = [ DoObjectGrist _versionrc.rc ] ;
+  versionrc = [ DoObjectGrist _versionrc.rc ] ;
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
-  
-  local metarc = [ DoObjectGrist _metarc.rc ] ;
-  LOCATE on $(metarc) = $(LOCATE_TARGET) ;
-  SEARCH on $(metarc) = $(LOCATE_TARGET) ;
-  
   MakeVersionRc $(versionrc) : $(<) ;
-  MakeMetadataRc $(<) : $(metarc) ;
-  Clean $(<)clean : $(versionrc) $(metarc) ;
+  
+  # This is order sensitive; metarc is appended to the output of versionrc.
+  if $(EMBED_META) = "yes"
+  {
+    metarc = [ DoObjectGrist _metarc.rc ] ;
+    LOCATE on $(metarc) = $(LOCATE_TARGET) ;
+    SEARCH on $(metarc) = $(LOCATE_TARGET) ;
+    MakeMetadataRc $(metarc) : $(<) ;
+  }
+
   Clean clean : $(versionrc) $(metarc) ;
+  Clean $(<)clean : $(versionrc) $(metarc) ;
+
   Win32Resource $(<) : $(versionrc) $(metarc) ;
 }
 
@@ -185,7 +192,7 @@ rule SystemLinkApplication
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 
-  LinkVersionRc $(<) ;
+  AppResourceWin32 $(<) ;
 }
 
 # SystemLinkPlugin target : objects : options
@@ -193,7 +200,6 @@ rule SystemLinkPlugin
 {
   local target = $($(<)_TARGET) ;
 
-  # create export definitions
   local exportdefs = [ DoObjectGrist $(<).def ] ;
   NAME on $(exportdefs) = $(<) ;
   GenerateExportDefs $(exportdefs) : $($(<)_METAFILE) ;
@@ -202,12 +208,15 @@ rule SystemLinkPlugin
   Depends $(target) : $(>) ;
   EXPORTDEFS on $(target) = $(exportdefs) ;
   LinkPlugin $(target) : $(>) ;
-  # PluginMetaData $(<) : $($(<)_METAFILE) ;
-  # setup clean rules
+  PluginResourceWin32 $(<) ;
+
+  if $(EMBED_META) != "yes"
+  {
+    PluginMetaData $(<) : $($(<)_METAFILE) ;
+  }
+
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
-
-  LinkVersionAndMetadataRc $(<) ;
 }
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS

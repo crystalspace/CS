@@ -185,6 +185,8 @@ static void AppendWin32Error (const char* text,
   delete[] buf;
 }
 
+#if defined(CS_EMBED_PLUGIN_META)
+
 static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
 						 csRef<iDocument>& metadata,
 						 bool& metadataValid)
@@ -246,6 +248,8 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
   return csPtr<iString> (result);
 }
 
+#endif
+
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata)
 {
@@ -279,8 +283,11 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   }
 
   bool metadataValid = false;
-  csRef<iString> result = 
-    InternalGetPluginMetadata (dllPath, metadata, metadataValid);
+  csRef<iString> result;
+
+#if defined(CS_EMBED_PLUGIN_META)
+  result = InternalGetPluginMetadata (dllPath, metadata, metadataValid);
+#endif
 
   /* Check whether a .csplugin file exists as well */
 
@@ -306,7 +313,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
       }
       else
       {
-	if (metadata == 0)
+	if (!metadata)
 	{
 	  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
 	    (new csTinyDocumentSystem ());
@@ -335,7 +342,7 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
     metadata = 0;
   }
 
-  return (result);
+  return result;
 }
 
 extern char* csGetConfigPath ();

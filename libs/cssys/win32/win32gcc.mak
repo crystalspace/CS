@@ -140,29 +140,41 @@ MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
 
+ifdef WIN32_USED_ONLY_BE_CSCONFIG
 # <cs-config>
 DO.SHARED.PLUGIN.PREAMBLE += \
   echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
   echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
   sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
 # </cs-config>
+endif
+
+ifeq ($(EMBED_META),yes)
+METARC = $(OUT)/$(@:$(DLL)=-meta.rc)
+# Replace/override the default preamble which simply copies .csplugin file.
 DO.SHARED.PLUGIN.PREAMBLE = \
+  $(MAKEMETADATA) $(METARC) $(INF.$(TARGET.RAW.UPCASE)) $(COMMAND_DELIM)
+else
+METARC =
+endif
+
+DO.SHARED.PLUGIN.PREAMBLE += \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" \
     "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
-  $(MAKEMETADATA) $(OUT)/$(@:$(DLL)=-meta.rc) $(INF.$(TARGET.RAW.UPCASE)) \
-    $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
-    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(OUT)/$(@:$(DLL)=-meta.rc) \
+    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(METARC) \
     $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) --include-dir "$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
   echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
   sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
+
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS)
+
 # <cs-config>
 DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
 # </cs-config>

@@ -46,7 +46,7 @@ case * :		# posix/unix/linux mode
 		resdir.cpp
 		runloop.cpp 
 		sysroot.cpp ;
-  if $(LIBBFD.AVAILABLE) = "yes"
+  if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
     SYSFILES += bfdplugins.cpp ;
   }

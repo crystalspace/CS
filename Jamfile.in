@@ -27,6 +27,7 @@ Clean distclean : Jamconfig Jamfile
 		  include/volatile.h
 		  [ Wildcard *.scf ]
 		  [ Wildcard *.cex ] ;
+CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
 # When build directory differs from source directory, also remove `include'
 # directory created by configure.
@@ -36,7 +37,6 @@ if $(TOP) != "."
 }
 
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
-CleanDir maintainerclean : autom4te.cache ;
 Depends maintainerclean : distclean ;
 
 # Process subdirectories

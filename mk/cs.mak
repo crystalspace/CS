@@ -244,13 +244,14 @@ all: $(OUTDIRS)
 dep: $(OUTBASE) $(OUTOS)
 
 maintainerclean: distclean
-	-$(RMDIR) $(SRCDIR)/configure $(SRCDIR)/autom4te.cache
+	-$(RM) $(SRCDIR)/configure
 
 # We also remove the `include' directory if building outside of the CS tree
 # since that directory was created by the configure script (for volatile.h).
 distclean: clean
 	-$(RM) Makefile config.mak config.cache config.status \
-	include/volatile.h Jamfile Jamconfig
+	include/volatile.h Jamfile Jamconfige
+	-$(RMDIR) $(SRCDIR)/autom4te.cache
 ifneq ($(SRCDIR),.)
 	-$(RMDIR) include
 endif
