@@ -23,16 +23,17 @@ JAM_DEBUG ?= 1 ;
 
 jamrulesdir = $(TOP)/mk/jam ;
 
-# This needs to be included before _and_ after all other includes since it
-# optionally overrides built-in rules to glean information about targets being
-# defined.
-include $(jamrulesdir)/dump.jam ;
-
+# Utility and compatibility rules used by all other scripts.
 include $(jamrulesdir)/jamcompatibility.jam ;
 include $(jamrulesdir)/subdir.jam ;
 include $(jamrulesdir)/property.jam ;
-include $(jamrulesdir)/options.jam ;
 
+# This needs to be included before _and_ after all other includes (except the
+# super low-level utility files above) since it optionally overrides built-in
+# rules to glean information about targets being defined.
+include $(jamrulesdir)/dump.jam ;
+
+include $(jamrulesdir)/options.jam ;
 include $(jamrulesdir)/variant.jam ;
 include $(jamrulesdir)/resource.jam ;
 

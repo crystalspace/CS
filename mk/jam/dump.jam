@@ -88,9 +88,13 @@ actions together piecemeal EmitPseudoTarget
 rule PossiblePseudoTarget
 {
   # NoCare and Includes are not actually required; they are used here merely to
-  # avoid Jam's "using independent target" warning.
+  # avoid Jam's "using independent target" warning.  Note, however, that Jam
+  # 2.4 and BoostJam try building the target despite the fact that we NoCare
+  # about it. (Presumably this is because the targets have updating actions,
+  # and those actions override the NoCare.)  Consequently, we have to put up
+  # with the "using independent target" warnings for these older Jam versions.
   NoCare $(<) ;
-  Includes dumptargets : $(<) ;
+  if $(JAMVERSION) != 2.4 { Includes dumptargets : $(<) ; }
 
   local i ;
   for i in $(<)
