@@ -109,12 +109,15 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
 {
   root = new csBspNode;
 
-  csPolygonInt** new_polygons = new csPolygonInt* [num];
-  int i;
-  for (i = 0 ; i < num ; i++)
-    new_polygons[i] = polygons[i];
-  Build ((csBspNode*)root, new_polygons, num);
-  delete [] new_polygons;
+  if (num)
+  {
+    csPolygonInt** new_polygons = new csPolygonInt* [num];
+    int i;
+    for (i = 0 ; i < num ; i++)
+      new_polygons[i] = polygons[i];
+    Build ((csBspNode*)root, new_polygons, num);
+    delete [] new_polygons;
+  }
 }
 
 int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
@@ -500,8 +503,9 @@ int compare_int (const void* p1, const void* p2)
 
 int* csBspTree::GetVertices (int& count)
 {
-  if (!root) return 0;
+  if (!root) { count = 0; return NULL; }
   int cnt = ((csBspNode*)root)->CountVertices ();
+  if (cnt == 0) { count = 0; return NULL; }
   int* idx = new int [cnt];
   int* idx2 = new int [cnt];
   int cur_idx = 0;

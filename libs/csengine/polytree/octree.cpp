@@ -49,6 +49,7 @@ csOctreeNode::csOctreeNode ()
     children[i] = NULL;
   minibsp = NULL;
   minibsp_verts = NULL;
+  minibsp_numverts = 0;
   leaf = false;
   pvs_vis_nr = 0;
 }
@@ -509,6 +510,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     // to be used for marking the visibility stubs.
     csBspTree* bsp;
     bsp = new csBspTree (sector, mode);
+    bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
     node->leaf = true;
     return;
