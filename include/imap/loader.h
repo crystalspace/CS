@@ -39,31 +39,13 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
 
-/**\name Loader bit flags
- * Used in iLoader::SetMode().
- * Some actions may be unwanted during loading, thus these flags.
- * @{ */
-/// Do not compress vertices
-#define CS_LOADER_NOCOMPRESS	0x00000001
-/// Do not create BSP/octrees
-#define CS_LOADER_NOBSP		0x00000002
-/// Do not apply transformations to things (and do not create bounding box)
-#define CS_LOADER_NOTRANSFORM	0x00000004
-/** @} */
-
-SCF_VERSION (iLoader, 0, 0, 7);
+SCF_VERSION (iLoader, 0, 0, 8);
 
 /**
  * This interface represents the map loader.
  */
 struct iLoader : public iBase
 {
-  /**
-   * Set loader mode 
-   * \sa #CS_LOADER_NOBSP
-   */
-  virtual void SetMode (int iFlags) = 0;
-
   /**
    * Load an image file. The image will be loaded in the format requested by
    * the engine. If no engine exists, the format is taken from the video

@@ -32,7 +32,7 @@ struct iSector;
 struct iTextureWrapper;
 struct iLight;
 
-SCF_VERSION (iLoaderContext, 0, 0, 3);
+SCF_VERSION (iLoaderContext, 0, 0, 4);
 
 /**
  * This interface gives the context for the loader.
@@ -62,6 +62,16 @@ struct iLoaderContext : public iBase
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;
 
+  /**
+   * Return true if we check for dupes (to avoid objects with same name
+   * being loaded again.
+   */
+  virtual bool CheckDupes () const = 0;
+
+  /**
+   * Return true if we only check in the current region.
+   */
+  virtual bool CurrentRegionOnly () const = 0;
 };
 
 /** @} */

@@ -44,8 +44,7 @@ bool csLoader::LoadEffectFile(const char* filename)
     return false;
   }
 
-  ResolveOnlyRegion = false;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
 
   csRef<iDocument> doc;
   bool er = TestXml (filename, buf, doc);
@@ -63,7 +62,8 @@ bool csLoader::LoadEffectFile(const char* filename)
 
 bool csLoader::ParseEffectList(iDocumentNode *node)
 {
-  csRef<iEffectServer> effect_server = CS_QUERY_REGISTRY(csLoader::object_reg, iEffectServer);
+  csRef<iEffectServer> effect_server = CS_QUERY_REGISTRY (
+  	csLoader::object_reg, iEffectServer);
 
   if(!effect_server.IsValid())
   {

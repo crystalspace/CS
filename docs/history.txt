@@ -37,6 +37,11 @@ The history order is reversed so that new features are at the top.
 	  as a parameter to all loading functions. That makes it easier to
 	  make the loader (partially) thread-safe.
 	- Jorrit made the plugin vector in the loader thread-safe.
+	- Jorrit removed iLoader->SetMode() and all the CS_LOADER_... flags.
+	  Two of them were unused and the other was invalid.
+	- Jorrit made checkDupes and resolveOnlyRegion in the loader part
+	  of the loader context to make it easier to make the loader thread
+	  safe.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

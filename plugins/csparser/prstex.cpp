@@ -126,7 +126,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
   const char* txtname = node->GetAttributeValue ("name");
-  if (checkDupes)
+  if (ldr_context->CheckDupes ())
   {
     iTextureWrapper* t = Engine->FindTexture (txtname);
     if (t) return t;
@@ -389,7 +389,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   if (!Engine) return NULL;
 
   const char* matname = node->GetAttributeValue ("name");
-  if (checkDupes)
+  if (ldr_context->CheckDupes ())
   {
     iMaterialWrapper* m = Engine->FindMaterial (matname);
     if (m) return m;
@@ -499,7 +499,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 		{
 		  const char* txtname = layer_child->GetContentsValue ();
 		  iTextureWrapper* texh;
-		  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+		  if (ldr_context->CurrentRegionOnly ()
+		  	&& Engine->GetCurrentRegion ())
 		    texh = Engine->GetCurrentRegion ()->FindTexture (txtname);
 		  else
                     texh = Engine->GetTextureList ()->FindByName (txtname);

@@ -270,7 +270,8 @@ class csLoader : public iLoader
 {
   friend class StdLoaderContext;
 private:
-  csPtr<iLoaderContext> CreateLoaderContext ();
+  csPtr<iLoaderContext> CreateLoaderContext (
+  	bool resolveOnlyRegion, bool checkDupes);
   csStringHash xmltokens;
 
   /// Parser for common stuff like MixModes, vectors, matrices, ...
@@ -320,19 +321,6 @@ private:
 
   /// List of loaded plugins
   csLoadedPluginVector loaded_plugins;
-  /// Loader flags
-  int flags;
-  /**
-   * If true then references to other objects (e.g. textures, mesh factories
-   * etc.) are only resolved if the referenced object exists in the current
-   * region.
-   */
-  bool ResolveOnlyRegion;
-  /**
-   * If true we only load objects (materials, textures and mesh factories)
-   * that are not already in memory (ignoring regions).
-   */
-  bool checkDupes;
 
   //------------------------------------------------------------------------
 
@@ -584,8 +572,6 @@ public:
   virtual ~csLoader();
   // initialize the plug-in
   virtual bool Initialize(iObjectRegistry *object_reg);
-
-  virtual void SetMode (int iFlags);
 
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,

@@ -97,9 +97,11 @@ private:
   iEngine* Engine;
   iRegion* region;
   csLoader* loader;
+  bool checkDupes;
+  bool resolveOnlyRegion;
 public:
-  StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion,
-    csLoader* loader);
+  StdLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
+    csLoader* loader, bool checkDupes);
   virtual ~StdLoaderContext ();
 
   SCF_DECLARE_IBASE;
@@ -110,6 +112,8 @@ public:
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight (const char *name);
+  virtual bool CheckDupes () const { return checkDupes; }
+  virtual bool CurrentRegionOnly () const { return resolveOnlyRegion; }
 };
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
@@ -117,15 +121,18 @@ SCF_IMPLEMENT_IBASE(StdLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 StdLoaderContext::StdLoaderContext (iEngine* Engine,
-	bool ResolveOnlyRegion, csLoader* loader)
+	bool resolveOnlyRegion, csLoader* loader,
+	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   StdLoaderContext::Engine = Engine;
-  if (ResolveOnlyRegion)
+  StdLoaderContext::resolveOnlyRegion = resolveOnlyRegion;
+  if (resolveOnlyRegion)
     region = Engine->GetCurrentRegion ();
   else
     region = NULL;
   StdLoaderContext::loader = loader;
+  StdLoaderContext::checkDupes = checkDupes;
 }
 
 StdLoaderContext::~StdLoaderContext ()
@@ -186,7 +193,7 @@ iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
   return Engine->FindMeshObject (name, region);
 }
 
-iLight* StdLoaderContext::FindLight(const char *name)
+iLight* StdLoaderContext::FindLight (const char *name)
 {
   // This function is necessary because Engine::FindLight returns iStatLight
   // and not iLight.
@@ -388,9 +395,8 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   bool iOnlyRegion, bool checkdupes)
 {
   if (iClearEngine) Engine->DeleteAll ();
-  ResolveOnlyRegion = iOnlyRegion;
-  csLoader::checkDupes = checkdupes;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (iOnlyRegion,
+  	checkdupes);
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
@@ -436,9 +442,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
     return false;
   }
 
-  ResolveOnlyRegion = false;
-  checkDupes = false;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
@@ -461,9 +465,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 {
   if (!Engine) return NULL;
 
-  ResolveOnlyRegion = false;
-  checkDupes = false;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
@@ -521,7 +523,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (false, false);
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -605,10 +607,6 @@ csLoader::csLoader (iBase *p)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   object_reg = NULL;
-
-  flags = 0;
-  ResolveOnlyRegion = false;
-  checkDupes = false;
 }
 
 csLoader::~csLoader()
@@ -616,10 +614,11 @@ csLoader::~csLoader()
   loaded_plugins.DeleteAll ();
 }
 
-csPtr<iLoaderContext> csLoader::CreateLoaderContext ()
+csPtr<iLoaderContext> csLoader::CreateLoaderContext (
+	bool resolveOnlyRegion, bool checkDupes)
 {
   return csPtr<iLoaderContext> (
-    	new StdLoaderContext (Engine, ResolveOnlyRegion, this));
+    	new StdLoaderContext (Engine, resolveOnlyRegion, this, checkDupes));
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
@@ -852,11 +851,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   return true;
 }
 
-void csLoader::SetMode (int iFlags)
-{
-  flags = iFlags;
-}
-
 //--- Parsing of Engine Objects ---------------------------------------------
 
 bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
@@ -894,7 +888,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
         case XMLTOKEN_MESHFACT:
           {
 	    const char* name = child->GetAttributeValue ("name");
-	    if (checkDupes)
+	    if (ldr_context->CheckDupes ())
 	    {
 	      iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
 	      if (t) break;
@@ -2765,8 +2759,9 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	  for (i = 0 ; i < sl->GetCount () ; i++)
 	  {
 	    iSector* sect = sl->Get (i);
-	    if ((!ResolveOnlyRegion) || (!Engine->GetCurrentRegion ()) ||
-	      Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
+	    if ((!ldr_context->CurrentRegionOnly ())
+	    	|| (!Engine->GetCurrentRegion ()) ||
+	        Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
 	    {
 	      l = sect->GetLights ()->FindByName (lightname);
 	      if (l) break;
@@ -2807,7 +2802,7 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	  const char* colname = child->GetContentsValue ();
 	  //@@@$$$ TODO: Collection in regions.
 	  iCollection* th;
-	  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+	  if (ldr_context->CurrentRegionOnly () && Engine->GetCurrentRegion ())
 	    th = Engine->GetCurrentRegion ()->FindCollection (colname);
 	  else
             th = Engine->GetCollections ()->FindByName (colname);
@@ -3494,19 +3489,18 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	return NULL;
     }
   }
-  if (!(flags & CS_LOADER_NOBSP))
-    if (do_culler)
+  if (do_culler)
+  {
+    bool rc = sector->SetVisibilityCullerPlugin (culplugname);
+    if (!rc)
     {
-      bool rc = sector->SetVisibilityCullerPlugin (culplugname);
-      if (!rc)
-      {
-	SyntaxService->ReportError (
+      SyntaxService->ReportError (
 	      	"crystalspace.maploader.load.sector",
 		node, "Could not load visibility culler for sector '%s'!",
 		secname ? secname : "<noname>");
-	return NULL;
-      }
+      return NULL;
     }
+  }
   return sector;
 }
 
