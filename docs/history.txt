@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  iGraphics3D/iGraphics2D interfaces.
 	- Eric Sunshine eliminated compilation warnings from the OpenGL
 	  renderer.
+	- Eric sunshine eliminated compilation warnings from the csSaver
+	  plugin.
 16-Oct-2002
 	- Keith Fulton added definitions and initial implementations for
 	  iSharedVariable, iSharedVariableList and iImposter.  iEngine now

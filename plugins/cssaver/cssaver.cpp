@@ -97,7 +97,6 @@ bool csSaver::SaveTextures(csRef<iDocumentNode>& parent) {
     const char *name=texWrap->QueryObject()->GetName();
     if(name && *name) child->SetAttribute("name", name);
 
-    int flags=texWrap->GetFlags();
     iImage *img=texWrap->GetImageFile();
 
     if(img) {
