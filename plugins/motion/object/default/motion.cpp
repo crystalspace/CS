@@ -461,6 +461,9 @@ void csMotionManager::UpdateAll()
 
 void csMotionManager::UpdateAll( int time )
 {
+#ifdef MOTION_DEBUG
+  printf("Update all: time %d numskels %d\n",time,skels.Length());
+#endif
   if (oldtime == 0) oldtime = time;
   cs_time elapsed_time = time - oldtime;
   oldtime = time;

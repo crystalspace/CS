@@ -237,6 +237,11 @@ public:
   virtual float GetRate( int idx ) { return skels[idx]->Rate; }
   
   virtual int GetTime( int idx ) { return skels[idx]->curtime; }
+  
+  virtual bool IsFirst( int idx ) { return !(skels[idx]->curframe); }
+  
+  virtual bool IsLast( int idx ) 
+  { return !(skels[idx]->numframes - skels[idx]->curframe - 1); }
 
   virtual void UpdateAll();
 

@@ -115,6 +115,9 @@ struct iMotionManager : public iPlugIn
   
   virtual int GetTime ( int idx ) = 0;
   
+  virtual bool IsFirst ( int idx ) = 0;
+  
+  virtual bool IsLast ( int idx ) = 0;
 
   virtual void UpdateAll () = 0;
   
