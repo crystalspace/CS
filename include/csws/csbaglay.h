@@ -332,7 +332,7 @@ protected:
   void InitCellFromHolder (CellHolder& holder);
   void CreateMatrix ();
   long GetCellCode (int x, int y);
-  void CleanUpConstraints ();
+  void CleanupConstraints ();
   void ClearCachedData ();
   bool HasCashedInfo ();
   void SetComponentLocations ();

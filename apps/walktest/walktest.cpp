@@ -1093,7 +1093,7 @@ void CaptureScreen ()
  * Our main event loop.
  *---------------------------------------------*/
 
-void cleanup ()
+void Cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
   free_keymap ();
@@ -1175,7 +1175,7 @@ void WalkTest::LoadLibraryData (void)
   LevelLoader->LoadLibraryFile ("/lib/std/library");
   if (CheckErrors ())
   {
-    cleanup ();
+    Cleanup ();
     exit (0);
   }
 }
@@ -1607,7 +1607,7 @@ int main (int argc, char* argv[])
   // The main loop.
   Sys->Loop ();
 
-  cleanup ();
+  Cleanup ();
 
   return 1;
 }

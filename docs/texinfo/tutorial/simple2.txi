@@ -69,7 +69,7 @@ bool Simple::Initialize(int argc, char const* const argv[],
   if (txt == NULL)
   @{
     Printf (CS_MSG_FATAL_ERROR, "Error loading texture!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   @}
   txt->Register (txtmgr);
@@ -129,7 +129,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (imeshfact == NULL)
   @{
     Printf (CS_MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   @}
 

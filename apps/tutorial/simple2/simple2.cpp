@@ -62,7 +62,7 @@ Simple::~Simple ()
   if (g3d) g3d->DecRef ();
 }
 
-void cleanup ()
+void Cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
@@ -100,7 +100,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!Open ("Simple Crystal Space Application"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -124,7 +124,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
@@ -211,7 +211,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (txt == NULL)
   {
     Printf (CS_MSG_FATAL_ERROR, "Error loading texture!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
   txt->Register (txtmgr);
@@ -226,7 +226,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (imeshfact == NULL)
   {
     Printf (CS_MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -323,7 +323,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -331,7 +331,7 @@ int main (int argc, char* argv[])
   System->Loop ();
 
   // Cleanup.
-  cleanup ();
+  Cleanup ();
 
   return 0;
 }

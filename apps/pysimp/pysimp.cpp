@@ -60,7 +60,7 @@ PySimple::~PySimple ()
     LevelLoader->DecRef();
 }
 
-void cleanup ()
+void Cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
@@ -99,7 +99,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (!Open ("Simple Crystal Space Python Application"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -243,7 +243,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -251,7 +251,7 @@ int main (int argc, char* argv[])
   System->Loop ();
 
   // Cleanup.
-  cleanup ();
+  Cleanup ();
 
   return 0;
 }

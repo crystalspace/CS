@@ -58,7 +58,7 @@ csGridBagLayout::csGridBagLayout (csComponent *pParent) : csLayout2 (pParent),
 csGridBagLayout::~csGridBagLayout ()
 {
   ClearCachedData();
-  CleanUpConstraints();
+  CleanupConstraints();
 }
 
 // impl. of LayoutManager
@@ -306,7 +306,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
   delete [] prefColSizes;
 }
 
-void csGridBagLayout::CleanUpConstraints ()
+void csGridBagLayout::CleanupConstraints ()
 {
   vConstraints.DeleteAll ();
   vConstraints.SetLength (0);

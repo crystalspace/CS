@@ -143,7 +143,7 @@ Phyztest::~Phyztest ()
   SCF_DEC_REF (myG3D);
 }
 
-void cleanup ()
+void Cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
@@ -189,7 +189,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!Open ("Phyztest Crystal Space Application"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -199,7 +199,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   else
   {
     Printf (CS_MSG_FATAL_ERROR, "No font plugin!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -678,7 +678,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -686,7 +686,7 @@ int main (int argc, char* argv[])
   System->Loop ();
 
   // Cleanup.
-  cleanup ();
+  Cleanup ();
 
   return 0;
 }

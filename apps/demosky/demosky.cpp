@@ -88,7 +88,7 @@ Simple::~Simple ()
   delete flock;
 }
 
-void cleanup ()
+void Cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
@@ -157,7 +157,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!Open ("Crystal Space Procedural Sky Demo"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-	cleanup ();
+	Cleanup ();
     exit (1);
   }
 
@@ -520,14 +520,14 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-	cleanup ();
+	Cleanup ();
     exit (1);
   }
 
   // Main loop.
   System->Loop ();
 
-  cleanup ();
+  Cleanup ();
 
   return 0;
 }

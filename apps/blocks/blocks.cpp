@@ -3069,7 +3069,7 @@ void Blocks::TerminateConnection()
 
 #endif // BLOCKS_NETWORKING
 
-void cleanup ()
+void Cleanup ()
 {
   if (Sys)
     Sys->console_out ("Cleaning up...\n");
@@ -3088,7 +3088,7 @@ int main (int argc, char* argv[])
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
     Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
+    Cleanup ();
     fatal_exit (0, false);
   }
 
@@ -3096,7 +3096,7 @@ int main (int argc, char* argv[])
   if (!Sys->Open ("3D Blocks"))
   {
     Sys->Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
+    Cleanup ();
     fatal_exit (0, false);
   }
 
@@ -3168,6 +3168,6 @@ int main (int argc, char* argv[])
   do_network = Sys->InitNet();
 #endif
   Sys->Loop ();
-  cleanup ();
+  Cleanup ();
   return 0;
 }

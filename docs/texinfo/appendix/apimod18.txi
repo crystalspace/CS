@@ -298,7 +298,7 @@ csMeshFactoryWrapper* spritetmpl =
 if (spritetmpl == NULL)
 @{
   Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
-  cleanup ();
+  Cleanup ();
   exit (1);
 @}
 // Add the sprite to the engine.

@@ -96,7 +96,7 @@ Demo::~Demo ()
   delete seqmgr;
 }
 
-void cleanup ()
+void Cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
@@ -762,7 +762,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   if (!Open ("The Crystal Space Demo."))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
 
@@ -1719,7 +1719,7 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, "/config/csdemo.cfg"))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
-    cleanup ();
+    Cleanup ();
     exit (1);
   }
  
@@ -1727,7 +1727,7 @@ int main (int argc, char* argv[])
   System->Loop ();
 
   // Cleanup.
-  cleanup ();
+  Cleanup ();
 
   return 0;
 }
