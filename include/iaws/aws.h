@@ -34,6 +34,7 @@ struct iAwsPrefManager;
 struct iAwsSinkManager;
 struct iAwsCanvas;
 struct iAwsKeyFactory;
+struct iAwsComponentFactory;
 
 class  awsWindow;
 class  awsComponent;
@@ -86,7 +87,10 @@ public:
   virtual void             SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
   /// Allows a component to register itself for dynamic template instatiation via definition files.
-  virtual void RegisterComponentFactory(awsComponentFactory *factory, char *name)=0;
+  virtual void RegisterComponentFactory(iAwsComponentFactory *factory, char *name)=0;
+
+  /// Find a component factory
+  virtual iAwsComponentFactory *FindComponentFactory (char *name)=0;
 
   /// Get the top window
   virtual iAwsWindow *GetTopWindow()=0;
