@@ -34,6 +34,8 @@ struct iRenderView;
 struct iRenderView;
 struct iVFS;
 
+class CalModel;
+
 SCF_VERSION (iSpriteCal3DSocket, 0, 0, 1);
 
 /**
@@ -477,6 +479,13 @@ struct iSpriteCal3DState : public iBase
 
   /// Set current animation time.
   virtual void SetAnimationTime(float animationTime) = 0;
+
+  /** This gives you access to the internal Cal3d Model class
+   *  which sprcal3d wraps.  If you use it directly, you run
+   *  the risk of making sprcal3d and CalModel get out of sync.
+   *  Use carefully!
+   */
+  virtual CalModel *GetCal3DModel() = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__
