@@ -6974,6 +6974,13 @@ class csKeyEventDataPtr(csKeyEventData):
         _swig_setattr(self, csKeyEventData,self.__class__,csKeyEventData)
 _cspace.csKeyEventData_swigregister(csKeyEventDataPtr)
 
+csmbLeft = _cspace.csmbLeft
+csmbRight = _cspace.csmbRight
+csmbMiddle = _cspace.csmbMiddle
+csmbWheelUp = _cspace.csmbWheelUp
+csmbWheelDown = _cspace.csmbWheelDown
+csmbExtra1 = _cspace.csmbExtra1
+csmbExtra2 = _cspace.csmbExtra2
 class csEventMouseData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csEventMouseData, name, value)
