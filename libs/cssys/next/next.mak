@@ -280,6 +280,8 @@ endif
 # hardcoded compiler name "cc".
 SYSCONFIG += $(NEXT.SYSCONFIG) \
   $(NEWLINE)CC=cc CXX=cc sh bin/comptest.sh>>config.tmp \
+  $(NEWLINE)CC=cc CXX=cc sh bin/chkheadr.sh>>config.tmp \
+  $(NEWLINE)CC=cc CXX=cc sh bin/chktools.sh>>config.tmp \
   $(NEWLINE)CC=cc CXX=cc sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
