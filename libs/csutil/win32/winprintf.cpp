@@ -202,12 +202,12 @@ static int _cs_vfprintf (FILE* stream, const char* format, va_list args)
   // _cs_fputs() will do codepage convertion, if necessary
   rc = _cs_fputs (str, stream);
   delete[] str;
-  // On success fputs() returns a value >= 0, but
-  // csPrintf() should return the number of chars written.
+  // On success _cs_fputs() returns a value >= 0, but
+  // _cs_vfprintf() should return the number of chars written.
   return ((rc >= 0) ? (newsize - 1) : -1);
 }
 
-// Replacement for csPrintf(); exact same prototype/functionality as csPrintf()
+// Replacement for printf(); exact same prototype/functionality as printf()
 int csPrintf (char const* str, ...)
 {
   va_list args;
@@ -218,7 +218,7 @@ int csPrintf (char const* str, ...)
   return rc;
 }
 
-// Replacement for csPrintfV()
+// Replacement for vprintf()
 int csPrintfV(char const* str, va_list args)
 {
   int ret = _cs_vfprintf (stdout, str, args);
