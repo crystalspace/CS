@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_MESHOBJ_H__
-#define __CS_MESHOBJ_H__
+#ifndef __CS_MESHOBJTMPL_H__
+#define __CS_MESHOBJTMPL_H__
 
 #include "csutil/refarr.h"
 #include "iengine/material.h"
@@ -356,4 +356,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __CS_MESHOBJ_H__
+#endif // __CS_MESHOBJTMPL_H__
