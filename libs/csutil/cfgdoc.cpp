@@ -26,6 +26,145 @@
 
 #include "csutil/cfgdoc.h"
 
+class csConfigDocumentIterator : public iConfigIterator
+{
+  csRef<csConfigDocument> doc;
+  csHash<csConfigDocument::KeyInfo, csStrKey, 
+    csConstCharHashKeyHandler>::GlobalIterator* iterator;
+  char* subsection;
+  size_t subsectionLen;
+  const csConfigDocument::KeyInfo* currentKey;
+  const char* currentKeyName;
+public:
+  SCF_DECLARE_IBASE;
+
+  csConfigDocumentIterator (csConfigDocument* doc, const char* Subsection);
+  virtual ~csConfigDocumentIterator();
+  
+  virtual iConfigFile *GetConfigFile () const;
+  virtual const char *GetSubsection () const;
+
+  virtual void Rewind ();
+  virtual bool Next();
+  virtual const char *GetKey (bool Local = false) const;
+  virtual int GetInt () const;
+  virtual float GetFloat () const;
+  virtual const char *GetStr () const;
+  virtual bool GetBool () const;
+  virtual const char *GetComment () const;
+};
+
+SCF_IMPLEMENT_IBASE(csConfigDocumentIterator)
+  SCF_IMPLEMENTS_INTERFACE(iConfigIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* doc, 
+						    const char* Subsection) :
+ currentKeyName(0)
+{
+  SCF_CONSTRUCT_IBASE(0);
+
+  currentKey = 0;
+  subsection = csStrNew (Subsection);
+  subsectionLen = subsection ? strlen (subsection) : 0;
+  csConfigDocumentIterator::doc = doc;
+  iterator = new csHash<csConfigDocument::KeyInfo, csStrKey, 
+    csConstCharHashKeyHandler>::GlobalIterator (doc->keys.GetIterator ());
+}
+
+csConfigDocumentIterator::~csConfigDocumentIterator()
+{
+  delete[] subsection;
+  delete iterator;
+  SCF_DESTRUCT_IBASE()
+}
+
+iConfigFile* csConfigDocumentIterator::GetConfigFile () const
+{
+  return doc;
+}
+
+const char* csConfigDocumentIterator::GetSubsection () const
+{
+  return subsection;
+}
+
+void csConfigDocumentIterator::Rewind ()
+{
+  currentKey = 0;
+  currentKeyName = csStrKey (0);
+  iterator->Reset();
+}
+
+bool csConfigDocumentIterator::Next()
+{
+  while (iterator->HasNext ())
+  {
+    const csConfigDocument::KeyInfo* key = &iterator->Next ();
+
+    if (strncasecmp (key->originalKey, subsection, subsectionLen) == 0)
+    {
+      if (!key->cachedStringValue) continue;
+
+      currentKey = key;
+      currentKeyName = key->originalKey;
+      return true;
+    }
+  }
+  return false;
+}
+
+const char* csConfigDocumentIterator::GetKey (bool Local) const
+{
+  return ((const char*)currentKeyName) + (Local ? subsectionLen : 0);
+}
+
+int csConfigDocumentIterator::GetInt () const
+{
+  if (!currentKey) return 0;
+  const char* val = currentKey->cachedStringValue;
+  
+  int v = 0;
+  sscanf (val, "%d", &v);
+  return v;
+}
+
+float csConfigDocumentIterator::GetFloat () const
+{
+  if (!currentKey) return 0.0f;
+  const char* val = currentKey->cachedStringValue;
+  
+  float v = 0.0f;
+  sscanf (val, "%f", &v);
+  return v;
+}
+
+const char* csConfigDocumentIterator::GetStr () const
+{
+  if (!currentKey) return 0;
+  return currentKey->cachedStringValue;
+}
+
+bool csConfigDocumentIterator::GetBool () const
+{
+  if (!currentKey) return false;
+  const char* val = currentKey->cachedStringValue;
+
+  return (
+     strcasecmp(val, "true") == 0 ||
+     strcasecmp(val, "yes" ) == 0 ||
+     strcasecmp(val, "on"  ) == 0 ||
+     strcasecmp(val, "1"   ) == 0);
+}
+
+const char* csConfigDocumentIterator::GetComment () const
+{
+  if (!currentKey) return 0;
+  return currentKey->cachedComment;
+}
+
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE(csConfigDocument)
   SCF_IMPLEMENTS_INTERFACE(iConfigFile)
 SCF_IMPLEMENT_IBASE_END
@@ -108,9 +247,10 @@ void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node,
 
     fullKey.Clear ();
     fullKey << parent << child->GetValue ();
-    fullKey.Downcase ();
+    csString downKey (fullKey);
+    downKey.Downcase ();
 
-    if (NewWins || !keys.In ((const char*)fullKey))
+    if (NewWins || !keys.In ((const char*)downKey))
     {
       KeyInfo newInfo;
       newInfo.node = child;
@@ -118,7 +258,8 @@ void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node,
       newInfo.cachedStringValue = csStrNew (child->GetContentsValue ());
       newInfo.cachedComment = lastComment ? csStrNew (
 	lastComment->GetContentsValue ()) : 0;
-      keys.PutFirst ((const char*)fullKey, newInfo);
+      newInfo.originalKey = csStrNew (fullKey);
+      keys.PutFirst ((const char*)downKey, newInfo);
       lastComment = 0;
     }
 
@@ -171,7 +312,9 @@ void csConfigDocument::Clear ()
 
 csPtr<iConfigIterator> csConfigDocument::Enumerate (const char* Subsection)
 {
-  return 0;
+  csRef<iConfigIterator> iter;
+  iter.AttachNew (new csConfigDocumentIterator (this, Subsection));
+  return csPtr<iConfigIterator> (iter);
 }
 
 bool csConfigDocument::KeyExists (const char *Key) const

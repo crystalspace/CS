@@ -447,6 +447,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       wglMakeCurrent (dwi->this_->hDC, dwi->this_->hGLRC);
 
       csGLExtensionManager& ext = dwi->this_->ext;
+      ext.Open();
       ext.InitWGL_ARB_pixel_format (dwi->this_->hDC);
       if (ext.CS_WGL_ARB_pixel_format)
       {

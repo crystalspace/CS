@@ -65,6 +65,11 @@ public:
   csStrKey (const char* s) { str = csStrNew (s); }
   csStrKey (const csStrKey& c) { str = csStrNew (c.str); }
   ~csStrKey () { delete[] str; }
+  csStrKey& operator=(const csStrKey& o)
+  {
+    delete[] str; str = csStrNew (o.str);
+    return *this;
+  }
   operator const char* () const { return str; }
 };
 

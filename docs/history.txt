@@ -33,6 +33,9 @@ chronological order.
 	  Then during loading of the library it will check for duplicate
 	  objects (factories, textures, materials, ...) and don't load them
 	  if they are already loaded in the engine.
+	- res added iterator support to csConfigDocument.
+	- res added an assignment operator to csStrKey.
+	- res fixed a crash in the glwin32 canvas due a non-opened ext manager.
 14-Jun-2004
 	- Jorrit implemented correct static lighting for static lod. In case
 	  of casting shadows, the lowest detail object that has a shadow

@@ -30,13 +30,16 @@
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 
+class csConfigDocumentIterator;
+
 /**
  * iConfigFile implementation for configurations stored in documents.
  * \todo Write support
- * \todo Enumerators
  */
 class CS_CSUTIL_EXPORT csConfigDocument : public iConfigFile
 {
+  friend class csConfigDocumentIterator;
+
   char* filename;
   csRef<iDocument> document;
   csRef<iVFS> fileVFS;
@@ -47,17 +50,20 @@ class CS_CSUTIL_EXPORT csConfigDocument : public iConfigFile
     csRef<iDocumentNode> node;
     char* cachedStringValue;
     char* cachedComment;
+    char* originalKey;
 
-    KeyInfo () : cachedStringValue(0), cachedComment(0) {}
+    KeyInfo () : cachedStringValue(0), cachedComment(0), originalKey(0) {}
     KeyInfo (const KeyInfo& other)
     {
       cachedStringValue = csStrNew (other.cachedStringValue);
       cachedComment = csStrNew (other.cachedComment);
+      originalKey = csStrNew (other.originalKey);
     }
     ~KeyInfo()
     {
       delete[] cachedStringValue;
       delete[] cachedComment;
+      delete[] originalKey;
     }
   };
   csHash<KeyInfo, csStrKey, csConstCharHashKeyHandler> keys;
