@@ -418,7 +418,12 @@ bool csGraphics2DMac::Open(char* Title)
 	for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
 		LineAddress[i] = theOffset;
 
+  SetClipRect (0, 0, Width, Height);
+
+	BeginDraw();
 	Clear( 0 );
+	FinishDraw();
+	Print( NULL );
 
 	return true;
 }
@@ -582,10 +587,15 @@ void csGraphics2DMac::Print( csRect * area )
 		 */
 
 		if ( area ) {
-			theRect.top = area->ymin;
-			theRect.left = area->xmin;
-			theRect.bottom = area->ymax;
-			theRect.right = area->xmax;
+			if (( area->xmin == 0 ) && ( area->ymin == 0 ) &&
+					( area->xmax == 0 ) && ( area->ymax == 0 )) {
+				SetRect( &theRect, 0, 0, Width, Height );
+			} else {
+				theRect.top = area->ymin;
+				theRect.left = area->xmin;
+				theRect.bottom = area->ymax;
+				theRect.right = area->xmax;
+			}
 			DSpContext_InvalBackBufferRect( mDisplayContext, &theRect );
 		}
 
@@ -607,10 +617,15 @@ void csGraphics2DMac::Print( csRect * area )
 			 */
 
 			if ( area ) {
-				theRect.top = area->ymin;
-				theRect.left = area->xmin;
-				theRect.bottom = area->ymax;
-				theRect.right = area->xmax;
+				if (( area->xmin == 0 ) && ( area->ymin == 0 ) &&
+						( area->xmax == 0 ) && ( area->ymax == 0 )) {
+					theRect = mOffscreen->portRect;
+				} else {
+					theRect.top = area->ymin;
+					theRect.left = area->xmin;
+					theRect.bottom = area->ymax;
+					theRect.right = area->xmax;
+				}
 			} else {
 				theRect = mOffscreen->portRect;
 			}
