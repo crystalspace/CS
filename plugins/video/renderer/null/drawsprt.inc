@@ -32,7 +32,7 @@
 static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  bool transp = hTex->GetTransparent ();
+  bool transp = hTex->GetAlphaMap ();
 
   csTextureMMNull *tex_mm = (csTextureMMNull *)hTex->GetPrivateObject ();
   csTextureNull *txt_unl = (csTextureNull *)tex_mm->get_texture (0);
