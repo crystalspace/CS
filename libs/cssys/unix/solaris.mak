@@ -9,6 +9,13 @@ PLUGINS+=video/renderer/software video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
+# uncomment some of the following if you have a special MESA version that uses some 
+# of the following hardware/software renderers
+# Also set the entry Driver in section Display of opengl.cfg
+#PLUGINS+=video/canvas/openglx/glide
+#PLUGINS+=video/canvas/openglx/svga
+PLUGINS+=video/canvas/openglx/empty
+
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi
 

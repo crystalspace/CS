@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+10-Nov-2000
+	- Samuel Humphreys did some fixes for bit rot in the procedural
+	  textures and prepared for dumping dtsimple.
+	- Samuel removed dtsimple and replaced it with ptlab which is
+	  a more object oriented version of dtsimple.
+	- Fixed solaris.mak because it suddenly appears needed to
+	  compile oglempty for OpenGL.
 9-Nov-2000
 	- Small type problem in ogl_halo.cpp (GLuint instead of GLenum for
 	  blend mode).
@@ -10,6 +17,7 @@ The history order has been reversed so that new features are at the top.
 	  this fix, but I think that it should correct the problem.  It was a
 	  vpath issue.  The Glide canvases were probably also broken in the
 	  same fashion.
+	- Martin Geisse restructured the sound modules.
 8-Nov-2000
 	- Andrew Zabolotny did the following changes:
 	    - Fixed the SIGSEGV at program exit when OpenGL driver is used
