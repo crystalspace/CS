@@ -84,11 +84,11 @@ void csFrustrum::RemoveBackPlane ()
 
 void csFrustrum::ExtendVertexArray (int num)
 {
-  csVector3* new_vertices = new csVector3 [max_vertices+num];
+  CHK (csVector3* new_vertices = new csVector3 [max_vertices+num]);
   if (vertices)
   {
     memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    delete [] vertices;
+    CHK (delete [] vertices);
   }
   vertices = new_vertices;
   max_vertices += num;
@@ -125,7 +125,7 @@ void csFrustrum::Transform (csTransform* trans)
 void csFrustrum::ClipPolyToPlane (csPlane* plane)
 {
   // First classify all vertices of the current polygon with regards to this
-  // frustrum.
+  // plane.
   int i, i1;
 
   bool front[100];	// @@@ Hard coded limit.
@@ -328,4 +328,19 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
   return new_frustrum;
 }
 
+bool csFrustrum::Contains (csVector3& point)
+{
+  if (backplane)
+  {
+    if (!csMath3::Visible (point, *backplane)) return false;
+  }
+  int i, i1;
+  i1 = num_vertices-1;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (csMath3::WhichSide3D (point, vertices[i], vertices[i1]) > 0) return false;
+    i1 = i;
+  }
+  return true;
+}
 
