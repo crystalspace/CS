@@ -242,6 +242,9 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
 }
 
 bool csShaderExpression::Evaluate(csShaderVariable * var) {
+  if (!opcodes.Length())
+    return false;
+
   oper_array::Iterator iter = opcodes.GetIterator();
 
   while (iter.HasNext()) {
@@ -267,6 +270,21 @@ bool csShaderExpression::Evaluate(csShaderVariable * var) {
 }
 
 bool csShaderExpression::eval_const(cons *& head) {
+  /* This pass is expected to do the following:
+      - Ensure that arguments are correct. No arg-less ops or multiple-arg
+        operators with single arguments. 
+      - In the case of single argument'd multi-arg ops, they are 
+        inserted into the parent cons list, and the sub-cons 
+	removed. This works nicely with the currently used constant 
+	reduction algorithm. (+ (+ 1) 2) becomes (+ 1 2).
+      - (- <atom>) is resolved to (- 0 <atom>)
+      - Sanity check, ensure that atom types are correct within 
+        the cons tree (currently via CS_ASSERT).
+
+     When modifying, please keep these in mind. The compiler and evaluator
+     have limited error-checking for the above, and will produce incorrect
+     results if they're not resolved. */
+
   cons * cell = head, * last = NULL;
   int oper;
 
@@ -975,6 +993,9 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
 
 	acc_top--;
       } else {
+	/* don't want to emit any code yet, there is no 
+	   useful second argument */
+
 	cptr = cptr->cdr;
 	continue;
       }

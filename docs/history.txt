@@ -60,6 +60,8 @@ chronological order.
 	    once the shaderexps are complete).
 	  - Fixed initializer problem in csShaderExpression::Parse(), MSVC6 doesn't 
 	    accept the constant initializer for an oper_arg struct.
+	  - Added some extra comments to csShaderExpression::eval_const() and 
+	    csShaderExpression::compile_cons().
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:
