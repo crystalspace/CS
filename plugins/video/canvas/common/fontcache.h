@@ -26,10 +26,13 @@
 #include "csutil/blockallocator.h"
 #include "csutil/refcount.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
 
 #define GLYPH_INDEX_UPPER_SHIFT	    9
 #define GLYPH_INDEX_LOWER_COUNT	    512
 #define GLYPH_INDEX_LOWER_MASK	    0x1ff
+
+#define RELEVANT_WRITE_FLAGS	    CS_WRITE_NOANTIALIAS
 
 /**
  * A cache for font glyphs. 
@@ -57,6 +60,8 @@ public:
     csGlyphMetrics glyphMetrics;
     /// Does this font have this glyph?
     bool hasGlyph;
+    /// Glyph flags.
+    uint flags;
   };
 
 protected:
@@ -153,16 +158,16 @@ protected:
 
   /// Cache canvas-dependent information for a specific font/glyph pair.
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
-    utf32_char glyph);
+    utf32_char glyph, uint flags);
   /// Uncache canvas-dependent information.
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
   /// Store glyph-specific information, but omit some safety checks.
   GlyphCacheData* CacheGlyphUnsafe (KnownFont* font, 
-    utf32_char glyph);
+    utf32_char glyph, uint flags);
   /// Fill the basic cache data.
   void SetupCacheData (GlyphCacheData* cacheData,
-    KnownFont* font, utf32_char glyph);
+    KnownFont* font, utf32_char glyph, uint flags);
 
   /// Add a glyph to the cache.
   void AddCacheData (KnownFont* font, utf32_char glyph, GlyphCacheData* cacheData);
@@ -170,7 +175,8 @@ protected:
   void RemoveCacheData (GlyphCacheData* cacheData);
   /// Remove a glyph from the cache.
   void RemoveLRUEntry (LRUEntry* entry);
-
+  /// Request cached data for a glyph of a known font.
+  GlyphCacheData* InternalGetCacheData (KnownFont* font, utf32_char glyph);
 
   /**
    * Font deletion callback
@@ -199,7 +205,8 @@ public:
   virtual ~csFontCache ();
   
   /// Store glyph-specific information.
-  GlyphCacheData* CacheGlyph (KnownFont* font, utf32_char glyph);
+  GlyphCacheData* CacheGlyph (KnownFont* font, utf32_char glyph,
+    uint flags);
   /// Uncache cached glyph data.
   void UncacheGlyph (GlyphCacheData* cacheData);
 
@@ -210,7 +217,8 @@ public:
   /// Uncache this font.
   void UncacheFont (iFont* font);
   /// Request cached data for a glyph of a known font.
-  GlyphCacheData* GetCacheData (KnownFont* font, utf32_char glyph);
+  GlyphCacheData* GetCacheData (KnownFont* font, utf32_char glyph, 
+    uint flags);
   /// Get cached data for the least used glyph.
   GlyphCacheData* GetLeastUsed ();
 
@@ -224,9 +232,7 @@ public:
    * Draw a string.
    */
   virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text);
-  virtual void WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text);
+    const utf8_char* text, uint flags);
 };
 
 #endif // __CS_CANVAS_COMMON_FONTCACHE_H__

@@ -93,7 +93,7 @@ class csGLFontCache : public csFontCache
     int& numBgVerts, const int fg, const int bg);
 protected:
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
-    utf32_char glyph);
+    utf32_char glyph, uint32 flags);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);
 
   void CopyGlyphData (iFont* font, utf32_char glyph, int tex,
@@ -111,8 +111,8 @@ public:
   /**
    * Draw a string using OpenGL, where the baseline starts at x,y. 
    */
-  virtual void WriteStringBaseline (iFont *font, int pen_x, int pen_y, 
-    int fg, int bg, const utf8_char* text);
+  virtual void WriteString (iFont *font, int pen_x, int pen_y, 
+    int fg, int bg, const utf8_char* text, uint flags);
 };
 
 #endif // __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__

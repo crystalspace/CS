@@ -35,6 +35,7 @@ csFontCache::FontDeleteNotify::FontDeleteNotify (csFontCache* cache)
 
 csFontCache::FontDeleteNotify::~FontDeleteNotify ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csFontCache::FontDeleteNotify::BeforeDelete (iFont* font)
@@ -217,8 +218,8 @@ void csFontCache::UncacheFont (iFont* font)
   }
 }
 
-csFontCache::GlyphCacheData* csFontCache::GetCacheData (KnownFont* font, 
-							utf32_char glyph)
+csFontCache::GlyphCacheData* csFontCache::InternalGetCacheData (KnownFont* font, 
+								utf32_char glyph)
 {
   LRUEntry* entry = FindLRUEntry (font, glyph);
   if (entry != 0)
@@ -258,6 +259,21 @@ csFontCache::GlyphCacheData* csFontCache::GetCacheData (KnownFont* font,
   {
     return 0;
   }
+}
+
+csFontCache::GlyphCacheData* csFontCache::GetCacheData (KnownFont* font, 
+							utf32_char glyph,
+							uint flags)
+{
+  GlyphCacheData* cacheData = InternalGetCacheData (font, glyph);
+  if ((cacheData != 0) && 
+    (cacheData->flags != (flags & RELEVANT_WRITE_FLAGS)))
+  {
+    // @@@ Hmmm, a complete uncache shouldn't be necessary.
+    UncacheGlyph (cacheData);
+    return 0;
+  }
+  return cacheData;
 }
 
 csFontCache::GlyphCacheData* csFontCache::GetLeastUsed ()
@@ -357,12 +373,13 @@ void csFontCache::RemoveLRUEntry (LRUEntry* entry)
 }
 
 csFontCache::GlyphCacheData* csFontCache::InternalCacheGlyph (KnownFont* font,
-							      utf32_char glyph)
+							      utf32_char glyph, 
+							      uint flags)
 {
   // This method is meant to be overridden by the actual canvas' font cache.
   // However, here you have the minimal stuff such a method should perform:
   GlyphCacheData* newData = new GlyphCacheData;
-  SetupCacheData (newData, font, glyph);
+  SetupCacheData (newData, font, glyph, flags);
   return newData;
 }
 
@@ -373,11 +390,12 @@ void csFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 }
 
 void csFontCache::SetupCacheData (GlyphCacheData* cacheData,
-  KnownFont* font, utf32_char glyph)
+  KnownFont* font, utf32_char glyph, uint flags)
 {
   memset (cacheData, 0, sizeof (GlyphCacheData));
   cacheData->font = font;
   cacheData->glyph = glyph;
+  cacheData->flags = flags & RELEVANT_WRITE_FLAGS;
   if (cacheData->hasGlyph = font->font->HasGlyph (glyph))
   {
     font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
@@ -389,10 +407,10 @@ void csFontCache::SetupCacheData (GlyphCacheData* cacheData,
 }
 
 csFontCache::GlyphCacheData* csFontCache::CacheGlyphUnsafe (
-  KnownFont* font, utf32_char glyph)
+  KnownFont* font, utf32_char glyph, uint flags)
 {
   GlyphCacheData* cacheData;
-  while ((cacheData = InternalCacheGlyph (font, glyph)) == 0)
+  while ((cacheData = InternalCacheGlyph (font, glyph, flags)) == 0)
   {
     GlyphCacheData* LUData = GetLeastUsed ();
     CS_ASSERT (LUData != 0);
@@ -404,14 +422,15 @@ csFontCache::GlyphCacheData* csFontCache::CacheGlyphUnsafe (
 }
 
 csFontCache::GlyphCacheData* csFontCache::CacheGlyph (KnownFont* font, 
-						      utf32_char glyph)
+						      utf32_char glyph, 
+						      uint flags)
 {
   CS_ASSERT (font != 0);
 
-  GlyphCacheData* cacheData = GetCacheData (font, glyph);
+  GlyphCacheData* cacheData = GetCacheData (font, glyph, flags);
   if (cacheData == 0) 
   {
-    return CacheGlyphUnsafe (font, glyph);
+    return CacheGlyphUnsafe (font, glyph, flags);
   }
 
   return cacheData;
@@ -442,13 +461,7 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
 }
 
 void csFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
-  const utf8_char* text)
-{
-  WriteStringBaseline (font, x, y + font->GetAscent (), fg, bg, text);
-}
-
-void csFontCache::WriteStringBaseline (iFont *font, int x, int y, int fg, int bg, 
-  const utf8_char* text)
+  const utf8_char* text, uint flags)
 {
 }
 

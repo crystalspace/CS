@@ -97,4 +97,6 @@ csScreenShot::~csScreenShot ()
     delete [] (uint8 *)Data;
   else
     delete [] (csRGBpixel *)Data;
+
+  SCF_DESTRUCT_IBASE();
 }

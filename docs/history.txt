@@ -25,6 +25,14 @@ chronological order.
 	  rather than having it bundled into SCF_IMPLEMENT_IBASE_DECREF().
         - acraig fixed up some calls to SCF_DESTRUCT_IBASE() that had a 0 as
           a param.
+	- res added a 'flags' parameter to iGraphics2D::Write(). At the moment
+	  you can specify flags to write on a baseline and disable font glyph
+	  antialiasing. As the functionality of WriteBaseline() is now 
+	  provided by Write(), so it has been marked as deprecated.
+	- res added SCF_DESTRUCT macros to the common and glwin32 canvas code.
+	- res updated a comment in ogl_txtmgr.cpp.
+	- res added a SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS invokation
+	  missing for csTinyXmlNode.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

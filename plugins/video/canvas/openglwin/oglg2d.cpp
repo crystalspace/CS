@@ -243,6 +243,7 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
 csGraphics2DOpenGL::~csGraphics2DOpenGL (void)
 {
   m_nGraphicsReady = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)

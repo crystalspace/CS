@@ -236,6 +236,12 @@ csGraphics2D::~csGraphics2D ()
   Close ();
   delete [] Palette;
   delete [] win_title;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csGraphics2D::HandleEvent (iEvent& Event)
@@ -806,15 +812,15 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
 }
 
 void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg, 
-			  const char *text) 
+			  const char *text, uint flags) 
 { 
-  fontCache->WriteString (font, x, y, fg, bg, (utf8_char*)text);
+  fontCache->WriteString (font, x, y, fg, bg, (utf8_char*)text, flags);
 }
 
-void csGraphics2D::WriteBaseline (iFont *font , int x, int y, int fg, int bg, 
+void csGraphics2D::WriteBaseline (iFont *font, int x, int y, int fg, int bg, 
 				  const char *text) 
 { 
-  fontCache->WriteStringBaseline (font, x, y, fg, bg, (utf8_char*)text);
+  Write (font, x, y, fg, bg, text, CS_WRITE_BASELINE);
 }
 
 unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)

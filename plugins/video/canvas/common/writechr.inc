@@ -81,10 +81,12 @@
 #endif
 
 void WS_NAME (iFont *font, int pen_x, int pen_y,
-  int fg, int bg, const utf8_char *text)
+  int fg, int bg, const utf8_char *text, uint flags)
 {
   if (!font)
     return;
+  
+  if (!(flags & CS_WRITE_BASELINE)) pen_y += font->GetAscent ();
 
   KnownFont* knownFont = GetCachedFont (font);
   if (knownFont == 0) knownFont = CacheFont (font);
@@ -106,12 +108,12 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
     textLen -= skip;
 
     SoftGlyphCacheData* cacheData = (SoftGlyphCacheData*)CacheGlyph 
-      (knownFont, glyph);
+      (knownFont, glyph, flags);
     if (!cacheData->hasGlyph) 
     {
       // fall back to the default glyph (CS_FONT_DEFAULT_GLYPH)
       cacheData = (SoftGlyphCacheData*)CacheGlyph (knownFont, 
-        CS_FONT_DEFAULT_GLYPH);
+        CS_FONT_DEFAULT_GLYPH, flags);
       if (!cacheData->hasGlyph) continue;
     }
 

@@ -41,6 +41,7 @@ void csGLScreenShot::DecRef()
 
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLScreenShot)
 SCF_IMPLEMENT_IBASE_REFOWNER(csGLScreenShot)
+SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLScreenShot)
 SCF_IMPLEMENT_IBASE_QUERY(csGLScreenShot)
   SCF_IMPLEMENTS_INTERFACE(iImage)
 SCF_IMPLEMENT_IBASE_END
@@ -60,6 +61,7 @@ csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D)
 csGLScreenShot::~csGLScreenShot ()
 {
   delete[] Data;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGLScreenShot::SetData (void* data)

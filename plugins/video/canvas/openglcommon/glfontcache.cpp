@@ -60,7 +60,7 @@ csGLFontCache::~csGLFontCache ()
 }
 
 csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
-  KnownFont* font, utf32_char glyph)
+  KnownFont* font, utf32_char glyph, uint32 flags)
 {
   bool hasGlyph = font->font->HasGlyph (glyph);
   if (!hasGlyph)
@@ -76,8 +76,11 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
   csSubRect2* sr = 0;
 
   csBitmapMetrics bmetrics;
-  csRef<iDataBuffer> alphaData = 
-    font->font->GetGlyphAlphaBitmap (glyph, bmetrics);
+  csRef<iDataBuffer> alphaData;
+  if ((flags & CS_WRITE_NOANTIALIAS) == 0)
+  {
+    alphaData = font->font->GetGlyphAlphaBitmap (glyph, bmetrics);
+  }
   csRef<iDataBuffer> bitmapData;
   if (!alphaData)
     bitmapData = font->font->GetGlyphBitmap (glyph, bmetrics);
@@ -139,6 +142,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     cacheData->texNum = tex;
     cacheData->font = font;
     cacheData->glyph = glyph;
+    cacheData->flags = flags & RELEVANT_WRITE_FLAGS;
     cacheData->bmetrics = bmetrics;
     font->font->GetGlyphMetrics (glyph, cacheData->glyphMetrics);
     cacheData->tx1 = (float)texRect.xmin / (float)texSize;
@@ -296,10 +300,13 @@ void csGLFontCache::FlushArrays (int& numverts, int bgVertOffset,
   }
 }
 
-void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y, 
-					 int fg, int bg, const utf8_char* text)
+void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y, 
+				 int fg, int bg, const utf8_char* text,
+				 uint flags)
 {
   if (!text || !*text) return;
+
+  if (!(flags & CS_WRITE_BASELINE)) pen_y += font->GetAscent ();
 
   bool gl_texture2d = G2D->statecache->IsEnabled_GL_TEXTURE_2D ();
   if (!gl_texture2d) G2D->statecache->Enable_GL_TEXTURE_2D ();
@@ -358,12 +365,13 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
     textLen -= skip;
 
     const GLGlyphCacheData* cacheData = 
-      (GLGlyphCacheData*)GetCacheData (knownFont, glyph);
+      (GLGlyphCacheData*)GetCacheData (knownFont, glyph, flags);
     if (cacheData == 0)
     {
       G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
       FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
-      cacheData = (GLGlyphCacheData*)CacheGlyphUnsafe (knownFont, glyph);
+      cacheData = (GLGlyphCacheData*)CacheGlyphUnsafe (knownFont, glyph, 
+	flags);
     }
     if (!cacheData->hasGlyph)
     {
@@ -371,7 +379,7 @@ void csGLFontCache::WriteStringBaseline (iFont *font, int pen_x, int pen_y,
       G2D->statecache->SetTexture (GL_TEXTURE_2D, lastTexture);
       FlushArrays (numverts, bgVertOffset, numBgVerts, fg, bg);
       cacheData = (GLGlyphCacheData*)CacheGlyph (knownFont, 
-	CS_FONT_DEFAULT_GLYPH);
+	CS_FONT_DEFAULT_GLYPH, flags);
       if (!cacheData->hasGlyph) continue;
     }
 

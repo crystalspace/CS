@@ -613,10 +613,10 @@ void csTextureHandleOpenGL::PrepareKeycolor ()
 
   while (pixels--)
   {
-    // By default, every csRGBpixel initializes its alpha component to
-    // 255. Thus, we should just drop to zero alpha for transparent
-    // pixels, if any.
-    //if (transp_color.eq (*_src)) _src->alpha = 0;
+    /*
+      Drop the alpha of the transparent pixels to 0 and of non-transparent
+      to 255, so really only keycolored pixels are transparent.
+     */
     _src->alpha = transp_color.eq (*_src) ? 0 : 255;
     _src++;
   }
