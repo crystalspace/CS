@@ -19,7 +19,7 @@
 
 #include <cssysdef.h>
 #include "csgeom/obb.h"
-#include "csgeom/obb_priv.h"
+#include "obb_priv.h"
 #include "csgeom/transfrm.h"
 #include "qsqrt.h"
 #include "csutil/indprint.h"

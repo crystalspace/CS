@@ -4,10 +4,10 @@
 #ifndef __CS_AWS_MENU_H__
 #define __CS_AWS_MENU_H__
 
-#include "aws/awsControlBar.h"
-#include "aws/awstimer.h"
+#include "awsControlBar.h"
+#include "awstimer.h"
 #include "csutil/scfstr.h"
-#include "aws/awscmdbt.h"
+#include "awscmdbt.h"
 
 /** You should be able to write your own class for menu entries as well if you
  *  don't like these simple ones. A menu entry should support the following:

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "walktest/walktest.h"
+#include "walktest.h"
 #include "qint.h"
 #include "csgeom/frustum.h"
 #include "ivaria/view.h"

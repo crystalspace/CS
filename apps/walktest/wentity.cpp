@@ -17,8 +17,8 @@
 */
 
 #include "cssysdef.h"
-#include "walktest/wentity.h"
-#include "walktest/walktest.h"
+#include "wentity.h"
+#include "walktest.h"
 #include "csgeom/matrix3.h"
 #include "iengine/light.h"
 #include "iengine/mesh.h"

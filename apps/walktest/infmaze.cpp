@@ -17,8 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "walktest/infmaze.h"
-#include "walktest/walktest.h"
 #include "cstool/collider.h"
 #include "csutil/dataobj.h"
 #include "csutil/sparse3d.h"
@@ -30,6 +28,9 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/material.h"
+
+#include "infmaze.h"
+#include "walktest.h"
 
 InfiniteMaze::InfiniteMaze ()
 {

@@ -11,7 +11,7 @@
 #include "ivaria/view.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
-#include "aws/aws3dfrm.h"
+#include "aws3dfrm.h"
 
 // makes sure this header file stays consistent with the project.
 #include "iaws/awsecomp.h"

@@ -17,8 +17,8 @@
 */
 
 #include "cssysdef.h"
-#include "walktest/walktest.h"
-#include "walktest/infmaze.h"
+#include "walktest.h"
+#include "infmaze.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/frustum.h"

@@ -8,7 +8,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "iutil/event.h"
-#include "aws/awslayot.h"
+#include "awslayot.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

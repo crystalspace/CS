@@ -23,11 +23,11 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
-#include "csutil/xmltinyp.h"
+#include "xmltinyp.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
 #include "iutil/databuff.h"
-#include "csutil/tinyxml.h"
+#include "tinyxml.h"
 
 //------------------------------------------------------------------------
 

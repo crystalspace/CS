@@ -25,7 +25,7 @@
 #include "csgeom/box.h"
 #include "cstool/collider.h"
 #include "csutil/cscolor.h"
-#include "walktest/wentity.h"
+#include "wentity.h"
 #include "iengine/engine.h"
 #include "iengine/fview.h"
 #include "ivaria/conout.h"

@@ -20,7 +20,7 @@
 #define __CSUTIL_XMLTINYPRIV_H__
 
 #include "iutil/document.h"
-#include "csutil/tinyxml.h"
+#include "tinyxml.h"
 
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
