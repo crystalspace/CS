@@ -26,9 +26,8 @@
 #include "csutil/parray.h"
 #include "csutil/strhash.h"
 #include "iutil/document.h"
+#include "ivaria/sequence.h"
 
-struct iSequence;
-struct iSequenceManager;
 class Demo;
 class DemoSequenceManager;
 class csNamedPath;
