@@ -20,6 +20,7 @@
 #include "csutil/binder.h"
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
+#include "csutil/csevent.h"
 
 struct csEvBind
 {
@@ -111,52 +112,91 @@ csInputBinder::~csInputBinder ()
 
 inline bool csInputBinder::HandleEvent (iEvent &ev)
 {
-  csEvBind *pair = (csEvBind *) Hash.Get (csHashComputeEvent (ev));
-  if (pair) switch (ev.Type)
+  switch (ev.Type)
   {
     case csevKeyDown:
     case csevMouseDown:
     case csevJoystickDown:
-      if (!pair->pos && pair->b)
+    {
+      csEvBind *bind = (csEvBind *) Hash.Get (csHashComputeEvent (ev));
+
+      if (bind && !bind->pos && bind->b)
       {
-        if (pair->tgl)
+        if (bind->tgl)
         {
-          if (pair->up)
+          if (bind->up)
           {
-            pair->up = false;
-            pair->b->Set (! pair->b->Get ());
+            bind->up = false;
+            bind->b->Set (! bind->b->Get ());
           }
         }
         else
-          pair->b->Set (true);
+          bind->b->Set (true);
+        return true;
       }
-      return true;
+      else
+        return false;
+    }
 
     case csevKeyUp:
     case csevMouseUp:
     case csevJoystickUp:
-      if (!pair->pos && pair->b)
+    {
+      csEvBind *bind = (csEvBind *) Hash.Get (csHashComputeEvent (ev));
+
+      if (bind && !bind->pos && bind->b)
       {
-        if (pair->tgl)
-          pair->up = true;
+        if (bind->tgl)
+          bind->up = true;
         else
-          pair->b->Set (false);
+          bind->b->Set (false);
+        return true;
       }
-      return true;
+      else
+        return false;
+    }
 
     case csevMouseMove:
-      if (pair->pos)
+    {
+      csEvBind *bindx = (csEvBind *) Hash.Get (csHashComputeEvent (
+        csEvent (0, csevMouseMove, 1, 0, 0, 0)));
+      csEvBind *bindy = (csEvBind *) Hash.Get (csHashComputeEvent (
+        csEvent (0, csevMouseMove, 0, 1, 0, 0)));
+
+      bool ok = false;
+      if (bindx && bindx->pos)
       {
-        //TODO
+        ok = true;
+        bindx->p->Set (ev.Mouse.x);
       }
-      return true;
+      if (bindy && bindy->pos)
+      {
+        ok = true;
+        bindy->p->Set (ev.Mouse.y);
+      }
+      return ok;
+    }
 
     case csevJoystickMove:
-      if (pair->pos)
+    {
+      csEvBind *bindx = (csEvBind *) Hash.Get (csHashComputeEvent (
+        csEvent (0, csevJoystickMove, ev.Joystick.number, 1, 0, 0, 0)));
+      csEvBind *bindy = (csEvBind *) Hash.Get (csHashComputeEvent (
+        csEvent (0, csevJoystickMove, ev.Joystick.number, 0, 1, 0, 0)));
+
+      bool ok = false;
+      if (bindx && bindx->pos)
       {
-        //TODO
+        ok = true;
+        bindx->p->Set (ev.Mouse.x);
       }
-      return true;
+      if (bindy && bindy->pos)
+      {
+        ok = true;
+        bindy->p->Set (ev.Mouse.y);
+      }
+      return ok;
+    }
 
     default:
       break;

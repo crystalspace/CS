@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 23-Mar-2003
 	- Oktal updated the network manager API and fixed a few problems in
 	  the plugin, including a redundant call to Poll() and a segfault.
+	- Oktal implemented mouse and joystick movement binding in the
+	  csInputBinder.
 20-Mar-2003
 	- Split iThingState with iThingState and iThingFactoryState.
 	- Renamed GetPolygonStatic() to GetPolygon().
