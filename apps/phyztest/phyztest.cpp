@@ -253,7 +253,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   view->GetCamera ()->SetPosition (csVector3 (0, 8, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
-  txtmgr->AllocPalette ();
+  txtmgr->SetPalette ();
   return true;
 }
 
