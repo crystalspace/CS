@@ -659,28 +659,28 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
 
         // Only give to child if it contains the mouse.
         if (child->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
-          if (child->HandleEvent(Event)) 
+        {
+
+          if (mouse_in != child)
           {
-            if (mouse_in != child)
+            // Create a new event for MouseExit and MouseEnter
+            uchar et = Event.Type;
+
+            if (mouse_in)
             {
-              // Create a new event for MouseExit and MouseEnter
-              uchar et = Event.Type;
-
-              if (mouse_in)
-              {
-                Event.Type = csevMouseExit;
-                mouse_in->HandleEvent(Event);
-              }
-
-              mouse_in=child;
-              Event.Type = csevMouseEnter;
+              Event.Type = csevMouseExit;
               mouse_in->HandleEvent(Event);
-
-              Event.Type = et;
             }
-            return true;
+
+            mouse_in=child;
+            Event.Type = csevMouseEnter;
+            mouse_in->HandleEvent(Event);
+
+            Event.Type = et;
           }
-        
+
+          return child->HandleEvent(Event);
+        } 
       break;
 
 

@@ -327,9 +327,11 @@ awsWindow::OnMouseMove(int button, int x, int y)
       marked=true;
     }
 
+    int delta_x, old_x = Frame().xmax;
+
     Frame().xmax=x;
     Frame().ymax=y;
-
+    
     if (Frame().xmax - Frame().xmin < grip_size<<1)
       Frame().xmax = Frame().xmin+(grip_size<<1);
 
@@ -341,6 +343,12 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     if (Frame().ymax > WindowManager()->G2D()->GetHeight())
       Frame().ymax = WindowManager()->G2D()->GetHeight();
+
+    delta_x = Frame().xmax - old_x;
+
+    minp.Move(delta_x,   0);
+    maxp.Move(delta_x,   0);
+    closep.Move(delta_x, 0);
 
     if (!marked)
       WindowManager()->Mark(Frame());

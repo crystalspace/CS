@@ -81,7 +81,7 @@ awsCmdButton::OnDraw(csRect clip)
   int  fill = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
-  
+    
   switch(frame_style)
   {
   case fsNormal:
@@ -124,12 +124,12 @@ awsCmdButton::OnDraw(csRect clip)
     if (tex[0])
        g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
 
-    
+        
     // Draw the caption, if there is one and the style permits it.
     if (caption && frame_style==fsNormal)
     {     
       int tw, th, tx, ty;
-
+      
       // Get the size of the text
       WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(caption->GetData(), tw, th);
 
@@ -144,6 +144,28 @@ awsCmdButton::OnDraw(csRect clip)
                    WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                    -1,
                    caption->GetData());
+
+        if (mouse_is_over)
+        {
+          int x, y, 
+              y1=Frame().ymin+ty+th+2+is_down, 
+              y2=Frame().ymin+ty-2+is_down, 
+              x1=Frame().xmin+is_down+4,
+              x2=Frame().xmax+is_down-4;
+
+          for(x=x1; x<x2; ++x)
+          {
+            g2d->DrawPixel(x, y1, (x&1 ? hi : lo));
+            g2d->DrawPixel(x, y2, (x&1 ? hi : lo));
+          }
+
+          for(y=y2; y<y1; ++y)
+          {
+            g2d->DrawPixel(x1, y, (y&1 ? hi : lo));
+            g2d->DrawPixel(x2, y, (y&1 ? hi : lo));
+          }
+
+        }
     }
     break;
 
@@ -203,13 +225,11 @@ bool
 awsCmdButton::OnMouseExit()
 {
   mouse_is_over=false;
+  Invalidate();
 
   if (is_down)
-  {
     is_down=false;
-    Invalidate();
-  }
-
+  
   return true;
 }
 
@@ -217,6 +237,7 @@ bool
 awsCmdButton::OnMouseEnter()
 {
   mouse_is_over=true;
+  Invalidate();
   return true;
 }
 
