@@ -351,8 +351,11 @@ bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
   csVector3 endObj = trans.Other2This (end);
   bool rc = false;
   if (HitBeamBBox (startObj, endObj, isect, NULL) > -1)
-    if ((rc = HitBeamOutline (startObj, endObj, isect, pr)))
+  {
+    rc = HitBeamOutline (startObj, endObj, isect, pr);
+    if (rc)
       isect = trans.This2Other (isect);
+  }
   return rc;
 }
 
