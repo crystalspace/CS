@@ -22,7 +22,7 @@
 #include "csutil/csstring.h"
 
 /**
- * This is a conveniance class that reads an input buffer line by line.
+ * This is a convenience class that reads an input buffer line by line.
  * It takes care of OS specific line endings (CR or CR/LF).
  */
 class CS_CSUTIL_EXPORT csStringReader

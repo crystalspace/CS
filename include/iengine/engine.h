@@ -831,7 +831,7 @@ struct iEngine : public iBase
   	iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0)) = 0;
 
   /**
-   * Conveniance function to create a portal from one sector to another
+   * Convenience function to create a portal from one sector to another
    * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
    * with iPortalContainer on the returned mesh for more control over the
    * portal(s) in the portal object.
@@ -854,7 +854,7 @@ struct iEngine : public iBase
 	iPortal*& portal) = 0;
 
   /**
-   * Conveniance function to create a portal from one sector to another.
+   * Convenience function to create a portal from one sector to another.
    * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
    * more control over the portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal

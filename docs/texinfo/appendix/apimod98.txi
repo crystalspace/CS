@@ -284,7 +284,7 @@ changed from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 
 Portals in thing have been removed completely! Instead there is now a separate
 portal container object which belongs in the engine (otherwise it is just
-a mesh like any other mesh). To create a portal you can use the conveniance
+a mesh like any other mesh). To create a portal you can use the convenience
 functions @code{iEngine::CreatePortal()} and
 @code{iEngine::CreatePortalContainer()}. Here is an example of old code
 and how to change it to new code:

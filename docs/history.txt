@@ -26,6 +26,9 @@ chronological order.
 	  Completely untested due to lack of cal3d library.
 	- Marten made chunkedlod display something again. It does not yet work
 	  with mirrors. Maybe someone who understands the plugin can fix that.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    conveniance --> convenience
+	    conveniant	--> convenient
 24-Mar-2004
 	- Jorrit extended the standard output console so that it now also
 	  supports setting of the font through the config file. Added
@@ -121,13 +124,13 @@ chronological order.
 	- Jorrit fixed a bug with NR and handling of visibility culling and
 	  portals. Previously the NR would reuse the same visibility culling
 	  result if you entered some sector twice (through different portal
-	  paths). But this is invalid since the portal contributes to visibility
-	  culling so for the same sector the visibility culling result can
-	  be different because the portal you entered is different (and other
-	  objects will be visible/invisible). Solved this by adding a
-	  context_id to csRenderContext. This id is used instead of comparing
-	  pointers. Comparing pointers was not safe because render contexts
-	  are reused. The id is never reused (for the same frame).
+	  paths). But this is invalid since the portal contributes to
+	  visibility culling so for the same sector the visibility culling
+	  result can be different because the portal you entered is different
+	  (and other objects will be visible/invisible). Solved this by adding
+	  a context_id to csRenderContext. This id is used instead of comparing
+	  pointers. Comparing pointers was not safe because render contexts are
+	  reused. The id is never reused (for the same frame).
 	- Jorrit fixed the chunklod terrain engine (NR) so that it no longer
 	  returns bounding boxes that have huge floating point values in them.
 	  The visibility cullers (more specifically the kdtree) cannot cope
@@ -244,7 +247,7 @@ chronological order.
 	  (or SwigValueWrapper<csPtr<T>> to csRef<T>).  GCC, on the other hand
 	  did not have a problem such assignments.
 	- res removed code from the plugin finalization code that set iSCF::SCF
-	  to 0. As the documentation states, iSCF::SCF can be, dependent on the 
+	  to 0. As the documentation states, iSCF::SCF can be, dependent on the
 	  platform, either module global or "truly" global. In the latter case,
 	  setting it to 0 can be dangerous.
 	- Eric Sunshine fixed bug in configure.ac where Java SDK check would be
@@ -429,9 +432,9 @@ chronological order.
 	  drawing behind the portal and restored afterwards. Makes the shape
 	  room mirror in flarge work, but a better solution should be 
 	  researched.
-	- John Harger added the beginnings of the macros for the DLL compilation
-	  on Windows. Added include/csextern.h, modified include/csdef.h and
-	  csutil/win32/csosdefs.h
+	- John Harger added the beginnings of the macros for the DLL
+	  compilation on Windows. Added include/csextern.h, modified
+	  include/csdef.h and csutil/win32/csosdefs.h
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
@@ -2084,7 +2087,7 @@ chronological order.
 	      reallocation of the array.  This memory allocator can be used
 	      when you have an array of objects that cannot be safely moved
 	      around in memory otherwise.
-	    - Added csSafeCopyArray conveniance class which is a version of
+	    - Added csSafeCopyArray convenience class which is a version of
 	      csArray that uses the csSafeCopyArrayMemoryAllocator.
 	    - Changed csWeakRefArray to inherit from csSafeCopyArray.
 	    - As a consequence of the above changes the dangerous

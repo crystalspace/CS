@@ -750,7 +750,7 @@ public:
 };
 
 /**
- * Conveniance class to make a version of csArray that does a
+ * Convenience class to make a version of csArray that does a
  * safe-copy in case of reallocation of the array. Useful for weak
  * references.
  */

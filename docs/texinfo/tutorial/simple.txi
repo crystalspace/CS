@@ -549,7 +549,7 @@ However in this example we assign them to a @code{csRef<>} which takes care of
 From the returned thing state we now get the factory state
 (@samp{iThingFactoryState}) which we can now use to create polygons.
 There are various functions to create individual polygons if you want that
-but in this case we use a conveniance function to create a box that can
+but in this case we use a convenience function to create a box that can
 be seen from the inside. That will serve as the walls of our room.
 The @code{AddInsideBox()} function does this. It will create six polygons
 arranged so that they are visible from inside.
