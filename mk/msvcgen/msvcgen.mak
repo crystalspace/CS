@@ -311,7 +311,9 @@ MSVC.VERSIONRC.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
 MSVC.VERSIONRC = $(MSVC.VERSIONRC.$(DSP.$*.TYPE))
 
 # Module name/description for project.rc.
-MSVC.VERSIONDESC.PLG = $(DESCRIPTION.$(DSP.$*.NAME))
+MSVC.VERSIONDESC.PLG = \
+  $(DESCRIPTION.$(shell echo $* | \
+  sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
 MSVC.VERSIONDESC.APP = $(DSP.$*.NAME)
 
 # Command to generate the project.rc file.

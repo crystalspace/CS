@@ -70,10 +70,13 @@ DSP.ZOO.TYPE = appcon
 MSVC.DSP += DOG
 DSP.DOG.NAME = dog
 DSP.DOG.TYPE = plugin
+# Those descriptions are really only for the Windows version info...
+DESCRIPTION.dog = The incredible Dog plug-in
 
 MSVC.DSP += WORM
 DSP.WORM.NAME = worm
 DSP.WORM.TYPE = plugin
+DESCRIPTION.worm = The fearsome Worm plug-in
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
