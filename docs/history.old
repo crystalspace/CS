@@ -20636,7 +20636,7 @@ updated3-Jun-2002
 	  experienced by non-OS/2 ports.
 	- Eric Sunshine fixed the next2d canvas so that it once again builds
 	  successfully.	 It broke on 2001/12/27.
-	- Eric Sunshined changed the next2d canvas so that it no longer bothers
+	- Eric Sunshine changed the next2d canvas so that it no longer bothers
 	  to register the iEventHandler implementor with the event queue in
 	  NeXTDriver2D::Initialize(), since its superclass'
 	  csGraphics2D::Initialize() already does so.  (No need to register the
@@ -23952,7 +23952,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  release the CPU on platforms which employ a native black-box run-loop
 	  mechanism.  It also causes the native user environment to incorrectly
 	  hang, and is therefore a bad-thing.
-	- Eric Sunshined added a implementation of csSleep() to the BeOS port.
+	- Eric Sunshine added a implementation of csSleep() to the BeOS port.
 	- Eric Sunshine eliminated an "unused variable" warning from
 	  ogl_g3dcom.cpp.
 	- Norman Kramer removed the "old" mp3 parts (which only played layer
