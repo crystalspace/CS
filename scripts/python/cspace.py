@@ -8368,6 +8368,7 @@ CS_MESHTYPE_POINT_SPRITES = _cspace.CS_MESHTYPE_POINT_SPRITES
 CS_MESHTYPE_LINES = _cspace.CS_MESHTYPE_LINES
 CS_MESHTYPE_LINESTRIP = _cspace.CS_MESHTYPE_LINESTRIP
 CS_MESHTYPE_POLYGON = _cspace.CS_MESHTYPE_POLYGON
+csSimpleMeshScreenspace = _cspace.csSimpleMeshScreenspace
 class csSimpleRenderMesh(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSimpleRenderMesh, name, value)
@@ -8414,6 +8415,9 @@ class csSimpleRenderMesh(_object):
     __swig_setmethods__["mixmode"] = _cspace.csSimpleRenderMesh_mixmode_set
     __swig_getmethods__["mixmode"] = _cspace.csSimpleRenderMesh_mixmode_get
     if _newclass:mixmode = property(_cspace.csSimpleRenderMesh_mixmode_get, _cspace.csSimpleRenderMesh_mixmode_set)
+    __swig_setmethods__["object2camera"] = _cspace.csSimpleRenderMesh_object2camera_set
+    __swig_getmethods__["object2camera"] = _cspace.csSimpleRenderMesh_object2camera_get
+    if _newclass:object2camera = property(_cspace.csSimpleRenderMesh_object2camera_get, _cspace.csSimpleRenderMesh_object2camera_set)
     def __init__(self, *args):
         _swig_setattr(self, csSimpleRenderMesh, 'this', _cspace.new_csSimpleRenderMesh(*args))
         _swig_setattr(self, csSimpleRenderMesh, 'thisown', 1)
