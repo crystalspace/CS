@@ -53,7 +53,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   strdesc.framecount = ph->framecount;
   strdesc.width = ph->width;
   strdesc.height = ph->height;
-  strdesc.framerate = 1000./ph->msecperframe;
+  strdesc.framerate = 1000./ph->msecperframe; // @@@, this is wrong, gonna reread it on the MS site when DDoS is over
   strdesc.duration = psh->length / psh->scale;
 
   delete pChunk;
@@ -102,7 +102,6 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   if (pMaterial) pMaterial->DecRef ();
   pMaterial = NULL;
-  // load the CODEC
   return LoadCodec ();
 }
 
@@ -169,10 +168,6 @@ bool csAVIStreamVideo::SetFXMode (UInt mode)
   fxmode = mode;
   return true;
 }
-#include "csgfxldr/pngsave.h"
-#include <unistd.h>
-#include <sys/types.h>
-#include <fcntl.h>
 
 iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
 {
@@ -318,36 +313,6 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   }
 
 #undef FIX_RANGE
-  /*    
-  static int n=0;
-  char tt[20];
-  char xx[20];
-  int l=memimage.GetWidth()*memimage.GetHeight();
-  sprintf (tt,"pic%03d.R", n);
-  int f = creat ( tt, 0);
-  sprintf (xx, "P5\n%d %d 255\n", memimage.GetWidth (), memimage.GetHeight ());
-  write (f,xx, strlen(xx));
-  //  write (f,ydata,idx);
-  for(idx=0; idx<l;idx++) 
-    write (f, &(pixel[idx].red), 1);
-  close (f);
-  sprintf (tt,"pic%03d.G", n);
-  f = creat ( tt, 0);
-  write (f,xx, strlen(xx));
-  //  write (f,udata,idx);
-  for(idx=0; idx<l;idx++) 
-    write (f, &(pixel[idx].green), 1);
-  close (f);
-  sprintf (tt,"pic%03d.B", n);
-  f = creat ( tt, 0);
-  write (f,xx, strlen(xx));
-  //  write (f,vdata,idx);
-  for(idx=0; idx<l;idx++) 
-    write (f, &(pixel[idx].blue), 1);
-  close (f);
-  n++;
-  printf ("%d\n", n);
-  */  
 }
 
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
@@ -371,7 +336,7 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
   char *rdata = data[0];
   char *gdata = data[1];
   char *bdata = data[2];
-  char *adata = data[2];
+  char *adata = data[3];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
   for (int idx=0, y=0; y < memimage.GetHeight (); y++)
     for (int x=0; x < memimage.GetWidth (); x++)
