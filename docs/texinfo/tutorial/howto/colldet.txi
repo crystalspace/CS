@@ -111,6 +111,13 @@ is automatically stored with the @code{iObject} that belongs
 with the given mesh. So there is no need to store it otherwise. Later
 on you can retrieve the collider for some mesh by doing:
 
+There is also a function @code{csColliderHelper::InitializeCollisionWrapper()}
+which does this work for you and also takes care of a lot of finer details
+that are ignored in the example above (like improved memory usage and
+performance by sharing the colliders if a factory mesh is used). In addition
+there is a function @code{csColliderHelper::InitializeCollisionWrappers()}
+which initializes all collider wrappers for all objects in the engine.
+
 @example
 csColliderWrapper* colwrap = csColliderWrapper::GetColliderWrapper (
 	mesh->QueryObject ());
