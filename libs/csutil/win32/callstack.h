@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
-#ifndef __CS_UTIL_WIN32_CALLSTACK_H__
-#define __CS_UTIL_WIN32_CALLSTACK_H__
+#ifndef __CS_LIBS_UTIL_WIN32_CALLSTACK_H__
+#define __CS_LIBS_UTIL_WIN32_CALLSTACK_H__
 
 #include "csextern.h"
 #include "csutil/array.h"
@@ -58,4 +58,4 @@ public:
   virtual bool GetParameters (int num, csString& str);
 };
 
-#endif // __CS_UTIL_WIN32_CALLSTACK_H__
+#endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_H__

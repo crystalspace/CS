@@ -21,6 +21,7 @@
 #include "csutil/util.h"
 #include "csutil/csstring.h"
 #include "callstack.h"
+#include "csutil/win32/callstack.h"
 
 #include <tlhelp32.h>
 
@@ -225,10 +226,6 @@ static SymInitializer symInit;
 
 csCallStack* csCallStackHelper::CreateCallStack (uint skip)
 {
-  if (!DbgHelp::SymSupportAvailable()) return 0;
-
-  symInit.Init ();
-
   HANDLE hProc = GetCurrentProcess ();
   HANDLE hThread = GetCurrentThread ();
 
@@ -236,6 +233,20 @@ csCallStack* csCallStackHelper::CreateCallStack (uint skip)
   memset (&context, 0, sizeof (context));
   context.ContextFlags = CONTEXT_FULL;
   GetThreadContext (hThread, &context);
+
+  return cswinCallStackHelper::CreateCallStack (hProc, hThread, context, 
+    skip);
+}
+
+csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
+						    HANDLE hThread,
+						    CONTEXT& context, 
+						    uint skip)
+{
+  if (!DbgHelp::SymSupportAvailable()) return 0;
+
+  symInit.Init ();
+
   STACKFRAME64 frame;
   memset (&frame, 0, sizeof (frame));
   frame.AddrPC.Offset = context.Eip;
