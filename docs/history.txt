@@ -1,6 +1,38 @@
 The history order has been reversed so that new features are at the top.
 
+2-Jun-2000
+	- Samuel Humphreys added some further options to dtsimple and fixed
+	  cleaning up. Dynamic textures clean up after themselves properly now.
+	- Samuel also did some changes which gets the metaballs texture working.
+	  Mainly to do with many iGraphics3D refering to one iGraphics2D
+	    - The engine now keys of iGraphics3D rather than iGraphics2D,
+	      to determine whether it needs to swap states.
+	    - Metaball plugin now queries iGraphics3D for width and height of
+	      context.
+	    - Opengl: need to convert vertices co-ordinates to the upper left
+	      subregion of the backbuffer.
+	- Gary Haussmann added a workaround to allow Mac users to see text;
+	  apparently the current Mac drivers do not support a pure GL_ALPHA
+	  texture, so for the OS_MACOS platform we use GL_LUMENENCE textures
+	  instead.  This means that text is not shaped (all letters are on
+	  a black background instead of showing the picture behind them) but
+	  at least you can see the text!
 1-Jun-2000
+	- Experiment with new octree generation method. Instead of only
+	  favoring a center with few splits I also try to favor centers which
+	  cause may polygons to fall exactly on the boundaries. This
+	  could improve occlusion. However, this doesn't seem to improve
+	  at all so it is disabled right now.
+	- Samuel Humphreys did various updates to dtsimple. He added another
+	  dynamic texture, this time with a portal. Unfortunately he hasn't
+	  worked out the warp transform yet so the animation is disabled.
+	- Samuel also did various fixes to some of the X 2D canvas drivers:
+	  migrated the 'behave well under cantankerous window managers code'
+	  into glx and linex.
+	- Alex Pfaffe added new terrain.zip for the new terrain engine
+	  (with low-res textures).
+	- Alex also fixed the terrain engine for software rendering and
+	  reenabled fixed frustum clipping for Crystal Space.
 	- Eric Sunshine eliminated several compilation warning in the terrain
 	  library.
 	- Eric Sunshine eliminated several compilation problems throughout the
@@ -14,6 +46,7 @@ The history order has been reversed so that new features are at the top.
 	  creating and destroying VFS's global ArchiveCache twice, thus
 	  resulting in a crash on some platforms.
 	- Eric Sunshine fixed the 'clean' makefile target for Simple.
+	- Robert Bate added rview.cpp to the Mac project files.
 31-May-2000
 	- Added a new allegro canvas driver from Burton Radonsxi
 	  <loth@pacificcoast.net>.  This allegro driver is developed on Linux
@@ -76,6 +109,11 @@ The history order has been reversed so that new features are at the top.
 	  (even Andrew's own code) rely on the head to tail order.  An example
 	  of this is csSystemDriver::GetOptionCL(), which broke after Andrew's
 	  change.
+	- Martin Geisse fixed a VC5 specific compilation error.
+	- Frank O'Connor updated VC project files for new MetaBall plugin
+	  and some other stuff.
+	- Norman Kramer fixed a bug in CreateOffScreenRenderer for Glide
+	  that someone introduced, now compiles again.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.

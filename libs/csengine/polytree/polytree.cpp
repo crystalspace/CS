@@ -276,6 +276,8 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
     // can stop and return solid already.
     if (p->PointOnPolygon (data->pos))
     {
+      //@@@ THINK ABOUT THIS SITUATION!
+      // For dmburg this seems to make no difference at all.
       //data->cnt_solid = 6;		// End this now.
       //data->touched_polygon = p;	// Remember this polygon.
       //return (void*)1;

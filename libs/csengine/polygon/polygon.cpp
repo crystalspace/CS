@@ -519,6 +519,7 @@ int csPolygon3D::ClassifyX (float x)
     if (xx < -EPSILON) front++;
     else if (xx > EPSILON) back++;
   }
+  if (back == 0 && front == 0) return POL_SAME_PLANE;
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
   return POL_SPLIT_NEEDED;
@@ -535,6 +536,7 @@ int csPolygon3D::ClassifyY (float y)
     if (yy < -EPSILON) front++;
     else if (yy > EPSILON) back++;
   }
+  if (back == 0 && front == 0) return POL_SAME_PLANE;
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
   return POL_SPLIT_NEEDED;
@@ -551,6 +553,7 @@ int csPolygon3D::ClassifyZ (float z)
     if (zz < -EPSILON) front++;
     else if (zz > EPSILON) back++;
   }
+  if (back == 0 && front == 0) return POL_SAME_PLANE;
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
   return POL_SPLIT_NEEDED;

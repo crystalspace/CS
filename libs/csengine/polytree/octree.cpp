@@ -33,10 +33,10 @@
 #include "isystem.h"
 #include "ivfs.h"
 
-#define DO_PVS_SOLID_NODE_OPT 0
+#define DO_PVS_SOLID_NODE_OPT 1
 #define DO_PVS_SOLID_SPACE_OPT 1
 #define DO_PVS_ADJACENT_NODES 1
-#define DO_PVS_POLYGONS 0
+#define DO_PVS_POLYGONS 1
 #define DO_PVS_QAD 0
 
 //---------------------------------------------------------------------------
@@ -572,65 +572,6 @@ static void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** 
   }
 }
 
-#if 0
-static void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
-	csPolygon3D* p)
-{
-  // We know the octree can currently only contain csPolygon3D
-  // because it's the static octree.
-  csPoly3D poly;
-  int i;
-  for (i = 0 ; i < p->GetNumVertices () ; i++)
-    poly.AddVertex (p->Vwor (i));
-  csSegment3 segment;
-  if (csIntersect3::IntersectPolygon (plane, &poly, segment))
-  {
-    const csVector3& v1 = segment.Start ();
-    const csVector3& v2 = segment.End ();
-    csVector2 s1 (v1.y, v1.z);
-    csVector2 s2 (v2.y, v2.z);
-    csSegment2* seg2;
-    // @@@ This test is probably very naive. The problem
-    // is that IntersectPolygon returns a un-ordered segment.
-    // i.e. start or end have no real meaning. For the 2D bsp
-    // tree we need an ordered segment. So we classify (0,0,0)
-    // in 3D to the polygon and (0,0) in 2D to the segment and
-    // see if they have the same direction. If not we swap
-    // the segment.
-    csPlane2 pl (s1, s2);
-    float cl3d = p->GetPolyPlane ()->Classify (csVector3 (0));
-    float cl2d = pl.Classify (csVector2 (0, 0));
-    if ((cl3d < 0 && cl2d < 0) || (cl3d > 0 && cl2d > 0))
-    {
-      seg2 = new csSegment2 (s1, s2);
-    }
-    else
-    {
-      seg2 = new csSegment2 (s2, s1);
-    }
-    bsp2d->Add (seg2);
-  }
-}
-#endif
-
-#if 0
-struct TestSolidData
-{
-  csVector2 pos;
-  bool is_solid;
-};
-
-static void* TestSolid (csSegment2** segments, int num, void* data)
-{
-  if (num == 0) return NULL; // Continue.
-  TestSolidData* d = (TestSolidData*)data;
-  csPlane2 plane (*segments[0]);
-  if (plane.Classify (d->pos) > 0) d->is_solid = true;
-  else d->is_solid = false;
-  return (void*)1;	// Stop recursion.
-}
-#endif
-
 // Given an array of csPolygonInt (which we know to be csPolygon3D
 // in this case) fill three other arrays with x, y, and z values
 // for all the vertices of those polygons that are in the given box.
@@ -736,23 +677,12 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   int i, j;
   csVector3 best_center = orig;
 #if 0
-  // @@@ Choose while trying to maximize the area of solid space
+  // Choose while trying to maximize the area of solid space
   // This will improve occlusion!
-  // One way to do this:
-  //    - Consider each plane (x,y,z) seperatelly.
-  //    - Try several values for each plane.
-  //    - Intersect plane with all polygons: resulting in set of lines.
-  //    - Possibly organize lines in 2D BSP or beam tree.
-  //    - Take a few samples on the plane and for every sample
-  //      we draw four lines (to above, down, right, and left). We
-  //      intersect every line with the nearest line from the intersections
-  //      and calculate the distance. Also by checking the normal of the
-  //      line we intersect with we can see if we are in solid or open
-  //      space. The four distances are used to calculate an approx
-  //      area of solid and open space. We add all solid space areas and
-  //      subtract all open space areas and so we have a total solid space
-  //      approx.
-  //    - Take the plane with most solid space.
+
+  // @@@ Idea: we would like to use ClassifyRectangle here but that
+  // function depends on the octree being generated already. Maybe
+  // octree generation needs to happen in two passes?
 
 # define DTRIES 10
   float dx = tbox.MaxX () - tbox.MinX ();
@@ -769,34 +699,13 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   {
     x = xarray[i]+.1;
     csPlane3 plane (1, 0, 0, -x);
-    // First create a 2D bsp tree for all intersections of the
-    // polygons in the node with the chosen plane.
-    csBspTree2D* bsp2d = new csBspTree2D ();
-    for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED)
-	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
-    // Given the calculated 2D bsp tree we will now try to see
-    // how much space is solid and how much space is open. We use
-    // a simple (but not very accurate) heuristic for this.
-    // We just take a number of samples and find the first segment
-    // for every of those samples. We then see if we are in front
-    // or behind the sample. If behind then we are in solid space.
-    // Otherwise we are in open space.
-    count_solid = 0;
-    for (tx = tbox.MinY ()+dy/(DTRIES*2) ; tx < tbox.MaxY () ; tx += dy/DTRIES)
-      for (ty = tbox.MinZ ()+dz/(DTRIES*2) ; ty < tbox.MaxZ () ; ty += dz/DTRIES)
-      {
-        tdata.pos.Set (tx, ty);
-        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
-	if (tdata.is_solid) count_solid++;
-      }
+    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
+  	const csBox2& box);//@@@
     if (count_solid > max_solid)
     {
       max_solid = count_solid;
       best_center.x = x;
     }
-
-    delete bsp2d;
   }
 
   // Try y planes.
@@ -805,24 +714,13 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   {
     y = yarray[i]+.1;
     csPlane3 plane (0, 1, 0, -y);
-    csBspTree2D* bsp2d = new csBspTree2D ();
-    for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED)
-	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
-    count_solid = 0;
-    for (tx = tbox.MinX ()+dx/(DTRIES*2) ; tx < tbox.MaxX () ; tx += dx/DTRIES)
-      for (ty = tbox.MinZ ()+dz/(DTRIES*2) ; ty < tbox.MaxZ () ; ty += dz/DTRIES)
-      {
-        tdata.pos.Set (tx, ty);
-        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
-	if (tdata.is_solid) count_solid++;
-      }
+    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
+  	const csBox2& box);//@@@
     if (count_solid > max_solid)
     {
       max_solid = count_solid;
       best_center.y = y;
     }
-    delete bsp2d;
   }
 
   // Try z planes.
@@ -831,35 +729,29 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   {
     z = zarray[i]+.1;
     csPlane3 plane (0, 0, 1, -z);
-    csBspTree2D* bsp2d = new csBspTree2D ();
-    for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED)
-	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
-    count_solid = 0;
-    for (tx = tbox.MinX ()+dx/(DTRIES*2) ; tx < tbox.MaxX () ; tx += dx/DTRIES)
-      for (ty = tbox.MinY ()+dy/(DTRIES*2) ; ty < tbox.MaxY () ; ty += dy/DTRIES)
-      {
-        tdata.pos.Set (tx, ty);
-        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
-	if (tdata.is_solid) count_solid++;
-      }
+    UShort mask = ClassifyRectangle (int plane_nr, float plane_pos,
+  	const csBox2& box);//@@@
     if (count_solid > max_solid)
     {
       max_solid = count_solid;
       best_center.z = z;
     }
-    delete bsp2d;
   }
 #else
   // Try a few x-planes first.
   float x, y, z;
   int splits, best_splits = 2000000000;
+  int rc;
   for (i = 0 ; i < num_x ; i++)
   {
     x = xarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED) splits++;
+    {
+      rc = polygons[j]->ClassifyX (x);
+      if (rc == POL_SPLIT_NEEDED) splits++;
+      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+    }
     if (splits < best_splits)
     {
       best_center.x = x;
@@ -872,7 +764,11 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     y = yarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED) splits++;
+    {
+      rc = polygons[j]->ClassifyY (y);
+      if (rc == POL_SPLIT_NEEDED) splits++;
+      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+    }
     if (splits < best_splits)
     {
       best_center.y = y;
@@ -885,7 +781,11 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     z = zarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
-      if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED) splits++;
+    {
+      rc = polygons[j]->ClassifyZ (z);
+      if (rc == POL_SPLIT_NEEDED) splits++;
+      //else if (rc == POL_SAME_PLANE) splits -= 2;	// Very good!
+    }
     if (splits < best_splits)
     {
       best_center.z = z;
