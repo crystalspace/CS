@@ -462,6 +462,10 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   bool vis)
 {
+  // @@@ Note: In case of dynamic light and static lod we probably only want
+  // to calculate lighting on the currently visible mesh. Have to think on
+  // how to do that exactly.
+
   if (!vis) return;
   iShadowReceiver* receiver = mesh->GetShadowReceiver ();
   if (receiver)

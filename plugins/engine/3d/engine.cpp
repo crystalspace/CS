@@ -777,17 +777,17 @@ bool csMeshListIt::HasNext () const
 }
 
 //---------------------------------------------------------------------------
-int csEngine:: frame_width;
-int csEngine:: frame_height;
-iObjectRegistry *csEngine:: object_reg = 0;
-csEngine *csEngine:: current_engine = 0;
-iEngine *csEngine:: current_iengine = 0;
-bool csEngine:: use_new_radiosity = false;
-int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
-bool csEngine:: do_force_revis = false;
-bool csEngine:: do_rad_debug = false;
-int csEngine:: max_lightmap_w = 0;
-int csEngine:: max_lightmap_h = 0;
+int csEngine::frame_width;
+int csEngine::frame_height;
+iObjectRegistry *csEngine::object_reg = 0;
+csEngine *csEngine::current_engine = 0;
+iEngine *csEngine::current_iengine = 0;
+bool csEngine::use_new_radiosity = false;
+int csEngine::lightcache_mode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
+bool csEngine::do_force_revis = false;
+bool csEngine::do_rad_debug = false;
+int csEngine::max_lightmap_w = 0;
+int csEngine::max_lightmap_h = 0;
 
 SCF_IMPLEMENT_IBASE(csEngine)
   SCF_IMPLEMENTS_INTERFACE(iEngine)

@@ -49,7 +49,8 @@ struct iShadowCaster : public iBase
    * Append a list of shadow frustums which extend from
    * this shadow caster. The origin is the position of the light.
    */
-  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin) = 0;
+  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+  	const csVector3& origin) = 0;
 };
 
 SCF_VERSION (iShadowReceiver, 0, 0, 2);

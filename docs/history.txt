@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Jun-2004
+	- Jorrit implemented correct static lighting for static lod. In case
+	  of casting shadows, the lowest detail object that has a shadow
+	  caster will be used. In case of receiving shadows all children
+	  will get the shadows.
 13-Jun-2004
 	- res changed the Win32 thread error reporting to be less 
 	  macro-centric.

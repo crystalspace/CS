@@ -31,8 +31,100 @@
 
 
 // ---------------------------------------------------------------------------
+
+// Implementations of iShadowCaster and iShadowReceiver that are used
+// in case of static lod.
+
+// Static shadow caster will cast shadows from the least detailed object
+// that actually has a shadow caster.
+class csStaticShadowCaster : public iShadowCaster
+{
+private:
+  // Pointer back to the mesh with static lod.
+  csMeshWrapper* static_lod_mesh;
+
+public:
+  csStaticShadowCaster (csMeshWrapper* m)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    static_lod_mesh = m;
+  }
+
+  virtual ~csStaticShadowCaster ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+  	const csVector3& origin)
+  {
+    const csMeshMeshList& c = static_lod_mesh->GetChildren ();
+    int cnt = c.GetCount ();
+    int i = 0;
+    while (i < cnt)
+    {
+      iMeshWrapper* child = c.Get (i);
+      if (child && child->GetShadowCaster ())
+      {
+        child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
+	return;
+      }
+      i++;
+    }
+  }
+};
+
+SCF_IMPLEMENT_IBASE(csStaticShadowCaster)
+  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
+SCF_IMPLEMENT_IBASE_END
+
+// Static shadow receiver will send the received shadows to all children
+// of the static lod mesh.
+class csStaticShadowReceiver : public iShadowReceiver
+{
+private:
+  // Pointer back to the mesh with static lod.
+  csMeshWrapper* static_lod_mesh;
+
+public:
+  csStaticShadowReceiver (csMeshWrapper* m)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    static_lod_mesh = m;
+  }
+
+  virtual ~csStaticShadowReceiver ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void CastShadows (iMovable* movable, iFrustumView* fview)
+  {
+    const csMeshMeshList& c = static_lod_mesh->GetChildren ();
+    int cnt = c.GetCount ();
+    int i;
+    for (i = 0 ; i < cnt ; i++)
+    {
+      iMeshWrapper* child = c.Get (i);
+      if (child && child->GetShadowReceiver ())
+        child->GetShadowReceiver ()->CastShadows (movable, fview);
+    }
+  }
+};
+
+SCF_IMPLEMENT_IBASE(csStaticShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
+SCF_IMPLEMENT_IBASE_END
+
+
+// ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iImposter)
@@ -114,6 +206,14 @@ iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
 {
   if (!shadow_receiver_valid)
   {
+    if (static_lod)
+    {
+      shadow_receiver_valid = true;
+      shadow_receiver = csPtr<iShadowReceiver> (
+      	new csStaticShadowReceiver (this));
+      return shadow_receiver;
+    }
+
     if (!meshobj) return 0;
     shadow_receiver_valid = true;
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
@@ -125,6 +225,14 @@ iShadowCaster* csMeshWrapper::GetShadowCaster ()
 {
   if (!shadow_caster_valid)
   {
+    if (static_lod)
+    {
+      shadow_caster_valid = true;
+      shadow_caster = csPtr<iShadowCaster> (
+      	new csStaticShadowCaster (this));
+      return shadow_caster;
+    }
+
     if (!meshobj) return 0;
     shadow_caster_valid = true;
     shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
@@ -479,12 +587,16 @@ bool csMeshWrapper::GetDrawAfterShadow ()
 
 iLODControl* csMeshWrapper::CreateStaticLOD ()
 {
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
   static_lod = csPtr<csStaticLODMesh> (new csStaticLODMesh ());
   return static_lod;
 }
 
 void csMeshWrapper::DestroyStaticLOD ()
 {
+  shadow_receiver_valid = false;
+  shadow_caster_valid = false;
   static_lod = 0;
 }
 
