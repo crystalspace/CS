@@ -1,7 +1,6 @@
 /*
     Alternate Windowing System: timer class
     Copyright (C) 2002 by Norman Kraemer
-    partly copied from csws' csTimer class
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

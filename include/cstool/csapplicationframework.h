@@ -103,9 +103,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * csApplicationFramework itself is derived from csInitializer for convenience,
  * allowing overridden members to call csInitializer methods without qualifying
  * them with csInitializer::.
- * \par
- * This class is not related to csApp or any other class from the deprecated
- * CSWS library.
  */
 class CS_CRYSTALSPACE_EXPORT csApplicationFramework : public csInitializer
 {

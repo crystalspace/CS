@@ -16,7 +16,7 @@ First TODO requires changes to the font caches. Maybe layouting in general
 should be moved to the font caches, and the font servers just provide the 
 necessary metrics (that includes removal of GetDimensions() and such from
 iFont.) The 2rd touches a few other routines currently in the 2d
-driver and most heavily csws.
+driver.
 
 Norman [w/ mods by res]
 

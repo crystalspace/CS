@@ -155,6 +155,7 @@ Common sound renderer functionality.
 @item CS/libs/csplugincommon/win32
 Common Microsoft Windows functionality.
 @end table
+@end table
 
 @item CS/mk
 This directory contains support facilities for the configuration and build

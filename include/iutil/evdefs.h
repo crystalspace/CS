@@ -510,15 +510,14 @@ typedef enum _csKeyCharType
 /**
  * General Command Codes<p>
  * The list below does not contain all defined command codes; these are only
- * the most general ones. Crystal Space Windowing System has a broad range of
- * predefined commands; look in CSWS header files for more info.
+ * the most general ones.
  *<p>
- * Basically CSWS uses command codes below 0x80000000; user applications
- * should use command codes above this number, for example:
+ * Third-party applications should use command codes greater than these
+ * standard code, for example:
  *<pre>
  * enum
  * {
- *   cscmdMyCommand1 = 0xdeadf00d,
+ *   cscmdMyCommand1 = 0x10000000,
  *   cscmdMyCommand2,
  *   cscmdMyCommand3
  *   ...
@@ -545,9 +544,9 @@ typedef enum _csCommandEventCode
 
   /**
    * Application has changed its "focused" status.<p>
-   * This command is posted (or is not posted) by system-dependent driver.
-   * This event is generated whenever user application receives/loses focus.
-   * Upon this event application may react correspondingly - stop music,
+   * This event is generated whenever user application receives/loses focus
+   * (that is, when the application itself activates or deactivates).
+   * Upon this event the application may react correspondingly - stop music,
    * hide software mouse cursor and so on. iEnable = true in the event
    * application receives focus and false if it loses focus.
    * <pre>

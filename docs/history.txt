@@ -37,6 +37,9 @@ chronological order.
 	- Eric Sunshine rewrote a bunch of outdated discussion in the Crystal
 	  Space manual.
 	- res removed the long-deprecated CSWS library.
+	- Eric Sunshine removed the remaining CSWS references which escaped
+	  Frank's clutches. Also fixed some Texinfo errors which were
+	  introduced with the CSWS removal.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

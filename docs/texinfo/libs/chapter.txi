@@ -43,6 +43,7 @@ and bounding boxes, 3D matrices and some other useful tools. @xref{csGeom}.
 
 @item csgfx
 Basic image support and graphical manipulation tools.
+@end table
 
 @imports{libs,csutil.txi}
 @imports{libs,scf.txi}

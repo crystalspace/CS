@@ -41,7 +41,6 @@ VFS.Mount.lev/particles  = $(CS_MAPDIR)$/particles$/
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
 VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/stdtex.zip
-VFS.Mount.lib/csws     = $(CS_DATADIR)$/csws.zip
 VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 
 ; Mount for AWS

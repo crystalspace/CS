@@ -793,7 +793,6 @@ been removed and was replaced with a simpler landscape engine, but one which is
 better integrated with the project. It is now also a mesh object.
 
 @subheading @sc{csws} Modal Session Paradigm Shift
-@cindex @sc{csws}
 @cindex @code{csMessageBox()}
 @cindex @code{csApp.Execute()}
 @cindex @code{csApp.StartModal()}

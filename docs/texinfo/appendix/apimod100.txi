@@ -1494,4 +1494,5 @@ documentations.
 
 @subheading @sc{csws} Removal
 
-The Crystal Space Windowing System (@sc{csws}) was removed. 
+The long-deprecated Crystal Space Windowing System (@sc{csws}) was removed. 
+Instead use @sc{aws}. @xref{AWS}.

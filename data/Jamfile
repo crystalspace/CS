@@ -2,7 +2,6 @@ SubDir TOP data ;
 
 InstallData
   awsdef.zip
-  csws.zip
   fancycon.zip
   standard.zip
   stdtex.zip

@@ -37,10 +37,9 @@
 #include "awswin.h"
 
 /**\file
- * This is the alternate windowing system plugin.  It defines a simple,
- * lightweight alternative to the current CSWS windowing system.  It supports
- * simple skinning via the .skn defintions, and creation of windows from
- * .win definitions.
+ * This is the Alternate Windowing System plugin.  It defines a simple,
+ * lightweight windowing system.  It supports simple skinning via the .skn
+ * defintions, and creation of windows from .win definitions.
  */
 
 /**

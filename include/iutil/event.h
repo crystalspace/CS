@@ -264,7 +264,7 @@ struct iEvent : public iBase
    * Event type. @see csEventType
    */
   uint8 Type;			
-  /// Event category (unused by CSWS)
+  /// Event category
   uint8 Category;		
   /// Even finer granularity
   uint8 SubCategory;		
