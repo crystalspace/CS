@@ -72,7 +72,7 @@ private:
   /// texturemanager handle
   csGLTextureManager *txtmgr;
 
-  int formatidx;
+  
   GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have? e.g. GL_UNSIGNED_BYTE
 
@@ -109,6 +109,7 @@ private:
 
 public:
     int bpp;
+    int formatidx;
   int orig_width, orig_height;
   texVector vTex;
   csGLRender3D *R3D;

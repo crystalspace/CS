@@ -495,7 +495,7 @@ csGLTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
 
 void csGLTextureHandle::CreateMipMaps()
 {
-
+  int thissize;
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
   //  printf ("delete old\n");
@@ -520,7 +520,6 @@ void csGLTextureHandle::CreateMipMaps()
 
   //  printf ("transform 0\n");
   transform (images, vTex[0]);
-
   // Create each new level by creating a level 2 mipmap from previous level
   // we do this down to 1x1 as opengl defines it
 
@@ -535,7 +534,7 @@ void csGLTextureHandle::CreateMipMaps()
   {
       (*prevImages)[i]->IncRef();
   }
-
+  
   while (w != 1 || h != 1)
   {
     nTex++;
@@ -573,7 +572,7 @@ void csGLTextureHandle::CreateMipMaps()
   {
       (*prevImages)[i]->DecRef();
   }
-
+  
 }
 
 
@@ -645,7 +644,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  h = image_data = new uint8 [n*nCompo*d];
           for (j=0; j<d; j++)
           {
-            data = (csRGBpixel *)(*ImageVector)[0]->GetImageData();
+            data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
 	    for (i=0; i<n; i++, data++, h+=nCompo)
 	      memcpy (h, data, nCompo);
           }
@@ -710,11 +709,8 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       }
   }
 
-
-  {
-    tex->size = n * csGLTextureManager::glformats[formatidx].texelbytes;
-  }
-
+  tex->size = n * d * csGLTextureManager::glformats[formatidx].components;
+  
   size += tex->size;
   return true;
 }
