@@ -57,6 +57,16 @@ void csSequence::Clear ()
   last = 0;
 }
 
+void csSequence::CleanupSequences ()
+{
+  csSequenceOp* n = first;
+  while (n)
+  {
+    if (n->operation) n->operation->CleanupSequences ();
+    n = n->next;
+  }
+}
+
 void csSequence::DeleteFirstSequence ()
 {
   if (first)
@@ -113,7 +123,6 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
 void csSequence::AddRunSequence (csTicks time, iSequence* sequence,
 	iBase* params)
 {
-  seqmgr->RegisterRef (sequence);
   RunSequenceOp* op = new RunSequenceOp (seqmgr, sequence);
   AddOperation (time, op, params);
   op->DecRef ();
@@ -129,8 +138,6 @@ void csSequence::AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
 	iBase* params)
 {
-  if (trueSequence) seqmgr->RegisterRef (trueSequence);
-  if (falseSequence) seqmgr->RegisterRef (falseSequence);
   RunCondition* op = new RunCondition (seqmgr, condition, trueSequence,
   	falseSequence);
   AddOperation (time, op, params);
@@ -154,7 +161,6 @@ void csSequence::RunCondition::Do (csTicks dt, iBase* params)
 void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,
   	iSequence* sequence, iBase* params)
 {
-  if (sequence) seqmgr->RegisterRef (sequence);
   RunLoop* op = new RunLoop (seqmgr, condition, sequence);
   AddOperation (time, op, params);
   op->DecRef ();
@@ -184,7 +190,8 @@ SCF_IMPLEMENT_IBASE (csSequenceManager::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csSequenceManager::csSequenceManager (iBase *iParent)
+csSequenceManager::csSequenceManager (iBase *iParent) :
+	weakref_alloc (100)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -207,11 +214,6 @@ csSequenceManager::~csSequenceManager ()
   }
   Clear ();
   main_sequence->DecRef ();
-}
-
-void csSequenceManager::RegisterRef (iBase* ref)
-{
-  refs.Push (ref);
 }
 
 bool csSequenceManager::Initialize (iObjectRegistry *r)
@@ -259,10 +261,23 @@ csTicks csSequenceManager::GetDeltaTime () const
 
 void csSequenceManager::Clear ()
 {
-  refs.DeleteAll ();
   main_sequence->Clear ();
   main_time = 0;
   previous_time_valid = false;
+  int i;
+  for (i = 0 ; i < sequences.Length () ; i++)
+  {
+    csWeakRef<csSequence>* seq = sequences[i];
+    if ((*seq) != 0)
+    {
+      // We keep a real ref to the sequence to prevent the
+      // sequence deleting itself.
+      csRef<csSequence> keepref = (csSequence*)*seq;
+      (*seq)->CleanupSequences ();
+    }
+    weakref_alloc.Free (seq);
+  }
+  sequences.DeleteAll ();
 }
 
 void csSequenceManager::Suspend ()
@@ -309,7 +324,28 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
 
 iSequence* csSequenceManager::NewSequence ()
 {
+  static int cnt = 0;
   csSequence* n = new csSequence (this);
+  csWeakRef<csSequence>* weakn = weakref_alloc.Alloc ();
+  *weakn = n;
+  sequences.Push (weakn);
+  cnt++;
+  if (cnt >= 100)
+  {
+    cnt = 0;
+    if (sequences.Length () > 100)
+    {
+      int i;
+      csArray<csWeakRef<csSequence>* > copy;
+      for (i = 0 ; i < sequences.Length () ; i++)
+      {
+        csWeakRef<csSequence>* seq = sequences[i];
+	if ((*seq) != 0) copy.Push (seq);
+	else weakref_alloc.Free (seq);
+      }
+      sequences = copy;
+    }
+  }
   return n;
 }
 

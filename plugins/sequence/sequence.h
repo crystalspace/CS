@@ -23,6 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
+#include "csutil/blockallocator.h"
 #include "ivaria/sequence.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -54,6 +55,7 @@ public:
     {
       SCF_CONSTRUCT_IBASE (0);
     }
+    virtual void CleanupSequences () { }
   };
 
   //=====
@@ -62,7 +64,7 @@ public:
   class RunSequenceOp : public StandardOperation
   {
   private:
-    csWeakRef<iSequence> sequence;
+    csRef<iSequence> sequence;
   protected:
     virtual ~RunSequenceOp () { }
   public:
@@ -72,6 +74,7 @@ public:
       sequence = seq;
     }
     virtual void Do (csTicks dt, iBase* params);
+    virtual void CleanupSequences () { sequence = 0; }
   };
 
   //=====
@@ -81,8 +84,8 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csWeakRef<iSequence> trueSequence;
-    csWeakRef<iSequence> falseSequence;
+    csRef<iSequence> trueSequence;
+    csRef<iSequence> falseSequence;
   protected:
     virtual ~RunCondition () { }
   public:
@@ -94,6 +97,7 @@ public:
       condition = cond;
     }
     virtual void Do (csTicks dt, iBase* params);
+    virtual void CleanupSequences () { trueSequence = 0; falseSequence = 0; }
   };
 
   //=====
@@ -103,7 +107,7 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csWeakRef<iSequence> sequence;
+    csRef<iSequence> sequence;
   protected:
     virtual ~RunLoop () { }
   public:
@@ -114,6 +118,7 @@ public:
       condition = cond;
     }
     virtual void Do (csTicks dt, iBase* params);
+    virtual void CleanupSequences () { sequence = 0; }
   };
 
 public:
@@ -136,6 +141,8 @@ public:
   	iSequence* sequence, iBase* params = 0);
   virtual void Clear ();
   virtual bool IsEmpty () { return first == 0; }
+
+  void CleanupSequences ();
 };
 
 class csSequenceManager : public iSequenceManager
@@ -148,12 +155,11 @@ private:
   // sequence operations. New sequences will be merged with this one.
   csSequence* main_sequence;
 
-  // Array of references. This is used to avoid circular
-  // references. If you need a circular reference (for example, a sequence
-  // containing an operation that runs itself) then you need to use weak
-  // references in the operation and register the real reference here.
-  // @@@ Implementation detail: should use a set of refs instead of an array!
-  csRefArray<iBase> refs;
+  // Array of sequences. These are weak refs to avoid them from being
+  // deleted. At destruction the refs here are used to forcibly clean
+  // up sequences that have circular references.
+  csBlockAllocator<csWeakRef<csSequence> > weakref_alloc;
+  csArray<csWeakRef<csSequence>* > sequences;
 
   // The previous time.
   csTicks previous_time;
@@ -172,8 +178,6 @@ public:
   csSequenceManager (iBase *iParent);
   virtual ~csSequenceManager ();
   virtual bool Initialize (iObjectRegistry *object_reg);
-
-  virtual void RegisterRef (iBase* ref);
 
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);

@@ -23,7 +23,7 @@
 
 struct iSequenceManager;
 
-SCF_VERSION (iSequenceOperation, 0, 1, 0);
+SCF_VERSION (iSequenceOperation, 0, 2, 0);
 
 /**
  * A sequence operation. This is effectively a callback
@@ -40,6 +40,13 @@ struct iSequenceOperation : public iBase
    * sequence manager only kicks in every frame and frame rate can be low.
    */
   virtual void Do (csTicks dt, iBase* params) = 0;
+
+  /**
+   * This routine is responsible for forcibly cleaning up
+   * all references to sequences. It is called when the sequence manager
+   * is destructed.
+   */
+  virtual void CleanupSequences () = 0;
 };
 
 SCF_VERSION (iSequenceCondition, 0, 1, 0);
@@ -141,8 +148,7 @@ struct iSequenceManager : public iBase
 {
   /**
    * Clear all sequence operations currently in memory (this will
-   * call DecRef() on them). All objects registered with RegisterRef()
-   * will be decreffed too.
+   * call DecRef() on them).
    */
   virtual void Clear () = 0;
 
@@ -227,16 +233,6 @@ struct iSequenceManager : public iBase
    */
   virtual void RunSequence (csTicks time, iSequence* sequence,
   	iBase* params = 0) = 0;
-
-  /**
-   * Register an object (usually a sequence) to the sequence
-   * manager. These refs will be released when the sequence manager closes
-   * down or when Clear() is called. The purpose of this function is to be
-   * able to allow circular references between sequences (i.e. a sequence
-   * containing an operation to run the same sequence). These refs should
-   * use weak references.
-   */
-  virtual void RegisterRef (iBase* ref) = 0;
 };
 
 #endif // __CS_IVARIA_SEQUENCE_H__

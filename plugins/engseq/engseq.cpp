@@ -70,6 +70,7 @@ protected:
 public:
   OpStandard () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
+  virtual void CleanupSequences () { }
 };
 
 SCF_IMPLEMENT_IBASE (OpStandard)

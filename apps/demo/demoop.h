@@ -45,6 +45,7 @@ protected:
 public:
   StandardOp () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
+  virtual void CleanupSequences () { }
 };
 
 /**

@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2003
+	- Jorrit fixed the engine sequence manager a better way. With
+	  yesterday's fix it was essentially possible for the sequence
+	  manager to grow in memory forever since sequences that were once
+	  the target of an operation would be registered and never released
+	  (except at shutdown of the sequence manager).
+	  The current fix works by making the operations use real references
+	  instead of weak references again (as they should). But the sequence
+	  manager now manages an array of weak references to all sequences.
+	  Whenever a sequence is deleted then that weak ref will become 0
+	  automatically and the sequence manager will later remove that entry
+	  from the array. If after Clear() the weak ref is
+	  still there then this means we have a circular reference. In that
+	  case the sequence manager will call CleanupSequences() on all the
+	  sequences to force breaking the circular references.
+	  Note that this fix doesn't help clean up sequences that circularly
+	  reference each other but are no longer used (i.e. they have no
+	  scheduled operations). For those there is no other solution but
+	  to clear the sequence manager manually.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:
