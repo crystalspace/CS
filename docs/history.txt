@@ -43,6 +43,18 @@ chronological order.
 	  program name on Windows.  Also fixed so that it no longer
 	  unnecessarily and (potentially) incorrectly passes "-f elf" to nasm
 	  during the test invocation.
+	- Duhprey did the following to the physics loader:
+	  Added softness parameter in a few places it wasn't (Thought this was
+	  there already)
+	  Changed behavior of mesh colliders attached to bodies so they won't
+	  transform based on the mesh (the body is already transformed based on
+	  the mesh so this would do the transform twice) mesh colliders
+	  attached to a systme are unaffected.
+	- Duhprey did the following to odedynam:
+	  Added ODEDynamicsState (although tunneling prediction
+	  "EnableFastObjects") not yet implemented
+	  Fixed a bug where somehow the line to rotate the mesh mass correctly
+	  was moved
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
