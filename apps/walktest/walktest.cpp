@@ -1047,7 +1047,7 @@ void WalkTest::InitCollDet (csEngine* engine, csRegion* region)
     if (region && !region->IsInRegion (sp)) continue;
     // Initialize the things in this sector.
     int i;
-    for (i = 0 ; i < sp->GetNumberThings () ; i++)
+    for (i = 0 ; i < sp->GetNumThings () ; i++)
     {
       csThing* tp = sp->GetThing (i);
       mesh = QUERY_INTERFACE (tp, iPolygonMesh);

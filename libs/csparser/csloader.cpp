@@ -2784,7 +2784,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     csSector* s = (csSector*)(Engine->sectors)[sn];
     if (cur_region && !cur_region->IsInRegion (s))
       continue;
-    int st = s->GetNumberThings ();
+    int st = s->GetNumThings ();
     int j = 0;
     while (j < st)
     {

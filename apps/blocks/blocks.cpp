@@ -2178,7 +2178,7 @@ void Blocks::StartNewGame ()
 
   // First delete all cubes that may still be in the engine.
   int i = 0;
-  while (i < room->GetNumberThings ())
+  while (i < room->GetNumThings ())
   {
     csThing* cube = room->GetThing (i);
     if (!strncmp (cube->GetName (), "cube", 4))

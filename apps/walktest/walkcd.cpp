@@ -220,7 +220,7 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
     return 1;
 
   // Check collision with the things in this sector.
-  for (i = 0 ; i < sp->GetNumberThings () ; i++)
+  for (i = 0 ; i < sp->GetNumThings () ; i++)
   {
     csThing* tp = sp->GetThing (i);
     Sys->collide_system->ResetCollisionPairs ();

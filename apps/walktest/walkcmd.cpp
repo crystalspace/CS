@@ -556,7 +556,7 @@ void WalkTest::ParseKeyCmds ()
     ParseKeyCmds (sector);
 
     int j;
-    for (j = 0 ; j < sector->GetNumberThings () ; j++)
+    for (j = 0 ; j < sector->GetNumThings () ; j++)
     {
       csThing* thing = sector->GetThing (j);
       ParseKeyCmds (thing);

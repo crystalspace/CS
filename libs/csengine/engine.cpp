@@ -112,7 +112,7 @@ csPolygon3D* csPolyIt::Fetch ()
     while (polygon_idx >= sector->GetThing (thing_idx)->GetNumPolygons ())
     {
       thing_idx++;
-      if (thing_idx >= sector->GetNumberThings ())
+      if (thing_idx >= sector->GetNumThings ())
       {
         thing_idx = -1;
 	break;
@@ -135,7 +135,7 @@ csPolygon3D* csPolyIt::Fetch ()
     polygon_idx = -1;
     thing_idx = 0;
     // Recurse.
-    if (thing_idx < sector->GetNumberThings ())
+    if (thing_idx < sector->GetNumThings ())
       return Fetch ();
     // No things. Go to next sector.
     if (!NextSector ()) return NULL;
@@ -201,7 +201,7 @@ csCurve* csCurveIt::Fetch ()
     while (curve_idx >= sector->GetThing (thing_idx)->GetNumCurves ())
     {
       thing_idx++;
-      if (thing_idx >= sector->GetNumberThings ())
+      if (thing_idx >= sector->GetNumThings ())
       {
         thing_idx = -1;
 	break;
@@ -225,7 +225,7 @@ csCurve* csCurveIt::Fetch ()
     thing_idx = 0;
 
     // Recurse.
-    if (thing_idx < sector->GetNumberThings ())
+    if (thing_idx < sector->GetNumThings ())
       return Fetch ();
 
     // No things. Go to next sector.
@@ -498,7 +498,7 @@ csObject* csObjectIt::Fetch ()
   {
     if (CheckType (cur_type))
     {
-      if (cur_idx >= cur_sector->GetNumberThings ())
+      if (cur_idx >= cur_sector->GetNumThings ())
         StartStatLights ();
       else
       {
