@@ -30,7 +30,6 @@ ifeq ($(MAKESECTION),postdefines)
 # Non-Unix OpenGL renderer do not need the X11 libs
 ifndef OPENGL.LIBS.DEFINED
 
-CFLAGS.GL3D+=-I$(X11_PATH)/include
 LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
 
 ifeq ($(USE_MESA),1)
@@ -42,6 +41,8 @@ ifeq ($(USE_MESA),1)
 else
   LIBS.LOCAL.GL3D+=-lGL
 endif
+
+CFLAGS.GL3D+=-I$(X11_PATH)/include
 
 endif # OPENGL.LIBS.DEFINED
 

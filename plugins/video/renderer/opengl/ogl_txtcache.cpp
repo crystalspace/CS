@@ -23,7 +23,7 @@
 #endif
 
 #include <GL/gl.h>
-#include <GL/glu.h>
+//#include <GL/glu.h>
 
 #include "cs3d/opengl/ogl_txtcache.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
