@@ -28,7 +28,13 @@ static char last_offender[255];
 static int parser_line;
 
 char* csGetLastOffender () { return last_offender; }
-int   csGetParserLine   () { return parser_line;   }
+
+// XXX: Here we have a problem: the parser_line variable is static and
+// therefor not shared across plugins, because the real fix (moving everything
+// into a class) takes time, we'll just always return -1 now...
+//int   csGetParserLine   () { return parser_line;   }
+int csGetParserLine() { return -1; }
+
 void  csResetParserLine () { parser_line = 1;      }
 
 long csGetObject (char **buf, csTokenVector * tokens, char **name, char **data)
