@@ -16,6 +16,8 @@ Short-term cleanups that need to be done:
 5-Aug-1999
 	- Eric Sunshine fixed a compilation warning in djvidsys.cpp where
 	  XModeCount was declared without a type.  It is now declared as int.
+	- Eric Sunshine generalized the MacOS/X Server, OpenStep, and NextStep
+	  makefiles slightly.
 4-Aug-1999
 	- Eric Sunshine committed Seth Galbraith's latest version of Squawk
 	  to the CVS repository.  He also made the following modifications:
@@ -31,7 +33,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed oodles of new compilation warnings and a few
 	  compilation errors in MazeD.  Also fixed a link error caused by a
 	  second definition of csTextureMM::fIgnoreLoadingErrors which
-	  incorrectly appeared in me_world.cpp for some unknown reason.
+	  incorrectly materialized in me_world.cpp for an unknown reason.
 3-Aug-1999
 	- Added 'FILE' keyword in SPRITE template loader so that you can load
 	  3DS and MD2 files from within a world file (and every other format
