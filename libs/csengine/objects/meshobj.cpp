@@ -226,7 +226,7 @@ void csMeshWrapper::Draw (iRenderView *rview)
 }
 
 #ifdef CS_USE_NEW_RENDERER
-csRenderMesh *csMeshWrapper::GetRenderMesh (/*iRenderView* rview*/)
+csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
@@ -255,7 +255,7 @@ csRenderMesh *csMeshWrapper::GetRenderMesh (/*iRenderView* rview*/)
     }*/
 
     UpdateDeferedLighting (movable.GetFullPosition ());
-    return meshobj->GetRenderMesh (/*rview, &movable.scfiMovable, zbufMode*/);
+    return meshobj->GetRenderMeshes (n);
 /*  }
   return NULL;*/
 

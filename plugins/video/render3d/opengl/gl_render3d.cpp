@@ -1108,7 +1108,7 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
     if (vertattribenabled[attrib])
       return true;
-    bind = false;
+    //bind = false; //@@@[res]: causes graphical errors in some cases
   }
   if (bind && vertattrib[attrib])
   {

@@ -447,12 +447,13 @@ void csGenmeshMeshObject::SetupObject ()
 
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
+#ifndef CS_USE_NEW_RENDERER
   SetupObject ();
   CheckLitColors ();
-
-#ifndef CS_USE_NEW_RENDERER
-  iGraphics3D* g3d = rview->GetGraphics3D ();
 #endif
+
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+//#endif
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -471,6 +472,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (hard_transform)
     tr_o2c /= *hard_transform;
 
+  int clip_portal, clip_plane, clip_z_plane;
   csVector3 radius;
   csSphere sphere;
   GetRadius (radius, sphere.GetCenter ());
@@ -478,7 +480,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
-  int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
@@ -737,8 +738,7 @@ iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
   return factory->GetBuffer (name);
 }
 
-csRenderMesh *csGenmeshMeshObject::GetRenderMesh (/*iRenderView* rview, iMovable* movable,
-	csZBufMode mode*/)
+csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 {
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
@@ -775,7 +775,9 @@ csRenderMesh *csGenmeshMeshObject::GetRenderMesh (/*iRenderView* rview, iMovable
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
   mesh.streamsource = stream;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  return &mesh;
+  meshPtr = &mesh;
+  n = 1;
+  return &meshPtr;
   /*
   r3d->DrawMesh (&mesh);
   return true;

@@ -38,6 +38,10 @@ The history order is reversed so that new features are at the top.
 	    redefinition errors when they're defined by the Perl headers.
 	- Oktal fixed a segfault when NewConnection() returns NULL in
 	  netmantest. This was a left-over from the ensocket API.
+	- res further worked on storing rendermeshes in the sector. Z sorting
+	  as specified by the renderpriorities works now.
+	- res fixed a bug in the new renderer where not binding of a render 
+	  buffer caused visual distortions.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.

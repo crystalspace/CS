@@ -403,7 +403,7 @@ struct iMeshWrapper : public iBase
   /**
    * Returns the render mesh.
    */
-  virtual csRenderMesh *GetRenderMesh (/*iRenderView* rview*/) = 0;
+  virtual csRenderMesh** GetRenderMeshes (int& n) = 0;
   /**
    * Draws the shadow buffer pass.  This sets of the stencil for the lights
    */

@@ -84,11 +84,37 @@ struct iSectorRenderMeshList : public iBase
    * \param visobj The mesh wrapper's visibility object. Returned
    *  for convenience.
    * \param rm The actual meshobject.
+   * \remark Sorting according to the renderpriorities is not done,
+   *  it's needed to call PrioritySort().
    */
   virtual void Get (int index, 
     iMeshWrapper*& mw, 
     iVisibilityObject*& visobj,
     csRenderMesh*& rm) = 0;
+  /**
+   * Get a visible RM.
+   * Retrieves the first visible rendermesh, beginning at index.
+   * 'Visible' refers to those visible with the view passed to
+   * iSector::PrepareDraw(). \p index is incremented, so the
+   * next call to GetVisible() will retrieve the next visible
+   * RM.
+   * \param index Which rendermesh to retrieve.
+   * \param mw The mesh wrapper that belongs to this object.
+   * \param visobj The mesh wrapper's visibility object. Returned
+   *  for convenience.
+   * \param rm The actual meshobject.
+   * \returns Whether any visible mesh was found.
+   * \remark Sorting according to the renderpriorities is done
+   *  'on the way', it's not needed to call PrioritySort().
+   */
+  virtual bool GetVisible (int& index, 
+    iMeshWrapper*& mw, 
+    iVisibilityObject*& visobj,
+    csRenderMesh*& rm) = 0;
+  /**
+   * Sort meshes according to the order specified in the renderpriorities.
+   */
+  virtual void PrioritySort () = 0;
 };
 
 #endif
@@ -233,6 +259,9 @@ struct iSector : public iBase
    * to enable the shadows.
    */
   virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
+
+  /// 
+  virtual void PrepareDraw (iRenderView* rview) = 0;
 
   virtual iSectorRenderMeshList* GetRenderMeshes () = 0;
 #endif

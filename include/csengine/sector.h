@@ -31,6 +31,7 @@
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
 #ifdef CS_USE_NEW_RENDERER
+#include "csutil/bitset.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "iengine/viscull.h"
@@ -100,21 +101,68 @@ public:
  */
 class csRenderMeshList : public iSectorRenderMeshList
 {
-  struct csRMLItem
+  // a rendermesh list item
+  //  A mesh wrapper item. Used to store data on a per-MW basis.
+  struct csMWitem
   {
-    csRef<iMeshWrapper> mw;
-    csRef<iVisibilityObject> visobj;
-    csRenderMesh* rm;
+    int count;
 
-    // needed for csArray
-    inline bool operator == (const csRMLItem& other);
+    // when was visibility checked last?
+    csTicks lastFrame;
+    // for what view?
+    iRenderView* lastView;
+
+    csMWitem()
+    {
+      count = 0;
+      lastFrame = (csTicks)-1;
+      lastView = NULL;
+    }
   };
 
-  csArray<csRMLItem> rendermeshes;
+  struct csRMLitem
+  {
+    iMeshWrapper* mw;
+    iVisibilityObject* visobj;
+    csRenderMesh* rm;
+    csMWitem* mwi;
 
-  static int CompareItems (const csRMLItem* a, 
-    const csRMLItem* b);
-  bool FindItem (int& index, csRMLItem* item);
+    // the renderpriority of this mesh
+    long RP;
+    // the Z value, needed for f2b/b2f sorting
+    float zvalue;
+    // when was the RP stuff updated last?
+    csTicks lastRPupd;
+    // for what view?
+    iRenderView* lastView;
+
+    // needed for csArray
+    //inline bool operator == (const csRMLitem& other);
+  };
+
+  csArray<csRMLitem> rendermeshes;
+  csHashMap mwrappers;
+  csSector* sector;
+  uint32 currentVisNr;
+  csTicks currentFrame;
+  csBitSet checkedRPs;
+  iRenderView* currentView;
+  const csReversibleTransform* camtrans;
+  // the RP currently sorted - this stored here so the 'uninteresting'
+  // items can be skipped quickly.
+  long currentRP;
+  // caching RP sorting
+  csArray<int> RPsorting;
+
+  static int CompareItems (const csRMLitem* a, 
+    const csRMLitem* b);
+  bool FindItem (int& index, csRMLitem* item);
+  
+  void SortRP (int Left, int Right, int order);
+  int SortRPCompare (csRMLitem* a, csRMLitem* b, int order);
+
+  void CheckVisibility (csRMLitem* item);
+  void UpdateZ (csRMLitem* item);
 public:
   /// Add all rendermeshes of a mesh wrapper.
   void Add (iMeshWrapper* mw);
@@ -123,15 +171,22 @@ public:
   /// Resort all rendermeshes from this mesh wrapper.
   void Relink (iMeshWrapper* mw);
 
+  void PrepareFrame (iRenderView* rview);
+
   SCF_DECLARE_IBASE;
 
-  csRenderMeshList();
+  csRenderMeshList(csSector* sector);
 
   virtual int GetCount ();
   virtual void Get (int index, 
     iMeshWrapper*& mw, 
     iVisibilityObject*& visobj,
     csRenderMesh*& rm);
+  virtual bool GetVisible (int& index, 
+    iMeshWrapper*& mw, 
+    iVisibilityObject*& visobj,
+    csRenderMesh*& rm);
+  virtual void PrioritySort ();
 };
 #endif
 
@@ -153,6 +208,10 @@ private:
 
 
 #ifdef CS_USE_NEW_RENDERER  
+  friend class csRenderMeshList;
+
+  csRef<iVirtualClock> virtual_clock;
+
   /// num_objects in this sector
   int num_objects;
 
@@ -587,6 +646,8 @@ public:
       { scfParent->DrawShadow (rview, light); }
     virtual void DrawLight (iRenderView* rview, iLight* light)
       { scfParent->DrawLight (rview, light); }
+    virtual void PrepareDraw (iRenderView* rview)
+    { scfParent->PrepareDraw (rview); }
     virtual iSectorRenderMeshList* GetRenderMeshes ()
     { return scfParent->GetRenderMeshes (); }
 #endif // CS_USE_NEW_RENDERER

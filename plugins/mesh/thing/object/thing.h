@@ -951,6 +951,11 @@ public:
       /// The following enable/disable shadow caps for stencil shadow rendering
     virtual void EnableShadowCaps () {}
     virtual void DisableShadowCaps () {}
+    virtual csRenderMesh** GetRenderMeshes (int &n)
+    {
+      n = 0;
+      return NULL;
+    }
 #endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const

@@ -378,7 +378,7 @@ public:
    * Draw the zpass for the object.  If this object doesn't use lighting
    * then it can be drawn fully here.
    */
-  csRenderMesh *GetRenderMesh (/*iRenderView* rview*/);
+  csRenderMesh** GetRenderMeshes (int& num);
   /// This pass sets up the shadow stencil buffer
   void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh
@@ -692,9 +692,9 @@ public:
       scfParent->Draw (rview);
     }
 #ifdef CS_USE_NEW_RENDERER
-    virtual csRenderMesh *GetRenderMesh (/*iRenderView* rview*/) 
+    virtual csRenderMesh** GetRenderMeshes (int& num) 
 	{
-	  return scfParent->GetRenderMesh (/*rview*/);
+	  return scfParent->GetRenderMeshes (num);
 	}
 	virtual void DrawShadow (iRenderView* rview, iLight* light)
 	{

@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 
 #include "iutil/objreg.h"
 
@@ -54,31 +55,21 @@ void csAmbientRenderStep::Perform (csRenderView* rview, iSector* sector)
 {
   iRender3D* r3d = rl->engine->G3D;
 
-  iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
-  viscull->VisTest (rview);
-  uint32 visnr = viscull->GetCurrentVisibilityNumber ();
-
   r3d->EnableZOffset ();
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
   
-  int i, meshnum = meshes->GetCount();
-  for (i = 0; i < meshnum; i++)
+  int i = 0, meshnum = meshes->GetCount();
+  while (true)
   {
     iMeshWrapper* mw;
     iVisibilityObject* visobj;
     csRenderMesh* mesh;
-    meshes->Get (i, mw, visobj, mesh);
+    if (!meshes->GetVisible (i, mw, visobj, mesh))
+    {
+      break;
+    }
 
     if (!mesh) continue;
-    if (visobj->GetVisibilityNumber() != visnr) continue;
-    // haacky.
-    // DrawTest() should be called (so the mesh has a chance to do some
-    // preparation before it's drawed), but not here.
-    if (!mw->GetMeshObject()->DrawTest (rview, mw->GetMovable()))
-    {
-      visobj->SetVisibilityNumber (visnr - 1);
-      continue;
-    }
 
     iMaterialWrapper *matsave;
     //matsave = mesh->mathandle;
@@ -87,9 +78,12 @@ void csAmbientRenderStep::Perform (csRenderView* rview, iSector* sector)
     mesh->material = NULL;
     uint mixsave = mesh->mixmode;
     mesh->mixmode = CS_FX_COPY;
+    csZBufMode zsave = mesh->z_buf_mode;
+    mesh->z_buf_mode = CS_ZBUF_USE;
     
     r3d->DrawMesh (mesh);
 
+    mesh->z_buf_mode = zsave;
     //mesh->mathandle = matsave;
     mesh->material = matsave;;
     mesh->mixmode = mixsave;
@@ -153,10 +147,6 @@ void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
 {
   iRender3D* r3d = rl->engine->G3D;
 
-  iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
-  viscull->VisTest (rview);
-  uint32 visnr = viscull->GetCurrentVisibilityNumber ();
-
   csReversibleTransform camTransR = 
     rview->GetCamera()->GetTransform();
   r3d->SetObjectToCamera (&camTransR);
@@ -165,35 +155,45 @@ void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
   	csVector3 (0, 0, 0));
   r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
   	csVector3 (1, 0, 0));
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-    csVector3 (1, 1, 1));
   r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
     csVector3 (0, 0, 0));
 
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  int i, meshnum = meshes->GetCount();
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
+  int i = 0/*, meshnum = meshes->GetCount()*/;
+  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshes->GetCount());
   int numSSM = 0;
   iShader* shader = NULL;
-  for (i = 0; i < meshnum; i++)
+  while (true)
   {
     iMeshWrapper* mw;
     iVisibilityObject* visobj;
     csRenderMesh* mesh;
-    meshes->Get (i, mw, visobj, mesh);
+    if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
+    /*
+     @@@!!! That should of course NOT be necessary,
+      but otherwise there's some corruption (at least w/ genmesh).
+     Seems that it has some side effect we have to find out.
+     */
+    int n;
+    mw->GetRenderMeshes(n);
+
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
+      csVector3 ((i & 1), (i & 2) >> 1, (i & 4) >> 2));
 
     if (!mesh) continue;
-    if (visobj->GetVisibilityNumber() != visnr) continue;
 
+    mesh->material->Visit(); // @@@ here?
     iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader();
-    if (meshShader != shader)
+/*    if (meshShader != shader)
     {
-      RenderMeshes (r3d, meshShader, sameShaderMeshes, numSSM);
+      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
 
       shader = meshShader;
       numSSM = 0;
     }
-    sameShaderMeshes[numSSM++] = mesh;
+    sameShaderMeshes[numSSM++] = mesh;*/
+    // for now, so different objects are colored
+    RenderMeshes (r3d, meshShader, &mesh, 1);
   }
 
   if (numSSM != 0)
@@ -265,7 +265,7 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   //if (s) s->Draw (&rview);
   if (s)
   {
-    rview.SetThisSector (s);
+    s->PrepareDraw (&rview);
 
     int i;
     for (i = 0; i < steps.Length(); i++)
@@ -294,6 +294,8 @@ void csRenderLoop::Draw (iCamera *c, iClipper2D *view)
   }*/
 
   engine->G3D->SetClipper (NULL, CS_CLIPPER_NONE);
+
+  //csSleep (1000);
 }
 
 #endif
