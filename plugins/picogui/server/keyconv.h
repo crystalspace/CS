@@ -31,7 +31,7 @@ class csPGKeyConverter
 {
  private:
   static int Chars [256];
-  static int Codes [CSKEY_LAST - CSKEY_FIRST + 1];
+  static int Codes [CSKEY_SPECIAL_LAST - CSKEY_SPECIAL_FIRST + 1];
 
  public:
   /// Initialize the converter.

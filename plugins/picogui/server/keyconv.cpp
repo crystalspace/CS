@@ -19,6 +19,8 @@
 
 #include "cssysdef.h"
 #include "iutil/event.h"
+#include "iutil/evdefs.h"
+#include "csutil/event.h"
 #include "keyconv.h"
 
 extern "C"
@@ -27,7 +29,7 @@ extern "C"
 }
 
 int csPGKeyConverter::Chars [256];
-int csPGKeyConverter::Codes [CSKEY_LAST - CSKEY_FIRST + 1];
+int csPGKeyConverter::Codes [CSKEY_SPECIAL_LAST - CSKEY_SPECIAL_FIRST + 1];
 
 void csPGKeyConverter::Construct ()
 {
@@ -38,7 +40,7 @@ void csPGKeyConverter::Construct ()
   #undef CODE
   #endif
   #define CHAR(CS, PG) Chars[(int) CS] = (PG);
-  #define CODE(CS, PG) Codes[(CS) - CSKEY_FIRST] = (PG);
+  #define CODE(CS, PG) Codes[(CS) - CSKEY_SPECIAL_FIRST] = (PG);
     #include "../keyconv.i"
   #undef CHAR
   #undef CODE
@@ -47,10 +49,10 @@ void csPGKeyConverter::Construct ()
 int csPGKeyConverter::CS2PG (iEvent &ev)
 {
   CS_ASSERT (CS_IS_KEYBOARD_EVENT (ev));
-  if (ev.Key.Char < 256 && ev.Key.Char > 0)
-    return Chars [ev.Key.Code];
-  else if (ev.Key.Code >= CSKEY_FIRST && ev.Key.Code <= CSKEY_LAST)
-    return Codes [ev.Key.Code - CSKEY_FIRST];
+  if (csKeyEventHelper::GetRawCode (&ev) < 256 && csKeyEventHelper::GetRawCode (&ev) > 0)
+    return Chars [csKeyEventHelper::GetCookedCode (&ev)];
+  else if (CSKEY_IS_SPECIAL (csKeyEventHelper::GetRawCode (&ev)) )
+    return Codes [CSKEY_SPECIAL_NUM (csKeyEventHelper::GetRawCode (&ev)) ];
   else
     CS_ASSERT (0);
   return 0;
@@ -60,8 +62,10 @@ int csPGKeyConverter::CS2PGMod (iEvent &ev)
 {
   CS_ASSERT (CS_IS_KEYBOARD_EVENT (ev));
   int mod = 0;
-  if (ev.Key.Modifiers & CSMASK_SHIFT)	mod |= PGMOD_SHIFT;
-  if (ev.Key.Modifiers & CSMASK_CTRL)	mod |= PGMOD_CTRL;
-  if (ev.Key.Modifiers & CSMASK_ALT)	mod |= PGMOD_ALT;
+  csKeyModifiers modifiers;
+  csKeyEventHelper::GetModifiers (&ev, modifiers);
+  if (modifiers.modifiers[csKeyModifierTypeShift] !=0)	mod |= PGMOD_SHIFT;
+  if (modifiers.modifiers[csKeyModifierTypeCtrl] !=0)	mod |= PGMOD_CTRL;
+  if (modifiers.modifiers[csKeyModifierTypeAlt] !=0)	mod |= PGMOD_ALT;
   return mod;
 }

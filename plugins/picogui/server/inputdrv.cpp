@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/event.h"
+#include "csutil/event.h"
 #include "iutil/evdefs.h"
 
 extern "C"
@@ -102,16 +103,22 @@ bool csPGInputHandler::HandleEvent (iEvent &ev)
   static int mbstate;
   switch (ev.Type)
   {
-    case csevKeyDown:
-    infilter_send_key (PG_TRIGGER_KEYDOWN,
-      csPGKeyConverter::CS2PG (ev), csPGKeyConverter::CS2PGMod (ev));
-    return true;
-
-    case csevKeyUp:
-    infilter_send_key (PG_TRIGGER_KEYUP,
-      csPGKeyConverter::CS2PG (ev), csPGKeyConverter::CS2PGMod (ev));
-    return true;
-
+    case csevKeyboard:
+    if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
+    {
+      infilter_send_key (PG_TRIGGER_KEYDOWN,
+        csPGKeyConverter::CS2PG (ev), csPGKeyConverter::CS2PGMod (ev));
+      return true;
+      break;
+    }
+    if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp)
+    {
+      infilter_send_key (PG_TRIGGER_KEYUP,
+        csPGKeyConverter::CS2PG (ev), csPGKeyConverter::CS2PGMod (ev));
+      return true;
+      break;
+    }
+    
     case csevMouseDown:
     mbstate |= 1<<(ev.Mouse.Button-1);
     infilter_send_pointing (PG_TRIGGER_DOWN, ev.Mouse.x, ev.Mouse.y,

@@ -22,7 +22,7 @@ chronological order.
 	  the assumption that the huge file size is what is triggering the
 	  server to drop the connection.  Enabling compression seems to
 	  side-step the problem.
-        - Andreas Busch changed pgtest to use new keyeventhandling.
+        - Andreas Busch changed pgtest and pgserver to use new keyeventhandling.
 	- Eric Sunshine removed an unportable #include <memory.h> from
 	  bitarray.h.  This header is not present on all platforms.
 	- Eric Sunshine augmented the Swig rules in the makefiles and in Jam
