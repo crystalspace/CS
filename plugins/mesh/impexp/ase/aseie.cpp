@@ -36,7 +36,7 @@
 typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
   const char *Token);
 
-class csModelConverterASE : iModelConverter
+class csModelConverterASE : public iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;

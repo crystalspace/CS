@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Dec-2003
+	- Eric Sunshine applied patch from Randall Foreman
+          <eidpers@comcast.net>.  csModelConverterASE was accidentally
+          inheriting iModelConverter privately, rather than publicly.
 12-Dec-2003
 	- res added a 'console control handler' for Win32.  It handles proper
           shutdown of the app in case the 'Close' button on the console window
