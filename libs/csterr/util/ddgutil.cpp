@@ -33,7 +33,7 @@
 bool ddgUtil::DetectSIMD(void)
 {
 bool found_simd = false;
-#if defined(COMP_VC) || defined (COMP_BC)
+#if defined(WIN32) && !defined(COMP_GCC)
 _asm
 {
 pushfd
@@ -65,10 +65,6 @@ jmp DONE
 NO_SIMD:
 mov found_simd,0
 DONE:
-#else
-// temp fix for COMP_GCC until Gnu-assembler can be implemented and
-// integrated, set found_simd to force PentIII result to "false"
-found_simd=0;
 #endif
 return found_simd;
 }
