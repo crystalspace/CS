@@ -431,7 +431,7 @@ void csGraphics2DDDraw8::SetRGB (int i, int r, int g, int b)
 bool csGraphics2DDDraw8::SetMouseCursor (csMouseCursorID iShape)
 {
   bool success;
-  if (!System->SystemExtension ("SetCursor", iShape, &success))
+  if (!System->PerformExtension ("SetCursor", iShape, &success))
     return false;
 
   return success;

@@ -36,7 +36,7 @@ CrystGlideView::~CrystGlideView()
 
 void CrystGlideView::UserAction() const
 {
-  system->SystemExtension("UserAction", Looper()->CurrentMessage());
+  system->PerformExtension("UserAction", Looper()->CurrentMessage());
 }
 
 void CrystGlideView::KeyDown(char const* bytes, int32 numBytes)
@@ -111,8 +111,8 @@ void CrystGlideWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGlideWindow::QuitRequested()
 {
-  system->SystemExtension("ContextClose", g2d);
-  system->SystemExtension("Quit");
+  system->PerformExtension("ContextClose", g2d);
+  system->PerformExtension("Quit");
   return false; // Allow Crystal Space to close window itself.
 }
 

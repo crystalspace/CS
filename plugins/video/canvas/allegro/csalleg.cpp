@@ -146,7 +146,7 @@ bool csGraphics2DAlleg::Open (const char* Title)
   Memory = (unsigned char *) bitmap->dat;
 
   // Tell printf() to shut up
-  System->SystemExtension ("EnablePrintf", false);
+  System->PerformExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -209,7 +209,7 @@ void csGraphics2DAlleg::Close (void)
   bitmap = NULL;
   Memory = NULL;
   csGraphics2D::Close ();
-  System->SystemExtension ("EnablePrintf", true);
+  System->PerformExtension ("EnablePrintf", true);
   set_gfx_mode (GFX_TEXT, 0, 0, 0, 0);
   opened = false;
 }

@@ -101,7 +101,7 @@ bool csFancyConsole::Initialize (iSystem *system)
     return false;
 
   int x, y, w, h;
-  base->ConsoleExtension("GetPos", &x, &y, &w, &h);
+  base->PerformExtension("GetPos", &x, &y, &w, &h);
   outersize.Set (x, y, x + w, y + h);
 
   return true;
@@ -140,7 +140,7 @@ void csFancyConsole::PutText (int iMode, const char *iText)
   if (auto_update && system_ready && G3D->BeginDraw (CSDRAW_2DGRAPHICS))
   {
     int bgcolor;
-    base->ConsoleExtension("GetBackgroundColor", &bgcolor);
+    base->PerformExtension("GetBackgroundColor", &bgcolor);
     G2D->Clear (bgcolor);
     csRect rect2;
     Draw2D (&rect2);
@@ -363,8 +363,8 @@ void csFancyConsole::DrawBorder (int x, int y, int width, int height,
 
 void csFancyConsole::SetPosition (int x, int y, int width, int height)
 {
-  base->ConsoleExtension("SetPos", x, y, width, height);
-  base->ConsoleExtension("GetPos", &x, &y, &width, &height);
+  base->PerformExtension("SetPos", x, y, width, height);
+  base->PerformExtension("GetPos", &x, &y, &width, &height);
   csRect size;
   size.Set (x, y, x + width, y + height);
   outersize.Set (size);
@@ -381,7 +381,7 @@ void csFancyConsole::SetPosition (int x, int y, int width, int height)
     size.ymin +=  bordersize.ymin - deco.p2ty - deco.ty;
     size.ymax += -bordersize.ymax + deco.p2by + deco.by;
     // call again with the final size
-    base->ConsoleExtension(
+    base->PerformExtension(
       "SetPos", size.xmin, size.ymin, size.Width(), size.Height());
   }
 }
@@ -518,16 +518,16 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   }
 }
 
-bool csFancyConsole::ConsoleExtension (const char *iCommand, ...)
+bool csFancyConsole::PerformExtension (const char *iCommand, ...)
 {
   va_list args;
   va_start (args, iCommand);
-  bool rc = ConsoleExtensionV(iCommand, args);
+  bool rc = PerformExtensionV(iCommand, args);
   va_end (args);
   return rc;
 }
 
-bool csFancyConsole::ConsoleExtensionV (const char *iCommand, va_list args)
+bool csFancyConsole::PerformExtensionV (const char *iCommand, va_list args)
 {
   bool rc = true;
   if (!strcmp (iCommand, "GetPos"))
@@ -547,6 +547,6 @@ bool csFancyConsole::ConsoleExtensionV (const char *iCommand, va_list args)
     SetPosition (x, y, w, h);
   }
   else
-    rc = base->ConsoleExtensionV(iCommand, args);
+    rc = base->PerformExtensionV(iCommand, args);
   return rc;
 }

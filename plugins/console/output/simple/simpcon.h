@@ -202,11 +202,11 @@ public:
   { Client = iClient; }
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, ...)
+  virtual bool PerformExtension (const char *iCommand, ...)
   { (void)iCommand; return false; }
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtensionV (const char *iCommand, va_list args)
+  virtual bool PerformExtensionV (const char *iCommand, va_list args)
   { (void)iCommand; (void)args; return false; }
 
   // Implement iPlugIn interface.

@@ -188,7 +188,7 @@ void NeXTDriver2D::setup_rgb_32()
 bool NeXTDriver2D::system_extension(
   char const* msg, void* data1, void* data2) const
 {
-  return System->SystemExtension(msg, data1, data2);
+  return System->PerformExtension(msg, data1, data2);
 }
 
 N2D_PROTO(int,system_extension)
@@ -203,7 +203,7 @@ void NeXTDriver2D::user_close() const
 {
   System->GetSystemEventOutlet()->Broadcast(
     cscmdContextClose, (iGraphics2D*)this);
-  System->SystemExtension("requestshutdown");
+  System->PerformExtension("requestshutdown");
 }
 
 N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)

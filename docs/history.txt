@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	  which had occurred prior to the call to Initialize(), thus requested
 	  plugins were not being loaded, and programs would crash in the
 	  absence of those plugins.
+	- Eric Sunshine renamed the following methods for API consistency:
+	    iSystem::SystemExtension()          --> PerformExtension()
+	    iConsoleOutput::ConsoleExtension()  --> PerformExtension()
+	    iConsoleOutput::ConsoleExtensionV() --> PerformExtentionV()
+	  These names now complement the existing PerformExtension() method of
+	  iGrahpics2D.
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem

@@ -83,7 +83,7 @@ bool csGraphics2DGLBe::Open(char const* title)
     window->Unlock();
   }
   window->Flush();
-  System->SystemExtension("BeginUI");
+  System->PerformExtension("BeginUI");
 
   return superclass::Open(title);
 }
@@ -124,7 +124,7 @@ void csGraphics2DGLBe::Print(csRect*)
 
 bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
 {
-  return System->SystemExtension("SetCursor", shape);
+  return System->PerformExtension("SetCursor", shape);
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)

@@ -145,7 +145,7 @@ bool csGraphics2DDOSRAW::Open (const char* Title)
 #endif // USE_ALLEGRO
 
   // Tell printf() to shut up
-  System->SystemExtension ("EnablePrintf", false);
+  System->PerformExtension ("EnablePrintf", false);
 
   // Update drawing routine addresses
   switch (pfmt.PixelBytes)
@@ -182,7 +182,7 @@ void csGraphics2DDOSRAW::Close ()
 #endif // USE_ALLEGRO
   csGraphics2D::Close ();
   // Tell printf() it can work now
-  System->SystemExtension ("EnablePrintf", true);
+  System->PerformExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DDOSRAW::Print (csRect *area)
@@ -223,7 +223,7 @@ void csGraphics2DDOSRAW::Print (csRect *area)
 
 bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
 {
-  return System->SystemExtension ("SetMousePosition", x, y);
+  return System->PerformExtension ("SetMousePosition", x, y);
 }
 
 bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)

@@ -127,7 +127,7 @@ void NeXTSystemDriver::advance_state()
 
 
 //-----------------------------------------------------------------------------
-// SystemExtension
+// PerformExtension
 //
 // Perform a system-specific extension.  The following requests are understood:
 //
@@ -186,7 +186,7 @@ void NeXTSystemDriver::advance_state()
 // the Crystal Space coordinate system where `x' increases from left to right,
 // and `y' increases from top to bottom.
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::SystemExtension(char const* cmd, ...)
+bool NeXTSystemDriver::PerformExtension(char const* cmd, ...)
 {
   bool ok = true;
   va_list args;
@@ -254,7 +254,7 @@ bool NeXTSystemDriver::SystemExtension(char const* cmd, ...)
 
 NSD_PROTO(int,system_extension)
   (NeXTSystemHandle h, char const* msg, void* d1, void* d2, void* d3)
-  { return ((NeXTSystemDriver*)h)->SystemExtension(msg, d1, d2, d3); }
+  { return ((NeXTSystemDriver*)h)->PerformExtension(msg, d1, d2, d3); }
 
 
 //-----------------------------------------------------------------------------

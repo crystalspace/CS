@@ -142,10 +142,10 @@ public:
   { Client = iClient; }
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, ...);
+  virtual bool PerformExtension (const char *iCommand, ...);
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtensionV (const char *iCommand, va_list);
+  virtual bool PerformExtensionV (const char *iCommand, va_list);
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn

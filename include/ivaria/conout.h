@@ -157,10 +157,10 @@ struct iConsoleOutput : public iBase
   virtual void RegisterWatcher (iConsoleWatcher*) = 0;
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtension (const char *iCommand, ...) = 0;
+  virtual bool PerformExtension (const char *iCommand, ...) = 0;
 
   /// Implement simple extension commands.
-  virtual bool ConsoleExtensionV (const char *iCommand, va_list) = 0;
+  virtual bool PerformExtensionV (const char *iCommand, va_list) = 0;
 };
 
 #endif // __IVARIA_CONOUT_H__

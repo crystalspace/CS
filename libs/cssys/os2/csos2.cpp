@@ -40,7 +40,7 @@ void SysSystemDriver::Sleep (int SleepTime)
   DosSleep (SleepTime);
 }
 
-bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
+bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
 {
   if (!strcmp (iCommand, "StartGUI"))
   {

@@ -144,14 +144,14 @@ int32 SysSystemDriver::ThreadEntry(void* p)
   SysSystemDriver* sys = (SysSystemDriver*)p;
   be_app->Lock();		// Thread invoking Run() must hold lock.
   be_app->Run();
-  sys->SystemExtension("Quit");	// BApplication terminated, so ask CS to quit.
+  sys->PerformExtension("Quit");	// BApplication terminated, so ask CS to quit.
   return 0;
 }
 
 
 //-----------------------------------------------------------------------------
 // Whenever a 2D driver (canvas) is about to place a window on-screen, it asks
-// the system driver -- via SystemExtension("BeginUI") -- to ensure that the
+// the system driver -- via PerformExtension("BeginUI") -- to ensure that the
 // BeOS event loop is active so that it can respond to events in window.  This
 // method runs the BApplication in a subthread the first time "BeginUI" is
 // requested.
@@ -223,7 +223,7 @@ void SysSystemDriver::NextFrame()
 //	ContextClose <iGraphics2D*>
 //	    Notify Crystal Space that a 2D graphics context is closing.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::SystemExtension(char const* cmd, ...)
+bool SysSystemDriver::PerformExtension(char const* cmd, ...)
 {
   bool ok = false;
   va_list args;

@@ -94,7 +94,7 @@ bool csGraphics2DBeLib::Open(char const* title)
     window->Flush();
 	
     Memory = (unsigned char*)bitmap->Bits();
-    System->SystemExtension("BeginUI");
+    System->PerformExtension("BeginUI");
   }
   return ok;
 }
@@ -126,7 +126,7 @@ void csGraphics2DBeLib::Print(csRect* cr)
 
 bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
-  return System->SystemExtension("SetCursor", shape);
+  return System->PerformExtension("SetCursor", shape);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)

@@ -697,7 +697,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
+bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
 {
   va_list args;
   va_start (args, iCommand);

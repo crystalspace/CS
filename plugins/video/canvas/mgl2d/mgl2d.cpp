@@ -143,7 +143,7 @@ bool csGraphics2DMGL::Open (const char *Title)
   }
   MGL_makeCurrentDC (dc);
 
-  System->SystemExtension ("EnablePrintf", false);
+  System->PerformExtension ("EnablePrintf", false);
 
   pixel_format_t pf;
   MGL_getPixelFormat (dc, &pf);
@@ -198,7 +198,7 @@ void csGraphics2DMGL::Close ()
   }
   csGraphics2D::Close ();
 
-  System->SystemExtension ("EnablePrintf", true);
+  System->PerformExtension ("EnablePrintf", true);
 }
 
 void csGraphics2DMGL::AllocateBackBuffer ()

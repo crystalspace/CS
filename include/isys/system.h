@@ -232,7 +232,7 @@ struct iSystem : public iBase
    * a new SCF interface and so on, better just override this function and
    * use it.
    */
-  virtual bool SystemExtension (const char *iCommand, ...) = 0;
+  virtual bool PerformExtension (const char *iCommand, ...) = 0;
 
   /**
    * Suspend the engine's virtual-time clock.<p>

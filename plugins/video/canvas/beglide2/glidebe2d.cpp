@@ -97,7 +97,7 @@ bool csGraphics2DBeGlide::Open(char const* title)
     window->Flush();
 
     Memory = (unsigned char*)bitmap->Bits();
-    System->SystemExtension("BeginUI");
+    System->PerformExtension("BeginUI");
   }
   return ok;
 }
@@ -121,7 +121,7 @@ void csGraphics2DBeGlide::Print (csRect* r)
 
 bool csGraphics2DBeGlide::SetMouseCursor(csMouseCursorID shape)
 {
-  return System->SystemExtension("SetCursor", shape);
+  return System->PerformExtension("SetCursor", shape);
 }
 
 void csGraphics2DBeGlide::FXgetImage(csRect* cr)

@@ -364,7 +364,7 @@ public:
   /// Print a string to the specified device.
   virtual void Printf (int mode, const char *format, ...);
   /// Execute a system-dependent extension command.
-  virtual bool SystemExtension (const char *iCommand, ...)
+  virtual bool PerformExtension (const char *iCommand, ...)
   { (void)iCommand; return false; }
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}

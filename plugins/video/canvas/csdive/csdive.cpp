@@ -108,7 +108,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  System->SystemExtension ("StartGUI");
+  System->PerformExtension ("StartGUI");
 
   // Initialize DIVE
   if (!gdDiveInitialize ())

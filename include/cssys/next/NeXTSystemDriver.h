@@ -45,7 +45,7 @@ public:
   NeXTSystemDriver();
   virtual ~NeXTSystemDriver();
   virtual bool Initialize(int argc, char const* const argv[], char const*);
-  virtual bool SystemExtension(char const*, ...);
+  virtual bool PerformExtension(char const*, ...);
   virtual void Loop();
 
   // Implement iEventPlug interface.

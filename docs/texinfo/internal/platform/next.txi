@@ -248,7 +248,7 @@ An Objective-C subclass of the AppKit's @samp{NSView} (Cocoa and OpenStep) or
 @samp{View} (NextStep) class.  This is the view where the rendered scene from
 Crystal Space is actually displayed.  This class also forwards received
 keyboard and mouse events to the system driver for interpretation and handling
-via the @code{iSystem::SystemExtension("dispatchevent")} interface.
+via the @code{iSystem::PerformExtension("dispatchevent")} interface.
 
 @item NeXTFrameBuffer.h
 An abstract 2D frame buffer class which defines the interface of objects which

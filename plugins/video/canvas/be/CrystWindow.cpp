@@ -36,7 +36,7 @@ CrystView::~CrystView()
 
 void CrystView::UserAction() const
 {
-  system->SystemExtension("UserAction", Looper()->CurrentMessage());
+  system->PerformExtension("UserAction", Looper()->CurrentMessage());
 }
 
 void CrystView::KeyDown(char const *bytes, int32 numBytes)
@@ -93,7 +93,7 @@ CrystWindow::~CrystWindow()
 
 bool CrystWindow::QuitRequested()
 {
-  system->SystemExtension("ContextClose", g2d);
-  system->SystemExtension("Quit");
+  system->PerformExtension("ContextClose", g2d);
+  system->PerformExtension("Quit");
   return false; // Allow Crystal Space to close window itself.
 }
