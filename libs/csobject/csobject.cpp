@@ -137,11 +137,6 @@ IMPLEMENT_IBASE (csObject)
   IMPLEMENTS_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
-void *csObject::QueryObjectType (int Type)
-{
-  return NULL;
-}
-
 csObject::csObject () : csBase (), iObject (), children (NULL), Name (NULL)
 {
   CONSTRUCT_IBASE (NULL);

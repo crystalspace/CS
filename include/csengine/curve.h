@@ -270,7 +270,6 @@ public:
   virtual void HardTransform (const csReversibleTransform& trans);
   
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------
@@ -324,7 +323,6 @@ public:
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csObject);
 
   //------------------ iCurveTemplate interface implementation --------------
@@ -371,7 +369,6 @@ public:
   virtual int NumVertices ();
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 };
 
 /**
@@ -426,7 +423,6 @@ public:
   virtual void HardTransform (const csReversibleTransform& trans);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 };
 
 #endif // __CS_CURVE_H__

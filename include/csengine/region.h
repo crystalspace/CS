@@ -73,7 +73,6 @@ public:
   virtual bool IsInRegion (iObject* obj);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //--------------------- iRegion implementation ---------------------

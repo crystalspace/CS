@@ -39,7 +39,6 @@ struct iGraphics3D;
 struct iSoundRender;
 struct iMotionManager;
 struct iLoaderPlugIn;
-struct iStringServer;
 
 struct iObject;
 struct iThing;
@@ -214,8 +213,6 @@ public:
   iSoundRender *SoundRender;
   // motion manager
   iMotionManager *MotionManager;
-  // string server
-  iStringServer *StringServer;
 
   // constructor
   csLoader(iBase *p);

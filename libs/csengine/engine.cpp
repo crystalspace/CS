@@ -65,7 +65,6 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
 #include "imap/reader.h"
-#include "ivaria/strserv.h"
 
 //---------------------------------------------------------------------------
 
@@ -401,63 +400,7 @@ INTERFACE_ID_VAR (csCollider);
 INTERFACE_ID_VAR (csRadPoly);
 INTERFACE_ID_VAR (csRadCurve);
 
-ALLOCATE_OBJECT_TYPE (iEngine)
-ALLOCATE_OBJECT_TYPE (csEngine)
-ALLOCATE_OBJECT_TYPE (iLight)
-ALLOCATE_OBJECT_TYPE (csLight)
-ALLOCATE_OBJECT_TYPE (iStatLight)
-ALLOCATE_OBJECT_TYPE (csStatLight)
-ALLOCATE_OBJECT_TYPE (iDynLight)
-ALLOCATE_OBJECT_TYPE (csDynLight)
-ALLOCATE_OBJECT_TYPE (iSector)
-ALLOCATE_OBJECT_TYPE (csSector)
-ALLOCATE_OBJECT_TYPE (iMeshWrapper)
-ALLOCATE_OBJECT_TYPE (csMeshWrapper)
-ALLOCATE_OBJECT_TYPE (iMeshFactoryWrapper)
-ALLOCATE_OBJECT_TYPE (csMeshFactoryWrapper)
-ALLOCATE_OBJECT_TYPE (iTerrainWrapper)
-ALLOCATE_OBJECT_TYPE (csTerrainWrapper)
-ALLOCATE_OBJECT_TYPE (iTerrainFactoryWrapper)
-ALLOCATE_OBJECT_TYPE (csTerrainFactoryWrapper)
-ALLOCATE_OBJECT_TYPE (iKeyValuePair)
-ALLOCATE_OBJECT_TYPE (csKeyValuePair)
-ALLOCATE_OBJECT_TYPE (iMapNode)
-ALLOCATE_OBJECT_TYPE (csMapNode)
-ALLOCATE_OBJECT_TYPE (iCurve)
-ALLOCATE_OBJECT_TYPE (csCurve)
-ALLOCATE_OBJECT_TYPE (iCurveTemplate)
-ALLOCATE_OBJECT_TYPE (csCurveTemplate)
-ALLOCATE_OBJECT_TYPE (iTextureWrapper)
-ALLOCATE_OBJECT_TYPE (csTextureWrapper)
-ALLOCATE_OBJECT_TYPE (iMaterialWrapper)
-ALLOCATE_OBJECT_TYPE (csMaterialWrapper)
-ALLOCATE_OBJECT_TYPE (iCameraPosition)
-ALLOCATE_OBJECT_TYPE (csCameraPosition)
-ALLOCATE_OBJECT_TYPE (iPolyTxtPlane)
-ALLOCATE_OBJECT_TYPE (csPolyTxtPlane)
-ALLOCATE_OBJECT_TYPE (iCollection)
-ALLOCATE_OBJECT_TYPE (csCollection)
-ALLOCATE_OBJECT_TYPE (csRadPoly)
-ALLOCATE_OBJECT_TYPE (csRadCurve)
-ALLOCATE_OBJECT_TYPE (csCollider)
-ALLOCATE_OBJECT_TYPE (iThing)
-ALLOCATE_OBJECT_TYPE (csThing)
-ALLOCATE_OBJECT_TYPE (iThingState)
-ALLOCATE_OBJECT_TYPE (iPolygonMesh)
-ALLOCATE_OBJECT_TYPE (iPolygon3D)
-ALLOCATE_OBJECT_TYPE (csPolygon3D)
-ALLOCATE_OBJECT_TYPE (csBezierCurve)
-ALLOCATE_OBJECT_TYPE (csBezierTemplate)
-ALLOCATE_OBJECT_TYPE (csRadElement)
-ALLOCATE_OBJECT_TYPE (csRadPolygon)
-ALLOCATE_OBJECT_TYPE (csRegion)
-ALLOCATE_OBJECT_TYPE (iRegion)
-
 IMPLEMENT_CSOBJTYPE (csEngine,csObject);
-
-IMPLEMENT_OBJECT_INTERFACE (csEngine)
-  IMPLEMENTS_OBJECT_TYPE (iEngine)
-IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE (csEngine)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -568,67 +511,7 @@ bool csEngine::Initialize (iSystem* sys)
 
   System = sys;
 
-  // initialize RTTI system
-  iStringServer *StrServ =
-    QUERY_PLUGIN_ID (sys, CS_FUNCID_STRSERV, iStringServer);
-  if (!StrServ)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Failed to initialize engine: no string server.\n");
-    return false;
-  }
-  INITIALIZE_OBJECT_TYPE (StrServ, iEngine)
-  INITIALIZE_OBJECT_TYPE (StrServ, csEngine)
-  INITIALIZE_OBJECT_TYPE (StrServ, iLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, csLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, iStatLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, csStatLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, iDynLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, csDynLight)
-  INITIALIZE_OBJECT_TYPE (StrServ, iSector)
-  INITIALIZE_OBJECT_TYPE (StrServ, csSector)
-  INITIALIZE_OBJECT_TYPE (StrServ, iMeshWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csMeshWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iMeshFactoryWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csMeshFactoryWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iTerrainWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csTerrainWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iTerrainFactoryWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csTerrainFactoryWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iKeyValuePair)
-  INITIALIZE_OBJECT_TYPE (StrServ, csKeyValuePair)
-  INITIALIZE_OBJECT_TYPE (StrServ, iMapNode)
-  INITIALIZE_OBJECT_TYPE (StrServ, csMapNode)
-  INITIALIZE_OBJECT_TYPE (StrServ, iCurve)
-  INITIALIZE_OBJECT_TYPE (StrServ, csCurve)
-  INITIALIZE_OBJECT_TYPE (StrServ, iCurveTemplate)
-  INITIALIZE_OBJECT_TYPE (StrServ, csCurveTemplate)
-  INITIALIZE_OBJECT_TYPE (StrServ, iTextureWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csTextureWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iMaterialWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, csMaterialWrapper)
-  INITIALIZE_OBJECT_TYPE (StrServ, iCameraPosition)
-  INITIALIZE_OBJECT_TYPE (StrServ, csCameraPosition)
-  INITIALIZE_OBJECT_TYPE (StrServ, iPolyTxtPlane)
-  INITIALIZE_OBJECT_TYPE (StrServ, csPolyTxtPlane)
-  INITIALIZE_OBJECT_TYPE (StrServ, iCollection)
-  INITIALIZE_OBJECT_TYPE (StrServ, csCollection)
-  INITIALIZE_OBJECT_TYPE (StrServ, csRadPoly)
-  INITIALIZE_OBJECT_TYPE (StrServ, csRadCurve)
-  INITIALIZE_OBJECT_TYPE (StrServ, csCollider)
-  INITIALIZE_OBJECT_TYPE (StrServ, iThing)
-  INITIALIZE_OBJECT_TYPE (StrServ, csThing)
-  INITIALIZE_OBJECT_TYPE (StrServ, iThingState)
-  INITIALIZE_OBJECT_TYPE (StrServ, iPolygonMesh)
-  INITIALIZE_OBJECT_TYPE (StrServ, iPolygon3D)
-  INITIALIZE_OBJECT_TYPE (StrServ, csPolygon3D)
-  INITIALIZE_OBJECT_TYPE (StrServ, csBezierCurve)
-  INITIALIZE_OBJECT_TYPE (StrServ, csBezierTemplate)
-  INITIALIZE_OBJECT_TYPE (StrServ, csRadElement)
-  INITIALIZE_OBJECT_TYPE (StrServ, csRadPolygon)
-  INITIALIZE_OBJECT_TYPE (StrServ, csRegion)
-  INITIALIZE_OBJECT_TYPE (StrServ, iRegion)
-  StrServ->DecRef ();
-
+  // initialize interface IDs (for QUERY_INTERFACE_FAST)
   INITIALIZE_INTERFACE_VAR (iEngine);
   INITIALIZE_INTERFACE_VAR (iSector);
   INITIALIZE_INTERFACE_VAR (iMeshWrapper);

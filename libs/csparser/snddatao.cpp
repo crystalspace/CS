@@ -24,14 +24,7 @@
 #include "csparser/snddatao.h"
 #include "csobject/csobject.h"
 
-DECLARE_OBJECT_TYPE (csSoundWrapper);
-DECLARE_OBJECT_TYPE (iSoundWrapper);
-
 IMPLEMENT_CSOBJTYPE (csSoundWrapper, csObject);
-
-IMPLEMENT_OBJECT_INTERFACE (csSoundWrapper)
-  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iSoundWrapper)
-IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE (csSoundWrapper);
   IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);

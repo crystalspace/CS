@@ -103,7 +103,6 @@ public:
   iObject* operator[] (int i) { return (iObject*) (objects[i]); }
   
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //------------------------- iCollection interface --------------------------

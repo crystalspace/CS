@@ -86,7 +86,6 @@ public:
   static csCollider* GetCollider (csObject& object);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csPObject);
 };
 

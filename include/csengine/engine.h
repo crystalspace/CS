@@ -94,58 +94,6 @@ extern INTERFACE_ID_VAR (csCollider);
 extern INTERFACE_ID_VAR (csRadPoly);
 extern INTERFACE_ID_VAR (csRadCurve);
 
-DECLARE_OBJECT_TYPE (iEngine)
-DECLARE_OBJECT_TYPE (csEngine)
-DECLARE_OBJECT_TYPE (iLight)
-DECLARE_OBJECT_TYPE (csLight)
-DECLARE_OBJECT_TYPE (iStatLight)
-DECLARE_OBJECT_TYPE (csStatLight)
-DECLARE_OBJECT_TYPE (iDynLight)
-DECLARE_OBJECT_TYPE (csDynLight)
-DECLARE_OBJECT_TYPE (iSector)
-DECLARE_OBJECT_TYPE (csSector)
-DECLARE_OBJECT_TYPE (iMeshWrapper)
-DECLARE_OBJECT_TYPE (csMeshWrapper)
-DECLARE_OBJECT_TYPE (iMeshFactoryWrapper)
-DECLARE_OBJECT_TYPE (csMeshFactoryWrapper)
-DECLARE_OBJECT_TYPE (iTerrainWrapper)
-DECLARE_OBJECT_TYPE (csTerrainWrapper)
-DECLARE_OBJECT_TYPE (iTerrainFactoryWrapper)
-DECLARE_OBJECT_TYPE (csTerrainFactoryWrapper)
-DECLARE_OBJECT_TYPE (iKeyValuePair)
-DECLARE_OBJECT_TYPE (csKeyValuePair)
-DECLARE_OBJECT_TYPE (iMapNode)
-DECLARE_OBJECT_TYPE (csMapNode)
-DECLARE_OBJECT_TYPE (iCurve)
-DECLARE_OBJECT_TYPE (csCurve)
-DECLARE_OBJECT_TYPE (iCurveTemplate)
-DECLARE_OBJECT_TYPE (csCurveTemplate)
-DECLARE_OBJECT_TYPE (iTextureWrapper)
-DECLARE_OBJECT_TYPE (csTextureWrapper)
-DECLARE_OBJECT_TYPE (iMaterialWrapper)
-DECLARE_OBJECT_TYPE (csMaterialWrapper)
-DECLARE_OBJECT_TYPE (iCameraPosition)
-DECLARE_OBJECT_TYPE (csCameraPosition)
-DECLARE_OBJECT_TYPE (iPolyTxtPlane)
-DECLARE_OBJECT_TYPE (csPolyTxtPlane)
-DECLARE_OBJECT_TYPE (iCollection)
-DECLARE_OBJECT_TYPE (csCollection)
-DECLARE_OBJECT_TYPE (csRadPoly)
-DECLARE_OBJECT_TYPE (csRadCurve)
-DECLARE_OBJECT_TYPE (csCollider)
-DECLARE_OBJECT_TYPE (iThing)
-DECLARE_OBJECT_TYPE (csThing)
-DECLARE_OBJECT_TYPE (iThingState)
-DECLARE_OBJECT_TYPE (iPolygonMesh)
-DECLARE_OBJECT_TYPE (iPolygon3D)
-DECLARE_OBJECT_TYPE (csPolygon3D)
-DECLARE_OBJECT_TYPE (csBezierCurve)
-DECLARE_OBJECT_TYPE (csBezierTemplate)
-DECLARE_OBJECT_TYPE (csRadElement)
-DECLARE_OBJECT_TYPE (csRadPolygon)
-DECLARE_OBJECT_TYPE (csRegion)
-DECLARE_OBJECT_TYPE (iRegion)
-
 /**
  * Iterator to iterate over all static lights in the engine.
  * This iterator assumes there are no fundamental changes
@@ -1079,7 +1027,6 @@ public:
   }
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //--------------------- iPlugIn interface implementation --------------------

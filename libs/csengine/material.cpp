@@ -136,10 +136,6 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
 
-IMPLEMENT_OBJECT_INTERFACE (csMaterialWrapper)
-  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iMaterialWrapper)
-IMPLEMENT_OBJECT_INTERFACE_END
-
 csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   csPObject (), handle (NULL)
 {

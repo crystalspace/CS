@@ -53,13 +53,6 @@ struct iMaterialHandle;
 struct iLoader;
 
 // type information
-DECLARE_OBJECT_TYPE (csWalkEntity);
-DECLARE_OBJECT_TYPE (GhostSpriteInfo);
-DECLARE_OBJECT_TYPE (csDoor);
-DECLARE_OBJECT_TYPE (csRotatingObject);
-DECLARE_OBJECT_TYPE (csLightObject);
-DECLARE_OBJECT_TYPE (iSoundWrapper);
-
 extern INTERFACE_ID_VAR (csWalkEntity);
 extern INTERFACE_ID_VAR (GhostSpriteInfo);
 extern INTERFACE_ID_VAR (csDoor);

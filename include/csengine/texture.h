@@ -127,7 +127,6 @@ public:
   inline void Visit ();
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //-------------------- iTextureWrapper implementation -----------------------

@@ -72,7 +72,6 @@
 #include "iengine/motion.h"
 #include "ivaria/perfstat.h"
 #include "imap/parser.h"
-#include "ivaria/strserv.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -95,12 +94,6 @@ REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
-
-ALLOCATE_OBJECT_TYPE (csWalkEntity);
-ALLOCATE_OBJECT_TYPE (GhostSpriteInfo);
-ALLOCATE_OBJECT_TYPE (csDoor);
-ALLOCATE_OBJECT_TYPE (csRotatingObject);
-ALLOCATE_OBJECT_TYPE (csLightObject);
 
 INTERFACE_ID_VAR (csWalkEntity);
 INTERFACE_ID_VAR (GhostSpriteInfo);
@@ -1345,21 +1338,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
   engine = Engine->GetCsEngine ();
 
-  // Find the string server and initialize object types
-  iStringServer *StringServer = QUERY_PLUGIN_ID (Sys, CS_FUNCID_STRSERV, iStringServer);
-  if (!StringServer)
-  {
-    Printf (MSG_FATAL_ERROR, "No string server plugin!\n");
-    return false;
-  }
-  INITIALIZE_OBJECT_TYPE (StringServer, csWalkEntity);
-  INITIALIZE_OBJECT_TYPE (StringServer, GhostSpriteInfo);
-  INITIALIZE_OBJECT_TYPE (StringServer, csDoor);
-  INITIALIZE_OBJECT_TYPE (StringServer, csRotatingObject);
-  INITIALIZE_OBJECT_TYPE (StringServer, csLightObject);
-  INITIALIZE_OBJECT_TYPE (StringServer, iSoundWrapper);
-  StringServer->DecRef ();
-
+  // initialize interface IDs (for QUERY_INTERFACE_FAST)
   INITIALIZE_INTERFACE_VAR (csWalkEntity);
   INITIALIZE_INTERFACE_VAR (GhostSpriteInfo);
   INITIALIZE_INTERFACE_VAR (csDoor);

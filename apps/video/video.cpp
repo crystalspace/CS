@@ -363,7 +363,6 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.engine.core:Engine");
   System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-  System->RequestPlugin ("crystalspace.string.server:StringServer");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

@@ -20,7 +20,6 @@
 #define __IOBJECT_OBJECT_H__
 
 #include "csutil/scf.h"
-#include "iobject/rtti.h"
 
 struct iObjectIterator;
 
@@ -124,8 +123,6 @@ struct iObject : public iBase
    * remove child objects while iterating.
    */
   virtual iObjectIterator *GetIterator () = 0;
-
-  DECLARE_ABSTRACT_OBJECT_INTERFACE;
 };
 
 

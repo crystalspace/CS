@@ -25,9 +25,6 @@
 
 IMPLEMENT_CSOBJTYPE (csKeyValuePair,csObject);
 
-IMPLEMENT_OBJECT_INTERFACE (csKeyValuePair)
-IMPLEMENT_OBJECT_INTERFACE_END
-
 IMPLEMENT_IBASE_EXT (csKeyValuePair)
   IMPLEMENTS_EMBEDDED_INTERFACE (iKeyValuePair)
 IMPLEMENT_IBASE_EXT_END
@@ -58,9 +55,6 @@ void csKeyValuePair::SetValue (const char* value)
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csMapNode,csObject);
-
-IMPLEMENT_OBJECT_INTERFACE (csMapNode)
-IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE_EXT (csMapNode)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMapNode)

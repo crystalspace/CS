@@ -41,10 +41,6 @@ unsigned long csLight::last_light_id = 0;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
-IMPLEMENT_OBJECT_INTERFACE (csLight)
-  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iLight)
-IMPLEMENT_OBJECT_INTERFACE_END
-
 IMPLEMENT_IBASE_EXT (csLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
 IMPLEMENT_IBASE_EXT_END
@@ -210,10 +206,6 @@ iFlareHalo* csLight::Light::CreateFlareHalo ()
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
-
-IMPLEMENT_OBJECT_INTERFACE_EXT (csStatLight, csLight)
-  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iStatLight)
-IMPLEMENT_OBJECT_INTERFACE_EXT_END
 
 IMPLEMENT_IBASE_EXT (csStatLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
@@ -411,10 +403,6 @@ void csLightPatch::Initialize (int n)
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csDynLight,csLight);
-
-IMPLEMENT_OBJECT_INTERFACE_EXT (csDynLight, csLight)
-  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iDynLight)
-IMPLEMENT_OBJECT_INTERFACE_EXT_END
 
 IMPLEMENT_IBASE_EXT (csDynLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)

@@ -56,7 +56,6 @@
 #include "iengine/thing.h"
 #include "iengine/camera.h"
 #include "imesh/object.h"
-#include "iobject/rtti.h"
 #include "iobject/object.h"
 #include "imap/parser.h"
 
@@ -90,8 +89,6 @@ Blocks* Sys = NULL;
 
 REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)
-
-DECLARE_OBJECT_TYPE (iSoundWrapper);
 
 int Blocks::white, Blocks::black, Blocks::red;
 

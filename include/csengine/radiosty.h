@@ -320,7 +320,6 @@ public:
   static csRadElement* GetRadElement(csCurve &object);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 };
 
 
@@ -373,7 +372,6 @@ public:
   { GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
                     GetCoverageMatrix(*lview, *shadow_matrix); }
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csRadElement);
 };
 
@@ -422,7 +420,6 @@ public:
   { curve->GetCoverageMatrix(*lview, *shadow_matrix); }
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csRadElement);
 };
 

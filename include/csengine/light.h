@@ -233,7 +233,6 @@ public:
   static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 
   //------------------------ iLight interface -----------------------------
   DECLARE_IBASE_EXT (csObject);
@@ -373,7 +372,6 @@ public:
   void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 
   //------------------------ iStatLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);
@@ -617,7 +615,6 @@ public:
   csDynLight* GetPrev () { return prev; }
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE;
 
   //------------------------ iDynLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);
