@@ -7,11 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-Jan-2004
-        - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the 
-          required CAL3D library.
+        - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the
+	  required CAL3D library.
 	- Jorrit did some cleanups on the imposter code.
-	- Daniel Duhprey fixed scattering for 2 texture units for the
-	  terrain engine.
+	- Daniel Duhprey fixed scattering for 2 texture units for the terrain
+	  engine.
+	- Eric Sunshine updated configure.ac's Cal3D check to test for the very
+	  recently added features required by sprcal3d.
 6-Jan-2004
 	- Eric Sunshine changed the libbfd check in configure.ac so that it is
 	  not performed on Windows.  Newer versions of Mingw supply libbfd and
@@ -32,7 +34,7 @@ chronological order.
 	  csMatrix3.  Also moved implementation of axis-angle specifier
 	  constructor to .cpp file.  Removed unnecessary 'inline' keywords.
 5-Jan-2004
-	- res fixed sprcal3d so render buffers are created correctly for 
+	- res fixed sprcal3d so render buffers are created correctly for
 	  multi-mesh models.
 	- Keith Fulton added more functionality to sprcal3d and updated
  	  bbox calcs to be more efficient.   This requires cal3d cvs as
@@ -44,7 +46,7 @@ chronological order.
 	  order to pacify Borland C++Builder based upon a list of compiler
 	  diagnostic messages (and very loosely based upon a patch) provided by
 	  Randall Foreman <eidpers@comcast.net>.
-	- duhprey updated ODE so it now optionally updates on 
+	- duhprey updated ODE so it now optionally updates on
 	  cscmdPreProcess instead of calling Step
 	- duhprey attemped to fix the sky in terrain on ATI cards (from thebolt)
 4-Jan-2004
@@ -64,11 +66,11 @@ chronological order.
 	  removing tr_o2c.
 	- Jorrit optimized the spr3d mesh object in a similar manner by also
 	  removing tr_o2c.
-	- res fixed the stenciltest level from coming up black by including 
+	- res fixed the stenciltest level from coming up black by including
 	  the needed shaders in the material definition.
 	- res made the following changes:
 	  - Minor cosmetic change in initapp.h.
-	  - Fixed csHash<>::GlobalIterator::Reset(): it failed to properly 
+	  - Fixed csHash<>::GlobalIterator::Reset(): it failed to properly
 	    skip to the first element to be returned.
 	  - Made iShaderVariableAccessor a descendant of iBase (so it can be
 	    refcounted.)
@@ -297,8 +299,8 @@ chronological order.
 	  <holomorph@users.sourceforge.net> for csInputBinder::HandleEvent().
 	  It was completely ignoring key down events and mis-interpreting key
 	  up events as key down events.
-	- Steven Geens added sockets to sprcal3d. The PositionChild method 
-	  hasn't been implemented yet. Steven Geens also fixed some minor 
+	- Steven Geens added sockets to sprcal3d. The PositionChild method
+	  hasn't been implemented yet. Steven Geens also fixed some minor
 	  bugs in sprcal3d.h and configure.ac.
 	- Steven Geens implemented the PositionChild method of sprcal3d.
 	  The socket system should now be completely ready.
