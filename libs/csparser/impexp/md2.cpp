@@ -23,7 +23,7 @@
 */
 
 #include "sysdef.h"
-#include "csutil/impexp.h"
+#include "csparser/impexp.h"
 
 // all int's in an MD2 file are little endian
 #include "cssys/csendian.h"
