@@ -778,7 +778,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
-//  printf ("Number of tris: %i\n", tricnt);
+  printf ("Number of tris: %i\n", tricnt);
   tricnt = 0;
   SetMirrorMode (false);
 
@@ -914,9 +914,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   SetZMode (mymesh->z_buf_mode);
   SetMirrorMode (mymesh->do_mirror);
 
-  csRef<iMaterialHandle> mathandle;
+  csMaterialHandle* mathandle = NULL;
   if (mymesh->GetMaterialWrapper ())
-    mathandle = mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
+    mathandle = (csMaterialHandle*)(mymesh->GetMaterialWrapper ()->GetMaterialHandle ());
 
   glVertexPointer (3, GL_FLOAT, 0,
     (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
@@ -969,20 +969,22 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
     statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
     statecache->EnableState (GL_TEXTURE_2D);
+
+    alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
+    alpha = SetMixMode (mymesh->mixmode, alpha, 
+      txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
   } else {
     statecache->DisableState (GL_TEXTURE_2D);
 
     csRGBpixel color;
-    mathandle->GetFlatColor (color);
+    if (mathandle)
+      mathandle->GetFlatColor (color);
     
     red = BYTE_TO_FLOAT (color.red);
     green = BYTE_TO_FLOAT (color.green);
     blue = BYTE_TO_FLOAT (color.blue);
+    alpha = SetMixMode (mymesh->mixmode, 1, false);
   }
-
-  alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
-  alpha = SetMixMode (mymesh->mixmode, alpha, 
-    txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
 
   glColor4f (red, green, blue, alpha);
 
@@ -993,50 +995,52 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
     +mymesh->GetIndexStart ());
 
-  csMaterialHandle* handle = (csMaterialHandle*)mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
-  for (int l=0; l<handle->GetTextureLayerCount (); l++)
+  if (mathandle)
   {
-    csTextureLayer* layer = handle->GetTextureLayer (l);
-    txthandle = layer->txt_handle;
-    if (txthandle)
+    for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
     {
-      txtcache->Cache (txthandle);
-      csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-        txthandle->GetPrivateObject ();
-      csTxtCacheData *cachedata =
-        (csTxtCacheData *)gltxthandle->GetCacheData ();
+      csTextureLayer* layer = mathandle->GetTextureLayer (l);
+      txthandle = layer->txt_handle;
+      if (txthandle)
+      {
+        txtcache->Cache (txthandle);
+        csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
+          txthandle->GetPrivateObject ();
+        csTxtCacheData *cachedata =
+          (csTxtCacheData *)gltxthandle->GetCacheData ();
 
-      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-      statecache->EnableState (GL_TEXTURE_2D);
-    } else continue;
+        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+        statecache->EnableState (GL_TEXTURE_2D);
+      } else continue;
 
-    alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
-    alpha = SetMixMode (layer->mode, alpha, 
-      txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
-    glColor4f (1, 1, 1, alpha);
+      alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+      alpha = SetMixMode (layer->mode, alpha, 
+        txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
+      glColor4f (1, 1, 1, alpha);
 
-    glMatrixMode (GL_TEXTURE);
-    glPushMatrix ();
-    glLoadIdentity ();
-    GLfloat scalematrix[16];
-    for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
-    scalematrix[0] = layer->uscale;
-    scalematrix[5] = layer->vscale;
-    scalematrix[10] = 1;
-    scalematrix[15] = 1;
-    scalematrix[12] = layer->ushift*layer->uscale; 
-    scalematrix[13] = layer->vshift*layer->vscale;
-    // @@@ Shift is ignored for now.
-    glMultMatrixf (scalematrix);
+      glMatrixMode (GL_TEXTURE);
+      glPushMatrix ();
+      glLoadIdentity ();
+      GLfloat scalematrix[16];
+      for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
+      scalematrix[0] = layer->uscale;
+      scalematrix[5] = layer->vscale;
+      scalematrix[10] = 1;
+      scalematrix[15] = 1;
+      scalematrix[12] = layer->ushift*layer->uscale; 
+      scalematrix[13] = layer->vshift*layer->vscale;
+      // @@@ Shift is ignored for now.
+      glMultMatrixf (scalematrix);
 
-    glDrawElements (
-      GL_TRIANGLES,
-      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
-      GL_UNSIGNED_INT,
-      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
-      +mymesh->GetIndexStart ());
+      glDrawElements (
+        GL_TRIANGLES,
+        mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+        GL_UNSIGNED_INT,
+        ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+        +mymesh->GetIndexStart ());
 
-    glPopMatrix ();
+      glPopMatrix ();
+    }
   }
 
   vertexbuf->Release();
