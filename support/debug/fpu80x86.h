@@ -46,21 +46,18 @@
 static inline unsigned int _control87(unsigned int newcw, unsigned int mask)
 {
   int oldcw;
-  int tmpcw;
   asm __volatile__
   (
         "       fclex                   \n"     // clear exceptions
         "       fstcw   %0              \n"     // oldcw = FPU control word
-	"       movl    %%ebx, %%eax    \n"
-        "       movl    %%ecx, %%edx    \n"
-        "       andl    %0,%%ebx        \n"     // eax &= oldcw;
-        "       andl    %1,%%edx        \n"     // ecx &= newcw
-        "       orl     %%edx,%%ebx     \n"     // eax |= ecx
-        "       movl    %%ebx,%4        \n"     // tmpcw = eax
-        "       fldcw   %4              \n"     // load FPU control word
+        "       andl    %0,%%eax        \n"     // eax &= oldcw;
+        "       andl    %1,%%ecx        \n"     // ecx &= newcw
+        "       orl     %%ecx,%%eax     \n"     // eax |= ecx
+        "       movl    %%eax,%0        \n"     // tmpcw = ebx
+        "       fldcw   %0              \n"     // load FPU control word
         : "=m" (oldcw)
-	: "g" (newcw), "a" (~mask), "c" (mask), "m" (tmpcw)
-	: "ebx", "edx", "memory"
+	: "g" (newcw), "a" (~mask), "c" (mask)
+	: "memory"
   );
   return oldcw & 0xffff;
 }

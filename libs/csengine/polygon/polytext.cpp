@@ -18,6 +18,7 @@
 
 #include <math.h>
 
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "qint.h"
 #include "csutil/bitset.h"
@@ -212,20 +213,15 @@ void csPolyTexture::InitLightMaps ()
 
 float calc_area (int n, csVector2 *p)
 {
-  float area=0;
+  float area = 0;
 
-  for (int i=0,j;i<n;i++)
+  for (int i = 0; i < n; i++)
   {
-    if (i!=n-1)
-      j = i+1;
-    else
-      j = 0;
-
-    area += (p[i].y+p[j].y)*(p[i].x-p[j].x);
+    int j = (i != n - 1) ? i + 1 : 0;
+    area += (p [i].y + p [j].y) * (p [i].x - p [j].x);
   }
 
-  area /= 2.0;
-  return fabs (area);
+  return fabs (area / 2.0);
 }
 
 static int __texture_width;
@@ -277,37 +273,46 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   if (depth > max_depth)
     max_depth = depth;
 
-  // how_to_divide:
-  //   0 -- horizontal
-  //   1 -- vertical
-
+  // Calculate the complete are of visible rectangle
   int height = QInt (visible.bottom - visible.top);
   int width = QInt (visible.right - visible.left);
+  int visarea = width * height;
 
-  float a = calc_area (n,p2d);
-  if (fabs (a - height * width) < EPS)
+  // Sanity check
+  if (visarea <= 0)
   {
-    // this area is completely covered
-
-    int x = QInt (visible.left), y = QInt (visible.top);
-    for (int i=0 ; i<height ; i++)
-      for (int j=0 ; j<width ; j++)
-    __draw_func (j+x, i+y, 1);
-
     depth--;
     return;
   }
-  else if (fabs (a) < EPS)
+
+  // Calculate the complete area of the polygon
+  float a = calc_area (n, p2d);
+
+  // Check if polygon is hollow
+  if (a < EPS)
   {
     // this area is hollow
     depth--;
     return;
   }
 
-  if (height==1&&width==1)
+  // Check if polygon surface equals the visible rectangle surface
+  if (fabs (a - visarea) < EPS)
   {
+    // this area is completely covered
+
     int x = QInt (visible.left), y = QInt (visible.top);
-    __draw_func (x, y, a);
+    for (int i = 0 ; i < height; i++)
+      for (int j = 0 ; j < width; j++)
+        __draw_func (j + x, i + y, 1);
+
+    depth--;
+    return;
+  }
+
+  if (height == 1 && width == 1)
+  {
+    __draw_func (QInt (visible.left), QInt (visible.top), a);
 
     depth--;
     return;
@@ -316,115 +321,108 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   int sub_x = QInt (visible.left) + width / 2;
   int sub_y = QInt (visible.top) + height / 2;
 
+  // 0 -- horizontal
+  // 1 -- vertical
   int how_to_divide = (height > width) ? 0 : 1;
 
-  int n2[2];
-  csVector2 *p2[2];
+  int n2 [2];
+  csVector2 *p2 [2];
 
-  CHK (p2[0] = new csVector2[n+1]);
-  CHK (p2[1] = new csVector2[n+1]);
+  p2 [0] = (csVector2 *)alloca (sizeof (csVector2) * (n + 1));
+  p2 [1] = (csVector2 *)alloca (sizeof (csVector2) * (n + 1));
 
-  n2[0]=n2[1]=0;
+  n2 [0] = n2 [1] = 0;
 
   if (how_to_divide)
   {
-    // dividing vertically
-    // (p[0] -- left poly, p[1] -- right poly)
+    // Split the polygon vertically by the line "x = sub_x"
+    // (p2 [0] -- left poly, p2 [1] -- right poly)
 
-    int i=0,where_are_we=p2d[0].x>sub_x;
-
-    p2[where_are_we][n2[where_are_we]++]=p2d[0];
-
-    for (int _=1,prev=0;_<=n;_++)
+    int where_are_we = p2d [0].x > sub_x;
+    p2 [where_are_we] [n2 [where_are_we]++] = p2d [0];
+    for (int v = 1, prev = 0; v <= n; v++)
     {
-      if (_==n) i=0;
-      else i=_;
+      // Check whenever current vertex is on left or right side of divider
+      int cur = (v == n) ? 0 : v;
+      int now_we_are = p2d [cur].x > sub_x;
 
-      int now_we_are=p2d[i].x>sub_x;
-
-      if (now_we_are==where_are_we)
+      if (now_we_are == where_are_we)
       {
-  	if (i)
-    	p2[where_are_we][n2[where_are_we]++]=p2d[i];
+        // Do not add the first point since it will be added at the end
+        if (cur) p2 [where_are_we] [n2 [where_are_we]++] = p2d [cur];
       }
       else
       {
-  	float y=(p2d[prev].y*(p2d[i].x-sub_x)+p2d[i].y*(sub_x-p2d[prev].x))/(p2d[i].x-p2d[prev].x);
-  	csVector2 p(sub_x,y);
+        // The most complex case: find the Y at intersection point
+        float y = p2d [prev].y + (p2d [cur].y - p2d [prev].y) *
+          (sub_x - p2d [prev].x) / (p2d [cur].x - p2d [prev].x);
 
-  	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+        // Add the intersection point to both polygons
+  	p2 [0] [n2 [0]++] = p2 [1] [n2 [1]++] = csVector2 (sub_x,y);
 
-  	if (i) p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  	if (cur) p2 [now_we_are] [n2 [now_we_are]++] = p2d [cur];
       }
 
-      where_are_we=now_we_are;
-      prev=i;
+      where_are_we = now_we_are;
+      prev = cur;
     }
 
     __rect v;
-    v.left=visible.left;
-    v.right=sub_x;
-    v.top=visible.top;
-    v.bottom=visible.bottom;
+    v.left = visible.left;
+    v.right = sub_x;
+    v.top = visible.top;
+    v.bottom = visible.bottom;
+    poly_fill (n2 [0], p2 [0], v);
 
-    poly_fill (n2[0],p2[0],v);
-
-    v.left=sub_x;
-    v.right=visible.right;
-
-    poly_fill (n2[1],p2[1],v);
+    v.left = sub_x;
+    v.right = visible.right;
+    poly_fill (n2[1], p2[1], v);
   }
   else
   {
-    // dividing horizontally
+    // Split the polygon horizontally by the line "y = sub_y"
     // (p[0] -- top poly, p[1] -- bottom poly)
 
-    int i=0,where_are_we=p2d[0].y>sub_y;
-
-    p2[where_are_we][n2[where_are_we]++]=p2d[0];
-
-    for (int _=1,prev=0;_<=n;_++)
+    int where_are_we = p2d [0].y > sub_y;
+    p2 [where_are_we] [n2 [where_are_we]++] = p2d [0];
+    for (int v = 1, prev = 0; v <= n; v++)
     {
-      if (_==n) i=0;
-      else i=_;
+      // Check whenever current vertex is on top or down side of divider
+      int cur = (v == n) ? 0 : v;
+      int now_we_are = p2d [cur].y > sub_y;
 
-      int now_we_are=p2d[i].y>sub_y;
-
-      if (now_we_are==where_are_we)
+      if (now_we_are == where_are_we)
       {
-  	if (i)
-    	p2[where_are_we][n2[where_are_we]++]=p2d[i];
+        // Do not add the first point since it will be added at the end
+  	if (cur) p2 [where_are_we] [n2 [where_are_we]++] = p2d [cur];
       }
       else
       {
-  	float x=(p2d[prev].x*(p2d[i].y-sub_y)+p2d[i].x*(sub_y-p2d[prev].y))/(p2d[i].y-p2d[prev].y);
-  	csVector2 p(x, sub_y);
+        // The most complex case: find the X at intersection point
+        float x = p2d [prev].x + (p2d [cur].x - p2d [prev].x) *
+          (sub_y - p2d [prev].y) / (p2d [cur].y - p2d [prev].y);
 
-  	p2[0][n2[0]++]=p2[1][n2[1]++]=p;
+        // Add the intersection point to both polygons
+  	p2 [0] [n2 [0]++] = p2 [1] [n2 [1]++] = csVector2 (x, sub_y);
 
-  	if (i) p2[now_we_are][n2[now_we_are]++]=p2d[i];
+  	if (cur) p2 [now_we_are] [n2 [now_we_are]++] = p2d [cur];
       }
 
-      where_are_we=now_we_are;
-      prev=i;
+      where_are_we = now_we_are;
+      prev = cur;
     }
 
     __rect v;
-    v.left=visible.left;
-    v.right=visible.right;
-    v.top=visible.top;
-    v.bottom=sub_y;
+    v.left = visible.left;
+    v.right = visible.right;
+    v.top = visible.top;
+    v.bottom = sub_y;
+    poly_fill (n2[0], p2[0], v);
 
-    poly_fill (n2[0],p2[0],v);
-
-    v.top=sub_y;
-    v.bottom=visible.bottom;
-
-    poly_fill (n2[1],p2[1],v);
+    v.top = sub_y;
+    v.bottom = visible.bottom;
+    poly_fill (n2 [1], p2 [1], v);
   }
-
-  CHK (delete[] p2[0]);
-  CHK (delete[] p2[1]);
 
   depth--;
 }
@@ -440,7 +438,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   csQuadcube* qc = csWorld::current_world->GetQuadcube ();
 #endif
 
-  int lw = lm->GetWidth (); // @@@ DON'T NEED TO GO TO PO2 SIZES
+  int lw = lm->GetWidth ();
   int lh = lm->GetHeight ();
 
   int u, uv;
@@ -566,78 +564,73 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   __texture_width = lw;
   __texture = (float *)calloc (lh * lw, sizeof (float));
-  __mark = (unsigned char *)calloc (lh,lw);
+  __mark = (unsigned char *)calloc (lh, lw);
 
-  __rect vis={0,lw,0,lh};
+  __rect vis = { 0, lw, 0, lh };
 
-  //fo=fopen("light.txt","at");
+  __draw_func = lixel_intensity;
+  poly_fill (num_frustrum, f_uv, vis);
+  __draw_func = correct_results;
+  poly_fill (rpv, rp, vis);
 
-  __draw_func=lixel_intensity;
-  poly_fill(num_frustrum,f_uv,vis);
-  __draw_func=correct_results;
-  poly_fill(rpv,rp,vis);
-
-  uv=0;
-  for (int sy=0; sy < lh; sy++)
+  uv = 0;
+  for (int sy = 0; sy < lh; sy++)
   {
-    for (u=0;u<lw;u++,uv++)
+    for (u = 0; u < lw; u++, uv++)
     {
       //@@@ (Note from Jorrit): The following test should not be needed
       // but it appears to be anyway. 'uv' can get too large.
       if (uv >= lm_size) continue;
 
-      float usual_value=1.0;
+      float usual_value = 1.0;
 
-//    __uv=uv;
-      float lightintensity=__texture[uv];
+      float lightintensity = __texture[uv];
 
-      if(!lightintensity)
+      if (!lightintensity)
       {
-        usual_value=0.0;
+        usual_value = 0.0;
 
-        if(u&&__mark[uv-1])
+        if (u && __mark [uv - 1])
         {
-          lightintensity+=__texture[uv-1];
+          lightintensity += __texture [uv - 1];
           usual_value++;
         }
 
-        if(sy&&__mark[uv-lw])
+        if (sy && __mark [uv - lw])
         {
-          lightintensity+=__texture[uv-lw];
+          lightintensity += __texture [uv - lw];
           usual_value++;
         }
 
-        if((u!=lw-1)&&__mark[uv+1])
+        if ((u != lw - 1) && __mark [uv + 1])
         {
-          lightintensity+=__texture[uv+1];
+          lightintensity += __texture [uv + 1];
           usual_value++;
         }
 
-        if((sy!=lh-1)&&__mark[uv+lw])
+        if ((sy != lh - 1) && __mark [uv + lw])
         {
-          lightintensity+=__texture[uv+lw];
+          lightintensity += __texture [uv + lw];
           usual_value++;
         }
 
-        if(!lightintensity)
+        if (!lightintensity)
           continue;
       }
 
-      float lightness=lightintensity/usual_value;
-//      if(lightness>1||lightness<0)
-//        fprintf(fo,"(%d, %d) -> lightness=%.2f/%.2f=%.2f\n",u,sy,lightintensity,usual_value,lightness);
+      float lightness = lightintensity / usual_value;
 
       ru = u << lightcell_shift;
       rv = sy << lightcell_shift;
 
       bool rc = false;
       int tst;
-      static int shift_u[5] = { 0, 2, 0, -2, 0 };
-      static int shift_v[5] = { 0, 0, 2, 0, -2 };
+      static int shift_u [5] = { 0, 2, 0, -2, 0 };
+      static int shift_v [5] = { 0, 0, 2, 0, -2 };
       for (tst = 0 ; tst < 5 ; tst++)
       {
-        v1.x = (float)(ru+shift_u[tst]+Imin_u)*invww;
-        v1.y = (float)(rv+shift_v[tst]+Imin_v)*invhh;
+        v1.x = (float)(ru + shift_u [tst] + Imin_u) * invww;
+        v1.y = (float)(rv + shift_v [tst] + Imin_v) * invhh;
         if (ABS (txt_C) < SMALL_EPSILON)
           v1.z = 0;
         else
@@ -646,7 +639,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
         // Check if the point on the polygon is shadowed. To do this
         // we traverse all shadow frustrums and see if it is contained in any of them.
-        csShadowFrustrum* shadow_frust;
+        csShadowFrustrum *shadow_frust;
         shadow_frust = lview.shadows.GetFirst ();
         bool shadow = false;
 #if QUADTREE_SHADOW
@@ -742,8 +735,6 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   free(__texture);
   free(__mark);
-
-  //fclose(fo);
 
   if (dyn && first_time)
   {
