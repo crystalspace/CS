@@ -71,11 +71,9 @@ protected:
   int num;
   /// Total size of all loaded textures
   long total_size;
-  /// internal rgb storage format
-  GLint internalRGBFormat;
 public:
   /// Takes the maximum size of the cache.
-  OpenGLTextureCache (GLint internalRGBFormat, int max_size, int bpp);
+  OpenGLTextureCache (int max_size);
   ///
   ~OpenGLTextureCache ();
 
@@ -93,7 +91,6 @@ public:
   bool GetBilinearMapping () { return rstate_bilinearmap; }
 
 protected:
-  int bpp;
 
   /// Really load the texture in OpenGL memory.
   void Load (csTxtCacheData *d, bool reload = false);

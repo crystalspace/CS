@@ -113,6 +113,14 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DOpenGL)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2DOpenGL::eiOpenGLInterface)
+  SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
 SCF_EXPORT_CLASS_TABLE (glwin32)
@@ -213,6 +221,7 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) :
                    m_bPalettized(false),
                    m_bPaletteChanged(false)
 {
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)

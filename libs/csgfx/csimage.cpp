@@ -282,7 +282,10 @@ iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
     return NULL;
 
   csImageFile* nimg = new csImageFile (Format);
-  nimg->set_dimensions (Width >> steps, Height >> steps);
+  if (steps == 1 && (Width < 2 || Height < 2) && (Width > 1 || Height > 1))
+    nimg->set_dimensions (MAX (1, Width >> steps), MAX( 1, Height >> steps));
+  else
+    nimg->set_dimensions (Width >> steps, Height >> steps);
 
   csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
   if (Alpha)

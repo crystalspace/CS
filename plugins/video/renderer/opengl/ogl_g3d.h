@@ -26,12 +26,7 @@
 // Expanded by Dan Ogles
 // Further expanded by Gary Haussmann
 
-#include "csutil/scf.h"
 #include "ogl_g3dcom.h"
-#include "video/renderer/common/dtmesh.h"
-#include "video/renderer/common/dpmesh.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
 struct iGraphics3D;
 
 class csGraphics3DOpenGL : public csGraphics3DOGLCommon
@@ -41,6 +36,7 @@ public:
   virtual ~csGraphics3DOpenGL ();
   virtual bool Initialize (iObjectRegistry*);
   virtual bool Open();
+
 };
 
 #endif

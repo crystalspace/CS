@@ -24,6 +24,7 @@
 // Concieved by Jorrit Tyberghein and Gary Clark
 // Expanded by Dan Ogles
 // Further expanded by Gary Haussmann
+// Further expanded by Heiko Jakob
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -47,6 +48,7 @@
 struct iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
+class csTextureHandleOpenGL;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iPluginManager;
@@ -331,6 +333,9 @@ private:
 
 protected:
   friend class csOpenGLHalo;
+  friend class csTextureManagerOpenGL;
+  friend class OpenGLTextureCache;
+  friend class csTextureHandleOpenGL;
 
   /**
    * OpenGL capabilities.
@@ -467,12 +472,25 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  /// internal color representation
-  GLint internalRGBFormat;
-  bool ARB_texture_compression;
+  // declare all the extension function pointers
+# define _CSGLEXT_
+# define CSGL_FOR_ALL
+# define CSGL_FUNCTION(fType,fName) \
+static fType fName
+# include "csglext.h"
+# undef CSGL_FUNCTION
+  virtual void InitGLExtensions ();
+
+  static bool ARB_multitexture;
+  static bool ARB_texture_compression;
+  static bool NV_vertex_array_range;
+
 
 public:
   SCF_DECLARE_IBASE;
+
+  typedef void (csGraphics3DOGLCommon::*DrawPolygonPtr)(G3DPolygonDP& poly);
+  DrawPolygonPtr DrawPolygonCall;
 
   /// The maximum texture size
   GLint max_texture_size;
@@ -540,7 +558,6 @@ public:
 
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
-
   /**
    * Draw the projected polygon with light and texture.
    * Debugging version. This one does not actually draw anything
@@ -722,17 +739,10 @@ public:
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
   /**
-   * If supported, this function will attempt to query the OpenGL driver
-   * to see what extensions it supports so that other parts of the renderer
-   * can use appropriate extensions where possible.
-   */
-  void DetectExtensions ();
-
-  /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer
    * that supports ARB_multitexture
    */
-  bool DrawPolygonMultiTexture (G3DPolygonDP &poly);
+  void DrawPolygonMultiTexture (G3DPolygonDP &poly);
 
   /**
    * Flush the DrawPolygon queue if needed.
@@ -755,10 +765,6 @@ public:
    * anything.
    */
   void DrawPolygonZFill (G3DPolygonDP &poly);
-
-  // Extension flags
-  bool ARB_multitexture;
-
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);

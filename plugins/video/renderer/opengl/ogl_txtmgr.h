@@ -43,29 +43,39 @@ enum csGLProcTexType
  */
 class csTextureOpenGL : public csTexture
 {
-protected:
-  /// The actual image
-  iImage *image;
-  bool bKCset;
-  
 public:
+
+  /// The actual image
+  uint8 *image_data;
+  GLint compressed;
+  GLint internalFormat;
+  GLint size;
+
   /// Create a csTexture object
   csTextureOpenGL (csTextureHandle *Parent, iImage *Image);
   /// Destroy the texture
   virtual ~csTextureOpenGL ();
   /// Get image data
-  csRGBpixel *get_image_data ()
-  { return (csRGBpixel *)image->GetImageData (); }
-  /// Get the image object
-  iImage *get_image ()
-  { return image; }
-  /// has the keycolor been set already ?
-  bool KeyColorSet ()
-  { return bKCset; }
-  /// remember state of KeyColor
-  void KeyColorSet (bool bWhat)
-  { bKCset = bWhat; }
+  uint8 *&get_image_data ()
+  { return image_data; }
+  virtual bool Compressable (){ return true;}
 };
+
+/**
+ * The procedural texture object.
+ */
+class csTextureProcOpenGL : public csTextureOpenGL
+{
+public:
+  iGraphics3D *texG3D;
+  csTextureProcOpenGL (csTextureHandle *Parent, iImage *image)
+    : csTextureOpenGL (Parent, image), texG3D (NULL)
+  {};
+  /// Destroy the texture
+  virtual ~csTextureProcOpenGL ();
+  virtual bool Compressable (){ return false;}
+};
+
 
 /**
  * This is a class derived from csTextureHandle that performs additional
@@ -73,7 +83,23 @@ public:
  */
 class csTextureHandleOpenGL : public csTextureHandle
 {
+ protected:
   csTextureManagerOpenGL *txtmgr;
+  int formatidx;
+  GLint sourceFormat, targetFormat;
+  GLenum sourceType; // what size does each fragment have ? e.g. GL_UNSIGNED_BYTE
+  int bpp; 
+  bool FindFormatType ();
+  bool transform (iImage *Image, csTextureOpenGL *tex);
+  void ShowFormat ();
+
+  class texVector : public csVector
+  {
+  public:
+    csTextureOpenGL* operator [] (int idx) const { return (csTextureOpenGL*)csVector::Get (idx);}
+    int Push (csTexture *t){ return csVector::Push ((csSome)t);}
+  };
+  
 public:
   /// Retains original size of image before any readjustment
   int orig_width, orig_height;
@@ -81,13 +107,18 @@ public:
   csGraphics3DOGLCommon *G3D;
   /// True if the texture has alphamap
   bool has_alpha;
+  texVector vTex;
+  long size;
 
   /// Initialize the object
-  csTextureHandleOpenGL (iImage *image, int flags, csGraphics3DOGLCommon *iG3D);
+  csTextureHandleOpenGL (iImage *image, int flags, GLint sourceFormat, int bpp, 
+			 csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureHandleOpenGL ();
   /// Adjust size, mipmap, create procedural texture etc
   void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
+
+  virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h);
 
   /// Override from csTextureHandle.
   virtual void GetOriginalDimensions (int& w, int& h)
@@ -99,7 +130,10 @@ public:
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture
-  virtual void ComputeMeanColor ();
+  virtual void ComputeMeanColor (){}
+  void ComputeMeanColor (int w, int h, csRGBpixel *src);
+  virtual void CreateMipmaps ();
+
   /// Returns dynamic texture interface if any.
   virtual iGraphics3D *GetProcTextureInterface ();
   /// Prepare the texture for usage
@@ -115,20 +149,12 @@ public:
 
   /// maybe we are an proc texture and have additionally things to free
   virtual void Clear ();
-};
 
-/**
- * The procedural texture object.
- */
-class csTextureProcOpenGL : public csTextureOpenGL
-{
-public:
-  iGraphics3D *texG3D;
-  csTextureProcOpenGL (csTextureHandle *Parent, iImage *Image)
-    : csTextureOpenGL (Parent, Image), texG3D (NULL)
-  {};
-  /// Destroy the texture
-  virtual ~csTextureProcOpenGL ();
+  GLenum SourceType (){return sourceType;}
+  GLint SourceFormat (){return sourceFormat;}
+  GLint TargetFormat (){return targetFormat;}
+
+  iImage *get_image (){return image;}
 };
 
 /**
@@ -136,18 +162,34 @@ public:
  */
 class csTextureManagerOpenGL : public csTextureManager
 {
-public:
+
+ protected:
+  struct formatDescription 
+  {
+    GLint targetFormat;
+    char *name;
+    GLint sourceFormat;
+    int components; // number of components in texture
+    GLint compressedFormat;
+    GLint forcedFormat;
+    int texelbytes;
+  };
+
+  void AlterTargetFormat (const char *oldTarget, const char *newTarget);
+  void DetermineStorageSizes ();
+
+ public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
   int max_tex_size;
   csGLProcTexType proc_tex_type;
   // The first instance of a sharing software texture
   csOpenGLProcSoftware *head_soft_proc_tex;
-
+  static formatDescription glformats [];
   ///
   csTextureManagerOpenGL (iObjectRegistry* object_reg,
-  	iGraphics2D* iG2D, iConfigFile *config,
-    csGraphics3DOGLCommon *iG3D);
+			  iGraphics2D* iG2D, iConfigFile *config,
+			  csGraphics3DOGLCommon *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
 
@@ -169,5 +211,15 @@ public:
   ///
   virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
 };
+
+#define CS_GL_FORMAT_TABLE(var) \
+csTextureManagerOpenGL::formatDescription var[] = {
+
+#define CS_GL_FORMAT(dsttype, srctype, size, texelsize) \
+{dsttype, #dsttype, srctype, size, 0, 0, texelsize},
+
+#define CS_GL_FORMAT_TABLE_END \
+{0, NULL, (GLenum)0, 0, 0, 0, 0}};
+
 
 #endif // TXTMGR_OPENGL_H

@@ -50,10 +50,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   {
     int r,g,b;
     image->GetKeycolor (r,g,b);
-    transp_color.red = r;
-    transp_color.green = g;
-    transp_color.blue = b;
-    transp = true;
+    SetKeyColor (r, g, b);
   }
   cachedata = NULL;
 }

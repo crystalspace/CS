@@ -24,6 +24,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/gl2d_font.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/iogl.h"
 
 struct iWin32Helper;
 
@@ -35,6 +36,8 @@ private:
   void CalcPixelFormat ();
 
 public:
+  SCF_DECLARE_IBASE_EXT (csGraphics2DOpenGL);
+
   csGraphics2DOpenGL(iBase *iParent);
   virtual ~csGraphics2DOpenGL(void);
   
@@ -61,6 +64,13 @@ public:
    * The OpenGL version of this function just returns NULL.
    */
   static unsigned char* GetPixelAtGL (int x, int y);
+
+  struct eiOpenGLInterface : public iOpenGLInterface
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DOpenGL);
+    virtual void *GetProcAddress (const char *funcname)
+    { return wglGetProcAddress ((const GLubyte *)funcname); }
+  } scfiOpenGLInterface;
 
 protected:
   

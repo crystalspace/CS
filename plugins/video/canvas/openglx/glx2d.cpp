@@ -35,6 +35,14 @@
 
 CS_IMPLEMENT_PLUGIN
 
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLX)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iOpenGLInterface)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2DGLX::eiOpenGLInterface)
+  SCF_IMPLEMENTS_INTERFACE (iOpenGLInterface)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 SCF_EXPORT_CLASS_TABLE (glx2d)
@@ -48,7 +56,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   csGraphics2DGLCommon (iParent), cmap (0)
 {
-
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
 
 void csGraphics2DGLX::Report (int severity, const char* msg, ...)

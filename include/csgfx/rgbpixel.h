@@ -126,6 +126,8 @@ struct csRGBpixel
   /// Get the pixel intensity
   int Intensity ()
   { return (red + green + blue) / 3; }
+  unsigned char Luminance ()
+  { return (((int)red)*30 + ((int)green)*59 + ((int)blue)*11)/100; }
   /// Assign given red/green/blue values to this pixel
   void Set (const int r, const int g, const int b)
   { red = r; green = g; blue = b; alpha = 255; }

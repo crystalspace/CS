@@ -132,10 +132,10 @@ public:
 
 iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 {
-  csTextureHandle *txtmm = (csTextureHandle*)ogl_txt->GetPrivateObject();
-  iImage *image = ((csTextureOpenGL*) txtmm->get_texture (0))->get_image();
+  csTextureHandleOpenGL *txtmm = (csTextureHandleOpenGL*)ogl_txt->GetPrivateObject();
+  iImage *image = txtmm->get_image();
 
-  int flags = ((csTextureHandleOpenGL*)txtmm)->GetFlags ();
+  int flags = txtmm->GetFlags ();
 #ifdef CS_DEBUG
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
   {
@@ -144,7 +144,6 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
   // flags are not set. 
-  // image->IncRef ();
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())

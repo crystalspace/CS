@@ -52,29 +52,7 @@
 #include "csutil/cscolor.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
-#include <GL/glext.h>
-
-// uncomment the 'USE_MULTITEXTURE 1' define to enable code for
-// multitexture support - this is independent of the extension detection,
-// but  it may rely on the extension module to supply proper function
-// prototypes for the ARB_MULTITEXTURE functions
-//#define USE_MULTITEXTURE 1
-
-// Whether or not we should try  and use OpenGL extensions. This should be
-// removed eventually, when all platforms have been updated.
-//#define USE_EXTENSIONS 1
-
-// ---------------------------------------------------------------------------
-
-// if you figure out how to support OpenGL extensions on your
-// machine add an appropriate file in the 'ext/'
-// directory and mangle the file 'ext/ext_auto.inc'
-// to access your extension code
-#if USE_EXTENSIONS
-#include "ext/ext_auto.inc"
-#else
-void csGraphics3DOGLCommon::DetectExtensions() {}
-#endif
+#include "video/canvas/openglcommon/iogl.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -129,6 +107,19 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 
+bool csGraphics3DOGLCommon::ARB_multitexture = false;
+bool csGraphics3DOGLCommon::ARB_texture_compression = false;
+bool csGraphics3DOGLCommon::NV_vertex_array_range = false;
+
+
+# define _CSGLEXT_
+# define CSGL_FOR_ALL
+# define CSGL_FUNCTION(fType,fName) \
+fType  csGraphics3DOGLCommon:: ## fName = (fType) NULL;
+# include "csglext.h"
+# undef CSGL_FUNCTION
+
+
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), object_reg (NULL)
 {
@@ -166,8 +157,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   clip_outer[1] = OPENGL_CLIP_SOFTWARE;
   clip_outer[2] = OPENGL_CLIP_SOFTWARE;
 
-  // Default extension state is for all extensions to be OFF
-  ARB_multitexture = false;
   ARB_texture_compression = false;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
@@ -238,6 +227,90 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   return true;
 }
 
+void csGraphics3DOGLCommon::InitGLExtensions ()
+{
+# define CSGL_FUNCTION(fType,fName) \
+fName = (fType) G2DGL->GetProcAddress ( #fName );
+
+  if (G2D)
+  {
+    iOpenGLInterface *G2DGL = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
+    if (G2DGL)
+    {
+      const unsigned char* extensions = glGetString(GL_EXTENSIONS);
+      if (!extensions)
+	return; //  no need to look any further
+
+      // check the extension string for each extension in turn
+      iConfigIterator *it = config->Enumerate ("Video.OpenGL.UseExtension");
+
+      while (it->Next ())
+      {
+	if (!it->GetBool ()) continue;
+
+	const char *ext = it->GetKey (true)+1;
+	const char* searchresult = strstr((const char*)extensions, ext);
+
+	while (searchresult)
+	{
+	  // make sure we didn't accidently catch the
+	  // substring of some other extension
+	  if (*(searchresult + strlen(ext)) == ' ' ||
+	      *(searchresult + strlen(ext)) == '\0')
+	  {
+	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s\n", ext);
+	    if (!strcmp (ext, "GL_ARB_multitexture"))
+	    {
+#             define _CSGLEXT_
+#             define CSGL_ARB_multitexture
+#             include "csglext.h"
+#             undef CSGL_ARB_multitexture
+	      GLint maxtextures;
+	      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
+	      if (maxtextures > 1) 
+	      {
+		m_config_options.do_multitexture_level = maxtextures;
+		DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
+		ARB_multitexture = true;
+		Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"Using multitexture extension with %d texture units", maxtextures);
+	      } 
+	      else 
+	      {
+		Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
+			" extension but only allows one texture unit!");
+	      }
+	    }
+	    else if (!strcmp (ext, "GL_ARB_texture_compression"))
+	    {
+#             define _CSGLEXT_
+#             define CSGL_ARB_texture_compression
+#             include "csglext.h"
+#             undef CSGL_ARB_texture_compression
+	      ARB_texture_compression = true;
+	    }
+	    else if (!strcmp (ext, "GL_NV_vertex_array_range"))
+	    {
+#             define _CSGLEXT_
+#             define CSGL_NV_vertex_array_range
+#             include "csglext.h"
+#             undef CSGL_NV_vertex_array_range
+	      NV_vertex_array_range = true;
+	    }
+	  }
+	  // find next occurance -- we could have multiple matches if we match the
+	  // substring of another extension, but only one will trigger the if
+	  // statement above
+	  searchresult = strstr(searchresult + 1, ext);
+	}
+      }
+      it->DecRef ();
+      G2DGL->DecRef ();
+    }
+  }
+# undef CSGL_FUNCTION
+}
+
 bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
@@ -273,7 +346,6 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     return false;
   object_reg->Register (G2D);
 
-  txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
@@ -659,8 +731,6 @@ void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
 
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
-
-  internalRGBFormat = d->internalRGBFormat;
 }
 
 bool csGraphics3DOGLCommon::NewOpen ()
@@ -675,12 +745,12 @@ bool csGraphics3DOGLCommon::NewOpen ()
     return false;
   }
 
+  // Initialize the default method calls
+  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
+
   // See if we find any OpenGL extensions, and set the corresponding
-  // flags. Look at the bottom
-  // of ogl_g3d.h for known extensions (currently only multitexture)
-#if USE_EXTENSIONS
-  DetectExtensions ();
-#endif
+  // flags.
+  InitGLExtensions ();
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
@@ -691,14 +761,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   else
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-  if (!strcmp (config->GetStr ("Video.OpenGL.Internal.RGB", "GL_RGB"), "GL_RGB"))
-    internalRGBFormat = GL_RGB;
-  else
-    internalRGBFormat = GL_RGB16;
-
-  if (ARB_texture_compression && config->GetBool ("Video.OpenGL.Internal.RGB.Compressed", false))
-    internalRGBFormat = GL_COMPRESSED_RGB_ARB;
 
   m_config_options.do_extra_bright = config->GetBool
         ("Video.OpenGL.ExtraBright", false);
@@ -734,30 +796,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
     }
     bl_idx++;
   }
-
-#if USE_EXTENSIONS
-  // check with the GL driver and see if it supports the multitexure
-  // extension
-  if (ARB_multitexture)
-  {
-    // if you support multitexture, you should allow more than one
-    // texture, right?  Let's see how many we can get...
-    GLint maxtextures;
-    glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
-
-    if (maxtextures > 1)
-    {
-      m_config_options.do_multitexture_level = maxtextures;
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Using multitexture extension with %d texture units", maxtextures);
-    }
-    else
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"WARNING: driver supports multitexture extension but only allows one texture unit!");
-    }
-  }
-#endif
 
   // tells OpenGL driver we align texture data on byte boundaries,
   // instead of perhaps word or dword boundaries
@@ -805,7 +843,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
     max_texture_size = Caps.maxTexHeight;
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
-  texture_cache = new OpenGLTextureCache (internalRGBFormat, max_cache_size, 24);
+  texture_cache = new OpenGLTextureCache (max_cache_size);
   lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));
@@ -837,6 +875,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
   glDisable (GL_BLEND);
 
   // Now that we know what pixelformat we use, clue the texture manager in.
+  txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
   txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
 
   PerfTest ();
@@ -850,7 +889,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 }
 
 void csGraphics3DOGLCommon::CommonOpen ()
-{
+ {
   DrawMode = 0;
   width = G2D->GetWidth ();
   height = G2D->GetHeight ();
@@ -865,7 +904,7 @@ void csGraphics3DOGLCommon::CommonOpen ()
 void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
 {
   CommonOpen ();
-  ARB_multitexture = d->ARB_multitexture;
+
   m_config_options.do_multitexture_level =
 	d->m_config_options.do_multitexture_level;
   m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
@@ -3334,10 +3373,10 @@ void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
 
 // Shortcut to override standard polygon drawing when we have
 // multitexture
-bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
+void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
 // work in progress - GJH
-#if USE_MULTITEXTURE
+#if USE_ARB_MULTITEXTURE
 
   // count 'real' number of vertices
   int num_vertices = 1;
@@ -3354,7 +3393,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 
   // if this is a 'degenerate' polygon, skip it
   if (num_vertices < 3)
-    return false;
+    return;
 
   iPolygonTexture *tex = poly.poly_texture;
 
@@ -3367,7 +3406,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   if (!thelightmap || poly.use_fog || mat_handle->GetTextureLayerCount () > 0)
   {
     DrawPolygonSingleTexture (poly);
-    return true;
+    return;
   }
   // OK, we're gonna draw a polygon with a dual texture
   // Get the plane normal of the polygon. Using this we can calculate
@@ -3512,11 +3551,9 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glDisable (GL_TEXTURE_2D);
   glActiveTextureARB (GL_TEXTURE0_ARB);
 
-  return true;
 #else
   (void) poly;
   // multitexture not enabled -- how did we get into this shortcut?
-  return false;
 #endif
 }
 
@@ -3541,16 +3578,7 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
     DrawPolygonZFill (poly);
     return;
   }
-
-#if USE_EXTENSIONS
-  if (ARB_multitexture)
-  {
-    //@@@ This needs to be done differently. Currently disabled.
-    //DrawPolygonMultiTexture (poly);
-    //return;
-  }
-#endif
-  DrawPolygonSingleTexture (poly);
+  (this->*DrawPolygonCall)(poly);
 }
 
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,

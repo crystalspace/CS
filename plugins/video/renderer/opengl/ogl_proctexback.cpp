@@ -83,7 +83,7 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   frame_height = g2d->GetHeight ();
   frame_width = g2d->GetWidth ();
 
-  tex_0 = (csTextureProcOpenGL*) tex_mm->get_texture (0);
+  tex_0 = (csTextureProcOpenGL*) tex_mm->vTex[0];
 
   SharedInitialize (g3d);
   SharedOpen (g3d);
@@ -220,6 +220,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 
   if (tex_data)
   {
+    printf ("cached \n");
     // Currently Mesa3.x has bugs which affects at least the voodoo2.
     // Copying the framebuffer to make a new texture will work with the voodoo2
     // as of Mesa CVS 6/6/2000. Unfortunately this change has broken the 
@@ -245,11 +246,14 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   }
   else
   {
+    printf ("not cached \n");
+    glReadPixels (0,0, width, height, tex_mm->SourceFormat (), tex_mm->SourceType (),
+		  tex_0->get_image_data ());
+#ifdef GL_VERSION_1_2x
     // Not in cache.
     if (pfmt.PixelBytes == 2)
     {
 
-#ifdef GL_VERSION_1_2
       glReadPixels (0,0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
 		    buffer);
 
@@ -265,11 +269,11 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
 	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
       }
-#endif
     }
     else
       glReadPixels (0, 0, width, height,
 		    GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
+#endif
   }
 }
 

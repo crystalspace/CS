@@ -69,7 +69,6 @@ static void MIPMAP_NAME (unsigned w, unsigned h
   )
 {
   unsigned x, y;
-  const unsigned nh = h >> MIPMAP_LEVEL;
 
 #if defined (MIPMAP_ALPHA)
 #    define ACCUMULATE_PIXEL(p, m)					\
@@ -143,6 +142,10 @@ static void MIPMAP_NAME (unsigned w, unsigned h
   ACCUMULATE_PIXEL (src [delta + w], 1);				\
   ACCUMULATE_PIXEL (src [delta + w + 1], 1);
 
+#define ACCUMULATE_1X2(delta)						\
+  ACCUMULATE_PIXEL (src [delta], 1);					\
+  ACCUMULATE_PIXEL (src [delta + 1], 1);				
+
 // We could call ACCUMULATE_2X2 four times, but
 // this way its faster by about 10%...
 #define ACCUMULATE_4X4(delta)						\
@@ -176,16 +179,39 @@ static void MIPMAP_NAME (unsigned w, unsigned h
   MIPMAP_PIXTYPE * const srcmax = (MIPMAP_PIXTYPE *)src + w * (h - 1);
 #endif
 
+  const unsigned nh = h >> MIPMAP_LEVEL;
   // Compute the adjusted width of mipmap
   const unsigned w1 = (w & ~((1 << MIPMAP_LEVEL) - 1)) - 1;
+
+#if MIPMAP_LEVEL == 1
+  if (nh == 0 && w1 == 0) return;
+  if (nh == 0 || w1 == 0)
+  {
+#undef FINALLY
+#define FINALLY
+    unsigned int n = MAX (1, nh) * MAX (1, w1);
+    for (x = 0; x <= n; x += MIPMAP_STEP)
+    {
+#ifndef MIPMAP_ALPHA
+      unsigned rb = 0, ga = 0;
+#else
+      unsigned a = 0;
+#endif
+      ACCUMULATE_1X2 (x)
+      MIPMAP_OUTPUT;
+      src += 2;
+    }
+    return;
+  }
+#endif
 
   // Loop through all rows of output image
   for (y = 0; y < nh; y++)
   {
 #if MIPMAP_LEVEL == 0
-#  undef MIPMAP_DIVIDER
-#  define MIPMAP_DIVIDER (1+2+1+2+4+2+1+2+1)
-#  define MIPMAP_PROCESS(d1,d2,d3)					\
+#undef MIPMAP_DIVIDER
+#define MIPMAP_DIVIDER (1+2+1+2+4+2+1+2+1)
+#define MIPMAP_PROCESS(d1,d2,d3)					\
     {									\
       ACCUMULATE_PIXEL (src1 [d1], 1);					\
       ACCUMULATE_PIXEL (src1 [d2], 2);					\

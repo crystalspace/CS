@@ -27,23 +27,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "qint.h"
-#include "csutil/scf.h"
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
-#include "csgeom/polyclip.h"
-#include "csgeom/plane3.h"
 #include "ogl_g3d.h"
-#include "ogl_txtcache.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "iengine/texture.h"
-#include "imesh/thing/polygon.h"	//@@@
-#include "imesh/thing/lightmap.h"	//@@@
-#include "ivideo/graph2d.h"
-#include "csutil/garray.h"
-#include "csutil/cscolor.h"
 
 /*=========================================================================
  SCF macro section

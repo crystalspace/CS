@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/iogl.h"
 #include "ivideo/xwindow.h"
 
 #include <GL/glx.h>
@@ -54,6 +55,9 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   bool CreateVisuals ();
 
 public:
+  
+  SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
+
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
 
@@ -86,6 +90,12 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape)
   { return xwin->SetMouseCursor (iShape);}
 
+  struct eiOpenGLInterface : public iOpenGLInterface
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2DGLX);
+    virtual void *GetProcAddress (const char *funcname)
+    { return glXGetProcAddressARB ((const GLubyte *)funcname); }
+  } scfiOpenGLInterface;
 };
 
 #endif // __GLX2D_H__
