@@ -29,7 +29,6 @@
 #include "csengine/cbuffer.h"
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
-#include "csengine/dumper.h"
 #include "csutil/memfile.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
@@ -132,8 +131,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   delete [] new_polygons;
-
-  Dumper::dump (this);
+  //Dumper::dump (this);
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)

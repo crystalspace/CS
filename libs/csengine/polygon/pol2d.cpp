@@ -31,7 +31,6 @@
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
 #include "csengine/portal.h"
-#include "csengine/dumper.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

@@ -29,7 +29,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/script.h"
-#include "csengine/dumper.h"
 #include "imap/parser.h"
 
 //------------------------------------------------- We need the 3D engine -----

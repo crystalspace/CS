@@ -21,17 +21,20 @@
 #include "cssysdef.h"
 #include "csver.h"
 #include "csutil/scf.h"
+#include "csutil/scanstr.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/box.h"
 #include "bugplug.h"
+#include "spider.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
 #include "ivaria/conout.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
@@ -39,6 +42,8 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "iengine/camera.h"
+#include "qint.h"
 
 IMPLEMENT_FACTORY (csBugPlug)
 
@@ -64,11 +69,20 @@ csBugPlug::csBugPlug (iBase *iParent)
   VFS = NULL;
   mappings = NULL;
   process_next_key = false;
+  edit_mode = false;
+  edit_string[0] = 0;
   initialized = false;
+  spider = new csSpider ();
+  spider_hunting = false;
 }
 
 csBugPlug::~csBugPlug ()
 {
+  if (spider)
+  {
+    spider->UnweaveWeb (Engine);
+    delete spider;
+  }
   if (Engine) Engine->DecRef ();
   if (G3D) G3D->DecRef ();
   if (Conout) Conout->DecRef ();
@@ -165,6 +179,69 @@ bool csBugPlug::EatKey (iEvent& event)
   bool shift = (event.Key.Modifiers & CSMASK_SHIFT) != 0;
   bool alt = (event.Key.Modifiers & CSMASK_ALT) != 0;
   bool ctrl = (event.Key.Modifiers & CSMASK_CTRL) != 0;
+
+  // If we are in edit mode we do special processing.
+  if (edit_mode)
+  {
+    if (down)
+    {
+      int l = strlen (edit_string);
+      if (key == '\n')
+      {
+        // Exit edit_mode.
+	edit_mode = false;
+	ExitEditMode ();
+      }
+      else if (key == '\b')
+      {
+        // Backspace.
+	if (edit_cursor > 0)
+	{
+	  edit_cursor--;
+	  edit_string[edit_cursor] = 0;
+	}
+      }
+      else if (key == CSKEY_DEL)
+      {
+        // Delete.
+	int i;
+	for (i = edit_cursor ; i < 79 ; i++)
+	  edit_string[i] = edit_string[i+1];
+      }
+      else if (key == CSKEY_HOME)
+      {
+        edit_cursor = 0;
+      }
+      else if (key == CSKEY_END)
+      {
+        edit_cursor = l;
+      }
+      else if (key == CSKEY_LEFT)
+      {
+        if (edit_cursor > 0) edit_cursor--;
+      }
+      else if (key == CSKEY_RIGHT)
+      {
+        if (edit_cursor < l) edit_cursor++;
+      }
+      else if (key == CSKEY_ESC)
+      {
+        // Cancel.
+	edit_string[0] = 0;
+	edit_mode = false;
+      }
+      else if (edit_cursor < 79)
+      {
+        int i;
+	for (i = 78 ; i >= edit_cursor ; i--)
+	  edit_string[i+1] = edit_string[i];
+        edit_string[edit_cursor] = key;
+	edit_cursor++;
+      }
+    }
+    return true;
+  }
+
   // Get command.
   int cmd = GetCommandCode (key, shift, alt, ctrl);
   if (down)
@@ -185,6 +262,7 @@ bool csBugPlug::EatKey (iEvent& event)
   if (!process_next_key) return false;
   if (down)
   {
+    char buf[100];
     switch (cmd)
     {
       case DEBUGCMD_UNKNOWN:
@@ -268,6 +346,40 @@ bool csBugPlug::EatKey (iEvent& event)
 	  	choices[v]);
 	}
 	break;
+      case DEBUGCMD_GAMMA:
+        {
+	  float val = G3D->GetRenderState (G3DRENDERSTATE_GAMMACORRECTION)
+		/ 65536.;
+	  sprintf (buf, "%g", val);
+          EnterEditMode (cmd, "Enter new gamma:", buf);
+	}
+        break;
+      case DEBUGCMD_DBLBUFF:
+        {
+	  bool state = G2D->GetDoubleBufferState ();
+	  state = !state;
+	  if (!G2D->DoubleBuffer (state))
+	  {
+	    System->Printf (MSG_CONSOLE,
+	    	"Double buffer not supported in current video mode!\n");
+	  }
+	  else
+	  {
+	    System->Printf (MSG_CONSOLE,
+	    	"BugPlug %s double buffering.\n",
+		state ? "enabled" : "disabled");
+	  }
+	}
+        break;
+      case DEBUGCMD_DUMPCAM:
+      case DEBUGCMD_FOV:
+      case DEBUGCMD_FOVANGLE:
+        // Set spider on a hunt.
+	spider_command = cmd;
+	spider_hunting = true;
+	spider->ClearCamera ();
+        spider->WeaveWeb (Engine);
+        break;
     }
     process_next_key = false;
   }
@@ -289,7 +401,109 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
+  char buf[80];
+  if (edit_mode)
+  {
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+    iFontServer* fntsvr = G2D->GetFontServer ();
+    CS_ASSERT (fntsvr != NULL);
+    iFont* fnt = fntsvr->GetFont (0);
+    if (fnt == NULL)
+    {
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+    }
+    CS_ASSERT (fnt != NULL);
+    int fw, fh;
+    fnt->GetMaxSize (fw, fh);
+    int sw = G2D->GetWidth ();
+    int sh = G2D->GetHeight ();
+    int x = 10;
+    int y = sh/2 - (fh*2+5*3)/2;
+    int w = sw-20;
+    int h = fh*2+5*3;
+    int bgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    G2D->DrawBox (x, y, w, h, bgcolor);
+    int fgcolor = G3D->GetTextureManager ()->FindRGB (0, 0, 0);
+    int maxlen = fnt->GetLength (msg_string, w-10);
+    if (maxlen < 80) msg_string[maxlen] = 0;
+    G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg_string);
+    maxlen = fnt->GetLength (edit_string, w-10);
+    if (maxlen < 80) edit_string[maxlen] = 0;
+    G2D->Write (fnt, x+5, y+5+fh+5, fgcolor, bgcolor, edit_string);
+    char cursor[83];
+    strcpy (cursor, edit_string);
+    cursor[edit_cursor] = 0;
+    int cursor_w, cursor_h;
+    fnt->GetDimensions (cursor, cursor_w, cursor_h);
+    G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
+    G3D->FinishDraw ();
+    G2D->Print (NULL);
+  }
+  if (spider_hunting)
+  {
+    iCamera* camera = spider->GetCamera ();
+    if (camera)
+    {
+      spider_hunting = false;
+      spider->UnweaveWeb (Engine);
+      System->Printf (MSG_CONSOLE, "Spider catched a camera!\n");
+      switch (spider_command)
+      {
+        case DEBUGCMD_DUMPCAM:
+	  Dump (camera);
+	  break;
+        case DEBUGCMD_FOV:
+	  {
+            int fov = camera->GetFOV ();
+	    sprintf (buf, "%d", fov);
+	    EnterEditMode (spider_command, "Enter new fov value:", buf);
+	  }
+	  break;
+        case DEBUGCMD_FOVANGLE:
+	  {
+            float fov = camera->GetFOVAngle ();
+	    sprintf (buf, "%g", fov);
+	    EnterEditMode (spider_command, "Enter new fov angle:", buf);
+	  }
+	  break;
+      }
+    }
+  }
   return false;
+}
+
+void csBugPlug::EnterEditMode (int cmd, const char* msg, const char* def)
+{
+  if (edit_mode) return;
+  edit_mode = true;
+  strcpy (msg_string, msg);
+  if (def) strcpy (edit_string, def);
+  else edit_string[0] = 0;
+  edit_cursor = strlen (edit_string);
+  edit_command = cmd;
+}
+
+void csBugPlug::ExitEditMode ()
+{
+  if (edit_string[0] == 0) return;
+  int i;
+  float f;
+  switch (edit_command)
+  {
+    case DEBUGCMD_GAMMA:
+      ScanStr (edit_string, "%f", &f);
+      G3D->SetRenderState (G3DRENDERSTATE_GAMMACORRECTION,
+      	QRound (f * 65536));
+      break;
+    case DEBUGCMD_FOV:
+      ScanStr (edit_string, "%d", &i);
+      spider->GetCamera ()->SetFOV (i, G3D->GetWidth ());
+      break;
+    case DEBUGCMD_FOVANGLE:
+      ScanStr (edit_string, "%f", &f);
+      spider->GetCamera ()->SetFOVAngle (f, G3D->GetWidth ());
+      break;
+  }
 }
 
 int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
@@ -370,6 +584,11 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "transp"))		return DEBUGCMD_TRANSP;
   if (!strcmp (cmd, "mipmap"))		return DEBUGCMD_MIPMAP;
   if (!strcmp (cmd, "inter"))		return DEBUGCMD_INTER;
+  if (!strcmp (cmd, "gamma"))		return DEBUGCMD_GAMMA;
+  if (!strcmp (cmd, "dblbuff"))		return DEBUGCMD_DBLBUFF;
+  if (!strcmp (cmd, "dumpcam"))		return DEBUGCMD_DUMPCAM;
+  if (!strcmp (cmd, "fov"))		return DEBUGCMD_FOV;
+  if (!strcmp (cmd, "fovangle"))	return DEBUGCMD_FOVANGLE;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -633,6 +852,24 @@ void csBugPlug::Dump (int indent, const csBox3& b)
   ind[i] = 0;
   System->Printf (MSG_DEBUG_0, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)\n",
   	ind, b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
+}
+
+void csBugPlug::Dump (iCamera* c)
+{
+  const char* sn = c->GetSector ()->QueryObject ()->GetName ();
+  if (!sn) sn = "?";
+  csPlane3 far_plane;
+  bool has_far_plane = c->GetFarPlane (far_plane);
+  System->Printf (MSG_DEBUG_0, "Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
+  	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
+  System->Printf (MSG_DEBUG_0, "    shiftx=%g shifty=%g camnr=%d)\n",
+  	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
+  if (has_far_plane)
+    System->Printf (MSG_DEBUG_0, "    far_plane=(%g,%g,%g,%g)\n",
+    	far_plane.A (), far_plane.B (), far_plane.C (), far_plane.D ());
+  csReversibleTransform& trans = c->GetTransform ();
+  Dump (4, trans.GetO2TTranslation (), "Camera vector");
+  Dump (4, trans.GetO2T (), "Camera matrix");
 }
 
 

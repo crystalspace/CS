@@ -20,7 +20,6 @@
 #include "qint.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
-#include "csengine/dumper.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"

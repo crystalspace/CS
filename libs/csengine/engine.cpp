@@ -19,7 +19,6 @@
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csengine/engine.h"
-#include "csengine/dumper.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
 #include "csengine/campos.h"
@@ -1021,7 +1020,7 @@ bool csEngine::CheckConsistency ()
     {
       CsPrintf (MSG_WARNING, "  Polygon with only %d vertices! (id=%d)\n", p->GetNumVertices (), p->GetID ());
       CsPrintf (MSG_DEBUG_0, "============ Polygon with only %d vertices (id=%d)!\n", p->GetNumVertices (), p->GetID ());
-      Dumper::dump (p);
+      //Dumper::dump (p);
       error = true;
     }
     else if (p->GetNumVertices () > 3)
@@ -1049,7 +1048,7 @@ bool csEngine::CheckConsistency ()
 	  {
             CsPrintf (MSG_WARNING, "  Non-coplanar polygon! (id=%d)\n", p->GetID ());
             CsPrintf (MSG_DEBUG_0, "============ Non-coplanar polygon (id=%d)!\n", p->GetID ());
-            Dumper::dump (p);
+            //Dumper::dump (p);
             error = true;
 	    break;
 	  }

@@ -25,7 +25,6 @@
 #include "command.h"
 #include "csengine/keyval.h"
 #include "csengine/thing.h"
-#include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
 #include "csengine/engine.h"
@@ -1064,7 +1063,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       csPolygonTree* tree = stat->GetStaticTree ();
       csOctree* otree = (csOctree*)tree;
       printf ("1\n");
-      Dumper::dump_stubs (otree);
+      //Dumper::dump_stubs (otree);
     }
     csMeshWrapper* spr = (csMeshWrapper*)Sys->engine->meshes[0];
     if (spr)
@@ -1366,7 +1365,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (c->GetSector ()->GetStaticThing ())
     {
       csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticThing ()->GetStaticTree ());
-      Dumper::dump_stubs (octree);
+      //Dumper::dump_stubs (octree);
 #if 0
       csNamedObjVector& meshes = Sys->view->GetEngine ()->meshes;
       int i;

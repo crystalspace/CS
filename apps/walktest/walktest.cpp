@@ -26,7 +26,6 @@
 #include "hugeroom.h"
 #include "command.h"
 #include "csgeom/frustum.h"
-#include "csengine/dumper.h"
 #include "csengine/campos.h"
 #include "csengine/region.h"
 #include "csengine/csview.h"
@@ -1061,26 +1060,6 @@ void CaptureScreen ()
  * Our main event loop.
  *---------------------------------------------*/
 
-/*
- * Do a large debug dump just before the program
- * exits. This function can be installed as a last signal
- * handler if the program crashes (for systems that support
- * this).
- */
-void debug_dump ()
-{
-  if (Sys->myVFS)
-    SaveCamera (Sys->myVFS, "/temp/walktest.bug");
-  Sys->Printf (MSG_DEBUG_0, "Camera saved in /temp/walktest.bug\n");
-  Dumper::dump (Sys->view->GetCamera ()->GetPrivateObject ());
-  Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
-  Dumper::dump ((csEngine*)(Sys->Engine));
-  Sys->Printf (MSG_DEBUG_0, "Engine dumped in debug.txt\n");
-}
-
-//---------------------------------------------------------------------------
-
-
 void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
@@ -1558,73 +1537,10 @@ void CreateSystem(void)
 #endif
 
 /*---------------------------------------------------------------------*
- * Signal handling for unix only.
- *---------------------------------------------------------------------*/
-
-#ifdef OS_UNIX
-
-/*
- * Signal handler to clean up and give some
- * final debugging information.
- */
-void debug_dump ();
-void cleanup ();
-void handler (int sig)
-{
-  static bool in_exit = false;
-  if (in_exit)
-    exit (1);
-  in_exit = true;
-
-  int err = errno;
-#if defined (__USE_GNU)
-  fprintf (stderr, "\n%s signal caught; last error: %s\n",
-    strsignal (sig), strerror (err));
-#elif defined (OS_LINUX) || defined (OS_FREEBSD)
-  fprintf (stderr, "\n%s signal caught; last error: %s\n",
-    sys_siglist [sig], strerror (err));
-#else
-  fprintf (stderr, "\nSignal %d caught; last error: %s\n",
-    sig, strerror (err));
-#endif
-
-  if (sig != SIGINT)
-    debug_dump ();
-
-  if (System) System->Shutdown = true;
-  cleanup ();
-  exit (1);
-}
-
-void init_sig ()
-{
-#ifndef DO_COREDUMP
-  signal (SIGHUP, handler);
-  signal (SIGINT, handler);
-  signal (SIGTRAP, handler);
-  signal (SIGABRT, handler);
-  signal (SIGALRM, handler);
-  signal (SIGTERM, handler);
-  signal (SIGPIPE, handler);
-  signal (SIGSEGV, handler);
-  signal (SIGBUS, handler);
-  signal (SIGFPE, handler);
-  signal (SIGILL, handler);
-#endif // ! DO_COREDUMP
-}
-
-#endif //OS_UNIX
-
-
-/*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#ifdef OS_UNIX
-  init_sig ();
-#endif
-
   // Initialize the random number generator
   srand (time (NULL));
 

@@ -21,7 +21,6 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "csengine/dumper.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
 #include "csengine/texture.h"
@@ -119,7 +118,7 @@ void select_object (iRenderView* rview, int type, void* entity)
         pp->AddVertex  (polygon->GetVertices ()[i]);
     if (csMath2::InPoly2D (coord_check_vector, pp->GetVertices (),
         pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
-      Dumper::dump (polygon, "csPolygon2D");
+      //Dumper::dump (polygon, "csPolygon2D");
 
     delete pp;
   }

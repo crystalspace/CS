@@ -36,12 +36,16 @@ struct iFile;
 struct iSector;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
+struct iCamera;
+
 class csMatrix3;
 class csVector3;
 class csVector2;
 class csPlane3;
 class csBox2;
 class csBox3;
+
+class csSpider;
 
 //--------------------------------------------------------------------------
 // Command codes.
@@ -71,6 +75,11 @@ class csBox3;
 #define DEBUGCMD_TRANSP		1013	// Enable transparent mode
 #define DEBUGCMD_MIPMAP		1014	// Set mipmapping mode
 #define DEBUGCMD_INTER		1015	// Set interpolation mode
+#define DEBUGCMD_GAMMA		1016	// Set gamma
+#define DEBUGCMD_DBLBUFF	1017	// Set double buffering (G2D)
+#define DEBUGCMD_DUMPCAM	1018	// Dump the camera
+#define DEBUGCMD_FOV		1019	// Set fov
+#define DEBUGCMD_FOVANGLE	1020	// Set fov in angles
 
 /**
  * For key mappings.
@@ -89,7 +98,7 @@ struct csKeyMap
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : iPlugIn
+class csBugPlug : public iPlugIn
 {
 private:
   iSystem *System;
@@ -106,15 +115,13 @@ private:
 
   /// For 'clear' command.
   bool do_clear;
-  /// Dump the contents of the engine.
-  void Dump (iEngine* engine);
-  /// Dump the contents of a sector.
-  void Dump (iSector* sector);
-  /// Dump the contents of a mesh object.
-  void Dump (iMeshWrapper* mesh);
-  /// Dump the contents of a mesh factory.
-  void Dump (iMeshFactoryWrapper* meshfact);
+
   /// Dump various structures.
+  void Dump (iEngine* engine);
+  void Dump (iSector* sector);
+  void Dump (iMeshWrapper* mesh);
+  void Dump (iMeshFactoryWrapper* meshfact);
+  void Dump (iCamera* c);
   void Dump (int indent, const csMatrix3& m, char const* name);
   void Dump (int indent, const csVector3& v, char const* name);
   void Dump (int indent, const csVector2& v, char const* name);
@@ -125,11 +132,29 @@ private:
   /// Toggle a G3D boolean option.
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
+  /// Spider!
+  csSpider* spider;
+  /// If true then spider is hunting.
+  bool spider_hunting;
+  /// Command to execute when spider found a camera.
+  int spider_command;
+
   //------------------------------------------------------------------
 
   csKeyMap* mappings;
   /// If true we will eat next key and process it.
   bool process_next_key;
+
+  /// If true we are in edit mode.
+  bool edit_mode;
+  /// The cursor position.
+  int edit_cursor;
+  /// String we are editing.
+  char edit_string[81];
+  /// Message string:
+  char msg_string[81];
+  /// Command to perform after finishing edit mode.
+  int edit_command;
 
   /// Eat a key and process it.
   bool EatKey (iEvent& event);
@@ -156,6 +181,11 @@ private:
 
   /// Setup this plugin.
   void SetupPlugin ();
+
+  /// Enter edit mode.
+  void EnterEditMode (int cmd, const char* msg, const char* def = NULL);
+  /// Process a command after finishing edit mode.
+  void ExitEditMode ();
 
 public:
   DECLARE_IBASE;

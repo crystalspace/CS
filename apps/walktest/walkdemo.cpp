@@ -22,7 +22,6 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/campos.h"
 #include "csengine/octree.h"

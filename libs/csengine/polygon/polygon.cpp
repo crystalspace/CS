@@ -30,7 +30,6 @@
 #include "csengine/camera.h"
 #include "csengine/meshobj.h"
 #include "csengine/portal.h"
-#include "csengine/dumper.h"
 #include "csengine/lppool.h"
 #include "csengine/thing.h"
 #include "csutil/garray.h"

@@ -33,7 +33,6 @@
 #include "csengine/polygon.h"
 #include "csengine/polytext.h"
 #include "csengine/meshobj.h"
-#include "csengine/dumper.h"
 #include "command.h"
 #include "csutil/scanstr.h"
 #include "walktest.h"
@@ -295,15 +294,12 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   {
     CsPrintf (MSG_CONSOLE, "-*- General commands -*-\n");
     CsPrintf (MSG_CONSOLE, " about, version, quit, help\n");
-    CsPrintf (MSG_CONSOLE, " dblbuff, debug, db_maxpol\n");
-//  CsPrintf (MSG_CONSOLE, " coorddump, coordsave, coordload, coordset\n");
+    CsPrintf (MSG_CONSOLE, " debug, db_maxpol, db_procpol\n");
     CsPrintf (MSG_CONSOLE, " console, facenorth, facesouth, faceeast\n");
     CsPrintf (MSG_CONSOLE, " facewest, faceup, facedown, turn, activate\n");
-    CsPrintf (MSG_CONSOLE, " cls, exec, dnl, dump, cmessage, dmessage\n");
-    CsPrintf (MSG_CONSOLE, " portals, gamma, fov, fovangle\n");
-    CsPrintf (MSG_CONSOLE, " lm_grid, lm_only, cosfact\n");
-    CsPrintf (MSG_CONSOLE, " extension, lod, sprlight, coorddump, coordset\n");
-    CsPrintf (MSG_CONSOLE, " db_procpol\n");
+    CsPrintf (MSG_CONSOLE, " cls, exec, dnl, cmessage, dmessage\n");
+    CsPrintf (MSG_CONSOLE, " portals, cosfact\n");
+    CsPrintf (MSG_CONSOLE, " extension, lod, sprlight, coordset\n");
   }
   else if (!strcasecmp (cmd, "about"))
   {
@@ -371,17 +367,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     }
     else CsPrintf (MSG_CONSOLE, "Please specify the name of the script!\n");
   }
-  else if (!strcasecmp (cmd, "dump"))
-  {
-    Dumper::dump (camera);
-  }
   else if (!strcasecmp (cmd, "portals"))
     change_boolean (arg, &csSector::do_portals, "portals");
-  //@@@
-  //else if (!strcasecmp (cmd, "lm_grid"))
-    //change_boolean (arg, &Textures::do_lightmapgrid, "lightmap grid");
-  //else if (!strcasecmp (cmd, "lm_only"))
-    //change_boolean (arg, &Textures::do_lightmaponly, "lightmap only");
   else if (!strcasecmp (cmd, "cls"))
   {
     if (console)
@@ -448,41 +435,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
    camera->SetO2T ( csMatrix3 (  1,  0,  0,
                                0,  0, -1,
                                1,  1,  0 ) );
-  else if (!strcasecmp (cmd, "coorddump"))
-    Dumper::dump (camera);
-  else if (!strcasecmp (cmd, "gamma"))
-  {
-    float val = g3d->GetRenderState (G3DRENDERSTATE_GAMMACORRECTION) / 65536.;
-    change_float (arg, &val, "gamma correction", 0, 10);
-    g3d->SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, QRound (val * 65536));
-  }
-  else if (!strcasecmp (cmd, "fov"))
-  {
-    float fov = (float)(camera->GetFOV ());
-    if (change_float (arg, &fov, "fov", 0.01, 2000.0))
-      camera->SetFOV ((int)fov, g3d->GetWidth ());
-  }
-  else if (!strcasecmp (cmd, "fovangle"))
-  {
-    float fov = (float)(camera->GetFOVAngle ());
-    if (change_float (arg, &fov, "fovangle", 0.01, 360.0))
-      camera->SetFOVAngle ((int)fov, g3d->GetWidth ());
-  }
-  else if (!strcasecmp (cmd, "dblbuff"))
-  {
-    iGraphics2D* g2d = g3d->GetDriver2D ();
-    bool state = g2d->GetDoubleBufferState ();
-
-    if (arg)
-    {
-      bool newstate = yes_or_no (arg, state);
-      if (newstate != (bool)state)
-        if (!g2d->DoubleBuffer (newstate))
-          CsPrintf (MSG_CONSOLE, "Switching double buffering is not supported in current video mode!\n");
-    }
-    else
-      CsPrintf (MSG_CONSOLE, "Current dblbuff is %s\n", say_on_or_off (state));
-  }
   else
   {
     CsPrintf (MSG_CONSOLE, "Unknown command: `%s'\n", cmd);

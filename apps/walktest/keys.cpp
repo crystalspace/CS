@@ -22,7 +22,6 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
 #include "csengine/engine.h"
@@ -634,7 +633,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     iObject* psobj = QUERY_INTERFACE (ps, iObject);
     Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
     	psobj->GetName (), sel->QueryObject ()->GetName ());
-    Dumper::dump (sel);
+    //Dumper::dump (sel);
     psobj->DecRef ();
   }
 

@@ -22,7 +22,6 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "csengine/dumper.h"
 #include "csengine/campos.h"
 #include "csengine/csview.h"
 #include "csengine/stats.h"

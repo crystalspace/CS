@@ -2,6 +2,23 @@ The history order is reversed so that new features are at the top.
 
 12-Jun-2001
 	- Fixed a compile error and warning in SCF.
+	- Removed dumper.cpp and dumper.h. They are obsolete and BugPlug
+	  will soon get nearly all the functionality which was in Dumper.
+	- Removed obsolete (and useless) unix specific signal handling
+	  in walktest.cpp.
+	- Removed the commands 'gamma', 'dblbuff', 'dump', 'coorddump',
+	  'fov', and 'fovangle' from WalkTest. Extended BugPlug to have
+	  the equivalent functionality.
+	- Beware! In the dark recesses of BugPlug there now lives a creature
+	  so awful and fierce that even the mightiest heroes don't dare to
+	  look at it! When the sun shines over the mountains and fields,
+	  everything is well and Spider remains hidden in its dark cave.
+	  However, when the moonlight is dim or shaded, and nasty bugs crawl
+	  over the country, Spider will weave its web of deceit over the
+	  infected land! Unaware of the great danger, an unsuspecting wanderer
+	  might look over the country. Here Spider will strike! It will put
+	  a curse on the wanderer which will reveal his whereabouts to Spider
+	  at any time in the future! The only remedy to this curse is death!
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following
