@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WIN32_H
-#define WIN32_H
+#ifndef __CS_WIN32_H__
+#define __CS_WIN32_H__
 
 #include <windows.h>
 
@@ -87,7 +87,7 @@ static inline bool isdir (char *path, dirent *de)
 #endif
 
 /// Windows system driver
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver
 {
 public:
   SysSystemDriver ();
@@ -97,24 +97,15 @@ public:
   virtual void Alert (const char* s);
   virtual void Warn (const char* s);
 
-  /// Implementation of IWin32SystemDriver interface.
-  class XWin32SystemDriver : public iWin32SystemDriver
-  {
-    /// Returns the HINSTANCE of the program
-    STDMETHODIMP GetInstance (HINSTANCE* retval);
-    /// Returns S_OK if the program is 'active', S_FALSE otherwise.
-    STDMETHODIMP GetIsActive ();
-    /// Gets the nCmdShow of the WinMain().
-    STDMETHODIMP GetCmdShow (int* retval);
+  /// Implementation of iWin32SystemDriver interface.
 
-    //DECLARE_IUNKNOWN ()
-  };
-
-/*
-  // COM stuff
-  DECLARE_IUNKNOWN ()
-  DECLARE_INTERFACE_TABLE (SysSystemDriver)  
-  DECLARE_COMPOSITE_INTERFACE_EMBEDDED (Win32SystemDriver);*/
+  /// Returns the HINSTANCE of the program
+  HINSTANCE GetInstance() const;
+  /// Returns true if the program is 'active', false otherwise.
+  bool GetIsActive() const;
+  /// Gets the nCmdShow of the WinMain().
+  int GetCmdShow() const;
+  DECLARE_IBASE;
 };
 
 /// Windows version.
@@ -151,5 +142,5 @@ public:
   void Move(int *x, int *y, int *button);
 };
 
-#endif // WIN32_H
+#endif // __CS_WIN32_H__
 

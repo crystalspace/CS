@@ -392,17 +392,15 @@ void SysMouseDriver::Close()
 
 // The System driver ////////////////
 
-/*
-BEGIN_INTERFACE_TABLE(SysSystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE (Win32SystemDriver)
-  IMPLEMENTS_COMPOSITE_INTERFACE (System)
-END_INTERFACE_TABLE()
-
-IMPLEMENT_UNKNOWN_NODELETE (SysSystemDriver)
-*/
+IMPLEMENT_IBASE(SysSystemDriver)
+    IMPLEMENTS_INTERFACE(iSystem)
+    IMPLEMENTS_INTERFACE(iWin32SystemDriver)
+IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
+  CONSTRUCT_IBASE(NULL);
+
   WNDCLASS wc;
 
   wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -463,23 +461,19 @@ void SysSystemDriver::Loop ()
 
 //----------------------------------------------// COM Implementation //------//
 
-//IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED( SysSystemDriver, Win32SystemDriver )
-
-STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetInstance(HINSTANCE* retval)
+HINSTANCE SysSystemDriver::GetInstance() const
 {
-  *retval = ModuleHandle;
-  return S_OK;
+  return ModuleHandle;
 }
 
-STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetIsActive()
+bool SysSystemDriver::GetIsActive() const
 {
-  return ApplicationActive ? S_OK : S_FALSE;
+  return ApplicationActive;
 }
 
-STDMETHODIMP SysSystemDriver::XWin32SystemDriver::GetCmdShow(int* retval)
+int SysSystemDriver::GetCmdShow() const
 {
-  *retval = ApplicationShow;
-  return S_OK;
+  return ApplicationShow;
 }
 
 //----------------------------------------// Windows input translator //------//
