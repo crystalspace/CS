@@ -39,7 +39,7 @@ AS_IF([test -z "$CXX"],
     [AC_MSG_ERROR([Could not find a usable C++ compiler.])])
 CS_PROG_LINK
 
-AC_CHECK_PROGS([INSTALL], [install])
+CS_CHECK_PROGS([INSTALL], [install])
 CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
 # The default RANLIB in Jambase is wrong on some platforms, and is also
@@ -48,7 +48,7 @@ CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 AC_PROG_RANLIB
 CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
 
-AC_CHECK_PROGS([PERL], [perl5 perl])
+CS_CHECK_PROGS([PERL], [perl5 perl])
 CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 
 CS_CHECK_TEMPLATE_TOOLKIT2([emit])
