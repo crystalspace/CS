@@ -19,6 +19,10 @@ chronological order.
 	  This demonstrates how the shadows and bumpmaps are modified
 	  dynamically.
 	- Jorrit fixed a crash in old renderer related to light attenuation.
+	- Jorrit fixed a strange construction in syntax services which
+	  prevented flarge from loading since there was a conflict with
+	  the 'float' keyword being used for shader variables and for
+	  portals.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6
