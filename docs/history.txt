@@ -51,6 +51,7 @@ chronological order.
 	- Eric Sunshine fixed several Jamfiles throughout the project to
 	  utilize the portable FDefines and FIncludes rules instead of
 	  harcoding -D and -I.
+	- Jorrit fixed a compile error in spr3d for OR.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there
