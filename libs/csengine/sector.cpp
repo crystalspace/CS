@@ -788,6 +788,12 @@ void csSector::Draw (iRenderView *rview)
 
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
+      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+  	alllights.Get (i)->GetCenter ());
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+  	alllights.Get (i)->GetAttenuationVector() );
+
       r3d->SetWriteMask (false, false, false, false);
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));
