@@ -336,6 +336,9 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
       format = GL_RGBA;
       type = GL_UNSIGNED_BYTE;
       break;
+    default:
+      // invalid format
+      return NULL;
   }
   glReadPixels (x, y, w, h, format, type, dest);
 
@@ -368,6 +371,9 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
         format = GL_RGBA;
         type = GL_UNSIGNED_BYTE;
         break;
+      default:
+        // invalid format
+        return;
     }
     glRasterPos2i (Area->x, Area->y);
     glDrawPixels (Area->w, Area->h, format, type, Area->data);
