@@ -679,7 +679,7 @@ iPolyTexType *csPolygon3D::eiPolygon3D::GetPolyTexType ()
 
 iThingState *csPolygon3D::eiPolygon3D::GetParent ()
 {
-  iThingState *it = SCF_QUERY_INTERFACE_FAST (
+  iThingState *it = SCF_QUERY_INTERFACE (
       scfParent->GetParent (),
       iThingState);
   it->DecRef ();

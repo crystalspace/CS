@@ -30,8 +30,6 @@
 class csObject;
 struct iObject;
 
-SCF_DECLARE_FAST_INTERFACE (iObject);
-
 /**
  * csNamedObjVector is a version of csObjVector that assumes all
  * its components are csObject's which can be examined by name etc.
@@ -237,7 +235,7 @@ inline iObject *csNamedObjectVector::Pop ()
   {
     iBase *objbase = (iBase*)Vector->Pop ();
     if (!objbase) return 0;
-    iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
+    iObject *obj = SCF_QUERY_INTERFACE (objbase, iObject);
     CS_ASSERT (obj);
     obj->DecRef ();
     return obj;
@@ -246,7 +244,7 @@ inline iObject *csNamedObjectVector::Top () const
   {
     iBase *objbase = (iBase*)Vector->Top ();
     if (!objbase) return 0;
-    iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
+    iObject *obj = SCF_QUERY_INTERFACE (objbase, iObject);
     CS_ASSERT (obj);
     obj->DecRef ();
     return obj;
@@ -258,14 +256,14 @@ inline void csNamedObjectVector::DeleteAll ()
 inline iObject *csNamedObjectVector::Get (int n) const
   {
     iBase *objbase = (iBase*)Vector->Get (n);
-    iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    iObject *o = objbase ? SCF_QUERY_INTERFACE (objbase, iObject) : 0;
     if (o) o->DecRef ();
     return o;
   }
 inline iObject *csNamedObjectVector::operator[] (int n) const
   {
     iBase *objbase = (iBase*)Vector->Get (n);
-    iObject *o = objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
+    iObject *o = objbase ? SCF_QUERY_INTERFACE (objbase, iObject) : 0;
     if (o) o->DecRef ();
     return o;
   }

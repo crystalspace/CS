@@ -119,7 +119,7 @@ csShadowMap *csLightMap::NewShadowMap (csLight *light, int w, int h)
 
   smap->Alloc (&light->scfiLight, w, h);
 
-  iStatLight *slight = SCF_QUERY_INTERFACE_FAST (light, iStatLight);
+  iStatLight *slight = SCF_QUERY_INTERFACE (light, iStatLight);
   slight->GetPrivateObject ()->RegisterLightMap (this);
   slight->DecRef ();
 

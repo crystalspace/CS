@@ -1201,7 +1201,7 @@ static void *IntersectSegmentTestPol (
     {
       csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
       csVisObjInfo *obj = bsppol->GetOriginator ();
-      iMeshWrapper *mesh = SCF_QUERY_INTERFACE_FAST (
+      iMeshWrapper *mesh = SCF_QUERY_INTERFACE (
           obj->visobj,
           iMeshWrapper);
       if (mesh)
@@ -3244,7 +3244,7 @@ void csThing::RegisterVisObject (iVisibilityObject *visobj)
   csVisObjInfo *vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
 
-  iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (visobj, iShadowCaster);
+  iShadowCaster *shadcast = SCF_QUERY_INTERFACE (visobj, iShadowCaster);
   if (shadcast) shadcast->DecRef ();
   vinf->shadcast = shadcast;
   vinf->bbox = new csPolyTreeBBox ();
@@ -3335,7 +3335,7 @@ bool csThing::VisTest (iRenderView *irview)
 
       iVisibilityObject *vo = vinf->visobj;
 
-      iMeshWrapper *mw = SCF_QUERY_INTERFACE_FAST (vo, iMeshWrapper);
+      iMeshWrapper *mw = SCF_QUERY_INTERFACE (vo, iMeshWrapper);
       mw->DecRef ();
       if (mw->GetMeshObject () == &scfiMeshObject)
       {
@@ -3528,7 +3528,7 @@ static void *CheckFrustumPolygonsFB (
 
       // @@@ The code below is all not very nice. We should not assume
       // that only meshes can be used in vis info.
-      iMeshWrapper *mesh = SCF_QUERY_INTERFACE_FAST (
+      iMeshWrapper *mesh = SCF_QUERY_INTERFACE (
           obj->visobj,
           iMeshWrapper);
       if (mesh)
@@ -3536,7 +3536,7 @@ static void *CheckFrustumPolygonsFB (
         mesh->DecRef ();
         if (!fdata->visible_things.In (mesh))
         {
-          iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (
+          iShadowCaster *shadcast = SCF_QUERY_INTERFACE (
               mesh->GetMeshObject (), iShadowCaster);
           if (shadcast)
           {
@@ -3754,7 +3754,7 @@ void csThing::CastShadows (iFrustumView *fview)
     // Only if the thing has right flags do we consider it for shadows.
     if (fview->CheckProcessMask (mesh->GetFlags ().Get ()))
     {
-      iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE_FAST (
+      iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iShadowReceiver);
       if (shadrcv)
@@ -3934,7 +3934,7 @@ void csThing::MergeTemplate (
   curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  iThingState *ith = SCF_QUERY_INTERFACE_FAST (tpl, iThingState);
+  iThingState *ith = SCF_QUERY_INTERFACE (tpl, iThingState);
   ParentTemplate = (csThing *) (ith->GetPrivateObject ());
   ith->DecRef ();
 
@@ -4054,7 +4054,7 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
 
-  iPolygon3D *ip = SCF_QUERY_INTERFACE_FAST (p, iPolygon3D);
+  iPolygon3D *ip = SCF_QUERY_INTERFACE (p, iPolygon3D);
   p->DecRef ();
   return ip;
 }
@@ -4169,7 +4169,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 iMeshObjectFactory *csThingObjectType::NewFactory ()
 {
   csThing *cm = new csThing (this);
-  iMeshObjectFactory *ifact = SCF_QUERY_INTERFACE_FAST (
+  iMeshObjectFactory *ifact = SCF_QUERY_INTERFACE (
       cm,
       iMeshObjectFactory);
   ifact->DecRef ();
@@ -4198,7 +4198,7 @@ iCurveTemplate *csThingObjectType::CreateBezierTemplate (const char *name)
   if (name) ptemplate->SetName (name);
   curve_templates.Push (ptemplate);
 
-  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE_FAST (
+  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE (
       ptemplate,
       iCurveTemplate);
   itmpl->DecRef ();
@@ -4211,7 +4211,7 @@ iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *iName)
   pl = (csCurveTemplate *)curve_templates.FindByName (iName);
   if (!pl) return NULL;
 
-  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE_FAST (pl, iCurveTemplate);
+  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE (pl, iCurveTemplate);
   itmpl->DecRef ();
   return itmpl;
 }
@@ -4236,7 +4236,7 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate *ct)
   for (i = 0; i < curve_templates.Length (); i++)
   {
     csCurveTemplate *cti = (csCurveTemplate *)curve_templates[i];
-    iCurveTemplate *i_cti = SCF_QUERY_INTERFACE_FAST (cti, iCurveTemplate);
+    iCurveTemplate *i_cti = SCF_QUERY_INTERFACE (cti, iCurveTemplate);
     i_cti->DecRef ();
     if (ct == i_cti)
     {

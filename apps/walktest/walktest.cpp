@@ -742,7 +742,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   {
     extern void HandleDynLight (iDynLight*);
     csDynLight* dn = dyn->GetNext ();
-    if (CS_GET_CHILD_OBJECT_FAST (dyn, iDataObject))
+    if (CS_GET_CHILD_OBJECT (dyn, iDataObject))
       HandleDynLight (&(dyn->scfiDynLight));
     dyn = dn;
   }
@@ -1617,11 +1617,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Load a few sounds.
   if (mySound)
   {
-    iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT_FAST (
+    iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT (
     	Engine->QueryObject (), iSoundWrapper, "boom.wav");
     wMissile_boom = w ? w->GetSound () : NULL;
     SCF_DEC_REF (w);
-    w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
+    w = CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (),
 					iSoundWrapper, "whoosh.wav");
     wMissile_whoosh = w ? w->GetSound () : NULL;
     SCF_DEC_REF (w);

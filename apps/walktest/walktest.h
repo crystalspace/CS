@@ -63,19 +63,6 @@ struct iVirtualClock;
 struct iGraphics3D;
 struct iGraphics2D;
 
-// type information
-
-SCF_DECLARE_FAST_INTERFACE (csWalkEntity)
-SCF_DECLARE_FAST_INTERFACE (GhostSpriteInfo)
-SCF_DECLARE_FAST_INTERFACE (csDoor)
-SCF_DECLARE_FAST_INTERFACE (csRotatingObject)
-SCF_DECLARE_FAST_INTERFACE (csLightObject)
-SCF_DECLARE_FAST_INTERFACE (iSoundWrapper)
-//SCF_DECLARE_FAST_INTERFACE (iLight)
-//SCF_DECLARE_FAST_INTERFACE (iMeshWrapper)
-//SCF_DECLARE_FAST_INTERFACE (iKeyValuePair)
-SCF_DECLARE_FAST_INTERFACE (iDataObject)
-
 // Several map modes.
 #define MAP_OFF 0
 #define MAP_OVERLAY 1

@@ -60,8 +60,6 @@
   iObject* clname::QueryObject ()					\
   { return &scfiObject; }
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
-SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 

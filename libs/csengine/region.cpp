@@ -84,7 +84,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCollection *o = SCF_QUERY_INTERFACE_FAST (obj, iCollection);
+      iCollection *o = SCF_QUERY_INTERFACE (obj, iCollection);
       if (!o) continue;
 
       engine->GetCollections ()->Remove (o);
@@ -99,7 +99,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMeshWrapper *o = SCF_QUERY_INTERFACE_FAST (obj, iMeshWrapper);
+      iMeshWrapper *o = SCF_QUERY_INTERFACE (obj, iMeshWrapper);
       if (!o) continue;
 
       engine->GetMeshes ()->Remove (o);
@@ -114,7 +114,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMeshFactoryWrapper *o = SCF_QUERY_INTERFACE_FAST (
+      iMeshFactoryWrapper *o = SCF_QUERY_INTERFACE (
           obj,
           iMeshFactoryWrapper);
       if (!o) continue;
@@ -131,7 +131,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iSector *o = SCF_QUERY_INTERFACE_FAST (obj, iSector);
+      iSector *o = SCF_QUERY_INTERFACE (obj, iSector);
       if (!o) continue;
 
       engine->GetSectors ()->Remove (o);
@@ -146,7 +146,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMaterialWrapper *o = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
+      iMaterialWrapper *o = SCF_QUERY_INTERFACE (obj, iMaterialWrapper);
       if (!o) continue;
 
       engine->GetMaterialList ()->Remove (o);
@@ -161,7 +161,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iTextureWrapper *o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
+      iTextureWrapper *o = SCF_QUERY_INTERFACE (obj, iTextureWrapper);
       if (!o) continue;
 
       engine->GetTextureList ()->Remove (o);
@@ -176,7 +176,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCameraPosition *o = SCF_QUERY_INTERFACE_FAST (obj, iCameraPosition);
+      iCameraPosition *o = SCF_QUERY_INTERFACE (obj, iCameraPosition);
       if (!o) continue;
 
       engine->GetCameraPositions ()->Remove (o);
@@ -191,7 +191,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCurveTemplate *o = SCF_QUERY_INTERFACE_FAST (obj, iCurveTemplate);
+      iCurveTemplate *o = SCF_QUERY_INTERFACE (obj, iCurveTemplate);
       if (!o) continue;
       ObjRemove (obj);
       copy[i] = NULL;
@@ -211,7 +211,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iPolyTxtPlane *o = SCF_QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
+      iPolyTxtPlane *o = SCF_QUERY_INTERFACE (obj, iPolyTxtPlane);
       if (!o) continue;
       ObjRemove (obj);
       copy[i] = NULL;
@@ -254,7 +254,7 @@ bool csRegion::PrepareTextures ()
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
     {
-      iTextureWrapper *csth = SCF_QUERY_INTERFACE_FAST (
+      iTextureWrapper *csth = SCF_QUERY_INTERFACE (
           iter->GetObject (),
           iTextureWrapper);
       if (csth)
@@ -273,7 +273,7 @@ bool csRegion::PrepareTextures ()
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
     {
-      iTextureWrapper *csth = SCF_QUERY_INTERFACE_FAST (
+      iTextureWrapper *csth = SCF_QUERY_INTERFACE (
           iter->GetObject (),
           iTextureWrapper);
       if (csth)
@@ -290,7 +290,7 @@ bool csRegion::PrepareTextures ()
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
     {
-      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE_FAST (
+      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE (
           iter->GetObject (),
           iMaterialWrapper);
       if (csmh)
@@ -308,7 +308,7 @@ bool csRegion::PrepareTextures ()
   {
     for (iter = GetIterator (); !iter->IsFinished (); iter->Next ())
     {
-      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE_FAST (
+      iMaterialWrapper *csmh = SCF_QUERY_INTERFACE (
           iter->GetObject (),
           iMaterialWrapper);
       if (csmh)
@@ -369,7 +369,7 @@ bool csRegion::Region::Prepare ()
 
 iSector *csRegion::Region::FindSector (const char *iName)
 {
-  iSector *sector = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iSector *sector = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iSector,
       iName);
@@ -379,7 +379,7 @@ iSector *csRegion::Region::FindSector (const char *iName)
 
 iMeshWrapper *csRegion::Region::FindMeshObject (const char *iName)
 {
-  iMeshWrapper *m = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iMeshWrapper *m = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iMeshWrapper,
       iName);
@@ -389,7 +389,7 @@ iMeshWrapper *csRegion::Region::FindMeshObject (const char *iName)
 
 iMeshFactoryWrapper *csRegion::Region::FindMeshFactory (const char *iName)
 {
-  iMeshFactoryWrapper *mf = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iMeshFactoryWrapper *mf = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iMeshFactoryWrapper,
       iName);
@@ -399,7 +399,7 @@ iMeshFactoryWrapper *csRegion::Region::FindMeshFactory (const char *iName)
 
 iTextureWrapper *csRegion::Region::FindTexture (const char *iName)
 {
-  iTextureWrapper *t = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iTextureWrapper *t = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iTextureWrapper,
       iName);
@@ -409,7 +409,7 @@ iTextureWrapper *csRegion::Region::FindTexture (const char *iName)
 
 iMaterialWrapper *csRegion::Region::FindMaterial (const char *iName)
 {
-  iMaterialWrapper *m = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iMaterialWrapper *m = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iMaterialWrapper,
       iName);
@@ -419,7 +419,7 @@ iMaterialWrapper *csRegion::Region::FindMaterial (const char *iName)
 
 iCameraPosition *csRegion::Region::FindCameraPosition (const char *iName)
 {
-  iCameraPosition *cp = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iCameraPosition *cp = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iCameraPosition,
       iName);
@@ -429,7 +429,7 @@ iCameraPosition *csRegion::Region::FindCameraPosition (const char *iName)
 
 iCollection *csRegion::Region::FindCollection (const char *iName)
 {
-  iCollection *col = CS_GET_NAMED_CHILD_OBJECT_FAST (
+  iCollection *col = CS_GET_NAMED_CHILD_OBJECT (
       scfParent,
       iCollection,
       iName);

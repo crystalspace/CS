@@ -43,8 +43,7 @@ public:
   void* GetData () const
   { return data; }
   /**
-   * Get first data pointer associated with other object (warning: SCF
-   * call is not speed-optimized, i.e. CS_GET_CHILD_OBJECT_FAST could be used).
+   * Get first data pointer associated with other object.
    */
   static void* GetData (iObject* obj)
   {

@@ -448,7 +448,7 @@ void csPolygon2D::DrawFilled (
           bool reset = true;
           while (lp)
           {
-            iLight *il = SCF_QUERY_INTERFACE_FAST (lp->GetLight (), iLight);
+            iLight *il = SCF_QUERY_INTERFACE (lp->GetLight (), iLight);
             unsplit->UpdateVertexLighting (
                 il,
                 lp->GetLight ()->GetColor (),

@@ -135,14 +135,6 @@ int csSingleIndexVertexSet::GetTexel (int n) const
 // Some helper declarations
 // ---------------------------------------------------------------------------
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
-SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
-SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
-SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
-SCF_DECLARE_FAST_INTERFACE (iModelData);
-
 CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
@@ -172,7 +164,7 @@ static void ExtractObjects (iModelData *Parent, csModelDataObjectVector &vec)
 {
   while (1)
   {
-    iModelDataObject *obj = CS_GET_CHILD_OBJECT_FAST ((Parent->QueryObject ()),
+    iModelDataObject *obj = CS_GET_CHILD_OBJECT ((Parent->QueryObject ()),
       iModelDataObject);
     if (!obj) break;
     vec.Push (obj);
@@ -239,7 +231,7 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
   int i;
   for (i=0; i<In1->GetFrameCount (); i++)
   {
-    iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (In1->GetState (i),
+    iModelDataVertices *ver = SCF_QUERY_INTERFACE (In1->GetState (i),
       iModelDataVertices);
     if (ver)
     {
@@ -302,8 +294,8 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
     float CurrentTime;
 
     if (ABS (nf2 - nf1) < EPSILON) {
-      Frame1 = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
-      Frame2 = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
+      Frame1 = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
+      Frame2 = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
       CurrentTime = nf1;
       Hit1 = Hit2 = true;
     } else {
@@ -312,9 +304,9 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
       bool Swap;
 
       if (nf1 < nf2) {
-        DirectFrame = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
-        InterpFrameStart = SCF_QUERY_INTERFACE_FAST (In2->GetState (prev2), iModelDataVertices);
-        InterpFrameEnd = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
+        DirectFrame = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE (In2->GetState (prev2), iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
         InterpAmount = (nf1-pf2) / (nf2-pf2);
         Swap = false;
 
@@ -322,9 +314,9 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
 	Hit1 = true;
 	Hit2 = false;
       } else {
-        DirectFrame = SCF_QUERY_INTERFACE_FAST (In2->GetState (n2), iModelDataVertices);
-        InterpFrameStart = SCF_QUERY_INTERFACE_FAST (In1->GetState (prev1), iModelDataVertices);
-        InterpFrameEnd = SCF_QUERY_INTERFACE_FAST (In1->GetState (n1), iModelDataVertices);
+        DirectFrame = SCF_QUERY_INTERFACE (In2->GetState (n2), iModelDataVertices);
+        InterpFrameStart = SCF_QUERY_INTERFACE (In1->GetState (prev1), iModelDataVertices);
+        InterpFrameEnd = SCF_QUERY_INTERFACE (In1->GetState (n1), iModelDataVertices);
         InterpAmount = (nf2-pf1) / (nf1-pf1);
         Swap = true;
 
@@ -511,7 +503,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 
   while (1)
   {
-    iModelDataAction *Action = CS_GET_CHILD_OBJECT_FAST (dest->QueryObject (), iModelDataAction);
+    iModelDataAction *Action = CS_GET_CHILD_OBJECT (dest->QueryObject (), iModelDataAction);
     if (!Action) break;
 
     ActionMap1.Push (Action);
@@ -521,7 +513,7 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 
   while (1)
   {
-    iModelDataAction *Action = CS_GET_CHILD_OBJECT_FAST (src->QueryObject (), iModelDataAction);
+    iModelDataAction *Action = CS_GET_CHILD_OBJECT (src->QueryObject (), iModelDataAction);
     if (!Action) break;
 
     int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
@@ -596,7 +588,7 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
 	int i;
     for (i=0; i<OldAction->GetFrameCount (); i++)
     {
-      iModelDataVertices *oldver = SCF_QUERY_INTERFACE_FAST (OldAction->GetState (i),
+      iModelDataVertices *oldver = SCF_QUERY_INTERFACE (OldAction->GetState (i),
         iModelDataVertices);
       if (oldver)
       {
@@ -618,7 +610,7 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
   {
     iModelDataAction *Action = it.Get ();
 
-    iModelDataAction *Action2 = CS_GET_NAMED_CHILD_OBJECT_FAST (obj2->QueryObject (),
+    iModelDataAction *Action2 = CS_GET_NAMED_CHILD_OBJECT (obj2->QueryObject (),
       iModelDataAction, Action->QueryObject ()->GetName ());
 
     if (Action2)
@@ -817,7 +809,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 
 #define CS_MDLTOOL_TRY_BEGIN(obj,t)				\
   {								\
-    t *Object = SCF_QUERY_INTERFACE_FAST (obj, t);		\
+    t *Object = SCF_QUERY_INTERFACE (obj, t);		\
     if (Object) {						\
       typestring = #t;
 
@@ -937,7 +929,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   while (!it->IsFinished ())
   {
     iModelDataPolygon *Polygon =
-      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataPolygon);
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon);
     if (Polygon)
     {
       Polygons.Push (Polygon);
@@ -945,13 +937,13 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     }
 
     iModelDataAction *Action =
-      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataAction);
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataAction);
     if (Action)
     {
       for (i=0; i<Action->GetFrameCount (); i++)
       {
         iModelDataVertices *ver =
-	  SCF_QUERY_INTERFACE_FAST (Action->GetState (i), iModelDataVertices);
+	  SCF_QUERY_INTERFACE (Action->GetState (i), iModelDataVertices);
 	if (ver)
 	{
 	  VertexFrames.PushSmart (ver);

@@ -515,7 +515,6 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
-      //@@@@@@@@@@@@ USE SCF_QUERY_INTERFACE_FAST @@@@@@@@@
         // This object is possibly intersected by this beam.
 	iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj_wrap->visobj,
 		iMeshWrapper);

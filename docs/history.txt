@@ -13,6 +13,18 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the octree version of VisTest(box/sphere). It
 	  would use the object space bounding box instead of the world
 	  space bounding box for testing.
+	- Removed the following macros:
+	     SCF_QUERY_INTERFACE_FAST
+	     CS_GET_CHILD_OBJECT_FAST
+	     CS_GET_NAMED_CHILD_OBJECT_FAST
+	     CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST
+	     SCF_DECLARE_FAST_INTERFACE
+	  All SCF macros are now declared automatically as the FAST
+	  version (inside SCF_VERSION). So just remove the _FAST
+	  and it will be ok.
+	  CS_QUERY_REGISTRY and CS_QUERY_REGISTRY_TAG will also benefit
+	  from this optimization.
+	- Updated apimod96.txi for this change.
 30-Jun-2002
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly

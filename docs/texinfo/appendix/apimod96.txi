@@ -39,3 +39,29 @@ A similar change has happened in the @code{iVisibilityObject} interface.
 Functions like @code{csGetObject()} and @code{csGetCommand()} which
 were used to implement parsing functionalities in CS have now been put
 into the @code{csParser} class.
+
+@subheading Fast @sc{scf} Interfaces
+@cindex @code{SCF_QUERY_INTERFACE_FAST}
+@cindex @code{CS_GET_CHILD_OBJECT_FAST}
+@cindex @code{CS_GET_NAMED_CHILD_OBJECT_FAST}
+@cindex @code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
+@cindex @code{SCF_DECLARE_FAST_INTERFACE}
+
+The following macros have been removed:
+
+@itemize
+@item
+cindex @code{SCF_QUERY_INTERFACE_FAST}
+@item
+cindex @code{CS_GET_CHILD_OBJECT_FAST}
+@item
+cindex @code{CS_GET_NAMED_CHILD_OBJECT_FAST}
+@item
+cindex @code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
+@item
+cindex @code{SCF_DECLARE_FAST_INTERFACE}
+@end itemize
+
+Fast interfaces are now default. Just use the
+normal query versions instead of the ones above.
+

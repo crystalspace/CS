@@ -77,7 +77,6 @@ SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 
 csModelConverterOBJ::csModelConverterOBJ (iBase *pBase)

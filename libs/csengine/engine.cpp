@@ -661,7 +661,7 @@ csEngine::csEngine (iBase *iParent) :
   cbufcube = NULL;
   current_camera = NULL;
   current_engine = this;
-  current_iengine = SCF_QUERY_INTERFACE_FAST (this, iEngine);
+  current_iengine = SCF_QUERY_INTERFACE (this, iEngine);
   current_iengine->DecRef ();
   scfiEventHandler = NULL;
   use_pvs = false;
@@ -1363,7 +1363,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
+      iLightingInfo *linfo = SCF_QUERY_INTERFACE (
         s->GetMeshObject (),
         iLightingInfo);
       if (linfo)
@@ -1445,7 +1445,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      iLightingInfo *linfo = SCF_QUERY_INTERFACE_FAST (
+      iLightingInfo *linfo = SCF_QUERY_INTERFACE (
           s->GetMeshObject (),
           iLightingInfo);
       if (linfo)
@@ -2061,7 +2061,7 @@ int csEngine::GetNearbyLights (
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
         if (sqdist < dl->GetSquaredRadius ())
         {
-          iLight *il = SCF_QUERY_INTERFACE_FAST (dl, iLight);
+          iLight *il = SCF_QUERY_INTERFACE (dl, iLight);
           light_array->AddLight (il, sqdist);
           il->DecRef ();
         }
@@ -2175,7 +2175,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     if (mw->IsVisible ())
     {
       AddObject (list, num_objects, max_objects, imw->QueryObject ());
-      iThingState* st = SCF_QUERY_INTERFACE_FAST (imw->GetMeshObject (), iThingState);
+      iThingState* st = SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState);
       if (st)
       {
 	// Check if there are portals and if they are near the position.
@@ -2355,7 +2355,7 @@ iMeshWrapper *csEngine::CreateSectorWallsMesh (
 {
   iMeshObjectType *thing_type = GetThingType ();
   iMeshObjectFactory *thing_fact = thing_type->NewFactory ();
-  iMeshObject *thing_obj = SCF_QUERY_INTERFACE_FAST (thing_fact, iMeshObject);
+  iMeshObject *thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
   csMeshWrapper *thing_wrap = new csMeshWrapper (NULL, thing_obj);
@@ -2394,7 +2394,7 @@ iMaterial *csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   csMaterial *mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
 
-  iMaterial *imat = SCF_QUERY_INTERFACE_FAST (mat, iMaterial);
+  iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -2420,7 +2420,7 @@ iMaterial *csEngine::CreateBaseMaterial (
         layers[i].vshift);
   }
 
-  iMaterial *imat = SCF_QUERY_INTERFACE_FAST (mat, iMaterial);
+  iMaterial *imat = SCF_QUERY_INTERFACE (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -2463,7 +2463,7 @@ iStatLight *csEngine::CreateLight (
       pseudoDyn);
   if (name) light->SetName (name);
 
-  iStatLight *il = SCF_QUERY_INTERFACE_FAST (light, iStatLight);
+  iStatLight *il = SCF_QUERY_INTERFACE (light, iStatLight);
   il->DecRef ();
   return il;
 }
@@ -2483,7 +2483,7 @@ iDynLight *csEngine::CreateDynLight (
       color.blue);
   AddDynLight (light);
 
-  iDynLight *il = SCF_QUERY_INTERFACE_FAST (light, iDynLight);
+  iDynLight *il = SCF_QUERY_INTERFACE (light, iDynLight);
   il->DecRef ();
   return il;
 }
@@ -2769,7 +2769,7 @@ iMeshWrapper *csEngine::CreateMeshWrapper (const char *name)
 bool csEngine::RemoveObject (iBase *object)
 {
   {
-    iSector *sector = SCF_QUERY_INTERFACE_FAST (object, iSector);
+    iSector *sector = SCF_QUERY_INTERFACE (object, iSector);
     if (sector)
     {
       if (region)
@@ -2780,7 +2780,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iCameraPosition *cp = SCF_QUERY_INTERFACE_FAST (object, iCameraPosition);
+    iCameraPosition *cp = SCF_QUERY_INTERFACE (object, iCameraPosition);
     if (cp)
     {
       if (region) region->QueryObject ()->ObjRemove (cp->QueryObject ());
@@ -2790,7 +2790,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iDynLight *dl = SCF_QUERY_INTERFACE_FAST (object, iDynLight);
+    iDynLight *dl = SCF_QUERY_INTERFACE (object, iDynLight);
     if (dl)
     {
       if (region) region->QueryObject ()->ObjRemove (dl->QueryObject ());
@@ -2800,7 +2800,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iCollection *col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
+    iCollection *col = SCF_QUERY_INTERFACE (object, iCollection);
     if (col)
     {
       if (region) region->QueryObject ()->ObjRemove (col->QueryObject ());
@@ -2810,7 +2810,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iTextureWrapper *txt = SCF_QUERY_INTERFACE_FAST (object, iTextureWrapper);
+    iTextureWrapper *txt = SCF_QUERY_INTERFACE (object, iTextureWrapper);
     if (txt)
     {
       if (region) region->QueryObject ()->ObjRemove (txt->QueryObject ());
@@ -2820,7 +2820,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iMaterialWrapper *mat = SCF_QUERY_INTERFACE_FAST (
+    iMaterialWrapper *mat = SCF_QUERY_INTERFACE (
         object,
         iMaterialWrapper);
     if (mat)
@@ -2832,7 +2832,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iMeshFactoryWrapper *factwrap = SCF_QUERY_INTERFACE_FAST (
+    iMeshFactoryWrapper *factwrap = SCF_QUERY_INTERFACE (
         object,
         iMeshFactoryWrapper);
     if (factwrap)
@@ -2845,7 +2845,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iMeshWrapper *meshwrap = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
+    iMeshWrapper *meshwrap = SCF_QUERY_INTERFACE (object, iMeshWrapper);
     if (meshwrap)
     {
       if (region)
@@ -2856,7 +2856,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iPolyTxtPlane *ptp = SCF_QUERY_INTERFACE_FAST (object, iPolyTxtPlane);
+    iPolyTxtPlane *ptp = SCF_QUERY_INTERFACE (object, iPolyTxtPlane);
     if (ptp)
     {
       if (region) region->QueryObject ()->ObjRemove (ptp->QueryObject ());
@@ -2871,7 +2871,7 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    iCurveTemplate *ct = SCF_QUERY_INTERFACE_FAST (object, iCurveTemplate);
+    iCurveTemplate *ct = SCF_QUERY_INTERFACE (object, iCurveTemplate);
     if (ct)
     {
       if (region) region->QueryObject ()->ObjRemove (ct->QueryObject ());

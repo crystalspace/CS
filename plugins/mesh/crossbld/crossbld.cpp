@@ -32,10 +32,6 @@
 #include "csgeom/transfrm.h"
 #include "csutil/objiter.h"
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-SCF_DECLARE_FAST_INTERFACE (iSprite3DFactoryState);
-SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
-
 CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
 
 //----------------------------------------------------------------------------
@@ -110,7 +106,7 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
   {
     // test if this is a valid polygon
     iModelDataPolygon *Polygon =
-      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataPolygon);
+      SCF_QUERY_INTERFACE (it->GetObject (), iModelDataPolygon);
     if (!Polygon || Polygon->GetVertexCount () < 3)
     {
       it->Next ();
@@ -168,7 +164,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
       return NULL;
     }
 
-    iSprite3DFactoryState *sfState = SCF_QUERY_INTERFACE_FAST (
+    iSprite3DFactoryState *sfState = SCF_QUERY_INTERFACE (
       SubWrapper->GetMeshObjectFactory (), iSprite3DFactoryState);
     if (!sfState)
     {

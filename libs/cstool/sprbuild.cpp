@@ -27,10 +27,6 @@
 #include "imesh/mdldata.h"
 #include "imesh/sprite3d.h"
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
-SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
-
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
 
 bool csSpriteBuilder::Build (iModelDataObject *Object)
@@ -47,14 +43,14 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (),
+    iModelDataAction *ac = SCF_QUERY_INTERFACE (it1->GetObject (),
     	iModelDataAction);
     if (ac)
     {
       for (i=0; i<ac->GetFrameCount (); i++)
       {
         iModelDataVertices *ver =
-	  SCF_QUERY_INTERFACE_FAST (ac->GetState (i), iModelDataVertices);
+	  SCF_QUERY_INTERFACE (ac->GetState (i), iModelDataVertices);
         if (ver)
 	{
 	  Frames.PushSmart (ver);
@@ -93,7 +89,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   while (!it1->IsFinished ())
   {
     iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataPolygon);
+      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
     if (poly)
     {
       vertices += poly->GetVertexCount ();
@@ -112,7 +108,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   while (!it1->IsFinished ())
   {
     iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataPolygon);
+      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
     if (poly)
     {
       // build the vertex array
@@ -174,7 +170,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataAction);
+    iModelDataAction *ac = SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataAction);
     if (ac)
     {
       const char *name = ac->QueryObject ()->GetName ();
@@ -191,7 +187,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 	 * in 3d sprites.
 	 */
         int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
-        iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (
+        iModelDataVertices *ver = SCF_QUERY_INTERFACE (
 		ac->GetState (FrameIndex), iModelDataVertices);
 	if (ver)
 	{

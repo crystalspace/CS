@@ -888,7 +888,7 @@ void move_ghost (iMeshWrapper* spr)
   }
 
   // Turn around at random intervals.
-  GhostSpriteInfo* gh_info = CS_GET_CHILD_OBJECT_FAST(spr->QueryObject (),
+  GhostSpriteInfo* gh_info = CS_GET_CHILD_OBJECT (spr->QueryObject (),
 						      GhostSpriteInfo);
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
@@ -1052,7 +1052,7 @@ void HandleDynLight (iDynLight* dyn)
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
 	}
-	iDataObject *ido = CS_GET_CHILD_OBJECT_FAST (dyn->QueryObject (), iDataObject);
+	iDataObject *ido = CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject);
         dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
 	ido->DecRef ();
         if (ms->snd)
@@ -1103,7 +1103,7 @@ void HandleDynLight (iDynLight* dyn)
         es->radius -= 2;
 	if (es->radius < 1)
 	{
-	  iDataObject *ido = CS_GET_CHILD_OBJECT_FAST (dyn->QueryObject (), iDataObject);
+	  iDataObject *ido = CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject);
 	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
 	  ido->DecRef ();
 	  delete es;

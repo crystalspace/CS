@@ -31,10 +31,10 @@
 #define CS_QUERY_REGISTRY_TAG(Reg,Tag)			\
   ((Reg)->Get (Tag))
 #define CS_QUERY_REGISTRY(Reg,Interface)		\
-  (Interface*)((Reg)->Get (#Interface, iSCF::SCF->GetInterfaceID (#Interface), \
+  (Interface*)((Reg)->Get (#Interface, scfGetID_##Interface (), \
   	VERSION_##Interface))
 #define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg,Tag,Interface)		\
-  (Interface*)((Reg)->Get (Tag, iSCF::SCF->GetInterfaceID (#Interface), \
+  (Interface*)((Reg)->Get (Tag, scfGetID_##Interface (), \
   	VERSION_##Interface))
 
 struct iObjectRegistryIterator;

@@ -301,7 +301,7 @@ void csMeshWrapper::PlaceMesh ()
   for (i = 0; i < ml->GetCount (); i++)
   {
     iMeshWrapper *mesh = ml->Get (i);
-    iThingState *thing = SCF_QUERY_INTERFACE_FAST (
+    iThingState *thing = SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iThingState);
     if (thing)

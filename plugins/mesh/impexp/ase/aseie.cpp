@@ -35,8 +35,6 @@
 typedef bool (csASEInterpreter) (class csModelConverterASE *conv, csDataStream &in,
   const char *Token);
 
-SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
-
 CS_DECLARE_OBJECT_VECTOR (csModelDataPolygonVector, iModelDataPolygon);
 
 class csModelConverterASE : iModelConverter

@@ -185,7 +185,7 @@ iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
   csCrossHalo *halo = new csCrossHalo (intensity, cross);
   scfParent->SetHalo (halo);
 
-  iCrossHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iCrossHalo);
+  iCrossHalo *ihalo = SCF_QUERY_INTERFACE (halo, iCrossHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -198,7 +198,7 @@ iNovaHalo *csLight::Light::CreateNovaHalo (
   csNovaHalo *halo = new csNovaHalo (seed, num_spokes, roundness);
   scfParent->SetHalo (halo);
 
-  iNovaHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iNovaHalo);
+  iNovaHalo *ihalo = SCF_QUERY_INTERFACE (halo, iNovaHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -208,7 +208,7 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
   csFlareHalo *halo = new csFlareHalo ();
   scfParent->SetHalo (halo);
 
-  iFlareHalo *ihalo = SCF_QUERY_INTERFACE_FAST (halo, iFlareHalo);
+  iFlareHalo *ihalo = SCF_QUERY_INTERFACE (halo, iFlareHalo);
   ihalo->DecRef ();
   return ihalo;
 }
@@ -356,7 +356,7 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   // @@@ Engine should not know about iThingState!!!
   if (th)
   {
-    iThingState *thing_state = SCF_QUERY_INTERFACE_FAST (
+    iThingState *thing_state = SCF_QUERY_INTERFACE (
         th->GetMeshObject (),
         iThingState);
     if (thing_state)

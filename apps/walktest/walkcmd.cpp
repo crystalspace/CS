@@ -900,7 +900,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      iSector *Sector = SCF_QUERY_INTERFACE_FAST (src, iSector);
+      iSector *Sector = SCF_QUERY_INTERFACE (src, iSector);
       if (Sector)
       {
         char name[100], rot[100];
@@ -914,7 +914,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
         anim_dirlight = wrap;
@@ -923,7 +923,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
     {
-      iLight* l = SCF_QUERY_INTERFACE_FAST (src, iLight);
+      iLight* l = SCF_QUERY_INTERFACE (src, iLight);
       if (l)
       {
         anim_dynlight = l;
@@ -932,7 +932,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
         csVector3 hinge;
@@ -960,10 +960,10 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
-      iMeshWrapper* wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper* wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
-        iThingState* thing = SCF_QUERY_INTERFACE_FAST (
+        iThingState* thing = SCF_QUERY_INTERFACE (
 		wrap->GetMeshObject (), iThingState);
 	if (thing)
 	{
@@ -1008,7 +1008,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
 	csColor start_col, end_col;
@@ -1056,7 +1056,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
   }
   it->DecRef ();
 
-  iMeshWrapper *mesh = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+  iMeshWrapper *mesh = SCF_QUERY_INTERFACE (src, iMeshWrapper);
   if (mesh)
   {
     int k;
@@ -1100,7 +1100,7 @@ void WalkTest::ActivateObject (iObject* src)
   iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    csWalkEntity* wentity = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+    csWalkEntity* wentity = SCF_QUERY_INTERFACE (it->GetObject (),
     	csWalkEntity);
     if (wentity)
     {
@@ -2484,7 +2484,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->mySound)
     {
-      iSoundWrapper *sb = CS_GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
+      iSoundWrapper *sb = CS_GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
         QueryObject (), iSoundWrapper, arg);
       if (sb)
       {

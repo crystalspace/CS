@@ -164,7 +164,7 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
   if (culler)
   {
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (
+    iVisibilityObject *vo = SCF_QUERY_INTERFACE (
         mesh,
         iVisibilityObject);
     culler->RegisterVisObject (vo);
@@ -178,7 +178,7 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
 
   if (culler)
   {
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (
+    iVisibilityObject *vo = SCF_QUERY_INTERFACE (
         mesh,
         iVisibilityObject);
     culler->UnregisterVisObject (vo);
@@ -205,7 +205,7 @@ void csSector::UseCuller (const char *meshname)
   if (!culler_mesh) return;
 
   // Query the culler interface from it.
-  culler = SCF_QUERY_INTERFACE_FAST (
+  culler = SCF_QUERY_INTERFACE (
       culler_mesh->GetMeshObject (),
       iVisibilityCuller);
   if (!culler) { culler_mesh = NULL; return; }
@@ -223,7 +223,7 @@ void csSector::UseCuller (const char *meshname)
     iMeshWrapper *th = meshes.Get (i);
     th->GetMovable ()->UpdateMove ();
 
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
+    iVisibilityObject *vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
     culler->RegisterVisObject (vo);
     vo->DecRef ();
   }
@@ -254,7 +254,7 @@ void csSector::UseCullerPlugin (const char *plugname)
     iMeshWrapper *th = meshes.Get (i);
     th->GetMovable ()->UpdateMove ();
 
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
+    iVisibilityObject *vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
     culler->RegisterVisObject (vo);
     vo->DecRef ();
   }
@@ -392,7 +392,7 @@ csPolygon3D *csSector::IntersectSegment (
       continue;  // Already handled above.
 
     // @@@ UGLY!!!
-    iThingState *ith = SCF_QUERY_INTERFACE_FAST (
+    iThingState *ith = SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iThingState);
     if (ith)
@@ -1015,7 +1015,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
         // Only if the thing has right flags do we consider it for shadows.
         if (lview->CheckShadowMask (mesh->flags.Get ()))
 	{
-          iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (
+          iShadowCaster *shadcast = SCF_QUERY_INTERFACE (
             mesh->GetMeshObject (), iShadowCaster);
           if (shadcast)
           {
@@ -1034,7 +1034,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
       // Only if the thing has right flags do we consider it for shadows.
       if (lview->CheckProcessMask (mesh->flags.Get ()))
       {
-        iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE_FAST (
+        iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE (
           mesh->GetMeshObject (),
           iShadowReceiver);
         if (shadrcv)

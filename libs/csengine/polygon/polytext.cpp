@@ -864,7 +864,7 @@ void csPolyTexture::GetTextureBox (
 
 void csPolyTexture::SetPolygon (csPolygon3D *p)
 {
-  ipolygon = SCF_QUERY_INTERFACE_FAST (p, iPolygon3D);
+  ipolygon = SCF_QUERY_INTERFACE (p, iPolygon3D);
   ipolygon->DecRef ();
   polygon = p;
 }

@@ -67,23 +67,6 @@ typedef uint32 scfInterfaceID;
   ((Major << 24) | (Minor << 16) | Micro)
 
 /**
- * SCF_VERSION can be used as a shorter way to define an interface version;
- * you should specify interface name and major, minor and micro version
- * components. This way:
- * <pre>
- * SCF_VERSION (iSomething, 0, 0, 1);
- * struct iSomething : public iBase
- * {
- *   ...
- * };
- * </pre>
- */
-#define SCF_VERSION(Name,Major,Minor,Micro)				\
-  const int VERSION_##Name = SCF_CONSTRUCT_VERSION (Major, Minor, Micro)
-
-SCF_VERSION (iBase, 0, 1, 0);
-
-/**
  * This is the basic interface: all other interfaces should be
  * derived from this one, this will allow us to always use at least
  * some minimal functionality given any interface pointer.
@@ -587,8 +570,6 @@ CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
 
 //--------------------------------------------- Class factory interface -----//
 
-SCF_VERSION (iFactory, 0, 0, 1);
-
 /**
  * iFactory is a interface that is used to create instances of shared classes.
  * Any object supports the iFactory interface; a QueryInterface about iFactory
@@ -621,21 +602,6 @@ struct iConfigFile;
 struct iStrVector;
 
 /**
- * This macro creates a wrapper function around a static variable that
- * contains the ID number for the given interface. The function
- * initializes the variable if that has not yet happened. This macro is
- * required if you want to use SCF_QUERY_INTERFACE_FAST ().
- */
-#define SCF_DECLARE_FAST_INTERFACE(Interface)				\
-inline static scfInterfaceID scfGetID_##Interface ()			\
-{									\
-  static scfInterfaceID ID = (scfInterfaceID)-1;			\
-  if (ID == (scfInterfaceID)(-1))					\
-    ID = iSCF::SCF->GetInterfaceID (#Interface);			\
-  return ID;								\
-}
-
-/**
  * Handy macro to create an instance of a shared class.
  * This is a simple wrapper around scfCreateInstance.
  */
@@ -644,22 +610,33 @@ inline static scfInterfaceID scfGetID_##Interface ()			\
   ClassID, #Interface, VERSION_##Interface)
 
 /**
+ * SCF_VERSION can be used as a shorter way to define an interface version;
+ * you should specify interface name and major, minor and micro version
+ * components. This way:
+ * <pre>
+ * SCF_VERSION (iSomething, 0, 0, 1);
+ * struct iSomething : public iBase
+ * {
+ *   ...
+ * };
+ * </pre>
+ */
+#define SCF_VERSION(Name,Major,Minor,Micro)				\
+  const int VERSION_##Name = SCF_CONSTRUCT_VERSION (Major, Minor, Micro); \
+inline static scfInterfaceID scfGetID_##Name ()				\
+{									\
+  static scfInterfaceID ID = (scfInterfaceID)-1;			\
+  if (ID == (scfInterfaceID)(-1))					\
+    ID = iSCF::SCF->GetInterfaceID (#Name);				\
+  return ID;								\
+}
+
+/**
  * Shortcut macro to query given interface from given object.
  * This is a wrapper around iBase::QueryInterface method.
  */
 #define SCF_QUERY_INTERFACE(Object,Interface)				\
   (Interface *)(Object)->QueryInterface (				\
-    iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface)
-
-/**
- * Shortcut macro to query given interface from given object. This is a
- * wrapper around iBase::QueryInterface method that uses an ID number to
- * identify the requested interface instead of its name. To use this
- * macro, fast access to the interface must be declared with
- * SCF_DECLARE_FAST_INTERFACE ().
- */
-#define SCF_QUERY_INTERFACE_FAST(Object,Interface)			\
-  (Interface*)(Object)->QueryInterface (				\
   scfGetID_##Interface (), VERSION_##Interface)
 
 /**
@@ -669,7 +646,7 @@ inline static scfInterfaceID scfGetID_##Interface ()			\
  */
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
   (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
-    iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
+  scfGetID_##Interface (), VERSION_##Interface))
 
 /**
  * This function should be called to initialize client SCF library.
@@ -695,8 +672,6 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
 #ifdef CS_DEBUG
   struct iObjectRegistry;
 #endif
-
-SCF_VERSION (iSCF, 0, 0, 1);
 
 /**
  * iSCF is the interface that allows using SCF functions from shared classes.
@@ -838,6 +813,11 @@ struct iSCF : public iBase
    */
   virtual iStrVector* QueryClassList (char const* pattern) = 0;
 };
+
+SCF_VERSION (iFactory, 0, 0, 1);
+SCF_VERSION (iBase, 0, 1, 0);
+SCF_VERSION (iSCF, 0, 0, 1);
+
 
 /* @} */
 
