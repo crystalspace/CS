@@ -26,7 +26,7 @@
 #include "igraph2d.h"
 
 /// Unix version.
-class SysSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver, public iUnixSystemDriver
 {
   /// Use system cursor if true; otherwise use builtin CSWS software cursors
   bool HardwareCursor;

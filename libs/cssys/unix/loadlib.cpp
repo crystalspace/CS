@@ -47,7 +47,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     if (Try & 1)
       strcat (name, "lib");
     strcat (strcat (name, iName), ".so");
-    if (Handle = dlopen (name, DLOPEN_MODE))
+    if ((Handle = dlopen (name, DLOPEN_MODE)))
       break;
   }
   if (!Handle)

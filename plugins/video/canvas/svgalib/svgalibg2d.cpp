@@ -244,7 +244,7 @@ void csGraphics2DSVGALib::ProcessEvents (void* Param)
     if (down != Self->keydown [scancode])
     {
       Self->keydown [scancode] = down;
-      Self->System->QueueKeyboardEvent (key, down);
+      Self->System->QueueKeyEvent (key, down);
     }
   }
 
