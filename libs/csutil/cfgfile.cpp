@@ -249,7 +249,7 @@ csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
   Config = c;
   Node = Config->FirstNode;
   Subsection = strnew(sub);
-  SubsectionLength = (SubsectionLength ? strlen(Subsection) : 0);
+  SubsectionLength = (Subsection ? strlen(Subsection) : 0);
   Config->IncRef();
 }
 
