@@ -1645,7 +1645,7 @@ csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
   COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 csTicks csTiledCoverageBuffer::Debug_Benchmark (int num_iterations)

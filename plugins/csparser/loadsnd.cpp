@@ -35,7 +35,7 @@
 csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 {
   if (!VFS || !SoundLoader)
-    return csPtr<iSoundData> (NULL);
+    return NULL;
 
   // read the file data
   csRef<iDataBuffer> buf (VFS->ReadFile (filename));
@@ -44,7 +44,7 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
     ReportError (
 	      "crystalspace.maploader.parse.sound",
 	      "Cannot open sound file '%s' from VFS!", filename);
-    return csPtr<iSoundData> (NULL);
+    return NULL;
   }
 
   // load the sound
@@ -68,10 +68,10 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 csPtr<iSoundHandle> csLoader::LoadSound(const char* filename)
 {
   if (!SoundRender)
-    return csPtr<iSoundHandle> (NULL);
+    return NULL;
 
   csRef<iSoundData> Sound (LoadSoundData(filename));
-  if (!Sound) return csPtr<iSoundHandle> (NULL);
+  if (!Sound) return NULL;
 
   /* register the sound */
   csRef<iSoundHandle> hdl (SoundRender->RegisterSound(Sound));
@@ -90,7 +90,7 @@ csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
 {
   // load the sound handle
   csRef<iSoundHandle> Sound (LoadSound(fname));
-  if (!Sound) return csPtr<iSoundWrapper> (NULL);
+  if (!Sound) return NULL;
 
   // build wrapper object
   iSoundWrapper* Wrapper = &(new csSoundWrapper (Sound))->scfiSoundWrapper;

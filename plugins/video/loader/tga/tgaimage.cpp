@@ -140,7 +140,7 @@ csPtr<iImage> csTGAImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
      delete i ;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -167,11 +167,11 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   case CS_IMGFMT_TRUECOLOR:
     break;
   default:
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   };
 
   if (palette && !Image->GetPalette ())
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
   // fill header
   TGAheader hdr;
@@ -248,7 +248,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, const char *mime,
   if (!strcasecmp (mime, TGA_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

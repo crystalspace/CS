@@ -1452,17 +1452,17 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   }
   delete tcovbuf;
 
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 csPtr<iString> csDynaVis::Debug_StateTest ()
 {
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 csPtr<iString> csDynaVis::Debug_Dump ()
 {
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 struct color { int r, g, b; };

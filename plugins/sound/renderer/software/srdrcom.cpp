@@ -217,7 +217,7 @@ void csSoundRenderSoftware::Close()
 csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
 {
   // convert the sound
-  if (!snd->Initialize(&LoadFormat)) return csPtr<iSoundHandle> (NULL);
+  if (!snd->Initialize(&LoadFormat)) return NULL;
 
   // create the sound handle
   csSoundHandleSoftware *hdl = new csSoundHandleSoftware(this, snd);

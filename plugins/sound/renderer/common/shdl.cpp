@@ -68,7 +68,7 @@ csPtr<iSoundSource> csSoundHandle::Play(bool Loop)
     src->IncRef ();	// Avoid smart pointer release.
     return csPtr<iSoundSource> (src);
   }
-  else return csPtr<iSoundSource> (NULL);
+  else return NULL;
 }
 
 void csSoundHandle::StartStream(bool Loop)

@@ -409,7 +409,7 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
 {
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
-  if (!er) return csPtr<iBase> (NULL);
+  if (!er) return NULL;
   if (doc)
   {
     // First find the <params> node in the loaded file.
@@ -419,7 +419,7 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
       SyntaxService->ReportError (
 	      "crystalspace.maploader.load.plugin",
               doc->GetRoot (), "Could not find <params> in '%s'!", fname);
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     return plug->Parse (paramsnode, GetLoaderContext (), context);
   }
@@ -920,7 +920,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, char* buf)
 
 csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 {
-  if (!Engine) return csPtr<iMeshFactoryWrapper> (NULL);
+  if (!Engine) return NULL;
 
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
@@ -932,12 +932,12 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
     	      "Could not open mesh object file '%s' on VFS!", fname);
-    return csPtr<iMeshFactoryWrapper> (NULL);
+    return NULL;
   }
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, databuff, doc);
-  if (!er) return csPtr<iMeshFactoryWrapper> (NULL);
+  if (!er) return NULL;
   if (doc)
   {
     csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
@@ -946,7 +946,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
       ReportError (
 	      "crystalspace.maploader.parse.map",
     	      "File '%s' does not seem to contain a 'meshfact'!", fname);
-      return csPtr<iMeshFactoryWrapper> (NULL);
+      return NULL;
     }
     csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
       	meshfactnode->GetAttributeValue ("name")));
@@ -960,7 +960,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
       iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
       	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
       Engine->GetMeshFactories ()->Remove (factwrap);
-      return csPtr<iMeshFactoryWrapper> (NULL);
+      return NULL;
     }
   }
   else
@@ -984,7 +984,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 	    "crystalspace.maploader.parse.badformat",
 	    "Expected parameters instead of '%s' while parsing mesh factory!",
 	    buf);
-        return csPtr<iMeshFactoryWrapper> (NULL);
+        return NULL;
       }
 
       csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
@@ -998,11 +998,11 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
         iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
       	  ->FindByName (name);
         Engine->GetMeshFactories ()->Remove (factwrap);
-        return csPtr<iMeshFactoryWrapper> (NULL);
+        return NULL;
       }
     }
   }
-  return csPtr<iMeshFactoryWrapper> (NULL);
+  return NULL;
 }
 
 bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
@@ -2349,7 +2349,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
 
 csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
 {
-  if (!Engine) return csPtr<iMeshWrapper> (NULL);
+  if (!Engine) return NULL;
 
   csRef<iDataBuffer> databuff (VFS->ReadFile (fname));
   csRef<iMeshWrapper> mesh;
@@ -2359,12 +2359,12 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     ReportError (
 	      "crystalspace.maploader.parse.meshobject",
     	      "Could not open mesh object file '%s' on VFS!", fname);
-    return csPtr<iMeshWrapper> (NULL);
+    return NULL;
   }
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, databuff, doc);
-  if (!er) return csPtr<iMeshWrapper> (NULL);
+  if (!er) return NULL;
   if (doc)
   {
     csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
@@ -2373,7 +2373,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
       ReportError (
 	      "crystalspace.maploader.parse.map",
     	      "File '%s' does not seem to contain a 'meshobj'!", fname);
-      return csPtr<iMeshWrapper> (NULL);
+      return NULL;
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));

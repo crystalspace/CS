@@ -130,7 +130,7 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
   }
   else
     delete sh;
-  return csPtr<iSoundData> (NULL);
+  return NULL;
 }
 
 void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
@@ -153,7 +153,7 @@ csPtr<iSoundSource> csArtsRenderer::CreateSource (csArtsHandle *pHandle, int Mod
   }
   else
     delete sh;
-  return csPtr<iSoundSource> (NULL);
+  return NULL;
 }
 
 iSoundListener *csArtsRenderer::GetListener ()

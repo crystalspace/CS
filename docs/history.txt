@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  the intended use in a full smart-pointer API). With this operator
 	  removed I fixed a large part of CS (but not all) to work cleanly.
 	  Then I enabled the T* cast again.
+	- Replaced csPtr<iBla> (NULL) with NULL everywhere since that is
+	  cleaner and works just as well.
 9-Sep-2002
 	- iTextureManager->RegisterTexture() and RegisterMaterial()
 	  now return csPtr. This also fixes several ref counting bugs

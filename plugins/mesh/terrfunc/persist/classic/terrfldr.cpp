@@ -157,7 +157,7 @@ csPtr<iBase> csTerrFuncFactoryLoader::Parse (const char* /*string*/,
     	iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.terrfunc\n");
     if (!pType)
-      return csPtr<iBase> (NULL);
+      return NULL;
   }
   iMeshObjectFactory* pFactory = pType->NewFactory ();
   pType->DecRef ();
@@ -180,7 +180,7 @@ csPtr<iBase> csTerrFuncFactoryLoader::Parse (iDocumentNode* /*node*/,
 		"crystalspace.terrfuncloader.setup.objecttype",
 		"Could not load the terrfunc mesh object plugin!");
       if (reporter) reporter->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
   }
   iMeshObjectFactory* pFactory = pType->NewFactory ();
@@ -269,7 +269,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
     if (!pParams)
     {
       // @@@ Error handling!
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -280,7 +280,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	  if (!iFactory)
 	  {
 	    // @@@ Error handling!
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = iFactory->GetMeshObjectFactory()->NewInstance();
           terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
@@ -295,7 +295,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	  {
             // @@@ Error handling!
             printf("Terrain func loader: Can't find requested material '%s'\n",pStr);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  terrstate->SetMaterial (i, mat);
 	}
@@ -309,7 +309,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 		if (!mat)
 		{
 		  printf("Terrain func loader: Cant find requested material '%s'\n",pStr);
-		  return csPtr<iBase> (NULL);
+		  return NULL;
 		}
 		for (i = 0; i < j; i++) terrstate->SetMaterial(i,mat);
 	  }
@@ -412,7 +412,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	  {
 	    // @@@ Use reporter!
 	    printf ("No VFS!\n");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  iImageIO* loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
 	  if (!loader)
@@ -420,7 +420,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	    vfs->DecRef ();
 	    // @@@ Use reporter!
 	    printf ("No image loader!\n");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 
 	  csRef<iDataBuffer> buf (vfs->ReadFile (pStr));
@@ -430,7 +430,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	    loader->DecRef ();
 	    // @@@ Use reporter!
 	    printf ("Can't open file '%s' in vfs!\n", pStr);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
@@ -439,7 +439,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	  {
 	    // @@@ Use reporter!
 	    printf ("Error loading image '%s'!\n", pStr);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  terrstate->SetHeightMap (ifile, hscale, hshift);
 	}
@@ -476,7 +476,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = iFactory->GetMeshObjectFactory()->NewInstance();
           terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
@@ -496,7 +496,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	      synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-              return csPtr<iBase> (NULL);
+              return NULL;
 	    }
 	    terrstate->SetMaterial (attr->GetValueAsInt (), mat);
 	  }
@@ -513,7 +513,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	        synldr->ReportError (
 	    	  "crystalspace.terrfuncloader.parse",
 		  child, "'end' attribute missing!");
-                return csPtr<iBase> (NULL);
+                return NULL;
 	      }
 	      int end = attr->GetValueAsInt ();
 	      terrstate->LoadMaterialGroup (ldr_context, matname, start, end);
@@ -529,7 +529,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	        synldr->ReportError (
 	    	  "crystalspace.terrfuncloader.parse.unknownmaterial",
 		  child, "Couldn't find material '%s'!", matname);
-                return csPtr<iBase> (NULL);
+                return NULL;
 	      }
 	      for (i = 0 ; i < j ; i++) terrstate->SetMaterial (i, mat);
 	    }
@@ -552,7 +552,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 tl;
 	  if (!synldr->ParseVector (child, tl))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           terrstate->SetTopLeftCorner (tl);
         }
         break;
@@ -560,7 +560,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           terrstate->SetScale (s);
         }
         break;
@@ -568,7 +568,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
         {
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  terrstate->SetColor (col);
 	}
 	break;
@@ -580,7 +580,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "<position> missing in <dirlight>!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  csVector3 pos;
 	  pos.x = posnode->GetAttributeValueAsFloat ("x");
@@ -612,7 +612,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
         {
 	  bool vt;
 	  if (!synldr->ParseBool (child, vt, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  terrstate->SetVisTesting (vt);
 	}
         break;
@@ -625,7 +625,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "<image> missing in <heightmap>!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  const char* imgname = imgnode->GetContentsValue ();
 	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
@@ -639,7 +639,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "VFS is missing!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  csRef<iImageIO> loader (CS_QUERY_REGISTRY (object_reg, iImageIO));
 	  if (!loader)
@@ -647,7 +647,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "Image loader is missing!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 
 	  csRef<iDataBuffer> buf (vfs->ReadFile (imgname));
@@ -656,7 +656,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "Cannot read file '%s' on VFS!", imgname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
@@ -665,14 +665,14 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 	    	"crystalspace.terrfuncloader.parse",
 		child, "Error reading image '%s'!", imgname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  terrstate->SetHeightMap (ifile, hscale, hshift);
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

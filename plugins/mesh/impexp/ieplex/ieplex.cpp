@@ -145,7 +145,7 @@ csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
     iModelData *mdl = Converters.Get(i)->Load (Buffer, Size);
     if (mdl) return csPtr<iModelData> (mdl);
   }
-  return csPtr<iModelData> (NULL);
+  return NULL;
 }
 
 csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl, const char *Format)
@@ -156,5 +156,5 @@ csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl, const cha
     iDataBuffer *dbuf = Converters.Get(i)->Save (mdl, Format);
     if (dbuf) return csPtr<iDataBuffer> (dbuf);
   }
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }

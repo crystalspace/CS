@@ -275,7 +275,7 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (snowstate) snowstate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -325,7 +325,7 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (snowstate) snowstate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -342,7 +342,7 @@ csPtr<iBase> csSnowLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (snowstate) snowstate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -394,7 +394,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -410,7 +410,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  snowstate->SetBox (box.Min (), box.Max ());
 	}
 	break;
@@ -418,7 +418,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  snowstate->SetFallSpeed (s);
 	}
 	break;
@@ -434,7 +434,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -450,7 +450,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -459,7 +459,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -467,7 +467,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           snowstate->SetLighting (do_lighting);
         }
         break;
@@ -476,7 +476,7 @@ csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-        return csPtr<iBase> (NULL);
+        return NULL;
     }
   }
 

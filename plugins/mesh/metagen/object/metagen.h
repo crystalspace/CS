@@ -245,7 +245,7 @@ public:
   void CreateBoundingBoxLinear(int num);
   void CreateBoundingBoxBlob(int num);
   virtual void GetObjectBoundingBox(csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual csPtr<iMeshObject> NewInstance() { return csPtr<iMeshObject> (NULL); }
+  virtual csPtr<iMeshObject> NewInstance() { return NULL; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }

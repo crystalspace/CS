@@ -94,7 +94,7 @@ public:
     }
     virtual csPtr<iString> StateTest ()
     {
-      return csPtr<iString> (NULL);
+      return NULL;
     }
     virtual csTicks Benchmark (int)
     {
@@ -102,7 +102,7 @@ public:
     }
     virtual csPtr<iString> Dump ()
     {
-      return csPtr<iString> (NULL);
+      return NULL;
     }
     virtual void Dump (iGraphics3D*)
     {

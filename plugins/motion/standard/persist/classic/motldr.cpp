@@ -661,7 +661,7 @@ csPtr<iBase> csMotionLoader::Parse (const char *string,
 	if (!params)
 	{
 	  printf("Expected parameters instead of '%s'\n", string);
-	  return csPtr<iBase> (NULL);
+	  return NULL;
 	}
 	switch (cmd)
 	{
@@ -691,7 +691,7 @@ csPtr<iBase> csMotionLoader::Parse (const char *string,
 	  Report(CS_REPORTER_SEVERITY_ERROR,
 		  "Token '%s' not found while parsing the iMotionLoader plugin",
 			parser->GetLastOffender());
-	  return csPtr<iBase> (NULL);
+	  return NULL;
 	}
 	return csPtr<iBase> (this);
 }
@@ -716,13 +716,13 @@ csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
 	  {
 	    m = motman->AddMotion (motname);
 	    if (!LoadMotion (child, m))
-	      return csPtr<iBase> (NULL);
+	      return NULL;
 	  }
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
   return csPtr<iBase> (this);

@@ -65,7 +65,7 @@ csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -81,7 +81,7 @@ csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, iImageIO::FileFormatDescri
   format = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, const char* mime,
@@ -91,7 +91,7 @@ csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, const char* mime,
   mime = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

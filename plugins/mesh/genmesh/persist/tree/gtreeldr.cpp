@@ -683,7 +683,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
     ReportError (reporter,
 		"crystalspace.gentreefactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -701,7 +701,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 		"Bad format while parsing general mesh/tree factory!");
       state->DecRef ();
       fact->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -791,7 +791,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
     ReportError (reporter,
 		"crystalspace.gentreefactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
 
   csRef<iMeshObjectFactory> fact;
@@ -816,7 +816,7 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
         ReportError (reporter,
 		"crystalspace.gentreefactoryloader.parse.badformat",
 		"Unexpected token '%s' while parsing 'gentree'!");
-        return csPtr<iBase> (NULL);
+        return NULL;
     }
   }
 

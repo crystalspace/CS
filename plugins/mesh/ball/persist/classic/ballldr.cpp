@@ -181,7 +181,7 @@ csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
     ReportError (reporter,
 		"crystalspace.ballfactoryloader.setup.objecttype",
 		"Could not load the ball mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   // Incref so that smart pointer doesn't delete.
@@ -206,7 +206,7 @@ csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
     ReportError (reporter,
 		"crystalspace.ballfactoryloader.setup.objecttype",
 		"Could not load the ball mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   // Incref so that smart pointer doesn't delete.
@@ -307,7 +307,7 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       ReportError (reporter,
 		"crystalspace.ballloader.parse.badformat",
 		"Bad format while parsing ball object!");
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -376,7 +376,7 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.ballloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
@@ -391,7 +391,7 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
       	    ReportError (reporter,
 		"crystalspace.ballloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  ballstate->SetMaterialWrapper (mat);
 	}
@@ -402,7 +402,7 @@ csPtr<iBase> csBallLoader::Parse (const char* string,
 	{
 	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
 	  	"Error parsing mixmode!");
-	  return csPtr<iBase> (NULL);
+	  return NULL;
 	}
         ballstate->SetMixMode (mm);
 	break;
@@ -432,7 +432,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetReversed (r);
 	}
 	break;
@@ -440,7 +440,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetTopOnly (r);
 	}
 	break;
@@ -448,7 +448,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetCylindricalMapping (r);
 	}
 	break;
@@ -456,7 +456,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetLighting (r);
 	}
 	break;
@@ -464,7 +464,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetColor (col);
 	}
 	break;
@@ -472,7 +472,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 rad;
 	  if (!synldr->ParseVector (child, rad))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetRadius (rad.x, rad.y, rad.z);
 	}
 	break;
@@ -480,7 +480,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 rad;
 	  if (!synldr->ParseVector (child, rad))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  ballstate->SetShift (rad.x, rad.y, rad.z);
 	}
 	break;
@@ -498,7 +498,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.ballloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
@@ -513,7 +513,7 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  ballstate->SetMaterialWrapper (mat);
 	}
@@ -522,13 +522,13 @@ csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 	{
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           ballstate->SetMixMode (mm);
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -330,7 +330,7 @@ public:
       if (!scfParent->Debug_CheckTree (rc->GetCsString ()))
         return csPtr<iString> (rc);
       delete rc;
-      return csPtr<iString> (NULL);
+      return NULL;
     }
     virtual csTicks Benchmark (int num_iterations)
     {

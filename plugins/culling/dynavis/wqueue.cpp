@@ -174,6 +174,6 @@ csPtr<iString> csWriteQueue::Debug_UnitTest ()
   scfString* rc = new scfString ();
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 

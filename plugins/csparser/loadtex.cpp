@@ -40,7 +40,7 @@
 csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
 {
   if (!ImageLoader)
-     return csPtr<iImage> (NULL);
+     return NULL;
 
   if (Format & CS_IMGFMT_INVALID)
   {
@@ -207,7 +207,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 
   csRef<iImage> Image (LoadImage (fname, Format));
   if (!Image)
-    return csPtr<iTextureHandle> (NULL);
+    return NULL;
 
   csRef<iTextureHandle> TexHandle;
   if (tm)

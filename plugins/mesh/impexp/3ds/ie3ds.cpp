@@ -396,7 +396,7 @@ csPtr<iModelData> csModelConverter3ds::Load( uint8* buffer, uint32 size )
   /***  send the buffer in to be translated  ***/
   p3dsFile = LoadFileData( buffer, size );
   if( !p3dsFile )
-    return csPtr<iModelData> (NULL); // kick out if there is a problem
+    return NULL; // kick out if there is a problem
 
   // make a new instance of iModelData
   pModelData = new csModelData( );
@@ -494,7 +494,7 @@ Lib3dsMaterial *pCurMaterial;
 
     // now process that mesh
     if( !LoadMeshObjectData( pDataObject, pCurMesh, p3dsFile->materials) )
-      return csPtr<iModelData> (NULL);
+      return NULL;
 
     pDataObject->DecRef ();
 
@@ -512,7 +512,7 @@ csPtr<iDataBuffer> csModelConverter3ds::Save( iModelData* /*pMdl*/,
 {
   // not yet supported
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,

@@ -162,7 +162,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 		"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 		"Could not load the sprite.3d mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
 
   // @@@ Temporary fix to allow to set actions for objects loaded
@@ -217,7 +217,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	"Couldn't find material named '%s'", mat_name);
     spr3dLook->DecRef ();
     fact->DecRef ();
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   spr3dLook->SetMaterialWrapper (mat);
   p += strlen(mat_name) + 1;
@@ -267,7 +267,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	    fr->GetName ());
 	spr3dLook->DecRef ();
 	fact->DecRef ();
-	return csPtr<iBase> (NULL);
+	return NULL;
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
       spr3dLook->SetTexel  (tex_idx, j, csVector2 (u, v));
@@ -281,7 +281,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	fr->GetName ());
       spr3dLook->DecRef ();
       fact->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
   }
 
@@ -317,7 +317,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 	  fn, act->GetName ());
 	spr3dLook->DecRef ();
 	fact->DecRef ();
-	return csPtr<iBase> (NULL);
+	return NULL;
       }
 
       // Read the delay

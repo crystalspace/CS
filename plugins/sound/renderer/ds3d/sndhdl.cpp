@@ -43,14 +43,14 @@ void csSoundHandleDS3D::Unregister() {
 }
 
 csPtr<iSoundSource> csSoundHandleDS3D::CreateSource(int Mode3d) {
-  if (!Registered) return csPtr<iSoundSource> (NULL);
+  if (!Registered) return NULL;
   csSoundSourceDS3D *src = new csSoundSourceDS3D(NULL);
   if (src->Initialize(SoundRender, this, Mode3d, NumSamples))
     return csPtr<iSoundSource> (src);
   else
   {
     src->DecRef();
-    return csPtr<iSoundSource> (NULL);
+    return NULL;
   }
 }
 

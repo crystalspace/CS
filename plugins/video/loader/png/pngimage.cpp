@@ -112,7 +112,7 @@ csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -157,7 +157,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   const char* extraoptions)
 {
   if (!Image)
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
   int compress = 6;
   bool interlace = false;
@@ -214,7 +214,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   if (!png)
   {
 error1:
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   png_set_compression_level (png, compress);
@@ -385,7 +385,7 @@ csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
   if (!strcasecmp (mime, PNG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -1073,7 +1073,7 @@ csPtr<iBase> csPlaneLoader::Parse (const char* string,
 	"crystalspace.planeloader.parse.badformat",
         "Token '%s' not found while parsing a plane!",
     	parser->GetLastOffender ());
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
 
   if (tx1_given)
@@ -1104,7 +1104,7 @@ csPtr<iBase> csPlaneLoader::Parse (const char* string,
       ReportError (reporter,
 	  "crystalspace.planeloader.parse.badplane",
           "Not supported!");
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
@@ -1186,7 +1186,7 @@ csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 
@@ -1218,7 +1218,7 @@ csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
       synldr->ReportError (
 	  "crystalspace.planeloader.parse.badplane",
           node, "Not supported!");
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
@@ -1320,7 +1320,7 @@ csPtr<iBase> csBezierLoader::Parse (const char* string,
 	  "crystalspace.bezierloader.parse.badformat",
           "Expected parameters instead of '%s'!", buf);
       engine->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -1338,7 +1338,7 @@ csPtr<iBase> csBezierLoader::Parse (const char* string,
 	    "crystalspace.bezierloader.parse.material",
             "Couldn't find material named '%s'!", str);
           engine->DecRef ();
-          return csPtr<iBase> (NULL);
+          return NULL;
         }
         tmpl->SetMaterial (mat);
         break;
@@ -1353,7 +1353,7 @@ csPtr<iBase> csBezierLoader::Parse (const char* string,
 	      "crystalspace.bezierloader.parse.vertices",
               "Wrong number of vertices to bezier! %d should be 9!", num);
             engine->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
           }
           for (i = 0 ; i < num ; i++) tmpl->SetVertex (i, list[i]);
         }
@@ -1366,7 +1366,7 @@ csPtr<iBase> csBezierLoader::Parse (const char* string,
 	  "crystalspace.bezierloader.parse.badformat",
           "Token '%s' not found while parsing a bezier template!",
     	  parser->GetLastOffender ());
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   tmpl->IncRef ();	// Prevent smart pointer from releasing.
   return csPtr<iBase> (tmpl);
@@ -1408,7 +1408,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.material",
               child, "Couldn't find material named '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
           }
           tmpl->SetMaterial (mat);
 	}
@@ -1420,7 +1420,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.vertices",
               child, "Wrong number of vertices to bezier! Should be 9!");
-            return csPtr<iBase> (NULL);
+            return NULL;
           }
 	  tmpl->SetVertex (num_v, child->GetContentsValueAsInt ());
 	  num_v++;
@@ -1428,7 +1428,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
   
@@ -1437,7 +1437,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
       "crystalspace.bezierloader.parse.vertices",
       node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   tmpl->IncRef ();	// Prevent smart pointer from releasing.
   return csPtr<iBase> (tmpl);

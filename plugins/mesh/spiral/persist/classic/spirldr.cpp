@@ -258,7 +258,7 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (spiralstate) spiralstate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -285,7 +285,7 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (spiralstate) spiralstate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -302,7 +302,7 @@ csPtr<iBase> csSpiralLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (spiralstate) spiralstate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -347,7 +347,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -355,7 +355,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  spiralstate->SetSource (s);
 	}
 	break;
@@ -368,7 +368,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -384,7 +384,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -393,7 +393,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -402,7 +402,7 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -2408,7 +2408,7 @@ csPtr<iMeshObject> csBCTerrObjectFactory::NewInstance ()
       float longest;
       int coverage;
       if (blocksize.x > blocksize.y) longest = blocksize.x; else longest = blocksize.y;
-      if (longest <= 0) return csPtr<iMeshObject> (NULL);
+      if (longest <= 0) return NULL;
       longest = longest * longest;
       Shared_Meshes = new csSharedLODMesh*[LOD_Levels];
       LOD_Mesh_Numbers = new int[LOD_Levels];
@@ -2448,7 +2448,7 @@ csPtr<iMeshObject> csBCTerrObjectFactory::NewInstance ()
   }
   else
   {
-    return csPtr<iMeshObject> (NULL);
+    return NULL;
   }
 }
 

@@ -151,5 +151,5 @@ csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const
     iSoundData* snd=Ldr->LoadSound(Data, Size);
     if (snd) return csPtr<iSoundData> (snd);
   }
-  return csPtr<iSoundData> (NULL);
+  return NULL;
 }

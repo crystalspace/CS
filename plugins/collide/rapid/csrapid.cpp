@@ -174,7 +174,7 @@ csPtr<iString> csRapidCollideSystem::Debug_UnitTest ()
   tri2->DecRef ();
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 //-------------------------------------------------------------------------

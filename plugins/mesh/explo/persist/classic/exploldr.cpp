@@ -292,7 +292,7 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (explostate) explostate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -326,7 +326,7 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (explostate) explostate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -343,7 +343,7 @@ csPtr<iBase> csExplosionLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (explostate) explostate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -465,7 +465,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -480,7 +480,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -489,7 +489,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -497,7 +497,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           explostate->SetLighting (do_lighting);
         }
         break;
@@ -524,7 +524,7 @@ csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -2220,7 +2220,7 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   const csVector3& /*pos*/)
 {
   // @@@ Not implemented yet.
-  return csPtr<iObjectIterator> (NULL);
+  return NULL;
 }
 
 csPtr<iObjectIterator> csEngine::GetVisibleObjects (
@@ -2228,7 +2228,7 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
   const csFrustum& /*frustum*/)
 {
   // @@@ Not implemented yet.
-  return csPtr<iObjectIterator> (NULL);
+  return NULL;
 }
 
 int csEngine::GetTextureFormat () const
@@ -2624,10 +2624,10 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
       iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  if (!plug) return csPtr<iMeshFactoryWrapper> (NULL);
+  if (!plug) return NULL;
 
   csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
-  if (!fact) return csPtr<iMeshFactoryWrapper> (NULL);
+  if (!fact) return NULL;
 
   char *buf = **input;
   csRef<iLoaderContext> elctxt (CreateLoaderContext ());
@@ -2636,7 +2636,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
-    return csPtr<iMeshFactoryWrapper> (NULL);
+    return NULL;
   }
 
   csRef<iMeshObjectFactory> mof2 (
@@ -2645,7 +2645,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   {
     // @@@ ERROR?
     GetMeshFactories ()->Remove (fact);
-    return csPtr<iMeshFactoryWrapper> (NULL);
+    return NULL;
   }
 
   fact->SetMeshObjectFactory (mof2);
@@ -2670,7 +2670,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
       iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  if (!plug) return csPtr<iMeshWrapper> (NULL);
+  if (!plug) return NULL;
 
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
   if (name) meshwrap->SetName (name);
@@ -2691,7 +2691,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   {
     GetMeshes ()->Remove (imw);
     meshwrap->DecRef ();
-    return csPtr<iMeshWrapper> (NULL);
+    return NULL;
   }
 
   csRef<iMeshObject> mof2 (SCF_QUERY_INTERFACE (mof, iMeshObject));
@@ -2758,10 +2758,10 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
       classId,
       iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  if (!type) return csPtr<iMeshWrapper> (NULL);
+  if (!type) return NULL;
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  if (!fact) return csPtr<iMeshWrapper> (NULL);
+  if (!fact) return NULL;
 
   csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
   if (!mo)
@@ -2775,7 +2775,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
       mw->IncRef ();	// To avoid smart pointer release.
       return csPtr<iMeshWrapper> (mw);
     }
-    return csPtr<iMeshWrapper> (NULL);
+    return NULL;
   }
 
   csRef<iMeshWrapper> mw (CreateMeshWrapper (mo, name, sector, pos));

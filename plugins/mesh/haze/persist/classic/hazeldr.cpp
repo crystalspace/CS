@@ -318,7 +318,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
     {
       // @@@ Error handling!
       if (hazefactorystate) hazefactorystate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -331,7 +331,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
 	    if (hazefactorystate) hazefactorystate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
 	}
@@ -407,7 +407,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
 	}
@@ -416,18 +416,18 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           hazefactorystate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
 	if (!synldr->ParseVector (child, a))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
         hazefactorystate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
 	if (!synldr->ParseVector (child, a))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
         hazefactorystate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -440,7 +440,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 
@@ -605,7 +605,7 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
     {
       // @@@ Error handling!
       if (hazestate) hazestate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -617,7 +617,7 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
 	  {
 	    // @@@ Error handling!
 	    if (hazestate) hazestate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
@@ -635,7 +635,7 @@ csPtr<iBase> csHazeLoader::Parse (const char* string,
             // @@@ Error handling!
             mesh->DecRef ();
 	    if (hazestate) hazestate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  hazestate->SetMaterialWrapper (mat);
 	}
@@ -698,7 +698,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badfactory",
 		child, "Could not find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
@@ -715,7 +715,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  hazestate->SetMaterialWrapper (mat);
 	}
@@ -724,18 +724,18 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           hazestate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
         if (!synldr->ParseVector (child, a))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
         hazestate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
         if (!synldr->ParseVector (child, a))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
         hazestate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -748,7 +748,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -211,7 +211,7 @@ csPtr<iImage> csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -230,7 +230,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
       break;
     default:
       // unknown format
-      return csPtr<iDataBuffer> (NULL);
+      return NULL;
   } /* endswitch */
 
   // compression options
@@ -298,7 +298,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "%s\n", errmsg);
     jpeg_destroy_compress (&cinfo);
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   jpeg_create_compress (&cinfo);
@@ -344,7 +344,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save (iImage *Image, const char *mime,
   if (!strcasecmp (mime, JPG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

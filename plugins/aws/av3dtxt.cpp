@@ -509,7 +509,7 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (
   iImage *image,
   int flags)
 {
-  if (!image) return csPtr<iTextureHandle> (NULL);
+  if (!image) return NULL;
 
   csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
   textures.Push (txt);

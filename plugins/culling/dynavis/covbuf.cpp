@@ -1450,7 +1450,7 @@ csPtr<iString> csCoverageBuffer::Debug_UnitTest ()
   }
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 csTicks csCoverageBuffer::Debug_Benchmark (int num_iterations)

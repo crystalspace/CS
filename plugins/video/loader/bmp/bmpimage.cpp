@@ -172,7 +172,7 @@ csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -187,7 +187,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   extraoptions = NULL;
 
   if (!Image || !Image->GetImageData ())
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
   // check if we have a format we support saving
   int format = Image->GetFormat ();
@@ -201,11 +201,11 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     break;
   default:
       // unknown format
-      return csPtr<iDataBuffer> (NULL);
+      return NULL;
   } /* endswitch */
 
   if (palette && !Image->GetPalette ())
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
   // calc size
   int w = Image->GetWidth ();
@@ -276,7 +276,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, const char *mime,
   if (!strcasecmp (mime, BMP_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 bool ImageBMPFile::Load (uint8* iBuffer, uint32 iSize)

@@ -128,7 +128,7 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   {
     // This is not an error. It is possible that the item
     // simply hasn't been cached.
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   data->IncRef();	// To make sure smart pointer doesn't release.

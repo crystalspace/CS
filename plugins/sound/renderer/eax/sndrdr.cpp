@@ -210,8 +210,8 @@ float csSoundRenderEAX::GetVolume()
 
 csPtr<iSoundHandle> csSoundRenderEAX::RegisterSound(iSoundData *snd)
 {
-  if (!snd) return csPtr<iSoundHandle> (NULL);
-  if (!snd->Initialize(&LoadFormat)) return csPtr<iSoundHandle> (NULL);
+  if (!snd) return NULL;
+  if (!snd->Initialize(&LoadFormat)) return NULL;
   csSoundHandleEAX *hdl = new csSoundHandleEAX(this, snd);
   SoundHandles.Push(hdl);
   return csPtr<iSoundHandle> (hdl);

@@ -209,8 +209,8 @@ float csSoundRenderDS3D::GetVolume()
 
 csPtr<iSoundHandle> csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 {
-  if (!snd) return csPtr<iSoundHandle> (NULL);
-  if (!snd->Initialize(&LoadFormat)) return csPtr<iSoundHandle> (NULL);
+  if (!snd) return NULL;
+  if (!snd->Initialize(&LoadFormat)) return NULL;
   csSoundHandleDS3D *hdl = new csSoundHandleDS3D(this, snd);
   SoundHandles.Push(hdl);
   return csPtr<iSoundHandle> (hdl);

@@ -66,7 +66,7 @@ csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -83,7 +83,7 @@ csPtr<iDataBuffer> csSGIImageIO::Save (iImage* image,
   format = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 csPtr<iDataBuffer> csSGIImageIO::Save (iImage* image, const char* mime,
@@ -94,7 +94,7 @@ csPtr<iDataBuffer> csSGIImageIO::Save (iImage* image, const char* mime,
   mime = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

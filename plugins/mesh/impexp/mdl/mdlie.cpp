@@ -226,7 +226,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMDLVersion (in))
-    return csPtr<iModelData> (NULL);
+    return NULL;
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -253,7 +253,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
     } else {
       Scene->DecRef ();
       Object->DecRef ();
-      return csPtr<iModelData> (NULL);
+      return NULL;
     }
   }
 
@@ -379,7 +379,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
 csPtr<iDataBuffer> csModelConverterMDL::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "mdl"))
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }

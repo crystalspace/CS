@@ -1038,7 +1038,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,

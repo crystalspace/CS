@@ -527,7 +527,7 @@ csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
       if (Vertices) Vertices->DecRef ();
       Vertices = NULL;
       Polygons.DeleteAll ();
-      return csPtr<iModelData> (NULL);
+      return NULL;
     }
   }
 
@@ -578,7 +578,7 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
 csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "ase"))
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
 /*
   Purpose:
@@ -600,7 +600,7 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data, const char *Form
 
   // only the first object is saved
   iModelDataObject *obj = CS_GET_CHILD_OBJECT (Data->QueryObject (), iModelDataObject);
-  if (!obj) return csPtr<iDataBuffer> (NULL);
+  if (!obj) return NULL;
   csString out;
   iModelDataVertices *ver = obj->GetDefaultVertices ();
 

@@ -468,7 +468,7 @@ void csTextureManagerLine::PrepareTextures ()
 csPtr<iTextureHandle> csTextureManagerLine::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return csPtr<iTextureHandle> (NULL);
+  if (!image) return NULL;
 
   csTextureHandleLine *txt = new csTextureHandleLine (this, image, flags);
   textures.Push (txt);

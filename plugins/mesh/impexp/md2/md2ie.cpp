@@ -232,7 +232,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
   // check for the correct version
   if (!CheckMD2Version (in))
-    return csPtr<iModelData> (NULL);
+    return NULL;
 
   // build the object framework
   iModelData *Scene = new csModelData ();
@@ -367,7 +367,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 csPtr<iDataBuffer> csModelConverterMD2::Save (iModelData *, const char *Format)
 {
   if (strcasecmp (Format, "md2"))
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }

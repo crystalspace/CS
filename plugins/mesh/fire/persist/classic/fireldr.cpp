@@ -288,7 +288,7 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (firestate) firestate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -359,7 +359,7 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (firestate) firestate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -377,7 +377,7 @@ csPtr<iBase> csFireLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (firestate) firestate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -429,7 +429,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -445,7 +445,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  firestate->SetOrigin (box);
 	}
 	break;
@@ -453,7 +453,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 origin;
 	  if (!synldr->ParseVector (child, origin))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  firestate->SetOrigin (origin);
 	}
 	break;
@@ -461,7 +461,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 dir;
 	  if (!synldr->ParseVector (child, dir))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  firestate->SetDirection (dir);
 	}
 	break;
@@ -482,7 +482,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.fireloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -498,7 +498,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fireloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -507,7 +507,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -515,7 +515,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           firestate->SetLighting (do_lighting);
         }
         break;
@@ -524,7 +524,7 @@ csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
         break;
       default:
       	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -232,7 +232,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
     ReportError (reporter,
 		"crystalspace.genmeshfactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -251,7 +251,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Bad format while parsing general mesh factory!");
       state->DecRef ();
       fact->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -267,7 +267,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Couldn't find material '%s'!", str);
             state->DecRef ();
             fact->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  state->SetMaterialWrapper (mat);
 	}
@@ -306,7 +306,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Bad format while parsing TRIANGLES for general mesh factory!");
 	      state->DecRef ();
 	      fact->DecRef ();
-	      return csPtr<iBase> (NULL);
+	      return NULL;
             }
             switch (cmd)
             {
@@ -318,7 +318,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		    "Too many TRIANGLES for a general mesh factory!");
 	          state->DecRef ();
 	          fact->DecRef ();
-	          return csPtr<iBase> (NULL);
+	          return NULL;
 		}
 		int a, b, c;
                 csScanStr (params2, "%d,%d,%d", &a, &b, &c);
@@ -337,7 +337,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           }
 	}
 	break;
@@ -355,7 +355,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Bad format while parsing NORMALS for general mesh factory!");
 	      state->DecRef ();
 	      fact->DecRef ();
-	      return csPtr<iBase> (NULL);
+	      return NULL;
             }
             switch (cmd)
             {
@@ -367,7 +367,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		    "Too many COLORS for a general mesh factory!");
 	          state->DecRef ();
 	          fact->DecRef ();
-	          return csPtr<iBase> (NULL);
+	          return NULL;
 		}
 		float x, y, z;
                 csScanStr (params2, "%f,%f,%f", &x, &y, &z);
@@ -384,7 +384,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           }
 	}
 	break;
@@ -402,7 +402,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Bad format while parsing COLORS for general mesh factory!");
 	      state->DecRef ();
 	      fact->DecRef ();
-	      return csPtr<iBase> (NULL);
+	      return NULL;
             }
             switch (cmd)
             {
@@ -414,7 +414,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		    "Too many COLORS for a general mesh factory!");
 	          state->DecRef ();
 	          fact->DecRef ();
-	          return csPtr<iBase> (NULL);
+	          return NULL;
 		}
 		float r, g, b;
                 csScanStr (params2, "%f,%f,%f", &r, &g, &b);
@@ -431,7 +431,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           }
 	}
 	break;
@@ -450,7 +450,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		"Bad format while parsing VERTICES for general mesh factory!");
 	      state->DecRef ();
 	      fact->DecRef ();
-	      return csPtr<iBase> (NULL);
+	      return NULL;
             }
             switch (cmd)
             {
@@ -462,7 +462,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		    "Too many VERTICES for a general mesh factory!");
 	          state->DecRef ();
 	          fact->DecRef ();
-	          return csPtr<iBase> (NULL);
+	          return NULL;
 		}
 		float x, y, z, u, v;
                 csScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
@@ -480,7 +480,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (const char* string,
 		parser->GetLastOffender ());
 	    state->DecRef ();
 	    fact->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           }
 	}
         break;
@@ -509,7 +509,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.setup.objecttype",
 		node, "Could not load the general mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   csRef<iMeshObjectFactory> fact;
   csRef<iGeneralFactoryState> state;
@@ -543,7 +543,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  state->SetMaterialWrapper (mat);
 	}
@@ -552,13 +552,13 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         {
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  state->GenerateBox (box);
 	}
         break;
       case XMLTOKEN_AUTONORMALS:
         if (!synldr->ParseBool (child, auto_normals, true))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
 	break;
       case XMLTOKEN_NUMTRI:
         state->SetTriangleCount (child->GetContentsValueAsInt ());
@@ -574,7 +574,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		      "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		      child, "Too many triangles for a general mesh factory!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
 	  tr[num_tri].b = child->GetAttributeValueAsInt ("v2");
@@ -590,7 +590,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    child, "Too many normals for a general mesh factory!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  float x, y, z;
 	  x = child->GetAttributeValueAsFloat ("x");
@@ -608,7 +608,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    child, "Too many colors for a general mesh factory!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  float r, g, b;
 	  r = child->GetAttributeValueAsFloat ("red");
@@ -627,7 +627,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		    child, "Too many colors for a general mesh factory!");
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  float x, y, z, u, v;
 	  x = child->GetAttributeValueAsFloat ("x");
@@ -642,7 +642,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 
@@ -751,7 +751,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
 		"crystalspace.genmeshloader.parse.badformat",
 		"Bad format while parsing general mesh object!");
       if (meshstate) meshstate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -786,7 +786,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
 		"crystalspace.genmeshloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
 	    if (meshstate) meshstate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
@@ -802,7 +802,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
 		"crystalspace.genmeshloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  meshstate->SetMaterialWrapper (mat);
 	}
@@ -815,7 +815,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (const char* string,
 	  	"Error parsing mixmode!");
 	  if (meshstate) meshstate->DecRef ();
 	  mesh->DecRef ();
-	  return csPtr<iBase> (NULL);
+	  return NULL;
 	}
         meshstate->SetMixMode (mm);
 	break;
@@ -845,7 +845,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  meshstate->SetManualColors (r);
 	}
 	break;
@@ -853,7 +853,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  meshstate->SetLighting (r);
 	}
 	break;
@@ -861,7 +861,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  meshstate->SetColor (col);
 	}
 	break;
@@ -874,7 +874,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.genmeshloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
@@ -889,7 +889,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.genmeshloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  meshstate->SetMaterialWrapper (mat);
 	}
@@ -898,13 +898,13 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           meshstate->SetMixMode (mm);
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

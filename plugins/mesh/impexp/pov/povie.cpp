@@ -121,7 +121,7 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
 
 csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/)
 {
-  return csPtr<iModelData> (NULL);
+  return NULL;
 }
 
 /*
@@ -192,7 +192,7 @@ csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/, uint32 /*Size*/
 csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "pov"))
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
 
   csString out;
   out << "// This file was created by csModelConverterPOV from Crystal Space.\n";

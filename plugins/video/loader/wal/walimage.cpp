@@ -88,12 +88,12 @@ const csVector& csWALImageIO::GetDescription ()
 csPtr<iImage> csWALImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   if (iSize < sizeof(WALHeader))
-    return csPtr<iImage> (NULL);
+    return NULL;
   ImageWALFile* i = new ImageWALFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -109,7 +109,7 @@ csPtr<iDataBuffer> csWALImageIO::Save (iImage *image, iImageIO::FileFormatDescri
   format = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 csPtr<iDataBuffer> csWALImageIO::Save (iImage *image, const char *mime,
@@ -119,7 +119,7 @@ csPtr<iDataBuffer> csWALImageIO::Save (iImage *image, const char *mime,
   mime = NULL;
   extraoptions = NULL;
 
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -126,7 +126,7 @@ void csTextureManagerInfinite::PrepareTextures ()
 csPtr<iTextureHandle> csTextureManagerInfinite::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return csPtr<iTextureHandle> (NULL);
+  if (!image) return NULL;
 
   csTextureHandleInfinite *txt = new csTextureHandleInfinite (
   	this, image, flags);

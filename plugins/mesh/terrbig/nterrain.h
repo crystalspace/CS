@@ -370,7 +370,7 @@ public:
 		virtual	iPolygonMesh*	GetPolygonMesh() { return	NULL;	}
 		virtual	iPolygonMesh*	GetSmallerPolygonMesh()	{	return NULL; }
 		virtual	csPtr<iPolygonMesh>	CreateLowerDetailPolygonMesh(	float	)
-		{	return csPtr<iPolygonMesh> (NULL); }
+		{	return NULL; }
 		virtual	void GetObjectBoundingBox( csBox3& bBBox,	int	iType	=	CS_BBOX_NORMAL )
 		{
 			scfParent->GetObjectBoundingBox(	bBBox, iType );

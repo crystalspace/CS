@@ -2419,6 +2419,6 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   desired_mixmode |= CS_FX_SETALPHA (.5);
   SYN_ASSERT (mixmode == desired_mixmode, "mixmode");
 
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 

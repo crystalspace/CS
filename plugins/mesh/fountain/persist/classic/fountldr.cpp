@@ -293,7 +293,7 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (fountstate) fountstate->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -369,7 +369,7 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (fountstate) fountstate->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -386,7 +386,7 @@ csPtr<iBase> csFountainLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (fountstate) fountstate->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -438,7 +438,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  partstate->SetColor (color);
 	}
 	break;
@@ -492,7 +492,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -508,7 +508,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -517,7 +517,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -525,7 +525,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           fountstate->SetLighting (do_lighting);
         }
         break;
@@ -534,7 +534,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -139,7 +139,7 @@ csPtr<iImage> csJNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return csPtr<iImage> (NULL);
+    return NULL;
   }
   return csPtr<iImage> (i);
 }
@@ -323,7 +323,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
       break;
     default:
       // unknown format
-      return csPtr<iDataBuffer> (NULL);
+      return NULL;
   } 
 
   // compression options
@@ -414,7 +414,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   {
     Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "failed to initialize libmng");
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   if ((mng_setcb_openstream (handle, cb_openstream) != MNG_NOERROR) ||
@@ -423,7 +423,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   {
     ReportLibmngError (object_reg, handle, "failed to set libmng callbacks");
     mng_cleanup (&handle);
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   outfile = new csMemFile ();
@@ -434,7 +434,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   bool has_alpha = imgRGBA->GetFormat() & CS_IMGFMT_ALPHA;
@@ -452,7 +452,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   // @@@ chunk data generation.
@@ -535,7 +535,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	delete outfile;
 	delete[] alpha;
 	imgRGBA->DecRef();
-	return csPtr<iDataBuffer> (NULL);
+	return NULL;
       }
     }
     else
@@ -580,7 +580,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	delete[] chunkdata;
 	delete[] alpha;
 	imgRGBA->DecRef();
-	return csPtr<iDataBuffer> (NULL);
+	return NULL;
       }
 
       char buff[0x8000];
@@ -633,7 +633,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     delete [] row;
     jpeg_destroy_compress (&cinfo);
     imgRGBA->DecRef();
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   jpeg_create_compress (&cinfo);
@@ -672,7 +672,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     mng_cleanup (&handle);
     delete outfile;
     imgRGBA->DecRef();
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
   
   imgRGBA->DecRef();
@@ -682,7 +682,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     ReportLibmngError (object_reg, handle, "failed to put IEND chunk");
     mng_cleanup (&handle);
     delete outfile;
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   if (mng_write (handle) != MNG_NOERROR)
@@ -690,7 +690,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     ReportLibmngError (object_reg, handle, "failed to write out JNG data");
     mng_cleanup (&handle);
     delete outfile;
-    return csPtr<iDataBuffer> (NULL);
+    return NULL;
   }
 
   mng_cleanup (&handle);
@@ -709,7 +709,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, const char *mime,
   if (!strcasecmp (mime, JNG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)NULL,
       extraoptions);
-  return csPtr<iDataBuffer> (NULL);
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

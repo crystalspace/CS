@@ -323,7 +323,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
     ReportError (reporter,
 		"crystalspace.sprite2dfactoryloader.setup.objecttype",
 		"Could not load the sprite.2d mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -340,7 +340,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 		"Bad format while parsing sprite2d factory!");
       fact->DecRef ();
       spr2dLook->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -355,7 +355,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 		"Couldn't find material named '%s'", str);
             fact->DecRef ();
 	    spr2dLook->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -374,7 +374,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
 	  {
 	    spr2dLook->DecRef ();
 	    fact->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
           spr2dLook->SetMixMode (mm);
 	}
@@ -406,7 +406,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.setup.objecttype",
 		node, "Could not load the sprite.2d mesh object plugin!");
-    return csPtr<iBase> (NULL);
+    return NULL;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   type->DecRef ();
@@ -431,7 +431,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
 		child, "Couldn't find material named '%s'", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -440,7 +440,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           spr2dLook->SetLighting (do_lighting);
         }
 	break;
@@ -448,18 +448,18 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           spr2dLook->SetMixMode (mm);
 	}
 	break;
       case XMLTOKEN_UVANIMATION:
 	if (!ParseAnim (child, reporter, spr2dLook,
 		child->GetAttributeValue ("name")))
-	  return csPtr<iBase> (NULL);
+	  return NULL;
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 
@@ -584,7 +584,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 		"crystalspace.sprite2dloader.parse.badformat",
 		"Bad format while parsing sprite2d!");
       if (spr2dLook) spr2dLook->DecRef ();
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -598,7 +598,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 		"crystalspace.sprite2dloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
 	    if (spr2dLook) spr2dLook->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
@@ -616,7 +616,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
 	    if (spr2dLook) spr2dLook->DecRef ();
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -628,7 +628,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 	  {
 	    if (spr2dLook) spr2dLook->DecRef ();
 	    mesh->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
           spr2dLook->SetMixMode (mm);
 	}
@@ -703,7 +703,7 @@ csPtr<iBase> csSprite2DLoader::Parse (const char* string,
 		"UVAnimation '%s' not found!", str);
 	    if (spr2dLook) spr2dLook->DecRef ();
 	    mesh->DecRef ();
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
         }
         break;
@@ -742,7 +742,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
@@ -758,7 +758,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  spr2dLook->SetMaterialWrapper (mat);
 	}
@@ -767,7 +767,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
         {
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           spr2dLook->SetMixMode (mm);
 	}
 	break;
@@ -812,7 +812,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
           spr2dLook->SetLighting (do_lighting);
         }
         break;
@@ -833,13 +833,13 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.sprite2dloader.parse.uvanim",
 		child, "UVAnimation '%s' not found!", animname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
         }
         break;
       default:
 	synldr->ReportBadToken (child);
-	return csPtr<iBase> (NULL);
+	return NULL;
     }
   }
 

@@ -1197,6 +1197,6 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
   }
 
   rc->DecRef ();
-  return csPtr<iString> (NULL);
+  return NULL;
 }
 

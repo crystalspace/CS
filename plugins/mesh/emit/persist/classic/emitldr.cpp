@@ -616,7 +616,7 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
       SCF_DEC_REF (partstate);
       SCF_DEC_REF (emitstate);
       SCF_DEC_REF (emitfactorystate);
-      return csPtr<iBase> (NULL);
+      return NULL;
     }
     switch (cmd)
     {
@@ -631,7 +631,7 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
             SCF_DEC_REF (partstate);
             SCF_DEC_REF (emitstate);
             SCF_DEC_REF (emitfactorystate);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -652,7 +652,7 @@ csPtr<iBase> csEmitLoader::Parse (const char* string,
             SCF_DEC_REF (partstate);
             SCF_DEC_REF (emitstate);
             SCF_DEC_REF (emitfactorystate);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -778,7 +778,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find factory '%s' for emit!", factname);
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -795,7 +795,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find material '%s' for emit!", matname);
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -814,7 +814,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  bool light = false;
 	  if (!synldr->ParseBool (child, light, true))
-	    return csPtr<iBase> (NULL);
+	    return NULL;
 	  emitstate->SetLighting (light);
 	}
 	break;
@@ -848,7 +848,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'alpha' in 'aging'!");
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  alpha = alphanode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> swirlnode = child->GetNode ("swirl");
@@ -856,7 +856,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'swirl' in 'aging'!");
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  swirl = swirlnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
@@ -864,7 +864,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'scale' in 'aging'!");
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  scale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> rotspeednode = child->GetNode ("rotspeed");
@@ -872,7 +872,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'rotspeed' in 'aging'!");
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  rotspeed = rotspeednode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> timenode = child->GetNode ("time");
@@ -880,13 +880,13 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'time' in 'aging'!");
-            return csPtr<iBase> (NULL);
+            return NULL;
 	  }
 	  time = timenode->GetContentsValueAsInt ();
 	  csRef<iDocumentNode> colornode = child->GetNode ("color");
 	  if (colornode)
 	    if (!synldr->ParseColor (colornode, col))
-	      return csPtr<iBase> (NULL);
+	      return NULL;
 	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
 	}
 	break;
@@ -923,7 +923,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-        return csPtr<iBase> (NULL);
+        return NULL;
     }
   }
 
