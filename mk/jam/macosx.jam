@@ -115,7 +115,7 @@ rule ApplicationIconOSX
 
 ## Wrapper basename : suffix [ : pathcomponents ]
 ##    Returns wrapper name in the directory specified by pathcomponents for
-##    the given basename.  If pathcomponents is omitted, LOCATE_TARGET is
+##    the given basename.  If pathcomponents is omitted, LOCATE.TARGETS is
 ##    used.
 rule Wrapper
 {
