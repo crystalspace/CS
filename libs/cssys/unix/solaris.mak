@@ -7,8 +7,7 @@ DESCRIPTION.solaris = Solaris
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/renderer/software video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
-PLUGINS+=video/renderer/line video/canvas/linex
-PLUGINS+=video/renderer/inf
+PLUGINS+=video/canvas/linex
 
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi

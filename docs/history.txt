@@ -10,6 +10,11 @@ The history order has been reversed so that new features are at the top.
 	  bug. When I have a little more time this needs to be investigated
 	  better.
 	- Eric Sunshine removed obsolete reference to CS/newdocs from subs.mak.
+	- Eric Sunshine changed the location of specification of the null,
+	  infinite, and line renderers in the makefiles.  Compilation of these
+	  renderers is now controlled by user.mak since they are platform-
+	  independent.  They are no longer controlled by platform-dependent
+	  makefiles.
 27-Jun-2000
 	- Samuel Humphreys fixed dtsimple:
 	    - Fixed the portal...it was the gouraud shading which broke it,

@@ -5,11 +5,11 @@
 DESCRIPTION.beos = BeOS
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/renderer/software video/renderer/line video/canvas/be \
+PLUGINS+=video/renderer/software video/canvas/be \
   video/canvas/openglbe video/renderer/opengl
 
 # Uncomment the following if you want to build/use Glide.  [CURRENTLY BROKEN]
-# PLUGINS+=video/canvas/beglide2 video/renderer/glide2
+# PLUGINS+=video/canvas/beglide2 video/renderer/glide
 
 # Be compiler does not currently grok CS assembly
 override DO_ASM=no
