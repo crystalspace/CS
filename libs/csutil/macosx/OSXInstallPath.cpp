@@ -45,20 +45,20 @@ static bool is_config_dir(csString path)
 //-----------------------------------------------------------------------------
 // test_config_dir
 //-----------------------------------------------------------------------------
-static bool test_config_dir(csString path)
+static csString test_config_dir(csString path)
 {
   if (!path.IsEmpty())
   {
     if (is_config_dir(path))
-      return true;
+      return path;
 
     if (path[path.Length() - 1] != CS_PATH_SEPARATOR)
       path << CS_PATH_SEPARATOR;
     path << "etc" << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
     if (is_config_dir(path))
-      return true;
+      return path;
   }
-  return false;
+  return "";
 }
 
 
@@ -84,8 +84,8 @@ csString csGetConfigPath()
 
   for (size_t i = 0, n = candidates.Length(); i < n; i++)
   {
-    csString path(candidates[i]);
-    if (test_config_dir(path))
+    csString const path = test_config_dir(candidates[i]);
+    if (!path.IsEmpty())
       return path;
   }
 

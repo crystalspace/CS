@@ -11,6 +11,9 @@ chronological order.
 	  msvcgen/project6x.tlib on 19-Sep-2004 which caused the linker's /out:
 	  option to be omitted from the generated project files. This caused
 	  built .exe and .dll resources to be deposited in the wrong location.
+	- Eric Sunshine fixed logic flaw in the re-written (18-Sep-2004)
+	  csGetConfigPath() for MacOS/X in which it would sometimes return the
+	  incorrect path.
 20-Sep-2004
         - Andrew Craig fixed memory leak in csparser.
 	- PK did the following:
