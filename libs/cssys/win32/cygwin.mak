@@ -47,7 +47,7 @@ O=.o
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
-LIBS.EXE=
+LIBS.EXE= $(LFLAGS.l)gdi32
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
