@@ -20,7 +20,7 @@
 #ifndef ZIP_H
 #define ZIP_H
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(COMP_BC)
 extern "C" {
 #endif
 
@@ -28,7 +28,7 @@ extern "C" {
 #include <zlib.h>
 #undef Byte
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(COMP_BC)
 }
 #endif
 
