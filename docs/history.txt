@@ -19,6 +19,7 @@ Short-term cleanups that need to be done:
 	- Fixed deletion of sprites so that they clean up their entry
 	  in the world list at deletion. So it is now safe to do
 	  'delete spr'.
+	- Martin Geisse provided another update to the Texinfo documents.
 7-Mar-2000
 	- Added LIGHTING(yes/no) option to skydomes to be able to disable
 	  lighting for the generated triangles.
