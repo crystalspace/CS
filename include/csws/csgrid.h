@@ -446,6 +446,7 @@ public:
    * Set string to display in specified cell
    */
   virtual void SetStringAt (int row, int col, const char *data);
+  csString *GetStringAt (int row, int col);
 };
 
 #endif

@@ -162,10 +162,13 @@ csSparseGrid::csGridRow::~csGridRow ()
 void csSparseGrid::csGridRow::SetAt (int col, csSome data)
 {
   int key = FindSortedKey ((csConstSome)col);
-  if (key == -1)
+  if (key == -1 && data)
     key = InsertSorted (new csGridRowEntry (col, data));
   else
-    Get (key)->data = data;
+    if (data)
+      Get (key)->data = data;
+    else
+      Delete (key);
 }
 
 csSparseGrid::csGridRowEntry* csSparseGrid::csGridRow::Get (int index)
@@ -285,12 +288,16 @@ void csGridCell::Draw ()
        sel ? CSPAL_GRIDCELL_SEL_BACKGROUND: CSPAL_GRIDCELL_BACKGROUND);
   if (data)
   {
-    int fh, fw = GetTextSize (((csString*)data)->GetData (), &fh);
-    int tx = (bound.Width () - fw) / 2;
-    int ty = (bound.Height () - fh) / 2;
-    Text (tx, ty, sel ? CSPAL_GRIDCELL_SEL_DATA_FG : CSPAL_GRIDCELL_DATA_FG, 
-	  sel ? CSPAL_GRIDCELL_SEL_DATA_BG : CSPAL_GRIDCELL_DATA_BG,
-      ((csString *)data)->GetData ());
+    const char *t = ((csString*)data)->GetData ();
+    if (t)
+    {
+      int fh, fw = MIN (bound.Width (), GetTextSize (t, &fh));
+      fh = MIN (bound.Height (), fh);
+      int tx = (bound.Width () - fw) / 2;
+      int ty = (bound.Height () - fh) / 2;
+      Text (tx, ty, sel ? CSPAL_GRIDCELL_SEL_DATA_FG : CSPAL_GRIDCELL_DATA_FG, 
+	    sel ? CSPAL_GRIDCELL_SEL_DATA_BG : CSPAL_GRIDCELL_DATA_BG, t);
+    }
   }
   bound.xmin -= lx;
   bound.ymin -= ty;
@@ -814,7 +821,7 @@ bool csGrid::HandleEvent (iEvent &Event)
       {
 	const csRect &rc = GetRootView ()->GetArea ();
 	if (ycur < rc.ymax)
-	  ycur++;
+	  SetCursorPos (ycur+1, xcur);
 	return true;
       }
       break;
@@ -823,7 +830,7 @@ bool csGrid::HandleEvent (iEvent &Event)
       {
 	const csRect &rc = GetRootView ()->GetArea ();
 	if (ycur > rc.ymin)
-	  ycur--;
+	  SetCursorPos (ycur-1, xcur);
 	return true;
       }
       break;
@@ -832,7 +839,7 @@ bool csGrid::HandleEvent (iEvent &Event)
       {
 	const csRect &rc = GetRootView ()->GetArea ();
 	if (xcur > rc.xmin)
-	  xcur--;
+	  SetCursorPos (ycur, xcur-1);
 	return true;
       }
       break;
@@ -841,7 +848,7 @@ bool csGrid::HandleEvent (iEvent &Event)
       {
 	const csRect &rc = GetRootView ()->GetArea ();
 	if (xcur < rc.xmax)
-	  xcur++;
+	  SetCursorPos (ycur, xcur+1);
 	return true;
       }
       break;
@@ -979,6 +986,11 @@ void csGrid::SetStringAt (int row, int col, const char *data)
   }
 }
 
+csString *csGrid::GetStringAt (int row, int col)
+{
+  return (csString*)grid->GetAt (row, col);
+}
+
 void csGrid::CreateRegion (csRect& rc, csGridCell *cell) 
 {
   regions->Insert (rc, cell); 
@@ -1012,7 +1024,7 @@ void csGrid::SetCursorPos (int row, int col)
   {
     ycur = row;
     xcur = col;
-    if (parent) parent->SendCommand (cscmdGridCursorChanged);
+    if (parent) parent->SendCommand (cscmdGridCursorChanged, (csSome)this);
   }
 }
 
