@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+25-Jun-2002
+	- Added howto for a very simple map.
 23-Jun-2002
 	- Added csIntersect3::BoxSphere() function which tests intersection
 	  between a box and a sphere.
