@@ -105,6 +105,40 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
+void add_sprite (char* name, csSector* where, csVector3 const& pos, float size)
+{
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (name, true);
+  if (!tmpl)
+  {
+    Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", name);
+    return;
+  }
+  csSprite3D* spr;
+  CHK (spr = new csSprite3D ());
+  spr->SetTemplate (tmpl);
+  csNameObject::AddName (*spr, name);
+  Sys->view->GetWorld ()->sprites.Push (spr);
+  spr->MoveToSector (where);
+  spr->SetMove (pos);
+  csMatrix3 m; m.Identity (); m = m * size;
+  spr->SetTransform (m);
+
+  CHK (csDataObject* sprdata = new csDataObject ((void*)1));
+  spr->ObjAdd (sprdata);
+
+  spr->SetAction ("default");
+  spr->InitSprite ();
+}
+
+void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
+{
+  sprite->SetMove (pos);
+  sprite->MoveToSector (where);
+  csLight* lights[2];
+  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+  sprite->UpdateLighting (lights, num_lights);
+}
+
 void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radius)
 {
   csDynLight* dyn = NULL;
@@ -122,7 +156,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radiu
   if (!tmpl) return;
   Bot* bot;
   CHK (bot = new Bot (tmpl));
-  csNameObject::AddName(*bot,"bot");
+  csNameObject::AddName (*bot, "bot");
   Sys->view->GetWorld ()->sprites.Push (bot);
   bot->MoveToSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
@@ -134,6 +168,15 @@ void add_bot (float size, csSector* where, csVector3 const& pos, float dyn_radiu
   bot->next = first_bot;
   bot->light = dyn;
   first_bot = bot;
+}
+
+void HandleSprite (csSprite3D* spr)
+{
+  int data = (int)csDataObject::GetData (*spr);
+  if (data)
+  {
+    move_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+  }
 }
 
 void HandleDynLight (csDynLight* dyn)
@@ -188,6 +231,9 @@ void HandleDynLight (csDynLight* dyn)
       {
         ms->sprite->SetMove (v);
 	ms->sprite->MoveToSector (s);
+        csLight* lights[2];
+        int num_lights = Sys->world->GetNearbyLights (s, v, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+	ms->sprite->UpdateLighting (lights, num_lights);
       }
       if (ms->snd)
       {
@@ -426,7 +472,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, p_alpha\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, snd_play, snd_volume, s_fog, move3d\n");
+    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, snd_play, snd_volume, s_fog, move3d\n");
   }
   else if (!strcasecmp (cmd, "bind"))
     bind_key (arg);
@@ -555,15 +601,23 @@ static bool CommandHandler (char *cmd, char *arg)
       csMatrix3 m = ms->dir.GetT2O ();
       sp->SetTransform (m);
       sp->SetAction ("default");
-      int i;
-      for (i = 0 ; i < tmpl->GetNumVertices () ; i++)
-      {
-        float r, g, b;
-        RandomColor (r, g, b);
-        sp->SetVertexColor (i, csColor (r, g, b));
-      }
+      //int i;
+      //for (i = 0 ; i < tmpl->GetNumVertices () ; i++)
+      //{
+        //float r, g, b;
+        //RandomColor (r, g, b);
+        //sp->SetVertexColor (i, csColor (r, g, b));
+      //}
       sp->InitSprite ();
     }
+  }
+  else if (!strcasecmp (cmd, "addsprite"))
+  {
+    char name[100];
+    float size;
+    if (arg) ScanStr (arg, "%s,%f", name, &size);
+    else { *name = 0; size = 1; }
+    add_sprite (name, Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (), size);
   }
   else if (!strcasecmp (cmd, "addbot"))
   {

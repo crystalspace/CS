@@ -17,9 +17,11 @@
 */
 
 #include "sysdef.h"
+#include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "csengine/sector.h"
 #include "csengine/light/light.h"
+#include "csengine/world.h"
 #include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(Bot,csSprite3D);
@@ -89,6 +91,9 @@ void Bot::move (long elapsed_time)
   if (s)
   {
     MoveToSector (s);
+    csLight* lights[2];
+    int num_lights = Sys->world->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    UpdateLighting (lights, num_lights);
     if (light)
     {
       light->Move (s, new_p.x, new_p.y, new_p.z);
