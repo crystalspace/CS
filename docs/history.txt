@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-Mar-2002
+	- Reverted part of 'res' changes to the lightmap checker because
+	  they cause big problems.
 27-Mar-2002
 	- Preparation for release 0.94. Updated version numbers.
 26-Mar-2002

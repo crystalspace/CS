@@ -881,7 +881,11 @@ void csPolygon3D::Finish ()
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
-  if (flags.Check (CS_POLY_LIGHTING))
+  if (
+    flags.Check (CS_POLY_LIGHTING) &&
+    csLightMap::CalcLightMapWidth (lmi->tex->w_orig) <= 256 &&
+    csLightMap::CalcLightMapHeight (lmi->tex->h) <= 256)
+  //&& TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
   {
     csLightMap *lm = new csLightMap ();
     lmi->tex->SetLightMap (lm);
@@ -893,14 +897,6 @@ void csPolygon3D::Finish ()
     g = csLight::ambient_green;
     b = csLight::ambient_blue;
     lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
-
-    if (!csEngine::current_engine->G3D->IsLightmapOK (lmi->GetPolyTex()))
-    {
-      csEngine::current_engine->Report ("Renderer can't handle lightmap "
-	"for polygon '%s'", GetName());
-      flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
-    }
-
     lm->DecRef ();
   }
 
@@ -1008,8 +1004,8 @@ void csPolygon3D::SetTextureSpace (
   float det = m.Determinant ();
   if (ABS (det) < EPSILON)
   {
-    csEngine::current_engine->Warn (
-      "Warning: badly specified UV coordinates for polygon '%s'!",
+    printf (
+      "Warning: badly specified UV coordinates for polygon '%s'!\n",
       GetName ());
     SetTextureSpace (p1, p2, 1);
     return ;
