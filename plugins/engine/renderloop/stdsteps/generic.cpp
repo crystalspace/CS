@@ -258,10 +258,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 	portal and copy them back afterwards.
        */
       saveMeshes.SetLength (num - n);
-      for (int i = n; i < num; i++)
+      int i;
+      for (i = n; i < num; i++)
 	saveMeshes[i - n] = *sameShaderMeshes[i - n];
       mesh->portal->Draw (rview);
-      for (int i = n; i < num; i++)
+      for (i = n; i < num; i++)
 	*sameShaderMeshes[i - n] = saveMeshes[i - n];
     }
     else 
