@@ -205,7 +205,6 @@ struct iSprite3DFactoryState : public iBase
    */
   virtual void SetNormals (csVector3 const* norms, int frame) = 0;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Add a triangle to the normal, texel, and vertex meshes
    * a, b and c are indices to texel vertices
@@ -221,7 +220,6 @@ struct iSprite3DFactoryState : public iBase
   virtual void SetTriangleCount (int count) = 0;
   /// Set array of triangles.  The array is copied.
   virtual void SetTriangles( csTriangle const* trigs, int count) = 0;
-#endif // CS_USE_NEW_RENDERER
 
   /// Create and add a new frame to the sprite.
   virtual iSpriteFrame* AddFrame () = 0;
