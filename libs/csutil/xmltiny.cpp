@@ -440,7 +440,7 @@ float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
   return f;
 }
 
-void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>& attr)
+void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>&)
 {
   // @@@ TODO
 }
@@ -507,7 +507,7 @@ csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
   return root;
 }
 
-const char* csTinyXmlDocument::Parse (iFile* file)
+const char* csTinyXmlDocument::Parse (iFile*)
 {
   return "Not implemented yet!";
 }

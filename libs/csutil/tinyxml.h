@@ -72,7 +72,8 @@ static void new_fputs (const char* msg, iString* file)
 {
   file->Append (msg);
 }
-static iString* new_fopen (const char* fn, const char* m) { return NULL; }
+static iString* new_fopen (const char* /*fn*/, const char* /*m*/)
+{ return NULL; }
 static void new_fseek (iString*, int, int) { }
 static long new_ftell (iString*) { return 0; }
 static void new_fclose (iString*) { }
