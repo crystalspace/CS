@@ -5,6 +5,7 @@
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "awsprefs.h"
+#include "awstex.h"
 #include <stdio.h>
 #include <string.h>
  
@@ -47,19 +48,25 @@ awsPrefManager::~awsPrefManager()
 void 
 awsPrefManager::Setup(iObjectRegistry *obj_reg)
 {  
-  if (DEBUG_INIT) printf("aws-debug: Initializing AWS Texture Manager\n");
+  if (DEBUG_INIT) printf("aws-debug: initializing AWS Texture Manager\n");
+
+  if (DEBUG_INIT) printf("aws-debug: creating texture manager.\n"); 
 
   awstxtmgr = new awsTextureManager();
-  awstxtmgr->Initialize(obj_reg);   
+
+  if (DEBUG_INIT) printf("aws-debug: initing texture manager\n");
+
+  if (awstxtmgr) awstxtmgr->Initialize(obj_reg); 
 }
 
 unsigned long 
 awsPrefManager::NameToId(char *n)
 {
+
  if (n) {
     unsigned long id = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n, strlen(n));
     
-    printf("aws-debug: mapped %s to %lu\n", n, id);
+    if (DEBUG_KEYS) printf("aws-debug: mapped %s to %lu\n", n, id);
     
     return id;
  }
@@ -79,13 +86,34 @@ awsPrefManager::GetColor(int index)
   return sys_colors[index]; 
 }
 
+iTextureHandle *
+awsPrefManager::GetTexture(char *name, char *filename)
+{
+
+ if (awstxtmgr)
+   return awstxtmgr->GetTexture(name, filename);
+ else 
+   return NULL;
+ 
+}
+
+void 
+awsPrefManager::SetTextureManager(iTextureManager *txtmgr)
+{
+  if (awstxtmgr)
+   awstxtmgr->SetTextureManager(txtmgr);
+}
+
 void
-awsPrefManager::SetupPalette(iGraphics3D *g3d)
+awsPrefManager::SetupPalette()
 {
  printf("aws-debug: setting up global AWS palette...\n");
   
  unsigned char red, green, blue;
- iTextureManager* txtmgr = g3d->GetTextureManager();
+ iTextureManager* txtmgr = NULL;
+
+ if (awstxtmgr)
+   txtmgr = awstxtmgr->GetTextureManager();
 
  LookupRGBKey("HighlightColor", red, green, blue); 
  sys_colors[AC_HIGHLIGHT] = txtmgr->FindRGB(red,green,blue);
@@ -148,6 +176,24 @@ awsPrefManager::SelectDefaultSkin(char *skin_name)
  {
     if (skin->Name() == id) {
       def_skin=skin;
+
+      // Set the AWS global palette
+      SetupPalette();
+  
+      // Get the default textures into the texture manager.
+      for(int i=0; i<def_skin->Length(); ++i)
+      {
+        awsKey *k = def_skin->GetAt(i);
+
+        if (k->Type() == KEY_STR)
+        {
+          awsStringKey *sk = (awsStringKey *)(k);
+          
+          if (awstxtmgr) 
+            (void)awstxtmgr->GetTexturebyID(sk->Name(), sk->Value()->GetData(), true);
+        }
+      }
+
       return true;
     }
 

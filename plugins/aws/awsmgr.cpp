@@ -26,18 +26,7 @@ awsManager::Initialize(iObjectRegistry *object_reg)
 {   
   awsManager::object_reg = object_reg;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  
-  printf("aws-debug: getting image loader.\n");
-  ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
-  
-  if (!ImageLoader) 
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
-      	"AWS could not find an image loader plugin. This is a fatal error.");
-    return false;
-  }
-
-  
+    
   printf("aws-debug: getting preference manager.\n");  
   iAwsPrefs *prefs =  SCF_CREATE_INSTANCE ("crystalspace.window.preferencemanager", iAwsPrefs);
   
@@ -53,10 +42,15 @@ awsManager::Initialize(iObjectRegistry *object_reg)
     
     prefs->Setup(object_reg);
 
+    printf("aws-debug: inited pref manager, now setting.\n");
+
     SetPrefMgr(prefs);
+
+    printf("aws-debug: decRefing the prefs manager.\n");
     prefs->DecRef();
   }
       
+  printf("aws-debug: left aws initialize.\n");
   return true;
 }
 
@@ -154,20 +148,23 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
     else
       printf("aws-debug: Prepare anim succeeded.\n");
    
-    iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
-    iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+    if (engine!=NULL)
+    {
+      iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
+      iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+    }
     
     DefaultContextInitialized=true;
   }
+
+  if (txtmgr)
+    GetPrefMgr()->SetTextureManager(txtmgr);
           
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
   
   printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
-  
-  if (ptG3D)
-    GetPrefMgr()->SetupPalette(ptG3D);
-  
+    
   if (ptG2D && ptG3D) 
   {
     ptG2D->DoubleBuffer(false);

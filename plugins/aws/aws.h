@@ -121,9 +121,6 @@ class awsManager : public iAws
 
    /// Contains the list of factory to ID mappings.
    csDLinkList component_factories;
-
-   /// Contains a reference to the image loader
-   iImageIO *ImageLoader;
    
    /// Is true if the window manager is using the internal canvas, else false.
    bool UsingDefaultContext;

@@ -172,7 +172,7 @@ public:
 
   /// Looks up a key based on it's ID.
   awsKey *Find(unsigned long id);
-    
+   
   csBasicVector &Children()
   { return children; }
  
@@ -197,6 +197,12 @@ class awsSkinNode : public awsKey, awsKeyContainer
 public:  
     awsSkinNode(iString *name):awsKey(name) {};
     virtual ~awsSkinNode() {};
+
+    int Length()
+    { return Children().Length(); }
+
+    awsKey *GetAt(int i)
+    { return (awsKey *)Children()[i]; }
     
     /// So that we know this is a skin node
     virtual unsigned char Type() 
@@ -334,13 +340,20 @@ public:
     
     /// Gets the value of a color from the global AWS palette.
     virtual int  GetColor(int index);
+
+    /// Gets a texture from the global AWS cache
+    virtual iTextureHandle *GetTexture(char *name, char *filename=NULL);
+
+    /** Changes the texture manager: unregisters all current textures, and then re-registers them
+     *  with the new manager */
+    virtual void SetTextureManager(iTextureManager *txtmgr);
     
     /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
        that you do not.  Colors should always be a user preference, and 
        should be read from the window and skin definition files (as
        happens automatically normally. */
-    virtual void SetupPalette(iGraphics3D *g3d);
+    virtual void SetupPalette();
 
     /** Performs whatever initialization is necessary.  For now, it simply initializes the
      * texture loader.
