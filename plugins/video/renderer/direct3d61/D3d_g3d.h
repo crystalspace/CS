@@ -266,10 +266,12 @@ public:
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
-  virtual csHaloHandle CreateHalo (float r, float g, float b);
-  virtual void DestroyHalo (csHaloHandle haloInfo);
-  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
-  virtual bool TestHalo (csVector3 *pCenter);
+  virtual csHaloHandle CreateHalo (float iR, float iG, float iB,
+    float iFactor, float iCross);
+  virtual void DestroyHalo (csHaloHandle iHalo);
+  virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo);
+  virtual bool TestHalo (csVector3 *iCenter);
+  virtual void SetHaloClipper (csVector2 *iClipper, int iCount) {}
 
   /// Our internal representation of halos.
   struct csG3DHardwareHaloInfo

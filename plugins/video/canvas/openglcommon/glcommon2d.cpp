@@ -60,7 +60,7 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 bool csGraphics2DGLCommon::Open(const char *Title)
 {
   if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "Renderer %s ", glGetString(GL_RENDERER) );
+    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer %s ", glGetString(GL_RENDERER) );
   if (glGetString (GL_VERSION))
     CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
   CsPrintf (MSG_INITIALIZATION, "\n");

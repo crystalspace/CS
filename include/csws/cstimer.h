@@ -55,7 +55,7 @@ class csTimer : public csComponent
   bool Stopped;
 
 public:
-  /// Create input line object
+  /// Create timer object: the timer is created in running state
   csTimer (csComponent *iParent, unsigned long iPeriod);
 
   /// Handle external events and generate timeouts

@@ -26,16 +26,18 @@
  * It has an reference count, so if you do an IncRef each time you make
  * use of it and an DecRef when you're done, the array will be automatically
  * freed when there are no more references to it.<p>
- * Methods:<p>
- * void SetLimit (int) - set max number of values the array can hold
- * int GetLimit () - query max number of values the array can hold
- * void IncRef ()/void DecRef () - Reference counter management
- * operator [] (int) - return a reference to Nth element of the array
- * <p>
+ * Methods:
+ * <ul>
+ * <li>void SetLimit (int) - set max number of values the array can hold
+ * <li>int GetLimit () - query max number of values the array can hold
+ * <li>void IncRef ()/void DecRef () - Reference counter management
+ * <li>operator [] (int) - return a reference to Nth element of the array
+ * </ul>
  * Usage examples:
- * <p>
+ * <pre>
  * DECLARE_GROWING_ARRAY (static, LightArray, csLight*)
  * DECLARE_GROWING_ARRAY (, IntArray, int)
+ * </pre>
  */
 #define DECLARE_GROWING_ARRAY(Static, Name, Type)			\
   Static class __##Name							\

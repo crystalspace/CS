@@ -40,11 +40,11 @@
 #define MAX_INDEXED_FOG_TABLES	8
 
 class TextureCache;
+class TextureCache16;
 
 struct iGraphics2D;
-class TextureCache;
-class TextureCache16;
 class csIniFile;
+class csPolygonClipper;
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
@@ -381,78 +381,24 @@ public:
   /// Use to printf through system driver
   void SysPrintf (int mode, char* str, ...);
 
-  /// Our internal representation of halos.
-  struct csG3DSoftwareHaloInfo
-  {
-    unsigned short* pbuf;
-    unsigned char* palpha;
-  };
-
-  /// Actually draws a halo the the screen.
-  class csHaloDrawer
-  {
-  public:
-    ///
-    csHaloDrawer (iGraphics2D* iG2D, float r, float g, float b);
-    ///
-    ~csHaloDrawer();
-
-    unsigned short* GetBuffer() { return mpBuffer; }
-    unsigned char* GetAlphaBuffer() { return mpAlphaBuffer; }
-
-  private:
-
-    /// the width and height of the graphics context
-    int mWidth, mHeight;
-    /// the 2D graphics context.
-    iGraphics2D* G2D;
-    /// the size to be drawn (the diameter of the halo)
-    int mDim;
-    /// the color of the halo
-    float mRed, mGreen, mBlue;
-    /// the ratio of the color intensity vs the radius
-    float mRatioRed, mRatioGreen, mRatioBlue;
-    /// the center coords.
-    int mx, my;
-    /// the buffer.
-    unsigned short* mpBuffer;
-    /// the alpha buffer.
-    unsigned char* mpAlphaBuffer;
-    /// the width of the buffer.
-    int mBufferWidth;
-    /// The number of bits to shift to get to red (depends on 555 or 565 mode).
-    int red_shift;
-    /// The mask for green (depends on 555 or 565 mode).
-    int green_mask;
-    /// The bits in one byte that are NOT used for green.
-    int not_green_bits;
-
-    void drawline_vertical(int x, int y1, int y2);
-    void drawline_outerrim(int x1, int x2, int y);
-    void drawline_innerrim(int x1, int x2, int y);
-  };
-
   ///------------ iHaloRasterizer interface implementation ------------------
-  struct csSoftHalo : public iHaloRasterizer
+  class csSoftHalo : public iHaloRasterizer
   {
+    csPolygonClipper *Clipper;
+  public:
+    csSoftHalo ();
+    virtual ~csSoftHalo ();
+
     DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
-    virtual csHaloHandle CreateHalo (float r, float g, float b);
-    virtual void DestroyHalo (csHaloHandle haloInfo);
-    virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
-    virtual bool TestHalo (csVector3* pCenter);
+    virtual csHaloHandle CreateHalo (float iR, float iG, float iB,
+      float iFactor, float iCross);
+    virtual void DestroyHalo (csHaloHandle iHalo);
+    virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo);
+    virtual bool TestHalo (csVector3 *iCenter);
+    virtual void SetHaloClipper (csVector2 *iClipper, int iCount);
   } scfiHaloRasterizer;
   friend struct csSoftHalo;
-
-  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
-  virtual csHaloHandle CreateHalo (float r, float g, float b);
-  /// Destroy the halo.
-  virtual void DestroyHalo (csHaloHandle haloInfo);
-
-  /// Draw the halo given a center point and an intensity.
-  virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
-
-  /// Test to see if a halo would be visible (but don't attempt to draw it)
-  virtual bool TestHalo (csVector3* pCenter);
+  friend struct csSoftHaloHandle;
 
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig

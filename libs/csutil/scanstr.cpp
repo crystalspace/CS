@@ -30,7 +30,7 @@ int ScanStr (const char* in, const char* format, ...)
   int num = 0;
   in += strspn (in, " \t\n\f");
 
-  while (*format)
+  while (*format && *in)
   {
     if (*format == '%')
     {

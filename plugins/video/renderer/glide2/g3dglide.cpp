@@ -1334,11 +1334,12 @@ void csGraphics3DGlide2x::SysPrintf(int mode, char* szMsg, ...)
   m_piSystem->Print(mode, buf);
 }
 
-csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
+csHaloHandle csGraphics3DGlide2x::CreateHalo (float iR, float iG, float iB,
+  float iFactor, float iCross)
 {
   if(m_bHaloEffect)
   {
-    csHaloDrawer halo(m_piG2D, r, g, b);
+    csHaloDrawer halo(m_piG2D, iR, iG, iB);
     
     csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo();
     
@@ -1374,29 +1375,29 @@ csHaloHandle csGraphics3DGlide2x::CreateHalo(float r, float g, float b)
   return NULL;
 }
 
-void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
+void csGraphics3DGlide2x::DestroyHalo(csHaloHandle iHalo)
 {
-  if(haloInfo != NULL)
+  if(iHalo != NULL)
   {
-    m_pTextureCache->UnloadHalo(((csG3DHardwareHaloInfo*)haloInfo)->halo);
-    delete (csG3DHardwareHaloInfo*)haloInfo;
+    m_pTextureCache->UnloadHalo(((csG3DHardwareHaloInfo*)iHalo)->halo);
+    delete (csG3DHardwareHaloInfo*)iHalo;
   }
 }
 
-void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
+bool csGraphics3DGlide2x::DrawHalo(csVector3* iCenter, float iIntensity, csHaloHandle iHalo)
 {
   if(m_bHaloEffect)
   {
-    if (haloInfo == NULL)
-      return E_INVALIDARG;
+    if (iHalo == NULL)
+      return false;
     
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
-      return S_FALSE;
+    if (iCenter->x > m_nWidth || iCenter->x < 0 || iCenter->y > m_nHeight || iCenter->y < 0  ) 
+      return false;
 /*
-    int izz = QInt24 (1.0f / pCenter->z);
+    int izz = QInt24 (1.0f / iCenter->z);
     HRESULT hRes = S_OK;
 
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+    unsigned long zb = z_buffer[(int)iCenter->x + (width * (int)iCenter->y)];
 
           // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)
@@ -1405,38 +1406,38 @@ void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloH
 
     GrVertex vx[4];
     
-                int ci = fIntensity*255.0f;
+                int ci = iIntensity*255.0f;
     float len = (m_nWidth/6);
 
     vx[0].a = ci; vx[0].r = ci; vx[0].g = ci; vx[0].b = ci;
-    vx[0].x = pCenter->x - len;
-    vx[0].y = pCenter->y - len;
-    vx[0].z = pCenter->z;
-    vx[0].oow = pCenter->z;
+    vx[0].x = iCenter->x - len;
+    vx[0].y = iCenter->y - len;
+    vx[0].z = iCenter->z;
+    vx[0].oow = iCenter->z;
     vx[0].tmuvtx[0].sow = 0;
     vx[0].tmuvtx[0].tow = 0;
 
     vx[1].a = ci; vx[1].r = ci; vx[1].g = ci; vx[1].b = ci;
-    vx[1].x = pCenter->x + len;
-    vx[1].y = pCenter->y - len;
-    vx[1].z = pCenter->z;
-    vx[1].oow = pCenter->z;
+    vx[1].x = iCenter->x + len;
+    vx[1].y = iCenter->y - len;
+    vx[1].z = iCenter->z;
+    vx[1].oow = iCenter->z;
     vx[1].tmuvtx[0].sow = 128;
     vx[1].tmuvtx[0].tow = 0;
 
     vx[2].a = ci; vx[2].r = ci; vx[2].g = ci; vx[2].b = ci;
-    vx[2].x = pCenter->x + len;
-    vx[2].y = pCenter->y + len;
-    vx[2].z = pCenter->z;
-    vx[2].oow = pCenter->z;
+    vx[2].x = iCenter->x + len;
+    vx[2].y = iCenter->y + len;
+    vx[2].z = iCenter->z;
+    vx[2].oow = iCenter->z;
     vx[2].tmuvtx[0].sow = 128;
     vx[2].tmuvtx[0].tow = 128;
 
     vx[3].a = ci; vx[3].r = ci; vx[3].g = ci; vx[3].b = ci;
-    vx[3].x = pCenter->x - len;
-    vx[3].y = pCenter->y + len;
-    vx[3].z = pCenter->z;
-    vx[3].oow = pCenter->z;
+    vx[3].x = iCenter->x - len;
+    vx[3].y = iCenter->y + len;
+    vx[3].z = iCenter->z;
+    vx[3].oow = iCenter->z;
     vx[3].tmuvtx[0].sow = 0;
     vx[3].tmuvtx[0].tow = 128;
     
@@ -1456,7 +1457,7 @@ void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloH
     GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);
     GlideLib_grDepthMask(FXFALSE);
 
-    HighColorCacheAndManage_Data *halo=((csG3DHardwareHaloInfo*)haloInfo)->halo;
+    HighColorCacheAndManage_Data *halo=((csG3DHardwareHaloInfo*)iHalo)->halo;
     TextureHandler *thTex = (TextureHandler *)halo->pData;
     GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
                          GR_MIPMAPLEVELMASK_BOTH,
@@ -1480,19 +1481,20 @@ void csGraphics3DGlide2x::DrawHalo(csVector3* pCenter, float fIntensity, csHaloH
                             FXFALSE,FXFALSE);
     }
   }
+  return true;
 };
 
-bool csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
+bool csGraphics3DGlide2x::TestHalo(csVector3* iCenter)
 {
   if(m_bHaloEffect)
   {
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
+    if (iCenter->x > m_nWidth || iCenter->x < 0 || iCenter->y > m_nHeight || iCenter->y < 0  ) 
       return false;
 /*
-    int izz = QInt24 (1.0f / pCenter->z);
+    int izz = QInt24 (1.0f / iCenter->z);
     HRESULT hRes = S_OK;
       
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+    unsigned long zb = z_buffer[(int)iCenter->x + (width * (int)iCenter->y)];
         
     // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SPARSE3D_H
-#define SPARSE3D_H
+#ifndef __SPARSE3D_H__
+#define __SPARSE3D_H__
 
 /**
  * General 3D sparse matrix class. This is an abstract class.
@@ -53,39 +53,40 @@ public:
  * consumes less memory.
  * @@@ NOTE! Current implementation is very naive. The list should
  * be sorted to make searching at least a little more efficient.
+ * <p>
+ * This implementation of Sparse3D is better suited when accesses
+ * are close together. The speed of access is much better (no need
+ * to scan lists).
  */
 class WideSparse3D : public Sparse3D
 {
 private:
   ///
-  class SparseCell
+  struct SparseCell
   {
-    public:
-      int z;
-      void* obj;
-      SparseCell* next, * prev;
+    int z;
+    void* obj;
+    SparseCell* next, * prev;
   };
   ///
-  class HdY
+  struct HdY
   {
-    public:
-      HdY () { first_z = NULL; }
-      int y;
-      HdY* next, * prev;
-      SparseCell* first_z;
+    HdY () { first_z = NULL; }
+    int y;
+    HdY* next, * prev;
+    SparseCell* first_z;
   };
   ///
-  class HdX
+  struct HdX
   {
-    public:
-      HdX () { first_y = NULL; }
-      int x;
-      HdX* next, * prev;
-      HdY* first_y;
+    HdX () { first_y = NULL; }
+    int x;
+    HdX* next, * prev;
+    HdY* first_y;
   };
+
   ///
   HdX* first_x;
-
   ///
   HdX* get_header_x (int x);
   ///
@@ -112,12 +113,4 @@ public:
   virtual void del (int x, int y, int z);
 };
 
-/**
- * This implementation of Sparse3D is better suited when accesses
- * are close together. The speed of access is much better (no need
- * to scan lists).
- */
-/// Unimplemented @@@
-
-#endif /*SPARSE3D_H*/
-
+#endif // __SPARSE3D_H__

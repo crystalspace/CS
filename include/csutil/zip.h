@@ -51,7 +51,6 @@ typedef unsigned long  ulg;
 #  define CRCVAL_INITIAL  0L
 #endif
 
-///
 typedef struct
 {
  uch version_needed_to_extract[2];
@@ -66,7 +65,6 @@ typedef struct
  ush extra_field_length;
 } ZIP_local_file_header;
 
-///
 typedef struct
 {
  uch version_made_by[2];
@@ -87,7 +85,6 @@ typedef struct
  ulg relative_offset_local_header;
 } ZIP_central_directory_file_header;
 
-///
 typedef struct
 {
  ush number_this_disk;

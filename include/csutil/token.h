@@ -16,20 +16,16 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TOKEN_H
-#define TOKEN_H
+#ifndef __TOKEN_H__
+#define __TOKEN_H__
 
-#include <stddef.h>
-
-extern char* spaces;
+/// Get a token
 extern char* get_token (char** buf);
+/// Get a floating-point number
 extern float get_token_float (char** buf);
+/// Get a integer number
 extern int get_token_int (char** buf);
-#ifdef COMP_WCC
-extern void skip_token (char** buf, char* tok);
-extern void skip_token (char** buf, char* tok, char* msg);
-#else
+/// Skip a token
 extern void skip_token (char** buf, char* tok, char* msg = NULL);
-#endif
 
-#endif /*TOKEN_H*/
+#endif // __TOKEN_H__

@@ -791,6 +791,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   current_camera = c;
   top_clipper = view;
 
+  // Set up halo clipping polygon
+  if (HaloRast)
+    HaloRast->SetHaloClipper (view->GetClipPoly (), view->GetNumVertices ());
+
   iGraphics2D *G2D = G3D->GetDriver2D ();
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
@@ -808,9 +812,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     c_buffer->InsertPolygon (verts, num, true);
   }
   if (quadtree)
-  {
     quadtree->MakeEmpty ();
-  }
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
@@ -863,8 +865,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
         pinfo->intensity = pinfo->pLight->GetHaloIntensity ();
 
-        HaloRast->DrawHalo (&pinfo->v, pinfo->intensity, pinfo->haloinfo);
-        halo_drawn = true;
+        halo_drawn = HaloRast->DrawHalo (&pinfo->v, pinfo->intensity, pinfo->haloinfo);
       }
     }
 
@@ -875,6 +876,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
       if (!pinfo->pLight->GetReferenceCount ())
         pinfo->pLight->AddReference();
   }
+
+  // Free halo clipping polygon
+  if (HaloRast)
+    HaloRast->SetHaloClipper (NULL, 0);
 }
 
 void csWorld::DrawFunc (csCamera* c, csClipper* view,

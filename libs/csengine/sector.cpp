@@ -771,15 +771,15 @@ void csSector::Draw (csRenderView& rview)
     {
       csStatLight* light = (csStatLight*)(lights[i]);
       if (!light->CheckFlags (CS_LIGHT_HALO)) continue;
-      
+
       // this light is already in the queue.
       if (light->GetHaloInQueue ())
         continue;
-      
+
       CHK (csHaloInformation* cshaloinfo = new csHaloInformation);
-      
+
       cshaloinfo->v = rview.World2Camera (light->GetCenter ());
-      
+
       if (cshaloinfo->v.z > SMALL_Z)
       {
         float iz = rview.aspect/cshaloinfo->v.z;
@@ -788,22 +788,23 @@ void csSector::Draw (csRenderView& rview)
 		(cshaloinfo->v.y * iz + rview.shift_y);
 
         cshaloinfo->pLight = light;
-        
+
         cshaloinfo->r = light->GetColor ().red;
         cshaloinfo->g = light->GetColor ().green;
         cshaloinfo->b = light->GetColor ().blue;
         cshaloinfo->intensity = 0.0f;
-        
+
         if (HaloRast->TestHalo(&cshaloinfo->v))
         {
-          cshaloinfo->haloinfo = HaloRast->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b);
+          float hi, hc;
+          light->GetHaloType (hi, hc);
+          cshaloinfo->haloinfo = HaloRast->CreateHalo (cshaloinfo->r,
+            cshaloinfo->g, cshaloinfo->b, hi, hc);
           csWorld::current_world->AddHalo (cshaloinfo);
         }
       }
       else
-      {
-        CHK (delete cshaloinfo);
-      }
+        CHKB (delete cshaloinfo);
     }
   }
 

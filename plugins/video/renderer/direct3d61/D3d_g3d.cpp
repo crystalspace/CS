@@ -1548,11 +1548,12 @@ void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
   m_piSystem->Print(mode, buf);
 }
 
-csHaloHandle csGraphics3DDirect3DDx6::CreateHalo(float r, float g, float b)
+csHaloHandle csGraphics3DDirect3DDx6::CreateHalo (float iR, float iG, float iB,
+  float iFactor, float iCross);
 {
   if(m_bHaloEffect)
   {
-    csHaloDrawer halo(m_piG2D, r, g, b);
+    csHaloDrawer halo(m_piG2D, iR, iG, iB);
     
     csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo();
     
@@ -1639,41 +1640,41 @@ csHaloHandle csGraphics3DDirect3DDx6::CreateHalo(float r, float g, float b)
   return NULL;
 }
 
-void csGraphics3DDirect3DDx6::DestroyHalo(csHaloHandle haloInfo)
+void csGraphics3DDirect3DDx6::DestroyHalo(csHaloHandle iHalo)
 {
-  if(haloInfo != NULL)
+  if(iHalo != NULL)
   {
-    if( ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf)
+    if( ((csG3DHardwareHaloInfo*)iHalo)->lpsurf)
     {
-      ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf->Release();
-      ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf = NULL;
+      ((csG3DHardwareHaloInfo*)iHalo)->lpsurf->Release();
+      ((csG3DHardwareHaloInfo*)iHalo)->lpsurf = NULL;
     }
-    if (((csG3DHardwareHaloInfo*)haloInfo)->lptex)
+    if (((csG3DHardwareHaloInfo*)iHalo)->lptex)
     {
-      ((csG3DHardwareHaloInfo*)haloInfo)->lptex->Release();
-      ((csG3DHardwareHaloInfo*)haloInfo)->lptex = NULL;
+      ((csG3DHardwareHaloInfo*)iHalo)->lptex->Release();
+      ((csG3DHardwareHaloInfo*)iHalo)->lptex = NULL;
     }
     
-    delete (csG3DHardwareHaloInfo*)haloInfo;
+    delete (csG3DHardwareHaloInfo*)iHalo;
   }
 }
 
-void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
+bool csGraphics3DDirect3DDx6::DrawHalo(csVector3* iCenter, float iIntensity, csHaloHandle iHalo)
 {
   if(m_bHaloEffect)
   {
     int dont_forget_to_return_false=0;
     
-    if (haloInfo == NULL)
-      return;
+    if (iHalo == NULL)
+      return false;
     
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0 ) 
+    if (iCenter->x > m_nWidth || iCenter->x < 0 || iCenter->y > m_nHeight || iCenter->y < 0 ) 
       dont_forget_to_return_false=1;
 /*
-    int izz = QInt24 (1.0f / pCenter->z);
+    int izz = QInt24 (1.0f / iCenter->z);
     HRESULT hRes = S_OK;
 
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+    unsigned long zb = z_buffer[(int)iCenter->x + (width * (int)iCenter->y)];
 
           // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)
@@ -1689,17 +1690,17 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
 
-    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, ((csG3DHardwareHaloInfo*)haloInfo)->lptex), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, ((csG3DHardwareHaloInfo*)iHalo)->lptex), DD_OK);
     VERIFY_RESULT( m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
   
-    vx.sz = SCALE_FACTOR / pCenter->z;
-    vx.rhw = pCenter->z;
+    vx.sz = SCALE_FACTOR / iCenter->z;
+    vx.rhw = iCenter->z;
 
-    if(fIntensity<=0.f)
-      return;
+    if(iIntensity<=0.f)
+      return false;
 
-//    vx.color = D3DRGBA(1, 1, 1, fIntensity);
-    vx.color = D3DRGBA(fIntensity, fIntensity, fIntensity, fIntensity);
+//    vx.color = D3DRGBA(1, 1, 1, iIntensity);
+    vx.color = D3DRGBA(iIntensity, iIntensity, iIntensity, iIntensity);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
 
     /**
@@ -1723,8 +1724,8 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     rc.x=dc.x*ca-dc.y*sa;
     rc.y=dc.y*ca+dc.x*sa;
 
-    vx.sx = pCenter->x + rc.x + 0.5;
-    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.sx = iCenter->x + rc.x + 0.5;
+    vx.sy = iCenter->y + rc.y + 0.5;
     vx.tu = 0;
     vx.tv = 0;
     m_lpd3dDevice2->Vertex( &vx );
@@ -1733,8 +1734,8 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     rc.x=dc.x*ca-dc.y*sa;
     rc.y=dc.y*ca+dc.x*sa;
 
-    vx.sx = pCenter->x + rc.x + 0.5;
-    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.sx = iCenter->x + rc.x + 0.5;
+    vx.sy = iCenter->y + rc.y + 0.5;
     vx.tu = 1;
     vx.tv = 0;
     m_lpd3dDevice2->Vertex( &vx );
@@ -1743,8 +1744,8 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     rc.x=dc.x*ca-dc.y*sa;
     rc.y=dc.y*ca+dc.x*sa;
 
-    vx.sx = pCenter->x + rc.x + 0.5;
-    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.sx = iCenter->x + rc.x + 0.5;
+    vx.sy = iCenter->y + rc.y + 0.5;
     vx.tu = 1;
     vx.tv = 1;
     m_lpd3dDevice2->Vertex( &vx );
@@ -1753,32 +1754,32 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     rc.x=dc.x*ca-dc.y*sa;
     rc.y=dc.y*ca+dc.x*sa;
 
-    vx.sx = pCenter->x + rc.x + 0.5;
-    vx.sy = pCenter->y + rc.y + 0.5;
+    vx.sx = iCenter->x + rc.x + 0.5;
+    vx.sy = iCenter->y + rc.y + 0.5;
     vx.tu = 0;
     vx.tv = 1;
     m_lpd3dDevice2->Vertex( &vx );
 #else
-    vx.sx = pCenter->x - len;
-    vx.sy = pCenter->y - len;
+    vx.sx = iCenter->x - len;
+    vx.sy = iCenter->y - len;
     vx.tu = 0;
     vx.tv = 0;
     m_lpd3dDevice2->Vertex( &vx );
 
-    vx.sx = pCenter->x + len;
-    vx.sy = pCenter->y - len;
+    vx.sx = iCenter->x + len;
+    vx.sy = iCenter->y - len;
     vx.tu = 1;
     vx.tv = 0;
     m_lpd3dDevice2->Vertex( &vx );
 
-    vx.sx = pCenter->x + len;
-    vx.sy = pCenter->y + len;
+    vx.sx = iCenter->x + len;
+    vx.sy = iCenter->y + len;
     vx.tu = 1;
     vx.tv = 1;
     m_lpd3dDevice2->Vertex( &vx );
 
-    vx.sx = pCenter->x - len;
-    vx.sy = pCenter->y + len;
+    vx.sx = iCenter->x - len;
+    vx.sy = iCenter->y + len;
     vx.tu = 0;
     vx.tv = 1;
     m_lpd3dDevice2->Vertex( &vx );
@@ -1792,19 +1793,20 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
   }
+  return true;
 };
 
-bool csGraphics3DDirect3DDx6::TestHalo(csVector3* pCenter)
+bool csGraphics3DDirect3DDx6::TestHalo(csVector3* iCenter)
 {
   if(m_bHaloEffect)
   {
-    if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
+    if (iCenter->x > m_nWidth || iCenter->x < 0 || iCenter->y > m_nHeight || iCenter->y < 0  ) 
       return false;
 /*
-    int izz = QInt24 (1.0f / pCenter->z);
+    int izz = QInt24 (1.0f / iCenter->z);
     HRESULT hRes = S_OK;
       
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+    unsigned long zb = z_buffer[(int)iCenter->x + (width * (int)iCenter->y)];
         
     // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)

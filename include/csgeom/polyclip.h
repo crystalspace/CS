@@ -71,6 +71,9 @@ public:
 
   /// Return vertex at index for this clipper polygon.
   virtual const csVector2 GetVertex (int i) = 0;
+
+  /// Return a pointer to the array of csVector2's
+  virtual csVector2 *GetClipPoly () = 0;
 };
 
 /**
@@ -81,12 +84,25 @@ class csBoxClipper : public csClipper
 {
   ///
   csBox region;
+  ///
+  csVector2 ClipBox [4];
+
+  ///
+  inline void InitClipBox ()
+  {
+    ClipBox [0].Set (region.MinX (), region.MinY ());
+    ClipBox [1].Set (region.MinX (), region.MaxY ());
+    ClipBox [2].Set (region.MaxX (), region.MaxY ());
+    ClipBox [3].Set (region.MaxX (), region.MinY ());
+  }
 
 public:
   /// Initializes the clipper object to the given bounding region.
-  csBoxClipper (const csBox& b) : region(b) {}
+  csBoxClipper (const csBox& b) : region (b)
+  { InitClipBox (); }
   /// Initializes the clipper object to a rectangle with the given coords.
-  csBoxClipper (float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2) {}
+  csBoxClipper (float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2)
+  { InitClipBox (); }
 
   /// Clip a to dest_poly.
   virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
@@ -120,6 +136,10 @@ public:
       default: return csVector2 (region.MinX (), region.MaxY ());
     }
   }
+
+  /// Return a pointer to the array of csVector2's
+  virtual csVector2 *GetClipPoly ()
+  { return ClipBox; }
 };
 
 /**
@@ -154,9 +174,15 @@ class csPolygonClipper : public csClipper
   /// Clipping polygon bounding box
   csBox ClipBox;
 
+  /// Prepare clipping line equations
+  void Prepare ();
+
 public:
-  /// Create a polygon clipper object from a set of 2D vectors.
+  /// Create a polygon clipper object from a 2D polygon.
   csPolygonClipper (csPoly2D *Clipper, bool mirror = false,
+    bool copy = false);
+  /// Create a polygon clipper object from a set of 2D vectors.
+  csPolygonClipper (csVector2 *Clipper, int Count, bool mirror = false,
     bool copy = false);
   /// Destroy the polygon clipper object.
   virtual ~csPolygonClipper ();
@@ -184,6 +210,10 @@ public:
 
   /// Return vertex at index for this clipper polygon.
   virtual const csVector2 GetVertex (int i) { return ClipPoly[i]; }
+
+  /// Return a pointer to the array of csVector2's
+  virtual csVector2 *GetClipPoly ()
+  { return ClipPoly; }
 };
 
 #endif // __POLYCLIP_H__

@@ -181,7 +181,8 @@ public:
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend)
 {
-  CONSTRUCT_IBASE (NULL);
+  // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
+  scfRefCount = 1; scfParent = NULL;
   ClassID = strnew (iClassID);
   ClassInfo = NULL;
   Dependencies = strnew (iDepend);
@@ -197,7 +198,8 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 
 scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 {
-  CONSTRUCT_IBASE (NULL);
+  // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
+  scfRefCount = 1; scfParent = NULL;
   ClassID = strnew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
   Dependencies = strnew (iClassInfo->Dependencies);

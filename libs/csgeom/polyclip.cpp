@@ -40,7 +40,7 @@ int csBoxClipper::ClassifyBox (csBox* box)
 }
 
 bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
-	int &OutCount)
+  int &OutCount)
 {
   memcpy (dest_poly, Polygon, Count * sizeof (csVector2));
   OutCount = Count;
@@ -54,7 +54,7 @@ bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
 }
 
 bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount, 
-                       csBox *BoundingBox)
+  csBox *BoundingBox)
 {
   csVector2 OutPoly[100];
   csVector2 *InPolygon = Polygon;
@@ -294,8 +294,50 @@ csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
     ClipPoly = Clipper->GetVertices ();
   }
 
-  CHK (ClipData = new SegData [ClipPolyVertices = Count]);
+  ClipPolyVertices = Count;
+  Prepare ();
+}
+
+csPolygonClipper::csPolygonClipper (csVector2 *Clipper, int Count,
+  bool mirror = false, bool copy = false)
+{
+  int vert;
+
+  if (mirror || copy)
+  {
+    ClipPoly2D = polypool.Alloc ();
+    ClipPoly2D->MakeRoom (Count);
+    ClipPoly = ClipPoly2D->GetVertices ();
+    if (mirror)
+      for (vert = 0; vert < Count; vert++)
+        ClipPoly [Count - 1 - vert] = Clipper [vert];
+    else
+      for (vert = 0; vert < Count; vert++)
+        ClipPoly [vert] = Clipper [vert];
+  }
+  else
+  {
+    ClipPoly2D = NULL;
+    ClipPoly = Clipper;
+  }
+
+  ClipPolyVertices = Count;
+  Prepare ();
+}
+
+csPolygonClipper::~csPolygonClipper ()
+{
+  if (ClipData)
+    CHKB (delete [] ClipData);
+  if (ClipPoly2D)
+    polypool.Free (ClipPoly2D);
+}
+
+void csPolygonClipper::Prepare ()
+{
+  CHK (ClipData = new SegData [ClipPolyVertices]);
   // Precompute some data for each clipping edge
+  int vert;
   for (vert = 0; vert < ClipPolyVertices; vert++)
   {
     int next = (vert == ClipPolyVertices - 1 ? 0 : vert + 1);
@@ -307,14 +349,6 @@ csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
   ClipBox.StartBoundingBox (ClipPoly [0]);
   for (vert = 1; vert < ClipPolyVertices; vert++)
     ClipBox.AddBoundingVertex (ClipPoly [vert]);
-}
-
-csPolygonClipper::~csPolygonClipper ()
-{
-  if (ClipData)
-    CHKB (delete [] ClipData);
-  if (ClipPoly2D)
-    polypool.Free (ClipPoly2D);
 }
 
 int csPolygonClipper::ClassifyBox (csBox* box)
@@ -330,7 +364,8 @@ int csPolygonClipper::ClassifyBox (csBox* box)
 bool csPolygonClipper::IsInside (float x, float y)
 {
   for (int vert = 0; vert < ClipPolyVertices; vert++)
-    if (x * ClipData [vert].dy - y * ClipData [vert].dx < 0)
+    if ((x - ClipPoly [vert].x) * ClipData [vert].dy -
+        (y - ClipPoly [vert].y) * ClipData [vert].dx < 0)
       return false;
   return true;
 }
@@ -375,4 +410,3 @@ bool csPolygonClipper::Clip (csVector2 *Polygon, int &Count, int MaxCount,
     return true;
   } /* endif */
 }
-

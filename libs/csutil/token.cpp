@@ -23,8 +23,6 @@
 
 //---------------------------------------------------------------------------
 
-char* spaces = "                                                                                  ";
-
 float get_token_float (char** buf)
 {
   char* t = get_token (buf);

@@ -24,7 +24,12 @@
 /// Return a random number.
 long RndNum(long minRange, long maxRange);
 
-/// Allocate a new char [] and copy the string into newly allocated storage
+/**
+ * Allocate a new char [] and copy the string into newly allocated storage.
+ * This is a handy method for copying strings, in fact it is the C++ analogue
+ * of the strdup() function from string.h (strdup() is not present on some
+ * platforms). To free the pointer the caller should call delete[].
+ */
 extern char *strnew (const char *s);
 
 /**
@@ -36,8 +41,13 @@ extern void Combinations (int m, int n, bool (*callback) (int *vector, int count
   void *arg), void *arg);
 
 /**
- * Expand a filename if it contains shortcuts ('.', '~', '..' etc)<p>
- * Return a newly-allocated with new [] "char *".
+ * Expand a filename if it contains shortcuts.
+ * Currently the following macros are recognised and expanded:
+ * <pre>
+ * '.', '~', '..', 'drive:' (on DOS/Win32/OS2)
+ * </pre>
+ * The returned filename is always absolute, i.e. it always starts
+ * from root. Return a string allocated with strnew().
  */
 extern char *expandname (const char *iName);
 /**
@@ -57,33 +67,33 @@ extern void splitpath (const char *iPathName, char *iPath, size_t iPathSize,
 extern bool fnamematches (const char *fName, const char *fMask);
 
 /// Swap two integer variables
-inline void iSwap (int &a, int &b)
+static inline void iSwap (int &a, int &b)
 {
   int tmp = a;
   a = b; b = tmp;
 }
 
 /// Swap two floating-point variables
-inline void fSwap (float &a, float &b)
+static inline void fSwap (float &a, float &b)
 {
   float tmp = a;
   a = b; b = tmp;
 }
 
 /// Return the argument squared
-inline float fSquare (float x)
+static inline float fSquare (float x)
 {
   return x*x;
 }
 
 /// Byte swap 32 bit data.
-inline unsigned long ByteSwap32bit( const unsigned long value )
+static inline unsigned long ByteSwap32bit( const unsigned long value )
 {
   return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
 /// Byte swap 16 bit data.
-inline unsigned short ByteSwap16bit( const unsigned short value )
+static inline unsigned short ByteSwap16bit( const unsigned short value )
 {
   return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
@@ -99,5 +109,14 @@ int FindNearestPowerOf2 (int n);
 
 /// returns true if n is a power of two
 bool IsPowerOf2 (int n);
+
+/// Find the log2 of argument
+static inline int log2 (int n)
+{
+  int l = 31; unsigned x = 0x80000000;
+  while (x && !(n & x))
+    l--, x >>= 1;
+  return l;
+}
 
 #endif // __UTIL_H__

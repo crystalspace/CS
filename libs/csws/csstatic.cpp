@@ -94,11 +94,14 @@ void csStatic::Draw ()
       DrawUnderline (txtx, 0, text, underline_pos, textcolor);
       break;
     }
+    case csscsBitmap:
+      if (Bitmap->GetTextureHandle ())
+      {
+        Sprite2D (Bitmap, 0, 0, bound.Width (), bound.Height ());
+        break;
+      }
     case csscsRectangle:
       Box (0, 0, bound.Width (), bound.Height (), CSPAL_STATIC_BACKGROUND);
-      break;
-    case csscsBitmap:
-      Sprite2D (Bitmap, 0, 0, bound.Width (), bound.Height ());
       break;
     case csscsText:
       break;

@@ -20,19 +20,20 @@
 #define __PARSER_H__
 
 /**
- * Structure to describe a single token
+ * Structure to describe a single token in a token table that is passed
+ * to most token-parsing functions.
  */
-typedef struct 
+struct csTokenDesc
 {
   /// value returned when token is matched
   long	id;
   /// token to match
   char	*token;
-} csTokenDesc;
+};
 
 /**
  * A set of macros for easier building of token tables. Usage example:
- * <code>
+ * <pre>
  * TOKEN_DEF_START
  *   TOKEN_DEF (ORIG)
  *   TOKEN_DEF (FIRST_LEN)
@@ -68,9 +69,9 @@ typedef struct
  *     }
  *   }
  * ...
- * </code>
+ * }
+ * </pre>
  */
-/// Start a csTokenDesc array
 #define TOKEN_DEF_START			\
   enum					\
   {					\
@@ -89,12 +90,11 @@ typedef struct
     { 0, 0 }				\
   };
 
-/// A string containing white spaces (' ', '\t', '\n', '\r')
-extern const char *kWhiteSpace;
+/// Current line that parser is at.
 extern int parser_line;
 
-#define PARSERR_EOF -2
-#define PARSERR_TOKENNOTFOUND -1
+#define PARSERR_EOF		-2
+#define PARSERR_TOKENNOTFOUND	-1
 
 /**
  * Get pointer to last offending token.
@@ -102,17 +102,18 @@ extern int parser_line;
 char* csGetLastOffender ();
 
 /**
+ * Get next token and his parameters.
  * Pass in a pointer to a buffer of text. This pointer is modified to point
  * to the text after the object description. The token id for the object is
  * returned. The name pointer will point to the optional name string in the
  * buffer. The data pointer will point to the optional data for the object.
  * <i>The text buffer will get modified so BEWARE.</i>
  * <p><b>eg text</b>:
- * <code>
- *   ROOM "test room" ( 1, 2, 3 )
- * </code>
- * <p>returning PARSERR_TOKENNOTFOUND on error.
- * <p>returning PARSERR_EOF on EOF.
+ * <pre>
+ *   ROOM 'test room' ( 1, 2, 3 )
+ * </pre>
+ * <p>returns PARSERR_TOKENNOTFOUND on error.
+ * <p>returns PARSERR_EOF on EOF.
  */
 long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
 /**

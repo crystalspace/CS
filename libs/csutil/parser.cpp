@@ -22,8 +22,10 @@
 #include "sysdef.h"
 #include "csutil/parser.h"
 
-const char *kWhiteSpace = " \t\n\r";
+// A string containing white spaces (' ', '\t', '\n', '\r')
+static const char *kWhiteSpace = " \t\n\r";
 static char last_offender[255];
+// Current line
 int parser_line;
 
 char* csGetLastOffender ()

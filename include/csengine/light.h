@@ -111,6 +111,10 @@ protected:
   int halo_ref_count;
   /// whether this light is in the halo queue or not.
   bool in_halo_queue;
+  /// Halo intensity factor
+  float intensity_factor;
+  /// Halo cross-ressemblance factor
+  float cross_factor;
 
   /// Set of flags
   ULong flags;
@@ -241,6 +245,18 @@ public:
    * Query if the halo is in the queue.
    */
   bool GetHaloInQueue () const { return in_halo_queue; }
+
+  /**
+   * Set light halo's intensity and cross-ressemblance factors.
+   */
+  void SetHaloType (float iFactor, float iCross)
+  { intensity_factor = iFactor; cross_factor = iCross; }
+
+  /**
+   * Query light halo's intensity and cross-ressemblance factors.
+   */
+  void GetHaloType (float &oFactor, float &oCross)
+  { oFactor = intensity_factor; oCross = cross_factor; }
 
   /**
    * Get the light's attenuation type

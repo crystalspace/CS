@@ -51,9 +51,8 @@ bool csTimer::HandleEvent (csEvent &Event)
       parent->SendCommand (cscmdTimerPulse, this);
       // if we're not too far behind, switch to next pulse
       // otherwise we'll have to jump far to the current time
-      if (start + timeout >= current)
-        start += timeout;
-      else
+      start += timeout;
+      if (current - start >= timeout)
         start = current;
     } /* endif */
   } /* endif */

@@ -603,6 +603,7 @@ csStatLight* csLoader::load_statlight (char* buf)
   float x, y, z, dist = 0, r, g, b;
   int dyn, attenuation = CS_ATTN_LINEAR;
   bool halo = false;
+  float haloIntensity, haloCross;
 
   if (strchr (buf, ':'))
   {
@@ -636,6 +637,8 @@ csStatLight* csLoader::load_statlight (char* buf)
           break;
         case TOKEN_HALO:
           halo = true;
+          haloIntensity = 0.5; haloCross = 2.0;
+          ScanStr (params, "%f,%f", &haloIntensity, &haloCross);
           break;
         case TOKEN_ATTENUATION:
           char str [100];
@@ -669,7 +672,11 @@ csStatLight* csLoader::load_statlight (char* buf)
   }
 
   CHK (csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn));
-  if (halo) l->SetFlags (CS_LIGHT_HALO, CS_LIGHT_HALO);
+  if (halo)
+  {
+    l->SetFlags (CS_LIGHT_HALO, CS_LIGHT_HALO);
+    l->SetHaloType (haloIntensity, haloCross);
+  }
   l -> SetAttenuation (attenuation);
   return l;
 }

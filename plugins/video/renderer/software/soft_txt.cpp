@@ -1215,30 +1215,31 @@ void csTextureManagerSoftware::MergeTexture (iTextureHandle* handle)
   // Then allocate colors for all textures at the same time.
   for (i = 0 ; i < 256 ; i++)
   {
-      if (i < txt->get_num_colors ())
+    if (i < txt->get_num_colors ())
+    {
+      alloc_rgb (txt->get_usage (i).red,
+                 txt->get_usage (i).green,
+                 txt->get_usage (i).blue,
+                 prefered_dist);
+      if (!truecolor && mixing == MIX_TRUE_RGB)
       {
-        alloc_rgb (txt->get_usage (i).red,
+        alloc_rgb (txt->get_usage (i).red + dist,
                    txt->get_usage (i).green,
                    txt->get_usage (i).blue,
-                   prefered_dist);
-        if (!truecolor && mixing == MIX_TRUE_RGB)
-        {
-          alloc_rgb (txt->get_usage (i).red + dist,
-                     txt->get_usage (i).green,
-                     txt->get_usage (i).blue,
-                     prefered_col_dist);
-          alloc_rgb (txt->get_usage (i).red,
-                     txt->get_usage (i).green + dist,
-                     txt->get_usage (i).blue,
-                     prefered_col_dist);
-          alloc_rgb (txt->get_usage (i).red,
-                     txt->get_usage (i).green,
-                     txt->get_usage (i).blue + dist,
-                     prefered_col_dist);
-        }
+                   prefered_col_dist);
+        alloc_rgb (txt->get_usage (i).red,
+                   txt->get_usage (i).green + dist,
+                   txt->get_usage (i).blue,
+                   prefered_col_dist);
+        alloc_rgb (txt->get_usage (i).red,
+                   txt->get_usage (i).green,
+                   txt->get_usage (i).blue + dist,
+                   prefered_col_dist);
       }
+    }
   }
 
+#if 0
   // compute light tables
   if (txtMode == TXT_PRIVATE)
     create_lt_truergb_private ();
@@ -1250,6 +1251,7 @@ void csTextureManagerSoftware::MergeTexture (iTextureHandle* handle)
     create_lt_white8 ();
   if (!truecolor)
     create_lt_alpha ();
+#endif
 
   // Remap all textures according to the new colormap.
   txt->remap_texture (this);
