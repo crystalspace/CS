@@ -35,15 +35,15 @@ static struct csKeyModDef
   utf32_char code;
 } KeyModifiers [] =
 {
-  {"Ctrl",	CSKEY_CTRL},
   {"LCtrl",	CSKEY_CTRL_LEFT},
   {"RCtrl",	CSKEY_CTRL_RIGHT},
-  {"Alt",	CSKEY_ALT},
+  {"Ctrl",	CSKEY_CTRL},
   {"LAlt",	CSKEY_ALT_LEFT},
   {"RAlt",	CSKEY_ALT_RIGHT},
-  {"Shift",	CSKEY_SHIFT},
+  {"Alt",	CSKEY_ALT},
   {"LShift",	CSKEY_SHIFT_LEFT},
   {"RShift",	CSKEY_SHIFT_RIGHT},
+  {"Shift",	CSKEY_SHIFT},
   {"Num",	CSKEY_PADNUM},
   {"Scroll", 	CSKEY_SCROLLLOCK},
   {"Caps",	CSKEY_CAPSLOCK},
@@ -287,6 +287,27 @@ csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
 	if (key) ret << key << '+';
       }
     }
+  }
+
+  if (CSKEY_IS_MODIFIER(code))
+  {
+    for (csKeyModDef *m = KeyModifiers; m->key; m++)
+    {
+      if (CSKEY_MODIFIER_TYPE(code) == CSKEY_MODIFIER_TYPE(m->code))
+      {
+	if (m->code == code)
+	{
+	  ret << m->key;
+	  return ret;
+	}
+	else if (CSKEY_MODIFIER_NUM(m->code) == csKeyModifierNumAny)
+	{
+	  ret << m->key << CSKEY_MODIFIER_NUM(code);
+	  return ret;
+	}
+      }
+    }
+    return "";
   }
 
   for (csKeyCodeDef *c = KeyDefs; c->key; c++)

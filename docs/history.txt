@@ -45,6 +45,8 @@ chronological order.
 	- Jorrit fixed a bug in Dynavis TestRect() which was initializing
 	  one row wrongly. The chance of this bug manifesting in real
 	  culling errors is very small though.
+	- res fixed csGetKeyDesc() to properly deal with keys that are 
+	  modifiers.
 23-Oct-2003
 	- Jorrit reduced the 'yellow-message-time' in the standard reporter
 	  from 10 to 5 seconds.
