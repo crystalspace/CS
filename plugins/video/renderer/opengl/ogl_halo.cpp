@@ -174,7 +174,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   glTranslatef (0, 0, 0);
 
   csGraphics3DOGLCommon::SetGLZBufferFlags (CS_ZBUF_NONE);
-  glEnable (GL_TEXTURE_2D);
+  csGraphics3DOGLCommon::statecache->Enable_GL_TEXTURE_2D ();
 
   csGraphics3DOGLCommon::statecache->SetShadeModel (GL_FLAT);
   csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, halohandle);

@@ -58,6 +58,7 @@ The history order is reversed so that new features are at the top.
 	  to prevent "make install" from trying to install it on platforms
 	  which do not have lib3ds intalled.  Also added it to "all" and "apps"
 	  pseudo-targets.
+	- The OpenGL halo code was bypassing the state cache.
 	- Eric Sunshine fixed botched OSS.AVAILABLE available test which was
 	  just added to configure.ac.  The botched test only covered two of the
 	  three cases.
