@@ -114,6 +114,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
+SCF_IMPLEMENT_FACTORY (csThingFactorySaver)
 
 
 #define MAXLINE 200 /* max number of chars per line... */
@@ -1270,13 +1271,8 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!thing) return false;
     if (!mesh) return false;
 
-    csRef<iMeshFactoryWrapper> factwrap;
-    iBase* factparent = mesh->GetFactory()->GetLogicalParent();
-    if (factparent)
-    {
-      csRef<iMeshFactoryWrapper> factwrap = 
-        SCF_QUERY_INTERFACE(factparent, iMeshFactoryWrapper);
-    }
+    csRef<iMeshWrapper> meshwrap = SCF_QUERY_INTERFACE(mesh->GetLogicalParent(), iMeshWrapper);
+    iMeshFactoryWrapper* factwrap = meshwrap->GetFactory();
     if (factwrap)
     {
       const char* factname = factwrap->QueryObject()->GetName();
@@ -1289,83 +1285,98 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     }
     else
     {
-      //Write the factory stuff inside the params of the meshobject
-      iThingFactoryState* thingfact = thing->GetFactory();
-      for (int vertidx = 0; vertidx < thingfact->GetVertexCount(); vertidx++)
-      {
-        csRef<iDocumentNode> vertNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        vertNode->SetValue("v");
-        csVector3 vertex = thingfact->GetVertex(vertidx);
-        synldr->WriteVector(vertNode, &vertex);
-      }  
-      iMaterialWrapper* material = 0;
-      for (int polyidx = 0; polyidx < thingfact->GetPolygonCount(); polyidx++)
-      {
-        if (material != thingfact->GetPolygonMaterial(polyidx))
-        {
-          material = thingfact->GetPolygonMaterial(polyidx);
-          csRef<iDocumentNode> materialNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          materialNode->SetValue("material");
-          const char* materialname = material->QueryObject()->GetName();
-          if (materialname && *materialname)
-          {
-            materialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(materialname);
-          }
-        }
-        csRef<iDocumentNode> polyNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        polyNode->SetValue("p");
-        const char* polyname = thingfact->GetPolygonName(polyidx);
-        if (polyname && *polyname)
-        {
-          polyNode->SetAttribute("name", polyname);
-        }
-        for (int pvertidx = 0; pvertidx < thingfact->GetPolygonVertexCount(polyidx); pvertidx++)
-        {
-          csRef<iDocumentNode> vertNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          vertNode->SetValue("v");
-          int vertex = thingfact->GetPolygonVertexIndices(polyidx)[pvertidx];
-          vertNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(vertex);
-        }
-        if (thingfact->IsPolygonTextureMappingEnabled(polyidx))
-        {
-          csRef<iDocumentNode> texmapNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          texmapNode->SetValue("texmap");
-          csMatrix3 m; csVector3 v;
-          thingfact->GetPolygonTextureMapping(polyidx, m, v);
-          csRef<iDocumentNode> matrixNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          matrixNode->SetValue("matrix");
-          synldr->WriteMatrix(matrixNode, &m);
-          csRef<iDocumentNode> vectorNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          vectorNode->SetValue("v");
-          synldr->WriteVector(vectorNode, &v);
-        }
-        //Writedown Colldet tag
-        bool colldet = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_COLLDET);
-        synldr->WriteBool(polyNode, "colldet", colldet, true);
-        
-        //Writedown Lighting tag
-        bool lighting = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_LIGHTING);
-        synldr->WriteBool(polyNode, "lighting", lighting, true);
-
-        //Writedown Viscull tag
-        bool viscull = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_VISCULL);
-        synldr->WriteBool(polyNode, "viscull", viscull, true);
-      }
-      //Writedown Smooth tag
-      synldr->WriteBool(paramsNode, "smooth", thingfact->GetSmoothingFlag(), false);
-
-      //Writedown Cosfact tag
-      float cosfact = thingfact->GetCosinusFactor();
-      csRef<iDocumentNode> cosfactNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      cosfactNode->SetValue("cosfact");
-      cosfactNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(cosfact);
-
-      //Writedown Mixmode tag
-      int mixmode = thing->GetMixMode();
-      csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      mixmodeNode->SetValue("mixmode");
-      synldr->WriteMixmode(mixmodeNode, mixmode, true);
+      WriteFactory(thing->GetFactory(), paramsNode);
     }
+    //Writedown Mixmode tag
+    int mixmode = thing->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
+  }
+  return true;
+}
+
+//TBD
+bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
+{
+  if (!parent) return false; //you never know...
+  
+  iDocumentNode* paramsNode = parent;
+
+  if (obj)
+  {
+    csRef<iThingFactoryState> thingfact = SCF_QUERY_INTERFACE (obj, iThingFactoryState);
+    if (!thingfact) return false;
+
+    //Write the factory stuff inside the params of the meshobject
+    for (int vertidx = 0; vertidx < thingfact->GetVertexCount(); vertidx++)
+    {
+      csRef<iDocumentNode> vertNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      vertNode->SetValue("v");
+      csVector3 vertex = thingfact->GetVertex(vertidx);
+      synldr->WriteVector(vertNode, &vertex);
+    }  
+    iMaterialWrapper* material = 0;
+    for (int polyidx = 0; polyidx < thingfact->GetPolygonCount(); polyidx++)
+    {
+      if (material != thingfact->GetPolygonMaterial(polyidx))
+      {
+        material = thingfact->GetPolygonMaterial(polyidx);
+        csRef<iDocumentNode> materialNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        materialNode->SetValue("material");
+        const char* materialname = material->QueryObject()->GetName();
+        if (materialname && *materialname)
+        {
+          materialNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(materialname);
+        }
+      }
+      csRef<iDocumentNode> polyNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      polyNode->SetValue("p");
+      const char* polyname = thingfact->GetPolygonName(polyidx);
+      if (polyname && *polyname)
+      {
+        polyNode->SetAttribute("name", polyname);
+      }
+      for (int pvertidx = 0; pvertidx < thingfact->GetPolygonVertexCount(polyidx); pvertidx++)
+      {
+        csRef<iDocumentNode> vertNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        vertNode->SetValue("v");
+        int vertex = thingfact->GetPolygonVertexIndices(polyidx)[pvertidx];
+        vertNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(vertex);
+      }
+      if (thingfact->IsPolygonTextureMappingEnabled(polyidx))
+      {
+        csRef<iDocumentNode> texmapNode = polyNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        texmapNode->SetValue("texmap");
+        csMatrix3 m; csVector3 v;
+        thingfact->GetPolygonTextureMapping(polyidx, m, v);
+        csRef<iDocumentNode> matrixNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matrixNode->SetValue("matrix");
+        synldr->WriteMatrix(matrixNode, &m);
+        csRef<iDocumentNode> vectorNode = texmapNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        vectorNode->SetValue("v");
+        synldr->WriteVector(vectorNode, &v);
+      }
+      //Writedown Colldet tag
+      bool colldet = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_COLLDET);
+      synldr->WriteBool(polyNode, "colldet", colldet, true);
+ 
+      //Writedown Lighting tag
+      bool lighting = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_LIGHTING);
+      synldr->WriteBool(polyNode, "lighting", lighting, true);
+
+      //Writedown Viscull tag
+      bool viscull = thingfact->GetPolygonFlags(polyidx).Check(CS_POLY_VISCULL);
+      synldr->WriteBool(polyNode, "viscull", viscull, true);
+    }
+    //Writedown Smooth tag
+    synldr->WriteBool(paramsNode, "smooth", thingfact->GetSmoothingFlag(), false);
+
+    //Writedown Cosfact tag
+    float cosfact = thingfact->GetCosinusFactor();
+    csRef<iDocumentNode> cosfactNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    cosfactNode->SetValue("cosfact");
+    cosfactNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(cosfact);
   }
   return true;
 }

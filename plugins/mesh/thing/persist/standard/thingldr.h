@@ -190,6 +190,7 @@ public:
 
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteFactory (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {
@@ -198,6 +199,26 @@ public:
     { return scfParent->Initialize (p); }
   } scfiComponent;
   friend struct eiComponent;
+};
+
+/**
+ * Thing factory saver.
+ */
+class csThingFactorySaver : public csThingSaver
+{
+public:
+  /// Constructor.
+  csThingFactorySaver (iBase* parent) : csThingSaver (parent) {}
+  /// Destructor.
+  virtual ~csThingFactorySaver () {}
+
+  /// Write down given factory and add to iDocumentNode.
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent)
+  {
+    csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+    return WriteFactory (obj, paramsNode);
+  };
 };
 
 #endif // __CS_THINGLDR_H__
