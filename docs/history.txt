@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+12-Jan-2001
+	- Eric Sunshine fixed several bugs in soundraw.cpp where it was
+	  applying `delete[]' to a void*.
 11-Jan-2001
 	- Wyatt Miler updated the Macintosh project files.
 	- Eric Sunshine made the following changes to the project:

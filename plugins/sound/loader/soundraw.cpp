@@ -32,7 +32,8 @@ csSoundDataRaw::csSoundDataRaw(iBase *iParent, void *d, long n,
 }
 
 csSoundDataRaw::~csSoundDataRaw() {
-  delete[] Data;
+  unsigned char* const p = (unsigned char*)Data;
+  delete[] p;
 }
 
 long csSoundDataRaw::GetNumSamples() {
@@ -47,10 +48,10 @@ iSoundStream *csSoundDataRaw::CreateStream() {
   return new csSoundStreamRaw(this);
 }
 
-#define REPLACE_DATA(x)     {       \
-  void *data2 = x;                  \
-  delete[] Data;                    \
-  Data = data2;                     \
+#define REPLACE_DATA(x) {                        \
+  unsigned char* const p = (unsigned char*)Data; \
+  delete[] p;                                    \
+  Data = x;                                      \
 }
 
 void *ConvertBuffer8To16Bit(void *buf, unsigned long Num) {
