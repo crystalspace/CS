@@ -122,6 +122,7 @@ void csPolygon2D::Draw (iGraphics2D* g2d, int col)
 void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 	int num_vertices, csVector2* orig_triangle, bool gouraud)
 {
+  // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
   // 'was_clipped' will be true if the triangle was clipped.
   // This is the case if rescount != 3 (because we then don't have
   // a triangle) or else if any of the clipped vertices is different.
@@ -165,8 +166,23 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
   int _vbl, _vbr;
   if (top <= 0) _vbl = 2; else _vbl = top - 1;
   if (top >= 2) _vbr = 0; else _vbr = top + 1;
+
+  // Rare special case is when triangle edge on, vertices satisfy
+  //  *--------->x     a == b && (a.y < c.y) && (a.x > c.x)
+  //  |  *a,b          and is clipped at c, where orig_triangle[0]
+  //  | /              can be either a, b or c. In other words when
+  //  |/               the single vertex is not 'top' and clipped.
+  // /|*c              
+  //  |                The '-= EPSILON' for both left and right 
+  //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
+
+  if (orig_triangle[top] == orig_triangle[_vbl]) 
+      orig_triangle[_vbl].x -= EPSILON;
+  if (orig_triangle[top] == orig_triangle[_vbr]) 
+      orig_triangle[_vbr].x -= EPSILON;
+
   for (j = 0 ; j < g3dpoly->num ; j++)
-  {
+    {
     float x = g3dpoly->vertices [j].sx;
     float y = g3dpoly->vertices [j].sy;
 
@@ -183,7 +199,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     //  |/       |/
     // C*       C*  Fig.1 :-)
     int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
-    int ry = QRound (y);
+    int ry = QRound (y); 
     if (ry > QRound (orig_triangle [vbl].y))
     {
       vtl = vbl;
@@ -200,11 +216,12 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     if (QRound (orig_triangle [vbl].y) != QRound (orig_triangle [vtl].y))
       tL = (y - orig_triangle [vtl].y) / (orig_triangle [vbl].y - orig_triangle [vtl].y);
     else
-      tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
+	tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
     if (QRound (orig_triangle [vbr].y) != QRound (orig_triangle [vtr].y))
       tR = (y - orig_triangle [vtr].y) / (orig_triangle [vbr].y - orig_triangle [vtr].y);
     else
-      tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
+	tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
+
     xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
     xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
     tX = xR - xL;

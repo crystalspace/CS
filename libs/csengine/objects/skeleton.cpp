@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "csengine/skeleton.h"
-#include "csengine/cssprite.h"
+
 
 //---------------------------------------------------------------------------
 
@@ -90,16 +90,16 @@ void csSkeletonLimb::RemapVertices (int* mapping)
   }
 }
 
-void csSkeletonLimb::ComputeBoundingBox (csFrame* source)
+void csSkeletonLimb::ComputeBoundingBox (csVector3* source)
 {
   if (num_vertices)
   {
-    csVector3* verts = source->GetVertices ();
-    box.StartBoundingBox (verts[vertices[0]]);
+
+    box.StartBoundingBox (source[vertices[0]]);
     int i;
     for (i = 1 ; i < num_vertices ; i++)
     {
-      box.AddBoundingVertexSmart (verts[vertices[i]]);
+      box.AddBoundingVertexSmart (source[vertices[i]]);
     }
   }
 
@@ -149,7 +149,7 @@ csSkeletonLimbState::~csSkeletonLimbState ()
   }
 }
 
-void csSkeletonLimbState::Transform (const csTransform& tr, csFrame* source, csVector3* dest)
+void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source, csVector3* dest)
 {
   csSkeletonLimbState* c = children;
   while (c)
@@ -157,13 +157,13 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csFrame* source, csV
     c->Transform (tr, source, dest);
     c = c->GetNext ();
   }
-  csVector3* src_verts = source->GetVertices ();
+
   int i;
   for (i = 0 ; i < num_vertices ; i++)
-    dest [vertices [i]] = tr * src_verts [vertices [i]];
+    dest [vertices [i]] = tr * source [vertices [i]];
 }
 
-void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* source,
+void csSkeletonConnectionState::Transform (const csTransform& tr, csVector3* source,
 	csVector3* dest)
 {
   csTransform tr_new = tr * trans;

@@ -12,6 +12,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Jan-2000
+	- Noah L. Gibbs (angelbob) modified and test phyztest to work with
+	  his changes of the csPhyzik inheritance hierarchy.
+	- Noah added linked list for ctEntity class.
+	- Noah changed ctPhysicalEntity to have ctEntity as a parent class.
+	- Michael Ewert did some other changes to csphyzik.
+	- Samuel <samuel@metalang.softnet.co.uk> fixed interpolation for
+	  triangles so that there are no more unexpected crashes (in
+	  some cases viewing sydney.zip could crash CS).
+	- Samuel also made some changes to the skeleton sprites so that
+	  the skeletal animation system is now completely seperate from
+	  csSprite3D.
 13-Jan-2000
 	- Some further work on dynamic objects in polygon trees.
 	- Eric Sunshine made a fairly major change to the CVS snapshot
@@ -22,10 +34,14 @@ Short-term cleanups that need to be done:
 	  more to decide which older package to choose).  Instead the diff is
 	  performed based upon time-stamp of the last run, and the timestamp
 	  is stored in a file in the log directory.
+	- Thomas Hieber fixed the DirectX 6.1 renderer to make it work again.
 12-Jan-2000
 	- Added double linked list code from David Durant to csutil.
 	- Did first work on new system to add dynamic objects to
 	  polygon trees.
+	- Andrew Zabolotny added documentation for his memory debugger.
+	- Michael Ewert did a few changes to the phyzik library. He added
+	  an NxN matrix class (ctMatrixN).
 11-Jan-2000
 	- Changes from David Durant to implement a new callback for sprites
 	  which is called when the sprite is REALLY drawn. He also added

@@ -25,7 +25,6 @@
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
 
-class csFrame;
 class csSkeletonLimbState;
 
 /**
@@ -91,7 +90,7 @@ public:
   /**
    * Compute the object space bounding box for this limb.
    */
-  void ComputeBoundingBox (csFrame* source);
+  void ComputeBoundingBox (csVector3* source);
 };
 
 /**
@@ -183,7 +182,7 @@ public:
    * This is a recursive function which traverses all limbs and creates
    * a combined transformation along the way.
    */
-  virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csVector3* source, csVector3* dest);
 
   /**
    * Calculate the real bounding box for the given state.
@@ -221,7 +220,7 @@ public:
   virtual ~csSkeletonConnectionState () { }
 
   /// Transform the vertices in the given frame to the destination frame.
-  virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
+  virtual void Transform (const csTransform& tr, csVector3* source, csVector3* dest);
 
   /// Calculate the real bounding box for the given state.
   virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);

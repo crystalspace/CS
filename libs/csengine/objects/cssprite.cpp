@@ -79,7 +79,7 @@ void csFrame::AddVertex (int num)
 
   CHK (csVector2 * new_texels = new csVector2 [max_vertex + num]);
   CHK (csVector3 * new_vertices = new csVector3 [max_vertex + num]);
-
+    
   memcpy (new_texels, texels, max_vertex*sizeof(csVector2));
   memcpy (new_vertices, vertices, max_vertex*sizeof(csVector3));
   CHK (delete [] texels);
@@ -260,7 +260,7 @@ void csSpriteTemplate::ComputeBoundingBox ()
   for (i = 0 ; i < GetNumFrames () ; i++)
     GetFrame (i)->ComputeBoundingBox (num_vertices);
   if (skeleton)
-    skeleton->ComputeBoundingBox (GetFrame (0));
+    skeleton->ComputeBoundingBox (GetFrame (0)->GetVertices());
 }
 
 csFrame* csSpriteTemplate::AddFrame ()
@@ -810,7 +810,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // If we have a skeleton then we let the skeleton do the transformation.
   // Otherwise we just transform all vertices.
   if (skeleton_state)
-    skeleton_state->Transform (tr_o2c, cframe, tr_verts.GetArray ());
+    skeleton_state->Transform (tr_o2c, cframe->GetVertices(), tr_verts.GetArray ());
   else
   {
     if (tween_ratio)
@@ -925,6 +925,7 @@ void csSprite3D::Draw (csRenderView& rview)
                           	   persp [b].x, persp [b].y,
                           	   persp [c].x, persp [c].y);
       int j, idx, dir;
+      if (!area) continue;
       if (mirror)
       {
         if (area <= -SMALL_EPSILON) continue;
@@ -974,8 +975,8 @@ void csSprite3D::Draw (csRenderView& rview)
 	idx += dir;
       }
       if (do_clip)
-        PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
-      	  vertex_colors != NULL);
+	  PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
+			    vertex_colors != NULL);
       else
       {
         poly.vertices [0].sx = triangle [0].x;
@@ -999,7 +1000,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   if (draw_callback2)
-     draw_callback2(this, &rview, myOwner);
+     draw_callback2 (this, &rview, myOwner);
 
   if (!rview.callback)
     rview.g3d->FinishPolygonFX ();
@@ -1058,7 +1059,7 @@ bool csSprite3D::NextFrame (time_t current_time, bool onestep, bool stoptoend)
           }
           cur_frame = 0;
           ret = true;
-        }
+        }        
       }
       else break;
     }
@@ -1098,7 +1099,7 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
   if (skeleton_state)
   {
     UpdateWorkTables (tpl->num_vertices);
-    skeleton_state->Transform (csTransform (), fr, tr_verts.GetArray ());
+    skeleton_state->Transform (csTransform (), fr->GetVertices(), tr_verts.GetArray ());
     return tr_verts.GetArray ();
   }
   else
