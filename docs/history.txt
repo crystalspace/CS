@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine re-enabled the devapi documentation build and publish
 	  task in jobber.pl since it appears that the new SF shell server is
 	  capable of building this documentation set.
+	- Eric Sunshine eliminated numerous compilation warnings throughout the
+	  project.
 30-Sep-2002
 	- Reverted a downscaling fix in OpenGL renderer for 2D images.
 	- Fixed simplept so it works again. Basically there was a problem
