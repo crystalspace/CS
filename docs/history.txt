@@ -53,6 +53,12 @@ Short-term cleanups that need to be done:
 	  had never been eliminated from the NextStep port, so this is the
 	  very first time that the NextStep port compiles entirely warning-
 	  free.
+	- Eric Sunshine updated his CVS snapshot script so that it is possible
+	  to specify distinct values for the number of archive packages, diffs,
+	  and logs to keep (rather than using the same value for all three).
+	  Dropped number of kept snapshots down to two from three (in order to
+	  make more efficient use of limited disk space at Source Forge), and
+	  bumped kept diffs and logs up to seven.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
