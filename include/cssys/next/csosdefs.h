@@ -193,16 +193,6 @@ static inline char* getcwd(char* p, size_t size)
 
 
 //-----------------------------------------------------------------------------
-// NeXT uses built-in alloca().
-//-----------------------------------------------------------------------------
-#ifdef CS_SYSDEF_PROVIDE_ALLOCA
-#undef CS_SYSDEF_PROVIDE_ALLOCA
-#define	alloca(x) __builtin_alloca(x)
-#define ALLOC_STACK_ARRAY(var,type,size) type var[size]
-#endif // CS_SYSDEF_PROVIDE_ALLOCA
-
-
-//-----------------------------------------------------------------------------
 // Endian support.
 //-----------------------------------------------------------------------------
 #if defined (__LITTLE_ENDIAN__)

@@ -58,6 +58,8 @@ The history order is reversed so that new features are at the top.
 	    plugins/video/canvas/openglbe/*
 	- Eric Sunshine eliminated a plethora of compilation warnings recently
 	  introduced into lghtmap.cpp.
+	- Eric Sunshine removed the remaining obsoleted
+	  CS_SYSDEF_PROVIDE_ALLOCA from the project.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature
