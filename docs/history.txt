@@ -28,6 +28,9 @@ The history order is reversed so that new features are at the top.
 	  (if available) when testing for GLU, since apparently some GLU tests
 	  (such as RedHat 8.0) fail without it.
 	- Philip Wyett removed ddraw8 canvas from win32gcc build process.
+	- Fixed lightmap reader so that it will still warn if it couldn't
+	  load lightmaps for some polygons of a thing but it will still try
+	  to load the other polygons of that thing.
 20-Feb-2003
 	- Anders Stenberg fixed a bug in shader loader causing fragment
 	  programs not to load.

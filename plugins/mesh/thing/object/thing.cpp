@@ -2720,20 +2720,22 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   cache_mgr->SetCurrentScope (cachename);
   delete[] cachename;
 
-  bool rc = false;
+  bool rc = true;
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
     int i;
     for (i = 0; i < polygons.Length (); i++)
-      if (!polygons.Get (i)->ReadFromCache (&mf)) goto stop;
+      if (!polygons.Get (i)->ReadFromCache (&mf)) rc = false;
     for (i = 0; i < GetCurveCount (); i++)
-      if (!curves.Get (i)->ReadFromCache (&mf)) goto stop;
-    rc = true;
+      if (!curves.Get (i)->ReadFromCache (&mf)) rc = false;
+  }
+  else
+  {
+    rc = false;
   }
 
-stop:
   cache_mgr->SetCurrentScope (NULL);
   return rc;
 }
