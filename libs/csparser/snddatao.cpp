@@ -22,7 +22,7 @@
 #include "cssysdef.h"
 #include "isound/handle.h"
 #include "csparser/snddatao.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 
 IMPLEMENT_IBASE (csSoundWrapper);
   IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);

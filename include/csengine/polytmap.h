@@ -20,7 +20,7 @@
 #define __CS_POLYTMAP_H__
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "iengine/polytmap.h"
 
 class Dumper;

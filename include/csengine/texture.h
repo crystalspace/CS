@@ -20,8 +20,8 @@
 #define __CS_TEXTURE_H__
 
 #include "cstypes.h"
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

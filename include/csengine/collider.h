@@ -19,7 +19,7 @@
 #ifndef __CS_COLLIDER_H__
 #define __CS_COLLIDER_H__
 
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"

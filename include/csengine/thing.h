@@ -20,7 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csengine/bsp.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"

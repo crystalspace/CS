@@ -21,11 +21,11 @@
 
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
-#include "csobject/nobjvec.h"
+#include "csutil/nobjvec.h"
 #include "csengine/arrays.h"
 #include "csengine/rview.h"
 #include "csengine/thing.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
 #include "isys/system.h"
 #include "iengine/engine.h"

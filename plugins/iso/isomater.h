@@ -21,8 +21,8 @@
 #define __CSISO_MATERIAL_H__
 
 #include "csgfx/rgbpixel.h"
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivaria/iso.h"

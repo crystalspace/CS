@@ -20,7 +20,7 @@
 #ifndef __CS_TERROBJ_H__
 #define __CS_TERROBJ_H__
 
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csutil/csvector.h"
 #include "iterrain/object.h"
 #include "iengine/terrain.h"

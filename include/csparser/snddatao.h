@@ -21,7 +21,7 @@
 #ifndef __SNDDATAO_H__
 #define __SNDDATAO_H__
 
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "isound/wrapper.h"
 
 class csSoundWrapper : public csObject

@@ -19,8 +19,8 @@
 #ifndef __CS_CAMPOS_H__
 #define __CS_CAMPOS_H__
 
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "csgeom/vector3.h"
 #include "csengine/camera.h"
 #include "iengine/campos.h"

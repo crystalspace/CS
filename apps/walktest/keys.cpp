@@ -35,7 +35,7 @@
 #include "csengine/collider.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
-#include "csobject/dataobj.h"
+#include "csutil/dataobj.h"
 #include "isound/data.h"
 #include "csparser/snddatao.h"
 #include "csparser/crossbld.h"

@@ -20,7 +20,7 @@
 #define __WENTITY_H
 
 #include "csengine/movable.h"
-#include "csobject/dataobj.h"
+#include "csutil/dataobj.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"

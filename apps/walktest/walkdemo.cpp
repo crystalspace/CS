@@ -39,7 +39,7 @@
 #include "csengine/region.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
-#include "csobject/dataobj.h"
+#include "csutil/dataobj.h"
 #include "csparser/snddatao.h"
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"

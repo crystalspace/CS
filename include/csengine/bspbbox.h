@@ -26,7 +26,7 @@
 #include "csengine/polyint.h"
 #include "csengine/pol2d.h"
 #include "csengine/treeobj.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 
 class csPolyTreeBBox;
 class csPolygonTree;

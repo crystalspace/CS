@@ -20,7 +20,7 @@
 #define __CS_CSCOLL_H__
 
 #include "csgeom/matrix3.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csutil/csvector.h"
 #include "csengine/movable.h"
 #include "iengine/collectn.h"

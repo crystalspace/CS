@@ -19,8 +19,8 @@
 #ifndef __CS_MESHOBJ_H__
 #define __CS_MESHOBJ_H__
 
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "csengine/movable.h"
 #include "csutil/flags.h"
 #include "imesh/object.h"

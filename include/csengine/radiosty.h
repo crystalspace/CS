@@ -19,7 +19,7 @@
 #ifndef __CS_RADIOSTY_H__
 #define __CS_RADIOSTY_H__
 
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
 #include "csengine/polygon.h"

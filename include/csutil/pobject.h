@@ -20,7 +20,7 @@
 #ifndef __POBJECT_H_
 #define __POBJECT_H_
 
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 
 /**
  * A csObject which maintains a reference to the parent csObject.

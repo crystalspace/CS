@@ -29,7 +29,7 @@
 #include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
 #include "iengine/curve.h"
 

@@ -18,8 +18,8 @@
 */
 
 #include "cssysdef.h"
-#include "csobject/nobjvec.h"
-#include "csobject/csobject.h"
+#include "csutil/nobjvec.h"
+#include "csutil/csobject.h"
 
 csObject *csNamedObjVector::FindByName (const char* name) const
 {

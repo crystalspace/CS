@@ -32,7 +32,7 @@ INC.BUMPTEST = $(wildcard apps/bumptest/*.h)
 SRC.BUMPTEST = $(wildcard apps/bumptest/*.cpp)
 OBJ.BUMPTEST = $(addprefix $(OUT),$(notdir $(SRC.BUMPTEST:.cpp=$O)))
 DEP.BUMPTEST = \
-  CSPARSER CSFX CSENGINE CSFX CSGFX CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
+  CSPARSER CSFX CSENGINE CSFX CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = data/config/csbumptest.cfg
 

@@ -41,7 +41,7 @@
 #include "csengine/terrobj.h"
 #include "csparser/impexp.h"
 #include "csgeom/csrect.h"
-#include "csobject/dataobj.h"
+#include "csutil/dataobj.h"
 #include "csfx/cspixmap.h"
 #include "iengine/collider.h"
 

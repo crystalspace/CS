@@ -19,8 +19,8 @@
 #ifndef __CS_SECTOR_H__
 #define __CS_SECTOR_H__
 
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
 #include "csutil/cscolor.h"

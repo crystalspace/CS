@@ -21,7 +21,7 @@
 #define __PROCTEX_H__
 
 #include <stdarg.h>
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 
 struct iTextureWrapper;
 struct iMaterialWrapper;

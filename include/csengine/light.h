@@ -20,7 +20,7 @@
 #define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csengine/lview.h"

@@ -18,8 +18,8 @@
 */
 
 #include "cssysdef.h"
-#include "csobject/csobject.h"
-#include "csobject/dataobj.h"
+#include "csutil/csobject.h"
+#include "csutil/dataobj.h"
 #include "csutil/csvector.h"
 
 #include <stdlib.h>

@@ -32,7 +32,7 @@ INC.PHYZTEST = $(wildcard apps/phyztest/*.h)
 SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp)
 OBJ.PHYZTEST = $(addprefix $(OUT),$(notdir $(SRC.PHYZTEST:.cpp=$O)))
 DEP.PHYZTEST = CSPARSER CSFX CSENGINE CSFX CSGFX CSPHYZIK CSUTIL CSSYS CSGEOM \
-  CSOBJECT CSUTIL
+  CSUTIL
 LIB.PHYZTEST = $(foreach d,$(DEP.PHYZTEST),$($d.LIB))
 
 #TO_INSTALL.EXE += $(PHYZTEST.EXE)

@@ -22,7 +22,7 @@
 #include "ivaria/iso.h"
 #include "isomater.h"
 #include "csutil/csvector.h"
-#include "csobject/csobject.h"
+#include "csutil/csobject.h"
 
 /// generic wrapper around iBase that is a csObject 
 class csIsoObjWrapper : public csObject

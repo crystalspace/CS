@@ -20,8 +20,8 @@
 #define __KEYVAL_H__
 
 #include "csgeom/vector3.h"
-#include "csobject/csobject.h"
-#include "csobject/nobjvec.h"
+#include "csutil/csobject.h"
+#include "csutil/nobjvec.h"
 #include "iengine/keyval.h"
 
 class csSector;

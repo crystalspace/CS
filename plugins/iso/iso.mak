@@ -40,7 +40,7 @@ endif
 INC.ISO = $(wildcard plugins/iso/*.h)
 SRC.ISO = $(wildcard plugins/iso/*.cpp)
 OBJ.ISO = $(addprefix $(OUT),$(notdir $(SRC.ISO:.cpp=$O)))
-DEP.ISO = CSUTIL CSSYS CSGEOM CSOBJECT CSGFX CSUTIL CSSYS
+DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
 MSVC.DSP += ISO
 DSP.ISO.NAME = iso

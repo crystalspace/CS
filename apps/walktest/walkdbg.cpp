@@ -36,7 +36,7 @@
 #include "csengine/csview.h"
 #include "csengine/octree.h"
 #include "csgeom/csrect.h"
-#include "csobject/dataobj.h"
+#include "csutil/dataobj.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
