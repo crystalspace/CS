@@ -15,6 +15,7 @@ The history order is reversed so that new features are at the top.
 	  above).
 	- Fixed a bug in iDynLight->GetNext(). It would actually try to
 	  get the iDynLight from a NULL csDynLight pointer.
+	- Removed isoldr.h from the plugins dir.
 1-Jul-2002
 	- Extended both iShadowCaster and iShadowReceiver with iMovable
 	  parameter.
