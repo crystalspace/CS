@@ -78,13 +78,14 @@ void csSoundHandleDS3D::StartStream(bool Loop)
 {
   if (!Data->IsStatic() && !ActiveStream)
   {
+    SoundRender->mutex_ActiveSources->LockWait();
     mutex_WriteCursor->LockWait();
-    buffer_writecursor=0;
     LoopStream = Loop;
     ActiveStream = true;
     // Fill our local buffer if we have one
     UpdateCount(NumSamples);
     mutex_WriteCursor->Release();
+    SoundRender->mutex_ActiveSources->Release();
   }
 }
 

@@ -68,9 +68,9 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
   Listener = NULL;
   AudioRenderer = NULL;
   object_reg = NULL;
-  mutex_Listener = csMutex::Create ();
-  mutex_ActiveSources = csMutex::Create ();
-  mutex_SoundHandles = csMutex::Create ();
+  mutex_Listener = csMutex::Create (true);
+  mutex_ActiveSources = csMutex::Create (true);
+  mutex_SoundHandles = csMutex::Create (true);
   bRunning=false;
 }
 

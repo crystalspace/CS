@@ -246,6 +246,7 @@ void csSoundSourceDS3D::Play(unsigned long PlayMethod)
     *   In the case of a streaming source we need to be sure that we are synced up with
     *   the rest of the sources playing from this handle.
     */
+    Renderer->mutex_ActiveSources->LockWait();
     SoundHandle->mutex_WriteCursor->LockWait();
     if (!Static)
     {
@@ -270,6 +271,7 @@ void csSoundSourceDS3D::Play(unsigned long PlayMethod)
 
     Buffer2D->Play(0, 0, Looped ? DSBPLAY_LOOPING : 0);
     SoundHandle->mutex_WriteCursor->Release();
+    Renderer->mutex_ActiveSources->Release();
   }
 }
 
@@ -277,7 +279,6 @@ void csSoundSourceDS3D::Stop()
 {
   if (Renderer->AudioRenderer && Buffer2D) Buffer2D->Stop();
   Renderer->RemoveSource(this);
-  if (!Static) ClearBuffer();
 }
 
 void csSoundSourceDS3D::SetFrequencyFactor(float factor) 
