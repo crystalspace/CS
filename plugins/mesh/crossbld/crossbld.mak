@@ -38,7 +38,7 @@ endif
 INC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.h)
 SRC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.cpp)
 OBJ.CROSSBLD = $(addprefix $(OUT),$(notdir $(SRC.CROSSBLD:.cpp=$O)))
-DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL
+DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSGEOM
 
 MSVC.DSP += CROSSBLD
 DSP.CROSSBLD.NAME = crossbld
