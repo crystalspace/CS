@@ -1088,14 +1088,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 	   wSoundData == csSoundDataObject::GetSound(*world, "boom.wav") ||
 	   wSoundData == csSoundDataObject::GetSound(*world, "whoosh.wav"))
       {
-        ++sobj;
+        ///++sobj;
       }
       else
       {
         Sound->PlayEphemeral (wSoundData, true);
-        ++sobj;
+        ///++sobj;
       }
     }
+	/// fix of infinite loop if Sound is null
+	++sobj;
   }
 #endif
 

@@ -480,9 +480,9 @@ int main (int argc, char* argv[])
   csWorld::System = Sys;
 
   // We want at least the minimal set of plugins
-  Sys->RequestPlugin ("crystalspace.kernel.vfs");
-  Sys->RequestPlugin ("crystalspace.graphics3d.software");
-  Sys->RequestPlugin ("crystalspace.engine.core");
+  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin ("crystalspace.engine.core:Engine");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
