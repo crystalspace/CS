@@ -87,6 +87,8 @@ WORLD (
     PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
     PLUGIN 'metafact' ('crystalspace.mesh.loader.factory.metaball')
     PLUGIN 'metablob' ('crystalspace.mesh.loader.metaball')
+    PLUGIN 'emitFact' ('crystalspace.mesh.loader.factory.emit')
+    PLUGIN 'emit' ('crystalspace.mesh.loader.emit')
   )
 
   ADDON (
@@ -300,6 +302,10 @@ WORLD (
   )
   MESHFACT 'snowFactory' (
     PLUGIN ('crystalspace.mesh.loader.factory.snow')
+    PARAMS ()
+  )
+  MESHFACT 'emitFact' (
+    PLUGIN ('emitFact')
     PARAMS ()
   )
   MESHFACT 'simpleCubeHierarchy' (
@@ -7917,6 +7923,33 @@ WORLD (
         V (15,-19,16)
       )
     )
+    )
+    MESHOBJ 'portalzoom' (
+      PLUGIN ('emit')
+      ZNONE ()
+      PRIORITY ('alpha')
+      MOVE (V (34,-16.5,13.5))
+      PARAMS (
+        FACTORY ('emitFact')
+        MIXMODE (ADD ())
+        NUMBER (20)
+        MATERIAL ('flare_center')
+        RECTPARTICLES(0.1, 0.1)
+        LIGHTING (off)
+        TOTALTIME (1000)
+        STARTPOS (EMITBOX (10,-2.5,-2.5, 10,3,2.5))
+        STARTSPEED (EMITFIXED (-15,0,0))
+        STARTACCEL (EMITFIXED (0,0,0))
+        ;ATTRACTOR ()
+        ;ATTRACTORFORCE (1.0)
+        ; age: time, rgb,      alpha,swirl,rotspeed,scale
+        AGING (0000, 1.0,1.0,1.0, 1.0, 1.0, 0.0, 1.0)
+        AGING (0200, 1.0,1.0,1.0, 0.0, 1.0, 0.0, 1.0)
+        AGING (0500, 0.0,1.0,1.0, 0.0, 1.0, 0.0, 1.0)
+        AGING (0800, 0.6,0.8,1.0, 0.0, 1.0, 0.0, 1.0)
+        AGING (1800, 0.3,0.4,0.5, 0.0, 0.0, 1.0, 1.0)
+        AGING (2000, 0.3,0.4,0.5, 1.0, 0.0, 0.0, 1.0)
+      )
     )
     )
 
