@@ -217,7 +217,11 @@ bool csGraphics2DWX::Open()
 
   int w, h;
   myParent->GetClientSize(&w, &h);
-
+  if(w < 0 || h < 0)
+  {
+    w = 0;
+    h = 0;
+  }
   theCanvas = new csGLCanvas(this, myParent, wxID_ANY,
                              wxPoint(0, 0), wxSize(w, h), 0, wxT(""), desired_attributes);
 
@@ -449,6 +453,11 @@ csGLCanvas::csGLCanvas(csGraphics2DWX* g, wxWindow *parent,
   int w, h;
   GetClientSize(&w, &h);
 
+  if(w < 0 || h < 0)
+  {
+    w = 0;
+    h = 0;
+  }
   SetCurrent();
   g2d->Resize(w, h);
 }
@@ -476,6 +485,11 @@ void csGLCanvas::OnSize(wxSizeEvent& event)
   int w, h;
   GetClientSize(&w, &h);
 
+  if(w < 0 || h < 0)
+  {
+    w = 0;
+    h = 0;
+  }
   SetCurrent();
   g2d->Resize(w, h);
 }
