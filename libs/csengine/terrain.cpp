@@ -223,7 +223,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 
   // TODO: JORRIT RENDER THE FRUSTRUM.
   //
-  bool finit = false;
+  static bool finit = false;
   ddgVector3 *fc = context->fc;
   // ntl = near top left, fbr = far bottom right.
   static csVector3 ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;
