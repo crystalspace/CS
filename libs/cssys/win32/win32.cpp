@@ -57,6 +57,7 @@ extern bool need_console;
 
 void SystemFatalError (char *s)
 {
+  ChangeDisplaySettings (NULL, 0);  // doesn't hurt
   MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   exit (1);
 }
@@ -471,20 +472,27 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
-#ifdef CS_DEBUG
-  need_console(true), 
-#else
-  need_console(false), 
-#endif
   EventOutlet(0)
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r,
-						   iCommandLineParser);
-  if (cmdline->GetOption ("console")) need_console = true;
-  if (cmdline->GetOption ("noconsole")) need_console = false;
-  cmdline->DecRef ();
+  need_console = false;
+#ifdef CS_DEBUG
+  need_console = true;
+#endif
+
+  // required as the CommandLineParser isn't set up yet:
+  int i;
+  for (i = 1; i < CS_WIN32_ARGC; i++)
+  {
+    char *opt = (char *)CS_WIN32_ARGV [i];
+    if (*opt == '-')
+    {
+      while (*opt == '-') opt++;
+      if (!strcmp(opt, "console")) need_console = true;
+      if (!strcmp(opt, "noconsole")) need_console = false;
+    }
+  }
 
   if (need_console)
   {
@@ -850,11 +858,6 @@ long FAR PASCAL Win32Assistant::WindowProc (HWND hWnd, UINT message,
     }
   }
   return DefWindowProc (hWnd, message, wParam, lParam);
-}
-
-void csSleep (int SleepTime)
-{
-  Sleep (SleepTime);
 }
 
 #if 0

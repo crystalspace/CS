@@ -74,3 +74,9 @@ csTicks csGetTicks ()
 
   return LastTime; //return a high quality measurement of time. 
 }
+
+void csSleep (int SleepTime)
+{
+  Sleep (SleepTime);
+}
+
