@@ -504,9 +504,9 @@ bool Simple::Initialize ()
   // Create and attach a box collider.
   const csMatrix3 tmm;
   const csVector3 tvv (0);
-  csOrthoTransform tt (tmm, tvv);
-  csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh.
-//  avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
+  // csOrthoTransform tt (tmm, tvv);
+  // csVector3 size (0.4f, 0.8f, 0.4f); // This should be same size as mesh.
+  // avatarbody->AttachColliderBox (size, tt, 10, 1, 0.8f);
   avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, 0.8f);
 
   return true;
