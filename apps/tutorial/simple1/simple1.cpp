@@ -283,7 +283,6 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  int x = 0;
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
 
   simple = new Simple (object_reg);
