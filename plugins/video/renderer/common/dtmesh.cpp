@@ -219,7 +219,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_colors;
-  csColor* col1 = NULL;// = mesh.vertex_colors[0];
+  csColor* col1 = NULL;
   if (mesh.use_vertex_color)
     col1 = mesh.vertex_colors[0];
 
@@ -230,14 +230,16 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     float remainder = 1 - tween_ratio;
     csVector3* f2 = mesh.vertices[1];
     csVector2* uv2 = mesh.texels[1][0];
-    csColor* col2 = mesh.vertex_colors[1];
+    csColor* col2 = NULL;
+    if (mesh.use_vertex_color)
+      col2 = mesh.vertex_colors[1];
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
       for (i = 0 ; i < mesh.num_vertices ; i++)
       {
         tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
 	if (mesh.do_morph_texels)
 	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
-	if (mesh.do_morph_colors)
+	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
 	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
 	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
@@ -250,7 +252,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
         tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
 	if (mesh.do_morph_texels)
 	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
-	if (mesh.do_morph_colors)
+	if (mesh.do_morph_colors && mesh.use_vertex_color)
 	{
 	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
 	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;

@@ -12,6 +12,8 @@ The history order has been reversed so that new features are at the top.
 	    - dtmesh.cpp (I think) didnt take into account
 	      mesh.use_vertex_color = false; and so segfaulted into
 	      perftest..I have fixed it I think :)
+	- Extended the fix from Samuel (to dtmesh.cpp) to some other
+	  places in the same code.
 	- Paul Garceau modified mingw.mak to fully accomodate Working
 	  Static Library Build.
 16-Jul-2000
