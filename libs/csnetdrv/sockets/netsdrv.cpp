@@ -25,7 +25,7 @@
 
 #if defined(OS_SOLARIS)
 extern unsigned long inet_addr(const char*);
-#elif !defined(OS_BE)
+#elif !defined(OS_BE) && !defined(OS_WIN32)
 #include <arpa/inet.h>
 #endif
 
