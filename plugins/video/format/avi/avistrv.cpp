@@ -34,6 +34,7 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pAVI = (csAVIFormat*)pBase;
   pSystem = NULL;
   pG3D = NULL;
+  pG2D = NULL;
   pCodec = NULL;
   pMaterial = NULL;
 
