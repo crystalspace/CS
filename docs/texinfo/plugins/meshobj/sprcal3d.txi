@@ -43,7 +43,7 @@ the following contents:
        where all the other files are located.  optional. -->
   <path dir="cally/" />
 
-  <!-- the cally model is much to large. -->
+  <!-- the cally model is much too large. -->
   <scale value="0.01" />
 
   <!-- specify cal3d skeleton file used by model -->
