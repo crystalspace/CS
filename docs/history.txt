@@ -8,6 +8,13 @@ The history order is reversed so that new features are at the top.
 	- Made sure that csTinyXmlNode->GetContentsValueAsInt() and
 	  GetContentsValueAsFloat() now return 0 if the contents is actually
 	  illegal. Previously they would simply return a random value.
+	- Fixed a bug in the OpenGL renderer with EffectDrawTriangleMesh.
+	  That function was enabling and disabling several client states by
+	  using the OpenGL functions directly but that is illegal since the
+	  OpenGL renderer itself keeps a cached state of this. So you should
+	  always go through the cache instead. This fixes a bug where
+	  enabling DrawPolygonMesh for the car in the street of flarge would cause
+	  the snow to become too bright.
 26-Jan-2003
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with

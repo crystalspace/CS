@@ -1783,6 +1783,48 @@ void csGraphics3DOGLCommon::SetClientStates (uint ct)
   prev_ct = ct;
 }
 
+void csGraphics3DOGLCommon::EnableClientStateColorArray ()
+{
+  if (prev_ct & CS_CLIENTSTATE_COLOR_ARRAY) return;
+  glEnableClientState (GL_COLOR_ARRAY);
+  prev_ct |= CS_CLIENTSTATE_COLOR_ARRAY;
+}
+
+void csGraphics3DOGLCommon::EnableClientStateVertexArray ()
+{
+  if (prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY) return;
+  glEnableClientState (GL_VERTEX_ARRAY);
+  prev_ct |= CS_CLIENTSTATE_VERTEX_ARRAY;
+}
+
+void csGraphics3DOGLCommon::EnableClientStateTextureArray ()
+{
+  if (prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) return;
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  prev_ct |= CS_CLIENTSTATE_TEXTURE_COORD_ARRAY;
+}
+
+void csGraphics3DOGLCommon::DisableClientStateColorArray ()
+{
+  if (!(prev_ct & CS_CLIENTSTATE_COLOR_ARRAY)) return;
+  glDisableClientState (GL_COLOR_ARRAY);
+  prev_ct &= ~CS_CLIENTSTATE_COLOR_ARRAY;
+}
+
+void csGraphics3DOGLCommon::DisableClientStateVertexArray ()
+{
+  if (!(prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY)) return;
+  glDisableClientState (GL_VERTEX_ARRAY);
+  prev_ct &= ~CS_CLIENTSTATE_VERTEX_ARRAY;
+}
+
+void csGraphics3DOGLCommon::DisableClientStateTextureArray ()
+{
+  if (!(prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY)) return;
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+  prev_ct &= ~CS_CLIENTSTATE_TEXTURE_COORD_ARRAY;
+}
+
 static bool mirror_mode = false;
 
 void csGraphics3DOGLCommon::SetMirrorMode (bool mirror)
@@ -4021,7 +4063,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  SetClientStates( CS_CLIENTSTATE_ALL );
+  SetClientStates (CS_CLIENTSTATE_ALL);
 
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
@@ -4084,18 +4126,18 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     if (pass_data->vcsource == ED_SOURCE_FOG)
     {
       glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
-      glEnableClientState (GL_COLOR_ARRAY);
+      EnableClientStateColorArray ();
     }
     else
     {
       if (mesh.buffers[0]->GetColors())
       {
         glColorPointer (3, GL_FLOAT, 0, work_colors);
-        glEnableClientState (GL_COLOR_ARRAY);
+        EnableClientStateColorArray ();
       }
       else
       {
-        glDisableClientState (GL_COLOR_ARRAY);
+        DisableClientStateColorArray ();
         glColor4f (1,1,1,1);
       }
     }
@@ -4126,27 +4168,27 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       {
         glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo),
 		&work_fog[0].intensity);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+        EnableClientStateTextureArray ();
       }
       else if (layer_data->vcord_source == ED_SOURCE_LIGHTMAP)
       {
         if (!lightmapcoords)
         {
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+          EnableClientStateTextureArray ();
         }
 	else
 	{
 	  /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
 	          &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
-	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
-	  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	    EnableClientStateTextureArray();*/
+	  DisableClientStateTextureArray ();
         }
       }
       else if (layer_data->vcord_source == ED_SOURCE_MESH)
       {
         glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+        EnableClientStateTextureArray ();
       }
       else if ((layer_data->vcord_source >= ED_SOURCE_USERARRAY(0)) &&
 	       (layer_data->vcord_source
@@ -4157,7 +4199,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         {
           glTexCoordPointer (userarraycomponents[idx],
             GL_FLOAT, 0, work_userarrays[idx]);
-          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+          EnableClientStateTextureArray ();
         }
       }
 

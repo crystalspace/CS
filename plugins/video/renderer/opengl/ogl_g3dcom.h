@@ -227,6 +227,12 @@ public:
    * Use a combination of CS_CLIENTSTATE_...
    */
   static void SetClientStates (uint client_states);
+  static void EnableClientStateColorArray ();
+  static void EnableClientStateTextureArray ();
+  static void EnableClientStateVertexArray ();
+  static void DisableClientStateColorArray ();
+  static void DisableClientStateTextureArray ();
+  static void DisableClientStateVertexArray ();
 
   /**
    * Set mirror mode for the rasterizer. Then polygons have
