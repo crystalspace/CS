@@ -3085,12 +3085,15 @@ public:
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
-  virtual iMaterialWrapper* FindNamedMaterial (const char* name,const char* filename);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name,
+  	const char* filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
-  virtual iTextureWrapper* FindNamedTexture (const char* name,const char* filename);
-  virtual iLight* FindLight(const char *name);
+  virtual iTextureWrapper* FindNamedTexture (const char* name,
+  	const char* filename);
+  virtual iLight* FindLight (const char *name);
+  virtual iShader* FindShader (const char* name);
   virtual bool CheckDupes () const { return false; }
   virtual iRegion* GetRegion () const { return region; }
   virtual bool CurrentRegionOnly () const { return curRegOnly; }
@@ -3149,6 +3152,26 @@ iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
                                                         const char* filename)
 {
   return Engine->FindTexture (name, curRegOnly ? region : 0);
+}
+
+iShader* EngineLoaderContext::FindShader (const char* name)
+{
+#ifdef CS_USE_NEW_RENDERER
+  if (!curRegOnly || !region)
+    return csEngine::current_engine->ShaderManager->GetShader (name);
+
+  csRefArray<iShader> shaders = csEngine::current_engine->ShaderManager
+  	->GetShaders ();
+  size_t i;
+  for (i = 0 ; i < shaders.Length () ; i++)
+  {
+    iShader* s = shaders[i];
+    if (region->IsInRegion (s->QueryObject ())
+    	&& !strcmp (name, s->QueryObject ()->GetName ()))
+      return s;
+  }
+#endif
+  return 0;
 }
 
 iLight* EngineLoaderContext::FindLight(const char *name)

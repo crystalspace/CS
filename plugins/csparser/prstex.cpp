@@ -629,7 +629,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
             break;
           }
           const char* shadername = child->GetContentsValue ();
-          iShader* shader = shaderMgr->GetShader (shadername);
+	  iShader* shader = ldr_context->FindShader (shadername);
           if (!shader)
           {
             ReportNotify (
@@ -686,24 +686,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
 
 #ifdef CS_USE_NEW_RENDERER
-  // If we didn't have any shaders then we automatically use
-  // the default ambient and diffuse shader.
-#if 0 // This is moved to the engine
-  if (!shaders_mentioned)
-  {
-    csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
-	  	iShaderManager);
-    if (shaderMgr)
-    {
-      iShader* shader_light = shaderMgr->GetShader ("or_lighting");
-      if (shader_light)
-      {
-        shadertypes.Push (strings->Request ("lighting"));
-	shaders.Push (shader_light);
-      }
-    }
-  }
-#endif
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
 #else
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,

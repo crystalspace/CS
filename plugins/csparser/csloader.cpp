@@ -232,6 +232,27 @@ iLight* StdLoaderContext::FindLight (const char *name)
   return 0;
 }
 
+iShader* StdLoaderContext::FindShader (const char *name)
+{
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
+  	loader->object_reg, iShaderManager);
+  if (!shaderMgr) return 0;
+  if (!curRegOnly || !region) return shaderMgr->GetShader (name);
+
+  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
+  size_t i;
+  for (i = 0 ; i < shaders.Length () ; i++)
+  {
+    iShader* s = shaders[i];
+    if (region->IsInRegion (s->QueryObject ())
+    	&& !strcmp (name, s->QueryObject ()->GetName ()))
+      return s;
+  }
+#endif
+  return 0;
+}
+
 iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 {
   // @@@ in case the texture is not found a replacement is taken.
@@ -404,6 +425,27 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
     if (!strcmp (light->QueryObject ()->GetName (),name))
       return light;
   }
+  return 0;
+}
+
+iShader* ThreadedLoaderContext::FindShader (const char *name)
+{
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
+  	loader->object_reg, iShaderManager);
+  if (!shaderMgr) return 0;
+  if (!curRegOnly || !region) return shaderMgr->GetShader (name);
+
+  csRefArray<iShader> shaders = shaderMgr->GetShaders ();
+  size_t i;
+  for (i = 0 ; i < shaders.Length () ; i++)
+  {
+    iShader* s = shaders[i];
+    if (region->IsInRegion (s->QueryObject ())
+    	&& !strcmp (name, s->QueryObject ()->GetName ()))
+      return s;
+  }
+#endif
   return 0;
 }
 
@@ -1162,46 +1204,6 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_MATERIALS:
-#ifdef CS_USE_NEW_RENDERER
-#if 0 // This is moved to engine
-	  // If there was no <shader> section we create the default shaders here.
-	  if (!shader_given)
-	  {
-	    csRef<iShaderManager> shaderMgr =
-	      CS_QUERY_REGISTRY (object_reg, iShaderManager);
-
-	    csRef<iVFS> vfs (CS_QUERY_REGISTRY(object_reg, iVFS));
-	    csRef<iDocumentSystem> docsys (
-	      CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
-	    if (docsys == 0)
-	      docsys.AttachNew (new csTinyDocumentSystem ());
-	    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-
-            /*csRef<iShaderCompiler> shcom (CS_LOAD_PLUGIN (plugin_mgr,
-            "crystalspace.graphics3d.shadercompiler.xmlshader",
-            iShaderCompiler));*/
-	    csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
-	      iShaderManager));
-	    csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
-	    
-	    csRef<iFile> shaderFile = vfs->Open ("/shader/or_lighting.xml", VFS_FILE_READ);
-	    shaderDoc->Parse (shaderFile);
-	    csRef<iShader> shader_light = 
-	      shcom->CompileShader (shaderDoc->GetRoot ()->GetNode ("shader"));
-	    shaderMgr->RegisterShader (shader_light);
-
-            /*csRef<iShader> shader_ambient = shaderMgr->CreateShader ();
-            csRef<iDataBuffer> db_ambient = VFS->ReadFile (
-            "/shader/ambient.xml");
-            shader_ambient->Load (db_ambient);
-
-            csRef<iShader> shader_light = shaderMgr->CreateShader ();
-            csRef<iDataBuffer> db_light = VFS->ReadFile ("/shader/light.xml");
-            shader_light->Load (db_light);*/
-          }
-#endif
-#endif
-
           if (!ParseMaterialList (ldr_context, child))
             return false;
           break;

@@ -309,6 +309,7 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
   virtual iLight* FindLight (const char *name);
+  virtual iShader* FindShader (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
   virtual bool CurrentRegionOnly () const { return curRegOnly; }
@@ -347,6 +348,7 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
   virtual iLight* FindLight (const char *name);
+  virtual iShader* FindShader (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
   virtual bool CurrentRegionOnly () const { return curRegOnly; }

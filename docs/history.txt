@@ -20,6 +20,8 @@ chronological order.
 	  true).
 	- Jorrit added iShaderManager::UnregisterShader().
 	- Jorrit fixed regions so that they can now unload shaders.
+	- Jorrit added FindShader() to iLoaderContext so that shader finding
+	  now also respects the restrictions on finding on region and such.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling
