@@ -39,7 +39,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   {
     actions PerlEmbedGlueFile
     {
-      echo '#include "crystalspace/csperlxs_fallback.inc"' > $(<)
+      echo '#include "csutil/csperlxs_fallback.inc"' > $(<)
     }
   }
 
