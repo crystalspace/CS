@@ -13,13 +13,100 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+11-Sep-1999
+	- Andrew Zabolotny integrated his Virtual File System (VFS) into
+	  Crystal Space.  This was a major update to CS, and involved many
+	  modifications to many portions of the system.
+	- Andrew also made these additional changes to the system, some of
+	  which are related to the VFS integration:
+	  - Renamed Archive to csArchive.  Also renamed its methods to conform
+	    to the CS naming convention.
+	  - Removed read-only support from csArchive since this functionality
+	    is now provided by VFS.
+	  - Added new methods to csVector: QuickSort(), FindKey(), Find(),
+	    FindSortedKey(), Compare(), CompareKey().
+	  - Removed the global "csIniFile* config" variable.  Added Config and
+	    Vfs members to csSystemDriver.  Use Sys->Config to access the
+	    configuration file now.
+	  - Renamed CSLoader to csLoader.  Renamed csLoader::LoadLibrary() to
+	    LoadLibraryFile().
+	  - Added FILE() option to the TEXTURE() and SOUND() commands
+	    understood by the script files.  This feature allows you to give
+	    the texture or sound a name which is different from the file name.
+	  - Added LIBRARY keyword to the WORLD file.  This is similar to the
+	    C-language #include directive.
+	  - Changed all of the standard zip archives to meet new VFS
+	    requirements for pathnames.
+	- Eric Sunshine provided a temporary replacement for a new, very
+	  important header file, vfs.h, which Andrew forgot to check in, and
+	  which left Crystal Space in an uncompilable state.  Eric was able to
+	  reverse-engineer VFS in order to create the replacement vfs.h which
+	  should serve until Andrew returns and checks in the "real" one.
+	  This replacement header is completely functional and allows the
+	  system to compile and run properly.
+	- Eric Sunshine also performed the following additional bug fixes,
+	  most of which are related to VFS or other global changes which
+	  Andrew made:
+	  - Renamed csVFS::EOF() to AtEOF() so that it does not collide with
+	    the pre-processor macro EOF which is present on many systems and
+	    defined as (-1).  Also fixed a problem which was considered an
+	    error by some compilers.
+	  - Fixed an initialization order bug in WalkTest which caused it to
+	    ignore some of its command line arguments.  This made it
+	    impossible, for example, to specify the name of the level on the
+	    command line.  This bug showed up with the introduction of VFS.
+	  - Fixed a serious bug in WalkTest where it was still calling
+	    csLoader::LoadLibrary() instead of LoadLibraryFile() in order to
+	    load standard.zip.  In some cases this bug resulted in semi-random
+	    crashes.  In all cases, it resulted in the failure to load
+	    standard.zip.
+	  - Fixed a bug in standard.zip which was inadvertantly introduced
+	    when Andrew updated this archive to work with VFS.  The bug
+	    resulted in a crash since the texture loader was unable to find
+	    the image resource for one of the missile sprites.
+	  - Fixed a bug in csLoader which resulted in sound files not loading
+	    from standard.zip.  The problem was that the world file was
+	    changed to use the new FILE() keyword for SOUND resources, but
+	    csLoader was not updated to parse the FILE directive.
+	    Consequently, the sound files could not be located.
+	  - Fixed a bug in CSWS where incorrect order of initialization
+	    prevented it from locating its image resources within MazeD.zip.
+	  - Fixed a number of bugs in CSWS where it was looking for its image
+	    resources in incorrect locations.  These bugs were a consequence
+	    of changes to the organization of MazeD.zip.
+	  - Fixed MazeD so that it once again compiles.  Andrew's system-wide
+	    changes introduced many compilation errors into MazeD.
+	  - Fixed a bug in MazeD where it was unable to locate its tool bar
+	    resources on account of changes to the organization of MazeD.zip.
+	  - Fixed vsh (the VFS test shell) so that it no longer overloads
+	    function names such as creat(), mount(), sync(), etc., which are
+	    standard functions on the Unix platform.
+	  - Fixed a bug in the vsh makefile where it refused to build vsh on
+	    platforms which use static linking.  Also fixed the linkage
+	    directives so that vsh can actually be built on platforms which
+	    use static linking.
+	  - Fixed a problem in the vsh makefile where it would not create any
+	    of the output directories or process other dependencies on on
+	    platforms which do not use the .EXE extension.  Specifically, the
+	    problem was that the meta target and the executable were both
+	    named "vsh".  Unfortuantely, the current makefile system does not
+	    work properly when the meta target and executable have the same
+	    name.
+	  - Fixed the MacOS/X Server, OpenStep, and NextStep system drivers so
+	    that they once again compile in the wake of Andrew's changes.  (He
+	    had partially patched them, but missed some items.)
+	  - Fixed the Network Driver Demo so it once again compiles.
+	- Eric Sunshine fixed a crasher in csPolygonSet::CompressVertices()
+	  which prevented many level files from loading.
+	- Eric Sunshine fixed compilation warnings in sector.cpp and
+	  polyset.cpp.
 10-Sep-1999
 	- AddVertexSmart() is now deprecated. It is still there and can be
 	  used. However, it is better (read faster) to use AddVertex()
 	  and then do CompressVertices() afterwards (for things and sectors).
 9-Sep-1999
-	- Brandon Ehle found another case where 0 size alllocation
-	  happens. Fixed!
+	- Brandon Ehle found another case where 0 size allocation happens.
+	  Fixed!
 	- Thomas Hieber removed warning related to new COM definitions of
 	  DECLARE_COMPOSITE_INTERFACE (something)
 	- Thomas also made a new csThing::RemoveThing() function (untested)
@@ -89,12 +176,13 @@ Short-term cleanups that need to be done:
 31-Aug-1999
 	- Further work on octree. Added specific versions for ClassifyX()
 	  to csPolygon3D.
-	- Dumping statistics for csPolygonTree subclasses (csOctree and csBspTree).
-	- Further experimentation with -huge option. I got very good results but
-	  did an interesting observation. Movement is VEEEERRRRYYY slow. The reason
-	  is that movement of the camera does not use the CD system to check if we
-	  have to go to another sector (through a portal). This means that it has
-	  to check all polygons in the sector!
+	- Dumping statistics for csPolygonTree subclasses (csOctree and
+	  csBspTree).
+	- Further experimentation with -huge option.  I got very good results
+	  but did an interesting observation.  Movement is VEEEERRRRYYY slow.
+	  The reason is that movement of the camera does not use the CD system
+	  to check if we have to go to another sector (through a portal).
+	  This means that it has to check all polygons in the sector!
 30-Aug-1999
 	- Changed csPolygonInt::Classify() to use a plane instead
 	  of another csPolygonInt. Also removed csPolygonInt::SamePlane()
