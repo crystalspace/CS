@@ -94,7 +94,10 @@ Bugs to fix:
 	     (already at this point I get strangely culled polygons which
 	     aren't there in opengl mode) then I turn right, work a little bit
 	     and it crashes." Jorrit reports that valgrind indicates problems
-	     with this program.
+	     with this program.  Matthew Sieker <msieker@siekersoft.com>
+	     reports: "I've noticed a problem with tbtut running with the
+	     software renderer.  If you just go forward for just a bit (holding
+	     down the up arrow for a few seconds), it suddenly locks up."
 	[S]  Some canvases still clip improperly as shown by the clipping tests
 	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
 	     Possibly, the MacOS/X canvases are also flawed. Same is true for
