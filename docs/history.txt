@@ -1,5 +1,6 @@
 The history order has been reversed so that new features are at the top.
 
+6-Mar-2001
 5-Mar-2001
 	- Thomas Hieber did the following to the gamecore plugin:
 	    - Added to scf.cfg.
