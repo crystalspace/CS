@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript csperl5 ;
 
-if $(PERL5.AVAILABLE) = "yes" && ! DISABLED
+if $(PERL5.AVAILABLE) = "yes"
 {
   if $(CMD.SWIG)
   {
@@ -19,7 +19,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! DISABLED
     Swig $(target) : $(sources) ;
   }
   
-  FILES = csperl5.cpp csperl5.h cswigpl5.cpp perlxsi_fallback.c ;
+  FILES = csperl5.cpp csperl5.h cswigpl5.cpp csperlxs.c ;
   
   Plugin csperl5
 	  : $(FILES)

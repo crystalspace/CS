@@ -87,55 +87,6 @@ SRC.MSCSPERL5SWIG = $(SWIG.PERL5.C)
 OBJ.MSCSPERL5SWIG = $(SWIG.PERL5.O)
 DEP.MSCSPERL5SWIG = $(DEP.CSPERL5)
 
-ifeq ($(PERL5.EXTUTILS.AVAILABLE),yes)
-define PERLXSI.CONTENT
-$(PERL) -MExtUtils::Embed -e xsinit -- -o $(PERLXSI.C) -std \
-  $(PERL5.EXTUTILS.DYNALOADER) cspace
-endef
-else
-define PERLXSI.CONTENT
-$(RM) -f $(PERLXSI.C)
-@echo '#if defined(__cplusplus) && !defined(PERL_OBJECT)' >> $(PERLXSI.C)
-@echo '#  define is_cplusplus' >> $(PERLXSI.C)
-@echo '#endif' >> $(PERLXSI.C)
-@echo '#ifdef is_cplusplus' >> $(PERLXSI.C)
-@echo 'extern "C" {' >> $(PERLXSI.C)
-@echo '#endif' >> $(PERLXSI.C)
-@echo '#include <EXTERN.h>' >> $(PERLXSI.C)
-@echo '#include <perl.h>' >> $(PERLXSI.C)
-@echo '#ifdef PERL_OBJECT' >> $(PERLXSI.C)
-@echo '#  define NO_XSLOCKS' >> $(PERLXSI.C)
-@echo '#  include <XSUB.h>' >> $(PERLXSI.C)
-@echo '#  include "win32iop.h"' >> $(PERLXSI.C)
-@echo '#  include <fcntl.h>' >> $(PERLXSI.C)
-@echo '#  include <perlhost.h>' >> $(PERLXSI.C)
-@echo '#endif' >> $(PERLXSI.C)
-@echo '#ifdef is_cplusplus' >> $(PERLXSI.C)
-@echo '}' >> $(PERLXSI.C)
-@echo '#  ifndef EXTERN_C' >> $(PERLXSI.C)
-@echo '#    define EXTERN_C extern "C"' >> $(PERLXSI.C)
-@echo '#  endif' >> $(PERLXSI.C)
-@echo '#else' >> $(PERLXSI.C)
-@echo '#  ifndef EXTERN_C' >> $(PERLXSI.C)
-@echo '#    define EXTERN_C extern' >> $(PERLXSI.C)
-@echo '#  endif' >> $(PERLXSI.C)
-@echo '#endif' >> $(PERLXSI.C)
-@echo 'EXTERN_C void xs_init (pTHXo);' >> $(PERLXSI.C)
-@echo 'EXTERN_C void boot_DynaLoader (pTHXo_ CV* cv);' >> $(PERLXSI.C)
-@echo 'EXTERN_C void boot_cspace (pTHXo_ CV* cv);' >> $(PERLXSI.C)
-@echo 'EXTERN_C void xs_init(pTHXo)' >> $(PERLXSI.C)
-@echo '{' >> $(PERLXSI.C)
-@echo '  char *file = __FILE__;' >> $(PERLXSI.C)
-@echo '  dXSUB_SYS;' >> $(PERLXSI.C)
-@echo '  /* DynaLoader is a special case */' >> $(PERLXSI.C)
-@echo '  newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);' >> \
-	$(PERLXSI.C)
-@echo '  newXS("cspace::bootstrap", boot_cspace, file);' >> $(PERLXSI.C)
-@echo '}' >> $(PERLXSI.C)
-@echo "Generated $(PERLXSI.C)"
-endef
-endif
-
 endif
 
 #----------------------------------------------------------------- targets ---#
@@ -152,9 +103,6 @@ $(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/csperl5/%.cpp
 	$(DO.COMPILE.CPP) $(PERL5.CFLAGS)
-
-$(PERLXSI.C): $(PERLXSI.DEP) $(PERLXSI.DIR)
-	$(PERLXSI.CONTENT)
 
 $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)

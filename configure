@@ -3703,6 +3703,20 @@ echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
 fi
 
 
+	{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e xsinit -- -o \\
+	  include/cssys/csperlxs.inc -std \${PERL5.EXTUTILS.DYNALOADER} cspace") >&5
+  ($PERL -MExtUtils::Embed -e xsinit -- -o \
+	  include/cssys/csperlxs.inc -std ${PERL5.EXTUTILS.DYNALOADER} cspace) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+	{ (echo "$as_me:$LINENO: echo '#include \"cssys/csperlxs.inc\"' \\
+	  > plugins/cscript/csperl5/csperlxs.c") >&5
+  (echo '#include "cssys/csperlxs.inc"' \
+	  > plugins/cscript/csperl5/csperlxs.c) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
 	cs_cv_perl_cflags=`{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e ccopts") >&5
   ($PERL -MExtUtils::Embed -e ccopts) 2>&5
   ac_status=$?
@@ -3719,6 +3733,13 @@ else
 echo "$as_me: Recommend you install the latest release of Perl 5." >&6;}
 	{ echo "$as_me:$LINENO: http://www.perl.org/" >&5
 echo "$as_me: http://www.perl.org/" >&6;}
+	{ (echo "$as_me:$LINENO: echo '#include \"cssys/csperlxs_fallback.inc\"' \\
+	  > plugins/cscript/csperl5/csperlxs.c") >&5
+  (echo '#include "cssys/csperlxs_fallback.inc"' \
+	  > plugins/cscript/csperl5/csperlxs.c) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
 
 	echo "$as_me:$LINENO: checking for perl Config module" >&5
 echo $ECHO_N "checking for perl Config module... $ECHO_C" >&6

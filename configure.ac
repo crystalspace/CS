@@ -314,12 +314,18 @@ AS_IF([test -n "$PERL"],
 	AS_IF([test $cs_cv_perl_mod_dynaloader = yes],
 	    [CS_BUILD_PROPERTY([PERL5.EXTUTILS.DYNALOADER], [DynaLoader])])
 
+	AC_RUN_LOG([$PERL -MExtUtils::Embed -e xsinit -- -o \
+	  include/cssys/csperlxs.inc -std ${PERL5.EXTUTILS.DYNALOADER} cspace])
+	AC_RUN_LOG([echo '#include "cssys/csperlxs.inc"' \
+	  > plugins/cscript/csperl5/csperlxs.c])
 	cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
 	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
 
 	# ExtUtils::Embed absent.
 	[AC_MSG_NOTICE([Recommend you install the latest release of Perl 5.])
 	AC_MSG_NOTICE([http://www.perl.org/])
+	AC_RUN_LOG([echo '#include "cssys/csperlxs_fallback.inc"' \
+	  > plugins/cscript/csperl5/csperlxs.c])
 
 	AC_CACHE_CHECK([for perl Config module], [cs_cv_perl_mod_config],
 	    [AS_IF([AC_RUN_LOG([$PERL -MConfig -e 0 1>&2])],

@@ -31,9 +31,9 @@ CS_IMPLEMENT_APPLICATION
 
 iObjectRegistry *objreg;
 
-char testscript [] =
+char testscript[] =
 "  $text = 'Jorrit does hail from all places';\n"
-"  $v = new csVector3 (4, 2, 0);\n"
+"  $v = new cspace::csVector3 (4, 2, 0);\n"
 "  print join (' ', (split (' ', $text)) [$v->{x}, $v->{y}, $v->{z}]);\n";
 
 int main (int argc, char *argv[], char *env[])
