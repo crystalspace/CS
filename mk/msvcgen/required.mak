@@ -40,6 +40,7 @@
 #------------------------------------------------------------------------------
 
 MSVC.PLUGINS.REQUIRED =         \
+  apps/import/caltocs		\
   cscript/cslua                 \
   cscript/cspython              \
   font/server/freefnt2          \

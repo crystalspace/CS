@@ -7,6 +7,16 @@ The history order is reversed so that new features are at the top.
 	- Avoided several warnings in ogl_g3dcom.cpp.
 	- Fixed DrawTriangleMesh() in OpenGL renderer so it no longer crashes
 	  if no material is given.
+	- Eric Sunshine made these additional changes to msvcgen.mak:
+	    - Fixed problem where generated project files were referring to .rc
+	      resource in CS/out/mk directory, rather than CS/mk/visualc[7].
+	    - Fixed problems with the top-level msvcgen install and clean
+	      targets where the MSVCGEN_VERSION was not being correctly set on
+	      Unix.  (It probably worked on Windows, though, because shell
+	      variables have a different scope on Windows than in Unix.)
+	    - Folded out a bunch of common code in the root targets makefile
+	      section.  This will reduce future maintenance headaches.
+	- Eric Sunshine added apps/import/caltocs to msvcgen/required.mak.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
 	  and msvc7gen.mak:

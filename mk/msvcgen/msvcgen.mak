@@ -163,7 +163,7 @@
 # Target description
 DESCRIPTION.msvcgen = MSVC DSW and DSP resources
 DESCRIPTION.msvcinst = $(DESCRIPTION.msvcgen)
-DESCRIPTION.msvc7gen = MSVC7 .SLN and .VCPROJ resources
+DESCRIPTION.msvc7gen = MSVC7 SLN and VCPROJ resources
 DESCRIPTION.msvc7inst = $(DESCRIPTION.msvc7gen)
 
 #------------------------------------------------------------- rootdefines ---#
@@ -187,43 +187,46 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: msvcgen msvcinst msvcgenclean msvc7gen msvc7inst msvc7genclean
 
+define MSVCGEN_BUILD
+  @echo $(SEPARATOR)
+  @echo $"  Generating $(DESCRIPTION.$@)$"
+  @echo $(SEPARATOR)
+  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcgen \
+  DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
+  PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
+endef
+
+define MSVCGEN_INSTALL
+  @echo $(SEPARATOR)
+  @echo $"  Installing $(DESCRIPTION.$@)$"
+  @echo $(SEPARATOR)
+  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcinst
+endef
+
+define MSVCGEN_CLEAN
+  @echo $(SEPARATOR)
+  @echo $"  Cleaning up the $(DESCRIPTION.$(subst clean,,$@))$"
+  @echo $(SEPARATOR)
+  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcgenclean
+endef
+
 msvcgen:
-	@echo $(SEPARATOR)
-	@echo $"  Generating $(DESCRIPTION.$@)$"
-	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
-	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
-	MSVCGEN_VERSION=6 \
-	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
+	$(MSVCGEN_BUILD) MSVCGEN_VERSION=6
 
 msvcinst: msvcgen
-	@echo $(SEPARATOR)
-	@echo $"  Installing $(DESCRIPTION.$@)$"
-	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+	$(MSVCGEN_INSTALL) MSVCGEN_VERSION=6
 
 msvcgenclean:
-	MSVCGEN_VERSION=6
-	$(MAKE_CLEAN)
+	$(MSVCGEN_CLEAN) MSVCGEN_VERSION=6
 
 msvc7gen:
-	@echo $(SEPARATOR)
-	@echo $"  Generating $(DESCRIPTION.$@)$"
-	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
-	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
-	MSVCGEN_VERSION=7 \
-	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
+	$(MSVCGEN_BUILD) MSVCGEN_VERSION=7
 
 msvc7inst: msvc7gen
-	@echo $(SEPARATOR)
-	@echo $"  Installing $(DESCRIPTION.$@)$"
-	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+	$(MSVCGEN_INSTALL) MSVCGEN_VERSION=7
 
 msvc7genclean:
-	MSVCGEN_VERSION=7
-	$(MAKE_CLEAN)
+	$(MSVCGEN_CLEAN) MSVCGEN_VERSION=7
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -284,11 +287,16 @@ MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
 # Name of project.rc file for types which require version information.
-MSVC.VERSIONRC.appgui  = $(MSVC.VERSIONRC.NAME)
-MSVC.VERSIONRC.appcon  = $(MSVC.VERSIONRC.NAME)
-MSVC.VERSIONRC.plugin  = $(MSVC.VERSIONRC.NAME)
-MSVC.VERSIONRC.library =
-MSVC.VERSIONRC.group   =
+MSVC.VERSIONRC.CVS.appgui  = $(MSVC.VERSIONRC.CVS.NAME)
+MSVC.VERSIONRC.OUT.appgui  = $(MSVC.VERSIONRC.OUT.NAME)
+MSVC.VERSIONRC.CVS.appcon  = $(MSVC.VERSIONRC.CVS.NAME)
+MSVC.VERSIONRC.OUT.appcon  = $(MSVC.VERSIONRC.OUT.NAME)
+MSVC.VERSIONRC.CVS.plugin  = $(MSVC.VERSIONRC.CVS.NAME)
+MSVC.VERSIONRC.OUT.plugin  = $(MSVC.VERSIONRC.OUT.NAME)
+MSVC.VERSIONRC.CVS.library =
+MSVC.VERSIONRC.OUT.library =
+MSVC.VERSIONRC.CVS.group   =
+MSVC.VERSIONRC.OUT.group   =
 
 # Define extra Windows-specific targets which do not have associated makefiles.
 include mk/msvcgen/win32.mak
@@ -304,11 +312,13 @@ MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
-# Macro to compose project.rc filename
-MSVC.VERSIONRC.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
+# Macros to compose project.rc filename for standard and build locations.
+MSVC.VERSIONRC.CVS.NAME = $(MSVC.CVS.DIR)/$(MSVC.PROJECT).rc
+MSVC.VERSIONRC.OUT.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
 
-# Macro to compose project.rc filename for a given project.
-MSVC.VERSIONRC = $(MSVC.VERSIONRC.$(DSP.$*.TYPE))
+# Macros to compose project.rc filename for a given project.
+MSVC.VERSIONRC.CVS = $(MSVC.VERSIONRC.CVS.$(DSP.$*.TYPE))
+MSVC.VERSIONRC.OUT = $(MSVC.VERSIONRC.OUT.$(DSP.$*.TYPE))
 
 # Module name/description for project.rc.
 MSVC.VERSIONDESC.PLG = \
@@ -318,16 +328,16 @@ MSVC.VERSIONDESC.APP = $(DSP.$*.NAME)
 
 # Command to generate the project.rc file.
 MSVC.MAKEVERRC.COMMAND.APP = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC.APP)'
+  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC.APP)'
 MSVC.MAKEVERRC.COMMAND.PLG = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC.PLG)'
+  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.VERSIONDESC.PLG)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
 MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
-  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC)
+  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC.CVS)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -436,9 +446,9 @@ workspacegen:
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
 	$(wildcard $(MSVC.OUT.FRAGMENT)/*.$(MSVC.EXT.FRAGMENT))
 	
-# Build all Visual C++ DSW and DSP project files.  The DSW file is built last
-# since it is composed of the fragment files generated as part of the DSP file
-# synthesis process.
+# Build all Visual C++ DSW/SLN and DSP/VCPROJ project files.  The DSW/SLN file
+# is built last since it is composed of the fragment files generated as part of
+# the DSP/VCPROJ file synthesis process.
 msvcgen: \
   msvcgenclean \
   $(MSVC.OUT.DIR) \
@@ -446,11 +456,6 @@ msvcgen: \
   $(addsuffix .MAKEPROJECT,$(MSVC.DSP)) \
   workspacegen
 
-# Build all Visual C++ 7 SLN and VCPROJ project files.  The SLN file is built
-# last since it is composed of the fragment files generated as part of the
-# VCPROJ file synthesis process.
-msvc7gen: msvcgen
-  
 # Install the generated project files in place of the files from the CVS
 # repository and inform the user as to which CVS commands must be manually
 # invoked in order to permanently commit the generated files to the repository.
@@ -476,13 +481,9 @@ endif
 	@echo $"  $(MSVC.CVS.WARNING.3)$"
 	@echo $(SEPARATOR)
 
-msvc7inst: msvcinst
-	
 # Scrub the sink; mop the floor; wash the dishes; paint the door.
 clean: msvcgenclean
 msvcgenclean:
 	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
 	
-msvc7genclean: msvcgenclean
-
 endif # ifeq ($(MAKESECTION),targets)
