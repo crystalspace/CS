@@ -4,8 +4,14 @@
 DESCRIPTION.win32gcc = Windows with MinGW32 GNU C/C++
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software \
-  video/canvas/ddraw61 video/renderer/direct3d61 video/renderer/opengl
+PLUGINS+= sound/renderer/software
+PLUGINS+= video/canvas/ddraw video/renderer/software
+PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61
+
+# if u have the following line uncommented make sure one  
+# OPENGL.LIBS.DEFINED is set below or you have a custom 
+# opengl dll installed as GL.dll (e.g. MESA)
+PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE
@@ -43,6 +49,13 @@ LIB_PREFIX=lib
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=
 
+# OpenGL settings for use with OpenGL Drivers...untested
+#SGI OPENGL SDK v1.1.1 for Win32
+#OPENGL.LIBS.DEFINED = -lopengl -lglut
+
+#MS OpenGL
+OPENGL.LIBS.DEFINED=-lopengl32 -lglut32
+
 # Where can the Zlib library be found on this system?
 Z_LIBS=-lz
 
@@ -59,7 +72,8 @@ SOUND_LIBS=
 NEED_SOCKET_LIB=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=
+# for instance where your dx includes are
+#CFLAGS.INCLUDE=-I/dx7asdk/dxf/include 
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
