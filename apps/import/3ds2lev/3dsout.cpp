@@ -75,9 +75,19 @@ void Writer::WriteV(const char* line, va_list args)
 {
     if (!indented)
     {
+      if (looknice > 5)
+      {
+        for (int i=0;i<indentlevel;i++)
+          fputs("  ", file);
+      }
+      else if (looknice > 3)
+      {
 	for (int i=0;i<indentlevel;i++)
-	    fputc(' ', file);
-	indented = true;
+	  fputc(' ', file);
+      }
+      // don't indent in lower modes
+
+      indented = true;	
     }
 
     vfprintf(file, line, args);
@@ -335,7 +345,12 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
       }
       newpointmap[v] = newpoint;
       vectors[newpoint].Set(xyz1[0], xyz1[1], xyz1[2]);
-      WriteL ("VERTEX (%g,%g,%g)    ; %d",
+      if (looknice > 5)
+	  Write ("VERTEX ");
+      else
+	  Write ("V ");
+      
+      WriteL ("(%g,%g,%g)    ; %d",
 	      xyz1[0]*xscale + xrelocate,
 	      xyz1[1]*yscale + yrelocate,
 	      xyz1[2]*zscale + zrelocate,
@@ -496,8 +511,17 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
     {
       if (used[f])
 	continue;
+     
+      if (looknice > 5)
+	Write ("POLYGON ");
+      else
+	Write ("P ");
+
+      if (looknice > 4)
+    	WriteL ("'x%d_%d'  (", numMesh, f);
+      else
+	WriteL ("''  (");
       
-      WriteL ("POLYGON 'x%d_%d'  (", numMesh, f);
       Indent();
       unsigned short* ppp = mesh->faceL[f].points; 
       int poly[1000];
@@ -521,7 +545,12 @@ void CSWriter::WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh)
 	  }
     	}
       }
-      Write ("VERTICES (");
+
+      if (looknice > 5)
+	Write ("VERTICES (");
+      else
+	Write ("V (");
+
       int mappoints[3]; int np=0;
       for (int i=0; i<plen; i++)
       {

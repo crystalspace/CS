@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.3dslev = 3DS to Crystal Space map convertor
+DESCRIPTION.3dslev = 3DS to Crystal Space map converter
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

@@ -17,6 +17,7 @@
 #define  FLAG_REMOVEDOUBLEVERTICES 0x10000 /* remove doubled vertices */
 
 extern int flags;
+extern int looknice;
 
 #endif // __CS_3DS2LEV_H__
 

@@ -32,8 +32,8 @@ CS_IMPLEMENT_APPLICATION
 float roundFloat (float f);
 
 int flags = 0;
-int curmodel = 0;
-int modelnum = -1;
+// middle looking output
+int looknice = 5;
 
 #define MODE_XYZ 0
 #define MODE_XZY 1
@@ -267,8 +267,7 @@ int main (int argc, char * argv[])
   float xrelocate = 0, yrelocate = 0, zrelocate = 0;
 
   flags = 0;
-  curmodel = 0;
-  modelnum = -1;
+  int modelnum = -1;
   mode_xyz = MODE_XZY;
   flags |= FLAG_SWAP_V; // default to lower left texture origin
   /*flags |= FLAG_REMOVEDOUBLEVERTICES;
@@ -291,7 +290,7 @@ int main (int argc, char * argv[])
                " -vv       Very verbose mode on\n"
                " -l        Don't convert but list objects in 3ds file\n"
 	       " -n	   optimize (combine every two triangles into polys)\n"
-               " -s x y z  Scale objects (x,y,z = floats)\n"
+	       " -w level  Output nice level from 0 small to 10 best looking\n"
                " -r x y z  Relocate objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"
                " -f        Don't ask for file overwrite (force)\n"
@@ -386,6 +385,11 @@ int main (int argc, char * argv[])
 	case 'N': 
 		  flags |= FLAG_COMBINEFACES;
 		  flags |= FLAG_REMOVEDOUBLEVERTICES;
+		  break;
+	case 'W':
+		  looknice = atoi(argv[++n]);
+		  if (looknice < 0 || looknice > 10)
+		    fprintf (stderr, "Bad param: looknice not in range 0-10\n");
 		  break;
 	default:  fprintf (stderr, "Bad param: %s\n",argv[n]);
 		  return 1;
