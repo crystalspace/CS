@@ -37,7 +37,7 @@ Applications for testing specific features of the project reside here.
 Some scripts to support the build process on various platforms.
 
 @item CS/data
-Here you should place your levels like @file{large.zip}. You can use any
+Here you should place your levels like @file{flarge.zip}. You can use any
 directory for this, so this is only a suggestion. If you change the name, you
 must update the information in the configuration for the Virtual File System,
 (@file{vfs.cfg}).
@@ -79,6 +79,9 @@ rendered into @sc{html} format.
 Here are the headers that can be used from other modules. The path for the
 headers reflect the structure of the modules in the lib directory. So for
 furter explanation of a specific directory see the @file{CS/lib} section.
+Include files which live in this directory itself (i.e. not deeper in the
+hierarchy) contain definitions for @sc{scf} interfaces.
+@xref{SCF}.
 
 @item CS/libs
 Here are all Modules provided be Crystal Space. Some modules will consist of
@@ -94,24 +97,23 @@ libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
 @sc{scf} interfaces to allow access through the @sc{scf} mechanism.
 
 @table @code
-@item CS/libs/csengine/colldet
-Collision detection system
 @item CS/libs/csengine/light
 Lighting system
 @item CS/libs/csengine/objects
-Sprites and things
+Things and Mesh objects
 @item CS/libs/csengine/polygon
 Polygon related functionality
 @end table
 
 @item CS/libs/csgeom
 The geometry library.  Various geometry related functions and classes can be
-found here: matrices, vectors, @sc{bsp} trees, clipper, planes, etc.
+found here: matrices, vectors, transforms, clipper, planes, etc.
 
 @item CS/libs/csgfxldr
 The graphics loader library.  Routines to support loading various graphic file
 formats and put them internally in the same format.  This library supports
-@sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}.
+@sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}. In the future this
+library will be removed in favor of a set of plugins.
 
 @item CS/libs/csobject
 Hierarchy of Crystal Space independant classes, that are used as base for most
@@ -121,7 +123,7 @@ dynamically be attached to objects at run-time.
 
 @item CS/libs/csparser
 A library which parses @sc{ascii} map files and imports the map into the
-3D engine.
+3D engine. In the future this library will be removed in favor of a plugin.
 
 @item CS/libs/cssys
 All system dependent stuff (non-graphics and non-sound related) is in this
@@ -155,18 +157,6 @@ and some other useful goodies.  This library requires the use of the external
 @item CS/libs/csws
 The Crystal Space Window System which is nicely integrated with Crystal Space.
 It is also platform independent.
-
-@item CS/libs/libjpeg
-Library to handle @sc{jpeg} format files.  This library is not part of Crystal
-Space.
-
-@item CS/libs/libpng
-Library to handle @sc{png} format files.  This library is not part of Crystal
-Space.
-
-@item CS/libs/zlib
-Library to handle @sc{zip} format files.  This library is not part of Crystal
-Space.
 @end table
 
 @item CS/mk
@@ -204,8 +194,8 @@ BeOS version
 @sc{os}/2 version
 @item CS/plugins/video/canvas/ddraw
 Win32 using Direct Draw
-@item CS/plugins/video/canvas/ddraw6
-Win32 using Direct Draw (DirectX 6)
+@item CS/plugins/video/canvas/ddraw61
+Win32 using Direct Draw (DirectX 6.1)
 @item CS/plugins/video/canvas/dosraw
 @sc{dos}
 @item CS/plugins/video/canvas/ggi
@@ -218,18 +208,12 @@ Unix, using @sc{svga}lib
 Macintosh
 @item CS/plugins/video/canvas/next
 MacOS/X Server, OpenStep, NextStep
-@item CS/plugins/video/canvas/glid2dcommon
+@item CS/plugins/video/canvas/glide2common
 Common code for to Glide2 drivers
 @item CS/plugins/video/canvas/beglide2
 Glide2X 2D driver for BeOS
-@item CS/plugins/video/canvas/macglide2
-Glide2x 2D driver for Macintosh
 @item CS/plugins/video/canvas/unxglide2
 Glide2x 2D driver for Unix
-@item CS/plugins/video/canvas/winglide2
-Glide2x 2D driver for Win32
-@item CS/plugins/video/canvas/winglide3
-Glide3x 2D driver for Win32
 @item CS/plugins/video/canvas/openglcommon
 Common code for all OpenGL 2D drivers
 @item CS/plugins/video/canvas/openglbe
@@ -255,14 +239,10 @@ certain operating systems, such as DirectX.
 @table @code
 @item CS/plugins/video/renderer/common
 Common code for 3D rasterizers
-@item CS/plugins/video/renderer/direct3d5
-Direct3D rasterizer using DirectX 5
-@item CS/plugins/video/renderer/direct3d6
-Direct3D rasterizer using DirectX 6
-@item CS/plugins/video/renderer/glide2
-3D rasterizer using glide2x
-@item CS/plugins/video/renderer/glide3
-3D rasterizer using glide3x
+@item CS/plugins/video/renderer/direct3d61
+Direct3D rasterizer using DirectX 6.1
+@item CS/plugins/video/renderer/glide
+3D rasterizer using glide
 @item CS/plugins/video/renderer/opengl
 3D rasterizer using OpenGL
 @item CS/plugins/video/renderer/software
@@ -271,12 +251,26 @@ Software based rasterizer
 A vector based rasterizer (draws only lines)
 @item CS/plugins/video/renderer/inf
 The @emph{infinite} rasterizer (draws nothing at all)
+@item CS/plugins/video/renderer/null
+The @emph{null} rasterizer (needed to work with 2D graphics alone)
 @end table
+
+@item CS/plugins/video/format
+Support for playing video files on a texture.
 
 @item CS/plugins/net/driver
 Network drivers.  The only existing driver is a @sc{bsd} socket-based
 @sc{tcp/ip} driver.
 
+@item CS/plugins/cscript/cspython
+@sc{Python} scripting module.
+
+@item CS/plugins/engine
+If you want to use the engine as a plugin then this directory contains
+the needed support for that. In the future using the engine as a plugin
+will be the prefered way.
+
+@table @code
 @item CS/plugins/sound/driver
 System dependent sound drivers.  There are currently drivers for Macintosh,
 @sc{oss} (Linux), and Windows.
@@ -290,12 +284,34 @@ Sounddriver for Unix
 Sounddriver for Win32
 @end table
 
+@item CS/plugins/sound/loader
+Loaders for various sound file formats.
+@item CS/plugins/sound/renderer
+Support for 3D sound (@sc{ds3d} or @sc{software} only at the moment).
+@end table
+
 @table @code
 @item CS/plugins/csclear
 The Crystal Clear plug-in, a game abstraction library.
 @item CS/plugins/cscon
 A console plug-in for displaying a textual console within the graphic
 environment.
+@end table
+
+@table @code
+@item CS/plugins/mesh/object
+Various mesh object implementations. @xref{MeshObject}
+@item CS/plugins/mesh/loader
+Loaders for the mesh objects.
+@end table
+
+@table @code
+@item CS/plugins/font/server/csfont
+Standard Crystal Space font server.
+@item CS/plugins/font/server/freefont
+Freefont font server.
+@item CS/plugins/font/server/fontplex
+Font server multiplexer.
 @end table
 
 @item CS/support

@@ -12,8 +12,8 @@ Crystal Space require an 8-bit, 15-bit, 16-bit, or 32-bit display to run.  It
 will @emph{not} work on 24-bit displays.
 
 @item
-@sc{djgpp}: If you have @sc{gcc} 2.8.1 then you must disable optimization (set
-@code{OPT=debug} in @file{mk/user.mak}) before compilation because there seems
+@sc{djgpp}: If you have @sc{gcc} 2.8.1 then you must disable optimization (use
+@code{make djgpp MODE=debug}) before compilation because there seems
 to be a bug in the optimizer.  You can also download @sc{egcs} from
 @uref{http://goof.com/pcg} which fixes this problem and also generates a more
 efficient executable.
@@ -28,7 +28,7 @@ more recent version of @sc{djgpp} if possible.
 OpenGL: If your OpenGL display looks really bad (bad quality of lighting
 compared to the software renderer) then you have a card which doesn't support
 the desired blending mode @code{2*SRC*DST} that Crystal Space uses.  You can
-edit @file{opengl.cfg} and change the @samp{LIGHTMAP_MODE} option to
+edit @file{data/config/opengl.cfg} and change the @samp{LightmapMode} option to
 @samp{multiply} (which all cards should understand) or any of the other
 values.  @samp{multiply} will make everything dark but at least it will look
 right.  The @sc{riva} 128@sc{zx} is an example of a card which doesn't support

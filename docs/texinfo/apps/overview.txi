@@ -14,7 +14,7 @@ particular application may be found in subsequent sections.
 @cindex @file{3ds2lev}
 @cindex Applications, @file{3ds2lev}
 @item 3ds2lev
-A @sc{3ds} to Crystal Space map converter.
+A @sc{3ds} to Crystal Space map converter (work in progress!).
 
 @cindex @file{blocks}
 @cindex Applications, @file{blocks}
@@ -26,6 +26,11 @@ A falling blocks game.  (Think 3D Tetris.).
 @item cctest
 A test application for the Crystal Clear library and plug-in module.
 @xref{CCtest}.
+
+@cindex @file{csfedit}
+@cindex Applications, @file{csfedit}
+@item csfedit
+A simple GUI based font editor for Crystal Space.
 
 @cindex @file{csfgen}
 @cindex Applications, @file{csfgen}
@@ -44,6 +49,11 @@ This application tests the Crystal Space Windowing System (@sc{csws}), which
 is designed to provide a clean, effective and cross-platform base for creating
 CrystalSpace-related utilites.  Currently there is only one such utility under
 development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
+
+@cindex @file{demosky}
+@cindex Applications, @file{demosky}
+@item demosky
+An application demonstrating the sky procedural texture.
 
 @cindex @file{dnapp}
 @cindex Applications, @file{dnapp}
@@ -65,7 +75,7 @@ The Crystal Space image manipulator.
 @cindex @file{levtool}
 @cindex Applications, @file{levtool}
 @item levtool
-A level maintenance tool.
+A level maintenance tool (work in progress!).
 
 @cindex @file{makedep}
 @cindex Applications, @file{makedep}
@@ -172,6 +182,11 @@ An uninstall program.
 @item vfstest
 A simple test program which measures the speed of the Virtual File System
 (@sc{vfs}).  @xref{VFS}.
+
+@cindex @file{video}
+@cindex Applications, @file{video}
+@item video
+An application demonstrating playing video files with Crystal Space.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}

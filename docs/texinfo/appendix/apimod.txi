@@ -11,7 +11,7 @@ sometimes be unavoidable (but we will try to minimize them).  The following
 sections should give you a head start at trying to convert your application
 from one version of Crystal Space to the next.  Only the major changes are
 covered here.  If you have trouble with something that is not discussed here
-you should send mail to the the Crystal Space mailing list and ask for help.
+you should send mail to the Crystal Space mailing list and ask for help.
 @xref{Mailing Lists}.
 
 @menu

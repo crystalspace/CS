@@ -53,6 +53,11 @@ A network driver, such as the @sc{bsd}-style Sockets driver.  Use this if
 the application you want to use relies upon network access.
 
 @item
+Many of the Crystal Space applications also need several other plugins. For
+example plugins which implement 3D sprites, particle systems, ... In general
+the Crystal Space distribution will contain source for all of them.
+
+@item
 You should also have @file{standard.zip} which is a library of standard
 resources used and shared by several of the Crystal Space applications.  You
 should @emph{not} unpack this file.  Crystal Space reads from @sc{zip} files
@@ -60,11 +65,13 @@ directly.
 
 @item
 Finally you need at least one map file.  The map file is also typically a
-@sc{zip} archive.  Possibly map files, among others, are @file{large.zip},
-@file{maze.zip}, and @file{room.zip}).  You should @emph{not} unpack these
-files.  Note that @file{standard.zip} is not a map file, nor is
-@file{mazed.zip}, which is a resource file for MazeD, the Crystal Space map
-editor.
+@sc{zip} archive.  Possible map files, among others, are @file{flarge.zip},
+@file{maze.zip}, and @file{room.zip}).  In addition to these map files you
+also need the standard texture archive @file{stdtex.zip}. You should
+@emph{not} unpack these files.  Note that @file{standard.zip} is not a
+map file, nor is @file{mazed.zip}, which is a resource file for MazeD, the
+Crystal Space map editor. All map files and related data files are usually
+located in the @file{data} directory.
 @end itemize
 
 @item
@@ -90,18 +97,20 @@ If you are running the application from the command-line, then you can try
 specifying the map file on on the command-line, like this:
 
 @example
-% walktest large
+% walktest flarge
 @end example
 
-Where @samp{large} is the name of the map file you wish to use.  In this case,
-@samp{large} corresponds to the @file{large.zip} file which you downloaded.
+Where @samp{flarge} is the name of the map file you wish to use.  In this case,
+@samp{flarge} corresponds to the @file{flarge.zip} file which you downloaded.
+Also note that @file{flarge.zip} itself requires the file @file{stdtex.zip}
+which contains all the textures.
 
 Alternately, for the @file{walktest} program, you can edit its configuration
-file @file{cryst.cfg} and change the @samp{WORLDFILE=@dots{}} setting.  For
+file @file{data/config/cryst.cfg} and change the @samp{WorldFile=@dots{}} setting.  For
 example:
 
 @example
-WORLDFILE=large
+Walktest.Settings.WorldFile = flarge
 @end example
 
 @strong{A5}: If all else fails ask a question on the Crystal Space mailing
@@ -218,4 +227,16 @@ fits your needs is to contribute to the project yourself.
 @strong{A2}: Crystal Space is under the @sc{lgpl} licensing policy so you can
 make commercial or shareware products using it.  For more details about what
 you can and cannot do, see the license, @ref{License}.
+
+@item
+How stable is the API for Crystal Space?
+
+@strong{A}: This depends. If you use @sc{SCF} interfaces (i.e. interfaces
+defined in the @file{include} folder) then you should be relatively safe.
+In the future (for the 1.0 release) we will put more stuff in plugins which
+means they will be accessible through @sc{SCF} interfaces. So for now I
+would say that there are likely to be API changes. Note that we try to
+minimize that as much as possible and we also document them with every
+release to make the transition easier.
+
 @end itemize

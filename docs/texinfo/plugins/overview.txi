@@ -44,6 +44,14 @@ library. This module is currently not helpful for your own projects.
 @xref{csEngine}.
 
 @item
+@emph{Mesh Objects}
+
+Mesh objects are 3D objects that can be used and displayed by the engine.
+Examples are 3D sprites, 2D sprites, and particle systems. This functionality
+used to be in the engine but has been removed from the engine for greater
+flexibility.
+
+@item
 @emph{Standard Loader}
 
 This plug-in will replace the @code{csParser} library once the engine is a

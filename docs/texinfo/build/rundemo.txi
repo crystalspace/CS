@@ -32,13 +32,12 @@ walktest flarge
 @end example
 
 Your other option is to edit the configuration file @file{cryst.cfg} and set
-the @samp{WORLDFILE} variable to the name of the map you wish to use.  For
+the @samp{WorldFile} variable to the name of the map you wish to use.  For
 instance:
 
 @example
-[World]
 ; Start map file
-WORLDFILE=flarge
+Walktest.Settings.WorldFile = flarge
 @end example
 
 If your map isn't one of those from the CS homepage, you also have to add it

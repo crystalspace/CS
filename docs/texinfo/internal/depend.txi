@@ -37,8 +37,6 @@ than actually linking with a library.
 @item
 @code{csgfxldr}
 @item
-@code{cssfxldr}
-@item
 @code{cssys}
 @end itemize
 
@@ -48,7 +46,7 @@ than actually linking with a library.
 @item
 @code{video/canvas}
 @item
-@code{video/renerer}
+@code{video/renderer}
 @item
 @code{network/driver}
 @item

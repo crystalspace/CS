@@ -44,27 +44,12 @@ The default for this option is @samp{yes} if you are compiling for
 optimization (see above option). Otherwise it is @samp{no} (because
 debugging interferes with the assembler).
 
-@item DO_SHM=... (possible values: 'yes' or 'no')
-When this option is set to @samp{yes}, CS will be linked with the XSHM
-(Shared Memory Extension) libraries. This option is set to @samp{yes}
-in all system dependent makefiles that require it. There is not
-much reason to set this option to @samp{no} because Crystal Space can
-check at runtime if the XSHM option is present or not. The only
-reason to disable it is if you don't have the libraries installed
-on your system (which should not happen often).
-
 @item DO_PNG, DO_GIF, DO_TGA, and DO_JPG (possible values: 'yes' or 'no')
 The @samp{DO_PNG} and @samp{DO_JPG} options are explained above.
 @samp{DO_GIF} and @samp{DO_TGA} are for controlling GIF and TGA graphics
 file loading. Do not disable @samp{DO_GIF} since all current level contain
 GIF files. It is not useful to disable @samp{DO_TGA} because it does not
 need any external library and it does not require much code in CS.
-
-@item MEM=...
-This is a flag which is definitelly not for the beginner. It enables
-a memory debugger which is in Crystal Space. Use only if you know
-what you are doing.
-@end table
 
 @node Unix Compiling, Unix Other2d3d, Unix Editing the Makefile, Unix
 @subsubsection Compiling on Unix

@@ -9,7 +9,9 @@
 3D @dfn{sprites} are triangle-based models which can be animated by a skeleton
 or pre-calculated vertex animations.  This type of model is well suited for
 detailed models which are not easily represented as heightmapped terrain or
-bezier curves.
+bezier curves. 3D sprites can be used in your application through the
+mesh object plugin systems (i.e. a 3D sprite is one particular type of
+mesh object). @xref{MeshObject}.
 
 @menu
 * 3D Sprites Example 1:: A Simple 3D Sprite

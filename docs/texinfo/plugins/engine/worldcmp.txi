@@ -31,14 +31,14 @@ texture mapping and can be shared by several polygons.  This improves
 performance.
 
 @item
-@emph{Sprites}.  Depending on the structure of your program it is more or less
-useful to define sprites directly in the map file, because your program
+@dfn{Meshes}.  Depending on the structure of your program it is more or less
+useful to define meshes directly in the map file, because your program
 might have little control over them.  You'll then want to use @dfn{Nodes}
-instead.  @xref{3D Sprites}.
+instead.  @xref{3D Sprites}. @xref{MeshObject}.
 
 @item
-@dfn{Thing Templates} and @dfn{Sprite Templates}.  These templates can be
-shared by several Things or Sprites to save some memory.
+@dfn{Thing Templates} and @dfn{Mesh Factories}.  These templates or
+factories can be shared by several Things or Meshes to save some memory.
 
 @item
 @dfn{Collection Objects}.  These are simply groups of other objects.
@@ -58,12 +58,6 @@ in space.  In theory it is up to your program as to how these key-value tuples
 are interpreted.  However, Crystal Space has set some standards to make life
 easier for level designers and also to make levels as portable as possible
 between different Crystal Space games.  @xref{Keylist Standards}.
-
-@item
-@emph{Particle Systems}. @@@@@@FIXME: @emph{Document this.}
-
-@item
-@@@@@@FIXME: @emph{Anything missing?}
 @end itemize
 
 @anchor{Keylist Standards}

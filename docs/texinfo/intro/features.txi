@@ -32,13 +32,13 @@ write your own engine. The libraries include:
 
 @itemize @bullet
 @item
-OpenGL, Direct3D, and Glide support in Windows port.
+Direct3D for Windows port.
 
 @item
-OpenGL support for BeOS and Linux.
+OpenGL support for GNU/Linux, BeOS, Macintosh, OS/2, and Windows.
 
 @item
-Glide support for Linux.
+Glide support for GNU/Linux and BeOS.
 
 @item
 Drawing arbitrary sloped convex polygons.
@@ -60,7 +60,8 @@ The width and height of textures must be a power of two but the
 texture need not be a square.
 
 @item
-Procedural textures.
+Procedural textures. Currently the included procedural textures are plasma,
+sky, water, and fire. You can define your own procedural textures.
 
 @item
 It is possible to map the texture on a polygon in various ways such as via
@@ -91,21 +92,16 @@ Integrated landscape engine.
 Moving objects and scripts controlling the movement.
 
 @item
-Static lighting with real shadows. Lighting and shadows are
-precomputed before the world is displayed.
-
-@item
-Colored lighting.  There are three different types of lights possible (can be
-controlled with a configuration file).  These three light colors can be choosen
-from white, red, green, or blue.  A light source can mix the three values.
+Static colored lighting with real shadows. Lighting and shadows are
+precomputed before the world is displayed. Radiosity is also supported.
 
 @item
 Pseudo-dynamic colored lights which cannot move but have very accurate
 shadows and can change intensity/color randomly.
 
 @item
-Dynamic colored lighting with support for shadows (Things and Sprites
-are ignored currently).
+Dynamic colored lighting with support for shadows (detail objects are
+ignored for shadows currently).
 
 @item
 Support for frame and skeletal based 3D triangle mesh sprites with
@@ -115,9 +111,14 @@ level-of-detail (@sc{lod}) reduction via progressive meshes!
 Support for 2D sprites and particle systems.
 
 @item
+Mesh object plugin system that is used for 3D sprites, 2D sprites and
+particle systems. The game developer can also write his own mesh objects
+and plug them into the engine transparently.
+
+@item
 Portals are used for efficient and easy visibility sorting. In
-addition you can optionally enable a @sc{bsp} for some sectors to allow for
-even more powerful world definitions.
+addition you can optionally enable an @sc{octree} and/or @sc{bsp} for some
+sectors to allow for even more powerful world definitions.
 
 @item
 Additional C-buffer (coverage buffer) which can be enabled for even
@@ -132,13 +133,18 @@ Alpha transparency in combination with mirrors allows simulation of
 shining walls.
 
 @item
-You can also include gouraud shaded triangle in the world.
+You can also include gouraud shaded triangles in the world.
 
 @item
-Dynamic gouraud shaded sky spheres.
+Dynamic gouraud shaded sky spheres. Also support for skybox.
 
 @item
-Curved surfaces.
+Curved bezier surfaces with dynamic tesselation depending on viewer
+distance.
+
+@item
+Support for multiple cameras and the ability to make 1st person or
+3rd person cameras.
 
 @item
 @sc{zip} archive format to pack the map file, the textures and all other
@@ -180,10 +186,15 @@ Dynamically-sized arrays (@code{csVector}).
 Virtual file system.  @xref{VFS}.
 
 @item Sound Driver / Sound Renderer
-General sound system.  Currently drivers exist for Linux, Macintosh, and
+General sound system.  Currently drivers exist for GNU/Linux, Macintosh, and
 Windows.
 
 @item Network Driver
 General networking support.  Currently supports socket-based networking via
 @sc{TCP/IP}.
+
+@item Scripting
+Crystal Space supports scripting through the @sc{Python} plugin. That way
+a game using Crystal Space can call @sc{Python} methods and @sc{Python}
+scripts can call Crystal Space methods.
 @end table

@@ -966,7 +966,7 @@ texture on the polygon while it remains static.
 
 @subsubheading Procedural Textures
 
-If you defnitley can't produce the effect you want with animated and or dynamic
+If you still can't produce the effect you want with animated and or dynamic
 textures then you can resort to procedural textures. Be warned this method is quite
 expensive compared to the previous two, and should be used sparingly and only when
 absolutely necessary. Another less common name for procedural textures is 

@@ -8,18 +8,21 @@ This tutorial continues on the Simple Tutorial (@pxref{Tutorial Simple}).
 In this tutorial we explain a bit about @sc{vfs}, texture management and
 how you can add a simple sprite to the simple application.
 
-Crystal Space has the concept of sprite templates and sprites. A sprite
-template is like a blue-print for a sprite. It defines how a sprite looks
-and how it animates. Before you can use a sprite you need to have a
-sprite template. Once you have a sprite template you can create multiple
-sprites from this.
+Crystal Space has the concept of mesh factories and meshes. A mesh is basically
+some kind of 3D object. Crystal Space supports several kinds of meshes. The
+one in which we're interested here is the 3D sprite mesh. A mesh
+factory is like a blue-print for a mesh (or sprite). It defines how the mesh
+looks and how it animates. Before you can use a mesh you need to have a
+mesh factory. Once you have a mesh factory you can create multiple
+meshes from this. @xref{MeshObject}
 
-In this example we are going to load a sprite template from disk.  If you have
+In this example we are going to load a mesh factory from disk.  If you have
 the standard Crystal Space distribution then you have the file
 @file{CS/data/standard.zip}.  In that archive file there is a file called
-@samp{sprite1} which contains the definition of our sprite template.  Extract
+@samp{sprite1} which contains the definition of our mesh factory.  Extract
 it (by using, for instance, the command @samp{unzip -x standard.zip sprite1})
-and examine it to see how sprite templates are defined.
+and examine it to see how mesh factories for 3D sprites are defined (mesh
+factories for other types of meshes can look different).
 
 But how are we actually going to get that file out of that @sc{zip} archive
 from within the Simple application?  This is in fact very easy because Crystal
@@ -30,24 +33,24 @@ documentation (@pxref{VFS}) to learn how it works.  Suffice it to say that
 the @file{CS/vfs.cfg} file (and you can add more).  So, this means that our
 sprite file can be found at the path @file{/lib/std/sprite1}.
 
-If you look at the @file{sprite1} file you can see that it refers to a texture
-named @samp{spark}.  So we'll have to load that texture as well.  This can
+If you look at the @file{sprite1} file you can see that it refers to a material
+named @samp{spark}.  So we'll have to load that material as well.  This can
 also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
 
 @menu
-* Simple Loading Texture:: Loading a Texture in Memory
-* Simple Loading Sprite Template:: Loading a Sprite Template in Memory
-* Simple Creating Sprite:: Creating a Sprite from a Template
+* Simple Loading Material:: Loading a Material in Memory
+* Simple Loading Mesh Factory:: Loading a Mesh Factory in Memory
+* Simple Creating Mesh:: Creating a Mesh from a Factory
 @end menu
 
-@node Simple Loading Texture, Simple Loading Sprite Template, Tutorial Simple 2, Tutorial Simple 2
-@subsection Loading a Texture in Memory
-@cindex Tutorial Simple Loading Texture
-@cindex Simple Loading Texture, Tutorial
+@node Simple Loading Material, Simple Loading Mesh Factory, Tutorial Simple 2, Tutorial Simple 2
+@subsection Loading a Material in Memory
+@cindex Tutorial Simple Loading Material
+@cindex Simple Loading Material, Tutorial
 
-To make this example a little more interesting the texture is going to be
+To make this example a little more interesting the material is going to be
 loaded @emph{after} the other setup of the texture manager has been done.
-This is not really needed but it illustrates how a game might load textures
+This is not really needed but it illustrates how a game might load materials
 dynamically later when the application is already running.  So first we edit
 @file{simple.cpp} and add the following in @code{Simple::Initialize()}
 (between @code{txtmgr->SetPalette()} and @samp{return true}):
@@ -60,7 +63,7 @@ bool Simple::Initialize(int argc, char const* const argv[],
   txtmgr->SetPalette ();
 
   // Load a texture for our sprite and fetch the material.
-  csTextureHandle* txt =
+  csTextureWrapper* txt =
     csLoader::LoadTexture (engine, "spark", "/lib/std/spark.png");
   if (txt == NULL)
   @{
@@ -69,12 +72,11 @@ bool Simple::Initialize(int argc, char const* const argv[],
     exit (1);
   @}
   txt->Register (txtmgr);
-  txtmgr->PrepareTexture (txt->GetTextureHandle ());
-
+  txt->GetTextureHandle ()->Prepare ();
   csMaterialWrapper* mat =
     engine->GetMaterials ()->FindByName ("spark");
   mat->Register (txtmgr);
-  txtmgr->PrepareMaterial (mat->GetMaterialHandle ());
+  mat->GetMaterialHandle ()->Prepare ();
 @}
 @end example
 
@@ -88,7 +90,7 @@ If this loading succeeds we need to register our texture with the
 texture manager. This is because we didn't put the loading of our texture
 before the @code{engine->Prepare()} call (which takes care of this
 registering automatically). The lines @code{txt->Register()} and
-@code{txtmgr->PrepareTexture()} can be used at any time while the
+@code{txt->Prepare()} can be used at any time while the
 application is running to dynamically load additional textures. The
 first call to @code{Register()} registers the texture with the texture
 manager so that it is aware of this texture. The second call makes
@@ -102,15 +104,15 @@ After the texture has been created we still have to create and register
 a material. The engine works with materials. The material in this case
 is simply a wrapper on top of the texture.
 
-@node Simple Loading Sprite Template, Simple Creating Sprite, Simple Loading Texture, Tutorial Simple 2
-@subsection Loading a Sprite Template in Memory
-@cindex Tutorial Simple Loading Sprite Template
-@cindex Simple Loading Sprite Template, Tutorial
+@node Simple Loading Mesh Factory, Simple Creating Mesh, Simple Loading Material, Tutorial Simple 2
+@subsection Loading a Mesh Factory in Memory
+@cindex Tutorial Simple Loading Mesh Factory
+@cindex Simple Loading Mesh Factory, Tutorial
 
-Now that we have our texture we can use it to load the sprite template.
+Now that we have our material we can use it to load the mesh factory.
 Edit @file{simple.cpp} and add the following code in
 @code{Simple::Initialize()} (before @samp{return true} and after
-the code we just added to load the texture):
+the code we just added to load the material):
 
 @example
 bool Simple::Initialize (int argc, const char* const argv[],
@@ -118,11 +120,11 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @{
   @dots{}
   // Load a sprite template from disk.
-  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (engine,
+  csMeshFactoryWrapper* spritetmpl = csLoader::LoadMeshObjectFactory (engine,
   	"/lib/std/sprite1");
   if (spritetmpl == NULL)
   @{
-    Printf (MSG_FATAL_ERROR, "Error loading sprite template!\n");
+    Printf (MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
     cleanup ();
     exit (1);
   @}
@@ -130,22 +132,22 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @}
 @end example
 
-This example uses @code{csLoader::LoadSpriteTemplate()} to load the
-sprite template from the given location. The name of the sprite template
+This example uses @code{csLoader::LoadMeshObjectFactory()} to load the
+mesh factory from the given location. The name of the mesh factory
 will be 'box' as that is the name given in the file @file{sprite1} itself.
 
-This is all there is to it. After this call the sprite template is loaded
-in the engine and can be used to create sprites. This is what we'll do
+This is all there is to it. After this call the mesh factory is loaded
+in the engine and can be used to create meshes. This is what we'll do
 in the next section.
 
-@node Simple Creating Sprite, , Simple Loading Sprite Template, Tutorial Simple 2
-@subsection Creating a Sprite from a Template
-@cindex Tutorial Simple Creating Sprite
-@cindex Simple Creating Sprite, Tutorial
+@node Simple Creating Mesh, , Simple Loading Mesh Factory, Tutorial Simple 2
+@subsection Creating a Mesh from a Factory
+@cindex Tutorial Simple Creating Mesh
+@cindex Simple Creating Mesh, Tutorial
 
-To create a sprite just add the following code in
+To create a mesh just add the following code in
 @code{Simple::Initialize} (before @code{return true} and after
-the code we just added to load the sprite template):
+the code we just added to load the mesh factory):
 
 @example
 bool Simple::Initialize (int argc, const char* const argv[],
@@ -153,46 +155,50 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @{
   @dots{}
   // Add the sprite to the engine.
-  csSprite3D* sprite = spritetmpl->NewSprite (engine);
-  sprite->SetName ("MySprite");
-  engine->sprites.Push (sprite);
-  sprite->GetMovable ().SetSector (room);
+  iMeshFactoryWrapper* imeshfact = QUERY_INTERFACE (
+  	spritetmpl, iMeshFactoryWrapper);
+  iMeshWrapper* sprite = engine->CreateMeshObject (
+  	imeshfact, "MySprite", iroom,
+	csVector3 (-3, 5, 3));
   csMatrix3 m; m.Identity (); m *= 5.;
-  sprite->GetMovable ().SetTransform (m);
-  sprite->GetMovable ().SetPosition (csVector3 (-3, 5, 3));
-  sprite->GetMovable ().UpdateMove ();
-  sprite->SetAction ("default");
-  sprite->InitSprite ();
+  sprite->GetMovable ()->SetTransform (m);
+  sprite->GetMovable ()->UpdateMove ();
+  iSprite3DState* spstate = QUERY_INTERFACE (
+  	sprite->GetMeshObject (), iSprite3DState);
+  spstate->SetAction ("default");
+  imeshfact->DecRef ();
+  spstate->DecRef ();
+
   return true;
 @}
 @end example
 
-The easiest way to create a sprite is to use @code{spritetmpl->NewSprite()}.
-This is not enough however. First we give the sprite a name. This is not
-required but it is useful in a game context. If you have scripts controlling
-game logic you sometimes might want to refer to objects by their name.
+The easiest way to create a mesh is to use @code{engine->CreateMeshObject()}.
+This will take care of using the given mesh factory to create the mesh, give
+it a name, and correctly place it at the given position in the world.
+The name of a mesh can be useful for scripting so that a script can refer
+to objects with their names.
 
-The @code{engine->sprites.Push(sprite)} line is important.  It registers the
-sprite with the engine.  If you don't do this then Crystal Space will not know
-about this sprite.  The @code{sprite->GetMovable().SetSector(room)} is
-equally important as it actually places the sprite in a sector (our room).
-@code{SetSector()} is a conveniance function to quickly position a sprite in
-some sector.  In reality it is possible for a sprite to be in multiple sectors
-at the same time (for instance, when it crosses a portal).  There is some
-support for this in Crystal Space at the moment but not very much.
-
-Moving sprites (and things) is done through the @samp{csMovable} class of
-which you can get an instance by doing @code{sprite->GetMovable()}.  The calls
+Moving meshes (and things) is done through the @code{iMovable} interface to
+which you can get a reference by doing @code{sprite->GetMovable()}.  The calls
 to @code{SetTransform()} and @code{SetPosition()} set up a transformation
-matrix and vector to correctly place the sprite in the room.  In this
+matrix and vector to correctly place the mesh in the room.  In this
 particular case we use the identity matrix as a transform and scale it with
-five to make the sprite five times bigger.  Then we place the sprite at
-position (-3,5,3) in world coordinates.  After doing movement (either updating
-the sectors or the position) you @emph{must} call
-@code{csMovable::UpdateMove()} to change internal data structures.
+five to make the sprite five times bigger.
+After doing movement (either updating the sectors or the position) you
+@emph{must} call @code{movable->UpdateMove()} to change internal data
+structures (i.e. the engine may use this to recalculate visibility information).
 
-The @code{SetAction()} function will set the action for the sprite.  An action
-is a set of frames and controls animation.  In our simple example the sprite
-only has one frame so there is not much animation to see.
+If you read the mesh object documentation (see @pxref{MeshObject})
+carefully you will see that in order to control visual attributes
+of mesh objects you will have to get the @emph{state} interface for
+either the object or the factory. In this example we query
+@code{iSprite3DState} from the mesh in order to set the default action.
+An action is a set of frames and is used to control animation. In our
+simple example the sprite has only one frame so there is not much animation
+to see.
+
+Whenever you are done with some interface you obtained through
+@code{QUERY_INTERFACE()} you should release the pointer with @code{DecRef()}.
 
 This concludes the second Simple tutorial.

@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+15-Feb-2001
+	- Updated various parts of the documentation. The most important
+	  change is that the simple tutorial has been updated to the mesh
+	  object plugin system.
 14-Feb-2001
 	- Continued making use of QUERY_INTERFACE in the engine more sensible.
 	  This involves:

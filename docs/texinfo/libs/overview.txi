@@ -11,7 +11,16 @@ sections.
 @table @code
 @item csEngine
 The 3d engine is currently moved to a separate plug-in. For documentation on
-the engine, have a look at @ref{csEngine}.
+the engine, have a look at @ref{csEngine}. In the future the prefered way
+to access the engine will be to use the engine plugin. At this moment
+this is still not fully possible because the @sc{scf} interfaces for the
+engine plugin are not complete yet.
+
+@item csFX
+This library contains various things that are useful for Crystal Space
+but are too specialized in order to be placed in @sc{csEngine}. Currently
+it contains the @code{csPixmap} class for simple 2D graphics and
+a number of predefined procedural textures.
 
 @item csSys
 All system dependent functionality (non-graphics and non-sound related) is in
@@ -45,11 +54,12 @@ objects, including a name for every object, faked run-time type information
 Routines to support loading various graphic file formats and put them
 internally in the same format. This library supports @sc{jpg}, @sc{gif},
 @sc{tga}, @sc{png}, and @sc{bmp}. Note that in the future this library will
-be converted to a plug-in.
+be converted to a set of plug-ins.
 
 @item csParser
 A library which parses @sc{ascii} map files and creates a world in the 3D
-Engine. @xref{csParser}.
+Engine. @xref{csParser}. In the future this library will be converted
+to a plug-in.
 
 @item csWS
 A window system nicely integrated with Crystal Space. It is also platform
