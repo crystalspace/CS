@@ -34,11 +34,11 @@ SCF_VERSION (iSaverPlugIn, 0, 0, 1);
 struct iSaverPlugIn : public iPlugIn
 {
   /** 
-   *  Take a given object and return a new string (in the string vector),
+   *  Take a given object and push description onto the given string vector.
    *  Concatenating the strings in the vector will create the saved text.
    *  Or write them to a file consequtively.
    */
-  virtual iStrVector* WriteDown (iBase *obj, iEngine* engine) = 0;
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine) = 0;
 };
 
 #endif
