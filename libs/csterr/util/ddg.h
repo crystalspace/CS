@@ -27,17 +27,26 @@
 
 #ifdef WIN32
 // Windows defines
+#if defined (COMP_VC) || defined (COMP_BC)
 #pragma warning (disable:4244)	// Disable bogus conversion warnings. 
 #pragma warning (disable:4305)  // VC++ 5.0 version of above warning. 
 #pragma warning (disable:4097)	// typedef-name 'super' used as synonym for class-name 'ddgSubclass::ddgSuperClass'. 
 #pragma warning (disable:4100)	// unreferenced formal parameter. 
 #pragma warning (disable:4706)	// assignment within conditional expression 
 #include "strstrea.h"
-#include "stdlib.h"			// For exit()
+#include "stdlib.h"			// For exit() COMP_VC/COMP_BC
+#endif
+//
 #ifdef DDG
 #define WEXP	__declspec(dllexport)
 #define WFEXP	__cdecl
 #endif
+//
+#if defined (COMP_GCC)
+#include <strstream.h>
+#include <stdlib.h>			// For exit() COMP_GCC
+#endif
+//
 #else
 // Linux defines
 #ifdef DDGSTREAM
