@@ -230,13 +230,13 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           case A3DL::Material::BLEND_NORMAL:
             try
             {
-              double transparency = mt->getTransparency();
-              if(transparency == 1.0)
+              double alpha = mt->getAlpha();
+              if(alpha == 0.0)
                 cmt->coords[i].mode = CS_FX_TRANSPARENT;
-              else if(transparency == 0.0)
+              else if(alpha == 1.0)
                 cmt->coords[i].mode = CS_FX_COPY;
               else
-                cmt->coords[i].mode = CS_FX_SETALPHA(1.0-transparency);
+                cmt->coords[i].mode = CS_FX_SETALPHA(alpha);
             }
             catch(...)
             {
