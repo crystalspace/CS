@@ -23,8 +23,6 @@
 
 #if defined(OS_NEXT)		/* Must appear before OS_UNIX */
 #  include "cssys/next/NeXTSystemDriver.h"
-#elif defined(OS_BE)		/* Must appear before OS_UNIX */
-#  include "cssys/be/csbe.h"
 #elif defined(OS_UNIX)
 #  include "cssys/unix/unix.h"
 #elif defined(OS_WIN32)

@@ -24,8 +24,6 @@
 
 #if defined(OS_NEXT)		/* Must appear before OS_UNIX */
 #  include "cssys/next/csosdefs.h"
-#elif defined(OS_BE)		/* Must appear before OS_UNIX */
-#  include "cssys/be/csosdefs.h"
 #elif defined(OS_UNIX)
 #  include "cssys/unix/csosdefs.h"
 #elif defined(OS_WIN32)
