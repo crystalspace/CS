@@ -6,14 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Dec-2004
+	- Eric Sunshine fixed problem on MacOS/X where output of `cs-config
+	  --libs' did not include "-framework AppKit -framework Foundation".
 17-Dec-2004
-	- Mike Handverger added support for enabling/disabling bodies
-          in odedynam. This is especially helpful when used with
-          EnableAutoDisable()
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.
 	- PK added *polygon_idx = i; to csSprite3DMeshObject::HitBeamObject
 	  in order to get the hit polygon.
+	- Mike Handverger added support for enabling/disabling bodies
+          in odedynam. This is especially helpful when used with
+          EnableAutoDisable()
 16-Dec-2004
 	- Eric Sunshine added the CS_QUERY_REGISTRY_PLUGIN() macro to
 	  <iutil/plugin.h>, which is based upon a submission from Reed Hedges.

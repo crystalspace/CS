@@ -19,9 +19,8 @@
 #==============================================================================
 SHELL ?= "/bin/sh" ;
 
-APPLICATION.LFLAGS += "-framework AppKit -framework Foundation" ;
-APPLICATION.CONSOLE.LFLAGS += "-framework AppKit -framework Foundation" ;
-PLUGIN.LFLAGS += "-bundle -framework AppKit -framework Foundation" ;
+LINKLIBS += "-framework AppKit -framework Foundation" ;
+PLUGIN.LFLAGS += "-bundle" ;
 MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
 
 # Jambase in Jam 2.4 has a bug where it incorrectly defines RANLIB as "" for
