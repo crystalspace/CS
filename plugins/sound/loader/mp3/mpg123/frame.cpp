@@ -85,6 +85,7 @@ csMPGFrame::csMPGFrame (void *datasource, ioCallback *io, int outformat, int fla
   channels = -1;
   down_sample = 0;
   bits = 16;
+  frequency = 0;
   framesize = 0;
   if (!layer_n_table_done)
   {
