@@ -124,6 +124,10 @@ ifdef SWIGBIN
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
 	$(SWIGBIN) -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
+else
+$(SWIG.CSPYTHON): $(SWIG.INTERFACE)
+	swig -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
 endif
 
 python.cex: plugins/cscript/cspython/python.cin

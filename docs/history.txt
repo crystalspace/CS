@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed the real sound bug which was in the RegisterSound()
 	  function of the software sound renderer.
 	- Reverted Norman's revert on my reversion again :-)
+	- Fixed cspython.mak for swig again.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
