@@ -160,6 +160,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 
   bool staticObj = false;
   bool part = false;
+  bool meshobj = false;
   int numMesh = 0;
   while (p3dsMesh)
   {
@@ -171,9 +172,9 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     {
         // on "_s_" decide if MESHOBJ or PART
         if (strstr(p3dsMesh->name, "_s_"))
-	{
+        {
             if (!staticObj)
-	    {
+            {
                 fprintf (o, "    MESHOBJ 'static' (\n");
                 fprintf (o, "      PLUGIN ('thing')\n");
                 fprintf (o, "      ZFILL ()\n");
@@ -186,17 +187,17 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
                 staticObj = true;
             }
             else
-	    {
+            {
                 fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
             }
             part = true;
-        // else always MESHOBJ
         }
-	else
-	{
+        // else always MESHOBJ
+        else
+        {
             // close previous PART and MESHOBJ if present
             if (part)
-	    {
+            {
                 fprintf (o, "      )\n\n");
                 fprintf (o, "    )\n\n");
                 part = false;
@@ -209,18 +210,19 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
             fprintf (o, "      ZUSE ()\n");
             // handles transparent objects
             if (strstr(p3dsMesh->name, "_t_"))
-	    {
+            {
                 fprintf (o, "      PRIORITY('alpha')\n");
             }
-	    else
-	    {
+            else
+            {
                 fprintf (o, "      PRIORITY('object')\n");
             }
             fprintf (o, "      PARAMS (\n");
+
+            meshobj = true;
         }
     }
     fprintf (o, "        MATERIAL ('%s')\n", p3dsMesh->faceL->material);
-
 
     // <--output vertexes-->
 
@@ -244,7 +246,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
         {
           u = pCurTexel[0][0];
           v = pCurTexel[0][1];
-	  pCurTexel++;
+          pCurTexel++;
         }
 
         fprintf (o, "        V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
@@ -285,22 +287,22 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 	             numMesh, i, pCurFace->points[0],
 		     pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
-	if (pTexelList)
-	{
+        if (pTexelList)
+        {
           Lib3dsTexel *mapV0 = (Lib3dsTexel*)pTexelList[pCurFace->points[0]];
-	  float u0 = mapV0[0][0];
-	  float v0 = mapV0[0][1];
+          float u0 = mapV0[0][0];
+          float v0 = mapV0[0][1];
           Lib3dsTexel *mapV1 = (Lib3dsTexel*)pTexelList[pCurFace->points[1]];
-	  float u1 = mapV1[0][0];
-	  float v1 = mapV1[0][1];
+          float u1 = mapV1[0][0];
+          float v1 = mapV1[0][1];
           Lib3dsTexel *mapV2 = (Lib3dsTexel*)pTexelList[pCurFace->points[2]];
-	  float u2 = mapV2[0][0];
-	  float v2 = mapV2[0][1];
+          float u2 = mapV2[0][0];
+          float v2 = mapV2[0][1];
           fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
                  u0, (flags & FLAG_SWAP_V ? 1.-v0 : v0),
                  u1, (flags & FLAG_SWAP_V ? 1.-v1 : v1),
                  u2, (flags & FLAG_SWAP_V ? 1.-v2 : v2));
-	}
+        }
 
         fprintf (o, "        )\n"); // close polygon
       }
@@ -309,17 +311,17 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
       pCurFace++;
     }
 
-    // close last PART
-    fprintf (o, "      )\n\n");
+    if (meshobj) {
+        // close PARAMS tag
+        fprintf (o, "      )\n\n");
+        // close MESHOBJ tag
+        fprintf (o, "    )\n\n");
 
-    if (part)
-    {
-       // close PARAMS tag
-       fprintf (o, "      )\n\n");
+        meshobj = false;
 
-       // close MESHOBJ tag
-       fprintf (o, "    )\n\n");
-       part = false;
+    } else {
+        // close PART
+        fprintf (o, "      )\n\n");
     }
 
     // increment mesh count
@@ -327,6 +329,17 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     p3dsMesh = p3dsMesh->next;
 
   } // ~end while (p3dsMesh)
+
+  // if working on static object closes MESHOBJECT
+  if (part)
+  {
+     // close PARAMS tag
+     fprintf (o, "      )\n\n");
+
+     // close MESHOBJ tag
+     fprintf (o, "    )\n\n");
+     part = false;
+  }
 
   if (flags & FLAG_SPRITE)
   {
