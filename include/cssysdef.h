@@ -222,31 +222,12 @@ struct csMemMapInfo
  */
 #endif
 
-#if !defined(CS_BUILD_SHARED_LIBS)
-# define CS_STATIC_VAR_EXTERN
-#else
-# define CS_STATIC_VAR_EXTERN	CS_CSUTIL_EXPORT
-#endif
-
-#ifndef CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION
-#  define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION cs_static_var_cleanup
-#endif
-
-#ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
-#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION \
-    CS_STATIC_VAR_EXTERN void \
-    CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
-#endif
-
-#ifndef CS_DECLARE_STATIC_VARIABLE_CLEANUP
-#  define CS_DECLARE_STATIC_VARIABLE_CLEANUP \
-   CS_DECLARE_STATIC_VARIABLE_REGISTRATION
-#endif
+typedef void (*csStaticVarCleanupFN) (void (*p)());
+extern csStaticVarCleanupFN csStaticVarCleanup;
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
-#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION                    \
-CS_STATIC_VAR_EXTERN void 					       \
-CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
+#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
+void Name (void (*p)())             			       \
 {                                                                      \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
@@ -276,11 +257,6 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
 }
 #endif
 
-#ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
-#  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
-   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION   
-#endif
-
 /**\def CS_IMPLEMENT_PLUGIN
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
@@ -292,15 +268,19 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
 #if defined(CS_STATIC_LINKED) || defined(CS_BUILD_SHARED_LIBS)
 
 #  ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN        \
-          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  define CS_IMPLEMENT_PLUGIN        					  \
+          CS_IMPLEMENT_PLATFORM_PLUGIN 					  \
+	  CS_CSUTIL_EXPORT void csStaticVarCleanup_csutil (void (*p)());  \
+	  csStaticVarCleanupFN csStaticVarCleanup = 			  \
+	    &csStaticVarCleanup_csutil;
 #  endif
 
 #else
 
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN              \
-   CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP    \
+   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)    \
+   csStaticVarCleanupFN csStaticVarCleanup = &csStaticVarCleanup_local;	  \
    CS_IMPLEMENT_PLATFORM_PLUGIN 
 #  endif
 
@@ -315,14 +295,11 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
  * platform.
  */
 #ifndef CS_IMPLEMENT_APPLICATION
-# if !defined(CS_BUILD_SHARED_LIBS)
-#  define CS_IMPLEMENT_APPLICATION       \
-   CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP  \
-   CS_IMPLEMENT_PLATFORM_APPLICATION 
-# else
-#  define CS_IMPLEMENT_APPLICATION       \
-   CS_IMPLEMENT_PLATFORM_APPLICATION 
-# endif
+#  define CS_IMPLEMENT_APPLICATION       				\
+  CS_CSUTIL_EXPORT void csStaticVarCleanup_csutil (void (*p)());	\
+  csStaticVarCleanupFN csStaticVarCleanup = 				\
+    &csStaticVarCleanup_csutil;						\
+  CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
 
 /**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
@@ -330,7 +307,7 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
  */
 #ifndef CS_REGISTER_STATIC_FOR_DESTRUCTION
 #define CS_REGISTER_STATIC_FOR_DESTRUCTION(getterFunc)\
-        CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (getterFunc);
+        csStaticVarCleanup (getterFunc);
 #endif
 
 /**\def CS_STATIC_VARIABLE_CLEANUP
@@ -338,7 +315,7 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
  */
 #ifndef CS_STATIC_VARIABLE_CLEANUP
 #define CS_STATIC_VARIABLE_CLEANUP  \
-        CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);
+        csStaticVarCleanup (0);
 #endif
 
 /**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
@@ -353,7 +330,6 @@ CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
 #define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
-CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
 extern "C" {                                                            \
 static Type* getterFunc ();                                             \
 static void getterFunc ## _kill ();                                     \
@@ -374,7 +350,7 @@ Type* getterFunc ()                                                     \
   if (!v)                                                               \
   {                                                                     \
     v = new Type initParam;                                             \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## kill_how);        \
+    csStaticVarCleanup (getterFunc ## kill_how);        		\
   }                                                                     \
   return v;                                                             \
 }                                                                       \
@@ -439,8 +415,7 @@ Type* Class::getterFunc ()                                                      
   if (!var)                                                                              \
   {                                                                                      \
     var = new Type initParam;                                                            \
-    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                              \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## kill_how);           \
+    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how);           		 \
   }                                                                                      \
   return var;                                                                            \
 }
@@ -478,8 +453,7 @@ Type &Class::getterFunc ()                                                      
   if (!var)                                                                                  \
   {                                                                                          \
     var = new Type initParam;                                                                \
-    CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                                  \
-    CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## kill_how);               \
+    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how);               		     \
   }                                                                                          \
   return *var;                                                                               \
 }

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Nov-2004
+	- res changed the static var cleanup code to employ a variable with
+	  a pointer to the cleanup function instead of using it directly.
+	- res added very crude, very hackish, very experimental but working
+	  shared libs support for MinGW.
 28-Nov-2004
 	- Eric Sunshine made the new-renderer the default. Users wanting to use
 	  the old-renderer must select it manually.

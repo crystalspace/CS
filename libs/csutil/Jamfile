@@ -68,7 +68,8 @@ Library csutil :
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil        ] : *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil macosx ] : *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil unix   ] : *.h ]
-  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil win32  ] : *.h ] ;
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil win32  ] : *.h ] :
+  shared ;
 
 CFlags csutil :
   [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]

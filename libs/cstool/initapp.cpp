@@ -439,7 +439,6 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
 
   // Destroy all static variables created by CS_IMPLEMENT_STATIC_VAR() or one
   // of its cousins.
-  CS_DECLARE_STATIC_VARIABLE_CLEANUP
   CS_STATIC_VARIABLE_CLEANUP
 
   iSCF::SCF->Finish();

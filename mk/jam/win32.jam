@@ -217,7 +217,14 @@ rule ConstructApplicationTarget
 }
 rule ConstructLibraryTarget
 {
-  return lib$(<)$(SUFLIB) ;
+  if ( ! [ IsElem shared : $(>) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
+  {
+    return lib$(<)$(SUFLIB) ;
+  }
+  else
+  {
+    return $(<)-$(COMPILER.TYPE).dll ;
+  }
 }
 rule ConstructPluginTarget
 {
@@ -411,6 +418,21 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
+rule SystemLinkLibrary
+{
+  local target = $($(<)_TARGET) ;
+  local libname = lib$(<).a ;
+  LIBNAME on $(target) = $(libname) ;
+
+  LFlags $(target) : $(LINKLIBS) ;
+  Depends $(libname) : $(target) ;
+  Depends $(target) : $(>) ;
+  LinkLibrary $(target) : $(>) ;
+
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
@@ -429,4 +451,10 @@ else
   {
     $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --dllname $(<:B) --def=$(EXPORTDEFS) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
   }
+}
+
+  #$(CMD.LINK) -o $(<) $(>) -mdll $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+actions LinkLibrary bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --output-lib=$(LIBNAME) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }

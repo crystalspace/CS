@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
-	      (C) 2004 by Frank Richter
+    Copyright (C) 2004 by Frank Richter
+	      (C) 2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,6 +19,9 @@
 
 #include "cssysdef.h"
 
-#if defined(CS_BUILD_SHARED_LIBS)
-CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
+CS_CSUTIL_EXPORT 
+CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_csutil)
+
+#ifdef CS_BUILD_SHARED_LIBS
+csStaticVarCleanupFN csStaticVarCleanup = &csStaticVarCleanup_csutil;
 #endif
