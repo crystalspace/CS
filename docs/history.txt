@@ -16,6 +16,10 @@ The history order is reversed so that new features are at the top.
 	      fire instead of 'raindrop' texture.
 	- res fixed a crash caused by too much memory being memset() in the
 	  fire texture default palette creation.
+	- res fixed map2cs so that the <moveable> token is written at the 
+	  correct location for the skybox. Also changes the UV coords of the 
+	  sides a bit; they are now calculated from the actual size of the 
+	  smallest side instead being a hardcoded value.
 16-May-2003
 	- Wouter added csgeom/objmodel.h and igeom/objmodel.h to css.h.
 	- Jorrit fixed a very weird bug in genmesh where SCF_CONSTRUCT_IBASE

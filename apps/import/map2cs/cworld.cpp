@@ -380,6 +380,7 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     {"d", { "3", "2", "0", "1"}, NULL}
   };
 
+  int smallest_size = 0x7fffffff;
   //assign texture pointers to the sides of the skybox
   int s,v;
   for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
@@ -387,10 +388,11 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     char name[255];
     sprintf(name, "%s_%s", BoxName, ThingSides[s].ext);
     ThingSides[s].pTex = pTexMan->GetTexture(name);
+
+    smallest_size = MIN (smallest_size, ThingSides[s].pTex->GetOriginalWidth());
+    smallest_size = MIN (smallest_size, ThingSides[s].pTex->GetOriginalHeight());
   }
  
-  CreateNode (node, "moveable");
-
   for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
   {
     DocNode vertex = CreateNode (node, "v");
@@ -399,6 +401,10 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     vertex->SetAttributeAsFloat ("z", BoxSize*Vertices[v].z);
   }
 
+  // Texture coordinates for the sky sides. 
+  // They are offset a bit as seams could be visible otherwise.
+  float min_tc = (0.5f) / ((float)smallest_size);
+  float max_tc = ((float)smallest_size - 0.5f) / ((float)smallest_size);
   //write the skyboxes polygons
   for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
   {
@@ -414,22 +420,24 @@ void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
     DocNode uv;
     uv = CreateNode (texmap, "uv");
     uv->SetAttributeAsInt ("idx", 0);
-    uv->SetAttributeAsFloat ("u", 0.005);
-    uv->SetAttributeAsFloat ("v", 0.005);
+    uv->SetAttributeAsFloat ("u", min_tc);
+    uv->SetAttributeAsFloat ("v", min_tc);
 
     uv = CreateNode (texmap, "uv");
     uv->SetAttributeAsInt ("idx", 1);
-    uv->SetAttributeAsFloat ("u", 0.995);
-    uv->SetAttributeAsFloat ("v", 0.005);
+    uv->SetAttributeAsFloat ("u", max_tc);
+    uv->SetAttributeAsFloat ("v", min_tc);
 
     uv = CreateNode (texmap, "uv");
     uv->SetAttributeAsInt ("idx", 2);
-    uv->SetAttributeAsFloat ("u", 0.995);
-    uv->SetAttributeAsFloat ("v", 0.995);
+    uv->SetAttributeAsFloat ("u", max_tc);
+    uv->SetAttributeAsFloat ("v", max_tc);
 
     CreateNode (p, "material", ThingSides[s].pTex->GetTexturename());
     CreateNode (p, "lighting", "no");
   }
+
+  CreateNode (node, "moveable");
 }
 
 void CCSWorld::FindAdditionalTextures()
