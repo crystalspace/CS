@@ -31,7 +31,7 @@
  */
 typedef uint32 csStringID;
 /// this ID is the 'invalid' value
-csStringID const csInvalidStringID = ~0;
+csStringID const csInvalidStringID = 4294967295;
 
 class csStringHash;
 
