@@ -174,31 +174,6 @@ csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame, int& vertex
   return skel;
 }
 
-// Add a skeletal tree sprite. If needed it will also create
-// the template for this.
-void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int width)
-{
-  char skelname[50];
-  sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
-  if (!tmpl)
-  {
-    CHK (tmpl = new csSpriteTemplate ());
-    csNameObject::AddName (*tmpl, skelname);
-    Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
-    int vertex_idx = 0;
-    csFrame* fr = tmpl->AddFrame ();
-    fr->SetName ("f");
-    csSpriteAction* act = tmpl->AddAction ();
-    act->SetName ("a");
-    act->AddFrame (fr, 100);
-    tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
-    tmpl->GenerateLOD ();
-  }
-  add_sprite (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
-}
-
 // Object added to every skeletal tree node to keep the animation
 // information.
 class TreeSkelSpriteInfo : public csObject
@@ -266,6 +241,38 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
     animate_skeleton_tree (con);
     con = (csSkeletonConnectionState*)(con->GetNext ());
   }
+}
+
+void animate_skeleton_tree_cb (csSprite3D* spr, csRenderView* /*rview*/)
+{
+  csSkeletonState* sk_state = spr->GetSkeletonState ();
+  animate_skeleton_tree (sk_state);
+}
+
+// Add a skeletal tree sprite. If needed it will also create
+// the template for this.
+void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int width)
+{
+  char skelname[50];
+  sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  if (!tmpl)
+  {
+    CHK (tmpl = new csSpriteTemplate ());
+    csNameObject::AddName (*tmpl, skelname);
+    Sys->world->sprite_templates.Push (tmpl);
+    tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
+    int vertex_idx = 0;
+    csFrame* fr = tmpl->AddFrame ();
+    fr->SetName ("f");
+    csSpriteAction* act = tmpl->AddAction ();
+    act->SetName ("a");
+    act->AddFrame (fr, 100);
+    tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
+    tmpl->GenerateLOD ();
+  }
+  csSprite3D* spr = add_sprite (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
+  spr->SetDrawCallback (animate_skeleton_tree_cb);
 }
 
 //===========================================================================
@@ -368,37 +375,6 @@ csSkeleton* create_skelghost (csSpriteTemplate* tmpl, csFrame* frame, int& verte
   return skel;
 }
 
-// Add a skeletal ghost sprite. If needed it will also create
-// the template for this.
-void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, int width)
-{
-  char skelname[50];
-  sprintf (skelname, "__skelghost__\n");
-  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
-  if (!tmpl)
-  {
-    CHK (tmpl = new csSpriteTemplate ());
-    csNameObject::AddName (*tmpl, skelname);
-    Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
-    int vertex_idx = 0;
-    csFrame* fr = tmpl->AddFrame ();
-    fr->SetName ("f");
-    csSpriteAction* act = tmpl->AddAction ();
-    act->SetName ("a");
-    act->AddFrame (fr, 100);
-    tmpl->SetSkeleton (create_skelghost (tmpl, fr, vertex_idx, maxdepth, width));
-    tmpl->GenerateLOD ();
-  }
-  csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
-  spr->SetMixmode (FX_Alpha, .75);
-  CHK (csCollider* col = new csCollider (spr));
-  csColliderPointerObject::SetCollider (*spr, col, true);
-  CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
-  spr->ObjAdd (gh_info);
-  gh_info->dir = 1;
-}
-
 // Animate a skeleton.
 void animate_skeleton_ghost (csSkeletonLimbState* limb)
 {
@@ -448,6 +424,45 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
     animate_skeleton_ghost (con);
     con = (csSkeletonConnectionState*)(con->GetNext ());
   }
+}
+
+void animate_skeleton_ghost_cb (csSprite3D* spr, csRenderView* /*rview*/)
+{
+  csSkeletonState* sk_state = spr->GetSkeletonState ();
+  animate_skeleton_ghost (sk_state);
+}
+
+
+// Add a skeletal ghost sprite. If needed it will also create
+// the template for this.
+void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, int width)
+{
+  char skelname[50];
+  sprintf (skelname, "__skelghost__\n");
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  if (!tmpl)
+  {
+    CHK (tmpl = new csSpriteTemplate ());
+    csNameObject::AddName (*tmpl, skelname);
+    Sys->world->sprite_templates.Push (tmpl);
+    tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
+    int vertex_idx = 0;
+    csFrame* fr = tmpl->AddFrame ();
+    fr->SetName ("f");
+    csSpriteAction* act = tmpl->AddAction ();
+    act->SetName ("a");
+    act->AddFrame (fr, 100);
+    tmpl->SetSkeleton (create_skelghost (tmpl, fr, vertex_idx, maxdepth, width));
+    tmpl->GenerateLOD ();
+  }
+  csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
+  spr->SetMixmode (FX_Alpha, .75);
+  CHK (csCollider* col = new csCollider (spr));
+  csColliderPointerObject::SetCollider (*spr, col, true);
+  CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
+  spr->ObjAdd (gh_info);
+  gh_info->dir = 1;
+  spr->SetDrawCallback (animate_skeleton_ghost_cb);
 }
 
 #define MAXSECTORSOCCUPIED  20
@@ -891,10 +906,10 @@ void light_statics ()
     if (sk_state)
     {
       const char* name = csNameObject::GetName (*spr);
-      if (!strcmp (name, "__skeltree__")) animate_skeleton_tree (sk_state);
-      else if (!strcmp (name, "__skelghost__"))
+      //if (!strcmp (name, "__skeltree__")) animate_skeleton_tree (sk_state);
+      if (!strcmp (name, "__skelghost__"))
       {
-        animate_skeleton_ghost (sk_state);
+        //animate_skeleton_ghost (sk_state);
         move_ghost (spr);
       }
     }
