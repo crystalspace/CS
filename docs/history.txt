@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+8-May-2003
+	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
+	  specifying its SCF dependency properly.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no
@@ -27,14 +30,15 @@ The history order is reversed so that new features are at the top.
 	- res wrote a plugin wrapping the four built-in proctexes.
 	- res also moved the <plugins> block in flarge since they are needed
 	  before the textures now.
-	- Matze moved the definition of the distclean and maintainerclean
-	  rules to the toplevel Jamfile. Having these filenames in clean.jam
-	  is not good for external projects.
-	- Also removed the clean target for application.txt again. Some
-	  external projects might have readme files in the same name. (We
-	  could let the Application rule construct a list of application
-	  targets and generate the clean targets from this list, but I think
-	  the question is if we really need this features) 
+	- Matze made the following changes:
+	    - Moved the definition of the distclean and maintainerclean rules
+	      to the toplevel Jamfile.  Having these filenames in clean.jam is
+	      not good for external projects.
+	    - Also removed the clean target for application.txt again.  Some
+	      external projects might have readme files in the same name.  (We
+	      could let the Application rule construct a list of application
+	      targets and generate the clean targets from this list, but I
+	      think the question is if we really need this features)
 	- Matze did several changes to the jam project generation (the script
 	    that creates a basic jambuildsystem for your external projects):
 	    - Added distclean and maintainerclean rules after the latest
@@ -42,8 +46,8 @@ The history order is reversed so that new features are at the top.
 	    - Made the script interactive instead of requiring lots of
 	      commandline arguments. Now the script outputs detailed
 	      desciptions too.
-	    - Creates a basic README with some building and installation
-	      notes now.
+	    - Creates a basic README with some building and installation notes
+	      now.
 	    - Rewrote some parts of the script. 
 	- res did some smaller fixes to the stdpt makefile and added stdpt.scf.
 6-May-2003

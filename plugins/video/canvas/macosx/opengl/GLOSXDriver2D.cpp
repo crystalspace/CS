@@ -38,7 +38,7 @@ SCF_IMPLEMENT_FACTORY(GLOSXDriver2D)
 
 SCF_EXPORT_CLASS_TABLE(glosx2d)
     SCF_EXPORT_CLASS_DEP(GLOSXDriver2D, "crystalspace.graphics2d.glosx",
-    "Crystal Space 2D driver for MacOS/X (OpenGL)", "crystalspace.font.server")
+    "Crystal Space 2D driver for MacOS/X (OpenGL)", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 // Constructor
