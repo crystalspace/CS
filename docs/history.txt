@@ -6,6 +6,10 @@ The history order has been reversed so that new features are at the top.
 	  point values near zero are better printed.
 	- Added '-l' option to 3ds2lev. If you use that option the
 	  LIGHTING(no) will not be added.
+	- Made cspython plugin a real plugin (i.e. let it inherit from
+	  iPlugIn).
+	- Fixed a bug in the cspython plugin which would initialize
+	  System to NULL. I have no idea why that code was there.
 3-Oct-2000
 	- Fixed a bug in the 3dslev convertor where it would accidently
 	  remove small polygons.

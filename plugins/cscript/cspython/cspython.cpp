@@ -24,15 +24,16 @@ extern "C" {
 #include "cspython.h"
 #include "csutil/csstring.h"
 
-IMPLEMENT_FACTORY(csPython)
+IMPLEMENT_IBASE(csPython)
+	IMPLEMENTS_INTERFACE (iScript)
+	IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
 
-EXPORT_CLASS_TABLE(cspython)
+IMPLEMENT_FACTORY (csPython)
+
+EXPORT_CLASS_TABLE (cspython)
 	EXPORT_CLASS(csPython, "crystalspace.script.python", "Crystal Space Script Python")
 EXPORT_CLASS_TABLE_END
-
-IMPLEMENT_IBASE(csPython)
-	IMPLEMENTS_INTERFACE(iScript)
-IMPLEMENT_IBASE_END
 
 csPython *thisclass=NULL;
 

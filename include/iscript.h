@@ -20,6 +20,7 @@
 #define __ISCRIPT_H__
 
 #include "csutil/scf.h"
+#include "iplugin.h"
 
 enum ResultType {
 	rtDouble=0,
@@ -33,7 +34,7 @@ SCF_VERSION (iScript, 0, 0, 1);
 /**
  * @@@ Please document me using Doc++!
  */
-struct iScript : public iBase
+struct iScript : public iPlugIn
 {
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool RunText(const char *iStr)=0;

@@ -95,8 +95,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   csTextureWrapper* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
 
-  iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
-  is->Initialize(this);
+  iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
 
   if(!is->LoadModule("unrmap"))
     return 0;
@@ -108,9 +107,9 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if(!is->RunText("unrmap.Load('data/entry')"))
     return 0;
 
-//	is->DecRef();
+  is->DecRef();
 
-	room->CompressVertices();
+  room->CompressVertices();
 
   csStatLight* light;
   light = new csStatLight (0, 0, 0, 10, 1, 0, 0, false);
@@ -177,7 +176,7 @@ bool PySimple::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    System->Shutdown = true;
+    Shutdown = true;
     return true;
   }
 
