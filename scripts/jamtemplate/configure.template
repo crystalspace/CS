@@ -66,7 +66,7 @@ AC_ARG_WITH([cs], [AC_HELP_STRING([--without-cs],
 AS_IF([test -z "$with_cs"], [with_cs=yes])
 
 AS_IF([test $with_cs != no],
-[CS_PATH_CRYSTAL_JAM([0.97], [],
+[CS_PATH_CRYSTAL_JAM([0.98], [],
   [AC_MSG_ERROR([
 *** Crystal Space could not be found. The latest version is always available
 *** from http://crystal.sourceforge.net/
@@ -85,7 +85,7 @@ m4_if(cel_desired, [yes],
 AS_IF([test -z "$with_cel"], [with_cel=yes])
 
 AS_IF([test $with_cel != no],
-[CS_PATH_CEL([0.97], [],
+[CS_PATH_CEL([0.98], [],
   [AC_MSG_ERROR([
 *** CEL could not be found. The latest version is always available from
 *** http://cel.sourceforge.net/
