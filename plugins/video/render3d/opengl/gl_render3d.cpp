@@ -1101,6 +1101,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 */
   SetWriteMask (true, true, true, true);
 
+  clipportal_dirty = true;
+
   int i = 0;
   for (i = 15; i >= 0; i--)
     DeactivateTexture (i);
@@ -2055,8 +2057,8 @@ void csGLGraphics3D::SetupClipPortals ()
 	csVector2* vt = cp->poly;
 	for (v = 0 ; v < cp->num_poly ; v++)
 	{
-	  float sx = cp->poly[v].x - asp_center_x;
-	  float sy = cp->poly[v].y - asp_center_y;
+	  float sx = vt->x - asp_center_x;
+	  float sy = vt->y - asp_center_y;
 	  float one_over_sz = M * sx + N * sy + O;
 	  float sz = 1.0f / one_over_sz;
 	  glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);

@@ -20,6 +20,8 @@ chronological order.
 	  (kirchdorfer@users.sourceforge.net). This patch makes sure walktest
 	  again correctly resizes when the window is resized. This was broken
 	  when this resizing functionality was added to csView by Pascal.
+	- Jorrit added a missing clipportal_dirty = true to the NR GL renderer
+	  BeginDraw() implementation.
 14-Jun-2004
 	- Jorrit implemented correct static lighting for static lod. In case
 	  of casting shadows, the lowest detail object that has a shadow
