@@ -127,6 +127,12 @@
     say "SHELL = "SHELL;
   end;
 
+  if (pos("CMD", translate(SHELL)) > 0) then
+  do
+    say '" ='
+    say '| = ³'
+  end
+
   if (SysSearchPath("PATH", "sed.exe") = "") then
     call problem "low",
       "GNU sed has not been found along your PATH."NL,
