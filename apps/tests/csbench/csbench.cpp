@@ -459,7 +459,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   }
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
-  int i;
+  size_t i;
   iMaterialWrapper* oldmat = material;
   csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
   csRef<iThingState> ws =
