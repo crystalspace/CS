@@ -42,10 +42,11 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
 {
   EventOutlet = 0;
   screen_shot = 0;
-  multiSamples = 0;
   multiFavorQuality = false;
   fontCache = 0;
   useCombineTE = false;
+
+  memset (currentFormat, 0, sizeof (currentFormat));
 
   ssPool = 0;
 }
@@ -74,8 +75,6 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
 
   statecache = new csGLStateCache (&ext);
 
-  depthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
-  multiSamples = config->GetInt ("Video.OpenGL.MultiSamples", 0);
   multiFavorQuality = config->GetBool ("Video.OpenGL.MultisampleFavorQuality");
 
   return true;
@@ -131,6 +130,16 @@ bool csGraphics2DGLCommon::Open ()
       "Using %s mode at resolution %dx%d.",
       FullScreen ? "full screen" : "windowed", Width, Height);
 
+  if (reporter)
+  {
+    csString pfStr;
+    GetPixelFormatString (currentFormat, pfStr);
+
+    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.canvas.openglcommon",
+      "Pixel format: %s", pfStr.GetData());
+  }
+
   if (version)
   {
     // initialize GL version pseudo-extensions
@@ -178,16 +187,16 @@ bool csGraphics2DGLCommon::Open ()
 
   if (ext.CS_GL_ARB_multisample)
   {
-    GLint glmultisamp = (GLint)multiSamples;
+    GLint glmultisamp = (GLint)currentFormat[glpfvMultiSamples];
     glGetIntegerv (GL_SAMPLES_ARB, &glmultisamp);
 
-    if (multiSamples)
+    if (glmultisamp)
     {
-      if (reporter)
+      if (reporter && (glmultisamp != currentFormat[glpfvMultiSamples]))
 	reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.canvas.openglcommon",
-	  "Multisample: %d samples",
-	  multiSamples);
+	  "Multisample: actually %d samples",
+	  glmultisamp);
 
       ext.InitGL_NV_multisample_filter_hint();
       if (ext.CS_GL_NV_multisample_filter_hint)
@@ -347,6 +356,19 @@ void csGraphics2DGLCommon::RecycleScreenShot (csGLScreenShot* shot)
     return;
   }
   scfRefCount--;
+}
+
+void csGraphics2DGLCommon::GetPixelFormatString (const GLPixelFormat& format, 
+						 csString& str)
+{
+  const char* valueNames[glpfvValueCount] = {"Color", "Alpha", "Depth",
+    "Stencil", "AccumColor", "AccumAlpha", "MultiSamples"};
+
+  str.Clear();
+  for (int v = 0; v < glpfvValueCount; v++)
+  {
+    str.Append (csString().Format ("%s: %d ", valueNames[v], format[v]));
+  }
 }
 
 const char* csGraphics2DGLCommon::GetRendererString (const char* str)
@@ -812,3 +834,188 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
 }
 
 
+csGraphics2DGLCommon::csGLPixelFormatPicker::csGLPixelFormatPicker(
+  csGraphics2DGLCommon* parent) : order(0)
+{
+  csGLPixelFormatPicker::parent = parent;
+
+  Reset();
+}
+
+csGraphics2DGLCommon::csGLPixelFormatPicker::~csGLPixelFormatPicker()
+{
+  delete[] order;
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
+{
+#ifndef CS_USE_NEW_RENDERER
+  #define RENDERER_DEPENDENT(vNR, vOR)	(vOR)
+#else
+  #define RENDERER_DEPENDENT(vNR, vOR)	(vNR)
+#endif
+
+  currentValues[glpfvColorBits] = parent->Depth;
+  currentValues[glpfvAlphaBits] = 
+    parent->config->GetInt ("Video.OpenGL.AlphaBits", 
+    RENDERER_DEPENDENT(8, 0));
+  currentValues[glpfvDepthBits] = 
+    parent->config->GetInt ("Video.OpenGL.DepthBits", 32);
+  currentValues[glpfvStencilBits] = 
+    parent->config->GetInt ("Video.OpenGL.StencilBits", 
+    RENDERER_DEPENDENT(8, 1));
+  currentValues[glpfvAccumColorBits] = 
+    parent->config->GetInt ("Video.OpenGL.AccumColorBits", 0);
+  currentValues[glpfvAccumAlphaBits] = 
+    parent->config->GetInt ("Video.OpenGL.AccumAlphaBits", 0);
+  currentValues[glpfvMultiSamples] = 
+    parent->config->GetInt ("Video.OpenGL.MultiSamples", 0);
+  currentValid = true;
+
+#undef RENDERER_DEPENDENT
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValues ()
+{
+  order = csStrNew (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.ReductionOrder", "mAasdc"));
+  orderNum = strlen (order);
+  orderPos = 0;
+
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.ColorBits"), values[glpfvColorBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.AlphaBits"), values[glpfvAlphaBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.DepthBits"), values[glpfvDepthBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.StencilBits"), values[glpfvStencilBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.AccumColorBits"), values[glpfvAccumColorBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.AccumAlphaBits"), values[glpfvAccumAlphaBits]);
+  ReadPickerValue (parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.MultiSamples"), values[glpfvMultiSamples]);
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
+  const char* valuesStr, csArray<int>& values)
+{
+  if ((valuesStr != 0) && (*valuesStr != 0))
+  {
+    CS_ALLOC_STACK_ARRAY(char, myValues, strlen (valuesStr) + 1);
+    strcpy (myValues, valuesStr);
+
+    char* currentVal = myValues;
+    while ((currentVal != 0) && (*currentVal != 0))
+    {
+      char* comma = strchr (currentVal, ',');
+      if (comma != 0) *comma = 0;
+
+      char dummy;
+      int val;
+      if (sscanf (currentVal, "%d%c", &val, &dummy) == 1)
+      {
+	values.Push (val);
+      }
+      currentVal = comma ? comma + 1 : 0;
+    }
+  }
+
+  if (values.Length() == 0)
+    values.Push (0);
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::SetInitialIndices ()
+{
+  for (size_t v = 0; v < glpfvValueCount; v++)
+  {
+    size_t closestIndex = 0;
+    int closestDiff = 0x7fffffff;
+
+    for (size_t i = 0; i < values[v].Length(); i++)
+    {
+      int currentDiff = values[v][i] - currentValues[v];
+      if (abs (currentDiff) < closestDiff)
+      {
+	closestDiff = abs (currentDiff);
+	closestIndex = i;
+	if (currentDiff >= 0) closestIndex++;
+      }
+      if (currentDiff == 0) break;
+    }
+    nextValueIndices[v] = closestIndex;
+  }
+}
+
+bool csGraphics2DGLCommon::csGLPixelFormatPicker::PickNextFormat ()
+{
+  size_t startOrderPos = orderPos;
+
+  bool formatPicked = false;
+  do
+  {
+    int nextValue = 0;
+    switch (order[orderPos++])
+    {
+      case 'c':
+	nextValue = glpfvColorBits;
+	break;
+      case 'a':
+	nextValue = glpfvAlphaBits;
+	break;
+      case 'd':
+	nextValue = glpfvDepthBits;
+	break;
+      case 's':
+	nextValue = glpfvStencilBits;
+	break;
+      case 'C':
+	nextValue = glpfvAccumColorBits;
+	break;
+      case 'A':
+	nextValue = glpfvAccumAlphaBits;
+	break;
+      case 'm':
+	nextValue = glpfvMultiSamples;
+	break;
+      default:
+	continue;
+    }
+    const size_t nextIndex = nextValueIndices[nextValue];
+    if (nextIndex < values[nextValue].Length())
+    {
+      currentValues[nextValue] = values[nextValue][nextIndex];
+      nextValueIndices[nextValue]++;
+      formatPicked = true;
+    }
+  }
+  while ((startOrderPos != (orderPos = orderPos % orderNum)) &&
+    !formatPicked);
+
+  return formatPicked;
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::Reset()
+{
+  delete[] order;
+
+  for (size_t v = 0; v < glpfvValueCount; v++)
+  {
+    values[v].DeleteAll();
+  }
+
+  ReadStartValues();
+  ReadPickerValues();
+  SetInitialIndices();
+}
+
+bool csGraphics2DGLCommon::csGLPixelFormatPicker::GetNextFormat (
+  GLPixelFormat& format)
+{
+  memcpy (format, currentValues, sizeof (GLPixelFormat));
+
+  bool oldCurrentValid = currentValid;
+  currentValid = PickNextFormat ();
+  return oldCurrentValid;
+}

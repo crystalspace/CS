@@ -54,6 +54,47 @@ protected:
   friend class csGLScreenShot;
   friend class csGLFontCache;
 
+  enum GLPixelFormatValue
+  {
+    glpfvColorBits = 0,
+    glpfvAlphaBits,
+    glpfvDepthBits,
+    glpfvStencilBits,
+    glpfvAccumColorBits,
+    glpfvAccumAlphaBits,
+    glpfvMultiSamples,
+
+    glpfvValueCount
+  };
+  typedef int GLPixelFormat[glpfvValueCount];
+  
+  class csGLPixelFormatPicker
+  {
+    csGraphics2DGLCommon* parent;
+
+    GLPixelFormat currentValues;
+    size_t nextValueIndices[glpfvValueCount];
+    csArray<int> values[glpfvValueCount];
+    bool currentValid;
+
+    char* order;
+    size_t orderPos;
+    size_t orderNum;
+
+    void ReadStartValues ();
+    void ReadPickerValues ();
+    void ReadPickerValue (const char* valuesStr, csArray<int>& values);
+    void SetInitialIndices ();
+    bool PickNextFormat ();
+  public:
+    csGLPixelFormatPicker (csGraphics2DGLCommon* parent);
+    ~csGLPixelFormatPicker ();
+
+    void Reset();
+    bool GetNextFormat (GLPixelFormat& format);
+  };
+  friend class csGLPixelFormatPicker;
+
   /// Cache for GL states
   csGLStateCache* statecache;
 
@@ -74,14 +115,17 @@ protected:
   /// Extension manager
   csGLExtensionManager ext;
   /// Multisample samples
-  int multiSamples;
+  //int multiSamples;
   /// Whether to favor quality or speed.
   bool multiFavorQuality;
   /// Depth buffer resolution
-  int depthBits;
+  //int depthBits;
+  GLPixelFormat currentFormat;
   /// Driver database
   csGLDriverDatabase driverdb;
   bool useCombineTE;
+
+  void GetPixelFormatString (const GLPixelFormat& format, csString& str);
 public:
   virtual const char* GetRendererString (const char* str);
   virtual const char* GetVersionString (const char* ver);

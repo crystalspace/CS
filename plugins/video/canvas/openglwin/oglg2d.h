@@ -33,9 +33,16 @@ struct iWin32Assistant;
 class csGraphics2DOpenGL : public csGraphics2DGLCommon
 {
 private:
+  struct DummyWndInfo
+  {
+    int pixelFormat;
+    csGraphics2DOpenGL* this_;
+    GLPixelFormat* chosenFormat;
+    csGLPixelFormatPicker* picker;
+  };
   // Calculate the OpenGL pixel format.
-  void CalcPixelFormat (int pixelFormat);
-  bool FindMultisampleFormat (int samples, int& pixelFormat);
+  int FindPixelFormatGDI (HDC hDC, csGLPixelFormatPicker& picker);
+  int FindPixelFormatWGL (csGLPixelFormatPicker& picker);
   static LRESULT CALLBACK DummyWindow (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
 

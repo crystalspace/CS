@@ -956,7 +956,7 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
 bool csSCF::ClassRegistered (const char *iClassID)
 {
   csScopedMutexLock lock (mutex);
-  return (ClassRegistry->FindClass(iClassID) >= 0);
+  return (ClassRegistry->FindClass(iClassID) != csArrayItemNotFound);
 }
 
 

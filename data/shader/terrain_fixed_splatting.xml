@@ -5,7 +5,7 @@
 
   <technique priority="300"> 
     <pass>
-      <mixmode><destalphaadd /></mixmode>
+      <mixmode><add /></mixmode>
       <alphamode><smooth /></alphamode>
       <buffer name="vertices" destination="position" />
       <buffer name="texture coordinates" destination="texture coordinate 0" />

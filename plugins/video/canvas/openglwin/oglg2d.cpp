@@ -108,11 +108,11 @@ CS_IMPLEMENT_PLUGIN
 #endif
 
 /*
-    in fs mode, the window is topmost, means above every other
-    window, all the time. but when debugging a break it is really annoying to 
+    In fs mode, the window is topmost, means above every other
+    window, all the time. But when debugging it is really annoying to 
     have a black window in front of your face instead of the IDE... 
-    note: this hack causes taskbar flickering when "always on top"  is enabled
-    and auto-hide is disabled.
+    Note: this hack may cause taskbar flickering when "always on top" is
+    enabled and auto-hide is disabled for the task bar.
  */
 #ifdef CS_DEBUG
 # define CS_WINDOW_Z_ORDER HWND_TOP
@@ -124,7 +124,7 @@ static void SystemFatalError (wchar_t* str, HRESULT hRes = ~0)
 {
   wchar_t* newMsg = 0;
   wchar_t* szMsg;
-  wchar_t szStdMessage[] = L"Last Error: ";
+  wchar_t szStdMessage[] = L"\nLast Error: ";
 
   if (hRes != ~0)
   {
@@ -302,91 +302,56 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-void csGraphics2DOpenGL::CalcPixelFormat (int pixelFormat)
+int csGraphics2DOpenGL::FindPixelFormatGDI (HDC hDC, 
+					    csGLPixelFormatPicker& picker)
 {
-  PIXELFORMATDESCRIPTOR pfd = {
-      sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-      1,                              /* version */
-      PFD_SUPPORT_OPENGL |
-      PFD_DOUBLEBUFFER |              /* support double-buffering */
-      PFD_DRAW_TO_WINDOW,
-      PFD_TYPE_RGBA,                  /* color type */
-      Depth,                          /* prefered color depth */
-      0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-#ifndef CS_USE_NEW_RENDERER
-      0,                              /* no alpha buffer */
-#else
-      8,                              /* 8 bit alpha buffer */
-#endif // CS_USE_NEW_RENDERER
-      0,                              /* alpha bits (ignored) */
-      0,                              /* no accumulation buffer */
-      0, 0, 0, 0,                     /* accum bits (ignored) */
-      depthBits,                   /* depth buffer */
-#ifndef CS_USE_NEW_RENDERER
-      1,                              /* no stencil buffer */
-#else
-      8,
-#endif // CS_USE_NEW_RENDERER
-      0,                              /* no auxiliary buffers */
-      PFD_MAIN_PLANE,                 /* main layer */
-      0,                              /* reserved */
-      0, 0, 0                         /* no layer, visible, damage masks */
-  };
-
-  if (pixelFormat <= 0)
+  int newPixelFormat = 0;
+  GLPixelFormat& format = currentFormat;
+  while (picker.GetNextFormat (format))
   {
-    pixelFormat = ChoosePixelFormat (hDC, &pfd);
+    PIXELFORMATDESCRIPTOR pfd = {
+	sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+	1,                              /* version */
+	PFD_SUPPORT_OPENGL |
+	PFD_DOUBLEBUFFER |              /* support double-buffering */
+	PFD_DRAW_TO_WINDOW,
+	PFD_TYPE_RGBA,                  /* color type */
+	format[glpfvColorBits],         /* prefered color depth */
+	0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+	format[glpfvAlphaBits],         /* no alpha buffer */
+	0,                              /* alpha bits (ignored) */
+	format[glpfvAccumColorBits],	/* accumulation buffer */
+	0, 0, 0,			/* accum bits (ignored) */
+	format[glpfvAccumAlphaBits],	/* accum alpha bits */
+	format[glpfvDepthBits],         /* depth buffer */
+	format[glpfvStencilBits],	/* stencil buffer */
+	0,                              /* no auxiliary buffers */
+	PFD_MAIN_PLANE,                 /* main layer */
+	0,                              /* reserved */
+	0, 0, 0                         /* no layer, visible, damage masks */
+    };
 
-    if (pixelFormat == 0)
-      SystemFatalError (L"ChoosePixelFormat failed.");
-  }
-  if (SetPixelFormat (hDC, pixelFormat, &pfd) != TRUE)
-    SystemFatalError (L"SetPixelFormat failed.");
+    newPixelFormat = ChoosePixelFormat (hDC, &pfd);
 
-  if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
-    SystemFatalError (L"DescribePixelFormat failed.");
+    if (newPixelFormat == 0)
+      SystemFatalError (L"ChoosePixelFormat failed.", GetLastError());
 
-  Depth = pfd.cColorBits; 
-  // @@@ ColorBits are ignored. Will cause corruption
-  /* [res: what "corruption"? if DescribePixelFormat() doesn't return
-   * the correct color depth maybe try EnumDisplaySettings() instead.
-   * but somehow the actual color depth should be retrieved. ]
-   */
-  depthBits = pfd.cDepthBits;
+    if (DescribePixelFormat (hDC, newPixelFormat, 
+      sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+      SystemFatalError (L"DescribePixelFormat failed.", GetLastError());
 
-  hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
-    (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
-  if (!hardwareAccelerated)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING,
-      "No hardware acceleration!");
+    if (!(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
+      (pfd.dwFlags & PFD_GENERIC_ACCELERATED))
+    {
+      return newPixelFormat;
+    }
   }
 
-  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
-  pfmt.RedBits = pfd.cRedBits;
-  pfmt.RedShift = pfd.cRedShift;
-  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
-  pfmt.GreenBits = pfd.cGreenBits;
-  pfmt.GreenShift = pfd.cGreenShift;
-  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
-  pfmt.BlueBits = pfd.cBlueBits;
-  pfmt.BlueShift = pfd.cBlueShift;
-  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
-  pfmt.PalEntries = 0;
+  return newPixelFormat;
 }
 
-struct DummyWndInfo
+int csGraphics2DOpenGL::FindPixelFormatWGL (csGLPixelFormatPicker& picker)
 {
-  int* pixelFormat;
-  csGraphics2DOpenGL* this_;
-  int samples;
-};
-
-bool csGraphics2DOpenGL::FindMultisampleFormat (int samples, 
-						int& pixelFormat)
-{
-  if (samples == 0) return false;
-
   /*
     To use multisampling, a special pixel format has to determined.
     However, this determination works over a WGL ext - thus we need
@@ -412,9 +377,10 @@ bool csGraphics2DOpenGL::FindMultisampleFormat (int samples,
   if (!RegisterClass (&wc)) return false;
 
   DummyWndInfo dwi;
-  dwi.pixelFormat = &pixelFormat;
+  dwi.pixelFormat = -1;
   dwi.this_ = this;
-  dwi.samples = samples;
+  dwi.chosenFormat = &currentFormat;
+  dwi.picker = &picker;
 
   HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
@@ -423,7 +389,9 @@ bool csGraphics2DOpenGL::FindMultisampleFormat (int samples,
 
   UnregisterClass (dummyClassName, ModuleHandle);
 
-  return true;
+  ext.Reset();
+
+  return dwi.pixelFormat;
 }
 
 LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
@@ -435,60 +403,76 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
     {
       DummyWndInfo* dwi = (DummyWndInfo*)(LPCREATESTRUCT(lParam)->lpCreateParams);
 
-      dwi->this_->hDC = GetWindowDC (hWnd);
-      dwi->this_->CalcPixelFormat (-1);
+      HDC hDC = GetDC (hWnd);
+      int acceleration = dwi->this_->config->GetBool (
+	"Video.OpenGL.FullAcceleration", true) ? WGL_FULL_ACCELERATION_ARB : 
+	WGL_GENERIC_ACCELERATION_ARB;
+      csGLPixelFormatPicker& picker (*dwi->picker);
 
-      int pixelFormat = ::GetPixelFormat (dwi->this_->hDC);
+      int pixelFormat = dwi->this_->FindPixelFormatGDI (hDC, picker);
       PIXELFORMATDESCRIPTOR pfd;
-      if (DescribePixelFormat (dwi->this_->hDC, pixelFormat, 
+      if (DescribePixelFormat (hDC, pixelFormat, 
 	sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
 	SystemFatalError (L"DescribePixelFormat failed.");
 
-      dwi->this_->hGLRC = wglCreateContext (dwi->this_->hDC);
-      wglMakeCurrent (dwi->this_->hDC, dwi->this_->hGLRC);
+      if (SetPixelFormat (hDC, pixelFormat, 0) != TRUE)
+      {
+	HRESULT spfErr = (HRESULT)GetLastError();
+	SystemFatalError (L"SetPixelFormat failed.", spfErr);
+      }
+
+      HGLRC hGLRC = wglCreateContext (hDC);
+      wglMakeCurrent (hDC, hGLRC);
 
       csGLExtensionManager& ext = dwi->this_->ext;
       ext.Open();
-      ext.InitWGL_ARB_pixel_format (dwi->this_->hDC);
+      ext.InitWGL_ARB_pixel_format (hDC);
       if (ext.CS_WGL_ARB_pixel_format)
       {
 	unsigned int numFormats = 0;
-	int iAttributes[20];
+	int iAttributes[12];
 	float fAttributes[] = {0.0f, 0.0f};
 
-	HDC hDC = GetDC(hWnd);
-	iAttributes[0] = WGL_DRAW_TO_WINDOW_ARB;
-	iAttributes[1] = GL_TRUE;
-	iAttributes[2] = WGL_ACCELERATION_ARB;
-	iAttributes[3] = WGL_FULL_ACCELERATION_ARB;
-	iAttributes[4] = WGL_COLOR_BITS_ARB;
-	iAttributes[5] = pfd.cColorBits;
-	iAttributes[6] = WGL_ALPHA_BITS_ARB;
-	iAttributes[7] = pfd.cAlphaBits ;
-	iAttributes[8] = WGL_DEPTH_BITS_ARB;
-	iAttributes[9] = pfd.cDepthBits;
-	iAttributes[10] = WGL_STENCIL_BITS_ARB;
-	iAttributes[11] = pfd.cStencilBits;
-	iAttributes[12] = WGL_DOUBLE_BUFFER_ARB;
-	iAttributes[13] = GL_TRUE;
-	iAttributes[14] = WGL_SAMPLE_BUFFERS_ARB;
-	iAttributes[15] = GL_TRUE;
-	iAttributes[16] = WGL_SAMPLES_ARB;
-	iAttributes[17] = dwi->samples;
-	iAttributes[18] = 0;
-	iAttributes[19] = 0;
-
-	if ((ext.wglChoosePixelFormatARB (hDC, iAttributes, fAttributes,
-	  1, dwi->pixelFormat, &numFormats) == GL_FALSE) || (numFormats == 0))
+	GLPixelFormat format;
+	memcpy (format, dwi->chosenFormat, sizeof (GLPixelFormat));
+	do
 	{
-	  *dwi->pixelFormat = -1;
+	  iAttributes[0] = WGL_DRAW_TO_WINDOW_ARB;
+	  iAttributes[1] = GL_TRUE;
+	  iAttributes[2] = WGL_ACCELERATION_ARB;
+	  iAttributes[3] = acceleration;
+	  iAttributes[4] = WGL_DOUBLE_BUFFER_ARB;
+	  iAttributes[5] = GL_TRUE;
+	  iAttributes[6] = WGL_SAMPLE_BUFFERS_ARB;
+	  iAttributes[7] = 
+	    (format[glpfvMultiSamples] != 0) ? GL_TRUE : GL_FALSE;
+	  iAttributes[8] = WGL_SAMPLES_ARB;
+	  iAttributes[9] = format[glpfvMultiSamples];
+	  iAttributes[10] = 0;
+	  iAttributes[11] = 0;
+
+	  if ((ext.wglChoosePixelFormatARB (hDC, iAttributes, fAttributes,
+	    1, &dwi->pixelFormat, &numFormats) == GL_TRUE) && (numFormats != 0))
+	  {
+	    int queriedAttrs[] = {WGL_SAMPLES_ARB};
+	    const int queriedAttrNum = sizeof(queriedAttrs) / sizeof(int);
+	    int attrValues[queriedAttrNum];
+
+	    if (ext.wglGetPixelFormatAttribivARB (hDC, dwi->pixelFormat, 0,
+	      queriedAttrNum, queriedAttrs, attrValues) == GL_TRUE)
+	    {
+	      (*dwi->chosenFormat)[glpfvMultiSamples] = attrValues[0];
+	      break;
+	    }
+	  }
 	}
+	while (picker.GetNextFormat (format));
       }
 
-      wglMakeCurrent (dwi->this_->hDC, 0);
-      wglDeleteContext (dwi->this_->hGLRC);
+      wglMakeCurrent (hDC, 0);
+      wglDeleteContext (hGLRC);
 
-      ReleaseDC (hWnd, dwi->this_->hDC);
+      ReleaseDC (hWnd, hDC);
     }
     break;
   }
@@ -501,19 +485,14 @@ bool csGraphics2DOpenGL::Open ()
   DWORD exStyle;
   DWORD style;
 
-  int pixelFormat = -1;
-  if (FindMultisampleFormat (multiSamples, pixelFormat))
-  {
-    // Reset all extensions. Needed for proper WGL_ext_str functioning -
-    // the WGL ext string is only valid for one HDC.
-    ext.Reset ();
-  }
-
   // create the window.
   if (FullScreen)
   {
     SwitchDisplayMode (false);
   }
+
+  csGLPixelFormatPicker picker (this);
+  int pixelFormat = FindPixelFormatWGL (picker);
 
   m_bActivated = true;
 
@@ -574,11 +553,51 @@ bool csGraphics2DOpenGL::Open ()
   }
 
   hDC = GetDC (m_hWnd);
-  CalcPixelFormat (pixelFormat);
+  if (pixelFormat == -1)
+  {
+    picker.Reset();
+    pixelFormat = FindPixelFormatGDI (hDC, picker);
+  }
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "Using %d bits per pixel (%d color mode), %d bits depth buffer.", 
-    Depth, 1 << (Depth == 32 ? 24 : Depth), depthBits);
+  if (SetPixelFormat (hDC, pixelFormat, 0) != TRUE)
+  {
+    HRESULT spfErr = (HRESULT)GetLastError();
+    SystemFatalError (L"SetPixelFormat failed.", spfErr);
+  }
+
+  PIXELFORMATDESCRIPTOR pfd;
+  if (DescribePixelFormat (hDC, pixelFormat, 
+    sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+    SystemFatalError (L"DescribePixelFormat failed.", GetLastError());
+
+  currentFormat[glpfvColorBits] = pfd.cColorBits;
+  currentFormat[glpfvAlphaBits] = pfd.cAlphaBits;
+  currentFormat[glpfvDepthBits] = pfd.cDepthBits;
+  currentFormat[glpfvStencilBits] = pfd.cStencilBits;
+  currentFormat[glpfvAccumColorBits] = pfd.cAccumBits;
+  currentFormat[glpfvAccumAlphaBits] = pfd.cAccumAlphaBits;
+
+  Depth = pfd.cColorBits; 
+
+  hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
+    (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
+  if (!hardwareAccelerated)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "No hardware acceleration!");
+  }
+
+  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
+  pfmt.RedBits = pfd.cRedBits;
+  pfmt.RedShift = pfd.cRedShift;
+  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
+  pfmt.GreenBits = pfd.cGreenBits;
+  pfmt.GreenShift = pfd.cGreenShift;
+  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
+  pfmt.BlueBits = pfd.cBlueBits;
+  pfmt.BlueShift = pfd.cBlueShift;
+  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
+  pfmt.PalEntries = 0;
 
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);

@@ -16,6 +16,13 @@ chronological order.
 	  API changes.
 	- Jorrit added iRegion->Remove() to remove an object from a region.
 	  There was already an Add() but the Remove() was missing.
+	- res added a "pixel format picker" to the common GL canvas, a tool
+	  that can help the platform-dependent GL canvases to iterate over
+	  multiple formats (which are then tested for acceleration).
+	- res updated the Win32 GL canvas to use the format picker.
+	- res fixed csSCF::ClassRegistered() returning always "true".
+	- res changed the mixmode of the terrain_fixed_splatting shader to a
+	  sufficient <add /> instead of <destalphaadd />.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
