@@ -198,6 +198,9 @@ void ddgContext::itransformation( ddgMatrix4 *matinv)
 
 void ddgContext::updateClippingInfo(void)
 {
+	ddgPlane3 *_frustrum3dx = new ddgPlane3[6];
+
+//	extractPlanesFromMatrix(_frustrum3d);
 	extractPlanes(_frustrum3d);
 	// Generally we want to clip against the left/right top/bottom and near planes.
 	// Far is handled by the _farClipSQ and provides a curved clip plane.
@@ -225,33 +228,6 @@ void ddgContext::updateClippingInfo(void)
 		}
 }
 
-// Extract 6 clipping planes in world space coordinates from the current view.
-void ddgContext::extractPlanes(ddgPlane3 planes[6])
-{
-	ddgVector4 tmpVec;
-	ddgMatrix4 comboMat;
-
-	comboMat = _pm * _mm;
-	comboMat.transpose();
-	// Left
-	tmpVec = comboMat.m[3] - comboMat.m[0];
-	planes[0].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-	// Right
-	tmpVec = comboMat.m[3] + comboMat.m[0];
-	planes[1].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-	// Bottom
-	tmpVec = comboMat.m[3] - comboMat.m[1];
-	planes[2].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-	// Top
-	tmpVec = comboMat.m[3] + comboMat.m[1];
-	planes[3].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-	// Near
-	tmpVec = comboMat.m[3] - comboMat.m[2];
-	planes[4].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-	// Far
-	tmpVec = comboMat.m[3] + comboMat.m[2];
-	planes[5].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
-}
 
 //
 // Calculate the approximate screen space distance between to points.
@@ -309,3 +285,90 @@ ddgInside ddgContext::clip( ddgBBox3 *bbox)
 		return _rootHull.clip(bbox);
 }
 
+void ddgContext::extractPlanes( ddgPlane3 planes[6])
+{
+	ddgVector3 *p = _control->position();
+
+	float snear = _clipbox.cornerz(0), sfar = _clipbox.cornerz(7);
+	// Derive 8 world space coords which represent the viewing frustrum.
+	// visible from the camera.
+	ddgVector3 c[8];
+	// Right
+	ddgVector3 r = _right;
+	r.multiply(_tanHalfFOV*_aspect);
+	// Up
+	ddgVector3 u = _up;
+	u.multiply(_tanHalfFOV);
+	// Near
+	ddgVector3 n = _forward;
+	n.multiply(snear);
+	// Far
+	ddgVector3 f = _forward;
+	f.multiply(sfar);
+
+	ddgVector3 t;
+	t = u - r; t.multiply(snear);
+	c[0] = p + n + t;	// Near Top Left
+	c[3] = p + n - t;	// Near Bottom Right
+	t = u + r; t.multiply(snear);
+	c[1] = p + n + t;	// Near Top Right
+	c[2] = p + n - t;	// Near Bottom Left
+	
+	t = u - r; t.multiply(sfar);
+	c[4] = p + f + t;	// Far Top Left
+	c[7] = p + f - t;	// Far Bottom Right
+
+	t = u + r; t.multiply(sfar);
+	c[5] = p + f + t;	// Far Top Right
+	c[6] = p + f - t;	// Far Bottom Left
+	// Find the plane vectors for each side of the frustrum.
+
+	ddgVector3 pn, v1, v2;
+	int i;
+
+	// Points which can be used to create plane equations.
+	int pv[6][3] = { {4,0,2}, {1,5,7}, {2,3,7}, {4,5,1}, {0,1,3}, {5,4,6} };
+	for (i = 0; i < 6; i++)
+	{
+		v1 = c[pv[i][1]] - c[pv[i][0]];
+		v2 = c[pv[i][2]] - c[pv[i][0]];
+		pn.cross(&v1 , &v2);
+		planes[i].set(pn,-1 * pn.dot(p));
+		planes[i].normalize();
+	}
+
+}
+
+// Extract 6 clipping planes in world space coordinates from the matrices.
+void ddgContext::extractPlanesFromMatrix(ddgPlane3 planes[6])
+{
+	ddgVector4 tmpVec;
+	ddgMatrix4 comboMat;
+
+	comboMat = _pm * _mm;
+	comboMat.transpose();
+	// Left
+	tmpVec = comboMat.m[3] - comboMat.m[0];
+	planes[0].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[0].normalize();
+	// Right
+	tmpVec = comboMat.m[3] + comboMat.m[0];
+	planes[1].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[1].normalize();
+	// Bottom
+	tmpVec = comboMat.m[3] - comboMat.m[1];
+	planes[2].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[2].normalize();
+	// Top
+	tmpVec = comboMat.m[3] + comboMat.m[1];
+	planes[3].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[3].normalize();
+	// Near
+	tmpVec = comboMat.m[3] - comboMat.m[2];
+	planes[4].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[4].normalize();
+	// Far
+	tmpVec = comboMat.m[3] + comboMat.m[2];
+	planes[5].set(ddgVector3(-tmpVec[0], -tmpVec[1], -tmpVec[2]), -tmpVec[3]);
+	planes[5].normalize();
+}

@@ -120,7 +120,7 @@ public:
 	/// Set the near clipping plane.
 	void nearfar (float n, float f) { _clipbox.setz(n,f); _dirty = true; }
 	/// Modify the field of vision angle of the view.
-	void fov( float f) { _fov = f; _tanHalfFOV = f/2.0; _dirty = true; }
+	void fov( float f) { _fov = f; _tanHalfFOV = tan(ddgAngle::degtorad(_fov/2.0)); _dirty = true; }
 	/// Return the field of vision angle of the view.
 	float fov( void ) { return _fov; }
     /// Set aspect ratio of the view, width/height.
@@ -168,7 +168,7 @@ public:
 	/**
 	 * Get frustrum clipping planes in world space coordinates.
 	 */
-	void extractPlanes(ddgPlane3 planes[6]);
+	void extractPlanesFromMatrix(ddgPlane3 planes[6]);
 	/// Update the clipping information based on the current viewpoint.
 	void updateClippingInfo(void);
 	/** Return true if the view is practically level.
@@ -196,6 +196,8 @@ public:
     bool ssdistance( ddgVector3 *p1, ddgVector3 *p2, ddgVector3 *normal, bool pixels = false);
     /// returns screen space distance between two points.
     float ssdistance2( ddgVector3 *p1, ddgVector3 *p2);
+	/// Compute frustrum from 5 points in world space coordinates.
+	void extractPlanes( ddgPlane3 planes[6]);
 };
 
 #endif

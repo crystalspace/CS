@@ -912,36 +912,7 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 		r0 += _stri[tv0].row; r1 += _stri[tv1].row; ra += _stri[tva].row;
 		c0 += _stri[tv0].col; c1 += _stri[tv1].col; ca += _stri[tva].col;
 	}
-#ifdef __CRYSTAL_SPACE__
-	// Calculate the angle between the forward vector and each point on the
-	// triangle and see if it falls within the fov, this is a kind of cone
-	// clipping test.
-	// Angle = acos(p dot f)
-	// dropping acos
-	// 0 degrees = 1.
-	// 90 degrees = 0   ~ 180 fov
-	// 45 degrees = 0.7 ~ 90 fov
-	// 60 degrees = 0.5 ~ 120 fov
-	int vin = 0;
-	center.set(ra - _pos[0],ca - _pos[1]);
-	center.normalize();
-	if ( _forward.dot(&center) > _cosHalfFOV)
-		vin++;
-	center.set(r0 - _pos[0],c0 - _pos[1]);
-	center.normalize();
-	if ( _forward.dot(&center) > _cosHalfFOV)
-		vin++;
-	center.set(r1 - _pos[0],c1 - _pos[1]);
-	center.normalize();
-	if ( _forward.dot(&center) > _cosHalfFOV)
-		vin++;
-	if (vin == 0)
-		return ddgOUT;
-	if (vin == 3)
-		return ddgIN;
-	return ddgPART;
 
-#else
 	int rmin, rmax, cmin, cmax;
 	// Bounding box is defined by points tva, v0 and v1.
 	rmin = (r0 < r1) ? r0 : r1;
@@ -973,8 +944,6 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 		rect.max.v[1] = cmax;
 		return _ctx->topDownWedge()->clip(&rect);
 		}
-
-#endif
 }
 
 
