@@ -52,7 +52,7 @@ struct csImageIOFileFormatDescription
 };
 
 /// Description for the array of file formats.
-typedef csArray<csImageIOFileFormatDescription*>
+typedef csArray<csImageIOFileFormatDescription const*>
 	csImageIOFileFormatDescriptions;
 
 /**
