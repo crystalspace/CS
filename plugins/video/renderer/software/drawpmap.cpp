@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -36,7 +36,10 @@ void csGraphics3DSoftware::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th)
 {
-  ((pfmt.PixelBytes == 1) ? DrawPixmap8 :
-   (pfmt.PixelBytes == 2) ? DrawPixmap16 :
-   DrawPixmap32) (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th);
+  switch (pfmt.PixelBytes)
+  {
+    case 1:  DrawPixmap8 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
+    case 2:  DrawPixmap16(G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
+    default: DrawPixmap32(G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th); break;
+  }
 }
