@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+7-Apr-2000
+	- W.C.A. Wijngaards <wouterw@cs.vu.nl> contributed a particle
+	  system (check out include/csengine/particle.h).
+	- Walktest uses the new particle system for demo purposes. There
+	  is a new 'explosion' command and when you fire the missile it
+	  will explode with a particle system :-)
+	- Wouter decreased particle size in explosion. That looks nicer.
+	- Norman Kramer removed a lot of unused variables in the glide
+	  code.
+	- Norman changed glide so that single TMU system do use the whole
+	  TMU mem available.
 6-Apr-2000
 	- Eric Sunshine did the following:
 	    - Fixed several Texinfo mark-up errors in cctest.txi. Slight
@@ -20,11 +31,6 @@ The history order has been reversed so that new features are at the top.
 	- Added new csBox3 constructor.
 	- Experimented further with solid-plane octree center selection.
 	- Thomas Hieber did some fixes for the MSVC port again.
-	- W.C.A. Wijngaards <wouterw@cs.vu.nl> contributed a particle
-	  system (check out include/csengine/particle.h). Walktest uses
-	  it for demo purposes. There is a new 'explosion' command
-	  and when you fire the missile it will explode with a particle
-	  system :-)
 5-Apr-2000
 	- Jason Platt did some fixes after Jorrit's changes.
 	- Small fix in csInifile for Borland BCB4 as suggested by
