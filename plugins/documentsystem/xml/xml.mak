@@ -39,8 +39,8 @@ else
 endif
 
 # XXX: Needs a test
-LIBXML2.CFLAGS = -I/usr/include/libxml2 ;
-LIBXML2.LFLAGS = -L/usr/lib -lxml2 ;
+LIBXML2.CFLAGS = -I/usr/include/libxml2
+LIBXML2.LFLAGS = -L/usr/lib -lxml2
 
 INC.XML = $(wildcard plugins/documentsystem/xml/*.h)
 SRC.XML = $(wildcard plugins/documentsystem/xml/*.cpp)
@@ -73,9 +73,7 @@ xmlclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/xml.dep
 $(OUTOS)/xml.dep: $(SRC.XML)
-	$(DO.DEP1) \
-	$(LIBXML2.CFLAGS) \
-	$(DO.DEP2)
+	$(DO.DEP1) $(LIBXML2.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/xml.dep
 endif
