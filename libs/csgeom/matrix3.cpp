@@ -67,16 +67,21 @@ csMatrix3& csMatrix3::operator-= (const csMatrix3& m)
 
 csMatrix3& csMatrix3::operator*= (const csMatrix3& m)
 {
-  csMatrix3 r(*this);
-  m11 = r.m11*m.m11 + r.m12*m.m21 + r.m13*m.m31;
-  m12 = r.m11*m.m12 + r.m12*m.m22 + r.m13*m.m32;
-  m13 = r.m11*m.m13 + r.m12*m.m23 + r.m13*m.m33;
-  m21 = r.m21*m.m11 + r.m22*m.m21 + r.m23*m.m31;
-  m22 = r.m21*m.m12 + r.m22*m.m22 + r.m23*m.m32;
-  m23 = r.m21*m.m13 + r.m22*m.m23 + r.m23*m.m33;
-  m31 = r.m31*m.m11 + r.m32*m.m21 + r.m33*m.m31;
-  m32 = r.m31*m.m12 + r.m32*m.m22 + r.m33*m.m32;
-  m33 = r.m31*m.m13 + r.m32*m.m23 + r.m33*m.m33;
+  float old_m11 = m11;
+  m11 = m11*m.m11 + m12*m.m21 + m13*m.m31;
+  float old_m12 = m12;
+  m12 = old_m11*m.m12 + m12*m.m22 + m13*m.m32;
+  m13 = old_m11*m.m13 + old_m12*m.m23 + m13*m.m33;
+  float old_m21 = m21;
+  m21 = m21*m.m11 + m22*m.m21 + m23*m.m31;
+  float old_m22 = m22;
+  m22 = old_m21*m.m12 + m22*m.m22 + m23*m.m32;
+  m23 = old_m21*m.m13 + old_m22*m.m23 + m23*m.m33;
+  float old_m31 = m31;
+  m31 = m31*m.m11 + m32*m.m21 + m33*m.m31;
+  float old_m32 = m32;
+  m32 = old_m31*m.m12 + m32*m.m22 + m33*m.m32;
+  m33 = old_m31*m.m13 + old_m32*m.m23 + m33*m.m33;
   return *this;
 }
 

@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+9-Dec-2001
+	- Optimized the matrix multiply routine considerably (the
+	  *= operator) by avoiding the copy of 'this'. Instead
+	  of 66323 multiplications per second I can now do
+	  715651 matrix multiplications per second. This should give
+	  a considerable speed increase all over CS since this is used
+	  a lot.
 8-Dec-2001
 	- Fixed a closing brace in mapfmt.txi.
 7-Dec-2001
