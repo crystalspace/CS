@@ -43,6 +43,10 @@ chronological order.
 	  win32gcc.mak to the new style where built resources are placed in a
 	  target-specific subdirectory of $(OUT) rather than directly polluting
 	  $(OUT).
+	- res changed the data/config/Jamfile to also install .xml files. 
+	  Needed for the GL driver db.
+	- res fixed mk/msvcgen/win32.mak to include generic/regex.c into the VC
+	  projects of csutil.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

@@ -1,4 +1,4 @@
 SubDir TOP data config ;
 
-InstallConfig [ Wildcard *.cfg *.key ] ;
+InstallConfig [ Wildcard *.cfg *.key *.xml ] ;
 
