@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 1
+%define release 2
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -72,18 +72,11 @@ make all
 %install
 DESTDIR=%{buildroot} make install
 
-# disabled relighting for now
-#CRYSTAL=%{buildroot}%{_libdir}/%{name} \
-# CS_DATADIR=%{buildroot}%{_datadir}/%{name} \
-# CS_MAPDIR=%{buildroot}%{_datadir}/%{name}/maps \
-# CS_CONFIGDIR=%{buildroot}%{_sysconfdir}/%{name} \
-# %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
+./cslight -canvas=null2d -video=null flarge
+cp -R data/flarge/cache %{buildroot}%{_datadir}/%{name}/maps/flarge
 
-#CRYSTAL=%{buildroot}%{_libdir}/%{name} \
-# CS_DATADIR=%{buildroot}%{_datadir}/%{name} \
-# CS_MAPDIR=%{buildroot}%{_datadir}/%{name}/maps \
-# CS_CONFIGDIR=%{buildroot}%{_sysconfdir}/%{name} \
-# %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
+./cslight -canvas=null2d -video=null partsys
+cp -R data/partsys/cache %{buildroot}%{_datadir}/%{name}/maps/partsys
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -152,6 +145,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Fri Jul 09 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-2
+- Simplified and re-enabled levels relighting.
+
 * Thu Jul 08 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-1
 - Adaptation for CS PACKAGE_NAME change.
 - Changed Group: to Development/C++
