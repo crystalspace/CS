@@ -107,10 +107,6 @@ csGLVBOBufferManager::~csGLVBOBufferManager ()
 
 bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)
 {
-  iRenderBuffer* master = buffer->GetMasterBuffer();
-  if (master != 0)
-    return ActivateBuffer (master);
-
   csGLVBOBufferSlot *slot = 0;
   RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
   if ((auxData != 0) && (auxData->vboSlot != 0) 
@@ -136,10 +132,6 @@ bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)
 
 bool csGLVBOBufferManager::DeactivateBuffer (iRenderBuffer *buffer)
 {
-  iRenderBuffer* master = buffer->GetMasterBuffer();
-  if (master != 0)
-    return DeactivateBuffer (master);
-
   RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
   if ((auxData != 0) && (auxData->vboSlot != 0)
     && (auxData->vboSlot->renderBuffer == buffer))
@@ -172,19 +164,20 @@ void csGLVBOBufferManager::DeactivateVBO ()
 }
 
 void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer, 
-					csGLRenderBufferLockType type, 
-					GLenum& compGLType)
+					csGLRenderBufferLockType type)
 {
-  ActivateBuffer (buffer);
-  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
+  iRenderBuffer* master = buffer->GetMasterBuffer();
+  iRenderBuffer* useBuffer = master ? master : buffer;
+  ActivateBuffer (useBuffer);
+  RenderBufferAux* auxData = bufferData.GetElementPointer (useBuffer);
   if (auxData == 0) return (void*)-1;
-  compGLType = auxData->compGLType;
   return (void*)(auxData->vbooffset + buffer->GetOffset());
 }
 
 void csGLVBOBufferManager::RenderRelease (iRenderBuffer* buffer)
 {
-  DeactivateBuffer (buffer);
+  iRenderBuffer* master = buffer->GetMasterBuffer();
+  DeactivateBuffer (master ? master : buffer);
 }
 
 void csGLVBOBufferManager::ActivateVBOSlot (csGLVBOBufferSlot *slot)
@@ -280,7 +273,6 @@ void csGLVBOBufferManager::AttachBuffer (csGLVBOBufferSlot *slot,
   auxData.vboSlot = slot;
   auxData.vbooffset = slot->offset;
   const csRenderBufferComponentType componentType = buffer->GetComponentType();
-  auxData.compGLType = compGLtypes[componentType];
   bufferData.PutUnique (buffer, auxData);
 }
 

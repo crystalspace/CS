@@ -2212,8 +2212,9 @@ void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer,
 				  csGLRenderBufferLockType type, 
 				  GLenum& compGLType)
 {
+  compGLType = compGLtypes[buffer->GetComponentType()];
   if (vboManager.IsValid())
-    return vboManager->RenderLock (buffer, type, compGLType);
+    return vboManager->RenderLock (buffer, type);
   else
   {
     void* data;
@@ -2223,7 +2224,6 @@ void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer,
     else
       data = buffer->Lock (CS_BUF_LOCK_READ);
     if (data == (void*)-1) return (void*)-1;
-    compGLType = compGLtypes[buffer->GetComponentType()];
     return ((uint8*)data + buffer->GetOffset());
   }
 }

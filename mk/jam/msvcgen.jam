@@ -953,16 +953,20 @@ rule LinkWith
 {
   local libs = [ ResolveLibs $(>) ] ;
   ExternalLibs $(<) : $($(>).EXTERNALLIBS) ;
-  local w ;
-  for w in $(MSVC.WORKSPACES)
+  if $($(<)_TYPE) != library
   {
-    local l ;
-    for l in $(libs)_MSVCNAME
+    # @@@ Don't let libs depend on other libs. Change for shared libs!
+    local w ;
+    for w in $(MSVC.WORKSPACES)
     {
-      if $($(l))
+      local l ;
+      for l in $(libs)_MSVCNAME
       {
-        ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l))" :
-	  notfile : $($(w)_WKS_RESPDIR) ;
+	if $($(l))
+	{
+	  ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l))" :
+	    notfile : $($(w)_WKS_RESPDIR) ;
+	}
       }
     }
   }

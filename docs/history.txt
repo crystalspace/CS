@@ -12,6 +12,12 @@ chronological order.
 	  DirectX specific code) to facilitate the creation of 3rd party 
 	  plugins (they can use the same base classes etc. as CS does) and
 	  future static linking of external projects.
+	- res made some udword->uintptr_t changes to Opcode again, hopefully
+	  this time with more success.
+	- res changed the VC projects to not let depend libraries on other
+	  libraries (caused odd linking warnings).
+	- res fixed interleaved VBO buffers after the recent change for 
+	  renderer-independency.
 22-Feb-2005
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such

@@ -156,8 +156,7 @@ public:
    */
   void DeactivateVBO ();
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType);
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
   void RenderRelease (iRenderBuffer* buffer);
 
   // Dump stats about buffers to console
@@ -171,7 +170,6 @@ protected:
   {
     size_t vbooffset; //offset from VBO-start
     //"cached" values to speed up usage
-    GLenum compGLType;
     csGLVBOBufferSlot* vboSlot;
   };
   csGLExtensionManager *ext; //extension manager
