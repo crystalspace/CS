@@ -68,7 +68,7 @@ SCF_VERSION (iShaderRenderInterface, 0,0,1);
 struct iShaderRenderInterface : iBase
 {
   /// Get a implementationspecific object
-  virtual csSome GetObject(const char* name) = 0;
+  virtual csSome GetPrivateObject(const char* name) = 0;
 };
 
 SCF_VERSION (iShader, 0,0,1);

@@ -95,7 +95,7 @@ void csGLShader_ARB::Open()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetObject("ext");
+  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
 }
 
 csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)

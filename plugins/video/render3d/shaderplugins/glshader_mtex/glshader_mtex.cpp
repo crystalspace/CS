@@ -102,7 +102,7 @@ void csGLShader_MTEX::Open()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetObject("ext");
+  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
 }
 
 csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)
@@ -382,8 +382,9 @@ bool csShaderGLMTEX::Prepare()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetObject("ext");
-  txtcache = (iGLTextureCache*) sri->GetObject("txtcache");
+  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
+  txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
+
   return true;
 }
 

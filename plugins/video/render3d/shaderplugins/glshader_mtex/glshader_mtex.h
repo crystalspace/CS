@@ -74,7 +74,7 @@ private:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
-  csGLStateCache statecache;
+  csGLStateCache* statecache;
 
   char* programstring;
   

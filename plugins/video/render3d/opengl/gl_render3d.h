@@ -394,7 +394,7 @@ public:
     virtual void Initialize( iObjectRegistry *reg);
 
 
-    virtual csSome GetObject(const char* name);
+    virtual csSome GetPrivateObject(const char* name);
   } scfiShaderRenderInterface;
   friend class eiShaderRenderInterface;
 
