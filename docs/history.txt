@@ -13,6 +13,9 @@ chronological order.
 	  names don't just take the first character and return true.  Instead
 	  it returns false as it should.  Eric also applied a few bug fixes and
 	  improvements to Bjorn's patch.
+	- Jorrit fixed a compile error introduced with the latest patch
+	  from Bjorn. The fix is incorrect (just commented out the line
+	  that doesn't compile) so a real fix is needed.
 29-Dec-2003
 	- Eric Sunshine changed user.mak so the old OpenGL renderer is not
 	  built when USE_NEW_RENDERER is 'yes'.
