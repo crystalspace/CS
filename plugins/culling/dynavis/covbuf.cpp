@@ -746,14 +746,33 @@ static uint32 keep_masks[33] =
 bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
 {
   csBox2Int bbox;
-  bbox.maxx = QRound (rect.MaxX ());
-  if (bbox.maxx < 0) return false;
-  bbox.maxy = QRound (rect.MaxY ());
-  if (bbox.maxy < 0) return false;
-  bbox.minx = QRound (rect.MinX ());
-  if (bbox.minx >= width) return false;
-  bbox.miny = QRound (rect.MinY ());
-  if (bbox.miny >= height) return false;
+  if (rect.MaxX () > 10000.0) bbox.maxx = 10000;
+  else
+  {
+    if (rect.MaxX () <= 0) return false;
+    bbox.maxx = QRound (rect.MaxX ());
+  }
+  if (rect.MaxY () > 10000.0) bbox.maxy = 10000;
+  else
+  {
+    if (rect.MaxY () <= 0) return false;
+    bbox.maxy = QRound (rect.MaxY ());
+  }
+
+  if (rect.MinX () < -10000.0) bbox.minx = -10000;
+  else
+  {
+    if (rect.MinX () > 10000.0) return false;
+    bbox.minx = QRound (rect.MinX ());
+    if (bbox.minx >= width) return false;
+  }
+  if (rect.MinY () < -10000.0) bbox.miny = -10000;
+  else
+  {
+    if (rect.MinY () > 10000.0) return false;
+    bbox.miny = QRound (rect.MinY ());
+    if (bbox.miny >= height) return false;
+  }
 
   int i, x;
   uint32* scr_buf;

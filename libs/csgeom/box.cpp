@@ -733,9 +733,10 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
   min_z = cbox.MinZ ();
   max_z = cbox.MaxZ ();
 
-  if (max_z < 0.0001) return false;
-  if (min_z <= 0)
+  if (max_z < 0.01) return false;
+  if (min_z < 0.01)
   {
+    //@@@ Is there a better solution to this?
     sbox.Set (-10000, -10000, 10000, 10000);
     return true;
   }
