@@ -49,10 +49,10 @@ class Dumper;
 class csOctreeVisible
 {
 private:
-  // The visible node.
-  csOctreeNode* node;
   // The visible polygons.
   csPolygonArray polygons;
+  // The visible node.
+  csOctreeNode* node;
   
 public:
   csOctreeVisible() : polygons(8,16), node(NULL) {}
