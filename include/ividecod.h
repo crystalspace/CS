@@ -129,7 +129,7 @@ struct iStreamFormat : public iPlugIn
   /**
    * Choose a video and audio stream to be played when calling NextFrame.
    */
-  virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo);
+  virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo) = 0;
   /** 
    * Call this in your main loop between BeginDraw and EndDraw. This will decode the next frame
    * from the video and draw it to the rectangle set in SetRect ().
