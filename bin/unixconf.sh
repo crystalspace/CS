@@ -53,6 +53,7 @@ case $MACHINE in
   *sparc*)	PROC="SPARC"   ;;
   *mips*)	PROC="MIPS"    ;;
   *alpha*)	PROC="ALPHA"   ;;
+  *arm*)	PROC="ARM"     ;;
   *)		echo "UNKNOWN MACHINE TYPE: Please fix $0!" >&2
 		exit 1         ;;
 esac
