@@ -517,11 +517,15 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   // Draw columns
   for(i=0; i<ncolumns; ++i)
     {
-      int tw=0, th=0, tx=0, ty=0, mcc;
-      int cw;
+      int tw=0, th=0, tx=0, ty=0, mcc; // text width, height, position, max len.
+      int cw;         // column width
 
       int iw=0, ih=0; // stateful image width and height
       int iws=0;      // stateful image spacer
+
+      int iiw=0, iih=0; // item image width and height
+      int iix=0, iiy=0; // item image x and y
+      int iiws=0;       // item image spacer
 
       iTextureHandle *si=0; // stateful image
 
@@ -543,6 +547,10 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
       // If this has state, get the size of the state image
       if (row->cols[i].has_state)
         tree_chke->GetOriginalDimensions(iw, ih);
+
+      // If this has an image, get the size of the image
+      if (row->cols[i].image)
+        row->cols[i].image->GetOriginalDimensions(iiw, iih);
 
       // Get the size of the text and truncate it
       if (row->cols[i].text)
@@ -579,6 +587,56 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
           iws = iw+2; 
           break;
       } // end switch text alignment
+
+      if (row->cols[i].image)
+      {
+        // Perform alignment of image
+        switch(row->cols[i].img_align)
+        {
+          case alignRight:
+            iix = cw-iiw-2;
+
+            // adjust spacer if needed
+            if (row->cols[i].text && row->cols[i].txt_align==alignRight)
+            {
+              iiws=iws;
+              iws-=iiw+2;
+            }
+            else
+              iiws=-iw+2;
+            
+            break;
+
+          case alignCenter:
+            iix = (cw>>1) -  ((iiw+iw+tw)>>1);
+            tx+=iiw+2;
+            break;
+
+          default:
+            if      (i==0 && depth && row->children)      iix = 2+(tbw*(depth+2));
+            else if (row->children && i==0)               iix = 2+tbw;
+            else if (depth && i==0)                       iix = 2+(tbw*(depth+1));
+            else                                          iix = 2;
+
+            // Adjust spacer
+            if (row->cols[i].text && row->cols[i].txt_align==alignRight)
+            {
+              iiws=iws;
+              iws+=iiw+2;
+            }
+            else 
+              iiws=iw+2;
+
+            break;
+        } // end switch text alignment
+
+        // Draw image
+        g3d->DrawPixmap(row->cols[i].image, 
+                        x+iix+iiws, y+iiy,  
+                        (cw < iiw ? cw : iiw), (ith < iih ? ith : iiw),
+                        0,0, iiw, iih);
+
+      } // end if there's an image
 
       if (row->cols[i].text)
       {
