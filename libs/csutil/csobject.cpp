@@ -100,18 +100,21 @@ SCF_IMPLEMENT_IBASE (csObject)
   SCF_IMPLEMENTS_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
+#include "csutil/debug.h"
+
 csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;
+  DG_ADD (this, "csObject(NONAME)");
 }
 
 csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
 {
   csObject (NULL);
-  
+
   iObjectIterator *it = o.GetIterator ();
   while (!it->IsFinished ())
   {
@@ -125,6 +128,8 @@ csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
 csObject::~csObject ()
 {
   ObjRemoveAll ();
+
+  DG_REM (this);
 
   if (Children) { delete Children; Children = NULL; }
   delete [] Name; Name = NULL;
@@ -141,6 +146,8 @@ csObject::~csObject ()
    */
   if (ParentObject)
   {
+    DG_REMCHILD (ParentObject, this);
+    DG_REMPARENT (this, ParentObject);
     ParentObject->ObjReleaseOld (this);
   }
 }
@@ -149,6 +156,7 @@ void csObject::SetName (const char *iName)
 {
   delete [] Name;
   Name = csStrNew (iName);
+  DG_DESCRIBE1 (this, "csObject(%s)", Name);
 }
 
 const char *csObject::GetName () const
@@ -180,7 +188,9 @@ void csObject::ObjAdd (iObject *obj)
     Children = new csObjectContainer ();
 
   obj->SetObjectParent (this);
+  DG_ADDPARENT (obj, this);
   Children->Push (obj);
+  DG_ADDCHILD (this, obj);
 }
 
 void csObject::ObjRemove (iObject *obj)
@@ -192,6 +202,8 @@ void csObject::ObjRemove (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
+    DG_REMPARENT (obj, this);
+    DG_REMCHILD (this, obj);
     Children->Delete (n);
   }
 }
@@ -228,6 +240,8 @@ void csObject::ObjRemoveAll ()
   {
     iObject* child = Children->Get (i);
     child->SetObjectParent (NULL);
+    DG_REMPARENT (child, this);
+    DG_REMCHILD (this, child);
     Children->Delete (i);
   }
 }
@@ -300,3 +314,4 @@ SCF_IMPLEMENT_IBASE_EXT_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
   SCF_IMPLEMENTS_INTERFACE (iDataObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+

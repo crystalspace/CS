@@ -19,37 +19,15 @@
 #ifndef __CS_UTIL_DEBUG__
 #define __CS_UTIL_DEBUG__
 
-struct iObjectRegistry;
+// Enable the following define to have the DG_... macros.
+//#define CS_USE_GRAPHDEBUG
 
-#define DG_ADD_O(object_reg,obj,desc) \
-  csDebuggingGraph::AddObject(object_reg,(void*)(obj),__FILE__,__LINE__,desc)
-#define DG_DESCRIBE1_O(object_reg,obj,desc) \
-  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc)
-#define DG_DESCRIBE2_O(object_reg,obj,desc,a) \
-  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc,a)
-#define DG_DESCRIBE3_O(object_reg,obj,desc,a,b) \
-  csDebuggingGraph::AttachDescription(object_reg,(void*)(obj),desc,a,b)
-#define DG_REM_O(object_reg,obj) \
-  csDebuggingGraph::RemoveObject(object_reg,(void*)(obj),__FILE__,__LINE__)
-#define DG_ADDCHILD_O(object_reg,parent,child) \
-  csDebuggingGraph::AddChild(object_reg,(void*)(parent),(void*)(child))
-#define DG_ADDPARENT_O(object_reg,child,parent) \
-  csDebuggingGraph::AddParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_REMCHILD_O(object_reg,parent,child) \
-  csDebuggingGraph::RemoveChild(object_reg,(void*)(parent),(void*)(child))
-#define DG_REMPARENT_O(object_reg,child,parent) \
-  csDebuggingGraph::RemoveParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_LINK_O(object_reg,parent,child) \
-  csDebuggingGraph::AddChild(object_reg,(void*)(parent),(void*)(child)); \
-  csDebuggingGraph::AddParent(object_reg,(void*)(child),(void*)(parent))
-#define DG_UNLINK_O(object_reg,parent,child) \
-  csDebuggingGraph::RemoveChild(object_reg,(void*)(parent),(void*)(child)); \
-  csDebuggingGraph::RemoveParent(object_reg,(void*)(child),(void*)(parent))
+struct iObjectRegistry;
 
 // The following versions of the defines are only available in
 // debug mode. In release mode they do nothing. They expect SetupGraph()
 // to be called with a valid object registry.
-#ifdef CS_DEBUG
+#if defined(CS_DEBUG) && defined(CS_USE_GRAPHDEBUG)
 #define DG_ADD(obj,desc) \
   csDebuggingGraph::AddObject(NULL,(void*)(obj),__FILE__,__LINE__,desc)
 #define DG_DESCRIBE0(obj,desc) \

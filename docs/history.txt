@@ -58,6 +58,12 @@ The history order is reversed so that new features are at the top.
 	- Improved output of csDebuggingGraph::Dump() a little.
 	- Relaxed the restriction in RemoveParent() and RemoveChild() that
 	  both objects had to be present in the graph.
+	- Added a new define CS_USE_GRAPHDEBUG which is disabled by default
+	  and which you can enable in include/csutil/debug.h. This define
+	  enables the DG_... macros. Otherwise these macros will do
+	  nothing.
+	- Added some DG_... defines to csObject code in an effort to find
+	  a bug that is pestering CEL.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could
