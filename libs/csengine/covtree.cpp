@@ -969,11 +969,11 @@ again:
 
 void calc_size ()
 {
-printf ("1: %d (%dx%d)\n", sizeof(csCovTreeNode1), csCovTreeNode1::GetHorizontalSize(), csCovTreeNode1::GetVerticalSize());
-printf ("2: %d (%dx%d)\n", sizeof(csCovTreeNode2), csCovTreeNode2::GetHorizontalSize(), csCovTreeNode2::GetVerticalSize());
-printf ("3: %d (%dx%d)\n", sizeof(csCovTreeNode3), csCovTreeNode3::GetHorizontalSize(), csCovTreeNode3::GetVerticalSize());
-printf ("4: %d (%dx%d)\n", sizeof(csCovTreeNode4), csCovTreeNode4::GetHorizontalSize(), csCovTreeNode4::GetVerticalSize());
-printf ("5: %d (%dx%d)\n", sizeof(csCovTreeNode5), csCovTreeNode5::GetHorizontalSize(), csCovTreeNode5::GetVerticalSize());
+printf ("1: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode1), csCovTreeNode1::GetHorizontalSize(), csCovTreeNode1::GetVerticalSize());
+printf ("2: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode2), csCovTreeNode2::GetHorizontalSize(), csCovTreeNode2::GetVerticalSize());
+printf ("3: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode3), csCovTreeNode3::GetHorizontalSize(), csCovTreeNode3::GetVerticalSize());
+printf ("4: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode4), csCovTreeNode4::GetHorizontalSize(), csCovTreeNode4::GetVerticalSize());
+printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode5::GetHorizontalSize(), csCovTreeNode5::GetVerticalSize());
 }
 
 //---------------------------------------------------------------------------

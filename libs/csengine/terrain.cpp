@@ -60,7 +60,7 @@ void csTerrain::classify( csVector3 *p, ddgColor3 *c)
     else
 		c->set(_snow);  // Snow
 	
-	static int cl = 0, b=0,g=0,t=0,r=0,s=0;
+	static int b=0,g=0,t=0,r=0,s=0;
     if (p->y < _beachalt)
 		b++;
     else if (p->y < _grassalt)

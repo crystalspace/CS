@@ -309,8 +309,8 @@ void csCovMaskLUT::BuildTables ()
 		right[(iy+1)*dimhor1+ix] && right[(iy+1)*dimhor1+ix+1];
 	// 's' will be 1 if there are points of this position in
 	// mask that are completely right of L2.
-	int s = right[iy*dimhor1+ix] || right[iy*dimhor1+ix+1] ||
-		right[(iy+1)*dimhor1+ix] || right[(iy+1)*dimhor1+ix+1];
+	//int s = right[iy*dimhor1+ix] || right[iy*dimhor1+ix+1] ||
+		//right[(iy+1)*dimhor1+ix] || right[(iy+1)*dimhor1+ix+1];
 	//int s = (!left[iy*dimhor1+ix]) || (!left[iy*dimhor1+ix+1]) ||
 		//(!left[(iy+1)*dimhor1+ix]) || (!left[(iy+1)*dimhor1+ix+1]);
 	triage_masks[mask_idx].SetState (bit, so, si);
