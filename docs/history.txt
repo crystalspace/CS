@@ -10,6 +10,10 @@ chronological order.
 	- res fixed the OR renderers for the recent DrawSimpleMesh() changes.
 	- res fixed the Fixed FP plugin to reset the multitexturing setup on
 	  deactivation.
+	- res fixed the software shader plugin. They don't really do anything,
+	  but even failed that. Instead of the SW shaders, a multipass 
+	  lighting shader, intended for GL only, was used, causing suboptimal
+	  quality.
 9-Jun-2004
 	- Jorrit fixed a bug in the engine where it would ignore (and not
 	  cache) lighting generated for hierarchical objects. This would
