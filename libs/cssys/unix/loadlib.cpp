@@ -46,7 +46,11 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
     csAddLibraryPath (path);
   }
 
+#ifdef OS_LINUX
+  return csFindLoadLibrary ("", iName, ".so");
+#else
   return csFindLoadLibrary ("lib", iName, ".so");
+#endif
 }
 
 csLibraryHandle csLoadLibrary (const char* iName)
