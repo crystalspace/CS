@@ -7,10 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Feb-2005
-	- Jorrit added a new howto that explains how to compile external
+	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.
 	- Jorrit fixed compilation for a few mesh plugins when leak
 	  guards are enabled.
+	- Eric Sunshine fixed the 'install' target so that it also installs the
+	  *.tok files from the CS/include/csplugincommon subdirectories.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently
