@@ -107,7 +107,7 @@
   Appear in the ARB_shader_objects ext spec.
  */
 typedef char GLcharARB;
-typedef uint32 GLhandleARB;
+typedef unsigned int GLhandleARB;
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"

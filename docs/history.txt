@@ -33,6 +33,8 @@ chronological order.
 	- Eric Sunshine fixed bug in LFlags rule (flags.jam) where it neglected
 	  to apply linker flags set on plugin modules to "static" variants,
 	  such as walktest_static, thus resulting in link failure.
+	- Eric Sunshine fixed conflict between typedef of GLhandleARB in
+	  canvas/openglcommon/glextmanager.h and /usr/include/GL/glext.h.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.
