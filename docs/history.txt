@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+13-Sep-2000
+	- Wyatt Miler added perfstat plugin to the shared lib project file.
+	  Updated cspython, however, it still doesn't link.
+	- Martin Geisse updated the msvc project files.
 11-Sep-2000
 	- Eric Sunshine made the following changes to worlfmt.txi, the Crystal
 	  Space World File Format description documentation:
@@ -94,6 +98,9 @@ The history order has been reversed so that new features are at the top.
 	  using can not deal with it, then that represents a bug in the
 	  compiler.  Note, also, that this type of string concatentation is
 	  used at many other places within the project.
+9-Sep-2000
+	- Added support for thing and polygon templates in the levtool
+	  world saver.
 8-Sep-2000
 	- Eric Sunshine renamed several classes from the NetSpace suite which
 	  only differed from other classes in the case of the name.  This was
