@@ -511,24 +511,17 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetVertexCount (int n);
   int GetVertexCount () const { return num_mesh_vertices; }
-#ifndef CS_USE_NEW_RENDERER
   csVector3* GetVertices () { SetupFactory (); return mesh_vertices; }
   csVector2* GetTexels () { SetupFactory (); return mesh_texels; }
   csVector3* GetNormals () { SetupFactory (); return mesh_normals; }
   csColor* GetColors () { SetupFactory (); return mesh_colors; }
-#else
-  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; return mesh_vertices; }
-  csVector2* GetTexels () { mesh_texels_dirty_flag = true; return mesh_texels; }
-  csVector3* GetNormals () { mesh_normals_dirty_flag = true; return mesh_normals; }
-  csColor* GetColors () { mesh_colors_dirty_flag = true; return mesh_colors; }
-#endif
   void SetTriangleCount (int n);
 #ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () const { return top_mesh.num_triangles; }
   csTriangle* GetTriangles () { SetupFactory (); return top_mesh.triangles; }
 #else
   int GetTriangleCount () const { return num_mesh_triangles; }
-  csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
+  csTriangle* GetTriangles () { SetupFactory (); return mesh_triangles; }
 #endif
   void Invalidate ();
   void CalculateNormals ();
