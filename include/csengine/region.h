@@ -47,6 +47,12 @@ public:
   virtual ~csRegion ();
 
   /**
+   * Add an object to this region.
+   */
+  virtual void Add(iObject *obj)
+  { ObjAdd (obj); }
+
+  /**
    * Check if some object is in this region.
    * The speed of this function is independent of the number of
    * objects in this region (i.e. very fast).
@@ -85,6 +91,9 @@ public:
 
     /// Query the iObject.
     virtual iObject *QueryObject();
+
+    virtual void Add(iObject *obj)
+    { scfParent->Add(obj); }
 
     /**
      * Clear this region without removing the entities in it. The entities

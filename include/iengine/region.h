@@ -51,6 +51,11 @@ struct iRegion : public iBase
   virtual iObject *QueryObject() = 0;
 
   /**
+   * Add an object to this region.
+   */
+  virtual void Add(iObject *obj) = 0;
+
+  /**
    * Clear this region without removing the entities in it. The entities
    * will simply get unconnected from this region.
    */
