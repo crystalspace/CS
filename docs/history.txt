@@ -31,6 +31,10 @@ chronological order.
 	  PerformExtension(), PutText(), are still exported.
 	- Eric Sunshine fixed bug in macosx.jam where it was emitting a
 	  slightly bogus PkgInfo file to the generated Cocoa .app wrapper.
+	- Eric Sunshine fixed bug in the ObjTagMetaData rule (unix.jam) where
+	  it was placing plugin meta-data in a section named ".crystal",
+	  despite the fact that csGetPluginMetadata() (bfdplugins.cpp) expects
+	  the section to be named ".crystalspace" (at least as of 8 July 2004).
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's

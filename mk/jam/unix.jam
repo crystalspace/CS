@@ -77,7 +77,7 @@ rule ObjTagMetaData
 }
 actions ObjTagMetaData
 {
-  $(CMD.OBJCOPY) --add-section .crystal=$(>) $(<)
+  $(CMD.OBJCOPY) --add-section .crystalspace=$(>) $(<)
 }
 
 # SystemLinkPlugin target : objects : options
