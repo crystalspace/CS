@@ -37,6 +37,7 @@
 
 #include "awscmpt.h"
 #include "awscscr.h"
+#include "awslayot.h"
 
 #include <stdio.h>
 
@@ -654,7 +655,11 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
 
         // Prepare the component, and add it into it's parent
         comp->Setup(wmgr, comp_node);
-        parent->AddChild(comp);
+        parent->AddChild(comp, (parent->Layout()!=NULL));
+
+	// Set it up in the parent's layout manager, if there is one.
+	if (parent->Layout())
+	  parent->Layout()->AddComponent(wmgr->GetPrefMgr(), settings, comp);
 
         // Process all subcomponents of this component.
         CreateChildrenFromDef(wmgr, win, comp, comp_node);

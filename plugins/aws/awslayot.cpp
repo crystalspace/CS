@@ -119,29 +119,47 @@ awsGridBagLayout::GridBagLayoutInfo::Set(awsGridBagLayout::GridBagLayoutInfo &l2
 }
 
 
-awsGridBagLayout::awsGridBagLayout(iAwsPrefManager *pm, awsComponentNode *settings):
+awsGridBagLayout::awsGridBagLayout(iAwsComponent *o):
+        awsLayoutManager(o),
 	layoutInfo(NULL),
 	columnWidths(NULL), columnWidthsLength(0), 
 	rowHeights(NULL), rowHeightsLength(0), 
 	columnWeights(NULL), columnWeightsLength(0), 
 	rowWeights(NULL), rowWeightsLength(0)
 	
-{	
-	//->GetInt(settings, "GridBagRows", &nRows);
-	//->GetInt(settings, "GridBagCols", &nCols);
-
-	
-	//pm->GetString(settings, "GridBagRowWeights", &rowsdef);
-	//pm->GetString(settings, "GridBagColWeights", &colsdef);
-			
-	//csScanStr(rowsdef, "%F", &gridRows, &nRows);
-	//csScanStr(colsdef, "%F", &gridCols, &nCols);
+{		
 }
-	
+
+void 
+awsGridBagLayout::LayoutComponents()
+{
+  ArrangeGrid(owner);
+}	
 
 csRect 
 awsGridBagLayout::AddComponent(iAwsPrefManager *pm, awsComponentNode *settings, iAwsComponent *cmp)
 {
+	awsGridBagConstraints c;
+
+	int wx=0, wy=0;
+
+	pm->GetInt(settings,"GridX",  c.gridx);
+	pm->GetInt(settings,"GridY",  c.gridy);
+	pm->GetInt(settings,"GridWidth",  c.gridwidth);
+	pm->GetInt(settings,"GridHeight", c.gridheight);
+	pm->GetInt(settings,"Fill",   c.fill);
+	pm->GetInt(settings,"Anchor", c.anchor);
+	pm->GetInt(settings,"iPadX",  c.ipadx);
+	pm->GetInt(settings,"iPadY",  c.ipady);
+	pm->GetInt(settings,"WeightX",  wx);
+	pm->GetInt(settings,"WeightY",  wy);
+	pm->GetRect(settings,"Insets",  c.insets);
+
+	c.weightx = wx/100.0;
+	c.weighty = wy/100.0;
+
+	setConstraints(cmp, c);
+
 	return csRect(0,0,0,0);
 }
 
@@ -519,7 +537,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
       else if (constraints->gridwidth == 0 && curCol < 0)
         curRow = curY + curHeight;
 
-      /* Assign the new values to the gridbag slave */
+      /* Assign the new values to the gridbag child */
       constraints->tempX = curX;
       constraints->tempY = curY;
       constraints->tempWidth = curWidth;
@@ -561,7 +579,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
 	  px = constraints->tempX + constraints->tempWidth; /* right column */
 
 	  /*
-	   * Figure out if we should use this slave\'s weight.  If the weight
+	   * Figure out if we should use this child\'s weight.  If the weight
 	   * is less than the total weight spanned by the width of the cell,
 	   * then discard the weight.  Otherwise split the difference
 	   * according to the existing weights.
@@ -587,7 +605,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
 
 	  /*
 	   * Calculate the minWidth array values.
-	   * First, figure out how wide the current slave needs to be.
+	   * First, figure out how wide the current child needs to be.
 	   * Then, see if it will fit within the current minWidth values.
 	   * If it will not fit, add the difference according to the
 	   * weightX array.
@@ -622,7 +640,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
 	  py = constraints->tempY + constraints->tempHeight; /* bottom row */
 
 	  /*
-	   * Figure out if we should use this slave\'s weight.  If the weight
+	   * Figure out if we should use this child\'s weight.  If the weight
 	   * is less than the total weight spanned by the height of the cell,
 	   * then discard the weight.  Otherwise split it the difference
 	   * according to the existing weights.
@@ -648,7 +666,7 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
 
 	  /*
 	   * Calculate the minHeight array values.
-	   * First, figure out how tall the current slave needs to be.
+	   * First, figure out how tall the current child needs to be.
 	   * Then, see if it will fit within the current minHeight values.
 	   * If it will not fit, add the difference according to the
 	   * weightY array.
@@ -793,7 +811,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     }
 
     /*
-     * Pass #1: scan all the slaves to figure out the total amount
+     * Pass #1: scan all the children to figure out the total amount
      * of space needed.
      */
 
@@ -889,26 +907,30 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
       r.SetSize(0,0);
       for(i = constraints->tempX;
 	  i < (constraints->tempX + constraints->tempWidth);
-	  i++) {
+	  i++)
+	    {
 	r.xmax += info.minWidth[i];
       }
       
       for(i = constraints->tempY;
 	  i < (constraints->tempY + constraints->tempHeight);
-	  i++) {
+	  i++)
+	  {
 	r.ymax += info.minHeight[i];
       }
 
       AdjustForGravity(constraints, r);
 
       /*
-       * If the window is too small to be interesting then
-       * unmap it.  Otherwise configure it and then make sure
-       * it's mapped.
+       * When is a window ever too small to be interesting in AWS?
+       * Not sure, but we don't have an unmap paradigm, so we just make
+       * it really, really small.  I need to add a pseudo flag which means
+       * that the component is too small to be seen but not actually hidden.
        */
 
-      if ((r.Width() <= 0) || (r.Height() <= 0)) {
-	cmp->Frame().Set(csRect(0,0,0,0));
+      if ((r.Width() <= 0) || (r.Height() <= 0)) 
+      {
+	cmp->Frame().MakeEmpty();
       }
       else 
       {

@@ -13,7 +13,7 @@
 class awsGridBagLayout : public awsLayoutManager
 {
 public:
-	/**
+   /**
      * The maximum number of grid positions (both horizontally and
      * vertically) that can be laid out by the grid bag layout.
      */
@@ -22,12 +22,12 @@ public:
     /**
      * The smallest grid that can be laid out by the grid bag layout.
      */
-	static const int MINSIZE ;
+    static const int MINSIZE ;
 
-	/** 
-	 * Preferred size of grid.
-	 */
-	static const int PREFERREDSIZE;
+   /** 
+     * Preferred size of grid.
+     */
+    static const int PREFERREDSIZE;
 
 private:
 	struct GridBagLayoutInfo
@@ -154,17 +154,20 @@ public:
 	/** Constructs a gridbag layout.  Note that columns and rows have a fixed
 	 * percentage size that does not change.
 	 */
-	awsGridBagLayout(iAwsPrefManager *pm, awsComponentNode *settings);
+	awsGridBagLayout(iAwsComponent *o);
 
 
 	/** Adds a component into this GridBagLayout */
 	virtual csRect AddComponent(iAwsPrefManager *pm, awsComponentNode *settings, iAwsComponent *cmp);
 
+	/** Lays out components properly */
+        virtual void LayoutComponents();
+
 	/**
-     * Sets the constraints for the specified component in this layout.
-     * @param       comp the component to be modified.
-     * @param       constraints the constraints to be applied.
-     */
+          * Sets the constraints for the specified component in this layout.
+          * @param       comp the component to be modified.
+	  * @param       constraints the constraints to be applied.
+	  */
 	void setConstraints(iAwsComponent *cmp, awsGridBagConstraints &constraints);
 
 	/**

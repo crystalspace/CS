@@ -3,6 +3,7 @@
 #include "awscomp.h"
 #include "awsslot.h"
 #include "awsfparm.h"
+#include "awslayot.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 #include "iaws/awsdefs.h"
@@ -90,6 +91,10 @@ iAwsComponent *
 awsComponent::Parent()
 { return parent; }
 
+awsLayoutManager *
+awsComponent::Layout()
+{ return layout; }
+
 void
 awsComponent::SetWindow(iAwsWindow *_win)
 { win = _win; }
@@ -97,6 +102,12 @@ awsComponent::SetWindow(iAwsWindow *_win)
 void
 awsComponent::SetParent(iAwsComponent *_parent)
 { parent = _parent; }
+
+void
+awsComponent::SetLayout(awsLayoutManager *l)
+{
+  layout=l;
+}
 
 iAwsComponent *
 awsComponent::GetComponent()
@@ -285,24 +296,21 @@ awsComponent::getMinimumSize()
 }
 
 void
-awsComponent::AddChild(iAwsComponent *child, bool owner)
+awsComponent::AddChild(iAwsComponent *child, bool has_layout)
 {
-  (void)owner;
-  /* @@@: we cannot incref for non-owned only if we generally decrefing upon destruction
-          We either incref them all or we store an additional mark for owned children
-   // Only grab a reference if we are not the owner.
-   if (owner==false)
-     child->IncRef();
-  */
+  
    // Create a new child list if the current one does not exist.
    if (children==NULL)
      children = new csBasicVector();
 
    children->Push(child);
-
-   // Modify the child's rectangle to be inside and relative to the parent's rectangle.
-   child->Frame().Move(Frame().xmin, Frame().ymin);
-
+  
+   if (!has_layout)
+   {
+    // Modify the child's rectangle to be inside and relative to the parent's rectangle.
+    child->Frame().Move(Frame().xmin, Frame().ymin);
+   }
+      
    // Fire off the event so that the child can do something if it needs to.
    child->OnAdded();
 }
@@ -377,6 +385,13 @@ awsComponent::MoveChildren(int delta_x, int delta_y)
     child->Frame().Move(delta_x, delta_y);
   }
 
+}
+
+void 
+awsComponent::ResizeChildren()
+{
+  if (Layout())
+    Layout()->LayoutComponents();
 }
 
 bool

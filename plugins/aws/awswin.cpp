@@ -1194,3 +1194,11 @@ awsWindow::getMinimumSize()
 {
   return comp.Frame();
 }
+
+awsLayoutManager *
+awsWindow::Layout()
+{ return comp.Layout(); }
+
+void
+awsWindow::SetLayout(awsLayoutManager *l)
+{ comp.SetLayout(l); }

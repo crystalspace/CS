@@ -59,6 +59,9 @@ class awsComponent : public iAwsComponent
    /// The stored handle to the parent
    iAwsComponent *parent;
 
+   /// The layout manager for this component (if one exists)
+   awsLayoutManager *layout;
+
    /// The rectangle marking the frame of this component
    csRect frame;
 
@@ -154,14 +157,20 @@ public:
     /// Recursively moves children (and all nested children) by relative amount given.
     virtual void MoveChildren(int delta_x, int delta_y);
 
+    /** 
+      *  Recursively resizes all children.  That is, it informs them that there has been
+      * a resize event and that they need to do something if there is anything to be done.
+      * This is where layouts or any other sort of stickiness take hold.
+      */
+    virtual void ResizeChildren();
+
 public:
     /** Adds a child into this component.  It's frame should be respective this component, not absolute.
      * This component can grab a reference to the child and dispose of it when it destructs, unless you
-     * call RemoveChild() beforehand.  If you set owner to false, this component will call IncRef, otherwise
-     * it will assume control of the child and not IncRef.  The difference is that, if owner is false the
-     * child component will NOT be destroyed on destruction of this component, or on call of RemoveChild().
+     * call RemoveChild() beforehand.  If has_layout is true then the child will not be 
+     * reframed during adding.
      */
-    virtual void AddChild(iAwsComponent* child, bool owner=true);
+    virtual void AddChild(iAwsComponent* child, bool has_layout=false);
 
     /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
      *  was true when you called AddChild().
@@ -188,11 +197,17 @@ public:
     /// Get's the parent component of this component;
     virtual iAwsComponent *Parent();
 
+    /// Sets the layout manager for this component.
+    virtual awsLayoutManager *Layout();
+    
     /// Sets the window that this component resides in.
     virtual void SetWindow(iAwsWindow *win);
 
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent);
+
+    /// Sets the layout manager for this component.
+    virtual void SetLayout(awsLayoutManager *layout);
 
     /// Gets the preferred size of the component
     virtual csRect getPreferredSize();

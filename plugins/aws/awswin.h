@@ -191,6 +191,12 @@ private:
     /// Gets the minimum size that the component can be
     virtual csRect getMinimumSize();
 
+    /// Gets the layout manager for this window.
+    awsLayoutManager * Layout();
+
+    /// Sets the layout manager for this window
+    void SetLayout(awsLayoutManager *l);
+
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;
