@@ -484,6 +484,12 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
 {
   object_bbox_valid = true;
+  if (num_mesh_vertices == 0)
+  {
+    object_bbox.StartBoundingBox ();
+    radius.Set (0, 0, 0);
+    return;
+  }
   object_bbox.StartBoundingBox (mesh_vertices[0]);
   csVector3 max_sq_radius (0);
   int i;

@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+10-Nov-2002
+	- Fixed genmesh so it no longer crashes when there are no vertices.
 8-Nov-2002
 	- Dynavis and Frustvis now make sure that their update callbacks
 	  (for when the object or movable changes) are protected against
