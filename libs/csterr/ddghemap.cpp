@@ -125,8 +125,8 @@ bool ddgHeightMap::writeTGN(const char *filename)
 	}
 
 	unsigned int scale, base;
-	scale = _scale * 65536;
-	base = _base;
+	scale = (unsigned int)(_scale * 65536);
+	base = (unsigned int)_base;
 	ch1 = scale % 256;
 	ch2 = (scale - ch1) / 256;
 	fputc(ch1,fptr);
@@ -434,16 +434,16 @@ void ddgHeightMap::setmax( int m)
 
 void ddgHeightMap::closeEdge(float l)
 {
-	l = iconvert(l);
+	short _l = (short)iconvert(l);
 	for (unsigned r = 0; r < _rows; r++)
 	{
-		set(r,0,l);
-		set(r,_cols-1,l);
+		set(r,0,_l);
+		set(r,_cols-1,_l);
 	}
 	for (unsigned c = 0; c < _cols; c++ )
 	{
-		set(0,c,l);
-		set(_rows-1,c,l);
+		set(0,c,_l);
+		set(_rows-1,c,_l);
 	}
 }
 

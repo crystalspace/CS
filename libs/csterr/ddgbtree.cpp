@@ -413,7 +413,7 @@ csVector3* ddgTBinTree::pos(ddgTriIndex tindex)
 	}
 	ptri = _mesh->vcache()->get( tri(tindex)->_cbufindex );
 	// Transform the vertex if we need to.
-	if (tri(tindex)->_state.flags.coord != true)
+	if (!tri(tindex)->_state.flags.coord)
 	{
 		static csVector3 wpqr;
 		vertex(tindex,&wpqr);
@@ -446,7 +446,6 @@ void ddgTBinTree::visibility(ddgTriIndex tvc)
 		// We dont know so analyze ourselves.
 		else
 		{
-			csVector3 wpqr;
 			// Calculate bounding box of wedgie.
 			csVector3 pmin;
 			csVector3 pmax;
@@ -664,7 +663,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 skip:
 	_mesh->priCountIncr();
 	// This puts in invalid values unless parents priority is always updated.
-	unsigned short tpriority = result;
+	unsigned short tpriority = (unsigned short)result;
 
 	if (tvc > 1 && tpriority > 1)
 	{
@@ -688,8 +687,8 @@ skip:
 	int v = 1;
 	if (_mesh->progdist() != 0)
 	{
-		v = zMin / _mesh->progdist();
-		v = ddgUtil::clamp(v,1,15);
+		v = int(zMin / _mesh->progdist());
+		v = int(ddgUtil::clamp(v,1,15));
 	}
 	tri(tvc)->setPriorityDelay(v);
 
@@ -699,18 +698,18 @@ skip:
 // Get height of bintree at a real location.
 float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz)
 {
-	// Is this triangle mirrored.
-    float m = (dx+dz > 1.0) ? 1.0 : 0.0;
+    // Is this triangle mirrored.
+    csVector3 v(dx,0,dz);
+/*
+    unsigned int m = (dx+dz > 1.0) ? 1 : 0;
     float h1 = height(r+ m,  c + m);
     float h2 = height(r,  c+1);
     float h3 = height(r+1,c);
-	csVector3 p0(m,h1,m),
-			   p1(0,h2,1),
-			   p2(1,h3,0),
-			   v(dx,0,dz);
-/*
-	ddgPlane p(p0,p1,p2);
-	p.projectAlongY(&v);
+    csVector3 p0(m,h1,m),
+    csVector3 p1(0,h2,1),
+    csVector3 p2(1,h3,0),
+    ddgPlane p(p0,p1,p2);
+    p.projectAlongY(&v);
 */
     return v.y;
 }
