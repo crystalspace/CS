@@ -31,6 +31,9 @@ struct iClothFactoryState;
 //#define      EULER_PROVOT
 #define      AMPC_PROVOT  
 	
+#define      STATIC_CONSTRAINT
+//#define      DYNAMIC_CONSTRAINT
+
 class Constraint
 {
 	public:
@@ -38,6 +41,9 @@ uint v0;
 uint v1;	
 float L0;
 	
+Constraint()
+{
+};
 Constraint(uint i0, uint i1) 
 {
 	v0=i0; v1=i1;	
@@ -76,6 +82,10 @@ int**            Edge2TriangleRef;  //which triangles share this edge?
 int**            Triangle2EdgeRef;  //which edges bound this triangle?
 //uint**            Vertex2EdgeRef;    //which edges share this vertex?
 
+#if defined(STATIC_CONSTRAINT)
+Constraint*      Fields;
+Constraint*      ShearFields;
+#endif
 
 Cloth ( iClothFactoryState*  mesh,
          csVector3&    Sh,
@@ -86,6 +96,7 @@ Cloth ( iClothFactoryState*  mesh,
 bool AddConstraint( int v0, int v1 , Constraint** edge , int* pos );
 bool AddShearConstraint( int v0, int v1 , Constraint** edge , int* pos );
 
+void ReallocFields(Constraint** Struct_F, int* StrSize, Constraint** Shear_F , int* ShrSize );
 };
 
 //**//**//**//**//**//**//**//**//**//**//**//**//**//**//
@@ -99,8 +110,15 @@ class Integrator
 	csVector3*     vertices;
 	csBitArray*    ConstrainedVertices;
 	uint           nverts;
+#if defined (DYNAMIC_CONSTRAINT)	
 	csBasicVector* fields;
 	csBasicVector* shear_fields;
+#elif defined (STATIC_CONSTRAINT)
+	Constraint*    fields;
+	Constraint*    shear_fields;
+	int            field_size;
+	int            shearfield_size;
+#endif
 	float          structural_k;
 	float          shear_k;
 	float          density;
@@ -130,15 +148,19 @@ class Integrator
 		cloth_object = obj;
 		vertices     = obj->vertices;
 		nverts       = obj->nverts;
+#if  defined(DYNAMIC_CONSTRAINT)		
 		fields       = obj->Edges;
 		shear_fields = obj->Shear_Neighbours;
+#elif defined(STATIC_CONSTRAINT)
+		obj -> ReallocFields( &fields, &field_size ,&shear_fields , &shearfield_size );
+#endif		
 		gravity      = obj->gravity;
-		structural_k        = 10.0;
-		shear_k             = 10.0;
+		structural_k        = 7.0;
+		shear_k             = 7.0;
 		density             = 1.0;
-		friction            = 0.9;
-		structural_rigidity = 0.8;
-		shear_rigidity      = 0.9;
+		friction            = 0.8;
+		structural_rigidity = 0.97;
+		shear_rigidity      = 0.8;
 		dt           = 0.05;
 		time         = 0.0;
 		int  i;
@@ -206,6 +228,7 @@ class Integrator
 	  {
 #if defined(AMPC_PROVOT)
 	ComputeFields();
+	ComputeShearFields();	  
         int i;     
 		  cloth_object->object_bbox->StartBoundingBox ( *(cloth_object->shift) +vertices[0] );
    for (i=0;i<nverts;i++)
@@ -228,6 +251,7 @@ class Integrator
 		Constraint* p;
 		csVector3   temp;
 		float       N;
+#if  defined(DYNAMIC_CONSTRAINT)		
 		int size    = fields->Length();  
 		for (int i=0; i < size ; i++ )
 			{
@@ -240,6 +264,19 @@ class Integrator
 				forces[ p->v0 ] += temp;
 				forces[ p->v1 ] -= temp;
 			};
+#elif defined(STATIC_CONSTRAINT)
+		for (int i=0; i < field_size ; i++ )
+		    {
+				p       = &fields[ i ];
+				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+				N       = temp.Norm();
+				
+				N       = structural_k*( ( N - p->L0 ) / N );
+				temp   *= N;
+				forces[ p->v0 ] += temp;
+				forces[ p->v1 ] -= temp;
+			};
+#endif			
 	}; 
 	
 	inline void ComputeShearFields()
@@ -248,6 +285,7 @@ class Integrator
 		Constraint* p;
 		csVector3   temp;
 		float       N;
+#if  defined(DYNAMIC_CONSTRAINT)		
 		int size    = shear_fields->Length();  
 		for (int i=0; i < size ; i++ )
 			{
@@ -260,6 +298,19 @@ class Integrator
 				forces[ p->v0 ] += temp;
 				forces[ p->v1 ] -= temp;
 			};
+#elif defined(STATIC_CONSTRAINT)
+		for (int i=0; i < shearfield_size ; i++)
+		    {
+				p       = &shear_fields[ i ];
+				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+				N       = temp.Norm();
+				
+				N       = shear_k*( ( N - p->L0 ) / N );
+				temp   *= N;
+				forces[ p->v0 ] += temp;
+				forces[ p->v1 ] -= temp;
+			};
+#endif			
 	}; 
 	
 	inline void ApplyProvotConstraint()
@@ -268,10 +319,18 @@ class Integrator
 	Constraint* p;
 	csVector3   temp;
 	float       N;
+#if   defined(DYNAMIC_CONSTRAINT)		
 	int size    = fields->Length();  
 	for (int i=0; i < size ; i++ )
+#elif defined(STATIC_CONSTRAINT)
+	for (int i=0; i < field_size ; i++ )
+#endif		
 		{
+#if   defined(DYNAMIC_CONSTRAINT)			
 			p       = (Constraint*) fields -> Get( i ); 
+#elif defined(STATIC_CONSTRAINT)
+			p       = &fields[ i ];
+#endif			
 			if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
 				{
 					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
@@ -314,17 +373,25 @@ class Integrator
 	Constraint* p;
 	csVector3   temp;
 	float       N;
+#if   defined(DYNAMIC_CONSTRAINT)		
 	int size    = shear_fields->Length();  
 	for (int i=0; i < size ; i++ )
+#elif defined(STATIC_CONSTRAINT)
+	for (int i=0; i < shearfield_size ; i++ )
+#endif		
 		{
+#if   defined(DYNAMIC_CONSTRAINT)			
 			p       = (Constraint*) shear_fields -> Get( i ); 
+#elif defined(STATIC_CONSTRAINT)
+			p       = &shear_fields[ i ];
+#endif			
 			if (!( ConstrainedVertices->IsBitSet(p->v0) || ConstrainedVertices->IsBitSet(p->v1) ))
 				{
 					temp    = (vertices [ p->v1 ] - vertices [ p->v0 ]);
 					N       = temp.Norm();
 					if (shear_rigidity*N>p->L0)
 					{
-						temp *= 1.1*( shear_rigidity - p->L0/N ); 
+						temp *= 0.5*( shear_rigidity - p->L0/N ); 
 					    vertices[ p->v0 ] += temp;
 						vertices[ p->v1 ] -= temp;
 					};

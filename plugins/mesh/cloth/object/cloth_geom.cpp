@@ -162,16 +162,24 @@ Cloth::Cloth( iClothFactoryState* mesh,
 		//printf( " CREATING the cloth3 3/4... \n");
 		
 		isNew = AddConstraint( tris[i].a , tris[i].b , &current , &Triangle2EdgeRef[ i ][ 0 ] );
-		if (isNew) 	{ current -> L0 =( verts[ tris[i].a ] - verts[ tris[i].b ] ).Norm();  nedges++; };
+		if (isNew)
+			{ current -> L0 =( verts[ tris[i].a ] - verts[ tris[i].b ] ).Norm(); 
+				nedges++; };
 		//Triangle2EdgeRef[ i ][ 0 ] = current;
 				
+				
 		isNew = AddConstraint( tris[i].b , tris[i].c , &current , &Triangle2EdgeRef[ i ][ 1 ] );
-		if (isNew) { current -> L0 = ( verts[ tris[i].b ] - verts[ tris[i].c ] ).Norm(); nedges++; };
+		if (isNew)
+			{   current -> L0 = ( verts[ tris[i].b ] - verts[ tris[i].c ] ).Norm(); 
+				nedges++; };
 		//Triangle2EdgeRef[ i ][ 1 ] = current;	
-		
+			
 		isNew = AddConstraint( tris[i].c , tris[i].a , &current , &Triangle2EdgeRef[ i ][ 2 ] );
-		if (isNew) { current -> L0 = ( verts[ tris[i].c ] - verts[ tris[i].a ] ).Norm(); nedges++; };	
+		if (isNew)
+			{ current -> L0 = ( verts[ tris[i].c ] - verts[ tris[i].a ] ).Norm(); 
+				nedges++; };	
 		//Triangle2EdgeRef[ i ][ 2 ] = current;	
+				
 	};
 	uint j = Edges->Length();
 	uint k;
@@ -217,7 +225,7 @@ Cloth::Cloth( iClothFactoryState* mesh,
 			//look for
 			//s0 = current->v0;                
 			//s1 = current->v1;
-				printf( " CREATING the cloth3... \n");
+			//	printf( " CREATING the cloth3... \n");
 	
 			//the factor 2* comes from the fact that triangles are stored double-sided 
 			tri[0] = triangles [ 2*Edge2TriangleRef[ i ][ 0 ] ].a;
@@ -225,11 +233,9 @@ Cloth::Cloth( iClothFactoryState* mesh,
 			tri[2] = triangles [ 2*Edge2TriangleRef[ i ][ 0 ] ].c;
 				
 			tri[3] = triangles [ 2*Edge2TriangleRef[ i ][ 1 ] ].a;
-			
 			tri[4] = triangles [ 2*Edge2TriangleRef[ i ][ 1 ] ].b;
 			tri[5] = triangles [ 2*Edge2TriangleRef[ i ][ 1 ] ].c;
-		printf(" L:%u  E2T %u T:%u,%u,%u : %u,%u,%u \n",j,Edge2TriangleRef[i][1],
-			  tri[0],tri[1],tri[2] , tri[3],tri[4],tri[5] ); 
+		//printf(" L:%u  E2T %u T:%u,%u,%u : %u,%u,%u \n",j,Edge2TriangleRef[i][1], tri[0],tri[1],tri[2] , tri[3],tri[4],tri[5] ); 
 			delete[] Edge2TriangleRef[ i ];
 			shared.Clear();
 			
@@ -256,7 +262,7 @@ Cloth::Cloth( iClothFactoryState* mesh,
 			{ s1 = tri[4]; }
 			else { s1 = tri[5]; };
 			
-			printf(" vertex %u and %u are the winners! " , s0 , s1);
+			//printf(" vertex %u and %u are the winners! " , s0 , s1);
 			isNew = AddShearConstraint( s0 , s1 , &current , &m );
 			if (isNew)
 				{ current -> L0 =( verts[ s0 ] - verts[ s1 ] ).Norm();  };
@@ -304,14 +310,49 @@ Cloth::~Cloth()
 	//if (vertices)        { delete[] vertices; };
 	if (triangles)       { delete[] triangles; };
 	Constraint* p;
-	//p=(Constraint*)Edges->GetFirstItem();
 	p=(Constraint*)Edges->Pop();
 	do
 	{
-		//Edges->RemoveItem( (void*) p );
 		delete p;
 		p=(Constraint*)Edges->Pop();
 	} while (p!=NULL);
 	delete Edges;
 };
 
+void Cloth::ReallocFields( Constraint** Struct_F , int* size0, Constraint** Shear_F , int* size1)
+{
+	//we should keep a local copy of these pointers 
+	// (Struct_F and Shear_F are intended to be from Integrator)
+	*size0    = Edges->Length();
+	Constraint* NewFields = new Constraint [ *size0 ];
+	int count = 0;
+	Constraint* p;
+	p=(Constraint*)Edges->Pop();
+	do
+	{
+		NewFields[ count ].v0 = p->v0;
+		NewFields[ count ].v1 = p->v1;
+		NewFields[ count ].L0 = p->L0;
+		delete p;
+		count++;
+		p=(Constraint*)Edges->Pop();
+	} while (count<*size0);
+	delete Edges;
+	*Struct_F = NewFields; 
+	*size1    = Shear_Neighbours->Length();
+	NewFields = new Constraint [ *size1 ];
+	count     = 0;
+	
+	p=(Constraint*)Shear_Neighbours->Pop();
+	do
+	{
+		NewFields[ count ].v0 = p->v0;
+		NewFields[ count ].v1 = p->v1;
+		NewFields[ count ].L0 = p->L0;
+		delete p;
+		count++;
+		p=(Constraint*)Shear_Neighbours->Pop();
+	} while (count<*size1);
+	delete Shear_Neighbours;
+	*Shear_F = NewFields; 
+};
