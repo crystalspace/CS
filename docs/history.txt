@@ -31,6 +31,13 @@ Short-term cleanups that need to be done:
 	- Thomas also fixed software renderer so that DrawPolygonFX
 	  supports all blending modes.
 	- Some changes to Glide StartPolygonFX from Norman Kramer.
+	- Made keys in Blocks configurable through blocks.cfg.
+	  However, there is still no GUI to change them.
+	  Also changed the default keys (qweasd to rotate shape,
+	  cursor keys to move shape, del/home/end/pgdn/ins/pgup to
+	  manipulate camera, space to drop shape, p to pause, esc
+	  to return to menu).
+	- Started work on GUI to change keys. Not functional yet.
 9-Feb-2000
 	- Andrew Zabolotny did some changes:
 	    - Renamed DEBUG to CS_DEBUG. On various systems many

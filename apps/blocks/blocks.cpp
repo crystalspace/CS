@@ -24,6 +24,10 @@
     Add highscore list.
     Add 'nightmare' level.
     'pause' should temporarily remove visible blocks (or fog area).
+    Solve rotation problem by defining main axis or something.
+      Or else look at bounding box and rotate that (even/odd).
+    Mark game-over height so that you can see it.
+    Different colors for frozen shapes at different heights.
  */
 
 #define SYSDEF_ACCESS
@@ -60,6 +64,64 @@ csView* view = NULL;
 
 REGISTER_STATIC_LIBRARY (vfs)
 REGISTER_STATIC_LIBRARY (engine)
+
+int Blocks::white, Blocks::black, Blocks::red;
+
+//-----------------------------------------------------------------------------
+
+TextEntryMenu::~TextEntryMenu ()
+{
+  Clear ();
+}
+
+void TextEntryMenu::Clear ()
+{
+  while (entries)
+  {
+    TextEntry* n = entries->next;
+    delete entries->txt;
+    delete entries->entry;
+    delete entries;
+    entries = n;
+  }
+  last = NULL;
+  num_entries = 0;
+}
+
+void TextEntryMenu::Add (char* txt, char* entry, void* userdata)
+{
+  TextEntry* n = new TextEntry;
+  n->txt = new char [strlen (txt+1)];
+  strcpy (n->txt, txt);
+  n->entry = new char [strlen (entry)+1];
+  strcpy (n->entry, entry);
+  n->userdata = userdata;
+  n->next = NULL;
+  if (last)
+  {
+    last->next = n;
+    last = n;
+  }
+  else
+  {
+    entries = last = n;
+  }
+  num_entries++;
+}
+
+void TextEntryMenu::Draw ()
+{
+  Gfx2D->Clear (0);
+  int i;
+  TextEntry* entry = entries;
+  for (i = 0 ; i < num_entries ; i++)
+  {
+    Gfx2D->Write (10, 10+i*12, Blocks::white,
+    	selected == i ? Blocks::red : Blocks::black, entry->txt);
+    Gfx2D->Write (200, 10+i*12, Blocks::black, Blocks::white, entry->entry);
+    entry = entry->next;
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -105,17 +167,19 @@ Blocks::Blocks ()
 
   view_origin = csVector3 (0, 3, 0);
 
-  newgame = true;
-  startup_screen = true;
+  initscreen = true;
+  screen = SCREEN_STARTUP;
   dynlight = NULL;
 
   zone_dim = ZONE_DIM;
+  keyconf_menu = NULL;
 }
 
 Blocks::~Blocks ()
 {
   delete dynlight;
   if (world) world->Clear ();
+  delete keyconf_menu;
 }
 
 void Blocks::InitGame ()
@@ -129,7 +193,7 @@ void Blocks::InitGame ()
 	  i >= ZONE_SAFETY+zone_dim || j >= ZONE_SAFETY+zone_dim ||
 	  k >= ZONE_SAFETY+ZONE_HEIGHT;
   transition = false;
-  newgame = false;
+  initscreen = false;
   score = 0;
   rot_px_todo = 0;
   rot_py_todo = 0;
@@ -780,161 +844,200 @@ void Blocks::HandleCameraMovement ()
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
 }
 
-void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
 {
-  if (startup_screen)
+  if (key_viewleft.Match (key, shift, alt, ctrl))
   {
-    switch (key)
-    {
-      case CSKEY_UP:
-        if (!menu_todo)
-	{
-          old_cur_menu = cur_menu;
-          cur_menu = (cur_menu+1)%num_menus;
-	  menu_todo = 1;
-	}
-        break;
-      case CSKEY_DOWN:
-        if (!menu_todo)
-	{
-          old_cur_menu = cur_menu;
-          cur_menu = (cur_menu-1+num_menus)%num_menus;
-	  menu_todo = 1;
-	}
-        break;
-      case CSKEY_ENTER:
-        switch (idx_menus[cur_menu])
-	{
-	  case MENU_BOARDSIZE:
-	    InitMenu ();
-	    AddMenuItem (MENU_3X3);
-	    AddMenuItem (MENU_4X4);
-	    AddMenuItem (MENU_5X5);
-	    AddMenuItem (MENU_6X6);
-	    switch (zone_dim)
-	    {
-	      case 3: cur_menu = 0; break;
-	      case 4: cur_menu = 1; break;
-	      case 5: cur_menu = 2; break;
-	      case 6: cur_menu = 3; break;
-	    }
-  	    DrawMenu (cur_menu);
-	    break;
-	  case MENU_3X3:
-	    ChangePlaySize (3);
-	    InitMainMenu ();
-	    break;
-	  case MENU_4X4:
-	    ChangePlaySize (4);
-	    InitMainMenu ();
-	    break;
-	  case MENU_5X5:
-	    ChangePlaySize (5);
-	    InitMainMenu ();
-	    break;
-	  case MENU_6X6:
-	    ChangePlaySize (6);
-	    InitMainMenu ();
-	    break;
-	  case MENU_NOVICE:
-            difficulty = NUM_EASY_SHAPE;
-	    startup_screen = false;
-	    newgame = true;
-	    break;
-          case MENU_AVERAGE:
-            difficulty = NUM_MEDIUM_SHAPE;
-	    startup_screen = false;
-	    newgame = true;
-	    break;
-          case MENU_EXPERT:
-            difficulty = NUM_HARD_SHAPE;
-	    startup_screen = false;
-	    newgame = true;
-	    break;
-	  case MENU_QUIT:
-	    System->Shutdown = true;
-	    break;
-	}
-	break;
-    }
-    return;
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cur_hor_dest = (cur_hor_dest-1+4)%4;
+    cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+    cam_move_up = csVector3 (0, -1, 0);
+    move_right_dx = dest_move_right_dx[cur_hor_dest];
+    move_right_dy = dest_move_right_dy[cur_hor_dest];
+    move_down_dx = dest_move_down_dx[cur_hor_dest];
+    move_down_dy = dest_move_down_dy[cur_hor_dest];
   }
+  else if (key_viewright.Match (key, shift, alt, ctrl))
+  {
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cur_hor_dest = (cur_hor_dest+1)%4;
+    cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+    cam_move_up = csVector3 (0, -1, 0);
+    move_right_dx = dest_move_right_dx[cur_hor_dest];
+    move_right_dy = dest_move_right_dy[cur_hor_dest];
+    move_down_dx = dest_move_down_dx[cur_hor_dest];
+    move_down_dy = dest_move_down_dy[cur_hor_dest];
+  }
+  else if (key_viewdown.Match (key, shift, alt, ctrl))
+  {
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    if (cur_ver_dest > 0) cur_ver_dest--;
+    cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+    cam_move_up = csVector3 (0, -1, 0);
+  }
+  else if (key_viewup.Match (key, shift, alt, ctrl))
+  {
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    if (cur_ver_dest < 2) cur_ver_dest++;
+    cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+    cam_move_up = csVector3 (0, -1, 0);
+  }
+  else if (key_zoomin.Match (key, shift, alt, ctrl))
+  {
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_dest = cam_move_src + .3 * (view_origin - cam_move_src);
+    cam_move_up = csVector3 (0, -1, 0);
+  }
+  else if (key_zoomout.Match (key, shift, alt, ctrl))
+  {
+    if (cam_move_dist) return;
+    cam_move_dist = 1;
+    cam_move_src = view->GetCamera ()->GetW2CTranslation ();
+    cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
+    cam_move_up = csVector3 (0, -1, 0);
+  }
+  else if (key_rotpx.Match (key, shift, alt, ctrl)) start_rotation (ROT_PX);
+  else if (key_rotmx.Match (key, shift, alt, ctrl)) start_rotation (ROT_MX);
+  else if (key_rotpy.Match (key, shift, alt, ctrl)) start_rotation (ROT_PY);
+  else if (key_rotmy.Match (key, shift, alt, ctrl)) start_rotation (ROT_MY);
+  else if (key_rotpz.Match (key, shift, alt, ctrl)) start_rotation (ROT_PZ);
+  else if (key_rotmz.Match (key, shift, alt, ctrl)) start_rotation (ROT_MZ);
+  else if (key_up.Match (key, shift, alt, ctrl)) start_horizontal_move (-move_down_dx, -move_down_dy);
+  else if (key_down.Match (key, shift, alt, ctrl)) start_horizontal_move (move_down_dx, move_down_dy);
+  else if (key_left.Match (key, shift, alt, ctrl)) start_horizontal_move (-move_right_dx, -move_right_dy);
+  else if (key_right.Match (key, shift, alt, ctrl)) start_horizontal_move (move_right_dx, move_right_dy);
+  else if (key_drop.Match (key, shift, alt, ctrl))
+  {
+    if (speed == MAX_FALL_SPEED)
+      speed = cur_speed;
+    else
+      speed = MAX_FALL_SPEED;
+  }
+  else if (key_pause.Match (key, shift, alt, ctrl)) pause = !pause;
+  else if (key_esc.Match (key, shift, alt, ctrl))
+  {
+    initscreen = true;
+    screen = SCREEN_STARTUP;
+  }
+}
 
+void Blocks::HandleKeyConfigKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+{
   switch (key)
   {
-    case 'u':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      cur_hor_dest = (cur_hor_dest-1+4)%4;
-      cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-      cam_move_up = csVector3 (0, -1, 0);
-      move_right_dx = dest_move_right_dx[cur_hor_dest];
-      move_right_dy = dest_move_right_dy[cur_hor_dest];
-      move_down_dx = dest_move_down_dx[cur_hor_dest];
-      move_down_dy = dest_move_down_dy[cur_hor_dest];
+    case CSKEY_UP:
+      keyconf_menu->SelUp ();
       break;
-    case 'o':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      cur_hor_dest = (cur_hor_dest+1)%4;
-      cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-      cam_move_up = csVector3 (0, -1, 0);
-      move_right_dx = dest_move_right_dx[cur_hor_dest];
-      move_right_dy = dest_move_right_dy[cur_hor_dest];
-      move_down_dx = dest_move_down_dx[cur_hor_dest];
-      move_down_dy = dest_move_down_dy[cur_hor_dest];
+    case CSKEY_DOWN:
+      keyconf_menu->SelDown ();
       break;
-    case 'h':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      if (cur_ver_dest > 0) cur_ver_dest--;
-      cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-      cam_move_up = csVector3 (0, -1, 0);
+    case CSKEY_ENTER:
       break;
-    case 'y':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      if (cur_ver_dest < 2) cur_ver_dest++;
-      cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-      cam_move_up = csVector3 (0, -1, 0);
+    case CSKEY_ESC:
+      screen = SCREEN_STARTUP;
       break;
-    case ';':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      cam_move_dest = cam_move_src + .3 * (view_origin - cam_move_src);
-      cam_move_up = csVector3 (0, -1, 0);
-      break;
-    case 'a':
-      if (cam_move_dist) break;
-      cam_move_dist = 1;
-      cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
-      cam_move_up = csVector3 (0, -1, 0);
-      break;
-    case 'w': start_rotation (ROT_PX); break;
-    case 's': start_rotation (ROT_MX); break;
-    case 'e': start_rotation (ROT_PY); break;
-    case 'd': start_rotation (ROT_MY); break;
-    case 'r': start_rotation (ROT_PZ); break;
-    case 'f': start_rotation (ROT_MZ); break;
-    case 'i': start_horizontal_move (-move_down_dx, -move_down_dy); break;
-    case 'k': start_horizontal_move (move_down_dx, move_down_dy); break;
-    case 'j': start_horizontal_move (-move_right_dx, -move_right_dy); break;
-    case 'l': start_horizontal_move (move_right_dx, move_right_dy); break;
-    case ' ':
-      if (speed == MAX_FALL_SPEED)
-    	speed = cur_speed;
-      else
-        speed = MAX_FALL_SPEED;
-      break;
-    case 'p': pause = !pause; break;
-    case CSKEY_ESC: newgame = true; startup_screen = true; break;
   }
+}
+
+void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
+{
+  switch (key)
+  {
+    case CSKEY_UP:
+      if (!menu_todo)
+      {
+        old_cur_menu = cur_menu;
+        cur_menu = (cur_menu+1)%num_menus;
+	menu_todo = 1;
+      }
+      break;
+    case CSKEY_DOWN:
+      if (!menu_todo)
+      {
+        old_cur_menu = cur_menu;
+        cur_menu = (cur_menu-1+num_menus)%num_menus;
+	menu_todo = 1;
+      }
+      break;
+    case CSKEY_ENTER:
+      switch (idx_menus[cur_menu])
+      {
+        case MENU_KEYCONFIG:
+	  screen = SCREEN_KEYCONFIG;
+	  initscreen = true;
+	  break;
+	case MENU_BOARDSIZE:
+	  InitMenu ();
+	  AddMenuItem (MENU_3X3);
+	  AddMenuItem (MENU_4X4);
+	  AddMenuItem (MENU_5X5);
+	  AddMenuItem (MENU_6X6);
+	  switch (zone_dim)
+	  {
+	    case 3: cur_menu = 0; break;
+	    case 4: cur_menu = 1; break;
+	    case 5: cur_menu = 2; break;
+	    case 6: cur_menu = 3; break;
+	  }
+  	  DrawMenu (cur_menu);
+	  break;
+	case MENU_3X3:
+	  ChangePlaySize (3);
+	  InitMainMenu ();
+	  break;
+	case MENU_4X4:
+	  ChangePlaySize (4);
+	  InitMainMenu ();
+	  break;
+	case MENU_5X5:
+	  ChangePlaySize (5);
+	  InitMainMenu ();
+	  break;
+	case MENU_6X6:
+	  ChangePlaySize (6);
+	  InitMainMenu ();
+	  break;
+	case MENU_NOVICE:
+          difficulty = NUM_EASY_SHAPE;
+	  screen = SCREEN_GAME;
+	  initscreen = true;
+	  break;
+        case MENU_AVERAGE:
+          difficulty = NUM_MEDIUM_SHAPE;
+	  screen = SCREEN_GAME;
+	  initscreen = true;
+	  break;
+        case MENU_EXPERT:
+          difficulty = NUM_HARD_SHAPE;
+	  screen = SCREEN_GAME;
+	  initscreen = true;
+	  break;
+	case MENU_QUIT:
+	  System->Shutdown = true;
+	  break;
+      }
+      break;
+  }
+}
+
+void Blocks::HandleKey (int key, bool shift, bool alt, bool ctrl)
+{
+  if (screen == SCREEN_KEYCONFIG)
+    HandleKeyConfigKey (key, shift, alt, ctrl);
+  else if (screen == SCREEN_STARTUP)
+    HandleDemoKey (key, shift, alt, ctrl);
+  else
+    HandleGameKey (key, shift, alt, ctrl);
 }
 
 void Blocks::move_shape_internal (int dx, int dy, int dz)
@@ -1238,7 +1341,7 @@ void Blocks::HandleMovement (time_t elapsed_time)
     if (elapsed_fog > fog_density) elapsed_fog = fog_density;
     fog_density -= elapsed_fog;
     csSector* s;
-    if (startup_screen) s = demo_room;
+    if (screen == SCREEN_STARTUP) s = demo_room;
     else s = room;
     if (fog_density)
       s->SetFog (fog_density, csColor (0, 0, 0));
@@ -1247,7 +1350,7 @@ void Blocks::HandleMovement (time_t elapsed_time)
     return;
   }
 
-  if (startup_screen)
+  if (screen == SCREEN_STARTUP)
   {
     HandleStartupMovement (elapsed_time);
     return;
@@ -1292,6 +1395,7 @@ void Blocks::InitTextures ()
   csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.gif");
   csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.gif");
   csLoader::LoadTexture (Sys->world, "menu_board", "board.gif");
+  csLoader::LoadTexture (Sys->world, "menu_keyconfig", "keys.gif");
 }
 
 void Blocks::DrawMenu (int menu)
@@ -1392,6 +1496,17 @@ void Blocks::ChangePlaySize (int new_size)
   room->InitLightMaps (false);
   room->ShineLights ();
   room->CreateLightMaps (Gfx3D);
+}
+
+void Blocks::StartKeyConfig ()
+{
+  initscreen = false;
+  delete keyconf_menu;
+  keyconf_menu = new TextEntryMenu ();
+  keyconf_menu->Add ("text1", "entry1", NULL);
+  keyconf_menu->Add ("text2", "entry2", NULL);
+  keyconf_menu->Add ("text3", "entry3", NULL);
+  keyconf_menu->SetSelected (0);
 }
 
 void Blocks::InitGameRoom ()
@@ -1506,6 +1621,7 @@ void Blocks::InitDemoRoom ()
   CreateMenuEntry ("menu_5x5", MENU_5X5);
   CreateMenuEntry ("menu_6x6", MENU_6X6);
   CreateMenuEntry ("menu_board", MENU_BOARDSIZE);
+  CreateMenuEntry ("menu_keyconfig", MENU_KEYCONFIG);
 }
 
 void Blocks::InitWorld ()
@@ -1519,7 +1635,7 @@ void Blocks::InitWorld ()
 
 void Blocks::StartDemo ()
 {
-  newgame = false;
+  initscreen = false;
 
   dynlight_x = 0;
   dynlight_y = 3;
@@ -1552,6 +1668,7 @@ void Blocks::InitMainMenu ()
   AddMenuItem (MENU_AVERAGE);
   AddMenuItem (MENU_EXPERT);
   AddMenuItem (MENU_BOARDSIZE);
+  AddMenuItem (MENU_KEYCONFIG);
   AddMenuItem (MENU_QUIT);
 
   cur_menu = 0;
@@ -1734,9 +1851,9 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
-  if (startup_screen)
+  if (screen == SCREEN_STARTUP)
   {
-    if (newgame) StartDemo ();
+    if (initscreen) StartDemo ();
     HandleMovement (elapsed_time);
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
@@ -1745,7 +1862,18 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     return;
   }
 
-  if (newgame) StartNewGame ();
+  if (screen == SCREEN_KEYCONFIG)
+  {
+    if (initscreen) StartKeyConfig ();
+    HandleMovement (elapsed_time);
+    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    keyconf_menu->Draw ();
+    Gfx3D->FinishDraw ();
+    Gfx3D->Print (NULL);
+    return;
+  }
+
+  if (initscreen) StartNewGame ();
 
   // This is where Blocks stuff really happens.
   HandleMovement (elapsed_time);
@@ -1780,7 +1908,7 @@ bool Blocks::HandleEvent (csEvent &Event)
   switch (Event.Type)
   {
     case csevKeyDown:
-      eatkeypress (Event.Key.Code, Event.Key.ShiftKeys & CSMASK_SHIFT,
+      HandleKey (Event.Key.Code, Event.Key.ShiftKeys & CSMASK_SHIFT,
           Event.Key.ShiftKeys & CSMASK_ALT, Event.Key.ShiftKeys & CSMASK_CTRL);
       break;
     case csevMouseDown:
@@ -1795,6 +1923,163 @@ bool Blocks::HandleEvent (csEvent &Event)
 
 int cnt = 1;
 long time0 = -1;
+
+//-----------------------------------------------------
+
+void Blocks::NamedKey (char* keyname, KeyMapping& map)
+{
+  map.shift = false;
+  map.alt = false;
+  map.ctrl = false;
+  char* dash = strchr (keyname, '-');
+  while (dash)
+  {
+    *dash = 0;
+    if (!strcmp (keyname, "shift")) map.shift = true;
+    else if (!strcmp (keyname, "alt")) map.alt = true;
+    else if (!strcmp (keyname, "ctrl")) map.ctrl = true;
+
+    *dash = '-';
+    keyname = dash+1;
+    dash = strchr (dash+1, '-');
+  }
+
+  if (!strcmp (keyname, "tab")) map.key = CSKEY_TAB;
+  else if (!strcmp (keyname, "space")) map.key = ' ';
+  else if (!strcmp (keyname, "esc")) map.key = CSKEY_ESC;
+  else if (!strcmp (keyname, "enter")) map.key = CSKEY_ENTER;
+  else if (!strcmp (keyname, "bs")) map.key = CSKEY_BACKSPACE;
+  else if (!strcmp (keyname, "up")) map.key = CSKEY_UP;
+  else if (!strcmp (keyname, "down")) map.key = CSKEY_DOWN;
+  else if (!strcmp (keyname, "right")) map.key = CSKEY_RIGHT;
+  else if (!strcmp (keyname, "left")) map.key = CSKEY_LEFT;
+  else if (!strcmp (keyname, "pgup")) map.key = CSKEY_PGUP;
+  else if (!strcmp (keyname, "pgdn")) map.key = CSKEY_PGDN;
+  else if (!strcmp (keyname, "home")) map.key = CSKEY_HOME;
+  else if (!strcmp (keyname, "end")) map.key = CSKEY_END;
+  else if (!strcmp (keyname, "ins")) map.key = CSKEY_INS;
+  else if (!strcmp (keyname, "del")) map.key = CSKEY_DEL;
+  else if (!strcmp (keyname, "f1")) map.key = CSKEY_F1;
+  else if (!strcmp (keyname, "f2")) map.key = CSKEY_F2;
+  else if (!strcmp (keyname, "f3")) map.key = CSKEY_F3;
+  else if (!strcmp (keyname, "f4")) map.key = CSKEY_F4;
+  else if (!strcmp (keyname, "f5")) map.key = CSKEY_F5;
+  else if (!strcmp (keyname, "f6")) map.key = CSKEY_F6;
+  else if (!strcmp (keyname, "f7")) map.key = CSKEY_F7;
+  else if (!strcmp (keyname, "f8")) map.key = CSKEY_F8;
+  else if (!strcmp (keyname, "f9")) map.key = CSKEY_F9;
+  else if (!strcmp (keyname, "f10")) map.key = CSKEY_F10;
+  else if (!strcmp (keyname, "f11")) map.key = CSKEY_F11;
+  else if (!strcmp (keyname, "f12")) map.key = CSKEY_F12;
+  else if ((*keyname >= 'A' && *keyname <= 'Z') || strchr ("!@#$%^&*()_+", *keyname))
+  {
+    map.shift = true;
+    map.key = *keyname;
+  }
+  else if (*keyname >= 'a' && *keyname <= 'z')
+  {
+    if (map.shift) map.key = (*keyname)+'A'-'a';
+    else map.key = *keyname;
+  }
+  else map.key = *keyname;
+}
+
+char* Blocks::KeyName (const KeyMapping& map)
+{
+  static char buf[100];
+  buf[0] = 0;
+  if (map.shift) strcat (buf, "shift-");
+  if (map.ctrl) strcat (buf, "ctrl-");
+  if (map.alt) strcat (buf, "alt-");
+  switch (map.key)
+  {
+    case CSKEY_TAB: strcat (buf, "tab"); break;
+    case ' ': strcat (buf, "space"); break;
+    case CSKEY_ESC: strcat (buf, "esc"); break;
+    case CSKEY_ENTER: strcat (buf, "enter"); break;
+    case CSKEY_BACKSPACE: strcat (buf, "bs"); break;
+    case CSKEY_UP: strcat (buf, "up"); break;
+    case CSKEY_DOWN: strcat (buf, "down"); break;
+    case CSKEY_RIGHT: strcat (buf, "right"); break;
+    case CSKEY_LEFT: strcat (buf, "left"); break;
+    case CSKEY_PGUP: strcat (buf, "pgup"); break;
+    case CSKEY_PGDN: strcat (buf, "pgdn"); break;
+    case CSKEY_HOME: strcat (buf, "home"); break;
+    case CSKEY_END: strcat (buf, "end"); break;
+    case CSKEY_INS: strcat (buf, "ins"); break;
+    case CSKEY_DEL: strcat (buf, "del"); break;
+    case CSKEY_F1: strcat (buf, "f1"); break;
+    case CSKEY_F2: strcat (buf, "f2"); break;
+    case CSKEY_F3: strcat (buf, "f3"); break;
+    case CSKEY_F4: strcat (buf, "f4"); break;
+    case CSKEY_F5: strcat (buf, "f5"); break;
+    case CSKEY_F6: strcat (buf, "f6"); break;
+    case CSKEY_F7: strcat (buf, "f7"); break;
+    case CSKEY_F8: strcat (buf, "f8"); break;
+    case CSKEY_F9: strcat (buf, "f9"); break;
+    case CSKEY_F10: strcat (buf, "f10"); break;
+    case CSKEY_F11: strcat (buf, "f11"); break;
+    case CSKEY_F12: strcat (buf, "f12"); break;
+    default:
+    {
+      char* s = strchr (buf, 0);
+      *s++ = map.key;
+      *s = 0;
+    }
+  }
+  return buf;
+}
+
+
+void Blocks::ReadConfig ()
+{
+  csIniFile keys ("blocks.cfg");
+  NamedKey (keys.GetStr ("Keys", "UP", "up"), key_up);
+  NamedKey (keys.GetStr ("Keys", "DOWN", "down"), key_down);
+  NamedKey (keys.GetStr ("Keys", "LEFT", "left"), key_left);
+  NamedKey (keys.GetStr ("Keys", "RIGHT", "right"), key_right);
+  NamedKey (keys.GetStr ("Keys", "ROTPX", "q"), key_rotpx);
+  NamedKey (keys.GetStr ("Keys", "ROTMX", "a"), key_rotmx);
+  NamedKey (keys.GetStr ("Keys", "ROTPY", "w"), key_rotpy);
+  NamedKey (keys.GetStr ("Keys", "ROTMY", "s"), key_rotmy);
+  NamedKey (keys.GetStr ("Keys", "ROTPZ", "e"), key_rotpz);
+  NamedKey (keys.GetStr ("Keys", "ROTMZ", "d"), key_rotmz);
+  NamedKey (keys.GetStr ("Keys", "PAUSE", "p"), key_pause);
+  NamedKey (keys.GetStr ("Keys", "ESC", "esc"), key_esc);
+  NamedKey (keys.GetStr ("Keys", "DROP", "space"), key_drop);
+  NamedKey (keys.GetStr ("Keys", "VIEWLEFT", "del"), key_viewleft);
+  NamedKey (keys.GetStr ("Keys", "VIEWRIGHT", "pgdn"), key_viewright);
+  NamedKey (keys.GetStr ("Keys", "VIEWUP", "home"), key_viewup);
+  NamedKey (keys.GetStr ("Keys", "VIEWDOWN", "end"), key_viewdown);
+  NamedKey (keys.GetStr ("Keys", "ZOOMIN", "ins"), key_zoomin);
+  NamedKey (keys.GetStr ("Keys", "ZOOMOUT", "pgup"), key_zoomout);
+}
+
+void Blocks::WriteConfig ()
+{
+  csIniFile keys ("blocks.cfg");
+  keys.SetStr ("Keys", "UP", KeyName (key_up));
+  keys.SetStr ("Keys", "DOWN", KeyName (key_down));
+  keys.SetStr ("Keys", "LEFT", KeyName (key_left));
+  keys.SetStr ("Keys", "RIGHT", KeyName (key_right));
+  keys.SetStr ("Keys", "ROTPX", KeyName (key_rotpx));
+  keys.SetStr ("Keys", "ROTMX", KeyName (key_rotmx));
+  keys.SetStr ("Keys", "ROTPY", KeyName (key_rotpy));
+  keys.SetStr ("Keys", "ROTMY", KeyName (key_rotmy));
+  keys.SetStr ("Keys", "ROTPZ", KeyName (key_rotpz));
+  keys.SetStr ("Keys", "ROTMZ", KeyName (key_rotmz));
+  keys.SetStr ("Keys", "PAUSE", KeyName (key_pause));
+  keys.SetStr ("Keys", "ESC", KeyName (key_esc));
+  keys.SetStr ("Keys", "DROP", KeyName (key_drop));
+  keys.SetStr ("Keys", "VIEWLEFT", KeyName (key_viewleft));
+  keys.SetStr ("Keys", "VIEWRIGHT", KeyName (key_viewright));
+  keys.SetStr ("Keys", "VIEWUP", KeyName (key_viewup));
+  keys.SetStr ("Keys", "VIEWDOWN", KeyName (key_viewdown));
+  keys.SetStr ("Keys", "ZOOMIN", KeyName (key_zoomin));
+  keys.SetStr ("Keys", "ZOOMOUT", KeyName (key_zoomout));
+  keys.Save ("blocks.cfg");
+}
+
 
 /*---------------------------------------------
  * Our main event loop.
@@ -1884,11 +2169,13 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
+  Sys->ReadConfig ();
   Sys->InitWorld ();  
 
   Sys->txtmgr->AllocPalette ();
   Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);
   Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
+  Sys->red = Sys->txtmgr->FindRGB (255, 0, 0);
 
   Sys->Loop ();
 

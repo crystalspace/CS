@@ -31,6 +31,19 @@ class csWorld;
 class csThing;
 class csDynLight;
 
+class KeyMapping
+{
+public:
+  int key;
+  bool shift, alt, ctrl;
+
+public:
+  bool Match (int k, bool s, bool a, bool c)
+  {
+    return key == k && shift == s && alt == a && ctrl == c;
+  }
+};
+
 enum BlRotType
 {
   ROT_NONE = 0,
@@ -108,9 +121,15 @@ enum BlShapeType
 #define MENU_5X5 8
 #define MENU_6X6 9
 #define MENU_BOARDSIZE 10
-#define MENU_TOTAL 11	// Total number of menu entries in system.
+#define MENU_KEYCONFIG 11
+#define MENU_TOTAL 12	// Total number of menu entries in system.
 
 #define MAX_MENUS 20	// Maximum number of menus visible at same time.
+
+// Screens.
+#define SCREEN_STARTUP 1
+#define SCREEN_GAME 2
+#define SCREEN_KEYCONFIG 3
 
 struct CubeInfo
 {
@@ -118,7 +137,34 @@ struct CubeInfo
   float dx, dy, dz;
 };
 
-///
+class TextEntryMenu
+{
+private:
+  struct TextEntry
+  {
+    char* txt;
+    char* entry;
+    void* userdata;
+    TextEntry* next;
+  };
+  TextEntry* entries;
+  TextEntry* last;
+  int num_entries;
+  int selected;
+
+public:
+  TextEntryMenu () { entries = last = NULL; num_entries = 0; selected = 0; }
+  ~TextEntryMenu ();
+  void Clear ();
+  void Add (char* txt, char* entry, void* userdata);
+  void Draw ();
+  int GetSelected () { return selected; }
+  int GetNumEntries () { return num_entries; }
+  void SetSelected (int sel) { selected = sel; }
+  void SelDown () { selected++; if (selected >= num_entries) selected = num_entries-1; }
+  void SelUp () { selected--; if (selected < 0) selected = 0; }
+};
+
 class Blocks : public SysSystemDriver
 {
 private:
@@ -152,6 +198,7 @@ private:
   int old_cur_menu;
   float menu_todo;
   int num_menus;	// Current number of active menu entries.
+  TextEntryMenu* keyconf_menu;
 
   csVector3 view_origin;
 
@@ -240,13 +287,13 @@ private:
 
   // When true clear world and start a new game. Usually false,
   // 'cause we are playing.
-  bool newgame;
+  bool initscreen;
 
   // If true we have Game Over.
   bool gameover;
 
-  // When true we are in startup screen mode.
-  bool startup_screen;
+  // Type of screen we are using (one of SCREEN_xxx).
+  int screen;
 
   // Difficulty setting.
   int difficulty;
@@ -269,10 +316,31 @@ private:
 
   int score;
 
+  // Keys...
+  KeyMapping key_up;
+  KeyMapping key_down;
+  KeyMapping key_left;
+  KeyMapping key_right;
+  KeyMapping key_rotpx;
+  KeyMapping key_rotmx;
+  KeyMapping key_rotpy;
+  KeyMapping key_rotmy;
+  KeyMapping key_rotpz;
+  KeyMapping key_rotmz;
+  KeyMapping key_pause;
+  KeyMapping key_drop;
+  KeyMapping key_esc;
+  KeyMapping key_viewleft;
+  KeyMapping key_viewright;
+  KeyMapping key_viewup;
+  KeyMapping key_viewdown;
+  KeyMapping key_zoomin;
+  KeyMapping key_zoomout;
+
 public:
   csWorld* world;
   iTextureManager* txtmgr;
-  int white, black;
+  static int white, black, red;
 
 public:
   Blocks ();
@@ -286,10 +354,16 @@ public:
   void InitMainMenu ();
   void StartNewGame ();
   void StartDemo ();
+  void StartKeyConfig ();
   void set_cube_room (csSector* s) { room = s; }
   void InitGame ();
   void CreateMenuEntry (char* txt, int menu_nr);
   void ChangePlaySize (int new_size);
+
+  void ReadConfig ();
+  void WriteConfig ();
+  void NamedKey (char* keyname, KeyMapping& map);
+  char* KeyName (const KeyMapping& map);
 
   void DrawMenu (int menu);
   void DrawMenu (float menu_transition, int old_menu, int new_menu);
@@ -299,7 +373,10 @@ public:
   // Handling of basic events and frame drawing.
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   virtual bool HandleEvent (csEvent &Event);
-  void eatkeypress (int key, bool shift, bool alt, bool ctrl);
+  void HandleKey (int key, bool shift, bool alt, bool ctrl);
+  void HandleGameKey (int key, bool shift, bool alt, bool ctrl);
+  void HandleDemoKey (int key, bool shift, bool alt, bool ctrl);
+  void HandleKeyConfigKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
   csThing* create_cube_thing (float dx, float dy, float dz);
