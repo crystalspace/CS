@@ -7582,6 +7582,7 @@ package cspace::iVFS;
 *Unmount = *cspacec::iVFS_Unmount;
 *MountRoot = *cspacec::iVFS_MountRoot;
 *SaveMounts = *cspacec::iVFS_SaveMounts;
+*LoadMountsFromFile = *cspacec::iVFS_LoadMountsFromFile;
 *GetFileTime = *cspacec::iVFS_GetFileTime;
 *SetFileTime = *cspacec::iVFS_SetFileTime;
 *GetFileSize = *cspacec::iVFS_GetFileSize;
@@ -8503,6 +8504,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iMouseDriver_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -10509,7 +10511,6 @@ package cspace::iTextureHandle;
 *SetCacheData = *cspacec::iTextureHandle_SetCacheData;
 *GetPrivateObject = *cspacec::iTextureHandle_GetPrivateObject;
 *GetAlphaMap = *cspacec::iTextureHandle_GetAlphaMap;
-*Prepare = *cspacec::iTextureHandle_Prepare;
 *GetCanvas = *cspacec::iTextureHandle_GetCanvas;
 *GetAlphaType = *cspacec::iTextureHandle_GetAlphaType;
 sub DESTROY {
@@ -10610,10 +10611,8 @@ package cspace::iTextureManager;
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
-*PrepareTextures = *cspacec::iTextureManager_PrepareTextures;
 *FreeImages = *cspacec::iTextureManager_FreeImages;
 *RegisterMaterial = *cspacec::iTextureManager_RegisterMaterial;
-*PrepareMaterials = *cspacec::iTextureManager_PrepareMaterials;
 *FreeMaterials = *cspacec::iTextureManager_FreeMaterials;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
@@ -10892,7 +10891,6 @@ package cspace::iMaterialHandle;
 *GetTexture = *cspacec::iMaterialHandle_GetTexture;
 *GetFlatColor = *cspacec::iMaterialHandle_GetFlatColor;
 *GetReflection = *cspacec::iMaterialHandle_GetReflection;
-*Prepare = *cspacec::iMaterialHandle_Prepare;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12900,6 +12898,7 @@ sub VFS_MAX_PATH_LEN () { $cspacec::VFS_MAX_PATH_LEN }
 sub VFS_FILE_MODE () { $cspacec::VFS_FILE_MODE }
 sub VFS_FILE_READ () { $cspacec::VFS_FILE_READ }
 sub VFS_FILE_WRITE () { $cspacec::VFS_FILE_WRITE }
+sub VFS_FILE_APPEND () { $cspacec::VFS_FILE_APPEND }
 sub VFS_FILE_UNCOMPRESSED () { $cspacec::VFS_FILE_UNCOMPRESSED }
 sub VFS_STATUS_OK () { $cspacec::VFS_STATUS_OK }
 sub VFS_STATUS_OTHER () { $cspacec::VFS_STATUS_OTHER }
