@@ -10,7 +10,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plugin-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make cslua     Make the $(DESCRIPTION.cslua)$"
+  $(NEWLINE)echo $"  make cslua        Make the $(DESCRIPTION.cslua)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

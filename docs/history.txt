@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+12-Nov-2001
+	- Fixed a MAJOR bug in the cslua and mp3 makefiles!!! This bug
+	  caused 'make' to show the description of both plugins
+	  misaligned compared to all the others! Lucky I catched this bug
+	  in time before it did any major harm.
 9-Nov-2001
 	- Reverted the SCF changes made to scfFactory yesterday since they
 	  completely break CS. The problem seems to be when attempting

@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Plug-in-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make mp3         Make the $(DESCRIPTION.mp3)$"
+  $(NEWLINE)echo $"  make mp3          Make the $(DESCRIPTION.mp3)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
