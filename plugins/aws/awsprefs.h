@@ -289,8 +289,7 @@ public:
 };
 
 class awsSkinNode :
-  public awsKey,
-  awsKeyContainer
+  public awsKey, public awsKeyContainer
 {
 public:
   awsSkinNode (iString *name) :
@@ -307,8 +306,7 @@ public:
 };
 
 class awsComponentNode :
-  public awsKey,
-  awsKeyContainer
+  public awsKey, public awsKeyContainer
 {
   /// The type of component, like "Radio Button", "Check Box", etc.
   iString *comp_type;
@@ -334,8 +332,7 @@ public:
 };
 
 class awsConnectionNode :
-  public awsKey,
-  awsKeyContainer
+  public awsKey, public awsKeyContainer
 {
 public:
   awsConnectionNode ();

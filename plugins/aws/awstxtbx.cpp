@@ -345,10 +345,8 @@ void awsTextBox::OnDraw (csRect /*clip*/)
       tmp.Truncate (mcc);
 
       // Get the size of the text
-      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
-	  tmp.GetData (),
-	  tw,
-	  th);
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
+		  GetDimensions (tmp.GetData (), tw, th);
 
       // Calculate the center
       tx = 4;
@@ -370,7 +368,6 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 	saved->Clear ();
 	saved->DecRef ();
       }
-    }
 
     if (has_focus && blink)
     {
@@ -380,6 +377,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
           Frame ().xmin + tx + tw + 1,
           Frame ().ymin + ty + th,
           WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE));
+    }
     }
   }
   else if (has_focus && blink)

@@ -731,7 +731,7 @@ void awsWindow::OnDraw (csRect clip)
   int black = WindowManager ()->GetPrefMgr ()->GetColor (AC_BLACK);
 
   //int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
-  int tw, th, toff, btw, bth, otw, oth;
+  int tw, th, toff;
   int i;
 
   clipper.SetClipRect (clip);
@@ -784,8 +784,6 @@ void awsWindow::OnDraw (csRect clip)
   title_bar_height = th + 3;
 
   // Get the texture size, if there is one.
-  if (btxt) btxt->GetOriginalDimensions (btw, bth);
-  if (otxt) otxt->GetOriginalDimensions (otw, oth);
 
   switch (frame_style)
   {
@@ -1223,6 +1221,9 @@ void awsWindow::OnDraw (csRect clip)
 
     case fsBitmap:
       if (btxt != NULL)
+	  {
+		int bth, btw;
+	    btxt->GetOriginalDimensions (btw, bth);
         clipper.DrawPixmap (
             btxt,
             Frame ().xmin,
@@ -1234,6 +1235,7 @@ void awsWindow::OnDraw (csRect clip)
             btw,
             bth,
             bkg_alpha);
+	  }
       if (view)
       {
         g3d->BeginDraw (
@@ -1242,6 +1244,9 @@ void awsWindow::OnDraw (csRect clip)
         g3d->BeginDraw (CSDRAW_2DGRAPHICS);
       }     //  end if view
       if (otxt != NULL)
+	  {
+		int otw, oth;
+		otxt->GetOriginalDimensions (otw, oth);
         clipper.DrawPixmap (
             otxt,
             Frame ().xmin,
@@ -1253,6 +1258,7 @@ void awsWindow::OnDraw (csRect clip)
             otw,
             oth,
             ovl_alpha);
+	  }
 
       break;
 
