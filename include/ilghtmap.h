@@ -31,6 +31,8 @@ interface ILightMap : public IUnknown
   STDMETHOD (SetInVideoMemory) (bool bVal);
   ///
   STDMETHOD (SetHighColorCache) (HighColorCache_Data* pVal);
+  ///
+  STDMETHOD (GetMeanLighting) (int& r, int& g, int& b);
 };
 
 #endif
