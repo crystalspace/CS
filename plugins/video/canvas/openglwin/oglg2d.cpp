@@ -24,23 +24,51 @@
 #include "oglg2d.h"
 #include "isystem.h"
 
-#ifndef CDS_FULLSCREEN
-#define CDS_UPDATEREGISTRY  0x00000001
+#ifndef CDS_UPDATEREGISTRY
+#  define CDS_UPDATEREGISTRY  0x00000001
+#endif
+#ifndef CDS_TEST
 #define CDS_TEST            0x00000002
-#define CDS_FULLSCREEN      0x00000004
+#endif
+#ifndef CDS_FULLSCREEN
+#  define CDS_FULLSCREEN      0x00000004
+#endif
+#ifndef CDS_GLOBAL
 #define CDS_GLOBAL          0x00000008
+#endif
+#ifndef CDS_SET_PRIMARY
 #define CDS_SET_PRIMARY     0x00000010
+#endif
+#ifndef CDS_RESET
 #define CDS_RESET           0x40000000
+#endif
+#ifndef CDS_SETRECT
 #define CDS_SETRECT         0x20000000
+#endif
+#ifndef CDS_NORESET
 #define CDS_NORESET         0x10000000
+#endif
 
 /* Return values for ChangeDisplaySettings */
+#ifndef DISP_CHANGE_SUCCESSFUL
 #define DISP_CHANGE_SUCCESSFUL       0
+#endif
+#ifndef DISP_CHANGE_RESTART
 #define DISP_CHANGE_RESTART          1
+#endif
+#ifndef DISP_CHANGE_FAILED
 #define DISP_CHANGE_FAILED          -1
+#endif
+#ifndef DISP_CHANGE_BADMODE
 #define DISP_CHANGE_BADMODE         -2
+#endif
+#ifndef DISP_CHANGE_NOTUPDATED
 #define DISP_CHANGE_NOTUPDATED      -3
+#endif
+#ifndef DISP_CHANGE_BADFLAGS
 #define DISP_CHANGE_BADFLAGS        -4
+#endif
+#ifndef DISP_CHANGE_BADPARAM
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
