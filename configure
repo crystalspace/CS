@@ -3689,10 +3689,6 @@ if test -n "$PERL"; then
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"yes\" ;
 "
-    cs_makefile_text="${cs_makefile_text}CMD.PERL5 = $PERL
-"
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$PERL\" ;
-"
     cs_makefile_text="${cs_makefile_text}PERL5 = $PERL
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$PERL\" ;
@@ -3700,6 +3696,10 @@ if test -n "$PERL"; then
     cs_makefile_text="${cs_makefile_text}PERL = $PERL
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL ?= \"$PERL\" ;
+"
+    cs_makefile_text="${cs_makefile_text}CMD.PERL5 = $PERL
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$PERL\" ;
 "
 
     echo "$as_me:$LINENO: checking for perl ExtUtils::Embed module" >&5
@@ -3725,6 +3725,7 @@ echo "${ECHO_T}$cs_cv_perl_mod_embed" >&6
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= \"yes\" ;
 "
+
 	echo "$as_me:$LINENO: checking for perl DynaLoader module" >&5
 echo $ECHO_N "checking for perl DynaLoader module... $ECHO_C" >&6
 if test "${cs_cv_perl_mod_dynaloader+set}" = set; then
@@ -3735,15 +3736,22 @@ else
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
+  cs_cv_perl_mod_dynaloader=yes
+else
+  cs_cv_perl_mod_dynaloader=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_perl_mod_dynaloader" >&5
+echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
+	if test $cs_cv_perl_mod_dynaloader = yes; then
   cs_makefile_text="${cs_makefile_text}PERL5.DYNALOADER.AVAILABLE = yes
 "
     cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= \"yes\" ;
 "
 fi
 
-fi
-echo "$as_me:$LINENO: result: $cs_cv_perl_mod_dynaloader" >&5
-echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
+
 	cs_cv_perl_cflags=`{ (echo "$as_me:$LINENO: \$PERL -MExtUtils::Embed -e ccopts") >&5
   ($PERL -MExtUtils::Embed -e ccopts) 2>&5
   ac_status=$?
@@ -3760,6 +3768,7 @@ else
 echo "$as_me: Recommend you install the latest release of Perl 5." >&6;}
 	{ echo "$as_me:$LINENO: http://www.perl.org/" >&5
 echo "$as_me: http://www.perl.org/" >&6;}
+
 	echo "$as_me:$LINENO: checking for perl Config module" >&5
 echo $ECHO_N "checking for perl Config module... $ECHO_C" >&6
 if test "${cs_cv_perl_mod_config+set}" = set; then

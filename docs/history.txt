@@ -4,10 +4,17 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 9-May-2003
-	- Philip Wyett added 'Makefile' to 'jam distclean', so at distclean
-	  the 'CS/' directory is again cleaned up fully.
+	- Philip Wyett did the following:
+	    - Added 'Makefile' to 'jam distclean', so at distclean the 'CS/'
+	      directory is again cleaned up fully.
 	    - Removed mod plugin from MSVC port. No one uses it and the
 	      libmikmod library is old and support is poor for Windows.
+	- Eric Sunshine fixed Oktal's changes to configure.ac from yesterday.
+	  There were two problems.  First, incorrect use of AC_CACHE_CHECK()
+	  caused it to behave differently between cached and non-cached runs.
+	  In fact, cached runs would produce incorrect results.  Second, poor
+	  quoting and parentheses placement borked up the logic of much of the
+	  Perl5 check.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.
@@ -47,26 +54,26 @@ The history order is reversed so that new features are at the top.
 	    - adjusted stdpt plugin to this behaviour.
 	    - the callback for procedural textures now keeps a reference to
 	      the PT.
-	    - like normal textures, proctexes now don't create a material of the 
-	      same name at load time.
+	    - like normal textures, proctexes now don't create a material of
+	      the same name at load time.
 	    - adjusted flarge to specify materials for the PTs.
 	- res changed the implementation of csThingStatic so that there's no
 	  embedded iPolygonMesh interface now. Queries for iPolygonMesh returns
 	  the result of iObjectModel->GetPolygonMeshColldet() and also printfs
 	  a notification.
-	- res fixed a leak in the Tiny XML parser. csTinyXmlDocument kept the 
-	  root as a ref to a csTinyXmlNode, which in turn kept a ref to the 
-	  document, leading to a circular reference. Solved by keeping the 
+	- res fixed a leak in the Tiny XML parser. csTinyXmlDocument kept the
+	  root as a ref to a csTinyXmlNode, which in turn kept a ref to the
+	  document, leading to a circular reference. Solved by keeping the
 	  root as a pointer to the TiDocument. New csTinyXmlNodes are created
 	  when the root is requested.
 	- res fixed a leak in the XmlRead plugin, analogue to the TinyXML leak.
 	- res fixed a leak when the engine reads the precalc info introduced
 	  after his recent changes related to VFS files.
-	- res changed the sprite3d and genmesh factories analogue to the changes
-	  made to csThingStatic.
+	- res changed the sprite3d and genmesh factories analogue to the
+	      changes made to csThingStatic.
 	- res augmented the API modification docs with information about the
 	  iPolygonMesh and procedural textures changes.
-	- res cured the Bezier plugin from leaks caused by the 
+	- res cured the Bezier plugin from leaks caused by the
 	  'embedded iPolygonMesh syndrome'.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
@@ -110,7 +117,7 @@ The history order is reversed so that new features are at the top.
 	      desciptions too.
 	    - Creates a basic README with some building and installation notes
 	      now.
-	    - Rewrote some parts of the script. 
+	    - Rewrote some parts of the script.
 	- res did some smaller fixes to the stdpt makefile and added stdpt.scf.
 6-May-2003
 	- Eric Sunshine made the following changes:
@@ -215,7 +222,7 @@ The history order is reversed so that new features are at the top.
 	  This can be used to retrieve a platform-specific configuration
 	  storage facility, intended for user-set settings/setting changed at
 	  runtime.
-	- res implemented csGetPlatformConfig() for Win32. The implementation 
+	- res implemented csGetPlatformConfig() for Win32. The implementation
 	  uses the registry.
 	- res also changed RegCreateKey() to RegOpenKeyEx() in instpath.cpp.
 	  RegCreateKey() is not only deprecated, but it also creates a
@@ -270,7 +277,7 @@ The history order is reversed so that new features are at the top.
 	  jamtemplate to take care of this by adding a new compiler.m4 macros.
 	- Wouter updated csfgen so it defaults an alphamap of the font by
 	  default. The opengl video uses this for antialiased font rendering.
-	  Unantialiased fonts can also be created (with -a). 
+	  Unantialiased fonts can also be created (with -a).
 1-May-2003
 	- res made the following changes to VFS:
 	    - Added iFile::SetPos() to complement iFile::GetPos().
@@ -346,8 +353,8 @@ The history order is reversed so that new features are at the top.
 	    - Upgraded configure.ac to utilize CS_CHECK_PROG_VERSION() for
 	      Bison and Swig tests.
 	    - Eliminated now obsolete bison.m4 (AC_CHECK_BISON).
-	- Norman Kraemer modified configure.ac to fix the case when 
-	  distutils.sysconfig.get_config_var() return None so concatenation 
+	- Norman Kraemer modified configure.ac to fix the case when
+	  distutils.sysconfig.get_config_var() return None so concatenation
 	  with a string would fail fails
 	- Oktal made the following changes to the Perl cspace module:
 	    - Numerous updates to the SWIG interface files.
