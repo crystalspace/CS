@@ -114,6 +114,7 @@ bool BumpTest::InitProcDemo ()
   prBump = new csProcBump (map);
   //prBump->SetBumpMap(map);
   matBump = prBump->Initialize (this, engine, txtmgr, "bumps");
+  prBump->PrepareAnim ();
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
   iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
