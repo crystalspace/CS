@@ -1,4 +1,0 @@
-SubDir TOP data flarge ;
-
-Mapfile flarge : world : [ Wildcard *.jpg *.png *.gif ] ;
-
