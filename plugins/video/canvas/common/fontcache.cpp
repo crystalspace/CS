@@ -143,7 +143,7 @@ int csFontCache::KnownFontArrayCompareToKey (
 
 csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
 {
-  int idx = knownFonts.FindSortedKey (font, KnownFontArrayCompareToKey);
+  int idx = knownFonts.FindSortedKey (KnownFontArrayKeyFunctor(font));
   csFontCache::KnownFont* knownFont = (idx >= 0) ? knownFonts[idx] : 0;
   if (knownFont != 0)
   {
@@ -191,7 +191,7 @@ csFontCache::KnownFont* csFontCache::CacheFont (iFont* font)
 
 void csFontCache::UncacheFont (iFont* font)
 {
-  int idx = knownFonts.FindSortedKey (font, KnownFontArrayCompareToKey);
+  int idx = knownFonts.FindSortedKey (KnownFontArrayKeyFunctor(font));
   if (idx >= 0)
   {
     KnownFont* knownFont = knownFonts[idx];

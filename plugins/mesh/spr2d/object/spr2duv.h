@@ -103,6 +103,12 @@ protected:
     {
       return strcmp (item->GetName (), key);
     }
+    static csArrayCmp<csSprite2DUVAnimationFrame*,char const*>
+    KeyCmp(char const* k)
+    {
+      return csArrayCmp<csSprite2DUVAnimationFrame*,char const*>(k,
+        CompareKey);
+    }
   };
 
   frameVector vFrames;

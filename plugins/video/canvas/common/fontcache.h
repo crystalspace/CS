@@ -155,6 +155,8 @@ protected:
     KnownFont* const& item2);
   static int KnownFontArrayCompareToKey (KnownFont* const& item1, 
     iFont* const& item2);
+  static csArrayCmp<KnownFont*,iFont*> KnownFontArrayKeyFunctor(iFont* f)
+    { return csArrayCmp<KnownFont*,iFont*>(f, KnownFontArrayCompareToKey); }
 
   /// Cache canvas-dependent information for a specific font/glyph pair.
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,

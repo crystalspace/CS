@@ -304,6 +304,10 @@ protected:
     {
       return strcmp (item->GetName (), key);
     }
+    csArrayCmp<csSprite2DUVAnimation*,char const*>KeyCmp(char const* key)
+    {
+      return csArrayCmp<csSprite2DUVAnimation*,char const*>(key, CompareKey);
+    }
   };
 
   animVector vAnims;
@@ -358,7 +362,7 @@ public:
   }
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
-    int idx = vAnims.FindKey (name, vAnims.CompareKey);
+    int idx = vAnims.FindKey (vAnims.KeyCmp(name));
     return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)

@@ -1109,7 +1109,7 @@ void csThingStatic::FillRenderMeshes (
 
 int csThingStatic::FindPolygonByName (const char* name)
 {
-  return static_polygons.FindKey (name, static_polygons.CompareKey);
+  return static_polygons.FindKey (static_polygons.KeyCmp(name));
 }
 
 int csThingStatic::GetRealIndex (int requested_index) const

@@ -337,7 +337,7 @@ const char *awsMultiLineEdit::Type ()
 bool awsMultiLineEdit::HandleEvent (iEvent &Event)
 {
   int idx;
-  idx = vDispatcher.FindSortedKey (&Event, vDispatcher.CompareEvent);
+  idx = vDispatcher.FindSortedKey (vDispatcher.EventCmp(&Event));
   if (idx != -1)
     (this->*vDispatcher.Get (idx)->ring) ();
   else

@@ -126,7 +126,8 @@ int csMotionTemplate::AddBone (const char* name)
 
 int csMotionTemplate::FindBoneByName (const char* name)
 {
-  return bones.FindSortedKey (csHashCompute(name), comparekey_bones);
+  return bones.FindSortedKey (csArrayCmp<csMotionBone*,unsigned int>(
+    csHashCompute(name), comparekey_bones));
 }
 
 //TODO Make sure bones are sorted by time
@@ -469,7 +470,9 @@ static int comparekey_motions (csMotionTemplate* const& mb,
 
 csMotionTemplate* csMotionManager::FindMotionTemplateByName (const char* name)
 {
-  int index = motions.FindSortedKey (csHashCompute(name), comparekey_motions);
+  int index =
+    motions.FindSortedKey (csArrayCmp<csMotionTemplate*,unsigned int>(
+      csHashCompute(name), comparekey_motions));
   if (index == -1)
     return 0;
   return motions.Get(index);
@@ -515,7 +518,9 @@ static int comparekey_skeleton (csMotionController* const& mb,
 csMotionController* csMotionManager::FindMotionControllerBySkeleton (
 	iSkeletonBone *skel)
 {
-  int index = controllers.FindSortedKey (skel, comparekey_skeleton);
+  int index =
+    controllers.FindSortedKey (csArrayCmp<csMotionController*,iSkeletonBone*>(
+      skel, comparekey_skeleton));
   if (index == -1)
     return 0;
   return controllers.Get(index);
@@ -525,7 +530,7 @@ csMotionController* csMotionManager::AddMotionController (iSkeletonBone *skel)
 {
   MOT_DPRINTF(("AddController(%p)\n", skel));
 
-  assert(controllers.FindSortedKey(skel, comparekey_skeleton)==-1);
+  CS_ASSERT(FindMotionControllerBySkeleton(skel) == 0);
 
   csMotionController *mc=new csMotionController(skel);
   controllers.InsertSorted (mc, compare_skeleton);

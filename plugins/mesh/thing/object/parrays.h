@@ -61,6 +61,12 @@ public:
 
   /// Find a polygon by name
   static int CompareKey (csPolygon3DStatic* const&, char const* const& Key);
+
+  /// Return a functor wrapping CompareKey for a given name.
+  static csArrayCmp<csPolygon3DStatic*,char const*> KeyCmp(char const* k)
+  {
+    return csArrayCmp<csPolygon3DStatic*,char const*>(k, CompareKey);
+  }
 };
 
 /**

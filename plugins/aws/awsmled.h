@@ -53,6 +53,11 @@ protected:
       return Item->inputDef.Compare (Key);
     }
 
+    static csArrayCmp<mlEvent*,iEvent*> EventCmp(iEvent* e)
+    {
+      return csArrayCmp<mlEvent*,iEvent*>(e, CompareEvent);
+    }
+
     bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring) ())
     {
       mlEvent *ev = new mlEvent;

@@ -112,6 +112,10 @@ public:
   /// Compare entry with a key.
   static int CompareKey (awsListRow* const&, iString* const& Key);
 
+  /// Return a functor wrapping CompareKey() for a given string.
+  static csArrayCmp<awsListRow*,iString*> KeyCmp(iString* s)
+  { return csArrayCmp<awsListRow*,iString*>(s, CompareKey); }
+
   /// Set the sort column.
   void SetSortCol (int sc) { local_sortcol = sc; }
 };

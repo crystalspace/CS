@@ -95,6 +95,10 @@ class csAVIFormat : public iStreamFormat
       {
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
       }
+      static csArrayCmp<StreamIdx*,uint32> KeyCmp(uint32 id)
+      {
+	return csArrayCmp<StreamIdx*,uint32>(id, CompareKey);
+      }
     };
 
     StreamList streamlist;

@@ -143,7 +143,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
-  int idx = vFrames.FindKey (name, vFrames.CompareKey);
+  int idx = vFrames.FindKey (vFrames.KeyCmp(name));
   return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : 0);
 }
 

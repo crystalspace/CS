@@ -185,6 +185,12 @@ protected:
     {
       return (te1->button < button ? -1 : te1->button > button ? 1 : 0);
     }
+
+    static csArrayCmp<tabEntry*,awsNotebookButton*>
+      KeyButtonFunctor(awsNotebookButton* b)
+    {
+      return csArrayCmp<tabEntry*,awsNotebookButton*>(b, CompareKeyButton);
+    }
   };
 
   TabVector vTabs;

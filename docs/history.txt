@@ -14,6 +14,13 @@ chronological order.
 	  GL_STENCIL_BITS. This bug was reported by valgrind.
 	- Eric Sunshine fixed user.mak so that it only builds glshader_arb,
 	  glshader_fixed, and glshader_ps1 if GL.AVAILABLE is 'yes'.
+	- Eric Sunshine worked around a slew of MSVC6 compiler bugs ("internal
+	  compiler error" and several others) which were triggered by changes
+	  to csArray<> aimed at making FindKey() and FindSortedKey() type-safe.
+	  The new approach wraps the comparison function in a functor which
+	  falls back to unsafe void* if and only if the compiler fails to grok
+	  the strongly typed approach.  The functor wrapper hides this MSVC6
+	  anomaly from client code.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.
