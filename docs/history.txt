@@ -55,6 +55,44 @@ The history order is reversed so that new features are at the top.
 	  awsmgr.cpp.
 	- Eric Sunshine fixed problem where aws_adler32() was defined by
 	  multiple implementation files.
+	- Eric Sunshine worked around a couple new problems which started
+	  afflicting jobber.pl today:
+	    - The unixconf.sh script now expects to find a C-compiler in
+	      addition to the C++ compiler which it always expected.Since the
+	      SourceForge shell machines do not have developer tools installed,
+	      had to fake out the unixconf.sh script.
+	    - It appears that some configuration may have changed today on the
+	      SourceForge shell machine which is causing the makefile
+	      configuration step performed by jobber.pl to crash when building
+	      the makefile cache.  As a stop-gap measure, rather than spending
+	      an inordinate amount of time trying to track down another
+	      SourceForge shell machine problem, I simply disabled makefile
+	      caching for now.
+	- Eric Sunshine made the following changes to the project:
+	    - Converted the Windows port over to the new csPlatformStartup()
+	      and csPlatformShutdown() paradigm in preparation for the removal
+	      of the system driver.
+	    - Removed all code and functionality from the Windows system driver
+	      subclass.  This class is now _completely_ empty and ready for
+	      removal.
+	    - Fixed a bug in the OpenGL Windows canvas where it was stealing a
+	      reference to the Win32 "helper" object from some other module by
+	      calling DecRef() even though it didn't own a reference.
+	    - Fixed win32/csosdefs.h so that the #pragmas for disabling
+	      warnings appear before the Windows system headers are included.
+	      This change eliminates the thousands upon thousands of warning
+	      messages emitted by MSVC5 when building the project.
+	    - Temporarily disabled cs_snprintf() (again) because MSVC users are
+	      experiencing linking problems.In particular, the following errors
+	      are produced:
+		libcsutil.lib(snprintf.obj) : error LNK2001: unresolved
+		    external symbol __pctype
+		libcsutil.lib(snprintf.obj) : error LNK2001: unresolved
+		    external symbol ___mb_cur_max
+	      Hopefully, we will get these problems resolved soon.
+	    - Eliminated a number of compilation warnings from snprintf.c which
+	      were reported by MSVC.Unfortunately, a couple additional warnings
+	      are still present.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:
