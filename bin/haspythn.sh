@@ -41,7 +41,7 @@ fi
 if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
   echo "PYTHON_INC = ${PYTHON_INC}"
   echo "PYTHON_LIB = ${PYTHON_LIB}"
-  echo "PLUGINS += cspython"
+  echo "DETECTED_PLUGINS += cspython"
 fi
 
 exit 0
