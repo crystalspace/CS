@@ -23,7 +23,6 @@
 #include "d3d.h"
 #include "d3dcaps.h"
 
-#include "d3d_txtcache.h"
 #include "d3d_g3d.h"
 #include "itexture.h"
 #include "ilghtmap.h"
