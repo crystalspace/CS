@@ -17,6 +17,8 @@ chronological order.
 	- Jorrit fixed a bug in genmesh pseudo-dynamic lighting handling.
 	  The lighting was too dark because it forgot to multiply the
 	  color with a factor.
+	- Jorrit fixed a bug in the simpleformer so that it no longer
+	  generates small irregularities.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

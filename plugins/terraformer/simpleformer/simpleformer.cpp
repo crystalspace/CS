@@ -82,6 +82,8 @@ float BiCubicData (float* data, int width, int height, float x, float z)
 
   // If deltaX/Z is close to 0, we're pretty much 
   // right on a heightmap sample point, which means it's useless to blend
+// Jorrit: Disabled this because it gives small irregularities.
+#if 0
   if (fabs (deltaX) <= SMALL_EPSILON && 
       fabs (deltaZ) <= SMALL_EPSILON)
   {
@@ -91,6 +93,7 @@ float BiCubicData (float* data, int width, int height, float x, float z)
     intZ = MAX (MIN (intZ, height-1), 0);
     return data[(int)intX+(int)intZ*width];
   }
+#endif
 
   // Grab 16 surrounding heights and blend them
   for (int i=0; i<4; ++i)
