@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "walktest/bot.h"
 #include "csengine/sector.h"
+#include "csobject/nameobj.h"
 
 CSOBJTYPE_IMPL(Bot,csSprite3D);
 
@@ -80,12 +81,11 @@ void Bot::move (long elapsed_time)
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
   csSprite3D::SetMove (new_p);
 
-  //@@@s = get_mso ().get_first_sector ();
   s = (csSector*)sectors[0];
   mirror = false;
   csOrthoTransform old_pos2 (GetW2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);
-  if (s)//@@@ get_mso ().init_one_sector (s);
+  if (s)
   {
     MoveToSector (s);
   }
