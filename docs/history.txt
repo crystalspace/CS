@@ -29,6 +29,9 @@ The history order is reversed so that new features are at the top.
 	  just width or height divided by two. Fixed a related bug in the
 	  edge drawing which would not work correctly with iso engine for
 	  this reason.
+	- Added 'simpmap' tutorial app. This app is not yet in the tutorials
+	  because it doesn't work yet. I have to investigate why it is
+	  crashing.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

@@ -2783,7 +2783,6 @@ defaulthalo:
 	      cur_idx++;
 	      params = end+1;
 	    }
-	    fflush (stdout);
 	    halo.flare.mat_center = FindMaterial (mat_names[0]);
 	    halo.flare.mat_spark1 = FindMaterial (mat_names[1]);
 	    halo.flare.mat_spark2 = FindMaterial (mat_names[2]);
