@@ -1011,7 +1011,7 @@ Ryan J. Evans@*
 Sebestyen Zoltan (@email{szoli@@valerie.inf.elte.hu})@*
 Simon B. (@email{simonb@@telisphere.com})@*
 Terrence Stewart@*
-Thiago Ramon
+Thiago Ramon@*
 Thomthee Besset (@email{Besset@@sugar-land.dowell.slb.com})@*
 Travis McLane (@email{tmclane@@swt.edu})@*
 Walt Armour (@email{walt@@armour.cx})@*
