@@ -7,10 +7,10 @@
 #include "iutil/string.h"
 
 struct iAws;
-struct iAwsPrefs;
 struct iAwsSlot;
 struct iAwsSink;
 struct iAwsSource;
+struct iAwsPrefManager;
 struct iAwsSinkManager;
 
 class  awsWindow;
@@ -37,10 +37,10 @@ struct iAws : public iBase
 {
 public:  
   /// Get a pointer to the preference manager
-  virtual iAwsPrefs *GetPrefMgr()=0;
+  virtual iAwsPrefManager *GetPrefMgr()=0;
 
   /// Set the preference manager used by the window system
-  virtual void       SetPrefMgr(iAwsPrefs *pmgr)=0;
+  virtual void             SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
   /// Allows a component to register itself for dynamic template instatiation via definition files.
   virtual void RegisterComponentFactory(awsComponentFactory *factory, char *name)=0;
@@ -93,9 +93,9 @@ public:
 };
 
 
-SCF_VERSION (iAwsPrefs, 0, 0, 1);
+SCF_VERSION (iAwsPrefManager, 0, 0, 1);
 
-struct iAwsPrefs : public iBase
+struct iAwsPrefManager : public iBase
 {
 public:
 
