@@ -51,6 +51,8 @@ CS_IMPLEMENT_PLUGIN
 // Set the default lod used.
 #define DEFAULT_LOD 1
 
+
+
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csSpriteFrame)
@@ -126,6 +128,37 @@ void csSpriteAction2::AddFrame (iSpriteFrame * f, int d)
 
 //--------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csSpriteSocket)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteSocket)
+SCF_IMPLEMENT_IBASE_END
+
+csSpriteSocket::csSpriteSocket()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  triangle_index = 0;
+  name = NULL;
+  attached_mesh = NULL;
+}
+
+csSpriteSocket::~csSpriteSocket ()
+{
+  delete [] name;
+}
+
+void csSpriteSocket::SetName (char const* n)
+{
+  delete [] name;
+  if (n)
+  {
+    name = new char [strlen (n)+1];
+    strcpy (name, n);
+  }
+  else
+    name = 0;
+}
+
+//--------------------------------------------------------------------------
+
 bool csSpriteFrameVector::FreeItem (csSome Item)
 {
   delete (csSpriteFrame *) Item;
@@ -137,6 +170,7 @@ csSpriteFrameVector::~csSpriteFrameVector ()
   DeleteAll ();
 }
 
+
 bool csSpriteActionVector::FreeItem (csSome Item)
 {
   delete (csSpriteAction2 *) Item;
@@ -147,6 +181,17 @@ csSpriteActionVector::~csSpriteActionVector ()
 {
   DeleteAll ();
 }
+
+bool csSpriteSocketVector::FreeItem (csSome Item)
+{
+  delete (csSpriteSocketVector *) Item;
+  return true;
+}
+csSpriteSocketVector::~csSpriteSocketVector ()
+{
+  DeleteAll ();
+}
+
 
 //--------------------------------------------------------------------------
 
@@ -447,6 +492,32 @@ csSpriteAction2* csSprite3DMeshObjectFactory::AddAction ()
   return a;
 }
 
+csSpriteSocket* csSprite3DMeshObjectFactory::AddSocket ()
+{
+  csSpriteSocket* socket = new csSpriteSocket();
+  sockets.Push (socket);
+  return socket;
+}
+
+csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n)
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (strcmp (GetSocket (i)->GetName (), n) == 0)
+      return GetSocket (i);
+
+  return NULL;
+}
+
+csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (GetSocket (i)->GetMeshWrapper() == mesh)
+      return GetSocket (i);
+
+  return NULL;
+}
 void csSprite3DMeshObjectFactory::SetMaterial (iMaterialWrapper *material)
 {
   cstxt = material;
@@ -1093,6 +1164,8 @@ void csSprite3DMeshObject::SetupObject ()
   }
 }
 
+
+
 bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
@@ -1103,6 +1176,103 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     	"Error! Trying to draw a sprite with no material!");
     return false;
   }
+
+  // Drill down into the parent and compute the center of
+  // the socket where this mesh should be located
+  iMeshWrapper* mw = SCF_QUERY_INTERFACE (movable,	iMeshWrapper);
+	if (mw)
+  {
+    // Get the parent of this wrapper
+    iMeshWrapper* parent = mw->GetParentContainer();
+    if (parent)
+    {
+      // Get the parent of this wrapper
+      iMeshFactoryWrapper* mfw = parent->GetFactory();
+      if (mfw)
+      {
+        // Get the parent of this wrapper
+        iMeshObjectFactory* mof = mfw->GetMeshObjectFactory();
+        if (mof)
+        {
+          // Find the socket in the parent
+          iSprite3DFactoryState* sof = SCF_QUERY_INTERFACE (
+              mof, iSprite3DFactoryState);
+          if (sof)
+          {  
+            iSpriteSocket * socket = sof->FindSocket(mw);
+            if (socket)
+            {
+              // Get the index of the triange at that spot
+              int tri_index = socket->GetTriangleIndex();
+              csTriangle& tri = sof->GetTriangles()[tri_index];
+
+              // Get the verts for the current frame
+              // This is crummy, but the only way to get at it.
+              csSprite3DMeshObject *cs = 
+                (csSprite3DMeshObject *)parent->GetMeshObject();
+
+              int current_frame = cs->GetCurFrame();
+              csSpriteAction2* current_action = cs->GetCurAction();
+              
+              csSpriteFrame* cf = 
+                current_action->GetCsFrame (current_frame);
+              
+              int idx = cf->GetAnmIndex();
+              csVector3 * current_verts = sof->GetVertices(idx);
+  
+              csVector3 spot_verts[3];
+              csVector3 center;
+
+              if (!cs->IsTweeningEnabled())
+              {
+                spot_verts[0] = current_verts[tri.a];
+                spot_verts[1] = current_verts[tri.b];
+                spot_verts[2] = current_verts[tri.c];
+                center = 
+                  (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
+              }
+              else
+              {
+                // Get the verts for the next frame
+                csSpriteFrame * nframe = NULL;
+                if (current_frame + 1 < current_action->GetFrameCount())
+                  nframe = current_action->GetCsFrame (current_frame + 1);
+                else
+                  nframe = current_action->GetCsFrame (0);
+                int nf_idx = nframe->GetAnmIndex();
+                csVector3 * next_verts = sof->GetVertices(nf_idx);
+
+                // Interpolate between them
+                float parent_tween_ratio = cs->GetTweenRatio();
+                float remainder = 1 - parent_tween_ratio;
+                spot_verts[0] = 
+                  parent_tween_ratio * next_verts[tri.a] + 
+                  remainder * current_verts[tri.a];
+
+                spot_verts[1] = 
+                  parent_tween_ratio * next_verts[tri.b] + 
+                  remainder * current_verts[tri.b];
+
+                spot_verts[2] = 
+                  parent_tween_ratio * next_verts[tri.c] + 
+                  remainder * current_verts[tri.c];
+  
+                center = 
+                  (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
+              }
+        
+              movable->SetPosition(center);
+	            movable->UpdateMove();
+            }
+          }
+          sof->DecRef();
+        }
+      }
+    }
+    mw->DecRef();
+  }
+    
+    
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();

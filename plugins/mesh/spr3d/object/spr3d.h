@@ -160,6 +160,43 @@ private:
   csVector delays;
 };
 
+
+/**
+ * A socket for specifying where sprites can plug into
+ * other sprites.
+ */
+class csSpriteSocket : public iSpriteSocket
+{
+private:
+  char* name;
+  int triangle_index;
+  iMeshWrapper *attached_mesh;
+
+public:
+  
+  /// Default Constructor
+  csSpriteSocket();
+  
+  virtual ~csSpriteSocket ();
+
+  /// Set the name.
+  virtual void SetName (char const*);
+  /// Get the name.
+  virtual char const* GetName () const { return name; }
+  
+  /// Set the attached sprite.
+  virtual void SetMeshWrapper (iMeshWrapper* mesh) {attached_mesh = mesh;}
+  /// Get the attached sprite.
+  virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
+
+  /// Set the index of the triangle for the socket.
+  virtual void SetTriangleIndex (int tri_index) { triangle_index = tri_index; }
+  /// Get the index of the triangle for the socket.
+  virtual int GetTriangleIndex () const { return triangle_index; }
+  
+  SCF_DECLARE_IBASE;
+};
+
 /**
  * A vector for frames which knows how to clean them up.
  */
@@ -181,6 +218,19 @@ class csSpriteActionVector : public csVector
 public:
   /// Delete all inserted objects before deleting the object itself.
   virtual ~csSpriteActionVector ();
+
+  /// Free a item as an action.
+  virtual bool FreeItem (csSome Item);
+};
+
+/**
+ * A vector for actions which knows how to clean them up.
+ */
+class csSpriteSocketVector : public csVector
+{
+public:
+  /// Delete all inserted objects before deleting the object itself.
+  virtual ~csSpriteSocketVector ();
 
   /// Free a item as an action.
   virtual bool FreeItem (csSome Item);
@@ -222,6 +272,8 @@ private:
   csSpriteFrameVector frames;
   /// The actions (a vector of csSpriteAction2 objects)
   csSpriteActionVector actions;
+  /// The sockets of the sprite (a vector of csSpriteSocket objects)
+  csSpriteSocketVector sockets;
 
   /// Enable tweening.
   bool do_tweening;
@@ -449,6 +501,23 @@ public:
   csSpriteAction2* GetAction (int No) const
   { return (csSpriteAction2 *)actions [No]; }
 
+  /// Create and add a new socket to the sprite.
+  csSpriteSocket* AddSocket ();
+  /// find a named socket into the sprite.
+  csSpriteSocket* FindSocket (const char * name);
+  /// find a socked based on the sprite attached to it
+  csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
+  /// Query the number of sockets
+  int GetSocketCount () const { return sockets.Length (); }
+  /// Query the socket number f
+  csSpriteSocket* GetSocket (int f) const
+  {
+    return (f < sockets.Length ())
+  	? (csSpriteSocket *)sockets [f]
+	: (csSpriteSocket*)NULL;
+  }
+
+
   /// Get the material
   iMaterialWrapper* GetMaterial () const
   { return cstxt; }
@@ -651,6 +720,37 @@ public:
       	iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
+    }
+    virtual iSpriteSocket* AddSocket ()
+    {
+      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+      	iSpriteSocket);
+      if (ifr) ifr->DecRef ();
+      return ifr;
+    }
+    virtual iSpriteSocket* FindSocket (const char* name) const
+    {
+      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (name), iSpriteSocket);
+      if (ifr) ifr->DecRef ();
+      return ifr;
+    }
+    virtual iSpriteSocket* FindSocket (iMeshWrapper* mesh) const
+    {
+      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (mesh), iSpriteSocket);
+      if (ifr) ifr->DecRef ();
+      return ifr;
+    }virtual int GetSocketCount () const
+    {
+      return scfParent->GetSocketCount ();
+    }
+    virtual iSpriteSocket* GetSocket (int f) const
+    {
+      iSpriteSocket* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+      	iSpriteSocket);
+      if (ifr) ifr->DecRef ();
+      return ifr;
     }
     virtual void EnableSkeletalAnimation ();
     virtual iSkeleton* GetSkeleton () const;
@@ -1073,6 +1173,7 @@ private:
    */
   void UpdateLightingRandom ();
 
+  
   /// random number generator used for random lighting.
   csRandomGen *rand_num;
 
@@ -1121,6 +1222,7 @@ public:
     return do_lighting;
   }
 
+  float GetTweenRatio(){return tween_ratio;}
   /// Set base color.
   void SetBaseColor (const csColor& col)
   {
@@ -1212,6 +1314,20 @@ public:
     }
     return false;
   }
+
+  /**
+   * Propogate set action to all children
+   */
+  virtual bool PropagateAction (const char *name)
+  {
+    // TODO:: Implement across children
+    return SetAction(name);
+  }
+
+  /**
+   * Gets the center of a sprite socket 
+   */
+  void GetSocketCenter(const char *name, csVector3 & center);
 
   /**
    * Initialize a sprite. This function is called automatically
@@ -1395,6 +1511,10 @@ public:
     virtual bool SetAction (const char * name)
     {
       return scfParent->SetAction (name);
+    }
+    virtual bool PropagateAction (const char *name)
+    {
+      return scfParent->PropagateAction (name);
     }
     virtual iSpriteAction* GetCurAction () const
     {

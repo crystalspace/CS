@@ -29,6 +29,7 @@ struct iMaterialWrapper;
 struct iSkeleton;
 struct iSkeletonState;
 struct iMeshObject;
+struct iMeshWrapper;
 struct iMeshObjectFactory;
 struct iRenderView;
 struct iRenderView;
@@ -116,6 +117,31 @@ struct iSpriteAction : public iBase
   virtual int GetFrameDelay (int f) = 0;
   /// Add a frame to this action.
   virtual void AddFrame (iSpriteFrame* frame, int delay) = 0;
+};
+
+SCF_VERSION (iSpriteSocket, 0, 0, 1);
+
+/**
+ * A socket for specifying where sprites can plug into
+ * other sprites.
+ */
+struct iSpriteSocket : public iBase
+{
+  /// Set the name.
+  virtual void SetName (char const*) = 0;
+  /// Get the name.
+  virtual char const* GetName () const = 0;
+  
+  /// Set the attached sprite.
+  virtual void SetMeshWrapper (iMeshWrapper* mesh) = 0;
+  /// Get the attached sprite.
+  virtual iMeshWrapper* GetMeshWrapper () const = 0;
+  
+  /// Set the index of the triangle for the socket.
+  virtual void SetTriangleIndex (int tri_index) = 0;
+  /// Get the index of the triangle for the socket.
+  virtual int GetTriangleIndex () const = 0;
+
 };
 
 SCF_VERSION (iSprite3DFactoryState, 0, 0, 3);
@@ -213,6 +239,17 @@ struct iSprite3DFactoryState : public iBase
   virtual int GetActionCount () const = 0;
   /// Get action number No
   virtual iSpriteAction* GetAction (int No) const = 0;
+
+  /// Create and add a new socket to the sprite.
+  virtual iSpriteSocket* AddSocket () = 0;
+  /// find a named socket into the sprite.
+  virtual iSpriteSocket* FindSocket (const char * name) const = 0;
+  /// find a socked based on the sprite attached to it
+  virtual iSpriteSocket* FindSocket (iMeshWrapper *mesh) const = 0;  
+  /// Query the number of sockets
+  virtual int GetSocketCount () const = 0;
+  /// Query the socket number f
+  virtual iSpriteSocket* GetSocket (int f) const = 0;
 
   /// Enable skeletal animation for this factory.
   virtual void EnableSkeletalAnimation () = 0;
@@ -327,6 +364,9 @@ struct iSprite3DState : public iBase
 
   /// Select an action.
   virtual bool SetAction (const char * name) = 0;
+
+  /// Propogate set action to all children
+  virtual bool PropagateAction (const char *name) = 0;
 
   /// Get the current action.
   virtual iSpriteAction* GetCurAction () const = 0;
