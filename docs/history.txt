@@ -12,6 +12,8 @@ chronological order.
 	  index.
 	- Jorrit fixed an initialization error in the csGLStateCache for
 	  GL_STENCIL_BITS. This bug was reported by valgrind.
+	- Eric Sunshine fixed user.mak so that it only builds glshader_arb,
+	  glshader_fixed, and glshader_ps1 if GL.AVAILABLE is 'yes'.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.

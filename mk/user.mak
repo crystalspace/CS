@@ -125,10 +125,12 @@ PLUGINS.DYNAMIC += video/renderer/null
 endif
 PLUGINS.DYNAMIC += video/render3d/shader/shadermgr
 PLUGINS.DYNAMIC += video/render3d/shader/shadercompiler/xmlshader
+PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/softshader
+ifeq ($(GL.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_arb
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_fixed
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_ps1
-PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/softshader
+endif
 ifeq ($(CG.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_cg
 endif
