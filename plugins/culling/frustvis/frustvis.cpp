@@ -783,7 +783,7 @@ struct IntersectSegment_Front2BackData
   float sqdist;		// Squared distance between seg.start and isect.
   float r;
   iMeshWrapper* mesh;
-  iPolygon3D* polygon;
+  int polygon_idx;
   csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
   bool accurate;
 };
@@ -865,13 +865,13 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	    if (!data->vector && visobj_wrap->thing_state)
 	    {
 	      iThingState* st = visobj_wrap->thing_state;
-	      iPolygon3D* p = st->IntersectSegment (
+	      int pidx = st->IntersectSegment (
 			obj_start, obj_end,
 			obj_isect, &r, false);
-	      if (p && r < data->r)
+	      if (pidx != -1 && r < data->r)
 	      {
 		data->r = r;
-		data->polygon = p;
+		data->polygon_idx = pidx;
 		if (identity)
 		  data->isect = obj_isect;
 		else
@@ -899,7 +899,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 	        else if (r < data->r)
 		{
 		  data->r = r;
-		  data->polygon = 0;
+		  data->polygon_idx = -1;
 		  if (identity)
 		    data->isect = obj_isect;
 		  else
@@ -920,7 +920,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode,
 
 bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
-    iMeshWrapper** p_mesh, iPolygon3D** poly, bool accurate)
+    iMeshWrapper** p_mesh, int* poly_idx, bool accurate)
 {
   UpdateObjects ();
   current_vistest_nr++;
@@ -929,14 +929,14 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
   data.mesh = 0;
-  data.polygon = 0;
+  data.polygon_idx = -1;
   data.vector = 0;
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
-  if (poly) *poly = data.polygon;
+  if (poly_idx) *poly_idx = data.polygon_idx;
   isect = data.isect;
 
   return data.mesh != 0;
@@ -952,7 +952,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.sqdist = 10000000000.0;
   data.r = 10000000000.;
   data.mesh = 0;
-  data.polygon = 0;
+  data.polygon_idx = -1;
   data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);

@@ -133,9 +133,9 @@ struct iThingFactoryState : public iBase
   /**
    * Intersect a segment with this thing and return the first
    * polygon that is hit. If only_portals == true then only portals
-   * will be checked.
+   * will be checked. -1 is returned if no hit.
    */
-  virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
+  virtual int IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = 0, bool only_portals = false) = 0;
 
@@ -235,9 +235,9 @@ struct iThingState : public iBase
   /**
    * Intersect a segment with this thing and return the first
    * polygon that is hit. If only_portals == true then only portals
-   * will be checked.
+   * will be checked. -1 is returned if no hit.
    */
-  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+  virtual int IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = 0, bool only_portals = false) = 0;
 

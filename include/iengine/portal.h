@@ -29,6 +29,7 @@
 
 class csReversibleTransform;
 class csPlane3;
+struct iMeshWrapper;
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -106,7 +107,6 @@ class csVector3;
 class csFlags;
 struct iTextureHandle;
 struct iSector;
-struct iPolygon3D;
 struct iPortal;
 struct iFrustumView;
 struct iObject;
@@ -318,17 +318,17 @@ struct iPortal : public iBase
 	  const csReversibleTransform& t, int alpha) = 0;
 
   /**
-   * Follow a beam through this portal and return the polygon
-   * that it hits with. This function properly acounts for space
-   * warping portals and also checks for infinite recursion (does
+   * Follow a beam through this portal and return the mesh and polygon index
+   * that it hits with (0 incase no hit). This function properly acounts for
+   * space warping portals and also checks for infinite recursion (does
    * not allow traversing the same sector more than five times).
    * Returns the intersection point with the polygon in 'isect'.
    * The given transform 't' is used to transform the warping matrix
    * in the portal from object to world space (this==object, other==world).
    */
-  virtual iPolygon3D* HitBeam (const csReversibleTransform& t,
+  virtual iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect) = 0;
+  	csVector3& isect, int* polygon_idx) = 0;
 
 };
 

@@ -607,7 +607,9 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   iSector* sector = view->GetCamera ()->GetSector ();
   csVector3 origin = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
-  iPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 20, isect);
+  int sel;
+  iMeshWrapper* mesh = sector->HitBeamPortals (origin,
+  	origin + (vw-origin) * 20, isect, &sel);
 
   vw = isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
@@ -618,20 +620,22 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   	"LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
 	v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
-  if (sel)
+  if (mesh && sel != -1)
   {
-    if (Sys->selected_polygon == sel)
+    csRef<iThingState> ps = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iThingState);
+    iPolygon3D* p = ps->GetPolygon (sel);
+    if (Sys->selected_polygon == p)
       Sys->selected_polygon = 0;
     else
-      Sys->selected_polygon = sel;
+      Sys->selected_polygon = p;
 
-    iThingState* ps = sel->GetParent ();
-    csRef<iMeshObject> obj = SCF_QUERY_INTERFACE (ps, iMeshObject);
-    csRef<iObject> psobj (SCF_QUERY_INTERFACE (obj->GetLogicalParent (),
-    	iObject));
+    iMeshObject* obj = mesh->GetMeshObject ();
+    csRef<iObject> psobj = SCF_QUERY_INTERFACE (obj->GetLogicalParent (),
+    	iObject);
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj ? psobj->GetName () : "<null>",
-	sel->GetStaticData ()->GetName ());
+	p->GetStaticData ()->GetName ());
     //Dumper::dump (sel);
   }
 

@@ -56,6 +56,7 @@
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
 #include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
 #include "imesh/genmesh.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
@@ -487,13 +488,19 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
 
-  iPolygon3D* poly = 0;
-  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
+  int polyidx = -1;
+  iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
   const char* poly_name;
-  if (poly)
+  if (polyidx != -1)
   {
-    poly_name = poly->GetStaticData ()->GetName ();
-    Dump (poly);
+    csRef<iThingState> ts = SCF_QUERY_INTERFACE (sel->GetMeshObject (),
+    	iThingState);
+    if (ts)
+    {
+      iPolygon3D* poly = ts->GetPolygon (polyidx);
+      poly_name = poly->GetStaticData ()->GetName ();
+      Dump (poly);
+    }
   }
   else
   {

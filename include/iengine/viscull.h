@@ -33,7 +33,6 @@ struct iFrustumView;
 struct iVisibilityObject;
 struct iMovable;
 struct iShadowReceiver;
-struct iPolygon3D;
 struct iMeshWrapper;
 struct iPolygonMesh;
 struct iObjectModel;
@@ -156,15 +155,15 @@ struct iVisibilityCuller : public iBase
 
   /**
    * Intersect a beam using this culler and return the intersection
-   * point, the mesh and optional polygon. If the returned mesh is 0
+   * point, the mesh and optional polygon index. If the returned mesh is 0
    * then this means that the object belonging to the culler itself was
-   * hit. This function will also detect hits with non-thing objects.
-   * In that case the returned polygon will always be 0.
+   * hit. Some meshes don't support returning polygon indices in which case
+   * that field will always be -1.
    * If accurate is true then a more accurate (and slower) method is used.
    */
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = 0,
-    iMeshWrapper** p_mesh = 0, iPolygon3D** poly = 0,
+    iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = false) = 0;
 
   /**

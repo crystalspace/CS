@@ -1331,12 +1331,14 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "action"))
   {
-    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other(3.0f*CS_VEC_FORWARD);
-    iPolygon3D* p = Sys->view->GetCamera ()->GetHit (where);
-    if (p)
+    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
+    	3.0f*CS_VEC_FORWARD);
+    int pidx;
+    iMeshWrapper* mesh = Sys->view->GetCamera ()->GetHit (where, &pidx);
+    if (mesh && pidx != -1)
     {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Action polygon '%s'", p->GetStaticData ()->GetName ());
+      //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	//"Action polygon '%s'", p->GetStaticData ()->GetName ());
       printf ("ACTION\n");
       //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }

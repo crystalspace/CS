@@ -326,8 +326,8 @@ public:
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned.
    */
-  iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& isect);
+  iMeshWrapper* HitBeamPortals (const csVector3& start, const csVector3& end,
+    csVector3& isect, int* polygon_idx);
 
   /**
    * Follow a beam from start to end and return the first object
@@ -336,7 +336,7 @@ public:
    * If polygonPtr is null then the polygon will not be filled in.
    */
   iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
+    csVector3& intersect, int* polygonPtr, bool accurate = false);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
@@ -395,14 +395,11 @@ public:
    * indicating where on the 'start'-'end' vector the intersection
    * happened.<p>
    *
-   * This function is an extension of csPolygonSet::intersect_segment in
-   * that it will also test for hits against things.<p>
-   *
    * If 'only_portals' == true only portals are checked.<p>
    *
    * If 'mesh' != 0 the mesh will be filled in.
    */
-  iPolygon3D* IntersectSegment (const csVector3& start,
+  int IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = 0, bool only_portals = false,
 	iMeshWrapper** p_mesh = 0);
@@ -524,12 +521,12 @@ public:
       { scfParent->SetFog (density, color); }
     virtual void DisableFog ()
       { scfParent->DisableFog (); }
-    virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& isect);
+    virtual iMeshWrapper* HitBeamPortals (const csVector3& start,
+    	const csVector3& end, csVector3& isect, int* polygon_idx);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
+      csVector3& intersect, int* polygonPtr, bool accurate = false);
     virtual iSector* FollowSegment (csReversibleTransform& t,
-    csVector3& new_position, bool& mirror, bool only_portals = false);
+      csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
       { scfParent->Draw (rview); }
     virtual void PrepareDraw (iRenderView* rview)

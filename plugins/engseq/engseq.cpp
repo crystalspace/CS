@@ -1940,8 +1940,8 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
       csVector3 isect, end = origin + (vw - origin) * 120;
 
-      iPolygon3D* poly = 0;
-      iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
+      int polyidx = -1;
+      iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
 
       int i;
       for (i = 0 ; i < mesh_triggers.Length () ; i++)

@@ -453,7 +453,7 @@ public:
 
   virtual csFlags& GetFlags () { return flags; }
 
-  virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
+  virtual int IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = 0, bool only_portals = false);
 
@@ -993,7 +993,7 @@ public:
     virtual void SetMovingOption (int opt)
     { scfParent->SetMovingOption (opt); }
 
-    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+    virtual int IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = 0, bool only_portals = false);
 

@@ -27,10 +27,13 @@ class csBoxClipper;
 class csIsoFakeCamera;
 class csPlane3;
 
+struct iMeshWrapper;
+
 /**
  *  isometric view
  */
-class csIsoView : public iIsoView {
+class csIsoView : public iIsoView
+{
 private:
   /// the isoengine to use
   iIsoEngine *engine;
@@ -151,7 +154,7 @@ public:
   virtual void SetFarPlane(csPlane3*) { }
   virtual csPlane3* GetFarPlane() const {return 0;}
   virtual long GetCameraNumber() const {return camnum;}
-  virtual iPolygon3D *GetHit (csVector3 &) {return 0;}
+  virtual iMeshWrapper *GetHit (csVector3 &, int*) {return 0;}
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

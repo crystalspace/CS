@@ -16,7 +16,24 @@ chronological order.
 	- Jorrit changed GetNearbyObjects() and GetNearbyMeshes() to support
 	  the new portal objects. This still leaves functions like
 	  FollowSegment() and IntersectSegment().
-	- Added a test standalone portal to flarge (in comments for now).
+	- Jorrit added a test standalone portal to flarge (in comments for now).
+	- Jorrit fixed a bug in csSector::HitBeam(). It wasn't correctly
+	  using GetFullTransform().
+	- Jorrit changed the api of the following functions:
+	    - iThingState->IntersectSegment() and
+	      iThingFactoryState->IntersectSegment() now return polygon index
+	      instead of polygon pointer.
+	    - The version of iSector->HitBeam() that doesn't support portals
+	      now returns polygon index instead of pointer.
+	    - The version of iSector->HitBeam() that supports portals is
+	      now renamed to iSector->HitBeamPortals(). It now returns
+	      the mesh that is hit and also a polygon index.
+	    - iCamera->GetHit() now returns the mesh that was hit and
+	      a polygon index.
+	    - iVisibilityCuller->IntersectSegment() now returns a polygon index
+	      instead of a pointer.
+	    - iPortal->HitBeam() is renamed to HitBeamPortals() and now
+	      returns a mesh and polygon index.
 	- Eric Sunshine upgraded a bunch of outdated information in the
 	  reference-counting HOWTO in the user manual, and added lot of
 	  important information which was missing.

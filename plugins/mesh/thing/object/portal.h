@@ -239,9 +239,9 @@ public:
    * The given transform 't' is used to transform the warping matrix
    * in the portal from object to world space (this==object, other==world).
    */
-  iPolygon3D* HitBeam (const csReversibleTransform& t,
+  iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect);
+  	csVector3& isect, int* polygon_idx);
 
   /**
    * Check if the destination sector is 0 and if so call
@@ -397,11 +397,11 @@ public:
     {
       scfParent->CheckFrustum (lview, t, alpha);
     }
-    virtual iPolygon3D* HitBeam (const csReversibleTransform& t,
+    virtual iMeshWrapper* HitBeamPortals (const csReversibleTransform& t,
 	const csVector3& start, const csVector3& end,
-  	csVector3& isect)
+  	csVector3& isect, int* polygon_idx)
     {
-      return scfParent->HitBeam (t, start, end, isect);
+      return scfParent->HitBeamPortals (t, start, end, isect, polygon_idx);
     }
   } scfiPortal;
 };

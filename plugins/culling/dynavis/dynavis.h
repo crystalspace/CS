@@ -247,7 +247,7 @@ public:
     const csVector3& start, const csVector3& end, bool accurate = false);
   virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = 0,
-    iMeshWrapper** p_mesh = 0, iPolygon3D** poly = 0,
+    iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = false);
   virtual void CastShadows (iFrustumView* fview);
   //virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }

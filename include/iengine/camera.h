@@ -47,7 +47,7 @@ class csCamera;
 class csVector3;
 class csVector2;
 struct iSector;
-struct iPolygon3D;
+struct iMeshWrapper;
 
 SCF_VERSION (iCamera, 0, 2, 0);
 
@@ -178,11 +178,12 @@ struct iCamera : public iBase
 
   /**
    * Check if there is a polygon in front of us in the direction
-   * defined by 'v' (world space coordinates). Return the nearest polygon.
+   * defined by 'v' (world space coordinates). Return the nearest polygon
+   * index or -1 if no polygon was hit.
    * Note that this function will not check beyond 'v'. So only the
    * vector between the current position of the camera and 'v' is checked.
    */
-  virtual iPolygon3D* GetHit (csVector3& v) = 0;
+  virtual iMeshWrapper* GetHit (csVector3& v, int* polygon_idx) = 0;
 
   /**
    * Get the 3D far plane that should be used to clip all geometry.

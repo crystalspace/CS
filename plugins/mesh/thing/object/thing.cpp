@@ -915,14 +915,13 @@ int csThingStatic::IntersectSegmentIndex (
   return best_p;
 }
 
-iPolygon3DStatic* csThingStatic::IntersectSegment (
+int csThingStatic::IntersectSegment (
 	const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr, bool only_portals)
 {
-  int p = IntersectSegmentIndex (start, end, isect, pr,
+  return IntersectSegmentIndex (start, end, isect, pr,
   	only_portals);
-  return p != -1 ? &(static_polygons.Get (p)->scfiPolygon3DStatic) : 0;
 }
 
 csPtr<csThingStatic> csThingStatic::Clone ()
@@ -2794,14 +2793,13 @@ iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
   return &(p->scfiPolygon3D);
 }
 
-iPolygon3D* csThing::ThingState::IntersectSegment (
+int csThing::ThingState::IntersectSegment (
 	const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr, bool only_portals)
 {
-  int p = scfParent->static_data->IntersectSegmentIndex (start, end, isect, pr,
+  return scfParent->static_data->IntersectSegmentIndex (start, end, isect, pr,
   	only_portals);
-  return p != -1 ? &(scfParent->polygons.Get (p)->scfiPolygon3D) : 0;
 }
 
 //---------------------------------------------------------------------------

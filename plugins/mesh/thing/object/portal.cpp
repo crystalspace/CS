@@ -345,11 +345,12 @@ bool csPortalObsolete::Draw (
   return true;
 }
 
-iPolygon3D *csPortalObsolete::HitBeam (
+iMeshWrapper *csPortalObsolete::HitBeamPortals (
   const csReversibleTransform& t,
   const csVector3 &start,
   const csVector3 &end,
-  csVector3 &isect)
+  csVector3 &isect,
+  int* polygon_idx)
 {
   if (!CompleteSector (0)) return 0;
   if (sector->GetRecLevel () >= max_sector_visit)
@@ -364,14 +365,18 @@ iPolygon3D *csPortalObsolete::HitBeam (
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
     csVector3 new_isect;
-    iPolygon3D *p = sector->HitBeam (new_start, new_end, new_isect);
-    if (p) isect = warp_wor.This2Other (new_isect);
-    return p;
+    int pidx;
+    iMeshWrapper *mesh = sector->HitBeam (new_start, new_end, new_isect, &pidx);
+    if (mesh && pidx != -1) isect = warp_wor.This2Other (new_isect);
+    if (mesh && polygon_idx) *polygon_idx = pidx;
+    return mesh;
   }
   else
   {
-    iPolygon3D *p = sector->HitBeam (start, end, isect);
-    return p;
+    int pidx;
+    iMeshWrapper *mesh = sector->HitBeam (start, end, isect, &pidx);
+    if (mesh && polygon_idx) *polygon_idx = pidx;
+    return mesh;
   }
 }
 
