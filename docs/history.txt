@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	  and wodrv.mak so that the basename of the dependency file matches the
 	  basename of the generated plugin; and so that all makefile variables
 	  match the basename of the plugin.
+	- Eric Sunshine added missing INC.FOO variables to casnddrv.mak,
+	  csarts.mak, oss.mak.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

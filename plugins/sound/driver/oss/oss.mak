@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(OSSDRV)
 endif
 
+INC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.h))
 SRC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
 OBJ.OSSDRV = $(addprefix $(OUT)/,$(notdir $(SRC.OSSDRV:.cpp=$O)))
 DEP.OSSDRV = CSUTIL CSSYS CSUTIL

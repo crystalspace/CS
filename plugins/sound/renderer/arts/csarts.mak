@@ -31,6 +31,7 @@ MCOP.INCDIR = $(KDEDIR)/include/arts
 
 # a few variables for the testapp
 ARTSTEST.EXE = artstest$(EXE)
+INC.ARTSTEST =
 SRC.ARTSTEST = $(CSARTS.DIR)/tt.cpp
 OBJ.ARTSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.ARTSTEST:.cpp=$O)))
 

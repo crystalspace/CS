@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CASNDDRV)
 endif
 
+INC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.h))
 SRC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.cpp))
 OBJ.CASNDDRV = $(addprefix $(OUT)/,$(notdir $(SRC.CASNDDRV:.cpp=$O)))
 LIB.CASNDDRV.COREAUDIO = -framework CoreAudio
