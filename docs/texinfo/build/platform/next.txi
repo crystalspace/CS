@@ -13,7 +13,7 @@
 @cindex NextStep
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 14 April 2000.}
+@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 8 September 2000.}
 
 This section contains configuration, compilation, installation, and usage
 instructions for the MacOS/X Server, OpenStep 4.2 and NextStep 3.3 ports of
@@ -41,6 +41,16 @@ compression and image manipulation (@pxref{External Libraries}).  These
 libraries, @samp{zlib}, @samp{libpng}, and @samp{libjpeg}, are present on most
 current Unix platforms, but are absent from MacOS/X Server, OpenStep, and
 NextStep.
+
+The most convenient site from which to download these library packages is the
+LinuxGames @sc{ftp} site.  These packages are known to work with MacOS/X
+Server, OpenStep, and NextStep and have already been organized to fit
+correctly into the Crystal Space project hierarchy.
+
+@noindent
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/zlib_1.1.1.tgz}@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/libjpeg-6a.tgz}@*
+@uref{ftp://ftp.linuxgames.com/crystal/support/general/libpng_1.0.tgz}
 
 Finally, if you are building Crystal Space on NextStep, you will need to
 download and install the @sc{gnu} @samp{make} program since Crystal Space
@@ -77,10 +87,10 @@ downloaded from one of the standard @sc{gnu} mirror sites; a couple of which
 are listed here:
 
 @noindent
-@uref{http://wuarchive.wustl.edu/systems/gnu/make-3.77.tar.gz}@*
-@uref{ftp://ftp.uu.net/systems/gnu/make-3.77.tar.gz}
+@uref{http://wuarchive.wustl.edu/systems/gnu/make/make-3.79.1.tar.gz}@*
+@uref{ftp://ftp.uu.net/systems/gnu/make/make-3.79.1.tar.gz}
 
-The current version of @sc{gnu} @samp{make} (3.77 at the time of this
+The current version of @sc{gnu} @samp{make} (3.79.1 at the time of this
 writing), does not correctly perform filename wildcard expansion
 out-of-the-box when used with NextStep 3.3.  Fortunately, this problem can be
 easily corrected.  Build the program by following these instructions:
@@ -90,14 +100,14 @@ easily corrected.  Build the program by following these instructions:
 Unpack the source:
 
 @example
-% gnutar xfz make-3.77.tar.gz
+% gnutar xfz make-3.79.1.tar.gz
 @end example
 
 @item
 Run the configuration script:
 
 @example
-% cd make-3.77
+% cd make-3.79.1
 % ./configure
 @end example
 
@@ -299,21 +309,39 @@ The simplest way to build the entire package, including all applications,
 drivers, and plug-in modules is to invoke the makefile target @samp{all}:
 
 @example
-% gnumake all
+% gnumake -k all
 @end example
 
 This can be a fairly time consuming operation.  If you would like to be more
 selective and only build the necessary drivers and a subset of the available
-applications, you can invoke their targets individually.  For example:
+applications, you can invoke their targets individually.
+
+For example, to build all plug-in drivers, you could invoke this command:
 
 @example
-% gnumake drivers # @r{Builds plug-in drivers}
-% gnumake csfont  # @r{Builds default font server}
-% gnumake rapid   # @r{Builds collision detection plug-in}
-% gnumake walk    # @r{Builds @code{walktest}, the level exploration program}
-% gnumake meta    # @r{Builds @code{metademo}, the MetaBalls demonstration}
-% gnumake mzed    # @r{Builds @code{mazed}, the Crystal Space level editor}
-% gnumake blks    # @r{Builds @code{blocks}, the 3D-Tetris style game}
+% gnumake -k drivers  # @r{Builds all plug-in drivers}
+@end example
+
+Or, for even finer control, you could build only the most commonly needed
+plug-in modules:
+
+@example
+% gnumake next2d    # @r{Builds the 2D graphics driver}
+% gnumake soft      # @r{Builds the software-based 3D renderer}
+% gnumake csfont    # @r{Builds default font server}
+% gnumake rapid     # @r{Builds collision detection plug-in}
+% gnumake perfstat  # @r{Builds the performance statistics plug-in}
+% gnumake simpcons  # @r{Builds the simple console plug-in}
+@end example
+
+For finer control over which applications are built, you can invoke their
+targets directly.  For instance:
+
+@example
+% gnumake walk  # @r{Builds @code{walktest}, the level exploration program}
+% gnumake blks  # @r{Builds @code{blocks}, the 3D-Tetris style game}
+% gnumake meta  # @r{Builds @code{metademo}, the MetaBalls demonstration}
+% gnumake mzed  # @r{Builds @code{mazed}, the Crystal Space level editor}
 @end example
 
 These commands individually build some of the more prominent Crystal Space
@@ -330,6 +358,20 @@ contains standard resources which are used by several of the example programs.
 You need to have one or more @dfn{map} files in order to run WalkTest.  These
 are the files which contain the maps and rooms which you can explore with
 WalkTest and edit with MazeD, the Crystal Space map (or ``maze'') editor.
+
+@strong{Note}: It is not currently possible to launch the Crystal Space
+demonstration applications by double-clicking on them in the Viewer
+application in MacOS/X Server, or from the the Workspace Manager's File Viewer
+on OpenStep and NextStep.  This problem is a result of a limitation of Viewer
+and Workspace Manager applications.  When the Crystal Space demonstration
+applications are launched, they expect to find the configuration files
+@file{scf.cfg} and @file{vfs.cfg} in the @dfn{current directory}--which is
+generally the same directory in which the Crystal Space applications reside.
+Unfortunately, neither Viewer nor Workspace Manager provide the necessary
+information for Crystal Space to locate these administrative files.  This
+problem will be corrected in the future once a suitable work-around has been
+devised.  @emph{Therefore, at this time, all Crystal Space applications
+@strong{must} be launched from the command-line.}
 
 Before running the demonstration programs for the first time, you should
 locate the file @file{cryst.cfg} in the @file{CS/data/config} directory.  This
@@ -388,9 +430,9 @@ Other interesting applications, such as MetaBalls, MazeD, and Blocks can be
 run with the following commands:
 
 @example
+% ./blocks
 % ./metademo
 % ./mazed
-% ./blocks
 @end example
 
 @unmacro NeXT

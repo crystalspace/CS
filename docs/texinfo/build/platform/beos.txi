@@ -10,7 +10,7 @@
 
 @emph{Originally written by David Huen, @email{david@@huen.freeserve.co.uk};
 heavily amended by Eric Sunshine, @email{sunshine@@sunshineco.com}).  Last
-updated 17 November 1999.}
+updated 8 September 2000.}
 
 CrystalSpace is a full-featured 3D graphics engine and the @BeOS{} port was
 originally created by Xavier Pianet (@email{xavier@@planet.dk}).  David Huen
@@ -61,7 +61,7 @@ This sets up everything you should need to compile the system.  After this,
 the simplest way to build the project is to type:
 
 @example
-make all
+make -k all
 @end example
 
 If you prefer more control over the build process, then you can compile the
@@ -69,17 +69,18 @@ various modules separately or in batches.  To compile all the basic drivers
 and plug-in modules, type:
 
 @example
-make plugins
+make -k plugins
 @end example
 
 Or for even more fine-grained control:
 
 @example
-make drivers2d
-make drivers3d
+make -k drivers2d
+make -k drivers3d
+make -k netdrivers
 make csfont
 make rapid
-make netdrivers
+make simpcons
 make cscon
 @end example
 
@@ -119,7 +120,7 @@ Finally, if you did not invoke the makefile target @samp{all}, you can build
 the example applications manually:
 
 @example
-make apps
+make -k apps
 @end example
 
 @node BeOS Running, , BeOS Building, BeOS

@@ -13,7 +13,7 @@
 @cindex NextStep Details
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 19 May 2000.}
+@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 8 September 2000.}
 
 This section contains comprehensive and detailed implementation information
 about the MacOS/X Server, OpenStep 4.2, and NextStep 3.3 ports of Crystal
@@ -691,6 +691,19 @@ Possibly implement sound support.
 This is a list of known problems with the current release of this project:
 
 @itemize @bullet
+@item
+It is not currently possible to launch the Crystal Space demonstration
+applications by double-clicking on them in the Viewer application in MacOS/X
+Server, or from the the Workspace Manager's File Viewer on OpenStep and
+NextStep.  This problem is a result of a limitation of Viewer and Workspace
+Manager applications.  When the Crystal Space demonstration applications are
+launched, they expect to find the configuration files @file{scf.cfg} and
+@file{vfs.cfg} in the @dfn{current directory}--which is generally the same
+directory in which the Crystal Space applications reside.  Unfortunately,
+neither Viewer nor Workspace Manager provide the necessary information for
+Crystal Space to locate these administrative files.  Therefore, at this time,
+all Crystal Space applications @emph{must} be launched from the command-line.
+
 @item
 Keyboard events generated with the @key{ALT} modifier are not correctly
 translated to Crystal Space events.  The reason is that NextStep @dfn{cooks}

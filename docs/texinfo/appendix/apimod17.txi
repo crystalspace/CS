@@ -13,7 +13,7 @@ Space to the next.  Only the major changes are covered here.  If you have
 trouble with something that isn't discussed here you should send mail to the
 the Crystal Space mailing list and ask for help.  @xref{Mailing Lists}.
 
-@heading API Changes: Version 0.16 to 0.17
+@heading @sc{api} Changes: Version 0.16 to 0.17
 
 This section documents the major changes between versions 0.16 and 0.17 of of
 Crystal Space.
@@ -63,12 +63,13 @@ changes:
 New class: @code{csMaterialWrapper}
 
 @item
-@code{SetTexture()} and @code{GetTexture()} were renamed to
+The methods @code{SetTexture()} and @code{GetTexture()} were renamed to
 @code{SetMaterial()} and @code{GetMaterial()}, respectively, in many places.
 
 @item
+The methods
 @code{SetTextureHandle()} and @code{GetTextureHandle()} were renamed to
-@code{SetMaterialWrapper() and @code{GetMaterialWrapper()}, respectively.
+@code{SetMaterialWrapper()} and @code{GetMaterialWrapper()}, respectively.
 @end itemize
 
 In general, in most places where you used to use @code{SetTexture()} or
@@ -156,8 +157,8 @@ somewhere) and then you can do:
 
 @example
 bool rc = collide_system->Collide(
-  col1->GetCollider (), trans1,
-  col2->GetCollider (), trans2);
+  col1->GetCollider(), trans1,
+  col2->GetCollider(), trans2);
 @end example
 
 @noindent
@@ -182,7 +183,7 @@ collide_system->SetOneHitOnly(@var{true}/@var{false});
 The argument for the second function depends on wether or not you
 are interested in receiving more than one hit.
 
-Note that @samp{ResetCollisionPairs} is important. Every call
+Note that @code{ResetCollisionPairs()} is important. Every call
 to @code{Collide()} will add additional collision pairs to this array.
 So you have to reset it if you are no longer interested in that.
 
@@ -203,7 +204,7 @@ texturing parameters at all thus saves memory.
 @item POLYTXT_FLAT
 Flat-shading.  Only the angle between light and polygon normal is considered
 if @samp{CS_POLY_LIGHTING} flag is set, and entire polygon is painted with one
-lighting value.  Every vertex has an U/V pair associated.
+lighting value.  Every vertex has an @sc{u/v} pair associated.
 
 @item POLYTXT_GOURAUD
 Every polygon vertex has a color and those colors are interpolated across
@@ -217,7 +218,7 @@ Now it is possible to define and use objects which have flat-color but still
 receive light with Gouraud as well as without Gouraud interpolation; in
 general this open a whole new area for experimenting.
 
-In practice this means that @samp{csGouraudShaded} has gone and is now
+In practice this means that @samp{csGouraudShaded} is gone and has been
 replaced with @samp{csPolyTexGouraud}.  @samp{csLightMapped} has also gone and
 is replaced with @samp{csPolyTexLightMap}.
 
@@ -368,12 +369,12 @@ Removed @code{csWorld::GetThing()}.  Use @code{world->things.FindByName()}
 instead.
 
 @item
-Removed @code{csWorld::GetSpriteTemplate()}.  Use
-@code{world->sprite_templates.FindByName()} instead.
+Removed the method @code{csWorld::GetSpriteTemplate()}.  Instead, use this
+expression: @code{world->sprite_templates.FindByName()}
 
 @item
-Removed @code{csWorld::GetThingTemplate()}.  Use
-@code{world->thing_templates.FindByName()} instead.
+Removed the method @code{csWorld::GetThingTemplate()}.  Instead, use this
+expression: @code{world->thing_templates.FindByName()} instead.
 
 @item
 Added @code{csWorld::UnlinkCollection()} and
@@ -381,6 +382,6 @@ Added @code{csWorld::UnlinkCollection()} and
 
 @item
 Added @code{csWorld::GetBeginDrawFlags()}.  This is a very important function
-that you @emph{must}} invoke when calling @code{iGraphics3D::BeginDraw()} in
+that you @emph{must} invoke when calling @code{iGraphics3D::BeginDraw()} in
 your application just before you give control to the engine for drawing.
 @end itemize

@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Tutorial Simple, Tutorial Simple 2, Tutorial Introduction, Tutorials
-@section Simple Tutorial
+@section Simple Tutorial 1
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
@@ -162,7 +162,8 @@ int main (int argc, char* argv[])
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+  System->RequestPlugin (
+    "crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
 
   // Initialize the main system. This will load all needed
@@ -514,7 +515,9 @@ void Simple::NextFrame ()
   superclass::NextFrame ();
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
+  if (!G3D->BeginDraw (
+      world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+      return;
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();

@@ -15,6 +15,27 @@ The history order has been reversed so that new features are at the top.
 	      csNSTP --> csNetSpaceTransportProto
 	- Received patched VC project files from Philip Wyett
 	  <philipwyett@leedsalumni.org.uk>.
+	- Eric Sunshine fixed quite a few formatting problems reported by TeX
+	  when building the Crystal Space manual from the Texinfo files for
+	  printed output.  Also fixed several errors in apimod17.txi which
+	  prevented TeX from building the manual at all.  (The only formatting
+	  problems not yet fixed are those in worldfmt.txi.  This document
+	  contains several hundred formatting problems and is going to require
+	  a significant effort to fix correctly.)
+	- Eric Sunshine modified several of the Texinfo documents which
+	  contain instructions for building Crystal Space on various platforms
+	  so that they now direct the user to use "make -k" (rather than
+	  "make") when building compound targets such as "all" and "drivers".
+	- Eric Sunshine upgraded the NeXT documentation Texinfo files in
+	  several ways:
+	    - Upgraded out-of-date URLs.
+	    - Added links to the zlib, jpeg, and png libraries at LinuxGames.
+	    - Added instructions for building new required plug-in modules.
+	    - Upgraded and clarified instructions for finer control over build
+	      process.
+	    - Added special note about having to run applications from the
+	      command line rather than by double-clicking on them from the
+	      file viewer.
 7-Sep-2000
 	- Continued work on saver in levtool.  The saved world file works very
 	  well already.  But a few important things are still missing (like

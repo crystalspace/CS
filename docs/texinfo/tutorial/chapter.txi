@@ -9,7 +9,7 @@ environment.
 
 @menu
 * Tutorial Introduction:: Developing a Crystal Space Application
-* Tutorial Simple:: Simple Tutorial
+* Tutorial Simple:: Simple Tutorial 1
 * Tutorial Simple 2:: Simple Tutorial 2
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * Tutorial CrystalClear:: A CrystalClear Tutorial

@@ -3,7 +3,7 @@
 @subsection @sc{gcc} and Mingw for Windows
 
 @noindent
-@emph{Updated by Norman Kr@"amer (@email{norman@@users.sourceforge.net}).}
+@emph{Updated by Norman Kr@"amer, @email{norman@@users.sourceforge.net}.}
 
 These instructions are for building Crystal Space with a @sc{gnu} compiler for
 Windows.  Unfortunately, there are many different versions of the @sc{gnu}
@@ -57,7 +57,7 @@ SET PATH=c:\mingw32\bin;c:\mingw32\lib;%PATH%
 @end example
 
 @noindent
-On Windows NT and Windows 2000, use the System control panel to edit the
+On Windows @sc{nt} and Windows 2000, use the System control panel to edit the
 environment variable.
 
 @item
@@ -83,13 +83,30 @@ commands:
 
 @example
 make win32gcc MODE=debug
-make clean depend all
+make -k clean depend all
+@end example
+
+Note that making the @samp{depend} target is not absolutely required.  If
+doing so presents problems, then you can safely omit it:
+
+@example
+make win32gcc MODE=debug
+make -k clean all
 @end example
 
 @subsubheading Customizing
 
-You may need to customize settings in the Mingw32 makefile which resides at
-@file{CS\libs\cssys\win32\win32gcc.mak}.  Check the the following variables:
-@samp{LIBS.GL3D.SYSTEM}, @samp{LIBS.SOCKET.SYSTEM}, and
-@samp{LIBS.SOUND.SYSTEM}.  Adjust them to match your system libraries.  Also
-in the file @file{CS\mk\user.mak} select which plugins you wish to compile.
+You may need to customize settings in @file{CS\libs\cssys\win32\win32gcc.mak},
+the Minw32 makefile.  Check the the following variables:
+
+@itemize @bullet
+@item
+@code{LIBS.GL3D.SYSTEM}
+@item
+@code{LIBS.SOCKET.SYSTEM}
+@item
+@code{LIBS.SOUND.SYSTEM}
+@end itemize
+
+Adjust them to match your system libraries.  Also in the file
+@file{CS\mk\user.mak} select which plugins you wish to compile.

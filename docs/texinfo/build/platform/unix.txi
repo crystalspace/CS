@@ -87,20 +87,20 @@ This indicates that we are going to compile for Linux and use dynamic
 linking (preferable). If you don't want to use the dynamic libraries you
 can set @code{USE_SHARED_PLUGINS=no}. That will generate one big executable.
 
-Optionally you can now do:
+You can optionally invoke the @samp{depend} target to make sure that all
+dependencies are correct.  This is only important if you intend to make
+changes to the sources and want to be sure that all files will be recompiled
+that are in need of recompiling.  You can, however, can safely omit this step
+if desired.
 
 @example
 make depend
 @end example
 
-To make sure that all dependencies are correct. This is only important
-if you intend to make changes to the sources and want to be sure that
-all files will be recompiled that are in need of recompiling.
-
-Then you need to do the following:
+Then you need to do the following to actually build the entire project:
 
 @example
-make all
+make -k all
 @end example
 
 If you selected @code{USE_SHARED_PLUGINS=yes} then this will generate an
@@ -116,7 +116,7 @@ However, typically this file is already up-to-date, so usually you can skip
 this step altogether. Only perform this step if the system is unable to
 locate the drivers or if you are actively developing a driver and changing
 registration information. The program to register plug-ins is called scfreg,
-and it was also compiled by @samp{make all}. To run it, type:
+and it was also compiled by @samp{make -k all}. To run it, type:
 
 @example
 ./scfreg *.so
@@ -148,8 +148,8 @@ Software with GGI
 
 To compile those drivers edit @file{libs/cssys/unix/linux.mak} (or one of the
 other makfiles in that directory) and edit the @samp{PLUGINS} statement so
-that it mentions the drivers you wish to build.  Then do @samp{make all} again
-and register the new drivers.
+that it mentions the drivers you wish to build.  Then do @samp{make -k all}
+again and register the new drivers.
 
 The software renderer can run with the X11, SVGALIB, or GGI drivers. If
 the @samp{GGI_DISPLAY} environment variable is defined it will choose the
