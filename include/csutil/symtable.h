@@ -26,7 +26,7 @@
 /**
  * This class provides a system for storing inheritable properties, by allowing
  * instances to be stacked in a tree formation with parent/child relationships.
- *
+ * <p>
  * Used by the render3d shader system.
  */
 class csSymbolTable

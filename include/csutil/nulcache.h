@@ -29,7 +29,6 @@
  */
 class csNullCacheManager : public iCacheManager
 {
-private:
 public:
   /**
    * Does nothing.

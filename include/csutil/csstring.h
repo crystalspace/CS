@@ -102,8 +102,8 @@ public:
   { return Truncate (0); }
 
   /**
-   * Get a pointer to ASCIIZ string - warning: this is a non constpointer
-   * ,so use this function with care!
+   * Get a pointer to ASCIIZ string - warning: this is a non constpointer,
+   * so use this function with care!
    */
   char* GetData () const
   { return Data; }
@@ -123,7 +123,7 @@ public:
     return Data [n];
   }
 
-  /// get n'th character
+  /// Get n'th character.
   char operator [] (size_t n) const
   {
     CS_ASSERT (n < Size);
@@ -185,14 +185,16 @@ public:
    */
   void SubString (csString& sub, size_t start, size_t len);
 
-  /// Find first character 'c' from position 'p'.
   /**
+   * Find first character 'c' from position 'p'.
    * If the character cannot be found, this function returns (size_t)-1
    */
   size_t FindFirst (const char c, size_t p = (size_t)-1);
-  /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+
   /**
-   * If the character cannot be found, this function returns (size_t)-1
+   * Find first character 'c', counting backwards from position 'p'. Default
+   * position is the end of the string. If the character cannot be found, this
+   * function returns (size_t)-1
    */
   size_t FindLast (const char c, size_t p = (size_t)-1);
 

@@ -24,7 +24,9 @@
 #include "csutil/hashmapr.h"
 #include "cssys/csendian.h"
 
-enum {
+/// Various datatypes supported by the event system (csEvent).
+enum
+{
   CS_DATATYPE_INT8 = 0x00,
   CS_DATATYPE_UINT8,
   CS_DATATYPE_INT16,
@@ -52,7 +54,7 @@ class csEvent : public iEvent
 {
 private:
   csHashMapReversible attributes;
-  
+
   uint32 count;
 
   bool CheckForLoops(csEvent *current, csEvent *e);
@@ -64,10 +66,11 @@ private:
   uint32 FlattenSizeCrystal();
   uint32 FlattenSizeMuscle();
   uint32 FlattenSizeXML();
-  
+
   bool UnflattenCrystal(const char *buffer, uint32 length);
   bool UnflattenMuscle(const char *buffer, uint32 length);
   bool UnflattenXML(const char *buffer, uint32 length);
+
 public:
   /// Empty initializer
   csEvent ();
@@ -93,52 +96,54 @@ public:
   /// Destructor
   virtual ~csEvent ();
 
-  virtual bool Add(const char *name, int8 v);
-  virtual bool Add(const char *name, uint8 v);
-  virtual bool Add(const char *name, int16 v);
-  virtual bool Add(const char *name, uint16 v);
-  virtual bool Add(const char *name, int32 v, bool force_boolean = false);
-  virtual bool Add(const char *name, uint32 v);
-  virtual bool Add(const char *name, int64 v);
-  virtual bool Add(const char *name, uint64 v);
-  virtual bool Add(const char *name, float v);
-  virtual bool Add(const char *name, double v);
-  virtual bool Add(const char *name, char *v);
-  virtual bool Add(const char *name, void *v, uint32 size);
+  /// Add a named event with a given parameter.
+  virtual bool Add (const char *name, int8 v);
+  virtual bool Add (const char *name, uint8 v);
+  virtual bool Add (const char *name, int16 v);
+  virtual bool Add (const char *name, uint16 v);
+  virtual bool Add (const char *name, int32 v, bool force_boolean = false);
+  virtual bool Add (const char *name, uint32 v);
+  virtual bool Add (const char *name, int64 v);
+  virtual bool Add (const char *name, uint64 v);
+  virtual bool Add (const char *name, float v);
+  virtual bool Add (const char *name, double v);
+  virtual bool Add (const char *name, char *v);
+  virtual bool Add (const char *name, void *v, uint32 size);
 #ifndef CS_USE_FAKE_BOOL_TYPE
-  virtual bool Add(const char *name, bool v, bool force_boolean = true);
+  virtual bool Add (const char *name, bool v, bool force_boolean = true);
 #endif
-  virtual bool Add(const char *name, iEvent *v);
+  virtual bool Add (const char *name, iEvent *v);
 
-  virtual bool Find(const char *name, int8 &v, int index = 0);
-  virtual bool Find(const char *name, uint8 &v, int index = 0);
-  virtual bool Find(const char *name, int16 &v, int index = 0);
-  virtual bool Find(const char *name, uint16 &v, int index = 0);
-  virtual bool Find(const char *name, int32 &v, int index = 0);
-  virtual bool Find(const char *name, uint32 &v, int index = 0);
-  virtual bool Find(const char *name, int64 &v, int index = 0);
-  virtual bool Find(const char *name, uint64 &v, int index = 0);
-  virtual bool Find(const char *name, float &v, int index = 0);
-  virtual bool Find(const char *name, double &v, int index = 0);
-  virtual bool Find(const char *name, char **v, int index = 0);
-  virtual bool Find(const char *name, void **v, uint32 &size, int index = 0);
+  /// Find a named event for a given type.
+  virtual bool Find (const char *name, int8 &v, int index = 0);
+  virtual bool Find (const char *name, uint8 &v, int index = 0);
+  virtual bool Find (const char *name, int16 &v, int index = 0);
+  virtual bool Find (const char *name, uint16 &v, int index = 0);
+  virtual bool Find (const char *name, int32 &v, int index = 0);
+  virtual bool Find (const char *name, uint32 &v, int index = 0);
+  virtual bool Find (const char *name, int64 &v, int index = 0);
+  virtual bool Find (const char *name, uint64 &v, int index = 0);
+  virtual bool Find (const char *name, float &v, int index = 0);
+  virtual bool Find (const char *name, double &v, int index = 0);
+  virtual bool Find (const char *name, char **v, int index = 0);
+  virtual bool Find (const char *name, void **v, uint32 &size, int index = 0);
 #ifndef CS_USE_FAKE_BOOL_TYPE
-  virtual bool Find(const char *name, bool &v, int index = 0);
+  virtual bool Find (const char *name, bool &v, int index = 0);
 #endif
-  virtual bool Find(const char *name, iEvent **v, int index = 0);
+  virtual bool Find (const char *name, iEvent **v, int index = 0);
 
-  virtual bool Remove(const char *name, int index = -1);
-  virtual bool RemoveAll();
+  virtual bool Remove (const char *name, int index = -1);
+  virtual bool RemoveAll ();
 
-  virtual uint32 FlattenSize(int format = CS_CRYSTAL_PROTOCOL);
-  virtual bool Flatten(char *buffer, int format = CS_CRYSTAL_PROTOCOL);
-  virtual bool Unflatten(const char *buffer, uint32 length);
-  
-  virtual bool Print(int level = 0);
+  virtual uint32 FlattenSize (int format = CS_CRYSTAL_PROTOCOL);
+  virtual bool Flatten (char *buffer, int format = CS_CRYSTAL_PROTOCOL);
+  virtual bool Unflatten (const char *buffer, uint32 length);
 
-  virtual void IncRefIfPooled();
-  virtual void DecRefUnlessPooled();
-  
+  virtual bool Print (int level = 0);
+
+  virtual void IncRefIfPooled ();
+  virtual void DecRefUnlessPooled ();
+
   SCF_DECLARE_IBASE;
 };
 
@@ -160,23 +165,23 @@ private:
   // and this also allows our overridden DecRef() to place the event back
   // into the pool when users are done with it.
   csRef<csEventQueue> pool;
- 
+
   // The next event in the pool, or null if the event is in use.
   csPoolEvent *next;
- 
-  // The 'real' DecRef() call that deletes the event, should in theory only be 
+
+  // The 'real' DecRef() call that deletes the event, should in theory only be
   // called from the csEventQueue;
-  void Free() { csEvent::DecRef(); }
- 
+  void Free () { csEvent::DecRef(); }
+
 public:
   /// The constructor, this should only be called from within the csEventQueue
-  csPoolEvent(csEventQueue *q);
+  csPoolEvent (csEventQueue *q);
 
-  virtual void IncRefIfPooled();
-  virtual void DecRefUnlessPooled();
- 
+  virtual void IncRefIfPooled ();
+  virtual void DecRefUnlessPooled ();
+
   /// The DecRef() that places the event back into the pool at a ref count of 1
-  void DecRef();
+  void DecRef ();
 };
 
 #endif // __CS_CSEVENT_H__

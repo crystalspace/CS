@@ -106,13 +106,13 @@ public:
 
   /// Initialize constructor.
   csInputBinderPosition (int pp) : p (pp)
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Empty constructor.
   csInputBinderPosition () : p (0)
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Copy constructor.
   csInputBinderPosition (iInputBinderPosition *pp) : p (pp->Get ())
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Destructor.
   virtual ~csInputBinderPosition () {}
 
@@ -137,13 +137,13 @@ public:
 
   /// Initialize constructor.
   csInputBinderBoolean (bool ss) : s (ss)
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Empty constructor.
   csInputBinderBoolean () : s (0)
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Copy constructor.
   csInputBinderBoolean (iInputBinderBoolean *ss) : s (ss->Get ())
-    { SCF_CONSTRUCT_IBASE (0); }
+  { SCF_CONSTRUCT_IBASE (0); }
   /// Destructor.
   virtual ~csInputBinderBoolean () {}
 

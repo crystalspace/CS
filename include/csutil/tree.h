@@ -54,14 +54,19 @@ class csTreeNode
   }
 
   /**
-   * Execute a function on this node and its children. Do this in "DepthSearchFirst" order, that is check a childs children
+   * Execute a function on this node and its children. Do this in
+   * "DepthSearchFirst" order, that is check a childs children
    * before testing the next direct child.
-   * Returns the last node where TreeFunc resulted in TRUE. If stopOnSuccess is true, then execution is stoped after first
+   * Returns the last node where TreeFunc resulted in TRUE.
+   * If stopOnSuccess is true, then execution is stoped after first
    * successful execution of TreeFunc.
-   * SelBranch lets you decide which children to select for further investugation. 0 means all children.
+   * SelBranch lets you decide which children to select for further
+   * investigation. 0 means all children.
    */
-  csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
-		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
+  csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, void* param,
+  					bool stopOnSuccess),
+		   bool (*SelBranch)(csTreeNode *node), void* param,
+		   			bool stopOnSuccess)
   {
     csTreeNode *foundNode = 0;
     int i=0;
@@ -80,14 +85,19 @@ class csTreeNode
   }
 
   /**
-   * Execute a function on this node and its children. Do this in "BreadthSearchFirst" order, that is check first all
+   * Execute a function on this node and its children. Do this in
+   * "BreadthSearchFirst" order, that is check first all
    * direct children before diving into subchildren.
-   * Returns the last node where TreeFunc resulted in TRUE. If stopOnSuccess is true, then execution is stoped after first
+   * Returns the last node where TreeFunc resulted in TRUE.
+   * If stopOnSuccess is true, then execution is stoped after first
    * successful execution of TreeFunc.
-   * SelBranch lets you decide which children to select for further investugation. 0 means all children.
+   * SelBranch lets you decide which children to select for further
+   * investugation. 0 means all children.
    */
-  csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
-		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
+  csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, void* param,
+  				bool stopOnSuccess),
+		   bool (*SelBranch)(csTreeNode *node), void* param,
+		   		bool stopOnSuccess)
   {
     csTreeNode *node, *foundNode = 0;
     csVector fifo;

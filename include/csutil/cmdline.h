@@ -25,6 +25,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
+/// Representation of a commandline option.
 struct csCommandLineOption
 {
   /// Option name

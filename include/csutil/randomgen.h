@@ -42,31 +42,30 @@ class csRandomGen
   float c, cd, cm;
 
 public:
-
   /// Initialize the random number generator using current time()
   csRandomGen ()
   { Initialize (); }
   /// Initialize the random number generator given a seed
-  csRandomGen (unsigned iSeed)
+  csRandomGen (uint32 iSeed)
   { Initialize (iSeed); }
 
   /// Initialize the RNG using current time() as the seed value
   void Initialize ();
   /// Select the random sequence number (942,438,978 sequences available)
-  void Initialize (unsigned iSeed);
+  void Initialize (uint32 iSeed);
 
   /// Get a floating-point random number in range 0 <= num < 1
   float Get ()
   { return RANMAR (); }
-  /// Get a unsigned integer random number in range 0 <= num < iLimit
-  unsigned Get (unsigned iLimit);
+  /// Get a uint32 integer random number in range 0 <= num < iLimit
+  uint32 Get (uint32 iLimit);
 
   /// Perform a self-test
   bool SelfTest ();
 
 private:
   /// Initialize the random number generator
-  void InitRANMAR (unsigned ij, unsigned kl);
+  void InitRANMAR (uint32 ij, uint32 kl);
   /// Get the next random number in sequence
   float RANMAR ();
 };

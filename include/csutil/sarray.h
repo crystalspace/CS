@@ -131,20 +131,20 @@ public:									\
 }
 
 inline int csStaticArray::GetSize () const
-  {
-    return Size;
-  }
+{
+  return Size;
+}
 inline void csStaticArray::TakeOver (csStaticArray *other, bool DeleteOld)
-  {
-    TakeOver (other->Map, other->Size, DeleteOld);
-    other->Map = 0;
-    other->Size = 0;
-  }
+{
+  TakeOver (other->Map, other->Size, DeleteOld);
+  other->Map = 0;
+  other->Size = 0;
+}
 inline void csStaticArray::TakeOver (void *NewData, int NewSize, bool DeleteOld)
-  {
-    if (DeleteOld) Clear ();
-    Map = NewData;
-    Size = NewSize;
-  }
+{
+  if (DeleteOld) Clear ();
+  Map = NewData;
+  Size = NewSize;
+}
 
 #endif // __CS_SARRAY_H__

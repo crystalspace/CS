@@ -112,3 +112,4 @@ extern bool csGetJoyDesc (int button, int shift, char *buf,
   bool use_shift = true);
 
 #endif // __CS_UTIL_CSINPUTS_H__
+

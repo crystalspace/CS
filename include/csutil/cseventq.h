@@ -31,6 +31,7 @@
 #include "csutil/evoutlet.h"
 #include "csutil/garray.h"
 #include "iutil/eventq.h"
+
 struct iObjectRegistry;
 
 /**\internal
@@ -51,6 +52,7 @@ class csEventQueue : public iEventQueue
 {
   friend class csEventOutlet;
   friend class csPoolEvent;
+
 private:
   struct Listener
   {
@@ -59,35 +61,35 @@ private:
   };
   typedef csGrowingArray<Listener> ListenerVector;
 
-  /*
+  /**
    * The array of all allocated event outlets.  *NOTE* It is not the
    * responsibility of this class to free the contained event outlets, thus
-   * this class does not override FreeItem().  Instead, it is the
-   * responsibility of the caller of iEventQueue::CreateEventOutlet() to send
-   * the outlet a DecRef() message (which, incidentally, will result in the
+   * this class does not override FreeItem ().  Instead, it is the
+   * responsibility of the caller of iEventQueue::CreateEventOutlet () to send
+   * the outlet a DecRef () message (which, incidentally, will result in the
    * automatic removal of the outlet from this list if no references to the
    * outlet remain).
    */
   class EventOutletsVector : public csVector
   {
   public:
-    EventOutletsVector() : csVector (16, 16) {}
-    virtual ~EventOutletsVector () { DeleteAll(); }
-    csEventOutlet* Get(int i)
-      { return (csEventOutlet*)csVector::Get(i); }
+    EventOutletsVector () : csVector (16, 16) {}
+    virtual ~EventOutletsVector () { DeleteAll (); }
+    csEventOutlet* Get (int i)
+      { return (csEventOutlet*)csVector::Get (i); }
   };
 
-  // The array of all allocated event cords.
+  /// The array of all allocated event cords.
   class EventCordsVector : public csVector
   {
   public:
-    EventCordsVector() : csVector (16, 16) {}
-    virtual ~EventCordsVector() { DeleteAll(); }
-    virtual bool FreeItem(void* p)
-      { ((csEventCord*)p)->DecRef(); return true; }
-    csEventCord* Get(int i)
-      { return (csEventCord*)csVector::Get(i); }
-    int Find(int Category, int SubCategory);
+    EventCordsVector () : csVector (16, 16) {}
+    virtual ~EventCordsVector () { DeleteAll (); }
+    virtual bool FreeItem (void* p)
+      { ((csEventCord*)p)->DecRef (); return true; }
+    csEventCord* Get (int i)
+      { return (csEventCord*)csVector::Get (i); }
+    int Find (int Category, int SubCategory);
   };
 
   // Shared-object registry
@@ -117,15 +119,15 @@ private:
   csPoolEvent *EventPool;
 
   // Enlarge the queue size.
-  void Resize(size_t iLength);
+  void Resize (size_t iLength);
   // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
-  inline void Lock() { while (SpinLock) {} SpinLock++; }
+  inline void Lock () { while (SpinLock) {} SpinLock++; }
   // Unlock the queue
-  inline void Unlock() { SpinLock--; }
+  inline void Unlock () { SpinLock--; }
   // Find a particular listener index; return -1 if listener is not registered.
-  int FindListener(iEventHandler*) const;
+  int FindListener (iEventHandler*) const;
   // Notify listeners of CSMASK_Nothing.
-  void Notify(iEvent&);
+  void Notify (iEvent&);
 
   /*
    * Start a loop. The purpose of this function is to protect
@@ -140,46 +142,46 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Initialize the event queue
-  csEventQueue(iObjectRegistry*, size_t iLength = DEF_EVENT_QUEUE_LENGTH);
+  csEventQueue (iObjectRegistry*, size_t iLength = DEF_EVENT_QUEUE_LENGTH);
   /// Destroy an event queue object
-  virtual ~csEventQueue();
+  virtual ~csEventQueue ();
 
-  /// Process the event queue.  Calls Dispatch() once for each contained event.
-  virtual void Process();
-  /// Dispatch a single event from the queue; normally called by Process().
-  virtual void Dispatch(iEvent&);
+  /// Process the event queue.  Calls Dispatch () once for each contained event.
+  virtual void Process ();
+  /// Dispatch a single event from the queue; normally called by Process ().
+  virtual void Dispatch (iEvent&);
 
   /// Register a listener for specific events.
-  virtual void RegisterListener(iEventHandler*, unsigned int trigger);
+  virtual void RegisterListener (iEventHandler*, unsigned int trigger);
   /// Unregister a listener.
-  virtual void RemoveListener(iEventHandler*);
+  virtual void RemoveListener (iEventHandler*);
   /**
    * Unregister all listeners.
-   * \copydoc iEventQueue::RemoveAllListeners()
+   * \copydoc iEventQueue::RemoveAllListeners ()
    */
-  virtual void RemoveAllListeners();
+  virtual void RemoveAllListeners ();
   /// Change a listener's trigger.
-  virtual void ChangeListenerTrigger(iEventHandler*, unsigned int trigger);
+  virtual void ChangeListenerTrigger (iEventHandler*, unsigned int trigger);
 
   /// Register an event plug and return a new outlet.
-  virtual csPtr<iEventOutlet> CreateEventOutlet(iEventPlug*);
+  virtual csPtr<iEventOutlet> CreateEventOutlet (iEventPlug*);
   /// Get a public event outlet for posting just an event.
-  virtual iEventOutlet* GetEventOutlet();
+  virtual iEventOutlet* GetEventOutlet ();
   /// Get the event cord for a given category and subcategory.
   virtual iEventCord* GetEventCord (int Category, int Subcategory);
 
   /// Get a count of events in the pool, for testing only.
-  uint32 CountPool();
+  uint32 CountPool ();
   /// Grab an event from the pool or make a new one if it's empty.
-  virtual csPtr<iEvent> CreateEvent(uint8 type);
+  virtual csPtr<iEvent> CreateEvent (uint8 type);
   /// Place an event into queue.
-  virtual void Post(iEvent*);
+  virtual void Post (iEvent*);
   /// Get next event from queue or a null references if no event.
-  virtual csPtr<iEvent> Get();
+  virtual csPtr<iEvent> Get ();
   /// Clear event queue
-  virtual void Clear();
+  virtual void Clear ();
   /// Query if queue is empty (@@@ Not thread safe!)
-  virtual bool IsEmpty() { return evqHead == evqTail; }
+  virtual bool IsEmpty () { return evqHead == evqTail; }
 };
 
 #endif // __CS_CSEVENTQ_H__

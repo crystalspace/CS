@@ -24,6 +24,14 @@ for each given day, however, are in normal (ascending) chronological order.
 	  to all canvas implementations that use X-Windows but they don't
 	  need to be public.
 	- Jorrit did more Doxygen and indentation cleanups in include/ivideo.
+	- Jorrit cleaned up various include files in csutil.
+	- Jorrit made the assignment operator and copy constructor of
+	  csArray<T> more efficient.
+	- Jorrit made the copy constructor of csRefArray<T> more efficient.
+	- Jorrit clarified the documentation in csFlags since people often
+	  seem to be confused about that class. Also replaced 'unsigned'
+	  with 'uint32' to store the flags.
+	- Jorrit marked csPArray<T> as deprecated.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

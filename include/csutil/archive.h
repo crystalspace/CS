@@ -87,7 +87,8 @@ private:
     virtual bool FreeItem (void* Item)
     { delete (ArchiveEntry *)Item; return true; }
     virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
-    { return strcmp (((ArchiveEntry *)Item1)->filename, ((ArchiveEntry *)Item2)->filename); }
+    { return strcmp (((ArchiveEntry *)Item1)->filename,
+	((ArchiveEntry *)Item2)->filename); }
     virtual int CompareKey (void* Item, const void* Key, int /*Mode*/) const
     { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
     ArchiveEntry *Get (int n) const
@@ -95,8 +96,8 @@ private:
   };
 
   ArchiveEntryVector dir;	// Archive directory: chain head (sorted)
-  csStrVector del;		// The array of files that should be deleted (sorted)
-  ArchiveEntryVector lazy;	// The array of lazy operations (unsorted)
+  csStrVector del;		// Files that should be deleted (sorted)
+  ArchiveEntryVector lazy;	// Lazy operations (unsorted)
 
   char *filename;		// Archive file name
   FILE *file;			// Archive file pointer.
@@ -117,7 +118,8 @@ private:
   bool WriteCentralDirectory (FILE *temp);
   void UpdateDirectory ();
   void ReadZipDirectory (FILE *infile);
-  ArchiveEntry *InsertEntry (const char *name, ZIP_central_directory_file_header &cdfh);
+  ArchiveEntry *InsertEntry (const char *name,
+	ZIP_central_directory_file_header &cdfh);
   void ReadZipEntries (FILE *infile);
   char *ReadEntry (FILE *infile, ArchiveEntry *f);
 

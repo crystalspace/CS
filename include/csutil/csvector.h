@@ -69,10 +69,12 @@ public:
   /// Query vector limit
   inline int Limit () const;
 
-  /** Delete element number 'n' from vector and shift the range
-    [n+1...m] down to [n...m-1] (where 'm' is the last position prior 
-    to removing 'n'). 
-    @note This method is not virtual. */
+  /**
+   * Delete element number 'n' from vector and shift the range
+   * [n+1...m] down to [n...m-1] (where 'm' is the last position prior 
+   * to removing 'n'). 
+   * @note This method is not virtual.
+   */
   bool Delete (int n);
   /// Delete a chunk of size at the position 'n' (non virtual)
   bool DeleteChunk (int n,int size);

@@ -52,7 +52,7 @@ protected:
   void InitializeObject ();
 
 public:
-  /// Initialize the csObject
+  /// Initialize the csObject.
   csObject (iBase* pParent = 0);
 
   /**

@@ -19,6 +19,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
+
 /*
   Copyright (C) 1999 Aladdin Enterprises.  All rights reserved.
 
@@ -72,7 +73,6 @@
  */
 class csMD5
 {
-// Peter's raw interface
 public:
   /// 8-bit byte
   typedef unsigned char md5_byte_t;
@@ -109,3 +109,4 @@ public:
 };
 
 #endif // __CS_CSMD5_H__
+

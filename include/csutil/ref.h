@@ -186,9 +186,9 @@ public:
       // destructed forever (when ref=0 is used for example).
       obj = newobj;
       if (newobj)
-  newobj->IncRef ();
+	newobj->IncRef ();
       if (oldobj)
-  oldobj->DecRef ();
+	oldobj->DecRef ();
     }
     return *this;
   }

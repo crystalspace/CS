@@ -60,7 +60,7 @@ public:
   csHashObject Get (csHashKey key) const
   { return csHashMap::Get (key); }
 
-    /// Delete the element with the given key string.
+  /// Delete the element with the given key string.
   void Delete (const char* key, csHashObject object);
 };
 

@@ -37,14 +37,14 @@ void csRandomGen::Initialize ()
   Initialize (time (0));
 }
 
-void csRandomGen::Initialize (unsigned iSeed)
+void csRandomGen::Initialize (uint32 iSeed)
 {
-  unsigned ij = iSeed % 31329UL;
-  unsigned kl = (iSeed / 31329UL) % 30082UL;
+  uint32 ij = iSeed % 31329UL;
+  uint32 kl = (iSeed / 31329UL) % 30082UL;
   InitRANMAR (ij, kl);
 }
 
-void csRandomGen::InitRANMAR (unsigned ij, unsigned kl)
+void csRandomGen::InitRANMAR (uint32 ij, uint32 kl)
 {
   /*
     This is the initialization routine for the random number generator RANMAR()
@@ -111,7 +111,7 @@ float csRandomGen::RANMAR ()
   return (uni);			/* return the random number */
 }
 
-unsigned csRandomGen::Get (unsigned iLimit)
+uint32 csRandomGen::Get (uint32 iLimit)
 {
   return int (Get () * iLimit);
 }

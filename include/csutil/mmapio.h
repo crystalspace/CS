@@ -38,7 +38,8 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
 
 
 /**
-  Defines a simple memory-mapped IO class that is portable.  Requires that data be organized in fixed block sizes.
+  Defines a simple memory-mapped IO class that is portable.  Requires that
+  data is organized in fixed block sizes.
   <p>
   Design notes:
   <p>
@@ -66,7 +67,7 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
    four operations per (counting the modulus.)  While the hash table 
    does consume about 4k more memory, I think the slight memory usage 
    is worth it, considering the massive speedup.
-*/  
+ */  
 class csMemoryMappedIO
 {
 private:
@@ -79,13 +80,19 @@ private:
   /// Size of a cache block in block_size blocks (software emulation)
   unsigned cache_block_size;
 
-  /// Size of in-memory cache in cache_block_size blocks, region is noncontiguous (software emulation)
+  /**
+   * Size of in-memory cache in cache_block_size blocks, region is
+   * noncontiguous (software emulation)
+   */
   unsigned int cache_max_size;
 
   /// Number of cache blocks in cache
   unsigned int cache_block_count;
   
-  /// Array of bits where one bit = cache_block_size * block_size bytes.  A set bit indicates we have the page in memory.
+  /**
+   * Array of bits where one bit = cache_block_size * block_size bytes.
+   * A set bit indicates we have the page in memory.
+   */
   csBitArray *page_map;
 
 #ifdef CS_DEBUG
@@ -122,7 +129,8 @@ private:
   /// Hash table for active blocks
   CacheBlock *cache[csmmioDefaultHashSize];
 
-  // Software specific mmioInfo struct, should only be defined for platforms w/o hardware mmio.
+  // Software specific mmioInfo struct, should only be defined for
+  // platforms w/o hardware mmio.
   struct emulatedMmioInfo 
   {          
     /// Handle to the mapped file 
@@ -144,10 +152,11 @@ private:
 #endif
 public:
   /** 
-   * Block size is the size of blocks that you want to get from the file, filename is the name of the file to
-   * map. Indexes will be resolved to absolute_index=index*block_size. If you supply a VFS,
-   * \c filename is tried to be resolved to a native path. Otherwise, \c filename is
-   * used as is, hence it must already be a native path.
+   * Block size is the size of blocks that you want to get from the file,
+   * filename is the name of the file to map. Indexes will be resolved to
+   * absolute_index=index*block_size. If you supply a VFS,
+   * \c filename is tried to be resolved to a native path. Otherwise,
+   * \c filename is used as is, hence it must already be a native path.
    */
   csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = 0);
 
@@ -157,8 +166,10 @@ public:
   csMemoryMappedIO::~csMemoryMappedIO();
 
   /** 
-   * This pointer will only be valid for a little while.  Read, at least until the next call to GetPointer.
-   * NEVER EVER EVER SAVE THIS POINTER.  You must recall this pointer when you want access to the data again.
+   * This pointer will only be valid for a little while.  Read, at least until
+   * the next call to GetPointer.
+   * NEVER EVER EVER SAVE THIS POINTER.  You must recall this pointer when
+   * you want access to the data again.
    */
   void *GetPointer(unsigned int index);
   

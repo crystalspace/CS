@@ -91,15 +91,16 @@ public:
       root = 0;
   }
 
-  /** Copy constructor just copies all data */
+  /// Copy constructor just copies all data.
   csArray (const csArray& other)
   {
     count = 0;
     capacity = 0;
     threshold = other.threshold;
     root = 0;
-    for (int i=0;i<other.Length();i++)
-      Push (other[i]);
+    SetLengthUnsafe (other.Length ());
+    for (int i=0 ; i<other.Length() ; i++)
+      ConstructElement (i, other[i]);
   }
 
   /**
@@ -119,16 +120,16 @@ public:
     capacity = count = 0;
   }
 
-  csArray<T>& operator = (const csArray& other)
+  /// Assignment operator.
+  csArray<T>& operator= (const csArray& other)
   {
     if (&other == this)
       return *this;
 
-    // simple but not optimal solution here
     DeleteAll ();
-
-    for (int i=0;i<other.Length();i++)
-      Push(other[i]);
+    SetLengthUnsafe (other.Length ());
+    for (int i=0 ; i<other.Length() ; i++)
+      ConstructElement (i, other[i]);
     return *this;
   }
 

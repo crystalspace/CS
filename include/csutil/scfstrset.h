@@ -49,3 +49,4 @@ public:
 };
 
 #endif // __CS_SCFSTRSET_H__
+

@@ -21,7 +21,7 @@
 #ifndef __CS_CSINPUT_H__
 #define __CS_CSINPUT_H__
 
-/**
+/*
  * These are the low-level implementations of generic classes of input devices
  * like keyboard, mouse, and joystick.
  */
@@ -31,6 +31,7 @@
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
 struct iEvent;
 struct iEventQueue;
 struct iObjectRegistry;

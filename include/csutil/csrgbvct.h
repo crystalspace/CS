@@ -23,16 +23,16 @@
 
 #include "csvector.h"
 
-/** This is a vector class that expects you to push
+/**
+ * This is a vector class that expects you to push
  * csRGBcolor structs onto it.  It has overrides for
  * Compare and CompareKey.  
  */
 class csRGBVector : public csVector
 {
-
 public:
   /// Compare two csRGBcolor structs.
-  virtual int Compare(void* item1, void* item2, int /*Mode*/)
+  virtual int Compare (void* item1, void* item2, int /*Mode*/)
   {
     csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item1);
     csRGBcolor *i2 = STATIC_CAST(csRGBcolor *, item2);
@@ -42,15 +42,13 @@ public:
     else if(i1->red < i2->red &&
 	    i1->green < i2->green &&
 	    i1->blue < i2->blue)
-    {
       return -1;
-    }
     else
       return 1;
   }
 
   /// Compare a key (csRGBcolor struct) with a csRGBcolor struct
-  virtual int CompareKey(void* item, const void* key, int /*Mode*/)
+  virtual int CompareKey (void* item, const void* key, int /*Mode*/)
   {
     csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item);
     const csRGBcolor *i2 = STATIC_CAST(const csRGBcolor *, key);
@@ -60,9 +58,7 @@ public:
     else if(i1->red < i2->red &&
 	    i1->green < i2->green &&
 	    i1->blue < i2->blue)
-    {
       return -1;
-    }
     else
       return 1;
   }

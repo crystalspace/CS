@@ -217,7 +217,10 @@ public:
     root [count - 1] = csStrNew (what);
     return (count - 1);
   }
-  /// Push a printf-style string onto the list (makes copy of string after formatting).
+  /**
+   * Push a printf-style string onto the list (makes copy of string after
+   * formatting).
+   */
   int FormatPush (char const * fmt, ...)
   {
     char str[1000];

@@ -168,9 +168,10 @@ void Class::IncRef ()							\
  * The SCF_IMPLEMENT_IBASE_DECREF() macro implements the DecRef() method for a
  * class in a C++ source module.  Typically, this macro is automatically
  * employed by the SCF_IMPLEMENT_IBASE() convenience macro.
+ * <p>
+ * A note about the implementation: We do the "if" before the "scRefCount--"
+ * to make sure that calling Inc/DecRef doesn't result in a 2nd delete
  */
-// A note to the implementation: We do the "if" before the "scRefCount--"
-// to make sure that calling Inc/DecRef doesn't result in a 2nd delete
 #define SCF_IMPLEMENT_IBASE_DECREF(Class)				\
 void Class::DecRef ()							\
 {									\

@@ -47,7 +47,6 @@
  * to overload the HandleEvent() method. Always override the specific
  * \c On... trigger function.
  */
-
 class csBaseEventHandler : public iEventHandler
 {
 private:
@@ -74,30 +73,32 @@ protected:
 
 public:
   /**
-  * Register the event handler with the event queue registered with the
-  * object registry.
-  * \param registry The application's object registry
-  * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
-  * iutil/evdefs.h. Multiple triggers may be specified by combining them with
-  * the bitwise "or" operator (`|').
-  * \see iEventQueue::RegisterListener()
-  */
-	bool RegisterQueue (iObjectRegistry* registry, unsigned int trigger = UINT_MAX);
+   * Register the event handler with the event queue registered with the
+   * object registry.
+   * \param registry The application's object registry
+   * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
+   * iutil/evdefs.h. Multiple triggers may be specified by combining them with
+   * the bitwise "or" operator (`|').
+   * \see iEventQueue::RegisterListener()
+   */
+  bool RegisterQueue (iObjectRegistry* registry,
+  	unsigned int trigger = UINT_MAX);
+
   /**
-  * Register the event handler with an event queue.
-  * \param queue The event queue to register with
-  * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
-  * iutil/evdefs.h. Multiple triggers may be specified by combining them with
-  * the bitwise "or" operator (`|').
-  * \see iEventQueue::RegisterListener()
-  */
+   * Register the event handler with an event queue.
+   * \param queue The event queue to register with
+   * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
+   * iutil/evdefs.h. Multiple triggers may be specified by combining them with
+   * the bitwise "or" operator (`|').
+   * \see iEventQueue::RegisterListener()
+   */
   bool RegisterQueue (iEventQueue* queue, unsigned int trigger = -1);
 
 private:
   // This contains an array of trigger functions which are used to dispatch
   // events based on event type.
-  static bool
-    (csBaseEventHandler::*pmfnTriggers[_CSBASEEVENT_MAXARRAYINDEX+1])(iEvent &event);
+  static bool (csBaseEventHandler::*pmfnTriggers[
+  	_CSBASEEVENT_MAXARRAYINDEX+1])(iEvent &event);
 
 private:
   /**
@@ -133,7 +134,9 @@ protected:
   /// Invoked by the event handler when a joystick movement event is received.
   virtual bool OnJoystickMove (iEvent &event);
 
-  /// Invoked by the event handler when a joystick button down event is received.
+  /**
+   * Invoked by the event handler when a joystick button down event is received.
+   */
   virtual bool OnJoystickDown (iEvent &event);
 
   /// Invoked by the event handler when a joystick button up event is received.
@@ -157,7 +160,10 @@ protected:
   /// Invoked by the event handler when a mouse button click event is received.
   virtual bool OnMouseClick (iEvent &event);
 
-  /// Invoked by the event handler when a mouse button double-click event is received.
+  /**
+   * Invoked by the event handler when a mouse button double-click event
+   * is received.
+   */
   virtual bool OnMouseDoubleClick (iEvent &event);
 
   /// Invoked by the event handler when a network event is received.

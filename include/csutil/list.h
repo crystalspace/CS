@@ -22,10 +22,11 @@
 
 /**
  * A lightweight template double-linked list.
- * This is VERY lightweight and not very tested, as it was writen for
- * one single purpose, and have not been extended to be more general
+ * This is VERY lightweight and not tested very well, as it was writen for
+ * one single purpose, and it has not been extended to be more general.
  */
-template <class T> class csList
+template <class T>
+class csList
 {
 protected:
   /* 
@@ -70,8 +71,7 @@ public:
   class Iterator
   {
   public:
-    Iterator()
-      : ptr(0)
+    Iterator() : ptr(0)
     { }
     Iterator(const Iterator& other)
     { ptr = other.ptr; }
@@ -227,7 +227,8 @@ template <class T> void csList<T>::DeleteAll ()
 }
 
 /// add one item last in the list
-template <class T> typename csList<T>::Iterator csList<T>::PushBack (const T& item)
+template <class T> typename csList<T>::Iterator csList<T>::PushBack (
+	const T& item)
 {
   csListElement* el = new csListElement (item, 0, tail);
   if (tail)
@@ -240,7 +241,8 @@ template <class T> typename csList<T>::Iterator csList<T>::PushBack (const T& it
 }
 
 /// add one item first in the list
-template <class T> typename csList<T>::Iterator csList<T>::PushFront (const T& item)
+template <class T> typename csList<T>::Iterator csList<T>::PushFront (
+	const T& item)
 {
   csListElement* el = new csListElement (item, head, 0);
   if (head)

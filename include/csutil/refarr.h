@@ -51,16 +51,15 @@ public:
       root = 0;
   }
 
+  /// Copy constructor.
   csRefArray (const csRefArray<T>& source)
   {
-    count = 0;
     limit = source.limit;
     threshold = source.threshold;
     root = (csRef<T>*)calloc (limit, sizeof(csRef<T>));
-    while (count < source.Length ())
-    {
-      Push (source[count]);
-    }
+    count = source.Length ();
+    for (int i = 0 ; i < count ; i++)
+      root [i] = source[i];
   }
   
   /**

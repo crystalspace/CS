@@ -21,7 +21,8 @@
 
 #include "cssys/thread.h"
 
-/** This is a utility class for locking a Mutex. If A MutexLock class is
+/**
+ * This is a utility class for locking a Mutex. If A MutexLock class is
  * created it locks the mutex, when it is destroyed it unlocks the Mutex
  * again. So locking a mutex can happen by creating a MutexLock object on the
  * stack. The compiler will then take care that the Unlock calls will be done

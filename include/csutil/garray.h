@@ -27,9 +27,13 @@
 /**
  * An automatically growing array of objects. Warning! Do NOT use
  * this for objects that require a constructor. Do not use this
- * for pointers. For normal pointers you should use csPArray and for
+ * for pointers. For normal pointers you should use csArray and for
  * reference counted pointers you should use csRefArray instead of this
  * class.
+ * <p>
+ * The main use of this class is when you absolutely need access
+ * to the internal array that is in this class. This can be useful
+ * if you want to access some external module (like OpenGL).
  */
 template <class T>
 class csGrowingArray
