@@ -411,6 +411,9 @@ Select @emph{Settings} and go to the @emph{Debug} tab.  Change the debug
 executate to @file{X:\CS\appname} where @file{X:} is the drive letter where the
 Crystal Space project is installed.  Next set the working directory to
 @file{X:\CS}.  Click @sc{ok} and you should be all set.
+
+If after doing this, you are still getting the same error, make sure that you 
+have the zlib.dll installed, the VFS plugin is dependant upon it.
 @end itemize
 
 @subsubheading Miscellaneous
