@@ -12,6 +12,8 @@ chronological order.
 	- Jorrit fixed the lod formula for calculating m and a from d0 and
 	  d1. Both in the documentation as in the code.
 	- Jorrit fixed a bug in the static lod code.
+	- Jorrit disabled the assembly routines in Dynavis on linux.
+	  They don't appear to work (crash).
 	- Troy in dynamics.h added bried comments to iRigidBody 
 	  AttachCollider methods to allow them to appear in API docs.
 14-Aug-2003

@@ -462,7 +462,7 @@ fillCol2:
         }
   #endif // End of COMP_VC
 
-  #if defined(COMP_GCC)
+  #if defined(COMP_GCC_disable)	// Disabled: doesn't work on linux in optimize mode!!! (Jorrit)
         csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
