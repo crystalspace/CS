@@ -14,6 +14,8 @@ chronological order.
 	  'navigate_child2', and 'navigate_parent' debug commands to pvsvis.
 	  Using bugplug you can now investigate the shape of the kdtree by
 	  navigating through the nodes.
+	- Eric Sunshine fixed Texinfo mark-up and other problems in
+	  colldet.txi.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

@@ -8,11 +8,11 @@
 @cindex @code{iObject}
 @cindex @code{iMeshWrapper}
 @cindex collision detection
-@cindex OPCODE
+@cindex @sc{opcode}
 
-Collision detection in CS is one of the more complicated issues. In this
-section I give a quick description of all the classes and interfaces in CS
-and what you should do to use them.
+Collision detection in Crystal Space is one of the more complicated issues. In
+this section I give a quick description of all the classes and interfaces in
+Crystal Space and what you should do to use them.
 
 @subsubheading Loading the @samp{iCollideSystem}
 
@@ -42,21 +42,21 @@ if (!cd_sys)
 @end example
 
 This is a very general example.  It will first get the preferred collision
-detection plugin from the config file.  If the config file doesn't specify it
-then it will use 'crystalspace.collisiondetection.opcode' which is the one
-we have at the moment.  If you don't want to let the users choose another
-plugin then you can also hardcode the string.  The cd_sys should be stored
-somewhere central (i.e. your application class).
+detection plugin from the configuration file.  If the configuration file does
+not specify it then it will use @samp{crystalspace.collisiondetection.opcode}
+which is the one we have at the moment.  If you do not want to let the users
+choose another plugin then you can also hard-code the string.  The
+@samp{cd_sys} should be stored somewhere central (i.e. your application class).
 
 @subsubheading Initializing Geometry
 
 Before you can use the collision detection system you have to make
 instances of @samp{iCollider}. Only the collide system can do that. To
 create an @samp{iCollider} you have to give an instance of @samp{iPolygonMesh}.
-Several meshes in CS implement @samp{iPolygonMesh}. If you have special
-geometry on your own you can make your own classes to implement
-@samp{iPolygonMesh}. Here is some code on how to initialize the collider
-for a mesh:
+Several meshes in Crystal Space implement @samp{iPolygonMesh}. If you have
+special geometry on your own you can make your own classes to implement
+@samp{iPolygonMesh}. Here is some code on how to initialize the collider for a
+mesh:
 
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
@@ -82,13 +82,13 @@ mesh. In that case you can easily store the collider in that entity class.
 
 However, you can also use the @samp{iObject} system to attach your collider
 to the mesh itself. An easy way to do this is to use the
-@code{csColliderWrapper} class that you can find in the @code{cstool}
-library. @code{csColliderWrapper} is a subclass of @code{csObject} which
-means that you can attach this object to any other @code{csObject}.
-@code{csColliderWrapper} additionally holds a pointer to an @code{iCollider}.
-This means that you can create a @code{csColliderWrapper} to hold your
-@code{iCollider} for some mesh object and then you can attach
-that @code{csColliderWrapper} to the mesh object itself. To do this
+@samp{csColliderWrapper} class that you can find in the @file{cstool}
+library. @samp{csColliderWrapper} is a subclass of @samp{csObject} which
+means that you can attach this object to any other @samp{csObject}.
+@samp{csColliderWrapper} additionally holds a pointer to an @samp{iCollider}.
+This means that you can create a @samp{csColliderWrapper} to hold your
+@samp{iCollider} for some mesh object and then you can attach
+that @samp{csColliderWrapper} to the mesh object itself. To do this
 use the following code instead of the @code{InitCollider()} routine
 above:
 
@@ -109,8 +109,8 @@ bool MyGame::InitCollider (iMeshWrapper* mesh)
 @}
 @end example
 
-This example creates a new instance of @code{csColliderWrapper} which
-is automatically stored with the @code{iObject} that belongs
+This example creates a new instance of @samp{csColliderWrapper} which
+is automatically stored with the @samp{iObject} that belongs
 with the given mesh. So there is no need to store it otherwise. Later
 on you can retrieve the collider for some mesh by doing:
 
@@ -123,7 +123,7 @@ initializes all collider wrappers for all objects in the engine.
 
 @example
 csColliderWrapper* colwrap = 
-  csColliderWrapper::GetColliderWrapper(mesh->QueryObject ());
+  csColliderWrapper::GetColliderWrapper(mesh->QueryObject());
 iCollider* collider = colwrap->GetCollider();
 @end example
 
@@ -153,7 +153,7 @@ main game class.
 @subsubheading Doing Collision Detection
 
 When everything is set up it is time to do collision detection. To test
-for collisions you use the @code{Collide} function in @samp{iCollideSystem}.
+for collisions you use the @code{Collide()} function in @samp{iCollideSystem}.
 This will test the collisions between two colliders. The result of this
 will be true or false and in addition the collide system will keep a list
 of all triangle pairs for the hits. Those triangle pairs can be used to
@@ -165,37 +165,41 @@ detects when it is useful to do collision detection. You can use a bounding
 sphere for that. Also you should only do collision detection if the object
 moves.
 
-Note! Don't forget to call @code{ResetCollisionPairs} before doing collision
-detection! Otherwise the internal table of collision pairs will grow
+@emph{Note}: Do not forget to call @code{ResetCollisionPairs()} before doing
+collision detection! Otherwise the internal table of collision pairs will grow
 forever.
 
-@subsubheading Sliding Along Walls (this section is in beta)
+@subsubheading Sliding Along Walls
+
+@noindent
+(@emph{Note: This section is in beta status.})
 
 For detecting collision between a mesh and the static world, it is better
-to use the @code{CollidePath} method of @samp{iCollideSystem}. Its use
-is similar to @code{Collide} but it takes arrays of @samp{iCollider}'s
-and @samp{csReversibleTransform}'s. It also takes a @samp{csVector3}
+to use the @code{CollidePath()} method of @samp{iCollideSystem}. Its use
+is similar to @code{Collide()} but it takes arrays of @samp{iCollider}
+and @samp{csReversibleTransform} instances. It also takes a @samp{csVector3}
 (passed by reference). This is the translation vector of the movement
-that the mesh wants to take (@code{CollidePath} is called before the
-movement occurs). The interface is detailed further in the public API docs.
+that the mesh wants to take (@code{CollidePath()} is called before the
+movement occurs). The interface is detailed further in the public @sc{api}
+docs.
 
 The translation vector is modified to reflect the distance that the mesh
 was able to move before it collided with the world. So you should move
 the mesh that far, and subtract the new vector from the original vector,
-to get the distance still to go. We will call this @code{V}.
+to get the distance still to go. We will call this @samp{V}.
 
 Use @code{GetCollisionPairs} to get the triangle that was collided with.
-It is described by the points @code{a2, b2, c2} in the
+It is described by the points @samp{a2}, @samp{b2}, @samp{c2} in the
 @samp{csCollisionPair} structure. Then use those points to create a
-@samp{csPlane3}. We will call this @code{P}.
+@samp{csPlane3}. We will call this @samp{P}.
 
-We want to give our vector a new direction so that it is on @code{P}.
-The cross-product (@code{V % P.Normal()}) of the two will give a vector
+We want to give our vector a new direction so that it is on @samp{P}.
+The cross-product (@samp{V % P.Normal()}) of the two will give a vector
 which is on the plane, but perpendicular to the vector that we want.
-Taking the cross-product again (now @code{(V % P.Normal()) % P.Normal()})
+Taking the cross-product again (now @samp{(V % P.Normal()) % P.Normal()})
 will give the vector we want.
 
-Now we try to move the mesh along this new vector. Hopefully there will be
+Now we try to move the mesh along this new vector. Hopefully, there will be
 no collision this time, but if there is we must do the whole thing over
 again. Example:
 
@@ -203,8 +207,8 @@ again. Example:
 void Player::Move (csVector3 move)
 @{
   csVector3 old (move);
-  while (collsys->CollidePath (player_collider, player_transform, move,
-         world_colliders, world_transforms) != 1)
+  while (collsys->CollidePath (player_collider, player_transform,
+         move, world_colliders, world_transforms) != 1)
   @{
     player_transform->Translate (move);
     csCollisionPair *pair = collsys->GetCollisionPairs ();
@@ -221,21 +225,21 @@ void Player::Move (csVector3 move)
 This example is limited in that it will run into an infinite loop if the
 player walks into a corner, but it serves as an example.
 
-@subsubheading Limitation of OPCODE
+@subsubheading Limitation of @sc{opcode}
 
 The current @sc{opcode} collision detection implementation
 has one important limitation. It assumes that the transform from object
-to world space will not change the size of the object. i.e. you cannot scale the
-object using the object to world transformation (which is kept in the
+to world space will not change the size of the object; i.e. you cannot scale
+the object using the object to world transformation (which is kept in the
 @samp{iMovable}) and expect collision detection to be ok. The only way
 aroud this limitation is to use @code{HardTransform()} to transform
 the object space vertices itself. But this can of course not be used
 dynamically as you would have to recalculate the collider every time
 the object changes.
 
-@subsubheading Include Files
+@subsubheading Header Files
 
-The include files useful for this section are:
+The header files useful for this section are:
 
 @example
 #include <iutil/object.h>
