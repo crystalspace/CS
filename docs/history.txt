@@ -21,6 +21,11 @@ chronological order.
 	  terminating semi-colon.
 	- Eric Sunshine fixed docs/Jamfile so that it also now installs
 	  history.old, README.html, and doxygen.css.
+	- Eric Sunshine fixed bug in data/Jamfile were it was installing some
+	  maps directly into ${sharedir}/crystal and others into
+	  ${sharedir}/crystal/maps.
+	- Eric Sunshine added scripts/python/Jamfile so that Python example
+	  scripts and very important cspace.py get installed.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

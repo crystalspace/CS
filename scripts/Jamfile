@@ -1,3 +1,4 @@
 SubDir TOP scripts ;
 
 SubInclude TOP scripts cs-config ;
+SubInclude TOP scripts python ;

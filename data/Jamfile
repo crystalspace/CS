@@ -1,6 +1,6 @@
 SubDir TOP data ;
 
-InstallData [ Wildcard *.zip ] ;
+InstallData [ Wildcard *.zip ] : maps ;
 
 maps = flarge partsys particles terrain r3dtest stenciltest isomap ;
 for map in $(maps) {
