@@ -8601,6 +8601,8 @@ fi
 
 fi
 
+else
+  cs_cv_python=no
 fi
 
 

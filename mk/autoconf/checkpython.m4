@@ -125,7 +125,9 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		    CS_EMITTER_OPTIONAL([$1]))], [], [],
 		[$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
 		[$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
-		[$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])])])
+		[$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])],
+	    [cs_cv_python=no])],
+	[cs_cv_python=no])])
 
 
 
