@@ -31,8 +31,8 @@
 #ifdef CS_HAS_MEMORY_MAPPED_IO
 /**
  * Map a file to a memory area. 
- * Fills in the mmioInfo struct by mapping in \code filename.
- * \code filename is a platform-dependent path.
+ * Fills in the mmioInfo struct by mapping in \c filename.
+ * \c filename is a platform-dependent path.
  * Returns true on success, false otherwise.
  */
 extern bool MemoryMapFile(mmioInfo* info, char const* filename);

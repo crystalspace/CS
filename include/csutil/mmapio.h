@@ -139,14 +139,14 @@ private:
   /// Holds information specific to the platform for hardware paging.
   mmioInfo platform;
   
-  /// true if \code platform conatins valid data.
+  /// true if \c platform contains valid data.
   bool valid_platform;
 #endif
 public:
   /** 
    * Block size is the size of blocks that you want to get from the file, filename is the name of the file to
    * map. Indexes will be resolved to absolute_index=index*block_size. If you supply a VFS,
-   * \code filename is tried to be resolved to a native path. Otherwise, \code filename is
+   * \c filename is tried to be resolved to a native path. Otherwise, \c filename is
    * used as is, hence it must already be a native path.
    */
   csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = NULL);
