@@ -379,7 +379,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   {
     for (vi = 0 ; vi < lm_height - 1; vi++)
     {
-      uv = vi*(lm_width + 2) + ui;
+      uv = vi*lm_width + ui;
 
       pos = _uv2World[uv];
 
@@ -416,7 +416,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-      //@@@: Do the tests for >0 increase or decrease performance?
+     //@@@: Do the tests for >0 increase or decrease performance?
       if (color.red > 0)
       {
         lval = mapR[uv] + QRound (color.red * brightness);
@@ -484,8 +484,8 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     if (!lightmap || lightmap_up_to_date) 
       return;
 
-    int lm_width = lightmap->GetWidth () - 2;
-    int lm_height = lightmap->GetHeight () - 2;
+    int lm_width = lightmap->GetWidth ();
+    int lm_height = lightmap->GetHeight ();
 
     csStatLight *light = (csStatLight *)lview.userdata;
 
@@ -526,18 +526,14 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     csVector3 pos;
     csVector3 normal;
     float d;
-    float u, v;
     int ui, vi;
     int uv;
-    for (ui = 0 ; ui <= lm_width ; ui++)
+    for (ui = 0 ; ui < lm_width - 1; ui++)
     {
-      u = ((float)ui)/(float)lm_width;
-      for (vi = 0 ; vi <= lm_height ; vi++)
+      for (vi = 0 ; vi < lm_height - 1; vi++)
       {
-        v = ((float)vi)/(float)lm_height;
-        uv = vi*(lm_width + 2) + ui;
-        PosInSpace (pos, u, v);
-        pos = _o2w->Other2This(pos);
+        uv = vi*lm_width + ui;
+        pos = _uv2World[uv];
 
         // is the point contained within the light frustrum? 
         if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
@@ -563,9 +559,8 @@ void csCurve::CalculateLighting (csFrustumView& lview)
         d = csSquaredDist::PointPoint (light->GetCenter (), pos);
         if (d >= light->GetSquaredRadius ()) continue;
         d = FastSqrt (d);
-        // @@@: Normals are returning 0,0,0.  I'm 90% positive that this
-        //      should never happen
-        Normal (normal, u, v);
+
+        normal = _uv2Normal[uv];
         float cosinus = (pos-light->GetCenter ())*normal;
         cosinus /= d;
         cosinus += cosfact;
@@ -625,7 +620,6 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
         uv = vi*lm_width + ui;
 
         _uv2World[uv] = _o2w->This2Other(_uv2World[uv]);
-//        _uv2Normal[uv] = _o2w->This2OtherRelative(_uv2Normal[uv]);
       }
     }
     
@@ -645,12 +639,10 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
         uv = vi*lm_width + ui;
 
         _uv2World[uv] = _o2w->Other2This(_uv2World[uv]);
-//        _uv2Normal[uv] = _o2w->Other2ThisRelative(_uv2Normal[uv]);
       }
     }
   }
 }
-
 
 void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
 {
@@ -702,14 +694,10 @@ void csCurve::CalcUVBuffers()
       if (_o2w)
       {
         _uv2World[uv] = _o2w->Other2This(_uv2World[uv]);
-//        _uv2Normal[uv] = _o2w->Other2ThisRelative(_uv2Normal[uv]);
       }
     }
   }
 }
-
-
-
 
 csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
 {
