@@ -13,6 +13,8 @@ The history order has been reversed so that new features are at the top.
 	  terrain library; mostly reported by MSVC.
 	- Eric Sunshine fixed many warnings throughout the project which were
 	  reported by MSVC.
+	- Eric Sunshine added YY_NEVER_INTERACTIVE to the Dungeon plugin in
+	  order to resolve the isatty() warning under MSVC.
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.
