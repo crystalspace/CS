@@ -867,26 +867,26 @@ AS_IF([test $enable_cpu_specific_instructions = yes],
 AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
     [AC_REQUIRE([AC_PROG_CC])
     AC_REQUIRE([AC_PROG_CXX])
-                                                                                
+
     cs_optimize_flags=''
-                                                                                
+
     CS_MAKEFILE_BUILD_FLAGS([how to enable optimizations],
         [cs_cv_prog_cxx_optimize],
         [CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
         [C++], [COMPILER.CFLAGS.optimize], [+], [],
         [cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
-                                                                                
+
     CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
         [cs_cv_prog_cxx_omit_frame_pointer],
         [CS_CREATE_TUPLE([-fomit-frame-pointer])],
         [C++], [COMPILER.CFLAGS.optimize], [+], [],
         [cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
-                                                                                
+
     CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ffast-math],
         [cs_cv_prog_cxx_fast_math],
         [CS_CREATE_TUPLE([-ffast-math])], [C++], [COMPILER.CFLAGS.optimize], [+], [],
         [cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])])
-                                                                                
+
 CS_CHECK_OPTIMIZE_FLAGS
 
 #------------------------------------------------------------------------------
@@ -1011,7 +1011,7 @@ AS_IF([test "$no_x" != yes],
     CS_JAMCONFIG_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
     CS_JAMCONFIG_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
     CS_JAMCONFIG_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
-    CS_JAMCONFIG_PROPERTY([X11.LFLAGS], 
+    CS_JAMCONFIG_PROPERTY([X11.LFLAGS],
       [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
 
     CS_CHECK_LIB_WITH([Xxf86vm],
@@ -1457,7 +1457,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[AS_ESCAPE([".csplugin"])])
 	CS_JAMCONFIG_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
 	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [AS_ESCAPE(["CS_24BIT_PIXEL_ARGB"])])
-    
+
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC"])
 	CS_JAMCONFIG_PROPERTY([CMD.OCC], [$cs_cv_prog_objc])
@@ -1534,24 +1534,24 @@ AC_LANG_PUSH([C++])
 AC_CHECK_TYPE([bool], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_BOOL_TYPE])])
 AC_LANG_POP([C++])
 
+
+
 #------------------------------------------------------------------------------
 # Check if stdint.h is available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADER([stdint.h],
-    [cs_cv_header_stdint_h=yes])
+    [cs_cv_header_stdint_h=yes], [cs_cv_header_stdint_h=no])
 
 AS_IF([test $cs_cv_header_stdint_h = yes],
-    [CS_CHECK_BUILD([whether INT64_C works], [cs_cv_int64_c_works],
+    [CS_CHECK_BUILD([whether INT64_C works], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
             [#define __STDC_CONSTANT_MACROS
-             #define __STDC_LIMIT_MACROS
-             #include <stdint.h>
-            ],
-            [(void)INT64_C(0x100000000);])
-        ],
-        [], [],
-        [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])
-    ])
+            #define __STDC_LIMIT_MACROS
+            #include <stdint.h>],
+            [(void)INT64_C(0x100000000)])],
+        [], [], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
+
+
 
 #------------------------------------------------------------------------------
 # Check for audio support.
@@ -1703,7 +1703,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
             CXXFLAGS="$cs_cflags_save"
             AC_LANG_POP([C++])])],
         [cs_cv_cxx_qsqrt_ok=no])])
-                                                                                
+
 CS_CHECK_QSQRT
 AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
     [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
@@ -1732,7 +1732,7 @@ AC_DEFUN([CS_CHECK_QINT],
             [cs_cv_cxx_qint_ok=no])
         CXXFLAGS="$cs_cflags_save"
         AC_LANG_POP([C++])])])
-                                                                                
+
 CS_CHECK_QINT
 AS_IF([test $cs_cv_cxx_qint_ok = no],
     [CS_HEADER_PROPERTY([CS_QINT_WORKAROUND])])

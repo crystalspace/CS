@@ -46,6 +46,9 @@ The history order is reversed so that new features are at the top.
 	  performance degradation. Now it should be better :-)
 	- Small optimization, moved GetBoundingBox() and GetRadius() from
 	  csThing to csThingStatic. Less pointer dereferencing needed then.
+	- Eric Sunshine fixed a bug with the INT64_C check in the configure
+	  script which caused the script to crash with a shell error if
+	  stdint.h was not found.
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()
