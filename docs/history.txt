@@ -16,6 +16,7 @@ chronological order.
 	- Eric Sunshine fixed the SDL check in configure.ac so that it succeeds
 	  on MacOS/X. It now #undefines `main' after #including <SDL/SDL.h>,
 	  since SDL's `main' #define breaks the test.
+	- res replaced the parallaxtest normal map with a better looking one.
 15-Nov-2004
 	- Eric Sunshine fixed _CS_CHECK_LIB_PKG_CONFIG_FLAGS() in checklib.m4
 	  so that it no longer checks for `pkg-config' only the very first time
