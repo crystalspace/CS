@@ -44,6 +44,7 @@
 #include "csutil/prfxcfg.h"
 #include "csutil/objreg.h"
 #include "csutil/virtclk.h"
+#include "csutil/csinput.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
@@ -67,6 +68,7 @@ iObjectRegistry* csInitializer::CreateEnvironment ()
   if (!CreateVirtualClock (object_reg)) return NULL;
   if (!CreateCommandLineParser (object_reg)) return NULL;
   if (!CreateConfigManager (object_reg)) return NULL;
+  if (!CreateInputDrivers (object_reg)) return NULL;
   return object_reg;
 }
 
@@ -114,6 +116,22 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
   object_reg->Register (q, NULL);
   q->DecRef();
   return q;
+}
+
+bool csInitializer::CreateInputDrivers (iObjectRegistry* object_reg)
+{
+  // Register some generic pseudo-plugins.  (Some day these should probably
+  // become real plugins.)
+  iKeyboardDriver* k = new csKeyboardDriver (object_reg);
+  iMouseDriver*    m = new csMouseDriver    (object_reg);
+  iJoystickDriver* j = new csJoystickDriver (object_reg);
+  object_reg->Register (k, NULL);
+  object_reg->Register (m, NULL);
+  object_reg->Register (j, NULL);
+  j->DecRef();
+  m->DecRef();
+  k->DecRef();
+  return true;
 }
 
 iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
@@ -361,7 +379,6 @@ SCF_IMPLEMENT_IBASE (csAppEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-
 bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
 	csEventHandlerFunc* evhdlr_func)
 {
@@ -378,13 +395,14 @@ bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
   return global_sys->Open ();
 }
 
-void csInitializer::CloseApplication (iObjectRegistry* object_reg)
+void csInitializer::CloseApplication (iObjectRegistry* /*object_reg*/)
 {
   global_sys->Close ();
 }
 
 void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
 {
+  CloseApplication (object_reg);
   if (installed_event_handler)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
@@ -485,8 +503,56 @@ bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,
   return true;
 }
 
-bool csInitializer::MainLoop (iObjectRegistry* /*object_reg*/)
+class csQuitEventHandler : public iEventHandler
 {
-  global_sys->Loop ();
+private:
+  bool* shutdown;
+
+public:
+  csQuitEventHandler (bool* shutdown)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csQuitEventHandler::shutdown = shutdown;
+    *shutdown = false;
+  }
+  SCF_DECLARE_IBASE;
+  virtual bool HandleEvent (iEvent& e)
+  {
+    if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
+    {
+      *shutdown = true;
+      return true;
+    }
+    return false;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csQuitEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
+bool csInitializer::MainLoop (iObjectRegistry* object_reg)
+{
+  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (!q) return false;
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!vc) return false;
+  iEventQueue* ev = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (!ev) return false;
+
+  bool shutdown = false;
+  csQuitEventHandler* evhdlr = new csQuitEventHandler (&shutdown);
+  q->RegisterListener (evhdlr, CSMASK_Broadcast);
+
+  while (!shutdown)
+  {
+    vc->Advance ();
+    ev->Process ();
+  }
+
+  q->RemoveListener (evhdlr);
+  evhdlr->DecRef ();
+
   return true;
 }
+

@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "cssys/win32/winhelp.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include <objbase.h>
 
 #include "cssys/system.h"
@@ -61,8 +62,6 @@ class SysSystemDriver : public csSystemDriver, public iEventPlug
 public:
   SysSystemDriver (iObjectRegistry* object_reg);
   virtual ~SysSystemDriver ();
-  
-  virtual bool HandleEvent(iEvent&);
 
   /// Returns the HINSTANCE of the program
   HINSTANCE GetInstance() const;
@@ -87,6 +86,8 @@ public:
     SetCursor (cur);
   }
 
+  bool HandleEvent (iEvent& e);
+
   //------------------------ iEventPlug interface ---------------------------//
   SCF_DECLARE_IBASE_EXT (csSystemDriver);
 
@@ -94,6 +95,12 @@ public:
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 100; }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (SysSystemDriver);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent (e); }
+  } scfiEventHandler;
 
 private:
   static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
@@ -110,3 +117,4 @@ private:
 };
 
 #endif // __CS_WIN32_H__
+

@@ -91,6 +91,7 @@ public:
    * <li>CreateVirtualClock()
    * <li>CreateCommandLineParser()
    * <li>CreateConfigManager()
+   * <li>CreateInputDrivers()
    * </ul>
    * This function will return the pointer to the object registry where
    * all the created objects will be registered.
@@ -148,6 +149,14 @@ public:
    * (using NULL tag).
    */
   static iConfigManager* CreateConfigManager (iObjectRegistry* object_reg);
+
+  /**
+   * This function will create the three common input drivers
+   * (csKeyboardDriver, csMouseDriver, and csJoystickDriver) and register
+   * them with the object registry. Note that this function must be
+   * called after creating the config manager (CreateConfigManager()).
+   */
+  static bool CreateInputDrivers (iObjectRegistry* object_reg);
 
   /**
    * Setup the config manager. If you have no config file then you can still

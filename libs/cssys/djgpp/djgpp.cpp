@@ -66,7 +66,12 @@ static unsigned short ScanCodeToChar[128] =
 
 SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (SysSystemDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
 	: csSystemDriver (object_reg)
@@ -101,8 +106,6 @@ SysSystemDriver::~SysSystemDriver ()
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (csSystemDriver::HandleEvent (e))
-    return true;
   if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
     if (!EventOutlet)
@@ -158,6 +161,10 @@ bool SysSystemDriver::Open ()
 {
   if (!csSystemDriver::Open ())
     return false;
+
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_queue->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
 
   // Initialize keyboard handler
   if (KH.install ())
@@ -224,6 +231,10 @@ bool SysSystemDriver::Open ()
 
 void SysSystemDriver::Close ()
 {
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_queue->RemoveListener (&scfiEventHandler);
+
   if (KeyboardOpened)
   {
     KH.uninstall ();

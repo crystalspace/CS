@@ -34,6 +34,23 @@ The history order is reversed so that new features are at the top.
 	  commandline option and the Walktest.Settings.DrawLogo config
 	  option. With this option you can disable the CS logo in Walktest.
 	  It is still enabled by default.
+	- Moved the creation of the input drivers (mouse, keyboard, and
+	  joystick) from the system driver to
+	  csInitializer::CreateInputDrivers(). CreateInputDrivers() is
+	  automatically called from csInitializer::CreateEnvironment() so
+	  this should have no effect on all current applications.
+	  Note that CreateInputDrivers() has to be called after creating
+	  the config manager (csInitializer::CreateConfigManager()).
+	- csInitializer::MainLoop() now creates its own event handler to
+	  listen for cscmdQuit. It no longer depends on csSystemDriver::Loop().
+	- csSystemDriver no longer has its own iEventHandler to listen
+	  for cscmdQuit. In addition csSystemDriver::Loop() has been removed.
+	  Note that this breaks the Macintosh port as it was doing a lot
+	  of processing in its subclass of Loop(). To fix this I think the
+	  best approach is to move part of this to the initialization of
+	  the system driver and another part to a cscmdPreProcess stage.
+	- csInitializer::DestroyApplication() now calls CloseApplication()
+	  first.
 8-Oct-2001
 	- Moved the creation of the config manager and the command line
 	  parser from the system driver to the respective csInitializer

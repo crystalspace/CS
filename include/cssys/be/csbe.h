@@ -23,6 +23,7 @@
 #include "csutil/csinput.h"
 #include "cssys/system.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "ivideo/graph2d.h" // csMouseCursorID
 #include <Handler.h>
 #include <MessageQueue.h>
@@ -105,11 +106,17 @@ public:
 
   // Implementation of the system.
   virtual bool Initialize(int argc, char const* const argv[]);
-  virtual bool HandleEvent(iEvent& ev);
+  bool HandleEvent(iEvent& ev);
 
   // Implementation of iEventPlug.
   virtual unsigned int GetPotentiallyConflictingEvents();
   virtual unsigned int QueryEventPriority(unsigned int);
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (SysSystemDriver);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent (e); }
+  } scfiEventHandler;
 };
 
 #endif // __CS_CSBE_H__

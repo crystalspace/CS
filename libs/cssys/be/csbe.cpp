@@ -33,9 +33,14 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-SCF_IMPLEMENT_IBASE_EXT(SysSystemDriver)
-  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (SysSystemDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Locally defined BMessage types passed from BeOS thread to Crystal Space
@@ -100,6 +105,10 @@ SysSystemDriver::~SysSystemDriver()
   }
   if (event_outlet != 0)
     event_outlet->DecRef();
+
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  CS_ASSERT (q != NULL);
+  q->RemoveListener (&scfiEventHandler);
 }
 
 
@@ -131,8 +140,9 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[])
     chdir(path);
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
-    event_outlet = q->CreateEventOutlet(this);
+  CS_ASSERT (q != NULL);
+  event_outlet = q->CreateEventOutlet(this);
+  q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
 
   if (be_app == 0)			// *2*
     (void)new BApplication("application/x-vnd.xsware-crystal");
@@ -180,8 +190,6 @@ bool SysSystemDriver::RunBeApp()
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (csSystemDriver::HandleEvent (e))
-    return true;
   if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
     if (message_queue.Lock())

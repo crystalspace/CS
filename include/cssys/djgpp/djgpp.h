@@ -23,6 +23,7 @@
 #define DJGPP_H
 
 #include "csutil/csinput.h"
+#include "iutil/eventh.h"
 #include "cssys/system.h"
 #include "cssys/djgpp/doshelp.h"
 
@@ -54,7 +55,7 @@ public:
   SysSystemDriver (iObjectRegistry* object_reg);
   virtual ~SysSystemDriver ();
 
-  virtual bool HandleEvent (iEvent& ev);
+  bool HandleEvent (iEvent& ev);
 
   /// Open the system
   virtual bool Open ();
@@ -74,6 +75,12 @@ public:
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 100; }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (SysSystemDriver);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent (e); }
+  } scfiEventHandler;
 
 private:
   bool KeyboardOpened;

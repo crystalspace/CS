@@ -37,7 +37,6 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iConfig;
 struct iConfigManager;
-struct iEventQueue;
 class csPluginList;
 
 /**
@@ -135,10 +134,6 @@ private:
   // Query all options supported by given plugin and place into OptionList
   void QueryOptions (iComponent *iObject);
 
-private:
-  // Shared event queue.
-  iEventQueue* EventQueue;
-
 protected:
   // The object registry.
   iObjectRegistry* object_reg;
@@ -151,9 +146,6 @@ private: //@@@
 
   /// The list of all plug-ins
   csPluginsVector Plugins;
-
-  /// Set to non-zero to exit csSystemDriver::Loop()
-  bool Shutdown;
 
   /// List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
@@ -174,18 +166,6 @@ public:
   /// Close the system
   virtual void Close ();
 
-  /**
-   * System loop. This should be called last since it returns
-   * only on program exit. There are two ways for every Crystal Space
-   * application to function: the simplest way is to call Loop() and
-   * it will take care of everything. The second way is to call NextFrame
-   * manually often enough, and use an API-dependent application loop
-   * (many GUI toolkits require your application to call their own event
-   * loop function rather than providing your own). You will have to handle
-   * the Shutdown variable yourself then.
-   */
-  virtual void Loop ();
-
 // @@@ The following (and some of the above) should all move to the
 // specific implementation of the plugin manager when we have that.
 
@@ -193,9 +173,6 @@ public:
   void RequestPlugin (const char *iPluginName);
 
 private:
-  /// Handle an event.
-  virtual bool HandleEvent(iEvent&);
-
   /// Load a plugin and initialize it.
   iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
     const char *iInterface, int iVersion);
@@ -270,12 +247,6 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
     virtual bool Initialize (iObjectRegistry*) { return true; }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSystemDriver);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
 };
 
 /// CS version of printf

@@ -423,12 +423,18 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 
 SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (SysSystemDriver::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
 	: csSystemDriver (object_reg)
 {
   System = this;
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
   if (ModuleHandle == NULL)
     ModuleHandle = GetModuleHandle(NULL);
@@ -475,6 +481,10 @@ bool SysSystemDriver::Open ()
   if (!csSystemDriver::Open ())
     return false;
 
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_queue->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+
   CreateEventOutlet (object_reg, this);
 
 #ifdef DO_DINPUT_KEYBOARD
@@ -495,6 +505,10 @@ void SysSystemDriver::Close ()
   csSystemDriver::Close ();
   ChangeDisplaySettings (NULL, 0);
 
+  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_queue->RemoveListener (&scfiEventHandler);
+
 #ifdef DO_DINPUT_KEYBOARD
   if (m_hEvent)
   {
@@ -510,8 +524,6 @@ void SysSystemDriver::Close ()
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (csSystemDriver::HandleEvent (e))
-    return true;
   if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
     MSG msg;

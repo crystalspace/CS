@@ -291,7 +291,6 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 SCF_IMPLEMENT_IBASE (csSystemDriver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
@@ -302,21 +301,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSystemDriver::csSystemDriver (iObjectRegistry* object_reg) :
-  EventQueue(0), Plugins (8, 8), OptionList (16, 16)
+  Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
   csSystemDriver::object_reg = object_reg;
-  Shutdown = false;
-
   object_reg->Register (&scfiPluginManager, NULL);
 }
 
@@ -337,31 +329,13 @@ csSystemDriver::~csSystemDriver ()
   for (i = Plugins.Length()-1; i >= 0; i--)
       UnloadPlugin((iComponent *)Plugins.Get(i)->Plugin);
      
-  if (EventQueue != 0)
-    EventQueue->DecRef();
-
   // Make sure to unregister the plugin manager here.
   object_reg->Unregister (&scfiPluginManager);
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[])
 {
-  EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  EventQueue->IncRef();
-
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
-
-  // Register some generic pseudo-plugins.  (Some day these should probably
-  // become real plugins.)
-  iKeyboardDriver* k = new csKeyboardDriver (object_reg);
-  iMouseDriver*    m = new csMouseDriver    (object_reg);
-  iJoystickDriver* j = new csJoystickDriver (object_reg);
-  object_reg->Register (k, NULL);
-  object_reg->Register (m, NULL);
-  object_reg->Register (j, NULL);
-  j->DecRef();
-  m->DecRef();
-  k->DecRef();
 
   // Collect all options from command line
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
@@ -455,18 +429,10 @@ bool csSystemDriver::Open ()
 {
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
 
-  // Start listening for events.  This class is interested in cscmdQuit, but
-  // subclasses may be interested in other broadcasts.
-  EventQueue->RegisterListener (&scfiEventHandler,
-  	CSMASK_Nothing | CSMASK_Broadcast);
-
-  //// Start listening for events.  This class is interested in cscmdQuit, but
-  //// subclasses may be interested in any event, so listen for all types except
-  //// for the special one which sends cscmdPreProcess/cscmdPostProcess.
-  //EventQueue->RegisterListener (&scfiEventHandler, ~CSMASK_Nothing);
-
   // Now pass the open event to all plugins
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
 
   return true;
@@ -478,33 +444,9 @@ void csSystemDriver::Close ()
 
   // Warn all plugins the system is going down
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
+  iEventQueue* EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (EventQueue != NULL);
   EventQueue->Dispatch (Event);
-
-  // Stop listening for events.
-  EventQueue->RemoveListener(&scfiEventHandler);
-}
-
-void csSystemDriver::Loop ()
-{
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  iEventQueue* ev = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (vc != NULL);
-  CS_ASSERT (ev != NULL);
-  while (!Shutdown)
-  {
-    vc->Advance ();
-    ev->Process ();
-  }
-}
-
-bool csSystemDriver::HandleEvent (iEvent& e)
-{
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
-  {
-    Shutdown = true;
-    return true;
-  }
-  return false;
 }
 
 void csSystemDriver::QueryOptions (iComponent *iObject)
