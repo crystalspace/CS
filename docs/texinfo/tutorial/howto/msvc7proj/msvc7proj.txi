@@ -68,14 +68,43 @@ Environment), with the @emph{simple1} project loaded.  Lets move on...
 
 @subsubheading Step 2 - Adding files/code to the project solution.
 
+Rather than create code for this tutorial and keeping inline with time honored
+tradition - We are now going to cheat and use existing Crystal Space code. :-)
+
+Firstly copy and paste the @file{simple1.cpp} and @file{simple1.h} from the
+Crystal Space code tree, into the newly created @file{simple1} project
+directory.  These files can be found here:
+
+@noindent
+@file{CS\apps\tutorial\simple1\}
+
+Once done, return to the @sc{msvc ide} and select the @emph{Solution Explorer}
+tab within the @emph{Solution Explorer} window.  See the image below to see the
+@emph{Solution Explorer} window from within the @sc{msvc IDE}.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap3}
 @end ifnotinfo
+
+To add file(s) to a project, select the appropriate folder in the
+@emph{Solution Explorer} window, be that @emph{Source Files} or
+@emph{Header Files} etc.  Right click on it to bring up the context menu and
+then hover over @emph{Add} until the sub menu appears and then click on
+@emph{Add Existing Item...}.  You will now be presented with the
+@emph{Add Existing Item} dialog box, which can be seen in the image below.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap4}
 @end ifnotinfo
 
+After selecting the desired file(s) you wish to add, click on the @emph{Open}
+button to finalize your choice(s) and be returned back to the @sc{msvc ide}.  
+Repeat this process twice adding @file{simple1.cpp} to the @emph{Source Files}
+folder and @file{simple1.h} to the @emph{Header Files} folder. Once done you
+should have a @emph{Solution Explorer} window which looks like the image below.
+
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap5}
 @end ifnotinfo
+
+@subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
