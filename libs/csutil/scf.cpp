@@ -99,8 +99,12 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   // This is the prototype for the only function that
   // a shared library should export
   typedef scfClassInfo *(*scfGetClassInfo) ();
+
+  // To get the library name, split the input name into path and file name.
+  // Then append "_GetClassTable" to the file name to get the name of
+  // the exported function.
   char name [200];
-  strcpy (name, iLibraryName);
+  splitpath (iLibraryName, NULL, 0, name, 200);
   strcat (name, "_GetClassTable");
 
   scfGetClassInfo func =
