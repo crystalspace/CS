@@ -378,7 +378,7 @@ bool awsMultiLineEdit::HandleEvent (iEvent &Event)
       if (composer->HandleKey (eventData, Char, 
 	sizeof (Char) / sizeof (utf32_char), &composedSize) != csComposeNoChar)
       {
-	for (size_t n = 0; n < composedSize; n++)
+	for (size_t n = 0; n < (size_t)composedSize; n++)
 	  InsertChar (Char[n]);
       }
       //InsertChar (Event.Key.Char);
