@@ -468,7 +468,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   if(tcaenabled == GL_FALSE)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   if(caenabled == GL_TRUE)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
 
   statecache->Disable_GL_BLEND ();
 //  statecache->DisableState (GL_ALPHA_TEST);

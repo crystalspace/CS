@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 4-Mar-2003
 	- Fixed a bug in the OpenGL canvas text drawer where the
 	  state of GL_TEXTURE_COORD_ARRAY was not properly queried.
+	- Fixed another mixup in the OpenGL canvas text drawer where
+	  the GL_COLOR_ARRAY state was restored incorrectly.
+	- Both fixes above make sure isotest in OpenGL shows lighting again.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from
