@@ -19,6 +19,8 @@ chronological order.
 	  renderer even if OpenGL was not detected.
 	- Eric Sunshine fixed bug in aws/skinpars.yy.  The `expf' lacked a
 	  terminating semi-colon.
+	- Eric Sunshine fixed docs/Jamfile so that it also now installs
+	  history.old, README.html, and doxygen.css.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support
