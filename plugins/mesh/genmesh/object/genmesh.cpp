@@ -40,11 +40,16 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralMeshState)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::GeneralMeshState)
@@ -56,6 +61,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
   csGenmeshMeshObject::factory = factory;
   logparent = NULL;
@@ -384,6 +390,26 @@ void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   cent.Set (0);
 }
 
+int csGenmeshMeshObject::PolyMesh::GetVertexCount ()
+{
+  return scfParent->factory->GetVertexCount ();
+}
+
+csVector3* csGenmeshMeshObject::PolyMesh::GetVertices ()
+{
+  return scfParent->factory->GetVertices ();
+}
+
+int csGenmeshMeshObject::PolyMesh::GetPolygonCount ()
+{
+  return scfParent->factory->GetTriangleCount ();
+}
+
+csMeshedPolygon* csGenmeshMeshObject::PolyMesh::GetPolygons ()
+{
+  return scfParent->factory->GetPolygons ();
+}
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
@@ -422,6 +448,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   vbufmgr = NULL;
   vbuf = NULL;
   material = NULL;
+  polygons = NULL;
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -434,6 +461,7 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete[] mesh_texels;
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
+  delete[] polygons;
 }
 
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
@@ -616,6 +644,8 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 void csGenmeshMeshObjectFactory::Invalidate ()
 {
   object_bbox_valid = false;
+  delete[] polygons;
+  polygons = NULL;
 }
 
 iMeshObject* csGenmeshMeshObjectFactory::NewInstance ()
@@ -634,6 +664,22 @@ void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbuf = NULL;
     scfParent->vbufmgr = NULL;
   }
+}
+
+csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
+{
+  if (!polygons)
+  {
+    csTriangle* triangles = top_mesh.triangles;
+    polygons = new csMeshedPolygon [top_mesh.num_triangles];
+    int i;
+    for (i = 0 ; i < top_mesh.num_triangles ; i++)
+    {
+      polygons[i].num_vertices = 3;
+      polygons[i].vertices = &triangles[i].a;
+    }
+  }
+  return polygons;
 }
 
 //----------------------------------------------------------------------

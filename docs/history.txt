@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-Aug-2002
+	- Added iPolygonMesh implementation for genmesh so it now works
+	  with collision detection.
 27-Aug-2002
 	- Eric Sunshine simplified the task of extracting version numbers and
 	  release date from csver.h by external tools.  Also simplified the

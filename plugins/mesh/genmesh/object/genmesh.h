@@ -29,6 +29,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "igeom/objmodel.h"
+#include "igeom/polymesh.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -187,6 +188,22 @@ public:
     }
   } scfiGeneralMeshState;
   friend class GeneralMeshState;
+
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual void Cleanup () { }
+
+    PolyMesh () { }
+    virtual ~PolyMesh () { }
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
 };
 
 /**
@@ -210,6 +227,8 @@ private:
   csBox3 object_bbox;
   bool object_bbox_valid;
   bool initialized;
+
+  csMeshedPolygon* polygons;
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
@@ -259,6 +278,11 @@ public:
   void GenerateBox (const csBox3& box);
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
+
+  /**
+   * Calculate polygons for iPolygonMesh.
+   */
+  csMeshedPolygon* GetPolygons ();
 
   iVertexBufferManager* GetVertexBufferManager ()
   {
