@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  outside array bounds if the number of vertices in the factory
 	  changed after objects made from that factory were being used.
 	  Now the objects will constantly check if the factory is still ok.
+	- Keith Fulton added SetOverrideAction to sprite3dobject.  This
+	  plays the named animation one time, while saving the prior
+	  animation.  When the override animation is completed, the prior
+	  animation is restore to operation.
 8-Jan-2002
 	- Committed a 'backwards compatibility' set from Rene Jager for the
 	  Python plugin and SWIG 1.1. The new cspython plugin is built when
