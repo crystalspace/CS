@@ -52,6 +52,9 @@ configure-stamp:
 	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
 	$(CURDIR)/debian/createmenus $(CURDIR)
+	# Some path adjustment
+	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/cssys/general/instpath.cpp
+	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/cssys/unix/instpath.cpp
 
 	touch configure-stamp
 
