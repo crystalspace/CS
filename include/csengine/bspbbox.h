@@ -33,6 +33,7 @@ class csPolygonTree;
 class csTransform;
 class csBox3;
 struct iVisibilityObject;
+struct iShadowCaster;
 
 /**
  * A factor for creating instances of csBspPolygon.
@@ -52,6 +53,7 @@ class csBspPolygonFactory : public csPolygonIntFactory
 struct csVisObjInfo
 {
   iVisibilityObject* visobj;
+  iShadowCaster* shadcast;
   csPolyTreeBBox* bbox;
   long last_movablenr;
   long last_shapenr;

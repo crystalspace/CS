@@ -365,7 +365,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
   csDynLight *light = lp->light;
 
-  csShadowIterator* shadow_it = lp->shadows.GetCsShadowIterator ();
+  iShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
@@ -450,7 +450,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
     }
   }
 
-  delete shadow_it;
+  shadow_it->DecRef ();
 }
 
 void csCurve::GetCoverageMatrix (csFrustumView& lview, 
@@ -459,7 +459,8 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   csVector3 pos;
   int uv;
 
-  iShadowIterator* shadow_it = lview.GetShadows ()->GetShadowIterator ();
+  iShadowIterator* shadow_it = lview.GetFrustumContext ()->
+  	GetShadows ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
   
   int lm_width = lightmap->GetWidth ();
@@ -475,8 +476,10 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       uv = vi*lm_width + ui;
       pos = _uv2World[uv];
 
+      csFrustumContext* ctxt = lview.GetFrustumContext ();
       // is the point contained within the light frustrum? 
-      if (!lview.light_frustum->Contains(pos-lview.light_frustum->GetOrigin()))
+      if (!ctxt->GetLightFrustum ()->Contains (pos-
+      		ctxt->GetLightFrustum ()->GetOrigin ()))
         // No, skip it
         continue;
 
@@ -502,12 +505,13 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
     }
   }
 
-  delete shadow_it;
+  shadow_it->DecRef ();
 }
 
 void csCurve::CalculateLighting (csFrustumView& lview)
 {
-  if (lview.dynamic)
+  csLightingInfo& linfo = lview.GetFrustumContext ()->GetLightingInfo ();
+  if (lview.IsDynamic ())
   {
     // We are working for a dynamic light. In this case we create
     // a light patch for this polygon.
@@ -515,7 +519,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
     AddLightPatch (lp);
   
-    csDynLight* dl = (csDynLight*)lview.userdata;
+    csDynLight* dl = (csDynLight*)lview.GetUserData ();
     dl->AddLightpatch (lp);
 
     // This light patch has exactly 4 vertices because it fits around our
@@ -527,9 +531,10 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     // @@@: It would be nice if we could optimize earlier 
     // to determine relevant shadow frustums in curves and use
     // AddRelevantShadows instead.
-    lp->shadows.AddAllShadows (lview.GetShadows ());
+    lp->shadows.AddAllShadows (lview.GetFrustumContext ()->GetShadows ());
 
-    lp->light_frustum = new csFrustum(*lview.light_frustum);
+    lp->light_frustum = new csFrustum(*lview.GetFrustumContext ()->
+    	GetLightFrustum ());
 
     MakeDirtyDynamicLights ();
   }
@@ -547,7 +552,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     int lm_width = lightmap->GetWidth ();
     int lm_height = lightmap->GetHeight ();
 
-    csStatLight *light = (csStatLight *)lview.userdata;
+    csStatLight *light = (csStatLight *)lview.GetUserData ();
 
     bool dyn = light->IsDynamic();
 
@@ -574,7 +579,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
       mapR = lightmap->GetStaticMap ().GetRed ();
       mapG = lightmap->GetStaticMap ().GetGreen ();
       mapB = lightmap->GetStaticMap ().GetBlue ();
-      color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
+      color = linfo.GetColor () * NORMAL_LIGHT_LEVEL;
     }
 
     int lval;
@@ -615,13 +620,9 @@ void csCurve::CalculateLighting (csFrustumView& lview)
         cosinus += cosfact;
 
         if (cosinus < 0) 
-        {
           cosinus = 0;
-        }
         else if (cosinus > 1) 
-        {
           cosinus = 1;
-        }
 
         float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
@@ -633,19 +634,20 @@ void csCurve::CalculateLighting (csFrustumView& lview)
         }
         else
         {
-          if (lview.r > 0)
+	  csColor& col = linfo.GetColor ();
+          if (col.red > 0)
           {
             lval = mapR[uv] + QRound (color.red * brightness);
             if (lval > 255) lval = 255;
             mapR[uv] = lval;
           }
-          if (lview.g > 0 && mapG)
+          if (col.green > 0 && mapG)
           {
             lval = mapG[uv] + QRound (color.green * brightness);
             if (lval > 255) lval = 255;
             mapG[uv] = lval;
           }
-          if (lview.b > 0 && mapB)
+          if (col.blue > 0 && mapB)
           {
             lval = mapB[uv] + QRound (color.blue * brightness);
             if (lval > 255) lval = 255;

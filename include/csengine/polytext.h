@@ -27,7 +27,9 @@ class Textures;
 class csPolyPlane;
 class csLightMap;
 class csLightPatch;
+class csFrustumContext;
 class csFrustumView;
+struct iFrustumView;
 struct csFrustumViewCleanup;
 class csBitSet;
 class Dumper;
@@ -188,11 +190,12 @@ public:
   void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);
 
   /// Process lighting for all delayed polygon lightmaps
-  static void ProcessDelayedLightmaps (csFrustumView *lview,
-    csFrustumViewCleanup *lighting_info);
+  static void ProcessDelayedLightmaps (iFrustumView *lview,
+  	csFrustumContext* ctxt, csFrustumViewCleanup *lighting_info);
 
   /// Collect all relevant shadows from this frustum that covers this lightmap
-  bool CollectShadows (csFrustumView *lview, csPolygon3D *poly);
+  bool CollectShadows (csFrustumView *lview,
+  	csFrustumContext* ctxt, csPolygon3D *poly);
 
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;

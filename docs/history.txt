@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+28-Mar-2001
+	- Finished the split of csFrustumView and csFrustumContext.
 27-Mar-2001
 	- Philip Wyett eliminated VC6 compiler warning about empty control
 	  statement.
@@ -10,7 +12,17 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards added end of line to canvas font server warning.
 26-Mar-2001
 	- Philip Wyett did some minor updates to the docs.
-25-Mar-2001
+25-Mar-2001:
+	- Removed iShadowSystem and merged its functionality with
+	  iVisibilityCuller. iShadowCaster and iShadowReceiver are still
+	  there but (logically) depend on iVisibilityObject now.
+	- Started iFrustumView SCF interface for csFrustumView.
+	- Fundamentally changed the way csFrustumView works. Added a
+	  csFrustumContext which is changing for every recursion level.
+	  csFrustumView remains constant now. This way csFrustumView works
+	  in a similar way to csRenderView (and csRenderContext).
+	- Philip Wyett fixed runtime memory reference error in csconin.cpp
+	  under windows.
 	- Philip Wyett fixed null reference error in csconin.cpp under Windows.
 	- Eric Sunshine reverted above change to csconin.cpp by Philip Wyett
 	  since Philip's change was incorrect.  Eric applied the correct fix
@@ -32,13 +44,22 @@ The history order has been reversed so that new features are at the top.
 	    - Removed refs to old/no longer needed MingW files.
 	    - Updated links to DOS Nasm and other support files,
 	      with respect to new location at 3D Downloads.
+24-Mar-2001:
+	- Further changes to avoid using world space coordinate system.
+	- Made all the members in csFrustumView private and added accessor
+	  functions.
+	- Created new csLightingInfo class which holds all information specific
+	  to lighting and CheckFrustum. This information used to be in
+	  csFrustumView but csFrustumView is supposed to be independent
+	  of 'lighting'.
+	- csThing now implements iShadowSystem.
+	- Philip Wyett added Python plugin to MingW build process. This
 	- Eric Sunshine reverted Philip Wyett's changes to cspython.mak for a
 	  couple of reasons.  First, as Philip mentioned in his log message,
 	  his changes were a bit of a hack.  Second, they actually broke the
 	  makefile with unbalanced instances of if/else/endif.  Instead, I
 	  generalized the makefile so that it should be able to handle Python
 	  via Mingw without any special hacks.
-24-Mar-2001
 	- Philip Wyett added Python plugin to MingW build process.  This
 	  addition also adds the compilation of CS Python test app, thanks
 	  to Unix makefile system.  Edited 'cspython.mak' in order to allow

@@ -41,6 +41,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
+#include "iengine/shadcast.h"
 #include "isys/vfs.h"
 #include "iengine/rview.h"
 #include "qint.h"
@@ -1859,6 +1860,9 @@ void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
+  iShadowCaster* shadcast = QUERY_INTERFACE (visobj, iShadowCaster);
+  if (shadcast) shadcast->DecRef ();
+  vinf->shadcast = shadcast;
   vinf->bbox = new csPolyTreeBBox ();
   // Initialize the movable and shape numbers with a number different
   // from the one that the objects currently have so that we know
@@ -2000,6 +2004,18 @@ bool csThing::VisTest (iRenderView* irview)
   }
 }
 
+void csThing::RegisterShadowReceiver (iShadowReceiver* receiver)
+{
+}
+
+void csThing::UnregisterShadowReceiver (iShadowReceiver* receiver)
+{
+}
+
+void csThing::CastShadows (const csVector3& pos)
+{
+}
+
 void csThing::CheckFrustum (csFrustumView& lview)
 {
   csCBufferCube* cb = engine->GetCBufCube ();
@@ -2019,27 +2035,27 @@ void csThing::RealCheckFrustum (csFrustumView& lview)
   if (light_frame_number != current_light_frame_number)
   {
     light_frame_number = current_light_frame_number;
-    lview.gouraud_color_reset = true;
+    lview.GetFrustumContext ()->SetFirstTime (true);
   }
-  else lview.gouraud_color_reset = false;
+  else lview.GetFrustumContext ()->SetFirstTime (false);
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = GetPolygon3D (i);
-    lview.poly_func ((csObject*)p, &lview);
+    lview.CallPolygonFunction ((csObject*)p);
   }
 
   for (i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
     
-    if (!lview.dynamic)
+    if (!lview.IsDynamic ())
     {
       csReversibleTransform o2w = movable.GetFullTransform ().GetInverse();
       c->SetObject2World (&o2w);
     }
     
-    lview.curve_func ((csObject*)c, &lview);
+    lview.CallCurveFunction ((csObject*)c);
   }
 
   draw_busy--;

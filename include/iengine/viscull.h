@@ -25,6 +25,7 @@
 struct iRenderView;
 struct iVisibilityObject;
 struct iMovable;
+struct iShadowReceiver;
 class csBox3;
 
 SCF_VERSION (iVisibilityCuller, 0, 0, 1);
@@ -33,10 +34,16 @@ SCF_VERSION (iVisibilityCuller, 0, 0, 1);
  * This interface represents a visibility culling system.
  * To use it you first register visibility objects (which are all the
  * objects for which you want to test visibility) to this culler.
+ * A visibility culler can usually also support shadow calculation.
  */
 struct iVisibilityCuller : public iBase
 {
-  /// Register a visibility object with this culler.
+  /**
+   * Register a visibility object with this culler.
+   * If this visibility object also supports iShadowCaster and
+   * this visibility culler supports shadow casting then it will
+   * automatically get registered as a shadow caster as well.
+   */
   virtual void RegisterVisObject (iVisibilityObject* visobj) = 0;
   /// Unregister a visibility object with this culler.
   virtual void UnregisterVisObject (iVisibilityObject* visobj) = 0;
@@ -49,6 +56,18 @@ struct iVisibilityCuller : public iBase
    * be considered visible.
    */
   virtual bool VisTest (iRenderView* irview) = 0;
+
+  /// Returns true if shadow casting is supported.
+  virtual bool SupportsShadowCasting () = 0;
+  /**
+   * Start casting shadows from a given point in space.
+   */
+  virtual void CastShadows (const csVector3& pos) = 0;
+
+  /// Register a shadow receiver.
+  virtual void RegisterShadowReceiver (iShadowReceiver* receiver) = 0;
+  /// Unregister a shadow receiver.
+  virtual void UnregisterShadowReceiver (iShadowReceiver* receiver) = 0;
 };
 
 SCF_VERSION (iVisibilityObject, 0, 0, 2);

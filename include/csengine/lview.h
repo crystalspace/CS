@@ -23,6 +23,7 @@
 #include "csgeom/frustum.h"
 #include "csutil/csvector.h"
 #include "iengine/shadows.h"
+#include "iengine/fview.h"
 
 class csMatrix3;
 class csVector3;
@@ -346,10 +347,6 @@ public:
     last = NULL;
   }
 
-  csShadowBlock* GetCsFirstShadowBlock () { return first; }
-  csShadowBlock* GetCsLastShadowBlock () { return last; }
-  csShadowBlock* GetNextShadowBlock (csShadowBlock* s) { return s->next; }
-  csShadowBlock* GetPreviousShadowBlock (csShadowBlock* s) { return s->prev; }
   virtual iShadowBlock* GetFirstShadowBlock () { return (iShadowBlock*)first; }
   virtual iShadowBlock* GetLastShadowBlock () { return (iShadowBlock*)last; }
   virtual iShadowBlock* GetNextShadowBlock (iShadowBlock* s)
@@ -388,60 +385,20 @@ typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview);
 typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 
 /**
- * The structure for registering cleanup actions.  You can register with any
- * frustumlist object any number of cleanup routines.  For this you create
- * such a structure and pass it to RegisterCleanup () method of csFrustumList.
- * You can derive a subclass from csFrustumViewCleanup and keep all
- * additional data there.
- */
-struct csFrustumViewCleanup
-{
-  // Pointer to next cleanup action in chain
-  csFrustumViewCleanup *next;
-  // The routine that is called for cleanup
-  void (*action) (csFrustumView *, csFrustumViewCleanup *);
-};
-
-/**
  * This structure represents all information needed for the frustum
  * visibility calculator.
- * @@@ This structure needs some cleanup. It contains too many
- * fields that are lighting related. These should probably go to
- * the 'userdata'.
  */
-class csFrustumView
+class csFrustumView : public iFrustumView
 {
 private:
-  /**
-   * The list of shadow frustums. Note that this list will be
-   * expanded with every traversal through a portal but it needs
-   * to be restored to original state again before returning.
-   */
-  csShadowBlockList* shadows;
-  /**
-   * This flag is true if the list of shadows is shared with some
-   * other csFrustumView.
-   */
-  bool shared;
-
-public:
-  /// The head of cleanup actions
-  csFrustumViewCleanup *cleanup;
-
   /// Data for the functions below.
-  void* userdata;
+  void* func_userdata;
   /// A function that is called for every node that is visited.
   csFrustumViewNodeFunc* node_func;
   /// A function that is called for every polygon that is hit.
   csFrustumViewFunc* poly_func;
   /// A function that is called for every curve that is hit.
   csFrustumViewFunc* curve_func;
-
-  /**
-   * The current color of the light. Initially this is the same as the
-   * light in csStatLight but portals may change this.
-   */
-  float r, g, b;
 
   /// Radius we want to check.
   float radius;
@@ -452,32 +409,11 @@ public:
   /// If true the we process shadows for things.
   bool things_shadow;
 
-  /// If space is mirrored.
-  bool mirror;
-
   /**
    * If this structure is used for dynamic light frustum calculation
    * then this flag is true.
    */
   bool dynamic;
-
-  /**
-   * If only gouraud shading should be updated then this flag is true.
-   */
-  bool gouraud_only;
-
-  /**
-   * If 'true' then the gouraud vertices need to be initialized (set to
-   * black) first. Only the parent PolygonSet of a polygon can know this
-   * because it is calculated using the current_light_frame_number.
-   */
-  bool gouraud_color_reset;
-
-  /**
-   * The frustum for the light. Everthing that falls in this frustum
-   * is lit unless it also is in a shadow frustum.
-   */
-  csFrustum* light_frustum;
 
   /**
    * A callback function. If this is set then no actual
@@ -502,26 +438,88 @@ public:
    */
   unsigned int process_thing_mask, process_thing_value;
 
+  /// Current frustum context.
+  csFrustumContext* ctxt;
+
 public:
   /// Constructor.
   csFrustumView ();
-  /// Copy constructor. Everything is copied.
-  csFrustumView (const csFrustumView &iCopy);
 
   /// Destroy the object
-  ~csFrustumView ();
+  virtual ~csFrustumView ();
 
-  /// Register a cleanup action to be called from destructor
-  void RegisterCleanup (csFrustumViewCleanup *action)
-  { action->next = cleanup; cleanup = action; }
-  /// Deregister a cleanup action
-  bool DeregisterCleanup (csFrustumViewCleanup *action);
+  /// Get the current frustum context.
+  virtual csFrustumContext* GetFrustumContext () const { return ctxt; }
+  /// Create a new frustum context.
+  virtual void CreateFrustumContext ();
+  /// Restore a frustum context.
+  virtual void RestoreFrustumContext (csFrustumContext* original);
 
   /// Start new shadow list for this frustum.
   void StartNewShadowBlock ();
 
-  /// Get the list of shadows.
-  iShadowBlockList* GetShadows () { return (iShadowBlockList*)shadows; }
+  /// Return true if we are handling a dynamic light.@@@LIGHTING SPECIFIC
+  bool IsDynamic () { return dynamic; }
+  /// Set/disable dynamic lighting. @@@LIGHTING SPECIFIC
+  void SetDynamic (bool d) { dynamic = d; }
+
+  /// Set the function that is called for every node.
+  void SetNodeFunction (csFrustumViewNodeFunc* func) { node_func = func; }
+  /// Set the function that is called for every polygon to visit.
+  void SetPolygonFunction (csFrustumViewFunc* func) { poly_func = func; }
+  /// Set the function that is called for every curve to visit.
+  void SetCurveFunction (csFrustumViewFunc* func) { curve_func = func; }
+  /// Call the node function.
+  void CallNodeFunction (csOctreeNode* onode)
+  {
+    if (node_func) node_func (onode, this);
+  }
+  /// Call the polygon function.
+  void CallPolygonFunction (csObject* poly) { poly_func (poly, this); }
+  /// Call the curve function.
+  void CallCurveFunction (csObject* curve) { curve_func (curve, this); }
+  /// Set the userdata.
+  void SetUserData (void* ud) { func_userdata = ud; }
+  /// Get the userdata.
+  void* GetUserData () { return func_userdata; }
+  /// Set the maximum radius to use for visiting objects.
+  void SetRadius (float rad)
+  {
+    radius = rad;
+    sq_radius = rad*rad;
+  }
+  /// Get the radius.
+  float GetRadius () { return radius; }
+  /// Get the squared radius.
+  float GetSquaredRadius () { return sq_radius; }
+  /// Enable shadowing for things (off by default). @@@SUSPECT!!!
+  void EnableThingShadows (bool e) { things_shadow = e; }
+  /// Return true if shadowing for things is enabled.
+  bool ThingShadowsEnabled () { return things_shadow; }
+  /// Set shadow mask.
+  void SetShadowMask (unsigned int mask, unsigned int value)
+  {
+    shadow_thing_mask = mask;
+    shadow_thing_value = value;
+  }
+  /// Set process mask.
+  void SetProcessMask (unsigned int mask, unsigned int value)
+  {
+    process_thing_mask = mask;
+    process_thing_value = value;
+  }
+  /// Check if a mask corresponds with the shadow mask.
+  bool CheckShadowMask (unsigned int mask)
+  {
+    return ((mask & shadow_thing_mask) == shadow_thing_value);
+  }
+  /// Check if a mask corresponds with the process mask.
+  bool CheckProcessMask (unsigned int mask)
+  {
+    return ((mask & process_thing_mask) == process_thing_value);
+  }
+
+  DECLARE_IBASE;
 };
 
 #endif // __CS_LVIEW_H__

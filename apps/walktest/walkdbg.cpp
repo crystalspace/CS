@@ -108,7 +108,8 @@ void show_frustum (csFrustumView* lview, int type, void* /*entity*/)
   if (type == CALLBACK_POLYGON)
   {
     csCamera* cam = Sys->view->GetCamera ();
-    csFrustum* fr = lview->light_frustum;
+    csFrustumContext* ctxt = lview->GetFrustumContext ();
+    csFrustum* fr = ctxt->GetLightFrustum ();
     csVector3 v0, v1, v2;
     csVector3 light_cam = cam->Other2This (fr->GetOrigin ());
     int j;
@@ -981,24 +982,18 @@ void ShowCheckFrustum (csView* view,
 	csSector* room, const csVector3& pos, int num_vis)
 {
   csFrustumView lview;
-  lview.poly_func = poly_db_func;
-  lview.curve_func = curve_db_func;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  lview.SetPolygonFunction (poly_db_func);
+  lview.SetCurveFunction (curve_db_func);
   dbf.max_vis = num_vis;
   dbf.num_vis = 0;
   dbf.queue.SetLength (0);
-  lview.userdata = (void*)&dbf;
-  lview.radius = 1000000000.;
-  lview.sq_radius = 1000000000.;
-  lview.things_shadow = false;
-  lview.mirror = false;
-  lview.gouraud_only = false;
-  lview.gouraud_color_reset = false;
-  lview.r = 1;
-  lview.g = 1;
-  lview.b = 1;
-  lview.dynamic = false;
-  lview.light_frustum = new csFrustum (pos);
-  lview.light_frustum->MakeInfinite ();
+  lview.SetUserData ((void*)&dbf);
+  lview.SetRadius (1000000000.);
+  lview.EnableThingShadows (false);
+  lview.SetDynamic (false);
+  ctxt->SetLightFrustum (new csFrustum (pos));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
   room->CheckFrustum (lview);
   view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
     	draw_frust_edges);

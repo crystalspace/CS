@@ -36,7 +36,8 @@
 #include "iengine/sector.h"
 
 class csSector;
-class StatLight;
+class csFrustumView;
+class csFrustumContext;
 class csMaterialWrapper;
 class csPolyPlane;
 class csPolyTxtPlane;
@@ -532,7 +533,7 @@ private:
    * through callbacks and csPolyTexture::ProcessDelayedLightmaps ().
    * Called only for lightmapped polygons with shared lightmap.
    */
-  void CalculateDelayedLighting (csFrustumView *lview);
+  void CalculateDelayedLighting (csFrustumView *lview, csFrustumContext* ctxt);
 
 public:
   /// Set of flags

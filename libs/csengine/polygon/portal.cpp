@@ -27,6 +27,7 @@
 #include "csengine/quadtr3d.h"
 #include "csengine/covtree.h"
 #include "csengine/lview.h"
+#include "csengine/light.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/rview.h"
@@ -232,40 +233,42 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   if (!sector) CompleteSector ();
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
-  //@@@@@@@@@@@@@@@@ DANGEROUS! CHECK!
-  csFrustumView new_lview = lview;
-  if (lview.light_frustum)
-    new_lview.light_frustum = new csFrustum (*lview.light_frustum);
-  //@@@@@@@@
-  new_lview.StartNewShadowBlock ();
+  csFrustumContext* old_ctxt = lview.GetFrustumContext ();
+  lview.CreateFrustumContext ();
+  csFrustumContext* new_ctxt = lview.GetFrustumContext ();
+  if (old_ctxt->GetLightFrustum ())
+    new_ctxt->SetLightFrustum (new csFrustum (*old_ctxt->GetLightFrustum ()));
+  lview.StartNewShadowBlock ();
 
-  // If copied_frustums is true we copied the frustums and we need to delete them
-  // later.
+  // If copied_frustums is true we copied the frustums and we need to
+  // delete them later.
   bool copied_frustums = false;
 
   if (flags.Check (CS_PORTAL_WARP))
   {
-    new_lview.light_frustum->Transform (&warp_wor);
+    new_ctxt->GetLightFrustum ()->Transform (&warp_wor);
 
-    if (flags.Check (CS_PORTAL_MIRROR)) new_lview.mirror = !lview.mirror;
-    new_lview.light_frustum->SetMirrored (new_lview.mirror);
+    if (flags.Check (CS_PORTAL_MIRROR))
+      new_ctxt->SetMirrored (!old_ctxt->IsMirrored ());
+    new_ctxt->GetLightFrustum ()->SetMirrored (new_ctxt->IsMirrored ());
 
     // Transform all shadow frustums. First make a copy.
     // Note that we only copy the relevant shadow frustums.
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    iShadowBlock* slist = lview.GetShadows ()->GetFirstShadowBlock ();
+    iShadowBlock* slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();
     while (slist)
     {
-      iShadowBlock* copy_slist = new_lview.GetShadows ()->NewShadowBlock (
+      iShadowBlock* copy_slist = new_ctxt->GetShadows ()->NewShadowBlock (
       	slist->GetSector (), slist->GetRecLevel ());
       copy_slist->AddRelevantShadows (slist, &warp_wor);
-      slist = lview.GetShadows ()->GetNextShadowBlock (slist);
+      slist = old_ctxt->GetShadows ()->GetNextShadowBlock (slist);
     }
 
     copied_frustums = true;
 
+    csLightingInfo& linfo = new_ctxt->GetLightingInfo ();
     if (alpha)
     {
       float fr, fg, fb;
@@ -281,14 +284,17 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
         fg = filter_g;
         fb = filter_b;
       }
-      new_lview.r = lview.r * fr;
-      new_lview.g = lview.g * fg;
-      new_lview.b = lview.b * fb;
+      linfo.SetColor (csColor (
+      	linfo.GetColor ().red * fr,
+      	linfo.GetColor ().green * fg,
+      	linfo.GetColor ().blue * fb));
     }
 
     // Don't go further if the light intensity is almost zero.
-    if (new_lview.r < SMALL_EPSILON && new_lview.g < SMALL_EPSILON && new_lview.b < SMALL_EPSILON)
-      return;
+    if (linfo.GetColor ().red < SMALL_EPSILON &&
+    	linfo.GetColor ().green < SMALL_EPSILON &&
+	linfo.GetColor ().blue < SMALL_EPSILON)
+      goto stop;
   }
   else
   {
@@ -297,25 +303,28 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    iShadowBlock* slist = lview.GetShadows ()->GetFirstShadowBlock ();
+    iShadowBlock* slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();
     while (slist)
     {
       copied_frustums = true; // Only set to true here
-      iShadowBlock* copy_slist = new_lview.GetShadows ()->NewShadowBlock (
+      iShadowBlock* copy_slist = new_ctxt->GetShadows ()->NewShadowBlock (
       	slist->GetSector (), slist->GetRecLevel ());
       copy_slist->AddRelevantShadows (slist);
 
-      slist = lview.GetShadows ()->GetNextShadowBlock (slist);
+      slist = old_ctxt->GetShadows ()->GetNextShadowBlock (slist);
     }
   }
 
-  sector->RealCheckFrustum (new_lview);
+  sector->RealCheckFrustum (lview);
 
   if (copied_frustums)
   {
     // Delete all copied frustums.
-    new_lview.GetShadows ()->DeleteAllShadows ();
+    new_ctxt->GetShadows ()->DeleteAllShadows ();
   }
+
+stop:
+  lview.RestoreFrustumContext (old_ctxt);
 }
 
 iSector *csPortal::GetPortal ()

@@ -48,6 +48,8 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
   {
     // The view frustum
     csFrustumView *frustum;
+    // The context.
+    csFrustumContext* ctxt;
     // The old value of csFrustumViewCleanup "next" field
     csFrustumViewCleanup *old_next;
     // The list of shadow frustums
@@ -55,11 +57,12 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
     // The list of polygons that are still unlit; if NULL we have no more shares
     csPolygon3D *unlit_poly;
 
-    LightViewInfo (csFrustumView *frust, csFrustumViewCleanup *next,
-      csPolygon3D *orig_poly)
-      : shadows (32, 32)
+    LightViewInfo (csFrustumView *frust, csFrustumContext* ctxt,
+    	csFrustumViewCleanup *next, csPolygon3D *orig_poly)
+        : shadows (32, 32)
     {
       frustum = frust;
+      LightViewInfo::ctxt = ctxt;
       old_next = next;
 
       // Count how many visible polygons that share this lightmap we have
@@ -121,7 +124,7 @@ public:
   }
 
   // Collect a reference from given frustum to our lightmap
-  bool Collect (csFrustumView *lview, csPolygon3D *poly);
+  bool Collect (csFrustumView *lview, csFrustumContext* ctxt, csPolygon3D *poly);
 
   // Delete the top lighting info on the stack.
   bool FinishLightView ();
@@ -135,36 +138,40 @@ public:
   csPolygon3D *GetNextUnlitPolygon ();
 };
 
-csDelayedLightingInfo::csDelayedLightingInfo (csPolyTexture *ptex) : lvlist (4, 4)
+csDelayedLightingInfo::csDelayedLightingInfo (csPolyTexture *ptex) :
+	lvlist (4, 4)
 {
   polytex = ptex;
   action = csPolyTexture::ProcessDelayedLightmaps;
 }
 
-bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
+bool csDelayedLightingInfo::Collect (csFrustumView *lview,
+	csFrustumContext* ctxt, csPolygon3D *poly)
 {
-  // If we have no lighting info, or this frustumview is different from the
-  // last collected frustum, we have a new (recursive) light source, that
-  // possibly came through a mirror or warped portal or such. Note that we
-  // CAN use frustumview address to check uniquity because a frustumview
+  // If we have no lighting info, or this frustumview/context is different
+  // from the last collected frustum, we have a new (recursive) light source,
+  // that possibly came through a mirror or warped portal or such. Note that we
+  // CAN use frustumview+ctxt address to check uniquity because a frustumview
   // cannot be deleted (and another one created on the same address) without
   // the frustum being removed from lvlist (this is done from the cleanup
   // callback, called from frustumview destructor).
-  if (!lvlist.Length ()
-   || lvlist.Get (lvlist.Length () - 1)->frustum != lview)
+  if (!lvlist.Length () ||
+    lvlist.Get (lvlist.Length () - 1)->frustum != lview ||
+    lvlist.Get (lvlist.Length () - 1)->ctxt != ctxt)
   {
 #ifdef CS_DEBUG
     // Check if this frustum has been seen EARLIER: if so, this means that
     // during the destruction of frustum views that are "on top" of it
     // ProcessDelayedLightMaps() has not been called.
     for (int i = lvlist.Length () - 2; i >= 0; i--)
-      if (lvlist.Get (i)->frustum == lview)
+      if (lvlist.Get (i)->frustum == lview && lvlist.Get (i)->ctxt == ctxt)
         DEBUG_BREAK;
 #endif
     // Create a new light frustum info structure
-    lvlist.Push (new LightViewInfo (lview, next, poly->GetBasePolygon ()));
+    lvlist.Push (new LightViewInfo (lview, ctxt, next,
+    	poly->GetBasePolygon ()));
     // Register with that frustumview for cleanup
-    lview->RegisterCleanup (this);
+    ctxt->RegisterCleanup (this);
   }
 
   LightViewInfo *lvi = lvlist.Get (lvlist.Length () - 1);
@@ -194,7 +201,8 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   CS_ASSERT (cur_poly);
 
   // Check if any shadow frustums we have now have not been seen in the past
-  lvi->shadows.AddUniqueRelevantShadows (lview->GetShadows ());
+  lvi->shadows.AddUniqueRelevantShadows (ctxt->GetShadows ());
+  //@@@ DEBUG?lvi->shadows.AddUniqueRelevantShadows (lview->GetFrustumContext ()->GetShadows ());
   return !lvi->unlit_poly;
 }
 
@@ -206,7 +214,7 @@ bool csDelayedLightingInfo::FinishLightView ()
   CS_ASSERT (idx >= 0);
 
   // Deregister ourselves from the cleanup list of frustumview
-  lvlist.Get (idx)->frustum->DeregisterCleanup (this);
+  lvlist.Get (idx)->ctxt->DeregisterCleanup (this);
   next = lvlist.Get (idx)->old_next;
 
   lvlist.Delete (idx);
@@ -285,9 +293,9 @@ void csPolyTexture::CreateBoundingTextureBox ()
   csVector3 v1, v2;
   for (i = 0; i < polygon->GetVertices ().GetNumVertices (); i++)
   {
-    v1 = polygon->Vwor (i);           // Coordinates of vertex in world space.
-    v1 -= txt_pl->v_world2tex;
-    v2 = (txt_pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
+    v1 = polygon->Vobj (i);           // Coordinates of vertex in object space.
+    v1 -= txt_pl->v_obj2tex;
+    v2 = (txt_pl->m_obj2tex) * v1;  // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -347,13 +355,15 @@ void csPolyTexture::InitLightMaps ()
 {
 }
 
-void csPolyTexture::ProcessDelayedLightmaps (csFrustumView *lview,
+void csPolyTexture::ProcessDelayedLightmaps (iFrustumView *lview,
+  csFrustumContext* ctxt,
   csFrustumViewCleanup *lighting_info)
 {
   csDelayedLightingInfo *dli = (csDelayedLightingInfo *)lighting_info;
 
   // Apply lighting to the lightmap
-  dli->GetPolygon ()->CalculateDelayedLighting (lview);
+  dli->GetPolygon ()->CalculateDelayedLighting ((csFrustumView*)lview,
+  	ctxt);
 }
 
 /**
@@ -415,12 +425,13 @@ bool csPolyTexture::GetLightmapBounds (const csVector3& lightpos, bool mirror,
   return !(lm->delayed_light_info || polygon->GetNextShare ());
 }
 
-bool csPolyTexture::CollectShadows (csFrustumView *lview, csPolygon3D *poly)
+bool csPolyTexture::CollectShadows (csFrustumView *lview,
+	csFrustumContext* ctxt, csPolygon3D *poly)
 {
   if (!lm->delayed_light_info)
     lm->delayed_light_info = new csDelayedLightingInfo (this);
 
-  return (lm->delayed_light_info->Collect (lview, poly));
+  return (lm->delayed_light_info->Collect (lview, ctxt, poly));
 }
 
 //
@@ -565,12 +576,13 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
-  csVector3 &lightpos = lview.light_frustum->GetOrigin ();
+  csFrustum* light_frustum = lview.GetFrustumContext ()->GetLightFrustum ();
+  csVector3 &lightpos = light_frustum->GetOrigin ();
   csDelayedLightingInfo *dli = lm->delayed_light_info;
 
   // Now allocate the space for the projected lighted polygon
-  int nvlf = lview.light_frustum->GetNumVertices ();
-  csVector3 *lf3d = lview.light_frustum->GetVertices ();
+  int nvlf = light_frustum->GetNumVertices ();
+  csVector3 *lf3d = light_frustum->GetVertices ();
   ALLOC_STACK_ARRAY (lf2d, csVector2, nvlf);
   // Project the light polygon from world space to responsability grid space
   float inv_lightcell_size = 1.0 / lightcell_size;
@@ -600,7 +612,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   else
   {
     nsf = 0;
-    shadow_it = lview.GetShadows ()->GetShadowIterator ();
+    shadow_it = lview.GetFrustumContext ()->GetShadows ()->GetShadowIterator ();
     while (shadow_it->HasNext ())
     {
       shadow_it->Next ();
@@ -624,7 +636,8 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 
     if (!dli || i < dli->GetShadowCount ())
     {
-      csFrustum *shadow = csf->Intersect (*lview.light_frustum);
+      csFrustum *shadow = csf->Intersect (*lview.GetFrustumContext ()->
+      		GetLightFrustum ());
       if (!shadow) { sfc [i] = NULL; continue; }
 
       // Translate the shadow frustum to polygon plane
@@ -709,6 +722,8 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 void csPolyTexture::FillLightMap (csFrustumView& lview)
 {
   if (!lm) return;
+  
+  csLightingInfo& linfo = lview.GetFrustumContext ()->GetLightingInfo ();
 
   // We will compute the lighting of the entire lightmap, disregarding
   // polygon bounds. This removes both the "black borders" and "white
@@ -734,9 +749,10 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
 
   bool hit = false;         // Set to true if there is a hit
   bool first_time = false;  // Set to true if this is the first pass for the dynamic light
-  csStatLight *light = (csStatLight *)lview.userdata;
+  csStatLight *light = (csStatLight *)lview.GetUserData ();
   bool dyn = light->IsDynamic ();
-  csVector3& lightpos = lview.light_frustum->GetOrigin ();
+  csVector3& lightpos = lview.GetFrustumContext ()->GetLightFrustum ()->
+  	GetOrigin ();
 
   if (dyn)
   {
@@ -770,9 +786,10 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
 
   // Finally, use the light coverage values to compute the actual lighting
   int covaddr = 0;
-  float light_r = lview.r * NORMAL_LIGHT_LEVEL;
-  float light_g = lview.g * NORMAL_LIGHT_LEVEL;
-  float light_b = lview.b * NORMAL_LIGHT_LEVEL;
+  csColor& col = linfo.GetColor ();
+  float light_r = col.red * NORMAL_LIGHT_LEVEL;
+  float light_g = col.green * NORMAL_LIGHT_LEVEL;
+  float light_b = col.blue * NORMAL_LIGHT_LEVEL;
   for (int i = 0; i < lmh; i++)
   {
     int uv = i * lm->GetWidth ();
@@ -881,7 +898,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
     f_uv = new csVector2 [lp->num_vertices];
     for (i = 0 ; i < lp->num_vertices ; i++)
     {
-      //if (lview.mirror) mi = lview.num_frustum-i-1;
+      //if (lview.IsMirrored ()) mi = lview.num_frustum-i-1;
       //else mi = i;
       mi = i;
 

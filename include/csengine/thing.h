@@ -668,6 +668,20 @@ public:
   bool VisTest (iRenderView* irview);
 
   //----------------------------------------------------------------------
+  // Shadow System
+  //----------------------------------------------------------------------
+
+  /// Register a shadow receiver.
+  void RegisterShadowReceiver (iShadowReceiver* receiver);
+  /// Unregister a shadow receiver.
+  void UnregisterShadowReceiver (iShadowReceiver* receiver);
+
+  /**
+   * Start casting shadows from a given point in space.
+   */
+  void CastShadows (const csVector3& pos);
+
+  //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
   
@@ -954,6 +968,22 @@ public:
     virtual bool VisTest (iRenderView* irview)
     {
       return scfParent->VisTest (irview);
+    }
+    virtual bool SupportsShadowCasting ()
+    {
+      return true;
+    }
+    virtual void RegisterShadowReceiver (iShadowReceiver* receiver)
+    {
+      scfParent->RegisterShadowReceiver (receiver);
+    }
+    virtual void UnregisterShadowReceiver (iShadowReceiver* receiver)
+    {
+      scfParent->UnregisterShadowReceiver (receiver);
+    }
+    virtual void CastShadows (const csVector3& pos)
+    {
+      scfParent->CastShadows (pos);
     }
   } scfiVisibilityCuller;
   friend struct VisCull;

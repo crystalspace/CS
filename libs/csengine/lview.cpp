@@ -27,57 +27,77 @@
 #include "iengine/camera.h"
 #include "iengine/sector.h"
 
-csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
-  callback_data (NULL)
+IMPLEMENT_IBASE (csFrustumView)
+  IMPLEMENTS_INTERFACE (iFrustumView)
+IMPLEMENT_IBASE_END
+
+csFrustumView::csFrustumView () :
+	node_func (NULL),
+	poly_func (NULL),
+	curve_func (NULL),
+	things_shadow (false),
+	dynamic (false),
+	callback (NULL),
+	callback_data (NULL),
+	ctxt (NULL)
 {
-  memset (this, 0, sizeof (csFrustumView));
-  shadows = new csShadowBlockList ();
-  shared = false;
+  CONSTRUCT_IBASE (NULL);
+  ctxt = new csFrustumContext ();
+  csShadowBlockList* sbl = new csShadowBlockList ();
+  ctxt->SetShadows ((iShadowBlockList*)sbl, false);
 }
 
+#if 0
 csFrustumView::csFrustumView (const csFrustumView &iCopy)
 {
   // hehe. kind of trick.
   memcpy (this, &iCopy, sizeof (csFrustumView));
-  // Leave cleanup actions alone to original copy
-  cleanup = NULL;
-  shared = true;
+  //@@@@@@@@@@@@@@@@@
+  CONSTRUCT_IBASE (NULL);
+  // Leave cleanup actions alone to original copy.
+  ctxt = new csFrustumContext ();
+  memcpy (ctxt, iCopy.GetFrustumContext (), sizeof (csFrustumContext));
+  ctxt->SetCleanup (NULL);
+  ctxt->SetShadows (iCopy.GetFrustumContext ()->GetShadows (), true);
 }
+#endif
 
 csFrustumView::~csFrustumView ()
 {
-  while (cleanup)
-  {
-    csFrustumViewCleanup *next = cleanup->next;
-    cleanup->action (this, cleanup);
-    cleanup = next;
-  }
-  if (light_frustum) light_frustum->DecRef ();
-  if (!shared) delete shadows;
-}
-
-bool csFrustumView::DeregisterCleanup (csFrustumViewCleanup *action)
-{
-  csFrustumViewCleanup **pcur = &cleanup;
-  csFrustumViewCleanup *cur = cleanup;
-  while (cur)
-  {
-    if (cur == action)
-    {
-      *pcur = cur->next;
-      return true;
-    }
-    pcur = &cur->next;
-    cur = cur->next;
-  }
-  return false;
+  ctxt->CallCleanups ((iFrustumView*)this);
+  if (ctxt->GetLightFrustum ()) ctxt->GetLightFrustum ()->DecRef ();
+  if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
+  delete ctxt;
 }
 
 void csFrustumView::StartNewShadowBlock ()
 {
-  if (!shared) delete shadows;
-  shadows = new csShadowBlockList ();
-  shared = false;
+  if (!ctxt->IsShared ()) ctxt->GetShadows ()->DecRef ();
+  ctxt->SetShadows ((iShadowBlockList*)(new csShadowBlockList ()), false);
+}
+
+void csFrustumView::CreateFrustumContext ()
+{
+  csFrustumContext* old_ctxt = ctxt;
+  // @@@ Use a pool for frustum contexts?
+  // A pool would work very well here since we have limited recusion depth.
+
+  // Leave cleanup actions alone to original copy.
+  ctxt = new csFrustumContext ();
+  *ctxt = *old_ctxt;
+  ctxt->SetCleanup (NULL);
+  ctxt->SetShadows (old_ctxt->GetShadows (), true);
+}
+
+void csFrustumView::RestoreFrustumContext (csFrustumContext* original)
+{
+  csFrustumContext* old_ctxt = ctxt;
+  ctxt = original;
+  old_ctxt->CallCleanups ((iFrustumView*)this);
+  //@@@ HANDLING OF LightFrustum
+  if (old_ctxt->GetLightFrustum ()) old_ctxt->GetLightFrustum ()->DecRef ();
+  if (!old_ctxt->IsShared ()) old_ctxt->GetShadows ()->DecRef ();
+  delete old_ctxt;
 }
 
 //---------------------------------------------------------------------------

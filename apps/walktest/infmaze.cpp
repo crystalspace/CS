@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -265,7 +265,7 @@ void InfPortalCS::CheckFrustum (csFrustumView& lview, int alpha)
 {
   if (!GetSector ())
   {
-    if (!lview.dynamic)
+    if (!lview.IsDynamic ())
     {
       // If we want to shine light through this portal but it doesn't
       // really exist yet then we remember the csFrustumView for later.
@@ -273,8 +273,10 @@ void InfPortalCS::CheckFrustum (csFrustumView& lview, int alpha)
       lv->next = lviews;
       lviews = lv;
       lv->lv = lview;
-      if (lview.light_frustum)
-        lv->lv.light_frustum = new csFrustum (*lview.light_frustum);
+      csFrustumContext* ctxt = lview.GetFrustumContext ();
+      if (ctxt->GetLightFrustum ())
+        lv->lv.GetFrustumContext ()->SetLightFrustum (
+		new csFrustum (*ctxt->GetLightFrustum ()));
     }
   }
   else

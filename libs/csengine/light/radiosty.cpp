@@ -1091,7 +1091,7 @@ void csRadiosity :: PrepareShootSource(csRadElement *src)
   source_poly_patch_area = shoot_src->GetOneLumelArea();
 
   delete texturemap;
-  
+
   texturemap = shoot_src->ComputeTextureLumelSized();
 }
 
@@ -1102,23 +1102,19 @@ static void frustum_curve_report_func (csObject *obj, csFrustumView* lview);
 void csRadiosity :: StartFrustum()
 {
   csFrustumView *lview = new csFrustumView();
-  lview->userdata = (void*) this;
-  lview->curve_func = frustum_curve_report_func;
-  lview->poly_func = frustum_polygon_report_func;
-  lview->radius = 10000000.0; // should be enough
-  lview->sq_radius = lview->radius * lview->radius;
-  lview->things_shadow = true;
-  lview->mirror = false;
-  lview->gouraud_only = false;
-  lview->gouraud_color_reset = false;
-  lview->r = 1.0; // the resulting color can be used as a filter
-  lview->g = 1.0;
-  lview->b = 1.0;
-  lview->dynamic = false;
-  lview->shadow_thing_mask = CS_ENTITY_NOSHADOWS;
-  lview->shadow_thing_value = 0;
-  lview->process_thing_mask = CS_ENTITY_NOLIGHTING;
-  lview->process_thing_value = 0;
+  csFrustumContext* ctxt = lview->GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  // the resulting color can be used as a filter
+  linfo.SetColor (csColor (1, 1, 1));
+  lview->SetUserData ((void*) this);
+  lview->SetCurveFunction (frustum_curve_report_func);
+  lview->SetPolygonFunction (frustum_polygon_report_func);
+  lview->SetRadius (10000000.0); // should be enough
+  lview->EnableThingShadows (true);
+  lview->SetDynamic (false);
+  lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
   // start from the center of the shooting poly.
   // this will lead to inaccuracy as each lumel of the shooting
@@ -1131,12 +1127,12 @@ void csRadiosity :: StartFrustum()
 
   center -= shoot_src->GetAvgNormal() * 0.1f;
 
-  lview->light_frustum = new csFrustum (center);
-  lview->light_frustum->MakeInfinite ();
+  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
   
   // add a backplane to frustum to clip to it... But which plane?
   //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
-  //lview->light_frustum->SetBackPlane(* src_plane);
+  //lview->GetLightFrustum ()->SetBackPlane(* src_plane);
 
   /// setup some vectors so we can test on plane location
   //plane_origin = shoot_src->GetPolygon3D()->Vwor(0);
@@ -1157,43 +1153,47 @@ static void frustum_curve_report_func (csObject *obj, csFrustumView* lview)
   if(dest)
   {
     /// radiosity to this curve.
-    csRadiosity *rad = (csRadiosity*)lview->userdata;
-    rad->ProcessDest(dest, lview);
+    csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
+    rad->ProcessDest (dest, lview);
   }
 }
 
 static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
 {
+  csPlane3 poly_plane;
   // radiosity works with the base, unsplit polygon.
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();
   // obtain radpoly
   csRadElement *dest = csRadElement::GetRadElement(*destpoly3d);
   // if polygon not lightmapped/radiosity rendered, it can still be a portal.
+  csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
 
   // check poly -- on right side of us?
   const csPlane3& wplane = destpoly3d->GetPlane ()->GetWorldPlane ();
-  if (!csMath3::Visible (lview->light_frustum->GetOrigin (), wplane))
+  if (!csMath3::Visible (light_frustum->GetOrigin (), wplane))
     return;
 
-  csFrustumView new_lview = *lview;
-  new_lview.light_frustum = NULL;
+  csFrustumContext* old_ctxt = lview->GetFrustumContext ();
+  lview->CreateFrustumContext ();
+  csFrustumContext* new_ctxt = lview->GetFrustumContext ();
+  new_ctxt->SetLightFrustum (NULL);
   csVector3 poly[40];
-  const csVector3& center = lview->light_frustum->GetOrigin ();
+  const csVector3& center = light_frustum->GetOrigin ();
   int num_vert = 4;
   int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   int j;
   if(dest)
   {
     if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
-      GetLightmapBounds(center, lview->mirror, poly) )
+        GetLightmapBounds(center, old_ctxt->IsMirrored (), poly) )
       /// empty intersection or lightmap has already been seen by frustum.
-      return;
+      goto stop;
   }
   else
   {
     /// clip to polygon instead of lightmap if no lightmap.
     /// @@@ hope that poly array is big enough
-    if (lview->mirror)
+    if (old_ctxt->IsMirrored ())
       for (j = 0 ; j < num_vertices ; j++)
         poly[j] = destpoly3d->Vwor (num_vertices - j - 1) - center;
     else
@@ -1201,42 +1201,47 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
         poly[j] = destpoly3d->Vwor (j) - center;
     num_vert = num_vertices;
   }
-  new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
+  new_ctxt->SetLightFrustum (light_frustum->Intersect(poly, num_vert));
   // empty intersection, none covered (will be skipped)
-  if(!new_lview.light_frustum) return;
+  if(!new_ctxt->GetLightFrustum ()) goto stop;
 
   // uses polygon3d of *base* polygon...
-  csPortal *po = destpoly3d->GetPortal();
+  csPortal *po;
+  po = destpoly3d->GetPortal();
 
-  csPlane3 poly_plane = *destpoly3d->GetPolyPlane ();
+  poly_plane = *destpoly3d->GetPolyPlane ();
   // First translate plane to center of frustum.
   poly_plane.DD += poly_plane.norm * center;
   poly_plane.Invert ();
-  if (!destpoly3d->MarkRelevantShadowFrustums (new_lview, poly_plane))
-    return;
+  if (!destpoly3d->MarkRelevantShadowFrustums (*lview, poly_plane))
+    goto stop;
 
   if(dest)
   {
     /// radiosity to this polygon.
-    csRadiosity *rad = (csRadiosity*)lview->userdata;
-    rad->ProcessDest(dest, &new_lview);
+    csRadiosity *rad = (csRadiosity*)lview->GetUserData ();
+    rad->ProcessDest(dest, lview);
   }
   
   /// portal?
-  if(!po) return;
+  if (!po) goto stop;
   /// @@@ hope that poly array is big enough
-  if (lview->mirror)
+  if (old_ctxt->IsMirrored ())
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (num_vertices - j - 1) - center;
   else
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (j) - center;
  
-  delete new_lview.light_frustum;
-  new_lview.light_frustum = lview->light_frustum->Intersect(poly,num_vertices);
-  if (!new_lview.light_frustum) return;
+  delete new_ctxt->GetLightFrustum ();
+  new_ctxt->SetLightFrustum (old_ctxt->
+  	GetLightFrustum ()-> Intersect(poly,num_vertices));
+  if (!new_ctxt->GetLightFrustum ()) goto stop;
 
-  po->CheckFrustum (new_lview, destpoly3d->GetAlpha ());
+  po->CheckFrustum (*lview, destpoly3d->GetAlpha ());
+
+stop:
+  lview->RestoreFrustumContext (old_ctxt);
 }
 
 
@@ -1288,7 +1293,8 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
   // dest_normal = - shoot_dest->GetNormal();
 
   // use filter colour from lview
-  trajectory_color.Set(lview->r, lview->g, lview->b);
+  csLightingInfo& linfo = lview->GetFrustumContext ()->GetLightingInfo ();
+  trajectory_color = linfo.GetColor ();
 
   // use shadows and light from lview
   // gets coverage matrix from polytext.cpp, so the code is shared

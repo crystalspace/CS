@@ -220,26 +220,21 @@ void csStatLight::CalculateLighting ()
 {
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
-  lview.userdata = (void*)this;
-  lview.poly_func = poly_light_func;
-  lview.curve_func = curve_light_func;
-  lview.radius = GetRadius ();
-  lview.sq_radius = GetSquaredRadius ();
-  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
-  lview.mirror = false;
-  lview.gouraud_only = false;
-  lview.gouraud_color_reset = false;
-  lview.r = GetColor ().red;
-  lview.g = GetColor ().green;
-  lview.b = GetColor ().blue;
-  lview.dynamic = false;
-  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
-  lview.shadow_thing_value = 0;
-  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
-  lview.process_thing_value = 0;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  linfo.SetColor (GetColor ());
+  lview.SetUserData ((void*)this);
+  lview.SetPolygonFunction (poly_light_func);
+  lview.SetCurveFunction (curve_light_func);
+  lview.SetRadius (GetRadius ());
+  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
+  lview.SetDynamic (false);
+  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  lview.light_frustum = new csFrustum (center);
-  lview.light_frustum->MakeInfinite ();
+  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum (lview);
 }
 
@@ -247,45 +242,38 @@ void csStatLight::CalculateLighting (csThing* th)
 {
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csFrustumView lview;
-  lview.userdata = (void*)this;
-  lview.poly_func = poly_light_func;
-  lview.curve_func = curve_light_func;
-  lview.radius = GetRadius ();
-  lview.sq_radius = GetSquaredRadius ();
-  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
-  lview.mirror = false;
-  lview.gouraud_only = false;
-  lview.gouraud_color_reset = false;
-  lview.r = GetColor ().red;
-  lview.g = GetColor ().green;
-  lview.b = GetColor ().blue;
-  lview.dynamic = false;
-  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
-  lview.shadow_thing_value = 0;
-  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
-  lview.process_thing_value = 0;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  linfo.SetColor (GetColor ());
+  lview.SetUserData ((void*)this);
+  lview.SetPolygonFunction (poly_light_func);
+  lview.SetCurveFunction (curve_light_func);
+  lview.SetRadius (GetRadius ());
+  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
+  lview.SetDynamic (false);
+  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  lview.light_frustum = new csFrustum (center);
-  lview.light_frustum->MakeInfinite ();
+  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
   th->CheckFrustum (lview);
 }
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
+#if 0
   csFrustumView lview;
-  lview.userdata = (void*)this;
-  lview.poly_func = poly_light_func;
-  lview.curve_func = curve_light_func;
-  lview.radius = GetRadius ();
-  lview.sq_radius = GetSquaredRadius ();
-  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
-  lview.mirror = false;
-  lview.gouraud_only = false;
-  lview.gouraud_color_reset = false;
-  lview.r = GetColor ().red;
-  lview.g = GetColor ().green;
-  lview.b = GetColor ().blue;
-  lview.dynamic = false;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  linfo.SetColor (GetColor ());
+  lview.SetUserData ((void*)this);
+  lview.SetPolygonFunction (poly_light_func);
+  lview.SetCurveFunction (curve_light_func);
+  lview.SetRadius (GetRadius ());
+  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
+  lview.SetDynamic (false);
   lview.callback = callback;
   lview.callback_data = callback_data;
   lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
@@ -293,9 +281,10 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
   lview.process_thing_value = 0;
 
-  lview.light_frustum = new csFrustum (center);
-  lview.light_frustum->MakeInfinite ();
+  ctxt->light_frustum = new csFrustum (center);
+  ctxt->light_frustum->MakeInfinite ();
   sector->CheckFrustum (lview);
+#endif
 }
 
 
@@ -404,26 +393,21 @@ void csDynLight::Setup ()
   while (lightpatches)
     csEngine::current_engine->lightpatch_pool->Free (lightpatches);
   csFrustumView lview;
-  lview.userdata = (void*)this;
-  lview.poly_func = poly_light_func;
-  lview.curve_func = curve_light_func;
-  lview.radius = GetRadius ();
-  lview.sq_radius = GetSquaredRadius ();
-  lview.things_shadow = flags.Get () & CS_LIGHT_THINGSHADOWS;
-  lview.mirror = false;
-  lview.gouraud_only = false;
-  lview.gouraud_color_reset = false;
-  lview.r = GetColor ().red;
-  lview.g = GetColor ().green;
-  lview.b = GetColor ().blue;
-  lview.dynamic = true;
-  lview.shadow_thing_mask = CS_ENTITY_NOSHADOWS;
-  lview.shadow_thing_value = 0;
-  lview.process_thing_mask = CS_ENTITY_NOLIGHTING;
-  lview.process_thing_value = 0;
+  csFrustumContext* ctxt = lview.GetFrustumContext ();
+  csLightingInfo& linfo = ctxt->GetLightingInfo ();
+  linfo.SetGouraudOnly (false);
+  linfo.SetColor (GetColor ());
+  lview.SetUserData ((void*)this);
+  lview.SetPolygonFunction (poly_light_func);
+  lview.SetCurveFunction (curve_light_func);
+  lview.SetRadius (GetRadius ());
+  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
+  lview.SetDynamic (true);
+  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
+  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
-  lview.light_frustum = new csFrustum (center);
-  lview.light_frustum->MakeInfinite ();
+  ctxt->SetLightFrustum (new csFrustum (center));
+  ctxt->GetLightFrustum ()->MakeInfinite ();
   sector->CheckFrustum (lview);
 }
 
