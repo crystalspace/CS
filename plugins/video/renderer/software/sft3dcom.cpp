@@ -1367,24 +1367,46 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
 
     if (!rt_onscreen)
     {
-#if 0
-      texture_cache->Cache (render_target);
-      GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
-      	->Handle;
-      statecache->SetShadeModel (GL_FLAT);
-      statecache->EnableState (GL_TEXTURE_2D);
-      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-      statecache->SetTexture (GL_TEXTURE_2D, handle);
-      SetupBlend (CS_FX_COPY, 0, false);
-      SetGLZBufferFlags (CS_ZBUF_NONE);
-
-      glBegin (GL_QUADS);
-      glTexCoord2f (0, 0); glVertex2i (0, height-txt_h+1);
-      glTexCoord2f (0, 1); glVertex2i (0, height-0+1);
-      glTexCoord2f (1, 1); glVertex2i (txt_w, height-0+1);
-      glTexCoord2f (1, 0); glVertex2i (txt_w, height-txt_h+1);
-      glEnd ();
-#endif
+      int txt_w, txt_h;
+      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
+	    render_target->GetPrivateObject ();
+      csTextureSoftware *tex_0 = (csTextureSoftware*)(tex_mm->get_texture (0));
+      int x, y;
+      uint8* bitmap = tex_0->bitmap;
+      switch (pfmt.PixelBytes)
+      {
+	case 1: // Not supported @@@
+	  break;
+	case 2:
+	  {
+	    uint16* pal2glob = (uint16*)(tex_mm->GetPaletteToGlobal ());
+	    for (y = txt_h-1 ; y >= 0 ; y--)
+	    {
+              uint16* d = (uint16*)line_table[y];
+	      for (x = 0 ; x < txt_w ; x++)
+	      {
+	        uint8 pix = *bitmap++;
+		*d++ = pal2glob[pix];
+	      }
+	    }
+	  }
+	  break;
+	case 4:
+	  {
+	    uint32* pal2glob = (uint32*)(tex_mm->GetPaletteToGlobal ());
+	    for (y = txt_h-1 ; y >= 0 ; y--)
+	    {
+              uint32* d = (uint32*)line_table[y];
+	      for (x = 0 ; x < txt_w ; x++)
+	      {
+	        uint8 pix = *bitmap++;
+		*d++ = pal2glob[pix];
+	      }
+	    }
+	  }
+	  break;
+      }
       rt_onscreen = true;
     }
   }
@@ -1494,14 +1516,12 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
     if (rt_onscreen)
     {
       rt_onscreen = false;
-#if 0
       int txt_w, txt_h;
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
 	    render_target->GetPrivateObject ();
+      tex_mm->UpdateTexture ();
       csTextureSoftware *tex_0 = (csTextureSoftware*)(tex_mm->get_texture (0));
-      tex_mm->CreateReversePalette ();
-      uint8* reverse_palette = tex_mm->GetReversePalette ();
       int x, y;
       uint8* bitmap = tex_0->bitmap;
       switch (pfmt.PixelBytes)
@@ -1510,31 +1530,39 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
 	  break;
 	case 2:
 	  {
-	    for (y = 0 ; y < txt_h ; y++)
+	    for (y = txt_h-1 ; y >= 0 ; y--)
 	    {
               uint16* d = (uint16*)line_table[y];
 	      for (x = 0 ; x < txt_w ; x++)
 	      {
-		*bitmap++ = reverse_palette[*d++];
+		uint16 pix = *d++;
+		uint8 pix8;
+		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >> 5) << 5;
+		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >> 5) << 2;
+		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >> 6);
+		*bitmap++ = pix8;
 	      }
 	    }
 	  }
 	  break;
 	case 4:
 	  {
-	    for (y = 0 ; y < txt_h ; y++)
+	    for (y = txt_h-1 ; y >= 0 ; y--)
 	    {
               uint32* d = (uint32*)line_table[y];
 	      for (x = 0 ; x < txt_w ; x++)
 	      {
 		uint32 pix = *d++;
-		//*bitmap++ = reverse_palette[*d++];
+		uint8 pix8;
+		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >> 5) << 5;
+		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >> 5) << 2;
+		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >> 6);
+		*bitmap++ = pix8;
 	      }
 	    }
 	  }
 	  break;
       }
-#endif
     }
   }
   render_target = NULL;
@@ -1645,8 +1673,9 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
-    // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
-    // so not to reject cases when bounds exceeded by less than epsilon. smgh
+    // Sometimes double precision in the clipper is not enough.
+    // Do an epsilon fuzz so not to reject cases when bounds exceeded
+    // by less than epsilon.
     if (((poly.vertices[i].x + EPSILON) < 0) ||
 	((poly.vertices[i].x - EPSILON) > width))
       return;
@@ -1681,7 +1710,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (num_vertices < 3)
     return;
 
-  // For debugging: if we reach the maximum number of polygons to draw we simply stop.
+  // For debugging: if we reach the maximum number of polygons to draw we
+  // simply stop.
   dbg_current_polygon++;
   if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
     return;
@@ -1752,12 +1782,12 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   // with at most two triangles (one at the top and one at the bottom).
 
   int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
+  int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
   int screenY;
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
@@ -1982,7 +2012,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   if (num_vertices < 3)
     return;
 
-  // For debugging: if we reach the maximum number of polygons to draw we simply stop.
+  // For debugging: if we reach the maximum number of polygons to draw
+  // we simply stop.
   dbg_current_polygon++;
   if (dbg_current_polygon == dbg_max_polygons_to_draw-1)
     return;
@@ -2134,7 +2165,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   }
 
   // Now get the unlighted texture corresponding to mipmap level we choosen
-  csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (mipmap);
+  csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (
+  	mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
   bool has_lightmap = tex->GetLightMap () && do_lighting && !poly.do_fullbright;
@@ -2196,8 +2228,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   // with at most two triangles (one at the top and one at the bottom).
 
   int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  float sxL, sxR, dxL, dxR;             // sl X left/right and deltas
+  int sy, fyL, fyR;                     // sl Y, final Y left, final Y right
   int xL, xR;
   int screenY;
 
@@ -3588,6 +3620,10 @@ void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent)
 {
   render_target = handle;
+  csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
+	    render_target->GetPrivateObject ();
+  tex_mm->Setup332Palette ();
+
   rt_onscreen = !persistent;
   rt_cliprectset = false;
 }

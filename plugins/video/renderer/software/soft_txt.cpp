@@ -136,7 +136,8 @@ csTextureHandleSoftware::csTextureHandleSoftware (
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
   (this->texman = texman)->IncRef ();
-  reverse_palette = NULL;
+  use_332_palette = false;
+  update_number = -1;
 }
 
 csTextureHandleSoftware::~csTextureHandleSoftware ()
@@ -145,56 +146,72 @@ csTextureHandleSoftware::~csTextureHandleSoftware ()
   texman->DecRef ();
   delete [] (uint8 *)pal2glob;
   delete [] pal2glob8;
-  delete [] reverse_palette;
 }
 
-void csTextureHandleSoftware::CreateReversePalette ()
+void csTextureHandleSoftware::Setup332Palette ()
 {
-  if (reverse_palette) return;
+  if (use_332_palette) return;
   if (texman->pfmt.PixelBytes == 1) return;	// @@@ Not supported.
 
-  // Make a copy of the pixel format for the canvas and
-  // correct it to a 16 bit format if it is 32 bit.
-  csPixelFormat pfmt = texman->pfmt;
-  if (pfmt.PixelBytes == 4)
+  use_332_palette = true;
+  // First remap the textures to use standard 3:3:2 palette.
+  int i;
+  for (i = 0 ; i < 4 ; i++)
   {
-    pfmt.RedMask = 0x1f << 11;
-    pfmt.GreenMask = 0x3f << 5;
-    pfmt.BlueMask = 0x1f;
-    pfmt.PalEntries = 0;
-    pfmt.PixelBytes = 2;
-    pfmt.complete ();
-  }
-
-  int total_colors = 1 << (pfmt.RedBits + pfmt.GreenBits + pfmt.BlueBits);
-  reverse_palette = new uint8 [total_colors];
-  int i, j;
-  for (i = 0 ; i < total_colors ; i++)
-  {
-    int r = ((i & pfmt.RedMask) >> pfmt.RedShift) << (8-pfmt.RedBits);
-    int g = ((i & pfmt.GreenMask) >> pfmt.GreenShift) << (8-pfmt.GreenBits);
-    int b = ((i & pfmt.BlueMask) >> pfmt.BlueShift) << (8-pfmt.BlueBits);
-    // @@@ This is probably not the best routine. Need to check later.
-    int best_dist = 60000;
-    int best_idx = -1;
-    for (j = 0 ; j < 256 ; j++)
+    if (tex [i])
     {
-      const csRGBpixel& p = palette[j];
-      // @@@ Use rgb_dist? Slower though.
-      int dist = ABS (p.red-r) + ABS (p.green-g) + ABS (p.blue-b);
-      if (dist == 0)
+      csTextureSoftware *t = (csTextureSoftware *)tex [i];
+      if (!t->bitmap) break;
+      int size = t->get_width () * t->get_height ();
+      uint8* bm = t->bitmap;
+      while (size > 0)
       {
-	// Perfect match.
-	best_idx = j;
-	break;
-      }
-      else if (dist < best_dist)
-      {
-	best_dist = dist;
-	best_idx = j;
+        const csRGBpixel& p = palette[*bm];
+	*bm++ = ((p.red >> 5) << 5) |
+	        ((p.green >> 5) << 2) |
+	        (p.green >> 6);
+        size--;
       }
     }
-    reverse_palette[i] = best_idx;
+  }
+
+  palette_size = 256;
+  delete[] pal2glob;
+
+  // Remap the pal2glob and pal2glob8 arrays.
+  if (texman->pfmt.PixelBytes == 2)
+  {
+    pal2glob = new uint8 [palette_size * sizeof (uint16)];
+    uint16* p2g = (uint16*)pal2glob;
+    for (i = 0 ; i < 256 ; i++)
+    {
+      int r = (i>>5) << 5;
+      int g = ((i>>2) & 0x7) << 5;
+      int b = (i & 0x3) << 6;
+      *p2g++ = texman->encode_rgb (r, g, b);
+    }
+  }
+  else
+  {
+    pal2glob = new uint8 [palette_size * sizeof (uint32)];
+    uint32* p2g = (uint32*)pal2glob;
+    for (i = 0 ; i < 256 ; i++)
+    {
+      int r = (i>>5) << 5;
+      int g = ((i>>2) & 0x7) << 5;
+      int b = (i & 0x3) << 6;
+      *p2g++ = texman->encode_rgb (r, g, b);
+    }
+  }
+  // Remap the palette itself.
+  for (i = 0 ; i < 256 ; i++)
+  {
+    int r = (i>>5) << 5;
+    int g = ((i>>2) & 0x7) << 5;
+    int b = (i & 0x3) << 6;
+    palette[i].red = r;
+    palette[i].green = g;
+    palette[i].blue = b;
   }
 }
 

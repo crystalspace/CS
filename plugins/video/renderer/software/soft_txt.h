@@ -155,15 +155,15 @@ protected:
   /// The private palette.
   csRGBpixel palette [256];
 
+  /// A number that is incremented if the texture is modified (proc texture).
+  uint32 update_number;
+
   /**
-   * Reverse palette. This will translate a 15 or 16-bit color
-   * value (corresponding to format of the display if display
-   * is 15 or 16 bit or else 5:6:5 if display is 32-bit) to a palette
-   * entry valid for this texture. This table is only present if
-   * CreateReversePalette() is called. Typically this is done
-   * for procedural textures (SetRenderTarget()) only.
+   * If the following flag is true then this texture uses a uniform
+   * 3:3:2 palette. This is used when the texture has been rendered
+   * on (using SetRenderTarget()).
    */
-  uint8* reverse_palette;
+  bool use_332_palette;
 
   /// Number of used colors in palette
   int palette_size;
@@ -196,15 +196,11 @@ public:
   void remap_texture ();
 
   /**
-   * Create the reverse palette for this texture.
-   * If the reverse palette is already created nothing will happen.
+   * Setup a 332 palette for this texture. This is useful when the
+   * texture is being used as a procedural texture. If the texture
+   * is already a 332 texture then nothing will happen.
    */
-  void CreateReversePalette ();
-
-  /**
-   * Get the pointer to the reverse palette or NULL if not calculate yet.
-   */
-  uint8* GetReversePalette () const { return reverse_palette; }
+  void Setup332Palette ();
 
   /// Query the private texture colormap
   csRGBpixel *GetColorMap () { return palette; }
@@ -231,6 +227,16 @@ public:
    * before using any texture.
    */
   virtual void Prepare ();
+
+  /**
+   * Indicate the texture is modified (update update_number).
+   */
+  void UpdateTexture () { update_number++; }
+
+  /**
+   * Get the texture update number.
+   */
+  uint32 GetUpdateNumber () const { return update_number; }
 };
 
 /**

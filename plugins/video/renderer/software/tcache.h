@@ -47,12 +47,17 @@ struct iTextureHandle;
 class SoftwareCachedTexture
 {
 public:
-
   /// Linked in the texture cache.
   SoftwareCachedTexture *next, *prev;
 
   /// Size (in bytes).
   long size;
+
+  /**
+   * Last update number of unlit texture. This is used to see if the
+   * texture changed and we need to flush this cache entry.
+   */
+  uint32 last_texture_number;
 
   /**
    * The lighted texture data. The beginning of this array

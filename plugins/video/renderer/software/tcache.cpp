@@ -161,6 +161,19 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
   SoftwareCachedTexture *cached_texture =
     (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
 
+  csTextureHandleSoftware* txt = (csTextureHandleSoftware*)(
+  	pt->GetMaterialHandle ()->GetTexture ());
+
+  // If texture is already in cache we first check if the
+  // unlit texture itself has changed (proc texture). If so
+  // we uncache it.
+  if (cached_texture  && cached_texture->last_texture_number
+  	!= txt->GetUpdateNumber ())
+  {
+    uncache_texture (MipMap, pt);
+    cached_texture = NULL;
+  }
+
   if (cached_texture)
   {
     // Texture is already in the cache.
@@ -192,7 +205,8 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
     int lightmap_size = pt->GetLightMap ()->GetSize () * sizeof (uint32);
     int bitmap_w = (pt->GetWidth () >> MipMap);
     int bitmap_h = ((pt->GetHeight () + (1 << MipMap) - 1) >> MipMap);
-    int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w * (H_MARGIN * 2 + bitmap_h);
+    int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w
+    	* (H_MARGIN * 2 + bitmap_h);
 
     total_textures++;
     total_size += bitmap_size;
@@ -255,6 +269,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
 
     cached_texture = new SoftwareCachedTexture (MipMap, pt);
     cached_texture->frameno = frameno;
+    cached_texture->last_texture_number = txt->GetUpdateNumber ();
 
     int margin_size = H_MARGIN * bitmap_w * bytes_per_texel;
     uint8 *data = new uint8 [bitmap_size];
@@ -276,19 +291,18 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
 }
 
 void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
-    csTextureHandleSoftware *tex_mm, float u_min, float v_min, float u_max, float v_max)
+    csTextureHandleSoftware *tex_mm, float u_min, float v_min, float u_max,
+    float v_max)
 {
   // Recalculate the lightmaps
-  // @@@ Note for Andrew: this function returns true if something
-  // has changed with regards to the dynamic lights. It seems a bit
-  // wasteful not to use this result. Or isn't it?
   pt->RecalculateDynamicLights ();
 
   // Now cache the texture
   SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
 
   // Compute the rectangle on the lighted texture, if it is dirty
-  (this->*create_lighted_texture) (pt, cached_texture, tex_mm, texman, u_min, v_min, u_max, v_max);
+  (this->*create_lighted_texture) (pt, cached_texture, tex_mm,
+  	texman, u_min, v_min, u_max, v_max);
 }
 
 void csTextureCacheSoftware::dump (csGraphics3DSoftwareCommon *iG3D)

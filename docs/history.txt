@@ -10,6 +10,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated compilation warnings from several modules.
 	- Eric Sunshine fixed a compilation error in cspthrd.cpp for platforms
 	  which do not publish sys_errlist[].
+	- Changed the way that SetRenderTarget() in the software renderer
+	  works. As soon as a texture is set as a target of rendering
+	  it will be converted to use a standard 332 palette (8-bit truecolor
+	  palette). This makes it a lot easier to convert the screen
+	  data to the texture.
+	- Procedural textures are now fully working in the software renderer
+	  (only in truecolor modes!).
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.
