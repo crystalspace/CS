@@ -576,7 +576,7 @@ public:
   /** @{ */
   /**
    * Set the actual number of items in this array.
-   * \deprecated Use SetLength() instead.
+   * \deprecated Use SetSize() instead.
    */
   void SetLength (size_t n, T const& what) { SetSize(n, what); }
   void SetLength (size_t n) { SetSize(n); }
