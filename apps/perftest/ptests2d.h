@@ -32,7 +32,6 @@ protected:
   iGraphics2D *G2D;
   int max_w, max_h, inc_h; 
   int colour[8];
-n
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
 };
