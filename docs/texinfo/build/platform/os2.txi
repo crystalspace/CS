@@ -4,7 +4,7 @@
 @sc{os}/2
 @end macro
 
-@node OS2, BeOS, NeXT, Platform Instructions
+@node OS2, MS-DOS, NeXT, Platform Instructions
 @subsection @sc{os}/2
 @cindex @sc{os}/2
 

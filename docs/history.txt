@@ -28,22 +28,34 @@ The history order is reversed so that new features are at the top.
 	- Modified flarge so that the only door flarge has, finally opens when
 	  you come near it :-)  Expect it to close too in a later commit.
 	- Eric Sunshine made the following configuration-time changes:
-	  - Added libs/cssys/next/nextconf.sh which replaces the individual
-	    invocations of various configuration shell scripts by the makefile.
-	    Hopefully, people making configuration-phase changes will remember
-	    to update this script along with the other "conf" scripts, so the
-	    Apple/NeXT ports won't lag behind.
-	  - Merged libs/cssys/next/macosx.sh into nextconf.sh.
-	  - Fixed bug: bin/comptest.sh failed to set the LINK shell variable,
-	    thus scripts run subsequent to comptest.sh would fail if they tried
-	    using LINK.
-	  - Values for CC, CXX, OBJC, and OBJCXX makefile variables are now
-	    determined dynamically by comptest.sh and nextconf.sh at
-	    configuration time, rather than being hard-coded in the makefiles.
- 	  - Added Objective-C++ compilation support to next.mak.  Objective-C++
-	    source files should use the customary .mm extension.  (As usual,
-	    Objective-C files should continue using the .m extension.)
-	  - Fixed incorrect comment in bin/checkprog.sh.
+	    - Added libs/cssys/next/nextconf.sh which replaces the individual
+	      invocations of various configuration shell scripts by the
+	      makefile.  Hopefully, people making configuration-phase changes
+	      will remember to update this script along with the other "conf"
+	      scripts, so the Apple/NeXT ports won't lag behind.
+	    - Merged libs/cssys/next/macosx.sh into nextconf.sh.
+	    - Fixed bug: bin/comptest.sh failed to set the LINK shell variable,
+	      thus scripts run subsequent to comptest.sh would fail if they
+	      tried using LINK.
+	    - Values for CC, CXX, OBJC, and OBJCXX makefile variables are now
+	      determined dynamically by comptest.sh and nextconf.sh at
+	      configuration time, rather than being hard-coded in the
+	      makefiles.
+	    - Added Objective-C++ compilation support to next.mak.
+	      Objective-C++ source files should use the customary .mm
+	      extension.  (As usual, Objective-C files should continue using
+	      the .m extension.)
+	    - Fixed incorrect comment in bin/checkprog.sh.
+	- Eric Sunshine eliminated the unmaintained BeOS port.  Prior to
+	  removing this port, all of the port-specific files were tagged in CVS
+	  as "BEOS_OBSOLETE" in order to make it simple to recover these files
+	  when/if needed.  The following directories and files were tagged and
+	  removed:
+	    docs/texinfo/build/platform/beos.txi
+	    include/cssys/be*
+	    libs/cssys/be/*
+	    plugins/video/canvas/be/*
+	    plugins/video/canvas/openglbe/*
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature
@@ -126,14 +138,14 @@ The history order is reversed so that new features are at the top.
 	  loss. This is only temporary until DrawPolygonMesh starts
 	  operating at full efficiency. Then we can start using that
 	  function a lot more. Here is what I did:
-	      - DrawPolygon no longer uses any of the polygon, lightmap,
-	        or fog queues and is fully stand alone. This makes
-		it slower but easier to seperate from the rest.
-	      - The fog queue has been removed and merged with the polygon
-	        queue. DrawPolygonFX is now the only function that uses
-		the polygon queue.
-	      - DrawPolygonMesh is the only function using the super lightmap
-	        queues.
+	    - DrawPolygon no longer uses any of the polygon, lightmap, or fog
+	      queues and is fully stand alone.  This makes it slower but easier
+	      to seperate from the rest.
+	    - The fog queue has been removed and merged with the polygon queue.
+	      DrawPolygonFX is now the only function that uses the polygon
+	      queue.
+	    - DrawPolygonMesh is the only function using the super lightmap
+	      queues.
 	- Changed iLoader->LoadTexture() so that there is now an additional
 	  parameter which indicates if you want the default material
 	  to be created or not. In the past LoadTexture() automatically
