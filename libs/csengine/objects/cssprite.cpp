@@ -936,23 +936,22 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   cbox = camera_bbox;
 }
 
-float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox)
+float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox, csBox3 &bbox3)
 {
   csVector2   oneCorner;
-  csBox3      cbox;
 
   // @@@ Note. The bounding box created by this function greatly
   // exagerates the real bounding box. However, this function
   // needs to be fast. I'm not sure how to do this more accuratelly.
 
-  GetCameraBoundingBox (camtrans, cbox);
+  GetCameraBoundingBox (camtrans, bbox3);
 
   // if the entire bounding box is behind the camera, we're done
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  if ((bbox3.MinZ () < 0) && (bbox3.MaxZ () < 0))
     return -1;
 
   // Transform from camera to screen space.
-  if (cbox.MinZ () <= 0)
+  if (bbox3.MinZ () <= 0)
   {
     // Sprite is very close to camera.
     // Just return a maximum bounding box.
@@ -960,19 +959,19 @@ float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundi
   }
   else
   {
-    camtrans.Perspective (cbox.Max (), oneCorner);
+    camtrans.Perspective (bbox3.Max (), oneCorner);
     boundingBox.StartBoundingBox (oneCorner);
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    csVector3 v (bbox3.MinX (), bbox3.MinY (), bbox3.MaxZ ());
     camtrans.Perspective (v, oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    camtrans.Perspective (cbox.Min (), oneCorner);
+    camtrans.Perspective (bbox3.Min (), oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    v.Set (bbox3.MaxX (), bbox3.MaxY (), bbox3.MinZ ());
     camtrans.Perspective (v, oneCorner);
     boundingBox.AddBoundingVertexSmart (oneCorner);
   }
 
-  return cbox.MaxZ ();
+  return bbox3.MaxZ ();
 }
 
 // New version of sprite drawing routine using DrawTriangleMesh.
@@ -994,7 +993,8 @@ void csSprite3D::Draw (csRenderView& rview)
   //	3. box is partially visible -> sprite is visible and needs to be clipped
   //	   if rview has do_clip_plane set to true.
   csBox2 bbox;
-  if (GetScreenBoundingBox (rview, bbox) < 0) return;	// Not visible.
+  csBox3 bbox3;
+  if (GetScreenBoundingBox (rview, bbox, bbox3) < 0) return;	// Not visible.
   //@@@ Debug output: this should be an optional feature for WalkTest.
   //{
     //csPolygon2D* p2d = new csPolygon2D ();
@@ -1006,6 +1006,20 @@ void csSprite3D::Draw (csRenderView& rview)
     //delete p2d;
   //}
 
+  // test against far plane if needed
+  if (rview.UseFarPlane ())
+  {
+    // we cull the whole sprite if all corners of the bbox are behind the farplane.
+    // it would be enough to test if the minimum z-value is in front of the farplane but only if the view vector
+    // is perpendicular on the farplane - so we test all corners (in the worst case) to not depend on that.
+    int i;
+    for (i=0; i < 8; i++)
+      if (rview.GetFarPlane ()->Classify (bbox3.GetCorner (i)) > SMALL_EPSILON)
+        break;
+    if (i==8)
+      return;	
+  }
+  
   // Test if we need and should clip to the current portal.
   int box_class;
   box_class = rview.view->ClassifyBox (bbox);
