@@ -102,6 +102,8 @@ chronological order.
 	- Eric Sunshine fixed bug in csArray::DeleteRange() where it failed to
 	  destroy (invoke the destructor of) the last object in the range.
 	  Reported by Bedrich Zaba <frogbride@seznam.cz>.
+15-Jul-2004
+	- *** RELEASED STABLE 0.98.3 ***
 11-Jul-2004
 	- Vincent Knecht added instructions for building RPMs in User Manual.
 	- Vincent Knecht ported note about removed plugins in apimod98.txi from
@@ -139,6 +141,7 @@ chronological order.
 	  seems wrong since it is very useful to have a callback for which
 	  the only reference exists in the object that is holding the
 	  callback.
+	- *** RELEASED STABLE 0.98.2 ***
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d
@@ -168,6 +171,7 @@ chronological order.
 	- Eric Sunshine added a bunch of missing entries to
 	  plugins/filesys/vfs/vfs.cfg.template, which is the vfs.cfg that
 	  actually gets installed by "jam install".
+	- *** RELEASED STABLE 0.98.1 ***
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
