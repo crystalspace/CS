@@ -24,7 +24,7 @@
 # project is configured with --enable-plugins (which is the default).  Please
 # think twice before adding anything to PLUGINS; in most cases you will want to
 # add optional plugins to PLUGINS.DYNAMIC.  Be aware that the platform-specific
-# makefile (CS/libs/cssys/*.mak) may augment the plugin list with plugins
+# makefile (CS/libs/csutil/*.mak) may augment the plugin list with plugins
 # specific to the platform.
 #
 # If you want additional plugins to be built, you can augment the PLUGINS or

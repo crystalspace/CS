@@ -79,7 +79,9 @@ ODE.MSVCLIBS = "ode.lib" ;
 OPENAL.AVAILABLE = "yes" ;
 OPENAL.MSVCLIBS = "openal32.lib" "alut.lib" ;
 FT2.AVAILABLE = "yes" ;
-FT2.CFLAGS = "-I \"..\\..\\include\\cssys\\win32\\freetype2\"" ;
+FT2.CFLAGS = "-I \"..\\..\\include\\csutil\\win32\\freetype2\"" ;
+# Temporary until msvc_libs package is fixed to put deposit these correctly.
+FT2.CFLAGS += "-I \"..\\..\\include\\cssys\\win32\\freetype2\"" ;
 FT2.MSVCLIBS = "freetype2.lib" ;
 OSS.AVAILABLE = "no" ;
 SOCKET.AVAILABLE = "yes" ;

@@ -35,12 +35,12 @@
 #	then transformed into (CSFONT VFS), which is exactly the list of
 #	bare-word project names upon which "grpplugins" should depend.
 #
-# *NOTE* CSSYS
-#	We override the INC.CSSYS and SRC.CSSYS variables from the
+# *NOTE* SYS_CSUTIL
+#	We override the SRC.SYS_CSUTIL and INC.SYS_CSUTIL variables from the
 #	platform-specific makefile since, for project file generation, the
 #	Windows-specific resources must be used.  We can not rely upon the
-#	default SRC.CSSYS and INC.CSSYS definitions (see
-#	CS/libs/cssys/cssys.mak) since they may reference inappropriate
+#	default SRC.SYS_CSUTIL and INC.SYS_CSUTIL definitions (see
+#	CS/libs/csutil/csutil.mak) since they may reference inappropriate
 #	resources if the project is configured for a non-Windows platform.  For
 #	example, it is possible to generate the project files from Unix.
 #------------------------------------------------------------------------------
@@ -48,19 +48,19 @@
 # Macro to generate a type-augmented project list. (*NOTE* AUGMENTED)
 MSVC.DSP.AUGMENTED = $(foreach d,$(MSVC.DSP),$(DSP.$d.TYPE).$d)
 
-# Platform-specific implementation for Windows. (*NOTE* CSSYS)
+# Platform-specific implementation for Windows. (*NOTE* SYS_CSUTIL)
 ifeq ($(DO_MSVCGEN),yes)
-INC.CSSYS = \
-  $(wildcard $(SRCDIR)/include/cssys/win32/*.h) \
-  $(wildcard $(SRCDIR)/libs/cssys/win32/*.h)
-SRC.CSSYS = \
-  $(wildcard $(SRCDIR)/libs/cssys/*.cpp $(SRCDIR)/libs/cssys/win32/*.cpp) \
-  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
-  $(SRCDIR)/libs/cssys/general/findlib.cpp \
-  $(SRCDIR)/libs/cssys/general/getopt.cpp \
-  $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
-  $(SRCDIR)/libs/cssys/general/resdir.cpp \
-  $(SRCDIR)/libs/cssys/general/runloop.cpp
+INC.SYS_CSUTIL = \
+  $(wildcard $(SRCDIR)/include/csutil/win32/*.h) \
+  $(wildcard $(SRCDIR)/libs/csutil/win32/*.h)
+SRC.SYS_CSUTIL = \
+  $(wildcard $(SRCDIR)/libs/csutil/win32/*.cpp) \
+  $(SRCDIR)/libs/csutil/generic/csprocessorcap.cpp \
+  $(SRCDIR)/libs/csutil/generic/findlib.cpp \
+  $(SRCDIR)/libs/csutil/generic/getopt.cpp \
+  $(SRCDIR)/libs/csutil/generic/pluginpaths.cpp \
+  $(SRCDIR)/libs/csutil/generic/resdir.cpp \
+  $(SRCDIR)/libs/csutil/generic/runloop.cpp
 endif
 
 # grpall -- represents all other projects indirectly through grpapps,

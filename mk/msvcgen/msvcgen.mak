@@ -280,7 +280,7 @@ endif
 
 MSVC.CVS.BASE = $(SRCDIR)/mk
 MSVC.OUT.BASE.0 = $(OUTBASE)/mk
-MSVC.OUT.BASE = $(MSVC.OUT.BASE.0)/msvcgen
+MSVC.OUT.BASE = $(OUTBASE)/mk/msvcgen
 ifeq ($(MSVCGEN_VERSION),6)
 MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc6
 MSVC.OUT.DIR = $(MSVC.OUT.BASE)/visualc6
@@ -372,14 +372,14 @@ MSVC.METARC.TEMP = $(MSVC.OUT.FRAGMENT)/meta.tmp
 MSVC.VERSIONDESC = $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh \
+MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkverres.sh \
   '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)' '$(SRCDIR)/include/csver.h'
-MSVC.MAKEMETARC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh \
+MSVC.MAKEMETARC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkmetadatares.sh \
   '$(MSVC.METARC.TEMP)' '$(INF.$*)'
-MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh \
+MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)'
-MSVC.MERGERCMETA.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh \
+MSVC.MERGERCMETA.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)' '$(MSVC.METARC.TEMP)'
 
@@ -475,13 +475,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: msvcgen msvcinst msvcgenclean dswgen
 
-# Directory creation targets.
-$(MSVC.OUT.BASE.0): $(OUTBASE)
-	-$(MSVC.SILENT)$(MKDIR)
-
-$(MSVC.OUT.BASE): $(MSVC.OUT.BASE.0)
-	-$(MSVC.SILENT)$(MKDIR)
-
+# Directory creation target.
 $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	$(MSVC.SILENT)$(MKDIR)
 

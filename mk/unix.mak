@@ -84,8 +84,8 @@ RUN_TEST=./
 
 # The files implementing threading and the related compiler and linker flags.
 ifeq ($(PTHREAD.AVAILABLE),yes)
-CSTHREAD.SRC = $(SRCDIR)/libs/cssys/general/cspthrd.cpp
-CSTHREAD.INC = $(SRCDIR)/libs/cssys/general/cspthrd.h
+CSTHREAD.SRC = $(SRCDIR)/libs/csutil/generic/cspthrd.cpp
+CSTHREAD.INC = $(SRCDIR)/libs/csutil/generic/cspthrd.h
 CSTHREAD.CFLAGS = $(PTHREAD.CFLAGS)
 CSTHREAD.LFLAGS = $(PTHREAD.LFLAGS)
 endif

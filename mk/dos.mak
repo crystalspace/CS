@@ -73,7 +73,7 @@ SYS_SED_DEPEND=-e "s/\.o/$$O/g"
 DEPEND_TOOL=mkdep
 
 # The files implementing threading and the related compiler and linker flags.
-CSTHREAD.SRC = $(SRCDIR)/libs/cssys/win32/winthread.cpp
-CSTHREAD.INC = $(SRCDIR)/libs/cssys/win32/winthread.h
+CSTHREAD.SRC = $(SRCDIR)/libs/csutil/win32/winthread.cpp
+CSTHREAD.INC = $(SRCDIR)/libs/csutil/win32/winthread.h
 CSTHREAD.CFLAGS =
 CSTHREAD.LFLAGS =

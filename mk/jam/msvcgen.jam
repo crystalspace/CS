@@ -34,9 +34,9 @@ if $(MSVCGEN_CONFIG)
 {
 
 MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
-MKVERRES = "$(SHELL) $(TOP)/libs/cssys/win32/mkverres.sh" ;
-MKMETADATARES = "$(SHELL) $(TOP)/libs/cssys/win32/mkmetadatares.sh" ;
-MERGERES = "$(SHELL) $(TOP)/libs/cssys/win32/mergeres.sh" ;
+MKVERRES = "$(SHELL) $(TOP)/libs/csutil/win32/mkverres.sh" ;
+MKMETADATARES = "$(SHELL) $(TOP)/libs/csutil/win32/mkmetadatares.sh" ;
+MERGERES = "$(SHELL) $(TOP)/libs/csutil/win32/mergeres.sh" ;
 
 MSVCGEN_BUILD_ROOT = $(BUILDTOP)/out ;
 
