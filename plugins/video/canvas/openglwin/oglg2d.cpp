@@ -154,17 +154,6 @@ SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
-static struct
-{
-  WORD Version;
-  WORD NumberOfEntries;
-  PALETTEENTRY aEntries[256];
-} SysPalette =
-{
-  0x300,
-    256
-};
-
 static HPALETTE hWndPalette = NULL;
 
 static void ClearSystemPalette ()
