@@ -2,6 +2,9 @@ The history order has been reversed so that new features are at the top.
 
 11-Mar-2001
 	- Eric Sunshine fixed some Texinfo mark-up problems in win32.txi.
+	- Eric Sunshine fixed formatting of help message in rle.mak.
+	- Eric Sunshine added DSP.DDG.CFLAGS to ddg.mak in order to augment the
+	  generated DSP file with an appropriate "/I" directive.
 	- Added interfaces iShadowBlock, iShadowBlockList, and iShadowIterator.
 	  These will be used by the iShadowSystem. Extended iShadowSystem,
 	  iShadowCaster, and iShadowReceiver a bit.
