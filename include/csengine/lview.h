@@ -95,7 +95,7 @@ private:
   csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
   csShadowIterator (const csBox3& bbox, csShadowBlock* cur,
     bool onlycur, int dir);
-  ~csShadowIterator();
+  virtual ~csShadowIterator();
   csShadowFrustum* cur_shad;
 
 public:
