@@ -86,7 +86,7 @@ CS_TYPEDEF_GROWING_ARRAY (csGeomList, dGeomID);
 class csODEDynamics : public iDynamics
 {
 private:
-  iObjectRegistry* object_reg;
+  csRef<iObjectRegistry> object_reg;
 
   static int geomclassnum;
   static dJointGroupID contactjoints;
@@ -152,8 +152,8 @@ private:
   dWorldID worldID;
   dSpaceID spaceID;
 
-  iCollideSystem* collidesys;
-  iDynamicsMoveCallback* move_cb;
+  csRef<iCollideSystem> collidesys;
+  csRef<iDynamicsMoveCallback> move_cb;
 
   csObjVector bodies;
   csObjVector groups;
@@ -195,7 +195,7 @@ class csODEBodyGroup : public iBodyGroup
 {
   csObjVector bodies;
 
-  csODEDynamicSystem *system;
+  csODEDynamicSystem* system;
  
 public:
   SCF_DECLARE_IBASE;
@@ -221,14 +221,15 @@ private:
   dGeomID groupID;
   csGeomList ids;
   dJointID statjoint;
-  iBodyGroup *collision_group;
 
+  /* these must be ptrs to avoid circular referencing */
+  iBodyGroup* collision_group;
   csODEDynamicSystem* dynsys;
 
-  iMeshWrapper* mesh;
-  iSkeletonBone* bone;
-  iDynamicsMoveCallback* move_cb;
-  iDynamicsCollisionCallback* coll_cb;
+  csRef<iMeshWrapper> mesh;
+  csRef<iSkeletonBone> bone;
+  csRef<iDynamicsMoveCallback> move_cb;
+  csRef<iDynamicsCollisionCallback> coll_cb;
 
 public:
   SCF_DECLARE_IBASE;
@@ -244,7 +245,7 @@ public:
 
   void SetGroup (iBodyGroup *group);
   void UnsetGroup () { collision_group = NULL; }
-  iBodyGroup *GetGroup (void) { return collision_group; }
+  csRef<iBodyGroup> GetGroup (void) { return collision_group; }
 
   bool AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction, float density,
@@ -293,9 +294,9 @@ public:
   //int GetJointCount () const = 0;
 
   void AttachMesh (iMeshWrapper* mesh);
-  iMeshWrapper *GetAttachedMesh () { return mesh; }
+  csRef<iMeshWrapper> GetAttachedMesh () { return mesh; }
   void AttachBone (iSkeletonBone* bone);
-  iSkeletonBone *GetAttachedBone () { return bone; }
+  csRef<iSkeletonBone> GetAttachedBone () { return bone; }
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
 
@@ -310,7 +311,7 @@ public:
 class csODEJoint : public iJoint
 {
   dJointID jointID;
-  iRigidBody *body[2];
+  csRef<iRigidBody> body[2];
   dBodyID bodyID[2];
 
   int transConstraint[3], rotConstraint[3];
@@ -319,7 +320,6 @@ class csODEJoint : public iJoint
   csOrthoTransform transform;
 
   csODEDynamicSystem* dynsys;
-
 
 public:
   SCF_DECLARE_IBASE;
@@ -330,7 +330,7 @@ public:
   inline dJointID GetID () { return jointID; }
 
   void Attach (iRigidBody *body1, iRigidBody *body2);
-  iRigidBody *GetAttachedBody (int body);
+  csRef<iRigidBody> GetAttachedBody (int body);
 
   void SetTransform (const csOrthoTransform &trans);
   csOrthoTransform GetTransform ();

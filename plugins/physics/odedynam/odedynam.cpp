@@ -588,6 +588,11 @@ csODEDynamicSystem::csODEDynamicSystem ()
 
 csODEDynamicSystem::~csODEDynamicSystem ()
 {
+  /* must delete all these before deleting the actual world */
+  joints.DeleteAll ();
+  groups.DeleteAll ();	
+  bodies.DeleteAll ();
+
   SCF_DEC_REF (collidesys);
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
@@ -1168,7 +1173,7 @@ void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
   BuildJoint ();
 }
 
-iRigidBody *csODEJoint::GetAttachedBody (int b)
+csRef<iRigidBody> csODEJoint::GetAttachedBody (int b)
 {
   return (b == 0) ? body[0] : body[1];
 }
