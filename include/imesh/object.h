@@ -92,7 +92,7 @@ struct iMeshObject : public iBase
   	csZBufMode zbufMode) = 0;
 
   virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode) = 0;
+  	csZBufMode zbufMode, iLight *light) = 0;
 
   virtual bool DrawLight (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
