@@ -29,6 +29,7 @@ chronological order.
 	  CVS Attic, they have been tagged as indicated.
 	    cssocket --> NET_OBSOLETE
 	    ensocket --> NET_OBSOLETE
+	    milk2spr --> MILK2SPR_OBSOLETE
 	    netman   --> NET_OBSOLETE
 	    netmtst  --> NET_OBSOLETE
 	    rlecodec --> RLE_OBSOLETE
