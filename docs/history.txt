@@ -18,6 +18,9 @@ chronological order.
 	  in various interfaces. Some interfaces used FooKeyColor(), while
 	  others used FooKeycolor(). All now use FooKeyColor(). (The
 	  FooKeycolor() methods are still available, though deprecated.)
+	- Anders fixed an error in nullmesh factory saver. It forgot a 
+	  <box>...</box> tag wrapping the actual contents of the bounding box, 
+	  resulting in a file that couldn't be loaded.
 30-Oct-2004
 	- res improved the Win32 custom cursor cleanup a bit.
 	- res fixed a crash in the software sound renderer source, where a 

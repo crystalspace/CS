@@ -360,7 +360,9 @@ bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Writedown Box tag
     csBox3 box;
     nullfact->GetBoundingBox(box);
-    synldr->WriteBox(paramsNode, &box);
+    csRef<iDocumentNode> boxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    boxNode->SetValue ("box");
+    synldr->WriteBox(boxNode, &box);
 
     //Writedown Radius tag
     float radius = nullfact->GetRadius();
