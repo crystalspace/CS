@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+9-Nov-2001
+	- Reverted the SCF changes made to scfFactory yesterday since they
+	  completely break CS. The problem seems to be when attempting
+	  to load plugins that are not there. This seems to crash SCF now
+	  while in the past it only returned NULL to the entity attempting
+	  the load. Since I don't fully understand neither the original
+	  nor the new code I decided to revert the changes for now.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.

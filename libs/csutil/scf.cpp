@@ -133,7 +133,7 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 {
   LibraryRegistry->Push (this);
 
-  RefCount = 1;
+  RefCount = 0;
   ClassTable = NULL;
   LibraryHandle = csFindLoadLibrary (LibraryName = iLibraryName);
   if (!LibraryHandle)
@@ -164,7 +164,8 @@ scfSharedLibrary::~scfSharedLibrary ()
 
 scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
 {
-  for (scfClassInfo* cur = ClassTable; cur->ClassID; cur++)
+  scfClassInfo *cur;
+  for (cur = ClassTable; cur->ClassID; cur++)
     if (strcmp (iClassID, cur->ClassID) == 0)
       return cur;
   return NULL;
@@ -301,18 +302,20 @@ void scfFactory::IncRef ()
       ClassInfo = Library->Find (ClassID);
     if (!Library->ok () || !ClassInfo)
     {
-      // If the library was not in the library-registry (libidx < 0), then we
+      // If the library was not in the library-registry (libidx<0), then we
       // just created it with `new'.  As a side-effect of creation, the library
-      // added itself to the library-registry, so we call
-      // scfSharedLibrary::TryUnload() to will remove the library from the
-      // registry, so as not to leak the instance.  In other circumstances,
-      // scfFactory::TryUnload() would free the instance (if needed), but it
-      // only does so if the `Library' variable is non-null.
-      Library->DecRef();
+      // added itself to the library-registry, so we call TryUnload(), which
+      // will remove the library from the registry, so as not to leak the
+      // instance.  In other circumstances, scfFactory::TryUnload() would free
+      // the instance (if needed), but it only does so if the `Library'
+      // variable is non-null.
       Library->TryUnload();
       Library = NULL;
+      return;
     }
   }
+  if (Library)
+    Library->IncRef ();
 #endif
   scfRefCount++;
 }
@@ -320,7 +323,7 @@ void scfFactory::IncRef ()
 void scfFactory::DecRef ()
 {
 #ifdef CS_DEBUG
-  if (scfRefCount == 0)
+  if (!scfRefCount)
   {
     fprintf (stderr, "SCF WARNING: Extra calls to scfFactory::DecRef () for "
       "class %s\n", ClassID);
@@ -328,6 +331,10 @@ void scfFactory::DecRef ()
   }
 #endif
   scfRefCount--;
+#ifndef CS_STATIC_LINKED
+  if (Library)
+    Library->DecRef ();
+#endif
 }
 
 int scfFactory::GetRefCount ()
@@ -483,7 +490,8 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
 void csSCF::UnloadUnusedModules ()
 {
-  for (int i = ClassRegistry->Length () - 1; i >= 0; i--)
+  int i;
+  for (i = ClassRegistry->Length () - 1; i >= 0; i--)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (i);
     cf->TryUnload ();
@@ -583,7 +591,8 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
   if (rlen != 0)
   {
     int const plen = (pattern ? strlen(pattern) : 0);
-    for (int i = 0; i < rlen; i++)
+	int i;
+    for (i = 0; i < rlen; i++)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
