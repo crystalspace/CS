@@ -63,7 +63,7 @@ headers( TARGET *t )
 	/* Call headers1() to get LIST of included files. */
 
 	if( DEBUG_HEADER )
-	    csPrintf( "header scan %s\n", t->name );
+	    printf( "header scan %s\n", t->name );
 
 	lol_init( &lol );
 
@@ -120,7 +120,7 @@ headers1(
 		result = list_new( result, buf2, 0 );
 
 		if( DEBUG_HEADER )
-		    csPrintf( "header found: %s\n", buf2 );
+		    printf( "header found: %s\n", buf2 );
 	    }
 	}
 

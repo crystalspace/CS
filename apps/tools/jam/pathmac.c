@@ -168,13 +168,13 @@ path_build(
 	
 	if( DEBUG_SEARCH )
 	{
-	csPrintf("build file: ");
+	printf("build file: ");
 	if( f->f_root.len )
-		csPrintf( "root = '%.*s' ", f->f_root.len, f->f_root.ptr );
+		printf( "root = '%.*s' ", f->f_root.len, f->f_root.ptr );
 	if( f->f_dir.len )
-		csPrintf( "dir = '%.*s' ", f->f_dir.len, f->f_dir.ptr );
+		printf( "dir = '%.*s' ", f->f_dir.len, f->f_dir.ptr );
 	if( f->f_base.len )
-		csPrintf( "base = '%.*s' ", f->f_base.len, f->f_base.ptr );
+		printf( "base = '%.*s' ", f->f_base.len, f->f_base.ptr );
 	}
 	
 	/* Start with the grist.  If the current grist isn't */
@@ -259,7 +259,7 @@ path_build(
 	*file = 0;	
 	
 	if( DEBUG_SEARCH )
-		csPrintf(" -> '%s'\n", ofile);
+		printf(" -> '%s'\n", ofile);
 }
 
 /*
