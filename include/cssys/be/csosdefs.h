@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,7 +28,19 @@
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glbe"
 
 // The 2D graphics driver used by Glide renderer
-#define GLIDE_2D_DRIVER "crystalspace.graphics2d.glidebe"
+#define GLIDE_2D_DRIVER "crystalspace.graphics2d.glide.be.2"
+
+// BeOS param.h unconditionally defines MAX and MIN, so we must remove the
+// definitions set up by csdefs.h in order to avoid redifinition warnings.
+#undef MIN
+#undef MAX
+#include <sys/param.h>
+#if !defined(MIN)
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#if !defined(MAX)
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR

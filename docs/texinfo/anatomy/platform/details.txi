@@ -12,9 +12,7 @@ you should read.
 @menu
 * NeXT Details:: MacOS/X Server, OpenStep, NextStep
 * OS2 Details:: OS/2
-* BeOS Details:: BeOS
 @end menu
 
 @importss{anatomy,platform,next.txi}
 @importss{anatomy,platform,os2.txi}
-@importss{anatomy,platform,beos.txi}

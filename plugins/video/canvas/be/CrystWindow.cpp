@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Xavier Planet.
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,61 +19,67 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include "cssysdef.h"
+#include "ievent.h"
+#include "igraph2d.h"
 #include "isystem.h"
-#include "video/canvas/be/CrystWindow.h"
-#include "cssys/be/icsbe.h"
+#include "CrystWindow.h"
 
-CrystView::CrystView(BRect frame, iBeLibSystemDriver* isys) :
-  BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), be_system(isys)
+CrystView::CrystView(BRect frame, iSystem* isys, BBitmap* ibmap) :
+  BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), system(isys), bitmap(ibmap)
 {
-  be_system->IncRef();
+  system->IncRef();
 }
 
 CrystView::~CrystView()
 {
-  be_system->DecRef();
+  system->DecRef();
 }
 
-void CrystView::ProcessUserEvent() const
+void CrystView::UserAction() const
 {
-  be_system->ProcessUserEvent(Looper()->CurrentMessage());
+  system->SystemExtension("UserAction", Looper()->CurrentMessage());
 }
 
-void CrystView::KeyDown(const char *bytes, int32 numBytes)
+void CrystView::KeyDown(char const *bytes, int32 numBytes)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-void CrystView::KeyUp(const char *bytes, int32 numBytes)
+void CrystView::KeyUp(char const *bytes, int32 numBytes)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-void CrystView::MouseMoved(BPoint point, uint32 transit, BMessage const* m)
+void CrystView::MouseMoved(BPoint, uint32 transit, BMessage const*)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-void CrystView::MouseDown(BPoint point)
+void CrystView::MouseDown(BPoint)
 {
-  ProcessUserEvent();
+  UserAction();
   if (!IsFocus())
     MakeFocus();
 }
 
-void CrystView::MouseUp(BPoint point)
+void CrystView::MouseUp(BPoint)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-CrystWindow::CrystWindow(BRect frame, const char* name, CrystView* v,
-  iSystem* isys, iBeLibSystemDriver* bsys) :
-  BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
-  view(v), cs_system(isys), be_system(bsys)
+void CrystView::Draw(BRect r)
 {
-  be_system->IncRef();
+  DrawBitmap(bitmap, r, r);
+}
+
+CrystWindow::CrystWindow(BRect frame, char const* name, CrystView* v,
+  iSystem* isys, iGraphics2D* ig2d) :
+  BDirectWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
+  view(v), system(isys), g2d(ig2d)
+{
+  system->IncRef();
+  g2d->IncRef();
   view->SetViewColor(0, 0, 0);
   AddChild(view);
   SetSizeLimits(40, 2000, 40, 2000);
@@ -85,14 +89,13 @@ CrystWindow::~CrystWindow()
 {
   Hide();
   Flush();
-  be_system->DecRef();
+  g2d->DecRef();
+  system->DecRef();
 }
 
 bool CrystWindow::QuitRequested()
 {
-//EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
-//EventOutlet->Broadcast (cscmdQuit);
-  cs_system->StartShutdown();
-  // @@@FIXME: Don't destroy window before "LoopThread" has finished.
-  return true;
+  system->SystemExtension("ContextClose", g2d);
+  system->SystemExtension("Quit");
+  return false; // Allow Crystal Space to close window itself.
 }

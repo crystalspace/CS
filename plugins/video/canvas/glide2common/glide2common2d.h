@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,14 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLIDECOMMON2D_H__
-#define __GLIDECOMMON2D_H__
+#ifndef __CS_GLIDECOMMON2D_H__
+#define __CS_GLIDECOMMON2D_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#if defined(OS_BE)	// dh: is this OS-dependence necessary? 
-#include "cssys/be/beitf.h"
-#endif
 #include "csutil/csrect.h"
 #include "iglide2d.h"
 #include <glide.h>
@@ -34,46 +31,48 @@
 class csGraphics2DGlideCommon : public csGraphics2D, public iGraphics2DGlide
 {
 protected:
-  /// flag to indicate whether to draw fullscreen or not.
+  /// Flag to indicate whether to draw fullscreen or not.
   bool m_DoGlideInWindow;
   bool m_bVRetrace;
 
-  /// current and last last mouse position
+  /// Current and last last mouse position
   int mx, my;
   int mxold, myold;
 
-  /// do we render into backbuffer ?
+  /// Do we render into backbuffer ?
   FxI32 m_drawbuffer;
     
-  /// cursor related data
+  // Cursor related data
   UShort *cursorBmp, *mcBack;
   int nCursor; // how many cursors defined
   int nCurCursor; // current cursor
   int mcCols, mcRows; // pixel rows and cols per cursor
   csRect mouseRect, writtenArea;
   
-  /// palette has been changed
+  // Palette has been changed
   bool bPaletteChanged;
   bool bPalettized;
   int glDrawMode;
   bool GraphicsReady;
   GrLfbInfo_t lfbInfo;
       
-  /// flag to prevent 2D drawing
+  /// Flag to prevent 2D drawing
   static bool locked;	
 
-  // Decode and encode internal color representation to/from RGB scheme
+  /// Encode internal color representation from RGB scheme.
   void EncodeRGB ( UShort& color, UByte r, UByte g, UByte b );
+  /// Decode internal color representation to RGB scheme.
   void DecodeRGB ( UShort color, UByte& r, UByte& g, UByte& b );
   
-  // Prepare the cursor. Return number of cursors.
+  /// Prepare the cursor. Return number of cursors.
   int PrepareCursors (char **shapes);
+  /// Draw cursors.
   void DrawCursor ();
   
 public:
   DECLARE_IBASE;
 
-  /** constructor initializes System member.. LocalFontServer and
+  /** Constructor initializes System member.. LocalFontServer and
    *  texture_cache are initialized in Open() */
   csGraphics2DGlideCommon (iBase *iParent);
 
@@ -91,34 +90,37 @@ public:
    *  the work is done in Open() */
   virtual bool Initialize (iSystem *pSystem);
 
-  /** initialize fonts, texture cache, prints renderer name and version.
+  /** Initialize fonts, texture cache, prints renderer name and version.
    *  you should still print out the 2D driver type (X, Win, etc.) in your
    *  subclass code.  Note that the Open() method makes some OpenGL calls,
    *  so your GL context should already be created and bound before
    *  you call csGraphics2DGlideCommon::Open()!  This means you
    *  may or may not be calling this method at the beginning of your own
    *  class Open(), since the GL context may not have been bound yet...
-   * check the GLX class for an example */
+   *  check the GLX class for an example. */
   virtual bool Open (const char *Title);
 
+  /// Close the canvas (graphics context).
   virtual void Close ();
 
-  // the remaining functions here do not need to be overridden when
+  // The remaining functions here do not need to be overridden when
   // inheriting from this class
 
-//  virtual void Clear(int color);
   virtual void SetRGB (int i, int r, int g, int b);
 
-  //  Glide-specific procedures
+  /// Glide-specific procedures
   void SetTMUPalette(int tmu);
   /// Draw a line
   virtual void DrawLine( float x1, float y1, float x2, float y2, int color);
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
-  static void WriteStringGlide (csGraphics2D *This, int x, int y, int fg, int bg, const char *text);
+  static void WriteStringGlide (csGraphics2D *This, int x, int y,
+    int fg, int bg, const char *text);
 
+  /// Prepare for drawing.
   virtual bool BeginDraw();
+  /// Finalize drawing.
   virtual void FinishDraw();
 
  /**
@@ -130,24 +132,24 @@ public:
   /// Restore a subarea of screen saved with SaveArea()
   virtual void RestoreArea (csImageArea *Area, bool Free);
 
+  /// Enable or disable double buffering.
   virtual bool DoubleBuffer (bool Enable);
-  virtual bool GetDoubleBufferState () { return m_drawbuffer == GR_BUFFER_BACKBUFFER; }
-  /// Figure out GL RGB color from a packed color format
-//  virtual void setGlideColorfromint(int color); //dh: not implemented yet
+  /// Get double buffering status.
+  virtual bool GetDoubleBufferState ()
+  { return m_drawbuffer == GR_BUFFER_BACKBUFFER; }
 
-  /**
-   * Get address of video RAM at given x,y coordinates.
-   */
+  /// Get address of video RAM at given x,y coordinates.
   unsigned char* GetPixelAt (int x, int y);
 
+  /// Flush a rectangle from frame buffer to screen.
   virtual void Print( csRect* area );  
-  /// iGraphics2DGlide
+  /// Set vertical retrace interval.
   virtual void SetVRetrace( bool wait4vr ){ m_bVRetrace = wait4vr; }
   /// Force resolution
   virtual void ForceResolution ( int w, int h )
   { Width = w; Height = h; }
+  /// Get Z-buffer value at coordinates.
   virtual float GetZBuffValue (int x, int y);
 };
 
-#endif
-
+#endif // __CS_GLIDECOMMON2D_H__

@@ -8,23 +8,21 @@
 @subsection @sc{b}e@sc{os}
 @cindex @sc{b}e@sc{os}
 
-@emph{Originally written by David Huen, @email{david@@huen.freeserve.co.uk};
-heavily amended by Eric Sunshine, @email{sunshine@@sunshineco.com}).  Last
-updated 8 September 2000.}
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
+@copyright{} 1999, 2000 by Eric Sunshine.  Last updated 13 October 2000.}
 
-CrystalSpace is a full-featured 3D graphics engine and the @BeOS{} port was
-originally created by Xavier Pianet (@email{xavier@@planet.dk}).  David Huen
+CrystalSpace is a full-featured 3D graphics engine.  The original @BeOS{}
+port was created by Xavier Pianet (@email{xavier@@planet.dk}).  David Huen
 (@email{david@@huen.freeserve.co.uk}) performed a small amount of maintenance
 after Xavier abandoned the project.  Most recently, Eric Sunshine
 (@email{sunshine@@sunshineco.com}) re-engineered the port almost completely
 from scratch in order to ensure that all programs compile cleanly and run
-properly right out of the box.  He also heavily updated the accompanying
+properly straight out of the box.  He also heavily updated the accompanying
 documentation.
 
 This section contains configuration, compilation, and installation
-instructions.  Detailed information about the internals of this port is also
-available, @ref{BeOS Details}, as is a list of @BeOS{}-specific bugs and
-future plans, @ref{BeOS Notes}.
+instructions.  A list of @BeOS{}-specific bugs and future plans is also
+presented.  @xref{BeOS Notes}
 
 It is assumed that you will have obtained a full set of sources at this stage.
 Full sources includes the Crystal Space sources as well as those for the
@@ -44,6 +42,7 @@ Other required libraries, @samp{zlib} and @samp{libpng} are already present on
 @menu
 * BeOS Building:: Building
 * BeOS Running:: Running the Applications
+* BeOS Notes:: Final Notes
 @end menu
 
 @node BeOS Building, BeOS Running, BeOS, BeOS
@@ -78,6 +77,7 @@ Or for even more fine-grained control:
 make -k drivers2d
 make -k drivers3d
 make -k netdrivers
+make vfs
 make csfont
 make rapid
 make simpcons
@@ -107,13 +107,17 @@ make gl3d
 @end example
 
 @item
-Glide (Warning: @emph{The Glide driver is currently broken.  Do not use these
-commands.})
+Glide
 
 @example
 make glidebe2d
-make glide3d
+make glide3d2
 @end example
+
+@emph{Note}: The Glide2 driver for BeOS is untested---owing to lack of
+appropriate hardware on the maintainer's part---however, it does compile.
+Also, it is only meaningful to invoke this makefile target if  the
+experimental Glide2 support is installed on your BeOS system.
 @end enumerate
 
 Finally, if you did not invoke the makefile target @samp{all}, you can build
@@ -123,7 +127,7 @@ the example applications manually:
 make -k apps
 @end example
 
-@node BeOS Running, , BeOS Building, BeOS
+@node BeOS Running, BeOS Notes, BeOS Building, BeOS
 @subsubsection Running the Applications
 
 You will need to have a world file to do anything.  It is suggested that you
@@ -161,12 +165,11 @@ keyword on the command-line:
 @example
 walktest -video=software  # @r{Runs in software mode}
 walktest -video=opengl    # @r{Runs in OpenGL mode}
-walktest -video=glide     # @r{Runs in Glide mode (@emph{currently broken})}
+walktest -video=glide     # @r{Runs in Glide mode}
 @end example
 
-@kbd{@key{ALT}-f} will switch you in and out of full screen.  (Note, the
-software driver does not currently implement full screen mode, though OpenGL
-does.)
+If you are using the OpenGL renderer, then invoking @kbd{@key{ALT}-f} will
+switch in and out of full screen.
 
 Note that walktest requires a good world file to show off effectively (like
 @file{flarge.zip}).  Make sure that @file{cryst.cfg} is correctly set to
@@ -176,10 +179,10 @@ identify this file or type it on the command line:
 walktest flarge
 @end example
 
-You may have to adjust the @samp{AMBIENT_WHITE} level in @file{cryst.cfg} if
-the maps appear too dark.  After adjusting the ambient level, specify
-@samp{-relight} on the command-line to instruct Crystal Space to recalculate
-the lighting information.
+You may have to adjust the @samp{Ambient.White} level in
+@file{data/config/cryst.cfg} if the maps appear too dark.  After adjusting
+the ambient level, specify @samp{-relight} on the command-line to instruct
+Crystal Space to recalculate the lighting information.
 
 @example
 walktest -relight flarge
@@ -187,5 +190,70 @@ walktest -relight flarge
 
 Other interesting example applications which you can run are @file{blocks},
 @file{metademo}, @file{shooter}, and @file{mazed}.
+
+@node BeOS Notes, , BeOS Running, BeOS
+@subsubsection Final Notes
+
+This section lists future plans as well as problems or potential problems with
+the @BeOS{} port of Crystal Space.
+
+@itemize @bullet
+@item
+Now that the engine supports window resizing, the @BeOS{} 2D drivers should
+also support this feature.  Also enable the ``zoom'' button on the window.
+
+@item
+Pause when not foreground application.  Make sure that screen redraws
+correctly even when paused.
+
+@item
+Add full-screen support for software mode.  Be careful about the resolution,
+since Crystal Space can use any arbitrary window dimension.
+
+@item
+The various 2D graphics drivers (software, OpenGL, Glide) should all be
+derived from a common class rather than being nearly identical copies of one
+another.
+
+@item
+Technically, the software and Glide 2D drivers should be employing
+double-buffering since a @dfn{window-exposed} event in the subthread which is
+running the @samp{BApplication} will draw using the @samp{BBitmap} even though
+the main thread in which Crystal Space is running may be in the process of
+updating the bitmap.  This thread-@emph{unsafe} behavior could lead to visual
+anomalies.
+
+@item
+Not all key combinations generate @code{KeyDown()} and @code{KeyUp()} events,
+yet Crystal Space applications may want to intercept them.  For instance,
+MazeD expects to responds to the keystrokes @kbd{@key{CTRL}-1},
+@kbd{@key{CTRL}-2}, etc., yet these key combinations are not seen by the
+system driver since @code{KeyUp()} and @code{KeyDown()} are never called in
+the canvas view subclasses  To fix this, it should be possible to intercept
+such keystrokes in @code{MessageReceived()} within each BView subclass in
+the 2D driver and respond directly to the @samp{B_UNMAPPED_KEY_DOWN} and
+@samp{B_UNMAPPED_KEY_UP} messages.
+
+@item
+Consider using @samp{DirectWindow} rather than @samp{DirectBitmap} where
+supported since @samp{DirectWindow} puts much less load on the @sc{cpu}.
+Auto-detect if @samp{DirectWindow} is available and use it if so.  Note,
+though, that David Huen says this might not be worthwhile on account of the
+fact that the software renderer reads from the frame buffer, and this can be a
+slow operation on some hardware.
+
+@item
+It is possible to depress the window's close button while Crystal Space is
+still initializing, however the close button is ignored until the Crystal
+Space event loop is activated---at which time Crystal Space processes the
+window-close event.  It might be worthwhile to offer the user the option to
+forcibly kill the application in this case, but at the very least the user
+must be warned that doing so might corrupt data on disk (for instance, if
+the engine is updating a @sc{zip} file on a @sc{vfs} volume.
+
+@item
+Ked Shayer (@email{c.shayer2@@ukonline.co.uk}) suggests using @sc{nasm} for
+the assembler code.
+@end itemize
 
 @unmacro BeOS

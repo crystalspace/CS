@@ -1,6 +1,6 @@
 /*
-  BeOS support for Crystal Space 3D library
-  Copyright (C) 1998 by Jorrit Tyberghein
+  BeOS dynamic library loader for Crystal Space
+  Copyright (C) 1999,2000 by Eric Sunshine
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -18,33 +18,32 @@
 */
 
 #include <kernel/image.h>
-#include <sys/param.h>
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/csstring.h"
 
-csLibraryHandle csFindLoadLibrary (const char *iName)
+csLibraryHandle csFindLoadLibrary(char const *iName)
 {
-  return csFindLoadLibrary (NULL, iName, ".plugin");
+  return csFindLoadLibrary(NULL, iName, ".plugin");
 }
 
-csLibraryHandle csLoadLibrary (const char* iName)
+csLibraryHandle csLoadLibrary(char const* iName)
 {
-  return load_add_on (iName);
+  return (csLibraryHandle)load_add_on(iName);
 }
 
-void csPrintLibraryError (const char *iModule)
+void csPrintLibraryError(char const* iModule)
 {
 }
 
-void *csGetLibrarySymbol (csLibraryHandle h, const char* name)
+void *csGetLibrarySymbol(csLibraryHandle h, char const* name)
 {
   void* sym;
-  return (get_image_symbol ((image_id)h, name, B_SYMBOL_TYPE_TEXT, &sym) ==
+  return (get_image_symbol((image_id)h, name, B_SYMBOL_TYPE_TEXT, &sym) ==
     B_OK) ? sym : 0;
 }
 
-bool csUnloadLibrary (csLibraryHandle h)
+bool csUnloadLibrary(csLibraryHandle h)
 {
-  return (unload_add_on ((image_id)h) == B_OK);
+  return (unload_add_on((image_id)h) == B_OK);
 }

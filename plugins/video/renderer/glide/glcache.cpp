@@ -246,9 +246,9 @@ bool csGlideTextureCache::CalculateTexData ( int width, int height, float wfak, 
                                         GrLOD_t *lod, int nLod, csGlideCacheData *d)
 {
   bool succ=true;
-  int texwidth, texheight;
-  int lodoff;
-  GrAspectRatio_t aspectRatio;
+  int texwidth = 0, texheight = 0;
+  int lodoff = 0;
+  GrAspectRatio_t aspectRatio = GR_ASPECT_LOG2_1x1;
   GrLOD_t lodlevels[]= { GR_LOD_LOG2_256, 
                          GR_LOD_LOG2_128, 
 			 GR_LOD_LOG2_64, 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,21 +16,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
 #include "cssysdef.h"
-#include "video/canvas/beglide2/glidebe2d.h"
 #include "csutil/scf.h"
-#include "cssys/csinput.h"
-#include "cssys/be/beitf.h"
+#include "glidebe2d.h"
+#include "crystglidewindow.h"
 #include "csutil/csrect.h"
-#include "video/renderer/glide2/gllib2.h"
 #include "isystem.h"
+#include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DBeGlide)
 
 EXPORT_CLASS_TABLE (glidebe2d)
-  EXPORT_CLASS (csGraphics2DBeGlide, "crystalspace.graphics2d.glidebe",
-    "BeOS/Glide2 2D graphics driver for Crystal Space")
+  EXPORT_CLASS (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
+    "Crystal Space Glide2 2D driver for BeOS")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics2DBeGlide)
@@ -38,282 +36,178 @@ IMPLEMENT_IBASE (csGraphics2DBeGlide)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-
-// csGraphics2DGLX functions
-csGraphics2DBeGlide::csGraphics2DBeGlide(iBase *iParent) :
-  csGraphics2DGlideCommon (iParent)//, xim (NULL), cmap (0)
+csGraphics2DBeGlide::csGraphics2DBeGlide(iBase* p) :
+  superclass(p), view(0), window(0), bitmap(0)
 {
 }
 
-bool csGraphics2DBeGlide::Initialize(iSystem *pSystem)
+csGraphics2DBeGlide::~csGraphics2DBeGlide() 
 {
-  if (!csGraphics2DGlideCommon::Initialize (pSystem))
-    return false;
+}
 
-  BeSystem = QUERY_INTERFACE (System, iBeLibSystemDriver);
-  if (!BeSystem))
+bool csGraphics2DBeGlide::Initialize(iSystem* isys)
+{
+  bool ok = superclass::Initialize(isys);
+  if (ok)
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iBeSystemDriver interface\n");
-    return false;
+    System->Printf(MSG_INITIALIZATION,
+      "Crystal Space BeOS Glide2 2D Driver.\n");
+
+    // Get current screen information.
+    BScreen screen(B_MAIN_SCREEN_ID);
+    screen_frame = screen.Frame();
+    curr_color_space = screen.ColorSpace();
+    ApplyDepthInfo(curr_color_space);
+  
+    // Create frame-buffer.
+    BRect const r(0, 0, Width - 1, Height - 1);
+    bitmap = new BBitmap(r, curr_color_space);
+    memset(bitmap->Bits(), 0, bitmap->BitsLength()); // Clear to black.
   }
-
-  // get current screen depth
-  curr_color_space = BScreen(B_MAIN_SCREEN_ID).ColorSpace();
-  ApplyDepthInfo(curr_color_space);
-  curr_page = 0;
-  
-  CsPrintf (MSG_INITIALIZATION, "Video driver Glide/X version ");
-  CsPrintf (MSG_INITIALIZATION, "\n");
- 
-  GraphicsReady=1;  
-  
-  // temporary bitmap
-  cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space);
-  return true;
+  return ok;
 }
 
-csGraphics2DBeGlide::~csGraphics2DBeGlide () 
-{
-  // Gotta call inherited destructor here?
-  
-  // Destroy your graphic interface
-  GraphicsReady=0;
-  if (BeSystem)
-    BeSystem->DecRef ();
-}
-
-bool csGraphics2DBeGlide::Open(const char *Title)
+bool csGraphics2DBeGlide::Open(char const* title)
 { 
-
-  // Open your graphic interface
-  if (!csGraphics2DGlideCommon::Open (Title))
-    return false;
-
-  // Query system event handlers
-  BeSystem->GetKeyboardHandler (KeyboardHandler, KeyboardHandlerParm);
-  BeSystem->GetMouseHandler (MouseHandler, MouseHandlerParm);
-  BeSystem->GetFocusHandler (FocusHandler, FocusHandlerParm);
-	
-  // Open window
-  dpy = new CrystGlideView(BRect(0,0,Width-1,Height-1));
-  window = new CrystGlideWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this);
-	printf ("2d driver. hwnd is %x \n", window);
-  window->Show();
-  if(window->Lock()) {
-	dpy->MakeFocus();
-	window->Unlock();
-  }	
-  
-  // temporary bitmap
-  BeMemory = (unsigned char *)cryst_bitmap->Bits();
-  
-  return true;
-}
-
-void csGraphics2DBeGlide::Close(void)
-{
-  // Close your graphic interface
-  csGraphics2DGlideCommon::Close ();
-}
-
-void csGraphics2DBeGlide::Print (csRect *area)
-{
-  if (m_DoGlideInWindow)  //temporary
+  bool ok = superclass::Open(title);
+  if (ok)
   {
-    FXgetImage();
-  }
-  csGraphics2DGlideCommon::Print( area );
-}
+    int const INSET = 32;
+    int const sw = screen_frame.IntegerWidth();
+    int const sh = screen_frame.IntegerHeight();
+    int const vw = Width  - 1;
+    int const vh = Height - 1;
+    BRect win_rect(INSET, INSET, vw + INSET, vh + INSET);
 
-// simplification of the Mesa FXgetImage() function
-void csGraphics2DBeGlide::FXgetImage()
-{
-
-  // we only handle 16bit 
-   if (Depth==16) 
-   {    
-          grLfbReadRegion( GR_BUFFER_FRONTBUFFER,       
-                      0, 0,
-                      Width, Height,
-                      Width * 2,
-                      BeMemory);         
-   }
-
-   // now put image in window...
-	if( window->Lock()) {
-//		dpy->Sync();
-		dpy->DrawBitmapAsync(cryst_bitmap);
-		dpy->Flush();
-		
-		window->Unlock();
-//after=system_time();
-//blit_time=after-before;
-//printf("blit time is %i \n", blit_time);
-	}
-
-}
-
-bool csGraphics2DBeGlide::HandleEvent (iEvent &/*Event*/)
-{
-//  static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
-#if 0
-  XEvent event;
-  int state, key;
-  bool down;
-
-  while (XCheckMaskEvent (dpy, ~0, &event))
-    switch (event.type)
+    if (vw <= sw && vh <= sh)
     {
-      case ButtonPress:
-        state = ((XButtonEvent*)&event)->state;
-        System->MouseEvent (button_mapping[event.xbutton.button],
-          true, event.xbutton.x, event.xbutton.y,
-          (state & ShiftMask ? CSMASK_SHIFT : 0) |
-	  (state & Mod1Mask ? CSMASK_ALT : 0) |
-	  (state & ControlMask ? CSMASK_CTRL : 0));
-        break;
-      case ButtonRelease:
-        System->MouseEvent (button_mapping [event.xbutton.button],
-          false, event.xbutton.x, event.xbutton.y, 0);
-        break;
-      case MotionNotify:
-        System->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
-        break;
-      case KeyPress:
-      case KeyRelease:
-        down = (event.type == KeyPress);
-        key = XLookupKeysym (&event.xkey, 0);
-        state = event.xkey.state;
-        switch (key)
-        {
-          case XK_Meta_L:
-	  case XK_Meta_R:
-	  case XK_Alt_L:
-          case XK_Alt_R:      key = CSKEY_ALT; break;
-          case XK_Control_L:
-          case XK_Control_R:  key = CSKEY_CTRL; break;
-          case XK_Shift_L:
-          case XK_Shift_R:    key = CSKEY_SHIFT; break;
-          case XK_Up:         key = CSKEY_UP; break;
-          case XK_Down:       key = CSKEY_DOWN; break;
-          case XK_Left:       key = CSKEY_LEFT; break;
-          case XK_Right:      key = CSKEY_RIGHT; break;
-          case XK_BackSpace:  key = CSKEY_BACKSPACE; break;
-          case XK_Insert:     key = CSKEY_INS; break;
-          case XK_Delete:     key = CSKEY_DEL; break;
-          case XK_Page_Up:    key = CSKEY_PGUP; break;
-          case XK_Page_Down:  key = CSKEY_PGDN; break;
-          case XK_Home:       key = CSKEY_HOME; break;
-          case XK_End:        key = CSKEY_END; break;
-          case XK_Escape:     key = CSKEY_ESC; break;
-          case XK_Tab:        key = CSKEY_TAB; break;
-          case XK_Return:     key = CSKEY_ENTER; break;
-          case XK_F1:         key = CSKEY_F1; break;
-          case XK_F2:         key = CSKEY_F2; break;
-          case XK_F3:         key = CSKEY_F3; break;
-          case XK_F4:         key = CSKEY_F4; break;
-          case XK_F5:         key = CSKEY_F5; break;
-          case XK_F6:         key = CSKEY_F6; break;
-          case XK_F7:         key = CSKEY_F7; break;
-          case XK_F8:         key = CSKEY_F8; break;
-          case XK_F9:         key = CSKEY_F9; break;
-          case XK_F10:        key = CSKEY_F10; break;
-          case XK_F11:        key = CSKEY_F11; break;
-          case XK_F12:        key = CSKEY_F12; break;
-          default:            break;
-        }
-	System->KeyboardEvent (key, down);
-        break;
-      case FocusIn:
-      case FocusOut:
-        System->FocusEvent (event.type == FocusIn);
-        break;
-      case Expose:
-      {
-        csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Print (&rect);
-	break;
-      }
-      default:
-        //if (event.type == CompletionType) shm_busy = 0;
-        break;
+      float const x = floor((sw - vw) / 2); // Center window horizontally.
+      float const y = floor((sh - vh) / 4); // A pleasing vertical position.
+      win_rect.Set(x, y, x + vw, y + vh);
     }
-#endif
-  return false;
+
+    view = new CrystGlideView(BRect(0, 0, vw, vh), System, bitmap);
+    window = new CrystGlideWindow(win_rect, title, view, System, this);
+
+    window->Show();
+    if (window->Lock())
+    {
+      view->MakeFocus();
+      window->Unlock();
+    }
+    window->Flush();
+
+    Memory = (unsigned char*)bitmap->Bits();
+    System->SystemExtension("BeginUI");
+  }
+  return ok;
 }
 
-void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
+void csGraphics2DBeGlide::Close()
+{
+  window->Lock();
+  window->Quit();
+  window = NULL;
+  delete bitmap;
+  bitmap = NULL;
+  superclass::Close();
+}
+
+void csGraphics2DBeGlide::Print (csRect* r)
+{
+  if (m_DoGlideInWindow)
+    FXgetImage(r);
+  superclass::Print(r);
+}
+
+void csGraphics2DBeGlide::FXgetImage(csRect* cr)
+{
+  // @@@FIXME: We only handle 16-bit (blah).
+  if (Depth == 16)
+    grLfbReadRegion(GR_BUFFER_FRONTBUFFER,0,0,Width,Height,Width*2,Memory);         
+
+  if (window->Lock())
+  {
+    // Adjust for BeOS coordinate system by decrementing values from csRect.
+    BRect br;
+    if (cr == 0)
+      br = view->Bounds();
+    else
+      br.Set(cr->xmin, cr->ymin, cr->xmax - 1, cr->ymax - 1);
+    view->Draw(br);
+    window->Unlock();
+  }
+}
+
+void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
 {
   unsigned long RedMask, GreenMask, BlueMask;
-  
-  switch (this_color_space) {
-  	case B_RGB15: 
-//			defer bitmap creation
-//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15);
-		Depth	  = 15;
-  		RedMask   = 0x1f << 10;
-  		GreenMask = 0x1f << 5;
-  		BlueMask  = 0x1f;
+  switch (cs)
+  {
+    case B_RGB15: 
+      Depth     = 15;
+      RedMask   = 0x1f << 10;
+      GreenMask = 0x1f << 5;
+      BlueMask  = 0x1f;
   		
-  		_DrawPixel = DrawPixel16;
-  		_WriteString = WriteString16;
-  		_GetPixelAt= GetPixelAt16;
+      _DrawPixel = DrawPixel16;
+      _WriteString = WriteString16;
+      _GetPixelAt= GetPixelAt16;
 
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
+      pfmt.PixelBytes = 2;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
   		
-  		pfmt.complete ();
-  		break;
-  	case B_RGB16:
-//			defer bitmap creation
-//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16);
-  		Depth	  = 16;
-  		RedMask   = 0x1f << 11;
-  		GreenMask = 0x3f << 5;
-  		BlueMask  = 0x1f;
+      pfmt.complete();
+      break;
+    case B_RGB16:
+      Depth     = 16;
+      RedMask   = 0x1f << 11;
+      GreenMask = 0x3f << 5;
+      BlueMask  = 0x1f;
   		
-  		_DrawPixel = DrawPixel16;
-  		_WriteString = WriteString16;
-  		_GetPixelAt= GetPixelAt16;
+      _DrawPixel = DrawPixel16;
+      _WriteString = WriteString16;
+      _GetPixelAt= GetPixelAt16;
 
-  		pfmt.PixelBytes = 2;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
+      pfmt.PixelBytes = 2;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
   		
-  		pfmt.complete ();
-  		break;
-  	case B_RGB32:
-  	case B_RGBA32:
-//			defer bitmap creation
-//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32);
-		Depth	  = 32;
-  		RedMask   = 0xff << 16;
-  		GreenMask = 0xff << 8;
-  		BlueMask  = 0xff;
+      pfmt.complete();
+      break;
+    case B_RGB32:
+    case B_RGBA32:
+      Depth     = 32;
+      RedMask   = 0xff << 16;
+      GreenMask = 0xff << 8;
+      BlueMask  = 0xff;
   		
-  		_DrawPixel = DrawPixel32;
-  		_WriteString = WriteString32;
-  		_GetPixelAt= GetPixelAt32;
+      _DrawPixel = DrawPixel32;
+      _WriteString = WriteString32;
+      _GetPixelAt= GetPixelAt32;
 
-  		pfmt.PixelBytes = 4;
-  		pfmt.PalEntries = 0;
-  		pfmt.RedMask    = RedMask;
-  		pfmt.GreenMask  = GreenMask;
-  		pfmt.BlueMask   = BlueMask;
+      pfmt.PixelBytes = 4;
+      pfmt.PalEntries = 0;
+      pfmt.RedMask    = RedMask;
+      pfmt.GreenMask  = GreenMask;
+      pfmt.BlueMask   = BlueMask;
   		
-  		pfmt.complete ();
-  		break;
-  	default:
-  	// an unimplemented colorspace, give up and die
-  	printf("Unimplemented color depth in Be 2D driver, depth = %i\n", Depth);
-  	exit(1);
-  		break;
+      pfmt.complete();
+      break;
+    default:
+      printf("Unimplemented color depth in Be2D driver (depth=%i)\n", Depth);
+      exit(1);
+      break;
   }
+}
+
+void csGraphics2DBeGlide::SetFullScreen(bool enable)
+{
+  grSstControl(enable ? GR_CONTROL_ACTIVATE : GR_CONTROL_DEACTIVATE);
+  m_DoGlideInWindow = !enable;
 }

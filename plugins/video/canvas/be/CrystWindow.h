@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Xavier Planet.
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,13 +24,13 @@
 #include <View.h>
 #include <Bitmap.h>
 #include <DirectWindow.h>
-class iSystem;
-class iBeLibSystemDriver;
+struct iSystem;
+struct iGraphics2D;
 
 class CrystView : public BView
 {
 public:
-  CrystView(BRect, iBeLibSystemDriver*); 
+  CrystView(BRect, iSystem*, BBitmap*); 
   virtual ~CrystView();
 
   virtual void KeyDown(char const* bytes, int32 numBytes);
@@ -40,23 +38,25 @@ public:
   virtual void MouseDown(BPoint);
   virtual void MouseUp(BPoint);
   virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
+  virtual void Draw(BRect);
 
 protected:
-  iBeLibSystemDriver* be_system;
-  void ProcessUserEvent() const;
+  iSystem* system;
+  BBitmap* bitmap;
+  void UserAction() const;
 };
 
 class CrystWindow : public BDirectWindow
 {
 public:
-  CrystWindow (BRect, const char*, CrystView*, iSystem*, iBeLibSystemDriver*);
+  CrystWindow (BRect, char const*, CrystView*, iSystem*, iGraphics2D*);
   virtual ~CrystWindow();
   virtual bool QuitRequested();
 
 protected:
   CrystView* view;
-  iSystem* cs_system;
-  iBeLibSystemDriver* be_system;
+  iSystem* system;
+  iGraphics2D* g2d;
 };
 
 #endif __CS_CRYSTWINDOW_H__

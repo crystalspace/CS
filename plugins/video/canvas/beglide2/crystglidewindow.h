@@ -1,92 +1,69 @@
 /*
-	
-	CrystWindow.h
-	
-	by Pierre Raynaud-Richard.
-	
-	Copyright 1998 Be Incorporated, All Rights Reserved.
-	
+    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CRYST_GLIDE_WINDOW_H
-#define CRYST_GLIDE_WINDOW_H
+#ifndef __CS_CRYSTGLIDEWINDOW_H__
+#define __CS_CRYSTGLIDEWINDOW_H__
 
-#ifndef _APPLICATION_H
 #include <Application.h>
-#endif
-
-#ifndef _WINDOW_H
 #include <Window.h>
-#endif
-#ifndef _VIEW_H
 #include <View.h>
-#endif
-#ifndef _BITMAP_H
 #include <Bitmap.h>
-#endif
-//#include <WindowScreen.h>
 #include <DirectWindow.h>
-
-//#include <OS.h>
-
-
-class CrystGlideView : public BView {
-
-public:
-		// standard constructor and destrcutor
-				CrystGlideView(BRect frame); 
-    virtual	    ~CrystGlideView();
-
-		// standard window member
-//virtual	void	MessageReceived(BMessage *message);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
-    virtual void KeyUp(const char *bytes, int32 numBytes);
-   	virtual void MouseDown(BPoint point);
-  	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-    virtual void DirectConnected(direct_buffer_info *info);
-   	bool IsInMotion(void);
-
-	//	for initialisation
-	virtual void AttachedToWindow();
-	
-	int 	inmotion;
-	BPoint 	lastloc;
-};
-
 class csGraphics2DBeGlide;
 
-class CrystGlideWindow : public BDirectWindow { // BGLScreen { //BWindow { // BWindowScreen {
-friend class csGraphics2DGLBe;
+class CrystGlideView : public BView
+{
 public:
-		// standard constructor and destrcutor
-			CrystGlideWindow(BRect frame, const char *name, CrystGlideView *v, csGraphics2DBeGlide *p); 
-virtual		~CrystGlideWindow();
+  CrystGlideView(BRect frame, iSystem*, BBitmap*);
+  virtual ~CrystGlideView();
+  virtual void AttachedToWindow();
 
-		// standard window member
-virtual	bool		QuitRequested();
-virtual status_t	SetFullScreen(bool enable);
-virtual	bool		IsFullScreen(void);
-virtual	void		MessageReceived(BMessage *message);
+  virtual void KeyDown(char const* bytes, int32 numBytes);
+  virtual void KeyUp(char const* bytes, int32 numBytes);
+  virtual void MouseDown(BPoint);
+  virtual void MouseUp(BPoint);
+  virtual void MouseMoved(BPoint, uint32 transit, BMessage const*);
+  virtual void DirectConnected(direct_buffer_info*);
+  virtual void Draw(BRect);
 
-virtual void	DirectConnected(direct_buffer_info *info);
-
-		CrystGlideView		*view;
-		status_t 		res;
-		
-		//	stuff to implement BDirectWindow
-//		IBeLibGraphicsInfo	*piG2D;// new pointer to 2D driver info method interface.
-		csGraphics2DBeGlide	*pi_BeG2D;//local copy of this pointer to csGraphics2DBeLib.
 protected:
-  BLocker		*locker;
-  bool			fDirty;
-  bool			fConnected;
-  bool			fConnectionDisabled;
-  bool			fDrawingThreadSuspended;
-		
-		// the drawing thread function.
-public:
-static	long	StarAnimation(void *data);
+  iSystem* system;
+  BBitmap* bitmap;
+  void UserAction() const;
 };
 
+class CrystGlideWindow : public BDirectWindow
+{
+public:
+  CrystGlideWindow(BRect, char const*, CrystGlideView*, iSystem*,
+    csGraphics2DBeGlide*);
+  virtual ~CrystGlideWindow();
+  virtual bool QuitRequested();
+  virtual void MessageReceived(BMessage*);
+  virtual void DirectConnected(direct_buffer_info*);
 
-#endif
+  virtual status_t SetFullScreen(bool enable);
+  virtual bool IsFullScreen();
+
+protected:
+  CrystGlideView* view;
+  iSystem* system;
+  csGraphics2DBeGlide* g2d;
+};
+
+#endif // __CS_CRYSTGLIDEWINDOW_H__

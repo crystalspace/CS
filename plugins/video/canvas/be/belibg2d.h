@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Xavier Planet.
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,7 +23,6 @@
 #include <Rect.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/be/icsbe.h"
 
 class CrystView;
 class CrystWindow;
@@ -35,7 +32,6 @@ class csGraphics2DBeLib : public csGraphics2D
 {
   typedef csGraphics2D superclass;
 protected:
-  iBeLibSystemDriver* be_system;
   CrystView* view;
   CrystWindow* window;
   BBitmap* bitmap;
@@ -45,15 +41,15 @@ protected:
 public:
   DECLARE_IBASE;
 
-  csGraphics2DBeLib (iBase*);
-  virtual ~csGraphics2DBeLib ();
+  csGraphics2DBeLib(iBase*);
+  virtual ~csGraphics2DBeLib();
 
-  virtual bool Initialize (iSystem*);
-  virtual bool Open (const char* title);
-  virtual void Close ();
-  virtual void Print (csRect* area = NULL);
-  virtual bool SetMouseCursor (csMouseCursorID shape);
-  virtual void ApplyDepthInfo (color_space);
+  virtual bool Initialize(iSystem*);
+  virtual bool Open(char const* title);
+  virtual void Close();
+  virtual void Print(csRect* area = NULL);
+  virtual bool SetMouseCursor(csMouseCursorID);
+  virtual void ApplyDepthInfo(color_space);
 };
 
 #endif // __CS_BELIBG2D_H__

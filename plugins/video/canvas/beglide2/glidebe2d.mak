@@ -1,10 +1,8 @@
 # This is a subinclude file used to define the rules needed
-# to build the Glide 2D driver -- glidebe2d
+# to build the BeOS Glide2 2D driver -- glidebe2d
 
 # Driver description
-DESCRIPTION.glidebe2d = Crystal Space BeOS/Glide 2D driver
-
-include plugins/video/canvas/glide2common/glide2common2d.mak
+DESCRIPTION.glidebe2d = Crystal Space BeOS Glide2 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -33,10 +31,10 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # local CFLAGS
-CFLAGS.GLIDEBE2D+=-I/boot/develop/headers/3dfx/glide2
+CFLAGS.GLIDEBE2D+=$(GLIDE2_PATH)
 LIBS._GLIDEBE2D+=/boot/develop/lib/x86/glide2x.so
 
-# The 2D BeOS/Glide driver
+# The 2D BeOS/Glide2 driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDEBE2D=$(OUTDLL)glidebe2d$(DLL)
   LIBS.GLIDEBE2D=$(LIBS._GLIDEBE2D)
@@ -58,26 +56,28 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glidebe2d glidebeclean
+.PHONY: glidebe2d glidebe2dclean
 
 # Chain rules
-clean: glidebeclean
+clean: glidebe2dclean
 
 glidebe2d: $(OUTDIRS) $(GLIDEBE2D)
 
 $(OUT)%$O: plugins/video/canvas/beglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
+$(OUT)%$O: plugins/video/canvas/glide2common/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
 $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
-glidebeclean:
+glidebe2dclean:
 	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D) $(OUTOS)glidebe2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glidebe2d.dep
 $(OUTOS)glidebe2d.dep: $(SRC.GLIDEBE2D)
-	$(DO.DEP) $(CFLAGS.GLIDEBE2D)
+	$(DO.DEP1) $(CFLAGS.GLIDEBE2D) $(DO.DEP2)
 else
 -include $(OUTOS)glidebe2d.dep
 endif

@@ -4,7 +4,7 @@
 @sc{os}/2
 @end macro
 
-@node OS2 Details, BeOS Details, NeXT Details, Platform Details
+@node OS2 Details, , NeXT Details, Platform Details
 @subsection OS/2
 @cindex OS/2 Details
 

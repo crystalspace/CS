@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,54 +19,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include "cssysdef.h"
+#include "ievent.h"
+#include "igraph2d.h"
 #include "isystem.h"
 #include "CrystGLWindow.h"
-#include "cssys/be/icsbe.h"
 
-CrystGLView::CrystGLView(BRect frame, iBeLibSystemDriver* isys) :
+CrystGLView::CrystGLView(BRect frame, iSystem* isys) :
   BGLView(frame, "", B_FOLLOW_NONE, 0, BGL_RGB | BGL_DEPTH | BGL_DOUBLE),
-  be_system(isys)
+  system(isys)
 {
-  be_system->IncRef();
+  system->IncRef();
 }
 
 CrystGLView::~CrystGLView()
 {
-  be_system->DecRef();
+  system->DecRef();
 }
 
-void CrystGLView::ProcessUserEvent() const
+void CrystGLView::UserAction() const
 {
-  be_system->ProcessUserEvent(Looper()->CurrentMessage());
+  system->SystemExtension("UserAction", Looper()->CurrentMessage());
 }
 
 void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
 void CrystGLView::KeyUp(char const* bytes, int32 numBytes)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-void CrystGLView::MouseMoved(BPoint point, uint32 transit, const BMessage* m)
+void CrystGLView::MouseMoved(BPoint, uint32 transit, BMessage const*)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
-void CrystGLView::MouseDown(BPoint point)
+void CrystGLView::MouseDown(BPoint)
 {
-  ProcessUserEvent();
+  UserAction();
   if (!IsFocus())
     MakeFocus();
 }
 
-void CrystGLView::MouseUp(BPoint point)
+void CrystGLView::MouseUp(BPoint)
 {
-  ProcessUserEvent();
+  UserAction();
 }
 
 void CrystGLView::AttachedToWindow()
@@ -77,12 +76,13 @@ void CrystGLView::AttachedToWindow()
   UnlockGL();
 }
 
-CrystGLWindow::CrystGLWindow(BRect frame, const char* name, CrystGLView *v,
-	iSystem* isys, iBeLibSystemDriver* bsys) :
-	BDirectWindow(frame,name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0),
-	view(v), cs_system(isys), be_system(bsys)
+CrystGLWindow::CrystGLWindow(BRect frame, char const* name, CrystGLView *v,
+	iSystem* isys, iGraphics2D* ig2d) :
+	BDirectWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE, 0),
+	view(v), system(isys), g2d(ig2d)
 {
-  be_system->IncRef();
+  system->IncRef();
+  g2d->IncRef();
   view->SetViewColor(0, 0, 0);
 
   AddChild(view);
@@ -94,7 +94,8 @@ CrystGLWindow::~CrystGLWindow()
 {
   Hide();
   Flush();
-  be_system->DecRef();
+  g2d->DecRef();
+  system->DecRef();
 }
 
 void CrystGLWindow::DirectConnected(direct_buffer_info* info)
@@ -108,16 +109,14 @@ void CrystGLWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGLWindow::QuitRequested()
 {
-//  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
-//  EventOutlet->Broadcast (cscmdQuit);
-  cs_system->StartShutdown ();
-  // @@@FIXME: Don't destroy window before "LoopThread" has finished.
-  return true;
+  system->SystemExtension("ContextClose", g2d);
+  system->SystemExtension("Quit");
+  return false; // Allow Crystal Space to close window itself.
 }
 
 void CrystGLWindow::MessageReceived(BMessage* m)
 {
-  switch(m->what)
+  switch (m->what)
   {
     case 'full':
       SetFullScreen(!IsFullScreen());

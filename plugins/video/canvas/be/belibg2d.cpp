@@ -1,8 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Xavier Planet.
-    Modified for better DDraw conformance by David Huen.
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,14 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <sys/param.h>
-#include <Screen.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "belibg2d.h"
 #include "CrystWindow.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DBeLib)
 
@@ -41,50 +37,39 @@ IMPLEMENT_IBASE (csGraphics2DBeLib)
 IMPLEMENT_IBASE_END
 
 csGraphics2DBeLib::csGraphics2DBeLib (iBase* p) :
-  superclass(), be_system(0), view(0), window(0), bitmap(0)
+  superclass(), view(0), window(0), bitmap(0)
 {
   CONSTRUCT_IBASE(p);
 }
 
 csGraphics2DBeLib::~csGraphics2DBeLib()
 {
-  if (be_system != 0)
-    be_system->DecRef();
-  delete bitmap;
 }
 
-bool csGraphics2DBeLib::Initialize (iSystem* p)
+bool csGraphics2DBeLib::Initialize(iSystem* isys)
 {
-  bool ok = superclass::Initialize(p);
+  bool ok = superclass::Initialize(isys);
   if (ok)
   {
-    System->Printf(MSG_INITIALIZATION, "Crystal Space BeOS version.\n");
-    be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
-    if (be_system != 0)
-    {
-      // Get current screen information.
-      BScreen screen(B_MAIN_SCREEN_ID);
-      screen_frame = screen.Frame();
-      curr_color_space = screen.ColorSpace();
-      ApplyDepthInfo(curr_color_space);
+    System->Printf(MSG_INITIALIZATION, "Crystal Space BeOS 2D Driver.\n");
 
-      // Create frame-buffer.
-      BRect const r(0, 0, Width - 1, Height - 1);
-      bitmap = new BBitmap(r, curr_color_space);
-    }
-    else
-    {
-      CsPrintf (MSG_FATAL_ERROR, "FATAL: System driver does not "
-        "implement the iBeLibSystemDriver interface\n");
-      ok = false;
-    }
+    // Get current screen information.
+    BScreen screen(B_MAIN_SCREEN_ID);
+    screen_frame = screen.Frame();
+    curr_color_space = screen.ColorSpace();
+    ApplyDepthInfo(curr_color_space);
+
+    // Create frame-buffer.
+    BRect const r(0, 0, Width - 1, Height - 1);
+    bitmap = new BBitmap(r, curr_color_space);
+    memset(bitmap->Bits(), 0, bitmap->BitsLength()); // Clear to black.
   }
   return ok;
 }
 
-bool csGraphics2DBeLib::Open(const char* title)
+bool csGraphics2DBeLib::Open(char const* title)
 {
-  bool ok = superclass::Open (title);
+  bool ok = superclass::Open(title);
   if (ok)
   {
     int const INSET = 32;
@@ -101,17 +86,19 @@ bool csGraphics2DBeLib::Open(const char* title)
       win_rect.Set(x, y, x + vw, y + vh);
     }
 
-    view = new CrystView(BRect(0, 0, vw, vh), be_system);
-    window = new CrystWindow(win_rect, title, view, System, be_system);
+    view = new CrystView(BRect(0, 0, vw, vh), System, bitmap);
+    window = new CrystWindow(win_rect, title, view, System, this);
 	
     window->Show();
-    if(window->Lock())
+    if (window->Lock())
     {
       view->MakeFocus();
       window->Unlock();
     }
+    window->Flush();
 	
     Memory = (unsigned char*)bitmap->Bits();
+    System->SystemExtension("BeginUI");
   }
   return ok;
 }
@@ -121,21 +108,29 @@ void csGraphics2DBeLib::Close()
   window->Lock();
   window->Quit();
   window = NULL;
+  delete bitmap;
+  bitmap = NULL;
   superclass::Close();
 }
 
-void csGraphics2DBeLib::Print (csRect*)
+void csGraphics2DBeLib::Print(csRect* cr)
 {
   if (window->Lock())
   {
-    view->DrawBitmap (bitmap);
+    // Adjust for BeOS coordinate system by decrementing values from csRect.
+    BRect br;
+    if (cr == 0)
+      br = view->Bounds();
+    else
+      br.Set(cr->xmin, cr->ymin, cr->xmax - 1, cr->ymax - 1);
+    view->Draw(br);
     window->Unlock();
   }
 }
 
-bool csGraphics2DBeLib::SetMouseCursor (csMouseCursorID shape)
+bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
-  return be_system->SetMouseCursor(shape);
+  return System->SystemExtension("SetCursor", shape);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
@@ -159,7 +154,7 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
 
-      pfmt.complete ();
+      pfmt.complete();
       break;
     case B_RGB16:
       Depth	= 16;
@@ -177,7 +172,7 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
 
-      pfmt.complete ();
+      pfmt.complete();
       break;
     case B_RGB32:
     case B_RGBA32:
@@ -196,10 +191,10 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
 
-      pfmt.complete ();
+      pfmt.complete();
       break;
     default:
-      printf ("Unimplemented color depth in Be 2D driver (depth=%i)\n", Depth);
+      printf("Unimplemented color depth in Be2D driver (depth=%i)\n", Depth);
       exit(1);
       break;
   }

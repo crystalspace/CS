@@ -57,7 +57,7 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
                          csVector2 *iVertices, int iVertCount)
 {
     csVector2 *v;
-    int i;
+    int i = 0;
     if (w<0) w = Width;
     if (h<0) h = Height;
     int p2width, p2height;

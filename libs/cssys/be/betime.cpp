@@ -18,7 +18,7 @@
 
 #include <OS.h>
 #include "cssysdef.h"
-#include "csbe.h"
+#include "cssys/be/csbe.h"
 
 //-----------------------------------------------------------------------------
 // The class function Time() is maintained in its own source file in order to
@@ -31,5 +31,5 @@
 //-----------------------------------------------------------------------------
 cs_time csSystemDriver::Time()
 {
-  return system_time()/1000;
+  return system_time() / 1000;
 }

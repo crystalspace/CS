@@ -2,7 +2,7 @@
 # to build the BeOS 2D driver -- be2d
 
 # Driver description
-DESCRIPTION.be2d = Crystal Space BeLib 2D driver
+DESCRIPTION.be2d = Crystal Space BeOS software 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

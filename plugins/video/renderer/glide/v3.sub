@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make glide3d3      Make the $(DESCRIPTION.glide3d3)$"
+  $(NEWLINE)echo $"  make glide3d3     Make the $(DESCRIPTION.glide3d3)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -30,12 +30,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+ifeq (,$(GLIDE2_LIB))
+GLIDE3_LIB = -lglide3x
+endif
+
 CFLAGS.GLIDE3D3+= $(GLIDE3_PATH) -DGLIDE3 
-LIBS._GLIDE3D3+=-lglide3x
+LIBS._GLIDE3D3+=$(GLIDE3_LIB)
 
 # The Glide driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLIDE3D3=glide3d3$(DLL)
+  GLIDE3D3=$(OUTDLL)glide3d3$(DLL)
   LIBS.GLIDE3D3=$(LIBS._GLIDE3D3)
   DEP.GLIDE3D3=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   TO_INSTALL.DYNAMIC_LIBS += $(GLIDE3D3)

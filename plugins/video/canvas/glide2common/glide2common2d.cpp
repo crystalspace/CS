@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,9 +21,6 @@
 #include "glide2common2d.h"
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
-#if defined(OS_BE)	// dh: is this OS-dependence necessary? 
-#include "cssys/be/beitf.h"
-#endif
 #include "video/renderer/glide/gllib.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
@@ -36,7 +33,7 @@ IMPLEMENT_IBASE (csGraphics2DGlideCommon)
   IMPLEMENTS_INTERFACE (iGraphics2DGlide)
 IMPLEMENT_IBASE_END
 
-bool csGraphics2DGlideCommon::locked=false;
+bool csGraphics2DGlideCommon::locked = false;
 
 // csGraphics2DGlideCommon function
 csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
@@ -59,7 +56,6 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  // see if we need to go fullscreen or not...
   int w, h;
   pSystem->GetSettings (w, h, Depth, m_DoGlideInWindow);
   m_DoGlideInWindow = !m_DoGlideInWindow;
@@ -79,7 +75,6 @@ csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 
 bool csGraphics2DGlideCommon::Open(const char *Title)
 {
-  // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
 
@@ -88,9 +83,8 @@ bool csGraphics2DGlideCommon::Open(const char *Title)
   return true;
 }
 
-void csGraphics2DGlideCommon::Close(void)
+void csGraphics2DGlideCommon::Close()
 {
-  // Close your graphic interface
   csGraphics2D::Close ();
 }
 
@@ -148,7 +142,7 @@ void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, 
 //#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
 //#define GR_DRAWBUFFER GR_BUFFER_BACKBUFFER
 
-bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
+bool csGraphics2DGlideCommon::BeginDraw()
 {
   csGraphics2D::BeginDraw ();
   if (FrameBufferLocked != 1)
@@ -319,7 +313,7 @@ void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
     }
     if (Free)
       FreeArea (Area);
-  } /* endif */
+  }
 }
 
 void csGraphics2DGlideCommon::EncodeRGB ( UShort& color, UByte r, UByte g, UByte b )

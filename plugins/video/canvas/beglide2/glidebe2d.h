@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,83 +16,43 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLIDEBE2D_H__
-#define __GLIDEBE2D_H__
+#ifndef __CS_GLIDEBE2D_H__
+#define __CS_GLIDEBE2D_H__
 
+#include <GraphicsDefs.h>
+#include <Rect.h>
 #include "csutil/scf.h"
-#include "video/canvas/common/graph2d.h"
-#include "cssys/be/csbe.h"
 #include "video/canvas/glide2common/glide2common2d.h"
 #include "video/canvas/glide2common/iglide2d.h"
 
-#include <glide.h>
+class CrystGlideView;
+class CrystGlideWindow;
 
-#ifndef CRYST_GLIDE_WINDOW_H
-#include "video/canvas/beglide2/CrystGlideWindow.h"
-#endif
-#include "video/canvas/beglide2/xg2d.h"
-
-/// BeOS version.
 class csGraphics2DBeGlide : public csGraphics2DGlideCommon
 {
-friend class CrystGlideWindow;
-
+  typedef csGraphics2DGlideCommon superclass;
 private:
-  // The display context
-  CrystGlideView *dpy;
-  int screen_num;
-  int display_width, display_height;
-  CrystGlideWindow		*window;
-  
-  color_space			curr_color_space;
+  CrystGlideView* view;
+  CrystGlideWindow* window;
+  BBitmap* bitmap;
+  color_space curr_color_space;
+  BRect screen_frame;
 
-  // buffer implementation (just temporary)
-  BBitmap				*cryst_bitmap;
-  unsigned char			  *BeMemory;
-  
-  // double buffer implementation
-  int			curr_page;// just temporary
+protected:
+  void FXgetImage(csRect*);
 
-  /// Pointer to DOS-specific interface
-  iBeLibSystemDriver* BeSystem;
-
-public:
-  /// The "real" mouse handler
-  BeMouseHandler MouseHandler;
-  /// The first parameter for "real" mouse handler
-  void *MouseHandlerParm;
-  /// The keyboard handler
-  BeKeyboardHandler KeyboardHandler;
-  /// The first parameter for keyboard handler
-  void *KeyboardHandlerParm;
-  /// The focus handler
-  BeFocusHandler FocusHandler;
-  /// The first parameter for focus handler
-  void *FocusHandlerParm;
-  
 public:
   DECLARE_IBASE;
 
-  csGraphics2DBeGlide (iBase *iParent);
-  virtual ~csGraphics2DBeGlide ();
+  csGraphics2DBeGlide(iBase*);
+  virtual ~csGraphics2DBeGlide();
 
-  virtual bool Initialize (iSystem *pSystem);
-  virtual bool Open (const char *Title);
-  virtual void Close ();
-  
-  virtual void Print (csRect *area = NULL);
-/*
-  /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape);
-*/
-protected:
-  /// Called on every frame by system driver
-  virtual bool HandleEvent (iEvent &Event);
-  
-  /// This method is used for GlideInWindow...
-  void FXgetImage();
-
-  void ApplyDepthInfo(color_space this_color_space);
+  virtual bool Initialize(iSystem*);
+  virtual bool Open(char const* title);
+  virtual void Close();
+  virtual void Print(csRect* area = NULL);
+  void ApplyDepthInfo(color_space);
+  void SetFullScreen(bool);
 };
 
-#endif // __GLIDEBE2D_H__
+#endif // __CS_GLIDEBE2D_H__

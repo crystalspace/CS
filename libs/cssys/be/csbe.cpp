@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Written by Xavier Planet.
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,98 +21,278 @@
 #include <stdarg.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/param.h>
 #include <Application.h>
 #include <Beep.h>
+#include <UTF8.h>
 #include <View.h>
 
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csbe.h"
+#include "cssys/be/csbe.h"
 #include "csutil/util.h"
 
-#define CSBE_MOUSE_BUTTON_COUNT 3
+IMPLEMENT_IBASE_EXT(SysSystemDriver)
+  IMPLEMENTS_INTERFACE(iEventPlug)
+IMPLEMENT_IBASE_EXT_END
 
-// The System driver ////////////////
-
-class CrystApp : public BApplication
+//-----------------------------------------------------------------------------
+// Locally defined BMessage types passed from BeOS thread to Crystal Space
+// thread via the system driver's thread-safe message queue.
+//-----------------------------------------------------------------------------
+enum
 {
-public:
-  CrystApp(iSystem*);
-  ~CrystApp();
-  bool QuitRequested();
-  void MessageReceived(BMessage*);
-  void HideMouse();
-  void ShowMouse();
-  bool SetMouse(csMouseCursorID shape);
-  void checkMouseMoved();
-
-private:
-  iSystem* driver;
-  bool shift_down;
-  bool alt_down;
-  bool ctrl_down;
-  bool button_state[CSBE_MOUSE_BUTTON_COUNT];
-  bool real_mouse;
-  bool mouse_moved;
-  BPoint mouse_point;
-
-  void doMouseMotion(BMessage*);
-  void doMouseAction(BMessage*);
-  void doKeyAction(BMessage*);
-  void queueMouseEvent(int button, bool down, BPoint);
-  void checkButton(int button, int32 buttons, int32 mask, BPoint);
-  void checkButtons(BMessage*);
-  void checkModifiers(BMessage*);
-  void checkModifier(long flags, long mask, int tag, bool& state) const;
-  int classifyFunctionKey(BMessage*) const;
-  int classifyAsciiKey(int) const;
+  CS_BE_QUIT = 'CSEX',
+  CS_BE_CONTEXT_CLOSE = 'CSCL'
 };
 
-CrystApp::CrystApp(iSystem* isys) :
-  BApplication("application/x-vnd.xsware-crystal"),
-  driver (isys), shift_down(false), alt_down(false), ctrl_down(false),
+
+//-----------------------------------------------------------------------------
+// Constructor
+//-----------------------------------------------------------------------------
+SysSystemDriver::SysSystemDriver() :
+  csSystemDriver(), running(false), event_outlet(0),
+  shift_down(false), alt_down(false), ctrl_down(false),
   real_mouse(true), mouse_moved(false), mouse_point(0,0)
 {
-  driver->IncRef();
   for (int i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
-};
-
-CrystApp::~CrystApp()
-{
-  driver->DecRef ();
 }
 
-bool CrystApp::QuitRequested()
+
+//-----------------------------------------------------------------------------
+// Destructor
+//
+// *DELETE*
+//	Unfortunately, we can not delete 'be_app' here even though we probably
+//	created it.  The problem is that the architecture of the system is
+//	such that plugin modules get cleaned up by ~csSystemDriver() only
+//	_after_ this destructor is invoked.  When the BeOS 2D drivers clean up
+//	their windows and bitmaps, be_app must exist.  (This is a requirement
+//	of the InterfaceKit and ApplicationKit.)
+//-----------------------------------------------------------------------------
+SysSystemDriver::~SysSystemDriver()
 {
-  printf("Terminating rendering loop.\n");
-  driver->StartShutdown();
-  snooze(200000); // @@@FIXME: Necessary?
-  status_t err_code, exit_value;
-  err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);
-  printf("LoopThread termination code: %lx\n", err_code);
+  if (be_app != 0)
+  {
+    if (be_app->Lock())
+    {
+      ShowMouse();
+      if (running)
+      {
+        be_app->Quit();
+        status_t err_code, exit_value;
+        err_code = wait_for_thread(find_thread("BeThread"), &exit_value);
+#if defined(CS_DEBUG)
+	printf("BeThread termination code: %lx, exit value: %lx \n",
+	  err_code, exit_value);
+#endif
+      }
+      be_app->SetPreferredHandler(0);
+      be_app->RemoveHandler(this);
+      be_app->Unlock();
+    }
+    // delete app;	// *DELETE*
+  }
+  if (event_outlet != 0)
+    event_outlet->DecRef();
+}
+
+
+//-----------------------------------------------------------------------------
+// Initialize the system driver.
+//
+// *1*
+//	Determine the path of the executable and set it as the "current
+//	working directory".  This allows Crystal Space applications to easily
+//	locate the common resource files, such as scf.cfg and vfs.cfg which,
+//	it expects to find in the current directory, even when launched via
+//	double-clicking the application from the Tracker.
+// *2*
+//	Only instantiate a BApplication object if one has not already been
+//	instantiated.  This allows a BeOS-specific Crystal Space client to
+//	easily employ a custom BApplication subclass by instantiating it prior
+//	to calling iSystem::Initialize().
+// *3*
+//	Sets the system driver as the application's preferred message handler
+//	so that it can intercept common BeOS messages and forward appropriate
+//	ones to the Crystal Space event-loop which runs in the main thread.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::Initialize (int argc, char const* const argv[],
+    char const *iConfigName)
+{
+  char path[MAXPATHLEN];		// *1*
+  char name[MAXPATHLEN];
+  splitpath(argv[0], path, sizeof(path), name, sizeof(name));
+  if (strlen(path) > 0)
+    chdir(path);
+
+  event_outlet = CreateEventOutlet(this);
+  if (be_app == 0)			// *2*
+    (void)new BApplication("application/x-vnd.xsware-crystal");
+  be_app->AddHandler(this);		// *3*
+  be_app->SetPreferredHandler(this);
+
+  return superclass::Initialize(argc, argv, iConfigName);
+}
+
+
+//-----------------------------------------------------------------------------
+// Entry-point function for the subthread in which the BApplication runs.
+//-----------------------------------------------------------------------------
+int32 SysSystemDriver::ThreadEntry(void* p)
+{
+  SysSystemDriver* sys = (SysSystemDriver*)p;
+  be_app->Lock();		// Thread invoking Run() must hold lock.
+  be_app->Run();
+  sys->SystemExtension("Quit");	// BApplication terminated, so ask CS to quit.
+  return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+// Whenever a 2D driver (canvas) is about to place a window on-screen, it asks
+// the system driver -- via SystemExtension("BeginUI") -- to ensure that the
+// BeOS event loop is active so that it can respond to events in window.  This
+// method runs the BApplication in a subthread the first time "BeginUI" is
+// requested.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::RunBeApp()
+{
+  if (!running)
+  {
+    running = true;
+    set_thread_priority(find_thread(0), B_DISPLAY_PRIORITY);
+    be_app->Unlock(); // Allow sub-thread to lock BAapplication before Run().
+    thread_id const ident = spawn_thread (ThreadEntry, "BeThread",
+      B_NORMAL_PRIORITY, this);
+    resume_thread(ident);
+  }
   return true;
 }
 
-void CrystApp::HideMouse()
+
+//-----------------------------------------------------------------------------
+// This method is called by csSystemDriver::Loop() in the main thread for each
+// animation frame.  It processes messages which have been sent from the
+// subthread running the BApplication before invoking its superclass'
+// implementation of NextFrame().
+//-----------------------------------------------------------------------------
+void SysSystemDriver::NextFrame()
 {
-  if (!IsCursorHidden())
-    HideCursor();
+  if (message_queue.Lock())
+  {
+    BMessage* m;
+    while ((m = message_queue.NextMessage()) != 0)
+    {
+      DispatchMessage(m);
+      delete m;
+    }
+    message_queue.Unlock();
+  }
+  CheckMouseMoved();
+  superclass::NextFrame();
 }
 
-void CrystApp::ShowMouse()
+
+//-----------------------------------------------------------------------------
+// Perform a system-specific extension.  Most requests are received from
+// BeOS-specific plugin modules, such as 2D drivers, though a few may also
+// originate from the system driver which is acting as the BApplication's
+// preferred message handler in the subthread.
+//
+// The following commands are understood.
+//
+//	UserAction <BMessage*>
+//	    A user action (probably sent from the subthread), such as keypress
+//	    or mouse action, in the form of a BMessage.  The BMessage is
+//	    placed in a thread-safe message queue and later processed by the
+//	    Crystal Space event-loop running in the main thread.
+//	SetCursor <csMouseCursorID>
+//	    Set the mouse pointer to one of the pre-defined Crystal Space
+//	    mouse shapes.
+//	BeginUI
+//	    Spawn a thread in which to run the BApplication and invokes its
+//	    Run() method.  If the application is already running in the
+//	    subthread, then this method does nothing.  This extension is
+//	    requested by 2D driver modules when they are about to place a
+//	    window on-screen, at which point the BeOS event-loop should be
+//	    running (independently of whether or not the Crystal Space
+//	    event-loop is running) so that they can respond to user actions.
+//	Quit
+//	    Ask the Crystal Space event-loop to terminate.
+//	ContextClose <iGraphics2D*>
+//	    Notify Crystal Space that a 2D graphics context is closing.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::SystemExtension(char const* cmd, ...)
 {
-  if (IsCursorHidden())
-    ShowCursor();
+  bool ok = false;
+  va_list args;
+  va_start(args, cmd);
+
+  if (strcmp(cmd, "UserAction") == 0)
+    ok = QueueMessage(va_arg(args, BMessage*));
+
+  else if (strcmp(cmd, "SetCursor") == 0)
+    ok = SetMouse(va_arg(args, csMouseCursorID));
+
+  else if (strcmp(cmd, "BeginUI") == 0)
+    ok = RunBeApp();
+
+  else if (strcmp(cmd, "Quit") == 0)
+    ok = QueueMessage(CS_BE_QUIT);
+
+  else if (strcmp(cmd, "ContextClose") == 0)
+    ok = QueueMessage(CS_BE_CONTEXT_CLOSE, va_arg(args, iGraphics2D*));
+
+  va_end(args);
+  return ok;
 }
 
-bool CrystApp::SetMouse(csMouseCursorID shape)
+
+//-----------------------------------------------------------------------------
+// iEventPlug Implementation.
+//-----------------------------------------------------------------------------
+unsigned int SysSystemDriver::GetPotentiallyConflictingEvents()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+
+unsigned int SysSystemDriver::QueryEventPriority(unsigned int)
+  { return 150; }
+
+
+//-----------------------------------------------------------------------------
+// Hide the mouse.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::HideMouse()
+{
+  CS_ASSERT(be_app != 0);
+  if (!be_app->IsCursorHidden())
+    be_app->HideCursor();
+}
+
+
+//-----------------------------------------------------------------------------
+// Show the mouse.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::ShowMouse()
+{
+  CS_ASSERT(be_app != 0);
+  if (be_app->IsCursorHidden())
+    be_app->ShowCursor();
+}
+
+
+//-----------------------------------------------------------------------------
+// Set the mouse pointer to one of the pre-defined Crystal Space shapes.
+// Returns 'true' if the pointer shape is directly supported; else 'false' if
+// Crystal Space must simulate the mouse pointer for this shape.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::SetMouse(csMouseCursorID shape)
 {
   real_mouse = false;
   if (shape == csmcArrow)
   {
-    SetCursor(B_HAND_CURSOR);
+    CS_ASSERT(be_app != 0);
+    be_app->SetCursor(B_HAND_CURSOR);
     real_mouse = true;
   }
 
@@ -126,43 +304,137 @@ bool CrystApp::SetMouse(csMouseCursorID shape)
   return real_mouse;
 }
 
-void CrystApp::MessageReceived(BMessage* m)
+
+//-----------------------------------------------------------------------------
+// User actions, such as keyboard and mouse events, are received from the
+// subthread running the BApplication.  Queue them up for processing by
+// csSystemDriver::Loop() which is running in the main thread.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::QueueMessage(BMessage* m)
+{
+  bool const ok = message_queue.Lock();
+  if (ok)
+  {
+    message_queue.AddMessage(new BMessage(*m));
+    message_queue.Unlock();
+  }
+  return ok;
+}
+
+
+//-----------------------------------------------------------------------------
+// Queue up a custom, port-specific message for processing by the main thread.
+//-----------------------------------------------------------------------------
+bool SysSystemDriver::QueueMessage(uint32 code, void const* data)
+{
+  BMessage m(code);
+  if (data != 0)
+    m.AddPointer("data", data);
+  return QueueMessage(&m);
+}
+
+
+//-----------------------------------------------------------------------------
+// This is an override of BHandler::MessageRecieved().  Since this object is
+// the BApplication's preferred message handler, it is called by the
+// BApplication object running in the subthread.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::MessageReceived(BMessage* m)
 {	
   switch(m->what)
   {
     case B_KEY_DOWN:
     case B_KEY_UP:
-      doKeyAction(m);
-      break;
     case B_MOUSE_DOWN:
     case B_MOUSE_UP:
-      doMouseAction(m);
-      break;
     case B_MOUSE_MOVED:
-      doMouseMotion(m);
+      QueueMessage(m);
       break;
     default:
-      BApplication::MessageReceived(m);
+      BHandler::MessageReceived(m);
       break;
   }
 }
 
-void CrystApp::queueMouseEvent(int button, bool down, BPoint where)
-{
-  if (where.x >= 0 && where.y >= 0)
-    EventOutlet->Mouse (button, down, where.x, where.y);
+
+//-----------------------------------------------------------------------------
+// Dispatch a message which was received from the subthread and queued for
+// processing in the main thread.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::DispatchMessage(BMessage* m)
+{	
+  switch(m->what)
+  {
+    case B_KEY_DOWN:
+    case B_KEY_UP:
+      DoKeyAction(m);
+      break;
+    case B_MOUSE_DOWN:
+    case B_MOUSE_UP:
+      DoMouseAction(m);
+      break;
+    case B_MOUSE_MOVED:
+      DoMouseMotion(m);
+      break;
+    case CS_BE_QUIT:
+      event_outlet->Broadcast(cscmdQuit);
+      break;
+    case CS_BE_CONTEXT_CLOSE:
+      DoContextClose(m);
+      break;
+    default:
+      Printf(MSG_WARNING,
+        "DispatchUserAction(): Unrecognized message (%lu)\n", m->what);
+      m->PrintToStream();
+      break;
+  }
 }
 
-void CrystApp::checkMouseMoved()
+
+//-----------------------------------------------------------------------------
+// Broadcast a context-close message via the Crystal Space event loop.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::DoContextClose(BMessage* m)
+{
+  void* p = 0;
+  if (m->FindPointer("data", &p) == B_OK)
+  {
+    CS_ASSERT(p != 0);
+    event_outlet->Broadcast(cscmdContextClose, (iGraphics2D*)p);
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+// Queue a mouse-related event to the Crystal Space event loop.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::QueueMouseEvent(int button, bool down, BPoint where)
+{
+  if (where.x >= 0 && where.y >= 0)
+    event_outlet->Mouse(button, down, where.x, where.y);
+}
+
+
+//-----------------------------------------------------------------------------
+// If the mouse moved, queue a mouse-moved event to the Crystal Space event
+// loop.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::CheckMouseMoved()
 {
   if (mouse_moved)
   {
-    queueMouseEvent (0, false, mouse_point);
+    QueueMouseEvent(0, false, mouse_point);
     mouse_moved = false;
   }
 }
 
-void CrystApp::checkButton(int button, int32 buttons, int32 mask, BPoint where)
+
+//-----------------------------------------------------------------------------
+// If a mouse button's state changed, queue a mouse event to the Crystal Space
+// event-loop.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::CheckButton(
+  int button, int32 buttons, int32 mask, BPoint where)
 {
   if (button < CSBE_MOUSE_BUTTON_COUNT)
   {
@@ -170,55 +442,78 @@ void CrystApp::checkButton(int button, int32 buttons, int32 mask, BPoint where)
     if (state != button_state[button])
     {
       button_state[button] = state;
-      checkMouseMoved();
-      queueMouseEvent (button + 1, state, where);
+      CheckMouseMoved();
+      QueueMouseEvent(button + 1, state, where);
     }
   }
 }
 
-void CrystApp::checkButtons(BMessage* m)
+
+//-----------------------------------------------------------------------------
+// Check for mouse button state changes.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::CheckButtons(BMessage* m)
 {
   BPoint where;
   int32 buttons;
   if (m->FindPoint("where",   &where  ) == B_OK &&
       m->FindInt32("buttons", &buttons) == B_OK)
   {
-    checkButton(0, buttons, B_PRIMARY_MOUSE_BUTTON,   where);
-    checkButton(1, buttons, B_SECONDARY_MOUSE_BUTTON, where);
-    checkButton(2, buttons, B_TERTIARY_MOUSE_BUTTON,  where);
+    CheckButton(0, buttons, B_PRIMARY_MOUSE_BUTTON,   where);
+    CheckButton(1, buttons, B_SECONDARY_MOUSE_BUTTON, where);
+    CheckButton(2, buttons, B_TERTIARY_MOUSE_BUTTON,  where);
   }
 }
 
-void CrystApp::checkModifier(long flags, long mask, int tag, bool& state) const
+
+//-----------------------------------------------------------------------------
+// If a modifier key's state changed, queue a keyboard event to the Crystal
+// Space event-loop.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::CheckModifier(
+  long flags, long mask, int tag, bool& state) const
 {
   bool const new_state = (flags & mask) != 0;
   if (state != new_state)
   {
     state = new_state;
-    EventOutlet->Key (tag, -1, state);
+    event_outlet->Key(tag, -1, state);
   }
 }
 
-void CrystApp::checkModifiers(BMessage* m)
+
+//-----------------------------------------------------------------------------
+// Check keyboard modifiers (shift, alternate, control) for state changes.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::CheckModifiers(BMessage* m)
 {
   int32 flags;
   if (m->FindInt32("modifiers", &flags) == B_OK)
   {
-    checkModifier(flags, B_SHIFT_KEY,   CSKEY_SHIFT, shift_down);
-    checkModifier(flags, B_OPTION_KEY,  CSKEY_ALT,   alt_down  );
-    checkModifier(flags, B_CONTROL_KEY, CSKEY_CTRL,  ctrl_down );
+    CheckModifier(flags, B_SHIFT_KEY,   CSKEY_SHIFT, shift_down);
+    CheckModifier(flags, B_OPTION_KEY,  CSKEY_ALT,   alt_down  );
+    CheckModifier(flags, B_CONTROL_KEY, CSKEY_CTRL,  ctrl_down );
   }
 }
 
-void CrystApp::doMouseAction(BMessage* m)
+
+//-----------------------------------------------------------------------------
+// Classify mouse related events.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::DoMouseAction(BMessage* m)
 {
-  checkModifiers(m);
-  checkButtons(m);
+  CheckModifiers(m);
+  CheckButtons(m);
 }
 
-void CrystApp::doMouseMotion(BMessage* m)
+
+//-----------------------------------------------------------------------------
+// Handle mouse movement events, taking into special account whether or not
+// the mouse has left or entered the canvas' window.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::DoMouseMotion(BMessage* m)
 {
-  checkModifiers(m);
+  CheckModifiers(m);
   int32 transit;
   if (m->FindInt32("be:transit", &transit) == B_OK)
   {
@@ -241,26 +536,36 @@ void CrystApp::doMouseMotion(BMessage* m)
   }
 }
 
-void CrystApp::doKeyAction(BMessage* m)
-{
-  checkModifiers(m);
 
-  char const* bytes;
-  if (m->FindString("bytes", &bytes) == B_OK && strlen(bytes) == 1)
+//-----------------------------------------------------------------------------
+// Classify keyboard-related events.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::DoKeyAction(BMessage* m)
+{
+  CheckModifiers(m);
+
+  long c;
+  if (m->FindInt32("raw_char", &c) == B_OK)
   {
-    int const c = bytes[0];
-    int key = 0;
+    int cs_key = 0;
+    int cs_char = -1;
     if (c == B_FUNCTION_KEY)
-      key = classifyFunctionKey(m);
+      ClassifyFunctionKey(m, cs_key, cs_char);
     else
-      key = classifyAsciiKey(c);
-    EventOutlet->Key(key, -1, m->what == B_KEY_DOWN);
+      ClassifyNormalKey(c, m, cs_key, cs_char);
+    event_outlet->Key(cs_key, cs_char, m->what == B_KEY_DOWN);
   }
 }
 
-int CrystApp::classifyFunctionKey(BMessage* m) const
+
+//-----------------------------------------------------------------------------
+// BeOS to Crystal Space function key translation.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::ClassifyFunctionKey(
+  BMessage* m, int& cs_key, int& cs_char) const
 {
-  int cs_key = 0;
+  cs_key = 0;
+  cs_char = -1;
   int32 be_key;
   if (m->FindInt32("key", &be_key) == B_OK)
   {
@@ -280,14 +585,16 @@ int CrystApp::classifyFunctionKey(BMessage* m) const
       case B_F12_KEY:	cs_key = CSKEY_F12;	break;
     }
   }
-  return cs_key;
 }
 
-// *NOTE* CrystalSpace wants control-keys translated to their lower-case
-// equivalents; that is: 'ctrl-c' --> 'c'.
-int CrystApp::classifyAsciiKey(int c) const
+
+//-----------------------------------------------------------------------------
+// BeOS to Crystal Space non-function key translation.
+//-----------------------------------------------------------------------------
+void SysSystemDriver::ClassifyNormalKey(
+  int c, BMessage* m, int& cs_key, int& cs_char) const
 {
-  int cs_key = 0;
+  cs_char = -1;
   switch (c)
   {
     case B_UP_ARROW:	cs_key = CSKEY_UP;			break;
@@ -304,79 +611,50 @@ int CrystApp::classifyAsciiKey(int c) const
     case B_ESCAPE:	cs_key = CSKEY_ESC;			break;
     case B_TAB:		cs_key = CSKEY_TAB;			break;
     case B_RETURN:	cs_key = CSKEY_ENTER;			break;
-    default:		cs_key = (c < ' ' ? c + '`' : c);	break; // *NOTE*
+    default:		cs_key = c;
+			cs_char = ClassifyUnicodeKey(m);	break;
   }
-  return cs_key;
 }
 
-//--------------------------------------------------// SysSystemDriver //-----//
 
-IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iBeLibSystemDriver)
-IMPLEMENT_IBASE_EXT_END
-
-SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
+//-----------------------------------------------------------------------------
+// Extract a Unicode value from a keyboard event.  The Crystal Space event
+// interface does not actually specify how to handle non-ASCII input
+// characters so, for lack of anything better, we return a Unicode value.
+//
+// *ASCII*
+//	First test for the simple ASCII case before doing the hard work of
+//	converting a multi-byte UTF-8 value into a Unicode 2.0 value.
+// *UNICODE*
+//	Unicode values are 16-bits in size.  Since this key event represents
+//	a single keystroke, it should translate to a single Unicode value,
+//	thus the buffer need be only 16-bits in width (even though the
+//	incoming UTF-8 value may be represented by 1, 2, 3, or 4 bytes).
+// *CONVERT*
+//	Convert the 2-byte Unicode byte string into an endian-correct Unicode
+//	16-bit numeric value.
+//-----------------------------------------------------------------------------
+int SysSystemDriver::ClassifyUnicodeKey(BMessage* m) const
 {
-  app = new CrystApp (this);
-};
-
-bool SysSystemDriver::Initialize (int argc, const char* const argv[],
-    const char *iConfigName)
-{
-  char path[MAXPATHLEN];
-  char name[MAXPATHLEN];
-  splitpath(argv[0], path, sizeof(path), name, sizeof(name));
-  if (strlen(path) > 0)
-    chdir(path);
-  return superclass::Initialize(argc, argv, iConfigName);
-}
-
-void SysSystemDriver::NextFrame ()
-{
-  if (!running)
+  int cs_char = -1;
+  void const* data;
+  ssize_t bytes;
+  if (m->FindData("bytes",B_STRING_TYPE,&data,&bytes) == B_OK && bytes != 0)
   {
-    // Start the BE application when we are called for the first time
-    // in a secondary thread. Then it stays there quietly and do all the
-    // dirty work for us (pump messages and so on).
-    running = true;
-    thread_id my_thread = spawn_thread (LoopThread, "LoopThread",
-      B_DISPLAY_PRIORITY, (void *)this);
-    resume_thread (my_thread);
-  }
-
-  app->checkMouseMoved (); // @@@FIXME: Probably want to lock "moved" flag.
-}
-
-// This is the thread doing the main application loop
-long SysSystemDriver::LoopThread (void *Self)
-{
-  SysSystemDriver *This = (SysSystemDriver *)Self;
-
-  snooze(100000); // @@@FIXME: Necesary?
-  This->app->Run ();
-  This->app->ShowMouse ();
-  This->app->PostMessage(B_QUIT_REQUESTED);
-  return 0;
-}
-
-void SysSystemDriver::ProcessUserEvent (BMessage* m)
-{
-  if (running)
-  {
-    switch (m->what)
+    unsigned char const* p = (unsigned char const*)data;
+    if ((p[0] & 0x80) == 0)		// *ASCII*
+      cs_char = p[0];
+    else
     {
-      case B_KEY_DOWN:
-      case B_KEY_UP:
-      case B_MOUSE_DOWN:
-      case B_MOUSE_MOVED:
-      case B_MOUSE_UP:
-        app->PostMessage(m, 0);
-        break;
+      char unicode[2];			// *UNICODE*
+      int32 unilen = sizeof(unicode);
+      if (convert_from_utf8(B_UNICODE_CONVERSION, (char const*)data, &bytes,
+        unicode, &unilen, 0) == B_OK)
+      {
+        p = (unsigned char const*)unicode;
+        cs_char = (p[1] << 8) | p[0];	// *CONVERT*
+      }
     }
   }
-}
-
-bool SysSystemDriver::SetMouseCursor(csMouseCursorID shape)
-{
-  return app->SetMouse(shape);
+  return cs_char;
 }

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,35 +23,31 @@
 #include <GraphicsDefs.h>
 #include <Rect.h>
 #include "csutil/scf.h"
-#include "cssys/be/icsbe.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
-
 class CrystGLView;
 class CrystGLWindow;
 
-/// Be 2D OpenGL Driver
 class csGraphics2DGLBe : public csGraphics2DGLCommon
 {
   typedef csGraphics2DGLCommon superclass;
 protected:
-  iBeLibSystemDriver* be_system;
   CrystGLView* view;
   CrystGLWindow* window;
   color_space curr_color_space;
   BRect screen_frame;
   
 public:
-  csGraphics2DGLBe (iBase*);
+  csGraphics2DGLBe(iBase*);
   virtual ~csGraphics2DGLBe();
   
-  virtual bool Initialize (iSystem*);
-  virtual bool Open (const char* title);
-  virtual void Close ();
-  virtual bool BeginDraw ();
-  virtual void Print (csRect* area = NULL);
-  virtual void FinishDraw ();
-  virtual void ApplyDepthInfo (color_space);
+  virtual bool Initialize(iSystem*);
+  virtual bool Open(char const* title);
+  virtual void Close();
+  virtual bool BeginDraw();
+  virtual void Print(csRect* area = NULL);
+  virtual void FinishDraw();
+  virtual void ApplyDepthInfo(color_space);
 };
 
 #endif // __CS_GLBE2D_H__

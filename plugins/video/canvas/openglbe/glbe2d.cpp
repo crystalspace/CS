@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
-    Overhauled and re-engineered by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,14 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-#include <sys/param.h>
-#include <Screen.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
 #include "isystem.h"
+#include <Screen.h>
 
 IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
@@ -34,42 +31,30 @@ EXPORT_CLASS_TABLE (glbe2d)
 EXPORT_CLASS_TABLE_END
 
 csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :
-  superclass(p), be_system(0), view(0), window(0)
+  superclass(p), view(0), window(0)
 {
 }
 
-csGraphics2DGLBe::~csGraphics2DGLBe ()
+csGraphics2DGLBe::~csGraphics2DGLBe()
 {
-  if (be_system != 0)
-    be_system->DecRef();
 }
 
-bool csGraphics2DGLBe::Initialize (iSystem* p)
+bool csGraphics2DGLBe::Initialize(iSystem* p)
 {
   bool ok = csGraphics2DGLCommon::Initialize(p);
   if (ok)
   {
-    CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL version.\n");
-    be_system = QUERY_INTERFACE (System, iBeLibSystemDriver);
-    if (be_system != 0)
-    {
-      // Get current screen information.
-      BScreen screen(B_MAIN_SCREEN_ID);
-      screen_frame = screen.Frame();
-      curr_color_space = screen.ColorSpace();
-      ApplyDepthInfo(curr_color_space);
-    }
-    else
-    {
-      CsPrintf (MSG_FATAL_ERROR, "FATAL: System driver does not "
-        "implement the iBeLibSystemDriver interface\n");
-      ok = false;
-    }
+    CsPrintf (MSG_INITIALIZATION, "Crystal Space BeOS OpenGL 2D driver.\n");
+    // Get current screen information.
+    BScreen screen(B_MAIN_SCREEN_ID);
+    screen_frame = screen.Frame();
+    curr_color_space = screen.ColorSpace();
+    ApplyDepthInfo(curr_color_space);
   }
   return ok;
 }
 
-bool csGraphics2DGLBe::Open(const char* title)
+bool csGraphics2DGLBe::Open(char const* title)
 {
   int const INSET = 32;
   int const sw = screen_frame.IntegerWidth();
@@ -85,8 +70,8 @@ bool csGraphics2DGLBe::Open(const char* title)
     win_rect.Set(x, y, x + vw, y + vh);
   }
 
-  view = new CrystGLView(BRect(0, 0, vw, vh), be_system);
-  window = new CrystGLWindow(win_rect, title, view, System, be_system);
+  view = new CrystGLView(BRect(0, 0, vw, vh), System);
+  window = new CrystGLWindow(win_rect, title, view, System, this);
 	
   window->Show();
   if (window->Lock())
@@ -94,8 +79,10 @@ bool csGraphics2DGLBe::Open(const char* title)
     view->MakeFocus();
     window->Unlock();
   }
+  window->Flush();
+  System->SystemExtension("BeginUI");
 
-  return superclass::Open (title);
+  return superclass::Open(title);
 }
 
 void csGraphics2DGLBe::Close()
@@ -106,24 +93,24 @@ void csGraphics2DGLBe::Close()
   superclass::Close();
 }
 
-bool csGraphics2DGLBe::BeginDraw ()
+bool csGraphics2DGLBe::BeginDraw()
 {
-  superclass::BeginDraw ();
+  superclass::BeginDraw();
   if (FrameBufferLocked == 1)
     view->LockGL();
   return true;
 }
 
-void csGraphics2DGLBe::FinishDraw ()
+void csGraphics2DGLBe::FinishDraw()
 {
-  superclass::FinishDraw ();
+  superclass::FinishDraw();
   if (FrameBufferLocked == 0)
     view->UnlockGL();
 }
 
-void csGraphics2DGLBe::Print (csRect*)
+void csGraphics2DGLBe::Print(csRect*)
 {
-  if(view != 0)
+  if (view != 0)
   {
     view->LockGL();
     view->SwapBuffers();

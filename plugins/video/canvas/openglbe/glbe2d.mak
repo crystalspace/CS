@@ -2,7 +2,7 @@
 # to build the GLBE 2D driver -- glbe2d
 
 # Driver description
-DESCRIPTION.glbe2d = Crystal Space GL/Be 2D driver
+DESCRIPTION.glbe2d = Crystal Space BeOS OpenGL 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
