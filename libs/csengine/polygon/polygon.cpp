@@ -33,6 +33,7 @@
 #include "csengine/polygon/portal.h"
 #include "csengine/dumper.h"
 #include "csobject/nameobj.h"
+#include "csutil/cleanup.h"
 #include "igraph3d.h"
 #include "itexture.h"
 #include "itxtmgr.h"
@@ -671,10 +672,10 @@ bool csPolygon3D::ClipPoly (csVector3* frustrum, int m, bool mirror, csVector3**
     // Infinite frustrum.
     CHK (csVector3* dd = new csVector3 [num_vertices]);
     *dest = dd;
-        if(!mirror)
+    if (!mirror)
       for (i = 0 ; i < num_vertices ; i++)
         dd[i] = Vcam (i);
-        else
+    else
       for (i = 0 ; i < num_vertices ; i++)
         dd[i] = Vcam (num_vertices-i-1);
     *num_dest = num_vertices;
@@ -683,7 +684,7 @@ bool csPolygon3D::ClipPoly (csVector3* frustrum, int m, bool mirror, csVector3**
 
   CHK (csVector3* dd = new csVector3 [num_vertices+m]);     // For safety
   *dest = dd;
-  if(!mirror)
+  if (!mirror)
     for (i = 0 ; i <num_vertices ; i++)
       dd[i] = Vcam (i);
   else
@@ -1171,7 +1172,7 @@ void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
-void csPolygon3D::CalculateLightmaps (csLightView& lview)
+void csPolygon3D::FillLightmap (csLightView& lview)
 {
   if (orig_poly) return;
 
@@ -1246,7 +1247,7 @@ void csPolygon3D::CalculateLightmaps (csLightView& lview)
   else
   {
     if (lightmap_up_to_date) return;
-    tex->CalculateLightmaps (lview);
+    tex->FillLightmap (lview);
 #if 0
 //@@@
     // If there is already a lightmap1 this means that we are
@@ -1259,93 +1260,111 @@ void csPolygon3D::CalculateLightmaps (csLightView& lview)
   }
 }
 
-void csPolygon3D::ShineLightmaps (csLightView& lview)
+void csPolygon3D::CalculateLighting (csLightView* lview)
 {
-  if (orig_poly) return;
+  csPortal* po;
+  csFrustrum* light_frustrum = lview->light_frustrum;
+  csFrustrum* new_light_frustrum;
+  csVector3& center = light_frustrum->GetOrigin ();
 
-  if (uv_coords || use_flat_color)
+  // This is a static vector array which is adapted to the
+  // right size everytime it is used. In the beginning it means
+  // that this array will grow a lot but finally it will
+  // stabilize to a maximum size (not big). The advantage of
+  // this approach is that we don't have a static array which can
+  // overflow. And we don't have to do allocation every time we
+  // come here. We register this memory to the 'cleanup' array
+  // in csWorld so that it will be freed later.
+
+  // csVectorArray is a subclass of csCleanable which is registered
+  // to csWorld.cleanup.
+  class csVectorArray : public csCleanable
   {
-    // We are working for a vertex lighted polygon.
-    csLight* light = (csLight*)lview.l;
-    float rd = lview.r / light->GetRadius ();
-    float gd = lview.g / light->GetRadius ();
-    float bd = lview.b / light->GetRadius ();
+  public:
+    csVector3* array;
+    int size;
+    csVectorArray () : array (NULL), size (0) { }
+    virtual ~csVectorArray () { CHK (delete [] array); }
+  };
+  static csVectorArray* cleanable = NULL;
+  if (!cleanable)
+  {
+    CHK (cleanable = new csVectorArray ());
+    csWorld::current_world->cleanup.Push (cleanable);
+  }
 
-    if (lview.dynamic)
+  if (num_vertices > cleanable->size)
+  {
+    CHK (delete [] cleanable->array);
+    CHK (cleanable->array = new csVector3 [num_vertices]);
+    cleanable->size = num_vertices;
+  }
+  csVector3* poly = cleanable->array;
+
+  if (!plane->VisibleFromPoint (center) || ABS (plane->Classify (center)) < SMALL_EPSILON) return;
+
+  int j;
+  if (lview->mirror)
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = Vcam (num_vertices-j-1);
+  else
+    for (j = 0 ; j < num_vertices ; j++)
+      poly[j] = Vcam (j);
+  new_light_frustrum = light_frustrum->Intersect (poly, num_vertices);
+
+  if (new_light_frustrum)
+  {
+    // There is an intersection of the current light frustrum with the polygon.
+    // This means that the polygon is hit by the light.
+
+    // First compute the distance from the center of the light to the plane of
+    // the polygon. If this distance is greater than the radius of the light then
+    // we have a trivial case (no hit possible).
+    float dist_to_plane = GetPolyPlane ()->Distance (center);
+
+    bool faraway = true;
+    if (dist_to_plane < lview->l->GetRadius ())
     {
-      // Currently not yet supported. @@@
-      return;
+      // The light is close enough to the plane of the polygon. Now we calculate
+      // an accurate minimum squared distance from the light to the polygon. Note
+      // that we use the new_frustrum which is relative to the center of the light.
+      // So this algorithm works with the light position at (0,0,0) (@@@ we should
+      // use this to optimize this algorithm further).
+      csVector3 o (0, 0, 0);
+      float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
+		new_light_frustrum->GetNumVertices (),
+		*(GetPolyPlane ()), dist_to_plane*dist_to_plane);
+      if (min_sqdist < lview->l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
+    }
+
+    if (!faraway)
+    {
+      csLightView new_lview = *lview;
+      new_lview.light_frustrum = new_light_frustrum;
+      FillLightmap (new_lview);
+      po = GetPortal ();
+      if (po) po->CalculateLighting (new_lview);
+      else if (!new_lview.dynamic && csSector::do_radiosity)
+      {
+        // If there is no portal we simulate radiosity by creating
+	// a dummy portal for this polygon which reflects light.
+	csPortalCS mirror;
+	mirror.SetSector (GetSector ());
+	mirror.SetAlpha (10);
+	float r, g, b;
+	GetTextureHandle ()->GetMeanColor (r, g, b);
+	mirror.SetFilter (r/4, g/4, b/4);
+	mirror.SetWarp (csTransform::GetReflect ( *(GetPolyPlane ()) ));
+	mirror.CalculateLighting (new_lview);
+      }
     }
     else
     {
-      csColor col;
-      int i;
-      float cosfact = cosinus_factor;
-      if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
-
-      for (i = 0 ; i < num_vertices ; i++)
-      {
-        if (colors && !lview.gouroud_color_reset) col = colors[i];
-	else col.Set (0, 0, 0);
-        float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
-	if (d >= light->GetSquaredRadius ()) continue;
-	d = sqrt (d);
-	float cosinus = (Vwor (i)-light->GetCenter ())*GetPolyPlane ()->Normal ();
-	cosinus /= d;
-	cosinus += cosfact;
-	if (cosinus < 0) cosinus = 0;
-	else if (cosinus > 1) cosinus = 1;
-	col.red = col.red + cosinus * rd*(light->GetRadius () - d);
-	if (col.red > 1) col.red = 1;
-	col.green = col.green + cosinus * gd*(light->GetRadius () - d);
-	if (col.green > 1) col.green = 1;
-	col.blue = col.blue + cosinus * bd*(light->GetRadius () - d);
-	if (col.blue > 1) col.blue = 1;
-        SetColor (i, col);
-      }
+      CHK (delete new_light_frustrum);
     }
-    return;
-  }
-
-  if (lview.gouroud_only) return;
-
-  if (lview.dynamic)
-  {
-    // We are working for a dynamic light. In this case we create
-    // a light patch for this polygon.
-    CHK (csLightPatch* lp = new csLightPatch ());
-    AddLightpatch (lp);
-    csDynLight* dl = (csDynLight*)lview.l;
-    dl->AddLightpatch (lp);
-
-    lp->num_vertices = lview.num_frustrum;
-    CHK (lp->vertices = new csVector3 [lview.num_frustrum]);
-
-    int i, mi;
-    for (i = 0 ; i < lview.num_frustrum ; i++)
-    {
-      if (lview.mirror) mi = lview.num_frustrum-i-1;
-      else mi = i;
-      //lp->vertices[i] = lview.frustrum[mi] + lview.center;
-      lp->vertices[i] = lview.frustrum[mi];
-    }
-
-  }
-  else
-  {
-    if (lightmap_up_to_date) return;
-    tex->ShineLightmaps (lview);
-#if 0
-//@@@
-    // If there is already a lightmap1 this means that we are
-    // redoing lighting at run-time. In that case we also
-    // need to update the other mipmap levels.
-    // @@@ We need specific functionality for this.
-    // Doing this with create_lightmaps is NOT efficient.
-    if (lightmap1) create_lightmaps ();
-#endif
   }
 }
+
 
 void csPolygon3D::CacheLightmaps (csPolygonSet* owner, int index)
 {

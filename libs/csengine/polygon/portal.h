@@ -243,15 +243,9 @@ public:
   virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly) = 0;
 
   /**
-  @@@OBSOLETE
-   * Update lightmaps of all polygons reachable through this portal.
+   * Update lighting of all polygons reachable through this portal.
    */
-  virtual void ShineLightmaps (csLightView& lview) = 0;
-
-  /**
-   * Update lightmaps of all polygons reachable through this portal.
-   */
-  virtual void CalculateLightmaps (csLightView& lview) = 0;
+  virtual void CalculateLighting (csLightView& lview) = 0;
 
   /**
    * Dump frustrum of all polygons reachable through this portal
@@ -318,15 +312,9 @@ public:
   virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly);
 
   /**
-   @@@OBSOLETE
-   * Update lightmaps of all polygons visible through this portal.
+   * Update lighting of all polygons visible through this portal.
    */
-  virtual void CalculateLightmaps (csLightView& lview);
-
-  /**
-   * Update lightmaps of all polygons visible through this portal.
-   */
-  virtual void ShineLightmaps (csLightView& lview);
+  virtual void CalculateLighting (csLightView& lview);
 
   /**
    * Dump frustrum of all polygons reachable through this portal

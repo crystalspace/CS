@@ -673,7 +673,7 @@ public:
    * This function also converts the lightmaps to the correct
    * format required by the 3D driver. This function does NOT
    * create the first lightmap. This is done by the precalculated
-   * lighting process (using ShineLightmaps()).
+   * lighting process (using CalculateLighting()).
    */
   void CreateLightmaps (IGraphics3D* g3d);
 
@@ -741,7 +741,7 @@ public:
 
   /**
    * Initialize the lightmaps for this polygon.
-   * Should be called before calling ShineLightmaps() and before
+   * Should be called before calling CalculateLighting() and before
    * calling CacheLightmaps().<p>
    *
    * This function will try to read the lightmap from the
@@ -754,8 +754,7 @@ public:
   void InitLightmaps (csPolygonSet* owner, bool do_cache, int index);
 
   /**
-  @@@OBSOLETE
-   * Update the lightmap of this polygon according to the given light and
+   * Fill the lightmap of this polygon according to the given light and
    * the frustrum. The light is given in world space coordinates. The
    * view frustrum is given in camera space (with (0,0,0) the origin
    * of the frustrum). The camera space used is just world space translated
@@ -763,21 +762,17 @@ public:
    * If the lightmaps were cached in the level archive this function will
    * do nothing.
    */
-  void ShineLightmaps (csLightView& lview);
+  void FillLightmap (csLightView& lview);
 
   /**
-   * Update the lightmap of this polygon according to the given light and
-   * the frustrum. The light is given in world space coordinates. The
-   * view frustrum is given in camera space (with (0,0,0) the origin
-   * of the frustrum). The camera space used is just world space translated
-   * so that the center of the light is at (0,0,0).
-   * If the lightmaps were cached in the level archive this function will
-   * do nothing.
+   * Check visibility of this polygon with the given csLightView
+   * and fill the lightmap if needed (this function calls FillLightmap ()).
+   * This function will also traverse through a portal if so needed.
    */
-  void CalculateLightmaps (csLightView& lview);
+  void CalculateLighting (csLightView* lview);
 
   /**
-   * Call after calling InitLightmaps and ShineLightmaps to cache
+   * Call after calling InitLightmaps and CalculateLighting to cache
    * the calculated lightmap to the level archive. This function does
    * nothing if the cached lightmap was already up-to-date.
    */

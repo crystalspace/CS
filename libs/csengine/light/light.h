@@ -295,18 +295,19 @@ public:
 
   /**
    * Shine this light on all polygons visible from the light.
-   * This routine will update the lightmaps of all polygons.
+   * This routine will update the lightmaps of all polygons or
+   * update the vertex colors if gouraud shading is used.
    * It correctly takes pseudo-dynamic lights into account and will then
    * update the corresponding shadow map.
    */
-  void ShineLightmaps ();
+  void CalculateLighting ();
 
   /**
    * Shine this light on all polygons of the csThing.
    * Only backface culling is used. The light is assumed
    * to be in the same sector as the csThing.
    */
-  void ShineLightmaps (csThing* th);
+  void CalculateLighting (csThing* th);
 
   /**
    * This is a debugging function that will show the outlines

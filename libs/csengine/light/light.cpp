@@ -59,6 +59,7 @@ csLight::~csLight ()
 void csLight::CorrectForNocolor (unsigned char* rp, unsigned char* gp,
 					unsigned char* bp)
 {
+(void)rp; (void)gp; (void)bp;
 //@@@
 #if 0
   if (Textures::mixing == MIX_TRUE_RGB)
@@ -97,6 +98,7 @@ void csLight::CorrectForNocolor (unsigned char* rp, unsigned char* gp,
 
 void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 {
+(void)rp; (void)gp; (void)bp;
 //@@@
 #if 0
   if (Textures::mixing == MIX_TRUE_RGB)
@@ -150,12 +152,11 @@ csStatLight::~csStatLight ()
   CHK (delete [] polygons);
 }
 
-void csStatLight::ShineLightmaps ()
+void csStatLight::CalculateLighting ()
 {
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
   lview.l = this;
-  lview.center = center;
   lview.mirror = false;
   lview.gouroud_only = false;
   lview.gouroud_color_reset = false;
@@ -164,19 +165,16 @@ void csStatLight::ShineLightmaps ()
   lview.b = GetColor ().blue;
   lview.dynamic = false;
 
-  sector->ShineLightmaps (lview);
-
-  //CHK (lview.light_frustrum = new csFrustrum (center));
-  //lview.light_frustrum->MakeInfinite ();
-  //sector->CalculateLightmaps (lview);
+  CHK (lview.light_frustrum = new csFrustrum (center));
+  lview.light_frustrum->MakeInfinite ();
+  sector->CalculateLighting (lview);
 }
 
-void csStatLight::ShineLightmaps (csThing* th)
+void csStatLight::CalculateLighting (csThing* th)
 {
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
   lview.l = this;
-  lview.center = center;
   lview.mirror = false;
   lview.gouroud_only = false;
   lview.gouroud_color_reset = false;
@@ -184,7 +182,10 @@ void csStatLight::ShineLightmaps (csThing* th)
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = false;
-  th->ShineLightmaps (lview);
+
+  CHK (lview.light_frustrum = new csFrustrum (center));
+  lview.light_frustrum->MakeInfinite ();
+  th->CalculateLighting (lview);
 }
 
 
@@ -259,9 +260,6 @@ void csDynLight::Setup ()
   while (lightpatches) CHKB (delete lightpatches);
   csLightView lview;
   lview.l = this;
-  lview.center = center;
-  lview.frustrum = NULL;
-  lview.num_frustrum = 0;
   lview.mirror = false;
   lview.gouroud_only = false;
   lview.gouroud_color_reset = false;
@@ -269,7 +267,10 @@ void csDynLight::Setup ()
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = true;
-  sector->ShineLightmaps (lview);
+
+  CHK (lview.light_frustrum = new csFrustrum (center));
+  lview.light_frustrum->MakeInfinite ();
+  sector->CalculateLighting (lview);
 }
 
 void csDynLight::Move (csSector* sector, float x, float y, float z)

@@ -199,16 +199,9 @@ public:
   void InitLightmaps (bool do_cache = true);
 
   /**
-  @@@OBSOLETE
-   * Update all lightmaps on this thing for the given light.
-   * If lview.frustrum == NULL everything is full visible (infinite frustrum).
+   * Update all lighting on this thing for the given light.
    */
-  void ShineLightmaps (csLightView& lview);
-
-  /**
-   * Update all lightmaps on this thing for the given light.
-   */
-  void CalculateLightmaps (csLightView& lview);
+  void CalculateLighting (csLightView& lview);
 
   /**
    * Cache the lightmaps for all polygons in this thing.

@@ -235,15 +235,9 @@ public:
   void InitLightmaps ();
 
   /**
-  @@@OBSOLETE
-   * Update the lightmaps for the given light.
+   * Update the lightmap for the given light.
    */
-  void ShineLightmaps (csLightView& lview);
-
-  /**
-   * Update the lightmaps for the given light.
-   */
-  void CalculateLightmaps (csLightView& lview);
+  void FillLightmap (csLightView& lview);
 
   /**
    * Update the real lightmap for a given csLightPatch
