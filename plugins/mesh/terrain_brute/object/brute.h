@@ -230,7 +230,7 @@ private:
   int numindices[16];
 
   csRef<iMaterialWrapper> matwrap;
-  csArray<iMaterialWrapper*> palette;
+  csArray<iMaterialWrapper*> palette;	// TODO@@@ Use csRefArray!!!
   csRefArray<iImage> alphas;
 
   float error_tolerance;

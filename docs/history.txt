@@ -9,6 +9,12 @@ chronological order.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.
+	- Jorrit fixed a problem with meshes that didn't keep their pointer
+	  to the material wrapper in a csRef. This could cause problems with
+	  games that use regions to load/unload parts of the world and when
+	  materials are being shared between regions. Warning! Having the
+	  meshes keep materials with a real reference will not avoid the
+	  material from being deleted from the engine lists.
 30-Jun-2004
 	- Peter Amstutz added search support to the csvosa3dl plugin,
 	  so that VOS servers with search support can send the world

@@ -288,7 +288,7 @@ private:
   friend class csSprite3DMeshObject;
 
   /// Material handle as returned by iTextureManager.
-  iMaterialWrapper* cstxt;
+  csRef<iMaterialWrapper> cstxt;
   iBase* logparent;
 
   /// Cache name for caching sprite specific data.
@@ -1225,7 +1225,7 @@ private:
   csSprite3DMeshObjectFactory* factory;
 
   /// The material handle as returned by iTextureManager.
-  iMaterialWrapper* cstxt;
+  csRef<iMaterialWrapper> cstxt;
 
   /// The current frame number.
   int cur_frame;

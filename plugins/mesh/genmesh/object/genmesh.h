@@ -100,7 +100,7 @@ private:
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   bool material_needs_visit;
   uint MixMode;
   iMeshObjectDrawCallback* vis_cb;
@@ -446,7 +446,7 @@ private:
   iVertexBufferManager* vbufmgr;
   G3DTriangleMesh top_mesh;
 #endif
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csVector3* mesh_normals;

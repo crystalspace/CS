@@ -56,7 +56,7 @@ private:
   float radiusx, radiusy, radiusz;
   csVector3 max_radius;
   csVector3 shift;
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
   uint MixMode;
   iMeshObjectDrawCallback* vis_cb;
   bool reversed;

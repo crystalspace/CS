@@ -288,7 +288,7 @@ private:
 
   csColor basecolor;
   csRef<iMaterialWrapper> matwrap;
-  csArray<iMaterialWrapper*> palette;
+  csArray<iMaterialWrapper*> palette;	// TODO@@@ Use csRefArray!!!
   csRefArray<iImage> alphas;
 
   csDirtyAccessArray<csColor> staticLights;

@@ -55,7 +55,7 @@ public:
   int num_mesh_vertices[LOD_LEVELS];
   G3DTriangleMesh mesh[LOD_LEVELS];	// Mesh with four LOD levels.
   csVector3* normals[LOD_LEVELS];	// Array of normals for the LOD levels.
-  iMaterialWrapper* material;		// Material for this block.
+  csRef<iMaterialWrapper> material;	// Material for this block.
   csVector3 center;			// Center for LOD.
   // Numbers of all meshes. Here we can see if we need to update the lighting
   // for a mesh and LOD.
