@@ -39,11 +39,13 @@ public:
 
   /**
    * Open a new string reader on the given input.
+   * 'input' must point to a null terminated character buffer.
    */
   csStringReader (const char* input);
 
   /**
    * Set input buffer.
+   * 'input' must point to a null terminated character buffer.
    */
   void SetInput (const char* input);
 

@@ -45,7 +45,7 @@ void csStringReader::Reset ()
 bool csStringReader::GetLine (csString& line)
 {
   line.Clear ();
-  if (cur == 0 || *cur == 0) return false;
+  if (!HasMoreLines ()) return false;
   const char* end = cur + strcspn (cur, "\n\r");
   line.Append (cur, end-cur);
   cur = end;
