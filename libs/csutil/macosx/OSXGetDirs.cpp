@@ -57,7 +57,7 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
     is_gui = false;
     int const n = apppath.Length();
     int const ngrist = sizeof(OSX_WRAPPER_GRIST) - 1;
-    if (strcasecmp(apppath + n - ngrist, OSX_WRAPPER_GRIST) == 0) // GUI app.
+    if (strcasecmp((char const*)apppath + n - ngrist, OSX_WRAPPER_GRIST) == 0)
     {
       is_gui = true;
       apppath.Truncate(n - ngrist);
