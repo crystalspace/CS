@@ -80,7 +80,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
 {
-  CS_ASSERT (object_reg != NULL);
+  CS_ASSERT (r != NULL);
   object_reg = r;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   // Get the system parameters
