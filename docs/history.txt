@@ -11,7 +11,8 @@ chronological order.
 	  upon the xmessage program, utilizes the Xaw toolkit and is enabled
 	  if the latter is detected by configure.
 14-Dec-2004
-	- PK replaced the old, csws using viewmesh with a new, aws using version.
+	- PK replaced the old, CSWS-based viewmesh with a new AWS-based
+	  version.
 13-Dec-2004
 	- Marten removed the old renderer and methods/classes/plugins
 	  deprecated together with it, for closer info about which see the
