@@ -30,7 +30,7 @@ class csMovable;
 class csMeshWrapper;
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : public csRefArrayObject<iSector>
+class csMovableSectorList : public iBase, public csRefArrayObject<iSector>
 {
 private:
   csMovable* movable;

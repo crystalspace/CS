@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Oct-2003
+	- Jorrit fixed a bug in csMovableSectorList which did all the needed
+	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for
+	  some reason this only causes crashes on linux with a static build
+	  and new renderer enabled and while using profile mode???
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:
