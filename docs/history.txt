@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  can be found when they reside in CS/libs (rather than an official
 	  install location) even when building outside of the source directory
 	  (i.e. building CS from CD-ROM, or cross-compiling, etc.).
+	- Eric Sunshine fixed the perl5tst Jamfile so that it is governed by
+	  the same constraints as the csperl5 Jamfile (that is, perl5tst is
+	  only enabled if a usable Perl installation was discoverd during the
+	  configuration process).
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
