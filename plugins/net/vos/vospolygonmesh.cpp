@@ -336,7 +336,7 @@ void ConstructPolygonMeshTask::doTask()
       //thingstate->SetMovingOption(CS_THING_MOVE_OCCASIONAL);
       thingstate->SetMovingOption(CS_THING_MOVE_NEVER);
 
-      thingfac->GetFlags().Set(CS_THING_NOCOMPRESS);
+      factory->GetMeshObjectFactory()->GetFlags().Set(CS_THING_NOCOMPRESS);
       meshwrapper->GetFlags().Set(CS_ENTITY_NOSHADOWS);
 
       //transformgroup->GetChildren()->Add(meshwrapper);
