@@ -27,6 +27,7 @@
 struct iEngine;
 struct iPluginManager;
 struct iObjectRegistry;
+struct iSyntaxService;
 
 /**
  * Thing loader.
@@ -36,6 +37,7 @@ class csThingLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -98,6 +100,7 @@ class csPlaneLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;
