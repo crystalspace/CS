@@ -91,10 +91,8 @@ rule CompileObject
   
   if $(HDRRULE_$(>:S))
   {
-    echo Customrule: $(>) ;
     HDRRULE on $(>) = $(HDRRULE_$(>:S)) ;
     HDRSCAN on $(>) = $(HDRPATTERN_$(>:S)) ;
-    echo pattern: $(HDRPATTERN_$(>:S)) ;
   }
   else
   {
@@ -132,9 +130,6 @@ rule HeaderRule
   # set SEARCH so Jam can find the headers, but then say we don't
   # care if we can't actually find the headers (they may have been
   # within ifdefs),
-
-  echo H: $(<) $(>) ;
-
   local s = $(>:G=$(HDRGRIST:E)) ;
                                                                                 
   Includes $(<) : $(s) ;

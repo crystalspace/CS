@@ -12,6 +12,7 @@ if $(CMD.FLEX)
     # with their source.
     MakeLocate $(<) : $(SUBDIR) ;
     Clean clean : $(<) ;
+    FLEX.FLAGS on $(<) += $(FLEX.FLAGS) ;
   }
   RegisterFileType Flex : .l ;
 

@@ -1,16 +1,33 @@
 SubDir TOP plugins cscript cspython ;
 
+# disabled for now
 if $(PYTHON.AVAILABLE) = "yes"
 {
-  if $(CMD.SSSWIG)
+  if $(CMD.SWIG)
   {
-    Swig cs_pyth.cpp : include/ivaria/cspace.i : 
-		       include/ivaria/pythpre.i include/ivaria/pythpost.i : 
-		       -python -c++ -shadow -Iinclude/ ;
+    # We need to work a bit on our own, because we create cs_pyth.cpp from
+    # cspaci.i instead of cspace.cpp.
+    local target = [ FGristFiles cs_pyth.cpp ] ;
+    local sources = [ FGristFiles cspace.i ] ;
+    
+    # source files are not in current directory
+    SEARCH on $(sources) = $(TOP)/include/ivaria ;
+        
+    # scan for special swig includes
+    HDRRULE on $(target) = HeaderRule ;
+    HDRSCAN on $(target) = $(SWIG.HDRPATTERN) ;
+    SWIG.FLAGS on $(target) += -python -c++ -shadow -I$(TOP)/include ;
+
+    Swig $(target) : $(sources) ;
   }
-  Plugin cspython : cs_pyth.cpp cspython.h cspython.cpp pytocs.h pytocs.cpp ;
-  LinkWith cspython : $(dep.cspython) ;
+  
+  Plugin cspython : 
+      cs_pyth.cpp cspython.h cspython.cpp pytocs.h pytocs.cpp
+  ;
+  LinkWith cspython : cstool csgfx csgeom csutil cssys ;
   ExternalLibs cspython : PYTHON ;
   Help cspython : "Crystal Script Python plug-in" ;
 }
+
 SubDir TOP plugins cscript cspython ;
+

@@ -213,12 +213,14 @@ AS_IF([test -n "$INSTALL"], [CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])])
 AC_PROG_RANLIB
 AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])])
 
-AC_CHECK_PROGS([SWIGBIN], [swig])
-AS_IF([test -n "$SWIGBIN"], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])
+# XXX: disabled for now until we have a good check for teh correct swig version
+#AC_CHECK_PROGS([SWIGBIN], [swig])
+#AS_IF([test -n "$SWIGBIN"], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])
 
-AC_CHECK_PROGS([LUASWIGBIN], [luaswig])
-AS_IF([test -n "$LUASWIGBIN"],
-    [CS_BUILD_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
+# XXX: disabled for now until we have a good check for teh correct swig version
+#AC_CHECK_PROGS([LUASWIGBIN], [luaswig])
+#AS_IF([test -n "$LUASWIGBIN"],
+#    [CS_BUILD_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
 
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_CHECK_PROGS([JAM], [jam])

@@ -41,6 +41,11 @@ The history order is reversed so that new features are at the top.
 	      only when the value is "yes".  This was necessary because
 	      CS/mk/cache.mak prints the value of this variable as part of
 	      $(SYSMODIFIER).
+	- Matze did the following changes to the jam rules:
+	    - added the possibilities to use custom header scan patterns.
+	      Added custom headerscanpatterns to the nasm and swig rules.
+	    - Improved the swig rules.
+	    - Cleaned the bison and flex rules a bit.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if
