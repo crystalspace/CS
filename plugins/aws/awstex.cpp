@@ -9,16 +9,11 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
-
-#include <stdio.h>
-
-
 #include "awstex.h"
+#include "awsadler.h"
 #include <string.h>
 #include <stdio.h>
 
-
-extern unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
 
 const bool DEBUG_GETTEX = true;
 

@@ -51,6 +51,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine re-added `gcc' to C++ compiler search list used by
 	  unixconf.sh.  Also added `cc' to the C++ compiler search list, since
 	  `cc' is a valid way to invoke the C++ back-end on some platforms.
+	- Eric Sunshine eliminated several compilation warnings from
+	  awsmgr.cpp.
+	- Eric Sunshine fixed problem where aws_adler32() was defined by
+	  multiple implementation files.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:

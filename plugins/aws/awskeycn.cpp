@@ -5,10 +5,7 @@
 #include "csutil/csdllist.h"
 #include "ivaria/aws.h"
 #include "awsprefs.h"
-
-
-extern unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
-
+#include "awsadler.h"
 
 awsKey *
 awsKeyContainer::Find(iString *n)
